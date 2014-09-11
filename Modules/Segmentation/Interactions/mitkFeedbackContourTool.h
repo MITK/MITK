@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkFeedbackContourTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkSegTool2D.h"
-#include "mitkContourModel.h"
-#include "mitkContourUtils.h"
+#include "mitkContourModelUtils.h"
+#include "mitkContourUtils.h" //TODO remove legacy support
 #include "mitkImage.h"
 
 #include "mitkDataNode.h"
@@ -50,7 +50,7 @@ namespace mitk
 
   $Author: nolden $
 */
-class Segmentation_EXPORT FeedbackContourTool : public SegTool2D
+class MitkSegmentation_EXPORT FeedbackContourTool : public SegTool2D
 {
   public:
 
@@ -84,7 +84,7 @@ class Segmentation_EXPORT FeedbackContourTool : public SegTool2D
 
       \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
-    ContourModel::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, bool correctionForIpSegmentation = false);
+    ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, ContourModel* contourIn2D, bool correctionForIpSegmentation = false);
 
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.
@@ -102,7 +102,6 @@ class Segmentation_EXPORT FeedbackContourTool : public SegTool2D
     DataNode::Pointer m_FeedbackContourNode;
     bool                  m_FeedbackContourVisible;
 
-    ContourUtils::Pointer m_ContourUtils;
 };
 
 } // namespace

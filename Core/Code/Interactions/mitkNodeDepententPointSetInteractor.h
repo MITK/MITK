@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNodeDepententPointSetInteractor_H_HEADER_INCLUDED
 #define MITKNodeDepententPointSetInteractor_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
-#include "mitkVector.h"
+#include <MitkCoreExports.h>
+#include "mitkNumericTypes.h"
 #include <mitkInteractor.h>
 #include <mitkDataNode.h>
 #include <mitkPointSetInteractor.h>
@@ -40,12 +40,17 @@ namespace mitk
    * See bug #6047 for further information and a patch to test this class embedded in tutorial Step 5.
    * \ingroup Interaction
    */
+
+  /**
+  * \deprecatedSince{2014_03} mitk::ConnectPointsInteractor is deprecated. Needs to be updated to the new interaction-framework.
+  * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
+  */
   class MITK_CORE_EXPORT NodeDepententPointSetInteractor : public PointSetInteractor
   {
   public:
     mitkClassMacro(NodeDepententPointSetInteractor, PointSetInteractor);
-    mitkNewMacro4Param(Self, const char*, DataNode*, DataNode*, int);
-    mitkNewMacro3Param(Self, const char*, DataNode*, DataNode*);
+    DEPRECATED() mitkNewMacro4Param(Self, const char*, DataNode*, DataNode*, int);
+    DEPRECATED() mitkNewMacro3Param(Self, const char*, DataNode*, DataNode*);
 
     /**
      * \brief Checks visibility of the specified node (e.g. image),

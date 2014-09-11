@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 
 typedef mitk::ToFProcessingCommon::ToFPoint2D ToFPoint2D;
-typedef mitk::ToFProcessingCommon::ToFScalarType ToFScalarType;
+typedef float ToFScalarType;
 typedef itk::Image<ToFScalarType,2> ItkImageType_2D;
 typedef itk::Image<ToFScalarType,3> ItkImageType_3D;
 typedef itk::ImageRegionIterator<ItkImageType_2D> ItkImageRegionIteratorType2D;
@@ -71,7 +71,7 @@ static bool ApplyTemporalMedianFilter(mitk::Image::Pointer& image, ItkImageType_
 
   //initialize median filtering
   std::vector<ToFScalarType> allDistances;
-  mitk::Index3D curIdx3D;
+  itk::Index<3> curIdx3D;
   ItkImageType_2D::IndexType curIdx2D;
 
   //compute median over time for each (x,y)
@@ -107,37 +107,6 @@ static bool ApplyTemporalMedianFilter(mitk::Image::Pointer& image, ItkImageType_
   }
   return true;
 
-}
-
-static bool CompareImages(mitk::Image::Pointer image1, mitk::Image::Pointer image2)
-{
-
-  unsigned int dimX = image1->GetDimension(0);
-  unsigned int dimY = image1->GetDimension(1);
-
-  //make sure images have the same dimensions
-  if((dimX != image1->GetDimension(0)) || (dimY != image1->GetDimension(1)))
-    return false;
-
-  //compare all pixel values
-  mitk::ImagePixelReadAccessor<ToFScalarType,2> image1Acces(image1, image1->GetSliceData(0));
-  mitk::ImagePixelReadAccessor<ToFScalarType,2> image2Acces(image2, image2->GetSliceData(0));
-  for(unsigned int i = 0; i<dimX; i++)
-  {
-    for(unsigned int j = 0; j < dimY; j++)
-    {
-      itk::Index<2> idx;
-      idx[0] = i; idx[1] = j;
-      if(!(mitk::Equal(image1Acces.GetPixelByIndex(idx), image2Acces.GetPixelByIndex(idx))))
-      {
-        return false;
-      }
-
-    }
-  }
-
-  //all pixels have identical values
-  return true;
 }
 
 bool CreateRandomDistanceImage(unsigned int dimX, unsigned int dimY, ItkImageType_2D::Pointer& itkImage, mitk::Image::Pointer& mitkImage) //TODO warum ITK image?
@@ -282,8 +251,8 @@ int mitkToFCompositeFilterTest(int /* argc */, char* /*argv*/[])
   mitk::Image::Pointer itkOutputImageConverted;
   mitk::CastToMitkImage(itkOutputImage,itkOutputImageConverted);
 
-  bool pipelineSuccess = CompareImages(itkOutputImageConverted,mitkOutputImage);
-  MITK_TEST_CONDITION_REQUIRED(pipelineSuccess,"Test threshold filter in pipeline");
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(itkOutputImageConverted,mitkOutputImage,mitk::eps,true),
+                                "Test threshold filter in pipeline");
 
   //-------------------------------------------------------------------------------------------------------
 
@@ -301,8 +270,8 @@ int mitkToFCompositeFilterTest(int /* argc */, char* /*argv*/[])
   //compare output
   mitk::CastToMitkImage(itkOutputImage,itkOutputImageConverted);
 
-  pipelineSuccess = CompareImages(itkOutputImageConverted,mitkOutputImage);
-  MITK_TEST_CONDITION_REQUIRED(pipelineSuccess,"Test threshold and median filter in pipeline");
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(itkOutputImageConverted,mitkOutputImage,mitk::eps,true),
+                               "Test threshold and median filter in pipeline");
 
 
   //-------------------------------------------------------------------------------------------------------
@@ -321,33 +290,36 @@ int mitkToFCompositeFilterTest(int /* argc */, char* /*argv*/[])
   //compare output
   mitk::CastToMitkImage(itkOutputImage,itkOutputImageConverted);
 
-  pipelineSuccess = CompareImages(itkOutputImageConverted,mitkOutputImage);
-  MITK_TEST_CONDITION_REQUIRED(pipelineSuccess,"Test threshold filter, bilateral filter and temporal median filter in pipeline");
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(itkOutputImageConverted,mitkOutputImage,mitk::eps,true),
+                               "Test threshold filter, bilateral filter and temporal median filter in pipeline");
 
 
   //-------------------------------------------------------------------------------------------------------
+  // TODO: Rewrite this. This don't make sense. the itk reference applies a median filter
+  // and threshold filter afterwards. The composite filter does it in the other directtion.
+  // also the input of random image stacks is never set into the composite filter
 
   //Apply all filters
 
   //generate image stack
-  ItkImageType_3D::Pointer itkInputImage3D = ItkImageType_3D::New();
-  mitk::Image::Pointer mitkImage3D = mitk::Image::New();
-  CreateRandomDistanceImageStack(100,100,12,itkInputImage3D,mitkImage3D);
-
-  //standard variant
-  ItkImageType_2D::Pointer medianFilteredImage = ItkImageType_2D::New();
-  ApplyTemporalMedianFilter(mitkImage3D,medianFilteredImage);
-  thresholdFilter->SetInput(medianFilteredImage);
-  itkOutputImage->Update();
-
-  //variant with composite filter
-  compositeFilter->SetApplyTemporalMedianFilter(true);
-  mitkOutputImage->Update();
-
-  //compare output
-  mitk::CastToMitkImage(itkOutputImage,itkOutputImageConverted);
-  pipelineSuccess = CompareImages(itkOutputImageConverted,mitkOutputImage);
-  MITK_TEST_CONDITION_REQUIRED(pipelineSuccess,"Test all filters in pipeline");
+//  ItkImageType_3D::Pointer itkInputImage3D = ItkImageType_3D::New();
+//  mitk::Image::Pointer mitkImage3D = mitk::Image::New();
+//  CreateRandomDistanceImageStack(100,100,12,itkInputImage3D,mitkImage3D);
+//
+//  //standard variant
+//  ItkImageType_2D::Pointer medianFilteredImage = ItkImageType_2D::New();
+//  ApplyTemporalMedianFilter(mitkImage3D,medianFilteredImage);
+//  thresholdFilter->SetInput(medianFilteredImage);
+//  itkOutputImage->Update();
+//
+//  //variant with composite filter
+//  compositeFilter->SetApplyTemporalMedianFilter(true);
+//  mitkOutputImage->Update();
+//
+//  //compare output
+//  mitk::CastToMitkImage(itkOutputImage,itkOutputImageConverted);
+//  pipelineSuccess = CompareImages(itkOutputImageConverted,mitkOutputImage);
+//  MITK_TEST_CONDITION_REQUIRED(pipelineSuccess,"Test all filters in pipeline");
 
 
 //-------------------------------------------------------------------------------------------------------
@@ -376,5 +348,3 @@ int mitkToFCompositeFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_END();
 
 }
-
-

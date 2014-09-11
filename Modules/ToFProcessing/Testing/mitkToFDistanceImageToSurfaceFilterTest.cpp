@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageGenerator.h>
 #include <mitkSurface.h>
 #include <mitkToFProcessingCommon.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkToFTestingCommon.h>
 #include <mitkIOUtil.h>
 
@@ -336,10 +336,10 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
         MITK_ERROR << "Image read exception!" << e.what();
     }
 
-    if (!mitk::Equal(distanceBackward,resultPointBackward[2]))
+    if (!mitk::Equal(distanceBackward,(float) resultPointBackward[2]))
     {
-//      MITK_INFO<<"expected: "<< image->GetPixelValueByIndex(pixelIndex);
-//      MITK_INFO<<"result: "<< resultPoint;
+      MITK_INFO<<"expected: " << resultPointBackward[2];
+      MITK_INFO<<"result: "<< distanceBackward;
       compareToInput = false;
     }
   }
@@ -372,7 +372,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
         MITK_ERROR << "Image read exception!" << e.what();
     }
 
-    if (!mitk::Equal(distanceBackward,resultPointBackward[2]))
+    if (!mitk::Equal(distanceBackward, (float) resultPointBackward[2]))
     {
 //      MITK_INFO<<"expected: "<< image->GetPixelValueByIndex(pixelIndex);
 //      MITK_INFO<<"result: "<< resultPoint;

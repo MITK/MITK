@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPositionTracker_H
 #define MITKPositionTracker_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkStateMachine.h"
 
 

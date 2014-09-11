@@ -162,7 +162,7 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     {
         mitk::Image::Pointer mitkBinaryImg = dynamic_cast<mitk::Image*>(m_SignalRegionNodes.at(i)->GetData());
         ItkUcharImgType::Pointer signalRegion = ItkUcharImgType::New();
-        mitk::CastToItkImage<ItkUcharImgType>(mitkBinaryImg, signalRegion);
+        mitk::CastToItkImage(mitkBinaryImg, signalRegion);
         m_SignalRegions.push_back(signalRegion);
     }
 
@@ -251,7 +251,7 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
 
     mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
     image->SetVectorImage( filter->GetOutput() );
-    image->SetB_Value(bVal);
+    image->SetReferenceBValue(bVal);
     image->SetDirections(gradientList);
     image->InitializeFromVectorImage();
     mitk::DataNode::Pointer node = mitk::DataNode::New();
@@ -320,7 +320,7 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
 
     if (m_Controls->m_OutputVectorFieldBox->isChecked())
     {
-        mitk::Geometry3D::Pointer geometry = image->GetGeometry();
+        mitk::BaseGeometry::Pointer geometry = image->GetGeometry();
         mitk::Vector3D outImageSpacing = geometry->GetSpacing();
         float minSpacing = 1;
         if(outImageSpacing[0]<outImageSpacing[1] && outImageSpacing[0]<outImageSpacing[2])

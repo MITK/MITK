@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkToolManager_h_Included
 
 #include "mitkTool.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vector>
 #include <map>
+
+#include "usServiceRegistration.h"
 
 namespace mitk
 {
@@ -83,7 +85,7 @@ class PlaneGeometry;
 
   $Author$
 */
-class Segmentation_EXPORT ToolManager : public itk::Object
+class MitkSegmentation_EXPORT ToolManager : public itk::Object
 {
   public:
 
@@ -184,6 +186,13 @@ class Segmentation_EXPORT ToolManager : public itk::Object
     */
     void SetRoiData(DataNode*);
 
+    /**
+      * If set to true the mitk::GlobalInteraction just informs
+      * the active tool about new mitk::StateEvent but no other
+      * Interactor or Statemachine
+      */
+    void ActivateExclusiveStateEventPolicy(bool);
+
     /*
       \brief Get the list of reference data.
     */
@@ -269,6 +278,7 @@ class Segmentation_EXPORT ToolManager : public itk::Object
 
     Tool* m_ActiveTool;
     int m_ActiveToolID;
+    us::ServiceRegistration<InteractionEventObserver> m_ActiveToolRegistration;
 
     DataVectorType m_ReferenceData;
     NodeTagMapType  m_ReferenceDataObserverTags;
@@ -282,6 +292,8 @@ class Segmentation_EXPORT ToolManager : public itk::Object
     int m_RegisteredClients;
 
     WeakPointer<DataStorage> m_DataStorage;
+
+    bool m_ExclusiveStateEventPolicy;
 
     /// \brief Callback for NodeRemove events
     void OnNodeRemoved(const mitk::DataNode* node);

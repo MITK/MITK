@@ -96,7 +96,6 @@ mitk::Dispatcher::~Dispatcher()
 bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 {
   InteractionEvent::Pointer p = event;
-  //MITK_INFO << event->GetEventClass();
   bool eventIsHandled = false;
   /* Filter out and handle Internal Events separately */
   InternalEvent* internalEvent = dynamic_cast<InternalEvent*>(event);
@@ -117,9 +116,11 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
     {
       m_ProcessingMode = REGULAR;
       eventIsHandled = m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode());
+      // delete reference to interactor as soon as connected action is finished
+      m_SelectedInteractor = NULL;
     }
     // give event to selected interactor
-    if (eventIsHandled == false)
+    if (eventIsHandled == false && m_SelectedInteractor.IsNotNull())
     {
       eventIsHandled = m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode());
     }

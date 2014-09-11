@@ -24,7 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 
 /*!
-  \brief View displaying details of the orientation distribution function in the voxel at the current crosshair position.
+  \brief Generate float image with artificial frequency maps used by Fiberfox. Simulates additional frequencies at (possibly multiple) positions based on 3D gaussians with the specified variance and amplitude and/or as a linear gradient in the image.
+* See "Fiberfox: Facilitating the creation of realistic white matter software phantoms" (DOI: 10.1002/mrm.25045) for details.
 
   \sa QmitkFunctionality
   \ingroup Functionalities

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkExtractSliceFilter_h_Included
 
 
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 #include "mitkImageToImageFilter.h"
 #include <vtkSmartPointer.h>
 
@@ -40,7 +40,7 @@ namespace mitk
 
   The convinient workflow is:
   1. Set an image as input.
-  2. Set the worldGeometry2D. This defines a grid where the slice is being extracted
+  2. Set the worldPlaneGeometry. This defines a grid where the slice is being extracted
   3. And then start the pipeline.
 
   There are a few more properties that can be set to modify the behavior of the slicing.
@@ -63,12 +63,13 @@ namespace mitk
   public:
 
     mitkClassMacro(ExtractSliceFilter, ImageToImageFilter);
-    itkNewMacro(ExtractSliceFilter);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     mitkNewMacro1Param(Self, vtkImageReslice*);
 
     /** \brief Set the axis where to reslice at.*/
-    void SetWorldGeometry(const Geometry2D* geometry ){
+    void SetWorldGeometry(const PlaneGeometry* geometry ){
        this->m_WorldGeometry = geometry;
        this->Modified(); }
 
@@ -79,7 +80,7 @@ namespace mitk
     /** \brief Set a transform for the reslice axes.
     * This transform is needed if the image volume itself is transformed. (Effects the reslice axis)
     */
-    void SetResliceTransformByGeometry(const Geometry3D* transform){ this->m_ResliceTransform = transform; }
+    void SetResliceTransformByGeometry(const BaseGeometry* transform){ this->m_ResliceTransform = transform; }
 
     /** \brief Resampling grid corresponds to: false->image    true->worldgeometry*/
     void SetInPlaneResampleExtentByGeometry(bool inPlaneResampleExtentByGeometry){ this->m_InPlaneResampleExtentByGeometry = inPlaneResampleExtentByGeometry; }
@@ -100,14 +101,14 @@ namespace mitk
     /** \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax]
     * The method uses the input of the filter to calculate the bounds.
     * It is recommended to use
-    * GetClippedPlaneBounds(const Geometry3D*, const PlaneGeometry*, vtkFloatingPointType*)
+    * GetClippedPlaneBounds(const BaseGeometry*, const PlaneGeometry*, double*)
     * if you are not sure about the input.
     */
     bool GetClippedPlaneBounds(double bounds[6]);
 
     /** \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax]*/
-    bool GetClippedPlaneBounds( const Geometry3D *boundingGeometry,
-      const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
+    bool GetClippedPlaneBounds( const BaseGeometry *boundingGeometry,
+      const PlaneGeometry *planeGeometry, double *bounds );
 
     /** \brief Get the spacing of the slice. returns mitk::ScalarType[2] */
     mitk::ScalarType* GetOutputSpacing();
@@ -146,7 +147,7 @@ namespace mitk
     virtual void GenerateOutputInformation();
     virtual void GenerateInputRequestedRegion();
 
-    const Geometry2D* m_WorldGeometry;
+    const PlaneGeometry* m_WorldGeometry;
     vtkSmartPointer<vtkImageReslice> m_Reslicer;
 
     unsigned int m_TimeStep;
@@ -161,7 +162,7 @@ namespace mitk
 
     ResliceInterpolation m_InterpolationMode;
 
-    Geometry3D::ConstPointer m_ResliceTransform;
+    BaseGeometry::ConstPointer m_ResliceTransform;
 
     bool m_InPlaneResampleExtentByGeometry;//Resampling grid corresponds to:  false->image    true->worldgeometry
 

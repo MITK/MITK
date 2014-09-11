@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsHolder.h"
 #include "mitkToolCommand.h"
 #include "mitkProgressBar.h"
+#include "mitkImage.h"
 
 #include <usModule.h>
 #include <usModuleResource.h>
@@ -44,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkExceptionObject.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, WatershedTool, "Watershed tool");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, WatershedTool, "Watershed tool");
 }
 
 
@@ -101,7 +102,7 @@ void mitk::WatershedTool::DoIt()
 
   try {
     // create and run itk filter pipeline
-    AccessFixedDimensionByItk_1(input.GetPointer(),ITKWatershed,3,output);
+    AccessByItk_1(input.GetPointer(),ITKWatershed,output);
 
     // create a new datanode for output
     mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
@@ -117,7 +118,7 @@ void mitk::WatershedTool::DoIt()
     // since we create a multi label image, define a vtk lookup table
     mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
     mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
-    vtkLookupTable *lookupTable = vtkLookupTable::New();
+    vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
     lookupTable->SetHueRange(1.0, 0.0);
     lookupTable->SetSaturationRange(1.0, 1.0);
     lookupTable->SetValueRange(1.0, 1.0);
@@ -192,7 +193,7 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
   watershed->Update();
 
   // then make sure, that the output has the desired pixel type
-  typedef itk::CastImageFilter<typename WatershedFilter::OutputImageType, itk::Image<Tool::DefaultSegmentationDataType,3> > CastFilter;
+  typedef itk::CastImageFilter<typename WatershedFilter::OutputImageType, itk::Image<Tool::DefaultSegmentationDataType,VImageDimension> > CastFilter;
   typename CastFilter::Pointer cast = CastFilter::New();
   cast->SetInput(watershed->GetOutput());
 

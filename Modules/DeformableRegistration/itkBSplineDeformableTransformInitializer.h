@@ -48,7 +48,8 @@ public:
   typedef SmartPointer<const Self>                  ConstPointer;
 
   /** New macro for creation of through a Smart Pointer. */
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Run-time type information (and related methods). */
   itkTypeMacro( BSplineDeformableTransformInitializer, Object );

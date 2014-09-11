@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkCameraIntrinsics_h
 
 #include <mitkCommon.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <itkDataObject.h>
 #include <itkFastMutexLock.h>
 #include <cv.h>
 #include <vnl/vnl_matrix_fixed.h>
 #include "mitkXMLSerializable.h"
-#include <mitkCameraCalibrationExports.h>
+#include <MitkCameraCalibrationExports.h>
 
 int mitkCameraIntrinsicsTest(int argc, char* argv[]);
 
@@ -34,7 +34,7 @@ namespace mitk
   ///
   /// \brief class representing camera intrinsics and related functions
   ///
-  class mitkCameraCalibration_EXPORT CameraIntrinsics: virtual public itk::Object,
+  class MitkCameraCalibration_EXPORT CameraIntrinsics: virtual public itk::Object,
     virtual public mitk::XMLSerializable
   {
   public:
@@ -138,7 +138,7 @@ namespace mitk
 
 } // namespace mitk
 
-mitkCameraCalibration_EXPORT std::ostream& operator<<
+MitkCameraCalibration_EXPORT std::ostream& operator<<
     (std::ostream& os, mitk::CameraIntrinsics::Pointer p);
 
 #endif // mitkCameraIntrinsics_h

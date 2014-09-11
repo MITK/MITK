@@ -15,10 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkImageToContourModelFilter.h"
+#include "mitkImageAccessByItk.h"
+
+#include <itkContourExtractor2DImageFilter.h>
 
 
 
 mitk::ImageToContourModelFilter::ImageToContourModelFilter()
+  : m_SliceGeometry(0)
 {
 }
 
@@ -72,5 +76,67 @@ const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilte
 
 void mitk::ImageToContourModelFilter::GenerateData()
 {
+  mitk::Image::ConstPointer sliceImage = this->GetInput();
 
+  if ( !sliceImage )
+  {
+    MITK_ERROR << "mitk::ImageToContourModelFilter: No input available. Please set the input!" << std::endl;
+    itkExceptionMacro("mitk::ImageToContourModelFilter: No input available. Please set the input!");
+    return;
+  }
+
+  if ( sliceImage->GetDimension() > 2 || sliceImage->GetDimension() < 2)
+  {
+    MITK_ERROR << "mitk::ImageToContourModelFilter::GenerateData() works only with 2D images. Please assure that your input image is 2D!" << std::endl;
+    itkExceptionMacro("mitk::ImageToContourModelFilter::GenerateData() works only with 2D images. Please assure that your input image is 2D!");
+    return;
+  }
+
+  m_SliceGeometry = sliceImage->GetGeometry();
+
+  AccessFixedDimensionByItk(sliceImage, Itk2DContourExtraction, 2);
+}
+
+template<typename TPixel, unsigned int VImageDimension>
+void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<TPixel, VImageDimension>* sliceImage)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::ContourExtractor2DImageFilter<ImageType> ContourExtractor;
+
+  typedef itk::PolyLineParametricPath<2> PolyLineParametricPath2D;
+  typedef PolyLineParametricPath2D::VertexListType ContourPath;
+
+  typename ContourExtractor::Pointer contourExtractor = ContourExtractor::New();
+  contourExtractor->SetInput(sliceImage);
+  contourExtractor->SetContourValue(0.5);
+
+  contourExtractor->Update();
+
+  unsigned int foundPaths = contourExtractor->GetNumberOfOutputs();
+  this->SetNumberOfIndexedOutputs(foundPaths);
+
+  for (unsigned int i = 0; i < foundPaths; i++)
+  {
+    const ContourPath* currentPath = contourExtractor->GetOutput(i)->GetVertexList();
+
+    mitk::Point3D currentPoint;
+    mitk::Point3D currentWorldPoint;
+
+    mitk::ContourModel::Pointer contour = this->GetOutput(i);
+
+    for (unsigned int j = 0; j < currentPath->Size(); j++)
+    {
+
+      currentPoint[0] = currentPath->ElementAt(j)[0];
+      currentPoint[1] = currentPath->ElementAt(j)[1];
+      currentPoint[2] = 0;
+
+      m_SliceGeometry->IndexToWorld(currentPoint, currentWorldPoint);
+
+      contour->AddVertex(currentWorldPoint);
+    }//for2
+
+    contour->Close();
+
+  }//for1
 }

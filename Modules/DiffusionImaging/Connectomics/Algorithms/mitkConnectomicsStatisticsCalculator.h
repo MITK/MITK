@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 #include <mitkConnectomicsNetwork.h>
 
@@ -31,7 +31,7 @@ namespace mitk
 {
   /**
   * \brief A class giving functions for calculating a variety of network indices */
-  class Connectomics_EXPORT ConnectomicsStatisticsCalculator : public itk::Object
+  class MitkConnectomics_EXPORT ConnectomicsStatisticsCalculator : public itk::Object
   {
   public:
 
@@ -39,7 +39,8 @@ namespace mitk
     /** Method for creation through the object factory. */
 
     mitkClassMacro(ConnectomicsStatisticsCalculator, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     // Typedefs
     typedef mitk::ConnectomicsNetwork::NetworkType NetworkType;
@@ -83,8 +84,8 @@ namespace mitk
     itkGetMacro( RatioOfIsolatedPoints, double );
     itkGetMacro( NumberOfEndPoints, unsigned int );
     itkGetMacro( RatioOfEndPoints, double );
-    itkGetMacro( VectorOfEccentrities, std::vector< int > );
-    itkGetMacro( VectorOfEccentrities90, std::vector< int > );
+    itkGetMacro( VectorOfEccentrities, std::vector< unsigned int > );
+    itkGetMacro( VectorOfEccentrities90, std::vector< unsigned int > );
     itkGetMacro( VectorOfAveragePathLengths, std::vector< double > );
     itkGetMacro( Diameter, unsigned int );
     itkGetMacro( Diameter90, unsigned int );
@@ -112,6 +113,7 @@ namespace mitk
     itkGetMacro( NormalizedLaplacianNumberOf0s, unsigned int );
     itkGetMacro( NormalizedLaplacianLowerSlope, double );
     itkGetMacro( NormalizedLaplacianUpperSlope, double );
+    itkGetMacro( SmallWorldness, double );
 
     void Update();
 
@@ -139,6 +141,16 @@ namespace mitk
 
     void CalculateHopPlotValues();
 
+    /**
+    * \brief Calculate the different clustering coefficients
+    *
+    * The clustering coefficient (cc) measures how strong the tendency to form cliques
+    * is in the network. Groups of nodes, that are highly interconnected.
+    *
+    * CC C - Percentage of connections between nodes connected with the given node
+    * CC D - Same as C, but including the connections with the given node
+    * CC E - Same as C, but not counting isolated nodes when averaging
+    */
     void CalculateClusteringCoefficients();
 
     void CalculateBetweennessCentrality();
@@ -152,6 +164,14 @@ namespace mitk
     void CalculateLaplacianMetrics();
 
     void CalculateNormalizedLaplacianMetrics();
+
+    /**
+     * \brief Calculate the small worldness of the network.
+     *
+     * This will compare the clustering coefficient and mean path length of the network
+     * to an Erdos-Reny network of the same number of nodes and edges.
+     */
+    void CalculateSmallWorldness();
 
     /////////////////////// Variables ////////////////////////
 
@@ -186,8 +206,8 @@ namespace mitk
     double m_RatioOfIsolatedPoints;
     unsigned int m_NumberOfEndPoints;
     double m_RatioOfEndPoints;
-    std::vector< int > m_VectorOfEccentrities;
-    std::vector< int > m_VectorOfEccentrities90;
+    std::vector< unsigned int > m_VectorOfEccentrities;
+    std::vector< unsigned int > m_VectorOfEccentrities90;
     std::vector< double > m_VectorOfAveragePathLengths;
     unsigned int m_Diameter;
     unsigned int m_Diameter90;
@@ -215,6 +235,7 @@ namespace mitk
     unsigned int m_NormalizedLaplacianNumberOf0s;
     double m_NormalizedLaplacianLowerSlope;
     double m_NormalizedLaplacianUpperSlope;
+    double m_SmallWorldness;
   };
 
 }// end namespace mitk

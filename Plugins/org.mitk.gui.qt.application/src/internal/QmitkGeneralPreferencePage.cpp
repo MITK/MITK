@@ -18,6 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QVBoxLayout>
 
+#include <berryIPreferencesService.h>
+#include <berryQtPreferences.h>
+#include <QCheckBox>
+#include <QGroupBox>
+#include <QLabel>
+
 QmitkGeneralPreferencePage::QmitkGeneralPreferencePage()
 : m_MainControl(0)
 {
@@ -32,8 +38,11 @@ void QmitkGeneralPreferencePage::CreateQtControl(QWidget* parent)
 {
   //empty page
   m_MainControl = new QWidget(parent);
+
   QVBoxLayout *layout = new QVBoxLayout;
+  layout->addStretch();
   m_MainControl->setLayout(layout);
+
   this->Update();
 }
 

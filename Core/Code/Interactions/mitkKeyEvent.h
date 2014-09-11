@@ -18,9 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef KeyEvent_H_HEADER_INCLUDED_C184F366
 #define KeyEvent_H_HEADER_INCLUDED_C184F366
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkEvent.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 
 
 namespace mitk {
@@ -53,7 +53,10 @@ class MITK_CORE_EXPORT KeyEvent : public Event
         return m_DisplayPosition;
     }
 
-    void SetDisplayPosition(const Point2D& displPosition) { m_DisplayPosition = displPosition; }
+    void SetDisplayPosition(const Point2D& displPosition) {
+      m_DisplayPosition = displPosition;
+      m_WorldPositionIsSet = false;
+    }
 
     const Point3D& GetWorldPosition() const;
 

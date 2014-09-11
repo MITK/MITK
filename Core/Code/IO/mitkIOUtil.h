@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIOUTIL_H
 #define MITKIOUTIL_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkDataStorage.h>
 #include <mitkSurface.h>
 #include <mitkPointSet.h>
@@ -114,6 +114,29 @@ public:
                                          const std::string& templateName = "XXXXXX",
                                          std::string path = std::string());
 
+   /**
+   * Creates an empty temporary file.
+   *
+   * This method generates a unique temporary filename from \c templateName and creates
+   * this file.
+   *
+   * The file is created with read and write permissions for owner only.
+   *
+   * ---
+   * This version is potentially unsafe because the created temporary file is not kept open
+   * and could be used by another process between calling this method and opening the returned
+   * file path for reading or writing.
+   * ---
+   *
+   * @return The filename of the created temporary file.
+   * @param templateName An optional template for the filename.
+   * @param path An optional path where the temporary file should be created. Defaults
+   *        to the default temp path as returned by GetTempPath().
+   * @throw mitk::Exception if the temporary file could not be created.
+   */
+  static std::string CreateTemporaryFile(const std::string& templateName = "XXXXXX",
+                                         std::string path = std::string());
+
   /**
    * Create a temporary directory.
    *
@@ -154,13 +177,21 @@ public:
   static DataStorage::Pointer LoadFiles(const std::vector<std::string>& fileNames);
 
   /**
+   * @brief Create a BaseData object from the given file.
+   * @param path The path to the file including file name and file extension.
+   * @throws mitk::Exception In case of an error when reading the file.
+   * @return Returns the created BaseData object.
+   */
+  static mitk::BaseData::Pointer LoadBaseData(const std::string& path);
+
+  /**
    * @brief LoadDataNode Method to load an arbitrary DataNode.
    * @param path The path to the file including file name and file extension.
    * @throws mitk::Exception This exception is thrown when the DataNodeFactory is not able to read/find the file
    * or the DataNode is NULL.
    * @return Returns the DataNode.
    */
-  static mitk::DataNode::Pointer LoadDataNode(const std::string path);
+  static mitk::DataNode::Pointer LoadDataNode(const std::string& path);
 
   /**
    * @brief LoadImage Convenience method to load an arbitrary mitkImage.
@@ -168,7 +199,7 @@ public:
    * @throws mitk::Exception This exception is thrown when the Image is NULL.
    * @return Returns the mitkImage.
    */
-  static mitk::Image::Pointer LoadImage(const std::string path);
+  static mitk::Image::Pointer LoadImage(const std::string& path);
 
   /**
    * @brief LoadSurface Convenience method to load an arbitrary mitkSurface.
@@ -176,7 +207,7 @@ public:
    * @throws mitk::Exception This exception is thrown when the Surface is NULL.
    * @return Returns the mitkSurface.
    */
-  static mitk::Surface::Pointer LoadSurface(const std::string path);
+  static mitk::Surface::Pointer LoadSurface(const std::string& path);
 
   /**
    * @brief LoadPointSet Convenience method to load an arbitrary mitkPointSet.
@@ -184,7 +215,7 @@ public:
    * @throws mitk::Exception This exception is thrown when the PointSet is NULL.
    * @return Returns the mitkPointSet.
    */
-  static mitk::PointSet::Pointer LoadPointSet(const std::string path);
+  static mitk::PointSet::Pointer LoadPointSet(const std::string& path);
 
   /**
    * @brief SaveImage Convenience method to save an arbitrary mitkImage.
@@ -194,7 +225,7 @@ public:
    * @throws mitk::Exception This exception is thrown when the writer is not able to write the image.
    * @return Returns true for success else false.
    */
-  static bool SaveImage(mitk::Image::Pointer image, const std::string path);
+  static bool SaveImage(mitk::Image::Pointer image, const std::string& path);
 
   /**
    * @brief SaveBaseData Convenience method to save arbitrary baseData.
@@ -214,7 +245,7 @@ public:
    * or if the fileextension is not suitable for writing.
    * @return Returns true for success else false.
    */
-  static bool SaveSurface(mitk::Surface::Pointer surface, const std::string path);
+  static bool SaveSurface(mitk::Surface::Pointer surface, const std::string& path);
 
   /**
    * @brief SavePointSet Convenience method to save an mitkPointSet.
@@ -223,7 +254,7 @@ public:
    * @throws mitk::Exception This exception is thrown when the writer is not able to write the pointset.
    * @return Returns true for success else false.
    */
-  static bool SavePointSet(mitk::PointSet::Pointer pointset, const std::string path);
+  static bool SavePointSet(mitk::PointSet::Pointer pointset, const std::string& path);
 
   static const std::string DEFAULTIMAGEEXTENSION;
   static const std::string DEFAULTSURFACEEXTENSION;

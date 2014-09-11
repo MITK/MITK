@@ -18,16 +18,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define PLANARFIGUREOBJECTFACTORY_H_INCLUDED
 
 #include "mitkCoreObjectFactoryBase.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 
 namespace mitk {
 
-class PlanarFigure_EXPORT PlanarFigureObjectFactory : public CoreObjectFactoryBase
+class MitkPlanarFigure_EXPORT PlanarFigureObjectFactory : public CoreObjectFactoryBase
 {
 public:
 
   mitkClassMacro(PlanarFigureObjectFactory,CoreObjectFactoryBase)
-  itkNewMacro(PlanarFigureObjectFactory)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   ~PlanarFigureObjectFactory();
 

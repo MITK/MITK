@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkDiffusionImage.h>
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
-#include <mitkFiberTrackingObjectFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkNrrdDiffusionImageWriter.h>
 #include <mitkFiberBundleX.h>
@@ -32,9 +30,15 @@ using namespace mitk;
 int FileFormatConverter(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
+
+    parser.setTitle("Format Converter");
+    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setDescription("");
+    parser.setContributor("MBI");
+
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("in", "i", ctkCommandLineParser::String, "input file", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
+    parser.addArgument("in", "i", ctkCommandLineParser::InputFile, "Input:", "input file", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -46,9 +50,6 @@ int FileFormatConverter(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
-        RegisterFiberTrackingObjectFactory();
-
         MITK_INFO << "Loading " << inName;
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inName, s1, s2, false );

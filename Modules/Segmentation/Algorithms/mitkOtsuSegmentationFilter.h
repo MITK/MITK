@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkImage.h"
 
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 namespace mitk {
 
@@ -36,7 +36,7 @@ namespace mitk {
 
   $Author: somebody$
 */
-class Segmentation_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
+class MitkSegmentation_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
 {
 
  public:
@@ -46,10 +46,12 @@ class Segmentation_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
   typedef mitk::ITKImageImport<itkOutputImageType> ImageConverterType;
 
   mitkClassMacro(OtsuSegmentationFilter,ImageToImageFilter);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkGetMacro(NumberOfThresholds, unsigned int);
-  void SetNumberOfThresholds(unsigned int number)
+
+  void SetNumberOfThresholds( unsigned int number )
   {
     if (number < 1)
     {
@@ -57,6 +59,21 @@ class Segmentation_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
       return;
     }
     m_NumberOfThresholds = number;
+  }
+
+  void SetValleyEmphasis( bool useValley )
+  {
+    m_ValleyEmphasis = useValley;
+  }
+
+  void SetNumberOfBins( unsigned int number )
+  {
+    if (number < 1)
+    {
+      MITK_WARN << "Tried to set an invalid number of bins in the OtsuSegmentationFilter.";
+      return;
+    }
+    m_NumberOfBins = number;
   }
 
  protected:
@@ -67,6 +84,8 @@ class Segmentation_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
 
  private:
   unsigned int m_NumberOfThresholds;
+  bool m_ValleyEmphasis;
+  unsigned int m_NumberOfBins;
 
 };//class
 

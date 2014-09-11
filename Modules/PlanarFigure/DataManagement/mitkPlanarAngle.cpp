@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarAngle.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 
 mitk::PlanarAngle::PlanarAngle()
@@ -41,12 +41,8 @@ void mitk::PlanarAngle::GeneratePolyLine()
 {
   this->ClearPolyLines();
 
-  // Generate poly-line for angle
   for ( unsigned int i=0; i<this->GetNumberOfControlPoints(); i++ )
-  {
-    mitk::PlanarFigure::PolyLineElement element( this->GetControlPoint( i ), i );
-    this->AppendPointToPolyLine( 0, element );
-  }
+    this->AppendPointToPolyLine(0, this->GetControlPoint(i));
 }
 
 void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
@@ -140,7 +136,7 @@ void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
     polyLinePoint[0] = centerPoint[0] + radius * cos( alpha );
     polyLinePoint[1] = centerPoint[1] + radius * sin( alpha );
 
-    AppendPointToHelperPolyLine( 0, PolyLineElement( polyLinePoint, t ) );
+    this->AppendPointToHelperPolyLine(0, polyLinePoint);
   }
 }
 
@@ -172,4 +168,17 @@ void mitk::PlanarAngle::EvaluateFeaturesInternal()
 void mitk::PlanarAngle::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
+}
+
+bool mitk::PlanarAngle::Equals(const PlanarFigure &other) const
+{
+  const mitk::PlanarAngle* otherAngle = dynamic_cast<const mitk::PlanarAngle*>(&other);
+  if ( otherAngle )
+  {
+    return Superclass::Equals(other);
+  }
+  else
+  {
+    return false;
+  }
 }

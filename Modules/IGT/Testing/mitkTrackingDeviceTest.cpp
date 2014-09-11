@@ -31,7 +31,8 @@ class TrackingDeviceTestClass : public mitk::TrackingDevice
 public:
 
   mitkClassMacro(TrackingDeviceTestClass, mitk::TrackingDevice);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual bool OpenConnection(){return true;};
   virtual bool CloseConnection(){return true;};
@@ -52,9 +53,6 @@ int mitkTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   // Test instantiation of TrackingDevice
   TrackingDeviceTestClass::Pointer trackingDeviceTestClass = TrackingDeviceTestClass::New();
   MITK_TEST_CONDITION(trackingDeviceTestClass.IsNotNull(),"Test instatiation");
-
-  // Test method GetErrorMessage()
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetErrorMessage()==std::string(""),"Error message should be empty");
 
   // Test method GetState()
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetState()==mitk::TrackingDevice::Setup,"Mode should be initialized to SETUP");

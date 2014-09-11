@@ -18,13 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_CALCULATE_SEGMENTATION_VOLUME_H_INCLUDET_WAD
 
 #include "mitkSegmentationSink.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkImageCast.h"
 
 namespace mitk
 {
 
-class Segmentation_EXPORT CalculateSegmentationVolume : public SegmentationSink
+class MitkSegmentation_EXPORT CalculateSegmentationVolume : public SegmentationSink
 {
   public:
 

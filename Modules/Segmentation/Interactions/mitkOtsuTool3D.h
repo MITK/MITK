@@ -16,20 +16,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKOTSUTOOL3D_H
 #define MITKOTSUTOOL3D_H
 
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
+#include "itkImage.h"
 
 namespace us {
 class ModuleResource;
 }
 
 namespace mitk{
-  class Segmentation_EXPORT OtsuTool3D : public AutoSegmentationTool
+
+  class Image;
+
+  class MitkSegmentation_EXPORT OtsuTool3D : public AutoSegmentationTool
   {
     public:
 
     mitkClassMacro(OtsuTool3D, AutoSegmentationTool);
-    itkNewMacro(OtsuTool3D);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
       virtual const char* GetName() const;
       virtual const char** GetXPM() const;
@@ -38,9 +43,10 @@ namespace mitk{
       virtual void Activated();
       virtual void Deactivated();
 
-      void RunSegmentation( int regions);
+      void RunSegmentation( int regions, bool useValley, int numberOfBins);
       void ConfirmSegmentation();
-      void UpdateBinaryPreview(int regionID);
+      //void UpdateBinaryPreview(int regionID);
+      void UpdateBinaryPreview(std::vector<int> regionIDs);
       void UpdateVolumePreview(bool volumeRendering);
       void ShowMultiLabelResultNode(bool);
 
@@ -48,7 +54,10 @@ namespace mitk{
       OtsuTool3D();
       virtual ~OtsuTool3D();
 
-      mitk::Image::Pointer m_OriginalImage;
+      template< typename TPixel, unsigned int VImageDimension>
+      void CalculatePreview( itk::Image< TPixel, VImageDimension>* itkImage, std::vector<int> regionIDs);
+
+      itk::SmartPointer<Image> m_OriginalImage;
       //holds the user selected binary segmentation
       mitk::DataNode::Pointer m_BinaryPreviewNode;
       //holds the multilabel result as a preview image

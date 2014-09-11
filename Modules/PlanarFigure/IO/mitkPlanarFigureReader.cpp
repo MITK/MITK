@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarRectangle.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkPlanarEllipse.h"
+#include "mitkPlanarDoubleEllipse.h"
+#include "mitkPlanarBezierCurve.h"
 
 #include "mitkBasePropertySerializer.h"
 
@@ -57,6 +59,21 @@ mitk::PlanarFigureReader::~PlanarFigureReader()
 
 void mitk::PlanarFigureReader::GenerateData()
 {
+    const std::string& locale = "C";
+    const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+    if ( locale.compare(currLocale)!=0 )
+    {
+      try
+      {
+        setlocale(LC_ALL, locale.c_str());
+      }
+      catch(...)
+      {
+        MITK_INFO << "Could not set locale " << locale;
+      }
+    }
+
   m_Success = false;
   this->SetNumberOfIndexedOutputs(0); // reset all outputs, we add new ones depending on the file content
 
@@ -175,6 +192,14 @@ void mitk::PlanarFigureReader::GenerateData()
     {
       planarFigure = mitk::PlanarArrow::New();
     }
+    else if (type == "PlanarDoubleEllipse")
+    {
+      planarFigure = mitk::PlanarDoubleEllipse::New();
+    }
+    else if (type == "PlanarBezierCurve")
+    {
+      planarFigure = mitk::PlanarBezierCurve::New();
+    }
     else
     {
       // unknown type
@@ -229,6 +254,21 @@ void mitk::PlanarFigureReader::GenerateData()
       }
     }
 
+    // If we load a planarFigure, it has definitely been placed correctly.
+    // If we do not set this property here, we cannot load old planarFigures
+    // without messing up the interaction (PF-Interactor needs this property.
+    planarFigure->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
+
+    // Which features (length or circumference etc) a figure has is decided by whether it is closed or not
+    // the function SetClosed has to be called in case of PlanarPolygons to ensure they hold the correct feature
+    PlanarPolygon* planarPolygon = dynamic_cast<PlanarPolygon*> (planarFigure.GetPointer());
+    if (planarPolygon != NULL)
+    {
+      bool isClosed = false;
+      planarFigure->GetPropertyList()->GetBoolProperty( "closed", isClosed);
+      planarPolygon->SetClosed(isClosed);
+    }
+
 
     // Read geometry of containing plane
     TiXmlElement* geoElement = pfElement->FirstChildElement("Geometry");
@@ -242,7 +282,7 @@ void mitk::PlanarFigureReader::GenerateData()
         // Extract and set plane transform parameters
         DoubleList transformList = this->GetDoubleAttributeListFromXMLNode( geoElement->FirstChildElement( "transformParam" ), "param", 12 );
 
-        typedef mitk::Geometry3D::TransformType TransformType;
+        typedef mitk::BaseGeometry::TransformType TransformType;
         TransformType::ParametersType parameters;
         parameters.SetSize( 12 );
 
@@ -255,7 +295,7 @@ void mitk::PlanarFigureReader::GenerateData()
           parameters.SetElement( i, *it );
         }
 
-        typedef mitk::Geometry3D::TransformType TransformType;
+        typedef mitk::BaseGeometry::TransformType TransformType;
         TransformType::Pointer affineGeometry = TransformType::New();
         affineGeometry->SetParameters( parameters );
         planeGeo->SetIndexToWorldTransform( affineGeometry );
@@ -264,7 +304,7 @@ void mitk::PlanarFigureReader::GenerateData()
         // Extract and set plane bounds
         DoubleList boundsList = this->GetDoubleAttributeListFromXMLNode( geoElement->FirstChildElement( "boundsParam" ), "bound", 6 );
 
-        typedef mitk::Geometry3D::BoundsArrayType BoundsArrayType;
+        typedef mitk::BaseGeometry::BoundsArrayType BoundsArrayType;
 
         BoundsArrayType bounds;
         for ( it = boundsList.begin(), i = 0;
@@ -283,7 +323,7 @@ void mitk::PlanarFigureReader::GenerateData()
 
         Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
         planeGeo->SetOrigin( origin );
-        planarFigure->SetGeometry2D(planeGeo);
+        planarFigure->SetPlaneGeometry(planeGeo);
       }
       catch (...)
       {
@@ -301,9 +341,9 @@ void mitk::PlanarFigureReader::GenerateData()
         mitk::Point2D::ValueType y = 0.0;
         if (vertElement->QueryIntAttribute("id", &id) == TIXML_WRONG_TYPE)
           return; // TODO: can we do a better error handling?
-        if (vertElement->QueryFloatAttribute("x", &x) == TIXML_WRONG_TYPE)
+        if (vertElement->QueryDoubleAttribute("x", &x) == TIXML_WRONG_TYPE)
           return; // TODO: can we do a better error handling?
-        if (vertElement->QueryFloatAttribute("y", &y) == TIXML_WRONG_TYPE)
+        if (vertElement->QueryDoubleAttribute("y", &y) == TIXML_WRONG_TYPE)
           return; // TODO: can we do a better error handling?
         Point2D p;
         p.SetElement(0, x);
@@ -325,6 +365,16 @@ void mitk::PlanarFigureReader::GenerateData()
     // \TODO: what about m_FigurePlaced and m_SelectedControlPoint ??
     this->SetNthOutput( this->GetNumberOfOutputs(), planarFigure );  // add planarFigure as new output of this filter
   }
+
+  try
+  {
+    setlocale(LC_ALL, currLocale.c_str());
+  }
+  catch(...)
+  {
+    MITK_INFO << "Could not reset locale " << currLocale;
+  }
+
   m_Success = true;
 }
 
@@ -334,13 +384,13 @@ mitk::Point3D mitk::PlanarFigureReader::GetPointFromXMLNode(TiXmlElement* e)
     throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
   mitk::Point3D point;
   mitk::ScalarType p(-1.0);
-  if (e->QueryFloatAttribute("x", &p) == TIXML_WRONG_TYPE)
+  if (e->QueryDoubleAttribute("x", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   point.SetElement(0, p);
-  if (e->QueryFloatAttribute("y", &p) == TIXML_WRONG_TYPE)
+  if (e->QueryDoubleAttribute("y", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   point.SetElement(1, p);
-  if (e->QueryFloatAttribute("z", &p) == TIXML_WRONG_TYPE)
+  if (e->QueryDoubleAttribute("z", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   point.SetElement(2, p);
   return point;
@@ -353,13 +403,13 @@ mitk::Vector3D mitk::PlanarFigureReader::GetVectorFromXMLNode(TiXmlElement* e)
     throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
   mitk::Vector3D vector;
   mitk::ScalarType p(-1.0);
-  if (e->QueryFloatAttribute("x", &p) == TIXML_WRONG_TYPE)
+  if (e->QueryDoubleAttribute("x", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   vector.SetElement(0, p);
-  if (e->QueryFloatAttribute("y", &p) == TIXML_WRONG_TYPE)
+  if (e->QueryDoubleAttribute("y", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   vector.SetElement(1, p);
-  if (e->QueryFloatAttribute("z", &p) == TIXML_WRONG_TYPE)
+  if (e->QueryDoubleAttribute("z", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   vector.SetElement(2, p);
   return vector;
@@ -379,7 +429,7 @@ mitk::PlanarFigureReader::GetDoubleAttributeListFromXMLNode(TiXmlElement* e, con
     std::stringstream attributeName;
     attributeName << attributeNameBase << i;
 
-    if (e->QueryFloatAttribute( attributeName.str().c_str(), &p ) == TIXML_WRONG_TYPE)
+    if (e->QueryDoubleAttribute( attributeName.str().c_str(), &p ) == TIXML_WRONG_TYPE)
       throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
     list.push_back( p );
   }

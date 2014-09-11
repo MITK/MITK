@@ -18,11 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef VTKMAPPER_H_HEADER_INCLUDED_C1C5453B
 #define VTKMAPPER_H_HEADER_INCLUDED_C1C5453B
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
 #include "mitkVtkPropRenderer.h"
+#include "mitkLocalStorageHandler.h"
+#include "mitkIShaderRepository.h"
+#include <mitkCoreServices.h>
 
 #include <vtkProp3D.h>
 #include <vtkActor.h>
@@ -111,6 +114,11 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
     }
 
     /**
+    * \brief SHADERTODO
+    */
+    void ApplyShaderProperties( mitk::BaseRenderer* renderer);
+
+    /**
     * \brief Apply color and opacity properties read from the PropertyList.
     * Called by mapper subclasses.
     */
@@ -118,11 +126,39 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
 
     /**
     * \brief  Release vtk-based graphics resources that are being consumed by this mapper.
-    * The parameter window could be used to determine which graphic
-    * resources to releases. Must be overwritten in individual subclasses
-    * if vtkProps are used.
+    *
+    * Method called by mitk::VtkPropRenderer. The parameter renderer could be used to
+    * determine which graphic resources to release.  The local storage is accessible
+    * by the parameter renderer. Should be overwritten in subclasses.
     */
-    virtual void ReleaseGraphicsResources(vtkWindow* /*renWin*/) { };
+    virtual void ReleaseGraphicsResources(mitk::BaseRenderer* /*renderer*/)
+    {
+    }
+
+    class VtkMapperLocalStorage : public mitk::Mapper::BaseLocalStorage
+    {
+    public:
+
+      mitk::IShaderRepository::ShaderProgram::Pointer m_ShaderProgram;
+      itk::TimeStamp m_ModifiedTimeStamp;
+
+      VtkMapperLocalStorage()
+      {
+        IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
+        if (shaderRepo)
+        {
+          m_ShaderProgram = shaderRepo->CreateShaderProgram();
+        }
+      }
+
+      ~VtkMapperLocalStorage()
+      {
+
+      }
+
+    };
+
+    mitk::LocalStorageHandler<VtkMapperLocalStorage> m_VtkMapperLSH;
 
   protected:
 

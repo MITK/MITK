@@ -25,34 +25,61 @@
         <property name="enabled">
          <bool>true</bool>
         </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
+         <enum>QFrame::Box</enum>
         </property>
         <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
+         <enum>QFrame::Sunken</enum>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QPushButton" name="viewExternalDataButton">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
+          <widget class="QPushButton" name="directoryButton">
            <property name="text">
-            <string>View</string>
+            <string>Scan directory</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Plugins/org.mitk.gui.qt.dicom/resources/dicom.qrc">
+             <normaloff>:/org.mitk.gui.qt.dicom/folder_32.png</normaloff>:/org.mitk.gui.qt.dicom/folder_32.png</iconset>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="downloadButton">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="text">
-            <string>Download</string>
+            <string>Add to local storage</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Plugins/org.mitk.gui.qt.dicom/resources/dicom.qrc">
+             <normaloff>:/org.mitk.gui.qt.dicom/import_32.png</normaloff>:/org.mitk.gui.qt.dicom/import_32.png</iconset>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="cancelButton">
+          <widget class="QPushButton" name="viewExternalDataButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
-            <string>Cancel</string>
+            <string>View</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Plugins/org.mitk.gui.qt.dicom/resources/dicom.qrc">
+             <normaloff>:/org.mitk.gui.qt.dicom/viewIcon.png</normaloff>:/org.mitk.gui.qt.dicom/viewIcon.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>20</height>
+            </size>
            </property>
           </widget>
          </item>
@@ -73,69 +100,21 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="QueryLayout_2" stretch="1,0">
+       <layout class="QHBoxLayout" name="QueryLayout_2" stretch="0">
         <property name="spacing">
          <number>0</number>
         </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetNoConstraint</enum>
+        </property>
         <property name="leftMargin">
-         <number>12</number>
+         <number>0</number>
         </property>
         <property name="rightMargin">
-         <number>12</number>
+         <number>0</number>
         </property>
         <item>
-         <widget class="QTreeView" name="ExternalDataTreeView">
-          <property name="alternatingRowColors">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="searchOptionLayout_2">
-          <property name="spacing">
-           <number>6</number>
-          </property>
-          <item>
-           <widget class="QDockWidget" name="ExternalSearchDockWidget">
-            <property name="floating">
-             <bool>false</bool>
-            </property>
-            <property name="features">
-             <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-            </property>
-            <property name="windowTitle">
-             <string/>
-            </property>
-            <widget class="QWidget" name="dockWidgetContents_2">
-             <layout class="QVBoxLayout" name="verticalLayout_6">
-              <item>
-               <widget class="ctkDICOMQueryWidget" name="SearchOption_2" native="true">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </widget>
-          </item>
-          <item>
-           <spacer name="VerticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
+         <widget class="ctkDICOMTableManager" name="ctkDICOMBrowser" native="true"/>
         </item>
        </layout>
       </item>
@@ -146,12 +125,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ctkDICOMQueryWidget</class>
+   <class>ctkDICOMTableManager</class>
    <extends>QWidget</extends>
-   <header>ctkDICOMQueryWidget.h</header>
+   <header>ctkDICOMTableManager.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../../Plugins/org.mitk.gui.qt.dicom/resources/dicom.qrc"/>
+ </resources>
  <connections/>
 </ui>

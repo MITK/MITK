@@ -19,24 +19,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PLANAR_ARROW_H_
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 
 
 namespace mitk
 {
 
-class Geometry2D;
+class PlaneGeometry;
 
 /**
  * \brief Implementation of PlanarFigure representing an arrow
  * through two control points
  */
-class PlanarFigure_EXPORT PlanarArrow : public PlanarFigure
+class MitkPlanarFigure_EXPORT PlanarArrow : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarArrow, PlanarFigure );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   /** \brief Place figure in its minimal configuration (a point at least)
@@ -61,6 +62,8 @@ public:
   }
 
   void SetArrowTipScaleFactor( float scale );
+
+  virtual bool Equals(mitk::PlanarFigure& other);
 
 protected:
   PlanarArrow();

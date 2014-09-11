@@ -19,9 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <cv.h>
 #include <ui_QmitkOpenCVVideoControls.h>
-#include <mitkOpenCVVideoSupportUIExports.h>
+#include <MitkOpenCVVideoSupportUIExports.h>
+#include <mitkIPersistenceService.h>
 
-class QmitkStdMultiWidget;
+class QmitkRenderWindow;
 class QmitkVideoBackground;
 namespace mitk
 {
@@ -34,7 +35,7 @@ namespace mitk
 /// the use of an !initialized! QmitkVideoBackground. The QmitkVideoBackground should
 /// contain an OpenCVVideoSource is then owned by this widget (and deleted)
 ///
-class MITK_OPENCVVIDEOSUPPORTUI_EXPORT QmitkOpenCVVideoControls : public QWidget
+class MITK_OPENCVVIDEOSUPPORTUI_EXPORT QmitkOpenCVVideoControls : public QWidget,  public mitk::PropertyListReplacedObserver
 {
   Q_OBJECT
 
@@ -42,7 +43,7 @@ public:
   ///
   /// Construct the widget with the given render window and the given preset values
   ///
-  QmitkOpenCVVideoControls(QmitkVideoBackground* _VideoBackground, QmitkStdMultiWidget* _MultiWidget
+  QmitkOpenCVVideoControls(QmitkVideoBackground* _VideoBackground, QmitkRenderWindow* _RenderWindow
     , QWidget * parent = 0, Qt::WindowFlags f = 0);
 
   ///
@@ -51,14 +52,14 @@ public:
   virtual ~QmitkOpenCVVideoControls();
 
   ///
-  /// sets the multiwidget for this video player
+  /// sets the render window for this video player
   ///
-  void SetStdMultiWidget(QmitkStdMultiWidget* _MultiWidget);
+  void SetRenderWindow(QmitkRenderWindow* _RenderWindow);
 
   ///
-  /// returns the current multiwidget
+  /// returns the current render window
   ///
-  QmitkStdMultiWidget* GetStdMultiWidget() const;
+  QmitkRenderWindow* GetRenderWindow() const;
 
   ///
   /// sets the qmitkvideobackground for this
@@ -69,6 +70,12 @@ public:
   /// returns the current QmitkVideoBackground
   ///
   QmitkVideoBackground* GetVideoBackground() const;
+
+  ///
+  /// calls FromPropertyList
+  ///
+  void AfterPropertyListReplaced( const std::string& id, mitk::PropertyList* propertyList );
+
 signals:
   ///
   /// When playback is started this informs when a new frame was grabbed
@@ -91,10 +98,23 @@ protected slots:
   void NewFrameAvailable(mitk::VideoSource* videoSource);
 protected:
   QmitkVideoBackground* m_VideoBackground;
-  QmitkStdMultiWidget* m_MultiWidget;
+  QmitkRenderWindow* m_RenderWindow;
   mitk::OpenCVVideoSource* m_VideoSource;
   Ui::QmitkOpenCVVideoControls* m_Controls;
   bool m_SliderCurrentlyMoved;
+
+private:
+    ///
+    /// muellerm: persitence service implementation
+    ///
+    PERSISTENCE_GET_SERVICE_METHOD_MACRO
+    ///
+    /// muellerm: a unique id for the prop list
+    ///
+    std::string m_Id;
+    void ToPropertyList();
+    void FromPropertyList();
+
 };
 
 #endif

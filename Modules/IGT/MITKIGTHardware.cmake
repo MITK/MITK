@@ -1,5 +1,7 @@
 #Begin MicronTracker Hardware
 option(MITK_USE_MICRON_TRACKER "Enable support for micron tracker hardware" OFF)
+#Begin Optitrack Hardware
+option(MITK_USE_OPTITRACK_TRACKER "Enable support for Optitrack tracker hardware" OFF)
 
 # only if MicronTracker is enabled
 if(MITK_USE_MICRON_TRACKER)
@@ -7,12 +9,21 @@ if(MITK_USE_MICRON_TRACKER)
   get_filename_component(MICRON_TRACKER_SDK_DIR ${MITK_MICRON_TRACKER_LIB} PATH)
   find_path(MITK_MICRON_TRACKER_INCLUDE_DIR MTC.h ${MICRON_TRACKER_SDK_DIR} DOC  "Include directory of the MT2.")
   find_path(MITK_MICRON_TRACKER_TEMP_DIR . DOC "Any temporary directory which can be used by the MicronTracker2.")
-  find_path(MITK_MICRON_TRACKER_CALIBRATION_DIR BumbleBee_6400420.calib DOC "Path which contains the MT2 calibration file.")
   MITK_INSTALL(FILES ${MICRON_TRACKER_SDK_DIR}/MTC.dll  CONFIGURATIONS Release)
   MITK_INSTALL(FILES ${MICRON_TRACKER_SDK_DIR}/MTInterfaceDotNet.dll  CONFIGURATIONS Release)
   MITK_INSTALL(FILES ${MICRON_TRACKER_SDK_DIR}/PGRFlyCapture.dll  CONFIGURATIONS Release)
 ENDIF(MITK_USE_MICRON_TRACKER)
 #End MicronTracker Hardware
+
+#only if Optitrack is enabled
+if(MITK_USE_OPTITRACK_TRACKER)
+  find_library(MITK_OPTITRACK_TRACKER_LIB NPTrackingTools DOC "Path which contains the Optitrack library. Please choose 32/64 bit version depending on your build.")
+  find_path(MITK_OPTITRACK_TRACKER_INCLUDE_DIR NPTrackinTools.h DOC  "Include directory of the Optitrack library.")
+  find_path(MITK_OPTITRACK_TRACKER_LIB_DIR NPTrackingTools.dll)
+  MITK_INSTALL(FILES ${MITK_OPTITRACK_TRACKER_LIB_DIR}/NPTrackingTools.dll CONFIGURATIONS Release)
+  MITK_INSTALL(FILES ${MITK_OPTITRACK_TRACKER_LIB_DIR}/NPTrackingToolsx64.dll CONFIGURATIONS Release)
+ENDIF(MITK_USE_OPTITRACK_TRACKER)
+#End Optitrack Hardware
 
 
 # only on Win32

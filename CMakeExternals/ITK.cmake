@@ -31,7 +31,6 @@ if(NOT DEFINED ITK_DIR)
 
     list(APPEND additional_cmake_args
          -DITK_WRAPPING:BOOL=ON
-         #-DITK_USE_REVIEW:BOOL=ON
          -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
          -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
          -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
@@ -57,21 +56,26 @@ if(NOT DEFINED ITK_DIR)
   endif()
 
   if(MITK_USE_OpenCV)
-    message("OpenCV_DIR: ${OpenCV_DIR}")
     list(APPEND additional_cmake_args
          -DModule_ITKVideoBridgeOpenCV:BOOL=ON
          -DOpenCV_DIR:PATH=${OpenCV_DIR}
         )
   endif()
 
-  set(ITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchITK-4.3.1.cmake)
+  # Keep the behaviour of ITK 4.3 which by default turned on ITK Review
+  # see MITK bug #17338
+  list(APPEND additional_cmake_args
+    -DModule_ITKReview:BOOL=ON
+  )
+
+  set(ITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchITK-4.5.1.cmake)
 
   ExternalProject_Add(${proj}
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.3.2.tar.gz
-     URL_MD5 f25bb1561887be621d3954689f3944a6
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.5.1-3e550bf8.tar.gz
+     URL_MD5 80e433ffc0e81cdc19a03dd02a3c329b
      INSTALL_COMMAND ""
      PATCH_COMMAND ${ITK_PATCH_COMMAND}
      CMAKE_GENERATOR ${gen}

@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PLANAR_CROSS_H_
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 
 
 namespace mitk
 {
 
-class Geometry2D;
+class PlaneGeometry;
 
 /**
  * \brief Implementation of PlanarFigure modeling a cross with two orthogonal lines
@@ -54,12 +54,13 @@ class Geometry2D;
  *
  * \sa PlanarFigureMapper2D
  */
-class PlanarFigure_EXPORT PlanarCross : public PlanarFigure
+class MitkPlanarFigure_EXPORT PlanarCross : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarCross, PlanarFigure );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** \brief Indicates whether the PlanarFigure shall represent only a single line instead of an
    * orthogonal cross. */
@@ -93,6 +94,7 @@ public:
   /** \brief Returns the number of features available for this PlanarCross (1 or 2). */
   virtual unsigned int GetNumberOfFeatures() const;
 
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
 
 protected:
   PlanarCross();

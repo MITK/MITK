@@ -2,23 +2,26 @@
  
 \page Step04Page MITK Tutorial - Step 4: Use several views to explore data
   
+\li \ref Step4.cpp "Step4.cpp"\n 
+Contains the code of step 4a + b.
+\li Path to files used in this step: \n
+http://mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
+http://mitk.org/download/tutorial-data/lungs.vtk (surface)
+
 As in Step 2 and Step 3 one or more data sets may be loaded.
 
 This now creates three views on the data.
 The QmitkRenderWindow is used for displaying a 3D view as in Step 3, but without volume-rendering.
 Furthermore two 2D views for slicing through the data are created. 
-The class QmitkSliceWidget is used, which is based on the class QmitkRenderWindow, but additionally provides sliders 
-to slice through the data. We create two instances of
-QmitkSliceWidget, one for axial and one for sagittal slicing. Step 4b enhances the program in that the two slices are also shown at their correct position in 3D as well as intersection-line, each in the other 2D view.
+The class QmitkSliceWidget is used, which is based on the class QmitkRenderWindow, but additionally provides sliders to slice through the data. We create two instances of
+QmitkSliceWidget, one for axial and one for sagittal slicing. 
+Step 4b enhances the program in that the two slices are also shown at their correct position in 3D as well as intersection-line, each in the other 2D view.
 
-As in the previous steps, to obtain the result the program has to be executed using the image file bin/CMakeExternals/Source/MITK-Data/Pic3D.nrrd and the surface file src/MITK/Modules/MitkExt/Testing/Data/lungs.vtk.
+As in the previous steps, to obtain the result the program has to be executed using the image file Pic3D.nrrd and the surface file lungs.vtk.
 
-\li \ref Step4.cpp "Step4.cpp"\n 
-Contains the code of step 4a + b.
- 
 \section Step4aSection Step 4a - Create axial and sagittal view
 
-\image html step4a_result.png 
+\imageMacro{step4a_result.png,"",11.01}
 
 \dontinclude Step4.cpp
 
@@ -48,7 +51,7 @@ The toplevelWidget is now the new main widget:
 
 \section Step4bSection Step 4b - Display slice positions
 
-\image html step4b_result.png 
+\imageMacro{step4b_result.png,"",11.01}
 
 We now want to see the position of the slice in 2D and the slice itself in 3D.
 Therefore it has to be added to the tree:

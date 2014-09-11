@@ -28,11 +28,12 @@ namespace mitk {
 //## @brief Superclass of all classes having one or more Images as input and
 //## generating PlanarFigures as output
 //## @ingroup PlanarFigure
-class PlanarFigure_EXPORT ImageToPlanarFigureFilter : public PlanarFigureSource
+class MitkPlanarFigure_EXPORT ImageToPlanarFigureFilter : public PlanarFigureSource
 {
 public:
   mitkClassMacro(ImageToPlanarFigureFilter,PlanarFigureSource);
-  //itkNewMacro(Self);
+  //itkFactorylessNewMacro(Self)
+  //itkCloneMacro(Self)
 
   /** Some convenient typedefs. */
   typedef mitk::Image                    InputImageType;
@@ -41,6 +42,7 @@ public:
   typedef SlicedData::RegionType         InputImageRegionType;
 
   /** Set/Get the image input of this process object.  */
+  using Superclass::SetInput;
   virtual void SetInput( const InputImageType *image);
   virtual void SetInput( unsigned int, const InputImageType * image);
   const InputImageType * GetInput(void);

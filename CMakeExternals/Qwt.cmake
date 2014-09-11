@@ -2,6 +2,8 @@
 # Qwt
 #-----------------------------------------------------------------------------
 
+if(MITK_USE_Qwt)
+
 # Sanity checks
 if(DEFINED Qwt_DIR AND NOT EXISTS ${Qwt_DIR})
   message(FATAL_ERROR "Qwt_DIR variable is defined but corresponds to non-existing directory")
@@ -26,7 +28,7 @@ if(NOT DEFINED ${proj}_DIR)
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
-       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+       ${qt_project_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 
@@ -35,5 +37,7 @@ if(NOT DEFINED ${proj}_DIR)
 else()
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+
+endif()
 
 endif()

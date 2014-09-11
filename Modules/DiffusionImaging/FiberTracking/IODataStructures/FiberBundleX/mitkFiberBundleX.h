@@ -20,25 +20,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //includes for MITK datastructure
 #include <mitkBaseData.h>
-#include "FiberTrackingExports.h"
+#include <MitkFiberTrackingExports.h>
 #include <mitkImage.h>
 
 
 //includes storing fiberdata
-#include <vtkSmartPointer.h> //may be replaced by class precompile argument
-#include <vtkPolyData.h> // may be replaced by class
-#include <vtkPoints.h> // my be replaced by class
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
+#include <vtkPoints.h>
 #include <vtkDataSet.h>
+#include <vtkTransform.h>
 
 //#include <QStringList>
 
 #include <mitkPlanarFigure.h>
+#include <mitkPixelTypeTraits.h>
+#include <mitkPlanarFigureComposite.h>
 
 namespace mitk {
 
 /**
    * \brief Base Class for Fiber Bundles;   */
-class  FiberTracking_EXPORT FiberBundleX : public BaseData
+class MitkFiberTracking_EXPORT FiberBundleX : public BaseData
 {
 public:
 
@@ -54,10 +57,11 @@ public:
     virtual void SetRequestedRegionToLargestPossibleRegion();
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
     virtual bool VerifyRequestedRegion();
-    virtual void SetRequestedRegion(const itk::DataObject *data );
+    virtual void SetRequestedRegion(const itk::DataObject*);
 
     mitkClassMacro( FiberBundleX, BaseData )
-    itkNewMacro( Self )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(Self, vtkSmartPointer<vtkPolyData>) // custom constructor
 
     // colorcoding related methods
@@ -71,6 +75,7 @@ public:
     void ResetFiberOpacity();
 
     // fiber smoothing/resampling
+    void CompressFibers(float error = 0.0);
     void ResampleFibers(float pointDistance = 1);
     void DoFiberSmoothing(float pointDistance);
     void DoFiberSmoothing(float pointDistance, double tension, double continuity, double bias );
@@ -81,15 +86,18 @@ public:
     void RotateAroundAxis(double x, double y, double z);
     void TranslateFibers(double x, double y, double z);
     void ScaleFibers(double x, double y, double z);
+    void TransformFibers(double rx, double ry, double rz, double tx, double ty, double tz);
+    itk::Point<float, 3> TransformPoint(vnl_vector_fixed< double, 3 > point, double rx, double ry, double rz, double tx, double ty, double tz);
+    itk::Matrix< double, 3, 3 > TransformMatrix(itk::Matrix< double, 3, 3 > m, double rx, double ry, double rz);
 
     // add/subtract fibers
     FiberBundleX::Pointer AddBundle(FiberBundleX* fib);
     FiberBundleX::Pointer SubtractBundle(FiberBundleX* fib);
 
     // fiber subset extraction
-    FiberBundleX::Pointer           ExtractFiberSubset(PlanarFigure *pf);
-    std::vector<long>               ExtractFiberIdSubset(PlanarFigure* pf);
-    FiberBundleX::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint);
+    FiberBundleX::Pointer           ExtractFiberSubset(BaseData* roi);
+    std::vector<long>               ExtractFiberIdSubset(BaseData* roi);
+    FiberBundleX::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false);
     FiberBundleX::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
 
     vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> ); // TODO: make protected
@@ -107,17 +115,21 @@ public:
     itkGetMacro( MeanFiberLength, float )
     itkGetMacro( MedianFiberLength, float )
     itkGetMacro( LengthStDev, float )
+    itkGetMacro( UpdateTime2D, itk::TimeStamp )
+    itkGetMacro( UpdateTime3D, itk::TimeStamp )
+    void RequestUpdate2D(){ m_UpdateTime2D.Modified(); }
+    void RequestUpdate3D(){ m_UpdateTime3D.Modified(); }
 
-    std::vector<int> GetPointsRoi()
-    {
-        return m_PointsRoi;
-    }
+    unsigned long GetNumberOfPoints();
 
     // copy fiber bundle
     mitk::FiberBundleX::Pointer GetDeepCopy();
 
     // compare fiber bundles
-    bool Equals(FiberBundleX* fib);
+    bool Equals(FiberBundleX* fib, double eps=0.0001);
+
+    itkSetMacro( ReferenceImage, mitk::Image::Pointer )
+    itkGetMacro( ReferenceImage, mitk::Image::Pointer )
 
 protected:
 
@@ -150,8 +162,10 @@ private:
     float   m_MedianFiberLength;
     float   m_LengthStDev;
     int     m_FiberSampling;
+    itk::TimeStamp m_UpdateTime2D;
+    itk::TimeStamp m_UpdateTime3D;
 
-    std::vector<int> m_PointsRoi; // this global variable needs to be refactored
+    mitk::Image::Pointer m_ReferenceImage;
 
 };
 

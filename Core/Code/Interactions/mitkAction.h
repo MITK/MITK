@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ACTION_H_HEADER_INCLUDED_C19AE06B
 #define ACTION_H_HEADER_INCLUDED_C19AE06B
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkPropertyList.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>

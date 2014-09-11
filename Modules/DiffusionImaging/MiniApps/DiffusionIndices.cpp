@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileWriter.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkQBallImage.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <itkTensorDerivedMeasurementsFilter.h>
 #include <itkDiffusionQballGeneralizedFaImageFilter.h>
 #include <mitkTensorImage.h>
@@ -36,10 +35,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 int DiffusionIndices(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
+
+    parser.setTitle("Diffusion Indices");
+    parser.setCategory("Diffusion Related Measures");
+    parser.setDescription("");
+    parser.setContributor("MBI");
+
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
-    parser.addArgument("index", "idx", ctkCommandLineParser::String, "index (fa, gfa, ra, ad, rd, ca, l2, l3, md)", us::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
+    parser.addArgument("index", "idx", ctkCommandLineParser::String, "Index:", "index (fa, gfa, ra, ad, rd, ca, l2, l3, md)", us::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -55,8 +60,6 @@ int DiffusionIndices(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
-
         // load input image
         const std::string s1="", s2="";
         std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
@@ -67,7 +70,7 @@ int DiffusionIndices(int argc, char* argv[])
             typedef itk::Image<OdfVectorType,3>         ItkQballImageType;
             mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());
             ItkQballImageType::Pointer itk_qbi = ItkQballImageType::New();
-            mitk::CastToItkImage<ItkQballImageType>(mitkQballImage, itk_qbi);
+            mitk::CastToItkImage(mitkQballImage, itk_qbi);
 
 
             typedef itk::DiffusionQballGeneralizedFaImageFilter<float,float,QBALL_ODFSIZE> GfaFilterType;
@@ -88,7 +91,7 @@ int DiffusionIndices(int argc, char* argv[])
             typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
             mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(infile.at(0).GetPointer());
             ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
-            mitk::CastToItkImage<ItkTensorImage>(mitkTensorImage, itk_dti);
+            mitk::CastToItkImage(mitkTensorImage, itk_dti);
 
             typedef itk::TensorDerivedMeasurementsFilter<float> MeasurementsType;
             MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();

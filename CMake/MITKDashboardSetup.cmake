@@ -5,29 +5,57 @@ list(APPEND CTEST_NOTES_FILES "${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}")
 #
 # Automatically determined properties
 #
-set(MY_OPERATING_SYSTEM "${CMAKE_HOST_SYSTEM}") # Windows 7, Linux-2.6.32, Darwin...
+set(MY_OPERATING_SYSTEM )
+
+if(UNIX)
+  # Download a utility script
+  set(url "http://mitk.org/git/?p=MITK.git;a=blob_plain;f=CMake/mitkDetectOS.sh;hb=${hb}")
+  set(dest "${CTEST_SCRIPT_DIRECTORY}/mitkDetectOS.sh")
+  downloadFile("${url}" "${dest}")
+  execute_process(COMMAND sh "${dest}"
+  RESULT_VARIABLE _result OUTPUT_VARIABLE _out
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  if(NOT _result)
+    set(MY_OPERATING_SYSTEM "${_out}")
+  endif()
+endif()
+
+if(NOT MY_OPERATING_SYSTEM)
+  set(MY_OPERATING_SYSTEM "${CMAKE_HOST_SYSTEM}") # Windows 7, Linux-2.6.32, Darwin...
+endif()
+
 site_name(CTEST_SITE)
 
-if(QT_BINARY_DIR)
-  set(QT_QMAKE_EXECUTABLE "${QT_BINARY_DIR}/qmake")
-else()
-  set(QT_QMAKE_EXECUTABLE "qmake")
+if(NOT DEFINED MITK_USE_QT)
+  set(MITK_USE_QT 1)
 endif()
 
-execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} --version
-                OUTPUT_VARIABLE MY_QT_VERSION
-                RESULT_VARIABLE qmake_error)
-if(qmake_error)
-  message(FATAL_ERROR "Error when executing ${QT_QMAKE_EXECUTABLE} --version\n${qmake_error}")
-endif()
+if(MITK_USE_QT)
+  if(NOT QT_QMAKE_EXECUTABLE)
+    find_program(QT_QMAKE_EXECUTABLE NAMES qmake qmake-qt4
+                 HINTS ${QT_BINARY_DIR})
+  endif()
 
-string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
+  execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} --version
+                  OUTPUT_VARIABLE MY_QT_VERSION
+                  RESULT_VARIABLE qmake_error)
+  if(qmake_error)
+    message(FATAL_ERROR "Error when executing ${QT_QMAKE_EXECUTABLE} --version\n${qmake_error}")
+  endif()
+
+  string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
+endif()
 
 #
 # Project specific properties
 #
 if(NOT CTEST_BUILD_NAME)
-  set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-Qt-${MY_QT_VERSION}-${CTEST_BUILD_CONFIGURATION}")
+  if(MITK_USE_QT)
+     set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM} ${MY_COMPILER} Qt${MY_QT_VERSION} ${CTEST_BUILD_CONFIGURATION}")
+  else()
+    set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM} ${MY_COMPILER} ${CTEST_BUILD_CONFIGURATION}")
+  endif()
 endif()
 set(PROJECT_BUILD_DIR "MITK-build")
 
@@ -71,10 +99,9 @@ message("Coverage: ${WITH_COVERAGE}, MemCheck: ${WITH_MEMCHECK}")
 #
 # Set initial cache options
 #
-if(CMAKE_GENERATOR MATCHES "[Mm]ake")
+if(${CMAKE_VERSION} VERSION_GREATER "2.8.9")
   set(CTEST_USE_LAUNCHERS 1)
-else()
-  set(CTEST_USE_LAUNCHERS 0)
+  set(ENV{CTEST_USE_LAUNCHERS_DEFAULT} 1)
 endif()
 
 # Remove this if block after all dartclients work
@@ -134,8 +161,14 @@ MITK_USE_Boost:BOOL=${MITK_USE_Boost}
 MITK_USE_OpenCV:BOOL=${MITK_USE_OpenCV}
 MITK_USE_Poco:BOOL=${MITK_USE_Poco}
 MITK_USE_SOFA:BOOL=${MITK_USE_SOFA}
+MITK_USE_QT:BOOL=${MITK_USE_QT}
 ${ADDITIONAL_CMAKECACHE_OPTION}
 ")
+
+if(MITK_USE_QT)
+  set(INITIAL_CMAKECACHE_OPTIONS "${INITIAL_CMAKECACHE_OPTIONS}
+QT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}")
+endif()
 
 # Write a cache file for populating the MITK initial cache (not the superbuild cache).
 # This can be used to provide variables which are not passed through the

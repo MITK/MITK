@@ -98,7 +98,6 @@ static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& 
 
 void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
-
   const mitk::DataNode* node=GetDataNode();
   if( node == NULL )
     return;
@@ -127,15 +126,13 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
     //
     // get the world time
     //
-    const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
-    assert( worldGeometry != NULL );
-    ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
+    ScalarType time = renderer->GetTime();
 
     //
     // convert the world time in time steps of the input object
     //
     int timeStep=0;
-    if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
+    if ( time > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() )
       timeStep = inputTimeGeometry->TimePointToTimeStep( time );
     if ( inputTimeGeometry->IsValidTimeStep( timeStep ) == false )
     {
@@ -319,7 +316,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
         glPointSize(p_size);
         //glShadeModel(GL_FLAT);
         glBegin (GL_POINTS);
-          glVertex2fv(&pt2d[0]);
+          glVertex2dv(&pt2d[0]);
         glEnd ();
       }
 
@@ -384,17 +381,17 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
               glLineWidth(m_PointLineWidth);
               //a diamond around the point with the selected color
               glBegin (GL_LINE_LOOP);
-               tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
-               tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
-               tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
-               tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
+               tmp=pt2d-horz;      glVertex2dv(&tmp[0]);
+               tmp=pt2d+vert;      glVertex2dv(&tmp[0]);
+               tmp=pt2d+horz;      glVertex2dv(&tmp[0]);
+               tmp=pt2d-vert;      glVertex2dv(&tmp[0]);
               glEnd ();
               glLineWidth(1);
               //the actual point in the specified color to see the usual color of the point
               glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
               glPointSize(1);
               glBegin (GL_POINTS);
-              tmp=pt2d;             glVertex2fv(&tmp[0]);
+              tmp=pt2d;             glVertex2dv(&tmp[0]);
               glEnd ();
             }
             else //if not selected
@@ -403,10 +400,10 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
               glLineWidth(m_PointLineWidth);
               //drawing crosses
               glBegin (GL_LINES);
-              tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
-              tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
-              tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
-              tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
+              tmp=pt2d-horz;      glVertex2dv(&tmp[0]);
+              tmp=pt2d+horz;      glVertex2dv(&tmp[0]);
+              tmp=pt2d-vert;      glVertex2dv(&tmp[0]);
+              tmp=pt2d+vert;      glVertex2dv(&tmp[0]);
               glEnd ();
               glLineWidth(1);
             }
@@ -454,8 +451,8 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 
            glLineWidth( m_LineWidth );
            glBegin (GL_LINES);
-           glVertex2fv(&pt2d[0]);
-           glVertex2fv(&lastPt2d[0]);
+           glVertex2dv(&pt2d[0]);
+           glVertex2dv(&lastPt2d[0]);
            glEnd ();
            glLineWidth(1.0);
            if(m_ShowDistances) // calculate and print a distance
@@ -467,7 +464,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
               Vector2D vec2d = pt2d-lastPt2d;
               makePerpendicularVector2D(vec2d, vec2d);
 
-              Vector2D pos2d = (lastPt2d.GetVectorFromOrigin()+pt2d)*0.5+vec2d*text2dDistance;
+              Vector2D pos2d = (lastPt2d.GetVectorFromOrigin()+pt2d.GetVectorFromOrigin())*0.5+vec2d*text2dDistance;
 
               mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
               OpenGLrenderer->WriteSimpleText(buffer.str(), pos2d[0], pos2d[1]);

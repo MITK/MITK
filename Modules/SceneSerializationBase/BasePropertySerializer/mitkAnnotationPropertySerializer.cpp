@@ -21,17 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAnnotationProperty.h"
 
-#include "SceneSerializationBaseExports.h"
+#include <MitkSceneSerializationBaseExports.h>
 
 namespace mitk
 {
 
-class SceneSerializationBase_EXPORT AnnotationPropertySerializer : public BasePropertySerializer
+class MitkSceneSerializationBase_EXPORT AnnotationPropertySerializer : public BasePropertySerializer
 {
   public:
 
     mitkClassMacro( AnnotationPropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {
@@ -53,11 +54,11 @@ class SceneSerializationBase_EXPORT AnnotationPropertySerializer : public BasePr
       if (!element) return NULL;
       const char* label( element->Attribute("label") );
       Point3D p;
-      if ( element->QueryFloatAttribute( "x", &p[0] ) != TIXML_SUCCESS )
+      if ( element->QueryDoubleAttribute( "x", &p[0] ) != TIXML_SUCCESS )
         return NULL;
-      if ( element->QueryFloatAttribute( "y", &p[1] ) != TIXML_SUCCESS )
+      if ( element->QueryDoubleAttribute( "y", &p[1] ) != TIXML_SUCCESS )
         return NULL;
-      if ( element->QueryFloatAttribute( "z", &p[2] ) != TIXML_SUCCESS )
+      if ( element->QueryDoubleAttribute( "z", &p[2] ) != TIXML_SUCCESS )
         return NULL;
       return AnnotationProperty::New(label, p).GetPointer();
     }

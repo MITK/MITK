@@ -755,7 +755,7 @@ void QmitkNavigationButtonsView::PlanarFigureFocus()
     if(figureInteractor.IsNull())
     {
       figureInteractor = mitk::PlanarFigureInteractor::New();
-      mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+      mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "MitkPlanarFigure" );
       figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
       figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
       figureInteractor->SetDataNode( m_SelectedNode );

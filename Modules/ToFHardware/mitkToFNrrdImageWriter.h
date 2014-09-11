@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFNrrdImageWriter_h
 #define __mitkToFNrrdImageWriter_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkToFImageWriter.h"
 
 #include <fstream>
@@ -36,7 +36,8 @@ namespace mitk
   {
   public:
     mitkClassMacro( ToFNrrdImageWriter , ToFImageWriter );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief Open file(s) for writing

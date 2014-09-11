@@ -21,55 +21,65 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
+//ToF
 #include "mitkIToFDeviceFactory.h"
-
 #include "mitkToFConfig.h"
 #include "mitkKinectDeviceFactory.h"
-
 #include "mitkAbstractToFDeviceFactory.h"
-
-/*
-  * This is the module activator for the "mitkKinectModule" module. It registers services
-  * like the IToFDeviceFactory.
-  */
 
 namespace mitk
 {
-class KinectActivator : public us::ModuleActivator {
+/**
+ * @brief The KinectActivator class This is the module activator for the "mitkKinectModule"
+ * module. It registers services like the IToFDeviceFactory.
+ */
+class KinectActivator : public us::ModuleActivator{
 public:
+  /**
+  * @brief Load This method is automatically called, when the kinect module
+  * is activated. It will automatically register a KinectDeviceFactory.
+  */
+  void Load(us::ModuleContext* context)
+  {
+    //Implementing KinectDeviceFactory
+    KinectDeviceFactory* kinectFactory = new KinectDeviceFactory();
+    us::ServiceProperties kinectFactoryProps;
+    kinectFactoryProps["ToFFactoryName"] =kinectFactory->GetFactoryName();
+    context->RegisterService<IToFDeviceFactory>(kinectFactory, kinectFactoryProps);
+    kinectFactory->ConnectToFDevice();
 
-    void Load(us::ModuleContext* context)
+    m_Factories.push_back( kinectFactory );
+  }
+
+  /**
+  * @brief Unload called when the module is unloaded.
+  */
+  void Unload(us::ModuleContext* )
+  {
+  }
+
+  /**
+  @brief Default destructor which deletes all registered factories.
+  Usually, there should never be more than one.
+  */
+  ~KinectActivator()
+  {
+    if(m_Factories.size() > 0)
     {
-        //Implementing KinectDeviceFactory
-        KinectDeviceFactory* kinectFactory = new KinectDeviceFactory();
-        us::ServiceProperties kinectFactoryProps;
-        kinectFactoryProps["ToFFactoryName"] =kinectFactory->GetFactoryName();
-        context->RegisterService<IToFDeviceFactory>(kinectFactory, kinectFactoryProps);
-        kinectFactory->ConnectToFDevice();
-
-        m_Factories.push_back( kinectFactory );
+      for(std::list< IToFDeviceFactory* >::iterator it = m_Factories.begin(); it != m_Factories.end(); ++it)
+      {
+        delete (*it);
+      }
     }
-
-    void Unload(us::ModuleContext* )
-    {
-    }
-
-    ~KinectActivator()
-    {
-        if(m_Factories.size() > 0)
-        {
-            for(std::list< IToFDeviceFactory* >::iterator it = m_Factories.begin(); it != m_Factories.end(); ++it)
-            {
-                delete (*it);
-            }
-        }
-    }
+  }
 
 private:
-
-    std::list< IToFDeviceFactory* > m_Factories;
+  /**
+  * @brief m_Factories List of all registered factories.
+  */
+  std::list< IToFDeviceFactory* > m_Factories;
 
 };
 }
-US_EXPORT_MODULE_ACTIVATOR(mitkKinectModule, mitk::KinectActivator)
+US_EXPORT_MODULE_ACTIVATOR(MitkKinect, mitk::KinectActivator)
 #endif

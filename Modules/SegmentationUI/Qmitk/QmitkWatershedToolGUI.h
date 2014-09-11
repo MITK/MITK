@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkWatershedToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 #include "mitkWatershedTool.h"
 
 class QSlider;
@@ -33,13 +33,14 @@ class QFrame;
   This GUI shows two sliders to change the watershed parameters. It executes the watershed algorithm by clicking on the button.
 
 */
-class SegmentationUI_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
     mitkClassMacro(QmitkWatershedToolGUI, QmitkToolGUI);
-    itkNewMacro(QmitkWatershedToolGUI);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
   protected slots:
 

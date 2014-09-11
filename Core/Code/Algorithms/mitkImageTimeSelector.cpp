@@ -55,7 +55,7 @@ void mitk::ImageTimeSelector::GenerateOutputInformation()
      mitkThrow() << "Failed to clone the retrieved sliced geometry.";
   }
 
-  mitk::Geometry3D::Pointer geom_3d =  dynamic_cast<Geometry3D*>(sliced_geo_clone.GetPointer());
+  mitk::BaseGeometry::Pointer geom_3d =  dynamic_cast<BaseGeometry*>(sliced_geo_clone.GetPointer());
   if( geom_3d.IsNotNull() )
   {
     output->SetGeometry(geom_3d.GetPointer() );

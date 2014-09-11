@@ -22,7 +22,7 @@ This file is based heavily on a corresponding ITK filter.
 #ifndef __itkStreamlineTrackingFilter_h_
 #define __itkStreamlineTrackingFilter_h_
 
-#include "FiberTrackingExports.h"
+#include <MitkFiberTrackingExports.h>
 #include <itkImageToImageFilter.h>
 #include <itkVectorContainer.h>
 #include <itkVectorImage.h>
@@ -52,7 +52,8 @@ namespace itk{
     typedef ImageToImageFilter< Image< DiffusionTensor3D<TTensorPixelType>, 3 >, Image< Vector< TPDPixelType, 3 >, 3 > > Superclass;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Runtime information support. */
     itkTypeMacro(StreamlineTrackingFilter, ImageToImageFilter)
@@ -63,65 +64,68 @@ namespace itk{
     typedef typename Superclass::OutputImageType        OutputImageType;
     typedef typename Superclass::OutputImageRegionType  OutputImageRegionType;
     typedef itk::Image<unsigned char, 3>                ItkUcharImgType;
+    typedef itk::Image<double, 3>                       ItkDoubleImgType;
     typedef itk::Image<float, 3>                        ItkFloatImgType;
     typedef itk::Image< vnl_vector_fixed<double,3>, 3>  ItkPDImgType;
     typedef vtkSmartPointer< vtkPolyData >              FiberPolyDataType;
 
-    itkGetMacro( FiberPolyData, FiberPolyDataType )
-    itkSetMacro( SeedImage, ItkUcharImgType::Pointer)
-    itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
-    itkSetMacro( SeedsPerVoxel, int)
-    itkSetMacro( FaThreshold, float)
-    itkSetMacro( StepSize, float)
-    itkSetMacro( F, float )
-    itkSetMacro( G, float )
-    itkSetMacro( Interpolate, bool )
-    itkSetMacro( MinTractLength, float )
-    itkGetMacro( MinTractLength, float )
-    itkSetMacro( MinCurvatureRadius, float )
-    itkGetMacro( MinCurvatureRadius, float )
-    itkSetMacro( ResampleFibers, bool )
+    itkGetMacro( FiberPolyData, FiberPolyDataType )     ///< Output fibers
+    itkSetMacro( SeedImage, ItkUcharImgType::Pointer)   ///< Seeds are only placed inside of this mask.
+    itkSetMacro( MaskImage, ItkUcharImgType::Pointer)   ///< Tracking is only performed inside of this mask image.
+    itkSetMacro( FaImage, ItkFloatImgType::Pointer)     ///< Use this FA image instead of the automatically calculated one. Necessary for multi tensor tracking.
+    itkSetMacro( SeedsPerVoxel, int)                    ///< One seed placed in the center of each voxel or multiple seeds randomly placed inside each voxel.
+    itkSetMacro( FaThreshold, double)                    ///< FA termination criterion.
+    itkSetMacro( StepSize, double)                       ///< Integration step size in mm
+    itkSetMacro( F, double )                             ///< Tensor deflection parameter f
+    itkSetMacro( G, double )                             ///< Tensor deflection parameter g
+    itkSetMacro( Interpolate, bool )                    ///< Toggle between nearest neighbour (false) and trilinear interpolation (true)
+    itkSetMacro( MinTractLength, double )                ///< Shorter tracts are discarded.
+    itkGetMacro( MinTractLength, double )
+    itkSetMacro( MinCurvatureRadius, double )            ///< Tracking is stopped if curvature radius (in mm) is too small.
+    itkGetMacro( MinCurvatureRadius, double )
+    itkSetMacro( ResampleFibers, bool )                 ///< If enabled, the resulting fibers are resampled to feature point distances of 0.5*MinSpacing. This is recommendable for very short integration steps and many seeds. If disabled, the resulting fiber bundle might become very large.
 
   protected:
     StreamlineTrackingFilter();
     ~StreamlineTrackingFilter() {}
     void PrintSelf(std::ostream& os, Indent indent) const;
 
-    void CalculateNewPosition(itk::ContinuousIndex<double, 3>& pos, vnl_vector_fixed<double,3>& dir, typename InputImageType::IndexType& index);
-    float FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids);
-    bool IsValidPosition(itk::ContinuousIndex<double, 3>& pos, typename InputImageType::IndexType& index, vnl_vector_fixed< float, 8 >& interpWeights);
+    void CalculateNewPosition(itk::ContinuousIndex<double, 3>& pos, vnl_vector_fixed<double,3>& dir, typename InputImageType::IndexType& index);    ///< Calculate next integration step.
+    double FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids, int imageIdx);       ///< Start streamline in one direction.
+    bool IsValidPosition(itk::ContinuousIndex<double, 3>& pos, typename InputImageType::IndexType& index, vnl_vector_fixed< double, 8 >& interpWeights, int imageIdx);   ///< Are we outside of the mask image? Is the FA too low?
 
     double RoundToNearest(double num);
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
     void AfterThreadedGenerateData();
 
-    FiberPolyDataType AddPolyData(FiberPolyDataType poly1, FiberPolyDataType poly2);
+    FiberPolyDataType AddPolyData(FiberPolyDataType poly1, FiberPolyDataType poly2);    ///< Combine tracking results generated by the individual threads.
 
-    FiberPolyDataType m_FiberPolyData;
-    vtkSmartPointer<vtkPoints> m_Points;
-    vtkSmartPointer<vtkCellArray> m_Cells;
+    FiberPolyDataType               m_FiberPolyData;
+    vtkSmartPointer<vtkPoints>      m_Points;
+    vtkSmartPointer<vtkCellArray>   m_Cells;
 
-    ItkFloatImgType::Pointer    m_EmaxImage;
-    ItkFloatImgType::Pointer    m_FaImage;
-    ItkPDImgType::Pointer       m_PdImage;
-    typename InputImageType::Pointer m_InputImage;
+    std::vector< ItkDoubleImgType::Pointer >         m_EmaxImage;    ///< Stores largest eigenvalues per voxel (one for each tensor)
+    ItkFloatImgType::Pointer                        m_FaImage;      ///< FA image used to determine streamline termination.
+    std::vector< ItkPDImgType::Pointer >            m_PdImage;      ///< Stores principal direction of each tensor in each voxel.
+    std::vector< typename InputImageType::Pointer > m_InputImage;   ///< Input tensor images. For multi tensor tracking provide multiple tensor images.
 
-    float m_FaThreshold;
-    float m_MinCurvatureRadius;
-    float m_StepSize;
-    int m_MaxLength;
-    float m_MinTractLength;
-    int m_SeedsPerVoxel;
-    float m_F;
-    float m_G;
-    std::vector< int > m_ImageSize;
-    std::vector< float > m_ImageSpacing;
-    ItkUcharImgType::Pointer m_SeedImage;
-    ItkUcharImgType::Pointer m_MaskImage;
-    bool m_Interpolate;
-    float m_PointPistance;
-    bool m_ResampleFibers;
+    int     m_NumberOfInputs;
+    double   m_FaThreshold;
+    double   m_MinCurvatureRadius;
+    double   m_StepSize;
+    int     m_MaxLength;
+    double   m_MinTractLength;
+    int     m_SeedsPerVoxel;
+    double   m_F;
+    double   m_G;
+    bool    m_Interpolate;
+    double   m_PointPistance;
+    bool    m_ResampleFibers;
+    std::vector< int >          m_ImageSize;
+    std::vector< double >        m_ImageSpacing;
+    ItkUcharImgType::Pointer    m_SeedImage;
+    ItkUcharImgType::Pointer    m_MaskImage;
 
     itk::VectorContainer< int, FiberPolyDataType >::Pointer m_PolyDataContainer;
 

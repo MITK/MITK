@@ -20,45 +20,62 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToItk.h"
 #include "mitkBaseProcess.h"
 #include "itkImportMitkImageContainer.h"
+#include "mitkImageReadAccessor.h"
 #include "mitkImageWriteAccessor.h"
 #include "mitkException.h"
 
+template<typename TImageType>
+struct SetLengthHelper
+{
+  SetLengthHelper(TImageType* in)
+  { m_Image = in;}
+
+private:
+  TImageType* m_Image;
+};
+
+template< typename T, unsigned int VDimension>
+struct SetLengthHelper< itk::Image< T, VDimension > >
+{
+  typedef itk::Image< T, VDimension > TImageType;
+
+  SetLengthHelper(TImageType* in)
+  { m_Image = in;}
+
+  void SetVectorLength( size_t ) {}
+
+private:
+  TImageType* m_Image;
+};
+
+template< typename T, unsigned int VDimension>
+struct SetLengthHelper< itk::VectorImage< T, VDimension > >
+{
+  typedef itk::VectorImage< T, VDimension > TImageType;
+
+  SetLengthHelper(TImageType* in)
+  { m_Image = in;}
+
+  void SetVectorLength( size_t len) { m_Image->SetVectorLength( len ); }
+
+private:
+  TImageType* m_Image;
+};
 
 template <class TOutputImage>
 void mitk::ImageToItk<TOutputImage>::SetInput(mitk::Image *input)
 {
-  if(input == NULL)
-    itkExceptionMacro( << "image is null" );
-  if(input->GetDimension()!=TOutputImage::GetImageDimension())
-    itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
-
-
-  if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>()))
-    itkExceptionMacro( << "image has wrong pixel type " );
-
-  // Process object is not const-correct so the const_cast is required here
-  itk::ProcessObject::SetNthInput(0, input);
+  this->SetInput(static_cast<const Image*>(input));
+  m_ConstInput = false;
 }
 
-template<class TOutputImage>
-void mitk::ImageToItk<TOutputImage>::SetInput( unsigned int index, mitk::Image * input )
+template <class TOutputImage>
+void mitk::ImageToItk<TOutputImage>::SetInput(const mitk::Image* input)
 {
-  if( index+1 > this->GetNumberOfInputs() )
-  {
-    this->SetNumberOfRequiredInputs( index + 1 );
-  }
-
-  if(input == NULL)
-    itkExceptionMacro( << "image is null" );
-  if(input->GetDimension()!=TOutputImage::GetImageDimension())
-    itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
-
-
-  if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>() ))
-    itkExceptionMacro( << "image has wrong pixel type " );
-
+  this->CheckInput(input);
   // Process object is not const-correct so the const_cast is required here
-  itk::ProcessObject::SetNthInput(index,input);
+  itk::ProcessObject::PushFrontInput(input);
+  m_ConstInput = true;
 }
 
 template<class TOutputImage>
@@ -69,13 +86,18 @@ mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(void)
     return 0;
   }
 
-  return (mitk::Image*) const_cast<itk::DataObject*>(itk::ProcessObject::GetInput(0));
+  return static_cast<mitk::Image*>(itk::ProcessObject::GetInput(0));
 }
 
 template<class TOutputImage>
-mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(unsigned int idx)
+const mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput() const
 {
-  return itk::ProcessObject::GetInput(idx);
+  if (this->GetNumberOfInputs() < 1)
+  {
+    return 0;
+  }
+
+  return static_cast<const mitk::Image*>(itk::ProcessObject::GetInput(0));
 }
 
 template<class TOutputImage>
@@ -92,8 +114,23 @@ template<class TOutputImage>
   {
     noBytes = noBytes * input->GetDimension(i);
   }
+  const mitk::PixelType pixelType = input->GetPixelType();
+  if (pixelType.GetPixelType() == itk::ImageIOBase::VECTOR)
+  {
+    noBytes *= pixelType.GetNumberOfComponents();
+    SetLengthHelper<typename Superclass::OutputImageType> helper( output.GetPointer() );
+    helper.SetVectorLength( pixelType.GetNumberOfComponents() );
+  }
 
-  mitk::ImageWriteAccessor* imageAccess = new mitk::ImageWriteAccessor(input);
+  mitk::ImageAccessorBase* imageAccess;
+  if (m_ConstInput)
+  {
+    imageAccess = new mitk::ImageReadAccessor(input, static_cast<const ImageDataItem*>(NULL), m_Options);
+  }
+  else
+  {
+    imageAccess = new mitk::ImageWriteAccessor(input, static_cast<const ImageDataItem*>(NULL), m_Options);
+  }
 
   // hier wird momentan wohl nur der erste Channel verwendet??!!
   if(imageAccess->GetData() == NULL)
@@ -111,14 +148,14 @@ template<class TOutputImage>
 
     output->Allocate();
 
-    memcpy( (PixelType *) output->GetBufferPointer(), imageAccess->GetData(), sizeof(PixelType)*noBytes);
+    memcpy(output->GetBufferPointer(), imageAccess->GetData(), sizeof(InternalPixelType)*noBytes);
 
     delete imageAccess;
   }
   else
   {
     itkDebugMacro("do not copyMem ...");
-    typedef itk::ImportMitkImageContainer< unsigned long, PixelType >   ImportContainerType;
+    typedef itk::ImportMitkImageContainer< unsigned long, InternalPixelType >   ImportContainerType;
     typename ImportContainerType::Pointer import;
 
     import = ImportContainerType::New();
@@ -126,7 +163,7 @@ template<class TOutputImage>
 
     itkDebugMacro( << "size of container = " << import->Size() );
     //import->SetImageDataItem(m_ImageDataItem);
-    import->SetImageAccessor(imageAccess,sizeof(PixelType)*noBytes);
+    import->SetImageAccessor(imageAccess,sizeof(InternalPixelType)*noBytes);
 
      output->SetPixelContainer(import);
     itkDebugMacro( << "size of container = " << import->Size() );
@@ -245,6 +282,24 @@ template<class TOutputImage>
   output->SetOrigin( origin );
   output->SetSpacing( spacing );
   output->SetDirection( direction );
+  }
+
+template<class TOutputImage>
+void mitk::ImageToItk<TOutputImage>::CheckInput(const mitk::Image* input) const
+{
+  if(input == NULL)
+  {
+    itkExceptionMacro( << "image is null" );
+  }
+  if(input->GetDimension()!=TOutputImage::GetImageDimension())
+  {
+    itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
+  }
+
+  if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>(input->GetPixelType().GetNumberOfComponents())))
+  {
+    itkExceptionMacro( << "image has wrong pixel type " );
+  }
 }
 
 template<class TOutputImage>

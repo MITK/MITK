@@ -13,11 +13,11 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef _mitkLegacyAdaptors_h
+#ifndef _mitkLegacyAdaptors_h_
 #define _mitkLegacyAdaptors_h_
 
 #include "mitkCommon.h"
-#include "LegacyAdaptorsExports.h"
+#include <MitkLegacyAdaptorsExports.h>
 
 #include <mitkIpPic.h>
 #include "mitkImage.h"
@@ -40,7 +40,7 @@ namespace mitk
 
    Meant to support legacy code, which was base on mitkIpPicDescriptor types. Please remind that such code should be migrated towards ITK/VTK solutions.
  */
-  LegacyAdaptors_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitk::ImageWriteAccessor*, mitkIpPicDescriptor* picDesc);
+  MitkLegacyAdaptors_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitk::ImageWriteAccessor*, mitkIpPicDescriptor* picDesc);
 
   /**
     \brief Constructs a legacy mitkIpPicDescriptor from mitk::ImageDataItem
@@ -49,7 +49,7 @@ namespace mitk
     Simply calling ipPicFree( desc ) will delete the data and so will the ImageDataItem try when it get deleted. Simplest way to avoid the duplicate
     deletion attempt is to set the desc->data manually to NULL before calling the ipPicFree() on the descriptor
   */
-  LegacyAdaptors_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitk::ImageWriteAccessor*, mitkIpPicDescriptor *picDesc );
+  MitkLegacyAdaptors_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitk::ImageWriteAccessor*, mitkIpPicDescriptor *picDesc );
 
  /**
    \brief Constructs a deprecated legacy mitkIpPicDescriptor from mitk::Image
@@ -57,7 +57,7 @@ namespace mitk
    Meant to support legacy code, which was base on mitkIpPicDescriptor types. Please remind that such code should be migrated towards ITK/VTK solutions.
    \deprecatedSince{2012_09} Please use image accessors instead! An image accessor (ImageWriteAccessor) can be commited to CastToIpPicDescriptor.
  */
-  LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitkIpPicDescriptor* picDesc));
+  MitkLegacyAdaptors_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitkIpPicDescriptor* picDesc));
 
   /**
     \brief Constructs a deprecated legacy mitkIpPicDescriptor from mitk::ImageDataItem
@@ -67,7 +67,7 @@ namespace mitk
     deletion attempt is to set the desc->data manually to NULL before calling the ipPicFree() on the descriptor
    \deprecatedSince{2012_09} Please use image accessors instead! An image accessor (ImageWriteAccessor) can be commited to CastToIpPicDescriptor.
   */
-  LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitkIpPicDescriptor *picDesc));
+  MitkLegacyAdaptors_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitkIpPicDescriptor *picDesc));
 
 
   /**
@@ -75,14 +75,14 @@ namespace mitk
 
     Performs the oposite cast direction to \sa CastToIpPicDescriptor
   */
-  LegacyAdaptors_EXPORT DEPRECATED(mitk::ImageDescriptor::Pointer CastToImageDescriptor(mitkIpPicDescriptor* desc));
+  MitkLegacyAdaptors_EXPORT DEPRECATED(mitk::ImageDescriptor::Pointer CastToImageDescriptor(mitkIpPicDescriptor* desc));
 
   /**
     \brief Constructs a legacy type information from mitk::PixelType
 
     The IpPicDescriptor uses own notations for different pixel types. This casting is needed e.g. by the CastToIpPicDescriptor method.
   */
-  LegacyAdaptors_EXPORT DEPRECATED(mitkIpPicType_t CastToIpPicType( int componentType ) );
+  MitkLegacyAdaptors_EXPORT DEPRECATED(mitkIpPicType_t CastToIpPicType( int componentType ) );
 
   /**
     \brief Returns a mitk::PixelType object corresponding to given mitkIpPicType_t
@@ -90,7 +90,7 @@ namespace mitk
     The method needs the mitkIpPicType_t and the bits per element (bpe) information to be able to create the correct corresponding PixelType
     \sa PixelType
   */
-  LegacyAdaptors_EXPORT DEPRECATED(PixelType CastToPixelType( mitkIpPicType_t pictype, size_t bpe ) );
+  MitkLegacyAdaptors_EXPORT DEPRECATED(PixelType CastToPixelType( mitkIpPicType_t pictype, size_t bpe ) );
 
 } // end namespace mitk
 

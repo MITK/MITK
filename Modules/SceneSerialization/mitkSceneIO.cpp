@@ -112,7 +112,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   if ( filename.empty() )
   {
     MITK_ERROR << "No filename given. Not possible to load scene.";
-    return NULL;
+    return storage;
   }
 
   // test if filename can be read
@@ -120,7 +120,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   if (!file.good())
   {
     MITK_ERROR << "Cannot open '" << filename << "' for reading";
-    return NULL;
+    return storage;
   }
 
   // get new temporary directory
@@ -128,7 +128,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   if (m_WorkingDirectory.empty())
   {
     MITK_ERROR << "Could not create temporary directory. Cannot open scene files.";
-    return NULL;
+    return storage;
   }
 
   // unzip all filenames contents to temp dir
@@ -151,7 +151,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   if (!document.LoadFile())
   {
     MITK_ERROR << "Could not open/read/parse " << m_WorkingDirectory << "/index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
-    return NULL;
+    return storage;
   }
 
   SceneReader::Pointer reader = SceneReader::New();
@@ -337,21 +337,24 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
           }
 
           // store all renderwindow specific propertylists
-          const RenderingManager::RenderWindowVector& allRenderWindows( RenderingManager::GetInstance()->GetAllRegisteredRenderWindows() );
-          for ( RenderingManager::RenderWindowVector::const_iterator rw = allRenderWindows.begin();
-                rw != allRenderWindows.end();
-                ++rw)
+          if (RenderingManager::IsInstantiated())
           {
-            if (vtkRenderWindow* renderWindow = *rw)
+            const RenderingManager::RenderWindowVector& allRenderWindows( RenderingManager::GetInstance()->GetAllRegisteredRenderWindows() );
+            for ( RenderingManager::RenderWindowVector::const_iterator rw = allRenderWindows.begin();
+                  rw != allRenderWindows.end();
+                  ++rw)
             {
-              std::string renderWindowName( mitk::BaseRenderer::GetInstance(renderWindow)->GetName() );
-              BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow);
-              PropertyList* propertyList = node->GetPropertyList(renderer);
-              if ( propertyList && !propertyList->IsEmpty() )
+              if (vtkRenderWindow* renderWindow = *rw)
               {
-                TiXmlElement* renderWindowPropertiesElement( SavePropertyList( propertyList, filenameHint + "-" + renderWindowName) ); // returns a reference to a file
-                renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName);
-                nodeElement->LinkEndChild( renderWindowPropertiesElement );
+                std::string renderWindowName( mitk::BaseRenderer::GetInstance(renderWindow)->GetName() );
+                BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow);
+                PropertyList* propertyList = node->GetPropertyList(renderer);
+                if ( propertyList && !propertyList->IsEmpty() )
+                {
+                  TiXmlElement* renderWindowPropertiesElement( SavePropertyList( propertyList, filenameHint + "-" + renderWindowName) ); // returns a reference to a file
+                  renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName);
+                  nodeElement->LinkEndChild( renderWindowPropertiesElement );
+                }
               }
             }
           }
@@ -395,6 +398,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         if (!file.good())
         {
           MITK_ERROR << "Could not open a zip file for writing: '" << filename << "'";
+          return false;
         }
         else
         {

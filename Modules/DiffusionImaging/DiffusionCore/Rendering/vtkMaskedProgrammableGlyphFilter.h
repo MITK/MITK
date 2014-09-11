@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __vtkMaskedProgrammableGlyphFilter_h
 #define __vtkMaskedProgrammableGlyphFilter_h
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 #include "vtkProgrammableGlyphFilter.h"
-#include "mitkGeometry3D.h"
+#include "mitkBaseGeometry.h"
 
 class vtkMaskPoints;
 /**
@@ -31,10 +31,10 @@ class vtkMaskPoints;
  * InputVectors and InputNormals by their field name in the
  * input dataset.
  */
-class DiffusionCore_EXPORT vtkMaskedProgrammableGlyphFilter : public vtkProgrammableGlyphFilter
+class MitkDiffusionCore_EXPORT vtkMaskedProgrammableGlyphFilter : public vtkProgrammableGlyphFilter
 {
 public:
-  vtkTypeRevisionMacro(vtkMaskedProgrammableGlyphFilter,vtkProgrammableGlyphFilter);
+  vtkTypeMacro(vtkMaskedProgrammableGlyphFilter,vtkProgrammableGlyphFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
@@ -89,23 +89,22 @@ public:
   //void SelectInputNormals(const char *fieldName)
   //  {this->SetInputNormalsSelection(fieldName);}
 
-  void SetGeometry(mitk::Geometry3D::Pointer geo)
+  void SetGeometry(mitk::BaseGeometry::Pointer geo)
   { this->m_Geometry = geo; }
-  mitk::Geometry3D::Pointer GetGeometry()
+  mitk::BaseGeometry::Pointer GetGeometry()
   { return this->m_Geometry; }
 
 protected:
   vtkMaskedProgrammableGlyphFilter();
   ~vtkMaskedProgrammableGlyphFilter();
 
-  virtual void Execute();
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;
   int UseMaskPoints;
 
-  mitk::Geometry3D::Pointer m_Geometry;
+  mitk::BaseGeometry::Pointer m_Geometry;
 
 private:
   vtkMaskedProgrammableGlyphFilter(const vtkMaskedProgrammableGlyphFilter&);  // Not implemented.

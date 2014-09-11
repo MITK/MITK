@@ -18,9 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef DISPLAYPOSITIONEVENT_H_HEADER_INCLUDED_C184F366
 #define DISPLAYPOSITIONEVENT_H_HEADER_INCLUDED_C184F366
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkEvent.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "mitkDataNode.h"
 
 
@@ -55,7 +55,12 @@ public:
       return m_DisplayPosition;
   }
 
-  void SetDisplayPosition(const Point2D& displPosition) { m_DisplayPosition = displPosition; }
+  void SetDisplayPosition(const Point2D& displayPosition)
+  {
+    m_DisplayPosition = displayPosition;
+    m_WorldPositionIsSet = false;
+    m_PickedObjectIsSet = false;
+  }
 
   Point3D& GetWorldPosition() const;
 

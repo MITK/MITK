@@ -169,7 +169,7 @@ void QmitkRegionGrowingView::DoImageProcessing()
 
 //! [cpp-itkimageaccess]
 template < typename TPixel, unsigned int VImageDimension >
-void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry )
+void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::BaseGeometry* imageGeometry )
 {
   typedef itk::Image< TPixel, VImageDimension > InputImageType;
   typedef typename InputImageType::IndexType    IndexType;

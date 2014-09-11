@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkImageToContourModelFilter_h__
 
 #include "mitkCommon.h"
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 #include "mitkContourModel.h"
 #include "mitkContourModelSource.h"
 #include <mitkImage.h>
@@ -33,16 +33,19 @@ namespace mitk {
   * \ingroup ContourModelFilters
   * \ingroup Process
   */
-  class ContourModel_EXPORT ImageToContourModelFilter : public ContourModelSource
+  class MitkContourModel_EXPORT ImageToContourModelFilter : public ContourModelSource
   {
 
   public:
 
     mitkClassMacro(ImageToContourModelFilter, ContourModelSource);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::Image InputType;
 
+
+    using Superclass::SetInput;
 
     virtual void SetInput( const InputType *input);
 
@@ -58,6 +61,12 @@ namespace mitk {
     virtual ~ImageToContourModelFilter();
 
     void GenerateData();
+
+    template<typename TPixel, unsigned int VImageDimension>
+    void Itk2DContourExtraction (const itk::Image<TPixel, VImageDimension>* sliceImage);
+
+  private:
+    const BaseGeometry* m_SliceGeometry;
 
   };
 

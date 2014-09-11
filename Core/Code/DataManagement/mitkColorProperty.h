@@ -14,11 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKCOLORPROPERTY_H_HEADER_INCLUDED_C17953D1
 #define MITKCOLORPROPERTY_H_HEADER_INCLUDED_C17953D1
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
 #include <itkRGBPixel.h>
 
@@ -29,17 +28,26 @@ namespace mitk {
 # pragma warning(disable: 4522)
 #endif
 
-//##Documentation
-//## @brief Standard RGB color typedef (float)
-//##
-//## Standard RGB color typedef to get rid of template argument (float).
-//## @ingroup Property
+/**
+ * @brief Color Standard RGB color typedef (float)
+ *
+ * Standard RGB color typedef to get rid of template argument (float).
+ * Color range is from 0.0f to 255.0f for each component.
+ *
+ * @ingroup Property
+ */
 typedef itk::RGBPixel< float > Color;
 
-//##Documentation
-//## @brief RGB color property
-//##
-//## @ingroup DataManagement
+/**
+ * @brief The ColorProperty class RGB color property
+ * @ingroup DataManagement
+ *
+ * @note If you want to apply the mitk::ColorProperty to an mitk::Image
+ * make sure to set the mitk::RenderingModeProperty to a mode which
+ * supports color (e.g. LEVELWINDOW_COLOR). For an example how to use
+ * the mitk::ColorProperty see mitkImageVtkMapper2DColorTest.cpp in
+ * Core\Code\Rendering.
+ */
 class MITK_CORE_EXPORT ColorProperty : public BaseProperty
 {
 protected:
@@ -59,7 +67,8 @@ public:
 
   mitkClassMacro(ColorProperty, BaseProperty)
 
-  itkNewMacro(ColorProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro1Param(ColorProperty, const float*);
   mitkNewMacro1Param(ColorProperty, const mitk::Color&);
   mitkNewMacro3Param(ColorProperty, const float, const float, const float);

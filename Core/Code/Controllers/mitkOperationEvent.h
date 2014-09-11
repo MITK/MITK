@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef OPERATIONEVENT_H_HEADER_INCLUDED_C16E83FC
 #define OPERATIONEVENT_H_HEADER_INCLUDED_C16E83FC
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkOperation.h"
 #include "mitkOperationActor.h"
 #include "mitkUndoModel.h"
@@ -39,7 +39,7 @@ namespace mitk {
 //## ExecuteIncrement() does the actual incementation.
 //##
 //## The GroupEventID is intended for logical grouping of several related Operations.
-//## Currently this is used only by PointSetInteractor. How this is done and when to use
+//## Currently this is used only by PointSetDataInteractor. How this is done and when to use
 //## GroupEventIDs is still undocumented.
 //## @ingroup Undo
 class MITK_CORE_EXPORT UndoStackItem

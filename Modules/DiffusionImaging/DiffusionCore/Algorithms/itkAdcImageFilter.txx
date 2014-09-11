@@ -72,13 +72,16 @@ AdcImageFilter< TInPixelType, TOutPixelType>
 
         double S0 = 0;
         int c = 0;
-        for (int i=0; i<inputImagePointer->GetVectorLength(); i++)
+        for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
         {
             GradientDirectionType g = m_GradientDirections->GetElement(i);
             if (g.magnitude()<0.001)
             {
-                S0 += pix[i];
-                c++;
+                if (pix[i]>0)
+                {
+                    S0 += pix[i];
+                    c++;
+                }
             }
         }
         if (c>0)
@@ -87,7 +90,7 @@ AdcImageFilter< TInPixelType, TOutPixelType>
         if (S0>0)
         {
             c = 0;
-            for (int i=0; i<inputImagePointer->GetVectorLength(); i++)
+            for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
             {
                 GradientDirectionType g = m_GradientDirections->GetElement(i);
                 if (g.magnitude()>0.001)
@@ -97,8 +100,11 @@ AdcImageFilter< TInPixelType, TOutPixelType>
                     if (b>0)
                     {
                         double S = pix[i];
-                        outval -= std::log(S/S0)/b;
-                        c++;
+                        if (S>0 && S0>0)
+                        {
+                            outval -= std::log(S/S0)/b;
+                            c++;
+                        }
                     }
                 }
             }

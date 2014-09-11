@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 
-void CheckRWSize(unsigned int width, unsigned int height)
+void CheckRWSize(int width, int height)
 {
   MITK_TEST_OUTPUT(<<"Requesting VTK render window of size " << width << "x" << height );
   vtkSmartPointer<vtkRenderWindow> renderWindowVTK = vtkRenderWindow::New();

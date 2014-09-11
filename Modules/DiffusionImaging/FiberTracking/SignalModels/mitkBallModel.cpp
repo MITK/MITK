@@ -15,6 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include <vnl/vnl_cross.h>
 #include <vnl/vnl_quaternion.h>
+#include <mitkBallModel.h>
+
+using namespace mitk;
 
 template< class ScalarType >
 BallModel< ScalarType >::BallModel()
@@ -31,6 +34,25 @@ BallModel< ScalarType >::~BallModel()
 }
 
 template< class ScalarType >
+ScalarType BallModel< ScalarType >::SimulateMeasurement(unsigned int dir)
+{
+    ScalarType signal = 0;
+
+    if (dir>=this->m_GradientList.size())
+        return signal;
+
+    GradientType g = this->m_GradientList[dir];
+    ScalarType bVal = g.GetNorm(); bVal *= bVal;
+
+    if (bVal>0.0001)
+        signal = std::exp( -m_BValue * bVal * m_Diffusivity );
+    else
+        signal = 1;
+
+    return signal;
+}
+
+template< class ScalarType >
 typename BallModel< ScalarType >::PixelType BallModel< ScalarType >::SimulateMeasurement()
 {
     PixelType signal;
@@ -42,7 +64,7 @@ typename BallModel< ScalarType >::PixelType BallModel< ScalarType >::SimulateMea
         ScalarType bVal = g.GetNorm(); bVal *= bVal;
 
         if (bVal>0.0001)
-            signal[i] = exp( -m_BValue * bVal * m_Diffusivity );
+            signal[i] = std::exp( -m_BValue * bVal * m_Diffusivity );
         else
             signal[i] = 1;
     }

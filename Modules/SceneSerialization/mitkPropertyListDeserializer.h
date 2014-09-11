@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkPropertyListDeserializer_h_included
 #define mitkPropertyListDeserializer_h_included
 
-#include "SceneSerializationExports.h"
+#include <MitkSceneSerializationExports.h>
 
 #include "mitkPropertyList.h"
 
@@ -27,12 +27,13 @@ namespace mitk
 /**
   \brief Deserializes a mitk::PropertyList
 */
-class SceneSerialization_EXPORT PropertyListDeserializer : public itk::Object
+class MitkSceneSerialization_EXPORT PropertyListDeserializer : public itk::Object
 {
   public:
 
     mitkClassMacro( PropertyListDeserializer, itk::Object );
-    itkNewMacro(Self); // is this needed? should never be instantiated, only subclasses should
+    itkFactorylessNewMacro(Self) // is this needed? should never be instantiated, only subclasses should
+    itkCloneMacro(Self)
 
     itkSetStringMacro(Filename);
     itkGetStringMacro(Filename);

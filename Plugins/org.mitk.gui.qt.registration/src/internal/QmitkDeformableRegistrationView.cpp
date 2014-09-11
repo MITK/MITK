@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVectorImageMapper2D.h"
 #include <mitkImageCast.h>
 
-#include "itkImageFileReader.h"
 #include "itkWarpImageFilter.h"
 
 #include "mitkDataNodeObject.h"
@@ -42,10 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
 
-typedef itk::Vector< float, 3 >       VectorType;
-typedef itk::Image< VectorType, 3 >   DeformationFieldType;
 
-typedef itk::ImageFileReader< DeformationFieldType > ImageReaderType;
 
 const std::string QmitkDeformableRegistrationView::VIEW_ID = "org.mitk.views.deformableregistration";
 
@@ -153,7 +149,7 @@ struct SelListenerDeformableRegistration : ISelectionListener
     if (part)
     {
       QString partname(part->GetPartName().c_str());
-      if(partname.compare("Datamanager")==0)
+      if(partname.compare("Data Manager")==0)
       {
         // apply selection
         DoSelectionChanged(selection);
@@ -210,6 +206,12 @@ void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
     m_Controls.m_QmitkBSplineRegistrationViewControls->show();
   }
   this->CheckCalculateEnabled();
+
+  mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+  m_Controls.comboBox->SetDataStorage(this->GetDataStorage());
+  m_Controls.comboBox->SetPredicate(isMitkImage);
+  m_Controls.comboBox_2->SetDataStorage(this->GetDataStorage());
+  m_Controls.comboBox_2->SetPredicate(isMitkImage);
 }
 
 void QmitkDeformableRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNode* node)
@@ -233,44 +235,33 @@ void QmitkDeformableRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNod
 
 }
 
-
 void QmitkDeformableRegistrationView::ApplyDeformationField()
 {
+    if ( m_Controls.comboBox->GetSelectedNode().IsNull() || m_Controls.comboBox_2->GetSelectedNode().IsNull() )
+        return;
 
-  ImageReaderType::Pointer reader  = ImageReaderType::New();
-  reader->SetFileName( m_Controls.m_QmitkBSplineRegistrationViewControls->m_Controls.m_DeformationField->text().toStdString() );
-  reader->Update();
-
-  DeformationFieldType::Pointer deformationField = reader->GetOutput();
-
-  mitk::Image * mimage = dynamic_cast<mitk::Image*> (m_MovingNode->GetData());
-  mitk::Image * fimage = dynamic_cast<mitk::Image*> (m_FixedNode->GetData());
+  mitk::Image* mitkDeformationField = dynamic_cast<mitk::Image*>(m_Controls.comboBox->GetSelectedNode()->GetData());
+  mitk::Image* mimage = dynamic_cast<mitk::Image*>(m_Controls.comboBox_2->GetSelectedNode()->GetData());
 
   typedef itk::Image<float, 3> FloatImageType;
 
   FloatImageType::Pointer itkMovingImage = FloatImageType::New();
-  FloatImageType::Pointer itkFixedImage = FloatImageType::New();
+  DeformationFieldType::Pointer itkDeformationField = DeformationFieldType::New();
   mitk::CastToItkImage(mimage, itkMovingImage);
-  mitk::CastToItkImage(fimage, itkFixedImage);
+  mitk::CastToItkImage(mitkDeformationField, itkDeformationField);
 
-  typedef itk::WarpImageFilter<
-                            FloatImageType,
-                            FloatImageType,
-                            DeformationFieldType  >     WarperType;
-
-  typedef itk::LinearInterpolateImageFunction<
-                                    FloatImageType,
-                                    double          >  InterpolatorType;
+  typedef itk::WarpImageFilter< FloatImageType, FloatImageType, DeformationFieldType  >     WarperType;
+  typedef itk::LinearInterpolateImageFunction< FloatImageType, double >  InterpolatorType;
 
   WarperType::Pointer warper = WarperType::New();
   InterpolatorType::Pointer interpolator = InterpolatorType::New();
 
   warper->SetInput( itkMovingImage );
   warper->SetInterpolator( interpolator );
-  warper->SetOutputSpacing( itkFixedImage->GetSpacing() );
-  warper->SetOutputOrigin( itkFixedImage->GetOrigin() );
-  warper->SetOutputDirection (itkFixedImage->GetDirection() );
-  warper->SetDisplacementField( deformationField );
+  warper->SetOutputSpacing( itkDeformationField->GetSpacing() );
+  warper->SetOutputOrigin( itkDeformationField->GetOrigin() );
+  warper->SetOutputDirection (itkDeformationField->GetDirection() );
+  warper->SetDisplacementField( itkDeformationField );
   warper->Update();
 
   FloatImageType::Pointer outputImage = warper->GetOutput();
@@ -286,11 +277,6 @@ void QmitkDeformableRegistrationView::ApplyDeformationField()
   // add the new datatree node to the datatree
   this->GetDefaultDataStorage()->Add(newNode);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  //Image::Pointer outputImage = this->GetOutput();
-  //mitk::CastToMitkImage( warper->GetOutput(), outputImage );
-
-
 }
 
 void QmitkDeformableRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -314,10 +300,7 @@ void QmitkDeformableRegistrationView::CreateConnections()
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
   connect((QObject*)(m_Controls.m_SwitchImages),SIGNAL(clicked()),this,SLOT(SwitchImages()));
   connect(this,SIGNAL(calculateBSplineRegistration()),m_Controls.m_QmitkBSplineRegistrationViewControls,SLOT(CalculateTransformation()));
-  connect( (QObject*)(m_Controls.m_QmitkBSplineRegistrationViewControls->m_Controls.m_ApplyDeformationField),
-    SIGNAL(clicked()),
-    (QObject*) this,
-    SLOT(ApplyDeformationField()) );
+  connect( m_Controls.m_WarpImageButton, SIGNAL(clicked()), this, SLOT(ApplyDeformationField()) );
 }
 
 void QmitkDeformableRegistrationView::Activated()
@@ -600,7 +583,7 @@ void QmitkDeformableRegistrationView::SetImagesVisible(berry::ISelection::ConstP
     for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
       ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
     {
-      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
+      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::PlaneGeometryData*>(nodeIt->Value()->GetData())==NULL)
       {
         nodeIt->Value()->SetVisibility(true);
       }
@@ -613,7 +596,7 @@ void QmitkDeformableRegistrationView::SetImagesVisible(berry::ISelection::ConstP
     for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
       ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
     {
-      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
+      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::PlaneGeometryData*>(nodeIt->Value()->GetData())==NULL)
       {
         nodeIt->Value()->SetVisibility(false);
       }

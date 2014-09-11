@@ -49,7 +49,7 @@ void QmitkResidualAnalysisWidget::DrawMeans()
 
   // Create values for x-axis
   std::vector<double> xAxis;
-  for(int i=0; i<m_Means.size(); ++i)
+  for(unsigned int i=0; i<m_Means.size(); ++i)
   {
     xAxis.push_back((double)i);
   }
@@ -96,7 +96,7 @@ void QmitkResidualAnalysisWidget::DrawPercentagesOfOutliers()
 
   // Create values for x-axis
   std::vector<double> xAxis;
-  for(int i=0; i<m_PercentagesOfOutliers.size(); ++i)
+  for(unsigned int i=0; i<m_PercentagesOfOutliers.size(); ++i)
   {
     xAxis.push_back((double)i);
   }

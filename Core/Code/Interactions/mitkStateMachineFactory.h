@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef STATEMACHINEFACTORY_H_HEADER_INCLUDED_C19AEDDD
 #define STATEMACHINEFACTORY_H_HEADER_INCLUDED_C19AEDDD
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkState.h"
 #include "mitkTransition.h"
 #include "mitkAction.h"

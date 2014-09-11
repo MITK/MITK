@@ -93,6 +93,15 @@ void mitk::ContourModelToSurfaceFilter::GenerateData()
     vtkSmartPointer<vtkCellArray> polygons = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
 
+    // if the contour has less than 3 points, set empty PolyData for current timestep
+    // polygon needs at least 3 points
+    if( inputContour->GetNumberOfVertices() <= 2)
+    {
+      vtkSmartPointer<vtkPolyData> emptyPolyData = vtkSmartPointer<vtkPolyData>::New();
+      surface->SetVtkPolyData(emptyPolyData, currentTimeStep);
+      continue;
+    }
+
     //iterate over all control points
     mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin(currentTimeStep);
 
@@ -131,7 +140,7 @@ void mitk::ContourModelToSurfaceFilter::GenerateData()
     {
       lines->InsertNextCell(2);
       lines->InsertCellPoint(0);
-      lines->InsertCellPoint( (inputContour->GetNumberOfVertices() - 1) );
+      lines->InsertCellPoint( (inputContour->GetNumberOfVertices(currentTimeStep) - 1) );
     }
 
     polygons->InsertNextCell(polygon);

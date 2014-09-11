@@ -63,7 +63,7 @@ if(NOT MITK_DIR)
 
   if(MITK_USE_QT)
     # Look for Qt at the superbuild level, to catch missing Qt libs early
-    find_package(Qt4 4.6.0 REQUIRED)
+    find_package(Qt4 4.7 REQUIRED)
   endif()
 
   set(additional_mitk_cmakevars )
@@ -115,7 +115,7 @@ if(NOT MITK_DIR)
 
   set(MITK_SOURCE_DIR "" CACHE PATH "MITK source code location. If empty, MITK will be cloned from MITK_GIT_REPOSITORY")
   set(MITK_GIT_REPOSITORY "http://git.mitk.org/MITK.git" CACHE STRING "The git repository for cloning MITK")
-  set(MITK_GIT_TAG "origin/master" CACHE STRING "The git tag/hash to be used when cloning from MITK_GIT_REPOSITORY")
+  set(MITK_GIT_TAG "releases/2014-03" CACHE STRING "The git tag/hash to be used when cloning from MITK_GIT_REPOSITORY")
   mark_as_advanced(MITK_SOURCE_DIR MITK_GIT_REPOSITORY MITK_GIT_TAG)
 
   #-----------------------------------------------------------------------------

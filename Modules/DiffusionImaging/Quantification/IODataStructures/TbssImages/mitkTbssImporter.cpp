@@ -38,7 +38,7 @@ void TbssImporter::Import(const mitk::PixelType , mitk::TbssImage::Pointer tbssI
   MITK_INFO << "called import ...";
   m_Data = DataImageType::New();
 
-  mitk::Geometry3D* geo = m_InputVolume->GetGeometry();
+  mitk::BaseGeometry* geo = m_InputVolume->GetGeometry();
   mitk::Vector3D spacing = geo->GetSpacing();
   mitk::Point3D origin = geo->GetOrigin();
 
@@ -65,8 +65,8 @@ void TbssImporter::Import(const mitk::PixelType , mitk::TbssImage::Pointer tbssI
 
   //Direction must be set
   DataImageType::DirectionType dir;
-  const itk::Transform<float, 3, 3>* transform3D = geo->GetParametricTransform();
-  itk::Transform<float,3,3>::ParametersType p = transform3D->GetParameters();
+  const itk::Transform<ScalarType, 3, 3>* transform3D = geo->GetIndexToWorldTransform();
+  itk::Transform<ScalarType,3,3>::ParametersType p = transform3D->GetParameters();
   int t=0;
   for(int i=0; i<3; i++)
   {
@@ -91,12 +91,12 @@ void TbssImporter::Import(const mitk::PixelType , mitk::TbssImage::Pointer tbssI
   try {
     mitk::ImagePixelReadAccessor<TPixel,4> readTbss( m_InputVolume );
 
-    for(int i=0; i<dataSize[0]; i++)
+    for(unsigned int i=0; i<dataSize[0]; i++)
     {
       MITK_INFO << "i " << i << " / " << dataSize[0];
-      for(int j=0; j<dataSize[1]; j++)
+      for(unsigned int j=0; j<dataSize[1]; j++)
       {
-        for(int k=0; k<dataSize[2]; k++)
+        for(unsigned int k=0; k<dataSize[2]; k++)
         {
           itk::VariableLengthVector<float> pixel;
           itk::Index<3> id;

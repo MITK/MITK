@@ -97,7 +97,7 @@ namespace mitk
       dimensions[ 2 ] = 0;
       dimensions[ 3 ] = 0;
 
-      float spacing[ MAXDIM ];
+      ScalarType spacing[ MAXDIM ];
       spacing[ 0 ] = 1.0f;
       spacing[ 1 ] = 1.0f;
       spacing[ 2 ] = 1.0f;
@@ -152,7 +152,7 @@ namespace mitk
       // re-initialize PlaneGeometry with origin and direction
       PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>
                                      (static_cast<OutputType*>
-                                      (this->GetPrimaryOutput())->GetSlicedGeometry(0)->GetGeometry2D(0));
+                                      (this->GetPrimaryOutput())->GetSlicedGeometry(0)->GetPlaneGeometry(0));
       planeGeometry->SetOrigin(origin);
       planeGeometry->GetIndexToWorldTransform()->SetMatrix(matrix);
 

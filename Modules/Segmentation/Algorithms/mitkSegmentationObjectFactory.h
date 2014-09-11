@@ -18,15 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define SEGMENTATIONOBJECTFACTORY_H_INCLUDED
 
 #include "mitkCoreObjectFactoryBase.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 namespace mitk {
 
-  class Segmentation_EXPORT SegmentationObjectFactory : public CoreObjectFactoryBase
+  class MitkSegmentation_EXPORT SegmentationObjectFactory : public CoreObjectFactoryBase
   {
   public:
     mitkClassMacro(SegmentationObjectFactory,CoreObjectFactoryBase);
-    itkNewMacro(SegmentationObjectFactory);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
     virtual void SetDefaultProperties(mitk::DataNode* node);
     virtual const char* GetFileExtensions();

@@ -2,22 +2,25 @@
  
  \page Step03Page MITK Tutorial - Step 3: Create 3D view
  
+ \li \ref Step3.cpp "Step3.cpp" \n
+Contains the code that both creates a 3D view and turns volume rendering on.
+ \li Path to files used in this step: \n
+http://mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
+http://mitk.org/download/tutorial-data/lungs.vtk (surface)
+
+
 As in the previous step, one or more data sets (many images, surface and other formats) may be loaded. The difference is that they are displayed in a 3D view.
 The QmitkRenderWindow is now used for displaying a 3D view, by setting the used mapper-slot to Standard3D. 
 Since volume-rendering is a (rather) slow procedure, the default is that images are not displayed in the 3D view.
 
 In Step 3a the default is kept whereas in Step 3b volume rendering is turned on.
 
-As in the previous step, to obtain the result the program has to be executed using the image file bin/CMakeExternals/Source/MITK-Data/Pic3D.nrrd and the surface file src/MITK/Modules/MitkExt/Testing/Data/lungs.vtk.
-
-
-\li \ref Step3.cpp "Step3.cpp" \n
-Contains the code that both creates a 3D view and turns volume rendering on.
+As in the previous step, to obtain the result the program has to be executed using the image file Pic3D.nrrd and the surface file lungs.vtk.
 
 
 \section Step3aSection Step 3a - Volume rendering turned off
   
-\image html step3a_result.png 
+\imageMacro{step3a_result.png,"",6.22}
   
 \dontinclude Step3.cpp
 
@@ -33,7 +36,7 @@ As volume rendering is off the image is not visible.
  
 \section Step3bSection Step 3b - Volume rendering turned on
  
-\image html step3b_result.png 
+\imageMacro{step3b_result.png,"",6.22}
  
 Volume Rendering is now turned on as shown in the picture above.
 

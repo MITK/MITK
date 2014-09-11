@@ -23,6 +23,7 @@ mitk::OverlayManager::OverlayManager()
 
 mitk::OverlayManager::~OverlayManager()
 {
+  RemoveAllOverlays();
 }
 
 void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
@@ -43,9 +44,18 @@ void mitk::OverlayManager::RemoveBaseRenderer(mitk::BaseRenderer* renderer)
 {
   if(!renderer)
     return;
-  std::pair<BaseRendererSet::iterator,bool> inSet;
-  inSet = m_BaseRendererSet.insert(renderer);
-  m_BaseRendererSet.erase(inSet.first);
+
+  OverlaySet::iterator it;
+  for ( it=m_OverlaySet.begin() ; it != m_OverlaySet.end(); it++ )
+  {
+    (*it)->RemoveFromBaseRenderer(renderer);
+  }
+
+  BaseRendererSet::iterator i = m_BaseRendererSet.find(renderer);
+  if( i == m_BaseRendererSet.end() )
+    return;
+
+  m_BaseRendererSet.erase(i);
 }
 
 void mitk::OverlayManager::AddOverlay(const Overlay::Pointer& overlay)
@@ -62,29 +72,35 @@ void mitk::OverlayManager::AddOverlay(const Overlay::Pointer& overlay)
   }
 }
 
-void mitk::OverlayManager::RemoveOverlay(const Overlay::Pointer &overlay)
+void mitk::OverlayManager::AddOverlay(const Overlay::Pointer& overlay, BaseRenderer* renderer)
 {
   std::pair<OverlaySet::iterator,bool> inSet;
   inSet = m_OverlaySet.insert(overlay);
-  if(!inSet.second)
+  if(inSet.second)
   {
-    BaseRendererSet::iterator it;
-    for ( it=m_BaseRendererSet.begin() ; it != m_BaseRendererSet.end(); it++ )
-    {
-      overlay->RemoveFromBaseRenderer(*it);
-    }
+    overlay->AddToBaseRenderer(renderer);
   }
-  m_OverlaySet.erase(inSet.first);
+}
+
+void mitk::OverlayManager::RemoveOverlay(const Overlay::Pointer &overlay)
+{
+  OverlaySet::iterator overlayIt = m_OverlaySet.find(overlay);
+  if( overlayIt == m_OverlaySet.end() )
+    return;
+
+  BaseRendererSet::iterator it;
+  for ( it=m_BaseRendererSet.begin() ; it != m_BaseRendererSet.end(); it++)
+  {
+    overlay->RemoveFromBaseRenderer(*it);
+  }
+
+  m_OverlaySet.erase(overlayIt);
 }
 
 void mitk::OverlayManager::RemoveAllOverlays()
 {
-  OverlaySet::iterator it;
-  for ( it=m_OverlaySet.begin() ; it != m_OverlaySet.end(); it++ )
-  {
-    RemoveOverlay(*it);
-  }
-  m_OverlaySet.clear();
+  while(!m_OverlaySet.empty())
+    RemoveOverlay(*m_OverlaySet.begin());
 }
 
 void mitk::OverlayManager::UpdateOverlays(mitk::BaseRenderer* baseRenderer)
@@ -96,7 +112,6 @@ void mitk::OverlayManager::UpdateOverlays(mitk::BaseRenderer* baseRenderer)
   }
   UpdateLayouts(baseRenderer);
 }
-
 
 void mitk::OverlayManager::SetLayouter(Overlay *overlay, const std::string &identifier, mitk::BaseRenderer *renderer)
 {

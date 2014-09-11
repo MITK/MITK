@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef VTKMITKEVENTPROVIDER_H_HEADER_INCLUDED_C1C53723
 #define VTKMITKEVENTPROVIDER_H_HEADER_INCLUDED_C1C53723
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkRenderWindow.h"
 
 #include "vtkInteractorObserver.h"
@@ -36,7 +36,7 @@ class MITK_CORE_EXPORT vtkEventProvider : public vtkInteractorObserver
 {
   public:
     static vtkEventProvider *New();
-    vtkTypeRevisionMacro(vtkEventProvider,vtkInteractorObserver);
+    vtkTypeMacro(vtkEventProvider,vtkInteractorObserver);
 
     // Satisfy the superclass API. Enable/disable listening for events.
     virtual void SetEnabled(int);

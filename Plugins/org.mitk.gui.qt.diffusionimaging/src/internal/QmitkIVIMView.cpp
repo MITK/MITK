@@ -377,7 +377,7 @@ void QmitkIVIMView::AutoThreshold()
 
     typedef itk::Image<short,3> ImgType;
     ImgType::Pointer img = ImgType::New();
-    mitk::CastToItkImage<ImgType>(dimg, img);
+    mitk::CastToItkImage(dimg, img);
 
     itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
     itw.GoToBegin();
@@ -447,7 +447,7 @@ void QmitkIVIMView::FittIVIMStart()
 
     OutImgType::IndexType dummy;
 
-    FittIVIM(vecimg, img->GetDirections(), img->GetB_Value(), true, dummy);
+    FittIVIM(vecimg, img->GetDirections(), img->GetReferenceBValue(), true, dummy);
     OutputToDatastorage(nodes);
 }
 
@@ -527,7 +527,7 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
         roiImage->Allocate();
         roiImage->SetPixel(newstart, vecimg->GetPixel(index));
 
-        success = FittIVIM(roiImage, diffusionImg->GetDirections(), diffusionImg->GetB_Value(), false, crosspos);
+        success = FittIVIM(roiImage, diffusionImg->GetDirections(), diffusionImg->GetReferenceBValue(), false, crosspos);
     }
     else
     {
@@ -594,7 +594,7 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
         roiImage->Allocate();
         roiImage->SetPixel(index, avg);
 
-        success = FittIVIM(roiImage, diffusionImg->GetDirections(), diffusionImg->GetB_Value(), false, index);
+        success = FittIVIM(roiImage, diffusionImg->GetDirections(), diffusionImg->GetReferenceBValue(), false, index);
     }
 
     vecimg->SetRegions( vecimg->GetLargestPossibleRegion() );

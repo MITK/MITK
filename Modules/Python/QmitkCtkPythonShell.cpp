@@ -22,21 +22,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMimeData>
 #include <QUrl>
 #include "mitkPythonService.h"
-#include <mitkModuleContext.h>
+#include <usModuleContext.h>
 #include <usServiceReference.h>
-#include <mitkGetModuleContext.h>
+#include <usGetModuleContext.h>
 
 struct QmitkCtkPythonShellData
 {
     mitk::PythonService* m_PythonService;
-    mitk::ServiceReference m_PythonServiceRef;
+    us::ServiceReference<mitk::PythonService> m_PythonServiceRef;
 };
 
 QmitkCtkPythonShell::QmitkCtkPythonShell(QWidget* parent)
     : ctkPythonConsole(parent), d( new QmitkCtkPythonShellData )
 {
   MITK_DEBUG("QmitkCtkPythonShell") << "retrieving  IPythonService";
-  mitk::ModuleContext* context = mitk::GetModuleContext();
+  us::ModuleContext* context = us::GetModuleContext();
   d->m_PythonServiceRef = context->GetServiceReference<mitk::IPythonService>();
   d->m_PythonService = dynamic_cast<mitk::PythonService*> ( context->GetService<mitk::IPythonService>(d->m_PythonServiceRef) );
 
@@ -51,7 +51,7 @@ QmitkCtkPythonShell::QmitkCtkPythonShell(QWidget* parent)
 
 QmitkCtkPythonShell::~QmitkCtkPythonShell()
 {
-  mitk::ModuleContext* context = mitk::GetModuleContext();
+  us::ModuleContext* context = us::GetModuleContext();
   context->UngetService( d->m_PythonServiceRef );
   delete d;
 }

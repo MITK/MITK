@@ -121,42 +121,32 @@ KinectController::~KinectController()
       }
 
       // Camera registration
-      if ( d->m_DepthGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
+      if( d->m_DepthGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
       {
-        if (d->m_UseIR)
-        {
-          d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_IRGenerator));
-          //if (!d->m_ConnectionCheck) return false;
-        }
-        else
+        if (!d->m_UseIR)
         {
           d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_ImageGenerator));
-          //if (!d->m_ConnectionCheck) return false;
         }
       }
       else
       {
-        std::cout << "Alternative view point not supported by the depth generator..." << std::endl;
+        MITK_ERROR << "Alternative view point not supported by the depth generator...";
       }
-      if (d->m_UseIR)
+      if(d->m_UseIR)
       {
-        if ( d->m_IRGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
+        if( d->m_IRGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
         {
           d->m_ConnectionCheck = d->ErrorText(d->m_IRGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_DepthGenerator));
-          //if (!d->m_ConnectionCheck) return false;
         }
         else
         {
-          std::cout << "Alternative view point not supported by the depth generator..." << std::endl;
+          MITK_ERROR << "Alternative view point not supported by the depth generator...";
         }
       }
 
       // Start data generation
       d->m_ConnectionCheck = d->ErrorText(d->m_Context.StartGeneratingAll());
       if (!d->m_ConnectionCheck) return false;
-
-//      // Update the connected flag
-//      d->m_ConnectionCheck = true;
     }
     return d->m_ConnectionCheck;
   }
@@ -177,7 +167,6 @@ KinectController::~KinectController()
     return updateSuccessful;
   }
 
-  // TODO flag image
   void KinectController::GetDistances(float* distances)
   {
     xn::DepthMetaData DepthMD;
@@ -186,7 +175,7 @@ KinectController::~KinectController()
 
     for (unsigned int i=0; i<d->m_CaptureWidth*d->m_CaptureHeight; i++)
     {
-      distances[i] = DepthData[i];
+      distances[i] = static_cast<float>(DepthData[i]);
     }
   }
 
@@ -232,10 +221,10 @@ KinectController::~KinectController()
 
     for (unsigned int i=0; i<d->m_CaptureWidth*d->m_CaptureHeight; i++)
     {
-      distances[i] = DepthData[i];
+      distances[i] = static_cast<float>(DepthData[i]);
       if (d->m_UseIR)
       {
-        amplitudes[i] = IRPixelData[i];
+        amplitudes[i] = static_cast<float>(IRPixelData[i]);
       }
       else
       {
@@ -256,15 +245,15 @@ KinectController::~KinectController()
 
       for (unsigned int i=0; i<d->m_CaptureWidth*d->m_CaptureHeight; i++)
       {
-        amplitudes[i] = IRPixelData[i];
+        amplitudes[i] = static_cast<float>(IRPixelData[i]);
       }
     }
   }
 
   void KinectController::GetIntensities( float* intensities )
   {
-
   }
+
   unsigned int KinectController::GetCaptureWidth() const
   {
     return d->m_CaptureWidth;

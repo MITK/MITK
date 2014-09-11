@@ -21,13 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include<mitkConnectomicsHistogramBase.h>
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 namespace mitk {
 
     /**
   * \brief A class to calculate and store the shortest path between each pair of nodes */
-  class Connectomics_EXPORT ConnectomicsShortestPathHistogram : public mitk::ConnectomicsHistogramBase
+  class MitkConnectomics_EXPORT ConnectomicsShortestPathHistogram : public mitk::ConnectomicsHistogramBase
   {
 
   public:

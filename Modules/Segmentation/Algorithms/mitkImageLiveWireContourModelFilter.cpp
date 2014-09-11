@@ -117,7 +117,7 @@ void mitk::ImageLiveWireContourModelFilter::GenerateData()
 
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::ImageLiveWireContourModelFilter::ItkPreProcessImage (itk::Image<TPixel, VImageDimension>* inputImage)
+void mitk::ImageLiveWireContourModelFilter::ItkPreProcessImage (const itk::Image<TPixel, VImageDimension>* inputImage)
 {
   typedef itk::Image< TPixel, VImageDimension >                      InputImageType;
   typedef itk::CastImageFilter< InputImageType, InternalImageType >  CastFilterType;
@@ -266,7 +266,7 @@ bool mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMap(mitk::ContourMo
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path )
+void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( const itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path )
 {
   /*++++++++++ create dynamic cost transfer map ++++++++++*/
 

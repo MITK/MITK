@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk
 #include <mitkInteractionConst.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkSurface.h>
 #include <mitkRenderingManager.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkGlobalInteraction.h>
 #include <mitkDataStorage.h>
 #include <mitkRenderingManager.h>
@@ -555,7 +555,7 @@ bool mitk::WiiMoteInteractor::FixedRotationAndTranslation(const mitk::WiiMoteAll
     //// depending on a combination of the
     //// orientation the angleX wil be altered
     //// because the range from roll is limited
-    //// range: -90° to 90° by the wiimote
+    //// range: -90ï¿½ to 90ï¿½ by the wiimote
     //if(wiiMoteEvent->GetOrientationZ() < 0)
     //{
     //  // value is positive

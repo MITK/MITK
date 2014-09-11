@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKIRENDERINGMANAGER_H
 #define MITKIRENDERINGMANAGER_H
 
@@ -26,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtPlugin>
 
 namespace mitk {
-
 /**
  * \ingroup org_mitk_gui_common
  *
@@ -38,7 +36,6 @@ namespace mitk {
  * \see MakeRenderingManagerInterface
  */
 struct IRenderingManager {
-
   virtual ~IRenderingManager() {}
 
   /** Get a list of all registered RenderWindows */
@@ -68,13 +65,12 @@ struct IRenderingManager {
   virtual void ForceImmediateUpdateAll( RenderingManager::RequestType type = RenderingManager::REQUEST_UPDATE_ALL ) = 0;
 
   /** Initializes the windows specified by requestType to the given geometry. */
-  virtual bool InitializeViews( const Geometry3D *geometry,
+  virtual bool InitializeViews( const BaseGeometry *geometry,
                                 RenderingManager::RequestType type = RenderingManager::REQUEST_UPDATE_ALL,
                                 bool preserveRoughOrientationInWorldSpace = false ) = 0;
   virtual bool InitializeViews( const TimeGeometry *geometry,
                                 RenderingManager::RequestType type = RenderingManager::REQUEST_UPDATE_ALL,
                                 bool preserveRoughOrientationInWorldSpace = false ) = 0;
-
 
   /**
    * Initializes the windows to the default viewing direction
@@ -87,7 +83,7 @@ struct IRenderingManager {
    * "initializeGlobalTimeSNC" to true in order to use this geometry as
    * global TimeGeometry.
    */
-  virtual bool InitializeView( vtkRenderWindow *renderWindow, const Geometry3D *geometry,
+  virtual bool InitializeView( vtkRenderWindow *renderWindow, const BaseGeometry *geometry,
                                bool initializeGlobalTimeSNC = false) = 0;
 
   /**
@@ -118,12 +114,6 @@ struct IRenderingManager {
   /** Get LOD abort mechanism status. */
   virtual bool GetLODAbortMechanismEnabled() const = 0;
 
-  /** En-/Disable depth peeling for all renderers */
-  virtual void SetDepthPeelingEnabled(bool enabled) = 0;
-
-  /** Set maximum number of peels for all renderers */
-  virtual void SetMaxNumberOfPeels(int maxNumber) = 0;
-
   virtual int GetNextLOD( BaseRenderer* renderer ) const = 0;
 
   /** Set current LOD (NULL means all renderers)*/
@@ -139,15 +129,12 @@ struct IRenderingManager {
                                  float specular, float specpower ) = 0;
 
   virtual QList<float> GetShadingValues() const = 0;
-
 };
-
 }
 
 Q_DECLARE_INTERFACE(mitk::IRenderingManager, "org.mitk.ui.IRenderingManager")
 
 namespace mitk {
-
 /**
  * Create a IRenderManager interface for a given RenderingManager. Ownership of the
  * returned pointer is transferred to the caller of this function.
@@ -156,7 +143,6 @@ namespace mitk {
  * \return A pointer to the interface object. The caller is responsible for deleting the pointer.
  */
 MITK_GUI_COMMON_PLUGIN IRenderingManager* MakeRenderingManagerInterface(RenderingManager::Pointer manager);
-
 }
 
 #endif // MITKIRENDERINGMANAGER_H

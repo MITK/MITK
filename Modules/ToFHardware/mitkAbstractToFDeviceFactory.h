@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkAbstractToFDeviceFactory_h
 #define __mitkAbstractToFDeviceFactory_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkIToFDeviceFactory.h"
 
 // Microservices
@@ -26,22 +26,54 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /**
-  * @brief Virtual interface and base class for all Time-of-Flight device factories
+  * @brief Virtual interface and base class for all Time-of-Flight device factories.
+  * The basic interface is in the base class: IToFDeviceFactory. This
+  * AbstractToFDeviceFactory implements some generic function which are useful
+  * for every device and not specific.
   *
   * @ingroup ToFHardware
   */
-
 struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFactory {
    public:
 
+  /**
+    * @brief ConnectToFDevice Use this method to connect a device.
+    * @return A ToFCameraDevice.
+    */
    ToFCameraDevice::Pointer ConnectToFDevice();
 
+   /**
+    * @brief DisconnectToFDevice Use this method to disconnect a device.
+    * @param device The device you want to disconnect.
+    */
    void DisconnectToFDevice(const ToFCameraDevice::Pointer& device);
 
+  /**
+    * @brief GetNumberOfDevices Get the number of devices produced by this factory.
+    * This function will return the number of registered devices to account for
+    * created and disconnected devices.
+    *
+    * @return Number of registered devices.
+    */
+  size_t GetNumberOfDevices();
 
-  protected:
+  std::string GetCurrentDeviceName()
+  {
+    std::stringstream name;
+    if(this->GetNumberOfDevices()>1)
+    {
+      name << this->GetDeviceNamePrefix()<< " "<< this->GetNumberOfDevices();
+    }
+    else
+    {
+      name << this->GetDeviceNamePrefix();
+    }
+    return name.str();
+  }
 
-   /**
+protected:
+
+  /**
    \brief Returns the CameraIntrinsics for the cameras created by this factory.
    *
    * This Method calls the virtual method GetIntrinsicsResource() to retrieve the necessary data.
@@ -58,8 +90,15 @@ struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFacto
    */
    virtual us::ModuleResource GetIntrinsicsResource();
 
-
+   /**
+    * @brief m_Devices A list (vector) containing all connected devices of
+    * the respective factory.
+    */
    std::vector<ToFCameraDevice::Pointer> m_Devices;
+   /**
+    * @brief m_DeviceRegistrations A map containing all the pairs of
+    * device registration numbers and devices.
+    */
    std::map<ToFCameraDevice*,us::ServiceRegistration<ToFCameraDevice> > m_DeviceRegistrations;
 };
 }

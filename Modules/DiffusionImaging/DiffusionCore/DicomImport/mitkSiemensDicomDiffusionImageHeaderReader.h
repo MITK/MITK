@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #ifndef __mitkSiemensDicomDiffusionImageHeaderReader_h__
-#define __mitkSiemensDicomDiffusionImageHeaderReader_h_
+#define __mitkSiemensDicomDiffusionImageHeaderReader_h__
 
 #include "mitkDicomDiffusionImageHeaderReader.h"
 
@@ -30,7 +30,8 @@ namespace mitk
   public:
 
     mitkClassMacro( SiemensDicomDiffusionImageHeaderReader, DicomDiffusionImageHeaderReader );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Extract the key value for the key nameString from the tagString */
     int ExtractSiemensDiffusionInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray, int startPos = 0 );

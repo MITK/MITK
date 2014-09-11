@@ -57,6 +57,8 @@ void QmitkToFCompositeFilterWidget::CreateQtPartControl(QWidget *parent)
     m_Controls->m_ThresholdFilterRangeSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
     m_Controls->m_ThresholdFilterRangeSlider->setStyle(sliderStyle);
     this->CreateConnections();
+
+    this->OnShowAdvancedOptionsCheckboxChecked(false);
   }
 }
 
@@ -77,6 +79,7 @@ void QmitkToFCompositeFilterWidget::CreateConnections()
     connect( (QObject*)(m_Controls->maskSegmentationCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnMaskSegmentationCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_BilateralFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnBilateralFilterCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_MedianFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnMedianFilterCheckBoxChecked(bool)) );
+    connect( (QObject*)(m_Controls->m_ShowAdvancedOptionsCheckbox), SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedOptionsCheckboxChecked(bool)) );
 
     connect(m_Controls->m_ThresholdFilterRangeSlider, SIGNAL(spanChanged(int, int)  ),this, SLOT( OnSpanChanged(int , int ) ));
 
@@ -164,6 +167,28 @@ void QmitkToFCompositeFilterWidget::OnAverageFilterCheckBoxChecked(bool checked)
     m_Controls->m_TemporalMedianFilterCheckBox->setChecked(false);
     this->m_ToFCompositeFilter->SetApplyTemporalMedianFilter(false);
   }
+}
+
+void QmitkToFCompositeFilterWidget::OnShowAdvancedOptionsCheckboxChecked(bool checked)
+{
+  this->m_Controls->m_AverageFilterCheckBox->setShown(checked);
+  this->m_Controls->m_BilateralFilterCheckBox->setShown(checked);
+  this->m_Controls->m_BilateralFilterDomainSigmaSpinBox->setShown(checked);
+  this->m_Controls->m_BilateralFilterKernelRadiusSpinBox->setShown(checked);
+  this->m_Controls->m_BilateralFilterRangeSigmaSpinBox->setShown(checked);
+  this->m_Controls->m_MedianFilterCheckBox->setShown(checked);
+  this->m_Controls->m_TemporalMedianFilterCheckBox->setShown(checked);
+  this->m_Controls->m_TemporalMedianFilterNumOfFramesSpinBox->setShown(checked);
+  this->m_Controls->m_ThresholdFilterCheckBox->setShown(checked);
+  this->m_Controls->m_ThresholdFilterMaxValueSpinBox->setShown(checked);
+  this->m_Controls->m_ThresholdFilterMinValueSpinBox->setShown(checked);
+  this->m_Controls->m_ThresholdFilterRangeSlider->setShown(checked);
+  this->m_Controls->m_ThresholdFilterRangeSliderReset->setShown(checked);
+  this->m_Controls->label_3->setShown(checked);
+  this->m_Controls->label_4->setShown(checked);
+  this->m_Controls->label_12->setShown(checked);
+  this->m_Controls->maskImageComboBox->setShown(checked);
+  this->m_Controls->maskSegmentationCheckBox->setShown(checked);
 }
 
 void QmitkToFCompositeFilterWidget::OnThresholdFilterCheckBoxChecked(bool checked)

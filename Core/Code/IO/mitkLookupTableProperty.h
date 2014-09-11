@@ -13,12 +13,10 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
-
 #ifndef MITKLookupTablePROPERTY_H_HEADER_INCLUDED_C10EEAA8
 #define MITKLookupTablePROPERTY_H_HEADER_INCLUDED_C10EEAA8
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
 #include "mitkLookupTable.h"
 
@@ -29,11 +27,19 @@ namespace mitk {
 # pragma warning(disable: 4522)
 #endif
 
-  //##Documentation
-  //## @brief Property for LookupTable data
-  //##
-  //## @ingroup DataManagement
-  class MITK_CORE_EXPORT LookupTableProperty : public BaseProperty
+/**
+ * @brief The LookupTableProperty class Property to associate mitk::LookupTable
+ * to an mitk::DataNode.
+ * @ingroup DataManagement
+ *
+ * @note If you want to use this property to colorize an mitk::Image, make sure
+ * to set the mitk::RenderingModeProperty to a mode which supports lookup tables
+ * (e.g. LOOKUPTABLE_COLOR). Make sure to check the documentation of the
+ * mitk::RenderingModeProperty. For a code example how to use the mitk::LookupTable
+ * and this property check the mitkImageVtkMapper2DLookupTableTest.cpp in
+ * Core\Code\Testing.
+ */
+class MITK_CORE_EXPORT LookupTableProperty : public BaseProperty
   {
 
   protected:
@@ -51,7 +57,8 @@ namespace mitk {
 
     mitkClassMacro(LookupTableProperty, BaseProperty);
 
-    itkNewMacro(LookupTableProperty);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(LookupTableProperty, const mitk::LookupTable::Pointer);
 
     itkGetObjectMacro(LookupTable, LookupTable );
@@ -79,9 +86,6 @@ namespace mitk {
 #ifdef _MSC_VER
 # pragma warning(pop)
 #endif
-
 } // namespace mitk
-
-
 
 #endif /* MITKLookupTablePROPERTY_H_HEADER_INCLUDED_C10EEAA8 */

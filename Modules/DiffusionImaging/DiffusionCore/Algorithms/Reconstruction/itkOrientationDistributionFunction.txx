@@ -472,7 +472,7 @@ namespace itk
         double p[3];
         points->GetPoint(i,p);
         std::vector<int> neighbors = GetNeighbors(i);
-        for(int j=0; j<neighbors.size(); j++)
+        for(std::size_t j=0; j<neighbors.size(); j++)
         {
           double n[3];
           points->GetPoint(neighbors[j],n);
@@ -512,7 +512,7 @@ namespace itk
       vtkPolyData* polydata = vtkPolyData::New();
       polydata->SetPoints( points );
       vtkDelaunay2D *delaunay = vtkDelaunay2D::New();
-      delaunay->SetInput( polydata );
+      delaunay->SetInputData( polydata );
       delaunay->Update();
 
       vtkCellArray* vtkpolys = delaunay->GetOutput()->GetPolys();
@@ -547,7 +547,7 @@ namespace itk
       vtkPolyData* polydata2 = vtkPolyData::New();
       polydata2->SetPoints( points2 );
       vtkDelaunay2D *delaunay2 = vtkDelaunay2D::New();
-      delaunay2->SetInput( polydata2 );
+      delaunay2->SetInputData( polydata2 );
       delaunay2->Update();
 
       vtkpolys = delaunay2->GetOutput()->GetPolys();
@@ -568,7 +568,7 @@ namespace itk
 
       polydata->SetPolys(vtknewpolys);
 
-      for (vtkIdType p = 0; p < NOdfDirections; p++)
+      for (unsigned int p = 0; p < NOdfDirections; p++)
       {
         points->SetPoint(p,m_Directions->get_column(p).data_block());
       }

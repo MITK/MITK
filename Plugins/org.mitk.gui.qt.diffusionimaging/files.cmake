@@ -12,6 +12,7 @@ set(SRC_CPP_FILES
   QmitkDotModelParametersWidget.cpp
   QmitkBallModelParametersWidget.cpp
   QmitkAstrosticksModelParametersWidget.cpp
+  QmitkPrototypeSignalParametersWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -21,7 +22,6 @@ set(INTERNAL_CPP_FILES
   QmitkDiffusionDicomImportView.cpp
   QmitkDiffusionQuantificationView.cpp
   QmitkTensorReconstructionView.cpp
-  QmitkDiffusionImagingPublicPerspective.cpp
   QmitkControlVisualizationPropertiesView.cpp
   QmitkODFDetailsView.cpp
   QmitkGibbsTrackingView.cpp
@@ -39,12 +39,22 @@ set(INTERNAL_CPP_FILES
   Connectomics/QmitkConnectomicsNetworkOperationsView.cpp
   Connectomics/QmitkConnectomicsStatisticsView.cpp
   Connectomics/QmitkNetworkHistogramCanvas.cpp
+  Connectomics/QmitkRandomParcellationView.cpp
   QmitkDwiSoftwarePhantomView.cpp
   QmitkOdfMaximaExtractionView.cpp
   QmitkFiberfoxView.cpp
   QmitkFiberExtractionView.cpp
   QmitkFieldmapGeneratorView.cpp
   QmitkDiffusionRegistrationView.cpp
+  QmitkDenoisingView.cpp
+
+  Perspectives/QmitkFiberProcessingPerspective.cpp
+  Perspectives/QmitkDiffusionImagingAppPerspective.cpp
+  Perspectives/QmitkGibbsTractographyPerspective.cpp
+  Perspectives/QmitkStreamlineTractographyPerspective.cpp
+  Perspectives/QmitkProbabilisticTractographyPerspective.cpp
+  Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.cpp
+  Perspectives/QmitkDIAppIVIMPerspective.cpp
 )
 
 set(UI_FILES
@@ -67,6 +77,7 @@ set(UI_FILES
   src/internal/Connectomics/QmitkConnectomicsDataViewControls.ui
   src/internal/Connectomics/QmitkConnectomicsNetworkOperationsViewControls.ui
   src/internal/Connectomics/QmitkConnectomicsStatisticsViewControls.ui
+  src/internal/Connectomics/QmitkRandomParcellationViewControls.ui
   src/internal/QmitkDwiSoftwarePhantomViewControls.ui
   src/internal/QmitkOdfMaximaExtractionViewControls.ui
   src/internal/QmitkFiberfoxViewControls.ui
@@ -77,9 +88,10 @@ set(UI_FILES
   src/QmitkDotModelParametersWidgetControls.ui
   src/QmitkBallModelParametersWidgetControls.ui
   src/QmitkAstrosticksModelParametersWidgetControls.ui
+  src/QmitkPrototypeSignalParametersWidgetControls.ui
   src/internal/QmitkFieldmapGeneratorViewControls.ui
   src/internal/QmitkDiffusionRegistrationViewControls.ui
-
+  src/internal/QmitkDenoisingViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -87,7 +99,6 @@ set(MOC_H_FILES
   src/internal/QmitkQBallReconstructionView.h
   src/internal/QmitkPreprocessingView.h
   src/internal/QmitkDiffusionDicomImportView.h
-  src/internal/QmitkDiffusionImagingPublicPerspective.h
   src/internal/QmitkDiffusionQuantificationView.h
   src/internal/QmitkTensorReconstructionView.h
   src/internal/QmitkControlVisualizationPropertiesView.h
@@ -111,6 +122,7 @@ set(MOC_H_FILES
   src/internal/Connectomics/QmitkConnectomicsNetworkOperationsView.h
   src/internal/Connectomics/QmitkConnectomicsStatisticsView.h
   src/internal/Connectomics/QmitkNetworkHistogramCanvas.h
+  src/internal/Connectomics/QmitkRandomParcellationView.h
   src/internal/QmitkDwiSoftwarePhantomView.h
   src/internal/QmitkOdfMaximaExtractionView.h
   src/internal/QmitkFiberfoxView.h
@@ -121,8 +133,18 @@ set(MOC_H_FILES
   src/QmitkDotModelParametersWidget.h
   src/QmitkBallModelParametersWidget.h
   src/QmitkAstrosticksModelParametersWidget.h
+  src/QmitkPrototypeSignalParametersWidget.h
   src/internal/QmitkFieldmapGeneratorView.h
   src/internal/QmitkDiffusionRegistrationView.h
+  src/internal/QmitkDenoisingView.h
+
+  src/internal/Perspectives/QmitkFiberProcessingPerspective.h
+  src/internal/Perspectives/QmitkDiffusionImagingAppPerspective.h
+  src/internal/Perspectives/QmitkGibbsTractographyPerspective.h
+  src/internal/Perspectives/QmitkStreamlineTractographyPerspective.h
+  src/internal/Perspectives/QmitkProbabilisticTractographyPerspective.h
+  src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h
+  src/internal/Perspectives/QmitkDIAppIVIMPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -148,6 +170,7 @@ set(CACHED_RESOURCE_FILES
   resources/connectomics/QmitkConnectomicsDataViewIcon_48.png
   resources/connectomics/QmitkConnectomicsNetworkOperationsViewIcon_48.png
   resources/connectomics/QmitkConnectomicsStatisticsViewIcon_48.png
+  resources/connectomics/QmitkRandomParcellationIcon.png
   resources/arrow.png
   resources/qball_peaks.png
   resources/phantom.png
@@ -158,6 +181,10 @@ set(CACHED_RESOURCE_FILES
   resources/odf.png
   resources/refresh.xpm
   resources/diffusionregistration.png
+  resources/denoisingicon.png
+  resources/syntheticdata.png
+  resources/ivim.png
+  resources/tractography.png
  )
 
 set(QRC_FILES

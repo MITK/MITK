@@ -15,10 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkContourModelWriter.h"
+#include "mitkTimeGeometry.h"
 #include <iostream>
 #include <fstream>
 #include <locale>
-
 
 /*
  * The xml file will look like:
@@ -74,7 +74,7 @@ mitk::ContourModelWriter::ContourModelWriter()
     : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
 {
     this->SetNumberOfRequiredInputs( 1 );
-    this->SetNumberOfOutputs( 1 );
+    this->SetNumberOfIndexedOutputs( 1 );
     this->SetNthOutput( 0, mitk::ContourModel::New().GetPointer() );
     m_Indent = 2;
     m_IndentDepth = 0;
@@ -248,7 +248,7 @@ void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::
 
 
 
-void mitk::ContourModelWriter::WriteGeometryInformation( mitk::TimeGeometry* geometry, std::ofstream& out )
+void mitk::ContourModelWriter::WriteGeometryInformation( mitk::TimeGeometry* /*geometry*/, std::ofstream& out )
 {
   WriteCharacterData("<!-- geometry information -->", out);
 }
@@ -258,7 +258,7 @@ void mitk::ContourModelWriter::WriteGeometryInformation( mitk::TimeGeometry* geo
 void mitk::ContourModelWriter::ResizeInputs( const unsigned int& num )
 {
     unsigned int prevNum = this->GetNumberOfInputs();
-    this->SetNumberOfInputs( num );
+    this->SetNumberOfIndexedInputs( num );
     for ( unsigned int i = prevNum; i < num; ++i )
     {
         this->SetNthInput( i, mitk::ContourModel::New().GetPointer() );

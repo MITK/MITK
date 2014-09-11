@@ -1,28 +1,36 @@
-set(LIBPOSTFIX "Ext")
 
 # Modules must be listed according to their dependencies
 set(module_dirs
+    DataTypesExt
+    AlgorithmsExt
+    MapperExt
+    IOExt
+    DICOMReader
+    DICOMTesting
+    Qt4Qt5TestModule
     SceneSerializationBase
     PlanarFigure
+    ImageDenoising
     ImageExtraction
     ImageStatistics
     LegacyAdaptors
     IpPicSupport
-    MitkExt
     SceneSerialization
     GraphAlgorithms
     ContourModel
     SurfaceInterpolation
     Segmentation
     PlanarFigureSegmentation
-    Qmitk
-    QmitkExt
+    OpenViewCore
+    QmlItems
+    QtWidgets
+    QtWidgetsExt
     SegmentationUI
     DiffusionImaging
     GPGPU
+    IGTBase
     IGT
     CameraCalibration
-    IGTUI
     RigidRegistration
     RigidRegistrationUI
     DeformableRegistration
@@ -35,13 +43,19 @@ set(module_dirs
     ToFProcessing
     ToFUI
     US
-    ClippingTools
     USUI
     DicomUI
     Simulation
     Remeshing
     Python
+    Persistence
+    IGTUI
+    VtkShaders
 )
+
+if(MITK_ENABLE_PIC_READER)
+  list(APPEND module_dirs IpPicSupportIO)
+endif()
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)
 

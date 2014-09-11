@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_CONNECTOMICS_RENDERING_EDGE_RADIUS_PARAMETER_PROPERTY__H_
 
 #include "mitkEnumerationProperty.h"
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 namespace mitk
 {
@@ -31,13 +31,14 @@ namespace mitk
 /**
  * Encapsulates the enumeration of different rendering schemes for connectomics networks
  */
-class Connectomics_EXPORT ConnectomicsRenderingEdgeRadiusParameterProperty : public EnumerationProperty
+class MitkConnectomics_EXPORT ConnectomicsRenderingEdgeRadiusParameterProperty : public EnumerationProperty
 {
 public:
 
   mitkClassMacro( ConnectomicsRenderingEdgeRadiusParameterProperty, EnumerationProperty );
 
-  itkNewMacro(ConnectomicsRenderingEdgeRadiusParameterProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(ConnectomicsRenderingEdgeRadiusParameterProperty, const IdType&);
 

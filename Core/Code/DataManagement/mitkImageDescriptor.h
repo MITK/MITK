@@ -45,7 +45,8 @@ class MITK_CORE_EXPORT ImageDescriptor : public itk::Object
   public:
     mitkClassMacro(ImageDescriptor, itk::Object);
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Insert new channel
 

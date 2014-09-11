@@ -37,8 +37,9 @@ set(MOC_H_FILES
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
-
   resources/help.png
+  resources/helpIndex.png
+  resources/helpSearch.png
 )
 
 set(QRC_FILES

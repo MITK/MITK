@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-class DiffusionCore_EXPORT BiExpFitFunctor : public DWIVoxelFunctor
+class MitkDiffusionCore_EXPORT BiExpFitFunctor : public DWIVoxelFunctor
 {
 public:
   BiExpFitFunctor(){}
@@ -39,7 +39,8 @@ public:
   typedef SmartPointer<const Self>                ConstPointer;
   typedef DWIVoxelFunctor                         Superclass;
   /** Method for creation through the object factory. */
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   /** Runtime information support. */
   itkTypeMacro(BiExpFitFunctor, DWIVoxelFunctor)
 

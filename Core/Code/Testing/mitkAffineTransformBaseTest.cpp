@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "itkScalableAffineTransform.h"
 #include "mitkMatrixConvert.h"
 
@@ -30,10 +30,10 @@ static Matrix3D rotation;
 static Point3D  originalPoint;
 static double   originalPointDouble[4];
 
-static vtkMatrix4x4* homogenMatrix;
+static vtkMatrix4x4* homogenMatrix = 0;
 
 
-static vtkMatrix4x4* expectedHomogenousMatrix;
+static vtkMatrix4x4* expectedHomogenousMatrix = 0;
 static const double  expectedPointAfterTransformation[] = {2, 4, 4, 1};
 
 static void Setup()
@@ -46,7 +46,7 @@ static void Setup()
 
   offset[0] = 2.0; offset[1] = 3.0; offset[2] = 4.0;
 
-  // 90° rotation
+  // 90ï¿½ rotation
   rotation.Fill(0);
   rotation[0][1] = -1;
   rotation[1][0] =  1;
@@ -71,6 +71,12 @@ static void Setup()
   expectedHomogenousMatrix->SetElement(1,3,3);
   expectedHomogenousMatrix->SetElement(2,3,4);
   expectedHomogenousMatrix->SetElement(3,3,1);
+}
+
+static void TearDown()
+{
+  if (homogenMatrix) homogenMatrix->Delete();
+  if (expectedHomogenousMatrix) expectedHomogenousMatrix->Delete();
 }
 
 /**
@@ -98,6 +104,8 @@ static void testIfPointIsTransformedAsExpected(void)
     pointCorrect &= Equal(pointTransformedByAffineTransform3D[i], expectedPointAfterTransformation[i]);
 
   MITK_TEST_CONDITION(pointCorrect, "Point has been correctly transformed by AffineTranform3D")
+
+  TearDown();
 }
 
 /**
@@ -122,6 +130,8 @@ static void testTransferItkTransformToVtkMatrix(void)
       allElementsEqual &= Equal(homogenMatrix->GetElement(i,j), expectedHomogenousMatrix->GetElement(i,j));
 
   MITK_TEST_CONDITION(allElementsEqual, "Homogenous Matrix is set as expected")
+
+  TearDown();
 }
 
 /**
@@ -165,6 +175,7 @@ static void testIfBothTransformationsProduceSameResults(void)
   MITK_TEST_CONDITION(pointsMatch
     && homogenousComponentCorrect, "Point transformed by AffineTransform and homogenous coordinates match")
 
+  TearDown();
 }
 
 /**

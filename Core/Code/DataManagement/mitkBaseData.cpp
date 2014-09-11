@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProportionalTimeGeometry.h>
 #include <itkObjectFactoryBase.h>
 #include <mitkException.h>
+#include <mitkGeometry3D.h>
 
 
 mitk::BaseData::BaseData() :
-  m_RequestedRegionInitialized(false),
   m_SourceOutputIndexDuplicate(0), m_Initialized(true)
 {
   m_TimeGeometry = mitk::ProportionalTimeGeometry::New();
@@ -32,7 +32,6 @@ mitk::BaseData::BaseData() :
 
 mitk::BaseData::BaseData( const BaseData &other ):
 itk::DataObject(), mitk::OperationActor(),
-m_RequestedRegionInitialized(other.m_RequestedRegionInitialized),
 m_SourceOutputIndexDuplicate(other.m_SourceOutputIndexDuplicate),
 m_Initialized(other.m_Initialized)
 {
@@ -46,14 +45,9 @@ mitk::BaseData::~BaseData()
 
 void mitk::BaseData::InitializeTimeGeometry(unsigned int timeSteps)
 {
-  mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
-  g3d->Initialize();
-
- if ( timeSteps > 1 )
- {
-    mitk::ScalarType timeBounds[] = {0.0, 1.0};
-    g3d->SetTimeBounds( timeBounds );
- }
+  mitk::Geometry3D::Pointer geo3D = mitk::Geometry3D::New();
+  mitk::BaseGeometry::Pointer baseGeo = dynamic_cast<BaseGeometry*>(geo3D.GetPointer());
+  baseGeo->Initialize();
 
   // The geometry is propagated automatically to the other items,
   // if EvenlyTimed is true...
@@ -64,7 +58,7 @@ void mitk::BaseData::InitializeTimeGeometry(unsigned int timeSteps)
   timeGeometry->Expand(timeSteps);
   for (TimeStepType step = 0; step < timeSteps; ++step)
   {
-    timeGeometry->SetTimeStepGeometry(g3d.GetPointer(),step);
+    timeGeometry->SetTimeStepGeometry(baseGeo.GetPointer(),step);
   }
 }
 
@@ -108,7 +102,7 @@ void mitk::BaseData::Expand( unsigned int timeSteps )
   }
 }
 
-const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry(int t)
+const mitk::BaseGeometry* mitk::BaseData::GetUpdatedGeometry(int t)
 {
   SetRequestedRegionToLargestPossibleRegion();
 
@@ -117,7 +111,7 @@ const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry(int t)
   return GetGeometry(t);
 }
 
-void mitk::BaseData::SetGeometry(Geometry3D* geometry)
+void mitk::BaseData::SetGeometry(BaseGeometry* geometry)
 {
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   if(geometry!=NULL)
@@ -134,9 +128,9 @@ void mitk::BaseData::SetTimeGeometry(TimeGeometry* geometry)
   this->Modified();
 }
 
-void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D)
+void mitk::BaseData::SetClonedGeometry(const BaseGeometry* aGeometry3D)
 {
-  SetGeometry(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()));
+  SetGeometry(static_cast<mitk::BaseGeometry*>(aGeometry3D->Clone().GetPointer()));
 }
 
 void mitk::BaseData::SetClonedTimeGeometry(const TimeGeometry* geometry)
@@ -146,11 +140,11 @@ void mitk::BaseData::SetClonedTimeGeometry(const TimeGeometry* geometry)
 }
 
 
-void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D, unsigned int time)
+void mitk::BaseData::SetClonedGeometry(const BaseGeometry* aGeometry3D, unsigned int time)
 {
   if (m_TimeGeometry)
   {
-    m_TimeGeometry->SetTimeStepGeometry(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()),time);
+    m_TimeGeometry->SetTimeStepGeometry(static_cast<mitk::BaseGeometry*>(aGeometry3D->Clone().GetPointer()),time);
   }
 }
 
@@ -207,7 +201,7 @@ void mitk::BaseData::SetOrigin(const mitk::Point3D& origin)
   TimeGeometry* timeGeom = GetTimeGeometry();
 
   assert (timeGeom != NULL);
-  Geometry3D* geometry;
+  BaseGeometry* geometry;
 
   TimeStepType steps = timeGeom->CountTimeSteps();
   for (TimeStepType timestep = 0; timestep < steps; ++timestep)

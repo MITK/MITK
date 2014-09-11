@@ -112,13 +112,13 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   //create two RenderWindows
   mitk::RenderingManager::Pointer myRenderingManager = mitk::RenderingManager::New();
   vtkRenderWindow* vtkRenWin1 = vtkRenderWindow::New();
-  mitk::VtkPropRenderer::Pointer br1 = mitk::VtkPropRenderer::New("testingBR", vtkRenWin1, myRenderingManager);
+  mitk::VtkPropRenderer::Pointer br1 = mitk::VtkPropRenderer::New("testingBR1", vtkRenWin1, myRenderingManager);
   mitk::BaseRenderer::AddInstance(vtkRenWin1,br1);
   myRenderingManager->AddRenderWindow(vtkRenWin1);
   mitk::BaseRenderer::Pointer renderer1 = mitk::BaseRenderer::GetInstance(vtkRenWin1);
 
   vtkRenderWindow* vtkRenWin2 = vtkRenderWindow::New();
-  mitk::VtkPropRenderer::Pointer br2 = mitk::VtkPropRenderer::New("testingBR", vtkRenWin2, myRenderingManager);
+  mitk::VtkPropRenderer::Pointer br2 = mitk::VtkPropRenderer::New("testingBR2", vtkRenWin2, myRenderingManager);
   mitk::BaseRenderer::AddInstance(vtkRenWin2,br2);
   myRenderingManager->AddRenderWindow(vtkRenWin2);
   mitk::BaseRenderer::Pointer renderer2 = mitk::BaseRenderer::GetInstance(vtkRenWin2);

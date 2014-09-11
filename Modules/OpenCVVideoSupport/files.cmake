@@ -5,6 +5,11 @@ set(CPP_FILES
     mitkOpenCVVideoSource.cpp
     mitkOpenCVToMitkImageFilter.cpp
     mitkImageToOpenCVImageFilter.cpp
+    Commands/mitkAbstractOpenCVImageFilter.cpp
+    Commands/mitkBasicCombinationOpenCVImageFilter.cpp
+    Commands/mitkConvertGrayscaleOpenCVImageFilter.cpp
+    Commands/mitkCropOpenCVImageFilter.cpp
+    Commands/mitkGrabCutOpenCVImageFilter.cpp
 )
 
 if(MITK_USE_videoInput)

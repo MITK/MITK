@@ -42,7 +42,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(MetricParameters,::itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
     \brief Unique integer value for every metric.

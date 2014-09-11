@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QMITKTOFCONNECTIONWIDGET_H_INCLUDED
 #define _QMITKTOFCONNECTIONWIDGET_H_INCLUDED
 
-#include "mitkTOFUIExports.h"
+#include <MitkToFUIExports.h>
 #include "ui_QmitkToFConnectionWidgetControls.h"
 
 //QT headers
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * @ingroup ToFUI
 */
-class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
+class MitkToFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 {
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT

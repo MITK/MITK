@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_CONTOUR_H_
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkBaseData.h"
 #include <vtkRenderWindow.h>
 
@@ -34,14 +34,13 @@ namespace mitk
 
   \sa ContourModel
 */
-class Segmentation_EXPORT Contour : public BaseData
+class MitkSegmentation_EXPORT Contour : public BaseData
 {
 public:
   mitkClassMacro(Contour, BaseData);
 
-  itkNewMacro(Self);
-
-  mitkCloneMacro(Contour);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef itk::PolyLineParametricPath<3>                        PathType;
   typedef PathType::Pointer                                     PathPointer;
@@ -49,7 +48,8 @@ public:
   typedef PathType::InputType                                   InputType;
   typedef PathType::OutputType                                  OutputType;
   typedef PathType::OffsetType                                  OffsetType;
-  typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
+  typedef itk::BoundingBox<unsigned long, 3, ScalarType,
+    itk::VectorContainer< unsigned long, mitk::Point< ScalarType, 3 > > >        BoundingBoxType;
   typedef BoundingBoxType::PointsContainer                      PointsContainer;
   typedef BoundingBoxType::PointsContainer::Pointer             PointsContainerPointer;
   typedef BoundingBoxType::PointsContainerIterator              PointsContainerIterator;
@@ -141,6 +141,8 @@ public:
   virtual void SetRequestedRegion( const itk::DataObject *data);
 
 protected:
+  mitkCloneMacro(Self);
+
   Contour();
   Contour(const Contour & other);
   virtual ~Contour();

@@ -8,21 +8,21 @@
 
     <view id="org.blueberry.views.helpcontents"
           name="Help - Contents"
-          category="org.blueberry.views.help"
+          category="Help"
           class="berry::HelpContentView"
           icon="resources/help.png" />
 
     <view id="org.blueberry.views.helpindex"
           name="Help - Index"
-          category="org.blueberry.views.help"
+          category="Help"
           class="berry::HelpIndexView"
-          icon="resources/help.png" />
+          icon="resources/helpIndex.png" />
 
     <view id="org.blueberry.views.helpsearch"
           name="Help - Search"
-          category="org.blueberry.views.help"
+          category="Help"
           class="berry::HelpSearchView"
-          icon="resources/help.png" />
+          icon="resources/helpSearch.png" />
   </extension>
 
   <extension point="org.blueberry.ui.editors">

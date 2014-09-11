@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkUSControlsBModeWidget</class>
+ <widget class="QWidget" name="QmitkUSControlsBModeWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>262</width>
+    <height>342</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="scanningDepthLabel">
+     <property name="text">
+      <string>Depth Control</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QToolButton" name="scanningDepthNext">
+       <property name="text">
+        <string>-</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/zoom-out.png</normaloff>:/USUI/zoom-out.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="scanningDepthPrev">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>+</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/zoom-in.png</normaloff>:/USUI/zoom-in.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QmitkComboBoxStepThrough" name="scanningDepthComboBox"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Frequency Control</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QToolButton" name="scanningFrequencyPrev">
+       <property name="text">
+        <string>-</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/zoom-out.png</normaloff>:/USUI/zoom-out.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="scanningFrequencyNext">
+       <property name="text">
+        <string>+</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/zoom-in.png</normaloff>:/USUI/zoom-in.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QmitkComboBoxStepThrough" name="scanningFrequencyComboBox"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="scanninPowerLabel">
+     <property name="text">
+      <string>Power Control</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSlider" name="scanningPowerSlider">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="invertedAppearance">
+      <bool>false</bool>
+     </property>
+     <property name="invertedControls">
+      <bool>false</bool>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="scanningDynamicRangeLabel">
+     <property name="text">
+      <string>Dynamic Range Control</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSlider" name="scanningDynamicRangeSlider">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="scanningGainLabel">
+     <property name="text">
+      <string>Gain Control</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSlider" name="scanningGainSlider">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="scanningRejectionLabel">
+     <property name="text">
+      <string>Rejection Control</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSlider" name="scanningRejectionSlider">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkComboBoxStepThrough</class>
+   <extends>QComboBox</extends>
+   <header>QmitkComboBoxStepThrough.h</header>
+   <slots>
+    <signal>SignalReachedBegin(bool)</signal>
+    <signal>SignalReachedEnd(bool)</signal>
+    <slot>OnSetPreviousIndex()</slot>
+    <slot>OnSetNextIndex()</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resources/USUI.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>scanningDepthNext</sender>
+   <signal>clicked()</signal>
+   <receiver>scanningDepthComboBox</receiver>
+   <slot>OnSetNextIndex()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>197</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>107</x>
+     <y>35</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scanningDepthPrev</sender>
+   <signal>clicked()</signal>
+   <receiver>scanningDepthComboBox</receiver>
+   <slot>OnSetPreviousIndex()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>17</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>107</x>
+     <y>35</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scanningDepthComboBox</sender>
+   <signal>SignalReachedBegin(bool)</signal>
+   <receiver>scanningDepthPrev</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>107</x>
+     <y>35</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>17</x>
+     <y>36</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scanningDepthComboBox</sender>
+   <signal>SignalReachedEnd(bool)</signal>
+   <receiver>scanningDepthNext</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>107</x>
+     <y>35</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>197</x>
+     <y>36</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scanningFrequencyNext</sender>
+   <signal>clicked()</signal>
+   <receiver>scanningFrequencyComboBox</receiver>
+   <slot>OnSetNextIndex()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>50</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>136</x>
+     <y>39</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scanningFrequencyPrev</sender>
+   <signal>clicked()</signal>
+   <receiver>scanningFrequencyComboBox</receiver>
+   <slot>OnSetPreviousIndex()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>21</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>136</x>
+     <y>39</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scanningFrequencyComboBox</sender>
+   <signal>SignalReachedBegin(bool)</signal>
+   <receiver>scanningFrequencyPrev</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>136</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>21</x>
+     <y>39</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scanningFrequencyComboBox</sender>
+   <signal>SignalReachedEnd(bool)</signal>
+   <receiver>scanningFrequencyNext</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>136</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>50</x>
+     <y>39</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

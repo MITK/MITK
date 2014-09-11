@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkCorrectorTool2D_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkSegTool2D.h"
 #include <mitkContourModel.h>
 #include <mitkContourModelLiveWireInteractor.h>
@@ -47,12 +47,13 @@ namespace mitk
 
   \warning Only to be instantiated by mitk::ToolManager.
 */
-class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
+class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
 {
   public:
 
     mitkClassMacro(LiveWireTool2D, SegTool2D);
-    itkNewMacro(LiveWireTool2D);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual us::ModuleResource GetCursorIconResource() const;
@@ -63,43 +64,39 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     /// \brief Convert all current contour objects to binary segmentation image.
     void ConfirmSegmentation();
 
+    /// \brief Delete all current contour objects.
+    void ClearSegmentation();
+
   protected:
 
     LiveWireTool2D();
     virtual ~LiveWireTool2D();
 
-    /**
-    * \brief Calculates how good the data, this statemachine handles, is hit by the event.
-    *
-    */
-    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
+    void ConnectActionsAndFunctions();
 
     virtual void Activated();
     virtual void Deactivated();
 
-    /// \brief Memory release from all used contours
-    virtual void ClearContours();
-
     /// \brief Initialize tool
-    virtual bool OnInitLiveWire (Action*, const StateEvent*);
+    virtual bool OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Add a control point and finish current segment
-    virtual bool OnAddPoint   (Action*, const StateEvent*);
+    virtual bool OnAddPoint   ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Actual LiveWire computation
-    virtual bool OnMouseMoved(Action*, const StateEvent*);
+    virtual bool OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Check double click on first control point to finish the LiveWire tool
-    virtual bool OnCheckPoint(Action*, const StateEvent*);
+    virtual bool OnCheckPoint( const InteractionEvent* interactionEvent );
 
     /// \brief Finish LiveWire tool
-    virtual bool OnFinish(Action*, const StateEvent*);
+    virtual bool OnFinish( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Close the contour
-    virtual bool OnLastSegmentDelete(Action*, const StateEvent*);
+    virtual bool OnLastSegmentDelete( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Don't use dynamic cost map for LiveWire calculation
-    virtual bool OnMouseMoveNoDynamicCosts(Action*, const StateEvent*);
+    virtual bool OnMouseMoveNoDynamicCosts( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Finish contour interaction.
     void FinishTool();
@@ -147,6 +144,11 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
 
     template<typename TPixel, unsigned int VImageDimension>
     void FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension>* inputImage, itk::Index<3> &index, itk::Index<3> &returnIndex);
+
+  private:
+    void RemoveHelperObjects();
+    void ReleaseHelperObjects();
+    void ReleaseInteractors();
 };
 
 } // namespace

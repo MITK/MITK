@@ -16,9 +16,6 @@ macro(MITK_GENERATE_TOOLS_LIBRARY)
   # GUI-less tools
   if(TOOL_FILES)
 
-    # TODO these will also get Qmitk includes! Should not be
-    include_directories(${MITK_INCLUDE_DIRS})
-
     foreach( TOOL_FILE ${TOOL_FILES}  )
 
       # construct tool name from file name
@@ -37,9 +34,6 @@ macro(MITK_GENERATE_TOOLS_LIBRARY)
 
   # part for Qt widgets
   if(TOOL_QT4GUI_FILES)
-
-    # give them Qmitk headers
-    include_directories(${QMITK_INCLUDE_DIRS})
 
     foreach( TOOL_GUI_FILE ${TOOL_QT4GUI_FILES})
 
@@ -84,10 +78,13 @@ macro(MITK_GENERATE_TOOLS_LIBRARY)
     # configure a file that contains an itkObjectFactory for this tool
     include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-    link_directories(${MITK_LINK_DIRECTORIES})
     add_library(${libraryname} SHARED ${TOOL_CPPS} ${TOOL_GUI_CPPS})
+    if(TOOL_QT4GUI_FILES)
+      mitk_use_modules(TARGET ${libraryname} MODULES Qmitk)
+    else()
+      mitk_use_modules(TARGET ${libraryname} MODULES Mitk)
+    endif()
 
-    target_link_libraries(${libraryname} ${QMITK_LIBRARIES})
     endif(libraryname AND reallycreatelibrary)
   endif(TOOL_FILES OR TOOL_QT4GUI_FILES)
 

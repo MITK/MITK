@@ -1,7 +1,7 @@
 SET(MODULE_TESTS
    mitkUSDeviceTest.cpp
-   mitkUSImageTest.cpp
    mitkUSProbeTest.cpp
+   mitkUSImageLoggingFilterTest.cpp
 
    # -----------------------------------------------------------------------
 
@@ -12,7 +12,6 @@ SET(MODULE_TESTS
 
 SET(MODULE_CUSTOM_TESTS
   mitkUSImageVideoSourceTest.cpp
-  mitkUSPipelineTest.cpp
 )
 
 

@@ -108,7 +108,7 @@ namespace mitk{
   * Converting from OpenCV image to ITK Image
   *********************************************/
   template <typename TPixel, unsigned int VImageDimension>
-  Image::Pointer mitk::OpenCVToMitkImageFilter::ConvertIplToMitkImage( const IplImage * input,  bool )
+  Image::Pointer mitk::OpenCVToMitkImageFilter::ConvertIplToMitkImage( const IplImage * input )
   {
     typedef itk::Image< TPixel, VImageDimension > ImageType;
 
@@ -153,16 +153,7 @@ namespace mitk{
   {
     m_OpenCVMat = image;
     m_OpenCVImage = NULL;
-  }
-
-
-  void OpenCVToMitkImageFilter::SetCopyBuffer(bool)
-  {
-  }
-
-  bool OpenCVToMitkImageFilter::GetCopyBuffer()
-  {
-    return true;
+    this->Modified();
   }
 
 } // end namespace mitk

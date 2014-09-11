@@ -19,24 +19,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PLANAR_RECTANGLE_H_
 
 #include "mitkPlanarPolygon.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 
 
 namespace mitk
 {
 
-class Geometry2D;
+class PlaneGeometry;
 
 /**
  * \brief Implementation of PlanarFigure representing a polygon
  * with two or more control points
  */
-class PlanarFigure_EXPORT PlanarRectangle : public PlanarFigure
+class MitkPlanarFigure_EXPORT PlanarRectangle : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarRectangle, PlanarFigure );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   /** \brief Place figure in its minimal configuration (a point at least)
@@ -82,6 +83,7 @@ protected:
   const unsigned int FEATURE_ID_CIRCUMFERENCE;
   const unsigned int FEATURE_ID_AREA;
 
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
 
 private:
 

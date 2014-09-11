@@ -255,7 +255,7 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_2">
+        <widget class="QGroupBox" name="m_TrackingControlsGroupBox">
          <property name="title">
           <string/>
          </property>
@@ -536,11 +536,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="m_LoggingFileName">
-           <property name="text">
-            <string>C:/logfile.csv</string>
-           </property>
-          </widget>
+          <widget class="QLineEdit" name="m_LoggingFileName"/>
          </item>
          <item>
           <widget class="QPushButton" name="m_ChooseFile">

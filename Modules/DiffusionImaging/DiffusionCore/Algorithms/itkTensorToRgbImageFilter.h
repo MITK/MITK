@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkUnaryFunctorImageFilter.h"
 #include "itkRGBAPixel.h"
+#include "itkImageRegionConstIterator.h"
+#include "itkImageRegionIterator.h"
 
 namespace itk
 {
@@ -52,7 +54,8 @@ namespace itk
     itkTypeMacro( TensorToRgbImageFilter, ImageToImageFilter );
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Print internal ivars */
     void PrintSelf(std::ostream& os, Indent indent) const

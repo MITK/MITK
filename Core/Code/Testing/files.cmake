@@ -1,8 +1,28 @@
-
 # tests with no extra command line parameter
 set(MODULE_TESTS
+  # IMPORTANT: If you plan to deactivate / comment out a test please write a bug number to the commented out line of code.
+  #
+  #     Example: #mitkMyTest #this test is commented out because of bug 12345
+  #
+  # It is important that the bug is open and that the test will be activated again before the bug is closed. This assures that
+  # no test is forgotten after it was commented out. If there is no bug for your current problem, please add a new one and
+  # mark it as critical.
+
+  ################## DISABLED TESTS #################################################
+  #mitkAbstractTransformGeometryTest.cpp #seems as tested class mitkExternAbstractTransformGeometry doesnt exist any more
+  #mitkStateMachineContainerTest.cpp #rewrite test, indirect since no longer exported Bug 14529
+  #mitkRegistrationBaseTest.cpp #tested class  mitkRegistrationBase doesn't exist any more
+  #mitkSegmentationInterpolationTest.cpp #file doesn't exist!
+  #mitkPipelineSmartPointerCorrectnessTest.cpp #file doesn't exist!
+  #mitkITKThreadingTest.cpp #test outdated because itk::Semaphore was removed from ITK
+  #mitkAbstractTransformPlaneGeometryTest.cpp #mitkVtkAbstractTransformPlaneGeometry doesn't exist any more
+  #mitkTestUtilSharedLibrary.cpp #Linker problem with this test...
+  #mitkTextOverlay2DSymbolsRenderingTest.cpp #Implementation of the tested feature is not finished yet. Ask Christoph or see bug 15104 for details.
+
+  ################# RUNNING TESTS ###################################################
   mitkAccessByItkTest.cpp
   mitkCoreObjectFactoryTest.cpp
+  mitkDataNodeTest.cpp
   mitkMaterialTest.cpp
   mitkActionTest.cpp
   mitkDispatcherTest.cpp
@@ -10,41 +30,37 @@ set(MODULE_TESTS
   mitkEventTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
-  mitkGeometry2DTest.cpp
   mitkGeometry3DTest.cpp
   mitkGeometry3DEqualTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
+  mitkImageCastTest.cpp
   mitkImageEqualTest.cpp
   mitkImageDataItemTest.cpp
-  #mitkImageMapper2DTest.cpp
   mitkImageGeneratorTest.cpp
+  mitkIOUtilTest.cpp
   mitkBaseDataTest.cpp
-  #mitkImageToItkTest.cpp
   mitkImportItkImageTest.cpp
   mitkGrabItkImageMemoryTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
-  #mitkITKThreadingTest.cpp
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
-  #mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
+  mitkPointSetTest.cpp
   mitkPointSetEqualTest.cpp
   mitkPointSetFileIOTest.cpp
-  mitkPointSetTest.cpp
+  mitkPointSetOnEmptyTest.cpp
   mitkPointSetWriterTest.cpp
   mitkPointSetReaderTest.cpp
   mitkPointSetInteractorTest.cpp
+  mitkPointSetPointOperationsTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
-  #mitkRegistrationBaseTest.cpp
-  #mitkSegmentationInterpolationTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
-  ##mitkStateMachineContainerTest.cpp ## rewrite test, indirect since no longer exported Bug 14529
   mitkStateTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceEqualTest.cpp
@@ -56,9 +72,7 @@ set(MODULE_TESTS
   mitkVerboseLimitedLinearUndoTest.cpp
   mitkWeakPointerTest.cpp
   mitkTransferFunctionTest.cpp
-  #mitkAbstractTransformGeometryTest.cpp
   mitkStepperTest.cpp
-  itkTotalVariationDenoisingImageFilterTest.cpp
   mitkRenderingManagerTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
   mitkNodePredicateSourceTest.cpp
@@ -77,7 +91,30 @@ set(MODULE_TESTS
   mitkPropertyDescriptionsTest.cpp
   mitkPropertyExtensionsTest.cpp
   mitkPropertyFiltersTest.cpp
+  mitkTinyXMLTest.cpp
+  mitkRawImageFileReaderTest.cpp
+  mitkInteractionEventTest.cpp
+  mitkLookupTableTest.cpp
+  mitkSTLFileReaderTest.cpp
+  mitkPointTypeConversionTest.cpp
+  mitkVectorTypeConversionTest.cpp
+  mitkMatrixTypeConversionTest.cpp
+  mitkArrayTypeConversionTest.cpp
+  mitkSurfaceToImageFilterTest.cpp
+  mitkBaseGeometryTest.cpp
+  mitkImageToSurfaceFilterTest.cpp
+  mitkEqualTest.cpp
+  mitkLineTest.cpp
 )
+
+if(MITK_ENABLE_RENDERING_TESTING) #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
+set(MODULE_TESTS
+  ${MODULE_TESTS}
+  mitkPointSetDataInteractorTest.cpp
+)
+endif()
+
+
 
 # test with image filename as an extra command line parameter
 set(MODULE_IMAGE_TESTS
@@ -105,10 +142,7 @@ set(MODULE_TESTSURFACES
 )
 
 set(MODULE_CUSTOM_TESTS
-    #mitkLabeledImageToSurfaceFilterTest.cpp
-    #mitkExternalToolsTest.cpp
     mitkDataStorageTest.cpp
-    mitkDataNodeTest.cpp
     mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp
     mitkEventMapperTest.cpp
@@ -127,7 +161,6 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DTransferFunctionTest.cpp
     mitkImageVtkMapper2DOpacityTransferFunctionTest.cpp
     mitkImageVtkMapper2DLookupTableTest.cpp
-    mitkIOUtilTest.cpp
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
     mitkSurfaceGLMapper2DColorTest.cpp
@@ -146,11 +179,12 @@ set(MODULE_CUSTOM_TESTS
     mitkTextOverlay3DRendering3DTest.cpp
     mitkTextOverlay3DColorRenderingTest.cpp
     mitkVTKRenderWindowSizeTest.cpp
+    mitkMultiComponentImageDataComparisonFilterTest.cpp
+    mitkImageToItkTest.cpp
+    mitkImageSliceSelectorTest.cpp
+    mitkSurfaceDepthPeelingTest.cpp
+    mitkSurfaceDepthSortingTest.cpp
 )
-
-if (${VTK_MAJOR_VERSION} VERSION_LESS 6) # test can be removed with VTK 6
-  set(MODULE_TESTS ${MODULE_TESTS} mitkVTKRenderWindowSizeTest.cpp)
-endif()
 
 set(MODULE_RESOURCE_FILES
   Interactions/AddAndRemovePoints.xml

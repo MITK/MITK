@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkDiffImageApplier_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkOperationActor.h"
 #include "mitkImage.h"
 
@@ -36,12 +36,13 @@ namespace mitk
 
   $Author: maleike $
 */
-class Segmentation_EXPORT DiffImageApplier : public itk::Object, public OperationActor
+class MitkSegmentation_EXPORT DiffImageApplier : public itk::Object, public OperationActor
 {
   public:
 
     mitkClassMacro(DiffImageApplier, Object);
-    itkNewMacro(DiffImageApplier);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual void ExecuteOperation( Operation* operation );
 

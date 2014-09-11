@@ -17,9 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPYRAMIDIMAGEREGISTRATION_H
 #define MITKPYRAMIDIMAGEREGISTRATION_H
 
-#include <DiffusionCoreExports.h>
+#include <MitkDiffusionCoreExports.h>
 
 #include <itkObject.h>
+#include "itkImageMaskSpatialObject.h"
+#include "itkNotImageFilter.h"
+#include <itkCenteredVersorTransformInitializer.h>
 #include <vnl/vnl_matrix_fixed.h>
 
 #include "mitkImage.h"
@@ -29,7 +32,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkWindowedSincInterpolateImageFunction.h>
 
 #include "mitkImageToItk.h"
+#include "mitkImageCast.h"
+#include "mitkImageCaster.h"
 #include "mitkITKImageImport.h"
+#include "mitkIOUtil.h"
 
 
 namespace mitk
@@ -48,7 +54,7 @@ namespace mitk
  *   - MattesMutualInformation for CrossModality=on ( default ) and
  *   - NormalizedCorrelation for CrossModality=off.
  */
-class DiffusionCore_EXPORT PyramidImageRegistrationMethod :
+class MitkDiffusionCore_EXPORT PyramidImageRegistrationMethod :
     public itk::Object
 {
 public:
@@ -57,10 +63,14 @@ public:
   mitkClassMacro(PyramidImageRegistrationMethod, itk::Object)
 
   /** Smart pointer support */
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Typedef for the transformation matrix, corresponds to the InternalMatrixType from ITK transforms */
   typedef vnl_matrix_fixed< double, 3, 3> TransformMatrixType;
+
+  typedef itk::AffineTransform< double >  AffineTransformType;
+  typedef itk::Euler3DTransform< double >  RigidTransformType;
 
   /** Registration is between modalities - will take MattesMutualInformation as error metric */
   void SetCrossModalityOn()
@@ -125,6 +135,15 @@ public:
   /** Input image, the one to be transformed */
   void SetMovingImage( mitk::Image::Pointer );
 
+  /** Fixed image mask, excludes the masked voxels from the registration metric*/
+  void SetFixedImageMask( mitk::Image::Pointer mask);
+
+
+  void SetInitializeByGeometry(bool flag)
+  {
+    m_InitializeByGeometry = flag;
+  }
+
   void Update();
 
   /**
@@ -175,11 +194,40 @@ public:
   }
 
   /**
+   * @brief Control the interpolator used for resampling.
+   *
+   * The class uses the
+   *  - Linear interpolator on default ( flag = false )
+   *  - Nearest neighbor interpolation if this is true
+   *
+   *  used to resample e.g. segmentations.
+   */
+  void SetUseNearestNeighborInterpolation( bool flag)
+  {
+    m_UseNearestNeighborInterpolator = flag;
+  }
+
+  /**
+   * @brief Set if fixed image mask is used to exclude a region.
+   * @param flag , true if mask is to be used, false if mask is to be ignored (default)
+   */
+  void SetUseFixedImageMask( bool flag)
+  {
+    m_UseMask = flag;
+  }
+
+  /**
    * @brief Returns the moving image transformed according to the estimated transformation and resampled
-   * to the geometry of the fixed image
+   * to the geometry of the fixed/resampling reference image
    *
    */
   mitk::Image::Pointer GetResampledMovingImage();
+
+  /**
+   * @brief Returns a provided moving image transformed according to the given transformation and resampled
+   * to the geometry of the fixed/resampling reference image
+   */
+  mitk::Image::Pointer GetResampledMovingImage(mitk::Image::Pointer movingImage, double *transform );
 
   /**
    * @brief Get the rotation part of the transformation as a vnl_fixed_matrix<double, 3,3>
@@ -202,16 +250,24 @@ protected:
   /** Moving image, will be transformed */
   mitk::Image::Pointer m_MovingImage;
 
+  mitk::Image::Pointer m_FixedImageMask;
+
   bool m_CrossModalityRegistration;
 
   bool m_UseAffineTransform;
 
   bool m_UseWindowedSincInterpolator;
 
+  bool m_UseNearestNeighborInterpolator;
+
+  bool m_UseMask;
+
   double* m_EstimatedParameters;
 
   /** Control the verbosity of the regsitistration output */
   bool m_Verbose;
+
+  bool m_InitializeByGeometry;
 
   template <typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
   void RegisterTwoImages(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image<TPixel2, VImageDimension2>* itkImage2)
@@ -221,8 +277,6 @@ protected:
     typedef typename itk::MultiResolutionImageRegistrationMethod< FixedImageType, MovingImageType > RegistrationType;
     typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
 
-    typedef itk::AffineTransform< double >  AffineTransformType;
-    typedef itk::Euler3DTransform< double >  RigidTransformType;
     typedef itk::MatrixOffsetTransformBase< double, VImageDimension1, VImageDimension2 > BaseTransformType;
 
     typedef typename itk::MattesMutualInformationImageToImageMetric< FixedImageType, MovingImageType > MMIMetricType;
@@ -266,8 +320,6 @@ protected:
     {
       initialParams[0] = initialParams[4] = initialParams[8] = 1;
     }
-
-
     typename FixedImageType::Pointer referenceImage = itkImage1;
     typename MovingImageType::Pointer movingImage = itkImage2;
     typename FixedImageType::RegionType maskedRegion = referenceImage->GetLargestPossibleRegion();
@@ -319,6 +371,25 @@ protected:
     optimizer->SetMaximumStepLength( optmaxstep );
     optimizer->SetMinimumStepLength( optminstep );
 
+    // Initializing by Geometry
+    if (!m_UseAffineTransform && m_InitializeByGeometry)
+    {
+      typedef itk::CenteredVersorTransformInitializer< FixedImageType, MovingImageType> TransformInitializerType;
+      typename TransformInitializerType::TransformType::Pointer rigidTransform = TransformInitializerType::TransformType::New() ;
+      MITK_INFO << "Initializer starting at : " << rigidTransform->GetParameters();
+
+      typename TransformInitializerType::Pointer initializer = TransformInitializerType::New();
+      initializer->SetTransform( rigidTransform);
+      initializer->SetFixedImage( referenceImage.GetPointer() );
+      initializer->SetMovingImage(  movingImage.GetPointer() );
+      initializer->MomentsOn();
+      initializer->InitializeTransform();
+      MITK_INFO << "Initialized Rigid position :  " << rigidTransform->GetParameters();
+      initialParams[3]=rigidTransform->GetParameters()[3];
+      initialParams[4]=rigidTransform->GetParameters()[4];
+      initialParams[5]=rigidTransform->GetParameters()[5];
+    }
+
     // add observer tag if verbose */
     unsigned long vopt_tag = 0;
     if(m_Verbose)
@@ -338,6 +409,19 @@ protected:
     registration->SetFixedImageRegion( maskedRegion );
     registration->SetMovingImage( movingImage );
     registration->SetSchedules( fixedSchedule, fixedSchedule);
+    // SET MASKED AREA
+    typedef itk::Image<unsigned char, 3> BinaryImageType;
+    BinaryImageType::Pointer itkFixedImageMask = BinaryImageType::New();
+    itk::ImageMaskSpatialObject< 3 >::Pointer fixedMaskSpatialObject = itk::ImageMaskSpatialObject< 3 >::New();
+    if (m_UseMask)
+    {
+      CastToItkImage(m_FixedImageMask,itkFixedImageMask);
+      itk::NotImageFilter<BinaryImageType, BinaryImageType>::Pointer notFilter = itk::NotImageFilter<BinaryImageType, BinaryImageType>::New();
+      notFilter->SetInput(itkFixedImageMask);
+      notFilter->Update();
+      fixedMaskSpatialObject->SetImage( notFilter->GetOutput() );
+      metric->SetFixedImageMask( fixedMaskSpatialObject );
+    }
     // OTHER INPUTS
     registration->SetMetric( metric );
     registration->SetOptimizer( optimizer );
@@ -392,57 +476,62 @@ protected:
     typedef itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
     typename InterpolatorType::Pointer linear_interpolator = InterpolatorType::New();
 
+
+    typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double > NearestNeighborInterpolatorType;
+    typename NearestNeighborInterpolatorType::Pointer nn_interpolator = NearestNeighborInterpolatorType::New();
+
+
     typedef itk::WindowedSincInterpolateImageFunction< ImageType, 7> WindowedSincInterpolatorType;
     typename WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
 
-    typename mitk::ImageToItk< ImageType >::Pointer reference_image = mitk::ImageToItk< ImageType >::New();
-    reference_image->SetInput( this->m_FixedImage );
-    reference_image->Update();
+    typename ImageType::Pointer reference_image = ImageType::New();
+    CastToItkImage(m_FixedImage,reference_image);
 
     typedef itk::MatrixOffsetTransformBase< double, 3, 3> BaseTransformType;
     BaseTransformType::Pointer base_transform = BaseTransformType::New();
 
     if( this->m_UseAffineTransform )
     {
-        typedef itk::AffineTransform< double > TransformType;
-        TransformType::Pointer transform = TransformType::New();
+      typedef itk::AffineTransform< double > TransformType;
+      TransformType::Pointer transform = TransformType::New();
 
-        TransformType::ParametersType affine_params( TransformType::ParametersDimension );
-        this->GetParameters( &affine_params[0] );
+      TransformType::ParametersType affine_params( TransformType::ParametersDimension );
+      this->GetParameters( &affine_params[0] );
 
-        transform->SetParameters( affine_params );
+      transform->SetParameters( affine_params );
 
-        base_transform = transform;
+      base_transform = transform;
     }
     // Rigid
     else
     {
-        typedef itk::Euler3DTransform< double > RigidTransformType;
-        RigidTransformType::Pointer rtransform = RigidTransformType::New();
+      typedef itk::Euler3DTransform< double > RigidTransformType;
+      RigidTransformType::Pointer rtransform = RigidTransformType::New();
 
-        RigidTransformType::ParametersType rigid_params( RigidTransformType::ParametersDimension  );
-        this->GetParameters( &rigid_params[0] );
+      RigidTransformType::ParametersType rigid_params( RigidTransformType::ParametersDimension  );
+      this->GetParameters( &rigid_params[0] );
 
-        rtransform->SetParameters( rigid_params );
+      rtransform->SetParameters( rigid_params );
 
-        base_transform = rtransform;
+      base_transform = rtransform;
     }
 
     typename ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
+
     resampler->SetInterpolator( linear_interpolator );
     if( m_UseWindowedSincInterpolator )
       resampler->SetInterpolator( sinc_interpolator );
+    if ( m_UseNearestNeighborInterpolator)
+      resampler->SetInterpolator ( nn_interpolator );
 
     resampler->SetInput( itkImage );
     resampler->SetTransform( base_transform );
-    resampler->SetReferenceImage( reference_image->GetOutput() );
+    resampler->SetReferenceImage( reference_image );
     resampler->UseReferenceImageOn();
 
     resampler->Update();
 
-
     mitk::GrabItkImageMemory( resampler->GetOutput(), outputImage);
-
   }
 
 };

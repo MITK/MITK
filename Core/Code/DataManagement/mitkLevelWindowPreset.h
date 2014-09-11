@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define LEVELWINDOWPRESET_H_HEADER
 
 #include <vtkXMLParser.h>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <map>
 #include <string>
 

@@ -27,10 +27,11 @@ class MyNavigationDataSourceTest : public mitk::NavigationDataSource
   {
   public:
     mitkClassMacro(MyNavigationDataSourceTest, mitk::NavigationDataSource);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     void CreateOutput()
     {
-      this->SetNumberOfOutputs(1);
+      this->SetNumberOfIndexedOutputs(1);
       this->SetNthOutput(0, this->MakeOutput(0));
     };
   };

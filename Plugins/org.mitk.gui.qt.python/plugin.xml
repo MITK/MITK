@@ -8,7 +8,7 @@
     <view
       id="org.mitk.views.python"
       name="Python Console"
-      category="org.mitk.views.general"
+      category="General"
       icon="resources/Python.png"
       class="QmitkPythonView" />
   </extension>

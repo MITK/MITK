@@ -19,24 +19,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PLANAR_ANGLE_H_
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 
 
 namespace mitk
 {
 
-class Geometry2D;
+class PlaneGeometry;
 
 /**
  * \brief Implementation of PlanarFigure to display an angle
  * through three control points
  */
-class PlanarFigure_EXPORT PlanarAngle : public PlanarFigure
+class MitkPlanarFigure_EXPORT PlanarAngle : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarAngle, PlanarFigure );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 public:
   // Feature identifiers
   const unsigned int FEATURE_ID_ANGLE;
@@ -60,6 +61,8 @@ public:
   {
     return 3;
   }
+
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
 
 protected:
   PlanarAngle();

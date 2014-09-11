@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFImageGrabber_h
 #define __mitkToFImageGrabber_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkCommon.h"
 #include "mitkImageSource.h"
 #include "mitkToFCameraDevice.h"
@@ -41,8 +41,10 @@ namespace mitk
 
     mitkClassMacro( ToFImageGrabber , ImageSource );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
+    void ShowDebugImage(float* distances);
     /*!
     \brief Establish a connection to the ToF camera
     */
@@ -152,6 +154,7 @@ namespace mitk
 
     BaseProperty* GetProperty( const char *propertyKey);
 
+
   protected:
 
     ///
@@ -168,13 +171,18 @@ namespace mitk
     */
     virtual void AllocateImageArrays();
 
+    /**
+     * @brief InitializeImages Initialze the geometries of the images according to the device properties.
+     */
+    void InitializeImages();
+
     ToFCameraDevice::Pointer m_ToFCameraDevice; ///< Device allowing access to ToF image data
     int m_CaptureWidth; ///< Width of the captured ToF image
     int m_CaptureHeight; ///< Height of the captured ToF image
     int m_PixelNumber; ///< Number of pixels in the image
-    int m_RGBImageWidth;
-    int m_RGBImageHeight;
-    int m_RGBPixelNumber;
+    int m_RGBImageWidth; ///< Width of the captured RGB image
+    int m_RGBImageHeight; ///< Height of the captured RGB image
+    int m_RGBPixelNumber; ///< Number of pixels in the RGB image
     int m_ImageSequence; ///< counter for currently acquired images
     int m_SourceDataSize; ///< size of the source data in bytes
     float* m_IntensityArray; ///< member holding the current intensity array
@@ -183,10 +191,6 @@ namespace mitk
     char* m_SourceDataArray;///< member holding the current source data array
     unsigned char* m_RgbDataArray; ///< member holding the current rgb data array
     unsigned long m_DeviceObserverTag; ///< tag of the observer for the ToFCameraDevice
-    bool m_DistanceImageInitialized; ///< flag indicating whether the distance image is initialized or not
-    bool m_IntensityImageInitialized; ///< flag indicating whether the intensity image is initialized or not
-    bool m_AmplitudeImageInitialized; ///< flag indicating whether the amplitude image is initialized or not
-    bool m_RGBImageInitialized; ///< flag indicating whether the RGB image is initialized or not
     ToFImageGrabber();
 
     ~ToFImageGrabber();
@@ -196,6 +200,7 @@ namespace mitk
     0: distance image
     1: amplitude image
     2: intensity image
+    3: RGB image
     */
     void GenerateData();
 

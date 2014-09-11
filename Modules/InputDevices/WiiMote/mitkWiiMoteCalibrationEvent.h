@@ -16,10 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_WIIMOTECALIBRATIONEVENT_H
 #define MITK_WIIMOTECALIBRATIONEVENT_H
 
-#include "mitkWiiMoteExports.h"
+#include <MitkWiiMoteExports.h>
 
 #include "mitkEvent.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "mitkInteractionConst.h"
 
 namespace mitk

@@ -36,12 +36,13 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class mitkCameraCalibration_EXPORT NavigationDataHandEyeCalibrationFilter : public NavigationDataToNavigationDataFilter
+  class MitkCameraCalibration_EXPORT NavigationDataHandEyeCalibrationFilter : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataHandEyeCalibrationFilter, NavigationDataToNavigationDataFilter);
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief transformation type for itk::QuaternionRigidTransforms

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSegmentationInterpolationAlgorithm.h"
 #include "mitkLegacyAdaptors.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 namespace mitk
 {
@@ -36,12 +36,13 @@ namespace mitk
  *  Last contributor:
  *  $Author:$
  */
-class Segmentation_EXPORT ShapeBasedInterpolationAlgorithm : public SegmentationInterpolationAlgorithm
+class MitkSegmentation_EXPORT ShapeBasedInterpolationAlgorithm : public SegmentationInterpolationAlgorithm
 {
   public:
 
     mitkClassMacro(ShapeBasedInterpolationAlgorithm, SegmentationInterpolationAlgorithm);
-    itkNewMacro(ShapeBasedInterpolationAlgorithm);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     Image::Pointer Interpolate(Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,
                                Image::ConstPointer upperSlice, unsigned int upperSliceIndex,

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 
-#include <mitkTesting.h>
+#include <mitkNumericTypes.h>
 #include <iomanip>
 
 mitk::PointSet::PointSet()
@@ -179,7 +179,7 @@ mitk::PointSet::PointsConstIterator mitk::PointSet::End(int t) const
   return PointsConstIterator();
 }
 
-int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
+int mitk::PointSet::SearchPoint( Point3D point, ScalarType distance, int t  ) const
 {
   if ( t >= (int)m_PointSetSeries.size() )
   {
@@ -335,7 +335,7 @@ void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, PointSpec
   if ( (unsigned int) t < m_PointSetSeries.size() )
   {
     mitk::Point3D indexPoint;
-    mitk::Geometry3D* tempGeometry = this->GetGeometry( t );
+    mitk::BaseGeometry* tempGeometry = this->GetGeometry( t );
     if (tempGeometry == NULL)
     {
       MITK_INFO<< __FILE__ << ", l." << __LINE__ << ": GetGeometry of "<< t <<" returned NULL!" << std::endl;
@@ -524,7 +524,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       pt.CastFrom(pointOp->GetPoint());
 
       //transfer from world to index coordinates
-      mitk::Geometry3D* geometry = this->GetGeometry( timeStep );
+      mitk::BaseGeometry* geometry = this->GetGeometry( timeStep );
       if (geometry == NULL)
       {
         MITK_INFO<<"GetGeometry returned NULL!\n";
@@ -821,31 +821,27 @@ bool mitk::PointSet::PointDataType::operator ==(const mitk::PointSet::PointDataT
 
 bool mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose )
 {
+  if((leftHandSide == NULL) || (rightHandSide == NULL))
+  {
+    MITK_ERROR << "mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose ) does not work with NULL pointer input.";
+    return false;
+  }
+  return Equal( *leftHandSide, *rightHandSide, eps, verbose);
+}
+
+bool mitk::Equal( const mitk::PointSet& leftHandSide, const mitk::PointSet& rightHandSide, mitk::ScalarType eps, bool verbose )
+{
   bool result = true;
 
-  if( rightHandSide == NULL )
-  {
-    if(verbose)
-    {
-      MITK_INFO << "[( PointSet )] rightHandSide NULL.";
-    }
-    return false;
-  }
-  if( leftHandSide == NULL )
-  {
-    if(verbose)
-      MITK_INFO << "[( PointSet )] leftHandSide NULL.";
-    return false;
-  }
 
-  if( !mitk::Equal(leftHandSide->GetGeometry(), rightHandSide->GetGeometry(), eps, verbose) )
+  if( !mitk::Equal( *leftHandSide.GetGeometry(), *rightHandSide.GetGeometry(), eps, verbose) )
   {
     if(verbose)
       MITK_INFO << "[( PointSet )] Geometries differ.";
     result = false;
   }
 
-  if ( leftHandSide->GetSize() != rightHandSide->GetSize())
+  if ( leftHandSide.GetSize() != rightHandSide.GetSize())
   {
     if(verbose)
       MITK_INFO << "[( PointSet )] Number of points differ.";
@@ -860,8 +856,8 @@ bool mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* righ
     int numberOfIncorrectPoints = 0;
 
     //Iterate over both pointsets in order to compare all points pair-wise
-    mitk::PointSet::PointsConstIterator end = leftHandSide->End();
-    for( mitk::PointSet::PointsConstIterator pointSetIteratorLeft = leftHandSide->Begin(), pointSetIteratorRight = rightHandSide->Begin();
+    mitk::PointSet::PointsConstIterator end = leftHandSide.End();
+    for( mitk::PointSet::PointsConstIterator pointSetIteratorLeft = leftHandSide.Begin(), pointSetIteratorRight = rightHandSide.Begin();
          pointSetIteratorLeft != end; ++pointSetIteratorLeft, ++pointSetIteratorRight) //iterate simultaneously over both sets
     {
       pointLeftHandSide = pointSetIteratorLeft.Value();
@@ -877,7 +873,7 @@ bool mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* righ
 
     if((numberOfIncorrectPoints > 0) && verbose)
     {
-      MITK_INFO << numberOfIncorrectPoints <<" of a total of " << leftHandSide->GetSize() << " points are different.";
+      MITK_INFO << numberOfIncorrectPoints <<" of a total of " << leftHandSide.GetSize() << " points are different.";
     }
   }
   return result;

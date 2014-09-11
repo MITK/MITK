@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkShowSegmentationAsSmoothedSurface.h"
 #include "mitkImageToItk.h"
+#include "mitkImageCast.h"
 #include "itkIntelligentBinaryClosingFilter.h"
 #include <mitkUIDGenerator.h>
 #include <mitkGeometry3D.h>
@@ -60,7 +61,7 @@ void ShowSegmentationAsSmoothedSurface::Initialize(const NonBlockingAlgorithm *o
   SetParameter("Sync visibility", syncVisibility);
   SetParameter("Wireframe", false);
 
-  // The Smoothing value is used as variance for a Gauﬂ filter.
+  // The Smoothing value is used as variance for a Gauss filter.
   // A reasonable default value equals the image spacing in mm.
   SetParameter("Smoothing", 1.0f);
 
@@ -417,14 +418,14 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
     MITK_INFO << "Quadric mesh decimation...";
 
     vtkQuadricDecimation *quadricDecimation = vtkQuadricDecimation::New();
-    quadricDecimation->SetInput(m_Surface->GetVtkPolyData());
+    quadricDecimation->SetInputData(m_Surface->GetVtkPolyData());
     quadricDecimation->SetTargetReduction(decimation);
     quadricDecimation->AttributeErrorMetricOn();
     quadricDecimation->GlobalWarningDisplayOff();
     quadricDecimation->Update();
 
     vtkCleanPolyData* cleaner = vtkCleanPolyData::New();
-    cleaner->SetInput(quadricDecimation->GetOutput());
+    cleaner->SetInputConnection(quadricDecimation->GetOutputPort());
     cleaner->PieceInvariantOn();
     cleaner->ConvertLinesToPointsOn();
     cleaner->ConvertStripsToPolysOn();
@@ -439,7 +440,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   // Compute Normals
 
   vtkPolyDataNormals* computeNormals = vtkPolyDataNormals::New();
-  computeNormals->SetInput(m_Surface->GetVtkPolyData());
+  computeNormals->SetInputData(m_Surface->GetVtkPolyData());
   computeNormals->SetFeatureAngle(360.0f);
   computeNormals->FlipNormalsOff();
   computeNormals->Update();
@@ -481,7 +482,7 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
   BaseProperty *colorProperty = groupNode->GetProperty("color");
 
   if (colorProperty != NULL)
-    node->ReplaceProperty("color", colorProperty);
+    node->ReplaceProperty("color", colorProperty->Clone());
   else
     node->SetProperty("color", ColorProperty::New(1.0f, 0.0f, 0.0f));
 
@@ -502,7 +503,7 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
   BaseProperty *visibleProperty = groupNode->GetProperty("visible");
 
   if (visibleProperty != NULL && syncVisibility)
-    node->ReplaceProperty("visible", visibleProperty);
+    node->ReplaceProperty("visible", visibleProperty->Clone());
   else
     node->SetProperty("visible", BoolProperty::New(showResult));
 

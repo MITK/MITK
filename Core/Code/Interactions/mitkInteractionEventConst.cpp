@@ -18,17 +18,40 @@
 
 namespace mitk {
 
+const std::string InteractionEventConst::xmlHead()
+{
+  static const std::string xmlHead = "<?xml version='1.0'?>";
+  return xmlHead;
+}
+
 const std::string InteractionEventConst::xmlTagConfigRoot()
 {
   static const std::string xmlTagConfigRoot = "config";
   return xmlTagConfigRoot;
 }
 
+const std::string InteractionEventConst::xmlTagEvents()
+{
+  static const std::string xmlTagEvents = "events";
+  return xmlTagEvents;
+}
+
+const std::string InteractionEventConst::xmlTagInteractions()
+{
+  static const std::string xmlTagInteractions = "interactions";
+  return xmlTagInteractions;
+}
+
+const std::string InteractionEventConst::xmlTagRenderer()
+{
+  static const std::string xmlTagRenderer = "renderer";
+  return xmlTagRenderer;
+}
+
 const std::string InteractionEventConst::xmlTagParam()
 {
   static const std::string xmlTagParam = "param";
   return xmlTagParam;
-
 }
 
 const std::string InteractionEventConst::xmlTagEventVariant()
@@ -85,6 +108,18 @@ const std::string InteractionEventConst::xmlEventPropertyButtonState()
   return xmlEventPropertyButtonState;
 }
 
+const std::string InteractionEventConst::xmlEventPropertyPositionInWorld()
+{
+  static const std::string xmlEventPropertyPosition = "PositionInWorld";
+  return xmlEventPropertyPosition;
+}
+
+const std::string InteractionEventConst::xmlEventPropertyPositionOnScreen()
+{
+  static const std::string xmlEventPropertyPosition = "PositionOnScreen";
+  return xmlEventPropertyPosition;
+}
+
 const std::string InteractionEventConst::xmlEventPropertyKey()
 {
   static const std::string xmlEventPropertyKey = "Key";
@@ -97,11 +132,52 @@ const std::string InteractionEventConst::xmlEventPropertyScrollDirection()
   return xmlEventPropertyScrollDirection;
 }
 
+const std::string InteractionEventConst::xmlEventPropertyWheelDelta()
+{
+  static const std::string xmlEventPropertyWheelDelta = "WheelDelta";
+  return xmlEventPropertyWheelDelta;
+}
+
 const std::string InteractionEventConst::xmlEventPropertySignalName()
 {
   static const std::string xmlEventPropertySignalName = "SignalName";
   return xmlEventPropertySignalName;
 }
 
+const std::string InteractionEventConst::xmlEventPropertyRendererName()
+{
+  static const std::string xmlEventPropertyRendererName = "RendererName";
+  return xmlEventPropertyRendererName;
+}
+
+const std::string InteractionEventConst::xmlEventPropertyViewDirection()
+{
+  static const std::string xmlEventPropertyViewDirection = "ViewDirection";
+  return xmlEventPropertyViewDirection;
+}
+
+const std::string InteractionEventConst::xmlEventPropertyMapperID()
+{
+  static const std::string xmlEventPropertyMapperID = "MapperID";
+  return xmlEventPropertyMapperID;
+}
+
+const std::string mitk::InteractionEventConst::xmlRenderSizeX()
+{
+  static const std::string xmlSize = "RenderSizeX";
+  return xmlSize;
+}
+
+const std::string mitk::InteractionEventConst::xmlRenderSizeY()
+{
+  static const std::string xmlSize = "RenderSizeY";
+  return xmlSize;
+}
+
+const std::string mitk::InteractionEventConst::xmlRenderSizeZ()
+{
+  static const std::string xmlSize = "RenderSizeZ";
+  return xmlSize;
+}
 
 }

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNODEPREDICATEBASE_H_HEADER_INCLUDED_
 #define MITKNODEPREDICATEBASE_H_HEADER_INCLUDED_
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkCommon.h>
 #include "itkObject.h"
 

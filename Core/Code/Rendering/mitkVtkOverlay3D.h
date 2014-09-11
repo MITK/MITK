@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef VTKOVERLAY3D_H
 #define VTKOVERLAY3D_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkVtkOverlay.h"
 #include <vtkSmartPointer.h>
 
@@ -38,9 +38,6 @@ public:
   void SetOffsetVector(const Point3D& OffsetVector, mitk::BaseRenderer* renderer = NULL);
 
   Point3D GetOffsetVector(mitk::BaseRenderer* renderer = NULL) const;
-
-  Overlay::Bounds GetBoundsOnDisplay(BaseRenderer*) const;
-  void SetBoundsOnDisplay(BaseRenderer*, const Bounds&);
 
   mitkClassMacro(VtkOverlay3D, VtkOverlay);
 

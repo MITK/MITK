@@ -142,7 +142,7 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByNthPoint (vtkIdType cel
   reducedPolygon->GetPointIds()->SetNumberOfIds(newNumberOfPoints);
   reducedPolygon->GetPoints()->SetNumberOfPoints(newNumberOfPoints);
 
-  for (unsigned int i = 0; i < cellSize; i++)
+  for (vtkIdType i = 0; i < cellSize; i++)
   {
     if (i%m_StepSize == 0)
     {
@@ -165,7 +165,7 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
                                                                         vtkPolygon* reducedPolygon, vtkPoints* reducedPoints)
 {
   //If the cell is too small to obtain a reduced polygon with the given stepsize return
-  if (cellSize <= m_StepSize*3)return;
+  if (cellSize <= static_cast<vtkIdType>(m_StepSize*3))return;
 
   /*
   What we do now is (see the Douglas Peucker Algorithm):
@@ -400,7 +400,7 @@ bool mitk::ReduceContourSetFilter::CheckForIntersection (vtkIdType* currentCell,
       double maxDistance (0);
       double minDistance (10000);
 
-      for (unsigned int j = 2; j < anotherInputPolygonSize; j++)
+      for (vtkIdType j = 2; j < anotherInputPolygonSize; j++)
       {
         poly->GetPoint(anotherInputPolygonIDs[j], p3);
 
@@ -433,7 +433,7 @@ bool mitk::ReduceContourSetFilter::CheckForIntersection (vtkIdType* currentCell,
       Calculate the distance to the plane for each point of the current polygon
       If the distance is zero then save the currentPoint as intersection point
       */
-      for (unsigned int k = 0; k < currentCellSize; k++)
+      for (vtkIdType k = 0; k < currentCellSize; k++)
       {
         double currentPoint[3];
         currentPoints->GetPoint(currentCell[k], currentPoint);

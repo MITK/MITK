@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraDevice_h
 #define __mitkToFCameraDevice_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkCommon.h"
 #include "mitkStringProperty.h"
 #include "mitkProperties.h"
@@ -43,10 +43,17 @@ namespace mitk
 
     mitkClassMacro(ToFCameraDevice, itk::Object);
     /*!
-    \brief opens a connection to the ToF camera
+    \brief Opens a connection to the ToF camera. Has to be implemented
+    in the specialized inherited classes.
+    \return True for success.
     */
     virtual bool OnConnectCamera() = 0;
 
+    /**
+     * @brief ConnectCamera Internally calls OnConnectCamera() of the
+     * respective device implementation.
+     * @return True for success.
+     */
     virtual bool ConnectCamera();
     /*!
     \brief closes the connection to the camera
@@ -103,13 +110,6 @@ namespace mitk
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
                               int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL) = 0;
-//    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
-//    /* // * TODO: Reenable doxygen comment when uncommenting, disabled to fix doxygen warning see bug 12882
-//    \brief pure virtual method resetting the buffer using the specified bufferSize. Has to be implemented by sub-classes
-//    \param bufferSize buffer size the buffer should be reset to
-//    */
-//    virtual void ResetBuffer(int bufferSize) = 0;
-    //TODO add/correct documentation for requiredImageSequence and capturedImageSequence in the GetAllImages, GetDistances, GetIntensities and GetAmplitudes methods.
     /*!
     \brief get the currently set capture width
     \return capture width
@@ -210,9 +210,9 @@ namespace mitk
     int m_CaptureWidth; ///< width of the range image (x dimension)
     int m_CaptureHeight; ///< height of the range image (y dimension)
     int m_PixelNumber; ///< number of pixels in the range image (m_CaptureWidth*m_CaptureHeight)
-    int m_RGBImageWidth;
-    int m_RGBImageHeight;
-    int m_RGBPixelNumber;
+    int m_RGBImageWidth; ///< width of the RGB image (x dimension)
+    int m_RGBImageHeight; ///< height of the RGB image (y dimension)
+    int m_RGBPixelNumber; ///< number of pixels in the range image (m_RGBImageWidth*m_RGBImageHeight)
     int m_SourceDataSize; ///< size of the PMD source data
     itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
     itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the range camera
@@ -226,6 +226,9 @@ namespace mitk
 
   };
 } //END mitk namespace
-// This is the microservice declaration. Do not meddle!
+/**
+ToFCameraDevice is declared a MicroService interface. See
+MicroService documenation for more details.
+*/
 US_DECLARE_SERVICE_INTERFACE(mitk::ToFCameraDevice, "org.mitk.services.ToFCameraDevice")
 #endif

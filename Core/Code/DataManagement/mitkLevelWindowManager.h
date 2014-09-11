@@ -53,7 +53,8 @@ namespace mitk
   public:
 
     mitkClassMacro(LevelWindowManager, itk::Object)
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void SetDataStorage(DataStorage* ds);
     DataStorage* GetDataStorage();  ///< returns the datastorage
@@ -124,9 +125,9 @@ namespace mitk
     typedef std::pair<unsigned long, DataNode::Pointer> PropDataPair;
     typedef std::map<PropDataPair, BaseProperty::Pointer> ObserverToPropertyMap;
 
-    ObserverToPropertyMap        m_PropObserverToNode;  ///< map to hold observer ID´s to every visible property of DataNode´s BaseProperty
-    ObserverToPropertyMap        m_PropObserverToNode2; ///< map to hold observer ID´s to every layer property of DataNode´s BaseProperty
-    ObserverToPropertyMap        m_PropObserverToNode3; ///< map to hold observer ID´s to every Image Rendering.Mode property of DataNode´s BaseProperty
+    ObserverToPropertyMap        m_PropObserverToNode;  ///< map to hold observer IDs to every visible property of DataNodeï¿½s BaseProperty
+    ObserverToPropertyMap        m_PropObserverToNode2; ///< map to hold observer IDs to every layer property of DataNodeï¿½s BaseProperty
+    ObserverToPropertyMap        m_PropObserverToNode3; ///< map to hold observer IDs to every Image Rendering.Mode property of DataNodeï¿½s BaseProperty
     void UpdateObservers();                             ///< updates the internal observer list. Ignores nodes which are marked to be deleted in the variable m_NodeMarkedToDelete
     void ClearPropObserverLists();                      ///< internal help method to clear both lists/maps.
     void CreatePropObserverLists();                     ///< internal help method to create both lists/maps.

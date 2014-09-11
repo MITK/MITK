@@ -1,5 +1,5 @@
 /**
-\page UserManualPortal MITK: User Manual
+\usersguidemainpage{UserManualPortal} MITK: User Manual
 
 To get an introduction to the usage of any MITK based application please read \ref MITKUserManualPage. It will give you an overview of most of the common questions, such as how to load or save data or navigate within it. This is a good starting point for first questions.
 
@@ -13,7 +13,9 @@ Alternatively, you can <a href="http://www.mitk.org/Contact">contact us directly
 <h2> UserManualPortalTopics List of topics</h2>
 <ul>
   <li> \subpage MITKUserManualPage </li>
-  <li> \subpage ApplicationsPage </li>  
+  <li> \subpage ApplicationsPage </li>
   <li> \subpage PluginListPage </li>
+  <li> \subpage PerspectiveListPage </li>
+  <li> \subpage MiniAppExplainPage </li>
 </ul>
 */

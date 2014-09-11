@@ -20,9 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkCommon.h>
 #include <mitkEvent.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
-#include <mitkSpaceNavigatorExports.h>
+#include <MitkSpaceNavigatorExports.h>
 
 namespace mitk {
 

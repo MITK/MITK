@@ -1,0 +1,42 @@
+<stateMachine name="ToolWithWheelInteraction">
+    <state name="ToolIdle" startstate="true">
+        <transition event_class="InteractionEvent" event_variant="StdMouseWheelUp" target="ToolIdle">
+            <action name="ScrollUp" />
+        </transition>
+        <transition event_class="InteractionEvent" event_variant="StdMouseWheelDown" target="ToolIdle">
+            <action name="ScrollDown" />
+        </transition>
+        <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="ToolIdle">
+            <action name="PrimaryButtonPressed" />
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="Moving" target="ToolIdle">
+            <action name="MouseMove" />
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="KeyPlus" target="ToolIdle">
+            <action name="Plus" />
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="KeyMinus" target="ToolIdle">
+            <action name="Minus" />
+        </transition>
+    </state>
+    <state name="ToolInUse">
+        <transition event_class="InteractionPositionEvent" event_variant="PrimaryButtonMoved" target="ToolInUse">
+            <action name="PrimaryButtonMoved" />
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="PrimaryButtonReleased" target="ToolIdle">
+            <action name="PrimaryButtonRelease" />
+        </transition>
+        <transition event_class="InteractionEvent" event_variant="StdMouseWheelUp" target="ToolInUse">
+            <action name="ScrollUp" />
+        </transition>
+        <transition event_class="InteractionEvent" event_variant="StdMouseWheelDown" target="ToolInUse">
+            <action name="ScrollDown" />
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="KeyPlus" target="ToolInUse">
+            <action name="Plus" />
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="KeyMinus" target="ToolInUse">
+            <action name="Minus" />
+        </transition>
+    </state>
+</stateMachine>

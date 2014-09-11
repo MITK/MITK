@@ -19,12 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkAbstractTransform.h>
 
 mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry()
-  : m_LandmarkProjector(NULL), m_InterpolatingAbstractTransform(NULL)
+  : AbstractTransformGeometry(), m_LandmarkProjector(NULL), m_InterpolatingAbstractTransform(NULL), m_TargetLandmarks(NULL)
 {
 }
 
 mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry(const mitk::LandmarkProjectorBasedCurvedGeometry& other) : Superclass(other)
 {
+  SetTargetLandmarks(other.m_TargetLandmarks);
   this->SetLandmarkProjector(other.m_LandmarkProjector);
   this->ComputeGeometry();
 }
@@ -58,7 +59,7 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::SetLandmarkProjector(mitk::Land
   }
 }
 
-void mitk::LandmarkProjectorBasedCurvedGeometry::SetFrameGeometry(const mitk::Geometry3D* frameGeometry)
+void mitk::LandmarkProjectorBasedCurvedGeometry::SetFrameGeometry(const mitk::BaseGeometry* frameGeometry)
 {
   Superclass::SetFrameGeometry(frameGeometry);
   if(m_LandmarkProjector.IsNotNull())
@@ -76,7 +77,7 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::ComputeGeometry()
 }
 itk::LightObject::Pointer mitk::LandmarkProjectorBasedCurvedGeometry::InternalClone() const
 {
-  mitk::Geometry3D::Pointer newGeometry = new LandmarkProjectorBasedCurvedGeometry(*this);
+  mitk::BaseGeometry::Pointer newGeometry = new LandmarkProjectorBasedCurvedGeometry(*this);
   newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }

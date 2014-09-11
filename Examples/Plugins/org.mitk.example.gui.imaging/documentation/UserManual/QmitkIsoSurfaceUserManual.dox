@@ -1,0 +1,37 @@
+/**
+
+\page org_mitk_views_isosurface The Iso Surface Module
+
+\imageMacro{IsoSurfaceIcon.png,"Icon of the Iso Surface Module",2.00}
+
+Available sections:
+  - \ref QmitkIsoSurfaceUserManualOverview 
+  - \ref QmitkIsoSurfaceUserManualFeatures 
+  - \ref QmitkIsoSurfaceUserManualUsage 
+  - \ref QmitkIsoSurfaceUserManualTroubleshooting
+
+\section QmitkIsoSurfaceUserManualOverview Overview
+
+IsoSurface is a program module for creating surfaces (e.g. polygon structures) out of images. The user defines a threshold that seperates object and background inside the image. Pixels that belong to the object need grey values below the threshold. Pixles with grey values above the threshold will be ignored. The result is a polygon object 
+that can be saved as an *.stl-object. 
+
+\section QmitkIsoSurfaceUserManualFeatures Features
+
+- Creates a surface by thresholding an image
+
+    
+\section QmitkIsoSurfaceUserManualUsage Usage
+How to create a surface:
+
+- Load an image into the program, for example by drag & drop 
+- Look for a meaningful threshold. All pixel grey values of the image that are lower than the threshold will be used to create the surface. All grey values that are higher than the surface will be ignored. You can find the best threshold by using the Volumetry-Functionality or by reading the grey value while clicking on a pixel (see picture 2). 
+- Insert the threshold into the GUI 
+- Press the Button "Create Surface" 
+
+
+\imageMacro{IsoSurfaceGUI.png,"Graphical User Interface of Iso Surface",16.00}
+
+\section QmitkIsoSurfaceUserManualTroubleshooting Troubleshooting
+
+*/
+

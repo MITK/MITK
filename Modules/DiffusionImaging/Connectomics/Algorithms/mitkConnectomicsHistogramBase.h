@@ -82,8 +82,7 @@ namespace mitk {
     /** @brief Is this a valid histogram*/
     bool m_Valid;
     /** @brief Which is the baseline value for the histogram
-    /*
-    /* This value should be zero for all network histograms */
+     This value should be zero for all network histograms */
     int m_BaselineValue;
     /** @brief Which is the top value for the histogram */
     int m_TopValue;

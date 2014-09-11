@@ -54,7 +54,8 @@ namespace itk
 
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Run-time type information (and related methods). */
     itkTypeMacro(ShortestPathCostFunctionLiveWire, ShortestPathCostFunction);

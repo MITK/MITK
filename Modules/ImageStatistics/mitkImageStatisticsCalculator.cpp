@@ -28,11 +28,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkStatisticsImageFilter.h>
 #include <itkLabelStatisticsImageFilter.h>
 #include <itkMaskImageFilter.h>
+#include <itkImageFileWriter.h>
+#include <itkRescaleIntensityImageFilter.h>
+
 
 #include <itkCastImageFilter.h>
 #include <itkImageFileWriter.h>
 #include <itkVTKImageImport.h>
 #include <itkVTKImageExport.h>
+#include <itkImageDuplicator.h>
 
 
 #include <vtkPoints.h>
@@ -44,20 +48,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageImport.h>
 #include <vtkImageExport.h>
 #include <vtkImageData.h>
-
-#include <itkImageFileWriter.h>
-#include <itkRescaleIntensityImageFilter.h>
+#include <vtkLassoStencilSource.h>
+#include <vtkMetaImageWriter.h>
 
 #include <list>
-
-#if ( ( VTK_MAJOR_VERSION <= 5 ) && ( VTK_MINOR_VERSION<=8)  )
-  #include "mitkvtkLassoStencilSource.h"
-#else
-  #include "vtkLassoStencilSource.h"
-#endif
-
-
-#include <vtkMetaImageWriter.h>
 
 #include <exception>
 
@@ -73,7 +67,9 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_PlanarFigureAxis (0),
   m_PlanarFigureSlice (0),
   m_PlanarFigureCoordinate0 (0),
-  m_PlanarFigureCoordinate1 (0)
+  m_PlanarFigureCoordinate1 (0),
+  m_HistogramBinSize(1),
+m_UseDefaultBinSize(true)
 {
   m_EmptyHistogram = HistogramType::New();
   m_EmptyHistogram->SetMeasurementVectorSize(1);
@@ -89,6 +85,10 @@ ImageStatisticsCalculator::~ImageStatisticsCalculator()
 {
 }
 
+void ImageStatisticsCalculator::SetUseDefaultBinSize(bool useDefault)
+{
+    m_UseDefaultBinSize = useDefault;
+}
 
 void ImageStatisticsCalculator::SetImage( const mitk::Image *image )
 {
@@ -130,11 +130,6 @@ void ImageStatisticsCalculator::SetImageMask( const mitk::Image *imageMask )
   if ( m_Image.IsNull() )
   {
     itkExceptionMacro( << "Image needs to be set first!" );
-  }
-
-  if ( m_Image->GetTimeSteps() != imageMask->GetTimeSteps() )
-  {
-    itkExceptionMacro( << "Image and image mask need to have equal number of time steps!" );
   }
 
   if ( m_ImageMask != imageMask )
@@ -248,6 +243,15 @@ bool ImageStatisticsCalculator::GetDoIgnorePixelValue()
   return m_DoIgnorePixelValue;
 }
 
+void ImageStatisticsCalculator::SetHistogramBinSize(unsigned int size)
+{
+  this->m_HistogramBinSize = size;
+}
+
+unsigned int ImageStatisticsCalculator::GetHistogramBinSize()
+{
+  return this->m_HistogramBinSize;
+}
 bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 {
 
@@ -556,12 +560,18 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       {
         if( m_InternalImage->GetDimension() == 3 )
         {
-          CastToItkImage( timeSliceImage, m_InternalImageMask3D );
+          if(itk::ImageIOBase::USHORT != timeSliceImage->GetPixelType().GetComponentType())
+            CastToItkImage( timeSliceImage, m_InternalImageMask3D );
+          else
+            CastToItkImage( timeSliceImage->Clone(), m_InternalImageMask3D  );
           m_InternalImageMask3D->FillBuffer(1);
         }
         if( m_InternalImage->GetDimension() == 2 )
         {
-          CastToItkImage( timeSliceImage, m_InternalImageMask2D );
+          if(itk::ImageIOBase::USHORT != timeSliceImage->GetPixelType().GetComponentType())
+            CastToItkImage( timeSliceImage, m_InternalImageMask2D );
+          else
+            CastToItkImage( timeSliceImage->Clone(), m_InternalImageMask2D );
           m_InternalImageMask2D->FillBuffer(1);
         }
       }
@@ -572,21 +582,27 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
     {
       if ( m_ImageMask.IsNotNull() && (m_ImageMask->GetReferenceCount() > 1) )
       {
-        if ( timeStep < m_ImageMask->GetTimeSteps() )
+        if ( timeStep >= m_ImageMask->GetTimeSteps() )
         {
-          ImageTimeSelector::Pointer maskedImageTimeSelector = ImageTimeSelector::New();
-          maskedImageTimeSelector->SetInput( m_ImageMask );
-          maskedImageTimeSelector->SetTimeNr( timeStep );
-          maskedImageTimeSelector->UpdateLargestPossibleRegion();
-          mitk::Image *timeSliceMaskedImage = maskedImageTimeSelector->GetOutput();
+          // Use the last mask time step in case the current time step is bigger than the total
+          // number of mask time steps.
+          // It makes more sense setting this to the last mask time step than to 0.
+          // For instance if you have a mask with 2 time steps and an image with 5:
+          // If time step 0 is selected, the mask will use time step 0.
+          // If time step 1 is selected, the mask will use time step 1.
+          // If time step 2+ is selected, the mask will use time step 1.
+          // If you have a mask with only one time step instead, this will always default to 0.
+          timeStep = m_ImageMask->GetTimeSteps() - 1;
+        }
 
-          m_InternalImage = timeSliceImage;
-          CastToItkImage( timeSliceMaskedImage, m_InternalImageMask3D );
-        }
-        else
-        {
-          throw std::runtime_error( "Error: image mask has not enough time steps!" );
-        }
+        ImageTimeSelector::Pointer maskedImageTimeSelector = ImageTimeSelector::New();
+        maskedImageTimeSelector->SetInput( m_ImageMask );
+        maskedImageTimeSelector->SetTimeNr( timeStep );
+        maskedImageTimeSelector->UpdateLargestPossibleRegion();
+        mitk::Image *timeSliceMaskedImage = maskedImageTimeSelector->GetOutput();
+
+        m_InternalImage = timeSliceImage;
+        CastToItkImage( timeSliceMaskedImage, m_InternalImageMask3D );
       }
       else
       {
@@ -608,20 +624,20 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
         throw std::runtime_error( "Masking not possible for non-closed figures" );
       }
 
-      const Geometry3D *imageGeometry = timeSliceImage->GetGeometry();
+      const BaseGeometry *imageGeometry = timeSliceImage->GetGeometry();
       if ( imageGeometry == NULL )
       {
         throw std::runtime_error( "Image geometry invalid!" );
       }
 
-      const Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
-      if ( planarFigureGeometry2D == NULL )
+      const PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
+      if ( planarFigurePlaneGeometry == NULL )
       {
         throw std::runtime_error( "Planar-Figure not yet initialized!" );
       }
 
       const PlaneGeometry *planarFigureGeometry =
-        dynamic_cast< const PlaneGeometry * >( planarFigureGeometry2D );
+        dynamic_cast< const PlaneGeometry * >( planarFigurePlaneGeometry );
       if ( planarFigureGeometry == NULL )
       {
         throw std::runtime_error( "Non-planar planar figures not supported!" );
@@ -646,13 +662,21 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
 
       // Extract slice with given position and direction from image
-      ExtractImageFilter::Pointer imageExtractor = ExtractImageFilter::New();
-      imageExtractor->SetInput( timeSliceImage );
-      imageExtractor->SetSliceDimension( axis );
-      imageExtractor->SetSliceIndex( slice );
-      imageExtractor->Update();
-      m_InternalImage = imageExtractor->GetOutput();
+      unsigned int dimension = timeSliceImage->GetDimension();
 
+      if (dimension != 2)
+      {
+        ExtractImageFilter::Pointer imageExtractor = ExtractImageFilter::New();
+        imageExtractor->SetInput( timeSliceImage );
+        imageExtractor->SetSliceDimension( axis );
+        imageExtractor->SetSliceIndex( slice );
+        imageExtractor->Update();
+        m_InternalImage = imageExtractor->GetOutput();
+      }
+      else
+      {
+        m_InternalImage = timeSliceImage;
+      }
 
       // Compute mask from PlanarFigure
       AccessFixedDimensionByItk_1(
@@ -685,7 +709,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
 
 bool ImageStatisticsCalculator::GetPrincipalAxis(
-  const Geometry3D *geometry, Vector3D vector,
+  const BaseGeometry *geometry, Vector3D vector,
   unsigned int &axis )
 {
   vector.Normalize();
@@ -767,7 +791,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
 
   statistics.MinIndex.set_size(image->GetImageDimension());
   statistics.MaxIndex.set_size(image->GetImageDimension());
-  for (int i=0; i<statistics.MaxIndex.size(); i++)
+  for (unsigned int i=0; i<statistics.MaxIndex.size(); i++)
   {
       statistics.MaxIndex[i] = minMaxFilter->GetIndexOfMaximum()[i];
       statistics.MinIndex[i] = minMaxFilter->GetIndexOfMinimum()[i];
@@ -775,11 +799,17 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
 
   statisticsContainer->push_back( statistics );
 
-   // Calculate histogram
+  // Calculate histogram
+  unsigned int numberOfBins = 200;
+  if (m_UseDefaultBinSize)
+      m_HistogramBinSize = std::ceil( (statistics.Max - statistics.Min + 1)/numberOfBins );
+  else
+    numberOfBins = std::floor( ( (statistics.Max - statistics.Min + 1) / m_HistogramBinSize) + 0.5 );
+
   typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
   histogramGenerator->SetInput( image );
   histogramGenerator->SetMarginalScale( 100 );
-  histogramGenerator->SetNumberOfBins( 768 );
+  histogramGenerator->SetNumberOfBins( numberOfBins );
   histogramGenerator->SetHistogramMin( statistics.Min );
   histogramGenerator->SetHistogramMax( statistics.Max );
   histogramGenerator->Compute();
@@ -947,7 +977,8 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
   statisticsFilter->Update();
 
-  int numberOfBins = ( m_DoIgnorePixelValue && (m_MaskingMode == MASKING_MODE_NONE) ) ? 768 : 384;
+  int numberOfBins = std::floor( ( (statisticsFilter->GetMaximum() - statisticsFilter->GetMinimum() + 1) / m_HistogramBinSize) + 0.5 );
+
   typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
   labelStatisticsFilter = LabelStatisticsFilterType::New();
   labelStatisticsFilter->SetInput( adaptedImage );
@@ -1013,7 +1044,10 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       // restrict image to mask area for min/max index calculation
       typedef itk::MaskImageFilter< ImageType, MaskImageType, ImageType > MaskImageFilterType;
       typename MaskImageFilterType::Pointer masker = MaskImageFilterType::New();
-      masker->SetOutsideValue( (statistics.Min+statistics.Max)/2 );
+      bool isMinAndMaxSameValue = (statistics.Min == statistics.Max);
+      // bug 17962: following is a workaround for the case when min and max are the same, we can probably find a nicer way here
+      double outsideValue = (isMinAndMaxSameValue ? (statistics.Max/2) : (statistics.Min+statistics.Max)/2);
+      masker->SetOutsideValue( outsideValue );
       masker->SetInput1(adaptedImage);
       masker->SetInput2(adaptedMaskImage);
       masker->Update();
@@ -1030,7 +1064,9 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
         statistics.MaxIndex.set_size(adaptedImage->GetImageDimension());
 
         typename MinMaxFilterType::IndexType tempMaxIndex = minMaxFilter->GetIndexOfMaximum();
-        typename MinMaxFilterType::IndexType tempMinIndex = minMaxFilter->GetIndexOfMinimum();
+        // bug 17962: following is a workaround for the case when min and max are the same, we can probably find a nicer way here
+        typename MinMaxFilterType::IndexType tempMinIndex =
+          (isMinAndMaxSameValue ? minMaxFilter->GetIndexOfMaximum() : minMaxFilter->GetIndexOfMinimum());
 
 // FIX BUG 14644
         //If a PlanarFigure is used for segmentation the
@@ -1049,7 +1085,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
             statistics.MinIndex[m_PlanarFigureAxis]=m_PlanarFigureSlice;
         } else
         {
-          for (int i = 0; i<statistics.MaxIndex.size(); i++)
+          for (unsigned int i = 0; i<statistics.MaxIndex.size(); i++)
           {
             statistics.MaxIndex[i] = tempMaxIndex[i];
             statistics.MinIndex[i] = tempMinIndex[i];
@@ -1063,7 +1099,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   else
   {
     histogramContainer->push_back( HistogramType::ConstPointer( m_EmptyHistogram ) );
-    statisticsContainer->push_back( Statistics() );;
+    statisticsContainer->push_back( Statistics() );
   }
 }
 
@@ -1086,9 +1122,15 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
   // These points are used by the vtkLassoStencilSource to create
   // a vtkImageStencil.
-  const mitk::Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
+  const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
   const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
-  const mitk::Geometry3D *imageGeometry3D = m_Image->GetGeometry( 0 );
+  const mitk::BaseGeometry *imageGeometry3D = m_Image->GetGeometry( 0 );
+  // If there is a second poly line in a closed planar figure, treat it as a hole.
+  PlanarFigure::PolyLineType planarFigureHolePolyline;
+
+  if (m_PlanarFigure->GetPolyLinesSize() == 2)
+    planarFigureHolePolyline = m_PlanarFigure->GetPolyLine(1);
+
 
   // Determine x- and y-dimensions depending on principal axis
   int i0, i1;
@@ -1125,7 +1167,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
     // Convert 2D point back to the local index coordinates of the selected
     // image
-    planarFigureGeometry2D->Map( it->Point, point3D );
+    planarFigurePlaneGeometry->Map( *it, point3D );
 
     // Polygons (partially) outside of the image bounds can not be processed
     // further due to a bug in vtkPolyDataToImageStencil
@@ -1137,6 +1179,23 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     imageGeometry3D->WorldToIndex( point3D, point3D );
 
     points->InsertNextPoint( point3D[i0], point3D[i1], 0 );
+  }
+
+  vtkSmartPointer<vtkPoints> holePoints = NULL;
+
+  if (!planarFigureHolePolyline.empty())
+  {
+    holePoints = vtkSmartPointer<vtkPoints>::New();
+
+    Point3D point3D;
+    PlanarFigure::PolyLineType::const_iterator end = planarFigureHolePolyline.end();
+
+    for (it = planarFigureHolePolyline.begin(); it != end; ++it)
+    {
+      planarFigurePlaneGeometry->Map(*it, point3D);
+      imageGeometry3D->WorldToIndex(point3D, point3D);
+      holePoints->InsertNextPoint(point3D[i0], point3D[i1], 0);
+    }
   }
 
   // mark a malformed 2D planar figure ( i.e. area = 0 ) as out of bounds
@@ -1164,6 +1223,15 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   lassoStencil->SetShapeToPolygon();
   lassoStencil->SetPoints( points );
 
+  vtkSmartPointer<vtkLassoStencilSource> holeLassoStencil = NULL;
+
+  if (holePoints.GetPointer() != NULL)
+  {
+    holeLassoStencil = vtkSmartPointer<vtkLassoStencilSource>::New();
+    holeLassoStencil->SetShapeToPolygon();
+    holeLassoStencil->SetPoints(holePoints);
+  }
+
   // Export from ITK to VTK (to use a VTK filter)
   typedef itk::VTKImageImport< MaskImage2DType > ImageImportType;
   typedef itk::VTKImageExport< MaskImage2DType > ImageExportType;
@@ -1177,23 +1245,41 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // Apply the generated image stencil to the input image
   vtkSmartPointer<vtkImageStencil> imageStencilFilter = vtkSmartPointer<vtkImageStencil>::New();
   imageStencilFilter->SetInputConnection( vtkImporter->GetOutputPort() );
-  imageStencilFilter->SetStencil( lassoStencil->GetOutput() );
+  imageStencilFilter->SetStencilConnection(lassoStencil->GetOutputPort());
   imageStencilFilter->ReverseStencilOff();
   imageStencilFilter->SetBackgroundValue( 0 );
   imageStencilFilter->Update();
 
+  vtkSmartPointer<vtkImageStencil> holeStencilFilter = NULL;
+
+  if (holeLassoStencil.GetPointer() != NULL)
+  {
+    holeStencilFilter = vtkSmartPointer<vtkImageStencil>::New();
+    holeStencilFilter->SetInputConnection(imageStencilFilter->GetOutputPort());
+    holeStencilFilter->SetStencilConnection(holeLassoStencil->GetOutputPort());
+    holeStencilFilter->ReverseStencilOn();
+    holeStencilFilter->SetBackgroundValue(0);
+    holeStencilFilter->Update();
+  }
+
   // Export from VTK back to ITK
-  vtkSmartPointer<vtkImageExport> vtkExporter = vtkImageExport::New(); // TODO: this is WRONG, should be vtkSmartPointer<vtkImageExport>::New(), but bug # 14455
-  //vtkSmartPointer<vtkImageExport> vtkExporter = vtkSmartPointer<vtkImageExport>::New();
-  vtkExporter->SetInputConnection( imageStencilFilter->GetOutputPort() );
+  vtkSmartPointer<vtkImageExport> vtkExporter = vtkSmartPointer<vtkImageExport>::New();
+  vtkExporter->SetInputConnection( holeStencilFilter.GetPointer() == NULL
+    ? imageStencilFilter->GetOutputPort()
+    : holeStencilFilter->GetOutputPort());
   vtkExporter->Update();
 
   typename ImageImportType::Pointer itkImporter = ImageImportType::New();
   this->ConnectPipelines( vtkExporter, itkImporter );
   itkImporter->Update();
 
+  typedef itk::ImageDuplicator< ImageImportType::OutputImageType > DuplicatorType;
+  DuplicatorType::Pointer duplicator = DuplicatorType::New();
+  duplicator->SetInputImage( itkImporter->GetOutput() );
+  duplicator->Update();
+
   // Store mask
-  m_InternalImageMask2D = itkImporter->GetOutput();
+  m_InternalImageMask2D = duplicator->GetOutput();
 }
 
 

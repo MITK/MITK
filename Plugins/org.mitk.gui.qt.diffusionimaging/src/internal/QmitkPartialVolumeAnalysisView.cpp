@@ -330,7 +330,7 @@ void QmitkPartialVolumeAnalysisView::ExportClusteringResults()
     if (m_ClusteringResult.IsNull() || m_SelectedImage.IsNull())
         return;
 
-    mitk::Geometry3D* geometry = m_SelectedImage->GetGeometry();
+    mitk::BaseGeometry* geometry = m_SelectedImage->GetGeometry();
 
     itk::Image< short, 3>::Pointer referenceImage = itk::Image< short, 3>::New();
 
@@ -1875,7 +1875,7 @@ void QmitkPartialVolumeAnalysisView::Activated()
           if(figureInteractor.IsNull())
           {
             figureInteractor = mitk::PlanarFigureInteractor::New();
-            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "MitkPlanarFigure" );
             figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
             figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
             figureInteractor->SetDataNode( node );
@@ -2131,7 +2131,7 @@ void QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage(const mitk::DataNode
         if(figureInteractor.IsNull())
         {
           figureInteractor = mitk::PlanarFigureInteractor::New();
-          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "MitkPlanarFigure" );
           figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
           figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
           figureInteractor->SetDataNode( nonConstNode );

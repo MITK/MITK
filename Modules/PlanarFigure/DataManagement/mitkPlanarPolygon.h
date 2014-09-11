@@ -19,24 +19,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PLANAR_POLYGON_H_
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 
 
 namespace mitk
 {
 
-class Geometry2D;
+class PlaneGeometry;
 
 /**
  * \brief Implementation of PlanarFigure representing a polygon
  * with two or more control points
  */
-class PlanarFigure_EXPORT PlanarPolygon : public PlanarFigure
+class MitkPlanarFigure_EXPORT PlanarPolygon : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarPolygon, PlanarFigure );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   /** \brief Set whether the polygon should be closed between first and last control point or not. */
@@ -68,6 +69,7 @@ public:
 
   std::vector<mitk::Point2D> CheckForLineIntersection( const Point2D& p1, const Point2D& p2 ) const;
 
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
 
 protected:
   PlanarPolygon();

@@ -144,7 +144,7 @@ namespace mitk
               std::pair< std::string, int > p;
 
               p.first="";
-              for (int i=0; i<tokens.size()-1;i++)
+              for (unsigned int i=0; i<tokens.size()-1;i++)
               {
                 p.first.append(" ");
                 p.first.append(tokens.at(i));

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_ConnectomicsNetwork_H
 #define _MITK_ConnectomicsNetwork_H
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 #include "mitkBaseData.h"
 
@@ -48,7 +48,7 @@ namespace mitk {
   *  <li> double edge_weight - Used for boost and algorithms, should be between 0 and 1
   * </ul>
   */
-  class Connectomics_EXPORT ConnectomicsNetwork : public BaseData
+  class MitkConnectomics_EXPORT ConnectomicsNetwork : public BaseData
   {
   public:
     /** Structs for the graph */
@@ -81,12 +81,13 @@ namespace mitk {
     virtual void SetRequestedRegionToLargestPossibleRegion();
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
     virtual bool VerifyRequestedRegion();
-    virtual void SetRequestedRegion(const itk::DataObject *data );
+    virtual void SetRequestedRegion(const itk::DataObject * );
 
 
     // Macros
     mitkClassMacro( ConnectomicsNetwork, BaseData );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     ////////////////// Interface ///////////////////
     /** return whether an edge exists between the two given vertices */
@@ -179,6 +180,11 @@ namespace mitk {
     /** Access boost graph directly */
     NetworkType* GetBoostGraph();
 
+    /** Set the boost graph directly */
+    void SetBoostGraph( NetworkType* newGraph );
+
+    void ImportNetwort( mitk::ConnectomicsNetwork::Pointer source );
+
     /** Get the modified flag */
     bool GetIsModified() const;
 
@@ -191,24 +197,16 @@ namespace mitk {
     /** Remove nodes not connected to any other node */
     void PruneUnconnectedSingleNodes();
 
-    /** Remove edges below the specified weight
-      *
-      * targetWeight is the number of connecting fibers
-      *
-      * This will remove unconnected nodes after removal
-      */
-    void PruneEdgesBelowWeight( int targetWeight );
+    /** This function will relabel all vertices and edges in a continuous manner
+    *
+    * Mainly important after removing vertices, to make sure that the ids run continuously from
+    * 0 to number of vertices - 1 and edge target and source ids match the corresponding node.
+    */
+    void UpdateIDs();
 
   protected:
     ConnectomicsNetwork();
     virtual ~ConnectomicsNetwork();
-
-    /** This function will relabel all vertices and edges in a continuous manner
-      *
-      * Mainly important after removing vertices, to make sure that the ids run continuously from
-      * 0 to number of vertices - 1 and edge target and source ids match the corresponding node.
-      */
-    void UpdateIDs();
 
     NetworkType m_Network;
 
@@ -221,6 +219,17 @@ namespace mitk {
   private:
 
   };
+
+  /**
+  * \brief Returns true if the networks are considered equal.
+  *
+  * For now two networks are considered equal if they have the following properties are equal:
+  * - Number of nodes
+  * - Number of edges
+  * - Smallworldness
+  */
+
+  MitkConnectomics_EXPORT bool Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNetwork* rightHandSide, mitk::ScalarType eps, bool verbose);
 
 } // namespace mitk
 

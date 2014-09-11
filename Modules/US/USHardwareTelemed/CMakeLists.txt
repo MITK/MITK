@@ -1,0 +1,23 @@
+IF(WIN32)
+
+OPTION(MITK_USE_US_TELEMED_SDK "Enable support for Telemed api devices" OFF)
+
+IF(MITK_USE_US_TELEMED_SDK)
+
+IF(CMAKE_CL_64)
+  message( FATAL_ERROR "The Telemed API cannot be used in 64 bit builds. Please configure a 32 bit build instead or deactivate MITK_USE_US_TELEMED_SDK." )
+ENDIF(CMAKE_CL_64)
+
+SET(MITK_US_TELEMED_SDK_PATH "" CACHE PATH "Path to Telemed SDK header files.")
+
+MITK_CREATE_MODULE(
+  SUBPROJECTS
+  DEPENDS MitkUS
+  INCLUDE_DIRS "${MITK_US_TELEMED_SDK_PATH}"
+  INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
+  AUTOLOAD_WITH MitkUS
+)
+
+ENDIF(MITK_USE_US_TELEMED_SDK)
+
+ENDIF(WIN32)

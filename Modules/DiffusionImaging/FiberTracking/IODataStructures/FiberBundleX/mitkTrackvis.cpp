@@ -7,18 +7,28 @@ TrackVis::~TrackVis() { if (fp) fclose( fp ); }
 
 // Create a TrackVis file and store standard metadata. The file is ready to append fibers.
 // ---------------------------------------------------------------------------------------
-short TrackVis::create(string filename , itk::Size<3> size, itk::Point<float,3> origin)
+short TrackVis::create(string filename , mitk::FiberBundleX *fib)
 {
     // prepare the header
     for(int i=0; i<3 ;i++)
     {
-        hdr.dim[i]            = size.GetElement(i);
-        hdr.voxel_size[i]     = 1;
-        hdr.origin[i]         = 0;
+        if (fib->GetReferenceImage().IsNotNull())
+        {
+            hdr.dim[i]            = fib->GetReferenceImage()->GetDimension(i);
+            hdr.voxel_size[i]     = fib->GetReferenceImage()->GetGeometry()->GetSpacing().GetElement(i);
+            m_Origin[i]         = fib->GetReferenceImage()->GetGeometry()->GetOrigin().GetElement(i);
+        }
+        else
+        {
+            hdr.dim[i]            = 1;
+            hdr.voxel_size[i]     = 1;
+            m_Origin[i]         = 0;
+        }
+        hdr.origin[i] = 0;
     }
     hdr.n_scalars = 0;
     hdr.n_properties = 0;
-    sprintf(hdr.voxel_order,"RAS");
+    sprintf(hdr.voxel_order,"LPS");
     sprintf(hdr.pad2,"LPS");
     hdr.image_orientation_patient[0] = 1.0;
     hdr.image_orientation_patient[1] = 0.0;
@@ -46,7 +56,8 @@ short TrackVis::create(string filename , itk::Size<3> size, itk::Point<float,3> 
         return 0;
     }
     sprintf(hdr.id_string,"TRACK");
-    fwrite((char*)&hdr, 1, 1000, fp);
+    if (fwrite((char*)&hdr, 1, 1000, fp) != 1000)
+        MITK_ERROR << "TrackVis::create : Error occurding during writing fiber.";
 
     this->filename = filename;
 
@@ -99,9 +110,9 @@ short TrackVis::append(mitk::FiberBundleX *fib)
         {
             double* p = points->GetPoint(i);
 
-            tmp[pos++] = -p[0];
-            tmp[pos++] = -p[1];
-            tmp[pos++] = p[2];
+            tmp[pos++] = p[0] - m_Origin[0];
+            tmp[pos++] = p[1] - m_Origin[1];
+            tmp[pos++] = p[2] - m_Origin[2];
         }
 
         // write the coordinates to the file
@@ -142,9 +153,9 @@ short TrackVis::read( mitk::FiberBundleX* fib )
         float tmp[3];
         for(int i=0; i<numPoints; i++)
         {
-            fread((char*)tmp, 1, 12, fp);
-            tmp[0] = -tmp[0];
-            tmp[1] = -tmp[1];
+            if (fread((char*)tmp, 1, 12, fp) == 0)
+                MITK_ERROR << "TrackVis::read: Error during read.";
+
             vtkIdType id = vtkNewPoints->InsertNextPoint(tmp);
             container->GetPointIds()->InsertNextId(id);
         }
@@ -166,14 +177,16 @@ short TrackVis::read( mitk::FiberBundleX* fib )
 void TrackVis::updateTotal( int totFibers )
 {
     fseek(fp, 1000-12, SEEK_SET);
-    fwrite((char*)&totFibers, 1, 4, fp);
+    if (fwrite((char*)&totFibers, 1, 4, fp) != 4)
+        MITK_ERROR << "[ERROR] Problems saving the fiber!";
 }
 
 
 void TrackVis::writeHdr()
 {
     fseek(fp, 0, SEEK_SET);
-    fwrite((char*)&hdr, 1, 1000, fp);
+    if (fwrite((char*)&hdr, 1, 1000, fp) != 1000)
+        MITK_ERROR << "[ERROR] Problems saving the fiber!";
 }
 
 

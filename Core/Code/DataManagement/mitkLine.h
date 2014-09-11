@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKLINE_H_HEADER_INCLUDED_C19C01E2
 #define MITKLINE_H_HEADER_INCLUDED_C19C01E2
 
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include <vnl/vnl_vector.h>
 #include <vnl/vnl_cross.h>
 #include <itkTransform.h>
@@ -37,7 +37,7 @@ public:
   {
     m_Point.Fill(0);
     m_Direction.Fill(0);
-  };
+  }
 
   //##Documentation
   //## @brief Define line by point and direction
@@ -76,11 +76,10 @@ public:
   //## @brief Set/change start point of the line
   void SetPoint( const itk::Point<TCoordRep,NPointDimension>& point1 )
   {
-    itk::Vector<TCoordRep,NPointDimension> point2;
+    itk::Point<TCoordRep,NPointDimension> point2;
     point2 = m_Point + m_Direction;
-
     m_Point = point1;
-    m_Direction = point2 - point1;
+    m_Direction = point2.GetVectorFromOrigin() - point1.GetVectorFromOrigin();
   }
 
   //##Documentation
@@ -128,10 +127,10 @@ public:
   void SetPoint1( const itk::Point<TCoordRep,NPointDimension>& point1 ) {
 
     itk::Vector<TCoordRep,NPointDimension> point2;
-    point2 = m_Point + m_Direction;
+    point2 = m_Point.GetVectorFromOrigin() + m_Direction;
 
     m_Point = point1;
-    m_Direction = point2 - point1;
+    m_Direction = point2 - point1.GetVectorFromOrigin();
   }
 
   //##Documentation
@@ -176,7 +175,11 @@ public:
 
   //##Documentation
   //## @brief Distance between two lines
-  double Distance( const Line<TCoordRep,NPointDimension>& line ) const;
+  double Distance( const Line<TCoordRep,NPointDimension>& line ) const
+  {
+    MITK_WARN << "Not implemented yet!";
+    return -1;
+  }
 
   //##Documentation
   //## @brief Distance of a point from the line
@@ -424,5 +427,6 @@ protected:
 typedef Line<ScalarType, 3> Line3D;
 
 } // namespace mitk
+
 #endif /* MITKLINE_H_HEADER_INCLUDED_C19C01E2 */
 

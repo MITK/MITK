@@ -13,33 +13,35 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
-
 #ifndef LEVELWINDOW_H_HEADER_INCLUDED_C1F4F02C
 #define LEVELWINDOW_H_HEADER_INCLUDED_C1F4F02C
 
-#include "mitkVector.h"
-#include <MitkExports.h>
-
-//struct mitkIpPicDescriptor;
+#include "mitkNumericTypes.h"
+#include <MitkCoreExports.h>
 
 namespace mitk {
 
 class Image;
 
-//##Documentation
-//## @brief Class to store level/window values
-//##
-//## Current min and max value are stored in m_LowerWindowBound and m_UpperWindowBound.
-//## The maximum and minimum of valid value range is stored in
-//## m_RangeMin and m_RangeMax.
-//## m_DefaultLevel amd m_DefaultWindow store the initial Level/Window values for the image.
-//## m_DefaultRangeMin and m_DefaultRangeMax store the initial minrange and maxrange for the image.
-//##
-//## See documentation of SetAuto for information on how the
-//## level window is initialized from an image.
-//##
-//## @ingroup DataManagement
+/**
+ * @brief The LevelWindow class Class to store level/window values.
+ *
+ * Current min and max value are stored in m_LowerWindowBound and m_UpperWindowBound.
+ * The maximum and minimum of valid value range is stored in m_RangeMin and m_RangeMax.
+ * m_DefaultLevel amd m_DefaultWindow store the initial Level/Window values for the image.
+ * m_DefaultRangeMin and m_DefaultRangeMax store the initial minrange and maxrange for the image.
+ *
+ * See documentation of SetAuto for information on how the level window is initialized from an image.
+ *
+ * @ingroup DataManagement
+ *
+ * @note If you want to apply the mitk::LevelWindow to an mitk::Image, make sure
+ * to use the mitk::LevelWindowProperty and set the mitk::RenderingModeProperty
+ * to a mode which supports level window (e.g. LEVELWINDOW_COLOR).
+ * Make sure to check the documentation of the mitk::RenderingModeProperty. For a
+ * code example how to use the mitk::LevelWindowProperty check the
+ * mitkImageVtkMapper2DLevelWindowTest.cpp in Core\Code\Testing.
+ */
 class MITK_CORE_EXPORT LevelWindow
 {
 public:
@@ -146,7 +148,7 @@ public:
   /**!
   * \brief sets level/window to the min/max greyvalues of the given Image
   */
-  void SetAuto(const mitk::Image* image, bool tryPicTags = true, bool guessByCentralSlice = true);
+  void SetAuto(const Image* image, bool tryPicTags = true, bool guessByCentralSlice = true);
 
   /**
    * If a level window is set to fixed, the set and get methods won't accept

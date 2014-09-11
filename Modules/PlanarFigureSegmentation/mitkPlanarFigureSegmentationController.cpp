@@ -60,8 +60,8 @@ void mitk::PlanarFigureSegmentationController::AddPlanarFigure( mitk::PlanarFigu
     return;
 
   bool newFigure = true;
-  int indexOfFigure = -1;
-  for( int i=0; i<m_PlanarFigureList.size(); i++ )
+  std::size_t indexOfFigure = 0;
+  for( std::size_t i=0; i<m_PlanarFigureList.size(); i++ )
   {
     if( m_PlanarFigureList.at(i) == planarFigure )
     {
@@ -78,12 +78,20 @@ void mitk::PlanarFigureSegmentationController::AddPlanarFigure( mitk::PlanarFigu
     m_PlanarFigureList.push_back( planarFigure );
     figureAsSurface = this->CreateSurfaceFromPlanarFigure( planarFigure );
     m_SurfaceList.push_back( figureAsSurface );
-    indexOfFigure = m_PlanarFigureList.size() -1 ;
+    if (!m_PlanarFigureList.empty())
+    {
+      indexOfFigure = m_PlanarFigureList.size() -1 ;
+    }
   }
   else
   {
     figureAsSurface = this->CreateSurfaceFromPlanarFigure( planarFigure );
     m_SurfaceList.at(indexOfFigure) = figureAsSurface;
+  }
+
+  if ( m_ReduceFilter.IsNull() )
+  {
+    InitializeFilters();
   }
 
   m_ReduceFilter->SetInput( indexOfFigure, figureAsSurface );
@@ -98,8 +106,8 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
     return;
 
   bool figureFound = false;
-  int indexOfFigure = -1;
-  for( int i=0; i<m_PlanarFigureList.size(); i++ )
+  std::size_t indexOfFigure = 0;
+  for( std::size_t i=0; i<m_PlanarFigureList.size(); i++ )
   {
     if( m_PlanarFigureList.at(i) == planarFigure )
     {
@@ -111,6 +119,14 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
 
   if ( !figureFound )
     return;
+
+  PlanarFigureListType::iterator whereIter = m_PlanarFigureList.begin();
+  whereIter += indexOfFigure;
+  m_PlanarFigureList.erase( whereIter );
+
+  SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
+  surfaceIter += indexOfFigure;
+  m_SurfaceList.erase( surfaceIter );
 
   // TODO: fix this! The following code had to be removed as the method
   // RemoveInputs() has been removed in ITK 4
@@ -137,21 +153,16 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
 
     // and add all existing surfaces
     SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
+    int index = 0;
     for ( surfaceIter = m_SurfaceList.begin(); surfaceIter!=m_SurfaceList.end(); surfaceIter++ )
     {
-      m_ReduceFilter->SetInput( indexOfFigure, (*surfaceIter) );
-      m_NormalsFilter->SetInput( indexOfFigure, m_ReduceFilter->GetOutput( indexOfFigure ) );
-      m_DistanceImageCreator->SetInput( indexOfFigure, m_NormalsFilter->GetOutput( indexOfFigure ) );
+      m_ReduceFilter->SetInput( index, (*surfaceIter) );
+      m_NormalsFilter->SetInput( index, m_ReduceFilter->GetOutput( index ) );
+      m_DistanceImageCreator->SetInput( index, m_NormalsFilter->GetOutput( index ) );
+
+      ++index;
     }
   }
-
-  PlanarFigureListType::iterator whereIter = m_PlanarFigureList.begin();
-  whereIter += indexOfFigure;
-  m_PlanarFigureList.erase( whereIter );
-
-  SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
-  surfaceIter += indexOfFigure;
-  m_SurfaceList.erase( surfaceIter );
 }
 
 template<typename TPixel, unsigned int VImageDimension>
@@ -167,7 +178,7 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
   if ( m_PlanarFigureList.size() == 0 )
   {
     m_SegmentationAsImage = mitk::Image::New();
-    m_SegmentationAsImage->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *m_ReferenceImage->GetTimeSlicedGeometry());
+    m_SegmentationAsImage->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *m_ReferenceImage->GetTimeGeometry());
 
     return m_SegmentationAsImage;
   }
@@ -252,7 +263,7 @@ mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFr
   vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
 
-  const mitk::Geometry2D* figureGeometry = figure->GetGeometry2D();
+  const mitk::PlaneGeometry* figureGeometry = figure->GetPlaneGeometry();
 
   // Get the polyline
   mitk::PlanarFigure::PolyLineType planarPolyLine = figure->GetPolyLine(0);
@@ -263,9 +274,8 @@ mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFr
   for( iter = planarPolyLine.begin(); iter != planarPolyLine.end(); iter++ )
   {
     // ... determine the world-coordinates
-    mitk::Point2D polyLinePoint = iter->Point;
     mitk::Point3D pointInWorldCoordiantes;
-    figureGeometry->Map( polyLinePoint, pointInWorldCoordiantes );
+    figureGeometry->Map( *iter, pointInWorldCoordiantes );
 
     // and add them as new points to the vtkPoints
     points->InsertNextPoint( pointInWorldCoordiantes[0], pointInWorldCoordiantes[1], pointInWorldCoordiantes[2] );
@@ -274,7 +284,7 @@ mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFr
 
   // create a polygon with the points of the polyline
   polygon->GetPointIds()->SetNumberOfIds( pointCounter );
-  for(unsigned int i = 0; i < pointCounter; i++)
+  for(int i = 0; i < pointCounter; i++)
   {
     polygon->GetPointIds()->SetId(i,i);
   }
@@ -303,5 +313,3 @@ void mitk::PlanarFigureSegmentationController::InitializeFilters()
   m_NormalsFilter = mitk::ComputeContourSetNormalsFilter::New();
   m_DistanceImageCreator = mitk::CreateDistanceImageFromSurfaceFilter::New();
 }
-
-

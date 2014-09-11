@@ -88,7 +88,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
 
   if(input->GetDirections()->Size())
   {
-    sprintf( valbuffer, "%1f", input->GetB_Value() );
+    sprintf( valbuffer, "%1f", input->GetReferenceBValue() );
     itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("DWMRI_b-value"),std::string(valbuffer));
   }
 
@@ -195,7 +195,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     itk::ImageRegionIterator<ImageType>   it (vecimg, vecimg->GetLargestPossibleRegion() );
     typedef typename ImageType::PixelType VecPixType;
 
-    for (it = it.Begin(); !it.IsAtEnd(); ++it)
+    for (it.GoToBegin(); !it.IsAtEnd(); ++it)
     {
       VecPixType vec = it.Get();
       typename ImageType::IndexType currentIndex = it.GetIndex();
@@ -248,7 +248,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
       for(unsigned int i=0; i<input->GetDirections()->Size(); i++)
       {
         double twonorm = input->GetDirections()->ElementAt(i).two_norm();
-        myfile << input->GetB_Value()*twonorm*twonorm << " ";
+        myfile << input->GetReferenceBValue()*twonorm*twonorm << " ";
       }
       myfile.close();
 

@@ -140,10 +140,10 @@ namespace mitk
     this->SetRotation( mat );
   }
 
-  void Transform::SetOrientation( const vnl_quaternion<double>& orientation)
+  void Transform::SetOrientation( const vnl_quaternion<float>& orientation)
   {
     vnl_vector_fixed<mitk::ScalarType, 4> qvec;
-    VnlVectorFixedCaster<double, mitk::ScalarType, 4> caster( &orientation, &qvec );
+    VnlVectorFixedCaster<float, mitk::ScalarType, 4> caster( &orientation, &qvec );
     caster.Update();
 
     mitk::Quaternion p( qvec );
@@ -676,34 +676,34 @@ namespace mitk
     elem->QueryDoubleAttribute("Time",&timestamp);
 
     // position and orientation is mandatory!
-    if(elem->QueryFloatAttribute("X", &position[0]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("X", &position[0]) != TIXML_SUCCESS)
       throw std::invalid_argument("No X position found in xml");
-    if(elem->QueryFloatAttribute("Y", &position[1]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("Y", &position[1]) != TIXML_SUCCESS)
       throw std::invalid_argument("No Y position found in xml");
-    if(elem->QueryFloatAttribute("Z", &position[2]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("Z", &position[2]) != TIXML_SUCCESS)
       throw std::invalid_argument("No Z position found in xml");
 
-    if(elem->QueryFloatAttribute("QX", &orientation[0]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("QX", &orientation[0]) != TIXML_SUCCESS)
       throw std::invalid_argument("No QX orientation found in xml");
-    if(elem->QueryFloatAttribute("QY", &orientation[1]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("QY", &orientation[1]) != TIXML_SUCCESS)
       throw std::invalid_argument("No QY orientation found in xml");
-    if(elem->QueryFloatAttribute("QZ", &orientation[2]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("QZ", &orientation[2]) != TIXML_SUCCESS)
       throw std::invalid_argument("No QZ orientation found in xml");
-    if(elem->QueryFloatAttribute("QR", &orientation[3]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("QR", &orientation[3]) != TIXML_SUCCESS)
       throw std::invalid_argument("No QR orientation found in xml");
 
-    elem->QueryFloatAttribute("C00", &matrix[0][0]);
-    elem->QueryFloatAttribute("C01", &matrix[0][1]);
-    elem->QueryFloatAttribute("C02", &matrix[0][2]);
-    elem->QueryFloatAttribute("C03", &matrix[0][3]);
-    elem->QueryFloatAttribute("C04", &matrix[0][4]);
-    elem->QueryFloatAttribute("C05", &matrix[0][5]);
-    elem->QueryFloatAttribute("C10", &matrix[1][0]);
-    elem->QueryFloatAttribute("C11", &matrix[1][1]);
-    elem->QueryFloatAttribute("C12", &matrix[1][2]);
-    elem->QueryFloatAttribute("C13", &matrix[1][3]);
-    elem->QueryFloatAttribute("C14", &matrix[1][4]);
-    elem->QueryFloatAttribute("C15", &matrix[1][5]);
+    elem->QueryDoubleAttribute("C00", &matrix[0][0]);
+    elem->QueryDoubleAttribute("C01", &matrix[0][1]);
+    elem->QueryDoubleAttribute("C02", &matrix[0][2]);
+    elem->QueryDoubleAttribute("C03", &matrix[0][3]);
+    elem->QueryDoubleAttribute("C04", &matrix[0][4]);
+    elem->QueryDoubleAttribute("C05", &matrix[0][5]);
+    elem->QueryDoubleAttribute("C10", &matrix[1][0]);
+    elem->QueryDoubleAttribute("C11", &matrix[1][1]);
+    elem->QueryDoubleAttribute("C12", &matrix[1][2]);
+    elem->QueryDoubleAttribute("C13", &matrix[1][3]);
+    elem->QueryDoubleAttribute("C14", &matrix[1][4]);
+    elem->QueryDoubleAttribute("C15", &matrix[1][5]);
 
     int tmpval = 0;
     elem->QueryIntAttribute("Valid", &tmpval);

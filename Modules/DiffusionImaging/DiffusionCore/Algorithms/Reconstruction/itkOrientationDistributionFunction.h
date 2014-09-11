@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkOrientationDistributionFunction_h
 #define __itkOrientationDistributionFunction_h
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 #include "itkIndent.h"
 #include "itkFixedArray.h"
 #include "itkMatrix.h"
@@ -212,10 +212,10 @@ typedef std::ostream               OutputStreamType;
 typedef std::istream               InputStreamType;
 
 template< typename TComponent, unsigned int NOdfDirections  >
-DiffusionCore_EXPORT OutputStreamType& operator<<(OutputStreamType& os,
+MitkDiffusionCore_EXPORT OutputStreamType& operator<<(OutputStreamType& os,
               const OrientationDistributionFunction<TComponent,NOdfDirections> & c);
 template< typename TComponent, unsigned int NOdfDirections  >
-DiffusionCore_EXPORT InputStreamType& operator>>(InputStreamType& is,
+MitkDiffusionCore_EXPORT InputStreamType& operator>>(InputStreamType& is,
                     OrientationDistributionFunction<TComponent,NOdfDirections> & c);
 
 
@@ -224,7 +224,7 @@ DiffusionCore_EXPORT InputStreamType& operator>>(InputStreamType& is,
 
 // Define instantiation macro for this template.
 #define ITK_TEMPLATE_OrientationDistributionFunction(_, EXPORT, x, y) namespace itk { \
-  _(2(class DiffusionCore_EXPORT EXPORT OrientationDistributionFunction< ITK_TEMPLATE_2 x >)) \
+  _(2(class MitkDiffusionCore_EXPORT EXPORT OrientationDistributionFunction< ITK_TEMPLATE_2 x >)) \
   namespace Templates { typedef OrientationDistributionFunction< ITK_TEMPLATE_2 x > \
                                          OrientationDistributionFunction##y; } \
   }

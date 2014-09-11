@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usModuleActivator.h>
-#include "mitkModuleContext.h"
+#include "usModuleContext.h"
 #include "mitkPythonService.h"
 #include <usServiceRegistration.h>
 
@@ -28,23 +28,23 @@ namespace mitk
     /// installs the PythonService
     /// runs all initial commands (setting env paths etc)
     ///
-    class PythonActivator : public mitk::ModuleActivator
+    class PythonActivator : public us::ModuleActivator
     {
     public:
 
-        void Load(mitk::ModuleContext* context)
+        void Load(us::ModuleContext* context)
         {
           MITK_DEBUG << "PythonActivator::Load";
           // Registering PythonService as MicroService
           m_PythonService = itk::SmartPointer<mitk::PythonService>(new PythonService());
 
-          ServiceProperties _PythonServiceProps;
+          us::ServiceProperties _PythonServiceProps;
           _PythonServiceProps["Name"] = std::string("PythonService");
 
-          m_PythonServiceRegistration = context->RegisterService<mitk::IPythonService>(m_PythonService, _PythonServiceProps);
+          m_PythonServiceRegistration = context->RegisterService<mitk::IPythonService>(m_PythonService.GetPointer(), _PythonServiceProps);
         }
 
-        void Unload(mitk::ModuleContext* context)
+        void Unload(us::ModuleContext* context)
         {
           MITK_DEBUG("PythonActivator") << "PythonActivator::Unload";
           MITK_DEBUG("PythonActivator") << "m_PythonService GetReferenceCount " << m_PythonService->GetReferenceCount();
@@ -59,9 +59,9 @@ namespace mitk
 
     private:
         itk::SmartPointer<mitk::PythonService> m_PythonService;
-        ServiceRegistration m_PythonServiceRegistration;
+        us::ServiceRegistration<PythonService> m_PythonServiceRegistration;
     };
 }
 
-US_EXPORT_MODULE_ACTIVATOR(mitkPython, mitk::PythonActivator)
+US_EXPORT_MODULE_ACTIVATOR(MitkPython, mitk::PythonActivator)
 #endif

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef IMAGETOIMAGEFILTER_H_HEADER_INCLUDED_C1E5E869
 #define IMAGETOIMAGEFILTER_H_HEADER_INCLUDED_C1E5E869
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkImageSource.h"
 
 namespace mitk {
@@ -33,7 +33,8 @@ public:
   mitkClassMacro(ImageToImageFilter,ImageSource);
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Superclass typedefs. */
   typedef Superclass::OutputImageRegionType OutputImageRegionType;
@@ -48,8 +49,10 @@ public:
   /** Set/Get the image input of this process object.  */
   virtual void SetInput( const InputImageType *image);
   virtual void SetInput( unsigned int, const InputImageType * image);
-  const InputImageType * GetInput(void);
-  const InputImageType * GetInput(unsigned int idx);
+  InputImageType * GetInput(void);
+  InputImageType * GetInput(unsigned int idx);
+  const InputImageType * GetInput(void) const;
+  const InputImageType * GetInput(unsigned int idx) const;
 
 protected:
   ImageToImageFilter();

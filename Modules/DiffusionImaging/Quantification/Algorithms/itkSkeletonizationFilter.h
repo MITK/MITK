@@ -67,7 +67,8 @@ public:
 
   typedef SmartPointer<const Self> ConstPointer;
 
-  itkNewMacro( Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** \brief Performs the work */
   virtual void GenerateData();

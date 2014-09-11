@@ -12,12 +12,12 @@
 
 The BlueBerry application framework provides the concept of extension points and extensions. The main goal is to allow the extension of functionality of a plugin (based on the contract defined by the extension point) by several other plugins. Both the extension point and the extension are defined in the according plugin.xml.
 
-\image html ExtensionPoints.png "Extension Point concept"
+\imageMacro{ExtensionPoints.png,"Extension Point concept",5.40}
 
 \section SimpleExample Why Extension Points?
 In the following simple example we have a plugin 'a' and 'b' with two classes 'A' and 'B' in these plugins.
 
-\image html ExtensionPointEx.png "Simple Example"
+\imageMacro{ExtensionPointEx.png,"Simple Example",5.10}
 
 Plugin 'a' uses the extension point mechanism and creates an extension point that can be extended by other plugins. Now if class 'A' reaches a part that can be extended it asks 'a' if another plugin is registered. If that's the case the functionality of the plugin 'b' that is defined in class 'B' is executed.
 A plugin can therefore be arbitrary extended.

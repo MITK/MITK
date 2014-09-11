@@ -1,63 +1,90 @@
 set(CPP_FILES
-  IGTFilters/mitkNavigationDataLandmarkTransformFilter.cpp
-  IGTFilters/mitkNavigationDataReferenceTransformFilter.cpp
-  IGTFilters/mitkNavigationDataTransformFilter.cpp
-  IGTFilters/mitkNavigationDataRecorder.cpp
-  IGTFilters/mitkNavigationDataPlayer.cpp
-  IGTFilters/mitkNavigationDataPlayerBase.cpp
-  IGTFilters/mitkNavigationDataObjectVisualizationFilter.cpp
-  IGTFilters/mitkCameraVisualization.cpp
-  IGTFilters/mitkNavigationData.cpp
-  IGTFilters/mitkNavigationDataDisplacementFilter.cpp
-  IGTFilters/mitkNavigationDataSequentialPlayer.cpp
-  IGTFilters/mitkNavigationDataSource.cpp
-  IGTFilters/mitkNavigationDataToMessageFilter.cpp
-  IGTFilters/mitkNavigationDataToNavigationDataFilter.cpp
-  IGTFilters/mitkNavigationDataToPointSetFilter.cpp
-  IGTFilters/mitkNavigationDataEvaluationFilter.cpp
 
-  IGTFilters/mitkTrackingDeviceSource.cpp
-  IGTFilters/mitkTrackingVolumeGenerator.cpp
-  IGTFilters/mitkIGTTimeStamp.cpp
-  IGTFilters/mitkRealTimeClock.cpp
-  IGTFilters/mitkTrackingDeviceSourceConfigurator.cpp
+  TestingHelper/mitkNavigationToolStorageTestHelper.cpp
 
-  IGTTrackingDevices/mitkClaronTool.cpp
-  IGTTrackingDevices/mitkClaronTrackingDevice.cpp
-  IGTTrackingDevices/mitkInternalTrackingTool.cpp
-  IGTTrackingDevices/mitkNDIPassiveTool.cpp
-  IGTTrackingDevices/mitkNDIProtocol.cpp
-  IGTTrackingDevices/mitkNDITrackingDevice.cpp
-  IGTTrackingDevices/mitkSerialCommunication.cpp
-  IGTTrackingDevices/mitkTrackingDevice.cpp
-  IGTTrackingDevices/mitkTrackingTool.cpp
-  IGTTrackingDevices/mitkVirtualTrackingDevice.cpp
-  IGTTrackingDevices/mitkVirtualTrackingTool.cpp
+  Algorithms/mitkNavigationDataDelayFilter.cpp
+  Algorithms/mitkNavigationDataDisplacementFilter.cpp
+  Algorithms/mitkNavigationDataEvaluationFilter.cpp
+  Algorithms/mitkNavigationDataLandmarkTransformFilter.cpp
+  Algorithms/mitkNavigationDataReferenceTransformFilter.cpp
+  Algorithms/mitkNavigationDataSmoothingFilter.cpp
+  Algorithms/mitkNavigationDataToMessageFilter.cpp
+  Algorithms/mitkNavigationDataToNavigationDataFilter.cpp
+  Algorithms/mitkNavigationDataToPointSetFilter.cpp
+  Algorithms/mitkNavigationDataTransformFilter.cpp
 
-  IGTToolManagement/mitkNavigationToolStorage.cpp
-  IGTToolManagement/mitkNavigationToolStorageSerializer.cpp
-  IGTToolManagement/mitkNavigationToolStorageDeserializer.cpp
-  IGTToolManagement/mitkNavigationTool.cpp
-  IGTToolManagement/mitkNavigationToolReader.cpp
-  IGTToolManagement/mitkNavigationToolWriter.cpp
+  Common/mitkIGTTimeStamp.cpp
+  Common/mitkSerialCommunication.cpp
+  Common/mitkTrackingTypes.cpp
 
-  IGTExceptionHandling/mitkIGTException.cpp
-  IGTExceptionHandling/mitkIGTHardwareException.cpp
-  IGTExceptionHandling/mitkIGTIOException.cpp
+  DataManagement/mitkNavigationData.cpp
+  DataManagement/mitkNavigationDataSet.cpp
+  DataManagement/mitkNavigationDataSource.cpp
+  DataManagement/mitkNavigationTool.cpp
+  DataManagement/mitkNavigationToolStorage.cpp
+  DataManagement/mitkTrackingDeviceSourceConfigurator.cpp
+  DataManagement/mitkTrackingDeviceSource.cpp
+
+  ExceptionHandling/mitkIGTException.cpp
+  ExceptionHandling/mitkIGTHardwareException.cpp
+  ExceptionHandling/mitkIGTIOException.cpp
+
+  IO/mitkNavigationDataPlayer.cpp
+  IO/mitkNavigationDataPlayerBase.cpp
+  IO/mitkNavigationDataRecorder.cpp
+  IO/mitkNavigationDataRecorderDeprecated.cpp
+  IO/mitkNavigationDataSequentialPlayer.cpp
+  IO/mitkNavigationToolReader.cpp
+  IO/mitkNavigationToolStorageSerializer.cpp
+  IO/mitkNavigationToolStorageDeserializer.cpp
+  IO/mitkNavigationToolWriter.cpp
+  IO/mitkNavigationDataReaderInterface.cpp
+  IO/mitkNavigationDataReaderXML.cpp
+  IO/mitkNavigationDataReaderCSV.cpp
+  IO/mitkNavigationDataSetWriterXML.cpp
+  IO/mitkNavigationDataSetWriterCSV.cpp
+
+  Rendering/mitkCameraVisualization.cpp
+  Rendering/mitkNavigationDataObjectVisualizationFilter.cpp
+
+  TrackingDevices/mitkClaronTool.cpp
+  TrackingDevices/mitkClaronTrackingDevice.cpp
+  TrackingDevices/mitkInternalTrackingTool.cpp
+  TrackingDevices/mitkNDIPassiveTool.cpp
+  TrackingDevices/mitkNDIProtocol.cpp
+  TrackingDevices/mitkNDITrackingDevice.cpp
+  TrackingDevices/mitkTrackingDevice.cpp
+  TrackingDevices/mitkTrackingTool.cpp
+  TrackingDevices/mitkTrackingVolumeGenerator.cpp
+  TrackingDevices/mitkVirtualTrackingDevice.cpp
+  TrackingDevices/mitkVirtualTrackingTool.cpp
+  TrackingDevices/mitkOptitrackErrorMessages.cpp
+  TrackingDevices/mitkOptitrackTrackingDevice.cpp
+  TrackingDevices/mitkOptitrackTrackingTool.cpp
 )
 
+set(RESOURCE_FILES
+  ClaronMicron.stl
+  IntuitiveDaVinci.stl
+  NDIAurora.stl
+  NDIAurora_Dome.stl
+  NDIAuroraCompactFG_Dome.stl
+  NDIAuroraPlanarFG_Dome.stl
+  NDIAuroraTabletopFG_Dome.stl
+  NDIAuroraTabletopFG_Prototype_Dome.stl
+  NDIPolarisOldModel.stl
+  NDIPolarisSpectra.stl
+  NDIPolarisSpectraExtendedPyramid.stl
+  NDIPolarisVicra.stl
+)
+
+
 if(MITK_USE_MICRON_TRACKER)
-  set(CPP_FILES ${CPP_FILES} IGTTrackingDevices/mitkClaronInterface.cpp)
+  set(CPP_FILES ${CPP_FILES} TrackingDevices/mitkClaronInterface.cpp)
 else()
-  set(CPP_FILES ${CPP_FILES} IGTTrackingDevices/mitkClaronInterfaceStub.cpp)
+  set(CPP_FILES ${CPP_FILES} TrackingDevices/mitkClaronInterfaceStub.cpp)
 endif(MITK_USE_MICRON_TRACKER)
 
 if(MITK_USE_MICROBIRD_TRACKER)
-  set(CPP_FILES ${CPP_FILES} IGTTrackingDevices/mitkMicroBirdTrackingDevice.cpp)
+  set(CPP_FILES ${CPP_FILES} TrackingDevices/mitkMicroBirdTrackingDevice.cpp)
 endif(MITK_USE_MICROBIRD_TRACKER)
-
-if(WIN32)
-  set(CPP_FILES ${CPP_FILES} IGTFilters/mitkWindowsRealTimeClock.cpp)
-else()
-  set(CPP_FILES ${CPP_FILES} IGTFilters/mitkLinuxRealTimeClock.cpp)
-endif(WIN32)

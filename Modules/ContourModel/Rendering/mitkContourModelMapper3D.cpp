@@ -58,7 +58,7 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
   this->ApplyContourProperties(renderer);
 
   //tube filter the polyData
-  localStorage->m_TubeFilter->SetInput(localStorage->m_OutlinePolyData);
+  localStorage->m_TubeFilter->SetInputData(localStorage->m_OutlinePolyData);
 
   float lineWidth(1.0);
   if (this->GetDataNode()->GetFloatProperty( "contour.3D.width", lineWidth, renderer ))
@@ -71,7 +71,7 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
   localStorage->m_TubeFilter->CappingOn();
   localStorage->m_TubeFilter->SetNumberOfSides(10);
   localStorage->m_TubeFilter->Update();
-  localStorage->m_Mapper->SetInput(localStorage->m_TubeFilter->GetOutput());
+  localStorage->m_Mapper->SetInputConnection(localStorage->m_TubeFilter->GetOutputPort());
 
 }
 
@@ -101,7 +101,7 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
     || ( this->GetTimestep() == -1 ) )
   {
     //clear the rendered polydata
-    localStorage->m_Mapper->SetInput(vtkSmartPointer<vtkPolyData>::New());
+    localStorage->m_Mapper->SetInputData(vtkSmartPointer<vtkPolyData>::New());
     return;
   }
 
@@ -111,8 +111,8 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
   //check if something important has changed and we need to rerender
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
     || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
-    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) //was the geometry modified?
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime())
     || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
     || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
   {

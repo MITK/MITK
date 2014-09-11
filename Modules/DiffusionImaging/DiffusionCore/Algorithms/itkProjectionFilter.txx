@@ -56,15 +56,16 @@ namespace itk
     data_4d_projected->FillBuffer(0.0);
 
     Float4DImageType::SizeType size = m_AllFA->GetRequestedRegion().GetSize();
+    long s0 = size[0], s1 = size[1], s2 = size[2], s3 = size[3];
 
-    for(int t=0; t<size[3]; t++)
+    for(int t=0; t<s3; t++)
     {
-      for(int z=1; z<size[2]-1; z++)
+      for(int z=1; z<s2-1; z++)
       {
-        for(int y=1; y<size[1]-1; y++)
+        for(int y=1; y<s1-1; y++)
         {
 
-          for(int x=1; x<size[0]-1; x++)
+          for(int x=1; x<s0-1; x++)
           {
 
             VectorImageType::IndexType ix;
@@ -73,7 +74,6 @@ namespace itk
             if(m_Skeleton->GetPixel(ix) != 0)
             {
               VectorImageType::PixelType dir = m_Directions->GetPixel(ix);
-              short maxvalX=0, maxvalY=0, maxvalZ=0;
 
               Float4DImageType::IndexType ix4d;
               ix4d[0]=x; ix4d[1]=y; ix4d[2]=z; ix4d[3]=t;
@@ -99,7 +99,7 @@ namespace itk
                     ix3d[0] = dx; ix3d[1] = dy; ix3d[2] = dz;
 
                     if(dx<0 || dy<0 || dz<0
-                      || dx>=size[0] && dy<=size[1] && dz<=size[2])
+                      || (dx>=s0 && dy<=s1 && dz<=s2))
                     {
                       d=MAXSEARCHLENGTH;
                     }
@@ -114,9 +114,6 @@ namespace itk
                       {
                         maxval = m_AllFA->GetPixel(ix4d);
                         maxval_weighted =  maxval*distanceweight;
-                        maxvalX = dir[0]*D;
-                        maxvalY = dir[1]*D;
-                        maxvalZ = dir[2]*D;
                       }
                     }
                     else{
@@ -166,9 +163,6 @@ namespace itk
                       {
                         maxval = m_AllFA->GetPixel(ix4d);
                         maxval_weighted = maxval * distanceweight;
-                        maxvalX=dx;
-                        maxvalY=dy;
-                        maxvalZ=0;
                       }
 
 

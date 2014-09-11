@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDiffSliceOpertationApplier_h_Included
 #define mitkDiffSliceOpertationApplier_h_Included
 
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkCommon.h"
 #include <mitkOperationActor.h>
 
@@ -30,14 +30,15 @@ namespace mitk
   /** \brief Executes a DiffSliceOperation.
     \sa DiffSliceOperation
   */
-  class Segmentation_EXPORT DiffSliceOperationApplier : public OperationActor
+  class MitkSegmentation_EXPORT DiffSliceOperationApplier : public OperationActor
   {
 
   public:
 
     mitkClassMacro(DiffSliceOperationApplier, OperationActor);
 
-    //itkNewMacro(DiffSliceOperationApplier);
+    //itkFactorylessNewMacro(Self)
+    //itkCloneMacro(Self)
 
     /** \brief Returns an instance of the class */
     static DiffSliceOperationApplier* GetInstance();

@@ -1,0 +1,16 @@
+/**
+\page org_mitk_views_fieldmapgenerator Fieldmap Generator View
+
+This view allows the creation of artificial frequency maps used by Fiberfox to introduce distortions into diffusion weighted images. The generated images can contain a linear frequency gradient and/or multiple 3D gaussian shaped field inhomogeneities.
+
+<b>Example:</b>
+\li Select a reference image with the combo box. The generated fieldmap will feature the same geometry as the selected image.
+\li Move the crosshair to the any position in the image and click "Place Field Source".
+\li A position marker will appear in the render windows and in the datamanager, which indicates the position of a 3D gaussian field distortion that will be introduced upon clicking "Generate Fieldmap".
+\li The strength and variance of the placed sources can be modified by selecting the corresponding data node in the data manager and adjusting the parameters in the lower part of the view (below "Edit Selected Source").
+\li To introduce an (additional) linear frequency gradient, specify the gradient below "Add Gradient".
+\li To finally generate the fieldmap, press "Generate Fieldmap".
+
+\imageMacro{fieldmapGenerator.png,"The Fieldmap Generator View. The render window shows a diffusion weighted image of the brain superimposed by a frequency map with two 3D gaussian field inhomogeneities (red).",16.00}
+
+*/

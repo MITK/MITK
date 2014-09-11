@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTextEdit>
 #include <QDragEnterEvent>
 #include <QDropEvent>
-#include "mitkPythonExports.h"
+#include <MitkPythonExports.h>
 struct QmitkPythonTextEditorData;
 
 ///

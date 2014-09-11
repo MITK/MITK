@@ -18,9 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKANNOTATIONPROPERTY_H_HEADER_INCLUDED
 #define MITKANNOTATIONPROPERTY_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 
 #include <itkConfigure.h>
 
@@ -40,7 +40,8 @@ public:
 
   typedef std::string ValueType;
 
-  itkNewMacro( AnnotationProperty );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro2Param( AnnotationProperty,
     const char *, const Point3D & );
   mitkNewMacro2Param( AnnotationProperty,

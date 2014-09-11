@@ -21,12 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkEnumerationProperty.h"
 
-#include "SceneSerializationBaseExports.h"
+#include <MitkSceneSerializationBaseExports.h>
 
 namespace mitk
 {
 
-class SceneSerializationBase_EXPORT EnumerationPropertySerializer : public BasePropertySerializer
+class MitkSceneSerializationBase_EXPORT EnumerationPropertySerializer : public BasePropertySerializer
 {
   public:
 

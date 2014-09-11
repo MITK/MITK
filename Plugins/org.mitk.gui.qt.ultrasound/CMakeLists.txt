@@ -1,7 +1,9 @@
 project(org_mitk_gui_qt_ultrasound)
 
+include_directories(${CTK_INCLUDE_DIRS})
+
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE ULTRASOUND_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDENCIES QmitkExt MitkUS MitkUSUI
+  MODULE_DEPENDS MitkQtWidgetsExt MitkUS MitkUSUI
 )

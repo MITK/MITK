@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <category id="org.mitk.views.example"
+      name="MITK Examples"/>
+
+    <view id="org.mitk.views.colourimageprocessing"
+      name="Colour Image Processing"
+      category="org.mitk.views.example"
+      class="QmitkColourImageProcessingView"
+      icon="resources/ColorImageProcessing.png" />
+
+    <view id="org.mitk.views.isosurface"
+      name="IsoSurface"
+      category="org.mitk.views.example"
+      icon="resources/isoSurface.xpm"
+      class="QmitkIsoSurface" />
+
+    <view id="org.mitk.views.simplemeasurement"
+      name="SimpleMeasurement"
+      category="org.mitk.views.example"
+      icon="resources/SimpleMeasurement.png"
+      class="QmitkSimpleMeasurement" />
+
+    <view id="org.mitk.views.simpleexample"
+      name="Simple Example"
+      category="org.mitk.views.example"
+      class="QmitkSimpleExampleView"
+      icon="resources/SimpleExample.png" />
+
+    <view id="org.mitk.views.viewinitialization"
+      name="ViewInitialization"
+      category="org.mitk.views.example"
+      class="QmitkViewInitializationView"
+      icon="resources/viewInitializationIcon.xpm"/>
+
+    <view id="org.mitk.views.volumetry"
+      name="Volumetry"
+      category="org.mitk.views.example"
+      class="QmitkVolumetryView"
+      icon="resources/volumetryIcon.xpm" />
+
+    <view id="org.mitk.views.qmitksurfaceutilies"
+      name="Surface Utility"
+      category="org.mitk.views.example"
+      class="QmitkSurfaceUtilities"
+      icon="resources/surfaceUtilities.xpm" />
+
+  </extension>
+
+</plugin>

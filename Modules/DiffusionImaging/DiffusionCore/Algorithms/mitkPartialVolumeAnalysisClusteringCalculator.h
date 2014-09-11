@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_PartialVolumeAnalysisClusteringCalculator_H
 #define _MITK_PartialVolumeAnalysisClusteringCalculator_H
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 #include "mitkCommon.h"
 #include "mitkImage.h"
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  class DiffusionCore_EXPORT PartialVolumeAnalysisClusteringCalculator : public itk::Object
+  class MitkDiffusionCore_EXPORT PartialVolumeAnalysisClusteringCalculator : public itk::Object
   {
   public:
 
@@ -138,12 +138,6 @@ namespace mitk
           (*retval)[i] = hVals(i);
         }
         return retval;
-      }
-
-      void Print(int nr=10)
-      {
-        int sz = xVals.size();
-        int incr = (int)((1.0*sz)/(1.0*nr));
       }
 
       VecType xVals;
@@ -436,7 +430,8 @@ namespace mitk
     };
 
     mitkClassMacro( PartialVolumeAnalysisClusteringCalculator, itk::Object )
-        itkNewMacro( PartialVolumeAnalysisClusteringCalculator )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
         ParamsType *InitialGuess(HistType h) const;
 

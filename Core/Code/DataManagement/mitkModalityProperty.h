@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkModalityProperty_h_Included
 #define mitkModalityProperty_h_Included
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkEnumerationProperty.h"
 #include <itkObjectFactory.h>
 
@@ -39,7 +39,8 @@ class MITK_CORE_EXPORT ModalityProperty : public EnumerationProperty
   public:
 
     mitkClassMacro(ModalityProperty, EnumerationProperty);
-    itkNewMacro(ModalityProperty);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(ModalityProperty, const IdType&);
     mitkNewMacro1Param(ModalityProperty, const std::string&);
 

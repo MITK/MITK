@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define LIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E9C96
 
 // MITK header
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkOperationEvent.h"
 #include "mitkUndoModel.h"
 // STL header
@@ -43,7 +43,8 @@ public:
   typedef std::vector<UndoStackItem*>::reverse_iterator UndoContainerRevIter;
 
   mitkClassMacro(LimitedLinearUndo, UndoModel);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual bool SetOperationEvent(UndoStackItem* stackItem);
 

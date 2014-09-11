@@ -24,9 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandardFileLocations.h>
 #include <mitkImageWriter.h>
 #include <mitkITKImageImport.h>
+#include <mitkImagePixelReadAccessor.h>
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 #include <ctime>
 #include <cstdlib>
@@ -100,8 +101,8 @@ public:
     TestPlane = planeGeometry;
     TestName = testname;
 
-    float centerCoordValue = TestvolumeSize / 2.0;
-    float center[3] = {centerCoordValue, centerCoordValue, centerCoordValue};
+    mitk::ScalarType centerCoordValue = TestvolumeSize / 2.0;
+    mitk::ScalarType center[3] = {centerCoordValue, centerCoordValue, centerCoordValue};
     mitk::Point3D centerIndex(center);
 
     double radius = TestvolumeSize / 4.0;
@@ -544,7 +545,7 @@ public:
     ImageType::IndexType testPoint3DInIndex;
     imageInMitk->GetGeometry()->WorldToIndex(testPoint3DInWorld, testPoint3DInIndex);
 
-    mitk::Index3D testPoint2DInIndex;
+    itk::Index<3> testPoint2DInIndex;
 
     /* end define a point in the 3D volume.*/
 
@@ -573,12 +574,18 @@ public:
     p[2] = testPoint3DInIndex[2];
     imageInMitk->GetGeometry()->IndexToWorld(p, imageIndexToWorld);
 
+    itk::Index<2> testPoint2DIn2DIndex;
+    testPoint2DIn2DIndex[0] = testPoint2DInIndex[0];
+    testPoint2DIn2DIndex[1] = testPoint2DInIndex[1];
 
+    typedef mitk::ImagePixelReadAccessor< unsigned short, 3 > VolumeReadAccessorType;
+    typedef mitk::ImagePixelReadAccessor< unsigned short, 2 > SliceReadAccessorType;
+    VolumeReadAccessorType VolumeReadAccessor( imageInMitk );
+    SliceReadAccessorType SliceReadAccessor( slice );
 
     //compare the pixelvalues of the defined point in the 3D volume with the value of the resliced image
-    unsigned short valueAt3DVolume = imageInMitk->GetPixelValueByIndex(testPoint3DInIndex);//image->GetPixel(testPoint3DInIndex);
-    //unsigned short valueAt3DVolumeByWorld = imageInMitk->GetPixelValueByWorldCoordinate(testPoint3DInWorld);
-    unsigned short valueAtSlice = slice->GetPixelValueByIndex(testPoint2DInIndex);
+    unsigned short valueAt3DVolume = VolumeReadAccessor.GetPixelByIndex( testPoint3DInIndex );
+    unsigned short valueAtSlice = SliceReadAccessor.GetPixelByIndex( testPoint2DIn2DIndex );
 
     //valueAt3DVolume == valueAtSlice is not always working. because of rounding errors
     //indices are shifted
@@ -627,13 +634,13 @@ public:
     MITK_INFO << "\n" << "volume world: " << testPoint3DInWorld << " = " << valueAt3DVolumeByWorld ;
     MITK_INFO << "\n" << "slice idx: " << testPoint2DInIndex << " = " << valueAtSlice ;
 
-    mitk::Index3D curr;
+    itk::Index<3> curr;
     curr[0] = curr[1] = curr[2] = 0;
 
     for( int i = 0; i < 32 ; ++i){
       for( int j = 0; j < 32; ++j){
         ++curr[1];
-        if(slice->GetPixelValueByIndex(curr) == valueAt3DVolume){
+        if(SliceReadAccessor.GetPixelByIndex( curr ) == valueAt3DVolume){
           MITK_INFO << "\n" << valueAt3DVolume << " MATCHED mitk " << curr;
         }
       }

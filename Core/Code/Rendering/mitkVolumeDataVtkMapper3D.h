@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKVOLUMEDATAVTKMAPPER3D_H_HEADER_INCLUDED
 #define MITKVOLUMEDATAVTKMAPPER3D_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkImage.h"
@@ -66,7 +66,8 @@ class MITK_CORE_EXPORT VolumeDataVtkMapper3D : public VtkMapper
 public:
   mitkClassMacro(VolumeDataVtkMapper3D, VtkMapper);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual const mitk::Image* GetInput();
 

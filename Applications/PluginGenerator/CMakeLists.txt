@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.5)
 
-project(MITKPluginGenerator)
+project(MitkPluginGenerator)
 
 set(VERSION_MAJOR 1)
 set(VERSION_MINOR 4)
@@ -20,7 +20,7 @@ endif()
 
 set(QT_DONT_USE_QTGUI 1)
 set(QT_USE_QTNETWORK 1)
-find_package(Qt 4.6.2 REQUIRED)
+find_package(Qt 4.7 REQUIRED)
 
 include(${QT_USE_FILE})
 

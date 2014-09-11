@@ -19,7 +19,7 @@
 
 #include <mitkVtkOverlay3D.h>
 #include <mitkLocalStorageHandler.h>
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 #include <vtkSmartPointer.h>
 
 class vtkStringArray;
@@ -62,7 +62,8 @@ public:
   };
 
   mitkClassMacro(LabelOverlay3D, mitk::VtkOverlay3D);
-  itkNewMacro(LabelOverlay3D);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** \brief Set the vector of labels that are shown to each corresponding point3D. The size has to be equal to the provided LabelCoordinates. */
   void SetLabelVector(const std::vector<std::string>& LabelVector);
@@ -73,6 +74,7 @@ public:
   /** \brief Coordinates of the labels */
   void SetLabelCoordinates(itk::SmartPointer<PointSet> LabelCoordinates);
 
+  void PointSetModified(const itk::Object *, const itk::EventObject &);
 protected:
 
   /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
@@ -97,6 +99,8 @@ private:
 
   /** \brief The coordinates of the labels. Indices must match the labelVector and the priorityVector.*/
   itk::SmartPointer<PointSet> m_LabelCoordinates;
+
+  unsigned long m_PointSetModifiedObserverTag;
 
   /** \brief copy constructor */
   LabelOverlay3D( const LabelOverlay3D &);

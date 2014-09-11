@@ -18,9 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFDistanceImageToSurfaceFilter.h>
 
 #include <mitkImage.h>
+#include <mitkImagePixelReadAccessor.h>
 #include <mitkSurface.h>
 #include <mitkToFProcessingCommon.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkToFTestingCommon.h>
 #include <mitkIOUtil.h>
 
@@ -30,17 +31,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
  * @brief mitkKinectReconstructionTest Testing method for the Kinect reconstruction mode. Specially meant for Kinect.
- * This tests loads a special data set from MITK-Data and compares it to a previously generated surface.
+ * This tests loads a special data set from MITK-Data and compares it to a reference surface.
  * This test has no dependency to the mitkKinectModule, although it is thematically connected to it.
  */
 int mitkKinectReconstructionTest(int  argc , char* argv[])
 {
     MITK_TEST_BEGIN("mitkKinectReconstructionTest");
 
-    MITK_TEST_CONDITION_REQUIRED(argc > 3, "Testing if enough arguments are set.");
+    MITK_TEST_CONDITION_REQUIRED(argc > 2, "Testing if enough arguments are set.");
     std::string calibrationFilePath(argv[1]);
     std::string kinectImagePath(argv[2]);
-    std::string groundTruthSurfacePath(argv[3]);
 
     mitk::ToFDistanceImageToSurfaceFilter::Pointer distToSurf = mitk::ToFDistanceImageToSurfaceFilter::New();
     mitk::CameraIntrinsics::Pointer intrinsics = mitk::CameraIntrinsics::New();
@@ -55,15 +55,44 @@ int mitkKinectReconstructionTest(int  argc , char* argv[])
     distToSurf->SetInput(kinectImage);
     distToSurf->Update();
 
-    //load ground truth data
-    mitk::Surface::Pointer groundTruth = mitk::IOUtil::LoadSurface(groundTruthSurfacePath);
-    MITK_TEST_CONDITION_REQUIRED(groundTruth.IsNotNull(), "Testing if ground truth could be loaded.");
-
     mitk::Surface::Pointer resultOfFilter = distToSurf->GetOutput();
     MITK_TEST_CONDITION_REQUIRED(resultOfFilter.IsNotNull(), "Testing if any output was generated.");
+    mitk::PointSet::Pointer resultPointSet = mitk::ToFTestingCommon::VtkPolyDataToMitkPointSet(resultOfFilter->GetVtkPolyData());
 
-    MITK_TEST_CONDITION_REQUIRED( mitk::ToFTestingCommon::VtkPolyDatasEqual(resultOfFilter->GetVtkPolyData(),
-                                                                            groundTruth->GetVtkPolyData() ),
+    // generate ground truth data
+    mitk::PointSet::Pointer groundTruthPointSet = mitk::PointSet::New();
+    mitk::ToFProcessingCommon::ToFPoint2D focalLength;
+    focalLength[0] = intrinsics->GetFocalLengthX();
+    focalLength[1] = intrinsics->GetFocalLengthY();
+    mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
+    principalPoint[0] = intrinsics->GetPrincipalPointX();
+    principalPoint[1] = intrinsics->GetPrincipalPointY();
+
+    int xDimension = (int)kinectImage->GetDimension(0);
+    int yDimension = (int)kinectImage->GetDimension(1);
+    int pointCount = 0;
+    mitk::ImagePixelReadAccessor<float,2> imageAcces(kinectImage, kinectImage->GetSliceData(0));
+    for (int j=0; j<yDimension; j++)
+    {
+      for (int i=0; i<xDimension; i++)
+      {
+        itk::Index<2> pixel;
+        pixel[0] = i;
+        pixel[1] = j;
+
+        mitk::ToFProcessingCommon::ToFScalarType distance = (double)imageAcces.GetPixelByIndex(pixel);
+
+        mitk::Point3D currentPoint;
+        currentPoint = mitk::ToFProcessingCommon::KinectIndexToCartesianCoordinates(i,j,distance,focalLength[0],focalLength[1],principalPoint[0],principalPoint[1]);
+
+        if (distance>mitk::eps)
+        {
+          groundTruthPointSet->InsertPoint( pointCount, currentPoint );
+          pointCount++;
+        }
+      }
+    }
+    MITK_TEST_CONDITION_REQUIRED( mitk::ToFTestingCommon::PointSetsEqual(resultPointSet,groundTruthPointSet),
                                   "Testing if point sets are equal (with a small epsilon).");
     MITK_TEST_END();
 }

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkLiveWireTool2DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 #include "mitkLiveWireTool2D.h"
 #include "ui_QmitkLiveWireTool2DGUIControls.h"
 
@@ -38,19 +38,22 @@ class QmitkLiveWireTool2DGUIControls;
 \brief GUI for mitk::LiveWireTool.
 \sa mitk::LiveWireTool2D
 */
-class SegmentationUI_EXPORT QmitkLiveWireTool2DGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkLiveWireTool2DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
 public:
   mitkClassMacro(QmitkLiveWireTool2DGUI, QmitkToolGUI);
-  itkNewMacro(QmitkLiveWireTool2DGUI);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
 
     void OnConfirmSegmentation();
+
+    void OnClearSegmentation();
 
     void OnShowInformation( bool on );
 

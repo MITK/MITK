@@ -21,7 +21,7 @@ namespace mitk
 {
 
 RestorePlanePositionOperation
-::RestorePlanePositionOperation( OperationType operationType, float width, float height, Vector3D spacing , unsigned int pos, Vector3D direction, AffineTransform3D::Pointer transform/*, PlaneOrientation orientation*/)
+::RestorePlanePositionOperation( OperationType operationType, ScalarType width, ScalarType height, Vector3D spacing , unsigned int pos, Vector3D direction, AffineTransform3D::Pointer transform/*, PlaneOrientation orientation*/)
 : Operation(operationType), m_Spacing( spacing ), m_DirectionVector(direction), m_Width( width ), m_Height( height ), m_Pos(pos), m_Transform(transform)/*, m_Orientation(orientation)*/
 {
   //MITK_INFO<<"Width: "<<width<<"height: "<<height<<"spacing: "<<spacing<<"direction: "<<direction<<"transform: "<<transform;
@@ -42,12 +42,12 @@ Vector3D RestorePlanePositionOperation::GetDirectionVector()
   return m_DirectionVector;
 }
 
-float RestorePlanePositionOperation::GetWidth()
+ScalarType RestorePlanePositionOperation::GetWidth()
 {
   return m_Width;
 }
 
-float RestorePlanePositionOperation::GetHeight()
+ScalarType RestorePlanePositionOperation::GetHeight()
 {
   return m_Height;
 }

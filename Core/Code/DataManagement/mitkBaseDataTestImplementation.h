@@ -34,8 +34,8 @@ namespace mitk {
 
     mitkClassMacro(BaseDataTestImplementation, BaseData);
 
-    itkNewMacro(Self);
-    mitkCloneMacro(BaseDataTestImplementation);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual void InitializeTimeGeometry( unsigned int timeSteps /* = 1 */ )
     {
@@ -43,6 +43,8 @@ namespace mitk {
     }
 
   protected:
+
+    mitkCloneMacro(Self);
 
     virtual bool VerifyRequestedRegion(){return false;};
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion(){return false;};

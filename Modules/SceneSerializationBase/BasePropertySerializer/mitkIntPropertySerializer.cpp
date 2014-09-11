@@ -21,17 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkProperties.h"
 
-#include "SceneSerializationBaseExports.h"
+#include <MitkSceneSerializationBaseExports.h>
 
 namespace mitk
 {
 
-class SceneSerializationBase_EXPORT IntPropertySerializer : public BasePropertySerializer
+class MitkSceneSerializationBase_EXPORT IntPropertySerializer : public BasePropertySerializer
 {
   public:
 
     mitkClassMacro( IntPropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QMITKTOFCOMPOSITEFILTERWIDGET_H_INCLUDED
 #define _QMITKTOFCOMPOSITEFILTERWIDGET_H_INCLUDED
 
-#include "mitkTOFUIExports.h"
+#include <MitkToFUIExports.h>
 #include "ui_QmitkToFCompositeFilterWidgetControls.h"
 
 //mitk headers
@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * @ingroup ToFUI
 */
-class mitkTOFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
+class MitkToFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
 {
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
@@ -86,9 +86,14 @@ class mitkTOFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
 
     void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
-  signals:
+signals:
 
   protected slots:
+    /**
+     * @brief OnShowAdvancedOptionsCheckboxChecked Show/hide advanced options.
+     * @param checked show/hide
+     */
+    void OnShowAdvancedOptionsCheckboxChecked(bool checked);
     /*!
     \brief slot en-/disabling temporal median filter in internal ToFCompositeFilter
     */

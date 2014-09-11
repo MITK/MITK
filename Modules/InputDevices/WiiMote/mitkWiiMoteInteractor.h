@@ -26,12 +26,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseRenderer.h>
 
 // export macro
-#include <mitkWiiMoteExports.h>
+#include <MitkWiiMoteExports.h>
 
 namespace mitk
 {
+  /**
+  * \deprecatedSince{2014_03} mitk::WiiMoteInteractor is deprecated. Needs to be updated to the new interaction-framework.
+  * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
+  */
 
-class mitkWiiMote_EXPORT WiiMoteInteractor: public mitk::Interactor
+class DEPRECATED() mitkWiiMote_EXPORT WiiMoteInteractor: public mitk::Interactor
 {
 
 public:

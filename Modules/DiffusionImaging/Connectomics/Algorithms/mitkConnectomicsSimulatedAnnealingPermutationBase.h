@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 #include "mitkConnectomicsSimulatedAnnealingCostFunctionBase.h"
 
@@ -32,7 +32,7 @@ namespace mitk
 
     /**
   * \brief Base class of a permutation to be used in simulated annealing */
-  class Connectomics_EXPORT ConnectomicsSimulatedAnnealingPermutationBase : public itk::Object
+  class MitkConnectomics_EXPORT ConnectomicsSimulatedAnnealingPermutationBase : public itk::Object
   {
   public:
 
@@ -40,7 +40,8 @@ namespace mitk
     /** Method for creation through the object factory. */
 
     mitkClassMacro(ConnectomicsSimulatedAnnealingPermutationBase, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     // Set the cost function
     void SetCostFunction( mitk::ConnectomicsSimulatedAnnealingCostFunctionBase::Pointer costFunction );
@@ -52,7 +53,7 @@ namespace mitk
     virtual void Initialize(){};
 
     // Do a permutation for a specific temperature
-    virtual void Permutate( double temperature ){};
+    virtual void Permutate( double /*temperature*/ ){};
 
     // Do clean up necessary after a permutation
     virtual void CleanUp(){};

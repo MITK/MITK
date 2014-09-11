@@ -44,7 +44,13 @@ QmitkExtAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   excludePerspectives.push_back("org.blueberry.perspectives.help");
   advisor->SetPerspectiveExcludeList(excludePerspectives);
 
-  advisor->SetWindowIcon(":/QmitkExtApplication/icon_research.xpm");
+  // Exclude some views from the normal view list
+  std::vector<std::string> excludeViews;
+  excludeViews.push_back("org.mitk.views.modules");
+  excludeViews.push_back( "org.blueberry.ui.internal.introview" );
+  advisor->SetViewExcludeList(excludeViews);
+
+  advisor->SetWindowIcon(":/org.mitk.gui.qt.extapplication/icon.png");
   return advisor;
   //return new QmitkExtWorkbenchWindowAdvisor(this, configurer);
 }

@@ -31,6 +31,20 @@ if(UNIX AND NOT APPLE)
 
 endif()
 
+#-----------------------------------------------------------------------------
+# Qt options for external projects and MITK
+#-----------------------------------------------------------------------------
+
+if(MITK_USE_QT)
+  set(qt_project_args -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION})
+else()
+  set(qt_project_args )
+endif()
+
+if(MITK_USE_Qt4)
+  list(APPEND qt_project_args
+       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE} )
+endif()
 
 #-----------------------------------------------------------------------------
 # ExternalProjects
@@ -55,8 +69,12 @@ set(external_projects
   SOFA
   MITKData
   Qwt
-  Qxt
   )
+
+# Qxt supports Qt5. We need to also support it in QxtCMakeLists.txt
+#if(MITK_USE_Qt4)
+  list(APPEND external_projects Qxt)
+#endif()
 
 # These are "hard" dependencies and always set to ON
 set(MITK_USE_tinyxml 1)
@@ -70,11 +88,9 @@ set(MITK_USE_VTK 1)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 if(MITK_USE_QT)
   set(MITK_USE_Qwt 1)
-  set(MITK_USE_Qxt 1)
-endif()
-
-if(MITK_USE_BLUEBERRY)
-  set(MITK_USE_CppUnit 1)
+  #if(MITK_USE_Qt4)
+    set(MITK_USE_Qxt 1) #TODO: Check how Qxt builds with Qt 5
+  #endif()
 endif()
 
 if(MITK_USE_SOFA)
@@ -101,6 +117,13 @@ if(MITK_USE_Boost)
     set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
   endif()
 endif()
+
+# Setup file for setting custom ctest vars
+configure_file(
+  CMake/SuperbuildCTestCustom.cmake.in
+  ${MITK_BINARY_DIR}/CTestCustom.cmake
+  @ONLY
+)
 
 if(BUILD_TESTING)
   set(EXTERNAL_MITK_DATA_DIR "${MITK_DATA_DIR}" CACHE PATH "Path to the MITK data directory")
@@ -156,6 +179,7 @@ endif()
 set(ep_common_args
   -DBUILD_TESTING:BOOL=${ep_build_testing}
   -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
+  -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}
   -DBUILD_SHARED_LIBS:BOOL=ON
   -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
   -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -176,6 +200,19 @@ set(ep_common_args
   -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
   -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
 )
+
+# Pass the CMAKE_OSX variables to external projects
+if(APPLE)
+  set(MAC_OSX_ARCHITECTURE_ARGS
+        -DCMAKE_OSX_ARCHITECTURES:PATH=${CMAKE_OSX_ARCHITECTURES}
+        -DCMAKE_OSX_DEPLOYMENT_TARGET:PATH=${CMAKE_OSX_DEPLOYMENT_TARGET}
+        -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}
+  )
+  set(ep_common_args
+        ${MAC_OSX_ARCHITECTURE_ARGS}
+        ${ep_common_args}
+  )
+endif()
 
 # Include external projects
 foreach(p ${external_projects})
@@ -209,6 +246,8 @@ set(mitk_cmake_boolean_args
   MITK_USE_SOFA
   MITK_USE_Python
   MITK_USE_OpenCL
+
+  MITK_ENABLE_PIC_READER
   )
 
 #-----------------------------------------------------------------------------
@@ -288,6 +327,7 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
     list(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
   endif()
 endforeach()
+
 # Optional python variables
 if(MITK_USE_Python)
     list(APPEND mitk_optional_cache_args
@@ -335,17 +375,19 @@ ExternalProject_Add(${proj}
     ${mitk_superbuild_boolean_args}
     ${mitk_optional_cache_args}
     -DMITK_USE_SUPERBUILD:BOOL=OFF
+    -DMITK_BUILD_CONFIGURATION:STRING=${MITK_BUILD_CONFIGURATION}
     -DCTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
     # ----------------- Miscellaneous ---------------
     -DMITK_CTEST_SCRIPT_MODE:STRING=${MITK_CTEST_SCRIPT_MODE}
     -DMITK_SUPERBUILD_BINARY_DIR:PATH=${MITK_BINARY_DIR}
     -DMITK_MODULES_TO_BUILD:INTERNAL=${MITK_MODULES_TO_BUILD}
+    ${qt_project_args}
     -DMITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_FLOATING_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}
+    -DMITK_ACCESSBYITK_VECTOR_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_DIMENSIONS:STRING=${MITK_ACCESSBYITK_DIMENSIONS}
     # --------------- External project dirs ---------------
-    -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
     -DCTK_DIR:PATH=${CTK_DIR}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
@@ -368,6 +410,7 @@ ExternalProject_Add(${proj}
     -DQxt_DIR:PATH=${Qxt_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
+    ${MAC_OSX_ARCHITECTURE_ARGS}
 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/MITK-build

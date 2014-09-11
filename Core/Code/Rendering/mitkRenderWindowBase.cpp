@@ -14,15 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkRenderWindowBase.h"
 #include "mitkDisplayPositionEvent.h"
 #include "mitkVtkLayerController.h"
 #include "mitkRenderingManager.h"
 #include "vtkRenderer.h"
 
-
 mitk::RenderWindowBase::RenderWindowBase( )
+: m_RenderProp(NULL)
+, m_InResize(false)
 {
 }
 
@@ -35,7 +35,7 @@ mitk::RenderWindowBase::RenderWindowBase( )
 
 * or short: within constructors and destructors classes are not polymorph.
 */
-void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManager, const char* name )
+void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManager, const char* name,mitk::BaseRenderer::RenderingMode::Type renderingMode )
 {
   if ( renderingManager == NULL )
   {
@@ -44,7 +44,7 @@ void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManage
 
   if(m_Renderer.IsNull())
   {
-      m_Renderer = mitk::VtkPropRenderer::New( name , GetVtkRenderWindow(), renderingManager );
+      m_Renderer = mitk::VtkPropRenderer::New( name , GetVtkRenderWindow(), renderingManager,renderingMode );
   }
 
   m_Renderer->InitRenderer(this->GetVtkRenderWindow());
@@ -79,9 +79,7 @@ void mitk::RenderWindowBase::Destroy()
 
 mitk::RenderWindowBase::~RenderWindowBase()
 {
-
 }
-
 
 void mitk::RenderWindowBase::mousePressMitkEvent(mitk::MouseEvent *me)
 {
@@ -115,7 +113,6 @@ void mitk::RenderWindowBase::keyPressMitkEvent(mitk::KeyEvent* mke)
     m_Renderer->KeyPressEvent(mke);
 }
 
-
 void mitk::RenderWindowBase::resizeMitkEvent(int width, int height)
 {
   if(m_InResize) //@FIXME CRITICAL probably related to VtkSizeBug
@@ -129,7 +126,6 @@ void mitk::RenderWindowBase::resizeMitkEvent(int width, int height)
 
   m_InResize = false;
 }
-
 
 mitk::SliceNavigationController * mitk::RenderWindowBase::GetSliceNavigationController()
 {

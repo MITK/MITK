@@ -27,13 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkTensorImage.h>
 
-#include <mitkDiffusionCoreObjectFactory.h>
-#include <mitkCoreExtObjectFactory.h>
 #include <mitkCoreObjectFactory.h>
 #include "ctkCommandLineParser.h"
 #include <mitkFiberBundleXWriter.h>
 #include <itkShCoefficientImageImporter.h>
-#include <mitkNrrdQBallImageWriter.h>
 #include <itkFlipImageFilter.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -57,19 +54,24 @@ mitk::Image::Pointer LoadData(std::string filename)
 
 
 template<int shOrder>
-int Start(int argc, char* argv[])
+int StartPeakExtraction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("image", "i", ctkCommandLineParser::String, "sh coefficient image", us::Any(), false);
-    parser.addArgument("outroot", "o", ctkCommandLineParser::String, "output root", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image");
-    parser.addArgument("normalization", "n", ctkCommandLineParser::Int, "0=no norm, 1=max norm, 2=single vec norm", 1, true);
-    parser.addArgument("numpeaks", "p", ctkCommandLineParser::Int, "maximum number of extracted peaks", 2, true);
-    parser.addArgument("peakthres", "r", ctkCommandLineParser::Float, "peak threshold relative to largest peak", 0.4, true);
-    parser.addArgument("abspeakthres", "a", ctkCommandLineParser::Float, "absolute peak threshold weighted with local GFA value", 0.06, true);
-    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "use specified SH-basis (MITK, FSL, MRtrix)", string("MITK"), true);
-    parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "do not flip input image to match MITK coordinate convention");
+    parser.addArgument("image", "i", ctkCommandLineParser::InputFile, "Input image", "sh coefficient image", us::Any(), false);
+    parser.addArgument("outroot", "o", ctkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask", "mask image");
+    parser.addArgument("normalization", "n", ctkCommandLineParser::Int, "Normalization", "0=no norm, 1=max norm, 2=single vec norm", 1, true);
+    parser.addArgument("numpeaks", "p", ctkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);
+    parser.addArgument("peakthres", "r", ctkCommandLineParser::Float, "Peak threshold", "peak threshold relative to largest peak", 0.4, true);
+    parser.addArgument("abspeakthres", "a", ctkCommandLineParser::Float, "Absolute peak threshold", "absolute peak threshold weighted with local GFA value", 0.06, true);
+    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "Use specified SH-basis", "use specified SH-basis (MITK, FSL, MRtrix)", string("MITK"), true);
+    parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "No flip", "do not flip input image to match MITK coordinate convention");
+
+    parser.setCategory("Preprocessing Tools");
+    parser.setTitle("Peak Extraction");
+    parser.setDescription("");
+    parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -117,10 +119,6 @@ int Start(int argc, char* argv[])
 
     try
     {
-        mitk::CoreObjectFactory::GetInstance();
-
-        RegisterDiffusionCoreObjectFactory();
-
         mitk::Image::Pointer image = LoadData(imageName);
         mitk::Image::Pointer mask = LoadData(maskImageName);
 
@@ -154,7 +152,7 @@ int Start(int argc, char* argv[])
         {
             try{
                 itkMaskImage = ItkUcharImgType::New();
-                mitk::CastToItkImage<ItkUcharImgType>(mask, itkMaskImage);
+                mitk::CastToItkImage(mask, itkMaskImage);
                 filter->SetMaskImage(itkMaskImage);
             }
             catch(...)
@@ -262,7 +260,7 @@ int Start(int argc, char* argv[])
         {
             typedef typename MaximaExtractionFilterType::ItkDirectionImageContainer ItkDirectionImageContainer;
             typename ItkDirectionImageContainer::Pointer container = filter->GetDirectionImageContainer();
-            for (int i=0; i<container->Size(); i++)
+            for (unsigned int i=0; i<container->Size(); i++)
             {
                 typename MaximaExtractionFilterType::ItkDirectionImage::Pointer itkImg = container->GetElement(i);
 
@@ -341,16 +339,21 @@ int PeakExtraction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("image", "i", ctkCommandLineParser::String, "sh coefficient image", us::Any(), false);
-    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "spherical harmonics order");
-    parser.addArgument("outroot", "o", ctkCommandLineParser::String, "output root", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image");
-    parser.addArgument("normalization", "n", ctkCommandLineParser::Int, "0=no norm, 1=max norm, 2=single vec norm", 1, true);
-    parser.addArgument("numpeaks", "p", ctkCommandLineParser::Int, "maximum number of extracted peaks", 2, true);
-    parser.addArgument("peakthres", "r", ctkCommandLineParser::Float, "peak threshold relative to largest peak", 0.4, true);
-    parser.addArgument("abspeakthres", "a", ctkCommandLineParser::Float, "absolute peak threshold weighted with local GFA value", 0.06, true);
-    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "use specified SH-basis (MITK, FSL, MRtrix)", string("MITK"), true);
-    parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "do not flip input image to match MITK coordinate convention");
+    parser.addArgument("image", "i", ctkCommandLineParser::InputFile, "Input image", "sh coefficient image", us::Any(), false);
+    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order");
+    parser.addArgument("outroot", "o", ctkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask", "mask image");
+    parser.addArgument("normalization", "n", ctkCommandLineParser::Int, "Normalization", "0=no norm, 1=max norm, 2=single vec norm", 1, true);
+    parser.addArgument("numpeaks", "p", ctkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);
+    parser.addArgument("peakthres", "r", ctkCommandLineParser::Float, "Peak threshold", "peak threshold relative to largest peak", 0.4, true);
+    parser.addArgument("abspeakthres", "a", ctkCommandLineParser::Float, "Absolute peak threshold", "absolute peak threshold weighted with local GFA value", 0.06, true);
+    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "Use specified SH-basis", "use specified SH-basis (MITK, FSL, MRtrix)", string("MITK"), true);
+    parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "No flip", "do not flip input image to match MITK coordinate convention");
+
+    parser.setCategory("Preprocessing Tools");
+    parser.setTitle("Peak Extraction");
+    parser.setDescription("");
+    parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -364,15 +367,15 @@ int PeakExtraction(int argc, char* argv[])
     switch (shOrder)
     {
     case 4:
-        return Start<4>(argc, argv);
+        return StartPeakExtraction<4>(argc, argv);
     case 6:
-        return Start<6>(argc, argv);
+        return StartPeakExtraction<6>(argc, argv);
     case 8:
-        return Start<8>(argc, argv);
+        return StartPeakExtraction<8>(argc, argv);
     case 10:
-        return Start<10>(argc, argv);
+        return StartPeakExtraction<10>(argc, argv);
     case 12:
-        return Start<12>(argc, argv);
+        return StartPeakExtraction<12>(argc, argv);
     }
     return EXIT_FAILURE;
 }

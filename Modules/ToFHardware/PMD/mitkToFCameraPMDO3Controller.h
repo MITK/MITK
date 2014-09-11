@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDO3Controller_h
 #define __mitkToFCameraPMDO3Controller_h
 
-#include "mitkPMDModuleExports.h"
+#include <MitkPMDExports.h>
 #include "mitkCommon.h"
 #include "mitkToFCameraPMDController.h"
 
@@ -37,7 +37,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraPMDO3Controller , mitk::ToFCameraPMDController );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief opens a connection to the PMD O3 ToF camera

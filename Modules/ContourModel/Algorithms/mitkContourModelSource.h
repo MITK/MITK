@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_CONTOURMODEL_SOURCE_H
 #define _MITK_CONTOURMODEL_SOURCE_H
 
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 #include "mitkBaseDataSource.h"
 #include "mitkContourModel.h"
 
@@ -27,12 +27,13 @@ namespace mitk
   * @brief Superclass of all classes generating ContourModels.
   * @ingroup Process
   */
-  class ContourModel_EXPORT ContourModelSource : public BaseDataSource
+  class MitkContourModel_EXPORT ContourModelSource : public BaseDataSource
   {
   public:
 
     mitkClassMacro( ContourModelSource, BaseDataSource )
-    itkNewMacro( Self )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef ContourModel OutputType;
 

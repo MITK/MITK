@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKSTATUSBAR_H
 #define MITKSTATUSBAR_H
 #include <itkObject.h>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkStatusBarImplementation.h"
 
 

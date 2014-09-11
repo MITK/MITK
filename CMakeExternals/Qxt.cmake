@@ -2,6 +2,8 @@
 # Qxt
 #-----------------------------------------------------------------------------
 
+if(MITK_USE_Qxt)
+
 # Sanity checks
 if(DEFINED Qxt_DIR AND NOT EXISTS ${Qxt_DIR})
   message(FATAL_ERROR "Qxt_DIR variable is defined but corresponds to non-existing directory")
@@ -19,14 +21,14 @@ if(NOT DEFINED ${proj}_DIR)
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/libqxt-0.6.2-dadc327c2a6a-patched.tar.gz
-     URL_MD5 b0438b4c76793c35b606c8aba02748b8
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/libqxt-3e7424f842d4.tar.gz
+     URL_MD5 a41a1e6d114cdabfc655f278176ca062
      PATCH_COMMAND ${patch_cmd}
      INSTALL_COMMAND ""
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
-       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+       ${qt_project_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 
@@ -35,5 +37,7 @@ if(NOT DEFINED ${proj}_DIR)
 else()
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+
+endif()
 
 endif()

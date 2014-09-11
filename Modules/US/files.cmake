@@ -1,15 +1,25 @@
 SET(CPP_FILES
-## Model classes
+
+## Module Activator
+mitkUSActivator.cpp
+
+## Model Classes
 USModel/mitkUSImage.cpp
 USModel/mitkUSImageMetadata.cpp
 USModel/mitkUSDevice.cpp
 USModel/mitkUSVideoDevice.cpp
+USModel/mitkUSVideoDeviceCustomControls.cpp
 USModel/mitkUSProbe.cpp
+USModel/mitkUSDevicePersistence.cpp
 
-## Services
-USService/mitkUSDeviceService.cpp
-
-## Filters and sources
+## Filters and Sources
+USFilters/mitkUSImageLoggingFilter.cpp
+USFilters/mitkUSImageSource.cpp
 USFilters/mitkUSImageVideoSource.cpp
-USFilters/mitkUSImageToUSImageFilter.cpp
+
+## Control Interfaces
+USControlInterfaces/mitkUSAbstractControlInterface.cpp
+USControlInterfaces/mitkUSControlInterfaceBMode.cpp
+USControlInterfaces/mitkUSControlInterfaceProbes.cpp
+USControlInterfaces/mitkUSControlInterfaceDoppler.cpp
 )

@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkSurface.h>
 
+namespace mitk {
+  class Image;
+}
+
 /*!
   \brief QmitkImageMaskingWidget
 
@@ -65,13 +69,13 @@ private:
   void EnableButtons(bool enable = true);
 
   /** @brief Mask an image with a given binary mask. Note that the input image and the mask image must be of the same size. */
-  mitk::Image::Pointer MaskImage(mitk::Image::Pointer referenceImage, mitk::Image::Pointer maskImage );
+  itk::SmartPointer<mitk::Image> MaskImage(itk::SmartPointer<mitk::Image> referenceImage, itk::SmartPointer<mitk::Image> maskImage );
 
   /** @brief Convert a surface into an binary image. */
-  mitk::Image::Pointer ConvertSurfaceToImage( mitk::Image::Pointer image, mitk::Surface::Pointer surface );
+  itk::SmartPointer<mitk::Image> ConvertSurfaceToImage( itk::SmartPointer<mitk::Image> image, mitk::Surface::Pointer surface );
 
   /** @brief Adds a new data object to the DataStorage.*/
-  void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation,
+  void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, itk::SmartPointer<mitk::Image> segmentation,
                         const std::string& name, mitk::DataNode::Pointer parent = NULL);
 
   Ui::QmitkImageMaskingWidgetControls m_Controls;

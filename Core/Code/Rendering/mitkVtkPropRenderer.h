@@ -14,11 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D
 #define MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseRenderer.h"
 #include "mitkDataStorage.h"
 #include "mitkRenderingManager.h"
@@ -38,10 +37,8 @@ class vtkTextActor;
 class vtkTextProperty;
 class vtkAssemblyPath;
 
-
 namespace mitk
 {
-
 class Mapper;
 
 /*!
@@ -67,6 +64,7 @@ public:
 
   mitkClassMacro(VtkPropRenderer,BaseRenderer);
   mitkNewMacro3Param(VtkPropRenderer, const char*, vtkRenderWindow *, mitk::RenderingManager* );
+  mitkNewMacro4Param(VtkPropRenderer, const char*, vtkRenderWindow *, mitk::RenderingManager*, mitk::BaseRenderer::RenderingMode::Type );
 
   typedef std::map<int,Mapper*> MappersMapType;
 
@@ -138,6 +136,8 @@ public:
    */
   vtkAssemblyPath* GetNextPath();
 
+  int GetNumberOfPaths();
+
   const vtkWorldPointPicker *GetWorldPointPicker() const;
   const vtkPointPicker *GetPointPicker() const;
   const vtkCellPicker *GetCellPicker() const;
@@ -153,7 +153,7 @@ public:
   static bool useImmediateModeRendering();
 
 protected:
-  VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL );
+  VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard );
   virtual ~VtkPropRenderer();
   virtual void Update();
 
@@ -166,7 +166,6 @@ protected:
   */
   mitk::Point2D TransformOpenGLPointToViewport( mitk::Point2D point );
 
-
 private:
 
   /** \brief This method sets up the camera on the actor (e.g. an image) of all
@@ -176,7 +175,7 @@ private:
   *
   * Similar to the textured plane of an image
   * (cf. void mitkImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer,
-  * vtkFloatingPointType planeBounds[6])), the mitkDisplayGeometry defines a view plane (or
+  * double planeBounds[6])), the mitkDisplayGeometry defines a view plane (or
   * projection plane). This plane is used to set the camera parameters. The view plane
   * center (VC) is important for camera positioning (cf. the image above).
   *
@@ -239,7 +238,7 @@ private:
   PickingMode               m_PickingMode;
 
   // Explicit use of SmartPointer to avoid circular #includes
-  itk::SmartPointer< mitk::Mapper > m_CurrentWorldGeometry2DMapper;
+  itk::SmartPointer< mitk::Mapper > m_CurrentWorldPlaneGeometryMapper;
 
   vtkLightKit* m_LightKit;
 
@@ -254,7 +253,6 @@ private:
   DataStorage::SetOfObjects::ConstPointer m_PickingObjects;
   DataStorage::SetOfObjects::const_iterator m_PickingObjectsIterator;
 };
-
 } // namespace mitk
 
 #endif /* MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D */

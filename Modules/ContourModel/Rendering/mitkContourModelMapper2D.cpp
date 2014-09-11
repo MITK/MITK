@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTubeFilter.h>
 #include <vtkSphereSource.h>
 
+#include <mitkPlaneGeometry.h>
 
 mitk::ContourModelMapper2D::ContourModelMapper2D()
 {
@@ -70,7 +71,7 @@ void mitk::ContourModelMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
   this->ApplyContourProperties(renderer);
 
-  localStorage->m_Mapper->SetInput(localStorage->m_OutlinePolyData);
+  localStorage->m_Mapper->SetInputData(localStorage->m_OutlinePolyData);
 
 }
 
@@ -114,8 +115,8 @@ void mitk::ContourModelMapper2D::Update(mitk::BaseRenderer* renderer)
   //check if something important has changed and we need to rerender
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
     || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
-    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) //was the geometry modified?
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime())
     || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
     || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
   {
@@ -137,7 +138,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
 
 
   //check for the worldgeometry from the current render window
-  mitk::PlaneGeometry* currentWorldGeometry = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(renderer->GetCurrentWorldGeometry2D()));
+  mitk::PlaneGeometry* currentWorldGeometry = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::PlaneGeometry*>(renderer->GetCurrentWorldPlaneGeometry()));
 
   if(currentWorldGeometry)
   {
@@ -227,7 +228,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
             sphere->SetRadius(1.2);
             sphere->SetCenter(coordinates[0], coordinates[1], coordinates[2]);
             sphere->Update();
-            appendPoly->AddInput(sphere->GetOutput());
+            appendPoly->AddInputConnection(sphere->GetOutputPort());
           }
         }
 
@@ -252,7 +253,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
           sphere->SetRadius(1.2);
           sphere->SetCenter(coordinates[0], coordinates[1], coordinates[2]);
           sphere->Update();
-          appendPoly->AddInput(sphere->GetOutput());
+          appendPoly->AddInputConnection(sphere->GetOutputPort());
         }
       }
 
@@ -292,7 +293,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
 
         //needed because currently there is no outher solution if the contour is within the plane
         vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
-        tubeFilter->SetInput(polyDataIn3D);
+        tubeFilter->SetInputData(polyDataIn3D);
         tubeFilter->SetRadius(0.05);
 
 
@@ -320,7 +321,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
 
     }//end if (it != end)
 
-    appendPoly->AddInput(resultingPolyData);
+    appendPoly->AddInputData(resultingPolyData);
     appendPoly->Update();
 
     //return contour with control points

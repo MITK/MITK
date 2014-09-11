@@ -35,7 +35,8 @@ class MITK_CORE_EXPORT ResliceMethodProperty : public EnumerationProperty
 public:
 
   mitkClassMacro( ResliceMethodProperty, EnumerationProperty );
-  itkNewMacro(ResliceMethodProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro1Param(ResliceMethodProperty, const IdType&);
   mitkNewMacro1Param(ResliceMethodProperty, const std::string&);
 

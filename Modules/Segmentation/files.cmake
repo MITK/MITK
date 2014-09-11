@@ -68,6 +68,7 @@ set(CPP_FILES
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
   Interactions/mitkWatershedTool.cpp
+  Interactions/mitkPickingTool.cpp
   #IO/mitkContourModelIOFactory.cpp
   #IO/mitkContourModelReader.cpp
   #IO/mitkContourModelWriter.cpp
@@ -99,6 +100,7 @@ set(RESOURCE_FILES
   Otsu_48x48.png
   Paint_48x48.png
   Paint_Cursor_32x32.png
+  Pick_48x48.png
   RegionGrowing_48x48.png
   RegionGrowing_Cursor_32x32.png
   Subtract_48x48.png
@@ -109,4 +111,12 @@ set(RESOURCE_FILES
   Watershed_Cursor_32x32.png
   Wipe_48x48.png
   Wipe_Cursor_32x32.png
+
+  Interactions/dummy.xml
+  Interactions/LiveWireTool.xml
+  Interactions/PressMoveRelease.xml
+  Interactions/PressMoveReleaseAndPointSetting.xml
+  Interactions/PressMoveReleaseWithCTRLInversion.xml
+  Interactions/PressMoveReleaseWithCTRLInversionAllMouseMoves.xml
+  Interactions/SegmentationToolsConfig.xml
 )

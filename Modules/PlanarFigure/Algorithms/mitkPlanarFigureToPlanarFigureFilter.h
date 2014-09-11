@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPlanarFigureToPlanarFigureFilter_H_HEADER_INCLUDED
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 #include "mitkCommon.h"
 #include "mitkPlanarFigureSource.h"
 
@@ -31,17 +31,20 @@ namespace mitk
  *
  * Base class for all filters which have an object of type mitk::PlanarFigure
  * as input and output.
- * @ingroup PlanarFigure_EXPORT
+ * @ingroup MitkPlanarFigure_EXPORT
  */
-class PlanarFigure_EXPORT PlanarFigureToPlanarFigureFilter : public mitk::PlanarFigureSource
+class MitkPlanarFigure_EXPORT PlanarFigureToPlanarFigureFilter : public mitk::PlanarFigureSource
 {
 public:
     mitkClassMacro( PlanarFigureToPlanarFigureFilter, PlanarFigureSource );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef PlanarFigure InputType;
     typedef InputType::Pointer InputTypePointer;
     typedef itk::DataObject::Pointer DataObjectPointer;
+
+    using Superclass::SetInput;
 
     virtual void SetInput( const InputType* figure );
 

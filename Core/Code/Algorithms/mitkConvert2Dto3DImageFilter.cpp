@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkImageAccessByItk.h"
-#include "mitkITKImageImport.h"
+#include "mitkImageCast.h"
 #include "mitkConvert2Dto3DImageFilter.h"
 
 mitk::Convert2Dto3DImageFilter::Convert2Dto3DImageFilter()
@@ -32,13 +32,13 @@ void mitk::Convert2Dto3DImageFilter::GenerateData()
    mitk::Image::ConstPointer inputImage = this->GetInput();
    mitk::Image::Pointer resultImage = this->GetOutput();
 
-  AccessFixedDimensionByItk_1(inputImage,ItkConvert2DTo3D, 2, resultImage);
+  AccessFixedDimensionByItk_1(inputImage, ItkConvert2DTo3D, 2, resultImage);
 
   resultImage->SetGeometry( inputImage->GetGeometry());
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::Convert2Dto3DImageFilter::ItkConvert2DTo3D( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Image::Pointer &mitkImage)
+void mitk::Convert2Dto3DImageFilter::ItkConvert2DTo3D(const itk::Image<TPixel,VImageDimension>* itkImage, mitk::Image::Pointer &mitkImage)
 {
    typedef itk::Image<TPixel,3> itkImageType3D;
    typedef typename itkImageType3D::SizeType::SizeValueType sizeValType;

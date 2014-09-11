@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef IMAGETIMESELECTOR_H_HEADER_INCLUDED_C1E4861D
 #define IMAGETIMESELECTOR_H_HEADER_INCLUDED_C1E4861D
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkSubImageSelector.h"
 
 namespace mitk {
@@ -34,7 +34,8 @@ class MITK_CORE_EXPORT ImageTimeSelector : public SubImageSelector
 public:
   mitkClassMacro(ImageTimeSelector,SubImageSelector);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkGetConstMacro(TimeNr,int);
   itkSetMacro(TimeNr,int);

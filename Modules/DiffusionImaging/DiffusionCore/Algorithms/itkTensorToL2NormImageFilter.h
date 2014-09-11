@@ -39,7 +39,8 @@ namespace itk
     itkStaticConstMacro (ImageDimension, unsigned int,
                          TOutputImage::ImageDimension);
 
-    itkNewMacro (Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef TInputImage                           InputImageType;
     typedef typename InputImageType::PixelType    InputPixelType;

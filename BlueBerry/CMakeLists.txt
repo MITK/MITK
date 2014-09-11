@@ -23,7 +23,7 @@ find_package(mbilog REQUIRED)
 include_directories(${mbilog_INCLUDE_DIRS})
 
 
-find_package(Qt4 4.6.2 REQUIRED)
+find_package(Qt4 4.7 REQUIRED)
 
 if(QT_QMAKE_CHANGED)
   set(QT_HELPGENERATOR_EXECUTABLE NOTFOUND)
@@ -56,7 +56,9 @@ find_program(QT_XMLPATTERNS_EXECUTABLE
   NO_DEFAULT_PATH
 )
 
-option(BLUEBERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ON)
+find_package(Doxygen)
+
+option(BLUEBERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ${DOXYGEN_FOUND})
 
 mark_as_advanced(BLUEBERRY_USE_QT_HELP
                  QT_HELPGENERATOR_EXECUTABLE
@@ -64,30 +66,28 @@ mark_as_advanced(BLUEBERRY_USE_QT_HELP
                  QT_ASSISTANT_EXECUTABLE
                  QT_XMLPATTERNS_EXECUTABLE)
 
-set(_doxygen_too_old 1)
 if(BLUEBERRY_USE_QT_HELP)
-  find_package(Doxygen)
-  if(DOXYGEN_FOUND)
-    execute_process(COMMAND ${DOXYGEN_EXECUTABLE} --version
-                    OUTPUT_VARIABLE _doxygen_version)
-    if(${_doxygen_version} VERSION_GREATER 1.6.0 OR
-       ${_doxygen_version} VERSION_EQUAL 1.6.0)
-      set(_doxygen_too_old 0)
-    endif()
+  set(_force_blueberry_use_qt_help_to_off 0)
+  if(NOT DOXYGEN_FOUND)
+    message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because Doxygen was not found.")
+    set(_force_blueberry_use_qt_help_to_off 1)
   endif()
-
-  if(_doxygen_too_old)
-    message("Doxygen was not found or is too old. Version 1.6.0 or later is needed if BLUEBERRY_USE_QT_HELP is ON")
-    set(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
+  if(DOXYGEN_FOUND AND NOT DOXYGEN_VERSION VERSION_EQUAL 1.8.0)
+    message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because Doxygen version 1.8.0 not found.")
+    set(_force_blueberry_use_qt_help_to_off 1)
   endif()
 
   if(NOT QT_HELPGENERATOR_EXECUTABLE)
-    message("You have enabled Qt Help support, but QT_HELPGENERATOR_EXECUTABLE is empty")
-    set(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
+    message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because QT_HELPGENERATOR_EXECUTABLE is empty.")
+    set(_force_blueberry_use_qt_help_to_off 1)
   endif()
 
   if(NOT QT_XMLPATTERNS_EXECUTABLE)
     message("You have enabled Qt Help support, but QT_XMLPATTERNS_EXECUTABLE is empty")
+    set(_force_blueberry_use_qt_help_to_off 1)
+  endif()
+
+  if(_force_blueberry_use_qt_help_to_off)
     set(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   endif()
 endif(BLUEBERRY_USE_QT_HELP)

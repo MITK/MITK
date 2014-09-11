@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_PLANAR_FIGURE_MAPPER_2D_H_
 
 #include "mitkCommon.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 #include "mitkGLMapper.h"
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarFigureControlPointStyleProperty.h"
@@ -106,13 +106,14 @@ class Contour;
 * \ingroup Mapper
 */
 
-class PlanarFigure_EXPORT PlanarFigureMapper2D : public GLMapper
+class MitkPlanarFigure_EXPORT PlanarFigureMapper2D : public GLMapper
 {
 public:
 
   mitkClassMacro(PlanarFigureMapper2D, GLMapper);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
   * reimplemented from Baseclass
@@ -152,8 +153,8 @@ protected:
   void RenderLines( PlanarFigureDisplayMode lineDisplayMode,
                     mitk::PlanarFigure * planarFigure,
                     mitk::Point2D &anchorPoint,
-                    mitk::Geometry2D * planarFigureGeometry2D,
-                    const mitk::Geometry2D * rendererGeometry2D,
+                    mitk::PlaneGeometry * planarFigurePlaneGeometry,
+                    const mitk::PlaneGeometry * rendererPlaneGeometry,
                     mitk::DisplayGeometry * displayGeometry );
 
   /**
@@ -181,16 +182,16 @@ protected:
   */
   void RenderControlPoints( mitk::PlanarFigure * planarFigure,
                             PlanarFigureDisplayMode lineDisplayMode,
-                            mitk::Geometry2D * planarFigureGeometry2D,
-                            const mitk::Geometry2D * rendererGeometry2D,
+                            mitk::PlaneGeometry * planarFigurePlaneGeometry,
+                            const mitk::PlaneGeometry * rendererPlaneGeometry,
                             mitk::DisplayGeometry * displayGeometry );
 
 
   void TransformObjectToDisplay(
     const mitk::Point2D &point2D,
     mitk::Point2D &displayPoint,
-    const mitk::Geometry2D *objectGeometry,
-    const mitk::Geometry2D *rendererGeometry,
+    const mitk::PlaneGeometry *objectGeometry,
+    const mitk::PlaneGeometry *rendererGeometry,
     const mitk::DisplayGeometry *displayGeometry );
 
   void DrawMarker(
@@ -201,8 +202,8 @@ protected:
     float markerOpacity,
     float lineWidth,
     PlanarFigureControlPointStyleProperty::Shape shape,
-    const mitk::Geometry2D *objectGeometry,
-    const mitk::Geometry2D *rendererGeometry,
+    const mitk::PlaneGeometry *objectGeometry,
+    const mitk::PlaneGeometry *rendererGeometry,
     const mitk::DisplayGeometry *displayGeometry );
 
   /**
@@ -211,8 +212,8 @@ protected:
   void PaintPolyLine( mitk::PlanarFigure::PolyLineType vertices,
     bool closed,
     Point2D& anchorPoint,
-    const Geometry2D* planarFigureGeometry2D,
-    const Geometry2D* rendererGeometry2D,
+    const PlaneGeometry* planarFigurePlaneGeometry,
+    const PlaneGeometry* rendererPlaneGeometry,
     const DisplayGeometry* displayGeometry);
 
   /**
@@ -221,8 +222,8 @@ protected:
   */
   void DrawMainLines( mitk::PlanarFigure* figure,
     Point2D& anchorPoint,
-    const Geometry2D* planarFigureGeometry2D,
-    const Geometry2D* rendererGeometry2D,
+    const PlaneGeometry* planarFigurePlaneGeometry,
+    const PlaneGeometry* rendererPlaneGeometry,
     const DisplayGeometry* displayGeometry) ;
 
   /**
@@ -231,8 +232,8 @@ protected:
   */
   void DrawHelperLines( mitk::PlanarFigure* figure,
     Point2D& anchorPoint,
-    const Geometry2D* planarFigureGeometry2D,
-    const Geometry2D* rendererGeometry2D,
+    const PlaneGeometry* planarFigurePlaneGeometry,
+    const PlaneGeometry* rendererPlaneGeometry,
     const DisplayGeometry* displayGeometry) ;
 
   void InitializeDefaultPlanarFigureProperties();
@@ -269,13 +270,14 @@ private:
   bool m_DrawControlPoints;
   bool m_DrawName;
   bool m_DrawDashed;
+  bool m_DrawHelperDashed;
 
   // the width of the shadow is defined as 'm_LineWidth * m_ShadowWidthFactor'
   float m_LineWidth;
   float m_ShadowWidthFactor;
   float m_OutlineWidth;
   float m_HelperlineWidth;
-  float m_PointWidth;
+  //float m_PointWidth;
 
   PlanarFigureControlPointStyleProperty::Shape m_ControlPointShape;
 
@@ -295,6 +297,9 @@ private:
 
   // Observer-tag for listening to itk::ModifiedEvents on the DataNode
   unsigned long m_NodeModifiedObserverTag;
+
+  // Bool flag that indicates if a node modified observer was added
+  bool m_NodeModifiedObserverAdded;
 };
 
 } // namespace mitk

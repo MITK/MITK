@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_MATERIAL_H_
 #define _MITK_MATERIAL_H_
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkCommon.h>
 #include <itkRGBPixel.h>
 #include <itkObject.h>
@@ -41,7 +41,7 @@ class MITK_CORE_EXPORT Material : public itk::Object
 public:
     mitkClassMacro( Material, itk::Object );
 
-    typedef itk::RGBPixel<vtkFloatingPointType> Color;
+    typedef itk::RGBPixel<double> Color;
 
     enum InterpolationType
     {
@@ -80,7 +80,7 @@ public:
      *              are forwarded. Please note, that if this node doesn't have the
      *              needed properties associated, they will be added.
      */
-    static Pointer New( Color color, vtkFloatingPointType opacity = 1.0f)
+    static Pointer New( Color color, double opacity = 1.0f)
     {
       Pointer smartPtr = new Material(color, opacity );
       smartPtr->UnRegister();
@@ -99,7 +99,7 @@ public:
      *        are forwarded. Please note, that if this node doesn't have the
      *        needed properties associated, they will be added.
      */
-    static Pointer New( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0f)
+    static Pointer New( double red, double green, double blue, double opacity = 1.0f)
     {
       Pointer smartPtr = new Material(red, green, blue, opacity );
       smartPtr->UnRegister();
@@ -124,8 +124,8 @@ public:
      *        are forwarded. Please note, that if this node doesn't have the
      *        needed properties associated, they will be added.
      */
-    static Pointer New( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType colorCoefficient,
-        vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity )
+    static Pointer New( double red, double green, double blue, double colorCoefficient,
+        double specularCoefficient, double specularPower, double opacity )
     {
       Pointer smartPtr = new Material(red, green, blue, colorCoefficient, specularCoefficient, specularPower, opacity );
       smartPtr->UnRegister();
@@ -150,7 +150,7 @@ public:
      *        are forwarded. Please note, that if this node doesn't have the
      *        needed properties associated, they will be added.
      */
-    static Pointer New( Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity )
+    static Pointer New( Color color, double colorCoefficient, double specularCoefficient, double specularPower, double opacity )
     {
       Pointer smartPtr = new Material(color, colorCoefficient, specularCoefficient, specularPower, opacity );
       smartPtr->UnRegister();
@@ -166,7 +166,7 @@ public:
      * Copy constructor, provided for convinience. The values are copied from property
      * and afterwards the values provided for red green blue and opacity are written into the object.
      */
-    static Pointer New( const Material& property, vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0, std::string name = "" )
+    static Pointer New( const Material& property, double red, double green, double blue, double opacity = 1.0, std::string name = "" )
     {
       Pointer smartPtr = new Material(property, red, green, blue, opacity, name );
       smartPtr->UnRegister();
@@ -189,14 +189,14 @@ public:
      * @param green the green component of the materials color (range [0..1])
      * @param blue the blue component of the materials color (range [0..1])
      */
-    virtual void SetColor( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue );
+    virtual void SetColor( double red, double green, double blue );
 
     /**
      * Sets a attenuation coefficient for the color. A value of 0 results in
      * a black object. VAlid range is [0..1]
      * @param coefficient the color attenuation coefficient
      */
-    virtual void SetColorCoefficient( vtkFloatingPointType coefficient );
+    virtual void SetColorCoefficient( double coefficient );
 
     /**
      * Sets the specular color
@@ -211,7 +211,7 @@ public:
      * @param green the green component of the specular color (range [0..1])
      * @param blue the blue component of the specular color (range [0..1])
      */
-    virtual void SetSpecularColor( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue );
+    virtual void SetSpecularColor( double red, double green, double blue );
 
     /**
      * Sets the specular coefficient which controls the shininess of the object
@@ -219,7 +219,7 @@ public:
      * @param specularCoefficient the new specular coefficient. Valid range
      *        is [0..1]
      */
-    virtual void SetSpecularCoefficient( vtkFloatingPointType specularCoefficient );
+    virtual void SetSpecularCoefficient( double specularCoefficient );
 
     /**
      * Sets the specular power which controls the shininess of the object
@@ -227,7 +227,7 @@ public:
      * @param specularCoefficient the new specular coefficient. Valid range
      *        is [0..inf]
      */
-    virtual void SetSpecularPower( vtkFloatingPointType specularPower );
+    virtual void SetSpecularPower( double specularPower );
 
     /**
      * Sets the opacity of the material, which controls how transparent the
@@ -235,7 +235,7 @@ public:
      * and 1 means a solid surface.
      * @param opacity the new opacity of the material
      */
-    virtual void SetOpacity( vtkFloatingPointType opacity );
+    virtual void SetOpacity( double opacity );
 
     /**
      * Sets the surface interpolation method of the object rendered using the
@@ -268,7 +268,7 @@ public:
     /**
      * @returns the color coefficient of the material. Range is [0..1]
      */
-    virtual vtkFloatingPointType GetColorCoefficient() const;
+    virtual double GetColorCoefficient() const;
 
     /**
      * @returns the specular color of the material in rgb values, which
@@ -279,17 +279,17 @@ public:
     /**
      * @returns the specular coefficient used for rendering. Range is [0..1]
      */
-    virtual vtkFloatingPointType GetSpecularCoefficient() const;
+    virtual double GetSpecularCoefficient() const;
 
     /**
      * @returns the specular power. Ranges from 0 to infinity
      */
-    virtual vtkFloatingPointType GetSpecularPower() const;
+    virtual double GetSpecularPower() const;
 
     /**
      * @returns the opacity of the material. Ranges from 0 to 1
      */
-    virtual vtkFloatingPointType GetOpacity() const;
+    virtual double GetOpacity() const;
 
     /**
      * @returns the interpolation method used for rendering.
@@ -373,7 +373,7 @@ protected:
    *              are forwarded. Please note, that if this node doesn't have the
    *              needed properties associated, they will be added.
    */
-  Material( Color color, vtkFloatingPointType opacity = 1.0f );
+  Material( Color color, double opacity = 1.0f );
 
   /**
    * Constructor. All values besides the given ones are set to defaults as
@@ -387,7 +387,7 @@ protected:
    *        are forwarded. Please note, that if this node doesn't have the
    *        needed properties associated, they will be added.
    */
-  Material( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0f );
+  Material( double red, double green, double blue, double opacity = 1.0f );
 
   /**
    * Constructor. All values besides the given ones are set to defaults as
@@ -407,8 +407,8 @@ protected:
    *        are forwarded. Please note, that if this node doesn't have the
    *        needed properties associated, they will be added.
    */
-  Material( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType colorCoefficient,
-    vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity );
+  Material( double red, double green, double blue, double colorCoefficient,
+    double specularCoefficient, double specularPower, double opacity );
 
   /**
    * Constructor. All values besides the given ones are set to defaults as
@@ -428,7 +428,7 @@ protected:
    *        are forwarded. Please note, that if this node doesn't have the
    *        needed properties associated, they will be added.
    */
-  Material( Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity );
+  Material( Color color, double colorCoefficient, double specularCoefficient, double specularPower, double opacity );
 
   /**
    * Copy constructor
@@ -439,7 +439,7 @@ protected:
    * Copy constructor, provided for convinience. The values are copied from property
    * and afterwards the values provided for red green blue and opacity are written into the object.
    */
-  Material( const Material& property, vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0, std::string name = "");
+  Material( const Material& property, double red, double green, double blue, double opacity = 1.0, std::string name = "");
 
 
     virtual void InitializeStandardValues();
@@ -452,13 +452,13 @@ protected:
 
     Color m_SpecularColor;
 
-    vtkFloatingPointType m_ColorCoefficient;
+    double m_ColorCoefficient;
 
-    vtkFloatingPointType m_SpecularCoefficient;
+    double m_SpecularCoefficient;
 
-    vtkFloatingPointType m_SpecularPower;
+    double m_SpecularPower;
 
-    vtkFloatingPointType m_Opacity;
+    double m_Opacity;
 
     float m_LineWidth;
 

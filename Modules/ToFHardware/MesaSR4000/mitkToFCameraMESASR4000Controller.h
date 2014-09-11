@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraMESASR4000Controller_h
 #define __mitkToFCameraMESASR4000Controller_h
 
-#include "mitkMESASR4000ModuleExports.h"
+#include <MitkMESASR4000ModuleExports.h>
 #include "mitkCommon.h"
 #include "mitkToFCameraMESAController.h"
 
@@ -37,7 +37,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraMESASR4000Controller , mitk::ToFCameraMESAController );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief opens a connection to the ToF camera and initializes the hardware specific members

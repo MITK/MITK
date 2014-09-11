@@ -56,7 +56,7 @@ ImportMitkImageContainer< TElementIdentifier , TElement >
 template <typename TElementIdentifier, typename TElement>
 void
 ImportMitkImageContainer< TElementIdentifier , TElement >
-::SetImageAccessor(mitk::ImageWriteAccessor* imageAccess, size_t noOfBytes)
+::SetImageAccessor(mitk::ImageAccessorBase* imageAccess, size_t noOfBytes)
 {
   m_imageAccess = imageAccess;
 

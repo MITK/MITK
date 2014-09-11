@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace ATL;
 
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <iostream>
 
 using std::cout;

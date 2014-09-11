@@ -18,12 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSegTool2D_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkTool.h"
 #include "mitkImage.h"
 
 #include "mitkStateEvent.h"
-#include "mitkPositionEvent.h"
+#include "mitkInteractionPositionEvent.h"
 
 #include "mitkPlanePositionManager.h"
 #include "mitkRestorePlanePositionOperation.h"
@@ -58,7 +58,7 @@ class BaseRenderer;
 
   $Author$
 */
-class Segmentation_EXPORT SegTool2D : public Tool
+class MitkSegmentation_EXPORT SegTool2D : public Tool
 {
   public:
 
@@ -86,17 +86,34 @@ class Segmentation_EXPORT SegTool2D : public Tool
     SegTool2D(const char*); // purposely hidden
     virtual ~SegTool2D();
 
+    struct SliceInformation
+    {
+      mitk::Image::Pointer slice;
+      mitk::PlaneGeometry* plane;
+      unsigned int timestep;
+
+      SliceInformation () {}
+
+      SliceInformation (mitk::Image* slice, mitk::PlaneGeometry* plane, unsigned int timestep)
+      {
+        this->slice = slice;
+        this->plane = plane;
+        this->timestep = timestep;
+      }
+
+    };
+
     /**
     * \brief Calculates how good the data, this statemachine handles, is hit by the event.
     *
     */
-    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
+    virtual float CanHandleEvent( InteractionEvent const *stateEvent) const;
 
     /**
       \brief Extract the slice of an image that the user just scribbles on.
       \return NULL if SegTool2D is either unable to determine which slice was affected, or if there was some problem getting the image data at that position.
     */
-    Image::Pointer GetAffectedImageSliceAs2DImage(const PositionEvent*, const Image* image);
+    Image::Pointer GetAffectedImageSliceAs2DImage(const InteractionPositionEvent*, const Image* image);
 
     /**
       \brief Extract the slice of an image cut by given plane.
@@ -109,33 +126,37 @@ class Segmentation_EXPORT SegTool2D : public Tool
       \return NULL if SegTool2D is either unable to determine which slice was affected, or if there was some problem getting the image data at that position,
                    or just no working image is selected.
     */
-    Image::Pointer GetAffectedWorkingSlice(const PositionEvent*);
+    Image::Pointer GetAffectedWorkingSlice(const InteractionPositionEvent*);
 
     /**
       \brief Extract the slice of the currently selected reference image that the user just scribbles on.
       \return NULL if SegTool2D is either unable to determine which slice was affected, or if there was some problem getting the image data at that position,
                    or just no reference image is selected.
     */
-    Image::Pointer GetAffectedReferenceSlice(const PositionEvent*);
+    Image::Pointer GetAffectedReferenceSlice(const InteractionPositionEvent*);
 
-    void WriteBackSegmentationResult (const PositionEvent*, Image*);
+    void WriteBackSegmentationResult (const InteractionPositionEvent*, Image*);
 
     void WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image*, unsigned int timeStep);
+
+    void WriteBackSegmentationResult (std::vector<SliceInformation> sliceList);
 
     /**
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure.
              By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry
     */
 
-    unsigned int AddContourmarker ( const PositionEvent* );
+    unsigned int AddContourmarker ();
 
     void InteractiveSegmentationBugMessage( const std::string& message );
-
 
     BaseRenderer*         m_LastEventSender;
     unsigned int          m_LastEventSlice;
 
   private:
+
+    void WriteSliceToVolume (SliceInformation sliceInfo);
+
     //The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string     m_Contourmarkername;
 

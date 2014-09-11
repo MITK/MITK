@@ -19,25 +19,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PLANAR_FOURPOINTANGLE_H_
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 
 
 namespace mitk
 {
 
-class Geometry2D;
+class PlaneGeometry;
 
 /**
  * \brief Implementation of PlanarFigure representing a four point
  * angle, which is defined by two non-intersecting lines in 2D. Each of those lines
  * is defined by two control points.
  */
-class PlanarFigure_EXPORT PlanarFourPointAngle : public PlanarFigure
+class MitkPlanarFigure_EXPORT PlanarFourPointAngle : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarFourPointAngle, PlanarFigure );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 public:
   // Feature identifiers
   const unsigned int FEATURE_ID_ANGLE;
@@ -63,6 +64,7 @@ public:
     return 4;
   }
 
+ virtual bool Equals(const mitk::PlanarFigure& other) const ;
 
 protected:
   PlanarFourPointAngle();

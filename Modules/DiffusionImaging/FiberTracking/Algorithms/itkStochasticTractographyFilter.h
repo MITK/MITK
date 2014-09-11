@@ -50,7 +50,8 @@ public:
   typedef SmartPointer< Self > Pointer;
   typedef SmartPointer< const Self > ConstPointer;
 
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   itkTypeMacro( StochasticTractographyFilter,
             ImageToImageFilter )
 

@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_example_gui_imaging org.mitk.example.gui.imaging
+  \ingroup MITKExamplePlugins
+
+  \brief Example plug-in demonstrating various imaging related techniques.
+  
+*/
+
+/**
+  \defgroup org_mitk_example_gui_imaging_internal Internal
+  \ingroup org_mitk_example_gui_imaging
+
+  \brief This subcategory includes the internal classes of the org.mitk.example.gui.imaging plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkExtrudedContour.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "mitkBaseProcess.h"
 #include "mitkProportionalTimeGeometry.h"
 
@@ -61,15 +61,15 @@ mitk::ExtrudedContour::ExtrudedContour()
   m_ExtrusionFilter->SetVector(vtkvector);
 
   m_TriangleFilter = vtkTriangleFilter::New();
-  m_TriangleFilter->SetInput(m_ExtrusionFilter->GetOutput());
+  m_TriangleFilter->SetInputConnection(m_ExtrusionFilter->GetOutputPort());
 
   m_SubdivisionFilter = vtkLinearSubdivisionFilter::New();
-  m_SubdivisionFilter->SetInput(m_TriangleFilter->GetOutput());
+  m_SubdivisionFilter->SetInputConnection(m_TriangleFilter->GetOutputPort());
   m_SubdivisionFilter->SetNumberOfSubdivisions(4);
 
   m_ClippingBox = vtkPlanes::New();
   m_ClipPolyDataFilter = vtkClipPolyData::New();
-  m_ClipPolyDataFilter->SetInput(m_SubdivisionFilter->GetOutput());
+  m_ClipPolyDataFilter->SetInputConnection(m_SubdivisionFilter->GetOutputPort());
   m_ClipPolyDataFilter->SetClipFunction(m_ClippingBox);
   m_ClipPolyDataFilter->InsideOutOn();
 
@@ -174,7 +174,7 @@ void mitk::ExtrudedContour::BuildSurface()
   polyData->SetPolys( polys );
   polys->Delete();
 
-  m_ExtrusionFilter->SetInput(polyData);
+  m_ExtrusionFilter->SetInputData(polyData);
 
   polyData->Delete();
 
@@ -291,8 +291,8 @@ void mitk::ExtrudedContour::BuildGeometry()
   mitk::Point2D pt2d;
   mitk::Point3D pt3d;
   mitk::Point2D min, max;
-  min.Fill(ScalarTypeNumericTraits::max());
-  max.Fill(ScalarTypeNumericTraits::min());
+  min.Fill(itk::NumericTraits<mitk::ScalarType>::max());
+  max.Fill(itk::NumericTraits<mitk::ScalarType>::min());
   xProj[2]=0.0;
   for(i=0, ccur=cstart; i<numPts; ++i, ccur+=cstep)
   {
@@ -331,7 +331,7 @@ void mitk::ExtrudedContour::BuildGeometry()
   // Part III: initialize geometry
   if(m_ClippingGeometry.IsNotNull())
   {
-    ScalarType min_dist=ScalarTypeNumericTraits::max(), max_dist=ScalarTypeNumericTraits::min(), dist;
+    ScalarType min_dist=itk::NumericTraits<mitk::ScalarType>::max(), max_dist=itk::NumericTraits<mitk::ScalarType>::min(), dist;
     unsigned char i;
     for(i=0; i<8; ++i)
     {
@@ -349,11 +349,10 @@ void mitk::ExtrudedContour::BuildGeometry()
 
   itk2vtk(origin, m_Origin);
 
-  mitk::Geometry3D::Pointer g3d = GetGeometry( 0 );
+  mitk::BaseGeometry::Pointer g3d = GetGeometry( 0 );
   assert( g3d.IsNotNull() );
   g3d->SetBounds(bounds);
   g3d->SetIndexToWorldTransform(m_ProjectionPlane->GetIndexToWorldTransform());
-  g3d->TransferItkToVtkTransform();
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(g3d,1);

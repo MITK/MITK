@@ -14,11 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKRENDERWINDOWBASE_H_HEADER_INCLUDED_C1C40D66ASDF
 #define MITKRENDERWINDOWBASE_H_HEADER_INCLUDED_C1C40D66ASDF
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 #include "mitkVtkPropRenderer.h"
 #include "vtkMitkRenderProp.h"
@@ -29,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
 /**
  * \brief Base class of MITK RenderWindows
  *
@@ -44,13 +42,11 @@ namespace mitk
 
 class MITK_CORE_EXPORT RenderWindowBase
 {
-
-
 public:
 
   //mitkClassMacro(RenderWindowBase,itk::Object);
-  //itkNewMacro(Self);
-
+  //itkFactorylessNewMacro(Self)
+  //itkCloneMacro(Self)
 
   virtual ~RenderWindowBase();
 
@@ -82,7 +78,7 @@ protected:
   RenderWindowBase();
 
   // helper functions: within constructors and destructors classes are not polymorph.
-  void Initialize( mitk::RenderingManager* renderingManager = NULL, const char* name = "unnamed renderer" );
+  void Initialize( mitk::RenderingManager* renderingManager = NULL, const char* name = "unnamed renderer",mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard );
   void Destroy();
 
   mitk::VtkPropRenderer::Pointer m_Renderer;
@@ -92,9 +88,7 @@ protected:
   bool                           m_InResize;
 
   private:
-
 };
-
 }
 
 #endif /* MITKRENDERWINDOWBASE_H_HEADER_INCLUDED_C1C40D66ASDF */

@@ -36,7 +36,9 @@ namespace mitk {
     {
     public:
       mitkClassMacro(USProbe,itk::Object);
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
+      mitkNewMacro1Param(Self, std::string);
 
       /**
       * \brief Compares this probe to another probe and returns true if they are equal in terms of name AND NAME ONLY
@@ -52,6 +54,7 @@ namespace mitk {
 
     protected:
       USProbe();
+      USProbe(std::string identifier);
       virtual ~USProbe();
 
       std::string m_Name;

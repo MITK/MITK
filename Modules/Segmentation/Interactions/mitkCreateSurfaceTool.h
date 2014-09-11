@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkCreateSurfaceTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkSegmentationsProcessingTool.h"
 
 namespace mitk
@@ -32,12 +32,13 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class Segmentation_EXPORT CreateSurfaceTool : public SegmentationsProcessingTool
+class MitkSegmentation_EXPORT CreateSurfaceTool : public SegmentationsProcessingTool
 {
   public:
 
     mitkClassMacro(CreateSurfaceTool, SegmentationsProcessingTool);
-    itkNewMacro(CreateSurfaceTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;

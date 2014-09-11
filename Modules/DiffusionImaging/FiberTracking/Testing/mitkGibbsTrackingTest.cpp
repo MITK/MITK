@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkQBallImage.h>
 #include <mitkBaseDataIOFactory.h>
-#include <mitkFiberTrackingObjectFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <itkGibbsTrackingFilter.h>
 #include <mitkFiberBundleX.h>
 
@@ -45,9 +43,6 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     MITK_INFO << "Parameter file: " << argv[3];
     MITK_INFO << "Reference bundle: " << argv[4];
 
-    RegisterDiffusionCoreObjectFactory();
-    RegisterFiberTrackingObjectFactory();
-
     const std::string s1="", s2="";
     std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[1], s1, s2, false );
     mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());
@@ -67,10 +62,10 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     typedef itk::GibbsTrackingFilter<OdfVectorImgType> GibbsTrackingFilterType;
 
     OdfVectorImgType::Pointer itk_qbi = OdfVectorImgType::New();
-    mitk::CastToItkImage<OdfVectorImgType>(mitkQballImage, itk_qbi);
+    mitk::CastToItkImage(mitkQballImage, itk_qbi);
 
     MaskImgType::Pointer itk_mask = MaskImgType::New();
-    mitk::CastToItkImage<MaskImgType>(mitkMaskImage, itk_mask);
+    mitk::CastToItkImage(mitkMaskImage, itk_mask);
 
     GibbsTrackingFilterType::Pointer gibbsTracker = GibbsTrackingFilterType::New();
     gibbsTracker->SetQBallImage(itk_qbi.GetPointer());

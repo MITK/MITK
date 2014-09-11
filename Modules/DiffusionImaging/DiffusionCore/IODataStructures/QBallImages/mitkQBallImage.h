@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorImage.h"
 #include "mitkImageVtkAccessor.h"
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 // generate by n-fold subdivisions of an icosahedron
 // 1 - 12
@@ -43,25 +43,28 @@ namespace mitk
   /**
   * \brief this class encapsulates qball images
   */
-  class DiffusionCore_EXPORT QBallImage : public Image
+  class MitkDiffusionCore_EXPORT QBallImage : public Image
   {
 
   public:
 
     mitkClassMacro( QBallImage, Image );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-    virtual ImageVtkAccessor* GetNonRgbVtkImageData(int t = 0, int n = 0);
+    virtual const vtkImageData* GetNonRgbVtkImageData(int t = 0, int n = 0) const;
+    virtual vtkImageData* GetNonRgbVtkImageData(int t = 0, int n = 0);
 
-    virtual ImageVtkAccessor* GetVtkImageData(int t = 0, int n = 0);
+    virtual const vtkImageData* GetVtkImageData(int t = 0, int n = 0) const;
+    virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
 
-    virtual void ConstructRgbImage();
+    virtual void ConstructRgbImage() const;
 
   protected:
     QBallImage();
     virtual ~QBallImage();
 
-    mitk::Image::Pointer m_RgbImage;
+    mutable mitk::Image::Pointer m_RgbImage;
 
   };
 

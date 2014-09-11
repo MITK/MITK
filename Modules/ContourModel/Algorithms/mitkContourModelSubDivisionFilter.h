@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkContourModelSubDivisionFilter_h__
 
 #include "mitkCommon.h"
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 #include "mitkContourModel.h"
 #include "mitkContourModelSource.h"
 
@@ -38,13 +38,14 @@ namespace mitk {
   * \ingroup ContourModelFilters
   * \ingroup Process
   */
-  class ContourModel_EXPORT ContourModelSubDivisionFilter : public ContourModelSource
+  class MitkContourModel_EXPORT ContourModelSubDivisionFilter : public ContourModelSource
   {
 
   public:
 
     mitkClassMacro(ContourModelSubDivisionFilter, ContourModelSource);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
 
     typedef ContourModel OutputType;
@@ -59,6 +60,8 @@ namespace mitk {
     {
       this->m_InterpolationIterations = iterations;
     }
+
+    using Superclass::SetInput;
 
     virtual void SetInput( const InputType *input);
 

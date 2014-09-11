@@ -73,7 +73,6 @@ void QmitkPartialVolumeAnalysisWidget::SetParameters( ParamsType *params, Result
 
 
     std::vector<double> *xVals = hist->GetXVals();
-    std::vector<double> *yVals = hist->GetHVals();
     std::vector<double> *fiberVals = new std::vector<double>(results->GetFiberVals());
     std::vector<double> *nonFiberVals = new std::vector<double>(results->GetNonFiberVals());
     std::vector<double> *mixedVals = new std::vector<double>(results->GetMixedVals());
@@ -83,7 +82,7 @@ void QmitkPartialVolumeAnalysisWidget::SetParameters( ParamsType *params, Result
     double fiberFA = 0.0;
     double weights = 0.0;
 
-    for(int i=0; i<xVals->size(); ++i)
+    for(unsigned int i=0; i<xVals->size(); ++i)
     {
 
       fiberFA += xVals->at(i) * fiberVals->at(i);

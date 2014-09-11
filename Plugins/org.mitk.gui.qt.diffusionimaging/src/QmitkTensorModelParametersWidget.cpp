@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkTensorModelParametersWidget::VIEW_ID = "org.mitk.views.tensormodelparameterswidget";
 
-QmitkTensorModelParametersWidget::QmitkTensorModelParametersWidget( QWidget * parent, Qt::WindowFlags f )
+QmitkTensorModelParametersWidget::QmitkTensorModelParametersWidget( QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
 {
     m_Controls = NULL;
@@ -57,7 +57,7 @@ void QmitkTensorModelParametersWidget::UpdateUi()
     m_Controls->m_FaLabel->setText(QString::number(tensor.GetFractionalAnisotropy()));
 }
 
-void QmitkTensorModelParametersWidget::DChanged( double value )
+void QmitkTensorModelParametersWidget::DChanged( double )
 {
     UpdateUi();
 }

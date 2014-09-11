@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include<itkCommand.h>
 #include <itkEventObject.h>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk
 {

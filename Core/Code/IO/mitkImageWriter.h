@@ -37,7 +37,8 @@ public:
 
     mitkClassMacro( ImageWriter, mitk::FileWriter );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     mitkWriterMacro;
 
@@ -136,6 +137,8 @@ public:
     virtual bool CanWriteBaseDataType(BaseData::Pointer data);
     virtual void DoWrite(BaseData::Pointer data);
 
+    void SetUseCompression( bool useCompression );
+
 protected:
 
     /**
@@ -163,6 +166,8 @@ protected:
     std::string m_Extension;
 
     std::string m_MimeType;
+
+    bool m_UseCompression;
 };
 
 }

@@ -21,17 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkProperties.h"
 
-#include "SceneSerializationBaseExports.h"
+#include <MitkSceneSerializationBaseExports.h>
 
 namespace mitk
 {
 
-class SceneSerializationBase_EXPORT FloatLookupTablePropertySerializer : public BasePropertySerializer
+class MitkSceneSerializationBase_EXPORT FloatLookupTablePropertySerializer : public BasePropertySerializer
 {
   public:
 
     mitkClassMacro( FloatLookupTablePropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {

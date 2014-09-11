@@ -1,7 +1,9 @@
 /**
 \page org_mitk_views_basicimageprocessing The Basic Image Processing Plugin
 
-\image html ImageProcessing_48.png "Icon of the Plugin"
+\imageMacro{QmitkBasicImageProcessing_ImageProcessing_48.png,"Icon of the Basic Image Processing Plugin",2.00}
+
+\tableofcontents
 
 \section QmitkBasicImageProcessingUserManualSummary Summary
 
@@ -9,26 +11,18 @@ This view provides an easy interface to fundamental image preprocessing and enha
 It offers filter operations on 3D and 4D images in the areas of noise suppression, morphological operations, edge detection and image arithmetics, 
 as well as image inversion and downsampling.
 
-Please see \ref QmitkBasicImageProcessingUserManualDetails for more detailed information on usage and supported filters.
+Please see \ref QmitkBasicImageProcessingUserManualOverview for more detailed information on usage and supported filters.
 If you encounter problems using the view, please have a look at the \ref QmitkBasicImageProcessingUserManualTrouble page.
-
-\section QmitkBasicImageProcessingUserManualDetails Details
-
-Manual sections:
-
-- \ref QmitkBasicImageProcessingUserManualOverview 
-- \ref QmitkBasicImageProcessingUserManualFilters 
-- \ref QmitkBasicImageProcessingUserManualUsage
-- \ref QmitkBasicImageProcessingUserManualTrouble
 
 \section QmitkBasicImageProcessingUserManualOverview Overview
 
 This view provides an easy interface to fundamental image preprocessing and image enhancement filters.
 It offers a variety of filter operations in the areas of noise suppression, morphological operations, edge detection and image arithmetics.
-At the moment, the view can be used with all 3D and 4D image types loadable by MITK. 2D image support will be added in the future. 
+Currently the view can be used with all 3D and 4D image types loadable by MITK.
+2D image support will be added in the future.
 All filters are encapsulated from the Insight Segmentation and Registration Toolkit (ITK, www.itk.org). 
 
-\image html BIP_Overview.png "MITK with the Basic Image Processing view"
+\imageMacro{QmitkBasicImageProcessing_BIP_Overview.png,"MITK with the Basic Image Processing view",16.00}
 
 This document will tell you how to use this view, but it is assumed that you already know how to use MITK in general.
 

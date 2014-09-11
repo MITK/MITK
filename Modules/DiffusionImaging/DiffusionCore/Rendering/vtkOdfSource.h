@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __vtkOdfSource_h
 #define __vtkOdfSource_h
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 #include "vtkPolyDataAlgorithm.h"
 #include "mitkCommon.h"
@@ -25,10 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkOrientationDistributionFunction.h>
 #include <mitkOdfNormalizationMethodProperty.h>
 
-class DiffusionCore_EXPORT vtkOdfSource : public vtkPolyDataAlgorithm
+class MitkDiffusionCore_EXPORT vtkOdfSource : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkOdfSource,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkOdfSource,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   typedef itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> OdfType;

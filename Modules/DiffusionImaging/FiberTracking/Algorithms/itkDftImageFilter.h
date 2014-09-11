@@ -22,7 +22,7 @@ This file is based heavily on a corresponding ITK filter.
 #ifndef __itkDftImageFilter_h_
 #define __itkDftImageFilter_h_
 
-#include "FiberTrackingExports.h"
+#include <MitkFiberTrackingExports.h>
 #include <itkImageToImageFilter.h>
 #include <itkDiffusionTensor3D.h>
 #include <vcl_complex.h>
@@ -45,7 +45,8 @@ namespace itk{
     typedef ImageToImageFilter< Image< vcl_complex< TPixelType > >, Image< TPixelType > > Superclass;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Runtime information support. */
     itkTypeMacro(DftImageFilter, ImageToImageFilter)

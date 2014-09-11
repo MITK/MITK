@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkVtkMapper.h>
 #include <vtkSmartPointer.h>
-#include <PlanarFigureExports.h>
+#include <MitkPlanarFigureExports.h>
 
 namespace mitk
 {
-  class PlanarFigure_EXPORT PlanarFigureVtkMapper3D : public VtkMapper
+  class MitkPlanarFigure_EXPORT PlanarFigureVtkMapper3D : public VtkMapper
   {
     class LocalStorage
     {
@@ -43,7 +43,8 @@ namespace mitk
     static void SetDefaultProperties(DataNode*, BaseRenderer* = NULL, bool = false);
 
     mitkClassMacro(PlanarFigureVtkMapper3D, VtkMapper);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtkActor* actor);
     void ApplyPlanarFigureProperties(BaseRenderer* renderer, vtkActor* actor);

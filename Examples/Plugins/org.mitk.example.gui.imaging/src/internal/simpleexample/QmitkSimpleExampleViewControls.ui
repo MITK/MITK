@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkSimpleExampleViewControls</class>
+ <widget class="QWidget" name="QmitkSimpleExampleViewControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>298</width>
+    <height>610</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="mouseTracking">
+   <bool>false</bool>
+  </property>
+  <property name="windowTitle">
+   <string>Form1</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Render Window</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="renderWindowComboBox"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Slice</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QmitkSliderNavigatorWidget" name="sliceNavigator" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Time</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QmitkSliderNavigatorWidget" name="sliceNavigatorTime" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="m_TakeScreenshotBtn">
+     <property name="text">
+      <string>Take Screenshot</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="m_TakeHighResScreenShotBtn">
+     <property name="toolTip">
+      <string>Screenshot will be 4 times larger than current render window size</string>
+     </property>
+     <property name="text">
+      <string>Take HighDef 3D Screenshot</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="genMovieButton">
+     <property name="maximumSize">
+      <size>
+       <width>32767</width>
+       <height>23</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Generate Movie</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Movie</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QmitkPrimitiveMovieNavigatorWidget" name="movieNavigatorTime" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QComboBox" name="stereoSelect">
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>0</height>
+      </size>
+     </property>
+     <item>
+      <property name="text">
+       <string>stereo off</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>red-blue stereo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>D4D stereo</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="reInitializeNavigatorsButton">
+     <property name="text">
+      <string>Re-initialize Navigators</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="spacer1">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>230</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="0" margin="0"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkSliderNavigatorWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkSliderNavigatorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkPrimitiveMovieNavigatorWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkPrimitiveMovieNavigatorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>stereoSelect</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

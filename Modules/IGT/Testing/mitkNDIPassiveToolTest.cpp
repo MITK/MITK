@@ -15,18 +15,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNDIPassiveTool.h"
-
 #include "mitkTestingMacros.h"
-
-#include "mitkStandardFileLocations.h"
-
+#include "mitkIGTConfig.h"
 #include <iostream>
 
 /**Documentation
-* NDIPassiveTool has a protected constructor and a protected itkNewMacro
+* NDIPassiveTool has a protected constructor and a protected itkFactorylessNewMacro
 * so that only it's friend class NDITrackingDevice is able to instantiate
 * tool objects. Therefore, we derive from NDIPassiveTool and add a
-* public itkNewMacro, so that we can instantiate and test the class
+* public itkFactorylessNewMacro, so that we can instantiate and test the class
 */
 class NDIPassiveToolTestClass : public mitk::NDIPassiveTool
 {
@@ -36,7 +33,8 @@ public:
   /** make a public constructor, so that the test is able
   *   to instantiate NDIPassiveTool
   */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 protected:
   NDIPassiveToolTestClass() : mitk::NDIPassiveTool()
@@ -68,7 +66,8 @@ int mitkNDIPassiveToolTest(int /* argc */, char* /*argv*/[])
   myNDIPassiveTool->SetTrackingPriority(mitk::NDIPassiveTool::Static);
   MITK_TEST_CONDITION(myNDIPassiveTool->GetTrackingPriority()==mitk::NDIPassiveTool::Static,"Testing Set/GetTrackingPriority() with 'Static'");
 
-  std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("SROMFile.rom", "Modules/IGT/Testing/Data");
+  std::string file(MITK_IGT_DATA_DIR);
+  file.append("/SROMFile.rom");
   const char *name = file.c_str();
   const char *name2 = "";
   MITK_TEST_CONDITION(myNDIPassiveTool->LoadSROMFile(name) == true ,"Test LoadSROMFile() with valid file")

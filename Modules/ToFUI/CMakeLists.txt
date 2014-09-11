@@ -1,8 +1,7 @@
-MITK_CREATE_MODULE(mitkTOFUI
+MITK_CREATE_MODULE(
   SUBPROJECTS MITK-ToF
   INCLUDE_DIRS Qmitk
-  DEPENDS mitkToFHardware mitkToFProcessing Qmitk QmitkExt Overlays
-  QT_MODULE
+  DEPENDS MitkToFHardware MitkToFProcessing MitkQtWidgetsExt MitkOverlays
   GENERATED_CPP ${TOOL_GUI_CPPS} ${TOOL_CPPS}
 )
 

@@ -18,17 +18,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTool.h"
 #include "mitkPointSet.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkStateEvent.h"
 
 #include "itkImage.h"
 
 namespace mitk{
-  class Segmentation_EXPORT RegionGrow3DTool : public Tool
+
+  class StateMachineAction;
+  class InteractionEvent;
+
+  class MitkSegmentation_EXPORT RegionGrow3DTool : public Tool
   {
   public:
     mitkClassMacro(RegionGrow3DTool, Tool);
-    itkNewMacro(RegionGrow3DTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     mitk::Message1<int> UpperThresholdValueChanged;
     mitk::Message1<int> LowerThresholdValueChanged;
@@ -58,9 +63,9 @@ namespace mitk{
     void SetupPreviewNodeFor(mitk::DataNode* nodeToProceed);
     void UpdatePreview();
     template < typename TPixel, unsigned int VImageDimension >
-    void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint );
+    void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint );
 
-    bool OnMouseReleased(Action*, const StateEvent*);
+    bool OnMouseReleased( StateMachineAction*, InteractionEvent*  );
 
 
     int m_SeedpointValue;

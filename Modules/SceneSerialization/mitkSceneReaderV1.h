@@ -24,7 +24,8 @@ class SceneReaderV1 : public SceneReader
   public:
 
     mitkClassMacro( SceneReaderV1, SceneReader);
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual bool LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage );
 

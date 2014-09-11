@@ -3368,11 +3368,17 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="CurveModelInteractor">
+  <stateMachine NAME="MitralModelInteractor">
     <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
     <state NAME="Start" ID="42" START_STATE="TRUE" X_POS="918" Y_POS="441" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="43">
         <action ID="21" />
+      </transition>
+    <transition NAME="Shift+pressLMB" NEXT_STATE_ID="6001" EVENT_ID="3">
+        <action ID="10" />
+      </transition>
+    <transition NAME="Shift+pressRMB" NEXT_STATE_ID="6002" EVENT_ID="2000">
+        <action ID="6000" />
       </transition>
     </state>
     <state NAME="IsPointSelected" ID="43" X_POS="470" Y_POS="441" WIDTH="100" HEIGHT="50">
@@ -3387,6 +3393,28 @@
       </transition>
       <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="42">
         <action ID="43" />
+      </transition>
+    </state>
+   <state NAME="DrawLeafletANT" ID="6001">
+      <transition NAME="mouseMove" EVENT_ID="541" NEXT_STATE_ID="6001">
+        <action ID="10" />
+      </transition>
+   <transition NAME="LmouseRelease" EVENT_ID="505" NEXT_STATE_ID="42">
+        <action ID="555" />
+      </transition>
+   <transition NAME="LmouseRelease+sift" EVENT_ID="508" NEXT_STATE_ID="42">
+        <action ID="555" />
+      </transition>
+    </state>
+   <state NAME="DrawLeafletPOST" ID="6002">
+      <transition NAME="mouseMove" EVENT_ID="2001" NEXT_STATE_ID="6002">
+        <action ID="6000" />
+      </transition>
+   <transition NAME="RmouseRelease" EVENT_ID="507" NEXT_STATE_ID="42">
+        <action ID="556" />
+      </transition>
+   <transition NAME="RmouseRelease+sift" EVENT_ID="2002" NEXT_STATE_ID="42">
+        <action ID="556" />
       </transition>
     </state>
   </stateMachine>

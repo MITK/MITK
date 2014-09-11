@@ -22,7 +22,7 @@
 #include "mitkCommon.h"
 #include "mitkInteractionEvent.h"
 #include "mitkInteractionEventConst.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <string>
 
 namespace mitk
@@ -37,27 +37,28 @@ namespace mitk
  *
  */
 
-  class MITK_CORE_EXPORT InteractionPositionEvent : public InteractionEvent {
+  class MITK_CORE_EXPORT InteractionPositionEvent : public InteractionEvent
+  {
 
   public:
 
     mitkClassMacro(InteractionPositionEvent,InteractionEvent);
-    mitkNewMacro2Param(Self, BaseRenderer*, const Point2D&);
+    mitkNewMacro3Param(Self, BaseRenderer*, const Point2D&, const Point3D&);
 
-    const Point2D GetPointerPositionOnScreen() const;
-    const Point3D GetPositionInWorld() const;
+    Point2D GetPointerPositionOnScreen() const;
+    Point3D GetPositionInWorld() const;
 
     virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
 
   protected:
-    InteractionPositionEvent(BaseRenderer* baseRenderer, const Point2D& mousePosition);
+    InteractionPositionEvent(BaseRenderer* baseRenderer, const Point2D& mousePosition, const Point3D &worldPosition);
     virtual ~InteractionPositionEvent();
 
     virtual bool IsEqual(const InteractionEvent&) const;
 
   private:
-    Point2D m_PointerPosition;
-    Point3D m_WorldPosition;
+    const Point2D m_PointerPosition;
+    const Point3D m_WorldPosition;
   };
 
 } /* namespace mitk */

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPointSetVtkMAPPER3D_H_HEADER_INCLUDED_C1907273
 #define MITKPointSetVtkMAPPER3D_H_HEADER_INCLUDED_C1907273
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include <vtkSmartPointer.h>
@@ -95,7 +95,8 @@ namespace mitk {
   public:
     mitkClassMacro(PointSetVtkMapper3D, VtkMapper);
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const mitk::PointSet* GetInput();
 
@@ -107,7 +108,12 @@ namespace mitk {
 
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
-    void ReleaseGraphicsResources(vtkWindow *renWin);
+    /*
+    * \deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
+    */
+    DEPRECATED(void ReleaseGraphicsResources(vtkWindow *renWin));
+
+    void ReleaseGraphicsResources(mitk::BaseRenderer* renderer);
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 

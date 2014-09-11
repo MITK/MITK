@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraMITKPlayerController_h
 #define __mitkToFCameraMITKPlayerController_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkCommon.h"
 #include "mitkFileReader.h"
 #include "mitkImage.h"
@@ -38,7 +38,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraMITKPlayerController , itk::Object );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief opens a connection to the ToF camera
@@ -74,8 +75,12 @@ namespace mitk
 
     virtual void SetInputFileName(std::string inputFileName);
 
+    itkGetMacro(PixelNumber, int);
+    itkGetMacro(RGBPixelNumber, int);
     itkGetMacro(CaptureWidth, int);
     itkGetMacro(CaptureHeight, int);
+    itkGetMacro(RGBCaptureWidth, int);
+    itkGetMacro(RGBCaptureHeight, int);
     itkGetMacro( DistanceImageFileName, std::string );
     itkGetMacro( AmplitudeImageFileName, std::string );
     itkGetMacro( IntensityImageFileName, std::string );
@@ -94,14 +99,16 @@ namespace mitk
     ~ToFCameraMITKPlayerController();
 
     int m_PixelNumber; ///< holds the number of pixels contained in the image
+    int m_RGBPixelNumber; ///< same for RGB image
     int m_NumberOfBytes; ///< holds the number of bytes contained in the image
+    int m_NumberOfRGBBytes; ///< same for RGB image
     int m_CaptureWidth; ///< holds the width of the image
     int m_CaptureHeight; ///< holds the height of the image
+    int m_RGBCaptureWidth; ///< same for RGB image which can be different then depth etc.
+    int m_RGBCaptureHeight; ///< same for RGB image which can be different then depth etc.
     bool m_ConnectionCheck; ///< flag showing whether the camera is connected (true) or not (false)
 
     std::string m_InputFileName;
-    std::string m_Extension;
-
     ToFImageType m_ToFImageType; ///< type of the ToF image to be played: 3D Volume (ToFImageType3D), temporal 2D image stack (ToFImageType2DPlusT)
 
     Image::Pointer m_DistanceImage;
@@ -131,11 +138,7 @@ namespace mitk
 
   private:
 
-    //void OpenPicFileToData(FILE** outfile, const char *outfileName);
     void AccessData(int frame, Image::Pointer image, float* &data);
-    bool CheckCurrentFileType();
-    void OpenNrrdImageFile( const std::string outfileName, Image::Pointer &image);
-    void OpenPicImageFile( const std::string outfileName, Image::Pointer &image);
     void CleanUp();
   };
 } //END mitk namespace

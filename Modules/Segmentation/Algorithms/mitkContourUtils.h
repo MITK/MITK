@@ -18,12 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkContourUtilshIncludett
 
 #include "mitkImage.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkContour.h"
 #include "mitkContourModel.h"
-#include "mitkLegacyAdaptors.h"
 
-#include <itkImage.h>
 
 namespace mitk
 {
@@ -31,14 +29,16 @@ namespace mitk
 /**
  * \brief Helpful methods for working with contours and images
  *
- *  Originally copied from FeedbackContourTool
+ *  Legacy support for mitk::Contour
+ *  TODO remove this class when mitk::Contour is removed
  */
-class Segmentation_EXPORT ContourUtils : public itk::Object
+class MitkSegmentation_EXPORT ContourUtils : public itk::Object
 {
   public:
 
     mitkClassMacro(ContourUtils, itk::Object);
-    itkNewMacro(ContourUtils);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
       \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
@@ -48,53 +48,24 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
     ContourModel::Pointer ProjectContourTo2DSlice(Image* slice, Contour* contourIn3D, bool correctionForIpSegmentation, bool constrainToInside);
 
     /**
-      \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
-
-      \param correctionForIpSegmentation adds 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
-    */
-    ContourModel::Pointer ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, bool correctionForIpSegmentation, bool constrainToInside);
-
-    /**
       \brief Projects a slice index coordinates of a contour back into world coordinates.
 
             \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
-    ContourModel::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation = false);
+    ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation = false);
 
-    /**
-      \brief Projects a slice index coordinates of a contour back into world coordinates.
-
-      \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
-    */
-    ContourModel::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, bool correctionForIpSegmentation = false);
 
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.
     */
     void FillContourInSlice( Contour* projectedContour, Image* sliceImage, int paintingPixelValue = 1 );
 
-    /**
-    \brief Fill a contour in a 2D slice with a specified pixel value at time step 0.
-    */
-    void FillContourInSlice( ContourModel* projectedContour, Image* sliceImage, int paintingPixelValue = 1 );
-
-    /**
-    \brief Fill a contour in a 2D slice with a specified pixel value at a given time step.
-    */
-    void FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue = 1 );
 
 protected:
 
     ContourUtils();
     virtual ~ContourUtils();
 
-    /**
-      \brief Paint a filled contour (e.g. of an ipSegmentation pixel type) into a mitk::Image (or arbitraty pixel type).
-      Will not copy the whole filledContourSlice, but only set those pixels in originalSlice to overwritevalue, where the corresponding pixel
-      in filledContourSlice is non-zero.
-    */
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDimension>* originalSlice, const Image* filledContourSlice, int overwritevalue = 1 );
 };
 
 }

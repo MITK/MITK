@@ -184,6 +184,11 @@ private:
           myModel->addLogEntry(l);
       }
 
+      mbilog::OutputType GetOutputType() const
+      {
+        return mbilog::Other;
+      }
+
       void Deactivate()
       {
         deactivated=true;

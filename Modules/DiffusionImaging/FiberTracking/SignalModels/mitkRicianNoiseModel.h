@@ -40,9 +40,14 @@ public:
     /** Adds rician noise to the input pixel **/
     void AddNoise(PixelType& pixel);
 
+    void SetNoiseVariance(double var){ m_NoiseVariance = var; }
+    double GetNoiseVariance(){ return m_NoiseVariance; }
+    void SetSeed(int seed); ///< Set seed for random number generator
+
 protected:
 
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
+    double      m_NoiseVariance;    ///< variance of underlying distribution
 
 };
 

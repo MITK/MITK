@@ -1,11 +1,16 @@
-MITK_CREATE_MODULE(MitkUS
+MITK_CREATE_MODULE(
   SUBPROJECTS
-  INCLUDE_DIRS USFilters USModel USService
+  INCLUDE_DIRS USControlInterfaces USFilters USModel USService
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  DEPENDS Mitk mitkOpenCVVideoSupport
+  PACKAGE_DEPENDS Poco
+  DEPENDS MitkOpenCVVideoSupport MitkQtWidgetsExt MitkIGTBase
+  WARNINGS_AS_ERRORS
 )
 
 ## create US config
 #CONFIGURE_FILE(mitkUSConfig.h.in ${PROJECT_BINARY_DIR}/mitkUSConfig.h @ONLY)
+
+ADD_SUBDIRECTORY(USHardwareTelemed)
+ADD_SUBDIRECTORY(USNavigation)
 
 ADD_SUBDIRECTORY(Testing)

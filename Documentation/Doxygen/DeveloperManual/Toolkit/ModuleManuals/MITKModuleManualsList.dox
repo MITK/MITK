@@ -9,7 +9,6 @@ The modules are shared libraries that provide functionality that can be used by 
 
   \li \subpage IGTGeneralModulePage
   \li \subpage MitkOpenCL_Overview
-  \li \subpage SimulationManualPage
   \li \subpage GeneratingDeviceModulesPage
   \li \subpage mitkPython_Overview
   \li \subpage USModulePage
@@ -23,4 +22,5 @@ The modules are shared libraries that provide functionality that can be used by 
 \section MITKMigrationGuides Migration Guides
 
   \li \subpage InteractionMigration
+  \li \subpage GeometryMigration
 */

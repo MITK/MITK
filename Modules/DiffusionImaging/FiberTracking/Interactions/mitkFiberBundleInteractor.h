@@ -19,10 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKFiberBundleINTERACTOR_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
 #include <mitkInteractor.h>
-#include <mitkVector.h>
-#include "FiberTrackingExports.h"
+#include <mitkNumericTypes.h>
+#include <MitkFiberTrackingExports.h>
 
 #include <vtkType.h>
 
@@ -37,7 +36,7 @@ namespace mitk
   //## All Set-operations would be done through the method "ExecuteAction", if there would be anyone.
   //## the identificationnumber of this point is set by this points and evalued from an empty place in the DataStructure
   //## @ingroup Interaction
-  class FiberTracking_EXPORT FiberBundleInteractor : public Interactor
+  class MitkFiberTracking_EXPORT FiberBundleInteractor : public Interactor
   {
   public:
     mitkClassMacro(FiberBundleInteractor, Interactor);
@@ -88,11 +87,11 @@ namespace mitk
 
 //    Point3D m_InitialPickedPoint;
 //    Point2D m_InitialPickedDisplayPoint;
-//    vtkFloatingPointType m_InitialPickedPointWorld[4];
+//    double m_InitialPickedPointWorld[4];
 
     Point3D m_CurrentPickedPoint;
     Point2D m_CurrentPickedDisplayPoint;
-    vtkFloatingPointType m_CurrentPickedPointWorld[4];
+    double m_CurrentPickedPointWorld[4];
 
   };
 }

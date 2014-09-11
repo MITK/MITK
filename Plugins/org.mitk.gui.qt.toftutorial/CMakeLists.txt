@@ -5,5 +5,5 @@ project(org_mitk_gui_qt_toftutorial)
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE TOFTUTORIAL_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDENCIES QmitkExt mitkToFHardware mitkToFProcessing
+  MODULE_DEPENDS MitkQtWidgetsExt MitkToFHardware MitkToFProcessing
 )

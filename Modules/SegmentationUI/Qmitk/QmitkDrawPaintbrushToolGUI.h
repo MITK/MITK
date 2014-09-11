@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkDrawPaintbrushToolGUI_h_Included
 
 #include "QmitkPaintbrushToolGUI.h"
-#include "SegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -29,14 +29,15 @@ See LICENSE.txt or http://www.mitk.org for details.
   Last contributor: $Author$
 */
 
-class SegmentationUI_EXPORT QmitkDrawPaintbrushToolGUI : public QmitkPaintbrushToolGUI
+class MitkSegmentationUI_EXPORT QmitkDrawPaintbrushToolGUI : public QmitkPaintbrushToolGUI
 {
   Q_OBJECT
 
   public:
 
     mitkClassMacro(QmitkDrawPaintbrushToolGUI, QmitkPaintbrushToolGUI);
-    itkNewMacro(QmitkDrawPaintbrushToolGUI);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual ~QmitkDrawPaintbrushToolGUI();
 

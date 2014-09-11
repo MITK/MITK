@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSubtractContourTool_h_Included
 
 #include "mitkContourTool.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 namespace us {
 class ModuleResource;
@@ -47,12 +47,13 @@ namespace mitk
 
   $Author$
 */
-class Segmentation_EXPORT SubtractContourTool : public ContourTool
+class MitkSegmentation_EXPORT SubtractContourTool : public ContourTool
 {
   public:
 
     mitkClassMacro(SubtractContourTool, ContourTool);
-    itkNewMacro(SubtractContourTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual us::ModuleResource GetCursorIconResource() const;

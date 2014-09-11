@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkFloatArray.h>
 
 /*!
-\brief View to process fiber bundles. Supplies methods to extract fibers from the bundle, join and subtract bundles, generate images from the selected bundle and much more.
+\brief View to process fiber bundles. Supplies methods to generate images from the selected bundle and much more.
 
 \sa QmitkFunctionality
 \ingroup Functionalities
@@ -76,6 +76,8 @@ protected slots:
   void ResampleSelectedBundles();   ///< smooth fiber bundle using the specified number of sampling points per cm.
   void DoImageColorCoding();        ///< color fibers by selected scalar image
   void ApplyCurvatureThreshold();   ///< remove/split fibers with a too high curvature threshold
+  void CompressSelectedBundles();   ///< remove points below certain error threshold
+  void CalculateFiberDirections();  ///< Calculate main fiber directions from tractogram
 
 protected:
 

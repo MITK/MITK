@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkRGBPixel.h>
 #include <itkRGBAPixel.h>
 #include <itkDiffusionTensor3D.h>
+#include <itkImage.h>
+#include <itkVectorImage.h>
 
 /** \file mitkPixelTypeTraits.h
   *
@@ -99,18 +101,32 @@ DEFINE_TYPE_PRIMITIVE(float);
 /** \brief Partial specialization (double) for the isPrimitiveType object */
 DEFINE_TYPE_PRIMITIVE(double);
 
-/** \brief Type trait to provide compile-time check for T ?= itk::VectorImage */
-template< class T, typename TValueType >
-struct isVectorImage
+template<typename TPixelType, unsigned int VDimension = 0>
+struct ImageTypeTrait
 {
-  static const bool value = false;
+  typedef itk::Image<TPixelType, VDimension> ImageType;
+  static const bool IsVectorImage = false;
 };
 
-/** \brief Partial specification for the isVectorImage trait. */
-template< typename TValueType >
-struct isVectorImage< itk::VariableLengthVector<TValueType>, TValueType>
+template<typename TPixelType, unsigned int VDimension>
+struct ImageTypeTrait<itk::VariableLengthVector<TPixelType>, VDimension >
 {
-  static const bool value = true;
+  typedef itk::VectorImage<TPixelType, VDimension> ImageType;
+  static const bool IsVectorImage = true;
+};
+
+template<typename T>
+struct ImageTypeTrait<T, 0>
+{
+  typedef T ImageType;
+  static const bool IsVectorImage = false;
+};
+
+template<typename TPixelType, unsigned int VDimension>
+struct ImageTypeTrait<itk::VectorImage<TPixelType, VDimension>, 0>
+{
+  typedef itk::VectorImage<TPixelType, VDimension> ImageType;
+  static const bool IsVectorImage = true;
 };
 
 /** \brief Compile-time trait for resolving the ValueType from an ItkImageType */
@@ -188,6 +204,12 @@ template< class C>
 struct MapCompositePixelType< itk::DiffusionTensor3D<C> >
 {
   static const itkIOPixelType IOCompositeType = itk::ImageIOBase::DIFFUSIONTENSOR3D;
+};
+
+template< class C>
+struct MapCompositePixelType< itk::VariableLengthVector<C> >
+{
+  static const itkIOPixelType IOCompositeType = itk::ImageIOBase::VECTOR;
 };
 
 //------------------------

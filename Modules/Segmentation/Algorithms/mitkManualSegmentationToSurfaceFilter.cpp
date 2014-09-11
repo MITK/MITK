@@ -52,10 +52,14 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
   {
     ProgressBar::GetInstance()->AddStepsToDo( 7 * (tmax - tstart)  );
   }
-
-  for( int t=tstart; t<tmax; t++ )
+  else
   {
+    ProgressBar::GetInstance()->AddStepsToDo(7);
+  }
 
+
+  for( int t=tstart; t<tmax; ++t )
+  {
     vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);
 
     // Median -->smooth 3D
@@ -63,7 +67,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     if(m_MedianFilter3D)
     {
       vtkImageMedian3D *median = vtkImageMedian3D::New();
-      median->SetInput(vtkimage); //RC++ (VTK < 5.0)
+      median->SetInputData(vtkimage); //RC++ (VTK < 5.0)
       median->SetKernelSize(m_MedianKernelSizeX,m_MedianKernelSizeY,m_MedianKernelSizeZ);//Std: 3x3x3
       median->ReleaseDataFlagOn();
       median->UpdateInformation();
@@ -78,7 +82,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     if(m_Interpolation)
     {
       vtkImageResample * imageresample = vtkImageResample::New();
-      imageresample->SetInput(vtkimage);
+      imageresample->SetInputData(vtkimage);
 
       //Set Spacing Manual to 1mm in each direction (Original spacing is lost during image processing)
       imageresample->SetAxisOutputSpacing(0, m_InterpolationX);
@@ -95,7 +99,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     if(m_UseGaussianImageSmooth)//gauss
     {
       vtkImageThreshold* vtkimagethreshold = vtkImageThreshold::New();
-      vtkimagethreshold->SetInput(vtkimage);
+      vtkimagethreshold->SetInputData(vtkimage);
       vtkimagethreshold->SetInValue( 100 );
       vtkimagethreshold->SetOutValue( 0 );
       vtkimagethreshold->ThresholdByUpper( this->m_Threshold );
@@ -105,7 +109,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkimagethreshold->ReleaseDataFlagOn();
 
       vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
-      gaussian->SetInput(vtkimagethreshold->GetOutput());
+      gaussian->SetInputConnection(vtkimagethreshold->GetOutputPort());
       gaussian->SetDimensionality(3);
       gaussian->SetRadiusFactor(0.49);
       gaussian->SetStandardDeviation( m_GaussianStandardDeviation );
@@ -129,13 +133,30 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       }
       gaussian->Delete();
       vtkimagethreshold->Delete();
-
     }
     ProgressBar::GetInstance()->Progress();
 
     // Create surface for t-Slice
     CreateSurface(t, vtkimage, surface, thresholdExpanded);
     ProgressBar::GetInstance()->Progress();
+  }
+
+  MITK_INFO << "Updating Time Geometry to ensure right timely displaying";
+  // Fixing wrong time geometry
+  TimeGeometry* surfaceTG = surface->GetTimeGeometry();
+  ProportionalTimeGeometry* surfacePTG = dynamic_cast<ProportionalTimeGeometry*>(surfaceTG);
+  TimeGeometry* imageTG = image->GetTimeGeometry();
+  ProportionalTimeGeometry* imagePTG = dynamic_cast<ProportionalTimeGeometry*>(imageTG);
+  // Requires ProportionalTimeGeometries to work. May not be available for all steps.
+  assert(surfacePTG != NULL);
+  assert(imagePTG != NULL);
+  if ((surfacePTG != NULL) && (imagePTG != NULL))
+  {
+    TimePointType firstTime = imagePTG->GetFirstTimePoint();
+    TimePointType duration = imagePTG->GetStepDuration();
+    surfacePTG->SetFirstTimePoint(firstTime);
+    surfacePTG->SetStepDuration(duration);
+    MITK_INFO << "First Time Point: " << firstTime << "  Duration: " << duration;
   }
 };
 
@@ -153,4 +174,3 @@ void mitk::ManualSegmentationToSurfaceFilter::SetInterpolation(vtkDouble x, vtkD
   m_InterpolationY = y;
   m_InterpolationZ = z;
 }
-

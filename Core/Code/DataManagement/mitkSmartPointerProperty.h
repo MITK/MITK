@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKSMARTPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791
 #define MITKSMARTPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
 #include "mitkUIDGenerator.h"
 
@@ -41,7 +41,8 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
   public:
     mitkClassMacro(SmartPointerProperty, BaseProperty);
 
-    itkNewMacro(SmartPointerProperty);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(SmartPointerProperty, itk::Object*);
 
     typedef itk::Object::Pointer ValueType;

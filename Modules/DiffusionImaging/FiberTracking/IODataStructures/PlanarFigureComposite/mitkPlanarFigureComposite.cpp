@@ -37,15 +37,6 @@ mitk::PlanarFigureComposite::~PlanarFigureComposite()
 
 }
 
-mitk::PlanarFigureComposite::PlanarFigureComposite(const Self& other)
-  : PlanarFigure(other),
-    m_PFVector(other.m_PFVector->Clone()),
-    m_compOperation(other.m_compOperation),
-    m_DNVector(other.m_DNVector->Clone()),
-    m_name(other.m_name)
-{
-}
-
 void mitk::PlanarFigureComposite::addDataNode(mitk::DataNode::Pointer dnode)
 {
 
@@ -54,7 +45,7 @@ void mitk::PlanarFigureComposite::addDataNode(mitk::DataNode::Pointer dnode)
 }
 
 
-void mitk::PlanarFigureComposite::addPlanarFigure(PlanarFigure::Pointer pf)
+void mitk::PlanarFigureComposite::addPlanarFigure(BaseData::Pointer pf)
 {
   m_PFVector->InsertElement(m_PFVector->Size(), pf);
 }
@@ -97,7 +88,7 @@ int mitk::PlanarFigureComposite::getNumberOfChildren()
 
 }
 
-mitk::PlanarFigure::Pointer mitk::PlanarFigureComposite::getChildAt(int idx)
+mitk::BaseData::Pointer mitk::PlanarFigureComposite::getChildAt(int idx)
 {
 
   return m_PFVector->ElementAt(idx);
@@ -117,7 +108,7 @@ mitk::DataNode::Pointer mitk::PlanarFigureComposite::getDataNodeAt(int idx)
 
 
 //musthave implementations from superclass.... not sure if return true makes sense
-bool mitk::PlanarFigureComposite::SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist )
+bool mitk::PlanarFigureComposite::SetControlPoint( unsigned int , const Point2D &, bool  )
 {
   return true;
 }
@@ -137,7 +128,30 @@ void mitk::PlanarFigureComposite::EvaluateFeaturesInternal()
 
 }
 
-void mitk::PlanarFigureComposite::PrintSelf( std::ostream& os, itk::Indent indent) const
+void mitk::PlanarFigureComposite::PrintSelf( std::ostream&, itk::Indent) const
 {
 
 }
+
+/* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
+void mitk::PlanarFigureComposite::UpdateOutputInformation()
+{
+
+}
+void mitk::PlanarFigureComposite::SetRequestedRegionToLargestPossibleRegion()
+{
+
+}
+bool mitk::PlanarFigureComposite::RequestedRegionIsOutsideOfTheBufferedRegion()
+{
+    return false;
+}
+bool mitk::PlanarFigureComposite::VerifyRequestedRegion()
+{
+    return true;
+}
+void mitk::PlanarFigureComposite::SetRequestedRegion(const itk::DataObject* )
+{
+
+}
+

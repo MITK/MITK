@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImage.h>
 #include <mitkDataNodeFactory.h>
-#include <mitkCylindricToCartesianFilter.h>
+//#include <mitkCylindricToCartesianFilter.h>
 #include <mitkImageSliceSelector.h>
 #include <itksys/SystemTools.hxx>
 
@@ -84,6 +84,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
+  /* deactivated because IpPic is not available any more (see bug 16662)
   if(itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic")!=std::string::npos)
   {
     std::cout << "Testing whether the slice is identical with a slice loaded by mitkIpPicGetSlice:";
@@ -105,7 +106,9 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     std::cout<<"[PASSED]"<<std::endl;
     mitkIpPicFree(picslice);
   }
+  */
 
+  /* Deactivated because CylindricToCartesianFilter is not available any more (see bug 16662)
   try
   {
     std::cout << "Testing another, smaller (!!) input with the same slice-selector(): ";
@@ -149,7 +152,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     //after such an exception, we need to call ResetPipeline.
     slice->ResetPipeline();
   }
-
+  */
   try
   {
     slice->UpdateLargestPossibleRegion();

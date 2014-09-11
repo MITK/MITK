@@ -166,7 +166,7 @@ m_MaximumNumberOfPoints = 80*80*80;
     //
     // set up the actual glyphing filter
     //
-    m_Glyph3DGenerator->SetSource( glyph );
+    m_Glyph3DGenerator->SetSourceData( glyph );
     m_Glyph3DGenerator->SetInput( vtkImage );
     //m_Glyph3DGenerator->SetInputConnection(m_Cutter->GetOutputPort());
     m_Glyph3DGenerator->SetInputArrayToProcess (1, 0,0, vtkDataObject::FIELD_ASSOCIATION_POINTS , "vector");
@@ -180,7 +180,7 @@ m_MaximumNumberOfPoints = 80*80*80;
     m_Glyph3DGenerator->SetRandomMode( m_RandomMode );
     m_Glyph3DGenerator->SetMaximumNumberOfPoints( m_MaximumNumberOfPoints );
     m_Glyph3DGenerator->Update();
-    m_Glyph3DMapper->SetInput( m_Glyph3DGenerator->GetOutput() );
+    m_Glyph3DMapper->SetInputConnection( m_Glyph3DGenerator->GetOutputPort() );
     m_Glyph3DActor->SetMapper( m_Glyph3DMapper );
 
     if (GetDataNode()->GetProperty("LookupTable"))

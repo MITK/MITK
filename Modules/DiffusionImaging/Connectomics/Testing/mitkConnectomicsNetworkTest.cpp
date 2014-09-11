@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 
-#include <mitkConnectomicsObjectFactory.h>
 #include "mitkConnectomicsNetwork.h"
 #include "mitkConnectomicsSyntheticNetworkGenerator.h"
 #include "mitkConnectomicsSimulatedAnnealingManager.h"
@@ -332,7 +331,7 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
     std::vector< VertexType > vertexVector;
     vertexVector.resize( inNodes.size() );
 
-    for(int loop(0); loop < inNodes.size(); loop++)
+    for(unsigned int loop(0); loop < inNodes.size(); loop++)
     {
       VertexType newVertex = network->AddVertex( inNodes[loop].id );
       vertexVector[ inNodes[loop].id ] = newVertex;
@@ -340,7 +339,7 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
       network->SetCoordinates( newVertex, inNodes[loop].coordinates );
     }
 
-    for(int loop(0); loop < inEdges.size(); loop++)
+    for(unsigned int loop(0); loop < inEdges.size(); loop++)
     {
       int sourceId = inEdges[loop].sourceId;
       int targetId = inEdges[loop].targetId;
@@ -363,9 +362,9 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
     }
 
     // Test whether network parameters are as expected
-    MITK_TEST_CONDITION_REQUIRED( inNodes.size() == network->GetNumberOfVertices(), "Expected number of vertices")
+    MITK_TEST_CONDITION_REQUIRED( inNodes.size() == (unsigned int)network->GetNumberOfVertices(), "Expected number of vertices")
 
-    MITK_TEST_CONDITION_REQUIRED( inEdges.size() == network->GetNumberOfEdges(), "Expected number of edges")
+    MITK_TEST_CONDITION_REQUIRED( inEdges.size() == (unsigned int)network->GetNumberOfEdges(), "Expected number of edges")
 
     MITK_TEST_CONDITION_REQUIRED( 0 == network->GetNumberOfSelfLoops(), "Expected number of self loops")
 
@@ -401,7 +400,7 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
     std::vector< VertexType > vertexVector;
     vertexVector.resize( inNodes.size() );
 
-    for(int loop(0); loop < inNodes.size(); loop++)
+    for(unsigned int loop(0); loop < inNodes.size(); loop++)
     {
       VertexType newVertex = network->AddVertex( inNodes[loop].id );
       vertexVector[ inNodes[loop].id ] = newVertex;
@@ -409,7 +408,7 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
       network->SetCoordinates( newVertex, inNodes[loop].coordinates );
     }
 
-    for(int loop(0); loop < inEdges.size(); loop++)
+    for(unsigned int loop(0); loop < inEdges.size(); loop++)
     {
       int sourceId = inEdges[loop].sourceId;
       int targetId = inEdges[loop].targetId;

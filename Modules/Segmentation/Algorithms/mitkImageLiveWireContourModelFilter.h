@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkImageLiveWireContourModelFilter_h__
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkContourModel.h"
 #include "mitkContourModelSource.h"
 
@@ -49,13 +49,14 @@ namespace mitk {
    \ingroup ContourModelFilters
    \ingroup Process
   */
-  class Segmentation_EXPORT ImageLiveWireContourModelFilter : public ContourModelSource
+  class MitkSegmentation_EXPORT ImageLiveWireContourModelFilter : public ContourModelSource
   {
 
   public:
 
     mitkClassMacro(ImageLiveWireContourModelFilter, ContourModelSource);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef ContourModel OutputType;
     typedef OutputType::Pointer OutputTypePointer;
@@ -152,10 +153,10 @@ namespace mitk {
     unsigned int m_TimeStep;
 
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkPreProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);
+    void ItkPreProcessImage (const itk::Image<TPixel, VImageDimension>* inputImage);
 
     template<typename TPixel, unsigned int VImageDimension>
-    void CreateDynamicCostMapByITK(itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path=NULL);
+    void CreateDynamicCostMapByITK(const itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path=NULL);
 
     InternalImageType::Pointer m_InternalImage;
 

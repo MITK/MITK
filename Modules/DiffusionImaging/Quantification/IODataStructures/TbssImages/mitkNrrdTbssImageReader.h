@@ -31,7 +31,7 @@ namespace mitk
   */
 
 
-  class Quantification_EXPORT NrrdTbssImageReader : public mitk::TbssImageSource, public FileReader
+  class MitkQuantification_EXPORT NrrdTbssImageReader : public mitk::TbssImageSource, public FileReader
   {
   public:
 
@@ -42,7 +42,8 @@ namespace mitk
 
 
     mitkClassMacro( NrrdTbssImageReader, TbssVolSourceType )
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     const char* GetFileName() const;
     void SetFileName(const char* aFileName);

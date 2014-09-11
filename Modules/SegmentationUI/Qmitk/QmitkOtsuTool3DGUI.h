@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkOtsuTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 #include "mitkOtsuTool3D.h"
 #include <QListWidget>
 #include <QPushButton>
@@ -36,13 +36,14 @@ class QLabel;
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
     mitkClassMacro(QmitkOtsuTool3DGUI, QmitkToolGUI);
-    itkNewMacro(QmitkOtsuTool3DGUI);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
   signals:
 
@@ -56,9 +57,15 @@ class SegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     void OnSegmentationRegionAccept();
 
-    void OnItemSelectionChanged(QListWidgetItem *item);
+    void OnRegionSelectionChanged();
+
+    void OnRegionSpinboxChanged(int);
 
     void OnVolumePreviewChecked(int);
+
+  private slots:
+
+    void OnAdvancedSettingsButtonToggled(bool toggled);
 
   protected:
 
@@ -71,7 +78,11 @@ class SegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     int m_NumberOfRegions;
 
-    QListWidgetItem* m_SelectedItem;
+    bool m_UseValleyEmphasis;
+
+    int m_NumberOfBins;
+
+    QList<QListWidgetItem *> m_SelectedItems;
 };
 
 #endif

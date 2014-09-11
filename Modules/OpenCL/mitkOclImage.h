@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MAX_DIMS 20
 
 #include "mitkImage.h"
-#include <MitkOclExports.h>
+#include <MitkOpenCLExports.h>
 
 #include "mitkOclBaseData.h"
 #include "mitkOclImageFormats.h"
@@ -43,11 +43,12 @@ namespace mitk {
   *  on-demand-copy to the graphics memory. It is the basic data structure for all
   *  mitk::oclImageToImageFilter classes
   */
-class MitkOcl_EXPORT OclImage : public OclBaseData
+class MitkOpenCL_EXPORT OclImage : public OclBaseData
 {
 public:
   mitkClassMacro(OclImage, OclBaseData);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /*!  \brief Copies the RAM-stored data to GMEM */
   virtual int TransferDataToGPU(cl_command_queue);

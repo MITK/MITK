@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <usModuleContext.h>
 #include <usServiceReference.h>
-#include <mitkGetModuleContext.h>
+#include <usGetModuleContext.h>
 #include <mitkTestingMacros.h>
 #include <mitkPythonService.h>
 

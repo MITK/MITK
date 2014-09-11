@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDicomSeriesReader.h"
 #include "mitkProperties.h"
+#include "mitkImage.h"
 
 
 static std::map<std::string, std::map<gdcm::Tag, std::string> > GetTagInformationFromFile(mitk::DicomSeriesReader::StringContainer files)
@@ -68,17 +69,8 @@ int mitkDicomSeriesReaderTest(int argc, char* argv[])
   }
 
   char* dir;
-
-  // Second argument can hold a broken series,
-  // here it is only tested that the loading fails gracefully without causing a seg fault,
-  // or another crash of any kind.
-  if (argc > 1)
-  {
-    dir = argv[2];
-    mitk::DicomSeriesReader::FileNamesGrouping brokenSeries = mitk::DicomSeriesReader::GetSeries( dir, true );
-  }
-
   dir = argv[1];
+
   //check if DICOMTags have been set as property for mitk::Image
   mitk::DicomSeriesReader::FileNamesGrouping seriesInFiles = mitk::DicomSeriesReader::GetSeries( dir, true );
   std::list<mitk::Image::Pointer> images;

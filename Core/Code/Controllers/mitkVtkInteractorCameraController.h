@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKVTKINTERACTORCAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722
 #define MITKVTKINTERACTORCAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkCameraController.h"
 #include "vtkRenderWindowInteractor.h"
 
@@ -33,7 +33,8 @@ class MITK_CORE_EXPORT VtkInteractorCameraController : public CameraController
 {
 public:
   mitkClassMacro(VtkInteractorCameraController, CameraController);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   //##Documentation
   //## @brief Returns the vtkRenderWindowInteractor used internally by this CameraController

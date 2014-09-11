@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPositionEvent.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 
 mitk::PositionEvent::PositionEvent(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key, const mitk::Point2D& displPosition, const mitk::Point3D& worldPosition)
 : DisplayPositionEvent(sender, type, button, buttonState, key, displPosition)

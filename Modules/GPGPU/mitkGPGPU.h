@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <GL/glew.h>
 
-#include <mitkGPGPUExports.h>
+#include <MitkGPGPUExports.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -73,7 +73,6 @@ class GPGPU_DLL_API GPGPU
         int myWidth,myHeight,myDepth;
 
         int glTarget;
-        int glInternalFormat;
         int glTextureHandle;
         int glFBOHandle;
     };
@@ -123,7 +122,6 @@ class GPGPU_DLL_API GPGPU
     GLXContext openGLContext;
     GLXDrawable GLX_drawable;
     Display *X_display;
-    Window *windowHandle;
 #endif
 
 

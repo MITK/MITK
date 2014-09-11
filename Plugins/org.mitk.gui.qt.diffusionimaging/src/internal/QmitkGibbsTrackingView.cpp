@@ -76,25 +76,27 @@ void QmitkTrackingWorker::run()
     m_View->m_TrackingThread.quit();
 }
 
-const std::string QmitkGibbsTrackingView::VIEW_ID =
-        "org.mitk.views.gibbstracking";
+const std::string QmitkGibbsTrackingView::VIEW_ID = "org.mitk.views.gibbstracking";
 
 QmitkGibbsTrackingView::QmitkGibbsTrackingView()
     : QmitkFunctionality()
     , m_Controls( 0 )
-    , m_MultiWidget( NULL )
-    , m_ThreadIsRunning(false)
-    , m_GlobalTracker(NULL)
-    , m_QBallImage(NULL)
+    , m_MultiWidget(NULL)
+    , m_FiberBundle(NULL)
     , m_MaskImage(NULL)
-    , m_ImageNode(NULL)
+    , m_TensorImage(NULL)
+    , m_QBallImage(NULL)
     , m_ItkQBallImage(NULL)
     , m_ItkTensorImage(NULL)
-    , m_FiberBundleNode(NULL)
+    , m_ImageNode(NULL)
     , m_MaskImageNode(NULL)
-    , m_TrackingWorker(this)
+    , m_FiberBundleNode(NULL)
+    , m_ThreadIsRunning(false)
+    , m_ElapsedTime(0)
     , m_Iterations(10000000)
     , m_LastStep(0)
+    , m_GlobalTracker(NULL)
+    , m_TrackingWorker(this)
 {
     m_TrackingWorker.moveToThread(&m_TrackingThread);
     connect(&m_TrackingThread, SIGNAL(started()), this, SLOT(BeforeThread()));
@@ -354,9 +356,8 @@ void QmitkGibbsTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
             m_ImageNode = node;
         else if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
-            bool isBinary = false;
-            node->GetPropertyValue<bool>("binary", isBinary);
-            if (isBinary)
+            mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(node->GetData());
+            if (img->GetPixelType().GetPixelType()==itk::ImageIOBase::SCALAR)
                 m_MaskImageNode = node;
         }
     }
@@ -503,12 +504,12 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
     if (m_QBallImage.IsNotNull())
     {
         m_ItkQBallImage = ItkQBallImgType::New();
-        mitk::CastToItkImage<ItkQBallImgType>(m_QBallImage, m_ItkQBallImage);
+        mitk::CastToItkImage(m_QBallImage, m_ItkQBallImage);
     }
     else
     {
         m_ItkTensorImage = ItkTensorImage::New();
-        mitk::CastToItkImage<ItkTensorImage>(m_TensorImage, m_ItkTensorImage);
+        mitk::CastToItkImage(m_TensorImage, m_ItkTensorImage);
     }
 
     // mask image found?
@@ -517,7 +518,7 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
         if(m_MaskImageNode.IsNotNull())
         {
             if (dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()))
-                mitk::CastToItkImage<ItkFloatImageType>(dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()), m_MaskImage);
+                mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()), m_MaskImage);
         }
     }
     catch(...){};
@@ -546,6 +547,7 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
     if ( m_GlobalTracker->GetNumAcceptedFibers()==0 )
         return;
     m_FiberBundle = mitk::FiberBundleX::New(fiberBundle);
+    m_FiberBundle->SetReferenceImage(dynamic_cast<mitk::Image*>(m_ImageNode->GetData()));
 
     if (m_FiberBundleNode.IsNotNull()){
         GetDefaultDataStorage()->Remove(m_FiberBundleNode);
@@ -559,6 +561,7 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
     name += "_Gibbs";
     m_FiberBundleNode->SetName(name.toStdString());
     m_FiberBundleNode->SetVisibility(true);
+
 
     if (!m_OutputFileName.isEmpty())
     {

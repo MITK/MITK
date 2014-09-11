@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStandaloneDataStorage.h"
 #include <mitkTestingMacros.h>
 #include <mitkIOUtil.h>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
+#include "mitkRenderingModeProperty.h"
 
 class mitkLevelWindowManagerTestClass
 {
@@ -143,6 +145,75 @@ public:
 
   }
 
+  static bool VerifyRenderingModes()
+  {
+    bool ok = false;
+
+    ok = ( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR == 1 ) &&
+    (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR == 2 ) &&
+    (mitk::RenderingModeProperty::LOOKUPTABLE_COLOR == 3 ) &&
+    (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR == 4 );
+
+    return ok;
+  }
+
+  static void TestLevelWindowSliderVisibility(std::string testImageFile)
+  {
+    bool renderingModesValid = mitkLevelWindowManagerTestClass::VerifyRenderingModes();
+    if ( !renderingModesValid )
+    {
+      MITK_ERROR << "Exception: Image Rendering.Mode property value types inconsistent.";
+    }
+
+    mitk::LevelWindowManager::Pointer manager;
+    manager = mitk::LevelWindowManager::New();
+    mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+    manager->SetDataStorage(ds);
+
+    //add multiple objects to the data storage => multiple observers should be created
+    mitk::Image::Pointer image1 = mitk::IOUtil::LoadImage(testImageFile);
+    mitk::DataNode::Pointer node1 = mitk::DataNode::New();
+    node1->SetData(image1);
+    //mitk::DataNode::Pointer node1 = mitk::IOUtil::LoadDataNode( testImageFile );
+    mitk::DataNode::Pointer node2 = mitk::IOUtil::LoadDataNode( testImageFile );
+    mitk::DataNode::Pointer node3 = mitk::IOUtil::LoadDataNode( testImageFile );
+    std::vector< mitk::DataNode::Pointer > nodeVec;
+    //nodeVec.resize( 3 );
+    nodeVec.push_back( node1 );
+    nodeVec.push_back( node2 );
+    nodeVec.push_back( node3 );
+
+    ds->Add(node1);
+    ds->Add(node2);
+    ds->Add(node3);
+
+    typedef itk::Statistics::MersenneTwisterRandomVariateGenerator RandomGeneratorType;
+    RandomGeneratorType::Pointer rnd = RandomGeneratorType::New();
+    rnd->Initialize();
+
+    for( unsigned int i=0; i<8; ++i )
+    {
+      unsigned int parity = i;
+
+      for( unsigned int img = 0; img < 3; ++img )
+      {
+        if ( parity & 1 )
+        {
+          int mode = rnd->GetIntegerVariate() % 3;
+          nodeVec[img]->SetProperty( "Image Rendering.Mode", mitk::RenderingModeProperty::New( mode ) );
+        }
+        else
+        {
+          int mode = rnd->GetIntegerVariate() % 2;
+          nodeVec[img]->SetProperty( "Image Rendering.Mode", mitk::RenderingModeProperty::New( 3 + mode ) );
+        }
+        parity >>= 1;
+      }
+
+      MITK_TEST_CONDITION( renderingModesValid && ( (!manager->GetLevelWindowProperty() && !i) || (manager->GetLevelWindowProperty() && i) ), "Testing level window property member according to rendering mode");
+    }
+  }
+
 };
 
 int mitkLevelWindowManagerTest(int argc, char* args[])
@@ -157,6 +228,7 @@ int mitkLevelWindowManagerTest(int argc, char* args[])
   mitkLevelWindowManagerTestClass::TestMethodsWithInvalidParameters();
   mitkLevelWindowManagerTestClass::TestOtherMethods();
   mitkLevelWindowManagerTestClass::TestRemoveObserver(testImage);
+  mitkLevelWindowManagerTestClass::TestLevelWindowSliderVisibility(testImage);
 
   MITK_TEST_END();
 }

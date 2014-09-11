@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDController_h
 #define __mitkToFCameraPMDController_h
 
-#include "mitkPMDModuleExports.h"
+#include <MitkPMDExports.h>
 #include "mitkCommon.h"
 
 
@@ -42,12 +42,10 @@ namespace mitk
     \brief opens a connection to the ToF camera. Has to be implemented by the sub class
     \throws mitkException In case of no connection, an exception is thrown!
     */
-    //TODO return value
     virtual bool OpenCameraConnection() = 0;
     /*!
     \brief closes the connection to the camera
     */
-    //TODO return value
     virtual bool CloseCameraConnection();
     /*!
     \brief Gets the current amplitude array from the device

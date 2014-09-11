@@ -9,5 +9,6 @@ Additionally we support tests of software function as well. More detailed inform
  <li> \subpage GeneralTests
  <li> \subpage RenderingTests
  <li> \subpage DICOMTesting
+ <li> \subpage InteractionTestingHowTo
 </ul>
 */

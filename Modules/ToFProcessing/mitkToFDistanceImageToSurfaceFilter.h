@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImage.h>
 #include <mitkSurfaceSource.h>
-#include <mitkToFProcessingExports.h>
+#include <MitkToFProcessingExports.h>
 #include <mitkToFProcessingCommon.h>
 #include <mitkCameraIntrinsics.h>
 #include "mitkCameraIntrinsics.h"
@@ -46,12 +46,13 @@ namespace mitk
   * @ingroup SurfaceFilters
   * @ingroup ToFProcessing
   */
-  class mitkToFProcessing_EXPORT ToFDistanceImageToSurfaceFilter : public SurfaceSource
+  class MitkToFProcessing_EXPORT ToFDistanceImageToSurfaceFilter : public SurfaceSource
   {
   public:
 
     mitkClassMacro( ToFDistanceImageToSurfaceFilter , SurfaceSource );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
 
     itkSetMacro(CameraIntrinsics, mitk::CameraIntrinsics::Pointer);

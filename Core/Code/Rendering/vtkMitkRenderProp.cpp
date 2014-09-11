@@ -67,6 +67,12 @@ vtkAssemblyPath* vtkMitkRenderProp::GetNextPath()
 {
   return m_VtkPropRenderer->GetNextPath();
 }
+
+int vtkMitkRenderProp::GetNumberOfPaths()
+{
+    return m_VtkPropRenderer->GetNumberOfPaths();
+}
+
 //BUG (#1551) added method depth peeling
 int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
 {

@@ -82,6 +82,7 @@ private:
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
 
   void UpdateInterface();
+  void NodeRemoved(const mitk::DataNode* node);
 
 };
 

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITKIMAGETOSURFACEFILTER_h__
 
 #include <vtkPolyData.h>
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 #include <mitkCommon.h>
 #include <mitkSurfaceSource.h>
 #include <mitkSurface.h>
@@ -62,7 +62,8 @@ namespace mitk {
       enum DecimationType {NoDecimation,DecimatePro,QuadricDecimation};
 
       mitkClassMacro(ImageToSurfaceFilter, SurfaceSource);
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
       /**
        * For each image time slice a surface will be created. This method is

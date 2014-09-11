@@ -1,9 +1,9 @@
 set(ProjConfig.cmake.in "
-set(${proj}_INCLUDE_DIRS @${proj}_INCLUDE_DIRS@)
+set(${proj}_INCLUDE_DIRS \"@${proj}_INCLUDE_DIRS@\")
 set(${proj}_LIBRARIES @${proj}_LIBRARIES@)
 
 if(NOT TARGET ${proj_target})
-  include(@${proj}_BINARY_DIR@/${proj}Exports.cmake)
+  include(\"@${proj}_BINARY_DIR@/${proj}Exports.cmake\")
 endif()
 ")
 

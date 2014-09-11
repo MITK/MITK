@@ -1,0 +1,29 @@
+/**
+\page org_mitk_views_regiongrowing The Region Growing View
+
+\imageMacro{regiongrowing.png,"Icon of the Region Growing View",2.00}
+
+Available documentation sections:
+- \ref QmitkRegionGrowingUserManualOverview
+- \ref QmitkRegionGrowingUserManualUsage
+
+\section QmitkRegionGrowingUserManualOverview Overview
+
+The Region growing view provides a programming example, showing developers how to create new views for MITK with a graphical user interface (GUI) that also uses some ITK image filters. 
+
+<b>For the programmers:</b> this functionality is the result of <a href="http://docs.mitk.org/nightly/Step9Page.html">tutorial step 9</a>
+
+\section QmitkRegionGrowingUserManualUsage Usage
+
+<ul>
+
+<li> you can set a number of seed points by clicking into the render windows while holding down the shift key.
+</li>
+<li> when clicking "Start region growing", a region growing algorithm starts. This algorithm is gray values based. The gray values are determined from the gray values at all point positions plus/minus a safety margin of 30 (Hounsfield units).
+</li>
+</ul>
+
+
+
+*/
+

@@ -51,6 +51,10 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
 mitk::DisplayInteractor::DisplayInteractor()
 : m_IndexToSliceModifier(4)
 , m_AutoRepeat(false)
+, m_InvertScrollDirection( false )
+, m_InvertZoomDirection( false )
+, m_InvertMoveDirection( false )
+, m_InvertLevelWindowDirection( false )
 , m_AlwaysReact(false)
 , m_ZoomFactor(2)
 {
@@ -94,8 +98,14 @@ bool mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
   BaseRenderer* sender = interactionEvent->GetSender();
   InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
+  float invertModifier = -1.0;
+  if ( m_InvertMoveDirection )
+  {
+    invertModifier = 1.0;
+  }
+
   // perform translation
-  sender->GetDisplayGeometry()->MoveBy((positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate) * (-1.0));
+  sender->GetDisplayGeometry()->MoveBy( (positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate) * invertModifier );
   sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   return true;
@@ -108,6 +118,7 @@ bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
 
   float factor = 1.0;
   float distance = 0;
+
   if (m_ZoomDirection == "updown")
   {
     distance = m_CurrentDisplayCoordinate[1] - m_LastDisplayCoordinate[1];
@@ -116,6 +127,12 @@ bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
   {
     distance = m_CurrentDisplayCoordinate[0] - m_LastDisplayCoordinate[0];
   }
+
+  if ( m_InvertZoomDirection )
+  {
+    distance *= -1.0;
+  }
+
   // set zooming speed
   if (distance < 0.0)
   {
@@ -125,8 +142,13 @@ bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
   {
     factor = 1.0 * m_ZoomFactor;
   }
-  sender->GetDisplayGeometry()->ZoomWithFixedWorldCoordinates(factor, m_StartDisplayCoordinate, m_StartCoordinateInMM);
-  sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+
+  if (factor != 1.0)
+  {
+    sender->GetDisplayGeometry()->ZoomWithFixedWorldCoordinates(factor, m_StartDisplayCoordinate, m_StartCoordinateInMM);
+    sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+  }
+
   m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
   m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   return true;
@@ -149,6 +171,12 @@ bool mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* inte
     {
       delta = static_cast<int>(m_LastDisplayCoordinate[0] - positionEvent->GetPointerPositionOnScreen()[0]);
     }
+
+    if ( m_InvertScrollDirection )
+    {
+      delta *= -1;
+    }
+
     // Set how many pixels the mouse has to be moved to scroll one slice
     // if we moved less than 'm_IndexToSliceModifier' pixels slice ONE slice only
     if (delta > 0 && delta < m_IndexToSliceModifier)
@@ -260,9 +288,25 @@ bool mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction*, Interaction
   node->GetLevelWindow(lv);
   ScalarType level = lv.GetLevel();
   ScalarType window = lv.GetWindow();
+
+  int levelIndex = 0;
+  int windowIndex = 1;
+
+  if ( m_LevelDirection != "leftright" )
+  {
+    levelIndex = 1;
+    windowIndex = 0;
+  }
+
+  int directionModifier = 1;
+  if ( m_InvertLevelWindowDirection )
+  {
+    directionModifier = -1;
+  }
+
   // calculate adjustments from mouse movements
-  level += (m_CurrentDisplayCoordinate[0] - m_LastDisplayCoordinate[0]) * static_cast<ScalarType>(2);
-  window += (m_CurrentDisplayCoordinate[1] - m_LastDisplayCoordinate[1]) * static_cast<ScalarType>(2);
+  level += (m_CurrentDisplayCoordinate[levelIndex] - m_LastDisplayCoordinate[levelIndex]) * static_cast<ScalarType>(2) * directionModifier;
+  window += (m_CurrentDisplayCoordinate[windowIndex] - m_LastDisplayCoordinate[windowIndex]) * static_cast<ScalarType>(2) * directionModifier;
 
   lv.SetLevelWindow(level, window);
   dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"))->SetLevelWindow(lv);
@@ -298,15 +342,33 @@ void mitk::DisplayInteractor::ConfigurationChanged()
     m_IndexToSliceModifier = 4;
   }
   // scroll direction
-  if (!properties->GetStringProperty("zoomDirection", m_ScrollDirection))
+  if (!properties->GetStringProperty("scrollDirection", m_ScrollDirection))
   {
     m_ScrollDirection = "updown";
   }
+
+  m_InvertScrollDirection = GetBoolProperty( properties, "invertScrollDirection", false );
+
+
   // zoom direction
   if (!properties->GetStringProperty("zoomDirection", m_ZoomDirection))
   {
     m_ZoomDirection = "updown";
   }
+
+  m_InvertZoomDirection = GetBoolProperty( properties, "invertZoomDirection", false );
+
+  m_InvertMoveDirection = GetBoolProperty( properties, "invertMoveDirection", false );
+
+
+  if (!properties->GetStringProperty("levelWindowDirection", m_LevelDirection))
+  {
+    m_LevelDirection = "leftright";
+  }
+
+  m_InvertLevelWindowDirection = GetBoolProperty( properties, "invertLevelWindowDirection", false );
+
+
   // zoom factor
   std::string strZoomFactor = "";
   properties->GetStringProperty("zoomFactor", strZoomFactor);
@@ -337,4 +399,26 @@ void mitk::DisplayInteractor::ConfigurationChanged()
 bool mitk::DisplayInteractor::FilterEvents(InteractionEvent* /*interactionEvent*/, DataNode* /*dataNode*/)
 {
   return true;
+}
+
+bool mitk::DisplayInteractor::GetBoolProperty( mitk::PropertyList::Pointer propertyList,
+                                               const char* propertyName,
+                                               bool defaultValue )
+{
+  std::string valueAsString;
+  if ( !propertyList->GetStringProperty( propertyName, valueAsString ) )
+  {
+    return defaultValue;
+  }
+  else
+  {
+    if ( valueAsString == "true" )
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
 }

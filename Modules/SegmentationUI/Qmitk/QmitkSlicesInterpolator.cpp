@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVtkImageOverwrite.h>
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageTimeSelector.h>
+#include <mitkImageWriteAccessor.h>
 
 #include <itkCommand.h>
 
@@ -363,6 +364,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       this->OnInterpolationActivated(false);
       this->On3DInterpolationActivated(false);
       this->Show3DInterpolationResult(false);
+      m_Interpolator->Activate2DInterpolation(false);
       break;
 
     case 1: // 2D
@@ -380,6 +382,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       this->Show3DInterpolationControls(true);
       this->OnInterpolationActivated(false);
       this->On3DInterpolationActivated(true);
+      m_Interpolator->Activate2DInterpolation(false);
       break;
 
     default:
@@ -411,6 +414,10 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
     //If no workingdata is set, remove the interpolation feedback
     this->GetDataStorage()->Remove(m_FeedbackNode);
     m_FeedbackNode->SetData(NULL);
+    this->GetDataStorage()->Remove(m_3DContourNode);
+    m_3DContourNode->SetData(NULL);
+    this->GetDataStorage()->Remove(m_InterpolatedSurfaceNode);
+    m_InterpolatedSurfaceNode->SetData(NULL);
     return;
   }
   //Updating the current selected segmentation for the 3D interpolation
@@ -474,7 +481,7 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
       if (slicedGeometry)
       {
         m_LastSNC = slicer;
-        mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetGeometry2D( event.GetPos() ));
+        mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetPlaneGeometry( event.GetPos() ));
         if (plane)
           Interpolate( plane, m_TimeStep[slicer], slicer );
         return true;
@@ -565,7 +572,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 
     // Set slice as input
     mitk::Image::Pointer slice = dynamic_cast<mitk::Image*>(m_FeedbackNode->GetData());
-    reslice->SetInputSlice(slice->GetSliceData()->GetVtkImageData(slice));
+    reslice->SetInputSlice(slice->GetSliceData()->GetVtkImageAccessor(slice)->GetVtkImageData());
     //set overwrite mode to true to write back to the image volume
     reslice->SetOverwriteMode(true);
     reslice->Modified();
@@ -619,9 +626,16 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     mitk::Image::Pointer diffImage = mitk::Image::New();
     diffImage->Initialize( image3D );
 
-    // Set all pixels to zero
-    mitk::PixelType pixelType( mitk::MakeScalarPixelType<unsigned char>()  );
-    memset( diffImage->GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
+    // Create scope for ImageWriteAccessor so that the accessor is destroyed
+    // after the image is initialized. Otherwise later image access will lead to an error
+    {
+      mitk::ImageWriteAccessor imAccess(diffImage);
+
+      // Set all pixels to zero
+      mitk::PixelType pixelType( mitk::MakeScalarPixelType<unsigned char>()  );
+      memset( imAccess.GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
+    }
+
 
     // Since we need to shift the plane it must be clone so that the original plane isn't altered
     mitk::PlaneGeometry::Pointer reslicePlane = slicer->GetCurrentPlaneGeometry()->Clone();
@@ -654,7 +668,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
         //set overwrite mode to true to write back to the image volume
-        reslice->SetInputSlice(interpolation->GetSliceData()->GetVtkImageData(interpolation));
+        reslice->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->GetVtkImageData());
         reslice->SetOverwriteMode(true);
         reslice->Modified();
 
@@ -862,7 +876,6 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
   m_3DInterpolationEnabled = on;
 
   this->CheckSupportedImageDimension();
-
   try
   {
     if ( m_DataStorage.IsNotNull() && m_ToolManager && m_3DInterpolationEnabled)
@@ -874,8 +887,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
         bool isInterpolationResult(false);
         workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
 
-        if ((workingNode->IsSelected() &&
-             workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) &&
+        if ((workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) &&
             !isInterpolationResult && m_3DInterpolationEnabled)
         {
           int ret = QMessageBox::Yes;

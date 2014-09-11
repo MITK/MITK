@@ -49,7 +49,7 @@ int mitkTextOverlay2DSymbolsRenderingTest(int argc, char* argv[])
   // compare rendering to reference image
   MITK_TEST_BEGIN("mitkTextOverlay2DSymbolsRenderingTest")
 
-  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
   renderingHelper.SetAutomaticallyCloseRenderWindow(false);
 
   mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderingHelper.GetVtkRenderWindow());

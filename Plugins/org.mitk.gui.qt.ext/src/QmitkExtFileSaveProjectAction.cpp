@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageService.h>
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
+#include <berryIPreferencesService.h>
+#include "berryPlatform.h"
 
 
 QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window)
@@ -106,6 +108,7 @@ void QmitkExtFileSaveProjectAction::Run()
     mitk::NodePredicateNot::Pointer isNotHelperObject =
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
     mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeSaved = storage->GetSubset(isNotHelperObject);
+
     if ( !sceneIO->SaveScene( nodesToBeSaved, storage, fileName.toStdString() ) )
     {
       QMessageBox::information(NULL,

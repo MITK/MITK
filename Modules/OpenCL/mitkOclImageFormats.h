@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //ocl
 #include "mitkOclUtils.h"
-#include <MitkOclExports.h>
+#include <MitkOpenCLExports.h>
 
 #define MAX_FORMATS 10
 #define MAX_DATA_TYPES 12
@@ -41,11 +41,12 @@ namespace mitk
 
       This class checks whether a format is supported or not and acts accordingly.
       */
-class MitkOcl_EXPORT OclImageFormats : public itk::LightObject
+class MitkOpenCL_EXPORT OclImageFormats : public itk::LightObject
 {
 public:
     mitkClassMacro(OclImageFormats, itk::LightObject);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** @brief Checks if format supported.
       @param format The image format to be checked for support.

@@ -46,4 +46,4 @@ namespace mitk
   };
 }
 
-US_EXPORT_MODULE_ACTIVATOR(Segmentation, mitk::SegmentationModuleActivator)
+US_EXPORT_MODULE_ACTIVATOR(MitkSegmentation, mitk::SegmentationModuleActivator)

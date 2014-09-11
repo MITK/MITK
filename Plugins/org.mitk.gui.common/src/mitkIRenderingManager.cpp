@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIRenderingManager.h"
 
 namespace mitk {
-
 struct RenderingManagerInterface : public IRenderingManager
 {
   RenderingManagerInterface(RenderingManager::Pointer manager)
@@ -56,7 +55,7 @@ struct RenderingManagerInterface : public IRenderingManager
     m_RM->ForceImmediateUpdateAll(type);
   }
 
-  bool InitializeViews( const Geometry3D *geometry,
+  bool InitializeViews( const BaseGeometry *geometry,
                         RenderingManager::RequestType type = RenderingManager::REQUEST_UPDATE_ALL,
                         bool preserveRoughOrientationInWorldSpace = false )
   {
@@ -75,7 +74,7 @@ struct RenderingManagerInterface : public IRenderingManager
     return m_RM->InitializeViews(type);
   }
 
-  bool InitializeView( vtkRenderWindow *renderWindow, const Geometry3D *geometry,
+  bool InitializeView( vtkRenderWindow *renderWindow, const BaseGeometry *geometry,
                                bool initializeGlobalTimeSNC = false)
   {
     return m_RM->InitializeView(renderWindow, geometry, initializeGlobalTimeSNC);
@@ -124,16 +123,6 @@ struct RenderingManagerInterface : public IRenderingManager
   bool GetLODAbortMechanismEnabled() const
   {
     return m_RM->GetLODAbortMechanismEnabled();
-  }
-
-  void SetDepthPeelingEnabled(bool enabled)
-  {
-    m_RM->SetDepthPeelingEnabled(enabled);
-  }
-
-  void SetMaxNumberOfPeels(int maxNumber)
-  {
-    m_RM->SetMaxNumberOfPeels(maxNumber);
   }
 
   int GetNextLOD( BaseRenderer* renderer ) const
@@ -185,12 +174,10 @@ struct RenderingManagerInterface : public IRenderingManager
   }
 
   const RenderingManager::Pointer m_RM;
-
 };
 
 IRenderingManager* MakeRenderingManagerInterface(RenderingManager::Pointer manager)
 {
   return new RenderingManagerInterface(manager);
 }
-
 }

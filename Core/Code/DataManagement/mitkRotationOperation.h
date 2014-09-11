@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKROTATIONOPERATION_H_HEADER_INCLUDED
 
 #include "mitkOperation.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 
 namespace mitk {
 

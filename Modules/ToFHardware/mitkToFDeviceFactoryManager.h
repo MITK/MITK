@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFDeviceListener_h
 #define __mitkToFDeviceListener_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkToFCameraDevice.h"
 
 //Microservices
@@ -37,7 +37,8 @@ namespace mitk
 
     mitkClassMacro( ToFDeviceFactoryManager, itk::Object );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     std::vector<std::string> GetRegisteredDeviceFactories();
 

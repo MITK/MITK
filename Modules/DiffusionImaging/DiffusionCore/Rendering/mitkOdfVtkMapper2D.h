@@ -41,12 +41,12 @@ template<class TPixelType, int NrOdfDirections>
 class OdfVtkMapper2D : public VtkMapper
 {
     struct OdfDisplayGeometry {
-        vtkFloatingPointType vp[ 3 ], vnormal[ 3 ];
+        double vp[ 3 ], vnormal[ 3 ];
         Vector3D normal;
         double d, d1, d2;
         mitk::Point3D M3D, L3D, O3D;
 
-        vtkFloatingPointType vp_original[ 3 ], vnormal_original[ 3 ];
+        double vp_original[ 3 ], vnormal_original[ 3 ];
         mitk::Vector2D size, origin;
 
         bool Equals(OdfDisplayGeometry other)
@@ -67,7 +67,8 @@ class OdfVtkMapper2D : public VtkMapper
 public:
 
     mitkClassMacro(OdfVtkMapper2D,VtkMapper)
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
     bool IsVisibleOdfs(mitk::BaseRenderer* renderer);

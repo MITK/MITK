@@ -83,9 +83,9 @@ class MITK_CORE_EXPORT PointSet : public BaseData
 public:
   mitkClassMacro(PointSet, BaseData);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
-  mitkCloneMacro(PointSet);
   typedef mitk::ScalarType CoordinateType;
   typedef mitk::ScalarType InterpolationWeightType;
 
@@ -130,7 +130,7 @@ public:
   typedef itk::Mesh<PointDataType, PointDimension, MeshTraits> MeshType;
 
   typedef MeshType DataType;
-  typedef DataType::PointType PointType;
+  typedef Point3D PointType;
   typedef DataType::PointIdentifier PointIdentifier;
   typedef DataType::PointsContainer PointsContainer;
   typedef DataType::PointsContainerIterator PointsIterator;
@@ -232,7 +232,7 @@ public:
    * returns -1 if no point is found
    * or the position in the list of the first match
    */
-  int SearchPoint( Point3D point, float distance, int t = 0 ) const;
+  int SearchPoint( Point3D point, ScalarType distance, int t = 0 ) const;
 
   virtual bool IsEmptyTimeStep(unsigned int t) const;
 
@@ -247,6 +247,9 @@ public:
   virtual void OnPointSetChange(){};
 
 protected:
+
+  mitkCloneMacro(Self);
+
   PointSet();
   PointSet(const PointSet &other);
   virtual ~PointSet();
@@ -272,6 +275,7 @@ protected:
 
 /**
  * @brief Equal A function comparing two pointsets for beeing identical.
+ * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::PointSet& p1, const mitk::PointSet& p2) instead.
  *
  * @ingroup MITKTestingAPI
  *
@@ -284,16 +288,30 @@ protected:
  * @param verbose Flag indicating if the user wants detailed console output or not.
  * @return True, if all subsequent comparisons are true, false otherwise
  */
-MITK_CORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose );
+DEPRECATED( MITK_CORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose ));
 
-#pragma GCC visibility push(default)
+/**
+ * @brief Equal A function comparing two pointsets for beeing identical.
+ *
+ * @ingroup MITKTestingAPI
+ *
+ * The function compares the Geometry, the size and all points element-wise.
+ * The parameter eps is a tolarence value for all methods which are internally used for comparion.
+ *
+ * @param rightHandSide Compare this against leftHandSide.
+ * @param leftHandSide Compare this against rightHandSide.
+ * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+ * @param verbose Flag indicating if the user wants detailed console output or not.
+ * @return True, if all subsequent comparisons are true, false otherwise
+ */
+MITK_CORE_EXPORT bool Equal( const mitk::PointSet& leftHandSide, const mitk::PointSet& rightHandSide, mitk::ScalarType eps, bool verbose );
+
 itkEventMacro( PointSetEvent, itk::AnyEvent );
 itkEventMacro( PointSetMoveEvent, PointSetEvent );
 itkEventMacro( PointSetSizeChangeEvent, PointSetEvent );
 itkEventMacro( PointSetAddEvent, PointSetSizeChangeEvent );
 itkEventMacro( PointSetRemoveEvent, PointSetSizeChangeEvent );
 itkEventMacro( PointSetExtendTimeRangeEvent, PointSetEvent );
-#pragma GCC visibility pop
 
 } // namespace mitk
 

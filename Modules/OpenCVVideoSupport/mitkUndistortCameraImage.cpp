@@ -23,9 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkUndistortCameraImage.h"
-#include "itkTimeProbe.h"
 
-#include "highgui.h"
 
 mitk::UndistortCameraImage::UndistortCameraImage()
 {
@@ -40,40 +38,33 @@ mitk::UndistortCameraImage::~UndistortCameraImage()
 
 
 /// undistort one pixel coordinate using floating point accuracy...
-mitk::Point2D mitk::UndistortCameraImage::UndistortPixel(mitk::Point2D src)
+mitk::Point2D mitk::UndistortCameraImage::UndistortPixel(const mitk::Point2D& src)
 {
-  float k1, k2, p1, p2;        // distortion values
-  float k_radial;
-  float x, y;
-  float delta_x, delta_y;
-  float r_2;                   // radial distance squared
-  float distx, disty;          // distored xy
-  mitk::Point2D desPnt;
-  mitk::Point2D dstd, dst;
-  mitk::Point2D old_src = src;  // copy of the original distorted point
+  float r_2 = 0;                // radial distance squared
+  const mitk::Point2D old_src = src;  // copy of the original distorted point
 
   // distortion coefficients
-  k1 = m_distortionMatrixData[0];
-  k2 = m_distortionMatrixData[1];
-  p1 = m_distortionMatrixData[2];
-  p2 = m_distortionMatrixData[3];
+  float k1 = m_distortionMatrixData[0];
+  float k2 = m_distortionMatrixData[1];
+  float p1 = m_distortionMatrixData[2];
+  float p2 = m_distortionMatrixData[3];
 
   // Shift points to principal point and use focal length
+  mitk::Point2D dstd;
   dstd[0] = (src[0] - m_ccX) / m_fcX;
   dstd[1] = (src[1] - m_ccY) / m_fcY;
-  desPnt[0] = dstd[0];
-  desPnt[1] = dstd[1];
+  mitk::Point2D desPnt = dstd;
 
   // Compensate lens distortion
-  x = dstd[0];
-  y = dstd[1];
+  float x = dstd[0];
+  float y = dstd[1];
 
   for (int iter = 0; iter < 5; iter++)
   {
     r_2 = x*x + y*y;
-    k_radial = 1 + k1 * r_2 + k2 * r_2 * r_2;
-    delta_x = 2 * p1*x*y + p2 * (r_2 + 2*x*x);
-    delta_y = 2 * p2*x*y + p1 * (r_2 + 2*y*y);
+    const float k_radial = 1 + k1 * r_2 + k2 * r_2 * r_2;
+    const float delta_x = 2 * p1*x*y + p2 * (r_2 + 2*x*x);
+    const float delta_y = 2 * p2*x*y + p1 * (r_2 + 2*y*y);
     x = (desPnt[0] - delta_x) / k_radial;
     y = (desPnt[1] - delta_y) / k_radial;
   }
@@ -85,8 +76,7 @@ mitk::Point2D mitk::UndistortCameraImage::UndistortPixel(mitk::Point2D src)
   dstd[1] += m_ccY;
 
   // ready
-  dst[0] = (float)dstd[0];
-  dst[1] = (float)dstd[1];
+  // const mitk::Point2D dst = dstd;
 
   // do a sanity check to make sure this ideal point translates properly to the distorted point
   // this does the reverse of the above.  It maps ideal undistorted to distorted image coordinates
@@ -95,22 +85,21 @@ mitk::Point2D mitk::UndistortCameraImage::UndistortPixel(mitk::Point2D src)
   x /= m_fcX;
   y /= m_fcY;
   r_2 = x*x + y*y;
-  distx = x + x*(k1*r_2 + k2*r_2*r_2) + (2*p1*x*y + p2*(r_2 + 2*x*x));
-  disty = y + y*(k1*r_2 + k2*r_2*r_2) + (2*p2*x*y + p1*(r_2 + 2*y*y));
+  float distx = x + x*(k1*r_2 + k2*r_2*r_2) + (2*p1*x*y + p2*(r_2 + 2*x*x));
+  float disty = y + y*(k1*r_2 + k2*r_2*r_2) + (2*p2*x*y + p1*(r_2 + 2*y*y));
   distx *= m_fcX;
   disty *= m_fcY;
   distx += m_ccX;
   disty += m_ccY;
 
   // this should never be more than .2 pixels...
-  float diffx = old_src[0] - distx;
-  float diffy = old_src[1] - disty;
+  const float diffx = old_src[0] - distx;
+  const float diffy = old_src[1] - disty;
   if (fabs(diffx) > .1 || fabs(diffy) > .1)
   {
     std::cout << "undistort sanity check error: diffx =" << diffx << " , diffy = " << diffy;
-
   }
-  return dst;
+  return dstd;
 }
 
 void mitk::UndistortCameraImage::UndistortImage(IplImage *src, IplImage *dst)

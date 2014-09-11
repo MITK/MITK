@@ -1,0 +1,6 @@
+<statemachine name="dummy">
+  <!-- Dummy for a null interaction -->
+  <state name="neutral" ID="0" startstate="true">
+    <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" target="neutral" EVENT_ID="0" />
+  </state>
+</statemachine>

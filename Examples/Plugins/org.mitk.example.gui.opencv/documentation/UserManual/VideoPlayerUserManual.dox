@@ -1,0 +1,16 @@
+/**
+\page org_videoplayer The Video Player Module
+
+\imageMacro{videoplayer.gif,"Icon of the Module",2.00}
+
+Available sections:
+  - \ref QmitkVideoPlayerUserManualOverview 
+<!-- - \ref QmitkVideoPlayerUserManualFeatures -->
+<!--  - \ref QmitkVideoPlayerUserManualUsage  -->
+
+\section QmitkVideoPlayerUserManualOverview Overview
+
+VideoPlayer is a program module that allows to play video files or grab frames directly from a connected camera with an intuitive user interface. Its main purpose is to demonstrate the usage of the OpenCV toolkit in MITK.
+
+*/
+

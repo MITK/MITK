@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDPlayerDeviceFactory_h
 #define __mitkToFCameraPMDPlayerDeviceFactory_h
 
-#include "mitkPMDModuleExports.h"
+#include <MitkPMDExports.h>
 #include "mitkToFCameraPMDPlayerDevice.h"
 #include "mitkAbstractToFDeviceFactory.h"
 #include <mitkCameraIntrinsics.h>
@@ -31,35 +31,32 @@ namespace mitk
   * This offers users the oppertunity to generate new PMD Player Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
-
 class MITK_PMDMODULE_EXPORT ToFCameraPMDPlayerDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
+  /**
+   * @brief ToFCameraPMDPlayerDeviceFactory Default contructor.
+   * This factory internally counts all PMD Player devices starting at 1.
+   */
   ToFCameraPMDPlayerDeviceFactory()
   {
-    this->m_DeviceNumber=1;
   }
   /*!
-   \brief Defining the Factorie´s Name, here for the ToFPMDPlayer.
+   \brief Get the name of the factory, here for the ToFPMDPlayer.
    */
    std::string GetFactoryName()
    {
-       return std::string("PMD Player Factory");
+     return std::string("PMD Player Factory");
    }
 
-   std::string GetCurrentDeviceName()
+  /**
+   * @brief GetCurrentDeviceName Get the name of the current Cam Cube.
+   * First device is named "PMD Player", second "PMD Player 2" and so on.
+   * @return Human readable name as string.
+   */
+   std::string GetDeviceNamePrefix()
    {
-     std::stringstream name;
-     if(m_DeviceNumber>1)
-     {
-       name << "PMD Player "<< m_DeviceNumber;
-     }
-     else
-     {
-       name << "PMD Player";
-     }
-     m_DeviceNumber++;
-     return name.str();
+     return std::string("PMD Player");
    }
 
 private:
@@ -76,8 +73,6 @@ private:
 
      return device.GetPointer();
    }
-
-   int m_DeviceNumber;
 };
 }
 #endif

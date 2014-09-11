@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-
 ViewDescriptor::ViewDescriptor(IConfigurationElement::Pointer e) :
   configElement(e)
 {
@@ -184,6 +183,23 @@ ViewDescriptor::DeactivateHandler()
 //  }
 }
 
+std::vector< std::string> ViewDescriptor::GetKeywordReferences() const
+{
+  std::vector<std::string> result;
+  std::string keywordRefId;
+  std::vector<berry::IConfigurationElement::Pointer> keywordRefs;
+  berry::IConfigurationElement::vector::iterator keywordRefsIt;
+  keywordRefs = configElement->GetChildren("keywordReference");
+  for (keywordRefsIt = keywordRefs.begin()
+          ; keywordRefsIt != keywordRefs.end(); ++keywordRefsIt) // iterate over all refs
+  {
+    (*keywordRefsIt)->GetAttribute("id", keywordRefId);
+    result.push_back(keywordRefId);
+  }
+  return result;
+}
+
+
 void ViewDescriptor::LoadFromExtension()
 {
   configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id);
@@ -209,5 +225,4 @@ void ViewDescriptor::LoadFromExtension()
     }
   }
 }
-
 } // namespace berry

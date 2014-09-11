@@ -26,14 +26,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConnectomicsNetwork.h"
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 namespace mitk
 {
 
     /**
   * \brief A class to generate synthetic networks */
-  class Connectomics_EXPORT ConnectomicsSyntheticNetworkGenerator : public itk::Object
+  class MitkConnectomics_EXPORT ConnectomicsSyntheticNetworkGenerator : public itk::Object
   {
   public:
 
@@ -41,7 +41,8 @@ namespace mitk
     /** Method for creation through the object factory. */
 
     mitkClassMacro(ConnectomicsSyntheticNetworkGenerator, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Create Synthetic Networks */
     mitk::ConnectomicsNetwork::Pointer CreateSyntheticNetwork(int networkTypeId, int paramterOne, double parameterTwo);

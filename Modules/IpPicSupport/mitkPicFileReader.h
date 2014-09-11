@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef PICFILEREADER_H_HEADER_INCLUDED_C1F48A22
 #define PICFILEREADER_H_HEADER_INCLUDED_C1F48A22
 
-#include "IpPicSupportExports.h"
+#include <MitkIpPicSupportExports.h>
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
 
@@ -30,13 +30,14 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read files in DKFZ-pic-format
 //## @ingroup IO
-class IpPicSupport_EXPORT PicFileReader : public ImageSource, public FileReader
+class MitkIpPicSupport_EXPORT PicFileReader : public ImageSource, public FileReader
 {
 public:
     mitkClassMacro(PicFileReader, FileReader);
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkSetStringMacro(FileName);
     itkGetStringMacro(FileName);

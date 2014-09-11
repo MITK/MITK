@@ -1,6 +1,5 @@
-MITK_CREATE_MODULE(MitkDeformableRegistrationUI
+MITK_CREATE_MODULE(
   SUBPROJECTS MITK-Registration
-  DEPENDS Qmitk MitkDeformableRegistration
-  QT_MODULE
+  DEPENDS MitkQtWidgets MitkDeformableRegistration
   EXPORT_DEFINE MITK_DEFORMABLEREGISTRATION_UI_EXPORT
 )

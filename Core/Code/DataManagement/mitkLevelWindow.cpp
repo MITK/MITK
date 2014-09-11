@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkLevelWindow.h"
+#include "mitkImage.h"
 #include "mitkImageSliceSelector.h"
 #include "mitkImageStatisticsHolder.h"
 
@@ -58,6 +59,7 @@ mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)
   m_Fixed( false )
 {
   SetDefaultLevelWindow(level, window);
+  SetLevelWindow(level, window, true);
 }
 
 mitk::LevelWindow::LevelWindow(const mitk::LevelWindow& levWin)
@@ -344,8 +346,8 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   for ( unsigned int k=0;  k<image->GetDimension();  ++k ) numPixelsInDataset *= image->GetDimensions()[k];
   unsigned int minCount = image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute();
   unsigned int maxCount = image->GetStatistics()->GetCountOfMaxValuedVoxelsNoRecompute();
-  float minCountFraction = minCount/float(numPixelsInDataset);
-  float maxCountFraction = maxCount/float(numPixelsInDataset);
+  ScalarType minCountFraction = minCount/ScalarType(numPixelsInDataset);
+  ScalarType maxCountFraction = maxCount/ScalarType(numPixelsInDataset);
 
   //// binary image
   if ( min2ndValue == maxValue )

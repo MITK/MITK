@@ -1,0 +1,34 @@
+/**
+\page org_mitk_views_colourimageprocessing The Colour Image Processing Module
+
+\imageMacro{ColorImageProcessing.png,"Icon of the Colour Image Processing Module",2.00}
+
+\section QmitkColourImageProcessingUserManualSummary Summary
+
+This module allows the user to create coloured images from medical images. Generally, these coloured images would be used in presentations, research papers, or as a teaching aide. 
+
+\section QmitkColourImageProcessingUserManualOverview Overview
+
+The purpose of this module is to create coloured images, which can then be later used in presentations, research papers, or anything else the user desires. Furthermore, different body sections can be assigned a different colour.
+These images are not particularly useful for further image processing, but provide nice, clear, diagrams. Please note that ultrasound images cannot be coloured.  
+
+
+
+\section QmitkColourImageProcessingUserManualFilters Creating Coloured Images
+Open an image in mitk, then click on the colour wheel button. Make sure the image you loaded is selected. 
+
+  
+<H2>\ Image -> RGBAimage</H2>
+Clicking on this button creates an RGBA image from your medical image, which should appear in your data manager. 
+
+<H2>\ Image + mask -> RGBAimage</H2>
+Before clicking on this button, a mask is needed. A mask is generally created using the segmentation tool. Make sure both the mask and image are selected, then click on the image + mask -> RGBA image button. This creates an
+RGBA image that is coloured only in section defined by the mask. 
+
+<H2>\ Image + mask + color-> RGBAimage</H2>
+This functions the same way as the Image + mask -> RGBAimage. The difference is that the user can select the colour of the section represented by the mask. This is done by clicking on the colour next to the Image + mask + color-> RGBAimage button
+If multiple RGBA images are created with different colours, they can be combined into one image. Ensure that the desired coloured images are selected, then click on the combine RGBA images button. 
+
+
+
+*/

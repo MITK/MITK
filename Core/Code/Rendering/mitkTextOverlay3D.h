@@ -19,7 +19,7 @@
 
 #include <mitkVtkOverlay3D.h>
 #include <mitkLocalStorageHandler.h>
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 
 class vtkFollower;
 class vtkVectorText;
@@ -57,7 +57,8 @@ public:
   };
 
   mitkClassMacro(TextOverlay3D, mitk::VtkOverlay3D);
-  itkNewMacro(TextOverlay3D);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 protected:
 

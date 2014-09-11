@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToolManager.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
+#include "mitkImageReadAccessor.h"
+#include "mitkAbstractTransformGeometry.h"
 
 #include "mitkCorrectorTool2D.xpm"
 
@@ -30,23 +32,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, CorrectorTool2D, "Correction tool");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, CorrectorTool2D, "Correction tool");
 }
 
 mitk::CorrectorTool2D::CorrectorTool2D(int paintingPixelValue)
 :FeedbackContourTool("PressMoveRelease"),
  m_PaintingPixelValue(paintingPixelValue)
 {
-  // great magic numbers
-  CONNECT_ACTION( 80, OnMousePressed );
-  CONNECT_ACTION( 90, OnMouseMoved );
-  CONNECT_ACTION( 42, OnMouseReleased );
-
-  GetFeedbackContour()->SetIsClosed( false ); // don't close the contour to a polygon
+  GetFeedbackContour()->SetClosed( false ); // don't close the contour to a polygon
 }
 
 mitk::CorrectorTool2D::~CorrectorTool2D()
 {
+}
+
+void mitk::CorrectorTool2D::ConnectActionsAndFunctions()
+{
+  CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
+  CONNECT_FUNCTION( "Move", OnMouseMoved);
+  CONNECT_FUNCTION( "Release", OnMouseReleased);
 }
 
 const char** mitk::CorrectorTool2D::GetXPM() const
@@ -83,38 +87,44 @@ void mitk::CorrectorTool2D::Deactivated()
   Superclass::Deactivated();
 }
 
-bool mitk::CorrectorTool2D::OnMousePressed (Action* action, const StateEvent* stateEvent)
+bool mitk::CorrectorTool2D::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+      return false;
+
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
-
   int timestep = positionEvent->GetSender()->GetTimeStep();
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
   contour->Clear();
   contour->Expand(timestep + 1);
-  contour->SetIsClosed(false, timestep);
-  contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
+  contour->SetClosed(false, timestep);
+  mitk::Point3D point = positionEvent->GetPositionInWorld();
+  contour->AddVertex( point, timestep );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
 
   return true;
 }
 
-bool mitk::CorrectorTool2D::OnMouseMoved   (Action* action, const StateEvent* stateEvent)
+bool mitk::CorrectorTool2D::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+      return false;
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
-  contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
+  mitk::Point3D point = positionEvent->GetPositionInWorld();
+  contour->AddVertex( point, timestep );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -122,25 +132,32 @@ bool mitk::CorrectorTool2D::OnMouseMoved   (Action* action, const StateEvent* st
   return true;
 }
 
-bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* stateEvent)
+bool mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+      return false;
+
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  //if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
-  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
   if ( !image || !planeGeometry ) return false;
+
+  const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
+  if ( !image || abstractTransformGeometry ) return false;
 
   // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
   m_WorkingSlice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
@@ -177,7 +194,8 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
 
   mitk::Image::Pointer resultSlice = mitk::Image::New();
   resultSlice->Initialize(algorithm->GetOutput());
-  resultSlice->SetVolume(algorithm->GetOutput()->GetData());
+  mitk::ImageReadAccessor imAccess(algorithm->GetOutput());
+  resultSlice->SetVolume(imAccess.GetData());
 
   this->WriteBackSegmentationResult(positionEvent, resultSlice);
 

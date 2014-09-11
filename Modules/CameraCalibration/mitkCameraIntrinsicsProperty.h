@@ -28,7 +28,7 @@ namespace mitk {
 # pragma warning(disable: 4522)
 #endif
 
-class mitkCameraCalibration_EXPORT CameraIntrinsicsProperty : public BaseProperty
+class MitkCameraCalibration_EXPORT CameraIntrinsicsProperty : public BaseProperty
 {
 public:
 
@@ -36,7 +36,8 @@ public:
 
   mitkClassMacro(CameraIntrinsicsProperty, BaseProperty);
 
-  itkNewMacro(CameraIntrinsicsProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro1Param(CameraIntrinsicsProperty, mitk::CameraIntrinsics::Pointer);
 
   itkSetMacro(Value, mitk::CameraIntrinsics::Pointer );

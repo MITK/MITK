@@ -14,12 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkThinPlateSplineCurvedGeometry.h"
 #include <vtkThinPlateSplineTransform.h>
 #include <vtkPoints.h>
 
 mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry()
+  : Superclass()
 {
   m_InterpolatingAbstractTransform = m_ThinPlateSplineTransform = vtkThinPlateSplineTransform::New();
 
@@ -50,15 +50,14 @@ bool mitk::ThinPlateSplineCurvedGeometry::IsValid() const
   return m_TargetLandmarks.IsNotNull() && (m_TargetLandmarks->Size() >= 3) && m_LandmarkProjector.IsNotNull();
 }
 
-void mitk::ThinPlateSplineCurvedGeometry::SetSigma(float sigma)
+void mitk::ThinPlateSplineCurvedGeometry::SetSigma(double sigma)
 {
   m_ThinPlateSplineTransform->SetSigma(sigma);
 }
 
-float mitk::ThinPlateSplineCurvedGeometry::GetSigma() const
+double mitk::ThinPlateSplineCurvedGeometry::GetSigma() const
 {
   return m_ThinPlateSplineTransform->GetSigma();
-
 }
 
 void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()
@@ -96,7 +95,7 @@ void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()
 
 itk::LightObject::Pointer mitk::ThinPlateSplineCurvedGeometry::InternalClone() const
 {
-  mitk::Geometry3D::Pointer newGeometry = new Self(*this);
+  mitk::BaseGeometry::Pointer newGeometry = new Self(*this);
   newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }

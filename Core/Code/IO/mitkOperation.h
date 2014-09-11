@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef OPERATION_H_HEADER_INCLUDED_C16E7D9E
 #define OPERATION_H_HEADER_INCLUDED_C16E7D9E
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <itkEventObject.h>
 
 namespace mitk {

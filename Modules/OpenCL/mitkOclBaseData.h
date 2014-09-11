@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkOclBaseData_h
 #define __mitkOclBaseData_h
 
-#include "MitkOclExports.h"
+#include "MitkOpenCLExports.h"
 #include "mitkOclUtils.h"
 
 #include "mitkOpenCL.h"
@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  class MitkOcl_EXPORT OclBaseData : public itk::Object
+  class MitkOpenCL_EXPORT OclBaseData : public itk::Object
   {
   public:
     mitkClassMacro(OclBaseData, itk::Object);

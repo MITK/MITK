@@ -18,9 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPICHELPER_H_HEADER_INCLUDED_C1F4DAB4
 #define MITKPICHELPER_H_HEADER_INCLUDED_C1F4DAB4
 
-#include <IpPicSupportExports.h>
-#include "mitkVector.h"
+#include <MitkIpPicSupportExports.h>
+#include "mitkNumericTypes.h"
 #include <mitkIpPic.h>
+#include <mitkCommon.h>
 
 namespace mitk {
 
@@ -29,7 +30,7 @@ class SlicedGeometry3D;
 //##Documentation
 //## @brief Internal class for managing references on sub-images
 //## @ingroup Data
-class IpPicSupport_EXPORT PicHelper
+class MitkIpPicSupport_EXPORT PicHelper
 {
 public:
   static const char *GetNameOfClass() { return "PicHelper"; }
@@ -42,7 +43,12 @@ public:
 
   static void InitializeEvenlySpaced(const mitkIpPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry);
 
-  static bool SetGeometry2D(const mitkIpPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry);
+  static bool SetPlaneGeometry(const mitkIpPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry);
+
+  /**
+  * \deprecatedSince{2014_06} Please use SetPlaneGeometry
+  */
+  DEPRECATED(static bool SetGeometry2D(const mitkIpPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry)){return SetPlaneGeometry(pic,s,slicedgeometry);};
 };
 
 } // namespace mitk

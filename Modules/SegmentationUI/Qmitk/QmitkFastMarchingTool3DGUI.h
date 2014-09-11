@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkFastMarchingTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 #include "mitkFastMarchingTool3D.h"
 
 class ctkSliderWidget;
@@ -32,13 +32,14 @@ class QPushButton;
 \brief GUI for mitk::FastMarchingTool.
 \sa mitk::FastMarchingTool
 */
-class SegmentationUI_EXPORT QmitkFastMarchingTool3DGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkFastMarchingTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
 public:
   mitkClassMacro(QmitkFastMarchingTool3DGUI, QmitkToolGUI);
-  itkNewMacro(QmitkFastMarchingTool3DGUI);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   void OnThresholdChanged(int current);
 

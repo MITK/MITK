@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef FILEWRITER_H_HEADER_INCLUDED
 #define FILEWRITER_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <itkProcessObject.h>
 #include <mitkDataNode.h>
 
@@ -97,12 +97,6 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
     //##Documentation
     //## @brief Return the MimeType of the saved File.
     virtual std::string GetWritenMIMEType();
-
-    //##Documentation
-    //## @brief Set the DataTreenode as Input. Important: The Writer
-    //## always have a SetInput-Function.
-    using itk::ProcessObject::SetInput;
-    virtual void SetInput( DataNode* );
 
     virtual void Write() = 0;
 

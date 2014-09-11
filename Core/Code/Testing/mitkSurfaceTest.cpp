@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSurface.h"
 #include "mitkCommon.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "mitkTestingMacros.h"
 
 #include "vtkPolyData.h"
@@ -54,7 +54,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(cloneSurface->GetVtkPolyData()!= NULL, "Testing set vtkPolyData of cloned surface!");
   cloneSurface = NULL;
 
-    vtkFloatingPointType bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    double bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     polys->ComputeBounds();
     polys->GetBounds( bounds );
 
@@ -78,7 +78,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   mitk::Surface::RegionType requestedRegion = surface->GetRequestedRegion();
   MITK_TEST_CONDITION_REQUIRED(requestedRegion.GetSize(3) == 5, "Testing mitk::Surface::Expand( timesteps ): ");
 
-  vtkFloatingPointType boundsMat[5][6];
+  double boundsMat[5][6];
 
   for (int i=0;i<5;i++) {
     vtkSphereSource* sphereSource = vtkSphereSource::New();

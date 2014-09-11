@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkAutoCropTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkSegmentationsProcessingTool.h"
 
 namespace mitk
@@ -33,12 +33,13 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class Segmentation_EXPORT AutoCropTool : public SegmentationsProcessingTool
+class MitkSegmentation_EXPORT AutoCropTool : public SegmentationsProcessingTool
 {
   public:
 
     mitkClassMacro(AutoCropTool, SegmentationsProcessingTool);
-    itkNewMacro(AutoCropTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;

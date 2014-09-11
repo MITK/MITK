@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKWEAKPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791
 #define MITKWEAKPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
 #include "itkWeakPointer.h"
 
@@ -38,7 +38,8 @@ namespace mitk {
   public:
     mitkClassMacro(WeakPointerProperty, BaseProperty);
 
-    itkNewMacro(WeakPointerProperty);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(WeakPointerProperty, itk::Object*);
 
     virtual ~WeakPointerProperty();

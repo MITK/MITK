@@ -64,7 +64,8 @@ namespace mitk {
       typedef  RigidRegistrationObserver   Self;
       typedef  itk::Command             Superclass;
       typedef itk::SmartPointer<Self>  Pointer;
-      itkNewMacro( Self );
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
       typedef itk::SingleValuedNonLinearOptimizer OptimizerType;
       typedef OptimizerType * OptimizerPointer;

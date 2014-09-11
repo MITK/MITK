@@ -31,8 +31,8 @@ MITK_USE_OpenCL
 The build system tries to find the OpenCL library and the include path automatically. If this attempt failes, you will be prompted to manually specify following variables:
 
 \verbatim
-OpenCL_INCLUDE_DIR
-OpenCL_LIBRARY
+OPENCL_INCLUDE_DIRS
+OPENCL_LIBRARIES
 \endverbatim
 
 

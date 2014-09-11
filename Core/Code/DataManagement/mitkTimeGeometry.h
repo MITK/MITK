@@ -21,19 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 //MITK
 #include <mitkCommon.h>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkOperationActor.h"
-#include <mitkGeometry3D.h>
+#include <mitkBaseGeometry.h>
 
 
 namespace mitk {
-
   /**
   * \deprecatedSince{2013_09} GlobalInteraction is deprecated. It is replaced by mitk::Dispatcher.
   *  Please use the new implementation described in \see DataInteractionPage .
   */
 
-  typedef float         TimePointType;
+  typedef mitk::ScalarType         TimePointType;
   typedef std::size_t   TimeStepType;
 
   /**
@@ -43,7 +42,7 @@ namespace mitk {
   * depends on the way the different time steps are managed.
   *
   * The time is defined either by a time step or a time point. Time steps
-  * are non-negativ integers starting from 0. A time point is is an float value
+  * are non-negativ integers starting from 0. A time point is is a ScalarType value
   * which gives the passed time since start in ms. Be aware that the starting
   * point is not fixed so it is possible that the same time point  defines two
   * different time depending on the start time of the used time geometry.
@@ -71,6 +70,7 @@ namespace mitk {
     mitkClassMacro(TimeGeometry, itk::Object)
     itkCloneMacro(Self)
     itkCreateAnotherMacro(Self)
+
     /**
     * \brief Returns the number of time steps.
     *
@@ -87,19 +87,38 @@ namespace mitk {
     * time steps available it usually goes from -max to +max. The time point
     * is given in ms.
     */
-    virtual TimePointType    GetMinimumTimePoint () const = 0;
+    virtual TimePointType    GetMinimumTimePoint() const = 0;
     /**
     * \brief Returns the last time point for which the object is valid
     *
     * Gives the last time point for which a valid geometrie is saved in
     * this time geometry. The time point is given in ms.
     */
-    virtual TimePointType    GetMaximumTimePoint () const = 0;
+    virtual TimePointType    GetMaximumTimePoint() const = 0;
+
+    /**
+    * \brief Returns the first time point for which the object is valid.
+    *
+    * Returns the first valid time point for the given TimeStep. The time point
+    * is given in ms.
+    */
+    virtual TimePointType    GetMinimumTimePoint(TimeStepType step) const = 0;
+    /**
+    * \brief Returns the last time point for which the object is valid
+    *
+    * Gives the last time point for the Geometry specified by the given TimeStep. The time point is given in ms.
+    */
+    virtual TimePointType    GetMaximumTimePoint(TimeStepType step) const = 0;
 
     /**
     * \brief Get the time bounds (in ms)
     */
-    virtual TimeBounds GetTimeBounds( ) const = 0;
+    virtual TimeBounds GetTimeBounds() const = 0;
+
+    /**
+    * \brief Get the time bounds for the given TimeStep (in ms)
+    */
+    virtual TimeBounds GetTimeBounds(TimeStepType step) const = 0;
     /**
     * \brief Tests if a given time point is covered by this object
     *
@@ -149,7 +168,7 @@ namespace mitk {
     * time point or all time points depending on the used implementation
     * of TimeGeometry.
     */
-    virtual Geometry3D::Pointer GetGeometryForTimePoint ( TimePointType timePoint) const = 0;
+    virtual BaseGeometry::Pointer GetGeometryForTimePoint ( TimePointType timePoint) const = 0;
     /**
     * \brief Returns the geometry which corresponds to the given time step
     *
@@ -162,7 +181,7 @@ namespace mitk {
     * time step or all time steps depending on the used implementation
     * of TimeGeometry.
     */
-    virtual Geometry3D::Pointer GetGeometryForTimeStep ( TimeStepType timeStep) const = 0;
+    virtual BaseGeometry::Pointer GetGeometryForTimeStep ( TimeStepType timeStep) const = 0;
 
     /**
     * \brief Returns a clone of the geometry of a specific time point
@@ -170,14 +189,14 @@ namespace mitk {
     * If an invalid time step is given (e.g. no geometry is defined for this time step)
     * a null-pointer will be returned.
     */
-    virtual Geometry3D::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const = 0;
+    virtual BaseGeometry::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const = 0;
     /**
     * \brief Sets the geometry for a given time step
     *
     * Sets the geometry for the given time steps. This may also afflects other
     * time steps, depending on the implementation of TimeGeometry.
     */
-    virtual void SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep) = 0;
+    virtual void SetTimeStepGeometry(BaseGeometry* geometry, TimeStepType timeStep) = 0;
 
     /**
     * \brief Expands to the given number of time steps
@@ -281,8 +300,6 @@ namespace mitk {
     virtual void ExecuteOperation(Operation *op);
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
-
   }; // end class TimeGeometry
-
 } // end namespace MITK
 #endif // TimeGeometry_h

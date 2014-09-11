@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarCircle.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 #include "mitkProperties.h"
 
@@ -47,7 +47,7 @@ bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &poi
   {
     const Point2D &centerPoint = GetControlPoint( 0 );
     Point2D boundaryPoint = GetControlPoint( 1 );
-    vnl_vector<float> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
+    vnl_vector<ScalarType> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
 
     boundaryPoint[0] += vec[0];
     boundaryPoint[1] += vec[1];
@@ -65,22 +65,22 @@ bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &poi
 
 mitk::Point2D mitk::PlanarCircle::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
 {
-  if ( this->GetGeometry2D() ==  NULL )
+  if ( this->GetPlaneGeometry() ==  NULL )
   {
     return point;
   }
 
   Point2D indexPoint;
-  this->GetGeometry2D()->WorldToIndex( point, indexPoint );
+  this->GetPlaneGeometry()->WorldToIndex( point, indexPoint );
 
-  BoundingBox::BoundsArrayType bounds = this->GetGeometry2D()->GetBounds();
+  BoundingBox::BoundsArrayType bounds = this->GetPlaneGeometry()->GetBounds();
   if ( indexPoint[0] < bounds[0] ) { indexPoint[0] = bounds[0]; }
   if ( indexPoint[0] > bounds[1] ) { indexPoint[0] = bounds[1]; }
   if ( indexPoint[1] < bounds[2] ) { indexPoint[1] = bounds[2]; }
   if ( indexPoint[1] > bounds[3] ) { indexPoint[1] = bounds[3]; }
 
   Point2D constrainedPoint;
-  this->GetGeometry2D()->IndexToWorld( indexPoint, constrainedPoint );
+  this->GetPlaneGeometry()->IndexToWorld( indexPoint, constrainedPoint );
 
   if(m_MinMaxRadiusContraintsActive)
   {
@@ -135,7 +135,7 @@ void mitk::PlanarCircle::GeneratePolyLine()
 
     // ... and append it to the PolyLine.
     // No extending supported here, so we can set the index of the PolyLineElement to '0'
-    AppendPointToPolyLine( 0, PolyLineElement( polyLinePoint, 0 ) );
+    this->AppendPointToPolyLine(0, polyLinePoint);
   }
 }
 
@@ -163,3 +163,26 @@ void mitk::PlanarCircle::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
 }
+
+bool mitk::PlanarCircle::SetCurrentControlPoint( const Point2D& point )
+{
+  if ( m_SelectedControlPoint < 0 )
+  {
+    m_SelectedControlPoint = 1;
+  }
+
+  return this->SetControlPoint( m_SelectedControlPoint, point, false);
+}
+
+ bool mitk::PlanarCircle::Equals(const PlanarFigure &other) const
+ {
+   const mitk::PlanarCircle* otherCircle = dynamic_cast<const mitk::PlanarCircle*>(&other);
+   if ( otherCircle )
+   {
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

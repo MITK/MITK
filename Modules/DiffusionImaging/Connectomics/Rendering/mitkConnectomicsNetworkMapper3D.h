@@ -55,7 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vector>
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 namespace mitk {
 
@@ -64,17 +64,17 @@ namespace mitk {
     * \ingroup Mapper
     */
 
-  class Connectomics_EXPORT ConnectomicsNetworkMapper3D : public VtkMapper
+  class MitkConnectomics_EXPORT ConnectomicsNetworkMapper3D : public VtkMapper
   {
   public:
 
     mitkClassMacro(ConnectomicsNetworkMapper3D, VtkMapper);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer); //looks like deprecated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
 
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);

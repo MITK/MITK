@@ -104,7 +104,8 @@ class EXPORT_SPEC CLASS_NAME ## Tool : public BASE_CLASS \
     typedef itk::SmartPointer<Self>  Pointer; \
     typedef itk::SmartPointer<const Self>  ConstPointer; \
  \
-    itkNewMacro(CLASS_NAME ## Tool); \
+    itkFactorylessNewMacro(Self) \
+    itkCloneMacro(Self) \
  \
   protected: \
  \

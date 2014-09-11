@@ -63,6 +63,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
     //A contour lies inside another one if the pixel values in the direction of the normal is 1
     m_NegativeNormalCounter = 0;
     m_PositiveNormalCounter = 0;
+    vtkIdType offSet (0);
 
     //Iterating over each polygon
     for( existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)
@@ -86,7 +87,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
       v1[1] = p2[1]-p1[1];
       v1[2] = p2[2]-p1[2];
 
-      for (unsigned int k = 2; k < cellSize; k++)
+      for (vtkIdType k = 2; k < cellSize; k++)
       {
         index = cellSize*0.25;
         existingPoints->GetPoint(cell[index], p1);
@@ -120,7 +121,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
       double vertexNormal[3];
 
-      for (unsigned j = 0; j < cellSize-2; j++)
+      for (vtkIdType j = 0; j < cellSize-2; j++)
       {
         existingPoints->GetPoint(cell[j+1], p1);
         existingPoints->GetPoint(cell[j+2], p2);
@@ -140,7 +141,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
         finalNormal[2] = (vertexNormal[2] + vertexNormalTemp[2])*0.5;
 
         //Here we determine the direction of the normal
-        if (j == 0 && m_SegmentationBinaryImage)
+        if (m_SegmentationBinaryImage)
         {
           Point3D worldCoord;
           worldCoord[0] = p1[0]+finalNormal[0]*m_MaxSpacing;
@@ -149,9 +150,11 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
           double val = 0.0;
           mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_SegmentationBinaryImage);
-          val = readAccess.GetPixelByWorldCoordinates(worldCoord);
+          itk::Index<3> idx;
+          m_SegmentationBinaryImage->GetGeometry()->WorldToIndex(worldCoord, idx);
+          val = readAccess.GetPixelByIndexSafe(idx);
 
-          if (val == 1.0)
+          if (val == 0.0)
           {
               ++m_PositiveNormalCounter;
           }
@@ -189,21 +192,22 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
       id = cell[cellSize-1];
       normals->SetTuple(id,vertexNormal);
 
-      int normalDirection(-1);
-
-      if(m_NegativeNormalCounter < m_PositiveNormalCounter)
+      if(m_NegativeNormalCounter > m_PositiveNormalCounter)
       {
-          normalDirection = 1;
+          for(vtkIdType n = 0; n < cellSize; n++)
+          {
+              double normal[3];
+              normals->GetTuple(offSet+n, normal);
+              normal[0] = (-1)*normal[0];
+              normal[1] = (-1)*normal[1];
+              normal[2] = (-1)*normal[2];
+              normals->SetTuple(offSet+n, normal);
+          }
       }
 
-      for(unsigned int n = 0; n < normals->GetNumberOfTuples(); n++)
-      {
-          double normal[3];
-          normals->GetTuple(n,normal);
-          normal[0] = normalDirection*normal[0];
-          normal[1] = normalDirection*normal[1];
-          normal[2] = normalDirection*normal[2];
-      }
+      m_NegativeNormalCounter = 0;
+      m_PositiveNormalCounter = 0;
+      offSet += cellSize;
 
 
     }//end for all cells
@@ -245,7 +249,7 @@ mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface
 
     for( existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)
     {
-      for ( unsigned int j = 0; j < cellSize; j++ )
+      for ( vtkIdType j = 0; j < cellSize; j++ )
       {
         double currentNormal[3];
         currentCellNormals->GetTuple(cell[j], currentNormal);

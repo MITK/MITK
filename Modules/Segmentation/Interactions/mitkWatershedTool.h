@@ -18,8 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkWatershedTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
+#include <itkImage.h>
 
 namespace us {
 class ModuleResource;
@@ -42,12 +43,13 @@ class Image;
 
   $Darth Vader$
 */
-class Segmentation_EXPORT WatershedTool : public AutoSegmentationTool
+class MitkSegmentation_EXPORT WatershedTool : public AutoSegmentationTool
 {
   public:
 
     mitkClassMacro(WatershedTool, AutoSegmentationTool);
-    itkNewMacro(WatershedTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void SetThreshold(double t) {
       m_Threshold = t;
@@ -68,7 +70,7 @@ class Segmentation_EXPORT WatershedTool : public AutoSegmentationTool
       * \param segmentation A pointer to the output image, which will point to the pipeline output after execution.
       */
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKWatershed( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer& segmentation );
+    void ITKWatershed( itk::Image<TPixel, VImageDimension>* originalImage, itk::SmartPointer<mitk::Image>& segmentation );
 
     const char** GetXPM() const;
     const char* GetName() const;

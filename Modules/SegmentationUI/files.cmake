@@ -13,6 +13,7 @@ Qmitk/QmitkLiveWireTool2DGUI.cpp
 Qmitk/QmitkNewSegmentationDialog.cpp
 Qmitk/QmitkOtsuTool3DGUI.cpp
 Qmitk/QmitkPaintbrushToolGUI.cpp
+Qmitk/QmitkPickingToolGUI.cpp
 Qmitk/QmitkPixelManipulationToolGUI.cpp
 Qmitk/QmitkRegionGrow3DToolGUI.cpp
 Qmitk/QmitkSlicesInterpolator.cpp
@@ -40,6 +41,7 @@ Qmitk/QmitkLiveWireTool2DGUI.h
 Qmitk/QmitkNewSegmentationDialog.h
 Qmitk/QmitkOtsuTool3DGUI.h
 Qmitk/QmitkPaintbrushToolGUI.h
+Qmitk/QmitkPickingToolGUI.h
 Qmitk/QmitkPixelManipulationToolGUI.h
 Qmitk/QmitkRegionGrow3DToolGUI.h
 Qmitk/QmitkSlicesInterpolator.h
@@ -56,5 +58,6 @@ set(UI_FILES
 Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
 Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
+Qmitk/QmitkPickingToolGUIControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
 )

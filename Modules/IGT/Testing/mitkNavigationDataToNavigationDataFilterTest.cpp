@@ -26,7 +26,8 @@ class NavigationDataToNavigationDataFilterTestClass : public mitk::NavigationDat
 {
 public:
   mitkClassMacro(NavigationDataToNavigationDataFilterTestClass, NavigationDataToNavigationDataFilter);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 };
 
 /**Documentation

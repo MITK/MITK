@@ -21,17 +21,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProgressBar.h>
 #include <mitkProperties.h>
 #include <mitkSurfaceToImageFilter.h>
+#include <mitkSurface.h>
+#include <mitkImage.h>
 
 #include <qmessagebox.h>
 
-static const char* const HelpText = "Select a regular image and a surface";
+static const char* const HelpText = "Select an image and a surface above";
 
 QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
   m_Controls.setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImagePredicate);
+  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImageAndSegmentationPredicate);
   m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::SurfacePredicate);
   m_Controls.dataSelectionWidget->SetHelpText(HelpText);
 

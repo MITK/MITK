@@ -22,65 +22,49 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-//##Documentation
-//## @brief Gives locked and index-based write access for a particular image part.
-//## The class provides several set- and get-methods, which allow an easy pixel access.
-//## It needs to know about pixel type and dimension of its image at compile time.
-//## @tparam TPixel defines the PixelType
-//## @tparam VDimension defines the dimension for accessing data
-//## @ingroup Data
+/**
+ * @brief Gives locked and index-based write access for a particular image part.
+ * The class provides several set- and get-methods, which allow an easy pixel access.
+ * It needs to know about pixel type and dimension of its image at compile time.
+ * @tparam TPixel defines the PixelType
+ * @tparam VDimension defines the dimension for accessing data
+ * @ingroup Data
+ */
 template <class TPixel, unsigned int VDimension = 3>
 class ImagePixelWriteAccessor : public ImagePixelAccessor<TPixel, VDimension>
 {
   friend class Image;
 
 public:
-    typedef ImagePixelAccessor<TPixel,VDimension> ImagePixelAccessorType;
+
+  typedef ImagePixelAccessor<TPixel,VDimension> ImagePixelAccessorType;
+  typedef itk::SmartPointer<mitk::Image> ImagePointer;
 
   /** \brief Instantiates a mitk::ImageWriteAccessor (see its doxygen page for more details)
-     *  \param Image::Pointer specifies the associated Image
-     *  \param ImageDataItem* specifies the allocated image part
-     *  \param OptionFlags properties from mitk::ImageAccessorBase::Options can be chosen and assembled with bitwise unification.
-     *  \throws mitk::Exception if the Constructor was created inappropriately
-     *  \throws mitk::MemoryIsLockedException if requested image area is exclusively locked and mitk::ImageAccessorBase::ExceptionIfLocked is set in OptionFlags
-     *
-     *   Includes a check if typeid of PixelType coincides with templated TPixel
-     *   and a check if VDimension equals to the Dimension of the Image.*/
+   *  \param Image::Pointer specifies the associated Image
+   *  \param ImageDataItem* specifies the allocated image part
+   *  \param OptionFlags properties from mitk::ImageAccessorBase::Options can be chosen and assembled with bitwise unification.
+   *  \throws mitk::Exception if the Constructor was created inappropriately
+   *  \throws mitk::MemoryIsLockedException if requested image area is exclusively locked and mitk::ImageAccessorBase::ExceptionIfLocked is set in OptionFlags
+   *
+   *   Includes a check if typeid of PixelType coincides with templated TPixel
+   *   and a check if VDimension equals to the Dimension of the Image.*/
   ImagePixelWriteAccessor(
       ImagePointer iP,
-      ImageDataItem* iDI = NULL,
+      const ImageDataItem* iDI = NULL,
       int OptionFlags = ImageAccessorBase::DefaultBehavior
-      ) :
-    ImagePixelAccessor<TPixel, VDimension>(iP,iDI),
-    m_WriteAccessor(iP , iDI, OptionFlags)
+      )
+    : ImagePixelAccessor<TPixel, VDimension>(iP.GetPointer(),iDI)
+    , m_WriteAccessor(iP , iDI, OptionFlags)
   {
-
-    // Check if Dimensions are correct
-    if(ImagePixelAccessor<TPixel,VDimension>::m_ImageDataItem == NULL) {
-      if(m_WriteAccessor.m_Image->GetDimension() != VDimension)
-        mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and Image are not equal. They have to be equal if an entire image is requested";
-    }
-    else {
-      if(ImagePixelAccessor<TPixel,VDimension>::m_ImageDataItem->GetDimension() != VDimension)
-        mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and ImageDataItem are not equal.";
-    }
-
-    // Check if PixelType is correct
-    if(!(m_WriteAccessor.m_Image->GetPixelType() ==  mitk::MakePixelType< itk::Image<TPixel, VDimension> >()) )
-    {
-      mitkThrow() << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal";
-    }
-
-
-
   }
 
 
-/** \brief Gives full data access. */
-    virtual inline TPixel * GetData()
-    {
-      return (TPixel*) m_WriteAccessor.m_AddressBegin;
-    }
+  /** \brief Gives full data access. */
+  virtual inline TPixel * GetData() const
+  {
+    return static_cast<TPixel*>(m_WriteAccessor.m_AddressBegin);
+  }
 
 
   /// Sets a pixel value at given index.
@@ -143,8 +127,8 @@ public:
   /** Returns a const reference to the pixel at given world coordinate - works only with three-dimensional ImageAccessor */
   const TPixel & GetPixelByWorldCoordinates(mitk::Point3D position)
   {
-    Index3D itkIndex;
-    m_WriteAccessor.m_Image->GetGeometry()->WorldToIndex(position, itkIndex);
+    itk::Index<3> itkIndex;
+    m_WriteAccessor.GetImage()->GetGeometry()->WorldToIndex(position, itkIndex);
 
     return GetPixelByIndex( itkIndex);
   }
@@ -161,6 +145,9 @@ public:
 private:
 
   ImageWriteAccessor m_WriteAccessor;
+
+  ImagePixelWriteAccessor& operator=(const ImagePixelWriteAccessor&);  // Not implemented on purpose.
+  ImagePixelWriteAccessor(const ImagePixelWriteAccessor &);
 
 };
 

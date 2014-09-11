@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __vtkMitkThickSlicesFilter_h
 #define __vtkMitkThickSlicesFilter_h
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 #include "vtkThreadedImageAlgorithm.h"
 
@@ -33,7 +33,7 @@ class MITK_CORE_EXPORT vtkMitkThickSlicesFilter : public vtkThreadedImageAlgorit
 {
 public:
   static vtkMitkThickSlicesFilter *New();
-  vtkTypeRevisionMacro(vtkMitkThickSlicesFilter,vtkThreadedImageAlgorithm);
+  vtkTypeMacro(vtkMitkThickSlicesFilter,vtkThreadedImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -53,7 +53,9 @@ public:
   enum {
     MIP=0,
     SUM,
-    WEIGHTED
+    WEIGHTED,
+    MINIP,
+    MEAN
   };
 
 protected:

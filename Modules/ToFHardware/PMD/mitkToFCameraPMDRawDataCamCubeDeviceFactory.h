@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDRawDataCamCubeDeviceFactory_h
 #define __mitkToFCameraPMDRawDataCamCubeDeviceFactory_h
 
-#include "mitkPMDModuleExports.h"
+#include <MitkPMDExports.h>
 #include "mitkToFCameraPMDRawDataCamCubeDevice.h"
 #include "mitkAbstractToFDeviceFactory.h"
 #include <mitkCameraIntrinsics.h>
@@ -46,28 +46,21 @@ public:
 
   ToFCameraPMDRawDataCamCubeDeviceFactory()
   {
-    this->m_DeviceNumber = 1;
   }
   /*!
-   \brief Defining the Factorie´s Name, here for the RawDataDeviceFactory.
+   \brief Get the name of the factory, here for the ToFPMDRawDataCamCube.
    */
    std::string GetFactoryName()
    {
        return std::string("PMD RAW Data Camcube Factory ");
    }
-   std::string GetCurrentDeviceName()
+
+   /**
+    * @brief GetDeviceNamePrefix Main part of the device name.
+    */
+   std::string GetDeviceNamePrefix()
    {
-     std::stringstream name;
-     if(m_DeviceNumber>1)
-     {
-       name << "PMD Raw Data CamCube 2.0/3.0 "<< m_DeviceNumber;
-     }
-     else
-     {
-       name << "PMD Raw Data CamCube 2.0/3.0";
-     }
-     m_DeviceNumber++;
-     return name.str();
+       return std::string("PMD Raw Data CamCube 2.0/3.0");
    }
 
 private:
@@ -90,8 +83,6 @@ private:
      us::Module* module = us::GetModuleContext()->GetModule();
      return module->GetResource("CalibrationFiles/PMDCamCube3_camera.xml");
    }
-
-   int m_DeviceNumber;
 };
 }
 #endif

@@ -20,12 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkProcessObject.h>
 #include <vnl/vnl_vector_fixed.h>
 #include <itkVectorContainer.h>
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 namespace itk
 {
 
-class DiffusionCore_EXPORT DwiGradientLengthCorrectionFilter : public ProcessObject
+class MitkDiffusionCore_EXPORT DwiGradientLengthCorrectionFilter : public ProcessObject
 {
 
 public:
@@ -38,7 +38,8 @@ public:
     typedef itk::VectorContainer< unsigned int, GradientDirectionType >                                 GradientDirectionContainerType;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     itkTypeMacro(DwiGradientLengthCorrectionFilter,ProcessObject)
 
     void GenerateData();

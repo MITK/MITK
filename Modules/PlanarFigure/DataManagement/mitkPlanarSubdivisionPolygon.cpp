@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarSubdivisionPolygon.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
 // stl related includes
@@ -130,3 +130,20 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
   }
   subdivisionPoints.clear();
 }
+
+ bool mitk::PlanarSubdivisionPolygon::Equals(const mitk::PlanarFigure& other) const
+ {
+   const mitk::PlanarSubdivisionPolygon* otherSubDivPoly = dynamic_cast<const mitk::PlanarSubdivisionPolygon*>(&other);
+   if ( otherSubDivPoly )
+   {
+     if ( this->m_SubdivisionRounds != otherSubDivPoly->m_SubdivisionRounds)
+       return false;
+     if ( std::abs(this->m_TensionParameter - otherSubDivPoly->m_TensionParameter) > mitk::eps)
+       return false;
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

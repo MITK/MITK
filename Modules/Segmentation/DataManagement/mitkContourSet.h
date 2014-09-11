@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_CONTOUR_SET_H_
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkBaseData.h"
 #include "mitkContour.h"
 #include  <map>
@@ -31,12 +31,13 @@ namespace mitk
 * This class holds stores vertices for drawing a contour
 *
 */
-class Segmentation_EXPORT ContourSet : public BaseData
+class MitkSegmentation_EXPORT ContourSet : public BaseData
 {
 public:
   mitkClassMacro(ContourSet, BaseData);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef std::map<unsigned long,Contour::Pointer>              ContourVectorType;
   typedef ContourVectorType::iterator                           ContourIterator;

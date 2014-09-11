@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkExtractDirectedPlaneImageFilter_h_Included
 #define mitkExtractDirectedPlaneImageFilter_h_Included
 
-#include "ImageExtractionExports.h"
+#include <MitkImageExtractionExports.h>
 #include "mitkImageToImageFilter.h"
 
 #include "vtkImageReslice.h"
@@ -66,14 +66,15 @@ namespace mitk
   Last contributor: $Author: T. Schwarz$
 */
 
-  class ImageExtraction_EXPORT ExtractDirectedPlaneImageFilter : public ImageToImageFilter
+  class MitkImageExtraction_EXPORT ExtractDirectedPlaneImageFilter : public ImageToImageFilter
   {
   public:
 
     mitkClassMacro(ExtractDirectedPlaneImageFilter, ImageToImageFilter);
-    itkNewMacro(ExtractDirectedPlaneImageFilter);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-    itkSetMacro( WorldGeometry, Geometry2D* );
+    itkSetMacro( WorldGeometry, PlaneGeometry* );
 
     // The Reslicer is accessible to configure the desired interpolation;
     // (See vtk::ImageReslice class for documentation).
@@ -102,12 +103,12 @@ namespace mitk
     virtual void GenerateData();
     virtual void GenerateOutputInformation();
 
-    bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
-      const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
+    bool CalculateClippedPlaneBounds( const BaseGeometry *boundingGeometry,
+      const PlaneGeometry *planeGeometry, double *bounds );
     bool LineIntersectZero( vtkPoints *points, int p1, int p2,
-      vtkFloatingPointType *bounds );
+      double *bounds );
 
-    const Geometry2D*  m_WorldGeometry;
+    const PlaneGeometry*  m_WorldGeometry;
     vtkImageReslice *  m_Reslicer;
 
     unsigned int    m_TargetTimestep;

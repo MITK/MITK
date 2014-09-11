@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseDataIOFactory.h"
 #include "mitkDiffusionImage.h"
 #include "mitkBaseData.h"
-#include "mitkDiffusionCoreObjectFactory.h"
 
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>
 #include <itkDiffusionTensor3D.h>
@@ -35,9 +34,14 @@ int TensorReconstruction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
-    parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "baseline image intensity threshold", 0, true);
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
+    parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
+
+    parser.setCategory("Preprocessing Tools");
+    parser.setTitle("Tensor Reconstruction");
+    parser.setDescription("");
+    parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -45,7 +49,7 @@ int TensorReconstruction(int argc, char* argv[])
 
     std::string inFileName = us::any_cast<string>(parsedArgs["input"]);
     std::string outfilename = us::any_cast<string>(parsedArgs["outFile"]);
-    outfilename = itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
+    outfilename = itksys::SystemTools::GetFilenamePath(outfilename)+"/"+itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
     outfilename += ".dti";
 
     int threshold = 0;
@@ -54,8 +58,6 @@ int TensorReconstruction(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
-
         MITK_INFO << "Loading image ...";
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
@@ -65,7 +67,7 @@ int TensorReconstruction(int argc, char* argv[])
         typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, float > TensorReconstructionImageFilterType;
         TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
         filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-        filter->SetBValue(dwi->GetB_Value());
+        filter->SetBValue(dwi->GetReferenceBValue());
         filter->SetThreshold(threshold);
         filter->Update();
 

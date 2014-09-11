@@ -17,67 +17,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIMAGEVTKACCESSOR_H
 #define MITKIMAGEVTKACCESSOR_H
 
-#include <algorithm>
-#include <itkIndex.h>
-#include <itkPoint.h>
-#include <mitkCommon.h>
-#include <itkSmartPointer.h>
-#include <vtkImageData.h>
-#include <vtkObjectFactory.h>
-#include "mitkImageAccessorBase.h"
-#include "mitkImageDataItem.h"
-#include "mitkPixelType.h"
+#include "mitkImageVtkWriteAccessor.h"
 
 namespace mitk {
 
-class Image;
-typedef itk::SmartPointer<mitk::Image> ImagePointer;
+/**
+ * @brief ImageVtkAccessor class provides any image read access which is required by Vtk methods
+ * @ingroup Data
+ * @deprecatedSince{next_release} Use ImageVtkWriteAccessor instead
+ */
+class ImageVtkAccessor : public ImageVtkWriteAccessor
+{
+protected:
 
-//##Documentation
-//## @brief ImageVtkAccessor class provides any image read access which is required by Vtk methods
-//## @ingroup Data
-  class ImageVtkAccessor : public ImageAccessorBase, public vtkImageData
-  {
-    friend class Image;
-
-  protected:
-    /** \brief Creates an ImageVtkAccessor for a whole Image
-     *  \param Image::Pointer specifies the associated Image
-     */
-    ImageVtkAccessor(
+  ImageVtkAccessor(
       ImagePointer iP,
-      ImageDataItem* iDI
-    );
+      const ImageDataItem* iDI
+      );
 
-  public:
+public:
 
-  static ImageVtkAccessor *New(ImagePointer, const ImageDataItem*);
-
-  //vtkTypeMacro(ImageVtkAccessor,vtkDataSet)
-
-    /** \brief Gives const access to the data. */
-    inline const void * GetData()
-    {
-      return m_AddressBegin;
-    }
-
-
-    /** Destructor */
-    virtual ~ImageVtkAccessor()
-    {
-    }
-
-  protected:
-
-    // protected members
-
-
-  private:
-    // due to smart pointer issues, the image is only kept as a weak pointer.
-    Image* m_Image;
-
-  };
-
+  DEPRECATED(static ImageVtkAccessor* New(ImagePointer, const ImageDataItem*));
+};
 
 }
 

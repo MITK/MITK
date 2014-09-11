@@ -19,11 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFDistanceImageToSurfaceFilter.h>
 
 #include <mitkImage.h>
+#include <mitkImageCast.h>
 #include <mitkPointSet.h>
 #include <mitkSurface.h>
 #include <mitkToFProcessingCommon.h>
 #include <mitkToFTestingCommon.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkImagePixelReadAccessor.h>
 
 #include <itkImage.h>
@@ -57,10 +58,33 @@ mitk::PointSet::Pointer CreateTestPointSet()
   return subSet;
 }
 
-// Create image with pixelValue in every pixel except for the pixels in subSet, which get successively the values of distances
-inline static mitk::Image::Pointer CreateTestImageWithPointSet(mitk::ScalarType pixelValue, unsigned int dimX, unsigned int dimY, mitk::PointSet::Pointer subSet)
+std::vector<itk::Index<3> > CreateVectorPointSet()
 {
-  typedef itk::Image<mitk::ScalarType,2> ItkImageType2D;
+  std::vector<itk::Index<3> > subSet = std::vector<itk::Index<3> >();
+  itk::Index<3> point;
+  point[0] = 10;
+  point[1] = 20;
+  point[2] = 0;
+  subSet.push_back(point);
+  point[0] = 100;
+  point[1] = 150;
+  point[2] = 0;
+  subSet.push_back(point);
+  point[0] = 110;
+  point[1] = 30;
+  point[2] = 0;
+  subSet.push_back(point);
+  point[0] = 40;
+  point[1] = 200;
+  point[2] = 0;
+  subSet.push_back(point);
+  return subSet;
+}
+
+// Create image with pixelValue in every pixel except for the pixels in subSet, which get successively the values of distances
+inline static mitk::Image::Pointer CreateTestImageWithPointSet(float pixelValue, unsigned int dimX, unsigned int dimY, mitk::PointSet::Pointer subSet)
+{
+  typedef itk::Image<float,2> ItkImageType2D;
   typedef itk::ImageRegionIterator<ItkImageType2D> ItkImageRegionIteratorType2D;
 
   ItkImageType2D::Pointer image = ItkImageType2D::New();
@@ -93,7 +117,7 @@ inline static mitk::Image::Pointer CreateTestImageWithPointSet(mitk::ScalarType 
     ++imageIterator;
   }
   // distances varying from pixelValue
-  std::vector<mitk::ScalarType> distances;
+  std::vector<float> distances;
   distances.push_back(50);
   distances.push_back(500);
   distances.push_back(2050);
@@ -105,7 +129,7 @@ inline static mitk::Image::Pointer CreateTestImageWithPointSet(mitk::ScalarType 
     ItkImageType2D::IndexType index;
     index[0] = point[0];
     index[1] = point[1];
-    mitk::ScalarType distance = distances.at(i);
+    float distance = distances.at(i);
     image->SetPixel(index,distance);
   }
   mitk::Image::Pointer mitkImage = mitk::Image::New();
@@ -131,13 +155,17 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   mitk::ToFProcessingCommon::ToFPoint2D interPixelDistance;
   interPixelDistance[0] = 0.04564;
   interPixelDistance[1] = 0.0451564;
+
   mitk::ToFProcessingCommon::ToFScalarType focalLengthX = 295.78960;
   mitk::ToFProcessingCommon::ToFScalarType focalLengthY = 296.348535;
+
   mitk::ToFProcessingCommon::ToFScalarType focalLength = (focalLengthX*interPixelDistance[0]+focalLengthY*interPixelDistance[1])/2.0;
   mitk::ToFProcessingCommon::ToFScalarType k1=-0.36,k2=-0.14,p1=0.001,p2=-0.00;
+
   mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
   principalPoint[0] = 103.576546;
   principalPoint[1] = 100.1532;
+
   mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
   cameraIntrinsics->SetFocalLength(focalLengthX,focalLengthY);
   cameraIntrinsics->SetPrincipalPoint(principalPoint[0],principalPoint[1]);
@@ -170,7 +198,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   filter->SetReconstructionMode(true);
   mitk::PointSet::Pointer expectedResult = mitk::PointSet::New();
   unsigned int counter = 0;
-  mitk::ImagePixelReadAccessor<mitk::ScalarType,2> imageAcces(image, image->GetSliceData(0));
+  mitk::ImagePixelReadAccessor<float,2> imageAcces(image, image->GetSliceData(0));
   for (unsigned int j=0; j<dimY; j++)
   {
     for (unsigned int i=0; i<dimX; i++)
@@ -178,7 +206,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
       itk::Index<2> index;
       index[0] = i;
       index[1] = j;
-      mitk::ScalarType distance = imageAcces.GetPixelByIndex(index);
+      float distance = imageAcces.GetPixelByIndex(index);
       mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthX,focalLengthY,principalPoint[0],principalPoint[1]);
       expectedResult->InsertPoint(counter,coordinate);
       counter++;
@@ -218,7 +246,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
       itk::Index<2> index;
       index[0] = i;
       index[1] = j;
-      mitk::ScalarType distance = imageAcces.GetPixelByIndex(index);
+      float distance = imageAcces.GetPixelByIndex(index);
       mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLength,interPixelDistance,principalPoint);
       expectedResult->InsertPoint(counter,coordinate);
       counter++;
@@ -261,7 +289,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
     itk::Index<2> index;
     index[0] = point[0];
     index[1] = point[1];
-    mitk::ScalarType distance = imageAcces.GetPixelByIndex(index);
+    float distance = imageAcces.GetPixelByIndex(index);
     mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(point[0],point[1],
                                                                                       distance,focalLengthX,focalLengthY,principalPoint[0],principalPoint[1]);
     expectedResult->InsertPoint(counter,coordinate);
@@ -290,7 +318,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
     itk::Index<2> index;
     index[0] = point[0];
     index[1] = point[1];
-    mitk::ScalarType distance = imageAcces.GetPixelByIndex(index);
+    float distance = imageAcces.GetPixelByIndex(index);
     mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(point[0],point[1],
                                                                                       distance,focalLength,interPixelDistance,principalPoint);
     expectedResult->InsertPoint(counter,coordinate);
@@ -303,7 +331,17 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED((expectedResult->GetSize()==result->GetSize()),"Test if point set size is equal");
   MITK_TEST_CONDITION_REQUIRED(mitk::ToFTestingCommon::PointSetsEqual(expectedResult,result),"Testing filter with subset");
 
+  // Test case to reproduce and check fix of bug 13933.
+  std::vector<itk::Index<3> > vecSubset = CreateVectorPointSet();
+  filter = mitk::ToFDistanceImageToPointSetFilter::New();
+  try
+  {
+    filter->SetSubset(vecSubset);
+  }
+  catch (...)
+  {
+    MITK_TEST_CONDITION_REQUIRED(false, "Caught an exception while setting point subset!");
+  }
+
   MITK_TEST_END();
-
 }
-

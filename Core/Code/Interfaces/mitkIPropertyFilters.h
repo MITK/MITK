@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceInterface.h>
 #include <map>
 #include <string>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk
 {

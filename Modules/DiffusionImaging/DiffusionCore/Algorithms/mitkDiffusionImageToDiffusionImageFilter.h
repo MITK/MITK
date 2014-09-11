@@ -40,7 +40,8 @@ public:
   mitkClassMacro( DiffusionImageToDiffusionImageFilter,
                   DiffusionImageSource<DiffusionPixelType> )
 
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef typename Superclass::OutputType                OutputImageType;
   typedef typename OutputImageType::Pointer              OutputImagePointerType;

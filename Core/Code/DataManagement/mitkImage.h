@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 #define MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkSlicedData.h"
 #include "mitkBaseData.h"
 #include "mitkLevelWindow.h"
@@ -38,6 +38,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 class vtkImageData;
+
+namespace itk {
+template<class T> class MutexLockHolder;
+}
 
 namespace mitk {
 
@@ -64,8 +68,10 @@ class ImageStatisticsHolder;
 //##
 //## For ITK v3.8 and older: Converting coordinates from the ITK physical
 //## coordinate system (which does not support rotated images) to the MITK world
-//## coordinate system should be performed via the Geometry3D of the Image, see
-//## Geometry3D::WorldToItkPhysicalPoint.
+//## coordinate system should be performed via the BaseGeometry of the Image, see
+//## BaseGeometry::WorldToItkPhysicalPoint.
+//##
+//## For more information, see \ref MitkImagePage .
 //## @ingroup Data
 class MITK_CORE_EXPORT Image : public SlicedData
 {
@@ -73,15 +79,16 @@ class MITK_CORE_EXPORT Image : public SlicedData
 
   friend class ImageAccessorBase;
   friend class ImageVtkAccessor;
+  friend class ImageVtkReadAccessor;
+  friend class ImageVtkWriteAccessor;
   friend class ImageReadAccessor;
   friend class ImageWriteAccessor;
 
 public:
   mitkClassMacro(Image, SlicedData);
 
-  itkNewMacro(Self);
-
-  mitkCloneMacro(Image);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Smart Pointer type to a ImageDataItem. */
   typedef itk::SmartPointer<ImageDataItem> ImageDataItemPointer;
@@ -130,7 +137,7 @@ public:
 
   The pixel type is always being converted to double.
    \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method can be replaced by a method from ImagePixelWriteAccessor or ImagePixelReadAccessor */
-  DEPRECATED(double GetPixelValueByIndex(const mitk::Index3D& position, unsigned int timestep = 0));
+  DEPRECATED(double GetPixelValueByIndex(const itk::Index<3>& position, unsigned int timestep = 0));
 
   /** @brief Get the pixel value at one specific world position.
 
@@ -140,7 +147,8 @@ public:
 
   //##Documentation
   //## @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.
-  virtual ImageVtkAccessor* GetVtkImageData(int t = 0, int n = 0);
+  virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
+  virtual const vtkImageData* GetVtkImageData(int t = 0, int n = 0) const;
 
   //##Documentation
   //## @brief Get the complete image, i.e., all channels linked together, as a @a mitkIpPicDescriptor.
@@ -236,18 +244,18 @@ public:
   virtual void Initialize(const mitk::PixelType& type, unsigned int dimension, const unsigned int *dimensions, unsigned int channels = 1);
 
   //##Documentation
-  //## initialize new (or re-initialize) image information by a Geometry3D
+  //## initialize new (or re-initialize) image information by a BaseGeometry
   //##
   //## @param tDim defines the number of time steps for which the Image should be initialized
-  virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=1);
+  virtual void Initialize(const mitk::PixelType& type, const mitk::BaseGeometry& geometry, unsigned int channels = 1, int tDim=1);
 
   /**
-  * initialize new (or re-initialize) image information by a Geometry3D
+  * initialize new (or re-initialize) image information by a TimeGeometry
   *
   * @param tDim defines the number of time steps for which the Image should be initialized
   * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
   */
-  DEPRECATED(virtual void Initialize(const mitk::PixelType& type, const mitk::TimeSlicedGeometry* geometry, unsigned int channels = 1, int tDim=1)){}
+  DEPRECATED(virtual void Initialize(const mitk::PixelType& /*type*/, const mitk::TimeSlicedGeometry* /*geometry*/, unsigned int /*channels = 1*/, int /*tDim=1*/)){}
 
   /**
   * \brief Initialize new (or re-initialize) image information by a TimeGeometry
@@ -257,13 +265,13 @@ public:
   virtual void Initialize(const mitk::PixelType& type, const mitk::TimeGeometry& geometry, unsigned int channels = 1, int tDim=-1 );
 
   //##Documentation
-  //## initialize new (or re-initialize) image information by a Geometry2D and number of slices
+  //## initialize new (or re-initialize) image information by a PlaneGeometry and number of slices
   //##
   //## Initializes the bounding box according to the width/height of the
-  //## Geometry2D and @a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
-  //## The spacing is calculated from the Geometry2D.
+  //## PlaneGeometry and @a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
+  //## The spacing is calculated from the PlaneGeometry.
   //## \sa SlicedGeometry3D::InitializeEvenlySpaced
-  virtual void Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped = false, unsigned int channels = 1, int tDim=1);
+  virtual void Initialize(const mitk::PixelType& type, int sDim, const mitk::PlaneGeometry& geometry2d, bool flipped = false, unsigned int channels = 1, int tDim=1);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by another
@@ -276,7 +284,7 @@ public:
 
   //##Documentation
   //## initialize new (or re-initialize) image information by @a pic.
-  //## Dimensions and @a Geometry3D /@a Geometry2D are set according
+  //## Dimensions and @a Geometry3D /@a PlaneGeometry are set according
   //## to the tags in @a pic.
   //## Only the header is used, not the data vector! Use SetPicVolume(pic)
   //## to set the data vector.
@@ -333,7 +341,7 @@ public:
    // mitk::PixelType importType = ImportItkPixelType( itkimage::PixelType );
 
 
-    Initialize(MakePixelType<itkImageType>(),
+    Initialize(MakePixelType<itkImageType>(itkimage->GetNumberOfComponentsPerPixel()),
       m_Dimension,
       tmpDimensions,
       channels);
@@ -418,7 +426,7 @@ public:
     }
 
     // re-initialize PlaneGeometry with origin and direction
-    PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(GetSlicedGeometry(0)->GetGeometry2D(0));
+    PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(GetSlicedGeometry(0)->GetPlaneGeometry(0));
     planeGeometry->SetOrigin(origin);
     planeGeometry->GetIndexToWorldTransform()->SetMatrix(matrix);
 
@@ -436,7 +444,7 @@ public:
     delete [] tmpDimensions;
 
     this->Initialize();
-  };
+  }
 
   //##Documentation
   //## @brief Check whether slice @a s at time @a t in channel @a n is valid, i.e.,
@@ -473,22 +481,22 @@ public:
 
   /** \brief Sets a geometry to an image.
     */
-  virtual void SetGeometry(Geometry3D* aGeometry3D);
+  virtual void SetGeometry(BaseGeometry* aGeometry3D);
 
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+  virtual ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+  virtual ImageDataItemPointer GetVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+  virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   /**
   \brief (DEPRECATED) Get the minimum for scalar images
@@ -587,6 +595,10 @@ public:
 
 protected:
 
+  mitkCloneMacro(Self);
+
+  typedef itk::MutexLockHolder<itk::SimpleFastMutexLock> MutexHolder;
+
   int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
 
   int GetVolumeIndex(int t = 0, int n = 0) const;
@@ -597,11 +609,11 @@ protected:
 
   virtual void Expand( unsigned int timeSteps );
 
-  virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+  virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
-  virtual ImageDataItemPointer AllocateVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+  virtual ImageDataItemPointer AllocateVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
-  virtual ImageDataItemPointer AllocateChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+  virtual ImageDataItemPointer AllocateChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   Image();
 
@@ -619,6 +631,7 @@ protected:
   mutable ImageDataItemPointerArray m_Channels;
   mutable ImageDataItemPointerArray m_Volumes;
   mutable ImageDataItemPointerArray m_Slices;
+  mutable itk::SimpleFastMutexLock m_ImageDataArraysLock;
 
   unsigned int m_Dimension;
 
@@ -635,12 +648,24 @@ protected:
 
 private:
 
+  ImageDataItemPointer GetSliceData_unlocked(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+  ImageDataItemPointer GetVolumeData_unlocked(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+  ImageDataItemPointer GetChannelData_unlocked(int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+
+  ImageDataItemPointer AllocateSliceData_unlocked(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+  ImageDataItemPointer AllocateVolumeData_unlocked(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+  ImageDataItemPointer AllocateChannelData_unlocked(int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+
+  bool IsSliceSet_unlocked(int s, int t, int n) const;
+  bool IsVolumeSet_unlocked(int t, int n) const;
+  bool IsChannelSet_unlocked(int n) const;
+
   /** Stores all existing ImageReadAccessors */
-  std::vector<ImageAccessorBase*> m_Readers;
+  mutable std::vector<ImageAccessorBase*> m_Readers;
   /** Stores all existing ImageWriteAccessors */
-  std::vector<ImageAccessorBase*> m_Writers;
+  mutable std::vector<ImageAccessorBase*> m_Writers;
   /** Stores all existing ImageVtkAccessors */
-  std::vector<ImageAccessorBase*> m_VtkReaders;
+  mutable std::vector<ImageAccessorBase*> m_VtkReaders;
 
   /** A mutex, which needs to be locked to manage m_Readers and m_Writers */
   itk::SimpleFastMutexLock m_ReadWriteLock;
@@ -651,6 +676,7 @@ private:
 
  /**
  * @brief Equal A function comparing two images for beeing equal in meta- and imagedata
+ * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::Image& i1, const mitk::Image& i2) instead.
  *
  * @ingroup MITKTestingAPI
  *
@@ -666,47 +692,27 @@ private:
  * @param verbose Flag indicating if the user wants detailed console output or not.
  * @return true, if all subsequent comparisons are true, false otherwise
  */
-MITK_CORE_EXPORT bool Equal( const mitk::Image* leftHandSide, const mitk::Image* rightHandSide, ScalarType eps, bool verbose );
+DEPRECATED (MITK_CORE_EXPORT bool Equal( const mitk::Image* leftHandSide, const mitk::Image* rightHandSide, ScalarType eps, bool verbose ));
 
+/**
+* @brief Equal A function comparing two images for beeing equal in meta- and imagedata
+*
+* @ingroup MITKTestingAPI
+*
+* Following aspects are tested for equality:
+*  - dimension of the images
+*  - size of the images
+*  - pixel type
+*  - pixel values : pixel values are expected to be identical at each position ( for other options see mitk::CompareImageFilter )
+*
+* @param rightHandSide An image to be compared
+* @param leftHandSide An image to be compared
+* @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+* @param verbose Flag indicating if the user wants detailed console output or not.
+* @return true, if all subsequent comparisons are true, false otherwise
+*/
+MITK_CORE_EXPORT bool Equal( const mitk::Image& leftHandSide, const mitk::Image& rightHandSide, ScalarType eps, bool verbose );
 
-//}
-//##Documentation
-//## @brief Cast an itk::Image (with a specific type) to an mitk::Image.
-//##
-//## CastToMitkImage does not cast pixel types etc., just image data
-//## Needs "mitkImage.h" header included.
-//## If you get a compile error, try image.GetPointer();
-//## @ingroup Adaptor
-//## \sa mitkITKImageImport
-template <typename ItkOutputImageType>
-void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
-{
-  if(mitkoutputimage.IsNull())
-  {
-    mitkoutputimage = mitk::Image::New();
-  }
-  mitkoutputimage->InitializeByItk(itkimage.GetPointer());
-  mitkoutputimage->SetChannel(itkimage->GetBufferPointer());
-}
-
-//##Documentation
-//## @brief Cast an itk::Image (with a specific type) to an mitk::Image.
-//##
-//## CastToMitkImage does not cast pixel types etc., just image data
-//## Needs "mitkImage.h" header included.
-//## If you get a compile error, try image.GetPointer();
-//## @ingroup Adaptor
-//## \sa mitkITKImageImport
-template <typename ItkOutputImageType>
-void CastToMitkImage(const ItkOutputImageType* itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
-{
-  if(mitkoutputimage.IsNull())
-  {
-    mitkoutputimage = mitk::Image::New();
-  }
-  mitkoutputimage->InitializeByItk(itkimage);
-  mitkoutputimage->SetChannel(itkimage->GetBufferPointer());
-}
 } // namespace mitk
 
 #endif /* MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2 */

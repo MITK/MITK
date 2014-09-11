@@ -46,13 +46,19 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node") )
   {
     ++listSize;
-    DataNodes.push_back( LoadBaseDataFromDataTag( element->FirstChildElement("data"), workingDirectory, error ) );
+  }
+
+  ProgressBar::GetInstance()->AddStepsToDo(listSize * 2);
+
+  for (TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node"))
+  {
+      DataNodes.push_back(LoadBaseDataFromDataTag(element->FirstChildElement("data"), workingDirectory, error));
+      ProgressBar::GetInstance()->Progress();
   }
 
   OrderedLayers orderedLayers;
   this->GetLayerOrder(document, workingDirectory, DataNodes, orderedLayers);
 
-  ProgressBar::GetInstance()->AddStepsToDo( listSize );
 
   // iterate all nodes
   // first level nodes should be <node> elements
@@ -213,7 +219,6 @@ void mitk::SceneReaderV1::GetLayerOrder(TiXmlDocument& document, const std::stri
   DataNodeVector::iterator nit = DataNodes.begin();
   for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit )
   {
-    bool error(false);
     DataNode::Pointer node = *nit;
     DecorateNodeWithProperties(node, element, workingDirectory);
 
@@ -291,55 +296,25 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
     const char* renderwindowa( properties->Attribute("renderwindow") );
     std::string renderwindow( renderwindowa ? renderwindowa : "" );
 
-    BaseRenderer* renderer = BaseRenderer::GetByName( renderwindow );
-    if (renderer || renderwindow.empty())
+    PropertyList::Pointer propertyList = node->GetPropertyList(renderwindow); // DataNode implementation always returns a propertylist
+    // clear all properties from node that might be set by DataNodeFactory during loading
+    propertyList->Clear();
+
+    // use deserializer to construct new properties
+    PropertyListDeserializer::Pointer deserializer = PropertyListDeserializer::New();
+
+    deserializer->SetFilename(workingDirectory + Poco::Path::separator() + propertiesfile);
+    bool success = deserializer->Deserialize();
+    error |= !success;
+    PropertyList::Pointer readProperties = deserializer->GetOutput();
+
+    if (readProperties.IsNotNull())
     {
-      PropertyList::Pointer propertyList = node->GetPropertyList(renderer); // DataNode implementation always returns a propertylist
-      // clear all properties from node that might be set by DataNodeFactory during loading
-      propertyList->Clear();
-
-      // use deserializer to construct new properties
-      PropertyListDeserializer::Pointer deserializer = PropertyListDeserializer::New();
-
-      deserializer->SetFilename(workingDirectory + Poco::Path::separator() + propertiesfile);
-      bool success = deserializer->Deserialize();
-      error |= !success;
-      PropertyList::Pointer readProperties = deserializer->GetOutput();
-
-      if (readProperties.IsNotNull())
-      {
-        //'use color' is deprecated since 2013.03 release. It was replaced by
-        //'Image Rendering.Mode' in bug #12056. This code is for legacy support
-        //of old scene files containing the property 'use color'. The code should
-        //be removed in one of the upcomng releases.
-        if(readProperties->GetProperty("Image Rendering.Mode") == NULL )
-        {
-          mitk::BaseProperty* useColorProperty = readProperties->GetProperty("use color");
-          if(mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(useColorProperty))
-          {
-            bool useColor = boolProp->GetValue();
-            readProperties->DeleteProperty("use color");
-            mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-            if(useColor)
-              renderingMode->SetValue( mitk::RenderingModeProperty::LEVELWINDOW_COLOR );
-            else
-              renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
-            readProperties->SetProperty("Image Rendering.Mode", renderingMode);
-            MITK_WARN << "The property 'use color' has been found in a scene file and was replaced by 'Image Rendering.Mode'. 'use color' is deprecated since 2013.03 release.";
-          }
-
-        }
-        propertyList->ConcatenatePropertyList( readProperties, true ); // true = replace
-      }
-      else
-      {
-        MITK_ERROR << "Property list reader did not return a property list. This is an implementation error. Please tell your developer.";
-        error = true;
-      }
+      propertyList->ConcatenatePropertyList( readProperties, true ); // true = replace
     }
     else
     {
-      MITK_ERROR << "Found properties for renderer " << renderwindow << " but there is no such renderer in current application. Ignoring those properties";
+      MITK_ERROR << "Property list reader did not return a property list. This is an implementation error. Please tell your developer.";
       error = true;
     }
   }

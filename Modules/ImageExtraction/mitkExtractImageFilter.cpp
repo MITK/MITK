@@ -73,7 +73,7 @@ void mitk::ExtractImageFilter::GenerateData()
    AccessFixedDimensionByItk( input, ItkImageProcessing, 3 );
 
   // set a nice geometry for display and point transformations
-  Geometry3D* inputImageGeometry = ImageToImageFilter::GetInput(0)->GetGeometry();
+  BaseGeometry* inputImageGeometry = ImageToImageFilter::GetInput(0)->GetGeometry();
   if (!inputImageGeometry)
   {
     MITK_ERROR << "In ExtractImageFilter::ItkImageProcessing: Input image has no geometry!" << std::endl;
@@ -104,7 +104,7 @@ void mitk::ExtractImageFilter::GenerateData()
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::ExtractImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage )
+void mitk::ExtractImageFilter::ItkImageProcessing( const itk::Image<TPixel,VImageDimension>* itkImage )
 {
   // use the itk::ExtractImageFilter to get a 2D image
   typedef itk::Image< TPixel, VImageDimension >   ImageType3D;

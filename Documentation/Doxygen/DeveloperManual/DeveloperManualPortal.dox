@@ -1,5 +1,5 @@
 /**
-\page DeveloperManualPortal MITK: Developer Manual
+\developersguidemainpage{DeveloperManualPortal} MITK: Developer Manual
 
 Development with MITK can happen under several conditions. Depending on whether you are using the Toolkit or the entire application, different sections may apply to you.
 In case you are unsure about what you need, please refer to \link Architecture The Architecture of MITK text\endlink.
@@ -22,7 +22,7 @@ Finally, generated API-Documentation can be found \link DevelopmentAPI here\endl
     <li> \ref AboutTestingPage </li>
   </ul>
   <li> \subpage Concepts </li>
-  <li> \subpage MITKModuleManualsListPage </li
+  <li> \subpage MITKModuleManualsListPage </li>
   <li> \subpage DevelopmentApplication </li>
   <ul>
     <li> \ref mitkExtPointsIndex </li>

@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLine.h"
 #include "mitkGeometry3D.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkDisplayGeometry.h"
 #include "mitkSlicedGeometry3D.h"
@@ -100,16 +100,16 @@ void SlicesSwiveller::UpdateRelevantSNCs()
         timeGeometry->GetGeometryForTimeStep(0).GetPointer() );
     if (!slicedGeometry) continue;
 
-    Geometry2D *firstSlice( NULL );
-    //Geometry2D *secondSlice( NULL );
+    PlaneGeometry *firstSlice( NULL );
+    //PlaneGeometry *secondSlice( NULL );
 
     if (slicedGeometry->IsValidSlice(0))
     {
-      firstSlice = slicedGeometry->GetGeometry2D(0);
+      firstSlice = slicedGeometry->GetPlaneGeometry(0);
     }
 //    if (slicedGeometry->IsValidSlice(1))
 //    {
-//      secondSlice = slicedGeometry->GetGeometry2D(1);
+//      secondSlice = slicedGeometry->GetPlaneGeometry(1);
 //    }
 
     // If the direction vector of these two slices is the same, then accept
@@ -346,9 +346,9 @@ bool SlicesSwiveller
 
           ScalarType xVector[] = { 1.0, 0.0, 0.0 };
           ScalarType yVector[] = { 0.0, 1.0, 0.0 };
-          clickedGeometry->Geometry3D::IndexToWorld(
+          clickedGeometry->BaseGeometry::IndexToWorld(
             Vector3D( xVector), m_RotationPlaneXVector );
-          clickedGeometry->Geometry3D::IndexToWorld(
+          clickedGeometry->BaseGeometry::IndexToWorld(
             Vector3D( yVector), m_RotationPlaneYVector );
 
           m_RotationPlaneNormal.Normalize();

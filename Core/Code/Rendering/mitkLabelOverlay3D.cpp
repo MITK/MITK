@@ -28,13 +28,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 
 
-mitk::LabelOverlay3D::LabelOverlay3D()
+mitk::LabelOverlay3D::LabelOverlay3D():m_PointSetModifiedObserverTag(0)
 {
 }
 
 
 mitk::LabelOverlay3D::~LabelOverlay3D()
 {
+  if(m_LabelCoordinates.IsNotNull())
+    m_LabelCoordinates->RemoveObserver(m_PointSetModifiedObserverTag);
 }
 
 mitk::LabelOverlay3D::LocalStorage::~LocalStorage()
@@ -60,7 +62,7 @@ mitk::LabelOverlay3D::LocalStorage::LocalStorage()
   m_Points->GetPointData()->AddArray(m_Labels);
 
   m_PointSetToLabelHierarchyFilter = vtkSmartPointer<vtkPointSetToLabelHierarchy>::New();
-  m_PointSetToLabelHierarchyFilter->SetInput(m_Points);
+  m_PointSetToLabelHierarchyFilter->SetInputData(m_Points);
   m_PointSetToLabelHierarchyFilter->SetLabelArrayName("labels");
   m_PointSetToLabelHierarchyFilter->SetPriorityArrayName("sizes");
   m_PointSetToLabelHierarchyFilter->Update();
@@ -117,7 +119,6 @@ void mitk::LabelOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
   }
 }
 
-
 vtkProp* mitk::LabelOverlay3D::GetVtkProp(BaseRenderer *renderer) const
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
@@ -139,6 +140,26 @@ void mitk::LabelOverlay3D::SetPriorityVector(const std::vector<int>& PriorityVec
 
 void mitk::LabelOverlay3D::SetLabelCoordinates(mitk::PointSet::Pointer LabelCoordinates)
 {
+  if(m_LabelCoordinates.IsNotNull())
+  {
+    m_LabelCoordinates->RemoveObserver(m_PointSetModifiedObserverTag);
+    m_PointSetModifiedObserverTag = 0;
+    m_LabelCoordinates = NULL;
+  }
+  if(LabelCoordinates.IsNull())
+  {
+    return;
+  }
   m_LabelCoordinates = LabelCoordinates;
+  itk::MemberCommand<mitk::LabelOverlay3D>::Pointer _PropertyListModifiedCommand =
+      itk::MemberCommand<mitk::LabelOverlay3D>::New();
+  _PropertyListModifiedCommand->SetCallbackFunction(this, &mitk::LabelOverlay3D::PointSetModified);
+  m_PointSetModifiedObserverTag = m_LabelCoordinates->AddObserver(itk::ModifiedEvent(), _PropertyListModifiedCommand);
   this->Modified();
 }
+
+void mitk::LabelOverlay3D::PointSetModified( const itk::Object* /*caller*/, const itk::EventObject& )
+{
+  this->Modified();
+}
+

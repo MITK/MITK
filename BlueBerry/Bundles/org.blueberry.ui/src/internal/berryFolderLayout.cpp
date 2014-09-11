@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-
 FolderLayout::FolderLayout(PageLayout::Pointer pageLayout, PartStack::Pointer folder,
     ViewFactory* viewFactory)
 {
@@ -50,6 +49,7 @@ void FolderLayout::AddPlaceholder(const std::string& viewId)
 
 void FolderLayout::AddView(const std::string& viewId)
 {
+  pageLayout->AddShowViewShortcut(viewId);
   if (pageLayout->CheckPartInLayout(viewId))
   {
     return;
@@ -93,5 +93,4 @@ void FolderLayout::LinkPartToPageLayout(const std::string& viewId,
   // force creation of the view layout rec
   pageLayout->GetViewLayoutRec(viewId, true);
 }
-
 }

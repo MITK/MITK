@@ -173,7 +173,7 @@ namespace mitk
     ModulationFrq frq = SR_GetModulationFrequency(m_MESAHandle);
     this->m_MaxRangeFactor = (this->m_Lambda[frq] * 1000.00) / (float)0xffff;
     float frequency = this->m_Frequency[frq];
-    return (int)frequency; // TODO float!!
+    return (int)frequency; // Attetntion frequency is converted to int to be consistent with MITK-ToF structure!!
   }
 
   void ToFCameraMESASR4000Controller::SetFPN( bool fpn )

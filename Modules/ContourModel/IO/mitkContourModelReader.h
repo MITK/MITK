@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_CONTOURMODEL_READER__H_
 #define _MITK_CONTOURMODEL_READER__H_
 
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 #include <mitkContourModel.h>
 #include <mitkContourModelSource.h>
 #include <mitkFileReader.h>
@@ -32,13 +32,14 @@ namespace mitk
  * @ingroup PSIO
  * @ingroup IO
 */
-class ContourModel_EXPORT ContourModelReader : public ContourModelSource, public FileReader
+class MitkContourModel_EXPORT ContourModelReader : public ContourModelSource, public FileReader
 {
 public:
 
     mitkClassMacro( ContourModelReader, FileReader );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * @brief Sets the filename of the file to be read

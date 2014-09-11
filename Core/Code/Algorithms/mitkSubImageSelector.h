@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef SUBIMAGESELECTOR_H_HEADER_INCLUDED_C1E4F463
 #define SUBIMAGESELECTOR_H_HEADER_INCLUDED_C1E4F463
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkImageToImageFilter.h"
 #include "mitkImageDataItem.h"
 #include "mitkBaseData.h"
@@ -39,7 +39,8 @@ public:
   /** Run-time type information (and related methods). */
   mitkClassMacro(SubImageSelector,ImageToImageFilter);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void SetPosNr(int p);
 

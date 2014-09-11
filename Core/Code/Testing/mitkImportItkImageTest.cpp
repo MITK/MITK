@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 #include "mitkITKImageImport.h"
+#include "mitkImageCast.h"
 
 #include "mitkImagePixelReadAccessor.h"
 
@@ -43,6 +44,46 @@ typename itk::Image<TPixel, VDimension>::Pointer CreateTestImageRandom( short in
   randomImageSource->Update();
 
   return randomImageSource->GetOutput();
+}
+
+/**
+ * Create a test vector image (with two components) with a single pixel value. The image size is determined by the input parameter.
+ *
+ * @param value the pixel value the created image is filled with
+ * @param size the number of voxels in each dimension
+ */
+template <typename TPixel, unsigned int VDimension>
+typename itk::VectorImage<TPixel, VDimension>::Pointer CreateTestVectorImageFixedValue(size_t size, const itk::VariableLengthVector<TPixel>& value)
+{
+  typedef typename itk::VectorImage< TPixel, VDimension> ImageType;
+  typedef typename ImageType::Pointer ImagePointer;
+
+  typename ImageType::RegionType imageRegion;
+  typename ImageType::RegionType::SizeType regionSize;
+  regionSize.Fill(size);
+
+  typename ImageType::RegionType::IndexType regionIndex;
+  regionIndex.Fill(0);
+  imageRegion.SetSize( regionSize );
+  imageRegion.SetIndex( regionIndex );
+
+  typename ImageType::SpacingType imageSpacing;
+  imageSpacing.Fill(1.0f);
+
+  typename ImageType::PointType imageOrigin;
+  imageOrigin.Fill(0.0f);
+
+  ImagePointer itkImage = ImageType::New();
+
+  itkImage->SetVectorLength(value.GetNumberOfElements());
+  itkImage->SetRegions( imageRegion );
+  itkImage->SetOrigin( imageOrigin );
+  itkImage->SetSpacing( imageSpacing );
+  itkImage->Allocate();
+
+  itkImage->FillBuffer( value );
+
+  return itkImage;
 }
 
 /**
@@ -110,7 +151,7 @@ bool Assert_ImageMetaData_AreEqual( typename ImageType::Pointer itkImage, mitk::
   return_value &= ptype_compare;
   MITK_TEST_CONDITION( ptype_compare, " - Pixel types equal!")
 
-  mitk::Geometry3D* imageGeometry = mitkImage->GetGeometry();
+  mitk::BaseGeometry* imageGeometry = mitkImage->GetGeometry();
   const mitk::Point3D origin = imageGeometry->GetOrigin();
 
   bool origin_compare = true;
@@ -215,6 +256,40 @@ void Assert_ItkImageImportSucceded_ReturnsTrue()
 
 }
 
+void Assert_ItkVectorImageImportAndCast_ReturnsTrue()
+{
+  typedef itk::VectorImage<short,3> ImageType;
+  ImageType::PixelType value;
+  value.SetSize(2);
+  value.SetElement(0, 1);
+  value.SetElement(0, 2);
+  ImageType::Pointer itkImage = CreateTestVectorImageFixedValue<short, 3>(5, value);
+
+  mitk::Image::Pointer mitkImage = mitk::ImportItkImage(itkImage);
+  mitk::PixelType pixelType = mitkImage->GetPixelType();
+  MITK_TEST_CONDITION(pixelType.GetPixelType() == itk::ImageIOBase::VECTOR, "Vector image pixel type")
+  MITK_TEST_CONDITION(pixelType.GetComponentType() == itk::ImageIOBase::SHORT, "Vector image component type")
+
+  mitk::Image::Pointer mitkImage2;
+  mitk::CastToMitkImage(itkImage, mitkImage2);
+  mitk::PixelType pixelType2 = mitkImage2->GetPixelType();
+  MITK_TEST_CONDITION(pixelType == pixelType2, "ImportItkImage and CastToMitkImage produce same pixel types")
+
+  ImageType::Pointer itkImageOut;
+  mitk::CastToItkImage(mitkImage, itkImageOut);
+
+  MITK_TEST_CONDITION(pixelType == mitk::MakePixelType<ImageType>(2), "MITK pixel type equals ITK pixel type")
+
+  typedef itk::VectorImage<int,3> IntImageType;
+  IntImageType::Pointer itkIntImageOut;
+  mitk::CastToItkImage(mitkImage, itkIntImageOut);
+  MITK_TEST_CONDITION(!(pixelType == mitk::MakePixelType<IntImageType>(2)), "MITK pixel type != ITK pixel type")
+
+  mitk::Image::Pointer mitkImage3;
+  mitk::CastToMitkImage(itkImageOut, mitkImage3);
+  MITK_ASSERT_EQUAL(mitkImage, mitkImage3, "Equality for vector images");
+}
+
 int mitkImportItkImageTest(int /*argc*/, char* /*argv*/[])
 {
 
@@ -235,6 +310,7 @@ int mitkImportItkImageTest(int /*argc*/, char* /*argv*/[])
   Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<unsigned char, 4>();// "Import succesfull on uchar");
   Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<int, 4>();// "Import succesfull on int");
 
-  MITK_TEST_END()
+  Assert_ItkVectorImageImportAndCast_ReturnsTrue();
 
+  MITK_TEST_END()
 }

@@ -55,7 +55,8 @@ namespace mitk
 
     mitkClassMacro( TeemDiffusionTensor3DReconstructionImageFilter,
       itk::Object );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkGetMacro(Input,
       typename DiffusionImage<DiffusionImagePixelType>::Pointer);

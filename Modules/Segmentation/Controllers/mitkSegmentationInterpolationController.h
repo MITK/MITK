@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSegmentationInterpolationController_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkImage.h"
 
 #include <itkImage.h>
@@ -63,12 +63,13 @@ class Image;
 
   $Author$
 */
-class Segmentation_EXPORT SegmentationInterpolationController : public itk::Object
+class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::Object
 {
   public:
 
     mitkClassMacro(SegmentationInterpolationController, itk::Object);
-    itkNewMacro(SegmentationInterpolationController); /// specify the segmentation image that should be interpolated
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
       \brief Find interpolator for a given image.
@@ -147,7 +148,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     /**
       \brief Protected class of mitk::SegmentationInterpolationController. Don't use (you shouldn't be able to do so)!
     */
-    class Segmentation_EXPORT SetChangedSliceOptions
+    class MitkSegmentation_EXPORT SetChangedSliceOptions
     {
       public:
         SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, void* pixels )
@@ -173,13 +174,13 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
     /// internal scan of a single slice
     template < typename DATATYPE >
-    void ScanChangedSlice( itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options );
+    void ScanChangedSlice( const itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options );
 
     template < typename TPixel, unsigned int VImageDimension >
-    void ScanChangedVolume( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
+    void ScanChangedVolume( const itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
 
     template < typename DATATYPE >
-    void ScanWholeVolume( itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep );
+    void ScanWholeVolume( const itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep );
 
     void PrintStatus();
 

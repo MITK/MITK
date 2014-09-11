@@ -9,58 +9,38 @@ set(CPP_FILES
   DicomImport/mitkSiemensDicomDiffusionImageHeaderReader.cpp
   DicomImport/mitkSiemensMosaicDicomDiffusionImageHeaderReader.cpp
 
-  # DataStructures
-  IODataStructures/mitkDiffusionCoreObjectFactory.cpp
-
   # DataStructures -> DWI
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageHeaderInformation.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSource.cpp
-  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageReader.cpp
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriter.cpp
-  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageIOFactory.cpp
-  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriterFactory.cpp
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSerializer.cpp
+
   IODataStructures/DiffusionWeightedImages/mitkImageToDiffusionImageSource.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageCorrectionFilter.cpp
 
   # DataStructures -> QBall
   IODataStructures/QBallImages/mitkQBallImageSource.cpp
-  IODataStructures/QBallImages/mitkNrrdQBallImageReader.cpp
-  IODataStructures/QBallImages/mitkNrrdQBallImageWriter.cpp
-  IODataStructures/QBallImages/mitkNrrdQBallImageIOFactory.cpp
-  IODataStructures/QBallImages/mitkNrrdQBallImageWriterFactory.cpp
   IODataStructures/QBallImages/mitkQBallImage.cpp
-  IODataStructures/QBallImages/mitkQBallImageSerializer.cpp
 
   # DataStructures -> Tensor
-  IODataStructures/TensorImages/mitkTensorImageSource.cpp
-  IODataStructures/TensorImages/mitkNrrdTensorImageReader.cpp
-  IODataStructures/TensorImages/mitkNrrdTensorImageWriter.cpp
-  IODataStructures/TensorImages/mitkNrrdTensorImageIOFactory.cpp
-  IODataStructures/TensorImages/mitkNrrdTensorImageWriterFactory.cpp
   IODataStructures/TensorImages/mitkTensorImage.cpp
-  IODataStructures/TensorImages/mitkTensorImageSerializer.cpp
 
   #IODataStructures/mitkRegistrationObject.cpp
 
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
-  Rendering/mitkCompositeMapper.cpp
   Rendering/mitkVectorImageVtkGlyphMapper3D.cpp
   Rendering/vtkOdfSource.cxx
   Rendering/vtkThickPlane.cxx
   Rendering/mitkOdfNormalizationMethodProperty.cpp
   Rendering/mitkOdfScaleByProperty.cpp
-  Rendering/mitkPlanarFigureMapper3D.cpp
 
   # Algorithms
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
   Algorithms/itkDwiGradientLengthCorrectionFilter.cpp
 
-
-
   # Registration Algorithms & Co.
+  Algorithms/Registration/mitkRegistrationWrapper.cpp
   Algorithms/Registration/mitkPyramidImageRegistrationMethod.cpp
 
 
@@ -81,7 +61,6 @@ set(H_FILES
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
-  Rendering/mitkPlanarFigureMapper3D.h
 
   # Reconstruction
   Algorithms/Reconstruction/itkDiffusionQballReconstructionImageFilter.h
@@ -129,15 +108,20 @@ set(H_FILES
   Algorithms/itkMrtrixPeakImageConverter.h
   Algorithms/itkFslPeakImageConverter.h
   Algorithms/itkShCoefficientImageImporter.h
+  Algorithms/itkShCoefficientImageExporter.h
   Algorithms/itkOdfMaximaExtractionFilter.h
   Algorithms/itkResampleDwiImageFilter.h
   Algorithms/itkDwiGradientLengthCorrectionFilter.h
   Algorithms/itkAdcImageFilter.h
-
+  Algorithms/itkDwiNormilzationFilter.h
   Algorithms/itkSplitDWImageFilter.h
+  Algorithms/itkRemoveDwiChannelFilter.h
+  Algorithms/itkExtractDwiChannelFilter.h
 
   Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.h
   Algorithms/mitkDiffusionImageToDiffusionImageFilter.h
+  Algorithms/itkNonLocalMeansDenoisingFilter.h
+  Algorithms/itkVectorImageToImageFilter.h
 
 
 )

@@ -37,7 +37,8 @@ public:
 
     mitkWriterMacro;
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::DiffusionImage<TPixelType> InputType;
 
@@ -76,6 +77,7 @@ public:
      * Sets the input object for the filter.
      * @param input the diffusion volumes to write to file.
      */
+    using itk::ProcessObject::SetInput;
     void SetInput( InputType* input );
 
     /**

@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkToFTestingCOMMON_H
 #define mitkToFTestingCOMMON_H
 
-#include "mitkToFProcessingExports.h"
-#include "mitkVector.h"
+#include <MitkToFProcessingExports.h>
+#include "mitkNumericTypes.h"
 #include <mitkToFProcessingCommon.h>
 #include <mitkSurface.h>
 #include <mitkPointSet.h>
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class mitkToFProcessing_EXPORT ToFTestingCommon
+class MitkToFProcessing_EXPORT ToFTestingCommon
 {
 public:
 
@@ -61,6 +61,7 @@ public:
         else
         {
             pointSetsEqual = false;
+            MITK_INFO<<"Point sets have different size: "<<pointSet1->GetSize()<<" vs. "<<pointSet2->GetSize();
         }
         return pointSetsEqual;
     }

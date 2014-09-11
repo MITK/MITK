@@ -41,7 +41,8 @@ public:
 
   mitkClassMacro( ShaderProperty, EnumerationProperty );
 
-  itkNewMacro(ShaderProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   mitkNewMacro1Param(ShaderProperty, const IdType&);
@@ -58,7 +59,6 @@ public:
   void SetShader(const std::string& i);
 
   using BaseProperty::operator=;
-
 protected:
 
   std::list<Element> shaderList;

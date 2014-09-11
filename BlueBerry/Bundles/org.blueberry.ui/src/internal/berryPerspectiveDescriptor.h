@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 
 namespace berry {
-
 /**
  * \ingroup org_blueberry_ui_internal
  *
@@ -45,7 +44,6 @@ namespace berry {
  *
  */
 class PerspectiveDescriptor : public IPerspectiveDescriptor {
-
 public:
   berryObjectMacro(PerspectiveDescriptor);
 
@@ -70,6 +68,8 @@ private:
    mutable ImageDescriptor::Pointer imageDescriptor;
 
    IConfigurationElement::Pointer configElement;
+
+   std::vector<std::string> categoryPath;
 
   /**
    * Create a new empty descriptor.
@@ -117,6 +117,8 @@ private:
    * @see org.blueberry.ui.IPerspectiveDescriptor#getDescription()
    */
   public: std::string GetDescription() const;
+public: void SetDescription(std::string desc) {description = desc; }
+  std::vector< std::string> GetKeywordReferences() const;
 
   /**
    * Returns whether or not this perspective is fixed.
@@ -226,8 +228,13 @@ private:
    */
   public: std::string GetFactoryClassName() const;
 
+  /**
+   * Return the category path of this descriptor
+   *
+   * @return the category path of this descriptor
+   */
+  public: std::vector<std::string> GetCategoryPath();
 };
-
 }
 
 #endif /*BERRYPERSPECTIVEDESCRIPTOR_H_*/

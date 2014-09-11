@@ -17,9 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKMouseModeSwitcher_H_HEADER_INCLUDED_C10DC4EB
 #define MITKMouseModeSwitcher_H_HEADER_INCLUDED_C10DC4EB
 
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 #include <itkObject.h>
 #include "mitkDisplayInteractor.h"
+
 
 namespace mitk {
 
@@ -70,7 +71,8 @@ namespace mitk {
 #pragma GCC visibility pop
 
     mitkClassMacro( MouseModeSwitcher, itk::Object );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     // enum of the different interaction schemes that are available
     enum InteractionScheme
@@ -116,6 +118,7 @@ namespace mitk {
     InteractionScheme m_ActiveInteractionScheme;
     MouseMode         m_ActiveMouseMode;
     DisplayInteractor::Pointer m_CurrentObserver;
+
     /**
      * Reference to the service registration of the observer,
      * it is needed to unregister the observer on unload.

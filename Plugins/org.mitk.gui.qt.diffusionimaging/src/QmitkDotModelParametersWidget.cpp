@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkDotModelParametersWidget::VIEW_ID = "org.mitk.views.DotModelParametersWidget";
 
-QmitkDotModelParametersWidget::QmitkDotModelParametersWidget( QWidget * parent, Qt::WindowFlags f )
+QmitkDotModelParametersWidget::QmitkDotModelParametersWidget( QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
 {
     m_Controls = NULL;

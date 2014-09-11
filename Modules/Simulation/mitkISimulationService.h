@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkSimulation.h>
 #include <usServiceInterface.h>
-#include <SimulationExports.h>
+#include <MitkSimulationExports.h>
 
 namespace mitk
 {
-  class Simulation_EXPORT ISimulationService
+  class MitkSimulation_EXPORT ISimulationService
   {
   public:
     virtual Simulation::Pointer GetSimulation() const = 0;

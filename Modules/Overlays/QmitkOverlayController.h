@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <string>
 
-#include "OverlaysExports.h"
+#include <MitkOverlaysExports.h>
 
 
 class QmitkRenderWindow;
@@ -56,7 +56,7 @@ class QmitkRenderWindow;
 * \ingroup Qmitk
 */
 
-class Overlays_EXPORT QmitkOverlayController : public QObject
+class MitkOverlays_EXPORT QmitkOverlayController : public QObject
 {
   Q_OBJECT
 

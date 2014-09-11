@@ -18,9 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKAFFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F
 #define MITKAFFINEINTERACTOR_H_HEADER_INCLUDED_C188C29F
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkInteractor.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 
 namespace mitk {
 class DisplayPositionEvent;
@@ -44,7 +44,8 @@ class MITK_CORE_EXPORT AffineInteractor : public Interactor
 {
 public:
   mitkClassMacro(AffineInteractor,Interactor);
-//  itkNewMacro(Self);
+//  itkFactorylessNewMacro(Self)
+//  itkCloneMacro(Self)
   mitkNewMacro2Param(Self, const char*, DataNode*);
 
 protected:

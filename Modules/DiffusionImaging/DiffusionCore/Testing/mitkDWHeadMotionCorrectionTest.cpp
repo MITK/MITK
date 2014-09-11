@@ -17,10 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkIOUtil.h"
 
-#include "mitkDiffusionCoreObjectFactory.h"
-
 #include "mitkDWIHeadMotionCorrectionFilter.h"
-#include "mitkNrrdDiffusionImageWriter.h"
 
 typedef short                                       DiffusionPixelType;
 typedef mitk::DiffusionImage< DiffusionPixelType >  DiffusionImageType;
@@ -36,8 +33,6 @@ int mitkDWHeadMotionCorrectionTest( int argc, char* argv[] )
 
   MITK_TEST_CONDITION_REQUIRED( argc > 2, "Specify input and output.");
 
-  RegisterDiffusionCoreObjectFactory();
-
   mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage( argv[1] );
   DiffusionImageType* dwimage =
       static_cast<DiffusionImageType*>( inputImage.GetPointer() );
@@ -48,15 +43,9 @@ int mitkDWHeadMotionCorrectionTest( int argc, char* argv[] )
   corrfilter->SetInput( dwimage );
   corrfilter->Update();
 
-  mitk::NrrdDiffusionImageWriter< DiffusionPixelType >::Pointer dwiwriter =
-      mitk::NrrdDiffusionImageWriter< DiffusionPixelType >::New();
-
-  dwiwriter->SetInput( corrfilter->GetOutput() );
-  dwiwriter->SetFileName( argv[2] );
-
   try
   {
-    dwiwriter->Update();
+    mitk::IOUtil::SaveBaseData(corrfilter->GetOutput(), argv[2]);
   }
   catch( const itk::ExceptionObject& e)
   {

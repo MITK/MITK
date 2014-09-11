@@ -21,9 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //Plugin defines for Camcube 2.0
 #define PROC_PARAM ""
 
-extern PMDHandle m_PMDHandle; //TODO
+extern PMDHandle m_PMDHandle;
 
-extern PMDDataDescription m_DataDescription; //TODO
+extern PMDDataDescription m_DataDescription;
 
 namespace mitk
 {

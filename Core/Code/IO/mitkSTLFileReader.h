@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef STLFileReader_H_HEADER_INCLUDED
 #define STLFileReader_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkSurfaceSource.h"
 
 namespace mitk {
@@ -29,7 +29,8 @@ public:
     mitkClassMacro(STLFileReader, SurfaceSource);
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkSetStringMacro(FileName);
     itkGetStringMacro(FileName);

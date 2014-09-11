@@ -125,15 +125,13 @@ void QmitkFiducialRegistrationWidget::SetImageFiducialsNode( mitk::DataNode::Poi
     FRW_WARN<< "tracker fiducial node is NULL";
     return;
   }
+  m_Controls->m_RegistrationImagePoints->SetPointSetNode(imageFiducialsNode); // pass node to pointListWidget
   if(m_MultiWidget == NULL)
   {
     FRW_WARN<< "stdMultiWidget is NULL";
     return;
   }
   m_Controls->m_RegistrationImagePoints->SetMultiWidget(m_MultiWidget); // pass multiWidget to pointListWidget
-  m_Controls->m_RegistrationImagePoints->SetPointSetNode(imageFiducialsNode); // pass node to pointListWidget
-
-
 }
 
 void QmitkFiducialRegistrationWidget::SetTrackerFiducialsNode( mitk::DataNode::Pointer trackerFiducialsNode )
@@ -143,19 +141,24 @@ void QmitkFiducialRegistrationWidget::SetTrackerFiducialsNode( mitk::DataNode::P
     FRW_WARN<< "tracker fiducial node is NULL";
     return;
   }
+  m_Controls->m_RegistrationTrackingPoints->SetPointSetNode(trackerFiducialsNode); // pass node to pointListWidget
   if(m_MultiWidget == NULL)
   {
     FRW_WARN<< "stdMultiWidget is NULL";
     return;
   }
   m_Controls->m_RegistrationTrackingPoints->SetMultiWidget(m_MultiWidget); // pass multiWidget to pointListWidget
-  m_Controls->m_RegistrationTrackingPoints->SetPointSetNode(trackerFiducialsNode); // pass node to pointListWidget
-
 }
 
 void QmitkFiducialRegistrationWidget::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
 {
   m_MultiWidget=multiWidget;
+}
+
+void QmitkFiducialRegistrationWidget::AddSliceNavigationController(mitk::SliceNavigationController* snc)
+{
+  m_Controls->m_RegistrationTrackingPoints->AddSliceNavigationController(snc);
+  m_Controls->m_RegistrationImagePoints->AddSliceNavigationController(snc);
 }
 
 mitk::DataNode::Pointer QmitkFiducialRegistrationWidget::GetImageFiducialsNode()

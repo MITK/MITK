@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ItkImageFileReader_H_HEADER_INCLUDED
 #define ItkImageFileReader_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
 
@@ -32,7 +32,8 @@ public:
     mitkClassMacro(ItkImageFileReader, FileReader);
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkSetStringMacro(FileName);
     itkGetStringMacro(FileName);

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkCalculateGrayValueStatisticsToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 
 #include "mitkCalculateGrayValueStatisticsTool.h"
 
@@ -30,14 +30,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
 
     mitkClassMacro(QmitkCalculateGrayValueStatisticsToolGUI, QmitkToolGUI);
-    itkNewMacro(QmitkCalculateGrayValueStatisticsToolGUI);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /// Reacts to signals from mitk::CalculateGrayValueStatisticsTool
     void OnCalculationsDone();

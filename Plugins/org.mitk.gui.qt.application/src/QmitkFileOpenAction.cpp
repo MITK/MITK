@@ -119,5 +119,6 @@ void QmitkFileOpenAction::Run()
     return;
 
   d->setLastFileOpenPath(fileNames.front());
+
   mitk::WorkbenchUtil::LoadFiles(fileNames, d->m_Window.Lock(), d->GetOpenEditor());
 }

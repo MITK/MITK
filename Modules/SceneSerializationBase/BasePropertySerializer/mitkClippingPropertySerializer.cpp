@@ -20,17 +20,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBasePropertySerializer.h"
 
 #include "mitkClippingProperty.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 
-#include "SceneSerializationBaseExports.h"
+#include <MitkSceneSerializationBaseExports.h>
 
 namespace mitk
 {
-class SceneSerializationBase_EXPORT ClippingPropertySerializer : public BasePropertySerializer
+class MitkSceneSerializationBase_EXPORT ClippingPropertySerializer : public BasePropertySerializer
 {
   public:
     mitkClassMacro( ClippingPropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {
@@ -69,21 +70,21 @@ class SceneSerializationBase_EXPORT ClippingPropertySerializer : public BaseProp
       if (originElement == NULL)
         return NULL;
       Point3D origin;
-      if ( originElement->QueryFloatAttribute( "x", &origin[0] ) != TIXML_SUCCESS )
+      if ( originElement->QueryDoubleAttribute( "x", &origin[0] ) != TIXML_SUCCESS )
         return NULL;
-      if ( originElement->QueryFloatAttribute( "y", &origin[1] ) != TIXML_SUCCESS )
+      if ( originElement->QueryDoubleAttribute( "y", &origin[1] ) != TIXML_SUCCESS )
         return NULL;
-      if ( originElement->QueryFloatAttribute( "z", &origin[2] ) != TIXML_SUCCESS )
+      if ( originElement->QueryDoubleAttribute( "z", &origin[2] ) != TIXML_SUCCESS )
         return NULL;
       TiXmlElement* normalElement = element->FirstChildElement("normal");
       if (normalElement == NULL)
         return NULL;
       Vector3D normal;
-      if ( normalElement->QueryFloatAttribute( "x", &normal[0] ) != TIXML_SUCCESS )
+      if ( normalElement->QueryDoubleAttribute( "x", &normal[0] ) != TIXML_SUCCESS )
         return NULL;
-      if ( normalElement->QueryFloatAttribute( "y", &normal[1] ) != TIXML_SUCCESS )
+      if ( normalElement->QueryDoubleAttribute( "y", &normal[1] ) != TIXML_SUCCESS )
         return NULL;
-      if ( normalElement->QueryFloatAttribute( "z", &normal[2] ) != TIXML_SUCCESS )
+      if ( normalElement->QueryDoubleAttribute( "z", &normal[2] ) != TIXML_SUCCESS )
         return NULL;
       ClippingProperty::Pointer cp = ClippingProperty::New(origin, normal);
       cp->SetClippingEnabled(enabled);

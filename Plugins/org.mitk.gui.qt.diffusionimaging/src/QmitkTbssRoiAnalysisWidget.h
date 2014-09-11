@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef itk::VectorImage<float,3>     VectorImageType;
 typedef std::vector< itk::Index<3> > RoiType;
 
-typedef itk::Point<float,3>               PointType;
+typedef mitk::Point3D                     PointType;
 typedef std::vector< PointType>           TractType;
 typedef std::vector< TractType > TractContainerType;
 
@@ -71,7 +71,8 @@ public:
                    int number);
 
 
-  void PlotFiberBundles(TractContainerType tracts, mitk::Image* img, bool avg=false);
+  template <typename T>
+  void PlotFiberBundles(const mitk::PixelType, TractContainerType tracts, mitk::Image* img, bool avg=false);
 
 
   /* \brief Sets the projections of the individual subjects */

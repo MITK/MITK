@@ -1,0 +1,11 @@
+/**
+\page IGTTutorialStep2 IGT Visualization Filter and MITK Concepts
+
+The following code shows how to insert IGT tracking data into an mitk::DataStorage and render the data with the mitk::NavigationDataObjectVisualizationFilter in an mitk::RenderWindow. The full code is shown below and can be found in MITK-Source/Modules/IGT/Tutorial/mitkIGTTutorialStep2.cpp.
+This tutorial is an extra target which can be build separately.
+
+\include mitkIGTTutorialStep2.cpp
+
+\ref IGTTutorialStep1 "[Previous step]" \ref IGTTutorialStep3 "[Next step]" \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+
+*/

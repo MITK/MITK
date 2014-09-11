@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkCalculateGrayValueStatisticsTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkSegmentationsProcessingTool.h"
 
 #ifndef __itkHistogram_h
@@ -40,14 +40,15 @@ namespace mitk
 
  Last contributor: $Author$
 */
-class Segmentation_EXPORT CalculateGrayValueStatisticsTool : public SegmentationsProcessingTool
+class MitkSegmentation_EXPORT CalculateGrayValueStatisticsTool : public SegmentationsProcessingTool
 {
   public:
 
   Message<> StatisticsCompleted;
 
     mitkClassMacro(CalculateGrayValueStatisticsTool, SegmentationsProcessingTool);
-    itkNewMacro(CalculateGrayValueStatisticsTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
   virtual const char** GetXPM() const;
   virtual const char* GetName() const;

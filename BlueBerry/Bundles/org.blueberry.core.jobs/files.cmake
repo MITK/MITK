@@ -26,7 +26,6 @@ set(INTERNAL_CPP_FILES
 )
 
 set(H_FILES
- src/berryJobsDll.h
  src/berryLockListener.h
  src/berryISchedulingRule.h
  src/berryIProgressMonitor.h

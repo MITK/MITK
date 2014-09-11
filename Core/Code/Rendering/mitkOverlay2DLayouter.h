@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKOVERLAY2DLAYOUTER_H
 #define MITKOVERLAY2DLAYOUTER_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkAbstractOverlayLayouter.h>
 
 namespace mitk {
@@ -28,7 +28,8 @@ class MITK_CORE_EXPORT Overlay2DLayouter : public mitk::AbstractOverlayLayouter 
 public:
   enum Alignment{TopLeft, Top, TopRight, BottomLeft, Bottom, BottomRight};
   mitkClassMacro(Overlay2DLayouter, mitk::AbstractOverlayLayouter);
-  itkNewMacro(Overlay2DLayouter);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   static std::string STANDARD_2D_TOPLEFT();
   static std::string STANDARD_2D_TOP();

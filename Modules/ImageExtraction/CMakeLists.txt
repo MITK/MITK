@@ -1,5 +1,6 @@
-MITK_CREATE_MODULE( ImageExtraction
-               DEPENDS Mitk mitkIpPic PlanarFigure
+MITK_CREATE_MODULE(
+  DEPENDS MitkAlgorithmsExt
+  WARNINGS_AS_ERRORS
 )
 
 if(BUILD_TESTING)

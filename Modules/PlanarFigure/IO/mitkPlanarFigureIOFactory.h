@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 
 #include "itkObjectFactoryBase.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 #include "mitkBaseData.h"
 
 namespace mitk
@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of PlanarFigureReader objects using an object factory.
 //##
 //## @ingroup IO
-class PlanarFigure_EXPORT PlanarFigureIOFactory : public itk::ObjectFactoryBase
+class MitkPlanarFigure_EXPORT PlanarFigureIOFactory : public itk::ObjectFactoryBase
 {
 public:
   /** Standard class typedefs. */

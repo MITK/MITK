@@ -26,8 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkPointListWidget.h>
 #include <mitkDataNodeObject.h>
 #include <mitkDataNodeSelection.h>
-#include <mitkPointSetInteractor.h>
-#include <mitkGlobalInteraction.h>
+
 
 QmitkPointSetInteractionView::QmitkPointSetInteractionView( QObject* /*parent*/ )
 : m_Controls(0)
@@ -108,21 +107,11 @@ void QmitkPointSetInteractionView::OnSelectionChanged(std::vector<mitk::DataNode
   if(selectedNode)
     pointSet = dynamic_cast<mitk::PointSet*> ( selectedNode->GetData() );
 
-  //if( m_SelectedPointSetInteractor.IsNotNull() )
-  //{
-  //  mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_SelectedPointSetInteractor );
-  //  m_SelectedPointSetInteractor = NULL;
-  //}
-
-  if (pointSet /*&& this->IsActivated()*/)
+  if (pointSet)
   {
     m_SelectedPointSetNode = selectedNode;
     m_Controls->m_CurrentPointSetLabel->setText(QString::fromStdString(selectedNode->GetName()));
     m_Controls->m_PointListWidget->SetPointSetNode(selectedNode);
-    // add interactor
-    //mitk::PointSetInteractor::Pointer _Interactor = mitk::PointSetInteractor::New("pointsetinteractor", selectedNode);
-    //mitk::GlobalInteraction::GetInstance()->AddInteractor( _Interactor );
-    //m_SelectedPointSetInteractor = _Interactor;
   }
   else
   {

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_SPACENAVIGATORVTKCAMERACONTROLLER_H_
 
 #include <mitkCameraController.h>
-#include <mitkSpaceNavigatorExports.h>
+#include <MitkSpaceNavigatorExports.h>
 
 
 class vtkRenderWindow;
@@ -39,7 +39,8 @@ namespace mitk {
 
     //SmartPointer Macros
     mitkClassMacro(SpaceNavigatorVtkCameraController, CameraController);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual bool OnSpaceNavigatorEvent(mitk::Action* a, const mitk::StateEvent* e);
     virtual bool OnSpaceNavigatorKeyDown(mitk::Action* a, const mitk::StateEvent* e);

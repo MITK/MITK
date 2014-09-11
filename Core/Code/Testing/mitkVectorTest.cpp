@@ -15,19 +15,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkTestingMacros.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
+
+#include <vnl/vnl_vector_fixed.txx>
 
 int mitkVectorTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("mitkVector");
   // test itk vector equality methods
-  itk::Vector<float,3> itkVector_1;
+  itk::Vector<mitk::ScalarType,3> itkVector_1;
   itkVector_1[0] = 4.6;
   itkVector_1[1] = 9.76543;
   itkVector_1[2] = 746.09;
 
-  itk::Vector<float,3> itkVector_2;
-  itk::Vector<float,3> itkVector_3;
+  itk::Vector<mitk::ScalarType,3> itkVector_2;
+  itk::Vector<mitk::ScalarType,3> itkVector_3;
   for (int i=0; i<3; i++)
   {
     itkVector_2[i] = itkVector_1[i] - mitk::eps*1.1;
@@ -36,12 +38,12 @@ int mitkVectorTest(int /*argc*/, char* /*argv*/[])
 
   MITK_TEST_CONDITION(mitk::Equal(itkVector_1,itkVector_1), "Test vector equality using the same vector with mitk::eps");
   MITK_TEST_CONDITION(!mitk::Equal(itkVector_1,itkVector_2), "Test vector equality using different vectors with an element-wise difference greater than mitk::eps");
-  MITK_TEST_CONDITION( mitk::Equal(itkVector_1, itkVector_2, mitk::eps*1.2f), "Vectors are equal for higher epsilon tolerance ( 1.2 * mitk::eps )");
+  MITK_TEST_CONDITION( mitk::Equal(itkVector_1, itkVector_2, mitk::eps*1.2), "Vectors are equal for higher epsilon tolerance ( 1.2 * mitk::eps )");
   MITK_TEST_CONDITION(mitk::Equal(itkVector_1,itkVector_3), "Test vector equality using different vectors with an element-wise difference less than mitk::eps");
   // test itk point equality methods
-  itk::Point<float,3> itkPoint_1;
-  itk::Point<float,3> itkPoint_2;
-  itk::Point<float,3> itkPoint_3;
+  itk::Point<mitk::ScalarType,3> itkPoint_1;
+  itk::Point<mitk::ScalarType,3> itkPoint_2;
+  itk::Point<mitk::ScalarType,3> itkPoint_3;
   for (int i=0; i<3; i++)
   {
     itkPoint_1[i] = itkVector_1[i];
@@ -50,7 +52,7 @@ int mitkVectorTest(int /*argc*/, char* /*argv*/[])
   }
   MITK_TEST_CONDITION(mitk::Equal(itkPoint_1,itkPoint_1), "Test point equality using the same point with mitk::eps");
   MITK_TEST_CONDITION(!mitk::Equal(itkPoint_1,itkPoint_2), "Test point equality using different points with an element-wise difference greater than mitk::eps");
-  MITK_TEST_CONDITION( mitk::Equal(itkPoint_1, itkPoint_2, mitk::eps * 1.2f), "Points are equal for higher epsilon tolerance ( 1.2 * mitk::eps )");
+  MITK_TEST_CONDITION( mitk::Equal(itkPoint_1, itkPoint_2, mitk::eps * 1.2), "Points are equal for higher epsilon tolerance ( 1.2 * mitk::eps )");
   MITK_TEST_CONDITION(mitk::Equal(itkPoint_1,itkPoint_3), "Test point equality using different points with an element-wise difference less than mitk::eps");
   // test mitk vnl vector equality methods
   mitk::VnlVector mitk_vnl_vector_1(3);
@@ -65,7 +67,7 @@ int mitkVectorTest(int /*argc*/, char* /*argv*/[])
 
   MITK_TEST_CONDITION(mitk::Equal(mitk_vnl_vector_1,mitk_vnl_vector_1), "Test mitk vnl vector equality using the same mitk vnl vector with mitk::eps");
   MITK_TEST_CONDITION(!mitk::Equal(mitk_vnl_vector_1,mitk_vnl_vector_2), "Test mitk vnl vector equality using different mitk vnl vectors with an element-wise difference greater than mitk::eps");
-  MITK_TEST_CONDITION( mitk::Equal(mitk_vnl_vector_1, mitk_vnl_vector_2, true, mitk::eps*1.2), "Vnl vectors are equal for higher epsilon tolerance ( 1.2 * mitk::eps )");
+  MITK_TEST_CONDITION( mitk::Equal(mitk_vnl_vector_1, mitk_vnl_vector_2, mitk::eps*1.2), "Vnl vectors are equal for higher epsilon tolerance ( 1.2 * mitk::eps )");
   MITK_TEST_CONDITION(mitk::Equal(mitk_vnl_vector_1,mitk_vnl_vector_3), "Test mitk vnl vector equality using different mitk vnl vectors with an element-wise difference less than mitk::eps");
 
   // test vnl_vector equality method
@@ -97,12 +99,14 @@ int mitkVectorTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION(!(mitk::Equal<VnlValueType, 7>(vnlVector_1,vnlVector_3, mitk::eps*0.8f)), "vnl_fixed : v_1 != v_3 with eps = 0.8 * mitk::eps ");
 
   // test scalar equality method
-  double scalar1 = 0.5689;
-  double scalar2 = scalar1 + mitk::eps;
-  double scalar3 = scalar1 + mitk::eps*0.95;
+  mitk::ScalarType scalar1 = 0.5689;
+  mitk::ScalarType scalar2 = scalar1 + mitk::eps*1.01;
+  mitk::ScalarType scalar3 = scalar1;
+  mitk::ScalarType scalar4 = scalar1 + mitk::eps*0.95;
   MITK_TEST_CONDITION(mitk::Equal(scalar1,scalar1), "Test scalar equality using the same scalar with mitk::eps");
   MITK_TEST_CONDITION(!mitk::Equal(scalar1,scalar2), "Test scalar equality using the different scalars with a difference greater than mitk::eps");
-  MITK_TEST_CONDITION(mitk::Equal(scalar1,scalar3), "Test scalar equality using the different scalars with a difference less than mitk::eps");
+  MITK_TEST_CONDITION(mitk::Equal(scalar1,scalar3), "Test scalar equality using the different scalars with a difference equal to mitk::eps");
+  MITK_TEST_CONDITION(mitk::Equal(scalar1,scalar4), "Test scalar equality using the different scalars with a difference less than mitk::eps");
 
   // test matrix equality methods
   vnl_matrix_fixed<mitk::ScalarType,3,3> vnlMatrix3x3_1;
@@ -127,7 +131,7 @@ int mitkVectorTest(int /*argc*/, char* /*argv*/[])
   vnlMatrix3x3_2(2,2) = 1.0000009;
 
   mitk::ScalarType epsilon = 0.000001;
-  MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(vnlMatrix3x3_1,vnlMatrix3x3_1,0.0),"Test for matrix equality with given epsilon=0.0 and exactly the same matrix elements");
+  MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(vnlMatrix3x3_1,vnlMatrix3x3_1,mitk::eps),"Test for matrix equality with given epsilon=mitk::eps and exactly the same matrix elements");
   MITK_TEST_CONDITION(!mitk::MatrixEqualElementWise(vnlMatrix3x3_1,vnlMatrix3x3_2,0.0),"Test for matrix equality with given epsilon=0.0 and slightly different matrix elements");
   MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(vnlMatrix3x3_1,vnlMatrix3x3_2,epsilon),"Test for matrix equality with given epsilon and slightly different matrix elements");
   MITK_TEST_CONDITION(!mitk::MatrixEqualRMS(vnlMatrix3x3_1,vnlMatrix3x3_2,0.0),"Test for matrix equality with given epsilon=0.0 and slightly different matrix elements");

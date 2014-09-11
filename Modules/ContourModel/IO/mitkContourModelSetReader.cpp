@@ -82,7 +82,6 @@ void mitk::ContourModelSetReader::ReadPoints(mitk::ContourModel::Pointer newCont
               currentPoint != NULL; currentPoint = currentPoint->NextSiblingElement())
       {
 
-        mitk::PointSpecificationType spec((mitk::PointSpecificationType) 0);
         double x(0.0);
         double y(0.0);
         double z(0.0);

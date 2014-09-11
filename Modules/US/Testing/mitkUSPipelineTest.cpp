@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSVideoDevice.h"
 #include "mitkTestingMacros.h"
 #include "mitkUSImageToUSImageFilter.h"
-#include "mitkPadImageFilter.h"
 #include <mitkImageWriteAccessor.h>
 
 // START TESTFILER
@@ -31,7 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
     public:
       mitkClassMacro(TestUSFilter, mitk::USImageToUSImageFilter);
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
     virtual void GenerateOutputInformation()
       {

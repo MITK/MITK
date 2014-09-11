@@ -1,5 +1,7 @@
-MITK_CREATE_MODULE( ImageStatistics
-               DEPENDS Mitk ImageExtraction PlanarFigure
+MITK_CREATE_MODULE(
+  DEPENDS MitkImageExtraction MitkPlanarFigure
+  PACKAGE_DEPENDS ITK|ITKVTK
+  WARNINGS_AS_ERRORS
 )
 
 if(BUILD_TESTING)

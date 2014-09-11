@@ -18,11 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkToolManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
+#include "mitkAbstractTransformGeometry.h"
 
 #include "ipSegmentation.h"
 
 #include "mitkBaseRenderer.h"
 #include "mitkImageDataItem.h"
+#include "mitkLegacyAdaptors.h"
 
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 
@@ -32,16 +34,17 @@ mitk::SetRegionTool::SetRegionTool(int paintingPixelValue)
  m_FillContour(false),
  m_StatusFillWholeSlice(false)
 {
-  // great magic numbers
-  CONNECT_ACTION( 80, OnMousePressed );
-  //CONNECT_ACTION( 90, OnMouseMoved );
-  CONNECT_ACTION( 42, OnMouseReleased );
-  CONNECT_ACTION( 49014, OnInvertLogic );
-
 }
 
 mitk::SetRegionTool::~SetRegionTool()
 {
+}
+
+void mitk::SetRegionTool::ConnectActionsAndFunctions()
+{
+  CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
+  CONNECT_FUNCTION( "Release", OnMouseReleased);
+  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic);
 }
 
 void mitk::SetRegionTool::Activated()
@@ -54,16 +57,20 @@ void mitk::SetRegionTool::Deactivated()
   Superclass::Deactivated();
 }
 
-bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+      return false;
+
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
   int timeStep = positionEvent->GetSender()->GetTimeStep();
 
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
 
   // 1. Get the working image
@@ -71,9 +78,9 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   if ( workingSlice.IsNull() ) return false; // can't do anything without the segmentation
 
   // if click was outside the image, don't continue
-  const Geometry3D* sliceGeometry = workingSlice->GetGeometry();
+  const BaseGeometry* sliceGeometry = workingSlice->GetGeometry();
   itk::Index<2> projectedPointIn2D;
-  sliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), projectedPointIn2D );
+  sliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), projectedPointIn2D );
   if ( !sliceGeometry->IsIndexInside( projectedPointIn2D ) )
   {
     MITK_ERROR << "point apparently not inside segmentation slice" << std::endl;
@@ -195,7 +202,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     // copy point from float* to mitk::Contour
     ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
     contourInImageIndexCoordinates->Expand(timeStep + 1);
-    contourInImageIndexCoordinates->SetIsClosed(true, timeStep);
+    contourInImageIndexCoordinates->SetClosed(true, timeStep);
     Point3D newPoint;
     for (int index = 0; index < numberOfContourPoints; ++index)
     {
@@ -220,7 +227,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     // copy point from float* to mitk::Contour
     ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
     contourInImageIndexCoordinates->Expand(timeStep + 1);
-    contourInImageIndexCoordinates->SetIsClosed(true, timeStep);
+    contourInImageIndexCoordinates->SetClosed(true, timeStep);
     Point3D newPoint;
     newPoint[0] = 0; newPoint[1] = 0; newPoint[2] = 0.0;
     contourInImageIndexCoordinates->AddVertex( newPoint, timeStep );
@@ -246,12 +253,16 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   return true;
 }
 
-bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
+bool mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+      return false;
+
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -261,14 +272,15 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
 
   if (!m_FillContour && !m_StatusFillWholeSlice) return true;
 
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
-  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
-  if ( !image || !planeGeometry ) return false;
+  const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
+  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
+  if ( !image || !planeGeometry || abstractTransformGeometry ) return false;
 
   Image::Pointer slice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
 
@@ -296,11 +308,12 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
 /**
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
 */
-bool mitk::SetRegionTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
+bool mitk::SetRegionTool::OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   if (m_StatusFillWholeSlice)

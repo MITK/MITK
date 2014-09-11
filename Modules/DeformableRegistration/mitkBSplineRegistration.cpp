@@ -75,7 +75,7 @@ namespace mitk {
 
 
   template < typename TPixel, unsigned int VImageDimension >
-    void BSplineRegistration::GenerateData2( itk::Image<TPixel, VImageDimension>* itkImage1)
+    void BSplineRegistration::GenerateData2( const itk::Image<TPixel, VImageDimension>* itkImage1)
   {
     std::cout << "start bspline registration" << std::endl;
 
@@ -179,7 +179,7 @@ namespace mitk {
 
     typename InternalImageType::Pointer fixedImage = InternalImageType::New();
     mitk::CastToItkImage(m_ReferenceImage, fixedImage);
-    typename InternalImageType::Pointer movingImage = itkImage1;
+    typename InternalImageType::ConstPointer movingImage = itkImage1;
     typename InternalImageType::RegionType fixedRegion = fixedImage->GetBufferedRegion();
     typename InternalImageType::RegionType movingRegion = movingImage->GetBufferedRegion();
 

@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class Segmentation_EXPORT ShowSegmentationAsSmoothedSurface : public SegmentationSink
+  class MitkSegmentation_EXPORT ShowSegmentationAsSmoothedSurface : public SegmentationSink
   {
   public:
     mitkClassMacro(ShowSegmentationAsSmoothedSurface, SegmentationSink);

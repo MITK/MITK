@@ -18,13 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define PLANARFIGURE_WRITERFACTORY_H_HEADER_INCLUDED
 
 #include "itkObjectFactoryBase.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 #include "mitkBaseData.h"
 
 namespace mitk
 {
 
-class PlanarFigure_EXPORT PlanarFigureWriterFactory : public itk::ObjectFactoryBase
+class MitkPlanarFigure_EXPORT PlanarFigureWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 

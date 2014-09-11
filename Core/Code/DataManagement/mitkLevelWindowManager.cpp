@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkMessage.h"
 #include "mitkRenderingModeProperty.h"
-
+#include "mitkImage.h"
 
 mitk::LevelWindowManager::LevelWindowManager()
 : m_DataStorage(NULL)
@@ -140,6 +140,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
     int nonLvlWinMode2 = mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR;
 
     mitk::RenderingModeProperty::Pointer mode = dynamic_cast<mitk::RenderingModeProperty*>(node->GetProperty( "Image Rendering.Mode" ));
+
     if( mode.IsNotNull() )
     {
       int currMode = mode->GetRenderingMode();

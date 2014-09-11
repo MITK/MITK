@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ImageGenerator_H_HEADER_INCLUDED
 #define ImageGenerator_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkImage.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <itkImageRegionIterator.h>
@@ -92,9 +92,9 @@ public:
                                                     unsigned int dimY,
                                                     unsigned int dimZ = 1,
                                                     unsigned int dimT = 1,
-                                                    float spacingX = 1,
-                                                    float spacingY = 1,
-                                                    float spacingZ = 1,
+                                                    mitk::ScalarType spacingX = 1,
+                                                    mitk::ScalarType spacingY = 1,
+                                                    mitk::ScalarType spacingZ = 1,
                                                     const double randomMax = 1000.0f, const double randMin = 0.0f)
     {
         //set the data type according to the template
@@ -143,7 +143,7 @@ public:
         output->SetSpacing(spacing);
 
         //get a pointer to the image buffer to write into
-        TPixelType* imageBuffer;
+        TPixelType* imageBuffer = NULL;
         try
         {
           mitk::ImageWriteAccessor writeAccess( output );

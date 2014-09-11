@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkVtkImageOverwrite_h_Included
 
 #include <vtkImageReslice.h>
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
   /** \brief A vtk Filter based on vtkImageReslice with the aditional feature to write a slice into the given input volume.
     All optimizations for e.g. the plane directions or interpolation are stripped away, the algorithm only interpolates nearest
@@ -49,7 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
       \sa vtkImageReslice
       (Note that the execute and interpolation functions are no members and thus can not be overriden)
    */
-  class Segmentation_EXPORT mitkVtkImageOverwrite : public vtkImageReslice
+  class MitkSegmentation_EXPORT mitkVtkImageOverwrite : public vtkImageReslice
   {
   public:
     static mitkVtkImageOverwrite *New();

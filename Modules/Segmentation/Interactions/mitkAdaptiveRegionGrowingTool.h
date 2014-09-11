@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkAdaptiveRegionGrowingTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
 #include "mitkDataStorage.h"
-#include "mitkPointSetInteractor.h"
+#include "mitkSinglePointDataInteractor.h"
 #include "mitkPointSet.h"
 
 namespace us {
@@ -40,36 +40,89 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
 
   */
-  class Segmentation_EXPORT AdaptiveRegionGrowingTool : public AutoSegmentationTool
+  class MitkSegmentation_EXPORT AdaptiveRegionGrowingTool : public AutoSegmentationTool
   {
   public:
 
+    /**
+     * @brief mitkClassMacro
+     */
     mitkClassMacro(AdaptiveRegionGrowingTool, AutoSegmentationTool);
-    itkNewMacro(AdaptiveRegionGrowingTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
+    /**
+     * @brief Get XPM
+     * @return NULL
+     */
     virtual const char** GetXPM() const;
+
+    /**
+     * @brief Get name
+     * @return name of the Tool
+     */
     virtual const char* GetName() const;
+
+    /**
+     * @brief Get icon resource
+     * @return the resource Object of the Icon
+     */
     us::ModuleResource GetIconResource() const;
 
-
+    /**
+     * @brief Adds interactor for the seedpoint and creates a seedpoint if neccessary.
+     *
+     *
+     */
     virtual void Activated();
+
+    /**
+     * @brief Removes all set points and interactors.
+     *
+     *
+     */
     virtual void Deactivated();
 
+    /**
+     * @brief get pointset node
+     * @return the point set node
+     */
     virtual DataNode::Pointer GetPointSetNode();
 
+    /**
+     * @brief get reference data
+     * @return the current reference data.
+     */
     mitk::DataNode* GetReferenceData();
+
+    /**
+     * @brief Get working data
+     * @return a list of all working data.
+     */
     mitk::DataNode* GetWorkingData();
+
+    /**
+     * @brief Get datastorage
+     * @return the current data storage.
+     */
     mitk::DataStorage* GetDataStorage();
 
 
   protected:
 
+    /**
+     * @brief constructor
+     */
     AdaptiveRegionGrowingTool(); // purposely hidden
+
+    /**
+     * @brief destructor
+     */
     virtual ~AdaptiveRegionGrowingTool();
 
   private:
     PointSet::Pointer m_PointSet;
-    PointSetInteractor::Pointer m_SeedPointInteractor;
+    SinglePointDataInteractor::Pointer m_SeedPointInteractor;
     DataNode::Pointer m_PointSetNode;
 
 

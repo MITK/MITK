@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
 #pragma GCC visibility pop
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 namespace mitk {
 
@@ -37,7 +37,7 @@ namespace mitk {
   of SliceNavigationControllers (which is picking one plane from a stack of planes).
 
   This additional class SlicesRotator is needed, because one has to be aware of multiple
-  "visible slices" (selected Geometry2Ds of some SliceNavigationControllers) in order to
+  "visible slices" (selected PlaneGeometries of some SliceNavigationControllers) in order to
   choose between rotation and slice selection. Such functionality could not be implemented
   by a single SliceNavigationController.
 

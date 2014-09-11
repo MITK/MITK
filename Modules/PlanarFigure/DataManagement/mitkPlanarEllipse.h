@@ -19,24 +19,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PLANAR_ELLIPSE_H_
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 
 
 namespace mitk
 {
 
-class Geometry2D;
+class PlaneGeometry;
 
 /**
  * \brief Implementation of PlanarFigure representing a circle
  * through two control points
  */
-class PlanarFigure_EXPORT PlanarEllipse : public PlanarFigure
+class MitkPlanarFigure_EXPORT PlanarEllipse : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarEllipse, PlanarFigure )
 
-  itkNewMacro( Self )
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   /** \brief Place figure in its minimal configuration (a point at least)
@@ -100,6 +101,11 @@ public:
   {
       m_TreatAsCircle = active;
   }
+
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
+
+  const unsigned int FEATURE_ID_MAJOR_AXIS;
+  const unsigned int FEATURE_ID_MINOR_AXIS;
 
 protected:
   PlanarEllipse();

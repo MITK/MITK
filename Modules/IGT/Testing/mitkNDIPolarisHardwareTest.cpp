@@ -29,14 +29,14 @@ int mitkNDIPolarisHardwareTest(int argc , char* argv[])
 
   if (argc<2) {MITK_TEST_FAILED_MSG(<<"Error: test must be called with the com port as second parameter!");}
 
-  int comPort = *argv[1] - '0';
-
   //create a polaris tracking device
   mitk::NDITrackingDevice::Pointer myNDITrackingDevice = mitk::NDITrackingDevice::New();
   myNDITrackingDevice->SetType(mitk::NDIPolaris);
 
 #ifdef WIN32
   //set port
+  int comPort = *argv[1] - '0';
+
   switch (comPort)
     {
     case 1:

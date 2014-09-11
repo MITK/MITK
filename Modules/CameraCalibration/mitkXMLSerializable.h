@@ -20,14 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <tinyxml.h>
 #include <itkObject.h>
 #include <itkMacro.h>
-#include <mitkCameraCalibrationExports.h>
+#include <MitkCameraCalibrationExports.h>
 
 namespace mitk
 {
   ///
   /// \brief interface for all classes able to write themselves to XML files
   ///
-  class mitkCameraCalibration_EXPORT XMLSerializable
+  class MitkCameraCalibration_EXPORT XMLSerializable
   {
   public:
     ///

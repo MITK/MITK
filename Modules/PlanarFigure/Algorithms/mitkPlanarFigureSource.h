@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPlanarFigureSOURCE_H_HEADER_INCLUDED
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 #include "mitkCommon.h"
 #include "mitkBaseDataSource.h"
 
@@ -35,11 +35,12 @@ namespace mitk
  * possible region.
  * @ingroup Process
  */
-class PlanarFigure_EXPORT PlanarFigureSource : public mitk::BaseDataSource
+class MitkPlanarFigure_EXPORT PlanarFigureSource : public mitk::BaseDataSource
 {
 public:
     mitkClassMacro( PlanarFigureSource, BaseDataSource )
-    itkNewMacro( Self )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::PlanarFigure OutputType;
     typedef OutputType::Pointer OutputTypePointer;

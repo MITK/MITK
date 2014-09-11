@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleContext.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, BinaryThresholdULTool, "ThresholdingUL tool");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, BinaryThresholdULTool, "ThresholdingUL tool");
 }
 
 mitk::BinaryThresholdULTool::BinaryThresholdULTool()
@@ -51,8 +51,6 @@ mitk::BinaryThresholdULTool::BinaryThresholdULTool()
   m_CurrentLowerThresholdValue(1),
   m_CurrentUpperThresholdValue(1)
 {
-  this->SupportRoiOn();
-
   m_ThresholdFeedbackNode = DataNode::New();
   m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
   m_ThresholdFeedbackNode->SetProperty( "name", StringProperty::New("Thresholding feedback") );

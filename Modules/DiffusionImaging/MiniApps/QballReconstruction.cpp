@@ -17,16 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MiniAppManager.h"
 
 #include "mitkBaseDataIOFactory.h"
+#include <mitkCoreObjectFactory.h>
 #include "mitkDiffusionImage.h"
-#include "mitkDiffusionCoreObjectFactory.h"
 #include "itkAnalyticalDiffusionQballReconstructionImageFilter.h"
 #include <boost/lexical_cast.hpp>
-#include <mitkNrrdQBallImageWriter.h>
 #include "ctkCommandLineParser.h"
 #include <mitkIOUtil.h>
 #include <itksys/SystemTools.hxx>
 
 using namespace mitk;
+
 /**
  * Perform Q-ball reconstruction using a spherical harmonics basis
  */
@@ -34,13 +34,19 @@ int QballReconstruction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
-    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "spherical harmonics order", 4, true);
-    parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "baseline image intensity threshold", 0, true);
-    parser.addArgument("lambda", "r", ctkCommandLineParser::Float, "ragularization factor lambda", 0.006, true);
-    parser.addArgument("csa", "csa", ctkCommandLineParser::Bool, "use constant solid angle consideration");
-    parser.addArgument("outputCoeffs", "shc", ctkCommandLineParser::Bool, "output file containing the SH coefficients");
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
+    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order", 4, true);
+    parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
+    parser.addArgument("lambda", "r", ctkCommandLineParser::Float, "Lambda", "ragularization factor lambda", 0.006, true);
+    parser.addArgument("csa", "csa", ctkCommandLineParser::Bool, "Constant solid angle consideration", "use constant solid angle consideration");
+    parser.addArgument("outputCoeffs", "shc", ctkCommandLineParser::Bool, "Output coefficients", "output file containing the SH coefficients");
+    parser.addArgument("mrtrix", "mb", ctkCommandLineParser::Bool, "MRtrix", "use MRtrix compatible spherical harmonics definition");
+
+    parser.setCategory("Preprocessing Tools");
+    parser.setTitle("Qball Reconstruction");
+    parser.setDescription("");
+    parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -48,7 +54,7 @@ int QballReconstruction(int argc, char* argv[])
 
     std::string inFileName = us::any_cast<string>(parsedArgs["input"]);
     std::string outfilename = us::any_cast<string>(parsedArgs["outFile"]);
-    outfilename = itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
+    outfilename = itksys::SystemTools::GetFilenamePath(outfilename)+"/"+itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
 
     int threshold = 0;
     if (parsedArgs.count("b0Threshold"))
@@ -70,10 +76,12 @@ int QballReconstruction(int argc, char* argv[])
     if (parsedArgs.count("outputCoeffs"))
         outCoeffs = us::any_cast<bool>(parsedArgs["outputCoeffs"]);
 
+    bool mrTrix = false;
+    if (parsedArgs.count("mrtrix"))
+        mrTrix = us::any_cast<bool>(parsedArgs["mrtrix"]);
+
     try
     {
-        RegisterDiffusionCoreObjectFactory();
-
         MITK_INFO << "Loading image ...";
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
@@ -93,9 +101,10 @@ int QballReconstruction(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
+            filter->SetUseMrtrixBasis(mrTrix);
             if (normalization==0)
                 filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
             else
@@ -112,9 +121,10 @@ int QballReconstruction(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,6,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
+            filter->SetUseMrtrixBasis(mrTrix);
             if (normalization==0)
                 filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
             else
@@ -131,9 +141,10 @@ int QballReconstruction(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,8,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
+            filter->SetUseMrtrixBasis(mrTrix);
             if (normalization==0)
                 filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
             else
@@ -150,9 +161,10 @@ int QballReconstruction(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,10,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
+            filter->SetUseMrtrixBasis(mrTrix);
             if (normalization==0)
                 filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
             else
@@ -169,7 +181,7 @@ int QballReconstruction(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,12,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             if (normalization==0)
@@ -189,9 +201,10 @@ int QballReconstruction(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
+            filter->SetUseMrtrixBasis(mrTrix);
             if (normalization==0)
                 filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
             else
@@ -209,10 +222,7 @@ int QballReconstruction(int argc, char* argv[])
 
         outfilename += ".qbi";
         MITK_INFO << "writing image " << outfilename;
-        mitk::NrrdQBallImageWriter::Pointer writer = mitk::NrrdQBallImageWriter::New();
-        writer->SetInput(image.GetPointer());
-        writer->SetFileName(outfilename.c_str());
-        writer->Update();
+        mitk::IOUtil::SaveBaseData(image, outfilename);
 
         if (outCoeffs)
             mitk::IOUtil::SaveImage(coeffsImage, coeffout);

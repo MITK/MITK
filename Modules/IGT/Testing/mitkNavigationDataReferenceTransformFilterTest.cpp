@@ -42,7 +42,7 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
 
 
   /*create helper objects: positions of the ND sources*/
-  mitk::NavigationData::PositionType sourcePos1,sourcePos2, sourcePos3, targetPos1, targetPos2, targetPos3;
+  mitk::Point3D sourcePos1,sourcePos2, sourcePos3, targetPos1, targetPos2, targetPos3;
   mitk::FillVector3D(sourcePos1, 11.1, 11.1, 11.1);
   mitk::FillVector3D(sourcePos2, 22.2, 22.2, 22.2);
   mitk::FillVector3D(sourcePos3, 33.3, 33.3, 33.3);
@@ -184,10 +184,12 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
   mitk::Point3D pointA;
   mitk::Point3D pointB;
   mitk::Point3D pointC;
+
   //initializing three points with position(0|0|0)
   pointA.Fill(0);
   pointB.Fill(0);
   pointC.Fill(0);
+
   // changing position off all points in order to make them orthogonal
   pointA[0] = 1;
   pointB[1] = 1;
@@ -198,26 +200,15 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
   pointB = quaternionTransform->GetMatrix() * pointB;
   pointC = quaternionTransform->GetMatrix() * pointC;
 
-  bool firstPoint0Same = sourcePos1[0] == myFilter->GetSourceLandmarks()->GetPoint(0)[0] - pointA[0];
-  bool firstPoint1Same = sourcePos1[1] == myFilter->GetSourceLandmarks()->GetPoint(0)[1] - pointA[1];
-  bool firstPoint2Same = sourcePos1[2] == myFilter->GetSourceLandmarks()->GetPoint(0)[2] - pointA[2];
+  // now subtract them from the filter landmarks and compare them to the source pos
 
-  bool firstPointCorrect = firstPoint0Same && firstPoint1Same && firstPoint2Same;
+  pointA = myFilter->GetSourceLandmarks()->GetPoint(0)-pointA;
+  pointB = myFilter->GetSourceLandmarks()->GetPoint(1)-pointB;
+  pointC = myFilter->GetSourceLandmarks()->GetPoint(2)-pointC;
 
-  bool secondPoint0Same = sourcePos1[0] == myFilter->GetSourceLandmarks()->GetPoint(1)[0] - pointB[0];
-  bool secondPoint1Same = sourcePos1[1] == myFilter->GetSourceLandmarks()->GetPoint(1)[1] - pointB[1];
-  bool secondPoint2Same = sourcePos1[2] == myFilter->GetSourceLandmarks()->GetPoint(1)[2] - pointB[2];
-
-  bool secondPointCorrect = secondPoint0Same && secondPoint1Same && secondPoint2Same;
-
-  bool thirdPoint0Same = sourcePos1[0] == myFilter->GetSourceLandmarks()->GetPoint(2)[0] - pointC[0];
-  bool thirdPoint1Same = sourcePos1[1] == myFilter->GetSourceLandmarks()->GetPoint(2)[1] - pointC[1];
-  bool thirdPoint2Same = sourcePos1[2] == myFilter->GetSourceLandmarks()->GetPoint(2)[2] - pointC[2];
-
-  bool thirdPointCorrect = thirdPoint0Same && thirdPoint1Same && thirdPoint2Same;
-
-  //MITK_TEST_CONDITION_REQUIRED(firstPointCorrect && secondPointCorrect && thirdPointCorrect, "Testing if point generation is correct");
-
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(sourcePos1,pointA,mitk::eps,true), "Testing if point generation of first point is correct");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(sourcePos1,pointB,mitk::eps,true), "Testing if point generation of second point is correct");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(sourcePos1,pointC,mitk::eps,true), "Testing if point generation of third point is correct");
 
   // deleting helper objects
   myFilter = NULL;

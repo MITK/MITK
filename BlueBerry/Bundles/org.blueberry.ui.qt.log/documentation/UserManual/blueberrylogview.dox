@@ -1,16 +1,16 @@
 /**
 \page org_blueberry_ui_qt_log The Logging Plugin
 
-\image html Logging.png "Icon of the Module"
+\imageMacro{Logging.png,"Icon of the Logging Plugin",2.00}
 
 This plug-in records all logging output of events and progress as specified in the source code with time of occurence, level of importance (Info, Warning, Error, Fatal, Debug), the message given and where it happens. The logging starts once the plug-is started. A screenshot of the provided Logging view is shown next.
 
-\image html LogView.png "Screenshot of the Logging Module"
+\imageMacro{LogView.png,"Screenshot of the Logging Module",16.00}
 
 There are different features available in the view. The filter text field allows for searching all log events containing a certain substring. Using the button "Copy to clipboard" on the bottom right you can copy the current content of the logging view to your clipboard. This enables you to insert the logging information to any text processing application.
 
 You can also show more information on every logging message by activating the two checkboxes. In the simple view, leaving both checkboxes unchecked, you'll see logging messages and logging levels. A brief description of the logging levels can be found in the \ref LoggingPage "logging concept documentation". The checkbox "Category" adds a column for the category. The checkbox "Show Advanced Field" shows method, filename and linenumber where the logging message was emitted as well as the running time of the application. The next figure shows all information which can be shown in the Logging Module.
 
-\image html LogViewExplain.png "Details on the Vizualized Logging Information"
+\imageMacro{LogViewExplain.png,"Details on the Vizualized Logging Information",16.00}
 
 */

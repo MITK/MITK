@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConfig.h"
 #include "mitkOpenCVVideoSource.h"
 #include "mitkUndistortCameraImage.h"
-#include <mitkOpenCVVideoSupportExports.h>
+#include <MitkOpenCVVideoSupportExports.h>
 
 #include "cv.h"       // open CV
 
@@ -31,7 +31,8 @@ namespace mitk
   {
     public:
     mitkClassMacro( VideoInputSource, OpenCVVideoSource );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     ////##Documentation
     ////## @brief All functions behave like OpenCVVideoSource to the outside.

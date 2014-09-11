@@ -2,23 +2,17 @@
 
 file(WRITE "ACVDConfig.cmake.in"
 "set(ACVD_INCLUDE_DIRS \"@VTKSURFACE_INCLUDE_DIR@;@VTKDISCRETEREMESHING_INCLUDE_DIR@;@VTKVOLUMEPROCESSING_INCLUDE_DIR@\")
-set(ACVD_LIBRARY_DIRS \"@VTKSURFACE_BINARY_DIR@/bin\")
+set(ACVD_LIBRARY_DIRS \"@PROJECT_BINARY_DIR@/bin\")
 set(ACVD_LIBRARIES vtkSurface vtkDiscreteRemeshing vtkVolumeProcessing)
 add_definitions(-DDOmultithread)")
 
 file(APPEND "CMakeLists.txt" "CONFIGURE_FILE(ACVDConfig.cmake.in ACVDConfig.cmake @ONLY)")
 
-# Replace VTK_COMMON_EXPORT by VTK_EXPORT in class declarations
+# Add vtkVersionMacros.h header file
 
-set(path "Common/vtkMyMinimalStandardRandomSequence.h")
+set(path "Common/vtkCurvatureMeasure.cxx")
 file(STRINGS ${path} contents NEWLINE_CONSUME)
-string(REPLACE "COMMON_" "" contents ${contents})
-set(CONTENTS ${contents})
-configure_file(${TEMPLATE_FILE} ${path} @ONLY)
-
-set(path "DiscreteRemeshing/vtkThreadedClustering.h")
-file(STRINGS ${path} contents NEWLINE_CONSUME)
-string(REPLACE "COMMON_" "" contents ${contents})
+string(REPLACE "vtkNeighbourhoodComputation.h\"" "vtkNeighbourhoodComputation.h\"\n#include <vtkVersionMacros.h>" contents ${contents})
 set(CONTENTS ${contents})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
@@ -38,10 +32,23 @@ string(REPLACE "int N" "vtkIdType N" contents ${contents})
 set(CONTENTS ${contents})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
+# Replace VTK 5 module names by VTK 6 module names
 # Link to POSIX thread library
 
 set(path "DiscreteRemeshing/CMakeLists.txt")
 file(STRINGS ${path} contents NEWLINE_CONSUME)
-string(REPLACE "TARGET_LINK_LIBRARIES(v" "IF(UNIX AND NOT APPLE)\n  LIST(APPEND LIB_ADDED pthread)\nENDIF(UNIX AND NOT APPLE)\n\nTARGET_LINK_LIBRARIES(v" contents ${contents})
+string(REPLACE "vtkCommon" "vtkCommonCore" contents ${contents})
+string(REPLACE "vtkFiltering" "vtkFiltersCore" contents ${contents})
+string(REPLACE "vtkImaging" "vtkImagingCore" contents ${contents})
+string(REPLACE "vtkIO" "vtkIOCore" contents ${contents})
+string(REPLACE "vtkRendering" "vtkRenderingCore" contents ${contents})
+string(REPLACE "vtkHybrid" "vtkFiltersHybrid vtkImagingHybrid" contents ${contents})
+
+string(REPLACE "ENDFOREACH(loop_var)" "ENDFOREACH()\nendif()" contents ${contents})
+string(REPLACE "FOREACH(loop_var" "option(ACVD_BUILD_EXAMPLES \"build examples\" OFF)
+if(ACVD_BUILD_EXAMPLES)
+FOREACH(loop_var" contents ${contents})
+
+
 set(CONTENTS ${contents})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)

@@ -17,7 +17,7 @@
 #ifndef STATE_H_HEADER_INCLUDED_C19A8A5D
 #define STATE_H_HEADER_INCLUDED_C19A8A5D
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <string>
 #include <map>
 #include <set>

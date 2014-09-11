@@ -18,14 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSetRegionTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkFeedbackContourTool.h"
 
 namespace mitk
 {
 
 class Image;
-
+class StateMachineAction;
+class InteractionEvent;
 /**
   \brief Fills or erases a 2D region
 
@@ -43,7 +44,7 @@ class Image;
 
   $Author$
 */
-class Segmentation_EXPORT SetRegionTool : public FeedbackContourTool
+class MitkSegmentation_EXPORT SetRegionTool : public FeedbackContourTool
 {
   public:
 
@@ -54,12 +55,14 @@ class Segmentation_EXPORT SetRegionTool : public FeedbackContourTool
     SetRegionTool(int paintingPixelValue = 1); // purposely hidden
     virtual ~SetRegionTool();
 
+    void ConnectActionsAndFunctions();
+
     virtual void Activated();
     virtual void Deactivated();
 
-    virtual bool OnMousePressed (Action*, const StateEvent*);
-    virtual bool OnMouseReleased(Action*, const StateEvent*);
-    virtual bool OnInvertLogic  (Action*, const StateEvent*);
+    virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
+    virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* );
+    virtual bool OnInvertLogic  ( StateMachineAction*, InteractionEvent* );
 
     int m_PaintingPixelValue;
 

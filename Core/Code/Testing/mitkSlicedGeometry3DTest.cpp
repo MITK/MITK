@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <fstream>
 
+static const mitk::ScalarType slicedGeometryEps = 1E-9; // epsilon for this testfile. Set to float precision.
+
 void mitkSlicedGeometry3D_ChangeImageGeometryConsideringOriginOffset_Test()
 {
   //Tests for Offset
@@ -48,9 +50,9 @@ void mitkSlicedGeometry3D_ChangeImageGeometryConsideringOriginOffset_Test()
   // create subslices as well
   for (int i=0; i < num_slices; i++)
   {
-    mitk::Geometry2D::Pointer geo2d = mitk::Geometry2D::New();
+    mitk::PlaneGeometry::Pointer geo2d = mitk::PlaneGeometry::New();
     geo2d->Initialize();
-    slicedGeo3D->SetGeometry2D(geo2d,i);
+    slicedGeo3D->SetPlaneGeometry(geo2d,i);
   }
 
   // now run tests
@@ -58,8 +60,8 @@ void mitkSlicedGeometry3D_ChangeImageGeometryConsideringOriginOffset_Test()
   MITK_TEST_OUTPUT( << "Testing whether slicedGeo3D->GetImageGeometry() is false by default");
   MITK_TEST_CONDITION_REQUIRED( slicedGeo3D->GetImageGeometry()==false, "");
   MITK_TEST_OUTPUT( << "Testing whether first and last geometry in the SlicedGeometry3D have GetImageGeometry()==false by default");
-  mitk::Geometry3D* subSliceGeo2D_first = slicedGeo3D->GetGeometry2D(0);
-  mitk::Geometry3D* subSliceGeo2D_last = slicedGeo3D->GetGeometry2D(num_slices-1);
+  mitk::BaseGeometry* subSliceGeo2D_first = slicedGeo3D->GetPlaneGeometry(0);
+  mitk::BaseGeometry* subSliceGeo2D_last = slicedGeo3D->GetPlaneGeometry(num_slices-1);
   MITK_TEST_CONDITION_REQUIRED( subSliceGeo2D_first->GetImageGeometry()==false, "");
   MITK_TEST_CONDITION_REQUIRED( subSliceGeo2D_last->GetImageGeometry()==false, "");
 
@@ -186,7 +188,7 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
   slicedWorldGeometry->InitializeEvenlySpaced(planegeometry3, 1, numSlices, false);
 
   std::cout << "Testing availability and type (PlaneGeometry) of first geometry in the SlicedGeometry3D: ";
-  mitk::PlaneGeometry* accessedplanegeometry3 = dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetGeometry2D(0));
+  mitk::PlaneGeometry* accessedplanegeometry3 = dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetPlaneGeometry(0));
   if(accessedplanegeometry3==NULL)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -195,10 +197,10 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing whether the first geometry in the SlicedGeometry3D is identical to planegeometry3 by axis comparison and origin: "<<std::endl;
-  if((mitk::Equal(accessedplanegeometry3->GetAxisVector(0), planegeometry3->GetAxisVector(0))==false) ||
-     (mitk::Equal(accessedplanegeometry3->GetAxisVector(1), planegeometry3->GetAxisVector(1))==false) ||
-     (mitk::Equal(accessedplanegeometry3->GetAxisVector(2), planegeometry3->GetAxisVector(2))==false) ||
-     (mitk::Equal(accessedplanegeometry3->GetOrigin(), planegeometry3->GetOrigin())==false))
+  if((mitk::Equal(accessedplanegeometry3->GetAxisVector(0), planegeometry3->GetAxisVector(0), slicedGeometryEps)==false) ||
+     (mitk::Equal(accessedplanegeometry3->GetAxisVector(1), planegeometry3->GetAxisVector(1), slicedGeometryEps)==false) ||
+     (mitk::Equal(accessedplanegeometry3->GetAxisVector(2), planegeometry3->GetAxisVector(2), slicedGeometryEps)==false) ||
+     (mitk::Equal(accessedplanegeometry3->GetOrigin(), planegeometry3->GetOrigin(), slicedGeometryEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -206,7 +208,7 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing availability and type (PlaneGeometry) of the last geometry in the SlicedGeometry3D: ";
-  mitk::PlaneGeometry* accessedplanegeometry3last = dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetGeometry2D(numSlices-1));
+  mitk::PlaneGeometry* accessedplanegeometry3last = dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetPlaneGeometry(numSlices-1));
   mitk::Point3D origin3last; origin3last = planegeometry3->GetOrigin()+slicedWorldGeometry->GetDirectionVector()*(numSlices-1);
   if(accessedplanegeometry3last==NULL)
   {
@@ -216,11 +218,11 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing whether the last geometry in the SlicedGeometry3D is identical to planegeometry3 by axis comparison: "<<std::endl;
-  if((mitk::Equal(accessedplanegeometry3last->GetAxisVector(0), planegeometry3->GetAxisVector(0))==false) ||
-     (mitk::Equal(accessedplanegeometry3last->GetAxisVector(1), planegeometry3->GetAxisVector(1))==false) ||
-     (mitk::Equal(accessedplanegeometry3last->GetAxisVector(2), planegeometry3->GetAxisVector(2))==false) ||
-     (mitk::Equal(accessedplanegeometry3last->GetOrigin(), origin3last)==false) ||
-     (mitk::Equal(accessedplanegeometry3last->GetIndexToWorldTransform()->GetOffset(), origin3last.GetVectorFromOrigin())==false))
+  if((mitk::Equal(accessedplanegeometry3last->GetAxisVector(0), planegeometry3->GetAxisVector(0), slicedGeometryEps)==false) ||
+     (mitk::Equal(accessedplanegeometry3last->GetAxisVector(1), planegeometry3->GetAxisVector(1), slicedGeometryEps)==false) ||
+     (mitk::Equal(accessedplanegeometry3last->GetAxisVector(2), planegeometry3->GetAxisVector(2), slicedGeometryEps)==false) ||
+     (mitk::Equal(accessedplanegeometry3last->GetOrigin(), origin3last, slicedGeometryEps)==false) ||
+     (mitk::Equal(accessedplanegeometry3last->GetIndexToWorldTransform()->GetOffset(), origin3last.GetVectorFromOrigin(), slicedGeometryEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -228,7 +230,7 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Again for first slice - Testing availability and type (PlaneGeometry) of first geometry in the SlicedGeometry3D: ";
-  accessedplanegeometry3 = dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetGeometry2D(0));
+  accessedplanegeometry3 = dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetPlaneGeometry(0));
   if(accessedplanegeometry3==NULL)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -237,11 +239,11 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Again for first slice - Testing whether the first geometry in the SlicedGeometry3D is identical to planegeometry3 by axis comparison and origin: "<<std::endl;
-  if((mitk::Equal(accessedplanegeometry3->GetAxisVector(0), planegeometry3->GetAxisVector(0))==false) ||
-     (mitk::Equal(accessedplanegeometry3->GetAxisVector(1), planegeometry3->GetAxisVector(1))==false) ||
-     (mitk::Equal(accessedplanegeometry3->GetAxisVector(2), planegeometry3->GetAxisVector(2))==false) ||
-     (mitk::Equal(accessedplanegeometry3->GetOrigin(), planegeometry3->GetOrigin())==false) ||
-     (mitk::Equal(accessedplanegeometry3->GetIndexToWorldTransform()->GetOffset(), planegeometry3->GetOrigin().GetVectorFromOrigin())==false))
+  if((mitk::Equal(accessedplanegeometry3->GetAxisVector(0), planegeometry3->GetAxisVector(0), slicedGeometryEps)==false) ||
+     (mitk::Equal(accessedplanegeometry3->GetAxisVector(1), planegeometry3->GetAxisVector(1), slicedGeometryEps)==false) ||
+     (mitk::Equal(accessedplanegeometry3->GetAxisVector(2), planegeometry3->GetAxisVector(2), slicedGeometryEps)==false) ||
+     (mitk::Equal(accessedplanegeometry3->GetOrigin(), planegeometry3->GetOrigin(), slicedGeometryEps)==false) ||
+     (mitk::Equal(accessedplanegeometry3->GetIndexToWorldTransform()->GetOffset(), planegeometry3->GetOrigin().GetVectorFromOrigin(), slicedGeometryEps)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

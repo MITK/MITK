@@ -36,7 +36,7 @@ double mitk::ConnectomicsSimulatedAnnealingCostFunctionModularity::CalculateModu
   double modularity( 0.0 );
   int numberOfModules = getNumberOfModules( vertexToModuleMap );
 
-  if( network->GetNumberOfVertices() != vertexToModuleMap->size() )
+  if( network->GetNumberOfVertices() != (int)vertexToModuleMap->size() )
   {
     MBI_ERROR << "Number of vertices and vertex to module map size do not match!";
     return modularity;
@@ -51,7 +51,7 @@ double mitk::ConnectomicsSimulatedAnnealingCostFunctionModularity::CalculateModu
   const std::vector< VertexDescriptorType > allNodesVector
     = network->GetVectorOfAllVertexDescriptors();
 
-  for( int nodeNumber( 0 ); nodeNumber < allNodesVector.size() ; nodeNumber++)
+  for( unsigned int nodeNumber( 0 ); nodeNumber < allNodesVector.size() ; nodeNumber++)
   {
     int correspondingModule = vertexToModuleMap->find( allNodesVector[ nodeNumber ] )->second;
     const std::vector< VertexDescriptorType > adjacentNodexVector
@@ -59,7 +59,7 @@ double mitk::ConnectomicsSimulatedAnnealingCostFunctionModularity::CalculateModu
     numberOfLinksInNetwork += adjacentNodexVector.size();
     sumOfDegreesInModule[ correspondingModule ] += adjacentNodexVector.size();
 
-    for( int adjacentNodeNumber( 0 ); adjacentNodeNumber < adjacentNodexVector.size() ; adjacentNodeNumber++)
+    for( unsigned int adjacentNodeNumber( 0 ); adjacentNodeNumber < adjacentNodexVector.size() ; adjacentNodeNumber++)
     {
       if( correspondingModule == vertexToModuleMap->find( adjacentNodexVector[ adjacentNodeNumber ] )->second )
       {

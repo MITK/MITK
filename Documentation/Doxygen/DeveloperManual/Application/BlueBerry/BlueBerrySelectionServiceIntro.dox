@@ -10,13 +10,13 @@
 
 The selection service provided by the BlueBerry workbench allows efficient linking of different parts within the workbench window: View parts that provide additional information for particular objects and update their content automatically whenever such objects are selected somewhere in the workbench window. For example the "Properties" view in MITK applications behaves in this way: Wherever an element is selected in the workbench this view lists the properties of that element.
 
-\image html MitkSelectionService.png "DataNode properties"
+\imageMacro{MitkSelectionService.png,"DataNode properties",16.00}
 
 Other aspects of the workbench like the enablement of global actions may also depend on the current selection.
 
 Each workbench window has its own selection service instance. The service keeps track of the selection in the currently active part and propagates selection changes to all registered listeners. Such selection events occur when the selection in the current part is changed or when a different part is activated. Both can be triggered by user interaction or programmatically.
 
-\image html SelectionServiceDiagram.png "Selection Service Diagram"
+\imageMacro{SelectionServiceDiagram.png,"Selection Service Diagram",11.64}
 
 \section BlueBerrySelectionServiceIntro_WhatCanBeSelected What can be selected?
 

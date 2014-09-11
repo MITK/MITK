@@ -37,7 +37,8 @@ class MITK_CORE_EXPORT SurfaceToSurfaceFilter : public mitk::SurfaceSource
 public:
   mitkClassMacro(SurfaceToSurfaceFilter, mitk::SurfaceSource);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef itk::DataObject::Pointer DataObjectPointer;
 

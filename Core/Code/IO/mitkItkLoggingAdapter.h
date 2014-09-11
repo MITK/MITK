@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ItkLoggingAdapter_H_HEADER_INCLUDED
 #define ItkLoggingAdapter_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <itkOutputWindow.h>
 #include <itkObjectFactory.h>
 
@@ -39,7 +39,8 @@ public:
   itkTypeMacro( ItkLoggingAdapter, itk::OutputWindow );
 
   /** New macro for creation of through a Smart Pointer   */
-  itkNewMacro(ItkLoggingAdapter);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** @brief Initializes the logging adapter. Itk logging
     *        messages are redirected to MITK logging afterwards.

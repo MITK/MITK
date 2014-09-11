@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 #include <mitkConnectomicsNetwork.h>
 
@@ -31,7 +31,7 @@ namespace mitk
 {
   /**
   * \brief A class giving functions for conversion of connectomics networks into different formats */
-  class Connectomics_EXPORT ConnectomicsNetworkConverter : public itk::Object
+  class MitkConnectomics_EXPORT ConnectomicsNetworkConverter : public itk::Object
   {
   public:
 
@@ -39,7 +39,8 @@ namespace mitk
     /** Method for creation through the object factory. */
 
     mitkClassMacro(ConnectomicsNetworkConverter, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     // Typedefs
     typedef mitk::ConnectomicsNetwork::NetworkType NetworkType;

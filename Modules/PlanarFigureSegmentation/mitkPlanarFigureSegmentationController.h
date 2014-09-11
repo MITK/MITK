@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPlanarFigureSegmentationController_h_Included
 
 #include "mitkCommon.h"
-#include "PlanarFigureSegmentationExports.h"
+#include <MitkPlanarFigureSegmentationExports.h>
 #include "mitkImage.h"
 
 #include "mitkPlanarFigure.h"
@@ -47,12 +47,13 @@ namespace mitk
 * mitkSurfaceToImageFilter.
 */
 
-class PlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : public itk::Object
+class MitkPlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : public itk::Object
 {
   public:
 
     mitkClassMacro(PlanarFigureSegmentationController, itk::Object);
-    itkNewMacro(PlanarFigureSegmentationController); /// specify the segmentation image that should be interpolated
+    itkFactorylessNewMacro(PlanarFigureSegmentationController) /// specify the segmentation image that should be interpolated
+    itkCloneMacro(Self)
 
     virtual ~PlanarFigureSegmentationController();
 

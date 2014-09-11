@@ -9,6 +9,8 @@ if(MITK_USE_Boost)
     message(FATAL_ERROR "BOOST_ROOT variable is defined but corresponds to non-existing directory")
   endif()
 
+  string(REPLACE "^^" ";" MITK_USE_Boost_LIBRARIES "${MITK_USE_Boost_LIBRARIES}")
+
   set(proj Boost)
   set(proj_DEPENDENCIES )
   set(Boost_DEPENDS ${proj})
@@ -24,7 +26,6 @@ if(MITK_USE_Boost)
       set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-install")
 
       # We need binary boost libraries
-      string(REPLACE "^^" ";" MITK_USE_Boost_LIBRARIES "${MITK_USE_Boost_LIBRARIES}")
       foreach(_boost_lib ${MITK_USE_Boost_LIBRARIES})
         set(_boost_libs ${_boost_libs} --with-${_boost_lib})
       endforeach()
@@ -61,10 +62,23 @@ if(MITK_USE_Boost)
         set(APPLE_CMAKE_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/${proj}-cmake/ChangeBoostLibsInstallNameForMac.cmake)
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeExternals/ChangeBoostLibsInstallNameForMac.cmake.in ${APPLE_CMAKE_SCRIPT} @ONLY)
         set(INSTALL_COMMAND ${CMAKE_COMMAND} -P ${APPLE_CMAKE_SCRIPT})
+
+        # Set OSX_SYSROOT
+        set (APPLE_SYSROOT_FLAG)
+        if (NOT ${CMAKE_OSX_SYSROOT} STREQUAL "")
+          set (APPLE_SYSROOT_FLAG --sysroot=${CMAKE_OSX_SYSROOT})
+        endif()
+
+        # Set the boost build command for apple
+        set(_boost_build_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bjam ${APPLE_SYSROOT_FLAG} --builddir=${CMAKE_CURRENT_BINARY_DIR}/${proj}-build --prefix=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
+            ${_boost_toolset} ${_boost_address_model} ${_boost_variant} ${_boost_libs} link=shared,static threading=multi runtime-link=shared -q install)
+      else()
+        set(_boost_build_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bjam --build-dir=${CMAKE_CURRENT_BINARY_DIR}/${proj}-build --prefix=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install ${_boost_toolset} ${_boost_address_model}
+            ${_boost_variant} ${_boost_libs} link=shared,static threading=multi runtime-link=shared -q install)
       endif()
 
       set(_boost_cfg_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bootstrap${_shell_extension})
-      set(_boost_build_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bjam --build-dir=${CMAKE_CURRENT_BINARY_DIR}/${proj}-build --prefix=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install ${_boost_toolset} ${_boost_address_model} ${_boost_variant} ${_boost_libs} link=shared,static threading=multi runtime-link=shared -q install)
+
     else()
       # If no libraries are specified set the boost root to the boost src directory
       set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-src")
@@ -77,8 +91,8 @@ if(MITK_USE_Boost)
       # Boost needs in-source builds
       BINARY_DIR ${proj}-src
       PREFIX ${proj}-cmake
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_54_0.tar.bz2
-      URL_MD5 15cb8c0803064faef0c4ddf5bc5ca279
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_55_0.tar.bz2
+      URL_MD5 d6eef4b4cacb2183f2bf265a5a03a354
       INSTALL_DIR ${proj}-install
       CONFIGURE_COMMAND "${_boost_cfg_cmd}"
       BUILD_COMMAND "${_boost_build_cmd}"

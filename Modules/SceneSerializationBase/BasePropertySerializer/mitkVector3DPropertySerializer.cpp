@@ -21,17 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkProperties.h"
 
-#include "SceneSerializationBaseExports.h"
+#include <MitkSceneSerializationBaseExports.h>
 
 namespace mitk
 {
 
-class SceneSerializationBase_EXPORT Vector3DPropertySerializer : public BasePropertySerializer
+class MitkSceneSerializationBase_EXPORT Vector3DPropertySerializer : public BasePropertySerializer
 {
   public:
 
     mitkClassMacro( Vector3DPropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {
@@ -52,9 +53,9 @@ class SceneSerializationBase_EXPORT Vector3DPropertySerializer : public BaseProp
       if (!element) return NULL;
 
       Vector3D v;
-      if ( element->QueryFloatAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryFloatAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryFloatAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryDoubleAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryDoubleAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryDoubleAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return NULL;
 
      return Vector3DProperty::New( v ).GetPointer();
     }

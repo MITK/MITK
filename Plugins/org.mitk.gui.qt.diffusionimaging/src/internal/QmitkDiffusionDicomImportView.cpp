@@ -30,12 +30,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 #include "mitkMemoryUtilities.h"
+#include "mitkIOUtil.h"
 
 // diffusion module includes
 #include "mitkDicomDiffusionImageHeaderReader.h"
 #include "mitkDicomDiffusionImageReader.h"
 #include "mitkDiffusionImage.h"
-#include "mitkNrrdDiffusionImageWriter.h"
 
 #include "gdcmDirectory.h"
 #include "gdcmScanner.h"
@@ -496,7 +496,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         gdcm::Scanner::ValuesType::const_iterator it;
 
         const gdcm::Scanner::ValuesType &values3 = s.GetValues(t3);
-        const gdcm::Scanner::ValuesType &values4 = s.GetValues(t4);;
+        const gdcm::Scanner::ValuesType &values4 = s.GetValues(t4);
         unsigned int nAcquis = values3.size();
 
         if(nAcquis > 1) // More than one element must have this tag (Not != )
@@ -510,13 +510,16 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           subsorter.SetSortFunction( SortBySeqName );
           it = values4.begin();
         }
+
         // Hotfix for Bug 14758, better fix by selecting always availible tags.
-        else
+        if( nAcquis == 0 || values4.size() == 0)
         {
-          Error("Sorting tags (0x0020,0x0012) and (0x0018,0x0024) missing, ABORTING");
-          if(m_OutputFolderNameSet) logfile << "Sorting tags (0x0020,0x0012) and (0x0018,0x0024) missing, ABORTING\n";
+          std::string err_msg = "Sorting tag (0x0020,0x0012) [Acquisition ID] or (0x0018,0x0024) [Sequence Name] missing, ABORTING";
+          Error(err_msg);
+          if(m_OutputFolderNameSet) logfile << err_msg << "\n";
           continue;
         }
+
         nTotalAcquis += nAcquis;
         subsorter.Sort( sub );
 
@@ -646,14 +649,11 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         for(unsigned int i=0; i<hc.size(); i++)
         {
           vnl_vector_fixed<double, 3> vect = hc[i]->DiffusionVector;
-          // since some protocols provide a gradient direction of (0,0,0) in their dicom files when isotropic diffusion is assumed,
-          // the nrrd compatible way of storing b-values is not possible, so in this case we overwrite
-          // the gradient direction to (1,1,1)
-          if (b_vals[i] > 0 && vect[0] == 0.0 && vect[1] == 0.0 && vect[2] ==0.0)
+          if (vect.magnitude()<0.0001 && b_vals[i]>0)
           {
-            vect.fill(1.0);
+              vect.fill(0.0);
+              vect[0] = 1;
           }
-
           vect.normalize();
           vect *= sqrt(b_vals[i]/maxb);
           directions->push_back(vect);
@@ -665,11 +665,10 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         if(m_OutputFolderNameSet) logfile << "Initializing Diffusion Image\n";
         typedef mitk::DiffusionImage<PixelValueType> DiffVolumesType;
         DiffVolumesType::Pointer diffImage = DiffVolumesType::New();
-        diffImage->SetDirections(directions);
         diffImage->SetVectorImage(vecImage);
-        diffImage->SetB_Value(maxb);
+        diffImage->SetReferenceBValue(maxb);
+        diffImage->SetDirections(directions);
         diffImage->InitializeFromVectorImage();
-        diffImage->UpdateBValueMap();
         Status(QString("Diffusion Image initialized"));
         if(m_OutputFolderNameSet) logfile << "Diffusion Image initialized\n";
 
@@ -698,8 +697,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         }
         else
         {
-          typedef mitk::NrrdDiffusionImageWriter<PixelValueType> WriterType;
-          WriterType::Pointer writer = WriterType::New();
           QString fullpath = QString("%1/%2.dwi")
                              .arg(m_OutputFolderName)
                              .arg(descr);
@@ -729,11 +726,9 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
               outputFile.setFileName( fullpath );
             }
           }
-          writer->SetFileName(fullpath.toStdString());
-          writer->SetInput(diffImage);
           try
           {
-            writer->Update();
+            mitk::IOUtil::SaveBaseData(diffImage, fullpath.toStdString());
           }
           catch (itk::ExceptionObject &ex)
           {

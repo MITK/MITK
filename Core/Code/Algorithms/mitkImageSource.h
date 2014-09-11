@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef IMAGESOURCE_H_HEADER_INCLUDED_C1E7D6EC
 #define IMAGESOURCE_H_HEADER_INCLUDED_C1E7D6EC
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseDataSource.h"
 #include "mitkImage.h"
 
@@ -45,7 +45,8 @@ public:
   mitkClassMacro(ImageSource,BaseDataSource)
 
   /** @brief Method for creation through the object factory. */
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** @brief Some convenient typedefs. */
   typedef mitk::Image OutputImageType;
@@ -131,6 +132,7 @@ public:
   virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
 
   virtual vtkImageData* GetVtkImageData();
+  virtual const vtkImageData* GetVtkImageData() const;
 
 protected:
   ImageSource();

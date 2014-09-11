@@ -1,0 +1,151 @@
+/**
+\page org_mitk_views_volumevisualization The Volume Visualization Plugin
+
+\imageMacro{QmitkVolumeVisualization_Icon.png,"Icon of the Volume Visualization Plugin",2.00}
+
+\tableofcontents
+
+\section QVV_Overview Overview
+
+The <b> Volume Visualization Plugin </b> is a basic tool for visualizing three dimensional medical images.
+MITK provides generic transfer function presets for medical CT data.
+These functions, that map the gray-value to color and opacity, can be interactively edited.
+Additionally, there are controls to quickly generate common used transfer function shapes
+like the threshold and bell curve to help identify a range of grey-values.
+
+\imageMacro{QmitkVolumeVisualization_Overview.png,"",16.00}
+
+\section QVV_EnableVRPage Enable Volume Rendering
+
+\subsection QVV_LoadingImage Loading an image into the application
+
+Load an image into the application by
+
+<ul>
+<li> dragging a file into the application window.
+<li> selecting file / load from the menu.
+</ul>
+
+Volume Visualization imposes following restrictions on images:
+
+<ul>
+<li> It has to be a 3D-Image Scalar image, that means a normal CT or MRT.
+<li> 3D+T are supported for rendering, but the histograms are not computed.
+<li> Also be aware that volume visualization requires a huge amount of memory.
+     Very large images may not work, unless you use the 64bit version.
+</ul>
+
+\subsection QVV_EnableVR Enable Volumerendering
+
+\imageMacro{QmitkVolumeVisualization_Checkboxen.png,"",8.21}
+
+Select an image in datamanager and click on the checkbox left of "Volumerendering".
+Please be patient, while the image is prepared for rendering, which can take up to a half minute.
+
+\subsection QVV_LODGPU The LOD & GPU checkboxes
+
+Volume Rendering requires a lot of computing resources including processor, memory and graphics card.
+
+To run volume rendering on smaller platforms,
+enable the LOD checkbox (level-of-detail rendering).
+Level-of-detail first renders a lower quality preview to increase interactivity.
+If the user stops to interact a normal quality rendering is issued.
+
+The GPU checkbox tries to use computing resources on the graphics card to accelerate volume rendering.
+It requires a powerful graphics card and OpenGL hardware support for shaders, but achieves much higher frame rates than software-rendering.
+
+\section QVV_PresetPage Applying premade presets
+
+\subsection QVV_Preset Internal presets
+
+There are some internal presets given, that can be used with normal CT data (given in Houndsfield units).
+A large set of medical data has been tested with that presets, but it may not suit on some special cases.
+
+Click on the "Preset" tab for using internal or custom presets.
+
+\imageMacro{QmitkVolumeVisualization_InternalPresets.png,"",8.30}
+
+<ul>
+<li> "CT Generic" is the default transferfunction that is first applied.
+<li> "CT Black&White" does not use any colors, as it may be distracting on some data.
+<li> "CT Cardiac" tries to increase detail on CTs from the heart.
+<li> "CT Bone" emphasizes bones and shows other areas more transparent.
+<li> "CT Bone (Gradient)" is like "CT Bone", but shows  from other organs only the surface by using the gradient.
+<li> "MR Generic" is the default transferfunction that we use on MRT data (which is not normalized like CT data).
+<li> "CT Thorax small" tries to increase detail.
+<li> "CT Thorax large" tries to increase detail.
+</ul>
+
+\subsection QVV_CustomPreset Saving and loading custom presets
+
+After creating or editing a transferfunction (see \ref QVV_Editing or \ref QVV_ThresholdBell),
+the custom transferfunction can be stored and later retrieved on the filesystem.
+Click "Save" (respectively "Load") button to save (load) the threshold-, color- and gradient function combined in a single .xml file.
+
+\section QVV_ThresholdBell Interactively create transferfunctions
+
+Beside the possibility to directly edit the transferfunctions (\ref QVV_Editing),
+a one-click generation of two commonly known shapes is given.
+
+Both generators have two parameters, that can be modified by first clicking on the cross and then moving the mouse up/down and left/right.
+
+The first parameter "center" (controlled by horizontal movement of the mouse) specifies the gravalue where the center of the shape will be located.
+
+The second parameter "width" (controlled by vertical movement of the mouse) specifies the width (or steepness) of the shape.
+
+\subsection Threshold
+
+Click on the "Threshold" tab to active the threshold function generator.
+
+\imageMacro{QmitkVolumeVisualization_Threshold.png,"",8.21}
+
+A threshold shape begins with zero and raises to one across the "center" parameter. Lower widths results in steeper threshold functions.
+
+\subsection Bell
+
+Click on the "Bell" tab to active the threshold function generator.
+
+\imageMacro{QmitkVolumeVisualization_Bell.png,"",8.23}
+
+A threshold shape begins with zero and raises to one at the "center" parameter and the lowers agains to zero. The "width" parameter correspondens to the width of the bell.
+
+\section QVV_Editing Customize transferfunctions in detail
+
+\subsection QVV_Navigate Choosing grayvalue interval to edit
+
+\imageMacro{QmitkVolumeVisualization_Slider.png,"",8.23}
+
+To navigate across the grayvalue range or to zoom in some ranges use the "range"-slider.
+
+All three function editors have in common following:
+
+<ul>
+<li> By left-clicking a new point is added.
+<li> By right-clicking a point is deleted.
+<li> By left-clicking and holding, an exisiting point can be dragged.
+<li> By pressing arrow keys, the currently selected point is moved.
+<li> By pressing the "DELETE" key, the currently selected point is deleted.
+<li> Between points the transferfunctions are linear interpolated.
+</ul>
+
+There are three transferfunctions to customize:
+
+\subsection QVV_GO Grayvalue -> Opacity
+
+\imageMacro{QmitkVolumeVisualization_Opacity.png,"grayvalues will be mapped to opacity.",8.04}
+
+An opacity of 0 means total transparent, an opacity of 1 means total opaque.
+
+\subsection QVV_GC Grayvalue -> Color
+
+\imageMacro{QmitkVolumeVisualization_Color.png,"grayvalues will be mapped to color.",8.81}
+
+The color transferfunction editor also allows by double-clicking a point to change its color.
+
+\subsection QVV_GGO Grayvalue and Gradient -> Opacity
+
+\imageMacro{QmitkVolumeVisualization_Gradient.png,"",8.85}
+
+Here the influence of the gradient is controllable at specific grayvalues.
+
+*/

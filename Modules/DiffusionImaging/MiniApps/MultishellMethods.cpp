@@ -34,8 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include <mitkQBallImage.h>
 #include <mitkBaseData.h>
-#include <mitkDiffusionCoreObjectFactory.h>
-#include <mitkFiberTrackingObjectFactory.h>
 #include <mitkFiberBundleX.h>
 #include "ctkCommandLineParser.h"
 #include <boost/lexical_cast.hpp>
@@ -50,13 +48,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 int MultishellMethods(int argc, char* argv[])
 {
   ctkCommandLineParser parser;
+
+  parser.setTitle("Multishell Methods");
+  parser.setCategory("Fiber Tracking and Processing Methods");
+  parser.setDescription("");
+  parser.setContributor("MBI");
+
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("in", "i", ctkCommandLineParser::String, "input file", us::Any(), false);
-  parser.addArgument("out", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
-  parser.addArgument("adc", "D", ctkCommandLineParser::Bool, "ADC Average", us::Any(), false);
-  parser.addArgument("akc", "K", ctkCommandLineParser::Bool, "Kurtosis Fit", us::Any(), false);
-  parser.addArgument("biexp", "B", ctkCommandLineParser::Bool, "BiExp fit", us::Any(), false);
-  parser.addArgument("targetbvalue", "b", ctkCommandLineParser::String, "target bValue (mean, min, max)", us::Any(), false);
+  parser.addArgument("in", "i", ctkCommandLineParser::InputFile, "Input:", "input file", us::Any(), false);
+  parser.addArgument("out", "o", ctkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
+  parser.addArgument("adc", "D", ctkCommandLineParser::Bool, "ADC:", "ADC Average", us::Any(), false);
+  parser.addArgument("akc", "K", ctkCommandLineParser::Bool, "Kurtosis fit:", "Kurtosis Fit", us::Any(), false);
+  parser.addArgument("biexp", "B", ctkCommandLineParser::Bool, "BiExp fit:", "BiExp fit", us::Any(), false);
+  parser.addArgument("targetbvalue", "b", ctkCommandLineParser::String, "b Value:", "target bValue (mean, min, max)", us::Any(), false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -72,9 +76,6 @@ int MultishellMethods(int argc, char* argv[])
 
   try
   {
-    RegisterDiffusionCoreObjectFactory();
-    RegisterFiberTrackingObjectFactory();
-
     MITK_INFO << "Loading " << inName;
     const std::string s1="", s2="";
     std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inName, s1, s2, false );
@@ -90,16 +91,16 @@ int MultishellMethods(int argc, char* argv[])
 
       CorrectionFilterType::Pointer roundfilter = CorrectionFilterType::New();
       roundfilter->SetRoundingValue( 1000 );
-      roundfilter->SetReferenceBValue(dwi->GetB_Value());
+      roundfilter->SetReferenceBValue(dwi->GetReferenceBValue());
       roundfilter->SetReferenceGradientDirectionContainer(dwi->GetDirections());
       roundfilter->Update();
 
-      dwi->SetB_Value( roundfilter->GetNewBValue() );
+      dwi->SetReferenceBValue( roundfilter->GetNewBValue() );
       dwi->SetDirections( roundfilter->GetOutputGradientDirectionContainer());
 
       // filter input parameter
       const mitk::DiffusionImage<short>::BValueMap
-          &originalShellMap  = dwi->GetB_ValueMap();
+          &originalShellMap  = dwi->GetBValueMap();
 
       const mitk::DiffusionImage<short>::ImageType
           *vectorImage       = dwi->GetVectorImage();
@@ -108,7 +109,7 @@ int MultishellMethods(int argc, char* argv[])
           gradientContainer = dwi->GetDirections();
 
       const unsigned int
-          &bValue            = dwi->GetB_Value();
+          &bValue            = dwi->GetReferenceBValue();
 
       // filter call
 
@@ -145,7 +146,7 @@ int MultishellMethods(int argc, char* argv[])
         // create new DWI image
         mitk::DiffusionImage<short>::Pointer outImage = mitk::DiffusionImage<short>::New();
         outImage->SetVectorImage( filter->GetOutput() );
-        outImage->SetB_Value( targetBValue );
+        outImage->SetReferenceBValue( targetBValue );
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 
@@ -171,7 +172,7 @@ int MultishellMethods(int argc, char* argv[])
         // create new DWI image
         mitk::DiffusionImage<short>::Pointer outImage = mitk::DiffusionImage<short>::New();
         outImage->SetVectorImage( filter->GetOutput() );
-        outImage->SetB_Value( targetBValue );
+        outImage->SetReferenceBValue( targetBValue );
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 
@@ -197,7 +198,7 @@ int MultishellMethods(int argc, char* argv[])
         // create new DWI image
         mitk::DiffusionImage<short>::Pointer outImage = mitk::DiffusionImage<short>::New();
         outImage->SetVectorImage( filter->GetOutput() );
-        outImage->SetB_Value( targetBValue );
+        outImage->SetReferenceBValue( targetBValue );
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 

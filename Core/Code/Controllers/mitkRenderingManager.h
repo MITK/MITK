@@ -14,11 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
 #define MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 #include <vtkCallbackCommand.h>
 
@@ -35,10 +34,9 @@ class vtkObject;
 
 namespace mitk
 {
-
 class RenderingManager;
 class RenderingManagerFactory;
-class Geometry3D;
+class BaseGeometry;
 class SliceNavigationController;
 class BaseRenderer;
 class DataStorage;
@@ -99,7 +97,6 @@ public:
     REQUEST_UPDATE_3DWINDOWS
   };
 
-
   static Pointer New();
 
   /** Set the object factory which produces the desired platform specific
@@ -141,7 +138,6 @@ public:
    * via the parameter requestType. */
   void RequestUpdateAll( RequestType type = REQUEST_UPDATE_ALL );
 
-
   /** Immediately executes an update of all registered RenderWindows.
    * If only 2D or 3D windows should be updated, this can be specified
    * via the parameter requestType. */
@@ -154,16 +150,14 @@ public:
 
   /** Initializes the windows specified by requestType to the given
    * geometry. PLATFORM SPECIFIC. TODO: HOW IS THIS PLATFORM SPECIFIC? */
-  virtual bool InitializeViews( const Geometry3D *geometry,
+  virtual bool InitializeViews( const BaseGeometry *geometry,
     RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
   virtual bool InitializeViews( const TimeGeometry *geometry,
     RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
-
   /** Initializes the windows to the default viewing direction
    * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
   virtual bool InitializeViews( RequestType type = REQUEST_UPDATE_ALL );
-
 
   /** Initializes the specified window to the geometry of the given
    * DataNode. Set "initializeGlobalTimeSNC" to true in order to use this
@@ -173,12 +167,20 @@ public:
   /** Initializes the specified window to the given geometry. Set
    * "initializeGlobalTimeSNC" to true in order to use this geometry as
    * global TimeGeometry. PLATFORM SPECIFIC. */
-  virtual bool InitializeView( vtkRenderWindow *renderWindow, const Geometry3D *geometry, bool initializeGlobalTimeSNC = false);
+  virtual bool InitializeView( vtkRenderWindow *renderWindow, const BaseGeometry *geometry, bool initializeGlobalTimeSNC = false);
   virtual bool InitializeView( vtkRenderWindow *renderWindow, const TimeGeometry *geometry, bool initializeGlobalTimeSNC = false);
 
   /** Initializes the specified window to the default viewing direction
    * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
   virtual bool InitializeView( vtkRenderWindow *renderWindow );
+
+  /**
+   * @brief Initializes the renderwindows by the aggregated geometry of
+   *        all objects that are held in the data storage.
+   * This is basically a global reinit
+   * @param The data storage from which the bounding object can be retrieved
+   */
+  virtual void InitializeViewsByBoundingObjects(const DataStorage * );
 
   /** Gets the (global) SliceNavigationController responsible for
    * time-slicing. */
@@ -207,7 +209,6 @@ public:
   /** En-/Disable LOD increase globally. */
   itkBooleanMacro( LODIncreaseBlocked );
 
-
   /** En-/Disable LOD abort mechanism. */
   itkSetMacro( LODAbortMechanismEnabled, bool );
 
@@ -217,18 +218,11 @@ public:
   /** En-/Disable LOD abort mechanism. */
   itkBooleanMacro( LODAbortMechanismEnabled );
 
-  /** En-/Disable depth peeling for all renderers */
-  void SetDepthPeelingEnabled(bool enabled);
-
-  /** Set maximum number of peels for all renderers */
-  void SetMaxNumberOfPeels(int maxNumber);
-
   /** Force a sub-class to start a timer for a pending hires-rendering request */
   virtual void StartOrResetTimer() {};
 
   /** To be called by a sub-class from a timer callback */
   void ExecutePendingHighResRenderingRequest();
-
 
   virtual void DoStartRendering() {};
   virtual void DoMonitorRendering() {};
@@ -283,7 +277,6 @@ public:
   */
   mitk::DataStorage* GetDataStorage();
 
-
   /**
   * \brief Setter / Getter for internal GloabInteraction
   *
@@ -324,7 +317,6 @@ protected:
 
   typedef std::map< BaseRenderer *, unsigned int > RendererIntMap;
   typedef std::map< BaseRenderer *, bool > RendererBoolMap;
-
 
   RendererBoolMap m_RenderingAbortedMap;
 
@@ -381,7 +373,6 @@ private:
   void InternalViewInitialization(
       mitk::BaseRenderer *baseRenderer, const mitk::TimeGeometry *geometry,
       bool boundingBoxInitialized, int mapperID );
-
 };
 
 #pragma GCC visibility push(default)
@@ -402,17 +393,15 @@ class MITK_CORE_EXPORT TestingRenderingManager : public RenderingManager
 {
 public:
   mitkClassMacro(TestingRenderingManager,RenderingManager);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 protected:
   virtual void GenerateRenderingRequestEvent()
   {
    // ForceImmediateUpdateAll();
   };
-
 };
-
-
 } // namespace mitk
 
 #endif /* MITKRenderingManager_H_HEADER_INCLUDED_C135A197 */

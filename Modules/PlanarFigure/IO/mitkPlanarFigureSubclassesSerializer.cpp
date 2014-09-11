@@ -24,12 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
   namespace mitk \
 { \
   \
-class PlanarFigure_EXPORT classname ## Serializer : public PlanarFigureSerializer \
+class MitkPlanarFigure_EXPORT classname ## Serializer : public PlanarFigureSerializer \
 { \
 public: \
   \
-  mitkClassMacro( classname ## Serializer, PlanarFigureSerializer ); \
-  itkNewMacro(Self); \
+  mitkClassMacro( classname ## Serializer, PlanarFigureSerializer ) \
+  itkFactorylessNewMacro(Self) \
+  itkCloneMacro(Self) \
   \
 protected: \
   \
@@ -41,13 +42,16 @@ protected: \
   \
   MITK_REGISTER_SERIALIZER( classname ## Serializer );
 
-MITK_REGISTER_PF_SUB_SERIALIZER(PlanarAngle);
-MITK_REGISTER_PF_SUB_SERIALIZER(PlanarCircle);
-MITK_REGISTER_PF_SUB_SERIALIZER(PlanarCross);
-MITK_REGISTER_PF_SUB_SERIALIZER(PlanarFourPointAngle);
-MITK_REGISTER_PF_SUB_SERIALIZER(PlanarLine);
-MITK_REGISTER_PF_SUB_SERIALIZER(PlanarPolygon);
-MITK_REGISTER_PF_SUB_SERIALIZER(PlanarRectangle);
-MITK_REGISTER_PF_SUB_SERIALIZER(PlanarEllipse);
+MITK_REGISTER_PF_SUB_SERIALIZER(PlanarAngle)
+MITK_REGISTER_PF_SUB_SERIALIZER(PlanarCircle)
+MITK_REGISTER_PF_SUB_SERIALIZER(PlanarCross)
+MITK_REGISTER_PF_SUB_SERIALIZER(PlanarFourPointAngle)
+MITK_REGISTER_PF_SUB_SERIALIZER(PlanarLine)
+MITK_REGISTER_PF_SUB_SERIALIZER(PlanarPolygon)
+MITK_REGISTER_PF_SUB_SERIALIZER(PlanarRectangle)
+MITK_REGISTER_PF_SUB_SERIALIZER(PlanarEllipse)
+MITK_REGISTER_PF_SUB_SERIALIZER(PlanarDoubleEllipse)
+MITK_REGISTER_PF_SUB_SERIALIZER(PlanarBezierCurve)
+MITK_REGISTER_PF_SUB_SERIALIZER(PlanarSubdivisionPolygon)
 
 #endif

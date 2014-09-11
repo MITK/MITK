@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _mitkpointsettopointsetfilter_h
 #define _mitkpointsettopointsetfilter_h
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkPointSetSource.h"
 
 namespace mitk
@@ -33,7 +33,8 @@ namespace mitk
   public:
     mitkClassMacro( PointSetToPointSetFilter, PointSetSource );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::PointSet InputType;
 

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_PartialVolumeAnalysisHistogramCalculator_H
 #define _MITK_PartialVolumeAnalysisHistogramCalculator_H
 
-#include "DiffusionCoreExports.h"
+#include "MitkDiffusionCoreExports.h"
 
 #include <itkObject.h>
 #include <itkImage.h>
@@ -54,7 +54,7 @@ namespace mitk
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
  */
-  class DiffusionCore_EXPORT PartialVolumeAnalysisHistogramCalculator : public itk::Object
+  class MitkDiffusionCore_EXPORT PartialVolumeAnalysisHistogramCalculator : public itk::Object
   {
   public:
 
@@ -103,7 +103,8 @@ namespace mitk
     typedef itk::Image< float, 2 > InternalImage2DType;
 
     mitkClassMacro( PartialVolumeAnalysisHistogramCalculator, itk::Object )
-    itkNewMacro( PartialVolumeAnalysisHistogramCalculator )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** \brief Set image from which to compute statistics. */
     void SetImage( const mitk::Image *image );
@@ -246,7 +247,7 @@ namespace mitk
 
 
     /** \brief If the passed vector matches any of the three principal axes
-   * of the passed geometry, the ínteger value corresponding to the axis
+   * of the passed geometry, the Ã­nteger value corresponding to the axis
    * is set and true is returned. */
     bool GetPrincipalAxis( const Geometry3D *geometry, Vector3D vector,
                            unsigned int &axis );
@@ -270,7 +271,7 @@ namespace mitk
 
     template < typename TPixel, unsigned int VImageDimension >
         void InternalReorientImagePlane(
-            const itk::Image< TPixel, VImageDimension > *image, mitk::Geometry3D* imggeo, mitk::Geometry3D* planegeo3D, int additionalIndex );
+          const itk::Image< TPixel, VImageDimension > *image, mitk::BaseGeometry* imggeo, mitk::BaseGeometry* planegeo3D, int additionalIndex );
 
     template < typename TPixel, unsigned int VImageDimension >
         void InternalResampleImageFromMask(

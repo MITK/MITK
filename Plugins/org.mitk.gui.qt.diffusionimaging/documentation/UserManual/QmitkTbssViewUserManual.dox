@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_tractbasedspatialstatistics The TBSS View
 
-\image html tbss.png "Icon of the View"
+\imageMacro{tbss.png,"Icon of the TBSS View",2.00}
 
 \section QmitkTractbasedSpatialStatistics Summary
 
@@ -9,17 +9,9 @@ This view can be used to locally explore data resulting from preprocessing with 
 
 This document will tell you how to use this view, but it is assumed that you already know how to use MITK in general and how to work with the TBSS view of FSL.
 
-If you encounter problems using the view, please have a look at the \ref QmitkTractbasedSpatialStatisticsUserManualTrouble page.
+If you encounter problems using the view, please have a look at the \ref QmitkTractbasedSpatialStatisticsUserManualTroubleshooting page.
 
-Sections:
-
-- \ref QmitkTractbasedSpatialStatisticsUserManualOverview 
-- \ref QmitkTractbasedSpatialStatisticsUserManualFSLImport
-- \ref QmitkTractbasedSpatialStatisticsUserManualRois
-- \ref QmitkTractbasedSpatialStatisticsUserManualProfiles
-- \ref QmitkTractbasedSpatialStatisticsUserManualFiberPlotting
-- \ref QmitkTractbasedSpatialStatisticsUserManualTroubleshooting
-- \ref QmitkTractbasedSpatialStatisticsUserManualReferences
+\tableofcontents
 
 \section QmitkTractbasedSpatialStatisticsUserManualOverview Overview
 
@@ -32,24 +24,24 @@ This documentation describes the features of this current version.
 \section QmitkTractbasedSpatialStatisticsUserManualFSLImport FSL Import
 The FSL import allows to import data that has been preprocessed by FSL. FSL creates output images that typically have names like all_FA_skeletonized.nii.gz that are 4-dimensional images that contain registered images of all subjects. By loading this 4D image into the datamanager and listing the groups with the correct number of subjects, in the order of occurrence in the 4D image, in the TBSS-View using the Add button and clicking the import subject data a TBSS file is created that contains all the information needed for tract analysis. The diffusion measure of the image can be set as well.
 
-\image html fslimport.png "FSL Import"
+\imageMacro{fslimport.png,"FSL Import",16.00}
 
 \section QmitkTractbasedSpatialStatisticsUserManualRois Regions of Interest (ROIs)
 To create a ROI the mean FA skeleton (typically called mean_FA_skeleton.nii.gz) that is created by FSL should be loaded in to the datamanager and selected. By using the Pointlistwidget points should be set on the skeleton (make sure to select points with relatively high FA values). Points are set by first selecting the button with the '+' and than shift-leftclick in the image. When the correct image is selected in the datamanager the Create ROI button is enabled. Clicking this will create a region of interest that passes through the previously selected points. The roi appears in the datamanager. Before doing so, the name of the roi and the information on the structure on which the ROI lies can be set. This will be saved as extra information in the roi-image. Before the ROI is calculated, a pop-up window will ask the user to provide a threshold value. This should be the same threshold that was previously used in FSL to create a binary mask of the FA skeleton. When this is not done correctly, the region of interest will possible contain zero-valued voxels.
 
-\image html tbssRoi.png "Regions of Interest (ROIs)"
+\imageMacro{tbssRoi.png,"Regions of Interest (ROIs)",16.00}
 
 
 \section QmitkTractbasedSpatialStatisticsUserManualProfiles
 
 y selecting a tbss image with group information and a region of interest image (as was created in a previous stap). A profile plot is drawn in the plot canvas. By clicking in the graph the crosshairs jump to the corresponding location in the image.
 
-\image html profiles.png "Profile plots"
+\imageMacro{profiles.png,"Profile plots",16.00}
 
 \section QmitkTractbasedSpatialStatisticsUserManualFiberPlotting 
 It is also possible to use fiber bundles to plot values in images. However, unlike TBSS this only works on 3D volumes (one subject only). To plot the values of a 3D volume using fiber tracking results, we need, fiber data and two planar circles as Regions of Interest that define the region that must be plotted. For every fiber that passes through both ROIs the values at the corresponding positions in the volume are plotted. Every fiber is resampled to the number of segments specified in the GUI. The average value can also be plotted. The subset of the fibers between the ROIs can be cut out by pressing the Cut button.
 
-\image html trackingplot.png "Plot of fiber tracts"
+\imageMacro{trackingplot.png,"Plot of fiber tracts",16.00}
 
 
 \section QmitkTractbasedSpatialStatisticsUserManualTroubleshooting Troubleshooting

@@ -19,24 +19,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PLANAR_SUBDIVISION_POLYGON_H_
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 #include "mitkPlanarPolygon.h"
 
 namespace mitk
 {
 
-class Geometry2D;
+class PlaneGeometry;
 
 /**
  * \brief Implementation of PlanarFigure representing a polygon
  * with two or more control points
  */
-class PlanarFigure_EXPORT PlanarSubdivisionPolygon : public PlanarPolygon
+class MitkPlanarFigure_EXPORT PlanarSubdivisionPolygon : public PlanarPolygon
 {
 public:
   mitkClassMacro( PlanarSubdivisionPolygon, PlanarFigure );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** \brief Subdivision Polygon has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const
@@ -83,6 +84,8 @@ public:
 
   void IncreaseSubdivisions();
   void DecreaseSubdivisions();
+
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
 
 protected:
   PlanarSubdivisionPolygon();

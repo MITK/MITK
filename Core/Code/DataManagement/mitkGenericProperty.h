@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 #include <stdlib.h>
 
-#include "mitkVector.h"
-#include <MitkExports.h>
+#include "mitkNumericTypes.h"
+#include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
 
 namespace mitk {
@@ -88,6 +88,7 @@ class MITK_EXPORT GenericProperty : public BaseProperty
     virtual itk::LightObject::Pointer InternalClone() const
     {
       itk::LightObject::Pointer result(new Self(*this));
+      result->UnRegister();
       return result;
     }
 
@@ -121,9 +122,10 @@ class MITK_EXPORT GenericProperty : public BaseProperty
 class Export PropertyName: public GenericProperty< Type >     \
 {                                                             \
 public:                                                       \
-  mitkClassMacro(PropertyName, GenericProperty< Type >);      \
-  itkNewMacro(PropertyName);                                  \
-  mitkNewMacro1Param(PropertyName, Type);                     \
+  mitkClassMacro(PropertyName, GenericProperty< Type >)       \
+  itkFactorylessNewMacro(Self)                                \
+  itkCloneMacro(Self)                                         \
+  mitkNewMacro1Param(PropertyName, Type)                      \
   using BaseProperty::operator=;                              \
 protected:                                                    \
   PropertyName();                                             \
@@ -139,6 +141,7 @@ private:                                                      \
   mitk::PropertyName::PropertyName(Type x) : Superclass(x) {}                \
   itk::LightObject::Pointer mitk::PropertyName::InternalClone() const {      \
     itk::LightObject::Pointer result(new Self(*this));                       \
+    result->UnRegister();                                                    \
     return result;                                                           \
   }                                                                          \
 

@@ -98,4 +98,20 @@ void mitk::DiffusionImageCorrectionFilter<TPixelType>
 
 }
 
+template< typename TPixelType >
+void mitk::DiffusionImageCorrectionFilter<TPixelType>
+::CorrectDirections( const TransformMatrixType& transformation)
+{
+  if( m_SourceImage.IsNull() )
+  {
+    mitkThrow() << " No diffusion image given! ";
+  }
+  TransformsVectorType transfVec;
+  for (unsigned int i=0; i< m_SourceImage->GetDirections()->Size();i++)
+  {
+    transfVec.push_back(transformation);
+  }
+  this->CorrectDirections(transfVec);
+}
+
 #endif

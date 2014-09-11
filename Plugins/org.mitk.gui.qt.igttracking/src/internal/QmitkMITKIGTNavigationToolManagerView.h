@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkFunctionality.h>
+#include <usServiceReference.h>
 
 #include "ui_QmitkMITKIGTNavigationToolManagerViewControls.h"
 
@@ -53,11 +54,17 @@ class QmitkMITKIGTNavigationToolManagerView : public QmitkFunctionality
 
   protected slots:
 
+    void NewStorageByWidget(mitk::NavigationToolStorage::Pointer storage,std::string);
+    void ToolStorageSelected(mitk::NavigationToolStorage::Pointer);
+
   protected:
 
     Ui::QmitkMITKIGTNavigationToolManagerViewControls* m_Controls;
 
     QmitkStdMultiWidget* m_MultiWidget;
+
+    /** Someone needs to hold the smart pointers of new storages, otherwise the objects will be lost although they are listed as microservice. */
+    std::vector<mitk::NavigationToolStorage::Pointer> m_AllStoragesHandledByThisWidget;
 };
 
 

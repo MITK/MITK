@@ -1,0 +1,7 @@
+mitk_create_module(
+  DEPENDS MitkCore
+  PACKAGE_DEPENDS VTK|vtkTestingRendering CppUnit
+  EXPORT_DEFINE MITK_TESTINGHELPER_EXPORT
+  WARNINGS_AS_ERRORS
+)
+

@@ -155,6 +155,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
 
   mitk::Point3D origin = input->GetGeometry()->GetOrigin();
+  mitk::Vector3D spacing = input->GetGeometry()->GetSpacing();
 
   for (int j=0; j<yDimension; j++)
   {
@@ -164,22 +165,28 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
       mitk::ToFProcessingCommon::ToFScalarType distance = (double)inputFloatData[pixelID];
 
+      /** Here we have to incorporate spacing and origin to allow processing of cropped/resampled images
+      * Usually origin will be [0, 0, 0] and spacing will be [1, 1, 1], but just in case the image is moved
+      * due to cropping or the spacing differes due to up- or downsampling.*/
+      unsigned int completeIndexX = i*spacing[0]+origin[0];
+      unsigned int completeIndexY = j*spacing[1]+origin[1];
+
       mitk::ToFProcessingCommon::ToFPoint3D cartesianCoordinates;
       switch (m_ReconstructionMode)
       {
       case WithOutInterPixelDistance:
       {
-        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i+origin[0],j+origin[1],distance,focalLengthInPixelUnits,principalPoint);
+        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(completeIndexX,completeIndexY,distance,focalLengthInPixelUnits,principalPoint);
         break;
       }
       case WithInterPixelDistance:
       {
-        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i+origin[0],j+origin[1],distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
+        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(completeIndexX,completeIndexY,distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
         break;
       }
       case Kinect:
       {
-        cartesianCoordinates = mitk::ToFProcessingCommon::KinectIndexToCartesianCoordinates(i+origin[0],j+origin[1],distance,focalLengthInPixelUnits,principalPoint);
+        cartesianCoordinates = mitk::ToFProcessingCommon::KinectIndexToCartesianCoordinates(completeIndexX,completeIndexY,distance,focalLengthInPixelUnits,principalPoint);
         break;
       }
       default:
@@ -260,16 +267,6 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
                 vertices->InsertCellPoint(xyV);
               }
             }
-
-            //Scalar values are necessary for mapping colors/texture onto the surface
-            if (scalarFloatData)
-            {
-              scalarArray->InsertTuple1(m_VertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
-            }
-            //These Texture Coordinates will map color pixel and vertices 1:1 (e.g. for Kinect).
-            float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
-            float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
-            textureCoords->InsertTuple2(m_VertexIdList->GetId(pixelID), xNorm, yNorm);
           }
         }
         else
@@ -278,6 +275,15 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
           vertices->InsertNextCell(1);
           vertices->InsertCellPoint(m_VertexIdList->GetId(pixelID));
         }
+        //Scalar values are necessary for mapping colors/texture onto the surface
+        if (scalarFloatData)
+        {
+          scalarArray->InsertTuple1(m_VertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
+        }
+        //These Texture Coordinates will map color pixel and vertices 1:1 (e.g. for Kinect).
+        float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
+        float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
+        textureCoords->InsertTuple2(m_VertexIdList->GetId(pixelID), xNorm, yNorm);
       }
     }
   }

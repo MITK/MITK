@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkFloatPropertyExtension_h
 
 #include <mitkPropertyExtension.h>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk
 {
@@ -31,7 +31,8 @@ namespace mitk
   public:
     mitkClassMacro(FloatPropertyExtension, PropertyExtension);
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro2Param(Self, float, float);
     mitkNewMacro3Param(Self, float, float, float);
     mitkNewMacro4Param(Self, float, float, float, int);

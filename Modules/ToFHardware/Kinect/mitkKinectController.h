@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkKinectController_h
 #define __mitkKinectController_h
 
-#include "mitkKinectModuleExports.h"
+#include <MitkKinectExports.h>
 #include "mitkCommon.h"
 #include "mitkToFConfig.h"
 
@@ -37,7 +37,8 @@ namespace mitk
 
     mitkClassMacro( KinectController , itk::Object );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     unsigned int GetCaptureWidth() const;
     unsigned int GetCaptureHeight() const;

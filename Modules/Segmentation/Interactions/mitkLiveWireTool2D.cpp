@@ -14,88 +14,131 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkLiveWireTool2D.h"
-
-#include "mitkToolManager.h"
-#include "mitkBaseRenderer.h"
-#include "mitkRenderingManager.h"
-
-#include "mitkLiveWireTool2D.xpm"
-
-#include <mitkInteractionConst.h>
-#include <mitkGlobalInteraction.h>
-
-#include "mitkContourUtils.h"
-#include "mitkContour.h"
-
 #include <itkGradientMagnitudeImageFilter.h>
 
-// us
-#include <usModule.h>
-#include <usModuleResource.h>
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
+#include <mitkBaseRenderer.h>
+#include <mitkContour.h>
+#include <mitkContourModelUtils.h>
+#include <mitkContourUtils.h>
+#include <mitkGlobalInteraction.h>
+#include <mitkInteractionConst.h>
+#include <mitkRenderingManager.h>
+#include <mitkToolManager.h>
 
-namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, LiveWireTool2D, "LiveWire tool");
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleContext.h>
+#include <usModuleResource.h>
+
+#include "mitkLiveWireTool2D.h"
+#include "mitkLiveWireTool2D.xpm"
+
+namespace mitk
+{
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, LiveWireTool2D, "LiveWire tool");
 }
 
+static void AddInteractorToGlobalInteraction(mitk::Interactor* interactor)
+{
+  mitk::GlobalInteraction::GetInstance()->AddInteractor(interactor);
+}
+
+static void RemoveInteractorFromGlobalInteraction(mitk::Interactor* interactor)
+{
+  mitk::GlobalInteraction::GetInstance()->RemoveInteractor(interactor);
+}
+
+class RemoveFromDataStorage
+{
+public:
+  RemoveFromDataStorage(mitk::DataStorage::Pointer dataStorage)
+    : m_DataStorage(dataStorage)
+  {
+  }
+
+  void operator()(mitk::DataNode* dataNode)
+  {
+    m_DataStorage->Remove(dataNode);
+  }
+
+  void operator()(const std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer>& dataNode)
+  {
+    m_DataStorage->Remove(dataNode.first);
+  }
+
+private:
+  mitk::DataStorage::Pointer m_DataStorage;
+};
 
 mitk::LiveWireTool2D::LiveWireTool2D()
-:SegTool2D("LiveWireTool")
+  : SegTool2D("LiveWireTool")
 {
-
-  // great magic numbers
-  CONNECT_ACTION( AcINITNEWOBJECT, OnInitLiveWire );
-  CONNECT_ACTION( AcADDPOINT, OnAddPoint );
-  CONNECT_ACTION( AcMOVE, OnMouseMoveNoDynamicCosts );
-  CONNECT_ACTION( AcCHECKPOINT, OnCheckPoint );
-  CONNECT_ACTION( AcFINISH, OnFinish );
-  CONNECT_ACTION( AcDELETEPOINT, OnLastSegmentDelete );
-  CONNECT_ACTION( AcADDLINE, OnMouseMoved );
 }
-
-
 
 mitk::LiveWireTool2D::~LiveWireTool2D()
 {
-  this->m_WorkingContours.clear();
-  this->m_EditingContours.clear();
+  this->ClearSegmentation();
 }
 
-
-
-float mitk::LiveWireTool2D::CanHandleEvent( StateEvent const *stateEvent) const
+void mitk::LiveWireTool2D::RemoveHelperObjects()
 {
-  mitk::PositionEvent const  *positionEvent =
-  dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+  DataStorage* dataStorage = m_ToolManager->GetDataStorage();
 
-  //Key event handling:
-  if (positionEvent == NULL)
-  {
-    //check for delete and escape event
-    if(stateEvent->GetId() == 12 || stateEvent->GetId() == 14)
-    {
-      return 1.0;
-    }
-    //check, if the current state has a transition waiting for that key event.
-    else if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
-    {
-      return 0.5;
-    }
-    else
-    {
-      return 0.0;
-    }
-  }
-  else
-  {
-    if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D )
-      return 0.0; // we don't want anything but 2D
+  if (!m_EditingContours.empty())
+    std::for_each(m_EditingContours.begin(), m_EditingContours.end(), RemoveFromDataStorage(dataStorage));
 
-    return 1.0;
-  }
+  if (!m_WorkingContours.empty())
+    std::for_each(m_WorkingContours.begin(), m_WorkingContours.end(), RemoveFromDataStorage(dataStorage));
 
+  if (m_EditingContourNode.IsNotNull())
+    dataStorage->Remove(m_EditingContourNode);
+
+  if (m_LiveWireContourNode.IsNotNull())
+    dataStorage->Remove(m_LiveWireContourNode);
+
+  if (m_ContourModelNode.IsNotNull())
+    dataStorage->Remove(m_ContourModelNode);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void mitk::LiveWireTool2D::ReleaseHelperObjects()
+{
+  this->RemoveHelperObjects();
+
+  if (!m_EditingContours.empty())
+    m_EditingContours.clear();
+
+  if (!m_WorkingContours.empty())
+    m_WorkingContours.clear();
+
+  m_EditingContourNode = NULL;
+  m_EditingContour = NULL;
+
+  m_LiveWireContourNode = NULL;
+  m_LiveWireContour = NULL;
+
+  m_ContourModelNode = NULL;
+  m_Contour = NULL;
+}
+
+void mitk::LiveWireTool2D::ReleaseInteractors()
+{
+  this->EnableContourLiveWireInteraction(false);
+  m_LiveWireInteractors.clear();
+}
+
+void mitk::LiveWireTool2D::ConnectActionsAndFunctions()
+{
+  CONNECT_CONDITION("CheckContourClosed", OnCheckPoint);
+
+  CONNECT_FUNCTION("InitObject", OnInitLiveWire);
+  CONNECT_FUNCTION("AddPoint", OnAddPoint);
+  CONNECT_FUNCTION("CtrlAddPoint", OnAddPoint);
+  CONNECT_FUNCTION("MovePoint", OnMouseMoveNoDynamicCosts);
+  CONNECT_FUNCTION("FinishContour", OnFinish);
+  CONNECT_FUNCTION("DeletePoint", OnLastSegmentDelete);
+  CONNECT_FUNCTION("CtrlMovePoint", OnMouseMoved);
 }
 
 const char** mitk::LiveWireTool2D::GetXPM() const
@@ -105,16 +148,12 @@ const char** mitk::LiveWireTool2D::GetXPM() const
 
 us::ModuleResource mitk::LiveWireTool2D::GetIconResource() const
 {
-  us::Module* module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("LiveWire_48x48.png");
-  return resource;
+  return us::GetModuleContext()->GetModule()->GetResource("LiveWire_48x48.png");
 }
 
 us::ModuleResource mitk::LiveWireTool2D::GetCursorIconResource() const
 {
-  us::Module* module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("LiveWire_Cursor_32x32.png");
-  return resource;
+  return us::GetModuleContext()->GetModule()->GetResource("LiveWire_Cursor_32x32.png");
 }
 
 const char* mitk::LiveWireTool2D::GetName() const
@@ -125,83 +164,39 @@ const char* mitk::LiveWireTool2D::GetName() const
 void mitk::LiveWireTool2D::Activated()
 {
   Superclass::Activated();
-
-  //enable interaction if there are any previously created contours
+  this->ResetToStartState();
   this->EnableContourLiveWireInteraction(true);
 }
 
 void mitk::LiveWireTool2D::Deactivated()
 {
   Superclass::Deactivated();
-
-  //disable interaction with current contours
-  this->EnableContourLiveWireInteraction(false);
+  this->ConfirmSegmentation();
 }
-
-void mitk::LiveWireTool2D::ClearContours()
-{
-  // for all contours in list (currently created by tool)
-  std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator iter = this->m_WorkingContours.begin();
-  while(iter != this->m_WorkingContours.end() )
-  {
-    //remove contour node from datastorage
-    m_ToolManager->GetDataStorage()->Remove( iter->first );
-
-    ++iter;
-  }
-
-  this->m_WorkingContours.clear();
-
-  // for all contours in list (currently created by tool)
-  std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator itEditingContours = this->m_EditingContours.begin();
-  while(itEditingContours != this->m_EditingContours.end() )
-  {
-      //remove contour node from datastorage
-      m_ToolManager->GetDataStorage()->Remove( itEditingContours->first );
-      ++itEditingContours;
-  }
-
-  this->m_EditingContours.clear();
-
-  this->EnableContourLiveWireInteraction(false);
-  this->m_LiveWireInteractors.clear();
-}
-
 
 void mitk::LiveWireTool2D::EnableContourLiveWireInteraction(bool on)
 {
-//for all currently created contours enable or disable interactor
-  std::vector< mitk::ContourModelLiveWireInteractor::Pointer >::iterator itLiveWireInteractors = this->m_LiveWireInteractors.begin();
-  std::vector< mitk::ContourModelLiveWireInteractor::Pointer >::iterator end = this->m_LiveWireInteractors.end();
-  while(itLiveWireInteractors != end )
-  {
-  if(on)
-  {
-    // add interactors to globalInteraction instance
-    mitk::GlobalInteraction::GetInstance()->AddInteractor( *itLiveWireInteractors );
-  }
-  else
-  {
-    // remove interactors from globalInteraction instance
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( *itLiveWireInteractors );
-  }
-    ++itLiveWireInteractors;
-  }
+  std::for_each(m_LiveWireInteractors.begin(), m_LiveWireInteractors.end(), on
+    ? AddInteractorToGlobalInteraction
+    : RemoveInteractorFromGlobalInteraction);
 }
-
 
 void mitk::LiveWireTool2D::ConfirmSegmentation()
 {
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert ( workingNode );
+
+  if (!workingNode)
+    return;
 
   Image* workingImage = dynamic_cast<Image*>(workingNode->GetData());
-  assert ( workingImage );
 
-  ContourUtils::Pointer contourUtils = mitk::ContourUtils::New();
+  if (!workingImage)
+    return;
 
   // for all contours in list (currently created by tool)
   std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator itWorkingContours = this->m_WorkingContours.begin();
+  std::vector<SliceInformation> sliceList;
+  sliceList.reserve(m_WorkingContours.size());
   while(itWorkingContours != this->m_WorkingContours.end() )
   {
     // if node contains data
@@ -220,56 +215,44 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
           //get the segmentation image slice at current timestep
           mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(itWorkingContours->second, workingImage, currentTimestep);
 
-          mitk::ContourModel::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice(workingSlice, contourModel, true, false);
-          contourUtils->FillContourInSlice(projectedContour, workingSlice, 1.0);
+          mitk::ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contourModel, true, false);
+          mitk::ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, 1.0);
 
           //write back to image volume
-          this->WriteBackSegmentationResult(itWorkingContours->second, workingSlice, currentTimestep);
+          SliceInformation sliceInfo (workingSlice, itWorkingContours->second, currentTimestep);
+          sliceList.push_back(sliceInfo);
         }
-
-        //remove contour node from datastorage
-    //    m_ToolManager->GetDataStorage()->Remove( itWorkingContours->first );
       }
     }
 
     ++itWorkingContours;
   }
-/*
-  this->m_WorkingContours.clear();
 
-  // for all contours in list (currently created by tool)
-  std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator itEditingContours = this->m_EditingContours.begin();
-  while(itEditingContours != this->m_EditingContours.end() )
-  {
-      //remove contour node from datastorage
-      m_ToolManager->GetDataStorage()->Remove( itEditingContours->first );
-      ++itEditingContours;
-  }
-
-  this->m_EditingContours.clear();
-
-  std::vector< mitk::ContourModelLiveWireInteractor::Pointer >::iterator itLiveWireInteractors = this->m_LiveWireInteractors.begin();
-  while(itLiveWireInteractors != this->m_LiveWireInteractors.end() )
-  {
-      // remove interactors from globalInteraction instance
-      mitk::GlobalInteraction::GetInstance()->RemoveInteractor( *itLiveWireInteractors );
-      ++itLiveWireInteractors;
-  }
-
-  this->m_LiveWireInteractors.clear();
-*/
-  this->ClearContours();
+  this->WriteBackSegmentationResult(sliceList);
+  this->ClearSegmentation();
 }
 
-bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* stateEvent)
+void mitk::LiveWireTool2D::ClearSegmentation()
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  this->ReleaseHelperObjects();
+  this->ReleaseInteractors();
+  this->ResetToStartState();
+}
+
+bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent )
+{
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+    return false;
+
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+
+  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
+    return false;
+
   if (!positionEvent) return false;
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
-
-  if ( Superclass::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
@@ -278,6 +261,9 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_ContourModelNode = mitk::DataNode::New();
   m_ContourModelNode->SetData( m_Contour );
   m_ContourModelNode->SetName("working contour node");
+  m_ContourModelNode->SetProperty( "layer", IntProperty::New(100));
+  m_ContourModelNode->AddProperty( "fixedLayer", BoolProperty::New(true));
+  m_ContourModelNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
   m_ContourModelNode->AddProperty( "contour.color", ColorProperty::New(1, 1, 0), NULL, true );
   m_ContourModelNode->AddProperty( "contour.points.color", ColorProperty::New(1.0, 0.0, 0.1), NULL, true );
   m_ContourModelNode->AddProperty( "contour.controlpoints.show", BoolProperty::New(true), NULL, true );
@@ -287,7 +273,8 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_LiveWireContourNode = mitk::DataNode::New();
   m_LiveWireContourNode->SetData( m_LiveWireContour );
   m_LiveWireContourNode->SetName("active livewire node");
-  m_LiveWireContourNode->SetProperty( "layer", IntProperty::New(100));
+  m_LiveWireContourNode->SetProperty( "layer", IntProperty::New(101));
+  m_LiveWireContourNode->AddProperty( "fixedLayer", BoolProperty::New(true));
   m_LiveWireContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
   m_LiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_LiveWireContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
@@ -297,24 +284,37 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_EditingContourNode = mitk::DataNode::New();
   m_EditingContourNode->SetData( m_EditingContour );
   m_EditingContourNode->SetName("editing node");
-  m_EditingContourNode->SetProperty( "layer", IntProperty::New(100));
+  m_EditingContourNode->SetProperty( "layer", IntProperty::New(102));
+  m_EditingContourNode->AddProperty( "fixedLayer", BoolProperty::New(true));
   m_EditingContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
   m_EditingContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_EditingContourNode->AddProperty( "contour.points.color", ColorProperty::New(0.0, 0.0, 1.0), NULL, true );
   m_EditingContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
 
-  m_ToolManager->GetDataStorage()->Add( m_ContourModelNode );
-  m_ToolManager->GetDataStorage()->Add( m_LiveWireContourNode );
-  m_ToolManager->GetDataStorage()->Add( m_EditingContourNode );
+  mitk::DataNode* workingDataNode = m_ToolManager->GetWorkingData(0);
+
+  m_ToolManager->GetDataStorage()->Add(m_ContourModelNode, workingDataNode);
+  m_ToolManager->GetDataStorage()->Add(m_LiveWireContourNode, workingDataNode);
+  m_ToolManager->GetDataStorage()->Add(m_EditingContourNode, workingDataNode);
 
   //set current slice as input for ImageToLiveWireContourFilter
   m_WorkingSlice = this->GetAffectedReferenceSlice(positionEvent);
+
+  //Transfer LiveWire's center based contour output to corner based via the adaption of the input
+  //slice image. Just in case someone stumbles across the 0.5 here I know what I'm doing ;-).
+  m_WorkingSlice->GetSlicedGeometry()->ChangeImageGeometryConsideringOriginOffset(false);
+  mitk::Point3D newOrigin = m_WorkingSlice->GetSlicedGeometry()->GetOrigin();
+  m_WorkingSlice->GetSlicedGeometry()->WorldToIndex(newOrigin, newOrigin);
+  newOrigin[2] += 0.5;
+  m_WorkingSlice->GetSlicedGeometry()->IndexToWorld(newOrigin, newOrigin);
+  m_WorkingSlice->GetSlicedGeometry()->SetOrigin(newOrigin);
+
 
   m_LiveWireFilter = mitk::ImageLiveWireContourModelFilter::New();
   m_LiveWireFilter->SetInput(m_WorkingSlice);
 
   //map click to pixel coordinates
-  mitk::Point3D click = const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition());
+  mitk::Point3D click = positionEvent->GetPositionInWorld();
   itk::Index<3> idx;
   m_WorkingSlice->GetGeometry()->WorldToIndex(click, idx);
 
@@ -341,18 +341,22 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   return true;
 }
 
-bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEvent)
+
+bool mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+    return false;
+
   //complete LiveWire interaction for last segment
   //add current LiveWire contour to the finished contour and reset
   //to start new segment and computation
 
   /* check if event can be handled */
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
+  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
+    return false;
 
-  if ( Superclass::CanHandleEvent(stateEvent) < 1.0 ) return false;
-  /* END check if event can be handled */
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  if (!positionEvent) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
@@ -380,7 +384,7 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
   m_LiveWireContour->Clear(timestep);
 
   //set new start point
-  m_LiveWireFilter->SetStartPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
+  m_LiveWireFilter->SetStartPoint(positionEvent->GetPositionInWorld());
 
   if( m_CreateAndUseDynamicCosts )
   {
@@ -397,22 +401,24 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
   return true;
 }
 
-bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* stateEvent)
+bool mitk::LiveWireTool2D::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+    return false;
+
   //compute LiveWire segment from last control point to current mouse position
+  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
+    return false;
 
-  // check if event can be handled
-  if ( Superclass::CanHandleEvent(stateEvent) < 1.0 ) return false;
-
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
 
   // actual LiveWire computation
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
-  m_LiveWireFilter->SetEndPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
+  m_LiveWireFilter->SetEndPoint(positionEvent->GetPositionInWorld());
 
-  m_LiveWireFilter->SetTimeStep(m_TimeStep);
+  m_LiveWireFilter->SetTimeStep( timestep );
   m_LiveWireFilter->Update();
 
   m_LiveWireContour = this->m_LiveWireFilter->GetOutput();
@@ -420,21 +426,23 @@ bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* state
 
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
-  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
+  positionEvent->GetSender()->GetRenderingManager()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 
   return true;
 }
 
-bool mitk::LiveWireTool2D::OnMouseMoveNoDynamicCosts(Action* action, const StateEvent* stateEvent)
+
+bool mitk::LiveWireTool2D::OnMouseMoveNoDynamicCosts( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   //do not use dynamic cost map
   m_LiveWireFilter->SetUseDynamicCostMap(false);
-  OnMouseMoved(action, stateEvent);
+  OnMouseMoved( NULL, interactionEvent);
   m_LiveWireFilter->SetUseDynamicCostMap(true);
   return true;
 }
 
-bool mitk::LiveWireTool2D::OnCheckPoint( Action* action, const StateEvent* stateEvent)
+
+bool mitk::LiveWireTool2D::OnCheckPoint( const InteractionEvent* interactionEvent)
 {
   //check double click on first control point to finish the LiveWire tool
   //
@@ -442,48 +450,47 @@ bool mitk::LiveWireTool2D::OnCheckPoint( Action* action, const StateEvent* state
   //Transition YES if click close to first control point
   //
 
-  mitk::StateEvent* newStateEvent = NULL;
+  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
+    return false;
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent)
-  {
-    //stay in current state
-    newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
-  }
-  else
+  const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<const mitk::InteractionPositionEvent*>( interactionEvent );
+  if (positionEvent)
   {
     int timestep = positionEvent->GetSender()->GetTimeStep();
 
-    mitk::Point3D click = positionEvent->GetWorldPosition();
-
+    mitk::Point3D click = positionEvent->GetPositionInWorld();
     mitk::Point3D first = this->m_Contour->GetVertexAt(0, timestep)->Coordinates;
 
     if (first.EuclideanDistanceTo(click) < 4.5)
     {
       // allow to finish
-      newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
+      return true;
     }
     else
     {
-      //stay active
-      newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
+      return false;
     }
   }
 
-  this->HandleEvent( newStateEvent );
-
-  return true;
+  return false;
 }
 
-bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEvent)
+
+bool mitk::LiveWireTool2D::OnFinish( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+    return false;
+
   // finish livewire tool interaction
 
-  // check if event can be handled
-  if ( Superclass::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
+    return false;
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
+
+  // Have to do that here so that the m_LastEventSender is set correctly
+  mitk::SegTool2D::AddContourmarker();
 
   // actual timestep
   int timestep = positionEvent->GetSender()->GetTimeStep();
@@ -492,10 +499,10 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
   m_Contour->RemoveVertexAt(m_Contour->GetNumberOfVertices(timestep) - 1, timestep);
 
   // save contour and corresponding plane geometry to list
-  std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> cp(m_ContourModelNode, dynamic_cast<mitk::PlaneGeometry*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D()->Clone().GetPointer()) );
+  std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> cp(m_ContourModelNode, dynamic_cast<mitk::PlaneGeometry*>(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone().GetPointer()) );
   this->m_WorkingContours.push_back(cp);
 
-  std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> ecp(m_EditingContourNode, dynamic_cast<mitk::PlaneGeometry*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D()->Clone().GetPointer()) );
+  std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> ecp(m_EditingContourNode, dynamic_cast<mitk::PlaneGeometry*>(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone().GetPointer()) );
   this->m_EditingContours.push_back(ecp);
 
   m_LiveWireFilter->SetUseDynamicCostMap(false);
@@ -521,10 +528,6 @@ void mitk::LiveWireTool2D::FinishTool()
   m_LiveWireContourNode = NULL;
   m_LiveWireContour = NULL;
 
-  //change color as visual feedback of completed livewire
-  //m_ContourModelNode->AddProperty( "contour.color", ColorProperty::New(1.0, 1.0, 0.1), NULL, true );
-  //m_ContourModelNode->SetName("contour node");
-
   //set the livewire interactor to edit control points
   m_ContourInteractor = mitk::ContourModelLiveWireInteractor::New(m_ContourModelNode);
   m_ContourInteractor->SetWorkingImage(this->m_WorkingSlice);
@@ -537,9 +540,10 @@ void mitk::LiveWireTool2D::FinishTool()
   mitk::GlobalInteraction::GetInstance()->AddInteractor(m_ContourInteractor);
 }
 
-bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent* stateEvent)
+
+bool mitk::LiveWireTool2D::OnLastSegmentDelete( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
+  int timestep = interactionEvent->GetSender()->GetTimeStep();
 
   //if last point of current contour will be removed go to start state and remove nodes
   if( m_Contour->GetNumberOfVertices(timestep) <= 1 )
@@ -551,7 +555,7 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent
     m_Contour = mitk::ContourModel::New();
     m_ContourModelNode->SetData( m_Contour );
     m_LiveWireContourNode->SetData( m_LiveWireContour );
-    Superclass::Deactivated(); //go to start state
+    this->ResetToStartState(); //go to start state
   }
   else //remove last segment from contour and reset livewire contour
   {
@@ -593,15 +597,15 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent
       it++;
     }
 
-    newContour->SetIsClosed(m_Contour->IsClosed());
+    newContour->SetClosed(m_Contour->IsClosed());
 
     //set new contour visible
     m_ContourModelNode->SetData(newContour);
 
     m_Contour = newContour;
 
-    assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
-    mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
+    assert( interactionEvent->GetSender()->GetRenderWindow() );
+    mitk::RenderingManager::GetInstance()->RequestUpdate( interactionEvent->GetSender()->GetRenderWindow() );
   }
 
   return true;

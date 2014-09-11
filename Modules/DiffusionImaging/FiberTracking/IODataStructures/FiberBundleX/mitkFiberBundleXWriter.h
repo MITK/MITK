@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFileWriterWithInformation.h>
 #include "mitkFiberBundleX.h"
 #include <vtkPolyDataWriter.h>
-#include <FiberTrackingExports.h>
+#include <MitkFiberTrackingExports.h>
 
 
 namespace mitk
@@ -31,13 +31,14 @@ namespace mitk
  * Writes fiber bundles to a file
  * @ingroup Process
  */
-class FiberTracking_EXPORT FiberBundleXWriter : public mitk::FileWriterWithInformation
+class MitkFiberTracking_EXPORT FiberBundleXWriter : public mitk::FileWriterWithInformation
 {
 public:
 
     mitkClassMacro( FiberBundleXWriter, mitk::FileWriterWithInformation );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     //mitkWriterMacro;
 

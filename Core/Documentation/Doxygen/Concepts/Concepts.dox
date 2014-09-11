@@ -10,12 +10,14 @@ The following items describe some issues about MITK on a more abstract level.
  -# \ref CodingPageMITKMacros
  -# \subpage MicroServices_Overview
 -# Data Concepts
+ -# \subpage BasicDataTypesPage
  -# \subpage DataManagementPage
  -# \subpage MitkImagePage
  -# \subpage PropertiesPage
  -# \subpage GeometryOverviewPage
  -# \subpage PipelineingConceptPage
  -# \subpage OverlaysPage
+ -# \subpage PersistenceConceptPage
 -# \subpage QVTKRendering
 -# Interaction
  -# \subpage DataInteractionPage

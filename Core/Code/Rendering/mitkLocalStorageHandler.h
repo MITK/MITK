@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef LOCALSTORAGEHANDLER_H_HEADER_INCLUDED_C1E6EA08
 #define LOCALSTORAGEHANDLER_H_HEADER_INCLUDED_C1E6EA08
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseRenderer.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkLevelWindow.h"

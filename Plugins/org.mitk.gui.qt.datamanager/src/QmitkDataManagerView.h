@@ -44,6 +44,9 @@ class QSignalMapper;
 
 class QmitkDnDFrameWidget;
 class QmitkDataStorageTreeModel;
+class QmitkDataManagerItemDelegate;
+class QmitkNumberPropertySlider;
+class QmitkDataStorageFilterProxyModel;
 
 ///
 /// \ingroup org_mitk_gui_qt_datamanager_internal
@@ -79,6 +82,10 @@ public slots:
   /// In this function the the opacity slider is set to the selected nodes opacity value
   ///
   void OpacityActionChanged();
+  /// Invoked when the component action changed
+  /// In this function the the opacity slider is set to the selected nodes opacity value
+  ///
+  void ComponentActionChanged();
   ///
   /// Invoked when the color button is pressed
   ///
@@ -96,10 +103,18 @@ public slots:
   ///
   void TextureInterpolationToggled ( bool checked );
   ///
+  /// \brief Agreggates available colormaps
+  ///
+  void ColormapMenuAboutToShow ();
+  ///
+  /// \brief changes the active colormap
+  ///
+  void ColormapActionToggled (bool);
+  ///
   /// SurfaceRepresentationActionToggled
   ///
   void SurfaceRepresentationMenuAboutToShow ();
-  ///public
+  ///
   /// SurfaceRepresentationActionToggled
   ///
   void SurfaceRepresentationActionToggled ( bool checked );
@@ -183,6 +198,10 @@ protected:
   ///
   void FileOpen( const char * fileName, mitk::DataNode* parentNode );
 
+  ///
+  /// React to node changes. Overridden from QmitkAbstractView.
+  ///
+  virtual void NodeChanged(const mitk::DataNode* node);
 protected:
 
   QWidget* m_Parent;
@@ -192,6 +211,9 @@ protected:
   /// \brief A plain widget as the base pane.
   ///
   QmitkDataStorageTreeModel* m_NodeTreeModel;
+  QmitkDataStorageFilterProxyModel* m_FilterModel;
+  mitk::NodePredicateBase::Pointer m_HelperObjectFilterPredicate;
+  mitk::NodePredicateBase::Pointer m_NodeWithNoDataFilterPredicate;
   ///
   /// Holds the preferences for the datamanager.
   ///
@@ -219,12 +241,16 @@ protected:
 
   /// A Slider widget to change the opacity of a node
   QSlider* m_OpacitySlider;
+  /// A Slider widget to change the rendered vector component of an image
+  QmitkNumberPropertySlider* m_ComponentSlider;
   /// button to change the color of a node
   QPushButton* m_ColorButton;
   /// TextureInterpolation action
   QAction* m_TextureInterpolation;
   /// SurfaceRepresentation action
   QAction* m_SurfaceRepresentation;
+  /// Lookuptable selection action
+  QAction* m_ColormapAction;
 
   /// Maps "Show in" actions to editor ids
   QSignalMapper* m_ShowInMapper;
@@ -237,6 +263,8 @@ protected:
 
   /// if true, GlobalReinit() is called if a node is deleted
   bool  m_GlobalReinitOnNodeDelete;
+
+  QmitkDataManagerItemDelegate* m_ItemDelegate;
 
 private:
 

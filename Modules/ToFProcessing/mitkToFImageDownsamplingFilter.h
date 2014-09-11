@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK includes
 #include <mitkImage.h>
 #include "mitkImageToImageFilter.h"
-#include "mitkToFProcessingExports.h"
+#include <MitkToFProcessingExports.h>
 // ITK includes
 #include "itkImage.h"
 
@@ -34,11 +34,12 @@ namespace mitk
   * @ingroup ToFProcessing
   */
 
-  class mitkToFProcessing_EXPORT ToFImageDownsamplingFilter : public ImageToImageFilter
+  class MitkToFProcessing_EXPORT ToFImageDownsamplingFilter : public ImageToImageFilter
   {
   public:
     mitkClassMacro(ToFImageDownsamplingFilter, ImageToImageFilter);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkSetMacro(ResampledX,double);
     itkGetMacro(ResampledX,double);
@@ -74,7 +75,7 @@ namespace mitk
     \param VImageDimension is the image dimension (2D or 3D)
     */
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageResampling( itk::Image<TPixel,VImageDimension>* itkImage );
+    void ItkImageResampling( const itk::Image<TPixel,VImageDimension>* itkImage );
 
     double m_ResampledX;///<  length of x dimension of output image in pixels
     double m_ResampledY;///<  length of y dimension of output image in pixels

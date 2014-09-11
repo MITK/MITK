@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_CONNECTOMICS_RENDERING_EDGE_COLOR_PARAMETER_PROPERTY__H_
 
 #include "mitkEnumerationProperty.h"
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 namespace mitk
 {
@@ -31,13 +31,14 @@ namespace mitk
 /**
  * Encapsulates the enumeration of different rendering schemes for connectomics networks
  */
-class Connectomics_EXPORT ConnectomicsRenderingEdgeColorParameterProperty : public EnumerationProperty
+class MitkConnectomics_EXPORT ConnectomicsRenderingEdgeColorParameterProperty : public EnumerationProperty
 {
 public:
 
   mitkClassMacro( ConnectomicsRenderingEdgeColorParameterProperty, EnumerationProperty );
 
-  itkNewMacro(ConnectomicsRenderingEdgeColorParameterProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(ConnectomicsRenderingEdgeColorParameterProperty, const IdType&);
 

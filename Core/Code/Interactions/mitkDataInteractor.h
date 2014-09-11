@@ -18,9 +18,10 @@
 #define MITKDATAINTERACTOR_H_
 
 #include "mitkCommon.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkEventStateMachine.h"
 #include <string.h>
+
 
 namespace mitk
 {
@@ -33,6 +34,13 @@ namespace mitk
    * Provides an interface that is relevant for the interactor to work together with the dispatcher.
    * To implement a new interactor overwrite the ConnectActionsAndFunctions to connect the actions.
    */
+
+  // Define events for DataInteractors
+  itkEventMacro( DataInteractorEvent, itk::AnyEvent )
+  /** Event is thrown when interation is started */
+  itkEventMacro( StartInteraction, DataInteractorEvent )
+  /** Event is thrown when DataInteractor stores a finished result in the DataNode */
+  itkEventMacro( ResultReady, DataInteractorEvent )
 
   // Public 'cause it's also used by the mitk::Dispatcher
   enum ProcessEventMode
@@ -50,7 +58,8 @@ namespace mitk
   public:
     typedef itk::SmartPointer<DataNode> NodeType;
     mitkClassMacro(DataInteractor, EventStateMachine)
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * Set/Change the DataNode of the DataInteractor
@@ -94,6 +103,19 @@ namespace mitk
      *  \note Is also called when the DataNode is set to NULL.
      */
     virtual void DataNodeChanged();
+
+    /**
+     * @brief NotifyStart Sends StartInteraction event via the mitk::DataNode
+     */
+    void virtual NotifyStart();
+
+    /**
+     * @brief NotifyResultReady Sends ResultReady event via the mitk::DataNode
+     *
+     * This can be used to get notifcation when the mitk::DataNode is in a ready state for further processing.
+     */
+
+    void virtual NotifyResultReady();
 
   private:
     NodeType m_DataNode;

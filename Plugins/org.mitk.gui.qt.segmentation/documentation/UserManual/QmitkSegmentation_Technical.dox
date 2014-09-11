@@ -1,0 +1,101 @@
+/**
+
+\page QmitkSegmentationTechnicalPage Technical design of QmitkSegmentation
+
+\li \ref QmitkSegmentationTechnicalPage2
+\li \ref QmitkSegmentationTechnicalPage3
+\li \ref QmitkSegmentationTechnicalPage4
+
+\section QmitkSegmentationTechnicalPage2 Introduction
+
+QmitkSegmentation was designed for the liver resection planning
+project "ReLiver".
+The goal was a stable, well-documented, extensible, and testable
+re-implementation of a functionality called "ERIS", which was used for manual
+segmentation in 2D slices of 3D or 3D+t images.
+Re-implementation was chosen because it seemed to be easier to write
+documentation and tests for newly developed code. In addition, the old code had
+some design weaknesses (e.g. a monolithic class), which would be hard to
+maintain in the future.
+
+By now Segmentation is a well tested and easily extensible vehicle for all kinds of interactive
+segmentation applications. A separate page describes how you can extend Segmentation with new
+tools in a shared object (DLL): \ref toolextensions.
+
+\section QmitkSegmentationTechnicalPage3 Overview of tasks
+
+We identified the following major tasks:
+
+<ol>
+<li> <b>Management of images</b>: what is the original patient image, what
+images are the active segmentations?
+<li> <b>Management of drawing tools</b>: there is a set of drawing tools, one at
+a time is active, that is, someone has to decide which tool will receive mouse
+(and other) events.
+<li> <b>Drawing tools</b>: each tool can modify a segmentation in reaction to
+user interaction. To do so, the tools have to know about the relevant images.
+<li> <b>Slice manipulation</b>: drawing tools need to have means to extract a
+single slice from an image volume and to write a single slice back into an image
+volume.
+<li> <b>Interpolation of unsegmented slices</b>: some class has to keep track of
+all the segmentations in a volume and generate suggestions for missing slices.
+This should be possible in all three orthogonal slice direction.
+<li> <b>Undo</b>: Slice manipulations should be undoable, no matter whether a
+tool or the interpolation mechanism changed something.
+<li> <b>GUI</b>: Integration of everything.
+</ol>
+
+
+\section QmitkSegmentationTechnicalPage4 Classes involved
+
+The above blocks correspond to a number of classes. Here is an overview of all
+related classes with their responsibilities and relations:
+
+\imageMacro{QmitkSegmentation_InteractiveSegmentationClasses.png,"",16.00}
+
+<ol>
+<li> <b>Management of images</b>: mitk::ToolManager has a set of reference
+data (original images) and a second set of working data (segmentations).
+mitk::Tool objects know a ToolManager and can ask the manager for the currently
+relevant images. There are two GUI elements that enable
+the user to modify the set of reference and working images (QmitkToolReferenceDataSelectionBox and QmitkToolWorkingDataSelectionBox). GUI and non-GUI
+classes are coupled by itk::Events (non-GUI to GUI) and direct method calls (GUI
+to non-GUI).
+<li> <b>Management of drawing tools</b>: As a second task, ToolManager manages all available tools and makes sure that one at a time is able to receive MITK events.
+The GUI for selecting tools is implemented in QmitkToolSelectionBox.
+<li> <b>Drawing tools</b>: Drawing tools all inherit from mitk::Tool, which is a
+mitk::StateMachine. There is a number of derivations from Tool, each offering
+some helper methods for specific sub-classes, like manipulation of 2D slices.
+Tools are instantiated through the itk::ObjectFactory, which means that there is
+also one factory for each tool (e.g. mitk::AddContourToolFactory). For the GUI representation, each tool has an
+identification, consisting of a name and an icon (XPM). The actual drawing
+methods are mainly implemented in mitk::SegTool2D (helper methods) and its
+sub-classes for region growing, freehand drawing, etc.
+<li> <b>Slice manipulation</b>: There are two filters for manipulation of slices
+inside a 3D image volume. mitk::ExtractImageFilter retrieves a single 2D slice
+from a 3D volume. mitk::OverwriteSliceImageFilter replaces a slice inside a 3D
+volume with a second slice which is a parameter to the filter. These classes are
+used extensively by most of the tools to fulfill their task.
+mitk::OverwriteSliceImageFilter cooperates with the interpolation classes to
+inform them of single slice modifications.
+<li> <b>Interpolation of unsegmented slices</b>: There are two classes involved
+in interpolation: mitk::SegmentationInterpolationController knows a mitk::Image (the
+segmentation) and scans its contents for slices with non-zero pixels. It keeps
+track of changes in the image and is always able to tell, which neighbors of a
+slice (in the three orthogonal slice directions) contain segmentations. The
+class also performs this interpolation for single slices on demand.
+Again, we have a second class responsible for the GUI:
+QmitkSlicesInterpolator enables/disables interpolation and offers to
+accept interpolations for one or all slices.
+<li> <b>Undo</b>: Undo functionality is implemented in mitk::OverwriteSliceImageFilter,
+since this is the central place where all image modifications are made. The filter stores a binary difference image
+to the undo stack as a mitk::ApplyDiffImageOperation. When the user requests undo, this ApplyDiffImageOperation
+will be executed by a singleton class DiffImageApplier. The operation itself observes the image, which it refers to,
+for itk::DeleteEvent, so no undo operation will be executed on/for images that have already been destroyed.
+<li> <b>GUI</b>: The top-level GUI is the functionality
+QmitkSegmentation, which is very thin in comparison to ERIS. There are
+separate widgets for image and tool selection, for interpolation. Additionaly,
+there are some methods to create, delete, crop, load and save segmentations.
+</ol>
+
+**/

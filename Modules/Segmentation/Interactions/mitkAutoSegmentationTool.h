@@ -18,18 +18,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkAutoSegmentationTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkTool.h"
 
 namespace mitk
 {
+
+class Image;
 
 /**
   \brief Superclass for tool that create a new segmentation without user interaction in render windows
 
   This class is undocumented. Ask the creator ($Author$) to supply useful comments.
 */
-class Segmentation_EXPORT AutoSegmentationTool : public Tool
+class MitkSegmentation_EXPORT AutoSegmentationTool : public Tool
 {
   public:
 
@@ -59,7 +61,7 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
 
     virtual const char* GetGroup() const;
 
-    virtual Image::Pointer Get3DImage(Image::Pointer image, unsigned int timestep);
+    virtual itk::SmartPointer<Image> Get3DImage(itk::SmartPointer<Image> image, unsigned int timestep);
 
     bool m_OverwriteExistingSegmentation;
  };

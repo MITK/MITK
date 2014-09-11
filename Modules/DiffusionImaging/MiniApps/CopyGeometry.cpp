@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkDiffusionImage.h>
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkNrrdDiffusionImageWriter.h>
 #include "ctkCommandLineParser.h"
@@ -29,10 +28,16 @@ using namespace mitk;
 int CopyGeometry(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
+
+    parser.setTitle("Copy Geometry");
+    parser.setCategory("Preprocessing Tools");
+    parser.setDescription("");
+    parser.setContributor("MBI");
+
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("in", "i", ctkCommandLineParser::String, "input image", us::Any(), false);
-    parser.addArgument("ref", "r", ctkCommandLineParser::String, "reference image", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "output image", us::Any(), false);
+    parser.addArgument("in", "i", ctkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
+    parser.addArgument("ref", "r", ctkCommandLineParser::InputFile, "Reference:", "reference image", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -45,7 +50,6 @@ int CopyGeometry(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
 
         MITK_INFO << "Loading image " << imageName;
         const std::string s1="", s2="";
@@ -54,8 +58,8 @@ int CopyGeometry(int argc, char* argv[])
         infile = BaseDataIO::LoadBaseDataFromFile( imageName, s1, s2, false );
         Image::Pointer target = dynamic_cast<Image*>(infile.at(0).GetPointer());
 
-        mitk::Geometry3D* s_geom = source->GetGeometry();
-        mitk::Geometry3D* t_geom = target->GetGeometry();
+        mitk::BaseGeometry* s_geom = source->GetGeometry();
+        mitk::BaseGeometry* t_geom = target->GetGeometry();
 
         t_geom->SetIndexToWorldTransform(s_geom->GetIndexToWorldTransform());
         target->SetGeometry(t_geom);

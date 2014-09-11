@@ -42,7 +42,8 @@ public:
 
   mitkClassMacro( VtkScalarModeProperty, EnumerationProperty );
 
-  itkNewMacro(VtkScalarModeProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(VtkScalarModeProperty, const IdType&);
 

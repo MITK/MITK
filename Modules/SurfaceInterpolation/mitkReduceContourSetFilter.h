@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkReduceContourSetFilter_h_Included
 #define mitkReduceContourSetFilter_h_Included
 
-#include "SurfaceInterpolationExports.h"
+#include <MitkSurfaceInterpolationExports.h>
 #include "mitkSurfaceToSurfaceFilter.h"
 #include "mitkSurface.h"
 #include "mitkProgressBar.h"
@@ -52,7 +52,7 @@ namespace mitk {
   $Author: fetzer$
 */
 
-    class SurfaceInterpolation_EXPORT ReduceContourSetFilter : public SurfaceToSurfaceFilter
+    class MitkSurfaceInterpolation_EXPORT ReduceContourSetFilter : public SurfaceToSurfaceFilter
     {
 
     public:
@@ -69,7 +69,8 @@ namespace mitk {
         };
 
         mitkClassMacro(ReduceContourSetFilter,SurfaceToSurfaceFilter);
-        itkNewMacro(Self);
+        itkFactorylessNewMacro(Self)
+        itkCloneMacro(Self)
 
         itkSetMacro(MinSpacing, double);
         itkSetMacro(MaxSpacing, double);

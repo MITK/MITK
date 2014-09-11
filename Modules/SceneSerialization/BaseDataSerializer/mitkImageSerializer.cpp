@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkImageSerializer.h"
-
+#include "mitkImage.h"
 #include "mitkImageWriter.h"
 #include <Poco/Path.h>
 

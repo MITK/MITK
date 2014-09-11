@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGeometry3D.h>
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
+#include <mitkImagePixelReadAccessor.h>
 
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
@@ -31,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-int VolumeSize = 128;
+int ObliquePlaneTestVolumeSize = 128;
 
 
 
@@ -42,7 +43,7 @@ static void OverwriteObliquePlaneTest(mitk::Image* workingImage, mitk::Image* re
 /*==============TEST WITHOUT MITK CONVERTION=============================*/
 
     /* ============= setup plane ============*/
-  int sliceindex = (int)(VolumeSize/2);//rand() % 32;
+  int sliceindex = (int)(ObliquePlaneTestVolumeSize /2);//rand() % 32;
   bool isFrontside = true;
   bool isRotated = false;
 
@@ -90,19 +91,23 @@ static void OverwriteObliquePlaneTest(mitk::Image* workingImage, mitk::Image* re
   overwriter->Modified();
   overwriter->Update();
 
+  typedef mitk::ImagePixelReadAccessor< unsigned short, 3 > ReadAccessorType;
+  ReadAccessorType refImgReadAccessor( refImg );
+  ReadAccessorType workingImgReadAccessor( workingImage );
+
 
 
   /* ============= check ref == working ============*/
   bool areSame = true;
-  mitk::Index3D id;
+  itk::Index<3> id;
   id[0] = id[1] = id[2] = 0;
-  for (int x = 0; x < VolumeSize; ++x){
+  for (int x = 0; x < ObliquePlaneTestVolumeSize ; ++x){
     id[0]  = x;
-    for (int y = 0; y < VolumeSize; ++y){
+    for (int y = 0; y < ObliquePlaneTestVolumeSize ; ++y){
       id[1] = y;
-      for (int z = 0; z < VolumeSize; ++z){
+      for (int z = 0; z < ObliquePlaneTestVolumeSize ; ++z){
         id[2] = z;
-        areSame = refImg->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
+        areSame = refImgReadAccessor.GetPixelByIndex(id) == workingImgReadAccessor.GetPixelByIndex(id);
         if(!areSame)
           goto stop;
       }
@@ -147,13 +152,13 @@ stop:
   /* ============= check ref == working ============*/
   areSame = true;
   id[0] = id[1] = id[2] = 0;
-  for (int x = 0; x < VolumeSize; ++x){
+  for (int x = 0; x < ObliquePlaneTestVolumeSize ; ++x){
     id[0]  = x;
-    for (int y = 0; y < VolumeSize; ++y){
+    for (int y = 0; y < ObliquePlaneTestVolumeSize ; ++y){
       id[1] = y;
-      for (int z = 0; z < VolumeSize; ++z){
+      for (int z = 0; z < ObliquePlaneTestVolumeSize ; ++z){
         id[2] = z;
-        areSame = refImg->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
+        areSame = refImgReadAccessor.GetPixelByIndex(id) == workingImgReadAccessor.GetPixelByIndex(id);
         if(!areSame)
           goto stop2;
       }
@@ -166,8 +171,8 @@ stop2:
 /*==============TEST EDIT WITHOUT MITK CONVERTION=============================*/
 
   /* ============= edit slice ============*/
-  int idX = std::abs(VolumeSize-59);
-  int idY = std::abs(VolumeSize-23);
+  int idX = std::abs(ObliquePlaneTestVolumeSize -59);
+  int idY = std::abs(ObliquePlaneTestVolumeSize -23);
   int idZ = 0;
   int component = 0;
   double val = 33.0;
@@ -198,13 +203,13 @@ stop2:
 
   int x,y,z;
 
-  for ( x = 0; x < VolumeSize; ++x){
+  for ( x = 0; x < ObliquePlaneTestVolumeSize ; ++x){
     id[0]  = x;
-    for ( y = 0; y < VolumeSize; ++y){
+    for ( y = 0; y < ObliquePlaneTestVolumeSize ; ++y){
       id[1] = y;
-      for ( z = 0; z < VolumeSize; ++z){
+      for ( z = 0; z < ObliquePlaneTestVolumeSize ; ++z){
         id[2] = z;
-        areSame = refImg->GetPixelValueByIndex(id) == workingImage->GetPixelValueByIndex(id);
+        areSame = refImgReadAccessor.GetPixelByIndex(id) == workingImgReadAccessor.GetPixelByIndex(id);
         if(!areSame)
           goto stop3;
       }
@@ -238,7 +243,7 @@ int mitkOverwriteSliceFilterObliquePlaneTest(int argc, char* argv[])
     start[0] = start[1] = start[2] = 0;
 
     ImageType::SizeType size;
-    size[0] = size[1] = size[2] = VolumeSize;
+    size[0] = size[1] = size[2] = ObliquePlaneTestVolumeSize ;
 
     ImageType::RegionType imgRegion;
     imgRegion.SetSize(size);

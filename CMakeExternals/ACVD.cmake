@@ -24,8 +24,8 @@ if(MITK_USE_ACVD)
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
-      URL http://mitk.org/download/thirdparty/ACVD_8bbb6da1.tar.gz
-      URL_MD5 9cbce5e05e288982e05a95cda780fe64
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ACVD-vtk6_2d8f5ea5.tar.gz
+      URL_MD5 ecc97728a86798b35c20eef964b094c9
       PATCH_COMMAND ${ACVD_PATCH_COMMAND}
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
@@ -37,6 +37,6 @@ if(MITK_USE_ACVD)
 
     set(ACVD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
   else()
-    mitkMacroEmptyExternalProject(${proj} "${proj}_DEPENDENCIES}")
+    mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()
 endif()

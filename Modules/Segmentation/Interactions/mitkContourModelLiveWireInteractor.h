@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkContourModelLiveWireInteractor_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkContourModelInteractor.h"
 
 #include <mitkImageLiveWireContourModelFilter.h>
@@ -39,7 +39,7 @@ namespace mitk
   \warning Make sure the working image is properly set, otherwise the algorithm for computing livewire contour segments will not work!
 
   */
-  class Segmentation_EXPORT ContourModelLiveWireInteractor : public ContourModelInteractor
+  class MitkSegmentation_EXPORT ContourModelLiveWireInteractor : public ContourModelInteractor
   {
   public:
 

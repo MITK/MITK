@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFeedbackContourTool.h"
 #include "mitkLegacyAdaptors.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkDataNode.h"
 #include "mitkPointSet.h"
 #include "mitkToolCommand.h"
@@ -43,6 +43,9 @@ class ModuleResource;
 namespace mitk
 {
 
+  class StateMachineAction;
+  class InteractionEvent;
+
 /**
   \brief FastMarching semgentation tool.
 
@@ -53,14 +56,15 @@ namespace mitk
 
   For detailed documentation see ITK Software Guide section 9.3.1 Fast Marching Segmentation.
 */
-class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
+class MitkSegmentation_EXPORT FastMarchingTool : public FeedbackContourTool
 {
     mitkNewMessageMacro(Ready);
 
   public:
 
     mitkClassMacro(FastMarchingTool, FeedbackContourTool);
-    itkNewMacro(FastMarchingTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /* typedefs for itk pipeline */
     typedef float                                     InternalPixelType;
@@ -118,7 +122,9 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     FastMarchingTool();
     virtual ~FastMarchingTool();
 
-    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
+    void ConnectActionsAndFunctions();
+
+    //virtual float CanHandleEvent( StateEvent const *stateEvent) const;
 
     virtual void Activated();
     virtual void Deactivated();
@@ -127,10 +133,10 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     virtual void BuildITKPipeline();
 
     /// \brief Add point action of StateMachine pattern
-    virtual bool OnAddPoint (Action*, const StateEvent*);
+    virtual bool OnAddPoint ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Delete action of StateMachine pattern
-    virtual bool OnDelete (Action*, const StateEvent*);
+    virtual bool OnDelete ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Reset all relevant inputs of the itk pipeline.
     void Reset();
@@ -144,7 +150,7 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
 
     int m_CurrentTimeStep;
 
-    mitk::PositionEvent* m_PositionEvent;
+    mitk::InteractionPositionEvent::Pointer m_PositionEvent;
 
     float m_LowerThreshold; //used in Threshold filter
     float m_UpperThreshold; //used in Threshold filter
@@ -167,6 +173,9 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     GradientFilterType::Pointer m_GradientMagnitudeFilter;
     SigmoidFilterType::Pointer m_SigmoidFilter;
     FastMarchingFilterType::Pointer m_FastMarchingFilter;
+
+  private:
+    PlaneGeometry::Pointer m_WorkingPlane;
 
 };
 

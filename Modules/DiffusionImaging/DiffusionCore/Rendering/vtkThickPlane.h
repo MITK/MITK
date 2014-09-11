@@ -24,19 +24,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __vtkThickPlane_h
 #define __vtkThickPlane_h
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 #include "vtkImplicitFunction.h"
 #include "mitkCommon.h"
 
-class DiffusionCore_EXPORT vtkThickPlane : public vtkImplicitFunction
+class MitkDiffusionCore_EXPORT vtkThickPlane : public vtkImplicitFunction
 {
 public:
   // Description
   // Construct plane passing through origin and normal to z-axis.
   static vtkThickPlane *New();
 
-  vtkTypeRevisionMacro(vtkThickPlane,vtkImplicitFunction);
+  vtkTypeMacro(vtkThickPlane,vtkImplicitFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description

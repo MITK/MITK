@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // vnl includes
 #include "vnl/vnl_matrix.h"
 
-PMDHandle m_PMDHandle; //TODO
-PMDDataDescription m_DataDescription; //TODO
+PMDHandle m_PMDHandle;
+PMDDataDescription m_DataDescription;
 
 struct SourceDataStruct {
    PMDDataDescription dataDescription;

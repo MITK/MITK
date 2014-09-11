@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
 #define PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
 #include "mitkGenericProperty.h"
 #include "mitkUIDGenerator.h"
@@ -71,7 +71,8 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
     /**
      * Method for creation through the object factory.
      */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * Map structure to hold the properties: the map key is a string,
@@ -130,41 +131,95 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
     * @brief Convenience method to access the value of a BoolProperty
     */
     bool GetBoolProperty(const char* propertyKey, bool& boolValue) const;
+    /**
+    * @brief ShortCut for the above method
+    */
+    bool Get(const char* propertyKey, bool& boolValue) const;
 
     /**
     * @brief Convenience method to set the value of a BoolProperty
     */
     void SetBoolProperty( const char* propertyKey, bool boolValue);
+    /**
+    * @brief ShortCut for the above method
+    */
+    void Set( const char* propertyKey, bool boolValue);
 
     /**
     * @brief Convenience method to access the value of an IntProperty
     */
     bool GetIntProperty(const char* propertyKey, int &intValue) const;
+    /**
+    * @brief ShortCut for the above method
+    */
+    bool Get(const char* propertyKey, int &intValue) const;
 
     /**
     * @brief Convenience method to set the value of an IntProperty
     */
     void SetIntProperty(const char* propertyKey, int intValue);
+    /**
+    * @brief ShortCut for the above method
+    */
+    void Set(const char* propertyKey, int intValue);
 
     /**
     * @brief Convenience method to access the value of a FloatProperty
     */
     bool GetFloatProperty(const char* propertyKey, float &floatValue) const;
+    /**
+    * @brief ShortCut for the above method
+    */
+    bool Get(const char* propertyKey, float &floatValue) const;
 
     /**
     * @brief Convenience method to set the value of a FloatProperty
     */
     void SetFloatProperty( const char* propertyKey, float floatValue);
+    /**
+    * @brief ShortCut for the above method
+    */
+    void Set( const char* propertyKey, float floatValue);
+
+    /**
+    * @brief Convenience method to access the value of a DoubleProperty
+    */
+    bool GetDoubleProperty(const char* propertyKey, double &doubleValue) const;
+    /**
+    * @brief ShortCut for the above method
+    */
+    bool Get(const char* propertyKey, double &doubleValue) const;
+
+    /**
+    * @brief Convenience method to set the value of a DoubleProperty
+    */
+    void SetDoubleProperty( const char* propertyKey, double doubleValue);
+    /**
+    * @brief ShortCut for the above method
+    */
+    void Set( const char* propertyKey, double doubleValue);
 
     /**
     * @brief Convenience method to access the value of a StringProperty
     */
     bool GetStringProperty(const char* propertyKey, std::string& stringValue) const;
+    /**
+    * @brief ShortCut for the above method
+    */
+    bool Get(const char* propertyKey, std::string& stringValue) const;
 
     /**
     * @brief Convenience method to set the value of a StringProperty
     */
     void SetStringProperty( const char* propertyKey, const char* stringValue);
+    /**
+    * @brief ShortCut for the above method
+    */
+    void Set( const char* propertyKey, const char* stringValue);
+    /**
+    * @brief ShortCut for the above method
+    */
+    void Set( const char* propertyKey, const std::string& stringValue);
 
     /**
      * @brief Get the timestamp of the last change of the map or the last change of one of

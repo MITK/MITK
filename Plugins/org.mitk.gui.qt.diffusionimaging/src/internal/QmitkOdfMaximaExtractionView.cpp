@@ -213,6 +213,9 @@ void QmitkOdfMaximaExtractionView::ConvertShCoeffs()
 
     switch (shOrder)
     {
+    case 2:
+        TemplatedConvertShCoeffs<2>(mitkImg);
+        break;
     case 4:
         TemplatedConvertShCoeffs<4>(mitkImg);
         break;
@@ -246,7 +249,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
         typedef itk::FslPeakImageConverter< float > FilterType;
         FilterType::Pointer filter = FilterType::New();
         FilterType::InputType::Pointer inputVec = FilterType::InputType::New();
-        mitk::Geometry3D::Pointer geom;
+        mitk::BaseGeometry::Pointer geom;
 
         for (int i=0; i<m_ImageNodes.size(); i++)
         {
@@ -308,7 +311,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
 
         // cast to itk
         mitk::Image::Pointer mitkImg = dynamic_cast<mitk::Image*>(m_ImageNodes.at(0)->GetData());
-        mitk::Geometry3D::Pointer geom = mitkImg->GetGeometry();
+        mitk::BaseGeometry::Pointer geom = mitkImg->GetGeometry();
         typedef mitk::ImageToItk< FilterType::InputImageType > CasterType;
         CasterType::Pointer caster = CasterType::New();
         caster->SetInput(mitkImg);
@@ -387,11 +390,11 @@ void QmitkOdfMaximaExtractionView::StartTensor()
     typedef itk::DiffusionTensorPrincipalDirectionImageFilter< float, float > MaximaExtractionFilterType;
     MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
 
-    mitk::Geometry3D::Pointer geometry;
+    mitk::BaseGeometry::Pointer geometry;
     try{
         TensorImage::Pointer img = dynamic_cast<TensorImage*>(m_TensorImageNodes.at(0)->GetData());
         ItkTensorImage::Pointer itkImage = ItkTensorImage::New();
-        CastToItkImage<ItkTensorImage>(img, itkImage);
+        CastToItkImage(img, itkImage);
         filter->SetInput(itkImage);
         geometry = img->GetGeometry();
     }
@@ -407,7 +410,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
     {
         ItkUcharImgType::Pointer itkMaskImage = ItkUcharImgType::New();
         Image::Pointer mitkMaskImg = dynamic_cast<Image*>(m_BinaryImageNodes.at(0)->GetData());
-        CastToItkImage<ItkUcharImgType>(mitkMaskImg, itkMaskImage);
+        CastToItkImage(mitkMaskImg, itkMaskImage);
         filter->SetMaskImage(itkMaskImage);
     }
 
@@ -487,7 +490,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
         filter->SetToolkit(MaximaExtractionFilterType::FSL);
     }
 
-    mitk::Geometry3D::Pointer geometry;
+    mitk::BaseGeometry::Pointer geometry;
     try{
         Image::Pointer img = dynamic_cast<Image*>(m_ImageNodes.at(0)->GetData());
         typedef ImageToItk< typename MaximaExtractionFilterType::CoefficientImageType > CasterType;
@@ -515,7 +518,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
     {
         ItkUcharImgType::Pointer itkMaskImage = ItkUcharImgType::New();
         Image::Pointer mitkMaskImg = dynamic_cast<Image*>(m_BinaryImageNodes.at(0)->GetData());
-        CastToItkImage<ItkUcharImgType>(mitkMaskImg, itkMaskImage);
+        CastToItkImage(mitkMaskImg, itkMaskImage);
         filter->SetMaskImage(itkMaskImage);
     }
 
@@ -626,7 +629,7 @@ void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
     typedef itk::OdfMaximaExtractionFilter< float > MaximaExtractionFilterType;
     MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
 
-    mitk::Geometry3D::Pointer geometry;
+    mitk::BaseGeometry::Pointer geometry;
     if (!m_ImageNodes.empty())
     {
         try{
@@ -654,7 +657,7 @@ void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
     {
         ItkUcharImgType::Pointer itkMaskImage = ItkUcharImgType::New();
         Image::Pointer mitkMaskImg = dynamic_cast<Image*>(m_BinaryImageNodes.at(0)->GetData());
-        CastToItkImage<ItkUcharImgType>(mitkMaskImg, itkMaskImage);
+        CastToItkImage(mitkMaskImg, itkMaskImage);
         filter->SetMaskImage(itkMaskImage);
     }
 

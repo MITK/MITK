@@ -20,15 +20,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <sofa/core/visual/DrawToolGL.h>
 #include <sofa/simulation/common/Simulation.h>
-#include <SimulationExports.h>
+#include <MitkSimulationExports.h>
 
 namespace mitk
 {
-  class Simulation_EXPORT Simulation : public BaseData
+  class MitkSimulation_EXPORT Simulation : public BaseData
   {
   public:
     mitkClassMacro(Simulation, BaseData);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void Animate();
     sofa::core::visual::DrawTool* GetDrawTool();

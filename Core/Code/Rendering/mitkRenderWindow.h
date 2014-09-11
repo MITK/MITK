@@ -14,17 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66ASDF
 #define MITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66ASDF
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 #include "mitkRenderWindowBase.h"
 
 namespace mitk
 {
-
 class vtkEventProvider;
 
 /**
@@ -36,15 +34,14 @@ class vtkEventProvider;
  */
 class MITK_CORE_EXPORT RenderWindow: public mitk::RenderWindowBase, public itk::Object
 {
-
-
 public:
   mitkClassMacro(RenderWindow, itk::Object);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro1Param(Self, vtkRenderWindow*);
   mitkNewMacro2Param(Self, vtkRenderWindow*, const char*);
   mitkNewMacro3Param(Self, vtkRenderWindow*, const char*, mitk::RenderingManager*);
-
+  mitkNewMacro4Param(Self, vtkRenderWindow*, const char*, mitk::RenderingManager*, mitk::BaseRenderer::RenderingMode::Type);
 
   virtual ~RenderWindow();
 
@@ -85,10 +82,8 @@ public:
   */
   void ReinitEventProvider();
 
-
 protected:
-    RenderWindow(vtkRenderWindow * existingRenderWindow = NULL , const char* name = "unnamed renderer", mitk::RenderingManager* rm = NULL );
-
+  RenderWindow(vtkRenderWindow * existingRenderWindow = NULL , const char* name = "unnamed renderer", mitk::RenderingManager* rm = NULL, mitk::BaseRenderer::RenderingMode::Type rmtype = mitk::BaseRenderer::RenderingMode::Standard );
 
     void ResetView();
     vtkRenderWindow *               m_vtkRenderWindow;
@@ -96,12 +91,8 @@ protected:
 
     vtkEventProvider *              m_vtkMitkEventProvider;
 
-
 private:
-
-
 };
-
 } //namespace
 
 #endif /* MITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66ASDF */

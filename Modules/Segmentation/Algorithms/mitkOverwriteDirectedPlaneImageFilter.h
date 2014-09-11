@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkOverwriteDirectedPlaneImageFilter_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkImageToImageFilter.h"
 
 #include <itkImage.h>
@@ -54,18 +54,19 @@ namespace mitk
 
   Last contributor: $Author: maleike $
 */
-class Segmentation_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImageFilter
+class MitkSegmentation_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImageFilter
 {
   public:
 
     mitkClassMacro(OverwriteDirectedPlaneImageFilter, ImageToImageFilter);
-    itkNewMacro(OverwriteDirectedPlaneImageFilter);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
       \brief Which plane to overwrite
     */
-    const Geometry3D* GetPlaneGeometry3D() const { return m_PlaneGeometry; }
-    void SetPlaneGeometry3D( const Geometry3D *geometry ) { m_PlaneGeometry = geometry; }
+    const BaseGeometry* GetPlaneGeometry3D() const { return m_PlaneGeometry; }
+    void SetPlaneGeometry3D( const BaseGeometry *geometry ) { m_PlaneGeometry = geometry; }
 
     /**
       \brief Time step of the slice to overwrite
@@ -92,7 +93,7 @@ class Segmentation_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImag
     virtual void GenerateData();
 
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkSliceOverwriting (itk::Image<TPixel, VImageDimension>* input3D);
+    void ItkSliceOverwriting ( itk::Image<TPixel, VImageDimension>* input3D);
 
     template<typename TPixel, unsigned int VImageDimension>
     void ItkImageSwitch( itk::Image<TPixel,VImageDimension>* image );
@@ -105,8 +106,8 @@ class Segmentation_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImag
     Image::ConstPointer m_SliceImage;
     Image::Pointer m_SliceDifferenceImage;
 
-    const Geometry3D  *m_PlaneGeometry;
-    const Geometry3D *m_ImageGeometry3D;
+    const BaseGeometry  *m_PlaneGeometry;
+    const BaseGeometry *m_ImageGeometry3D;
     unsigned int m_TimeStep;
     unsigned int m_Dimension0;
     unsigned int m_Dimension1;

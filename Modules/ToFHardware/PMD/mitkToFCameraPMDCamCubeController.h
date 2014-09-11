@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDCamCubeController_h
 #define __mitkToFCameraPMDCamCubeController_h
 
-#include "mitkPMDModuleExports.h"
+#include <MitkPMDExports.h>
 #include "mitkCommon.h"
 #include "mitkToFCameraPMDController.h"
 
@@ -37,7 +37,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraPMDCamCubeController , ToFCameraPMDController );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief opens a connection to the ToF camera and initializes the hardware specific members

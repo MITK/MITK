@@ -210,16 +210,27 @@ int mitkImageAccessorTest(int argc, char* argv[])
    }
 
 
-   // CHECK PROHIBITED AND UNAPPROPRIATE USE
+   // CHECK INAPPROPRIATE AND SPECIAL USAGE
 
    // recursive mutex lock
    MITK_TEST_OUTPUT( << "Testing a recursive mutex lock attempt, should end in an exception ...");
 
    MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception)
      mitk::ImageWriteAccessor first(image);
-     mitk::ImageWriteAccessor second(image);
+     mitk::ImageReadAccessor second(image);
    MITK_TEST_FOR_EXCEPTION_END(mitk::Exception)
 
+   // ignore lock mechanism in read accessor
+   try
+   {
+     mitk::ImageWriteAccessor first(image);
+     mitk::ImageReadAccessor second(image, NULL, mitk::ImageAccessorBase::IgnoreLock);
+     MITK_TEST_CONDITION_REQUIRED(true, "Testing the option flag \"IgnoreLock\" in ReadAccessor");
+   }
+   catch(const mitk::Exception& /*e*/)
+   {
+     MITK_TEST_CONDITION_REQUIRED(false, "Ignoring the lock mechanism leads to exception.");
+   }
 
    // CREATE THREADS
 

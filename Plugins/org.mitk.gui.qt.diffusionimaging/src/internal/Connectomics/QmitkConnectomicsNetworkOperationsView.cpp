@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsSimulatedAnnealingPermutationModularity.h"
 #include "mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h"
 #include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
+#include <mitkConnectomicsNetworkThresholder.h>
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
@@ -78,7 +79,7 @@ void QmitkConnectomicsNetworkOperationsView::CreateQtPartControl( QWidget *paren
   {
     this->m_Controls->convertToRGBAImagePushButton->show();
     this->m_Controls->modularizePushButton->hide();
-    this->m_Controls->pruneOptionsGroupBox->hide();
+    this->m_Controls->pruneOptionsGroupBox->show();
   }
   else
   {
@@ -437,10 +438,43 @@ void QmitkConnectomicsNetworkOperationsView::OnPrunePushButtonClicked()
 
     {
       mitk::ConnectomicsNetwork* network = dynamic_cast<mitk::ConnectomicsNetwork*>( node->GetData() );
+
       if( node.IsNotNull() && network )
       {
-        // Edge pruning will also do node pruning
-        network->PruneEdgesBelowWeight( this->m_Controls->pruneEdgeWeightSpinBox->value() );
+        mitk::ConnectomicsNetworkThresholder::Pointer thresholder = mitk::ConnectomicsNetworkThresholder::New();
+        thresholder->SetNetwork( network );
+        thresholder->SetTargetThreshold( this->m_Controls->targetThresholdSpinBox->value() );
+        thresholder->SetTargetDensity( this->m_Controls->densityThresholdDoubleSpinBox->value() );
+
+        if( this->m_Controls->thresholdBasedThresholdingCheckBox->isChecked() )
+        {
+          thresholder->SetThresholdingScheme( mitk::ConnectomicsNetworkThresholder::ThresholdBased );
+
+          mitk::DataNode::Pointer thresholdBasedNode = mitk::DataNode::New();
+          thresholdBasedNode->SetData ( thresholder->GetThresholdedNetwork() );
+          thresholdBasedNode->SetName( "Threshold based" );
+          this->GetDefaultDataStorage()->Add(thresholdBasedNode, node );
+        }
+
+        if( this->m_Controls->largestDensityLowerThanCheckBox->isChecked() )
+        {
+          thresholder->SetThresholdingScheme( mitk::ConnectomicsNetworkThresholder::LargestLowerThanDensity );
+
+          mitk::DataNode::Pointer thresholdBasedNode = mitk::DataNode::New();
+          thresholdBasedNode->SetData ( thresholder->GetThresholdedNetwork() );
+          thresholdBasedNode->SetName( "Largest density below threshold" );
+          this->GetDefaultDataStorage()->Add(thresholdBasedNode, node );
+        }
+
+        if( this->m_Controls->RandomRemovalThresholdingCheckBox->isChecked() )
+        {
+          thresholder->SetThresholdingScheme( mitk::ConnectomicsNetworkThresholder::RandomRemovalOfWeakest );
+
+          mitk::DataNode::Pointer thresholdBasedNode = mitk::DataNode::New();
+          thresholdBasedNode->SetData ( thresholder->GetThresholdedNetwork() );
+          thresholdBasedNode->SetName( "Random removal threshold" );
+          this->GetDefaultDataStorage()->Add(thresholdBasedNode, node );
+        }
       }
     }
   }

@@ -1,6 +1,9 @@
 # Called by tinyxml.cmake (ExternalProject_Add) as a patch for tinyxml.
 # Adds #define TIXML_USE_STL to enable STL string support
 
+configure_file(${CMAKE_CURRENT_LIST_DIR}/Patchtinyxml-2.6.2.h tinyxml.h COPYONLY)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/Patchtinyxml-2.6.2.cpp tinyxml.cpp COPYONLY)
+
 # read whole file
 file(STRINGS tinyxml.h sourceCode NEWLINE_CONSUME)
 

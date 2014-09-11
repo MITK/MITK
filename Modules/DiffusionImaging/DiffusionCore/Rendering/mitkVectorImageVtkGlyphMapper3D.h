@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_VECTOR_IMAGE_VTK_MAPPER_3D__H
 #define _MITK_VECTOR_IMAGE_VTK_MAPPER_3D__H
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 #include "mitkVtkMapper.h"
 #include "mitkImage.h"
@@ -31,12 +31,13 @@ class vtkMaskPoints;
 namespace mitk
 {
 
-class DiffusionCore_EXPORT VectorImageVtkGlyphMapper3D : public VtkMapper
+class MitkDiffusionCore_EXPORT VectorImageVtkGlyphMapper3D : public VtkMapper
 {
 public:
     mitkClassMacro( VectorImageVtkGlyphMapper3D, VtkMapper );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     enum GlyphType {LineGlyph, ArrowGlyph};
 

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define VERBOSELIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E96
 
 // MITK header
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkLimitedLinearUndo.h"
 // STL header
 #include <vector>
@@ -41,7 +41,8 @@ class MITK_CORE_EXPORT VerboseLimitedLinearUndo : public LimitedLinearUndo
 {
 public:
   mitkClassMacro(VerboseLimitedLinearUndo, LimitedLinearUndo);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef std::pair<int,std::string> StackDescriptionItem;
   typedef std::vector<StackDescriptionItem> StackDescription; /// a list of pairs (int,string), representing a stack with ObjectEventIDs and descriptions

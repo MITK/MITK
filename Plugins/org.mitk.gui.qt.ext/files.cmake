@@ -3,10 +3,12 @@ set(SRC_CPP_FILES
   QmitkExtWorkbenchWindowAdvisor.cpp
   QmitkExtFileSaveProjectAction.cpp
   QmitkOpenDicomEditorAction.cpp
+  QmitkOpenXnatEditorAction.cpp
 )
 
 set(INTERNAL_CPP_FILES
   QmitkAppInstancesPreferencePage.cpp
+  QmitkExternalProgramsPreferencePage.cpp
   QmitkCommonExtPlugin.cpp
   QmitkInputDevicesPrefPage.cpp
   QmitkModuleView.cpp
@@ -14,6 +16,7 @@ set(INTERNAL_CPP_FILES
 
 set(UI_FILES
   src/internal/QmitkAppInstancesPreferencePage.ui
+  src/internal/QmitkExternalProgramsPreferencePage.ui
 )
 
 set(MOC_H_FILES
@@ -21,11 +24,13 @@ set(MOC_H_FILES
   src/QmitkExtWorkbenchWindowAdvisor.h
 
   src/internal/QmitkAppInstancesPreferencePage.h
+  src/internal/QmitkExternalProgramsPreferencePage.h
   src/internal/QmitkCommonExtPlugin.h
   src/internal/QmitkExtWorkbenchWindowAdvisorHack.h
   src/internal/QmitkInputDevicesPrefPage.h
   src/internal/QmitkModuleView.h
   src/QmitkOpenDicomEditorAction.h
+  src/QmitkOpenXnatEditorAction.h
 )
 
 set(CACHED_RESOURCE_FILES

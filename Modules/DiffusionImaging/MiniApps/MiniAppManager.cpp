@@ -28,7 +28,10 @@ MiniAppManager* MiniAppManager::GetInstance()
 // the app will be run
 int MiniAppManager::RunMiniApp(int argc, char* argv[])
 {
-    itk::MultiThreader::SetGlobalDefaultNumberOfThreads(itk::MultiThreader::GetGlobalMaximumNumberOfThreads());
+    int threadNum = itk::MultiThreader::GetGlobalMaximumNumberOfThreads();
+    if (threadNum>12)
+        threadNum = 12;
+    itk::MultiThreader::SetGlobalDefaultNumberOfThreads(threadNum);
     try
     {
         std::string nameOfMiniApp;
@@ -53,8 +56,16 @@ int MiniAppManager::RunMiniApp(int argc, char* argv[])
         }
         else
         {
-            nameOfMiniApp = argv[1];
-            //--argc;
+            std::string arg = argv[1];
+
+            if (arg == "--xml")
+            {
+                std::cout << this->CreateXML() << std::endl;
+            }
+            else
+            {
+                nameOfMiniApp = argv[1];
+            }
         }
 
         it = m_Functions.find(nameOfMiniApp);
@@ -64,7 +75,7 @@ int MiniAppManager::RunMiniApp(int argc, char* argv[])
             throw std::invalid_argument(s.str().c_str());
         }
 
-        MITK_INFO << "Start " << nameOfMiniApp << " ..";
+//        MITK_INFO << "Start " << nameOfMiniApp << " ..";
         MiniAppFunction func = it->second;
         return func( argc, argv );
     }
@@ -90,4 +101,23 @@ MiniAppManager::AddFunction(const std::string& name, MiniAppFunction func)
 {
     m_Functions.insert( std::pair<std::string, MiniAppFunction>(name, func) );
     return func;
+}
+
+std::string MiniAppManager::CreateXML() const
+{
+    std::ostringstream output;
+
+    output << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl;
+    output << "<executables>" << std::endl;
+
+    std::map<std::string, MiniAppFunction>::const_iterator it = m_Functions.begin();
+
+    for (; it != m_Functions.end(); ++it)
+    {
+        output << "  <executable name=\"" << it->first << "\"/>" << std::endl;
+    }
+
+    output << "</executables>";
+
+    return output.str();
 }

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkExtractImageFilter_h_Included
 
 #include "mitkCommon.h"
-#include "ImageExtractionExports.h"
+#include <MitkImageExtractionExports.h>
 #include "mitkImageToImageFilter.h"
 
 #include "itkImage.h"
@@ -49,12 +49,13 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class ImageExtraction_EXPORT ExtractImageFilter : public ImageToImageFilter
+class MitkImageExtraction_EXPORT ExtractImageFilter : public ImageToImageFilter
 {
   public:
 
     mitkClassMacro(ExtractImageFilter, ImageToImageFilter);
-    itkNewMacro(ExtractImageFilter);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
       \brief Which slice to extract (first one has index 0).
@@ -100,7 +101,7 @@ class ImageExtraction_EXPORT ExtractImageFilter : public ImageToImageFilter
     virtual void GenerateData();
 
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image );
+    void ItkImageProcessing( const itk::Image<TPixel,VImageDimension>* image );
 
     unsigned int m_SliceIndex;
     unsigned int m_SliceDimension;

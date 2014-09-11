@@ -171,7 +171,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
         {  //set 0-Gradient to bValue 0
             vecCont->InsertElement(i,0);
         }else{
-            vecCont->InsertElement(i,m_DiffusionImage->GetB_Value());
+            vecCont->InsertElement(i,m_DiffusionImage->GetReferenceBValue());
         }
     }
 
@@ -216,7 +216,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
 
     itk::ImageRegionConstIterator< BinaryImageType > it(binaryImageToItk1->GetOutput(), binaryImageToItk1->GetOutput()->GetRequestedRegion());
     it.GoToBegin();
-    mitk::Geometry3D* geom = m_DiffusionImage->GetGeometry();
+    mitk::BaseGeometry* geom = m_DiffusionImage->GetGeometry();
 
     while(!it.IsAtEnd())
     {
@@ -276,6 +276,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     fiberPolyData->SetLines(vCellArray);
 
     mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberPolyData);
+    fib->SetReferenceImage(dynamic_cast<mitk::Image*>(m_DiffusionImageNode->GetData()));
     mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
     fbNode->SetData(fib);
     QString name("FiberBundle_");

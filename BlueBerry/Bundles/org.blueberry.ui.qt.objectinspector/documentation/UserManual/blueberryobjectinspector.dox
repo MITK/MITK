@@ -1,7 +1,7 @@
 /**
 \page org_blueberry_ui_qt_objectinspector The Object Browser
 
-\image html ObjectBrowser.png "Icon of the Module"
+\imageMacro{ObjectBrowser.png,"Icon of the Object Browser",2.00}
 
 This view is only a debugging tool for berry::Object derived classes.
 

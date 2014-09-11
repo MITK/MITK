@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKTOFPROCESSINGCOMMON_H
 #define MITKTOFPROCESSINGCOMMON_H
 
-#include "mitkToFProcessingExports.h"
+#include <MitkToFProcessingExports.h>
 #include <mitkCameraIntrinsics.h>
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include <vnl/vnl_math.h>
 
 namespace mitk
@@ -39,7 +39,7 @@ namespace mitk
   * \image html ../Modules/ToFProcessing/Documentation/ImagePlane.png
   * @ingroup ToFProcessing
   */
-  class mitkToFProcessing_EXPORT ToFProcessingCommon
+  class MitkToFProcessing_EXPORT ToFProcessingCommon
   {
   public:
     typedef double ToFScalarType;
@@ -85,7 +85,7 @@ namespace mitk
     \param principalPoint coordinates of principal point on image plane in pixel
     \return cartesian coordinates for current index will be written here
     */
-    inline static ToFPoint3D IndexToCartesianCoordinates(mitk::Index3D index, ToFScalarType distance,
+    inline static ToFPoint3D IndexToCartesianCoordinates(itk::Index<3> index, ToFScalarType distance,
       ToFPoint2D focalLength, ToFPoint2D principalPoint)
     {
       return IndexToCartesianCoordinates(index[0],index[1],distance,focalLength[0],focalLength[1],principalPoint[0], principalPoint[1]);
@@ -145,7 +145,7 @@ namespace mitk
     \param principalPoint coordinates of principal point on image plane in pixel
     \return cartesian coordinates for current index will be written here
     */
-    inline static ToFPoint3D IndexToCartesianCoordinatesWithInterpixdist(mitk::Index3D index, ToFScalarType distance, ToFScalarType focalLength,
+    inline static ToFPoint3D IndexToCartesianCoordinatesWithInterpixdist(itk::Index<3> index, ToFScalarType distance, ToFScalarType focalLength,
       ToFPoint2D interPixelDistance, ToFPoint2D principalPoint)
     {
       return IndexToCartesianCoordinatesWithInterpixdist(index[0],index[1],distance,focalLength,interPixelDistance[0], interPixelDistance[1],principalPoint[0], principalPoint[1]);
@@ -289,7 +289,7 @@ namespace mitk
       return KinectIndexToCartesianCoordinates(i,j,distance,focalLength[0],focalLength[1],principalPoint[0],principalPoint[1]);
     }
 
-    inline static ToFPoint3D KinectIndexToCartesianCoordinates(mitk::Index3D index, ToFScalarType distance, ToFPoint2D focalLength, ToFPoint2D principalPoint)
+    inline static ToFPoint3D KinectIndexToCartesianCoordinates(itk::Index<3> index, ToFScalarType distance, ToFPoint2D focalLength, ToFPoint2D principalPoint)
     {
         return KinectIndexToCartesianCoordinates(index[0],index[1],distance,focalLength[0],focalLength[1],principalPoint[0], principalPoint[1]);
     }

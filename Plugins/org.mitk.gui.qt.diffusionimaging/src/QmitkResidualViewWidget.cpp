@@ -56,7 +56,7 @@ void QmitkResidualViewWidget::mousePressEvent(QMouseEvent* event) {
 }
 
 
-void QmitkResidualViewWidget::mouseReleaseEvent(QMouseEvent* event) {
+void QmitkResidualViewWidget::mouseReleaseEvent(QMouseEvent*) {
   setCursor(Qt::OpenHandCursor);
   m_LastPanPoint = QPoint();
 }

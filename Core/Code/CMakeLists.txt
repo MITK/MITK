@@ -14,31 +14,46 @@ set_source_files_properties( Controllers/mitkSliceNavigationController.cpp COMPI
 # Mitk Core library.
 set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 0)
 
-MITK_CREATE_MODULE( Mitk
+MITK_CREATE_MODULE(Core
   INCLUDE_DIRS
     Algorithms Common DataManagement Controllers
     Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}
   INTERNAL_INCLUDE_DIRS
     ${OPENGL_INCLUDE_DIR}
   DEPENDS mbilog CppMicroServices
-  PACKAGE_DEPENDS tinyxml ITK GDCM VTK OpenGL
+  PACKAGE_DEPENDS tinyxml GDCM
+                  ITK|ITKTransform+ITKImageGrid+ITKImageFeature+ITKTestKernel+ITKIORAW
+                  VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingVolumeOpenGL+vtkRenderingFreeTypeOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
+                  OpenGL
   EXPORT_DEFINE MITK_CORE_EXPORT
   WARNINGS_AS_ERRORS
+  # Do not automatically create CppMicroServices initialization code.
+  # Because the VTK 6 "auto-init" functionality injects file-local static
+  # initialization code in every cpp file which includes a VTK header,
+  # static initialization order becomes an issue again. For the Mitk
+  # core library, we need to ensure that the VTK static initialization stuff
+  # happens before the CppMicroServices initialization, since the latter
+  # might already use VTK code which needs to access VTK object factories.
+  # Hence, CppMicroServices initialization code is placed manually within
+  # the mitkCoreActivator.cpp file.
+  NO_INIT
 )
 
 # this is needed for libraries which link to Mitk and need
 # symbols from explicitly instantiated templates
 if(MINGW)
-  get_target_property(_mitkCore_MINGW_linkflags Mitk LINK_FLAGS)
+  get_target_property(_mitkCore_MINGW_linkflags ${MODULE_TARGET} LINK_FLAGS)
   if(NOT _mitkCore_MINGW_linkflags)
     set(_mitkCore_MINGW_linkflags "")
   endif(NOT _mitkCore_MINGW_linkflags)
-  set_target_properties(Mitk PROPERTIES LINK_FLAGS "${_mitkCore_MINGW_linkflags} -Wl,--export-all-symbols")
+  set_target_properties(${MODULE_TARGET} PROPERTIES LINK_FLAGS "${_mitkCore_MINGW_linkflags} -Wl,--export-all-symbols")
 endif(MINGW)
 
 if(MSVC_IDE OR MSVC_VERSION OR MINGW)
-  target_link_libraries(Mitk psapi.lib)
+  target_link_libraries(${MODULE_TARGET} psapi.lib)
 endif(MSVC_IDE OR MSVC_VERSION OR MINGW)
+
+add_subdirectory(TestingHelper)
 
 # build tests?
 if(BUILD_TESTING)

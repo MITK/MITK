@@ -150,7 +150,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       {
         MITK_INFO<< "Kinect is connected here";
         //If the particular property is selected, the suitable data-node will be generated
-        this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_KinectParameterWidget->IsAcquisitionModeRGB());//--------------------------------------------------------
+        this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_KinectParameterWidget->IsAcquisitionModeRGB());
         this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_KinectParameterWidget->IsAcquisitionModeIR());
       }
 
@@ -346,10 +346,14 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       // ask wether camera parameters (intrinsics, ...) should be loaded
       if (QMessageBox::question(this,"Camera parameters","Do you want to specify your own camera intrinsics?",QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes)
       {
-        QString fileName = QFileDialog::getOpenFileName(this,"Open camera intrinsics","/","*.xml");
-        mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
-        cameraIntrinsics->FromXMLFile(fileName.toStdString());
-        this->m_ToFImageGrabber->SetProperty("CameraIntrinsics",mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
+        try {
+          QString fileName = QFileDialog::getOpenFileName(this,"Open camera intrinsics","/","*.xml");
+          mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
+          cameraIntrinsics->FromXMLFile(fileName.toStdString());
+          this->m_ToFImageGrabber->SetProperty("CameraIntrinsics",mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
+        } catch ( std::exception &e ) {
+          MITK_WARN << "Error loading camera intrinsics: " << e.what();
+        }
       }
       ////Reset the status of some GUI-Elements
       m_Controls->m_DeviceList->setEnabled(false);          //Deactivating the Instance of QmitkServiceListWidget

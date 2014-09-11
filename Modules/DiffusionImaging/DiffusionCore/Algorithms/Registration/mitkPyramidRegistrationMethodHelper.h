@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPYRAMIDREGISTRATIONMETHODHELPER_H
 #define MITKPYRAMIDREGISTRATIONMETHODHELPER_H
 
-#include <DiffusionCoreExports.h>
+#include <MitkDiffusionCoreExports.h>
 
 #include <itkCommand.h>
 
@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   nonConstImage2->Update();                                                                         \
   _checkSpecificDimension(mitkImage1, (dimension));                                                 \
   _checkSpecificDimension(mitkImage2, (dimension));                                                 \
-  _accessTwoImagesByItkForEach(itkImageTypeFunction, ((short, dimension))((float, dimension)), ((short, dimension))((float, dimension)) ) \
+  _accessTwoImagesByItkForEach(itkImageTypeFunction, ((short, dimension))((unsigned short, dimension))((float, dimension))((double, dimension)), ((short, dimension))((unsigned short, dimension))((float, dimension))((double, dimension)) ) \
   {                                                                                                 \
     std::string msg("Pixel type ");                                                                 \
     msg.append(pixelType1.GetComponentTypeAsString() );                                             \
@@ -73,7 +73,9 @@ public:
 
   typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
 
-  itkNewMacro( PyramidOptControlCommand )
+  mitkClassMacro(PyramidOptControlCommand<RegistrationType>, itk::Command)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   void Execute(itk::Object *caller, const itk::EventObject & /*event*/)
   {
@@ -101,9 +103,11 @@ template <typename OptimizerType>
 class OptimizerIterationCommand : public itk::Command
 {
 public:
-  itkNewMacro( OptimizerIterationCommand )
+  mitkClassMacro(OptimizerIterationCommand<OptimizerType>, itk::Command)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
-  void Execute(itk::Object *caller, const itk::EventObject & event)
+  void Execute(itk::Object *caller, const itk::EventObject & /*event*/)
   {
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >( caller );
 
@@ -112,7 +116,7 @@ public:
 
   }
 
-  void Execute(const itk::Object * object, const itk::EventObject & event)
+  void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/)
   {
 
   }

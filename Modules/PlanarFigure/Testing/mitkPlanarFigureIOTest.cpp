@@ -61,70 +61,78 @@ public:
 
     // Create PlanarAngle
     mitk::PlanarAngle::Pointer planarAngle = mitk::PlanarAngle::New();
-    planarAngle->SetGeometry2D( planeGeometry );
+    planarAngle->SetPlaneGeometry( planeGeometry );
     planarAngle->PlaceFigure( p0 );
     planarAngle->SetCurrentControlPoint( p1 );
     planarAngle->AddControlPoint( p2 );
+    planarAngle->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarAngle.GetPointer() );
 
     // Create PlanarCircle
     mitk::PlanarCircle::Pointer planarCircle = mitk::PlanarCircle::New();
-    planarCircle->SetGeometry2D( planeGeometry );
+    planarCircle->SetPlaneGeometry( planeGeometry );
     planarCircle->PlaceFigure( p0 );
     planarCircle->SetCurrentControlPoint( p1 );
+    planarCircle->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarCircle.GetPointer() );
 
     // Create PlanarCross
     mitk::PlanarCross::Pointer planarCross = mitk::PlanarCross::New();
     planarCross->SetSingleLineMode( false );
-    planarCross->SetGeometry2D( planeGeometry );
+    planarCross->SetPlaneGeometry( planeGeometry );
     planarCross->PlaceFigure( p0 );
     planarCross->SetCurrentControlPoint( p1 );
     planarCross->AddControlPoint( p2 );
     planarCross->AddControlPoint( p3 );
+    planarCross->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarCross.GetPointer() );
 
     // Create PlanarFourPointAngle
     mitk::PlanarFourPointAngle::Pointer planarFourPointAngle = mitk::PlanarFourPointAngle::New();
-    planarFourPointAngle->SetGeometry2D( planeGeometry );
+    planarFourPointAngle->SetPlaneGeometry( planeGeometry );
     planarFourPointAngle->PlaceFigure( p0 );
     planarFourPointAngle->SetCurrentControlPoint( p1 );
     planarFourPointAngle->AddControlPoint( p2 );
     planarFourPointAngle->AddControlPoint( p3 );
+    planarFourPointAngle->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarFourPointAngle.GetPointer() );
 
     // Create PlanarLine
     mitk::PlanarLine::Pointer planarLine = mitk::PlanarLine::New();
-    planarLine->SetGeometry2D( planeGeometry );
+    planarLine->SetPlaneGeometry( planeGeometry );
     planarLine->PlaceFigure( p0 );
     planarLine->SetCurrentControlPoint( p1 );
+    planarLine->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarLine.GetPointer() );
 
     // Create PlanarPolygon
     mitk::PlanarPolygon::Pointer planarPolygon = mitk::PlanarPolygon::New();
     planarPolygon->SetClosed( false );
-    planarPolygon->SetGeometry2D( planeGeometry );
+    planarPolygon->SetPlaneGeometry( planeGeometry );
     planarPolygon->PlaceFigure( p0 );
     planarPolygon->SetCurrentControlPoint( p1 );
     planarPolygon->AddControlPoint( p2 );
     planarPolygon->AddControlPoint( p3 );
+    planarPolygon->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarPolygon.GetPointer() );
 
     // Create PlanarSubdivisionPolygon
     mitk::PlanarSubdivisionPolygon::Pointer planarSubdivisionPolygon = mitk::PlanarSubdivisionPolygon::New();
     planarSubdivisionPolygon->SetClosed( false );
-    planarSubdivisionPolygon->SetGeometry2D( planeGeometry );
+    planarSubdivisionPolygon->SetPlaneGeometry( planeGeometry );
     planarSubdivisionPolygon->PlaceFigure( p0 );
     planarSubdivisionPolygon->SetCurrentControlPoint( p1 );
     planarSubdivisionPolygon->AddControlPoint( p2 );
     planarSubdivisionPolygon->AddControlPoint( p3 );
+    planarSubdivisionPolygon->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarSubdivisionPolygon.GetPointer() );
 
     // Create PlanarRectangle
     mitk::PlanarRectangle::Pointer planarRectangle = mitk::PlanarRectangle::New();
-    planarRectangle->SetGeometry2D( planeGeometry );
+    planarRectangle->SetPlaneGeometry( planeGeometry );
     planarRectangle->PlaceFigure( p0 );
     planarRectangle->SetCurrentControlPoint( p1 );
+    planarRectangle->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarRectangle.GetPointer() );
 
     //create preciseGeometry which is using float coordinates
@@ -155,69 +163,77 @@ public:
     // Create PlanarCross
     mitk::PlanarCross::Pointer nochncross = mitk::PlanarCross::New();
     nochncross->SetSingleLineMode( false );
-    nochncross->SetGeometry2D( preciseGeometry );
+    nochncross->SetPlaneGeometry( preciseGeometry );
     nochncross->PlaceFigure( p0precise );
     nochncross->SetCurrentControlPoint( p1precise );
     nochncross->AddControlPoint( p2precise );
     nochncross->AddControlPoint( p3precise );
+    nochncross->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( nochncross.GetPointer() );
 
     // Create PlanarAngle
     mitk::PlanarAngle::Pointer planarAnglePrecise = mitk::PlanarAngle::New();
-    planarAnglePrecise->SetGeometry2D( preciseGeometry );
+    planarAnglePrecise->SetPlaneGeometry( preciseGeometry );
     planarAnglePrecise->PlaceFigure( p0precise );
     planarAnglePrecise->SetCurrentControlPoint( p1precise );
     planarAnglePrecise->AddControlPoint( p2precise );
+    planarAnglePrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarAnglePrecise.GetPointer() );
 
     // Create PlanarCircle
     mitk::PlanarCircle::Pointer planarCirclePrecise = mitk::PlanarCircle::New();
-    planarCirclePrecise->SetGeometry2D( preciseGeometry );
+    planarCirclePrecise->SetPlaneGeometry( preciseGeometry );
     planarCirclePrecise->PlaceFigure( p0precise );
     planarCirclePrecise->SetCurrentControlPoint( p1precise );
+    planarCirclePrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarCirclePrecise.GetPointer() );
 
     // Create PlanarFourPointAngle
     mitk::PlanarFourPointAngle::Pointer planarFourPointAnglePrecise = mitk::PlanarFourPointAngle::New();
-    planarFourPointAnglePrecise->SetGeometry2D( preciseGeometry );
+    planarFourPointAnglePrecise->SetPlaneGeometry( preciseGeometry );
     planarFourPointAnglePrecise->PlaceFigure( p0precise );
     planarFourPointAnglePrecise->SetCurrentControlPoint( p1precise );
     planarFourPointAnglePrecise->AddControlPoint( p2precise );
     planarFourPointAnglePrecise->AddControlPoint( p3precise );
+    planarFourPointAnglePrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarFourPointAnglePrecise.GetPointer() );
 
     // Create PlanarLine
     mitk::PlanarLine::Pointer planarLinePrecise = mitk::PlanarLine::New();
-    planarLinePrecise->SetGeometry2D( preciseGeometry );
+    planarLinePrecise->SetPlaneGeometry( preciseGeometry );
     planarLinePrecise->PlaceFigure( p0precise );
     planarLinePrecise->SetCurrentControlPoint( p1precise );
+    planarLinePrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarLinePrecise.GetPointer() );
 
     // Create PlanarPolygon
     mitk::PlanarPolygon::Pointer planarPolygonPrecise = mitk::PlanarPolygon::New();
     planarPolygonPrecise->SetClosed( false );
-    planarPolygonPrecise->SetGeometry2D( preciseGeometry );
+    planarPolygonPrecise->SetPlaneGeometry( preciseGeometry );
     planarPolygonPrecise->PlaceFigure( p0precise );
     planarPolygonPrecise->SetCurrentControlPoint( p1precise );
     planarPolygonPrecise->AddControlPoint( p2precise );
     planarPolygonPrecise->AddControlPoint( p3precise );
+    planarPolygonPrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarPolygonPrecise.GetPointer() );
 
     // Create PlanarSubdivisionPolygon
     mitk::PlanarSubdivisionPolygon::Pointer planarSubdivisionPolygonPrecise = mitk::PlanarSubdivisionPolygon::New();
     planarSubdivisionPolygonPrecise->SetClosed( false );
-    planarSubdivisionPolygonPrecise->SetGeometry2D( preciseGeometry );
+    planarSubdivisionPolygonPrecise->SetPlaneGeometry( preciseGeometry );
     planarSubdivisionPolygonPrecise->PlaceFigure( p0precise );
     planarSubdivisionPolygonPrecise->SetCurrentControlPoint( p1precise );
     planarSubdivisionPolygonPrecise->AddControlPoint( p2precise );
     planarSubdivisionPolygonPrecise->AddControlPoint( p3precise );
+    planarSubdivisionPolygonPrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarSubdivisionPolygonPrecise.GetPointer() );
 
     // Create PlanarRectangle
     mitk::PlanarRectangle::Pointer planarRectanglePrecise = mitk::PlanarRectangle::New();
-    planarRectanglePrecise->SetGeometry2D( preciseGeometry );
+    planarRectanglePrecise->SetPlaneGeometry( preciseGeometry );
     planarRectanglePrecise->PlaceFigure( p0precise );
     planarRectanglePrecise->SetCurrentControlPoint( p1precise );
+    planarRectanglePrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarRectanglePrecise.GetPointer() );
 
     return planarFigures;
@@ -231,42 +247,9 @@ public:
 
     for ( it1 = original.begin(); it1 != original.end(); ++it1 )
     {
-      mitk::PlanarFigure::Pointer copiedFigure;
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarAngle") == 0)
-      {
-        copiedFigure    = mitk::PlanarAngle::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarCircle") == 0)
-      {
-        copiedFigure    = mitk::PlanarCircle::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarLine") == 0)
-      {
-        copiedFigure    = mitk::PlanarLine::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarPolygon") == 0)
-      {
-        copiedFigure    = mitk::PlanarPolygon::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarSubdivisionPolygon") == 0)
-      {
-        copiedFigure    = mitk::PlanarSubdivisionPolygon::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarCross") == 0)
-      {
-        copiedFigure    = mitk::PlanarCross::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarRectangle") == 0)
-      {
-        copiedFigure    = mitk::PlanarRectangle::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarFourPointAngle") == 0)
-      {
-        copiedFigure    = mitk::PlanarFourPointAngle::New();
-      }
+      mitk::PlanarFigure::Pointer copiedFigure = (*it1)->Clone();
 
-      copiedFigure->DeepCopy((*it1));
-      copiedPlanarFigures.push_back(copiedFigure.GetPointer());
+      copiedPlanarFigures.push_back(copiedFigure);
     }
     return copiedPlanarFigures;
   }
@@ -283,9 +266,11 @@ public:
   {
     PlanarFigureList::iterator it1, it2;
 
+    int i = 0;
     for ( it1 = planarFigures1.begin(); it1 != planarFigures1.end(); ++it1 )
     {
       bool planarFigureFound = false;
+      int j = 0;
       for ( it2 = planarFigures2.begin(); it2 != planarFigures2.end(); ++it2 )
       {
         // Compare PlanarFigures (returns false if different types)
@@ -293,12 +278,14 @@ public:
         {
           planarFigureFound = true;
         }
+        ++j;
       }
 
       // Test if (at least) on PlanarFigure of the first type was found in the second list
       MITK_TEST_CONDITION_REQUIRED(
           planarFigureFound,
-          "Testing if " << (*it1)->GetNameOfClass() << " has a counterpart" );
+          "Testing if " << (*it1)->GetNameOfClass() << " has a counterpart " << i );
+      ++i;
     }
   }
 
@@ -308,6 +295,11 @@ public:
     if ( strcmp( figure1->GetNameOfClass(), figure2->GetNameOfClass() ) != 0 )
     {
       return false;
+    }
+
+    if( strcmp( figure1->GetNameOfClass(), "PlanarCross" ) == 0 )
+    {
+      std::cout << "Planar Cross Found" << std::endl;
     }
 
     // Test for equal number of control points
@@ -359,8 +351,8 @@ public:
     }
 
     // Test if Geometry is equal
-    const mitk::PlaneGeometry* planeGeometry1 = dynamic_cast<const mitk::PlaneGeometry*>(figure1->GetGeometry2D());
-    const mitk::PlaneGeometry* planeGeometry2 = dynamic_cast<const mitk::PlaneGeometry*>(figure2->GetGeometry2D());
+    const mitk::PlaneGeometry* planeGeometry1 = dynamic_cast<const mitk::PlaneGeometry*>(figure1->GetPlaneGeometry());
+    const mitk::PlaneGeometry* planeGeometry2 = dynamic_cast<const mitk::PlaneGeometry*>(figure2->GetPlaneGeometry());
 
     // Test Geometry transform parameters
     typedef mitk::Geometry3D::TransformType TransformType;

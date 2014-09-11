@@ -18,9 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkToolManager.h"
 #include "mitkProperties.h"
-#include <mitkInteractionConst.h>
-#include "mitkGlobalInteraction.h"
-
 // us
 #include <usModule.h>
 #include <usModuleResource.h>
@@ -29,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, AdaptiveRegionGrowingTool, "AdaptiveRegionGrowingTool");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, AdaptiveRegionGrowingTool, "AdaptiveRegionGrowingTool");
 }
 
 mitk::AdaptiveRegionGrowingTool::AdaptiveRegionGrowingTool()
@@ -39,7 +36,10 @@ mitk::AdaptiveRegionGrowingTool::AdaptiveRegionGrowingTool()
   m_PointSetNode->GetPropertyList()->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_PointSet = mitk::PointSet::New();
   m_PointSetNode->SetData(m_PointSet);
-  m_SeedPointInteractor = mitk::PointSetInteractor::New("singlepointinteractor", m_PointSetNode);
+  m_SeedPointInteractor = mitk::SinglePointDataInteractor::New();
+  m_SeedPointInteractor->LoadStateMachine("PointSet.xml");
+  m_SeedPointInteractor->SetEventConfig("PointSetConfig.xml");
+  m_SeedPointInteractor->SetDataNode(m_PointSetNode);
 }
 
 mitk::AdaptiveRegionGrowingTool::~AdaptiveRegionGrowingTool()
@@ -67,18 +67,11 @@ void mitk::AdaptiveRegionGrowingTool::Activated()
 {
   if (!GetDataStorage()->Exists(m_PointSetNode))
     GetDataStorage()->Add(m_PointSetNode, GetWorkingData());
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SeedPointInteractor);
 }
 
 void mitk::AdaptiveRegionGrowingTool::Deactivated()
 {
-  if (m_PointSet->GetPointSet()->GetNumberOfPoints() != 0)
-  {
-    mitk::Point3D point = m_PointSet->GetPoint(0);
-    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, point, 0);
-    m_PointSet->ExecuteOperation(doOp);
-  }
-  mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
+  m_PointSet->Clear();
   GetDataStorage()->Remove(m_PointSetNode);
 }
 

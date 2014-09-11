@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk headers
 #include <mitkNavigationDataSource.h>
 #include <usGetModuleContext.h>
-#include "usServiceReference.h"
+#include <usServiceReference.h>
 
 
 
@@ -47,7 +47,7 @@ void QmitkNavigationDataSourceSelectionWidget::CreateQtPartControl(QWidget *pare
     m_Controls->setupUi(parent);
 
     std::string empty = "";
-    m_Controls->m_NaviagationDataSourceWidget->Initialize<mitk::NavigationDataSource>(mitk::NavigationDataSource::US_PROPKEY_DEVICENAME,empty);
+    m_Controls->m_NavigationDataSourceWidget->Initialize<mitk::NavigationDataSource>(mitk::NavigationDataSource::US_PROPKEY_DEVICENAME,empty);
 
   }
 }
@@ -56,7 +56,7 @@ void QmitkNavigationDataSourceSelectionWidget::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->m_NaviagationDataSourceWidget), SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(NavigationDataSourceSelected(us::ServiceReferenceU)) );
+    connect( (QObject*)(m_Controls->m_NavigationDataSourceWidget), SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(NavigationDataSourceSelected(us::ServiceReferenceU)) );
 
   }
 }
@@ -77,8 +77,14 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
     m_CurrentSource = context->GetService<mitk::NavigationDataSource>(s);
     std::string id = s.GetProperty(mitk::NavigationDataSource::US_PROPKEY_ID).ToString();
 
+    // clear tool list before filling it
+    m_Controls->m_ToolView->clear();
     //Fill tool list
-    for(std::size_t i = 0; i < m_CurrentSource->GetNumberOfOutputs(); i++) {new QListWidgetItem(tr(m_CurrentSource->GetOutput(i)->GetName()), m_Controls->m_ToolView);}
+    MITK_INFO<<"no outputs: "<<m_CurrentSource->GetNumberOfOutputs();
+    for(std::size_t i = 0; i < m_CurrentSource->GetNumberOfOutputs(); i++)
+    {
+      new QListWidgetItem(tr(m_CurrentSource->GetOutput(i)->GetName()), m_Controls->m_ToolView);
+    }
 
 
     // Create Filter for ToolStorage

@@ -3,25 +3,21 @@
 
 This view provides the user interface for the Gibbs Tracking algorithm, a global fiber tracking algorithm, originally proposed by Reisert et.al. [1].
 
-Available sections:
-  - \ref QmitkGibbsTrackingUserManualInputData
-  - \ref QmitkGibbsTrackingUserManualParameters
-  - \ref QmitkGibbsTrackingUserManualTrackingSurveillance
-  - \ref QmitkGibbsTrackingUserManualReferences
+\tableofcontents
 
-\image html gibbstrackingview.png The Gibbs Tracking View
+\imageMacro{gibbstrackingview.png,"The Gibbs Tracking View",2}
 
 \section QmitkGibbsTrackingUserManualInputData Input Data
 
 Mandatory Input:
-\li One Q-Ball image selected in the datamanager
+\li One Q-Ball or tensor image selected in the datamanager
 
 Optional Input:
-\li Mask Image: Float image used as probability mask for the generation of fiber segments. Usually used as binary brain mask to reduce the searchspace of the algorithm and to avoid fibers resulting from noise outside of the brain.
+\li Mask Image: White matter probability mask. Corresponds to the probability to generate fiber segments in the respective voxel.
 
 \section QmitkGibbsTrackingUserManualParameters Q-Ball Reconstruction
 
-\li Number of iterations: More iterations causes the algorithm to be more stable but also to take longer to finish the tracking. Rcommended: 10⁷-10⁹ iterations.
+\li Number of iterations: More iterations causes the algorithm to be more stable but also to take longer to finish the tracking. Recommended: 10^7  to 10^8 iterations.
 \li Particle length/width/weight controlling the contribution of each particle to the model M
 \li Start and end temperature controlling how fast the process reaches a stable state. (usually no change needed)
 \li Weighting between the internal (affinity of the model to long and straigt fibers) and external energy (affinity of the model towards the data). (usually no change needed).
@@ -29,11 +25,11 @@ Optional Input:
 
 The automatic selection of parameters for the particle length/width and weight are determined directly from the input image using information about the image spacing and GFA.
 
-\image html gibbstrackingviewadvanced.png Advanced Tracking Parameters
+\imageMacro{gibbstrackingviewadvanced.png,"Advanced Tracking Parameters",10.08}
 
 \section QmitkGibbsTrackingUserManualTrackingSurveillance Surveilance of the tracking process
 
-Once started, the tracking can be monitored via the textual output that informs about the tracking progress and several stats of the current state of the algorithm. 
+Once started, the tracking can be monitored via the textual output that informs about the tracking progress and several stats of the current state of the algorithm.
 If enabled, the intermediate tracking results are displayed in the renderwindows each second. This live visualization should usually be disabled for performance reasons. It can be turned on and off during the tracking process via the according checkbox. The button next to this checkbox allows the visualization of only the next iteration step.
 
 \section QmitkGibbsTrackingUserManualReferences References

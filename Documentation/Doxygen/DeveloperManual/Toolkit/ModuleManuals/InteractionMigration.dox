@@ -149,30 +149,4 @@ configDescription->push_back(propertyList2);
 mitk::EventConfig newConfig(configDescription);
 \endcode
 
-\section ModifyDisplayInteractorBehavior How to modify the display interactor behavior
-
-Sometimes it may be desirable to change the behaviour of the mitk::DisplayInteractor which controls zooming, panning and scrolling, e.g. when a
-Tool is activated that reacts to the same events. Changing the behavior of the DisplayInteractor (or possibly any other EventHandler) can be achieved from anywhere
-in the code by requesting the InteractionEventObserver and assigning an alternative configuration to it, as demonstrated in this example:
-
-\code
-
-std::ifstream* configStream = new std::ifstream( #path to alternative configuration file# );
-mitk::EventConfig newConfig(configStream);
-
-// Requesting all registered EventObservers
-std::list<mitk::ServiceReference> listEventObserver = GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
-
-for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
-{
-    DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(GetModuleContext()->GetService<InteractionEventObserver>(*it));
-    // filtering: only adjust the DisplayInteractor
-    if (displayInteractor != NULL)
-    {
-        displayInteractor->SetEventConfig(newConfig);
-    }
-}
-
-\endcode
-
 */

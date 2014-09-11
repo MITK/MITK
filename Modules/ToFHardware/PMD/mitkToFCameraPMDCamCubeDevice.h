@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDCamCubeDevice_h
 #define __mitkToFCameraPMDCamCubeDevice_h
 
-#include "mitkPMDModuleExports.h"
+#include <MitkPMDExports.h>
 #include "mitkCommon.h"
 #include "mitkToFCameraDevice.h"
 #include "mitkToFCameraPMDDevice.h"
@@ -42,7 +42,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraPMDCamCubeDevice , ToFCameraPMDDevice );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual void SetProperty( const char *propertyKey, BaseProperty* propertyValue );
 

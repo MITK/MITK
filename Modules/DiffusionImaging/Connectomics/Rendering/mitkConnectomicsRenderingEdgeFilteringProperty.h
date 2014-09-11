@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_CONNECTOMICS_RENDERING_EDGE_FILTERING_PROPERTY__H_
 
 #include "mitkEnumerationProperty.h"
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 namespace mitk
 {
@@ -31,13 +31,14 @@ namespace mitk
 /**
  * Encapsulates the enumeration of different edge filtering options for rendering connectomics networks
  */
-class Connectomics_EXPORT ConnectomicsRenderingEdgeFilteringProperty : public EnumerationProperty
+class MitkConnectomics_EXPORT ConnectomicsRenderingEdgeFilteringProperty : public EnumerationProperty
 {
 public:
 
   mitkClassMacro( ConnectomicsRenderingEdgeFilteringProperty, EnumerationProperty );
 
-  itkNewMacro(ConnectomicsRenderingEdgeFilteringProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(ConnectomicsRenderingEdgeFilteringProperty, const IdType&);
 

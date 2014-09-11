@@ -2,16 +2,7 @@ set(CPP_FILES
 
   # DataStructures Connectomics
   IODataStructures/mitkConnectomicsNetwork.cpp
-  IODataStructures/mitkConnectomicsNetworkReader.cpp
-  IODataStructures/mitkConnectomicsNetworkIOFactory.cpp
-  IODataStructures/mitkConnectomicsNetworkSerializer.cpp
-  IODataStructures/mitkConnectomicsNetworkWriter.cpp
-  IODataStructures/mitkConnectomicsNetworkWriterFactory.cpp
-  IODataStructures/mitkConnectomicsNetworkDefinitions.cpp
   IODataStructures/mitkConnectomicsConstantsManager.cpp
-
-  # DataStructures
-  IODataStructures/mitkConnectomicsObjectFactory.cpp
 
   # Rendering Connectomics
   Rendering/mitkConnectomicsNetworkMapper3D.cpp
@@ -34,7 +25,6 @@ set(CPP_FILES
   Algorithms/mitkConnectomicsBetweennessHistogram.cpp
   Algorithms/mitkConnectomicsHistogramCache.cpp
   Algorithms/mitkConnectomicsSyntheticNetworkGenerator.cpp
-  #Algorithms/itkConnectomicsNetworkToConnectivityMatrixImageFilter.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingPermutationBase.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingPermutationModularity.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingManager.cpp
@@ -42,6 +32,7 @@ set(CPP_FILES
   Algorithms/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.cpp
   Algorithms/mitkConnectomicsStatisticsCalculator.cpp
   Algorithms/mitkConnectomicsNetworkConverter.cpp
+  Algorithms/mitkConnectomicsNetworkThresholder.cpp
 )
 
 set(H_FILES
@@ -61,12 +52,6 @@ set(H_FILES
 
   # Datastructures Connectomics
   IODataStructures/mitkConnectomicsNetwork.h
-  IODataStructures/mitkConnectomicsNetworkReader.h
-  IODataStructures/mitkConnectomicsNetworkIOFactory.h
-  IODataStructures/mitkConnectomicsNetworkSerializer.h
-  IODataStructures/mitkConnectomicsNetworkWriter.h
-  IODataStructures/mitkConnectomicsNetworkWriterFactory.h
-  IODataStructures/mitkConnectomicsNetworkDefinitions.h
   IODataStructures/mitkConnectomicsConstantsManager.h
 
   # Algorithms Connectomics
@@ -85,6 +70,9 @@ set(H_FILES
   Algorithms/itkConnectomicsNetworkToConnectivityMatrixImageFilter.h
   Algorithms/mitkConnectomicsStatisticsCalculator.h
   Algorithms/mitkConnectomicsNetworkConverter.h
+  Algorithms/BrainParcellation/mitkCostFunctionBase.h
+  Algorithms/BrainParcellation/mitkRandomParcellationGenerator.h
+  Algorithms/BrainParcellation/mitkRegionVoxelCounter.h
 )
 
 

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef OVERLAYMANAGER_H
 #define OVERLAYMANAGER_H
 
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 #include <itkLightObject.h>
 #include <vtkSmartPointer.h>
 #include "mitkOverlay.h"
@@ -41,9 +41,11 @@ public:
   typedef std::map<const BaseRenderer*,LayouterMap > LayouterRendererMap;
 
   mitkClassMacro(OverlayManager, itk::LightObject);
-  itkNewMacro(OverlayManager);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   void AddOverlay(const Overlay::Pointer& overlay);
+  void AddOverlay(const Overlay::Pointer& overlay, BaseRenderer* renderer);
   void RemoveOverlay(const Overlay::Pointer& overlay);
 
   /** \brief Clears the manager of all Overlays.*/

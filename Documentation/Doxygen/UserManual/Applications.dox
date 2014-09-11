@@ -19,7 +19,7 @@ A typical example of this would be an application which contains only views rela
 If you are unsure which application you are currently using, start the application and have a look in the Title Bar.
 You should see it's name there.
   
-\image html ApplicationTitle.jpg "The application name is displayed in the title bar"
+\imageMacro{ApplicationTitle.jpg,"The application name is displayed in the title bar",16}
   
 \section ApplicationsPageApplicationsList List of Applications
 

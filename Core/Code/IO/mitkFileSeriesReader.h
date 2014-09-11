@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __MITK_FILE_SERIES_READER__H_
 #define __MITK_FILE_SERIES_READER__H_
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkCommon.h>
 #include <mitkFileReader.h>
 #include <vector>

@@ -1,0 +1,34 @@
+  <statemachine name="LiveWireTool">
+    <state name="Start" ID="1" startstate="true">
+      <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Active" >
+        <action name="InitObject" ID="5" />
+      </transition>
+    </state>
+    <state name="Active" ID="2" >
+      <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="Active" >
+        <action name="AddPoint" ID="10" />
+      </transition>
+      <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="Active" >
+        <action name="MovePoint" ID="92" />
+      </transition>
+      <transition event_class="InteractionKeyEvent" event_variant="KeyEscape" target="Active" >
+        <action name="DeletePoint" ID="120"/>
+      </transition>
+      <transition event_class="InteractionKeyEvent" event_variant="KeyDelete" target="Active" >
+        <action name="DeletePoint" ID="120"/>
+      </transition>
+      <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Start" >
+        <condition name="CheckContourClosed" />
+        <action name="FinishContour" ID="44" />
+      </transition>
+      <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Active" >
+        <condition name="CheckContourClosed" inverted="true"/>
+      </transition>
+      <transition event_class="MouseMoveEvent" event_variant="CtrlMouseMove" target="Active" >
+        <action name="CtrlMovePoint" ID="12"/>
+      </transition>
+      <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" target="Active" >
+        <action name="CtrlAddPoint" ID="10" />
+      </transition>
+    </state>
+  </statemachine>

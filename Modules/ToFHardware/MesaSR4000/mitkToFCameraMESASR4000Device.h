@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraMESASR4000Device_h
 #define __mitkToFCameraMESASR4000Device_h
 
-#include "mitkMESASR4000ModuleExports.h"
+#include <MitkMESASR4000ModuleExports.h>
 #include "mitkCommon.h"
 #include "mitkToFCameraDevice.h"
 #include "mitkToFCameraMESADevice.h"
@@ -41,7 +41,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraMESASR4000Device , ToFCameraMESADevice );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief set a BaseProperty

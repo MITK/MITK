@@ -53,7 +53,7 @@ void testConstructor()
   {
     mitk::Color color;
     color.Set(0, 0, 0);
-    vtkFloatingPointType opacity = 1.0f;
+    double opacity = 1.0f;
     myMP = mitk::Material::New(color, opacity);
     MITK_TEST_CONDITION_REQUIRED(myMP.IsNotNull(),"Testing instantiation")
     MITK_TEST_CONDITION( color==myMP->GetColor(), "Testing if a Color object was set correctly" )
@@ -64,8 +64,8 @@ void testConstructor()
   {
     mitk::Material::Color color;
     color.Set(0, 0, 0);
-    vtkFloatingPointType opacity = 1.0f;
-    vtkFloatingPointType rgb = 0;
+    double opacity = 1.0f;
+    double rgb = 0;
 
     myMP = mitk::Material::New(rgb, rgb, rgb, opacity);
     MITK_TEST_CONDITION_REQUIRED(myMP.IsNotNull(),"Testing instantiation")
@@ -77,11 +77,11 @@ void testConstructor()
   {
     mitk::Material::Color color;
     color.Set(0, 0, 0);
-    vtkFloatingPointType opacity = 1.0f;
-    vtkFloatingPointType rgb = 0;
-    vtkFloatingPointType colorCoefficient = 0;
-    vtkFloatingPointType specularCoefficient = 0;
-    vtkFloatingPointType specularPower = 0;
+    double opacity = 1.0f;
+    double rgb = 0;
+    double colorCoefficient = 0;
+    double specularCoefficient = 0;
+    double specularPower = 0;
 
     myMP = mitk::Material::New(rgb, rgb, rgb, colorCoefficient,
       specularCoefficient, specularPower, opacity);
@@ -97,11 +97,11 @@ void testConstructor()
   {
     mitk::Material::Color color;
     color.Set(0, 0, 0);
-    vtkFloatingPointType opacity = 1.0f;
-    vtkFloatingPointType rgb = 0;
-    vtkFloatingPointType colorCoefficient = 0;
-    vtkFloatingPointType specularCoefficient = 0;
-    vtkFloatingPointType specularPower = 0;
+    double opacity = 1.0f;
+    double rgb = 0;
+    double colorCoefficient = 0;
+    double specularCoefficient = 0;
+    double specularPower = 0;
 
     myMP = mitk::Material::New(rgb, rgb, rgb, colorCoefficient,
       specularCoefficient, specularPower, opacity);
@@ -115,8 +115,8 @@ void testConstructor()
   void testConstructorPropertyRedGreenBlueOpacityAndName()
   {
     mitk::Material::Pointer reference = myMP;
-    vtkFloatingPointType opacity = 1.0f;
-    vtkFloatingPointType rgb = 0;
+    double opacity = 1.0f;
+    double rgb = 0;
     std::string name = "Hans Wurst";
 
     myMP = mitk::Material::New(*reference, rgb, rgb, rgb, opacity, name);
@@ -140,7 +140,7 @@ void testSetColor()
 void testSetColorCoefficient()
 {
 
-  vtkFloatingPointType colorCoefficient = 0;
+  double colorCoefficient = 0;
   myMP = mitk::Material::New();
   myMP->SetColorCoefficient(colorCoefficient);
   MITK_TEST_CONDITION(colorCoefficient == myMP->GetColorCoefficient(), "Testing if a colorcoefficent was set correctly")
@@ -161,7 +161,7 @@ void testSetSpecularColor()
 void testSetSpecularCoefficient()
 {
   myMP = mitk::Material::New();
-  vtkFloatingPointType specularCoefficient = 1;
+  double specularCoefficient = 1;
   myMP->SetSpecularCoefficient(specularCoefficient);
   MITK_TEST_CONDITION(specularCoefficient == myMP->GetSpecularCoefficient(),"Testing if a SpecularCoefficient was set correctly")
 
@@ -169,7 +169,7 @@ void testSetSpecularCoefficient()
 void testSetSpecularPower()
 {
   myMP = mitk::Material::New();
-  vtkFloatingPointType specularPower = 1;
+  double specularPower = 1;
   myMP->SetSpecularPower(specularPower);
   MITK_TEST_CONDITION(specularPower==myMP->GetSpecularPower(), "Testing if a SpecularPower was set correctly")
 
@@ -178,7 +178,7 @@ void testSetSpecularPower()
 void testSetOpacity()
 {
   myMP = mitk::Material::New();
-  vtkFloatingPointType opacity = 1;
+  double opacity = 1;
   myMP->SetOpacity(opacity);
   MITK_TEST_CONDITION(opacity==myMP->GetOpacity(), "Testing if a Opacity was set correctly")
 
@@ -204,7 +204,7 @@ void testSetRepresentation()
 void testSetLineWidth()
 {
   myMP = mitk::Material::New();
-  vtkFloatingPointType lineWidth = 1;
+  double lineWidth = 1;
   myMP->SetLineWidth(lineWidth);
   MITK_TEST_CONDITION(lineWidth==myMP->GetLineWidth(), "Testing if a LineWidth was set correctly")
 }
@@ -213,15 +213,15 @@ void testInitialize()
 {
   mitk::Material::Color color;
   color.Set(0, 0, 0);
-  vtkFloatingPointType opacity = 1.0f;
-  vtkFloatingPointType rgb = 0;
-  vtkFloatingPointType colorCoefficient = 0;
-  vtkFloatingPointType specularCoefficient = 0;
-  vtkFloatingPointType specularPower = 0;
+  double opacity = 1.0f;
+  double rgb = 0;
+  double colorCoefficient = 0;
+  double specularCoefficient = 0;
+  double specularPower = 0;
 
   myMP = mitk::Material::New(rgb, rgb, rgb, colorCoefficient,
     specularCoefficient, specularPower, opacity);
-  vtkFloatingPointType lineWidth = 1;
+  double lineWidth = 1;
   myMP->SetLineWidth(lineWidth);
   mitk::Material::RepresentationType representation = mitk::Material::Wireframe;
   myMP->SetRepresentation(representation);mitk::Material::InterpolationType interpolation = mitk::Material::Flat;
@@ -238,15 +238,15 @@ void testOperatorequality()
   {
     mitk::Material::Color color;
     color.Set(0, 0, 0);
-    vtkFloatingPointType opacity = 1.0f;
-    vtkFloatingPointType rgb = 0;
-    vtkFloatingPointType colorCoefficient = 0;
-    vtkFloatingPointType specularCoefficient = 0;
-    vtkFloatingPointType specularPower = 0;
+    double opacity = 1.0f;
+    double rgb = 0;
+    double colorCoefficient = 0;
+    double specularCoefficient = 0;
+    double specularPower = 0;
 
     myMP = mitk::Material::New(rgb, rgb, rgb, colorCoefficient,
       specularCoefficient, specularPower, opacity);
-    vtkFloatingPointType lineWidth = 1;
+    double lineWidth = 1;
     myMP->SetLineWidth(lineWidth);
     mitk::Material::RepresentationType representation = mitk::Material::Wireframe;
     myMP->SetRepresentation(representation);mitk::Material::InterpolationType interpolation = mitk::Material::Flat;
@@ -258,15 +258,15 @@ void testOperatorequality()
 
     mitk::Material::Color color2;
     color2.Set(0, 0, 0);
-    vtkFloatingPointType opacity2 = 1.0f;
-    vtkFloatingPointType rgb2 = 0;
-    vtkFloatingPointType colorCoefficient2 = 0;
-    vtkFloatingPointType specularCoefficient2 = 0;
-    vtkFloatingPointType specularPower2 = 0;
+    double opacity2 = 1.0f;
+    double rgb2 = 0;
+    double colorCoefficient2 = 0;
+    double specularCoefficient2 = 0;
+    double specularPower2 = 0;
 
     mitk::Material::Pointer myMP2 = mitk::Material::New(rgb2, rgb2, rgb2, colorCoefficient2,
       specularCoefficient2, specularPower2, opacity2);
-    vtkFloatingPointType lineWidth2 = 1;
+    double lineWidth2 = 1;
     myMP2->SetLineWidth(lineWidth2);
     mitk::Material::RepresentationType representation2 = mitk::Material::Wireframe;
     myMP2->SetRepresentation(representation2);
@@ -280,15 +280,15 @@ void testOperatorequality()
   {
     mitk::Material::Color color;
     color.Set(0, 0, 0);
-    vtkFloatingPointType opacity = 1.0f;
-    vtkFloatingPointType rgb = 0;
-    vtkFloatingPointType colorCoefficient = 0;
-    vtkFloatingPointType specularCoefficient = 0;
-    vtkFloatingPointType specularPower = 0;
+    double opacity = 1.0f;
+    double rgb = 0;
+    double colorCoefficient = 0;
+    double specularCoefficient = 0;
+    double specularPower = 0;
 
     myMP = mitk::Material::New(rgb, rgb, rgb, colorCoefficient,
       specularCoefficient, specularPower, opacity);
-    vtkFloatingPointType lineWidth = 1;
+    double lineWidth = 1;
     myMP->SetLineWidth(lineWidth);
     mitk::Material::RepresentationType representation = mitk::Material::Wireframe;
     myMP->SetRepresentation(representation);mitk::Material::InterpolationType interpolation = mitk::Material::Flat;
@@ -300,15 +300,15 @@ void testOperatorequality()
 
     mitk::Material::Color color2;
     color2.Set(0, 0, 0);
-    vtkFloatingPointType opacity2 = 1.0f;
-    vtkFloatingPointType rgb2 = 1;
-    vtkFloatingPointType colorCoefficient2 = 0;
-    vtkFloatingPointType specularCoefficient2 = 0;
-    vtkFloatingPointType specularPower2 = 0;
+    double opacity2 = 1.0f;
+    double rgb2 = 1;
+    double colorCoefficient2 = 0;
+    double specularCoefficient2 = 0;
+    double specularPower2 = 0;
 
     mitk::Material::Pointer myMP2 = mitk::Material::New(rgb2, rgb2, rgb2, colorCoefficient2,
       specularCoefficient2, specularPower2, opacity2);
-    vtkFloatingPointType lineWidth2 = 1;
+    double lineWidth2 = 1;
     myMP2->SetLineWidth(lineWidth2);
     mitk::Material::RepresentationType representation2 = mitk::Material::Wireframe;
     myMP2->SetRepresentation(representation2);

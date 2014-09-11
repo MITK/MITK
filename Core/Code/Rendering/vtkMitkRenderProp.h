@@ -59,6 +59,8 @@ class MITK_CORE_EXPORT vtkMitkRenderProp : public vtkProp
      */
     virtual vtkAssemblyPath* GetNextPath();
 
+    virtual int GetNumberOfPaths();
+
     //BUG (#1551) added method for depth peeling support
     virtual int HasTranslucentPolygonalGeometry();
     virtual int RenderTranslucentPolygonalGeometry( vtkViewport *);

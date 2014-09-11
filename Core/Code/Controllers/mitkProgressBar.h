@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPROGRESSBAR_H
 #define MITKPROGRESSBAR_H
 #include <itkObject.h>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 
 namespace mitk

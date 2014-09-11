@@ -31,7 +31,8 @@ namespace mitk {
   public:
 
     mitkClassMacro(DiffusionImageMapper,ImageVtkMapper2D);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void GenerateDataForRenderer( mitk::BaseRenderer *renderer );
 

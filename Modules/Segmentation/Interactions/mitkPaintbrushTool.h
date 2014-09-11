@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPaintbrushTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkFeedbackContourTool.h"
 #include "mitkPointSet.h"
 #include "mitkPointOperation.h"
@@ -26,6 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
+  class StateMachineAction;
+  class InteractionEvent;
+  class InteractionPositionEvent;
+
  /**
   \brief Paintbrush tool for InteractiveSegmentation
 
@@ -42,7 +47,7 @@ namespace mitk
   \warning Only to be instantiated by mitk::ToolManager.
   $Author: maleike $
 */
-class Segmentation_EXPORT PaintbrushTool : public FeedbackContourTool
+class MitkSegmentation_EXPORT PaintbrushTool : public FeedbackContourTool
 {
   public:
 
@@ -58,19 +63,23 @@ class Segmentation_EXPORT PaintbrushTool : public FeedbackContourTool
     PaintbrushTool(int paintingPixelValue = 1); // purposely hidden
     virtual ~PaintbrushTool();
 
+    void ConnectActionsAndFunctions();
+
     virtual void Activated();
     virtual void Deactivated();
 
-    virtual bool OnMousePressed (Action*, const StateEvent*);
-    virtual bool OnMouseMoved   (Action*, const StateEvent*);
-    virtual bool OnMouseReleased(Action*, const StateEvent*);
-    virtual bool OnInvertLogic  (Action*, const StateEvent*);
+    virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
+    virtual bool OnMouseMoved   ( StateMachineAction*, InteractionEvent* );
+    virtual bool OnPrimaryButtonPressedMoved( StateMachineAction*, InteractionEvent* );
+    virtual bool MouseMoved(mitk::InteractionEvent* interactionEvent, bool leftMouseButtonPressed);
+    virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* );
+    virtual bool OnInvertLogic  ( StateMachineAction*, InteractionEvent* );
 
     /**
      * \todo This is a possible place where to introduce
      *       different types of pens
      */
-    void UpdateContour(const StateEvent* stateEvent);
+    void UpdateContour( const InteractionPositionEvent* );
 
 
     /**
@@ -81,7 +90,9 @@ class Segmentation_EXPORT PaintbrushTool : public FeedbackContourTool
     /**
       * Checks  if the current slice has changed
       */
-    void CheckIfCurrentSliceHasChanged(const PositionEvent* event);
+    void CheckIfCurrentSliceHasChanged(const InteractionPositionEvent* event);
+
+    void OnToolManagerWorkingDataModified();
 
     int m_PaintingPixelValue;
     static int m_Size;

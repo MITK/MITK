@@ -199,7 +199,13 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "bundlemainpage{1}=\page \1" \
                          "embmainpage{1}=\page \1" \
                          "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
-                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" "
+                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" " \
+                         "minimumCMakeVersion=@CMAKE_MINIMUM_REQUIRED_VERSION@" \
+                         "minimumQt4Version=@MITK_QT4_MINIMUM_VERSION@" \
+                         "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
+                         "developersguidemainpage{1}=\page \1 " \
+                         "usersguidemainpage{1}=\page \1 " \
+                         "nondependentPluginLink{3}= \ref \1 \"\3\" "
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding
@@ -668,6 +674,7 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = @MITK_SOURCE_DIR@ \
+                         @MITK_SOURCE_DIR@/README.md \
                          @MITK_BINARY_DIR@ \
                          @MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS@
 
@@ -709,18 +716,17 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = @MITK_SOURCE_DIR@/BlueBerry/Documentation/reference/api/MainPage.dox \
-                         @MITK_SOURCE_DIR@/Utilities/ipFunc/ \
-                         @MITK_SOURCE_DIR@/Utilities/ipSegmentation/ \
+                         @MITK_SOURCE_DIR@/Utilities/IpFunc/ \
+                         @MITK_SOURCE_DIR@/Utilities/IpSegmentation/ \
                          @MITK_SOURCE_DIR@/Utilities/KWStyle/ \
                          @MITK_SOURCE_DIR@/Utilities/Poco/ \
                          @MITK_SOURCE_DIR@/Utilities/qtsingleapplication/ \
                          @MITK_SOURCE_DIR@/Applications/PluginGenerator/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/README.md \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/documentation/snippets/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/documentation/doxygen/standalone/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/examples/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/test/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/src/util/jsoncpp.cpp \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/doc/snippets/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/doc/doxygen/standalone/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/test/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/examples/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/src/util/jsoncpp.cpp \
                          @MITK_SOURCE_DIR@/Deprecated/ \
                          @MITK_SOURCE_DIR@/Build/ \
                          @MITK_SOURCE_DIR@/CMake/PackageDepends \
@@ -746,7 +752,8 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = moc_* \
+EXCLUDE_PATTERNS       = README* \
+                         moc_* \
                          ui_* \
                          qrc_* \
                          wrap_* \
@@ -776,14 +783,16 @@ EXCLUDE_SYMBOLS        =
 
 EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/ \
                          @MITK_SOURCE_DIR@/Examples/Tutorial/ \
-                        @MITK_SOURCE_DIR@/Examples/Plugins/ \
+                         @MITK_SOURCE_DIR@/Examples/Plugins/ \
                          @MITK_SOURCE_DIR@/Examples/QtFreeRender/ \
                          @MITK_SOURCE_DIR@/Core/Code/ \
-                         @MITK_SOURCE_DIR@/Core/Code/CppMicroServices/Documentation/Snippets/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/doc/snippets/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/examples/ \
                          @MITK_DOXYGEN_OUTPUT_DIR@/html/extension-points/html/ \
                          @MITK_SOURCE_DIR@/Documentation/Snippets/ \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/ExampleCode/ \
-                         @MITK_SOURCE_DIR@/Modules/OpenCL/Documentation/doxygen/snippets/
+                         @MITK_SOURCE_DIR@/Modules/OpenCL/Documentation/doxygen/snippets/ \
+                         @MITK_SOURCE_DIR@/Modules/IGT/Tutorial/
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp
@@ -1607,6 +1616,8 @@ PREDEFINED             = itkNotUsed(x)= \
                          "itkSetVectorMacro(name,type,count)=                   virtual void Set##name(type data[]);" \
                          "itkGetVectorMacro(name,type,count)=                   virtual type* Get##name () const;" \
                          "itkNewMacro(type)=                   static Pointer New();" \
+                         "itkFactorylessNewMacro(type)=        static Pointer New();" \
+                         "itkCloneMacro(type)=                 Pointer Clone() const;" \
                          "itkTypeMacro(thisClass,superclass)=                   virtual const char *GetClassName() const;" \
                          "itkConceptMacro(name,concept)=                   enum { name = 0 };" \
                          "ITK_NUMERIC_LIMITS=                   std::numeric_limits" \

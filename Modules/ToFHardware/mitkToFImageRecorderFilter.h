@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkToFImageRecorderFilter_h
 
 #include <mitkImageToImageFilter.h>
-#include <mitkToFHardwareExports.h>
+#include <MitkToFHardwareExports.h>
 
 #include <mitkToFImageWriter.h>
 
@@ -33,7 +33,8 @@ namespace mitk
   {
   public:
     mitkClassMacro( ToFImageRecorderFilter , ImageToImageFilter );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief Set file name for writing image files

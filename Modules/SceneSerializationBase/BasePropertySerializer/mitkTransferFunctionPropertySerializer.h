@@ -17,16 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTransferFunctionProperty.h"
 #include "mitkBasePropertySerializer.h"
 
-#include "SceneSerializationBaseExports.h"
+#include <MitkSceneSerializationBaseExports.h>
 
 namespace mitk
 {
-  class SceneSerializationBase_EXPORT TransferFunctionPropertySerializer : public BasePropertySerializer
+  class MitkSceneSerializationBase_EXPORT TransferFunctionPropertySerializer : public BasePropertySerializer
   {
     public:
 
       mitkClassMacro( TransferFunctionPropertySerializer, BasePropertySerializer );
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
       virtual TiXmlElement* Serialize();
       virtual BaseProperty::Pointer Deserialize(TiXmlElement* element);

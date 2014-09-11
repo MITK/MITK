@@ -1,0 +1,44 @@
+/**
+\page org_mitk_views_simplemeasurement The Simple Measurement Module
+
+\imageMacro{SimpleMeasurementIcon.png,"Icon of the Simple Measurement Module",2.00}
+
+Available sections:
+  - \ref QmitkSimpleMeasurementUserManualOverview 
+  - \ref QmitkSimpleMeasurementUserManualFeatures 
+  - \ref QmitkSimpleMeasurementUserManualUsage 
+
+\section QmitkSimpleMeasurementUserManualOverview Overview
+
+SimpleMeasurement is a program module that allows to measure distances, angles and paths on a dataset.
+
+\section QmitkSimpleMeasurementUserManualFeatures Features
+
+<ul>
+  <li> The SimpleMeasurement Module is able to measure:
+  <ul>
+    <li> Distances between two points
+    <li> Angles between two lines (defined by three points) 
+    <li> Distances along a path 
+    </ul>
+</ul>
+    
+\section QmitkSimpleMeasurementUserManualUsage Usage
+To use the SimpleMeasurement Module, a data set must first be loaded. This can be done by drag & drop.
+Choose the simplemeasurement method you need by pressing the according button. 
+<ul>
+  <li>Points can be set by "shift-clicking" on the place in the data set. 
+  <li>Remove points by pressing the del-button on your keyboard. 
+  <li>You can mark a point by clicking on it with the cursor and moving it while the mouse button is still pressed. 
+</ul>
+What the different modes mean and how to use them:
+<ul>
+  <li> Distances(a): To measure the distance between two points, you have to set two points. The distance will be displayed on the line between the points.
+  <li> Angles(b): Angles can be measured between two lines. For that you have to set three points. The angle will be displayed between the two lines. 
+  <li> Path(c): Distances and angles along a path can be measured by setting at least two (for distance) or three (for angles) or more (for longer paths) points. The distance and the angles for each part will be displayed next to the path.
+</ul>
+
+\imageMacro{SimpleMeasurementGUI.png,"Graphical User Interface of SimpleMeasurement",16.00}
+
+*/
+

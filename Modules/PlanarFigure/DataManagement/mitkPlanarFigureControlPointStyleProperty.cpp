@@ -75,5 +75,6 @@ void mitk::PlanarFigureControlPointStyleProperty::SetShape(mitk::PlanarFigureCon
 itk::LightObject::Pointer mitk::PlanarFigureControlPointStyleProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

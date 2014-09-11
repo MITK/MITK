@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConnectomicsBetweennessHistogram.h>
 #include <mitkConnectomicsShortestPathHistogram.h>
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 namespace mitk {
 
@@ -64,7 +64,7 @@ namespace mitk {
     ConnectomicsShortestPathHistogram m_ShortestPathHistogram;
   };
 
-  class Connectomics_EXPORT ConnectomicsHistogramCache : public SimpleHistogramCache
+  class MitkConnectomics_EXPORT ConnectomicsHistogramCache : public SimpleHistogramCache
   {
   public:
 

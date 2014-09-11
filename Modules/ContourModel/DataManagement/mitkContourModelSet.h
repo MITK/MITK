@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkContourModelSet_H_
 
 #include "mitkCommon.h"
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 
 #include "mitkContourModel.h"
 
@@ -28,16 +28,15 @@ namespace mitk
 
   /** \brief
   */
-  class ContourModel_EXPORT ContourModelSet : public mitk::BaseData
+  class MitkContourModel_EXPORT ContourModelSet : public mitk::BaseData
   {
 
   public:
 
     mitkClassMacro(ContourModelSet, mitk::BaseData);
 
-    itkNewMacro(ContourModelSet);
-
-    mitkCloneMacro(ContourModelSet);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef std::deque<mitk::ContourModel::Pointer> ContourModelListType;
     typedef ContourModelListType::iterator ContourModelSetIterator;
@@ -85,7 +84,7 @@ namespace mitk
 
     /** \brief Returns a bool whether the container is empty or not.
     */
-    bool IsEmpty();
+    bool IsEmpty() const;
 
     /** \brief Remove the given ContourModel from the container if exists.
     \param ContourModel - the ContourModel to be removed.
@@ -124,6 +123,7 @@ namespace mitk
 
 
   protected:
+    mitkCloneMacro(Self);
 
     ContourModelSet();
     ContourModelSet(const mitk::ContourModelSet &other);

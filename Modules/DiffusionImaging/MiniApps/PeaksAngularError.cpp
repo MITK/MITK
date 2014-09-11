@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
-#include <mitkDiffusionCoreObjectFactory.h>
-#include <mitkFiberTrackingObjectFactory.h>
 #include <itkEvaluateDirectionImagesFilter.h>
 #include <metaCommand.h>
 #include "ctkCommandLineParser.h"
@@ -39,12 +37,17 @@ int PeaksAngularError(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("test", "t", ctkCommandLineParser::StringList, "test direction images", us::Any(), false);
-    parser.addArgument("reference", "r", ctkCommandLineParser::StringList, "reference direction images", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "output root", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image");
-    parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "output optional and intermediate calculation results");
-    parser.addArgument("ignore", "i", ctkCommandLineParser::Bool, "don't increase error for missing or too many directions");
+    parser.addArgument("test", "t", ctkCommandLineParser::StringList, "Test images", "test direction images", us::Any(), false);
+    parser.addArgument("reference", "r", ctkCommandLineParser::StringList, "Reference images", "reference direction images", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask", "mask image");
+    parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "Verbose", "output optional and intermediate calculation results");
+    parser.addArgument("ignore", "i", ctkCommandLineParser::Bool, "Ignore", "don't increase error for missing or too many directions");
+
+    parser.setCategory("Preprocessing Tools");
+    parser.setTitle("Peaks Angular Error");
+    parser.setDescription("");
+    parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -69,16 +72,13 @@ int PeaksAngularError(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
-        RegisterFiberTrackingObjectFactory();
-
         typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
         typedef itk::Image< itk::Vector< float, 3>, 3 >                         ItkDirectionImage3DType;
-        typedef itk::VectorContainer< int, ItkDirectionImage3DType::Pointer >   ItkDirectionImageContainerType;
+        typedef itk::VectorContainer< unsigned int, ItkDirectionImage3DType::Pointer >   ItkDirectionImageContainerType;
         typedef itk::EvaluateDirectionImagesFilter< float >                     EvaluationFilterType;
 
         ItkDirectionImageContainerType::Pointer directionImageContainer = ItkDirectionImageContainerType::New();
-        for (int i=0; i<testImages.size(); i++)
+        for (unsigned int i=0; i<testImages.size(); i++)
         {
             try
             {
@@ -95,7 +95,7 @@ int PeaksAngularError(int argc, char* argv[])
 
         // load reference directions
         ItkDirectionImageContainerType::Pointer referenceImageContainer = ItkDirectionImageContainerType::New();
-        for (int i=0; i<referenceImages.size(); i++)
+        for (unsigned int i=0; i<referenceImages.size(); i++)
         {
             try
             {
@@ -127,7 +127,7 @@ int PeaksAngularError(int argc, char* argv[])
         else
         {
             mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(maskImage)->GetData());
-            mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMaskImage);
+            mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
         }
 
         // evaluate directions

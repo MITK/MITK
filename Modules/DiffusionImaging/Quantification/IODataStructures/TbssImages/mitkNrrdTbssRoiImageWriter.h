@@ -20,8 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
 #include <mitkTbssRoiImage.h>
-#include <QString>
-#include "QuantificationExports.h"
+#include "MitkQuantificationExports.h"
 
 namespace mitk
 {
@@ -31,7 +30,7 @@ namespace mitk
  * @ingroup Process
  */
 
-class Quantification_EXPORT NrrdTbssRoiImageWriter : public mitk::FileWriterWithInformation
+class MitkQuantification_EXPORT NrrdTbssRoiImageWriter : public mitk::FileWriterWithInformation
 {
 public:
 
@@ -41,7 +40,8 @@ public:
 
     mitkWriterMacro
 
-    itkNewMacro( Self )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::TbssRoiImage InputType;
 
@@ -80,6 +80,7 @@ public:
      * Sets the input object for the filter.
      * @param input the diffusion volumes to write to file.
      */
+    using ProcessObject::SetInput;
     void SetInput( InputType* input );
 
     /**

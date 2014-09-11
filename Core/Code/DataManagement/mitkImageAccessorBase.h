@@ -33,10 +33,10 @@ namespace mitk {
 //## @ingroup Data
 
 class Image;
-typedef itk::SmartPointer<mitk::Image> ImagePointer;
 
 /** \brief This struct allows to make ImageAccessors wait for this particular ImageAccessor object*/
-struct ImageAccessorWaitLock {
+struct ImageAccessorWaitLock
+{
   /** \brief Holds the number of ImageAccessors, which are waiting until the represented ImageAccessor is released. */
   unsigned int m_WaiterCount;
 
@@ -49,7 +49,8 @@ struct ImageAccessorWaitLock {
   #define MITK_USE_RECURSIVE_MUTEX_PREVENTION
 #endif
 
-class MITK_CORE_EXPORT ImageAccessorBase {
+class MITK_CORE_EXPORT ImageAccessorBase
+{
 
   friend class Image;
 
@@ -64,6 +65,8 @@ class MITK_CORE_EXPORT ImageAccessorBase {
 
 public:
 
+  typedef itk::SmartPointer<const mitk::Image> ImageConstPointer;
+
   /** \brief defines different flags for the ImageAccessor constructors
     */
   enum Options {
@@ -72,11 +75,17 @@ public:
     /** Defines if the Constructor waits for locked memory until it is released or not. If not, an exception is thrown.*/
     ExceptionIfLocked = 1,
     /** Defines if requested Memory has to be coherent. If the parameter is true, it is possible that new Memory has to be allocated to arrange this desired condition. Consequently, this parameter can heavily affect computation time.*/
-    ForceCoherentMemory = 2
+    ForceCoherentMemory = 2,
+    /** Ignores the lock mechanism for immediate access. Only possible with read accessors. */
+    IgnoreLock = 4
   };
 
-  virtual ~ImageAccessorBase()
+  virtual ~ImageAccessorBase();
+
+  /** \brief Gives const access to the data. */
+  inline const void * GetData() const
   {
+    return m_AddressBegin;
   }
 
 protected:
@@ -95,14 +104,13 @@ typedef pthread_t ThreadIDType;
 #endif
 
   /** \brief Checks validity of given parameters from inheriting classes and stores those parameters in member variables. */
-  ImageAccessorBase(
-      ImagePointer iP,
-      ImageDataItem* iDI = NULL,
+  ImageAccessorBase(ImageConstPointer iP,
+      const ImageDataItem* iDI = NULL,
       int OptionFlags = DefaultBehavior
     );
 
   /** ImageAccessor has access to the image it belongs to. */
-  ImagePointer m_Image;
+  //ImagePointer m_Image;
 
   /** Contains a SubRegion (always represented in maximal possible dimension) */
   itk::ImageRegion<4>* m_SubRegion;
@@ -143,6 +151,7 @@ typedef pthread_t ThreadIDType;
   /** \brief Prevents a recursive mutex lock by comparing thread ids of competing image accessors */
   void PreventRecursiveMutexLock(ImageAccessorBase* iAB);
 
+  virtual const Image* GetImage() const = 0;
 
 private:
 
@@ -154,11 +163,11 @@ private:
 };
 
 
-  class MemoryIsLockedException : public Exception
-  {
-  public:
-    mitkExceptionClassMacro(MemoryIsLockedException,Exception)
-  };
+class MemoryIsLockedException : public Exception
+{
+public:
+  mitkExceptionClassMacro(MemoryIsLockedException,Exception)
+};
 
 }
 

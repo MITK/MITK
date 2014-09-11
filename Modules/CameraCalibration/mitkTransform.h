@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 #include <cv.h>
 #include <mitkCommon.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkNavigationData.h>
 #include <tinyxml.h>
 #include <sstream>
 #include <vtkMatrix4x4.h>
 #include <mitkXMLSerializable.h>
-#include <mitkCameraCalibrationExports.h>
+#include <MitkCameraCalibrationExports.h>
 
 namespace mitk {
 
@@ -37,7 +37,7 @@ namespace mitk {
   /// between opencv/vnl/mitk/xml representations of transform
   /// data
   ///
-  class mitkCameraCalibration_EXPORT Transform: public itk::Object,
+  class MitkCameraCalibration_EXPORT Transform: public itk::Object,
     public XMLSerializable
   {
   public:
@@ -135,9 +135,9 @@ namespace mitk {
     ///
     void SetOrientation( const vnl_quaternion<mitk::ScalarType>& orientation);
     ///
-    /// method to set double valued orientation quat
+    /// method to set float valued orientation quat
     ///
-    void SetOrientation( const vnl_quaternion<double>& orientation);
+    void SetOrientation( const vnl_quaternion<float>& orientation);
     ///
     /// method to set translation
     ///
@@ -299,7 +299,7 @@ namespace mitk {
 
 } // namespace mitk
 
-mitkCameraCalibration_EXPORT std::ostream& operator<<
+MitkCameraCalibration_EXPORT std::ostream& operator<<
     (std::ostream& os, mitk::Transform::Pointer p);
 
 #endif // MITKTRANSFORM_H

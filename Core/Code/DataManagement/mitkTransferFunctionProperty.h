@@ -13,14 +13,11 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
-
 #ifndef MITKTRANFERFUNCTIONPROPERTY_H_HEADER_INCLUDED
 #define MITKTRANFERFUNCTIONPROPERTY_H_HEADER_INCLUDED
 
 #include "mitkBaseProperty.h"
 #include "mitkTransferFunction.h"
-
 
 namespace mitk {
 
@@ -29,6 +26,17 @@ namespace mitk {
 # pragma warning(disable: 4522)
 #endif
 
+/**
+ * @brief The TransferFunctionProperty class Property class for the mitk::TransferFunction.
+ * @ingroup DataManagement
+ *
+ * @note If you want to use this property for an mitk::Image, make sure
+ * to set the mitk::RenderingModeProperty to a mode which supports transfer
+ * functions (e.g. COLORTRANSFERFUNCTION_COLOR). Make sure to check the
+ * documentation of the mitk::RenderingModeProperty. For a code example how
+ * to use the mitk::TransferFunction check the
+ * mitkImageVtkMapper2DTransferFunctionTest.cpp in Core\Code\Testing.
+ */
 class MITK_CORE_EXPORT TransferFunctionProperty : public BaseProperty
 {
 public:
@@ -37,7 +45,8 @@ public:
 
   mitkClassMacro(TransferFunctionProperty, BaseProperty);
 
-  itkNewMacro(TransferFunctionProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro1Param(TransferFunctionProperty, mitk::TransferFunction::Pointer);
 
   itkSetMacro(Value, mitk::TransferFunction::Pointer );

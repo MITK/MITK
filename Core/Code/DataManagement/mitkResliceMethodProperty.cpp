@@ -42,10 +42,13 @@ void mitk::ResliceMethodProperty::AddThickSlicesTypes()
   AddEnum( "mip", (IdType) 1 );
   AddEnum( "sum", (IdType) 2 );
   AddEnum( "weighted", (IdType) 3 );
+  AddEnum( "minip", (IdType) 4 );
+  AddEnum( "mean", (IdType) 5 );
 }
 
 itk::LightObject::Pointer mitk::ResliceMethodProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

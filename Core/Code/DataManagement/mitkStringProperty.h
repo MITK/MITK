@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkConfigure.h>
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
 
 #include <string>
@@ -50,7 +50,8 @@ namespace mitk {
       mitkClassMacro(StringProperty, BaseProperty);
       typedef std::string ValueType;
 
-      itkNewMacro(StringProperty);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
       mitkNewMacro1Param(StringProperty, const char*);
       mitkNewMacro1Param(StringProperty, const std::string&)
 

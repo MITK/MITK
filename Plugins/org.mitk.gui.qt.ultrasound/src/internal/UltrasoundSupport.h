@@ -14,25 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef UltrasoundSupport_h
 #define UltrasoundSupport_h
 
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
-#include <mitkUSDevicePersistence.h>
 
 #include "ui_UltrasoundSupportControls.h"
+#include "QmitkUSAbstractCustomWidget.h"
+#include "QmitkUSControlsBModeWidget.h"
+#include "QmitkUSControlsDopplerWidget.h"
+#include "QmitkUSControlsProbesWidget.h"
 
 #include <QTime>
 
-/*!
-  \brief UltrasoundSupport
-  This plugin provides functionality to manage Ultrasound devices, create video devices and to view device images.
+#include <ctkServiceEvent.h>
 
-  \sa QmitkFunctionality
-  \ingroup ${plugin_target}_internal
+/*!
+\brief UltrasoundSupport
+This plugin provides functionality to manage Ultrasound devices, create video devices and to view device images.
+
+\sa QmitkFunctionality
+\ingroup ${plugin_target}_internal
 */
 class UltrasoundSupport : public QmitkAbstractView
 {
@@ -40,16 +44,16 @@ class UltrasoundSupport : public QmitkAbstractView
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
 
-    virtual void SetFocus();
+  virtual void SetFocus();
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
 
-    virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent);
 
-    UltrasoundSupport();
-    virtual ~UltrasoundSupport();
+  UltrasoundSupport();
+  virtual ~UltrasoundSupport();
 
   public slots:
     /*
@@ -57,52 +61,67 @@ class UltrasoundSupport : public QmitkAbstractView
     */
     void OnNewDeviceWidgetDone();
 
-  protected slots:
+    protected slots:
 
-    void OnClickedAddNewDevice();
+      void OnClickedAddNewDevice();
 
-    void OnClickedViewDevice();
+      void OnChangedFramerateLimit(int);
 
-    void OnCropAreaChanged();
+      /*
+       *\brief Called, when the selection in the list of the active devices changes.
+       */
+      void OnChangedActiveDevice();
 
-    /*
-    * \brief This is the main imaging loop that is called regularily during the imaging process
-    */
-    void DisplayImage();
+      void OnClickedFreezeButton();
 
-  protected:
+      void OnDeciveServiceEvent(const ctkServiceEvent event);
 
+      /*
+      * \brief This is the main imaging loop that is called regularily during the imaging process
+      */
+      void DisplayImage();
 
+protected:
 
-    int m_FrameCounter;
+  void CreateControlWidgets();
+  void RemoveControlWidgets();
 
-    /*
-    * \brief This timer triggers periodic updates to the pipeline
-    */
-    QTimer *m_Timer;
+  int m_FrameCounter;
 
-    QTime m_Clock;
+  /*
+  * \brief This timer triggers periodic updates to the pipeline
+  */
+  QTimer* m_Timer;
 
-    /*
-    * \brief The device that is currently used to aquire images
-    */
-    mitk::USDevice::Pointer m_Device;
+  QTime   m_Clock;
 
-    /*
-    * \brief The node that we feed images into
-    */
-    mitk::DataNode::Pointer m_Node;
+  /*
+  * \brief The device that is currently used to aquire images
+  */
+  mitk::USDevice::Pointer m_Device;
 
-    mitk::Image::Pointer m_Image;
+  /*
+  * \brief The node that we feed images into
+  */
+  mitk::DataNode::Pointer m_Node;
 
-    Ui::UltrasoundSupportControls m_Controls;
+  mitk::Image::Pointer m_Image;
 
-    /** @brief reinits the view globally. */
-    void GlobalReinit();
+  mitk::Geometry3D::Pointer m_OldGeometry;
 
-    mitk::USDevicePersistence::Pointer m_DevicePersistence;
+  Ui::UltrasoundSupportControls m_Controls;
 
+  QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
+  QmitkUSControlsBModeWidget*   m_ControlBModeWidget;
+  QmitkUSControlsDopplerWidget* m_ControlDopplerWidget;
+  QmitkUSControlsProbesWidget*  m_ControlProbesWidget;
+
+  QList<ctkServiceReference>    m_CustomWidgetServiceReference;
+
+  bool m_ImageAlreadySetToNode;
+  unsigned int m_CurrentImageWidth;
+  unsigned int m_CurrentImageHeight;
+  double m_CurrentDynamicRange;
 };
 
 #endif // UltrasoundSupport_h
-

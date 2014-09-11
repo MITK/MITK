@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkImageGenerator.h"
 
-#include "mitkTesting.h"
 #include "mitkTestingMacros.h"
 
 #include "mitkIOUtil.h"
@@ -45,7 +44,7 @@ static void Setup( )
   }
   catch( const itk::ExceptionObject &e)
   {
-    MITK_TEST_FAILED_MSG(<< "(Setup) Caught exception from IOUtil while loading input : " << m_Filename <<"\n")
+    MITK_TEST_FAILED_MSG(<< "(Setup) Caught exception from IOUtil while loading input : " << m_Filename <<"\n" << e.what())
   }
 }
 

@@ -24,42 +24,74 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // us
 #include <usModuleResource.h>
+#include <usGetModuleContext.h>
 
 #include <itkObjectFactory.h>
 
 mitk::Tool::Tool(const char* type)
-: StateMachine(type),
-  m_SupportRoi(false),
-  // for reference images
-  m_PredicateImages(NodePredicateDataType::New("Image")),
-  m_PredicateDim3(NodePredicateDimension::New(3, 1)),
-  m_PredicateDim4(NodePredicateDimension::New(4, 1)),
-  m_PredicateDimension( mitk::NodePredicateOr::New(m_PredicateDim3, m_PredicateDim4) ),
-  m_PredicateImage3D( NodePredicateAnd::New(m_PredicateImages, m_PredicateDimension) ),
-
-  m_PredicateBinary(NodePredicateProperty::New("binary", BoolProperty::New(true))),
-  m_PredicateNotBinary( NodePredicateNot::New(m_PredicateBinary) ),
-
-  m_PredicateSegmentation(NodePredicateProperty::New("segmentation", BoolProperty::New(true))),
-  m_PredicateNotSegmentation( NodePredicateNot::New(m_PredicateSegmentation) ),
-
-  m_PredicateHelper(NodePredicateProperty::New("helper object", BoolProperty::New(true))),
-  m_PredicateNotHelper( NodePredicateNot::New(m_PredicateHelper) ),
-
-  m_PredicateImageColorful( NodePredicateAnd::New(m_PredicateNotBinary, m_PredicateNotSegmentation) ),
-
-  m_PredicateImageColorfulNotHelper( NodePredicateAnd::New(m_PredicateImageColorful, m_PredicateNotHelper) ),
-
-  m_PredicateReference( NodePredicateAnd::New(m_PredicateImage3D, m_PredicateImageColorfulNotHelper) ),
-
-  // for working image
-  m_IsSegmentationPredicate(NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
+: m_PredicateImages(NodePredicateDataType::New("Image")) // for reference images
+, m_PredicateDim3(NodePredicateDimension::New(3, 1))
+, m_PredicateDim4(NodePredicateDimension::New(4, 1))
+, m_PredicateDimension( mitk::NodePredicateOr::New(m_PredicateDim3, m_PredicateDim4) )
+, m_PredicateImage3D( NodePredicateAnd::New(m_PredicateImages, m_PredicateDimension) )
+, m_PredicateBinary(NodePredicateProperty::New("binary", BoolProperty::New(true)))
+, m_PredicateNotBinary( NodePredicateNot::New(m_PredicateBinary) )
+, m_PredicateSegmentation(NodePredicateProperty::New("segmentation", BoolProperty::New(true)))
+, m_PredicateNotSegmentation( NodePredicateNot::New(m_PredicateSegmentation) )
+, m_PredicateHelper(NodePredicateProperty::New("helper object", BoolProperty::New(true)))
+, m_PredicateNotHelper( NodePredicateNot::New(m_PredicateHelper) )
+, m_PredicateImageColorful( NodePredicateAnd::New(m_PredicateNotBinary, m_PredicateNotSegmentation) )
+, m_PredicateImageColorfulNotHelper( NodePredicateAnd::New(m_PredicateImageColorful, m_PredicateNotHelper) )
+, m_PredicateReference( NodePredicateAnd::New(m_PredicateImage3D, m_PredicateImageColorfulNotHelper) )
+, m_IsSegmentationPredicate(NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
+, m_InteractorType( type )
 {
+
 }
 
 mitk::Tool::~Tool()
 {
 }
+
+void mitk::Tool::InitializeStateMachine()
+{
+  if (m_InteractorType.empty())
+    return;
+
+  m_InteractorType += ".xml";
+
+  try
+  {
+    LoadStateMachine( m_InteractorType, us::GetModuleContext()->GetModule() );
+    SetEventConfig( "SegmentationToolsConfig.xml", us::GetModuleContext()->GetModule() );
+  }
+  catch( const std::exception& e )
+  {
+    MITK_ERROR << "Could not load statemachine pattern " << m_InteractorType << " with exception: " << e.what();
+  }
+}
+
+void mitk::Tool::Notify( InteractionEvent* interactionEvent, bool isHandled )
+{
+  // to use the state machine pattern,
+  // the event is passed to the state machine interface to be handled
+  if ( !isHandled )
+  {
+    this->HandleEvent(interactionEvent, NULL);
+  }
+}
+
+void mitk::Tool::ConnectActionsAndFunctions()
+{
+}
+
+
+bool mitk::Tool::FilterEvents(InteractionEvent* , DataNode* )
+{
+  return true;
+}
+
+
 
 const char* mitk::Tool::GetGroup() const
 {
@@ -77,7 +109,8 @@ void mitk::Tool::Activated()
 
 void mitk::Tool::Deactivated()
 {
-  StateMachine::ResetStatemachineToStartState(); // forget about the past
+  // ToDo: reactivate this feature!
+  //StateMachine::ResetStatemachineToStartState(); // forget about the past
 }
 
 itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix)
@@ -215,3 +248,4 @@ us::ModuleResource mitk::Tool::GetCursorIconResource() const
   // Each specific tool should load its own resource. This one will be invalid
   return us::ModuleResource();
 }
+

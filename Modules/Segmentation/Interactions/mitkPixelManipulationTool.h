@@ -17,24 +17,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPIXELMANIPULATIONTOOL_H
 
 #include "mitkTool.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 #include "itkImage.h"
 
 namespace mitk
 {
-  class Segmentation_EXPORT PixelManipulationTool : public Tool
+  class Image;
+
+  class MitkSegmentation_EXPORT PixelManipulationTool : public Tool
   {
   public:
     mitkClassMacro(PixelManipulationTool, Tool);
-    itkNewMacro(PixelManipulationTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-    itkSetMacro(Value, int);
-    itkGetMacro(Value, int);
+    void SetValue( int value );
+    int GetValue();
 
-    itkSetMacro(FixedValue, bool);
-    itkGetMacro(FixedValue, bool);
-    itkBooleanMacro(FixedValue);
+    void SetFixedValue( int value );
+    int GetFixedValue();
 
     virtual const char* GetName() const;
     virtual const char** GetXPM() const;
@@ -50,7 +52,7 @@ namespace mitk
     virtual ~PixelManipulationTool();
 
     virtual void OnRoiDataChanged();
-    void AddImageToDataStorage(mitk::Image::Pointer image);
+    void AddImageToDataStorage(itk::SmartPointer<mitk::Image> image);
 
     template <typename TPixel, unsigned int VImageDimension>
     void ITKPixelManipulation( itk::Image<TPixel, VImageDimension>* originalImage, Image* maskImage, Image* newImage, int newValue);

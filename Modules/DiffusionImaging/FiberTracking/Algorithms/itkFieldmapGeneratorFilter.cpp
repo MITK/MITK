@@ -61,7 +61,7 @@ void FieldmapGeneratorFilter< OutputImageType >::ThreadedGenerateData( const Out
         for (int i=0; i<3; i++)
             value += idx[i]*m_Gradient[i] + m_Offset[i];
 
-        for (int i=0; i<m_WorldPositions.size(); i++)
+        for (unsigned int i=0; i<m_WorldPositions.size(); i++)
         {
             mitk::Point3D c = m_WorldPositions.at(i);
             itk::Point<double, 3> vertex;

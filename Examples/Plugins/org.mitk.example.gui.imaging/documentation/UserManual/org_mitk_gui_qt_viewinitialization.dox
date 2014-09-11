@@ -1,0 +1,8 @@
+/**
+\page org_mitk_views_viewinitialitzation The View Initialization Module
+
+\imageMacro{viewInitializationIcon.png,"Icon of the View Initialization Module",2.00}
+
+This view serves as a sandbox for understanding and experimenting with the geometry initialization parameters. For example, to view the axial slices from above instead of from below. It is not intended for end users, but for developers.
+
+*/

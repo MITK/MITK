@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPixelManipulationTool.h"
 
 #include "mitkToolManager.h"
-
+#include "mitkImage.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkProperties.h"
@@ -26,14 +26,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPixelManipulationTool.xpm"
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, PixelManipulationTool, "Pixel manipulation tool");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, PixelManipulationTool, "Pixel manipulation tool");
 }
 
 mitk::PixelManipulationTool::PixelManipulationTool() : Tool("dummy"),
 m_Value(0),
 m_FixedValue(false)
 {
-  this->SupportRoiOn();
 }
 
 mitk::PixelManipulationTool::~PixelManipulationTool()
@@ -168,4 +167,24 @@ void mitk::PixelManipulationTool::AddImageToDataStorage(mitk::Image::Pointer ima
     if (m_ToolManager)
       m_ToolManager->GetDataStorage()->Add(node, m_OriginalImageNode);
   }
+}
+
+void mitk::PixelManipulationTool::SetValue( int value )
+{
+  m_Value = value;
+}
+
+int mitk::PixelManipulationTool::GetValue()
+{
+  return m_Value;
+}
+
+void mitk::PixelManipulationTool::SetFixedValue( int value )
+{
+  m_FixedValue = value;
+}
+
+int mitk::PixelManipulationTool::GetFixedValue()
+{
+  return m_FixedValue;
 }

@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGlobalInteraction.h"
 #include "mitkEventMapper.h"
 #include "mitkGenericProperty.h"
-
+#include "mitkImageSource.h"
 #include "mitkCoreObjectFactory.h"
 
 
@@ -194,17 +194,26 @@ void mitk::DataNode::SetRequestedRegion( const itk::DataObject * /*data*/)
 void mitk::DataNode::CopyInformation(const itk::DataObject * /*data*/)
 {
 }
+
 mitk::PropertyList* mitk::DataNode::GetPropertyList(const mitk::BaseRenderer* renderer) const
 {
   if(renderer==NULL)
     return m_PropertyList;
 
-  mitk::PropertyList::Pointer & propertyList = m_MapOfPropertyLists[renderer];
+  return this->GetPropertyList(renderer->GetName());
+}
+
+mitk::PropertyList* mitk::DataNode::GetPropertyList(const std::string& rendererName) const
+{
+  if (rendererName.empty())
+    return m_PropertyList;
+
+  mitk::PropertyList::Pointer & propertyList = m_MapOfPropertyLists[rendererName];
 
   if(propertyList.IsNull())
     propertyList = mitk::PropertyList::New();
 
-  assert(m_MapOfPropertyLists[renderer].IsNotNull());
+  assert(m_MapOfPropertyLists[rendererName].IsNotNull());
 
   return propertyList;
 }
@@ -222,9 +231,11 @@ mitk::BaseProperty* mitk::DataNode::GetProperty(const char *propertyKey, const m
   //renderer specified?
   if (renderer)
   {
-    std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer>::const_iterator it;
+    std::string rendererName = renderer->GetName();
+
+    MapOfPropertyLists::const_iterator it;
     //check for the renderer specific property
-    it=m_MapOfPropertyLists.find(renderer);
+    it=m_MapOfPropertyLists.find(rendererName);
     if(it!=m_MapOfPropertyLists.end()) //found
     {
       mitk::BaseProperty::Pointer property;
@@ -298,6 +309,25 @@ bool mitk::DataNode::GetFloatProperty(const char* propertyKey, float &floatValue
     return false;
 
   floatValue = floatprop->GetValue();
+  return true;
+}
+
+bool mitk::DataNode::GetDoubleProperty(const char* propertyKey, double &doubleValue, mitk::BaseRenderer* renderer) const
+{
+  mitk::DoubleProperty::Pointer doubleprop = dynamic_cast<mitk::DoubleProperty*>(GetProperty(propertyKey, renderer));
+  if(doubleprop.IsNull())
+  {
+    // try float instead
+    float floatValue = 0;
+    if (this->GetFloatProperty(propertyKey, floatValue, renderer))
+    {
+      doubleValue = floatValue;
+      return true;
+    }
+    return false;
+  }
+
+  doubleValue = doubleprop->GetValue();
   return true;
 }
 
@@ -401,7 +431,20 @@ void mitk::DataNode::SetBoolProperty( const char* propertyKey, bool boolValue, m
 
 void mitk::DataNode::SetFloatProperty( const char* propertyKey, float floatValue, mitk::BaseRenderer* renderer/*=NULL*/ )
 {
+  if (dynamic_cast<DoubleProperty*>(this->GetProperty(propertyKey, renderer)) != NULL)
+  {
+    MITK_WARN << "Setting float property " << propertyKey << " although a double property with the same name already exists";
+  }
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::FloatProperty::New(floatValue));
+}
+
+void mitk::DataNode::SetDoubleProperty(const char *propertyKey, float doubleValue, mitk::BaseRenderer *renderer)
+{
+  if (dynamic_cast<FloatProperty*>(this->GetProperty(propertyKey, renderer)) != NULL)
+  {
+    MITK_WARN << "Setting double property " << propertyKey << " although a float property with the same name already exists";
+  }
+  GetPropertyList(renderer)->SetProperty(propertyKey, mitk::DoubleProperty::New(doubleValue));
 }
 
 void mitk::DataNode::SetStringProperty( const char* propertyKey, const char* stringValue, mitk::BaseRenderer* renderer/*=NULL*/ )
@@ -439,7 +482,7 @@ vtkLinearTransform* mitk::DataNode::GetVtkTransform(int t) const
 {
   assert(m_Data.IsNotNull());
 
-  mitk::Geometry3D* geometry = m_Data->GetGeometry(t);
+  mitk::BaseGeometry* geometry = m_Data->GetGeometry(t);
 
   if(geometry == NULL)
     return NULL;

@@ -113,7 +113,7 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
       if (i == m_GrabbedHandle && m_LineEditAvailable)
       {
         int xCursor = m_XEdit->cursorPosition();
-        m_XEdit->setText(QString::number(GetFunctionX(m_GrabbedHandle)));
+        m_XEdit->setText(QString::number(GetFunctionX(m_GrabbedHandle), 'g', 4));
         m_XEdit->setCursorPosition( xCursor );
       }
     }

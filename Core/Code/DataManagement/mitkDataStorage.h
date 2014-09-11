@@ -259,7 +259,7 @@ namespace mitk {
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    mitk::TimeGeometry::Pointer ComputeBoundingGeometry3D( const SetOfObjects* input, const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL) const;
+    mitk::TimeGeometry::Pointer ComputeBoundingGeometry3D( const SetOfObjects* input, const char* boolPropertyKey = NULL, const mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL) const;
 
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of the data tree
@@ -270,7 +270,7 @@ namespace mitk {
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    mitk::TimeGeometry::Pointer ComputeBoundingGeometry3D( const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL) const;
+    mitk::TimeGeometry::Pointer ComputeBoundingGeometry3D( const char* boolPropertyKey = NULL, const mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL) const;
 
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of all visible parts of the
@@ -281,7 +281,7 @@ namespace mitk {
     //## @param renderer the reference to the renderer
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
-    mitk::TimeGeometry::Pointer ComputeVisibleBoundingGeometry3D( mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL);
+    mitk::TimeGeometry::Pointer ComputeVisibleBoundingGeometry3D( const mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL);
 
     //##Documentation
     //## @brief Compute the bounding box of data tree structure
@@ -290,7 +290,7 @@ namespace mitk {
      //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    mitk::BoundingBox::Pointer ComputeBoundingBox( const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
+    mitk::BoundingBox::Pointer ComputeBoundingBox( const char* boolPropertyKey = NULL, const mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
 
     //##Documentation
     //## \brief Compute the bounding box of all visible parts of the data tree structure, for general
@@ -301,7 +301,7 @@ namespace mitk {
     //## @param renderer the reference to the renderer
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
-    mitk::BoundingBox::Pointer ComputeVisibleBoundingBox( mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL)
+    mitk::BoundingBox::Pointer ComputeVisibleBoundingBox( const mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL)
     {
       return ComputeBoundingBox( "visible", renderer, boolPropertyKey);
     }
@@ -316,7 +316,7 @@ namespace mitk {
     //## and is set to @a false, the node is ignored for the time-bounds calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    mitk::TimeBounds ComputeTimeBounds( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2);
+    mitk::TimeBounds ComputeTimeBounds( const char* boolPropertyKey, const mitk::BaseRenderer* renderer, const char* boolPropertyKey2);
 
     //##Documentation
     //## @brief Compute the time-bounds of all visible parts of the data tree structure, for general
@@ -329,7 +329,7 @@ namespace mitk {
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the time-bounds calculation.
     //## @param renderer see @a boolPropertyKey
-    mitk::TimeBounds ComputeTimeBounds( mitk::BaseRenderer* renderer, const char* boolPropertyKey)
+    mitk::TimeBounds ComputeTimeBounds( const mitk::BaseRenderer* renderer, const char* boolPropertyKey)
     {
       return ComputeTimeBounds( "visible", renderer, boolPropertyKey);
     }

@@ -13,8 +13,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKCMDLINEMODULEPROGRESSWIDGET_H
-#define QMITKCMDLINEMODULEPROGRESSWIDGET_H
+#ifndef QMITKCMDLINEMODULERUNNER_H
+#define QMITKCMDLINEMODULERUNNER_H
 
 #include <QWidget>
 #include <QTimer>
@@ -38,21 +38,21 @@ class DataStorage;
 }
 
 /**
- * \class QmitkCmdLineModuleProgressWidget
+ * \class QmitkCmdLineModuleRunner
  * \brief Based on ctkCmdLineModuleExplorerProgressWidget, implements a progress widget
  * with console output, and space for storing the GUI widgets.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  * \sa ctkCmdLineModuleExplorerProgressWidget
  */
-class QmitkCmdLineModuleProgressWidget : public QWidget
+class QmitkCmdLineModuleRunner : public QWidget
 {
   Q_OBJECT
 
 public:
 
-  QmitkCmdLineModuleProgressWidget(QWidget *parent = 0);
-  virtual ~QmitkCmdLineModuleProgressWidget();
+  QmitkCmdLineModuleRunner(QWidget *parent = 0);
+  virtual ~QmitkCmdLineModuleRunner();
 
   /**
    * \brief Sets the manager on this object, and must be called immediately
@@ -232,4 +232,4 @@ private:
   int m_ErrorCount;
 };
 
-#endif // QMITKCMDLINEMODULEPROGRESSWIDGET_H
+#endif // QMITKCMDLINEMODULERUNNER_H

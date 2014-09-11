@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "CommandLineModulesPreferencesPage.h"
 #include "QmitkCmdLineModuleFactoryGui.h"
 #include "QmitkCmdLineModuleGui.h"
-#include "QmitkCmdLineModuleProgressWidget.h"
+#include "QmitkCmdLineModuleRunner.h"
 
 // Qt
 #include <QDebug>
@@ -114,7 +114,7 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     // We create CommandLineModulesViewControls, which derives from the Qt generated class.
     m_Controls = new CommandLineModulesViewControls(parent);
 
-    // Create a layout to contain a display of QmitkCmdLineModuleProgressWidget.
+    // Create a layout to contain a display of QmitkCmdLineModuleRunner.
     m_Layout = new QVBoxLayout(m_Controls->m_RunningWidgets);
     m_Layout->setContentsMargins(0,0,0,0);
     m_Layout->setSpacing(0);
@@ -421,8 +421,8 @@ void CommandLineModulesView::OnRunButtonPressed()
   int tabNumber = m_Controls->m_TabWidget->currentIndex();
   if (tabNumber >= 0)
   {
-    // 1. Create a new QmitkCmdLineModuleProgressWidget to represent the running widget.
-    QmitkCmdLineModuleProgressWidget *widget = new QmitkCmdLineModuleProgressWidget(m_Controls->m_RunningWidgets);
+    // 1. Create a new QmitkCmdLineModuleRunner to represent the running widget.
+    QmitkCmdLineModuleRunner *widget = new QmitkCmdLineModuleRunner(m_Controls->m_RunningWidgets);
     widget->SetDataStorage(this->GetDataStorage());
     widget->SetManager(m_ModuleManager);
     widget->SetOutputDirectory(m_OutputDirectoryName);

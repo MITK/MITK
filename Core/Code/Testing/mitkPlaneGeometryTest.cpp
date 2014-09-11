@@ -460,7 +460,6 @@ public:
     //the corner of the box, not around the planes origin. Now change it to a rotation around
     //the origin, simply by re-setting the origin to the original one:
     planegeometry->SetOrigin(origin);
-    mitk::Point3D cornerpoint0 = planegeometry->GetCornerPoint(0);
 
     CPPUNIT_ASSERT_MESSAGE("Testing whether SetIndexToWorldTransform kept origin: ", mitk::Equal(planegeometry->GetOrigin(), origin, testEps) );
 

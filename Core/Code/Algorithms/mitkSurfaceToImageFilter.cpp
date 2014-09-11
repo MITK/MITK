@@ -134,12 +134,12 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   vtkPolyData * polydata = ( (mitk::Surface*)GetInput() )->GetVtkPolyData( surfaceTimeStep );
   if(polydata)
   {
-    vtkSmartPointer<vtkTransformPolyDataFilter> move=vtkTransformPolyDataFilter::New();
+    vtkSmartPointer<vtkTransformPolyDataFilter> move = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
     move->SetInputData(polydata);
     move->ReleaseDataFlagOn();
 
-    vtkSmartPointer<vtkTransform> transform=vtkTransform::New();
-  BaseGeometry* geometry = surfaceTimeGeometry->GetGeometryForTimeStep( surfaceTimeStep );
+    vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+    BaseGeometry* geometry = surfaceTimeGeometry->GetGeometryForTimeStep( surfaceTimeStep );
     if(!geometry)
     {
       geometry = GetInput()->GetGeometry();
@@ -147,11 +147,11 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
     transform->PostMultiply();
     transform->Concatenate(geometry->GetVtkTransform()->GetMatrix());
     // take image geometry into account. vtk-Image information will be changed to unit spacing and zero origin below.
-  BaseGeometry* imageGeometry = imageTimeGeometry->GetGeometryForTimeStep(time);
+    BaseGeometry* imageGeometry = imageTimeGeometry->GetGeometryForTimeStep(time);
     transform->Concatenate(imageGeometry->GetVtkTransform()->GetLinearInverse());
     move->SetTransform(transform);
 
-    vtkSmartPointer<vtkPolyDataNormals> normalsFilter = vtkPolyDataNormals::New();
+    vtkSmartPointer<vtkPolyDataNormals> normalsFilter = vtkSmartPointer<vtkPolyDataNormals>::New();
     normalsFilter->SetFeatureAngle(50);
     normalsFilter->SetConsistency(1);
     normalsFilter->SetSplitting(1);
@@ -160,7 +160,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
 
     normalsFilter->SetInputConnection(move->GetOutputPort());
 
-    vtkSmartPointer<vtkPolyDataToImageStencil> surfaceConverter = vtkPolyDataToImageStencil::New();
+    vtkSmartPointer<vtkPolyDataToImageStencil> surfaceConverter = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
     surfaceConverter->SetTolerance( 0.0 );
     surfaceConverter->ReleaseDataFlagOn();
 
@@ -171,7 +171,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
         : const_cast<mitk::Image *>(this->GetImage())->GetVtkImageData(time);
 
     // Create stencil and use numerical minimum of pixel type as background value
-    vtkSmartPointer<vtkImageStencil> stencil = vtkImageStencil::New();
+    vtkSmartPointer<vtkImageStencil> stencil = vtkSmartPointer<vtkImageStencil>::New();
     stencil->SetInputData(image);
     stencil->ReverseStencilOff();
     stencil->ReleaseDataFlagOn();

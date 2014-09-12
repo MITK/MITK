@@ -25,6 +25,18 @@
 #include <MitkCoreExports.h>
 #include <string>
 
+/**
+ * Macro that can be used to connect a StateMachineAction with a function.
+ * It assumes that there is a typedef Classname Self in classes that use
+ * this macro, as is provided by e.g. mitkClassMacro
+ */
+#define CONNECT_FUNCTION(a, f) \
+  ::mitk::EventStateMachine::AddActionFunction(a, ::mitk::MessageDelegate2<Self, ::mitk::StateMachineAction*, ::mitk::InteractionEvent*, bool>(this, &Self::f));
+
+#define CONNECT_CONDITION(a, f) \
+  ::mitk::EventStateMachine::AddConditionFunction(a, ::mitk::MessageDelegate1<Self,const ::mitk::InteractionEvent*, bool>(this, &Self::f));
+
+
 namespace us {
 class Module;
 }
@@ -83,16 +95,6 @@ namespace mitk
     bool (T::*m_MemberFunctionPointer)(StateMachineAction*, InteractionEvent*);
   };
 
-  /** Macro that can be used to connect a StateMachineAction with a function.
-   *  It assumes that there is a typedef Classname Self in classes that use this macro, as is provided by e.g. mitkClassMacro
-   */
-#define CONNECT_FUNCTION(a, f) \
-    ::mitk::EventStateMachine::AddActionFunction(a, ::mitk::MessageDelegate2<Self, ::mitk::StateMachineAction*, ::mitk::InteractionEvent*, bool>(this, &Self::f));
-
-#define CONNECT_CONDITION(a, f) \
-    ::mitk::EventStateMachine::AddConditionFunction(a, ::mitk::MessageDelegate1<Self,const ::mitk::InteractionEvent*, bool>(this, &Self::f));
-
-
   /**
    * \class EventStateMachine
    *
@@ -103,7 +105,6 @@ namespace mitk
    * is triggered by an event and it is associated with actions that are to be executed when the state change is performed.
    *
    */
-
   class MITK_CORE_EXPORT EventStateMachine : public mitk::InteractionEventHandler
   {
 
@@ -143,7 +144,6 @@ namespace mitk
       m_UndoEnabled = enable;
     }
 
-
     /**
     * @brief Enables/disables the state machine. In un-enabled state it won't react to any events.
     **/
@@ -151,7 +151,6 @@ namespace mitk
     {
       m_IsActive = enable;
     }
-
 
   protected:
     EventStateMachine();

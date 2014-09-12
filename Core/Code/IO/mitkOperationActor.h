@@ -28,7 +28,7 @@ namespace mitk
 
   /** Macro for checking the type of an operation*/
 #define mitkCheckOperationTypeMacro(OperationType, operation, newOperationName) \
-  mitk::OperationType *newOperationName= dynamic_cast<mitk::OperationType *>(operation);\
+  mitk::OperationType *newOperationName= dynamic_cast<OperationType *>(operation);\
   if (newOperationName == NULL)\
   {\
   itkWarningMacro("Recieved wrong type of operation!");\

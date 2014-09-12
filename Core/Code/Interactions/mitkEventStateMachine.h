@@ -87,10 +87,10 @@ namespace mitk
    *  It assumes that there is a typedef Classname Self in classes that use this macro, as is provided by e.g. mitkClassMacro
    */
 #define CONNECT_FUNCTION(a, f) \
-    EventStateMachine::AddActionFunction(a, MessageDelegate2<Self, StateMachineAction*, InteractionEvent*, bool>(this, &Self::f));
+    ::mitk::EventStateMachine::AddActionFunction(a, ::mitk::MessageDelegate2<Self, ::mitk::StateMachineAction*, ::mitk::InteractionEvent*, bool>(this, &Self::f));
 
 #define CONNECT_CONDITION(a, f) \
-    EventStateMachine::AddConditionFunction(a, MessageDelegate1<Self,const InteractionEvent*, bool>(this, &Self::f));
+    ::mitk::EventStateMachine::AddConditionFunction(a, ::mitk::MessageDelegate1<Self,const ::mitk::InteractionEvent*, bool>(this, &Self::f));
 
 
   /**

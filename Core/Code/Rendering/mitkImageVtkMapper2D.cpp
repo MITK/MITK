@@ -172,7 +172,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   {
     VtkResliceInterpolationProperty *resliceInterpolationProperty;
     datanode->GetProperty(
-          resliceInterpolationProperty, "reslice interpolation" );
+          resliceInterpolationProperty, "reslice interpolation", renderer );
 
     int interpolationMode = VTK_RESLICE_NEAREST;
     if ( resliceInterpolationProperty != NULL )
@@ -214,11 +214,11 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     {
       ResliceMethodProperty *resliceMethodEnumProperty=0;
 
-      if( dn->GetProperty( resliceMethodEnumProperty, "reslice.thickslices" ) && resliceMethodEnumProperty )
+      if( dn->GetProperty( resliceMethodEnumProperty, "reslice.thickslices", renderer ) && resliceMethodEnumProperty )
         thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
 
       IntProperty *intProperty=0;
-      if( dn->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
+      if( dn->GetProperty( intProperty, "reslice.thickslices.num", renderer ) && intProperty )
       {
         thickSlicesNum = intProperty->GetValue();
         if(thickSlicesNum < 1) thickSlicesNum=1;

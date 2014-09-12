@@ -180,14 +180,6 @@ function(mitk_create_module)
     endforeach()
   endif()
 
-  # check and set-up auto-loading
-  if(MODULE_AUTOLOAD_WITH)
-    set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-autoload")
-    if(NOT TARGET "${MODULE_AUTOLOAD_WITH}")
-      message(SEND_ERROR "The module target \"${MODULE_AUTOLOAD_WITH}\" specified as the auto-loading module for \"${MODULE_NAME}\" does not exist")
-    endif()
-  endif()
-
   # assume worst case
   set(MODULE_IS_ENABLED 0)
   # first we check if we have an explicit module build list
@@ -240,6 +232,14 @@ function(mitk_create_module)
         set(Q${KITNAME}_GENERATED_MOC_CPP )
         set(Q${KITNAME}_GENERATED_QRC_CPP )
         set(Q${KITNAME}_GENERATED_UI_CPP )
+
+        # check and set-up auto-loading
+        if(MODULE_AUTOLOAD_WITH)
+          set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-autoload")
+          if(NOT TARGET "${MODULE_AUTOLOAD_WITH}")
+            message(SEND_ERROR "The module target \"${MODULE_AUTOLOAD_WITH}\" specified as the auto-loading module for \"${MODULE_NAME}\" does not exist")
+          endif()
+        endif()
 
         # Convert relative include dirs to absolute dirs
         set(_include_dirs . ${MODULE_INCLUDE_DIRS})

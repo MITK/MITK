@@ -104,6 +104,8 @@ void HelpEditor::CreateQtPartControl(QWidget* parent)
                                                 m_WebView, SLOT(forward()));
   m_HomeAction = m_ToolBar->addAction(QIcon(":/org.blueberry.ui.qt.help/go-home.png"), "Go home",
                                       m_WebView, SLOT(home()));
+  m_PrintAction = m_ToolBar->addAction(QIcon(":/org.blueberry.ui.qt.help/print.png"), "Print",
+    m_WebView, SLOT(print()));
 
   m_ToolBar->addSeparator();
 

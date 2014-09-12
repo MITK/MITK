@@ -21,12 +21,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateBase.h"
 #include "mitkBaseProperty.h"
 #include "mitkWeakPointer.h"
+#include "mitkBaseRenderer.h"
 
 namespace mitk {
 
     //##Documentation
     //## @brief Predicate that evaluates if the given DataNode has a specific property.
     //## If the second parameter is NULL, it will only be checked whether there is a property with the specified name.
+    //## If a renderer is specified in the third parameter the renderer-specific property will be checked. If this
+    //## parameter is NULL or not specified, then the non-renderer-specific property will be checked.
     //##
     //##
     //##
@@ -37,6 +40,7 @@ namespace mitk {
       mitkClassMacro(NodePredicateProperty, NodePredicateBase);
       mitkNewMacro1Param(NodePredicateProperty, const char*);
       mitkNewMacro2Param(NodePredicateProperty, const char*, mitk::BaseProperty*);
+      mitkNewMacro3Param(NodePredicateProperty, const char*, mitk::BaseProperty*, const mitk::BaseRenderer*);
 
       //##Documentation
       //## @brief Standard Destructor
@@ -49,16 +53,13 @@ namespace mitk {
     protected:
       //##Documentation
       //## @brief Constructor to check for a named property
-      NodePredicateProperty(const char* propertyName, mitk::BaseProperty* p);
-
-      //##Documentation
-      //## @brief Constructor to check for the existence of a property with a given name
-      NodePredicateProperty(const char* propertyName);
+      NodePredicateProperty(const char* propertyName, mitk::BaseProperty* p=0, const mitk::BaseRenderer *renderer=0);
 
       //mitk::WeakPointer<mitk::BaseProperty> m_ValidProperty;
       mitk::BaseProperty::Pointer m_ValidProperty;
       //mitk::BaseProperty* m_ValidProperty;
       std::string m_ValidPropertyName;
+      const mitk::BaseRenderer *m_Renderer;
     };
 
 } // namespace mitk

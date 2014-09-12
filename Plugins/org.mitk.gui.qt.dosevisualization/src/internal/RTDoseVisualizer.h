@@ -99,9 +99,7 @@ public:
 
     void OnHandleCTKEventPresetsChanged(const ctkEvent& event);
 
-    void UpdateFreeIsoLine(mitk::IsoDoseLevel*level, mitk::DoseValueRel old);
-
-    void UpdateFreeIsoLineColor(mitk::IsoDoseLevel* level);
+    void ActualizeFreeIsoLine();
 
 protected:
 
@@ -116,7 +114,7 @@ protected:
   /** Update the transfer funtion property for the color wash*/
   void UpdateColorWashTransferFunction();
 
-  /** Method updates the list widget according to the current m_freeIsoValues.*/
+  /** Method updates the list widget according to the current free iso values.*/
   void UpdateFreeIsoValues();
 
   /** Update the members according to the currently selected node */
@@ -140,54 +138,12 @@ protected:
   @TODO: should be moved outside the class, to be available for other classes at well.*/
   void ActualizeDisplayStyleForAllDoseDataNodes();
 
-  /**
-   * @brief UpdatePolyData
-   * @param num
-   * @param min
-   * @param max
-   * @return
-   */
-  mitk::DataNode::Pointer UpdatePolyData(int num, double min, double max);
-
-  mitk::DataNode::Pointer GetIsoDoseNode();
-
-  /**
-   * @brief Calculates the isolines for the dose image
-   * Number, value and color depends on the selected preset
-   */
-  void UpdateStdIsolines();
-
-  /**
-   * @brief Get the active axial slice as 2D image
-   * Uses a mitkExtractSliceFilter for getting the 2D slice of the
-   * axial view
-   * @param image the mitkImage which is shown in the axial window
-   * @return the 2D mitkImage slice
-   */
-  mitk::Image::Pointer GetExtractedSlice(mitk::Image::Pointer image);
-
-  /**
-   * @brief Get the mitkGeometry2D of a specific render window
-   * @param dim the name of the render window
-   * @return the mitkGeometry2D of the render window
-   */
-  const mitk::Geometry2D* GetGeometry2D(char* dim);
-
   Ui::RTDoseVisualizerControls m_Controls;
   mitk::DataNode::Pointer m_selectedNode;
-  mitk::IsoDoseLevel::Pointer m_FreeIsoValue;
-  mitk::IsoDoseLevelVector::Pointer m_freeIsoValues;
-  std::vector<mitk::DataNode::Pointer> m_FreeIsoLines;
-  std::vector<mitk::DataNode::Pointer> m_StdIsoLines;
-  /** Iso level set of the current node. Should normaly be a clone of the
-  * current iso preset. It held as own member because visibility
-  * settings may differ.*/
-  mitk::IsoDoseLevelSet::Pointer m_selectedNodeIsoSet;
+  unsigned int m_freeIsoValuesCount;
+
   mitk::PresetMapType m_Presets;
   std::string m_selectedPresetName;
-
-  mitk::DataNode::Pointer m_FreeIsoline;
-  bool m_FreeIsoAdded;
 
   /** Prescribed Dose of the selected data.*/
   mitk::DoseValueAbs m_PrescribedDose_Data;
@@ -197,10 +153,10 @@ protected:
   QmitkDoseValueDelegate* m_DoseValueDelegate;
   QmitkDoseVisualStyleDelegate* m_DoseVisualDelegate;
 
-  vtkSmartPointer<vtkContourFilter> m_freeIsoFilter;
-  std::vector< vtkSmartPointer<vtkContourFilter> > m_Filters;
-
   bool m_internalUpdate;
+
+private:
+  mitk::DataNode::Pointer GetIsoDoseNode(mitk::DataNode::Pointer doseNode);
 };
 
 #endif // RTDoseVisualizer_h

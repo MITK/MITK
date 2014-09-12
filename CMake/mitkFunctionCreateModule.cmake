@@ -235,9 +235,13 @@ function(mitk_create_module)
 
         # check and set-up auto-loading
         if(MODULE_AUTOLOAD_WITH)
-          set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-autoload")
           if(NOT TARGET "${MODULE_AUTOLOAD_WITH}")
             message(SEND_ERROR "The module target \"${MODULE_AUTOLOAD_WITH}\" specified as the auto-loading module for \"${MODULE_NAME}\" does not exist")
+          endif()
+          set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-autoload")
+          # create a meta-target if it does not already exist
+          if(NOT TARGET ${_module_autoload_meta_target})
+            add_custom_target(${_module_autoload_meta_target})
           endif()
         endif()
 

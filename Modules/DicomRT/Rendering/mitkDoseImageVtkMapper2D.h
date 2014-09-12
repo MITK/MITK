@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //VTK
 #include <vtkSmartPointer.h>
 #include <vtkPropAssembly.h>
+#include <vtkCellArray.h>
 
 class vtkActor;
 class vtkPolyDataMapper;
@@ -301,6 +302,10 @@ namespace mitk {
     * If the distances have different sign, there is an intersection.
     **/
     bool RenderingGeometryIntersectsImage( const PlaneGeometry* renderingGeometry, SlicedGeometry3D* imageGeometry );
+
+  private:
+    void CreateLevelOutline(mitk::BaseRenderer* renderer, const mitk::IsoDoseLevel* level, float pref, vtkSmartPointer<vtkPoints> points, vtkSmartPointer<vtkCellArray> lines,  vtkSmartPointer<vtkUnsignedCharArray> colors);
+
   };
 
 } // namespace mitk

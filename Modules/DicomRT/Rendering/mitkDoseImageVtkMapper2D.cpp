@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNodeFactory.h>
 #include <mitkImageSliceSelector.h>
 #include <mitkIsoDoseLevelSetProperty.h>
+#include <mitkIsoDoseLevelVectorProperty.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkPixelType.h>
@@ -42,7 +43,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //VTK
 #include <vtkCamera.h>
-#include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkGeneralTransform.h>
@@ -812,21 +812,9 @@ mitk::DoseImageVtkMapper2D::LocalStorage* mitk::DoseImageVtkMapper2D::GetLocalSt
   return m_LSH.GetLocalStorage(renderer);
 }
 
-vtkSmartPointer<vtkPolyData> mitk::DoseImageVtkMapper2D::CreateOutlinePolyData(mitk::BaseRenderer* renderer ){
-  LocalStorage* localStorage = this->GetLocalStorage(renderer);
 
-  //get the min and max index values of each direction
-  int* extent = localStorage->m_ReslicedImage->GetExtent();
-  int xMin = extent[0];
-  int xMax = extent[1];
-  int yMin = extent[2];
-  int yMax = extent[3];
-
-  int* dims = localStorage->m_ReslicedImage->GetDimensions(); //dimensions of the image
-  int line = dims[0]; //how many pixels per line?
-  //get the depth for each contour
-  float depth = CalculateLayerDepth(renderer);
-
+vtkSmartPointer<vtkPolyData> mitk::DoseImageVtkMapper2D::CreateOutlinePolyData(mitk::BaseRenderer* renderer )
+{
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
   vtkSmartPointer<vtkUnsignedCharArray> colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
@@ -843,132 +831,18 @@ vtkSmartPointer<vtkPolyData> mitk::DoseImageVtkMapper2D::CreateOutlinePolyData(m
   {
     if(doseIT->GetVisibleIsoLine())
     {
-      double doseValue = doseIT->GetDoseValue()*pref;
-      mitk::IsoDoseLevel::ColorType isoColor = doseIT->GetColor();
-      unsigned char colorLine[3] = {isoColor.GetRed()*255, isoColor.GetGreen()*255, isoColor.GetBlue()*255};
+      this->CreateLevelOutline(renderer, &(doseIT.Value()), pref, points, lines, colors);
+    }//end of if visible dose value
+  }//end of loop over all does values
 
-      int x = xMin; //pixel index x
-      int y = yMin; //pixel index y
-      unsigned short* currentPixel;
+  mitk::IsoDoseLevelVectorProperty::Pointer propfreeIsoVec = dynamic_cast<mitk::IsoDoseLevelVectorProperty* >(GetDataNode()->GetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str()));
+  mitk::IsoDoseLevelVector::Pointer frereIsoDoseLevelVec = propfreeIsoVec->GetValue();
 
-      // We take the pointer to the first pixel of the image
-      currentPixel = static_cast<unsigned short*>(localStorage->m_ReslicedImage->GetScalarPointer() );
-
-      while (y <= yMax)
-      {
-        //if the current pixel value is set to something
-        if ((currentPixel) && (*currentPixel >= doseValue))
-        {
-          //check in which direction a line is necessary
-          //a line is added if the neighbor of the current pixel has the value 0
-          //and if the pixel is located at the edge of the image
-
-          //if   vvvvv  not the first line vvvvv
-          if (y > yMin && *(currentPixel-line) < doseValue)
-          { //x direction - bottom edge of the pixel
-            //add the 2 points
-            vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
-            vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
-            //add the line between both points
-            lines->InsertNextCell(2);
-            lines->InsertCellPoint(p1);
-            lines->InsertCellPoint(p2);
-            colors->InsertNextTupleValue(colorLine);
-          }
-
-          //if   vvvvv  not the last line vvvvv
-          if (y < yMax && *(currentPixel+line) < doseValue)
-          { //x direction - top edge of the pixel
-            vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
-            vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
-            lines->InsertNextCell(2);
-            lines->InsertCellPoint(p1);
-            lines->InsertCellPoint(p2);
-            colors->InsertNextTupleValue(colorLine);
-          }
-
-          //if   vvvvv  not the first pixel vvvvv
-          if ( (x > xMin || y > yMin) && *(currentPixel-1) < doseValue)
-          { //y direction - left edge of the pixel
-            vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
-            vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
-            lines->InsertNextCell(2);
-            lines->InsertCellPoint(p1);
-            lines->InsertCellPoint(p2);
-            colors->InsertNextTupleValue(colorLine);
-          }
-
-          //if   vvvvv  not the last pixel vvvvv
-          if ( (y < yMax || (x < xMax) ) && *(currentPixel+1) < doseValue)
-          { //y direction - right edge of the pixel
-            vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
-            vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
-            lines->InsertNextCell(2);
-            lines->InsertCellPoint(p1);
-            lines->InsertCellPoint(p2);
-            colors->InsertNextTupleValue(colorLine);
-          }
-
-          /*  now consider pixels at the edge of the image  */
-
-          //if   vvvvv  left edge of image vvvvv
-          if (x == xMin)
-          { //draw left edge of the pixel
-            vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
-            vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
-            lines->InsertNextCell(2);
-            lines->InsertCellPoint(p1);
-            lines->InsertCellPoint(p2);
-            colors->InsertNextTupleValue(colorLine);
-          }
-
-          //if   vvvvv  right edge of image vvvvv
-          if (x == xMax)
-          { //draw right edge of the pixel
-            vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
-            vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
-            lines->InsertNextCell(2);
-            lines->InsertCellPoint(p1);
-            lines->InsertCellPoint(p2);
-            colors->InsertNextTupleValue(colorLine);
-          }
-
-          //if   vvvvv  bottom edge of image vvvvv
-          if (y == yMin)
-          { //draw bottom edge of the pixel
-            vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
-            vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
-            lines->InsertNextCell(2);
-            lines->InsertCellPoint(p1);
-            lines->InsertCellPoint(p2);
-            colors->InsertNextTupleValue(colorLine);
-          }
-
-          //if   vvvvv  top edge of image vvvvv
-          if (y == yMax)
-          { //draw top edge of the pixel
-            vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
-            vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
-            lines->InsertNextCell(2);
-            lines->InsertCellPoint(p1);
-            lines->InsertCellPoint(p2);
-            colors->InsertNextTupleValue(colorLine);
-          }
-        }//end if currentpixel is set
-
-        x++;
-
-        if (x > xMax)
-        { //reached end of line
-          x = xMin;
-          y++;
-        }
-
-        // Increase the pointer-position to the next pixel.
-        // This is safe, as the while-loop and the x-reset logic above makes
-        // sure we do not exceed the bounds of the image
-        currentPixel++;
-      }//end of while
+  for(mitk::IsoDoseLevelVector::ConstIterator freeDoseIT = frereIsoDoseLevelVec->Begin(); freeDoseIT!=frereIsoDoseLevelVec->End();++freeDoseIT)
+  {
+    if(freeDoseIT->Value()->GetVisibleIsoLine())
+    {
+      this->CreateLevelOutline(renderer, freeDoseIT->Value(), pref, points, lines, colors);
     }//end of if visible dose value
   }//end of loop over all does values
 
@@ -980,6 +854,150 @@ vtkSmartPointer<vtkPolyData> mitk::DoseImageVtkMapper2D::CreateOutlinePolyData(m
   polyData->SetLines(lines);
   polyData->GetCellData()->SetScalars(colors);
   return polyData;
+}
+
+void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer* renderer, const mitk::IsoDoseLevel* level, float pref, vtkSmartPointer<vtkPoints> points, vtkSmartPointer<vtkCellArray> lines,  vtkSmartPointer<vtkUnsignedCharArray> colors)
+{
+  LocalStorage* localStorage = this->GetLocalStorage(renderer);
+
+  //get the min and max index values of each direction
+  int* extent = localStorage->m_ReslicedImage->GetExtent();
+  int xMin = extent[0];
+  int xMax = extent[1];
+  int yMin = extent[2];
+  int yMax = extent[3];
+
+  int* dims = localStorage->m_ReslicedImage->GetDimensions(); //dimensions of the image
+  int line = dims[0]; //how many pixels per line?
+  //get the depth for each contour
+  float depth = CalculateLayerDepth(renderer);
+
+  double doseValue = level->GetDoseValue()*pref;
+  mitk::IsoDoseLevel::ColorType isoColor = level->GetColor();
+  unsigned char colorLine[3] = {isoColor.GetRed()*255, isoColor.GetGreen()*255, isoColor.GetBlue()*255};
+
+  int x = xMin; //pixel index x
+  int y = yMin; //pixel index y
+  unsigned short* currentPixel;
+
+  // We take the pointer to the first pixel of the image
+  currentPixel = static_cast<unsigned short*>(localStorage->m_ReslicedImage->GetScalarPointer() );
+
+  while (y <= yMax)
+  {
+    //if the current pixel value is set to something
+    if ((currentPixel) && (*currentPixel >= doseValue))
+    {
+      //check in which direction a line is necessary
+      //a line is added if the neighbor of the current pixel has the value 0
+      //and if the pixel is located at the edge of the image
+
+      //if   vvvvv  not the first line vvvvv
+      if (y > yMin && *(currentPixel-line) < doseValue)
+      { //x direction - bottom edge of the pixel
+        //add the 2 points
+        vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        //add the line between both points
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+        colors->InsertNextTupleValue(colorLine);
+      }
+
+      //if   vvvvv  not the last line vvvvv
+      if (y < yMax && *(currentPixel+line) < doseValue)
+      { //x direction - top edge of the pixel
+        vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
+        vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+        colors->InsertNextTupleValue(colorLine);
+      }
+
+      //if   vvvvv  not the first pixel vvvvv
+      if ( (x > xMin || y > yMin) && *(currentPixel-1) < doseValue)
+      { //y direction - left edge of the pixel
+        vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+        colors->InsertNextTupleValue(colorLine);
+      }
+
+      //if   vvvvv  not the last pixel vvvvv
+      if ( (y < yMax || (x < xMax) ) && *(currentPixel+1) < doseValue)
+      { //y direction - right edge of the pixel
+        vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+        colors->InsertNextTupleValue(colorLine);
+      }
+
+      /*  now consider pixels at the edge of the image  */
+
+      //if   vvvvv  left edge of image vvvvv
+      if (x == xMin)
+      { //draw left edge of the pixel
+        vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+        colors->InsertNextTupleValue(colorLine);
+      }
+
+      //if   vvvvv  right edge of image vvvvv
+      if (x == xMax)
+      { //draw right edge of the pixel
+        vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+        colors->InsertNextTupleValue(colorLine);
+      }
+
+      //if   vvvvv  bottom edge of image vvvvv
+      if (y == yMin)
+      { //draw bottom edge of the pixel
+        vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+        colors->InsertNextTupleValue(colorLine);
+      }
+
+      //if   vvvvv  top edge of image vvvvv
+      if (y == yMax)
+      { //draw top edge of the pixel
+        vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
+        vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
+        lines->InsertNextCell(2);
+        lines->InsertCellPoint(p1);
+        lines->InsertCellPoint(p2);
+        colors->InsertNextTupleValue(colorLine);
+      }
+    }//end if currentpixel is set
+
+    x++;
+
+    if (x > xMax)
+    { //reached end of line
+      x = xMin;
+      y++;
+    }
+
+    // Increase the pointer-position to the next pixel.
+    // This is safe, as the while-loop and the x-reset logic above makes
+    // sure we do not exceed the bounds of the image
+    currentPixel++;
+  }//end of while
 }
 
 void mitk::DoseImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer)

@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class ctkCmdLineModuleBackendLocalProcess;
 class ctkCmdLineModuleDirectoryWatcher;
 class CommandLineModulesViewControls;
-class QmitkCmdLineModuleProgressWidget;
+class QmitkCmdLineModuleRunner;
 class QAction;
 class QVBoxLayout;
 

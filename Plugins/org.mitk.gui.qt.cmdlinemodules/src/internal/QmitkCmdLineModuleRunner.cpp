@@ -13,7 +13,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkCmdLineModuleProgressWidget.h"
+#include "QmitkCmdLineModuleRunner.h"
 #include "ui_QmitkCmdLineModuleProgressWidget.h"
 
 // Qt
@@ -34,23 +34,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleManager.h>
 #include <ctkCmdLineModuleFrontend.h>
 #include <ctkCmdLineModuleDescription.h>
-#include <ctkCmdLineModuleParameter.h>
 #include <ctkCollapsibleGroupBox.h>
 
 // MITK
 #include <mitkIOUtil.h>
 #include <mitkDataStorage.h>
-#include <mitkDataNode.h>
+#include <mitkExceptionMacro.h>
 #include <QmitkCustomVariants.h>
 #include "QmitkCmdLineModuleGui.h"
 
 
 //-----------------------------------------------------------------------------
-QmitkCmdLineModuleProgressWidget::QmitkCmdLineModuleProgressWidget(QWidget *parent)
+QmitkCmdLineModuleRunner::QmitkCmdLineModuleRunner(QWidget *parent)
   : QWidget(parent)
 , m_ModuleManager(NULL)
 , m_DataStorage(NULL)
-, m_TemporaryDirectoryName("")
 , m_UI(new Ui::QmitkCmdLineModuleProgressWidget)
 , m_Layout(NULL)
 , m_ModuleFrontEnd(NULL)
@@ -79,7 +77,7 @@ QmitkCmdLineModuleProgressWidget::QmitkCmdLineModuleProgressWidget(QWidget *pare
 
 
 //-----------------------------------------------------------------------------
-QmitkCmdLineModuleProgressWidget::~QmitkCmdLineModuleProgressWidget()
+QmitkCmdLineModuleRunner::~QmitkCmdLineModuleRunner()
 {
   if (m_ModuleFrontEnd != NULL)
   {
@@ -93,35 +91,28 @@ QmitkCmdLineModuleProgressWidget::~QmitkCmdLineModuleProgressWidget()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::SetManager(ctkCmdLineModuleManager* manager)
+void QmitkCmdLineModuleRunner::SetManager(ctkCmdLineModuleManager* manager)
 {
   this->m_ModuleManager = manager;
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkCmdLineModuleRunner::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   this->m_DataStorage = dataStorage;
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::SetTemporaryDirectory(const QString& directoryName)
-{
-  this->m_TemporaryDirectoryName = directoryName;
-}
-
-
-//-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::SetOutputDirectory(const QString& directoryName)
+void QmitkCmdLineModuleRunner::SetOutputDirectory(const QString& directoryName)
 {
   this->m_OutputDirectoryName = directoryName;
 }
 
 
 //-----------------------------------------------------------------------------
-QString QmitkCmdLineModuleProgressWidget::GetTitle()
+QString QmitkCmdLineModuleRunner::GetTitle()
 {
   assert(m_ModuleFrontEnd);
 
@@ -133,7 +124,7 @@ QString QmitkCmdLineModuleProgressWidget::GetTitle()
 
 
 //-----------------------------------------------------------------------------
-QString QmitkCmdLineModuleProgressWidget::GetFullName() const
+QString QmitkCmdLineModuleRunner::GetFullName() const
 {
   assert(m_ModuleFrontEnd);
 
@@ -145,7 +136,7 @@ QString QmitkCmdLineModuleProgressWidget::GetFullName() const
 
 
 //-----------------------------------------------------------------------------
-QString QmitkCmdLineModuleProgressWidget::GetValidNodeName(const QString& nodeName)
+QString QmitkCmdLineModuleRunner::GetValidNodeName(const QString& nodeName) const
 {
   QString outputName = nodeName;
 
@@ -179,7 +170,7 @@ QString QmitkCmdLineModuleProgressWidget::GetValidNodeName(const QString& nodeNa
 
 
 //-----------------------------------------------------------------------------
-bool QmitkCmdLineModuleProgressWidget::IsStarted() const
+bool QmitkCmdLineModuleRunner::IsStarted() const
 {
   bool isStarted = false;
   if (m_FutureWatcher != NULL && m_FutureWatcher->isStarted())
@@ -190,7 +181,7 @@ bool QmitkCmdLineModuleProgressWidget::IsStarted() const
 }
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnCheckModulePaused()
+void QmitkCmdLineModuleRunner::OnCheckModulePaused()
 {
   if (!this->IsStarted())
   {
@@ -215,7 +206,7 @@ void QmitkCmdLineModuleProgressWidget::OnCheckModulePaused()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnPauseButtonToggled(bool toggled)
+void QmitkCmdLineModuleRunner::OnPauseButtonToggled(bool toggled)
 {
   this->m_FutureWatcher->setPaused(toggled);
 
@@ -231,14 +222,14 @@ void QmitkCmdLineModuleProgressWidget::OnPauseButtonToggled(bool toggled)
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnRemoveButtonClicked()
+void QmitkCmdLineModuleRunner::OnRemoveButtonClicked()
 {
   this->deleteLater();
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleStarted()
+void QmitkCmdLineModuleRunner::OnModuleStarted()
 {
   this->m_UI->m_ProgressBar->setMaximum(0);
 
@@ -250,7 +241,7 @@ void QmitkCmdLineModuleProgressWidget::OnModuleStarted()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleCanceled()
+void QmitkCmdLineModuleRunner::OnModuleCanceled()
 {
   QString message = "cancelling.";
   this->PublishMessage(message);
@@ -270,7 +261,7 @@ void QmitkCmdLineModuleProgressWidget::OnModuleCanceled()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleFinished()
+void QmitkCmdLineModuleRunner::OnModuleFinished()
 {
   this->m_UI->m_PauseButton->setEnabled(false);
   this->m_UI->m_PauseButton->setChecked(false);
@@ -313,14 +304,14 @@ void QmitkCmdLineModuleProgressWidget::OnModuleFinished()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleResumed()
+void QmitkCmdLineModuleRunner::OnModuleResumed()
 {
   this->m_UI->m_PauseButton->setChecked(false);
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleProgressRangeChanged(int progressMin, int progressMax)
+void QmitkCmdLineModuleRunner::OnModuleProgressRangeChanged(int progressMin, int progressMax)
 {
   this->m_UI->m_ProgressBar->setMinimum(progressMin);
   this->m_UI->m_ProgressBar->setMaximum(progressMax);
@@ -328,21 +319,21 @@ void QmitkCmdLineModuleProgressWidget::OnModuleProgressRangeChanged(int progress
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleProgressTextChanged(const QString& progressText)
+void QmitkCmdLineModuleRunner::OnModuleProgressTextChanged(const QString& progressText)
 {
   this->m_UI->m_Console->appendPlainText(progressText);
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleProgressValueChanged(int progressValue)
+void QmitkCmdLineModuleRunner::OnModuleProgressValueChanged(int progressValue)
 {
   this->m_UI->m_ProgressBar->setValue(progressValue);
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnOutputDataReady()
+void QmitkCmdLineModuleRunner::OnOutputDataReady()
 {
   m_OutputCount++;
   this->PublishByteArray(this->m_FutureWatcher->readPendingOutputData());
@@ -350,7 +341,7 @@ void QmitkCmdLineModuleProgressWidget::OnOutputDataReady()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnErrorDataReady()
+void QmitkCmdLineModuleRunner::OnErrorDataReady()
 {
   m_ErrorCount++;
   this->PublishByteArray(this->m_FutureWatcher->readPendingErrorData());
@@ -358,7 +349,7 @@ void QmitkCmdLineModuleProgressWidget::OnErrorDataReady()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::PublishMessage(const QString& message)
+void QmitkCmdLineModuleRunner::PublishMessage(const QString& message)
 {
   QString prefix = ""; // Can put additional prefix here if needed.
   QString outputMessage = prefix + message;
@@ -369,7 +360,7 @@ void QmitkCmdLineModuleProgressWidget::PublishMessage(const QString& message)
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::PublishByteArray(const QByteArray& array)
+void QmitkCmdLineModuleRunner::PublishByteArray(const QByteArray& array)
 {
   QString message = array.data();
   this->PublishMessage(message);
@@ -377,30 +368,28 @@ void QmitkCmdLineModuleProgressWidget::PublishByteArray(const QByteArray& array)
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::ClearUpTemporaryFiles()
+void QmitkCmdLineModuleRunner::ClearUpTemporaryFiles()
 {
   QString message;
   QString fileName;
 
-  foreach (fileName, m_TemporaryFileNames)
+  foreach (QTemporaryFile* file, m_TemporaryFiles)
   {
-    QFile file(fileName);
-    if (file.exists())
-    {
-      message = QObject::tr("removing %1").arg(fileName);
-      this->PublishMessage(message);
+    assert(file != NULL);
 
-      bool success = file.remove();
+    fileName = file->fileName();
+    message = QObject::tr("removing %1").arg(fileName);
+    this->PublishMessage(message);
 
-      message = QObject::tr("removed %1, successfully=%2").arg(fileName).arg(success);
-      this->PublishMessage(message);
-    }
+    delete file;
   }
+
+  m_TemporaryFiles.clear();
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::LoadOutputData()
+void QmitkCmdLineModuleRunner::LoadOutputData()
 {
   assert(m_DataStorage);
 
@@ -426,7 +415,7 @@ void QmitkCmdLineModuleProgressWidget::LoadOutputData()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::SetFrontend(QmitkCmdLineModuleGui* frontEnd)
+void QmitkCmdLineModuleRunner::SetFrontend(QmitkCmdLineModuleGui* frontEnd)
 {
   assert(frontEnd);
   assert(m_ModuleManager);
@@ -449,7 +438,7 @@ void QmitkCmdLineModuleProgressWidget::SetFrontend(QmitkCmdLineModuleGui* frontE
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::Run()
+void QmitkCmdLineModuleRunner::Run()
 {
   assert(m_ModuleManager);
   assert(m_DataStorage);
@@ -488,12 +477,12 @@ void QmitkCmdLineModuleProgressWidget::Run()
 
     if (applicationDir == outputDir)
     {
-      qDebug() << "QmitkCmdLineModuleProgressWidget::Run(), output folder = application folder, so will swap to defaultOutputDir, specified in CLI module preferences";
+      qDebug() << "QmitkCmdLineModuleRunner::Run(), output folder = application folder, so will swap to defaultOutputDir, specified in CLI module preferences";
 
       QFileInfo newOutputFileInfo(m_OutputDirectoryName, outputFileInfo.fileName());
       QString newOutputFileAbsolutePath = newOutputFileInfo.absoluteFilePath();
 
-      qDebug() << "QmitkCmdLineModuleProgressWidget::Run(), swapping " << outputFileName << " to " << newOutputFileAbsolutePath;
+      qDebug() << "QmitkCmdLineModuleRunner::Run(), swapping " << outputFileName << " to " << newOutputFileAbsolutePath;
 
       QMessageBox msgBox;
         msgBox.setText("The output directory is the same as the application installation directory");
@@ -540,66 +529,21 @@ void QmitkCmdLineModuleProgressWidget::Run()
       mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
       if (image != NULL)
       {
-        QString name = this->GetValidNodeName(QString::fromStdString(node->GetName()));
-        int pid = QCoreApplication::applicationPid();
-        int randomInt = qrand() % 1000000;
+        QString errorMessage;
+        QTemporaryFile* tempFile = this->SaveTemporaryImage(parameter, node.GetPointer(), errorMessage);
 
-        QString fileNameBase = m_TemporaryDirectoryName + "/" + name + QString::number(pid) + "_" + QString::number(randomInt);
-        QString fileName = "";
-        bool writeSucess = false;
-
-        // Try to save the image using one of the specified "fileExtensions" or
-        // .nii if none have been specified.
-        if (parameter.fileExtensions().isEmpty())
+        if(tempFile == NULL)
         {
-          fileName = fileNameBase + ".nii";
-          try
-          {
-            if (mitk::IOUtil::SaveBaseData( image, fileName.toStdString() ))
-            {
-              writeSucess = true;
-            }
-          }
-          catch(const std::exception&){}
-        }
-        else
-        {
-          foreach (QString extension, parameter.fileExtensions())
-          {
-              if (extension[0]!='.')
-                fileName = fileNameBase + "." + extension;
-              else
-                  fileName = fileNameBase + extension;
-
-            try
-            {
-              if (mitk::IOUtil::SaveBaseData( image, fileName.toStdString() ))
-              {
-                writeSucess = true;
-                break;
-              }
-            }
-            catch(const std::exception&)
-            {}
-          }
-        }
-
-        if(!writeSucess)
-        {
-          QStringList extensions = parameter.fileExtensions();
-          if (extensions.isEmpty())
-          {
-            extensions.push_back("nii");
-          }
-          QMessageBox::warning(this, "Saving temporary input file failed",
-                               QString("Unsupported file formats: ") + extensions.join(", "));
+          QMessageBox::warning(this, "Saving temporary file failed", errorMessage);
           return;
         }
-        m_TemporaryFileNames.push_back(fileName);
-        m_ModuleFrontEnd->setValue(parameterName, fileName);
 
-        message = "Saved " + fileName;
+        m_TemporaryFiles.push_back(tempFile);
+        m_ModuleFrontEnd->setValue(parameterName, tempFile->fileName());
+
+        message = "Saved " + tempFile->fileName();
         this->PublishMessage(message);
+
       } // end if image
     } // end if node
   } // end foreach input image
@@ -638,4 +582,74 @@ void QmitkCmdLineModuleProgressWidget::Run()
 
   // Give some immediate indication that we are running.
   m_UI->m_ProgressTitle->setText(description.title() + ": running");
+}
+
+
+//-----------------------------------------------------------------------------
+QTemporaryFile* QmitkCmdLineModuleRunner::SaveTemporaryImage(const ctkCmdLineModuleParameter &parameter, mitk::DataNode::ConstPointer node, QString& errorMessage) const
+{
+  // Don't call this if node is null or node is not an image.
+  assert(node.GetPointer());
+  mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+  assert(image);
+
+  QString intermediateError;
+  QString intermediateErrors;
+
+  QTemporaryFile *returnedFile = NULL;
+  QString name = this->GetValidNodeName(QString::fromStdString(node->GetName()));
+  QString fileNameTemplate = name + "_XXXXXX";
+
+  // If no file extensions are specified, we default to .nii
+  QStringList fileExts = parameter.fileExtensions();
+  if (fileExts.isEmpty())
+  {
+    fileExts.push_back(".nii");
+  }
+
+  // Try each extension until we get a good one.
+  foreach (QString extension, fileExts)
+  {
+    // File extensions may or may not include the leading dot, so add one if necessary.
+    if (!extension.startsWith("."))
+    {
+      extension.prepend(".");
+    }
+    fileNameTemplate = fileNameTemplate + extension;
+
+    try
+    {
+      QTemporaryFile *tempFile = new QTemporaryFile(QDir::tempPath() + QDir::separator() + fileNameTemplate);
+      if (tempFile->open())
+      {
+        tempFile->close();
+        if (mitk::IOUtil::SaveBaseData( image, tempFile->fileName().toStdString() ))
+        {
+          returnedFile = tempFile;
+          break;
+        }
+        else
+        {
+          intermediateError = QObject::tr("Tried %1, failed to save image:\n%2\n").arg(extension).arg(tempFile->fileName());
+        }
+      }
+      else
+      {
+        intermediateError = QObject::tr("Tried %1, failed to open file:\n%2\n").arg(extension).arg(tempFile->fileName());
+      }
+    }
+    catch(const mitk::Exception &e)
+    {
+      intermediateError = QObject::tr("Tried %1, caught MITK Exception:\nDescription: %2\nFilename: %3\nLine: %4\n")
+                          .arg(extension).arg(e.GetDescription()).arg(e.GetFile()).arg(e.GetLine());
+    }
+    catch(const std::exception& e)
+    {
+      intermediateError = QObject::tr("Tried %1, caught exception:\nDescription: %2\n")
+                          .arg(extension).arg(e.what());
+    }
+    intermediateErrors += intermediateError;
+  }
+  errorMessage = intermediateErrors;
+  return returnedFile;
 }

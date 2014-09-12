@@ -236,10 +236,8 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
   if (mitk::VtkLayerController::GetInstance(m_RenderWindow) == NULL)
   {
     mitk::VtkLayerController::AddInstance(m_RenderWindow, m_VtkRenderer);
-    mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertSceneRenderer(m_VtkRenderer);
   }
-  else
-    mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertSceneRenderer(m_VtkRenderer);
+  mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertSceneRenderer(m_VtkRenderer);
 }
 
 mitk::BaseRenderer::~BaseRenderer()
@@ -353,16 +351,18 @@ void mitk::BaseRenderer::Resize(int w, int h)
 
 void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)
 {
-  if (m_RenderWindow != NULL)
+  if (m_RenderWindow != renderwindow)
   {
-    m_RenderWindow->Delete();
+    if (m_RenderWindow != NULL)
+    {
+      m_RenderWindow->Delete();
+    }
+    m_RenderWindow = renderwindow;
+    if (m_RenderWindow != NULL)
+    {
+      m_RenderWindow->Register(NULL);
+    }
   }
-  m_RenderWindow = renderwindow;
-  if (m_RenderWindow != NULL)
-  {
-    m_RenderWindow->Register(NULL);
-  }
-
   RemoveAllLocalStorages();
 
   if (m_CameraController.IsNotNull())

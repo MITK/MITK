@@ -120,6 +120,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/python-cmake-buildsystem-47845c55.tar.gz
       URL_MD5 "6e49d1ed93a5a0fff7621430c163d2d1"
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
+      PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/Patch${proj}CMake.cmake
       PREFIX ${proj}-cmake
       BINARY_DIR ${proj}-build
       INSTALL_DIR ${proj}-install

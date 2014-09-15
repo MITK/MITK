@@ -261,7 +261,7 @@ public:
    * \return \a true property was found
    */
   template <typename T>
-    bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL) const
+    bool GetPropertyValue(const char* propertyKey, T & value, const mitk::BaseRenderer* renderer=NULL) const
     {
       GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer));
       if ( gp != NULL )

@@ -26,11 +26,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseDataIOFactory.h>
 #include <mitkConnectomicsStatisticsCalculator.h>
 
+// VTK includes
+#include <vtkDebugLeaks.h>
 
 
 class mitkConnectomicsStatisticsCalculatorTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkConnectomicsStatisticsCalculatorTestSuite);
+
+  /// \todo Fix VTK memory leaks. Bug 18097.
+  vtkDebugLeaks::SetExitError(0);
+
   MITK_TEST(StatisticsCalculatorUpdate);
   CPPUNIT_TEST_SUITE_END();
 

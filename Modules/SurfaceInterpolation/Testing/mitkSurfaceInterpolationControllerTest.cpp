@@ -257,30 +257,33 @@ public:
     m_Controller->SetCurrentInterpolationSession(segmentation_2);
 
     // Create some contours
-    p_source->SetNumberOfSides(8);
-    p_source->SetCenter(10.0,10.0,10.0);
-    p_source->SetRadius(5);
-    p_source->SetNormal(0,1,0);
-    p_source->Update();
-    vtkPolyData* poly_4 = p_source->GetOutput();
+    vtkSmartPointer<vtkRegularPolygonSource> p_source_4 = vtkSmartPointer<vtkRegularPolygonSource>::New();
+    p_source_4->SetNumberOfSides(8);
+    p_source_4->SetCenter(10.0,10.0,10.0);
+    p_source_4->SetRadius(5);
+    p_source_4->SetNormal(0,1,0);
+    p_source_4->Update();
+    vtkPolyData* poly_4 = p_source_4->GetOutput();
     mitk::Surface::Pointer surf_4 = mitk::Surface::New();
     surf_4->SetVtkPolyData(poly_4);
 
-    p_source_2->SetNumberOfSides(16);
-    p_source_2->SetCenter(3.0,10.0,10.0);
-    p_source_2->SetRadius(8);
-    p_source_2->SetNormal(1, 0, 0);
-    p_source_2->Update();
-    vtkPolyData* poly_5 = p_source_2->GetOutput();
+    vtkSmartPointer<vtkRegularPolygonSource> p_source_5 = vtkSmartPointer<vtkRegularPolygonSource>::New();
+    p_source_5->SetNumberOfSides(16);
+    p_source_5->SetCenter(3.0,10.0,10.0);
+    p_source_5->SetRadius(8);
+    p_source_5->SetNormal(1, 0, 0);
+    p_source_5->Update();
+    vtkPolyData* poly_5 = p_source_5->GetOutput();
     mitk::Surface::Pointer surf_5 = mitk::Surface::New();
     surf_5->SetVtkPolyData(poly_5);
 
-    p_source_3->SetNumberOfSides(100);
-    p_source_3->SetCenter(10.0,10.0,3.0);
-    p_source_3->SetRadius(5);
-    p_source_3->SetNormal(0,0,1);
-    p_source_3->Update();
-    vtkPolyData* poly_6 = p_source_3->GetOutput();
+    vtkSmartPointer<vtkRegularPolygonSource> p_source_6 = vtkSmartPointer<vtkRegularPolygonSource>::New();
+    p_source_6->SetNumberOfSides(100);
+    p_source_6->SetCenter(10.0,10.0,3.0);
+    p_source_6->SetRadius(5);
+    p_source_6->SetNormal(0,0,1);
+    p_source_6->Update();
+    vtkPolyData* poly_6 = p_source_6->GetOutput();
     mitk::Surface::Pointer surf_6 = mitk::Surface::New();
     surf_6->SetVtkPolyData(poly_6);
 
@@ -307,12 +310,13 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!", mitk::Equal(*(surf_6->GetVtkPolyData()), *(contour_6->GetVtkPolyData()), 0.000001, true));
 
     // Modify some contours
-    p_source_2->SetNumberOfSides(200);
-    p_source_2->SetCenter(3.0,10.0,10.0);
-    p_source_2->SetRadius(5);
-    p_source_2->SetNormal(1, 0, 0);
-    p_source_2->Update();
-    vtkPolyData* poly_7 = p_source_2->GetOutput();
+    vtkSmartPointer<vtkRegularPolygonSource> p_source_7 = vtkSmartPointer<vtkRegularPolygonSource>::New();
+    p_source_7->SetNumberOfSides(200);
+    p_source_7->SetCenter(3.0,10.0,10.0);
+    p_source_7->SetRadius(5);
+    p_source_7->SetNormal(1, 0, 0);
+    p_source_7->Update();
+    vtkPolyData* poly_7 = p_source_7->GetOutput();
     mitk::Surface::Pointer surf_7 = mitk::Surface::New();
     surf_7->SetVtkPolyData(poly_7);
 

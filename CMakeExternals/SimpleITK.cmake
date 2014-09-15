@@ -89,6 +89,9 @@ if(MITK_USE_SimpleITK)
       set(_install_dir ${Python_DIR})
       if(WIN32)
         STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
+      else()
+      # escape spaces in the install path for linux
+        STRING(REPLACE " " "\ " _install_dir ${Python_DIR})
       endif()
       # Build python distribution with easy install. If a own runtime is used
       # embedd the egg into the site-package folder of the runtime

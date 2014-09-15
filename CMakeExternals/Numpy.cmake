@@ -53,6 +53,9 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     set(_install_dir ${Python_DIR})
     if(WIN32)
       STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
+    else()
+      # escape scpaces on unix
+      STRING(REPLACE " " "\ " _install_dir ${Python_DIR})
     endif()
 
     set(_install_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_install_step.cmake)

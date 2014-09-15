@@ -53,16 +53,15 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     set(_install_dir "${Python_DIR}")
     if(WIN32)
       STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
-    else()
-      # escape scpaces on unix
-      STRING(REPLACE " " "\ " _install_dir ${Python_DIR})
     endif()
+    # escape spaces in install path
+    STRING(REPLACE " " "\\ " _install_dir ${_install_dir})
 
     set(_install_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_install_step.cmake)
     file(WRITE ${_install_step}
        "${_numpy_env}
         include(\"${_numpy_build_step}\")
-        mitkFunctionExternalPythonBuildStep(${proj} install \"${PYTHON_EXECUTABLE}\" \"${CMAKE_BINARY_DIR}\" setup.py install --prefix=\"${_install_dir}\")
+        mitkFunctionExternalPythonBuildStep(${proj} install \"${PYTHON_EXECUTABLE}\" \"${CMAKE_BINARY_DIR}\" setup.py install --prefix=${_install_dir})
        ")
 
     set(Numpy_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/numpy-1.4.1.tar.gz)

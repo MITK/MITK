@@ -56,6 +56,10 @@ bool mitk::FocusManager::RemoveElement(FocusElement* element)
   }
 
   m_FocusList.erase(position);
+  if (m_FocusList.empty())
+  {
+    m_FocElement = NULL;
+  }
 
   return true;
 }
@@ -100,6 +104,11 @@ const mitk::FocusManager::FocusElement* mitk::FocusManager::GetLast() const
 
 bool mitk::FocusManager::GoToNext()
 {
+  if (m_FocusList.empty())
+  {
+    return false;
+  }
+
   //find the m_FocElement
   FocusListIterator position = std::find(m_FocusList.begin(), m_FocusList.end(), m_FocElement);
   if (position == m_FocusList.end())
@@ -107,7 +116,13 @@ bool mitk::FocusManager::GoToNext()
     return false;
   }
 
-  for (FocusListIterator nextPosition = position + 1; nextPosition != position; ++nextPosition)
+  if (m_FocusList.size() == 1)
+  {
+    return true;
+  }
+
+  FocusListIterator nextPosition = position + 1;
+  while(nextPosition != position)
   {
     if (nextPosition == m_FocusList.end())
     {
@@ -124,8 +139,10 @@ bool mitk::FocusManager::GoToNext()
       m_FocElement = focusElement;
       return true;
     }
+    ++nextPosition;
   }
 
+  m_FocElement = NULL;
   return false;
 }
 

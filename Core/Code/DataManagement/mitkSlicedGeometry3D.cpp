@@ -50,9 +50,8 @@ mitk::SlicedGeometry3D::SlicedGeometry3D(const SlicedGeometry3D& other)
   if ( m_EvenlySpaced )
   {
     PlaneGeometry::Pointer geometry = other.m_PlaneGeometries[0]->Clone();
-    PlaneGeometry* geometry2D = dynamic_cast<PlaneGeometry*>(geometry.GetPointer());
-    assert(geometry2D!=NULL);
-    SetPlaneGeometry(geometry2D, 0);
+    assert(geometry.IsNotNull());
+    SetPlaneGeometry(geometry, 0);
   }
   else
   {
@@ -94,8 +93,7 @@ mitk::PlaneGeometry *
     // in the direction of m_DirectionVector.
     if ( (m_EvenlySpaced) && (geometry2D.IsNull()) )
     {
-      PlaneGeometry *firstSlice = dynamic_cast< PlaneGeometry * > (
-        m_PlaneGeometries[0].GetPointer() );
+      PlaneGeometry *firstSlice = m_PlaneGeometries[0];
 
       if ( firstSlice != NULL && dynamic_cast<AbstractTransformGeometry*>(m_PlaneGeometries[0].GetPointer() )==NULL)
       {
@@ -330,11 +328,10 @@ void
   }
 
   // Get first plane of plane stack
-  PlaneGeometry *firstPlane =
-    dynamic_cast< PlaneGeometry * >( m_PlaneGeometries[0].GetPointer() );
+  PlaneGeometry *firstPlane = m_PlaneGeometries[0];
 
   // If plane stack is empty, exit
-  if ( firstPlane == NULL || dynamic_cast<AbstractTransformGeometry*>( m_PlaneGeometries[0].GetPointer() )!=NULL)
+  if ( !firstPlane || dynamic_cast<AbstractTransformGeometry*>(firstPlane) )
   {
     return;
   }
@@ -540,13 +537,9 @@ void
   // since the spacing influences them
   if ((m_EvenlySpaced) && (m_PlaneGeometries.size() > 0))
   {
-    mitk::PlaneGeometry::ConstPointer firstGeometry =
-      m_PlaneGeometries[0].GetPointer();
+    const PlaneGeometry *planeGeometry = m_PlaneGeometries[0];
 
-    const PlaneGeometry *planeGeometry =
-      dynamic_cast< const PlaneGeometry * >( firstGeometry.GetPointer() );
-
-    if (planeGeometry != NULL && dynamic_cast<AbstractTransformGeometry*>( m_PlaneGeometries[0].GetPointer() )==NULL)
+    if ( planeGeometry && !dynamic_cast<const AbstractTransformGeometry*>( planeGeometry ) )
     {
       this->WorldToIndex( planeGeometry->GetOrigin(), origin );
       this->WorldToIndex( planeGeometry->GetAxisVector(0), rightDV );
@@ -780,13 +773,13 @@ void
       PlaneOperation *planeOp = dynamic_cast< PlaneOperation * >( operation );
 
       // Get first slice
-      PlaneGeometry::Pointer geometry2D = m_PlaneGeometries[0];
-      PlaneGeometry *planeGeometry = dynamic_cast< PlaneGeometry * >(
-        geometry2D.GetPointer() );
+      PlaneGeometry::Pointer planeGeometry = m_PlaneGeometries[0];
 
       // Need a PlaneGeometry, a PlaneOperation and a reference frame to
       // carry out the re-orientation. If not all avaialble, stop here
-      if ( !m_ReferenceGeometry || (!planeGeometry || dynamic_cast<AbstractTransformGeometry*>( m_PlaneGeometries[0].GetPointer() )!=NULL) || !planeOp )
+      if ( !m_ReferenceGeometry                                                                       ||
+           ( !planeGeometry || dynamic_cast<AbstractTransformGeometry*>(planeGeometry.GetPointer()) ) ||
+           !planeOp )
       {
         break;
       }
@@ -840,7 +833,7 @@ void
         );
 
       // Rotate first slice
-      geometry2D->ExecuteOperation( &centeredRotation );
+      planeGeometry->ExecuteOperation( &centeredRotation );
 
       // Reinitialize planes and select slice, if my rotations are all done.
       if (!planeOp->AreAxisDefined())
@@ -867,7 +860,7 @@ void
       {
         mitk::Vector3D vecAxixNew = planeOp->GetAxisVec0();
         vecAxixNew.Normalize();
-        mitk::Vector3D VecAxisCurr = geometry2D->GetAxisVector(0);
+        mitk::Vector3D VecAxisCurr = planeGeometry->GetAxisVector(0);
         VecAxisCurr.Normalize();
 
         ScalarType rotationAngle = angle(VecAxisCurr.GetVnlVector(),vecAxixNew.GetVnlVector());
@@ -887,7 +880,7 @@ void
 
         // Perfom Rotation
         mitk::RotationOperation op(mitk::OpROTATE, center, rotationAxis, rotationAngle);
-        geometry2D->ExecuteOperation( &op );
+        planeGeometry->ExecuteOperation( &op );
 
         // Apply changes on first slice to whole slice stack
         this->ReinitializePlanes( center, planeOp->GetPoint() );
@@ -918,22 +911,19 @@ void
     if ( m_EvenlySpaced )
     {
       // Save first slice
-      PlaneGeometry::Pointer geometry2D = m_PlaneGeometries[0];
-
-      PlaneGeometry* planeGeometry = dynamic_cast< PlaneGeometry * >(
-        geometry2D.GetPointer() );
+      PlaneGeometry::Pointer planeGeometry = m_PlaneGeometries[0];
 
       RestorePlanePositionOperation *restorePlaneOp = dynamic_cast< RestorePlanePositionOperation* >( operation );
 
       // Need a PlaneGeometry, a PlaneOperation and a reference frame to
       // carry out the re-orientation
-      if ( m_ReferenceGeometry && (planeGeometry && dynamic_cast<AbstractTransformGeometry*>( m_PlaneGeometries[0].GetPointer() )==NULL) && restorePlaneOp )
+      if ( m_ReferenceGeometry && (planeGeometry && dynamic_cast<AbstractTransformGeometry*>(planeGeometry.GetPointer()) == NULL) && restorePlaneOp )
       {
         // Clear all generated geometries and then rotate only the first slice.
         // The other slices will be re-generated on demand
 
         // Rotate first slice
-        geometry2D->ExecuteOperation( restorePlaneOp );
+        planeGeometry->ExecuteOperation( restorePlaneOp );
 
         m_DirectionVector = restorePlaneOp->GetDirectionVector();
 
@@ -976,7 +966,7 @@ void
 
         if ( m_Slices > 0 )
         {
-          m_PlaneGeometries[0] = geometry2D;
+          m_PlaneGeometries[0] = planeGeometry;
         }
 
         m_SliceNavigationController->GetSlice()->SetSteps( m_Slices );

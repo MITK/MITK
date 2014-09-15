@@ -8,7 +8,6 @@ find_package(PackageHandleStandardArgs)
 if(DEFINED Numpy_DIR AND EXISTS ${Numpy_DIR})
   if(EXISTS ${Numpy_DIR}/core/include)
     set(NUMPY_INCLUDE_DIR  ${Numpy_DIR}/core/include)
-    MESSAGE("NUMPY: " ${NUMPY_INCLUDE_DIR})
   endif()
 else() #numpy dir not defined
   execute_process (
@@ -23,8 +22,6 @@ else() #numpy dir not defined
 endif()
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(Numpy DEFAULT_MSG NUMPY_INCLUDE_DIR)
-
-MESSAGE("found: " ${NUMPY_FOUND})
 
 MARK_AS_ADVANCED (
   NUMPY_INCLUDE_DIR

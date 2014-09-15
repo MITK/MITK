@@ -106,6 +106,9 @@ protected:
     void SetFragmentShaderCode(const std::string& code);
     std::string GetFragmentShaderCode() const;
 
+    void SetGeometryShaderCode(const std::string& code);
+    std::string GetGeometryShaderCode() const;
+
     std::list<Uniform::Pointer> GetUniforms() const;
 
   private:
@@ -114,6 +117,7 @@ protected:
 
     std::string m_VertexShaderCode;
     std::string m_FragmentShaderCode;
+    std::string m_GeometryShaderCode;
 
     void LoadXmlShader(std::istream& stream);
 

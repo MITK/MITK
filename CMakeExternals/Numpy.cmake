@@ -38,7 +38,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
        "${_numpy_env}
         include(\"${_numpy_build_step}\")
         file(WRITE \"${CMAKE_BINARY_DIR}/${proj}-src/site.cfg\" \"\")
-        mitkFunctionExternalPythonBuildStep(${proj} configure ${PYTHON_EXECUTABLE} \"${CMAKE_BINARY_DIR}\" setup.py config)
+        mitkFunctionExternalPythonBuildStep(${proj} configure \"${PYTHON_EXECUTABLE}\" \"${CMAKE_BINARY_DIR}\" setup.py config)
        ")
 
     # build step
@@ -46,11 +46,11 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     file(WRITE ${_build_step}
        "${_numpy_env}
         include(\"${_numpy_build_step}\")
-        mitkFunctionExternalPythonBuildStep(${proj} build ${PYTHON_EXECUTABLE} \"${CMAKE_BINARY_DIR}\" setup.py build --fcompiler=none)
+        mitkFunctionExternalPythonBuildStep(${proj} build \"${PYTHON_EXECUTABLE}\" \"${CMAKE_BINARY_DIR}\" setup.py build --fcompiler=none)
        ")
 
     # install step
-    set(_install_dir ${Python_DIR})
+    set(_install_dir "${Python_DIR}")
     if(WIN32)
       STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
     else()
@@ -62,11 +62,18 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     file(WRITE ${_install_step}
        "${_numpy_env}
         include(\"${_numpy_build_step}\")
-        mitkFunctionExternalPythonBuildStep(${proj} install ${PYTHON_EXECUTABLE} \"${CMAKE_BINARY_DIR}\" setup.py install --prefix=${_install_dir})
+        mitkFunctionExternalPythonBuildStep(${proj} install \"${PYTHON_EXECUTABLE}\" \"${CMAKE_BINARY_DIR}\" setup.py install --prefix=\"${_install_dir}\")
        ")
 
     set(Numpy_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/numpy-1.4.1.tar.gz)
     set(Numpy_MD5 "5c7b5349dc3161763f7f366ceb96516b")
+
+    # escape spaces
+    if(UNIX)
+      STRING(REPLACE " " "\ " _configure_step ${_configure_step})
+      STRING(REPLACE " " "\ " _build_step ${_build_step})
+      STRING(REPLACE " " "\ " _install_step ${_install_step})
+    endif()
 
     ExternalProject_Add(${proj}
       URL ${Numpy_URL}

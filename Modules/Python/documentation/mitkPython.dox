@@ -2,42 +2,48 @@
 
 \page mitkPython_Overview The MITK Python Module
 
-<h1>Brief description</h1>
-The MITK Python Module provides a service class for interactively run python code (passed as C++ strings) and evaluate the results. Furthermore the service class offers means to convert an MITK Image to an ITK/OpenCV image in their wrapped python environment. <strong>Thus, one can process MITK images with Python Code from the OpenCV and ITK wrapping system</strong>. Furthermore one can convert an mitk::Surface to a vtkPolyData in its Python environment.<br />
-Under the hood, the MITK build system takes care that the wrapping build process for ITK/VTK/OpenCV is correctly initiated and all paths are correctly set within MITK code.
+\section sec1 Brief description
+The MITK Python Module provides a service class for interactively run python code (passed as C++ strings) and 
+evaluate the results. Furthermore the service class offers means to convert an MITK Image to an ITK/OpenCV image in their wrapped python environment. 
+<strong>Thus, one can process MITK images with Python Code from the OpenCV and ITK wrapping system</strong>. 
+Furthermore one can convert an mitk::Surface to a vtkPolyData in its Python environment.<br />
+Under the hood, the MITK build system takes care that the wrapping build process for SimpleITK/VTK/OpenCV is correctly initiated and all paths are correctly set within MITK code.
+To use the features of the different toolkits make sure they are enabled during the superbuild process.
 
-<h1>Build Instructions</h1>
-- Install Python <b>2.x</b>
-- Activate MITK_USE_Python in the superbuild process of MITK
-- Provide CMake with the correct Python paths (if not found automatically)
-- Build MITK: All wrapping will be setup by the MITK superbuild routine
+\section sec2 Build Instructions
 
-<h1>Known problems and workarounds</h1>
+The following build options are available:
+<ul>
+  <li> MITK_USE_Python
+  <li> MITK_USE_SYSTEM_PYTHON
+</ul>
 
-<p>System: Linux/OSX/gcc<br />
-Problem: An error during the build process occurs:
-<pre>
-Linking CXX shared library libPythonQt.so
-/usr/bin/ld: error: /usr/lib/gcc/x86_64-linux-gnu/4.6.1/../../../../lib/libpython2.7.a(abstract.o): requires dynamic R_X86_64_PC32 reloc against 'PyErr_Occurred' which may overflow at runtime; recompile with -fPIC
-</pre>
-<strong>Workaround</strong>: Try setting the CMake var PYTHON_LIBRARY to the shared object, e.g. /usr/lib/libpython2.7.so
-</p>
-<p>System: Linux/gcc (maybe Mac OS)<br />
-Problem: An error during the build process occurs:
-<pre>
-Scanning dependencies of target install_wrapitk_compatibility
-[ 40%] Built target install_wrapitk_compatibility
-[ 40%] Generating swigrun.xml
-gccxml_cc1plus: error: gccxml_builtins.h: No such file or directory
-make[5]: *** [Wrapping/WrapITK/SwigRuntime/swigrun.xml] Error 1
-make[4]: *** [Wrapping/WrapITK/SwigRuntime/CMakeFiles/SwigRuntimePython.dir/all] Error 2
-make[3]: *** [all] Error 2
-make[2]: *** [ITK-cmake/src/ITK-stamp/ITK-build] Error 2
-make[1]: *** [CMakeFiles/ITK.dir/all] Error 2
-make: *** [all] Error 2
-</pre>
-<strong>Workaround</strong>: Install CableSwig from the software repo and set the CMake var EXTERNAL_CableSwig_DIR to the directory containing CableSwigConfig.cmake, on linux usually /usr/lib/CableSwig
-</p>
+\subsection ssec1 MITK_USE_Python 
+MITK_USE_Python enables the python wrapping in MITK. When the option is activated
+the build of the additional dependency SimpleITK is also enabled. The default behaviour is to download and build
+Python 2.7.3 with numpy and embed it into MITK.To use an own custom runtime see MITK_USE_SYSTEM_PYTHON.
 
+\subsection ssec2 MITK_USE_SYSTEM_PYTHON
+This option is deactivated by default. If MITK_USE_SYSTEM_PYTHON is activated the python runtime from the system is used.
+The user can also specify it's own runtime by modifing the variables added by the
+FindPythonLib.cmake script. <strong>Note:</strong> A Python runtime with numpy is needed to use the MITK Python wrapping.
+
+\section sec3 Suported Data Types
+The following data types in MITK are supported in the MITK Python Wrapping:
+<ul>
+  <li> Image
+  <li> Surface
+</ul>
+
+\subsection ssec4 Image
+Mitk Images can be transferred to python. The images are copied in-memory and
+transferred as a numpy array to Python and vice versa. The MITK python wrapping creates a SimpleITK image
+using the numpy array with the  properties of the MITK Image. Two dimensional images
+can also be transferred as an OpenCV image to python.
+
+\subsection ssec5 Surface
+Surfaces within mitk can be transferred as a vtkPolyData Object to Python.
+The surfaces are fully memory mapped. When changing a python wrapped surface 
+the original object is also modified on the C++ side of MITK.
 
  */

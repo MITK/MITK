@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PythonSnippets>
-    <PythonSnippet key="medianfilter" value="filter = itk.MedianImageFilter[ mitkImage, mitkImage ].New()&#10;filter.SetRadius( 1 )&#10;filter.SetInput( mitkImage )&#10;filter.Update()&#10;mitkImage_new = filter.GetOutput()"/>
-    <PythonSnippet key="vtk.vtkDecimatePro" value="deci = vtk.vtkDecimatePro()&#10;deci.SetInputConnection( mitkSurface )&#10;deci.SetTargetReduction(0.9)&#10;deci.PreserveTopologyOn()&#10;deci.Update()&#10;&#10;mitkSurface_new = deci.GetOutput()"/>
+    <PythonSnippet key="medianfilter" value="import SimpleITK as sitk&#10;filter = sitk.MedianImageFilter()&#10;filter.SetRadius(1)&#10;mitkImage_new = filter.Execute(mitkImage)"/>
+    <PythonSnippet key="vtk.vtkDecimatePro" value="deci = vtk.vtkDecimatePro()&#10;deci.SetInputData( mitkSurface )&#10;deci.SetTargetReduction(0.9)&#10;deci.PreserveTopologyOn()&#10;deci.Update()&#10;&#10;mitkSurface_new = deci.GetOutput()"/>
     <PythonSnippet key="opencv median filter" value="mitkImage_new = cv2.medianBlur(mitkImage, 3)"/>
     <PythonSnippet key="vtk: create cone" value="coneSrc = vtk.vtkConeSource()&#10;coneSrc.SetResolution(60)&#10;coneSrc.SetCenter(-2,0,0)&#10;coneSrc.Update()&#10;cone = coneSrc.GetOutput()"/>
 </PythonSnippets>

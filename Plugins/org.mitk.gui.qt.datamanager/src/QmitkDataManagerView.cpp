@@ -1097,6 +1097,17 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+void QmitkDataManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes)
+{
+    m_NodeTreeView->clearSelection();
+
+    for (int i = 0; i < nodes.size(); ++i) {
+        QModelIndex itemIndex = m_NodeTreeModel->GetIndex(nodes[i]);
+        m_NodeTreeView->selectionModel()->select(m_FilterModel->mapFromSource(itemIndex), QItemSelectionModel::Select);
+        m_NodeTreeView->scrollTo(m_FilterModel->mapFromSource(itemIndex));
+    }
+}
+
 void QmitkDataManagerView::ShowIn(const QString &editorId)
 {
   berry::IWorkbenchPage::Pointer page = this->GetSite()->GetPage();

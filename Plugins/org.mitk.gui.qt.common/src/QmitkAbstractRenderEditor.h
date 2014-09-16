@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryQtEditorPart.h>
 #include <berryIBerryPreferences.h>
+#include <berryISelectionProvider.h>
 
 #include "mitkIRenderWindowPart.h"
 
@@ -92,6 +93,14 @@ protected:
    * Get the preferences for this editor.
    */
   virtual berry::IPreferences::Pointer GetPreferences() const;
+
+  /**
+  * Reimplement this method to set a custom selection provider. This method is
+  * called once at initialization.
+  *
+  * The default implementation registers a mitk::PickedDataNodeSelectionProvider to support picking.
+  */
+  virtual void SetSelectionProvider();
 
   /**
    * Get the RenderingManager used by this editor. This default implementation uses the

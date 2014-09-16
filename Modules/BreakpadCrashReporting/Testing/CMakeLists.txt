@@ -7,7 +7,6 @@ if(CMAKE_SYSTEM MATCHES "Windows")
     MITK_CREATE_MODULE_TESTS()
 
     add_executable(BreakpadCrashReportingDumpTestApplication mitkBreakpadCrashReportingDumpTestApplication.cpp)
-    target_link_libraries(BreakpadCrashReportingDumpTestApplication ${ALL_LIBRARIES} BreakpadCrashReporting)
-endif()
+    target_link_libraries(BreakpadCrashReportingDumpTestApplication ${ALL_LIBRARIES} MitkBreakpadCrashReporting)
 
 endif()

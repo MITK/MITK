@@ -5,9 +5,6 @@ if(MITK_SHOW_CONSOLE_WINDOW)
   list(APPEND _app_options SHOW_CONSOLE)
 endif()
 
-if(MITK_USE_Breakpad)
-MITK_USE_MODULE(BreakpadCrashReporting)
-endif()
 
 # Create a cache entry for the provisioning file which is used to export
 # the file name in the MITKConfig.cmake file. This will keep external projects
@@ -32,7 +29,10 @@ FunctionCreateBlueBerryApplication(
   EXCLUDE_PLUGINS ${_exclude_plugins}
   ${_app_options}
 )
-mitk_use_modules(TARGET MitkWorkbench MODULES qtsingleapplication MitkCore)
+mitk_use_modules(TARGET MitkWorkbench MODULES qtsingleapplication MitkCore MitkBreakpadCrashReporting)
+if(MITK_USE_Breakpad)
+  mitk_use_modules(TARGET MitkWorkbench MODULES MitkBreakpadCrashReporting)
+endif()
 
 # Add meta dependencies (e.g. on auto-load modules from depending modules)
 if(ALL_META_DEPENDENCIES)

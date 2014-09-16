@@ -16,6 +16,7 @@ if(MITK_USE_Breakpad) # from top-level CMakeLists.txt
   endif()
 
   MITK_CREATE_MODULE(BreakpadCrashReporting
+    DEPENDS MitkCore
     INTERNAL_INCLUDE_DIRS ${Breakpad_INCLUDE_DIR}
     ADDITIONAL_LIBS ${Breakpad_LIBRARIES}
     FORCE_STATIC

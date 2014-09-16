@@ -28,6 +28,14 @@ if(NOT DEFINED VTK_DIR)
         )
   endif()
 
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # Enable memory leak checks for any objects derived from vtkObject. This
+    # will force unit tests to fail if they have any of these memory leaks.
+    set(additional_cmake_args
+        -DVTK_DEBUG_LEAKS:BOOL=ON
+        )
+  endif()
+
   if(MITK_USE_Python)
     if(NOT MITK_USE_SYSTEM_PYTHON)
      list(APPEND proj_DEPENDENCIES Python)

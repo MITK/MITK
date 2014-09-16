@@ -21,9 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkComputeContourSetNormalsFilter.h>
 
+#include <vtkDebugLeaks.h>
+
 class mitkCreateDistanceImageFromSurfaceFilterTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkCreateDistanceImageFromSurfaceFilterTestSuite);
+  vtkDebugLeaks::SetExitError(0);
   MITK_TEST(TestCreateDistanceImageForLiver);
   MITK_TEST(TestCreateDistanceImageForTube);
   CPPUNIT_TEST_SUITE_END();

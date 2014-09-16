@@ -25,11 +25,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGlobalInteraction.h>
 #include <mitkDataNode.h>
 
+#include <vtkDebugLeaks.h>
 
 class mitkToolInteractionTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkToolInteractionTestSuite);
+
+  /// \todo Fix VTK memory leaks. Bug 18098.
+  vtkDebugLeaks::SetExitError(0);
+
   /* ####### example ######
 
   MITK_TEST(AddToolInteraction_4D_Test);

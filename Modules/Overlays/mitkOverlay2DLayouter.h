@@ -17,14 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKOVERLAY2DLAYOUTER_H
 #define MITKOVERLAY2DLAYOUTER_H
 
-#include <MitkCoreExports.h>
+#include <MitkOverlaysExports.h>
 #include <mitkAbstractOverlayLayouter.h>
 
 namespace mitk {
 
 /** @brief A simple implementation of a layouter for 2D Overlays
  */
-class MITK_CORE_EXPORT Overlay2DLayouter : public mitk::AbstractOverlayLayouter {
+class MitkOverlays_EXPORT Overlay2DLayouter : public mitk::AbstractOverlayLayouter {
 public:
   enum Alignment{TopLeft, Top, TopRight, BottomLeft, Bottom, BottomRight};
   mitkClassMacro(Overlay2DLayouter, mitk::AbstractOverlayLayouter);

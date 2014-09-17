@@ -75,7 +75,7 @@ public:
 *  Test for vtkMitkThickSlicesFilter.
 *
 */
-int vtkMitkThickSlicesFilterTest(int, char** )
+int vtkMitkThickSlicesFilterTest(int, char* [])
 {
   // always start with this!
   MITK_TEST_BEGIN("vtkMitkThickSlicesFilterTest")

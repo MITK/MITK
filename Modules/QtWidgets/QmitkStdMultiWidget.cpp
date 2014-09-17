@@ -407,15 +407,25 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_GradientBackground4->Enable();
 
   // setup the department logo rendering
-  m_LogoRendering = mitk::LogoOverlay::New();
-  mitk::BaseRenderer::Pointer renderer4 = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
-  m_LogoRendering->SetOpacity(0.6);
-  renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(),renderer4);
-  mitk::Overlay::Bounds bounds = m_LogoRendering->GetBoundsOnDisplay(renderer4);
-  bounds.Size[0] = bounds.Size[1] = 0.12;
-  bounds.Position[0] = 0.02;
-  bounds.Position[1] = 0.02;
-  m_LogoRendering->SetBoundsOnDisplay(renderer4,bounds);
+  m_LogoRendering1 = mitk::ManufacturerLogo::New();
+  m_LogoRendering1->SetRenderWindow(
+    mitkWidget1->GetRenderWindow() );
+  m_LogoRendering1->Disable();
+
+  m_LogoRendering2 = mitk::ManufacturerLogo::New();
+  m_LogoRendering2->SetRenderWindow(
+    mitkWidget2->GetRenderWindow() );
+  m_LogoRendering2->Disable();
+
+  m_LogoRendering3 = mitk::ManufacturerLogo::New();
+  m_LogoRendering3->SetRenderWindow(
+    mitkWidget3->GetRenderWindow() );
+  m_LogoRendering3->Disable();
+
+  m_LogoRendering4 = mitk::ManufacturerLogo::New();
+  m_LogoRendering4->SetRenderWindow(
+    mitkWidget4->GetRenderWindow() );
+  m_LogoRendering4->Enable();
 
   m_RectangleRendering1 = mitk::RenderWindowFrame::New();
   m_RectangleRendering1->SetRenderWindow(
@@ -1777,17 +1787,17 @@ void QmitkStdMultiWidget::DisableGradientBackground()
 
 void QmitkStdMultiWidget::EnableDepartmentLogo()
 {
-  m_LogoRendering->SetVisibility(true);
+  m_LogoRendering4->Enable();
 }
 
 void QmitkStdMultiWidget::DisableDepartmentLogo()
 {
-  m_LogoRendering->SetVisibility(false);
+  m_LogoRendering4->Disable();
 }
 
 bool QmitkStdMultiWidget::IsDepartmentLogoEnabled() const
 {
-  return m_LogoRendering->IsVisible(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
+  return m_LogoRendering4->IsEnabled();
 }
 
 bool QmitkStdMultiWidget::IsCrosshairNavigationEnabled() const
@@ -1985,7 +1995,10 @@ void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper
 
 void QmitkStdMultiWidget::SetDepartmentLogoPath( const char * path )
 {
-  m_LogoRendering->SetLogoImagePath(path);
+  m_LogoRendering1->SetLogoSource(path);
+  m_LogoRendering2->SetLogoSource(path);
+  m_LogoRendering3->SetLogoSource(path);
+  m_LogoRendering4->SetLogoSource(path);
 }
 
 void QmitkStdMultiWidget::SetWidgetPlaneModeToSlicing( bool activate )

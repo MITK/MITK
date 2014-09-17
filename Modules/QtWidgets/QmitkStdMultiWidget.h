@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSlicesRotator.h"
 #include "mitkSlicesSwiveller.h"
 #include "mitkRenderWindowFrame.h"
-#include "mitkLogoOverlay.h"
+#include "mitkManufacturerLogo.h"
 #include "mitkGradientBackground.h"
 #include "mitkCoordinateSupplier.h"
 #include "mitkDataStorage.h"
@@ -309,7 +309,10 @@ protected:
   mitk::RenderWindowFrame::Pointer m_RectangleRendering1;
   mitk::RenderWindowFrame::Pointer m_RectangleRendering4;
 
-  mitk::LogoOverlay::Pointer m_LogoRendering;
+  mitk::ManufacturerLogo::Pointer m_LogoRendering1;
+  mitk::ManufacturerLogo::Pointer m_LogoRendering2;
+  mitk::ManufacturerLogo::Pointer m_LogoRendering3;
+  mitk::ManufacturerLogo::Pointer m_LogoRendering4;
 
   mitk::GradientBackground::Pointer m_GradientBackground1;
   mitk::GradientBackground::Pointer m_GradientBackground2;

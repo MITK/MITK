@@ -20,9 +20,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     set(PYTHON_SOURCE_DIR  "${CMAKE_BINARY_DIR}/${PYTHON_SOURCE_PACKAGE}")
     # patch the VS compiler config
 
-    if(WIN32)
-      set(PYTHON_PATCH_COMMAND PATCH_COMMAND ${CMAKE_COMMAND} -DPYTHON_SOURCE_DIR:PATH=${PYTHON_SOURCE_DIR} -P ${CMAKE_CURRENT_LIST_DIR}/Patch${proj}.cmake)
-    endif()
+    set(PYTHON_PATCH_COMMAND PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${CMAKE_CURRENT_LIST_DIR}/Patch${proj}.cmake)
 
     # download the source code
     ExternalProject_Add(Python-src

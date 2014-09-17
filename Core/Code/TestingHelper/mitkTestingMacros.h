@@ -82,10 +82,10 @@ namespace mitk {
  * @ingroup MITKTestingAPI
  */
 #define MITK_TEST_END()                                   \
-  } catch (mitk::TestFailedException ex) {                      \
+  } catch (const mitk::TestFailedException& ex) {                      \
     MITK_TEST_OUTPUT(<< "Further test execution skipped.") \
     mitk::TestManager::GetInstance()->TestFailed(); \
-  } catch (std::exception ex) { \
+  } catch (const std::exception& ex) { \
     MITK_TEST_OUTPUT(<< "std::exception occured " << ex.what()) \
     mitk::TestManager::GetInstance()->TestFailed(); \
   }                                                     \

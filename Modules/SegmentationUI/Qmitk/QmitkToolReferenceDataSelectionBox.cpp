@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkToolManagerProvider.h"
 
-QmitkToolReferenceDataSelectionBox::QmitkToolReferenceDataSelectionBox(QWidget* parent, mitk::DataStorage* storage)
+QmitkToolReferenceDataSelectionBox::QmitkToolReferenceDataSelectionBox(QWidget* parent)
 :QWidget(parent),
 m_SelfCall(false),
 m_DisplayMode(ListDataIfAnyToolMatches ),

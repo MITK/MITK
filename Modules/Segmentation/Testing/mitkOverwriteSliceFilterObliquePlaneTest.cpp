@@ -225,7 +225,7 @@ stop3:
 
 
 /*================ #BEGIN test main ================*/
-int mitkOverwriteSliceFilterObliquePlaneTest(int argc, char* argv[])
+int mitkOverwriteSliceFilterObliquePlaneTest(int , char* [])
 {
 
   MITK_TEST_BEGIN("mitkOverwriteSliceFilterObliquePlaneTest")

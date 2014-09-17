@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  INCLUDE_DIRS BaseDataSerializer BasePropertySerializer
+  INCLUDE_DIRS BasePropertySerializer
   DEPENDS MitkCore
   WARNINGS_AS_ERRORS
 )

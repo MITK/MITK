@@ -38,7 +38,7 @@ int VolumeSize = 128;
 
 
 /*================ #BEGIN test main ================*/
-int mitkOverwriteSliceFilterTest(int argc, char* argv[])
+int mitkOverwriteSliceFilterTest(int, char* [])
 {
 
   MITK_TEST_BEGIN("mitkOverwriteSliceFilterTest")

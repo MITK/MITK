@@ -19,7 +19,7 @@
 
 #include <mitkVtkOverlay3D.h>
 #include <mitkLocalStorageHandler.h>
-#include "MitkCoreExports.h"
+#include "MitkOverlaysExports.h"
 #include <vtkSmartPointer.h>
 
 class vtkStringArray;
@@ -37,7 +37,7 @@ class PointSet;
 
 
 /** \brief Can display a high amount of 3D labels to a PointSet */
-class MITK_CORE_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
+class MitkOverlays_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
 public:
 
   /** \brief Internal class holding the vtkActor, etc. for each of the render windows */

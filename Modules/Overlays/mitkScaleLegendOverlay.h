@@ -14,37 +14,27 @@
 
   ===================================================================*/
 
-#ifndef TextOverlay3D_H
-#define TextOverlay3D_H
+#ifndef SCALELEGENDOVERLAY_H
+#define SCALELEGENDOVERLAY_H
 
-#include <mitkVtkOverlay3D.h>
+#include <mitkVtkOverlay.h>
 #include <mitkLocalStorageHandler.h>
-#include "MitkCoreExports.h"
+#include <vtkSmartPointer.h>
+#include "MitkOverlaysExports.h"
 
-class vtkFollower;
-class vtkVectorText;
-class vtkTextActor3D;
+class vtkLegendScaleActor;
 
 namespace mitk {
 
-/** \brief Displays at 3D position, always facing the camera */
-class MITK_CORE_EXPORT TextOverlay3D : public mitk::VtkOverlay3D {
+/** \brief Displays configurable scales on the renderwindow. The scale is determined by the image spacing. */
+class MitkOverlays_EXPORT ScaleLegendOverlay : public mitk::VtkOverlay {
 public:
 
-  /** \brief Internal class holding the mapper, actor, etc. for each of the render windows */
-  /**
-     * To render the Overlay on transveral, coronal, and sagittal, the update method
-     * is called for each renderwindow. For performance reasons, the corresponding data
-     * for each view is saved in the internal helper class LocalStorage.
-     * This allows rendering n views with just 1 mitkOverlay using n vtkMapper.
-     * */
   class LocalStorage : public mitk::Overlay::BaseLocalStorage
   {
   public:
     /** \brief Actor of a 2D render window. */
-    vtkSmartPointer<vtkFollower> m_follower;
-
-    vtkSmartPointer<vtkVectorText> m_textSource;
+    vtkSmartPointer<vtkLegendScaleActor> m_legendScaleActor;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;
@@ -53,12 +43,32 @@ public:
     LocalStorage();
     /** \brief Default deconstructor of the local storage. */
     ~LocalStorage();
-
   };
 
-  mitkClassMacro(TextOverlay3D, mitk::VtkOverlay3D);
+  mitkClassMacro(ScaleLegendOverlay, mitk::VtkOverlay);
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
+
+  void SetRightAxisVisibility(bool visibility);
+  bool GetRightAxisVisibility() const;
+
+  void SetLeftAxisVisibility(bool visibility);
+  bool GetLeftAxisVisibility() const;
+
+  void SetTopAxisVisibility(bool visibility);
+  bool GetTopAxisVisibility() const;
+
+  void SetBottomAxisVisibility(bool visibility);
+  bool GetBottomAxisVisibility() const;
+
+  void SetLegendVisibility(bool visibility);
+  bool GetLegendVisibility() const;
+
+  void SetRightBorderOffset(int offset);
+  int GetRightBorderOffset() const;
+
+  void SetCornerOffsetFactor(float offsetFactor);
+  float GetCornerOffsetFactor() const;
 
 protected:
 
@@ -66,25 +76,25 @@ protected:
   mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   virtual vtkProp* GetVtkProp(BaseRenderer *renderer) const;
-  void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
+  virtual void UpdateVtkOverlay(BaseRenderer *renderer);
 
   /** \brief explicit constructor which disallows implicit conversions */
-  explicit TextOverlay3D();
+  explicit ScaleLegendOverlay();
 
   /** \brief virtual destructor in order to derive from this class */
-  virtual ~TextOverlay3D();
+  virtual ~ScaleLegendOverlay();
 
 private:
 
   /** \brief copy constructor */
-  TextOverlay3D( const TextOverlay3D &);
+  ScaleLegendOverlay( const ScaleLegendOverlay &);
 
   /** \brief assignment operator */
-  TextOverlay3D &operator=(const TextOverlay3D &);
+  ScaleLegendOverlay &operator=(const ScaleLegendOverlay &);
 
 };
 
 } // namespace mitk
-#endif // TextOverlay3D_H
+#endif // SCALELEGENDOVERLAY_H
 
 

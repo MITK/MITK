@@ -20,7 +20,7 @@
 #include <mitkVtkOverlay2D.h>
 #include <mitkLocalStorageHandler.h>
 #include <vtkSmartPointer.h>
-#include "MitkCoreExports.h"
+#include "MitkOverlaysExports.h"
 
 class vtkTextActor;
 class vtkImageMapper;
@@ -29,7 +29,7 @@ class vtkImageData;
 namespace mitk {
 
 /** \brief Displays text on the renderwindow */
-class MITK_CORE_EXPORT TextOverlay2D : public mitk::VtkOverlay2D {
+class MitkOverlays_EXPORT TextOverlay2D : public mitk::VtkOverlay2D {
 public:
 
   class LocalStorage : public mitk::Overlay::BaseLocalStorage

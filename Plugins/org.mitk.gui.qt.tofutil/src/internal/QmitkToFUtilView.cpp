@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include "QmitkToFUtilView.h"
 #include <QmitkStdMultiWidget.h>
-#include <QmitkTextOverlay.h>
 
 // Qt
 #include <QMessageBox>

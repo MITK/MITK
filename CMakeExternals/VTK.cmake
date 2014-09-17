@@ -28,6 +28,14 @@ if(NOT DEFINED VTK_DIR)
         )
   endif()
 
+  # Optionally enable memory leak checks for any objects derived from vtkObject. This
+  # will force unit tests to fail if they have any of these memory leaks.
+  option(MITK_VTK_DEBUG_LEAKS OFF)
+  mark_as_advanced(MITK_VTK_DEBUG_LEAKS)
+  set(additional_cmake_args
+      -DVTK_DEBUG_LEAKS:BOOL=${MITK_VTK_DEBUG_LEAKS}
+      )
+
   if(MITK_USE_Python)
     list(APPEND additional_cmake_args
          -DVTK_WRAP_PYTHON:BOOL=ON

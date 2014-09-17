@@ -62,6 +62,7 @@ public:
   void tearDown()
   {
     //destroy all objects
+    m_TestPointSetNode->SetDataInteractor(NULL);
     m_TestPointSetNode = NULL;
     m_TestPointSet = NULL;
     m_DataInteractor = NULL;

@@ -24,9 +24,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExtractSliceFilter.h>
 #include <mitkPlaneGeometry.h>
 
+#include <vtkDebugLeaks.h>
+
 class mitkComputeContourSetNormalsFilterTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkComputeContourSetNormalsFilterTestSuite);
+
+  /// \todo Fix leaks of vtkObjects. Bug 18096.
+  vtkDebugLeaks::SetExitError(0);
+
   MITK_TEST(TestComputeNormals);
   MITK_TEST(TestComputeNormalsWithHole);
   CPPUNIT_TEST_SUITE_END();

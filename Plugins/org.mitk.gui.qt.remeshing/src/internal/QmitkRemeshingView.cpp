@@ -200,7 +200,6 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(QString("%1 (%2, %3)").arg(selectedNode->GetName().c_str()).arg(remeshedSurface->GetVtkPolyData()->GetNumberOfPoints()).arg(gradation).toStdString());
   newNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
-  newNode->SetProperty("material.specularCoefficient", mitk::FloatProperty::New(0.0f));
   newNode->SetData(remeshedSurface);
 
   this->GetDataStorage()->Add(newNode, selectedNode);

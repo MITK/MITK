@@ -106,7 +106,7 @@ static void Valid_ImageExpandedByTimestep_ReturnsTrue()
   }
 }
 
-int mitkImageTimeSelectorTest(int, char* [])
+int mitkImageTimeSelectorTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN(mitkImageTimeSelectorTest);
 

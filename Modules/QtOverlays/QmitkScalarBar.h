@@ -19,14 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKSCALARBAR_H_HEADER_INCLUDED_C10DC4EB
 
 #include <mitkCommon.h>
-#include <MitkOverlaysExports.h>
+#include <MitkQtOverlaysExports.h>
 
 #include <QPen>
 #include <QWidget>
 
 
 
-class MitkOverlays_EXPORT QmitkScalarBar : public QWidget
+class MitkQtOverlays_EXPORT QmitkScalarBar : public QWidget
   {
     Q_OBJECT
   public:

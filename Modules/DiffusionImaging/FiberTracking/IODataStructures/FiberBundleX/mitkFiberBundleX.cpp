@@ -988,7 +988,7 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
         m_MinFiberLength = 0;
         m_MaxFiberLength = 0;
         mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
-        geometry->SetImageGeometry(true);
+        geometry->SetImageGeometry(false);
         float b[] = {0, 1, 0, 1, 0, 1};
         geometry->SetFloatBounds(b);
         SetGeometry(geometry);

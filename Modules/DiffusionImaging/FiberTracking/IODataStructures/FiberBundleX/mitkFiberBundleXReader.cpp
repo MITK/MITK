@@ -66,23 +66,6 @@ void FiberBundleXReader::GenerateOutputInformation()
             TrackVisFiberReader reader;
             reader.open(m_FileName);
             reader.read(m_OutputCache);
-
-            mitk::Geometry3D::Pointer geometry = dynamic_cast<mitk::Geometry3D*>(m_OutputCache->GetGeometry());
-
-            mitk::Point3D origin;
-            origin[0]=reader.hdr.origin[0];
-            origin[1]=reader.hdr.origin[1];
-            origin[2]=reader.hdr.origin[2];
-            geometry->SetOrigin(origin);
-
-            mitk::Vector3D spacing;
-            spacing[0]=reader.hdr.voxel_size[0];
-            spacing[1]=reader.hdr.voxel_size[1];
-            spacing[2]=reader.hdr.voxel_size[2];
-            geometry->SetSpacing(spacing);
-
-            m_OutputCache->SetGeometry(geometry);
-
             return;
         }
 

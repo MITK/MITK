@@ -29,8 +29,8 @@ FunctionCreateBlueBerryApplication(
   EXCLUDE_PLUGINS ${_exclude_plugins}
   ${_app_options}
 )
-mitk_use_modules(TARGET MitkWorkbench MODULES qtsingleapplication MitkCore MitkBreakpadCrashReporting)
-if(MITK_USE_Breakpad)
+mitk_use_modules(TARGET MitkWorkbench MODULES qtsingleapplication MitkCore)
+if(MITK_USE_BREAKPAD)
   mitk_use_modules(TARGET MitkWorkbench MODULES MitkBreakpadCrashReporting)
 endif()
 

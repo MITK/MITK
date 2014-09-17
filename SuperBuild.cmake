@@ -253,7 +253,7 @@ set(mitk_cmake_boolean_args
   MITK_USE_CppUnit
   MITK_USE_GLEW
   MITK_USE_Boost
-  MITK_USE_Breakpad
+  MITK_USE_BREAKPAD
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_CTK

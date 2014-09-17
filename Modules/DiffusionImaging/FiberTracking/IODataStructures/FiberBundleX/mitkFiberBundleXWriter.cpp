@@ -87,7 +87,7 @@ void mitk::FiberBundleXWriter::GenerateData()
     else if (ext==".trk")
     {
         MITK_INFO << "Writing fiber bundle as TRK";
-        TrackVis trk;
+        TrackVisFiberReader trk;
         trk.create(m_FileName, input);
         trk.writeHdr();
         trk.append(input);

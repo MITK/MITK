@@ -1,13 +1,13 @@
 #include <mitkTrackvis.h>
 
-TrackVis::TrackVis()  { filename = ""; fp = NULL; maxSteps = 20000; }
+TrackVisFiberReader::TrackVisFiberReader()  { filename = ""; fp = NULL; }
 
-TrackVis::~TrackVis() { if (fp) fclose( fp ); }
+TrackVisFiberReader::~TrackVisFiberReader() { if (fp) fclose( fp ); }
 
 
 // Create a TrackVis file and store standard metadata. The file is ready to append fibers.
 // ---------------------------------------------------------------------------------------
-short TrackVis::create(string filename , mitk::FiberBundleX *fib)
+short TrackVisFiberReader::create(string filename , mitk::FiberBundleX *fib)
 {
     // prepare the header
     for(int i=0; i<3 ;i++)
@@ -16,15 +16,14 @@ short TrackVis::create(string filename , mitk::FiberBundleX *fib)
         {
             hdr.dim[i]            = fib->GetReferenceImage()->GetDimension(i);
             hdr.voxel_size[i]     = fib->GetReferenceImage()->GetGeometry()->GetSpacing().GetElement(i);
-            m_Origin[i]         = fib->GetReferenceImage()->GetGeometry()->GetOrigin().GetElement(i);
+            hdr.origin[i]         = fib->GetReferenceImage()->GetGeometry()->GetOrigin().GetElement(i);
         }
         else
         {
             hdr.dim[i]            = 1;
             hdr.voxel_size[i]     = 1;
-            m_Origin[i]         = 0;
+            hdr.origin[i]         = 0;
         }
-        hdr.origin[i] = 0;
     }
     hdr.n_scalars = 0;
     hdr.n_properties = 0;
@@ -68,7 +67,7 @@ short TrackVis::create(string filename , mitk::FiberBundleX *fib)
 // Open an existing TrackVis file and read metadata information.
 // The file pointer is positiond at the beginning of fibers data
 // -------------------------------------------------------------
-short TrackVis::open( string filename )
+short TrackVisFiberReader::open( string filename )
 {
     fp = fopen(filename.c_str(),"r+b");
     if (fp == NULL)
@@ -85,7 +84,7 @@ short TrackVis::open( string filename )
 
 // Append a fiber to the file
 // --------------------------
-short TrackVis::append(mitk::FiberBundleX *fib)
+short TrackVisFiberReader::append(mitk::FiberBundleX *fib)
 {
     vtkPolyData* poly = fib->GetFiberPolyData();
     for (int i=0; i<fib->GetNumFibers(); i++)
@@ -99,20 +98,14 @@ short TrackVis::append(mitk::FiberBundleX *fib)
         std::vector< float > tmp;
         tmp.reserve(3*numPoints);
 
-        if ( numPoints > maxSteps )
-        {
-            printf( "[ERROR] Trying to write a fiber too long!\n" );
-            return 0;
-        }
-
         numSaved = numPoints;
         for(unsigned int i=0; i<numSaved ;i++)
         {
             double* p = points->GetPoint(i);
 
-            tmp[pos++] = p[0] - m_Origin[0];
-            tmp[pos++] = p[1] - m_Origin[1];
-            tmp[pos++] = p[2] - m_Origin[2];
+            tmp[pos++] = p[0];
+            tmp[pos++] = p[1];
+            tmp[pos++] = p[2];
         }
 
         // write the coordinates to the file
@@ -131,11 +124,9 @@ short TrackVis::append(mitk::FiberBundleX *fib)
     return 0;
 }
 
-
-
 //// Read one fiber from the file
 //// ----------------------------
-short TrackVis::read( mitk::FiberBundleX* fib )
+short TrackVisFiberReader::read( mitk::FiberBundleX* fib )
 {
     int numPoints;
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
@@ -143,7 +134,7 @@ short TrackVis::read( mitk::FiberBundleX* fib )
 
     while (fread((char*)&numPoints, 1, 4, fp)==4)
     {
-        if ( numPoints >= maxSteps || numPoints <= 0 )
+        if ( numPoints <= 0 )
         {
             printf( "[ERROR] Trying to read a fiber with %d points!\n", numPoints );
             return -1;
@@ -155,6 +146,14 @@ short TrackVis::read( mitk::FiberBundleX* fib )
         {
             if (fread((char*)tmp, 1, 12, fp) == 0)
                 MITK_ERROR << "TrackVis::read: Error during read.";
+
+//            tmp[0] *= hdr.voxel_size[0];
+//            tmp[1] *= hdr.voxel_size[1];
+//            tmp[2] *= hdr.voxel_size[2];
+
+//            tmp[0] += hdr.origin[0];
+//            tmp[1] += hdr.origin[1];
+//            tmp[2] += hdr.origin[2];
 
             vtkIdType id = vtkNewPoints->InsertNextPoint(tmp);
             container->GetPointIds()->InsertNextId(id);
@@ -174,7 +173,7 @@ short TrackVis::read( mitk::FiberBundleX* fib )
 
 // Update the field in the header to the new FIBER TOTAL.
 // ------------------------------------------------------
-void TrackVis::updateTotal( int totFibers )
+void TrackVisFiberReader::updateTotal( int totFibers )
 {
     fseek(fp, 1000-12, SEEK_SET);
     if (fwrite((char*)&totFibers, 1, 4, fp) != 4)
@@ -182,7 +181,7 @@ void TrackVis::updateTotal( int totFibers )
 }
 
 
-void TrackVis::writeHdr()
+void TrackVisFiberReader::writeHdr()
 {
     fseek(fp, 0, SEEK_SET);
     if (fwrite((char*)&hdr, 1, 1000, fp) != 1000)
@@ -192,7 +191,7 @@ void TrackVis::writeHdr()
 
 // Close the TrackVis file, but keep the metadata in the header.
 // -------------------------------------------------------------
-void TrackVis::close()
+void TrackVisFiberReader::close()
 {
     fclose(fp);
     fp = NULL;

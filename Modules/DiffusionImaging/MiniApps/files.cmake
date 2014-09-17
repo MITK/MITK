@@ -23,7 +23,6 @@ set(CPP_FILES
     MultishellMethods.cpp
     Fiberfox.cpp
     ExportShImage.cpp
-    ImportShImage.cpp
     NetworkCreation.cpp
     NetworkStatistics.cpp
     DwiDenoising.cpp

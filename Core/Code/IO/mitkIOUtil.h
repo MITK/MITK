@@ -67,6 +67,13 @@ public:
   static std::string GetTempPath();
 
   /**
+  * Returns the Directory Seperator for the current OS.
+  *
+  * @return the Directory Seperator for the current OS, i.e. "\\" for Windows and "/" otherwise.
+  */
+  static std::string GetDirectorySeparator();
+
+  /**
    * Create and open a temporary file.
    *
    * This method generates a unique temporary filename from \c templateName, creates

@@ -124,48 +124,48 @@ public:
     mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
 
     //Path to the reference PointSet
-    std::string referencePointSetPath = GetTestDataFilePath("InteractionTestData/InitPointSet.mps");
+    std::string referencePointSetPath = GetTestDataFilePath("InteractionTestData/InputData/InitPointSet.mps");
     mitk::PointSet::Pointer ps = mitk::IOUtil::LoadPointSet( referencePointSetPath );
     pointSetNode->SetData( ps );
 
     this->SetupInteractor( dataInteractor, pointSetNode );
 
-    std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-0_1.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-0.mps");
+    std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-0_1.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-0.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 1 );
 
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-1_3.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-1.mps");
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-1_3.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-1.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 1 );
 
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-2_4.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-2.mps");
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-2_4.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-2.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 1 );
 
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-3_8.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-3.mps");
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-3_8.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-3.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 1 );
 
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-4_2.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-4.mps");
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-4_2.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-4.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 4 );
 
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-5_6.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-5.mps");
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-5_6.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-5.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 4 );
 
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-6_7.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-6.mps");
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-6_7.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-6.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 4 );
 
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-7_5.xml");
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-7_5.xml");
     //referencePointSetPath = GetTestDataFilePath("InteractionTestData/PointSet1.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
 

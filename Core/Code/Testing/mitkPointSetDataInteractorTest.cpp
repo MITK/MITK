@@ -101,11 +101,14 @@ public:
   void EvaluateState( std::string &refPsFile, mitk::PointSet::Pointer ps, int selected )
   {
     mitk::PointSet::Pointer refPs = mitk::IOUtil::LoadPointSet( refPsFile );
+    refPs->UpdateOutputInformation();
+    ps->UpdateOutputInformation();
 
     MITK_ASSERT_EQUAL(ps, refPs, "");
 
+    MITK_TEST_CONDITION_REQUIRED(true, "Test against reference point set." );
     MITK_TEST_CONDITION_REQUIRED(ps->GetNumberOfSelected() == 1, "One selected point." );
-    MITK_TEST_CONDITION_REQUIRED(ps->GetSelectInfo( selected ) , "Testing if point is selected." );
+    MITK_TEST_CONDITION_REQUIRED(ps->GetSelectInfo( selected ) , "Testing if proper point is selected." );
   }
 
   void SetupInteractor( mitk::PointSetDataInteractor* dataInteractor, mitk::DataNode* node )
@@ -128,42 +131,42 @@ public:
     this->SetupInteractor( dataInteractor, pointSetNode );
 
     std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-0_1.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/PointSet-0.mps");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-0.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 1 );
 
     interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-1_3.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/PointSet-1.mps");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-1.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 1 );
 
     interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-2_4.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/PointSet-2.mps");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-2.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 1 );
 
     interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-3_8.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/PointSet-3.mps");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-3.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 1 );
 
     interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-4_2.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/PointSet-4.mps");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-4.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 4 );
 
     interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-5_6.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/PointSet-5.mps");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-5.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 4 );
 
     interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-6_7.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/PointSet-6.mps");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/refPointSet-6.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
     EvaluateState( referencePointSetPath, ps, 4 );
 
     interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/testInteractionDel-7_5.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/PointSet1.mps");
+    //referencePointSetPath = GetTestDataFilePath("InteractionTestData/PointSet1.mps");
     PlayInteraction( interactionXmlPath, pointSetNode );
 
     MITK_TEST_CONDITION_REQUIRED(ps->GetPointSet()->GetNumberOfPoints() == 0, "Empty point set check.");

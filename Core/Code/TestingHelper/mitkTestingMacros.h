@@ -82,7 +82,7 @@ namespace mitk {
  * @ingroup MITKTestingAPI
  */
 #define MITK_TEST_END()                                   \
-  } catch (const mitk::TestFailedException& ex) {                      \
+  } catch (const mitk::TestFailedException&) {                      \
     MITK_TEST_OUTPUT(<< "Further test execution skipped.") \
     mitk::TestManager::GetInstance()->TestFailed(); \
   } catch (const std::exception& ex) { \

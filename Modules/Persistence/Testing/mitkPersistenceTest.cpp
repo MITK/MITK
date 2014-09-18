@@ -22,8 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPersistenceService.h>
 #include <mitkSceneIO.h>
 #include <mitkIOUtil.h>
-
-#include <Poco/File.h>
+#include <itksys\SystemTools.hxx>
 
 struct PersistenceTestClass
 {
@@ -84,13 +83,13 @@ int mitkPersistenceTest(int /*argc*/, char* /*argv*/[])
 
     MITK_INFO << "Initialize testable parameter values.";
 
-  Poco::File defaultPersistenceFile(persistenceService->GetDefaultPersistenceFile());
+  std::string defaultPersistenceFile = persistenceService->GetDefaultPersistenceFile();
   PersistenceTestClass autoLoadTestClass;
   autoLoadTestClass.id = testClassId;
-  if( defaultPersistenceFile.exists() && persistenceService->GetAutoLoadAndSave() )
+  if( itksys::SystemTools::FileExists(defaultPersistenceFile.c_str(), true) && persistenceService->GetAutoLoadAndSave() )
   {
     MITK_INFO << "Testing auto load/save of the PersistenceService.";
-    defaultPersistenceFile.remove();
+    itksys::SystemTools::RemoveFile(defaultPersistenceFile.c_str());
     autoLoadTestClass.FromPropertyList();
 
     testParams( autoLoadTestClass, "autoLoadTestClass" );

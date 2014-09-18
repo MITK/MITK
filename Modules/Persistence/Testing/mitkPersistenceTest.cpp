@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPersistenceService.h>
 #include <mitkSceneIO.h>
 #include <mitkIOUtil.h>
-#include <itksys\SystemTools.hxx>
+#include <itksys/SystemTools.hxx>
 
 struct PersistenceTestClass
 {

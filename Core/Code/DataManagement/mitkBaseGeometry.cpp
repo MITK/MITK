@@ -91,9 +91,6 @@ void mitk::BaseGeometry::Initialize()
   this->PostInitialize();
 }
 
-void mitk::BaseGeometry::PostInitializeGeometry(BaseGeometry * newGeometry) const
-{
-}
 
 void mitk::BaseGeometry::SetFloatBounds(const float bounds[6])
 {
@@ -133,16 +130,12 @@ void mitk::BaseGeometry::InitializeGeometryTransformHolder(const BaseGeometry* o
   this->m_GeometryTransform->Initialize(otherGeometry->GetGeometryTransformHolder());
 }
 
-void mitk::BaseGeometry::PostInitialize()
-{
-}
-
 /** Set the bounds */
 void mitk::BaseGeometry::SetBounds(const BoundsArrayType& bounds)
 {
   mitk::ModifiedLock lock(this);
 
-  PreSetBounds(bounds);
+  this->PreSetBounds(bounds);
 
   m_BoundingBox = BoundingBoxType::New();
 
@@ -166,8 +159,6 @@ void mitk::BaseGeometry::SetBounds(const BoundsArrayType& bounds)
   this->Modified();
 }
 
-void mitk::BaseGeometry::PreSetBounds(const BoundsArrayType& /*bounds*/){};
-
 void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* transform)
 {
   mitk::ModifiedLock lock(this);
@@ -180,10 +171,6 @@ void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* trans
   PostSetIndexToWorldTransform(transform);
 }
 
-void mitk::BaseGeometry::PreSetIndexToWorldTransform(mitk::AffineTransform3D* /*transform*/)
-{}
-void mitk::BaseGeometry::PostSetIndexToWorldTransform(mitk::AffineTransform3D* /*transform*/)
-{}
 
 const  mitk::BaseGeometry::BoundsArrayType  mitk::BaseGeometry::GetBounds() const
 {
@@ -205,9 +192,6 @@ void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D& aSpacing, bool enforce
 void mitk::BaseGeometry::_SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing){
   m_GeometryTransform->SetSpacing(aSpacing, enforceSetSpacing);
 }
-
-void mitk::BaseGeometry::PreSetSpacing(const mitk::Vector3D& /*aSpacing*/)
-{}
 
 mitk::Vector3D mitk::BaseGeometry::GetAxisVector(unsigned int direction) const
 {
@@ -352,7 +336,6 @@ void mitk::BaseGeometry::SetExtentInMM(int direction, ScalarType extentInMM)
   PostSetExtentInMM(direction,extentInMM);
 }
 
-void mitk::BaseGeometry::PostSetExtentInMM(int /*direction*/, ScalarType /*extentInMM*/){};
 
 bool mitk::BaseGeometry::IsInside(const mitk::Point3D& p) const
 {

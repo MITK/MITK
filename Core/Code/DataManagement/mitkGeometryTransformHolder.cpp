@@ -1,9 +1,9 @@
 /*
- * mitkGeometryTransformHolder.cpp
- *
- *  Created on: Sep 3, 2014
- *      Author: wirkert
- */
+* mitkGeometryTransformHolder.cpp
+*
+*  Created on: Sep 3, 2014
+*      Author: wirkert
+*/
 
 #include <itkMatrix.h>
 #include <itkScalableAffineTransform.h>
@@ -23,9 +23,6 @@
 #include <cassert>
 
 namespace mitk {
-
-
-
   void GeometryTransformHolder::CopySpacingFromTransform(const mitk::AffineTransform3D* transform, mitk::Vector3D& spacing)
   {
     mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
@@ -35,7 +32,6 @@ namespace mitk {
     spacing[1]=vnlmatrix.get_column(1).magnitude();
     spacing[2]=vnlmatrix.get_column(2).magnitude();
   }
-
 
   GeometryTransformHolder::GeometryTransformHolder()
   {
@@ -67,7 +63,6 @@ namespace mitk {
 
     m_VtkMatrix->Identity();
   }
-
 
   void GeometryTransformHolder::Initialize(const GeometryTransformHolder* other)
   {
@@ -196,6 +191,12 @@ namespace mitk {
     return m_VtkMatrix;
   }
 
+    //## Get the Vtk Matrix which describes the transform.
+  const vtkMatrix4x4* GeometryTransformHolder::GetVtkMatrix() const
+  {
+    return m_VtkMatrix;
+  }
+
   //##Documentation
   //## @brief Get the m_IndexToWorldTransform as a vtkLinearTransform
   vtkLinearTransform* GeometryTransformHolder::GetVtkTransform() const
@@ -236,6 +237,59 @@ namespace mitk {
   {
     return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
   }
-
 }
 
+bool mitk::Equal(const mitk::GeometryTransformHolder *leftHandSide, const mitk::GeometryTransformHolder *rightHandSide, ScalarType eps, bool verbose)
+{
+  if(( leftHandSide == NULL) || ( rightHandSide == NULL ))
+  {
+    MITK_ERROR << "mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType eps, bool verbose) does not with NULL pointer input.";
+    return false;
+  }
+  return Equal( *leftHandSide, *rightHandSide, eps, verbose);
+}
+
+bool mitk::Equal(const mitk::GeometryTransformHolder& leftHandSide, const mitk::GeometryTransformHolder& rightHandSide, ScalarType eps, bool verbose)
+{
+  bool result = true;
+
+  //Compare spacings
+  if( !mitk::Equal( leftHandSide.GetSpacing(), rightHandSide.GetSpacing(), eps ) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] Spacing differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetSpacing() << " : leftHandSide is " << leftHandSide.GetSpacing() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  //Compare Origins
+  if( !mitk::Equal( leftHandSide.GetOrigin(), rightHandSide.GetOrigin(), eps ) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] Origin differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetOrigin() << " : leftHandSide is " << leftHandSide.GetOrigin() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  //Compare IndexToWorldTransform Matrix
+  if( !mitk::Equal( *leftHandSide.GetIndexToWorldTransform(), *rightHandSide.GetIndexToWorldTransform(), eps, verbose) )
+  {
+    result = false;
+  }
+
+  //Compare vtk Matrix
+  for (int i=0;i<4;i++){
+    for (int j=0;j<4;j++){
+      if( leftHandSide.GetVtkMatrix()->GetElement(i,j) != rightHandSide.GetVtkMatrix()->GetElement(i,j))
+      {
+        result = false;
+      }
+    }
+  }
+
+  return result;
+}

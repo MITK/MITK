@@ -570,28 +570,23 @@ namespace mitk {
 
     void _SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
 
-  private:
-
-    GeometryTransformHolder* m_GeometryTransform;
-
     //##Documentation
     //## @brief Pre- and Post-functions are empty in BaseGeometry
     //##
     //## These virtual functions allow for a different beahiour in subclasses.
-    virtual void PreSetBounds(const BoundsArrayType& bounds);
+    //## Do implement them in every subclass of BaseGeometry. If not needed, use {}.
+    //## If this class is inherited from a subclass of BaseGeometry, call {Superclass::Pre...();};, example: DisplayGeometry class
+    virtual void PreSetBounds(const BoundsArrayType& bounds){};
+    virtual void PostInitialize(){};
+    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * newGeometry) const {};
+    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM) {};
+    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* transform) {};
+    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform) {};
+    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing) {};
 
-    virtual void PostInitialize();
-    virtual void PostInitializeGeometry(Self * newGeometry) const;
+  private:
 
-    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
-
-    //virtual void PostSetTimeBounds(const TimeBounds& timebounds);
-
-    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
-    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
-
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing);
-
+    GeometryTransformHolder* m_GeometryTransform;
 
     void InitializeGeometryTransformHolder(const BaseGeometry* otherGeometry);
 

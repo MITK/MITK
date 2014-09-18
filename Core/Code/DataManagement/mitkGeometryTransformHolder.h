@@ -1,9 +1,19 @@
-/*
- * mitkGeometryTransformHolder.h
- *
- *  Created on: Sep 3, 2014
- *      Author: wirkert
- */
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
 
 #ifndef MITKGEOMETRYTRANSFORMHOLDER_H_
 #define MITKGEOMETRYTRANSFORMHOLDER_H_
@@ -12,6 +22,13 @@
 
 #include <mitkAffineTransform3D.h>
 #include <vtkMatrixToLinearTransform.h>
+#include <mitkVector.h>
+#include <mitkMatrix.h>
+#include <MitkCoreExports.h>
+#include <mitkCommon.h>
+#include <mitkPoint.h>
+#include <mitkAffineTransform3D.h>
+#include <vtkTransform.h>
 
 namespace mitk {
 
@@ -106,6 +123,9 @@ public:
   //## Get the Vtk Matrix which describes the transform.
   vtkMatrix4x4* GetVtkMatrix();
 
+  //## Get the Vtk Matrix which describes the transform.
+  const vtkMatrix4x4* GetVtkMatrix() const;
+
   //##Documentation
   //## @brief Get the m_IndexToWorldTransform as a vtkLinearTransform
   vtkLinearTransform* GetVtkTransform() const;
@@ -122,5 +142,10 @@ public:
 
   AffineTransform3D::MatrixType::InternalMatrixType GetVnlMatrix();
 };
+  MITK_CORE_EXPORT bool Equal(const mitk::GeometryTransformHolder& leftHandSide, const mitk::GeometryTransformHolder& rightHandSide, ScalarType eps, bool verbose);
+
+  MITK_CORE_EXPORT bool Equal(const mitk::GeometryTransformHolder* leftHandSide, const mitk::GeometryTransformHolder* rightHandSide, ScalarType eps, bool verbose);
+
+
 }
 #endif /* MITKGEOMETRYTRANSFORMHOLDER_H_ */

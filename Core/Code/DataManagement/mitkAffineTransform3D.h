@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <itkAffineGeometryFrame.h>
+#include <mitkVector.h>
 
 namespace mitk
 {

@@ -65,9 +65,9 @@ if(MITK_USE_SOFA)
     endforeach()
   endif()
 
-  set(rev "10669")
+  set(rev "b13c6367")
 
-  set(SOFA_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSOFA-rev${rev}.cmake)
+  set(SOFA_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSOFA-${rev}.cmake)
   set(SOFA_PRECONFIGURE_COMMAND ${CMAKE_COMMAND} -G${gen} ${ep_common_args} ${preconfigure_cmake_args} ${boost_cmake_args} ${CMAKE_BINARY_DIR}/${proj}-src)
 
   if(NOT DEFINED SOFA_DIR)
@@ -75,8 +75,9 @@ if(MITK_USE_SOFA)
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SOFA-rev${rev}.tar.gz
-      URL_MD5 d01a194f54b933f4cdfdfc75b2f81a2f
+      URL http://dl.dropboxusercontent.com/u/5822501/SOFA-${rev}.tar.gz
+      # URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SOFA-${rev}.tar.gz
+      URL_MD5 89c3484bece704a5404bed7e88ba77f1
       PATCH_COMMAND ${SOFA_PATCH_COMMAND}
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

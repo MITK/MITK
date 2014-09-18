@@ -16,6 +16,11 @@ configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
 # Adjust tinyxml references (see above)
 
+set(path "framework/sofa/helper/CMakeLists.txt")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "tinyxml" "SofaTinyXml" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
 set(path "modules/sofa/component/SofaBaseVisual/CMakeLists.txt")
 file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
 string(REPLACE "tinyxml" "SofaTinyXml" CONTENTS ${CONTENTS})
@@ -31,11 +36,23 @@ file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
 string(REPLACE "tinyxml" "SofaTinyXml" CONTENTS ${CONTENTS})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
-# Allow setting SOFA_APPLICATIONS_PLUGINS_DIR from outside
+# Changes of cmake/environment.cmake are commented separately below
 
 set(path "cmake/environment.cmake")
 file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+
+# Allow setting SOFA_APPLICATIONS_PLUGINS_DIR from outside
+
 string(REPLACE "S_DIR}/plugins\" CACHE INTERNAL" "S_DIR}/plugins\" CACHE PATH" CONTENTS ${CONTENTS})
+
+# Place binaries and libraries in different subfolders according to the build
+# configuration
+
+string(REPLACE "DEBUG \"\${directory}" "DEBUG \"\${directory}/Debug" CONTENTS ${CONTENTS})
+string(REPLACE "RELEASE \"\${directory}" "RELEASE \"\${directory}/Release" CONTENTS ${CONTENTS})
+string(REPLACE "RELWITHDEBINFO \"\${directory}" "RELWITHDEBINFO \"\${directory}/RelWithDebInfo" CONTENTS ${CONTENTS})
+string(REPLACE "MINSIZEREL \"\${directory}" "MINSIZEREL \"\${directory}/MinSizeRel" CONTENTS ${CONTENTS})
+
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
 # Binary directories in add_subdirectory() regarding external plugins have to be explicitly specified
@@ -51,28 +68,6 @@ string(REPLACE "add_subdirectory(\"\${GLOBAL_PROJECT_PATH_\${projectName}}\")"
                       add_subdirectory(\"\${GLOBAL_PROJECT_PATH_\${projectName}}\" \"\${CMAKE_BINARY_DIR}/applications/plugins\${subdir}\")
                     endif()"
 CONTENTS ${CONTENTS})
-configure_file(${TEMPLATE_FILE} ${path} @ONLY)
-
-# Add -fPIC compiler flag for static libraries also if Clang is used
-
-set(path "extlibs/csparse/CMakeLists.txt")
-file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
-string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CONTENTS ${CONTENTS})
-configure_file(${TEMPLATE_FILE} ${path} @ONLY)
-
-set(path "extlibs/metis-5.1.0/CMakeLists.txt")
-file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
-string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CONTENTS ${CONTENTS})
-configure_file(${TEMPLATE_FILE} ${path} @ONLY)
-
-set(path "extlibs/miniFlowVR/CMakeLists.txt")
-file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
-string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CONTENTS ${CONTENTS})
-configure_file(${TEMPLATE_FILE} ${path} @ONLY)
-
-set(path "extlibs/newmat/CMakeLists.txt")
-file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
-string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CONTENTS ${CONTENTS})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
 # Remove SOFA's FindGLEW.cmake since we need the official FindGLEW.cmake to
@@ -100,30 +95,15 @@ string(REPLACE "GLEW REQUIRED" "GLEW REQUIRED CONFIG" CONTENTS ${CONTENTS})
 string(REPLACE "graph " "" CONTENTS ${CONTENTS})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
-# Place binaries and libraries in different subfolders according to the build
-# configuration
-
-set(path "cmake/preProject.cmake")
-file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
-string(REPLACE "DEBUG \"\${SOFA_BIN_DIR}" "DEBUG \"\${SOFA_BIN_DIR}/Debug" CONTENTS ${CONTENTS})
-string(REPLACE "RELEASE \"\${SOFA_BIN_DIR}" "RELEASE \"\${SOFA_BIN_DIR}/Release" CONTENTS ${CONTENTS})
-string(REPLACE "RELWITHDEBINFO \"\${SOFA_BIN_DIR}" "RELWITHDEBINFO \"\${SOFA_BIN_DIR}/RelWithDebInfo" CONTENTS ${CONTENTS})
-string(REPLACE "MINSIZEREL \"\${SOFA_BIN_DIR}" "MINSIZEREL \"\${SOFA_BIN_DIR}/MinSizeRel" CONTENTS ${CONTENTS})
-string(REPLACE "DEBUG \"\${SOFA_LIB_DIR}" "DEBUG \"\${SOFA_LIB_DIR}/Debug" CONTENTS ${CONTENTS})
-string(REPLACE "RELEASE \"\${SOFA_LIB_DIR}" "RELEASE \"\${SOFA_LIB_DIR}/Release" CONTENTS ${CONTENTS})
-string(REPLACE "RELWITHDEBINFO \"\${SOFA_LIB_DIR}" "RELWITHDEBINFO \"\${SOFA_LIB_DIR}/RelWithDebInfo" CONTENTS ${CONTENTS})
-string(REPLACE "MINSIZEREL \"\${SOFA_LIB_DIR}" "MINSIZEREL \"\${SOFA_LIB_DIR}/MinSizeRel" CONTENTS ${CONTENTS})
-configure_file(${TEMPLATE_FILE} ${path} @ONLY)
-
 # Create SOFAConfig.cmake.in file to make SOFA findable through the config mode
 # of find_package()
 
 file(APPEND "CMakeLists.txt" "\nconfigure_file(SOFAConfig.cmake.in SOFAConfig.cmake @ONLY)\n")
 
 file(WRITE "SOFAConfig.cmake.in"
-"add_definitions(-DSOFA_XML_PARSER_TINYXML;-DTIXML_USE_STL;-DMINI_FLOWVR;-DSOFA_HAVE_BOOST;-DSOFA_HAVE_CSPARSE;-DSOFA_HAVE_EIGEN2;-DSOFA_HAVE_FREEGLUT;-DSOFA_HAVE_GLEW;-DSOFA_HAVE_METIS)
+"add_definitions(-DSOFA_XML_PARSER_TINYXML;-DTIXML_USE_STL;-DMINI_FLOWVR;-DSOFA_HAVE_BOOST;-DSOFA_HAVE_CSPARSE;-DSOFA_HAVE_DAG;-DSOFA_HAVE_EIGEN2;-DSOFA_HAVE_FREEGLUT;-DSOFA_HAVE_GLEW;-DSOFA_HAVE_METIS)
 
-set(SOFA_INCLUDE_DIRS \"@SOFA_EXTLIBS_DIR@/csparse;@SOFA_EXTLIBS_DIR@/eigen-3.2.0;@SOFA_EXTLIBS_DIR@/metis-5.1.0/include;@SOFA_EXTLIBS_DIR@/miniFlowVR/include;@SOFA_EXTLIBS_DIR@/newmat;@SOFA_EXTLIBS_DIR@/tinyxml;@SOFA_SRC_DIR@/framework;@SOFA_SRC_DIR@/modules\")
+set(SOFA_INCLUDE_DIRS \"@SOFA_EXTLIBS_DIR@/csparse;@SOFA_EXTLIBS_DIR@/eigen-3.2.1;@SOFA_EXTLIBS_DIR@/metis-5.1.0/include;@SOFA_EXTLIBS_DIR@/miniFlowVR/include;@SOFA_EXTLIBS_DIR@/newmat;@SOFA_EXTLIBS_DIR@/tinyxml;@SOFA_SRC_DIR@/framework;@SOFA_SRC_DIR@/modules\")
 
 if(WIN32)
   set(SOFA_LIBRARY_DIRS \"@SOFA_LIB_DIR@\")
@@ -178,6 +158,7 @@ set(SOFA_LIBRARIES
   debug SofaRigid\${version}d optimized SofaRigid\${version}
   debug SofaSimpleFem\${version}d optimized SofaSimpleFem\${version}
   debug SofaSimulationCommon\${version}d optimized SofaSimulationCommon\${version}
+  debug SofaSimulationGraph\${version}d optimized SofaSimulationGraph\${version}
   debug SofaSimulationTree\${version}d optimized SofaSimulationTree\${version}
   debug SofaSparseSolver\${version}d optimized SofaSparseSolver\${version}
   debug SofaSphFluid\${version}d optimized SofaSphFluid\${version}

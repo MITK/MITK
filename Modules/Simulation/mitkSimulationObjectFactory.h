@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSimulationObjectFactory_h
 
 #include "mitkSimulationIOFactory.h"
+#include "mitkSimulationWriterFactory.h"
 #include <mitkCoreObjectFactoryBase.h>
 
 namespace mitk
@@ -42,6 +43,7 @@ namespace mitk
     ~SimulationObjectFactory();
 
     SimulationIOFactory::Pointer m_SimulationIOFactory;
+    SimulationWriterFactory::Pointer m_SimulationWriterFactory;
     MultimapType m_FileExtensionsMap;
     MultimapType m_SaveFileExtensionsMap;
   };

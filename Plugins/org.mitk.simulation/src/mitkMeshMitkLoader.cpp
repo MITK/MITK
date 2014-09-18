@@ -14,14 +14,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "internal/mitkGetData.h"
+#include "internal/org_mitk_simulation_Activator.h"
 #include "mitkMeshMitkLoader.h"
+#include <mitkDataStorage.h>
+#include <mitkIDataStorageService.h>
+#include <mitkNodePredicateDataType.h>
 #include <mitkSurface.h>
 #include <vtkCellArray.h>
 #include <vtkLinearTransform.h>
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <vtkTransformPolyDataFilter.h>
+
+static mitk::DataStorage::Pointer GetDataStorage()
+{
+  mitk::IDataStorageService* dataStorageService = mitk::org_mitk_simulation_Activator::GetService<mitk::IDataStorageService>();
+
+  if (dataStorageService != NULL)
+  {
+    mitk::IDataStorageReference::Pointer dataStorageReference = dataStorageService->GetDefaultDataStorage();
+
+    if (dataStorageReference.IsNotNull())
+      return dataStorageReference->GetDataStorage();
+  }
+
+  return NULL;
+}
+
+template <class T>
+typename T::Pointer GetData(const std::string& name)
+{
+  mitk::DataStorage::Pointer dataStorage = GetDataStorage();
+
+  if (dataStorage.IsNull())
+    return NULL;
+
+  typename mitk::TNodePredicateDataType<T>::Pointer predicate = mitk::TNodePredicateDataType<T>::New();
+  mitk::DataStorage::SetOfObjects::ConstPointer subset = dataStorage->GetSubset(predicate);
+
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = subset->Begin(); it != subset->End(); ++it)
+  {
+    mitk::DataNode::Pointer dataNode = it.Value();
+
+    if (dataNode->GetName() == name)
+    {
+      typename T::Pointer data = static_cast<T*>(dataNode->GetData());
+
+      if (data.IsNotNull())
+        return data;
+    }
+  }
+
+  return NULL;
+}
 
 mitk::MeshMitkLoader::MeshMitkLoader()
 {

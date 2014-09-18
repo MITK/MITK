@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::SimulationVtkMapper3D::LocalStorage::LocalStorage()
   : m_Actor(vtkSmartPointer<vtkActor>::New())
 {
-
 }
 
 mitk::SimulationVtkMapper3D::LocalStorage::~LocalStorage()

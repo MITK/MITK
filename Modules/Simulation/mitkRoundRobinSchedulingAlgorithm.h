@@ -14,27 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkSimulationService_h
-#define mitkSimulationService_h
+#ifndef mitkRoundRobinSchedulingAlgorithm_h
+#define mitkRoundRobinSchedulingAlgorithm_h
 
-#include <mitkISimulationService.h>
-#include <mitkScheduler.h>
+#include "mitkSchedulingAlgorithmBase.h"
 
 namespace mitk
 {
-  class SimulationService : public ISimulationService
+  class RoundRobinSchedulingAlgorithm : public SchedulingAlgorithmBase
   {
   public:
-    SimulationService();
-    ~SimulationService();
+    RoundRobinSchedulingAlgorithm();
+    ~RoundRobinSchedulingAlgorithm();
 
-    Simulation::Pointer GetActiveSimulation() const;
-    void SetActiveSimulation(Simulation::Pointer activeSimulation);
-    Scheduler* GetScheduler();
-
-  private:
-    Simulation::Pointer m_ActiveSimulation;
-    Scheduler m_Scheduler;
+    SchedulableProcess* GetNextProcess(std::vector<SchedulableProcess*>& processQueue);
   };
 }
 

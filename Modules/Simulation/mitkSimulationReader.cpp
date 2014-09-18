@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkISimulationService.h"
 #include "mitkSimulation.h"
 #include "mitkSimulationReader.h"
+#include <mitkStringProperty.h>
 #include <sofa/helper/system/SetDirectory.h>
 #include <algorithm>
 
@@ -52,12 +53,30 @@ mitk::SimulationReader::~SimulationReader()
 void mitk::SimulationReader::GenerateData()
 {
   Simulation::Pointer simulation = static_cast<mitk::Simulation*>(this->GetOutput());
-  sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSimulation();
+  sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSOFASimulation();
 
   ISimulationService* simulationService = GetSimulationService();
-  Simulation::Pointer currentSimulation = simulationService->GetSimulation();
+  Simulation::Pointer lastActiveSimulation = simulationService->GetActiveSimulation();
 
-  simulationService->SetSimulation(simulation);
+  simulationService->SetActiveSimulation(simulation);
+
+  std::ifstream scnFile(m_FileName.c_str());
+  std::string content = std::string((std::istreambuf_iterator<char>(scnFile)), std::istreambuf_iterator<char>());
+  scnFile.close();
+
+  std::istringstream stream(content);
+  std::string firstLine;
+
+  if (!std::getline(stream, firstLine).good())
+    mitkThrow() << "Could not load '" << m_FileName << "'!";
+
+  std::string originalPath;
+
+  if (firstLine.size() > 21 && firstLine.substr(0, 21) == "<!-- ORIGINAL_PATH = ")
+  {
+    originalPath = firstLine.substr(21);
+    sofa::helper::system::DataRepository.addFirstPath(originalPath);
+  }
 
   std::string path = sofa::helper::system::SetDirectory::GetParentDir(m_FileName.c_str());
   sofa::helper::system::DataRepository.addFirstPath(path);
@@ -78,7 +97,19 @@ void mitk::SimulationReader::GenerateData()
 
   sofa::helper::system::DataRepository.removePath(path);
 
-  simulationService->SetSimulation(currentSimulation);
+  if (!originalPath.empty())
+  {
+    sofa::helper::system::DataRepository.removePath(originalPath);
+    simulation->SetProperty("Path", StringProperty::New(originalPath));
+  }
+  else
+  {
+    simulation->SetProperty("Path", StringProperty::New(path));
+  }
+
+  simulation->SetProperty("Scene File", StringProperty::New(content));
+
+  simulationService->SetActiveSimulation(lastActiveSimulation);
 }
 
 void mitk::SimulationReader::GenerateOutputInformation()

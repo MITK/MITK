@@ -14,27 +14,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkSimulationService_h
-#define mitkSimulationService_h
+#ifndef mitkSchedulingAlgorithmBase_h
+#define mitkSchedulingAlgorithmBase_h
 
-#include <mitkISimulationService.h>
-#include <mitkScheduler.h>
+#include <vector>
 
 namespace mitk
 {
-  class SimulationService : public ISimulationService
+  class SchedulableProcess;
+
+  class SchedulingAlgorithmBase
   {
   public:
-    SimulationService();
-    ~SimulationService();
+    SchedulingAlgorithmBase();
+    virtual ~SchedulingAlgorithmBase();
 
-    Simulation::Pointer GetActiveSimulation() const;
-    void SetActiveSimulation(Simulation::Pointer activeSimulation);
-    Scheduler* GetScheduler();
+    virtual SchedulableProcess* GetNextProcess(std::vector<SchedulableProcess*>& processQueue) = 0;
 
   private:
-    Simulation::Pointer m_ActiveSimulation;
-    Scheduler m_Scheduler;
+    SchedulingAlgorithmBase(const SchedulingAlgorithmBase&);
+    SchedulingAlgorithmBase& operator=(const SchedulingAlgorithmBase&);
   };
 }
 

@@ -14,28 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkSimulationService_h
-#define mitkSimulationService_h
+#ifndef QmitkNoEditItemDelegate_h
+#define QmitkNoEditItemDelegate_h
 
-#include <mitkISimulationService.h>
-#include <mitkScheduler.h>
+#include <QStyledItemDelegate>
 
-namespace mitk
+class QmitkNoEditItemDelegate : public QStyledItemDelegate
 {
-  class SimulationService : public ISimulationService
-  {
-  public:
-    SimulationService();
-    ~SimulationService();
+  Q_OBJECT
 
-    Simulation::Pointer GetActiveSimulation() const;
-    void SetActiveSimulation(Simulation::Pointer activeSimulation);
-    Scheduler* GetScheduler();
+public:
+  explicit QmitkNoEditItemDelegate(QObject* parent = NULL);
+  ~QmitkNoEditItemDelegate();
 
-  private:
-    Simulation::Pointer m_ActiveSimulation;
-    Scheduler m_Scheduler;
-  };
-}
+  QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+};
 
 #endif

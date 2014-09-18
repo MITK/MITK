@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "internal/mitkGetDataStorage.h"
-#include "internal/mitkGetSimulationDataNode.h"
 #include "mitkExportMitkVisitor.h"
+#include <mitkNodePredicateDataType.h>
+#include <mitkSimulation.h>
 #include <mitkSurface.h>
 #include <sofa/component/visualmodel/VisualModelImpl.h>
 #include <vtkCellArray.h>
@@ -57,13 +57,39 @@ static void ApplyMaterial(mitk::DataNode::Pointer dataNode, const sofa::core::lo
   dataNode->SetFloatProperty("material.specularPower", shininess);
 }
 
-mitk::ExportMitkVisitor::ExportMitkVisitor(const sofa::core::ExecParams* params)
-  : Visitor(params)
+static mitk::DataNode::Pointer GetSimulationDataNode(mitk::DataStorage::Pointer dataStorage, sofa::core::objectmodel::BaseNode::SPtr rootNode)
+{
+  if (dataStorage.IsNull())
+    return NULL;
+
+  if (!rootNode)
+    return NULL;
+
+  mitk::TNodePredicateDataType<mitk::Simulation>::Pointer predicate = mitk::TNodePredicateDataType<mitk::Simulation>::New();
+  mitk::DataStorage::SetOfObjects::ConstPointer subset = dataStorage->GetSubset(predicate);
+
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = subset->Begin(); it != subset->End(); ++it)
+  {
+    mitk::DataNode::Pointer dataNode = it.Value();
+    mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(dataNode->GetData());
+
+    if (simulation->GetRootNode() == rootNode)
+      return dataNode;
+  }
+
+  return NULL;
+}
+
+
+mitk::ExportMitkVisitor::ExportMitkVisitor(DataStorage::Pointer dataStorage, const sofa::core::ExecParams* params)
+  : Visitor(params),
+    m_DataStorage(dataStorage)
 {
 }
 
-mitk::ExportMitkVisitor::ExportMitkVisitor(const std::string& visualModelName, const sofa::core::ExecParams* params)
+mitk::ExportMitkVisitor::ExportMitkVisitor(DataStorage::Pointer dataStorage, const std::string& visualModelName, const sofa::core::ExecParams* params)
   : Visitor(params),
+    m_DataStorage(dataStorage),
     m_VisualModelName(visualModelName)
 {
 }
@@ -74,8 +100,13 @@ mitk::ExportMitkVisitor::~ExportMitkVisitor()
 
 sofa::simulation::Visitor::Result mitk::ExportMitkVisitor::processNodeTopDown(sofa::simulation::Node* node)
 {
-  for_each(this, node, node->visualModel, &ExportMitkVisitor::processVisualModel);
-  return RESULT_CONTINUE;
+  if (m_DataStorage.IsNotNull())
+  {
+    for_each(this, node, node->visualModel, &ExportMitkVisitor::processVisualModel);
+    return RESULT_CONTINUE;
+  }
+
+  return RESULT_PRUNE;
 }
 
 void mitk::ExportMitkVisitor::processVisualModel(sofa::simulation::Node* node, sofa::core::visual::VisualModel* visualModel)
@@ -93,11 +124,6 @@ void mitk::ExportMitkVisitor::processVisualModel(sofa::simulation::Node* node, s
     return;
 
   if (!m_VisualModelName.empty() && m_VisualModelName != visualModelImpl->name.getValue())
-    return;
-
-  DataStorage::Pointer dataStorage = GetDataStorage();
-
-  if (dataStorage.IsNull())
     return;
 
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
@@ -195,10 +221,10 @@ void mitk::ExportMitkVisitor::processVisualModel(sofa::simulation::Node* node, s
 
   ApplyMaterial(dataNode, visualModelImpl->material.getValue());
 
-  DataNode::Pointer parentDataNode = GetSimulationDataNode(node->getRoot());
+  DataNode::Pointer parentDataNode = GetSimulationDataNode(m_DataStorage, node->getRoot());
 
   if (parentDataNode.IsNotNull())
     surface->SetGeometry(parentDataNode->GetData()->GetGeometry());
 
-  dataStorage->Add(dataNode, parentDataNode);
+  m_DataStorage->Add(dataNode, parentDataNode);
 }

@@ -237,7 +237,7 @@ void
   this->SetDirectionVector( directionVector );
   this->SetBounds( bounds );
   this->SetPlaneGeometry( geometry2D, 0 );
-  this->SetSpacing( spacing ,true);
+  this->SetSpacing( spacing, true);
   this->SetEvenlySpaced();
 
   //this->SetTimeBounds( geometry2D->GetTimeBounds() );
@@ -550,7 +550,7 @@ void
     }
   }
 
-  _SetSpacing(aSpacing);
+  BaseGeometry::_SetSpacing(aSpacing);
 
   mitk::PlaneGeometry::Pointer firstGeometry;
 

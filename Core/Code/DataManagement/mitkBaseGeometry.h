@@ -27,6 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkQuaternionRigidTransform.h>
 #include "itkScalableAffineTransform.h"
 #include <itkIndex.h>
+#include <mitkAffineTransform3D.h>
+
+#include <vtkTransform.h>
+#include <mitkGeometryTransformHolder.h>
 
 class vtkMatrix4x4;
 class vtkMatrixToLinearTransform;
@@ -100,7 +104,7 @@ namespace mitk {
 
     // ********************************** TypeDef **********************************
 
-    typedef itk::ScalableAffineTransform<ScalarType, 3>    TransformType;
+    typedef GeometryTransformHolder::TransformType         TransformType;
     typedef itk::BoundingBox<unsigned long, 3, ScalarType> BoundingBoxType;
     typedef BoundingBoxType::BoundsArrayType               BoundsArrayType;
     typedef BoundingBoxType::Pointer                       BoundingBoxPointer;
@@ -109,7 +113,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Get the origin, e.g. the upper-left corner of the plane
-    const Point3D& GetOrigin() const;
+    const Point3D GetOrigin() const;
 
     //##Documentation
     //## @brief Set the origin, i.e. the upper-left corner of the plane
@@ -119,7 +123,7 @@ namespace mitk {
     //##Documentation
     //## @brief Get the spacing (size of a pixel).
     //##
-    itkGetConstReferenceMacro(Spacing, mitk::Vector3D);
+    const mitk::Vector3D GetSpacing() const;
 
     //##Documentation
     //## @brief Set the spacing (m_Spacing).
@@ -170,13 +174,16 @@ namespace mitk {
 
     // ********************************** Transformations Set/Get **********************************
 
-    // a bit of a misuse, but we want only doxygen to see the following:
-#ifdef DOXYGEN_SKIP
     //##Documentation
     //## @brief Get the transformation used to convert from index
     //## to world coordinates
-    itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D);
-#endif
+    mitk::AffineTransform3D* GetIndexToWorldTransform();
+
+    //##Documentation
+    //## @brief Get the transformation used to convert from index
+    //## to world coordinates
+    const mitk::AffineTransform3D*   GetIndexToWorldTransform() const;
+
     //## @brief Set the transformation used to convert from index
     //## to world coordinates. The spacing of the new transform is
     //## copied to m_spacing.
@@ -188,10 +195,6 @@ namespace mitk {
     //## the new transform is copied to m_spacing.
     //## \sa SetIndexToWorldTransform
     virtual void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
-
-    //## Get the IndexToWorldTransform
-    itkGetConstObjectMacro(IndexToWorldTransform, AffineTransform3D);
-    itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D);
 
     //## Get the Vtk Matrix which describes the transform.
     vtkMatrix4x4* GetVtkMatrix();
@@ -219,7 +222,7 @@ namespace mitk {
     //## transformation consists of first applying self to the source,
     //## followed by other.
     //## This method also changes m_spacing.
-    void Compose( const BaseGeometry::TransformType * other, bool pre = 0 );
+    void Compose( const TransformType * other, bool pre = 0 );
 
     //##Documentation
     //## @brief Compose new IndexToWorldTransform with a given vtkMatrix4x4.
@@ -521,6 +524,8 @@ namespace mitk {
     itkSetMacro(ImageGeometry, bool);
     itkBooleanMacro(ImageGeometry);
 
+    const GeometryTransformHolder* GetGeometryTransformHolder() const;
+
   protected:
 
     // ********************************** Constructor **********************************
@@ -551,17 +556,7 @@ namespace mitk {
     //## @brief Deprecated
     void BackTransform(const mitk::Point3D& at, const mitk::Vector3D& in, mitk::Vector3D& out) const;
 
-    //##Documentation
-    //## @brief Copy the ITK transform
-    //## (m_IndexToWorldTransform) to the VTK transform
-    //## \sa SetIndexToWorldTransform
-    void TransferItkToVtkTransform();
 
-    //##Documentation
-    //## @brief Copy the VTK transform
-    //## to the ITK transform (m_IndexToWorldTransform)
-    //## \sa SetIndexToWorldTransform
-    void TransferVtkToItkTransform();
 
     static const std::string GetTransformAsString( TransformType* transformType );
 
@@ -571,11 +566,14 @@ namespace mitk {
 
     bool IsIndexToWorldTransformNull() const;
 
-    //##Documentation
-    //## @brief Intern functions to assure a consistent behaviour of SetSpacing.
+    void SetVtkMatrixDeepCopy(vtkTransform *vtktransform);
+
     void _SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
 
   private:
+
+    GeometryTransformHolder* m_GeometryTransform;
+
     //##Documentation
     //## @brief Pre- and Post-functions are empty in BaseGeometry
     //##
@@ -594,25 +592,15 @@ namespace mitk {
 
     virtual void PreSetSpacing(const mitk::Vector3D& aSpacing);
 
-    // ********************************** Variables **********************************
-    //##Documentation
-    //## @brief Spacing, measurement of the resolution
-    //##
-    mitk::Vector3D m_Spacing;
 
-    //##Documentation
-    //## @brief Index to World Transform, contains a transformation matrix to convert
-    //## points from indes coordinates to world coordinates (mm). The Spacing is included in this variable.
-    AffineTransform3D::Pointer m_IndexToWorldTransform;
+    void InitializeGeometryTransformHolder(const BaseGeometry* otherGeometry);
 
     //##Documentation
     //## @brief Bounding Box, which is axes-parallel in intrinsic coordinates
     //## (often integer indices of pixels)
     BoundingBoxPointer m_BoundingBox;
 
-    vtkMatrixToLinearTransform* m_VtkIndexToWorldTransform;
 
-    vtkMatrix4x4* m_VtkMatrix;
 
     unsigned int m_FrameOfReferenceID;
 
@@ -623,11 +611,6 @@ namespace mitk {
     mutable TransformType::Pointer m_InvertedTransform;
 
     mutable unsigned long m_IndexToWorldTransformLastModified;
-
-    //##Documentation
-    //## @brief Origin, i.e. upper-left corner of the plane
-    //##
-    Point3D m_Origin;
 
     bool m_ImageGeometry;
 

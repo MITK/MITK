@@ -208,30 +208,10 @@ void mitk::PlaneGeometryDataMapper2D::Paint(BaseRenderer *renderer)
         NodesVectorType::iterator otherPlanesIt = m_OtherPlaneGeometries.begin();
         NodesVectorType::iterator otherPlanesEnd = m_OtherPlaneGeometries.end();
 
-        DataNode* dataNodeOfInputPlaneGeometry = NULL;
 
         // Now we have to find the DataNode that contains the inputPlaneGeometry
         // in order to determine the state of the thick-slice rendering
-        while ( otherPlanesIt != otherPlanesEnd )
-        {
-          PlaneGeometry *otherPlane = static_cast< PlaneGeometry * >(
-            static_cast< PlaneGeometryData * >(
-            (*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
-
-          // if we have found the correct node
-          if ( (otherPlane == inputPlaneGeometry)
-            && worldPlaneGeometry->IntersectionLine(
-            otherPlane, otherCrossLine ) )
-          {
-            dataNodeOfInputPlaneGeometry = (*otherPlanesIt);
-//            if( dataNodeOfInputPlaneGeometry )
-//            {
-//              mainLineThickSlicesMode = this->DetermineThickSliceMode(dataNodeOfInputPlaneGeometry, mainLineThickSlicesNum);
-//            }
-            break;
-          }
-          otherPlanesIt++;
-        }
+        DataNode* dataNodeOfInputPlaneGeometry = this->GetDataNode();
 
         // if we did not find a dataNode for the inputPlaneGeometry there is nothing we can do from here
         if ( dataNodeOfInputPlaneGeometry == NULL )

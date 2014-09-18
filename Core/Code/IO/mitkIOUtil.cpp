@@ -352,12 +352,12 @@ namespace mitk {
     return returnValue;
   }
 
-  std::string IOUtil::GetDirectorySeparator()
+  char IOUtil::GetDirectorySeparator()
   {
 #ifdef US_PLATFORM_WINDOWS
-    return "\\";
+    return '\\';
 #else
-    return "/";
+    return '/';
 #endif
   }
 

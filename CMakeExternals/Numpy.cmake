@@ -74,10 +74,13 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       STRING(REPLACE " " "\ " _install_step ${_install_step})
     endif()
 
+    set(NUMPY_PATCH_COMMAND PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${CMAKE_CURRENT_LIST_DIR}/Patch${proj}.cmake)
+
     ExternalProject_Add(${proj}
       URL ${Numpy_URL}
       URL_MD5 ${Numpy_MD5}
       SOURCE_DIR ${proj}-src
+      ${NUMPY_PATCH_COMMAND}
       PREFIX ${proj}-cmake
       BUILD_IN_SOURCE 1
       CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${_configure_step}

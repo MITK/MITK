@@ -1,0 +1,7 @@
+if(WIN32)
+  set(path "numpy/core/setup_common.py")
+  file(STRINGS ${path} contents NEWLINE_CONSUME)
+  string(REPLACE "fid = open(filename, 'r')" "fid = open(filename, 'rb')" contents ${contents})
+  set(CONTENTS ${contents})
+  configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+endif()

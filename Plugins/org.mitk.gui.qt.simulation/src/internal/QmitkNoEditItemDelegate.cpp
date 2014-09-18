@@ -14,21 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkGetDataStorage.h"
-#include "org_mitk_simulation_Activator.h"
-#include <mitkIDataStorageService.h>
+#include "QmitkNoEditItemDelegate.h"
 
-mitk::DataStorage::Pointer mitk::GetDataStorage()
+QmitkNoEditItemDelegate::QmitkNoEditItemDelegate(QObject* parent)
+  : QStyledItemDelegate(parent)
 {
-  IDataStorageService* dataStorageService = org_mitk_simulation_Activator::GetService<mitk::IDataStorageService>();
+}
 
-  if (dataStorageService != NULL)
-  {
-    IDataStorageReference::Pointer dataStorageReference = dataStorageService->GetDefaultDataStorage();
+QmitkNoEditItemDelegate::~QmitkNoEditItemDelegate()
+{
+}
 
-    if (dataStorageReference.IsNotNull())
-      return dataStorageReference->GetDataStorage();
-  }
-
+QWidget* QmitkNoEditItemDelegate::createEditor(QWidget*, const QStyleOptionViewItem&, const QModelIndex&) const
+{
   return NULL;
 }

@@ -14,15 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkGetSimulationDataNode_h
-#define mitkGetSimulationDataNode_h
+#include "mitkSchedulableProcess.h"
+#include "mitkSchedulingAlgorithmBase.h"
 
-#include <mitkDataNode.h>
-#include <sofa/core/objectmodel/BaseNode.h>
-
-namespace mitk
+mitk::SchedulingAlgorithmBase::SchedulingAlgorithmBase()
 {
-  DataNode::Pointer GetSimulationDataNode(sofa::core::objectmodel::BaseNode::SPtr rootNode);
 }
 
-#endif
+mitk::SchedulingAlgorithmBase::~SchedulingAlgorithmBase()
+{
+}

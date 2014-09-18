@@ -14,14 +14,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkGetDataStorage_h
-#define mitkGetDataStorage_h
+#ifndef mitkSimulationSerializer_h
+#define mitkSimulationSerializer_h
 
-#include <mitkDataStorage.h>
+#include <mitkBaseDataSerializer.h>
+#include <MitkSimulationExports.h>
 
 namespace mitk
 {
-  DataStorage::Pointer GetDataStorage();
+  class MitkSimulation_EXPORT SimulationSerializer : public BaseDataSerializer
+  {
+  public:
+    mitkClassMacro(SimulationSerializer, BaseDataSerializer);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+
+    std::string Serialize();
+
+  protected:
+    SimulationSerializer();
+    ~SimulationSerializer();
+  };
 }
 
 #endif

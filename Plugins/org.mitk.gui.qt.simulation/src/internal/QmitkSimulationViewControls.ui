@@ -168,17 +168,17 @@
   <customwidget>
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>
-   <header>QmitkDataStorageComboBox.h</header>
+   <header location="global">QmitkDataStorageComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>QmitkSceneTreeWidget</class>
    <extends>QTreeWidget</extends>
-   <header>QmitkSceneTreeWidget.h</header>
+   <header location="global">internal/QmitkSceneTreeWidget.h</header>
   </customwidget>
   <customwidget>
    <class>QmitkBaseTreeWidget</class>
    <extends>QTreeWidget</extends>
-   <header>QmitkBaseTreeWidget.h</header>
+   <header location="global">internal/QmitkBaseTreeWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -127,7 +127,11 @@ if(NOT DEFINED MITK_USE_Poco)
 endif()
 
 if(NOT DEFINED MITK_USE_Python)
-  set(MITK_USE_Python TRUE)
+  if(WIN32)
+    set(MITK_USE_Python FALSE)
+  else()
+    set(MITK_USE_Python TRUE)
+  endif()
 endif()
 
 if(NOT DEFINED MITK_USE_SOFA)

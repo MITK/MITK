@@ -152,12 +152,12 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       # used to compile links to the wrong library in /usr/lib
       set(_python_compile_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_compile_step.sh)
       file(WRITE ${_python_compile_step}
-         "#!/bin/bash
-         export PYTHONHOME=${Python_DIR}
-         export LD_LIBRARY_PATH=${Python_DIR}/lib
-         ${PYTHON_EXECUTABLE} -m compileall
+"#!/bin/bash
+export PYTHONHOME=${Python_DIR}
+export LD_LIBRARY_PATH=${Python_DIR}/lib
+${PYTHON_EXECUTABLE} -m compileall
 
-         ")
+")
       # pre compile all *.py files in the runtime after install step
       ExternalProject_Add_Step(${proj} compile_step
         COMMAND sh ${_python_compile_step}

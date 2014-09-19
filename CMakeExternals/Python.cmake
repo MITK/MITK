@@ -146,25 +146,42 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include/python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}")
       set(PYTHON_LIBRARY "${Python_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}${CMAKE_SHARED_LIBRARY_SUFFIX}")
       set(MITK_PYTHON_SITE_DIR "${Python_DIR}/lib/python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}/site-packages")
+
+      # linux custom compile step, set the environment variables and python home to the right
+      # path. Other runtimes can mess up the paths of the installation and the stripped executable
+      # used to compile links to the wrong library in /usr/lib
+      set(_python_compile_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_compile_step.sh)
+      file(WRITE ${_python_compile_step}
+         "#!/bin/bash
+         export PYTHONHOME=${Python_DIR}
+         export LD_LIBRARY_PATH=${Python_DIR}/lib
+         ${PYTHON_EXECUTABLE} -m compileall
+
+         ")
+      # pre compile all *.py files in the runtime after install step
+      ExternalProject_Add_Step(${proj} compile_step
+        COMMAND sh ${_python_compile_step}
+        WORKING_DIRECTORY ${Python_DIR}
+        DEPENDEES install
+      )
+
+      # use the python executable in the build dir for unix systems. The stripped
+      # ones will cause conflicts if system libraries are present during the build/configure process
+      # of opencv, since they will try to lookup the sys path first if no lib is directly
+      # linked with it s path into the executable
+      set(PYTHON_EXECUTABLE "${CMAKE_BINARY_DIR}/${proj}-build/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
     else()
       set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include")
       set(PYTHON_LIBRARY "${Python_DIR}/libs/python${MITK_PYTHON_MAJOR_VERSION}${MITK_PYTHON_MINOR_VERSION}.lib")
       set(MITK_PYTHON_SITE_DIR "${Python_DIR}/Lib/site-packages")
-    endif()
 
-    # pre compile all *.py files in the runtime after install step
-    ExternalProject_Add_Step(${proj} compile_step
-      COMMAND ${PYTHON_EXECUTABLE} -m compileall
-      DEPENDEES install
-    )
-
-    # use the python executable in the build dir for unix systems. The stripped
-    # ones will cause conflicts if system libraries are present during the build/configure process
-    # of opencv, since they will try to lookup the sys path first if no lib is directly
-    # linked with it s path into the executable
-    if(UNIX)
-      set(PYTHON_EXECUTABLE "${CMAKE_BINARY_DIR}/${proj}-build/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
+      # pre compile all *.py files in the runtime after install step
+      ExternalProject_Add_Step(${proj} compile_step
+        COMMAND ${PYTHON_EXECUTABLE} -m compileall
+        WORKING_DIRECTORY ${Python_DIR}
+        DEPENDEES install
+      )
     endif()
 
   else()

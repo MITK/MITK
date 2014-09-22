@@ -217,7 +217,7 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
                 string maskFileName = itksys::SystemTools::GetFilenameWithoutExtension(maskImages.at(i));
                 unsigned found = maskFileName.find_last_of("_");
 
-                string sens = itksys::SystemTools::GetFilenameWithoutExtension(itksys::SystemTools::GetFilenameName(fibFile));
+                string sens = itksys::SystemTools::GetFilenameWithoutLastExtension(fibFile);
                 if (!fileID.empty())
                     sens = fileID;
                 sens.append(",");
@@ -266,7 +266,7 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
                 writer->Update();
             }
 
-            string sens = itksys::SystemTools::GetFilenameWithoutExtension(itksys::SystemTools::GetFilenameName(fibFile));
+            string sens = itksys::SystemTools::GetFilenameWithoutLastExtension(fibFile);
             if (!fileID.empty())
                 sens = fileID;
             sens.append(",");

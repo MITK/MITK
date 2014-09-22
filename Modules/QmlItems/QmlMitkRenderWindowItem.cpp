@@ -111,11 +111,7 @@ void QmlMitkRenderWindowItem::init()
     planeNode->SetProperty("visible", mitk::BoolProperty::New(true) );
     planeNode->SetProperty("helper object", mitk::BoolProperty::New(true) );
 
-    mitk::PlaneGeometryDataMapper2D::Pointer mapper = mitk::PlaneGeometryDataMapper2D::New();
-    mapper->SetDatastorageAndGeometryBaseNode( m_DataStorage, m_PlaneNodeParent );
-    planeNode->SetMapper( mitk::BaseRenderer::Standard2D, mapper );
-
-    m_DataStorage->Add( planeNode, m_PlaneNodeParent );
+    m_DataStorage->Add( planeNode );
   }
 }
 
@@ -353,11 +349,6 @@ void QmlMitkRenderWindowItem::SetCrossHairPositioningOnClick(bool enabled)
   {
     mitk::GlobalInteraction::GetInstance()->RemoveListener( mitk::RenderWindowBase::GetSliceNavigationController() );
   }
-}
-
-void QmlMitkRenderWindowItem::SetPlaneNodeParent( mitk::DataNode::Pointer node )
-{
-  m_PlaneNodeParent = node;
 }
 
 void QmlMitkRenderWindowItem::geometryChanged(const QRectF & newGeometry, const QRectF & oldGeometry)

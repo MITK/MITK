@@ -53,8 +53,6 @@ public:
     void InitView( mitk::BaseRenderer::MapperSlotId mapperID,
                    mitk::SliceNavigationController::ViewDirection viewDirection );
 
-    void SetPlaneNodeParent( mitk::DataNode::Pointer node );
-
     void SetCrossHairPositioningOnClick(bool enabled);
 
 signals:
@@ -86,7 +84,6 @@ private slots:
 
 private:
     mitk::DataStorage::Pointer m_DataStorage;
-    mitk::DataNode::Pointer m_PlaneNodeParent;
 
     mitk::BaseRenderer::MapperSlotId m_MapperID;
     mitk::SliceNavigationController::ViewDirection m_ViewDirection;

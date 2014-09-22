@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkWeakPointer.h"
 #include "mitkLine.h"
 
+#include <set>
+
 namespace mitk {
   class BaseRenderer;
   class PlaneGeometryDataMapper2D;
@@ -60,8 +62,6 @@ namespace mitk {
       const PlaneGeometryData *GetInput();
 
     virtual void Paint( BaseRenderer *renderer );
-
-    virtual void SetDatastorageAndGeometryBaseNode(mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent);
 
     /** Applies properties specific to this mapper */
     virtual void ApplyAllProperties( BaseRenderer *renderer );
@@ -109,8 +109,8 @@ namespace mitk {
 
     SurfaceGLMapper2D::Pointer m_SurfaceMapper;
 
-    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;  ///< DataStorage that will be searched for sub nodes
-    DataNode::Pointer m_ParentNode;  ///< parent node that will be used to search for sub nodes
+    typedef std::set<Self*> AllInstancesContainer;
+    static AllInstancesContainer s_AllInstances;
 
     typedef std::vector<DataNode*> NodesVectorType;
     NodesVectorType m_OtherPlaneGeometries;

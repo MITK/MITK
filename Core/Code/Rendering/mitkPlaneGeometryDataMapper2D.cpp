@@ -31,17 +31,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkResliceMethodProperty.h"
 #include "mitkAbstractTransformGeometry.h"
 
+mitk::PlaneGeometryDataMapper2D::AllInstancesContainer mitk::PlaneGeometryDataMapper2D::s_AllInstances;
 
 mitk::PlaneGeometryDataMapper2D::PlaneGeometryDataMapper2D()
-: m_SurfaceMapper( NULL ), m_DataStorage(NULL), m_ParentNode(NULL),
+: m_SurfaceMapper( NULL ),
   m_OtherPlaneGeometries(), m_RenderOrientationArrows( false ),
   m_ArrowOrientationPositive( true )
 {
+  s_AllInstances.insert(this);
 }
 
 
 mitk::PlaneGeometryDataMapper2D::~PlaneGeometryDataMapper2D()
 {
+  s_AllInstances.erase(this);
 }
 
 
@@ -54,34 +57,48 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer
 {
   BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  if(!ls->IsGenerateDataRequired(renderer,this,GetDataNode()))
-    return;
+  // The PlaneGeometryDataMapper2D mapper is special in that the rendering of
+  // OTHER PlaneGeometryDatas affects how we render THIS PlaneGeometryData
+  // (for the gap at the point where they intersect).  A change in any of the
+  // other PlaneGeometryData nodes could mean that we render ourself
+  // differently, so we check for that here.
+  bool generateDataRequired = false;
+  for (AllInstancesContainer::iterator it = s_AllInstances.begin();
+       it != s_AllInstances.end();
+       ++it)
+  {
+    generateDataRequired = ls->IsGenerateDataRequired(renderer, this, (*it)->GetDataNode());
+    if (generateDataRequired) break;
+  }
+
+  if (!generateDataRequired) return;
 
   ls->UpdateGenerateDataTime();
 
-  // collect all PlaneGeometryDatas accessible from the DataStorage
+  // Collect all other PlaneGeometryDatas that are being mapped by this mapper
   m_OtherPlaneGeometries.clear();
-  if (m_DataStorage.IsNull())
-    return;
 
-  mitk::NodePredicateDataType::Pointer p = mitk::NodePredicateDataType::New("PlaneGeometryData");
-  mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetDerivations(m_ParentNode, p, false);
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
+  for (AllInstancesContainer::iterator it = s_AllInstances.begin(); it != s_AllInstances.end(); ++it)
   {
-    if(it->Value().IsNull())
-      continue;
+    Self *otherInstance = *it;
 
-    BaseData* data = it->Value()->GetData();
-    if (data == NULL)
-      continue;
+    // Skip ourself
+    if (otherInstance == this) continue;
 
-    PlaneGeometryData* geometry2dData = dynamic_cast<PlaneGeometryData*>(data);
-    if(geometry2dData == NULL)
-      continue;
+    mitk::DataNode *otherNode = otherInstance->GetDataNode();
+    if (!otherNode) continue;
 
-    PlaneGeometry* planegeometry = dynamic_cast<PlaneGeometry*>(geometry2dData->GetPlaneGeometry());
-    if (planegeometry != NULL && dynamic_cast<AbstractTransformGeometry*>(geometry2dData->GetPlaneGeometry())==NULL)
-      m_OtherPlaneGeometries.push_back(it->Value());
+    // Skip other PlaneGeometryData nodes that are not visible on this renderer
+    if (!otherNode->IsVisible(renderer)) continue;
+
+    PlaneGeometryData* otherData = dynamic_cast<PlaneGeometryData*>(otherNode->GetData());
+    if (!otherData) continue;
+
+    PlaneGeometry* otherGeometry = dynamic_cast<PlaneGeometry*>(otherData->GetPlaneGeometry());
+    if ( otherGeometry && !dynamic_cast<AbstractTransformGeometry*>(otherData->GetPlaneGeometry()) )
+    {
+      m_OtherPlaneGeometries.push_back(otherNode);
+    }
   }
 }
 
@@ -484,19 +501,6 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer
     {
       m_RenderOrientationArrows = false;
     }
-  }
-}
-
-
-void mitk::PlaneGeometryDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent )
-{
-  if (ds.IsNotNull())
-  {
-    m_DataStorage = ds;
-  }
-  if (parent.IsNotNull())
-  {
-    m_ParentNode = parent;
   }
 }
 

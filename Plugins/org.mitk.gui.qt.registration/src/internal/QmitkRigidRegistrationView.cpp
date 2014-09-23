@@ -493,35 +493,45 @@ void QmitkRigidRegistrationView::MovingSelected(mitk::DataNode::Pointer movingIm
       m_FixedNode->SetOpacity(0.5);
     this->SetImageColor(false);
   }
-  m_MovingNode = movingImage;
-  if (m_MovingNode.IsNotNull())
-  {
-    m_MovingNode->SetVisibility(true);
-    m_Controls.TextLabelMoving->setText(QString::fromStdString(m_MovingNode->GetName()));
-    m_Controls.m_MovingLabel->show();
-    m_Controls.TextLabelMoving->show();
-    mitk::ColorProperty::Pointer colorProperty;
-    colorProperty = dynamic_cast<mitk::ColorProperty*>(m_MovingNode->GetProperty("color"));
-    if ( colorProperty.IsNotNull() )
-    {
-      m_MovingColor = colorProperty->GetColor();
-    }
-    this->SetImageColor(m_ShowRedGreen);
-    m_MovingNode->GetFloatProperty("opacity", m_OriginalOpacity);
-    this->OpacityUpdate(m_Opacity);
 
-    // what's about masking?
-    m_Controls.m_UseMaskingCB->show();
+  // selection did not change - do onot reset
+  if( m_MovingNode.IsNotNull() && m_MovingNode == movingImage)
+  {
+
   }
   else
   {
-    m_Controls.m_MovingLabel->hide();
-    m_Controls.TextLabelMoving->hide();
-    m_Controls.m_UseMaskingCB->hide();
+
+    m_MovingNode = movingImage;
+    if (m_MovingNode.IsNotNull())
+    {
+      m_MovingNode->SetVisibility(true);
+      m_Controls.TextLabelMoving->setText(QString::fromStdString(m_MovingNode->GetName()));
+      m_Controls.m_MovingLabel->show();
+      m_Controls.TextLabelMoving->show();
+      mitk::ColorProperty::Pointer colorProperty;
+      colorProperty = dynamic_cast<mitk::ColorProperty*>(m_MovingNode->GetProperty("color"));
+      if ( colorProperty.IsNotNull() )
+      {
+        m_MovingColor = colorProperty->GetColor();
+      }
+      this->SetImageColor(m_ShowRedGreen);
+      m_MovingNode->GetFloatProperty("opacity", m_OriginalOpacity);
+      this->OpacityUpdate(m_Opacity);
+
+      // what's about masking?
+      m_Controls.m_UseMaskingCB->show();
+    }
+    else
+    {
+      m_Controls.m_MovingLabel->hide();
+      m_Controls.TextLabelMoving->hide();
+      m_Controls.m_UseMaskingCB->hide();
+    }
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    this->MovingImageChanged();
+    this->CheckCalculateEnabled();
   }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  this->MovingImageChanged();
-  this->CheckCalculateEnabled();
 }
 
 bool QmitkRigidRegistrationView::CheckCalculate()
@@ -974,7 +984,7 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
     for (unsigned long i = 0; i < size; ++i)
     {
       childNode = children->GetElement(i);
-      childNode->GetData()->GetGeometry()->Compose( rotationMatrix );
+      childNode->GetData()->GetGeometry()->Compose( translationMatrix );
       childNode->GetData()->Modified();
     }
     m_MovingNode->GetData()->Modified();

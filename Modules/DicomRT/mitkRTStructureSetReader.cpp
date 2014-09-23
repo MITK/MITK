@@ -92,7 +92,7 @@ namespace mitk
     OFCondition output = file.loadFile(filepath, EXS_Unknown);
     if(output.bad())
     {
-      MITK_ERROR << "Cant read the file" << endl;
+      MITK_ERROR << "Cant read the file" << std::endl;
     }
     DcmDataset *dataset = file.getDataset();
 
@@ -100,7 +100,7 @@ namespace mitk
     OFCondition outp = structureSetObject.read(*dataset);
     if(!outp.good())
     {
-      MITK_ERROR << "Error reading the file" << endl;
+      MITK_ERROR << "Error reading the file" << std::endl;
       RTStructureSetReader::ContourModelSetNodes x;
       return x;
     }
@@ -108,7 +108,7 @@ namespace mitk
             structureSetObject.getStructureSetROISequence();
     if(!roiSequence.gotoFirstItem().good())
     {
-      MITK_ERROR << "Error reading the structure sequence" << endl;
+      MITK_ERROR << "Error reading the structure sequence" << std::endl;
       RTStructureSetReader::ContourModelSetNodes x;
       return x;
     }
@@ -141,7 +141,7 @@ namespace mitk
             structureSetObject.getROIContourSequence();
     if(!roiContourSeqObject.gotoFirstItem().good())
     {
-      MITK_ERROR << "Error reading the contour sequence" << endl;
+      MITK_ERROR << "Error reading the contour sequence" << std::endl;
       RTStructureSetReader::ContourModelSetNodes x;
       return x;
     }
@@ -193,12 +193,12 @@ namespace mitk
       }
       else
       {
-        MITK_ERROR << "Error reading contourSeqObject" << endl;
+        MITK_ERROR << "Error reading contourSeqObject" << std::endl;
       }
       RoiEntry* refROI = this->FindRoiByNumber(refRoiNumber);
       if(refROI==NULL)
       {
-        MITK_ERROR << "Can not find references ROI" << endl;
+        MITK_ERROR << "Can not find references ROI" << std::endl;
         continue;
       }
       Sint32 roiColor;

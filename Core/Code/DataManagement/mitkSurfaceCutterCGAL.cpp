@@ -118,8 +118,8 @@ public:
             _tree->all_intersections(query_plane, std::back_inserter(segments));
         }
 
-        vtkSmartPointer<vtkPolyData> pdOut = vtkPolyData::New();
-        vtkSmartPointer<vtkPoints> pointsOut = vtkPoints::New();
+        vtkSmartPointer<vtkPolyData> pdOut = vtkSmartPointer<vtkPolyData>::New();
+        vtkSmartPointer<vtkPoints> pointsOut = vtkSmartPointer<vtkPoints>::New();
         pdOut->SetPoints(pointsOut);
         pointsOut->Allocate(2 * segments.size());
         pdOut->Allocate(segments.size());
@@ -135,16 +135,16 @@ public:
             pointsOut->InsertNextPoint(s->start().x(), s->start().y(), s->start().z());
             pointsOut->InsertNextPoint(s->end().x(), s->end().y(), s->end().z());
 
-            auto ids = vtkIdList::New();
+            vtkSmartPointer<vtkIdList> ids = vtkSmartPointer<vtkIdList>::New();
             ids->InsertNextId(2 * i);
             ids->InsertNextId(2 * i + 1);
             pdOut->InsertNextCell(VTK_LINE, ids);
         }
 
-        vtkSmartPointer<vtkCleanPolyData> cleaner = vtkCleanPolyData::New();
+        vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
         cleaner->SetInputData(pdOut);
 
-        vtkSmartPointer<vtkStripper> stripper = vtkStripper::New();
+        vtkSmartPointer<vtkStripper> stripper = vtkSmartPointer<vtkStripper>::New();
         stripper->SetInputConnection(cleaner->GetOutputPort());
         stripper->Update();
 

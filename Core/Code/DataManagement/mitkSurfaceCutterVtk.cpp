@@ -25,8 +25,8 @@ namespace mitk {
 class SurfaceCutterVtkPrivate {
 public:
     SurfaceCutterVtkPrivate() 
-        : _plane(vtkPlane::New())
-        , _cutter(vtkCutter::New())
+        : _plane(vtkSmartPointer<vtkPlane>::New())
+        , _cutter(vtkSmartPointer<vtkCutter>::New())
     {
         _cutter->SetCutFunction(_plane);
     }

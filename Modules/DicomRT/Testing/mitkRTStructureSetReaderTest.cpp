@@ -87,7 +87,7 @@ public:
   bool Compare(mitk::ContourModelSet::Pointer c1, mitk::ContourModelSet::Pointer c2){
     if(c1->GetSize()!=c2->GetSize())
     {
-      MITK_INFO << "Number of ContourModelSets different" << endl;
+      MITK_INFO << "Number of ContourModelSets different" << std::endl;
       return false;
     }
     else
@@ -98,7 +98,7 @@ public:
         mitk::ContourModel::Pointer cm2 = c2->GetContourModelAt(i);
         if(cm1->GetNumberOfVertices()!=cm2->GetNumberOfVertices())
         {
-          MITK_INFO << "Number of Vertices different" << endl;
+          MITK_INFO << "Number of Vertices different" << std::endl;
           return false;
         }
         else

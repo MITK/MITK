@@ -40,7 +40,7 @@ namespace mitk
     OFCondition outp = fileformat.loadFile(filename, EXS_Unknown);
     if(outp.bad())
     {
-      MITK_ERROR << "Cant read the file" << endl;
+      MITK_ERROR << "Cant read the file" << std::endl;
     }
     DcmDataset *dataset = fileformat.getDataset();
 
@@ -54,7 +54,7 @@ namespace mitk
 
     if(originalNode.IsNull())
     {
-      MITK_ERROR << "Error reading the dcm file" << endl;
+      MITK_ERROR << "Error reading the dcm file" << std::endl;
       return 0;
     }
 
@@ -66,7 +66,7 @@ namespace mitk
 
     if(result.bad())
     {
-      MITK_ERROR << "Error reading the Dataset" << endl;
+      MITK_ERROR << "Error reading the Dataset" << std::endl;
       return 0;
     }
 
@@ -107,7 +107,7 @@ namespace mitk
     OFCondition result = doseObject.read(*dataSet);
     if(result.bad())
     {
-      MITK_ERROR << "Error reading the RT Dose dataset" << endl;
+      MITK_ERROR << "Error reading the RT Dose dataset" << std::endl;
       return 0;
     }
 

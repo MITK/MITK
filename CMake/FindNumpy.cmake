@@ -4,7 +4,10 @@
 find_package(PackageHandleStandardArgs)
 
 if(DEFINED Numpy_DIR AND EXISTS ${Numpy_DIR})
-  set(NUMPY_INCLUDE_DIR ${Numpy_DIR}/core/include
+  set(NUMPY_INCLUDE_DIR ${Numpy_DIR}/core/include)
+  MESSAGE("NUMPY_DIR: " ${Numpy_DIR})
+  MESSAGE("NUMPY_INCLUDE_DIR: " ${NUMPY_INCLUDE_DIR})
+  MESSAGE("PYTHON_EXECUTABLE: " ${PYTHON_EXECUTABLE})
 else()
   set(_python ${PYTHON_EXECUTABLE})
   if(UNIX)

@@ -864,10 +864,11 @@ void QmitkRigidRegistrationView::Translate(int* translateVector)
   if (m_MovingNode.IsNotNull())
   {
     mitk::Vector3D translateVec;
+    mitk::ScalarType sliderSensitivity = 0.1;
 
-    translateVec[0] = translateVector[0] - m_TranslateSliderPos[0];
-    translateVec[1] = translateVector[1] - m_TranslateSliderPos[1];
-    translateVec[2] = translateVector[2] - m_TranslateSliderPos[2];
+    translateVec[0] = sliderSensitivity * (translateVector[0] - m_TranslateSliderPos[0]);
+    translateVec[1] = sliderSensitivity * (translateVector[1] - m_TranslateSliderPos[1]);
+    translateVec[2] = sliderSensitivity * (translateVector[2] - m_TranslateSliderPos[2]);
 
     m_TranslateSliderPos[0] = translateVector[0];
     m_TranslateSliderPos[1] = translateVector[1];

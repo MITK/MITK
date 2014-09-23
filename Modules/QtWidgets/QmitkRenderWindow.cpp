@@ -342,7 +342,7 @@ void QmitkRenderWindow::dropEvent(QDropEvent * event)
 
     for (int i = 0; i < listOfDataNodes.size(); i++)
     {
-      long val = listOfDataNodes[i].toLong();
+      unsigned long long val = listOfDataNodes[i].toULongLong();
       mitk::DataNode* node = static_cast<mitk::DataNode *>((void*) val);
       vectorOfDataNodePointers.push_back(node);
     }

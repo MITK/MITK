@@ -150,7 +150,7 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   }
   else
   {
-    UpdateSession();
+    //UpdateSession();
   }
 }
 
@@ -451,8 +451,8 @@ void QmitkXnatEditor::UpdateSession()
     m_Controls.treeView->reset();
   }
 
-  // Get the XNAT Session from Activator
-  m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->GetXnatSession();
+  // Get the XNAT Session from Activator <== CHANGED TO MICRO SERVICE
+  //m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->GetXnatSession();
 
   if(m_Session != NULL)
   {

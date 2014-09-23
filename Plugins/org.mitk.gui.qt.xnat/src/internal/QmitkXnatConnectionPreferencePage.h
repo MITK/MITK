@@ -60,9 +60,9 @@ public:
     virtual void DownloadPathChanged();
 
     ///
-    /// Creates a test connection to the entered server name with the entered user information.
+    /// Toggles the Connection in the Service Registry from opened to closed or the other way around.
     ///
-    virtual bool PerformTestConnection();
+    virtual void ToggleConnection();
 
 protected:
 
@@ -71,6 +71,13 @@ protected:
   QWidget* m_Control;
 
   berry::IPreferences::WeakPtr m_XnatConnectionPreferencesNode;
+
+private:
+
+  ///
+  /// Checks if the entered user information is empty.
+  ///
+  virtual bool UserInformationEmpty();
 
 };
 

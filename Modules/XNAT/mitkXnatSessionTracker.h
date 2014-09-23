@@ -17,37 +17,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKXNATSESSIONTRACKER_H
 #define MITKXNATSESSIONTRACKER_H
 
+#include "usServiceTracker.h"
+
+#include "MitkXNATExports.h"
+
 #include "mitkXnatSession.h"
-#include <usServiceTracker.h>
 
 namespace mitk {
 
-class MITK_XNAT_EXPORT XnatSessionTracker : public us::ServiceTracker<XnatSession>, public QObject
+class MITK_XNAT_EXPORT XnatSessionTracker : public QObject, public us::ServiceTracker<ctkXnatSession>
 {
   Q_OBJECT
 
 public:
   XnatSessionTracker(us::ModuleContext* context);
 
-  virtual void Open();
-  virtual void Close();
-
-  public signals:
-    void Opened(XnatSession*);
-    void AboutToBeClosed(XnatSession*);
-
-  private slots:
-    void SessionOpened();
-    void SessionAboutToBeClosed():
+signals:
+  void Opened(ctkXnatSession*);
+  void AboutToBeClosed(ctkXnatSession*);
 
 private:
-  typedef us::ServiceTracker<XnatSession> Superclass;
+  typedef us::ServiceTracker<ctkXnatSession> Superclass;
 
   us::ModuleContext* m_Context;
 
   virtual TrackedType AddingService(const ServiceReferenceType &reference);
-  virtual void RemovedService(const ServiceReferenceType& /*reference*/, TrackedType tracked);
+  virtual void RemovedService(const ServiceReferenceType& reference, TrackedType tracked);
 
+  private slots:
+    void SessionOpened();
+    void SessionAboutToBeClosed();
 };
 
 } // end of namespace mitk

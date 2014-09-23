@@ -38,79 +38,8 @@ typedef CGAL_Kernel::Plane_3 CGAL_Plane;
 typedef CGAL_Kernel::Segment_3 CGAL_Segment;
 typedef CGAL_Kernel::Triangle_3 CGAL_Triangle;
 
-// Custom iterator over triangles for vtk polydata objects
-class vtkPolyDataTrianglesIterator 
-    : public boost::iterator_facade<
-          vtkPolyDataTrianglesIterator  // Self for CRTP       
-        , CGAL_Triangle const           // Value
-        , boost::forward_traversal_tag  // CategoryOrTraversal
-        >
-{
-public:
-    vtkPolyDataTrianglesIterator()
-        : data(nullptr), cellId(-1) {}   
-
-    static vtkPolyDataTrianglesIterator begin(vtkPolyData* data)
-    {
-        return vtkPolyDataTrianglesIterator(data, 0);
-    }
-
-    static vtkPolyDataTrianglesIterator end(vtkPolyData* data)
-    {
-        return vtkPolyDataTrianglesIterator(data, data->GetNumberOfCells());
-    }
-
-private:
-    vtkPolyDataTrianglesIterator(vtkPolyData* data, int index)
-        : data(data), cellId(index)
-    {
-        _cache = convertVTKtoCGAL();
-    }
-
-
-    friend class boost::iterator_core_access;
-    void increment() {
-        ++cellId;
-        _cache = convertVTKtoCGAL();
-    }
-
-    // Convert triangle to CGAL from VTK
-    CGAL_Triangle const& dereference() const
-    {
-        return _cache;
-    }
-
-    CGAL_Triangle convertVTKtoCGAL() const
-    {
-        if (cellId < data->GetNumberOfCells()) {
-            vtkCell* cell = data->GetCell(cellId);
-
-            if (cell->GetNumberOfPoints() == 3) {
-                CGAL_Point p[3];
-                for (int i = 0; i < 3; ++i) {
-                    double* pt = data->GetPoints()->GetPoint(cell->GetPointId(i));
-                    p[i] = CGAL_Point(pt[0], pt[1], pt[2]);
-                }
-
-                // Convert triangle to CGAL
-                return CGAL_Triangle(p[0], p[1], p[2]);
-            }
-        }
-        return CGAL_Triangle();
-    }
-
-    bool equal(vtkPolyDataTrianglesIterator const& other) const
-    {
-        return data == other.data && cellId == other.cellId;
-    }
-
-    int cellId;
-    vtkPolyData* data;
-    CGAL_Triangle _cache;
-};
-
 // Definition of AABB tree types
-typedef CGAL::AABB_triangle_primitive<CGAL_Kernel, vtkPolyDataTrianglesIterator> CGAL_AABBPrimitive;
+typedef CGAL::AABB_triangle_primitive<CGAL_Kernel, std::vector<CGAL_Triangle>::iterator> CGAL_AABBPrimitive;
 typedef CGAL::AABB_traits<CGAL_Kernel, CGAL_AABBPrimitive> CGAL_AABBTraits;
 typedef CGAL::AABB_tree<CGAL_AABBTraits> CGAL_AABBTree;
 
@@ -127,6 +56,7 @@ public:
     {
         if (_tree) {
             _tree.release();
+            _triangles.clear();
         }
 
         if (surface) {
@@ -136,11 +66,24 @@ public:
             triangleFilter->SetInputData(surface);
             triangleFilter->Update();
 
-            // Note: it is ok to delete the triangulated data after the tree is build
-            // The triangles will be cached within the iterators
+            vtkPolyData* polyData = triangleFilter->GetOutput();
+
+            _triangles.reserve(polyData->GetNumberOfCells());
+            for (int cellId = 0; cellId < polyData->GetNumberOfCells(); ++cellId) {
+                vtkCell* cell = polyData->GetCell(cellId);
+
+                CGAL_Point p[3];
+                for (int i = 0; i < 3; ++i) {
+                    double* pt = polyData->GetPoints()->GetPoint(cell->GetPointId(i));
+                    p[i] = CGAL_Point(pt[0], pt[1], pt[2]);
+                }
+
+                // Convert triangle to CGAL
+                _triangles.push_back(CGAL_Triangle(p[0], p[1], p[2]));
+            }
 
             // Build the AABB tree
-            _tree.reset(new CGAL_AABBTree(vtkPolyDataTrianglesIterator::begin(triangleFilter->GetOutput()), vtkPolyDataTrianglesIterator::end(triangleFilter->GetOutput())));
+            _tree.reset(new CGAL_AABBTree(_triangles.begin(), _triangles.end()));
             _tree->build();
         }
     }
@@ -210,6 +153,7 @@ public:
 
 private:
     std::unique_ptr<CGAL_AABBTree> _tree;
+    std::vector<CGAL_Triangle> _triangles;
 };
 
 

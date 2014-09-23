@@ -984,7 +984,9 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataNode* pare
 
 void QmitkDataManagerView::NodeChanged(const mitk::DataNode* node)
 {
-    m_FilterModel->invalidate();
+  // m_FilterModel->invalidate();
+  // fix as proposed by R. Khlebnikov in the mitk-users mail from 02.09.2014
+  QMetaObject::invokeMethod( m_FilterModel, "invalidate", Qt::QueuedConnection );
 }
 
 QItemSelectionModel *QmitkDataManagerView::GetDataNodeSelectionModel() const

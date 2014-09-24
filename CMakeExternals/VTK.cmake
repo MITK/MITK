@@ -28,6 +28,14 @@ if(NOT DEFINED VTK_DIR)
         )
   endif()
 
+  if(WIN32)
+    # see http://bugs.mitk.org/show_bug.cgi?id=17858
+    list(APPEND additional_cmake_args
+         -DVTK_DO_NOT_DEFINE_OSTREAM_SLL:BOOL=ON
+         -DVTK_DO_NOT_DEFINE_OSTREAM_ULL:BOOL=ON
+        )
+  endif()
+
   if(MITK_USE_Python)
     list(APPEND additional_cmake_args
          -DVTK_WRAP_PYTHON:BOOL=ON

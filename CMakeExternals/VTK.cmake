@@ -90,6 +90,10 @@ if(NOT DEFINED VTK_DIR)
         -DVTK_LEGACY_REMOVE:BOOL=ON
         -DModule_vtkTestingRendering:BOOL=ON
         -DVTK_MAKE_INSTANTIATORS:BOOL=ON
+		if(WIN32)
+		-DVTK_DO_NOT_DEFINE_OSTREAM_SLL:BOOL=ON
+		-DVTK_DO_NOT_DEFINE_OSTREAM_ULL:BOOL=ON
+		endif(WIN32)
         ${additional_cmake_args}
      DEPENDS ${proj_DEPENDENCIES}
     )

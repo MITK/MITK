@@ -121,15 +121,26 @@ void mitk::SurfaceGLMapper2D::SetDataNode( mitk::DataNode* node )
       vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
       if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 )) continue;
       vtkDataArray *vpointscalars = vtkpolydata->GetPointData()->GetScalars();
-      if (vpointscalars) {
-        vpointscalars->GetRange( range, 0 );
-        if (dataRange[0]==0 && dataRange[1]==0) {
-          dataRange[0] = range[0];
-          dataRange[1] = range[1];
+      if (vpointscalars)
+      {
+        if(vpointscalars->GetLookupTable())
+        {
+          // load vtk lookup table if there is one for the scalar data
+          m_LUT->DeepCopy(vpointscalars->GetLookupTable());
         }
-        else {
-          if (range[0] < dataRange[0]) dataRange[0] = range[0];
-          if (range[1] > dataRange[1]) dataRange[1] = range[1];
+        else
+        {
+          vpointscalars->GetRange( range, 0 );
+          if (dataRange[0]==0 && dataRange[1]==0)
+          {
+            dataRange[0] = range[0];
+            dataRange[1] = range[1];
+          }
+          else
+          {
+            if (range[0] < dataRange[0]) dataRange[0] = range[0];
+            if (range[1] > dataRange[1]) dataRange[1] = range[1];
+          }
         }
       }
     }

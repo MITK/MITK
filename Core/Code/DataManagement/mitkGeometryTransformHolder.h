@@ -35,7 +35,7 @@ namespace mitk {
 // Here is a helper class which manages the transform related variables.
 // This needs to be implemented at the beginning of the cpp file.
 // Do not change if you don't know what you are doing!
-class GeometryTransformHolder
+class MITK_CORE_EXPORT GeometryTransformHolder
 {
 private:
   //##Documentation
@@ -134,7 +134,7 @@ public:
 
   void SetIdentity();
 
-  void Compose( const TransformType * other, bool pre );
+  void Compose( const TransformType * other, bool pre = 0 );
 
   void SetVtkMatrixDeepCopy(vtkTransform *vtktransform);
 

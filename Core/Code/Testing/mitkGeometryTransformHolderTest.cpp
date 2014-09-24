@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingConfig.h>
 #include <mitkTestFixture.h>
 
-#include <mitkGeometryTransformHolder.h>
+#include "mitkGeometryTransformHolder.h"
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
 #include "mitkOperationActor.h"
@@ -58,7 +58,6 @@ class mitkGeometryTransformHolderTestSuite : public mitk::TestFixture
 
   //other Functions
   MITK_TEST(TestComposeTransform);
-  MITK_TEST(TestComposeVtkMatrix);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -76,6 +75,10 @@ private:
   mitk::AffineTransform3D::Pointer aThirdTransform;
   mitk::AffineTransform3D::MatrixType anotherMatrix;
   mitk::AffineTransform3D::MatrixType aThirdMatrix;
+  vtkMatrix4x4* vtkmatrix;
+
+  mitk::AffineTransform3D::Pointer combinedTransform_AnotherOffsetSpacingTransform;
+  mitk::AffineTransform3D::MatrixType::InternalMatrixType combinedMatrix;
 
   mitk::GeometryTransformHolder* dummyGeoHolder;
   mitk::GeometryTransformHolder* dummyGeoHolder_Unchanged;
@@ -97,8 +100,16 @@ public:
 
     anotherTransform = mitk::AffineTransform3D::New();
 
+    //For the testing, vtkmatrix and anotherMatrix need to have the same values in setUp!
+    vtkmatrix = vtkMatrix4x4::New();
+
     anotherMatrix.SetIdentity();
+    vtkmatrix->Identity();
     anotherMatrix(1,1) = 2;
+    vtkmatrix->SetElement(1,1,2);
+    anotherMatrix(1,2) = 3;
+    vtkmatrix->SetElement(1,2,3);
+
     anotherTransform->SetMatrix( anotherMatrix );
 
     aThirdTransform = mitk::AffineTransform3D::New();
@@ -108,7 +119,19 @@ public:
     aThirdTransform->SetMatrix( aThirdMatrix );
 
     mitk::FillVector3D(anotherPoint, 2,3,4);
-    mitk::FillVector3D(anotherSpacing, 5,6.5,7);
+    mitk::FillVector3D(anotherSpacing, 5,6.5,8);
+
+    //Combine Origin, Transform and Spacing. The order is important!
+    combinedTransform_AnotherOffsetSpacingTransform = mitk::AffineTransform3D::New();
+    combinedMatrix=anotherMatrix.GetVnlMatrix();
+    mitk::VnlVector col;
+    col = combinedMatrix.get_column(0); col.normalize(); col*=anotherSpacing[0]; combinedMatrix.set_column(0, col);
+    col = combinedMatrix.get_column(1); col.normalize(); col*=anotherSpacing[1]; combinedMatrix.set_column(1, col);
+    col = combinedMatrix.get_column(2); col.normalize(); col*=anotherSpacing[2]; combinedMatrix.set_column(2, col);
+    mitk::Matrix3D matrix;
+    matrix = combinedMatrix;
+    combinedTransform_AnotherOffsetSpacingTransform->SetMatrix(matrix);
+    combinedTransform_AnotherOffsetSpacingTransform->SetOffset(anotherPoint.GetVectorFromOrigin());
 
     dummyGeoHolder = new mitk::GeometryTransformHolder();
     dummyGeoHolder_Unchanged = new mitk::GeometryTransformHolder();
@@ -116,10 +139,49 @@ public:
 
   void tearDown()
   {
+    vtkmatrix->Delete();
     delete dummyGeoHolder;
+    delete dummyGeoHolder_Unchanged;
   }
 
-  // Test functions
+  //Test functions
+
+  void TestInitialize()
+  {
+    dummyGeoHolder->SetOrigin(anotherPoint);
+    dummyGeoHolder->SetIndexToWorldTransform(anotherTransform);
+    dummyGeoHolder->SetSpacing(anotherSpacing);
+
+    mitk::GeometryTransformHolder* dummy2 = new mitk::GeometryTransformHolder();
+    dummy2->Initialize(dummyGeoHolder);
+    CPPUNIT_ASSERT(mitk::Equal(dummy2,dummyGeoHolder,mitk::eps,true));
+
+    dummyGeoHolder->Initialize();
+
+    CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder,dummyGeoHolder_Unchanged,mitk::eps,true));
+  }
+
+  void TestConstructors()
+  {
+    //test standard constructor
+    CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder->GetSpacing(), aSpacing));
+    CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder->GetOrigin(), aPoint));
+    CPPUNIT_ASSERT(mitk::Equal( dummyGeoHolder->GetIndexToWorldTransform(), aTransform, mitk::eps, true));
+
+    //Test, if combination of Set functions works. Use result for complex copy constructor.
+    // Order of Set-functions is important! If you change it here, change aswell in setup function.
+    dummyGeoHolder->SetIndexToWorldTransform(anotherTransform);
+    dummyGeoHolder->SetSpacing(anotherSpacing);
+    dummyGeoHolder->SetOrigin(anotherPoint);
+
+    CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder->GetSpacing(), anotherSpacing));
+    CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder->GetOrigin(), anotherPoint));
+    CPPUNIT_ASSERT(mitk::Equal( dummyGeoHolder->GetIndexToWorldTransform(), combinedTransform_AnotherOffsetSpacingTransform, mitk::eps, true));
+
+    //Test copy constructor
+    mitk::GeometryTransformHolder* dummy3 = new mitk::GeometryTransformHolder(*dummyGeoHolder);
+    CPPUNIT_ASSERT(mitk::Equal(dummy3,dummyGeoHolder,mitk::eps,true));
+  }
 
   void TestSetOrigin()
   {
@@ -147,11 +209,6 @@ public:
 
   void TestSetIndexToWorldTransformByVtkMatrix()
   {
-    vtkMatrix4x4* vtkmatrix;
-    vtkmatrix = vtkMatrix4x4::New();
-    vtkmatrix->Identity();
-    vtkmatrix->SetElement(1,1,2);
-
     dummyGeoHolder->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
     CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummyGeoHolder->GetIndexToWorldTransform(),mitk::eps,true));
 
@@ -161,7 +218,7 @@ public:
     CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummyGeoHolder->GetIndexToWorldTransform(),mitk::eps,false)==false);
 
     //undo changes, new and changed object need to be the same!
-    vtkmatrix->SetElement(1,1,1);
+    vtkmatrix->Identity();
     dummyGeoHolder->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
     CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder,dummyGeoHolder_Unchanged,mitk::eps,true));
   }
@@ -199,22 +256,6 @@ public:
     dummyGeoHolder->SetIndexToWorldTransform(anotherTransform); //calls TransferItkToVtkTransform
     mitk::AffineTransform3D::Pointer dummyTransform = dummyGeoHolder->GetIndexToWorldTransform();
     CPPUNIT_ASSERT(mitk::MatrixEqualElementWise( anotherMatrix, dummyTransform->GetMatrix() ));
-  }
-
-  void TestConstructors()
-  {
-    //test standard constructor
-    CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder->GetSpacing(), aSpacing));
-    CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder->GetOrigin(), aPoint));
-
-    CPPUNIT_ASSERT(mitk::Equal( dummyGeoHolder->GetIndexToWorldTransform(), aTransform, mitk::eps, true));
-
-    dummyGeoHolder->SetOrigin(anotherPoint);
-    dummyGeoHolder->SetIndexToWorldTransform(anotherTransform);
-    dummyGeoHolder->SetSpacing(anotherSpacing);
-
-    mitk::GeometryTransformHolder* dummy3 = new mitk::GeometryTransformHolder(*dummyGeoHolder);
-    CPPUNIT_ASSERT(mitk::Equal(dummy3,dummyGeoHolder,mitk::eps,true));
   }
 
   //Equal Tests
@@ -255,70 +296,13 @@ public:
     expectedSpacing[1] = 4;
 
     dummyGeoHolder->SetIndexToWorldTransform(transform1);  //Spacing = 2
-    //xxxdummyGeoHolder->Compose(transform2); //Spacing = 4
+    dummyGeoHolder->Compose(transform2); //Spacing = 4
     CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder->GetSpacing(), expectedSpacing));
     CPPUNIT_ASSERT(mitk::Equal(transform3,dummyGeoHolder->GetIndexToWorldTransform(),mitk::eps,true)); // 4=4
 
     //undo changes, new and changed object need to be the same!
-    //xxxx dummyGeoHolder->Compose(transform4); //Spacing = 1
+    dummyGeoHolder->Compose(transform4); //Spacing = 1
     CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder,dummyGeoHolder_Unchanged,mitk::eps,true)); // 1=1
-  }
-
-  void TestComposeVtkMatrix(){
-    //Create Transformations to set and compare
-    mitk::AffineTransform3D::Pointer transform1;
-    transform1 = mitk::AffineTransform3D::New();
-    mitk::AffineTransform3D::MatrixType matrix1;
-    matrix1.SetIdentity();
-    matrix1(1,1) = 2;
-    transform1->SetMatrix( matrix1 );  //Spacing = 2
-
-    vtkMatrix4x4* vtkmatrix2;
-    vtkmatrix2 = vtkMatrix4x4::New();
-    vtkmatrix2->Identity();
-    vtkmatrix2->SetElement(1,1,2); //Spacing = 2
-
-    mitk::AffineTransform3D::Pointer transform3;
-    transform3 = mitk::AffineTransform3D::New();
-    mitk::AffineTransform3D::MatrixType matrix3;
-    matrix3.SetIdentity();
-    matrix3(1,1) = 4;
-    transform3->SetMatrix( matrix3 );  //Spacing = 4
-
-    vtkMatrix4x4* vtkmatrix4;
-    vtkmatrix4 = vtkMatrix4x4::New();
-    vtkmatrix4->Identity();
-    vtkmatrix4->SetElement(1,1,0.25); //Spacing = 0.25
-
-    //Vector to compare spacing
-    mitk::Vector3D expectedSpacing;
-    expectedSpacing.Fill(1.0);
-    expectedSpacing[1] = 4;
-
-    dummyGeoHolder->SetIndexToWorldTransform(transform1);  //Spacing = 2
-    //XXXXXXXXXdummyGeoHolder->Compose(vtkmatrix2); //Spacing = 4
-
-    CPPUNIT_ASSERT(mitk::Equal(transform3,dummyGeoHolder->GetIndexToWorldTransform(),mitk::eps,true)); // 4=4
-    CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder->GetSpacing(), expectedSpacing));
-
-    //undo changes, new and changed object need to be the same!
-    //XXXXXXXXXdummyGeoHolder->Compose(vtkmatrix4); //Spacing = 1
-    CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder,dummyGeoHolder_Unchanged,mitk::eps,true)); // 1=1
-  }
-
-  void TestInitialize()
-  {
-    dummyGeoHolder->SetOrigin(anotherPoint);
-    dummyGeoHolder->SetIndexToWorldTransform(anotherTransform);
-    dummyGeoHolder->SetSpacing(anotherSpacing);
-
-    mitk::GeometryTransformHolder* dummy2 = new mitk::GeometryTransformHolder();
-    dummy2->Initialize(dummyGeoHolder);
-    CPPUNIT_ASSERT(mitk::Equal(dummy2,dummyGeoHolder,mitk::eps,true));
-
-    dummyGeoHolder->Initialize();
-
-    CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder,dummyGeoHolder_Unchanged,mitk::eps,true));
   }
 };//end class mitkGeometryTransformHolderTestSuite
 

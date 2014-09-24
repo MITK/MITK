@@ -38,6 +38,7 @@ namespace mitk {
     m_VtkMatrix = vtkMatrix4x4::New();
     m_VtkIndexToWorldTransform = vtkMatrixToLinearTransform::New();
     m_VtkIndexToWorldTransform->SetInput(m_VtkMatrix);
+    this->Initialize();
   }
 
   GeometryTransformHolder::GeometryTransformHolder(const GeometryTransformHolder& other)

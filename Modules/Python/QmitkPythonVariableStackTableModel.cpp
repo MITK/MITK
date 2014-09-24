@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <QStringList>
 #include <QMessageBox>
+#include "QmitkMimeTypes.h"
 
 const QString QmitkPythonVariableStackTableModel::MITK_IMAGE_VAR_NAME = "mitkImage";
 const QString QmitkPythonVariableStackTableModel::MITK_SURFACE_VAR_NAME = "mitkSurface";
@@ -50,22 +51,16 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
     // Note, we are returning true if we handled it, and false otherwise
     bool returnValue = false;
 
-    if(data->hasFormat("application/x-mitk-datanodes"))
+    if(data->hasFormat(QmitkMimeTypes::DataNodePtrs))
     {
         MITK_DEBUG("QmitkPythonVariableStackTableModel") << "dropped MITK DataNode";
         returnValue = true;
 
-        QString arg = QString(data->data("application/x-mitk-datanodes").data());
-        QStringList listOfDataNodeAddressPointers = arg.split(",");
-
-        QStringList::iterator slIter;
         int i = 0;
-        for (slIter = listOfDataNodeAddressPointers.begin();
-             slIter != listOfDataNodeAddressPointers.end();
-             slIter++)
+        QList<mitk::DataNode*> dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
+        mitk::DataNode* node = NULL;
+        foreach(node, dataNodeList)
         {
-          long val = (*slIter).toLong();
-          mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
           mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
           MITK_DEBUG("QmitkPythonVariableStackTableModel") << "mitkImage is not null " << (mitkImage != 0? "true": "false");
 

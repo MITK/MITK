@@ -128,8 +128,8 @@ public:
     // compare fiber bundles
     bool Equals(FiberBundleX* fib, double eps=0.0001);
 
-    itkSetMacro( ReferenceImage, mitk::Image::Pointer )
-    itkGetMacro( ReferenceImage, mitk::Image::Pointer )
+    itkSetMacro( ReferenceGeometry, mitk::BaseGeometry::Pointer )
+    itkGetMacro( ReferenceGeometry, mitk::BaseGeometry::Pointer )
 
 protected:
 
@@ -164,9 +164,7 @@ private:
     int     m_FiberSampling;
     itk::TimeStamp m_UpdateTime2D;
     itk::TimeStamp m_UpdateTime3D;
-
-    mitk::Image::Pointer m_ReferenceImage;
-
+    mitk::BaseGeometry::Pointer m_ReferenceGeometry;
 };
 
 } // namespace mitk

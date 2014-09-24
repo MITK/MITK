@@ -276,7 +276,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     fiberPolyData->SetLines(vCellArray);
 
     mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberPolyData);
-    fib->SetReferenceImage(dynamic_cast<mitk::Image*>(m_DiffusionImageNode->GetData()));
+    fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_DiffusionImageNode->GetData())->GetGeometry());
     mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
     fbNode->SetData(fib);
     QString name("FiberBundle_");

@@ -156,7 +156,7 @@ int StreamlineTracking(int argc, char* argv[])
             return EXIT_FAILURE;
         }
         mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberBundle);
-        fib->SetReferenceImage(mitkImage);
+        fib->SetReferenceGeometry(mitkImage->GetGeometry());
 
         mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
         for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)

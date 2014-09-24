@@ -221,24 +221,22 @@ int TractometerMetrics(int argc, char* argv[])
                                 detected.at(i) = true;
                                 invalid = false;
 
-                                if (verbose)
-                                {
-                                    vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-                                    for (int j=0; j<numPoints; j++)
-                                    {
-                                        double* p = points->GetPoint(j);
-                                        vtkIdType id = validPoints->InsertNextPoint(p);
-                                        container->GetPointIds()->InsertNextId(id);
 
-                                        itk::Point<float, 3> itkP;
-                                        itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
-                                        itk::Index<3> idx;
-                                        coverage->TransformPhysicalPointToIndex(itkP, idx);
-                                        if ( coverage->GetLargestPossibleRegion().IsInside(idx) )
-                                            coverage->SetPixel(idx, 1);
-                                    }
-                                    validCells->InsertNextCell(container);
+                                vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+                                for (int j=0; j<numPoints; j++)
+                                {
+                                    double* p = points->GetPoint(j);
+                                    vtkIdType id = validPoints->InsertNextPoint(p);
+                                    container->GetPointIds()->InsertNextId(id);
+
+                                    itk::Point<float, 3> itkP;
+                                    itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
+                                    itk::Index<3> idx;
+                                    coverage->TransformPhysicalPointToIndex(itkP, idx);
+                                    if ( coverage->GetLargestPossibleRegion().IsInside(idx) )
+                                        coverage->SetPixel(idx, 1);
                                 }
+                                validCells->InsertNextCell(container);
                             }
                             break;
                         }

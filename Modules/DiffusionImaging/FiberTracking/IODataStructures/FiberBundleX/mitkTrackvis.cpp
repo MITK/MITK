@@ -13,23 +13,22 @@ short TrackVisFiberReader::create(string filename , mitk::FiberBundleX *fib)
     // prepare the header
     for(int i=0; i<3 ;i++)
     {
-        if (fib->GetReferenceImage().IsNotNull())
+        if (fib->GetReferenceGeometry().IsNotNull())
         {
-            m_Header.dim[i]            = fib->GetReferenceImage()->GetDimension(i);
-            m_Header.voxel_size[i]     = fib->GetReferenceImage()->GetGeometry()->GetSpacing().GetElement(i);
-            m_Header.origin[i]         = fib->GetReferenceImage()->GetGeometry()->GetOrigin().GetElement(i);
+            m_Header.dim[i]            = fib->GetReferenceGeometry()->GetExtent(i);
+            m_Header.voxel_size[i]     = fib->GetReferenceGeometry()->GetSpacing()[i];
+            m_Header.origin[i]         = fib->GetReferenceGeometry()->GetOrigin()[i];
         }
         else
         {
-            m_Header.dim[i]            = 1;
-            m_Header.voxel_size[i]     = 1;
-            m_Header.origin[i]         = 0;
+            m_Header.dim[i]            = fib->GetGeometry()->GetExtent(i);
+            m_Header.voxel_size[i]     = fib->GetGeometry()->GetSpacing()[i];
+            m_Header.origin[i]         = fib->GetGeometry()->GetOrigin()[i];
         }
     }
     m_Header.n_scalars = 0;
     m_Header.n_properties = 0;
     sprintf(m_Header.voxel_order,"LPS");
-    sprintf(m_Header.pad2,"LPS");
     m_Header.image_orientation_patient[0] = 1.0;
     m_Header.image_orientation_patient[1] = 0.0;
     m_Header.image_orientation_patient[2] = 0.0;
@@ -38,6 +37,8 @@ short TrackVisFiberReader::create(string filename , mitk::FiberBundleX *fib)
     m_Header.image_orientation_patient[5] = 0.0;
     m_Header.pad1[0] = 0;
     m_Header.pad1[1] = 0;
+    m_Header.pad2[0] = 0;
+    m_Header.pad2[1] = 0;
     m_Header.invert_x = 0;
     m_Header.invert_y = 0;
     m_Header.invert_z = 0;
@@ -148,14 +149,6 @@ short TrackVisFiberReader::read( mitk::FiberBundleX* fib )
             if (fread((char*)tmp, 1, 12, m_FilePointer) == 0)
                 MITK_ERROR << "TrackVis::read: Error during read.";
 
-            //            tmp[0] *= hdr.voxel_size[0];
-            //            tmp[1] *= hdr.voxel_size[1];
-            //            tmp[2] *= hdr.voxel_size[2];
-
-            //            tmp[0] += hdr.origin[0];
-            //            tmp[1] += hdr.origin[1];
-            //            tmp[2] += hdr.origin[2];
-
             vtkIdType id = vtkNewPoints->InsertNextPoint(tmp);
             container->GetPointIds()->InsertNextId(id);
         }
@@ -171,15 +164,6 @@ short TrackVisFiberReader::read( mitk::FiberBundleX* fib )
     mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
     vtkSmartPointer< vtkMatrix4x4 > matrix = vtkSmartPointer< vtkMatrix4x4 >::New();
     matrix->Identity();
-    if (IsTransformValid())
-    {
-        matrix->SetElement(0,0,m_Header.image_orientation_patient[0]);
-        matrix->SetElement(0,1,m_Header.image_orientation_patient[1]);
-        matrix->SetElement(0,2,m_Header.image_orientation_patient[2]);
-        matrix->SetElement(1,1,m_Header.image_orientation_patient[3]);
-        matrix->SetElement(1,2,m_Header.image_orientation_patient[4]);
-        matrix->SetElement(2,2,m_Header.image_orientation_patient[5]);
-    }
 
     if (m_Header.voxel_order[0]=='R')
         matrix->SetElement(0,0,-matrix->GetElement(0,0));
@@ -189,6 +173,12 @@ short TrackVisFiberReader::read( mitk::FiberBundleX* fib )
         matrix->SetElement(2,2,-matrix->GetElement(2,2));
 
     geometry->SetIndexToWorldTransformByVtkMatrix(matrix);
+
+    vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+    transformFilter->SetInputData(fiberPolyData);
+    transformFilter->SetTransform(geometry->GetVtkTransform());
+    transformFilter->Update();
+    fib->SetFiberPolyData(transformFilter->GetOutput());
 
     mitk::Point3D origin;
     origin[0]=m_Header.origin[0];
@@ -202,16 +192,11 @@ short TrackVisFiberReader::read( mitk::FiberBundleX* fib )
     spacing[2]=m_Header.voxel_size[2];
     geometry->SetSpacing(spacing);
 
-//    matrix = geometry->GetVtkMatrix();
-//    for (int i=0; i<3; i++)
-//        MITK_INFO << matrix->GetElement(i,i);
+    geometry->SetExtentInMM(0, m_Header.voxel_size[0]*m_Header.dim[0]);
+    geometry->SetExtentInMM(1, m_Header.voxel_size[1]*m_Header.dim[1]);
+    geometry->SetExtentInMM(2, m_Header.voxel_size[2]*m_Header.dim[2]);
 
-    vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-    transformFilter->SetInputData(fiberPolyData);
-    transformFilter->SetTransform(geometry->GetVtkTransform());
-    transformFilter->Update();
-
-    fib->SetFiberPolyData(transformFilter->GetOutput());
+    fib->SetReferenceGeometry(dynamic_cast<mitk::BaseGeometry*>(geometry.GetPointer()));
 
     return numPoints;
 }

@@ -38,6 +38,11 @@
       <bool>false</bool>
      </property>
      <widget class="QWidget" name="tab">
+      <attribute name="icon">
+       <iconset resource="../../../../Modules/USUI/resources/USUI.qrc">
+        <normaloff>:/USUI/ultrasound01-probe-300ppi.png</normaloff>
+        <normalon>:/USUI/ultrasound01-probe-300ppi.png</normalon>:/USUI/ultrasound01-probe-300ppi.png</iconset>
+      </attribute>
       <attribute name="title">
        <string>Device Management</string>
       </attribute>
@@ -127,6 +132,12 @@
       <property name="enabled">
        <bool>false</bool>
       </property>
+      <attribute name="icon">
+       <iconset resource="../../../../Modules/USUI/resources/USUI.qrc">
+        <normaloff>:/USUI/ultrasound02-scan-300ppi.png</normaloff>
+        <disabledoff>:/USUI/ultrasound02-scan-300ppi-deactivated.png</disabledoff>
+        <disabledon>:/USUI/ultrasound02-scan-300ppi.png</disabledon>:/USUI/ultrasound02-scan-300ppi.png</iconset>
+      </attribute>
       <attribute name="title">
        <string>US Imaging</string>
       </attribute>

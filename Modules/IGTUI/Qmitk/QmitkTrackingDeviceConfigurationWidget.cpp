@@ -48,12 +48,12 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   CreateConnections();
   m_MTCalibrationFile = "";
 
-
-
   //reset a few things
   ResetOutput();
-  AddOutput("<br>NDI Polaris selected");
   this->m_TrackingDeviceConfigurated = false;
+  AddOutput("<br>NDI Polaris selected"); //Polaris is selected by default
+  m_Controls->m_trackingDeviceChooser->setCurrentIndex(0);
+  m_Controls->m_TrackingSystemWidget->setCurrentIndex(0);
 
   m_AdvancedUserControl = true;
 }
@@ -380,6 +380,7 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
   {
   mitk::TrackingDevice::Pointer returnValue;
   //#### Step 1: configure tracking device:
+  MITK_INFO << "Current Index: " << m_Controls->m_trackingDeviceChooser->currentIndex();
   if (m_Controls->m_trackingDeviceChooser->currentIndex()==0)//NDI Polaris
       {
       if(m_Controls->m_radioPolaris5D->isChecked()) //5D Tracking

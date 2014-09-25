@@ -47,6 +47,7 @@ private:
 
   us::ServiceRegistration<ctkXnatSession> m_SessionRegistration;
   berry::IPreferencesService::WeakPtr m_PreferencesService;
+  ctkXnatSession* m_Session;
 
 };
 

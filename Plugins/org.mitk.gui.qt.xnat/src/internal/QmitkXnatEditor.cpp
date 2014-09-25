@@ -132,6 +132,13 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.buttonSession, SIGNAL(clicked()), this, SLOT(OnSessionButtonClicked()) );
   connect( m_Controls.buttonResource, SIGNAL(clicked()), this, SLOT(OnResourceButtonClicked()) );
 
+  m_Tracker = new mitk::XnatSessionTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext());
+
+  connect( m_Tracker, SIGNAL(AboutToBeClosed(ctkXnatSession*)), this, SLOT(CleanListModel(ctkXnatSession*)) );
+  connect( m_Tracker, SIGNAL(Opened(ctkXnatSession*)), this, SLOT(UpdateSession(ctkXnatSession*)) );
+
+  m_Tracker->Open();
+
   // Makes the breadcrumb feature invisible
   for(int i = 0; i < m_Controls.breadcrumbHorizontalLayout->count()-1; i++)
   {
@@ -150,7 +157,17 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   }
   else
   {
-    //UpdateSession();
+    ctkXnatSession* session;
+    try
+    {
+      session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
+        mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+    }
+    catch(std::invalid_argument)
+    {
+      session = 0;
+    }
+    UpdateSession(session);
   }
 }
 
@@ -441,30 +458,19 @@ void QmitkXnatEditor::OnResourceButtonClicked()
   }
 }
 
-void QmitkXnatEditor::UpdateSession()
+void QmitkXnatEditor::UpdateSession(ctkXnatSession* session)
 {
   GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemoveSelectionListener(m_SelectionListener);
 
-  if(m_Session != 0 && m_Session->isOpen())
-  {
-    m_ListModel->setRootObject(NULL);
-    m_Controls.treeView->reset();
-  }
-
-  // Get the XNAT Session from Activator <== CHANGED TO MICRO SERVICE
-  //m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->GetXnatSession();
-
-  if(m_Session != NULL)
+  if(session != 0 && session->isOpen())
   {
     m_Controls.labelInfo->setText("Current Position:");
     m_Controls.labelInfo->setStyleSheet("QLabel { color: black; }");
     m_Controls.buttonDownloadFile->setEnabled(true);
     m_Controls.buttonDownloadResource->setEnabled(true);
 
-    connect( this->m_Session, SIGNAL(aboutToBeClosed()), this, SLOT(UpdateSession()) );
-
     // Fill model and show in the GUI
-    QmitkXnatObjectEditorInput::Pointer xoPtr = QmitkXnatObjectEditorInput::New( m_Session->dataModel() );
+    QmitkXnatObjectEditorInput::Pointer xoPtr = QmitkXnatObjectEditorInput::New( session->dataModel() );
     berry::IEditorInput::Pointer editorInput( xoPtr );
     this->SetInput(editorInput);
     this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
@@ -472,11 +478,23 @@ void QmitkXnatEditor::UpdateSession()
   }
   else
   {
-    m_Controls.labelInfo->setText("Please check the Preferences of the XNAT Connection.\nMaybe they are not ok. Close and reopen the tab.");
+    m_Controls.labelInfo->setText("Please check the Preferences of the XNAT Connection.\nMaybe they are not ok.");
     m_Controls.labelInfo->setStyleSheet("QLabel { color: red; }");
     m_Controls.buttonDownloadFile->setEnabled(false);
     m_Controls.buttonDownloadResource->setEnabled(false);
   }
 
   GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
+}
+
+void QmitkXnatEditor::CleanListModel(ctkXnatSession* session)
+{
+  if(session != 0)
+  {
+    m_Controls.treeView->setModel(0);
+    m_ListModel->setRootObject(0);
+    m_Controls.treeView->reset();
+    m_Controls.buttonDownloadFile->setEnabled(false);
+    m_Controls.buttonDownloadResource->setEnabled(false);
+  }
 }

@@ -123,7 +123,7 @@ bool QmitkXnatConnectionPreferencePage::PerformOk()
   else
   {
     QMessageBox::critical(QApplication::activeWindow(), "Saving Preferences failed",
-      "Something with the connection parameters in XNAT Preferences is not ok.\nPlease use the 'Connect' button to validate the connection parameters.");
+      "The connection parameters in XNAT Preferences were empty.\nPlease use the 'Connect' button to validate the connection parameters.");
   }
   return false;
 }

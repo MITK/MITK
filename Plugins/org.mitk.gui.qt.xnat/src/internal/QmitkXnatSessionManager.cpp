@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkXnatException.h"
 
 QmitkXnatSessionManager::QmitkXnatSessionManager()
+  :m_Session(0)
 {
   m_PreferencesService = berry::Platform::GetServiceRegistry().
     GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
@@ -36,13 +37,19 @@ QmitkXnatSessionManager::QmitkXnatSessionManager()
 
 QmitkXnatSessionManager::~QmitkXnatSessionManager()
 {
-  CloseXnatSession();
+  if(m_SessionRegistration != 0)
+  {
+    m_SessionRegistration.Unregister();
+  }
+  if(m_Session != 0)
+  {
+    delete m_Session;
+  }
 }
 
 void QmitkXnatSessionManager::OpenXnatSession()
 {
-  us::ServiceReference<ctkXnatSession> ref = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>();
-  ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(ref);
+  ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(m_SessionRegistration.GetReference());
   if(session == NULL) return;
 
   if(!session->isOpen())
@@ -66,16 +73,17 @@ void QmitkXnatSessionManager::CreateXnatSession()
   profile.setPassword(QString::fromStdString(nodeConnectionPref->Get("Password", "")));
   profile.setDefault(true);
 
-  ctkXnatSession* session = new ctkXnatSession(profile);
+  m_Session = new ctkXnatSession(profile);
 
-  m_SessionRegistration = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->RegisterService(session);
+  m_SessionRegistration = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->RegisterService(m_Session);
 }
 
 void QmitkXnatSessionManager::CloseXnatSession()
 {
-  us::ServiceReference<ctkXnatSession> ref = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>();
-  ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(ref);
+  ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(m_SessionRegistration.GetReference());
   session->close();
   m_SessionRegistration.Unregister();
-  delete session;
+  m_SessionRegistration = 0;
+  delete m_Session;
+  m_Session = 0;
 }

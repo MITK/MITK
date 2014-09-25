@@ -984,9 +984,9 @@ void QmitkMITKIGTTrackingToolboxView::UpdateToolStorageLabel(QString pathOfLoade
 {
   Poco::Path myPath = Poco::Path(pathOfLoadedStorage.toStdString()); //use this to seperate filename from path
   QString toolLabel = QString("Loaded ") + QString::number(m_toolStorage->GetToolCount()) + " Tools from " + myPath.getFileName().c_str();
-  if (toolLabel.size() > 40) //if the tool storage name is to long trimm the string
+  if (toolLabel.size() > 55) //if the tool storage name is to long trimm the string
     {
-    toolLabel.resize(35);
+    toolLabel.resize(50);
     toolLabel+="[...]";
     }
   m_Controls->m_toolLabel->setText(toolLabel);

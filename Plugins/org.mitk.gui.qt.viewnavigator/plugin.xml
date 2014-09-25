@@ -5,6 +5,7 @@
     <view id="org.mitk.views.viewnavigatorview"
           name="View Navigator"
           class="ViewNavigatorView"
+          icon="resources/view-manager_48.png"
            />
   </extension>
 

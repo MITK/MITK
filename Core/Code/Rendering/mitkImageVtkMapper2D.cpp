@@ -466,9 +466,11 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
   // binary image hovering & binary image selection
   bool hover    = false;
   bool selected = false;
+  bool binary = false;
   GetDataNode()->GetBoolProperty("binaryimage.ishovering", hover, renderer);
   GetDataNode()->GetBoolProperty("selected", selected, renderer);
-  if(hover && !selected)
+  GetDataNode()->GetBoolProperty("binary", binary, renderer);
+  if(binary && hover && !selected)
   {
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
                                                                                 ("binaryimage.hoveringcolor", renderer));
@@ -481,7 +483,7 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
       GetDataNode()->GetColor( rgb, renderer, "color" );
     }
   }
-  if(selected)
+  if(binary && selected)
   {
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
                                                                                 ("binaryimage.selectedcolor", renderer));
@@ -493,7 +495,7 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
       GetDataNode()->GetColor(rgb, renderer, "color");
     }
   }
-  if(!hover && !selected)
+  if(!binary || (!hover && !selected))
   {
     GetDataNode()->GetColor( rgb, renderer, "color" );
   }

@@ -151,14 +151,6 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_StopTracking->setEnabled(false);
     m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
 
-    //Update List of available models for selected tool.
-    std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
-    m_Controls->m_VolumeSelectionBox->clear();
-    for(int i = 0; i < Compatibles.size(); i++)
-    {
-      m_Controls->m_VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
-    }
-
     //initialize tool storage
     m_toolStorage = mitk::NavigationToolStorage::New(GetDataStorage());
     m_toolStorage->SetName("TrackingToolbox Default Storage");
@@ -177,6 +169,14 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     this->GetDataStorage()->Add(m_TrackingVolumeNode);
     if (!m_Controls->m_ShowTrackingVolume->isChecked()) m_TrackingVolumeNode->SetOpacity(0.0);
     else m_TrackingVolumeNode->SetOpacity(0.25);
+
+    //Update List of available models for selected tool.
+    std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
+    m_Controls->m_VolumeSelectionBox->clear();
+    for(int i = 0; i < Compatibles.size(); i++)
+    {
+      m_Controls->m_VolumeSelectionBox->addItem(Compatibles[i].Model.c_str());
+    }
   }
 }
 
@@ -221,9 +221,7 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
     }
 
   //update label
-  Poco::Path myPath = Poco::Path(filename.toStdString()); //use this to seperate filename from path
-  QString toolLabel = QString("Loaded Tools: ") + QString::number(m_toolStorage->GetToolCount()) + " Tools from " + myPath.getFileName().c_str();
-  m_Controls->m_toolLabel->setText(toolLabel);
+  UpdateToolStorageLabel(filename);
 
   //update tool preview
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
@@ -968,9 +966,7 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
       m_toolStorage->RegisterAsMicroservice("no tracking device");
 
       //update label
-      Poco::Path myPath = Poco::Path(m_ToolStorageFilename.toStdString()); //use this to seperate filename from path
-      QString toolLabel = QString("Loaded Tools: ") + QString::number(m_toolStorage->GetToolCount()) + " Tools from " + myPath.getFileName().c_str();
-      m_Controls->m_toolLabel->setText(toolLabel);
+      UpdateToolStorageLabel(m_ToolStorageFilename);
 
       //update tool preview
       m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
@@ -982,6 +978,18 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
       this->OnResetTools(); //if there where errors reset the tool storage to avoid problems later on
     }
   }
+}
+
+void QmitkMITKIGTTrackingToolboxView::UpdateToolStorageLabel(QString pathOfLoadedStorage)
+{
+  Poco::Path myPath = Poco::Path(pathOfLoadedStorage.toStdString()); //use this to seperate filename from path
+  QString toolLabel = QString("Loaded ") + QString::number(m_toolStorage->GetToolCount()) + " Tools from " + myPath.getFileName().c_str();
+  if (toolLabel.size() > 40) //if the tool storage name is to long trimm the string
+    {
+    toolLabel.resize(35);
+    toolLabel+="[...]";
+    }
+  m_Controls->m_toolLabel->setText(toolLabel);
 }
 
 

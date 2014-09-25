@@ -186,6 +186,11 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     * \brief Loads the properties of some QWidgets (and the tool storage file name) from QSettings.
     */
    void LoadUISettings();
+   /**
+    * Help method for updating the tool label
+    */
+   void UpdateToolStorageLabel(QString pathOfLoadedStorage);
+
    //members for worker thread
    QThread* m_WorkerThread;
    QmitkMITKIGTTrackingToolboxViewWorker* m_Worker;

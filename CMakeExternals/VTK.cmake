@@ -28,12 +28,20 @@ if(NOT DEFINED VTK_DIR)
         )
   endif()
 
+  if(WIN32)
+    # see http://bugs.mitk.org/show_bug.cgi?id=17858
+    list(APPEND additional_cmake_args
+         -DVTK_DO_NOT_DEFINE_OSTREAM_SLL:BOOL=ON
+         -DVTK_DO_NOT_DEFINE_OSTREAM_ULL:BOOL=ON
+        )
+  endif()
+
   # Optionally enable memory leak checks for any objects derived from vtkObject. This
   # will force unit tests to fail if they have any of these memory leaks.
   option(MITK_VTK_DEBUG_LEAKS OFF)
   mark_as_advanced(MITK_VTK_DEBUG_LEAKS)
-  set(additional_cmake_args
-      -DVTK_DEBUG_LEAKS:BOOL=${MITK_VTK_DEBUG_LEAKS}
+  list(APPEND additional_cmake_args
+       -DVTK_DEBUG_LEAKS:BOOL=${MITK_VTK_DEBUG_LEAKS}
       )
 
   if(MITK_USE_Python)

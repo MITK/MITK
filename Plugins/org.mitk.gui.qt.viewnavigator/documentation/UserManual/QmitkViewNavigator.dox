@@ -1,6 +1,8 @@
 /**
 \page org_mitk_gui_qt_viewnavigator View Navigator
 
+\imageMacro{view-manager_48.png,"Icon of the view navigator",2.00}
+
 This view allows for the easy navigation of the available views.
 
 You can select which view to open by double-clicking the name of the view in the view navigator. It provides a keyworded, grouped and searchable list of views.

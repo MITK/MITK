@@ -594,7 +594,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
         imageNavigatorAction->setToolTip("Toggle image navigator for navigating through image");
     }
 
-    viewNavigatorAction = new QAction("&View Navigator", NULL);
+    viewNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/view-manager_48.png"),"&View Navigator", NULL);
     viewNavigatorFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.viewnavigatorview");
     if (viewNavigatorFound)
     {

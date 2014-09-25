@@ -33,6 +33,7 @@ public:
 
   static QmitkXnatSessionManager* GetXnatSessionManager();
   static ctkPluginContext* GetContext();
+  static us::ModuleContext* GetXnatModuleContext();
 
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
@@ -40,6 +41,7 @@ public:
 private:
 
   static ctkPluginContext* m_Context;
+  static us::ModuleContext* m_ModuleContext;
 
 }; // org_mitk_gui_qt_xnatinterface_Activator
 

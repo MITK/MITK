@@ -53,6 +53,7 @@ set(module_dirs
     IGTUI
     VtkShaders
     DicomRT
+    XNAT
 )
 
 if(MITK_ENABLE_PIC_READER)

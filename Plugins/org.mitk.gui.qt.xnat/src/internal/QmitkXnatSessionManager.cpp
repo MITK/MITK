@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkXnatSessionManager.h"
 
+#include "org_mitk_gui_qt_xnatinterface_Activator.h"
+
 #include "berryPlatform.h"
 #include "berryIPreferences.h"
 #include "mitkLogMacros.h"
@@ -23,49 +25,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QApplication>
 
+#include "ctkXnatSession.h"
 #include "ctkXnatException.h"
 
-
-QmitkXnatSessionManager::QmitkXnatSessionManager() :
-  m_Session(0)
+QmitkXnatSessionManager::QmitkXnatSessionManager()
 {
   m_PreferencesService = berry::Platform::GetServiceRegistry().
     GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-
-  UpdateXnatSession();
 }
 
 QmitkXnatSessionManager::~QmitkXnatSessionManager()
 {
-  delete m_Session;
+  CloseXnatSession();
 }
 
-ctkXnatSession* QmitkXnatSessionManager::GetXnatSession()
+void QmitkXnatSessionManager::OpenXnatSession()
 {
-  if(m_Session == NULL) return NULL;
+  us::ServiceReference<ctkXnatSession> ref = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>();
+  ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(ref);
+  if(session == NULL) return;
 
-  if(!m_Session->isOpen())
+  if(!session->isOpen())
   {
-    try
-    {
-      m_Session->open();
-    }
-    catch(const ctkException& e)
-    {
-      MITK_ERROR << "Just look if your XNAT preferences are ok. Maybe the server is not running.\nTry to use 'Test Connection' funktionality.\n" << e.message().toStdString();
-      return NULL;
-    }
+    session->open();
   }
-  return m_Session;
 }
 
-void QmitkXnatSessionManager::UpdateXnatSession()
+void QmitkXnatSessionManager::CreateXnatSession()
 {
-  if(m_Session != 0)
-  {
-    m_Session->deleteLater();
-  }
-
   berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
   berry::IPreferences::Pointer nodeConnectionPref = prefService->GetSystemPreferences()->Node("/XnatConnection");
 
@@ -79,5 +66,16 @@ void QmitkXnatSessionManager::UpdateXnatSession()
   profile.setPassword(QString::fromStdString(nodeConnectionPref->Get("Password", "")));
   profile.setDefault(true);
 
-  m_Session = new ctkXnatSession(profile);
+  ctkXnatSession* session = new ctkXnatSession(profile);
+
+  m_SessionRegistration = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->RegisterService(session);
+}
+
+void QmitkXnatSessionManager::CloseXnatSession()
+{
+  us::ServiceReference<ctkXnatSession> ref = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>();
+  ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(ref);
+  session->close();
+  m_SessionRegistration.Unregister();
+  delete session;
 }

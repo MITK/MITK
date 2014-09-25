@@ -250,26 +250,25 @@ void QmitkXnatConnectionPreferencePage::ToggleConnection()
     try
     {
       mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->OpenXnatSession();
+
+      m_Controls.testConnectionButton->setText("Disconnect");
+      m_Controls.testConnectionLabel->setStyleSheet("QLabel { color: green; }");
+      m_Controls.testConnectionLabel->setText("Connecting successful.");
     }
     catch(const ctkXnatAuthenticationException& auth)
     {
       m_Controls.testConnectionLabel->setStyleSheet("QLabel { color: red; }");
       m_Controls.testConnectionLabel->setText("Connecting failed:\nAuthentication error.");
-      MITK_ERROR << auth.message().toStdString();
-    }
-    catch(const ctkXnatException& xnatEx)
-    {
-      MITK_ERROR << xnatEx.message().toStdString();
+      MITK_INFO << auth.message().toStdString();
+      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CloseXnatSession();
     }
     catch(const ctkException& e)
     {
       m_Controls.testConnectionLabel->setStyleSheet("QLabel { color: red; }");
       m_Controls.testConnectionLabel->setText("Connecting failed:\nInvalid Server Adress");
-      MITK_ERROR << e.message().toStdString();
+      MITK_INFO << e.message().toStdString();
+      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CloseXnatSession();
     }
-    m_Controls.testConnectionButton->setText("Disconnect");
     m_Controls.testConnectionButton->setEnabled(true);
-    m_Controls.testConnectionLabel->setStyleSheet("QLabel { color: green; }");
-    m_Controls.testConnectionLabel->setText("Connecting successful.");
   }
 }

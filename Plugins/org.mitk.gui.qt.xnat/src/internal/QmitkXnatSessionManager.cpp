@@ -47,16 +47,7 @@ void QmitkXnatSessionManager::OpenXnatSession()
 
   if(!session->isOpen())
   {
-    try
-    {
-      session->open();
-    }
-    catch(const ctkException& e)
-    {
-      QMessageBox::critical(QApplication::activeWindow(), "Failed to open Session",
-      "Something with the connection parameters in XNAT Preferences is not ok.");
-      MITK_ERROR << "Just look if your XNAT preferences are ok. Maybe the server is not running.\n" << e.message().toStdString();
-    }
+    session->open();
   }
 }
 

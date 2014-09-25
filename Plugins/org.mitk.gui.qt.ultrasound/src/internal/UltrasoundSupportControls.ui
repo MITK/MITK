@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>284</width>
-    <height>274</height>
+    <height>552</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -60,7 +60,7 @@
               <widget class="QLabel" name="m_Headline">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <pointsize>10</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
                 </font>
@@ -92,7 +92,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>Active Ultrasound Devices:</string>
+                <string>Active Devices:</string>
                </property>
               </widget>
              </item>

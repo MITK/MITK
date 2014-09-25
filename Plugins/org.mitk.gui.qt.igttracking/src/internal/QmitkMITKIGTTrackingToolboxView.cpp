@@ -208,8 +208,8 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   }
   catch(mitk::IGTException)
   {
-   std::string errormessage = "Error during deserializing. Problems with file,please check the file?";
-   QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+   std::string errormessage = "Error during loading the tool storage file. Please only load tool storage files created with the NavigationToolManager view.";
+   QMessageBox::warning(NULL, "Tool Storage Loading Error", errormessage.c_str());
    return;
   }
 

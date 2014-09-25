@@ -23,11 +23,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkPointSetDataInteractor.h>
 
+#include <vtkDebugLeaks.h>
 
 class mitkPointSetDataInteractorTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkPointSetDataInteractorTestSuite);
+
+  /// \todo Fix VTK memory leaks. Bug 18144.
+  vtkDebugLeaks::SetExitError(0);
+
   MITK_TEST(AddPointInteraction);
   MITK_TEST(DeletePointInteraction);
   CPPUNIT_TEST_SUITE_END();

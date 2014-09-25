@@ -43,19 +43,22 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   m_ScanPortsWorkerThread = new QThread();
   m_TestConnectionWorkerThread = new QThread();
 
+   //initializations
   m_Controls = NULL;
   CreateQtPartControl(this);
   CreateConnections();
   m_MTCalibrationFile = "";
+  m_AdvancedUserControl = true;
 
-  //reset a few things
-  ResetOutput();
+  //initialize a few UI elements
   this->m_TrackingDeviceConfigurated = false;
   AddOutput("<br>NDI Polaris selected"); //Polaris is selected by default
   m_Controls->m_trackingDeviceChooser->setCurrentIndex(0);
   m_Controls->m_TrackingSystemWidget->setCurrentIndex(0);
+  ResetOutput();
 
-  m_AdvancedUserControl = true;
+  //restore old UI settings
+  LoadUISettings();
 }
 
 void QmitkTrackingDeviceConfigurationWidget::SetGUIStyle(QmitkTrackingDeviceConfigurationWidget::Style style)
@@ -204,7 +207,6 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
     //disable unused UI component
     m_Controls->m_polarisTrackingModeBox->setVisible(false); //don't delete this component, because it is used in the MBI part of MITK
   }
-  LoadUISettings();
 }
 
 void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
@@ -502,7 +504,9 @@ void QmitkTrackingDeviceConfigurationWidget::EnableAdvancedUserControl(bool enab
 void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
 {
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
-  if ( this->GetPeristenceService() )
+  int selectedDevice = m_Controls->m_trackingDeviceChooser->currentIndex();
+
+  if ( this->GetPeristenceService() ) // now save the settings using the persistence service
   {
     mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
     propList->Set("PolarisPortWin",m_Controls->m_portSpinBoxPolaris->value());
@@ -510,22 +514,18 @@ void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
     propList->Set("PortTypePolaris", m_Controls->portTypePolaris->currentIndex());
     propList->Set("PortTypeAurora", m_Controls->portTypeAurora->currentIndex());
     propList->Set("MTCalibrationFile",m_MTCalibrationFile);
-    propList->Set("SelectedDevice",m_Controls->m_trackingDeviceChooser->currentIndex());
+    propList->Set("SelectedDevice",selectedDevice);
   }
-  else
+  else // QSettings as a fallback if the persistence service is not available
   {
-    // QSettings as a fallback if the persistence service is not available
     QSettings settings;
-
     settings.beginGroup(QString::fromStdString(id));
-
-    settings.setValue("trackingDeviceChooser", QVariant(m_Controls->m_trackingDeviceChooser->currentIndex()));
+    settings.setValue("trackingDeviceChooser", QVariant(selectedDevice));
     settings.setValue("portSpinBoxAurora", QVariant(m_Controls->m_portSpinBoxAurora->value()));
     settings.setValue("portSpinBoxPolaris", QVariant(m_Controls->m_portSpinBoxPolaris->value()));
     settings.setValue("portTypePolaris", QVariant(m_Controls->portTypePolaris->currentIndex()));
     settings.setValue("portTypeAurora", QVariant(m_Controls->portTypeAurora->currentIndex()));
     settings.setValue("mTCalibrationFile", QVariant(QString::fromStdString(m_MTCalibrationFile)));
-
     settings.endGroup();
   }
 }
@@ -533,18 +533,20 @@ void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
 void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
 {
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+  int SelectedDevice = 0;
   if ( this->GetPeristenceService() )
   {
     mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
     if (propList.IsNull())
     {MITK_ERROR << "Property list for this UI (" << id <<") is not available, could not load UI settings!"; return;}
-    int portPolarisWin,portAuroraWin,portTypePolaris,portTypeAurora,SelectedDevice;
+    int portPolarisWin,portAuroraWin,portTypePolaris,portTypeAurora;
     propList->Get("PolarisPortWin",portPolarisWin);
     propList->Get("AuroraPortWin",portAuroraWin);
     propList->Get("PortTypePolaris", portTypePolaris);
     propList->Get("PortTypeAurora", portTypeAurora);
     propList->Get("MTCalibrationFile",m_MTCalibrationFile);
     propList->Get("SelectedDevice",SelectedDevice);
+
     if (SelectedDevice<0)
     {
       MITK_ERROR << "Loaded data from persistence service is invalid (SelectedDevice:" <<SelectedDevice<<"): aborted to restore data!";
@@ -554,8 +556,6 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
     m_Controls->m_portSpinBoxAurora->setValue(portAuroraWin);
     m_Controls->portTypePolaris->setCurrentIndex(portTypePolaris);
     m_Controls->portTypeAurora->setCurrentIndex(portTypeAurora);
-    m_Controls->m_TrackingSystemWidget->setCurrentIndex(SelectedDevice);
-    m_Controls->m_trackingDeviceChooser->setCurrentIndex(SelectedDevice);
     MITK_INFO << "Sucessfully restored UI settings";
   }
   else
@@ -564,7 +564,7 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
     QSettings settings;
     settings.beginGroup(QString::fromStdString(id));
 
-    m_Controls->m_trackingDeviceChooser->setCurrentIndex(settings.value("trackingDeviceChooser", 0).toInt());
+    SelectedDevice = settings.value("trackingDeviceChooser", 0).toInt();
     m_Controls->m_portSpinBoxAurora->setValue(settings.value("portSpinBoxAurora", 0).toInt());
     m_Controls->m_portSpinBoxPolaris->setValue(settings.value("portSpinBoxPolaris", 0).toInt());
     m_Controls->portTypePolaris->setCurrentIndex(settings.value("portTypePolaris", 0).toInt());
@@ -573,6 +573,16 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
 
     settings.endGroup();
   }
+
+  //the selected device requires some checks because a device that is not installed should not be restored to avoids bugs
+  int selectedDeviceChecked = SelectedDevice;
+  if (SelectedDevice==2 && !mitk::ClaronTrackingDevice::New()->IsDeviceInstalled())
+    {selectedDeviceChecked = 0;} //0 = Polaris (default)
+  else if (SelectedDevice==3 && !mitk::OptitrackTrackingDevice::New()->IsDeviceInstalled())
+    {selectedDeviceChecked = 0;}
+  MITK_INFO << "SelectedDeviceChecked: " << selectedDeviceChecked;
+  m_Controls->m_TrackingSystemWidget->setCurrentIndex(selectedDeviceChecked);
+  m_Controls->m_trackingDeviceChooser->setCurrentIndex(selectedDeviceChecked);
 
   m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString::fromStdString(m_MTCalibrationFile));
 }

@@ -16,7 +16,7 @@ if( MITK_USE_Python )
 
 
   MITK_CREATE_MODULE(
-    DEPENDS MitkCore
+    DEPENDS MitkCore MitkQtWidgets
     EXPORT_DEFINE MITK_PYTHON_EXPORT
     PACKAGE_DEPENDS Qt4|QtGui CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets PythonLibs VTK|vtkPython+vtkWrappingPythonCore Numpy ${SimpleITK_DEP} ${OpenCV_DEP}
   )

@@ -7,5 +7,7 @@ set(CPP_FILES
   mitkLabelOverlay3D.cpp
   mitkOverlay2DLayouter.cpp
   mitkScaleLegendOverlay.cpp
+  mitkLogoOverlay.cpp
+  mitkVtkLogoRepresentation.cxx
 )
 

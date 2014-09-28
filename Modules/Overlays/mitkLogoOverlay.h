@@ -20,7 +20,7 @@
 #include <mitkVtkOverlay.h>
 #include <mitkLocalStorageHandler.h>
 #include <vtkSmartPointer.h>
-#include "MitkCoreExports.h"
+#include "MitkOverlaysExports.h"
 
 class mitkVtkLogoRepresentation;
 class vtkLogoWidget;
@@ -30,7 +30,7 @@ class vtkImageReader2Factory;
 namespace mitk {
 
 /** \brief Displays a logo on the renderwindow */
-class MITK_CORE_EXPORT LogoOverlay : public mitk::VtkOverlay {
+class MitkOverlays_EXPORT LogoOverlay : public mitk::VtkOverlay {
 public:
 
   class LocalStorage : public mitk::Overlay::BaseLocalStorage

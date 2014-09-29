@@ -736,12 +736,12 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
       DataStorage::SetOfObjects::Pointer nodes;
       if (ds != NULL)
       {
-        nodes = reader->Read(infoIter->m_Path, *ds);
+        nodes = reader->Read(*ds);
       }
       else
       {
         nodes = DataStorage::SetOfObjects::New();
-        std::vector<mitk::BaseData::Pointer> baseData = reader->Read(infoIter->m_Path);
+        std::vector<mitk::BaseData::Pointer> baseData = reader->Read();
         for (std::vector<mitk::BaseData::Pointer>::iterator iter = baseData.begin();
              iter != baseData.end(); ++iter)
         {
@@ -995,7 +995,8 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
     // Do the actual writing
     try
     {
-      writer->Write(infoIter->m_BaseData, infoIter->m_Path);
+      writer->SetOutputLocation(infoIter->m_Path);
+      writer->Write();
     }
     catch(const std::exception& e)
     {

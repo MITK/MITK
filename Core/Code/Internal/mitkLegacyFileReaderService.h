@@ -36,8 +36,7 @@ public:
   virtual ~LegacyFileReaderService();
 
   using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read(const std::string& path);
-  virtual std::vector<itk::SmartPointer<BaseData> > Read(std::istream& stream);
+  virtual std::vector<itk::SmartPointer<BaseData> > Read();
 
 private:
 

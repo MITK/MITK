@@ -72,8 +72,9 @@ FileReaderSelector::FileReaderSelector(const std::string& path)
       if (reader == NULL) continue;
       try
       {
+        reader->SetInput(path);
         std::cout << "*** Checking confidence level of " << typeid(*reader).name() << " ... ";
-        IFileReader::ConfidenceLevel confidenceLevel = reader->GetConfidenceLevel(path);
+        IFileReader::ConfidenceLevel confidenceLevel = reader->GetConfidenceLevel();
         std::cout << confidenceLevel << std::endl;
         if (confidenceLevel == IFileReader::Unsupported)
         {

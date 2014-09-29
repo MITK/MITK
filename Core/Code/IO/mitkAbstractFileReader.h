@@ -39,31 +39,42 @@ class CustomMimeType;
 
 /**
  * @brief Base class for creating mitk::BaseData objects from files or streams.
- * @ingroup Process
+ * @ingroup IO
  */
 class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
 {
 
 public:
 
+  virtual void SetInput(const std::string& location);
+
+  virtual void SetInput(const std::string &location, std::istream* is);
+
+  virtual std::string GetInputLocation() const;
+
+  virtual std::istream* GetInputStream() const;
+
   /**
-   * @brief Reads the given \c path and creates a list BaseData objects.
+   * @brief Reads a path or stream and creates a list of BaseData objects.
    *
-   * The default implementation opens a std::ifstream in binary mode for reading
-   * and passed the stream to Read(std::istream&).
+   * This method must be implemented for each specific reader. Call
+   * GetInputStream() first and check for a non-null stream to read from.
+   * If the input stream is \c NULL, use GetInputLocation() to read from a local
+   * file-system path.
    *
-   * @param path The absolute path to a file include the file name extension.
-   * @return
+   * If the reader cannot use streams directly, use GetLocalFileName() instead.
+   *
+   * @return The created BaseData objects.
+   * @throws mitk::Exception
+   *
+   * @see GetLocalFileName()
+   * @see IFileReader::Read()
    */
-  virtual std::vector<itk::SmartPointer<BaseData> > Read(const std::string& path);
+  virtual std::vector<itk::SmartPointer<BaseData> > Read() = 0;
 
-  virtual std::vector<itk::SmartPointer<BaseData> > Read(std::istream& stream) = 0;
+  virtual DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage& ds);
 
-  virtual DataStorage::SetOfObjects::Pointer Read(const std::string& path, mitk::DataStorage& ds);
-
-  virtual DataStorage::SetOfObjects::Pointer Read(std::istream& stream, mitk::DataStorage& ds);
-
-  virtual ConfidenceLevel GetConfidenceLevel(const std::string &path) const;
+  virtual ConfidenceLevel GetConfidenceLevel() const;
 
   virtual Options GetOptions() const;
   virtual us::Any GetOption(const std::string &name) const;
@@ -93,6 +104,23 @@ public:
   void UnregisterService();
 
 protected:
+
+  /**
+   * @brief An input stream wrapper.
+   *
+   * If a reader can only work with input streams, use an instance
+   * of this class to either wrap the specified input stream or
+   * create a new input stream based on the input location in the
+   * file system.
+   */
+  class InputStream : public std::istream
+  {
+  public:
+    InputStream(IFileReader* writer, std::ios_base::openmode mode = std::ios_base::in);
+    ~InputStream();
+  private:
+    std::istream* m_Stream;
+  };
 
   AbstractFileReader();
   ~AbstractFileReader();
@@ -167,6 +195,26 @@ protected:
    */
   void SetRanking(int ranking);
   int GetRanking() const;
+
+  /**
+   * @brief Get a local file name for reading.
+   *
+   * This is a convenience method for readers which cannot work natively
+   * with input streams. If no input stream has been been set,
+   * this method just returns the result of GetLocation(). However, if
+   * SetLocation(std::string, std::istream*) has been called with a non-null
+   * input stream, this method writes the contents of the stream to a temporary
+   * file and returns the name of the temporary file.
+   *
+   * The temporary file is deleted when either SetLocation(std::string, std::istream*)
+   * is called again with a different input stream or the destructor of this
+   * class is called.
+   *
+   * This method does not validate file names set via SetInput(std::string).
+   *
+   * @return A file path in the local file-system for reading.
+   */
+  std::string GetLocalFileName() const;
 
   virtual void SetDefaultDataNodeProperties(DataNode* node, const std::string& filePath);
 

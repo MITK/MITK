@@ -36,17 +36,14 @@ public:
   // -------------- AbstractFileReader -------------
 
   using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read(const std::string& path);
-  virtual std::vector<itk::SmartPointer<BaseData> > Read(std::istream& stream);
+  virtual std::vector<itk::SmartPointer<BaseData> > Read();
 
-  virtual ReaderConfidenceLevel GetReaderConfidenceLevel(const std::string& path) const;
+  virtual ReaderConfidenceLevel GetReaderConfidenceLevel() const;
 
   // -------------- AbstractFileWriter -------------
 
-  virtual void Write(const BaseData* data, const std::string& path);
-  virtual void Write(const BaseData* data, std::ostream& stream);
-
-  virtual WriterConfidenceLevel GetWriterConfidenceLevel(const BaseData *data) const;
+  virtual void Write();
+  virtual WriterConfidenceLevel GetWriterConfidenceLevel() const;
 
 private:
 

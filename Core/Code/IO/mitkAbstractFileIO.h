@@ -22,7 +22,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class MITK_CORE_EXPORT AbstractFileIO : public AbstractFileReader, public AbstractFileWriter
+class AbstractFileIOReader : public AbstractFileReader
+{
+public:
+
+  virtual ConfidenceLevel GetReaderConfidenceLevel() const
+  {
+    return AbstractFileReader::GetConfidenceLevel();
+  }
+
+  virtual ConfidenceLevel GetConfidenceLevel() const
+  {
+    return this->GetReaderConfidenceLevel();
+  }
+
+protected:
+
+  AbstractFileIOReader() {}
+
+  AbstractFileIOReader(const CustomMimeType& mimeType, const std::string& description)
+    : AbstractFileReader(mimeType, description) {}
+
+  AbstractFileIOReader(const std::string& extension, const std::string& description)
+    : AbstractFileReader(extension, description) {}
+};
+
+struct AbstractFileIOWriter : public AbstractFileWriter
+{
+  virtual ConfidenceLevel GetWriterConfidenceLevel() const
+  {
+    return AbstractFileWriter::GetConfidenceLevel();
+  }
+
+  virtual ConfidenceLevel GetConfidenceLevel() const
+  {
+    return this->GetWriterConfidenceLevel();
+  }
+
+protected:
+
+  AbstractFileIOWriter(const std::string& baseDataType) : AbstractFileWriter(baseDataType) {}
+
+  AbstractFileIOWriter(const std::string& baseDataType, const CustomMimeType& mimeType,
+                       const std::string& description)
+    : AbstractFileWriter(baseDataType, mimeType, description) {}
+
+  AbstractFileIOWriter(const std::string& baseDataType, const std::string& extension,
+                       const std::string& description)
+    : AbstractFileWriter(baseDataType, extension, description) {}
+};
+
+class MITK_CORE_EXPORT AbstractFileIO : public AbstractFileIOReader, public AbstractFileIOWriter
 {
 public:
 
@@ -76,9 +126,6 @@ protected:
   explicit AbstractFileIO(const std::string& baseDataType, const std::string& extension,
                           const std::string& description);
 
-  virtual ReaderConfidenceLevel GetReaderConfidenceLevel(const std::string& path) const;
-  virtual WriterConfidenceLevel GetWriterConfidenceLevel(const BaseData* data) const;
-
   void SetMimeType(const CustomMimeType& mimeType);
 
   /**
@@ -119,9 +166,6 @@ private:
   AbstractFileIO& operator=(const AbstractFileIO& other);
 
   virtual AbstractFileIO* Clone() const = 0;
-
-  virtual ReaderConfidenceLevel GetConfidenceLevel(const std::string& path) const;
-  virtual WriterConfidenceLevel GetConfidenceLevel(const BaseData *data) const;
 
 };
 

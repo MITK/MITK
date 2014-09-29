@@ -61,12 +61,7 @@ mitk::LegacyFileReaderService::~LegacyFileReaderService()
 
 ////////////////////// Reading /////////////////////////
 
-std::vector<itk::SmartPointer<mitk::BaseData> > mitk::LegacyFileReaderService::Read(std::istream& stream)
-{
-  return mitk::AbstractFileReader::Read(stream);
-}
-
-std::vector<itk::SmartPointer<mitk::BaseData> > mitk::LegacyFileReaderService::Read(const std::string& path)
+std::vector<itk::SmartPointer<mitk::BaseData> > mitk::LegacyFileReaderService::Read()
 {
   std::vector<BaseData::Pointer> result;
 
@@ -90,6 +85,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::LegacyFileReaderService::R
     }
   }
 
+  const std::string path = this->GetLocalFileName();
   for( std::list<IOAdapterBase::Pointer>::iterator k = possibleIOAdapter.begin();
                                                    k != possibleIOAdapter.end();
                                                    ++k )

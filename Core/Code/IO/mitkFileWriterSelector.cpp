@@ -76,7 +76,8 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
         try
         {
           std::cout << "*** Checking confidence level of " << typeid(*writer).name() << " ... ";
-          IFileWriter::ConfidenceLevel confidenceLevel = writer->GetConfidenceLevel(baseData);
+          writer->SetInput(baseData);
+          IFileWriter::ConfidenceLevel confidenceLevel = writer->GetConfidenceLevel();
           std::cout << confidenceLevel << std::endl;
           if (confidenceLevel == IFileWriter::Unsupported)
           {

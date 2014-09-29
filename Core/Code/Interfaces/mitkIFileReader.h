@@ -41,6 +41,7 @@ namespace mitk {
 
   /**
    * \brief The common interface for all MITK file readers.
+   * \ingroup IO
    *
    * Implementations of this interface must be registered as a service
    * to make themselve available via the service registry. If the
@@ -52,10 +53,12 @@ namespace mitk {
    * have a corresponding CustomMimeType service object, registered by the reader
    * or some other party.
    *
-   * It is recommended to derive new implementations from AbstractFileReader,
-   * which provides correct service registration semantics.
+   * It is recommended to derive new implementations from AbstractFileReader or
+   * from AbstractFileIO (if both reader and writer is implemented),
+   * which provide correct service registration semantics.
    *
    * \sa AbstractFileReader
+   * \sa AbstractFileIO
    * \sa CustomMimeType
    * \sa FileReaderRegistry
    * \sa IFileWriter
@@ -79,30 +82,36 @@ namespace mitk {
     typedef mitk::MessageAbstractDelegate1<float> ProgressCallback;
 
     /**
-     * \brief Reads the specified file and returns its contents.
+     * \brief Set the input file name.
+     * \param location The file name to read from.
      */
-    virtual std::vector<itk::SmartPointer<BaseData> > Read(const std::string& path) = 0;
+    virtual void SetInput(const std::string& location) = 0;
+
+    virtual void SetInput(const std::string &location, std::istream* is) = 0;
+
+    virtual std::string GetInputLocation() const = 0;
+
+    virtual std::istream* GetInputStream() const = 0;
 
     /**
-     * \brief Reads the specified input stream and returns its contents.
-     */
-    virtual std::vector<itk::SmartPointer<BaseData> > Read(std::istream& stream) = 0;
-
-    /**
-     * \brief Reads the specified file, loading its contents into the provided DataStorage.
+     * \brief Reads the specified file or input stream and returns its contents.
      *
-     * \param path The absolute file path include the file name extension.
-     * \param ds The DataStorage to which the data is added.
-     * \return The set of add DataNodes to \c ds.
+     * \return A list of created BaseData objects.
+     * \throws mitk::Exception
      */
-    virtual DataStorage::SetOfObjects::Pointer Read(const std::string& path, mitk::DataStorage& ds) = 0;
+    virtual std::vector<itk::SmartPointer<BaseData> > Read() = 0;
 
     /**
-     * \brief Reads the specified input stream and returns its contents.
+     * \brief Reads the specified file or input stream, loading its
+     * contents into the provided DataStorage.
+     *
+     * \param ds The DataStorage to which the data is added.
+     * \return The set of added DataNodes to \c ds.
+     * \throws mitk::Exception
      */
-    virtual DataStorage::SetOfObjects::Pointer Read(std::istream& stream, mitk::DataStorage& ds) = 0;
+    virtual DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage& ds) = 0;
 
-    virtual ConfidenceLevel GetConfidenceLevel(const std::string& path) const = 0;
+    virtual ConfidenceLevel GetConfidenceLevel() const = 0;
 
     /**
      * \brief returns a list of the supported Options

@@ -47,23 +47,40 @@ class CustomMimeType;
  * The default implementation only requires one Write()
  * method and the Clone() method to be implemented.
  *
- * @ingroup Process
+ * @ingroup IO
  */
 class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
 {
 public:
 
-  /**
-   * \brief Write the data in <code>data</code> to the the location specified in <code>path</code>
-   */
-  virtual void Write(const BaseData* data, const std::string& path);
+  virtual void SetInput(const BaseData* data);
+  virtual const BaseData* GetInput() const;
+
+  virtual void SetOutputLocation(const std::string& location);
+  virtual std::string GetOutputLocation() const;
+
+  virtual void SetOutputStream(const std::string& location, std::ostream* os);
+  virtual std::ostream* GetOutputStream() const;
 
   /**
-   * \brief Write the data in <code>data</code> to the the stream specified in <code>stream</code>
+   * \brief Write the base data to the specified location or output stream.
+   *
+   * This method must be implemented for each specific writer. Call
+   * GetOutputStream() first and check for a non-null stream to write to.
+   * If the output stream is \c NULL, use GetOutputLocation() to write
+   * to a local file-system path.
+   *
+   * If the reader cannot use streams directly, use GetLocalFile() to retrieve
+   * a temporary local file name instead.
+   *
+   * \throws mitk::Exception
+   *
+   * \see GetLocalFile()
+   * \see IFileWriter::Write()
    */
-  virtual void Write(const BaseData* data, std::ostream& stream ) = 0;
+  virtual void Write() = 0;
 
-  virtual ConfidenceLevel GetConfidenceLevel(const BaseData *data) const;
+  virtual ConfidenceLevel GetConfidenceLevel() const;
 
   virtual Options GetOptions() const;
   virtual us::Any GetOption(const std::string &name) const;
@@ -79,6 +96,53 @@ public:
   void UnregisterService();
 
 protected:
+
+  /**
+   * @brief A local file representation for streams.
+   *
+   * If a writer can only work with local files, use an instance
+   * of this class to get either a temporary file name for writing
+   * to the specified output stream or the original output location
+   * if no output stream was set.
+   */
+  class LocalFile
+  {
+  public:
+    LocalFile(IFileWriter* writer);
+
+    // Writes to the ostream and removes the temporary file
+    ~LocalFile();
+
+    // Creates a temporary file for output operations.
+    std::string GetFileName();
+
+  private:
+
+    // disabled
+    LocalFile();
+    LocalFile(const LocalFile&);
+    LocalFile& operator=(const LocalFile& other);
+
+    struct Impl;
+    std::auto_ptr<Impl> d;
+  };
+
+  /**
+   * @brief An output stream wrapper.
+   *
+   * If a writer can only work with output streams, use an instance
+   * of this class to either wrap the specified output stream or
+   * create a new output stream based on the output location in the
+   * file system.
+   */
+  class OutputStream : public std::ostream
+  {
+  public:
+    OutputStream(IFileWriter* writer, std::ios_base::openmode mode = std::ios_base::trunc | std::ios_base::out);
+    ~OutputStream();
+  private:
+    std::ostream* m_Stream;
+  };
 
   ~AbstractFileWriter();
 

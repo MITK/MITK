@@ -31,19 +31,46 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+AbstractFileReader::InputStream::InputStream(IFileReader* reader, std::ios_base::openmode mode)
+  : std::istream()
+  , m_Stream(NULL)
+{
+  std::istream* stream = reader->GetInputStream();
+  if (stream)
+  {
+    this->init(stream->rdbuf());
+  }
+  else
+  {
+    m_Stream = new std::ifstream(reader->GetInputLocation().c_str(), mode);
+    this->init(m_Stream->rdbuf());
+  }
+}
+
+AbstractFileReader::InputStream::~InputStream()
+{
+  delete m_Stream;
+}
+
 class AbstractFileReader::Impl : public FileReaderWriterBase
 {
 public:
 
   Impl()
     : FileReaderWriterBase()
+    , m_Stream(NULL)
     , m_PrototypeFactory(NULL)
   {}
 
   Impl(const Impl& other)
     : FileReaderWriterBase(other)
+    , m_Stream(NULL)
     , m_PrototypeFactory(NULL)
   {}
+
+  std::string m_Location;
+  std::string m_TmpFile;
+  std::istream* m_Stream;
 
   us::PrototypeServiceFactory* m_PrototypeFactory;
   us::ServiceRegistration<IFileReader> m_Reg;
@@ -61,6 +88,11 @@ AbstractFileReader::~AbstractFileReader()
   UnregisterService();
 
   delete d->m_PrototypeFactory;
+
+  if (!d->m_TmpFile.empty())
+  {
+    std::remove(d->m_TmpFile.c_str());
+  }
 }
 
 AbstractFileReader::AbstractFileReader(const AbstractFileReader& other)
@@ -86,77 +118,36 @@ AbstractFileReader::AbstractFileReader(const std::string& extension, const std::
 
 ////////////////////// Reading /////////////////////////
 
-std::vector<itk::SmartPointer<BaseData> > AbstractFileReader::Read(const std::string& path)
-{
-  if (!itksys::SystemTools::FileExists(path.c_str()))
-  {
-    mitkThrow() << "File '" + path + "' not found.";
-  }
-  std::ifstream stream;
-  stream.open(path.c_str(), std::ios_base::in | std::ios_base::binary);
-  try
-  {
-    return this->Read(stream);
-  }
-  catch (mitk::Exception& e)
-  {
-    mitkReThrow(e) << "Error reading file '" << path << "'";
-  }
-  catch (const std::exception& e)
-  {
-    mitkThrow() << "Error reading file '" << path << "': " << e.what();
-  }
-}
-
-std::vector<itk::SmartPointer<BaseData> > AbstractFileReader::Read(std::istream& stream)
-{
-  // Create a temporary file and copy the data to it
-  std::ofstream tmpOutputStream;
-  std::string tmpFilePath = IOUtil::CreateTemporaryFile(tmpOutputStream);
-  tmpOutputStream << stream.rdbuf();
-  tmpOutputStream.close();
-
-  // Now read from the temporary file
-  std::vector<itk::SmartPointer<BaseData> > result = this->Read(tmpFilePath);
-  std::remove(tmpFilePath.c_str());
-  return result;
-}
-
-DataStorage::SetOfObjects::Pointer AbstractFileReader::Read(const std::string& path, DataStorage& ds)
+DataStorage::SetOfObjects::Pointer AbstractFileReader::Read(DataStorage& ds)
 {
   DataStorage::SetOfObjects::Pointer result = DataStorage::SetOfObjects::New();
-  std::vector<BaseData::Pointer> data = this->Read(path);
+  std::vector<BaseData::Pointer> data = this->Read();
   for (std::vector<BaseData::Pointer>::iterator iter = data.begin();
        iter != data.end(); ++iter)
   {
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData(*iter);
-    this->SetDefaultDataNodeProperties(node, path);
+    this->SetDefaultDataNodeProperties(node, this->GetInputLocation());
     ds.Add(node);
     result->InsertElement(result->Size(), node);
   }
   return result;
 }
 
-DataStorage::SetOfObjects::Pointer AbstractFileReader::Read(std::istream& stream, DataStorage& ds)
+IFileReader::ConfidenceLevel AbstractFileReader::GetConfidenceLevel() const
 {
-  DataStorage::SetOfObjects::Pointer result = DataStorage::SetOfObjects::New();
-  std::vector<BaseData::Pointer> data = this->Read(stream);
-  for (std::vector<BaseData::Pointer>::iterator iter = data.begin();
-       iter != data.end(); ++iter)
+  if (d->m_Stream)
   {
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(*iter);
-    this->SetDefaultDataNodeProperties(node, std::string());
-    ds.Add(node);
-    result->InsertElement(result->Size(), node);
+    if (*d->m_Stream) return Supported;
   }
-  return result;
-}
-
-IFileReader::ConfidenceLevel AbstractFileReader::GetConfidenceLevel(const std::string& path) const
-{
-  return itksys::SystemTools::FileExists(path.c_str(), true) ? Supported : Unsupported;
+  else
+  {
+    if (itksys::SystemTools::FileExists(this->GetInputLocation().c_str(), true))
+    {
+      return Supported;
+    }
+  }
+  return Unsupported;
 }
 
 
@@ -250,6 +241,33 @@ int AbstractFileReader::GetRanking() const
   return d->GetRanking();
 }
 
+std::string AbstractFileReader::GetLocalFileName() const
+{
+  std::string localFileName;
+  if (d->m_Stream)
+  {
+    if (d->m_TmpFile.empty())
+    {
+      // write the stream contents to temporary file
+      std::string ext = itksys::SystemTools::GetFilenameExtension(this->GetInputLocation());
+      std::ofstream tmpStream;
+      localFileName = mitk::IOUtil::CreateTemporaryFile(tmpStream, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary,
+                                                        "XXXXXX" + ext);
+      tmpStream << d->m_Stream->rdbuf();
+      d->m_TmpFile = localFileName;
+    }
+    else
+    {
+      localFileName = d->m_TmpFile;
+    }
+  }
+  else
+  {
+    localFileName = d->m_Location;
+  }
+  return localFileName;
+}
+
 //////////////////////// Options ///////////////////////
 
 void AbstractFileReader::SetDefaultOptions(const IFileReader::Options& defaultOptions)
@@ -260,6 +278,33 @@ void AbstractFileReader::SetDefaultOptions(const IFileReader::Options& defaultOp
 IFileReader::Options AbstractFileReader::GetDefaultOptions() const
 {
   return d->GetDefaultOptions();
+}
+
+void AbstractFileReader::SetInput(const std::string& location)
+{
+  d->m_Location = location;
+  d->m_Stream = NULL;
+}
+
+void AbstractFileReader::SetInput(const std::string& location, std::istream* is)
+{
+  if (d->m_Stream != is && !d->m_TmpFile.empty())
+  {
+    std::remove(d->m_TmpFile.c_str());
+    d->m_TmpFile.clear();
+  }
+  d->m_Location = location;
+  d->m_Stream = is;
+}
+
+std::string AbstractFileReader::GetInputLocation() const
+{
+  return d->m_Location;
+}
+
+std::istream*AbstractFileReader::GetInputStream() const
+{
+  return d->m_Stream;
 }
 
 IFileReader::Options AbstractFileReader::GetOptions() const

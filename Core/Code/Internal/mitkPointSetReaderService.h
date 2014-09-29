@@ -45,8 +45,7 @@ public:
   virtual ~PointSetReaderService();
 
   using AbstractFileReader::Read;
-
-  virtual std::vector< itk::SmartPointer<BaseData> > Read(std::istream& stream);
+  virtual std::vector< itk::SmartPointer<BaseData> > Read();
 
 private:
 

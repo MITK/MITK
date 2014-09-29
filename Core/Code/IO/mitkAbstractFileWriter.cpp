@@ -32,28 +32,131 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+struct AbstractFileWriter::LocalFile::Impl
+{
+  Impl(const std::string& location, std::ostream* os)
+    : m_Location(location)
+    , m_Stream(os)
+  {}
+
+  std::string m_Location;
+  std::string m_TmpFileName;
+  std::ostream* m_Stream;
+};
+
+AbstractFileWriter::LocalFile::LocalFile(IFileWriter *writer)
+  : d(new Impl(writer->GetOutputLocation(), writer->GetOutputStream()))
+{
+}
+
+AbstractFileWriter::LocalFile::~LocalFile()
+{
+  if (d->m_Stream && !d->m_TmpFileName.empty())
+  {
+    std::ifstream ifs(d->m_TmpFileName.c_str(), std::ios_base::binary);
+    *d->m_Stream << ifs.rdbuf();
+    d->m_Stream->flush();
+    ifs.close();
+    std::remove(d->m_TmpFileName.c_str());
+  }
+}
+
+std::string AbstractFileWriter::LocalFile::GetFileName()
+{
+  if (d->m_Stream == NULL)
+  {
+    return d->m_Location;
+  }
+  else if (d->m_TmpFileName.empty())
+  {
+    std::string ext = itksys::SystemTools::GetFilenameExtension(d->m_Location);
+    d->m_TmpFileName = IOUtil::CreateTemporaryFile("XXXXXX" + ext);
+  }
+  return d->m_TmpFileName;
+}
+
+AbstractFileWriter::OutputStream::OutputStream(IFileWriter* writer, std::ios_base::openmode mode)
+  : std::ostream()
+  , m_Stream(NULL)
+{
+  std::ostream* stream = writer->GetOutputStream();
+  if (stream)
+  {
+    this->init(stream->rdbuf());
+  }
+  else
+  {
+    m_Stream = new std::ofstream(writer->GetOutputLocation().c_str(), mode);
+    this->init(m_Stream->rdbuf());
+  }
+}
+
+AbstractFileWriter::OutputStream::~OutputStream()
+{
+  delete m_Stream;
+}
+
+
 class AbstractFileWriter::Impl : public FileReaderWriterBase
 {
 public:
 
   Impl()
     : FileReaderWriterBase()
+    , m_BaseData(NULL)
+    , m_Stream(NULL)
     , m_PrototypeFactory(NULL)
   {}
 
   Impl(const Impl& other)
     : FileReaderWriterBase(other)
     , m_BaseDataType(other.m_BaseDataType)
+    , m_BaseData(NULL)
+    , m_Stream(NULL)
     , m_PrototypeFactory(NULL)
   {}
 
   std::string m_BaseDataType;
+  const BaseData* m_BaseData;
+  std::string m_Location;
+  std::ostream* m_Stream;
 
   us::PrototypeServiceFactory* m_PrototypeFactory;
   us::ServiceRegistration<IFileWriter> m_Reg;
 
 };
 
+void AbstractFileWriter::SetInput(const BaseData* data)
+{
+  d->m_BaseData = data;
+}
+
+const BaseData* AbstractFileWriter::GetInput() const
+{
+  return d->m_BaseData;
+}
+
+void AbstractFileWriter::SetOutputLocation(const std::string& location)
+{
+  d->m_Location = location;
+  d->m_Stream = NULL;
+}
+
+std::string AbstractFileWriter::GetOutputLocation() const
+{
+  return d->m_Location;
+}
+
+void AbstractFileWriter::SetOutputStream(const std::string& location, std::ostream* os)
+{
+  d->m_Location = location;
+  d->m_Stream = os;
+}
+
+std::ostream* AbstractFileWriter::GetOutputStream() const
+{
+  return d->m_Stream;
+}
 
 AbstractFileWriter::~AbstractFileWriter()
 {
@@ -95,48 +198,15 @@ AbstractFileWriter::AbstractFileWriter(const std::string& baseDataType, const st
 
 ////////////////////// Writing /////////////////////////
 
-void AbstractFileWriter::Write(const BaseData* data, const std::string& path)
+IFileWriter::ConfidenceLevel AbstractFileWriter::GetConfidenceLevel() const
 {
-  std::ofstream stream;
-  stream.open(path.c_str());
-  try
-  {
-    this->Write(data, stream);
-  }
-  catch(mitk::Exception& e)
-  {
-    mitkReThrow(e) << "Error writing file '" << path << "'";
-  }
-  catch(const std::exception& e)
-  {
-    mitkThrow() << "Error writing file '" << path << "': " << e.what();
-  }
-}
+  if (d->m_BaseData == NULL) return Unsupported;
 
-IFileWriter::ConfidenceLevel AbstractFileWriter::GetConfidenceLevel(const BaseData* data) const
-{
-  if (data == NULL) return Unsupported;
-
-  if (data->GetNameOfClass() == d->m_BaseDataType)
+  if (d->m_BaseData->GetNameOfClass() == d->m_BaseDataType)
   {
     return Supported;
   }
   return Unsupported;
-}
-
-void AbstractFileWriter::Write(const BaseData* data, std::ostream& stream)
-{
-  // Create a temporary file and write the data to it
-  std::ofstream tmpOutputStream;
-  std::string tmpFilePath = IOUtil::CreateTemporaryFile(tmpOutputStream);
-  this->Write(data, tmpFilePath);
-  tmpOutputStream.close();
-
-  // Now copy the contents
-  std::ifstream tmpInputStream(tmpFilePath.c_str(), std::ios_base::binary);
-  stream << tmpInputStream.rdbuf();
-  tmpInputStream.close();
-  std::remove(tmpFilePath.c_str());
 }
 
 //////////// µS Registration & Properties //////////////

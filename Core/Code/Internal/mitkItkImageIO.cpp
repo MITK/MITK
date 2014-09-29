@@ -144,12 +144,7 @@ ItkImageIO::ItkImageIO(itk::ImageIOBase::Pointer imageIO)
   this->RegisterService();
 }
 
-std::vector<BaseData::Pointer> ItkImageIO::Read(std::istream& stream)
-{
-  return mitk::AbstractFileReader::Read(stream);
-}
-
-std::vector<BaseData::Pointer> ItkImageIO::Read(const std::string& path)
+std::vector<BaseData::Pointer> ItkImageIO::Read()
 {
   std::vector<BaseData::Pointer> result;
 
@@ -173,6 +168,8 @@ std::vector<BaseData::Pointer> ItkImageIO::Read(const std::string& path)
   const unsigned int MINDIM = 2;
   const unsigned int MAXDIM = 4;
 
+  const std::string path = this->GetLocalFileName();
+
   MITK_INFO << "loading " << path << " via itk::ImageIOFactory... " << std::endl;
 
   // Check to see if we can read the file given the name or prefix
@@ -183,7 +180,7 @@ std::vector<BaseData::Pointer> ItkImageIO::Read(const std::string& path)
 
   // Got to allocate space for the image. Determine the characteristics of
   // the image.
-  m_ImageIO->SetFileName( path.c_str() );
+  m_ImageIO->SetFileName( path );
   m_ImageIO->ReadImageInformation();
 
   unsigned int ndim = m_ImageIO->GetNumberOfDimensions();
@@ -297,14 +294,14 @@ std::vector<BaseData::Pointer> ItkImageIO::Read(const std::string& path)
   return result;
 }
 
-AbstractFileIO::ReaderConfidenceLevel ItkImageIO::GetReaderConfidenceLevel(const std::string& path) const
+AbstractFileIO::ReaderConfidenceLevel ItkImageIO::GetReaderConfidenceLevel() const
 {
-  return m_ImageIO->CanReadFile(path.c_str()) ? IFileReader::Supported : IFileReader::Unsupported;
+  return m_ImageIO->CanReadFile(GetLocalFileName().c_str()) ? IFileReader::Supported : IFileReader::Unsupported;
 }
 
-void ItkImageIO::Write(const BaseData* data, const std::string& path)
+void ItkImageIO::Write()
 {
-  const mitk::Image* image = dynamic_cast<const mitk::Image*>(data);
+  const mitk::Image* image = dynamic_cast<const mitk::Image*>(this->GetInput());
 
   if (image == NULL)
   {
@@ -367,6 +364,9 @@ void ItkImageIO::Write(const BaseData* data, const std::string& path)
     geometry->SetSpacing(spacing);
     geometry->SetOrigin(origin);
   }
+
+  LocalFile localFile(this);
+  const std::string path = localFile.GetFileName();
 
   MITK_INFO << "Writing image: " << path << std::endl;
 
@@ -455,15 +455,10 @@ void ItkImageIO::Write(const BaseData* data, const std::string& path)
   }
 }
 
-void ItkImageIO::Write(const BaseData* data, std::ostream& stream)
-{
-  AbstractFileWriter::Write(data, stream);
-}
-
-AbstractFileIO::WriterConfidenceLevel ItkImageIO::GetWriterConfidenceLevel(const BaseData* data) const
+AbstractFileIO::WriterConfidenceLevel ItkImageIO::GetWriterConfidenceLevel() const
 {
   // Check if the image dimension is supported
-  const Image* image = dynamic_cast<const Image*>(data);
+  const Image* image = dynamic_cast<const Image*>(this->GetInput());
   if (image == NULL || !m_ImageIO->SupportsDimension(image->GetDimension()))
   {
     return IFileWriter::Unsupported;

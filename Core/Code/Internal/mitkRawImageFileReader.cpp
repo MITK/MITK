@@ -69,9 +69,11 @@ mitk::RawImageFileReader::RawImageFileReader(const mitk::RawImageFileReader& oth
 {
 }
 
-std::vector<itk::SmartPointer<mitk::BaseData> > mitk::RawImageFileReader::Read(const std::string& path)
+std::vector<itk::SmartPointer<mitk::BaseData> > mitk::RawImageFileReader::Read()
 {
   std::vector<mitk::BaseData::Pointer> result;
+
+  const std::string path = this->GetLocalFileName();
 
   const Options options = this->GetOptions();
 
@@ -171,11 +173,6 @@ mitk::BaseData::Pointer mitk::RawImageFileReader::TypedRead(const std::string& p
   mitk::CastToMitkImage(reader->GetOutput(), image);
   image->SetVolume(  reader->GetOutput()->GetBufferPointer());
   return image.GetPointer();
-}
-
-std::vector<itk::SmartPointer<mitk::BaseData> > mitk::RawImageFileReader::Read(std::istream& stream)
-{
-  return AbstractFileReader::Read(stream);
 }
 
 mitk::RawImageFileReader*mitk::RawImageFileReader::Clone() const

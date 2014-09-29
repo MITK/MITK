@@ -34,11 +34,13 @@ mitk::PointSetReaderService::PointSetReaderService()
 mitk::PointSetReaderService::~PointSetReaderService()
 {}
 
-std::vector< itk::SmartPointer<mitk::BaseData> > mitk::PointSetReaderService::Read(std::istream& stream)
+std::vector< itk::SmartPointer<mitk::BaseData> > mitk::PointSetReaderService::Read()
 {
   std::locale::global(std::locale("C"));
 
   std::vector< itk::SmartPointer<mitk::BaseData> > result;
+
+  InputStream stream(this);
 
   TiXmlDocument doc;
   stream >> doc;

@@ -56,8 +56,10 @@ mitk::PointSetWriterService::PointSetWriterService(const mitk::PointSetWriterSer
 mitk::PointSetWriterService::~PointSetWriterService()
 {}
 
-void mitk::PointSetWriterService::Write( const BaseData* baseData, std::ostream& out )
+void mitk::PointSetWriterService::Write()
 {
+  OutputStream out(this);
+
   if ( !out.good() )
   {
     mitkThrow() << "Stream not good.";
@@ -76,7 +78,7 @@ void mitk::PointSetWriterService::Write( const BaseData* baseData, std::ostream&
   out << VERSION_STRING;
   WriteEndElement( XML_FILE_VERSION, out, false );
 
-  WriteXML( static_cast<const PointSet*>(baseData), out );
+  WriteXML( static_cast<const PointSet*>(this->GetInput()), out );
 
   WriteEndElement( XML_POINT_SET_FILE, out );
 

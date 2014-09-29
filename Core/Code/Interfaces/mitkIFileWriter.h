@@ -48,10 +48,12 @@ namespace mitk {
    * The specified mime-type should have a corresponding CustomMimeType service
    * object, registered by the reader or some other party.
    *
-   * It is recommended to derive new implementations from AbstractFileWriter,
-   * which provides correct service registration semantics.
+   * It is recommended to derive new implementations from AbstractFileWriter or
+   * AbstractFileIO (if both reader and writer is implemented),
+   * which provide correct service registration semantics.
    *
    * \sa AbstractFileWriter
+   * \sa AbstractFileIO
    * \sa CustomMimeType
    * \sa FileWriterRegistry
    * \sa IFileReader
@@ -73,11 +75,18 @@ namespace mitk {
 
     typedef mitk::MessageAbstractDelegate1<float> ProgressCallback;
 
-    virtual void Write(const BaseData* data, const std::string& path ) = 0;
+    virtual void SetInput(const BaseData* data) = 0;
+    virtual const BaseData* GetInput() const = 0;
 
-    virtual void Write(const BaseData* data, std::ostream& stream ) = 0;
+    virtual void SetOutputLocation(const std::string& location) = 0;
+    virtual std::string GetOutputLocation() const = 0;
 
-    virtual ConfidenceLevel GetConfidenceLevel(const BaseData* data) const = 0;
+    virtual void SetOutputStream(const std::string& location, std::ostream* os) = 0;
+    virtual std::ostream* GetOutputStream() const = 0;
+
+    virtual void Write() = 0;
+
+    virtual ConfidenceLevel GetConfidenceLevel() const = 0;
 
     /**
      * \brief returns a list of the supported Options

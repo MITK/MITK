@@ -50,39 +50,29 @@ AbstractFileIO::RegisterService(us::ModuleContext* context)
 }
 
 AbstractFileIO::AbstractFileIO(const AbstractFileIO& other)
-  : AbstractFileReader(other)
-  , AbstractFileWriter(other)
+  : AbstractFileIOReader(other)
+  , AbstractFileIOWriter(other)
 {
 }
 
 AbstractFileIO::AbstractFileIO(const std::string& baseDataType)
-  : AbstractFileReader()
-  , AbstractFileWriter(baseDataType)
+  : AbstractFileIOReader()
+  , AbstractFileIOWriter(baseDataType)
 {
 }
 
 AbstractFileIO::AbstractFileIO(const std::string& baseDataType,
                                const CustomMimeType& mimeType,
                                const std::string& description)
-  : AbstractFileReader(mimeType, description)
-  , AbstractFileWriter(baseDataType, mimeType, description)
+  : AbstractFileIOReader(mimeType, description)
+  , AbstractFileIOWriter(baseDataType, mimeType, description)
 {
 }
 
 AbstractFileIO::AbstractFileIO(const std::string& baseDataType, const std::string& extension, const std::string& description)
-  : AbstractFileReader(extension, description)
-  , AbstractFileWriter(baseDataType, extension, description)
+  : AbstractFileIOReader(extension, description)
+  , AbstractFileIOWriter(baseDataType, extension, description)
 {
-}
-
-AbstractFileIO::ReaderConfidenceLevel AbstractFileIO::GetReaderConfidenceLevel(const std::string& /*path*/) const
-{
-  return IFileReader::Supported;
-}
-
-AbstractFileIO::WriterConfidenceLevel AbstractFileIO::GetWriterConfidenceLevel(const BaseData* /*data*/) const
-{
-  return IFileWriter::Supported;
 }
 
 void AbstractFileIO::SetMimeType(const CustomMimeType& mimeType)
@@ -159,20 +149,6 @@ void AbstractFileIO::SetWriterRanking(int ranking)
 int AbstractFileIO::GetWriterRanking() const
 {
   return this->AbstractFileWriter::GetRanking();
-}
-
-AbstractFileIO::ReaderConfidenceLevel AbstractFileIO::GetConfidenceLevel(const std::string& path) const
-{
-  ReaderConfidenceLevel level = AbstractFileReader::GetConfidenceLevel(path);
-  if (level == IFileReader::Unsupported) return level;
-  return this->GetReaderConfidenceLevel(path);
-}
-
-AbstractFileIO::WriterConfidenceLevel AbstractFileIO::GetConfidenceLevel(const BaseData* data) const
-{
-  WriterConfidenceLevel level = AbstractFileWriter::GetConfidenceLevel(data);
-  if (level == IFileWriter::Unsupported) return level;
-  return this->GetWriterConfidenceLevel(data);
 }
 
 }

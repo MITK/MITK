@@ -40,7 +40,7 @@ public:
   virtual ~PointSetWriterService();
 
   using AbstractFileWriter::Write;
-  virtual void Write(const BaseData* data, std::ostream& stream );
+  virtual void Write();
 
 private:
 

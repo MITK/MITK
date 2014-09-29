@@ -128,9 +128,6 @@ protected:
 
   virtual ~SurfaceGLMapper2D();
 
-  vtkPlane*  m_Plane;
-  vtkCutter* m_Cutter;
-
   Surface::ConstPointer m_Surface;
 
   vtkLookupTable* m_LUT;

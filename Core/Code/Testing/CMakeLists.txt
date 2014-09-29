@@ -199,6 +199,12 @@ mitkAddCustomModuleTest(mitkSurfaceGLMapper2DOpacityTest_BallOpacity mitkSurface
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/ballOpacity640x480REF.png #corresponding reference screenshot
 )
 
+mitkAddCustomModuleTest(mitkSurfaceGLMapper2DCutterTest_RedBall mitkSurfaceGLMapper2DCutterTest
+                        ${MITK_DATA_DIR}/ball.stl
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/ballColorRed640x480REF.png #corresponding reference screenshot
+)
+
+
 ############################## DISABLED TESTS
 
 #Removed due to high rendering error.

@@ -35,6 +35,7 @@ class IPropertyAliases;
 class IPropertyDescriptions;
 class IPropertyExtensions;
 class IPropertyFilters;
+class ISurfaceCutterFactory;
 
 /**
  * @brief Access MITK core services.
@@ -92,6 +93,13 @@ public:
    * @return A non-NULL IPropertyFilters instance.
    */
   static IPropertyFilters* GetPropertyFilters(us::ModuleContext* context = us::GetModuleContext());
+
+  /**
+  * @brief Get an IPropertyDescriptions instance.
+  * @param context The module context of the module getting the service.
+  * @return A non-NULL IPropertyDescriptions instance.
+  */
+  static ISurfaceCutterFactory* GetSurfaceCutterFactory(us::ModuleContext* context = us::GetModuleContext());
 
   /**
    * @brief Unget a previously acquired service instance.

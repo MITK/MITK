@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <mitkGL.h>
-
+ 
 #include "mitkSurfaceGLMapper2D.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
@@ -43,9 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::SurfaceGLMapper2D::SurfaceGLMapper2D()
-: m_Plane( vtkPlane::New() ),
-  m_Cutter( vtkCutter::New() ),
-  m_LUT( vtkLookupTable::New() ),
+: m_LUT( vtkLookupTable::New() ),
   m_PointLocator( vtkPKdTree::New() ),
   m_Stripper( vtkStripper::New() ),
   m_DrawNormals(false),
@@ -70,9 +68,6 @@ mitk::SurfaceGLMapper2D::SurfaceGLMapper2D()
   m_LineColor[2] = 0.0;
   m_LineColor[3] = 1.0;
 
-  m_Cutter->SetCutFunction(m_Plane);
-  m_Cutter->GenerateValues(1,0,1);
-
   m_LUT->SetTableRange(0,255);
   m_LUT->SetNumberOfColors(255);
   m_LUT->SetRampToLinear();
@@ -81,8 +76,6 @@ mitk::SurfaceGLMapper2D::SurfaceGLMapper2D()
 
 mitk::SurfaceGLMapper2D::~SurfaceGLMapper2D()
 {
-  m_Plane->Delete();
-  m_Cutter->Delete();
   m_LUT->Delete();
   m_PointLocator->Delete();
   m_Stripper->Delete();
@@ -170,7 +163,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) )
     return;
 
-  m_LineWidth = 1;
+    m_LineWidth = 1;
   GetDataNode()->GetIntProperty("line width", m_LineWidth, renderer);
 
   //
@@ -202,8 +195,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
   if(vtkpolydata!=NULL)
   {
-    Point3D point;
-    Vector3D normal;
+    Point3D points[4];
 
     //Check if Lookup-Table is already given, else use standard one.
     double* scalarLimits = m_LUT->GetTableRange();
@@ -239,9 +231,10 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     if (worldGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry
-      point=worldGeometry->GetOrigin();
-      normal=worldGeometry->GetNormal(); normal.Normalize();
-      m_Plane->SetTransform((vtkAbstractTransform*)NULL);
+      points[0] = worldGeometry->GetOrigin();
+      points[1] = points[0] + worldGeometry->GetAxisVector(0);
+      points[2] = points[0] + worldGeometry->GetAxisVector(1);
+      points[3] = points[1] + worldGeometry->GetAxisVector(1);
     }
     else
     {
@@ -259,47 +252,38 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           //@FIXME: does not work correctly. Does m_Plane->SetTransform really transforms a "flat plane" into a "curved plane"?
           return;
           // set up vtkPlane according to worldGeometry
-          point=const_cast<BoundingBox*>(worldAbstractGeometry->GetParametricBoundingBox())->GetMinimum();
-          FillVector3D(normal, 0, 0, 1);
-          m_Plane->SetTransform(worldAbstractGeometry->GetVtkAbstractTransform()->GetInverse());
+          // point=const_cast<BoundingBox*>(worldAbstractGeometry->GetParametricBoundingBox())->GetMinimum();
+          // FillVector3D(normal, 0, 0, 1);
         }
       }
       else
         return;
     }
 
-    double vp[3], vnormal[3];
-
-    vnl2vtk(point.GetVnlVector(), vp);
-    vnl2vtk(normal.GetVnlVector(), vnormal);
-
     //normally, we would need to transform the surface and cut the transformed surface with the cutter.
     //This might be quite slow. Thus, the idea is, to perform an inverse transform of the plane instead.
     //@todo It probably does not work for scaling operations yet:scaling operations have to be
     //dealed with after the cut is performed by scaling the contour.
     vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
-    inversetransform->TransformPoint(vp, vp);
-    inversetransform->TransformNormalAtPoint(vp, vnormal, vnormal);
+    for (int i = 0; i < 4; ++i) {
+        double vp[3];
+        itk2vtk(points[i], vp);
+        inversetransform->TransformPoint(vp, vp);
+        vtk2itk(vp, points[i]);
+    }
 
-    m_Plane->SetOrigin(vp);
-    m_Plane->SetNormal(vnormal);
-
-    //set data into cutter
-    m_Cutter->SetInputData(vtkpolydata);
-    m_Cutter->Update();
-    //    m_Cutter->GenerateCutScalarsOff();
-    //    m_Cutter->SetSortByToSortByCell();
+    vtkSmartPointer<vtkPolyData> cutResult = input->CutWithPlane(points, timestep);
 
     if (m_DrawNormals)
     {
-      m_Stripper->SetInputData( m_Cutter->GetOutput() );
+        m_Stripper->SetInputData(cutResult);
       // calculate the cut
       m_Stripper->Update();
       PaintCells(renderer, m_Stripper->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
     }
     else
     {
-      PaintCells(renderer, m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
+        PaintCells(renderer, cutResult, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
     }
   }
 }

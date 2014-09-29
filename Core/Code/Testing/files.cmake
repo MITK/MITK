@@ -191,12 +191,6 @@ set(MODULE_RESOURCE_FILES
   Interactions/StatemachineConfigTest.xml
 )
 
-# Create an artificial module initializing class for
-# the usServiceListenerTest.cpp
-usFunctionGenerateExecutableInit(testdriver_init_file
-                                 IDENTIFIER ${MODULE_NAME}TestDriver
-                                )
-
 # Embed the resources
 set(testdriver_resources )
 usFunctionEmbedResources(testdriver_resources

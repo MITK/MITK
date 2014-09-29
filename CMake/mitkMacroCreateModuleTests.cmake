@@ -7,7 +7,7 @@
 #
 macro(MITK_CREATE_MODULE_TESTS)
   MACRO_PARSE_ARGUMENTS(MODULE_TEST
-                        "EXTRA_DRIVER_INIT;EXTRA_DRIVER_INCLUDE;EXTRA_DEPENDS" "" ${ARGN})
+                        "EXTRA_DRIVER_INIT;EXTRA_DRIVER_INCLUDE;EXTRA_DEPENDS" "US_MODULE" ${ARGN})
 
   if(BUILD_TESTING AND MODULE_IS_ENABLED)
     set(OLD_MOC_H_FILES ${MOC_H_FILES})
@@ -52,6 +52,16 @@ ${MODULE_TEST_EXTRA_DRIVER_INIT};"
       ${MODULE_TESTS} ${MODULE_IMAGE_TESTS} ${MODULE_SURFACE_TESTS} ${MODULE_CUSTOM_TESTS}
       EXTRA_INCLUDE ${_extra_include_file}
     )
+
+    if(MODULE_TEST_US_MODULE)
+      set(testdriver_init_file )
+      find_package(CppMicroServices QUIET NO_MODULE REQUIRED)
+      # Create CppMicroServices initialization code
+      usFunctionGenerateExecutableInit(testdriver_init_file
+                                       IDENTIFIER ${TESTDRIVER}
+                                      )
+      list(APPEND TEST_CPP_FILES ${testdriver_init_file})
+    endif()
 
     add_executable(${TESTDRIVER} ${MODULETEST_SOURCE} ${MODULE_TEST_GENERATED_MOC_CPP} ${TEST_CPP_FILES})
     mitk_use_modules(TARGET ${TESTDRIVER}

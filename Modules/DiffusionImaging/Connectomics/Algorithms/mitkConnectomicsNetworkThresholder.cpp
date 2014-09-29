@@ -135,6 +135,8 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
   {
  //   result = Threshold( result, loop );
     std::vector< EdgeDescriptorType > candidateVector;
+    minWeight = result->GetMaximumWeight();
+    count = 0;
 
     // determine minimum weight and number of edges having that weight
     NetworkType* boostGraph = result->GetBoostGraph();

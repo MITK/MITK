@@ -33,7 +33,7 @@ bool testGetAxisVectorVariants(mitk::Geometry3D* geometry)
   int direction;
   for(direction=0; direction<3; ++direction)
   {
-    mitk::Vector3D frontToBack;
+    mitk::Vector3D frontToBack(0.);
     switch(direction)
     {
     case 0: frontToBack = geometry->GetCornerPoint(false, false, false)-geometry->GetCornerPoint(true , false, false); break; //7-3

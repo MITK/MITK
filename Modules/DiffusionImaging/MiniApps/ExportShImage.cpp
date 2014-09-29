@@ -36,10 +36,16 @@ template<int shOrder>
 int StartShConversion(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
+
+    parser.setTitle("Export SH Image");
+    parser.setCategory("Preprocessing Tools");
+    parser.setDescription("");
+    parser.setContributor("MBI");
+
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "MITK SH image", us::Any(), false);
-    parser.addArgument("output", "o", ctkCommandLineParser::String, "MRtrix SH image", us::Any(), false);
-    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "spherical harmonics order");
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "MITK SH image", us::Any(), false);
+    parser.addArgument("output", "o", ctkCommandLineParser::InputFile, "Output", "MRtrix SH image", us::Any(), false);
+    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "SH order:", "spherical harmonics order");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -99,9 +105,14 @@ int ExportShImage(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "MITK SH image", us::Any(), false);
-    parser.addArgument("output", "o", ctkCommandLineParser::String, "MRtrix SH image", us::Any(), false);
-    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "spherical harmonics order");
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input image", "MITK SH image", us::Any(), false);
+    parser.addArgument("output", "o", ctkCommandLineParser::OutputFile, "Output image", "MRtrix SH image", us::Any(), false);
+    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order");
+
+    parser.setCategory("Preprocessing Tools");
+    parser.setTitle("Export SH Image");
+    parser.setDescription("");
+    parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

@@ -39,7 +39,6 @@ mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
   this->InitializeDefaultPlanarFigureProperties();
 }
 
-
 mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
 {
   if ( m_NodeModifiedObserverAdded && GetDataNode() != NULL )
@@ -47,7 +46,6 @@ mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
     GetDataNode()->RemoveObserver( m_NodeModifiedObserverTag );
   }
 }
-
 
 void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
@@ -193,18 +191,22 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
       rightMostPoint = displayPoint;
   }
 
+  // If the planarfigure is closed, we add the first control point again.
+  // Thus we can always use 'GL_LINE_STRIP' and get rid of strange flickering
+  // effect when using the MESA OpenGL library.
+  if ( closed )
+  {
+    mitk::Point2D displayPoint;
+    this->TransformObjectToDisplay( vertices.begin()->Point, displayPoint,
+      planarFigurePlaneGeometry, rendererPlaneGeometry, displayGeometry );
+
+    pointlist.push_back( displayPoint );
+  }
+
   // now paint all the points in one run
   std::vector<mitk::Point2D>::iterator pointIter;
 
-  if ( closed )
-  {
-    glBegin( GL_LINE_LOOP );
-  }
-  else
-  {
-    glBegin( GL_LINE_STRIP );
-  }
-
+  glBegin( GL_LINE_STRIP );
   for ( pointIter = pointlist.begin(); pointIter!=pointlist.end(); pointIter++ )
   {
     glVertex3f( (*pointIter)[0], (*pointIter)[1], PLANAR_OFFSET );

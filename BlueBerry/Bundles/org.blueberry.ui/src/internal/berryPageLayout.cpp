@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-
 PageLayout::PageLayout()
  : editorVisible(true)
 {
@@ -91,7 +90,6 @@ void PageLayout::AddPart(LayoutPart::Pointer newPart,
     const std::string& partId, int relationship, float ratio,
     const std::string& refId)
 {
-
   this->SetRefPart(partId, newPart);
 
   // If the referenced part is inside a folder,
@@ -177,7 +175,7 @@ void PageLayout::AddShowInPart(const std::string& id)
 
 void PageLayout::AddShowViewShortcut(const std::string& id)
 {
-  if (std::find(showViewShortcuts.begin(), showViewShortcuts.end(), id) == showInPartIds.end())
+  if (std::find(showViewShortcuts.begin(), showViewShortcuts.end(), id) == showViewShortcuts.end())
   {
     showViewShortcuts.push_back(id);
   }
@@ -199,6 +197,7 @@ void PageLayout::AddView(const std::string& viewId, int relationship,
     float ratio, const std::string& refId, bool /*minimized*/, bool standalone,
     bool showTitle)
 {
+  this->AddShowViewShortcut(viewId);
   if (this->CheckPartInLayout(viewId))
   {
     return;
@@ -580,7 +579,6 @@ void PageLayout::AddStandaloneView(const std::string& viewId, bool showTitle,
 void PageLayout::AddStandaloneViewPlaceholder(const std::string& viewId,
     int relationship, float ratio, const std::string& refId, bool showTitle)
 {
-
   std::string stackId = viewId + ".standalonefolder"; //$NON-NLS-1$
 
   // Check to see if the view is already in the layout
@@ -669,5 +667,4 @@ IPlaceholderFolderLayout::Pointer PageLayout::GetFolderForView(
   }
   return layout;
 }
-
 }

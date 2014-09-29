@@ -161,10 +161,15 @@ set(CPP_FILES
   DataManagement/mitkImageCastPart4.cpp
   DataManagement/mitkImageDataItem.cpp
   DataManagement/mitkImageDescriptor.cpp
-  DataManagement/mitkImageVtkAccessor.cpp
+  DataManagement/mitkImageReadAccessor.cpp
   DataManagement/mitkImageStatisticsHolder.cpp
+  DataManagement/mitkImageVtkAccessor.cpp
+  DataManagement/mitkImageVtkReadAccessor.cpp
+  DataManagement/mitkImageVtkWriteAccessor.cpp
+  DataManagement/mitkImageWriteAccessor.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjector.cpp
+  DataManagement/mitkLine.cpp
   DataManagement/mitkLevelWindow.cpp
   DataManagement/mitkLevelWindowManager.cpp
   DataManagement/mitkLevelWindowPreset.cpp
@@ -369,12 +374,6 @@ set(CPP_FILES
   Rendering/mitkVtkOverlay3D.cpp
   Rendering/mitkOverlayManager.cpp
   Rendering/mitkAbstractOverlayLayouter.cpp
-
-  Rendering/mitkTextOverlay2D.cpp
-  Rendering/mitkTextOverlay3D.cpp
-  Rendering/mitkLabelOverlay3D.cpp
-  Rendering/mitkOverlay2DLayouter.cpp
-  Rendering/mitkScaleLegendOverlay
 
   Common/mitkException.cpp
   Common/mitkCommon.h

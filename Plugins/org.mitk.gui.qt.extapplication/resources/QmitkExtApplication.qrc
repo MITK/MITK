@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/org.mitk.gui.qt.extapplication">
         <file>icon.png</file>
+        <file>perspectives/eye.png</file>
     </qresource>
 </RCC>

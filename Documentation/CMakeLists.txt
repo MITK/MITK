@@ -120,6 +120,26 @@ if(NOT DEFINED MITK_DOXYGEN_DOT_NUM_THREADS)
   set(MITK_DOXYGEN_DOT_NUM_THREADS 0)
 endif()
 
+# parse which plug-in documentation to activate
+set(USERS_GUIDE_INPUT "${MITK_SOURCE_DIR}/Documentation/Doxygen/UserManual/")
+if(MITK_USE_BLUEBERRY)
+  if(MITK_BUILD_ALL_PLUGINS)
+    set(USERS_GUIDE_INPUT "${USERS_GUIDE_INPUT} \\
+        ${MITK_SOURCE_DIR}/Plugins/")
+  else()
+    foreach(mitk_plugin ${${CMAKE_PROJECT_NAME}_PLUGIN_LIBRARIES})
+      # we want each line to end in " \" and each directory be on a separate line
+      set(USERS_GUIDE_INPUT "${USERS_GUIDE_INPUT} \\
+          ${${mitk_plugin}_SOURCE_DIR}/")
+    endforeach()
+  endif()
+
+  if(MITK_BUILD_EXAMPLES)
+    set(USERS_GUIDE_INPUT "${USERS_GUIDE_INPUT} \\
+        ${MITK_SOURCE_DIR}/Examples/Plugins/")
+  endif()
+endif()
+
 # create output directories for the guides
 file(MAKE_DIRECTORY ${MITK_DOXYGEN_OUTPUT_DIR}/Guides/Users_Guide/)
 file(MAKE_DIRECTORY ${MITK_DOXYGEN_OUTPUT_DIR}/Guides/Developers_Guide/)

@@ -30,20 +30,25 @@ int StreamlineTracking(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::StringList, "input tensor image (.dti)", us::Any(), false);
-    parser.addArgument("seed", "si", ctkCommandLineParser::String, "binary seed image", us::Any(), true);
-    parser.addArgument("mask", "mi", ctkCommandLineParser::String, "binary mask image", us::Any(), true);
-    parser.addArgument("faImage", "fai", ctkCommandLineParser::String, "FA image", us::Any(), true);
-    parser.addArgument("minFA", "fa", ctkCommandLineParser::Float, "minimum fractional anisotropy threshold", 0.15, true);
-    parser.addArgument("minCurv", "c", ctkCommandLineParser::Float, "minimum curvature radius in mm (default = 0.5*minimum-spacing)");
-    parser.addArgument("stepSize", "s", ctkCommandLineParser::Float, "stepsize in mm (default = 0.1*minimum-spacing)");
-    parser.addArgument("tendf", "f", ctkCommandLineParser::Float, "Weighting factor between first eigenvector (f=1 equals FACT tracking) and input vector dependent direction (f=0).", 1.0, true);
-    parser.addArgument("tendg", "g", ctkCommandLineParser::Float, "Weighting factor between input vector (g=0) and tensor deflection (g=1 equals TEND tracking)", 0.0, true);
-    parser.addArgument("numSeeds", "n", ctkCommandLineParser::Int, "Number of seeds per voxel.", 1, true);
-    parser.addArgument("minLength", "l", ctkCommandLineParser::Float, "minimum fiber length in mm", 20, true);
+    parser.addArgument("input", "i", ctkCommandLineParser::StringList, "Input image", "input tensor image (.dti)", us::Any(), false);
+    parser.addArgument("seed", "si", ctkCommandLineParser::InputFile, "Seed image", "binary seed image", us::Any(), true);
+    parser.addArgument("mask", "mi", ctkCommandLineParser::InputFile, "Mask", "binary mask image", us::Any(), true);
+    parser.addArgument("faImage", "fai", ctkCommandLineParser::InputFile, "FA image", "FA image", us::Any(), true);
+    parser.addArgument("minFA", "fa", ctkCommandLineParser::Float, "Min. FA threshold", "minimum fractional anisotropy threshold", 0.15, true);
+    parser.addArgument("minCurv", "c", ctkCommandLineParser::Float, "Min. curvature radius", "minimum curvature radius in mm (default = 0.5*minimum-spacing)");
+    parser.addArgument("stepSize", "s", ctkCommandLineParser::Float, "Step size", "step size in mm (default = 0.1*minimum-spacing)");
+    parser.addArgument("tendf", "f", ctkCommandLineParser::Float, "Weight f", "Weighting factor between first eigenvector (f=1 equals FACT tracking) and input vector dependent direction (f=0).", 1.0, true);
+    parser.addArgument("tendg", "g", ctkCommandLineParser::Float, "Weight g", "Weighting factor between input vector (g=0) and tensor deflection (g=1 equals TEND tracking)", 0.0, true);
+    parser.addArgument("numSeeds", "n", ctkCommandLineParser::Int, "Seeds per voxel", "Number of seeds per voxel.", 1, true);
+    parser.addArgument("minLength", "l", ctkCommandLineParser::Float, "Min. fiber length", "minimum fiber length in mm", 20, true);
 
-    parser.addArgument("interpolate", "ip", ctkCommandLineParser::Bool, "Use linear interpolation", false, true);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", us::Any(), false);
+    parser.addArgument("interpolate", "ip", ctkCommandLineParser::Bool, "Interpolate", "Use linear interpolation", false, true);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "Output file", "output fiber bundle (.fib)", us::Any(), false);
+
+    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setTitle("Streamline Tracking");
+    parser.setDescription("");
+    parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -100,7 +105,7 @@ int StreamlineTracking(int argc, char* argv[])
                 mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(inputImages.at(i))->GetData());
                 mitk::TensorImage::Pointer img = dynamic_cast<mitk::TensorImage*>(mitk::IOUtil::LoadDataNode(inputImages.at(i))->GetData());
                 ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
-                mitk::CastToItkImage<ItkTensorImage>(img, itk_dti);
+                mitk::CastToItkImage(img, itk_dti);
                 filter->SetInput(i, itk_dti);
             }
             catch(...){ MITK_INFO << "could not load: " << inputImages.at(i); }
@@ -130,14 +135,14 @@ int StreamlineTracking(int argc, char* argv[])
         if (mitkSeedImage.IsNotNull())
         {
             ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
-            mitk::CastToItkImage<ItkUCharImageType>(mitkSeedImage, mask);
+            mitk::CastToItkImage(mitkSeedImage, mask);
             filter->SetSeedImage(mask);
         }
 
         if (mitkMaskImage.IsNotNull())
         {
             ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
-            mitk::CastToItkImage<ItkUCharImageType>(mitkMaskImage, mask);
+            mitk::CastToItkImage(mitkMaskImage, mask);
             filter->SetMaskImage(mask);
         }
 

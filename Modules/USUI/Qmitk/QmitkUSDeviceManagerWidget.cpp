@@ -43,6 +43,8 @@ void QmitkUSDeviceManagerWidget::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkUSDeviceManagerWidgetControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
+
+    m_Controls->m_ConnectedDevices->SetAutomaticallySelectFirstEntry(true);
   }
 
   // Initializations
@@ -85,6 +87,10 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
     if ( ! device->GetIsActive() )
     {
       QMessageBox::warning(this, "Activation failed", "Could not activate device. Check logging for details.");
+    }
+    else
+    {
+      emit DeviceActivated();
     }
   }
 

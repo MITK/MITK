@@ -76,7 +76,7 @@ namespace mitk {
   }
 
   template < typename TPixel, unsigned int VImageDimension >
-    void DemonsRegistration::GenerateData2( itk::Image<TPixel, VImageDimension>* itkImage1)
+  void DemonsRegistration::GenerateData2(const itk::Image<TPixel, VImageDimension>* itkImage1)
   {
     typedef typename itk::Image< TPixel, VImageDimension >  FixedImageType;
     typedef typename itk::Image< TPixel, VImageDimension >  MovingImageType;
@@ -112,7 +112,7 @@ namespace mitk {
 
     typename FixedImageType::Pointer fixedImage = FixedImageType::New();
     mitk::CastToItkImage(m_ReferenceImage, fixedImage);
-    typename MovingImageType::Pointer movingImage = itkImage1;
+    typename MovingImageType::ConstPointer movingImage = itkImage1;
 
     if (fixedImage.IsNotNull() && movingImage.IsNotNull())
     {

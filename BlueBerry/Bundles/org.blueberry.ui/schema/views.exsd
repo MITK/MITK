@@ -6,14 +6,14 @@
          <meta.schema plugin="org.blueberry.ui" id="views" name="Views"/>
       </appinfo>
       <documentation>
-         This extension point is used to define additional views 
-for the workbench.  A view is a visual component 
-within a workbench page.  It is typically used to 
-navigate a hierarchy of information (like the workspace), 
-open an editor,  or display properties for 
-the active editor.  The user can make a view 
-visible from the Window &gt; Show View menu or close it from the 
-view local title bar. 
+         This extension point is used to define additional views
+for the workbench.  A view is a visual component
+within a workbench page.  It is typically used to
+navigate a hierarchy of information (like the workspace),
+open an editor,  or display properties for
+the active editor.  The user can make a view
+visible from the Window &gt; Show View menu or close it from the
+view local title bar.
 &lt;p&gt;
 In order to reduce the visual clutter in the Show View Dialog, views should be grouped using categories.
       </documentation>
@@ -95,6 +95,7 @@ allows the creation of a hierarchy of categories.
       <complexType>
          <sequence>
             <element ref="description" minOccurs="0" maxOccurs="1"/>
+            <element ref="keywordReference" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -127,8 +128,8 @@ by &apos;/&apos;. Each referenced category must be declared in a corresponding c
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  a fully qualified name of the class that implements 
-&lt;samp&gt;berry::IViewPart&lt;/samp&gt;. A common practice 
+                  a fully qualified name of the class that implements
+&lt;samp&gt;berry::IViewPart&lt;/samp&gt;. A common practice
 is to subclass &lt;samp&gt;berry::ViewPart&lt;/samp&gt; or &lt;samp&gt;berry::QtViewPart&lt;/samp&gt;
 in order to inherit the default functionality.
                </documentation>
@@ -140,7 +141,7 @@ in order to inherit the default functionality.
          <attribute name="icon" type="string">
             <annotation>
                <documentation>
-                  a relative name of the icon that will 
+                  a relative name of the icon that will
 be associated with the view.
                </documentation>
                <appinfo>
@@ -243,29 +244,29 @@ If no value is supplied, a default ratio will be used.
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         The following is an example of the extension point: 
+         The following is an example of the extension point:
 &lt;p&gt;
 &lt;pre&gt;
-   &lt;extension point=&quot;org.blueberry.ui.views&quot;&gt; 
-      &lt;category 
-         id=&quot;com.xyz.views.XYZviews&quot; 
-         name=&quot;XYZ&quot;/&gt; 
-      &lt;view 
-         id=&quot;com.xyz.views.XYZView&quot; 
-         name=&quot;XYZ View&quot; 
-         category=&quot;com.xyz.views.XYZviews&quot; 
-         class=&quot;ns::XYZView&quot; 
+   &lt;extension point=&quot;org.blueberry.ui.views&quot;&gt;
+      &lt;category
+         id=&quot;com.xyz.views.XYZviews&quot;
+         name=&quot;XYZ&quot;/&gt;
+      &lt;view
+         id=&quot;com.xyz.views.XYZView&quot;
+         name=&quot;XYZ View&quot;
+         category=&quot;com.xyz.views.XYZviews&quot;
+         class=&quot;ns::XYZView&quot;
          icon=&quot;icons/XYZ.gif&quot;/&gt;
-   &lt;/extension&gt; 
+   &lt;/extension&gt;
 &lt;/pre&gt;
 &lt;/p&gt;
 The following is an example of a sticky view declaration:
 &lt;p&gt;
 &lt;pre&gt;
-   &lt;extension point=&quot;org.blueberry.ui.views&quot;&gt; 
+   &lt;extension point=&quot;org.blueberry.ui.views&quot;&gt;
       &lt;stickyView
          id=&quot;com.xyz.views.XYZView&quot; /&gt;
-   &lt;/extension&gt; 
+   &lt;/extension&gt;
 &lt;/pre&gt;
 &lt;/p&gt;
       </documentation>
@@ -276,9 +277,9 @@ The following is an example of a sticky view declaration:
          <meta.section type="apiInfo"/>
       </appinfo>
       <documentation>
-         The value of the &lt;samp&gt;class&lt;/samp&gt; attribute must be a 
-fully qualified name of the class that implements 
-&lt;samp&gt;berry::IViewPart&lt;/samp&gt;.  It is common 
+         The value of the &lt;samp&gt;class&lt;/samp&gt; attribute must be a
+fully qualified name of the class that implements
+&lt;samp&gt;berry::IViewPart&lt;/samp&gt;.  It is common
 practice to subclass &lt;samp&gt;berry::ViewPart&lt;/samp&gt;
 or &lt;samp&gt;berry::QtViewPart&lt;samp&gt; when developing a new view.
       </documentation>
@@ -302,7 +303,7 @@ or &lt;samp&gt;berry::QtViewPart&lt;samp&gt; when developing a new view.
          Copyright (c) 2002, 2005 IBM Corporation and others.&lt;br&gt;
 All rights reserved. This program and the accompanying materials are made
 available under the terms of the Eclipse Public License v1.0 which accompanies
-this distribution, and is available at &lt;a 
+this distribution, and is available at &lt;a
 href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
       </documentation>
    </annotation>

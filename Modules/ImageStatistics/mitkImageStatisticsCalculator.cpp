@@ -68,7 +68,8 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_PlanarFigureSlice (0),
   m_PlanarFigureCoordinate0 (0),
   m_PlanarFigureCoordinate1 (0),
-  m_HistogramBinSize(1)
+  m_HistogramBinSize(1),
+m_UseDefaultBinSize(true)
 {
   m_EmptyHistogram = HistogramType::New();
   m_EmptyHistogram->SetMeasurementVectorSize(1);
@@ -84,6 +85,10 @@ ImageStatisticsCalculator::~ImageStatisticsCalculator()
 {
 }
 
+void ImageStatisticsCalculator::SetUseDefaultBinSize(bool useDefault)
+{
+    m_UseDefaultBinSize = useDefault;
+}
 
 void ImageStatisticsCalculator::SetImage( const mitk::Image *image )
 {
@@ -795,7 +800,11 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   statisticsContainer->push_back( statistics );
 
   // Calculate histogram
-  unsigned int numberOfBins = std::floor( ( (statistics.Max - statistics.Min + 1) / m_HistogramBinSize) + 0.5 );
+  unsigned int numberOfBins = 200;
+  if (m_UseDefaultBinSize)
+      m_HistogramBinSize = std::ceil( (statistics.Max - statistics.Min + 1)/numberOfBins );
+  else
+    numberOfBins = std::floor( ( (statistics.Max - statistics.Min + 1) / m_HistogramBinSize) + 0.5 );
 
   typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
   histogramGenerator->SetInput( image );
@@ -1035,7 +1044,10 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       // restrict image to mask area for min/max index calculation
       typedef itk::MaskImageFilter< ImageType, MaskImageType, ImageType > MaskImageFilterType;
       typename MaskImageFilterType::Pointer masker = MaskImageFilterType::New();
-      masker->SetOutsideValue( (statistics.Min+statistics.Max)/2 );
+      bool isMinAndMaxSameValue = (statistics.Min == statistics.Max);
+      // bug 17962: following is a workaround for the case when min and max are the same, we can probably find a nicer way here
+      double outsideValue = (isMinAndMaxSameValue ? (statistics.Max/2) : (statistics.Min+statistics.Max)/2);
+      masker->SetOutsideValue( outsideValue );
       masker->SetInput1(adaptedImage);
       masker->SetInput2(adaptedMaskImage);
       masker->Update();
@@ -1052,7 +1064,9 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
         statistics.MaxIndex.set_size(adaptedImage->GetImageDimension());
 
         typename MinMaxFilterType::IndexType tempMaxIndex = minMaxFilter->GetIndexOfMaximum();
-        typename MinMaxFilterType::IndexType tempMinIndex = minMaxFilter->GetIndexOfMinimum();
+        // bug 17962: following is a workaround for the case when min and max are the same, we can probably find a nicer way here
+        typename MinMaxFilterType::IndexType tempMinIndex =
+          (isMinAndMaxSameValue ? minMaxFilter->GetIndexOfMaximum() : minMaxFilter->GetIndexOfMinimum());
 
 // FIX BUG 14644
         //If a PlanarFigure is used for segmentation the

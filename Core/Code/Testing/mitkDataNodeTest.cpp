@@ -173,6 +173,7 @@ static void TestInteractorSetting(mitk::DataNode::Pointer dataNode)
   MITK_TEST_CONDITION( interactor == dataNode->GetDataInteractor(), "Testing if a NULL pointer was set correctly (DataInteractor)" )
 
   interactor = mitk::PointSetDataInteractor::New();
+  interactor->SetEventConfig("PointSetConfig.xml");
   interactor->SetDataNode(dataNode);
   MITK_TEST_CONDITION( interactor == dataNode->GetDataInteractor(), "Testing if a PointSetDataInteractor was set correctly" )
 
@@ -201,6 +202,9 @@ static void TestPropertyList(mitk::DataNode::Pointer dataNode)
   float y;
   dataNode->GetFloatProperty("float", y);
   MITK_TEST_CONDITION(y - -31.337 < 0.01, "Testing Set/GetFloatProperty");
+  double yd = 0;
+  dataNode->GetDoubleProperty("float", yd);
+  MITK_TEST_CONDITION(mitk::Equal(yd, static_cast<double>(y)), "Testing GetDoubleProperty");
   dataNode->SetStringProperty("string", "MITK");
   std::string s = "GANZVIELPLATZ";
   dataNode->GetStringProperty("string", s);

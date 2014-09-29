@@ -504,12 +504,12 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
     if (m_QBallImage.IsNotNull())
     {
         m_ItkQBallImage = ItkQBallImgType::New();
-        mitk::CastToItkImage<ItkQBallImgType>(m_QBallImage, m_ItkQBallImage);
+        mitk::CastToItkImage(m_QBallImage, m_ItkQBallImage);
     }
     else
     {
         m_ItkTensorImage = ItkTensorImage::New();
-        mitk::CastToItkImage<ItkTensorImage>(m_TensorImage, m_ItkTensorImage);
+        mitk::CastToItkImage(m_TensorImage, m_ItkTensorImage);
     }
 
     // mask image found?
@@ -518,7 +518,7 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
         if(m_MaskImageNode.IsNotNull())
         {
             if (dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()))
-                mitk::CastToItkImage<ItkFloatImageType>(dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()), m_MaskImage);
+                mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()), m_MaskImage);
         }
     }
     catch(...){};

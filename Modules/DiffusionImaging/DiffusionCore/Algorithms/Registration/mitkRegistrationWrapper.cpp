@@ -6,7 +6,9 @@
 #include "itkB0ImageExtractionImageFilter.h"
 #include <itkResampleImageFilter.h>
 #include <itkWindowedSincInterpolateImageFunction.h>
+#include <itkLinearInterpolateImageFunction.h>
 #include <itkNearestNeighborExtrapolateImageFunction.h>
+#include <itkBSplineInterpolateImageFunction.h>
 
 #include <vnl/vnl_inverse.h>
 
@@ -52,11 +54,19 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
       ItkImageType::Pointer itkReference = ItkImageType::New();
       CastToItkImage(resampleReference,itkReference);
 
-      typedef itk::WindowedSincInterpolateImageFunction< ItkImageType, 3> WindowedSincInterpolatorType;
+      typedef itk::Function::WelchWindowFunction<4> WelchWindowFunction;
+      typedef itk::WindowedSincInterpolateImageFunction< ItkImageType, 4,WelchWindowFunction> WindowedSincInterpolatorType;
       WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
+
+
+      typedef itk::LinearInterpolateImageFunction< ItkImageType> LinearInterpolatorType;
+      LinearInterpolatorType::Pointer lin_interpolator = LinearInterpolatorType::New();
 
       typedef itk::NearestNeighborInterpolateImageFunction< ItkImageType, double > NearestNeighborInterpolatorType;
       NearestNeighborInterpolatorType::Pointer nn_interpolator = NearestNeighborInterpolatorType::New();
+
+      typedef itk::BSplineInterpolateImageFunction< ItkImageType, double > BSplineInterpolatorType;
+      BSplineInterpolatorType::Pointer bSpline_interpolator = BSplineInterpolatorType::New();
 
 
       ResampleFilterType::Pointer resampler = ResampleFilterType::New();
@@ -66,7 +76,7 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
       if (binary)
         resampler->SetInterpolator(nn_interpolator);
       else
-        resampler->SetInterpolator(sinc_interpolator);
+        resampler->SetInterpolator(lin_interpolator);
 
       resampler->Update();
 
@@ -122,7 +132,7 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
   }
 }
 
-void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, RidgidTransformType transformation,double* offset, mitk::Image* mask)
+void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, RidgidTransformType transformation,double* offset, bool useSameOrigin, mitk::Image* mask)
 {
   // Handle the case that fixed/moving image is a DWI image
   mitk::DiffusionImage<short>* fixedDwi = dynamic_cast<mitk::DiffusionImage<short>*> (fixedImage.GetPointer());
@@ -154,12 +164,15 @@ void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImag
   Point3D origin = fixedImage->GetGeometry()->GetOrigin();
   Point3D originMoving = movingImage->GetGeometry()->GetOrigin();
 
-  offset[0] = originMoving[0]-origin[0];
-  offset[1] = originMoving[1]-origin[1];
-  offset[2] = originMoving[2]-origin[2];
-
   mitk::Image::Pointer tmpImage = movingImage->Clone();
-  tmpImage->GetGeometry()->SetOrigin(origin);
+  if (useSameOrigin)
+  {
+    offset[0] = originMoving[0]-origin[0];
+    offset[1] = originMoving[1]-origin[1];
+    offset[2] = originMoving[2]-origin[2];
+    tmpImage->GetGeometry()->SetOrigin(origin);
+  }
+
   // Start registration
   mitk::PyramidImageRegistrationMethod::Pointer registrationMethod = mitk::PyramidImageRegistrationMethod::New();
   registrationMethod->SetFixedImage( fixedImage );

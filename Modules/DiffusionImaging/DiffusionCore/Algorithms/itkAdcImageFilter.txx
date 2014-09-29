@@ -105,8 +105,6 @@ AdcImageFilter< TInPixelType, TOutPixelType>
                             outval -= std::log(S/S0)/b;
                             c++;
                         }
-                        else
-                            MITK_WARN << "Signal is zero in direction " << i << " at position " << git.GetIndex() << " --> skipping measurement";
                     }
                 }
             }

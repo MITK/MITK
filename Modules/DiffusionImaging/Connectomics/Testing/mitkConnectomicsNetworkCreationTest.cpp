@@ -26,9 +26,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsNetworkCreator.h"
 #include <mitkCoreObjectFactory.h>
 
+// VTK includes
+#include <vtkDebugLeaks.h>
+
 class mitkConnectomicsNetworkCreationTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkConnectomicsNetworkCreationTestSuite);
+
+  /// \todo Fix VTK memory leaks. Bug 18097.
+  vtkDebugLeaks::SetExitError(0);
+
   MITK_TEST(CreateNetworkFromFibersAndParcellation);
   CPPUNIT_TEST_SUITE_END();
 

@@ -10,6 +10,12 @@ SET(CPP_FILES
   QmitkPythonSnippets.cpp
 )
 
+if(BUILD_TESTING)
+  SET(H_FILES
+    Testing/mitkCommonPythonTest.h
+  )
+endif()
+
 #SET(UI_FILES
 #  QmitkPythonSnippets.ui
 #)

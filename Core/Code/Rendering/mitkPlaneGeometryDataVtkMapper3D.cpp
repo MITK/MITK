@@ -148,6 +148,10 @@ namespace mitk
     m_BackNormalsActor->Delete();
     m_BackHedgeHog->Delete();
 
+    for(ActorList::iterator it = m_ImageActors.begin();
+        it!=m_ImageActors.end(); ++it)
+      it->second.m_Actor->ReleaseGraphicsResources(0);
+
     // Delete entries in m_ImageActors list one by one
     m_ImageActors.clear();
 

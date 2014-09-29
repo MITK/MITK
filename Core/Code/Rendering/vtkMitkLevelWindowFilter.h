@@ -75,7 +75,6 @@ protected:
   vtkMitkLevelWindowFilter();
   /** Default deconstructor. */
   ~vtkMitkLevelWindowFilter();
-
   /** \brief Method for threaded execution of the filter.
    * \param *inData: The input.
    * \param *outData: The output of the filter.

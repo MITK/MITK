@@ -3,24 +3,27 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <category 
-      id="org.mitk.views.general" 
-      name="MITK General"/> 
-    <view id="org.mitk.views.segmentation" 
-      name="Segmentation" 
+    <category
+      id="org.mitk.views.general"
+      name="MITK General"/>
+    <view id="org.mitk.views.segmentation"
+      name="Segmentation"
+      category="Segmentation"
       icon="resources/segmentation.png"
       class="QmitkSegmentationView" />
      <view id="org.mitk.views.deformableclippingplane"
        name="Clipping Plane"
+       category="Segmentation"
        class="QmitkDeformableClippingPlaneView"
        icon="resources/deformablePlane.png" />
     <view
       id="org.mitk.views.segmentationutilities"
       name="Segmentation Utilities"
+      category="Segmentation"
       class="QmitkSegmentationUtilitiesView"
       icon="resources/SegmentationUtilities_48x48.png" />
   </extension>
-  
+
   <extension point="org.blueberry.ui.preferencePages">
     <page id="org.mitk.gui.qt.application.SegmentationPreferencePage" name="Segmentation" class="QmitkSegmentationPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.SegmentationPreferencePageKeywords"></keywordreference>
@@ -30,7 +33,7 @@
    <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.gui.qt.application.SegmentationPreferencePageKeywords" label="data manager"></keyword>
   </extension>
-  
+
   <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />

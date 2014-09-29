@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureComposite.h>
 #include <mitkImageCast.h>
+#include <mitkFiberBundleXWriter.h>
+
+#include <vtkDebugLeaks.h>
 
 /**Documentation
  *  Test if fiber transfortaiom methods work correctly
@@ -27,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 int mitkFiberExtractionTest(int argc, char* argv[])
 {
     MITK_TEST_BEGIN("mitkFiberExtractionTest");
+
+    /// \todo Fix VTK memory leaks. Bug 18097.
+    vtkDebugLeaks::SetExitError(0);
 
     MITK_INFO << "argc: " << argc;
     MITK_TEST_CONDITION_REQUIRED(argc==13,"check for input data")
@@ -39,17 +45,24 @@ int mitkFiberExtractionTest(int argc, char* argv[])
         mitk::PlanarFigure::Pointer pf1 = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::LoadDataNode(argv[3])->GetData());
         mitk::PlanarFigure::Pointer pf2 = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::LoadDataNode(argv[4])->GetData());
         mitk::PlanarFigure::Pointer pf3 = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::LoadDataNode(argv[5])->GetData());
+
+        MITK_INFO << "TEST1";
+
         mitk::PlanarFigureComposite::Pointer pfc1 = mitk::PlanarFigureComposite::New();
         pfc1->setOperationType(mitk::PFCOMPOSITION_AND_OPERATION);
-        pfc1->addPlanarFigure(pf2);
-        pfc1->addPlanarFigure(pf3);
+        pfc1->addPlanarFigure(dynamic_cast<mitk::BaseData*>(pf2.GetPointer()));
+        pfc1->addPlanarFigure(dynamic_cast<mitk::BaseData*>(pf3.GetPointer()));
+        MITK_INFO << "TEST2";
         mitk::PlanarFigureComposite::Pointer pfc2 = mitk::PlanarFigureComposite::New();
         pfc2->setOperationType(mitk::PFCOMPOSITION_OR_OPERATION);
-        pfc2->addPlanarFigure(pf1);
-        pfc2->addPlanarFigure(dynamic_cast<mitk::PlanarFigure*>(pfc1.GetPointer()));
+        pfc2->addPlanarFigure(dynamic_cast<mitk::BaseData*>(pf1.GetPointer()));
+        pfc2->addPlanarFigure(pfc1.GetPointer());
+        MITK_INFO << "TEST3";
         mitk::FiberBundleX::Pointer extractedFibs = groundTruthFibs->ExtractFiberSubset(pfc2);
+        MITK_INFO << "TEST4";
         MITK_TEST_CONDITION_REQUIRED(extractedFibs->Equals(testFibs),"check planar figure extraction")
 
+                MITK_INFO << "TEST5";
         // test subtraction and addition
         mitk::FiberBundleX::Pointer notExtractedFibs = groundTruthFibs->SubtractBundle(extractedFibs);
 
@@ -65,7 +78,7 @@ int mitkFiberExtractionTest(int argc, char* argv[])
         mitk::Image::Pointer mitkRoiImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[6])->GetData());
         typedef itk::Image< unsigned char, 3 >    itkUCharImageType;
         itkUCharImageType::Pointer itkRoiImage = itkUCharImageType::New();
-        mitk::CastToItkImage<itkUCharImageType>(mitkRoiImage, itkRoiImage);
+        mitk::CastToItkImage(mitkRoiImage, itkRoiImage);
 
         mitk::FiberBundleX::Pointer inside = groundTruthFibs->RemoveFibersOutside(itkRoiImage, false);
         mitk::FiberBundleX::Pointer outside = groundTruthFibs->RemoveFibersOutside(itkRoiImage, true);

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRawImageFileReader.h"
 #include "mitkITKImageImport.h"
+#include "mitkImageCast.h"
 #include "mitkIOConstants.h"
 
 #include <itkImage.h>

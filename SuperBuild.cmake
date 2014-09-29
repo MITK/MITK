@@ -51,6 +51,9 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(external_projects
+  ZLIB
+  Python
+  Numpy
   tinyxml
   GLUT
   ANN
@@ -59,7 +62,6 @@ set(external_projects
   VTK
   ACVD
   GDCM
-  CableSwig
   OpenCV
   Poco
   ITK
@@ -69,6 +71,9 @@ set(external_projects
   SOFA
   MITKData
   Qwt
+  PCRE
+  Swig
+  SimpleITK
   )
 
 # Qxt supports Qt5. We need to also support it in QxtCMakeLists.txt
@@ -85,7 +90,6 @@ set(MITK_USE_ITK 1)
 set(MITK_USE_VTK 1)
 
 # Semi-hard dependencies, enabled by user-controlled variables
-set(MITK_USE_CableSwig ${MITK_USE_Python})
 if(MITK_USE_QT)
   set(MITK_USE_Qwt 1)
   #if(MITK_USE_Qt4)
@@ -95,6 +99,17 @@ endif()
 
 if(MITK_USE_SOFA)
   set(MITK_USE_GLUT 1)
+endif()
+
+if(NOT MITK_USE_SYSTEM_PYTHON)
+  set(MITK_USE_ZLIB 1)
+endif()
+
+if(MITK_USE_SimpleITK OR MITK_USE_Python)
+  set(MITK_USE_SWIG 1)
+  if(UNIX)
+    set(MITK_USE_PCRE 1)
+  endif()
 endif()
 
 # A list of "nice" external projects, playing well together with CMake
@@ -293,6 +308,8 @@ ExternalProject_Add(${proj}
     ${MITK-Data_DEPENDS}
     ${Qwt_DEPENDS}
     ${Qxt_DEPENDS}
+    ${SimpleITK_DEPENDS}
+    ${Numpy_DEPENDS}
 )
 #-----------------------------------------------------------------------------
 # Additional MITK CXX/C Flags
@@ -330,11 +347,21 @@ endforeach()
 
 # Optional python variables
 if(MITK_USE_Python)
+  list(APPEND mitk_optional_cache_args
+       -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
+       -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
+       -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+       -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
+       -DMITK_USE_SYSTEM_PYTHON:BOOL=${MITK_USE_SYSTEM_PYTHON}
+       -DMITK_BUILD_org.mitk.gui.qt.python:BOOL=ON
+      )
+  if( NOT MITK_USE_SYSTEM_PYTHON )
     list(APPEND mitk_optional_cache_args
-         -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
-         -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
-         -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
-         -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2} )
+          # Folders are needed to create an installer
+          -DPython_DIR:PATH=${Python_DIR}
+          -DNumpy_DIR:PATH=${Numpy_DIR}
+        )
+  endif()
 endif()
 
 set(proj MITK-Configure)
@@ -385,6 +412,7 @@ ExternalProject_Add(${proj}
     -DMITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_FLOATING_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}
+    -DMITK_ACCESSBYITK_VECTOR_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_DIMENSIONS:STRING=${MITK_ACCESSBYITK_DIMENSIONS}
     # --------------- External project dirs ---------------
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
@@ -407,6 +435,8 @@ ExternalProject_Add(${proj}
     -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
     -DQwt_DIR:PATH=${Qwt_DIR}
     -DQxt_DIR:PATH=${Qxt_DIR}
+    -DSimpleITK_DIR:PATH=${SimpleITK_DIR}
+    -DNumpy_DIR:PATH=${Numpy_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}

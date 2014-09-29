@@ -240,19 +240,18 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     filter->SetG((float)m_Controls->m_gSlider->value()/100);
     filter->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
     filter->SetMinTractLength(m_Controls->m_MinTractLengthSlider->value());
-    filter->SetResampleFibers(m_Controls->m_ResampleFibersBox->isChecked());
 
     if (m_SeedRoi.IsNotNull())
     {
         ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
-        mitk::CastToItkImage<ItkUCharImageType>(m_SeedRoi, mask);
+        mitk::CastToItkImage(m_SeedRoi, mask);
         filter->SetSeedImage(mask);
     }
 
     if (m_MaskImage.IsNotNull())
     {
         ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
-        mitk::CastToItkImage<ItkUCharImageType>(m_MaskImage, mask);
+        mitk::CastToItkImage(m_MaskImage, mask);
         filter->SetMaskImage(mask);
     }
 
@@ -271,6 +270,8 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     }
     mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberBundle);
     fib->SetReferenceImage(dynamic_cast<mitk::Image*>(m_TensorImageNodes.at(0)->GetData()));
+    if (m_Controls->m_ResampleFibersBox->isChecked())
+        fib->CompressFibers(m_Controls->m_FiberErrorBox->value());
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData(fib);

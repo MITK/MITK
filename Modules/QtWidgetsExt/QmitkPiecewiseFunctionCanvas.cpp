@@ -47,8 +47,8 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
   }
 
   {
-    QString qs_min = QString::number( m_Min );
-    QString qs_max = QString::number( m_Max );
+    QString qs_min = QString::number( m_Min, 'g', 4 );
+    QString qs_max = QString::number( m_Max, 'g', 4 );
 
     QRect qr_min = painter.fontMetrics().boundingRect( qs_min );
     QRect qr_max = painter.fontMetrics().boundingRect( qs_max );
@@ -116,8 +116,12 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
         painter.setBrush(QBrush(Qt::red));
         if (m_LineEditAvailable)
         {
-          m_XEdit->setText(QString::number(GetFunctionX(m_GrabbedHandle)));
-          m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle)));
+          int xCursor = m_XEdit->cursorPosition();
+          int yCursor = m_YEdit->cursorPosition();
+          m_XEdit->setText(QString::number(GetFunctionX(m_GrabbedHandle), 'g', 4));
+          m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle), 'g', 4));
+          m_XEdit->setCursorPosition( xCursor );
+          m_YEdit->setCursorPosition( yCursor );
         }
       }
       else
@@ -153,6 +157,5 @@ void QmitkPiecewiseFunctionCanvas::MoveFunctionPoint(int index,
     std::pair<double,double> pos)
 {
   RemoveFunctionPoint(GetFunctionX(index));
-  AddFunctionPoint(pos.first, pos.second);
+  m_GrabbedHandle = AddFunctionPoint(pos.first, pos.second);
 }
-

@@ -48,6 +48,9 @@ bool KinectDevice::OnConnectCamera()
       this->m_RGBImageHeight = m_CaptureHeight;
       this->m_RGBPixelNumber = this->m_RGBImageWidth * this->m_RGBImageHeight;
 
+      this->SetBoolProperty("HasAmplitudeImage", m_Controller->GetUseIR());
+      this->SetBoolProperty("HasRGBImage", !m_Controller->GetUseIR());
+
       // allocate buffer
       this->m_DistanceArray = new float[this->m_PixelNumber];
       for(int i=0; i<this->m_PixelNumber; i++) {this->m_DistanceArray[i]=0.0;}
@@ -186,18 +189,6 @@ ITK_THREAD_RETURN_TYPE KinectDevice::Acquire(void* pInfoStruct)
     bool printStatus = false;
     while (toFCameraDevice->IsCameraActive())
     {
-      //check if to provide IR or RGB image
-      if(toFCameraDevice->GetController()->GetUseIR())
-      {
-        toFCameraDevice->SetBoolProperty("HasAmplitudeImage", true);
-        toFCameraDevice->SetBoolProperty("HasRGBImage", false);
-      }
-      else
-      {
-        toFCameraDevice->SetBoolProperty("HasAmplitudeImage", false);
-        toFCameraDevice->SetBoolProperty("HasRGBImage", true);
-      }
-
       // update the ToF camera
       toFCameraDevice->UpdateCamera();
       // get the image data from the camera and write it at the next free position in the buffer

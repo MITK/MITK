@@ -18,6 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkInstantiateAccessFunctions.h>
 
 #define InstantiateAccessFunction_RegistrationAccessItkImage(pixelType, dim) \
-  template void mitk::ImageRegistrationMethodAccessFunctor::AccessItkImage(itk::Image<pixelType, dim>* itkImage1, mitk::ImageRegistrationMethod* method);
+  template void mitk::ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<pixelType, dim>* itkImage1, mitk::ImageRegistrationMethod* method);
 
 InstantiateAccessFunctionForFixedPixelType(RegistrationAccessItkImage, (@TYPE@))

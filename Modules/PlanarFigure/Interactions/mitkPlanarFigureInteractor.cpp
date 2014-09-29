@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigureInteractor.h"
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarPolygon.h"
+#include "mitkPlanarCircle.h"
 
 #include "mitkInteractionPositionEvent.h"
 #include "mitkInternalEvent.h"
@@ -28,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 
 #include "mitkPlaneGeometry.h"
+#include "mitkAbstractTransformGeometry.h"
 
 
 //how precise must the user pick the point
@@ -101,6 +103,11 @@ bool mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction*, Interac
 
   mitk::PlaneGeometry *planarFigureGeometry =
     dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
+  mitk::AbstractTransformGeometry *abstractTransformGeometry =
+    dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
+
+  if ( abstractTransformGeometry != NULL )
+    return false;
 
   // Extract point in 2D world coordinates (relative to PlaneGeometry of
   // PlanarFigure)
@@ -109,6 +116,8 @@ bool mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction*, Interac
   {
     return false;
   }
+
+  planarFigure->InvokeEvent( StartInteractionPlanarFigureEvent() );
 
   // check if the control points shall be hidden during interaction
   bool hidecontrolpointsduringinteraction = false;
@@ -239,6 +248,11 @@ bool mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
 
   mitk::PlaneGeometry *planarFigureGeometry =
     dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
+  mitk::AbstractTransformGeometry *abstractTransformGeometry =
+    dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
+
+  if ( abstractTransformGeometry != NULL)
+    return false;
 
   // If the planarFigure already has reached the maximum number
   if ( planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMaximumNumberOfControlPoints() )
@@ -335,6 +349,7 @@ bool mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction*, Interact
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   mitk::PlaneGeometry *planarFigureGeometry = dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
+  mitk::AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
 
   // Invoke event to notify listeners that placement of this PF starts now
   planarFigure->InvokeEvent( StartPlacementPlanarFigureEvent() );
@@ -343,7 +358,7 @@ bool mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction*, Interact
   mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
     dynamic_cast< const mitk::PlaneGeometry * >(
     renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry() ) );
-  if ( planeGeometry != NULL )
+  if ( planeGeometry != NULL && abstractTransformGeometry == NULL)
   {
     planarFigureGeometry = planeGeometry;
     planarFigure->SetPlaneGeometry( planeGeometry );
@@ -462,7 +477,11 @@ bool mitk::PlanarFigureInteractor::CheckFigureHovering( const InteractionEvent* 
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   mitk::PlaneGeometry *planarFigureGeometry = dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
+  mitk::AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
   const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
+
+  if ( abstractTransformGeometry != NULL )
+    return false;
 
   mitk::Point2D pointProjectedOntoLine;
   int previousControlPoint = this->IsPositionOverFigure( positionEvent,
@@ -497,8 +516,11 @@ bool mitk::PlanarFigureInteractor::CheckControlPointHovering( const InteractionE
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   mitk::PlaneGeometry *planarFigureGeometry = dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
+  mitk::AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
   const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
 
+  if (abstractTransformGeometry != NULL)
+    return false;
 
   int pointIndex = -1;
   pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
@@ -542,8 +564,11 @@ bool mitk::PlanarFigureInteractor::SelectPoint( StateMachineAction*, Interaction
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   mitk::PlaneGeometry *planarFigureGeometry = dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
+  mitk::AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
   const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
 
+  if (abstractTransformGeometry != NULL)
+    return false;
 
   int pointIndex = -1;
   pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
@@ -630,9 +655,6 @@ bool mitk::PlanarFigureInteractor::CheckResetOnPointSelect( const InteractionEve
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
 
-  // Invoke tmpEvent to notify listeners that interaction with this PF starts now
-  planarFigure->InvokeEvent( StartInteractionPlanarFigureEvent() );
-
   // Reset the PlanarFigure if required
   return planarFigure->ResetOnPointSelect();
 }
@@ -650,6 +672,10 @@ bool mitk::PlanarFigureInteractor::CheckFigureOnRenderingGeometry( const Interac
     GetDataNode()->GetData() );
 
   mitk::PlaneGeometry *planarFigurePlaneGeometry = dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
+  mitk::AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
+
+  if ( abstractTransformGeometry != NULL)
+    return false;
 
   double planeThickness = planarFigurePlaneGeometry->GetExtentInMM( 2 );
   if ( planarFigurePlaneGeometry->Distance( worldPoint3D ) > planeThickness )
@@ -705,7 +731,7 @@ bool mitk::PlanarFigureInteractor::TransformObjectToDisplay(
   double planeThickness = objectGeometry->GetExtentInMM( 2 );
 
   // TODO: proper handling of distance tolerance
-  if ( displayGeometry->Distance( point3D ) < planeThickness / 3.0 )
+  if ( rendererGeometry->Distance( point3D ) < planeThickness / 3.0 )
   {
     // Project 3D world point onto display geometry
     rendererGeometry->Map( point3D, displayPoint );
@@ -870,6 +896,11 @@ mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
 
   mitk::PlaneGeometry *planarFigureGeometry =
     dynamic_cast< mitk::PlaneGeometry * >( planarFigure->GetGeometry( timeStep ) );
+  mitk::AbstractTransformGeometry *abstractTransformGeometry =
+    dynamic_cast< mitk::AbstractTransformGeometry * >( planarFigure->GetGeometry( timeStep ) );
+
+  if ( abstractTransformGeometry != NULL )
+    return false;
 
   Point2D point2D, correctedPoint;
   // Get the point2D from the positionEvent

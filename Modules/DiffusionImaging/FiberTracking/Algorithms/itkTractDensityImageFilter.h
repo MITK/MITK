@@ -55,6 +55,7 @@ public:
   itkGetMacro( UseImageGeometry, bool)                          ///< use input image geometry to initialize output image
   itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer)        ///< input fiber bundle
   itkSetMacro( InputImage, typename OutputImageType::Pointer)   ///< use input image geometry to initialize output image
+  itkSetMacro( UseTrilinearInterpolation, bool )
 
   void GenerateData();
 
@@ -72,6 +73,7 @@ protected:
   bool                              m_BinaryOutput;         ///< generate binary fiber envelope
   bool                              m_UseImageGeometry;     ///< use input image geometry to initialize output image
   bool                              m_OutputAbsoluteValues; ///< do not normalize image values to 0-1
+  bool                              m_UseTrilinearInterpolation;
 };
 
 }

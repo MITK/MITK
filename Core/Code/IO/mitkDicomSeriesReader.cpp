@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkDicomSeriesReader.h>
 #include <mitkImage.h>
+#include <mitkImageCast.h>
+
 #include <itkGDCMSeriesFileNames.h>
 
 #include <gdcmSorter.h>
@@ -596,6 +598,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
               MITK_DEBUG << "Comparing recorded tilt angle " << angle << " against calculated value " << tiltInfo.GetTiltAngleInDegrees();
               // TODO we probably want the signs correct, too (that depends: this is just a rough check, nothing serious)
+              // TODO TODO TODO when angle -27 and tiltangle 63, this will never trigger the if-clause... useless check in this case! old bug..?!
               if ( fabs(angle) - tiltInfo.GetTiltAngleInDegrees() > 0.25)
               {
                 result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
@@ -828,7 +831,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
     StringContainer filesStillToAnalyze = groupIter->second.GetFilenames();
     std::string groupUID = groupIter->first;
     unsigned int subgroup(0);
-    MITK_DEBUG << "Analyze group " << groupUID;
+    MITK_DEBUG << "Analyze group " << groupUID << " of " << groupIter->second.GetFilenames().size() << " files";
 
     while (!filesStillToAnalyze.empty()) // repeat until all files are grouped somehow
     {

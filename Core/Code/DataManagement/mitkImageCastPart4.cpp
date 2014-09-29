@@ -15,39 +15,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include <mitkImageCast.h>
-#include <mitkImageAccessByItk.h>
-#include <itkRGBPixel.h>
-#include <itkImage.h>
-#include <itkCastImageFilter.h>
+#include <mitkImageCast.txx>
 
+#include <itkRGBPixel.h>
 #include <itkDiffusionTensor3D.h>
 
 namespace mitk
 {
 
-#ifndef DOXYGEN_SKIP
-  template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
-  {
-    AccessFixedDimensionByItk_1(mitkImage, _CastToItkImage2Access, (ItkOutputImageType::ImageDimension), itkOutputImage);
-  }
-#endif //DOXYGEN_SKIP
-
 typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
 typedef itk::Image<itk::DiffusionTensor3D<float>, 2>  itkImageDTIF2;
 typedef itk::Image<itk::DiffusionTensor3D<double>, 2>  itkImageDTID2;
 
-template <> void MITK_CORE_EXPORT CastToItkImage<itkImageRGBUC2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageRGBUC2>& itkOutputImage)
+template <> void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itkImageRGBUC2>& itkOutputImage)
 {
   typedef itkImageRGBUC2 ItkOutputImageType;
   AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, (itk::RGBPixel<unsigned char>), (ItkOutputImageType::ImageDimension), itkOutputImage);
 }
-template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTIF2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTIF2>& itkOutputImage)
+template <> void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTIF2>& itkOutputImage)
 {
   typedef itkImageDTIF2 ItkOutputImageType;
   AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, (itk::DiffusionTensor3D<float>), (ItkOutputImageType::ImageDimension), itkOutputImage);
 }
-template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTID2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTID2>& itkOutputImage)
+template <> void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTID2>& itkOutputImage)
 {
   typedef itkImageDTID2 ItkOutputImageType;
   AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, (itk::DiffusionTensor3D<double>), (ItkOutputImageType::ImageDimension), itkOutputImage);
@@ -57,17 +47,17 @@ typedef itk::Image<itk::RGBPixel<unsigned char>, 3>  itkImageRGBUC3;
 typedef itk::Image<itk::DiffusionTensor3D<float>, 3>  itkImageDTIF3;
 typedef itk::Image<itk::DiffusionTensor3D<double>, 3>  itkImageDTID3;
 
-template <> void MITK_CORE_EXPORT CastToItkImage<itkImageRGBUC3>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageRGBUC3>& itkOutputImage)
+template <> void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itkImageRGBUC3>& itkOutputImage)
 {
   typedef itkImageRGBUC3 ItkOutputImageType;
   AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, (itk::RGBPixel<unsigned char>), (ItkOutputImageType::ImageDimension), itkOutputImage);
 }
-template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTIF3>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTIF3>& itkOutputImage)
+template <> void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTIF3>& itkOutputImage)
 {
   typedef itkImageDTIF3 ItkOutputImageType;
   AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, (itk::DiffusionTensor3D<float>), (ItkOutputImageType::ImageDimension), itkOutputImage);
 }
-template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTID3>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTID3>& itkOutputImage)
+template <> void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTID3>& itkOutputImage)
 {
   typedef itkImageDTID3 ItkOutputImageType;
   AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, (itk::DiffusionTensor3D<double>), (ItkOutputImageType::ImageDimension), itkOutputImage);
@@ -103,13 +93,13 @@ template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTID3>(const mitk::Imag
   _TYPE_N_VEC(N_DIRS,short)                                                                  \
 
 #define _TYPE_N_VEC(N_DIRS,PIXTYPE)                                                                                                                                                                \
-  template <> void MITK_CORE_EXPORT CastToItkImage<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 2> >(const mitk::Image * mitkImage, itk::SmartPointer<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 2> >& itkOutputImage)                                       \
+  template <> void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 2> >& itkOutputImage)                                       \
 {                                                                                                                                                                                                \
   typedef itk::Vector<PIXTYPE,N_DIRS> VECTORTYPE;                                                                                                                           \
   typedef itk::Image<VECTORTYPE, 2>  ItkOutputImageType2;                                                                                                                                               \
   AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, (VECTORTYPE), (ItkOutputImageType2::ImageDimension), itkOutputImage);                                               \
 }                                                                                                                                                                                                \
-  template <> void MITK_CORE_EXPORT CastToItkImage<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 3> >(const mitk::Image * mitkImage, itk::SmartPointer<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 3> >& itkOutputImage)                                       \
+  template <> void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 3> >& itkOutputImage)                                       \
 {                                                                                                                                                                                                \
   typedef itk::Vector<PIXTYPE,N_DIRS> VECTORTYPE;                                                                                                                           \
   typedef itk::Image<VECTORTYPE, 3>  ItkOutputImageType3;                                                                                                                                               \

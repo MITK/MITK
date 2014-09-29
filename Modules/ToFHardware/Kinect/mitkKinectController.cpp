@@ -121,7 +121,7 @@ KinectController::~KinectController()
       }
 
       // Camera registration
-      if ( d->m_DepthGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
+      if( d->m_DepthGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
       {
         if (!d->m_UseIR)
         {
@@ -132,9 +132,9 @@ KinectController::~KinectController()
       {
         MITK_ERROR << "Alternative view point not supported by the depth generator...";
       }
-      if (d->m_UseIR)
+      if(d->m_UseIR)
       {
-        if ( d->m_IRGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
+        if( d->m_IRGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
         {
           d->m_ConnectionCheck = d->ErrorText(d->m_IRGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_DepthGenerator));
         }

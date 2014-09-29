@@ -52,6 +52,8 @@ public:
 
   friend class WorkbenchPage;
 
+  bool ContainsView(const std::string& viewId);
+
 private:
 
   ViewFactory* viewFactory;

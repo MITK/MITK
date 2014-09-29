@@ -208,6 +208,7 @@ env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 env_option(MITK_USE_Poco "Use the Poco library" ON)
 env_option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
 env_option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
+env_option(MITK_USE_SimpleITK "Use the SimpleITK library" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 
 option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
@@ -226,8 +227,21 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
                 )
 
 if(MITK_USE_Python)
-  FIND_PACKAGE(PythonLibs REQUIRED)
-  FIND_PACKAGE(PythonInterp REQUIRED)
+  if(APPLE)
+    message(WARNING "Python wrapping is unsuported on mac OSX!")
+    set(MITK_USE_Python OFF CACHE BOOL "Use Python wrapping in MITK" FORCE)
+  else()
+    option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" OFF)
+    # SimpleITK is required when python is enabled
+    set(MITK_USE_SimpleITK ON CACHE BOOL "Use the SimpleITK library" FORCE)
+    if(MITK_USE_SYSTEM_PYTHON)
+      FIND_PACKAGE(PythonLibs REQUIRED)
+      FIND_PACKAGE(PythonInterp REQUIRED)
+    else()
+      FIND_PACKAGE(PythonLibs)
+      FIND_PACKAGE(PythonInterp)
+    endif()
+  endif()
 endif()
 
 if(MITK_USE_Boost)
@@ -289,6 +303,12 @@ if(MITK_USE_SOFA)
     message("Adding 'thread' to MITK_USE_Boost_LIBRARIES.")
     list(APPEND MITK_USE_Boost_LIBRARIES thread)
   endif()
+  # Simulation plugin requires boost chrono library
+  list(FIND MITK_USE_Boost_LIBRARIES chrono _result)
+  if(_result LESS 0)
+    message("Adding 'chrono' to MITK_USE_Boost_LIBRARIES.")
+    list(APPEND MITK_USE_Boost_LIBRARIES chrono)
+  endif()
   set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "" FORCE)
   # Allow setting external SOFA plugins directory and SOFA plugins
   set(MITK_USE_SOFA_PLUGINS_DIR ${MITK_USE_SOFA_PLUGINS_DIR} CACHE PATH "External SOFA plugins directory" FORCE)
@@ -337,6 +357,20 @@ if(NOT MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES)
   set(MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES
     "itk::RGBPixel<unsigned char>, itk::RGBAPixel<unsigned char>"
     CACHE STRING "List of composite pixel types used in AccessByItk and InstantiateAccessFunction macros" FORCE)
+endif()
+
+if(NOT MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES)
+  string(REPLACE "," ";" _integral_types ${MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES})
+  string(REPLACE "," ";" _floating_types ${MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES})
+  foreach(_scalar_type ${_integral_types} ${_floating_types})
+    set(MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES
+        "${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}itk::VariableLengthVector<${_scalar_type}>,")
+  endforeach()
+  string(LENGTH "${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}" _length)
+  math(EXPR _length "${_length} - 1")
+  string(SUBSTRING "${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}" 0 ${_length} MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES)
+  set(MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES ${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}
+      CACHE STRING "List of vector pixel types used in AccessByItk and InstantiateAccessFunction macros for itk::VectorImage types" FORCE)
 endif()
 
 if(NOT MITK_ACCESSBYITK_DIMENSIONS)
@@ -840,11 +874,6 @@ if(MITK_USE_BLUEBERRY)
 endif()
 
 #-----------------------------------------------------------------------------
-# Python Wrapping
-#-----------------------------------------------------------------------------
-option(MITK_USE_Python "Build Python integration for MITK (requires CableSwig)." OFF)
-
-#-----------------------------------------------------------------------------
 # Documentation
 #-----------------------------------------------------------------------------
 
@@ -1050,3 +1079,4 @@ feature_summary(
   DESCRIPTION "------- FEATURE SUMMARY FOR ${PROJECT_NAME} -------"
   WHAT ALL
 )
+

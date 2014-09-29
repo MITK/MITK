@@ -52,8 +52,12 @@ class QmitkPreprocessingView : public QmitkFunctionality
 
   static const std::string VIEW_ID;
 
-  typedef vnl_vector_fixed< double, 3 > GradientDirectionType;
-  typedef itk::VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
+  typedef vnl_vector_fixed< double, 3 >                                 GradientDirectionType;
+  typedef itk::VectorContainer< unsigned int, GradientDirectionType >   GradientDirectionContainerType;
+  typedef mitk::DiffusionImage<short>                                   MitkDwiType;
+  typedef itk::VectorImage< short, 3 >                                  ItkDwiType;
+  typedef itk::Image< unsigned char, 3 >                                UcharImageType;
+  typedef itk::Image< double, 3 >                                       ItkDoubleImageType;
 
   QmitkPreprocessingView();
   virtual ~QmitkPreprocessingView();
@@ -78,19 +82,50 @@ protected slots:
   void AverageGradients();
   void ExtractB0();
   void MergeDwis();
+  void DoApplySpacing();
+  void DoApplyOrigin();
+  void DoApplyDirectionMatrix();
   void DoApplyMesurementFrame();
   void DoReduceGradientDirections();
   void DoShowGradientDirections();
   void DoHalfSphereGradientDirections();
-  void DoADCAverage();
-  void DoADCFit();
-  void DoAKCFit();
-  void DoBiExpFit();
   void UpdateDwiBValueMapRounder(int i);
   void DoLengthCorrection();
   void DoAdcCalculation();
+  void DoDwiNormalization();
+  void DoProjectSignal();
+  void DoExtractBrainMask();
+  void DoResampleImage();
+  void DoCropImage();
+  void DoUpdateInterpolationGui(int i);
+  void DoRemoveGradient();
+  void DoExtractGradient();
 
 protected:
+
+  void DoADCFit();
+  void DoAKCFit();
+  void DoBiExpFit();
+  void DoADCAverage();
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedCropImage( itk::Image<TPixel, VImageDimension>* itkImage);
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedApplyRotation( itk::Image<TPixel, VImageDimension>* itkImage);
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedUpdateGui( itk::Image<TPixel, VImageDimension>* itkImage);
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedResampleImage( itk::Image<TPixel, VImageDimension>* itkImage);
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedSetImageSpacing( itk::Image<TPixel, VImageDimension>* itkImage);
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedSetImageOrigin( itk::Image<TPixel, VImageDimension>* itkImage);
+
   /** Called by ExtractB0 if check-box activated, extracts all b0 images without averaging */
   void DoExtractBOWithoutAveraging();
 
@@ -105,13 +140,12 @@ protected:
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
+  mitk::DataNode::Pointer                           m_SelectedImageNode;
+  mitk::Image::Pointer                              m_SelectedImage;
   mitk::DiffusionImage<DiffusionPixelType>::Pointer m_DiffusionImage;
   std::vector< mitk::DataNode::Pointer >            m_SelectedDiffusionNodes;
 
-  QList<QCheckBox*> m_ReduceGradientCheckboxes;
-  QList<QSpinBox*> m_ReduceGradientSpinboxes;
-
-  void CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::DiffusionImage<DiffusionPixelType>::Pointer ImPtr, QString imageName);
+  void CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::DiffusionImage<DiffusionPixelType>::Pointer ImPtr, QString imageName, mitk::DataNode* parent);
 };
 
 

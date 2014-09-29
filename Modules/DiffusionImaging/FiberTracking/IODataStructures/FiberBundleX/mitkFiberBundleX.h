@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <QStringList>
 
 #include <mitkPlanarFigure.h>
+#include <mitkPixelTypeTraits.h>
+#include <mitkPlanarFigureComposite.h>
 
 namespace mitk {
 
@@ -73,6 +75,7 @@ public:
     void ResetFiberOpacity();
 
     // fiber smoothing/resampling
+    void CompressFibers(float error = 0.0);
     void ResampleFibers(float pointDistance = 1);
     void DoFiberSmoothing(float pointDistance);
     void DoFiberSmoothing(float pointDistance, double tension, double continuity, double bias );
@@ -92,9 +95,9 @@ public:
     FiberBundleX::Pointer SubtractBundle(FiberBundleX* fib);
 
     // fiber subset extraction
-    FiberBundleX::Pointer           ExtractFiberSubset(PlanarFigure *pf);
-    std::vector<long>               ExtractFiberIdSubset(PlanarFigure* pf);
-    FiberBundleX::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint);
+    FiberBundleX::Pointer           ExtractFiberSubset(BaseData* roi);
+    std::vector<long>               ExtractFiberIdSubset(BaseData* roi);
+    FiberBundleX::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false);
     FiberBundleX::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
 
     vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> ); // TODO: make protected
@@ -112,11 +115,12 @@ public:
     itkGetMacro( MeanFiberLength, float )
     itkGetMacro( MedianFiberLength, float )
     itkGetMacro( LengthStDev, float )
+    itkGetMacro( UpdateTime2D, itk::TimeStamp )
+    itkGetMacro( UpdateTime3D, itk::TimeStamp )
+    void RequestUpdate2D(){ m_UpdateTime2D.Modified(); }
+    void RequestUpdate3D(){ m_UpdateTime3D.Modified(); }
 
-    std::vector<int> GetPointsRoi()
-    {
-        return m_PointsRoi;
-    }
+    unsigned long GetNumberOfPoints();
 
     // copy fiber bundle
     mitk::FiberBundleX::Pointer GetDeepCopy();
@@ -158,8 +162,8 @@ private:
     float   m_MedianFiberLength;
     float   m_LengthStDev;
     int     m_FiberSampling;
-
-    std::vector<int> m_PointsRoi; // this global variable needs to be refactored
+    itk::TimeStamp m_UpdateTime2D;
+    itk::TimeStamp m_UpdateTime3D;
 
     mitk::Image::Pointer m_ReferenceImage;
 

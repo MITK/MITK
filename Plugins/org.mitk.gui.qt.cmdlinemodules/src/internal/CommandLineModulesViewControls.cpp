@@ -34,3 +34,12 @@ CommandLineModulesViewControls::~CommandLineModulesViewControls()
 {
 
 }
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesViewControls::SetAdvancedWidgetsVisible(const bool& isVisible)
+{
+  this->m_ClearXMLCache->setVisible(isVisible);
+  this->m_ReloadModules->setVisible(isVisible);
+}
+

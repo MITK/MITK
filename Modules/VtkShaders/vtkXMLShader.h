@@ -102,7 +102,8 @@ public:
     SCOPE_NONE=0,
     SCOPE_MIXED,
     SCOPE_VERTEX,
-    SCOPE_FRAGMENT
+    SCOPE_FRAGMENT,
+    SCOPE_GEOMETRY
     };
 
 //ETX

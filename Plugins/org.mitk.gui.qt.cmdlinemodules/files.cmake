@@ -14,7 +14,7 @@ set(INTERNAL_CPP_FILES
   CommandLineModulesViewControls.cpp
   CommandLineModulesPreferencesPage.cpp
   CommandLineModulesView.cpp
-  QmitkCmdLineModuleProgressWidget.cpp
+  QmitkCmdLineModuleRunner.cpp
 )
 
 set(UI_FILES
@@ -34,7 +34,7 @@ set(MOC_H_FILES
   src/internal/CommandLineModulesViewControls.h
   src/internal/CommandLineModulesPreferencesPage.h
   src/internal/CommandLineModulesView.h
-  src/internal/QmitkCmdLineModuleProgressWidget.h
+  src/internal/QmitkCmdLineModuleRunner.h
 )
 
 # list of resource files which can be used by the plug-in

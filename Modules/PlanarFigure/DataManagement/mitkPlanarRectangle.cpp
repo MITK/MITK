@@ -144,3 +144,16 @@ void mitk::PlanarRectangle::PrintSelf( std::ostream& os, itk::Indent indent) con
     os << indent << indent << i << ": " <<GetControlPoint( i ) << std::endl;
   }
 }
+
+ bool mitk::PlanarRectangle::Equals(const mitk::PlanarFigure& other) const
+ {
+   const mitk::PlanarRectangle* otherRectangle = dynamic_cast<const mitk::PlanarRectangle*>(&other);
+   if ( otherRectangle )
+   {
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

@@ -97,11 +97,11 @@ public:
   void PaintHistogram(QPainter &p);
 
   virtual int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32) = 0;
-  virtual void AddFunctionPoint(double x,double val) = 0;
+  virtual int AddFunctionPoint(double x,double val) = 0;
   virtual void RemoveFunctionPoint(double x) = 0;
   virtual void MoveFunctionPoint(int index, std::pair<double,double> pos) = 0;
   virtual double GetFunctionX(int index) = 0;
-  virtual float GetFunctionY(int index) = 0;
+  virtual double GetFunctionY(int index) = 0;
   virtual int GetFunctionSize() = 0;
   int m_GrabbedHandle;
 
@@ -117,10 +117,12 @@ public:
 
   void SetImmediateUpdate(bool state);
 
-  static std::pair<double,double> ValidateCoord( std::pair<double,double> x )
+  std::pair<double,double> ValidateCoord( std::pair<double,double> x )
   {
-    if( x.first < -2048 ) x.first = -2048;
-    if( x.first >  2048 ) x.first =  2048;
+    double max = m_Histogram->GetMax();
+    double min = m_Histogram->GetMin();
+    if( x.first < min ) x.first = min;
+    if( x.first >  max ) x.first =  max;
     if( x.second < 0 ) x.second = 0;
     if( x.second > 1 ) x.second = 1;
     return x;

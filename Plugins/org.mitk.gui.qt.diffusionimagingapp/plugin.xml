@@ -17,76 +17,10 @@
   </extension>
 
   <extension point="org.blueberry.ui.perspectives">
-<!--    <perspective id="org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp"
-      name="Data Display"
-      class="QmitkDiffusionImagingAppPerspective"
-      icon="resources/perspectives/icon_home.png"/>-->
-
     <perspective id="org.mitk.diffusionimagingapp.perspectives.welcome"
       name="Data Display"
       class="QmitkWelcomePerspective"
       icon="resources/perspectives/icon_home.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.dicomimport"
-      name="DICOM Import"
-      class="QmitkDIAppDicomImportPerspective"
-      icon="resources/perspectives/dicomimport.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.ivim"
-      name="IVIM"
-      class="QmitkDIAppIVIMPerspective"
-      icon="resources/perspectives/ivim.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.preprocessingreconstruction"
-      name="Preprocessing and Reconstruction"
-      class="QmitkDIAppPreprocessingReconstructionPerspective"
-      icon="resources/perspectives/preprocessing.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.quantification"
-      name="Quantification"
-      class="QmitkDIAppQuantificationPerspective"
-      icon="resources/perspectives/chart.png"/>
-
-<!--    <perspective id="org.mitk.diffusionimagingapp.perspectives.tbss"
-      name="TBSS"
-      class="QmitkDIAppTBSSPerspective"
-      icon="resources/perspectives/tbss.png"/>-->
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.tractography"
-      name="Tractography"
-      class="QmitkDIAppFiberTractographyPerspective"
-      icon="resources/perspectives/tractography.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.connectomics"
-      name="Connectomics"
-      class="QmitkDIAppConnectomicsPerspective"
-      icon="resources/perspectives/connectomics.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.syntheticdata"
-      name="Synthetic Data"
-      class="QmitkDIAppSyntheticDataGenerationPerspective"
-      icon="resources/perspectives/syntheticdata.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.registration"
-      name="Registration"
-      class="QmitkDIAppRegistrationPerspective"
-      icon="resources/perspectives/registration.xpm"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.imageprocessing"
-      name="Image Processing"
-      class="QmitkDIAppImageProcessingPerspective"
-      icon="resources/perspectives/imageProcessing.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.visualization"
-      name="Visualization"
-      class="QmitkDIAppVisualizationPerspective"
-      icon="resources/perspectives/eye.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.utility"
-      name="Utilities"
-      class="QmitkDIAppUtilityPerspective"
-      icon="resources/perspectives/utilities.png"/>
-
   </extension>
 
 </plugin>

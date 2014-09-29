@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkShowSegmentationAsSmoothedSurface.h"
 #include "mitkImageToItk.h"
+#include "mitkImageCast.h"
 #include "itkIntelligentBinaryClosingFilter.h"
 #include <mitkUIDGenerator.h>
 #include <mitkGeometry3D.h>
@@ -60,7 +61,7 @@ void ShowSegmentationAsSmoothedSurface::Initialize(const NonBlockingAlgorithm *o
   SetParameter("Sync visibility", syncVisibility);
   SetParameter("Wireframe", false);
 
-  // The Smoothing value is used as variance for a Gauﬂ filter.
+  // The Smoothing value is used as variance for a Gauss filter.
   // A reasonable default value equals the image spacing in mm.
   SetParameter("Smoothing", 1.0f);
 

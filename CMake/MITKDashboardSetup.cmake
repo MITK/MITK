@@ -5,29 +5,57 @@ list(APPEND CTEST_NOTES_FILES "${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}")
 #
 # Automatically determined properties
 #
-set(MY_OPERATING_SYSTEM "${CMAKE_HOST_SYSTEM}") # Windows 7, Linux-2.6.32, Darwin...
+set(MY_OPERATING_SYSTEM )
+
+if(UNIX)
+  # Download a utility script
+  set(url "http://mitk.org/git/?p=MITK.git;a=blob_plain;f=CMake/mitkDetectOS.sh;hb=${hb}")
+  set(dest "${CTEST_SCRIPT_DIRECTORY}/mitkDetectOS.sh")
+  downloadFile("${url}" "${dest}")
+  execute_process(COMMAND sh "${dest}"
+  RESULT_VARIABLE _result OUTPUT_VARIABLE _out
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  if(NOT _result)
+    set(MY_OPERATING_SYSTEM "${_out}")
+  endif()
+endif()
+
+if(NOT MY_OPERATING_SYSTEM)
+  set(MY_OPERATING_SYSTEM "${CMAKE_HOST_SYSTEM}") # Windows 7, Linux-2.6.32, Darwin...
+endif()
+
 site_name(CTEST_SITE)
 
-if(QT_BINARY_DIR)
-  set(QT_QMAKE_EXECUTABLE "${QT_BINARY_DIR}/qmake")
-else()
-  set(QT_QMAKE_EXECUTABLE "qmake")
+if(NOT DEFINED MITK_USE_QT)
+  set(MITK_USE_QT 1)
 endif()
 
-execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} --version
-                OUTPUT_VARIABLE MY_QT_VERSION
-                RESULT_VARIABLE qmake_error)
-if(qmake_error)
-  message(FATAL_ERROR "Error when executing ${QT_QMAKE_EXECUTABLE} --version\n${qmake_error}")
-endif()
+if(MITK_USE_QT)
+  if(NOT QT_QMAKE_EXECUTABLE)
+    find_program(QT_QMAKE_EXECUTABLE NAMES qmake qmake-qt4
+                 HINTS ${QT_BINARY_DIR})
+  endif()
 
-string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
+  execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} --version
+                  OUTPUT_VARIABLE MY_QT_VERSION
+                  RESULT_VARIABLE qmake_error)
+  if(qmake_error)
+    message(FATAL_ERROR "Error when executing ${QT_QMAKE_EXECUTABLE} --version\n${qmake_error}")
+  endif()
+
+  string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
+endif()
 
 #
 # Project specific properties
 #
 if(NOT CTEST_BUILD_NAME)
-  set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-Qt-${MY_QT_VERSION}-${CTEST_BUILD_CONFIGURATION}")
+  if(MITK_USE_QT)
+     set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM} ${MY_COMPILER} Qt${MY_QT_VERSION} ${CTEST_BUILD_CONFIGURATION}")
+  else()
+    set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM} ${MY_COMPILER} ${CTEST_BUILD_CONFIGURATION}")
+  endif()
 endif()
 set(PROJECT_BUILD_DIR "MITK-build")
 
@@ -45,11 +73,12 @@ if(WIN32)
   set(ITK_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/ITK-build/bin/${CTEST_BUILD_CONFIGURATION}")
   set(BOOST_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/Boost-install/lib")
   set(GDCM_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/GDCM-build/bin/${CTEST_BUILD_CONFIGURATION}")
+  set(DCMTK_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/DCMTK-install/bin/${CTEST_BUILD_CONFIGURATION}")
   set(OPENCV_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/OpenCV-build/bin/${CTEST_BUILD_CONFIGURATION}")
   set(POCO_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/Poco-install/lib")
   set(SOFA_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/SOFA-build/bin/${CTEST_BUILD_CONFIGURATION}")
   set(BLUEBERRY_OSGI_DIR "${CTEST_BINARY_DIRECTORY}/MITK-build/bin/BlueBerry/org.blueberry.osgi/bin/${CTEST_BUILD_CONFIGURATION}")
-  set(CTEST_PATH "${CTEST_PATH};${CPPUNIT_BINARY_DIR};${QT_BINARY_DIR};${VTK_BINARY_DIR};${ANN_BINARY_DIR};${GLUT_BINARY_DIR};${GLEW_BINARY_DIR};${TINYXML_BINARY_DIR};${QWT_BINARY_DIR};${QXT_BINARY_DIR};${ACVD_BINARY_DIR};${ITK_BINARY_DIR};${BOOST_BINARY_DIR};${GDCM_BINARY_DIR};${OPENCV_BINARY_DIR};${POCO_BINARY_DIR};${SOFA_BINARY_DIR};${BLUEBERRY_OSGI_DIR}")
+  set(CTEST_PATH "${CTEST_PATH};${CPPUNIT_BINARY_DIR};${QT_BINARY_DIR};${VTK_BINARY_DIR};${ANN_BINARY_DIR};${GLUT_BINARY_DIR};${GLEW_BINARY_DIR};${TINYXML_BINARY_DIR};${QWT_BINARY_DIR};${QXT_BINARY_DIR};${ACVD_BINARY_DIR};${ITK_BINARY_DIR};${BOOST_BINARY_DIR};${GDCM_BINARY_DIR};${DCMTK_BINARY_DIR};${OPENCV_BINARY_DIR};${POCO_BINARY_DIR};${SOFA_BINARY_DIR};${BLUEBERRY_OSGI_DIR}")
 endif()
 set(ENV{PATH} "${CTEST_PATH}")
 
@@ -98,10 +127,21 @@ if(NOT DEFINED MITK_USE_Poco)
   set(MITK_USE_Poco 1)
 endif()
 
+if(NOT DEFINED MITK_USE_Python)
+  if(WIN32)
+    set(MITK_USE_Python FALSE)
+  else()
+    set(MITK_USE_Python TRUE)
+  endif()
+endif()
+
 if(NOT DEFINED MITK_USE_SOFA)
   set(MITK_USE_SOFA 1)
 endif()
 
+if(NOT DEFINED MITK_VTK_DEBUG_LEAKS)
+  set(MITK_VTK_DEBUG_LEAKS 1)
+endif()
 if(NOT DEFINED MITK_BUILD_ALL_APPS)
   set(MITK_BUILD_ALL_APPS TRUE)
 endif()
@@ -132,9 +172,17 @@ MITK_USE_ACVD:BOOL=${MITK_USE_ACVD}
 MITK_USE_Boost:BOOL=${MITK_USE_Boost}
 MITK_USE_OpenCV:BOOL=${MITK_USE_OpenCV}
 MITK_USE_Poco:BOOL=${MITK_USE_Poco}
+MITK_USE_Python:BOOL=${MITK_USE_Python}
 MITK_USE_SOFA:BOOL=${MITK_USE_SOFA}
+MITK_USE_QT:BOOL=${MITK_USE_QT}
+MITK_VTK_DEBUG_LEAKS:BOOL=${MITK_VTK_DEBUG_LEAKS}
 ${ADDITIONAL_CMAKECACHE_OPTION}
 ")
+
+if(MITK_USE_QT)
+  set(INITIAL_CMAKECACHE_OPTIONS "${INITIAL_CMAKECACHE_OPTIONS}
+QT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}")
+endif()
 
 # Write a cache file for populating the MITK initial cache (not the superbuild cache).
 # This can be used to provide variables which are not passed through the

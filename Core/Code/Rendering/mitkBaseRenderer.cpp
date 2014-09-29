@@ -107,14 +107,41 @@ vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName(const std::string& na
   return NULL;
 }
 
-mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm,RenderingMode::Type renderingMode) :
-    m_RenderWindow(NULL), m_VtkRenderer(NULL), m_MapperID(defaultMapper), m_DataStorage(NULL), m_RenderingManager(rm), m_LastUpdateTime(0), m_CameraController(
-        NULL), m_SliceNavigationController(NULL), m_CameraRotationController(NULL), /*m_Size(),*/
-    m_Focused(false), m_WorldGeometry(NULL), m_WorldTimeGeometry(NULL), m_CurrentWorldGeometry(NULL), m_CurrentWorldPlaneGeometry(NULL), m_DisplayGeometry(
-        NULL), m_Slice(0), m_TimeStep(), m_CurrentWorldPlaneGeometryUpdateTime(), m_DisplayGeometryUpdateTime(), m_TimeStepUpdateTime(), m_WorldGeometryData(
-        NULL), m_DisplayGeometryData(NULL), m_CurrentWorldPlaneGeometryData(NULL), m_WorldGeometryNode(NULL), m_DisplayGeometryNode(NULL), m_CurrentWorldPlaneGeometryNode(
-        NULL), m_DisplayGeometryTransformTime(0), m_CurrentWorldPlaneGeometryTransformTime(0), m_Name(name), /*m_Bounds(),*/m_EmptyWorldGeometry(
-        true), m_NumberOfVisibleLODEnabledMappers(0)
+mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm,RenderingMode::Type renderingMode)
+  : m_RenderWindow(NULL)
+  , m_VtkRenderer(NULL)
+  , m_MapperID(defaultMapper)
+  , m_DataStorage(NULL)
+  , m_RenderingManager(rm)
+  , m_LastUpdateTime(0)
+  , m_CameraController(NULL)
+  , m_SliceNavigationController(NULL)
+  , m_CameraRotationController(NULL)
+  /*, m_Size()*/
+  , m_Focused(false)
+  , m_WorldGeometry(NULL)
+  , m_WorldTimeGeometry(NULL)
+  , m_CurrentWorldGeometry(NULL)
+  , m_CurrentWorldPlaneGeometry(NULL)
+  , m_DisplayGeometry(NULL)
+  , m_Slice(0)
+  , m_TimeStep()
+  , m_CurrentWorldPlaneGeometryUpdateTime()
+  , m_DisplayGeometryUpdateTime()
+  , m_TimeStepUpdateTime()
+  , m_KeepDisplayedRegion(true)
+  , m_WorldGeometryData(NULL)
+  , m_DisplayGeometryData(NULL)
+  , m_CurrentWorldPlaneGeometryData(NULL)
+  , m_WorldGeometryNode(NULL)
+  , m_DisplayGeometryNode(NULL)
+  , m_CurrentWorldPlaneGeometryNode(NULL)
+  , m_DisplayGeometryTransformTime(0)
+  , m_CurrentWorldPlaneGeometryTransformTime(0)
+  , m_Name(name)
+  /*, m_Bounds()*/
+  , m_EmptyWorldGeometry(true)
+  , m_NumberOfVisibleLODEnabledMappers(0)
 {
   m_Bounds[0] = 0;
   m_Bounds[1] = 0;
@@ -249,6 +276,7 @@ mitk::BaseRenderer::~BaseRenderer()
     m_RenderWindow->Delete();
     m_RenderWindow = NULL;
   }
+
 }
 
 void mitk::BaseRenderer::RemoveAllLocalStorages()
@@ -275,7 +303,6 @@ mitk::Point3D mitk::BaseRenderer::Map2DRendererPositionTo3DWorldPosition(const P
 {
   Point2D p_mm;
   Point3D position;
-
   if (m_MapperID == 1)
   {
     GetDisplayGeometry()->DisplayToWorld(mousePosition, p_mm);
@@ -321,7 +348,7 @@ void mitk::BaseRenderer::Resize(int w, int h)
   if (m_CameraController)
     m_CameraController->Resize(w, h); //(formerly problematic on windows: vtkSizeBug)
 
-  GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);
+  GetDisplayGeometry()->SetSizeInDisplayUnits(w, h, m_KeepDisplayedRegion);
 }
 
 void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)
@@ -342,6 +369,7 @@ void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)
   {
     m_CameraController->SetRenderer(this);
   }
+
 }
 
 void mitk::BaseRenderer::InitSize(int w, int h)

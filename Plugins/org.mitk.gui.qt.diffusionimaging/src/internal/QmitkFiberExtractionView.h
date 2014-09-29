@@ -81,8 +81,9 @@ protected slots:
   void JoinBundles();               ///< merge selected fiber bundles
   void SubstractBundles();          ///< subtract bundle A from bundle B. Not commutative! Defined by order of selection.
   void GenerateRoiImage();          ///< generate binary image of selected planar figures.
-  void ExtractPassingMask();                 ///< extract all fibers passing the selected surface mesh
-  void ExtractEndingInMask();               ///< extract all fibers passing the selected surface mesh
+  void ExtractPassingMask();        ///< extract all fibers passing the selected segmentation
+  void ExtractNotPassingMask();     ///< extract all fibers NOT passing the selected segmentation
+  void ExtractEndingInMask();       ///< extract all fibers passing the selected segmentation
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name, const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
 
@@ -143,7 +144,6 @@ protected:
       void InternalReorientImagePlane(
         const itk::Image< TPixel, VImageDimension > *image, mitk::BaseGeometry* planegeo3D, int additionalIndex );
 
-  void GenerateStats(); ///< generate statistics of selected fiber bundles
   void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
 
   int m_CircleCounter;                                      ///< used for data node naming
@@ -158,15 +158,17 @@ protected:
   itkUCharImageType::Pointer            m_PlanarFigureImage;
   float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
   mitk::DataNode::Pointer               m_MaskImageNode;
-  mitk::DataNode::Pointer               m_LastAddedPf;
 
-  void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
+  void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer pfc, mitk::DataNode::Pointer parentNode=NULL);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
-  void CompositeExtraction(mitk::DataNode::Pointer node, mitk::Image* image);
+  void WritePfToImage(mitk::DataNode::Pointer node, mitk::Image* image);
   mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary, bool absolute);
   mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundleX::Pointer fib);
   mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundleX::Pointer fib);
   mitk::DataNode::Pointer GenerateFiberEndingsPointSet(mitk::FiberBundleX::Pointer fib);
+
+  void NodeAdded( const mitk::DataNode* node );
+  void NodeRemoved(const mitk::DataNode* node);
 };
 
 

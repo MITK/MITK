@@ -49,7 +49,7 @@ ScalarType StickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
     if (bVal>0.0001)
     {
         ScalarType dot = this->m_FiberDirection*g;
-        signal = exp( -m_BValue * bVal * m_Diffusivity*dot*dot );
+        signal = std::exp( -m_BValue * bVal * m_Diffusivity*dot*dot );
     }
     else
         signal = 1;
@@ -72,7 +72,7 @@ typename StickModel< ScalarType >::PixelType StickModel< ScalarType >::SimulateM
         if (bVal>0.0001)
         {
             ScalarType dot = this->m_FiberDirection*g;
-            signal[i] = exp( -m_BValue * bVal * m_Diffusivity*dot*dot );
+            signal[i] = std::exp( -m_BValue * bVal * m_Diffusivity*dot*dot );
         }
         else
             signal[i] = 1;

@@ -49,13 +49,20 @@ class ResampleDwiImageFilter
 
 public:
 
+    enum Interpolation {
+        Interpolate_NearestNeighbour,
+        Interpolate_Linear,
+        Interpolate_BSpline,
+        Interpolate_WindowedSinc
+    };
+
     typedef ResampleDwiImageFilter Self;
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ImageToImageFilter< itk::VectorImage<TScalarType,3>, itk::VectorImage<TScalarType,3> >
     Superclass;
 
-    typedef itk::Vector< double, 3 > SamplingFactorType;
+    typedef itk::Vector< double, 3 > DoubleVectorType;
     typedef itk::VectorImage<TScalarType,3> DwiImageType;
     typedef itk::Image<TScalarType,3> DwiChannelType;
 
@@ -66,8 +73,47 @@ public:
     /** Runtime information support. */
     itkTypeMacro(ResampleDwiImageFilter, ImageToImageFilter)
 
-    itkGetMacro(SamplingFactor, SamplingFactorType)
-    itkSetMacro(SamplingFactor, SamplingFactorType)
+    itkSetMacro( Interpolation, Interpolation )
+
+    void SetSamplingFactor(DoubleVectorType sampling)
+    {
+        m_NewSpacing = this->GetInput()->GetSpacing();
+        m_NewSpacing[0] /= sampling[0];
+        m_NewSpacing[1] /= sampling[1];
+        m_NewSpacing[2] /= sampling[2];
+        m_NewImageRegion = this->GetInput()->GetLargestPossibleRegion();
+        m_NewImageRegion.SetSize(0, m_NewImageRegion.GetSize(0)*sampling[0]);
+        m_NewImageRegion.SetSize(1, m_NewImageRegion.GetSize(1)*sampling[1]);
+        m_NewImageRegion.SetSize(2, m_NewImageRegion.GetSize(2)*sampling[2]);
+    }
+    void SetNewSpacing(DoubleVectorType spacing)
+    {
+        DoubleVectorType oldSpacing = this->GetInput()->GetSpacing();
+        DoubleVectorType sampling;
+        sampling[0] = oldSpacing[0]/spacing[0];
+        sampling[1] = oldSpacing[1]/spacing[1];
+        sampling[2] = oldSpacing[2]/spacing[2];
+
+        m_NewSpacing = spacing;
+        m_NewImageRegion = this->GetInput()->GetLargestPossibleRegion();
+        m_NewImageRegion.SetSize(0, m_NewImageRegion.GetSize(0)*sampling[0]);
+        m_NewImageRegion.SetSize(1, m_NewImageRegion.GetSize(1)*sampling[1]);
+        m_NewImageRegion.SetSize(2, m_NewImageRegion.GetSize(2)*sampling[2]);
+    }
+    void SetNewImageSize(ImageRegion<3> region)
+    {
+        ImageRegion<3> oldRegion = this->GetInput()->GetLargestPossibleRegion();
+        DoubleVectorType sampling;
+        sampling[0] = (double)region.GetSize(0)/oldRegion.GetSize(0);
+        sampling[1] = (double)region.GetSize(1)/oldRegion.GetSize(1);
+        sampling[2] = (double)region.GetSize(2)/oldRegion.GetSize(2);
+
+        m_NewImageRegion = region;
+        m_NewSpacing = this->GetInput()->GetSpacing();
+        m_NewSpacing[0] /= sampling[0];
+        m_NewSpacing[1] /= sampling[1];
+        m_NewSpacing[2] /= sampling[2];
+    }
 
     protected:
         ResampleDwiImageFilter();
@@ -75,7 +121,9 @@ public:
 
     void GenerateData();
 
-    SamplingFactorType m_SamplingFactor;
+    DoubleVectorType m_NewSpacing;
+    ImageRegion<3>   m_NewImageRegion;
+    Interpolation    m_Interpolation;
 };
 
 

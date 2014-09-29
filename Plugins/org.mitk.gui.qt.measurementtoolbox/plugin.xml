@@ -3,22 +3,23 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <category 
-      id="org.mitk.views.general" 
-      name="MITK General"/> 
-    <view 
-      id="org.mitk.views.measurement" 
-      name="Measurement" 
-      category="org.mitk.views.general" 
+    <category
+      id="org.mitk.views.general"
+      name="MITK General"/>
+    <view
+      id="org.mitk.views.measurement"
+      name="Measurement"
+      category="Quantification"
       icon="resources/measurement.png"
       class="QmitkMeasurementView" />
   </extension>
-  
+
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.imagestatistics"
           name="Statistics"
+          category="Quantification"
           class="QmitkImageStatisticsView"
           icon="resources/ImageStatistic_24.png" />
   </extension>
-  
+
 </plugin>

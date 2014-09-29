@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAbstractTransformGeometry.h"
 #include <vtkAbstractTransform.h>
 
-mitk::AbstractTransformGeometry::AbstractTransformGeometry() : m_Plane(NULL), m_FrameGeometry(NULL)
+mitk::AbstractTransformGeometry::AbstractTransformGeometry() : Superclass(), m_Plane(NULL), m_FrameGeometry(NULL)
 {
   Initialize();
 }

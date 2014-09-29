@@ -62,13 +62,13 @@ namespace mitk
       void NotifyObserver( const std::string& command );
       ///
       /// \see IPythonService::IsItkPythonWrappingAvailable()
-      bool IsItkPythonWrappingAvailable();
+      bool IsSimpleItkPythonWrappingAvailable();
       ///
       /// \see IPythonService::CopyToPythonAsItkImage()
-      bool CopyToPythonAsItkImage( mitk::Image* image, const std::string& varName );
+      bool CopyToPythonAsSimpleItkImage( mitk::Image* image, const std::string& varName );
       ///
       /// \see IPythonService::CopyItkImageFromPython()
-      mitk::Image::Pointer CopyItkImageFromPython( const std::string& varName );
+      mitk::Image::Pointer CopySimpleItkImageFromPython( const std::string& varName );
       ///
       /// \see IPythonService::IsOpenCvPythonWrappingAvailable()
       bool IsOpenCvPythonWrappingAvailable();

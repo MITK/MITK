@@ -92,7 +92,7 @@ TPDPixelType>
     m_ImageSpacing[1] = inputImage->GetSpacing()[1];
     m_ImageSpacing[2] = inputImage->GetSpacing()[2];
 
-    float minSpacing;
+    double minSpacing;
     if(m_ImageSpacing[0]<m_ImageSpacing[1] && m_ImageSpacing[0]<m_ImageSpacing[2])
         minSpacing = m_ImageSpacing[0];
     else if (m_ImageSpacing[1] < m_ImageSpacing[2])
@@ -163,7 +163,7 @@ TPDPixelType>
         pdImage->Allocate();
         m_PdImage.push_back(pdImage);
 
-        ItkFloatImgType::Pointer emaxImage = ItkFloatImgType::New();
+        ItkDoubleImgType::Pointer emaxImage = ItkDoubleImgType::New();
         emaxImage->SetSpacing( inputImage->GetSpacing() );
         emaxImage->SetOrigin( inputImage->GetOrigin() );
         emaxImage->SetDirection( inputImage->GetDirection() );
@@ -252,7 +252,7 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
         dir[2] /= m_ImageSpacing[2];
 
         int smallest = 0;
-        float x = 100000;
+        double x = 100000;
         if (dir[0]>0)
         {
             if (fabs(fabs(RoundToNearest(pos[0])-pos[0])-0.5)>mitk::eps)
@@ -267,9 +267,9 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
             else
                 x = -fabs(pos[0]-std::floor(pos[0])+0.5)/dir[0];
         }
-        float s = x;
+        double s = x;
 
-        float y = 100000;
+        double y = 100000;
         if (dir[1]>0)
         {
             if (fabs(fabs(RoundToNearest(pos[1])-pos[1])-0.5)>mitk::eps)
@@ -290,7 +290,7 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
             smallest = 1;
         }
 
-        float z = 100000;
+        double z = 100000;
         if (dir[2]>0)
         {
             if (fabs(fabs(RoundToNearest(pos[2])-pos[2])-0.5)>mitk::eps)
@@ -349,14 +349,14 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
             index[0] = RoundToNearest(pos[0]);
         }
 
-        //        float x = 100000;
+        //        double x = 100000;
         //        if (dir[0]>0)
         //            x = fabs(pos[0]-RoundToNearest(pos[0])-0.5)/dir[0];
         //        else if (dir[0]<0)
         //            x = -fabs(pos[0]-RoundToNearest(pos[0])+0.5)/dir[0];
-        //        float s = x;
+        //        double s = x;
 
-        //        float y = 100000;
+        //        double y = 100000;
         //        if (dir[1]>0)
         //            y = fabs(pos[1]-RoundToNearest(pos[1])-0.5)/dir[1];
         //        else if (dir[1]<0)
@@ -364,7 +364,7 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
         //        if (s>y)
         //            s=y;
 
-        //        float z = 100000;
+        //        double z = 100000;
         //        if (dir[2]>0)
         //            z = fabs(pos[2]-RoundToNearest(pos[2])-0.5)/dir[2];
         //        else if (dir[2]<0)
@@ -388,16 +388,16 @@ void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
 
 template< class TTensorPixelType, class TPDPixelType>
 bool StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
-::IsValidPosition(itk::ContinuousIndex<double, 3>& pos, typename InputImageType::IndexType &index, vnl_vector_fixed< float, 8 >& interpWeights, int imageIdx)
+::IsValidPosition(itk::ContinuousIndex<double, 3>& pos, typename InputImageType::IndexType &index, vnl_vector_fixed< double, 8 >& interpWeights, int imageIdx)
 {
     if (!m_InputImage.at(imageIdx)->GetLargestPossibleRegion().IsInside(index) || m_MaskImage->GetPixel(index)==0)
         return false;
 
     if (m_Interpolate)
     {
-        float frac_x = pos[0] - index[0];
-        float frac_y = pos[1] - index[1];
-        float frac_z = pos[2] - index[2];
+        double frac_x = pos[0] - index[0];
+        double frac_y = pos[1] - index[1];
+        double frac_z = pos[2] - index[2];
 
         if (frac_x<0)
         {
@@ -437,7 +437,7 @@ bool StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
         interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
 
         typename InputImageType::IndexType tmpIdx;
-        float FA = m_FaImage->GetPixel(index) * interpWeights[0];
+        double FA = m_FaImage->GetPixel(index) * interpWeights[0];
         tmpIdx = index; tmpIdx[0]++;
         FA +=  m_FaImage->GetPixel(tmpIdx) * interpWeights[1];
         tmpIdx = index; tmpIdx[1]++;
@@ -463,20 +463,20 @@ bool StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
 }
 
 template< class TTensorPixelType, class TPDPixelType>
-float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
+double StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
 ::FollowStreamline(itk::ContinuousIndex<double, 3> pos, int dirSign, vtkPoints* points, std::vector< vtkIdType >& ids, int imageIdx)
 {
-    float tractLength = 0;
+    double tractLength = 0;
     typedef itk::DiffusionTensor3D<TTensorPixelType>    TensorType;
     typename TensorType::EigenValuesArrayType eigenvalues;
     typename TensorType::EigenVectorsMatrixType eigenvectors;
-    vnl_vector_fixed< float, 8 > interpWeights;
+    vnl_vector_fixed< double, 8 > interpWeights;
 
     typename InputImageType::IndexType index, indexOld;
     indexOld[0] = -1; indexOld[1] = -1; indexOld[2] = -1;
     itk::Point<double> worldPos;
-    float distance = 0;
-    float distanceInVoxel = 0;
+    double distance = 0;
+    double distanceInVoxel = 0;
 
     // starting index and direction
     index[0] = RoundToNearest(pos[0]);
@@ -523,13 +523,13 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                         continue;
 
                     typename InputImageType::PixelType tensor = m_InputImage.at(img)->GetPixel(index);
-                    float scale = m_EmaxImage.at(img)->GetPixel(index);
+                    double scale = m_EmaxImage.at(img)->GetPixel(index);
                     newDir[0] = m_F*newDir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + scale*m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
                     newDir[1] = m_F*newDir[1] + (1-m_F)*( (1-m_G)*dirOld[1] + scale*m_G*(tensor[1]*dirOld[0] + tensor[3]*dirOld[1] + tensor[4]*dirOld[2]));
                     newDir[2] = m_F*newDir[2] + (1-m_F)*( (1-m_G)*dirOld[2] + scale*m_G*(tensor[2]*dirOld[0] + tensor[4]*dirOld[1] + tensor[5]*dirOld[2]));
                     newDir.normalize();
 
-                    float angle = dot_product(dirOld, newDir);
+                    double angle = dot_product(dirOld, newDir);
                     if (angle<0)
                     {
                         newDir *= -1;
@@ -543,12 +543,12 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                     }
                 }
 
-                //float r = m_StepSize/(2*std::asin(std::acos(minAngle)/2));
+                //double r = m_StepSize/(2*std::asin(std::acos(minAngle)/2));
                 vnl_vector_fixed<double,3> v3 = dir+dirOld; v3 *= m_StepSize;
-                float a = m_StepSize;
-                float b = m_StepSize;
-                float c = v3.magnitude();
-                float r = a*b*c/std::sqrt((a+b+c)*(a+b-c)*(b+c-a)*(a-b+c)); // radius of triangle via Heron's formula (area of triangle)
+                double a = m_StepSize;
+                double b = m_StepSize;
+                double c = v3.magnitude();
+                double r = a*b*c/std::sqrt((a+b+c)*(a+b-c)*(b+c-a)*(a-b+c)); // radius of triangle via Heron's formula (area of triangle)
 
                 if (r<m_MinCurvatureRadius)
                 {
@@ -573,7 +573,7 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                 double minAngle = 0;
                 for (int img=0; img<m_NumberOfInputs; img++)
                 {
-                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    double angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
                     if (fabs(angle)>minAngle)
                     {
                         minAngle = angle;
@@ -586,7 +586,7 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                 tmpIdx = index; tmpIdx[0]++;
                 for (int img=0; img<m_NumberOfInputs; img++)
                 {
-                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    double angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
                     if (fabs(angle)>minAngle)
                     {
                         minAngle = angle;
@@ -599,7 +599,7 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                 tmpIdx = index; tmpIdx[1]++;
                 for (int img=0; img<m_NumberOfInputs; img++)
                 {
-                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    double angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
                     if (fabs(angle)>minAngle)
                     {
                         minAngle = angle;
@@ -612,7 +612,7 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                 tmpIdx = index; tmpIdx[2]++;
                 for (int img=0; img<m_NumberOfInputs; img++)
                 {
-                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    double angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
                     if (fabs(angle)>minAngle)
                     {
                         minAngle = angle;
@@ -625,7 +625,7 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                 tmpIdx = index; tmpIdx[0]++; tmpIdx[1]++;
                 for (int img=0; img<m_NumberOfInputs; img++)
                 {
-                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    double angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
                     if (fabs(angle)>minAngle)
                     {
                         minAngle = angle;
@@ -638,7 +638,7 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                 tmpIdx = index; tmpIdx[1]++; tmpIdx[2]++;
                 for (int img=0; img<m_NumberOfInputs; img++)
                 {
-                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    double angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
                     if (fabs(angle)>minAngle)
                     {
                         minAngle = angle;
@@ -651,7 +651,7 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                 tmpIdx = index; tmpIdx[2]++; tmpIdx[0]++;
                 for (int img=0; img<m_NumberOfInputs; img++)
                 {
-                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    double angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
                     if (fabs(angle)>minAngle)
                     {
                         minAngle = angle;
@@ -664,7 +664,7 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                 tmpIdx = index; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
                 for (int img=0; img<m_NumberOfInputs; img++)
                 {
-                    float angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
+                    double angle = dot_product(dirOld, m_PdImage.at(img)->GetPixel(tmpIdx));
                     if (fabs(angle)>minAngle)
                     {
                         minAngle = angle;
@@ -700,13 +700,13 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
                 continue;
             dir.normalize();
 
-            float scale = 2/eigenvalues[2];
+            double scale = 2/eigenvalues[2];
             dir[0] = m_F*dir[0] + (1-m_F)*( (1-m_G)*dirOld[0] + scale*m_G*(tensor[0]*dirOld[0] + tensor[1]*dirOld[1] + tensor[2]*dirOld[2]));
             dir[1] = m_F*dir[1] + (1-m_F)*( (1-m_G)*dirOld[1] + scale*m_G*(tensor[1]*dirOld[0] + tensor[3]*dirOld[1] + tensor[4]*dirOld[2]));
             dir[2] = m_F*dir[2] + (1-m_F)*( (1-m_G)*dirOld[2] + scale*m_G*(tensor[2]*dirOld[0] + tensor[4]*dirOld[1] + tensor[5]*dirOld[2]));
             dir.normalize();
 
-            float angle = dot_product(dirOld, dir);
+            double angle = dot_product(dirOld, dir);
             if (angle<0)
             {
                 dir *= -1;
@@ -714,10 +714,10 @@ float StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
             }
 
             vnl_vector_fixed<double,3> v3 = dir+dirOld; v3 *= m_StepSize;
-            float a = m_StepSize;
-            float b = m_StepSize;
-            float c = v3.magnitude();
-            float r = a*b*c/std::sqrt((a+b+c)*(a+b-c)*(b+c-a)*(a-b+c)); // radius of triangle via Heron's formula (area of triangle)
+            double a = m_StepSize;
+            double b = m_StepSize;
+            double c = v3.magnitude();
+            double r = a*b*c/std::sqrt((a+b+c)*(a+b-c)*(b+c-a)*(a-b+c)); // radius of triangle via Heron's formula (area of triangle)
 
             if (r<m_MinCurvatureRadius)
                 return tractLength;
@@ -743,11 +743,11 @@ TPDPixelType>
     typedef itk::DiffusionTensor3D<TTensorPixelType>        TensorType;
     typedef ImageRegionConstIterator< InputImageType >      InputIteratorType;
     typedef ImageRegionConstIterator< ItkUcharImgType >     MaskIteratorType;
-    typedef ImageRegionConstIterator< ItkFloatImgType >     FloatIteratorType;
+    typedef ImageRegionConstIterator< ItkFloatImgType >     doubleIteratorType;
     typedef typename InputImageType::PixelType              InputTensorType;
 
     MaskIteratorType    sit(m_SeedImage, outputRegionForThread );
-    FloatIteratorType   fit(m_FaImage, outputRegionForThread );
+    doubleIteratorType   fit(m_FaImage, outputRegionForThread );
     MaskIteratorType    mit(m_MaskImage, outputRegionForThread );
 
     for (int img=0; img<m_NumberOfInputs; img++)
@@ -788,7 +788,7 @@ TPDPixelType>
                 }
 
                 // forward tracking
-                float tractLength = FollowStreamline(start, 1, points, pointIDs, img);
+                double tractLength = FollowStreamline(start, 1, points, pointIDs, img);
 
                 // add ids to line
                 counter += pointIDs.size();

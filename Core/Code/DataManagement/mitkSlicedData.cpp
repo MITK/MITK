@@ -18,9 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSlicedData.h"
 #include "mitkBaseProcess.h"
 #include <mitkProportionalTimeGeometry.h>
+#include "mitkAbstractTransformGeometry.h"
 
 
-mitk::SlicedData::SlicedData() : m_UseLargestPossibleRegion(false)
+mitk::SlicedData::SlicedData()
+  : m_RequestedRegionInitialized(false)
+  , m_UseLargestPossibleRegion(false)
 {
   unsigned int i;
   for(i=0;i<4;++i)
@@ -30,11 +33,13 @@ mitk::SlicedData::SlicedData() : m_UseLargestPossibleRegion(false)
   }
 }
 
-mitk::SlicedData::SlicedData( const SlicedData &other ): BaseData(other),
-m_LargestPossibleRegion(other.m_LargestPossibleRegion),
-m_RequestedRegion(other.m_RequestedRegion),
-m_BufferedRegion(other.m_BufferedRegion),
-m_UseLargestPossibleRegion(other.m_UseLargestPossibleRegion)
+mitk::SlicedData::SlicedData( const SlicedData &other )
+  : BaseData(other)
+  , m_LargestPossibleRegion(other.m_LargestPossibleRegion)
+  , m_RequestedRegion(other.m_RequestedRegion)
+  , m_RequestedRegionInitialized(other.m_RequestedRegionInitialized)
+  , m_BufferedRegion(other.m_BufferedRegion)
+  , m_UseLargestPossibleRegion(other.m_UseLargestPossibleRegion)
 {
 
 }
@@ -270,7 +275,7 @@ void mitk::SlicedData::SetGeometry(BaseGeometry* aGeometry3D)
     if(slicedGeometry.IsNull())
     {
       PlaneGeometry* geometry2d = dynamic_cast<PlaneGeometry*>(aGeometry3D);
-      if(geometry2d!=NULL)
+      if(geometry2d!=NULL && dynamic_cast<mitk::AbstractTransformGeometry*>(aGeometry3D) == NULL)
       {
         if((GetSlicedGeometry()->GetPlaneGeometry(0)==geometry2d) && (GetSlicedGeometry()->GetSlices()==1))
           return;

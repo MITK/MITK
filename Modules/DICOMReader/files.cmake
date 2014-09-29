@@ -1,0 +1,58 @@
+set(H_FILES
+  mitkDICOMFileReader.h
+  mitkDICOMGDCMTagScanner.h
+  mitkDICOMImageFrameInfo.h
+  mitkDICOMImageBlockDescriptor.h
+  mitkDICOMGDCMImageFrameInfo.h
+  mitkDICOMITKSeriesGDCMReader.h
+  mitkDICOMDatasetSorter.h
+  mitkDICOMEnums.h
+  mitkDICOMTagBasedSorter.h
+  mitkDICOMSortCriterion.h
+  mitkDICOMSortByTag.h
+  mitkEquiDistantBlocksSorter.h
+  mitkNormalDirectionConsistencySorter.h
+  mitkSortByImagePositionPatient.h
+  mitkClassicDICOMSeriesReader.h
+  mitkThreeDnTDICOMSeriesReader.h
+  mitkDICOMTag.h
+  mitkDICOMTagCache.h
+  mitkDICOMReaderConfigurator.h
+  mitkDICOMFileReaderSelector.h
+)
+
+set(CPP_FILES
+  mitkDICOMFileReader.cpp
+  mitkDICOMGDCMTagScanner.cpp
+  mitkDICOMImageBlockDescriptor.cpp
+  mitkDICOMITKSeriesGDCMReader.cpp
+  mitkDICOMDatasetSorter.cpp
+  mitkDICOMTagBasedSorter.cpp
+  mitkDICOMGDCMImageFrameInfo.cpp
+  mitkDICOMImageFrameInfo.cpp
+  mitkDICOMSortCriterion.cpp
+  mitkDICOMSortByTag.cpp
+  mitkITKDICOMSeriesReaderHelper.cpp
+  mitkEquiDistantBlocksSorter.cpp
+  mitkNormalDirectionConsistencySorter.cpp
+  mitkSortByImagePositionPatient.cpp
+  mitkGantryTiltInformation.cpp
+  mitkClassicDICOMSeriesReader.cpp
+  mitkThreeDnTDICOMSeriesReader.cpp
+  mitkDICOMTag.cpp
+  mitkDICOMTagCache.cpp
+  mitkDICOMEnums.cpp
+  mitkDICOMReaderConfigurator.cpp
+  mitkDICOMFileReaderSelector.cpp
+)
+
+set(RESOURCE_FILES
+  configurations/3D/classicreader.xml
+  configurations/3D/imageposition.xml
+  configurations/3D/imageposition_byacquisition.xml
+  configurations/3D/instancenumber.xml
+  configurations/3D/instancenumber_soft.xml
+  configurations/3D/slicelocation.xml
+
+  configurations/3DnT/classicreader.xml
+)

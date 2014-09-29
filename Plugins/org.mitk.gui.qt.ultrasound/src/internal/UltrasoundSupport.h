@@ -65,9 +65,12 @@ public:
 
       void OnClickedAddNewDevice();
 
-      void OnClickedViewDevice();
-
       void OnChangedFramerateLimit(int);
+
+      /*
+       *\brief Called, when the selection in the list of the active devices changes.
+       */
+      void OnChangedActiveDevice();
 
       void OnClickedFreezeButton();
 
@@ -79,9 +82,6 @@ public:
       void DisplayImage();
 
 protected:
-
-  void StartViewing();
-  void StopViewing();
 
   void CreateControlWidgets();
   void RemoveControlWidgets();
@@ -106,6 +106,8 @@ protected:
   mitk::DataNode::Pointer m_Node;
 
   mitk::Image::Pointer m_Image;
+
+  mitk::Geometry3D::Pointer m_OldGeometry;
 
   Ui::UltrasoundSupportControls m_Controls;
 

@@ -27,11 +27,17 @@
 int ExtractImageStatistics(int argc, char* argv[])
 {
   ctkCommandLineParser parser;
+
+  parser.setTitle("Extract Image Statistics");
+  parser.setCategory("Preprocessing Tools");
+  parser.setDescription("");
+  parser.setContributor("MBI");
+
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("help", "h", ctkCommandLineParser::String, "Show this help text");
-  parser.addArgument("input", "i", ctkCommandLineParser::String, "input image", us::Any(),false);
-  parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image / roi image denotin area on which statistics are calculated", us::Any(),false);
-  parser.addArgument("out", "o", ctkCommandLineParser::String, "output file (default: filenameOfRoi.nrrd_statistics.txt)", us::Any());
+  parser.addArgument("help", "h", ctkCommandLineParser::String, "Help:", "Show this help text");
+  parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input image", us::Any(),false);
+  parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask:", "mask image / roi image denotin area on which statistics are calculated", us::Any(),false);
+  parser.addArgument("out", "o", ctkCommandLineParser::OutputFile, "Output", "output file (default: filenameOfRoi.nrrd_statistics.txt)", us::Any());
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0 || parsedArgs.count("help") || parsedArgs.count("h"))

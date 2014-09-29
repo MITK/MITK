@@ -96,6 +96,9 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         fOdfFilter->SetMaskImage(itkMaskImage);
         fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
         fOdfFilter->SetNormalizeVectors(true);
+        //fOdfFilter->SetMaxNumDirections(1);
+        fOdfFilter->SetSizeThreshold(0.0);
+
         fOdfFilter->SetUseWorkingCopy(false);
         fOdfFilter->SetNumberOfThreads(1);
         fOdfFilter->Update();
@@ -135,24 +138,27 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         mitk::Image::Pointer gtNumTestDirImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(LDFP_NUM_DIRECTIONS)->GetData());
         mitk::FiberBundleX::Pointer gtTestDirections = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(LDFP_VECTOR_FIELD)->GetData());
 
-        if (!testDirections->Equals(gtTestDirections))
-        {
-            MITK_INFO << "SAVING FILES TO " << mitk::IOUtil::GetTempPath();
-            std::string out1 = mitk::IOUtil::GetTempPath().append("test.fib");
-            std::string out2 = mitk::IOUtil::GetTempPath().append("reference.fib");
+//        if (!mitk::Equal(gtNumTestDirImage, mitkNumDirImage, 0.1, true))
+//        {
+//            MITK_INFO << "SAVING FILES TO " << mitk::IOUtil::GetTempPath();
+////            std::string out1 = mitk::IOUtil::GetTempPath().append("test.nrrd");
+////            std::string out2 = mitk::IOUtil::GetTempPath().append("reference.nrrd");
 
-            mitk::FiberBundleXWriter::Pointer fibWriter = mitk::FiberBundleXWriter::New();
-            fibWriter->SetFileName(out1.c_str());
-            fibWriter->DoWrite(testDirections.GetPointer());
+////            mitk::FiberBundleXWriter::Pointer fibWriter = mitk::FiberBundleXWriter::New();
+////            fibWriter->SetFileName(out1.c_str());
+////            fibWriter->DoWrite(testDirections.GetPointer());
 
-            fibWriter->SetFileName(out2.c_str());
-            fibWriter->DoWrite(gtTestDirections.GetPointer());
-        }
+////            fibWriter->SetFileName(out2.c_str());
+////            fibWriter->DoWrite(gtTestDirections.GetPointer());
+//            mitk::IOUtil::SaveBaseData(mitkNumDirImage, mitk::IOUtil::GetTempPath()+"testImage.nrrd");
+//            mitk::IOUtil::SaveBaseData(gtNumTestDirImage, mitk::IOUtil::GetTempPath()+"refImage.nrrd");
+//            return EXIT_FAILURE;
+//        }
 
-        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImageIgnore, mitkAngularErrorImageIgnore, 0.0001, true), "Check if error images are equal (ignored missing directions).");
-        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImage, mitkAngularErrorImage, 0.0001, true), "Check if error images are equal.");
+        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImageIgnore, mitkAngularErrorImageIgnore, 0.01, true), "Check if error images are equal (ignored missing directions).");
+        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImage, mitkAngularErrorImage, 0.01, true), "Check if error images are equal.");
         MITK_TEST_CONDITION_REQUIRED(testDirections->Equals(gtTestDirections), "Check if vector fields are equal.");
-        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtNumTestDirImage, mitkNumDirImage, 0.0001, true), "Check if num direction images are equal.");
+        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtNumTestDirImage, mitkNumDirImage, 0.1, true), "Check if num direction images are equal.");
     }
     catch (itk::ExceptionObject e)
     {

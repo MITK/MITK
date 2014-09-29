@@ -275,23 +275,6 @@ static char* mkdtemps_compat(char* tmpl, int suffixlen)
 
 //#endif
 
-// *****************************************************************
-// Utility code
-
-US_HASH_FUNCTION_NAMESPACE_BEGIN
-US_HASH_FUNCTION_BEGIN(std::vector<std::string>)
-  std::string imploded;
-  imploded.reserve(256);
-  for(std::vector<std::string>::const_iterator iter = arg.begin(),
-      iterEnd = arg.end(); iter != iterEnd; ++iter)
-  {
-   imploded += *iter;
-  }
-  return US_HASH_FUNCTION(std::string, imploded);
-US_HASH_FUNCTION_END
-US_HASH_FUNCTION_NAMESPACE_END
-
-
 //**************************************************************
 // mitk::IOUtil method definitions
 
@@ -387,6 +370,15 @@ std::string IOUtil::GetProgramPath()
 }
 #endif
 
+char IOUtil::GetDirectorySeparator()
+{
+#ifdef US_PLATFORM_WINDOWS
+  return '\\';
+#else
+  return '/';
+#endif
+}
+
 std::string IOUtil::GetTempPath()
 {
   static std::string result;
@@ -434,7 +426,7 @@ std::string IOUtil::CreateTemporaryFile(std::ofstream& f, std::ios_base::openmod
     path = GetTempPath();
   }
 
-  path += "/" + templateName;
+    path += GetDirectorySeparator() + templateName;
   std::vector<char> dst_path(path.begin(), path.end());
   dst_path.push_back('\0');
 
@@ -470,7 +462,7 @@ std::string IOUtil::CreateTemporaryDirectory(const std::string& templateName, st
     path = GetTempPath();
   }
 
-  path += "/" + templateName;
+    path += GetDirectorySeparator() + templateName;
   std::vector<char> dst_path(path.begin(), path.end());
   dst_path.push_back('\0');
 

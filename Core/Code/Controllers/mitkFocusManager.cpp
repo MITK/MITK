@@ -43,27 +43,24 @@ bool mitk::FocusManager::AddElement(FocusElement* element)
 
 bool mitk::FocusManager::RemoveElement(FocusElement* element)
 {
-  // Try find
-  mitk::FocusManager::FocusListIterator position = std::find(m_FocusList.begin(),m_FocusList.end(),element);
-  if (position == m_FocusList.end())
-    return false;
-  position = m_FocusList.erase(position);
-  // first delete the one on the position, and store the one afterewards into position
-  if ( m_FocusList.size() == 0 )
+  if (element == m_FocElement)
   {
-    // no more FocusElements available
+    this->GoToNext();
+  }
+
+  // Try to find
+  mitk::FocusManager::FocusListIterator position = std::find(m_FocusList.begin(), m_FocusList.end(), element);
+  if (position == m_FocusList.end())
+  {
+    return false;
+  }
+
+  m_FocusList.erase(position);
+  if (m_FocusList.empty())
+  {
     m_FocElement = NULL;
   }
-  else if ( position == m_FocusList.end() )
-  {
-    // deleted was the last in row, then take the one before
-    m_FocElement = m_FocusList.back();
-  }
-  else
-  {
-    // m_FocElement is equal to the next one in row
-    m_FocElement = *position;
-  }
+
   return true;
 }
 
@@ -107,27 +104,45 @@ const mitk::FocusManager::FocusElement* mitk::FocusManager::GetLast() const
 
 bool mitk::FocusManager::GoToNext()
 {
-  //find the m_FocElement
-  FocusListIterator position = std::find(m_FocusList.begin(),m_FocusList.end(),m_FocElement);
-  if (position == m_FocusList.end())//not found
+  if (m_FocusList.empty())
+  {
     return false;
-  else if (*position == m_FocusList.back())//last in row
-  {
-    if (m_Loop)
-    {
-      m_FocElement = *(m_FocusList.begin());
-      return true;
-    }
-    else
-    {
-      return false;//last in row and loop == false, so GoToNext == false
-    }
   }
-  else //not last in row
+
+  //find the m_FocElement
+  FocusListIterator position = std::find(m_FocusList.begin(), m_FocusList.end(), m_FocElement);
+  if (position == m_FocusList.end())
   {
-    m_FocElement = *(++position);//increase position and set m_FocElement
+    return false;
+  }
+
+  if (m_FocusList.size() == 1)
+  {
     return true;
   }
+
+  FocusListIterator nextPosition = position + 1;
+  while(nextPosition != position)
+  {
+    if (nextPosition == m_FocusList.end())
+    {
+      if (!m_Loop)
+      {
+        return false;
+      }
+      nextPosition = m_FocusList.begin();
+    }
+
+    FocusElement* focusElement = *nextPosition;
+    if (focusElement->GetSizeX() > 0 && focusElement->GetSizeY() > 0)
+    {
+      m_FocElement = focusElement;
+      return true;
+    }
+    ++nextPosition;
+  }
+
+  m_FocElement = NULL;
   return false;
 }
 

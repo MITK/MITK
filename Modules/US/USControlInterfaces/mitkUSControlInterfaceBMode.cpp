@@ -31,6 +31,33 @@ mitk::USControlInterfaceBMode::~USControlInterfaceBMode()
 {
 }
 
+void mitk::USControlInterfaceBMode::Initialize()
+{
+  m_Device->UpdateServiceProperty(
+    mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_FREQUENCY,
+    this->GetScanningFrequency());
+
+  m_Device->UpdateServiceProperty(
+    mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_POWER,
+    this->GetScanningPower());
+
+  m_Device->UpdateServiceProperty(
+    mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH,
+    this->GetScanningDepth());
+
+  m_Device->UpdateServiceProperty(
+    mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_GAIN,
+    this->GetScanningGain());
+
+  m_Device->UpdateServiceProperty(
+    mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_REJECTION,
+    this->GetScanningRejection());
+
+  m_Device->UpdateServiceProperty(
+    mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DYNAMIC_RANGE,
+    this->GetScanningDynamicRange());
+}
+
 void mitk::USControlInterfaceBMode::SetScanningFrequency( double frequency )
 {
   this->OnSetScanningFrequency(frequency);

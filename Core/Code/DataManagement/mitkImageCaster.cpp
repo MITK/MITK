@@ -48,7 +48,7 @@ void mitk::ImageCaster::CastBaseData(mitk::BaseData* const mitkBaseData, itk::Sm
 
 #define DefineMitkImageCasterMethods(r, data, type) \
   void mitk::ImageCaster::CastToItkImage(const mitk::Image* mitkImage, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type> >& itkOutputImage) { \
-    mitk::CastToItkImage<itk::Image<MITK_PP_TUPLE_REM(2)type> >(mitkImage, itkOutputImage); \
+    mitk::CastToItkImage(mitkImage, itkOutputImage); \
   } \
   void mitk::ImageCaster::CastToMitkImage(const itk::Image<MITK_PP_TUPLE_REM(2)type>* itkImage, itk::SmartPointer<mitk::Image>& mitkOutputImage) { \
     mitk::CastToMitkImage<itk::Image<MITK_PP_TUPLE_REM(2)type> >(itkImage, mitkOutputImage); \

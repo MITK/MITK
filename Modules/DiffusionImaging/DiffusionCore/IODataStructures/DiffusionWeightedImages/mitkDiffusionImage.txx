@@ -161,7 +161,7 @@ void mitk::DiffusionImage<TPixelType>
   {
     typedef itk::Image<TPixelType,3> ImgType;
     typename ImgType::Pointer img = ImgType::New();
-    CastToItkImage<ImgType>(this, img);
+    CastToItkImage(this, img);
 
     itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
     itw.GoToBegin();

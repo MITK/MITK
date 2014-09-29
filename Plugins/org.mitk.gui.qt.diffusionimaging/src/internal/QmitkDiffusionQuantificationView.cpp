@@ -255,7 +255,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
         mitk::Image* vol =
                 static_cast<mitk::Image*>((*itemiter)->GetData());
         OdfVectorImgType::Pointer itkvol = OdfVectorImgType::New();
-        mitk::CastToItkImage<OdfVectorImgType>(vol, itkvol);
+        mitk::CastToItkImage(vol, itkvol);
 
         std::string nodename;
         (*itemiter)->GetStringProperty("name", nodename);
@@ -448,7 +448,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
         mitk::Image* vol =
                 static_cast<mitk::Image*>((*itemiter)->GetData());
         TensorImageType::Pointer itkvol = TensorImageType::New();
-        mitk::CastToItkImage<TensorImageType>(vol, itkvol);
+        mitk::CastToItkImage(vol, itkvol);
 
         std::string nodename;
         (*itemiter)->GetStringProperty("name", nodename);

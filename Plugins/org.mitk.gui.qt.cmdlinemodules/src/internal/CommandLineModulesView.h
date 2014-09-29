@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class ctkCmdLineModuleBackendLocalProcess;
 class ctkCmdLineModuleDirectoryWatcher;
 class CommandLineModulesViewControls;
-class QmitkCmdLineModuleProgressWidget;
+class QmitkCmdLineModuleRunner;
 class QAction;
 class QVBoxLayout;
 
@@ -85,6 +85,11 @@ protected Q_SLOTS:
    */
   void OnRunButtonPressed();
 
+  /**
+   * \brief Alerts the user of any errors comming out of the directory watcher.
+   */
+  void OnDirectoryWatcherErrorsDetected(const QString&);
+
 protected:
 
   /**
@@ -109,6 +114,16 @@ private slots:
    * \brief Called from QmitkCmdLineModuleProgressWidget to indicate a job has finished.
    */
   void OnJobFinished();
+
+  /**
+   * \brief Called when the user hits the 'clear XML cache' button.
+   */
+  void OnClearCache();
+
+  /**
+   * \brief Called when the user hits the 'reload modules' button.
+   */
+  void OnReloadModules();
 
 private:
 
@@ -197,6 +212,16 @@ private:
   QString m_OutputDirectoryName;
 
   /**
+   * \brief Cache the list of directory paths locally to avoid repeatedly trying to update Directory Watcher.
+   */
+  QStringList m_DirectoryPaths;
+
+  /**
+   * \brief Cache the list of module/executable paths locally to avoid repeatedly trying to update Directory Watcher.
+   */
+  QStringList m_ModulePaths;
+
+  /**
    * \brief We store the validation mode, accessisble via user preferences.
    */
   ctkCmdLineModuleManager::ValidationMode m_ValidationMode;
@@ -215,6 +240,11 @@ private:
    * \brief Member variable, taken from preference page.
    */
   bool m_DebugOutput;
+
+  /**
+   * \brief Member variable, taken from preferences page.
+   */
+  int m_XmlTimeoutSeconds;
 
   /**
    * \brief We keep a list of front ends to match the m_TabWidget.

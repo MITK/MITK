@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkExtractSliceFilter.h>
 #include <mitkTestingMacros.h>
-#include <mitkFileReaderRegistry.h>
+#include <mitkIOUtil.h>
 #include <itkImageRegionIterator.h>
 #include <mitkImageCast.h>
 #include <itkImage.h>
@@ -709,7 +709,7 @@ public:
 
     std::string filename = locator->FindFile("sphere_512.nrrd.mhd", "Modules/ImageExtraction/Testing/Data");
 
-    TestVolume = mitk::FileReaderRegistry::Read<mitk::Image>(filename);
+    TestVolume = mitk::IOUtil::LoadImage(filename);
 
   #endif
 
@@ -1023,7 +1023,7 @@ int mitkExtractSliceFilterTest(int /*argc*/, char* /*argv*/[])
 
     //set reslicer for renderwindow
 
-    mitk::Image::Pointer pic = mitk::FileReaderRegistry::Read<mitk::Image>(filename);
+    mitk::Image::Pointer pic = mitk::IOUtil::LoadImage(filename);
     vtkSmartPointer<vtkImageReslice> slicer = vtkSmartPointer<vtkImageReslice>::New();
 
     slicer->SetInput(pic->GetVtkImageData());

@@ -162,6 +162,16 @@ std::string mitk::VtkShaderRepository::Shader::GetFragmentShaderCode() const
   return this->m_FragmentShaderCode;
 }
 
+void mitk::VtkShaderRepository::Shader::SetGeometryShaderCode(const std::string& code)
+{
+  this->m_GeometryShaderCode = code;
+}
+
+std::string mitk::VtkShaderRepository::Shader::GetGeometryShaderCode() const
+{
+  return this->m_GeometryShaderCode;
+}
+
 std::list<mitk::VtkShaderRepository::Shader::Uniform::Pointer> mitk::VtkShaderRepository::Shader::GetUniforms() const
 {
   return uniforms;
@@ -217,6 +227,28 @@ void mitk::VtkShaderRepository::Shader::LoadXmlShader(std::istream& stream)
     if (s)
     {
       SetFragmentShaderCode(s->GetCode());
+      vtkXMLDataElement *x=s->GetRootElement();
+      int n=x->GetNumberOfNestedElements();
+      for(int r=0;r<n;r++)
+      {
+        vtkXMLDataElement *y=x->GetNestedElement(r);
+        if(strcmp(y->GetName(),"ApplicationUniform") == 0 ||
+           strcmp(y->GetName(), "Uniform") == 0)
+        {
+          Uniform::Pointer element=Uniform::New();
+          element->LoadFromXML(y);
+          uniforms.push_back(element);
+        }
+      }
+    }
+  }
+
+  // Geometryshader uniforms
+  {
+    vtkXMLShader *s=material->GetGeometryShader();
+    if (s)
+    {
+      SetGeometryShaderCode(s->GetCode());
       vtkXMLDataElement *x=s->GetRootElement();
       int n=x->GetNumberOfNestedElements();
       for(int r=0;r<n;r++)
@@ -485,11 +517,25 @@ mitk::VtkShaderRepository::UpdateShaderProgram(ShaderProgram* shaderProgram,
     program->GetShaders()->AddItem(shader);
     shader->Delete();
 
+    if(s->GetGeometryShaderCode().size()>0)
+    {
+    // The Geometry shader
+    shader = vtkShader2::New();
+    shader->SetType(VTK_SHADER_TYPE_GEOMETRY);
+    shader->SetSourceCode(s->GetGeometryShaderCode().c_str());
+#if ((VTK_MAJOR_VERSION < 6 ) || ((VTK_MAJOR_VERSION == 6) && (VTK_MINOR_VERSION == 0) ))
+    shader->SetContext(dynamic_cast<vtkOpenGLRenderWindow*>(renderer->GetRenderWindow()));
+#else
+    shader->SetContext(renderer->GetRenderWindow());
+#endif
+    program->GetShaders()->AddItem(shader);
+    shader->Delete();
+    }
+
     program->Build();
 
     mitkVtkShaderProgram->SetVtkShaderProgram(program);
 
-    MITK_INFO << "enabling shader ";
     mitkVtkShaderProgram->GetShaderTimestampUpdate().Modified();
   }
 

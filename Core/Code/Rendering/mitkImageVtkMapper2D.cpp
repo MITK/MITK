@@ -171,7 +171,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   {
     VtkResliceInterpolationProperty *resliceInterpolationProperty;
     datanode->GetProperty(
-          resliceInterpolationProperty, "reslice interpolation" );
+          resliceInterpolationProperty, "reslice interpolation", renderer );
 
     int interpolationMode = VTK_RESLICE_NEAREST;
     if ( resliceInterpolationProperty != NULL )
@@ -213,15 +213,14 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     {
       ResliceMethodProperty *resliceMethodEnumProperty=0;
 
-      if( dn->GetProperty( resliceMethodEnumProperty, "reslice.thickslices" ) && resliceMethodEnumProperty )
+      if( dn->GetProperty( resliceMethodEnumProperty, "reslice.thickslices", renderer ) && resliceMethodEnumProperty )
         thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
 
       IntProperty *intProperty=0;
-      if( dn->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
+      if( dn->GetProperty( intProperty, "reslice.thickslices.num", renderer ) && intProperty )
       {
         thickSlicesNum = intProperty->GetValue();
         if(thickSlicesNum < 1) thickSlicesNum=1;
-        if(thickSlicesNum > 10) thickSlicesNum=10;
       }
     }
     else
@@ -238,12 +237,14 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
     Vector3D normInIndex, normal;
 
-    if ( planeGeometry != NULL ){
-      normal = planeGeometry->GetNormal();
-    }else{
-      const mitk::AbstractTransformGeometry* abstractGeometry = dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
-      if(abstractGeometry != NULL)
+
+    const mitk::AbstractTransformGeometry* abstractGeometry = dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
+    if(abstractGeometry != NULL)
         normal = abstractGeometry->GetPlane()->GetNormal();
+    else{
+      if ( planeGeometry != NULL ){
+        normal = planeGeometry->GetNormal();
+      }
       else
         return; //no fitting geometry set
     }
@@ -464,9 +465,11 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
   // binary image hovering & binary image selection
   bool hover    = false;
   bool selected = false;
+  bool binary = false;
   GetDataNode()->GetBoolProperty("binaryimage.ishovering", hover, renderer);
   GetDataNode()->GetBoolProperty("selected", selected, renderer);
-  if(hover && !selected)
+  GetDataNode()->GetBoolProperty("binary", binary, renderer);
+  if(binary && hover && !selected)
   {
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
                                                                                 ("binaryimage.hoveringcolor", renderer));
@@ -479,7 +482,7 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
       GetDataNode()->GetColor( rgb, renderer, "color" );
     }
   }
-  if(selected)
+  if(binary && selected)
   {
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
                                                                                 ("binaryimage.selectedcolor", renderer));
@@ -491,7 +494,7 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
       GetDataNode()->GetColor(rgb, renderer, "color");
     }
   }
-  if(!hover && !selected)
+  if(!binary || (!hover && !selected))
   {
     GetDataNode()->GetColor( rgb, renderer, "color" );
   }
@@ -614,6 +617,7 @@ void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer *rend
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
   //pass the transfer function to our level window filter
   localStorage->m_LevelWindowFilter->SetLookupTable(transferFunctionProp->GetValue()->GetColorTransferFunction());
+  localStorage->m_LevelWindowFilter->SetOpacityPiecewiseFunction(transferFunctionProp->GetValue()->GetScalarOpacityFunction());
 }
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
@@ -701,7 +705,9 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       // Set inverse grayscale look-up table
       mitkLut->SetType(mitk::LookupTable::INVERSE_GRAYSCALE);
       mitkLutProp->SetLookupTable(mitkLut);
-      node->SetProperty("LookupTable", mitkLutProp);
+      node->SetProperty( "LookupTable", mitkLutProp );
+      renderingModeProperty->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR ); // USE lookuptable
+
     }
     // Otherwise do nothing - the default grayscale look-up table has already been set
   }
@@ -769,8 +775,11 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       PixelType pixelType = image->GetPixelType();
       size_t numComponents = pixelType.GetNumberOfComponents();
 
-      if ((pixelType.GetPixelTypeAsString() == "vector" && numComponents > 1) || numComponents == 2 || numComponents > 4)
+      if ((pixelType.GetPixelType() == itk::ImageIOBase::VECTOR && numComponents > 1) ||
+          numComponents == 2 || numComponents > 4)
+      {
         node->AddProperty("Image.Displayed Component", mitk::IntProperty::New(0), renderer, overwrite);
+      }
     }
   }
 

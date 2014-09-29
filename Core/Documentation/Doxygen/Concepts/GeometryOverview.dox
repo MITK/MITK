@@ -19,9 +19,9 @@ To use the geometry classes in the right way you have to understand the three di
     - If you are NOT dealing with an image geometry (no defined discrete Voxels), the origin is pointing to the bottom-left-back CORNER
     - Index coordinates can be converted to world coordinates by calling BaseGeometry::IndexToWorld()\n\n
 
-\imageMacro{worldcoordinateSystem.png,"",16}
+\imageMacro{worldcoordinateSystem.png,"",12}
 <center><b>Corner-based coordinates\n\n</b></center>
-\imageMacro{WorldcoordinateSystemCenterBased.png,"",16}
+\imageMacro{WorldcoordinateSystemCenterBased.png,"",12}
 <center><b>Center-based image-coordinates\n\n</b></center>\n
   -# Continuous index coordinates:
     - Dividing world coordinates through the pixel spacing and simultanously taking the offset into account leads to continuous index coordinates inside your dataobject.\n
@@ -84,7 +84,9 @@ PlaneGeometry provides methods for working with 2D manifolds (i.e., simply spoke
 For example it allows mapping of a 3D point on the 2D manifold using PlaneGeometry::Map(). \n
 An important subclass of PlaneGeometry is the DisplayGeometry which describes the geometry of the display (the monitor screen). Basically it represents a rectangular view on a 2D world geometry.\n
 The DisplayGeometry converts between screen and world coordinates, processes input events (e.g. mouse click) and provides methods for zooming and panning.\n
-\imageMacro{DisplayGeometry.png,"",16}
+
+\imageMacro{DisplayGeometry.png,"",9}
+
 <center><b>Display Geometry\n\n</b></center>
 Finally there is the AbstractTransformGeometry which describes a 2D manifold in 3D space, defined by a vtkAbstractTransform. It is a abstract superclass for arbitrary user defined geometries.\n
 An example is the ThinPlateSplineCurvedGeometry.\n
@@ -100,7 +102,7 @@ As mentioned in the previous section, world coordinates of data objects (e.g. su
 In contrast to that a geometry of an Image is center-based, which means that the world coordinates of a voxel belonging to an image points to the center of that voxel.
 E.g:
 
-\imageMacro{PixelCenterBased.png,"",16}
+\imageMacro{PixelCenterBased.png,"",6}
 <center><b>Center-based voxel\n\n</b></center>
 
 If the origin of e.g. a surface lies at (15,10,0) in world coordinates, the origin`s world coordinates for an image are internally calculated like the following:
@@ -124,7 +126,7 @@ An image has a TimeGeometry, which contains one or more SlicedGeometry3D instanc
 As a reminder: Geometry instances referring to images need a slightly different definition of corners, see BaseGeometry::SetImageGeometry. This is usualy automatically called by Image.\n\n
 
 \section GeometryOverviewPage_Connection Connection between MITK, ITK and VTK Geometries
-\imageMacro{ITK_VTK_MITK_Geometries.png,"",16}
+\imageMacro{ITK_VTK_MITK_Geometries.png,"",10}
 \n\n
   - VTK transformation for rendering
   - ITK transformation for calculations

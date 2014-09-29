@@ -195,8 +195,12 @@ bool mitk::DisplayGeometry::ZoomWithFixedWorldCoordinates(ScalarType factor, con
 {
   assert(factor > 0);
 
-  SetScaleFactor(m_ScaleFactorMMPerDisplayUnit/factor);
-  SetOriginInMM(focusUnitsInMM.GetVectorFromOrigin()-focusDisplayUnits.GetVectorFromOrigin()*m_ScaleFactorMMPerDisplayUnit);
+  if (factor != 1.0)
+  {
+    SetScaleFactor(m_ScaleFactorMMPerDisplayUnit/factor);
+    SetOriginInMM(focusUnitsInMM.GetVectorFromOrigin()-focusDisplayUnits.GetVectorFromOrigin()*m_ScaleFactorMMPerDisplayUnit);
+  }
+
   return true;
 }
 
@@ -397,7 +401,8 @@ void mitk::DisplayGeometry::Map(const Point2D & atPt2d_mm, const Vector2D &vec2d
 // protected methods
 
 mitk::DisplayGeometry::DisplayGeometry()
-  :m_ScaleFactorMMPerDisplayUnit(1.0)
+  : PlaneGeometry()
+  ,m_ScaleFactorMMPerDisplayUnit(1.0)
   ,m_WorldGeometry(NULL)
   ,m_ConstrainZoomingAndPanning(true)
   ,m_MaxWorldViewPercentage(1.0)

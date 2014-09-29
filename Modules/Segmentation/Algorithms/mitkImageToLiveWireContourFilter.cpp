@@ -106,7 +106,7 @@ void mitk::ImageToLiveWireContourFilter::GenerateData()
 
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::ImageToLiveWireContourFilter::ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage)
+void mitk::ImageToLiveWireContourFilter::ItkProcessImage (const itk::Image<TPixel, VImageDimension>* inputImage)
 {
   //typedef itk::Image< TPixel, VImageDimension >                              InputImageType;
   //typedef itk::Image< float,  2 >                                          FloatImageType;

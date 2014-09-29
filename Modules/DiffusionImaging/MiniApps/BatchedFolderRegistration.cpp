@@ -26,9 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkDiffusionImage.h>
 #include "mitkNrrdDiffusionImageWriter.h"
+#include <mitkImageTimeSelector.h>
 // ITK
 #include <itksys/SystemTools.hxx>
 #include <itkDirectory.h>
+#include "itkLinearInterpolateImageFunction.h"
 #include "itkWindowedSincInterpolateImageFunction.h"
 #include "itkIdentityTransform.h"
 #include "itkResampleImageFilter.h"
@@ -36,6 +38,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 typedef std::vector<std::string> FileListType;
 typedef itk::Image<double, 3> InputImageType;
+
+static mitk::Image::Pointer ExtractFirstTS(mitk::Image* image, std::string fileType)
+{
+  if (fileType == ".dwi")
+    return image;
+  mitk::ImageTimeSelector::Pointer selector = mitk::ImageTimeSelector::New();
+  selector->SetInput(image);
+  selector->SetTimeNr(0);
+  selector->UpdateLargestPossibleRegion();
+  mitk::Image::Pointer img =selector->GetOutput()->Clone();
+  return img;
+}
+
 
 static std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems)
 {
@@ -78,20 +93,18 @@ static FileListType CreateFileList(std::string folder , std::string postfix)
   return fileList;
 }
 
-/// Add '_reg' tag to file name
 static std::string GetSavePath(std::string outputFolder, std::string fileName)
 {
   std::string fileType = itksys::SystemTools::GetFilenameExtension(fileName);
   std::string fileStem = itksys::SystemTools::GetFilenameWithoutExtension(fileName);
 
-  std::string savePathAndFileName = outputFolder +fileStem + "_reg" + fileType;
+  std::string savePathAndFileName = outputFolder +fileStem + fileType;
 
   return savePathAndFileName;
 }
 
 
-
-static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing)
+static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing, bool useLinInt = false)
 {
   InputImageType::Pointer itkImage = InputImageType::New();
   CastToItkImage(input,itkImage);
@@ -107,7 +120,7 @@ static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing
   // So no transform will be specified.
   typedef itk::IdentityTransform<double, 3> T_Transform;
 
-    // The resampler type itself.
+  // The resampler type itself.
   typedef itk::ResampleImageFilter<InputImageType, InputImageType>  T_ResampleFilter;
 
   // Prepare the resampler.
@@ -145,9 +158,17 @@ static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing
   _pResizeFilter->SetSize(outputSize);
 
 
-  typedef itk::WindowedSincInterpolateImageFunction< InputImageType, 3> WindowedSincInterpolatorType;
+  typedef itk::LinearInterpolateImageFunction< InputImageType > LinearInterpolatorType;
+  LinearInterpolatorType::Pointer lin_interpolator = LinearInterpolatorType::New();
+
+  typedef itk::Function::WelchWindowFunction<4> WelchWindowFunction;
+  typedef itk::WindowedSincInterpolateImageFunction< InputImageType, 4,WelchWindowFunction> WindowedSincInterpolatorType;
   WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
-  _pResizeFilter->SetInterpolator(sinc_interpolator);
+
+  if (useLinInt)
+    _pResizeFilter->SetInterpolator(lin_interpolator);
+  else
+    _pResizeFilter->SetInterpolator(sinc_interpolator);
 
   // Specify the input.
   _pResizeFilter->SetInput(itkImage);
@@ -216,30 +237,36 @@ static void CopyResources(FileListType fileList, std::string outputPath)
     std::string derivedResourceFilename = fileList.at(j);
     std::string fileType = itksys::SystemTools::GetFilenameExtension(derivedResourceFilename);
     std::string fileStem = itksys::SystemTools::GetFilenameWithoutExtension(derivedResourceFilename);
-    std::string savePathAndFileName = outputPath +fileStem + "_reg." + fileType;
+    std::string savePathAndFileName = outputPath +fileStem + "." + fileType;
     MITK_INFO << "Copy resource " << savePathAndFileName;
-    mitk::Image::Pointer resImage = mitk::IOUtil::LoadImage(derivedResourceFilename);
+    mitk::Image::Pointer resImage = ExtractFirstTS(mitk::IOUtil::LoadImage(derivedResourceFilename), fileType);
     mitk::IOUtil::SaveImage(resImage, savePathAndFileName);
   }
 }
-
 
 int BatchedFolderRegistration( int argc, char* argv[] )
 {
   ctkCommandLineParser parser;
   parser.setArgumentPrefix("--","-");
+
+  parser.setTitle("Batched Folder Registraton");
+  parser.setCategory("Preprocessing Tools");
+  parser.setDescription("");
+  parser.setContributor("MBI");
+
   // Add command line argument names
-  parser.addArgument("help", "h",ctkCommandLineParser::Bool, "Show this help text");
-  parser.addArgument("xml", "x",ctkCommandLineParser::Bool, "Print a XML description of this modules command line interface");
+  parser.addArgument("help", "h",ctkCommandLineParser::Bool, "Help", "Show this help text");
   //parser.addArgument("usemask", "u", QVariant::Bool, "Use segmentations (derived resources) to exclude areas from registration metrics");
-  parser.addArgument("input", "i", ctkCommandLineParser::String, "Input folder",us::Any(),false);
-  parser.addArgument("output", "o", ctkCommandLineParser::String, "Output folder (ending with /)",us::Any(),false);
-  parser.addArgument("fixed", "f", ctkCommandLineParser::String, "Suffix for fixed image",us::Any(),false);
-  parser.addArgument("moving", "m", ctkCommandLineParser::String, "Suffix for moving images",us::Any(),false);
-  parser.addArgument("derived", "d", ctkCommandLineParser::String, "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);
-  parser.addArgument("silent", "s", ctkCommandLineParser::Bool, "No xml progress output.");
-  parser.addArgument("resample", "r", ctkCommandLineParser::String, "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
-  parser.addArgument("binary", "b", ctkCommandLineParser::String, "Speficies that derived resource are binary (interpolation using nearest neighbor)",us::Any());
+  parser.addArgument("input", "i", ctkCommandLineParser::InputDirectory, "Input:", "Input folder",us::Any(),false);
+  parser.addArgument("output", "o", ctkCommandLineParser::OutputDirectory, "Output:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("fixed", "f", ctkCommandLineParser::String, "Fixed images:", "Suffix for fixed image (if none is supplied first file matching moving pattern is chosen)",us::Any(),true);
+  parser.addArgument("moving", "m", ctkCommandLineParser::String, "Moving images:", "Suffix for moving images",us::Any(),false);
+  parser.addArgument("derived", "d", ctkCommandLineParser::String, "Derived resources:", "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);
+  parser.addArgument("silent", "s", ctkCommandLineParser::Bool, "Silent:" "No xml progress output.");
+  parser.addArgument("resample", "r", ctkCommandLineParser::String, "Resample (x,y,z)mm:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
+  parser.addArgument("binary", "b", ctkCommandLineParser::Bool, "Binary:", "Speficies that derived resource are binary (interpolation using nearest neighbor)",us::Any());
+  parser.addArgument("correct-origin", "c", ctkCommandLineParser::Bool, "Origin correction:", "Correct for large origin displacement. Switch when you reveive:  Joint PDF summed to zero ",us::Any());
+  parser.addArgument("sinc-int", "s", ctkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
 
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -247,6 +274,8 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   // Handle special arguments
   bool silent = false;
   bool isBinary = false;
+  bool alignOrigin = false;
+  bool useLinearInterpol = true;
   {
     if (parsedArgs.size() == 0)
     {
@@ -260,11 +289,17 @@ int BatchedFolderRegistration( int argc, char* argv[] )
       return EXIT_SUCCESS;
     }
 
+    if (parsedArgs.count("sinc-int"))
+      useLinearInterpol = false;
+
     if (parsedArgs.count("silent"))
       silent = true;
 
     if (parsedArgs.count("binary"))
       isBinary = true;
+
+    if (parsedArgs.count("correct-origin"))
+      alignOrigin = true;
 
     // Show a help message
     if ( parsedArgs.count("help") || parsedArgs.count("h"))
@@ -273,10 +308,23 @@ int BatchedFolderRegistration( int argc, char* argv[] )
       return EXIT_SUCCESS;
     }
   }
-  std::string outputPath = us::any_cast<string>(parsedArgs["output"]);
-  std::string refPattern = us::any_cast<string>(parsedArgs["fixed"]);
-  std::string inputPath = us::any_cast<string>(parsedArgs["input"]);
+  std::string refPattern = "";
+  bool useFirstMoving = false;
   std::string movingImgPattern = us::any_cast<string>(parsedArgs["moving"]);
+
+  if (parsedArgs.count("fixed"))
+  {
+    refPattern = us::any_cast<string>(parsedArgs["fixed"]);
+  }
+  else
+  {
+    useFirstMoving = true;
+    refPattern = movingImgPattern;
+  }
+
+  std::string outputPath = us::any_cast<string>(parsedArgs["output"]);
+
+  std::string inputPath = us::any_cast<string>(parsedArgs["input"]);
   //QString resampleReference = parsedArgs["resample"].toString();
   //bool maskTumor = parsedArgs["usemask"].toBool();
 
@@ -307,7 +355,7 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   MITK_INFO << "Looking for reference image ...";
   FileListType referenceFileList = CreateFileList(inputPath,refPattern);
 
-  if (referenceFileList.size() != 1)
+  if ((!useFirstMoving && referenceFileList.size() != 1) || (useFirstMoving && referenceFileList.size() == 0))
   {
     MITK_ERROR << "None or more than one possible reference images (" << refPattern <<") found. Exiting." << referenceFileList.size();
     MITK_INFO  << "Choose a fixed arguement that is unique in the given folder!";
@@ -317,7 +365,8 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   std::string referenceFileName = referenceFileList.at(0);
 
   MITK_INFO << "Loading Reference (fixed) image: " << referenceFileName;
-  mitk::Image::Pointer refImage = mitk::IOUtil::LoadImage(referenceFileName);
+  std::string fileType = itksys::SystemTools::GetFilenameExtension(referenceFileName);
+  mitk::Image::Pointer refImage = ExtractFirstTS(mitk::IOUtil::LoadImage(referenceFileName), fileType);
   mitk::Image::Pointer resampleReference = NULL;
   if (doResampling)
   {
@@ -386,18 +435,18 @@ int BatchedFolderRegistration( int argc, char* argv[] )
     double transf[6];
     double offset[3];
     {
-      mitk::Image::Pointer movingImage = mitk::IOUtil::LoadImage(fileMorphName);
+      std::string fileType = itksys::SystemTools::GetFilenameExtension(fileMorphName);
+      mitk::Image::Pointer movingImage = ExtractFirstTS(mitk::IOUtil::LoadImage(fileMorphName), fileType);
 
       if (movingImage.IsNull())
         MITK_ERROR << "Loaded moving image is NULL";
 
       // Store transformation,  apply it to morph file
       MITK_INFO << "----------Registering moving image to reference----------";
-      mitk::RegistrationWrapper::GetTransformation(refImage, movingImage, transf, offset, referenceMask);
+      mitk::RegistrationWrapper::GetTransformation(refImage, movingImage, transf, offset, alignOrigin, referenceMask);
       mitk::RegistrationWrapper::ApplyTransformationToImage(movingImage, transf,offset, resampleReference); // , resampleImage
 
       savePathAndFileName = GetSavePath(outputPath, fileMorphName);
-      std::string fileType = itksys::SystemTools::GetFilenameExtension(fileMorphName);
       if (fileType == ".dwi")
         fileType = "dwi";
       SaveImage(savePathAndFileName,movingImage,fileType );
@@ -419,14 +468,13 @@ int BatchedFolderRegistration( int argc, char* argv[] )
     for (unsigned int j=0; j < fList.size(); j++)
     {
       derivedResourceFilename = fList.at(j);
-      MITK_INFO << "----Processing derived resource " << derivedResourceFilename << " ...";
-      mitk::Image::Pointer derivedMovingResource = mitk::IOUtil::LoadImage(derivedResourceFilename);
+      MITK_INFO << "----Processing derived resorce " << derivedResourceFilename << " ...";
+      std::string fileType = itksys::SystemTools::GetFilenameExtension(derivedResourceFilename);
+      mitk::Image::Pointer derivedMovingResource = ExtractFirstTS(mitk::IOUtil::LoadImage(derivedResourceFilename), fileType);
       // Apply transformation to derived resource, treat derived resource as binary
       mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource, transf,offset, resampleReference,isBinary);
 
       savePathAndFileName = GetSavePath(outputPath, derivedResourceFilename);
-      std::string fileType = itksys::SystemTools::GetFilenameExtension(derivedResourceFilename);
-
       SaveImage(savePathAndFileName,derivedMovingResource,fileType );
     }
   }

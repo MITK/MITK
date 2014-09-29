@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 
 mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry()
+  : Superclass()
 {
   m_InterpolatingAbstractTransform = m_ThinPlateSplineTransform = vtkThinPlateSplineTransform::New();
 

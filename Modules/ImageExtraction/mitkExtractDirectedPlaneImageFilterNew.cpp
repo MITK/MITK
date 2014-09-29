@@ -92,7 +92,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateOutputInformation ()
 * (similar to the shannon theorem).
 */
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TPixel, VImageDimension>* inputImage)
+void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (const itk::Image<TPixel, VImageDimension>* inputImage)
 {
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
     typedef itk::Image<TPixel, VImageDimension-1> SliceImageType;

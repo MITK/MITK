@@ -32,12 +32,18 @@ namespace mitk
   * A new point is added by mouse movement, an existing point will be removed before adding a new one.
   * \ingroup Interaction
   */
+
+  /**
+  * \deprecatedSince{2014_03} mitk::MouseMovePointSetInteractor is deprecated. Needs to be updated to the new interaction-framework.
+  * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
+  */
+
   class MITK_CORE_EXPORT MouseMovePointSetInteractor : public PointSetInteractor
   {
   public:
     mitkClassMacro(MouseMovePointSetInteractor, Interactor);
-    mitkNewMacro3Param(Self, const char*, DataNode*, int);
-    mitkNewMacro2Param(Self, const char*, DataNode*);
+    DEPRECATED() mitkNewMacro3Param(Self, const char*, DataNode*, int);
+    DEPRECATED() mitkNewMacro2Param(Self, const char*, DataNode*);
 
 
     /**

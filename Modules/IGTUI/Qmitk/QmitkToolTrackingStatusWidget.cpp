@@ -69,8 +69,8 @@ void QmitkToolTrackingStatusWidget::SetTextAlignment(Qt::AlignmentFlag alignment
 QmitkToolTrackingStatusWidget::~QmitkToolTrackingStatusWidget()
 {
   //m_Controls = NULL;
-  delete m_StatusLabels;
-  delete m_NavigationDatas;
+  if (m_StatusLabels!=NULL) {delete m_StatusLabels;}
+  if (m_NavigationDatas!=NULL) {delete m_NavigationDatas;}
 }
 
 void QmitkToolTrackingStatusWidget::CreateQtPartControl(QWidget *parent)

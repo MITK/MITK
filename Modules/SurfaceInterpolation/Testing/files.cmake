@@ -1,6 +1,7 @@
 set(MODULE_TESTS
   mitkComputeContourSetNormalsFilterTest.cpp
   mitkReduceContourSetFilterTest.cpp
+  mitkSurfaceInterpolationControllerTest.cpp
 )
 
 if(NOT WIN32)

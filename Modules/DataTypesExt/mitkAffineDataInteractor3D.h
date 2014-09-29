@@ -66,7 +66,7 @@ private:
 
   bool ColorizeSurface(BaseRenderer::Pointer renderer, double scalar = 0.0);
 
-  Point3D m_InitialPickedPoint;
+  double m_InitialPickedWorldPoint[4];
   Point2D m_InitialPickedDisplayPoint;
 
   //Point3D m_CurrentPickedPoint;

@@ -93,6 +93,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Flip Image
 #include <itkFlipImageFilter.h>
 
+#include <itkRescaleIntensityImageFilter.h>
+
 
 // Convenient Definitions
 typedef itk::Image<short, 3>                                                            ImageType;
@@ -219,6 +221,7 @@ void QmitkBasicImageProcessing::Activated()
   this->m_Controls->cbWhat1->insertItem( DOWNSAMPLING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Downsampling", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( FLIPPING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Flipping", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( RESAMPLING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Resample to", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( RESCALE, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Rescale image values", 0, QApplication::UnicodeUTF8) ));
 
   this->m_Controls->cbWhat2->clear();
   this->m_Controls->cbWhat2->insertItem( TWOIMAGESNOACTIONSELECTED, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Please select on operation", 0, QApplication::UnicodeUTF8) ) );
@@ -596,6 +599,22 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       text2 = "y-spacing:";
       text3 = "z-spacing:";
       text4 = "Interplation:";
+      break;
+    }
+
+  case 20:
+    {
+      m_SelectedAction = RESCALE;
+      m_Controls->dsbParam1->show();
+      m_Controls->tlParam1->show();
+      m_Controls->dsbParam1->setEnabled(true);
+      m_Controls->tlParam1->setEnabled(true);
+      m_Controls->dsbParam2->show();
+      m_Controls->tlParam2->show();
+      m_Controls->dsbParam2->setEnabled(true);
+      m_Controls->tlParam2->setEnabled(true);
+      text1 = "Output minimum:";
+      text2 = "Output maximum:";
       break;
     }
 
@@ -996,6 +1015,27 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       break;
     }
 
+
+  case RESCALE:
+    {
+      FloatImageType::Pointer floatImage = FloatImageType::New();
+      CastToItkImage( newImage, floatImage );
+      itk::RescaleIntensityImageFilter<FloatImageType,FloatImageType>::Pointer filter = itk::RescaleIntensityImageFilter<FloatImageType,FloatImageType>::New();
+      filter->SetInput(0, floatImage);
+      filter->SetOutputMinimum(dparam1);
+      filter->SetOutputMaximum(dparam2);
+      filter->Update();
+      floatImage = filter->GetOutput();
+
+      newImage = mitk::Image::New();
+      newImage->InitializeByItk(floatImage.GetPointer());
+      newImage->SetVolume(floatImage->GetBufferPointer());
+      nameAddition << "_Rescaled";
+      std::cout << "Rescaling successful." << std::endl;
+
+      break;
+    }
+
   default:
     this->BusyCursorOff();
     return;
@@ -1109,7 +1149,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
 
   // check if 4D image and use filter on correct time step
   int time = ((QmitkSliderNavigatorWidget*)m_Controls->sliceNavigatorTime)->GetPos();
-  if(time>=0)
+  if(newImage1->GetDimension() > 3)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
 
@@ -1234,8 +1274,6 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       resampleFilter->SetInterpolator( nn_interpolator );
       resampleFilter->SetDefaultPixelValue( 0 );
 
-      ImageType::Pointer resampledImage = resampleFilter->GetOutput()->Clone();
-
       try
       {
         resampleFilter->UpdateLargestPossibleRegion();
@@ -1245,6 +1283,8 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
         MITK_WARN << "Updating resampling filter failed. ";
         MITK_WARN << "REASON: " << e.what();
       }
+
+      ImageType::Pointer resampledImage = resampleFilter->GetOutput();
 
       newImage1 = mitk::ImportItkImage( resampledImage )->Clone();
       nameAddition = "_Resampled";

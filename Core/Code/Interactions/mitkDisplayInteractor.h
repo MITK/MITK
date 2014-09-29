@@ -109,6 +109,12 @@ namespace mitk
      */
     virtual bool AdjustLevelWindow(StateMachineAction*, InteractionEvent*);
 
+    /**
+    * \brief Method to retrieve bool-value for given property from string-property
+    * in given propertylist.
+    */
+    bool GetBoolProperty( mitk::PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue );
+
   private:
     /**
      * \brief Coordinate of the pointer at begin of an interaction
@@ -142,16 +148,47 @@ namespace mitk
      *  If set to true it will restart at end of data set from the beginning.
      */
     bool m_AutoRepeat;
+
     /**
-     * Defines scroll behavior.
-     * Default is up/down movement of pointer performs scrolling
-     */
+    * Defines scroll behavior.
+    * Default is up/down movement of pointer performs scrolling
+    */
     std::string m_ScrollDirection;
+
     /**
-     * Defines scroll behavior.
-     * Default is up/down movement of pointer performs zooming
-     */
+    * Defines how the axis of interaction influences scroll behavior.
+    */
+    bool m_InvertScrollDirection;
+
+
+    /**
+    * Defines scroll behavior.
+    * Default is up/down movement of pointer performs zooming
+    */
     std::string m_ZoomDirection;
+
+    /**
+    * Defines how the axis of interaction influences zoom behavior.
+    */
+    bool m_InvertZoomDirection;
+
+    /**
+    * Defines how the axis of interaction influences move behavior.
+    */
+    bool m_InvertMoveDirection;
+
+
+    /**
+    * Defines level/window behavior.
+    * Default is left/right movement of pointer modifies the level.
+    */
+    std::string m_LevelDirection;
+
+    /**
+    * Defines how the axis of interaction influences level/window behavior.
+    */
+    bool m_InvertLevelWindowDirection;
+
     /**
      * Determines if the Observer reacts to events that already have been processed by a DataInteractor.
      * The default value is false.

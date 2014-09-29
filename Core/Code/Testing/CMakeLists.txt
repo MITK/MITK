@@ -128,10 +128,10 @@ mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_openMeAloneTransformed640x480 mi
                          ${MITK_DATA_DIR}/RenderingTestData/openMeAlone.mps #input point set to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/openMeAloneTransformedPoints640x480REF.png #corresponding reference screenshot
 )
-#mitkAddCustomModuleTest(mitkSurfaceDepthSortingTransparency_StanfordBunnySTL640x480 mitkSurfaceDepthSortingTest
-#                        ${MITK_DATA_DIR}/RenderingTestData/Stanford_bunny.stl
-#                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Stanford_bunnySTLDepthSorting640x480REF.png
-#)
+mitkAddCustomModuleTest(mitkSurfaceDepthSortingTransparency_StanfordBunnySTL640x480 mitkSurfaceDepthSortingTest
+                        ${MITK_DATA_DIR}/RenderingTestData/Stanford_bunny.stl
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Stanford_bunnySTLDepthSorting640x480REF.png
+)
 if(NOT APPLE)
 mitkAddCustomModuleTest(mitkSurfaceDepthPeelingTransparency_StanfordBunnySTL640x480 mitkSurfaceDepthPeelingTest
                         ${MITK_DATA_DIR}/RenderingTestData/Stanford_bunny.stl
@@ -156,41 +156,6 @@ mitkAddCustomModuleTest(ResliceInterpolationIsCubic mitkImageVtkMapper2DResliceI
 )
 #End test reslice interpolation
 
-#Overlays
-mitkAddCustomModuleTest(mitkLabelOverlay3DRendering2DTest mitkLabelOverlay3DRendering2DTest #OverlayTest
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkLabelOverlay3DRendering2DTest.png #corresponding reference screenshot
-)
-
-mitkAddCustomModuleTest(mitkLabelOverlay3DRendering3DTest mitkLabelOverlay3DRendering3DTest #OverlayTest
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkLabelOverlay3DRendering3DTest.png #corresponding reference screenshot
-)
-
-mitkAddCustomModuleTest(mitkTextOverlay2DRenderingTest_ball mitkTextOverlay2DRenderingTest #OverlayTest
-                        ${MITK_DATA_DIR}/ball.stl #input image to load in data storage
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkTextOverlay2DRenderingTest_ball.png #corresponding reference screenshot
-)
-
-#mitkAddCustomModuleTest(mitkTextOverlay2DLayouterRenderingTest_ball mitkTextOverlay2DLayouterRenderingTest #OverlayTest
-#                        ${MITK_DATA_DIR}/ball.stl #input image to load in data storage
-#                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkTextOverlay2DLayouterRenderingTest_ball.png #corresponding reference screenshot
-#)
-
-mitkAddCustomModuleTest(mitkTextOverlay3DRendering2DTest_ball mitkTextOverlay3DRendering2DTest #OverlayTest
-                        ${MITK_DATA_DIR}/ball.stl #input image to load in data storage
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkTextOverlay3DRendering2DTest_ball.png #corresponding reference screenshot
-)
-
-mitkAddCustomModuleTest(mitkTextOverlay3DRendering3DTest_ball mitkTextOverlay3DRendering3DTest #OverlayTest
-                        ${MITK_DATA_DIR}/ball.stl #input image to load in data storage
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkTextOverlay3DRendering3DTest_ball.png #corresponding reference screenshot
-)
-
-mitkAddCustomModuleTest(mitkTextOverlay3DColorRenderingTest_ball mitkTextOverlay3DColorRenderingTest #OverlayTest
-                        ${MITK_DATA_DIR}/ball.stl #input image to load in data storage
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkTextOverlay3DColorRenderingTest_ball.png #corresponding reference screenshot
-)
-#End of overlayTests
-
 # Testing of the rendering of binary images
 #mitkAddCustomModuleTest(mitkImageVtkMapper2D_binaryTestImage640x480 mitkImageVtkMapper2DTest #test for standard Pic3D axial slice
 #                        ${MITK_DATA_DIR}/RenderingTestData/binaryImage.nrrd #input image to load in data storage
@@ -212,6 +177,11 @@ mitkAddCustomModuleTest(mitkSurfaceVtkMapper3DTest_TextureProperty mitkSurfaceVt
 mitkAddCustomModuleTest(mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw mitkImageVtkMapper2DTransferFunctionTest
                         ${MITK_DATA_DIR}/Png2D-bw.png
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Png2D-bw-TransferFunctionRGBImage640x480REF.png #corresponding reference screenshot
+)
+
+mitkAddCustomModuleTest(mitkImageVtkMapper2DOpacityTransferFunctionTest_Png2D-bw mitkImageVtkMapper2DOpacityTransferFunctionTest
+                        ${MITK_DATA_DIR}/Png2D-bw.png
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Png2D-bw-OpacityTransferFunctionRGBImage640x480REF.png #corresponding reference screenshot
 )
 
 mitkAddCustomModuleTest(mitkSurfaceGLMapper2DColorTest_RedBall mitkSurfaceGLMapper2DColorTest
@@ -269,5 +239,4 @@ set_property(TEST mitkImageWriterTest_2DPNGImage PROPERTY LABELS MITK-Core)
 set_property(TEST mitkImageWriterTest_rgbPNGImage PROPERTY LABELS MITK-Core)
 set_property(TEST mitkImageWriterTest_rgbaPNGImage PROPERTY LABELS MITK-Core)
 
-add_subdirectory(DICOMTesting)
-
+add_subdirectory(DCMTesting)

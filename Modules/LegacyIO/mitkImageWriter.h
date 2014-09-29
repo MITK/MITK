@@ -139,6 +139,8 @@ public:
     virtual bool CanWriteBaseDataType(BaseData::Pointer data);
     virtual void DoWrite(BaseData::Pointer data);
 
+    void SetUseCompression( bool useCompression );
+
 protected:
 
     /**
@@ -166,6 +168,8 @@ protected:
     std::string m_Extension;
 
     std::string m_MimeType;
+
+    bool m_UseCompression;
 };
 
 }

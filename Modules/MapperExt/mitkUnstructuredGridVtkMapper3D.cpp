@@ -384,13 +384,11 @@ void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mit
 //   node->GetBoolProperty("color mode", colorMode);
 //   m_VtkVolumeRayCastMapper->SetColorMode( (colorMode ? 1 : 0) );
 
-//   float scalarsMin = 0;
-//   if (dynamic_cast<mitk::FloatProperty *>(node->GetProperty("ScalarsRangeMinimum").GetPointer()) != NULL)
-//     scalarsMin = dynamic_cast<mitk::FloatProperty*>(node->GetProperty("ScalarsRangeMinimum").GetPointer())->GetValue();
+//   double scalarsMin = 0;
+//   node->GetDoubleProperty("ScalarsRangeMinimum", scalarsMin, renderer);
 
-//   float scalarsMax = 1.0;
-//   if (dynamic_cast<mitk::FloatProperty *>(node->GetProperty("ScalarsRangeMaximum").GetPointer()) != NULL)
-//     scalarsMax = dynamic_cast<mitk::FloatProperty*>(node->GetProperty("ScalarsRangeMaximum").GetPointer())->GetValue();
+//   double scalarsMax = 1.0;
+//   node->GetProperty("ScalarsRangeMaximum", scalarsMax, renderer);
 
 //   m_VtkVolumeRayCastMapper->SetScalarRange(scalarsMin,scalarsMax);
 

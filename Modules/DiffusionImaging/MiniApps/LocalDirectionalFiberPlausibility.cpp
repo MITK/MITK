@@ -38,14 +38,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 int LocalDirectionalFiberPlausibility(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
+
+    parser.setTitle("Local Directional Fiber Plausibility");
+    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setDescription("");
+    parser.setContributor("MBI");
+
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
-    parser.addArgument("reference", "r", ctkCommandLineParser::StringList, "reference direction images", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "output root", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::StringList, "mask images");
-    parser.addArgument("athresh", "a", ctkCommandLineParser::Float, "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
-    parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "output optional and intermediate calculation results");
-    parser.addArgument("ignore", "n", ctkCommandLineParser::Bool, "don't increase error for missing or too many directions");
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
+    parser.addArgument("reference", "r", ctkCommandLineParser::StringList, "Reference images:", "reference direction images", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::StringList, "Masks:", "mask images");
+    parser.addArgument("athresh", "a", ctkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
+    parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
+    parser.addArgument("ignore", "n", ctkCommandLineParser::Bool, "Ignore:", "don't increase error for missing or too many directions");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -179,7 +185,7 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
             for (unsigned int i=0; i<maskImages.size(); i++)
             {
                 mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(maskImages.at(i))->GetData());
-                mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMaskImage);
+                mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
 
                 // evaluate directions
                 EvaluationFilterType::Pointer evaluationFilter = EvaluationFilterType::New();

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSlicesRotator.h"
 #include "mitkSlicesSwiveller.h"
 #include "mitkRenderWindowFrame.h"
-#include "mitkManufacturerLogo.h"
+#include "mitkLogoOverlay.h"
 #include "mitkGradientBackground.h"
 #include "mitkCoordinateSupplier.h"
 #include "mitkDataStorage.h"
@@ -60,7 +60,7 @@ class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
 
 public:
 
-  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
+  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, const QString& name = "stdmulti");
   virtual ~QmitkStdMultiWidget();
 
   mitk::SliceNavigationController*
@@ -309,10 +309,7 @@ protected:
   mitk::RenderWindowFrame::Pointer m_RectangleRendering1;
   mitk::RenderWindowFrame::Pointer m_RectangleRendering4;
 
-  mitk::ManufacturerLogo::Pointer m_LogoRendering1;
-  mitk::ManufacturerLogo::Pointer m_LogoRendering2;
-  mitk::ManufacturerLogo::Pointer m_LogoRendering3;
-  mitk::ManufacturerLogo::Pointer m_LogoRendering4;
+  mitk::LogoOverlay::Pointer m_LogoRendering;
 
   mitk::GradientBackground::Pointer m_GradientBackground1;
   mitk::GradientBackground::Pointer m_GradientBackground2;

@@ -17,12 +17,15 @@ set(CPP_FILES
     LocalDirectionalFiberPlausibility.cpp
     #TractogramAngularError.cpp
     FiberDirectionExtraction.cpp
+    ImageResampler.cpp
     PeakExtraction.cpp
     PeaksAngularError.cpp
     MultishellMethods.cpp
-    #FiberFoxProcessing.cpp
+    Fiberfox.cpp
     ExportShImage.cpp
     NetworkCreation.cpp
     NetworkStatistics.cpp
     DwiDenoising.cpp
+    FiberExtraction.cpp
+    FiberJoin.cpp
 )

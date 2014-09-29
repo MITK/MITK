@@ -49,8 +49,10 @@ public:
   /** Set/Get the image input of this process object.  */
   virtual void SetInput( const InputImageType *image);
   virtual void SetInput( unsigned int, const InputImageType * image);
-  const InputImageType * GetInput(void);
-  const InputImageType * GetInput(unsigned int idx);
+  InputImageType * GetInput(void);
+  InputImageType * GetInput(unsigned int idx);
+  const InputImageType * GetInput(void) const;
+  const InputImageType * GetInput(unsigned int idx) const;
 
 protected:
   ImageToImageFilter();

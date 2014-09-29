@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/org.mitk.gui.qt.ext" >
+    <qresource prefix="/org.mitk.gui.qt.ext">
         <file>Load_48.png</file>
         <file>Redo_48.png</file>
         <file>Save_48.png</file>
@@ -9,5 +9,6 @@
         <file>Slider.png</file>
         <file>index.html</file>
         <file>xnat-icon.png</file>
+        <file>view-manager_48.png</file>
     </qresource>
 </RCC>

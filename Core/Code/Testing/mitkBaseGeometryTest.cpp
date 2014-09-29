@@ -85,6 +85,7 @@ class mitkBaseGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestSetFloatBoundsDouble);
   MITK_TEST(TestSetFrameOfReferenceID);
   MITK_TEST(TestSetIndexToWorldTransform);
+  MITK_TEST(TestSetIndexToWorldTransform_WithPointerToSameTransform);
   MITK_TEST(TestSetSpacing);
   MITK_TEST(TestTransferItkToVtkTransform);
   MITK_TEST(TestSetIndexToWorldTransformByVtkMatrix);
@@ -226,7 +227,7 @@ public:
   {
     DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetOrigin(anotherPoint);
-    CPPUNIT_ASSERT(anotherPoint==dummy->GetOrigin());
+    CPPUNIT_ASSERT(mitk::Equal(anotherPoint,dummy->GetOrigin()));
 
     //undo changes, new and changed object need to be the same!
     dummy->SetOrigin(aPoint);
@@ -326,6 +327,25 @@ public:
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
   }
 
+  void TestSetIndexToWorldTransform_WithPointerToSameTransform()
+  {
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
+
+    dummy->SetOrigin(anotherPoint);
+    dummy->SetIndexToWorldTransform(anotherTransform);
+    dummy->SetSpacing(anotherSpacing);
+
+    mitk::AffineTransform3D::Pointer testTransfrom = dummy->GetIndexToWorldTransform();
+
+    mitk::Vector3D modifiedPoint = anotherPoint.GetVectorFromOrigin() *2.;
+
+    testTransfrom->SetOffset(modifiedPoint);
+
+    dummy->SetIndexToWorldTransform(testTransfrom);
+
+    CPPUNIT_ASSERT(mitk::Equal(modifiedPoint, dummy->GetOrigin().GetVectorFromOrigin()));
+  }
+
   void TestSetIndexToWorldTransformByVtkMatrix()
   {
     vtkMatrix4x4* vtkmatrix;
@@ -344,6 +364,7 @@ public:
     //undo changes, new and changed object need to be the same!
     vtkmatrix->SetElement(1,1,1);
     dummy->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
+    vtkmatrix->Delete();
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
   }
@@ -359,8 +380,8 @@ public:
     dummy->SetIdentity();
 
     CPPUNIT_ASSERT(mitk::Equal(aTransform,dummy->GetIndexToWorldTransform(),mitk::eps,true));
-    CPPUNIT_ASSERT(aPoint==dummy->GetOrigin());
-    CPPUNIT_ASSERT(aSpacing==dummy->GetSpacing());
+    CPPUNIT_ASSERT(mitk::Equal(aPoint,dummy->GetOrigin()));
+    CPPUNIT_ASSERT(mitk::Equal(aSpacing,dummy->GetSpacing()));
 
     //new and changed object need to be the same!
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
@@ -371,7 +392,7 @@ public:
   {
     DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetSpacing(anotherSpacing);
-    CPPUNIT_ASSERT(anotherSpacing==dummy->GetSpacing());
+    CPPUNIT_ASSERT(mitk::Equal(anotherSpacing,dummy->GetSpacing()));
 
     //undo changes, new and changed object need to be the same!
     dummy->SetSpacing(aSpacing);
@@ -396,8 +417,8 @@ public:
     CPPUNIT_ASSERT(dummy1->GetFrameOfReferenceID() == 0);
     CPPUNIT_ASSERT(dummy1->GetIndexToWorldTransformLastModified() == 0);
 
-    CPPUNIT_ASSERT(dummy1->GetSpacing() == aSpacing);
-    CPPUNIT_ASSERT(dummy1->GetOrigin()==aPoint);
+    CPPUNIT_ASSERT(mitk::Equal(dummy1->GetSpacing(), aSpacing));
+    CPPUNIT_ASSERT(mitk::Equal(dummy1->GetOrigin(), aPoint));
 
     CPPUNIT_ASSERT(dummy1->GetImageGeometry()==false);
 
@@ -541,12 +562,14 @@ public:
     DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetIndexToWorldTransform(transform1);  //Spacing = 2
     dummy->Compose(vtkmatrix2); //Spacing = 4
+    vtkmatrix2->Delete();
 
     CPPUNIT_ASSERT(mitk::Equal(transform3,dummy->GetIndexToWorldTransform(),mitk::eps,true)); // 4=4
     CPPUNIT_ASSERT(mitk::Equal(dummy->GetSpacing(), expectedSpacing));
 
     //undo changes, new and changed object need to be the same!
     dummy->Compose(vtkmatrix4); //Spacing = 1
+    vtkmatrix4->Delete();
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true)); // 1=1
   }
@@ -554,7 +577,7 @@ public:
   void TestTranslate(){
     DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetOrigin(anotherPoint);
-    CPPUNIT_ASSERT(anotherPoint==dummy->GetOrigin());
+    CPPUNIT_ASSERT(mitk::Equal(anotherPoint,dummy->GetOrigin()));
 
     //use some random values for translation
     mitk::Vector3D translationVector;
@@ -592,7 +615,7 @@ public:
     //Testing index->world->index conversion consistency
     dummyGeometry->WorldToIndex(origin, dummyPoint);
     dummyGeometry->IndexToWorld(dummyPoint, dummyPoint);
-    CPPUNIT_ASSERT(dummyPoint == origin);
+    CPPUNIT_ASSERT(mitk::EqualArray(dummyPoint, origin, 3, mitk::eps, true));
 
     //Testing WorldToIndex(origin, mitk::Point3D)==(0,0,0)
     mitk::Point3D globalOrigin;
@@ -600,34 +623,34 @@ public:
 
     mitk::Point3D originContinuousIndex;
     dummyGeometry->WorldToIndex(origin, originContinuousIndex);
-    CPPUNIT_ASSERT(originContinuousIndex == globalOrigin);
+    CPPUNIT_ASSERT(mitk::EqualArray(originContinuousIndex, globalOrigin, 3, mitk::eps, true));
 
     //Testing WorldToIndex(origin, itk::Index)==(0,0,0)
     itk::Index<3> itkindex;
     dummyGeometry->WorldToIndex(origin, itkindex);
     itk::Index<3> globalOriginIndex;
     mitk::vtk2itk(globalOrigin, globalOriginIndex);
-    CPPUNIT_ASSERT(itkindex == globalOriginIndex);
+    CPPUNIT_ASSERT(mitk::EqualArray(itkindex, globalOriginIndex, 3, mitk::eps, true));
 
     //Testing WorldToIndex(origin-0.5*spacing, itk::Index)==(0,0,0)
     mitk::Vector3D halfSpacingStep = dummyGeometry->GetSpacing()*0.5;
     mitk::Matrix3D rotation;
     mitk::Point3D originOffCenter = origin-halfSpacingStep;
     dummyGeometry->WorldToIndex(originOffCenter, itkindex);
-    CPPUNIT_ASSERT(itkindex == globalOriginIndex);
+    CPPUNIT_ASSERT(mitk::EqualArray(itkindex, globalOriginIndex, 3, mitk::eps, true));
 
     //Testing WorldToIndex(origin+0.5*spacing-eps, itk::Index)==(0,0,0)
     originOffCenter = origin+halfSpacingStep;
     originOffCenter -= 0.0001;
     dummyGeometry->WorldToIndex( originOffCenter, itkindex);
-    CPPUNIT_ASSERT(itkindex == globalOriginIndex);
+    CPPUNIT_ASSERT(mitk::EqualArray(itkindex, globalOriginIndex, 3, mitk::eps, true));
 
     //Testing WorldToIndex(origin+0.5*spacing, itk::Index)==(1,1,1)");
     originOffCenter = origin+halfSpacingStep;
     itk::Index<3> global111;
     mitk::FillVector3D(global111, 1,1,1);
     dummyGeometry->WorldToIndex( originOffCenter, itkindex);
-    CPPUNIT_ASSERT(itkindex == global111);
+    CPPUNIT_ASSERT(mitk::EqualArray(itkindex, global111, 3, mitk::eps, true));
 
     //Testing WorldToIndex(GetCenter())==BoundingBox.GetCenter
     mitk::Point3D center = dummyGeometry->GetCenter();
@@ -651,7 +674,7 @@ public:
     //Testing index->world->index conversion consistency
     dummyGeometry->WorldToIndex(point, dummyPoint);
     dummyGeometry->IndexToWorld(dummyPoint, dummyPoint);
-    CPPUNIT_ASSERT(dummyPoint == point);
+    CPPUNIT_ASSERT(mitk::EqualArray(dummyPoint, point, 3, mitk::eps, true));
 
     return EXIT_SUCCESS;
   }
@@ -671,18 +694,18 @@ public:
     dummyGeometry->WorldToIndex(p,pIndex);
 
     dummyGeometry->WorldToIndex(xAxisMM,xAxisContinuousIndex);
-    CPPUNIT_ASSERT(xAxisContinuousIndex[0] == pIndex[0]);
-    CPPUNIT_ASSERT(xAxisContinuousIndex[1] == pIndex[1]);
-    CPPUNIT_ASSERT(xAxisContinuousIndex[2] == pIndex[2]);
+    CPPUNIT_ASSERT(mitk::Equal(xAxisContinuousIndex[0], pIndex[0]));
+    CPPUNIT_ASSERT(mitk::Equal(xAxisContinuousIndex[1], pIndex[1]));
+    CPPUNIT_ASSERT(mitk::Equal(xAxisContinuousIndex[2], pIndex[2]));
 
     dummyGeometry->IndexToWorld(xAxisContinuousIndex,xAxisContinuousIndex);
 
     dummyGeometry->IndexToWorld(pIndex,p);
 
     CPPUNIT_ASSERT(xAxisContinuousIndex == xAxisMM);
-    CPPUNIT_ASSERT(xAxisContinuousIndex[0] == p[0]-origin[0]);
-    CPPUNIT_ASSERT(xAxisContinuousIndex[1] == p[1]-origin[1]);
-    CPPUNIT_ASSERT(xAxisContinuousIndex[2] == p[2]-origin[2]);
+    CPPUNIT_ASSERT(mitk::Equal(xAxisContinuousIndex[0], p[0]-origin[0]));
+    CPPUNIT_ASSERT(mitk::Equal(xAxisContinuousIndex[1], p[1]-origin[1]));
+    CPPUNIT_ASSERT(mitk::Equal(xAxisContinuousIndex[2], p[2]-origin[2]));
 
     //Test consictency for random vector
     mitk::Vector3D vector;
@@ -696,18 +719,18 @@ public:
     dummyGeometry->WorldToIndex(p,pIndex);
 
     dummyGeometry->WorldToIndex(vector,vectorContinuousIndex);
-    CPPUNIT_ASSERT(vectorContinuousIndex[0] == pIndex[0]);
-    CPPUNIT_ASSERT(vectorContinuousIndex[1] == pIndex[1]);
-    CPPUNIT_ASSERT(vectorContinuousIndex[2] == pIndex[2]);
+    CPPUNIT_ASSERT(mitk::Equal(vectorContinuousIndex[0], pIndex[0]));
+    CPPUNIT_ASSERT(mitk::Equal(vectorContinuousIndex[1], pIndex[1]));
+    CPPUNIT_ASSERT(mitk::Equal(vectorContinuousIndex[2], pIndex[2]));
 
     dummyGeometry->IndexToWorld(vectorContinuousIndex,vectorContinuousIndex);
 
     dummyGeometry->IndexToWorld(pIndex,p);
 
     CPPUNIT_ASSERT(vectorContinuousIndex == vector);
-    CPPUNIT_ASSERT(vectorContinuousIndex[0] == p[0]-origin[0]);
-    CPPUNIT_ASSERT(vectorContinuousIndex[1] == p[1]-origin[1]);
-    CPPUNIT_ASSERT(vectorContinuousIndex[2] == p[2]-origin[2]);
+    CPPUNIT_ASSERT(mitk::Equal(vectorContinuousIndex[0], p[0]-origin[0]));
+    CPPUNIT_ASSERT(mitk::Equal(vectorContinuousIndex[1], p[1]-origin[1]));
+    CPPUNIT_ASSERT(mitk::Equal(vectorContinuousIndex[2], p[2]-origin[2]));
 
     return EXIT_SUCCESS;
   }
@@ -815,7 +838,7 @@ public:
     //Test operation Move
     mitk::PointOperation* opP = new mitk::PointOperation(mitk::OpMOVE,anotherPoint);
     dummy->ExecuteOperation(opP);
-    CPPUNIT_ASSERT(anotherPoint==dummy->GetOrigin());
+    CPPUNIT_ASSERT(mitk::Equal(anotherPoint,dummy->GetOrigin()));
     newDummy->SetOrigin(anotherPoint);
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
 
@@ -827,7 +850,7 @@ public:
 
     mitk::PointOperation* opS = new mitk::PointOperation(mitk::OpSCALE,spacing);
     dummy->ExecuteOperation(opS);
-    CPPUNIT_ASSERT(anotherSpacing==dummy->GetSpacing());
+    CPPUNIT_ASSERT(mitk::Equal(anotherSpacing,dummy->GetSpacing()));
     newDummy->SetSpacing(anotherSpacing);
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
 
@@ -979,65 +1002,65 @@ public:
     mitk::FillVector3D(refCorner,bounds[0],bounds[2],bounds[4]);
     refCorner = anotherTransform->TransformPoint(refCorner);
     corner=dummy->GetCornerPoint(0);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
     corner=dummy->GetCornerPoint(true,true,true);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
 
     //Corner 1
     mitk::FillVector3D(refCorner,bounds[0],bounds[2],bounds[5]);
     refCorner = anotherTransform->TransformPoint(refCorner);
     corner=dummy->GetCornerPoint(1);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
     corner=dummy->GetCornerPoint(true,true,false);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
 
     //Corner 2
     mitk::FillVector3D(refCorner,bounds[0],bounds[3],bounds[4]);
     refCorner = anotherTransform->TransformPoint(refCorner);
     corner=dummy->GetCornerPoint(2);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
     corner=dummy->GetCornerPoint(true,false,true);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
 
     //Corner 3
     mitk::FillVector3D(refCorner,bounds[0],bounds[3],bounds[5]);
     refCorner = anotherTransform->TransformPoint(refCorner);
     corner=dummy->GetCornerPoint(3);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
     corner=dummy->GetCornerPoint(true,false,false);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
 
     //Corner 4
     mitk::FillVector3D(refCorner,bounds[1],bounds[2],bounds[4]);
     refCorner = anotherTransform->TransformPoint(refCorner);
     corner=dummy->GetCornerPoint(4);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
     corner=dummy->GetCornerPoint(false,true,true);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
 
     //Corner 5
     mitk::FillVector3D(refCorner,bounds[1],bounds[2],bounds[5]);
     refCorner = anotherTransform->TransformPoint(refCorner);
     corner=dummy->GetCornerPoint(5);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
     corner=dummy->GetCornerPoint(false,true,false);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
 
     //Corner 6
     mitk::FillVector3D(refCorner,bounds[1],bounds[3],bounds[4]);
     refCorner = anotherTransform->TransformPoint(refCorner);
     corner=dummy->GetCornerPoint(6);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
     corner=dummy->GetCornerPoint(false,false,true);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
 
     //Corner 7
     mitk::FillVector3D(refCorner,bounds[1],bounds[3],bounds[5]);
     refCorner = anotherTransform->TransformPoint(refCorner);
     corner=dummy->GetCornerPoint(7);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
     corner=dummy->GetCornerPoint(false,false,false);
-    CPPUNIT_ASSERT(refCorner==corner);
+    CPPUNIT_ASSERT(mitk::Equal(refCorner,corner));
 
     //Wrong Corner needs to fail
     CPPUNIT_ASSERT_THROW(dummy->GetCornerPoint(20),itk::ExceptionObject);
@@ -1053,22 +1076,22 @@ public:
   {
     DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetExtentInMM(0,50);
-    CPPUNIT_ASSERT(50==dummy->GetExtentInMM(0));
+    CPPUNIT_ASSERT(mitk::Equal(50.,dummy->GetExtentInMM(0)));
     //Vnl Matrix has changed. The next line only works because the spacing is 1!
-    CPPUNIT_ASSERT(50==dummy->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0).magnitude());
+    CPPUNIT_ASSERT(mitk::Equal(50.,dummy->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0).magnitude()));
 
     //Smaller extent than original
     dummy->SetExtentInMM(0,5);
-    CPPUNIT_ASSERT(5==dummy->GetExtentInMM(0));
-    CPPUNIT_ASSERT(5==dummy->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0).magnitude());
+    CPPUNIT_ASSERT(mitk::Equal(5.,dummy->GetExtentInMM(0)));
+    CPPUNIT_ASSERT(mitk::Equal(5.,dummy->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0).magnitude()));
 
     dummy->SetExtentInMM(1,4);
-    CPPUNIT_ASSERT(4==dummy->GetExtentInMM(1));
-    CPPUNIT_ASSERT(4==dummy->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1).magnitude());
+    CPPUNIT_ASSERT(mitk::Equal(4.,dummy->GetExtentInMM(1)));
+    CPPUNIT_ASSERT(mitk::Equal(4.,dummy->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1).magnitude()));
 
     dummy->SetExtentInMM(2,2.5);
-    CPPUNIT_ASSERT(2.5==dummy->GetExtentInMM(2));
-    CPPUNIT_ASSERT(2.5==dummy->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).magnitude());
+    CPPUNIT_ASSERT(mitk::Equal(2.5,dummy->GetExtentInMM(2)));
+    CPPUNIT_ASSERT(mitk::Equal(2.5,dummy->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).magnitude()));
   }
 
   void TestGetAxisVector(){
@@ -1080,15 +1103,15 @@ public:
     mitk::Vector3D vector;
     mitk::FillVector3D(vector,bounds[1],0,0);
     dummy->IndexToWorld(vector,vector);
-    CPPUNIT_ASSERT(dummy->GetAxisVector(0)==vector);
+    CPPUNIT_ASSERT(mitk::Equal(dummy->GetAxisVector(0),vector));
 
     mitk::FillVector3D(vector,0,bounds[3],0);
     dummy->IndexToWorld(vector,vector);
-    CPPUNIT_ASSERT(dummy->GetAxisVector(1)==vector);
+    CPPUNIT_ASSERT(mitk::Equal(dummy->GetAxisVector(1),vector));
 
     mitk::FillVector3D(vector,0,0,bounds[5]);
     dummy->IndexToWorld(vector,vector);
-    CPPUNIT_ASSERT(dummy->GetAxisVector(2)==vector);
+    CPPUNIT_ASSERT(mitk::Equal(dummy->GetAxisVector(2),vector));
   }
 
   void TestGetCenter(){
@@ -1103,7 +1126,7 @@ public:
 
     dummy->IndexToWorld(refCenter,refCenter);
 
-    CPPUNIT_ASSERT(dummy->GetCenter()==refCenter);
+    CPPUNIT_ASSERT(mitk::Equal(dummy->GetCenter(),refCenter));
   }
 
   void TestGetDiagonalLength(){
@@ -1113,8 +1136,8 @@ public:
     //3-1=2, 8-5=3, 11.5-7.5=4; 2^2+3^2+4^2 = 29
     double expectedLength = sqrt(29.);
 
-    CPPUNIT_ASSERT(expectedLength==dummy->GetDiagonalLength());
-    CPPUNIT_ASSERT(29==dummy->GetDiagonalLength2());
+    CPPUNIT_ASSERT(mitk::Equal(expectedLength, dummy->GetDiagonalLength(), mitk::eps, true));
+    CPPUNIT_ASSERT(mitk::Equal(29., dummy->GetDiagonalLength2(), mitk::eps, true));
 
     //dummy must not have changed
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
@@ -1127,9 +1150,9 @@ public:
     double bounds[6] = {1,3,5,8,7.5,11.5};
     dummy->SetFloatBounds(bounds);
 
-    CPPUNIT_ASSERT(2==dummy->GetExtent(0));
-    CPPUNIT_ASSERT(3==dummy->GetExtent(1));
-    CPPUNIT_ASSERT(4==dummy->GetExtent(2));
+    CPPUNIT_ASSERT(mitk::Equal(2.,dummy->GetExtent(0)));
+    CPPUNIT_ASSERT(mitk::Equal(3.,dummy->GetExtent(1)));
+    CPPUNIT_ASSERT(mitk::Equal(4.,dummy->GetExtent(2)));
 
     //dummy must not have changed
     DummyTestClass::Pointer newDummy = DummyTestClass::New();

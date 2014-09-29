@@ -244,7 +244,7 @@ vtkRenderWindow* mitk::RenderingTestHelper::GetVtkRenderWindow()
 bool mitk::RenderingTestHelper::CompareRenderWindowAgainstReference(int argc, char* argv[], double threshold)
 {
   this->Render();
-
+  m_RenderWindow->GetRenderer()->ForceImmediateUpdate();
   //retVal meanings: (see VTK/Rendering/vtkTesting.h)
   //0 = test failed
   //1 = test passed

@@ -77,6 +77,7 @@ public:
   // Description:
   // Get number of fragment shaders.
   int GetNumberOfFragmentShaders();
+  int GetNumberOfGeometryShaders();
 
   // Description:
   // Get the ith vtkXMLDataElement of type <Property />.
@@ -93,6 +94,8 @@ public:
   // Description:
   // Get the ith vtkXMLDataElement of type <FragmentShader />.
   vtkXMLShader* GetFragmentShader(int id=0);
+
+  vtkXMLShader* GetGeometryShader(int id=0);
 
   // Description:
   // Get/Set the XML root element that describes this material.

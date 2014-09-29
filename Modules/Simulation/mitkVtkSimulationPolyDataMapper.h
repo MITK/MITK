@@ -31,6 +31,7 @@ namespace mitk
     static vtkSimulationPolyDataMapper* New();
     vtkTypeMacro(vtkSimulationPolyDataMapper, vtkPolyDataMapper);
 
+    double* GetBounds();
     void Render(vtkRenderer* renderer, vtkActor* actor);
     void RenderPiece(vtkRenderer*, vtkActor*);
     void SetSimulation(mitk::Simulation::Pointer simulation);

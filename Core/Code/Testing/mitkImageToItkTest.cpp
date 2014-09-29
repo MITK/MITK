@@ -125,10 +125,6 @@ MITK_TEST_CONDITION_REQUIRED(itkImage.IsNotNull(),"Casting test image to ITK.");
 mitk::Image::Pointer mitkImageAfterCast = mitk::ImportItkImage(itkImage);
 MITK_TEST_CONDITION_REQUIRED(mitkImageAfterCast.IsNotNull(),"Casting ITK image back.");
 
-// we need to explicitely dereference the itkImage as it still holds an mitk::ImageWriteAccessor
-// and the Equal methods throws an exception in this case
-itkImage = 0;
-
 try
 {
   MITK_ASSERT_EQUAL(testImage, mitkImageAfterCast, "Testing if both images are equal.");

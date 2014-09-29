@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>410</width>
-    <height>171</height>
+    <height>241</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -104,19 +104,12 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_2">
                <item>
-                <widget class="QPushButton" name="m_BtnView">
-                 <property name="minimumSize">
-                  <size>
-                   <width>120</width>
-                   <height>0</height>
-                  </size>
-                 </property>
+                <widget class="QCheckBox" name="m_ShowImageStream">
                  <property name="text">
-                  <string>Start Viewing</string>
+                  <string>Show Image Stream</string>
                  </property>
-                 <property name="icon">
-                  <iconset resource="../../../../Modules/USUI/resources/USUI.qrc">
-                   <normaloff>:/USUI/accept.png</normaloff>:/USUI/accept.png</iconset>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>

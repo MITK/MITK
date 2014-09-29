@@ -1,0 +1,180 @@
+/**
+\page DiffusionMiniApps MITK Diffusion MiniApps
+
+\tableofcontents
+
+The respective MiniApp is called MitkDiffusionMiniApp and is shipped with the current MITK Diffusion installer.
+This page intends to provide an overview of all tools that are included in the DiffusionMiniApp. Also it relates them
+to the respective Plugin in the MITK Diffusion application (if one exists).
+For a detailed list of parameters call the according tool without any arguments (see \ref MiniAppExplainPage for details on this) or refer its Plugin equivalent.
+
+\section Preprocessing Preprocessing Tools
+
+
+\subsection BatchedFolderRegistratuion Batched Folder Registration
+
+Allows to register a series of images (of different modalities, including diffusion weighted) to one reference image. It allows to register derived resources (e.g. a segmentation on
+a T2 image) using the transformation of the original (T2) image.
+
+For the following examples assume  a folder containing a longitudinal study with T1,T2, DWI images and segmentations (ROI) :
+
+\code
+Patien01_2010-1.dwi
+Patien01_2010-1_T1.nrrd
+Patien01_2010-1_T2.nrrd
+Patien01_2010-1_ROI.nrrd
+Patien01_2010-2.dwi
+Patien01_2010-2_T1.nrrd
+Patien01_2010-2_T2.nrrd
+Patien01_2010-2_ROI.nrrd
+Patien01_2010-3.dwi
+Patien01_2010-3_T1.nrrd
+Patien01_2010-3_T2.nrrd
+Patien01_2010-3_ROI.nrrd
+Patien01_2010-4.dwi
+Patien01_2010-4_T1.nrrd
+Patien01_2010-4_T2.nrrd
+Patien01_2010-4_ROI.nrrd
+\endcode
+
+All T2 and DWI images are to be co-registered to the first T2 image, this can be achieved by the following two calls:
+
+\code
+ $./MitkDiffusionMiniApps BatchedFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m T2.nrrd
+ $./MitkDiffusionMiniApps BatchedFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m .dwi
+\endcode
+
+The segmentations where performed on the T1 image and are therefore related to the image space of the respective T1 image,
+so they can be bound to these images by marking them as derived resources. To register them both you would call
+
+\code
+$./bin/MitkDiffusionMiniApps BatchedFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m _T1.nrrd -d _ROI.nrrd -b
+\endcode
+
+\note the suffixes of '_T1.nrrd' and '_ROI.nrrd' must have the same length!
+
+The parameter -b designates the derived resource as binary such that a nearest neighbor interpolation is used.
+
+All images (execpt for DWI files) are resample to the reference image, to resample to a specific spacing append the desired
+spacing like this (e.g. 1 x 1 x 2 mm)
+
+\code
+$./MitkDiffusionMiniApps BatchedFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m .dwi -r 1,1,2
+\endcode
+
+\note Registration methods assume that both images occupy roughly the same space. It may happend that this is not the case,
+and therefore registration fails. In this case you can try the -c option which uses the same origin for both images.
+
+
+\subsection CopyGeometry Copy Geometry
+
+Copies the geometry (origin) of the source image to the target image.
+
+\subsection DicomLoad Dicom Loader
+
+Dicom Tools allow to parse dicom folders and export NRRD or DWI files, using standard naming.
+
+TODO enhance Docu, when MiniApp is ready ..
+
+\subsection TensorRecon Tensor Reconstruction
+See \ref QmitkDiffusionImagingUserManualTensorReconstruction for the GUI equivalent of this tool.
+
+Takes a .dwi, .fsl/.fslgz file as input and saves the computed reconstructed tensor to the specified file.
+It also allows for a threshold to be set, to exclude low b values from the reconstruction process.
+
+\code
+./MitkDiffusionMiniApps TensorReconstruction -i /home/user/sample.dwi -o /home/user/tensors.dti -t 50
+\endcode
+
+\subsection QballRecon  Qball Reconstruction
+
+See \ref QmitkDiffusionImagingUserManualQBallReconstruction for the GUI equivalent of this tool.
+
+\code
+./MitkDiffusionMiniApps QballReconstruction -i /home/user/sample.dwi -o /home/user/tensors.qbi -t 50 -r .006 -shc /home/user/coeffs.csv
+\endcode
+
+\subsection PeakExtraction Peak Extraction
+
+
+\subsection PeakAngularErr Peak Angular Error
+
+\section DiffusionMeasures Diffusion Related Measures
+
+\subsection DiffusionIndices Diffusion Indices
+
+See \ref QmitkDiffusionImagingUserManualQuantification for the GUI equivalent of this tool.
+
+Computes a selected tensor derived indices (fa, gfa, ra, ad, rd, ca, l2, l3, md) given a
+Tensor, Q-ball or FSL/MRTrix SH-coefficient image. E.g. to compute the fraction anisotropy call
+
+\code
+./MitkDiffusionMiniApps DiffusionIndices -i /home/user/input.dti -idx fa -o /home/user/fa_image.nrrd
+\endcode
+
+\subsection AllDiffusionIndices Tensor Derived Maps Extraction
+
+Similar to \ref DiffusionIndices . But computes all of the following indices FA, RA, MD, CA, RD, AD at once.
+Also the input is a regular .dwi file, the tensor reconstruction is done implicitly (using a b0 threshold of 50).
+
+
+\section FibTracking Fiber Tracking and Processing Methods
+
+\subsection FibDirection Fiber Direction Extraction
+
+TODO Peter ?
+
+\subsection Streamline Streamline Tracking
+
+See \ref org_mitk_views_streamlinetracking for the GUI equivalent of this tool.
+
+Performs a streamline tracking on a tensor image.
+
+\subsection GibbsTracking Gibbs Fiber Tracking
+
+See \ref org_mitk_views_gibbstracking for the GUI equivalent of this tool.
+
+Performs a Gibbs tracking on a tensor image.
+
+\subsection FibProcessing Fiber Processing
+
+Post-process a fiber bundle. Provides the possibility to
+
+\li remove short/long fiber tracks
+\li combine fiber bundles
+\li resample a fiber bundle
+\li scale bundle in each direction independently
+
+
+\subsection FibFoxProcessing Fiber Fox Processing
+
+See \ref QmitkFiberfoxViewUserManualSignalGeneration for the GUI equivalent of this tool.
+
+Generates a signal from a fiber bundle provided a reference DWI and a parameter file. The parameter file can be generated
+using the Fiberfox plugin (sub-tab) Signal Generation.
+
+\subsection FormatConv  File Format Converter
+
+Determines the data type and converts the input file (if possible) to .NRRD (regular image),
+.DWI (diffusion image) or .FIB (fiber bundle).
+
+\subsection MultiShell Multishell Methods
+
+Computes several fits on an images (Kurtosis,Bi-Exponential, ADC).
+
+These fits are part of the Preprocessing Plugin \ref QmitkDiffusionImagingUserManualPreprocessing .
+
+\section NetworkTools Connectomics
+
+\subsection NetworkCreation Network Creation
+
+See \ref org_mitk_views_connectomicsdata for the GUI equivalent of this tool.
+
+Creates a network based on a brain parcellation and a fiber image.
+
+\subsection  NetworkStatistics Network Statistics
+
+See \ref org_mitk_views_connectomicsstatistics for the GUI equivalent of this tool.
+
+Calculates several network statistics for a given connectome.
+*/

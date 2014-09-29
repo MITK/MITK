@@ -291,21 +291,9 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
 
     mitk::Image::Pointer workingImageSlice;
     mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(this->m_ToolManager->GetWorkingData(0)->GetData());
-    if(workingImage->GetTimeGeometry()->CountTimeSteps() > 1)
-    {
-      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-      timeSelector->SetInput( workingImage );
-      timeSelector->SetTimeNr( m_CurrentTimeStep );
-      timeSelector->UpdateLargestPossibleRegion();
-      // todo: make GetAffectedWorkingSlice dependant of current time step
-      workingImageSlice = GetAffectedWorkingSlice( m_PositionEvent );
-      CastToItkImage( workingImageSlice, workingImageSliceInITK );
-    }
-    else
-    {
-      workingImageSlice = GetAffectedWorkingSlice( m_PositionEvent );
-      CastToItkImage( workingImageSlice, workingImageSliceInITK );
-    }
+
+    workingImageSlice = GetAffectedImageSliceAs2DImage(m_WorkingPlane, workingImage, m_CurrentTimeStep);
+    CastToItkImage( workingImageSlice, workingImageSliceInITK );
 
     typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
     OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
@@ -322,7 +310,7 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
 
     //write to segmentation volume and hide preview image
     // again, current time step is not considered
-    this->WriteBackSegmentationResult(m_PositionEvent, segmentationResult );
+    this->WriteBackSegmentationResult(m_WorkingPlane, segmentationResult, m_CurrentTimeStep);
     this->m_ResultImageNode->SetVisibility(false);
 
     this->ClearSeeds();
@@ -359,6 +347,7 @@ bool mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* 
 
   m_LastEventSender = m_PositionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
+  m_WorkingPlane = positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone();
 
   mitk::Point3D clickInIndex;
 

@@ -2,6 +2,12 @@
 
  \page Step05Page MITK Tutorial - Step 5: Interactively add points
 
+ \li \ref Step5.cpp "Step5.cpp"\n
+ Contains the code for this step.
+ \li Path to files used in this step: \n
+http://mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
+http://mitk.org/download/tutorial-data/lungs.vtk (surface)
+
  In addition to Step 4 where 3 views were created on the data, we now want to interactively add points.
 
  A node containing a PointSet as data is added to the data tree and a PointSetDataInteractor is associated with the node, which handles the interaction.
@@ -19,9 +25,6 @@
 
  In order to add a point the shift key has to be pressed while left clicking in a render window.
  You can also move points or remove them (left click while pressing ALT).
-
- \li \ref Step5.cpp "Step5.cpp"\n
- Contains the code for this step.
 
  \image html step5_result.png
 

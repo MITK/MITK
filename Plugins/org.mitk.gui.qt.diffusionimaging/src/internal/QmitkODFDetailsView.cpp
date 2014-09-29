@@ -200,7 +200,7 @@ void QmitkODFDetailsView::UpdateOdf()
 
       try
       {
-        mitk::QBallImage* qball_image = dynamic_cast< mitk::QBallImage* >( m_ImageNode->GetData() );
+        const mitk::QBallImage* qball_image = dynamic_cast< mitk::QBallImage* >( m_ImageNode->GetData() );
 
         // get access to the qball image data with explicitely allowing exceptions if memory locked
         mitk::ImageReadAccessor readAccess( qball_image, qball_image->GetVolumeData(0), mitk::ImageAccessorBase::ExceptionIfLocked );
@@ -259,7 +259,7 @@ void QmitkODFDetailsView::UpdateOdf()
       m_Controls->m_OdfBox->setVisible(false);
 
 
-      mitk::TensorImage* qball_image = dynamic_cast< mitk::TensorImage*>(m_ImageNode->GetData());
+      const mitk::TensorImage* qball_image = dynamic_cast< mitk::TensorImage*>(m_ImageNode->GetData());
 
       // pixel access block
       try
@@ -297,16 +297,16 @@ void QmitkODFDetailsView::UpdateOdf()
         typedef itk::Matrix<float, 3, 3> EigenVectorsMatrixType;
 
         EigenValuesArrayType eigenValues;
-        EigenVectorsMatrixType eigenVectors;
+        EigenVectorsMatrixType eigenvectors;
 
         QString pos = QString::number(ind[0])+", "+QString::number(ind[1])+", "+QString::number(ind[2]);
         overviewText += "Coordinates: "+pos+"\n";
         overviewText += "FA: "+QString::number(tensor.GetFractionalAnisotropy())+"\n";
         overviewText += "RA: "+QString::number(tensor.GetRelativeAnisotropy())+"\n";
         overviewText += "Trace: "+QString::number(tensor.GetTrace())+"\n";
-        tensor.ComputeEigenAnalysis(eigenValues,eigenVectors);
+        tensor.ComputeEigenAnalysis(eigenValues,eigenvectors);
         overviewText += "Eigenvalues:\n     "+QString::number(eigenValues[2])+"\n     "+QString::number(eigenValues[1])+"\n     "+QString::number(eigenValues[0])+"\n";
-        overviewText += "Main Diffusion:\n     "+QString::number(eigenVectors[0][0])+"\n     "+QString::number(eigenVectors[1][0])+"\n     "+QString::number(eigenVectors[2][0])+"\n";
+        overviewText += "Main Diffusion:\n     "+QString::number(eigenvectors(2, 0))+"\n     "+QString::number(eigenvectors(2, 1))+"\n     "+QString::number(eigenvectors(2, 2))+"\n";
         overviewText += "Values:\n     "+QString::number(tensorelems[0])+"\n     "+QString::number(tensorelems[1])+"\n     "+QString::number(tensorelems[2])+"\n     "+QString::number(tensorelems[3])+"\n     "+QString::number(tensorelems[4])+"\n     "+QString::number(tensorelems[5])+"\n     "+"\n";
         m_Controls->m_OverviewTextEdit->setVisible(true);
       }

@@ -46,13 +46,19 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node") )
   {
     ++listSize;
-    DataNodes.push_back( LoadBaseDataFromDataTag( element->FirstChildElement("data"), workingDirectory, error ) );
+  }
+
+  ProgressBar::GetInstance()->AddStepsToDo(listSize * 2);
+
+  for (TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node"))
+  {
+      DataNodes.push_back(LoadBaseDataFromDataTag(element->FirstChildElement("data"), workingDirectory, error));
+      ProgressBar::GetInstance()->Progress();
   }
 
   OrderedLayers orderedLayers;
   this->GetLayerOrder(document, workingDirectory, DataNodes, orderedLayers);
 
-  ProgressBar::GetInstance()->AddStepsToDo( listSize );
 
   // iterate all nodes
   // first level nodes should be <node> elements

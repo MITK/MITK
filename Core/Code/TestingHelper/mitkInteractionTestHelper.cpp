@@ -76,8 +76,28 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
         mapperID = static_cast<mitk::BaseRenderer::MapperSlotId>(mapperIDNum);
       }
 
+
+      // Get Size of Render Windows
+      int size[3];
+      size[0]=size[1]=size[2]=0;
+      if(element->Attribute(mitk::InteractionEventConst::xmlRenderSizeX()) != NULL)
+      {
+        size[0] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlRenderSizeX())->c_str());
+      }
+      if(element->Attribute(mitk::InteractionEventConst::xmlRenderSizeY()) != NULL)
+      {
+        size[1] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlRenderSizeY())->c_str());
+      }
+      if(element->Attribute(mitk::InteractionEventConst::xmlRenderSizeZ()) != NULL)
+      {
+        size[2] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlRenderSizeZ())->c_str());
+      }
+
       //create renderWindow, renderer and dispatcher
       mitk::RenderWindow::Pointer rw = mitk::RenderWindow::New(NULL, rendererName, rm); //VtkRenderWindow is created within constructor if NULL
+
+      if (size[0] != 0 && size[1] != 0)
+        rw->SetSize(size[0],size[1]);
 
       //set storage of renderer
       rw->GetRenderer()->SetDataStorage(m_DataStorage);
@@ -163,6 +183,8 @@ void mitk::InteractionTestHelper::LoadInteraction()
   mitk::XML2EventParser parser(xmlStream);
   m_Events = parser.GetInteractions();
   xmlStream.close();
+    // Avoid VTK warning: Trying to delete object with non-zero reference count.
+  parser.SetReferenceCount(0);
 }
 
 

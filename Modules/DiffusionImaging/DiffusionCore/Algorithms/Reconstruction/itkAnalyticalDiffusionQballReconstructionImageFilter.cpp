@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/version.hpp>
 #include <stdio.h>
 #include <locale>
+#include <fstream>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -422,7 +423,7 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::tofile2(vnl_matrix<double> *pA, std::string fname)
 {
     vnl_matrix<double> A = (*pA);
-    ofstream myfile;
+    std::ofstream myfile;
     std::locale C("C");
     std::locale originalLocale = myfile.getloc();
     myfile.imbue(C);

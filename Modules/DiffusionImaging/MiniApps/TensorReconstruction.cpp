@@ -34,9 +34,14 @@ int TensorReconstruction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
-    parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "baseline image intensity threshold", 0, true);
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
+    parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
+
+    parser.setCategory("Preprocessing Tools");
+    parser.setTitle("Tensor Reconstruction");
+    parser.setDescription("");
+    parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

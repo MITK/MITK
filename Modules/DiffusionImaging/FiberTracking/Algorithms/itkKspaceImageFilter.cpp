@@ -64,20 +64,20 @@ void KspaceImageFilter< TPixelType >
     outputImage->Allocate();
 
     double gamma = 42576000;    // Gyromagnetic ratio in Hz/T
-    if (m_Parameters.m_EddyStrength>0 && m_DiffusionGradientDirection.GetNorm()>0.001)
+    if ( m_Parameters.m_SignalGen.m_EddyStrength>0 && m_DiffusionGradientDirection.GetNorm()>0.001)
     {
         m_DiffusionGradientDirection.Normalize();
-        m_DiffusionGradientDirection = m_DiffusionGradientDirection * m_Parameters.m_EddyStrength/1000 *  gamma;
+        m_DiffusionGradientDirection = m_DiffusionGradientDirection *  m_Parameters.m_SignalGen.m_EddyStrength/1000 *  gamma;
         m_IsBaseline = false;
     }
 
     this->SetNthOutput(0, outputImage);
     m_Spike = vcl_complex<double>(0,0);
 
-    m_Transform = m_Parameters.m_ImageDirection;
+    m_Transform =  m_Parameters.m_SignalGen.m_ImageDirection;
     for (int i=0; i<3; i++)
         for (int j=0; j<3; j++)
-            m_Transform[i][j] *= m_Parameters.m_ImageSpacing[j];
+            m_Transform[i][j] *=  m_Parameters.m_SignalGen.m_ImageSpacing[j];
 }
 
 template< class TPixelType >
@@ -96,8 +96,8 @@ void KspaceImageFilter< TPixelType >
     double yMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(1); // scanner coverage in y-direction
 
     double numPix = kxMax*kyMax;
-    double dt = m_Parameters.m_tLine/kxMax;
-    double fromMaxEcho = - m_Parameters.m_tLine*kyMax/2;
+    double dt =  m_Parameters.m_SignalGen.m_tLine/kxMax;
+    double fromMaxEcho = -  m_Parameters.m_SignalGen.m_tLine*kyMax/2;
 
     double upsampling = xMax/kxMax;     //  discrepany between k-space resolution and image resolution
     double yMaxFov = kyMax*upsampling;  //  actual FOV in y-direction (in x-direction xMax==FOV)
@@ -126,24 +126,24 @@ void KspaceImageFilter< TPixelType >
 
         // calculate eddy current decay factors
         double eddyDecay = 0;
-        if (m_Parameters.m_EddyStrength>0)
-            eddyDecay = exp(-(m_Parameters.m_tEcho/2 + t)/m_Parameters.m_Tau) * t/1000;
+        if ( m_Parameters.m_SignalGen.m_EddyStrength>0)
+            eddyDecay = exp(-( m_Parameters.m_SignalGen.m_tEcho/2 + t)/ m_Parameters.m_SignalGen.m_Tau) * t/1000;
 
         // calcualte signal relaxation factors
         std::vector< double > relaxFactor;
-        if (m_Parameters.m_DoSimulateRelaxation)
+        if ( m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
             for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
-                relaxFactor.push_back(exp(-(m_Parameters.m_tEcho+t)/m_T2.at(i) -fabs(t)/m_Parameters.m_tInhom));
+                relaxFactor.push_back(exp(-( m_Parameters.m_SignalGen.m_tEcho+t)/m_T2.at(i) -fabs(t)/ m_Parameters.m_SignalGen.m_tInhom));
 
         double kx = kIdx[0];
         double ky = kIdx[1];
         if (oit.GetIndex()[1]%2 == 1)               // reverse readout direction and add ghosting
         {
             kIdx[0] = kxMax-kIdx[0]-1;                // reverse readout direction
-            kx = (double)kIdx[0]-m_Parameters.m_KspaceLineOffset;    // add gradient delay induced offset
+            kx = (double)kIdx[0]- m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
         }
         else
-            kx += m_Parameters.m_KspaceLineOffset;    // add gradient delay induced offset
+            kx +=  m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
 
         // add gibbs ringing offset (cropps k-space)
         if (kx>=kxMax/2)
@@ -162,14 +162,14 @@ void KspaceImageFilter< TPixelType >
 
             // sum compartment signals and simulate relaxation
             for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
-                if (m_Parameters.m_DoSimulateRelaxation)
-                    f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) * relaxFactor.at(i) * m_Parameters.m_SignalScale, 0);
+                if ( m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
+                    f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) * relaxFactor.at(i) *  m_Parameters.m_SignalGen.m_SignalScale, 0);
                 else
-                    f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) * m_Parameters.m_SignalScale );
+                    f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) *  m_Parameters.m_SignalGen.m_SignalScale );
 
             // simulate eddy currents and other distortions
             double omega_t = 0;
-            if ( m_Parameters.m_EddyStrength>0 && !m_IsBaseline)
+            if (  m_Parameters.m_SignalGen.m_EddyStrength>0 && !m_IsBaseline)
             {
                 itk::Vector< double, 3 > pos; pos[0] = x; pos[1] = y; pos[2] = m_Z;
                 pos = m_Transform*pos/1000;   // vector from image center to current position (in meter)
@@ -206,7 +206,7 @@ void KspaceImageFilter< TPixelType >
     double kxMax = outputImage->GetLargestPossibleRegion().GetSize(0);  // k-space size in x-direction
     double kyMax = outputImage->GetLargestPossibleRegion().GetSize(1);  // k-space size in y-direction
 
-    m_Spike *= m_Parameters.m_SpikeAmplitude;
+    m_Spike *=  m_Parameters.m_SignalGen.m_SpikeAmplitude;
     itk::Index< 2 > spikeIdx;
     for (unsigned int i=0; i<m_SpikesPerSlice; i++)
     {

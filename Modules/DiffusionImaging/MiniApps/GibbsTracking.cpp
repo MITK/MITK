@@ -87,13 +87,19 @@ typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Poin
 int GibbsTracking(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
+
+    parser.setTitle("Gibbs Tracking");
+    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setDescription("");
+    parser.setContributor("MBI");
+
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
-    parser.addArgument("parameters", "p", ctkCommandLineParser::String, "parameter file (.gtp)", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::String, "binary mask image");
-    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "sh coefficient convention (FSL, MRtrix)", string("FSL"), true);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", us::Any(), false);
-    parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "do not flip input image to match MITK coordinate convention");
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
+    parser.addArgument("parameters", "p", ctkCommandLineParser::InputFile, "Parameters:", "parameter file (.gtp)", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask:", "binary mask image");
+    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "SH coefficient:", "sh coefficient convention (FSL, MRtrix)", string("FSL"), true);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output:", "output fiber bundle (.fib)", us::Any(), false);
+    parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "No flip:", "do not flip input image to match MITK coordinate convention");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -127,7 +133,7 @@ int GibbsTracking(int argc, char* argv[])
             MITK_INFO << "Loading qball image ...";
             mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());
             ItkQballImageType::Pointer itk_qbi = ItkQballImageType::New();
-            mitk::CastToItkImage<ItkQballImageType>(mitkQballImage, itk_qbi);
+            mitk::CastToItkImage(mitkQballImage, itk_qbi);
             gibbsTracker->SetQBallImage(itk_qbi.GetPointer());
         }
         else if( boost::algorithm::ends_with(inFileName, ".dti") )
@@ -136,7 +142,7 @@ int GibbsTracking(int argc, char* argv[])
             typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
             mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(infile.at(0).GetPointer());
             ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
-            mitk::CastToItkImage<ItkTensorImage>(mitkTensorImage, itk_dti);
+            mitk::CastToItkImage(mitkTensorImage, itk_dti);
             gibbsTracker->SetTensorImage(itk_dti);
         }
         else if ( boost::algorithm::ends_with(inFileName, ".nii") )
@@ -204,7 +210,7 @@ int GibbsTracking(int argc, char* argv[])
             typedef itk::Image<float,3> MaskImgType;
             mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["mask"]));
             MaskImgType::Pointer itk_mask = MaskImgType::New();
-            mitk::CastToItkImage<MaskImgType>(mitkMaskImage, itk_mask);
+            mitk::CastToItkImage(mitkMaskImage, itk_mask);
             gibbsTracker->SetMaskImage(itk_mask);
         }
 

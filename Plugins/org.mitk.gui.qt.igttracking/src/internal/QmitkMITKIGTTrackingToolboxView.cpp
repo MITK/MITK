@@ -36,6 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkProgressBar.h>
+#include <mitkNavigationDataSetWriterXML.h>
+#include <mitkNavigationDataSetWriterCSV.h>
 
 // vtk
 #include <vtkSphereSource.h>
@@ -77,6 +79,7 @@ QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
   }
   catch(std::exception& e) {MITK_WARN << "Unexpected exception during clean up of tracking toolbox view: " << e.what();}
   catch(...) {MITK_WARN << "Unexpected unknown error during clean up of tracking toolbox view!";}
+  this->StoreUISettings();
 }
 
 void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
@@ -136,7 +139,6 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     //initialize tracking volume node
     m_TrackingVolumeNode = mitk::DataNode::New();
     m_TrackingVolumeNode->SetName("TrackingVolume");
-    m_TrackingVolumeNode->SetOpacity(0.25);
     m_TrackingVolumeNode->SetBoolProperty("Backface Culling",true);
     mitk::Color red;
     red.SetRed(1);
@@ -182,11 +184,10 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 
     this->LoadUISettings();
 
-    //add tracking volume node only to data storage if the volume should be shown
-    if ( m_Controls->m_ShowTrackingVolume->isChecked() )
-    {
-      this->GetDataStorage()->Add(m_TrackingVolumeNode);
-    }
+    //add tracking volume node only to data storage
+    this->GetDataStorage()->Add(m_TrackingVolumeNode);
+    if (!m_Controls->m_ShowTrackingVolume->isChecked()) m_TrackingVolumeNode->SetOpacity(0.0);
+    else m_TrackingVolumeNode->SetOpacity(0.25);
   }
 }
 
@@ -249,7 +250,6 @@ void QmitkMITKIGTTrackingToolboxView::OnResetTools()
   m_Controls->m_toolLabel->setText(toolLabel);
 
   m_ToolStorageFilename = "";
-
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnConnect()
@@ -476,24 +476,25 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
 {
   if (qstr.isNull()) return;
   if (qstr.isEmpty()) return;
-  if (m_Controls->m_ShowTrackingVolume->isChecked())
-  {
-    mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
 
-    std::string str = qstr.toStdString();
+  mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
 
-    mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
-    m_TrackingDeviceData = data;
+  std::string str = qstr.toStdString();
 
-    volumeGenerator->SetTrackingDeviceData(data);
-    volumeGenerator->Update();
+  mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
+  m_TrackingDeviceData = data;
 
-    mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
+  volumeGenerator->SetTrackingDeviceData(data);
+  volumeGenerator->Update();
 
-    m_TrackingVolumeNode->SetData(volumeSurface);
+  mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
 
-    GlobalReinit();
-  }
+  m_TrackingVolumeNode->SetData(volumeSurface);
+
+  if (!m_Controls->m_ShowTrackingVolume->isChecked()) m_TrackingVolumeNode->SetOpacity(0.0);
+  else m_TrackingVolumeNode->SetOpacity(0.25);
+
+  GlobalReinit();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnShowTrackingVolumeChanged()
@@ -501,12 +502,11 @@ void QmitkMITKIGTTrackingToolboxView::OnShowTrackingVolumeChanged()
   if (m_Controls->m_ShowTrackingVolume->isChecked())
   {
     OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
-    GetDataStorage()->Add(m_TrackingVolumeNode);
+    m_TrackingVolumeNode->SetOpacity(0.25);
   }
   else
   {
-    GetDataStorage()->Remove(m_TrackingVolumeNode);
-    GlobalReinit();
+    m_TrackingVolumeNode->SetOpacity(0.0);
   }
 }
 
@@ -607,10 +607,22 @@ void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
 
 void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
 {
+  //update filter
   m_ToolVisualizationFilter->Update();
   MITK_DEBUG << "Number of outputs ToolVisualizationFilter: " << m_ToolVisualizationFilter->GetNumberOfIndexedOutputs();
   MITK_DEBUG << "Number of inputs ToolVisualizationFilter: " << m_ToolVisualizationFilter->GetNumberOfIndexedInputs();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  //update tool colors to show tool status
+  for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfIndexedOutputs(); i++)
+    {
+    mitk::NavigationData::Pointer currentTool = m_ToolVisualizationFilter->GetOutput(i);
+    if(currentTool->IsDataValid())
+      {this->m_toolStorage->GetTool(i)->GetDataNode()->SetColor(mitk::IGTColor_VALID);}
+    else
+      {this->m_toolStorage->GetTool(i)->GetDataNode()->SetColor(mitk::IGTColor_WARNING);}
+    }
+
+  //update logging
   if (m_logging)
   {
     this->m_loggingFilter->Update();
@@ -619,7 +631,33 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
     //check if logging stopped automatically
     if((m_loggedFrames>1)&&(!m_loggingFilter->GetRecording())){StopLogging();}
   }
+
+  //refresh view and status widget
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   m_Controls->m_TrackingToolsStatusWidget->Refresh();
+
+  //code to better isolate bug 17713, could be removed when bug 17713 is fixed
+  static int i = 0;
+  static mitk::Point3D lastPositionTool1 = m_ToolVisualizationFilter->GetOutput(0)->GetPosition();
+  static itk::TimeStamp lastTimeStamp = m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
+  i++;
+  //every 20 frames: check if tracking is frozen
+  if(i>20)
+    {
+    i = 0;
+    if (mitk::Equal(lastPositionTool1,m_ToolVisualizationFilter->GetOutput(0)->GetPosition(),0.000000001,false))
+      {
+      MITK_WARN << "Seems as tracking (of at least tool 1) is frozen which means that bug 17713 occurred. Restart tracking might help.";
+      //display further information to find the bug
+      MITK_WARN << "Timestamp of current navigation data: " << m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
+      MITK_WARN << "Timestamp of last navigation data (which holds the same values): " << lastTimeStamp;
+      }
+    if (m_ToolVisualizationFilter->GetOutput(0)->IsDataValid())
+      {
+      lastPositionTool1 = m_ToolVisualizationFilter->GetOutput(0)->GetPosition();
+      lastTimeStamp = m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
+      }
+    }
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
@@ -725,12 +763,27 @@ void QmitkMITKIGTTrackingToolboxView::StopLogging()
 {
   if (m_logging)
   {
-    //update label
-    this->m_Controls->m_LoggingLabel->setText("Logging OFF");
-
+    //stop logging
     m_loggingFilter->StopRecording();
     m_logging = false;
+
+    //update GUI
+    this->m_Controls->m_LoggingLabel->setText("Logging OFF");
     EnableLoggingButtons();
+
+    //write the results to a file
+    if(m_Controls->m_csvFormat->isChecked())
+      {
+      mitk::NavigationDataSetWriterCSV* writer = new mitk::NavigationDataSetWriterCSV();
+      writer->Write(this->m_Controls->m_LoggingFileName->text().toStdString(),m_loggingFilter->GetNavigationDataSet());
+      delete writer;
+      }
+    else if (m_Controls->m_xmlFormat->isChecked())
+      {
+      mitk::NavigationDataSetWriterXML* writer = new mitk::NavigationDataSetWriterXML();
+      writer->Write(this->m_Controls->m_LoggingFileName->text().toStdString(),m_loggingFilter->GetNavigationDataSet());
+      delete writer;
+      }
   }
 }
 
@@ -902,6 +955,7 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
 
   settings.endGroup();
 
+
   // try to deserialize the tool storage from the given tool storage file name
   if ( ! m_ToolStorageFilename.isEmpty() )
   {
@@ -924,10 +978,12 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
     }
     catch(mitk::IGTException)
     {
-      MITK_WARN("QmitkMITKIGTTrackingToolBoxView") << "Error during deserializing. Problems with file,please check the file?";
+      MITK_WARN("QmitkMITKIGTTrackingToolBoxView") << "Error during restoring tools. Problems with file ("<<m_ToolStorageFilename.toStdString()<<"), please check the file?";
+      this->OnResetTools(); //if there where errors reset the tool storage to avoid problems later on
     }
   }
 }
+
 
 void QmitkMITKIGTTrackingToolboxViewWorker::SetWorkerMethod(WorkerMethod w)
 {
@@ -1129,11 +1185,26 @@ void QmitkMITKIGTTrackingToolboxViewWorker::StartTracking()
     emit StartTrackingFinished(false,errorMessage);
     return;
   }
+  //remember the original colors of the tools
+  m_OriginalColors = std::map<mitk::DataNode::Pointer,mitk::Color>();
+  for(int i=0; i<this->m_NavigationToolStorage->GetToolCount(); i++)
+    {
+    mitk::DataNode::Pointer currentToolNode = m_NavigationToolStorage->GetTool(i)->GetDataNode();
+    float c[3];
+    currentToolNode->GetColor(c);
+    mitk::Color color;
+    color.SetRed(c[0]);
+    color.SetGreen(c[1]);
+    color.SetBlue(c[2]);
+    m_OriginalColors[currentToolNode] = color;
+    }
+
   emit StartTrackingFinished(true,errorMessage);
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::StopTracking()
 {
+  //stop tracking
   try
   {
     m_TrackingDeviceSource->StopTracking();
@@ -1142,6 +1213,18 @@ void QmitkMITKIGTTrackingToolboxViewWorker::StopTracking()
   {
     emit StopTrackingFinished(false, e.GetDescription());
   }
+
+  //restore the original colors of the tools
+  for(int i=0; i<this->m_NavigationToolStorage->GetToolCount(); i++)
+  {
+    mitk::DataNode::Pointer currentToolNode = m_NavigationToolStorage->GetTool(i)->GetDataNode();
+    if (m_OriginalColors.find(currentToolNode) == m_OriginalColors.end())
+      {MITK_WARN << "Cannot restore original color of tool " << m_NavigationToolStorage->GetTool(i)->GetToolName();}
+    else
+      {currentToolNode->SetColor(m_OriginalColors[currentToolNode]);}
+  }
+
+  //emit signal
   emit StopTrackingFinished(true, "");
 }
 

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkConnectedThresholdImageFilter.h>
 
 #include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
 #include <mitkLevelWindowProperty.h>
 
 template < typename TPixel, unsigned int VImageDimension >

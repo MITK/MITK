@@ -58,7 +58,7 @@ void SimpleUnstructuredGridHistogram::ComputeFromBaseData( BaseData* source )
   MeasurementVectorType upperBound;
 
   int numberOfBins = 1;
-  HistogramType::SizeType size;
+  HistogramType::SizeType size(1);
 
   vtkDataArray* data;
   /*if (m_UsePointData)*/ data = vtkUGrid->GetPointData()->GetScalars();
@@ -105,8 +105,8 @@ void SimpleUnstructuredGridHistogram::ComputeFromBaseData( BaseData* source )
   typedef itk::Statistics::SampleToHistogramFilter<ListSampleType, HistogramType> FilterType;
   FilterType::Pointer histoFilter = FilterType::New();
 
-  FilterType::HistogramMeasurementVectorType binMin;
-  FilterType::HistogramMeasurementVectorType binMax;
+  FilterType::HistogramMeasurementVectorType binMin(1);
+  FilterType::HistogramMeasurementVectorType binMax(1);
 
   binMin[0] = lowerBound[0];
   binMax[0] = upperBound[0];
@@ -117,7 +117,7 @@ void SimpleUnstructuredGridHistogram::ComputeFromBaseData( BaseData* source )
   histoFilter->SetHistogramBinMaximum(binMax);
   histoFilter->Update();
 
-  m_UGHistogram = histoFilter->GetOutput()->Clone();
+  m_UGHistogram = histoFilter->GetOutput();
 
   m_BinSize = (GetMax() - GetMin())/(double)numberOfBins;
 

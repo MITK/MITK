@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRealTimeClock.h"
 
 #include <iostream>
+#include <fstream>
 #include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
 
@@ -65,6 +66,7 @@ bool ToFCameraMITKPlayerDevice::DisconnectCamera()
   if (ok)
   {
     m_CameraConnected = false;
+    m_PropertyList->Clear();
   }
   return ok;
 }

@@ -62,10 +62,10 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     typedef itk::GibbsTrackingFilter<OdfVectorImgType> GibbsTrackingFilterType;
 
     OdfVectorImgType::Pointer itk_qbi = OdfVectorImgType::New();
-    mitk::CastToItkImage<OdfVectorImgType>(mitkQballImage, itk_qbi);
+    mitk::CastToItkImage(mitkQballImage, itk_qbi);
 
     MaskImgType::Pointer itk_mask = MaskImgType::New();
-    mitk::CastToItkImage<MaskImgType>(mitkMaskImage, itk_mask);
+    mitk::CastToItkImage(mitkMaskImage, itk_mask);
 
     GibbsTrackingFilterType::Pointer gibbsTracker = GibbsTrackingFilterType::New();
     gibbsTracker->SetQBallImage(itk_qbi.GetPointer());

@@ -136,6 +136,8 @@ public:
    */
   vtkAssemblyPath* GetNextPath();
 
+  int GetNumberOfPaths();
+
   const vtkWorldPointPicker *GetWorldPointPicker() const;
   const vtkPointPicker *GetPointPicker() const;
   const vtkCellPicker *GetCellPicker() const;

@@ -95,6 +95,10 @@ public:
       m_MinMaxRadiusContraintsActive = active;
   }
 
+  virtual bool SetCurrentControlPoint( const Point2D& point );
+
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
+
 protected:
   PlanarCircle();
   virtual ~PlanarCircle();

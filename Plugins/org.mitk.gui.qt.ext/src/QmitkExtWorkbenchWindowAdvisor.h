@@ -70,6 +70,10 @@ public:
 
     bool GetShowClosePerspectiveMenuItem();
 
+    void ShowMemoryIndicator(bool show);
+
+    bool GetShowMemoryIndicator();
+
     //TODO should be removed when product support is here
     void SetProductName(const std::string& product);
     void SetWindowIcon(const std::string& wndIcon);
@@ -117,12 +121,14 @@ private:
   berry::IPerspectiveListener::Pointer titlePerspectiveListener;
   berry::IPerspectiveListener::Pointer menuPerspectiveListener;
   berry::IPartListener::Pointer imageNavigatorPartListener;
+  berry::IPartListener::Pointer viewNavigatorPartListener;
   berry::IPropertyChangeListener::Pointer editorPropertyListener;
   friend struct berry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
   friend class PartListenerForTitle;
   friend class PerspectiveListenerForTitle;
   friend class PerspectiveListenerForMenu;
   friend class PartListenerForImageNavigator;
+  friend class PartListenerForViewNavigator;
 
   berry::IEditorPart::WeakPtr lastActiveEditor;
   berry::IPerspectiveDescriptor::WeakPtr lastPerspective;
@@ -138,6 +144,8 @@ private:
   bool showViewMenuItem;
   bool showNewWindowMenuItem;
   bool showClosePerspectiveMenuItem;
+  bool viewNavigatorFound;
+  bool showMemoryIndicator;
   std::string productName;
   std::string windowIcon;
 
@@ -160,6 +168,7 @@ private:
   QAction* undoAction;
   QAction* redoAction;
   QAction* imageNavigatorAction;
+  QAction* viewNavigatorAction;
   QAction* resetPerspAction;
   QAction* closePerspAction;
   QAction* openDicomEditorAction;

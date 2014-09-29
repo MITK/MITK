@@ -59,6 +59,21 @@ mitk::PlanarFigureReader::~PlanarFigureReader()
 
 void mitk::PlanarFigureReader::GenerateData()
 {
+    const std::string& locale = "C";
+    const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+    if ( locale.compare(currLocale)!=0 )
+    {
+      try
+      {
+        setlocale(LC_ALL, locale.c_str());
+      }
+      catch(...)
+      {
+        MITK_INFO << "Could not set locale " << locale;
+      }
+    }
+
   m_Success = false;
   this->SetNumberOfIndexedOutputs(0); // reset all outputs, we add new ones depending on the file content
 
@@ -244,6 +259,16 @@ void mitk::PlanarFigureReader::GenerateData()
     // without messing up the interaction (PF-Interactor needs this property.
     planarFigure->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
 
+    // Which features (length or circumference etc) a figure has is decided by whether it is closed or not
+    // the function SetClosed has to be called in case of PlanarPolygons to ensure they hold the correct feature
+    PlanarPolygon* planarPolygon = dynamic_cast<PlanarPolygon*> (planarFigure.GetPointer());
+    if (planarPolygon != NULL)
+    {
+      bool isClosed = false;
+      planarFigure->GetPropertyList()->GetBoolProperty( "closed", isClosed);
+      planarPolygon->SetClosed(isClosed);
+    }
+
 
     // Read geometry of containing plane
     TiXmlElement* geoElement = pfElement->FirstChildElement("Geometry");
@@ -340,6 +365,16 @@ void mitk::PlanarFigureReader::GenerateData()
     // \TODO: what about m_FigurePlaced and m_SelectedControlPoint ??
     this->SetNthOutput( this->GetNumberOfOutputs(), planarFigure );  // add planarFigure as new output of this filter
   }
+
+  try
+  {
+    setlocale(LC_ALL, currLocale.c_str());
+  }
+  catch(...)
+  {
+    MITK_INFO << "Could not reset locale " << currLocale;
+  }
+
   m_Success = true;
 }
 

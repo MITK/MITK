@@ -134,7 +134,7 @@ static void TestInteractorSetting(mitk::DataNode::Pointer dataNode)
 int mitkDataNodeSegmentationTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
-  MITK_TEST_BEGIN("DataNode")
+  MITK_TEST_BEGIN("DataNodeSegmentation")
 
   // Global interaction must(!) be initialized
   mitk::GlobalInteraction::GetInstance()->Initialize("global");

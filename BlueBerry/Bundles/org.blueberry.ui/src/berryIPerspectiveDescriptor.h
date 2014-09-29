@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryImageDescriptor.h"
 
 namespace berry {
-
 /**
  * \ingroup org_blueberry_ui
  *
@@ -61,10 +60,9 @@ namespace berry {
  * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI IPerspectiveDescriptor : public Object {
+    berryInterfaceMacro(IPerspectiveDescriptor, berry);
 
-  berryInterfaceMacro(IPerspectiveDescriptor, berry);
-
-  virtual ~IPerspectiveDescriptor();
+    virtual ~IPerspectiveDescriptor();
 
     /**
      * Returns the description of this perspective.
@@ -99,8 +97,24 @@ struct BERRY_UI IPerspectiveDescriptor : public Object {
      * @return the label
      */
     virtual std::string GetLabel() const = 0;
-};
 
+    /**
+    * Returns <code>true</code> if this perspective is predefined by an
+    * extension.
+    *
+    * @return boolean whether this perspective is predefined by an extension
+    */
+    virtual bool IsPredefined() const = 0;
+
+    /**
+    * Return the category path of this descriptor
+    *
+    * @return the category path of this descriptor
+    */
+    virtual std::vector<std::string> GetCategoryPath() = 0;
+
+    virtual std::vector< std::string> GetKeywordReferences() const = 0;
+};
 }
 
 #endif /*BERRYIPERSPECTIVEDESCRIPTOR_H_*/

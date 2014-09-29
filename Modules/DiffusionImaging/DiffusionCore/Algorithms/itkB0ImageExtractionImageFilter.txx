@@ -24,6 +24,7 @@ This file is based heavily on a corresponding ITK filter.
 
 #include "itkB0ImageExtractionImageFilter.h"
 
+#include "itkImageRegionIterator.h"
 
 namespace itk {
 

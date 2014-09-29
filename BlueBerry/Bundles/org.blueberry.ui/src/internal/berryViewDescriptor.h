@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-
 struct IHandlerActivation;
 
 /**
@@ -82,6 +81,8 @@ public:
    * @see org.blueberry.ui.internal.registry.IViewDescriptor#getDescription()
    */
   std::string GetDescription() const;
+
+  std::vector< std::string> GetKeywordReferences() const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPartDescriptor#getId()
@@ -146,7 +147,6 @@ private:
    */
   void LoadFromExtension();
 };
-
 }
 
 #endif /*BERRYVIEWDESCRIPTOR_H_*/

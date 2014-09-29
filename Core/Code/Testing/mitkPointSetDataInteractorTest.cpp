@@ -23,12 +23,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkPointSetDataInteractor.h>
 
+#include <vtkDebugLeaks.h>
 
 class mitkPointSetDataInteractorTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkPointSetDataInteractorTestSuite);
+
+  /// \todo Fix VTK memory leaks. Bug 18144.
+  vtkDebugLeaks::SetExitError(0);
+
   MITK_TEST(AddPointInteraction);
+  MITK_TEST(DeletePointInteraction);
   CPPUNIT_TEST_SUITE_END();
 
 
@@ -61,6 +67,7 @@ public:
   void tearDown()
   {
     //destroy all objects
+    m_TestPointSetNode->SetDataInteractor(NULL);
     m_TestPointSetNode = NULL;
     m_TestPointSet = NULL;
     m_DataInteractor = NULL;
@@ -88,6 +95,88 @@ public:
 
     //Compare reference with the result of the interaction
     MITK_ASSERT_EQUAL(m_TestPointSet, referencePointSet, "");
+  }
+
+  void PlayInteraction( std::string &xmlFile, mitk::DataNode* node )
+  {
+    mitk::InteractionTestHelper interactionTestHelper( xmlFile );
+    interactionTestHelper.AddNodeToStorage( node );
+    interactionTestHelper.PlaybackInteraction();
+  }
+
+  void EvaluateState( std::string &refPsFile, mitk::PointSet::Pointer ps, int selected )
+  {
+    mitk::PointSet::Pointer refPs = mitk::IOUtil::LoadPointSet( refPsFile );
+    refPs->UpdateOutputInformation();
+    ps->UpdateOutputInformation();
+
+    MITK_ASSERT_EQUAL(ps, refPs, "");
+
+    MITK_TEST_CONDITION_REQUIRED(true, "Test against reference point set." );
+    MITK_TEST_CONDITION_REQUIRED(ps->GetNumberOfSelected() == 1, "One selected point." );
+    MITK_TEST_CONDITION_REQUIRED(ps->GetSelectInfo( selected ) , "Testing if proper point is selected." );
+  }
+
+  void SetupInteractor( mitk::PointSetDataInteractor* dataInteractor, mitk::DataNode* node )
+  {
+    dataInteractor->LoadStateMachine("PointSet.xml");
+    dataInteractor->SetEventConfig("PointSetConfig.xml");
+    dataInteractor->SetDataNode( node );
+  }
+
+  void DeletePointInteraction()
+  {
+    mitk::PointSetDataInteractor::Pointer dataInteractor = mitk::PointSetDataInteractor::New();
+    mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
+
+    //Path to the reference PointSet
+    std::string referencePointSetPath = GetTestDataFilePath("InteractionTestData/InputData/InitPointSet.mps");
+    mitk::PointSet::Pointer ps = mitk::IOUtil::LoadPointSet( referencePointSetPath );
+    pointSetNode->SetData( ps );
+
+    this->SetupInteractor( dataInteractor, pointSetNode );
+
+    std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-0_1.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-0.mps");
+    PlayInteraction( interactionXmlPath, pointSetNode );
+    EvaluateState( referencePointSetPath, ps, 1 );
+
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-1_3.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-1.mps");
+    PlayInteraction( interactionXmlPath, pointSetNode );
+    EvaluateState( referencePointSetPath, ps, 1 );
+
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-2_4.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-2.mps");
+    PlayInteraction( interactionXmlPath, pointSetNode );
+    EvaluateState( referencePointSetPath, ps, 1 );
+
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-3_8.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-3.mps");
+    PlayInteraction( interactionXmlPath, pointSetNode );
+    EvaluateState( referencePointSetPath, ps, 1 );
+
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-4_2.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-4.mps");
+    PlayInteraction( interactionXmlPath, pointSetNode );
+    EvaluateState( referencePointSetPath, ps, 4 );
+
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-5_6.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-5.mps");
+    PlayInteraction( interactionXmlPath, pointSetNode );
+    EvaluateState( referencePointSetPath, ps, 4 );
+
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-6_7.xml");
+    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-6.mps");
+    PlayInteraction( interactionXmlPath, pointSetNode );
+    EvaluateState( referencePointSetPath, ps, 4 );
+
+    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-7_5.xml");
+    //referencePointSetPath = GetTestDataFilePath("InteractionTestData/PointSet1.mps");
+    PlayInteraction( interactionXmlPath, pointSetNode );
+
+    MITK_TEST_CONDITION_REQUIRED(ps->GetPointSet()->GetNumberOfPoints() == 0, "Empty point set check.");
+    MITK_TEST_CONDITION_REQUIRED(ps->GetNumberOfSelected() == 0, "No selected points." );
   }
 
 };

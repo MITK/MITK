@@ -266,7 +266,7 @@ std::cout<<"[PASSED]"<<std::endl;
   void TestCreateHoleInThePointIDs()
   {
     // create a hole in the point IDs
-    mitk::Point3D point;
+    mitk::Point3D point(0.);
     mitk::PointSet::PointType p10, p11, p12;
     p10.Fill(10.0);
     p11.Fill(11.0);

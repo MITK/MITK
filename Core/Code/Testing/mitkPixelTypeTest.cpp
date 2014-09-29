@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <mitkLogMacros.h>
 
+#include <itkVectorImage.h>
+
 struct MyObscurePixelType
 {
   typedef float ValueType;
@@ -101,6 +103,33 @@ int mitkPixelTypeTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION( obscurePixelType.GetNumberOfComponents() == MyObscurePixelType::Length, "Lenght was set correctly");
   MITK_TEST_CONDITION( obscurePixelType.GetComponentType() == mitk::MapPixelComponentType<MyObscurePixelType::ValueType>::value, "ValueType corresponds."   );
 
+  typedef itk::VectorImage< short, 3> VectorImageType;
+  mitk::PixelType vectorPixelType = mitk::MakePixelType< VectorImageType >( 78 );
+  //vectorPixelType.SetVectorLength( 78 );
+
+  typedef itk::Image< itk::Vector< short, 7> > FixedVectorImageType;
+  mitk::PixelType fixedVectorPixelType = mitk::MakePixelType< FixedVectorImageType >();
+
+  mitk::PixelType scalarPixelType = mitk::MakeScalarPixelType< float >();
+
+  // test ImageTypeTrait traits class
+  MITK_TEST_CONDITION(typeid(mitk::ImageTypeTrait<int, 3>::ImageType) == typeid(itk::Image<int, 3>), "ImageTypeTrait");
+  MITK_TEST_CONDITION((mitk::ImageTypeTrait<int, 3>::IsVectorImage == false), "ImageTypeTrait");
+
+  MITK_TEST_CONDITION(typeid(mitk::ImageTypeTrait<itk::FixedArray<short, 2>, 3>::ImageType) == typeid(itk::Image<itk::FixedArray<short, 2>, 3>), "ImageTypeTrait");
+  MITK_TEST_CONDITION((mitk::ImageTypeTrait<itk::FixedArray<short, 2>, 3>::IsVectorImage == false), "ImageTypeTrait");
+
+  MITK_TEST_CONDITION(typeid(mitk::ImageTypeTrait<itk::VariableLengthVector<short>, 3>::ImageType) == typeid(itk::VectorImage<short, 3>), "ImageTypeTrait");
+  MITK_TEST_CONDITION((mitk::ImageTypeTrait<itk::VariableLengthVector<short>, 3>::IsVectorImage == true), "ImageTypeTrait");
+
+  MITK_TEST_CONDITION(typeid(mitk::ImageTypeTrait<itk::Image<int, 3> >::ImageType) == typeid(itk::Image<int, 3>), "ImageTypeTrait");
+  MITK_TEST_CONDITION((mitk::ImageTypeTrait<itk::Image<int, 3> >::IsVectorImage == false), "ImageTypeTrait");
+
+  MITK_TEST_CONDITION(typeid(mitk::ImageTypeTrait<itk::Image<itk::FixedArray<short, 2>, 3> >::ImageType) == typeid(itk::Image<itk::FixedArray<short, 2>, 3>), "ImageTypeTrait");
+  MITK_TEST_CONDITION((mitk::ImageTypeTrait<itk::Image<itk::FixedArray<short, 2>, 3> >::IsVectorImage == false), "ImageTypeTrait");
+
+  MITK_TEST_CONDITION(typeid(mitk::ImageTypeTrait<itk::VectorImage<short, 3> >::ImageType) == typeid(itk::VectorImage<short, 3>), "ImageTypeTrait");
+  MITK_TEST_CONDITION((mitk::ImageTypeTrait<itk::VectorImage<short, 3> >::IsVectorImage == true), "ImageTypeTrait");
 
   // test CastableTo
 

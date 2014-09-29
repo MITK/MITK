@@ -48,11 +48,13 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
 
   m_LevelInput = new QLineEdit( this );
   m_LevelInput->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred));
+  m_LevelInput->setToolTip("Edit this field to change the center of the levelwindow.");
   //m_LevelInput->setFrameShape( QLineEdit::LineEditPanel );
   //m_LevelInput->setFrameShadow( QLineEdit::Sunken );
 
   m_WindowInput = new QLineEdit( this );
   m_WindowInput->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred));
+  m_WindowInput->setToolTip("Edit this field to change the span of the levelwindow. This number describes the whole span around the center.");
   //m_WindowInput->setFrameShape( QLineEdit::LineEditPanel );
   //m_WindowInput->setFrameShadow( QLineEdit::Sunken );
 

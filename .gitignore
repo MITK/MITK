@@ -9,6 +9,8 @@ CMakeLists.txt.user*
 *.rej
 *.orig
 
+!Utilities/qtsingleapplication/*.patch
+
 ########## IDE specific
 
 ## Office

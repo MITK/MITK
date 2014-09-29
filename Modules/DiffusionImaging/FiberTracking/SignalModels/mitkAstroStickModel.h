@@ -27,28 +27,50 @@ namespace mitk {
   *
   */
 
-template< class ScalarType >
+template< class ScalarType = double >
 class AstroStickModel : public DiffusionSignalModel< ScalarType >
 {
 public:
 
     AstroStickModel();
+    template< class OtherType >AstroStickModel(AstroStickModel<OtherType>* model)
+    {
+        this->m_CompartmentId = model->m_CompartmentId;
+        this->m_T2 = model->GetT2();
+        this->m_FiberDirection = model->GetFiberDirection();
+        this->m_GradientList = model->GetGradientList();
+        this->m_VolumeFractionImage = model->GetVolumeFractionImage();
+        this->m_RandGen = model->GetRandomGenerator();
+
+        this->m_BValue = model->GetBvalue();
+        this->m_Diffusivity = model->GetDiffusivity();
+        this->m_Sticks = model->GetSticks();
+        this->m_NumSticks = model->GetNumSticks();
+        this->m_RandomizeSticks = model->GetRandomizeSticks();
+    }
     ~AstroStickModel();
 
     typedef typename DiffusionSignalModel< ScalarType >::PixelType          PixelType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientType       GradientType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientListType   GradientListType;
-    typedef itk::Statistics::MersenneTwisterRandomVariateGenerator          ItkRandGenType;
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
     ScalarType SimulateMeasurement(unsigned int dir);
 
-    void SetSeed(int s);    ///< set seed for random generator that creates the stick orientations
+
+    void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
+    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
 
     void SetRandomizeSticks(bool randomize=true){ m_RandomizeSticks=randomize; } ///< Random stick configuration in each voxel
-    void SetBvalue(ScalarType bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
-    void SetDiffusivity(ScalarType diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
+    bool GetRandomizeSticks() { return m_RandomizeSticks; }
+
+    void SetBvalue(double bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
+    double GetBvalue() { return m_BValue; }
+
+    void SetDiffusivity(double diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
+    double GetDiffusivity() { return m_Diffusivity; }
+
     void SetNumSticks(unsigned int order)
     {
         vnl_matrix<double> sticks;
@@ -87,16 +109,17 @@ public:
             m_Sticks.push_back(stick);
         }
     }
+    unsigned int GetNumSticks(){ return m_NumSticks; }
+    GradientListType GetSticks(){ return m_Sticks; }
 
 protected:
 
     GradientType GetRandomDirection();
-    ScalarType   m_BValue;              ///< b-value used to generate the artificial signal
-    ScalarType   m_Diffusivity;         ///< Scalar diffusion constant
+    double   m_BValue;              ///< b-value used to generate the artificial signal
+    double   m_Diffusivity;         ///< Scalar diffusion constant
     GradientListType m_Sticks;          ///< Stick container
     unsigned int m_NumSticks;           ///< Number of sticks
     bool m_RandomizeSticks;
-    ItkRandGenType::Pointer m_RandGen;  ///< Random number generator
 };
 
 }

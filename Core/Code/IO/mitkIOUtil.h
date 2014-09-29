@@ -33,8 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class FileWriterRegistry;
-
 /**
  * \ingroup IO
  *
@@ -94,6 +92,13 @@ public:
    * @return The default path for temporary data.
    */
   static std::string GetTempPath();
+
+  /**
+  * Returns the Directory Seperator for the current OS.
+  *
+  * @return the Directory Seperator for the current OS, i.e. "\\" for Windows and "/" otherwise.
+  */
+  static char GetDirectorySeparator();
 
   /**
    * Create and open a temporary file.

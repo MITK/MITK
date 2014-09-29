@@ -427,6 +427,11 @@ void
 SliceNavigationController
 ::SetGeometryTime( const itk::EventObject &geometryTimeEvent )
 {
+  if (m_CreatedWorldGeometry.IsNull())
+  {
+    return;
+  }
+
   const SliceNavigationController::GeometryTimeEvent *timeEvent =
     dynamic_cast< const SliceNavigationController::GeometryTimeEvent * >(
       &geometryTimeEvent);
@@ -436,14 +441,11 @@ SliceNavigationController
   TimeGeometry *timeGeometry = timeEvent->GetTimeGeometry();
   assert( timeGeometry != NULL );
 
-  if ( m_CreatedWorldGeometry.IsNotNull() )
-  {
-    int timeStep = (int) timeEvent->GetPos();
-    ScalarType timeInMS;
-    timeInMS = timeGeometry->TimeStepToTimePoint( timeStep );
-    timeStep = m_CreatedWorldGeometry->TimePointToTimeStep( timeInMS );
-    this->GetTime()->SetPos( timeStep );
-  }
+  int timeStep = (int) timeEvent->GetPos();
+  ScalarType timeInMS;
+  timeInMS = timeGeometry->TimeStepToTimePoint( timeStep );
+  timeStep = m_CreatedWorldGeometry->TimePointToTimeStep( timeInMS );
+  this->GetTime()->SetPos( timeStep );
 }
 
 void
@@ -461,6 +463,11 @@ SliceNavigationController
 void
 SliceNavigationController::SelectSliceByPoint( const Point3D &point )
 {
+  if (m_CreatedWorldGeometry.IsNull())
+  {
+    return;
+  }
+
   //@todo add time to PositionEvent and use here!!
   SlicedGeometry3D* slicedWorldGeometry = dynamic_cast< SlicedGeometry3D * >(
     m_CreatedWorldGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() ).GetPointer() );
@@ -524,6 +531,11 @@ void
 SliceNavigationController::ReorientSlices( const Point3D &point,
   const Vector3D &normal )
 {
+  if (m_CreatedWorldGeometry.IsNull())
+  {
+    return;
+  }
+
   PlaneOperation op( OpORIENT, point, normal );
 
   m_CreatedWorldGeometry->ExecuteOperation( &op );
@@ -534,11 +546,13 @@ SliceNavigationController::ReorientSlices( const Point3D &point,
 void SliceNavigationController::ReorientSlices(const mitk::Point3D &point,
    const mitk::Vector3D &axisVec0, const mitk::Vector3D &axisVec1 )
 {
-   PlaneOperation op( OpORIENT, point, axisVec0, axisVec1 );
+   if (m_CreatedWorldGeometry)
+   {
+     PlaneOperation op( OpORIENT, point, axisVec0, axisVec1 );
+     m_CreatedWorldGeometry->ExecuteOperation( &op );
 
-   m_CreatedWorldGeometry->ExecuteOperation( &op );
-
-   this->SendCreatedWorldGeometryUpdate();
+     this->SendCreatedWorldGeometryUpdate();
+   }
 }
 
 mitk::TimeGeometry *
@@ -571,7 +585,6 @@ SliceNavigationController::GetCurrentPlaneGeometry()
   if ( slicedGeometry )
   {
     const mitk::PlaneGeometry *planeGeometry =
-      dynamic_cast< mitk::PlaneGeometry * >
         ( slicedGeometry->GetPlaneGeometry(this->GetSlice()->GetPos()) );
     return planeGeometry;
   }
@@ -633,7 +646,7 @@ SliceNavigationController::ExecuteOperation( Operation *operation )
   // switch on type
   // - select best slice for a given point
   // - rotate created world geometry according to Operation->SomeInfo()
-  if ( !operation )
+  if ( !operation || m_CreatedWorldGeometry.IsNull())
   {
     return;
   }

@@ -15,48 +15,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include <mitkImageCast.h>
-#include <itkImage.h>
-#include <itkCastImageFilter.h>
+#include <mitkImageCast.txx>
+
 #include <itkRGBPixel.h>
 #include <itkVector.h>
 #include <itkDiffusionTensor3D.h>
 
 namespace mitk
 {
-#ifndef DOXYGEN_SKIP
-template < typename TPixel, unsigned int VImageDimension, class ItkOutputImageType >
-void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
-{
-  typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
-  if(typeid(ItkInputImageType) == typeid(ItkOutputImageType))
-  {
-    itkOutputImage = reinterpret_cast<ItkOutputImageType*>(itkInputImage);
-    return;
-  }
-  typedef itk::CastImageFilter< ItkInputImageType, ItkOutputImageType > CastImageFilterType;
-  typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
-  castImageFilter->SetInput( itkInputImage );
-  castImageFilter->Update();
-  itkOutputImage = castImageFilter->GetOutput();
-}
-#endif //DOXYGEN_SKIP
 
 typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
 typedef itk::Image<itk::DiffusionTensor3D<float>, 2>  itkImageDTIF2;
 typedef itk::Image<itk::DiffusionTensor3D<double>, 2>  itkImageDTID2;
 
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBUC2*,  itk::SmartPointer<itkImageRGBUC2>&);
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTIF2*,  itk::SmartPointer<itkImageDTIF2>&);
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID2*,  itk::SmartPointer<itkImageDTID2>&);
+template void MITK_CORE_EXPORT _CastToItkImage2Access(const itkImageRGBUC2*,  itk::SmartPointer<itkImageRGBUC2>&);
+template void MITK_CORE_EXPORT _CastToItkImage2Access(const itkImageDTIF2*,  itk::SmartPointer<itkImageDTIF2>&);
+template void MITK_CORE_EXPORT _CastToItkImage2Access(const itkImageDTID2*,  itk::SmartPointer<itkImageDTID2>&);
 
 typedef itk::Image<itk::RGBPixel<unsigned char>, 3>  itkImageRGBUC3;
 typedef itk::Image<itk::DiffusionTensor3D<float>, 3>  itkImageDTIF3;
 typedef itk::Image<itk::DiffusionTensor3D<double>, 3>  itkImageDTID3;
 
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBUC3*,  itk::SmartPointer<itkImageRGBUC3>&);
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTIF3*,  itk::SmartPointer<itkImageDTIF3>&);
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID3*,  itk::SmartPointer<itkImageDTID3>&);
+template void MITK_CORE_EXPORT _CastToItkImage2Access(const itkImageRGBUC3*,  itk::SmartPointer<itkImageRGBUC3>&);
+template void MITK_CORE_EXPORT _CastToItkImage2Access(const itkImageDTIF3*,  itk::SmartPointer<itkImageDTIF3>&);
+template void MITK_CORE_EXPORT _CastToItkImage2Access(const itkImageDTID3*,  itk::SmartPointer<itkImageDTID3>&);
 
 #define CAST_HUNDRED_VECS(HUN)   \
   CAST_TEN_VECS(HUN)              \
@@ -88,8 +70,8 @@ template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID3*,  itk::Smar
   _CAST_N_VEC(N_DIRS,short)                                                                  \
 
 #define _CAST_N_VEC(N_DIRS,PIXTYPE)                                                                         \
-  template void MITK_CORE_EXPORT _CastToItkImage2Access(itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 2> *,  itk::SmartPointer<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 2> >&);  \
-  template void MITK_CORE_EXPORT _CastToItkImage2Access(itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 3> *,  itk::SmartPointer<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 3> >&);  \
+  template void MITK_CORE_EXPORT _CastToItkImage2Access(const itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 2> *,  itk::SmartPointer<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 2> >&);  \
+  template void MITK_CORE_EXPORT _CastToItkImage2Access(const itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 3> *,  itk::SmartPointer<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 3> >&);
 
 // the following lines allow for fixed-size vector images up to a certain size limit
 // (commented out for shorter compile times)

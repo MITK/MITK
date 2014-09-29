@@ -136,6 +136,10 @@ int vtkXMLShader::GetScope()
       {
       return vtkXMLShader::SCOPE_FRAGMENT;
       }
+    else if (strcmp(scope, "Geometry") == 0)
+      {
+      return vtkXMLShader::SCOPE_GEOMETRY;
+      }
     }
   return vtkXMLShader::SCOPE_NONE;
 }
@@ -258,6 +262,9 @@ void vtkXMLShader::PrintSelf(ostream& os, vtkIndent indent)
     break;
   case SCOPE_FRAGMENT:
     os << "Fragment";
+    break;
+  case SCOPE_GEOMETRY:
+    os << "Geometry";
     break;
     }
   os << endl;

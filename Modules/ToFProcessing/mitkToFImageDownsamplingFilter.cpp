@@ -80,7 +80,7 @@ void mitk::ToFImageDownsamplingFilter::GenerateData()
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::ToFImageDownsamplingFilter::ItkImageResampling( itk::Image<TPixel,VImageDimension>* itkImage )
+void mitk::ToFImageDownsamplingFilter::ItkImageResampling( const itk::Image<TPixel,VImageDimension>* itkImage )
 {
   // declare typdef for itk image from input mitk image
  typedef itk::Image< TPixel, VImageDimension >   ItkImageType;

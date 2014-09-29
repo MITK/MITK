@@ -4,9 +4,9 @@ set(CPACK_PACKAGE_EXECUTABLES "MitkDiffusion;MITK Diffusion")
 set(CPACK_PACKAGE_NAME "MITK-Diffusion")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MITK application for processing of MR diffusion imaging data.")
 # Major version is the year of release
-set(CPACK_PACKAGE_VERSION_MAJOR "2012")
+set(CPACK_PACKAGE_VERSION_MAJOR "2014")
 # Minor version is the month of release
-set(CPACK_PACKAGE_VERSION_MINOR "12")
+set(CPACK_PACKAGE_VERSION_MINOR "04")
 # Patch versioning is not intended to be done
 set(CPACK_PACKAGE_VERSION_PATCH "99")
 

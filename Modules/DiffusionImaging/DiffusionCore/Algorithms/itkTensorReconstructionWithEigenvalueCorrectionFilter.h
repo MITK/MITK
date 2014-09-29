@@ -58,6 +58,7 @@ namespace itk
     itkTypeMacro(TensorReconstructionWithEigenvalueCorrectionFilter, ImageToImageFilter)
 
 
+    typedef typename itk::Image<itk::DiffusionTensor3D<TTensorPixelType>,3> OutputType;
     typedef TDiffusionPixelType                       GradientPixelType;
     typedef DiffusionTensor3D< TTensorPixelType >     TensorPixelType;
 
@@ -93,6 +94,7 @@ namespace itk
     * should be set. */
     void SetGradientImage( GradientDirectionContainerType *,
       const GradientImagesType *image);
+
 
 
 

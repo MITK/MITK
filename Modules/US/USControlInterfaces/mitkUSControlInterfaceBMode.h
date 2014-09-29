@@ -59,6 +59,15 @@ public:
   mitkClassMacro(USControlInterfaceBMode, USAbstractControlInterface);
 
   /**
+    * \brief Initializes the microservice properties with the current values from the device.
+    * This method must be called before one would like to get the
+    * b mode values (e.g. frequency, power, ...) from the microservice
+    * and after the device is ready to deliver the values by the methods
+    * of this control interface.
+    */
+  void Initialize();
+
+  /**
     * \return current frequency value
     */
   virtual double GetScanningFrequency( ) = 0;

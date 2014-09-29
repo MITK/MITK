@@ -17,13 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkUndistortCameraImage_h
 #define __mitkUndistortCameraImage_h
 
-#include "mitkConfig.h"
 #include "mitkCommon.h"
 #include <MitkOpenCVVideoSupportExports.h>
 #include "itkObject.h"
-#include "itkObjectFactory.h"
 
-#include "mitkNumericTypes.h"
+#include "mitkPoint.h"
 #include "cv.h"
 
 /*!
@@ -84,7 +82,7 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT UndistortCameraImage : public itk::Object
     /*
     * Undistort a single pixel, returns undistorted pixel
     */
-    mitk::Point2D UndistortPixel(mitk::Point2D src);
+    mitk::Point2D UndistortPixel(const mitk::Point2D& src);
     /*
     * Complete undistortion of an OpenCV image, including all calculations
     */

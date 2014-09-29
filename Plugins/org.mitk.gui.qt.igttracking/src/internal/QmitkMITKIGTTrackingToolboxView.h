@@ -186,7 +186,6 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     * \brief Loads the properties of some QWidgets (and the tool storage file name) from QSettings.
     */
    void LoadUISettings();
-
    //members for worker thread
    QThread* m_WorkerThread;
    QmitkMITKIGTTrackingToolboxViewWorker* m_Worker;
@@ -245,6 +244,9 @@ public:
     mitk::TrackingDeviceData m_TrackingDeviceData; ///> stores the tracking device data as long as this is not handled by the tracking device configuration widget
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter; ///> holds the tool visualization filter (second filter of the IGT pipeline)
     bool m_InverseMode;
+
+    //stores the original colors of the tracking tools
+    std::map<mitk::DataNode::Pointer,mitk::Color> m_OriginalColors;
 
     void AutoDetectTools();
     void ConnectDevice();

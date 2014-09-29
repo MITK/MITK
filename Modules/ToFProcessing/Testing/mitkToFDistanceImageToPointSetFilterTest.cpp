@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFDistanceImageToSurfaceFilter.h>
 
 #include <mitkImage.h>
+#include <mitkImageCast.h>
 #include <mitkPointSet.h>
 #include <mitkSurface.h>
 #include <mitkToFProcessingCommon.h>

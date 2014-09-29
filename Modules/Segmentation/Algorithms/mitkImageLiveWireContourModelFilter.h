@@ -153,10 +153,10 @@ namespace mitk {
     unsigned int m_TimeStep;
 
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkPreProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);
+    void ItkPreProcessImage (const itk::Image<TPixel, VImageDimension>* inputImage);
 
     template<typename TPixel, unsigned int VImageDimension>
-    void CreateDynamicCostMapByITK(itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path=NULL);
+    void CreateDynamicCostMapByITK(const itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path=NULL);
 
     InternalImageType::Pointer m_InternalImage;
 

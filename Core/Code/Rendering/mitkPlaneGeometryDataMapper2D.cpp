@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateDataType.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkResliceMethodProperty.h"
+#include "mitkAbstractTransformGeometry.h"
 
 
 mitk::PlaneGeometryDataMapper2D::PlaneGeometryDataMapper2D()
@@ -79,7 +80,7 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer
       continue;
 
     PlaneGeometry* planegeometry = dynamic_cast<PlaneGeometry*>(geometry2dData->GetPlaneGeometry());
-    if (planegeometry != NULL)
+    if (planegeometry != NULL && dynamic_cast<AbstractTransformGeometry*>(geometry2dData->GetPlaneGeometry())==NULL)
       m_OtherPlaneGeometries.push_back(it->Value());
   }
 }
@@ -109,7 +110,8 @@ void mitk::PlaneGeometryDataMapper2D::Paint(BaseRenderer *renderer)
     dynamic_cast< const PlaneGeometry* >(
     renderer->GetCurrentWorldPlaneGeometry() );
 
-  if ( worldPlaneGeometry && inputPlaneGeometry
+  if ( worldPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(renderer->GetCurrentWorldPlaneGeometry())==NULL
+    && inputPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(input->GetPlaneGeometry() )==NULL
     && inputPlaneGeometry->GetReferenceGeometry() )
   {
     DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
@@ -206,9 +208,6 @@ void mitk::PlaneGeometryDataMapper2D::Paint(BaseRenderer *renderer)
         NodesVectorType::iterator otherPlanesIt = m_OtherPlaneGeometries.begin();
         NodesVectorType::iterator otherPlanesEnd = m_OtherPlaneGeometries.end();
 
-        //int mainLineThickSlicesMode = 0;
-        int mainLineThickSlicesNum = 1;
-
         DataNode* dataNodeOfInputPlaneGeometry = NULL;
 
         // Now we have to find the DataNode that contains the inputPlaneGeometry
@@ -248,9 +247,11 @@ void mitk::PlaneGeometryDataMapper2D::Paint(BaseRenderer *renderer)
         // determine the pixelSpacing in that direction
         double thickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
 
-        // As the inputPlaneGeometry cuts through the center of the slice in the middle
-        // we have to add 0.5 pixel in order to compensate.
-        thickSliceDistance *= mainLineThickSlicesNum+0.5;
+        IntProperty *intProperty=0;
+        if( dataNodeOfInputPlaneGeometry->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
+            thickSliceDistance *= intProperty->GetValue()+0.5;
+        else
+            showAreaOfThickSlicing = false;
 
         // not the nicest place to do it, but we have the width of the visible bloc in MM here
         // so we store it in this fancy property
@@ -275,7 +276,7 @@ void mitk::PlaneGeometryDataMapper2D::Paint(BaseRenderer *renderer)
 
 
         //int otherLineThickSlicesMode = 0;
-        int otherLineThickSlicesNum = 1;
+        int otherLineThickSlicesNum = 0;
 
         // by default, there is no gap for the helper lines
         ScalarType gapSize = 0.0;
@@ -298,7 +299,7 @@ void mitk::PlaneGeometryDataMapper2D::Paint(BaseRenderer *renderer)
             Vector3D normal = otherPlane->GetNormal();
 
             double otherLineThickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
-            otherLineThickSliceDistance *= (otherLineThickSlicesNum+0.5)*2;
+            otherLineThickSliceDistance *= (otherLineThickSlicesNum)*2;
 
             Point2D otherLineFrom, otherLineTo;
 

@@ -14,6 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef mitkTestingMacros_h
+#define mitkTestingMacros_h
+
 #include <exception>
 #include <string>
 #include <iostream>
@@ -79,10 +82,10 @@ namespace mitk {
  * @ingroup MITKTestingAPI
  */
 #define MITK_TEST_END()                                   \
-  } catch (mitk::TestFailedException ex) {                      \
+  } catch (const mitk::TestFailedException&) {                      \
     MITK_TEST_OUTPUT(<< "Further test execution skipped.") \
     mitk::TestManager::GetInstance()->TestFailed(); \
-  } catch (std::exception ex) { \
+  } catch (const std::exception& ex) { \
     MITK_TEST_OUTPUT(<< "std::exception occured " << ex.what()) \
     mitk::TestManager::GetInstance()->TestFailed(); \
   }                                                     \
@@ -379,3 +382,5 @@ namespace mitk {
   args.push_back(arg2);                                        \
   MITK_PARAMETERIZED_TEST(TESTMETHOD, args)                    \
 }
+
+#endif

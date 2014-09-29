@@ -323,6 +323,7 @@ set(CPP_FILES
   IO/mitkFileWriter.cpp
   IO/mitkFileWriterRegistry.cpp
   IO/mitkFileWriterSelector.cpp
+  IO/mitkIFileIO.cpp
 # IO/mitkIpPicGet.c
   IO/mitkImageGenerator.cpp
   IO/mitkIOConstants.cpp

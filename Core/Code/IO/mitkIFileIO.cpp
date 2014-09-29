@@ -14,17 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkIFileWriter.h"
+#include "mitkIFileIO.h"
 
 namespace mitk {
 
-IFileWriter::~IFileWriter()
+IFileIO::~IFileIO()
 {
 }
 
-std::string IFileWriter::PROP_BASEDATA_TYPE()
+std::string mitk::IFileIO::PROP_DESCRIPTION()
 {
-  static std::string s = "org.mitk.IFileWriter.basedatatype";
+  static std::string s = "org.mitk.IFileIO.description";
+  return s;
+}
+
+std::string mitk::IFileIO::PROP_MIMETYPE()
+{
+  static std::string s = "org.mitk.IFileIO.mimetype";
   return s;
 }
 

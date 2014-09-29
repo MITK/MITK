@@ -302,6 +302,11 @@ QmitkViewNavigatorWidget::~QmitkViewNavigatorWidget()
 
 }
 
+void QmitkViewNavigatorWidget::setFocus()
+{
+  m_Controls.lineEdit->setFocus();
+}
+
 void QmitkViewNavigatorWidget::CreateQtPartControl( QWidget *parent )
 {
     // create GUI widgets from the Qt Designer's .ui file

@@ -12,6 +12,7 @@ The following items describe some issues about MITK on a more abstract level.
 -# Data Concepts
  -# \subpage BasicDataTypesPage
  -# \subpage DataManagementPage
+ -# \subpage ReaderWriterPage
  -# \subpage MitkImagePage
  -# \subpage PropertiesPage
  -# \subpage GeometryOverviewPage

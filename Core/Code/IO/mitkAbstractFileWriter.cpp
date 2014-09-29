@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkBaseData.h>
 #include <mitkIOUtil.h>
+#include <mitkCustomMimeType.h>
 
 #include <Internal/mitkFileReaderWriterBase.h>
 
@@ -54,18 +55,11 @@ public:
 };
 
 
-AbstractFileWriter::AbstractFileWriter()
-  : d(new Impl)
-{
-}
-
 AbstractFileWriter::~AbstractFileWriter()
 {
   UnregisterService();
 
   delete d->m_PrototypeFactory;
-
-  d->UnregisterMimeType();
 }
 
 AbstractFileWriter::AbstractFileWriter(const AbstractFileWriter& other)
@@ -73,7 +67,13 @@ AbstractFileWriter::AbstractFileWriter(const AbstractFileWriter& other)
 {
 }
 
-AbstractFileWriter::AbstractFileWriter(const std::string& baseDataType, const MimeType& mimeType,
+AbstractFileWriter::AbstractFileWriter(const std::string& baseDataType)
+  : d(new Impl)
+{
+  d->m_BaseDataType = baseDataType;
+}
+
+AbstractFileWriter::AbstractFileWriter(const std::string& baseDataType, const CustomMimeType& mimeType,
                                        const std::string& description)
   : d(new Impl)
 {
@@ -88,7 +88,9 @@ AbstractFileWriter::AbstractFileWriter(const std::string& baseDataType, const st
 {
   d->m_BaseDataType = baseDataType;
   d->SetDescription(description);
-  d->AddExtension(extension);
+  CustomMimeType customMimeType;
+  customMimeType.AddExtension(extension);
+  d->SetMimeType(customMimeType);
 }
 
 ////////////////////// Writing /////////////////////////
@@ -109,6 +111,17 @@ void AbstractFileWriter::Write(const BaseData* data, const std::string& path)
   {
     mitkThrow() << "Error writing file '" << path << "': " << e.what();
   }
+}
+
+IFileWriter::ConfidenceLevel AbstractFileWriter::GetConfidenceLevel(const BaseData* data) const
+{
+  if (data == NULL) return Unsupported;
+
+  if (data->GetNameOfClass() == d->m_BaseDataType)
+  {
+    return Supported;
+  }
+  return Unsupported;
 }
 
 void AbstractFileWriter::Write(const BaseData* data, std::ostream& stream)
@@ -139,7 +152,7 @@ us::ServiceRegistration<IFileWriter> AbstractFileWriter::RegisterService(us::Mod
 
   d->RegisterMimeType(context);
 
-  if (this->GetMimeType().empty())
+  if (this->GetMimeType().GetName().empty())
   {
     MITK_WARN << "Not registering writer due to empty MIME type.";
     return us::ServiceRegistration<IFileWriter>();
@@ -185,7 +198,7 @@ us::ServiceProperties AbstractFileWriter::GetServiceProperties() const
 {
   us::ServiceProperties result;
   result[IFileWriter::PROP_DESCRIPTION()] = this->GetDescription();
-  result[IFileWriter::PROP_MIMETYPE()] = this->GetMimeType();
+  result[IFileWriter::PROP_MIMETYPE()] = this->GetMimeType().GetName();
   result[IFileWriter::PROP_BASEDATA_TYPE()] = d->m_BaseDataType;
   result[us::ServiceConstants::SERVICE_RANKING()] = this->GetRanking();
 
@@ -196,17 +209,17 @@ us::ServiceProperties AbstractFileWriter::GetServiceProperties() const
   return result;
 }
 
-std::string AbstractFileWriter::GetMimeType() const
+CustomMimeType AbstractFileWriter::GetMimeType() const
 {
   return d->GetMimeType();
 }
 
-us::ServiceRegistration<IMimeType> AbstractFileWriter::RegisterMimeType(us::ModuleContext* context)
+us::ServiceRegistration<CustomMimeType> AbstractFileWriter::RegisterMimeType(us::ModuleContext* context)
 {
   return d->RegisterMimeType(context);
 }
 
-void AbstractFileWriter::SetMimeType(const std::string& mimeType)
+void AbstractFileWriter::SetMimeType(const CustomMimeType& mimeType)
 {
   d->SetMimeType(mimeType);
 }
@@ -268,26 +281,6 @@ int AbstractFileWriter::GetRanking() const
   return d->GetRanking();
 }
 
-std::vector<std::string> AbstractFileWriter::GetExtensions() const
-{
-  return d->GetExtensions();
-}
-
-void AbstractFileWriter::AddExtension(const std::string& extension)
-{
-  d->AddExtension(extension);
-}
-
-void AbstractFileWriter::SetCategory(const std::string& category)
-{
-  d->SetCategory(category);
-}
-
-std::string AbstractFileWriter::GetCategory() const
-{
-  return d->GetCategory();
-}
-
 void AbstractFileWriter::SetBaseDataType(const std::string& baseDataType)
 {
   d->m_BaseDataType = baseDataType;
@@ -306,19 +299,6 @@ std::string AbstractFileWriter::GetBaseDataType() const
 void AbstractFileWriter::SetDescription(const std::string& description)
 {
   d->SetDescription(description);
-}
-
-AbstractFileWriter::MimeType::MimeType(const std::string& mimeType)
-  : std::string(mimeType)
-{
-  if (this->empty())
-  {
-    throw std::invalid_argument("MIME type must not be empty.");
-  }
-}
-
-AbstractFileWriter::MimeType::MimeType()
-{
 }
 
 }

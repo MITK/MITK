@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 #include "mitkCoreServices.h"
 #include "mitkIMimeTypeProvider.h"
+#include "mitkMimeType.h"
+#include "mitkCustomMimeType.h"
 #include "mitkFileReaderRegistry.h"
 #include "mitkFileWriterRegistry.h"
 
@@ -31,40 +33,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSet>
+#include <QDebug>
 
 //ITK
 #include <itksys/SystemTools.hxx>
+
+#include <algorithm>
 
 struct QmitkIOUtil::Impl
 {
   struct ReaderOptionsDialogFunctor : public ReaderOptionsFunctorBase
   {
 
-    virtual bool operator()(const std::string& path, const std::vector<std::string>& readerLabels,
-                            const std::vector<mitk::IFileReader*>& readers, mitk::IFileReader*& selectedReader)
+    virtual bool operator()(LoadInfo& loadInfo)
     {
-      QStringList qLabels;
-      for (std::vector<std::string>::const_iterator iter = readerLabels.begin(), iterEnd = readerLabels.end();
-           iter != iterEnd; ++iter)
-      {
-        qLabels.push_back(QString::fromStdString(*iter));
-      }
-      QList<mitk::IFileReader*> qReaders;
-      for (std::vector<mitk::IFileReader*>::const_iterator iter = readers.begin(), iterEnd = readers.end();
-           iter != iterEnd; ++iter)
-      {
-        qReaders.push_back(*iter);
-      }
-
-      QmitkFileReaderOptionsDialog dialog(QString::fromStdString(path), qLabels, qReaders);
+      QmitkFileReaderOptionsDialog dialog(loadInfo);
       if (dialog.exec() == QDialog::Accepted)
       {
-        selectedReader = dialog.GetReader();
         return !dialog.ReuseOptions();
       }
       else
       {
-        selectedReader = NULL;
+        loadInfo.m_Cancel = true;
         return true;
       }
     }
@@ -73,36 +63,35 @@ struct QmitkIOUtil::Impl
   struct WriterOptionsDialogFunctor : public WriterOptionsFunctorBase
   {
 
-    virtual bool operator()(const std::string& path, const std::vector<std::string>& writerLabels,
-                            const std::vector<mitk::IFileWriter*>& writers, mitk::IFileWriter*& selectedWriter)
+    virtual bool operator()(SaveInfo& saveInfo)
     {
-      QStringList qLabels;
-      for (std::vector<std::string>::const_iterator iter = writerLabels.begin(), iterEnd = writerLabels.end();
-           iter != iterEnd; ++iter)
-      {
-        qLabels.push_back(QString::fromStdString(*iter));
-      }
-      QList<mitk::IFileWriter*> qWriters;
-      for (std::vector<mitk::IFileWriter*>::const_iterator iter = writers.begin(), iterEnd = writers.end();
-           iter != iterEnd; ++iter)
-      {
-        qWriters.push_back(*iter);
-      }
-
-      QmitkFileWriterOptionsDialog dialog(QString::fromStdString(path), qLabels, qWriters);
+      QmitkFileWriterOptionsDialog dialog(saveInfo);
       if (dialog.exec() == QDialog::Accepted)
       {
-        selectedWriter = dialog.GetWriter();
         return !dialog.ReuseOptions();
       }
       else
       {
-        selectedWriter = NULL;
+        saveInfo.m_Cancel = true;
         return true;
       }
     }
   };
 
+};
+
+struct MimeTypeComparison : public std::unary_function<mitk::MimeType, bool>
+{
+  MimeTypeComparison(const std::string& mimeTypeName)
+    : m_Name(mimeTypeName)
+  {}
+
+  bool operator()(const mitk::MimeType& mimeType) const
+  {
+    return mimeType.GetName() == m_Name;
+  }
+
+  const std::string m_Name;
 };
 
 QString QmitkIOUtil::GetFileOpenFilterString()
@@ -114,10 +103,11 @@ QString QmitkIOUtil::GetFileOpenFilterString()
   for (std::vector<std::string>::iterator cat = categories.begin(); cat != categories.end(); ++cat)
   {
     QSet<QString> filterExtensions;
-    std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForCategory(*cat);
-    for (std::vector<std::string>::iterator mt = mimeTypes.begin(); mt != mimeTypes.end(); ++mt)
+    std::vector<mitk::MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForCategory(*cat);
+    for (std::vector<mitk::MimeType>::iterator mt = mimeTypes.begin(); mt != mimeTypes.end(); ++mt)
     {
-      std::vector<std::string> extensions = mimeTypeProvider->GetExtensions(*mt);
+      std::cout << "Got " << mt->GetName() << " for cat " << *cat << std::endl;
+      std::vector<std::string> extensions = mt->GetExtensions();
       for (std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ++ext)
       {
         filterExtensions << QString::fromStdString(*ext);
@@ -136,27 +126,16 @@ QString QmitkIOUtil::GetFileOpenFilterString()
   return filters;
 }
 
-QmitkIOUtil::SaveFilter QmitkIOUtil::GetFileSaveFilter(const mitk::BaseData* baseData)
-{
-  return SaveFilter(baseData);
-}
-
-QmitkIOUtil::SaveFilter QmitkIOUtil::GetFileSaveFilter(const std::string& baseDataType)
-{
-  return SaveFilter(baseDataType);
-}
-
 QList<mitk::BaseData::Pointer> QmitkIOUtil::Load(const QStringList& paths, QWidget* parent)
 {
-  std::vector<std::string> qPaths;
+  std::vector<LoadInfo> loadInfos;
   foreach(const QString& file, paths)
   {
-    qPaths.push_back(file.toStdString());
+    loadInfos.push_back(LoadInfo(file.toStdString()));
   }
 
-  std::vector<mitk::BaseData::Pointer> result;
   Impl::ReaderOptionsDialogFunctor optionsCallback;
-  std::string errMsg = Load(qPaths, &result, NULL, NULL, &optionsCallback);
+  std::string errMsg = Load(loadInfos, NULL, NULL, &optionsCallback);
   if (!errMsg.empty())
   {
     QMessageBox::warning(parent, "Error reading files", QString::fromStdString(errMsg));
@@ -164,25 +143,29 @@ QList<mitk::BaseData::Pointer> QmitkIOUtil::Load(const QStringList& paths, QWidg
   }
 
   QList<mitk::BaseData::Pointer> qResult;
-  for(std::vector<mitk::BaseData::Pointer>::const_iterator iter = result.begin(),
-      iterEnd = result.end(); iter != iterEnd; ++iter)
+  for(std::vector<LoadInfo>::const_iterator iter = loadInfos.begin(), iterEnd = loadInfos.end();
+      iter != iterEnd; ++iter)
   {
-    qResult << *iter;
+    for (std::vector<mitk::BaseData::Pointer>::const_iterator dataIter = iter->m_Output.begin(),
+         dataIterEnd = iter->m_Output.end(); dataIter != dataIterEnd; ++dataIter)
+    {
+      qResult << *dataIter;
+    }
   }
   return qResult;
 }
 
 mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QStringList& paths, mitk::DataStorage& storage, QWidget* parent)
 {
-  std::vector<std::string> qPaths;
+  std::vector<LoadInfo> loadInfos;
   foreach(const QString& file, paths)
   {
-    qPaths.push_back(file.toStdString());
+    loadInfos.push_back(LoadInfo(file.toStdString()));
   }
 
   mitk::DataStorage::SetOfObjects::Pointer nodeResult = mitk::DataStorage::SetOfObjects::New();
   Impl::ReaderOptionsDialogFunctor optionsCallback;
-  std::string errMsg = Load(qPaths, NULL, nodeResult, &storage, &optionsCallback);
+  std::string errMsg = Load(loadInfos, nodeResult, &storage, &optionsCallback);
   if (!errMsg.empty())
   {
     QMessageBox::warning(parent, "Error reading files", QString::fromStdString(errMsg));
@@ -230,7 +213,9 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
   for(std::vector<const mitk::BaseData*>::const_iterator dataIter = data.begin(),
       dataIterEnd = data.end(); dataIter != dataIterEnd; ++dataIter, ++counter)
   {
-    SaveFilter filters(*dataIter);
+    SaveInfo saveInfo(*dataIter);
+
+    SaveFilter filters(saveInfo);
 
     // If there is only the "__all__" filter string, it means there is no writer for this base data
     if (filters.Size() < 2)
@@ -251,16 +236,16 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
     {
       dialogTitle += " \"" + defaultBaseNames[counter] + "\"";
       fileName += QDir::separator() + defaultBaseNames[counter];
-      std::pair<std::string,std::string> defaultExt = mitk::FileWriterRegistry::GetDefaultExtension(*dataIter);
-      if (!defaultExt.first.empty())
+      // We do not append an extension to the file name by default. The extension
+      // is chosen by the user by either selecting a filter or writing the
+      // extension in the file name himself (in the file save dialog).
+      /*
+      QString defaultExt = filters.GetDefaultExtension();
+      if (!defaultExt.isEmpty())
       {
-        fileName += "." + QString::fromStdString(defaultExt.first);
-        QString  filter = filters.GetFilterForMimeType(defaultExt.second);
-        if (!filter.isEmpty())
-        {
-          selectedFilter = filter;
-        }
+        fileName += "." + defaultExt;
       }
+      */
     }
 
     // Ask the user for a file name
@@ -272,30 +257,32 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
 
     if (nextName.isEmpty())
     {
-      continue;
+      // We stop asking for further file names, but we still save the
+      // data where the user already confirmed the save dialog.
+      break;
     }
 
     fileName = nextName;
     QFileInfo fileInfo(fileName);
     currentPath = fileInfo.absolutePath();
     QString suffix = fileInfo.completeSuffix();
-    std::string mimeType = filters.GetMimeTypeForFilter(selectedFilter);
+    mitk::MimeType mimeType = filters.GetMimeTypeForFilter(selectedFilter);
 
     mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
     // If the filename contains a suffix, use it but check if it is valid
     if (!suffix.isEmpty())
     {
-      std::vector<std::string> availableTypes = mimeTypeProvider->GetMimeTypesForExtension(suffix.toStdString());
+      std::vector<mitk::MimeType> availableTypes = mimeTypeProvider->GetMimeTypesForExtension(suffix.toStdString());
 
       // Check if the selected mime-type is related to the specified suffix (file extension).
       // If not, get the best matching mime-type for the suffix.
       if (std::find(availableTypes.begin(), availableTypes.end(), mimeType) == availableTypes.end())
       {
-        mimeType.clear();
-        for (std::vector<std::string>::const_iterator availIter = availableTypes.begin(),
+        mimeType = mitk::MimeType();
+        for (std::vector<mitk::MimeType>::const_iterator availIter = availableTypes.begin(),
              availIterEnd = availableTypes.end(); availIter != availIterEnd; ++availIter)
         {
-          if (filters.ContainsMimeType(*availIter))
+          if (filters.ContainsMimeType(availIter->GetName()))
           {
             mimeType = *availIter;
             break;
@@ -303,7 +290,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
         }
       }
 
-      if (mimeType.empty())
+      if (!mimeType.IsValid())
       {
         // The extension is not valid (no mime-type found), bail out
         QMessageBox::warning(parent,
@@ -318,15 +305,14 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
     {
       // Create a default suffix, unless the file already exists and the user
       // already confirmed to overwrite it (without using a suffix)
-      if (mimeType == SaveFilter::ALL_MIMETYPE)
+      if (mimeType == SaveFilter::ALL_MIMETYPE())
       {
         // Use the highest ranked mime-type from the list
         mimeType = filters.GetDefaultMimeType();
       }
       if (!fileInfo.exists())
       {
-        suffix = QString::fromStdString(
-                   mimeTypeProvider->GetExtensions(mimeType).front());
+        suffix = QString::fromStdString(mimeType.GetExtensions().front());
         fileName += "." + suffix;
         // We changed the file name (added a suffix) so ask in case
         // the file aready exists.
@@ -338,14 +324,11 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
             QMessageBox::warning(parent, "Saving not possible", QString("The path \"%1\" is not a file").arg(fileName));
             continue;
           }
-          if (fileInfo.exists())
+          if (QMessageBox::question(parent, "Replace File",
+                                    QString("A file named \"%1\" already exists. Do you want to replace it?").arg(fileName)) ==
+              QMessageBox::No)
           {
-            if (QMessageBox::question(parent, "Replace File",
-                                      "A file named \"%1\" already exists. Do you want to replace it?") ==
-                QMessageBox::No)
-            {
-              continue;
-            }
+            continue;
           }
         }
       }
@@ -358,16 +341,23 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
     }
 
     fileNames.push_back(fileName);
-    saveInfos.push_back(SaveInfo(*dataIter, mimeType, fileName.toStdString()));
+    saveInfo.m_Path = fileName.toStdString();
+    saveInfo.m_MimeType = mimeType;
+    // pre-select the best writer for the chosen mime-type
+    saveInfo.m_WriterSelector.Select(mimeType.GetName());
+    saveInfos.push_back(saveInfo);
     MITK_INFO << "****** SAVING TO FILENAME: " << fileName.toStdString();
   }
 
-  Impl::WriterOptionsDialogFunctor optionsCallback;
-  std::string errMsg = Save(saveInfos, &optionsCallback);
-  if (!errMsg.empty())
+  if (!saveInfos.empty())
   {
-    QMessageBox::warning(parent, "Error writing files", QString::fromStdString(errMsg));
-    mitkThrow() << errMsg;
+    Impl::WriterOptionsDialogFunctor optionsCallback;
+    std::string errMsg = Save(saveInfos, &optionsCallback);
+    if (!errMsg.empty())
+    {
+      QMessageBox::warning(parent, "Error writing files", QString::fromStdString(errMsg));
+      mitkThrow() << errMsg;
+    }
   }
 
   return fileNames;
@@ -395,75 +385,64 @@ void QmitkIOUtil::SavePointSetWithDialog(mitk::PointSet::Pointer pointset, std::
 
 struct QmitkIOUtil::SaveFilter::Impl
 {
-  void Init(const std::string& baseDataType)
+  Impl(const mitk::IOUtil::SaveInfo& saveInfo)
+    : m_SaveInfo(saveInfo)
   {
     // Add an artifical filter for "All"
-    m_MimeTypes.push_back(ALL_MIMETYPE);
+    m_MimeTypes.push_back(ALL_MIMETYPE());
     m_FilterStrings.push_back("All (*.*)");
 
     // Get all writers and their mime types for the given base data type
-    std::vector<std::string> mimeTypes;
-    std::vector<mitk::FileWriterRegistry::WriterReference> refs = mitk::FileWriterRegistry::GetReferences(baseDataType);
-    for (std::vector<mitk::FileWriterRegistry::WriterReference>::const_iterator iter = refs.begin(),
-         iterEnd = refs.end(); iter != iterEnd; ++iter)
-    {
-      std::string mimeType = iter->GetProperty(mitk::IFileWriter::PROP_MIMETYPE()).ToString();
-      if (!mimeType.empty() && std::find(mimeTypes.begin(), mimeTypes.end(), mimeType) == mimeTypes.end())
-      {
-        mimeTypes.push_back(mimeType);
-      }
-    }
+    // (this is sorted already)
+    std::vector<mitk::MimeType> mimeTypes = saveInfo.m_WriterSelector.GetMimeTypes();
 
-    mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
-    for (std::vector<std::string>::const_iterator iter = mimeTypes.begin(), iterEnd = mimeTypes.end();
-         iter != iterEnd; ++iter)
+    for (std::vector<mitk::MimeType>::const_reverse_iterator iter = mimeTypes.rbegin(),
+         iterEnd = mimeTypes.rend(); iter != iterEnd; ++iter)
     {
       QSet<QString> filterExtensions;
-      std::vector<std::string> extensions = mimeTypeProvider->GetExtensions(*iter);
+      mitk::MimeType mimeType = *iter;
+      std::vector<std::string> extensions = mimeType.GetExtensions();
       for (std::vector<std::string>::iterator extIter = extensions.begin(), extIterEnd = extensions.end();
            extIter != extIterEnd; ++extIter)
       {
         filterExtensions << QString::fromStdString(*extIter);
       }
+      if (m_DefaultExtension.isEmpty())
+      {
+        m_DefaultExtension = QString::fromStdString(extensions.front());
+      }
 
-      QString filter = QString::fromStdString(mimeTypeProvider->GetDescription(*iter)) + " (";
+      QString filter = QString::fromStdString(mimeType.GetComment()) + " (";
       foreach(const QString& extension, filterExtensions)
       {
         filter += "*." + extension + " ";
       }
       filter = filter.replace(filter.size()-1, 1, ')');
-      m_MimeTypes.push_back(*iter);
+      m_MimeTypes.push_back(mimeType);
       m_FilterStrings.push_back(filter);
     }
   }
 
-  std::vector<std::string> m_MimeTypes;
+  const mitk::IOUtil::SaveInfo m_SaveInfo;
+  std::vector<mitk::MimeType> m_MimeTypes;
   QStringList m_FilterStrings;
+  QString m_DefaultExtension;
 };
 
-std::string QmitkIOUtil::SaveFilter::ALL_MIMETYPE = "__all__";
+mitk::MimeType QmitkIOUtil::SaveFilter::ALL_MIMETYPE()
+{
+  static mitk::CustomMimeType allMimeType(std::string("__all__"));
+  return mitk::MimeType(allMimeType, -1, -1);
+}
 
 QmitkIOUtil::SaveFilter::SaveFilter(const QmitkIOUtil::SaveFilter& other)
   : d(new Impl(*other.d))
 {
 }
 
-QmitkIOUtil::SaveFilter::SaveFilter(const std::string& baseDataType)
-  : d(new Impl)
+QmitkIOUtil::SaveFilter::SaveFilter(const SaveInfo& saveInfo)
+  : d(new Impl(saveInfo))
 {
-  if (!baseDataType.empty())
-  {
-    d->Init(baseDataType);
-  }
-}
-
-QmitkIOUtil::SaveFilter::SaveFilter(const mitk::BaseData* baseData)
-  : d(new Impl)
-{
-  if (baseData != NULL)
-  {
-    d->Init(baseData->GetNameOfClass());
-  }
 }
 
 QmitkIOUtil::SaveFilter& QmitkIOUtil::SaveFilter::operator=(const QmitkIOUtil::SaveFilter& other)
@@ -474,8 +453,8 @@ QmitkIOUtil::SaveFilter& QmitkIOUtil::SaveFilter::operator=(const QmitkIOUtil::S
 
 QString QmitkIOUtil::SaveFilter::GetFilterForMimeType(const std::string& mimeType) const
 {
-  std::vector<std::string>::const_iterator iter =
-      std::find(d->m_MimeTypes.begin(), d->m_MimeTypes.end(), mimeType);
+  std::vector<mitk::MimeType>::const_iterator iter =
+      std::find_if(d->m_MimeTypes.begin(), d->m_MimeTypes.end(), MimeTypeComparison(mimeType));
   if (iter == d->m_MimeTypes.end())
   {
     return QString();
@@ -488,12 +467,12 @@ QString QmitkIOUtil::SaveFilter::GetFilterForMimeType(const std::string& mimeTyp
   return d->m_FilterStrings[index];
 }
 
-std::string QmitkIOUtil::SaveFilter::GetMimeTypeForFilter(const QString& filter) const
+mitk::MimeType QmitkIOUtil::SaveFilter::GetMimeTypeForFilter(const QString& filter) const
 {
   int index = d->m_FilterStrings.indexOf(filter);
   if (index < 0)
   {
-    return std::string();
+    return mitk::MimeType();
   }
   return d->m_MimeTypes[index];
 }
@@ -511,7 +490,12 @@ QString QmitkIOUtil::SaveFilter::GetDefaultFilter() const
   return QString();
 }
 
-std::string QmitkIOUtil::SaveFilter::GetDefaultMimeType() const
+QString QmitkIOUtil::SaveFilter::GetDefaultExtension() const
+{
+  return d->m_DefaultExtension;
+}
+
+mitk::MimeType QmitkIOUtil::SaveFilter::GetDefaultMimeType() const
 {
   if (d->m_MimeTypes.size() > 1)
   {
@@ -521,7 +505,7 @@ std::string QmitkIOUtil::SaveFilter::GetDefaultMimeType() const
   {
     return d->m_MimeTypes.front();
   }
-  return std::string();
+  return mitk::MimeType();
 }
 
 QString QmitkIOUtil::SaveFilter::ToString() const
@@ -541,5 +525,5 @@ bool QmitkIOUtil::SaveFilter::IsEmpty() const
 
 bool QmitkIOUtil::SaveFilter::ContainsMimeType(const std::string& mimeType)
 {
-  return std::find(d->m_MimeTypes.begin(), d->m_MimeTypes.end(), mimeType) != d->m_MimeTypes.end();
+  return std::find_if(d->m_MimeTypes.begin(), d->m_MimeTypes.end(), MimeTypeComparison(mimeType)) != d->m_MimeTypes.end();
 }

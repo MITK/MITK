@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSet.h"
 
 #include "mitkTestingMacros.h"
-#include "mitkFileWriterRegistry.h"
+#include "mitkFileWriterSelector.h"
 
 #include <iostream>
 #include <time.h>
@@ -35,12 +35,6 @@ int mitkPointSetWriterTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("PointSetWriter")
 
-  mitk::FileWriterRegistry writerRegistry;
-
-  // Get PointSet writer(s)
-  std::vector<mitk::IFileWriter*> writers = writerRegistry.GetWriters(mitk::PointSet::GetStaticNameOfClass());
-  MITK_TEST_CONDITION_REQUIRED(!writers.empty(), "Testing for registered writers")
-
   // create pointSet
   srand(time(NULL));
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
@@ -56,13 +50,18 @@ int mitkPointSetWriterTest(int /* argc */, char* /*argv*/[])
 
   MITK_TEST_CONDITION_REQUIRED(pointSet.IsNotNull(),"PointSet creation")
 
-  for (std::vector<mitk::IFileWriter*>::const_iterator iter = writers.begin(),
+  // Get PointSet writer(s)
+  mitk::FileWriterSelector writerSelector(pointSet.GetPointer());
+  std::vector<mitk::FileWriterSelector::Item> writers = writerSelector.Get();
+  MITK_TEST_CONDITION_REQUIRED(!writers.empty(), "Testing for registered writers")
+
+  for (std::vector<mitk::FileWriterSelector::Item>::const_iterator iter = writers.begin(),
        end = writers.end(); iter != end; ++iter)
   {
     // test for exception handling
     try
     {
-      (*iter)->Write(pointSet, "/usr/bin");
+      iter->GetWriter()->Write(pointSet, "/usr/bin");
       MITK_TEST_FAILED_MSG( << "itk::ExceptionObject expected" )
     }
     catch (const itk::ExceptionObject&)

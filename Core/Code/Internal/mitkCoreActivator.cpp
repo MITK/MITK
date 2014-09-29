@@ -264,7 +264,7 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
   m_MimeTypeProvider->Start();
   m_MimeTypeProviderReg = context->RegisterService<mitk::IMimeTypeProvider>(m_MimeTypeProvider.get());
 
-  this->RegisterMimeTypes();
+  this->RegisterDefaultMimeTypes();
   this->RegisterItkReaderWriter();
 
   // Add custom Reader / Writer Services
@@ -323,23 +323,26 @@ void MitkCoreActivator::Unload(us::ModuleContext* )
   m_ShaderRepositoryTracker->Close();
 }
 
-void MitkCoreActivator::RegisterMimeTypes()
+void MitkCoreActivator::RegisterDefaultMimeTypes()
 {
   // Register some default mime-types
 
-  // 3D Images
-  std::vector<std::string> mimeTypeExtensions;
-  mimeTypeExtensions.push_back("dc3");
-  mimeTypeExtensions.push_back("dcm");
-  RegisterMimeType("application/dicom", "Images", "Dicom Images", mimeTypeExtensions);
-  RegisterMimeType("application/vnd.mitk.pic", "Images", "DKFZ PIC Format", "pic");
-  RegisterMimeType("application/vnd.mitk.pic+gz", "Images", "DKFZ Compressed PIC Format", "pic.gz");
+  // Custom MITK point set format
+  mitk::CustomMimeType pointSetMimeType("application/vnd.mitk.pointset");
+  pointSetMimeType.AddExtension("mps");
+  pointSetMimeType.SetCategory("Point Sets");
+  pointSetMimeType.SetComment("MITK Point Set");
+  m_DefaultMimeTypes.push_back(pointSetMimeType);
+  m_Context->RegisterService(&m_DefaultMimeTypes.back());
 
-  // REMOVE: Test multiple mime types for same extension
-  //RegisterMimeType("application/vnd.fancy", "Images", "Fancy Compressed PIC Format", "pic.gz");
-
-  // 2D Images
-  RegisterMimeType("image/bmp", "2D Images", "Bitmap Image", "bmp");
+  // Register the NRRD format early on
+  mitk::CustomMimeType nrrdMimeType("application/vnd.mitk.nrrd");
+  nrrdMimeType.AddExtension("nrrd");
+  nrrdMimeType.AddExtension("nhdr");
+  nrrdMimeType.SetCategory("Images");
+  nrrdMimeType.SetComment("NRRD");
+  m_DefaultMimeTypes.push_back(nrrdMimeType);
+  m_Context->RegisterService(&m_DefaultMimeTypes.back());
 }
 
 void MitkCoreActivator::RegisterItkReaderWriter()
@@ -360,26 +363,6 @@ void MitkCoreActivator::RegisterItkReaderWriter()
                 << ( *i )->GetNameOfClass();
     }
   }
-}
-
-void MitkCoreActivator::RegisterMimeType(const std::string& id, const std::string& category,
-                                         const std::string& description, const std::string& extension)
-{
-  std::vector<std::string> extensions;
-  extensions.push_back(extension);
-  this->RegisterMimeType(id, category, description, extensions);
-}
-
-void MitkCoreActivator::RegisterMimeType(const std::string& id, const std::string& category,
-                                         const std::string& description, const std::vector<std::string>& extensions)
-{
-  us::ServiceProperties mimeTypeProps;
-  mimeTypeProps[mitk::IMimeType::PROP_ID()] = id;
-  mimeTypeProps[mitk::IMimeType::PROP_CATEGORY()] = category;
-  mimeTypeProps[mitk::IMimeType::PROP_DESCRIPTION()] = description;
-  mimeTypeProps[mitk::IMimeType::PROP_EXTENSIONS()] = extensions;
-  mimeTypeProps[us::ServiceConstants::SERVICE_RANKING()] = -100;
-  m_Context->RegisterService<mitk::IMimeType>(&m_MimeType, mimeTypeProps);
 }
 
 US_EXPORT_MODULE_ACTIVATOR(MitkCore, MitkCoreActivator)

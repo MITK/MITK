@@ -17,11 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKFILEWRITEROPTIONSDIALOG_H
 #define QMITKFILEWRITEROPTIONSDIALOG_H
 
-#include <QDialog>
+#include <mitkIOUtil.h>
 
-namespace mitk {
-class IFileWriter;
-}
+#include <QDialog>
 
 namespace Ui {
 class QmitkFileWriterOptionsDialog;
@@ -35,13 +33,8 @@ class QmitkFileWriterOptionsDialog : public QDialog
 
 public:
 
-  explicit QmitkFileWriterOptionsDialog(const QString& filePath,
-                                        const QStringList& labels,
-                                        const QList<mitk::IFileWriter*>& writers,
-                                        QWidget *parent = 0);
+  explicit QmitkFileWriterOptionsDialog(mitk::IOUtil::SaveInfo& saveInfo, QWidget *parent = 0);
   ~QmitkFileWriterOptionsDialog();
-
-  mitk::IFileWriter* GetWriter() const;
 
   bool ReuseOptions() const;
 
@@ -50,7 +43,8 @@ public:
 private:
 
   Ui::QmitkFileWriterOptionsDialog* ui;
-  const QList<mitk::IFileWriter*> m_Writers;
+  mitk::IOUtil::SaveInfo& m_SaveInfo;
+  std::vector<mitk::FileWriterSelector::Item> m_WriterItems;
 };
 
 #endif // QMITKFILEREADEROPTIONSDIALOG_H

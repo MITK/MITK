@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include "mitkPointSetReaderService.h"
+#include "mitkCustomMimeType.h"
 
 // STL
 #include <iostream>
@@ -25,9 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <tinyxml.h>
 
 mitk::PointSetReaderService::PointSetReaderService()
-  : AbstractFileReader(MimeType("application/vnd.mitk.pointset"), "MITK Point Set Reader")
+  : AbstractFileReader(CustomMimeType("application/vnd.mitk.pointset"), "MITK Point Set Reader")
 {
-  this->AddExtension("mps");
   RegisterService();
 }
 

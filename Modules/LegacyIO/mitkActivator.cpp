@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtiFileIOFactory.h"
 #include "mitkItkImageFileIOFactory.h"
 #include "mitkImageWriterFactory.h"
-#include "mitkSimpleMimeType.h"
 
 #include <usServiceProperties.h>
 #include <usModuleContext.h>

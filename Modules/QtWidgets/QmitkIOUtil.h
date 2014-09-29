@@ -43,6 +43,7 @@ class QStringList;
 
 namespace mitk {
 class DataStorage;
+class MimeType;
 struct IFileReader;
 }
 
@@ -58,19 +59,19 @@ public:
   {
   public:
 
-    static std::string ALL_MIMETYPE;
+    static mitk::MimeType ALL_MIMETYPE();
 
     SaveFilter(const SaveFilter& other);
 
-    SaveFilter(const std::string& baseDataType);
-    SaveFilter(const mitk::BaseData* baseData);
+    SaveFilter(const SaveInfo& saveInfo);
 
     SaveFilter& operator=(const SaveFilter& other);
 
     QString GetFilterForMimeType(const std::string& mimeType) const;
-    std::string GetMimeTypeForFilter(const QString& filter) const;
+    mitk::MimeType GetMimeTypeForFilter(const QString& filter) const;
     QString GetDefaultFilter() const;
-    std::string GetDefaultMimeType() const;
+    QString GetDefaultExtension() const;
+    mitk::MimeType GetDefaultMimeType() const;
     QString ToString() const;
     int Size() const;
     bool IsEmpty() const;
@@ -88,9 +89,6 @@ public:
    * @return
    */
   static QString GetFileOpenFilterString();
-
-  static SaveFilter GetFileSaveFilter(const mitk::BaseData* baseData);
-  static SaveFilter GetFileSaveFilter(const std::string& baseDataType);
 
   /**
    * @brief Loads the specified files
@@ -120,6 +118,70 @@ public:
   static QString Save(const mitk::BaseData* data, const QString& defaultBaseName,
                       const QString& defaultPath = QString(), QWidget* parent = NULL);
 
+  /**
+   * @brief Save a list of BaseData objects using a "File Save Dialog".
+   *
+   * For each element in the \c data vector, the following algorithm is
+   * used to find a IFileWriter instance for writing the BaseData object.
+   *
+   * First, the user is prompted to select file names for each BaseData object. This
+   * is equivalent to choosing a specific mime-type, either by selecting a filter
+   * in the save dialog or by explicitly providing a file name extension:
+   * <ol>
+   * <li>Get a list of registered IFileWriter objects for the current BaseData object.
+   *     If no writers are found, a message box displays a warning and
+   *     the process starts from the beginning for the next BaseData object.</li>
+   * <li>A QFileDialog for prompting the user to select a file name is opened.
+   *     The mime-type associated with each IFileWriter object is used to create
+   *     a filter for file name extensions.
+   *     The best IFileWriter (see FileWriterSelector) for the current BaseData object
+   *     defines the default file name suffix via its associated mime-type. If the
+   *     file name is empty (the user cancelled the dialog), the remaining
+   *     BaseData objects are skipped.
+   * <li>The file name suffix is extracted from the user-supplied file name and validated.
+   *     If the suffix is not empty and it is either not contained in the
+   *     extension list of the selected filter (from the QFileDialog) or the mime-type
+   *     containing the suffix as an extension is not contained in the original
+   *     list of compatible mime-types, a message box displays a warning and
+   *     the process starts from the beginning with the next BaseData object.
+   *     If the suffix is empty, a default suffix is created if the file name does
+   *     not point to an already existing file (in that case, the user already
+   *     confirmed to overwrite that file). The default suffix is the first entry
+   *     in the extension list of the selected filter. If the special "all"
+   *     filter is selected, the first entry from the extensions list of the
+   *     highest-ranked compatible mime-type for the current base data object is used.
+   *     The base data object is associated with the mime-type containing the suffix
+   *     in its extension list. If the suffix is empty (the user is overwriting an
+   *     existing file without an extension, the associated mime-type is the one
+   *     of the selected filter or the mime-type of the best matching IFileWriter
+   *     if the special "all" filter was selected.</li>
+   * <li>The selected/derived file name and associated mime-type is stored in a list
+   *     and the process starts from the beginning for the next BaseData object.</li>
+   * </ol>
+   *
+   * In the second phase, each BaseData object is saved to disk using the specified
+   * file name and mime-type, according to the following procedure:
+   * <ol>
+   * <li>If multiple IFileWriter objects are compatible with the current base data
+   *     object or if the single compatible IFileWriter provides configuration
+   *     options, a dialog window containing a list of IFileWriter objects and
+   *     configurable options is displayed. If the dialog is cancelled by the user,
+   *     neither the current nor the remaining base data objects are saved to disk.
+   *     If the user previously in this phase enabled the "remember options" checkbox
+   *     of the dialog, then the dialog is not shown for base data objects with the
+   *     same data type and associated mime-type if the file writer instance reports
+   *     a higher or equal confidence level for the current base data object.</li>
+   * <li>The selected writer (either the only available one or the user selected one)
+   *     is used to write the base data object to disk. On failure, an error is
+   *     reported and the second phase continues with the next base data object.</li>
+   * </ol>
+   *
+   * @param data
+   * @param defaultBaseNames
+   * @param defaultPath
+   * @param parent
+   * @return
+   */
   static QStringList Save(const std::vector<const mitk::BaseData*>& data, const QStringList& defaultBaseNames,
                           const QString& defaultPath = QString(), QWidget* parent = NULL);
 

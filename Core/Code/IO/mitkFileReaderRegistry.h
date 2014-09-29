@@ -31,8 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+class MimeType;
+
 /**
- * @ingroup Process
+ * @ingroup IO
  *
  * Provides convenient access to mitk::IFileReader instances and reading
  * files into mitk::BaseData types.
@@ -50,18 +52,24 @@ public:
   FileReaderRegistry();
   ~FileReaderRegistry();
 
-  static ReaderReference GetReference(const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
+  /**
+   * @brief Get the highest ranked mime-type for the given extension.
+   * @param extension A file name extension without a leading dot.
+   * @param context
+   * @return The highest ranked mime-type containing \c extension in
+   *         its extension list.
+   */
+  static MimeType GetMimeTypeForExtension(const std::string& extension, us::ModuleContext* context = us::GetModuleContext());
 
-  static std::vector<ReaderReference> GetReferences(const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
+  static ReaderReference GetReference(const MimeType& mimeType, us::ModuleContext* context = us::GetModuleContext());
+
+  static std::vector<ReaderReference> GetReferences(const MimeType& mimeType, us::ModuleContext* context = us::GetModuleContext());
 
   mitk::IFileReader* GetReader(const ReaderReference& ref, us::ModuleContext* context = us::GetModuleContext());
 
-  /**
-   * Returns a compatible Reader to the given file extension
-   */
-  mitk::IFileReader* GetReader(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
+  mitk::IFileReader* GetReader(const MimeType& mimeType, us::ModuleContext* context = us::GetModuleContext());
 
-  std::vector <mitk::IFileReader*> GetReaders(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
+  std::vector <mitk::IFileReader*> GetReaders(const MimeType& mimeType, us::ModuleContext* context = us::GetModuleContext());
 
   void UngetReader(mitk::IFileReader* reader);
   void UngetReaders(const std::vector<mitk::IFileReader*>& readers);

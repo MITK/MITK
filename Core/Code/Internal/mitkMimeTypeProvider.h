@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKMIMETYPEPROVIDER_H
 
 #include "mitkIMimeTypeProvider.h"
-#include "mitkIMimeType.h"
+#include "mitkCustomMimeType.h"
 
 #include "usServiceTracker.h"
 #include "usServiceTrackerCustomizer.h"
@@ -27,13 +27,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-struct MimeTypeTrackerTypeTraits : public us::TrackedTypeTraitsBase<us::ServiceReference<IMimeType>,MimeTypeTrackerTypeTraits>
+struct MimeTypeTrackerTypeTraits : public us::TrackedTypeTraitsBase<MimeType,MimeTypeTrackerTypeTraits>
 {
-  typedef us::ServiceReference<IMimeType> TrackedType;
+  typedef MimeType TrackedType;
 
   static bool IsValid(const TrackedType& t)
   {
-    return t;
+    return t.IsValid();
   }
 
   static TrackedType DefaultValue()
@@ -41,14 +41,13 @@ struct MimeTypeTrackerTypeTraits : public us::TrackedTypeTraitsBase<us::ServiceR
     return TrackedType();
   }
 
-  static void Dispose(TrackedType& t)
+  static void Dispose(TrackedType& /*t*/)
   {
-    t = 0;
   }
 };
 
 class MimeTypeProvider : public IMimeTypeProvider,
-    private us::ServiceTrackerCustomizer<IMimeType, us::ServiceReference<IMimeType> >
+    private us::ServiceTrackerCustomizer<CustomMimeType, MimeType>
 {
 public:
 
@@ -57,30 +56,28 @@ public:
   void Start();
   void Stop();
 
-  virtual std::vector<std::string> GetMimeTypes() const;
-  virtual std::vector<std::string> GetMimeTypesForFile(const std::string& filePath) const;
-  virtual std::vector<std::string> GetMimeTypesForExtension(const std::string& extension) const;
-  virtual std::vector<std::string> GetMimeTypesForCategory(const std::string& category) const;
-
-  virtual std::string GetDescription(const std::string& mimeType) const;
-
-  virtual std::vector<std::string> GetExtensions(const std::string& mimeType) const;
-
-  virtual std::string GetCategory(const std::string& mimeType) const;
+  virtual std::vector<MimeType> GetMimeTypes() const;
+  virtual std::vector<MimeType> GetMimeTypesForFile(const std::string& filePath) const;
+  virtual std::vector<MimeType> GetMimeTypesForExtension(const std::string& extension) const;
+  virtual std::vector<MimeType> GetMimeTypesForCategory(const std::string& category) const;
+  virtual MimeType GetMimeTypeForName(const std::string& name) const;
 
   virtual std::vector<std::string> GetCategories() const;
 
 private:
 
-  virtual ServiceReferenceType AddingService(const ServiceReferenceType& reference);
-  virtual void ModifiedService(const ServiceReferenceType& reference, ServiceReferenceType service);
-  virtual void RemovedService(const ServiceReferenceType& reference, ServiceReferenceType service);
+  virtual TrackedType AddingService(const ServiceReferenceType& reference);
+  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedType service);
+  virtual void RemovedService(const ServiceReferenceType& reference, TrackedType service);
 
-  us::ServiceTracker<IMimeType, MimeTypeTrackerTypeTraits>* m_Tracker;
+  MimeType GetMimeType(const ServiceReferenceType& reference) const;
 
-  typedef std::map<std::string, std::set<us::ServiceReferenceU> > MapType;
-  MapType m_MimeTypeToRefs;
+  us::ServiceTracker<CustomMimeType, MimeTypeTrackerTypeTraits>* m_Tracker;
 
+  typedef std::map<std::string, std::set<MimeType> > MapType;
+  MapType m_NameToMimeTypes;
+
+  std::map<std::string, MimeType> m_NameToMimeType;
 };
 
 }

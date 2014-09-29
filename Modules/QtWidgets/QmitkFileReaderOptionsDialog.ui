@@ -129,7 +129,7 @@
   </connection>
   <connection>
    <sender>m_ReaderComboBox</sender>
-   <signal>activated(int)</signal>
+   <signal>currentIndexChanged(int)</signal>
    <receiver>m_StackedOptionsWidget</receiver>
    <slot>setCurrentIndex(int)</slot>
    <hints>

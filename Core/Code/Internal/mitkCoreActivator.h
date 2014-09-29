@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIFileReader.h>
 #include <mitkIFileWriter.h>
 #include <mitkAbstractFileIO.h>
-#include <mitkSimpleMimeType.h>
 
 #include <mitkIShaderRepository.h>
 
@@ -55,14 +54,8 @@ private:
 
   void HandleModuleEvent(const us::ModuleEvent moduleEvent);
 
-  void RegisterMimeTypes();
+  void RegisterDefaultMimeTypes();
   void RegisterItkReaderWriter();
-
-  void RegisterMimeType(const std::string& id, const std::string& category,
-                        const std::string& description, const std::string& extension);
-
-  void RegisterMimeType(const std::string& id, const std::string& category,
-                        const std::string& description, const std::vector<std::string>& extensions);
 
   std::auto_ptr<us::ServiceTracker<mitk::IShaderRepository> > m_ShaderRepositoryTracker;
 
@@ -79,9 +72,9 @@ private:
   std::vector<mitk::IFileWriter*> m_FileWriters;
   std::vector<mitk::AbstractFileIO*> m_FileIOs;
 
-  us::ServiceRegistration<mitk::IMimeTypeProvider> m_MimeTypeProviderReg;
+  std::vector<mitk::CustomMimeType> m_DefaultMimeTypes;
 
-  mitk::SimpleMimeType m_MimeType;
+  us::ServiceRegistration<mitk::IMimeTypeProvider> m_MimeTypeProviderReg;
 
   us::ModuleContext* m_Context;
 };

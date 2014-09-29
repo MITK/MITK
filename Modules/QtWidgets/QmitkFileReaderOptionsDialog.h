@@ -17,11 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKFILEREADEROPTIONSDIALOG_H
 #define QMITKFILEREADEROPTIONSDIALOG_H
 
-#include <QDialog>
+#include "mitkIOUtil.h"
 
-namespace mitk {
-class IFileReader;
-}
+#include <QDialog>
 
 namespace Ui {
 class QmitkFileReaderOptionsDialog;
@@ -35,13 +33,9 @@ class QmitkFileReaderOptionsDialog : public QDialog
 
 public:
 
-  explicit QmitkFileReaderOptionsDialog(const QString& filePath,
-                                        const QStringList& labels,
-                                        const QList<mitk::IFileReader*>& readers,
+  explicit QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInfo& loadInfo,
                                         QWidget *parent = 0);
   ~QmitkFileReaderOptionsDialog();
-
-  mitk::IFileReader* GetReader() const;
 
   bool ReuseOptions() const;
 
@@ -50,7 +44,8 @@ public:
 private:
 
   Ui::QmitkFileReaderOptionsDialog* ui;
-  const QList<mitk::IFileReader*> m_Readers;
+  mitk::IOUtil::LoadInfo& m_LoadInfo;
+  std::vector<mitk::FileReaderSelector::Item> m_ReaderItems;
 };
 
 #endif // QMITKFILEREADEROPTIONSDIALOG_H

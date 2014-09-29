@@ -40,7 +40,21 @@ mitk::FileReaderRegistry::~FileReaderRegistry()
   }
 }
 
-mitk::FileReaderRegistry::ReaderReference mitk::FileReaderRegistry::GetReference(const std::string& mimeType, us::ModuleContext* context)
+mitk::MimeType mitk::FileReaderRegistry::GetMimeTypeForExtension(const std::string& extension, us::ModuleContext* context)
+{
+  mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider(context));
+  std::vector<MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(extension);
+  if (mimeTypes.empty())
+  {
+    return MimeType();
+  }
+  else
+  {
+    return mimeTypes.front();
+  }
+}
+
+mitk::FileReaderRegistry::ReaderReference mitk::FileReaderRegistry::GetReference(const MimeType& mimeType, us::ModuleContext* context)
 {
   std::vector<ReaderReference> refs = GetReferences(mimeType, context);
   if (refs.empty()) return ReaderReference();
@@ -48,10 +62,10 @@ mitk::FileReaderRegistry::ReaderReference mitk::FileReaderRegistry::GetReference
   return refs.back();
 }
 
-std::vector<mitk::FileReaderRegistry::ReaderReference> mitk::FileReaderRegistry::GetReferences(const std::string& mimeType, us::ModuleContext* context)
+std::vector<mitk::FileReaderRegistry::ReaderReference> mitk::FileReaderRegistry::GetReferences(const MimeType& mimeType, us::ModuleContext* context)
 {
   std::string filter = us::LDAPProp(us::ServiceConstants::OBJECTCLASS()) == us_service_interface_iid<IFileReader>() &&
-                       us::LDAPProp(IFileReader::PROP_MIMETYPE()) == mimeType;
+                       us::LDAPProp(IFileReader::PROP_MIMETYPE()) == mimeType.GetName();
   return context->GetServiceReferences<IFileReader>(filter);
 }
 
@@ -63,26 +77,20 @@ mitk::IFileReader* mitk::FileReaderRegistry::GetReader(const mitk::FileReaderReg
   return reader;
 }
 
-mitk::IFileReader* mitk::FileReaderRegistry::GetReader(const std::string& extension, us::ModuleContext* context )
+mitk::IFileReader* mitk::FileReaderRegistry::GetReader(const MimeType& mimeType, us::ModuleContext* context )
 {
-  std::vector<mitk::IFileReader*> results = GetReaders(extension, context);
+  std::vector<mitk::IFileReader*> results = GetReaders(mimeType, context);
   if (results.empty()) return NULL;
   return results.front();
 }
 
-std::vector <mitk::IFileReader*> mitk::FileReaderRegistry::GetReaders(const std::string& extension, us::ModuleContext* context )
+std::vector <mitk::IFileReader*> mitk::FileReaderRegistry::GetReaders(const MimeType& mimeType, us::ModuleContext* context )
 {
   std::vector <mitk::IFileReader*> result;
 
-  // filter for mime type
-  mitk::IMimeTypeProvider* mimeTypeProvider = mitk::CoreServices::GetMimeTypeProvider(context);
-  std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(extension);
-  if (mimeTypes.empty())
-  {
-    MITK_WARN << "No mime-type information for extension " << extension << " available.";
-    return result;
-  }
-  std::vector <us::ServiceReference<IFileReader> > refs = GetReferences(mimeTypes.front(), context);
+  if (!mimeType.IsValid()) return result;
+
+  std::vector <us::ServiceReference<IFileReader> > refs = GetReferences(mimeType, context);
   std::sort(refs.begin(), refs.end());
 
   result.reserve(refs.size());

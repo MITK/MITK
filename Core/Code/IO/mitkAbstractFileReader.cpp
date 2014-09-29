@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractFileReader.h>
 
 #include <mitkIOUtil.h>
+#include <mitkCustomMimeType.h>
 
 #include <Internal/mitkFileReaderWriterBase.h>
 
@@ -60,8 +61,6 @@ AbstractFileReader::~AbstractFileReader()
   UnregisterService();
 
   delete d->m_PrototypeFactory;
-
-  d->UnregisterMimeType();
 }
 
 AbstractFileReader::AbstractFileReader(const AbstractFileReader& other)
@@ -69,7 +68,7 @@ AbstractFileReader::AbstractFileReader(const AbstractFileReader& other)
 {
 }
 
-AbstractFileReader::AbstractFileReader(const MimeType& mimeType, const std::string& description)
+AbstractFileReader::AbstractFileReader(const CustomMimeType& mimeType, const std::string& description)
   : d(new Impl)
 {
   d->SetMimeType(mimeType);
@@ -79,8 +78,10 @@ AbstractFileReader::AbstractFileReader(const MimeType& mimeType, const std::stri
 AbstractFileReader::AbstractFileReader(const std::string& extension, const std::string& description)
   : d(new Impl)
 {
+  CustomMimeType customMimeType;
+  customMimeType.AddExtension(extension);
+  d->SetMimeType(customMimeType);
   d->SetDescription(description);
-  d->AddExtension(extension);
 }
 
 ////////////////////// Reading /////////////////////////
@@ -153,6 +154,11 @@ DataStorage::SetOfObjects::Pointer AbstractFileReader::Read(std::istream& stream
   return result;
 }
 
+IFileReader::ConfidenceLevel AbstractFileReader::GetConfidenceLevel(const std::string& path) const
+{
+  return itksys::SystemTools::FileExists(path.c_str(), true) ? Supported : Unsupported;
+}
+
 
 //////////// µS Registration & Properties //////////////
 
@@ -167,7 +173,7 @@ us::ServiceRegistration<IFileReader> AbstractFileReader::RegisterService(us::Mod
 
   d->RegisterMimeType(context);
 
-  if (this->GetMimeType().empty())
+  if (this->GetMimeType().GetName().empty())
   {
     MITK_WARN << "Not registering reader due to empty MIME type.";
     return us::ServiceRegistration<IFileReader>();
@@ -214,29 +220,19 @@ us::ServiceProperties AbstractFileReader::GetServiceProperties() const
   us::ServiceProperties result;
 
   result[IFileReader::PROP_DESCRIPTION()] = this->GetDescription();
-  result[IFileReader::PROP_MIMETYPE()] = this->GetMimeType();
+  result[IFileReader::PROP_MIMETYPE()] = this->GetMimeType().GetName();
   result[us::ServiceConstants::SERVICE_RANKING()]  = this->GetRanking();
   return result;
 }
 
-us::ServiceRegistration<IMimeType> AbstractFileReader::RegisterMimeType(us::ModuleContext* context)
+us::ServiceRegistration<CustomMimeType> AbstractFileReader::RegisterMimeType(us::ModuleContext* context)
 {
   return d->RegisterMimeType(context);
 }
 
-void AbstractFileReader::SetMimeType(const std::string& mimeType)
+void AbstractFileReader::SetMimeType(const CustomMimeType& mimeType)
 {
   d->SetMimeType(mimeType);
-}
-
-void AbstractFileReader::SetCategory(const std::string& category)
-{
-  d->SetCategory(category);
-}
-
-void AbstractFileReader::AddExtension(const std::string& extension)
-{
-  d->AddExtension(extension);
 }
 
 void AbstractFileReader::SetDescription(const std::string& description)
@@ -288,30 +284,6 @@ void AbstractFileReader::SetOption(const std::string& name, const us::Any& value
 
 ////////////////// MISC //////////////////
 
-bool AbstractFileReader::CanRead(const std::string& path) const
-{
-  if (!itksys::SystemTools::FileExists(path.c_str(), true))
-  {
-    return false;
-  }
-
-  // Default implementation only checks if extension is correct
-  std::string extension = itksys::SystemTools::GetFilenameExtension(path);
-  extension = extension.substr(1, extension.size()-1);
-  if (!d->HasExtension(extension))
-  {
-    return false;
-  }
-
-  std::ifstream stream(path.c_str());
-  return this->CanRead(stream);
-}
-
-bool AbstractFileReader::CanRead(std::istream& stream) const
-{
-  return stream.good();
-}
-
 void AbstractFileReader::AddProgressCallback(const ProgressCallback& callback)
 {
   d->AddProgressCallback(callback);
@@ -324,37 +296,15 @@ void AbstractFileReader::RemoveProgressCallback(const ProgressCallback& callback
 
 ////////////////// µS related Getters //////////////////
 
-std::string AbstractFileReader::GetCategory() const
-{
-  return d->GetCategory();
-}
 
-std::string AbstractFileReader::GetMimeType() const
+CustomMimeType AbstractFileReader::GetMimeType() const
 {
   return d->GetMimeType();
-}
-
-std::vector<std::string> AbstractFileReader::GetExtensions() const
-{
-  return d->GetExtensions();
 }
 
 std::string AbstractFileReader::GetDescription() const
 {
   return d->GetDescription();
-}
-
-AbstractFileReader::MimeType::MimeType(const std::string& mimeType)
-  : std::string(mimeType)
-{
-  if (this->empty())
-  {
-    throw std::invalid_argument("MIME type must not be empty.");
-  }
-}
-
-AbstractFileReader::MimeType::MimeType()
-{
 }
 
 void AbstractFileReader::SetDefaultDataNodeProperties(DataNode* node, const std::string& filePath)

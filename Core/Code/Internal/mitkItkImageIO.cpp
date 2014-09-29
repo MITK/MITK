@@ -18,7 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkItkImageIO.h"
 
 #include <mitkImage.h>
-#include <mitkProportionalTimeGeometry.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkCustomMimeType.h>
 
 #include <itkImage.h>
 #include <itkImageIOFactory.h>
@@ -30,6 +31,7 @@ namespace mitk {
 
 ItkImageIO::ItkImageIO(const ItkImageIO& other)
   : AbstractFileIO(other)
+  , m_ImageIO(dynamic_cast<itk::ImageIOBase*>(other.m_ImageIO->Clone().GetPointer()))
 {
 }
 
@@ -76,46 +78,64 @@ std::vector<std::string> ItkImageIO::FixUpImageIOExtensions(const std::string& i
 }
 
 ItkImageIO::ItkImageIO(itk::ImageIOBase::Pointer imageIO)
-  : AbstractFileIO()
+  : AbstractFileIO(Image::GetStaticNameOfClass())
   , m_ImageIO(imageIO)
 {
-  std::vector<std::string> extensions = imageIO->GetSupportedReadExtensions();
-  if (extensions.empty())
+  if (m_ImageIO.IsNull() )
   {
-    std::string imageIOName = imageIO->GetNameOfClass();
-    MITK_WARN << "ITK ImageIOBase " << imageIOName << " does not provide read extensions";
-    extensions = FixUpImageIOExtensions(imageIOName);
+    mitkThrow() << "ITK ImageIOBase argument must not be NULL";
   }
-  for(std::vector<std::string>::const_iterator iter = extensions.begin(),
-      endIter = extensions.end(); iter != endIter; ++iter)
+
+  std::vector<std::string> readExtensions = m_ImageIO->GetSupportedReadExtensions();
+  if (readExtensions.empty())
+  {
+    std::string imageIOName = m_ImageIO->GetNameOfClass();
+    MITK_WARN << "ITK ImageIOBase " << imageIOName << " does not provide read extensions";
+    readExtensions = FixUpImageIOExtensions(imageIOName);
+  }
+
+  CustomMimeType customReaderMimeType;
+  customReaderMimeType.SetCategory("Images");
+  for(std::vector<std::string>::const_iterator iter = readExtensions.begin(),
+      endIter = readExtensions.end(); iter != endIter; ++iter)
   {
     std::string extension = *iter;
     if (!extension.empty() && extension[0] == '.')
     {
-      extension.assign(extension.begin()+1, extension.end());
+      extension.assign(iter->begin()+1, iter->end());
     }
-    this->AbstractFileReader::AddExtension(extension);
+    customReaderMimeType.AddExtension(extension);
   }
+  this->AbstractFileReader::SetMimeType(customReaderMimeType);
 
-  extensions = imageIO->GetSupportedWriteExtensions();
-  if (extensions.empty())
+  std::vector<std::string> writeExtensions = imageIO->GetSupportedWriteExtensions();
+  if (writeExtensions.empty())
   {
     std::string imageIOName = imageIO->GetNameOfClass();
     MITK_WARN << "ITK ImageIOBase " << imageIOName << " does not provide write extensions";
-    extensions = FixUpImageIOExtensions(imageIOName);
-  }
-  for(std::vector<std::string>::const_iterator iter = extensions.begin(),
-      endIter = extensions.end(); iter != endIter; ++iter)
-  {
-    std::string extension = *iter;
-    if (!extension.empty() && extension[0] == '.')
-    {
-      extension.assign(extension.begin()+1, extension.end());
-    }
-    this->AbstractFileWriter::AddExtension(extension);
+    writeExtensions = FixUpImageIOExtensions(imageIOName);
   }
 
-  this->SetCategory("Images");
+  CustomMimeType customWriterMimeType;
+  customWriterMimeType.SetCategory("Images");
+  if (writeExtensions == readExtensions)
+  {
+    customWriterMimeType.AddExtension(customReaderMimeType.GetExtensions().front());
+  }
+  else
+  {
+    for(std::vector<std::string>::const_iterator iter = writeExtensions.begin(),
+        endIter = writeExtensions.end(); iter != endIter; ++iter)
+    {
+      std::string extension = *iter;
+      if (!extension.empty() && extension[0] == '.')
+      {
+        extension.assign(iter->begin()+1, iter->end());
+      }
+      customWriterMimeType.AddExtension(extension);
+    }
+  }
+  this->AbstractFileWriter::SetMimeType(customWriterMimeType);
 
   std::string description = std::string("ITK ") + imageIO->GetNameOfClass();
   this->SetReaderDescription(description);
@@ -161,18 +181,12 @@ std::vector<BaseData::Pointer> ItkImageIO::Read(const std::string& path)
     mitkThrow() << "Empty filename in mitk::ItkImageIO ";
   }
 
-  itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO( path.c_str(), itk::ImageIOFactory::ReadMode );
-  if ( imageIO.IsNull() )
-  {
-    mitkThrow() << "Could not create itk::ImageIOBase object for filename " << path;
-  }
-
   // Got to allocate space for the image. Determine the characteristics of
   // the image.
-  imageIO->SetFileName( path.c_str() );
-  imageIO->ReadImageInformation();
+  m_ImageIO->SetFileName( path.c_str() );
+  m_ImageIO->ReadImageInformation();
 
-  unsigned int ndim = imageIO->GetNumberOfDimensions();
+  unsigned int ndim = m_ImageIO->GetNumberOfDimensions();
   if ( ndim < MINDIM || ndim > MAXDIM )
   {
     MITK_WARN << "Sorry, only dimensions 2, 3 and 4 are supported. The given file has " << ndim << " dimensions! Reading as 4D.";
@@ -202,17 +216,17 @@ std::vector<BaseData::Pointer> ItkImageIO::Read(const std::string& path)
   for ( i = 0; i < ndim ; ++i )
   {
     ioStart[ i ] = 0;
-    ioSize[ i ] = imageIO->GetDimensions( i );
+    ioSize[ i ] = m_ImageIO->GetDimensions( i );
     if(i<MAXDIM)
     {
-      dimensions[ i ] = imageIO->GetDimensions( i );
-      spacing[ i ] = imageIO->GetSpacing( i );
+      dimensions[ i ] = m_ImageIO->GetDimensions( i );
+      spacing[ i ] = m_ImageIO->GetSpacing( i );
       if(spacing[ i ] <= 0)
         spacing[ i ] = 1.0f;
     }
     if(i<3)
     {
-      origin[ i ] = imageIO->GetOrigin( i );
+      origin[ i ] = m_ImageIO->GetOrigin( i );
     }
   }
 
@@ -220,11 +234,11 @@ std::vector<BaseData::Pointer> ItkImageIO::Read(const std::string& path)
   ioRegion.SetIndex( ioStart );
 
   MITK_INFO << "ioRegion: " << ioRegion << std::endl;
-  imageIO->SetIORegion( ioRegion );
-  void* buffer = new unsigned char[imageIO->GetImageSizeInBytes()];
-  imageIO->Read( buffer );
+  m_ImageIO->SetIORegion( ioRegion );
+  void* buffer = new unsigned char[m_ImageIO->GetImageSizeInBytes()];
+  m_ImageIO->Read( buffer );
 
-  image->Initialize( MakePixelType(imageIO), ndim, dimensions );
+  image->Initialize( MakePixelType(m_ImageIO), ndim, dimensions );
   image->SetImportChannel( buffer, 0, Image::ManageMemory );
 
   // access direction of itk::Image and include spacing
@@ -233,7 +247,7 @@ std::vector<BaseData::Pointer> ItkImageIO::Read(const std::string& path)
   unsigned int j, itkDimMax3 = (ndim >= 3? 3 : ndim);
   for ( i=0; i < itkDimMax3; ++i)
     for( j=0; j < itkDimMax3; ++j )
-      matrix[i][j] = imageIO->GetDirection(j)[i];
+      matrix[i][j] = m_ImageIO->GetDirection(j)[i];
 
   // re-initialize PlaneGeometry with origin and direction
   PlaneGeometry* planeGeometry = image->GetSlicedGeometry(0)->GetPlaneGeometry(0);
@@ -256,7 +270,7 @@ std::vector<BaseData::Pointer> ItkImageIO::Read(const std::string& path)
   buffer = NULL;
   MITK_INFO << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
 
-  const itk::MetaDataDictionary& dictionary = imageIO->GetMetaDataDictionary();
+  const itk::MetaDataDictionary& dictionary = m_ImageIO->GetMetaDataDictionary();
   for (itk::MetaDataDictionary::ConstIterator iter = dictionary.Begin(), iterEnd = dictionary.End();
        iter != iterEnd; ++iter)
   {
@@ -283,26 +297,185 @@ std::vector<BaseData::Pointer> ItkImageIO::Read(const std::string& path)
   return result;
 }
 
-
-bool mitk::ItkImageIO::CanRead(const std::string& path) const
+AbstractFileIO::ReaderConfidenceLevel ItkImageIO::GetReaderConfidenceLevel(const std::string& path) const
 {
-  if (AbstractFileReader::CanRead(path) == false) return false;
-
-  itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO(path.c_str(), itk::ImageIOFactory::ReadMode);
-  if (imageIO.IsNull())
-    return false;
-
-  return imageIO->CanReadFile(path.c_str());
+  return m_ImageIO->CanReadFile(path.c_str()) ? IFileReader::Supported : IFileReader::Unsupported;
 }
 
 void ItkImageIO::Write(const BaseData* data, const std::string& path)
 {
+  const mitk::Image* image = dynamic_cast<const mitk::Image*>(data);
 
+  if (image == NULL)
+  {
+    mitkThrow() << "Cannot write non-image data";
+  }
+
+  struct LocaleSwitch
+  {
+    LocaleSwitch(const std::string& newLocale)
+      : m_OldLocale(std::setlocale(LC_ALL, NULL))
+      , m_NewLocale(newLocale)
+    {
+      if (m_OldLocale == NULL)
+      {
+        m_OldLocale = "";
+      }
+      else if (m_NewLocale != m_OldLocale)
+      {
+        // set the locale
+        if (std::setlocale(LC_ALL, m_NewLocale.c_str()) == NULL)
+        {
+          MITK_INFO << "Could not set locale " << m_NewLocale;
+          m_OldLocale = NULL;
+        }
+      }
+    }
+
+    ~LocaleSwitch()
+    {
+      if (m_OldLocale != NULL && std::setlocale(LC_ALL, m_OldLocale) == NULL)
+      {
+        MITK_INFO << "Could not reset locale " << m_OldLocale;
+      }
+    }
+
+  private:
+    const char* m_OldLocale;
+    const std::string m_NewLocale;
+  };
+
+  // Switch the current locale to "C"
+  LocaleSwitch localeSwitch("C");
+
+  // Clone the image geometry, because we might have to change it
+  // for writing purposes
+  BaseGeometry::Pointer geometry = image->GetGeometry()->Clone();
+
+  // Check if geometry information will be lost
+  if (image->GetDimension() == 2 &&
+      !geometry->Is2DConvertable())
+  {
+    MITK_WARN << "Saving a 2D image with 3D geometry information. Geometry information will be lost! You might consider using Convert2Dto3DImageFilter before saving.";
+
+    // set matrix to identity
+    mitk::AffineTransform3D::Pointer affTrans = mitk::AffineTransform3D::New();
+    affTrans->SetIdentity();
+    mitk::Vector3D spacing = geometry->GetSpacing();
+    mitk::Point3D origin = geometry->GetOrigin();
+    geometry->SetIndexToWorldTransform(affTrans);
+    geometry->SetSpacing(spacing);
+    geometry->SetOrigin(origin);
+  }
+
+  MITK_INFO << "Writing image: " << path << std::endl;
+
+  try
+  {
+    // Implementation of writer using itkImageIO directly. This skips the use
+    // of templated itkImageFileWriter, which saves the multiplexing on MITK side.
+
+    const unsigned int dimension = image->GetDimension();
+    const unsigned int* const dimensions = image->GetDimensions();
+    const mitk::PixelType pixelType = image->GetPixelType();
+    const mitk::Vector3D mitkSpacing = geometry->GetSpacing();
+    const mitk::Point3D mitkOrigin = geometry->GetOrigin();
+
+    // Due to templating in itk, we are forced to save a 4D spacing and 4D Origin,
+    // though they are not supported in MITK
+    itk::Vector<double, 4u> spacing4D;
+    spacing4D[0] = mitkSpacing[0];
+    spacing4D[1] = mitkSpacing[1];
+    spacing4D[2] = mitkSpacing[2];
+    spacing4D[3] = 1; // There is no support for a 4D spacing. However, we should have a valid value here
+
+    itk::Vector<double, 4u> origin4D;
+    origin4D[0] = mitkOrigin[0];
+    origin4D[1] = mitkOrigin[1];
+    origin4D[2] = mitkOrigin[2];
+    origin4D[3] = 0; // There is no support for a 4D origin. However, we should have a valid value here
+
+    // Set the necessary information for imageIO
+    m_ImageIO->SetNumberOfDimensions(dimension);
+    m_ImageIO->SetPixelType(pixelType.GetPixelType());
+    m_ImageIO->SetComponentType(pixelType.GetComponentType() < PixelComponentUserType ?
+                                  static_cast<itk::ImageIOBase::IOComponentType>(pixelType.GetComponentType()) :
+                                  itk::ImageIOBase::UNKNOWNCOMPONENTTYPE);
+    m_ImageIO->SetNumberOfComponents( pixelType.GetNumberOfComponents() );
+
+    itk::ImageIORegion ioRegion( dimension );
+
+    for(unsigned int i = 0; i < dimension; i++)
+    {
+      m_ImageIO->SetDimensions(i, dimensions[i]);
+      m_ImageIO->SetSpacing(i, spacing4D[i]);
+      m_ImageIO->SetOrigin(i, origin4D[i]);
+
+      mitk::Vector3D mitkDirection;
+      mitkDirection.SetVnlVector(geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
+      itk::Vector<double, 4u> direction4D;
+      direction4D[0] = mitkDirection[0];
+      direction4D[1] = mitkDirection[1];
+      direction4D[2] = mitkDirection[2];
+
+      // MITK only supports a 3x3 direction matrix. Due to templating in itk, however, we must
+      // save a 4x4 matrix for 4D images. in this case, add an homogneous component to the matrix.
+      if (i == 3)
+      {
+        direction4D[3] = 1; // homogenous component
+      }
+      else
+      {
+        direction4D[3] = 0;
+      }
+      vnl_vector<double> axisDirection(dimension);
+      for(unsigned int j = 0; j < dimension; j++)
+      {
+        axisDirection[j] = direction4D[j] / spacing4D[i];
+      }
+      m_ImageIO->SetDirection(i, axisDirection);
+
+      ioRegion.SetSize(i, image->GetLargestPossibleRegion().GetSize(i));
+      ioRegion.SetIndex(i, image->GetLargestPossibleRegion().GetIndex(i));
+    }
+
+    //use compression if available
+    m_ImageIO->UseCompressionOn();
+
+    m_ImageIO->SetIORegion(ioRegion);
+    m_ImageIO->SetFileName(path);
+
+    // ***** Remove const_cast after bug 17952 is fixed ****
+    ImageReadAccessor imageAccess(const_cast<mitk::Image*>(image));
+    m_ImageIO->Write(imageAccess.GetData());
+  }
+  catch (const std::exception& e)
+  {
+    mitkThrow() << e.what();
+  }
 }
 
 void ItkImageIO::Write(const BaseData* data, std::ostream& stream)
 {
   AbstractFileWriter::Write(data, stream);
+}
+
+AbstractFileIO::WriterConfidenceLevel ItkImageIO::GetWriterConfidenceLevel(const BaseData* data) const
+{
+  // Check if the image dimension is supported
+  const Image* image = dynamic_cast<const Image*>(data);
+  if (image == NULL || !m_ImageIO->SupportsDimension(image->GetDimension()))
+  {
+    return IFileWriter::Unsupported;
+  }
+
+  // Check if geometry information will be lost
+  if (image->GetDimension() == 2 &&
+      !image->GetGeometry()->Is2DConvertable())
+  {
+    return IFileWriter::PartiallySupported;
+  }
+  return IFileWriter::Supported;
 }
 
 ItkImageIO* ItkImageIO::Clone() const

@@ -290,7 +290,6 @@ set(CPP_FILES
   Interactions/mitkCrosshairPositionEvent.cpp
   Interactions/mitkXML2EventParser.cpp
 
-  Interfaces/mitkIMimeType.cpp
   Interfaces/mitkIMimeTypeProvider.cpp
   Interfaces/mitkInteractionEventObserver.cpp
   Interfaces/mitkIShaderRepository.cpp
@@ -303,6 +302,7 @@ set(CPP_FILES
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp
   IO/mitkAbstractFileIO.cpp
+  IO/mitkCustomMimeType.cpp
   IO/mitkDicomSeriesReader.cpp
   IO/mitkDicomSR_LoadDICOMScalar.cpp
   IO/mitkDicomSR_LoadDICOMScalar4D.cpp
@@ -313,14 +313,17 @@ set(CPP_FILES
   IO/mitkDicomSR_SliceGroupingResult.cpp
 
   IO/mitkFileReader.cpp
-  IO/mitkFileWriter.cpp
   IO/mitkFileReaderRegistry.cpp
+  IO/mitkFileReaderSelector.cpp
+  IO/mitkFileWriter.cpp
   IO/mitkFileWriterRegistry.cpp
+  IO/mitkFileWriterSelector.cpp
 # IO/mitkIpPicGet.c
   IO/mitkImageGenerator.cpp
   IO/mitkIOConstants.cpp
   IO/mitkIOUtil.cpp
   IO/mitkItkLoggingAdapter.cpp
+  IO/mitkMimeType.cpp
   IO/mitkOperation.cpp
 # IO/mitkPicFileIOFactory.cpp
 # IO/mitkPicFileReader.cpp
@@ -329,7 +332,6 @@ set(CPP_FILES
 # IO/mitkPicVolumeTimeSeriesIOFactory.cpp
 # IO/mitkPicVolumeTimeSeriesReader.cpp
   IO/mitkPixelType.cpp
-  IO/mitkSimpleMimeType.cpp
   IO/mitkStandardFileLocations.cpp
   IO/mitkVtkLoggingAdapter.cpp
   IO/mitkLog.cpp

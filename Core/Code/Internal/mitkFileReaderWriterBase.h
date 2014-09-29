@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKFILEREADERWRITERBASE_H
 
 #include <mitkMessage.h>
-#include <mitkSimpleMimeType.h>
+#include <mitkCustomMimeType.h>
 
 #include <usAny.h>
 #include <usServiceRegistration.h>
@@ -34,6 +34,7 @@ public:
   typedef mitk::MessageAbstractDelegate1<float> ProgressCallback;
 
   FileReaderWriterBase();
+  ~FileReaderWriterBase();
 
   Options GetOptions() const;
   us::Any GetOption(const std::string &name) const;
@@ -57,32 +58,23 @@ public:
   void SetRanking(int ranking);
   int GetRanking() const;
 
-  void SetMimeType(const std::string& mimeType);
-  std::string GetMimeType() const;
-
-  void AddExtension(const std::string& extension);
-  std::vector<std::string> GetExtensions() const;
-  bool HasExtension(const std::string& extension);
+  void SetMimeType(const CustomMimeType& mimeType);
+  CustomMimeType GetMimeType() const;
+  CustomMimeType& GetMimeType();
 
   void SetDescription(const std::string& description);
   std::string GetDescription() const;
 
-  void SetCategory(const std::string& category);
-  std::string GetCategory() const;
-
   void AddProgressCallback(const ProgressCallback& callback);
   void RemoveProgressCallback(const ProgressCallback& callback);
 
-  us::ServiceRegistration<IMimeType> RegisterMimeType(us::ModuleContext* context);
+  us::ServiceRegistration<CustomMimeType> RegisterMimeType(us::ModuleContext* context);
   void UnregisterMimeType();
 
 protected:
 
   FileReaderWriterBase(const FileReaderWriterBase& other);
 
-  std::string m_MimeType;
-  std::string m_Category;
-  std::vector<std::string> m_Extensions;
   std::string m_Description;
   int m_Ranking;
 
@@ -99,8 +91,8 @@ protected:
 
   Message1<float> m_ProgressMessage;
 
-  SimpleMimeType m_SimpleMimeType;
-  us::ServiceRegistration<IMimeType> m_MimeTypeReg;
+  CustomMimeType m_CustomMimeType;
+  us::ServiceRegistration<CustomMimeType> m_MimeTypeReg;
 
 private:
 

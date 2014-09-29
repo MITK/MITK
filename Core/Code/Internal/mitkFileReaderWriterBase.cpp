@@ -30,14 +30,17 @@ FileReaderWriterBase::FileReaderWriterBase()
 {
 }
 
+FileReaderWriterBase::~FileReaderWriterBase()
+{
+  this->UnregisterMimeType();
+}
+
 FileReaderWriterBase::FileReaderWriterBase(const FileReaderWriterBase& other)
-  : m_MimeType(other.m_MimeType)
-  , m_Category(other.m_Category)
-  , m_Extensions(other.m_Extensions)
-  , m_Description(other.m_Description)
+  : m_Description(other.m_Description)
   , m_Ranking(other.m_Ranking)
   , m_Options(other.m_Options)
   , m_DefaultOptions(other.m_DefaultOptions)
+  , m_CustomMimeType(other.m_CustomMimeType)
 {
 
 }
@@ -114,29 +117,19 @@ int FileReaderWriterBase::GetRanking() const
   return m_Ranking;
 }
 
-void FileReaderWriterBase::SetMimeType(const std::string& mimeType)
+void FileReaderWriterBase::SetMimeType(const CustomMimeType& mimeType)
 {
-  m_MimeType = mimeType;
+  m_CustomMimeType = mimeType;
 }
 
-std::string FileReaderWriterBase::GetMimeType() const
+CustomMimeType FileReaderWriterBase::GetMimeType() const
 {
-  return m_MimeType;
+  return m_CustomMimeType;
 }
 
-void FileReaderWriterBase::AddExtension(const std::string& extension)
+CustomMimeType&FileReaderWriterBase::GetMimeType()
 {
-  m_Extensions.push_back(extension);
-}
-
-std::vector<std::string> FileReaderWriterBase::GetExtensions() const
-{
-  return m_Extensions;
-}
-
-bool FileReaderWriterBase::HasExtension(const std::string& extension)
-{
-  return std::find(m_Extensions.begin(), m_Extensions.end(), extension) != m_Extensions.end();
+  return m_CustomMimeType;
 }
 
 void FileReaderWriterBase::SetDescription(const std::string& description)
@@ -149,16 +142,6 @@ std::string FileReaderWriterBase::GetDescription() const
   return m_Description;
 }
 
-void FileReaderWriterBase::SetCategory(const std::string& category)
-{
-  m_Category = category;
-}
-
-std::string FileReaderWriterBase::GetCategory() const
-{
-  return m_Category;
-}
-
 void FileReaderWriterBase::AddProgressCallback(const FileReaderWriterBase::ProgressCallback& callback)
 {
   m_ProgressMessage += callback;
@@ -169,84 +152,57 @@ void FileReaderWriterBase::RemoveProgressCallback(const FileReaderWriterBase::Pr
   m_ProgressMessage -= callback;
 }
 
-us::ServiceRegistration<IMimeType> FileReaderWriterBase::RegisterMimeType(us::ModuleContext* context)
+us::ServiceRegistration<CustomMimeType> FileReaderWriterBase::RegisterMimeType(us::ModuleContext* context)
 {
   if (context == NULL) throw std::invalid_argument("The context argument must not be NULL.");
 
-  const std::string mimeType = this->GetMimeType();
-  std::vector<std::string> extensions = this->GetExtensions();
-  const std::string primaryExtension = extensions.empty() ? "" : extensions.front();
-  std::sort(extensions.begin(), extensions.end());
-  extensions.erase(std::unique(extensions.begin(), extensions.end()), extensions.end());
+  CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(CoreServices::GetMimeTypeProvider(context));
 
-  us::ServiceProperties props;
+  const std::vector<std::string> extensions = m_CustomMimeType.GetExtensions();
 
-  props[IMimeType::PROP_ID()] = mimeType;
-  props[IMimeType::PROP_CATEGORY()] = this->GetCategory();
-  props[IMimeType::PROP_EXTENSIONS()] = extensions;
-  props[IMimeType::PROP_DESCRIPTION()] = std::string("Synthesized MIME type");
-  props[us::ServiceConstants::SERVICE_RANKING()]  = this->GetRanking();
-
-  // If the mime type is set and the list of extensions is not empty,
-  // register a new IMimeType service
-  if (!mimeType.empty() && !extensions.empty())
-  {
-    return context->RegisterService<IMimeType>(&m_SimpleMimeType, props);
-  }
-
-  // If the mime type is set and the list of extensions is empty,
+  // If the mime type name is set and the list of extensions is empty,
   // look up the mime type in the registry and print a warning if
   // there is none
-  if (!mimeType.empty() && extensions.empty())
+  if (!m_CustomMimeType.GetName().empty() && extensions.empty())
   {
-    if(us::GetModuleContext()->GetServiceReferences<IMimeType>(us::LDAPProp(IMimeType::PROP_ID()) == mimeType).empty())
+    if(!mimeTypeProvider->GetMimeTypeForName(m_CustomMimeType.GetName()).IsValid())
     {
-      MITK_WARN << "Registering a MITK reader or writer with an unknown MIME type " << mimeType;
+      MITK_WARN << "Registering a MITK reader or writer with an unknown MIME type " << m_CustomMimeType.GetName();
     }
-    return us::ServiceRegistration<IMimeType>();
+    return m_MimeTypeReg;
   }
 
-  // If the mime type is empty, get a mime type using the extensions list
-  assert(mimeType.empty());
-  mitk::CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
-
-  if(extensions.empty())
+  // If the mime type name is empty, get a mime type using the extensions list
+  if(m_CustomMimeType.GetName().empty() && extensions.empty())
   {
-    MITK_WARN << "Trying to register a MITK reader or writer with an empty mime type and empty extension list.";
-    return us::ServiceRegistration<IMimeType>();
-  }
-  else if(extensions.size() == 1)
-  {
-    // If there is only one extension, try to look-up an existing mime tpye
-    std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(extensions.front());
-    if (!mimeTypes.empty())
-    {
-      m_MimeType = mimeTypes.front();
-    }
+    MITK_WARN << "Trying to register a MITK reader or writer with an empty mime type name and empty extension list.";
+    return m_MimeTypeReg;
   }
 
-  if (m_MimeType.empty())
+  // extensions is not empty, so register a mime-type
+  if(m_CustomMimeType.GetName().empty())
   {
-    // There is no registered mime type for the extension or the extensions
-    // list contains more than one entry.
-    // Register a new mime type by creating a synthetic mime type id from the
+    // Register a new mime type by creating a synthetic mime type name from the
     // first extension in the list
-    m_MimeType = "application/vnd.mitk." + primaryExtension;
-    props[IMimeType::PROP_ID()] = m_MimeType;
-    return context->RegisterService<IMimeType>(&m_SimpleMimeType, props);
+    m_CustomMimeType.SetName("application/vnd.mitk." + extensions.front());
   }
-  else
-  {
-    // A mime type for one of the listed extensions was found, do nothing.
-    return us::ServiceRegistration<IMimeType>();
-  }
+  m_MimeTypeReg = context->RegisterService<CustomMimeType>(&m_CustomMimeType);
+
+  return m_MimeTypeReg;
 }
 
 void FileReaderWriterBase::UnregisterMimeType()
 {
   if (m_MimeTypeReg)
   {
-    m_MimeTypeReg.Unregister();
+    try
+    {
+      m_MimeTypeReg.Unregister();
+    }
+    catch (const std::logic_error&)
+    {
+      // service already unregistered
+    }
   }
 }
 

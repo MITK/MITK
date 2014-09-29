@@ -45,19 +45,28 @@ namespace mitk {
    * The file writer implementation is associated with a mime-type, specified
    * in the service property PROP_MIMETYPE() and a mitk::BaseData sub-class
    * as specified in the PROP_BASEDATA_TYPE() service property.
-   * The specified mime-type should have a corresponding IMimeType service
+   * The specified mime-type should have a corresponding CustomMimeType service
    * object, registered by the reader or some other party.
    *
    * It is recommended to derive new implementations from AbstractFileWriter,
    * which provides correct service registration semantics.
    *
    * \sa AbstractFileWriter
-   * \sa IMimeType
+   * \sa CustomMimeType
    * \sa FileWriterRegistry
    * \sa IFileReader
    */
   struct MITK_CORE_EXPORT IFileWriter
   {
+    // The order of the enum values is important: it is used
+    // to rank writer implementations
+    enum ConfidenceLevel
+    {
+      Unsupported = 0,
+      PartiallySupported = 8,
+      Supported = 16
+    };
+
     virtual ~IFileWriter();
 
     typedef std::map<std::string, us::Any> Options;
@@ -67,6 +76,8 @@ namespace mitk {
     virtual void Write(const BaseData* data, const std::string& path ) = 0;
 
     virtual void Write(const BaseData* data, std::ostream& stream ) = 0;
+
+    virtual ConfidenceLevel GetConfidenceLevel(const BaseData* data) const = 0;
 
     /**
      * \brief returns a list of the supported Options

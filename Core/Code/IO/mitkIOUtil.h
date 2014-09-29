@@ -26,42 +26,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIFileReader.h>
 #include <mitkIFileWriter.h>
+#include <mitkFileReaderSelector.h>
+#include <mitkFileWriterSelector.h>
 
 #include <fstream>
 
 namespace mitk {
+
+class FileWriterRegistry;
 
 /**
  * \ingroup IO
  *
  * \brief A utility class to load and save data from/to the local file system.
  *
- * This method LoadFiles queries the MITK Micro Services registry for registered mitk::IDataNodeReader service
- * instances. The service instance with the highest ranking will be asked first to load the
- * given file. On error (exception thrown) or if no mitk::DataNode was constructed, the next
- * service instance is used.
- *
  * The methods LoadImage, LoadSurface, and LoadPointSet are convenience methods for general loading of
- * the three main data types in MITK. They all use the more generic method LoadDataNode.
+ * the three main data types in MITK. They all use the more generic method Load().
  *
- * The methods SaveImage, SaveSurface, and SurfacePointSet are also meant for convenience (e.g. during testing).
- * Currently, there is no generic way to save a generic DataNode with an appropriate format. Thus, every method
- * initializes the corresponding instance of the special writer for the data type.
- *
- * \see mitk::IDataNodeReader
+ * \see QmitkIOUtil
  */
 class MITK_CORE_EXPORT IOUtil
 {
 
 public:
 
+  struct LoadInfo
+  {
+    LoadInfo(const std::string& path);
+
+    std::string m_Path;
+    std::vector<BaseData::Pointer> m_Output;
+
+    FileReaderSelector m_ReaderSelector;
+    bool m_Cancel;
+  };
+
   struct SaveInfo
   {
-    SaveInfo(const BaseData* baseData, const std::string& mimeType, const std::string& path);
+    SaveInfo(const BaseData* baseData);
+    SaveInfo(const BaseData* baseData, const MimeType& mimeType, const std::string& path);
 
+    bool operator<(const SaveInfo& other) const;
+
+    /// The BaseData object to save.
     const BaseData* m_BaseData;
-    std::string m_MimeType;
+
+    /// The selected mime-type, used to restrict results from FileWriterSelector.
+    MimeType m_MimeType;
+    /// Contains a set of IFileWriter objects.
+    FileWriterSelector m_WriterSelector;
+    /// The path to write the BaseData object to.
     std::string m_Path;
+    /// Flag indicating if sub-sequent save operations are to be canceled.
+    bool m_Cancel;
   };
 
   /**
@@ -207,7 +224,7 @@ public:
   static std::vector<BaseData::Pointer> Load(const std::vector<std::string>& paths);
 
   /**
-   * Load a files in <code>fileNames</code> and add the constructed mitk::DataNode instances
+   * Load files in <code>fileNames</code> and add the constructed mitk::DataNode instances
    * to the mitk::DataStorage <code>storage</code>
    *
    * @param fileNames A list (vector) of absolute file name paths.
@@ -278,32 +295,70 @@ public:
 
 
   /**
-   * @brief Convenience method to save mitk::BaseData instances.
-   * @param path The path to the image including file name and file extension.
-   *        If no extention is set, the default extension is used.
+   * @brief Save a mitk::BaseData instance.
    * @param data The data to save.
+   * @param path The path to the image including file name and and optional file extension.
+   *        If no extension is set, the default extension and mime-type for the
+   *        BaseData type of \c data is used.
    * @throws mitk::Exception if no writer for \c data is available or the writer
    *         is not able to write the image.
    */
   static void Save(const mitk::BaseData* data, const std::string& path);
 
-  static void Save(const mitk::BaseData* data, const std::string& path, const IFileWriter::Options& options);
-
-  static void Save(const mitk::BaseData* data, const std::string& mimeType, const std::string& path);
-
   /**
-   * @brief Convenience method to save mitk::BaseData instances.
-   * @param path The path to the image including file name and file extension.
-   *        If no extention is set, the default extension is used.
+   * @brief Save a mitk::BaseData instance.
    * @param data The data to save.
-   * @param mimeType The mime-type to use for the written file
-   * @parma options Configuration data for the used IFileWriter instance.
+   * @param path The path to the image including file name and an optional file extension.
+   *        If no extension is set, the default extension and mime-type for the
+   *        BaseData type of \c data is used.
+   * @param options The IFileWriter options to use for the selected writer.
    * @throws mitk::Exception if no writer for \c data is available or the writer
    *         is not able to write the image.
    */
-  static void Save(const mitk::BaseData* data, const std::string& mimeType, const std::string& path, const mitk::IFileWriter::Options& options);
+  static void Save(const mitk::BaseData* data, const std::string& path, const IFileWriter::Options& options);
 
-  static void Save(const std::vector<SaveInfo>& saveInfos);
+  /**
+   * @brief Save a mitk::BaseData instance.
+   * @param data The data to save.
+   * @param mimeType The mime-type to use for writing \c data.
+   * @param path The path to the image including file name and an optional file extension.
+   * @param addExtension If \c true, an extension according to the given \c mimeType
+   *        is added to \c path if it does not contain one. If \c path already contains
+   *        a file name extension, it is not checked for compatibility with \c mimeType.
+   *
+   * @throws mitk::Exception if no writer for the combination of \c data and \c mimeType is
+   *         available or the writer is not able to write the image.
+   */
+  static void Save(const mitk::BaseData* data, const std::string& mimeType, const std::string& path,
+                   bool addExtension = true);
+
+  /**
+   * @brief Save a mitk::BaseData instance.
+   * @param data The data to save.
+   * @param mimeType The mime-type to use for writing \c data.
+   * @param path The path to the image including file name and an optional file extension.
+   * @param options Configuration data for the used IFileWriter instance.
+   * @param addExtension If \c true, an extension according to the given \c mimeType
+   *        is added to \c path if it does not contain one. If \c path already contains
+   *        a file name extension, it is not checked for compatibility with \c mimeType.
+   *
+   * @throws mitk::Exception if no writer for the combination of \c data and \c mimeType is
+   *         available or the writer is not able to write the image.
+   */
+  static void Save(const mitk::BaseData* data, const std::string& mimeType, const std::string& path,
+                   const mitk::IFileWriter::Options& options, bool addExtension = true);
+
+  /**
+   * @brief Use SaveInfo objects to save BaseData instances.
+   *
+   * This is a low-level method for directly working with SaveInfo objects. Usually,
+   * the Save() methods taking a BaseData object as an argument are more appropriate.
+   *
+   * @param saveInfos A list of SaveInfo objects for saving contained BaseData objects.
+   *
+   * @see Save(const mitk::BaseData*, const std::string&)
+   */
+  static void Save(std::vector<SaveInfo>& saveInfos);
 
   /**
    * @brief SaveImage Convenience method to save an arbitrary mitkImage.
@@ -363,23 +418,21 @@ protected:
 
   struct ReaderOptionsFunctorBase
   {
-    virtual bool operator()(const std::string& path, const std::vector<std::string>& readerLabels,
-                            const std::vector<IFileReader*>& readers, IFileReader*& selectedReader) = 0;
+    virtual bool operator()(LoadInfo& loadInfo) = 0;
   };
 
   struct WriterOptionsFunctorBase
   {
-    virtual bool operator()(const std::string& path, const std::vector<std::string>& writerLabels,
-                            const std::vector<IFileWriter*>& readers, IFileWriter*& selectedWriter) = 0;
+    virtual bool operator()(SaveInfo& saveInfo) = 0;
   };
 
-  static std::string Load(const std::vector<std::string>& paths, std::vector<BaseData::Pointer>* result,
-                          DataStorage::SetOfObjects* nodeResult, DataStorage* ds, ReaderOptionsFunctorBase* optionsCallback);
+  static std::string Load(std::vector<LoadInfo>& loadInfos, DataStorage::SetOfObjects* nodeResult,
+                          DataStorage* ds, ReaderOptionsFunctorBase* optionsCallback);
 
   static std::string Save(const BaseData* data, const std::string& mimeType, const std::string& path,
-                          WriterOptionsFunctorBase* optionsCallback);
+                          WriterOptionsFunctorBase* optionsCallback, bool addExtension);
 
-  static std::string Save(const std::vector<SaveInfo>& saveInfos,
+  static std::string Save(std::vector<SaveInfo>& saveInfos,
                           WriterOptionsFunctorBase* optionsCallback);
 
 private:

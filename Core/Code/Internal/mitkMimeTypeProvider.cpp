@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkMimeTypeProvider.h"
 
+#include "mitkLogMacros.h"
+
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
@@ -37,7 +39,7 @@ void MimeTypeProvider::Start()
 {
   if (m_Tracker == NULL)
   {
-    m_Tracker = new us::ServiceTracker<IMimeType, MimeTypeTrackerTypeTraits>(us::GetModuleContext(), this);
+    m_Tracker = new us::ServiceTracker<CustomMimeType, MimeTypeTrackerTypeTraits>(us::GetModuleContext(), this);
   }
   m_Tracker->Open();
 }
@@ -47,18 +49,18 @@ void MimeTypeProvider::Stop()
   m_Tracker->Close();
 }
 
-std::vector<std::string> MimeTypeProvider::GetMimeTypes() const
+std::vector<MimeType> MimeTypeProvider::GetMimeTypes() const
 {
-  std::vector<std::string> result;
-  for (MapType::const_iterator iter = m_MimeTypeToRefs.begin(),
-       end = m_MimeTypeToRefs.end(); iter != end; ++iter)
+  std::vector<MimeType> result;
+  for (std::map<std::string, MimeType>::const_iterator iter = m_NameToMimeType.begin(),
+       end = m_NameToMimeType.end(); iter != end; ++iter)
   {
-    result.push_back(iter->first);
+    result.push_back(iter->second);
   }
   return result;
 }
 
-std::vector<std::string> MimeTypeProvider::GetMimeTypesForFile(const std::string& filePath) const
+std::vector<MimeType> MimeTypeProvider::GetMimeTypesForFile(const std::string& filePath) const
 {
   // For now, just use the file extension to look-up the registered mime-types.
   std::string extension = itksys::SystemTools::GetFilenameExtension(filePath);
@@ -69,101 +71,54 @@ std::vector<std::string> MimeTypeProvider::GetMimeTypesForFile(const std::string
   return this->GetMimeTypesForExtension(extension);
 }
 
-std::vector<std::string> MimeTypeProvider::GetMimeTypesForExtension(const std::string& extension) const
+std::vector<MimeType> MimeTypeProvider::GetMimeTypesForExtension(const std::string& extension) const
 {
-  std::vector<std::string> result;
-  std::vector<us::ServiceReference<IMimeType> > mimeTypeRefs;
-  for (MapType::const_iterator iter = m_MimeTypeToRefs.begin(),
-       end = m_MimeTypeToRefs.end(); iter != end; ++iter)
+  std::vector<MimeType> result;
+  for (std::map<std::string, MimeType>::const_iterator iter = m_NameToMimeType.begin(),
+       iterEnd = m_NameToMimeType.end(); iter != iterEnd; ++iter)
   {
-    us::Any any = iter->second.rbegin()->GetProperty(IMimeType::PROP_EXTENSIONS());
-    if (!any.Empty() && any.Type() == typeid(std::vector<std::string>))
+    const std::vector<std::string> extensions = iter->second.GetExtensions();
+    if (std::find(extensions.begin(), extensions.end(), extension) != extensions.end())
     {
-      const std::vector<std::string>& extensions = us::ref_any_cast<std::vector<std::string> >(any);
-      if (std::find(extensions.begin(), extensions.end(), extension) != extensions.end())
-      {
-        mimeTypeRefs.push_back(*(iter->second.rbegin()));
-      }
+      result.push_back(iter->second);
     }
   }
-  std::sort(mimeTypeRefs.begin(), mimeTypeRefs.end());
-  for (std::vector<us::ServiceReference<IMimeType> >::reverse_iterator iter = mimeTypeRefs.rbegin();
-       iter != mimeTypeRefs.rend(); ++iter)
-  {
-    result.push_back(us::ref_any_cast<std::string>(iter->GetProperty(IMimeType::PROP_ID())));
-  }
+  std::sort(result.begin(), result.end());
+  std::reverse(result.begin(), result.end());
   return result;
 }
 
-std::vector<std::string> MimeTypeProvider::GetMimeTypesForCategory(const std::string& category) const
+std::vector<MimeType> MimeTypeProvider::GetMimeTypesForCategory(const std::string& category) const
 {
-  std::vector<std::string> result;
-  for (MapType::const_iterator iter = m_MimeTypeToRefs.begin(),
-       end = m_MimeTypeToRefs.end(); iter != end; ++iter)
+  std::vector<MimeType> result;
+  for (std::map<std::string, MimeType>::const_iterator iter = m_NameToMimeType.begin(),
+       end = m_NameToMimeType.end(); iter != end; ++iter)
   {
-    us::Any cat = iter->second.rbegin()->GetProperty(IMimeType::PROP_CATEGORY());
-    if (!cat.Empty() && cat.Type() == typeid(std::string) &&
-        us::ref_any_cast<std::string>(cat) == category)
+    if (iter->second.GetCategory() == category)
     {
-      result.push_back(iter->first);
+      result.push_back(iter->second);
     }
   }
   return result;
 }
 
-std::string MimeTypeProvider::GetDescription(const std::string& mimeType) const
+MimeType MimeTypeProvider::GetMimeTypeForName(const std::string& name) const
 {
-  MapType::const_iterator iter = m_MimeTypeToRefs.find(mimeType);
-  if (iter == m_MimeTypeToRefs.end()) return std::string();
-
-  us::Any description = iter->second.rbegin()->GetProperty(IMimeType::PROP_DESCRIPTION());
-  if (!description.Empty() && description.Type() == typeid(std::string))
-  {
-    return us::ref_any_cast<std::string>(description);
-  }
-  return std::string();
-}
-
-std::vector<std::string> MimeTypeProvider::GetExtensions(const std::string& mimeType) const
-{
-  MapType::const_iterator iter = m_MimeTypeToRefs.find(mimeType);
-  if (iter == m_MimeTypeToRefs.end()) return std::vector<std::string>();
-
-  us::Any extensions = iter->second.rbegin()->GetProperty(IMimeType::PROP_EXTENSIONS());
-  if (!extensions.Empty() && extensions.Type() == typeid(std::vector<std::string>))
-  {
-    return us::ref_any_cast<std::vector<std::string> >(extensions);
-  }
-  return std::vector<std::string>();
-}
-
-std::string MimeTypeProvider::GetCategory(const std::string& mimeType) const
-{
-  MapType::const_iterator iter = m_MimeTypeToRefs.find(mimeType);
-  if (iter == m_MimeTypeToRefs.end()) return std::string();
-
-  us::Any category = iter->second.rbegin()->GetProperty(IMimeType::PROP_CATEGORY());
-  if (!category.Empty() && category.Type() == typeid(std::string))
-  {
-    return us::ref_any_cast<std::string>(category);
-  }
-  return std::string();
+  std::map<std::string, MimeType>::const_iterator iter = m_NameToMimeType.find(name);
+  if (iter != m_NameToMimeType.end()) return iter->second;
+  return MimeType();
 }
 
 std::vector<std::string> MimeTypeProvider::GetCategories() const
 {
   std::vector<std::string> result;
-  for (MapType::const_iterator iter = m_MimeTypeToRefs.begin(),
-       end = m_MimeTypeToRefs.end(); iter != end; ++iter)
+  for (std::map<std::string, MimeType>::const_iterator iter = m_NameToMimeType.begin(),
+       end = m_NameToMimeType.end(); iter != end; ++iter)
   {
-    us::Any category = iter->second.rbegin()->GetProperty(IMimeType::PROP_CATEGORY());
-    if (!category.Empty() && category.Type() == typeid(std::string))
+    std::string category = iter->second.GetCategory();
+    if (!category.empty())
     {
-      std::string s = us::ref_any_cast<std::string>(category);
-      if (!s.empty())
-      {
-        result.push_back(s);
-      }
+      result.push_back(category);
     }
   }
   std::sort(result.begin(), result.end());
@@ -171,30 +126,68 @@ std::vector<std::string> MimeTypeProvider::GetCategories() const
   return result;
 }
 
-us::ServiceReference<IMimeType> MimeTypeProvider::AddingService(const ServiceReferenceType& reference)
+MimeTypeProvider::TrackedType MimeTypeProvider::AddingService(const ServiceReferenceType& reference)
 {
-  us::Any id = reference.GetProperty(IMimeType::PROP_ID());
-  if (!id.Empty() && id.Type() == typeid(std::string))
+  MimeType result = this->GetMimeType(reference);
+  if (result.IsValid())
   {
-    m_MimeTypeToRefs[us::ref_any_cast<std::string>(id)].insert(reference);
-    return reference;
+    std::string name = result.GetName();
+    m_NameToMimeTypes[name].insert(result);
+
+    // get the highest ranked mime-type
+    m_NameToMimeType[name] = *(m_NameToMimeTypes[name].rbegin());
   }
-  return ServiceReferenceType();
+  return result;
 }
 
-void MimeTypeProvider::ModifiedService(const ServiceReferenceType& /*reference*/, ServiceReferenceType /*service*/)
+void MimeTypeProvider::ModifiedService(const ServiceReferenceType& /*reference*/, TrackedType /*mimetype*/)
 {
+  // should we track changes in the ranking property?
 }
 
-void MimeTypeProvider::RemovedService(const ServiceReferenceType& /*reference*/, ServiceReferenceType service)
+void MimeTypeProvider::RemovedService(const ServiceReferenceType& /*reference*/, TrackedType mimeType)
 {
-  std::string id = us::ref_any_cast<std::string>(service.GetProperty(IMimeType::PROP_ID()));
-  std::set<us::ServiceReferenceU>& refs = m_MimeTypeToRefs[id];
-  refs.erase(service);
-  if (refs.empty())
+  std::string name = mimeType.GetName();
+  std::set<MimeType>& mimeTypes = m_NameToMimeTypes[name];
+  mimeTypes.erase(mimeType);
+  if (mimeTypes.empty())
   {
-    m_MimeTypeToRefs.erase(id);
+    m_NameToMimeTypes.erase(name);
+    m_NameToMimeType.erase(name);
   }
+  else
+  {
+    // get the highest ranked mime-type
+    m_NameToMimeType[name] = *(mimeTypes.rbegin());
+  }
+}
+
+MimeType MimeTypeProvider::GetMimeType(const ServiceReferenceType& reference) const
+{
+  MimeType result;
+  if (!reference) return result;
+
+  CustomMimeType* mimeType = us::GetModuleContext()->GetService(reference);
+  if (mimeType != NULL)
+  {
+    try
+    {
+      int rank = 0;
+      us::Any rankProp = reference.GetProperty(us::ServiceConstants::SERVICE_RANKING());
+      if (!rankProp.Empty())
+      {
+        rank = us::any_cast<int>(rankProp);
+      }
+      long id = us::any_cast<long>(reference.GetProperty(us::ServiceConstants::SERVICE_ID()));
+      result = MimeType(*mimeType, rank, id);
+    }
+    catch (const us::BadAnyCastException& e)
+    {
+      MITK_WARN << "Unexpected exception: " << e.what();
+    }
+    us::GetModuleContext()->UngetService(reference);
+  }
+  return result;
 }
 
 }

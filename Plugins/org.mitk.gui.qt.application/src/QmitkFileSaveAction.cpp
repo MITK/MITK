@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNodeSelection.h>
 
 #include <berryISelectionService.h>
-#include <berryISelectionListener.h>
+#include <berryINullSelectionListener.h>
 
 #include <QmitkIOUtil.h>
 
@@ -43,7 +43,7 @@ private:
 public:
 
   QmitkFileSaveActionPrivate()
-    : m_SelectionListener(new berry::SelectionChangedAdapter<QmitkFileSaveActionPrivate>(
+    : m_SelectionListener(new berry::NullSelectionChangedAdapter<QmitkFileSaveActionPrivate>(
                             this, &QmitkFileSaveActionPrivate::HandleSelectionChanged))
   {
   }
@@ -173,7 +173,10 @@ void QmitkFileSaveAction::Run()
   {
     QStringList fileNames = QmitkIOUtil::Save(data, names, d->getLastFileSavePath(),
                                               d->m_Action->parentWidget());
-    d->setLastFileSavePath(QFileInfo(fileNames.back()).absolutePath());
+    if (!fileNames.empty())
+    {
+      d->setLastFileSavePath(QFileInfo(fileNames.back()).absolutePath());
+    }
   }
   catch (const mitk::Exception& e)
   {

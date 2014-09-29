@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
+#include <usLDAPProp.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkIDataNodeReader.h>
 #include <mitkProgressBar.h>
@@ -290,90 +291,6 @@ US_HASH_FUNCTION_BEGIN(std::vector<std::string>)
 US_HASH_FUNCTION_END
 US_HASH_FUNCTION_NAMESPACE_END
 
-namespace {
-
-class FileSorter
-{
-
-public:
-
-  typedef std::vector<std::string> MimeTypeVector;
-  typedef std::vector<std::string> FileVector;
-
-  FileSorter()
-  {}
-
-private:
-
-  FileSorter(const FileSorter&);
-  FileSorter& operator=(const FileSorter&);
-
-  typedef US_UNORDERED_MAP_TYPE<MimeTypeVector, FileVector> HashMapType;
-
-  HashMapType m_MimeTypesToFiles;
-
-public:
-
-  typedef HashMapType::const_iterator Iterator;
-
-  void AddFile(const std::string& file, const std::string& mimeType)
-  {
-    MimeTypeVector mimeTypes;
-    mimeTypes.push_back(mimeType);
-    m_MimeTypesToFiles[mimeTypes].push_back(file);
-  }
-
-  void AddFile(const std::string& file, const MimeTypeVector& mimeTypes)
-  {
-    m_MimeTypesToFiles[mimeTypes].push_back(file);
-  }
-
-  Iterator Begin() const
-  {
-    return m_MimeTypesToFiles.begin();
-  }
-
-  Iterator End() const
-  {
-    return m_MimeTypesToFiles.end();
-  }
-
-};
-
-class SaveInfoSorter
-{
-public:
-
-  typedef std::vector<mitk::IOUtil::SaveInfo> SaveInfoVector;
-
-private:
-
-  typedef US_UNORDERED_MAP_TYPE<std::string, SaveInfoVector> HashMapType;
-
-  HashMapType m_SaveInfoMap;
-
-public:
-
-  typedef HashMapType::const_iterator Iterator;
-
-  void AddSaveInfo(const mitk::IOUtil::SaveInfo& info)
-  {
-    std::string key = std::string(info.m_BaseData->GetNameOfClass()) + "+" + info.m_MimeType;
-    m_SaveInfoMap[key].push_back(info);
-  }
-
-  Iterator Begin() const
-  {
-    return m_SaveInfoMap.begin();
-  }
-
-  Iterator End() const
-  {
-    return m_SaveInfoMap.end();
-  }
-};
-
-}
 
 //**************************************************************
 // mitk::IOUtil method definitions
@@ -392,11 +309,13 @@ struct IOUtil::Impl
       : m_Options(options)
     {}
 
-    virtual bool operator()(const std::string& /*path*/, const std::vector<std::string>& /*readerLabels*/,
-                            const std::vector<IFileReader*>& readers, IFileReader*& selectedReader)
+    virtual bool operator()(LoadInfo& loadInfo)
     {
-      selectedReader = readers.front();
-      selectedReader->SetOptions(m_Options);
+      IFileReader* reader = loadInfo.m_ReaderSelector.GetSelected().GetReader();
+      if (reader)
+      {
+        reader->SetOptions(m_Options);
+      }
       return false;
     }
 
@@ -410,11 +329,13 @@ struct IOUtil::Impl
       : m_Options(options)
     {}
 
-    virtual bool operator()(const std::string& /*path*/, const std::vector<std::string>& /*writerLabels*/,
-                            const std::vector<IFileWriter*>& writers, IFileWriter*& selectedWriter)
+    virtual bool operator()(SaveInfo& saveInfo)
     {
-      selectedWriter = writers.front();
-      selectedWriter->SetOptions(m_Options);
+      IFileWriter* writer = saveInfo.m_WriterSelector.GetSelected().GetWriter();
+      if (writer)
+      {
+        writer->SetOptions(m_Options);
+      }
       return false;
     }
 
@@ -584,11 +505,11 @@ DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::string& path,
                                                 const IFileReader::Options& options,
                                                 DataStorage& storage)
 {
-  std::vector<std::string> paths;
-  paths.push_back(path);
+  std::vector<LoadInfo> loadInfos;
+  loadInfos.push_back(LoadInfo(path));
   DataStorage::SetOfObjects::Pointer nodeResult = DataStorage::SetOfObjects::New();
   Impl::FixedReaderOptionsFunctor optionsCallback(options);
-  std::string errMsg = Load(paths, NULL, nodeResult, &storage, &optionsCallback);
+  std::string errMsg = Load(loadInfos, nodeResult, &storage, &optionsCallback);
   if (!errMsg.empty())
   {
     mitkThrow() << errMsg;
@@ -605,22 +526,28 @@ std::vector<BaseData::Pointer> IOUtil::Load(const std::string& path)
 
 std::vector<BaseData::Pointer> IOUtil::Load(const std::string& path, const IFileReader::Options& options)
 {
-  std::vector<std::string> paths;
-  paths.push_back(path);
-  std::vector<BaseData::Pointer> result;
+  std::vector<LoadInfo> loadInfos;
+  loadInfos.push_back(LoadInfo(path));
   Impl::FixedReaderOptionsFunctor optionsCallback(options);
-  std::string errMsg = Load(paths, &result, NULL, NULL, &optionsCallback);
+  std::string errMsg = Load(loadInfos, NULL, NULL, &optionsCallback);
   if (!errMsg.empty())
   {
     mitkThrow() << errMsg;
   }
-  return result;
+  return loadInfos.front().m_Output;
 }
 
 DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::vector<std::string>& paths, DataStorage& storage)
 {
   DataStorage::SetOfObjects::Pointer nodeResult = DataStorage::SetOfObjects::New();
-  std::string errMsg = Load(paths, NULL, nodeResult, &storage, NULL);
+  std::vector<LoadInfo> loadInfos;
+  for (std::vector<std::string>::const_iterator iter = paths.begin(), iterEnd = paths.end();
+       iter != iterEnd; ++iter)
+  {
+    LoadInfo loadInfo(*iter);
+    loadInfos.push_back(loadInfo);
+  }
+  std::string errMsg = Load(loadInfos, nodeResult, &storage, NULL);
   if (!errMsg.empty())
   {
     mitkThrow() << errMsg;
@@ -631,10 +558,23 @@ DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::vector<std::string>& 
 std::vector<BaseData::Pointer> IOUtil::Load(const std::vector<std::string>& paths)
 {
   std::vector<BaseData::Pointer> result;
-  std::string errMsg = Load(paths, &result, NULL, NULL, NULL);
+  std::vector<LoadInfo> loadInfos;
+  for (std::vector<std::string>::const_iterator iter = paths.begin(), iterEnd = paths.end();
+       iter != iterEnd; ++iter)
+  {
+    LoadInfo loadInfo(*iter);
+    loadInfos.push_back(loadInfo);
+  }
+  std::string errMsg = Load(loadInfos, NULL, NULL, NULL);
   if (!errMsg.empty())
   {
     mitkThrow() << errMsg;
+  }
+
+  for (std::vector<LoadInfo>::const_iterator iter = loadInfos.begin(), iterEnd = loadInfos.end();
+       iter != iterEnd; ++iter)
+  {
+    result.insert(result.end(), iter->m_Output.begin(), iter->m_Output.end());
   }
   return result;
 }
@@ -709,191 +649,150 @@ PointSet::Pointer IOUtil::LoadPointSet(const std::string& path)
   return pointset;
 }
 
-std::string IOUtil::Load(const std::vector<std::string>& paths, std::vector<BaseData::Pointer>* result,
+std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
                          DataStorage::SetOfObjects* nodeResult, DataStorage* ds,
                          ReaderOptionsFunctorBase* optionsCallback)
 {
-  if (paths.empty())
+  if (loadInfos.empty())
   {
     return "No input files given";
   }
 
-  int filesToRead = paths.size();
+  int filesToRead = loadInfos.size();
   mitk::ProgressBar::GetInstance()->AddStepsToDo(2*filesToRead);
-
-  CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(CoreServices::GetMimeTypeProvider());
 
   std::string errMsg;
 
-  // group the selected files by mime-type(s)
-  FileSorter fileSorter;
-  std::string noMimeTypeError;
-  for(std::vector<std::string>::const_iterator selectedFileIter = paths.begin(),
-      iterEnd = paths.end(); selectedFileIter != iterEnd; ++selectedFileIter)
+  std::map<std::string, FileReaderSelector::Item> usedReaderItems;
+
+  for(std::vector<LoadInfo>::iterator infoIter = loadInfos.begin(),
+      infoIterEnd = loadInfos.end(); infoIter != infoIterEnd; ++infoIter)
   {
-    std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForFile(*selectedFileIter);
-    if (!mimeTypes.empty())
+    std::vector<FileReaderSelector::Item> readers = infoIter->m_ReaderSelector.Get();
+
+    if (readers.empty())
     {
-      fileSorter.AddFile(*selectedFileIter, mimeTypes);
+      errMsg += "No reader available for '" + infoIter->m_Path + "'\n";
+      continue;
     }
-    else
+
+    bool callOptionsCallback = readers.size() > 1 || !readers.front().GetReader()->GetOptions().empty();
+
+    // check if we already used a reader which should be re-used
+    std::vector<MimeType> currMimeTypes = infoIter->m_ReaderSelector.GetMimeTypes();
+    std::string selectedMimeType;
+    for (std::vector<MimeType>::const_iterator mimeTypeIter = currMimeTypes.begin(),
+         mimeTypeIterEnd = currMimeTypes.end(); mimeTypeIter != mimeTypeIterEnd; ++mimeTypeIter)
     {
-      noMimeTypeError += "  * " + *selectedFileIter + "\n";
-    }
-  }
-
-  if (!noMimeTypeError.empty())
-  {
-    errMsg += "Unknown file format for\n\n" + noMimeTypeError + "\n\n";
-  }
-
-  FileReaderRegistry readerRegistry;
-
-  for(FileSorter::Iterator iter = fileSorter.Begin(), endIter = fileSorter.End();
-      iter != endIter; ++iter)
-  {
-    std::vector<mitk::IFileReader*> finalReaders;
-    std::vector<std::string> finalReaderLabels;
-    const FileSorter::FileVector& currentFiles = iter->second;
-    const FileSorter::MimeTypeVector& fileMimeTypes = iter->first;
-    for(FileSorter::MimeTypeVector::const_iterator mimeTypeIter = fileMimeTypes.begin(),
-        mimeTypeIterEnd = fileMimeTypes.end(); mimeTypeIter != mimeTypeIterEnd; ++mimeTypeIter)
-    {
-      // Get all IFileReader references for the given mime-type
-      std::vector<mitk::FileReaderRegistry::ReaderReference> readerRefs = readerRegistry.GetReferences(*mimeTypeIter);
-      // Sort according to priority (ascending)
-      std::sort(readerRefs.begin(), readerRefs.end());
-
-      // Loop over all readers, starting at the highest priority, and check if it
-      // really can read the file (well, the first in the list).
-      for (std::vector<mitk::FileReaderRegistry::ReaderReference>::reverse_iterator readerRef = readerRefs.rbegin();
-           readerRef != readerRefs.rend(); ++readerRef)
+      std::map<std::string, FileReaderSelector::Item>::const_iterator oldSelectedItemIter =
+          usedReaderItems.find(mimeTypeIter->GetName());
+      if (oldSelectedItemIter != usedReaderItems.end())
       {
-        mitk::IFileReader* reader = readerRegistry.GetReader(*readerRef);
-        try
+        // we found an already used item for a mime-type which is contained
+        // in the current reader set, check all current readers if there service
+        // id equals the old reader
+        for (std::vector<FileReaderSelector::Item>::const_iterator currReaderItem = readers.begin(),
+             currReaderItemEnd = readers.end(); currReaderItem != currReaderItemEnd; ++currReaderItem)
         {
-          if (reader->CanRead(currentFiles.front()))
+          if (currReaderItem->GetMimeType().GetName() == mimeTypeIter->GetName() &&
+              currReaderItem->GetServiceId() == oldSelectedItemIter->second.GetServiceId() &&
+              currReaderItem->GetConfidenceLevel() >= oldSelectedItemIter->second.GetConfidenceLevel())
           {
-            finalReaders.push_back(reader);
-            finalReaderLabels.push_back(readerRef->GetProperty(mitk::IFileReader::PROP_DESCRIPTION()).ToString());
+            // okay, we used the same reader already, re-use its options
+            selectedMimeType = mimeTypeIter->GetName();
+            callOptionsCallback = false;
+            infoIter->m_ReaderSelector.Select(oldSelectedItemIter->second.GetServiceId());
+            infoIter->m_ReaderSelector.GetSelected().GetReader()->SetOptions(
+                  oldSelectedItemIter->second.GetReader()->GetOptions());
+            break;
           }
         }
-        catch (const std::exception& e)
-        {
-          MITK_ERROR << "Calling CanRead('" << currentFiles.front() << "') on " << typeid(reader).name() << "failed: " << e.what();
-        }
+        if (!selectedMimeType.empty()) break;
       }
     }
 
-    if (finalReaders.empty())
+    if (callOptionsCallback && optionsCallback)
     {
-      errMsg += "No reader available for files\n\n";
-      for(FileSorter::FileVector::const_iterator fileIter = currentFiles.begin(),
-          fileIterEnd = currentFiles.end(); fileIter != fileIterEnd; ++fileIter)
+      callOptionsCallback = (*optionsCallback)(*infoIter);
+      if (!callOptionsCallback && !infoIter->m_Cancel)
       {
-        errMsg += "  * " + *fileIter + "\n";
-      }
-    }
-    else
-    {
-      // TODO check if the reader can read a series of files and if yes,
-      //      pass the complete file list to one "Read" call.
-
-      bool callOptionsCallback = finalReaders.size() > 1 || !finalReaders.front()->GetOptions().empty();
-      mitk::IFileReader* selectedReader = finalReaders.front();
-
-      for(FileSorter::FileVector::const_iterator fileIter = currentFiles.begin(),
-          fileIterEnd = currentFiles.end(); fileIter != fileIterEnd; ++fileIter)
-      {
-        if (callOptionsCallback && optionsCallback)
-        {
-          callOptionsCallback = (*optionsCallback)(*fileIter, finalReaderLabels, finalReaders, selectedReader);
-        }
-        if (selectedReader == NULL)
-        {
-          errMsg += "Reading operation(s) cancelled.";
-          break;
-        }
-
-        MITK_INFO << "******* USING READER " << typeid(*selectedReader).name() << "*********";
-
-        // Do the actual reading
-        try
-        {
-          // Correct conversion for File names.(BUG 12252)
-          const std::string& stdFile = *fileIter;
-
-          DataStorage::SetOfObjects::Pointer nodes;
-          // Now do the actual reading
-          if (ds != NULL)
-          {
-            nodes = selectedReader->Read(stdFile, *ds);
-          }
-          else
-          {
-            nodes = DataStorage::SetOfObjects::New();
-            std::vector<mitk::BaseData::Pointer> baseData = selectedReader->Read(stdFile);
-            for (std::vector<mitk::BaseData::Pointer>::iterator iter = baseData.begin();
-                 iter != baseData.end(); ++iter)
-            {
-              if (iter->IsNotNull())
-              {
-                mitk::DataNode::Pointer node = mitk::DataNode::New();
-                node->SetData(*iter);
-                nodes->InsertElement(nodes->Size(), node);
-              }
-            }
-          }
-
-          for (DataStorage::SetOfObjects::ConstIterator nodeIter = nodes->Begin(),
-               nodeIterEnd = nodes->End(); nodeIter != nodeIterEnd; ++nodeIter)
-          {
-            const mitk::DataNode::Pointer& node = nodeIter->Value();
-            mitk::BaseData::Pointer data = node->GetData();
-            if (data.IsNull())
-            {
-              continue;
-            }
-
-            mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New(stdFile);
-            data->SetProperty("path", pathProp);
-
-            if (result)
-            {
-              result->push_back(data);
-            }
-            if (nodeResult)
-            {
-              nodeResult->push_back(nodeIter->Value());
-            }
-          }
-
-          if ((result && result->empty()) || (nodeResult && nodeResult->Size() == 0))
-          {
-            errMsg += "Unknown read error occurred reading " + stdFile;
-          }
-        }
-        catch (const std::exception& e)
-        {
-          errMsg += "Exception occured when reading file " + *fileIter + ":\n" + e.what() + "\n\n";
-        }
-        mitk::ProgressBar::GetInstance()->Progress(2);
-        --filesToRead;
-      }
-
-      if (selectedReader == NULL)
-      {
-        // reading was cancelled within the optionsCallback,
-        // break outer loop as well
-        break;
+        usedReaderItems.erase(selectedMimeType);
+        FileReaderSelector::Item selectedItem = infoIter->m_ReaderSelector.GetSelected();
+        usedReaderItems.insert(std::make_pair(selectedItem.GetMimeType().GetName(),
+                                              selectedItem));
       }
     }
 
-    for(std::vector<mitk::IFileReader*>::const_iterator readerIter = finalReaders.begin(),
-        readerIterEnd = finalReaders.end(); readerIter != readerIterEnd; ++readerIter)
+    if (infoIter->m_Cancel)
     {
-      readerRegistry.UngetReader(*readerIter);
+      errMsg += "Reading operation(s) cancelled.";
+      break;
     }
+
+    IFileReader* reader = infoIter->m_ReaderSelector.GetSelected().GetReader();
+    if (reader == NULL)
+    {
+      errMsg += "Unexpected NULL reader.";
+      break;
+    }
+
+    MITK_INFO << "******* USING READER " << typeid(*reader).name() << "*********";
+
+    // Do the actual reading
+    try
+    {
+      DataStorage::SetOfObjects::Pointer nodes;
+      if (ds != NULL)
+      {
+        nodes = reader->Read(infoIter->m_Path, *ds);
+      }
+      else
+      {
+        nodes = DataStorage::SetOfObjects::New();
+        std::vector<mitk::BaseData::Pointer> baseData = reader->Read(infoIter->m_Path);
+        for (std::vector<mitk::BaseData::Pointer>::iterator iter = baseData.begin();
+             iter != baseData.end(); ++iter)
+        {
+          if (iter->IsNotNull())
+          {
+            mitk::DataNode::Pointer node = mitk::DataNode::New();
+            node->SetData(*iter);
+            nodes->InsertElement(nodes->Size(), node);
+          }
+        }
+      }
+
+      for (DataStorage::SetOfObjects::ConstIterator nodeIter = nodes->Begin(),
+           nodeIterEnd = nodes->End(); nodeIter != nodeIterEnd; ++nodeIter)
+      {
+        const mitk::DataNode::Pointer& node = nodeIter->Value();
+        mitk::BaseData::Pointer data = node->GetData();
+        if (data.IsNull())
+        {
+          continue;
+        }
+
+        mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New(infoIter->m_Path);
+        data->SetProperty("path", pathProp);
+
+        infoIter->m_Output.push_back(data);
+        if (nodeResult)
+        {
+          nodeResult->push_back(nodeIter->Value());
+        }
+      }
+
+      if (infoIter->m_Output.empty() || (nodeResult && nodeResult->Size() == 0))
+      {
+        errMsg += "Unknown read error occurred reading " + infoIter->m_Path;
+      }
+    }
+    catch (const std::exception& e)
+    {
+      errMsg += "Exception occured when reading file " + infoIter->m_Path + ":\n" + e.what() + "\n\n";
+    }
+    mitk::ProgressBar::GetInstance()->Progress(2);
+    --filesToRead;
   }
 
   if (!errMsg.empty())
@@ -916,23 +815,24 @@ void IOUtil::Save(const BaseData* data, const std::string& path, const IFileWrit
   Save(data, std::string(), path, options);
 }
 
-void IOUtil::Save(const BaseData* data, const std::string& mimeType, const std::string& path)
+void IOUtil::Save(const BaseData* data, const std::string& mimeType, const std::string& path,
+                  bool addExtension)
 {
-  Save(data, mimeType, path, IFileWriter::Options());
+  Save(data, mimeType, path, IFileWriter::Options(), addExtension);
 }
 
 void IOUtil::Save(const BaseData* data, const std::string& mimeType, const std::string& path,
-                  const IFileWriter::Options& options)
+                  const IFileWriter::Options& options, bool addExtension)
 {
   std::string errMsg;
   if (options.empty())
   {
-    errMsg = Save(data, mimeType, path, NULL);
+    errMsg = Save(data, mimeType, path, NULL, addExtension);
   }
   else
   {
     Impl::FixedWriterOptionsFunctor optionsCallback(options);
-    errMsg = Save(data, mimeType, path, &optionsCallback);
+    errMsg = Save(data, mimeType, path, &optionsCallback, addExtension);
   }
 
   if (!errMsg.empty())
@@ -941,7 +841,7 @@ void IOUtil::Save(const BaseData* data, const std::string& mimeType, const std::
   }
 }
 
-void IOUtil::Save(const std::vector<IOUtil::SaveInfo>& saveInfos)
+void IOUtil::Save(std::vector<IOUtil::SaveInfo>& saveInfos)
 {
   std::string errMsg = Save(saveInfos, NULL);
   if (!errMsg.empty())
@@ -974,20 +874,52 @@ bool IOUtil::SaveBaseData( mitk::BaseData* data, const std::string& path)
   return true;
 }
 
-std::string IOUtil::Save(const BaseData* data, const std::string& mimeType, const std::string& path,
-                         WriterOptionsFunctorBase* optionsCallback)
+std::string IOUtil::Save(const BaseData* data, const std::string& mimeTypeN, const std::string& path,
+                         WriterOptionsFunctorBase* optionsCallback, bool addExtension)
 {
   if (path.empty())
   {
     return "No output filename given";
   }
 
-  std::vector<SaveInfo> infos;
-  infos.push_back(SaveInfo(data, mimeType, path));
-  return Save(infos, optionsCallback);
+  mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
+
+  std::string mimeTypeName = mimeTypeN;
+
+  // If no mime-type is provided, we try to get the mime-type from the
+  // highest ranked IFileWriter object for the given BaseData type
+  if (mimeTypeName.empty())
+  {
+    std::vector<us::ServiceReferenceU> refs = us::GetModuleContext()->GetServiceReferences(
+          us::LDAPProp(us::ServiceConstants::OBJECTCLASS()) == us_service_interface_iid<IFileWriter>() &&
+          us::LDAPProp(IFileWriter::PROP_BASEDATA_TYPE()) == data->GetNameOfClass());
+    std::sort(refs.begin(), refs.end());
+    if (!refs.empty())
+    {
+      us::Any mimeProp = refs.back().GetProperty(IFileWriter::PROP_MIMETYPE());
+      if (mimeProp.Type() == typeid(std::string))
+      {
+        mimeTypeName = us::any_cast<std::string>(mimeProp);
+      }
+    }
+  }
+
+  MimeType mimeType = mimeTypeProvider->GetMimeTypeForName(mimeTypeName);
+  if (mimeType.IsValid())
+  {
+    std::string ext = itksys::SystemTools::GetFilenameExtension(path);
+    if (ext.empty() && addExtension)
+    {
+      ext = mimeType.GetExtensions().empty() ? std::string() : "." + mimeType.GetExtensions().front();
+    }
+    std::vector<SaveInfo> infos;
+    infos.push_back(SaveInfo(data, mimeType, path + ext));
+    return Save(infos, optionsCallback);
+  }
+  return "The mime-type '" + mimeTypeName + "' is not registered";
 }
 
-std::string IOUtil::Save(const std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorBase* optionsCallback)
+std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorBase* optionsCallback)
 {
   if (saveInfos.empty())
   {
@@ -999,111 +931,86 @@ std::string IOUtil::Save(const std::vector<SaveInfo>& saveInfos, WriterOptionsFu
 
   std::string errMsg;
 
-  // Group the SaveInfo objects by base data type and mime-type
-  SaveInfoSorter infoSorter;
-  std::string infoError;
-  for (std::vector<SaveInfo>::const_iterator iter = saveInfos.begin(), iterEnd = saveInfos.end();
-       iter != iterEnd; ++iter)
+  std::set<SaveInfo> usedSaveInfos;
+
+  for (std::vector<SaveInfo>::iterator infoIter = saveInfos.begin(),
+       infoIterEnd = saveInfos.end(); infoIter != infoIterEnd; ++infoIter)
   {
-    if (iter->m_BaseData == NULL)
-    {
-      infoError += "Cannot save NULL data to path " + (iter->m_Path.empty() ? "(NULL)" : iter->m_Path) + "\n";
-      continue;
-    }
-    if (iter->m_Path.empty())
-    {
-      infoError += std::string("Cannot save ") + (iter->m_BaseData == NULL ? "(NULL)" : iter->m_BaseData->GetNameOfClass()) +
-                   " data to unknown file path.\n";
-      continue;
-    }
-    infoSorter.AddSaveInfo(*iter);
-  }
+    const std::string baseDataType = infoIter->m_BaseData->GetNameOfClass();
 
-  if(!infoError.empty())
-  {
-    errMsg += "Invalid information:\n\n" + infoError + "\n\n";
-  }
-
-  FileWriterRegistry writerRegistry;
-
-  for (SaveInfoSorter::Iterator iter = infoSorter.Begin(), endIter = infoSorter.End();
-       iter != endIter; ++iter)
-  {
-    const SaveInfoSorter::SaveInfoVector& currentInfos = iter->second;
-
-    const std::string baseDataType = currentInfos.front().m_BaseData->GetNameOfClass();
-    const std::string mimeType = currentInfos.front().m_MimeType;
-
-    // Get all IFileWriter references for the base data and mime type
-    std::vector<FileWriterRegistry::WriterReference> writerRefs =
-        writerRegistry.GetReferences(baseDataType, mimeType);
-    std::sort(writerRefs.begin(), writerRefs.end());
-    std::reverse(writerRefs.begin(), writerRefs.end());
-
-    std::vector<IFileWriter*> writers;
-    std::vector<std::string> writerLabels;
-    for (std::vector<FileWriterRegistry::WriterReference>::const_iterator iter = writerRefs.begin(),
-         iterEnd = writerRefs.end(); iter != iterEnd; ++iter)
-    {
-      IFileWriter* writer = writerRegistry.GetWriter(*iter);
-      if (writer)
-      {
-        writers.push_back(writer);
-        writerLabels.push_back(iter->GetProperty(IFileWriter::PROP_DESCRIPTION()).ToString());
-      }
-    }
+    std::vector<FileWriterSelector::Item> writers = infoIter->m_WriterSelector.Get();
 
     // Error out if no compatible Writer was found
     if (writers.empty())
     {
       errMsg += std::string("No writer available for ") + baseDataType + " data.\n";
+      continue;
     }
-    else
-    {
-      bool callOptionsCallback = writers.size() > 1 || !writers.front()->GetOptions().empty();
-      mitk::IFileWriter* selectedWriter = writers.front();
 
-      for (SaveInfoSorter::SaveInfoVector::const_iterator infoIter = currentInfos.begin(),
-           infoIterEnd = currentInfos.end(); infoIter != infoIterEnd; ++infoIter)
+    bool callOptionsCallback = writers.size() > 1 || !writers[0].GetWriter()->GetOptions().empty();
+
+    // check if we already used a writer for this base data type
+    // which should be re-used
+    std::set<SaveInfo>::const_iterator oldSaveInfoIter = usedSaveInfos.find(*infoIter);
+    if (oldSaveInfoIter != usedSaveInfos.end())
+    {
+      // we previously saved a base data object of the same data with the same mime-type,
+      // check if the same writer is contained in the current writer set and if the
+      // confidence level matches
+      FileWriterSelector::Item oldSelectedItem =
+          oldSaveInfoIter->m_WriterSelector.Get(oldSaveInfoIter->m_WriterSelector.GetSelectedId());
+      for (std::vector<FileWriterSelector::Item>::const_iterator currWriterItem = writers.begin(),
+           currWriterItemEnd = writers.end(); currWriterItem != currWriterItemEnd; ++currWriterItem)
       {
-        if (callOptionsCallback && optionsCallback)
+        if (currWriterItem->GetServiceId() == oldSelectedItem.GetServiceId() &&
+            currWriterItem->GetConfidenceLevel() >= oldSelectedItem.GetConfidenceLevel())
         {
-          callOptionsCallback = (*optionsCallback)(infoIter->m_Path, writerLabels, writers, selectedWriter);
-        }
-        if (selectedWriter == NULL)
-        {
-          errMsg += "Writing operation(s) cancelled.";
+          // okay, we used the same writer already, re-use its options
+          callOptionsCallback = false;
+          infoIter->m_WriterSelector.Select(oldSaveInfoIter->m_WriterSelector.GetSelectedId());
+          infoIter->m_WriterSelector.GetSelected().GetWriter()->SetOptions(
+                oldSelectedItem.GetWriter()->GetOptions());
           break;
         }
-
-        MITK_INFO << "******* USING WRITER " << typeid(*selectedWriter).name() << "*********";
-
-        // Do the actual writing
-        try
-        {
-          selectedWriter->Write(infoIter->m_BaseData, infoIter->m_Path);
-        }
-        catch(const std::exception& e)
-        {
-          errMsg += std::string("Exception occurred when writing to ") + infoIter->m_Path + ":\n" + e.what() + "\n";
-        }
-        mitk::ProgressBar::GetInstance()->Progress(2);
-        --filesToWrite;
-      }
-
-      if (selectedWriter == NULL)
-      {
-        // writing was cancelled within the optionsCallback,
-        // break outer loop as well
-        break;
       }
     }
 
-    for(std::vector<mitk::IFileWriter*>::const_iterator writerIter = writers.begin(),
-        writerIterEnd = writers.end(); writerIter != writerIterEnd; ++writerIter)
+    if (callOptionsCallback && optionsCallback)
     {
-      writerRegistry.UngetWriter(*writerIter);
+      callOptionsCallback = (*optionsCallback)(*infoIter);
+      if (!callOptionsCallback && !infoIter->m_Cancel)
+      {
+        usedSaveInfos.erase(*infoIter);
+        usedSaveInfos.insert(*infoIter);
+      }
     }
+
+    if (infoIter->m_Cancel)
+    {
+      errMsg += "Writing operation(s) cancelled.";
+      break;
+    }
+
+    IFileWriter* writer = infoIter->m_WriterSelector.GetSelected().GetWriter();
+    if (writer == NULL)
+    {
+      errMsg += "Unexpected NULL writer.";
+      break;
+    }
+
+    MITK_INFO << "******* USING WRITER " << typeid(*writer).name() << "*********";
+
+    // Do the actual writing
+    try
+    {
+      writer->Write(infoIter->m_BaseData, infoIter->m_Path);
+    }
+    catch(const std::exception& e)
+    {
+      errMsg += std::string("Exception occurred when writing to ") + infoIter->m_Path + ":\n" + e.what() + "\n";
+    }
+    mitk::ProgressBar::GetInstance()->Progress(2);
+    --filesToWrite;
   }
 
   if (!errMsg.empty())
@@ -1150,10 +1057,38 @@ void IOUtil::Impl::SetDefaultDataNodeProperties(DataNode* node, const std::strin
   }
 }
 
-IOUtil::SaveInfo::SaveInfo(const BaseData* baseData, const std::string& mimeType, const std::string& path)
+IOUtil::SaveInfo::SaveInfo(const BaseData* baseData)
+  : m_BaseData(baseData)
+  , m_WriterSelector(baseData, std::string())
+  , m_Cancel(false)
+{
+}
+
+IOUtil::SaveInfo::SaveInfo(const BaseData* baseData, const MimeType& mimeType,
+                           const std::string& path)
   : m_BaseData(baseData)
   , m_MimeType(mimeType)
+  , m_WriterSelector(baseData, mimeType.IsValid() ? mimeType.GetName() : std::string())
   , m_Path(path)
+  , m_Cancel(false)
+{
+}
+
+bool IOUtil::SaveInfo::operator<(const IOUtil::SaveInfo& other) const
+{
+  int r = strcmp(m_BaseData->GetNameOfClass(), other.m_BaseData->GetNameOfClass());
+  if (r == 0)
+  {
+    return m_WriterSelector.GetSelected().GetMimeType() <
+        other.m_WriterSelector.GetSelected().GetMimeType();
+  }
+  return r < 0;
+}
+
+IOUtil::LoadInfo::LoadInfo(const std::string& path)
+  : m_Path(path)
+  , m_ReaderSelector(path)
+  , m_Cancel(false)
 {
 }
 

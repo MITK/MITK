@@ -19,7 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 
+#include <mitkMimeType.h>
+
 #include <usServiceInterface.h>
+#include <usServiceReference.h>
 
 #include <vector>
 
@@ -30,7 +33,7 @@ namespace mitk {
  *        mime types.
  *
  * Mime types are added to the system by registering a service object of type
- * IMimeType and the registered mime types can be queried bei either using direct
+ * CustomMimeType and the registered mime types can be queried bei either using direct
  * look-ups in the service registry or calling the methods of this service interface.
  *
  * This service interface also allows to infer the mime type of a file on the file
@@ -38,7 +41,7 @@ namespace mitk {
  *
  * @note This is a <em>core service</em>
  *
- * @sa IMimeType
+ * @sa CustomMimeType
  * @sa CoreServices::GetMimeTypeProvider()
  */
 struct MITK_CORE_EXPORT IMimeTypeProvider
@@ -46,19 +49,15 @@ struct MITK_CORE_EXPORT IMimeTypeProvider
 
   virtual ~IMimeTypeProvider();
 
-  virtual std::vector<std::string> GetMimeTypes() const = 0;
+  virtual std::vector<MimeType> GetMimeTypes() const = 0;
 
-  virtual std::vector<std::string> GetMimeTypesForFile(const std::string& filePath) const = 0;
+  virtual std::vector<MimeType> GetMimeTypesForFile(const std::string& filePath) const = 0;
 
-  virtual std::vector<std::string> GetMimeTypesForExtension(const std::string& extension) const = 0;
+  virtual std::vector<MimeType> GetMimeTypesForExtension(const std::string& extension) const = 0;
 
-  virtual std::vector<std::string> GetMimeTypesForCategory(const std::string& category) const = 0;
+  virtual std::vector<MimeType> GetMimeTypesForCategory(const std::string& category) const = 0;
 
-  virtual std::string GetDescription(const std::string& mimeType) const = 0;
-
-  virtual std::vector<std::string> GetExtensions(const std::string& mimeType) const = 0;
-
-  virtual std::string GetCategory(const std::string& mimeType) const = 0;
+  virtual MimeType GetMimeTypeForName(const std::string& name) const = 0;
 
   /**
    * @brief Get a sorted and unique list of mime-type categories.

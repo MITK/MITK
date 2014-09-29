@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkIFileReader.h>
 #include <mitkBaseData.h>
-#include <mitkIMimeType.h>
 
 // Microservices
 #include <usServiceRegistration.h>
@@ -35,6 +34,8 @@ namespace us {
 }
 
 namespace mitk {
+
+class CustomMimeType;
 
 /**
  * @brief Base class for creating mitk::BaseData objects from files or streams.
@@ -62,32 +63,13 @@ public:
 
   virtual DataStorage::SetOfObjects::Pointer Read(std::istream& stream, mitk::DataStorage& ds);
 
+  virtual ConfidenceLevel GetConfidenceLevel(const std::string &path) const;
+
   virtual Options GetOptions() const;
   virtual us::Any GetOption(const std::string &name) const;
 
   virtual void SetOptions(const Options& options);
   virtual void SetOption(const std::string& name, const us::Any& value);
-
-  /**
-   * @brief Checks if the specified path can be read.
-   *
-   * The default implementation checks if the path exists and contains a
-   * file extension associated with the mime-type of this reader.
-   * It then creates a std::ifstream object for the given path and
-   * calls CanRead(const std::istream&).
-   *
-   * @param path The absolute path to a file.
-   * @return \c true if the file can be read, \c false otherwise.
-   */
-  virtual bool CanRead(const std::string& path) const;
-
-  /**
-   * @brief Checks if the specified input stream can be read.
-   *
-   * @param stream The stream to be read.
-   * @return \c true if the stream is good, \c false otherwise.
-   */
-  virtual bool CanRead(std::istream& stream) const;
 
   virtual void AddProgressCallback(const ProgressCallback& callback);
 
@@ -104,24 +86,13 @@ public:
    * having the form "application/vnd.mitk.<extension>".
    *
    * @param extension The file extension (without a leading period) for which a registered
-   *        IMimeType object is looked up and associated with this reader instance.
+   *        mime-type object is looked up and associated with this reader instance.
    * @param description A human readable description of this reader.
    */
   us::ServiceRegistration<IFileReader> RegisterService(us::ModuleContext* context = us::GetModuleContext());
   void UnregisterService();
 
 protected:
-
-  class MITK_CORE_EXPORT MimeType : public std::string
-  {
-  public:
-    MimeType(const std::string& mimeType);
-
-  private:
-    MimeType();
-
-    friend class AbstractFileReader;
-  };
 
   AbstractFileReader();
   ~AbstractFileReader();
@@ -138,7 +109,7 @@ protected:
    *
    * @see RegisterService
    */
-  explicit AbstractFileReader(const MimeType& mimeType, const std::string& description);
+  explicit AbstractFileReader(const CustomMimeType& mimeType, const std::string& description);
 
   /**
    * Associate this reader with the given file extension.
@@ -147,7 +118,7 @@ protected:
    * or SetExtensions.
    *
    * @param extension The file extension (without a leading period) for which a registered
-   *        IMimeType object is looked up and associated with this reader instance.
+   *        mime-type object is looked up and associated with this reader instance.
    * @param description A human readable description of this reader.
    *
    * @see RegisterService
@@ -157,32 +128,26 @@ protected:
   virtual us::ServiceProperties GetServiceProperties() const;
 
   /**
-   * Registers a new IMimeType service object.
+   * Registers a new CustomMimeType service object.
    *
    * This method is called from RegisterService and the default implementation
-   * registers a new IMimeType service object if all of the following conditions
+   * registers a new mime-type service object if all of the following conditions
    * are true:
    *
-   *  - The reader
+   *  - TODO
    *
    * @param context
    * @return
    * @throws std::invalid_argument if \c context is NULL.
    */
-  virtual us::ServiceRegistration<IMimeType> RegisterMimeType(us::ModuleContext* context);
+  virtual us::ServiceRegistration<CustomMimeType> RegisterMimeType(us::ModuleContext* context);
 
-  void SetMimeType(const std::string& mimeType);
+  void SetMimeType(const CustomMimeType& mimeType);
 
   /**
    * @return The mime-type this reader can handle.
    */
-  std::string GetMimeType() const;
-
-  void SetCategory(const std::string& category);
-  std::string GetCategory() const;
-
-  std::vector<std::string> GetExtensions() const;
-  void AddExtension(const std::string& extension);
+  CustomMimeType GetMimeType() const;
 
   void SetDescription(const std::string& description);
   std::string GetDescription() const;

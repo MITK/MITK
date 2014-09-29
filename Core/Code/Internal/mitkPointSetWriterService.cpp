@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPointSetWriterService.h"
+#include "mitkCustomMimeType.h"
+
 #include <iostream>
 #include <fstream>
 #include <locale>
@@ -37,11 +39,10 @@ const std::string mitk::PointSetWriterService::VERSION_STRING = "0.1" ;
 
 
 mitk::PointSetWriterService::PointSetWriterService()
-  : AbstractFileWriter(PointSet::GetStaticNameOfClass(), MimeType("application/vnd.mitk.pointset"), "MITK Point Set Writer")
+  : AbstractFileWriter(PointSet::GetStaticNameOfClass(), CustomMimeType("application/vnd.mitk.pointset"), "MITK Point Set Writer")
   , m_IndentDepth(0)
   , m_Indent(2)
 {
-  this->AddExtension("mps");
   RegisterService();
 }
 

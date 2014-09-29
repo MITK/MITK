@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkIFileWriter.h>
-#include <mitkIMimeType.h>
 
 // Microservices
 #include <usServiceRegistration.h>
@@ -36,6 +35,8 @@ namespace us {
 }
 
 namespace mitk {
+
+class CustomMimeType;
 
 /**
  * @brief Base class for writing mitk::BaseData objects to files or streams.
@@ -62,6 +63,8 @@ public:
    */
   virtual void Write(const BaseData* data, std::ostream& stream ) = 0;
 
+  virtual ConfidenceLevel GetConfidenceLevel(const BaseData *data) const;
+
   virtual Options GetOptions() const;
   virtual us::Any GetOption(const std::string &name) const;
 
@@ -77,58 +80,39 @@ public:
 
 protected:
 
-  class MITK_CORE_EXPORT MimeType : public std::string
-  {
-  public:
-    MimeType(const std::string& mimeType);
-
-  private:
-    MimeType();
-
-    friend class AbstractFileReader;
-  };
-
-  AbstractFileWriter();
   ~AbstractFileWriter();
 
   AbstractFileWriter(const AbstractFileWriter& other);
 
-  AbstractFileWriter(const std::string& basedataType, const MimeType& mimeType, const std::string& description);
+  AbstractFileWriter(const std::string& baseDataType);
 
-  AbstractFileWriter(const std::string& basedataType, const std::string& extension, const std::string& description);
+  AbstractFileWriter(const std::string& baseDataType, const CustomMimeType& mimeType, const std::string& description);
+
+  AbstractFileWriter(const std::string& baseDataType, const std::string& extension, const std::string& description);
 
   virtual us::ServiceProperties GetServiceProperties() const;
 
   /**
-   * Registers a new IMimeType service object.
+   * Registers a new CustomMimeType service object.
    *
    * This method is called from RegisterService and the default implementation
-   * registers a new IMimeType service object if all of the following conditions
+   * registers a new mime-type service object if all of the following conditions
    * are true:
    *
-   *  - The writer
+   *  - TODO
    *
    * @param context
    * @return
    * @throws std::invalid_argument if \c context is NULL.
    */
-  virtual us::ServiceRegistration<IMimeType> RegisterMimeType(us::ModuleContext* context);
+  virtual us::ServiceRegistration<CustomMimeType> RegisterMimeType(us::ModuleContext* context);
 
-  void SetMimeType(const std::string& mimeType);
+  void SetMimeType(const CustomMimeType& mimeType);
 
   /**
    * @return Get the mime-type this writer can handle.
    */
-  std::string GetMimeType() const;
-
-  void SetCategory(const std::string& category);
-  std::string GetCategory() const;
-
-  /**
-   * \brief Get file extension that this writer is able to handle.
-   */
-  std::vector<std::string> GetExtensions() const;
-  void AddExtension(const std::string& extension);
+  CustomMimeType GetMimeType() const;
 
   /**
    * \brief Sets a human readable description of this writer.

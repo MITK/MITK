@@ -38,6 +38,7 @@ namespace itk {
 }
 
 namespace mitk {
+
   /**
    * \brief The common interface for all MITK file readers.
    *
@@ -48,19 +49,29 @@ namespace mitk {
    *
    * The file reader implementation is associated with a mime-type, specified
    * in the service property PROP_MIMETYPE(). The specified mime-type should
-   * have a corresponding IMimeType service object, registered by the reader
+   * have a corresponding CustomMimeType service object, registered by the reader
    * or some other party.
    *
    * It is recommended to derive new implementations from AbstractFileReader,
    * which provides correct service registration semantics.
    *
    * \sa AbstractFileReader
-   * \sa IMimeType
+   * \sa CustomMimeType
    * \sa FileReaderRegistry
    * \sa IFileWriter
    */
   struct MITK_CORE_EXPORT IFileReader
   {
+
+    // The order of the enum values is important: it is used
+    // to rank writer implementations
+    enum ConfidenceLevel
+    {
+      Unsupported = 0,
+      PartiallySupported = 8,
+      Supported = 16
+    };
+
     virtual ~IFileReader();
 
     typedef std::map<std::string, us::Any> Options;
@@ -91,6 +102,8 @@ namespace mitk {
      */
     virtual DataStorage::SetOfObjects::Pointer Read(std::istream& stream, mitk::DataStorage& ds) = 0;
 
+    virtual ConfidenceLevel GetConfidenceLevel(const std::string& path) const = 0;
+
     /**
      * \brief returns a list of the supported Options
      *
@@ -114,19 +127,6 @@ namespace mitk {
     virtual void SetOptions(const Options& options) = 0;
 
     virtual void SetOption(const std::string& name, const us::Any& value) = 0;
-
-    /**
-     * \brief Returns true if this writer can confirm that it can read this file and false otherwise.
-     */
-    virtual bool CanRead(const std::string& path) const = 0;
-
-    /**
-     * \brief Returns true if this writer can read from the specified stream.
-     *
-     * @param stream The input stream.
-     * @return \c true if the stream can be read, \c false otherwise.
-     */
-    virtual bool CanRead(std::istream& stream) const = 0;
 
     virtual void AddProgressCallback(const ProgressCallback& callback) = 0;
 

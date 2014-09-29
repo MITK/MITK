@@ -29,6 +29,9 @@ public:
   typedef IFileReader::Options ReaderOptions;
   typedef IFileWriter::Options WriterOptions;
 
+  typedef IFileReader::ConfidenceLevel ReaderConfidenceLevel;
+  typedef IFileWriter::ConfidenceLevel WriterConfidenceLevel;
+
   ReaderOptions GetReaderOptions() const;
   us::Any GetReaderOption(const std::string &name) const;
 
@@ -40,11 +43,9 @@ public:
 
 protected:
 
-  typedef AbstractFileReader::MimeType MimeType;
-
-  AbstractFileIO();
-
   AbstractFileIO(const AbstractFileIO& other);
+
+  AbstractFileIO(const std::string& baseDataType);
 
   /**
    * Associate this reader instance with the given MIME type.
@@ -56,17 +57,18 @@ protected:
    *
    * @see RegisterService
    */
-  explicit AbstractFileIO(const std::string& baseDataType, const MimeType& mimeType,
+  explicit AbstractFileIO(const std::string& baseDataType, const CustomMimeType& mimeType,
                           const std::string& description);
 
   /**
    * Associate this reader with the given file extension.
    *
    * Additonal file extensions can be added by sub-classes by calling AddExtension
-   * or SetExtensions.
+   * or SetExtensions on the CustomMimeType object returned by GetMimeType() and
+   * setting the modified object again via SetMimeType().
    *
    * @param extension The file extension (without a leading period) for which a registered
-   *        IMimeType object is looked up and associated with this reader instance.
+   *        mime-type object is looked up and associated with this instance.
    * @param description A human readable description of this reader.
    *
    * @see RegisterService
@@ -74,18 +76,15 @@ protected:
   explicit AbstractFileIO(const std::string& baseDataType, const std::string& extension,
                           const std::string& description);
 
-  void SetMimeType(const std::string& mimeType);
+  virtual ReaderConfidenceLevel GetReaderConfidenceLevel(const std::string& path) const;
+  virtual WriterConfidenceLevel GetWriterConfidenceLevel(const BaseData* data) const;
+
+  void SetMimeType(const CustomMimeType& mimeType);
 
   /**
    * @return The mime-type this reader can handle.
    */
-  std::string GetMimeType() const;
-
-  void SetCategory(const std::string& category);
-  std::string GetCategory() const;
-
-  std::vector<std::string> GetExtensions() const;
-  void AddExtension(const std::string& extension);
+  CustomMimeType GetMimeType() const;
 
   void SetReaderDescription(const std::string& description);
   std::string GetReaderDescription() const;
@@ -120,6 +119,9 @@ private:
   AbstractFileIO& operator=(const AbstractFileIO& other);
 
   virtual AbstractFileIO* Clone() const = 0;
+
+  virtual ReaderConfidenceLevel GetConfidenceLevel(const std::string& path) const;
+  virtual WriterConfidenceLevel GetConfidenceLevel(const BaseData *data) const;
 
 };
 

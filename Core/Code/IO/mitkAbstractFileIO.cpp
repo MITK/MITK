@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAbstractFileIO.h"
 
+#include "mitkCustomMimeType.h"
+
 namespace mitk {
 
 AbstractFileIO::ReaderOptions AbstractFileIO::GetReaderOptions() const
@@ -47,80 +49,56 @@ AbstractFileIO::RegisterService(us::ModuleContext* context)
   return result;
 }
 
-AbstractFileIO::AbstractFileIO()
-{
-}
-
 AbstractFileIO::AbstractFileIO(const AbstractFileIO& other)
   : AbstractFileReader(other)
   , AbstractFileWriter(other)
 {
 }
 
+AbstractFileIO::AbstractFileIO(const std::string& baseDataType)
+  : AbstractFileReader()
+  , AbstractFileWriter(baseDataType)
+{
+}
+
 AbstractFileIO::AbstractFileIO(const std::string& baseDataType,
-                               const AbstractFileIO::MimeType& mimeType,
+                               const CustomMimeType& mimeType,
                                const std::string& description)
   : AbstractFileReader(mimeType, description)
-  , AbstractFileWriter()
+  , AbstractFileWriter(baseDataType, mimeType, description)
 {
-  this->AbstractFileWriter::SetBaseDataType(baseDataType);
-  this->AbstractFileWriter::SetMimeType(mimeType);
 }
 
 AbstractFileIO::AbstractFileIO(const std::string& baseDataType, const std::string& extension, const std::string& description)
   : AbstractFileReader(extension, description)
+  , AbstractFileWriter(baseDataType, extension, description)
 {
-  this->AbstractFileWriter::SetBaseDataType(baseDataType);
-  this->AbstractFileWriter::AddExtension(extension);
-  this->AbstractFileWriter::SetDescription(description);
 }
 
-void AbstractFileIO::SetMimeType(const std::string& mimeType)
+AbstractFileIO::ReaderConfidenceLevel AbstractFileIO::GetReaderConfidenceLevel(const std::string& /*path*/) const
+{
+  return IFileReader::Supported;
+}
+
+AbstractFileIO::WriterConfidenceLevel AbstractFileIO::GetWriterConfidenceLevel(const BaseData* /*data*/) const
+{
+  return IFileWriter::Supported;
+}
+
+void AbstractFileIO::SetMimeType(const CustomMimeType& mimeType)
 {
   this->AbstractFileReader::SetMimeType(mimeType);
   this->AbstractFileWriter::SetMimeType(mimeType);
 }
 
-std::string AbstractFileIO::GetMimeType() const
+CustomMimeType AbstractFileIO::GetMimeType() const
 {
-  std::string mimeType = this->AbstractFileReader::GetMimeType();
-  if (mimeType != this->AbstractFileWriter::GetMimeType())
+  CustomMimeType mimeType = this->AbstractFileReader::GetMimeType();
+  if (mimeType.GetName() != this->AbstractFileWriter::GetMimeType().GetName())
   {
     MITK_WARN << "Reader and writer mime-tpyes are different, using the mime-type from IFileReader";
   }
   return mimeType;
-}
-
-void AbstractFileIO::SetCategory(const std::string& category)
-{
-  this->AbstractFileReader::SetCategory(category);
-  this->AbstractFileWriter::SetCategory(category);
-}
-
-std::string AbstractFileIO::GetCategory() const
-{
-  std::string category = this->AbstractFileReader::GetCategory();
-  if (category != this->AbstractFileWriter::GetCategory())
-  {
-    MITK_WARN << "Reader and writer mime-tpyes are different, using the mime-type from IFileReader";
-  }
-  return category;
-}
-
-std::vector<std::string> AbstractFileIO::GetExtensions() const
-{
-  std::vector<std::string> extensions = this->AbstractFileReader::GetExtensions();
-  if (extensions != this->AbstractFileWriter::GetExtensions())
-  {
-    MITK_WARN << "Reader and writer extensions are different, using extensions from IFileReader";
-  }
-  return extensions;
-}
-
-void AbstractFileIO::AddExtension(const std::string& extension)
-{
-  this->AbstractFileReader::AddExtension(extension);
-  this->AbstractFileWriter::AddExtension(extension);
 }
 
 void AbstractFileIO::SetReaderDescription(const std::string& description)
@@ -183,6 +161,18 @@ int AbstractFileIO::GetWriterRanking() const
   return this->AbstractFileWriter::GetRanking();
 }
 
+AbstractFileIO::ReaderConfidenceLevel AbstractFileIO::GetConfidenceLevel(const std::string& path) const
+{
+  ReaderConfidenceLevel level = AbstractFileReader::GetConfidenceLevel(path);
+  if (level == IFileReader::Unsupported) return level;
+  return this->GetReaderConfidenceLevel(path);
+}
 
+AbstractFileIO::WriterConfidenceLevel AbstractFileIO::GetConfidenceLevel(const BaseData* data) const
+{
+  WriterConfidenceLevel level = AbstractFileWriter::GetConfidenceLevel(data);
+  if (level == IFileWriter::Unsupported) return level;
+  return this->GetWriterConfidenceLevel(data);
+}
 
 }

@@ -294,6 +294,7 @@ bool compareQStandardItems(QStandardItem* a, QStandardItem* b)
 QmitkViewNavigatorWidget::QmitkViewNavigatorWidget( QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
 {
+    m_Generated = false;
     this->CreateQtPartControl(this);
 }
 
@@ -336,7 +337,6 @@ void QmitkViewNavigatorWidget::CreateQtPartControl( QWidget *parent )
     m_FilterProxyModel->setSourceModel(m_TreeModel);
     //proxyModel->setFilterFixedString("Diff");
     m_Controls.m_PluginTreeView->setModel(m_FilterProxyModel);
-    FillTreeList();
 }
 
 void QmitkViewNavigatorWidget::UpdateTreeList(QStandardItem* root, berry::IWorkbenchPartReference *partRef, const std::string &changeId)
@@ -344,6 +344,11 @@ void QmitkViewNavigatorWidget::UpdateTreeList(QStandardItem* root, berry::IWorkb
     berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
     if (page.IsNull())
         return;
+
+    if( !m_Generated )
+    {
+      m_Generated = FillTreeList();
+    }
 
     if (root==NULL)
         root = m_TreeModel->invisibleRootItem();

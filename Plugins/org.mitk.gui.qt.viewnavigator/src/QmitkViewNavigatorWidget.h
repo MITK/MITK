@@ -81,6 +81,7 @@ protected:
     ClassFilterProxyModel*                      m_FilterProxyModel;
     QMenu*                                      m_ContextMenu;
     berry::IPerspectiveDescriptor::Pointer      m_RegisteredPerspective;
+    bool                                        m_Generated;
 
 private:
 

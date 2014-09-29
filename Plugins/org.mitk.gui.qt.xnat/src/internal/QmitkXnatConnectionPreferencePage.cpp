@@ -206,8 +206,14 @@ void QmitkXnatConnectionPreferencePage::UrlChanged()
 void QmitkXnatConnectionPreferencePage::DownloadPathChanged()
 {
   m_Controls.inDownloadPath->setStyleSheet("QLineEdit { background-color: white; }");
-  if(!m_Controls.inDownloadPath->text().isEmpty())
+  QString downloadPath = m_Controls.inDownloadPath->text();
+  if(!downloadPath.isEmpty())
   {
+    if (downloadPath.lastIndexOf("/") != downloadPath.size()-1)
+    {
+      downloadPath.append("/");
+      m_Controls.inDownloadPath->setText(downloadPath);
+    }
     QFileInfo path(m_Controls.inDownloadPath->text());
     if(!path.isDir())
     {

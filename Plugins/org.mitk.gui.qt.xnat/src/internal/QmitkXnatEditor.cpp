@@ -316,7 +316,8 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
       mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
       if(dsService != NULL)
       {
-        mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode((m_DownloadPath + file->id()).toStdString());
+        QString name = file->property("Name");
+        mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode((m_DownloadPath + name).toStdString());
         if ( ( node.IsNotNull() ) && ( node->GetData() != NULL ) )
         {
           dsService->GetDataStorage()->GetDataStorage()->Add(node);
@@ -350,12 +351,13 @@ void QmitkXnatEditor::InternalFileDownload(const QModelIndex& index)
     {
       MITK_INFO << "Download started ...";
       MITK_INFO << "...";
-      QString filePath = m_DownloadPath + file->id();
+      QString name = file->property("Name");
+      QString filePath = m_DownloadPath + name;
       file->download(filePath);
 
       // Testing if the file exists
       QDir downDir(m_DownloadPath);
-      if( downDir.exists(file->id()) )
+      if( downDir.exists(name) )
       {
         MITK_INFO << "Download of " << file->id().toStdString() << " was completed!";
       }

@@ -50,6 +50,7 @@ public:
     virtual ~QmitkViewNavigatorWidget();
 
     virtual void CreateQtPartControl(QWidget *parent);
+    void setFocus();
 
     bool FillTreeList();
     void UpdateTreeList(QStandardItem* item = NULL, berry::IWorkbenchPartReference* partRef=NULL, const std::string& changeId="");
@@ -80,6 +81,7 @@ protected:
     ClassFilterProxyModel*                      m_FilterProxyModel;
     QMenu*                                      m_ContextMenu;
     berry::IPerspectiveDescriptor::Pointer      m_RegisteredPerspective;
+    bool                                        m_Generated;
 
 private:
 

@@ -32,7 +32,7 @@ const std::string ViewNavigatorView::VIEW_ID = "org.mitk.views.viewnavigatorview
 
 void ViewNavigatorView::SetFocus()
 {
-
+  m_Controls.widget->setFocus();
 }
 
 void ViewNavigatorView::CreateQtPartControl( QWidget *parent )
@@ -40,14 +40,6 @@ void ViewNavigatorView::CreateQtPartControl( QWidget *parent )
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
 
-
-
-//  candyStore = new QDockWidget("Candy Store");
-//  candyStore->setWidget(new QmitkViewNavigatorWidget());
-//  candyStore->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-//  candyStore->setVisible(false);
-//  candyStore->setObjectName("Candy Store");
-//  mainWindow->addDockWidget(Qt::LeftDockWidgetArea, candyStore);
 }
 
 void ViewNavigatorView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,

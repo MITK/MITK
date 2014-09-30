@@ -99,6 +99,11 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
     //## @brief Return the MimeType of the saved File.
     virtual std::string GetWritenMIMEType();
 
+    virtual std::string GetSupportedBaseData() const = 0;
+
+    using ProcessObject::SetInput;
+    void SetInput( BaseData* data );
+
     virtual void Write() = 0;
 
     /**

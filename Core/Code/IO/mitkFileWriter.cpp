@@ -27,6 +27,11 @@ std::string mitk::FileWriter::GetWritenMIMEType()
   return "";
 }
 
+void mitk::FileWriter::SetInput(mitk::BaseData* data)
+{
+  this->SetNthInput(0, data);
+}
+
 std::string mitk::FileWriter::GetFileExtension()
 {
   return "";

@@ -116,6 +116,8 @@ public:
     */
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
+    virtual std::string GetSupportedBaseData() const;
+
     /**
     * @brief Return the extension to be added to the filename.
     */

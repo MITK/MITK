@@ -165,6 +165,9 @@ public:
     */
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
+    virtual std::string GetSupportedBaseData() const
+    { return Surface::GetStaticNameOfClass(); }
+
 protected:
 
     /**

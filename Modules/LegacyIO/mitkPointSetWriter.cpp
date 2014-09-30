@@ -376,6 +376,11 @@ std::vector<std::string> mitk::PointSetWriter::GetPossibleFileExtensions()
   return possibleFileExtensions;
 }
 
+std::string mitk::PointSetWriter::GetSupportedBaseData() const
+{
+  return PointSet::GetStaticNameOfClass();
+}
+
 std::string mitk::PointSetWriter::GetFileExtension()
 {
   return m_Extension;

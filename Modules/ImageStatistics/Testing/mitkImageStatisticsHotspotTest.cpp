@@ -168,7 +168,7 @@ struct mitkImageStatisticsHotspotTestClass
       std::stringstream(attributeValue) >> resultValue;
       return resultValue;
     }
-    catch(std::exception& e)
+    catch(std::exception& /*e*/)
     {
       MITK_TEST_CONDITION_REQUIRED(false, "Convert tag value '" << attributeValue << "' for tag '" << tag << "' to integer");
       return 0; // just to satisfy compiler
@@ -190,7 +190,7 @@ struct mitkImageStatisticsHotspotTestClass
       std::stringstream(attributeValue) >> resultValue;
       return resultValue;
     }
-    catch(std::exception& e)
+    catch(std::exception& /*e*/)
     {
       MITK_TEST_CONDITION_REQUIRED(false, "Convert tag value '" << attributeValue << "' for tag '" << tag << "' to double");
       return 0.0; // just to satisfy compiler

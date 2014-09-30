@@ -264,12 +264,12 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
     // number formatting)
     QString clipboard( "Mean \t StdDev \t RMS \t Max \t Min \t N \t V (mm³)\n" );
     clipboard = clipboard.append( "%L1 \t %L2 \t %L3 \t %L4 \t %L5 \t %L6 \t %L7" )
-      .arg( statistics.GetMean(), 0, 'f', 10 )
-      .arg( statistics.GetSigma(), 0, 'f', 10 )
-      .arg( statistics.GetRMS(), 0, 'f', 10 )
-      .arg( statistics.GetMax(), 0, 'f', 10 )
-      .arg( statistics.GetMin(), 0, 'f', 10 )
-      .arg( statistics.GetN() )
+      .arg( statistics[t].GetMean(), 0, 'f', 10 )
+      .arg( statistics[t].GetSigma(), 0, 'f', 10 )
+      .arg( statistics[t].GetRMS(), 0, 'f', 10 )
+      .arg( statistics[t].GetMax(), 0, 'f', 10 )
+      .arg( statistics[t].GetMin(), 0, 'f', 10 )
+      .arg( statistics[t].GetN() )
       .arg( m_Controls->m_StatisticsTable->item( 0, 6 )->text().toDouble(), 0, 'f', 10 );
 
     QApplication::clipboard()->setText(
@@ -765,12 +765,21 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   this->m_Controls->m_StatisticsTable->setColumnCount(image->GetTimeSteps());
   this->m_Controls->m_StatisticsTable->horizontalHeader()->setVisible(image->GetTimeSteps() > 1);
 
+  int decimals = 2;
+
+  mitk::PixelType doublePix = mitk::MakeScalarPixelType< double >();
+  mitk::PixelType floatPix = mitk::MakeScalarPixelType< float >();
+  if (image->GetPixelType()==doublePix || image->GetPixelType()==floatPix)
+  {
+    decimals = 5;
+  }
+
   for (unsigned int t = 0; t < image->GetTimeSteps(); t++)
   {
     this->m_Controls->m_StatisticsTable->setHorizontalHeaderItem(t,
       new QTableWidgetItem(QString::number(t)));
 
-    if (s[t].MaxIndex.size()==3)
+    if (s[t].GetMaxIndex().size()==3)
     {
       mitk::Point3D index, max, min;
       index[0] = s[t].GetMaxIndex()[0];
@@ -785,12 +794,6 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
       this->m_WorldMinList.push_back(min);
     }
 
-    int decimals = 2;
-
-    mitk::PixelType doublePix = mitk::MakeScalarPixelType< double >();
-    mitk::PixelType floatPix = mitk::MakeScalarPixelType< float >();
-    if (image->GetPixelType()==doublePix || image->GetPixelType()==floatPix)
-      decimals = 5;
 
     this->m_Controls->m_StatisticsTable->setItem( 0, t, new QTableWidgetItem(
       QString("%1").arg(s[t].GetMean(), 0, 'f', decimals) ) );
@@ -800,7 +803,7 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     this->m_Controls->m_StatisticsTable->setItem( 2, t, new QTableWidgetItem(
       QString("%1").arg(s[t].GetRMS(), 0, 'f', decimals) ) );
 
-    QString max; max.append(QString("%1").arg(s[t].Max, 0, 'f', decimals));
+    QString max; max.append(QString("%1").arg(s[t].GetMax(), 0, 'f', decimals));
     max += " (";
     for (int i=0; i<s[t].GetMaxIndex().size(); i++)
     {
@@ -852,13 +855,13 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   this->m_Controls->m_StatisticsTable->setMinimumHeight(height);
 
   // make sure the current timestep's column is highlighted (and the correct histogram is displayed)
-  unsigned int timestep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->
+  unsigned int t = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->
     GetPos();
   mitk::SliceNavigationController::GeometryTimeEvent timeEvent(this->m_SelectedImage->GetTimeGeometry(),
-    timestep);
+    t);
   this->OnTimeChanged(timeEvent);
 
-  QString hotspotMean; hotspotMean.append(QString("%1").arg(s[t].GetHotspotMean(), 0, 'f', decimals));
+  QString hotspotMean; hotspotMean.append(QString("%1").arg(s[t].GetHotspotStatistics().GetMean(), 0, 'f', decimals));
     hotspotMean += " (";
     for (int i=0; i<s[t].GetHotspotIndex().size(); i++)
     {
@@ -871,12 +874,12 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   this->m_Controls->m_StatisticsTable->setItem( 7, t, new QTableWidgetItem( hotspotMean ) );
 
 
-  QString hotspotMax; hotspotMax.append(QString("%1").arg(s[t].GetHotspotMax(), 0, 'f', decimals));
+  QString hotspotMax; hotspotMax.append(QString("%1").arg(s[t].GetHotspotStatistics().GetMax(), 0, 'f', decimals));
     hotspotMax += " (";
-    for (int i=0; i<s[t].GetHotspotMaxIndex().size(); i++)
+    for (int i=0; i<s[t].GetHotspotStatistics().GetMaxIndex().size(); i++)
     {
-        hotspotMax += QString::number(s[t].GetHotspotMaxIndex()[i]);
-        if (i<s[t].GetHotspotMaxIndex().size()-1)
+        hotspotMax += QString::number(s[t].GetHotspotStatistics().GetMaxIndex()[i]);
+        if (i<s[t].GetHotspotStatistics().GetMaxIndex().size()-1)
             hotspotMax += ",";
     }
     hotspotMax += ")";
@@ -884,12 +887,12 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   this->m_Controls->m_StatisticsTable->setItem( 8, t, new QTableWidgetItem( hotspotMax ) );
 
 
-  QString hotspotMin; hotspotMin.append(QString("%1").arg(s[t].GetHotspotMin(), 0, 'f', decimals));
+  QString hotspotMin; hotspotMin.append(QString("%1").arg(s[t].GetHotspotStatistics().GetMin(), 0, 'f', decimals));
     hotspotMin += " (";
-    for (int i=0; i<s[t].GetHotspotMinIndex().size(); i++)
+    for (int i=0; i<s[t].GetHotspotStatistics().GetMinIndex().size(); i++)
     {
-        hotspotMin += QString::number(s[t].GetHotspotMinIndex()[i]);
-        if (i<s[t].GetHotspotMinIndex().size()-1)
+        hotspotMin += QString::number(s[t].GetHotspotStatistics().GetMinIndex()[i]);
+        if (i<s[t].GetHotspotStatistics().GetMinIndex().size()-1)
             hotspotMin += ",";
     }
     hotspotMin += ")";

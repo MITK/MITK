@@ -18,42 +18,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef LegacyFileWriterService_H_HEADER_INCLUDED_C1E7E521
 #define LegacyFileWriterService_H_HEADER_INCLUDED_C1E7E521
 
-// Macro
-#include <MitkCoreExports.h>
-
-// MITK
 #include <mitkAbstractFileWriter.h>
-#include <mitkFileWriterWithInformation.h>
+#include <mitkFileWriter.h>
 
 namespace mitk {
 
-//##Documentation
-//## @brief
-//## @ingroup Process
 class LegacyFileWriterService : public mitk::AbstractFileWriter
 {
 public:
 
-  LegacyFileWriterService(mitk::FileWriterWithInformation::Pointer legacyWriter, const std::string& basedataType,
-                          const std::string& extension, const std::string& description);
+  LegacyFileWriterService(mitk::FileWriter::Pointer legacyWriter,
+                          const std::string& description);
 
   ~LegacyFileWriterService();
 
   using AbstractFileWriter::Write;
 
-  virtual void Write(const BaseData* data, const std::string& path);
+  virtual void Write();
 
-  virtual void Write(const BaseData* data, std::ostream& stream );
-
-  virtual bool CanWrite(const BaseData *data) const;
-
-protected:
-
-    mitk::FileWriterWithInformation::Pointer m_LegacyWriter;
+  virtual ConfidenceLevel GetConfidenceLevel() const;
 
 private:
 
     LegacyFileWriterService* Clone() const;
+
+    mitk::FileWriter::Pointer m_LegacyWriter;
 
     us::ServiceRegistration<IFileWriter> m_ServiceRegistration;
 };

@@ -386,7 +386,7 @@ set(CPP_FILES
   Internal/mitkFileReaderWriterBase.cpp
   Internal/mitkItkImageIO.cpp
   Internal/mitkLegacyFileReaderService.cpp
-  #Internal/mitkLegacyFileWriterService.cpp
+  Internal/mitkLegacyFileWriterService.cpp
   Internal/mitkMimeTypeProvider.cpp
   Internal/mitkPointSetReaderService.cpp
   Internal/mitkPointSetWriterService.cpp

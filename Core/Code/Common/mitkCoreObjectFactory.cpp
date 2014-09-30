@@ -418,40 +418,49 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(mitk::CoreObjectFactoryBase*
 
   MultimapType fileExtensionMap = factory->GetSaveFileExtensionsMap();
 
-//  for(mitk::CoreObjectFactory::FileWriterList::iterator it = writers.begin(); it != writers.end(); it++)
-//  {
-//    std::vector<std::string> extensions = (*it)->GetPossibleFileExtensions();
-//    for(std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ext++)
-//    {
-//      if (ext->empty()) continue;
+  for(mitk::CoreObjectFactory::FileWriterList::iterator it = writers.begin(); it != writers.end(); it++)
+  {
+    std::vector<std::string> extensions = (*it)->GetPossibleFileExtensions();
+    if (extensions.empty()) continue;
 
-//      std::string extension = *ext;
-//      std::string extensionWithStar = extension;
-//      if (extension.find_first_of('*') == 0)
-//      {
-//        // remove "*."
-//        extension = extension.substr(0, extension.size()-2);
-//      }
-//      else
-//      {
-//        extensionWithStar.insert(extensionWithStar.begin(), '*');
-//      }
+    std::string description;
+    for(std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ext++)
+    {
+      if (ext->empty()) continue;
 
-//      std::string description;
-//      for(MultimapType::iterator fileExtensionIter = fileExtensionMap.begin();
-//          fileExtensionIter != fileExtensionMap.end(); fileExtensionIter++)
-//      {
-//        if (fileExtensionIter->first == extensionWithStar)
-//        {
-//          description = fileExtensionIter->second;
-//          break;
-//        }
-//      }
+      std::string extension = *ext;
+      std::string extensionWithStar = extension;
+      if (extension.find_first_of('*') == 0)
+      {
+        // remove "*."
+        extension = extension.substr(0, extension.size()-2);
+      }
+      else
+      {
+        extensionWithStar.insert(extensionWithStar.begin(), '*');
+      }
 
-//      //extension = extension.erase(0,1);
-//      std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-//      mitk::LegacyFileWriterService* lfws = new mitk::LegacyFileWriterService(*it, "LegacyDataType", extension, description);
-//      m_LegacyWriters.push_back(lfws);
-//    }
-//  }
+      for(MultimapType::iterator fileExtensionIter = fileExtensionMap.begin();
+          fileExtensionIter != fileExtensionMap.end(); fileExtensionIter++)
+      {
+        if (fileExtensionIter->first == extensionWithStar)
+        {
+          description = fileExtensionIter->second;
+          break;
+        }
+      }
+      if (!description.empty()) break;
+    }
+    if (description.empty())
+    {
+      description = std::string("Legacy ") + (*it)->GetNameOfClass() + " Reader";
+    }
+
+    std::cout << "***** CREATING LEGACY WRITER for " << description << std::endl;
+
+    mitk::FileWriter::Pointer fileWriter(it->GetPointer());
+    mitk::LegacyFileWriterService* lfws = new mitk::LegacyFileWriterService(fileWriter, description);
+    m_LegacyWriters.push_back(lfws);
+  }
+
 }

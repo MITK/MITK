@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Internal/mitkPointSetWriterService.h>
 #include <Internal/mitkRawImageFileReader.h>
 
+#include <mitkFileWriter.h>
+#include "mitkLegacyFileWriterService.h"
+
 // Micro Services
 #include <usGetModuleContext.h>
 #include <usModuleInitialization.h>
@@ -286,6 +289,31 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
     vtkObjectFactory::RegisterFactory( textureFactory );
     textureFactory->Delete();
     */
+
+
+
+  std::list<mitk::FileWriter::Pointer> possibleWriters;
+  std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("IOWriter");
+
+  for( std::list<itk::LightObject::Pointer>::iterator i = allobjects.begin();
+       i != allobjects.end();
+       ++i)
+  {
+    mitk::FileWriter* io = dynamic_cast<mitk::FileWriter*>(i->GetPointer());
+    if(io)
+    {
+      std::cout << "**** FOUND IOWRITER " << io->GetNameOfClass() << std::endl;
+      std::string description = std::string("Legacy ") + io->GetNameOfClass() + " Reader";
+      new mitk::LegacyFileWriterService(io, description);
+      possibleWriters.push_back(io);
+    }
+    else
+    {
+      MITK_ERROR << "Error BaseDataIO factory did not return an IOAdapterBase: "
+        << (*i)->GetNameOfClass()
+        << std::endl;
+    }
+  }
 }
 
 void MitkCoreActivator::Unload(us::ModuleContext* )

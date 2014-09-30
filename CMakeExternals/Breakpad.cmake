@@ -21,7 +21,7 @@ if(MITK_USE_BREAKPAD)
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/BREAKPAD_c25757086676cc3f4cf3d5e3870c5d70.tar.gz
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/Breakpad_c25757086676cc3f4cf3d5e3870c5d70.tar.gz
       URL_MD5 c25757086676cc3f4cf3d5e3870c5d70
       #SVN_REPOSITORY http://google-breakpad.googlecode.com/svn/trunk
       #SVN_REVISION -r ${revision_tag}

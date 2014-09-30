@@ -9,6 +9,7 @@ This section will show you how to extend MITK for your own project.
   <li> \subpage NewViewPage</li>
   <li> \subpage CMAKE_FAQ </li>
   <li> \subpage StatemachineEditor </li>
+  <li> \subpage MiniAppCommandLineToolHowToPage </li>
 </ul>
 
 */

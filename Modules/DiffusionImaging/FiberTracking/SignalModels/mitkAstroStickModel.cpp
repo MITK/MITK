@@ -26,9 +26,10 @@ AstroStickModel< ScalarType >::AstroStickModel()
     , m_NumSticks(42)
     , m_RandomizeSticks(false)
 {
-    m_RandGen = ItkRandGenType::New();
+    this->m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+    this->m_RandGen->SetSeed();
 
-    vnl_matrix_fixed<ScalarType,3,42>* sticks = itk::PointShell<42, vnl_matrix_fixed<ScalarType, 3, 42> >::DistributePointShell();
+    vnl_matrix_fixed<double,3,42>* sticks = itk::PointShell<42, vnl_matrix_fixed<double, 3, 42> >::DistributePointShell();
     for (unsigned int i=0; i<m_NumSticks; i++)
     {
         GradientType stick;
@@ -45,12 +46,6 @@ AstroStickModel< ScalarType >::~AstroStickModel()
 }
 
 template< class ScalarType >
-void AstroStickModel< ScalarType >::SetSeed(int s)
-{
-    m_RandGen->SetSeed(s);
-}
-
-template< class ScalarType >
 ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
 {
     ScalarType signal = 0;
@@ -61,7 +56,7 @@ ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
     ScalarType b = -m_BValue*m_Diffusivity;
 
     if (m_RandomizeSticks)  // random number of sticks
-        m_NumSticks = 30 + m_RandGen->GetIntegerVariate()%31;
+        m_NumSticks = 30 + this->m_RandGen->GetIntegerVariate()%31;
 
     GradientType g = this->m_GradientList[dir];
     ScalarType bVal = g.GetNorm(); bVal *= bVal;
@@ -75,7 +70,7 @@ ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
                 dot = GetRandomDirection()*g;
             else
                 dot = m_Sticks[j]*g;
-            signal += exp( b*bVal*dot*dot );
+            signal += std::exp( (double)(b*bVal*dot*dot) );
         }
         signal /= m_NumSticks;
     }
@@ -89,9 +84,9 @@ template< class ScalarType >
 typename AstroStickModel< ScalarType >::GradientType AstroStickModel< ScalarType >::GetRandomDirection()
 {
     GradientType vec;
-    vec[0] = m_RandGen->GetNormalVariate();
-    vec[1] = m_RandGen->GetNormalVariate();
-    vec[2] = m_RandGen->GetNormalVariate();
+    vec[0] = this->m_RandGen->GetNormalVariate();
+    vec[1] = this->m_RandGen->GetNormalVariate();
+    vec[2] = this->m_RandGen->GetNormalVariate();
     vec.Normalize();
     return vec;
 }
@@ -104,7 +99,7 @@ typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >:
     ScalarType b = -m_BValue*m_Diffusivity;
 
     if (m_RandomizeSticks)
-        m_NumSticks = 30 + m_RandGen->GetIntegerVariate()%31;
+        m_NumSticks = 30 + this->m_RandGen->GetIntegerVariate()%31;
 
     for( unsigned int i=0; i<this->m_GradientList.size(); i++)
     {
@@ -120,7 +115,7 @@ typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >:
                     dot = GetRandomDirection()*g;
                 else
                     dot = m_Sticks[j]*g;
-                signal[i] += exp( b*bVal*dot*dot );
+                signal[i] += std::exp( (double)(b*bVal*dot*dot) );
             }
             signal[i] /= m_NumSticks;
         }

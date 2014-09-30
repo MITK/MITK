@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.viewnavigatorview"
+          name="View Navigator"
+          class="ViewNavigatorView"
+          icon="resources/view-manager_48.png"
+           />
+  </extension>
+
+</plugin>

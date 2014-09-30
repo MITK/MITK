@@ -19,13 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-mitk::NodePredicateProperty::NodePredicateProperty(const char* propertyName, mitk::BaseProperty* p)
-: NodePredicateBase(), m_ValidProperty(p), m_ValidPropertyName(propertyName)
-{
-}
-
-mitk::NodePredicateProperty::NodePredicateProperty(const char* propertyName)
-: NodePredicateBase(), m_ValidProperty(NULL), m_ValidPropertyName(propertyName)
+mitk::NodePredicateProperty::NodePredicateProperty(const char* propertyName, mitk::BaseProperty* p, const mitk::BaseRenderer *renderer)
+: NodePredicateBase(), m_ValidProperty(p), m_ValidPropertyName(propertyName), m_Renderer(renderer)
 {
 }
 
@@ -46,11 +41,11 @@ bool mitk::NodePredicateProperty::CheckNode(const mitk::DataNode* node) const
   if (m_ValidProperty.IsNull())
   //if (m_ValidProperty==NULL)
   {
-    return (node->GetPropertyList()->GetProperty(m_ValidPropertyName.c_str()) != NULL); // search only for name
+    return (node->GetProperty(m_ValidPropertyName.c_str(), m_Renderer) != NULL); // search only for name
   }
   else
   {
-    mitk::BaseProperty::Pointer p = node->GetPropertyList()->GetProperty(m_ValidPropertyName.c_str());
+    mitk::BaseProperty::Pointer p = node->GetProperty(m_ValidPropertyName.c_str(), m_Renderer);
     if (p.IsNull())
       return false;
     return (*p == *m_ValidProperty); // search for name and property

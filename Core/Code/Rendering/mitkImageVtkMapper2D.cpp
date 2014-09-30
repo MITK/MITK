@@ -172,7 +172,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   {
     VtkResliceInterpolationProperty *resliceInterpolationProperty;
     datanode->GetProperty(
-          resliceInterpolationProperty, "reslice interpolation" );
+          resliceInterpolationProperty, "reslice interpolation", renderer );
 
     int interpolationMode = VTK_RESLICE_NEAREST;
     if ( resliceInterpolationProperty != NULL )
@@ -214,11 +214,11 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     {
       ResliceMethodProperty *resliceMethodEnumProperty=0;
 
-      if( dn->GetProperty( resliceMethodEnumProperty, "reslice.thickslices" ) && resliceMethodEnumProperty )
+      if( dn->GetProperty( resliceMethodEnumProperty, "reslice.thickslices", renderer ) && resliceMethodEnumProperty )
         thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
 
       IntProperty *intProperty=0;
-      if( dn->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
+      if( dn->GetProperty( intProperty, "reslice.thickslices.num", renderer ) && intProperty )
       {
         thickSlicesNum = intProperty->GetValue();
         if(thickSlicesNum < 1) thickSlicesNum=1;
@@ -466,9 +466,11 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
   // binary image hovering & binary image selection
   bool hover    = false;
   bool selected = false;
+  bool binary = false;
   GetDataNode()->GetBoolProperty("binaryimage.ishovering", hover, renderer);
   GetDataNode()->GetBoolProperty("selected", selected, renderer);
-  if(hover && !selected)
+  GetDataNode()->GetBoolProperty("binary", binary, renderer);
+  if(binary && hover && !selected)
   {
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
                                                                                 ("binaryimage.hoveringcolor", renderer));
@@ -481,7 +483,7 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
       GetDataNode()->GetColor( rgb, renderer, "color" );
     }
   }
-  if(selected)
+  if(binary && selected)
   {
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
                                                                                 ("binaryimage.selectedcolor", renderer));
@@ -493,7 +495,7 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
       GetDataNode()->GetColor(rgb, renderer, "color");
     }
   }
-  if(!hover && !selected)
+  if(!binary || (!hover && !selected))
   {
     GetDataNode()->GetColor( rgb, renderer, "color" );
   }
@@ -616,6 +618,7 @@ void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer *rend
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
   //pass the transfer function to our level window filter
   localStorage->m_LevelWindowFilter->SetLookupTable(transferFunctionProp->GetValue()->GetColorTransferFunction());
+  localStorage->m_LevelWindowFilter->SetOpacityPiecewiseFunction(transferFunctionProp->GetValue()->GetScalarOpacityFunction());
 }
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)

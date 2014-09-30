@@ -254,7 +254,7 @@ void mitk::DataStorage::RemoveListeners( const mitk::DataNode* _Node )
   }
 }
 
-mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const SetOfObjects* input, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2) const
+mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const SetOfObjects* input, const char* boolPropertyKey, const mitk::BaseRenderer* renderer, const char* boolPropertyKey2) const
 {
   if (input == NULL)
     throw std::invalid_argument("DataStorage: input is invalid");
@@ -388,17 +388,17 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const 
   return timeGeometry;
 }
 
-mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2) const
+mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const char* boolPropertyKey, const mitk::BaseRenderer* renderer, const char* boolPropertyKey2) const
 {
   return this->ComputeBoundingGeometry3D(this->GetAll(), boolPropertyKey, renderer, boolPropertyKey2);
 }
 
-mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeVisibleBoundingGeometry3D( mitk::BaseRenderer* renderer, const char* boolPropertyKey )
+mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeVisibleBoundingGeometry3D( const mitk::BaseRenderer* renderer, const char* boolPropertyKey )
 {
   return ComputeBoundingGeometry3D( "visible", renderer, boolPropertyKey );
 }
 
-mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
+mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* boolPropertyKey, const mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
   BoundingBox::PointsContainer::Pointer pointscontainer=BoundingBox::PointsContainer::New();
 
@@ -451,7 +451,7 @@ mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* bo
   return result;
 }
 
-mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
+mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyKey, const mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
   TimeBounds timeBounds;
 

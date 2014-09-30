@@ -364,6 +364,7 @@ public:
     //undo changes, new and changed object need to be the same!
     vtkmatrix->SetElement(1,1,1);
     dummy->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
+    vtkmatrix->Delete();
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
   }
@@ -561,12 +562,14 @@ public:
     DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetIndexToWorldTransform(transform1);  //Spacing = 2
     dummy->Compose(vtkmatrix2); //Spacing = 4
+    vtkmatrix2->Delete();
 
     CPPUNIT_ASSERT(mitk::Equal(transform3,dummy->GetIndexToWorldTransform(),mitk::eps,true)); // 4=4
     CPPUNIT_ASSERT(mitk::Equal(dummy->GetSpacing(), expectedSpacing));
 
     //undo changes, new and changed object need to be the same!
     dummy->Compose(vtkmatrix4); //Spacing = 1
+    vtkmatrix4->Delete();
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true)); // 1=1
   }

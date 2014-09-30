@@ -1,15 +1,30 @@
 set(CPP_FILES
   mitkGetSimulationService.cpp
+  mitkExportMitkVisitor.cpp
   mitkIndexROI.cpp
   mitkISimulationService.cpp
+  mitkRoundRobinSchedulingAlgorithm.cpp
   mitkSetVtkRendererVisitor.cpp
+  mitkSchedulableProcess.cpp
+  mitkScheduler.cpp
+  mitkSchedulingAlgorithmBase.cpp
   mitkSimulation.cpp
   mitkSimulationActivator.cpp
+  mitkSimulationInteractor.cpp
   mitkSimulationIOFactory.cpp
   mitkSimulationObjectFactory.cpp
   mitkSimulationReader.cpp
+  mitkSimulationSerializer.cpp
   mitkSimulationService.cpp
   mitkSimulationVtkMapper3D.cpp
+  mitkSimulationWriter.cpp
+  mitkSimulationWriterFactory.cpp
   mitkVtkModel.cpp
   mitkVtkSimulationPolyDataMapper.cpp
+  mitkWeightedRoundRobinSchedulingAlgorithm.cpp
+)
+
+set(RESOURCE_FILES
+  Interactions/Simulation.xml
+  Interactions/SimulationConfig.xml
 )

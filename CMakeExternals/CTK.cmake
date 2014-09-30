@@ -22,6 +22,9 @@ if(MITK_USE_CTK)
 
     set(ctk_optional_cache_args )
     if(MITK_USE_Python)
+      if(NOT MITK_USE_SYSTEM_PYTHON)
+        list(APPEND proj_DEPENDENCIES Python)
+      endif()
       list(APPEND ctk_optional_cache_args
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
            -DCTK_ENABLE_Python_Wrapping:BOOL=ON

@@ -26,6 +26,7 @@ The distinction between developer and end user use is for convenience only and m
   \li \subpage org_mitk_gui_qt_remeshing
   \li \subpage org_mitk_views_segmentation
   \li \subpage org_mitk_gui_qt_ultrasound
+  \li \subpage org_mitk_gui_qt_viewnavigator
   \li \subpage org_mitk_views_volumevisualization
   \li \subpage org_mitk_gui_qt_xnat
 

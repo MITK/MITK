@@ -54,9 +54,9 @@ void mitk::ReduceContourSetFilter::GenerateData()
     mitk::Surface* currentSurface = const_cast<mitk::Surface*>( this->GetInput(i) );
     vtkSmartPointer<vtkPolyData> polyData = currentSurface->GetVtkPolyData();
 
-    newPolyData = vtkPolyData::New();
-    newPolygons = vtkCellArray::New();
-    newPoints = vtkPoints::New();
+    newPolyData = vtkSmartPointer<vtkPolyData>::New();
+    newPolygons = vtkSmartPointer<vtkCellArray>::New();
+    newPoints = vtkSmartPointer<vtkPoints>::New();
 
     vtkSmartPointer<vtkCellArray> existingPolys = polyData->GetPolys();
 

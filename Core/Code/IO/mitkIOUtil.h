@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKIOUTIL_H
 #define MITKIOUTIL_H
 
@@ -65,6 +64,13 @@ public:
    * @return The default path for temporary data.
    */
   static std::string GetTempPath();
+
+  /**
+  * Returns the Directory Seperator for the current OS.
+  *
+  * @return the Directory Seperator for the current OS, i.e. "\\" for Windows and "/" otherwise.
+  */
+  static char GetDirectorySeparator();
 
   /**
    * Create and open a temporary file.
@@ -259,9 +265,7 @@ public:
   static const std::string DEFAULTIMAGEEXTENSION;
   static const std::string DEFAULTSURFACEEXTENSION;
   static const std::string DEFAULTPOINTSETEXTENSION;
-
 };
-
 }
 
 #endif // MITKIOUTIL_H

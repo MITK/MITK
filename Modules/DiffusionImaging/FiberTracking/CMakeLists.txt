@@ -24,7 +24,7 @@ if(NOT _missing_deps)
   message("Downloading FiberTracking LUT ${lut_url}...")
   file(DOWNLOAD ${lut_url} ${lut_tarball}
        EXPECTED_MD5 38ecb6d4a826c9ebb0f4965eb9aeee44
-       TIMEOUT 20
+       TIMEOUT 60
        STATUS status
        SHOW_PROGRESS
       )

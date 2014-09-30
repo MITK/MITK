@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkToFUtilView_h
 #define QmitkToFUtilView_h
 
-#include <QmitkOverlayController.h>
 #include <QmitkAbstractView.h>
 #include <berryIWorkbenchPartReference.h>
 #include <mitkIZombieViewPart.h>

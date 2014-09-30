@@ -18,11 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulation.h"
 #include "mitkSimulationObjectFactory.h"
 #include "mitkSimulationVtkMapper3D.h"
+#include "mitkSimulationWriter.h"
 #include "mitkVtkModel.h"
 #include <mitkCoreObjectFactory.h>
 #include <sofa/helper/system/glut.h>
 #include <sofa/component/init.h>
 #include <sofa/core/ObjectFactory.h>
+#include <sofa/core/visual/VisualParams.h>
 #include <sofa/simulation/common/xml/initXml.h>
 
 static void InitializeSofa()
@@ -32,6 +34,8 @@ static void InitializeSofa()
 
   sofa::component::init();
   sofa::simulation::xml::initXml();
+
+  sofa::core::visual::VisualParams::defaultInstance()->setSupported(sofa::core::visual::API_OpenGL);
 }
 
 static void RegisterSofaClasses()
@@ -47,13 +51,16 @@ static void RegisterSofaClasses()
 }
 
 mitk::SimulationObjectFactory::SimulationObjectFactory()
-  : m_SimulationIOFactory(SimulationIOFactory::New())
+  : m_SimulationIOFactory(SimulationIOFactory::New()),
+    m_SimulationWriterFactory(SimulationWriterFactory::New())
 {
   itk::ObjectFactoryBase::RegisterFactory(m_SimulationIOFactory);
+  itk::ObjectFactoryBase::RegisterFactory(m_SimulationWriterFactory);
+
+  m_FileWriters.push_back(SimulationWriter::New().GetPointer());
 
   std::string description = "SOFA Scene Files";
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.scn", description));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.xml", description));
 
   InitializeSofa();
   RegisterSofaClasses();
@@ -61,6 +68,7 @@ mitk::SimulationObjectFactory::SimulationObjectFactory()
 
 mitk::SimulationObjectFactory::~SimulationObjectFactory()
 {
+  itk::ObjectFactoryBase::UnRegisterFactory(m_SimulationWriterFactory);
   itk::ObjectFactoryBase::UnRegisterFactory(m_SimulationIOFactory);
 }
 

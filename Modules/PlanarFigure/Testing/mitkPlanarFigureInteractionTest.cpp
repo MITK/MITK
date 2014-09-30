@@ -36,6 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarRectangle.h>
 
+#include <vtkDebugLeaks.h>
+
 #include "usModuleRegistry.h"
 
 class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
@@ -60,6 +62,8 @@ public:
 
   void setUp()
   {
+    /// \todo Fix leaks of vtkObjects. Bug 18095.
+    vtkDebugLeaks::SetExitError(0);
   }
 
   void tearDown()

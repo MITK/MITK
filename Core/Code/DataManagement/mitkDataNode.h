@@ -73,7 +73,7 @@ public:
   typedef std::set<std::string> GroupTagList;
 
   /**
-   *\brief Definition of an itk::Event that is invoked when
+   * \brief Definition of an itk::Event that is invoked when
    * a DataInteractor is set on this DataNode.
    */
   itkEventMacro(InteractorChangedEvent, itk::AnyEvent);
@@ -261,7 +261,7 @@ public:
    * \return \a true property was found
    */
   template <typename T>
-    bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL) const
+    bool GetPropertyValue(const char* propertyKey, T & value, const mitk::BaseRenderer* renderer=NULL) const
     {
       GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer));
       if ( gp != NULL )
@@ -280,21 +280,21 @@ public:
    * BoolProperty)
    * \return \a true property was found
    */
-  bool GetBoolProperty(const char* propertyKey, bool &boolValue, mitk::BaseRenderer* renderer = NULL) const;
+  bool GetBoolProperty(const char* propertyKey, bool &boolValue, const mitk::BaseRenderer* renderer = NULL) const;
 
   /**
    * \brief Convenience access method for int properties (instances of
    * IntProperty)
    * \return \a true property was found
    */
-  bool GetIntProperty(const char* propertyKey, int &intValue, mitk::BaseRenderer* renderer=NULL) const;
+  bool GetIntProperty(const char* propertyKey, int &intValue, const mitk::BaseRenderer* renderer=NULL) const;
 
   /**
    * \brief Convenience access method for float properties (instances of
    * FloatProperty)
    * \return \a true property was found
    */
-  bool GetFloatProperty(const char* propertyKey, float &floatValue, mitk::BaseRenderer* renderer = NULL) const;
+  bool GetFloatProperty(const char* propertyKey, float &floatValue, const mitk::BaseRenderer* renderer = NULL) const;
 
   /**
    * \brief Convenience access method for double properties (instances of
@@ -305,46 +305,46 @@ public:
    *
    * \return \a true property was found
    */
-  bool GetDoubleProperty(const char* propertyKey, double &doubleValue, mitk::BaseRenderer* renderer = NULL) const;
+  bool GetDoubleProperty(const char* propertyKey, double &doubleValue, const mitk::BaseRenderer* renderer = NULL) const;
 
   /**
    * \brief Convenience access method for string properties (instances of
    * StringProperty)
    * \return \a true property was found
    */
-  bool GetStringProperty(const char* propertyKey, std::string& string, mitk::BaseRenderer* renderer = NULL) const;
+  bool GetStringProperty(const char* propertyKey, std::string& string, const mitk::BaseRenderer* renderer = NULL) const;
 
   /**
    * \brief Convenience access method for color properties (instances of
    * ColorProperty)
    * \return \a true property was found
    */
-  bool GetColor(float rgb[3], mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color") const;
+  bool GetColor(float rgb[3], const mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color") const;
 
   /**
    * \brief Convenience access method for level-window properties (instances of
    * LevelWindowProperty)
    * \return \a true property was found
    */
-  bool GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "levelwindow") const;
+  bool GetLevelWindow(mitk::LevelWindow &levelWindow, const mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "levelwindow") const;
 
   /**
    * \brief set the node as selected
    */
-  void SetSelected(bool selected, mitk::BaseRenderer* renderer=NULL);
+  void SetSelected(bool selected, const mitk::BaseRenderer* renderer=NULL);
 
   /**
    * \brief set the node as selected
    * \return \a true node is selected
    */
-  bool IsSelected(mitk::BaseRenderer* renderer=NULL);
+  bool IsSelected(const mitk::BaseRenderer* renderer=NULL);
 
   /**
    * \brief Convenience access method for accessing the name of an object (instance of
    * StringProperty with property-key "name")
    * \return \a true property was found
    */
-  bool GetName(std::string& nodeName, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "name") const
+  bool GetName(std::string& nodeName, const mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "name") const
   {
     return GetStringProperty(propertyKey, nodeName, renderer);
   }
@@ -377,7 +377,6 @@ public:
       return;
     this->SetProperty("name", StringProperty::New(name));
   }
-
   /**
    * \brief Extra convenience access method to set the name of an object.
    *
@@ -394,7 +393,7 @@ public:
    * \return \a true property was found
    * \sa IsVisible
    */
-  bool GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* propertyKey = "visible") const
+  bool GetVisibility(bool &visible, const mitk::BaseRenderer* renderer, const char* propertyKey = "visible") const
   {
     return GetBoolProperty(propertyKey, visible, renderer);
   }
@@ -404,7 +403,7 @@ public:
    * FloatProperty)
    * \return \a true property was found
    */
-  bool GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* propertyKey = "opacity") const;
+  bool GetOpacity(float &opacity, const mitk::BaseRenderer* renderer, const char* propertyKey = "opacity") const;
 
   /**
    * \brief Convenience access method for boolean properties (instances
@@ -415,7 +414,7 @@ public:
    * GetBoolProperty method!
    * \sa GetBoolProperty
    */
-  bool IsOn(const char* propertyKey, mitk::BaseRenderer* renderer, bool defaultIsOn = true) const
+  bool IsOn(const char* propertyKey, const mitk::BaseRenderer* renderer, bool defaultIsOn = true) const
   {
     if(propertyKey==NULL)
       return defaultIsOn;
@@ -434,7 +433,7 @@ public:
    * \sa GetVisibility
    * \sa IsOn
    */
-  bool IsVisible(mitk::BaseRenderer* renderer, const char* propertyKey = "visible", bool defaultIsOn = true) const
+  bool IsVisible(const mitk::BaseRenderer* renderer, const char* propertyKey = "visible", bool defaultIsOn = true) const
   {
     return IsOn(propertyKey, renderer, defaultIsOn);
   }
@@ -443,19 +442,19 @@ public:
    * \brief Convenience method for setting color properties (instances of
    * ColorProperty)
    */
-  void SetColor(const mitk::Color &color, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
+  void SetColor(const mitk::Color &color, const mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
 
   /**
    * \brief Convenience method for setting color properties (instances of
    * ColorProperty)
    */
-  void SetColor(float red, float green, float blue, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
+  void SetColor(float red, float green, float blue, const mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
 
   /**
    * \brief Convenience method for setting color properties (instances of
    * ColorProperty)
    */
-  void SetColor(const float rgb[3], mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
+  void SetColor(const float rgb[3], const mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
 
   /**
    * \brief Convenience method for setting visibility properties (instances
@@ -464,49 +463,49 @@ public:
    * \param renderer Specify a renderer if the visibility shall be specific to a renderer
    * \param propertykey Can be used to specify a user defined name of the visibility propery.
    */
-  void SetVisibility(bool visible, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "visible");
+  void SetVisibility(bool visible, const mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "visible");
 
   /**
    * \brief Convenience method for setting opacity properties (instances of
    * FloatProperty)
    */
-  void SetOpacity(float opacity, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "opacity");
+  void SetOpacity(float opacity, const mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "opacity");
 
   /**
    * \brief Convenience method for setting level-window properties
    * (instances of LevelWindowProperty)
    */
-  void SetLevelWindow(mitk::LevelWindow levelWindow, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "levelwindow");
+  void SetLevelWindow(mitk::LevelWindow levelWindow, const mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "levelwindow");
 
   /**
    * \brief Convenience method for setting int properties (instances of
    * IntProperty)
    */
-  void SetIntProperty(const char* propertyKey, int intValue, mitk::BaseRenderer* renderer=NULL);
+  void SetIntProperty(const char* propertyKey, int intValue, const mitk::BaseRenderer* renderer=NULL);
 
   /**
    * \brief Convenience method for setting boolean properties (instances of
    * BoolProperty)
    */
-  void SetBoolProperty(const char* propertyKey, bool boolValue, mitk::BaseRenderer* renderer=NULL);
+  void SetBoolProperty(const char* propertyKey, bool boolValue, const mitk::BaseRenderer* renderer=NULL);
 
   /**
    * \brief Convenience method for setting float properties (instances of
    * FloatProperty)
    */
-  void SetFloatProperty(const char* propertyKey, float floatValue, mitk::BaseRenderer* renderer=NULL);
+  void SetFloatProperty(const char* propertyKey, float floatValue, const mitk::BaseRenderer* renderer=NULL);
 
   /**
    * \brief Convenience method for setting double properties (instances of
    * DoubleProperty)
    */
-  void SetDoubleProperty(const char* propertyKey, float doubleValue, mitk::BaseRenderer* renderer=NULL);
+  void SetDoubleProperty(const char* propertyKey, float doubleValue, const mitk::BaseRenderer* renderer=NULL);
 
   /**
    * \brief Convenience method for setting string properties (instances of
    * StringProperty)
    */
-  void SetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer=NULL);
+  void SetStringProperty(const char* propertyKey, const char* string, const mitk::BaseRenderer* renderer=NULL);
 
   /**
    * \brief Get the timestamp of the last change of the contents of this node or

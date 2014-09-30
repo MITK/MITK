@@ -375,34 +375,41 @@ namespace mitk
     //##Documentation
     //## @brief Get the MapperSlotId to use.
     itkGetMacro(MapperID, MapperSlotId)
-      itkGetConstMacro(MapperID, MapperSlotId)
+    itkGetConstMacro(MapperID, MapperSlotId)
 
-      //##Documentation
-      //## @brief Set the MapperSlotId to use.
-      itkSetMacro(MapperID, MapperSlotId)
+    //##Documentation
+    //## @brief Set the MapperSlotId to use.
+    itkSetMacro(MapperID, MapperSlotId)
 
-      //##Documentation
-      //## @brief Has the renderer the focus?
-      itkGetMacro(Focused, bool)
-      //##Documentation
-      //## @brief Tell the renderer that it is focused. The caller is responsible for focus management,
-      //## not the renderer itself.
-      itkSetMacro(Focused, bool)
+    //##Documentation
+    //## @brief Has the renderer the focus?
+    itkGetMacro(Focused, bool)
+    //##Documentation
+    //## @brief Tell the renderer that it is focused. The caller is responsible for focus management,
+    //## not the renderer itself.
+    itkSetMacro(Focused, bool)
 
-      itkGetMacro(Size, int*)
+    itkGetMacro(Size, int*)
 
-      void SetSliceNavigationController(SliceNavigationController* SlicenavigationController);
+    void SetSliceNavigationController(SliceNavigationController* SlicenavigationController);
     void SetCameraController(CameraController* cameraController);
     itkGetObjectMacro(CameraController, CameraController)
-      itkGetObjectMacro(SliceNavigationController, SliceNavigationController)
-      itkGetObjectMacro(CameraRotationController, CameraRotationController)
+    itkGetObjectMacro(SliceNavigationController, SliceNavigationController)
+    itkGetObjectMacro(CameraRotationController, CameraRotationController)
 
-      itkGetMacro(EmptyWorldGeometry, bool)
+    itkGetMacro(EmptyWorldGeometry, bool)
 
-      //##Documentation
-      //## @brief Mouse event dispatchers
-      //## @note for internal use only. preliminary.
-      virtual void MousePressEvent(MouseEvent*);
+    //##Documentation
+    //## @brief Tells if the displayed region is shifted and rescaled if the render window is resized.
+    itkGetMacro(KeepDisplayedRegion, bool)
+    //##Documentation
+    //## @brief Tells if the displayed region should be shifted and rescaled if the render window is resized.
+    itkSetMacro(KeepDisplayedRegion, bool)
+
+    //##Documentation
+    //## @brief Mouse event dispatchers
+    //## @note for internal use only. preliminary.
+    virtual void MousePressEvent(MouseEvent*);
     //##Documentation
     //## @brief Mouse event dispatchers
     //## @note for internal use only. preliminary.
@@ -603,6 +610,10 @@ namespace mitk
     //##Documentation
     //## @brief Helper class which establishes connection between Interactors and Dispatcher via a common DataStorage.
     BindDispatcherInteractor* m_BindDispatcherInteractor;
+
+    //##Documentation
+    //## @brief Tells if the displayed region should be shifted or rescaled if the render window is resized.
+    bool m_KeepDisplayedRegion;
 
   protected:
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;

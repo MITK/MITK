@@ -21,7 +21,7 @@ set(CPP_FILES
     PeakExtraction.cpp
     PeaksAngularError.cpp
     MultishellMethods.cpp
-    #FiberFoxProcessing.cpp
+    Fiberfox.cpp
     ExportShImage.cpp
     NetworkCreation.cpp
     NetworkStatistics.cpp

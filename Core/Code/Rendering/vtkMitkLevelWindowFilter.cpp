@@ -38,7 +38,11 @@ static const double PI = itk::Math::pi;
 
 vtkStandardNewMacro(vtkMitkLevelWindowFilter);
 
-vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter(): m_LookupTable(NULL), m_OpacityFunction(NULL), m_MinOpacity(0.0), m_MaxOpacity(255.0)
+vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter()
+  : m_LookupTable(NULL)
+  , m_OpacityFunction(NULL)
+  , m_MinOpacity(0.0)
+  , m_MaxOpacity(255.0)
 {
   //MITK_INFO << "mitk level/window filter uses " << GetNumberOfThreads() << " thread(s)";
 }
@@ -485,7 +489,6 @@ int vtkMitkLevelWindowFilter::RequestInformation(vtkInformation* request,
   vtkDataObject::SetPointDataActiveScalarInfo(outInfo, VTK_UNSIGNED_CHAR, 4);
 
   return 1;
-
 }
 
 //Method to run the filter in different threads.

@@ -75,7 +75,7 @@ public:
 *  Test for vtkMitkThickSlicesFilter.
 *
 */
-int vtkMitkThickSlicesFilterTest(int argc, char** const argv)
+int vtkMitkThickSlicesFilterTest(int, char* [])
 {
   // always start with this!
   MITK_TEST_BEGIN("vtkMitkThickSlicesFilterTest")
@@ -166,6 +166,8 @@ int vtkMitkThickSlicesFilterTest(int argc, char** const argv)
   thickSliceFilter->Modified();
   thickSliceFilter->Update();
   vtkMitkThickSlicesFilterTestHelper::EvaluateResult( 6, thickSliceFilter->GetOutput(), "Mean" );
+
+  thickSliceFilter->Delete();
 
   MITK_TEST_END()
 }

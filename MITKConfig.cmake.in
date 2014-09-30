@@ -95,6 +95,8 @@ set(Qxt_DIR "@Qxt_DIR@")
 set(ACVD_DIR "@ACVD_DIR@")
 set(MITK_QMAKE_EXECUTABLE "@QT_QMAKE_EXECUTABLE@")
 set(MITK_DATA_DIR "@MITK_DATA_DIR@")
+set(SimpleITK_DIR "@SimpleITK_DIR@")
+set(Python_DIR "@Python_DIR@")
 
 # External SDK directories
 set(MITK_PMD_SDK_DIR @MITK_PMD_SDK_DIR@)
@@ -113,6 +115,7 @@ set(MITK_USE_DCMTK @MITK_USE_DCMTK@)
 set(MITK_USE_OpenCV @MITK_USE_OpenCV@)
 set(MITK_USE_SOFA @MITK_USE_SOFA@)
 set(MITK_USE_Python @MITK_USE_Python@)
+set(MITK_USE_SimpleITK @MITK_USE_SimpleITK@)
 set(MITK_USE_ACVD @MITK_USE_ACVD@)
 
 if(MITK_USE_Qt4)

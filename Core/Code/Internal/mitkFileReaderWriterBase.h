@@ -62,6 +62,9 @@ public:
   CustomMimeType GetMimeType() const;
   CustomMimeType& GetMimeType();
 
+  void SetMimeTypePrefix(const std::string& prefix);
+  std::string GetMimeTypePrefix() const;
+
   void SetDescription(const std::string& description);
   std::string GetDescription() const;
 
@@ -77,6 +80,8 @@ protected:
 
   std::string m_Description;
   int m_Ranking;
+
+  std::string m_MimeTypePrefix;
 
   /**
    * \brief Options supported by this reader. Set sensible default values!

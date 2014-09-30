@@ -177,6 +177,9 @@ protected:
    */
   CustomMimeType GetMimeType() const;
 
+  void SetMimeTypePrefix(const std::string& prefix);
+  std::string GetMimeTypePrefix() const;
+
   void SetDescription(const std::string& description);
   std::string GetDescription() const;
 

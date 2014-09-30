@@ -38,12 +38,12 @@ public:
   using AbstractFileReader::Read;
   virtual std::vector<itk::SmartPointer<BaseData> > Read();
 
-  virtual ReaderConfidenceLevel GetReaderConfidenceLevel() const;
+  virtual ConfidenceLevel GetReaderConfidenceLevel() const;
 
   // -------------- AbstractFileWriter -------------
 
   virtual void Write();
-  virtual WriterConfidenceLevel GetWriterConfidenceLevel() const;
+  virtual ConfidenceLevel GetWriterConfidenceLevel() const;
 
 private:
 

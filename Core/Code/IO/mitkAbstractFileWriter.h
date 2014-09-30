@@ -178,6 +178,9 @@ protected:
    */
   CustomMimeType GetMimeType() const;
 
+  void SetMimeTypePrefix(const std::string& prefix);
+  std::string GetMimeTypePrefix() const;
+
   /**
    * \brief Sets a human readable description of this writer.
    *

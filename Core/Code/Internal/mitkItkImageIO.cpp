@@ -294,7 +294,7 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
   return result;
 }
 
-AbstractFileIO::ReaderConfidenceLevel ItkImageIO::GetReaderConfidenceLevel() const
+AbstractFileIO::ConfidenceLevel ItkImageIO::GetReaderConfidenceLevel() const
 {
   return m_ImageIO->CanReadFile(GetLocalFileName().c_str()) ? IFileReader::Supported : IFileReader::Unsupported;
 }
@@ -455,7 +455,7 @@ void ItkImageIO::Write()
   }
 }
 
-AbstractFileIO::WriterConfidenceLevel ItkImageIO::GetWriterConfidenceLevel() const
+AbstractFileIO::ConfidenceLevel ItkImageIO::GetWriterConfidenceLevel() const
 {
   // Check if the image dimension is supported
   const Image* image = dynamic_cast<const Image*>(this->GetInput());

@@ -284,6 +284,16 @@ CustomMimeType AbstractFileWriter::GetMimeType() const
   return d->GetMimeType();
 }
 
+void AbstractFileWriter::SetMimeTypePrefix(const std::string& prefix)
+{
+  d->SetMimeTypePrefix(prefix);
+}
+
+std::string AbstractFileWriter::GetMimeTypePrefix() const
+{
+  return d->GetMimeTypePrefix();
+}
+
 us::ServiceRegistration<CustomMimeType> AbstractFileWriter::RegisterMimeType(us::ModuleContext* context)
 {
   return d->RegisterMimeType(context);

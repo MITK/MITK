@@ -106,7 +106,6 @@ QString QmitkIOUtil::GetFileOpenFilterString()
     std::vector<mitk::MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForCategory(*cat);
     for (std::vector<mitk::MimeType>::iterator mt = mimeTypes.begin(); mt != mimeTypes.end(); ++mt)
     {
-      std::cout << "Got " << mt->GetName() << " for cat " << *cat << std::endl;
       std::vector<std::string> extensions = mt->GetExtensions();
       for (std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ++ext)
       {

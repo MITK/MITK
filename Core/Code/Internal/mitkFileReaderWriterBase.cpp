@@ -27,6 +27,7 @@ namespace mitk {
 
 FileReaderWriterBase::FileReaderWriterBase()
  : m_Ranking(0)
+ , m_MimeTypePrefix("application/vnd.mitk.")
 {
 }
 
@@ -38,6 +39,7 @@ FileReaderWriterBase::~FileReaderWriterBase()
 FileReaderWriterBase::FileReaderWriterBase(const FileReaderWriterBase& other)
   : m_Description(other.m_Description)
   , m_Ranking(other.m_Ranking)
+  , m_MimeTypePrefix(other.m_MimeTypePrefix)
   , m_Options(other.m_Options)
   , m_DefaultOptions(other.m_DefaultOptions)
   , m_CustomMimeType(other.m_CustomMimeType)
@@ -132,6 +134,16 @@ CustomMimeType&FileReaderWriterBase::GetMimeType()
   return m_CustomMimeType;
 }
 
+void FileReaderWriterBase::SetMimeTypePrefix(const std::string& prefix)
+{
+  m_MimeTypePrefix = prefix;
+}
+
+std::string FileReaderWriterBase::GetMimeTypePrefix() const
+{
+  return m_MimeTypePrefix;
+}
+
 void FileReaderWriterBase::SetDescription(const std::string& description)
 {
   m_Description = description;
@@ -184,7 +196,7 @@ us::ServiceRegistration<CustomMimeType> FileReaderWriterBase::RegisterMimeType(u
   {
     // Register a new mime type by creating a synthetic mime type name from the
     // first extension in the list
-    m_CustomMimeType.SetName("application/vnd.mitk." + extensions.front());
+    m_CustomMimeType.SetName(m_MimeTypePrefix + extensions.front());
   }
   m_MimeTypeReg = context->RegisterService<CustomMimeType>(&m_CustomMimeType);
 

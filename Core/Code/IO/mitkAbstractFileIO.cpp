@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-AbstractFileIO::ReaderOptions AbstractFileIO::GetReaderOptions() const
+AbstractFileIO::Options AbstractFileIO::GetReaderOptions() const
 {
   return AbstractFileReader::GetOptions();
 }
@@ -30,7 +30,7 @@ us::Any AbstractFileIO::GetReaderOption(const std::string& name) const
   return AbstractFileReader::GetOption(name);
 }
 
-void AbstractFileIO::SetReaderOptions(const AbstractFileIO::ReaderOptions& options)
+void AbstractFileIO::SetReaderOptions(const AbstractFileIO::Options& options)
 {
   AbstractFileReader::SetOptions(options);
 }
@@ -111,22 +111,22 @@ std::string AbstractFileIO::GetWriterDescription() const
   return this->AbstractFileWriter::GetDescription();
 }
 
-void AbstractFileIO::SetDefaultReaderOptions(const AbstractFileIO::ReaderOptions& defaultOptions)
+void AbstractFileIO::SetDefaultReaderOptions(const AbstractFileIO::Options& defaultOptions)
 {
   this->AbstractFileReader::SetDefaultOptions(defaultOptions);
 }
 
-AbstractFileIO::ReaderOptions AbstractFileIO::GetDefaultReaderOptions() const
+AbstractFileIO::Options AbstractFileIO::GetDefaultReaderOptions() const
 {
   return this->AbstractFileReader::GetDefaultOptions();
 }
 
-void AbstractFileIO::SetDefaultWriterOptions(const AbstractFileIO::WriterOptions& defaultOptions)
+void AbstractFileIO::SetDefaultWriterOptions(const AbstractFileIO::Options& defaultOptions)
 {
   this->AbstractFileWriter::SetDefaultOptions(defaultOptions);
 }
 
-AbstractFileIO::WriterOptions AbstractFileIO::GetDefaultWriterOptions() const
+AbstractFileIO::Options AbstractFileIO::GetDefaultWriterOptions() const
 {
   return this->AbstractFileWriter::GetDefaultOptions();
 }

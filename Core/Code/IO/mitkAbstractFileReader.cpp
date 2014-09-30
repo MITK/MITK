@@ -347,6 +347,16 @@ CustomMimeType AbstractFileReader::GetMimeType() const
   return d->GetMimeType();
 }
 
+void AbstractFileReader::SetMimeTypePrefix(const std::string& prefix)
+{
+  d->SetMimeTypePrefix(prefix);
+}
+
+std::string AbstractFileReader::GetMimeTypePrefix() const
+{
+  return d->GetMimeTypePrefix();
+}
+
 std::string AbstractFileReader::GetDescription() const
 {
   return d->GetDescription();

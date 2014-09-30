@@ -30,6 +30,8 @@ mitk::LegacyFileReaderService::LegacyFileReaderService(const std::vector<std::st
                                                        const std::string& category)
   : AbstractFileReader()
 {
+  this->SetMimeTypePrefix("application/vnd.mitk.legacy.reader.");
+
   CustomMimeType customMimeType;
   customMimeType.SetCategory(category);
 
@@ -51,12 +53,6 @@ mitk::LegacyFileReaderService::LegacyFileReaderService(const std::vector<std::st
 
 mitk::LegacyFileReaderService::~LegacyFileReaderService()
 {
-  try
-  {
-    m_ServiceReg.Unregister();
-  }
-  catch (const std::exception&)
-  {}
 }
 
 ////////////////////// Reading /////////////////////////

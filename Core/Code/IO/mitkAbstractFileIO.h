@@ -76,16 +76,10 @@ class MITK_CORE_EXPORT AbstractFileIO : public AbstractFileIOReader, public Abst
 {
 public:
 
-  typedef IFileReader::Options ReaderOptions;
-  typedef IFileWriter::Options WriterOptions;
-
-  typedef IFileReader::ConfidenceLevel ReaderConfidenceLevel;
-  typedef IFileWriter::ConfidenceLevel WriterConfidenceLevel;
-
-  ReaderOptions GetReaderOptions() const;
+  Options GetReaderOptions() const;
   us::Any GetReaderOption(const std::string &name) const;
 
-  void SetReaderOptions(const ReaderOptions& options);
+  void SetReaderOptions(const Options& options);
   void SetReaderOption(const std::string& name, const us::Any& value);
 
   std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileReader> >
@@ -139,11 +133,11 @@ protected:
   void SetWriterDescription(const std::string& description);
   std::string GetWriterDescription() const;
 
-  void SetDefaultReaderOptions(const ReaderOptions& defaultOptions);
-  ReaderOptions GetDefaultReaderOptions() const;
+  void SetDefaultReaderOptions(const Options& defaultOptions);
+  Options GetDefaultReaderOptions() const;
 
-  void SetDefaultWriterOptions(const WriterOptions& defaultOptions);
-  WriterOptions GetDefaultWriterOptions() const;
+  void SetDefaultWriterOptions(const Options& defaultOptions);
+  Options GetDefaultWriterOptions() const;
 
   /**
    * \brief Set the service ranking for this file reader.

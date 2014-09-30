@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkIOUtil.h>
-#include "mitkItkImageFileReader.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImageSliceSelector.h"
 
@@ -178,10 +177,7 @@ void ComparePixels( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image )
 void ReadImageDataAndConvertForthAndBack(std::string imageFileName)
 {
   // first we load an mitk::Image from the data repository
-  mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
-  reader->SetFileName(imageFileName);
-  reader->Update();
-  mitk::Image::Pointer mitkTestImage = reader->GetOutput();
+  mitk::Image::Pointer mitkTestImage = mitk::IOUtil::LoadImage(imageFileName);
 
   // some format checking
   mitk::Image::Pointer resultImg = NULL;

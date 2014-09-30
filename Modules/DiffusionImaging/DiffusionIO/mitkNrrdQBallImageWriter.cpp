@@ -153,3 +153,8 @@ std::vector<std::string> mitk::NrrdQBallImageWriter::GetPossibleFileExtensions()
   possibleFileExtensions.push_back(".hqbi");
   return possibleFileExtensions;
 }
+
+std::string mitk::NrrdQBallImageWriter::GetSupportedBaseData() const
+{
+  return InputType::GetStaticNameOfClass();
+}

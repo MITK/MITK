@@ -157,4 +157,9 @@ std::vector<std::string> mitk::NrrdTbssImageWriter::GetPossibleFileExtensions()
   return possibleFileExtensions;
 }
 
+std::string mitk::NrrdTbssImageWriter::GetSupportedBaseData() const
+{
+  return TbssImage::GetStaticNameOfClass();
+}
+
 #endif //__mitkNrrdTbssImageWriter__cpp

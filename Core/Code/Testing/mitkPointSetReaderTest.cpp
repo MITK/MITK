@@ -44,14 +44,16 @@ int mitkPointSetReaderTest(int argc , char* argv[])
   {
     std::string testName = "test1";
     mitk::IFileReader* reader = *iter;
+    reader->SetInput(testName);
     // testing file reading with invalid data
-    MITK_TEST_CONDITION_REQUIRED(reader->GetConfidenceLevel(testName) == mitk::IFileReader::Unsupported, "Testing confidence level with invalid input file name!");
-    CPPUNIT_ASSERT_THROW(reader->Read(testName), mitk::Exception);
+    MITK_TEST_CONDITION_REQUIRED(reader->GetConfidenceLevel() == mitk::IFileReader::Unsupported, "Testing confidence level with invalid input file name!");
+    CPPUNIT_ASSERT_THROW(reader->Read(), mitk::Exception);
 
     // testing file reading with valid data
     std::string filePath = argv[1];
-    MITK_TEST_CONDITION_REQUIRED( reader->GetConfidenceLevel(filePath) == mitk::IFileReader::Supported, "Testing confidence level with valid input file name!");
-    std::vector<mitk::BaseData::Pointer> data = reader->Read(filePath);
+    reader->SetInput(filePath);
+    MITK_TEST_CONDITION_REQUIRED( reader->GetConfidenceLevel() == mitk::IFileReader::Supported, "Testing confidence level with valid input file name!");
+    std::vector<mitk::BaseData::Pointer> data = reader->Read();
     MITK_TEST_CONDITION_REQUIRED( !data.empty(), "Testing non-empty data with valid input file name!");
 
     // evaluate if the read point set is correct

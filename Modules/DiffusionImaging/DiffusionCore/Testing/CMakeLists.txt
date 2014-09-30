@@ -1,3 +1,13 @@
+# The DiffusionCore tests need relaxed compiler flags...
+# TODO fix tests to compile without these additional no-error flags
+if(MSVC_VERSION)
+  # disable deprecated warnings (they would lead to errors)
+  mitkFunctionCheckCAndCXXCompilerFlags("/wd4996" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+else()
+  mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+  mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-declarations" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+endif()
+
 MITK_CREATE_MODULE_TESTS()
 if(TARGET ${TESTDRIVER})
   mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|ITKIOTransformBase+ITKDiffusionTensorImage)

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 
 // MITK includes
-#include <mitkBaseDataIOFactory.h>
+#include <mitkIOUtil.h>
 #include <mitkConnectomicsStatisticsCalculator.h>
 
 // VTK includes
@@ -55,10 +55,8 @@ public:
     //load network
 
     m_NetworkPath = GetTestDataFilePath("DiffusionImaging/Connectomics/reference.cnf");
-    const std::string s1="", s2="";
 
-    std::vector<mitk::BaseData::Pointer> networkFile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( m_NetworkPath, s1, s2, false );
+    std::vector<mitk::BaseData::Pointer> networkFile = mitk::IOUtil::Load( m_NetworkPath );
     if( networkFile.empty() )
     {
       std::string errorMessage = "File at " + m_NetworkPath + " could not be read. Aborting.";

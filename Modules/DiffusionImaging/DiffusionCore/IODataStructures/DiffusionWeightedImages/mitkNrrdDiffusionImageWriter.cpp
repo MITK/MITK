@@ -325,4 +325,10 @@ std::vector<std::string> mitk::NrrdDiffusionImageWriter<TPixelType>::GetPossible
   return possibleFileExtensions;
 }
 
+template<typename TPixelType>
+std::string mitk::NrrdDiffusionImageWriter<TPixelType>::GetSupportedBaseData() const
+{
+  return DiffusionImage<TPixelType>::GetStaticNameOfClass();
+}
+
 #endif //__mitkNrrdDiffusionImageWriter__cpp

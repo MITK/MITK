@@ -51,7 +51,7 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read(std::istream& /*stream*/)
+  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read()
   {
     std::vector<mitk::BaseData::Pointer> result;
     return result;
@@ -95,7 +95,7 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read(std::istream& /*stream*/)
+  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read()
   {
     std::vector<mitk::BaseData::Pointer> result;
     return result;

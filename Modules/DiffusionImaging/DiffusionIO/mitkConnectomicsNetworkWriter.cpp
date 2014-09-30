@@ -155,3 +155,8 @@ std::vector<std::string> mitk::ConnectomicsNetworkWriter::GetPossibleFileExtensi
   possibleFileExtensions.push_back(".cnf");
   return possibleFileExtensions;
 }
+
+std::string mitk::ConnectomicsNetworkWriter::GetSupportedBaseData() const
+{
+  return InputType::GetStaticNameOfClass();
+}

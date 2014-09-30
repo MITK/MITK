@@ -61,7 +61,10 @@ int mitkPointSetWriterTest(int /* argc */, char* /*argv*/[])
     // test for exception handling
     try
     {
-      iter->GetWriter()->Write(pointSet, "/usr/bin");
+      mitk::IFileWriter* writer = iter->GetWriter();
+      writer->SetInput(pointSet);
+      writer->SetOutputLocation("/usr/bin");
+      iter->GetWriter()->Write();
       MITK_TEST_FAILED_MSG( << "itk::ExceptionObject expected" )
     }
     catch (const itk::ExceptionObject&)

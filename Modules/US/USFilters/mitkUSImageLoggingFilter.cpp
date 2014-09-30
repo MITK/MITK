@@ -108,7 +108,7 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
     {
       std::stringstream name;
       name << path << uniqueID << "_Image_" << i << m_ImageExtension;
-      mitk::IOUtil::SaveImage(m_LoggedImages.at(i),name.str());
+      mitk::IOUtil::Save(m_LoggedImages.at(i),name.str());
       filenames.push_back(name.str());
     }
 

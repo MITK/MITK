@@ -1,0 +1,5 @@
+#if @MITK_USE_BREAKPAD@ == 1
+  #include <mitkBreakpadCrashReporting.h>
+
+  #define MITK_USE_BREAKPAD
+#endif

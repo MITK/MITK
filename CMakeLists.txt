@@ -412,6 +412,14 @@ endif()
 # Generate Project.xml file expected by the CTest driver script
 mitkFunctionGenerateProjectXml(${MITK_BINARY_DIR} MITK "${subproject_list}" ${MITK_USE_SUPERBUILD})
 
+# Configure mitkBreakpadConfig.h that should be used for including breakpad
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mitkBreakpadConfig.h.in" "${CMAKE_CURRENT_BINARY_DIR}/mitkBreakpadConfig.h" @ONLY)
+if (MITK_USE_BREAKPAD)
+  set (MITK_USE_BREAKPAD 1)
+else()
+  set (MITK_USE_BREAKPAD 0)
+endif()
+
 #-----------------------------------------------------------------------------
 # Superbuild script
 #-----------------------------------------------------------------------------

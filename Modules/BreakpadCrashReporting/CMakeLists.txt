@@ -35,3 +35,4 @@ if(MITK_USE_BREAKPAD) # from top-level CMakeLists.txt
 add_subdirectory(Testing)
 
 endif(MITK_USE_BREAKPAD)
+

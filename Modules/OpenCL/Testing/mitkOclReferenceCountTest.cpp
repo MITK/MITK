@@ -57,7 +57,7 @@ int mitkOclReferenceCountTest( int argc, char* argv[] )
   int outsideVal = 0;
   int insideVal = 100;
 
-  mitk::OclBinaryThresholdImageFilter* oclFilter1 = new mitk::OclBinaryThresholdImageFilter;
+  mitk::OclBinaryThresholdImageFilter::Pointer oclFilter1 = mitk::OclBinaryThresholdImageFilter::New();
   oclFilter1->SetInput( inputImage );
   oclFilter1->SetUpperThreshold( upperThr );
   oclFilter1->SetLowerThreshold( lowerThr );
@@ -68,7 +68,7 @@ int mitkOclReferenceCountTest( int argc, char* argv[] )
   mitk::Image::Pointer outputImage1 = mitk::Image::New();
   outputImage1 = oclFilter1->GetOutput();
 
-  mitk::OclBinaryThresholdImageFilter* oclFilter2 = new mitk::OclBinaryThresholdImageFilter;
+  mitk::OclBinaryThresholdImageFilter::Pointer oclFilter2 = mitk::OclBinaryThresholdImageFilter::New();
 
   oclFilter2->SetInput( inputImage );
   oclFilter2->SetUpperThreshold( upperThr );
@@ -81,8 +81,8 @@ int mitkOclReferenceCountTest( int argc, char* argv[] )
   outputImage2 = oclFilter2->GetOutput();
 
   // delete filters
-  delete oclFilter1;
-  delete oclFilter2;
+  oclFilter1 = NULL;
+  oclFilter2 = NULL;
 
   // this is only visible if the delete did not cause a segmentation fault
   // it is always true and successfull if the program reaches this state

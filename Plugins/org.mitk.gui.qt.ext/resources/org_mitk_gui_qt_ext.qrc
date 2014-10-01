@@ -1,10 +1,11 @@
 <RCC>
     <qresource prefix="/org.mitk.gui.qt.ext">
-        <file>Load_48.png</file>
-        <file>Redo_48.png</file>
-        <file>Save_48.png</file>
-        <file>Undo_48.png</file>
-        <file>Remove_48.png</file>
+        <file>document-open.svg</file>
+        <file>document-save.svg</file>
+        <file>edit-delete.svg</file>
+        <file>edit-redo.svg</file>
+        <file>edit-undo.svg</file>
+        <file>system-log-out.svg</file>
         <file>dcm-icon.png</file>
         <file>Slider.png</file>
         <file>index.html</file>

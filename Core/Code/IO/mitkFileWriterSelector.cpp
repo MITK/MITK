@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include <usAny.h>
 
+#include <itksys/SystemTools.hxx>
+
 #include <set>
 #include <limits>
 #include <iterator>
@@ -73,10 +75,26 @@ FileWriterSelector::FileWriterSelector(const FileWriterSelector& other)
 {
 }
 
-FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::string& destMimeType)
+FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::string& mimeType,
+                                       const std::string& path)
   : m_Data(new Impl)
 {
   mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
+
+  std::string destMimeType = mimeType;
+  if (destMimeType.empty() && !path.empty())
+  {
+    // try to derive a mime-type from the extension
+    std::string ext = itksys::SystemTools::GetFilenameExtension(path);
+    if (!ext.empty())
+    {
+      std::vector<MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(ext);
+      if (!mimeTypes.empty())
+      {
+        destMimeType = mimeTypes.front().GetName();
+      }
+    }
+  }
 
   std::vector<std::string> classHierarchy = baseData->GetClassHierarchy();
 
@@ -162,6 +180,11 @@ FileWriterSelector& FileWriterSelector::operator=(const FileWriterSelector& othe
 {
   m_Data = other.m_Data;
   return *this;
+}
+
+bool FileWriterSelector::IsEmpty() const
+{
+  return m_Data->m_Items.empty();
 }
 
 std::vector<FileWriterSelector::Item> FileWriterSelector::Get(const std::string& mimeType) const

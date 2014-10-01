@@ -141,6 +141,11 @@ FileReaderSelector& FileReaderSelector::operator=(const FileReaderSelector& othe
   return *this;
 }
 
+bool FileReaderSelector::IsEmpty() const
+{
+  return m_Data->m_Items.empty();
+}
+
 std::vector<MimeType> FileReaderSelector::GetMimeTypes() const
 {
   return m_Data->m_MimeTypes;

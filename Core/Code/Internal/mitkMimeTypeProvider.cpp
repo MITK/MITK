@@ -35,6 +35,11 @@ MimeTypeProvider::MimeTypeProvider()
 {
 }
 
+MimeTypeProvider::~MimeTypeProvider()
+{
+  delete m_Tracker;
+}
+
 void MimeTypeProvider::Start()
 {
   if (m_Tracker == NULL)

@@ -64,11 +64,14 @@ public:
   };
 
   FileWriterSelector(const FileWriterSelector& other);
-  FileWriterSelector(const BaseData* baseData, const std::string& destMimeType = std::string());
+  FileWriterSelector(const BaseData* baseData, const std::string& destMimeType = std::string(),
+                     const std::string& path = std::string());
 
   ~FileWriterSelector();
 
   FileWriterSelector& operator=(const FileWriterSelector& other);
+
+  bool IsEmpty() const;
 
   /**
    * @brief Get a sorted list of file writer info objects.

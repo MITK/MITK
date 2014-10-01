@@ -153,7 +153,7 @@ set(MODULE_CUSTOM_TESTS
     mitkStateMachineFactoryTest.cpp
     mitkPointSetLocaleTest.cpp
     mitkImageTest.cpp
-    #mitkImageWriterTest.cpp
+    mitkImageWriterTest.cpp
     mitkImageVtkMapper2DTest.cpp
     mitkImageVtkMapper2DLevelWindowTest.cpp
     mitkImageVtkMapper2DOpacityTest.cpp

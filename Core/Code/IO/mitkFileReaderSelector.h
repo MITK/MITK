@@ -69,6 +69,8 @@ public:
 
   FileReaderSelector& operator=(const FileReaderSelector& other);
 
+  bool IsEmpty() const;
+
   std::vector<MimeType> GetMimeTypes() const;
 
   /**

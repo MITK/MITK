@@ -289,31 +289,6 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
     vtkObjectFactory::RegisterFactory( textureFactory );
     textureFactory->Delete();
     */
-
-
-
-  std::list<mitk::FileWriter::Pointer> possibleWriters;
-  std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("IOWriter");
-
-  for( std::list<itk::LightObject::Pointer>::iterator i = allobjects.begin();
-       i != allobjects.end();
-       ++i)
-  {
-    mitk::FileWriter* io = dynamic_cast<mitk::FileWriter*>(i->GetPointer());
-    if(io)
-    {
-      std::cout << "**** FOUND IOWRITER " << io->GetNameOfClass() << std::endl;
-      std::string description = std::string("Legacy ") + io->GetNameOfClass() + " Reader";
-      new mitk::LegacyFileWriterService(io, description);
-      possibleWriters.push_back(io);
-    }
-    else
-    {
-      MITK_ERROR << "Error BaseDataIO factory did not return an IOAdapterBase: "
-        << (*i)->GetNameOfClass()
-        << std::endl;
-    }
-  }
 }
 
 void MitkCoreActivator::Unload(us::ModuleContext* )
@@ -332,6 +307,12 @@ void MitkCoreActivator::Unload(us::ModuleContext* )
 
   for(std::vector<mitk::AbstractFileIO*>::iterator iter = m_FileIOs.begin(),
       endIter = m_FileIOs.end(); iter != endIter; ++iter)
+  {
+    delete *iter;
+  }
+
+  for(std::vector<mitk::IFileWriter*>::iterator iter = m_LegacyWriters.begin(),
+      endIter = m_LegacyWriters.end(); iter != endIter; ++iter)
   {
     delete *iter;
   }
@@ -389,6 +370,29 @@ void MitkCoreActivator::RegisterItkReaderWriter()
     {
       MITK_WARN << "Error ImageIO factory did not return an ImageIOBase: "
                 << ( *i )->GetNameOfClass();
+    }
+  }
+}
+
+void MitkCoreActivator::RegisterLegacyWriter()
+{
+  std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("IOWriter");
+
+  for( std::list<itk::LightObject::Pointer>::iterator i = allobjects.begin();
+       i != allobjects.end(); ++i)
+  {
+    mitk::FileWriter::Pointer io = dynamic_cast<mitk::FileWriter*>(i->GetPointer());
+    if(io)
+    {
+      std::string description = std::string("Legacy ") + io->GetNameOfClass() + " Reader";
+      mitk::IFileWriter* writer = new mitk::LegacyFileWriterService(io, description);
+      m_LegacyWriters.push_back(writer);
+    }
+    else
+    {
+      MITK_ERROR << "Error IOWriter override is not of type mitk::FileWriter: "
+                 << (*i)->GetNameOfClass()
+                 << std::endl;
     }
   }
 }

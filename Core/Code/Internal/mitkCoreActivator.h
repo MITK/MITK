@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <memory>
 
+
 /*
  * This is the module activator for the "Mitk" module. It registers core services
  * like ...
@@ -57,6 +58,8 @@ private:
   void RegisterDefaultMimeTypes();
   void RegisterItkReaderWriter();
 
+  void RegisterLegacyWriter();
+
   std::auto_ptr<us::ServiceTracker<mitk::IShaderRepository> > m_ShaderRepositoryTracker;
 
   //mitk::RenderingManager::Pointer m_RenderingManager;
@@ -71,6 +74,7 @@ private:
   std::vector<mitk::IFileReader*> m_FileReaders;
   std::vector<mitk::IFileWriter*> m_FileWriters;
   std::vector<mitk::AbstractFileIO*> m_FileIOs;
+  std::vector<mitk::IFileWriter*> m_LegacyWriters;
 
   std::vector<mitk::CustomMimeType> m_DefaultMimeTypes;
 

@@ -91,6 +91,8 @@ public:
     */
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
+    std::string GetSupportedBaseData() const;
+
 
 protected:
 

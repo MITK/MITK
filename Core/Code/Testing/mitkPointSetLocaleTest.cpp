@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkPointSetReader.h"
-#include "mitkPointSetWriter.h"
+#include "mitkPointSet.h"
 #include "mitkStandardFileLocations.h"
+#include "mitkIOUtil.h"
 #include "mitkTestingMacros.h"
 #include <list>
 #include <fstream>
@@ -48,10 +48,7 @@ void ReaderLocaleTest(mitk::Point3D & refPoint, std::string filename)
 {
   MITK_TEST_OUTPUT(<< "---- Reader Test ---- ");
 
-  mitk::PointSetReader::Pointer reader = mitk::PointSetReader::New();
-  reader -> SetFileName(filename.c_str());
-  reader -> Update();
-  mitk::PointSet::Pointer pointSet = reader -> GetOutput();
+  mitk::PointSet::Pointer pointSet = mitk::IOUtil::LoadPointSet(filename);
 
   mitk::Point3D point;
   if (pointSet->GetPointIfExists(0, &point))
@@ -76,24 +73,20 @@ void WriterLocaleTest(mitk::Point3D & refPoint, std::string filename)
   refPointSet->InsertPoint(0,refPoint);
   //SetPoint(0, refPoint);
 
-  std::string testFileName = "testPointSet.mps";
+  std::ofstream tmpStream;
+  std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream);
 
   // write point set
-  mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
-  writer -> SetFileName(testFileName.c_str());
-  writer -> SetInput(refPointSet);
-  writer -> Write();
+  mitk::IOUtil::Save(refPointSet, tmpFilePath);
+  tmpStream.close();
+
+  std::ifstream stream(tmpFilePath.c_str());
 
   //compare two .mps files
   std::ifstream refStream (filename.c_str());
-  std::ifstream stream (testFileName.c_str());
 
   MITK_TEST_CONDITION_REQUIRED(refStream,"Read reference point set");
   MITK_TEST_CONDITION_REQUIRED(stream,"Read point set");
-
-
-  std::string streamLine;
-  std::string refStreamLine;
 
   bool differ = false;
   if (stream.is_open() && refStream.is_open())

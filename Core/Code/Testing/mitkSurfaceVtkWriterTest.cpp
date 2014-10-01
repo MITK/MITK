@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkSurfaceVtkWriter.h"
-
 #include "mitkTestingMacros.h"
+#include "mitkIOUtil.h"
+#include "mitkSurface.h"
 
 #include <vtkPolyDataReader.h>
 #include <vtkPolyDataWriter.h>
@@ -36,14 +36,6 @@ int mitkSurfaceVtkWriterTest(int /*argc*/ , char* argv[])
   // always start with this!
   MITK_TEST_BEGIN("SurfaceVtkWriter")
 
-  // let's create an object of our class
-  mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer mySurfaceVtkWriter = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
-
-  // first test: did this work?
-  // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
-  // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(mySurfaceVtkWriter.IsNotNull(),"Testing instantiation")
-
   // create contour
   vtkPolyDataReader* reader = vtkPolyDataReader::New();
   reader->SetFileName(argv[1]);
@@ -56,30 +48,27 @@ int mitkSurfaceVtkWriterTest(int /*argc*/ , char* argv[])
 
     MITK_TEST_CONDITION_REQUIRED(surface.IsNotNull(),"Surface creation")
 
-      try{
-        // test for exception handling
-        MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
-        mySurfaceVtkWriter->SetInput(surface);
-        mySurfaceVtkWriter->SetFileName("/usr/bin");
-        mySurfaceVtkWriter->Update();
-        MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+    try
+    {
+      // test for exception handling
+      mitk::IOUtil::Save(surface, "/usr/bin");
+      MITK_TEST_FAILED_MSG( << "itk::ExceptionObject expected" )
     }
-    catch(...) {
+    catch (const mitk::Exception&) { /* this is expected */ }
+    catch(...)
+    {
       //this means that a wrong exception (i.e. no itk:Exception) has been thrown
-      std::cout << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
-      return EXIT_FAILURE;
+      MITK_TEST_FAILED_MSG( << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" )
     }
 
     // write your own tests here and use the macros from mitkTestingMacros.h !!!
     // do not write to std::cout and do not return from this function yourself!
-
-    // always end with this!
   }
 
   //Delete reader correctly
   reader->Delete();
 
+  // always end with this!
   MITK_TEST_END()
-
 }
 

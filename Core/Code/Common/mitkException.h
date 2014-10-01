@@ -110,4 +110,7 @@ namespace mitk {
 
   };
 } // namespace mitk
+
+MITK_CORE_EXPORT std::ostream& operator<<(std::ostream& os, const mitk::Exception& e);
+
 #endif

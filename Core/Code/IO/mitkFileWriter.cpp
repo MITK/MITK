@@ -16,15 +16,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFileWriter.h"
 
-bool mitk::FileWriter::CanWriteDataType( DataNode* )
+bool mitk::FileWriter::CanWriteDataType( DataNode* node )
 {
   //TODO #345 check for writing permission
-  return false;
+  if (node == NULL || node->GetData() == NULL) return false;
+  return node->GetData()->GetNameOfClass() == this->GetSupportedBaseData();
 }
 
 std::string mitk::FileWriter::GetWritenMIMEType()
 {
   return "";
+}
+
+void mitk::FileWriter::SetInput(mitk::BaseData* data)
+{
+  this->SetNthInput(0, data);
 }
 
 std::string mitk::FileWriter::GetFileExtension()

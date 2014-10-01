@@ -15,9 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPointSet.h"
-#include "mitkPointSetWriter.h"
-#include "mitkPointSetReader.h"
 #include "mitkTestingMacros.h"
+#include "mitkFileWriterRegistry.h"
+#include "mitkIOUtil.h"
+
 #include <vector>
 #include <itksys/SystemTools.hxx>
 #include <time.h>
@@ -30,11 +31,20 @@ class mitkPointSetFileIOTestClass
 {
 public:
 
-  std::vector<mitk::PointSet::Pointer> m_SavedPointSet;
+  mitk::PointSet::Pointer m_SavedPointSet;
+  std::string m_FilePath;
 
   mitkPointSetFileIOTestClass()
   {
 
+  }
+
+  ~mitkPointSetFileIOTestClass()
+  {
+    if (!m_FilePath.empty())
+    {
+      std::remove(m_FilePath.c_str());
+    }
   }
 
   mitk::PointSet::Pointer CreateTestPointSet()
@@ -56,7 +66,7 @@ public:
       ++position;
       pointSet->SetPoint(position, point, t);
     }
-    m_SavedPointSet.push_back(pointSet);
+    m_SavedPointSet = pointSet;
 
     return pointSet;
 
@@ -90,21 +100,15 @@ public:
 
   }
 
-  bool PointSetWrite(unsigned int numberOfPointSets)
+  bool PointSetWrite()
   {
     try
     {
-      m_SavedPointSet.clear();
+      m_SavedPointSet = NULL;
 
-      mitk::PointSetWriter::Pointer pointSetWriter = mitk::PointSetWriter::New();
-      pointSetWriter->SetFileName("test_pointset_new.mps");
-
-      for (unsigned int i = 0; i < numberOfPointSets; i++)
-      {
-        pointSetWriter->SetInput(i, CreateTestPointSet());
-      }
-
-      pointSetWriter->Write();
+      std::ofstream tmpStream;
+      m_FilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream);
+      mitk::IOUtil::Save(CreateTestPointSet(), m_FilePath);
     }
     catch (std::exception& /*e*/)
     {
@@ -114,25 +118,16 @@ public:
     return true;
   }
 
-  void PointSetLoadAndCompareTest(unsigned int numberOfPointSets)
+  void PointSetLoadAndCompareTest()
   {
     try
     {
-      mitk::PointSetReader::Pointer pointSetReader =
-          mitk::PointSetReader::New();
-      mitk::PointSet::Pointer pointSet;
+      mitk::PointSet::Pointer pointSet = mitk::IOUtil::LoadPointSet(m_FilePath);
+      MITK_TEST_CONDITION(pointSet.IsNotNull(), "Testing if the loaded Data are NULL" );
 
-      pointSetReader->SetFileName("test_pointset_new.mps");
-      for (unsigned int i = 0; i < numberOfPointSets; i++)
-      {
-        pointSetReader->Update();
-        pointSet = pointSetReader->GetOutput(i);
-        MITK_TEST_CONDITION(pointSet.IsNotNull(), "Testing if the loaded Data are NULL" );
-
-        bool identical(true);
-        PointSetCompare(pointSet.GetPointer(), m_SavedPointSet.at(i).GetPointer(),
-            identical);
-      }
+      bool identical(true);
+      PointSetCompare(pointSet.GetPointer(), m_SavedPointSet.GetPointer(),
+                      identical);
     } catch (std::exception& /*e*/)
     {
     }
@@ -144,15 +139,14 @@ public:
 int mitkPointSetFileIOTest(int, char*[])
 {
   MITK_TEST_BEGIN("PointSet");
-  unsigned int numberOfPointSets(5);
 
   mitkPointSetFileIOTestClass* test = new mitkPointSetFileIOTestClass();
 
   // write
-  MITK_TEST_CONDITION(test->PointSetWrite(numberOfPointSets), "Testing if the PointSetWriter writes Data" );
+  MITK_TEST_CONDITION(test->PointSetWrite(), "Testing if the PointSetWriter writes Data" );
 
   // load - compare
-  test->PointSetLoadAndCompareTest(numberOfPointSets);
+  test->PointSetLoadAndCompareTest();
 
   //Delete correctly
   delete test;

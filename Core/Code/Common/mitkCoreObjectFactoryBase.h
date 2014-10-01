@@ -41,15 +41,35 @@ class DataNode;
 class MITK_CORE_EXPORT CoreObjectFactoryBase : public itk::Object
 {
   public:
+
     typedef std::list<mitk::FileWriterWithInformation::Pointer> FileWriterList;
     typedef std::multimap<std::string, std::string> MultimapType;
-    mitkClassMacro(CoreObjectFactoryBase,itk::Object);
+
+    mitkClassMacro(CoreObjectFactoryBase,itk::Object)
+
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) = 0;
     virtual void SetDefaultProperties(mitk::DataNode* node) = 0;
+
+    /**
+     * @deprecatedSince{2014_03} See mitk::FileReaderRegistry and QmitkIOUtil
+     */
     virtual const char* GetFileExtensions() = 0;
+
+    /**
+     * @deprecatedSince{2014_03} See mitk::FileReaderRegistry and QmitkIOUtil
+     */
     virtual MultimapType GetFileExtensionsMap() = 0;
+
+    /**
+     * @deprecatedSince{2014_03} See mitk::FileWriterRegistry and QmitkIOUtil
+     */
     virtual const char* GetSaveFileExtensions() = 0;
+
+    /**
+     * @deprecatedSince{2014_03} See mitk::FileWriterRegistry and QmitkIOUtil
+     */
     virtual MultimapType GetSaveFileExtensionsMap() = 0;
+
     virtual const char* GetITKSourceVersion() const
     {
       return ITK_SOURCE_VERSION;
@@ -58,7 +78,12 @@ class MITK_CORE_EXPORT CoreObjectFactoryBase : public itk::Object
     {
       return "Core Object Factory";
     }
-    FileWriterList GetFileWriters() {
+
+    /**
+     * @deprecatedSince{2014_03} See mitk::FileWriterRegistry
+     */
+    FileWriterList GetFileWriters()
+    {
       return m_FileWriters;
     }
 
@@ -69,10 +94,14 @@ class MITK_CORE_EXPORT CoreObjectFactoryBase : public itk::Object
      * @param fileExtensionsMap input map with the file extensions, e.g. ("*.dcm", "DICOM files")("*.dc3", "DICOM files")
      * @param fileExtensions the converted output string, suitable for the QT QFileDialog widget
      *                       e.g. "all (*.dcm *.DCM *.dc3 ... *.vti *.hdr *.nrrd *.nhdr );;Q-Ball Images (*.hqbi *qbi)"
+     *
+     * @deprecatedSince{2014_03}
      */
     static void CreateFileExtensions(MultimapType fileExtensionsMap, std::string& fileExtensions);
 
     FileWriterList m_FileWriters;
+
+    friend class CoreObjectFactory;
 };
 }
 #endif

@@ -16,7 +16,6 @@
 
 #include "mitkRenderWindow.h"
 
-#include <mitkDataNodeFactory.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkProperties.h>
 #include <mitkTransferFunction.h>
@@ -40,6 +39,7 @@
 #include "mitkGradientBackground.h"
 #include "mitkCoordinateSupplier.h"
 #include "mitkDataStorage.h"
+#include "mitkIOUtil.h"
 
 #include "vtkTextProperty.h"
 #include "vtkCornerAnnotation.h"
@@ -252,31 +252,28 @@ int main(int argc, char* argv[])
     if (strcmp(argv[i], "-testing") == 0)
       continue;
 
-    // Create a DataNodeFactory to read a data format supported
-    // by the DataNodeFactory (many image formats, surface formats, etc.)
-    mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-    const char * filename = argv[i];
+    std::string filename = argv[i];
     try
     {
-      nodeReader->SetFileName(filename);
-      nodeReader->Update();
+      // Read the file and add it as a data node to the data storage
+      mitk::DataStorage::SetOfObjects::Pointer nodes = mitk::IOUtil::Load(filename, *m_DataStorage);
 
-      // Since the DataNodeFactory directly creates a node,
-      // use the datastorage to add the read node
-      mitk::DataNode::Pointer node = nodeReader->GetOutput();
-      m_DataStorage->Add(node);
-
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-      if (image.IsNotNull())
+      for (mitk::DataStorage::SetOfObjects::Iterator nodeIter = nodes->Begin(),
+           nodeIterEnd = nodes->End(); nodeIter != nodeIterEnd; ++nodeIter)
       {
-        // Set the property "volumerendering" to the Boolean value "true"
-        node->SetProperty("volumerendering", mitk::BoolProperty::New(false));
-        node->SetProperty("name", mitk::StringProperty::New("testimage"));
-        node->SetProperty("layer", mitk::IntProperty::New(1));
+        mitk::DataNode::Pointer node = nodeIter->Value();
+        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+        if (image.IsNotNull())
+        {
+          // Set the property "volumerendering" to the Boolean value "true"
+          node->SetProperty("volumerendering", mitk::BoolProperty::New(false));
+          node->SetProperty("name", mitk::StringProperty::New("testimage"));
+          node->SetProperty("layer", mitk::IntProperty::New(1));
+        }
       }
     } catch (...)
     {
-      fprintf(stderr, "Could not open file %s \n\n", filename);
+      std::cerr << "Could not open file " << filename << std::endl;
       exit(2);
     }
   }

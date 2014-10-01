@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateDataType.h"
 #include <QtGui>
 #include <mitkCoreObjectFactory.h>
-#include <mitkDataNodeFactory.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkIRenderingManager.h>
+#include <mitkIOUtil.h>
 
 const std::string QmitkDataManagerLightView::VIEW_ID = "org.mitk.views.datamanagerlight";
 
@@ -166,30 +166,13 @@ void QmitkDataManagerLightView::on_Load_pressed()
   }
 }
 
-void QmitkDataManagerLightView::FileOpen( const char * fileName, mitk::DataNode* parentNode )
+void QmitkDataManagerLightView::FileOpen( const char * fileName, mitk::DataNode* /*parentNode*/ )
 {
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
-
   try
   {
-    factory->SetFileName( fileName );
-
     QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
-
-    factory->Update();
-
-    for ( unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i )
-    {
-      mitk::DataNode::Pointer node = factory->GetOutput( i );
-      if ( ( node.IsNotNull() ) && ( node->GetData() != NULL ) )
-      {
-        this->GetDataStorage()->Add(node, parentNode);
-        mitk::BaseData::Pointer basedata = node->GetData();
-        mitk::RenderingManager::GetInstance()->InitializeViews(
-          basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-        //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      }
-    }
+    mitk::IOUtil::Load(fileName, *this->GetDataStorage());
+    mitk::RenderingManager::GetInstance()->InitializeViews();
   }
   catch ( itk::ExceptionObject & ex )
   {

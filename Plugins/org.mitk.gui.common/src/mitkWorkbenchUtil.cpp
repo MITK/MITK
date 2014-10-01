@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferencesService.h>
 #include <berryIBerryPreferences.h>
 
-#include <mitkDataNodeFactory.h>
 #include "mitkIDataStorageService.h"
 #include "mitkDataStorageEditorInput.h"
 #include "mitkRenderingManager.h"
@@ -34,9 +33,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateData.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
-#include "mitkIOUtil.h"
-#include "mitkWorkbenchUtil.h"
-#include <ctkUtils.h>
+#include "mitkCoreObjectFactory.h"
+
+#include "QmitkIOUtil.h"
 
 #include <QMessageBox>
 #include <QApplication>
@@ -129,22 +128,23 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
   mitk::DataStorage::Pointer dataStorage = dataStorageRef->GetDataStorage();
 
   // Do the actual work of loading the data into the data storage
-  std::vector<std::string> fileNames2;
-
-  // Correct conversion for File names.(BUG 12252)
-  fileNames2.resize(fileNames.size());
-  for (int i = 0; i< fileNames.size(); i++)
-    fileNames2[i] = std::string(QFile::encodeName(fileNames[i]).data());
-
-  // Old conversion which returns wrong encoded Non-Latin-Characters.
-  //ctk::qListToSTLVector(fileNames, fileNames2);
 
   // Turn off ASSERT
   #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
       int lastCrtReportType = _CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_DEBUG );
   #endif
 
-  const bool dsmodified = mitk::IOUtil::LoadFiles(fileNames2, *dataStorage);
+  DataStorage::SetOfObjects::Pointer data;
+  try
+  {
+    data = QmitkIOUtil::Load(fileNames, *dataStorage);
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_INFO << e;
+    return;
+  }
+  const bool dsmodified = !data->empty();
 
   // Set ASSERT status back to previous status.
   #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)

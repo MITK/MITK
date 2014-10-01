@@ -125,3 +125,8 @@ std::vector<std::string> mitk::NrrdTensorImageWriter::GetPossibleFileExtensions(
   possibleFileExtensions.push_back(".hdti");
   return possibleFileExtensions;
 }
+
+std::string mitk::NrrdTensorImageWriter::GetSupportedBaseData() const
+{
+  return InputType::GetStaticNameOfClass();
+}

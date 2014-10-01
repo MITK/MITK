@@ -304,3 +304,8 @@ std::vector<std::string> mitk::PicFileWriter::GetPossibleFileExtensions()
   possibleFileExtensions.push_back(".pic");
   return possibleFileExtensions;
 }
+
+std::string mitk::PicFileWriter::GetSupportedBaseData() const
+{
+  return Image::GetStaticNameOfClass();
+}

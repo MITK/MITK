@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkInteractionTestHelper_h
 
 #include <mitkRenderWindow.h>
-#include <mitkDataNodeFactory.h>
 #include <mitkDataStorage.h>
 #include <mitkXML2EventParser.h>
 #include <mitkMouseModeSwitcher.h>

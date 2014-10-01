@@ -132,6 +132,8 @@ namespace mitk
     */
     virtual void SetInput( DataNode* );
 
+    virtual std::string GetSupportedBaseData() const;
+
     /**
     * @returns whether the last write attempt was successful or not.
     */

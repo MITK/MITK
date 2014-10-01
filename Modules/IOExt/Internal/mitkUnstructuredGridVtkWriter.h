@@ -111,6 +111,9 @@ public:
     */
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
+    virtual std::string GetSupportedBaseData() const
+    { return UnstructuredGrid::GetStaticNameOfClass(); }
+
     // FileWriterWithInformation methods
     virtual const char * GetDefaultFilename();
     virtual const char * GetFileDialogPattern();

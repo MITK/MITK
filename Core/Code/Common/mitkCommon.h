@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLogMacros.h"
 #include "mitkExportMacros.h"
 #include "mitkExceptionMacro.h"
+#include "mitkGetClassHierarchy.h"
 
 #ifndef MITK_UNMANGLE_IPPIC
 #define mitkIpPicDescriptor mitkIpPicDescriptor
@@ -36,12 +37,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 typedef unsigned int MapperSlotId;
 
+
 #define mitkClassMacro(className,SuperClassName) \
   typedef className        Self; \
   typedef SuperClassName      Superclass; \
   typedef itk::SmartPointer<Self> Pointer; \
   typedef itk::SmartPointer<const Self>  ConstPointer; \
-    itkTypeMacro(className,SuperClassName)
+  static const char* GetStaticNameOfClass() { return #className; } \
+  virtual std::vector<std::string> GetClassHierarchy() const { return mitk::GetClassHierarchy<Self>(); } \
+  itkTypeMacro(className,SuperClassName)
+
 /**
 * Macro for Constructors with one parameter for classes derived from itk::Lightobject
 **/

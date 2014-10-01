@@ -133,3 +133,8 @@ std::vector<std::string> mitk::FiberBundleXWriter::GetPossibleFileExtensions()
   possibleFileExtensions.push_back(".trk");
   return possibleFileExtensions;
 }
+
+string mitk::FiberBundleXWriter::GetSupportedBaseData() const
+{
+  return FiberBundleX::GetStaticNameOfClass();
+}

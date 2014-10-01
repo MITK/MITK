@@ -97,6 +97,7 @@ namespace mitk {
   {
   public:
     mitkClassMacro(BaseGeometry, itk::Object);
+    itkCloneMacro(Self)
 
     // ********************************** TypeDef **********************************
 

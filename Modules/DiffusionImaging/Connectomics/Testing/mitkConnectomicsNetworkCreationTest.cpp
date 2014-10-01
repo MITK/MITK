@@ -22,9 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 
 // MITK includes
-#include <mitkBaseDataIOFactory.h>
 #include "mitkConnectomicsNetworkCreator.h"
-#include <mitkCoreObjectFactory.h>
+#include "mitkIOUtil.h"
 
 // VTK includes
 #include <vtkDebugLeaks.h>
@@ -66,11 +65,8 @@ public:
 
   void CreateNetworkFromFibersAndParcellation()
   {
-    const std::string s1="", s2="";
-
     // load fiber image
-    std::vector<mitk::BaseData::Pointer> fiberInfile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( m_FiberPath, s1, s2, false );
+    std::vector<mitk::BaseData::Pointer> fiberInfile = mitk::IOUtil::Load( m_FiberPath );
     if( fiberInfile.empty() )
     {
       std::string errorMessage = "Fiber Image at " + m_FiberPath + " could not be read. Aborting.";
@@ -80,8 +76,7 @@ public:
     mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*>( fiberBaseData );
 
     // load parcellation
-    std::vector<mitk::BaseData::Pointer> parcellationInFile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( m_ParcellationPath, s1, s2, false );
+    std::vector<mitk::BaseData::Pointer> parcellationInFile = mitk::IOUtil::Load( m_ParcellationPath );
     if( parcellationInFile.empty() )
     {
       std::string errorMessage = "Parcellation at " + m_ParcellationPath + " could not be read. Aborting.";
@@ -99,8 +94,7 @@ public:
     connectomicsNetworkCreator->CreateNetworkFromFibersAndSegmentation();
 
     // load network
-    std::vector<mitk::BaseData::Pointer> referenceFile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( m_ReferenceNetworkPath, s1, s2, false );
+    std::vector<mitk::BaseData::Pointer> referenceFile = mitk::IOUtil::Load( m_ReferenceNetworkPath );
     if( referenceFile.empty() )
     {
       std::string errorMessage = "Reference Network at " + m_ReferenceNetworkPath + " could not be read. Aborting.";

@@ -289,8 +289,8 @@ void mitk::RenderingTestHelper::AddToStorage(const std::string &filename)
 {
   try
   {
-    mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode(filename);
-    this->AddNodeToStorage(node);
+    mitk::IOUtil::Load(filename, *m_DataStorage.GetPointer());
+    mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
   }
   catch ( itk::ExceptionObject & e )
   {

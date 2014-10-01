@@ -282,6 +282,11 @@ void mitk::PlanarFigureWriter::SetInput( DataNode* input )
     this->ProcessObject::SetNthInput( 0, dynamic_cast<mitk::PlanarFigure*>( input->GetData() ) );
 }
 
+std::string mitk::PlanarFigureWriter::GetSupportedBaseData() const
+{
+  return PlanarFigure::GetStaticNameOfClass();
+}
+
 
 std::string mitk::PlanarFigureWriter::GetWritenMIMEType()
 {

@@ -28,6 +28,8 @@ set(MODULE_TESTS
   mitkDispatcherTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp
+  mitkFileReaderRegistryTest.cpp
+  #mitkFileWriterRegistryTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
@@ -97,7 +99,7 @@ set(MODULE_TESTS
   mitkRawImageFileReaderTest.cpp
   mitkInteractionEventTest.cpp
   mitkLookupTableTest.cpp
-  mitkSTLFileReaderTest.cpp
+  #mitkSTLFileReaderTest.cpp
   mitkPointTypeConversionTest.cpp
   mitkVectorTypeConversionTest.cpp
   mitkMatrixTypeConversionTest.cpp
@@ -122,12 +124,10 @@ endif()
 set(MODULE_IMAGE_TESTS
   mitkImageTimeSelectorTest.cpp #only runs on images
   mitkImageAccessorTest.cpp #only runs on images
-  mitkDataNodeFactoryTest.cpp #runs on all types of data
 )
 
 set(MODULE_SURFACE_TESTS
   mitkSurfaceVtkWriterTest.cpp #only runs on surfaces
-  mitkDataNodeFactoryTest.cpp #runs on all types of data
 )
 
 # list of images for which the tests are run
@@ -153,7 +153,7 @@ set(MODULE_CUSTOM_TESTS
     mitkStateMachineFactoryTest.cpp
     mitkPointSetLocaleTest.cpp
     mitkImageTest.cpp
-    mitkImageWriterTest.cpp
+    #mitkImageWriterTest.cpp
     mitkImageVtkMapper2DTest.cpp
     mitkImageVtkMapper2DLevelWindowTest.cpp
     mitkImageVtkMapper2DOpacityTest.cpp
@@ -187,12 +187,6 @@ set(MODULE_RESOURCE_FILES
   Interactions/StatemachineTest.xml
   Interactions/StatemachineConfigTest.xml
 )
-
-# Create an artificial module initializing class for
-# the usServiceListenerTest.cpp
-usFunctionGenerateExecutableInit(testdriver_init_file
-                                 IDENTIFIER ${MODULE_NAME}TestDriver
-                                )
 
 # Embed the resources
 set(testdriver_resources )

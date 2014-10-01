@@ -80,7 +80,7 @@ public:
   }
 
 
-  void Rotate_Image_RotatedPoint(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void Rotate_Image_RotatedPoint(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int /*DimT*/)
   {
     mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
     mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
@@ -153,7 +153,7 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Index-toWorld with new Scaling returns expected values ");
   }
 
-  void GetMinimumTimePoint_4DBaseData_Zero(mitk::BaseData* baseData, unsigned int DimT)
+  void GetMinimumTimePoint_4DBaseData_Zero(mitk::BaseData* baseData, unsigned int /*DimT*/)
   {
     baseData->Update();
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
@@ -169,21 +169,21 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(expectedTimePoint, DimT), "Returns correct maximum time point ");
   }
 
-    void CountTimeSteps_Image_ReturnDimT(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+    void CountTimeSteps_Image_ReturnDimT(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     mitk::TimeStepType expectedTimeSteps = geometry->CountTimeSteps();
     MITK_TEST_CONDITION(mitk::Equal(expectedTimeSteps, DimT), "Returns correct number of time Steps ");
   }
 
-    void GetMinimumTimePoint_3DImage_Min(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+    void GetMinimumTimePoint_3DImage_Min(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int /*DimT*/)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     mitk::TimePointType expectedTimePoint = geometry->GetMinimumTimePoint();
     MITK_TEST_CONDITION(mitk::Equal(expectedTimePoint, -std::numeric_limits<mitk::TimePointType>().max()), "Returns correct minimum time point ");
   }
 
-    void GetMaximumTimePoint_3DImage_Max(mitk::BaseData* baseData,unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+    void GetMaximumTimePoint_3DImage_Max(mitk::BaseData* baseData,unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int /*DimT*/)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     mitk::TimePointType expectedTimePoint = geometry->GetMaximumTimePoint();
@@ -201,7 +201,7 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(expectedTimeBounds[1], DimT), "Returns correct maximum time point ");
   }
 
-  void GetTimeBounds_3DImage_ZeroAndDimT(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void GetTimeBounds_3DImage_ZeroAndDimT(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int /*DimT*/)
   {
     baseData->Update();
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
@@ -210,7 +210,7 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(expectedTimeBounds[1], std::numeric_limits<mitk::TimePointType>().max()), "Returns correct maximum time point ");
   }
 
-  void IsValidTimePoint_ImageValidTimePoint_True(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void IsValidTimePoint_ImageValidTimePoint_True(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int DimT)
   {
     baseData->Update();
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
@@ -234,42 +234,42 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(isValid, false), "Is invalid time Point correct minimum time point ");
   }
 
-  void IsValidTimeStep_ImageValidTimeStep_True(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void IsValidTimeStep_ImageValidTimeStep_True(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     bool isValid = geometry->IsValidTimeStep(DimT-1);
     MITK_TEST_CONDITION(mitk::Equal(isValid, true), "Is valid time Point correct minimum time point ");
   }
 
-  void IsValidTimeStep_ImageNegativInvalidTimeStep_False(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void IsValidTimeStep_ImageNegativInvalidTimeStep_False(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     bool isValid = geometry->IsValidTimeStep(-DimT);
     MITK_TEST_CONDITION(mitk::Equal(isValid, false), "Is invalid time Point correct minimum time point ");
   }
 
-  void IsValidTimeStep_ImageInvalidTimeStep_False(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void IsValidTimeStep_ImageInvalidTimeStep_False(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     bool isValid = geometry->IsValidTimeStep(DimT);
     MITK_TEST_CONDITION(mitk::Equal(isValid, false), "Is invalid time Point correct minimum time point ");
   }
 
-  void TimeStepToTimePoint_ImageValidTimeStep_TimePoint(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void TimeStepToTimePoint_ImageValidTimeStep_TimePoint(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     mitk::TimePointType timePoint= geometry->TimeStepToTimePoint(DimT-1);
     MITK_TEST_CONDITION(mitk::Equal(timePoint, DimT-1), "Calculated right time Point for Time Step ");
   }
 
-  void TimeStepToTimePoint_ImageInvalidTimeStep_TimePoint(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void TimeStepToTimePoint_ImageInvalidTimeStep_TimePoint(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     mitk::TimePointType timePoint= geometry->TimeStepToTimePoint(DimT+1);
     MITK_TEST_CONDITION(mitk::Equal(timePoint, DimT+1), "Calculated right time Point for invalid Time Step ");
   }
 
-  void TimePointToTimeStep_ImageValidTimePoint_TimePoint(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void TimePointToTimeStep_ImageValidTimePoint_TimePoint(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     mitk::TimeStepType timePoint= geometry->TimePointToTimeStep(DimT-0.5);
@@ -315,7 +315,7 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Geometry transformation match expection. ");
   }
 
-  void GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     mitk::BaseGeometry::Pointer geometry3D = geometry->GetGeometryForTimeStep(DimT+1);
@@ -386,7 +386,7 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Geometry transformation not changed. ");
   }
 
-  void GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(mitk::BaseData* baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     mitk::BaseGeometry::Pointer geometry3D = geometry->GetGeometryCloneForTimeStep(DimT+1);

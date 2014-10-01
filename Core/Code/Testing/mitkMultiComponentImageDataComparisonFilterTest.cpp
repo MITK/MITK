@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk includes
 #include "mitkTestingMacros.h"
 #include "mitkMultiComponentImageDataComparisonFilter.h"
-#include "mitkItkImageFileReader.h"
 #include "mitkImageReadAccessor.h"
+#include "mitkIOUtil.h"
 
 #include "itkNumericTraits.h"
 
-int mitkMultiComponentImageDataComparisonFilterTest(int argc, char* argv[])
+int mitkMultiComponentImageDataComparisonFilterTest(int /*argc*/, char* argv[])
 {
   MITK_TEST_BEGIN("MultiComponentImageDataComparisonFilter");
 
@@ -48,11 +48,7 @@ int mitkMultiComponentImageDataComparisonFilterTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(testObject->GetResult() == false, "CompareResult still false" );
 
   //now load an image with several components and present it to the filter
-  mitk::ItkImageFileReader::Pointer imgReader = mitk::ItkImageFileReader::New();
-  imgReader->SetFileName(argv[1]);
-  imgReader->Update();
-
-  mitk::Image::Pointer testImg = imgReader->GetOutput();
+  mitk::Image::Pointer testImg = mitk::IOUtil::LoadImage(argv[1]);
   mitk::Image::Pointer testImg2 = testImg->Clone();
 
   testObject->SetValidImage(testImg);

@@ -435,10 +435,13 @@ void mitk::ContourModelWriter::WriteIndent( std::ofstream& file )
 
 bool mitk::ContourModelWriter::GetSuccess() const
 {
-    return m_Success;
+  return m_Success;
 }
 
-
+std::string mitk::ContourModelWriter::GetSupportedBaseData() const
+{
+  return ContourModel::GetStaticNameOfClass();
+}
 
 bool mitk::ContourModelWriter::CanWriteDataType( DataNode* input )
 {

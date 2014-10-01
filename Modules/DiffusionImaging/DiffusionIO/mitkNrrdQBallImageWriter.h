@@ -95,6 +95,8 @@ public:
     */
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
+    std::string GetSupportedBaseData() const;
+
     // FileWriterWithInformation methods
     virtual const char * GetDefaultFilename() { return "QBalls.qbi"; }
     virtual const char * GetFileDialogPattern() { return "Q-Ball Images (*.qbi *.hqbi"; }

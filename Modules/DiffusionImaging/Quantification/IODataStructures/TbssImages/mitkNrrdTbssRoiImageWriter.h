@@ -98,6 +98,8 @@ public:
     */
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
+    std::string GetSupportedBaseData() const;
+
     // FileWriterWithInformation methods
     virtual const char * GetDefaultFilename() { return "TbssRoiImage.roi"; }
     virtual const char * GetFileDialogPattern() { return "Tbss Roi Images (*.roi)"; }

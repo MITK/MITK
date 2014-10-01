@@ -165,6 +165,8 @@ public:
     */
     bool GetSuccess() const;
 
+    std::string GetSupportedBaseData() const;
+
     /*++++++ FileWriterWithInformation methods +++++++*/
     virtual const char *GetDefaultFilename() { return "ContourModel.cnt"; }
     virtual const char *GetFileDialogPattern() { return "MITK ContourModel (*.cnt)"; }

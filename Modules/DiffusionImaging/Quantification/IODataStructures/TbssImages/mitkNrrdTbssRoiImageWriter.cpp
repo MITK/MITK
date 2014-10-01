@@ -139,4 +139,9 @@ std::vector<std::string> mitk::NrrdTbssRoiImageWriter::GetPossibleFileExtensions
   return possibleFileExtensions;
 }
 
+std::string mitk::NrrdTbssRoiImageWriter::GetSupportedBaseData() const
+{
+  return TbssRoiImage::GetStaticNameOfClass();
+}
+
 #endif //__mitkNrrdTbssRoiImageWriter__cpp

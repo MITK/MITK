@@ -127,7 +127,10 @@ bool mitk::ContourModelSetWriter::GetSuccess() const
   return m_Success;
 }
 
-
+std::string mitk::ContourModelSetWriter::GetSupportedBaseData() const
+{
+  return ContourModelSet::GetStaticNameOfClass();
+}
 
 bool mitk::ContourModelSetWriter::CanWriteDataType( DataNode* input )
 {

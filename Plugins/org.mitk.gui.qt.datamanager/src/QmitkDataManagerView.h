@@ -123,10 +123,6 @@ public slots:
   ///
   void NodeTableViewContextMenuRequested( const QPoint & index );
   ///
-  /// \brief Invoked when an element should be saved.
-  ///
-  void SaveSelectedNodes( bool checked = false );
-  ///
   /// \brief Invoked when an element should be removed.
   ///
   void RemoveSelectedNodes( bool checked = false );
@@ -150,10 +146,6 @@ public slots:
   /// \brief Invoked when infos of the selected nodes should be shown in a dialog.
   ///
   void ShowInfoDialogForSelectedNodes ( bool checked = false );
-  ///
-  /// \brief Shows a load dialog.
-  ///
-  void Load ( bool checked = false );
   ///
   /// \brief Reinits everything.
   ///

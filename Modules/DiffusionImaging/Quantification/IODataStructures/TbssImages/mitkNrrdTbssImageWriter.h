@@ -95,6 +95,8 @@ public:
     */
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
+    std::string GetSupportedBaseData() const;
+
     // FileWriterWithInformation methods
     virtual const char * GetDefaultFilename() { return "TbssImage.tbss"; }
     virtual const char * GetFileDialogPattern() { return "Tbss Images (*.tbss)"; }

@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkSmartPointer.h>
 #include <mitkRenderWindow.h>
-#include <mitkDataNodeFactory.h>
 #include <mitkDataStorage.h>
 
 #include <MitkTestingHelperExports.h>

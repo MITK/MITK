@@ -44,7 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   * catch(mitk::Exception e)
   *   {
   *   //here we want to rethrow the exception
-  *   mitkmitkReThrow(e) << "Message that will be appended to the exception (optional)";
+  *   mitkReThrow(e) << "Message that will be appended to the exception (optional)";
   *   }
   */
 #define mitkReThrow(mitkexception) \

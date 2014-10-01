@@ -1,4 +1,4 @@
-MITK_CREATE_MODULE_TESTS()
+MITK_CREATE_MODULE_TESTS(US_MODULE)
 if(BUILD_TESTING AND MODULE_IS_ENABLED)
 #Only enabled for Windows and Mac nightlies.
 #If you want to run this on linux, just enable the flag in the superbuild.

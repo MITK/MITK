@@ -16,8 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLabeledImageToSurfaceFilter.h"
 #include <itksys/SystemTools.hxx>
-#include "mitkDataNodeFactory.h"
 #include "mitkReferenceCountWatcher.h"
+
+#include "mitkIOUtil.h"
 
 #include <cmath>
 
@@ -36,41 +37,14 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char* argv[])
 
   std::string fileIn = argv[1];
   std::cout<<"Eingabe Datei: "<<fileIn<<std::endl;
-  mitk::Image::Pointer image = NULL;
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
-  try
-  {
-    std::cout << "Loading file: ";
-    factory->SetFileName( fileIn.c_str() );
-    factory->Update();
-
-    if(factory->GetNumberOfOutputs()<1)
-    {
-      std::cout<<"file could not be loaded [FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-    image = dynamic_cast<mitk::Image*>(node->GetData());
-    if(image.IsNull())
-    {
-      std::cout<<"file not an image - test will not be applied [PASSED]"<<std::endl;
-      std::cout<<"[TEST DONE]"<<std::endl;
-      return EXIT_SUCCESS;
-    }
-    else if( image->GetPixelType() != mitk::PixelType( mitk::MakeScalarPixelType<char>() )
+  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(fileIn);
+  if( image->GetPixelType() != mitk::PixelType( mitk::MakeScalarPixelType<char>() )
       || image->GetPixelType() != mitk::PixelType( mitk::MakeScalarPixelType<unsigned char>() ))
-    {
-      std::cout<<"file not a char or unsigned char image - test will not be applied [PASSED]"<<std::endl;
-      std::cout<<"[TEST DONE]"<<std::endl;
-      return EXIT_SUCCESS;
-    }
-  }
-  catch ( itk::ExceptionObject & ex )
   {
-    std::cout << "Exception: " << ex << "[FAILED]" << std::endl;
-    return EXIT_FAILURE;
+    std::cout<<"file not a char or unsigned char image - test will not be applied [PASSED]"<<std::endl;
+    std::cout<<"[TEST DONE]"<<std::endl;
+    return EXIT_SUCCESS;
   }
-
 
   std::cout << "Testing instantiation: " ;
   mitk::LabeledImageToSurfaceFilter::Pointer filter = mitk::LabeledImageToSurfaceFilter::New();

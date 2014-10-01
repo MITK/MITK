@@ -109,30 +109,31 @@ void TestCastingMITKDoubleITKTensorDouble_EmptyImage_ThrowsException()
 
 void TestCastingMITKtoITK_TestImage(mitk::Image::Pointer testImage)
 {
-  itk::Image<short, 3>::Pointer itkImage;
+itk::Image<short, 3>::Pointer itkImage;
 
-  try
-  {
-    mitk::CastToItkImage( testImage, itkImage );
-  }
-  catch( const std::exception &e)
-  {
-    MITK_TEST_FAILED_MSG(<< e.what() )
-  }
+try
+{
+mitk::CastToItkImage( testImage, itkImage );
+}
+catch( const std::exception &e)
+{
+  MITK_TEST_FAILED_MSG(<< e.what() )
+}
 
-  MITK_TEST_CONDITION_REQUIRED(itkImage.IsNotNull(),"Casting test image to ITK.");
+MITK_TEST_CONDITION_REQUIRED(itkImage.IsNotNull(),"Casting test image to ITK.");
 
-  mitk::Image::Pointer mitkImageAfterCast = mitk::ImportItkImage(itkImage);
-  MITK_TEST_CONDITION_REQUIRED(mitkImageAfterCast.IsNotNull(),"Casting ITK image back.");
+mitk::Image::Pointer mitkImageAfterCast = mitk::ImportItkImage(itkImage);
+MITK_TEST_CONDITION_REQUIRED(mitkImageAfterCast.IsNotNull(),"Casting ITK image back.");
 
-  try
-  {
-    MITK_ASSERT_EQUAL(testImage, mitkImageAfterCast,"Testing if both images are equal.");
-  }
-  catch( const itk::ExceptionObject &e)
-  {
-    MITK_TEST_FAILED_MSG(<< e.what() )
-  }
+try
+{
+  MITK_ASSERT_EQUAL(testImage, mitkImageAfterCast, "Testing if both images are equal.");
+}
+catch( const itk::ExceptionObject &e)
+{
+  MITK_TEST_FAILED_MSG(<< e.what() )
+}
+
 }
 
 int mitkImageToItkTest(int argc, char* argv[])

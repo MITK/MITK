@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCompressedImageContainer.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkImageDataItem.h"
 #include "mitkImageReadAccessor.h"
+#include "mitkIOUtil.h"
 
 class mitkCompressedImageContainerTestClass
 {
@@ -128,26 +128,16 @@ int mitkCompressedImageContainerTest(int argc, char* argv[])
   // load the image
 
     mitk::Image::Pointer image = NULL;
-    mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
     try
     {
       std::cout << "Testing with parameter '" << argv[1] << "'" << std::endl;
-      factory->SetFileName( argv[1] );
-      factory->Update();
-
-      if(factory->GetNumberOfOutputs()<1)
-      {
-        std::cerr<<"File could not be loaded [FAILED]"<<std::endl;
-        return EXIT_FAILURE;
-      }
-      mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-      image = dynamic_cast<mitk::Image*>(node->GetData());
-      if(image.IsNull())
-      {
-        std::cout<<"File not an image - test will not be applied [PASSED]"<<std::endl;
-        std::cout<<"[TEST DONE]"<<std::endl;
-        return EXIT_SUCCESS;
-      }
+      image = mitk::IOUtil::LoadImage(argv[1]);
+    }
+    catch ( const mitk::Exception& )
+    {
+      std::cout<<"File not an image - test will not be applied [PASSED]"<<std::endl;
+      std::cout<<"[TEST DONE]"<<std::endl;
+      return EXIT_SUCCESS;
     }
     catch ( itk::ExceptionObject & ex )
     {

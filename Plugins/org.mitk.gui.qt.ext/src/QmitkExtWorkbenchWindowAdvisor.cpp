@@ -43,6 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <internal/berryQtOpenPerspectiveAction.h>
 
 #include <QmitkFileOpenAction.h>
+#include <QmitkFileSaveAction.h>
 #include <QmitkExtFileSaveProjectAction.h>
 #include <QmitkFileExitAction.h>
 #include <QmitkCloseProjectAction.h>
@@ -533,7 +534,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     fileMenu->setObjectName("FileMenu");
 
     QAction* fileOpenAction = new QmitkFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/Load_48.png"), window);
+    fileOpenAction->setShortcut(QKeySequence::Open);
     fileMenu->addAction(fileOpenAction);
+    QAction* fileSaveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"), window);
+    fileSaveAction->setShortcut(QKeySequence::Save);
+    fileMenu->addAction(fileSaveAction);
     fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
     fileSaveProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"));
     fileMenu->addAction(fileSaveProjectAction);
@@ -542,6 +547,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     fileMenu->addAction(closeProjectAction);
     fileMenu->addSeparator();
     QAction* fileExitAction = new QmitkFileExitAction(window);
+    fileExitAction->setShortcut(QKeySequence::Quit);
     fileExitAction->setObjectName("QmitkFileExitAction");
     fileMenu->addAction(fileExitAction);
 

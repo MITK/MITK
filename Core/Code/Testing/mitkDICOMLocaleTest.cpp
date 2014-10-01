@@ -26,10 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 */
 
-#include "mitkDataNodeFactory.h"
 #include "mitkStandardFileLocations.h"
 #include "mitkDicomSeriesReader.h"
+#include "mitkIOUtil.h"
 #include "mitkImage.h"
+
 #include "mitkTestingMacros.h"
 #include "mitkTestFixture.h"
 
@@ -127,14 +128,7 @@ public:
   {
     if (m_SkipImageTest) return;
 
-    mitk::Image::Pointer image;
-    mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
-    factory->SetFileName( m_FileName );
-    factory->Update();
-    CPPUNIT_ASSERT(factory->GetNumberOfOutputs() > 0);
-
-    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-    image = dynamic_cast<mitk::Image*>(node->GetData());
+    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(m_FileName);
     CPPUNIT_ASSERT(image.IsNotNull());
 
     // note importance of minor differences in spacings:

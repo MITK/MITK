@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkProperties.h>
 #include <mitkDataNode.h>
-#include <mitkDataNodeFactory.h>
 #include <mitkResliceMethodProperty.h>
 #include "vtkMitkThickSlicesFilter.h"
 

@@ -3,6 +3,7 @@ set(SRC_CPP_FILES
   QmitkDefaultDropTargetListener.cpp
   QmitkFileExitAction.cpp
   QmitkFileOpenAction.cpp
+  QmitkFileSaveAction.cpp
   QmitkPreferencesDialog.cpp
   QmitkStatusBar.cpp
 )
@@ -17,6 +18,7 @@ set(MOC_H_FILES
   src/QmitkCloseProjectAction.h
   src/QmitkFileExitAction.h
   src/QmitkFileOpenAction.h
+  src/QmitkFileSaveAction.h
   src/QmitkPreferencesDialog.h
 
   src/internal/org_mitk_gui_qt_application_Activator.h

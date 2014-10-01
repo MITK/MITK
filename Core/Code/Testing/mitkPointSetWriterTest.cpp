@@ -15,9 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPointSet.h"
-#include "mitkPointSetWriter.h"
 
 #include "mitkTestingMacros.h"
+#include "mitkFileWriterSelector.h"
 
 #include <iostream>
 #include <time.h>
@@ -35,17 +35,6 @@ int mitkPointSetWriterTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("PointSetWriter")
 
-  // let's create an object of our class
-  mitk::PointSetWriter::Pointer myPointSetWriter = mitk::PointSetWriter::New();
-
-  // first test: did this work?
-  // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
-  // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(myPointSetWriter.IsNotNull(),"Testing instantiation")
-
-  // write your own tests here and use the macros from mitkTestingMacros.h !!!
-  // do not write to std::cout and do not return from this function yourself!
-
   // create pointSet
   srand(time(NULL));
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
@@ -61,52 +50,31 @@ int mitkPointSetWriterTest(int /* argc */, char* /*argv*/[])
 
   MITK_TEST_CONDITION_REQUIRED(pointSet.IsNotNull(),"PointSet creation")
 
-    try{
-      // test for exception handling
-      MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
-      myPointSetWriter->SetInput(pointSet);
-      myPointSetWriter->SetFileName("/usr/bin");
-      myPointSetWriter->Update();
-      MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
-  }
-  catch(...) {
-    //this means that a wrong exception (i.e. no itk:Exception) has been thrown
-    std::cout << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
-    return EXIT_FAILURE;
-  }
+  // Get PointSet writer(s)
+  mitk::FileWriterSelector writerSelector(pointSet.GetPointer());
+  std::vector<mitk::FileWriterSelector::Item> writers = writerSelector.Get();
+  MITK_TEST_CONDITION_REQUIRED(!writers.empty(), "Testing for registered writers")
 
-  /*
-  MITK_TEST_OUTPUT( << "Check if filename can be set correctly: ");
-  myPointSetWriter->SetFileName("filename");
-  const char * filename = myPointSetWriter->GetFileName();
-  MITK_TEST_CONDITION_REQUIRED(std::string("filename") == "filename", "Filename set correctly?");
-
-  MITK_TEST_OUTPUT( << "Check if prefix can be set correctly: ");
-  myPointSetWriter->SetFilePrefix("pre");
-  const char * prefix = myPointSetWriter->GetFilePrefix();
-  MITK_TEST_CONDITION_REQUIRED(std::string("pre") == prefix, "Prefix set correctly?");
-
-  MITK_TEST_OUTPUT( << "Check if pattern can be set correctly: ");
-  myPointSetWriter->SetFilePattern("pattern");
-  const char * pattern = myPointSetWriter->GetFilePattern();
-  MITK_TEST_CONDITION_REQUIRED(std::string("pattern") == prefix, "Pattern set correctly?");
-  */
-
-  MITK_TEST_OUTPUT( << "Check if input can be set correctly: ");
-  myPointSetWriter->SetInput(pointSet);
-  mitk::PointSet::Pointer pointSet2 = mitk::PointSet::New();
-  pointSet2 = myPointSetWriter->GetInput();
-
-  MITK_TEST_CONDITION_REQUIRED( pointSet->GetSize() == pointSet2->GetSize(), "Pointsets have unequal size" );
-
-  for(int i=0; i<pointSet->GetSize(); i++)
+  for (std::vector<mitk::FileWriterSelector::Item>::const_iterator iter = writers.begin(),
+       end = writers.end(); iter != end; ++iter)
   {
-    mitk::Point3D p1 = pointSet->GetPoint(i);
-    mitk::Point3D p2 = pointSet2->GetPoint(i);
-    MITK_TEST_CONDITION_REQUIRED( p1[0] == p2[0] && p1[0] == p2[0] && p1[0] == p2[0], "Pointsets aren't equal" );
+    // test for exception handling
+    try
+    {
+      mitk::IFileWriter* writer = iter->GetWriter();
+      writer->SetInput(pointSet);
+      writer->SetOutputLocation("/usr/bin");
+      iter->GetWriter()->Write();
+      MITK_TEST_FAILED_MSG( << "itk::ExceptionObject expected" )
+    }
+    catch (const itk::ExceptionObject&)
+    { /* this is expected */ }
+    catch(...)
+    {
+      //this means that a wrong exception (i.e. no itk:Exception) has been thrown
+      MITK_TEST_FAILED_MSG( << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]")
+    }
   }
-
-  std::vector< std::string > extensions = myPointSetWriter->GetPossibleFileExtensions();
 
   // always end with this!
   MITK_TEST_END()

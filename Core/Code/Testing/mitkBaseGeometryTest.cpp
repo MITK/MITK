@@ -65,7 +65,7 @@ public:
     return newGeometry.GetPointer();
   }
 
-  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const{};
+  virtual void PrintSelf(std::ostream& /*os*/, itk::Indent /*indent*/) const{};
 
 };
 
@@ -232,7 +232,7 @@ public:
     //undo changes, new and changed object need to be the same!
     dummy->SetOrigin(aPoint);
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy, newDummy, "TestSetOrigin");
   }
 
   void TestSetImageGeometry()
@@ -245,58 +245,58 @@ public:
     dummy->SetImageGeometry(false);
     CPPUNIT_ASSERT(dummy->GetImageGeometry()==false);
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy, "TestSetImageGeometry");
   }
 
   void TestSetFloatBounds(){
     float bounds[6] = {0,11,0,12,0,13};
     DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetFloatBounds(bounds);
-    CPPUNIT_ASSERT(mitk::Equal( dummy->GetBoundingBox(), anotherBoundingBox, mitk::eps, true));
+    MITK_ASSERT_EQUAL(BoundingBox::ConstPointer(dummy->GetBoundingBox()), anotherBoundingBox, "BoundingBox equality");
 
     //Wrong bounds, test needs to fail
     bounds[1]=7;
     dummy->SetFloatBounds(bounds);
-    CPPUNIT_ASSERT((mitk::Equal( dummy->GetBoundingBox(), anotherBoundingBox, mitk::eps, false))==false);
+    MITK_ASSERT_NOT_EQUAL(BoundingBox::ConstPointer(dummy->GetBoundingBox()), anotherBoundingBox, "BoundingBox not equal");
 
     //undo changes, new and changed object need to be the same!
     float originalBounds[6] = {0,1,0,1,0,1};
     dummy->SetFloatBounds(originalBounds);
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy, "Undo and equal");
   }
 
   void TestSetBounds(){
     DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetBounds(anotherBoundingBox->GetBounds());
-    CPPUNIT_ASSERT(mitk::Equal( dummy->GetBoundingBox(), anotherBoundingBox, mitk::eps, true));
+    MITK_ASSERT_EQUAL(BoundingBox::ConstPointer(dummy->GetBoundingBox()), anotherBoundingBox, "Setting bounds");
 
     //Test needs to fail now
     dummy->SetBounds(aThirdBoundingBox->GetBounds());
-    CPPUNIT_ASSERT(mitk::Equal( dummy->GetBoundingBox(), anotherBoundingBox, mitk::eps, false)==false);
+    MITK_ASSERT_NOT_EQUAL(BoundingBox::ConstPointer(dummy->GetBoundingBox()), anotherBoundingBox, "Setting unequal bounds");
 
     //undo changes, new and changed object need to be the same!
     dummy->SetBounds(aBoundingBox->GetBounds());
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy, "Undo set bounds");
   }
 
   void TestSetFloatBoundsDouble(){
     double bounds[6] = {0,11,0,12,0,13};
     DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetFloatBounds(bounds);
-    CPPUNIT_ASSERT(mitk::Equal( dummy->GetBoundingBox(), anotherBoundingBox, mitk::eps, true));
+    MITK_ASSERT_EQUAL(BoundingBox::ConstPointer(dummy->GetBoundingBox()), anotherBoundingBox, "Float bounds");
 
     //Test needs to fail now
     bounds[3]=7;
     dummy->SetFloatBounds(bounds);
-    CPPUNIT_ASSERT(mitk::Equal( dummy->GetBoundingBox(), anotherBoundingBox, mitk::eps, false)==false);
+    MITK_ASSERT_NOT_EQUAL(BoundingBox::ConstPointer(dummy->GetBoundingBox()), anotherBoundingBox, "Float bounds unequal");
 
     //undo changes, new and changed object need to be the same!
     double originalBounds[6] = {0,1,0,1,0,1};
     dummy->SetFloatBounds(originalBounds);
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy, "Undo set float bounds");
   }
 
   void TestSetFrameOfReferenceID()
@@ -308,7 +308,7 @@ public:
     //undo changes, new and changed object need to be the same!
     dummy->SetFrameOfReferenceID(0);
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy, "Undo set frame of reference");
   }
 
   void TestSetIndexToWorldTransform()

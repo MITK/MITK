@@ -17,10 +17,4 @@ set(MODULE_CUSTOM_TESTS
   mitkPlayerLoadAndRenderRGBDataTest.cpp
 )
 
-# Create an artificial module initializing class for
-# the mitkToFCameraMITKPlayerDeviceFactoryTest
-usFunctionGenerateExecutableInit(testdriver_init_file
-                                 IDENTIFIER ${MODULE_NAME}TestDriver
-                                )
-
 set(TEST_CPP_FILES ${testdriver_init_file})

@@ -16,13 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkExtractSliceFilter.h>
 #include <mitkTestingMacros.h>
-#include <mitkItkImageFileReader.h>
+#include <mitkIOUtil.h>
 #include <itkImageRegionIterator.h>
 #include <mitkImageCast.h>
 #include <itkImage.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkStandardFileLocations.h>
-#include <mitkImageWriter.h>
 #include <mitkITKImageImport.h>
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkRotationOperation.h>
@@ -710,11 +709,7 @@ public:
 
     std::string filename = locator->FindFile("sphere_512.nrrd.mhd", "Modules/ImageExtraction/Testing/Data");
 
-    mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
-    reader->SetFileName(filename);
-
-    reader->Update();
-    TestVolume = reader->GetOutput();
+    TestVolume = mitk::IOUtil::LoadImage(filename);
 
   #endif
 
@@ -888,7 +883,7 @@ double mitkExtractSliceFilterTestClass::TestFailureDeviation = 0.0;
 
 
 /*================ #BEGIN test main ================*/
-int mitkExtractSliceFilterTest(int , char* [])
+int mitkExtractSliceFilterTest(int /*argc*/, char* /*argv*/[])
 {
 
   MITK_TEST_BEGIN("mitkExtractSliceFilterTest")
@@ -1027,14 +1022,8 @@ int mitkExtractSliceFilterTest(int , char* [])
     /*================ #BEGIN vtk render code ================*/
 
     //set reslicer for renderwindow
-    mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
 
-    std::string filename =  "C:\\home\\Pics\\Pic3D.nrrd";
-    reader->SetFileName(filename);
-
-    reader->Update();
-
-    mitk::Image::Pointer pic = reader->GetOutput();
+    mitk::Image::Pointer pic = mitk::IOUtil::LoadImage(filename);
     vtkSmartPointer<vtkImageReslice> slicer = vtkSmartPointer<vtkImageReslice>::New();
 
     slicer->SetInput(pic->GetVtkImageData());

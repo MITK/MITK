@@ -25,9 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointOperation.h"
 #include "mitkTestingMacros.h"
 #include "mitkStandaloneDataStorage.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkStandardFileLocations.h"
 #include "mitkNodePredicateDataType.h"
+#include "mitkIOUtil.h"
 
 void SendPositionEvent(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key, const mitk::Point2D& displPosition, const mitk::Point3D& worldPosition)
 {
@@ -52,7 +52,6 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   //these two images are used as node the interactors depend on. If the visibility property of one node if false, the
   //associated interactor may not change the data
   mitk::DataNode::Pointer node1, node2;
-  mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
 
   MITK_TEST_CONDITION_REQUIRED(argc >= 3, "Test if a files to load has been specified");
 
@@ -61,17 +60,11 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   {
     //file 1
     const std::string filename1 = argv[1];
-    nodeReader->SetFileName(filename1);
-    nodeReader->Update();
-    node1 = nodeReader->GetOutput();
-    ds->Add(node1);
+    node1 = mitk::IOUtil::Load(filename1, *ds)->GetElement(0);
 
     //file 2
     const std::string filename2 = argv[2];
-    nodeReader->SetFileName(filename2);
-    nodeReader->Update();
-    node2 = nodeReader->GetOutput();
-    ds->Add(node2);
+    node2 = mitk::IOUtil::Load(filename2, *ds)->GetElement(0);
   }
   catch(...) {
     MITK_TEST_FAILED_MSG(<< "Could not read file for testing");

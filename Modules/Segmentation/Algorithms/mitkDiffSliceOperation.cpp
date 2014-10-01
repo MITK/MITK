@@ -36,8 +36,7 @@ mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image* imageVolume,
                                              BaseGeometry* currentWorldGeometry):Operation(1)
 
 {
-  itk::LightObject::Pointer lopointer = currentWorldGeometry->Clone();
-  m_WorldGeometry = dynamic_cast<BaseGeometry*>(lopointer.GetPointer());
+  m_WorldGeometry = currentWorldGeometry->Clone();
 
   /*
   Quick fix for bug 12338.

@@ -118,6 +118,8 @@ namespace mitk
     */
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
+    std::string GetSupportedBaseData() const;
+
     // FileWriterWithInformation methods
     virtual const char * GetDefaultFilename() { return "ConnectomicsNetwork.cnf"; }
     virtual const char * GetFileDialogPattern() { return "ConnectomicsNetwork (*.cnf)"; }

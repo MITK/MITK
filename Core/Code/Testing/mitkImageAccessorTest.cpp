@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImagePixelReadAccessor.h"
 #include "mitkImagePixelWriteAccessor.h"
 #include "mitkImageWriteAccessor.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkIOUtil.h"
 #include <itksys/SystemTools.hxx>
 #include "itkBarrier.h"
 #include <itkMultiThreader.h>
@@ -183,30 +183,18 @@ int mitkImageAccessorTest(int argc, char* argv[])
       return EXIT_FAILURE;
    }
    mitk::Image::Pointer image = NULL;
-   mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
    try
    {
-      factory->SetFileName( argv[1] );
-      factory->Update();
+     image = mitk::IOUtil::LoadImage(std::string(argv[1]));
 
-      if(factory->GetNumberOfOutputs()<1)
-      {
-         std::cout<<"file could not be loaded [FAILED]"<<std::endl;
-         return EXIT_FAILURE;
-      }
-      mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-      image = dynamic_cast<mitk::Image*>(node->GetData());
       if(image.IsNull())
       {
-         std::cout<<"file not an image - test will not be applied [PASSED]"<<std::endl;
-         std::cout<<"[TEST DONE]"<<std::endl;
-         return EXIT_SUCCESS;
+         MITK_TEST_FAILED_MSG( << "file could not be loaded [FAILED]" )
       }
    }
    catch ( itk::ExceptionObject & ex )
    {
-      std::cout << "Exception: " << ex << "[FAILED]" << std::endl;
-      return EXIT_FAILURE;
+      MITK_TEST_FAILED_MSG( << "Exception: " << ex << "[FAILED]" )
    }
 
 

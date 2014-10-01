@@ -761,8 +761,8 @@ namespace mitk
     os << indent << " Normal: " << GetNormal() << std::endl;
   }
 
-  void  PlaneGeometry::PostSetIndexToWorldTransform(
-    mitk::AffineTransform3D* transform)
+  void PlaneGeometry::PostSetIndexToWorldTransform(
+      mitk::AffineTransform3D* /*transform*/)
   {
     m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
     m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);
@@ -771,8 +771,7 @@ namespace mitk
     assert(m_ScaleFactorMMPerUnitY<itk::NumericTraits<ScalarType>::infinity());
   }
 
-  void
-    PlaneGeometry::PostSetExtentInMM(int direction, ScalarType extentInMM)
+  void PlaneGeometry::PostSetExtentInMM(int /*direction*/, ScalarType /*extentInMM*/)
   {
     m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
     m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);
@@ -781,9 +780,7 @@ namespace mitk
     assert(m_ScaleFactorMMPerUnitY<itk::NumericTraits<ScalarType>::infinity());
   }
 
-  bool
-    PlaneGeometry::Map(
-    const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
+  bool PlaneGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
   {
     assert(this->IsBoundingBoxNull()==false);
 

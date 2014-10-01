@@ -138,6 +138,8 @@ namespace mitk
     */
     bool GetSuccess() const;
 
+    std::string GetSupportedBaseData() const;
+
     /*++++++ FileWriterWithInformation methods +++++++*/
     virtual const char *GetDefaultFilename() { return "ContourModelSet.cnt_set"; }
     virtual const char *GetFileDialogPattern() { return "MITK ContourModelSet (*.cnt_set)"; }

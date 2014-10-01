@@ -96,7 +96,9 @@ AbstractFileReader::~AbstractFileReader()
 }
 
 AbstractFileReader::AbstractFileReader(const AbstractFileReader& other)
-  : d(new Impl(*other.d.get()))
+  : IFileReader(),
+    d(new Impl(*other.d.get()))
+
 {
 }
 

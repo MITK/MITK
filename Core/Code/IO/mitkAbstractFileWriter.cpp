@@ -166,7 +166,8 @@ AbstractFileWriter::~AbstractFileWriter()
 }
 
 AbstractFileWriter::AbstractFileWriter(const AbstractFileWriter& other)
-  : d(new Impl(*other.d.get()))
+  : IFileWriter(),
+    d(new Impl(*other.d.get()))
 {
 }
 

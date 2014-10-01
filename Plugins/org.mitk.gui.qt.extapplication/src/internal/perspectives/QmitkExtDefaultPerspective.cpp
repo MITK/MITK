@@ -25,7 +25,7 @@ void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer
 {
   std::string editorArea = layout->GetEditorArea();
 
-  layout->AddStandaloneViewPlaceholder("org.mitk.views.candystoreview", berry::IPageLayout::LEFT, 0.3f, editorArea, false);
+  layout->AddStandaloneViewPlaceholder("org.mitk.views.viewnavigatorview", berry::IPageLayout::LEFT, 0.3f, editorArea, false);
 
   layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::LEFT, 0.3f, editorArea);
 

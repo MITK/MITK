@@ -214,7 +214,9 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
             if(image->GetGeometry()->IsIndexInside(currentIndex))
             {
-              pixelValues[pos] = image->GetPixelValueByIndex(currentIndex);
+                int component = 0;
+                m_InputImageNode->GetIntProperty("Image.Displayed Component", component);
+              pixelValues[pos] = image->GetPixelValueByIndex(currentIndex, 0, component);
               pos++;
             }
             else

@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkDataStorage.h"
-
+#include <mitkImagePixelReadAccessor.h>
 //DEPRECATED
 #include <mitkTimeSlicedGeometry.h>
 

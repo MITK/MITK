@@ -76,7 +76,7 @@ std::string AbstractFileWriter::LocalFile::GetFileName()
 }
 
 AbstractFileWriter::OutputStream::OutputStream(IFileWriter* writer, std::ios_base::openmode mode)
-  : std::ostream()
+  : std::ostream(NULL)
   , m_Stream(NULL)
 {
   std::ostream* stream = writer->GetOutputStream();

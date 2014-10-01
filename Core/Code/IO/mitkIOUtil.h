@@ -48,7 +48,7 @@ class MITK_CORE_EXPORT IOUtil
 
 public:
 
-  struct LoadInfo
+  struct MITK_CORE_EXPORT LoadInfo
   {
     LoadInfo(const std::string& path);
 
@@ -59,7 +59,7 @@ public:
     bool m_Cancel;
   };
 
-  struct SaveInfo
+  struct MITK_CORE_EXPORT SaveInfo
   {
     SaveInfo(const BaseData* baseData);
     SaveInfo(const BaseData* baseData, const MimeType& mimeType, const std::string& path);

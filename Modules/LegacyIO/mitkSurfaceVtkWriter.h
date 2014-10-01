@@ -54,7 +54,7 @@ namespace mitk
  * @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 */
 template <class VTKWRITER>
-class DEPRECATED() MitkLegacyIO_EXPORT SurfaceVtkWriter : public mitk::FileWriter
+class MitkLegacyIO_EXPORT SurfaceVtkWriter : public mitk::FileWriter
 {
 public:
 

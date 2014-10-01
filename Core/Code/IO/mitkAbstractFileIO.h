@@ -45,6 +45,11 @@ protected:
 
   AbstractFileIOReader(const std::string& extension, const std::string& description)
     : AbstractFileReader(extension, description) {}
+
+private:
+
+  virtual IFileReader* ReaderClone() const = 0;
+  IFileReader* Clone() const { return ReaderClone(); }
 };
 
 struct AbstractFileIOWriter : public AbstractFileWriter
@@ -70,6 +75,11 @@ protected:
   AbstractFileIOWriter(const std::string& baseDataType, const std::string& extension,
                        const std::string& description)
     : AbstractFileWriter(baseDataType, extension, description) {}
+
+private:
+
+  virtual IFileWriter* WriterClone() const = 0;
+  IFileWriter* Clone() const { return WriterClone(); }
 };
 
 class MITK_CORE_EXPORT AbstractFileIO : public AbstractFileIOReader, public AbstractFileIOWriter
@@ -159,7 +169,10 @@ private:
 
   AbstractFileIO& operator=(const AbstractFileIO& other);
 
-  virtual AbstractFileIO* Clone() const = 0;
+  virtual AbstractFileIO* IOClone() const = 0;
+
+  virtual IFileReader* ReaderClone() const;
+  virtual IFileWriter* WriterClone() const;
 
 };
 

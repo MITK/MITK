@@ -34,7 +34,7 @@ class MITK_CORE_EXPORT FileWriterSelector
 {
 public:
 
-  class Item
+  class MITK_CORE_EXPORT Item
   {
   public:
 

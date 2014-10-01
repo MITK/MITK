@@ -151,4 +151,14 @@ int AbstractFileIO::GetWriterRanking() const
   return this->AbstractFileWriter::GetRanking();
 }
 
+IFileReader* AbstractFileIO::ReaderClone() const
+{
+  return this->IOClone();
+}
+
+IFileWriter* AbstractFileIO::WriterClone() const
+{
+  return this->IOClone();
+}
+
 }

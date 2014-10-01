@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 AbstractFileReader::InputStream::InputStream(IFileReader* reader, std::ios_base::openmode mode)
-  : std::istream()
+  : std::istream(NULL)
   , m_Stream(NULL)
 {
   std::istream* stream = reader->GetInputStream();

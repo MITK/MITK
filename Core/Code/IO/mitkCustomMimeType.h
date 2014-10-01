@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace mitk {
 
@@ -37,6 +36,8 @@ public:
   CustomMimeType(const std::string& name);
   CustomMimeType(const CustomMimeType& other);
   explicit CustomMimeType(const MimeType& other);
+
+  ~CustomMimeType();
 
   CustomMimeType& operator=(const CustomMimeType& other);
   CustomMimeType& operator=(const MimeType& other);
@@ -57,7 +58,7 @@ public:
 private:
 
   struct Impl;
-  std::auto_ptr<Impl> d;
+  Impl* d;
 };
 
 void swap(CustomMimeType& l, CustomMimeType& r);

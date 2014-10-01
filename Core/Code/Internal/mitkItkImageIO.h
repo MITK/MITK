@@ -49,7 +49,7 @@ private:
 
   ItkImageIO(const ItkImageIO& other);
 
-  ItkImageIO* Clone() const;
+  ItkImageIO* IOClone() const;
 
   std::vector<std::string> FixUpImageIOExtensions(const std::string& imageIOName);
 

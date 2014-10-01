@@ -30,6 +30,11 @@ struct CustomMimeType::Impl
   std::string m_Comment;
 };
 
+CustomMimeType::~CustomMimeType()
+{
+  delete d;
+}
+
 CustomMimeType::CustomMimeType()
   : d(new Impl)
 {
@@ -42,7 +47,7 @@ CustomMimeType::CustomMimeType(const std::string& name)
 }
 
 CustomMimeType::CustomMimeType(const CustomMimeType& other)
-  : d(new Impl(*other.d.get()))
+  : d(new Impl(*other.d))
 {
 }
 
@@ -126,10 +131,9 @@ void CustomMimeType::SetComment(const std::string& comment)
 
 void CustomMimeType::Swap(CustomMimeType& r)
 {
-  Impl* d1 = d.release();
-  Impl* d2 = r.d.release();
-  d.reset(d2);
-  r.d.reset(d1);
+  Impl* d1 = d;
+  d = r.d;
+  r.d = d1;
 }
 
 void swap(CustomMimeType& l, CustomMimeType& r)

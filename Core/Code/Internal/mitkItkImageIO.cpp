@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageIORegion.h>
 #include <itkMetaDataObject.h>
 
+#include <clocale>
+
 namespace mitk {
 
 ItkImageIO::ItkImageIO(const ItkImageIO& other)
@@ -473,7 +475,7 @@ AbstractFileIO::ConfidenceLevel ItkImageIO::GetWriterConfidenceLevel() const
   return IFileWriter::Supported;
 }
 
-ItkImageIO* ItkImageIO::Clone() const
+ItkImageIO* ItkImageIO::IOClone() const
 {
   return new ItkImageIO(*this);
 }

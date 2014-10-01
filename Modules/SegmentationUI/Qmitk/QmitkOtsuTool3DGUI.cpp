@@ -83,6 +83,15 @@ void QmitkOtsuTool3DGUI::OnAdvancedSettingsButtonToggled(bool toggled)
   m_Controls.m_ValleyCheckbox->setVisible(toggled);
   m_Controls.binLabel->setVisible(toggled);
   m_Controls.m_BinsSpinBox->setVisible(toggled);
+
+  if(toggled)
+  {
+    int max = m_OtsuTool3DTool->GetNumberOfBins();
+    if(max >= m_Controls.m_BinsSpinBox->minimum())
+    {
+      m_Controls.m_BinsSpinBox->setMaximum(max);
+    }
+  }
 }
 
 void QmitkOtsuTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)

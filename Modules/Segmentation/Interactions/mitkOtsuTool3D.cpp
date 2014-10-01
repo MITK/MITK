@@ -41,6 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
+#include <mitkImageStatisticsHolder.h>
+
 namespace mitk {
   MITK_TOOL_MACRO(MitkSegmentation_EXPORT, OtsuTool3D, "Otsu Segmentation");
 }
@@ -291,4 +293,11 @@ void mitk::OtsuTool3D::ShowMultiLabelResultNode(bool show)
   m_MultiLabelResultNode->SetVisibility(show);
   m_BinaryPreviewNode->SetVisibility(!show);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+int mitk::OtsuTool3D::GetNumberOfBins()
+{
+  ScalarType min = m_OriginalImage.GetPointer()->GetStatistics()->GetScalarValueMin();
+  ScalarType max = m_OriginalImage.GetPointer()->GetStatistics()->GetScalarValueMaxNoRecompute();
+  return static_cast<int>(max-min) + 1;
 }

@@ -213,8 +213,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     }
 
     // Initial moving image geometry
-    itk::LightObject::Pointer lopointer = m_MovingNode->GetData()->GetGeometry()->Clone();
-    m_ImageGeometry = dynamic_cast<mitk::BaseGeometry*>(lopointer.GetPointer());
+    m_ImageGeometry = m_MovingNode->GetData()->GetGeometry()->Clone();
     std::cout << "Moving Image Geometry (IndexToWorldTransform)"  << std::endl;
     std::cout << m_ImageGeometry->GetIndexToWorldTransform()->GetMatrix();
     mitk::BaseGeometry::TransformType::InputPointType center = m_ImageGeometry->GetIndexToWorldTransform()->GetCenter();
@@ -239,21 +238,19 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     // container that holds all derived moving data, that needs to be transformed with the transformation found by registration
     if(m_MovingMaskNode.IsNotNull())
     {
-      m_ChildNodes.insert(std::pair<mitk::DataNode::Pointer, mitk::BaseGeometry*>(m_MovingMaskNode, m_MovingMaskNode->GetData()->GetGeometry()));
-      itk::LightObject::Pointer lopointer = m_MovingMaskNode->GetData()->GetGeometry()->Clone();
-      m_ChildNodes2.insert(std::pair<mitk::DataNode::Pointer, mitk::BaseGeometry::Pointer>(m_MovingMaskNode, dynamic_cast<mitk::BaseGeometry*>(lopointer.GetPointer())));
+      m_ChildNodes.insert(std::pair<mitk::DataNode::Pointer, mitk::BaseGeometry*>(m_MovingMaskNode, m_MovingMaskNode->GetData()->GetGeometry()));;
+      m_ChildNodes2.insert(std::pair<mitk::DataNode::Pointer, mitk::BaseGeometry::Pointer>(m_MovingMaskNode, m_MovingMaskNode->GetData()->GetGeometry()->Clone()));
     }
 
     if(m_MovingNodeChildren.IsNotNull())
     {
       unsigned long size = 0;
       size = m_MovingNodeChildren->Size();
-      mitk::DataNode::Pointer childNode;
       for (unsigned long i = 0; i < size; ++i)
       {
         m_ChildNodes.insert(std::pair<mitk::DataNode::Pointer, mitk::BaseGeometry*>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()));
-         itk::LightObject::Pointer lopointer = m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()->Clone();
-         m_ChildNodes2.insert(std::pair<mitk::DataNode::Pointer, mitk::BaseGeometry::Pointer>(m_MovingNodeChildren->GetElement(i), dynamic_cast<mitk::BaseGeometry*>(lopointer.GetPointer())));
+        mitk::BaseGeometry::Pointer lopointer = m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()->Clone();
+        m_ChildNodes2.insert(std::pair<mitk::DataNode::Pointer, mitk::BaseGeometry::Pointer>(m_MovingNodeChildren->GetElement(i), lopointer));
       }
     }
 

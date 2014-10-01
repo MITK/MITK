@@ -777,8 +777,7 @@ void QmitkPointBasedRegistrationView::UndoTransformation()
 {
   if(!m_UndoPointsGeometryList.empty())
   {
-    itk::LightObject::Pointer lopointer = m_MovingLandmarks->GetGeometry(0)->Clone();
-    mitk::BaseGeometry::Pointer movingLandmarksGeometry = dynamic_cast<mitk::BaseGeometry*>(lopointer.GetPointer());
+    mitk::BaseGeometry::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
     m_RedoPointsGeometryList.push_back(movingLandmarksGeometry.GetPointer());
     m_MovingLandmarks->SetGeometry(m_UndoPointsGeometryList.back());
     m_UndoPointsGeometryList.pop_back();
@@ -787,8 +786,7 @@ void QmitkPointBasedRegistrationView::UndoTransformation()
     m_MovingPointSetNode->SetMapper(1, NULL);
 
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
-    itk::LightObject::Pointer lopointer2 = movingData->GetGeometry(0)->Clone();
-    mitk::BaseGeometry::Pointer movingGeometry = dynamic_cast<mitk::BaseGeometry*>(lopointer2.GetPointer());
+    mitk::BaseGeometry::Pointer movingGeometry = movingData->GetGeometry(0)->Clone();
     m_RedoGeometryList.push_back(movingGeometry.GetPointer());
     movingData->SetGeometry(m_UndoGeometryList.back());
     m_UndoGeometryList.pop_back();
@@ -817,8 +815,7 @@ void QmitkPointBasedRegistrationView::RedoTransformation()
 {
   if(!m_RedoPointsGeometryList.empty())
   {
-    itk::LightObject::Pointer lopointer = m_MovingLandmarks->GetGeometry(0)->Clone();
-    mitk::BaseGeometry::Pointer movingLandmarksGeometry = dynamic_cast<mitk::BaseGeometry*>(lopointer.GetPointer());
+    mitk::BaseGeometry::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
     m_UndoPointsGeometryList.push_back(movingLandmarksGeometry.GetPointer());
     m_MovingLandmarks->SetGeometry(m_RedoPointsGeometryList.back());
     m_RedoPointsGeometryList.pop_back();
@@ -827,8 +824,7 @@ void QmitkPointBasedRegistrationView::RedoTransformation()
     m_MovingPointSetNode->SetMapper(1, NULL);
 
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
-    itk::LightObject::Pointer lopointer2 = movingData->GetGeometry(0)->Clone();
-    mitk::BaseGeometry::Pointer movingGeometry = dynamic_cast<mitk::BaseGeometry*>(lopointer2.GetPointer());
+    mitk::BaseGeometry::Pointer movingGeometry = movingData->GetGeometry(0)->Clone();
     m_UndoGeometryList.push_back(movingGeometry.GetPointer());
     movingData->SetGeometry(m_RedoGeometryList.back());
     m_RedoGeometryList.pop_back();
@@ -1013,13 +1009,11 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbasedWithICP()
   if(CheckCalculate())
   {
     mitk::BaseGeometry::Pointer pointsGeometry = m_MovingLandmarks->GetGeometry(0);
-    itk::LightObject::Pointer lopointer = m_MovingLandmarks->GetGeometry(0)->Clone();
-    mitk::BaseGeometry::Pointer movingLandmarksGeometry = dynamic_cast<mitk::BaseGeometry*>(lopointer.GetPointer());
+    mitk::BaseGeometry::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
     m_UndoPointsGeometryList.push_back(movingLandmarksGeometry.GetPointer());
 
     mitk::BaseData::Pointer originalData = m_MovingNode->GetData();
-    itk::LightObject::Pointer lopointer2 = originalData->GetGeometry(0)->Clone();
-    mitk::BaseGeometry::Pointer originalDataGeometry = dynamic_cast<mitk::BaseGeometry*>(lopointer2.GetPointer());
+    mitk::BaseGeometry::Pointer originalDataGeometry = originalData->GetGeometry(0)->Clone();
     m_UndoGeometryList.push_back(originalDataGeometry.GetPointer());
 
     vtkIdType pointId;
@@ -1110,13 +1104,11 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbased()
   if(CheckCalculate())
   {
     mitk::BaseGeometry::Pointer pointsGeometry = m_MovingLandmarks->GetGeometry(0);
-    itk::LightObject::Pointer lopointer = m_MovingLandmarks->GetGeometry(0)->Clone();
-    mitk::BaseGeometry::Pointer movingLandmarksGeometry =  dynamic_cast<mitk::BaseGeometry*>(lopointer.GetPointer());
+    mitk::BaseGeometry::Pointer movingLandmarksGeometry =  m_MovingLandmarks->GetGeometry(0)->Clone();
     m_UndoPointsGeometryList.push_back(movingLandmarksGeometry.GetPointer());
 
     mitk::BaseData::Pointer originalData = m_MovingNode->GetData();
-    itk::LightObject::Pointer lopointer2 = originalData->GetGeometry(0)->Clone();
-    mitk::BaseGeometry::Pointer originalDataGeometry =  dynamic_cast<mitk::BaseGeometry*>(lopointer2.GetPointer());
+    mitk::BaseGeometry::Pointer originalDataGeometry =  originalData->GetGeometry(0)->Clone();
     m_UndoGeometryList.push_back(originalDataGeometry.GetPointer());
 
     vtkIdType pointId;

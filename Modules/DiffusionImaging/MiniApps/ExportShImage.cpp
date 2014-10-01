@@ -76,12 +76,9 @@ int StartShConversion(int argc, char* argv[])
 
         typedef itk::ImageFileWriter< OutImageType > WriterType;
         WriterType::Pointer writer = WriterType::New();
-        MITK_INFO << "writing " << outFile;
         writer->SetFileName(outFile.c_str());
         writer->SetInput(outImage);
         writer->Update();
-
-        MITK_INFO << "DONE";
     }
     catch (itk::ExceptionObject e)
     {
@@ -103,6 +100,7 @@ int StartShConversion(int argc, char* argv[])
 
 int ExportShImage(int argc, char* argv[])
 {
+    MITK_INFO << "ExportShImage";
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input image", "MITK SH image", us::Any(), false);

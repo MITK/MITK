@@ -47,6 +47,7 @@ mitk::FiberBundleX::Pointer LoadFib(std::string filename)
 
 int FiberProcessing(int argc, char* argv[])
 {
+    MITK_INFO << "FiberProcessing";
     ctkCommandLineParser parser;
 
     parser.setTitle("Fiber Processing");
@@ -214,7 +215,6 @@ int FiberProcessing(int argc, char* argv[])
         for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
         {
             if ( (*it)->CanWriteBaseDataType(fib.GetPointer()) ) {
-                MITK_INFO << "writing " << outFileName;
                 (*it)->SetFileName( outFileName.c_str() );
                 (*it)->DoWrite( fib.GetPointer() );
             }

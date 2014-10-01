@@ -32,6 +32,7 @@ using namespace mitk;
  */
 int QballReconstruction(int argc, char* argv[])
 {
+    MITK_INFO << "QballReconstruction";
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
@@ -82,7 +83,6 @@ int QballReconstruction(int argc, char* argv[])
 
     try
     {
-        MITK_INFO << "Loading image ...";
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
         DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer());
@@ -221,7 +221,6 @@ int QballReconstruction(int argc, char* argv[])
         coeffout += "_shcoeffs.nrrd";
 
         outfilename += ".qbi";
-        MITK_INFO << "writing image " << outfilename;
         mitk::IOUtil::SaveBaseData(image, outfilename);
 
         if (outCoeffs)

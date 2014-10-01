@@ -28,4 +28,5 @@ set(CPP_FILES
     DwiDenoising.cpp
     FiberExtraction.cpp
     FiberJoin.cpp
+    TractometerMetrics.cpp
 )

@@ -102,7 +102,7 @@
       <item row="2" column="1">
        <widget class="QSlider" name="m_AngularThresholdSlider">
         <property name="toolTip">
-         <string>Minimally allowed curcature radius (in mm, interpolated auto = 0.5 minimal spacing, noninterpolated auto = 0.1 minimal spacing)</string>
+         <string>Minimally allowed curcature radius (in mm, interpolated auto = 0.5 minimal spacing, noninterpolated auto = 0.5 * minimal spacing)</string>
         </property>
         <property name="minimum">
          <number>-1</number>
@@ -124,7 +124,7 @@
          <string/>
         </property>
         <property name="text">
-         <string>Min. Tract Length: 40mm</string>
+         <string>Min. Tract Length: 20mm</string>
         </property>
        </widget>
       </item>
@@ -250,7 +250,7 @@
          <number>500</number>
         </property>
         <property name="value">
-         <number>40</number>
+         <number>20</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -266,7 +266,7 @@
          <string>Enable Trilinear Interpolation</string>
         </property>
         <property name="checked">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
       </item>

@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkCoreExports.h>
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
-#include <mitkImageAccessByItk.h>
 
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>

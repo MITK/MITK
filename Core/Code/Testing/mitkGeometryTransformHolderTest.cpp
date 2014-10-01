@@ -197,10 +197,12 @@ public:
   {
     dummyGeoHolder->SetIndexToWorldTransform(anotherTransform);
     CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummyGeoHolder->GetIndexToWorldTransform(),mitk::eps,true));
+    // spacing has to change if index to world transform was changed to a matrix with different spacing
+    CPPUNIT_ASSERT(!mitk::Equal(dummyGeoHolder->GetIndexToWorldTransform(), dummyGeoHolder_Unchanged->GetIndexToWorldTransform(), mitk::eps, true));
 
     //Test needs to fail now
     dummyGeoHolder->SetIndexToWorldTransform(aThirdTransform);
-    CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummyGeoHolder->GetIndexToWorldTransform(),mitk::eps,false)==false);
+    CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummyGeoHolder->GetIndexToWorldTransform(),mitk::eps,true)==false);
 
     //undo changes, new and changed object need to be the same!
     dummyGeoHolder->SetIndexToWorldTransform(aTransform);
@@ -211,11 +213,14 @@ public:
   {
     dummyGeoHolder->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
     CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummyGeoHolder->GetIndexToWorldTransform(),mitk::eps,true));
+    // spacing has to change if index to world transform was changed to a matrix with different spacing
+    CPPUNIT_ASSERT(!mitk::Equal(dummyGeoHolder->GetIndexToWorldTransform(), dummyGeoHolder_Unchanged->GetIndexToWorldTransform(), mitk::eps, true));
+
 
     //test needs to fail now
     vtkmatrix->SetElement(1,1,7);
     dummyGeoHolder->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
-    CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummyGeoHolder->GetIndexToWorldTransform(),mitk::eps,false)==false);
+    CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummyGeoHolder->GetIndexToWorldTransform(),mitk::eps,true)==false);
 
     //undo changes, new and changed object need to be the same!
     vtkmatrix->Identity();
@@ -244,6 +249,8 @@ public:
   {
     dummyGeoHolder->SetSpacing(anotherSpacing);
     CPPUNIT_ASSERT(mitk::Equal(anotherSpacing,dummyGeoHolder->GetSpacing()));
+    // the changed spacing will result in a changed index to world transform
+    CPPUNIT_ASSERT(!mitk::Equal(dummyGeoHolder->GetIndexToWorldTransform(), dummyGeoHolder_Unchanged->GetIndexToWorldTransform(), mitk::eps, true));
 
     //undo changes, new and changed object need to be the same!
     dummyGeoHolder->SetSpacing(aSpacing);

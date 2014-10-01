@@ -122,7 +122,7 @@ namespace mitk {
   }
 
   //##Documentation
-  //## @brief Set the spacing (m_Spacing).
+  //## @brief Set the spacing.
   //##
   //##The spacing is also changed in the IndexToWorldTransform.
   void GeometryTransformHolder::SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing)

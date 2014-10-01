@@ -31,10 +31,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 
 namespace mitk {
-
-// Here is a helper class which manages the transform related variables.
-// This needs to be implemented at the beginning of the cpp file.
-// Do not change if you don't know what you are doing!
+/*
+ GeometryTransformHolder is a helper class which manages the transform related variables.
+ Its job is to keep all information about the transform (as e.g.: spacing, offset, transformation matrices) in
+ consistent states.
+ It provides getters and setters to all transformation related information. Implementation is hidden and may be
+ subject to changes.
+*/
 class MITK_CORE_EXPORT GeometryTransformHolder
 {
 private:
@@ -109,14 +112,12 @@ public:
   const mitk::AffineTransform3D*   GetIndexToWorldTransform() const;
 
   //## @brief Set the transformation used to convert from index
-  //## to world coordinates. The spacing of the new transform is
-  //## copied to m_spacing.
+  //## to world coordinates.
   void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
   //##Documentation
   //## @brief Convenience method for setting the ITK transform
-  //## (m_IndexToWorldTransform) via an vtkMatrix4x4.The spacing of
-  //## the new transform is copied to m_spacing.
+  //## (m_IndexToWorldTransform) via an vtkMatrix4x4.
   //## \sa SetIndexToWorldTransform
   virtual void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
 

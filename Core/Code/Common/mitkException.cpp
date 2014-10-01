@@ -43,7 +43,7 @@ void mitk::Exception::GetRethrowData(int rethrowNumber, std::string &file, int &
 }
 
 
-std::ostream& operator<<(std::ostream& os, const mitk::Exception& e)
+std::ostream& mitk::operator<<(std::ostream& os, const mitk::Exception& e)
 {
   os << e.GetDescription();
   return os;

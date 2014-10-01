@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkLegacyIOExports.h>
 #include <itkProcessObject.h>
-#include <mitkFileWriter.h>
+#include <mitkFileWriterWithInformation.h>
 #include <mitkPointSet.h>
 #include <mitkSurface.h>
 
@@ -54,7 +54,7 @@ namespace mitk
  * @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 */
 template <class VTKWRITER>
-class MitkLegacyIO_EXPORT SurfaceVtkWriter : public mitk::FileWriter
+class MitkLegacyIO_EXPORT SurfaceVtkWriter : public mitk::FileWriterWithInformation
 {
 public:
 
@@ -167,6 +167,12 @@ public:
 
     virtual std::string GetSupportedBaseData() const
     { return Surface::GetStaticNameOfClass(); }
+
+    virtual const char *GetDefaultFilename();
+    virtual const char *GetFileDialogPattern();
+    virtual const char *GetDefaultExtension();
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data);
+    virtual void DoWrite(BaseData::Pointer data);
 
 protected:
 

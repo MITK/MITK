@@ -44,6 +44,108 @@ void SurfaceVtkWriter<vtkXMLPolyDataWriter>::SetDefaultExtension()
 }
 
 template<>
+const char * SurfaceVtkWriter<vtkSTLWriter>::GetDefaultFilename()
+{
+  return "surface";
+}
+
+template<>
+const char * SurfaceVtkWriter<vtkSTLWriter>::GetFileDialogPattern()
+{
+  return "STL Surface (*.stl)";
+}
+
+template<>
+const char * SurfaceVtkWriter<vtkSTLWriter>::GetDefaultExtension()
+{
+  return ".stl";
+}
+
+template<>
+bool SurfaceVtkWriter<vtkSTLWriter>::CanWriteBaseDataType(BaseData::Pointer data)
+{
+  return dynamic_cast<mitk::Surface*>(data.GetPointer()) != NULL;
+}
+
+template<>
+void SurfaceVtkWriter<vtkSTLWriter>::DoWrite(BaseData::Pointer data)
+{
+  if (this->CanWriteBaseDataType(data))
+  {
+    this->SetInput(data.GetPointer());
+    this->Update();
+  }
+}
+
+template<>
+const char * SurfaceVtkWriter<vtkPolyDataWriter>::GetDefaultFilename()
+{
+  return "surface";
+}
+
+template<>
+const char * SurfaceVtkWriter<vtkPolyDataWriter>::GetFileDialogPattern()
+{
+  return "VTK Polydata (*.vtk)";
+}
+
+template<>
+const char * SurfaceVtkWriter<vtkPolyDataWriter>::GetDefaultExtension()
+{
+  return ".vtk";
+}
+
+template<>
+bool SurfaceVtkWriter<vtkPolyDataWriter>::CanWriteBaseDataType(BaseData::Pointer data)
+{
+  return dynamic_cast<mitk::Surface*>(data.GetPointer()) != NULL;
+}
+
+template<>
+void SurfaceVtkWriter<vtkPolyDataWriter>::DoWrite(BaseData::Pointer data)
+{
+  if (this->CanWriteBaseDataType(data))
+  {
+    this->SetInput(data.GetPointer());
+    this->Update();
+  }
+}
+
+template<>
+const char * SurfaceVtkWriter<vtkXMLPolyDataWriter>::GetDefaultFilename()
+{
+  return "surface";
+}
+
+template<>
+const char * SurfaceVtkWriter<vtkXMLPolyDataWriter>::GetFileDialogPattern()
+{
+  return "VTK XML Polydata (*.vtp)";
+}
+
+template<>
+const char * SurfaceVtkWriter<vtkXMLPolyDataWriter>::GetDefaultExtension()
+{
+  return ".vtp";
+}
+
+template<>
+bool SurfaceVtkWriter<vtkXMLPolyDataWriter>::CanWriteBaseDataType(BaseData::Pointer data)
+{
+  return dynamic_cast<mitk::Surface*>(data.GetPointer()) != NULL;
+}
+
+template<>
+void SurfaceVtkWriter<vtkXMLPolyDataWriter>::DoWrite(BaseData::Pointer data)
+{
+  if (this->CanWriteBaseDataType(data))
+  {
+    this->SetInput(data.GetPointer());
+    this->Update();
+  }
+}
+
+template<>
 void SurfaceVtkWriter<vtkXMLPolyDataWriter>::ExecuteWrite( VtkWriterType* vtkWriter )
 {
   if ( vtkWriter->Write() == 0 || vtkWriter->GetErrorCode() != 0 )

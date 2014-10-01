@@ -289,6 +289,8 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
     vtkObjectFactory::RegisterFactory( textureFactory );
     textureFactory->Delete();
     */
+
+  this->RegisterLegacyWriter();
 }
 
 void MitkCoreActivator::Unload(us::ModuleContext* )

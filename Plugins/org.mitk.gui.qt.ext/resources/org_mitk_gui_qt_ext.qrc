@@ -1,11 +1,5 @@
 <RCC>
     <qresource prefix="/org.mitk.gui.qt.ext">
-        <file>document-open.svg</file>
-        <file>document-save.svg</file>
-        <file>edit-delete.svg</file>
-        <file>edit-redo.svg</file>
-        <file>edit-undo.svg</file>
-        <file>system-log-out.svg</file>
         <file>dcm-icon.png</file>
         <file>Slider.png</file>
         <file>index.html</file>

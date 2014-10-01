@@ -1,0 +1,18 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/org_mitk_icons">
+     <file>icons/awesome/index.theme</file>
+     <file>icons/awesome/scalable/actions/document-open.svg</file>
+     <file>icons/awesome/scalable/actions/document-save.svg</file>
+     <file>icons/awesome/scalable/actions/edit-delete.svg</file>
+     <file>icons/awesome/scalable/actions/edit-redo.svg</file>
+     <file>icons/awesome/scalable/actions/edit-undo.svg</file>
+     <file>icons/awesome/scalable/actions/system-log-out.svg</file>
+     <file>icons/tango/index.theme</file>
+     <file>icons/tango/scalable/actions/document-open.svg</file>
+     <file>icons/tango/scalable/actions/document-save.svg</file>
+     <file>icons/tango/scalable/actions/edit-delete.svg</file>
+     <file>icons/tango/scalable/actions/edit-redo.svg</file>
+     <file>icons/tango/scalable/actions/edit-undo.svg</file>
+     <file>icons/tango/scalable/actions/system-log-out.svg</file>
+ </qresource>
+ </RCC>

@@ -32,12 +32,41 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Active Theme</string>
+         <string>Active Style Theme</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QComboBox" name="m_StylesCombo">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="m_IconThemeFrame">
+     <property name="frameShape">
+      <enum>QFrame::Panel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLabel" name="m_IconThemeLabel">
+        <property name="text">
+         <string>Active Icon Theme</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="m_IconThemeComboBox">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>1</horstretch>
@@ -68,7 +97,7 @@
    <item>
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Search Paths</string>
+      <string>Style Search Paths</string>
      </property>
     </widget>
    </item>

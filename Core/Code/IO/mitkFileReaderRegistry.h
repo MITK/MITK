@@ -61,15 +61,11 @@ public:
    */
   static MimeType GetMimeTypeForExtension(const std::string& extension, us::ModuleContext* context = us::GetModuleContext());
 
-  static ReaderReference GetReference(const MimeType& mimeType, us::ModuleContext* context = us::GetModuleContext());
-
   static std::vector<ReaderReference> GetReferences(const MimeType& mimeType, us::ModuleContext* context = us::GetModuleContext());
 
   mitk::IFileReader* GetReader(const ReaderReference& ref, us::ModuleContext* context = us::GetModuleContext());
 
-  mitk::IFileReader* GetReader(const MimeType& mimeType, us::ModuleContext* context = us::GetModuleContext());
-
-  std::vector <mitk::IFileReader*> GetReaders(const MimeType& mimeType, us::ModuleContext* context = us::GetModuleContext());
+  std::vector<mitk::IFileReader*> GetReaders(const MimeType& mimeType, us::ModuleContext* context = us::GetModuleContext());
 
   void UngetReader(mitk::IFileReader* reader);
   void UngetReaders(const std::vector<mitk::IFileReader*>& readers);

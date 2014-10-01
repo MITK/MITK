@@ -202,11 +202,13 @@ IFileWriter::ConfidenceLevel AbstractFileWriter::GetConfidenceLevel() const
 {
   if (d->m_BaseData == NULL) return Unsupported;
 
-  if (d->m_BaseData->GetNameOfClass() == d->m_BaseDataType)
+  std::vector<std::string> classHierarchy = d->m_BaseData->GetClassHierarchy();
+  if (std::find(classHierarchy.begin(), classHierarchy.end(), d->m_BaseDataType) ==
+      classHierarchy.end())
   {
-    return Supported;
+    return Unsupported;
   }
-  return Unsupported;
+  return Supported;
 }
 
 //////////// µS Registration & Properties //////////////

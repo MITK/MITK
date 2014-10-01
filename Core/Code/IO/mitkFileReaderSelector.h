@@ -38,6 +38,11 @@ public:
   {
   public:
 
+    Item(const Item& other);
+    ~Item();
+
+    Item& operator=(const Item& other);
+
     IFileReader* GetReader() const;
     std::string GetDescription() const;
     IFileReader::ConfidenceLevel GetConfidenceLevel() const;
@@ -53,11 +58,8 @@ public:
 
     Item();
 
-    us::ServiceReference<IFileReader> m_FileReaderRef;
-    IFileReader* m_FileReader;
-    IFileReader::ConfidenceLevel m_ConfidenceLevel;
-    MimeType m_MimeType;
-    long m_Id;
+    struct Impl;
+    us::SharedDataPointer<Impl> d;
   };
 
   FileReaderSelector(const FileReaderSelector& other);

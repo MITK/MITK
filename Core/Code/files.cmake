@@ -42,6 +42,7 @@ set(H_FILES
 
   Common/mitkCommon.h
   Common/mitkExceptionMacro.h
+  Common/mitkGetClassHierarchy.h
 
   DataManagement/mitkProportionalTimeGeometry.h
   DataManagement/mitkTimeGeometry.h
@@ -377,7 +378,6 @@ set(CPP_FILES
   Rendering/mitkAbstractOverlayLayouter.cpp
 
   Common/mitkException.cpp
-  Common/mitkCommon.h
   Common/mitkCoreObjectFactoryBase.cpp
   Common/mitkCoreObjectFactory.cpp
   Common/mitkCoreServices.cpp

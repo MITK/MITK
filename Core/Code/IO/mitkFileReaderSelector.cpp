@@ -26,6 +26,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+struct FileReaderSelector::Item::Impl : us::SharedData
+{
+  Impl()
+    : m_FileReader(NULL)
+    , m_ConfidenceLevel(IFileReader::Unsupported)
+    , m_Id(-1)
+  {}
+
+  us::ServiceReference<IFileReader> m_FileReaderRef;
+  IFileReader* m_FileReader;
+  IFileReader::ConfidenceLevel m_ConfidenceLevel;
+  MimeType m_MimeType;
+  long m_Id;
+};
+
 struct FileReaderSelector::Impl : us::SharedData
 {
   Impl()
@@ -81,12 +96,12 @@ FileReaderSelector::FileReaderSelector(const std::string& path)
         }
 
         Item item;
-        item.m_FileReaderRef = *readerIter;
-        item.m_FileReader = reader;
-        item.m_ConfidenceLevel = confidenceLevel;
-        item.m_MimeType = *mimeTypeIter;
-        item.m_Id = us::any_cast<long>(readerIter->GetProperty(us::ServiceConstants::SERVICE_ID()));
-        m_Data->m_Items.insert(std::make_pair(item.m_Id, item));
+        item.d->m_FileReaderRef = *readerIter;
+        item.d->m_FileReader = reader;
+        item.d->m_ConfidenceLevel = confidenceLevel;
+        item.d->m_MimeType = *mimeTypeIter;
+        item.d->m_Id = us::any_cast<long>(readerIter->GetProperty(us::ServiceConstants::SERVICE_ID()));
+        m_Data->m_Items.insert(std::make_pair(item.d->m_Id, item));
         //m_Data->m_MimeTypes.insert(mimeType);
       }
       catch (const us::BadAnyCastException& e)
@@ -175,7 +190,7 @@ long FileReaderSelector::GetSelectedId() const
 
 bool FileReaderSelector::Select(const FileReaderSelector::Item& item)
 {
-  return Select(item.m_Id);
+  return Select(item.d->m_Id);
 }
 
 bool FileReaderSelector::Select(long id)
@@ -197,64 +212,78 @@ void FileReaderSelector::Swap(FileReaderSelector& fws)
   m_Data.Swap(fws.m_Data);
 }
 
+FileReaderSelector::Item::Item(const FileReaderSelector::Item& other)
+  : d(other.d)
+{
+}
+
+FileReaderSelector::Item::~Item()
+{
+}
+
+FileReaderSelector::Item& FileReaderSelector::Item::operator=(const FileReaderSelector::Item& other)
+{
+  d = other.d;
+  return *this;
+}
+
 IFileReader* FileReaderSelector::Item::GetReader() const
 {
-  return m_FileReader;
+  return d->m_FileReader;
 }
 
 std::string FileReaderSelector::Item::GetDescription() const
 {
-  us::Any descr = m_FileReaderRef.GetProperty(IFileReader::PROP_DESCRIPTION());
+  us::Any descr = d->m_FileReaderRef.GetProperty(IFileReader::PROP_DESCRIPTION());
   if (descr.Empty()) return std::string();
   return descr.ToString();
 }
 
 IFileReader::ConfidenceLevel FileReaderSelector::Item::GetConfidenceLevel() const
 {
-  return m_ConfidenceLevel;
+  return d->m_ConfidenceLevel;
 }
 
 MimeType FileReaderSelector::Item::GetMimeType() const
 {
-  return m_MimeType;
+  return d->m_MimeType;
 }
 
 us::ServiceReference<IFileReader> FileReaderSelector::Item::GetReference() const
 {
-  return m_FileReaderRef;
+  return d->m_FileReaderRef;
 }
 
 long FileReaderSelector::Item::GetServiceId() const
 {
-  return m_Id;
+  return d->m_Id;
 }
 
 bool FileReaderSelector::Item::operator<(const FileReaderSelector::Item& other) const
 {
   // sort by confidence level first (ascending)
-  if (m_ConfidenceLevel == other.m_ConfidenceLevel)
+  if (d->m_ConfidenceLevel == other.d->m_ConfidenceLevel)
   {
     // sort by mime-type ranking
-    if (m_MimeType < other.m_MimeType)
+    if (d->m_MimeType < other.d->m_MimeType)
     {
       return true;
     }
-    else if (other.m_MimeType < m_MimeType)
+    else if (other.d->m_MimeType < d->m_MimeType)
     {
       return false;
     }
     else
     {
       // sort by file writer service ranking
-      return m_FileReaderRef < other.m_FileReaderRef;
+      return d->m_FileReaderRef < other.d->m_FileReaderRef;
     }
   }
-  return m_ConfidenceLevel < other.m_ConfidenceLevel;
+  return d->m_ConfidenceLevel < other.d->m_ConfidenceLevel;
 }
 
 FileReaderSelector::Item::Item()
-  : m_FileReader(NULL)
-  , m_Id(-1)
+  : d(new Impl())
 {}
 
 void swap(FileReaderSelector& frs1, FileReaderSelector& frs2)

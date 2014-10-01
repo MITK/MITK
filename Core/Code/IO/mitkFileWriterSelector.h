@@ -38,10 +38,16 @@ public:
   {
   public:
 
+    Item(const Item& other);
+    ~Item();
+
+    Item& operator=(const Item& other);
+
     IFileWriter* GetWriter() const;
     std::string GetDescription() const;
     IFileWriter::ConfidenceLevel GetConfidenceLevel() const;
     MimeType GetMimeType() const;
+    std::string GetBaseDataType() const;
     us::ServiceReference<IFileWriter> GetReference() const;
     long GetServiceId() const;
 
@@ -53,11 +59,8 @@ public:
 
     Item();
 
-    us::ServiceReference<IFileWriter> m_FileWriterRef;
-    IFileWriter* m_FileWriter;
-    IFileWriter::ConfidenceLevel m_ConfidenceLevel;
-    MimeType m_MimeType;
-    long m_Id;
+    struct Impl;
+    us::SharedDataPointer<Impl> d;
   };
 
   FileWriterSelector(const FileWriterSelector& other);

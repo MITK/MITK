@@ -19,14 +19,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFileWriterRegistry.h>
 #include <mitkCoreServices.h>
 #include <mitkIMimeTypeProvider.h>
+#include <mitkBaseData.h>
 
 #include <usServiceReference.h>
 #include <usServiceProperties.h>
 #include <usAny.h>
 
 #include <set>
+#include <limits>
+#include <iterator>
 
 namespace mitk {
+
+struct FileWriterSelector::Item::Impl : us::SharedData
+{
+  Impl()
+    : m_FileWriter(NULL)
+    , m_ConfidenceLevel(IFileWriter::Unsupported)
+    , m_BaseDataIndex(0)
+    , m_Id(-1)
+  {}
+
+  us::ServiceReference<IFileWriter> m_FileWriterRef;
+  IFileWriter* m_FileWriter;
+  IFileWriter::ConfidenceLevel m_ConfidenceLevel;
+  std::size_t m_BaseDataIndex;
+  MimeType m_MimeType;
+  long m_Id;
+};
 
 struct FileWriterSelector::Impl : us::SharedData
 {
@@ -58,6 +78,8 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
 {
   mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
 
+  std::vector<std::string> classHierarchy = baseData->GetClassHierarchy();
+
   // Get all writers and their mime types for the given base data type
   std::vector<FileWriterRegistry::WriterReference> refs = m_Data->m_WriterRegistry.GetReferences(baseData, destMimeType);
   us::ServiceReference<IFileWriter> bestRef;
@@ -85,13 +107,23 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
             continue;
           }
 
+          std::string baseDataType = iter->GetProperty(IFileWriter::PROP_BASEDATA_TYPE()).ToString();
+          std::vector<std::string>::iterator idxIter =
+              std::find(classHierarchy.begin(), classHierarchy.end(), baseDataType);
+          std::size_t baseDataIndex = std::numeric_limits<std::size_t>::max();
+          if (idxIter != classHierarchy.end())
+          {
+            baseDataIndex = std::distance(classHierarchy.begin(), idxIter);
+          }
+
           Item item;
-          item.m_FileWriterRef = *iter;
-          item.m_FileWriter = writer;
-          item.m_ConfidenceLevel = confidenceLevel;
-          item.m_MimeType = mimeType;
-          item.m_Id = us::any_cast<long>(iter->GetProperty(us::ServiceConstants::SERVICE_ID()));
-          m_Data->m_Items.insert(std::make_pair(item.m_Id, item));
+          item.d->m_FileWriterRef = *iter;
+          item.d->m_FileWriter = writer;
+          item.d->m_ConfidenceLevel = confidenceLevel;
+          item.d->m_BaseDataIndex = baseDataIndex;
+          item.d->m_MimeType = mimeType;
+          item.d->m_Id = us::any_cast<long>(iter->GetProperty(us::ServiceConstants::SERVICE_ID()));
+          m_Data->m_Items.insert(std::make_pair(item.d->m_Id, item));
           m_Data->m_MimeTypes.insert(mimeType);
           if (!bestRef || bestRef < *iter)
           {
@@ -149,7 +181,7 @@ std::vector<FileWriterSelector::Item> FileWriterSelector::Get(const std::string&
 
 std::vector<FileWriterSelector::Item> FileWriterSelector::Get() const
 {
-  return Get(this->GetSelected().m_MimeType.GetName());
+  return Get(this->GetSelected().d->m_MimeType.GetName());
 }
 
 FileWriterSelector::Item FileWriterSelector::Get(long id) const
@@ -191,7 +223,7 @@ bool FileWriterSelector::Select(const std::string& mimeType)
 
 bool FileWriterSelector::Select(const FileWriterSelector::Item& item)
 {
-  return Select(item.m_Id);
+  return Select(item.d->m_Id);
 }
 
 bool FileWriterSelector::Select(long id)
@@ -221,52 +253,79 @@ void FileWriterSelector::Swap(FileWriterSelector& fws)
   m_Data.Swap(fws.m_Data);
 }
 
+FileWriterSelector::Item::Item(const FileWriterSelector::Item& other)
+  : d(other.d)
+{
+}
+
+FileWriterSelector::Item::~Item()
+{
+}
+
+FileWriterSelector::Item& FileWriterSelector::Item::operator=(const FileWriterSelector::Item& other)
+{
+  d = other.d;
+  return *this;
+}
+
 IFileWriter* FileWriterSelector::Item::GetWriter() const
 {
-  return m_FileWriter;
+  return d->m_FileWriter;
 }
 
 std::string FileWriterSelector::Item::GetDescription() const
 {
-  us::Any descr = m_FileWriterRef.GetProperty(IFileWriter::PROP_DESCRIPTION());
+  us::Any descr = d->m_FileWriterRef.GetProperty(IFileWriter::PROP_DESCRIPTION());
   if (descr.Empty()) return std::string();
   return descr.ToString();
 }
 
 IFileWriter::ConfidenceLevel FileWriterSelector::Item::GetConfidenceLevel() const
 {
-  return m_ConfidenceLevel;
+  return d->m_ConfidenceLevel;
 }
 
 MimeType FileWriterSelector::Item::GetMimeType() const
 {
-  return m_MimeType;
+  return d->m_MimeType;
+}
+
+std::string FileWriterSelector::Item::GetBaseDataType() const
+{
+  us::Any any = d->m_FileWriterRef.GetProperty(IFileWriter::PROP_BASEDATA_TYPE());
+  if (any.Empty()) return std::string();
+  return any.ToString();
 }
 
 us::ServiceReference<IFileWriter> FileWriterSelector::Item::GetReference() const
 {
-  return m_FileWriterRef;
+  return d->m_FileWriterRef;
 }
 
 long FileWriterSelector::Item::GetServiceId() const
 {
-  return m_Id;
+  return d->m_Id;
 }
 
 bool FileWriterSelector::Item::operator<(const FileWriterSelector::Item& other) const
 {
   // sort by confidence level first (ascending)
-  if (m_ConfidenceLevel == other.m_ConfidenceLevel)
+  if (d->m_ConfidenceLevel == other.d->m_ConfidenceLevel)
   {
-    // sort by file writer service ranking
-    return m_FileWriterRef < other.m_FileWriterRef;
+    // sort by class hierarchy index (writers for more derived
+    // based data types are considered a better match)
+    if (d->m_BaseDataIndex == other.d->m_BaseDataIndex)
+    {
+      // sort by file writer service ranking
+      return d->m_FileWriterRef < other.d->m_FileWriterRef;
+    }
+    return other.d->m_BaseDataIndex < d->m_BaseDataIndex;
   }
-  return m_ConfidenceLevel < other.m_ConfidenceLevel;
+  return d->m_ConfidenceLevel < other.d->m_ConfidenceLevel;
 }
 
 FileWriterSelector::Item::Item()
-  : m_FileWriter(NULL)
-  , m_Id(-1)
+  : d(new Impl())
 {}
 
 void swap(FileWriterSelector& fws1, FileWriterSelector& fws2)

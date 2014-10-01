@@ -41,20 +41,6 @@ mitk::FileWriterRegistry::~FileWriterRegistry()
   }
 }
 
-mitk::FileWriterRegistry::WriterReference mitk::FileWriterRegistry::GetReference(const mitk::BaseData* baseData, us::ModuleContext* context)
-{
-  return GetReference(baseData, std::string(), context);
-}
-
-mitk::FileWriterRegistry::WriterReference mitk::FileWriterRegistry::GetReference(const mitk::BaseData* baseData, const std::string& mimeType, us::ModuleContext* context)
-{
-  std::vector<WriterReference> refs = GetReferences(baseData, mimeType, context);
-  if (refs.empty()) return WriterReference();
-
-  std::sort(refs.begin(), refs.end());
- return refs.back();
-}
-
 std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry::GetReferences(const mitk::BaseData* baseData, us::ModuleContext* context)
 {
   return GetReferences(baseData, std::string(), context);
@@ -62,10 +48,21 @@ std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry:
 
 std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry::GetReferences(const mitk::BaseData* baseData, const std::string& mimeType, us::ModuleContext* context)
 {
-  std::string filter = us::LDAPProp(us::ServiceConstants::OBJECTCLASS()) == us_service_interface_iid<IFileWriter>() &&
-                       us::LDAPProp(IFileWriter::PROP_BASEDATA_TYPE()) == baseData->GetNameOfClass() &&
-                       (mimeType.empty() ? us::LDAPPropExpr(std::string()) : us::LDAPProp(IFileWriter::PROP_MIMETYPE()) == mimeType);
-  return context->GetServiceReferences<IFileWriter>(filter);
+  std::vector<WriterReference> result;
+
+  // loop over the class hierarchy of baseData and get all writers
+  // claiming the support the actual baseData class or any of its super classes
+  std::vector<std::string> classHierarchy = baseData->GetClassHierarchy();
+  for (std::vector<std::string>::const_iterator clIter = classHierarchy.begin(),
+       clIterEnd = classHierarchy.end(); clIter != clIterEnd; ++clIter)
+  {
+    std::string filter = us::LDAPProp(us::ServiceConstants::OBJECTCLASS()) == us_service_interface_iid<IFileWriter>() &&
+                         us::LDAPProp(IFileWriter::PROP_BASEDATA_TYPE()) == *clIter &&
+                         (mimeType.empty() ? us::LDAPPropExpr(std::string()) : us::LDAPProp(IFileWriter::PROP_MIMETYPE()) == mimeType);
+    std::vector<WriterReference> refs = context->GetServiceReferences<IFileWriter>(filter);
+    result.insert(result.end(), refs.begin(), refs.end());
+  }
+  return result;
 }
 
 mitk::IFileWriter* mitk::FileWriterRegistry::GetWriter(const mitk::FileWriterRegistry::WriterReference& ref, us::ModuleContext* context)
@@ -76,21 +73,6 @@ mitk::IFileWriter* mitk::FileWriterRegistry::GetWriter(const mitk::FileWriterReg
   mitk::IFileWriter* writer = serviceObjects.GetService();
   m_ServiceObjects.insert(std::make_pair(writer, serviceObjects));
   return writer;
-}
-
-mitk::IFileWriter* mitk::FileWriterRegistry::GetWriter(const mitk::BaseData* baseData, us::ModuleContext* context)
-{
-  return GetWriter(GetReference(baseData, context), context);
-}
-
-mitk::IFileWriter* mitk::FileWriterRegistry::GetWriter(const mitk::BaseData* baseData, const std::string& mimeType, us::ModuleContext* context)
-{
-  return GetWriter(GetReference(baseData, mimeType, context), context);
-}
-
-std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(const mitk::BaseData* baseData, us::ModuleContext* context)
-{
-  return GetWriters(baseData, std::string(), context);
 }
 
 std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(const mitk::BaseData* baseData, const std::string& mimeType, us::ModuleContext* context)

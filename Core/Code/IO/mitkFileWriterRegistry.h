@@ -51,18 +51,11 @@ public:
   FileWriterRegistry();
   ~FileWriterRegistry();
 
-  static WriterReference GetReference(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
-  static WriterReference GetReference(const BaseData* baseData, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
-
   static std::vector<WriterReference> GetReferences(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
   static std::vector<WriterReference> GetReferences(const BaseData* baseData, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
 
   IFileWriter* GetWriter(const WriterReference& ref, us::ModuleContext* context = us::GetModuleContext());
 
-  IFileWriter* GetWriter(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
-  IFileWriter* GetWriter(const BaseData* baseData, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
-
-  std::vector<IFileWriter*> GetWriters(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
   std::vector<IFileWriter*> GetWriters(const BaseData* baseData, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
 
   void UngetWriter(IFileWriter* writer);

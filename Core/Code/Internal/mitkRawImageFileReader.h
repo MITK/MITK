@@ -55,15 +55,6 @@ private:
 
   RawImageFileReader* Clone() const;
 
-  /** Pixel type of image to be read. Must be of type IOPixelType. */
-  IOPixelType m_PixelType;
-
-  /** Dimensionality of file to be read. Can be 2 or 3. */
-  int m_Dimensionality;
-
-  /** Endianity. Must be set to LITTLE or BIG. Default is BIG. */
-  EndianityType m_Endianity;
-
   /** Vector containing dimensions of image to be read. */
   itk::Vector<int, 3> m_Dimensions;
 

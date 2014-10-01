@@ -294,12 +294,18 @@ bool compareQStandardItems(QStandardItem* a, QStandardItem* b)
 QmitkViewNavigatorWidget::QmitkViewNavigatorWidget( QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
 {
+    m_Generated = false;
     this->CreateQtPartControl(this);
 }
 
 QmitkViewNavigatorWidget::~QmitkViewNavigatorWidget()
 {
 
+}
+
+void QmitkViewNavigatorWidget::setFocus()
+{
+  m_Controls.lineEdit->setFocus();
 }
 
 void QmitkViewNavigatorWidget::CreateQtPartControl( QWidget *parent )
@@ -331,7 +337,6 @@ void QmitkViewNavigatorWidget::CreateQtPartControl( QWidget *parent )
     m_FilterProxyModel->setSourceModel(m_TreeModel);
     //proxyModel->setFilterFixedString("Diff");
     m_Controls.m_PluginTreeView->setModel(m_FilterProxyModel);
-    FillTreeList();
 }
 
 void QmitkViewNavigatorWidget::UpdateTreeList(QStandardItem* root, berry::IWorkbenchPartReference *partRef, const std::string &changeId)
@@ -339,6 +344,11 @@ void QmitkViewNavigatorWidget::UpdateTreeList(QStandardItem* root, berry::IWorkb
     berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
     if (page.IsNull())
         return;
+
+    if( !m_Generated )
+    {
+      m_Generated = FillTreeList();
+    }
 
     if (root==NULL)
         root = m_TreeModel->invisibleRootItem();
@@ -648,7 +658,7 @@ void QmitkViewNavigatorWidget::ClonePerspective()
 
 void QmitkViewNavigatorWidget::ResetPerspective()
 {
-    if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to reset the curent perspective?", QMessageBox::Yes|QMessageBox::No).exec())
+    if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to reset the current perspective?", QMessageBox::Yes|QMessageBox::No).exec())
         berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
 
@@ -661,14 +671,17 @@ void QmitkViewNavigatorWidget::DeletePerspective()
         question.append("'?");
         if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", question, QMessageBox::Yes|QMessageBox::No).exec())
         {
+          if( m_RegisteredPerspective == berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->GetPerspective() )
+          {
+            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->CloseCurrentPerspective(true, true);
+          }
             berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
             perspRegistry->DeletePerspective(m_RegisteredPerspective);
             berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->RemovePerspective(m_RegisteredPerspective);
             FillTreeList();
             if (! berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->GetPerspective())
             {
-                berry::IPerspectiveDescriptor::Pointer persp = perspRegistry->FindPerspectiveWithId(perspRegistry->GetDefaultPerspective());
-                berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->SetPerspective(persp);
+                berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->Close();
             }
         }
     }
@@ -676,7 +689,7 @@ void QmitkViewNavigatorWidget::DeletePerspective()
 
 void QmitkViewNavigatorWidget::ClosePerspective()
 {
-    if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to close the curent perspective?", QMessageBox::Yes|QMessageBox::No).exec())
+    if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to close the current perspective?", QMessageBox::Yes|QMessageBox::No).exec())
     {
         berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
         page->CloseCurrentPerspective(true, true);

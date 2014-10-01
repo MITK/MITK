@@ -312,7 +312,7 @@
     name="Fiber Processing"
     class="QmitkFiberProcessingPerspective"
     icon="resources/FiberBundleOperations.png">
-    <description>This persective contains all views necessary to postprocess fibers.</description>
+    <description>This perspective contains all views necessary to post process fibers.</description>
     <keywordReference id="org.mitk.perspectives.fiberprocessings.Keyword"/>
     </perspective>
 

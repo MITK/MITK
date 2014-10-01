@@ -150,3 +150,9 @@ void mitk::SimulationWriter::DoWrite(BaseData::Pointer data)
     this->Update();
   }
 }
+
+
+std::string mitk::SimulationWriter::GetSupportedBaseData() const
+{
+  return Simulation::GetStaticNameOfClass();
+}

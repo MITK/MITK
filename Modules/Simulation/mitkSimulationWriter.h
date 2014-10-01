@@ -59,6 +59,8 @@ namespace mitk
     bool CanWriteBaseDataType(BaseData::Pointer data);
     void DoWrite(BaseData::Pointer data);
 
+    std::string GetSupportedBaseData() const;
+
   protected:
     SimulationWriter();
     ~SimulationWriter();

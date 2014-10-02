@@ -212,7 +212,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
   for(std::vector<const mitk::BaseData*>::const_iterator dataIter = data.begin(),
       dataIterEnd = data.end(); dataIter != dataIterEnd; ++dataIter, ++counter)
   {
-    SaveInfo saveInfo(*dataIter);
+    SaveInfo saveInfo(*dataIter, mitk::MimeType(), std::string());
 
     SaveFilter filters(saveInfo);
 

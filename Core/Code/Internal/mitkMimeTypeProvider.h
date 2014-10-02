@@ -52,6 +52,7 @@ class MimeTypeProvider : public IMimeTypeProvider,
 public:
 
   MimeTypeProvider();
+  ~MimeTypeProvider();
 
   void Start();
   void Stop();

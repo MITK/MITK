@@ -61,7 +61,6 @@ public:
 
   struct MITK_CORE_EXPORT SaveInfo
   {
-    SaveInfo(const BaseData* baseData);
     SaveInfo(const BaseData* baseData, const MimeType& mimeType, const std::string& path);
 
     bool operator<(const SaveInfo& other) const;
@@ -69,10 +68,10 @@ public:
     /// The BaseData object to save.
     const BaseData* m_BaseData;
 
-    /// The selected mime-type, used to restrict results from FileWriterSelector.
-    MimeType m_MimeType;
     /// Contains a set of IFileWriter objects.
     FileWriterSelector m_WriterSelector;
+    /// The selected mime-type, used to restrict results from FileWriterSelector.
+    MimeType m_MimeType;
     /// The path to write the BaseData object to.
     std::string m_Path;
     /// Flag indicating if sub-sequent save operations are to be canceled.

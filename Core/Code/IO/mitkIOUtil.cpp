@@ -866,7 +866,7 @@ bool IOUtil::SaveBaseData( mitk::BaseData* data, const std::string& path)
   return true;
 }
 
-std::string IOUtil::Save(const BaseData* data, const std::string& mimeTypeN, const std::string& path,
+std::string IOUtil::Save(const BaseData* data, const std::string& mimeTypeName, const std::string& path,
                          WriterOptionsFunctorBase* optionsCallback, bool addExtension)
 {
   if (path.empty())
@@ -876,39 +876,26 @@ std::string IOUtil::Save(const BaseData* data, const std::string& mimeTypeN, con
 
   mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
 
-  std::string mimeTypeName = mimeTypeN;
-
-  // If no mime-type is provided, we try to get the mime-type from the
-  // highest ranked IFileWriter object for the given BaseData type
-  if (mimeTypeName.empty())
-  {
-    std::vector<us::ServiceReferenceU> refs = us::GetModuleContext()->GetServiceReferences(
-          us::LDAPProp(us::ServiceConstants::OBJECTCLASS()) == us_service_interface_iid<IFileWriter>() &&
-          us::LDAPProp(IFileWriter::PROP_BASEDATA_TYPE()) == data->GetNameOfClass());
-    std::sort(refs.begin(), refs.end());
-    if (!refs.empty())
-    {
-      us::Any mimeProp = refs.back().GetProperty(IFileWriter::PROP_MIMETYPE());
-      if (mimeProp.Type() == typeid(std::string))
-      {
-        mimeTypeName = us::any_cast<std::string>(mimeProp);
-      }
-    }
-  }
-
   MimeType mimeType = mimeTypeProvider->GetMimeTypeForName(mimeTypeName);
-  if (mimeType.IsValid())
+
+  SaveInfo saveInfo(data, mimeType, path);
+
+  if (saveInfo.m_WriterSelector.IsEmpty())
   {
-    std::string ext = itksys::SystemTools::GetFilenameExtension(path);
-    if (ext.empty() && addExtension)
-    {
-      ext = mimeType.GetExtensions().empty() ? std::string() : "." + mimeType.GetExtensions().front();
-    }
-    std::vector<SaveInfo> infos;
-    infos.push_back(SaveInfo(data, mimeType, path + ext));
-    return Save(infos, optionsCallback);
+    return std::string("No writer registered for type ") + data->GetNameOfClass() +
+        (mimeType.IsValid() ? (std::string(" and mime-type ") + mimeType.GetName()) : std::string());
   }
-  return "The mime-type '" + mimeTypeName + "' is not registered";
+
+  // Add an extension if not already specified
+  std::string ext = itksys::SystemTools::GetFilenameExtension(path);
+  if (ext.empty() && addExtension)
+  {
+    ext = saveInfo.m_MimeType.GetExtensions().empty() ? std::string() : "." + saveInfo.m_MimeType.GetExtensions().front();
+  }
+
+  std::vector<SaveInfo> infos;
+  infos.push_back(saveInfo);
+  return Save(infos, optionsCallback);
 }
 
 std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorBase* optionsCallback)
@@ -1050,18 +1037,15 @@ void IOUtil::Impl::SetDefaultDataNodeProperties(DataNode* node, const std::strin
   }
 }
 
-IOUtil::SaveInfo::SaveInfo(const BaseData* baseData)
-  : m_BaseData(baseData)
-  , m_WriterSelector(baseData, std::string())
-  , m_Cancel(false)
-{
-}
-
 IOUtil::SaveInfo::SaveInfo(const BaseData* baseData, const MimeType& mimeType,
                            const std::string& path)
   : m_BaseData(baseData)
-  , m_MimeType(mimeType)
-  , m_WriterSelector(baseData, mimeType.IsValid() ? mimeType.GetName() : std::string())
+  , m_WriterSelector(baseData, mimeType.GetName(), path)
+  , m_MimeType(mimeType.IsValid() ? mimeType // use the original mime-type
+                                  : (m_WriterSelector.IsEmpty() ? mimeType // no writer found, use the original invalid mime-type
+                                                                : m_WriterSelector.GetDefault().GetMimeType() // use the found default mime-type
+                                                                  )
+                                    )
   , m_Path(path)
   , m_Cancel(false)
 {

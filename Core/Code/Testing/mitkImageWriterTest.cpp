@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkExtractSliceFilter.h>
 #include "mitkIOUtil.h"
-#include "mitkFileWriterRegistry.h"
 
 #include "itksys/SystemTools.hxx"
 
@@ -82,7 +81,7 @@ void TestPictureWriting(mitk::Image* image, const std::string& filename, const s
     singleSliceImage = extractFilter->GetOutput();
 
     // test 3D writing in format supporting only 2D
-    mitk::FileWriterRegistry::Write(image, fullFileName);
+    mitk::IOUtil::Save(image, fullFileName);
 
     // test images
     unsigned int foundImagesCount = 0;
@@ -91,14 +90,14 @@ void TestPictureWriting(mitk::Image* image, const std::string& filename, const s
     if(image->GetDimension(2) == 1)
     {
       std::stringstream series_filenames;
-        series_filenames << filename << extension;
-        mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage( series_filenames.str() );
-        if( compareImage.IsNotNull() )
-        {
-          foundImagesCount++;
-          MITK_TEST_CONDITION(CompareImageMetaData( singleSliceImage, compareImage, false ), "Image meta data unchanged after writing and loading again. "); //ignore bits per component
-        }
-        remove( series_filenames.str().c_str() );
+      series_filenames << filename << extension;
+      mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage( series_filenames.str() );
+      if( compareImage.IsNotNull() )
+      {
+        foundImagesCount++;
+        MITK_TEST_CONDITION(CompareImageMetaData( singleSliceImage, compareImage, false ), "Image meta data unchanged after writing and loading again. "); //ignore bits per component
+      }
+      remove( series_filenames.str().c_str() );
     }
     else //test the whole slice stack
     {
@@ -127,13 +126,13 @@ void TestPictureWriting(mitk::Image* image, const std::string& filename, const s
   {
     try
     {
-      mitk::FileWriterRegistry::Write(singleSliceImage, fullFileName);
+      mitk::IOUtil::Save(singleSliceImage, fullFileName);
 
       mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(fullFileName.c_str());
       MITK_TEST_CONDITION_REQUIRED( compareImage.IsNotNull(), "Image stored was succesfully loaded again");
 
       MITK_TEST_CONDITION_REQUIRED( CompareImageMetaData(singleSliceImage, compareImage, false ), "Image meta data unchanged after writing and loading again. ");//ignore bits per component
-      remove(AppendExtension(filename, extension.c_str()).c_str());
+      remove(fullFileName.c_str());
     }
     catch(itk::ExceptionObject &e)
     {
@@ -179,54 +178,63 @@ int mitkImageWriterTest(int  argc , char* argv[])
 
   MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(),"loaded image not NULL")
 
-  mitk::FileWriterRegistry writerRegistry;
-
-  std::ofstream tmpStream;
-  std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream);
-  tmpStream.close();
-
-  // write ITK .mhd image (2D and 3D only)
+    // write ITK .mhd image (2D and 3D only)
   if( image->GetDimension() <= 3 )
   {
+    std::ofstream tmpStream;
+    std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.mhd");
+    tmpStream.close();
+
+    std::string tmpFilePathWithoutExt = tmpFilePath.substr(0, tmpFilePath.size() - 4);
+
     try
     {
-      mitk::IFileWriter* writer = writerRegistry.GetWriter(mitk::Image::GetStaticNameOfClass(), ".mhd");
-      writer->Write(image, tmpFilePath);
+      mitk::IOUtil::Save(image, tmpFilePath);
 
       mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(tmpFilePath);
       MITK_TEST_CONDITION_REQUIRED( compareImage.IsNotNull(), "Image stored in MHD format was succesfully loaded again! ");
 
-      MITK_TEST_CONDITION(itksys::SystemTools::FileExists((tmpFilePath + ".mhd").c_str()), ".mhd file exists")
-      MITK_TEST_CONDITION(itksys::SystemTools::FileExists((tmpFilePath + ".raw").c_str()) ||
-                          itksys::SystemTools::FileExists((tmpFilePath + ".zraw").c_str()), ".raw or .zraw exists")
+      MITK_TEST_CONDITION(itksys::SystemTools::FileExists((tmpFilePathWithoutExt + ".mhd").c_str()), ".mhd file exists")
+      MITK_TEST_CONDITION(itksys::SystemTools::FileExists((tmpFilePathWithoutExt + ".raw").c_str()) ||
+                          itksys::SystemTools::FileExists((tmpFilePathWithoutExt + ".zraw").c_str()), ".raw or .zraw exists")
 
       // delete
-      remove((tmpFilePath + ".mhd").c_str());
-      remove((tmpFilePath + ".raw").c_str());
-      remove((tmpFilePath + ".zraw").c_str());
+      remove(tmpFilePath.c_str());
+      remove((tmpFilePathWithoutExt + ".raw").c_str());
+      remove((tmpFilePathWithoutExt + ".zraw").c_str());
     }
-    catch (...)
+    catch (const std::exception& e)
     {
-      MITK_TEST_FAILED_MSG(<< "Exception during .mhd file writing");
+      MITK_TEST_FAILED_MSG(<< "Exception during .mhd file writing: " << e.what());
     }
   }
 
   //testing more component image writing as nrrd files
-  try
-  {
-    mitk::IFileWriter* writer = writerRegistry.GetWriter(mitk::Image::GetStaticNameOfClass(), ".nrrd");
-    writer->Write(image, tmpFilePath);
 
-    std::fstream fin;
-    mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(AppendExtension(tmpFilePath, ".nrrd").c_str());
-    MITK_TEST_CONDITION_REQUIRED(compareImage.IsNotNull(), "Image stored in NRRD format was succesfully loaded again");
-    fin.close();
-    remove(AppendExtension(tmpFilePath, ".nrrd").c_str());
-  }
-  catch(...)
   {
-    MITK_TEST_FAILED_MSG(<< "Exception during .nrrd file writing");
+    std::ofstream tmpStream;
+    std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.nrrd");
+    tmpStream.close();
+
+    try
+    {
+      mitk::IOUtil::Save(image, tmpFilePath);
+
+      mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(tmpFilePath);
+      MITK_TEST_CONDITION_REQUIRED(compareImage.IsNotNull(), "Image stored in NRRD format was succesfully loaded again");
+
+      remove(tmpFilePath.c_str());
+    }
+    catch(...)
+    {
+      std::remove(tmpFilePath.c_str());
+      MITK_TEST_FAILED_MSG(<< "Exception during .nrrd file writing");
+    }
   }
+
+  std::ofstream tmpStream;
+  std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX");
+  tmpStream.close();
 
   TestPictureWriting(image, tmpFilePath, ".png");
   TestPictureWriting(image, tmpFilePath, ".jpg");
@@ -234,21 +242,16 @@ int mitkImageWriterTest(int  argc , char* argv[])
   TestPictureWriting(image, tmpFilePath, ".bmp");
 
   // test for exception handling
-  std::vector<mitk::IFileWriter*> writers = writerRegistry.GetWriters(mitk::Image::GetStaticNameOfClass());
-  for (std::vector<mitk::IFileWriter*>::const_iterator iter = writers.begin(),
-       end = writers.end(); iter != end; ++iter)
+  try
   {
-    try
-    {
-      (*iter)->Write(image, "/usr/bin");
-      MITK_TEST_FAILED_MSG( << "itk::ExceptionObject expected")
-    }
-    catch (const itk::ExceptionObject&) { /* this is expected */ }
-    catch(...)
-    {
-      //this means that a wrong exception (i.e. no itk:Exception) has been thrown
-      MITK_TEST_FAILED_MSG(<< "Wrong exception (i.e. no itk:Exception) caught during write");
-    }
+    mitk::IOUtil::Save(image, "/usr/bin");
+    MITK_TEST_FAILED_MSG( << "mitk::Exception expected")
+  }
+  catch (const mitk::Exception&) { /* this is expected */ }
+  catch (...)
+  {
+    //this means that a wrong exception (i.e. no itk:Exception) has been thrown
+    MITK_TEST_FAILED_MSG(<< "Wrong exception (i.e. no itk:Exception) caught during write");
   }
 
   // always end with this!

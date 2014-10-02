@@ -321,7 +321,14 @@ void QtStyleManager::SetStyle(const QString& fileName, bool update)
 
 void QtStyleManager::SetIconTheme(const QString& themeName)
 {
-  SetIconTheme(themeName, true);
+  if( themeName == QString( "<<default>>" ) )
+  {
+    SetIconTheme( QString("tango"), true);
+  }
+  else
+  {
+    SetIconTheme(themeName, true);
+  }
 }
 
 void QtStyleManager::SetIconTheme(const QString& themeName, bool update)

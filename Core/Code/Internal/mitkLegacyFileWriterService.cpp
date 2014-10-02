@@ -25,12 +25,11 @@ mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriter::Pointer
   : AbstractFileWriter(legacyWriter->GetSupportedBaseData())
   , m_LegacyWriter(legacyWriter)
 {
-  this->SetMimeTypePrefix("application/vnd.mitk.legacy.writer.");
+  this->SetMimeTypePrefix("application/vnd.mitk.legacy.");
   this->SetDescription(description);
 
-  std::vector<std::string> extensions = legacyWriter->GetPossibleFileExtensions();
-
   CustomMimeType customMimeType;
+  std::vector<std::string> extensions = legacyWriter->GetPossibleFileExtensions();
   for(std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ext++)
   {
     if (ext->empty()) continue;

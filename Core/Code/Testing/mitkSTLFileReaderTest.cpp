@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkImage.h"
-#include "mitkSTLFileReader.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkSurface.h"
+#include "mitkIOUtil.h"
 #include "mitkTestingMacros.h"
 #include "mitkTestFixture.h"
 #include <vtkSTLReader.h>
@@ -52,32 +52,27 @@ public:
   {
   }
 
-void testReadFile()
+  void testReadFile()
   {
-  //Read STL-Image from file
-  mitk::STLFileReader::Pointer reader = mitk::STLFileReader::New();
-  if (!reader->CanReadFile(m_SurfacePath, "", "")) {CPPUNIT_FAIL("Cannot read test data STL file.");}
-  reader->SetFileName(m_SurfacePath);
-  reader->Update();
-  mitk::Surface::Pointer surface = reader->GetOutput();
+    //Read STL-Image from file
+    mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(m_SurfacePath);
 
-  //check some basic stuff
-  CPPUNIT_ASSERT_MESSAGE("Reader output not NULL",surface.IsNotNull());
-  CPPUNIT_ASSERT_MESSAGE("IsInitialized()",surface->IsInitialized());
-  CPPUNIT_ASSERT_MESSAGE("mitk::Surface::SetVtkPolyData()",(surface->GetVtkPolyData()!=NULL));
-  CPPUNIT_ASSERT_MESSAGE("Availability of geometry",(surface->GetGeometry()!=NULL));
+    //check some basic stuff
+    CPPUNIT_ASSERT_MESSAGE("Reader output not NULL",surface.IsNotNull());
+    CPPUNIT_ASSERT_MESSAGE("IsInitialized()",surface->IsInitialized());
+    CPPUNIT_ASSERT_MESSAGE("mitk::Surface::SetVtkPolyData()",(surface->GetVtkPolyData()!=NULL));
+    CPPUNIT_ASSERT_MESSAGE("Availability of geometry",(surface->GetGeometry()!=NULL));
 
-  //use vtk stl reader for reference
-  vtkSmartPointer<vtkSTLReader> myVtkSTLReader = vtkSmartPointer<vtkSTLReader>::New();
-  myVtkSTLReader->SetFileName( m_SurfacePath.c_str() );
-  myVtkSTLReader->Update();
-  vtkSmartPointer<vtkPolyData> myVtkPolyData = myVtkSTLReader->GetOutput();
-  //vtkPolyData from vtkSTLReader directly
-  int n = myVtkPolyData->GetNumberOfPoints();
-  //vtkPolyData from mitkSTLFileReader
-  int m = surface->GetVtkPolyData()->GetNumberOfPoints();
-  CPPUNIT_ASSERT_MESSAGE("Number of Points in VtkPolyData",(n == m));
-
+    //use vtk stl reader for reference
+    vtkSmartPointer<vtkSTLReader> myVtkSTLReader = vtkSmartPointer<vtkSTLReader>::New();
+    myVtkSTLReader->SetFileName( m_SurfacePath.c_str() );
+    myVtkSTLReader->Update();
+    vtkSmartPointer<vtkPolyData> myVtkPolyData = myVtkSTLReader->GetOutput();
+    //vtkPolyData from vtkSTLReader directly
+    int n = myVtkPolyData->GetNumberOfPoints();
+    //vtkPolyData from mitkSTLFileReader
+    int m = surface->GetVtkPolyData()->GetNumberOfPoints();
+    CPPUNIT_ASSERT_MESSAGE("Number of Points in VtkPolyData",(n == m));
   }
 
 };

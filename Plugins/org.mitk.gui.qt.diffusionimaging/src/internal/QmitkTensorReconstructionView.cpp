@@ -280,7 +280,6 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     // TENSORS TO DATATREE
     mitk::DiffusionImage<DiffusionPixelType>::Pointer image = mitk::DiffusionImage<DiffusionPixelType>::New();
     image->SetVectorImage( filter->GetOutput() );
-
     image->SetReferenceBValue(diffImage->GetReferenceBValue());
     image->SetDirections(gradients);
     image->InitializeFromVectorImage();

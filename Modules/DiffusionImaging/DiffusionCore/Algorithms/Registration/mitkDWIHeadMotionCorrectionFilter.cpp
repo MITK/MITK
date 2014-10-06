@@ -156,7 +156,6 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   split_filter->SetInput (input->GetVectorImage() );
   split_filter->SetExtractAllAboveThreshold(8, input->GetBValueMap() );
 
-
   try
   {
     split_filter->Update();
@@ -192,6 +191,7 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   weightedRegistrationMethod->SetFixedImage( b0referenceImage );
   // use the advanced (windowed sinc) interpolation
   weightedRegistrationMethod->SetUseAdvancedInterpolation(true);
+  weightedRegistrationMethod->SetVerboseOn();
 
   //
   //   - (3.2) Register all timesteps in the splitted image onto the first reference
@@ -207,9 +207,12 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   registeredWeighted->Initialize( splittedImage->GetPixelType(0), *tsg );
 
   // insert the first unweighted reference as the first volume
-  mitk::ImageWriteAccessor imac(b0referenceImage);
-  registeredWeighted->SetImportVolume( imac.GetData(),
-    0,0, mitk::Image::CopyMemory );
+  // in own scope to release the accessor asap after copy
+  {
+    mitk::ImageWriteAccessor imac(b0referenceImage);
+    registeredWeighted->SetImportVolume( imac.GetData(),
+      0,0, mitk::Image::CopyMemory );
+  }
 
 
   // mitk::Image::Pointer registeredWeighted = splittedImage->Clone();
@@ -318,7 +321,6 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   this->GetOutput()->SetMeasurementFrame(output->GetMeasurementFrame());
   this->GetOutput()->SetDirections(output->GetDirections());
   this->GetOutput()->InitializeFromVectorImage();
-
   this->GetOutput()->Modified();
 }
 

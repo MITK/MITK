@@ -255,7 +255,7 @@ mitk::NavigationData::GetInverse() const
   if (Equal(zeroQuaternion, this->GetOrientation()))
     mitkThrow() << "tried to invert zero quaternion in NavigationData";
 
-  mitk::NavigationData::Pointer navigationDataInverse = NavigationData::Clone();
+  mitk::NavigationData::Pointer navigationDataInverse = this->Clone();
   navigationDataInverse->SetOrientation(this->GetOrientation().inverse());
 
   // To vnl_vector

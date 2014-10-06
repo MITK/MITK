@@ -76,11 +76,6 @@ set(external_projects
   SimpleITK
   )
 
-# Qxt supports Qt5. We need to also support it in QxtCMakeLists.txt
-#if(MITK_USE_Qt4)
-  list(APPEND external_projects Qxt)
-#endif()
-
 # These are "hard" dependencies and always set to ON
 set(MITK_USE_tinyxml 1)
 set(MITK_USE_ANN 1)
@@ -92,9 +87,6 @@ set(MITK_USE_VTK 1)
 # Semi-hard dependencies, enabled by user-controlled variables
 if(MITK_USE_QT)
   set(MITK_USE_Qwt 1)
-  #if(MITK_USE_Qt4)
-    set(MITK_USE_Qxt 1) #TODO: Check how Qxt builds with Qt 5
-  #endif()
 endif()
 
 if(MITK_USE_SOFA)
@@ -307,7 +299,6 @@ ExternalProject_Add(${proj}
     ${SOFA_DEPENDS}
     ${MITK-Data_DEPENDS}
     ${Qwt_DEPENDS}
-    ${Qxt_DEPENDS}
     ${SimpleITK_DEPENDS}
     ${Numpy_DEPENDS}
 )
@@ -434,7 +425,6 @@ ExternalProject_Add(${proj}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
     -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
     -DQwt_DIR:PATH=${Qwt_DIR}
-    -DQxt_DIR:PATH=${Qxt_DIR}
     -DSimpleITK_DIR:PATH=${SimpleITK_DIR}
     -DNumpy_DIR:PATH=${Numpy_DIR}
   CMAKE_ARGS

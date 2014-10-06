@@ -18,8 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef PICFILEREADER_H_HEADER_INCLUDED_C1F48A22
 #define PICFILEREADER_H_HEADER_INCLUDED_C1F48A22
 
-#include "mitkFileReader.h"
-#include "mitkImageSource.h"
+#include "mitkAbstractFileReader.h"
+
+#include "mitkImage.h"
 
 #include "mitkIpPic.h"
 
@@ -27,50 +28,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 //##Documentation
 //## @brief Reader to read files in DKFZ-pic-format
-class PicFileReader : public ImageSource, public FileReader
+class PicFileReader : public AbstractFileReader
 {
+
 public:
-    mitkClassMacro(PicFileReader, FileReader);
 
-    /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+  PicFileReader();
 
-    itkSetStringMacro(FileName);
-    itkGetStringMacro(FileName);
-
-    itkSetStringMacro(FilePrefix);
-    itkGetStringMacro(FilePrefix);
-
-    itkSetStringMacro(FilePattern);
-    itkGetStringMacro(FilePattern);
-
-    virtual void EnlargeOutputRequestedRegion(itk::DataObject *output);
-
-    static void ConvertHandedness(mitkIpPicDescriptor* pic);
-
-    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
+  using AbstractFileReader::Read;
+  std::vector<mitk::BaseData::Pointer> Read();
 
 protected:
-    virtual void GenerateData();
 
-    virtual void GenerateOutputInformation();
+  void FillImage(Image::Pointer image);
 
-    PicFileReader();
+  Image::Pointer CreateImage();
 
-    ~PicFileReader();
+private:
 
-    //##Description
-    //## @brief Time when Header was last read
-    itk::TimeStamp m_ReadHeaderTime;
+  static void ConvertHandedness(mitkIpPicDescriptor* pic);
 
-    int m_StartFileIndex;
-
-    std::string m_FileName;
-
-    std::string m_FilePrefix;
-
-    std::string m_FilePattern;
+  PicFileReader* Clone() const;
 
 };
 

@@ -17,9 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPicFileReader.h"
 #include "mitkPicHelper.h"
-#include <itkImageFileReader.h>
+#include "mitkLegacyAdaptors.h"
+
 #include "mitkImageWriteAccessor.h"
-#include <mitkLegacyAdaptors.h>
+#include "mitkCustomMimeType.h"
 
 extern "C"
 {
@@ -27,153 +28,105 @@ extern "C"
   mitkIpPicDescriptor * MITKipPicGetTags( char *infile_name, mitkIpPicDescriptor *pic );
 }
 
-void mitk::PicFileReader::GenerateOutputInformation()
+mitk::PicFileReader::PicFileReader()
+  : AbstractFileReader()
 {
-    Image::Pointer output = this->GetOutput();
+  CustomMimeType mimeType(this->GetMimeTypePrefix() + "mbipic");
+  mimeType.AddExtension("pic");
+  mimeType.AddExtension("pic.gz");
+  mimeType.AddExtension("PIC");
+  mimeType.AddExtension("PIC.gz");
+  mimeType.SetCategory("Images");
+  mimeType.SetComment("DKFZ Legacy PIC Format");
 
-    if ((output->IsInitialized()) && (this->GetMTime() <= m_ReadHeaderTime.GetMTime()))
-        return;
+  this->SetMimeType(mimeType);
+  this->SetDescription("DKFZ PIC");
 
-    itkDebugMacro(<<"Reading file for GenerateOutputInformation()" << m_FileName);
+  this->RegisterService();
+}
 
-    // Check to see if we can read the file given the name or prefix
-    //
-    if ( m_FileName == "" && m_FilePrefix == "" )
+std::vector<mitk::BaseData::Pointer> mitk::PicFileReader::Read()
+{
+  mitk::Image::Pointer image = this->CreateImage();
+  this->FillImage(image);
+  std::vector<BaseData::Pointer> result;
+  result.push_back(image.GetPointer());
+  return result;
+}
+
+mitk::Image::Pointer mitk::PicFileReader::CreateImage()
+{
+  Image::Pointer output = Image::New();
+
+  std::string fileName = this->GetLocalFileName();
+
+  mitkIpPicDescriptor* header=mitkIpPicGetHeader(const_cast<char *>(fileName.c_str()), NULL);
+
+  if ( !header )
+  {
+    mitkThrow() << "File could not be read.";
+  }
+
+  header=MITKipPicGetTags(const_cast<char *>(fileName.c_str()), header);
+
+  int channels = 1;
+
+  mitkIpPicTSV_t *tsv;
+  if ( (tsv = mitkIpPicQueryTag( header, "SOURCE HEADER" )) != NULL)
+  {
+    if(tsv->n[0]>1e+06)
     {
-        throw itk::ImageFileReaderException(__FILE__, __LINE__, "One of FileName or FilePrefix must be non-empty");
+      mitkIpPicTSV_t *tsvSH;
+      tsvSH = mitkIpPicDelTag( header, "SOURCE HEADER" );
+      mitkIpPicFreeTag(tsvSH);
     }
+  }
+  if ( (tsv = mitkIpPicQueryTag( header, "ICON80x80" )) != NULL)
+  {
+    mitkIpPicTSV_t *tsvSH;
+    tsvSH = mitkIpPicDelTag( header, "ICON80x80" );
+    mitkIpPicFreeTag(tsvSH);
+  }
+  if ( (tsv = mitkIpPicQueryTag( header, "VELOCITY" )) != NULL)
+  {
+    ++channels;
+    mitkIpPicDelTag( header, "VELOCITY" );
+  }
 
-    if( m_FileName != "")
-    {
-        mitkIpPicDescriptor* header=mitkIpPicGetHeader(const_cast<char *>(m_FileName.c_str()), NULL);
+  if( header == NULL || header->bpe == 0)
+  {
+    mitkThrow() << " Could not read file " << fileName;
+  }
 
-        if ( !header )
-        {
-            throw itk::ImageFileReaderException(__FILE__, __LINE__, "File could not be read.");
-        }
+  // if pic image only 2D, the n[2] value is not initialized
+  unsigned int slices = 1;
+  if( header->dim == 2 )
+  {
+    header->n[2] = slices;
+  }
 
-        header=MITKipPicGetTags(const_cast<char *>(m_FileName.c_str()), header);
+  // First initialize the geometry of the output image by the pic-header
+  SlicedGeometry3D::Pointer slicedGeometry = mitk::SlicedGeometry3D::New();
+  PicHelper::InitializeEvenlySpaced(header, header->n[2], slicedGeometry);
 
-        int channels = 1;
+  // if pic image only 3D, the n[3] value is not initialized
+  unsigned int timesteps = 1;
+  if( header->dim > 3 )
+  {
+    timesteps = header->n[3];
+  }
 
-        mitkIpPicTSV_t *tsv;
-        if ( (tsv = mitkIpPicQueryTag( header, "SOURCE HEADER" )) != NULL)
-        {
-          if(tsv->n[0]>1e+06)
-          {
-            mitkIpPicTSV_t *tsvSH;
-            tsvSH = mitkIpPicDelTag( header, "SOURCE HEADER" );
-            mitkIpPicFreeTag(tsvSH);
-          }
-        }
-        if ( (tsv = mitkIpPicQueryTag( header, "ICON80x80" )) != NULL)
-        {
-          mitkIpPicTSV_t *tsvSH;
-          tsvSH = mitkIpPicDelTag( header, "ICON80x80" );
-          mitkIpPicFreeTag(tsvSH);
-        }
-        if ( (tsv = mitkIpPicQueryTag( header, "VELOCITY" )) != NULL)
-        {
-          ++channels;
-          mitkIpPicDelTag( header, "VELOCITY" );
-        }
+  slicedGeometry->ImageGeometryOn();
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(slicedGeometry, timesteps);
 
-        if( header == NULL || header->bpe == 0)
-        {
-            itk::ImageFileReaderException e(__FILE__, __LINE__);
-            std::ostringstream msg;
-            msg << " Could not read file "
-                << m_FileName.c_str();
-            e.SetDescription(msg.str().c_str());
-            throw e;
-            return;
-        }
+  // Cast the pic descriptor to ImageDescriptor and initialize the output
 
-        // if pic image only 2D, the n[2] value is not initialized
-        unsigned int slices = 1;
-        if( header->dim == 2 )
-            header->n[2] = slices;
+  output->Initialize( CastToImageDescriptor(header));
+  output->SetTimeGeometry( timeGeometry );
+  mitkIpPicFree ( header );
 
-        // First initialize the geometry of the output image by the pic-header
-        SlicedGeometry3D::Pointer slicedGeometry = mitk::SlicedGeometry3D::New();
-        PicHelper::InitializeEvenlySpaced(header, header->n[2], slicedGeometry);
-
-        // if pic image only 3D, the n[3] value is not initialized
-        unsigned int timesteps = 1;
-        if( header->dim > 3 )
-            timesteps = header->n[3];
-
-        slicedGeometry->ImageGeometryOn();
-        ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-        timeGeometry->Initialize(slicedGeometry, timesteps);
-
-        // Cast the pic descriptor to ImageDescriptor and initialize the output
-
-        output->Initialize( CastToImageDescriptor(header));
-        output->SetTimeGeometry( timeGeometry );
-        mitkIpPicFree ( header );
-    }
-    else
-    {
-        int numberOfImages=0;
-        m_StartFileIndex=0;
-
-        mitkIpPicDescriptor* header=NULL;
-
-        char fullName[1024];
-
-        while(m_StartFileIndex<10)
-        {
-            sprintf(fullName, m_FilePattern.c_str(), m_FilePrefix.c_str(), m_StartFileIndex+numberOfImages);
-            FILE * f=fopen(fullName,"r");
-            if(f==NULL)
-            {
-                //already found an image?
-                if(numberOfImages>0)
-                    break;
-                //no? let's increase start
-                ++m_StartFileIndex;
-            }
-            else
-            {
-                fclose(f);
-                //only open the header of the first file found,
-                //@warning what to do when images do not have the same size??
-                if(header==NULL)
-                {
-                    header=mitkIpPicGetHeader(fullName, NULL);
-                    header=MITKipPicGetTags(fullName, header);
-                }
-                ++numberOfImages;
-            }
-        }
-
-        printf("\n numberofimages %d\n",numberOfImages);
-
-        if(numberOfImages==0)
-        {
-            itk::ImageFileReaderException e(__FILE__, __LINE__);
-            std::ostringstream msg;
-            msg << "no images found";
-            e.SetDescription(msg.str().c_str());
-            throw e;
-            return;
-        }
-
-        //@FIXME: was ist, wenn die Bilder nicht alle gleich gross sind?
-        if(numberOfImages>1)
-        {
-            printf("\n numberofimages %d > 1\n",numberOfImages);
-            header->dim=3;
-            header->n[2]=numberOfImages;
-        }
-
-        printf(" \ninitialisize output\n");
-        output->Initialize( CastToImageDescriptor(header) );
-        mitkIpPicFree ( header );
-    }
-
-    m_ReadHeaderTime.Modified();
+  return output;
 }
 
 void mitk::PicFileReader::ConvertHandedness(mitkIpPicDescriptor* pic)
@@ -181,196 +134,72 @@ void mitk::PicFileReader::ConvertHandedness(mitkIpPicDescriptor* pic)
   //left to right handed conversion
   if(pic->dim>=3)
   {
-      mitkIpPicDescriptor* slice=mitkIpPicCopyHeader(pic, NULL);
-      slice->dim=2;
-      size_t size=_mitkIpPicSize(slice);
-      slice->data=malloc(size);
+    mitkIpPicDescriptor* slice=mitkIpPicCopyHeader(pic, NULL);
+    slice->dim=2;
+    size_t size=_mitkIpPicSize(slice);
+    slice->data=malloc(size);
 
-      size_t v, volumes = (pic->dim>3? pic->n[3] : 1);
-      size_t volume_size = size*pic->n[2];
+    size_t v, volumes = (pic->dim>3? pic->n[3] : 1);
+    size_t volume_size = size*pic->n[2];
 
-      for(v=0; v<volumes; ++v)
+    for(v=0; v<volumes; ++v)
+    {
+      unsigned char *p_first=(unsigned char *)pic->data;
+      unsigned char *p_last=(unsigned char *)pic->data;
+      p_first+=v*volume_size;
+      p_last+=size*(pic->n[2]-1)+v*volume_size;
+
+      size_t i, smid=pic->n[2]/2;
+      for(i=0; i<smid;++i,p_last-=size, p_first+=size)
       {
-        unsigned char *p_first=(unsigned char *)pic->data;
-        unsigned char *p_last=(unsigned char *)pic->data;
-        p_first+=v*volume_size;
-        p_last+=size*(pic->n[2]-1)+v*volume_size;
-
-        size_t i, smid=pic->n[2]/2;
-        for(i=0; i<smid;++i,p_last-=size, p_first+=size)
-        {
-            memcpy(slice->data, p_last, size);
-            memcpy(p_last, p_first, size);
-            memcpy(p_first, slice->data, size);
-        }
+        memcpy(slice->data, p_last, size);
+        memcpy(p_last, p_first, size);
+        memcpy(p_first, slice->data, size);
       }
-      mitkIpPicFree(slice);
+    }
+    mitkIpPicFree(slice);
   }
 }
 
-void mitk::PicFileReader::GenerateData()
+mitk::PicFileReader* mitk::PicFileReader::Clone() const
 {
-    Image::Pointer output = this->GetOutput();
-
-    // Check to see if we can read the file given the name or prefix
-    //
-    if ( m_FileName == "" && m_FilePrefix == "" )
-    {
-        throw itk::ImageFileReaderException(__FILE__, __LINE__, "One of FileName or FilePrefix must be non-empty");
-    }
-
-    if( m_FileName != "")
-    {
-        mitkIpPicDescriptor* outputPic = mitkIpPicNew();
-        mitk::ImageWriteAccessor imageAccess(output);
-        outputPic = CastToIpPicDescriptor(output, &imageAccess, outputPic);
-        mitkIpPicDescriptor* pic=MITKipPicGet(const_cast<char *>(m_FileName.c_str()),
-                                              outputPic);
-        // comes upside-down (in MITK coordinates) from PIC file
-        ConvertHandedness(pic);
-
-        mitkIpPicTSV_t *tsv;
-        if ( (tsv = mitkIpPicQueryTag( pic, "SOURCE HEADER" )) != NULL)
-        {
-          if(tsv->n[0]>1e+06)
-          {
-            mitkIpPicTSV_t *tsvSH;
-            tsvSH = mitkIpPicDelTag( pic, "SOURCE HEADER" );
-            mitkIpPicFreeTag(tsvSH);
-          }
-        }
-        if ( (tsv = mitkIpPicQueryTag( pic, "ICON80x80" )) != NULL)
-        {
-          mitkIpPicTSV_t *tsvSH;
-          tsvSH = mitkIpPicDelTag( pic, "ICON80x80" );
-          mitkIpPicFreeTag(tsvSH);
-        }
-        if ( (tsv = mitkIpPicQueryTag( pic, "VELOCITY" )) != NULL)
-        {
-          mitkIpPicDescriptor* header = mitkIpPicCopyHeader(pic, NULL);
-          header->data = tsv->value;
-          ConvertHandedness(header);
-          output->SetChannel(header->data, 1);
-          header->data = NULL;
-          mitkIpPicFree(header);
-          mitkIpPicDelTag( pic, "VELOCITY" );
-        }
-
-        //slice-wise reading
-        //currently much too slow.
-        //else
-        //{
-        //  int sstart, smax;
-        //  int tstart, tmax;
-
-        //  sstart=output->GetRequestedRegion().GetIndex(2);
-        //  smax=sstart+output->GetRequestedRegion().GetSize(2);
-
-        //  tstart=output->GetRequestedRegion().GetIndex(3);
-        //  tmax=tstart+output->GetRequestedRegion().GetSize(3);
-
-        //  int s,t;
-        //  for(s=sstart; s<smax; ++s)
-        //  {
-        //    for(t=tstart; t<tmax; ++t)
-        //    {
-        //      mitkIpPicDescriptor* pic=mitkIpPicGetSlice(const_cast<char *>(m_FileName.c_str()), NULL, t*smax+s+1);
-        //      output->SetPicSlice(pic,s,t);
-        //    }
-        //  }
-        //}
-    }
-    else
-    {
-        int position;
-        mitkIpPicDescriptor*  pic=NULL;
-
-        int zDim=(output->GetDimension()>2?output->GetDimensions()[2]:1);
-        printf("\n zdim is %u \n",zDim);
-
-        for (position = 0; position < zDim; ++position)
-        {
-            char fullName[1024];
-
-            sprintf(fullName, m_FilePattern.c_str(), m_FilePrefix.c_str(), m_StartFileIndex+position);
-
-            pic=MITKipPicGet(fullName, pic);
-            if(pic==NULL)
-            {
-                itkDebugMacro("Pic file '" << fullName << "' does not exist.");
-            }
-            /* FIXME else
-            if(output->SetPicSlice(pic, position)==false)
-            {
-                itkDebugMacro("Image '" << fullName << "' could not be added to Image.");
-            }*/
-       }
-       if(pic!=NULL)
-         mitkIpPicFree(pic);
-    }
+  return new PicFileReader(*this);
 }
 
-void mitk::PicFileReader::EnlargeOutputRequestedRegion(itk::DataObject *output)
+void mitk::PicFileReader::FillImage(Image::Pointer output)
 {
-  output->SetRequestedRegionToLargestPossibleRegion();
-}
+  mitkIpPicDescriptor* outputPic = mitkIpPicNew();
+  mitk::ImageWriteAccessor imageAccess(output);
+  outputPic = CastToIpPicDescriptor(output, &imageAccess, outputPic);
+  mitkIpPicDescriptor* pic=MITKipPicGet(const_cast<char *>(this->GetLocalFileName().c_str()),
+                                        outputPic);
+  // comes upside-down (in MITK coordinates) from PIC file
+  ConvertHandedness(pic);
 
-bool mitk::PicFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
-{
-  // First check the extension
-  if(  filename == "" )
+  mitkIpPicTSV_t *tsv;
+  if ( (tsv = mitkIpPicQueryTag( pic, "SOURCE HEADER" )) != NULL)
   {
-      //MITK_INFO<<"No filename specified."<<std::endl;
-    return false;
+    if(tsv->n[0]>1e+06)
+    {
+      mitkIpPicTSV_t *tsvSH;
+      tsvSH = mitkIpPicDelTag( pic, "SOURCE HEADER" );
+      mitkIpPicFreeTag(tsvSH);
+    }
   }
-
-  // check if image is serie
-  if( filePattern != "" && filePrefix != "" )
-    return false;
-
-  bool extensionFound = false;
-  std::string::size_type PICPos = filename.rfind(".pic");
-  if ((PICPos != std::string::npos)
-      && (PICPos == filename.length() - 4))
-    {
-    extensionFound = true;
-    }
-
-  PICPos = filename.rfind(".PIC");
-  if ((PICPos != std::string::npos)
-      && (PICPos == filename.length() - 4))
-    {
-    extensionFound = true;
-    }
-
-  PICPos = filename.rfind(".pic.gz");
-  if ((PICPos != std::string::npos)
-      && (PICPos == filename.length() - 7))
-    {
-    extensionFound = true;
-    }
-
-  PICPos = filename.rfind(".seq");
-  if ((PICPos != std::string::npos)
-      && (PICPos == filename.length() - 4))
-    {
-    extensionFound = true;
-    }
-
-  if( !extensionFound )
-    {
-      //MITK_INFO<<"The filename extension is not recognized."<<std::endl;
-    return false;
-    }
-
-  return true;
-}
-
-mitk::PicFileReader::PicFileReader()
-    : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
-{
-}
-
-mitk::PicFileReader::~PicFileReader()
-{
+  if ( (tsv = mitkIpPicQueryTag( pic, "ICON80x80" )) != NULL)
+  {
+    mitkIpPicTSV_t *tsvSH;
+    tsvSH = mitkIpPicDelTag( pic, "ICON80x80" );
+    mitkIpPicFreeTag(tsvSH);
+  }
+  if ( (tsv = mitkIpPicQueryTag( pic, "VELOCITY" )) != NULL)
+  {
+    mitkIpPicDescriptor* header = mitkIpPicCopyHeader(pic, NULL);
+    header->data = tsv->value;
+    ConvertHandedness(header);
+    output->SetChannel(header->data, 1);
+    header->data = NULL;
+    mitkIpPicFree(header);
+    mitkIpPicDelTag( pic, "VELOCITY" );
+  }
 }

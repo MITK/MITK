@@ -62,6 +62,8 @@ public:
   CustomMimeType GetMimeType() const;
   CustomMimeType& GetMimeType();
 
+  MimeType GetRegisteredMimeType() const;
+
   void SetMimeTypePrefix(const std::string& prefix);
   std::string GetMimeTypePrefix() const;
 

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLegacyFileWriterService.h"
 
 #include <mitkDataNode.h>
+#include <mitkIOMimeTypes.h>
 #include <mitkCustomMimeType.h>
 
 mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriter::Pointer legacyWriter,
@@ -25,7 +26,7 @@ mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriter::Pointer
   : AbstractFileWriter(legacyWriter->GetSupportedBaseData())
   , m_LegacyWriter(legacyWriter)
 {
-  this->SetMimeTypePrefix("application/vnd.mitk.legacy.");
+  this->SetMimeTypePrefix(IOMimeTypes::DEFAULT_BASE_NAME() + ".legacy.");
   this->SetDescription(description);
 
   CustomMimeType customMimeType;
@@ -63,6 +64,8 @@ void mitk::LegacyFileWriterService::Write()
 {
   if (m_LegacyWriter.IsNull())
     mitkThrow() << "LegacyFileWriterService was incorrectly initialized: Has no LegacyFileWriter.";
+
+  ValidateOutputLocation();
 
   LocalFile localFile(this);
 

@@ -329,6 +329,7 @@ set(CPP_FILES
   IO/mitkImageGenerator.cpp
   IO/mitkIOConstants.cpp
   IO/mitkIOUtil.cpp
+  IO/mitkIOMimeTypes.cpp
   IO/mitkItkLoggingAdapter.cpp
   IO/mitkMimeType.cpp
   IO/mitkOperation.cpp
@@ -384,6 +385,8 @@ set(CPP_FILES
 
   Internal/mitkCoreActivator.cpp
   Internal/mitkFileReaderWriterBase.cpp
+  Internal/mitkImageVtkLegacyIO.cpp
+  Internal/mitkImageVtkXmlIO.cpp
   Internal/mitkItkImageIO.cpp
   Internal/mitkLegacyFileReaderService.cpp
   Internal/mitkLegacyFileWriterService.cpp
@@ -391,6 +394,10 @@ set(CPP_FILES
   Internal/mitkPointSetReaderService.cpp
   Internal/mitkPointSetWriterService.cpp
   Internal/mitkRawImageFileReader.cpp
+  Internal/mitkSurfaceStlIO.cpp
+  Internal/mitkSurfaceVtkIO.cpp
+  Internal/mitkSurfaceVtkLegacyIO.cpp
+  Internal/mitkSurfaceVtkXmlIO.cpp
 )
 
 set(RESOURCE_FILES

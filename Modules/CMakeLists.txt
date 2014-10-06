@@ -15,7 +15,6 @@ set(module_dirs
     ImageExtraction
     ImageStatistics
     LegacyAdaptors
-    IpPicSupport
     SceneSerialization
     GraphAlgorithms
     ContourModel

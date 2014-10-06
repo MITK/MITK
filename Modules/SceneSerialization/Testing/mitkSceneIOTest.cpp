@@ -21,12 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkStandaloneDataStorage.h"
 #include "mitkStandardFileLocations.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkCoreObjectFactory.h"
 #include "mitkBaseData.h"
 #include "mitkImage.h"
 #include "mitkSurface.h"
 #include "mitkPointSet.h"
+#include "mitkIOUtil.h"
 #include "Poco/File.h"
 #include "Poco/TemporaryFile.h"
 
@@ -39,32 +39,9 @@ class SceneIOTestClass
 {
   public:
 
-static mitk::BaseData::Pointer LoadBaseData(const std::string& filename)
-{
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
-  try
-  {
-    factory->SetFileName( filename );
-    factory->Update();
-
-    if(factory->GetNumberOfOutputs()<1)
-    {
-      MITK_TEST_FAILED_MSG(<< "Could not find test data '" << filename << "'");
-    }
-
-    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-    return node->GetData();
-  }
-  catch ( itk::ExceptionObject & e )
-  {
-    MITK_TEST_FAILED_MSG(<< "Failed loading test data '" << filename << "': " << e.what());
-  }
-}
-
 static mitk::Image::Pointer LoadImage(const std::string& filename)
 {
-  mitk::BaseData::Pointer basedata = LoadBaseData( filename );
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(basedata.GetPointer());
+  mitk::Image::Pointer image = mitk::IOUtil::LoadImage( filename );
   if(image.IsNull())
   {
     MITK_TEST_FAILED_MSG(<< "Test image '" << filename << "' was not loaded as an mitk::Image");
@@ -74,8 +51,7 @@ static mitk::Image::Pointer LoadImage(const std::string& filename)
 
 static mitk::Surface::Pointer LoadSurface(const std::string& filename)
 {
-  mitk::BaseData::Pointer basedata = LoadBaseData( filename );
-  mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(basedata.GetPointer());
+  mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface( filename );
   if(surface.IsNull())
   {
     MITK_TEST_FAILED_MSG(<< "Test surface '" << filename << "' was not loaded as an mitk::Surface");

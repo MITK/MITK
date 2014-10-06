@@ -93,6 +93,12 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
       {
         destMimeType = mimeTypes.front().GetName();
       }
+      else
+      {
+        // if both mimeType is empty and path does not contain a known
+        // extension, we stop here
+        return;
+      }
     }
   }
 
@@ -100,7 +106,7 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
 
   // Get all writers and their mime types for the given base data type
   std::vector<FileWriterRegistry::WriterReference> refs = m_Data->m_WriterRegistry.GetReferences(baseData, destMimeType);
-  us::ServiceReference<IFileWriter> bestRef;
+  Item bestItem;
   for (std::vector<FileWriterRegistry::WriterReference>::const_iterator iter = refs.begin(),
        iterEnd = refs.end(); iter != iterEnd; ++iter)
   {
@@ -119,7 +125,6 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
         {
           writer->SetInput(baseData);
           IFileWriter::ConfidenceLevel confidenceLevel = writer->GetConfidenceLevel();
-          std::cout << confidenceLevel << std::endl;
           if (confidenceLevel == IFileWriter::Unsupported)
           {
             continue;
@@ -143,9 +148,9 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
           item.d->m_Id = us::any_cast<long>(iter->GetProperty(us::ServiceConstants::SERVICE_ID()));
           m_Data->m_Items.insert(std::make_pair(item.d->m_Id, item));
           m_Data->m_MimeTypes.insert(mimeType);
-          if (!bestRef || bestRef < *iter)
+          if (!bestItem.GetReference() || bestItem < item)
           {
-            bestRef = *iter;
+            bestItem = item;
           }
         }
         catch (const us::BadAnyCastException& e)
@@ -162,13 +167,10 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
     }
   }
 
-  if (bestRef)
+  if (bestItem.GetReference())
   {
-    try
-    {
-      m_Data->m_BestId = us::any_cast<long>(bestRef.GetProperty(us::ServiceConstants::SERVICE_ID()));
-      m_Data->m_SelectedId = m_Data->m_BestId;
-    } catch (const us::BadAnyCastException&) {}
+    m_Data->m_BestId = bestItem.GetServiceId();
+    m_Data->m_SelectedId = m_Data->m_BestId;
   }
 }
 

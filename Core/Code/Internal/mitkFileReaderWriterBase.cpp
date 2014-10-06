@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLogMacros.h"
 #include "mitkCoreServices.h"
 #include "mitkIMimeTypeProvider.h"
+#include "mitkIOMimeTypes.h"
 
 #include <usGetModuleContext.h>
 #include <usLDAPProp.h>
@@ -27,7 +28,7 @@ namespace mitk {
 
 FileReaderWriterBase::FileReaderWriterBase()
  : m_Ranking(0)
- , m_MimeTypePrefix("application/vnd.mitk.")
+ , m_MimeTypePrefix(IOMimeTypes::DEFAULT_BASE_NAME() + ".")
 {
 }
 
@@ -129,9 +130,42 @@ CustomMimeType FileReaderWriterBase::GetMimeType() const
   return m_CustomMimeType;
 }
 
-CustomMimeType&FileReaderWriterBase::GetMimeType()
+CustomMimeType& FileReaderWriterBase::GetMimeType()
 {
   return m_CustomMimeType;
+}
+
+MimeType FileReaderWriterBase::GetRegisteredMimeType() const
+{
+  MimeType result;
+  if (!m_MimeTypeReg)
+  {
+    if (!m_CustomMimeType.GetName().empty())
+    {
+      CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(
+            CoreServices::GetMimeTypeProvider(us::GetModuleContext()));
+      return mimeTypeProvider->GetMimeTypeForName(m_CustomMimeType.GetName());
+    }
+    return result;
+  }
+
+  us::ServiceReferenceU reference = m_MimeTypeReg.GetReference();
+  try
+  {
+    int rank = 0;
+    us::Any rankProp = reference.GetProperty(us::ServiceConstants::SERVICE_RANKING());
+    if (!rankProp.Empty())
+    {
+      rank = us::any_cast<int>(rankProp);
+    }
+    long id = us::any_cast<long>(reference.GetProperty(us::ServiceConstants::SERVICE_ID()));
+    result = MimeType(m_CustomMimeType, rank, id);
+  }
+  catch (const us::BadAnyCastException& e)
+  {
+    MITK_WARN << "Unexpected exception: " << e.what();
+  }
+  return result;
 }
 
 void FileReaderWriterBase::SetMimeTypePrefix(const std::string& prefix)
@@ -184,20 +218,26 @@ us::ServiceRegistration<CustomMimeType> FileReaderWriterBase::RegisterMimeType(u
     return m_MimeTypeReg;
   }
 
-  // If the mime type name is empty, get a mime type using the extensions list
+  // If the mime type name and extensions list is empty, print a warning
   if(m_CustomMimeType.GetName().empty() && extensions.empty())
   {
     MITK_WARN << "Trying to register a MITK reader or writer with an empty mime type name and empty extension list.";
     return m_MimeTypeReg;
   }
 
-  // extensions is not empty, so register a mime-type
+  // extensions is not empty
+
   if(m_CustomMimeType.GetName().empty())
   {
-    // Register a new mime type by creating a synthetic mime type name from the
+    // Create a synthetic mime type name from the
     // first extension in the list
     m_CustomMimeType.SetName(m_MimeTypePrefix + extensions.front());
   }
+
+  // Register a new mime type
+  //us::ServiceProperties props;
+  //props["name"] = m_CustomMimeType.GetName();
+  //props["extensions"] = m_CustomMimeType.GetExtensions();
   m_MimeTypeReg = context->RegisterService<CustomMimeType>(&m_CustomMimeType);
 
   return m_MimeTypeReg;

@@ -15,48 +15,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKITKFILEIO_H
-#define MITKITKFILEIO_H
+#ifndef _MITK_SURFACE_STL_IO_H_
+#define _MITK_SURFACE_STL_IO_H_
 
-#include "mitkAbstractFileIO.h"
+#include "mitkSurfaceVtkIO.h"
 
-#include <itkImageIOBase.h>
-
-namespace mitk {
-
-// This class wraps ITK image IO objects registered via the
-// ITK object factory system
-class ItkImageIO : public AbstractFileIO
+namespace mitk
 {
 
+class SurfaceStlIO : public mitk::SurfaceVtkIO
+{
 public:
 
-  ItkImageIO(itk::ImageIOBase::Pointer imageIO);
-  ItkImageIO(const CustomMimeType& mimeType, itk::ImageIOBase::Pointer imageIO, int rank);
+  SurfaceStlIO();
 
   // -------------- AbstractFileReader -------------
 
   using AbstractFileReader::Read;
   virtual std::vector<itk::SmartPointer<BaseData> > Read();
 
-  virtual ConfidenceLevel GetReaderConfidenceLevel() const;
-
   // -------------- AbstractFileWriter -------------
 
   virtual void Write();
-  virtual ConfidenceLevel GetWriterConfidenceLevel() const;
 
 private:
 
-  ItkImageIO(const ItkImageIO& other);
+  SurfaceStlIO* IOClone() const;
 
-  ItkImageIO* IOClone() const;
+  static std::string OPTION_MERGE_POINTS();
+  static std::string OPTION_TAG_SOLIDS();
+  static std::string OPTION_CLEAN();
 
-  std::vector<std::string> FixUpImageIOExtensions(const std::string& imageIOName);
-
-  itk::ImageIOBase::Pointer m_ImageIO;
 };
 
-} // namespace mitk
+}
 
-#endif /* MITKITKFILEIO_H */
+#endif //_MITK_SURFACE_STL_IO_H_

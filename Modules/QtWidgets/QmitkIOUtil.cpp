@@ -345,7 +345,6 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
     // pre-select the best writer for the chosen mime-type
     saveInfo.m_WriterSelector.Select(mimeType.GetName());
     saveInfos.push_back(saveInfo);
-    MITK_INFO << "****** SAVING TO FILENAME: " << fileName.toStdString();
   }
 
   if (!saveInfos.empty())

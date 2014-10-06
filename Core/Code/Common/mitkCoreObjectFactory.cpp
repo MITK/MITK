@@ -53,9 +53,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Legacy Support:
 #include <mitkCoreServices.h>
-#include <mitkFileReaderRegistry.h>
-#include <mitkFileWriterRegistry.h>
-#include <mitkIMimeTypeProvider.h>
 #include <Internal/mitkLegacyFileReaderService.h>
 #include <Internal/mitkLegacyFileWriterService.h>
 
@@ -144,8 +141,8 @@ mitk::CoreObjectFactory::CoreObjectFactory()
   {
     CreateFileExtensionsMap();
 
-    RegisterLegacyReaders(this);
-    RegisterLegacyWriters(this);
+    //RegisterLegacyReaders(this);
+    //RegisterLegacyWriters(this);
 
     alreadyDone = true;
   }
@@ -266,66 +263,17 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::CoreObjectFactory::GetFileExtens
 
 void mitk::CoreObjectFactory::CreateFileExtensionsMap()
 {
+  /*
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dcm", "DICOM files"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.DCM", "DICOM files"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dc3", "DICOM files"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.DC3", "DICOM files"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.gdcm", "DICOM files"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.seq", "DKFZ Pic"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic", "DKFZ Pic"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic.gz", "DKFZ Pic"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.mhd", "MetaImage"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.seq.gz", "DKFZ Pic"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", "Analyze Format"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.img", "Analyze Format"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.img.gz", "Analyze Format"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nrrd", "Nearly Raw Raster Data"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nhdr", "NRRD with detached header"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.mps", "Point sets"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic", "Sets of 2D slices"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic.gz", "Sets of 2D slices"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.bmp", "Sets of 2D slices"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.png", "Sets of 2D slices"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpg", "Sets of 2D slices"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpeg", "Sets of 2D slices"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dcm", "Sets of 2D slices"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.gdcm", "Sets of 2D slices"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.ima", "Sets of 2D slices"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tiff", "Sets of 2D slices"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tif", "Sets of 2D slices"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.stl", "Surface files"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Surface files"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtp", "Surface files"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.obj", "Surface files"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", "NIfTI format"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii.gz", "NIfTI format"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.gipl", "UMDS GIPL Format Files"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.gipl.gz", "UMDS GIPL Format Files"));
-
-  //m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic", "DKFZ Pic"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.mhd", "MetaImage"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Surface Files"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vti", "VTK Image Data Files"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", "Analyze Format"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.png", "Sets of 2D slices"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tiff", "Sets of 2D slices"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tif", "Sets of 2D slices"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpg", "Sets of 2D slices"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpeg", "Sets of 2D slices"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.bmp", "Sets of 2D slices"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dcm", "Sets of 2D slices"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.gipl", "UMDS GIPL Format Files"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.gipl.gz", "UMDS compressed GIPL Format Files"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", "NIfTI format"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii.gz", "NIfTI compressed format"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nrrd", "Nearly Raw Raster Data"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nhdr", "NRRD with detached header"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lsm", "Microscope Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", "Q-Ball Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", "Q-Ball Images"));
-
+  */
 }
 
 const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
@@ -455,8 +403,6 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(mitk::CoreObjectFactoryBase*
     {
       description = std::string("Legacy ") + (*it)->GetNameOfClass() + " Reader";
     }
-
-    std::cout << "***** CREATING LEGACY WRITER for " << description << std::endl;
 
     mitk::FileWriter::Pointer fileWriter(it->GetPointer());
     mitk::LegacyFileWriterService* lfws = new mitk::LegacyFileWriterService(fileWriter, description);

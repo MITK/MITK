@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkIFileReader.h>
 #include <mitkBaseData.h>
+#include <mitkMimeType.h>
 
 // Microservices
 #include <usServiceRegistration.h>
@@ -53,6 +54,8 @@ public:
   virtual std::string GetInputLocation() const;
 
   virtual std::istream* GetInputStream() const;
+
+  MimeType GetRegisteredMimeType() const;
 
   /**
    * @brief Reads a path or stream and creates a list of BaseData objects.
@@ -130,6 +133,12 @@ protected:
   /**
    * Associate this reader instance with the given MIME type.
    *
+   * If \c mimeType does not provide an extension list, an already
+   * registered mime-type object is used. Otherwise, the first entry in
+   * the extensions list is used to construct a mime-type name and
+   * register it as a new CustomMimeType service object in the default
+   * implementation of RegisterMimeType().
+   *
    * @param mimeType The mime type this reader can read.
    * @param description A human readable description of this reader.
    *
@@ -138,20 +147,6 @@ protected:
    * @see RegisterService
    */
   explicit AbstractFileReader(const CustomMimeType& mimeType, const std::string& description);
-
-  /**
-   * Associate this reader with the given file extension.
-   *
-   * Additonal file extensions can be added by sub-classes by calling AddExtension
-   * or SetExtensions.
-   *
-   * @param extension The file extension (without a leading period) for which a registered
-   *        mime-type object is looked up and associated with this reader instance.
-   * @param description A human readable description of this reader.
-   *
-   * @see RegisterService
-   */
-  explicit AbstractFileReader(const std::string& extension, const std::string& description);
 
   virtual us::ServiceProperties GetServiceProperties() const;
 

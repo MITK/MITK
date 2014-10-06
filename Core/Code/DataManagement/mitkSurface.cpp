@@ -158,7 +158,7 @@ bool mitk::Surface::IsEmptyTimeStep(unsigned int t) const
   );
 }
 
-vtkPolyData* mitk::Surface::GetVtkPolyData(unsigned int t)
+vtkPolyData* mitk::Surface::GetVtkPolyData(unsigned int t) const
 {
   if (t < m_PolyDatas.size())
   {
@@ -167,8 +167,7 @@ vtkPolyData* mitk::Surface::GetVtkPolyData(unsigned int t)
       RegionType requestedRegion;
       requestedRegion.SetIndex(3, t);
       requestedRegion.SetSize(3, 1);
-
-      this->SetRequestedRegion(&requestedRegion);
+      this->m_RequestedRegion = requestedRegion;
       this->GetSource()->Update();
     }
 

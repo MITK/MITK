@@ -40,11 +40,46 @@ void AbstractFileIO::SetReaderOption(const std::string& name, const us::Any& val
   AbstractFileReader::SetOption(name, value);
 }
 
+AbstractFileIO::Options AbstractFileIO::GetWriterOptions() const
+{
+  return AbstractFileWriter::GetOptions();
+}
+
+us::Any AbstractFileIO::GetWriterOption(const std::string& name) const
+{
+  return AbstractFileWriter::GetOption(name);
+}
+
+void AbstractFileIO::SetWriterOptions(const AbstractFileIO::Options& options)
+{
+  AbstractFileWriter::SetOptions(options);
+}
+
+void AbstractFileIO::SetWriterOption(const std::string& name, const us::Any& value)
+{
+  AbstractFileWriter::SetOption(name, value);
+}
+
+IFileIO::ConfidenceLevel AbstractFileIO::GetReaderConfidenceLevel() const
+{
+  return AbstractFileIOReader::GetReaderConfidenceLevel();
+}
+
+IFileIO::ConfidenceLevel AbstractFileIO::GetWriterConfidenceLevel() const
+{
+  return AbstractFileIOWriter::GetWriterConfidenceLevel();
+}
+
 std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileReader> >
 AbstractFileIO::RegisterService(us::ModuleContext* context)
 {
   std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileReader> > result;
   result.first = this->AbstractFileReader::RegisterService(context);
+  CustomMimeType writerMimeType = this->AbstractFileWriter::GetMimeType();
+  if (writerMimeType.GetName().empty() && writerMimeType.GetExtensions().empty())
+  {
+    this->AbstractFileWriter::SetMimeType(CustomMimeType(this->AbstractFileReader::GetRegisteredMimeType().GetName()));
+  }
   result.second = this->AbstractFileWriter::RegisterService(context);
   return result;
 }
@@ -65,20 +100,14 @@ AbstractFileIO::AbstractFileIO(const std::string& baseDataType,
                                const CustomMimeType& mimeType,
                                const std::string& description)
   : AbstractFileIOReader(mimeType, description)
-  , AbstractFileIOWriter(baseDataType, mimeType, description)
-{
-}
-
-AbstractFileIO::AbstractFileIO(const std::string& baseDataType, const std::string& extension, const std::string& description)
-  : AbstractFileIOReader(extension, description)
-  , AbstractFileIOWriter(baseDataType, extension, description)
+  , AbstractFileIOWriter(baseDataType, CustomMimeType(mimeType.GetName()), description)
 {
 }
 
 void AbstractFileIO::SetMimeType(const CustomMimeType& mimeType)
 {
   this->AbstractFileReader::SetMimeType(mimeType);
-  this->AbstractFileWriter::SetMimeType(mimeType);
+  this->AbstractFileWriter::SetMimeType(CustomMimeType(mimeType.GetName()));
 }
 
 CustomMimeType AbstractFileIO::GetMimeType() const

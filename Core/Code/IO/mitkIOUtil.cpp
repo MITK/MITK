@@ -728,8 +728,6 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
       break;
     }
 
-    MITK_INFO << "******* USING READER " << typeid(*reader).name() << "*********";
-
     // Do the actual reading
     try
     {
@@ -880,14 +878,16 @@ std::string IOUtil::Save(const BaseData* data, const std::string& mimeTypeName, 
 
   SaveInfo saveInfo(data, mimeType, path);
 
+  std::string ext = itksys::SystemTools::GetFilenameExtension(path);
+
   if (saveInfo.m_WriterSelector.IsEmpty())
   {
-    return std::string("No writer registered for type ") + data->GetNameOfClass() +
-        (mimeType.IsValid() ? (std::string(" and mime-type ") + mimeType.GetName()) : std::string());
+    return std::string("No suitable writer found for the current data  of type ") + data->GetNameOfClass() +
+        (mimeType.IsValid() ? (std::string(" and mime-type ") + mimeType.GetName()) : std::string()) +
+        (ext.empty() ? std::string() : (std::string(" with extension ") + ext));
   }
 
   // Add an extension if not already specified
-  std::string ext = itksys::SystemTools::GetFilenameExtension(path);
   if (ext.empty() && addExtension)
   {
     ext = saveInfo.m_MimeType.GetExtensions().empty() ? std::string() : "." + saveInfo.m_MimeType.GetExtensions().front();
@@ -976,8 +976,6 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
       errMsg += "Unexpected NULL writer.";
       break;
     }
-
-    MITK_INFO << "******* USING WRITER " << typeid(*writer).name() << "*********";
 
     // Do the actual writing
     try

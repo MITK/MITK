@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <mitkIOUtil.h>
 #include <mitkCustomMimeType.h>
+#include <mitkExceptionMacro.h>
 
 #include <Internal/mitkFileReaderWriterBase.h>
 
@@ -186,17 +187,6 @@ AbstractFileWriter::AbstractFileWriter(const std::string& baseDataType, const Cu
   d->SetDescription(description);
 }
 
-AbstractFileWriter::AbstractFileWriter(const std::string& baseDataType, const std::string& extension,
-                                       const std::string& description)
-  : d(new Impl)
-{
-  d->m_BaseDataType = baseDataType;
-  d->SetDescription(description);
-  CustomMimeType customMimeType;
-  customMimeType.AddExtension(extension);
-  d->SetMimeType(customMimeType);
-}
-
 ////////////////////// Writing /////////////////////////
 
 IFileWriter::ConfidenceLevel AbstractFileWriter::GetConfidenceLevel() const
@@ -210,6 +200,11 @@ IFileWriter::ConfidenceLevel AbstractFileWriter::GetConfidenceLevel() const
     return Unsupported;
   }
   return Supported;
+}
+
+MimeType AbstractFileWriter::GetRegisteredMimeType() const
+{
+  return d->GetRegisteredMimeType();
 }
 
 //////////// µS Registration & Properties //////////////
@@ -377,6 +372,19 @@ std::string AbstractFileWriter::GetDescription() const
 std::string AbstractFileWriter::GetBaseDataType() const
 {
   return d->m_BaseDataType;
+}
+
+void AbstractFileWriter::ValidateOutputLocation() const
+{
+  if (this->GetOutputStream() == NULL)
+  {
+    // check if a file name is set and if we can write to it
+    const std::string fileName = this->GetOutputLocation();
+    if (fileName.empty())
+    {
+      mitkThrow() << "No output location or stream specified";
+    }
+  }
 }
 
 void AbstractFileWriter::SetDescription(const std::string& description)

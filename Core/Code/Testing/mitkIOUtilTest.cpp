@@ -26,11 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkIOUtilTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkIOUtilTestSuite);
-  //MITK_TEST(TestTempMethods);
-  //MITK_TEST(TestLoadAndSaveImage);
-  //MITK_TEST(TestLoadAndSavePointSet);
+  MITK_TEST(TestTempMethods);
+  MITK_TEST(TestLoadAndSaveImage);
+  MITK_TEST(TestLoadAndSavePointSet);
   MITK_TEST(TestLoadAndSaveSurface);
-  //MITK_TEST(TestTempMethodsForUniqueFilenames);
+  MITK_TEST(TestTempMethodsForUniqueFilenames);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -165,7 +165,7 @@ public:
     tmpStream.close();
     std::string pointSetPathWithDefaultExtension = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.mps");
     tmpStream.close();
-    std::string pointSetPathWithoutDefaultExtension = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.xXx");
+    std::string pointSetPathWithoutDefaultExtension = mitk::IOUtil::CreateTemporaryFile(tmpStream);
     tmpStream.close();
 
     // the cases where no exception should be thrown

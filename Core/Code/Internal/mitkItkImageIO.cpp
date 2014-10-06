@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkCustomMimeType.h>
+#include <mitkIOMimeTypes.h>
 
 #include <itkImage.h>
 #include <itkImageIOFactory.h>
@@ -73,7 +74,7 @@ std::vector<std::string> ItkImageIO::FixUpImageIOExtensions(const std::string& i
 
   if (!extensions.empty())
   {
-    MITK_WARN << "Fixing up known extensions for " << imageIOName;
+    MITK_DEBUG << "Fixing up known extensions for " << imageIOName;
   }
 
   return extensions;
@@ -88,11 +89,14 @@ ItkImageIO::ItkImageIO(itk::ImageIOBase::Pointer imageIO)
     mitkThrow() << "ITK ImageIOBase argument must not be NULL";
   }
 
+  this->AbstractFileReader::SetMimeTypePrefix(IOMimeTypes::DEFAULT_BASE_NAME() + ".image.");
+
   std::vector<std::string> readExtensions = m_ImageIO->GetSupportedReadExtensions();
+
   if (readExtensions.empty())
   {
     std::string imageIOName = m_ImageIO->GetNameOfClass();
-    MITK_WARN << "ITK ImageIOBase " << imageIOName << " does not provide read extensions";
+    MITK_DEBUG << "ITK ImageIOBase " << imageIOName << " does not provide read extensions";
     readExtensions = FixUpImageIOExtensions(imageIOName);
   }
 
@@ -114,18 +118,14 @@ ItkImageIO::ItkImageIO(itk::ImageIOBase::Pointer imageIO)
   if (writeExtensions.empty())
   {
     std::string imageIOName = imageIO->GetNameOfClass();
-    MITK_WARN << "ITK ImageIOBase " << imageIOName << " does not provide write extensions";
+    MITK_DEBUG << "ITK ImageIOBase " << imageIOName << " does not provide write extensions";
     writeExtensions = FixUpImageIOExtensions(imageIOName);
   }
 
-  CustomMimeType customWriterMimeType;
-  customWriterMimeType.SetCategory("Images");
-  if (writeExtensions == readExtensions)
+  if (writeExtensions != readExtensions)
   {
-    customWriterMimeType.AddExtension(customReaderMimeType.GetExtensions().front());
-  }
-  else
-  {
+    CustomMimeType customWriterMimeType;
+    customWriterMimeType.SetCategory("Images");
     for(std::vector<std::string>::const_iterator iter = writeExtensions.begin(),
         endIter = writeExtensions.end(); iter != endIter; ++iter)
     {
@@ -136,12 +136,32 @@ ItkImageIO::ItkImageIO(itk::ImageIOBase::Pointer imageIO)
       }
       customWriterMimeType.AddExtension(extension);
     }
+    this->AbstractFileWriter::SetMimeType(customWriterMimeType);
   }
-  this->AbstractFileWriter::SetMimeType(customWriterMimeType);
 
   std::string description = std::string("ITK ") + imageIO->GetNameOfClass();
   this->SetReaderDescription(description);
   this->SetWriterDescription(description);
+
+  this->RegisterService();
+}
+
+ItkImageIO::ItkImageIO(const CustomMimeType& mimeType, itk::ImageIOBase::Pointer imageIO, int rank)
+  : AbstractFileIO(Image::GetStaticNameOfClass(), mimeType, std::string("ITK ") + imageIO->GetNameOfClass())
+  , m_ImageIO(imageIO)
+{
+  if (m_ImageIO.IsNull() )
+  {
+    mitkThrow() << "ITK ImageIOBase argument must not be NULL";
+  }
+
+  this->AbstractFileReader::SetMimeTypePrefix(IOMimeTypes::DEFAULT_BASE_NAME() + ".image.");
+
+  if (rank)
+  {
+    this->AbstractFileReader::SetRanking(rank);
+    this->AbstractFileWriter::SetRanking(rank);
+  }
 
   this->RegisterService();
 }

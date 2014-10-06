@@ -19,13 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkITKImageImport.h"
 #include "mitkImageCast.h"
 #include "mitkIOConstants.h"
+#include "mitkIOMimeTypes.h"
 
 #include <itkImage.h>
 #include <itkRawImageIO.h>
 #include <itkImageFileReader.h>
 
 mitk::RawImageFileReader::RawImageFileReader()
-  : AbstractFileReader("raw", "ITK raw image reader")
+  : AbstractFileReader(CustomMimeType(IOMimeTypes::RAW_MIMETYPE_NAME()), "ITK raw image reader")
 {
   Options defaultOptions;
 

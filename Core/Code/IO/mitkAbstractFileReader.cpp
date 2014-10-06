@@ -109,15 +109,6 @@ AbstractFileReader::AbstractFileReader(const CustomMimeType& mimeType, const std
   d->SetDescription(description);
 }
 
-AbstractFileReader::AbstractFileReader(const std::string& extension, const std::string& description)
-  : d(new Impl)
-{
-  CustomMimeType customMimeType;
-  customMimeType.AddExtension(extension);
-  d->SetMimeType(customMimeType);
-  d->SetDescription(description);
-}
-
 ////////////////////// Reading /////////////////////////
 
 DataStorage::SetOfObjects::Pointer AbstractFileReader::Read(DataStorage& ds)
@@ -307,6 +298,11 @@ std::string AbstractFileReader::GetInputLocation() const
 std::istream*AbstractFileReader::GetInputStream() const
 {
   return d->m_Stream;
+}
+
+MimeType AbstractFileReader::GetRegisteredMimeType() const
+{
+  return d->GetRegisteredMimeType();
 }
 
 IFileReader::Options AbstractFileReader::GetOptions() const

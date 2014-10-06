@@ -18,14 +18,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // File IO
 #include <mitkIOUtil.h>
+#include <mitkIOMimeTypes.h>
 #include <Internal/mitkItkImageIO.h>
 #include <Internal/mitkMimeTypeProvider.h>
 #include <Internal/mitkPointSetReaderService.h>
 #include <Internal/mitkPointSetWriterService.h>
 #include <Internal/mitkRawImageFileReader.h>
+#include <Internal/mitkSurfaceStlIO.h>
+#include <Internal/mitkSurfaceVtkLegacyIO.h>
+#include <Internal/mitkSurfaceVtkXmlIO.h>
+#include <Internal/mitkImageVtkXmlIO.h>
+#include <Internal/mitkImageVtkLegacyIO.h>
 
 #include <mitkFileWriter.h>
 #include "mitkLegacyFileWriterService.h"
+
+#include <itkNiftiImageIO.h>
 
 // Micro Services
 #include <usGetModuleContext.h>
@@ -38,7 +46,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 #include <usServiceTracker.h>
-#include <usSharedLibrary.h>
 
 
 void HandleMicroServicesMessages(us::MsgType type, const char* msg)
@@ -224,6 +231,27 @@ private:
   std::vector<mitk::IShaderRepository*> m_ShaderRepositories;
 };
 
+class FixedNiftiImageIO : public itk::NiftiImageIO
+{
+public:
+
+  /** Standard class typedefs. */
+  typedef FixedNiftiImageIO         Self;
+  typedef itk::NiftiImageIO         Superclass;
+  typedef itk::SmartPointer< Self > Pointer;
+
+  /** Method for creation through the object factory. */
+  itkNewMacro(Self)
+
+  /** Run-time type information (and related methods). */
+  itkTypeMacro(FixedNiftiImageIO, Superclass)
+
+  virtual bool SupportsDimension(unsigned long dim)
+  {
+    return dim > 1 && dim < 5;
+  }
+
+};
 
 void MitkCoreActivator::Load(us::ModuleContext* context)
 {
@@ -269,15 +297,12 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
 
   this->RegisterDefaultMimeTypes();
   this->RegisterItkReaderWriter();
+  this->RegisterVtkReaderWriter();
 
   // Add custom Reader / Writer Services
   m_FileReaders.push_back(new mitk::PointSetReaderService());
   m_FileWriters.push_back(new mitk::PointSetWriterService());
   m_FileReaders.push_back(new mitk::RawImageFileReader());
-
-  // Explicitly load the LegacyIO module
-  us::SharedLibrary legacyIOLib(programPath, "MitkLegacyIO");
-  legacyIOLib.Load();
 
   m_ShaderRepositoryTracker->Open();
 
@@ -338,22 +363,13 @@ void MitkCoreActivator::RegisterDefaultMimeTypes()
 {
   // Register some default mime-types
 
-  // Custom MITK point set format
-  mitk::CustomMimeType pointSetMimeType("application/vnd.mitk.pointset");
-  pointSetMimeType.AddExtension("mps");
-  pointSetMimeType.SetCategory("Point Sets");
-  pointSetMimeType.SetComment("MITK Point Set");
-  m_DefaultMimeTypes.push_back(pointSetMimeType);
-  m_Context->RegisterService(&m_DefaultMimeTypes.back());
-
-  // Register the NRRD format early on
-  mitk::CustomMimeType nrrdMimeType("application/vnd.mitk.nrrd");
-  nrrdMimeType.AddExtension("nrrd");
-  nrrdMimeType.AddExtension("nhdr");
-  nrrdMimeType.SetCategory("Images");
-  nrrdMimeType.SetComment("NRRD");
-  m_DefaultMimeTypes.push_back(nrrdMimeType);
-  m_Context->RegisterService(&m_DefaultMimeTypes.back());
+  std::vector<mitk::CustomMimeType> mimeTypes = mitk::IOMimeTypes::Get();
+  for (std::vector<mitk::CustomMimeType>::const_iterator mimeTypeIter = mimeTypes.begin(),
+       iterEnd = mimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
+  {
+    m_DefaultMimeTypes.push_back(*mimeTypeIter);
+    m_Context->RegisterService(&m_DefaultMimeTypes.back());
+  }
 }
 
 void MitkCoreActivator::RegisterItkReaderWriter()
@@ -364,6 +380,11 @@ void MitkCoreActivator::RegisterItkReaderWriter()
        endIter = allobjects.end(); i != endIter; ++i)
   {
     itk::ImageIOBase* io = dynamic_cast<itk::ImageIOBase*>(i->GetPointer());
+
+    // NiftiImageIO does not provide a correct "SupportsDimension()" methods
+    // and the supported read/write extensions are not ordered correctly
+    if (dynamic_cast<itk::NiftiImageIO*>(io)) continue;
+
     if (io)
     {
       m_FileIOs.push_back(new mitk::ItkImageIO(io));
@@ -374,6 +395,20 @@ void MitkCoreActivator::RegisterItkReaderWriter()
                 << ( *i )->GetNameOfClass();
     }
   }
+
+  mitk::ItkImageIO* io = new mitk::ItkImageIO(mitk::CustomMimeType(mitk::IOMimeTypes::NIFTI_MIMETYPE_NAME()),
+                                              new FixedNiftiImageIO(), 0);
+  m_FileIOs.push_back(io);
+}
+
+void MitkCoreActivator::RegisterVtkReaderWriter()
+{
+  m_FileIOs.push_back(new mitk::SurfaceVtkXmlIO());
+  m_FileIOs.push_back(new mitk::SurfaceStlIO());
+  m_FileIOs.push_back(new mitk::SurfaceVtkLegacyIO());
+
+  m_FileIOs.push_back(new mitk::ImageVtkXmlIO());
+  m_FileIOs.push_back(new mitk::ImageVtkLegacyIO());
 }
 
 void MitkCoreActivator::RegisterLegacyWriter()

@@ -22,6 +22,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+#ifndef DOXYGEN_SKIP
+
+// Skip this code during Doxygen processing, because it only
+// exists to resolve name clashes when inheriting from both
+// AbstractFileReader and AbstractFileWriter.
+
 class AbstractFileIOReader : public AbstractFileReader
 {
 public:
@@ -42,9 +48,6 @@ protected:
 
   AbstractFileIOReader(const CustomMimeType& mimeType, const std::string& description)
     : AbstractFileReader(mimeType, description) {}
-
-  AbstractFileIOReader(const std::string& extension, const std::string& description)
-    : AbstractFileReader(extension, description) {}
 
 private:
 
@@ -72,15 +75,13 @@ protected:
                        const std::string& description)
     : AbstractFileWriter(baseDataType, mimeType, description) {}
 
-  AbstractFileIOWriter(const std::string& baseDataType, const std::string& extension,
-                       const std::string& description)
-    : AbstractFileWriter(baseDataType, extension, description) {}
-
 private:
 
   virtual IFileWriter* WriterClone() const = 0;
   IFileWriter* Clone() const { return WriterClone(); }
 };
+
+#endif // DOXYGEN_SKIP
 
 class MITK_CORE_EXPORT AbstractFileIO : public AbstractFileIOReader, public AbstractFileIOWriter
 {
@@ -91,6 +92,16 @@ public:
 
   void SetReaderOptions(const Options& options);
   void SetReaderOption(const std::string& name, const us::Any& value);
+
+  Options GetWriterOptions() const;
+  us::Any GetWriterOption(const std::string &name) const;
+
+  void SetWriterOptions(const Options& options);
+  void SetWriterOption(const std::string& name, const us::Any& value);
+
+  virtual ConfidenceLevel GetReaderConfidenceLevel() const;
+
+  virtual ConfidenceLevel GetWriterConfidenceLevel() const;
 
   std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileReader> >
   RegisterService(us::ModuleContext* context = us::GetModuleContext());

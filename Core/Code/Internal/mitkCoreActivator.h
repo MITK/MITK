@@ -57,6 +57,7 @@ private:
 
   void RegisterDefaultMimeTypes();
   void RegisterItkReaderWriter();
+  void RegisterVtkReaderWriter();
 
   void RegisterLegacyWriter();
 

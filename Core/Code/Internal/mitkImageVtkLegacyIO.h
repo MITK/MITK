@@ -14,49 +14,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#ifndef MITKITKFILEIO_H
-#define MITKITKFILEIO_H
+#ifndef MITKIMAGEVTKLEGACYIO_H
+#define MITKIMAGEVTKLEGACYIO_H
 
 #include "mitkAbstractFileIO.h"
 
-#include <itkImageIOBase.h>
-
 namespace mitk {
 
-// This class wraps ITK image IO objects registered via the
-// ITK object factory system
-class ItkImageIO : public AbstractFileIO
+class ImageVtkLegacyIO : public mitk::AbstractFileIO
 {
 
 public:
 
-  ItkImageIO(itk::ImageIOBase::Pointer imageIO);
-  ItkImageIO(const CustomMimeType& mimeType, itk::ImageIOBase::Pointer imageIO, int rank);
+  ImageVtkLegacyIO();
 
   // -------------- AbstractFileReader -------------
 
   using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read();
+  virtual std::vector<BaseData::Pointer> Read();
 
   virtual ConfidenceLevel GetReaderConfidenceLevel() const;
 
   // -------------- AbstractFileWriter -------------
 
   virtual void Write();
+
   virtual ConfidenceLevel GetWriterConfidenceLevel() const;
 
 private:
 
-  ItkImageIO(const ItkImageIO& other);
-
-  ItkImageIO* IOClone() const;
-
-  std::vector<std::string> FixUpImageIOExtensions(const std::string& imageIOName);
-
-  itk::ImageIOBase::Pointer m_ImageIO;
+  ImageVtkLegacyIO* IOClone() const;
 };
 
-} // namespace mitk
-
-#endif /* MITKITKFILEIO_H */
+}
+#endif // MITKIMAGEVTKLEGACYIO_H

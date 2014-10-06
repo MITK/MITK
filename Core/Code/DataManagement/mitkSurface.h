@@ -44,7 +44,7 @@ namespace mitk
     const RegionType& GetLargestPossibleRegion() const;
     virtual const RegionType& GetRequestedRegion() const;
     unsigned int GetSizeOfPolyDataSeries() const;
-    virtual vtkPolyData* GetVtkPolyData(unsigned int t = 0);
+    virtual vtkPolyData* GetVtkPolyData(unsigned int t = 0) const;
     virtual void Graft( const DataObject* data );
     virtual bool IsEmptyTimeStep(unsigned int t) const;
     virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
@@ -74,7 +74,7 @@ namespace mitk
   private:
     std::vector<vtkPolyData*> m_PolyDatas;
     mutable RegionType m_LargestPossibleRegion;
-    RegionType m_RequestedRegion;
+    mutable RegionType m_RequestedRegion;
     bool m_CalculateBoundingBox;
   };
 

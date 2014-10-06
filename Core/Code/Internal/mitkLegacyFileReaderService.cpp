@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDicomSeriesReader.h>
 #include <mitkProgressBar.h>
 #include <mitkIOAdapter.h>
+#include <mitkIOMimeTypes.h>
 #include <mitkCustomMimeType.h>
 
 mitk::LegacyFileReaderService::LegacyFileReaderService(const mitk::LegacyFileReaderService& other)
@@ -30,7 +31,7 @@ mitk::LegacyFileReaderService::LegacyFileReaderService(const std::vector<std::st
                                                        const std::string& category)
   : AbstractFileReader()
 {
-  this->SetMimeTypePrefix("application/vnd.mitk.legacy.");
+  this->SetMimeTypePrefix(IOMimeTypes::DEFAULT_BASE_NAME() + ".legacy.");
 
   CustomMimeType customMimeType;
   customMimeType.SetCategory(category);

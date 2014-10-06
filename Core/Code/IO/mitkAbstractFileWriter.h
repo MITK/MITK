@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkIFileWriter.h>
+#include <mitkMimeType.h>
 
 // Microservices
 #include <usServiceRegistration.h>
@@ -81,6 +82,8 @@ public:
   virtual void Write() = 0;
 
   virtual ConfidenceLevel GetConfidenceLevel() const;
+
+  MimeType GetRegisteredMimeType() const;
 
   virtual Options GetOptions() const;
   virtual us::Any GetOption(const std::string &name) const;
@@ -152,8 +155,6 @@ protected:
 
   AbstractFileWriter(const std::string& baseDataType, const CustomMimeType& mimeType, const std::string& description);
 
-  AbstractFileWriter(const std::string& baseDataType, const std::string& extension, const std::string& description);
-
   virtual us::ServiceProperties GetServiceProperties() const;
 
   /**
@@ -213,6 +214,8 @@ protected:
    */
   void SetBaseDataType(const std::string& baseDataType);
   virtual std::string GetBaseDataType() const;
+
+  void ValidateOutputLocation() const;
 
 private:
 

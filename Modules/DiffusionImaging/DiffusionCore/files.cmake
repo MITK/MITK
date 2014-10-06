@@ -38,10 +38,12 @@ set(CPP_FILES
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
   Algorithms/itkDwiGradientLengthCorrectionFilter.cpp
+  Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
 
   # Registration Algorithms & Co.
   Algorithms/Registration/mitkRegistrationWrapper.cpp
   Algorithms/Registration/mitkPyramidImageRegistrationMethod.cpp
+  # Algorithms/Registration/mitkRegistrationMethodITK4.cpp
 
 
   # MultishellProcessing

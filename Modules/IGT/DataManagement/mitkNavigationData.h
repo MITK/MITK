@@ -41,8 +41,8 @@ namespace mitk {
     {
     public:
       mitkClassMacro(NavigationData, itk::DataObject);
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self);
+      itkCloneMacro(Self);
       mitkNewMacro2Param(Self, mitk::AffineTransform3D::Pointer, const bool);
       mitkNewMacro1Param(Self, mitk::AffineTransform3D::Pointer);
 
@@ -274,5 +274,24 @@ namespace mitk {
       static mitk::NavigationData::Pointer getComposition(const mitk::NavigationData::Pointer nd1, const mitk::NavigationData::Pointer nd2);
 
     };
+
+    /**
+      * @brief Equal A function comparing two navigation data objects for beeing equal in meta- and imagedata
+      *
+      * @ingroup MITKTestingAPI
+      *
+      * Following aspects are tested for equality:
+      *  - position
+      *  - orientation
+      *  - other members and flags of the class
+      *
+      * @param rightHandSide An NavigationData to be compared
+      * @param leftHandSide An NavigationData to be compared
+      * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+      * @param verbose Flag indicating if the user wants detailed console output or not.
+      * @return true, if all subsequent comparisons are true, false otherwise
+      */
+      MitkIGT_EXPORT bool Equal( const mitk::NavigationData& leftHandSide, const mitk::NavigationData& rightHandSide, ScalarType eps = mitk::eps, bool verbose = false );
+
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATA_H_HEADER_INCLUDED_ */

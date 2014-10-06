@@ -569,6 +569,23 @@ static void TestReverseCompose()
   TestCompose(true);
 }
 
+/**
+ * Tests the clone method.
+ */
+static void TestClone()
+{
+  SetupNaviDataTests();
+  mitk::NavigationData::Pointer    nd = CreateNavidata(quaternion, offsetPoint);
+  mitk::NavigationData::Pointer    myClone = nd->Clone();
+  MITK_TEST_CONDITION(mitk::Equal(*nd,*myClone,mitk::eps,true), "Test if clone is equal to original object.");
+
+  //change clone, original object should not change
+  mitk::Point3D myPoint;
+  mitk::FillVector3D(myPoint,121,32132,433);
+  myClone->SetPosition(myPoint);
+  MITK_TEST_CONDITION(!mitk::Equal(*nd,*myClone), "Test if clone could be modified without changing the original object.");
+}
+
 
 /**
 * This function is testing the Class mitk::NavigationData. For most tests we would need the MicronTracker hardware, so only a few
@@ -601,6 +618,7 @@ int mitkNavigationDataTest(int /* argc */, char* /*argv*/[])
 
   TestCompose();
   TestReverseCompose();
+  TestClone();
 
   MITK_TEST_END();
 }

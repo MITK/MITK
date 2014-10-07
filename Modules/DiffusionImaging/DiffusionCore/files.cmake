@@ -9,6 +9,15 @@ set(CPP_FILES
   DicomImport/mitkSiemensDicomDiffusionImageHeaderReader.cpp
   DicomImport/mitkSiemensMosaicDicomDiffusionImageHeaderReader.cpp
 
+  DicomImport/mitkDiffusionDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderSiemensDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderSiemensDICOMFileHelper.cpp
+  DicomImport/mitkDiffusionHeaderSiemensMosaicDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderGEDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderPhilipsDICOMFileReader.cpp
+
+
   # DataStructures -> DWI
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageHeaderInformation.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSource.cpp
@@ -24,9 +33,6 @@ set(CPP_FILES
   # DataStructures -> Tensor
   IODataStructures/TensorImages/mitkTensorImage.cpp
 
-  #IODataStructures/mitkRegistrationObject.cpp
-
-  # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
   Rendering/mitkVectorImageVtkGlyphMapper3D.cpp
   Rendering/vtkOdfSource.cxx

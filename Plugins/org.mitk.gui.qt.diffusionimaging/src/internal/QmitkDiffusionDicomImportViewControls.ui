@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>341</width>
-    <height>559</height>
+    <width>374</width>
+    <height>603</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -73,7 +73,16 @@ p, li { white-space: pre-wrap; }
       <number>0</number>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -157,6 +166,33 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <property name="spacing">
+         <number>8</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetNoConstraint</enum>
+        </property>
+        <item>
+         <widget class="QPushButton" name="m_SetPrefixButton">
+          <property name="text">
+           <string>Set Prefix</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="m_SubdirPrefixLineEdit"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_ResetPrefixButton">
+          <property name="text">
+           <string>Reset</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <widget class="QFrame" name="frame">
         <property name="toolTip">
          <string>Multiple acquistions of one gradient direction can be averaged. Due to rounding errors, similar gradients often differ in the last decimal positions. The Merge radius allows to average them anyway by taking into account all directions within a certain radius.</string>
@@ -168,7 +204,16 @@ p, li { white-space: pre-wrap; }
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
@@ -222,7 +267,16 @@ p, li { white-space: pre-wrap; }
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
@@ -286,6 +340,13 @@ p, li { white-space: pre-wrap; }
        <widget class="QCheckBox" name="m_OverrideOptionCheckbox">
         <property name="text">
          <string>Override existing files</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="m_SplitMosaicCheckBox">
+        <property name="text">
+         <string>Split Mosaic </string>
         </property>
        </widget>
       </item>

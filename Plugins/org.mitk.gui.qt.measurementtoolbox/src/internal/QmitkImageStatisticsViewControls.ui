@@ -97,12 +97,6 @@
       </property>
       <item>
        <widget class="QTableWidget" name="m_StatisticsTable">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="minimumSize">
          <size>
           <width>100</width>
@@ -214,6 +208,21 @@
         <row>
          <property name="text">
           <string>V (mm³)</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>Hotspot Peak</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>Hotspot Max</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>Hotspot Min</string>
          </property>
         </row>
         <column>

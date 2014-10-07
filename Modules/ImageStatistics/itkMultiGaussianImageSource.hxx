@@ -414,7 +414,7 @@ namespace itk
 
     int intersect = IntersectTheSphere( globalCoordinateMidpointCuboid, globalCoordinateMidpointSphere, cuboidRadiusRecursion);
 
-    if( (intersect == 1) )
+    if( intersect == 1 )
     {
       if (level < 4)
       {

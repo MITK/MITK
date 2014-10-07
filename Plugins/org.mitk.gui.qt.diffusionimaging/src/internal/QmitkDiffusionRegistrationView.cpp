@@ -37,32 +37,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDir>
+#include <QDirIterator>
 
 
 #include <mitkDWIHeadMotionCorrectionFilter.h>
-
-
-
-/*
-#include "QmitkDataStorageComboBox.h"
-#include <mitkDataStorage.h>
-#include <mitkILinkedRenderWindowPart.h>
-#include <mitkGlobalInteraction.h>
-#include <mitkNodePredicateDataType.h>
-#include <itkScalableAffineTransform.h>
-#include <mitkLevelWindowProperty.h>
-#include <mitkNodePredicateOr.h>
-#include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateNot.h>
-*/
-
-#include <mitkDWIHeadMotionCorrectionFilter.h>
+#include <mitkNrrdDiffusionImageWriter.h>
 
 
 #define _USE_MATH_DEFINES
 #include <math.h>
-
-
 
 QmitkRegistrationWorker::QmitkRegistrationWorker(QmitkDiffusionRegistrationView* view)
   : m_View(view)
@@ -76,13 +59,47 @@ void QmitkRegistrationWorker::run()
   typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
   typedef DiffusionImageType::BValueMap BValueMap;
 
-  for(unsigned int i=0; i< m_View->m_SelectedDiffusionNodes.size(); i++)
+  unsigned int totalImagesCount;
+  if( !m_View->m_IsBatch )
   {
+    totalImagesCount = m_View->m_SelectedDiffusionNodes.size();
+  }
+  else
+  {
+    totalImagesCount = m_View->m_BatchList.size();
+  }
+  m_View->m_TotalFiles = totalImagesCount;
 
+  QString inputPath = m_View->m_Controls->m_InputFolderTextbox->text();
+  QString outputPath = m_View->m_Controls->m_OutputFolderTextbox->text();
+
+
+  for(unsigned int i=0; i< totalImagesCount; i++)
+  {
+    if(m_View->m_IsAborted){
+      m_View->m_RegistrationThread.quit();
+      return;
+    }
+
+    m_View->m_CurrentFile = i+1;
     m_View->m_GlobalRegisterer = QmitkDiffusionRegistrationView::DWIHeadMotionCorrectionFilterType::New();
 
-    mitk::DataNode::Pointer node = m_View->m_SelectedDiffusionNodes.at(i);
-    DiffusionImageType::Pointer inImage = dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData());
+    //mitk::DataNode::Pointer node = m_View->m_SelectedDiffusionNodes.at(i);
+    DiffusionImageType::Pointer inImage;
+    mitk::DataNode::Pointer node;
+
+    if( !m_View->m_IsBatch )
+    {
+      node = m_View->m_SelectedDiffusionNodes.at(i);
+      inImage = dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData());
+    }
+    else
+    {
+      mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage( m_View->m_BatchList.at(i).toStdString() );
+      inImage = static_cast<DiffusionImageType*>( inputImage.GetPointer() );
+    }
+
+
     if(inImage.IsNull())
     {
       MITK_ERROR << "Error occured: can't get input image. \nAborting";
@@ -92,7 +109,8 @@ void QmitkRegistrationWorker::run()
 
     m_View->m_GlobalRegisterer->SetInput(inImage);
 
-    try{
+    try
+    {
       m_View->m_GlobalRegisterer->Update();
     }
     catch( mitk::Exception e )
@@ -102,18 +120,41 @@ void QmitkRegistrationWorker::run()
 
     if( m_View->m_GlobalRegisterer->GetIsInValidState() )
     {
-      DiffusionImageType::Pointer image = m_View->m_GlobalRegisterer->GetOutput();
-      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-      imageNode->SetData( image );
-      QString name = node->GetName().c_str();
-      imageNode->SetName((name+"_MC").toStdString().c_str());
-      m_View->GetDataStorage()->Add(imageNode);
+
+      if(! m_View->m_IsBatch)
+      {
+        DiffusionImageType::Pointer image = m_View->m_GlobalRegisterer->GetOutput();
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = node->GetName().c_str();
+        imageNode->SetName((name+"_MC").toStdString().c_str());
+        m_View->GetDataStorage()->Add(imageNode);
+      }
+      else
+      {
+        mitk::NrrdDiffusionImageWriter< DiffusionPixelType >::Pointer dwiwriter =
+            mitk::NrrdDiffusionImageWriter< DiffusionPixelType >::New();
+
+        dwiwriter->SetInput( m_View->m_GlobalRegisterer->GetOutput() );
+
+        QString name = m_View->m_BatchList.at(i);
+        name = name.replace(".dwi", "_MC.dwi", Qt::CaseInsensitive);
+        name = name.replace(inputPath, outputPath, Qt::CaseInsensitive);
+        dwiwriter->SetFileName(  name.toStdString().c_str() );
+
+        try
+        {
+          dwiwriter->Update();
+        }
+        catch( const itk::ExceptionObject& e)
+        {
+          MITK_ERROR << "Catched exception: " << e.what();
+          mitkThrow() << "Failed with exception from subprocess!";
+        }
+      }
     }
 
-
   }
-
-
   m_View->m_RegistrationThread.quit();
 }
 
@@ -210,16 +251,18 @@ void QmitkDiffusionRegistrationView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_RegistrationStopButton, SIGNAL(clicked()), this, SLOT(StopRegistration()) );
     connect( m_Controls->m_RegistrationStartButton, SIGNAL(clicked()), this, SLOT(StartRegistration()) );
     connect( m_Controls->m_AdvancedSettingsCheckbox, SIGNAL(clicked()), this, SLOT(AdvancedSettings()) );
+    connect( m_Controls->m_SelectInputButton, SIGNAL(clicked()), this, SLOT(AddInputFolderName()) );
+    connect( m_Controls->m_SelectOutputButton, SIGNAL(clicked()), this, SLOT(AddOutputFolderName()) );
+    connect( m_Controls->m_StartBatchButton, SIGNAL(clicked()), this, SLOT(StartBatch()) );
 
+    this->m_Parent = parent;
   }
 }
 
 // show/hide advanced settings frame
 void QmitkDiffusionRegistrationView::AdvancedSettings()
 {
-  //m_Controls->m_AdvancedFrame->setVisible(m_Controls->m_AdvancedSettingsCheckbox->isChecked());
-  m_Controls->m_AdvancedFrame->setVisible(false);
-  m_Controls->m_AdvancedSettingsCheckbox->setVisible(false);
+  m_Controls->m_AdvancedFrame->setVisible(m_Controls->m_AdvancedSettingsCheckbox->isChecked());
 }
 
 
@@ -283,7 +326,7 @@ void QmitkDiffusionRegistrationView::UpdateRegistrationStatus()
 
   m_Controls->m_RegistrationTimeLabel->setText( QString::number(hours)+QString("h ")+QString::number(minutes)+QString("m ")+QString::number(seconds)+QString("s") );
   m_Controls->m_CurrentStepLabel->setText( QString::number((int)(100*(float)(m_GlobalRegisterer->GetCurrentStep()-1)/m_GlobalRegisterer->GetSteps()))+"%" );
-
+  m_Controls->m_CurrentFileLabel->setText( QString::number(m_CurrentFile)+" / "+QString::number(m_TotalFiles) );
 }
 
 void QmitkDiffusionRegistrationView::UpdateGUI()
@@ -293,6 +336,7 @@ void QmitkDiffusionRegistrationView::UpdateGUI()
   {
     m_Controls->m_RegistrationStopButton->setEnabled(false);
     m_Controls->m_RegistrationStartButton->setEnabled(true);
+    m_Controls->m_StartBatchButton->setEnabled(true);
     m_Controls->m_AdvancedFrame->setEnabled(true);
     m_Controls->m_RegistrationStopButton->setText("Stop");
     m_Controls->m_RegistrationStartButton->setToolTip("Start Registration");
@@ -302,6 +346,7 @@ void QmitkDiffusionRegistrationView::UpdateGUI()
   {
     m_Controls->m_RegistrationStopButton->setEnabled(false);
     m_Controls->m_RegistrationStartButton->setEnabled(false);
+    m_Controls->m_StartBatchButton->setEnabled(true);
     m_Controls->m_AdvancedFrame->setEnabled(true);
     m_Controls->m_RegistrationStopButton->setText("Stop");
     m_Controls->m_RegistrationStartButton->setToolTip("No Diffusion image selected.");
@@ -311,12 +356,12 @@ void QmitkDiffusionRegistrationView::UpdateGUI()
   {
     m_Controls->m_RegistrationStopButton->setEnabled(true);
     m_Controls->m_RegistrationStartButton->setEnabled(false);
+    m_Controls->m_StartBatchButton->setEnabled(false);
     m_Controls->m_AdvancedFrame->setEnabled(false);
-    m_Controls->m_AdvancedFrame->setVisible(false);
-    m_Controls->m_AdvancedSettingsCheckbox->setChecked(false);
     m_Controls->m_RegistrationStartButton->setToolTip("Registration in progress.");
     m_Controls->m_RegistrationStopButton->setToolTip("Cancel Registration");
   }
+
 
 }
 
@@ -342,8 +387,11 @@ void QmitkDiffusionRegistrationView::StartRegistration()
     return;
   }
 
+  m_IsBatch = false;
+  m_IsAborted = false;
 
   m_Controls->m_RegistrationStartButton->setEnabled(false);
+  m_Controls->m_StartBatchButton->setEnabled(false);
 
   // start worker thread
   m_RegistrationThread.start(QThread::NormalPriority);
@@ -357,9 +405,85 @@ void QmitkDiffusionRegistrationView::StopRegistration()
   if (m_GlobalRegisterer.IsNull())
     return;
 
+  m_IsAborted = true;
   m_GlobalRegisterer->SetAbortRegistration(true);
   m_Controls->m_RegistrationStopButton->setEnabled(false);
   m_Controls->m_RegistrationStopButton->setText("Stopping ...");
 
   return;
+}
+
+void QmitkDiffusionRegistrationView::AddInputFolderName()
+{
+
+  // SELECT FOLDER DIALOG
+  QFileDialog* w = new QFileDialog( m_Parent, QString("Select the input folder with DWI files within") );
+  w->setFileMode( QFileDialog::Directory );
+
+  // RETRIEVE SELECTION
+  if ( w->exec() != QDialog::Accepted )
+    return;
+
+  m_Controls->m_InputFolderTextbox->setText(w->selectedFiles()[0]);
+}
+
+void QmitkDiffusionRegistrationView::AddOutputFolderName()
+{
+  // SELECT FOLDER DIALOG
+  QFileDialog* w = new QFileDialog( m_Parent, QString("Select the output folder") );
+  w->setFileMode( QFileDialog::Directory );
+
+  // RETRIEVE SELECTION
+  if ( w->exec() != QDialog::Accepted )
+    return;
+
+  m_Controls->m_OutputFolderTextbox->setText(w->selectedFiles()[0]);
+}
+
+void QmitkDiffusionRegistrationView::StartBatch()
+{
+  QString inputPath = m_Controls->m_InputFolderTextbox->text();
+  QString outputPath = m_Controls->m_OutputFolderTextbox->text();
+
+  if(inputPath == outputPath){
+    QMessageBox::information( NULL, "Error", "Input and Output folders can't be the same");
+    return;
+  }
+
+  QStringList list, filters;
+  filters<<"*.dwi";
+  QDirIterator dirIterator(inputPath,
+                           filters,
+                           QDir::Files|QDir::NoSymLinks);
+
+  while (dirIterator.hasNext())
+  {
+    dirIterator.next();
+
+    list.append(dirIterator.fileInfo().absoluteFilePath());
+    std::cout << dirIterator.fileInfo().absoluteFilePath().toStdString() << endl;
+    m_BatchList = list;
+
+    m_IsBatch = true;
+    m_IsAborted = false;
+
+    if(m_ThreadIsRunning)
+    {
+      MITK_WARN("QmitkDiffusionRegistrationView")<<"Thread already running!";
+      return;
+    }
+    m_GlobalRegisterer = NULL;
+
+    if (m_BatchList.size()<1)
+    {
+      QMessageBox::information( NULL, "Error", "No diffusion images were found in the selected input folder.");
+      return;
+    }
+
+    m_Controls->m_RegistrationStartButton->setEnabled(false);
+    m_Controls->m_StartBatchButton->setEnabled(false);
+
+    // start worker thread
+    m_RegistrationThread.start(QThread::NormalPriority);
+  }
 }

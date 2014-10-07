@@ -107,8 +107,7 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
 }
 
 template <class TInputScalarType, class TOutputScalarType>
-void
-TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
+void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
 ::ThreadedGenerateData (const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId )
 {
   typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;
@@ -123,11 +122,19 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
   IteratorInputType  itIn (this->GetInput(), outputRegionForThread);
   IteratorBaselineType itB0 (m_BaselineImage, outputRegionForThread);
 
+  typedef ImageRegionConstIterator< MaskImageType >   IteratorMaskImageType;
+  IteratorMaskImageType itMask;
+
+  if( m_MaskImage.IsNotNull() )
+  {
+    itMask = IteratorMaskImageType( m_MaskImage, outputRegionForThread);
+    itMask.GoToBegin();
+  }
+
   if( threadId==0 )
   {
     this->UpdateProgress (0.0);
   }
-
 
   while(!itIn.IsAtEnd())
   {
@@ -145,15 +152,28 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
     out.SetSize(m_GradientList->Size());
     out.Fill(0);
 
+    short maskvalue = 1;
+    if( m_MaskImage.IsNotNull() )
+    {
+      maskvalue = itMask.Get();
+      ++itMask;
+    }
+
+    std::vector<unsigned int> b0_indices;
     if( b0 > 0)
     {
-      for( unsigned int i=0; i<m_GradientList->Size()-1; i++)
+      for( unsigned int i=0; i<m_GradientList->Size(); i++)
       {
-
-        GradientType g = m_GradientList->at(i+1);
+        GradientType g = m_GradientList->at(i);
 
         // normalize vector so the following computations work
         const double twonorm = g.two_norm();
+        if( twonorm < vnl_math::eps )
+        {
+          b0_indices.push_back(i);
+          continue;
+        }
+
         GradientType gn = g.normalize();
 
         InputPixelType S;
@@ -175,13 +195,17 @@ TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
           // estimate the bvalue from the base value and the norm of the gradient
           //   - because of this estimation the vector have to be normalized beforehand
           //     otherwise the modelled signal is wrong ( i.e. not scaled properly )
-          const double bval = m_BValue * twonorm;
-          out[i+1] = static_cast<OutputScalarType>( 1.0 * b0 * exp ( -1.0 * bval * res ) );
+          const double bval = m_BValue * twonorm * twonorm;
+          out[i] = static_cast<OutputScalarType>( maskvalue * 1.0 * b0 * exp ( -1.0 * bval * res ) );
         }
       }
     }
 
-    out[0] = b0;
+    for(unsigned int idx = 0; idx < b0_indices.size(); idx++ )
+    {
+      out[b0_indices.at(idx)] = b0;
+    }
+
 
     itOut.Set(out);
 

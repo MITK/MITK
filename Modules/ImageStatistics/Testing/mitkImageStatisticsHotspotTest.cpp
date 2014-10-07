@@ -396,7 +396,7 @@ struct mitkImageStatisticsHotspotTestClass
     mitk::Image::Pointer result;
 
     typedef double PixelType;
-    const unsigned int Dimension = 3;
+    const int Dimension = 3;
     typedef itk::Image<PixelType, Dimension> ImageType;
     ImageType::Pointer image = ImageType::New();
     typedef itk::MultiGaussianImageSource< ImageType > MultiGaussianImageSource;

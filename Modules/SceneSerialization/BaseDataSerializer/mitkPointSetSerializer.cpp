@@ -15,8 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPointSetSerializer.h"
-#include "mitkPointSetWriter.h"
-#include "Poco/Path.h"
+#include "mitkIOUtil.h"
 
 
 MITK_REGISTER_SERIALIZER(PointSetSerializer)
@@ -45,15 +44,12 @@ std::string mitk::PointSetSerializer::Serialize()
   filename += ".mps";
 
   std::string fullname(m_WorkingDirectory);
-  fullname += Poco::Path::separator();
+  fullname += IOUtil::GetDirectorySeparator();
   fullname += filename;
 
   try
   {
-    PointSetWriter::Pointer writer = PointSetWriter::New();
-    writer->SetFileName( fullname );
-    writer->SetInput( const_cast<PointSet*>( ps ) );
-    writer->Write();
+    IOUtil::Save(ps, fullname);
   }
   catch (std::exception& e)
   {

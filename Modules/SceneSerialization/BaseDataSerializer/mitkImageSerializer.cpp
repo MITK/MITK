@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageSerializer.h"
 #include "mitkImage.h"
-#include "mitkImageWriter.h"
+#include "mitkIOUtil.h"
 #include <Poco/Path.h>
 
 MITK_REGISTER_SERIALIZER(ImageSerializer)
@@ -46,17 +46,11 @@ std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std
 
   std::string fullname(m_WorkingDirectory);
   fullname += Poco::Path::separator();
-  fullname += filename;
+  fullname += filename + ".nrrd";
 
   try
   {
-    ImageWriter::Pointer writer = ImageWriter::New();
-    writer->SetFileName( fullname );
-    // was previously .pic, but due to IpPic-removal from core, the current standard file ending ist .nrrd
-    writer->SetExtension(".nrrd");
-    writer->SetInput( const_cast<Image*>(image) ); // bad writer design??
-    writer->Write();
-    fullname = writer->GetFileName();
+    IOUtil::Save(image, fullname);
   }
   catch (std::exception& e)
   {

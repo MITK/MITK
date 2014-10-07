@@ -16,10 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSurfaceSerializer.h"
 
-#include "mitkSurfaceVtkWriter.h"
-
-#include <vtkXMLPolyDataWriter.h>
-#include "Poco/Path.h"
+#include "mitkIOUtil.h"
 
 MITK_REGISTER_SERIALIZER(SurfaceSerializer)
 
@@ -47,16 +44,12 @@ std::string mitk::SurfaceSerializer::Serialize()
   filename += ".vtp";
 
   std::string fullname(m_WorkingDirectory);
-  fullname += Poco::Path::separator();
+  fullname += IOUtil::GetDirectorySeparator();
   fullname += filename;
 
   try
   {
-    SurfaceVtkWriter<vtkXMLPolyDataWriter>::Pointer writer = SurfaceVtkWriter<vtkXMLPolyDataWriter>::New();
-    writer->SetFileName( fullname );
-    //writer->SetExtension(".vtp");
-    writer->SetInput( const_cast<Surface*>( surface ) );
-    writer->Write();
+    IOUtil::Save(surface, fullname);
   }
   catch (std::exception& e)
   {

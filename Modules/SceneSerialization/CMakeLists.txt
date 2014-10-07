@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(
   INCLUDE_DIRS BaseDataSerializer
-  DEPENDS MitkSceneSerializationBase MitkLegacyIO
+  DEPENDS MitkSceneSerializationBase
   PACKAGE_DEPENDS Poco
   WARNINGS_AS_ERRORS
 )

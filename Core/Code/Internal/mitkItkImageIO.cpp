@@ -50,6 +50,10 @@ std::vector<std::string> ItkImageIO::FixUpImageIOExtensions(const std::string& i
   else if (imageIOName == "GDCMImageIO")
   {
     extensions.push_back("gdcm");
+    extensions.push_back("dcm");
+    extensions.push_back("DCM");
+    extensions.push_back("dc3");
+    extensions.push_back("DC3");
   }
   else if (imageIOName == "PNGImageIO")
   {

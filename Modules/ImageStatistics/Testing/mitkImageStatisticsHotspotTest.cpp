@@ -423,7 +423,7 @@ struct mitkImageStatisticsHotspotTestClass
 
     ImageType::SpacingType spacing;
 
-    for(unsigned int i = 0; i < Dimension; ++i)
+    for( int i = 0; i < Dimension; ++i )
       spacing[i] = testParameters.m_Spacing[i];
 
     gaussianGenerator->SetSize( size );

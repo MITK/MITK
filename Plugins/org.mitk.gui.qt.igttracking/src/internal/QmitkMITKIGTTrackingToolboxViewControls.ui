@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>346</width>
-    <height>666</height>
+    <height>592</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -245,7 +245,7 @@ p, li { white-space: pre-wrap; }
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="m_Connect">
+             <widget class="QPushButton" name="m_ConnectDisconnectButton">
               <property name="minimumSize">
                <size>
                 <width>120</width>
@@ -254,19 +254,6 @@ p, li { white-space: pre-wrap; }
               </property>
               <property name="text">
                <string>Connect</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="m_Disconnect">
-              <property name="minimumSize">
-               <size>
-                <width>120</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Disconnect</string>
               </property>
              </widget>
             </item>
@@ -288,7 +275,7 @@ p, li { white-space: pre-wrap; }
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="m_StartTracking">
+             <widget class="QPushButton" name="m_StartStopTrackingButton">
               <property name="minimumSize">
                <size>
                 <width>120</width>
@@ -297,19 +284,6 @@ p, li { white-space: pre-wrap; }
               </property>
               <property name="text">
                <string>Start Tracking</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="m_StopTracking">
-              <property name="minimumSize">
-               <size>
-                <width>120</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Stop Tracking</string>
               </property>
              </widget>
             </item>

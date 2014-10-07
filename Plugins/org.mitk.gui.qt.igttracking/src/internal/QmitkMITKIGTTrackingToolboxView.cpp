@@ -54,6 +54,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 {
   m_TrackingTimer = new QTimer(this);
   m_tracking = false;
+  m_connected = false;
   m_logging = false;
   m_loggedFrames = 0;
 
@@ -92,10 +93,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 
     //create connections
     connect( m_Controls->m_LoadTools, SIGNAL(clicked()), this, SLOT(OnLoadTools()) );
-    connect( m_Controls->m_Connect, SIGNAL(clicked()), this, SLOT(OnConnect()) );
-    connect( m_Controls->m_Disconnect, SIGNAL(clicked()), this, SLOT(OnDisconnect()) );
-    connect( m_Controls->m_StartTracking, SIGNAL(clicked()), this, SLOT(OnStartTracking()) );
-    connect( m_Controls->m_StopTracking, SIGNAL(clicked()), this, SLOT(OnStopTracking()) );
+    connect( m_Controls->m_ConnectDisconnectButton, SIGNAL(clicked()), this, SLOT(OnConnectDisconnect()) );
+    connect( m_Controls->m_StartStopTrackingButton, SIGNAL(clicked()), this, SLOT(OnStartStopTracking()) );
     connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(UpdateTrackingTimer()));
     connect( m_Controls->m_ChooseFile, SIGNAL(clicked()), this, SLOT(OnChooseFileClicked()));
     connect( m_Controls->m_StartLogging, SIGNAL(clicked()), this, SLOT(StartLogging()));
@@ -145,11 +144,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_TrackingVolumeNode->SetColor(red);
 
     //initialize buttons
-    m_Controls->m_Connect->setEnabled(true);
-    m_Controls->m_Disconnect->setEnabled(false);
-    m_Controls->m_StartTracking->setEnabled(false);
-    m_Controls->m_StopTracking->setEnabled(false);
     m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
+    m_Controls->m_StartStopTrackingButton->setEnabled(false);
 
     //initialize tool storage
     m_toolStorage = mitk::NavigationToolStorage::New(GetDataStorage());
@@ -241,6 +237,23 @@ void QmitkMITKIGTTrackingToolboxView::OnResetTools()
   m_ToolStorageFilename = "";
 }
 
+void QmitkMITKIGTTrackingToolboxView::OnStartStopTracking()
+  {
+  if(!m_connected)
+    {
+    MITK_WARN << "Can't start tracking if no device is connected. Aborting";
+    return;
+    }
+  if(m_tracking) {OnStopTracking();}
+  else {OnStartTracking();}
+  }
+
+void QmitkMITKIGTTrackingToolboxView::OnConnectDisconnect()
+  {
+  if(m_connected) {OnDisconnect();}
+  else {OnConnect();}
+  }
+
 void QmitkMITKIGTTrackingToolboxView::OnConnect()
   {
   MITK_INFO << "Connect Clicked";
@@ -298,15 +311,14 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString er
   m_ToolVisualizationFilter = m_Worker->GetToolVisualizationFilter();
 
   //enable/disable Buttons
-  m_Controls->m_Disconnect->setEnabled(true);
-  m_Controls->m_StartTracking->setEnabled(true);
-  m_Controls->m_StopTracking->setEnabled(false);
-  m_Controls->m_Connect->setEnabled(false);
   DisableOptionsButtons();
   DisableTrackingConfigurationButtons();
   m_Controls->m_configurationWidget->ConfigurationFinished();
 
   m_Controls->m_TrackingControlLabel->setText("Status: connected");
+  m_Controls->m_ConnectDisconnectButton->setText("Disconnect");
+  m_Controls->m_StartStopTrackingButton->setEnabled(true);
+  m_connected = true;
   }
 
 void QmitkMITKIGTTrackingToolboxView::OnDisconnect()
@@ -329,14 +341,14 @@ void QmitkMITKIGTTrackingToolboxView::OnDisconnectFinished(bool success, QString
     }
 
   //enable/disable Buttons
-  m_Controls->m_Disconnect->setEnabled(false);
-  m_Controls->m_StartTracking->setEnabled(false);
-  m_Controls->m_StopTracking->setEnabled(false);
-  m_Controls->m_Connect->setEnabled(true);
+  m_Controls->m_StartStopTrackingButton->setEnabled(false);
   EnableOptionsButtons();
   EnableTrackingConfigurationButtons();
   m_Controls->m_configurationWidget->Reset();
   m_Controls->m_TrackingControlLabel->setText("Status: disconnected");
+  m_Controls->m_ConnectDisconnectButton->setText("Connect");
+
+  m_connected = false;
   }
 
 void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
@@ -373,13 +385,8 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   //show tracking volume
   this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
 
-  //enable/disable Buttons
-  m_Controls->m_Disconnect->setEnabled(true);
-  m_Controls->m_StartTracking->setEnabled(false);
-  m_Controls->m_StopTracking->setEnabled(true);
-  m_Controls->m_Connect->setEnabled(false);
-
   m_tracking = true;
+  m_Controls->m_StartStopTrackingButton->setText("Stop Tracking");
 
   this->GlobalReinit();
 }
@@ -410,12 +417,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTrackingFinished(bool success, QStri
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
   m_tracking = false;
-
-  //enable/disable Buttons
-  m_Controls->m_Disconnect->setEnabled(true);
-  m_Controls->m_StartTracking->setEnabled(true);
-  m_Controls->m_StopTracking->setEnabled(false);
-  m_Controls->m_Connect->setEnabled(false);
+  m_Controls->m_StartStopTrackingButton->setText("Start Tracking");
 
   this->GlobalReinit();
 }

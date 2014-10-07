@@ -157,7 +157,6 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
         {
           MITK_WARN << "Unexpected: " << e.what();
         }
-
         catch (const std::exception& e)
         {
           // Log the error but continue

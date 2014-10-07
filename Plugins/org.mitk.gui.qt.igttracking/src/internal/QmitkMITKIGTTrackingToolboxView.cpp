@@ -386,6 +386,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
 
   m_tracking = true;
+  m_Controls->m_ConnectDisconnectButton->setEnabled(false);
   m_Controls->m_StartStopTrackingButton->setText("Stop Tracking");
 
   this->GlobalReinit();
@@ -418,6 +419,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTrackingFinished(bool success, QStri
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
   m_tracking = false;
   m_Controls->m_StartStopTrackingButton->setText("Start Tracking");
+  m_Controls->m_ConnectDisconnectButton->setEnabled(true);
 
   this->GlobalReinit();
 }

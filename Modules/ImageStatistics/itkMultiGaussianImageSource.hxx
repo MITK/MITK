@@ -901,7 +901,7 @@ namespace itk
     ::CalculateMaxAndMinInSphere()
   {
     IndexType index;
-    MultiGaussianImageSource< TOutputImage >::OutputImagePixelType value;
+    typename MultiGaussianImageSource< TOutputImage >::OutputImagePixelType value;
     m_MaxValueInSphere = std::numeric_limits<OutputImagePixelType>::min();
     m_MinValueInSphere = std::numeric_limits<OutputImagePixelType>::max();
     int radInt, sizeRegion;

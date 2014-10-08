@@ -82,6 +82,8 @@ protected:
   virtual vtkProp *GetVtkProp(BaseRenderer *renderer) const;
   void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
 
+  vtkImageData* CreateMbiLogo();
+
   /** \brief explicit constructor which disallows implicit conversions */
   explicit LogoOverlay();
 

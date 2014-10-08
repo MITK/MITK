@@ -18,6 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOMimeTypes.h>
 #include <mitkCustomMimeType.h>
+#include <mitkSceneIO.h>
+#include <mitkDataStorage.h>
+
+#include <itkVectorContainer.h>
 
 mitk::SceneFileReader::SceneFileReader(const mitk::SceneFileReader& other)
   : mitk::AbstractFileReader(other)
@@ -53,8 +57,28 @@ mitk::SceneFileReader::~SceneFileReader()
 std::vector<itk::SmartPointer<mitk::BaseData> > mitk::SceneFileReader::Read()
 {
   MITK_INFO("SceneFileReader") << "SceneFileReader Triggered";
-  std::vector<itk::SmartPointer<mitk::BaseData> > vector;
-  return vector;
+  std::istream* stream = this->GetInputStream();
+  if (stream == NULL) MITK_INFO("SceneFileReader") << "Stream Found";
+  std::string location = GetInputLocation();
+  MITK_INFO("SceneFileReader") << "File Location is " << location;
+  std::vector<itk::SmartPointer<mitk::BaseData> > result;
+
+  mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
+  mitk::DataStorage::Pointer storage = sceneIO->LoadScene(location);
+
+  typedef  itk::VectorContainer<unsigned int, mitk::DataNode::Pointer>  VectorContainerType;
+
+  VectorContainerType::ConstPointer nodes = storage->GetAll();
+  VectorContainerType::ConstIterator it = nodes->Begin();
+  it = nodes->Begin();
+  while(it != nodes->End())
+    {
+      mitk::DataNode::Pointer n = it->Value();
+      result.push_back(n->GetData());
+      ++it;
+    }
+
+  return result;
 }
 
 mitk::SceneFileReader* mitk::SceneFileReader::Clone() const

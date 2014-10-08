@@ -75,8 +75,6 @@ public:
 int main(int argc, char** argv)
 {
 
-  QtSafeApplication::setAttribute( Qt::AA_X11InitThreads );
-
   // Create a QApplication instance first
   QtSafeApplication qSafeApp(argc, argv);
   qSafeApp.setApplicationName("MitkDiffusion");

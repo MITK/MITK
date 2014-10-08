@@ -21,5 +21,6 @@ namespace berry {
 const std::string QtPreferences::QT_STYLES_NODE = "qtstyles";
 const std::string QtPreferences::QT_STYLE_NAME = "stylename";
 const std::string QtPreferences::QT_STYLE_SEARCHPATHS = "searchpaths";
+const std::string QtPreferences::QT_ICON_THEME = "icontheme";
 
 }

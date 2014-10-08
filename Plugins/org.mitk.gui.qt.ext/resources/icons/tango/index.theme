@@ -1,0 +1,18 @@
+[Icon Theme]
+Name=tango
+Comment=An icon theme following the tango style guide
+Directories=scalable/actions scalable/status
+
+[scalable/actions]
+Size=48
+Type=Scalable
+MinSize=1
+MaxSize=256
+Context=Actions
+
+[scalable/status]
+Size=48
+Type=Scalable
+MinSize=1
+MaxSize=256
+Context=Status

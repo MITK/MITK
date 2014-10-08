@@ -53,10 +53,12 @@ protected:
 
   void AddPath(const QString& path, bool updateCombo);
   void FillStyleCombo(const berry::IQtStyleManager::Style& currentStyle);
+  void FillIconThemeComboBox();
 
 protected slots:
 
   void StyleChanged(int /*index*/);
+  void IconThemeChanged(int /*index*/);
   void AddPathClicked(bool /*checked*/);
   void RemovePathClicked(bool /*checked*/);
   void EditPathClicked(bool checked);

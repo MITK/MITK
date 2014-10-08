@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileInfo>
 #include <QStringList>
 #include <QDirIterator>
+#include <QIcon>
 
 #include <berryLog.h>
 #include <berryPlatform.h>
@@ -255,6 +256,33 @@ void QtStyleManager::GetStyles(StyleList& styleNames) const
     styleNames.push_back(Style(i.value()->name, i.value()->fileName));
 }
 
+void QtStyleManager::GetIconThemes(IconThemeList& iconThemes) const
+{
+  iconThemes.clear();
+  iconThemes.push_back(IconTheme(QString( "<<default>>" )));
+
+  QStringList iconSearchPaths = QIcon::themeSearchPaths();
+
+  for(QStringList::Iterator pathIt = iconSearchPaths.begin(); pathIt != iconSearchPaths.end(); ++pathIt)
+  {
+    QDirIterator dirIt(*pathIt);
+    while (dirIt.hasNext())
+    {
+      QString current = dirIt.next();
+      QFileInfo info = dirIt.fileInfo();
+      if (info.isDir() && info.isReadable())
+      {
+        QFileInfo themeFile( info.filePath() + QString("/index.theme") );
+        if( themeFile.exists() && themeFile.isFile() && themeFile.isReadable() )
+        {
+          QString fileName = info.fileName();
+          iconThemes.push_back( IconTheme(fileName) );
+        }
+      }
+    }
+  }
+}
+
 void QtStyleManager::SetStyle(const QString& fileName)
 {
   SetStyle(fileName, true);
@@ -289,6 +317,23 @@ void QtStyleManager::SetStyle(const QString& fileName, bool update)
     qApp->setStyleSheet(currentStyle->stylesheet);
     PlatformUI::GetWorkbench()->UpdateTheme();
   }
+}
+
+void QtStyleManager::SetIconTheme(const QString& themeName)
+{
+  if( themeName == QString( "<<default>>" ) )
+  {
+    SetIconTheme( QString("tango"), true);
+  }
+  else
+  {
+    SetIconTheme(themeName, true);
+  }
+}
+
+void QtStyleManager::SetIconTheme(const QString& themeName, bool update)
+{
+  QIcon::setThemeName( themeName );
 }
 
 QtStyleManager::Style QtStyleManager::GetDefaultStyle() const

@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPerspectiveRegistry.h>
 #include <berryIPerspectiveDescriptor.h>
 #include <berryIWorkbenchPartConstants.h>
+#include <berryQtPreferences.h>
 
 #include <internal/berryQtShowViewAction.h>
 #include <internal/berryQtOpenPerspectiveAction.h>
@@ -526,6 +527,24 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  " QMenuBar {"
  "background-color: #808080; }");*/
 
+    // Load selected icon theme
+
+    QStringList searchPaths = QIcon::themeSearchPaths();
+    searchPaths.push_front( QString(":/org_mitk_icons/icons/") );
+    QIcon::setThemeSearchPaths( searchPaths );
+
+    berry::IPreferencesService::Pointer prefService
+      = berry::Platform::GetServiceRegistry()
+      .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+
+    berry::IPreferences::Pointer stylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
+    QString iconTheme = QString::fromStdString(stylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>"));
+    if( iconTheme == QString( "<<default>>" ) )
+    {
+      iconTheme = QString( "tango" );
+    }
+    QIcon::setThemeName( iconTheme );
+
     // ==== Application menu ============================
     QMenuBar* menuBar = mainWindow->menuBar();
     menuBar->setContextMenuPolicy(Qt::PreventContextMenu);
@@ -533,20 +552,21 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     QMenu* fileMenu = menuBar->addMenu("&File");
     fileMenu->setObjectName("FileMenu");
 
-    QAction* fileOpenAction = new QmitkFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/Load_48.png"), window);
+    QAction* fileOpenAction = new QmitkFileOpenAction(QIcon::fromTheme("document-open",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-open.svg")), window);
     fileOpenAction->setShortcut(QKeySequence::Open);
     fileMenu->addAction(fileOpenAction);
     QAction* fileSaveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"), window);
     fileSaveAction->setShortcut(QKeySequence::Save);
     fileMenu->addAction(fileSaveAction);
     fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
-    fileSaveProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"));
+    fileSaveProjectAction->setIcon(QIcon::fromTheme("document-save",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-save.svg")));
     fileMenu->addAction(fileSaveProjectAction);
     closeProjectAction = new QmitkCloseProjectAction(window);
-    closeProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Remove_48.png"));
+    closeProjectAction->setIcon(QIcon::fromTheme("edit-delete",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-delete.svg")));
     fileMenu->addAction(closeProjectAction);
     fileMenu->addSeparator();
     QAction* fileExitAction = new QmitkFileExitAction(window);
+    fileExitAction->setIcon(QIcon::fromTheme("system-log-out",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/system-log-out.svg")));
     fileExitAction->setShortcut(QKeySequence::Quit);
     fileExitAction->setObjectName("QmitkFileExitAction");
     fileMenu->addAction(fileExitAction);
@@ -567,12 +587,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     // another bad hack to get an edit/undo menu...
     QMenu* editMenu = menuBar->addMenu("&Edit");
-    undoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Undo_48.png"),
+    undoAction = editMenu->addAction(QIcon::fromTheme("edit-undo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-undo.svg")),
                                      "&Undo",
                                      QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
                                      QKeySequence("CTRL+Z"));
     undoAction->setToolTip("Undo the last action (not supported by all modules)");
-    redoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Redo_48.png")
+    redoAction = editMenu->addAction(QIcon::fromTheme("edit-redo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-redo.svg"))
                                      , "&Redo",
                                      QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
                                      QKeySequence("CTRL+Y"));

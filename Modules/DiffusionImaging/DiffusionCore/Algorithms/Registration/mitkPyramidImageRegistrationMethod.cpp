@@ -249,7 +249,7 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
     caster_m->Update();
 
   }
-  catch( const itk::ExceptionObject &e )
+  catch( const itk::ExceptionObject &/*e*/ )
   {
     return ;
   }

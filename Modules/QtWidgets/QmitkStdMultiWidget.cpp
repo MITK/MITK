@@ -1986,6 +1986,9 @@ void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper
 void QmitkStdMultiWidget::SetDepartmentLogoPath( const char * path )
 {
   m_LogoRendering->SetLogoImagePath(path);
+  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
+  m_LogoRendering->Update(renderer);
+  RequestUpdate();
 }
 
 void QmitkStdMultiWidget::SetWidgetPlaneModeToSlicing( bool activate )

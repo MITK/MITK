@@ -22,11 +22,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 
 #include <itkRegularStepGradientDescentOptimizer.h>
-#include <itkMattesMutualInformationImageToImageMetric.h>
-#include <itkNormalizedCorrelationImageToImageMetric.h>
+#include <itkMattesMutualInformationImageToImageMetricv4.h>
+#include <itkCorrelationImageToImageMetricv4.h>
+#include <itkGradientDescentLineSearchOptimizerv4.h>
+
+#include <itkImageRegistrationMethodv4.h>
 
 #include <itkAffineTransform.h>
 #include <itkEuler3DTransform.h>
+
+#include <itkMattesMutualInformationImageToImageMetric.h>
+#include <itkNormalizedCorrelationImageToImageMetric.h>
 
 #include <itkMultiResolutionImageRegistrationMethod.h>
 #include <itkImageMomentsCalculator.h>
@@ -81,18 +87,70 @@ public:
   {
     RegistrationType* registration = dynamic_cast< RegistrationType* >( caller );
 
+    if( registration == NULL)
+      return;
+
     MITK_DEBUG << "\t - Pyramid level " << registration->GetCurrentLevel();
     if( registration->GetCurrentLevel() == 0 )
-      return;
+    { MITK_WARN("OptCommand") << "Cast to registration failed";
+          return;
+    }
 
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >(registration->GetOptimizer());
 
-    MITK_INFO << optimizer->GetStopConditionDescription()  << "\n"
+    if( optimizer == NULL)
+    { MITK_WARN("OptCommand") << "Cast to optimizer failed";
+          return;
+    }
+
+    MITK_INFO /*<< optimizer->GetStopConditionDescription()  << "\n"*/
                << optimizer->GetValue() << " : " << optimizer->GetCurrentPosition();
 
     optimizer->SetMaximumStepLength( optimizer->GetMaximumStepLength() * 0.25f );
     optimizer->SetMinimumStepLength( optimizer->GetMinimumStepLength() * 0.1f );
    // optimizer->SetNumberOfIterations( optimizer->GetNumberOfIterations() * 1.5f );
+  }
+
+  void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/){}
+};
+
+#include <itkGradientDescentLineSearchOptimizerv4.h>
+
+template <typename RegistrationType >
+class PyramidOptControlCommandv4 : public itk::Command
+{
+public:
+
+  typedef itk::GradientDescentLineSearchOptimizerv4 OptimizerType;
+
+  mitkClassMacro(PyramidOptControlCommandv4<RegistrationType>, itk::Command)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
+
+  void Execute(itk::Object *caller, const itk::EventObject & /*event*/)
+  {
+    RegistrationType* registration = dynamic_cast< RegistrationType* >( caller );
+
+    if( registration == NULL)
+      return;
+
+    MITK_DEBUG << "\t - Pyramid level " << registration->GetCurrentLevel();
+    if( registration->GetCurrentLevel() == 0 )
+      return;
+
+    OptimizerType* optimizer = dynamic_cast< OptimizerType* >( registration->GetOptimizer() );
+
+    if( optimizer == NULL)
+    { MITK_WARN("OptCommand4") << "Cast to optimizer failed";
+          return;
+    }
+
+    optimizer->SetNumberOfIterations( optimizer->GetNumberOfIterations() * 2.5 );
+    optimizer->SetMaximumStepSizeInPhysicalUnits( optimizer->GetMaximumStepSizeInPhysicalUnits() * 0.4);
+
+    MITK_INFO("Pyramid.Command.Iter") << optimizer->GetNumberOfIterations();
+    MITK_INFO("Pyramid.Command.MaxStep") << optimizer->GetMaximumStepSizeInPhysicalUnits();
+
   }
 
   void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/){}
@@ -109,6 +167,7 @@ public:
 
   void Execute(itk::Object *caller, const itk::EventObject & /*event*/)
   {
+
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >( caller );
 
     unsigned int currentIter = optimizer->GetCurrentIteration();
@@ -118,6 +177,33 @@ public:
 
   void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/)
   {
+
+  }
+};
+
+template <typename OptimizerType>
+class OptimizerIterationCommandv4 : public itk::Command
+{
+public:
+  itkNewMacro( OptimizerIterationCommandv4 )
+
+  void Execute(itk::Object *object, const itk::EventObject & event)
+  {
+    OptimizerType* optimizer = dynamic_cast< OptimizerType* >( object );
+
+    if( typeid( event ) != typeid( itk::IterationEvent ) )
+      { return; }
+
+    unsigned int currentIter = optimizer->GetCurrentIteration();
+    MITK_INFO << "[" << currentIter << "] : " << optimizer->GetCurrentMetricValue() << " : "
+              << optimizer->GetMetric()->GetParameters() ;
+              //<< " : " << optimizer->GetScales();
+
+  }
+
+  void Execute(const itk::Object * object, const itk::EventObject & event)
+  {
+
 
   }
 };

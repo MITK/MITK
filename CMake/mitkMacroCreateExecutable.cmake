@@ -73,7 +73,6 @@ macro(mitk_create_executable)
     if(ALL_META_DEPENDENCIES)
       add_dependencies(${MODULE_TARGET} ${ALL_META_DEPENDENCIES})
     endif()
-    add_dependencies(${MODULE_TARGET} MitkLegacyIO)
 
     # Create batch files for Windows platforms
     if(WIN32)

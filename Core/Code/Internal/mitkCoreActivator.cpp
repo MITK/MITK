@@ -302,7 +302,7 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
   // Add custom Reader / Writer Services
   m_FileReaders.push_back(new mitk::PointSetReaderService());
   m_FileWriters.push_back(new mitk::PointSetWriterService());
-  m_FileReaders.push_back(new mitk::RawImageFileReader());
+  m_FileReaders.push_back(new mitk::RawImageFileReaderService());
 
   m_ShaderRepositoryTracker->Open();
 

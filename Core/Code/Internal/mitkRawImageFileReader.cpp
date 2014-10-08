@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkRawImageIO.h>
 #include <itkImageFileReader.h>
 
-mitk::RawImageFileReader::RawImageFileReader()
+mitk::RawImageFileReaderService::RawImageFileReaderService()
   : AbstractFileReader(CustomMimeType(IOMimeTypes::RAW_MIMETYPE_NAME()), "ITK raw image reader")
 {
   Options defaultOptions;
@@ -65,12 +65,12 @@ mitk::RawImageFileReader::RawImageFileReader()
   this->RegisterService();
 }
 
-mitk::RawImageFileReader::RawImageFileReader(const mitk::RawImageFileReader& other)
+mitk::RawImageFileReaderService::RawImageFileReaderService(const mitk::RawImageFileReaderService& other)
   : AbstractFileReader(other)
 {
 }
 
-std::vector<itk::SmartPointer<mitk::BaseData> > mitk::RawImageFileReader::Read()
+std::vector<itk::SmartPointer<mitk::BaseData> > mitk::RawImageFileReaderService::Read()
 {
   std::vector<mitk::BaseData::Pointer> result;
 
@@ -128,7 +128,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::RawImageFileReader::Read()
 }
 
 template < typename TPixel, unsigned int VImageDimensions >
-mitk::BaseData::Pointer mitk::RawImageFileReader::TypedRead(const std::string& path, EndianityType endianity, int* size)
+mitk::BaseData::Pointer mitk::RawImageFileReaderService::TypedRead(const std::string& path, EndianityType endianity, int* size)
 {
   typedef itk::Image< TPixel, VImageDimensions > ImageType;
   typedef itk::ImageFileReader< ImageType > ReaderType;
@@ -176,7 +176,7 @@ mitk::BaseData::Pointer mitk::RawImageFileReader::TypedRead(const std::string& p
   return image.GetPointer();
 }
 
-mitk::RawImageFileReader*mitk::RawImageFileReader::Clone() const
+mitk::RawImageFileReaderService*mitk::RawImageFileReaderService::Clone() const
 {
-  return new RawImageFileReader(*this);
+  return new RawImageFileReaderService(*this);
 }

@@ -27,7 +27,7 @@ namespace mitk
  * The user must set the dimensionality, the dimensions and the pixel type.
  * If they are incorrect, the image will not be opened or the visualization will be incorrect.
  */
-class RawImageFileReader : public AbstractFileReader
+class RawImageFileReaderService : public AbstractFileReader
 {
 
 public:
@@ -38,11 +38,11 @@ public:
   /** Endianity of bits. */
   typedef enum {LITTLE, BIG} EndianityType;
 
-  RawImageFileReader();
+  RawImageFileReaderService();
 
 protected:
 
-  RawImageFileReader(const RawImageFileReader& other);
+  RawImageFileReaderService(const RawImageFileReaderService& other);
 
   virtual std::vector<itk::SmartPointer<BaseData> > Read();
 
@@ -53,7 +53,7 @@ private:
   template <typename TPixel, unsigned int VImageDimensions>
   mitk::BaseData::Pointer TypedRead(const std::string& path, EndianityType endianity, int* size);
 
-  RawImageFileReader* Clone() const;
+  RawImageFileReaderService* Clone() const;
 
   /** Vector containing dimensions of image to be read. */
   itk::Vector<int, 3> m_Dimensions;

@@ -297,9 +297,9 @@ namespace mitk {
     // They may ultimately be unecessary
 
     const mitk::AbstractTransformGeometry* abstractGeometry = dynamic_cast< const AbstractTransformGeometry * > (ourViewportGeometry);
-    if (abstractGeometry == NULL) MITK_WARN << "SliceRotator recieved an AbstractTransformGeometry, expecting a simple PlainGeometry, behaviour should be verified.";
+    if (abstractGeometry != NULL) MITK_WARN << "SliceRotator recieved an AbstractTransformGeometry, expecting a simple PlainGeometry, behaviour should be verified.";
     const mitk::DisplayGeometry* displayGeometry = dynamic_cast< const DisplayGeometry * > (ourViewportGeometry);
-    if (displayGeometry == NULL) MITK_WARN << "SliceRotator recieved a DisplayGeometry, expecting a simple PlainGeometry, behaviour should be verified.";
+    if (displayGeometry != NULL) MITK_WARN << "SliceRotator recieved a DisplayGeometry, expecting a simple PlainGeometry, behaviour should be verified.";
     // End sanity checks
 
     if (!ourViewportGeometry) return false;

@@ -121,6 +121,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     /** @brief This slot is called if the user cancels the creation of a new tool. */
     void OnAddSingleToolCanceled();
 
+    void OnTimeOut();
+
   protected slots:
 
    //help slots for enable/disable buttons
@@ -170,6 +172,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
    /** @brief This timer updates the IGT pipline and also the logging filter if logging is activated.*/
    QTimer* m_TrackingTimer;
+   QTimer* m_TimeoutTimer;
 
    /** Replaces the current navigation tool storage which is stored in m_toolStorage.
     *  Basically handles the microservice stuff: unregisteres the old storage, then

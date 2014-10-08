@@ -53,6 +53,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   , m_MultiWidget( NULL )
 {
   m_TrackingTimer = new QTimer(this);
+  m_TimeoutTimer = new QTimer(this);
   m_tracking = false;
   m_logging = false;
   m_loggedFrames = 0;
@@ -64,18 +65,24 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
 {
-  this->StoreUISettings();
-
-  try
+this->StoreUISettings();
+m_TrackingTimer->stop();
+m_TimeoutTimer->stop();
+delete m_TrackingTimer;
+delete m_TimeoutTimer;
+try
   {
-    //clean up worker thread
-    if(m_WorkerThread) {delete m_WorkerThread;}
-    if(m_Worker) {delete m_Worker;}
-    //remove the tracking volume
-    this->GetDataStorage()->Remove(m_TrackingVolumeNode);
-    //remove the tool storage
-    if(m_toolStorage) {m_toolStorage->UnRegisterMicroservice();}
-    if(m_TrackingDeviceSource) {m_TrackingDeviceSource->UnRegisterMicroservice();}
+  // wait for thread to finish
+  m_WorkerThread->terminate();
+  m_WorkerThread->wait();
+  //clean up worker thread
+  if(m_WorkerThread) {delete m_WorkerThread;}
+  if(m_Worker) {delete m_Worker;}
+  //remove the tracking volume
+  this->GetDataStorage()->Remove(m_TrackingVolumeNode);
+  //remove the tool storage
+  if(m_toolStorage) {m_toolStorage->UnRegisterMicroservice();}
+  if(m_TrackingDeviceSource) {m_TrackingDeviceSource->UnRegisterMicroservice();}
   }
   catch(std::exception& e) {MITK_WARN << "Unexpected exception during clean up of tracking toolbox view: " << e.what();}
   catch(...) {MITK_WARN << "Unexpected unknown error during clean up of tracking toolbox view!";}
@@ -98,6 +105,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_StartTracking, SIGNAL(clicked()), this, SLOT(OnStartTracking()) );
     connect( m_Controls->m_StopTracking, SIGNAL(clicked()), this, SLOT(OnStopTracking()) );
     connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(UpdateTrackingTimer()));
+    connect( m_TimeoutTimer, SIGNAL(timeout()), this, SLOT(OnTimeOut()));
     connect( m_Controls->m_ChooseFile, SIGNAL(clicked()), this, SLOT(OnChooseFileClicked()));
     connect( m_Controls->m_StartLogging, SIGNAL(clicked()), this, SLOT(StartLogging()));
     connect( m_Controls->m_StopLogging, SIGNAL(clicked()), this, SLOT(StopLogging()));
@@ -292,6 +300,7 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
 void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString errorMessage)
 {
   m_WorkerThread->quit();
+  m_WorkerThread->wait();
 
   //enable buttons
   this->m_Controls->m_MainWidget->setEnabled(true);
@@ -330,6 +339,7 @@ void QmitkMITKIGTTrackingToolboxView::OnDisconnect()
 void QmitkMITKIGTTrackingToolboxView::OnDisconnectFinished(bool success, QString errorMessage)
 {
   m_WorkerThread->quit();
+  m_WorkerThread->wait();
   m_Controls->m_MainWidget->setEnabled(true);
 
   if (!success)
@@ -360,6 +370,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
 void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QString errorMessage)
 {
   m_WorkerThread->quit();
+  m_WorkerThread->wait();
   this->m_Controls->m_MainWidget->setEnabled(true);
 
   if(!success)
@@ -408,6 +419,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
 void QmitkMITKIGTTrackingToolboxView::OnStopTrackingFinished(bool success, QString errorMessage)
 {
   m_WorkerThread->quit();
+  m_WorkerThread->wait();
   m_Controls->m_MainWidget->setEnabled(true);
   if(!success)
   {
@@ -519,6 +531,8 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
     m_Worker->SetTrackingDevice(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());
     m_Worker->SetDataStorage(this->GetDataStorage());
     m_WorkerThread->start();
+    m_TimeoutTimer->start(5000);
+    MITK_INFO << "Timeout Timer started";
     //disable controls until worker thread is finished
     this->m_Controls->m_MainWidget->setEnabled(false);
   }
@@ -526,7 +540,9 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 
 void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QString errorMessage)
 {
-  m_WorkerThread->quit();
+    m_TimeoutTimer->stop();
+    m_WorkerThread->quit();
+    m_WorkerThread->wait();
 
   //enable controls again
   this->m_Controls->m_MainWidget->setEnabled(true);
@@ -924,6 +940,15 @@ void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::Navigation
   m_toolStorage->RegisterAsMicroservice("no tracking device");
 }
 
+void QmitkMITKIGTTrackingToolboxView::OnTimeOut()
+{
+  MITK_INFO << "Time Out";
+  m_WorkerThread->terminate();
+  m_WorkerThread->wait();
+
+  m_TimeoutTimer->stop();
+}
+
 void QmitkMITKIGTTrackingToolboxView::StoreUISettings()
 {
   // persistence service does not directly work in plugins for now
@@ -1037,7 +1062,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ThreadFunc()
   default:
     MITK_WARN << "Undefined worker method was set ... something went wrong!";
     break;
-  }
+    }
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()

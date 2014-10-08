@@ -137,13 +137,13 @@ public:
 
   The pixel type is always being converted to double.
    \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method can be replaced by a method from ImagePixelWriteAccessor or ImagePixelReadAccessor */
-  DEPRECATED(double GetPixelValueByIndex(const itk::Index<3>& position, unsigned int timestep = 0));
+  DEPRECATED(double GetPixelValueByIndex(const itk::Index<3>& position, unsigned int timestep = 0, unsigned int component=0));
 
   /** @brief Get the pixel value at one specific world position.
 
   The pixel type is always being converted to double.
    \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method can be replaced by a method from ImagePixelWriteAccessor or ImagePixelReadAccessor */
-  DEPRECATED(double GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep = 0));
+  DEPRECATED(double GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep = 0, unsigned int component=0));
 
   //##Documentation
   //## @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.

@@ -47,19 +47,19 @@ public:
 
     typedef itk::Statistics::Histogram<double> HistogramType;
 
-    virtual const HistogramType* GetScalarHistogram(int t=0);
+    virtual const HistogramType* GetScalarHistogram(int t=0, unsigned int component=0);
 
     //##Documentation
     //## \brief Get the minimum for scalar images
-    virtual ScalarType GetScalarValueMin(int t=0);
+    virtual ScalarType GetScalarValueMin(int t=0, unsigned int component=0);
 
     //##Documentation
     //## \brief Get the maximum for scalar images
-    virtual ScalarType GetScalarValueMax(int t=0);
+    virtual ScalarType GetScalarValueMax(int t=0, unsigned int component=0);
 
     //##Documentation
     //## \brief Get the second smallest value for scalar images
-    virtual ScalarType GetScalarValue2ndMin(int t=0);
+    virtual ScalarType GetScalarValue2ndMin(int t=0, unsigned int component=0);
 
     //##Documentation
     //## \brief Get the smallest value for scalar images, but do not recompute it first
@@ -81,7 +81,7 @@ public:
 
     //##Documentation
     //## \brief Get the second largest value for scalar images
-    virtual ScalarType GetScalarValue2ndMax(int t=0);
+    virtual ScalarType GetScalarValue2ndMax(int t=0, unsigned int component=0);
 
     //##Documentation
     //## \brief Get the largest value for scalar images, but do not recompute it first
@@ -103,11 +103,11 @@ public:
 
     //##Documentation
     //## \brief Get the count of voxels with the smallest scalar value in the dataset
-    mitk::ScalarType GetCountOfMinValuedVoxels(int t = 0);
+    mitk::ScalarType GetCountOfMinValuedVoxels(int t = 0, unsigned int component=0);
 
     //##Documentation
     //## \brief Get the count of voxels with the largest scalar value in the dataset
-    mitk::ScalarType GetCountOfMaxValuedVoxels(int t = 0);
+    mitk::ScalarType GetCountOfMaxValuedVoxels(int t = 0, unsigned int component=0);
 
     //##Documentation
     //## \brief Get the count of voxels with the largest scalar value in the dataset
@@ -132,11 +132,14 @@ public:
     template < typename ItkImageType >
       friend void _ComputeExtremaInItkImage( const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t);
 
+    template < typename ItkImageType >
+      friend void _ComputeExtremaInItkVectorImage( const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t, unsigned int component);
+
 protected:
 
       virtual void ResetImageStatistics();
 
-      virtual void ComputeImageStatistics(int t=0);
+      virtual void ComputeImageStatistics(int t=0, unsigned int component=0);
 
       virtual void Expand( unsigned int timeSteps );
 

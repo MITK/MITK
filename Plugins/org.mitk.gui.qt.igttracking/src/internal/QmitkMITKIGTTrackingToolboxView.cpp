@@ -194,7 +194,6 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     else m_TrackingVolumeNode->SetOpacity(0.25);
 
     //Update List of available models for selected tool.
-    std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
     m_Controls->m_VolumeSelectionBox->clear();
     for(int i = 0; i < Compatibles.size(); i++)
     {

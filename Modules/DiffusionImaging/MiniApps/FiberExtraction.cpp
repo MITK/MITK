@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int FiberExtraction(int argc, char* argv[])
 {
+    MITK_INFO << "FiberExtraction";
     ctkCommandLineParser parser;
 
     parser.setTitle("Fiber Extraction");
@@ -136,8 +137,6 @@ int FiberExtraction(int argc, char* argv[])
             mitk::IOUtil::SaveBaseData(result, outFib);
         else
             MITK_INFO << "No valid fiber bundle extracted.";
-
-        MITK_INFO << "DONE";
     }
     catch (itk::ExceptionObject e)
     {

@@ -142,7 +142,6 @@ int TractogramAngularError(int argc, char* argv[])
             string outfilename = outRoot;
             outfilename.append("_ERROR_IMAGE.nrrd");
 
-            MITK_INFO << "writing " << outfilename;
             writer->SetFileName(outfilename.c_str());
             writer->SetInput(angularErrorImage);
             writer->Update();
@@ -182,8 +181,6 @@ int TractogramAngularError(int argc, char* argv[])
         file << sens;
 
         file.close();
-
-        MITK_INFO << "DONE";
     }
     catch (itk::ExceptionObject e)
     {

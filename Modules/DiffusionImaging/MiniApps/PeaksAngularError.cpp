@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int PeaksAngularError(int argc, char* argv[])
 {
+    MITK_INFO << "PeaksAngularError";
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("test", "t", ctkCommandLineParser::StringList, "Test images", "test direction images", us::Any(), false);
@@ -147,7 +148,6 @@ int PeaksAngularError(int argc, char* argv[])
             string outfilename = outRoot;
             outfilename.append("_ERROR_IMAGE.nrrd");
 
-            MITK_INFO << "writing " << outfilename;
             writer->SetFileName(outfilename.c_str());
             writer->SetInput(angularErrorImage);
             writer->Update();
@@ -187,8 +187,6 @@ int PeaksAngularError(int argc, char* argv[])
         file << sens;
 
         file.close();
-
-        MITK_INFO << "DONE";
     }
     catch (itk::ExceptionObject e)
     {

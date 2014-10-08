@@ -86,6 +86,7 @@ typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Poin
 
 int GibbsTracking(int argc, char* argv[])
 {
+    MITK_INFO << "GibbsTracking";
     ctkCommandLineParser parser;
 
     parser.setTitle("Gibbs Tracking");
@@ -220,7 +221,7 @@ int GibbsTracking(int argc, char* argv[])
         gibbsTracker->Update();
 
         mitk::FiberBundleX::Pointer mitkFiberBundle = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());
-        mitkFiberBundle->SetReferenceImage(mitkImage);
+        mitkFiberBundle->SetReferenceGeometry(mitkImage->GetGeometry());
 
         mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
         for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)

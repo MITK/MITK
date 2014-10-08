@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int FiberDirectionExtraction(int argc, char* argv[])
 {
+    MITK_INFO << "FiberDirectionExtraction";
     ctkCommandLineParser parser;
 
     parser.setTitle("Fiber Direction Extraction");
@@ -126,7 +127,6 @@ int FiberDirectionExtraction(int argc, char* argv[])
             outfilename.append(boost::lexical_cast<string>(i));
             outfilename.append(".nrrd");
 
-            MITK_INFO << "writing " << outfilename;
             writer->SetFileName(outfilename.c_str());
             writer->SetInput(itkImg);
             writer->Update();
@@ -156,14 +156,11 @@ int FiberDirectionExtraction(int argc, char* argv[])
                 string outfilename = outRoot;
                 outfilename.append("_NUM_DIRECTIONS.nrrd");
 
-                MITK_INFO << "writing " << outfilename;
                 writer->SetFileName(outfilename.c_str());
                 writer->SetInput(numDirImage);
                 writer->Update();
             }
         }
-
-        MITK_INFO << "DONE";
     }
     catch (itk::ExceptionObject e)
     {

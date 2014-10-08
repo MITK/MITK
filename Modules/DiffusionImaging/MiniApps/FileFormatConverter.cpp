@@ -50,14 +50,12 @@ int FileFormatConverter(int argc, char* argv[])
 
     try
     {
-        MITK_INFO << "Loading " << inName;
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inName, s1, s2, false );
         mitk::BaseData::Pointer baseData = infile.at(0);
 
         if ( dynamic_cast<DiffusionImage<short>*>(baseData.GetPointer()) )
         {
-            MITK_INFO << "Writing " << outName;
             DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(baseData.GetPointer());
             NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
             writer->SetFileName(outName);
@@ -71,7 +69,6 @@ int FileFormatConverter(int argc, char* argv[])
         }
         else if ( dynamic_cast<FiberBundleX*>(baseData.GetPointer()) )
         {
-            MITK_INFO << "Writing " << outName;
             FiberBundleXWriter::Pointer fibWriter = FiberBundleXWriter::New();
             fibWriter->SetFileName(outName.c_str());
             fibWriter->DoWrite( dynamic_cast<FiberBundleX*>(baseData.GetPointer()) );
@@ -94,7 +91,6 @@ int FileFormatConverter(int argc, char* argv[])
         MITK_INFO << "ERROR!?!";
         return EXIT_FAILURE;
     }
-    MITK_INFO << "DONE";
     return EXIT_SUCCESS;
 }
 RegisterDiffusionMiniApp(FileFormatConverter);

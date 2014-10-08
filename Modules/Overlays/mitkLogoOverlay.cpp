@@ -54,6 +54,53 @@ mitk::LogoOverlay::LocalStorage::~LocalStorage()
 
 mitk::LogoOverlay::LocalStorage::LocalStorage()
 {
+  m_LogoRep = vtkSmartPointer<mitkVtkLogoRepresentation>::New();
+  m_LogoWidget = vtkSmartPointer<vtkLogoWidget>::New();
+  m_LogoWidget->SetRepresentation(m_LogoRep);
+}
+
+void mitk::LogoOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
+{
+  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  if(ls->IsGenerateDataRequired(renderer,this))
+  {
+
+    vtkImageReader2* imageReader = m_readerFactory->CreateImageReader2(GetLogoImagePath().c_str());
+    if(imageReader)
+    {
+      imageReader->SetFileName(GetLogoImagePath().c_str());
+      imageReader->Update();
+      ls->m_LogoImage = imageReader->GetOutput();
+      imageReader->Delete();
+    }
+    else
+    {
+      ls->m_LogoImage = CreateMbiLogo();
+    }
+
+    ls->m_LogoRep->SetImage(ls->m_LogoImage);
+    ls->m_LogoRep->SetDragable(false);
+    ls->m_LogoRep->SetMoving(false);
+    ls->m_LogoRep->SetPickable(false);
+    ls->m_LogoRep->SetShowBorder(true);
+    ls->m_LogoRep->SetRenderer(renderer->GetVtkRenderer());
+    float size = GetRelativeSize(renderer);
+    ls->m_LogoRep->SetPosition2(size,size);
+    int corner = GetCornerPosition(renderer);
+    ls->m_LogoRep->SetCornerPosition(corner);
+    mitk::Point2D offset = GetOffsetVector(renderer);
+    ls->m_LogoRep->SetPosition(offset[0],offset[1]);
+    float opacity = 1.0;
+    GetOpacity(opacity,renderer);
+    ls->m_LogoRep->GetImageProperty()->SetOpacity(opacity);
+    ls->m_LogoRep->BuildRepresentation();
+    ls->UpdateGenerateDataTime();
+  }
+
+}
+
+vtkImageData *mitk::LogoOverlay::CreateMbiLogo()
+{
   vtkImageImport*     VtkImageImport = vtkImageImport::New();
   VtkImageImport->SetDataScalarTypeToUnsignedChar();
   VtkImageImport->SetNumberOfScalarComponents(mbiLogo_NumberOfScalars);
@@ -85,38 +132,7 @@ mitk::LogoOverlay::LocalStorage::LocalStorage()
   VtkImageImport->SetImportVoidPointer(ImageData);
   VtkImageImport->Modified();
   VtkImageImport->Update();
-  m_LogoImage = VtkImageImport->GetOutput();
-
-  m_LogoRep = vtkSmartPointer<mitkVtkLogoRepresentation>::New();
-  m_LogoWidget = vtkSmartPointer<vtkLogoWidget>::New();
-  m_LogoWidget->SetRepresentation(m_LogoRep);
-}
-
-void mitk::LogoOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
-{
-  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
-  if(ls->IsGenerateDataRequired(renderer,this))
-  {
-
-    ls->m_LogoRep->SetImage(ls->m_LogoImage);
-    ls->m_LogoRep->SetDragable(false);
-    ls->m_LogoRep->SetMoving(false);
-    ls->m_LogoRep->SetPickable(false);
-    ls->m_LogoRep->SetShowBorder(true);
-    ls->m_LogoRep->SetRenderer(renderer->GetVtkRenderer());
-    float size = GetRelativeSize(renderer);
-    ls->m_LogoRep->SetPosition2(size,size);
-    int corner = GetCornerPosition(renderer);
-    ls->m_LogoRep->SetCornerPosition(corner);
-    mitk::Point2D offset = GetOffsetVector(renderer);
-    ls->m_LogoRep->SetPosition(offset[0],offset[1]);
-    float opacity = 1.0;
-    GetOpacity(opacity,renderer);
-    ls->m_LogoRep->GetImageProperty()->SetOpacity(opacity);
-    ls->m_LogoRep->BuildRepresentation();
-    ls->UpdateGenerateDataTime();
-  }
-
+  return VtkImageImport->GetOutput();
 }
 
 void mitk::LogoOverlay::SetLogoImagePath(std::string path)

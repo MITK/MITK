@@ -1,5 +1,5 @@
 project(BlueBerry)
-cmake_minimum_required(VERSION 2.8.5)
+cmake_minimum_required(VERSION 2.8.9)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
 
@@ -12,7 +12,7 @@ include(MacroInstallCTKPlugin)
 include(FunctionCreateProvisioningFile)
 
 if(MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4250 /wd4275 /wd4251 /wd4503")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX /wd4250 /wd4275 /wd4251 /wd4503")
 endif()
 
 if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
@@ -22,8 +22,16 @@ endif()
 find_package(mbilog REQUIRED)
 include_directories(${mbilog_INCLUDE_DIRS})
 
-
-find_package(Qt4 4.7 REQUIRED)
+if(MITK_USE_Qt4)
+  find_package(Qt4 4.7 REQUIRED)
+else()
+  find_package(Qt5Concurrent ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+  find_package(Qt5Help ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+  find_package(Qt5Sql ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+  find_package(Qt5WebKitWidgets ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+  find_package(Qt5Widgets ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+  find_package(Qt5Xml ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+endif()
 
 if(QT_QMAKE_CHANGED)
   set(QT_HELPGENERATOR_EXECUTABLE NOTFOUND)
@@ -92,7 +100,9 @@ if(BLUEBERRY_USE_QT_HELP)
   endif()
 endif(BLUEBERRY_USE_QT_HELP)
 
-include(${QT_USE_FILE})
+if(MITK_USE_Qt4)
+  include(${QT_USE_FILE})
+endif()
 
 # =========  CTK specific CMake stuff ============
 cmake_policy(SET CMP0012 NEW)

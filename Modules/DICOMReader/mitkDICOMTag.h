@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPoint.h"
 #include "mitkVector.h"
+#include "mitkPoint.h"
 
 #include "MitkDICOMReaderExports.h"
 

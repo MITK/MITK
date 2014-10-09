@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 #include "mitkTestDCMLoading.h"
-
 #include <stack>
 
 mitk::TestDCMLoading::TestDCMLoading()

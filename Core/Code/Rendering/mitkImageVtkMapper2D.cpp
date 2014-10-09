@@ -707,7 +707,6 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       mitkLutProp->SetLookupTable(mitkLut);
       node->SetProperty( "LookupTable", mitkLutProp );
       renderingModeProperty->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR ); // USE lookuptable
-
     }
     // Otherwise do nothing - the default grayscale look-up table has already been set
   }

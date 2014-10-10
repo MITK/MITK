@@ -17,6 +17,8 @@ set(proj VTK)
 set(proj_DEPENDENCIES )
 set(VTK_DEPENDS ${proj})
 
+  set(VTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchVTK.cmake)
+
 if(NOT DEFINED VTK_DIR)
 
   set(additional_cmake_args )
@@ -86,6 +88,7 @@ if(NOT DEFINED VTK_DIR)
     PREFIX ${proj}-cmake
     URL ${VTK_URL}
     URL_MD5 ${VTK_URL_MD5}
+    PATCH_COMMAND ${VTK_PATCH_COMMAND}
     INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS

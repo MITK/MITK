@@ -51,10 +51,10 @@ QmitkMemoryUsageIndicatorView::QmitkMemoryUsageIndicatorView( QWidget *  /*paren
   QTimer *timer = new QTimer( this );
   QObject::connect( timer, SIGNAL( timeout() ), this, SLOT( UpdateMemoryUsage() ) );
   timer->start(1000);
-  m_LEDGreen = QmitkMemoryUsageIndicatorImagesGreen_xpm;
-  m_LEDYellow = QmitkMemoryUsageIndicatorImagesYellow_xpm;
-  m_LEDOrange = QmitkMemoryUsageIndicatorImagesOrange_xpm;
-  m_LEDRed = QmitkMemoryUsageIndicatorImagesRed_xpm;
+  m_LEDGreen = QPixmap(QmitkMemoryUsageIndicatorImagesGreen_xpm);
+  m_LEDYellow = QPixmap(QmitkMemoryUsageIndicatorImagesYellow_xpm);
+  m_LEDOrange = QPixmap(QmitkMemoryUsageIndicatorImagesOrange_xpm);
+  m_LEDRed = QPixmap(QmitkMemoryUsageIndicatorImagesRed_xpm);
   m_LED->setPixmap(m_LEDGreen);
   m_PreviousState = 0;
 }

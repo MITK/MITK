@@ -468,7 +468,8 @@ void QmitkDataStorageTableModel::sort( int column, Qt::SortOrder order /*= Qt::A
     DataNodeCompareFunction compareFunc(_CompareCriteria, _CompareOperator);
     std::sort(m_NodeSet.begin(), m_NodeSet.end(), compareFunc);
 
-    QAbstractTableModel::reset();
+    QAbstractTableModel::beginResetModel();
+    QAbstractTableModel::endResetModel();
   //}
 }
 

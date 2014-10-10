@@ -32,7 +32,11 @@ QmitkLevelWindowPresetDefinitionDialog::QmitkLevelWindowPresetDefinitionDialog(Q
   QObject::connect(presetView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortPresets(int)));
 
   presetView->verticalHeader()->setVisible(false);
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   presetView->horizontalHeader()->setResizeMode(QHeaderView::Fixed);
+#else
+  presetView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+#endif
 
   presetView->setModel(&m_SortModel);
 }

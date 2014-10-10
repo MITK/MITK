@@ -36,6 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //Qt
 #include <QList>
 #include <QPair>
+#include <QScopedPointer>
+#include <QString>
 
 class QWidget;
 class QString;

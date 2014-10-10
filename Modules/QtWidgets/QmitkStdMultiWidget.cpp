@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <qsplitter.h>
-#include <QMotifStyle>
 #include <QList>
 #include <QMouseEvent>
 #include <QTimer>

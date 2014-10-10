@@ -297,8 +297,8 @@ QMimeData *QmitkDataStorageTreeModel::mimeDataFromModelIndexList(const QModelInd
   }
 
   // ------------------ deprecated -----------------
-  ret->setData("application/x-qabstractitemmodeldatalist", QByteArray(treeItemAddresses.toAscii()));
-  ret->setData("application/x-mitk-datanodes", QByteArray(dataNodeAddresses.toAscii()));
+  ret->setData("application/x-qabstractitemmodeldatalist", QByteArray(treeItemAddresses.toLatin1()));
+  ret->setData("application/x-mitk-datanodes", QByteArray(dataNodeAddresses.toLatin1()));
   // --------------- end deprecated -----------------
 
   ret->setData(QmitkMimeTypes::DataStorageTreeItemPtrs, baTreeItemPtrs);
@@ -417,7 +417,8 @@ void QmitkDataStorageTreeModel::SetDataStorage( mitk::DataStorage* _DataStorage 
     mitk::DataNode::Pointer rootDataNode = mitk::DataNode::New();
     rootDataNode->SetName("Data Manager");
     m_Root = new TreeItem(rootDataNode, 0);
-    this->reset();
+    this->beginResetModel();
+    this->endResetModel();
 
     if(m_DataStorage.IsNotNull())
     {
@@ -842,7 +843,8 @@ void QmitkDataStorageTreeModel::Update()
 {
     if (m_DataStorage.IsNotNull())
     {
-        this->reset();
+        this->beginResetModel();
+        this->endResetModel();
 
         mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = m_DataStorage->GetAll();
 

@@ -50,10 +50,10 @@ std::string mitk::ContourModelSetSerializer::Serialize()
 
   try
   {
-    ContourModelSetWriter::Pointer writer = ContourModelSetWriter::New();
-    writer->SetFileName( fullname );
-    writer->SetInput( const_cast<ContourModelSet*>( contourSet ) );
-    writer->Write();
+    ContourModelSetWriter writer;
+    writer.SetOutputLocation( fullname );
+    writer.SetInput( const_cast<ContourModelSet*>( contourSet ) );
+    writer.Write();
   }
   catch (std::exception& e)
   {

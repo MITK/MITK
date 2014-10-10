@@ -21,31 +21,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include <locale>
 
-#include <mitkContourModelReader.h>
+#include <mitkIOUtil.h>
 
 
 
 static void TestContourModel(mitk::ContourModel* contour, std::string fileName)
 {
-  mitk::ContourModelWriter::Pointer writer = mitk::ContourModelWriter::New();
-
-  writer->SetInput(contour);
   std::string filename = std::string( MITK_TEST_OUTPUT_DIR ) + fileName;
 
-  writer->SetFileName(filename);
-  writer->Update();
+  mitk::IOUtil::Save(contour, filename);
 
-  MITK_TEST_CONDITION(writer->GetSuccess(),"write file");
+  std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = mitk::IOUtil::Load(filename);
 
-  mitk::ContourModelReader::Pointer reader = mitk::ContourModelReader::New();
-
-  reader->SetFileName(filename);
-
-  reader->Update();
-
-  MITK_TEST_CONDITION(reader->GetSuccess(), "read file");
-
-  mitk::ContourModel::Pointer contour2 = reader->GetOutput();
+  mitk::ContourModel::Pointer contour2 = dynamic_cast<mitk::ContourModel*>(readerOutput.at(0).GetPointer());
 
   MITK_TEST_CONDITION_REQUIRED(contour2.IsNotNull(),"contour is not null");
 

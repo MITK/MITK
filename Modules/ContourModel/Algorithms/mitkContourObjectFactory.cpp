@@ -24,8 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkContourModel.h"
 #include "mitkContourModelSet.h"
-#include "mitkContourModelIOFactory.h"
-#include "mitkContourModelWriterFactory.h"
 #include "mitkContourModelWriter.h"
 #include "mitkContourModelSetWriter.h"
 #include "mitkContourModelMapper2D.h"
@@ -37,21 +35,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ContourObjectFactory::ContourObjectFactory()
   : CoreObjectFactoryBase()
-  , m_ContourModelIOFactory(mitk::ContourModelIOFactory::New().GetPointer())
-  , m_ContourModelWriterFactory(mitk::ContourModelWriterFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
     MITK_DEBUG << "ContourObjectFactory c'tor" << std::endl;
-
-    itk::ObjectFactoryBase::RegisterFactory( m_ContourModelIOFactory );
-    itk::ObjectFactoryBase::RegisterFactory( m_ContourModelWriterFactory );
-
-    this->m_FileWriters.push_back(mitk::ContourModelWriter::New().GetPointer());
-    this->m_FileWriters.push_back(mitk::ContourModelSetWriter::New().GetPointer());
-
-    CreateFileExtensionsMap();
 
     alreadyDone = true;
   }
@@ -59,8 +47,6 @@ mitk::ContourObjectFactory::ContourObjectFactory()
 
 mitk::ContourObjectFactory::~ContourObjectFactory()
 {
-  itk::ObjectFactoryBase::UnRegisterFactory(m_ContourModelIOFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_ContourModelWriterFactory);
 }
 
 mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
@@ -139,13 +125,6 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::ContourObjectFactory::GetSaveFil
 
 void mitk::ContourObjectFactory::CreateFileExtensionsMap()
 {
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour Files"));
-
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour File"));
-
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt_set", "ContourModelSet Files"));
-
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt_set", "ContourModelSet File"));
 }
 
 const char* mitk::ContourObjectFactory::GetSaveFileExtensions()

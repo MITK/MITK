@@ -160,6 +160,12 @@ NOrderL, NrOdfDirections>
     {
     case QBAR_STANDARD:
     {
+        int n = vec.size();
+        double b0f = (double)b0;
+        for(int i=0; i<n; i++)
+        {
+            vec[i] = vec[i]/b0f;
+        }
         return vec;
         break;
     }

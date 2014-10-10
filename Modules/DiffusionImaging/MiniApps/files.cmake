@@ -29,4 +29,5 @@ set(CPP_FILES
     FiberExtraction.cpp
     FiberJoin.cpp
     DICOMLoader.cpp
+    TractometerMetrics.cpp
 )

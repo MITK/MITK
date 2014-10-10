@@ -32,6 +32,7 @@ using namespace mitk;
  */
 int TensorReconstruction(int argc, char* argv[])
 {
+    MITK_INFO << "TensorReconstruction";
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
@@ -58,12 +59,10 @@ int TensorReconstruction(int argc, char* argv[])
 
     try
     {
-        MITK_INFO << "Loading image ...";
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
         DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer());
 
-        MITK_INFO << "B0 threshold: " << threshold;
         typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, float > TensorReconstructionImageFilterType;
         TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
         filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
@@ -72,7 +71,6 @@ int TensorReconstruction(int argc, char* argv[])
         filter->Update();
 
         // Save tensor image
-        MITK_INFO << "writing image " << outfilename;
         itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
         io->SetFileType( itk::ImageIOBase::Binary );
         io->UseCompressionOn();

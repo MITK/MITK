@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>392</width>
+    <width>395</width>
     <height>761</height>
    </rect>
   </property>
@@ -88,7 +88,16 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <property name="horizontalSpacing">
@@ -141,7 +150,16 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <property name="horizontalSpacing">
@@ -297,7 +315,7 @@
             <number>90</number>
            </property>
            <property name="value">
-            <number>25</number>
+            <number>30</number>
            </property>
           </widget>
          </item>
@@ -366,6 +384,9 @@
        <widget class="QComboBox" name="m_ToolkitBox">
         <property name="toolTip">
          <string>Define SH coefficient convention (depends on toolkit)</string>
+        </property>
+        <property name="currentIndex">
+         <number>1</number>
         </property>
         <item>
          <property name="text">

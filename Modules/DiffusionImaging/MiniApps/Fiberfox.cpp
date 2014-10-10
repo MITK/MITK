@@ -39,6 +39,7 @@ namespace mitk
 {
 int Fiberfox(int argc, char* argv[])
 {
+    MITK_INFO << "Fiberfox";
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("out", "o", ctkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);

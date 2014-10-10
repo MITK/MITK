@@ -47,6 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int MultishellMethods(int argc, char* argv[])
 {
+    MITK_INFO << "MultishellMethods";
   ctkCommandLineParser parser;
 
   parser.setTitle("Multishell Methods");
@@ -83,7 +84,6 @@ int MultishellMethods(int argc, char* argv[])
 
     if ( dynamic_cast<mitk::DiffusionImage<short>*>(baseData.GetPointer()) )
     {
-      MITK_INFO << "Writing " << outName;
       mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(baseData.GetPointer());
       typedef itk::RadialMultishellToSingleshellImageFilter<short, short> FilterType;
 
@@ -224,7 +224,6 @@ int MultishellMethods(int argc, char* argv[])
     MITK_INFO << "ERROR!?!";
     return EXIT_FAILURE;
   }
-  MITK_INFO << "DONE";
   return EXIT_SUCCESS;
 }
 RegisterDiffusionMiniApp(MultishellMethods);

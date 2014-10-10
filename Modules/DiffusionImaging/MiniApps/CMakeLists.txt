@@ -37,6 +37,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     NetworkCreation.cpp
     NetworkStatistics.cpp
     DwiDenoising.cpp
+    TractometerMetrics.cpp
   )
 
   # deprecated

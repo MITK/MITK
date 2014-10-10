@@ -38,7 +38,7 @@ namespace mitk
 
     typedef mitk::FiberBundleX OutputType;
 
-    mitkClassMacro( FiberBundleXReader, BaseDataSource );
+    mitkClassMacro( FiberBundleXReader, BaseDataSource )
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -51,13 +51,9 @@ namespace mitk
 
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
-//    itkGetMacro(GroupFiberBundleX, FiberGroupType::Pointer);
-//    itkGetMacro(TractContainer, ContainerType::Pointer);
-
     virtual void Update();
 
     BaseDataSource::DataObjectPointer MakeOutput(const DataObjectIdentifierType &name);
-
     BaseDataSource::DataObjectPointer MakeOutput( DataObjectPointerArraySizeType idx);
 
   protected:
@@ -71,7 +67,6 @@ namespace mitk
     std::string m_FileName;
     std::string m_FilePrefix;
     std::string m_FilePattern;
-
 
   private:
     void operator=(const Self&); //purposely not implemented

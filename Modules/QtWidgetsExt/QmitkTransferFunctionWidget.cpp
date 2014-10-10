@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkTransferFunctionWidget.h"
 
 #include <mitkTransferFunctionProperty.h>
-#include <QPlastiqueStyle>
 
 QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
                                                          Qt::WindowFlags f) :

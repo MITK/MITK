@@ -126,7 +126,8 @@ void QmitkCorrespondingPointSetsModel::AddObservers()
 
 void QmitkCorrespondingPointSetsModel::OnPointSetChanged(const itk::EventObject&)
 {
-  QAbstractTableModel::reset();
+  QAbstractTableModel::beginResetModel();
+  QAbstractTableModel::endResetModel();
 }
 void QmitkCorrespondingPointSetsModel::SetPointSetNodes( std::vector<mitk::DataNode*> nodes )
 {
@@ -147,7 +148,8 @@ void QmitkCorrespondingPointSetsModel::SetPointSetNodes( std::vector<mitk::DataN
     m_ReferencePointSetNode = NULL;
   }
   this->AddObservers();
-  QAbstractTableModel::reset();
+  QAbstractTableModel::beginResetModel();
+  QAbstractTableModel::endResetModel();
 }
 
 void QmitkCorrespondingPointSetsModel::SetTimeStep(int t)
@@ -156,7 +158,8 @@ void QmitkCorrespondingPointSetsModel::SetTimeStep(int t)
     return;
 
   m_TimeStepper->SetPos(t);
-  QAbstractTableModel::reset();
+  QAbstractTableModel::beginResetModel();
+  QAbstractTableModel::endResetModel();
 }
 
 int QmitkCorrespondingPointSetsModel::GetTimeStep() const
@@ -433,7 +436,8 @@ void QmitkCorrespondingPointSetsModel::MoveSelectedPointUp()
   mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStepper->GetPos());
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP,tsInMS, pointSet->GetPoint(selectedID, m_TimeStepper->GetPos()), selectedID, true);
   pointSet->ExecuteOperation(doOp);
-  QAbstractTableModel::reset();
+  QAbstractTableModel::beginResetModel();
+  QAbstractTableModel::endResetModel();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   emit SignalPointSetChanged();
 }
@@ -463,7 +467,8 @@ void QmitkCorrespondingPointSetsModel::MoveSelectedPointDown()
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, tsInMS, pointSet->GetPoint(selectedID, m_TimeStepper->GetPos()), selectedID, true);
   pointSet->ExecuteOperation(doOp);
 
-  QAbstractTableModel::reset();
+  QAbstractTableModel::beginResetModel();
+  QAbstractTableModel::endResetModel();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   emit SignalPointSetChanged();
 }
@@ -511,7 +516,8 @@ void QmitkCorrespondingPointSetsModel::RemoveSelectedPoint()
   delete delStateEvent;
 
 
-  QAbstractTableModel::reset();
+  QAbstractTableModel::beginResetModel();
+  QAbstractTableModel::endResetModel();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   emit SignalPointSetChanged();
 }
@@ -561,7 +567,8 @@ void QmitkCorrespondingPointSetsModel::MoveSelectedPoint(int targetID)
     selectedID = pointSet->SearchSelectedPoint(m_TimeStepper->GetPos());
   }
 
-  QAbstractTableModel::reset();
+  QAbstractTableModel::beginResetModel();
+  QAbstractTableModel::endResetModel();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   emit SignalPointSetChanged();
 }
@@ -662,7 +669,8 @@ void QmitkCorrespondingPointSetsModel::ClearSelectedPointSet()
     this->m_TimeStepper->SetPos(oldTimeStep);
   }
 
-  QAbstractTableModel::reset();
+  QAbstractTableModel::beginResetModel();
+  QAbstractTableModel::endResetModel();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   emit SignalPointSetChanged();
 }
@@ -691,7 +699,8 @@ void QmitkCorrespondingPointSetsModel::ClearCurrentTimeStep()
     this->RemoveSelectedPoint();
   }
 
-  QAbstractTableModel::reset();
+  QAbstractTableModel::beginResetModel();
+  QAbstractTableModel::endResetModel();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   emit SignalPointSetChanged();
 }

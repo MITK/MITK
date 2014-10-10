@@ -50,7 +50,8 @@ QmitkPointListModel::~QmitkPointListModel()
 void QmitkPointListModel::SetPointSetNode( mitk::DataNode* pointSetNode )
 {
   this->ObserveNewPointSet( pointSetNode );
-  QAbstractListModel::reset();
+  QAbstractListModel::beginResetModel();
+  QAbstractListModel::beginResetModel();
   emit SignalUpdateSelection();
 }
 
@@ -62,7 +63,8 @@ mitk::PointSet* QmitkPointListModel::GetPointSet() const
 void QmitkPointListModel::SetTimeStep(int t)
 {
   m_TimeStep = t;
-  QAbstractListModel::reset();
+  QAbstractListModel::beginResetModel();
+  QAbstractListModel::endResetModel();
   emit SignalUpdateSelection();
 }
 
@@ -111,7 +113,8 @@ void QmitkPointListModel::ObserveNewPointSet( mitk::DataNode* pointSetNode )
 
 void QmitkPointListModel::OnPointSetChanged(const itk::EventObject&)
 {
-  QAbstractListModel::reset();
+  QAbstractListModel::beginResetModel();
+  QAbstractListModel::endResetModel();
   emit SignalUpdateSelection();
 }
 
@@ -126,7 +129,8 @@ void QmitkPointListModel::OnPointSetDeleted(const itk::EventObject&)
 
   m_PointSetModifiedObserverTag = 0;
   m_PointSetDeletedObserverTag = 0;
-  QAbstractListModel::reset();
+  QAbstractListModel::beginResetModel();
+  QAbstractListModel::endResetModel();
 }
 
 int QmitkPointListModel::rowCount(const QModelIndex&) const

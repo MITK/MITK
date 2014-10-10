@@ -369,7 +369,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
         }
     }
 
-    boost::property_tree::xml_writer_settings<char> writerSettings(' ', 2);
+    boost::property_tree::xml_writer_settings<std::string> writerSettings(' ', 2);
     boost::property_tree::xml_parser::write_xml(filename, parameters, std::locale(), writerSettings);
 
     try{

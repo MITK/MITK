@@ -20,11 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
+  : m_SegmentationBinaryImage(NULL)
+  , m_MaxSpacing(5)
+  , m_NegativeNormalCounter(0)
+  , m_PositiveNormalCounter(0)
+  , m_UseProgressBar(false)
+  , m_ProgressStepSize(1)
 {
-  m_MaxSpacing = 5;
-  this->m_UseProgressBar = false;
-  this->m_ProgressStepSize = 1;
-
   mitk::Surface::Pointer output = mitk::Surface::New();
   this->SetNthOutput(0, output.GetPointer());
 }

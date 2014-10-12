@@ -246,15 +246,15 @@ int main(int argc, char* argv[])
     reader->LoadImages();
     mitk::Image::Pointer image = reader->GetOutput(0).GetMitkImage();
     MITK_INFO << "---- Output image:";
-    mitk::Geometry3D::Pointer geo3D = image->GetGeometry();
+    mitk::BaseGeometry::Pointer geo3D = image->GetGeometry();
     if (geo3D.IsNotNull())
     {
       mitk::SlicedGeometry3D::Pointer sg = dynamic_cast<mitk::SlicedGeometry3D*>(geo3D.GetPointer());
       if (sg.IsNotNull())
       {
         unsigned int nos = sg->GetSlices();
-        mitk::Geometry2D::Pointer first = sg->GetGeometry2D(0);
-        mitk::Geometry2D::Pointer last = sg->GetGeometry2D(nos-1);
+        mitk::PlaneGeometry::ConstPointer first = sg->GetPlaneGeometry(0);
+        mitk::PlaneGeometry::ConstPointer last = sg->GetPlaneGeometry(nos-1);
 
         mitk::Point3D firstOrigin = first->GetOrigin();
         mitk::Point3D lastOrigin = last->GetOrigin();

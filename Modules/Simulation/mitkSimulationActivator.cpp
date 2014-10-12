@@ -51,4 +51,4 @@ namespace mitk
   };
 }
 
-US_EXPORT_MODULE_ACTIVATOR(MitkSimulation, mitk::SimulationActivator);
+US_EXPORT_MODULE_ACTIVATOR(mitk::SimulationActivator);

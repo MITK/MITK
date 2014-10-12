@@ -36,7 +36,6 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
 {
   //First of all we have to build the equation-system from the existing contour-edge-points
   this->CreateSolutionMatrixAndFunctionValues();
-
   //Then we solve the equation-system via QR - decomposition. The interpolation weights are obtained in that way
   vnl_qr<double> solver (m_SolutionMatrix);
   m_Weights = solver.solve(m_FunctionValues);
@@ -452,29 +451,24 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateOutputInformation()
 
 void mitk::CreateDistanceImageFromSurfaceFilter::PrintEquationSystem()
 {
-  std::ofstream esfile;
-  esfile.open("C:/Users/fetzer/Desktop/equationSystem/es.txt");
-  esfile<<"Nummber of rows: "<<m_SolutionMatrix.rows()<<" ****** Number of columns: "<<m_SolutionMatrix.columns()<<endl;
-  esfile<<"[ ";
+  std::stringstream out;
+  out<<"Nummber of rows: "<<m_SolutionMatrix.rows()<<" ****** Number of columns: "<<m_SolutionMatrix.columns()<<endl;
+  out<<"[ ";
   for (unsigned int i = 0; i < m_SolutionMatrix.rows(); i++)
   {
     for (unsigned int j = 0; j < m_SolutionMatrix.columns(); j++)
     {
-      esfile<<m_SolutionMatrix(i,j)<<"   ";
+      out<<m_SolutionMatrix(i,j)<<"   ";
     }
-    esfile<<";"<<endl;
+    out<<";"<<endl;
   }
-  esfile<<" ]";
-  esfile.close();
+  out<<" ]\n\n\n";
 
-  std::ofstream centersFile;
-  centersFile.open("C:/Users/fetzer/Desktop/equationSystem/centers.txt");
   for (unsigned int i = 0; i < m_Centers.size(); i++)
   {
-    centersFile<<m_Centers.at(i)<<";"<<endl;
+    out<<m_Centers.at(i)<<";"<<endl;
   }
-  centersFile.close();
-
+  std::cout<<"Equation system: \n\n\n"<<out.str();
 }
 
 

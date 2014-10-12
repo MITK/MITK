@@ -74,20 +74,6 @@ float mitk::SegTool2D::CanHandleEvent( InteractionEvent const *stateEvent) const
     return 0.0; // we don't want anything but 2D
 
   return 1.0;
-
-//   //This are the mouse event that are used by the statemachine patterns for zooming and panning. This must be possible although a tool is activ
-//   if (stateEvent->GetId() == EIDRIGHTMOUSEBTN || stateEvent->GetId() == EIDMIDDLEMOUSEBTN || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDCTRL ||
-//     stateEvent->GetId() == EIDMIDDLEMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDMOUSEMOVE ||
-//     stateEvent->GetId() == EIDMIDDLEMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNRELEASE )
-//   {
-//     //Since the usual segmentation tools currently do not need right click interaction but the mitkDisplayVectorInteractor
-//     return 0.0;
-//   }
-//   else
-//   {
-//     return 1.0;
-//   }
-
 }
 
 
@@ -259,11 +245,18 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
 
     mitk::PlaneGeometry::Pointer plane = const_cast<mitk::PlaneGeometry*>(planeGeometry);
 
-    this->AddContourmarker();
-    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, plane);
-    contour->DisconnectPipeline();
+    if (contour->GetVtkPolyData()->GetNumberOfPoints() > 0)
+    {
+      this->AddContourmarker();
+      mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, plane);
+      contour->DisconnectPipeline();
+    }
+    else
+    {
+      // Remove contour!
+      mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(plane);
+    }
   }
-
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -357,6 +350,7 @@ unsigned int mitk::SegTool2D::AddContourmarker()
   us::ServiceReference<PlanePositionManagerService> serviceRef =
       us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
   PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
+
   unsigned int slicePosition = m_LastEventSender->GetSliceNavigationController()->GetSlice()->GetPos();
 
   // the first geometry is needed otherwise restoring the position is not working

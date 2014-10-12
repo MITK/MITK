@@ -346,7 +346,7 @@ public:
     // Create segmentation image
     unsigned int dimensions1[] = {10, 10, 10};
     mitk::Image::Pointer segmentation_1 = createImage(dimensions1);
-    mitk::Geometry3D* geo_1 = segmentation_1->GetGeometry();
+    mitk::BaseGeometry* geo_1 = segmentation_1->GetGeometry();
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
 
     // Create some contours

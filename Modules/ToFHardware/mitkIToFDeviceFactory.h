@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFCameraDevice.h"
 #include <MitkToFHardwareExports.h>
 //for microservices
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 
 namespace mitk
 {
@@ -63,5 +63,5 @@ namespace mitk
 IToFDeviceFactory is declared a MicroService interface. See
 MicroService documenation for more details.
 */
-US_DECLARE_SERVICE_INTERFACE(mitk::IToFDeviceFactory, "org.mitk.services.IToFDeviceFactory")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::IToFDeviceFactory, "org.mitk.services.IToFDeviceFactory")
 #endif

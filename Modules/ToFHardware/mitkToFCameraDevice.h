@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkFastMutexLock.h"
 
 // Microservices
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 
 namespace mitk
 {
@@ -230,5 +230,5 @@ namespace mitk
 ToFCameraDevice is declared a MicroService interface. See
 MicroService documenation for more details.
 */
-US_DECLARE_SERVICE_INTERFACE(mitk::ToFCameraDevice, "org.mitk.services.ToFCameraDevice")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::ToFCameraDevice, "org.mitk.services.ToFCameraDevice")
 #endif

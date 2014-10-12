@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 #include "usModuleContext.h"
 #include "usServiceEvent.h"
-#include "usServiceInterface.h"
+#include "mitkServiceInterface.h"
 
 
 

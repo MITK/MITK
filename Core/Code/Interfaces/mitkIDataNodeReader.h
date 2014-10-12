@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKIDATANODEREADER_H
 
 #include <mitkDataNode.h>
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 
 namespace mitk {
 
@@ -55,6 +55,6 @@ struct IDataNodeReader
 
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::IDataNodeReader, "org.mitk.IDataNodeReader")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::IDataNodeReader, "org.mitk.IDataNodeReader")
 
 #endif // MITKIDATANODEREADER_H

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkISimulationService_h
 
 #include <mitkSimulation.h>
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include <MitkSimulationExports.h>
 
 namespace mitk
@@ -42,6 +42,6 @@ namespace mitk
   };
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::ISimulationService, "org.mitk.ISimulationService");
+MITK_DECLARE_SERVICE_INTERFACE(mitk::ISimulationService, "org.mitk.ISimulationService");
 
 #endif

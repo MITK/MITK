@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 
 #include <string>
 #include <vector>
@@ -65,6 +65,6 @@ void swap(CustomMimeType& l, CustomMimeType& r);
 
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::CustomMimeType, "org.mitk.CustomMimeType")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::CustomMimeType, "org.mitk.CustomMimeType")
 
 #endif // MITKCUSTOMMIMETYPE_H

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDevice.h"
 
 // Microservices
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
 
@@ -152,6 +152,6 @@ private:
 };
 
 // This is the microservice declaration. Do not meddle!
-US_DECLARE_SERVICE_INTERFACE(QmitkUSAbstractCustomWidget, "org.mitk.QmitkUSAbstractCustomWidget")
+MITK_DECLARE_SERVICE_INTERFACE(QmitkUSAbstractCustomWidget, "org.mitk.QmitkUSAbstractCustomWidget")
 
 #endif // QmitkUSAbstractCustomWidget_h

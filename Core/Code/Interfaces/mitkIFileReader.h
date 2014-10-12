@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIFileIO.h>
 #include <mitkDataStorage.h>
 
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 
 namespace mitk {
   class BaseData;
@@ -95,6 +95,6 @@ struct MITK_CORE_EXPORT IFileReader : public IFileIO
 
 } // namespace mitk
 
-US_DECLARE_SERVICE_INTERFACE(mitk::IFileReader, "org.mitk.IFileReader")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::IFileReader, "org.mitk.IFileReader")
 
 #endif /* IFileReader_H_HEADER_INCLUDED_C1E7E521 */

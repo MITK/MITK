@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkIPropertyAliases_h
 #define mitkIPropertyAliases_h
 
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include <string>
 #include <vector>
 #include <MitkCoreExports.h>
@@ -91,6 +91,6 @@ namespace mitk
   };
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::IPropertyAliases, "org.mitk.IPropertyAliases")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::IPropertyAliases, "org.mitk.IPropertyAliases")
 
 #endif

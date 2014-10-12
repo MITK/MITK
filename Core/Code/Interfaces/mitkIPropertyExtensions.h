@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkIPropertyExtensions_h
 
 #include <mitkPropertyExtension.h>
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include <string>
 #include <MitkCoreExports.h>
 
@@ -77,6 +77,6 @@ namespace mitk
   };
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::IPropertyExtensions, "org.mitk.IPropertyExtensions")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::IPropertyExtensions, "org.mitk.IPropertyExtensions")
 
 #endif

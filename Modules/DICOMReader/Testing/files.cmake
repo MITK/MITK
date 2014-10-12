@@ -7,7 +7,7 @@ set(MODULE_CUSTOM_TESTS
   mitkDICOMITKSeriesGDCMReaderBasicsTest.cpp
 )
 
-set(TEST_CPP_FILES
+set(CPP_FILES
   mitkDICOMNullFileReader.cpp
   mitkDICOMFilenameSorter.cpp
 )

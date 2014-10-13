@@ -23,7 +23,8 @@
 #include "usModuleResource.h"
 
 #include "usAtomicInt_p.h"
-#include "usModuleResourceTree_p.h"
+#include "usModuleResourceContainer_p.h"
+#include "usModuleInfo.h"
 
 #include <string>
 
@@ -34,32 +35,22 @@ class ModuleResourcePrivate
 
 public:
 
-  ModuleResourcePrivate()
-    : associatedResourceTree(NULL)
-    , node(-1)
-    , size(0)
-    , data(NULL)
-    , isFile(false)
-    , isCompressed(false)
+  ModuleResourcePrivate(const ModuleResourceContainer* rc)
+    : resourceContainer(rc)
     , ref(1)
   {}
 
+  void InitFilePath(const std::string& file);
+
+  const ModuleResourceContainer* const resourceContainer;
+
+  ModuleResourceContainer::Stat stat;
+
   std::string fileName;
   std::string path;
-  std::string filePath;
-
-  std::vector<ModuleResourceTree*> resourceTrees;
-  const ModuleResourceTree* associatedResourceTree;
-
-  int node;
-  int32_t size;
-  const unsigned char* data;
-  unsigned char* uncompressedData;
 
   mutable std::vector<std::string> children;
-
-  bool isFile;
-  bool isCompressed;
+  mutable std::vector<uint32_t> childNodes;
 
   /**
    * Reference count for implicitly shared private implementation.
@@ -67,34 +58,29 @@ public:
   AtomicInt ref;
 };
 
-ModuleResource::ModuleResource()
-  : d(new ModuleResourcePrivate)
+void ModuleResourcePrivate::InitFilePath(const std::string& file)
 {
-}
-
-ModuleResource::ModuleResource(const ModuleResource &resource)
-  : d(resource.d)
-{
-  d->ref.Ref();
-}
-
-ModuleResource::ModuleResource(const std::string& _file, ModuleResourceTree* associatedResourceTree,
-                               const std::vector<ModuleResourceTree*>& resourceTrees)
-  : d(new ModuleResourcePrivate)
-{
-  d->resourceTrees = resourceTrees;
-  d->associatedResourceTree = associatedResourceTree;
-
-  std::string file = _file;
-  if (file.empty()) file = "/";
-  if (file[0] != '/') file = std::string("/") + file;
-
-  std::size_t index = file.find_last_of('/');
-  if (index < file.size()-1)
+  std::string normalizedFile = file;
+  if (normalizedFile.empty() || normalizedFile[0] != '/')
   {
-    d->fileName = file.substr(index+1);
+    normalizedFile = '/' + normalizedFile;
   }
-  std::string rawPath = file.substr(0,index+1);
+
+  std::string rawPath;
+  std::size_t index = normalizedFile.find_last_of('/');
+  if (index == std::string::npos)
+  {
+    fileName = normalizedFile;
+  }
+  else if (index < normalizedFile.size()-1)
+  {
+    fileName = normalizedFile.substr(index+1);
+    rawPath = normalizedFile.substr(0,index+1);
+  }
+  else
+  {
+    rawPath = normalizedFile;
+  }
 
   // remove duplicate /
   std::string::value_type lastChar = 0;
@@ -105,21 +91,40 @@ ModuleResource::ModuleResource(const std::string& _file, ModuleResourceTree* ass
       continue;
     }
     lastChar = rawPath[i];
-    d->path.push_back(lastChar);
+    path.push_back(lastChar);
   }
-
-  d->filePath = d->path + d->fileName;
-
-  d->node = d->associatedResourceTree->FindNode(GetResourcePath());
-  if (d->node != -1)
+  if (path.empty())
   {
-    d->isFile = !d->associatedResourceTree->IsDir(d->node);
-    if (d->isFile)
-    {
-      d->data = d->associatedResourceTree->GetData(d->node, &d->size);
-      d->isCompressed = d->associatedResourceTree->IsCompressed(d->node);
-    }
+    path.push_back('/');
   }
+}
+
+ModuleResource::ModuleResource()
+  : d(new ModuleResourcePrivate(NULL))
+{
+}
+
+ModuleResource::ModuleResource(const ModuleResource &resource)
+  : d(resource.d)
+{
+  d->ref.Ref();
+}
+
+ModuleResource::ModuleResource(const std::string& file, const ModuleResourceContainer& resourceContainer)
+  : d(new ModuleResourcePrivate(&resourceContainer))
+{
+  d->InitFilePath(file);
+
+  d->stat.filePath = d->resourceContainer->GetModuleInfo()->name + d->path + d->fileName;
+
+  d->resourceContainer->GetStat(d->stat);
+}
+
+ModuleResource::ModuleResource(int index, const ModuleResourceContainer& resourceContainer)
+  : d(new ModuleResourcePrivate(&resourceContainer))
+{
+  d->resourceContainer->GetStat(index, d->stat);
+  d->InitFilePath(d->stat.filePath.substr(d->resourceContainer->GetModuleInfo()->name.size()));
 }
 
 ModuleResource::~ModuleResource()
@@ -147,7 +152,7 @@ bool ModuleResource::operator <(const ModuleResource& resource) const
 
 bool ModuleResource::operator ==(const ModuleResource& resource) const
 {
-  return d->associatedResourceTree == resource.d->associatedResourceTree &&
+  return d->resourceContainer == resource.d->resourceContainer &&
       this->GetResourcePath() == resource.GetResourcePath();
 }
 
@@ -158,12 +163,7 @@ bool ModuleResource::operator !=(const ModuleResource &resource) const
 
 bool ModuleResource::IsValid() const
 {
-  return d->associatedResourceTree && d->associatedResourceTree->IsValid() && d->node > -1;
-}
-
-bool ModuleResource::IsCompressed() const
-{
-  return d->isCompressed;
+  return d->resourceContainer && d->resourceContainer->IsValid() && d->stat.index > -1;
 }
 
 ModuleResource::operator bool_type() const
@@ -183,7 +183,7 @@ std::string ModuleResource::GetPath() const
 
 std::string ModuleResource::GetResourcePath() const
 {
-  return d->filePath;
+  return d->path + d->fileName;
 }
 
 std::string ModuleResource::GetBaseName() const
@@ -210,55 +210,73 @@ std::string ModuleResource::GetCompleteSuffix() const
 
 bool ModuleResource::IsDir() const
 {
-  return !d->isFile;
+  return d->stat.isDir;
 }
 
 bool ModuleResource::IsFile() const
 {
-  return d->isFile;
+  return !d->stat.isDir;
 }
 
 std::vector<std::string> ModuleResource::GetChildren() const
 {
-  if (d->isFile || !IsValid()) return d->children;
+  if (!IsValid() || !IsDir()) return d->children;
 
-  if (!d->children.empty()) return d->children;
-
-  bool indexPastAssociatedResTree = false;
-  for (std::size_t i = 0; i < d->resourceTrees.size(); ++i)
+  if (d->children.empty())
   {
-    if (d->resourceTrees[i] == d->associatedResourceTree)
-    {
-      indexPastAssociatedResTree = true;
-      d->associatedResourceTree->GetChildren(d->node, d->children);
-    }
-    else if (indexPastAssociatedResTree)
-    {
-      int nodeIndex = d->resourceTrees[i]->FindNode(GetPath());
-      if (nodeIndex > -1)
-      {
-        d->resourceTrees[i]->GetChildren(d->node, d->children);
-      }
-    }
+    d->resourceContainer->GetChildren(d->stat.filePath, true,
+                                      d->children, d->childNodes);
   }
   return d->children;
 }
 
-int ModuleResource::GetSize() const
+std::vector<ModuleResource> ModuleResource::GetChildResources() const
 {
-  return d->size;
+  std::vector<ModuleResource> childResources;
+
+  if (!IsValid() || !IsDir()) return childResources;
+
+  if (d->childNodes.empty())
+  {
+    d->resourceContainer->GetChildren(this->GetResourcePath(), true,
+                                      d->children, d->childNodes);
+  }
+
+  for (std::vector<uint32_t>::const_iterator iter = d->childNodes.begin(),
+       iterEnd = d->childNodes.end(); iter != iterEnd; ++iter)
+  {
+    childResources.push_back(ModuleResource(static_cast<int>(*iter), *d->resourceContainer));
+  }
+  return childResources;
 }
 
-const unsigned char* ModuleResource::GetData() const
+int ModuleResource::GetSize() const
 {
-  if (!IsValid()) return NULL;
-  return d->data;
+  return d->stat.uncompressedSize;
+}
+
+time_t ModuleResource::GetLastModified() const
+{
+  return d->stat.modifiedTime;
 }
 
 std::size_t ModuleResource::Hash() const
 {
   using namespace US_HASH_FUNCTION_NAMESPACE;
-  return US_HASH_FUNCTION(std::string, this->GetResourcePath());
+  return US_HASH_FUNCTION(std::string, d->resourceContainer->GetModuleInfo()->name + this->GetResourcePath());
+}
+
+void* ModuleResource::GetData() const
+{
+  if (!IsValid()) return NULL;
+
+  void* data = d->resourceContainer->GetData(d->stat.index);
+  if (data == NULL)
+  {
+    US_WARN << "Error uncompressing resource data for " << this->GetResourcePath() << " from "
+            << d->resourceContainer->GetModuleInfo()->location;
+  }
+  return data;
 }
 
 US_END_NAMESPACE

@@ -19,15 +19,31 @@
 
 =============================================================================*/
 
-#ifndef USUNCOMPRESSRESOURCEDATA_H
-#define USUNCOMPRESSRESOURCEDATA_H
+#ifndef USTESTDRIVERACTIVATOR_H
+#define USTESTDRIVERACTIVATOR_H
 
-#include "usCoreConfig.h"
+#include <usModuleActivator.h>
 
 US_BEGIN_NAMESPACE
 
-US_Core_EXPORT unsigned char* UncompressResourceData(const unsigned char* data, std::size_t size, std::size_t* uncompressedSize);
+class TestDriverActivator : public ModuleActivator
+{
+public:
+
+  TestDriverActivator();
+
+  static bool LoadCalled();
+
+  void Load(ModuleContext*);
+
+  void Unload(ModuleContext* );
+
+private:
+
+  static TestDriverActivator* m_Instance;
+  bool m_LoadCalled;
+};
 
 US_END_NAMESPACE
 
-#endif // USUNCOMPRESSRESOURCEDATA_H
+#endif // USTESTDRIVERACTIVATOR_H

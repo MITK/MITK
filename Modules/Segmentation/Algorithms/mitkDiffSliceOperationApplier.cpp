@@ -16,6 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDiffSliceOperationApplier.h"
 #include "mitkRenderingManager.h"
+#include "mitkSegTool2D.h"
+
+// VTK
 #include <vtkSmartPointer.h>
 
 mitk::DiffSliceOperationApplier::DiffSliceOperationApplier()
@@ -62,6 +65,20 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
     //make sure the modification is rendered
     RenderingManager::GetInstance()->RequestUpdateAll();
     imageOperation->GetImage()->Modified();
+
+    mitk::ExtractSliceFilter::Pointer extractor2 = mitk::ExtractSliceFilter::New();
+    extractor2->SetInput( imageOperation->GetImage() );
+    extractor2->SetTimeStep( imageOperation->GetTimeStep() );
+    extractor2->SetWorldGeometry( dynamic_cast<Geometry2D*>(imageOperation->GetWorldGeometry()) );
+    extractor2->SetResliceTransformByGeometry( imageOperation->GetImage()->GetGeometry( imageOperation->GetTimeStep() ) );
+    extractor2->Modified();
+    extractor2->Update();
+
+    // TODO Move this code to SurfaceInterpolationController!
+    mitk::Image::Pointer slice = extractor2->GetOutput();
+    mitk::PlaneGeometry::Pointer plane = dynamic_cast<PlaneGeometry*>(imageOperation->GetWorldGeometry());
+    slice->DisconnectPipeline();
+    mitk::SegTool2D::UpdateSurfaceInterpolation(slice, imageOperation->GetImage(), plane, true);
   }
 }
 

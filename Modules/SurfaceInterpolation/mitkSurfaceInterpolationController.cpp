@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageToSurfaceFilter.h"
 
-
 mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   :m_SelectedSegmentation(0)
 {
@@ -65,7 +64,7 @@ mitk::SurfaceInterpolationController* mitk::SurfaceInterpolationController::GetI
   return m_Instance;
 }
 
-void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer newContour, PlaneGeometry::Pointer plane)
+void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer newContour, PlaneGeometry::ConstPointer plane)
 {
   ContourPositionPair pair;
   pair.contour = newContour;
@@ -88,11 +87,11 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
 {
   int pos (-1);
   ContourPositionPairList currentContourList = m_ListOfInterpolationSessions[m_SelectedSegmentation];
-  mitk::PlaneGeometry* plane = pair.plane;
+  const mitk::PlaneGeometry* plane = pair.plane;
   mitk::Surface* newContour = pair.contour;
   for (unsigned int i = 0; i < currentContourList.size(); i++)
   {
-    mitk::PlaneGeometry::Pointer planeFromList = currentContourList.at(i).plane;
+    mitk::PlaneGeometry::ConstPointer planeFromList = currentContourList.at(i).plane;
     if ( mitk::Equal(*plane, *planeFromList, mitk::eps, false) )
     {
       pos = i;
@@ -111,6 +110,10 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
     m_ListOfInterpolationSessions[m_SelectedSegmentation].at(pos) = pair;
     m_ReduceFilter->SetInput(pos, newContour);
   }
+  else if (newContour->GetVtkPolyData()->GetNumberOfPoints() == 0)
+  {
+    this->RemoveContour(plane);
+  }
 
   m_ReduceFilter->Update();
   m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
@@ -122,7 +125,7 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
   }
 }
 
-bool mitk::SurfaceInterpolationController::RemoveContour(mitk::PlaneGeometry *plane)
+bool mitk::SurfaceInterpolationController::RemoveContour(const mitk::PlaneGeometry *plane)
 {
   ContourPositionPairList::iterator it = m_ListOfInterpolationSessions[m_SelectedSegmentation].begin();
   while (it !=  m_ListOfInterpolationSessions[m_SelectedSegmentation].end())
@@ -139,7 +142,7 @@ bool mitk::SurfaceInterpolationController::RemoveContour(mitk::PlaneGeometry *pl
   return false;
 }
 
-const mitk::Surface* mitk::SurfaceInterpolationController::GetContour(mitk::PlaneGeometry::Pointer plane)
+const mitk::Surface* mitk::SurfaceInterpolationController::GetContour(mitk::PlaneGeometry::ConstPointer plane)
 {
   ContourPositionPairList contourList = m_ListOfInterpolationSessions[m_SelectedSegmentation];
   for (unsigned int i = 0; i < contourList.size(); ++i)

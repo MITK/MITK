@@ -4,7 +4,6 @@ MITK_CREATE_MODULE(
   INCLUDE_DIRS DataStructures
   DEPENDS MitkSegmentation MitkSceneSerializationBase
   PACKAGE_DEPENDS DCMTK
-  QT_MODULE
 )
 ADD_SUBDIRECTORY(Testing)
 ELSE()

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkIPropertyFilters_h
 
 #include <mitkBaseProperty.h>
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include <map>
 #include <string>
 #include <MitkCoreExports.h>
@@ -81,6 +81,6 @@ namespace mitk
   };
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::IPropertyFilters, "org.mitk.IPropertyFilters")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::IPropertyFilters, "org.mitk.IPropertyFilters")
 
 #endif

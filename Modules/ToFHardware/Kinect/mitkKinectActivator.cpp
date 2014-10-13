@@ -81,5 +81,5 @@ private:
 
 };
 }
-US_EXPORT_MODULE_ACTIVATOR(MitkKinect, mitk::KinectActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::KinectActivator)
 #endif

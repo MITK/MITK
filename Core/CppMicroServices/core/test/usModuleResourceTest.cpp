@@ -31,7 +31,7 @@
 
 #include "usTestingMacros.h"
 
-#include <assert.h>
+#include <cassert>
 
 #include <set>
 
@@ -46,7 +46,7 @@ void checkResourceInfo(const ModuleResource& res, const std::string& path,
                        const std::string& baseName,
                        const std::string& completeBaseName, const std::string& suffix,
                        const std::string& completeSuffix,
-                       int size, bool children = false, bool compressed = false)
+                       int size, bool children = false)
 {
   US_TEST_CONDITION_REQUIRED(res.IsValid(), "Valid resource")
   US_TEST_CONDITION(res.GetBaseName() == baseName, "GetBaseName()")
@@ -58,7 +58,6 @@ void checkResourceInfo(const ModuleResource& res, const std::string& path,
   US_TEST_CONDITION(res.GetSize() == size, "Data size")
   US_TEST_CONDITION(res.GetSuffix() == suffix, "Suffix")
   US_TEST_CONDITION(res.GetCompleteSuffix() == completeSuffix, "Complete suffix")
-  US_TEST_CONDITION(res.IsCompressed() == compressed, "Compression flag")
 }
 
 void testTextResource(Module* module)
@@ -143,7 +142,6 @@ void testTextResourceAsBinary(Module* module)
   US_TEST_CONDITION(content == fileData, "Resource content");
 }
 
-#ifdef US_BUILD_SHARED_LIBS
 void testInvalidResource(Module* module)
 {
   ModuleResource res = module->GetResource("invalid");
@@ -157,7 +155,6 @@ void testInvalidResource(Module* module)
 
   US_TEST_CONDITION(res.GetChildren().empty(), "Check empty children")
   US_TEST_CONDITION(res.GetSize() == 0, "Check zero size")
-  US_TEST_CONDITION(res.GetData() == NULL, "Check NULL data")
 
   ModuleResourceStream rs(res);
   US_TEST_CONDITION(rs.good() == true, "Check invalid resource stream")
@@ -165,7 +162,6 @@ void testInvalidResource(Module* module)
   US_TEST_CONDITION(rs.good() == false, "Check invalid resource stream")
   US_TEST_CONDITION(rs.eof() == true, "Check invalid resource stream")
 }
-#endif
 
 void testSpecialCharacters(Module* module)
 {
@@ -239,11 +235,10 @@ void testBinaryResource(Module* module)
   US_TEST_CONDITION(png.eof(), "EOF check");
 }
 
-#ifdef US_ENABLE_RESOURCE_COMPRESSION
 void testCompressedResource(Module* module)
 {
   ModuleResource res = module->GetResource("/icons/compressable.bmp");
-  checkResourceInfo(res, "/icons/", "compressable", "compressable", "bmp", "bmp", 411, false, true);
+  checkResourceInfo(res, "/icons/", "compressable", "compressable", "bmp", "bmp", 300122, false);
 
   ModuleResourceStream rs(res, std::ios_base::binary);
   rs.seekg(0, std::ios_base::end);
@@ -279,7 +274,6 @@ void testCompressedResource(Module* module)
   US_TEST_CONDITION_REQUIRED(isEqual, "Equal binary contents");
   US_TEST_CONDITION(bmp.eof(), "EOF check");
 }
-#endif
 
 struct ResourceComparator {
   bool operator()(const ModuleResource& mr1, const ModuleResource& mr2) const
@@ -288,7 +282,6 @@ struct ResourceComparator {
   }
 };
 
-#ifdef US_BUILD_SHARED_LIBS
 void testResourceTree(Module* module)
 {
   ModuleResource res = module->GetResource("");
@@ -299,7 +292,7 @@ void testResourceTree(Module* module)
   std::sort(children.begin(), children.end());
   US_TEST_CONDITION_REQUIRED(children.size() == 4, "Check child count")
   US_TEST_CONDITION(children[0] == "foo.txt", "Check child name")
-  US_TEST_CONDITION(children[1] == "icons", "Check child name")
+  US_TEST_CONDITION(children[1] == "icons/", "Check child name")
   US_TEST_CONDITION(children[2] == "special_chars.dummy.txt", "Check child name")
   US_TEST_CONDITION(children[3] == "test.xml", "Check child name")
 
@@ -307,7 +300,7 @@ void testResourceTree(Module* module)
   ModuleResource readme = module->GetResource("/icons/readme.txt");
   US_TEST_CONDITION(readme.IsFile() && readme.GetChildren().empty(), "Check file resource")
 
-  ModuleResource icons = module->GetResource("icons");
+  ModuleResource icons = module->GetResource("icons/");
   US_TEST_CONDITION(icons.IsDir() && !icons.IsFile() && !icons.GetChildren().empty(), "Check directory resource")
 
   children = icons.GetChildren();
@@ -335,9 +328,9 @@ void testResourceTree(Module* module)
 
   // find all resources
   nodes = module->FindResources("", "", true);
-  US_TEST_CONDITION(nodes.size() == 6, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 7, "Total resource number")
   nodes = module->FindResources("", "**", true);
-  US_TEST_CONDITION(nodes.size() == 6, "Total resource number")
+  US_TEST_CONDITION(nodes.size() == 7, "Total resource number")
 
 
   // test pattern matching
@@ -349,85 +342,6 @@ void testResourceTree(Module* module)
   nodes = module->FindResources("", "*.txt", true);
   US_TEST_CONDITION(nodes.size() == 3, "Check recursive pattern matches")
 }
-
-#else
-
-void testResourceTree(Module* module)
-{
-  ModuleResource res = module->GetResource("");
-  US_TEST_CONDITION(res.GetResourcePath() == "/", "Check root file path")
-  US_TEST_CONDITION(res.IsDir() == true, "Check type")
-
-  std::vector<std::string> children = res.GetChildren();
-  std::sort(children.begin(), children.end());
-  US_TEST_CONDITION_REQUIRED(children.size() == 10, "Check child count")
-  US_TEST_CONDITION(children[0] == "dynamic.txt", "Check dynamic.txt child name")
-  US_TEST_CONDITION(children[1] == "foo.txt", "Check foo.txt child name")
-  US_TEST_CONDITION(children[2] == "icons", "Check icons child name")
-  US_TEST_CONDITION(children[3] == "manifest.json", "Check manifest.json child name")
-  US_TEST_CONDITION(children[4] == "manifest.json", "Check manifest.json child name")
-  US_TEST_CONDITION(children[5] == "res.txt", "Check res.txt child name")
-  US_TEST_CONDITION(children[6] == "res.txt", "Check res.txt child name")
-  US_TEST_CONDITION(children[7] == "special_chars.dummy.txt", "Check special_chars.dummy.txt child name")
-  US_TEST_CONDITION(children[8] == "static.txt", "Check static.txt child name")
-  US_TEST_CONDITION(children[9] == "test.xml", "Check test.xml child name")
-
-
-  ModuleResource readme = module->GetResource("/icons/readme.txt");
-  US_TEST_CONDITION(readme.IsFile() && readme.GetChildren().empty(), "Check file resource")
-
-  ModuleResource icons = module->GetResource("icons");
-  US_TEST_CONDITION(icons.IsDir() && !icons.IsFile() && !icons.GetChildren().empty(), "Check directory resource")
-
-  children = icons.GetChildren();
-  US_TEST_CONDITION_REQUIRED(children.size() == 3, "Check icons child count")
-  std::sort(children.begin(), children.end());
-  US_TEST_CONDITION(children[0] == "compressable.bmp", "Check child name")
-  US_TEST_CONDITION(children[1] == "cppmicroservices.png", "Check child name")
-  US_TEST_CONDITION(children[2] == "readme.txt", "Check child name")
-
-  ResourceComparator resourceComparator;
-
-  // find all .txt files
-  std::vector<ModuleResource> nodes = module->FindResources("", "*.txt", false);
-  std::sort(nodes.begin(), nodes.end(), resourceComparator);
-  US_TEST_CONDITION_REQUIRED(nodes.size() == 6, "Found child count")
-  US_TEST_CONDITION(nodes[0].GetResourcePath() == "/dynamic.txt", "Check dynamic.txt child name")
-  US_TEST_CONDITION(nodes[1].GetResourcePath() == "/foo.txt", "Check child name")
-  US_TEST_CONDITION(nodes[2].GetResourcePath() == "/res.txt", "Check res.txt child name")
-  US_TEST_CONDITION(nodes[3].GetResourcePath() == "/res.txt", "Check res.txt child name")
-  US_TEST_CONDITION(nodes[4].GetResourcePath() == "/special_chars.dummy.txt", "Check child name")
-  US_TEST_CONDITION(nodes[5].GetResourcePath() == "/static.txt", "Check static.txt child name")
-
-  nodes = module->FindResources("", "*.txt", true);
-  std::sort(nodes.begin(), nodes.end(), resourceComparator);
-  US_TEST_CONDITION_REQUIRED(nodes.size() == 7, "Found child count")
-  US_TEST_CONDITION(nodes[0].GetResourcePath() == "/dynamic.txt", "Check dynamic.txt child name")
-  US_TEST_CONDITION(nodes[1].GetResourcePath() == "/foo.txt", "Check child name")
-  US_TEST_CONDITION(nodes[2].GetResourcePath() == "/icons/readme.txt", "Check child name")
-  US_TEST_CONDITION(nodes[3].GetResourcePath() == "/res.txt", "Check res.txt child name")
-  US_TEST_CONDITION(nodes[4].GetResourcePath() == "/res.txt", "Check res.txt child name")
-  US_TEST_CONDITION(nodes[5].GetResourcePath() == "/special_chars.dummy.txt", "Check child name")
-  US_TEST_CONDITION(nodes[6].GetResourcePath() == "/static.txt", "Check static.txt child name")
-
-  // find all resources
-  nodes = module->FindResources("", "", true);
-  US_TEST_CONDITION(nodes.size() == 12, "Total resource number")
-  nodes = module->FindResources("", "**", true);
-  US_TEST_CONDITION(nodes.size() == 12, "Total resource number")
-
-
-  // test pattern matching
-  nodes.clear();
-  nodes = module->FindResources("/icons", "*micro*.png", false);
-  US_TEST_CONDITION(nodes.size() == 1 && nodes[0].GetResourcePath() == "/icons/cppmicroservices.png", "Check file pattern matches")
-
-  nodes.clear();
-  nodes = module->FindResources("", "*.txt", true);
-  US_TEST_CONDITION(nodes.size() == 7, "Check recursive pattern matches")
-}
-
-#endif
 
 void testResourceOperators(Module* module)
 {
@@ -464,7 +378,6 @@ void testResourceOperators(Module* module)
   US_TEST_CONDITION(oss.str() == foo.GetResourcePath(), "Check operator<<")
 }
 
-#ifdef US_BUILD_SHARED_LIBS
 void testResourceFromExecutable(Module* module)
 {
   ModuleResource resource = module->GetResource("usTestResource.txt");
@@ -475,7 +388,6 @@ void testResourceFromExecutable(Module* module)
   std::getline(rs, line);
   US_TEST_CONDITION(line == "meant to be compiled into the test driver", "Check executable resource content")
 }
-#endif
 
 } // end unnamed namespace
 
@@ -504,20 +416,16 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
   {
     US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
   }
+#endif
 
-  Module* moduleR = ModuleRegistry::GetModule("TestModuleR Module");
+  Module* moduleR = ModuleRegistry::GetModule("TestModuleR");
   US_TEST_CONDITION_REQUIRED(moduleR != NULL, "Test for existing module TestModuleR")
 
-  US_TEST_CONDITION(moduleR->GetName() == "TestModuleR Module", "Test module name")
+  US_TEST_CONDITION(moduleR->GetName() == "TestModuleR", "Test module name")
 
   testInvalidResource(moduleR);
-  testResourceFromExecutable(mc->GetModule());
-#else
-  Module* moduleR = mc->GetModule();
-  US_TEST_CONDITION_REQUIRED(moduleR != NULL, "Test for existing module 0")
 
-  US_TEST_CONDITION(moduleR->GetName() == "CppMicroServices", "Test module name")
-#endif
+  testResourceFromExecutable(mc->GetModule());
 
   testResourceTree(moduleR);
 
@@ -529,16 +437,13 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
   testBinaryResource(moduleR);
 
-#ifdef US_ENABLE_RESOURCE_COMPRESSION
   testCompressedResource(moduleR);
-#endif
 
-#ifdef US_BUILD_SHARED_LIBS
   ModuleResource foo = moduleR->GetResource("foo.txt");
   US_TEST_CONDITION(foo.IsValid() == true, "Valid resource")
+#ifdef US_BUILD_SHARED_LIBS
   libR.Unload();
-  US_TEST_CONDITION(foo.IsValid() == false, "Invalidated resource")
-  US_TEST_CONDITION(foo.GetData() == NULL, "NULL data")
+  US_TEST_CONDITION(foo.IsValid() == true, "Still valid resource")
 #endif
 
   US_TEST_END()

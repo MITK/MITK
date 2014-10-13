@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cv.h>
 #include <ui_QmitkOpenCVVideoControls.h>
 #include <MitkOpenCVVideoSupportUIExports.h>
-#include <mitkIPersistenceService.h>
+#include <mitkPropertyListReplacedObserver.h>
 
 class QmitkRenderWindow;
 class QmitkVideoBackground;
@@ -29,6 +29,8 @@ namespace mitk
   class VideoSource;
   class OpenCVVideoSource;
 }
+
+class QmitkOpenCVVideoControlsPrivate;
 
 ///
 /// \brief Offers widgets to play/pause/stop a video on a certain render window with
@@ -104,16 +106,10 @@ protected:
   bool m_SliderCurrentlyMoved;
 
 private:
-    ///
-    /// muellerm: persitence service implementation
-    ///
-    PERSISTENCE_GET_SERVICE_METHOD_MACRO
-    ///
-    /// muellerm: a unique id for the prop list
-    ///
-    std::string m_Id;
-    void ToPropertyList();
-    void FromPropertyList();
+
+  friend class QmitkOpenCVVideoControlsPrivate;
+
+  QScopedPointer<QmitkOpenCVVideoControlsPrivate> d;
 
 };
 

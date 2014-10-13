@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include <usServiceReference.h>
 
 #include <cassert>

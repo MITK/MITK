@@ -48,6 +48,6 @@ namespace mitk
   };
 } // namespace mitk
 
-US_EXPORT_MODULE_ACTIVATOR(MitkUSHardwareTelemed, mitk::USTelemedActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::USTelemedActivator)
 
 #endif // __mitkUSTelemedActivator_h

@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <QObject>
+
 #include "mitkProperties.h"
 #include "mitkSegTool2D.h"
 #include "mitkStatusBar.h"

@@ -19,6 +19,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkRenderWindow.h>
 #include <mitkOpenCVVideoSource.h>
 
+#include <mitkIPersistenceService.h>
+
+class QmitkOpenCVVideoControlsPrivate
+{
+public:
+
+  QmitkOpenCVVideoControlsPrivate(QmitkOpenCVVideoControls* q, const std::string& id)
+    : q(q)
+    , m_Id(id)
+  {}
+
+  ///
+  /// muellerm: persitence service implementation
+  ///
+  PERSISTENCE_GET_SERVICE_METHOD_MACRO
+
+  QmitkOpenCVVideoControls* q;
+
+  ///
+  /// muellerm: a unique id for the prop list
+  ///
+  std::string m_Id;
+  void ToPropertyList();
+  void FromPropertyList();
+};
+
 QmitkOpenCVVideoControls::QmitkOpenCVVideoControls( QmitkVideoBackground* _VideoBackground
                                                    , QmitkRenderWindow* _RenderWindow
                                                    , QWidget * parent, Qt::WindowFlags f)
@@ -28,7 +54,7 @@ QmitkOpenCVVideoControls::QmitkOpenCVVideoControls( QmitkVideoBackground* _Video
 , m_VideoSource(0)
 , m_Controls(new Ui::QmitkOpenCVVideoControls)
 , m_SliderCurrentlyMoved(false)
-, m_Id("QmitkOpenCVVideoControls")
+, d(new QmitkOpenCVVideoControlsPrivate(this, "QmitkOpenCVVideoControls"))
 {
   m_Controls->setupUi(this);
   m_Controls->FileChooser->SetFileMustExist(true);
@@ -36,16 +62,16 @@ QmitkOpenCVVideoControls::QmitkOpenCVVideoControls( QmitkVideoBackground* _Video
 
   this->SetRenderWindow(_RenderWindow);
   this->SetVideoBackground(_VideoBackground);
-  this->FromPropertyList();
-  this->GetPeristenceService()->AddPropertyListReplacedObserver(this);
+  d->FromPropertyList();
+  d->GetPeristenceService()->AddPropertyListReplacedObserver(this);
 }
 
 QmitkOpenCVVideoControls::~QmitkOpenCVVideoControls()
 {
   if(m_VideoSource != 0 && m_VideoSource->IsCapturingEnabled())
       this->Stop(); // emulate stop
-  this->GetPeristenceService()->RemovePropertyListReplacedObserver(this);
-  this->ToPropertyList();
+  d->GetPeristenceService()->RemovePropertyListReplacedObserver(this);
+  d->ToPropertyList();
 }
 
 void QmitkOpenCVVideoControls::on_UseGrabbingDeviceButton_clicked( bool /*checked=false*/ )
@@ -320,41 +346,41 @@ void QmitkOpenCVVideoControls::QObjectDestroyed( QObject * obj /*= 0 */ )
   }
 }
 
-void QmitkOpenCVVideoControls::ToPropertyList()
+void QmitkOpenCVVideoControlsPrivate::ToPropertyList()
 {
     mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(m_Id);
-    propList->Set("deviceType", m_Controls->UseGrabbingDeviceButton->isChecked()? 0: 1);
-    propList->Set("grabbingDeviceNumber", m_Controls->GrabbingDeviceNumber->value());
-    propList->Set("updateRate", m_Controls->UpdateRate->value());
-    propList->Set("repeatVideo", m_Controls->RepeatVideoButton->isChecked());
+    propList->Set("deviceType", q->m_Controls->UseGrabbingDeviceButton->isChecked()? 0: 1);
+    propList->Set("grabbingDeviceNumber", q->m_Controls->GrabbingDeviceNumber->value());
+    propList->Set("updateRate", q->m_Controls->UpdateRate->value());
+    propList->Set("repeatVideo", q->m_Controls->RepeatVideoButton->isChecked());
 }
 
-void QmitkOpenCVVideoControls::FromPropertyList()
+void QmitkOpenCVVideoControlsPrivate::FromPropertyList()
 {
     mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(m_Id);
 
     bool repeatVideo = false;
     propList->Get("repeatVideo", repeatVideo);
-    m_Controls->RepeatVideoButton->setChecked(repeatVideo);
+    q->m_Controls->RepeatVideoButton->setChecked(repeatVideo);
 
     int updateRate = 25;
     propList->Get("updateRate", updateRate);
-    m_Controls->UpdateRate->setValue(updateRate);
+    q->m_Controls->UpdateRate->setValue(updateRate);
 
     int grabbingDeviceNumber = 0;
     propList->Get("grabbingDeviceNumber", grabbingDeviceNumber);
-    m_Controls->GrabbingDeviceNumber->setValue(grabbingDeviceNumber);
+    q->m_Controls->GrabbingDeviceNumber->setValue(grabbingDeviceNumber);
 
     int deviceType = 0;
     propList->Get("deviceType", deviceType);
     if( deviceType == 0 )
-        m_Controls->UseGrabbingDeviceButton->setChecked(true);
+        q->m_Controls->UseGrabbingDeviceButton->setChecked(true);
     else
-        m_Controls->UseVideoFileButton->setChecked(true);
+        q->m_Controls->UseVideoFileButton->setChecked(true);
 }
 
-void QmitkOpenCVVideoControls::AfterPropertyListReplaced( const std::string& id, mitk::PropertyList* propertyList )
+void QmitkOpenCVVideoControls::AfterPropertyListReplaced( const std::string& id, mitk::PropertyList* /*propertyList*/ )
 {
-    if( id == m_Id )
-        this->FromPropertyList();
+    if( id == d->m_Id )
+        d->FromPropertyList();
 }

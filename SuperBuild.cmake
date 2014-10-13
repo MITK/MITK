@@ -308,6 +308,7 @@ ExternalProject_Add(${proj}
     ${MITK-Data_DEPENDS}
     ${Qwt_DEPENDS}
     ${Qxt_DEPENDS}
+    ${ZLIB_DEPENDS}
     ${SimpleITK_DEPENDS}
     ${Numpy_DEPENDS}
 )
@@ -415,6 +416,7 @@ ExternalProject_Add(${proj}
     -DMITK_ACCESSBYITK_VECTOR_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_DIMENSIONS:STRING=${MITK_ACCESSBYITK_DIMENSIONS}
     # --------------- External project dirs ---------------
+    -DCppMicroServices_DIR:PATH=${CppMicroServices_DIR}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
     -DCTK_DIR:PATH=${CTK_DIR}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}

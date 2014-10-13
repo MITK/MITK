@@ -1,0 +1,47 @@
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/files.cmake)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/files.cmake)
+endif()
+
+# Write a header file containing include directives and custom code
+# for the test driver.
+set(TESTDRIVER_EXTRA_INCLUDES )
+list(APPEND MODULE_TEST_EXTRA_DRIVER_INCLUDE "mitkLog.h")
+list(REMOVE_DUPLICATES MODULE_TEST_EXTRA_DRIVER_INCLUDE)
+
+foreach(_include ${MODULE_TEST_EXTRA_DRIVER_INCLUDE})
+  set(TESTDRIVER_EXTRA_INCLUDES "${TESTDRIVER_EXTRA_INCLUDES}
+#include <${_include}>")
+endforeach()
+
+set(TESTDRIVER_EXTRA_INCLUDES "${TESTDRIVER_EXTRA_INCLUDES}
+#include <vector>
+std::vector<std::string> globalCmdLineArgs;")
+
+set(_extra_include_file ${CMAKE_CURRENT_BINARY_DIR}/${TESTDRIVER}_extras.h)
+configure_file(${MITK_CMAKE_DIR}/mitkTestDriverExtraIncludes.h.in ${_extra_include_file})
+
+set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
+for (int avIndex = 1; avIndex < ac; ++avIndex) globalCmdLineArgs.push_back(av[avIndex]);
+mitk::LoggingBackend::Register();
+${MODULE_TEST_EXTRA_DRIVER_INIT};"
+)
+
+set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "mitk::LoggingBackend::Unregister();")
+
+create_test_sourcelist(_test_cpp_files ${MODULE_NAME}_main.cpp
+  ${MODULE_TESTS} ${MODULE_IMAGE_TESTS} ${MODULE_SURFACE_TESTS} ${MODULE_CUSTOM_TESTS}
+  EXTRA_INCLUDE ${_extra_include_file}
+)
+list(APPEND CPP_FILES ${_test_cpp_files})
+
+# Some old CMake scripts use TEST_CPP_FILES in their files.cmake
+# file of the test driver to add source fiels to the executable
+# (they should just use CPP_FILES like in any other files.cmake
+# file instead).
+if(TEST_CPP_FILES)
+  list(APPEND CPP_FILES ${TEST_CPP_FILES})
+endif()
+
+if(MODULE_RESOURCE_FILES)
+  list(APPEND RESOURCE_FILES ${MODULE_RESOURCE_FILES})
+endif()

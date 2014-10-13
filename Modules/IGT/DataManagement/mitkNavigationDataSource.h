@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPropertyList.h"
 
 // Microservices
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include <usServiceRegistration.h>
 
 namespace mitk {
@@ -167,5 +167,5 @@ namespace mitk {
   };
 } // namespace mitk
 // This is the microservice declaration. Do not meddle!
-US_DECLARE_SERVICE_INTERFACE(mitk::NavigationDataSource, "org.mitk.services.NavigationDataSource")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::NavigationDataSource, "org.mitk.services.NavigationDataSource")
 #endif /* MITKNAVIGATIONDATASOURCE_H_HEADER_INCLUDED_ */

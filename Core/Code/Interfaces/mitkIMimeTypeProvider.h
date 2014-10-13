@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkMimeType.h>
 
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include <usServiceReference.h>
 
 #include <vector>
@@ -68,6 +68,6 @@ struct MITK_CORE_EXPORT IMimeTypeProvider
 
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::IMimeTypeProvider, "org.mitk.IMimeTypeProvider")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::IMimeTypeProvider, "org.mitk.IMimeTypeProvider")
 
 #endif // MITKIMIMETYPEPROVIDER_H

@@ -1,18 +1,23 @@
-/*===================================================================
+/*=============================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
+  Library: CppMicroServices
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
-All rights reserved.
+  Copyright (c) German Cancer Research Center,
+    Division of Medical and Biological Informatics
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-See LICENSE.txt or http://www.mitk.org for details.
+    http://www.apache.org/licenses/LICENSE-2.0
 
-===================================================================*/
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+=============================================================================*/
 
 #include <usTestingMacros.h>
 #include <usTestingConfig.h>
@@ -57,12 +62,10 @@ bool CheckConvertibility(const std::vector<ServiceReferenceU>& refs,
 struct MyInterfaceOne {
   virtual ~MyInterfaceOne() {}
 };
-US_DECLARE_SERVICE_INTERFACE(MyInterfaceOne, "org.cppmicroservices.servicetrackertest.MyInterfaceOne")
 
 struct MyInterfaceTwo {
   virtual ~MyInterfaceTwo() {}
 };
-US_DECLARE_SERVICE_INTERFACE(MyInterfaceTwo, "org.cppmicroservices.servicetrackertest.MyInterfaceTwo")
 
 class MyCustomizer : public us::ServiceTrackerCustomizer<MyInterfaceOne>
 {
@@ -146,10 +149,10 @@ void TestServiceTracker()
 
   // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
 
-  std::string s1("org.cppmicroservices.TestModuleSService");
+  std::string s1("us::TestModuleSService");
   ServiceReferenceU servref = mc->GetServiceReference(s1 + "0");
 
-  US_TEST_CONDITION_REQUIRED(servref != 0, "Test if registered service of id org.cppmicroservices.TestModuleSService0");
+  US_TEST_CONDITION_REQUIRED(servref != 0, "Test if registered service of id us::TestModuleSService0");
 
   ServiceReference<ServiceControlInterface> servCtrlRef = mc->GetServiceReference<ServiceControlInterface>();
   US_TEST_CONDITION_REQUIRED(servCtrlRef != 0, "Test if constrol service was registered");

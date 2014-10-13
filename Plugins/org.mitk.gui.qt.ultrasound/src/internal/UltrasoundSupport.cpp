@@ -231,7 +231,7 @@ if ( pluginContext )
 {
 std::string filter = "(ork.mitk.services.UltrasoundCustomWidget.deviceClass=" + m_Device->GetDeviceClass() + ")";
 
-QString interfaceName ( us_service_interface_iid<QmitkUSAbstractCustomWidget>() );
+QString interfaceName = QString::fromStdString(us_service_interface_iid<QmitkUSAbstractCustomWidget>() );
 m_CustomWidgetServiceReference = pluginContext->getServiceReferences(interfaceName, QString::fromStdString(filter));
 
 if (m_CustomWidgetServiceReference.size() > 0)

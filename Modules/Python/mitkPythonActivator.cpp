@@ -63,5 +63,5 @@ namespace mitk
     };
 }
 
-US_EXPORT_MODULE_ACTIVATOR(MitkPython, mitk::PythonActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::PythonActivator)
 #endif

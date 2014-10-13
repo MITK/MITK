@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleContext.h"
 #include "usGetModuleContext.h"
 //for microservices
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include "mitkDataStorage.h"
 
 namespace mitk
@@ -334,6 +334,6 @@ private:\
     propList->Get( #PARAM8_MEMBER_NAME, PARAM8_MEMBER_NAME );\
     PERSISTENCE_MACRO_END_PART(THE_CLASS_NAME, ID_MEMBER_NAME)
 
-US_DECLARE_SERVICE_INTERFACE(mitk::IPersistenceService, "org.mitk.services.IPersistenceService")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::IPersistenceService, "org.mitk.services.IPersistenceService")
 
 #endif

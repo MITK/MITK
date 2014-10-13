@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 
 // Microservices
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
 
@@ -171,5 +171,5 @@ namespace mitk {
 
   };
 } // namespace mitk
-US_DECLARE_SERVICE_INTERFACE(mitk::NavigationToolStorage, "org.mitk.services.NavigationToolStorage")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::NavigationToolStorage, "org.mitk.services.NavigationToolStorage")
 #endif //NAVIGATIONTOOLSTORAGE

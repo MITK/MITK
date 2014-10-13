@@ -19,7 +19,7 @@
 
 #include "mitkInteractionEventObserver.h"
 #include "mitkInteractionEvent.h"
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 
 
 namespace mitk
@@ -39,5 +39,5 @@ namespace mitk
   };
 
 } /* namespace mitk */
-US_DECLARE_SERVICE_INTERFACE(mitk::EventInformerService, "EventInformerService/1.0")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::EventInformerService, "EventInformerService/1.0")
 #endif

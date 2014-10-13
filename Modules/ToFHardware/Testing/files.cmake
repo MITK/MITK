@@ -16,5 +16,3 @@ set(MODULE_CUSTOM_TESTS
   mitkPlayerLoadAndRenderDepthDataTest.cpp
   mitkPlayerLoadAndRenderRGBDataTest.cpp
 )
-
-set(TEST_CPP_FILES ${testdriver_init_file})

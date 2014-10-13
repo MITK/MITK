@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkOclResourceService_h
 #define __mitkOclResourceService_h
 
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 
 #include <mitkOpenCL.h>
 
@@ -79,5 +79,5 @@ public:
 
 };
 
-US_DECLARE_SERVICE_INTERFACE(OclResourceService, "OpenCLResourceService/1.0")
+MITK_DECLARE_SERVICE_INTERFACE(OclResourceService, "OpenCLResourceService/1.0")
 #endif // __mitkOclResourceService_h

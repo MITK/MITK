@@ -17,11 +17,11 @@
 /**
   \file mitkdumpdir.cpp
 
-  \brief Commandline application that calls the mitkdump application on multiple directories.
+  \brief Commandline application that calls the MitkDump application on multiple directories.
 
   Usage:
   \verbatim
-    mitkdumpdir [-v] dir1 [... dirN]
+    MitkDumpDir [-v] dir1 [... dirN]
 
     -v      output more details on commandline
     dirN    directory names
@@ -88,7 +88,7 @@ void processLeafNodes(const QString& rootDir, const QString& executablename)
 
   if ( QDir( rootDir ).entryList( QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable ).empty() )
   {
-    bool successful = processLeafNode( rootDir, executablename );
+    processLeafNode( rootDir, executablename );
   }
 }
 
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
     ++firstDirIndex;
   }
 
-  QString executablename( QCoreApplication::applicationDirPath() + QDir::separator() + "mitkdump" );
+  QString executablename( QCoreApplication::applicationDirPath() + QDir::separator() + "MitkDump" );
 #ifdef WIN32
   executablename += ".exe";
 #endif

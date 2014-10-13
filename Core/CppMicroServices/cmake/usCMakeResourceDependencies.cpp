@@ -19,6 +19,12 @@
 
 =============================================================================*/
 
-#include <usModuleInitialization.h>
+#include <iostream>
 
-US_INITIALIZE_EXECUTABLE("@US_EXECUTABLE_IDENTIFIER@")
+namespace {
+
+// This is dummy code to silence some linkers warning about
+// empty object files.
+struct CMakeResourceDependencies { CMakeResourceDependencies() { std::cout << std::flush; } };
+
+}

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIFileIO.h>
 
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 
 
 namespace mitk {
@@ -80,6 +80,6 @@ struct MITK_CORE_EXPORT IFileWriter : public IFileIO
 
 } // namespace mitk
 
-US_DECLARE_SERVICE_INTERFACE(mitk::IFileWriter, "org.mitk.IFileWriter")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::IFileWriter, "org.mitk.IFileWriter")
 
 #endif /* IFileWriter_H_HEADER_INCLUDED_C1E7E521 */

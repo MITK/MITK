@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkDataStorage.h"
 
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include <mitkPlaneGeometry.h>
 
 class MitkCoreActivator;
@@ -89,6 +89,6 @@ namespace mitk
    std::vector<mitk::RestorePlanePositionOperation*> m_PositionList;
  };
 }
-US_DECLARE_SERVICE_INTERFACE(mitk::PlanePositionManagerService, "org.mitk.PlanePositionManagerService")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::PlanePositionManagerService, "org.mitk.PlanePositionManagerService")
 
 #endif

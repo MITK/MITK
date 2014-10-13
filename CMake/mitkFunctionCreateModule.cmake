@@ -386,9 +386,26 @@ function(mitk_create_module)
           if(NOT MODULE_NO_INIT)
             usFunctionGenerateModuleInit(CPP_FILES)
           endif()
+
+          set(binary_res_files )
+          set(source_res_files )
           if(RESOURCE_FILES)
-            # Add a source level dependency on resource files
-            list(APPEND CPP_FILES ${MODULE_TARGET}_resources.cpp)
+            set(res_dir Resources)
+            foreach(res_file ${RESOURCE_FILES})
+              if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}/${res_file})
+                list(APPEND binary_res_files "${res_file}")
+              else()
+                list(APPEND source_res_files "${res_file}")
+              endif()
+            endforeach()
+
+            # Add a source level dependencies on resource files
+            if(source_res_files)
+              list(APPEND CPP_FILES ${MODULE_TARGET}_resources.cpp)
+            endif()
+            if(binary_res_files)
+              list(APPEND CPP_FILES ${CMAKE_CURRENT_BINARY_DIR}/${MODULE_TARGET}_binary_resources.cpp)
+            endif()
           endif()
         endif()
 
@@ -553,29 +570,16 @@ function(mitk_create_module)
             set_property(TARGET ${MODULE_AUTOLOAD_WITH} APPEND PROPERTY MITK_AUTOLOAD_TARGETS ${MODULE_TARGET})
           endif()
 
-          if(RESOURCE_FILES)
-            set(res_dir Resources)
-            set(binary_res_files )
-            set(source_res_files )
-            foreach(res_file ${RESOURCE_FILES})
-              if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}/${res_file})
-                list(APPEND binary_res_files "${res_file}")
-              else()
-                list(APPEND source_res_files "${res_file}")
-              endif()
-            endforeach()
-
-            set(res_macro_args )
-            if(binary_res_files)
-              usFunctionAddResources(TARGET ${MODULE_TARGET}
-                                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}
-                                     FILES ${binary_res_files})
-            endif()
-            if(source_res_files)
-              usFunctionAddResources(TARGET ${MODULE_TARGET}
-                                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${res_dir}
-                                     FILES ${source_res_files})
-            endif()
+          if(binary_res_files)
+            usFunctionAddResources(TARGET ${MODULE_TARGET}
+                                   SOURCE_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${MODULE_TARGET}_binary_resources.cpp
+                                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}
+                                   FILES ${binary_res_files})
+          endif()
+          if(source_res_files)
+            usFunctionAddResources(TARGET ${MODULE_TARGET}
+                                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${res_dir}
+                                   FILES ${source_res_files})
           endif()
 
         endif()

@@ -1,7 +1,6 @@
 SET(MODULE_CUSTOM_TESTS
   mitkFiberBundleXReaderWriterTest.cpp
-  # temporarily disabled, see bug #18253
-  #mitkGibbsTrackingTest.cpp
+  mitkGibbsTrackingTest.cpp
   mitkStreamlineTrackingTest.cpp
   mitkPeakExtractionTest.cpp
   mitkLocalFiberPlausibilityTest.cpp

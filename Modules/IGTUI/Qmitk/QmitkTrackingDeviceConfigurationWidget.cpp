@@ -330,7 +330,7 @@ void QmitkTrackingDeviceConfigurationWidget::AutoScanPortsFinished(int PolarisPo
 
 void QmitkTrackingDeviceConfigurationWidget::SetMTCalibrationFileClicked()
   {
-  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), "/", "*.*").toAscii().data();
+  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), "/", "*.*").toLatin1().data();
   if (filename=="") {return;}
   else
     {
@@ -342,7 +342,7 @@ void QmitkTrackingDeviceConfigurationWidget::SetMTCalibrationFileClicked()
 
 void QmitkTrackingDeviceConfigurationWidget::SetOptitrackCalibrationFileClicked()
   {
-  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), "/", "*.*").toAscii().data();
+  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), "/", "*.*").toLatin1().data();
   if (filename=="") {return;}
   else
     {

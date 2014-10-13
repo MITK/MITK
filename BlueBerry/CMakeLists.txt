@@ -1,5 +1,7 @@
 project(BlueBerry)
-cmake_minimum_required(VERSION 2.8.9)
+if (${CMAKE_SOURCE_DIR} EQUAL ${PROJECT_SOURCE_DIR})
+  cmake_minimum_required(VERSION 2.8.9)
+endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
 

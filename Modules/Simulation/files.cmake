@@ -10,6 +10,7 @@ set(CPP_FILES
   mitkSchedulingAlgorithmBase.cpp
   mitkSimulation.cpp
   mitkSimulationActivator.cpp
+  mitkSimulationGLMapper2D.cpp
   mitkSimulationInteractor.cpp
   mitkSimulationIOFactory.cpp
   mitkSimulationObjectFactory.cpp

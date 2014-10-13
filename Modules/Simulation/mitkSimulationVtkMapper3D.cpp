@@ -132,25 +132,30 @@ void mitk::SimulationVtkMapper3D::ApplySimulationProperties(BaseRenderer* render
 
 void mitk::SimulationVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
 {
-  Simulation* simulation = static_cast<Simulation*>(this->GetData());
+  DataNode* dataNode = this->GetDataNode();
 
-  if (simulation != NULL)
+  if (dataNode == NULL)
+    return;
+
+  Simulation* simulation = static_cast<Simulation*>(dataNode->GetData());
+
+  if (simulation == NULL)
+    return;
+
+  LocalStorage* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+
+  if (localStorage->m_Mapper == NULL)
   {
-    LocalStorage* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+    localStorage->m_Mapper = vtkSmartPointer<vtkSimulationPolyDataMapper>::New();
+    localStorage->m_Mapper->SetSimulation(simulation);
 
-    if (localStorage->m_Mapper == NULL)
-    {
-      localStorage->m_Mapper = vtkSmartPointer<vtkSimulationPolyDataMapper>::New();
-      localStorage->m_Mapper->SetSimulation(simulation);
-
-      localStorage->m_Actor->SetMapper(localStorage->m_Mapper);
-
-      SetVtkRendererVisitor initVisitor(renderer->GetVtkRenderer());
-      simulation->GetRootNode()->executeVisitor(&initVisitor);
-    }
-
-    this->ApplySimulationProperties(renderer);
+    localStorage->m_Actor->SetMapper(localStorage->m_Mapper);
   }
+
+  SetVtkRendererVisitor setVtkRendererVisitor(renderer->GetVtkRenderer());
+  simulation->GetRootNode()->executeVisitor(&setVtkRendererVisitor);
+
+  this->ApplySimulationProperties(renderer);
 }
 
 vtkProp* mitk::SimulationVtkMapper3D::GetVtkProp(BaseRenderer* renderer)

@@ -19,7 +19,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::SetVtkRendererVisitor::SetVtkRendererVisitor(vtkRenderer* renderer, const sofa::core::ExecParams* params)
   : Visitor(params),
-    m_VtkRenderer(renderer)
+    m_VtkRenderer(renderer),
+    m_RenderingMode(VtkModel::Default)
+{
+}
+
+mitk::SetVtkRendererVisitor::SetVtkRendererVisitor(vtkRenderer* renderer, const Point3D& planePoint, const Vector3D& planeNormal, ScalarType planeThickness, const sofa::core::ExecParams* params)
+  : Visitor(params),
+    m_RenderingMode(VtkModel::ClippingPlanes),
+    m_PlanePoint(planePoint),
+    m_PlaneNormal(planeNormal),
+    m_PlaneThickness(planeThickness)
 {
 }
 
@@ -38,5 +48,11 @@ void mitk::SetVtkRendererVisitor::processVisualModel(sofa::simulation::Node*, so
   VtkModel* vtkModel = dynamic_cast<VtkModel*>(visualModel);
 
   if (vtkModel != NULL)
+  {
     vtkModel->SetVtkRenderer(m_VtkRenderer);
+    vtkModel->SetRenderingMode(m_RenderingMode);
+
+    if (m_RenderingMode == VtkModel::ClippingPlanes)
+      vtkModel->SetPlane(m_PlanePoint, m_PlaneNormal, m_PlaneThickness);
+  }
 }

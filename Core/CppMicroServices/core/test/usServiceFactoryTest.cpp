@@ -56,9 +56,6 @@ struct TestModuleH2
 
 US_END_NAMESPACE
 
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleH), "org.cppmicroservices.TestModuleH")
-US_DECLARE_SERVICE_INTERFACE(US_PREPEND_NAMESPACE(TestModuleH2), "org.cppmicroservices.TestModuleH2")
-
 
 void TestServiceFactoryModuleScope()
 {
@@ -77,32 +74,31 @@ void TestServiceFactoryModuleScope()
   {
     US_TEST_FAILED_MSG( << "Failed to load module, got exception: " << e.what())
   }
+#endif
 
-  Module* moduleH = ModuleRegistry::GetModule("TestModuleH Module");
+  Module* moduleH = ModuleRegistry::GetModule("TestModuleH");
   US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
 
   std::vector<ServiceReferenceU> registeredRefs = moduleH->GetRegisteredServices();
   US_TEST_CONDITION_REQUIRED(registeredRefs.size() == 2, "# of registered services")
   US_TEST_CONDITION(registeredRefs[0].GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_MODULE(), "service scope")
   US_TEST_CONDITION(registeredRefs[1].GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_PROTOTYPE(), "service scope")
-#endif
 
   ModuleContext* mc = GetModuleContext();
   // Check that a service reference exist
-  const ServiceReferenceU sr1 = mc->GetServiceReference("org.cppmicroservices.TestModuleH");
+  const ServiceReferenceU sr1 = mc->GetServiceReference("us::TestModuleH");
   US_TEST_CONDITION_REQUIRED(sr1, "Service shall be present.")
   US_TEST_CONDITION(sr1.GetProperty(ServiceConstants::SERVICE_SCOPE()).ToString() == ServiceConstants::SCOPE_MODULE(), "service scope")
 
   InterfaceMap service = mc->GetService(sr1);
   US_TEST_CONDITION_REQUIRED(service.size() >= 1, "GetService()")
-  InterfaceMap::const_iterator serviceIter = service.find("org.cppmicroservices.TestModuleH");
+  InterfaceMap::const_iterator serviceIter = service.find("us::TestModuleH");
   US_TEST_CONDITION_REQUIRED(serviceIter != service.end(), "GetService()")
   US_TEST_CONDITION_REQUIRED(serviceIter->second != NULL, "GetService()")
 
   InterfaceMap service2 = mc->GetService(sr1);
   US_TEST_CONDITION(service == service2, "Same service pointer")
 
-#ifdef US_BUILD_SHARED_LIBS
   std::vector<ServiceReferenceU> usedRefs = mc->GetModule()->GetServicesInUse();
   US_TEST_CONDITION_REQUIRED(usedRefs.size() == 1, "services in use")
   US_TEST_CONDITION(usedRefs[0] == sr1, "service ref in use")
@@ -110,7 +106,6 @@ void TestServiceFactoryModuleScope()
   InterfaceMap service3 = moduleH->GetModuleContext()->GetService(sr1);
   US_TEST_CONDITION(service != service3, "Different service pointer")
   US_TEST_CONDITION(moduleH->GetModuleContext()->UngetService(sr1), "UngetService()")
-#endif
 
   US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == false, "ungetService()")
   US_TEST_CONDITION_REQUIRED(mc->UngetService(sr1) == true, "ungetService()")
@@ -136,7 +131,7 @@ void TestServiceFactoryPrototypeScope()
     US_TEST_FAILED_MSG( << "Failed to load module, got exception: " << e.what())
   }
 
-  Module* moduleH = ModuleRegistry::GetModule("TestModuleH Module");
+  Module* moduleH = ModuleRegistry::GetModule("TestModuleH");
   US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
 #endif
 

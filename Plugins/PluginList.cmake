@@ -1,6 +1,5 @@
 
 # Plug-ins must be ordered according to their dependencies
-if (MITK_USE_Qt4)
 
 set(MITK_EXT_PLUGINS
   org.mitk.core.services:ON
@@ -48,11 +47,3 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.eventrecorder:OFF
   org.mitk.gui.qt.xnat:OFF
 )
-
-else()
-
-set(MITK_EXT_PLUGINS
-  # empty so far
-)
-
-endif()

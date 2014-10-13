@@ -308,6 +308,7 @@ ExternalProject_Add(${proj}
     ${MITK-Data_DEPENDS}
     ${Qwt_DEPENDS}
     ${Qxt_DEPENDS}
+    ${ZLIB_DEPENDS}
     ${SimpleITK_DEPENDS}
     ${Numpy_DEPENDS}
 )

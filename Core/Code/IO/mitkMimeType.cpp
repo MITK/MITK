@@ -18,28 +18,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCustomMimeType.h"
 
+#include <memory>
+
 namespace mitk {
 
 struct MimeType::Impl : us::SharedData
 {
   Impl()
-    : m_Rank(-1)
+    : m_CustomMimeType(new CustomMimeType())
+    , m_Rank(-1)
     , m_Id(-1)
   {}
 
   Impl(const CustomMimeType& x, int rank, long id)
-    : m_Name(x.GetName())
-    , m_Category(x.GetCategory())
-    , m_Extensions(x.GetExtensions())
-    , m_Comment(x.GetComment())
+    : m_CustomMimeType(x.Clone())
     , m_Rank(rank)
     , m_Id(id)
   {}
 
-  std::string m_Name;
-  std::string m_Category;
-  std::vector<std::string> m_Extensions;
-  std::string m_Comment;
+  std::auto_ptr<CustomMimeType> m_CustomMimeType;
 
   int m_Rank;
   long m_Id;
@@ -72,7 +69,7 @@ MimeType& MimeType::operator=(const MimeType& other)
 
 bool MimeType::operator==(const MimeType& other) const
 {
-  return m_Data->m_Name == other.GetName();
+  return this->GetName() == other.GetName();
 }
 
 bool MimeType::operator<(const MimeType& other) const
@@ -86,27 +83,32 @@ bool MimeType::operator<(const MimeType& other) const
 
 std::string MimeType::GetName() const
 {
-  return m_Data->m_Name;
+  return m_Data->m_CustomMimeType->GetName();
 }
 
 std::string MimeType::GetCategory() const
 {
-  return m_Data->m_Category;
+  return m_Data->m_CustomMimeType->GetCategory();
 }
 
 std::vector<std::string> MimeType::GetExtensions() const
 {
-  return m_Data->m_Extensions;
+  return m_Data->m_CustomMimeType->GetExtensions();
 }
 
 std::string MimeType::GetComment() const
 {
-  return m_Data->m_Comment;
+  return m_Data->m_CustomMimeType->GetComment();
+}
+
+bool MimeType::AppliesTo(const std::string& path) const
+{
+  return m_Data->m_CustomMimeType->AppliesTo(path);
 }
 
 bool MimeType::IsValid() const
 {
-  return m_Data.Data() != NULL && !m_Data->m_Name.empty();
+  return m_Data.Data() != NULL && m_Data->m_CustomMimeType.get() != NULL && !m_Data->m_CustomMimeType->GetName().empty();
 }
 
 void MimeType::Swap(MimeType& m)

@@ -271,7 +271,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
     // If the filename contains a suffix, use it but check if it is valid
     if (!suffix.isEmpty())
     {
-      std::vector<mitk::MimeType> availableTypes = mimeTypeProvider->GetMimeTypesForExtension(suffix.toStdString());
+      std::vector<mitk::MimeType> availableTypes = mimeTypeProvider->GetMimeTypesForFile(fileName.toStdString());
 
       // Check if the selected mime-type is related to the specified suffix (file extension).
       // If not, get the best matching mime-type for the suffix.

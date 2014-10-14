@@ -53,8 +53,6 @@ struct MITK_CORE_EXPORT IMimeTypeProvider
 
   virtual std::vector<MimeType> GetMimeTypesForFile(const std::string& filePath) const = 0;
 
-  virtual std::vector<MimeType> GetMimeTypesForExtension(const std::string& extension) const = 0;
-
   virtual std::vector<MimeType> GetMimeTypesForCategory(const std::string& category) const = 0;
 
   virtual MimeType GetMimeTypeForName(const std::string& name) const = 0;

@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceRegistration.h>
 #include <usModuleContext.h>
 
+#include <memory>
+
 namespace mitk {
 
 class FileReaderWriterBase
@@ -59,8 +61,8 @@ public:
   int GetRanking() const;
 
   void SetMimeType(const CustomMimeType& mimeType);
-  CustomMimeType GetMimeType() const;
-  CustomMimeType& GetMimeType();
+  const CustomMimeType* GetMimeType() const;
+  CustomMimeType* GetMimeType();
 
   MimeType GetRegisteredMimeType() const;
 
@@ -98,7 +100,7 @@ protected:
 
   Message1<float> m_ProgressMessage;
 
-  CustomMimeType m_CustomMimeType;
+  std::auto_ptr<CustomMimeType> m_CustomMimeType;
   us::ServiceRegistration<CustomMimeType> m_MimeTypeReg;
 
 private:

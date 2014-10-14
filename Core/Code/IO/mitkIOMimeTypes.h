@@ -23,13 +23,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class IOMimeTypes
+class MITK_CORE_EXPORT IOMimeTypes
 {
 public:
 
-  static std::vector<CustomMimeType> Get();
+  class MITK_CORE_EXPORT DicomMimeType : public CustomMimeType
+  {
+  public:
+    DicomMimeType();
+    virtual bool AppliesTo(const std::string &path) const;
+    virtual DicomMimeType* Clone() const;
+  };
+
+  static std::vector<CustomMimeType*> Get();
 
   static std::string DEFAULT_BASE_NAME(); // application/vnd.mitk
+
+  static std::string CATEGORY_IMAGES(); // Images
+  static std::string CATEGORY_SURFACES(); // Surfaces
 
   // ------------------------------ VTK formats ----------------------------------
 
@@ -54,10 +65,12 @@ public:
   static CustomMimeType NRRD_MIMETYPE(); // nrrd, nhdr
   static CustomMimeType NIFTI_MIMETYPE();
   static CustomMimeType RAW_MIMETYPE(); // raw
+  static DicomMimeType DICOM_MIMETYPE();
 
   static std::string NRRD_MIMETYPE_NAME(); // DEFAULT_BASE_NAME.nrrd
   static std::string NIFTI_MIMETYPE_NAME();
   static std::string RAW_MIMETYPE_NAME(); // DEFAULT_BASE_NAME.raw
+  static std::string DICOM_MIMETYPE_NAME();
 
   // ------------------------------ MITK formats ----------------------------------
 

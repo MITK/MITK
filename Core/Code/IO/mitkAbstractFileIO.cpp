@@ -75,8 +75,9 @@ AbstractFileIO::RegisterService(us::ModuleContext* context)
 {
   std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileReader> > result;
   result.first = this->AbstractFileReader::RegisterService(context);
-  CustomMimeType writerMimeType = this->AbstractFileWriter::GetMimeType();
-  if (writerMimeType.GetName().empty() && writerMimeType.GetExtensions().empty())
+  const CustomMimeType* writerMimeType = this->AbstractFileWriter::GetMimeType();
+  if (writerMimeType == NULL ||
+      (writerMimeType->GetName().empty() && writerMimeType->GetExtensions().empty()))
   {
     this->AbstractFileWriter::SetMimeType(CustomMimeType(this->AbstractFileReader::GetRegisteredMimeType().GetName()));
   }
@@ -110,10 +111,10 @@ void AbstractFileIO::SetMimeType(const CustomMimeType& mimeType)
   this->AbstractFileWriter::SetMimeType(CustomMimeType(mimeType.GetName()));
 }
 
-CustomMimeType AbstractFileIO::GetMimeType() const
+const CustomMimeType* AbstractFileIO::GetMimeType() const
 {
-  CustomMimeType mimeType = this->AbstractFileReader::GetMimeType();
-  if (mimeType.GetName() != this->AbstractFileWriter::GetMimeType().GetName())
+  const CustomMimeType* mimeType = this->AbstractFileReader::GetMimeType();
+  if (mimeType->GetName() != this->AbstractFileWriter::GetMimeType()->GetName())
   {
     MITK_WARN << "Reader and writer mime-tpyes are different, using the mime-type from IFileReader";
   }

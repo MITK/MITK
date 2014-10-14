@@ -59,7 +59,6 @@ public:
 
   virtual std::vector<MimeType> GetMimeTypes() const;
   virtual std::vector<MimeType> GetMimeTypesForFile(const std::string& filePath) const;
-  virtual std::vector<MimeType> GetMimeTypesForExtension(const std::string& extension) const;
   virtual std::vector<MimeType> GetMimeTypesForCategory(const std::string& category) const;
   virtual MimeType GetMimeTypeForName(const std::string& name) const;
 

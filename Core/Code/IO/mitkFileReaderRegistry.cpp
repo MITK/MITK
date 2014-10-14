@@ -40,10 +40,10 @@ mitk::FileReaderRegistry::~FileReaderRegistry()
   }
 }
 
-mitk::MimeType mitk::FileReaderRegistry::GetMimeTypeForExtension(const std::string& extension, us::ModuleContext* context)
+mitk::MimeType mitk::FileReaderRegistry::GetMimeTypeForFile(const std::string& path, us::ModuleContext* context)
 {
   mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider(context));
-  std::vector<MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(extension);
+  std::vector<MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForFile(path);
   if (mimeTypes.empty())
   {
     return MimeType();

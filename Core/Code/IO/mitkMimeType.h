@@ -53,6 +53,8 @@ public:
   std::vector<std::string> GetExtensions() const;
   std::string GetComment() const;
 
+  bool AppliesTo(const std::string& path) const;
+
   bool IsValid() const;
 
   void Swap(MimeType& m);

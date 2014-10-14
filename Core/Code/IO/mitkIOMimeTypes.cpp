@@ -18,29 +18,61 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCustomMimeType.h"
 
+#include "itkGDCMImageIO.h"
+
 namespace mitk {
 
-std::vector<CustomMimeType> IOMimeTypes::Get()
+IOMimeTypes::DicomMimeType::DicomMimeType()
+  : CustomMimeType(DICOM_MIMETYPE_NAME())
 {
-  std::vector<CustomMimeType> mimeTypes;
+  this->AddExtension("gdcm");
+  this->AddExtension("dcm");
+  this->AddExtension("DCM");
+  this->AddExtension("dc3");
+  this->AddExtension("DC3");
+  this->AddExtension("ima");
+  this->AddExtension("img");
+
+  this->SetCategory(CATEGORY_IMAGES());
+  this->SetComment("DICOM");
+}
+
+bool IOMimeTypes::DicomMimeType::AppliesTo(const std::string &path) const
+{
+  if (CustomMimeType::AppliesTo(path)) return true;
+  // Ask the GDCM ImageIO class directly
+  itk::GDCMImageIO::Pointer gdcmIO = itk::GDCMImageIO::New();
+  return gdcmIO->CanReadFile(path.c_str());
+}
+
+IOMimeTypes::DicomMimeType* IOMimeTypes::DicomMimeType::Clone() const
+{
+  return new DicomMimeType(*this);
+}
+
+std::vector<CustomMimeType*> IOMimeTypes::Get()
+{
+  std::vector<CustomMimeType*> mimeTypes;
 
   // order matters here (descending rank for mime types)
 
-  mimeTypes.push_back(NRRD_MIMETYPE());
-  mimeTypes.push_back(NIFTI_MIMETYPE());
+  mimeTypes.push_back(NRRD_MIMETYPE().Clone());
+  mimeTypes.push_back(NIFTI_MIMETYPE().Clone());
 
-  mimeTypes.push_back(VTK_IMAGE_MIMETYPE());
-  mimeTypes.push_back(VTK_PARALLEL_IMAGE_MIMETYPE());
-  mimeTypes.push_back(VTK_IMAGE_LEGACY_MIMETYPE());
+  mimeTypes.push_back(VTK_IMAGE_MIMETYPE().Clone());
+  mimeTypes.push_back(VTK_PARALLEL_IMAGE_MIMETYPE().Clone());
+  mimeTypes.push_back(VTK_IMAGE_LEGACY_MIMETYPE().Clone());
 
-  mimeTypes.push_back(VTK_POLYDATA_MIMETYPE());
-  mimeTypes.push_back(VTK_PARALLEL_POLYDATA_MIMETYPE());
-  mimeTypes.push_back(VTK_POLYDATA_LEGACY_MIMETYPE());
+  mimeTypes.push_back(DICOM_MIMETYPE().Clone());
 
-  mimeTypes.push_back(STEREOLITHOGRAPHY_MIMETYPE());
+  mimeTypes.push_back(VTK_POLYDATA_MIMETYPE().Clone());
+  mimeTypes.push_back(VTK_PARALLEL_POLYDATA_MIMETYPE().Clone());
+  mimeTypes.push_back(VTK_POLYDATA_LEGACY_MIMETYPE().Clone());
 
-  mimeTypes.push_back(RAW_MIMETYPE());
-  mimeTypes.push_back(POINTSET_MIMETYPE());
+  mimeTypes.push_back(STEREOLITHOGRAPHY_MIMETYPE().Clone());
+
+  mimeTypes.push_back(RAW_MIMETYPE().Clone());
+  mimeTypes.push_back(POINTSET_MIMETYPE().Clone());
   return mimeTypes;
 }
 
@@ -48,7 +80,7 @@ CustomMimeType IOMimeTypes::VTK_IMAGE_MIMETYPE()
 {
   CustomMimeType mimeType(VTK_IMAGE_NAME());
   mimeType.AddExtension("vti");
-  mimeType.SetCategory("Images");
+  mimeType.SetCategory(CATEGORY_IMAGES());
   mimeType.SetComment("VTK Image");
   return mimeType;
 }
@@ -57,7 +89,7 @@ CustomMimeType IOMimeTypes::VTK_IMAGE_LEGACY_MIMETYPE()
 {
   CustomMimeType mimeType(VTK_IMAGE_LEGACY_NAME());
   mimeType.AddExtension("vtk");
-  mimeType.SetCategory("Images");
+  mimeType.SetCategory(CATEGORY_IMAGES());
   mimeType.SetComment("VTK Legacy Image");
   return mimeType;
 }
@@ -66,7 +98,7 @@ CustomMimeType IOMimeTypes::VTK_PARALLEL_IMAGE_MIMETYPE()
 {
   CustomMimeType mimeType(VTK_PARALLEL_IMAGE_NAME());
   mimeType.AddExtension("pvti");
-  mimeType.SetCategory("Images");
+  mimeType.SetCategory(CATEGORY_IMAGES());
   mimeType.SetComment("VTK Parallel Image");
   return mimeType;
 }
@@ -75,7 +107,7 @@ CustomMimeType IOMimeTypes::VTK_POLYDATA_MIMETYPE()
 {
   CustomMimeType mimeType(VTK_POLYDATA_NAME());
   mimeType.AddExtension("vtp");
-  mimeType.SetCategory("Surfaces");
+  mimeType.SetCategory(CATEGORY_SURFACES());
   mimeType.SetComment("VTK PolyData");
   return mimeType;
 }
@@ -84,7 +116,7 @@ CustomMimeType IOMimeTypes::VTK_POLYDATA_LEGACY_MIMETYPE()
 {
   CustomMimeType mimeType(VTK_POLYDATA_LEGACY_NAME());
   mimeType.AddExtension("vtk");
-  mimeType.SetCategory("Surfaces");
+  mimeType.SetCategory(CATEGORY_SURFACES());
   mimeType.SetComment("VTK Legacy PolyData");
   return mimeType;
 }
@@ -93,7 +125,7 @@ CustomMimeType IOMimeTypes::VTK_PARALLEL_POLYDATA_MIMETYPE()
 {
   CustomMimeType mimeType(VTK_PARALLEL_POLYDATA_NAME());
   mimeType.AddExtension("pvtp");
-  mimeType.SetCategory("Surfaces");
+  mimeType.SetCategory(CATEGORY_SURFACES());
   mimeType.SetComment("VTK Parallel PolyData");
   return mimeType;
 }
@@ -102,7 +134,7 @@ CustomMimeType IOMimeTypes::STEREOLITHOGRAPHY_MIMETYPE()
 {
   CustomMimeType mimeType(STEREOLITHOGRAPHY_NAME());
   mimeType.AddExtension("stl");
-  mimeType.SetCategory("Surfaces");
+  mimeType.SetCategory(CATEGORY_SURFACES());
   mimeType.SetComment("Stereolithography");
   return mimeType;
 }
@@ -117,6 +149,18 @@ std::string IOMimeTypes::DEFAULT_BASE_NAME()
 {
   static std::string name = "application/vnd.mitk";
   return name;
+}
+
+std::string IOMimeTypes::CATEGORY_IMAGES()
+{
+  static std::string cat = "Images";
+  return cat;
+}
+
+std::string IOMimeTypes::CATEGORY_SURFACES()
+{
+  static std::string cat = "Surfaces";
+  return cat;
 }
 
 std::string IOMimeTypes::VTK_IMAGE_NAME()
@@ -189,6 +233,11 @@ CustomMimeType IOMimeTypes::RAW_MIMETYPE()
   return mimeType;
 }
 
+IOMimeTypes::DicomMimeType IOMimeTypes::DICOM_MIMETYPE()
+{
+  return DicomMimeType();
+}
+
 std::string IOMimeTypes::NRRD_MIMETYPE_NAME()
 {
   static std::string name = DEFAULT_BASE_NAME() + ".image.nrrd";
@@ -204,6 +253,12 @@ std::string IOMimeTypes::NIFTI_MIMETYPE_NAME()
 std::string IOMimeTypes::RAW_MIMETYPE_NAME()
 {
   static std::string name = DEFAULT_BASE_NAME() + ".image.raw";
+  return name;
+}
+
+std::string IOMimeTypes::DICOM_MIMETYPE_NAME()
+{
+  static std::string name = DEFAULT_BASE_NAME() + ".image.dicom";
   return name;
 }
 

@@ -53,13 +53,13 @@ public:
   ~FileReaderRegistry();
 
   /**
-   * @brief Get the highest ranked mime-type for the given extension.
+   * @brief Get the highest ranked mime-type for the given file name.
    * @param extension A file name extension without a leading dot.
    * @param context
    * @return The highest ranked mime-type containing \c extension in
    *         its extension list.
    */
-  static MimeType GetMimeTypeForExtension(const std::string& extension, us::ModuleContext* context = us::GetModuleContext());
+  static MimeType GetMimeTypeForFile(const std::string& path, us::ModuleContext* context = us::GetModuleContext());
 
   static std::vector<ReaderReference> GetReferences(const MimeType& mimeType, us::ModuleContext* context = us::GetModuleContext());
 

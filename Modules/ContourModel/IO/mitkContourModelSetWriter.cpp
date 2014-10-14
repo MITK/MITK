@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourModelSetWriter.h"
 #include "mitkContourModelWriter.h"
 #include <mitkCustomMimeType.h>
+#include <iostream>
+#include <fstream>
 
 mitk::ContourModelSetWriter::ContourModelSetWriter()
   : AbstractFileWriter(ContourModelSet::GetStaticNameOfClass())

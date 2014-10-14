@@ -63,7 +63,7 @@ void mitk::ContourModelSet::AddContourModel(mitk::ContourModel::Pointer contourM
 
 
 
-mitk::ContourModel* mitk::ContourModelSet::GetContourModelAt(int index)
+mitk::ContourModel* mitk::ContourModelSet::GetContourModelAt(int index) const
 {
   if( index >= 0 && static_cast<ContourModelListType::size_type>(index) < this->m_Contours.size() )
   {

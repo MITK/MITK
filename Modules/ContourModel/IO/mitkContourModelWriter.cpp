@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkContourModelWriter.h"
+#include "mitkIOMimeTypes.h"
 #include "mitkTimeGeometry.h"
 #include <iostream>
 #include <fstream>
@@ -69,89 +70,86 @@ const char* mitk::ContourModelWriter::XML_Y = "y" ;
 const char* mitk::ContourModelWriter::XML_Z = "z" ;
 
 
-
 mitk::ContourModelWriter::ContourModelWriter()
-    : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
+  : AbstractFileWriter(ContourModel::GetStaticNameOfClass())
+  , m_IndentDepth(0)
+  , m_Indent(2)
 {
-    this->SetNumberOfRequiredInputs( 1 );
-    this->SetNumberOfIndexedOutputs( 1 );
-    this->SetNthOutput( 0, mitk::ContourModel::New().GetPointer() );
-    m_Indent = 2;
-    m_IndentDepth = 0;
-    m_Success = false;
+  std::string category = "Contour File";
+  mitk::CustomMimeType customMimeType;
+  customMimeType.SetCategory(category);
+  customMimeType.AddExtension("cnt");
+
+  this->SetDescription(category);
+  this->SetMimeType(customMimeType);
+
+  RegisterService();
 }
 
-
-
+mitk::ContourModelWriter::ContourModelWriter(const mitk::ContourModelWriter& other)
+  : AbstractFileWriter(other)
+  , m_IndentDepth(other.m_IndentDepth)
+  , m_Indent(other.m_Indent)
+{
+}
 
 mitk::ContourModelWriter::~ContourModelWriter()
 {}
 
-
-
-
-void mitk::ContourModelWriter::GenerateData()
+void mitk::ContourModelWriter::Write()
 {
-    m_Success = false;
-    m_IndentDepth = 0;
+  std::ostream* out;
+  std::ofstream outStream;
 
-    //
-    // Opening the file to write to
-    //
-    if ( m_FileName == "" )
-    {
-        itkWarningMacro( << "Sorry, filename has not been set!" );
-        return ;
-    }
-    std::ofstream out( m_FileName.c_str() );
-    if ( !out.good() )
-    {
-      itkExceptionMacro(<< "File " << m_FileName << " could not be opened!");
-      itkWarningMacro( << "Sorry, file " << m_FileName << " could not be opened!" );
-      out.close();
-        return ;
-    }
+  if( this->GetOutputStream() )
+  {
+    out = this->GetOutputStream();
+  }
+  else
+  {
+    outStream.open( this->GetOutputLocation().c_str() );
+    out = &outStream;
+  }
 
-    std::locale previousLocale(out.getloc());
-    std::locale I("C");
-    out.imbue(I);
+  if ( !out->good() )
+  {
+    mitkThrow() << "Stream not good.";
+  }
 
+  std::locale previousLocale(out->getloc());
+  std::locale I("C");
+  out->imbue(I);
 
-/*+++++++++++ Here the actual xml writing begins +++++++++*/
+  /*+++++++++++ Here the actual xml writing begins +++++++++*/
 
     /*++++ <?xml version="1.0" encoding="utf-8"?> ++++*/
-    WriteXMLHeader( out );
+    WriteXMLHeader( *out );
 
 
     //
     // for each input object write its xml representation to
     // the stream
     //
-    for ( unsigned int i = 0 ; i < this->GetNumberOfInputs(); ++i )
+    mitk::ContourModel::ConstPointer contourModel = dynamic_cast<const mitk::ContourModel*>(this->GetInput());
+    assert( contourModel.IsNotNull() );
+    WriteXML( contourModel.GetPointer(), *out );
+
+    out->imbue(previousLocale);
+
+    if ( !out->good() ) // some error during output
     {
-        InputType::Pointer contourModel = this->GetInput( i );
-        assert( contourModel.IsNotNull() );
-        WriteXML( contourModel.GetPointer(), out );
-    }
-
-
-    out.imbue(previousLocale);
-
-    if ( !out.good() ) // some error during output
-    {
-      out.close();
       throw std::ios_base::failure("Some error during contour writing.");
     }
 
-    out.close();
-    m_Success = true;
-    m_MimeType = "application/MITK.ContourModel";
+}
+
+mitk::ContourModelWriter*mitk::ContourModelWriter::Clone() const
+{
+  return new ContourModelWriter(*this);
 }
 
 
-
-
-void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::ofstream& out )
+void mitk::ContourModelWriter::WriteXML( const mitk::ContourModel* contourModel, std::ostream& out )
 {
    /*++++ <contourModel> ++++*/
     WriteStartElement( XML_CONTOURMODEL, out );
@@ -162,7 +160,7 @@ void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::
     /*++++ <geometryInfo> ++++*/
     WriteStartElement( XML_GEOMETRY_INFO, out);
 
-    WriteGeometryInformation( contourModel->GetTimeGeometry(), out);;
+    WriteGeometryInformation( contourModel->GetTimeGeometry(), out);
 
     /*++++ </geometryInfo> ++++*/
     WriteEndElement( XML_GEOMETRY_INFO, out);
@@ -246,68 +244,10 @@ void mitk::ContourModelWriter::WriteXML( mitk::ContourModel* contourModel, std::
     WriteEndElement( XML_CONTOURMODEL, out );
 }
 
-
-
-void mitk::ContourModelWriter::WriteGeometryInformation( mitk::TimeGeometry* /*geometry*/, std::ofstream& out )
+void mitk::ContourModelWriter::WriteGeometryInformation(const mitk::TimeGeometry* /*geometry*/, std::ostream& out )
 {
   WriteCharacterData("<!-- geometry information -->", out);
 }
-
-
-
-void mitk::ContourModelWriter::ResizeInputs( const unsigned int& num )
-{
-    unsigned int prevNum = this->GetNumberOfInputs();
-    this->SetNumberOfIndexedInputs( num );
-    for ( unsigned int i = prevNum; i < num; ++i )
-    {
-        this->SetNthInput( i, mitk::ContourModel::New().GetPointer() );
-    }
-}
-
-
-
-
-void mitk::ContourModelWriter::SetInput( InputType* contourModel )
-{
-    this->ProcessObject::SetNthInput( 0, contourModel );
-}
-
-
-
-
-void mitk::ContourModelWriter::SetInput( const unsigned int& id, InputType* contourModel )
-{
-    if ( id >= this->GetNumberOfInputs() )
-        this->ResizeInputs( id + 1 );
-    this->ProcessObject::SetNthInput( id, contourModel );
-}
-
-
-
-mitk::ContourModel* mitk::ContourModelWriter::GetInput()
-{
-    if ( this->GetNumberOfInputs() < 1 )
-    {
-        return 0;
-    }
-    else
-    {
-        return dynamic_cast<InputType*> ( this->GetInput( 0 ) );
-    }
-}
-
-
-
-
-mitk::ContourModel* mitk::ContourModelWriter::GetInput( const unsigned int& num )
-{
-    return dynamic_cast<InputType*> ( this->ProcessObject::GetInput( num ) );
-}
-
-
-
-
 
 template < typename T>
 std::string mitk::ContourModelWriter::ConvertToString( T value )
@@ -324,17 +264,12 @@ std::string mitk::ContourModelWriter::ConvertToString( T value )
         return "conversion error";
 }
 
-
-
-void mitk::ContourModelWriter::WriteXMLHeader( std::ofstream &file )
+void mitk::ContourModelWriter::WriteXMLHeader( std::ostream &file )
 {
     file << "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 }
 
-
-
-
-void mitk::ContourModelWriter::WriteStartElement( const char *const tag, std::ofstream &file )
+void mitk::ContourModelWriter::WriteStartElement( const char *const tag, std::ostream &file )
 {
     file << std::endl;
     WriteIndent( file );
@@ -342,9 +277,7 @@ void mitk::ContourModelWriter::WriteStartElement( const char *const tag, std::of
     m_IndentDepth++;
 }
 
-
-
-void mitk::ContourModelWriter::WriteStartElementWithAttribut( const char *const tag, std::vector<std::string> attributes, std::vector<std::string> values, std::ofstream &file )
+void mitk::ContourModelWriter::WriteStartElementWithAttribut( const char *const tag, std::vector<std::string> attributes, std::vector<std::string> values, std::ostream &file )
 {
     file << std::endl;
     WriteIndent( file );
@@ -376,10 +309,7 @@ void mitk::ContourModelWriter::WriteStartElementWithAttribut( const char *const 
     m_IndentDepth++;
 }
 
-
-
-
-void mitk::ContourModelWriter::WriteEndElement( const char *const tag, std::ofstream &file, const bool& indent )
+void mitk::ContourModelWriter::WriteEndElement( const char *const tag, std::ostream &file, const bool& indent )
 {
     m_IndentDepth--;
     if ( indent )
@@ -390,97 +320,28 @@ void mitk::ContourModelWriter::WriteEndElement( const char *const tag, std::ofst
     file << '<' << '/' << tag << '>';
 }
 
-
-
-
-void mitk::ContourModelWriter::WriteCharacterData( const char *const data, std::ofstream &file )
+void mitk::ContourModelWriter::WriteCharacterData( const char *const data, std::ostream &file )
 {
     file << data;
 }
 
-
-
-
-void mitk::ContourModelWriter::WriteStartElement( std::string &tag, std::ofstream &file )
+void mitk::ContourModelWriter::WriteStartElement( std::string &tag, std::ostream &file )
 {
     WriteStartElement( tag.c_str(), file );
 }
 
-
-
-
-void mitk::ContourModelWriter::WriteEndElement( std::string &tag, std::ofstream &file, const bool& indent )
+void mitk::ContourModelWriter::WriteEndElement( std::string &tag, std::ostream &file, const bool& indent )
 {
     WriteEndElement( tag.c_str(), file, indent );
 }
 
-
-
-
-void mitk::ContourModelWriter::WriteCharacterData( std::string &data, std::ofstream &file )
+void mitk::ContourModelWriter::WriteCharacterData( std::string &data, std::ostream &file )
 {
     WriteCharacterData( data.c_str(), file );
 }
 
-
-
-
-void mitk::ContourModelWriter::WriteIndent( std::ofstream& file )
+void mitk::ContourModelWriter::WriteIndent( std::ostream& file )
 {
     std::string spaces( m_IndentDepth * m_Indent, ' ' );
     file << spaces.c_str();
-}
-
-
-
-bool mitk::ContourModelWriter::GetSuccess() const
-{
-  return m_Success;
-}
-
-std::string mitk::ContourModelWriter::GetSupportedBaseData() const
-{
-  return ContourModel::GetStaticNameOfClass();
-}
-
-bool mitk::ContourModelWriter::CanWriteDataType( DataNode* input )
-{
-  if ( input )
-  {
-    mitk::BaseData* data = input->GetData();
-    if ( data )
-    {
-       mitk::ContourModel::Pointer contourModel = dynamic_cast<mitk::ContourModel*>( data );
-       if( contourModel.IsNotNull() )
-       {
-         //this writer has no "SetDefaultExtension()" - function
-         m_Extension = ".cnt";
-         return true;
-       }
-    }
-  }
-  return false;
-}
-
-void mitk::ContourModelWriter::SetInput( DataNode* input )
-{
-  if( input && CanWriteDataType( input ) )
-    this->ProcessObject::SetNthInput( 0, dynamic_cast<mitk::ContourModel*>( input->GetData() ) );
-}
-
-std::string mitk::ContourModelWriter::GetWritenMIMEType()
-{
-  return m_MimeType;
-}
-
-std::vector<std::string> mitk::ContourModelWriter::GetPossibleFileExtensions()
-{
-  std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(".cnt");
-  return possibleFileExtensions;
-}
-
-std::string mitk::ContourModelWriter::GetFileExtension()
-{
-  return m_Extension;
 }

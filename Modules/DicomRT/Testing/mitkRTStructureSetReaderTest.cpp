@@ -18,8 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 
 #include "mitkRTStructureSetReader.h"
-#include <mitkContourModelSet.h>
-#include <mitkContourModelSetReader.h>
+#include <mitkIOUtil.h>
 #include <mitkStringProperty.h>
 
 class mitkRTStructureSetReaderTestSuite : public mitk::TestFixture
@@ -121,41 +120,35 @@ public:
 
   void LoadData(std::deque<mitk::ContourModelSet::Pointer> &r)
   {
-    mitk::ContourModelSetReader::Pointer reader = mitk::ContourModelSetReader::New();
+    std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput;
 
-    reader->SetFileName(GetTestDataFilePath("RT/StructureSet/BODY.cnt_set"));
-    reader->Update();
-    mitk::ContourModelSet::Pointer cnt_set = reader->GetOutput();
+    readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("RT/StructureSet/BODY.cnt_set"));
+    mitk::ContourModelSet::Pointer cnt_set = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
     cnt_set->SetProperty("name", mitk::StringProperty::New("BODY"));
     r.push_back(cnt_set);
 
-    reader->SetFileName(GetTestDataFilePath("RT/StructureSet/Bladder.cnt_set"));
-    reader->Update();
-    cnt_set = reader->GetOutput();
+    readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("RT/StructureSet/Bladder.cnt_set"));
+    cnt_set = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
     cnt_set->SetProperty("name", mitk::StringProperty::New("Bladder"));
     r.push_back(cnt_set);
 
-    reader->SetFileName(GetTestDataFilePath("RT/StructureSet/Femoral Head Lt.cnt_set"));
-    reader->Update();
-    cnt_set = reader->GetOutput();
+    readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("RT/StructureSet/Femoral Head Lt.cnt_set"));
+    cnt_set = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
     cnt_set->SetProperty("name", mitk::StringProperty::New("Femoral Head Lt"));
     r.push_back(cnt_set);
 
-    reader->SetFileName(GetTestDataFilePath("RT/StructureSet/Femoral Head RT.cnt_set"));
-    reader->Update();
-    cnt_set = reader->GetOutput();
+    readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("RT/StructureSet/Femoral Head RT.cnt_set"));
+    cnt_set = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
     cnt_set->SetProperty("name", mitk::StringProperty::New("Femoral Head RT"));
     r.push_back(cnt_set);
 
-    reader->SetFileName(GetTestDataFilePath("RT/StructureSet/PTV.cnt_set"));
-    reader->Update();
-    cnt_set = reader->GetOutput();
+    readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("RT/StructureSet/PTV.cnt_set"));
+    cnt_set = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
     cnt_set->SetProperty("name", mitk::StringProperty::New("PTV"));
     r.push_back(cnt_set);
 
-    reader->SetFileName(GetTestDataFilePath("RT/StructureSet/Rectum.cnt_set"));
-    reader->Update();
-    cnt_set = reader->GetOutput();
+    readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("RT/StructureSet/Rectum.cnt_set"));
+    cnt_set = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
     cnt_set->SetProperty("name", mitk::StringProperty::New("Rectum"));
     r.push_back(cnt_set);
   }

@@ -22,7 +22,7 @@ if(NOT DEFINED Eigen_DIR)
        -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
     )
 
-  set(Eigen_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/include/eigen3)
+  set(Eigen_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
 
 else()
 

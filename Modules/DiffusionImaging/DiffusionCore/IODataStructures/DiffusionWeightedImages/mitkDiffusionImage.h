@@ -54,6 +54,7 @@ public:
   mitkClassMacro( DiffusionImage, Image )
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
+  mitkCloneMacro(Self)
 
   /**
   * \brief Return the itkVectorImage as pointer
@@ -152,8 +153,6 @@ public:
   void SetDisplayIndexForRendering(int displayIndex);
 
 protected:
-  mitkCloneMacro(Self);
-
   DiffusionImage();
   DiffusionImage(const DiffusionImage<TPixelType> &);
   virtual ~DiffusionImage();

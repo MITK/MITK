@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSetVtkRendererVisitor_h
 #define mitkSetVtkRendererVisitor_h
 
-#include <mitkVtkModel.h>
 #include <sofa/simulation/common/Visitor.h>
 #include <MitkSimulationExports.h>
 
@@ -29,7 +28,6 @@ namespace mitk
   {
   public:
     explicit SetVtkRendererVisitor(vtkRenderer* renderer, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
-    SetVtkRendererVisitor(vtkRenderer* renderer, const Point3D& planePoint, const Vector3D& planeNormal, ScalarType planeThickness = 1.0, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
     ~SetVtkRendererVisitor();
 
     Result processNodeTopDown(sofa::simulation::Node* node);
@@ -41,10 +39,6 @@ namespace mitk
     void processVisualModel(sofa::simulation::Node*, sofa::core::visual::VisualModel* visualModel);
 
     vtkRenderer* m_VtkRenderer;
-    VtkModel::RenderingMode m_RenderingMode;
-    Point3D m_PlanePoint;
-    Vector3D m_PlaneNormal;
-    ScalarType m_PlaneThickness;
   };
 }
 

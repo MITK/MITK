@@ -34,16 +34,8 @@ namespace mitk
   public:
     SOFA_CLASS(VtkModel, sofa::component::visualmodel::VisualModelImpl);
 
-    enum RenderingMode
-    {
-      Default,
-      ClippingPlanes
-    };
-
     void internalDraw(const sofa::core::visual::VisualParams* vparams, bool transparent);
     bool loadTextures();
-    void SetRenderingMode(RenderingMode renderingMode);
-    void SetPlane(const Point3D& point, const Vector3D& normal, ScalarType thickness = 1.0);
     void SetVtkRenderer(vtkRenderer* renderer);
     void updateBuffers();
 
@@ -74,9 +66,6 @@ namespace mitk
     GLuint m_IndexBuffer;
     std::map<unsigned int, vtkSmartPointer<vtkOpenGLTexture> > m_Textures;
     vtkRenderer* m_VtkRenderer;
-    RenderingMode m_RenderingMode;
-    GLdouble m_ClippingPlaneEquation0[4];
-    GLdouble m_ClippingPlaneEquation1[4];
   };
 }
 

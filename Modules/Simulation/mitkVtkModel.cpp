@@ -31,8 +31,7 @@ mitk::VtkModel::VtkModel()
     m_LastNumberOfQuads(0),
     m_VertexBuffer(0),
     m_IndexBuffer(0),
-    m_VtkRenderer(NULL),
-    m_RenderingMode(Default)
+    m_VtkRenderer(NULL)
 {
   if (!IsGlewInitialized)
   {
@@ -200,15 +199,6 @@ void mitk::VtkModel::internalDraw(const sofa::core::visual::VisualParams* vparam
   if (!displayFlags.getShowVisualModels())
     return;
 
-  if (m_RenderingMode == ClippingPlanes)
-  {
-    glClipPlane(GL_CLIP_PLANE0, m_ClippingPlaneEquation0);
-    glEnable(GL_CLIP_PLANE0);
-
-    glClipPlane(GL_CLIP_PLANE1, m_ClippingPlaneEquation1);
-    glEnable(GL_CLIP_PLANE1);
-  }
-
   glEnable(GL_LIGHTING);
   glColor3f(1.0f, 1.0f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, displayFlags.getShowWireFrame() ? GL_LINE : GL_FILL);
@@ -238,12 +228,6 @@ void mitk::VtkModel::internalDraw(const sofa::core::visual::VisualParams* vparam
 
   if (displayFlags.getShowNormals())
     this->DrawNormals();
-
-  if (m_RenderingMode == ClippingPlanes)
-  {
-    glDisable(GL_CLIP_PLANE1);
-    glDisable(GL_CLIP_PLANE0);
-  }
 }
 
 void mitk::VtkModel::DrawNormals()
@@ -322,30 +306,6 @@ bool mitk::VtkModel::loadTextures()
   }
 
   return retValue;
-}
-
-void mitk::VtkModel::SetPlane(const Point3D& point, const Vector3D& normal, ScalarType thickness)
-{
-  Point3D point0 = point - normal * (thickness * 0.5);
-  Point3D point1 = point + normal * (thickness * 0.5);
-
-  // Plane equation: A*x + B*x + C*x + D = 0
-  // A, B, and C are the plane normal components and D is the plane distance from origin
-
-  m_ClippingPlaneEquation0[0] = normal[0];
-  m_ClippingPlaneEquation0[1] = normal[1];
-  m_ClippingPlaneEquation0[2] = normal[2];
-  m_ClippingPlaneEquation0[3] = -(normal[0] * point0[0] + normal[1] * point0[1] + normal[2] * point0[2]);
-
-  m_ClippingPlaneEquation1[0] = -normal[0];
-  m_ClippingPlaneEquation1[1] = -normal[1];
-  m_ClippingPlaneEquation1[2] = -normal[2];
-  m_ClippingPlaneEquation1[3] = normal[0] * point1[0] + normal[1] * point1[1] + normal[2] * point1[2];
-}
-
-void mitk::VtkModel::SetRenderingMode(RenderingMode renderingMode)
-{
-  m_RenderingMode = renderingMode;
 }
 
 void mitk::VtkModel::SetVtkRenderer(vtkRenderer* renderer)

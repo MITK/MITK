@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class ISimulationService;
-
   class MitkSimulation_EXPORT SimulationGLMapper2D : public GLMapper
   {
   public:
@@ -42,8 +40,6 @@ namespace mitk
 
     SimulationGLMapper2D(const Self&);
     Self& operator=(const Self&);
-
-    ISimulationService* m_SimulationService;
   };
 }
 

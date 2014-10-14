@@ -3,6 +3,7 @@ set(CPP_FILES
   mitkExportMitkVisitor.cpp
   mitkIndexROI.cpp
   mitkISimulationService.cpp
+  mitkPlaneIntersectionVisitor.cpp
   mitkRoundRobinSchedulingAlgorithm.cpp
   mitkSetVtkRendererVisitor.cpp
   mitkSchedulableProcess.cpp

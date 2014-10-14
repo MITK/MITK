@@ -57,4 +57,4 @@ private:
 };
 }
 
-US_EXPORT_MODULE_ACTIVATOR(MitkContourModel, mitk::ContourModelActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::ContourModelActivator)

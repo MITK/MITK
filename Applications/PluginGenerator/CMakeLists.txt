@@ -1,4 +1,6 @@
-cmake_minimum_required(VERSION 2.8.5)
+if (${CMAKE_SOURCE_DIR} EQUAL ${PROJECT_SOURCE_DIR})
+  cmake_minimum_required(VERSION 2.8.9)
+endif()
 
 project(MitkPluginGenerator)
 
@@ -20,9 +22,12 @@ endif()
 
 set(QT_DONT_USE_QTGUI 1)
 set(QT_USE_QTNETWORK 1)
-find_package(Qt 4.7 REQUIRED)
-
-include(${QT_USE_FILE})
+if(MITK_USE_Qt4)
+  find_package(Qt 4.7 REQUIRED)
+  include(${QT_USE_FILE})
+else()
+  find_package(Qt5Network REQUIRED)
+endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/PluginGeneratorConfig.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/PluginGeneratorConfig.h" @ONLY)
@@ -37,12 +42,22 @@ set(src_files
   ctkCommandLineParser.cpp
 )
 
-qt4_wrap_cpp(src_files ctkCommandLineParser.h OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-qt4_add_resources(src_files plugin_template.qrc project_template.qrc)
+if(MITK_USE_Qt4)
+  qt4_wrap_cpp(src_files ctkCommandLineParser.h OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+  qt4_add_resources(src_files plugin_template.qrc project_template.qrc)
+else()
+  qt5_wrap_cpp(src_files ctkCommandLineParser.h OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+  qt5_add_resources(src_files plugin_template.qrc project_template.qrc)
+endif()
 
 set(exec_target ${PROJECT_NAME})
 add_executable(${exec_target} ${src_files})
-target_link_libraries(${exec_target} ${QT_LIBRARIES})
+
+if(MITK_USE_Qt4)
+  target_link_libraries(${exec_target} ${QT_LIBRARIES})
+else()
+  target_link_libraries(${exec_target} Qt5::Network)
+endif()
 
 if(NOT standalone_build)
   # subproject support

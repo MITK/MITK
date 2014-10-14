@@ -18,7 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkMeasurementView.h"
 
-#include <QtGui>
+#include <QAction>
+#include <QApplication>
+#include <QClipboard>
+#include <QGridLayout>
+#include <QToolBar>
+#include <QTextBrowser>
 
 #include <mitkIPropertyFilters.h>
 #include <mitkPropertyFilter.h>

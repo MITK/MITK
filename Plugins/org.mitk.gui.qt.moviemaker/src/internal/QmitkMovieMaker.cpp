@@ -483,7 +483,7 @@ void QmitkMovieMaker::GenerateMovie()
     if (movieFileName.isEmpty() == false)
     {
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      m_movieGenerator->SetFileName(movieFileName.toAscii());
+      m_movieGenerator->SetFileName(movieFileName.toLatin1());
       m_movieGenerator->WriteMovie();
     }
 

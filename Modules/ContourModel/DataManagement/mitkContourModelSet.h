@@ -59,7 +59,7 @@ namespace mitk
 
     /** \brief Returns the number of contained contours.
     */
-    virtual int GetSize()
+    virtual int GetSize() const
     {
       return this->m_Contours.size();
     }
@@ -76,7 +76,7 @@ namespace mitk
     /** \brief Returns the ContourModel a given index
     \param index
     */
-    virtual mitk::ContourModel* GetContourModelAt(int index);
+    virtual mitk::ContourModel* GetContourModelAt(int index) const;
 
     /** \brief Returns the container of the contours.
     */

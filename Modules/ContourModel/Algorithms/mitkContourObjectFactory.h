@@ -46,8 +46,7 @@ namespace mitk {
     MultimapType m_SaveFileExtensionsMap;
 
   private:
-    itk::ObjectFactoryBase::Pointer m_ContourModelIOFactory;
-    itk::ObjectFactoryBase::Pointer m_ContourModelWriterFactory;
+
   };
 
 }

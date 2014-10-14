@@ -67,23 +67,11 @@ std::vector<MimeType> MimeTypeProvider::GetMimeTypes() const
 
 std::vector<MimeType> MimeTypeProvider::GetMimeTypesForFile(const std::string& filePath) const
 {
-  // For now, just use the file extension to look-up the registered mime-types.
-  std::string extension = itksys::SystemTools::GetFilenameExtension(filePath);
-  if (!extension.empty())
-  {
-    extension = extension.substr(1, extension.size()-1);
-  }
-  return this->GetMimeTypesForExtension(extension);
-}
-
-std::vector<MimeType> MimeTypeProvider::GetMimeTypesForExtension(const std::string& extension) const
-{
   std::vector<MimeType> result;
   for (std::map<std::string, MimeType>::const_iterator iter = m_NameToMimeType.begin(),
        iterEnd = m_NameToMimeType.end(); iter != iterEnd; ++iter)
   {
-    const std::vector<std::string> extensions = iter->second.GetExtensions();
-    if (std::find(extensions.begin(), extensions.end(), extension) != extensions.end())
+    if (iter->second.AppliesTo(filePath))
     {
       result.push_back(iter->second);
     }

@@ -84,21 +84,17 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
   std::string destMimeType = mimeType;
   if (destMimeType.empty() && !path.empty())
   {
-    // try to derive a mime-type from the extension
-    std::string ext = itksys::SystemTools::GetFilenameExtension(path);
-    if (ext.size() > 1)
+    // try to derive a mime-type from the file
+    std::vector<MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForFile(path);
+    if (!mimeTypes.empty())
     {
-      std::vector<MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(ext.substr(1));
-      if (!mimeTypes.empty())
-      {
-        destMimeType = mimeTypes.front().GetName();
-      }
-      else
-      {
-        // if both mimeType is empty and path does not contain a known
-        // extension, we stop here
-        return;
-      }
+      destMimeType = mimeTypes.front().GetName();
+    }
+    else if (!itksys::SystemTools::GetFilenameExtension(path).empty())
+    {
+      // If there are no suitable mime-type for the file AND an extension
+      // was supplied, we stop here.
+      return;
     }
   }
 

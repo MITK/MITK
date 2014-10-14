@@ -77,7 +77,7 @@ private:
   std::vector<mitk::AbstractFileIO*> m_FileIOs;
   std::vector<mitk::IFileWriter*> m_LegacyWriters;
 
-  std::vector<mitk::CustomMimeType> m_DefaultMimeTypes;
+  std::vector<mitk::CustomMimeType*> m_DefaultMimeTypes;
 
   us::ServiceRegistration<mitk::IMimeTypeProvider> m_MimeTypeProviderReg;
 

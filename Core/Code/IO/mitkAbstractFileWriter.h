@@ -177,7 +177,7 @@ protected:
   /**
    * @return Get the mime-type this writer can handle.
    */
-  CustomMimeType GetMimeType() const;
+  const CustomMimeType* GetMimeType() const;
 
   void SetMimeTypePrefix(const std::string& prefix);
   std::string GetMimeTypePrefix() const;

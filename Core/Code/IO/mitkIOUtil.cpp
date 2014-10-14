@@ -882,7 +882,7 @@ std::string IOUtil::Save(const BaseData* data, const std::string& mimeTypeName, 
 
   if (saveInfo.m_WriterSelector.IsEmpty())
   {
-    return std::string("No suitable writer found for the current data  of type ") + data->GetNameOfClass() +
+    return std::string("No suitable writer found for the current data of type ") + data->GetNameOfClass() +
         (mimeType.IsValid() ? (std::string(" and mime-type ") + mimeType.GetName()) : std::string()) +
         (ext.empty() ? std::string() : (std::string(" with extension ") + ext));
   }

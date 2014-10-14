@@ -14,12 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkGetSimulationService.h"
-#include "mitkISimulationService.h"
-#include "mitkSetVtkRendererVisitor.h"
+#include "mitkPlaneIntersectionVisitor.h"
 #include "mitkSimulation.h"
 #include "mitkSimulationGLMapper2D.h"
-#include <sofa/core/visual/VisualParams.h>
 
 void mitk::SimulationGLMapper2D::SetDefaultProperties(DataNode* node, BaseRenderer* renderer, bool overwrite)
 {
@@ -30,7 +27,6 @@ void mitk::SimulationGLMapper2D::SetDefaultProperties(DataNode* node, BaseRender
 }
 
 mitk::SimulationGLMapper2D::SimulationGLMapper2D()
-  : m_SimulationService(GetSimulationService())
 {
 }
 
@@ -66,4 +62,7 @@ void mitk::SimulationGLMapper2D::Paint(BaseRenderer* renderer)
 
   if (simulation == NULL)
     return;
+
+  PlaneIntersectionVisitor planeIntersectionVisitor(planeGeometry->GetOrigin(), planeGeometry->GetNormal());
+  simulation->GetRootNode()->executeVisitor(&planeIntersectionVisitor);
 }

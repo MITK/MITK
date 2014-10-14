@@ -150,10 +150,10 @@ void mitk::SimulationVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer
     localStorage->m_Mapper->SetSimulation(simulation);
 
     localStorage->m_Actor->SetMapper(localStorage->m_Mapper);
-  }
 
-  SetVtkRendererVisitor setVtkRendererVisitor(renderer->GetVtkRenderer());
-  simulation->GetRootNode()->executeVisitor(&setVtkRendererVisitor);
+    SetVtkRendererVisitor setVtkRendererVisitor(renderer->GetVtkRenderer());
+    simulation->GetRootNode()->executeVisitor(&setVtkRendererVisitor);
+  }
 
   this->ApplySimulationProperties(renderer);
 }

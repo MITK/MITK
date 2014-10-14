@@ -66,16 +66,4 @@ void mitk::SimulationGLMapper2D::Paint(BaseRenderer* renderer)
 
   if (simulation == NULL)
     return;
-
-  SetVtkRendererVisitor setVtkRendererVisitor(renderer->GetVtkRenderer(), planeGeometry->GetOrigin(), planeGeometry->GetNormal());
-  simulation->GetRootNode()->executeVisitor(&setVtkRendererVisitor);
-
-  m_SimulationService->SetActiveSimulation(simulation);
-
-  sofa::core::visual::VisualParams* vParams = sofa::core::visual::VisualParams::defaultInstance();
-  sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSOFASimulation();
-  sofa::simulation::Node::SPtr rootNode = simulation->GetRootNode();
-
-  sofaSimulation->updateVisual(rootNode.get()); // TODO: Check if this is happening only once per time step.
-  sofaSimulation->draw(vParams, rootNode.get());
 }

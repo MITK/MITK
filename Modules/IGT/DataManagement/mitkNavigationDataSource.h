@@ -155,11 +155,25 @@ namespace mitk {
     */
     virtual mitk::PropertyList::ConstPointer GetParameters() const;
 
+    /** Freezes the navigation data source which means the current state is frozen and the output
+     *  navigation data stays at it is. Calling Update() does not have any effect until UnFreeze()
+     *  is called. This also means that the data source is not updated any more. */
+    virtual void Freeze();
+
+    /** Unfreezes the data source. */
+    virtual void UnFreeze();
+
+    /** @return Returns whether the data source is currently frozen. */
+    itkGetMacro(IsFrozen,bool);
+
+
   protected:
     NavigationDataSource();
     virtual ~NavigationDataSource();
 
     std::string m_Name;
+
+    bool m_IsFrozen;
 
 
   private:

@@ -50,7 +50,11 @@ See LICENSE.txt or http://www.mitk.org for details.
     }
 
     this->Update(); // make sure we are working on current data
-    mitk::NavigationData::Pointer reference = this->GetOutput(m_SelectedInput);
+    mitk::NavigationData::Pointer reference;
+    if (m_InitialReferencePose.IsNotNull()) //if there is a given reference pose use it
+      {reference = m_InitialReferencePose;}
+    else //else use the current pose of the given input
+      {reference = this->GetOutput(m_SelectedInput);}
 
     if (! reference->IsDataValid())
     {

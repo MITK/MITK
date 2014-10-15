@@ -1226,9 +1226,15 @@ void QmitkSegmentationView::SetMouseCursor( const us::ModuleResource& resource, 
 
 void QmitkSegmentationView::SetToolSelectionBoxesEnabled(bool status)
 {
-   m_Controls->m_ManualToolSelectionBox2D->setEnabled(status);
-   m_Controls->m_ManualToolSelectionBox3D->setEnabled(status);
-   m_Controls->m_SlicesInterpolator->setEnabled(status);
+  if (status)
+  {
+    m_Controls->m_ManualToolSelectionBox2D->RecreateButtons();
+    m_Controls->m_ManualToolSelectionBox3D->RecreateButtons();
+  }
+
+  m_Controls->m_ManualToolSelectionBox2D->setEnabled(status);
+  m_Controls->m_ManualToolSelectionBox3D->setEnabled(status);
+  m_Controls->m_SlicesInterpolator->setEnabled(status);
 }
 
 // ATTENTION some methods for handling the known list of (organ names, colors) are defined in QmitkSegmentationOrganNamesHandling.cpp

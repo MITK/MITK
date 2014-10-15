@@ -55,6 +55,22 @@ mitk::FastMarchingTool3D::~FastMarchingTool3D()
 {
 }
 
+bool mitk::FastMarchingTool3D::CanHandle(BaseData* referenceData) const
+{
+  if (referenceData == NULL)
+    return false;
+
+  Image* image = dynamic_cast<Image*>(referenceData);
+
+  if (image == NULL)
+    return false;
+
+  if (image->GetDimension() < 3)
+    return false;
+
+  return true;
+}
+
 const char** mitk::FastMarchingTool3D::GetXPM() const
 {
   return NULL;//mitkFastMarchingTool3D_xpm;

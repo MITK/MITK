@@ -135,6 +135,8 @@ mitk::Tool* mitk::ToolManager::GetToolById(int id)
 
 bool mitk::ToolManager::ActivateTool(int id)
 {
+  if (id != -1 && !this->GetToolById(id)->CanHandle(this->GetReferenceData(0)->GetData()))
+    return false;
 
   if(this->GetDataStorage())
     {

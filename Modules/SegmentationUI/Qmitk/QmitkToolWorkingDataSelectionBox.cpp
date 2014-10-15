@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToolWorkingDataSelectionBox.h"
 #include "mitkToolManagerProvider.h"
 
-QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* parent, mitk::DataStorage* storage)
+QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* parent)
 :QListWidget(parent),
 m_SelfCall(false),
 m_LastSelectedReferenceData(NULL),

@@ -121,14 +121,14 @@ private:
   berry::IPerspectiveListener::Pointer titlePerspectiveListener;
   berry::IPerspectiveListener::Pointer menuPerspectiveListener;
   berry::IPartListener::Pointer imageNavigatorPartListener;
-  berry::IPartListener::Pointer candyStorePartListener;
+  berry::IPartListener::Pointer viewNavigatorPartListener;
   berry::IPropertyChangeListener::Pointer editorPropertyListener;
   friend struct berry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
   friend class PartListenerForTitle;
   friend class PerspectiveListenerForTitle;
   friend class PerspectiveListenerForMenu;
   friend class PartListenerForImageNavigator;
-  friend class PartListenerForCandyStore;
+  friend class PartListenerForViewNavigator;
 
   berry::IEditorPart::WeakPtr lastActiveEditor;
   berry::IPerspectiveDescriptor::WeakPtr lastPerspective;
@@ -144,7 +144,7 @@ private:
   bool showViewMenuItem;
   bool showNewWindowMenuItem;
   bool showClosePerspectiveMenuItem;
-  bool candyStoreFound;
+  bool viewNavigatorFound;
   bool showMemoryIndicator;
   std::string productName;
   std::string windowIcon;
@@ -168,7 +168,7 @@ private:
   QAction* undoAction;
   QAction* redoAction;
   QAction* imageNavigatorAction;
-  QAction* candyStoreAction;
+  QAction* viewNavigatorAction;
   QAction* resetPerspAction;
   QAction* closePerspAction;
   QAction* openDicomEditorAction;

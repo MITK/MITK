@@ -13,6 +13,7 @@ QmitkLevelWindowWidgetContextMenu.cpp
 QmitkLevelWindowWidget.cpp
 QmitkLineEditLevelWindowWidget.cpp
 QmitkMemoryUsageIndicatorView.cpp
+QmitkMimeTypes.cpp
 QmitkNodeDescriptor.cpp
 QmitkNodeDescriptorManager.cpp
 QmitkRenderWindowMenu.cpp
@@ -28,6 +29,7 @@ QmitkServiceListWidget.cpp
 QmitkSliderLevelWindowWidget.cpp
 QmitkStdMultiWidget.cpp
 QmitkMouseModeSwitcher.cpp
+QmitkDataStorageFilterProxyModel.cpp
 )
 
 set(MOC_H_FILES

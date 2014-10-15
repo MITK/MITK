@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkACVD.h>
 #include <mitkIOUtil.h>
 #include <mitkTestingMacros.h>
+#include <vtkDebugLeaks.h>
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <sstream>
@@ -109,6 +110,8 @@ int mitkACVDTest(int argc, char* argv[])
   const bool boundaryFixing = lexical_cast<bool>(argv[9]);
 
   MITK_TEST_BEGIN("mitkACVDTest")
+
+    vtkDebugLeaks::SetExitError(0);
 
     Remesh_SurfaceIsNull_ThrowsException();
     Remesh_PolyDataIsNull_ThrowsException();

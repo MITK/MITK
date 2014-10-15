@@ -93,6 +93,8 @@ The pixels with a value between the lower and upper boundary are displayed in di
 
 You can pick the levelwindow with the mouse to move it up and down, while moving the mouse cursor to the left or right to change its size. Picking one of the boundaries with a left click allows you to change the size symmetrically. Holding CTRL and clicking a boundary adjusts only that value.
 
+With line edit fields below you can directly adjust the levelwindow. The upper field describes the center of the levelwindow, the bottom the span of the window around the center. By selecting one of fields and typing any number you can set these two parameters.
+
 \section MITKUserManualPageMemoryUsage System Load Indicator
 
 The System Load Indicator in the lower right hand corner of the screen gives information about the memory currently required by the MITK application. Keep in mind that image processing is a highly memory intensive task and monitor the indicator to avoid your system freezing while constantly swapping to the hard drive.

@@ -31,7 +31,8 @@ TractsToVectorImageFilter< PixelType >::TractsToVectorImageFilter():
     m_UseWorkingCopy(true),
     m_MaxNumDirections(3),
     m_SizeThreshold(0.2),
-    m_NumDirectionsImage(NULL)
+    m_NumDirectionsImage(NULL),
+    m_CreateDirectionImages(true)
 {
     this->SetNumberOfRequiredOutputs(1);
 }
@@ -224,8 +225,14 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
         }
 
         std::vector< double > lengths; lengths.resize(dirCont->size(), 1);  // all peaks have size 1
-        DirectionContainerType::Pointer directions = FastClustering(dirCont, lengths);
-        std::sort( directions->begin(), directions->end(), CompareVectorLengths );
+        DirectionContainerType::Pointer directions;
+        if (m_MaxNumDirections>0)
+        {
+            directions = FastClustering(dirCont, lengths);
+            std::sort( directions->begin(), directions->end(), CompareVectorLengths );
+        }
+        else
+            directions = dirCont;
 
         unsigned int numDir = directions->size();
         if (m_MaxNumDirections>0 && numDir>m_MaxNumDirections)
@@ -247,29 +254,29 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
                 continue;
             count++;
 
-            if (dir.magnitude()<0.4)
-                continue;
-
-            if (i==m_DirectionImageContainer->size())
+            if (m_CreateDirectionImages && i<10)
             {
-                ItkDirectionImageType::Pointer directionImage = ItkDirectionImageType::New();
-                directionImage->SetSpacing( spacing );
-                directionImage->SetOrigin( origin );
-                directionImage->SetDirection( direction );
-                directionImage->SetRegions( imageRegion );
-                directionImage->Allocate();
-                Vector< float, 3 > nullVec; nullVec.Fill(0.0);
-                directionImage->FillBuffer(nullVec);
-                m_DirectionImageContainer->InsertElement(i, directionImage);
-            }
+                if (i==m_DirectionImageContainer->size())
+                {
+                    ItkDirectionImageType::Pointer directionImage = ItkDirectionImageType::New();
+                    directionImage->SetSpacing( spacing );
+                    directionImage->SetOrigin( origin );
+                    directionImage->SetDirection( direction );
+                    directionImage->SetRegions( imageRegion );
+                    directionImage->Allocate();
+                    Vector< float, 3 > nullVec; nullVec.Fill(0.0);
+                    directionImage->FillBuffer(nullVec);
+                    m_DirectionImageContainer->InsertElement(i, directionImage);
+                }
 
-            // set direction image pixel
-            ItkDirectionImageType::Pointer directionImage = m_DirectionImageContainer->GetElement(i);
-            Vector< float, 3 > pixel;
-            pixel.SetElement(0, dir[0]);
-            pixel.SetElement(1, dir[1]);
-            pixel.SetElement(2, dir[2]);
-            directionImage->SetPixel(index, pixel);
+                // set direction image pixel
+                ItkDirectionImageType::Pointer directionImage = m_DirectionImageContainer->GetElement(i);
+                Vector< float, 3 > pixel;
+                pixel.SetElement(0, dir[0]);
+                pixel.SetElement(1, dir[1]);
+                pixel.SetElement(2, dir[2]);
+                directionImage->SetPixel(index, pixel);
+            }
 
             // add direction to vector field (with spacing compensation)
             itk::Point<double> worldStart;

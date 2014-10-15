@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSimulationService_h
 
 #include <mitkISimulationService.h>
+#include <mitkScheduler.h>
 
 namespace mitk
 {
@@ -27,11 +28,13 @@ namespace mitk
     SimulationService();
     ~SimulationService();
 
-    Simulation::Pointer GetSimulation() const;
-    void SetSimulation(Simulation::Pointer simulation);
+    Simulation::Pointer GetActiveSimulation() const;
+    void SetActiveSimulation(Simulation::Pointer activeSimulation);
+    Scheduler* GetScheduler();
 
   private:
-    Simulation::Pointer m_Simulation;
+    Simulation::Pointer m_ActiveSimulation;
+    Scheduler m_Scheduler;
   };
 }
 

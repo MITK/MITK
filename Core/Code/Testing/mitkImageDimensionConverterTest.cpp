@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // vtk includes
 #include <vtkImageData.h>
 
-int mitkImageDimensionConverterTest(int argc, char* argv[])
+int mitkImageDimensionConverterTest(int , char* [])
 {
   MITK_TEST_BEGIN(mitkImageDimensionConverterTest);
 

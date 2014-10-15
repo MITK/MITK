@@ -74,6 +74,7 @@ public Q_SLOTS:
 
   void backward() { back(); }
   void home();
+  void print();
 
   void scaleUp();
   void scaleDown();

@@ -1,0 +1,82 @@
+/**
+\page OverlaysModulePage Overlays and Annotations Module
+
+\tableofcontents
+
+\section OverlaysModulePage_Introduction Overlays and Annotations
+
+The overlays in MITK are a simple way to display additional information on the render windows. A class, deriving from mitk::Overlay represents an arbitrary
+2D or 3D object that can be rendered as an overlay. This can for example be used for the annotation of 3D points or to overlay despriptions in the window corners.
+The mitk::OverlayManager is used to add the overlays to the renderwindows, updating them and manage the respective layout managers.
+The following features are implemented in this framework.
+<ol>
+  <li>Definition of graphical elements that can be displayed in the render windows.
+  <li>It is possible to manage multiple elements in each window.
+  <li>A single Overlay can be rendered on any number of available render windows.
+  <li>2D and 3D textelements are already defined in the Overlay module and are using VTK to create custom annotations.
+  <li>The mitk::BaseLayouter interface enables the implementation of layout managers, to handle the placement of the overlays.
+</ol>
+
+\section OverlaysModulePage_ArchitectureSection General Architecture
+\section OverlaysModulePage_UsageSection Usage of Predefined Overlays
+
+\subsection OverlaysModulePage_TextWidget2DUsageSubsection mitkTextOverlay2D
+This exemplary overlay can render UTF-8 encoded text as a 2D Overlay. The Overlay2DLayouter can be used to automatically place a group of overlays to a
+specific corner.
+\snippet OverlayExample.cpp TextOverlay2D
+\snippet OverlayExample.cpp SetLayouterToOverlay
+
+\subsection OverlaysModulePage_TextWidget3DUsageSubsection mitkTextOverlay3D
+This overlay displays labels in 3D coordinates. The labels always face the camera.
+
+\snippet OverlayExample.cpp TextOverlay3D
+
+\subsection OverlaysModulePage_NotManagedSubsection Manually Managed Overlays
+In order to integrate an Overlay into an mitk::Mapper, it is advised not to use the OverlayManager but to manually manage the Overlay.
+To do so, the update methods of the overlays have to be called manually before the start of each rendering procedure. It must only be called if the Properties have changed or if your custom overlay implements its own rendering mechanism.
+
+\section OverlaysModulePage_CustomOverlaySection Implement a Custom Overlay
+
+A new custom Overlay should derive from mitkOverlay or one of the later mentioned subclasses VtkOverlay2D oder VtkOverlay3D. There should always be an implementation for the methods
+AddOverlay, RemoveOverlay and Update Overlay.
+UpdateOverlay is the procedure that is called in each rendering step. If the Overlay is rendered by VTK, this method only applies the properties to the representation.
+If the custom Overlay requires additional properties, they should be made accessible by getters and setters for a better usability:
+\code
+void mitk::VtkOverlay3D::SetPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
+{
+  mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
+  SetProperty("Position3D", position3dProperty,renderer);
+}
+
+mitk::Point3D mitk::VtkOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
+{
+  mitk::Point3D position3D;
+  GetPropertyValue<mitk::Point3D>("Position3D", position3D, renderer);
+  return position3D;
+}
+\endcode
+
+\subsection OverlaysModulePage_CustomVTK2DOverlaySubsection VTK 2D Overlay
+
+VTK based overlays which are meant to be displayed in 2D over the render window should derive from the mitk::VtkOverlay2D.
+The mitk::VtkOverlay2D is a subclass of Vtk::Overlay, that uses VTK to render the overlay. This class creates the Overlay representation as a vtkActor2D, and is very easy to implement
+because only UpdateVtkOverlay2D and GetVtkActor2D have to be implemented. The add, update and remove methods are implemented in the superclasses.
+UpdateVtkOverlay2D only needs to apply the specific properties and GetVtkActor2D simply returns the created vtkActor.
+
+\subsection OverlaysModulePage_CustomVTK3DOverlaySubsection VTK 3D Overlay
+
+The mitkVtkOverlay3D works just like mitkVtkOverlay2D, but it is designed for arbitrary 3D objects which derive from vtkProp,
+
+\section OverlaysModulePage_CustomLayouterSection Implement a Custom Layouter
+
+A Layouter is used for an automatic positioning of a group of Overlays and is derived from mitkBaseLayouter. Every Layouter that manages a group of Layouts should have a unique identifier
+which is used to register the Layouter in the OverlayManager. A Layouter is always uniquely defined by the identifier and one BaseRenderer. Before a Layouter can be used by the
+OverlayManager it has to be added, using the AddLayouter Method. An Overlay can then be added to a Layout as follows:
+
+\code
+overlayManager->SetLayouter(textOverlay.GetPointer(),mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT,axialRenderer);
+\endcode
+
+A new Layouter has to implement PrepareLayout which should parse the internal Overlay list and set their position as required.
+
+*/

@@ -3,7 +3,6 @@ project(org_blueberry_ui)
 set(PLUGIN_exported_include_suffixes
   src
   src/application
-  src/commands
   src/dialogs
   src/guitk
   src/handlers

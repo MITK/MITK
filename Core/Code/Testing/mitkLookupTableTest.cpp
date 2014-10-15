@@ -93,6 +93,7 @@ public:
     double rgba[4];
     lut->GetTableValue(tableIndex, rgba);
     CPPUNIT_ASSERT_MESSAGE("Opacity not set for value", mitk::Equal(1.0, rgba[3], 0.01, true));
+    lut->Delete();
   }
 
   void TestCreateColorTransferFunction ()
@@ -122,6 +123,7 @@ public:
                              mitk::Equal(rgbaTable[2], rgbaFunction[2], 0.000001, true)
                              );
     }
+    lut->Delete();
   }
 
   void TestCreateOpacityTransferFunction ()
@@ -148,6 +150,7 @@ public:
                              mitk::Equal(table[i], rgba[3], 0.000001, true)
                              );
     }
+    lut->Delete();
     delete [] table;
   }
 
@@ -176,6 +179,7 @@ public:
                              mitk::Equal(table[i], rgba[3], 0.000001, true)
                              );
     }
+    lut->Delete();
     delete [] table;
   }
 };

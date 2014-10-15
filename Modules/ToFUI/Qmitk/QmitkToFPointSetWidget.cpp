@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToFPointSetWidget.h"
 
-#include <QmitkTextOverlay.h>
-
 #include <mitkGlobalInteraction.h>
 #include <mitkVtkLayerController.h>
 

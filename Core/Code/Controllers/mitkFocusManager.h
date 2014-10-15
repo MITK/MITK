@@ -46,7 +46,7 @@ namespace mitk {
   //##Documentation
   //##@brief Element, that can be focused and held here.
   //##
-  //## has to be an itk-Objekct in order to use itk-Smartpointer!
+  //## has to be an itk-Object in order to use itk-Smartpointer!
   typedef mitk::BaseRenderer FocusElement;
 
   typedef itk::WeakPointer<FocusElement> FocusElementWeakPointer;
@@ -67,9 +67,8 @@ namespace mitk {
   //##Documentation
   //## removes the given widget from the list.
   //## true if found and removed, else false
-  //## afterwards the focused widget is the one behind the deleted
-  //## or if the deleted was the last, then the one before the deleted
-  //## that way you can delete sequentialy from the back on or from front to back
+  //## If the focus was on the removed widget then the next widget
+  //## will get the focus, as described in GoToNext().
   bool RemoveElement(FocusElement* element);
 
   //##Documentation

@@ -72,19 +72,6 @@ The mitk::OverlayManager::SetLayouter method can then be used to configure an Ov
 
 \snippet OverlayExample.cpp SetLayouterToOverlay
 
-\section OverlaysPage_UsageSection Usage of Predefined Overlays
-
-\subsection OverlaysPage_TextWidget2DUsageSubsection mitkTextOverlay2D
-This exemplary overlay can render UTF-8 encoded text as a 2D Overlay. The Overlay2DLayouter can be used to automatically place a group of overlays to a
-specific corner.
-\snippet OverlayExample.cpp TextOverlay2D
-\snippet OverlayExample.cpp SetLayouterToOverlay
-
-\subsection OverlaysPage_TextWidget3DUsageSubsection mitkTextOverlay3D
-This overlay displays labels in 3D coordinates. The labels always face the camera.
-
-\snippet OverlayExample.cpp TextOverlay3D
-
 \subsection OverlaysPage_NotManagedSubsection Manually Managed Overlays
 In order to integrate an Overlay into an mitk::Mapper, it is advised not to use the OverlayManager but to manually manage the Overlay.
 To do so, the update methods of the overlays have to be called manually before the start of each rendering procedure. It must only be called if the Properties have changed or if your custom overlay implements its own rendering mechanism.

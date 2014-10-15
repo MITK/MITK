@@ -17,6 +17,8 @@ The perspective groups a number of tools which can be used for:
   <li> manual segmentation of any structures you might want to delineate
 </ul>
 
+For more detailed information on the clipping plane view see \subpage org_mitk_views_deformableclippingplane.
+
 \imageMacro{QmitkSegmentation_IMGApplication.png,"Segmentation perspective consisting of the Data Manager view and the Segmentation view",16.00}
 
 If you wonder what segmentations are good for, we shortly revisit the concept of a segmentation here.

@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTemporaryFile>
 #include <QDesktopServices>
 #include <QWheelEvent>
+#include <QPrinter>
+#include <QPrintDialog>
 
 #include <QWebPage>
 
@@ -523,5 +525,22 @@ void HelpWebView::home()
 {
   setSource(m_HelpEngine.homePage());
 }
+
+void HelpWebView::print()
+{
+  QPrinter printer;
+
+  QPrintDialog *dialog = new QPrintDialog(&printer, this);
+  dialog->setWindowTitle(tr("Print Document"));
+  if(hasSelection())
+  {
+    dialog->addEnabledOption(QAbstractPrintDialog::PrintSelection);
+  }
+  if(dialog->exec() == QDialog::Accepted)
+  {
+    QWebView::print(&printer);
+  }
+}
+
 
 }

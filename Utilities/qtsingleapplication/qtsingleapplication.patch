@@ -1,0 +1,188 @@
+diff --git a/Utilities/qtsingleapplication/qtlocalpeer.cpp b/Utilities/qtsingleapplication/qtlocalpeer.cpp
+index 332b064..dd0143b 100644
+--- a/Utilities/qtsingleapplication/qtlocalpeer.cpp
++++ b/Utilities/qtsingleapplication/qtlocalpeer.cpp
+@@ -132,7 +132,7 @@ bool QtLocalPeer::isClient()
+ }
+ 
+ 
+-bool QtLocalPeer::sendMessage(const QString &message, int timeout)
++bool QtLocalPeer::sendMessage(const QByteArray &message, int timeout)
+ {
+     if (!isClient())
+         return false;
+@@ -156,9 +156,8 @@ bool QtLocalPeer::sendMessage(const QString &message, int timeout)
+     if (!connOk)
+         return false;
+ 
+-    QByteArray uMsg(message.toUtf8());
+     QDataStream ds(&socket);
+-    ds.writeBytes(uMsg.constData(), uMsg.size());
++    ds.writeBytes(message.constData(), message.size());
+     bool res = socket.waitForBytesWritten(timeout);
+     if (res) {
+         res &= socket.waitForReadyRead(timeout);   // wait for ack
+@@ -194,10 +193,9 @@ void QtLocalPeer::receiveConnection()
+         delete socket;
+         return;
+     }
+-    QString message(QString::fromUtf8(uMsg));
+     socket->write(ack, qstrlen(ack));
+     socket->waitForBytesWritten(1000);
+     socket->waitForDisconnected(1000); // make sure client reads ack
+     delete socket;
+-    emit messageReceived(message); //### (might take a long time to return)
++    emit messageReceived(uMsg); //### (might take a long time to return)
+ }
+diff --git a/Utilities/qtsingleapplication/qtlocalpeer.h b/Utilities/qtsingleapplication/qtlocalpeer.h
+index 1b533b1..07374d9 100644
+--- a/Utilities/qtsingleapplication/qtlocalpeer.h
++++ b/Utilities/qtsingleapplication/qtlocalpeer.h
+@@ -54,12 +54,12 @@ class QtLocalPeer : public QObject
+ public:
+     QtLocalPeer(QObject *parent = 0, const QString &appId = QString());
+     bool isClient();
+-    bool sendMessage(const QString &message, int timeout);
++    bool sendMessage(const QByteArray &message, int timeout);
+     QString applicationId() const
+         { return id; }
+ 
+ Q_SIGNALS:
+-    void messageReceived(const QString &message);
++    void messageReceived(const QByteArray &message);
+ 
+ protected Q_SLOTS:
+     void receiveConnection();
+diff --git a/Utilities/qtsingleapplication/qtlockedfile_win.cpp b/Utilities/qtsingleapplication/qtlockedfile_win.cpp
+index 5e21262..a44620b 100644
+--- a/Utilities/qtsingleapplication/qtlockedfile_win.cpp
++++ b/Utilities/qtsingleapplication/qtlockedfile_win.cpp
+@@ -63,7 +63,7 @@ Qt::HANDLE QtLockedFile::getMutexHandle(int idx, bool doCreate)
+ 
+     Qt::HANDLE mutex;
+     if (doCreate) {
+-        QT_WA( { mutex = CreateMutexW(NULL, FALSE, (TCHAR*)mname.utf16()); },
++        QT_WA( { mutex = CreateMutexW(NULL, FALSE, reinterpret_cast<LPCWSTR>(mname.utf16())); },
+                { mutex = CreateMutexA(NULL, FALSE, mname.toLocal8Bit().constData()); } );
+         if (!mutex) {
+             qErrnoWarning("QtLockedFile::lock(): CreateMutex failed");
+@@ -71,7 +71,7 @@ Qt::HANDLE QtLockedFile::getMutexHandle(int idx, bool doCreate)
+         }
+     }
+     else {
+-        QT_WA( { mutex = OpenMutexW(SYNCHRONIZE | MUTEX_MODIFY_STATE, FALSE, (TCHAR*)mname.utf16()); },
++        QT_WA( { mutex = OpenMutexW(SYNCHRONIZE | MUTEX_MODIFY_STATE, FALSE, reinterpret_cast<LPCWSTR>(mname.utf16())); },
+                { mutex = OpenMutexA(SYNCHRONIZE | MUTEX_MODIFY_STATE, FALSE, mname.toLocal8Bit().constData()); } );
+         if (!mutex) {
+             if (GetLastError() != ERROR_FILE_NOT_FOUND)
+diff --git a/Utilities/qtsingleapplication/qtsingleapplication.cpp b/Utilities/qtsingleapplication/qtsingleapplication.cpp
+index d0fb15d..b2f2058 100644
+--- a/Utilities/qtsingleapplication/qtsingleapplication.cpp
++++ b/Utilities/qtsingleapplication/qtsingleapplication.cpp
+@@ -137,7 +137,7 @@ void QtSingleApplication::sysInit(const QString &appId)
+ {
+     actWin = 0;
+     peer = new QtLocalPeer(this, appId);
+-    connect(peer, SIGNAL(messageReceived(const QString&)), SIGNAL(messageReceived(const QString&)));
++    connect(peer, SIGNAL(messageReceived(const QByteArray&)), SIGNAL(messageReceived(const QByteArray&)));
+ }
+ 
+ 
+@@ -256,7 +256,7 @@ bool QtSingleApplication::isRunning()
+ 
+     \sa isRunning(), messageReceived()
+ */
+-bool QtSingleApplication::sendMessage(const QString &message, int timeout)
++bool QtSingleApplication::sendMessage(const QByteArray &message, int timeout)
+ {
+     return peer->sendMessage(message, timeout);
+ }
+@@ -288,9 +288,9 @@ void QtSingleApplication::setActivationWindow(QWidget* aw, bool activateOnMessag
+ {
+     actWin = aw;
+     if (activateOnMessage)
+-        connect(peer, SIGNAL(messageReceived(const QString&)), this, SLOT(activateWindow()));
++        connect(peer, SIGNAL(messageReceived(const QByteArray&)), this, SLOT(activateWindow()));
+     else
+-        disconnect(peer, SIGNAL(messageReceived(const QString&)), this, SLOT(activateWindow()));
++        disconnect(peer, SIGNAL(messageReceived(const QByteArray&)), this, SLOT(activateWindow()));
+ }
+ 
+ 
+diff --git a/Utilities/qtsingleapplication/qtsingleapplication.h b/Utilities/qtsingleapplication/qtsingleapplication.h
+index 049406f..4acf5f5 100644
+--- a/Utilities/qtsingleapplication/qtsingleapplication.h
++++ b/Utilities/qtsingleapplication/qtsingleapplication.h
+@@ -43,6 +43,8 @@
+ 
+ #include <QApplication>
+ 
++#include <qthandlenewappinstance.h>
++
+ class QtLocalPeer;
+ 
+ #if defined(Q_OS_WIN)
+@@ -88,12 +90,12 @@ public:
+         { isRunning(); Q_UNUSED(dummy) }
+ 
+ public Q_SLOTS:
+-    bool sendMessage(const QString &message, int timeout = 5000);
++    bool sendMessage(const QByteArray &message, int timeout = 5000);
+     void activateWindow();
+ 
+ 
+ Q_SIGNALS:
+-    void messageReceived(const QString &message);
++    void messageReceived(const QByteArray &message);
+ 
+ 
+ private:
+diff --git a/Utilities/qtsingleapplication/qtsinglecoreapplication.cpp b/Utilities/qtsingleapplication/qtsinglecoreapplication.cpp
+index 5634537..a7cbf77 100644
+--- a/Utilities/qtsingleapplication/qtsinglecoreapplication.cpp
++++ b/Utilities/qtsingleapplication/qtsinglecoreapplication.cpp
+@@ -74,7 +74,7 @@ QtSingleCoreApplication::QtSingleCoreApplication(int &argc, char **argv)
+     : QCoreApplication(argc, argv)
+ {
+     peer = new QtLocalPeer(this);
+-    connect(peer, SIGNAL(messageReceived(const QString&)), SIGNAL(messageReceived(const QString&)));
++    connect(peer, SIGNAL(messageReceived(const QByteArray&)), SIGNAL(messageReceived(const QByteArray&)));
+ }
+ 
+ 
+@@ -87,7 +87,7 @@ QtSingleCoreApplication::QtSingleCoreApplication(const QString &appId, int &argc
+     : QCoreApplication(argc, argv)
+ {
+     peer = new QtLocalPeer(this, appId);
+-    connect(peer, SIGNAL(messageReceived(const QString&)), SIGNAL(messageReceived(const QString&)));
++    connect(peer, SIGNAL(messageReceived(const QByteArray&)), SIGNAL(messageReceived(const QByteArray&)));
+ }
+ 
+ 
+@@ -122,7 +122,7 @@ bool QtSingleCoreApplication::isRunning()
+     \sa isRunning(), messageReceived()
+ */
+ 
+-bool QtSingleCoreApplication::sendMessage(const QString &message, int timeout)
++bool QtSingleCoreApplication::sendMessage(const QByteArray &message, int timeout)
+ {
+     return peer->sendMessage(message, timeout);
+ }
+diff --git a/Utilities/qtsingleapplication/qtsinglecoreapplication.h b/Utilities/qtsingleapplication/qtsinglecoreapplication.h
+index b87fffe..593915a 100644
+--- a/Utilities/qtsingleapplication/qtsinglecoreapplication.h
++++ b/Utilities/qtsingleapplication/qtsinglecoreapplication.h
+@@ -57,11 +57,11 @@ public:
+     QString id() const;
+ 
+ public Q_SLOTS:
+-    bool sendMessage(const QString &message, int timeout = 5000);
++    bool sendMessage(const QByteArray &message, int timeout = 5000);
+ 
+ 
+ Q_SIGNALS:
+-    void messageReceived(const QString &message);
++    void messageReceived(const QByteArray &message);
+ 
+ 
+ private:

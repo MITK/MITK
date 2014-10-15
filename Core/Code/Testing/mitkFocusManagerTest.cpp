@@ -34,6 +34,9 @@ int mitkFocusManagerTest(int /*argc*/, char* /*argv*/[])
   mitk::VtkPropRenderer::Pointer element1 = mitk::VtkPropRenderer::New( "renderer1", renderWindow, rm );
   mitk::VtkPropRenderer::Pointer element2 = mitk::VtkPropRenderer::New( "renderer2", renderWindow, rm );
   mitk::VtkPropRenderer::Pointer element3 = mitk::VtkPropRenderer::New( "renderer3", renderWindow, rm );
+  element1->InitSize(100, 100);
+  element2->InitSize(100, 100);
+  element3->InitSize(100, 100);
 
   //the FocusManager itself
   mitk::FocusManager::Pointer focusManager = mitk::FocusManager::New();
@@ -65,7 +68,7 @@ int mitkFocusManagerTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(focusManager->GetFocused() == element3, "focus on element 3");
 
   MITK_TEST_CONDITION_REQUIRED(focusManager->RemoveElement(element1), "Testing removing first element; Elements in list: 2 3");
-  MITK_TEST_CONDITION_REQUIRED(focusManager->GetFocused() == element2, "Testing if focused element is the one behind the deleted one: 2");
+  MITK_TEST_CONDITION_REQUIRED(focusManager->GetFocused() == element3, "Testing if focused element is still element 3");
   MITK_TEST_CONDITION_REQUIRED(focusManager->AddElement(element1), "Testing addition of an element again; Elements in list: 2 3 1");
   MITK_TEST_CONDITION_REQUIRED(focusManager->RemoveElement(element3), "Testing removing element 3; Elements in list: 2 1");
   MITK_TEST_CONDITION_REQUIRED(focusManager->GetFocused() == element1, "Testing if focused element is the one behind the deleted one: 1");

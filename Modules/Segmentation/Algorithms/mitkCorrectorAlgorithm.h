@@ -26,21 +26,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
 /**
  * This class encapsulates an algorithm, which takes a 2D binary image and a contour.
  * The algorithm tests if the line begins and ends inside or outside a segmentation
  * and whether areas should be added to or subtracted from the segmentation shape.
  *
  * This class has two outputs:
- *   \li a difference image from GetDifferenceImage()
  *   \li the modified input image from GetOutput()
- *
- * The difference image is an image of the same dimensions as the input. Each pixel has
- * one of three values -1, 0, +1 meaning
- *   \li <b>-1</b> this pixel was foreground in the input image and should be removed from the segmentation
- *   \li <b>0</b> this pixel needs no change
- *   \li <b>+1</b> this pixel was background in the input image and should be added to the segmentation
  *
  * The output image is a combination of the original input with the generated difference image.
  *
@@ -64,7 +56,6 @@ class MitkSegmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
      */
     //itkGetObjectMacro(DifferenceImage, Image);
 
-  protected:
 
     // used by TobiasHeimannCorrectionAlgorithm
     typedef struct
@@ -72,8 +63,12 @@ class MitkSegmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
       int  lineStart;
       int lineEnd;
       bool modified;
+
+      std::vector< itk::Index<2> > points;
     }
     TSegData;
+
+  protected:
 
     CorrectorAlgorithm();
     virtual ~CorrectorAlgorithm();
@@ -81,19 +76,16 @@ class MitkSegmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     // does the actual processing
     virtual void GenerateData();
 
-    void TobiasHeimannCorrectionAlgorithm(mitkIpPicDescriptor* pic);
-    bool modifySegment( int lineStart, int lineEnd, ipMITKSegmentationTYPE state, mitkIpPicDescriptor *pic, int* _ofsArray );
-
-    void CalculateDifferenceImage( Image* modifiedImage, Image* originalImage );
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkCalculateDifferenceImage( itk::Image<TPixel, VImageDimension>* originalImage, Image* modifiedMITKImage );
+    bool ImprovedHeimannCorrectionAlgorithm(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic);
+    bool ModifySegment(const TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic);
 
     Image::Pointer m_WorkingImage;
     ContourModel::Pointer m_Contour;
     Image::Pointer m_DifferenceImage;
-};
 
+    int m_FillColor;
+    int m_EraseColor;
+};
 }
 
 #endif
-

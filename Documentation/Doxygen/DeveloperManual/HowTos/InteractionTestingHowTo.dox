@@ -1,0 +1,70 @@
+/**
+
+\page InteractionTestingHowTo Interaction Testing in MITK
+
+\tableofcontents
+
+\section RecordingInteractions Recording Interactions
+To be able to record interactions activate Interaction Event Recorder in MITK-build cmake.
+The following table explains how to step-wise create an interaction sequence, which is necessary for developing interaction tests.
+The given example shows how the AddTool Segmentation Interaction Test was developed.
+For implementation examples refer to mitkToolInteractionTest.cpp or mitkPlanarFigureInteractionTest.cpp
+
+Step           | AddTool Segmentation Example
+-------------- | ----------------------
+Load Image | MITK-Data/Pic3D.nrrd
+Do not scroll image slices before recording starts | -
+Activate Interaction | Click on Add in segmentation plugin
+Define output filename (be careful: plugin appends interactions to existing files) | SegmentationInteractor_AddTool.xml
+Start recording | Click on record symbol (red circle) in Event Recorder Plugin
+Perform Interaction | Draw a segmentation in the render window
+Stop recording | Click on stop symbol (red square) in Event Recorder Plugin
+Save record (\<interaction\>.xml) to your testing environment | MITK-Data/InteractionTestData/Interactions/SegmentationInteractor_AddTool.xml
+Save interaction result (Image, Surface, etc.) to your testing environment | InteractionTestData/ReferenceData/SegmentationInteractor_AddTool.nrrd
+
+\section Limitations Limitations
+<ul>
+ <li> No VTK interactions are recorded
+ <li> Renderwindows have to stay constant during record (e.g. no resizing)
+ <li> Interactions have to follow the new Interaction concept
+</ul>
+
+\section UsingInteractionsInTests Using Interactions in Tests
+
+In order to use interaction tests, the class mitk::InteractionTestHelper has to be used.
+The usage of this class is explained with an example of the SegmentationTool test.
+The TestHelper needs to know the location of the recorded interaction file.
+This is done by giving the filename to the constructor.
+
+\code
+//Create test helper to initialize all necessary objects for interaction
+mitk::InteractionTestHelper interactionTestHelper(GetTestDataFilePath(interactionPattern));
+\endcode
+
+The InteractionTestHelper stores its own DataStorage.
+We want to use this DataStorage and provide all necessary DataNodes.
+\code
+//Use data storage of test helper
+mitk::DataStorage::Pointer dataStorage = interactionTestHelper.GetDataStorage();
+
+//add images to datastorage
+interactionTestHelper.AddNodeToStorage(patientImageNode);
+interactionTestHelper.AddNodeToStorage(workingImageNode);
+\endcode
+
+Let the InteractionTestHelper know about the relevant time step (particularly necessary with 4D images)
+\code
+//set time step
+interactionTestHelper.SetTimeStep(timestep);
+\endcode
+
+When everything is set up, the loaded Interaction can be played back.
+\code
+//Start Interaction
+interactionTestHelper.PlaybackInteraction();
+\endcode
+
+
+
+
+*/

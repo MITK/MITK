@@ -113,7 +113,6 @@ void QmitkFiberProcessingView::CalculateFiberDirections()
     mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.back()->GetData());
 
     itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
-    // load/create mask image
     if (m_SelectedImage.IsNotNull())
     {
         ItkUcharImgType::Pointer itkMaskImage = ItkUcharImgType::New();
@@ -126,6 +125,7 @@ void QmitkFiberProcessingView::CalculateFiberDirections()
     fOdfFilter->SetAngularThreshold(cos(m_Controls->m_AngularThreshold->value()*M_PI/180));
     fOdfFilter->SetNormalizeVectors(true);
     fOdfFilter->SetUseWorkingCopy(true);
+    fOdfFilter->SetCreateDirectionImages(m_Controls->m_DirectionImagesBox->isChecked());
     fOdfFilter->SetSizeThreshold(m_Controls->m_PeakThreshold->value());
     fOdfFilter->SetMaxNumDirections(m_Controls->m_MaxNumDirections->value());
     fOdfFilter->Update();
@@ -134,11 +134,24 @@ void QmitkFiberProcessingView::CalculateFiberDirections()
 
     if (m_Controls->m_VectorFieldBox->isChecked())
     {
+        float minSpacing = 1;
+        if (m_SelectedImage.IsNotNull())
+        {
+            mitk::Vector3D outImageSpacing = m_SelectedImage->GetGeometry()->GetSpacing();
+
+            if(outImageSpacing[0]<outImageSpacing[1] && outImageSpacing[0]<outImageSpacing[2])
+                minSpacing = outImageSpacing[0];
+            else if (outImageSpacing[1] < outImageSpacing[2])
+                minSpacing = outImageSpacing[1];
+            else
+                minSpacing = outImageSpacing[2];
+        }
+
         mitk::FiberBundleX::Pointer directions = fOdfFilter->GetOutputFiberBundle();
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData(directions);
         node->SetName((name+"_vectorfield").toStdString().c_str());
-//        node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(minSpacing));
+        node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(minSpacing));
         node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
         node->SetProperty("color", mitk::ColorProperty::New(1.0f, 1.0f, 1.0f));
 

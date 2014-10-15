@@ -155,7 +155,7 @@ void QmitkPythonTextEditor::on_SaveScript_triggered( bool )
   d->m_FileName = QFileDialog::getSaveFileName(this,tr("Save File"), d->m_FileName,tr("*.py"));
   if( d->m_FileName.compare("") != 0)
   {
-    ofstream myfile;
+    std::ofstream myfile;
     myfile.open(d->m_FileName.toLocal8Bit().data());
     myfile << d->m_Content->toPlainText().toLocal8Bit().data();
     myfile.close();

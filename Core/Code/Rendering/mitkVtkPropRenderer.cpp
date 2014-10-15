@@ -675,6 +675,33 @@ void mitk::VtkPropRenderer::InitPathTraversal()
   }
 }
 
+int mitk::VtkPropRenderer::GetNumberOfPaths()
+{
+    if (m_DataStorage.IsNull()) {
+        return 0;
+    }
+
+    int nPaths = 0;
+    DataStorage::SetOfObjects::ConstPointer objects = m_DataStorage->GetAll();
+    for (DataStorage::SetOfObjects::const_iterator iter = objects->begin(); iter != objects->end(); ++iter) {
+        Mapper* mapper = (*iter)->GetMapper(BaseRenderer::Standard3D);
+        if (mapper)
+        {
+            VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>(mapper);
+            if (vtkmapper)
+            {
+                vtkProp* prop = vtkmapper->GetVtkProp(this);
+                if (prop && prop->GetVisibility())
+                {
+                    ++nPaths;
+                }
+            }
+        }
+    }
+
+    return nPaths;
+}
+
 vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 {
   if (m_DataStorage.IsNull() )
@@ -833,7 +860,8 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
   {
     //activate parallel projection for 2D
     this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(false);
-    this->GetRenderWindow()->GetInteractor()->SetInteractorStyle( vtkInteractorStyleTrackballCamera::New() );
+    vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+    this->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
     m_CameraInitializedForMapperID = Standard3D;
   }
   else if( this->GetMapperID() == Standard2D)
@@ -844,7 +872,8 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
     //TODO Implement a property for light in the 2D render windows (in another method)
     this->GetVtkRenderer()->RemoveAllLights();
 
-    this->GetRenderWindow()->GetInteractor()->SetInteractorStyle( mitkVtkInteractorStyle::New() );
+    vtkSmartPointer<mitkVtkInteractorStyle> style = vtkSmartPointer<mitkVtkInteractorStyle>::New();
+    this->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
 
     m_CameraInitializedForMapperID = Standard2D;
   }

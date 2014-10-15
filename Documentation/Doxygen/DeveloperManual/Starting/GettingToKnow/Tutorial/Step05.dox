@@ -1,13 +1,13 @@
  /**
 
  \page Step05Page MITK Tutorial - Step 5: Interactively add points
- 
+
  \li \ref Step5.cpp "Step5.cpp"\n
  Contains the code for this step.
  \li Path to files used in this step: \n
-.../bin/CMakeExternals/Source/MITK-Data/Pic3D.nrrd (image) \n
-.../MITK/Modules/Segmentation/Testing/Data/lungs.vtk (surface) 
- 
+http://mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
+http://mitk.org/download/tutorial-data/lungs.vtk (surface)
+
  In addition to Step 4 where 3 views were created on the data, we now want to interactively add points.
 
  A node containing a PointSet as data is added to the data tree and a PointSetDataInteractor is associated with the node, which handles the interaction.

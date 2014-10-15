@@ -36,7 +36,8 @@ mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   m_Contours = Surface::New();
 
   m_PolyData = vtkSmartPointer<vtkPolyData>::New();
-  m_PolyData->SetPoints(vtkPoints::New());
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+  m_PolyData->SetPoints(points);
 
   m_InterpolationResult = 0;
   m_CurrentNumberOfReducedContours = 0;
@@ -55,11 +56,11 @@ mitk::SurfaceInterpolationController::~SurfaceInterpolationController()
 
 mitk::SurfaceInterpolationController* mitk::SurfaceInterpolationController::GetInstance()
 {
-  static mitk::SurfaceInterpolationController* m_Instance;
+  static mitk::SurfaceInterpolationController::Pointer m_Instance;
 
-  if ( m_Instance == 0)
+  if ( m_Instance.IsNull() )
   {
-    m_Instance = new SurfaceInterpolationController();
+    m_Instance = SurfaceInterpolationController::New();
   }
   return m_Instance;
 }

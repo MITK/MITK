@@ -37,12 +37,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <fstream>
 #include <sstream>
+#include <mitkIOUtil.h>
 
 #include "itksys/SystemTools.hxx"
 
 mitk::SceneIO::SceneIO()
-:m_WorkingDirectory(""),
- m_UnzipErrors(0)
+  :m_WorkingDirectory(""),
+  m_UnzipErrors(0)
 {
 }
 
@@ -52,7 +53,6 @@ mitk::SceneIO::~SceneIO()
 
 std::string mitk::SceneIO::CreateEmptyTempDirectory()
 {
-
   mitk::UIDGenerator uidGen("UID_",6);
 
   //std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTemp" + uidGen.GetUID();
@@ -64,16 +64,16 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
   {
     bool existsNot = tempdir.createDirectory();
     if (!existsNot)
-      {
+    {
       MITK_ERROR << "Warning: Directory already exitsts: " << uniquename << " (choosing another)";
       returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uidGen.GetUID();
       uniquename = returnValue + Poco::Path::separator();
       Poco::File tempdir2( uniquename );
       if (!tempdir2.createDirectory())
-        {
+      {
         MITK_ERROR << "Warning: Second directory also already exitsts: " << uniquename;
-        }
       }
+    }
   }
   catch( std::exception& e )
   {
@@ -81,13 +81,12 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
     return "";
   }
 
-
   return returnValue;
 }
 
 mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename,
-                                                     DataStorage* pStorage,
-                                                     bool clearStorageFirst )
+                                                    DataStorage* pStorage,
+                                                    bool clearStorageFirst )
 {
   // prepare data storage
   DataStorage::Pointer storage = pStorage;
@@ -147,10 +146,10 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 
   // test if index.xml exists
   // parse index.xml with TinyXML
-  TiXmlDocument document( m_WorkingDirectory + Poco::Path::separator() + "index.xml" );
+  TiXmlDocument document( m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml" );
   if (!document.LoadFile())
   {
-    MITK_ERROR << "Could not open/read/parse " << m_WorkingDirectory << "/index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    MITK_ERROR << "Could not open/read/parse " << m_WorkingDirectory << mitk::IOUtil::GetDirectorySeparator() << "index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
     return storage;
   }
 
@@ -173,11 +172,10 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 
   // return new data storage, even if empty or uncomplete (return as much as possible but notify calling method)
   return storage;
-
 }
 
 bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
-                                           const std::string& filename)
+                              const std::string& filename)
 {
   if (!sceneNodes)
   {
@@ -198,7 +196,6 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
   try
   {
-
     m_FailedNodes = DataStorage::SetOfObjects::New();
     m_FailedProperties = PropertyList::New();
 
@@ -226,7 +223,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         MITK_WARN << "Saving empty scene to " << filename;
       }
 
-    MITK_INFO << "Storing scene with " << sceneNodes->size() << " objects to " << filename;
+      MITK_INFO << "Storing scene with " << sceneNodes->size() << " objects to " << filename;
 
       m_WorkingDirectory = CreateEmptyTempDirectory();
       if (m_WorkingDirectory.empty())
@@ -247,8 +244,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       UIDGenerator nodeUIDGen("OBJECT_");
 
       for (DataStorage::SetOfObjects::const_iterator iter = sceneNodes->begin();
-           iter != sceneNodes->end();
-           ++iter)
+        iter != sceneNodes->end();
+        ++iter)
       {
         DataNode* node = iter->GetPointer();
         if (!node)
@@ -257,8 +254,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         // generate UIDs for all source objects
         DataStorage::SetOfObjects::ConstPointer sourceObjects = storage->GetSources( node );
         for ( mitk::DataStorage::SetOfObjects::const_iterator sourceIter = sourceObjects->begin();
-              sourceIter != sourceObjects->end();
-              ++sourceIter )
+          sourceIter != sourceObjects->end();
+          ++sourceIter )
         {
           if ( std::find( sceneNodes->begin(), sceneNodes->end(), *sourceIter ) == sceneNodes->end() )
             continue; // source is not saved, so don't generate a UID for this source
@@ -281,8 +278,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
       // write out objects, dependencies and properties
       for (DataStorage::SetOfObjects::const_iterator iter = sceneNodes->begin();
-           iter != sceneNodes->end();
-           ++iter)
+        iter != sceneNodes->end();
+        ++iter)
       {
         DataNode* node = iter->GetPointer();
 
@@ -305,8 +302,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
           {
             // store all source IDs
             for ( std::list<std::string>::iterator sourceUIDIter = searchSourcesIter->second.begin();
-                  sourceUIDIter != searchSourcesIter->second.end();
-                  ++sourceUIDIter )
+              sourceUIDIter != searchSourcesIter->second.end();
+              ++sourceUIDIter )
             {
               TiXmlElement* uidElement = new TiXmlElement("source");
               uidElement->SetAttribute("UID", sourceUIDIter->c_str() );
@@ -341,8 +338,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
           {
             const RenderingManager::RenderWindowVector& allRenderWindows( RenderingManager::GetInstance()->GetAllRegisteredRenderWindows() );
             for ( RenderingManager::RenderWindowVector::const_iterator rw = allRenderWindows.begin();
-                  rw != allRenderWindows.end();
-                  ++rw)
+              rw != allRenderWindows.end();
+              ++rw)
             {
               if (vtkRenderWindow* renderWindow = *rw)
               {
@@ -375,7 +372,6 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
         ProgressBar::GetInstance()->Progress();
       } // end for all nodes
-
     } // end if sceneNodes
 
     if ( !document.SaveFile( m_WorkingDirectory + Poco::Path::separator() + "index.xml" ) )
@@ -433,7 +429,6 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
   }
 }
 
-
 TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& filenamehint, bool& error )
 {
   assert(data);
@@ -457,8 +452,8 @@ TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& fi
   }
 
   for ( std::list<itk::LightObject::Pointer>::iterator iter = thingsThatCanSerializeThis.begin();
-        iter != thingsThatCanSerializeThis.end();
-        ++iter )
+    iter != thingsThatCanSerializeThis.end();
+    ++iter )
   {
     if (BaseDataSerializer* serializer = dynamic_cast<BaseDataSerializer*>( iter->GetPointer() ) )
     {
@@ -513,7 +508,6 @@ TiXmlElement* mitk::SceneIO::SavePropertyList( PropertyList* propertyList, const
 
   return element;
 }
-
 
 const mitk::SceneIO::FailedBaseDataListType* mitk::SceneIO::GetFailedNodes()
 {

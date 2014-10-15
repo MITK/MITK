@@ -37,24 +37,22 @@ int mitkFiberGenerationTest(int argc, char* argv[])
         mitk::FiberBundleX::Pointer uniform = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[4])->GetData());
         mitk::FiberBundleX::Pointer gaussian = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[5])->GetData());
 
-
+        FiberGenerationParameters parameters;
         vector< mitk::PlanarEllipse::Pointer > fid; fid.push_back(pf1); fid.push_back(pf2); fid.push_back(pf3);
         vector< unsigned int > flip; flip.push_back(0); flip.push_back(0); flip.push_back(0);
-        vector< vector< mitk::PlanarEllipse::Pointer > > fiducials;
-        vector< vector< unsigned int > > fliplist;
-        fiducials.push_back(fid); fliplist.push_back(flip);
+        parameters.m_Fiducials.push_back(fid); parameters.m_FlipList.push_back(flip);
+        parameters.m_Density = 50;
+        parameters.m_Tension = 0;
+        parameters.m_Continuity = 0;
+        parameters.m_Bias = 0;
+        parameters.m_Sampling = 1;
+        parameters.m_Variance = 0.1;
 
         // check uniform fiber distribution
         {
             itk::FibersFromPlanarFiguresFilter::Pointer filter = itk::FibersFromPlanarFiguresFilter::New();
-            filter->SetFiducials(fiducials);
-            filter->SetFlipList(fliplist);
-            filter->SetFiberDistribution(itk::FibersFromPlanarFiguresFilter::DISTRIBUTE_UNIFORM);
-            filter->SetDensity(50);
-            filter->SetTension(0);
-            filter->SetContinuity(0);
-            filter->SetBias(0);
-            filter->SetFiberSampling(1);
+            parameters.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
+            filter->SetParameters(parameters);
             filter->Update();
             vector< mitk::FiberBundleX::Pointer > fiberBundles = filter->GetFiberBundles();
             MITK_TEST_CONDITION_REQUIRED(uniform->Equals(fiberBundles.at(0)),"check uniform bundle")
@@ -63,15 +61,9 @@ int mitkFiberGenerationTest(int argc, char* argv[])
         // check gaussian fiber distribution
         {
             itk::FibersFromPlanarFiguresFilter::Pointer filter = itk::FibersFromPlanarFiguresFilter::New();
-            filter->SetFiducials(fiducials);
-            filter->SetFlipList(fliplist);
-            filter->SetFiberDistribution(itk::FibersFromPlanarFiguresFilter::DISTRIBUTE_GAUSSIAN);
-            filter->SetVariance(0.1);
-            filter->SetDensity(50);
-            filter->SetTension(0);
-            filter->SetContinuity(0);
-            filter->SetBias(0);
-            filter->SetFiberSampling(1);
+            parameters.m_Distribution = FiberGenerationParameters::DISTRIBUTE_GAUSSIAN;
+            filter->SetParameters(parameters);
+            filter->SetParameters(parameters);
             filter->Update();
             vector< mitk::FiberBundleX::Pointer > fiberBundles = filter->GetFiberBundles();
             MITK_TEST_CONDITION_REQUIRED(gaussian->Equals(fiberBundles.at(0)),"check gaussian bundle")

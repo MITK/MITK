@@ -356,6 +356,12 @@ void QmitkSegmentationView::CreateNewSegmentation()
 void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
 {
    mitk::DataNode* selectedNode = m_Controls->segImageSelector->GetSelectedNode();
+   if ( !selectedNode )
+   {
+     this->SetToolSelectionBoxesEnabled(false);
+     return;
+   }
+
    bool selectedNodeIsVisible = selectedNode->IsVisible(mitk::BaseRenderer::GetInstance(
       mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
 
@@ -639,7 +645,7 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
    mitk::DataNode* refNode = m_Controls->patImageSelector->GetSelectedNode();
 
    RenderingManagerReinitialized();
-   if ( m_Controls->lblSegmentationWarnings->isVisible()) // "RenderingManagerReinitialized()" caused a warning. we do not nede to go any further
+   if ( m_Controls->lblSegmentationWarnings->isVisible()) // "RenderingManagerReinitialized()" caused a warning. we do not need to go any further
       return;
 
    if (m_AutoSelectionEnabled)
@@ -838,6 +844,9 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
          }
       }
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+       if ( m_Controls->lblSegmentationWarnings->isVisible()) // "RenderingManagerReinitialized()" caused a warning. we do not need to go any further
+        return;
+      RenderingManagerReinitialized();
    }
 }
 
@@ -1050,7 +1059,10 @@ void QmitkSegmentationView::RenderingManagerReinitialized()
    if (workingNode && worldGeo)
    {
       const mitk::BaseGeometry* workingNodeGeo = workingNode->GetData()->GetGeometry();
-      if (mitk::Equal(workingNodeGeo->GetBoundingBox(), worldGeo->GetBoundingBox(), mitk::eps, true))
+      const mitk::BaseGeometry* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
+      //if (mitk::Equal(workingNodeGeo->GetBoundingBox(), worldGeo->GetBoundingBox(), mitk::eps, true))
+      if (mitk::Equal(workingNodeGeo->GetCornerPoint(false,false,false), worldGeo->GetCornerPoint(false,false,false), mitk::eps) &&
+        mitk::Equal(workingNodeGeo->GetCornerPoint(true,true,true), worldGeo->GetCornerPoint(true,true,true), mitk::eps))
       {
          this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
          this->SetToolSelectionBoxesEnabled(true);

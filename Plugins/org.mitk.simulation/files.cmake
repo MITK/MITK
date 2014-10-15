@@ -1,12 +1,9 @@
 set(SRC_CPP_FILES
-  mitkExportMitkVisitor.cpp
   mitkGetSimulationPreferences.cpp
   mitkMeshMitkLoader.cpp
 )
 
 set(INTERNAL_CPP_FILES
-  mitkGetDataStorage.cpp
-  mitkGetSimulationDataNode.cpp
   org_mitk_simulation_Activator.cpp
 )
 

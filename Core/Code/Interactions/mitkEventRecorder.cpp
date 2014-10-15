@@ -41,11 +41,19 @@ static void WriteEventXMLConfig(std::ofstream& stream)
   for(; rendererIterator != end; rendererIterator++)
   {
     std::string rendererName = (*rendererIterator).second->GetName();
+
     mitk::SliceNavigationController::ViewDirection viewDirection = (*rendererIterator).second->GetSliceNavigationController()->GetDefaultViewDirection();
     mitk::BaseRenderer::MapperSlotId mapperID = (*rendererIterator).second->GetMapperID();
 
-    //  <renderer RendererName="stdmulti.widget2" ViewDirection="1" MapperID="1"/>
-    stream << "  <" << mitk::InteractionEventConst::xmlTagRenderer() << " " << mitk::InteractionEventConst::xmlEventPropertyRendererName() << "=\"" <<  rendererName << "\" " << mitk::InteractionEventConst::xmlEventPropertyViewDirection() << "=\"" << viewDirection << "\" " << mitk::InteractionEventConst::xmlEventPropertyMapperID() << "=\"" << mapperID << "\"/>\n";
+    //  <renderer RendererName="stdmulti.widget2" ViewDirection="1" MapperID="1" SizeX="200" SizeY="200" SizeZ="1"/>
+    stream << "  <" << mitk::InteractionEventConst::xmlTagRenderer() << " "
+           << mitk::InteractionEventConst::xmlEventPropertyRendererName() << "=\""<<  rendererName << "\" "
+           << mitk::InteractionEventConst::xmlEventPropertyViewDirection() << "=\""<< viewDirection << "\" "
+           << mitk::InteractionEventConst::xmlEventPropertyMapperID() << "=\"" << mapperID << "\" "
+           << mitk::InteractionEventConst::xmlRenderSizeX() << "=\"" << (*rendererIterator).second->GetSize()[0] << "\" "
+           << mitk::InteractionEventConst::xmlRenderSizeY() << "=\"" << (*rendererIterator).second->GetSize()[1] << "\" "
+           << mitk::InteractionEventConst::xmlRenderSizeZ() << "=\"" << (*rendererIterator).second->GetSize()[2] << "\" "
+           << "/>\n";
   }
 
   // </config>
@@ -99,7 +107,6 @@ mitk::EventRecorder::~EventRecorder()
 
 void mitk::EventRecorder::Notify(mitk::InteractionEvent *interactionEvent, bool /*isHandled*/)
 {
-  std::cout << EventFactory::EventToXML(interactionEvent) << "\n";
   if (m_FileStream.is_open())
     m_FileStream << EventFactory::EventToXML(interactionEvent) << "\n";
 }

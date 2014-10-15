@@ -93,6 +93,8 @@ namespace mitk
       */
       static void CatchLogFileCommandLineParameter(int &argc,char **argv);
 
+      virtual mbilog::OutputType GetOutputType() const;
+
     protected:
       /** Checks if a file exists.
        *  @return Returns true if the file exists, false if not.

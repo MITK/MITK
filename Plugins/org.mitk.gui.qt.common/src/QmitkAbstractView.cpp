@@ -596,7 +596,7 @@ void QmitkAbstractView::FireNodesSelected( const QList<mitk::DataNode::Pointer>&
     {
       d->m_DataNodeItemModel->AddDataNode(node);
     }
-    d->m_DataNodeSelectionModel->select(QItemSelection(d->m_DataNodeItemModel->index(0,0), d->m_DataNodeItemModel->index(nodes.size(), 0)),
+    d->m_DataNodeSelectionModel->select(QItemSelection(d->m_DataNodeItemModel->index(0,0), d->m_DataNodeItemModel->index(nodes.size()-1, 0)),
                                         QItemSelectionModel::ClearAndSelect);
   }
 }

@@ -46,6 +46,7 @@ class QmitkDnDFrameWidget;
 class QmitkDataStorageTreeModel;
 class QmitkDataManagerItemDelegate;
 class QmitkNumberPropertySlider;
+class QmitkDataStorageFilterProxyModel;
 
 ///
 /// \ingroup org_mitk_gui_qt_datamanager_internal
@@ -197,6 +198,10 @@ protected:
   ///
   void FileOpen( const char * fileName, mitk::DataNode* parentNode );
 
+  ///
+  /// React to node changes. Overridden from QmitkAbstractView.
+  ///
+  virtual void NodeChanged(const mitk::DataNode* node);
 protected:
 
   QWidget* m_Parent;
@@ -206,6 +211,9 @@ protected:
   /// \brief A plain widget as the base pane.
   ///
   QmitkDataStorageTreeModel* m_NodeTreeModel;
+  QmitkDataStorageFilterProxyModel* m_FilterModel;
+  mitk::NodePredicateBase::Pointer m_HelperObjectFilterPredicate;
+  mitk::NodePredicateBase::Pointer m_NodeWithNoDataFilterPredicate;
   ///
   /// Holds the preferences for the datamanager.
   ///

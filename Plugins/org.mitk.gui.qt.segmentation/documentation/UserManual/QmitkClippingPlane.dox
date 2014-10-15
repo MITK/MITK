@@ -1,0 +1,71 @@
+/**
+\page org_mitk_views_deformableclippingplane The Clipping Plane
+
+\imageMacro{QmitkClippingPlane_Icon.png,"Icon of the Clipping Plane Plugin",5.00}
+
+\tableofcontents
+
+\section org_mitk_views_clippingPlaneManualOverview Overview
+
+The <b>Clipping Plane view</b> allows you to create clipping planes and calculate the volumina of the devided parts.
+
+\imageMacro{QmitkClippingPlane_Overview.png,"Clipping Plane view with segmentation and two clipping planes",16.00}
+
+\section org_mitk_views_clippingPlaneTechnicalIssue Technical Issue
+
+To use the Update Volumina function your image should be binary.
+
+\section org_mitk_views_clippingPlaneManualImageSelection Image Selection
+
+The Clipping Plane view makes use of the Data Manager view to give you an overview of all images, segmentations and clipping planes.
+
+\imageMacro{QmitkClippingPlane_DataManager.png,"Data Manager is used for selecting the current clipping plane. The reference plane is selected in the drop down box of the control area.",8.00}
+
+To select the reference plane use the drop down box in the control area of the Clipping Plane view or the Data Manager. The clipping plane selected in the Data Manager is displayed below the drop down box. If no clipping plane exists or none is selected create a new clipping plane by using the "Create new clipping plane" button.
+Some items of the graphical user interface might be disabled when no plane is selected.
+In any case, the application will give you hints if a selection is needed.
+
+\section org_mitk_views_clippingPlaneCreating Creating New Clipping Plane
+
+If you want to create a new clipping plane select an image from the Data Manager and press the button "Create new clipping plane". Optionally you can enable the "...with surface model" option.
+
+\section org_mitk_views_clippingPlaneInteraction Interaction with the planes
+\imageMacro{QmitkClippingPlane_Interaction.png,"The interaction buttons",5.00}
+
+You have different options to interact with the clipping planes:
+
+\subsection org_mitk_views_clippingPlaneTranslation Translation
+
+In Translation mode you can change the position of the clipping plane.
+ - Click the Translation Button
+ - Move mouse over the selected clipping plane (the plane changes its color from blue to green)
+ - Hold mouse-left button and move the mouse orthogonally to the plane
+
+\subsection org_mitk_views_clippingPlaneRotation Rotation
+
+In Rotation mode you can change the angle of the clipping plane.
+ - Click the Rotation Button
+ - Move mouse over the selected clipping plane (the plane changes its color from blue to green)
+ - Hold mouse-left button and move the mouse in the direction it should be rotated
+
+\subsection org_mitk_views_clippingPlaneDeformation Deformation
+
+In Deformation mode you can change the surface of the clipping plane.
+ - Click the Deformation Button
+ - Move mouse over the selected clipping plane (the plane changes its color from blue to green). The deformation area is highlighted in red and yellow.
+ - On mouse-scrolling you can change the size of the deformation area (Scroll-Down = smaller / Scroll-Up = bigger).
+ - Hold mouse-left button and move the mouse orthogonally to the plane to deformate the plane
+
+\section org_mitk_views_clippingPlaneUpdateVolumina Update Volumina
+
+\imageMacro{QmitkClippingPlane_UpdateVolumina.png,"The 'Update Volumina' button",5.00}
+
+Calculating the volumina of the segmentation parts, which are devided by the clipping plane(s).
+ - Create a segmentation (see Segmentation-Manual)
+ - Create one or more clipping plane(s)
+ - Use the interaction buttons (Translation, Rotation, Deformation) to adjust the clipping plane for intersecting the segmentation
+ - (You can decide which planes shouldnt be included for the calculation by changing their visibility to invisible)
+ - Click button "Update Volumina" button
+ - The intersected parts are displayed in different colors and their volumina are shown beneath the "Update Volumina" button
+
+**/

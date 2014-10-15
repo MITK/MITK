@@ -162,4 +162,22 @@ const std::string InteractionEventConst::xmlEventPropertyMapperID()
   return xmlEventPropertyMapperID;
 }
 
+const std::string mitk::InteractionEventConst::xmlRenderSizeX()
+{
+  static const std::string xmlSize = "RenderSizeX";
+  return xmlSize;
+}
+
+const std::string mitk::InteractionEventConst::xmlRenderSizeY()
+{
+  static const std::string xmlSize = "RenderSizeY";
+  return xmlSize;
+}
+
+const std::string mitk::InteractionEventConst::xmlRenderSizeZ()
+{
+  static const std::string xmlSize = "RenderSizeZ";
+  return xmlSize;
+}
+
 }

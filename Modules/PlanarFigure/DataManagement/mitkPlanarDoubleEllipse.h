@@ -40,6 +40,8 @@ namespace mitk
     const unsigned int FEATURE_ID_MINOR_AXIS;
     const unsigned int FEATURE_ID_THICKNESS;
 
+    virtual bool Equals(const mitk::PlanarFigure& other) const;
+
   protected:
     PlanarDoubleEllipse();
     virtual ~PlanarDoubleEllipse();

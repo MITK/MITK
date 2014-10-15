@@ -5,17 +5,15 @@
 #endif
 
 #define PYTHONPATH_COMMAND "import sys\n"\
-"sys.path.append('@ITK_LIBRARY_DIRS@')\n"\
-"sys.path.append('@ITK_DIR@/Wrapping/WrapITK/Python')\n"\
-"sys.path.append('@ITK_LIBRARY_DIRS@" PYTHON_PATH_BUILD_TYPE "')\n"\
-"sys.path.append('@ITK_DIR@/Wrapping/WrapITK/Python" PYTHON_PATH_BUILD_TYPE "')\n"\
-"sys.path.append('@ITK_DIR@/Wrapping/Generators/Python')\n"\
-"sys.path.append('@ITK_DIR@/lib')\n"\
-"sys.path.append('@VTK_LIBRARY_DIRS@')\n"\
+"sys.path.append('@SimpleITK_DIR@/bin')\n"\
+"sys.path.append('@SimpleITK_DIR@/lib')\n"\
+"sys.path.append('@SimpleITK_DIR@/Wrapping')\n"\
 "sys.path.append('@VTK_DIR@/Wrapping/Python')\n"\
+"sys.path.append('@VTK_DIR@/lib')\n"\
 "sys.path.append('@VTK_DIR@/bin" PYTHON_PATH_BUILD_TYPE "')\n"\
-"sys.path.append('@VTK_DIR@/Wrapping/Python')\n"\
 "sys.path.append('@OpenCV_DIR@/lib" PYTHON_PATH_BUILD_TYPE "')\n"\
 "sys.path.append('@OpenCV_DIR@/lib')\n"\
 "sys.path.append('@OpenCV_DIR@/bin')\n"\
 "sys.path.append('@OpenCV_DIR@/bin" PYTHON_PATH_BUILD_TYPE "')"
+
+#define PYTHONHOME "@Python_DIR@"

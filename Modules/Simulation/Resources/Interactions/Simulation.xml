@@ -1,0 +1,45 @@
+<statemachine>
+  <state name="start" startstate="true">
+    <!-- MousePress -->
+    <transition event_class="MousePressEvent" event_variant="ShiftKeyLeftButtonPressed" target="start">
+      <action name="startPrimaryInteraction" />
+    </transition>
+    <transition event_class="MousePressEvent" event_variant="ShiftKeyRightButtonPressed" target="start">
+      <action name="startSecondaryInteraction" />
+    </transition>
+    <!-- MouseMove -->
+    <transition event_class="MouseMoveEvent" event_variant="ShiftKeyLeftButtonMoved" target="start">
+      <condition name="isInteractionPerformerNotNull" />
+      <action name="executeInteraction" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="LeftButtonMoved" target="start">
+      <condition name="isInteractionPerformerNotNull" />
+      <action name="executeInteraction" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="ShiftKeyRightButtonMoved" target="start">
+      <condition name="isInteractionPerformerNotNull" />
+      <action name="executeInteraction" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="RightButtonMoved" target="start">
+      <condition name="isInteractionPerformerNotNull" />
+      <action name="executeInteraction" />
+    </transition>
+    <!-- MouseRelease -->
+    <transition event_class="MouseReleaseEvent" event_variant="ShiftKeyLeftButtonReleased" target="start">
+      <condition name="isInteractionPerformerNotNull" />
+      <action name="stopInteraction" />
+    </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="LeftButtonReleased" target="start">
+      <condition name="isInteractionPerformerNotNull" />
+      <action name="stopInteraction" />
+    </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="ShiftKeyRightButtonReleased" target="start">
+      <condition name="isInteractionPerformerNotNull" />
+      <action name="stopInteraction" />
+    </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="RightButtonReleased" target="start">
+      <condition name="isInteractionPerformerNotNull" />
+      <action name="stopInteraction" />
+    </transition>
+  </state>
+</statemachine>

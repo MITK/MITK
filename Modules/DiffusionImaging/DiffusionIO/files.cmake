@@ -24,7 +24,7 @@ set(CPP_FILES
   mitkDiffusionCoreObjectFactory.cpp
 
   mitkNrrdDiffusionImageReader.cpp
-  mitkNrrdDiffusionImageIOFactory.cpp
+#  mitkNrrdDiffusionImageIOFactory.cpp
   mitkNrrdDiffusionImageWriterFactory.cpp
   mitkDiffusionImageSerializer.cpp
 

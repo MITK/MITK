@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkManualSegmentationToSurfaceFilter.h>
 
 #include <vtkSmartPointer.h>
+#include <vtkImageShiftScale.h>
 
 #include "mitkProgressBar.h"
 
@@ -98,18 +99,13 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     MITK_INFO << (m_UseGaussianImageSmooth ? "Applying gaussian smoothing..." : "No gaussian smoothing");
     if(m_UseGaussianImageSmooth)//gauss
     {
-      vtkImageThreshold* vtkimagethreshold = vtkImageThreshold::New();
-      vtkimagethreshold->SetInputData(vtkimage);
-      vtkimagethreshold->SetInValue( 100 );
-      vtkimagethreshold->SetOutValue( 0 );
-      vtkimagethreshold->ThresholdByUpper( this->m_Threshold );
-      thresholdExpanded = 49;
-
-      vtkimagethreshold->SetOutputScalarTypeToUnsignedChar();
-      vtkimagethreshold->ReleaseDataFlagOn();
+      vtkImageShiftScale* scalefilter = vtkImageShiftScale::New();
+      scalefilter->SetScale(100);
+      scalefilter->SetInputData(vtkimage);
+      scalefilter->Update();
 
       vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
-      gaussian->SetInputConnection(vtkimagethreshold->GetOutputPort());
+      gaussian->SetInputConnection(scalefilter->GetOutputPort());
       gaussian->SetDimensionality(3);
       gaussian->SetRadiusFactor(0.49);
       gaussian->SetStandardDeviation( m_GaussianStandardDeviation );
@@ -117,7 +113,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       gaussian->UpdateInformation();
       gaussian->Update();
 
-      vtkimage=vtkimagethreshold->GetOutput();
+      vtkimage=scalefilter->GetOutput();
 
       double range[2];
       vtkimage->GetScalarRange(range);
@@ -132,7 +128,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
         MITK_INFO<<"Smoothing removes all pixels of the segmentation. Use unsmoothed result";
       }
       gaussian->Delete();
-      vtkimagethreshold->Delete();
+      scalefilter->Delete();
     }
     ProgressBar::GetInstance()->Progress();
 

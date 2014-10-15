@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkFileWriter.h>
 #include "mitkLegacyFileWriterService.h"
+#include "mitkDicomSeriesReaderService.h"
 
 #include <itkNiftiImageIO.h>
 #include <itkGDCMImageIO.h>
@@ -303,6 +304,7 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
   // Add custom Reader / Writer Services
   m_FileReaders.push_back(new mitk::PointSetReaderService());
   m_FileWriters.push_back(new mitk::PointSetWriterService());
+  m_FileReaders.push_back(new mitk::DicomSeriesReaderService());
   m_FileReaders.push_back(new mitk::RawImageFileReaderService());
 
   m_ShaderRepositoryTracker->Open();
@@ -384,7 +386,6 @@ void MitkCoreActivator::RegisterItkReaderWriter()
   std::list<itk::LightObject::Pointer> allobjects =
     itk::ObjectFactoryBase::CreateAllInstance("itkImageIOBase");
 
-  itk::ImageIOBase* itkGdcmIO = NULL;
   for (std::list<itk::LightObject::Pointer >::iterator i = allobjects.begin(),
        endIter = allobjects.end(); i != endIter; ++i)
   {
@@ -397,7 +398,7 @@ void MitkCoreActivator::RegisterItkReaderWriter()
     // Use a custom mime-type for GDCMImageIO below
     if (dynamic_cast<itk::GDCMImageIO*>(i->GetPointer()))
     {
-      itkGdcmIO = io;
+      // MITK provides its own DICOM reader (which internally uses GDCMImageIO).
       continue;
     }
 
@@ -416,10 +417,6 @@ void MitkCoreActivator::RegisterItkReaderWriter()
   mitk::ItkImageIO* niftiIO = new mitk::ItkImageIO(mitk::CustomMimeType(mitk::IOMimeTypes::NIFTI_MIMETYPE_NAME()),
                                                    itkNiftiIO.GetPointer(), 0);
   m_FileIOs.push_back(niftiIO);
-
-  mitk::ItkImageIO* gdcmIO = new mitk::ItkImageIO(mitk::CustomMimeType(mitk::IOMimeTypes::DICOM_MIMETYPE_NAME()),
-                                                  itkGdcmIO, 0);
-  m_FileIOs.push_back(gdcmIO);
 }
 
 void MitkCoreActivator::RegisterVtkReaderWriter()

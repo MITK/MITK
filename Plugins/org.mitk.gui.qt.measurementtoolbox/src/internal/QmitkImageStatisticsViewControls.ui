@@ -134,7 +134,7 @@
          <bool>false</bool>
         </property>
         <property name="rowCount">
-         <number>7</number>
+         <number>10</number>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>

@@ -336,6 +336,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
                   this->OnSelectionChanged( emptySegmentation );
 
                   m_Controls->segImageSelector->SetSelectedNode(emptySegmentation);
+                  mitk::RenderingManager::GetInstance()->InitializeViews(emptySegmentation->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
                }
                catch (std::bad_alloc)
                {

@@ -1005,8 +1005,7 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
       bool isInterpolationResult(false);
       workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
 
-      bool isVisible (workingNode->IsVisible(m_LastSNC->GetRenderer()));
-      if (isVisible && !isInterpolationResult)
+      if (!isInterpolationResult)
       {
         QWidget::setEnabled( true );
 

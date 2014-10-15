@@ -15,15 +15,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // Qmitk
-#include "QmitkDicomEditor.h"
+#include "QmitkDicomBrowser.h"
 #include "mitkPluginActivator.h"
 
 
-const std::string QmitkDicomEditor::EDITOR_ID = "org.mitk.editors.dicomeditor";
-const QString QmitkDicomEditor::TEMP_DICOM_FOLDER_SUFFIX="TmpDicomFolder";
+const std::string QmitkDicomBrowser::EDITOR_ID = "org.mitk.editors.dicombrowser";
+const QString QmitkDicomBrowser::TEMP_DICOM_FOLDER_SUFFIX="TmpDicomFolder";
 
 
-QmitkDicomEditor::QmitkDicomEditor()
+QmitkDicomBrowser::QmitkDicomBrowser()
 : m_Thread(new QThread())
 , m_DicomDirectoryListener(new QmitkDicomDirectoryListener())
 , m_StoreSCPLauncher(new QmitkStoreSCPLauncher(&m_Builder))
@@ -31,7 +31,7 @@ QmitkDicomEditor::QmitkDicomEditor()
 {
 }
 
-QmitkDicomEditor::~QmitkDicomEditor()
+QmitkDicomBrowser::~QmitkDicomBrowser()
 {
     m_Thread.quit();
     m_Thread.wait(1000);
@@ -41,7 +41,7 @@ QmitkDicomEditor::~QmitkDicomEditor()
     delete m_Publisher;
 }
 
-void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
+void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent )
 {
     m_Controls.setupUi( parent );
     m_Controls.StoreSCPStatusLabel->setTextFormat(Qt::RichText);
@@ -71,22 +71,22 @@ void QmitkDicomEditor::CreateQtPartControl(QWidget *parent )
 }
 
 
-void QmitkDicomEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
+void QmitkDicomBrowser::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
 {
     this->SetSite(site);
     this->SetInput(input);
 }
 
-void QmitkDicomEditor::SetFocus()
+void QmitkDicomBrowser::SetFocus()
 {
 }
 
-berry::IPartListener::Events::Types QmitkDicomEditor::GetPartEventTypes() const
+berry::IPartListener::Events::Types QmitkDicomBrowser::GetPartEventTypes() const
 {
     return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
 }
 
-void QmitkDicomEditor::OnTabChanged(int page)
+void QmitkDicomBrowser::OnTabChanged(int page)
 {
   if (page == 2)//Query/Retrieve is selected
   {
@@ -101,12 +101,12 @@ void QmitkDicomEditor::OnTabChanged(int page)
   }
 }
 
-void QmitkDicomEditor::OnDicomImportFinished()
+void QmitkDicomBrowser::OnDicomImportFinished()
 {
   m_Controls.tabWidget->setCurrentIndex(0);
 }
 
-void QmitkDicomEditor::StartDicomDirectoryListener()
+void QmitkDicomBrowser::StartDicomDirectoryListener()
 {
     if(!m_Thread.isRunning())
     {
@@ -120,13 +120,13 @@ void QmitkDicomEditor::StartDicomDirectoryListener()
 }
 
 
-void QmitkDicomEditor::TestHandler()
+void QmitkDicomBrowser::TestHandler()
 {
     m_Handler = new DicomEventHandler();
     m_Handler->SubscribeSlots();
 }
 
-void QmitkDicomEditor::OnViewButtonAddToDataManager(QHash<QString, QVariant> eventProperties)
+void QmitkDicomBrowser::OnViewButtonAddToDataManager(QHash<QString, QVariant> eventProperties)
 {
     ctkDictionary properties;
 //    properties["PatientName"] = eventProperties["PatientName"];
@@ -141,7 +141,7 @@ void QmitkDicomEditor::OnViewButtonAddToDataManager(QHash<QString, QVariant> eve
 }
 
 
-void QmitkDicomEditor::StartStoreSCP()
+void QmitkDicomBrowser::StartStoreSCP()
 {
     QString storagePort = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StoragePort"].toString();
     QString storageAET = m_Controls.m_ctkDICOMQueryRetrieveWidget->getServerParameters()["StorageAETitle"].toString();
@@ -155,28 +155,28 @@ void QmitkDicomEditor::StartStoreSCP()
 
 }
 
-void QmitkDicomEditor::OnStoreSCPStatusChanged(const QString& status)
+void QmitkDicomBrowser::OnStoreSCPStatusChanged(const QString& status)
 {
     m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicom/network-idle_16.png'> "+status);
 }
 
-void QmitkDicomEditor::OnDicomNetworkError(const QString& status)
+void QmitkDicomBrowser::OnDicomNetworkError(const QString& status)
 {
     m_Controls.StoreSCPStatusLabel->setText("<img src=':/org.mitk.gui.qt.dicom/network-error_16.png'> "+status);
 }
 
-void QmitkDicomEditor::StopStoreSCP()
+void QmitkDicomBrowser::StopStoreSCP()
 {
     delete m_StoreSCPLauncher;
 }
 
-void QmitkDicomEditor::SetPluginDirectory()
+void QmitkDicomBrowser::SetPluginDirectory()
 {
      m_PluginDirectory = mitk::PluginActivator::getContext()->getDataFile("").absolutePath();
      m_PluginDirectory.append("/");
 }
 
-void QmitkDicomEditor::SetDatabaseDirectory(const QString& databaseDirectory)
+void QmitkDicomBrowser::SetDatabaseDirectory(const QString& databaseDirectory)
 {
     m_DatabaseDirectory.clear();
     m_DatabaseDirectory.append(m_PluginDirectory);
@@ -184,7 +184,7 @@ void QmitkDicomEditor::SetDatabaseDirectory(const QString& databaseDirectory)
     m_Controls.internalDataWidget->SetDatabaseDirectory(m_DatabaseDirectory);
 }
 
-void QmitkDicomEditor::CreateTemporaryDirectory()
+void QmitkDicomBrowser::CreateTemporaryDirectory()
 {
     QDir tmp;
     QString tmpPath = QDir::tempPath();

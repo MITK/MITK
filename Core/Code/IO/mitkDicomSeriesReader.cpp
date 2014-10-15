@@ -36,7 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
 std::string DicomSeriesReader::ReaderImplementationLevelToString( const ReaderImplementationLevel& enumValue )
 {
   switch (enumValue)
@@ -871,7 +870,6 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
       filesStillToAnalyze = analysisResult.GetUnsortedFilenames(); // remember what needs further analysis
       for (StringContainer::const_iterator siter = filesStillToAnalyze.begin(); siter != filesStillToAnalyze.end(); ++siter)
         MITK_DEBUG << " OUT  " << *siter;
-
     }
 
     // end of grouping, now post-process groups
@@ -939,7 +937,6 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
 
               identicalOrigins =  ( (thisOriginString == previousOriginString) && (thisDestinationString == previousDestinationString) );
             }
-
           } catch(...)
           {
             identicalOrigins = false;
@@ -1353,7 +1350,6 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
   // tags for each image
   for ( std::list<StringContainer>::iterator i = imageBlock.begin(); i != imageBlock.end(); i++, timeStep++ )
   {
-
     const StringContainer& files = (*i);
     unsigned int slice(0);
     for ( StringContainer::const_iterator fIter = files.begin();
@@ -1539,7 +1535,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
       if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
-
         DcmIoType::Pointer io;
         image = MultiplexLoadDICOMByITK( imageBlocks.front(), correctTilt, tiltInfo, io, command, preLoadedImageBlock ); // load first 3D block
 
@@ -1561,7 +1556,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
         initialize_node = true;
       }
-
     }
 
     if (initialize_node)
@@ -1569,7 +1563,10 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       // forward some image properties to node
       node.GetPropertyList()->ConcatenatePropertyList( image->GetPropertyList(), true );
 
+      std::string patientName = node.GetProperty("dicom.patient.PatientsName")->GetValueAsString();
+
       node.SetData( image );
+      node.SetName(patientName);
       setlocale(LC_NUMERIC, previousCLocale);
       std::cin.imbue(previousCppLocale);
     }
@@ -1777,5 +1774,4 @@ DicomSeriesReader
     return NULL;
   }
 }
-
 } // end namespace mitk

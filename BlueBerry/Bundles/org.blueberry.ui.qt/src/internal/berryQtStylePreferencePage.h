@@ -53,7 +53,7 @@ protected:
 
   void AddPath(const QString& path, bool updateCombo);
   void FillStyleCombo(const berry::IQtStyleManager::Style& currentStyle);
-  void FillIconThemeComboBox();
+  void FillIconThemeComboBox(const QString currentIconTheme);
 
 protected slots:
 

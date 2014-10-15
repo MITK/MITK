@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkAdaptiveRegionGrowingTool.h"
-
+#include "mitkImage.h"
 #include "mitkToolManager.h"
 #include "mitkProperties.h"
 // us
@@ -44,6 +44,22 @@ mitk::AdaptiveRegionGrowingTool::AdaptiveRegionGrowingTool()
 
 mitk::AdaptiveRegionGrowingTool::~AdaptiveRegionGrowingTool()
 {
+}
+
+bool mitk::AdaptiveRegionGrowingTool::CanHandle(BaseData* referenceData) const
+{
+  if (referenceData == NULL)
+    return false;
+
+  Image* image = dynamic_cast<Image*>(referenceData);
+
+  if (image == NULL)
+    return false;
+
+  if (image->GetDimension() < 3)
+    return false;
+
+  return true;
 }
 
 const char** mitk::AdaptiveRegionGrowingTool::GetXPM() const

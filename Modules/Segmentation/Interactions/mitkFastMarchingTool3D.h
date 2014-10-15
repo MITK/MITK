@@ -77,6 +77,8 @@ class MitkSegmentation_EXPORT FastMarchingTool3D : public AutoSegmentationTool
     typedef FastMarchingFilterType::NodeContainer                                                       NodeContainer;
     typedef FastMarchingFilterType::NodeType                                                            NodeType;
 
+    bool CanHandle(BaseData* referenceData) const;
+
     /* icon stuff */
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;

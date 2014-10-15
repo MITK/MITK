@@ -85,6 +85,8 @@ class MitkSegmentationUI_EXPORT QmitkToolSelectionBox : public QWidget
     void OnToolErrorMessage(std::string s);
     void OnGeneralToolMessage(std::string s);
 
+    void RecreateButtons();
+
   signals:
 
     /// Whenever a tool is activated. id is the index of the active tool. Counting starts at 0, -1 indicates "no tool selected"
@@ -113,7 +115,6 @@ class MitkSegmentationUI_EXPORT QmitkToolSelectionBox : public QWidget
     void showEvent( QShowEvent* );
     void hideEvent( QHideEvent* );
 
-    void RecreateButtons();
     void SetOrUnsetButtonForActiveTool();
 
     mitk::ToolManager::Pointer m_ToolManager;

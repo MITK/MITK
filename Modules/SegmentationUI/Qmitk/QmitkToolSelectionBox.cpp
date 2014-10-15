@@ -574,6 +574,11 @@ void QmitkToolSelectionBox::RecreateButtons()
       button->setShortcut( firstLetter );                      // a keyboard shortcut (just the first letter of the given name w/o any CTRL or something)
     }
 
+    mitk::DataNode* dataNode = m_ToolManager->GetReferenceData(0);
+
+    if (dataNode != NULL && !tool->CanHandle(dataNode->GetData()))
+      button->setEnabled(false);
+
     m_ButtonIDForToolID[currentToolID] = currentButtonID;
     m_ToolIDForButtonID[currentButtonID] = currentToolID;
 

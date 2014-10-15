@@ -384,6 +384,7 @@ set(CPP_FILES
   Common/mitkCoreServices.cpp
 
   Internal/mitkCoreActivator.cpp
+  Internal/mitkDicomSeriesReaderService.cpp
   Internal/mitkFileReaderWriterBase.cpp
   Internal/mitkImageVtkLegacyIO.cpp
   Internal/mitkImageVtkXmlIO.cpp

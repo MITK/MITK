@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOUtil.h>
 #include <mitkCustomMimeType.h>
+#include <mitkStandaloneDataStorage.h>
 
 #include <Internal/mitkFileReaderWriterBase.h>
 
@@ -98,7 +99,6 @@ AbstractFileReader::~AbstractFileReader()
 AbstractFileReader::AbstractFileReader(const AbstractFileReader& other)
   : IFileReader(),
     d(new Impl(*other.d.get()))
-
 {
 }
 
@@ -110,6 +110,21 @@ AbstractFileReader::AbstractFileReader(const CustomMimeType& mimeType, const std
 }
 
 ////////////////////// Reading /////////////////////////
+
+std::vector<BaseData::Pointer> AbstractFileReader::Read()
+{
+  std::vector<BaseData::Pointer> result;
+
+  DataStorage::Pointer ds = StandaloneDataStorage::New().GetPointer();
+  this->Read(*ds);
+  DataStorage::SetOfObjects::ConstPointer dataNodes = ds->GetAll();
+  for (DataStorage::SetOfObjects::ConstIterator iter = dataNodes->Begin(),
+       iterEnd = dataNodes->End(); iter != iterEnd; ++iter)
+  {
+    result.push_back(iter.Value()->GetData());
+  }
+  return result;
+}
 
 DataStorage::SetOfObjects::Pointer AbstractFileReader::Read(DataStorage& ds)
 {

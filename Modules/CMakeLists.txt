@@ -5,7 +5,6 @@ set(module_dirs
     DataTypesExt
     AlgorithmsExt
     MapperExt
-    IOExt
     DICOMReader
     DICOMTesting
     Qt4Qt5TestModule
@@ -53,6 +52,7 @@ set(module_dirs
     IGTUI
     VtkShaders
     DicomRT
+    IOExt
 )
 
 if(MITK_ENABLE_PIC_READER)

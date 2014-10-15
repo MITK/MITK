@@ -14,24 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkIOExtActivator.h"
 
-#include "mitkSceneDataNodeReader.h"
-
-#include "mitkSceneIO.h"
+#include "mitkSceneFileReader.h"
 
 namespace mitk {
 
-int mitk::SceneDataNodeReader::Read(const std::string &fileName, mitk::DataStorage &storage)
+void IOExtActivator::Load(us::ModuleContext*)
 {
-  int n = 0;
-  if (fileName.substr(fileName.size()-5) == ".mitk")
-  {
-    SceneIO::Pointer sceneIO = SceneIO::New();
-    int oldSize = storage.GetAll()->Size();
-    sceneIO->LoadScene(fileName, &storage, false);
-    n = storage.GetAll()->Size() - oldSize;
-  }
-  return n;
+  m_SceneReader.reset(new SceneFileReader());
+}
+
+void IOExtActivator::Unload(us::ModuleContext*)
+{
 }
 
 }
+
+US_EXPORT_MODULE_ACTIVATOR(mitk::IOExtActivator)

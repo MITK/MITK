@@ -14,22 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef MITKIOEXTACTIVATOR_H
+#define MITKIOEXTACTIVATOR_H
 
-#ifndef MITKSCENEDATANODEREADER_H
-#define MITKSCENEDATANODEREADER_H
+#include <usModuleActivator.h>
 
-#include <mitkIDataNodeReader.h>
+#include <memory>
 
 namespace mitk {
 
-class SceneDataNodeReader : public mitk::IDataNodeReader
-{
+struct IFileReader;
 
+class IOExtActivator : public us::ModuleActivator
+{
 public:
 
-  int Read(const std::string& fileName, mitk::DataStorage& storage);
+  void Load(us::ModuleContext*context);
+  void Unload(us::ModuleContext* context);
+
+private:
+
+  std::auto_ptr<IFileReader> m_SceneReader;
 };
 
 }
 
-#endif // MITKSCENEDATANODEREADER_H
+#endif // MITKIOEXTACTIVATOR_H

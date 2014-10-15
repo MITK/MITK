@@ -1,6 +1,3 @@
-# Temporarily deactivating test for Mac. See Bug #16941
-if (BUILD_TESTING AND NOT APPLE)
-
 MITK_CREATE_MODULE_TESTS()
 
 set(testcaseBasename mitkViewportRenderingTest)
@@ -153,5 +150,3 @@ foreach(renderWindowAspect Square Landscape Portrait)
   endforeach()
 endforeach()
 endif() # endif MITK_ENABLE_RENDERING_TESTING
-
-endif() # BUILD_TESTING

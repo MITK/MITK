@@ -108,7 +108,11 @@ QmitkGibbsTrackingView::QmitkGibbsTrackingView()
 
 QmitkGibbsTrackingView::~QmitkGibbsTrackingView()
 {
-    delete m_TrackingTimer;
+  if (m_GlobalTracker.IsNull())
+      return;
+
+  m_GlobalTracker->SetAbortTracking(true);
+  m_TrackingThread.wait();
 }
 
 // update tracking status and generate fiber bundle

@@ -159,7 +159,7 @@ mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QStringList& pa
   std::vector<LoadInfo> loadInfos;
   foreach(const QString& file, paths)
   {
-    loadInfos.push_back(LoadInfo(file.toStdString()));
+    loadInfos.push_back(LoadInfo(QFile::encodeName(file).constData()));
   }
 
   mitk::DataStorage::SetOfObjects::Pointer nodeResult = mitk::DataStorage::SetOfObjects::New();
@@ -262,6 +262,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
     }
 
     fileName = nextName;
+    std::string stdFileName = QFile::encodeName(fileName).constData();
     QFileInfo fileInfo(fileName);
     currentPath = fileInfo.absolutePath();
     QString suffix = fileInfo.completeSuffix();
@@ -271,7 +272,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
     // If the filename contains a suffix, use it but check if it is valid
     if (!suffix.isEmpty())
     {
-      std::vector<mitk::MimeType> availableTypes = mimeTypeProvider->GetMimeTypesForFile(fileName.toStdString());
+      std::vector<mitk::MimeType> availableTypes = mimeTypeProvider->GetMimeTypesForFile(stdFileName);
 
       // Check if the selected mime-type is related to the specified suffix (file extension).
       // If not, get the best matching mime-type for the suffix.
@@ -340,7 +341,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
     }
 
     fileNames.push_back(fileName);
-    saveInfo.m_Path = fileName.toStdString();
+    saveInfo.m_Path = stdFileName;
     saveInfo.m_MimeType = mimeType;
     // pre-select the best writer for the chosen mime-type
     saveInfo.m_WriterSelector.Select(mimeType.GetName());

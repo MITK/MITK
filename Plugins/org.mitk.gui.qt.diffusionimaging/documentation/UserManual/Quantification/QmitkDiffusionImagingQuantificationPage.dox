@@ -1,0 +1,8 @@
+/**
+
+\page QmitkDiffusionImagingQuantificationPage Quantification
+
+The quantification view allows the derivation of different scalar anisotropy measures for the reconstructed tensors (Fractional Anisotropy, Relative Anisotropy, Axial Diffusivity, Radial Diffusivity) or q-balls (Generalized Fractional Anisotropy).
+
+\imageMacro{quantification.png,"Anisotropy quantification",2}
+*/

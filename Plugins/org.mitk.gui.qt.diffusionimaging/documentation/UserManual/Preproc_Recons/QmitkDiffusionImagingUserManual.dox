@@ -1,0 +1,19 @@
+/**
+\page QmitkDiffusionImagingVisualization ODF Visualization
+
+\section QmitkDiffusionImagingUserManualVisualizationSettings ODF Visualization Setting
+
+In this small view, the visualization of ODFs and diffusion images can be configured. Depending on the selected image in the data storage, different options are shown here.
+
+For tensor or q-ball images, the visibility of glyphs in the different render windows (T)ransversal, (S)agittal, and (C)oronal can be configured here. The maximal number of glyphs to display can also be configured here for. This is usefull to keep the system response time during rendering feasible. The other options configure normalization and scaling of the glyphs.
+
+In diffusion images, a slider lets you choose the desired image channel from the vector of images (each gradient direction one image) for rendering. Furthermore reinit can be performed and texture interpolation toggled.
+
+This is how a visualization with activated glyphs should look like:
+
+\imageMacro{visualization3.png,"Q-ball image with ODF glyph visibility toggled ON",16.00}
+
+
+
+
+*/

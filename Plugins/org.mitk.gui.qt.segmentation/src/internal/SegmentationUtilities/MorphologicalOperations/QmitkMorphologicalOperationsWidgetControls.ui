@@ -94,7 +94,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Dilatation</string>
+        <string>Dilation</string>
        </property>
        <property name="icon">
         <iconset resource="../../../../resources/MorphologicalOperationsWidget.qrc">

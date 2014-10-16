@@ -1563,7 +1563,13 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       // forward some image properties to node
       node.GetPropertyList()->ConcatenatePropertyList( image->GetPropertyList(), true );
 
-      std::string patientName = node.GetProperty("dicom.patient.PatientsName")->GetValueAsString();
+      std::string patientName = "NoName";
+      if(node.GetProperty("dicom.patient.PatientsName"))
+        patientName = node.GetProperty("dicom.patient.PatientsName")->GetValueAsString();
+      else if(node.GetProperty("dicom.series.SeriesDescription"))
+        patientName = node.GetProperty("dicom.series.SeriesDescription")->GetValueAsString();
+      else if(node.GetProperty("dicom.study.StudyDescription"))
+        patientName = node.GetProperty("dicom.study.StudyDescription")->GetValueAsString();
 
       node.SetData( image );
       node.SetName(patientName);

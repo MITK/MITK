@@ -17,59 +17,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include <mitkFiberBundleX.h>
 #include <mitkFiberBundleXReader.h>
-#include <mitkFiberBundleXWriter.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkTestingConfig.h>
+#include <mitkIOUtil.h>
 
-/**Documentation
- *  Test for fiber bundle reader and writer
- */
-int mitkFiberBundleXReaderWriterTest(int argc, char* argv[])
+#include "mitkTestFixture.h"
+
+class mitkFiberBundleXReaderWriterTestSuite : public mitk::TestFixture
 {
-  MITK_TEST_BEGIN("mitkFiberBundleXReaderWriterTest");
 
-   std::cout << argv[1]<<std::endl;
+  CPPUNIT_TEST_SUITE(mitkFiberBundleXReaderWriterTestSuite);
+  MITK_TEST(Equal_SaveLoad_ReturnsTrue);
+  CPPUNIT_TEST_SUITE_END();
 
-  MITK_TEST_CONDITION_REQUIRED(argc>1,"check for filename")
+private:
 
-  mitk::FiberBundleXWriter::Pointer writer = mitk::FiberBundleXWriter::New();
+  /** Members used inside the different (sub-)tests. All members are initialized via setUp().*/
   mitk::FiberBundleX::Pointer fib1;
   mitk::FiberBundleX::Pointer fib2;
 
-  // first test: did this work?
-  // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
-  // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(writer.IsNotNull(),"writer instantiation")
+public:
 
-  try{
-    // test if fib1 can be read
+  void setUp()
+  {
+    fib1 = NULL;
+    fib2 = NULL;
+
     const std::string s1="", s2="";
+    std::string filename = GetTestDataFilePath("DiffusionImaging/fiberBundleX.fib");
 
-    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[1], s1, s2, false );
+    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::BaseDataIO::LoadBaseDataFromFile( filename, s1, s2, false );
     mitk::BaseData::Pointer baseData = fibInfile.at(0);
     fib1 = dynamic_cast<mitk::FiberBundleX*>(baseData.GetPointer());
-    MITK_TEST_CONDITION_REQUIRED(fib1.IsNotNull(),"check if reader returned null")
+  }
 
-    // test if fib1 can be written
-    MITK_TEST_CONDITION_REQUIRED( writer->CanWriteBaseDataType(fib1.GetPointer()),"writer can write data")
-    writer->SetFileName( std::string(MITK_TEST_OUTPUT_DIR)+"/writerTest.fib" );
-    writer->DoWrite( fib1.GetPointer() );
+  void tearDown()
+  {
+    fib1 = NULL;
+    fib2 = NULL;
+  }
 
-    // test if fib1 can be read again as fib2
-    fibInfile = mitk::BaseDataIO::LoadBaseDataFromFile( std::string(MITK_TEST_OUTPUT_DIR)+"/writerTest.fib", s1, s2, false );
-    baseData = fibInfile.at(0);
+  void Equal_SaveLoad_ReturnsTrue()
+  {
+    const std::string s1="", s2="";
+    mitk::IOUtil::Save(fib1.GetPointer(), std::string(MITK_TEST_OUTPUT_DIR)+"/writerTest.fib");
+    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::BaseDataIO::LoadBaseDataFromFile( std::string(MITK_TEST_OUTPUT_DIR)+"/writerTest.fib", s1, s2, false );
+    mitk::BaseData::Pointer baseData = fibInfile.at(0);
     fib2 = dynamic_cast<mitk::FiberBundleX*>(baseData.GetPointer());
-    MITK_TEST_CONDITION_REQUIRED(fib2.IsNotNull(),"reader can read file written before")
-
-    // test if fib1 equals fib2
-    MITK_TEST_CONDITION_REQUIRED(fib1->Equals(fib2),"fiber bundles are not changed during reading/writing")
-  }
-  catch(...) {
-    return EXIT_FAILURE;
+    CPPUNIT_ASSERT_MESSAGE("Should be equal", fib1->Equals(fib2));
+    //MITK_ASSERT_EQUAL(fib1, fib2, "A saved and re-loaded file should be equal");
   }
 
-  // always end with this!
-  MITK_TEST_END();
-}
+};
+
+MITK_TEST_SUITE_REGISTRATION(mitkFiberBundleXReaderWriter)

@@ -66,10 +66,10 @@ private:
 public:
     TrackVis_header     m_Header;
 
-    short   create(string m_Filename, mitk::FiberBundleX* fib);
+    short   create(string m_Filename, const mitk::FiberBundleX* fib);
     short   open( string m_Filename );
     short   read( mitk::FiberBundleX* fib );
-    short   append( mitk::FiberBundleX* fib );
+    short   append(const mitk::FiberBundleX* fib );
     void    writeHdr();
     void    updateTotal( int totFibers );
     void    close();

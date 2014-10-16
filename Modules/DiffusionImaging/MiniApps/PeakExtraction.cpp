@@ -35,6 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <mitkIOUtil.h>
+
 mitk::Image::Pointer LoadData(std::string filename)
 {
     if( filename.empty() )
@@ -309,10 +311,7 @@ int StartPeakExtraction(int argc, char* argv[])
 
             string outfilename = outRoot.c_str();
             outfilename.append("_VECTOR_FIELD.fib");
-
-            mitk::FiberBundleXWriter::Pointer fibWriter = mitk::FiberBundleXWriter::New();
-            fibWriter->SetFileName(outfilename.c_str());
-            fibWriter->DoWrite(directions.GetPointer());
+            mitk::IOUtil::Save(directions.GetPointer(),outfilename.c_str());
         }
     }
     catch (itk::ExceptionObject e)

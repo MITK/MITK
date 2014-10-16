@@ -3,31 +3,11 @@
 
 mitk::FiberTrackingObjectFactory::FiberTrackingObjectFactory()
   : CoreObjectFactoryBase()
-  , m_FiberBundleXIOFactory(mitk::FiberBundleXIOFactory::New().GetPointer())
-  , m_FiberBundleXWriterFactory(mitk::FiberBundleXWriterFactory::New().GetPointer())
 {
-
-  static bool alreadyDone = false;
-  if (!alreadyDone)
-  {
-    MITK_DEBUG << "FiberTrackingObjectFactory c'tor" << std::endl;
-
-    itk::ObjectFactoryBase::RegisterFactory(m_FiberBundleXIOFactory);
-    itk::ObjectFactoryBase::RegisterFactory(m_FiberBundleXWriterFactory);
-
-    m_FileWriters.push_back( mitk::FiberBundleXWriter::New().GetPointer() );//modernized
-
-    CreateFileExtensionsMap();
-
-    alreadyDone = true;
-  }
-
 }
 
 mitk::FiberTrackingObjectFactory::~FiberTrackingObjectFactory()
 {
-  itk::ObjectFactoryBase::UnRegisterFactory(m_FiberBundleXWriterFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_FiberBundleXIOFactory);
 }
 
 mitk::Mapper::Pointer mitk::FiberTrackingObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
@@ -106,13 +86,7 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::FiberTrackingObjectFactory::GetS
 
 void mitk::FiberTrackingObjectFactory::CreateFileExtensionsMap()
 {
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.fib", "Fiber Bundle"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.trk", "TrackVis Fiber Bundle"));
 
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.fib", "Fiber Bundle"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.trk", "TrackVis Fiber Bundle"));
 }
 
 void mitk::FiberTrackingObjectFactory::RegisterIOFactories()

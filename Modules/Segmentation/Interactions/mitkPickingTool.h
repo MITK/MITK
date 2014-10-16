@@ -90,7 +90,7 @@ namespace mitk
     SinglePointDataInteractor::Pointer m_SeedPointInteractor;
     DataNode::Pointer m_PointSetNode;
 
-
+    DataNode* m_WorkingData;
   };
 
 } // namespace

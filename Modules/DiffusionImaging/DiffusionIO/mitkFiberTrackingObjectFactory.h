@@ -5,9 +5,6 @@
 
 //modernized fiberbundle datastrucutre
 #include "mitkFiberBundleX.h"
-#include "mitkFiberBundleXIOFactory.h"
-#include "mitkFiberBundleXWriterFactory.h"
-#include "mitkFiberBundleXWriter.h"
 #include "mitkFiberBundleXMapper3D.h"
 #include "mitkFiberBundleXMapper2D.h"
 
@@ -49,8 +46,6 @@ protected:
     MultimapType m_FileExtensionsMap;
     MultimapType m_SaveFileExtensionsMap;
 
-    itk::ObjectFactoryBase::Pointer m_FiberBundleXIOFactory;
-    itk::ObjectFactoryBase::Pointer m_FiberBundleXWriterFactory;
 };
 
 }

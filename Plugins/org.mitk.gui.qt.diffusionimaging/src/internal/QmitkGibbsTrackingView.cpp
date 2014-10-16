@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkProgressBar.h>
-#include <mitkFiberBundleXWriter.h>
+#include <mitkIOUtil.h>
 
 // ITK
 #include <itkGibbsTrackingFilter.h>
@@ -41,6 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MISC
 #include <tinyxml.h>
+
+
 
 
 QmitkTrackingWorker::QmitkTrackingWorker(QmitkGibbsTrackingView* view)
@@ -569,14 +571,10 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
 
     if (!m_OutputFileName.isEmpty() && !m_ThreadIsRunning)
     {
-        QString filename = m_OutputFileName;
-        mitk::FiberBundleXWriter::Pointer writer = mitk::FiberBundleXWriter::New();
-        writer->SetFileName(filename.toStdString());
-        writer->SetInputFiberBundleX(m_FiberBundle.GetPointer());
         try
         {
-            writer->Update();
-            QMessageBox::information(NULL, "Fiber bundle saved to", filename);
+          mitk::IOUtil::Save(m_FiberBundle.GetPointer(),m_OutputFileName.toStdString());
+          QMessageBox::information(NULL, "Fiber bundle saved to", m_OutputFileName);
         }
         catch (itk::ExceptionObject &ex)
         {

@@ -64,14 +64,11 @@ int FileFormatConverter(int argc, char* argv[])
         }
         else if ( dynamic_cast<Image*>(baseData.GetPointer()) )
         {
-            Image::Pointer image = dynamic_cast<Image*>(baseData.GetPointer());
-            mitk::IOUtil::SaveImage(image, outName);
+            mitk::IOUtil::Save(dynamic_cast<Image*>(baseData.GetPointer()), outName.c_str());
         }
         else if ( dynamic_cast<FiberBundleX*>(baseData.GetPointer()) )
         {
-            FiberBundleXWriter::Pointer fibWriter = FiberBundleXWriter::New();
-            fibWriter->SetFileName(outName.c_str());
-            fibWriter->DoWrite( dynamic_cast<FiberBundleX*>(baseData.GetPointer()) );
+            mitk::IOUtil::Save(dynamic_cast<FiberBundleX*>(baseData.GetPointer()) ,outName.c_str());
         }
         else
             MITK_INFO << "File type currently not supported!";

@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNavigationToolCreationWidget.h"
 
 //mitk headers
-#include "mitkTrackingTypes.h"
+#include <mitkTrackingTypes.h>
 #include <mitkSTLFileReader.h>
 #include <mitkSurface.h>
-#include "mitkNavigationData.h"
-#include "mitkRenderingManager.h"
+#include <mitkNavigationData.h>
+#include <mitkRenderingManager.h>
 
 //qt headers
 #include <qfiledialog.h>
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // vtk
 #include <vtkSphereSource.h>
-#include "vtkConeSource.h"
+#include <vtkConeSource.h>
 
 const std::string QmitkNavigationToolCreationWidget::VIEW_ID = "org.mitk.views.navigationtoolcreationwizardwidget";
 
@@ -106,16 +106,18 @@ void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDevi
 {
 switch(type)
 {
-case mitk::NDIAurora:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);break;
-case mitk::NDIPolaris:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(1);break;
-case mitk::ClaronMicron:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
-case mitk::NPOptitrack:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(3);break;
-default:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);
+  case mitk::NDIAurora:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);break;
+  case mitk::NDIPolaris:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(1);break;
+  case mitk::ClaronMicron:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
+  case mitk::NPOptitrack:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(3);break;
+  case mitk::VirtualTracker:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(4);break;
+  default:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(4);
 }
 m_Controls->m_TrackingDeviceTypeChooser->setEnabled(changeable);
 }
@@ -167,8 +169,9 @@ m_CreatedTool->SetSerialNumber(m_Controls->m_SerialNumberEdit->text().toAscii().
 //Tracking Device
 if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Aurora") m_CreatedTool->SetTrackingDeviceType(mitk::NDIAurora);
 else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Polaris") m_CreatedTool->SetTrackingDeviceType(mitk::NDIPolaris);
-else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="Claron Technology Micron Tracker") m_CreatedTool->SetTrackingDeviceType(mitk::ClaronMicron);
+else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="CT MicronTracker") m_CreatedTool->SetTrackingDeviceType(mitk::ClaronMicron);
 else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NP Optitrack") m_CreatedTool->SetTrackingDeviceType(mitk::NPOptitrack);
+else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="Virtual Tracker") m_CreatedTool->SetTrackingDeviceType(mitk::VirtualTracker);
 else m_CreatedTool->SetTrackingDeviceType(mitk::TrackingSystemNotSpecified);
 
 //ToolType
@@ -242,6 +245,8 @@ case mitk::ClaronMicron:
 m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
 case mitk::NPOptitrack:
 m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(3);break;
+case mitk::VirtualTracker:
+m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(4);break;
 default:
 m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);
 }

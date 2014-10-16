@@ -8,7 +8,7 @@ TrackVisFiberReader::~TrackVisFiberReader() { if (m_FilePointer) fclose( m_FileP
 
 // Create a TrackVis file and store standard metadata. The file is ready to append fibers.
 // ---------------------------------------------------------------------------------------
-short TrackVisFiberReader::create(string filename , mitk::FiberBundleX *fib)
+short TrackVisFiberReader::create(string filename , const mitk::FiberBundleX *fib)
 {
     // prepare the header
     for(int i=0; i<3 ;i++)
@@ -86,7 +86,7 @@ short TrackVisFiberReader::open( string filename )
 
 // Append a fiber to the file
 // --------------------------
-short TrackVisFiberReader::append(mitk::FiberBundleX *fib)
+short TrackVisFiberReader::append(const mitk::FiberBundleX *fib)
 {
     vtkPolyData* poly = fib->GetFiberPolyData();
     for (int i=0; i<fib->GetNumFibers(); i++)

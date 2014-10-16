@@ -325,7 +325,7 @@ void mitk::FiberBundleX::SetFiberPolyData(vtkSmartPointer<vtkPolyData> fiberPD, 
 /*
  * return vtkPolyData
  */
-vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GetFiberPolyData()
+vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GetFiberPolyData() const
 {
     return m_FiberPolyData;
 }

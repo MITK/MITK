@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkDicomEditor_h
-#define QmitkDicomEditor_h
+#ifndef QmitkDicomBrowser_h
+#define QmitkDicomBrowser_h
 
 // Blueberry
 #include <berryIPartListener.h>
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDicomDirectoryListener.h"
 #include "QmitkStoreSCPLauncher.h"
 #include "QmitkStoreSCPLauncherBuilder.h"
-#include "ui_QmitkDicomEditorControls.h"
+#include "ui_QmitkDicomBrowserControls.h"
 #include <org_mitk_gui_qt_dicom_Export.h>
 
 // Qt
@@ -39,12 +39,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVariant>
 
 /**
-* \brief QmitkDicomEditor is an editor providing functionality for dicom storage and import and query retrieve functionality.
+* \brief QmitkDicomBrowser is an editor providing functionality for dicom storage and import and query retrieve functionality.
 *
 * \sa berry::IPartListener
 * \ingroup ${plugin_target}_internal
 */
-class DICOM_EXPORT QmitkDicomEditor : public berry::QtEditorPart, virtual public berry::IPartListener
+class DICOM_EXPORT QmitkDicomBrowser : public berry::QtEditorPart, virtual public berry::IPartListener
 {
 // this is needed for all Qt objects that should have a Qt meta-object
     // (everything that derives from QObject and wants to have signal/slots)
@@ -52,19 +52,19 @@ class DICOM_EXPORT QmitkDicomEditor : public berry::QtEditorPart, virtual public
 
 public:
 
-    berryObjectMacro(QmitkDicomEditor);
+    berryObjectMacro(QmitkDicomBrowser);
     static const std::string EDITOR_ID;
     static const QString TEMP_DICOM_FOLDER_SUFFIX;
 
    /**
-    * \brief QmitkDicomEditor constructor.
+    * \brief QmitkDicomBrowser constructor.
     */
-    QmitkDicomEditor();
+    QmitkDicomBrowser();
 
    /**
-    * \brief QmitkDicomEditor destructor.
+    * \brief QmitkDicomBrowser destructor.
     */
-    virtual ~QmitkDicomEditor();
+    virtual ~QmitkDicomBrowser();
 
    /**
     * \brief Init initialize the editor.
@@ -123,7 +123,7 @@ protected:
 
 
    /**
-    * \brief CreateQtPartControl(QWidget *parent) sets the view objects from ui_QmitkDicomeditorControls.h.
+    * \brief CreateQtPartControl(QWidget *parent) sets the view objects from ui_QmitkDicomBrowserControls.h.
     *
     * \param parent is a pointer to the parent widget
     */
@@ -135,7 +135,7 @@ protected:
     Events::Types GetPartEventTypes() const;
 
     ctkFileDialog* m_ImportDialog;
-    Ui::QmitkDicomEditorControls m_Controls;
+    Ui::QmitkDicomBrowserControls m_Controls;
     QThread m_Thread;
     QmitkDicomDirectoryListener* m_DicomDirectoryListener;
     QmitkStoreSCPLauncherBuilder m_Builder;
@@ -147,4 +147,4 @@ protected:
     QString m_DatabaseDirectory;
 };
 
-#endif // QmitkDicomEditor_h
+#endif // QmitkDicomBrowser_h

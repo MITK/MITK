@@ -2,10 +2,14 @@
  <qresource prefix="/org_mitk_icons">
      <file>icons/awesome/index.theme</file>
      <file>icons/awesome/scalable/actions/document-open.svg</file>
+     <file>icons/awesome/scalable/actions/document-print.svg</file>
      <file>icons/awesome/scalable/actions/document-save.svg</file>
      <file>icons/awesome/scalable/actions/edit-delete.svg</file>
      <file>icons/awesome/scalable/actions/edit-redo.svg</file>
      <file>icons/awesome/scalable/actions/edit-undo.svg</file>
+     <file>icons/awesome/scalable/actions/go-home.svg</file>
+     <file>icons/awesome/scalable/actions/go-next.svg</file>
+     <file>icons/awesome/scalable/actions/go-previous.svg</file>
      <file>icons/awesome/scalable/actions/system-log-out.svg</file>
      <file>icons/awesome/scalable/status/dialog-error.svg</file>
      <file>icons/awesome/scalable/status/dialog-information.svg</file>
@@ -13,10 +17,14 @@
      <file>icons/awesome/scalable/status/dialog-warning.svg</file>
      <file>icons/tango/index.theme</file>
      <file>icons/tango/scalable/actions/document-open.svg</file>
+     <file>icons/tango/scalable/actions/document-print.svg</file>
      <file>icons/tango/scalable/actions/document-save.svg</file>
      <file>icons/tango/scalable/actions/edit-delete.svg</file>
      <file>icons/tango/scalable/actions/edit-redo.svg</file>
      <file>icons/tango/scalable/actions/edit-undo.svg</file>
+     <file>icons/tango/scalable/actions/go-home.svg</file>
+     <file>icons/tango/scalable/actions/go-next.svg</file>
+     <file>icons/tango/scalable/actions/go-previous.svg</file>
      <file>icons/tango/scalable/actions/system-log-out.svg</file>
      <file>icons/tango/scalable/status/dialog-error.svg</file>
      <file>icons/tango/scalable/status/dialog-information.svg</file>

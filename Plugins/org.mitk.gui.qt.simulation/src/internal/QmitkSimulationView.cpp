@@ -161,7 +161,7 @@ void QmitkSimulationView::OnResetButtonClicked()
   m_Controls.dtSpinBox->setValue(simulation->GetRootNode()->getDt());
   simulation->Reset();
 
-  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 }
 
 void QmitkSimulationView::OnSelectedSimulationChanged(const mitk::DataNode* node)
@@ -209,7 +209,7 @@ void QmitkSimulationView::OnStep(bool renderWindowUpdate)
     simulation->Animate();
 
   if (renderWindowUpdate)
-    this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+    this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 }
 
 void QmitkSimulationView::OnStepButtonClicked()
@@ -222,7 +222,7 @@ void QmitkSimulationView::OnStepButtonClicked()
   m_SimulationService->SetActiveSimulation(simulation);
   simulation->Animate();
 
-  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 }
 
 void QmitkSimulationView::OnTimeout()

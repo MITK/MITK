@@ -72,15 +72,14 @@ namespace mitk
 
     /**
      * @brief Adds a new extracted contour to the list
-     * @param newContour the contour to be added
-     * @param plane the image plane in which the contour lies. If plane already exists the related
-     *        contour will be updated
+     * @param newContour the contour to be added. If a contour at that position
+     *        already exists the related contour will be updated
      */
     void AddNewContour (Surface::Pointer newContour);
 
     /**
      * @brief Removes the contour for a given plane for the current selected segmenation
-     * @param contourInfo the contour which should be returned
+     * @param contourInfo the contour which should be removed
      * @return true if a contour was found and removed, false if no contour was found
      */
     bool RemoveContour (ContourPositionInformation contourInfo);
@@ -94,8 +93,8 @@ namespace mitk
 
     /**
     * @brief Returns the contour for a given plane for the current selected segmenation
-    * @param plane the plane for which the contour should be returned
-    * @return the contour as an mitk::Surface. If no contour is available for the plane NULL is returned
+    * @param ontourInfo the contour which should be returned
+    * @return the contour as an mitk::Surface. If no contour is available at the give position NULL is returned
     */
     const mitk::Surface* GetContour (ContourPositionInformation contourInfo);
 

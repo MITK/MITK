@@ -54,6 +54,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
+float SURFACE_COLOR_RGB [3] = {0.49f, 1.0f, 0.16f};
+
 const std::map<QAction*, mitk::SliceNavigationController*> QmitkSlicesInterpolator::createActionToSliceDimension()
 {
   std::map<QAction*, mitk::SliceNavigationController*> actionToSliceDimension;
@@ -143,9 +145,10 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
 
   m_InterpolatedSurfaceNode = mitk::DataNode::New();
-  m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(255.0,255.0,0.0) );
+  m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(SURFACE_COLOR_RGB) );
   m_InterpolatedSurfaceNode->SetProperty( "name", mitk::StringProperty::New("Surface Interpolation feedback") );
   m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
+  m_InterpolatedSurfaceNode->SetProperty( "line width", mitk::IntProperty::New(4) );
   m_InterpolatedSurfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
   m_InterpolatedSurfaceNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
   m_InterpolatedSurfaceNode->SetVisibility(false);
@@ -766,6 +769,19 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     segmentationNode->SetData(s2iFilter->GetOutput());
     m_CmbInterpolation->setCurrentIndex(0);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::DataNode::Pointer segSurface = mitk::DataNode::New();
+    float rgb[3];
+    segmentationNode->GetColor(rgb);
+    segSurface->SetColor(rgb);
+    segSurface->SetData(m_InterpolatedSurfaceNode->GetData());
+    std::stringstream stream;
+    stream << segmentationNode->GetName();
+    stream << "_";
+    stream << "3D-interpolation";
+    segSurface->SetName(stream.str());
+    segSurface->SetProperty( "opacity", mitk::FloatProperty::New(0.7) );
+    segSurface->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
+    m_DataStorage->Add(segSurface, segmentationNode);
     this->Show3DInterpolationResult(false);
   }
 }
@@ -883,7 +899,7 @@ void QmitkSlicesInterpolator::StartUpdateInterpolationTimer()
 void QmitkSlicesInterpolator::StopUpdateInterpolationTimer()
 {
   m_Timer->stop();
-  m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(255.0,255.0,0.0));
+  m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(SURFACE_COLOR_RGB));
   mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
 }
 
@@ -891,16 +907,17 @@ void QmitkSlicesInterpolator::ChangeSurfaceColor()
 {
   float currentColor[3];
   m_InterpolatedSurfaceNode->GetColor(currentColor);
+  MITK_INFO<<"Current color: "<<currentColor[0]<<", "<<currentColor[1]<<", "<<currentColor[2];
 
-  float yellow[3] = {255.0,255.0,0.0};
-
-  if( currentColor[2] == yellow[2])
+  if( currentColor[2] == /*yellow*/SURFACE_COLOR_RGB[2])
   {
-    m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(255.0,255.0,255.0));
+    MITK_INFO<<"Changing white";
+    m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(1.0f,1.0f,1.0f));
   }
   else
   {
-    m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(yellow));
+    MITK_INFO<<"Changing green";
+    m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(SURFACE_COLOR_RGB));
   }
   m_InterpolatedSurfaceNode->Update();
   mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());

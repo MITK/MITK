@@ -286,6 +286,10 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
   this->UpdateSurfaceInterpolation(slice, image, planeGeometry, false);
+
+  if (m_SurfaceInterpolationEnabled)
+    this->AddContourmarker();
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

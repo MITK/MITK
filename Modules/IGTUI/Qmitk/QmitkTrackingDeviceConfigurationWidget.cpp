@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkTrackingDeviceConfigurationWidget.h"
 #include <mitkClaronTrackingDevice.h>
+#include <mitkVirtualTrackingDevice.h>
 #include <mitkNDITrackingDevice.h>
 #include <mitkOptitrackTrackingDevice.h>
 #include <mitkIGTException.h>
@@ -419,6 +420,11 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
     // Create the Tracking Device this->m_OptitrackDevice = mitk::OptitrackTrackingDevice::New();
     returnValue = ConfigureOptitrackTrackingDevice();
     returnValue->SetType(mitk::NPOptitrack);
+  }
+  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==4) //Virtual Tracker
+  {
+    // Create the Virtual Tracking Device
+    returnValue = mitk::VirtualTrackingDevice::New();
   }
   return returnValue;
   }

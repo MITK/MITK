@@ -1117,7 +1117,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->setupUi(parent);
 
    m_Controls->patImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-   m_Controls->patImageSelector->SetPredicate(m_IsNotABinaryImagePredicate);
+   m_Controls->patImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsNotABinaryImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
 
    this->UpdateWarningLabel("Please load an image");
 
@@ -1125,7 +1125,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
       this->UpdateWarningLabel("Select or create a new segmentation");
 
    m_Controls->segImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-   m_Controls->segImageSelector->SetPredicate(m_IsABinaryImagePredicate);
+   m_Controls->segImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsABinaryImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
    if( m_Controls->segImageSelector->GetSelectedNode().IsNotNull() )
       this->UpdateWarningLabel("");
 

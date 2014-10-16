@@ -216,6 +216,10 @@ protected:
 
 
 public:
+  mitkClassMacro(AnisotropicIterativeClosestPointRegistration, itk::Object)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
+
 
   /** Set the maximum amount of iterations used by the algorithm. */
   itkSetMacro(MaxIterations, unsigned int)
@@ -302,9 +306,6 @@ public:
   {
     m_CovarianceMatricesFixedSurface = list;
   }
-
-  mitkClassMacro(AnisotropicIterativeClosestPointRegistration, itk::Object)
-  itkNewMacro(Self)
 
   /**
     * This method executes the algorithm.

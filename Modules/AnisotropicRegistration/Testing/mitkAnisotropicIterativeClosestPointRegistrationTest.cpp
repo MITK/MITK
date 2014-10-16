@@ -117,7 +117,7 @@ public:
 
     MITK_INFO << "FRE: Expected: " << expFRE << ", computed: " << aICP->GetFRE();
     CPPUNIT_ASSERT_MESSAGE("mitkAnisotropicIterativeClosestPointRegistrationTest:AicpRegistration Test FRE",
-                           mitk::Equal(aICP->GetFRE(),expFRE,0.00001));
+                           mitk::Equal(aICP->GetFRE(),expFRE,0.0001));
 
     // compute the target registration Error
     const double tre = mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError(

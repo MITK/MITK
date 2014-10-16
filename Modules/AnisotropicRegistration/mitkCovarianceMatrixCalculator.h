@@ -89,7 +89,8 @@ protected:
 
 public:
   mitkClassMacro(CovarianceMatrixCalculator, itk::Object)
-  itkNewMacro (Self)
+  itkFactorylessNewMacro (Self)
+  itkCloneMacro(Self)
 
   /** Sets the scaling factor for the voronoi area.
    *  @param factor The scaling factor.

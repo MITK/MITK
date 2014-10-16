@@ -72,7 +72,8 @@ class MitkAnisotropicRegistration_EXPORT WeightedPointTransform : public itk::Ob
 public:
 
   mitkClassMacro(WeightedPointTransform, itk::Object);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self)
 
   /** @brief Method which registers both point sets. */
   void ComputeTransformation();

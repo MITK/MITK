@@ -26,151 +26,83 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <tinyxml.h>
 #include <vtkCleanPolyData.h>
 #include <mitkTrackvis.h>
+#include <mitkCustomMimeType.h>
 
-namespace mitk
+
+mitk::FiberBundleXReader::FiberBundleXReader()
+  :mitk::AbstractFileReader()
 {
+  std::string category = "Fiber Bundle File";
+  mitk::CustomMimeType customMimeType;
+  customMimeType.SetCategory(category);
+  customMimeType.AddExtension("fib");
+  customMimeType.AddExtension("trk");
+  customMimeType.AddExtension("vtk");
 
-void FiberBundleXReader
-::GenerateData()
-{
-    if ( ( ! m_OutputCache ) )
-    {
-        Superclass::SetNumberOfRequiredOutputs(0);
-        this->GenerateOutputInformation();
-    }
+  this->SetDescription(category);
+  this->SetMimeType(customMimeType);
 
-    if (!m_OutputCache)
-    {
-        itkWarningMacro("Output cache is empty!");
-    }
-
-
-    Superclass::SetNumberOfRequiredOutputs(1);
-    Superclass::SetNthOutput(0, m_OutputCache.GetPointer());
+  m_ServiceReg = this->RegisterService();
 }
 
-void FiberBundleXReader::GenerateOutputInformation()
+mitk::FiberBundleXReader::FiberBundleXReader(const FiberBundleXReader &other)
+  :mitk::AbstractFileReader(other)
 {
-    try
-    {
-        const std::string& locale = "C";
-        const std::string& currLocale = setlocale( LC_ALL, NULL );
-        setlocale(LC_ALL, locale.c_str());
-
-        std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
-        ext = itksys::SystemTools::LowerCase(ext);
-
-        if (ext==".trk")
-        {
-            m_OutputCache = OutputType::New();
-            TrackVisFiberReader reader;
-            reader.open(m_FileName);
-            reader.read(m_OutputCache);
-            return;
-        }
-
-        vtkSmartPointer<vtkDataReader> chooser=vtkSmartPointer<vtkDataReader>::New();
-        chooser->SetFileName(m_FileName.c_str() );
-        if( chooser->IsFilePolyData())
-        {
-            vtkSmartPointer<vtkPolyDataReader> reader = vtkSmartPointer<vtkPolyDataReader>::New();
-            reader->SetFileName( m_FileName.c_str() );
-            reader->Update();
-
-            if ( reader->GetOutput() != NULL )
-            {
-                vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput();
-                m_OutputCache = OutputType::New(fiberPolyData);
-            }
-        }
-        setlocale(LC_ALL, currLocale.c_str());
-        MITK_INFO << "Fiber bundle read";
-    }
-    catch(...)
-    {
-        throw;
-    }
 }
 
-void FiberBundleXReader::Update()
+mitk::FiberBundleXReader * mitk::FiberBundleXReader::Clone() const
 {
-    this->GenerateData();
-}
-
-const char* FiberBundleXReader
-::GetFileName() const
-{
-    return m_FileName.c_str();
+  return new FiberBundleXReader(*this);
 }
 
 
-void FiberBundleXReader
-::SetFileName(const char* aFileName)
+std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleXReader::Read()
 {
-    m_FileName = aFileName;
-}
 
+  std::vector<itk::SmartPointer<mitk::BaseData> > result;
+  try
+  {
+    const std::string& locale = "C";
+    const std::string& currLocale = setlocale( LC_ALL, NULL );
+    setlocale(LC_ALL, locale.c_str());
 
-const char* FiberBundleXReader
-::GetFilePrefix() const
-{
-    return m_FilePrefix.c_str();
-}
+    std::string filename = this->GetInputLocation();
 
-
-void FiberBundleXReader
-::SetFilePrefix(const char* aFilePrefix)
-{
-    m_FilePrefix = aFilePrefix;
-}
-
-
-const char* FiberBundleXReader
-::GetFilePattern() const
-{
-    return m_FilePattern.c_str();
-}
-
-
-void FiberBundleXReader
-::SetFilePattern(const char* aFilePattern)
-{
-    m_FilePattern = aFilePattern;
-}
-
-
-bool FiberBundleXReader
-::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/)
-{
-    // First check the extension
-    if(  filename == "" )
-    {
-        return false;
-    }
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
     ext = itksys::SystemTools::LowerCase(ext);
 
-    if (ext == ".fib" || ext == ".trk")
+    if (ext==".trk")
     {
-        return true;
+      FiberBundleX::Pointer image = FiberBundleX::New();
+      TrackVisFiberReader reader;
+      reader.open(this->GetInputLocation().c_str());
+      reader.read(image.GetPointer());
+      result.push_back(image.GetPointer());
+      return result;
     }
 
-    return false;
-}
-
-BaseDataSource::DataObjectPointer FiberBundleXReader::MakeOutput(const DataObjectIdentifierType &name)
-{
-    itkDebugMacro("MakeOutput(" << name << ")");
-    if( this->IsIndexedOutputName(name) )
+    vtkSmartPointer<vtkDataReader> chooser=vtkSmartPointer<vtkDataReader>::New();
+    chooser->SetFileName( this->GetInputLocation().c_str() );
+    if( chooser->IsFilePolyData())
     {
-        return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+      vtkSmartPointer<vtkPolyDataReader> reader = vtkSmartPointer<vtkPolyDataReader>::New();
+      reader->SetFileName( this->GetInputLocation().c_str() );
+      reader->Update();
+
+      if ( reader->GetOutput() != NULL )
+      {
+        vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput();
+        FiberBundleX::Pointer image = FiberBundleX::New(fiberPolyData);
+        result.push_back(image.GetPointer());
+        return result;
+      }
     }
-    return static_cast<itk::DataObject*>(OutputType::New().GetPointer());
+    setlocale(LC_ALL, currLocale.c_str());
+    MITK_INFO << "Fiber bundle read";
+  }
+  catch(...)
+  {
+    throw;
+  }
+  return result;
 }
-
-BaseDataSource::DataObjectPointer FiberBundleXReader::MakeOutput(DataObjectPointerArraySizeType /*idx*/)
-{
-    return OutputType::New().GetPointer();
-}
-
-} //namespace MITK

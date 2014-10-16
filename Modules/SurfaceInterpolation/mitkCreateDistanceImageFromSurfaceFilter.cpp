@@ -450,9 +450,9 @@ void mitk::CreateDistanceImageFromSurfaceFilter::PrintEquationSystem()
   std::stringstream out;
   out<<"Nummber of rows: "<<m_SolutionMatrix.rows()<<" ****** Number of columns: "<<m_SolutionMatrix.cols()<<endl;
   out<<"[ ";
-  for (unsigned int i = 0; i < m_SolutionMatrix.rows(); i++)
+  for (int i = 0; i < m_SolutionMatrix.rows(); i++)
   {
-    for (unsigned int j = 0; j < m_SolutionMatrix.cols(); j++)
+    for (int j = 0; j < m_SolutionMatrix.cols(); j++)
     {
       out<<m_SolutionMatrix(i,j)<<"   ";
     }

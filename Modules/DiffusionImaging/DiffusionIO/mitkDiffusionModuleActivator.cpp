@@ -13,11 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
-#include <usGetModuleContext.h>
 #include <usModuleActivator.h>
-#include <usModuleContext.h>
-#include <usModule.h>
 
 #include <mitkFiberBundleXReader.h>
 #include <mitkFiberBundleXWriter.h>

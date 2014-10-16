@@ -14,6 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <mitkGL.h>
 #include "mitkPlaneIntersectionVisitor.h"
 #include "mitkSimulation.h"
 #include "mitkSimulationGLMapper2D.h"
@@ -40,6 +41,9 @@ void mitk::SimulationGLMapper2D::ApplyColorAndOpacityProperties(BaseRenderer*, v
 
 void mitk::SimulationGLMapper2D::Paint(BaseRenderer* renderer)
 {
+  typedef PlaneIntersectionVisitor::Edge Edge;
+  typedef PlaneIntersectionVisitor::Intersection Intersection;
+
   if (renderer == NULL)
     return;
 
@@ -65,4 +69,34 @@ void mitk::SimulationGLMapper2D::Paint(BaseRenderer* renderer)
 
   PlaneIntersectionVisitor planeIntersectionVisitor(planeGeometry->GetOrigin(), planeGeometry->GetNormal());
   simulation->GetRootNode()->executeVisitor(&planeIntersectionVisitor);
+
+  mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
+  Point2D point2D;
+
+  const std::vector<Intersection>& intersections = planeIntersectionVisitor.GetIntersections();
+  std::vector<Intersection>::const_iterator intersectionsEnd = intersections.end();
+
+  for (std::vector<Intersection>::const_iterator intersectionIt = intersections.begin(); intersectionIt != intersectionsEnd; ++intersectionIt)
+  {
+    const std::vector<Edge>& edges = intersectionIt->edges;
+    std::vector<Edge>::const_iterator edgesEnd = edges.end();
+
+    glColor3dv(intersectionIt->color);
+    glBegin(GL_LINES);
+
+    for (std::vector<Edge>::const_iterator edgeIt = edges.begin(); edgeIt != edgesEnd; ++edgeIt)
+    {
+      displayGeometry->Map(edgeIt->v0, point2D);
+      displayGeometry->WorldToDisplay(point2D, point2D);
+
+      glVertex2dv(point2D.GetDataPointer());
+
+      displayGeometry->Map(edgeIt->v1, point2D);
+      displayGeometry->WorldToDisplay(point2D, point2D);
+
+      glVertex2dv(point2D.GetDataPointer());
+    }
+
+    glEnd();
+  }
 }

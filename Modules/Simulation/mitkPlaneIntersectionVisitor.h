@@ -27,8 +27,22 @@ namespace mitk
   class MitkSimulation_EXPORT PlaneIntersectionVisitor : public sofa::simulation::Visitor
   {
   public:
+    struct Edge
+    {
+      Point3D v0;
+      Point3D v1;
+    };
+
+    struct Intersection
+    {
+      ScalarType color[3];
+      std::vector<Edge> edges;
+    };
+
     PlaneIntersectionVisitor(const Point3D& point, const Vector3D& normal, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
     ~PlaneIntersectionVisitor();
+
+    const std::vector<Intersection>& GetIntersections() const;
 
     Result processNodeTopDown(sofa::simulation::Node* node);
 
@@ -40,6 +54,8 @@ namespace mitk
 
     Point3D m_Point;
     Vector3D m_Normal;
+
+    std::vector<Intersection> m_Intersections;
   };
 }
 

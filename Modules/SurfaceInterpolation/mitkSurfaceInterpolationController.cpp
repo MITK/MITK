@@ -21,8 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageToSurfaceFilter.h"
 
+// Check whether the given contours are coplanar
 bool ContoursCoplanar(mitk::SurfaceInterpolationController::ContourPositionInformation leftHandSide, mitk::SurfaceInterpolationController::ContourPositionInformation rightHandSide)
 {
+  // Here we check two things:
+  // 1. Whether the normals of both contours are at least parallel
+  // 2. Whether both contours lie in the same plane
+
+  // Check for coplanarity:
+  // a. Span a vector between two points one from each contour
+  // b. Calculate dot product for the vector and one of the normals
+  // c. If the dot is zero the two vectors are orthogonal and the contours are coplanar
+
   double vec[3];
   vec[0] = leftHandSide.contourPoint[0] - rightHandSide.contourPoint[0];
   vec[1] = leftHandSide.contourPoint[1] - rightHandSide.contourPoint[1];
@@ -42,8 +52,9 @@ bool ContoursCoplanar(mitk::SurfaceInterpolationController::ContourPositionInfor
   double lengthLHS = leftHandSide.contourNormal.GetNorm();
   double lengthRHS = rightHandSide.contourNormal.GetNorm();
   double dot2 = vtkMath::Dot(n, n2);
+  bool contoursParallel = mitk::Equal(fabs(lengthLHS*lengthRHS), fabs(dot2), 0.001);
 
-  if (mitk::Equal(dot, 0.0, 0.001) && mitk::Equal(fabs(lengthLHS*lengthRHS), fabs(dot2), 0.001))
+  if (mitk::Equal(dot, 0.0, 0.001) && contoursParallel)
     return true;
   else
     return false;
@@ -70,8 +81,11 @@ mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   m_InterpolateSurfaceFilter = CreateDistanceImageFromSurfaceFilter::New();
 
   m_ReduceFilter->SetUseProgressBar(false);
-  m_NormalsFilter->SetUseProgressBar(false);
-  m_InterpolateSurfaceFilter->SetUseProgressBar(false);
+//  m_ReduceFilter->SetProgressStepSize(1);
+  m_NormalsFilter->SetUseProgressBar(true);
+  m_NormalsFilter->SetProgressStepSize(1);
+  m_InterpolateSurfaceFilter->SetUseProgressBar(true);
+  m_InterpolateSurfaceFilter->SetProgressStepSize(7);
 
   m_Contours = Surface::New();
 
@@ -208,10 +222,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
   }
 
   //Setting up progress bar
-   /*
-    * Removed due to bug 12441. ProgressBar messes around with Qt event queue which is fatal for segmentation
-    */
-  //mitk::ProgressBar::GetInstance()->AddStepsToDo(8);
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
 
   // create a surface from the distance-image
   mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
@@ -231,10 +242,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
 
   //Last progress step
-  /*
-   * Removed due to bug 12441. ProgressBar messes around with Qt event queue which is fatal for segmentation
-   */
-  //mitk::ProgressBar::GetInstance()->Progress(8);
+  mitk::ProgressBar::GetInstance()->Progress(20);
 
   m_InterpolationResult->DisconnectPipeline();
 }
@@ -381,7 +389,6 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation(mitk::Surfa
   // 1. detect coplanar contours
   // 2. merge coplanar contours into a single surface
   // 4. add contour to pipeline
-  // 5. create position nodes
 
   // Split the surface into separate polygons
   vtkSmartPointer<vtkCellArray> existingPolys;
@@ -482,6 +489,7 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation(mitk::Surfa
     finalSurfaces.push_back(surface);
   }
 
+  // Add detected contours to interpolation pipeline
   this->AddNewContours(finalSurfaces);
 }
 

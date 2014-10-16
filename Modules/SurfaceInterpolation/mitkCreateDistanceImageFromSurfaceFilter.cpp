@@ -36,6 +36,10 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
 {
   //First of all we have to build the equation-system from the existing contour-edge-points
   this->CreateSolutionMatrixAndFunctionValues();
+
+  if (this->m_UseProgressBar)
+    mitk::ProgressBar::GetInstance()->Progress(1);
+
   //Then we solve the equation-system via QR - decomposition. The interpolation weights are obtained in that way
   vnl_qr<double> solver (m_SolutionMatrix);
   m_Weights = solver.solve(m_FunctionValues);
@@ -46,6 +50,10 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
 
   //The last step is to create the distance map with the interpolated distance function
   this->CreateDistanceImage();
+
+  if (this->m_UseProgressBar)
+    mitk::ProgressBar::GetInstance()->Progress(2);
+
   m_Centers.clear();
   m_FunctionValues.clear();
   m_Normals.clear();

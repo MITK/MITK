@@ -46,7 +46,7 @@ public:
     fib2 = NULL;
 
     const std::string s1="", s2="";
-    std::string filename = GetTestDataFilePath("/DiffusionImaging/fiberBundleX.fib");
+    std::string filename = GetTestDataFilePath("DiffusionImaging/fiberBundleX.fib");
 
     std::vector<mitk::BaseData::Pointer> fibInfile = mitk::BaseDataIO::LoadBaseDataFromFile( filename, s1, s2, false );
     mitk::BaseData::Pointer baseData = fibInfile.at(0);

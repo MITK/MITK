@@ -53,6 +53,7 @@ set(module_dirs
     IGTUI
     VtkShaders
     DicomRT
+    AnisotropicRegistration
 )
 
 if(MITK_ENABLE_PIC_READER)

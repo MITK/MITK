@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.aicpregistration"
+          name="AICP-Registration"
+          class="QmitkAICPRegistrationView"
+          icon="resources/QmitkAICPRegistration_Icon.xpm" />
+  </extension>
+
+</plugin>

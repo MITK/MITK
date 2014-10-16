@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include <usModuleActivator.h>
 
-#include <mitkFiberBundleXReader.h>
-#include <mitkFiberBundleXWriter.h>
+//#include <mitkFiberBundleXReader.h>
+//#include <mitkFiberBundleXWriter.h>
 
 namespace mitk
 {
@@ -29,20 +29,20 @@ namespace mitk
 
     void Load(us::ModuleContext* /*context*/)
     {
-        m_FiberBundleXReader = new FiberBundleXReader();
-        m_FiberBundleXWriter = new FiberBundleXWriter();
+//        m_FiberBundleXReader = new FiberBundleXReader();
+//        m_FiberBundleXWriter = new FiberBundleXWriter();
     }
 
     void Unload(us::ModuleContext*)
     {
-      delete m_FiberBundleXReader;
-      delete m_FiberBundleXWriter;
+//      delete m_FiberBundleXReader;
+//      delete m_FiberBundleXWriter;
     }
 
   private:
 
-    FiberBundleXReader * m_FiberBundleXReader;
-    FiberBundleXWriter * m_FiberBundleXWriter;
+//    FiberBundleXReader * m_FiberBundleXReader;
+//    FiberBundleXWriter * m_FiberBundleXWriter;
 
   };
 }

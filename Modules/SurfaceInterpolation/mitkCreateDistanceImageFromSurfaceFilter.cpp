@@ -40,11 +40,8 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
   if (this->m_UseProgressBar)
     mitk::ProgressBar::GetInstance()->Progress(1);
 
-  //Then we solve the equation-system via QR - decomposition. The interpolation weights are obtained in that way
-  vnl_qr<double> solver (m_SolutionMatrix);
-  m_Weights = solver.solve(m_FunctionValues);
+  m_Weights = m_SolutionMatrix.partialPivLu().solve(m_FunctionValues);
 
-  //Setting progressbar
   if (this->m_UseProgressBar)
     mitk::ProgressBar::GetInstance()->Progress(2);
 
@@ -55,14 +52,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
     mitk::ProgressBar::GetInstance()->Progress(2);
 
   m_Centers.clear();
-  m_FunctionValues.clear();
   m_Normals.clear();
-  m_Weights.clear();
-  m_SolutionMatrix.clear();
-
-  //Setting progressbar
-  if (this->m_UseProgressBar)
-    mitk::ProgressBar::GetInstance()->Progress(3);
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunctionValues()
@@ -140,7 +130,8 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
   unsigned int numberOfCenters = m_Centers.size();
   m_Centers.reserve(numberOfCenters*3);
 
-  m_FunctionValues.set_size(numberOfCenters*3);
+  m_FunctionValues.resize(numberOfCenters*3);
+
   m_FunctionValues.fill(0);
 
   //Create inner points
@@ -155,7 +146,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
 
     m_Centers.push_back(currentPoint);
 
-    m_FunctionValues.put(numberOfCenters+i, -1);
+    m_FunctionValues[numberOfCenters+i] = -1;
   }
 
   //Create outer points
@@ -170,14 +161,15 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
 
     m_Centers.push_back(currentPoint);
 
-    m_FunctionValues.put(numberOfCenters*2+i, 1);
+    m_FunctionValues[numberOfCenters*2+i] = 1;
   }
 
   //Now we have created all centers and all function values. Next step is to create the solution matrix
   numberOfCenters = m_Centers.size();
-  m_SolutionMatrix.set_size(numberOfCenters, numberOfCenters);
 
-  m_Weights.set_size(numberOfCenters);
+  m_SolutionMatrix.resize(numberOfCenters, numberOfCenters);
+
+  m_Weights.resize(numberOfCenters);
 
   PointType p1;
   PointType p2;
@@ -193,10 +185,8 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
       p1 = p1 - p2;
       norm = p1.two_norm();
       m_SolutionMatrix(i,j) = norm;
-
     }
   }
-
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
@@ -436,16 +426,17 @@ double mitk::CreateDistanceImageFromSurfaceFilter::CalculateDistanceValue(PointT
   double norm;
 
   CenterList::iterator centerIter;
-  InterpolationWeights::iterator weightsIter;
 
-  for ( centerIter=m_Centers.begin(), weightsIter=m_Weights.begin();
-    centerIter!=m_Centers.end() && weightsIter!=m_Weights.end();
-    centerIter++, weightsIter++ )
+  unsigned int count (0);
+  for ( centerIter=m_Centers.begin();
+    centerIter!=m_Centers.end();
+    centerIter++)
   {
     p1 = *centerIter;
     p2 = p-p1;
     norm = p2.two_norm();
-    distanceValue = distanceValue + norm* (*weightsIter);
+    distanceValue = distanceValue + (norm * m_Weights[count]);
+    ++count;
   }
   return distanceValue;
 }
@@ -457,11 +448,11 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateOutputInformation()
 void mitk::CreateDistanceImageFromSurfaceFilter::PrintEquationSystem()
 {
   std::stringstream out;
-  out<<"Nummber of rows: "<<m_SolutionMatrix.rows()<<" ****** Number of columns: "<<m_SolutionMatrix.columns()<<endl;
+  out<<"Nummber of rows: "<<m_SolutionMatrix.rows()<<" ****** Number of columns: "<<m_SolutionMatrix.cols()<<endl;
   out<<"[ ";
   for (unsigned int i = 0; i < m_SolutionMatrix.rows(); i++)
   {
-    for (unsigned int j = 0; j < m_SolutionMatrix.columns(); j++)
+    for (unsigned int j = 0; j < m_SolutionMatrix.cols(); j++)
     {
       out<<m_SolutionMatrix(i,j)<<"   ";
     }

@@ -40,6 +40,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <queue>
 
+#include <Eigen/Dense>
+
 namespace mitk {
 
   /**
@@ -84,10 +86,6 @@ namespace mitk {
 
     typedef std::vector< PointType > NormalList;
     typedef std::vector< PointType > CenterList;
-
-    typedef vnl_matrix<double> SolutionMatrix;
-    typedef vnl_vector<double> FunctionValues;
-    typedef vnl_vector<double> InterpolationWeights;
 
     typedef std::vector<Surface::Pointer> SurfaceList;
 
@@ -178,9 +176,11 @@ namespace mitk {
     //Datastructures for the interpolation
     CenterList m_Centers;
     NormalList m_Normals;
-    FunctionValues m_FunctionValues;
-    InterpolationWeights m_Weights;
-    SolutionMatrix m_SolutionMatrix;
+
+    Eigen::MatrixXd m_SolutionMatrix;
+    Eigen::VectorXd m_FunctionValues;
+    Eigen::VectorXd m_Weights;
+
     double m_DistanceImageSpacing;
 
     itk::ImageBase<3>::Pointer m_ReferenceImage;

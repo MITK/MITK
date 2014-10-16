@@ -1,13 +1,14 @@
 set(CPP_FILES
+  mitkDiffusionModuleActivator.cpp
   mitkNrrdTbssImageWriterFactory.cpp
-  mitkFiberBundleXIOFactory.cpp
+  #mitkFiberBundleXIOFactory.cpp
   mitkConnectomicsNetworkIOFactory.cpp
   mitkConnectomicsNetworkReader.cpp
   mitkConnectomicsNetworkWriter.cpp
   mitkConnectomicsNetworkSerializer.cpp
   mitkConnectomicsNetworkDefinitions.cpp
   mitkNrrdTbssRoiImageIOFactory.cpp
-  mitkFiberBundleXWriterFactory.cpp
+  #mitkFiberBundleXWriterFactory.cpp
   mitkConnectomicsNetworkWriterFactory.cpp
   mitkNrrdTbssRoiImageWriterFactory.cpp
   mitkNrrdTensorImageReader.cpp

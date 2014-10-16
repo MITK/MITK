@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarCircle.h"
 #include "mitkOverwriteSliceImageFilter.h"
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
+#include "mitkMorphologicalOperations.h"
 
 #include "usGetModuleContext.h"
 
@@ -51,13 +52,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
+bool mitk::SegTool2D::m_SurfaceInterpolationEnabled = true;
+
 mitk::SegTool2D::SegTool2D(const char* type)
 :Tool(type),
 m_LastEventSender(NULL),
 m_LastEventSlice(0),
 m_Contourmarkername ("Position"),
-m_ShowMarkerNodes (false),
-m_3DInterpolationEnabled(true)
+m_ShowMarkerNodes (false)
 {
 }
 
@@ -136,6 +138,48 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   if ( affectedSlice < 0 || affectedSlice >= static_cast<int>(image->GetDimension(affectedDimension)) ) return false;
 
   return true;
+}
+
+void mitk::SegTool2D::UpdateSurfaceInterpolation (const Image* slice, const Image* workingImage, const PlaneGeometry *plane, bool detectIntersection)
+{
+  if (!m_SurfaceInterpolationEnabled)
+    return;
+
+  ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
+  mitk::Surface::Pointer contour;
+
+  if (detectIntersection)
+  {
+    // Test whether there is something to extract or whether the slice just contains intersections of others
+    mitk::Image::Pointer slice2 = slice->Clone();
+    mitk::MorphologicalOperations::Erode(slice2, 2, mitk::MorphologicalOperations::Ball);
+
+    contourExtractor->SetInput(slice2);
+    contourExtractor->Update();
+    contour = contourExtractor->GetOutput();
+
+    if (contour->GetVtkPolyData()->GetNumberOfPoints() == 0)
+    {
+      // Remove contour!
+      mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(plane);
+      return;
+    }
+  }
+
+  contourExtractor->SetInput(slice);
+  contourExtractor->Update();
+  contour = contourExtractor->GetOutput();
+
+  if (contour->GetVtkPolyData()->GetNumberOfPoints() != 0 && workingImage->GetDimension() == 3)
+  {
+    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, plane);
+    contour->DisconnectPipeline();
+  }
+  else
+  {
+    // Remove contour!
+    mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(plane);
+  }
 }
 
 
@@ -235,28 +279,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
-  if (m_3DInterpolationEnabled && image->GetDimension() == 3)
-  {
-    slice->DisconnectPipeline();
-    ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
-    contourExtractor->SetInput(slice);
-    contourExtractor->Update();
-    mitk::Surface::Pointer contour = contourExtractor->GetOutput();
-
-    mitk::PlaneGeometry::Pointer plane = const_cast<mitk::PlaneGeometry*>(planeGeometry);
-
-    if (contour->GetVtkPolyData()->GetNumberOfPoints() > 0)
-    {
-      this->AddContourmarker();
-      mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, plane);
-      contour->DisconnectPipeline();
-    }
-    else
-    {
-      // Remove contour!
-      mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(plane);
-    }
-  }
+  this->UpdateSurfaceInterpolation(slice, image, planeGeometry, false);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -269,11 +292,12 @@ void mitk::SegTool2D::WriteBackSegmentationResult(std::vector<mitk::SegTool2D::S
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
+
   for (unsigned int i = 0; i < sliceList.size(); ++i)
   {
     SliceInformation currentSliceInfo = sliceList.at(i);
     this->WriteSliceToVolume(currentSliceInfo);
-    if (m_3DInterpolationEnabled && image->GetDimension() == 3)
+    if (m_SurfaceInterpolationEnabled && image->GetDimension() == 3)
     {
       currentSliceInfo.slice->DisconnectPipeline();
       contourExtractor->SetInput(currentSliceInfo.slice);
@@ -288,6 +312,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult(std::vector<mitk::SegTool2D::S
     }
   }
   mitk::SurfaceInterpolationController::GetInstance()->AddNewContours(contourList);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation sliceInfo)
@@ -342,7 +367,7 @@ void mitk::SegTool2D::SetShowMarkerNodes(bool status)
 
 void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
 {
-  m_3DInterpolationEnabled = enabled;
+  m_SurfaceInterpolationEnabled = enabled;
 }
 
 unsigned int mitk::SegTool2D::AddContourmarker()

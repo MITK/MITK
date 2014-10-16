@@ -51,7 +51,7 @@ public:
     return newImage;
   }
 
-  mitk::PlaneGeometry::Pointer createPlaneForContour(mitk::BaseGeometry* geo, vtkPolyData* contour, mitk::PlaneGeometry::PlaneOrientation orientation)
+  const mitk::PlaneGeometry* createPlaneForContour(mitk::BaseGeometry* geo, vtkPolyData* contour, mitk::PlaneGeometry::PlaneOrientation orientation)
   {
     mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
     mitk::Point3D p = contour->GetPoint(0);
@@ -234,9 +234,9 @@ public:
     surf_3->SetVtkPolyData(poly_3);
 
     // Create planes for contours
-    mitk::PlaneGeometry::Pointer plane_1 = createPlaneForContour(geo_1, poly_1, mitk::PlaneGeometry::Frontal);
-    mitk::PlaneGeometry::Pointer plane_2 = createPlaneForContour(geo_1, poly_2, mitk::PlaneGeometry::Sagittal);
-    mitk::PlaneGeometry::Pointer plane_3 = createPlaneForContour(geo_1, poly_3, mitk::PlaneGeometry::Axial);
+    mitk::PlaneGeometry::ConstPointer plane_1 = createPlaneForContour(geo_1, poly_1, mitk::PlaneGeometry::Frontal);
+    mitk::PlaneGeometry::ConstPointer plane_2 = createPlaneForContour(geo_1, poly_2, mitk::PlaneGeometry::Sagittal);
+    mitk::PlaneGeometry::ConstPointer plane_3 = createPlaneForContour(geo_1, poly_3, mitk::PlaneGeometry::Axial);
 
     // Add contours
     m_Controller->AddNewContour(surf_1, plane_1);
@@ -244,9 +244,9 @@ public:
     m_Controller->AddNewContour(surf_3, plane_3);
 
     // Check if all contours are there
-    mitk::PlaneGeometry::Pointer plane_1_clone = plane_1->Clone();
-    mitk::PlaneGeometry::Pointer plane_2_clone = plane_2->Clone();
-    mitk::PlaneGeometry::Pointer plane_3_clone = plane_3->Clone();
+    mitk::PlaneGeometry::ConstPointer plane_1_clone = const_cast<const mitk::PlaneGeometry*>(plane_1->Clone().GetPointer());
+    mitk::PlaneGeometry::ConstPointer plane_2_clone = const_cast<const mitk::PlaneGeometry*>(plane_2->Clone().GetPointer());
+    mitk::PlaneGeometry::ConstPointer plane_3_clone = const_cast<const mitk::PlaneGeometry*>(plane_3->Clone().GetPointer());
     mitk::Surface* contour_1 = const_cast<mitk::Surface*>(m_Controller->GetContour(plane_1_clone));
     mitk::Surface* contour_2 = const_cast<mitk::Surface*>(m_Controller->GetContour(plane_2_clone));
     mitk::Surface* contour_3 = const_cast<mitk::Surface*>(m_Controller->GetContour(plane_3_clone));
@@ -294,9 +294,9 @@ public:
     surf_6->SetVtkPolyData(poly_6);
 
     // Create planes for contours
-    mitk::PlaneGeometry::Pointer plane_4 = createPlaneForContour(geo_2, poly_4, mitk::PlaneGeometry::Frontal);
-    mitk::PlaneGeometry::Pointer plane_5 = createPlaneForContour(geo_2, poly_5, mitk::PlaneGeometry::Sagittal);
-    mitk::PlaneGeometry::Pointer plane_6 = createPlaneForContour(geo_2, poly_6, mitk::PlaneGeometry::Axial);
+    mitk::PlaneGeometry::ConstPointer plane_4 = createPlaneForContour(geo_2, poly_4, mitk::PlaneGeometry::Frontal);
+    mitk::PlaneGeometry::ConstPointer plane_5 = createPlaneForContour(geo_2, poly_5, mitk::PlaneGeometry::Sagittal);
+    mitk::PlaneGeometry::ConstPointer plane_6 = createPlaneForContour(geo_2, poly_6, mitk::PlaneGeometry::Axial);
 
     // Add contours
     m_Controller->AddNewContour(surf_4, plane_4);
@@ -304,9 +304,9 @@ public:
     m_Controller->AddNewContour(surf_6, plane_6);
 
     // Check if all contours are there
-    mitk::PlaneGeometry::Pointer plane_4_clone = plane_4->Clone();
-    mitk::PlaneGeometry::Pointer plane_5_clone = plane_5->Clone();
-    mitk::PlaneGeometry::Pointer plane_6_clone = plane_6->Clone();
+    mitk::PlaneGeometry::ConstPointer plane_4_clone = const_cast<const mitk::PlaneGeometry*>(plane_4->Clone().GetPointer());
+    mitk::PlaneGeometry::ConstPointer plane_5_clone = const_cast<const mitk::PlaneGeometry*>(plane_5->Clone().GetPointer());
+    mitk::PlaneGeometry::ConstPointer plane_6_clone = const_cast<const mitk::PlaneGeometry*>(plane_6->Clone().GetPointer());
     mitk::Surface* contour_4 = const_cast<mitk::Surface*>(m_Controller->GetContour(plane_4_clone));
     mitk::Surface* contour_5 = const_cast<mitk::Surface*>(m_Controller->GetContour(plane_5_clone));
     mitk::Surface* contour_6 = const_cast<mitk::Surface*>(m_Controller->GetContour(plane_6_clone));
@@ -371,8 +371,8 @@ public:
     surf_2->SetVtkPolyData(poly_2);
 
     // Create planes for contours
-    mitk::PlaneGeometry::Pointer plane_1 = createPlaneForContour(geo_1, poly_1, mitk::PlaneGeometry::Frontal);
-    mitk::PlaneGeometry::Pointer plane_2 = createPlaneForContour(geo_1, poly_2, mitk::PlaneGeometry::Sagittal);
+    mitk::PlaneGeometry::ConstPointer plane_1 = createPlaneForContour(geo_1, poly_1, mitk::PlaneGeometry::Frontal);
+    mitk::PlaneGeometry::ConstPointer plane_2 = createPlaneForContour(geo_1, poly_2, mitk::PlaneGeometry::Sagittal);
 
     // Add contours
     m_Controller->AddNewContour(surf_1, plane_1);

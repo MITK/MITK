@@ -1,4 +1,7 @@
 set(CPP_FILES
+
+  mitkFiberTrackingModuleActivator.cpp
+
   ## IO datastructures
   IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriter.cpp

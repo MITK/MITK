@@ -124,7 +124,18 @@ public:
 
 protected:
 
-  SurfaceGLMapper2D();
+    class LocalStorage : public mitk::Mapper::BaseLocalStorage
+    {
+    public:
+        LocalStorage() : m_SliceTimeStep(-1) {}
+
+        vtkSmartPointer<vtkPolyData> m_SlicedSurface;
+        itk::TimeStamp m_LastSliceUpdateTime;
+        int m_SliceTimeStep;
+    };
+
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
+    SurfaceGLMapper2D();
 
   virtual ~SurfaceGLMapper2D();
 

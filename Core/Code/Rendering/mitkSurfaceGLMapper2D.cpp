@@ -261,18 +261,31 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
         vtk2itk(vp, points[i]);
     }
 
-    vtkSmartPointer<vtkPolyData> cutResult = input->CutWithPlane(points, timestep);
+    LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
+
+    if ((localStorage->m_LastSliceUpdateTime < GetDataNode()->GetMTime()) //was the node modified?
+        || (localStorage->m_LastSliceUpdateTime < GetDataNode()->GetData()->GetPipelineMTime()) //Was the data modified?
+        || (localStorage->m_LastSliceUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) //was the geometry modified?
+        || (localStorage->m_LastSliceUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime())
+        || (localStorage->m_LastSliceUpdateTime < GetDataNode()->GetPropertyList()->GetMTime()) //was a property modified?
+        || (localStorage->m_LastSliceUpdateTime < GetDataNode()->GetPropertyList(renderer)->GetMTime())
+        || (localStorage->m_SliceTimeStep != timestep))
+    {
+        localStorage->m_SlicedSurface = input->CutWithPlane(points, timestep);
+        localStorage->m_LastSliceUpdateTime.Modified();
+        localStorage->m_SliceTimeStep = timestep;
+    }
 
     if (m_DrawNormals)
     {
-        m_Stripper->SetInputData(cutResult);
+        m_Stripper->SetInputData(localStorage->m_SlicedSurface);
       // calculate the cut
       m_Stripper->Update();
       PaintCells(renderer, m_Stripper->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
     }
     else
     {
-        PaintCells(renderer, cutResult, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
+        PaintCells(renderer, localStorage->m_SlicedSurface, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
     }
   }
 }

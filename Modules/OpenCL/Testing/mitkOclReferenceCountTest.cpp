@@ -49,7 +49,7 @@ int mitkOclReferenceCountTest( int argc, char* argv[] )
   cl_device_id gpuDevice = resources->GetCurrentDevice();
 
   //Create a random reference image
-  mitk::Image::Pointer inputImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 52, 1, // dimension
+  mitk::Image::Pointer inputImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 0, 1, // dimension
                                                                                     1.0f, 1.0f, 1.0f, // spacing
                                                                                     255, 0); // max, min
   int upperThr = 255;

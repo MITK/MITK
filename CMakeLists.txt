@@ -1,5 +1,9 @@
 set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
-if(DESIRED_QT_VERSION MATCHES "4")
+
+if (${CMAKE_GENERATOR} MATCHES "Visual Studio 12")
+  message("For MS Visual Studio 12 (2013) the minimum required CMake version is 3.0.2")
+  cmake_minimum_required(VERSION 3.0.2)
+elseif(DESIRED_QT_VERSION MATCHES "4")
   cmake_minimum_required(VERSION 2.8.9)
 else()
   cmake_minimum_required(VERSION 2.8.12)

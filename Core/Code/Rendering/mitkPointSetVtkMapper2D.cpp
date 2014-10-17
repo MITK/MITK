@@ -358,10 +358,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
         //check if there is a color property
         GetDataNode()->GetColor(unselectedColor);
 
-        if (unselectedColor != NULL)
-          ls->m_VtkTextActor->GetTextProperty()->SetColor(unselectedColor[0], unselectedColor[1], unselectedColor[2]);
-        else
-          ls->m_VtkTextActor->GetTextProperty()->SetColor(0.0f, 1.0f, 0.0f);
+        ls->m_VtkTextActor->GetTextProperty()->SetColor(unselectedColor[0], unselectedColor[1], unselectedColor[2]);
 
         ls->m_VtkTextLabelActors.push_back(ls->m_VtkTextActor);
       }

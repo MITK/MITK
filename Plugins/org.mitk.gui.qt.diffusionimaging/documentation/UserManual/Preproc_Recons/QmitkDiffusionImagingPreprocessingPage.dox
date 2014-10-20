@@ -1,10 +1,9 @@
 /**
-\page QmitkDiffusionImagingUserManualPreprocessingPage Preprocessing of Diffusion Images
+\page QmitkDiffusionImagingPreprocessingPage Preprocessing of Diffusion Images
 
-
-
-\section QmitkDiffusionImagingUserManualPreprocessing Preprocessing
+\section QmitkDiffusionImagingPreprocessingPagePreprocessing Preprocessing
 
 The preprocessing view gives an overview over the important features of a diffusion weighted image like the number of gradient directions, b-value and the measurement frame. Additionally it allows the extraction of the B0 image, reduction of gradient directions and the generation of a binary brain mask. The image volume can be modified by applying a new mesurement frame, which is useful if the measurement frame is not set correctly in the image header, or by averaging redundant gradient directions.
 
 \imageMacro{prepro1.png,"Preprocessing",9.97}
+*/

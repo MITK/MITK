@@ -18,7 +18,7 @@ MITK Diffusion consists of further components, which have their own documentatio
 Register or denoise original data and convert it into tensor or q-ball images.
 
   \li \subpage QmitkDiffusionImagingDWIRegistrationPage
-  \li \subpage QmitkDiffusionImagingUserManualPreprocessingPage
+  \li \subpage QmitkDiffusionImagingPreprocessingPage
   \li \subpage QmitkDiffusionImagingReconstructionPage
   \li \subpage org_mitk_views_odfdetails
   \li \subpage org_mitk_views_odfmaximaextraction

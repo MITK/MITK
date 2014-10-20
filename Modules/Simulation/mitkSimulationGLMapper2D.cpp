@@ -57,12 +57,12 @@ void mitk::SimulationGLMapper2D::Paint(BaseRenderer* renderer)
   if (planeGeometry == NULL)
     return;
 
-  DataNode* dataNode = this->GetDataNode();
+  DataNode* node = this->GetDataNode();
 
-  if (dataNode == NULL)
+  if (node == NULL)
     return;
 
-  Simulation* simulation = static_cast<Simulation*>(dataNode->GetData());
+  Simulation* simulation = static_cast<Simulation*>(node->GetData());
 
   if (simulation == NULL)
     return;

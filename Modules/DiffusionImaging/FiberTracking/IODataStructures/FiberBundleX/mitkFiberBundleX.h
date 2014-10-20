@@ -105,11 +105,12 @@ public:
 
     // get/set data
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);
-    vtkSmartPointer<vtkPolyData> GetFiberPolyData();
+    vtkSmartPointer<vtkPolyData> GetFiberPolyData() const;
     std::vector< std::string > GetAvailableColorCodings();
     char* GetCurrentColorCoding();
     itkGetMacro( NumFibers, int)
-    itkGetMacro( FiberSampling, int)
+    //itkGetMacro( FiberSampling, int)
+    int GetNumFibers() const {return m_NumFibers;}
     itkGetMacro( MinFiberLength, float )
     itkGetMacro( MaxFiberLength, float )
     itkGetMacro( MeanFiberLength, float )
@@ -128,8 +129,8 @@ public:
     // compare fiber bundles
     bool Equals(FiberBundleX* fib, double eps=0.0001);
 
-    itkSetMacro( ReferenceImage, mitk::Image::Pointer )
-    itkGetMacro( ReferenceImage, mitk::Image::Pointer )
+    itkSetMacro( ReferenceGeometry, mitk::BaseGeometry::Pointer )
+    itkGetConstMacro( ReferenceGeometry, mitk::BaseGeometry::Pointer )
 
 protected:
 
@@ -164,9 +165,7 @@ private:
     int     m_FiberSampling;
     itk::TimeStamp m_UpdateTime2D;
     itk::TimeStamp m_UpdateTime3D;
-
-    mitk::Image::Pointer m_ReferenceImage;
-
+    mitk::BaseGeometry::Pointer m_ReferenceGeometry;
 };
 
 } // namespace mitk

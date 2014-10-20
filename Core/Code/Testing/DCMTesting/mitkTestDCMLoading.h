@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+
 class Image;
 
 class MitkDCMTesting_EXPORT TestDCMLoading

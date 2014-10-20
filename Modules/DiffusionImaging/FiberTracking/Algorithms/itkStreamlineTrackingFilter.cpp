@@ -494,18 +494,18 @@ double StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
         // get new position
         CalculateNewPosition(pos, dir, index);
         distance += m_StepSize;
-        tractLength +=  m_StepSize;
-        distanceInVoxel += m_StepSize;
 
         // is new position valid (inside image, above FA threshold etc.)
-        if (!IsValidPosition(pos, index, interpWeights, imageIdx))   // if not add last point and end streamline
+        if (!IsValidPosition(pos, index, interpWeights, imageIdx))   // if not end streamline
         {
-            m_SeedImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
-            ids.push_back(points->InsertNextPoint(worldPos.GetDataPointer()));
+//            m_SeedImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
+//            ids.push_back(points->InsertNextPoint(worldPos.GetDataPointer()));
             return tractLength;
         }
         else if (distance>=m_PointPistance)
         {
+            tractLength +=  m_StepSize;
+            distanceInVoxel += m_StepSize;
             m_SeedImage->TransformContinuousIndexToPhysicalPoint( pos, worldPos );
             ids.push_back(points->InsertNextPoint(worldPos.GetDataPointer()));
             distance = 0;

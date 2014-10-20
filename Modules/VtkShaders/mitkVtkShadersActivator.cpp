@@ -56,4 +56,4 @@ namespace mitk
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(MitkVtkShaders, mitk::VtkShadersActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::VtkShadersActivator)

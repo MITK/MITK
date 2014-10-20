@@ -40,6 +40,7 @@ MITK_TOOL_MACRO(MitkSegmentation_EXPORT, PickingTool, "PickingTool");
 }
 
 mitk::PickingTool::PickingTool()
+  : m_WorkingData(NULL)
 {
   m_PointSetNode = mitk::DataNode::New();
   m_PointSetNode->GetPropertyList()->SetProperty("name", mitk::StringProperty::New("Picking_Seedpoint"));
@@ -61,11 +62,9 @@ mitk::PickingTool::PickingTool()
   // set some properties
   m_ResultNode->SetProperty("name", mitk::StringProperty::New("result"));
   m_ResultNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_ResultNode->SetProperty("color", mitk::ColorProperty::New(0.0,1.0,0.0));
+  m_ResultNode->SetProperty("color", mitk::ColorProperty::New(1, 1, 0));
   m_ResultNode->SetProperty("layer", mitk::IntProperty::New(1));
-  m_ResultNode->SetProperty("opacity", mitk::FloatProperty::New(0.7));
-
-
+  m_ResultNode->SetProperty("opacity", mitk::FloatProperty::New(0.33f));
 }
 
 mitk::PickingTool::~PickingTool()
@@ -93,12 +92,15 @@ us::ModuleResource mitk::PickingTool::GetIconResource() const
 
 void mitk::PickingTool::Activated()
 {
+  DataStorage* dataStorage = this->GetDataStorage();
+  m_WorkingData = this->GetWorkingData();
+
   //add to datastorage and enable interaction
-  if (!GetDataStorage()->Exists(m_PointSetNode))
-    GetDataStorage()->Add(m_PointSetNode, GetWorkingData());
+  if (!dataStorage->Exists(m_PointSetNode))
+    dataStorage->Add(m_PointSetNode, m_WorkingData);
 
   // now add result to data tree
-  GetDataStorage()->Add( m_ResultNode, this->GetWorkingData() );
+  dataStorage->Add(m_ResultNode, m_WorkingData);
 }
 
 void mitk::PickingTool::Deactivated()
@@ -128,6 +130,25 @@ mitk::DataNode::Pointer mitk::PickingTool::GetPointSetNode()
 
 void mitk::PickingTool::OnPointAdded()
 {
+  if (m_WorkingData != this->GetWorkingData())
+  {
+    DataStorage* dataStorage = this->GetDataStorage();
+
+    if (dataStorage->Exists(m_PointSetNode))
+    {
+      dataStorage->Remove(m_PointSetNode);
+      dataStorage->Add(m_PointSetNode, this->GetWorkingData());
+    }
+
+    if (dataStorage->Exists(m_ResultNode))
+    {
+      dataStorage->Remove(m_ResultNode);
+      dataStorage->Add(m_ResultNode, this->GetWorkingData());
+    }
+
+    m_WorkingData = this->GetWorkingData();
+  }
+
   //Perform region growing/picking
 
   int timeStep = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep();
@@ -182,9 +203,8 @@ void mitk::PickingTool::OnPointAdded()
     {
       regionGrower->Update();
     }
-    catch(itk::ExceptionObject &exc)
+    catch(const itk::ExceptionObject&)
     {
-
       return; // can't work
     }
     catch( ... )
@@ -204,18 +224,22 @@ void mitk::PickingTool::OnPointAdded()
 
   void mitk::PickingTool::ConfirmSegmentation()
   {
-     //create a new node and store the image from the result node
-     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-     newNode->SetProperty("name", mitk::StringProperty::New("Picking_result"));
-     newNode->SetProperty("helper object", mitk::BoolProperty::New(false));
-     newNode->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));
-     newNode->SetProperty("opacity", mitk::FloatProperty::New(1.0));
-     newNode->SetData(m_ResultNode->GetData());
+    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+    newNode->SetProperty("name", mitk::StringProperty::New(m_WorkingData->GetName() + "_picked"));
 
-     GetDataStorage()->Add(newNode);
+    float rgb[3] = { 1.0f, 0.0f, 0.0f };
+    m_WorkingData->GetColor(rgb);
+    newNode->SetProperty("color", mitk::ColorProperty::New(rgb));
 
-     //reset result node
-     m_ResultNode->SetData(NULL);
+    float opacity = 1.0f;
+    m_WorkingData->GetOpacity(opacity, NULL);
+    newNode->SetProperty("opacity", mitk::FloatProperty::New(opacity));
 
-     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    newNode->SetData(m_ResultNode->GetData());
+
+    GetDataStorage()->Add(newNode, this->GetReferenceData());
+
+    m_ResultNode->SetData(NULL);
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

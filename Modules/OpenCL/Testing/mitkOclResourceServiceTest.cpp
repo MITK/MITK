@@ -111,4 +111,4 @@ int mitkOclResourceServiceTest( int argc, char* argv[] )
 
   MITK_TEST_END();
 }
-US_INITIALIZE_MODULE("OpenCLTestDriver", "" )
+US_INITIALIZE_MODULE

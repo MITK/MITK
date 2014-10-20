@@ -82,31 +82,13 @@ void mitk::TrackingVolumeGenerator::GenerateData()
   us::Module* module = us::GetModuleContext()->GetModule();
 
   us::ModuleResource moduleResource = module->GetResource(filename);
-  bool isCompressed = moduleResource.IsCompressed();
 
   // Create ResourceStream from Resource
   us::ModuleResourceStream resStream(moduleResource,std::ios_base::binary);
 
   ofstream tmpOutputStream;
   std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpOutputStream);
-  if (!isCompressed)
-  {
-    tmpOutputStream << resStream.rdbuf();
-  }
-  else
-  {
-    resStream.seekg(0, std::ios::end);
-    std::ios::pos_type length = resStream.tellg();
-    resStream.seekg(0, std::ios::beg);
-
-    char* data = new char[length];
-    resStream.read(data, length);
-    tmpOutputStream.close();
-    tmpOutputStream.open(tmpFilePath.c_str(), std::ios_base::binary | std::ios_base::out);
-    tmpOutputStream.write(data, length);
-    tmpOutputStream.flush();
-    delete[] data;
-  }
+  tmpOutputStream << resStream.rdbuf();
   tmpOutputStream.close();
 
 

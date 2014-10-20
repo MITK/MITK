@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <QObject>
+
 #include "mitkProperties.h"
 #include "mitkSegTool2D.h"
 #include "mitkStatusBar.h"
@@ -1115,7 +1117,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->setupUi(parent);
 
    m_Controls->patImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-   m_Controls->patImageSelector->SetPredicate(m_IsNotABinaryImagePredicate);
+   m_Controls->patImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsNotABinaryImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
 
    this->UpdateWarningLabel("Please load an image");
 
@@ -1123,7 +1125,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
       this->UpdateWarningLabel("Select or create a new segmentation");
 
    m_Controls->segImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-   m_Controls->segImageSelector->SetPredicate(m_IsABinaryImagePredicate);
+   m_Controls->segImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsABinaryImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
    if( m_Controls->segImageSelector->GetSelectedNode().IsNotNull() )
       this->UpdateWarningLabel("");
 
@@ -1224,9 +1226,15 @@ void QmitkSegmentationView::SetMouseCursor( const us::ModuleResource& resource, 
 
 void QmitkSegmentationView::SetToolSelectionBoxesEnabled(bool status)
 {
-   m_Controls->m_ManualToolSelectionBox2D->setEnabled(status);
-   m_Controls->m_ManualToolSelectionBox3D->setEnabled(status);
-   m_Controls->m_SlicesInterpolator->setEnabled(status);
+  if (status)
+  {
+    m_Controls->m_ManualToolSelectionBox2D->RecreateButtons();
+    m_Controls->m_ManualToolSelectionBox3D->RecreateButtons();
+  }
+
+  m_Controls->m_ManualToolSelectionBox2D->setEnabled(status);
+  m_Controls->m_ManualToolSelectionBox3D->setEnabled(status);
+  m_Controls->m_SlicesInterpolator->setEnabled(status);
 }
 
 // ATTENTION some methods for handling the known list of (organ names, colors) are defined in QmitkSegmentationOrganNamesHandling.cpp

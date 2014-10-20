@@ -62,6 +62,6 @@ protected:
 };
 } // namespace mitk
 
-US_EXPORT_MODULE_ACTIVATOR(MitkUS, mitk::USActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::USActivator)
 
 #endif // __mitkUSActivator_h

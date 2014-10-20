@@ -147,6 +147,7 @@ set(MODULE_CUSTOM_TESTS
     mitkDataStorageTest.cpp
     mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp
+    mitkDataNodeTest.cpp
     mitkEventMapperTest.cpp
     mitkEventConfigTest.cpp
     mitkNodeDependentPointSetInteractorTest.cpp
@@ -181,19 +182,9 @@ set(MODULE_CUSTOM_TESTS
     mitkSurfaceDepthSortingTest.cpp
 )
 
-set(MODULE_RESOURCE_FILES
+set(RESOURCE_FILES
   Interactions/AddAndRemovePoints.xml
   Interactions/globalConfig.xml
   Interactions/StatemachineTest.xml
   Interactions/StatemachineConfigTest.xml
 )
-
-# Embed the resources
-set(testdriver_resources )
-usFunctionEmbedResources(testdriver_resources
-                         EXECUTABLE_NAME ${MODULE_NAME}TestDriver
-                         ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Resources
-                         FILES ${MODULE_RESOURCE_FILES}
-                        )
-
-set(TEST_CPP_FILES ${testdriver_init_file} ${testdriver_resources})

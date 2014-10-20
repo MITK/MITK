@@ -183,6 +183,8 @@ namespace mitk
     DataNode::Pointer CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color );
     DataNode::Pointer CreateSegmentationNode(      Image* image,    const std::string& organName, const mitk::Color& color );
 
+    virtual bool CanHandle(BaseData* referenceData) const;
+
   protected:
 
     friend class ToolManager;

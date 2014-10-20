@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int StreamlineTracking(int argc, char* argv[])
 {
+    MITK_INFO << "StreamlineTracking";
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", ctkCommandLineParser::StringList, "Input image", "input tensor image (.dti)", us::Any(), false);
@@ -155,7 +156,7 @@ int StreamlineTracking(int argc, char* argv[])
             return EXIT_FAILURE;
         }
         mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberBundle);
-        fib->SetReferenceImage(mitkImage);
+        fib->SetReferenceGeometry(mitkImage->GetGeometry());
 
         mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
         for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
@@ -181,7 +182,6 @@ int StreamlineTracking(int argc, char* argv[])
         MITK_INFO << "ERROR!?!";
         return EXIT_FAILURE;
     }
-    MITK_INFO << "DONE";
     return EXIT_SUCCESS;
 }
 RegisterDiffusionMiniApp(StreamlineTracking);

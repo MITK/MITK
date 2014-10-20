@@ -57,27 +57,26 @@ struct TrackVis_header
 
 // Class to handle TrackVis files.
 // -------------------------------
-class MitkFiberTracking_EXPORT TrackVis
+class MitkFiberTracking_EXPORT TrackVisFiberReader
 {
 private:
-    string              filename;
-    FILE*               fp;
-    int                 maxSteps;  // [TODO] should be related to the variable defined for fiber-tracking
+    string              m_Filename;
+    FILE*               m_FilePointer;
 
 public:
-    TrackVis_header     hdr;
-    float               m_Origin[3];
+    TrackVis_header     m_Header;
 
-    short     create(string filename, mitk::FiberBundleX* fib);
-    short     open( string filename );
-    short     read( mitk::FiberBundleX* fib );
-    short    append( mitk::FiberBundleX* fib );
+    short   create(string m_Filename, const mitk::FiberBundleX* fib);
+    short   open( string m_Filename );
+    short   read( mitk::FiberBundleX* fib );
+    short   append(const mitk::FiberBundleX* fib );
     void    writeHdr();
     void    updateTotal( int totFibers );
     void    close();
+    bool    IsTransformValid();
 
-    TrackVis();
-    ~TrackVis();
+    TrackVisFiberReader();
+    ~TrackVisFiberReader();
 };
 
 #endif

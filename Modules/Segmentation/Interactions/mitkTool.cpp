@@ -53,6 +53,11 @@ mitk::Tool::~Tool()
 {
 }
 
+bool mitk::Tool::CanHandle(BaseData* referenceData) const
+{
+  return true;
+}
+
 void mitk::Tool::InitializeStateMachine()
 {
   if (m_InteractorType.empty())

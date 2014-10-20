@@ -99,6 +99,22 @@ std::string CustomMimeType::GetComment() const
   return "Unknown";
 }
 
+bool CustomMimeType::AppliesTo(const std::string& path) const
+{
+  for (std::vector<std::string>::const_iterator iter = d->m_Extensions.begin(),
+       iterEnd = d->m_Extensions.end(); iter != iterEnd; ++iter)
+  {
+    if (!iter->empty() && path.size() >= iter->size())
+    {
+      if (path.substr(path.size() - iter->size()) == *iter)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 void CustomMimeType::SetName(const std::string& name)
 {
   d->m_Name = name;
@@ -134,6 +150,11 @@ void CustomMimeType::Swap(CustomMimeType& r)
   Impl* d1 = d;
   d = r.d;
   r.d = d1;
+}
+
+CustomMimeType* CustomMimeType::Clone() const
+{
+  return new CustomMimeType(*this);
 }
 
 void swap(CustomMimeType& l, CustomMimeType& r)

@@ -1,12 +1,11 @@
 /**
-\page $(plugin-target) $(plugin-name)
+\page $(plugin-target) The $(plugin-name)
 
 \imageMacro{icon.png,"Icon of $(plugin-name)",2.00}
 
-Available sections:
-  - \ref $(plugin-target)Overview
+\tableofcontents
 
-\section $(plugin-target)Overview
+\section $(plugin-target)Overview Overview
 Describe the features of your awesome plugin here
 <ul>
 <li>Increases productivity

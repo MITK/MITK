@@ -290,14 +290,14 @@ void mitk::ContourModel::Concatenate(mitk::ContourModel* other, int timestep, bo
 
 
 
-mitk::ContourModel::VertexIterator mitk::ContourModel::Begin( int timestep)
+mitk::ContourModel::VertexIterator mitk::ContourModel::Begin( int timestep) const
 {
   return this->IteratorBegin(timestep);
 }
 
 
 
-mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin( int timestep)
+mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin( int timestep) const
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -311,14 +311,14 @@ mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin( int timest
 
 
 
-mitk::ContourModel::VertexIterator mitk::ContourModel::End( int timestep)
+mitk::ContourModel::VertexIterator mitk::ContourModel::End( int timestep) const
 {
   return this->IteratorEnd(timestep);
 }
 
 
 
-mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorEnd( int timestep)
+mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorEnd( int timestep) const
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -332,7 +332,7 @@ mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorEnd( int timestep
 
 
 
-bool mitk::ContourModel::IsClosed( int timestep)
+bool mitk::ContourModel::IsClosed( int timestep) const
 {
   if(!this->IsEmptyTimeStep(timestep))
   {

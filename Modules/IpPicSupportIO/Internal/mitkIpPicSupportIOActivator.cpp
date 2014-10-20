@@ -37,4 +37,4 @@ private:
   mitk::IFileReader* m_Reader;
 };
 
-US_EXPORT_MODULE_ACTIVATOR(MitkIpPicSupportIO, mitkIpPicSupportIOActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitkIpPicSupportIOActivator)

@@ -146,7 +146,7 @@ protected:
   /**
    * @return The mime-type this reader can handle.
    */
-  CustomMimeType GetMimeType() const;
+  const CustomMimeType* GetMimeType() const;
 
   void SetReaderDescription(const std::string& description);
   std::string GetReaderDescription() const;

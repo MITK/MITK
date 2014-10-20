@@ -59,7 +59,6 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  itkSetMacro(SegmentationBinaryImage, mitk::Image::Pointer);
 
    /*
       \brief Returns the computed normals as a surface
@@ -85,6 +84,11 @@ public:
   */
   void SetProgressStepSize(unsigned int stepSize);
 
+  void SetSegmentationBinaryImage(mitk::Image* segmentationImage)
+  {
+    m_SegmentationBinaryImage = segmentationImage;
+  }
+
 protected:
   ComputeContourSetNormalsFilter();
   virtual ~ComputeContourSetNormalsFilter();
@@ -94,7 +98,7 @@ protected:
 private:
 
   //The segmentation out of which the contours were extracted. Can be used to determine the direction of the normals
-  mitk::Image::Pointer m_SegmentationBinaryImage;
+  mitk::Image* m_SegmentationBinaryImage;
   double m_MaxSpacing;
 
   unsigned int m_NegativeNormalCounter;

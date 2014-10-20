@@ -33,6 +33,7 @@ set(MITK_DIR ${PROJECT_BINARY_DIR})
 set(MITK_EXPORTS_FILE_INCLUDED 1)
 
 set(_example_dirs
+  Dump
   MbiLog
   QtFreeRender
   Tutorial
@@ -47,8 +48,7 @@ if (MITK_USE_Qt5)
 elseif (MITK_USE_Qt4)
   list(APPEND _example_dirs
     QtAppExample
-    mitkdump
-    mitkdumpdir
+    DumpDir
     )
 endif()
 

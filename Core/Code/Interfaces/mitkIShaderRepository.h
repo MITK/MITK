@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkLightObject.h>
 
 #include "mitkCommon.h"
-#include "usServiceInterface.h"
+#include "mitkServiceInterface.h"
 
 #include <list>
 
@@ -139,6 +139,6 @@ struct MITK_CORE_EXPORT IShaderRepository
 
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::IShaderRepository, "org.mitk.services.IShaderRepository/1.0")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::IShaderRepository, "org.mitk.services.IShaderRepository/1.0")
 
 #endif // MITKISHADERREPOSITORY_H

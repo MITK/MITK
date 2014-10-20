@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSegmentationExports.h>
 
 #include <usModuleContext.h>
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 
 #include "mitkToolManager.h"
 #include <itkObjectFactory.h>
@@ -77,6 +77,6 @@ namespace mitk
   };
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::ToolManagerProvider, "org.mitk.services.ToolManagerProvider")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::ToolManagerProvider, "org.mitk.services.ToolManagerProvider")
 
 #endif

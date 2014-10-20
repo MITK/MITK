@@ -59,37 +59,44 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    struct ContourPositionPair {
+    struct ContourPositionInformation {
       Surface::Pointer contour;
-      mitk::PlaneGeometry::Pointer plane;
+      Vector3D contourNormal;
+      Point3D contourPoint;
     };
 
-    typedef std::vector<ContourPositionPair> ContourPositionPairList;
-    typedef std::map<mitk::Image*, ContourPositionPairList> ContourListMap;
+    typedef std::vector<ContourPositionInformation> ContourPositionInformationList;
+    typedef std::map<mitk::Image*, ContourPositionInformationList> ContourListMap;
 
     static SurfaceInterpolationController* GetInstance();
 
     /**
      * @brief Adds a new extracted contour to the list
-     * @param newContour the contour to be added
-     * @param plane the image plane in which the contour lies. If plane already exists the related
-     *        contour will be updated
+     * @param newContour the contour to be added. If a contour at that position
+     *        already exists the related contour will be updated
      */
-    void AddNewContour (Surface::Pointer newContour, PlaneGeometry::Pointer plane);
+    void AddNewContour (Surface::Pointer newContour);
+
+    /**
+     * @brief Removes the contour for a given plane for the current selected segmenation
+     * @param contourInfo the contour which should be removed
+     * @return true if a contour was found and removed, false if no contour was found
+     */
+    bool RemoveContour (ContourPositionInformation contourInfo);
 
     /**
      * @brief Adds new extracted contours to the list. If one or more contours at a given position
      *        already exist they will be updated respectively
-     * @param newContours the list of the contours and the respective positions
+     * @param newContours the list of the contours
      */
-    void AddNewContours (ContourPositionPairList newContours);
+    void AddNewContours (std::vector<Surface::Pointer> newContours);
 
     /**
     * @brief Returns the contour for a given plane for the current selected segmenation
-    * @param plane the plane for which the contour should be returned
-    * @return the contour as an mitk::Surface. If no contour is available for the plane NULL is returned
+    * @param ontourInfo the contour which should be returned
+    * @return the contour as an mitk::Surface. If no contour is available at the give position NULL is returned
     */
-    const mitk::Surface* GetContour (PlaneGeometry::Pointer plane);
+    const mitk::Surface* GetContour (ContourPositionInformation contourInfo);
 
     /**
     * @brief Returns the number of available contours for the current selected segmentation
@@ -121,12 +128,6 @@ namespace mitk
      * By evaluation we found out that 50.000 pixel delivers a good result
      */
     void SetDistanceImageVolume(unsigned int distImageVolume);
-
-    /**
-     * Sets the current segmentation which is used by the interpolation
-     * This is needed because the calculation of the normals needs to now wheather a normal points inside a segmentation or not
-     */
-    void SetSegmentationImage(Image* workingImage);
 
     /**
      * @brief Get the current selected segmentation for which the interpolation is performed
@@ -169,6 +170,12 @@ namespace mitk
      */
     void RemoveAllInterpolationSessions();
 
+    /**
+     * @brief Reinitializes the interpolation using the provided contour data
+     * @param contours a mitk::Surface which contains the contours as polys in the vtkPolyData
+     */
+    void ReinitializeInterpolation(mitk::Surface::Pointer contours);
+
     mitk::Image* GetImage();
 
     /**
@@ -193,9 +200,7 @@ namespace mitk
 
    void ReinitializeInterpolation();
 
-   void AddToInterpolationPipeline(ContourPositionPair pair);
-
-    ContourPositionPairList::iterator m_Iterator;
+   void AddToInterpolationPipeline(ContourPositionInformation contourInfo);
 
     ReduceContourSetFilter::Pointer m_ReduceFilter;
     ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkPythonExports.h>
 #include "mitkImage.h"
 //for microservices
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include "mitkSurface.h"
 #include <vector>
 
@@ -136,6 +136,6 @@ namespace mitk
     };
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::IPythonService, "org.mitk.services.IPythonService")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::IPythonService, "org.mitk.services.IPythonService")
 
 #endif

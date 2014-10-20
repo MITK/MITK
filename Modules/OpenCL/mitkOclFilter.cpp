@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //Mitk
 #include <mitkLogMacros.h>
-#include <mitkDataNodeFactory.h>
-#include <mitkStandardFileLocations.h>
 #include <mitkConfig.h>
 
 //usService

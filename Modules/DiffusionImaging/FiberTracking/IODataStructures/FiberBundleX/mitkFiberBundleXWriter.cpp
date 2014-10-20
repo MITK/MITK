@@ -21,120 +21,117 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTrackvis.h>
 #include <itkSize.h>
 
+#include <mitkAbstractFileWriter.h>
+#include <mitkCustomMimeType.h>
+
 mitk::FiberBundleXWriter::FiberBundleXWriter()
-    : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
+  : mitk::AbstractFileWriter(mitk::FiberBundleX::GetStaticNameOfClass())
 {
-    this->SetNumberOfRequiredInputs( 1 );
+  std::string category = "Fiber Bundle File";
+  mitk::CustomMimeType customMimeType;
+  customMimeType.SetCategory(category);
+  customMimeType.AddExtension("fib");
+  customMimeType.AddExtension("afib");
+  customMimeType.AddExtension("vtk");
+  customMimeType.AddExtension("avtk");
+  customMimeType.AddExtension("trk");
+
+  this->SetDescription(category);
+  this->SetMimeType(customMimeType);
+
+  RegisterService();
 }
 
+mitk::FiberBundleXWriter::FiberBundleXWriter(const mitk::FiberBundleXWriter & other)
+  :mitk::AbstractFileWriter(other)
+{}
 
 mitk::FiberBundleXWriter::~FiberBundleXWriter()
 {}
 
-
-void mitk::FiberBundleXWriter::GenerateData()
+mitk::FiberBundleXWriter * mitk::FiberBundleXWriter::Clone() const
 {
+  return new mitk::FiberBundleXWriter(*this);
+}
+
+void mitk::FiberBundleXWriter::Write()
+{
+
+  std::ostream* out;
+  std::ofstream outStream;
+
+  if( this->GetOutputStream() )
+  {
+    out = this->GetOutputStream();
+  }else{
+    outStream.open( this->GetOutputLocation().c_str() );
+    out = &outStream;
+  }
+
+  if ( !out->good() )
+  {
+    mitkThrow() << "Stream not good.";
+  }
+
   try
   {
     const std::string& locale = "C";
     const std::string& currLocale = setlocale( LC_ALL, NULL );
     setlocale(LC_ALL, locale.c_str());
 
-    m_Success = false;
-    InputType* input = this->GetInput();
-    if (input == NULL)
-    {
-        itkWarningMacro(<<"Sorry, input to FiberBundleXWriter is NULL!");
-        return;
-    }
-    else if ( m_FileName == "" )
-    {
-        itkWarningMacro( << "Sorry, filename has not been set!" );
-        return ;
-    }
 
-    std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
+    std::locale previousLocale(out->getloc());
+    std::locale I("C");
+    out->imbue(I);
+
+    std::string filename = this->GetOutputLocation().c_str();
+
+    mitk::FiberBundleX::ConstPointer input = dynamic_cast<const mitk::FiberBundleX*>(this->GetInput());
+    std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetOutputLocation().c_str());
 
     if (ext==".fib" || ext==".vtk")
     {
         MITK_INFO << "Writing fiber bundle as binary VTK";
         vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
         writer->SetInputData(input->GetFiberPolyData());
-        writer->SetFileName(m_FileName.c_str());
+        writer->SetFileName(this->GetOutputLocation().c_str());
         writer->SetFileTypeToBinary();
         writer->Write();
     }
     else if (ext==".afib")
     {
-        itksys::SystemTools::ReplaceString(m_FileName,".afib",".fib");
+        itksys::SystemTools::ReplaceString(filename,".afib",".fib");
         MITK_INFO << "Writing fiber bundle as ascii VTK";
         vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
         writer->SetInputData(input->GetFiberPolyData());
-        writer->SetFileName(m_FileName.c_str());
+        writer->SetFileName(this->GetOutputLocation().c_str());
         writer->SetFileTypeToASCII();
         writer->Write();
     }
     else if (ext==".avtk")
     {
-        itksys::SystemTools::ReplaceString(m_FileName,".avtk",".vtk");
+        itksys::SystemTools::ReplaceString(filename,".avtk",".vtk");
         MITK_INFO << "Writing fiber bundle as ascii VTK";
         vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
         writer->SetInputData(input->GetFiberPolyData());
-        writer->SetFileName(m_FileName.c_str());
+        writer->SetFileName(this->GetOutputLocation().c_str());
         writer->SetFileTypeToASCII();
         writer->Write();
     }
     else if (ext==".trk")
     {
         MITK_INFO << "Writing fiber bundle as TRK";
-        TrackVis trk;
-        trk.create(m_FileName, input);
+        TrackVisFiberReader trk;
+        trk.create(filename, input.GetPointer());
         trk.writeHdr();
-        trk.append(input);
+        trk.append(input.GetPointer());
     }
 
     setlocale(LC_ALL, currLocale.c_str());
-    m_Success = true;
     MITK_INFO << "Fiber bundle written";
   }
   catch(...)
   {
     throw;
   }
-}
-
-
-void mitk::FiberBundleXWriter::SetInputFiberBundleX( InputType* diffVolumes )
-{
-    this->ProcessObject::SetNthInput( 0, diffVolumes );
-}
-
-
-mitk::FiberBundleX* mitk::FiberBundleXWriter::GetInput()
-{
-    if ( this->GetNumberOfInputs() < 1 )
-    {
-        return NULL;
-    }
-    else
-    {
-        return dynamic_cast<InputType*> ( this->ProcessObject::GetInput( 0 ) );
-    }
-}
-
-
-std::vector<std::string> mitk::FiberBundleXWriter::GetPossibleFileExtensions()
-{
-  std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(".fib");
-  possibleFileExtensions.push_back(".afib");
-  possibleFileExtensions.push_back(".vtk");
-  possibleFileExtensions.push_back(".avtk");
-  possibleFileExtensions.push_back(".trk");
-  return possibleFileExtensions;
-}
-
-string mitk::FiberBundleXWriter::GetSupportedBaseData() const
-{
-  return FiberBundleX::GetStaticNameOfClass();
 }

@@ -214,7 +214,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
     {
       for (unsigned int z=0;z<size[2];z++)
       {
-        itk::Index<3> ix = {x,y,z};
+        itk::Index<3> ix = {{x,y,z}};
 
         mask_val = mask->GetPixel(ix);
 
@@ -445,7 +445,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
     {
       for (int k=back_z; k<=forth_z; k++)
       {
-        itk::Index<3> ix = {i,j,k};
+        itk::Index<3> ix = {{i,j,k}};
 
         GradientVectorType p = corrected_diffusion_temp->GetPixel(ix);
 
@@ -463,7 +463,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 
   //getting back to the original position of the voxel
 
-  itk::Index<3> ix = {x,y,z};
+  itk::Index<3> ix = {{x,y,z}};
 
   if (temp_number <= 0.0)
   {
@@ -492,7 +492,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
   {
     if(m_B0Mask[i]>0)
     {
-      double o_d=org_data[i];
+   //   double o_d=org_data[i];
       mean_b=mean_b+org_data[i];
     }
 
@@ -539,7 +539,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
       {
 
 
-        itk::Index<3> ix = {x,y,z};
+        itk::Index<3> ix = {{x,y,z}};
         pixel = mask->GetPixel(ix);
 
         // but only if previously marked as bad one-negative eigen value
@@ -618,7 +618,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 
       for (unsigned int y=0;y<size[1];y++)
       {
-        itk::Index<3> ix = {x, y, z};
+        itk::Index<3> ix = {{x, y, z}};
 
 
         if(mask->GetPixel(ix) > 1.0)
@@ -686,7 +686,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
                   {
                     for (unsigned int k=back_z; k<=forth_z; k++)
                     {
-                      itk::Index<3> ix = {i,j,k};
+                      itk::Index<3> ix = {{i,j,k}};
 
                       GradientVectorType p = corrected_diffusion->GetPixel(ix);
 
@@ -709,7 +709,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 
                 //getting back to the original position of the voxel
 
-                itk::Index<3> ix = {x,y,z};
+                itk::Index<3> ix = {{x,y,z}};
 
                 if (temp_number <= 0.0)
                 {
@@ -756,7 +756,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
                 {
                   for (unsigned int k=back_z; k<=forth_z; k++)
                   {
-                    itk::Index<3> ix = {i,j,k};
+                    itk::Index<3> ix = {{i,j,k}};
 
                     GradientVectorType p = corrected_diffusion->GetPixel(ix);
 
@@ -779,7 +779,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 
               //getting back to the original position of the voxel
 
-              itk::Index<3> ix = {x,y,z};
+              itk::Index<3> ix = {{x,y,z}};
 
               if (temp_number <= 0.0)
               {

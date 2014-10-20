@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFiberBundleXWriter.h"
 
 #include <itksys/SystemTools.hxx>
+#include <mitkIOUtil.h>
 
 
 MITK_REGISTER_SERIALIZER(FiberBundleXSerializer)
@@ -55,10 +56,7 @@ std::string mitk::FiberBundleXSerializer::Serialize()
 
   try
   {
-    FiberBundleXWriter::Pointer writer = FiberBundleXWriter::New();
-    writer->SetFileName(fullname);
-    writer->SetInputFiberBundleX(const_cast<FiberBundleX*>(fb));
-    writer->Write();
+    mitk::IOUtil::Save(const_cast<FiberBundleX*>(fb),fullname);
   }
   catch (std::exception& e)
   {

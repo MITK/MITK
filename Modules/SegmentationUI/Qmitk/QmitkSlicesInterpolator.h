@@ -165,6 +165,8 @@ class MitkSegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     */
     void OnAccept3DInterpolationClicked();
 
+    void OnReinit3DInterpolation();
+
     /*
      * Will trigger interpolation for all slices in given orientation (called from popup menu of OnAcceptAllInterpolationsClicked)
      */
@@ -252,6 +254,7 @@ private:
     QPushButton* m_BtnApplyForAllSlices2D;
     QPushButton* m_BtnApply3D;
     QCheckBox* m_ChkShowPositionNodes;
+    QPushButton* m_BtnReinit3DInterpolation;
 
     mitk::DataNode::Pointer m_FeedbackNode;
     mitk::DataNode::Pointer m_InterpolatedSurfaceNode;

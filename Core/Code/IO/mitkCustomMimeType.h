@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 
 #include <string>
 #include <vector>
@@ -37,7 +37,7 @@ public:
   CustomMimeType(const CustomMimeType& other);
   explicit CustomMimeType(const MimeType& other);
 
-  ~CustomMimeType();
+  virtual ~CustomMimeType();
 
   CustomMimeType& operator=(const CustomMimeType& other);
   CustomMimeType& operator=(const MimeType& other);
@@ -47,6 +47,8 @@ public:
   std::vector<std::string> GetExtensions() const;
   std::string GetComment() const;
 
+  virtual bool AppliesTo(const std::string& path) const;
+
   void SetName(const std::string& name);
   void SetCategory(const std::string& category);
   void SetExtension(const std::string& extension);
@@ -54,6 +56,8 @@ public:
   void SetComment(const std::string& comment);
 
   void Swap(CustomMimeType& r);
+
+  virtual CustomMimeType* Clone() const;
 
 private:
 
@@ -65,6 +69,6 @@ void swap(CustomMimeType& l, CustomMimeType& r);
 
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::CustomMimeType, "org.mitk.CustomMimeType")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::CustomMimeType, "org.mitk.CustomMimeType")
 
 #endif // MITKCUSTOMMIMETYPE_H

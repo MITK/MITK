@@ -220,7 +220,7 @@ us::ServiceRegistration<IFileWriter> AbstractFileWriter::RegisterService(us::Mod
 
   d->RegisterMimeType(context);
 
-  if (this->GetMimeType().GetName().empty())
+  if (this->GetMimeType()->GetName().empty())
   {
     MITK_WARN << "Not registering writer due to empty MIME type.";
     return us::ServiceRegistration<IFileWriter>();
@@ -266,7 +266,7 @@ us::ServiceProperties AbstractFileWriter::GetServiceProperties() const
 {
   us::ServiceProperties result;
   result[IFileWriter::PROP_DESCRIPTION()] = this->GetDescription();
-  result[IFileWriter::PROP_MIMETYPE()] = this->GetMimeType().GetName();
+  result[IFileWriter::PROP_MIMETYPE()] = this->GetMimeType()->GetName();
   result[IFileWriter::PROP_BASEDATA_TYPE()] = d->m_BaseDataType;
   result[us::ServiceConstants::SERVICE_RANKING()] = this->GetRanking();
 
@@ -277,7 +277,7 @@ us::ServiceProperties AbstractFileWriter::GetServiceProperties() const
   return result;
 }
 
-CustomMimeType AbstractFileWriter::GetMimeType() const
+const CustomMimeType* AbstractFileWriter::GetMimeType() const
 {
   return d->GetMimeType();
 }

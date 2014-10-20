@@ -74,11 +74,13 @@ set(external_projects
   PCRE
   Swig
   SimpleITK
+  Eigen
   )
 
 # These are "hard" dependencies and always set to ON
 set(MITK_USE_tinyxml 1)
 set(MITK_USE_ANN 1)
+set(MITK_USE_Eigen 1)
 set(MITK_USE_GLEW 1)
 set(MITK_USE_GDCM 1)
 set(MITK_USE_ITK 1)
@@ -289,6 +291,7 @@ ExternalProject_Add(${proj}
     # Optionnal dependencies
     ${ACVD_DEPENDS}
     ${CppUnit_DEPENDS}
+    ${Eigen_DEPENDS}
     ${GLUT_DEPENDS}
     ${GLEW_DEPENDS}
     ${Boost_DEPENDS}
@@ -299,6 +302,7 @@ ExternalProject_Add(${proj}
     ${SOFA_DEPENDS}
     ${MITK-Data_DEPENDS}
     ${Qwt_DEPENDS}
+    ${ZLIB_DEPENDS}
     ${SimpleITK_DEPENDS}
     ${Numpy_DEPENDS}
 )
@@ -406,9 +410,11 @@ ExternalProject_Add(${proj}
     -DMITK_ACCESSBYITK_VECTOR_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_DIMENSIONS:STRING=${MITK_ACCESSBYITK_DIMENSIONS}
     # --------------- External project dirs ---------------
+    -DCppMicroServices_DIR:PATH=${CppMicroServices_DIR}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
     -DCTK_DIR:PATH=${CTK_DIR}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
+    -DEigen_DIR:PATH=${Eigen_DIR}
     -Dtinyxml_DIR:PATH=${tinyxml_DIR}
     -DGLUT_DIR:PATH=${GLUT_DIR}
     -DGLEW_DIR:PATH=${GLEW_DIR}

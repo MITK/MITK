@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtPlugin>
 
-#include "QmitkDicomEditor.h"
+#include "QmitkDicomBrowser.h"
 //#include "QmitkDicomPreferencePage.h"
 
 namespace mitk {
@@ -27,7 +27,7 @@ ctkPluginContext* PluginActivator::pluginContext = 0;
 
 void PluginActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDicomEditor, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDicomBrowser, context)
   //BERRY_REGISTER_EXTENSION_CLASS(QmitkDicomPreferencePage, context)
   pluginContext = context;
 }

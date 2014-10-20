@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRenderWindow.h"
 
 
-US_INITIALIZE_MODULE("InteractionEventRecorder","liborg_mitk_gui_qt_eventrecorder")
+US_INITIALIZE_MODULE
 
 
 const std::string InteractionEventRecorder::VIEW_ID = "org.mitk.views.interactioneventrecorder";

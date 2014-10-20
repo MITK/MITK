@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkMimeType.h>
 
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include <usServiceReference.h>
 
 #include <vector>
@@ -53,8 +53,6 @@ struct MITK_CORE_EXPORT IMimeTypeProvider
 
   virtual std::vector<MimeType> GetMimeTypesForFile(const std::string& filePath) const = 0;
 
-  virtual std::vector<MimeType> GetMimeTypesForExtension(const std::string& extension) const = 0;
-
   virtual std::vector<MimeType> GetMimeTypesForCategory(const std::string& category) const = 0;
 
   virtual MimeType GetMimeTypeForName(const std::string& name) const = 0;
@@ -68,6 +66,6 @@ struct MITK_CORE_EXPORT IMimeTypeProvider
 
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::IMimeTypeProvider, "org.mitk.IMimeTypeProvider")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::IMimeTypeProvider, "org.mitk.IMimeTypeProvider")
 
 #endif // MITKIMIMETYPEPROVIDER_H

@@ -20,11 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
+  : m_SegmentationBinaryImage(NULL)
+  , m_MaxSpacing(5)
+  , m_NegativeNormalCounter(0)
+  , m_PositiveNormalCounter(0)
+  , m_UseProgressBar(false)
+  , m_ProgressStepSize(1)
 {
-  m_MaxSpacing = 5;
-  this->m_UseProgressBar = false;
-  this->m_ProgressStepSize = 1;
-
   mitk::Surface::Pointer output = mitk::Surface::New();
   this->SetNthOutput(0, output.GetPointer());
 }
@@ -149,10 +151,18 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
           worldCoord[2] = p1[2]+finalNormal[2]*m_MaxSpacing;
 
           double val = 0.0;
+
           mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_SegmentationBinaryImage);
           itk::Index<3> idx;
           m_SegmentationBinaryImage->GetGeometry()->WorldToIndex(worldCoord, idx);
-          val = readAccess.GetPixelByIndexSafe(idx);
+          try
+          {
+            val = readAccess.GetPixelByIndexSafe(idx);
+          }
+          catch (mitk::Exception e)
+          {
+            // If value is outside the image's region ignore it
+          }
 
           if (val == 0.0)
           {

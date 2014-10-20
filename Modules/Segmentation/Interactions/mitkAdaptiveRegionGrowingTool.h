@@ -51,6 +51,8 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
+    bool CanHandle(BaseData* referenceData) const;
+
     /**
      * @brief Get XPM
      * @return NULL

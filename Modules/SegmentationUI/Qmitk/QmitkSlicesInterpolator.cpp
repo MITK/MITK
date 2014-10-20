@@ -54,6 +54,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
+float SURFACE_COLOR_RGB [3] = {0.49f, 1.0f, 0.16f};
+
 const std::map<QAction*, mitk::SliceNavigationController*> QmitkSlicesInterpolator::createActionToSliceDimension()
 {
   std::map<QAction*, mitk::SliceNavigationController*> actionToSliceDimension;
@@ -99,8 +101,12 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_BtnApply3D = new QPushButton("Confirm", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply3D);
 
+  m_BtnReinit3DInterpolation = new QPushButton("Reinit Interpolation", m_GroupBoxEnableExclusiveInterpolationMode);
+  vboxLayout->addWidget(m_BtnReinit3DInterpolation);
+
   m_ChkShowPositionNodes = new QCheckBox("Show Position Nodes", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_ChkShowPositionNodes);
+
 
   this->HideAllInterpolationControls();
 
@@ -108,6 +114,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   connect(m_BtnApply2D, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
   connect(m_BtnApplyForAllSlices2D, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
   connect(m_BtnApply3D, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
+  connect(m_BtnReinit3DInterpolation, SIGNAL(clicked()), this, SLOT(OnReinit3DInterpolation()));
   connect(m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
   connect(m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SIGNAL(SignalShowMarkerNodes(bool)));
 
@@ -138,16 +145,17 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
 
   m_InterpolatedSurfaceNode = mitk::DataNode::New();
-  m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(255.0,255.0,0.0) );
+  m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(SURFACE_COLOR_RGB) );
   m_InterpolatedSurfaceNode->SetProperty( "name", mitk::StringProperty::New("Surface Interpolation feedback") );
   m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
+  m_InterpolatedSurfaceNode->SetProperty( "line width", mitk::IntProperty::New(4) );
   m_InterpolatedSurfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
   m_InterpolatedSurfaceNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
   m_InterpolatedSurfaceNode->SetVisibility(false);
 
   m_3DContourNode = mitk::DataNode::New();
   m_3DContourNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 0.0, 0.0) );
-  m_3DContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+  m_3DContourNode->SetProperty("hidden object", mitk::BoolProperty::New(true));
   m_3DContourNode->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
   m_3DContourNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
   m_3DContourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
@@ -350,6 +358,7 @@ void QmitkSlicesInterpolator::Show3DInterpolationControls(bool show)
 {
   m_BtnApply3D->setVisible(show);
   m_ChkShowPositionNodes->setVisible(show);
+  m_BtnReinit3DInterpolation->setVisible(show);
 }
 
 
@@ -408,6 +417,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
   if (m_ToolManager->GetWorkingData(0) != 0)
   {
     m_Segmentation = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
+    m_BtnReinit3DInterpolation->setEnabled(true);
   }
   else
   {
@@ -418,6 +428,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
     m_3DContourNode->SetData(NULL);
     this->GetDataStorage()->Remove(m_InterpolatedSurfaceNode);
     m_InterpolatedSurfaceNode->SetData(NULL);
+    m_BtnReinit3DInterpolation->setEnabled(false);
     return;
   }
   //Updating the current selected segmentation for the 3D interpolation
@@ -443,9 +454,8 @@ void QmitkSlicesInterpolator::OnTimeChanged(itk::Object* sender, const itk::Even
   mitk::SliceNavigationController* slicer = dynamic_cast<mitk::SliceNavigationController*>(sender);
   Q_ASSERT(slicer);
 
-  m_TimeStep[slicer]/* = event.GetPos()*/;
+  m_TimeStep[slicer];
 
-  //TODO Macht das hier wirklich Sinn????
   if (m_LastSNC == slicer)
   {
     slicer->SendSlice();//will trigger a new interpolation
@@ -536,11 +546,15 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
     this->Show3DInterpolationResult(true);
 
-    if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) && !m_DataStorage->Exists(m_3DContourNode))
+    if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) )
     {
-      m_DataStorage->Add(m_3DContourNode);
       m_DataStorage->Add(m_InterpolatedSurfaceNode);
     }
+    if (!m_DataStorage->Exists(m_3DContourNode))
+    {
+      m_DataStorage->Add(m_3DContourNode, workingNode);
+    }
+
   }
   else if (interpolatedSurface.IsNull())
   {
@@ -551,6 +565,8 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
       this->Show3DInterpolationResult(false);
     }
   }
+
+  m_BtnReinit3DInterpolation->setEnabled(true);
 
   foreach (mitk::SliceNavigationController* slicer, m_ControllerToTimeObserverTag.keys())
   {
@@ -753,8 +769,43 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     segmentationNode->SetData(s2iFilter->GetOutput());
     m_CmbInterpolation->setCurrentIndex(0);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::DataNode::Pointer segSurface = mitk::DataNode::New();
+    float rgb[3];
+    segmentationNode->GetColor(rgb);
+    segSurface->SetColor(rgb);
+    segSurface->SetData(m_InterpolatedSurfaceNode->GetData());
+    std::stringstream stream;
+    stream << segmentationNode->GetName();
+    stream << "_";
+    stream << "3D-interpolation";
+    segSurface->SetName(stream.str());
+    segSurface->SetProperty( "opacity", mitk::FloatProperty::New(0.7) );
+    segSurface->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
+    m_DataStorage->Add(segSurface, segmentationNode);
     this->Show3DInterpolationResult(false);
   }
+}
+
+void QmitkSlicesInterpolator::OnReinit3DInterpolation()
+{
+  mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("3DContourContainer", mitk::BoolProperty::New(true));
+  mitk::DataStorage::SetOfObjects::ConstPointer contourNodes = m_DataStorage->GetDerivations( m_ToolManager->GetWorkingData(0), pred);
+  if (contourNodes->Size() != 0)
+  {
+    m_3DContourNode = contourNodes->at(0);
+  }
+  else
+  {
+    QMessageBox errorInfo;
+    errorInfo.setWindowTitle("Reinitialize surface interpolation");
+    errorInfo.setIcon(QMessageBox::Information);
+    errorInfo.setText("No contours available for the selected segmentation!");
+    errorInfo.exec();
+  }
+  mitk::Surface::Pointer contours = dynamic_cast<mitk::Surface*>(m_3DContourNode->GetData());
+  if (contours)
+    mitk::SurfaceInterpolationController::GetInstance()->ReinitializeInterpolation(contours);
+  m_BtnReinit3DInterpolation->setEnabled(false);
 }
 
 void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction* action)
@@ -848,7 +899,7 @@ void QmitkSlicesInterpolator::StartUpdateInterpolationTimer()
 void QmitkSlicesInterpolator::StopUpdateInterpolationTimer()
 {
   m_Timer->stop();
-  m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(255.0,255.0,0.0));
+  m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(SURFACE_COLOR_RGB));
   mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
 }
 
@@ -857,15 +908,13 @@ void QmitkSlicesInterpolator::ChangeSurfaceColor()
   float currentColor[3];
   m_InterpolatedSurfaceNode->GetColor(currentColor);
 
-  float yellow[3] = {255.0,255.0,0.0};
-
-  if( currentColor[2] == yellow[2])
+  if( currentColor[2] == SURFACE_COLOR_RGB[2])
   {
-    m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(255.0,255.0,255.0));
+    m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(1.0f,1.0f,1.0f));
   }
   else
   {
-    m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(yellow));
+    m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(SURFACE_COLOR_RGB));
   }
   m_InterpolatedSurfaceNode->Update();
   mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
@@ -1005,8 +1054,7 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
       bool isInterpolationResult(false);
       workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
 
-      bool isVisible (workingNode->IsVisible(m_LastSNC->GetRenderer()));
-      if (isVisible && !isInterpolationResult)
+      if (!isInterpolationResult)
       {
         QWidget::setEnabled( true );
 
@@ -1026,14 +1074,13 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
           }
         }
 
-        m_SurfaceInterpolator->SetSegmentationImage(dynamic_cast<mitk::Image*>(workingNode->GetData()));
         m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
         m_SurfaceInterpolator->SetMinSpacing(minSpacing);
         m_SurfaceInterpolator->SetDistanceImageVolume(50000);
 
         mitk::Image* segmentationImage = dynamic_cast<mitk::Image*>(workingNode->GetData());
         if (segmentationImage->GetDimension() == 3)
-          m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(segmentationImage);
+          m_SurfaceInterpolator->SetCurrentInterpolationSession(segmentationImage);
         else
           MITK_INFO<<"3D Interpolation is only supported for 3D images at the moment!";
 

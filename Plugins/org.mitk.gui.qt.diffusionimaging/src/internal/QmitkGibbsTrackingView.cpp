@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkProgressBar.h>
-#include <mitkFiberBundleXWriter.h>
+#include <mitkIOUtil.h>
 
 // ITK
 #include <itkGibbsTrackingFilter.h>
@@ -41,6 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MISC
 #include <tinyxml.h>
+
+
 
 
 QmitkTrackingWorker::QmitkTrackingWorker(QmitkGibbsTrackingView* view)
@@ -108,7 +110,11 @@ QmitkGibbsTrackingView::QmitkGibbsTrackingView()
 
 QmitkGibbsTrackingView::~QmitkGibbsTrackingView()
 {
-    delete m_TrackingTimer;
+  if (m_GlobalTracker.IsNull())
+      return;
+
+  m_GlobalTracker->SetAbortTracking(true);
+  m_TrackingThread.wait();
 }
 
 // update tracking status and generate fiber bundle
@@ -547,7 +553,7 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
     if ( m_GlobalTracker->GetNumAcceptedFibers()==0 )
         return;
     m_FiberBundle = mitk::FiberBundleX::New(fiberBundle);
-    m_FiberBundle->SetReferenceImage(dynamic_cast<mitk::Image*>(m_ImageNode->GetData()));
+    m_FiberBundle->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_ImageNode->GetData())->GetGeometry());
 
     if (m_FiberBundleNode.IsNotNull()){
         GetDefaultDataStorage()->Remove(m_FiberBundleNode);
@@ -565,14 +571,10 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
 
     if (!m_OutputFileName.isEmpty() && !m_ThreadIsRunning)
     {
-        QString filename = m_OutputFileName;
-        mitk::FiberBundleXWriter::Pointer writer = mitk::FiberBundleXWriter::New();
-        writer->SetFileName(filename.toStdString());
-        writer->SetInputFiberBundleX(m_FiberBundle.GetPointer());
         try
         {
-            writer->Update();
-            QMessageBox::information(NULL, "Fiber bundle saved to", filename);
+          mitk::IOUtil::Save(m_FiberBundle.GetPointer(),m_OutputFileName.toStdString());
+          QMessageBox::information(NULL, "Fiber bundle saved to", m_OutputFileName);
         }
         catch (itk::ExceptionObject &ex)
         {

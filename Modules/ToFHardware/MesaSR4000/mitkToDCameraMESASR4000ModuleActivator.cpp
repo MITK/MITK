@@ -82,5 +82,5 @@ private:
 
 };
 }
-US_EXPORT_MODULE_ACTIVATOR(MitkMESASR4000, mitk::MESASR4000ModuleActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::MESASR4000ModuleActivator)
 #endif

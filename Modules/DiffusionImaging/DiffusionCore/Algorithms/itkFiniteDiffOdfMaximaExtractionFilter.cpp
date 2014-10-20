@@ -429,12 +429,10 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
                 dir /= max;
                 break;
             }
-//            dir[0] = -dir[0];
-//            dir[2] = -dir[2];
 
             dir = m_MaskImage->GetDirection()*dir;
             itk::Vector< float, 3 > pixel;
-            pixel.SetElement(0, dir[0]);
+            pixel.SetElement(0, -dir[0]);
             pixel.SetElement(1, dir[1]);
             pixel.SetElement(2, dir[2]);
             img->SetPixel(index, pixel);

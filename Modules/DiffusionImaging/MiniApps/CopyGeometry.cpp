@@ -50,8 +50,6 @@ int CopyGeometry(int argc, char* argv[])
 
     try
     {
-
-        MITK_INFO << "Loading image " << imageName;
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( refImage, s1, s2, false );
         Image::Pointer source = dynamic_cast<Image*>(infile.at(0).GetPointer());
@@ -66,7 +64,6 @@ int CopyGeometry(int argc, char* argv[])
 
         if ( dynamic_cast<DiffusionImage<short>*>(target.GetPointer()) )
         {
-            MITK_INFO << "Writing " << outImage;
             DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(target.GetPointer());
             NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
             writer->SetFileName(outImage);
@@ -91,7 +88,6 @@ int CopyGeometry(int argc, char* argv[])
         MITK_INFO << "ERROR!?!";
         return EXIT_FAILURE;
     }
-    MITK_INFO << "DONE";
     return EXIT_SUCCESS;
 }
 RegisterDiffusionMiniApp(CopyGeometry);

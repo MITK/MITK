@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkFiberBundleXWriter_h
 #define __mitkFiberBundleXWriter_h
 
-#include <itkProcessObject.h>
-#include <mitkFileWriterWithInformation.h>
+#include <mitkAbstractFileWriter.h>
+
 #include "mitkFiberBundleX.h"
 #include <vtkPolyDataWriter.h>
-#include <MitkFiberTrackingExports.h>
+
 
 
 namespace mitk
@@ -31,103 +31,18 @@ namespace mitk
  * Writes fiber bundles to a file
  * @ingroup Process
  */
-class MitkFiberTracking_EXPORT FiberBundleXWriter : public mitk::FileWriterWithInformation
+class FiberBundleXWriter : public mitk::AbstractFileWriter
 {
 public:
 
-    mitkClassMacro( FiberBundleXWriter, mitk::FileWriterWithInformation );
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    FiberBundleXWriter();
+    FiberBundleXWriter(const FiberBundleXWriter & other);
+    virtual FiberBundleXWriter * Clone() const;
+    virtual ~FiberBundleXWriter();
 
-    //mitkWriterMacro;
-
-    virtual void Write()
-    {
-      if ( this->GetInput() == NULL )
-    {
-      itkExceptionMacro(<<"Write:Please specify an input!");
-      return;
-    }
-    /* Fill in image information.*/
-      this->UpdateOutputInformation();
-      (*(this->GetInputs().begin()))->SetRequestedRegionToLargestPossibleRegion();
-      this->PropagateRequestedRegion(NULL);
-      this->UpdateOutputData(NULL);
-    }
-
-    virtual void Update()
-    {
-      Write();
-    }
-
-    typedef mitk::FiberBundleX InputType;
-
-    /**
-     * Sets the filename of the file to write.
-     * @param FileName the name of the file to write.
-     */
-    itkSetStringMacro( FileName );
-
-    /**
-     * @returns the name of the file to be written to disk.
-     */
-    itkGetStringMacro( FileName );
-
-    /**
-     * @warning multiple write not (yet) supported
-     */
-    itkSetStringMacro( FilePrefix );
-
-    /**
-     * @warning multiple write not (yet) supported
-     */
-    itkGetStringMacro( FilePrefix );
-
-    /**
-     * @warning multiple write not (yet) supported
-     */
-    itkSetStringMacro( FilePattern );
-
-    /**
-     * @warning multiple write not (yet) supported
-     */
-    itkGetStringMacro( FilePattern );
-
-    /**
-     * Sets the input object for the filter.
-     * @param input the diffusion volumes to write to file.
-     */
-    void SetInputFiberBundleX( InputType* input );
-
-    /**
-     * @returns the 0'th input object of the filter.
-     */
-    InputType* GetInput();
-
-    /**
-     * Returns false if an error happened during writing
-     */
-    itkGetMacro( Success, bool );
-
-    /**
-    * @return possible file extensions for the data type associated with the writer
-    */
-    virtual std::vector<std::string> GetPossibleFileExtensions();
-
-    std::string GetSupportedBaseData() const;
-
-    // FileWriterWithInformation methods
-    virtual const char * GetDefaultFilename() { return "FiberBundle.fib"; }
-    virtual const char * GetFileDialogPattern() { return "Fiber Bundle (*.fib *.vtk *.trk *.afib *.avtk)"; }
-    virtual const char * GetDefaultExtension() { return ".fib"; }
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::FiberBundleX*>(data.GetPointer()) != NULL); };
-    virtual void DoWrite(BaseData::Pointer data) {
-      if (CanWriteBaseDataType(data)) {
-        this->SetInputFiberBundleX(dynamic_cast<mitk::FiberBundleX*>(data.GetPointer()));
-        this->Update();
-      }
-    };
+    using mitk::AbstractFileWriter::Write;
+    virtual void Write();
 
     static const char* XML_GEOMETRY;
 
@@ -194,22 +109,6 @@ public:
     static const char* ASCII_FILE;
 
     static const char* FILE_NAME;
-
-protected:
-
-    FiberBundleXWriter();
-
-    virtual ~FiberBundleXWriter();
-
-    virtual void GenerateData();
-
-    std::string m_FileName;
-
-    std::string m_FilePrefix;
-
-    std::string m_FilePattern;
-
-    bool m_Success;
 
 };
 

@@ -18,7 +18,7 @@
 #define InteractionEventObserver_h
 
 #include <MitkCoreExports.h>
-#include "usServiceInterface.h"
+#include "mitkServiceInterface.h"
 #include "mitkInteractionEvent.h"
 
 namespace mitk
@@ -65,5 +65,5 @@ namespace mitk
   };
 
 } /* namespace mitk */
-US_DECLARE_SERVICE_INTERFACE(mitk::InteractionEventObserver, "org.mitk.InteractionEventObserver")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::InteractionEventObserver, "org.mitk.InteractionEventObserver")
 #endif /* InteractionEventObserver_h */

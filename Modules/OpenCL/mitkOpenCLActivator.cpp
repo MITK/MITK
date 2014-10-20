@@ -30,4 +30,4 @@ void OpenCLActivator::Unload(us::ModuleContext *)
   m_ResourceService.release();
 }
 
-US_EXPORT_MODULE_ACTIVATOR(MitkOpenCL, OpenCLActivator )
+US_EXPORT_MODULE_ACTIVATOR(OpenCLActivator )

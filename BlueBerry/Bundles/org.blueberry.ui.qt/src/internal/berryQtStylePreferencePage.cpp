@@ -78,7 +78,7 @@ void QtStylePreferencePage::FillStyleCombo(const berry::IQtStyleManager::Style& 
   controls.m_StylesCombo->setCurrentIndex(styles.indexOf(currentStyle));
 }
 
-void QtStylePreferencePage::FillIconThemeComboBox()
+void QtStylePreferencePage::FillIconThemeComboBox(const QString currentIconTheme)
 {
   controls.m_IconThemeComboBox->clear();
   berry::IQtStyleManager::IconThemeList iconThemes;
@@ -90,7 +90,8 @@ void QtStylePreferencePage::FillIconThemeComboBox()
     controls.m_IconThemeComboBox->addItem(iconThemes.at(i).name);
   }
 
-  QString currentTheme = QIcon::themeName();
+  QString currentTheme = currentIconTheme;
+
   if(currentTheme == QString(""))
   {
     currentTheme = QString("<<default>>");
@@ -240,7 +241,7 @@ void QtStylePreferencePage::Update()
   oldStyle = styleManager->GetStyle();
 
   FillStyleCombo(oldStyle);
-  FillIconThemeComboBox();
+  FillIconThemeComboBox( iconTheme );
 }
 
 }

@@ -1,10 +1,43 @@
 /**
-\page org_mitk_gui_qt_viewnavigator View Navigator
+\page org_mitk_gui_qt_viewnavigator The View Navigator
 
 \imageMacro{view-manager_48.png,"Icon of the view navigator",2.00}
+
+\tableofcontents
+
+\section org_mitk_gui_qt_viewnavigatorOverview Overview
 
 This view allows for the easy navigation of the available views.
 
 You can select which view to open by double-clicking the name of the view in the view navigator. It provides a keyworded, grouped and searchable list of views.
 
+\section org_mitk_gui_qt_viewnavigatorUsage Usage
+
+You can toggle the View Navigator on and off by clicking on its icon in the menu bar. Alternatively it is also available via the Window->Show Views dialog.
+
+\imageMacro{QmitkViewNavigatorGUI.png,"The View Navigator GUI",6.00}
+
+Once the View Navigator has been opened you will see a list divided in workflows/perspectives and views. Via this list you can access any view or perspective provided by the application. They are further organized based on their associated category.
+
+An entry on the list is opened by a double left-click.
+
+\subsection org_mitk_gui_qt_viewnavigatorSearch Search
+
+You can search the lists for view/workflow names, keywords or categories.
+
+\imageMacro{QmitkViewNavigatorSearch.png,"Search the View Navigator",4.00}
+
+\subsection org_mitk_gui_qt_viewnavigatorCustomWorkflows Custom Workflows
+
+\imageMacro{QmitkViewNavigatorContextMenuWorkflows.png,"The workflow context menu",4.00}
+
+A right click on a workflow opens a context menu that allows you to copy that workflow to create your own custom one.
+\note The duplicated workflow will look like the basic state of the original workflow. Any changes to the original workflow will not be copied.
+
+\imageMacro{QmitkViewNavigatorNewWorkflow.png,"Custom workflow creation dialog",4.00}
+
+Your new workflow will appear in the list and you can modify it independently of the original workflow. Any changes will be stored for future sessions unless the workflow is deleted.
+\note Resetting a custom perspective will return it to the original state after duplicating.
+
+\imageMacro{QmitkViewNavigatorContextMenuCustomWorkflow.png,"Custom workflow context menu",4.00}
 */

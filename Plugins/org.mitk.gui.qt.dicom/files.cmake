@@ -3,7 +3,7 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  QmitkDicomEditor.cpp
+  QmitkDicomBrowser.cpp
   QmitkDicomDirectoryListener.cpp
   QmitkStoreSCPLauncher.cpp
   QmitkStoreSCPLauncherBuilder.cpp
@@ -13,12 +13,12 @@ set(INTERNAL_CPP_FILES
 )
 
 set(UI_FILES
-  src/internal/QmitkDicomEditorControls.ui
+  src/internal/QmitkDicomBrowserControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
-  src/internal/QmitkDicomEditor.h
+  src/internal/QmitkDicomBrowser.h
   src/internal/QmitkDicomDirectoryListener.h
   src/internal/QmitkStoreSCPLauncher.h
   src/internal/QmitkStoreSCPLauncherBuilder.h

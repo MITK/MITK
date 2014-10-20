@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkConditionVariable.h>
 
 // Microservices
-#include <usServiceInterface.h>
+#include <mitkServiceInterface.h>
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
 
@@ -431,6 +431,6 @@ class USControlInterfaceDoppler;
 } // namespace mitk
 
 // This is the microservice declaration. Do not meddle!
-US_DECLARE_SERVICE_INTERFACE(mitk::USDevice, "org.mitk.services.UltrasoundDevice")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::USDevice, "org.mitk.services.UltrasoundDevice")
 
 #endif // MITKUSDevice_H_HEADER_INCLUDED_

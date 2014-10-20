@@ -121,14 +121,21 @@ function(mitk_create_module)
     endif()
   endif()
 
+  set(_module_type module)
+  set(_Module_type Module)
+  if(MODULE_EXECUTABLE)
+    set(_module_type executable)
+    set(_Module_type Executable)
+  endif()
+
   if(MITK_MODULE_NAME_REGEX_MATCH)
     if(NOT ${MODULE_NAME} MATCHES ${MITK_MODULE_NAME_REGEX_MATCH})
-      message(SEND_ERROR "The module name \"${MODULE_NAME}\" does not match the regular expression \"${MITK_MODULE_NAME_REGEX_MATCH}\".")
+      message(SEND_ERROR "The ${_module_type} name \"${MODULE_NAME}\" does not match the regular expression \"${MITK_MODULE_NAME_REGEX_MATCH}\".")
     endif()
   endif()
   if(MITK_MODULE_NAME_REGEX_NOT_MATCH)
     if(${MODULE_NAME} MATCHES ${MITK_MODULE_NAME_REGEX_NOT_MATCH})
-      message(SEND_ERROR "The module name \"${MODULE_NAME}\" must not match the regular expression \"${MITK_MODULE_NAME_REGEX_NOT_MATCH}\".")
+      message(SEND_ERROR "The ${_module_type} name \"${MODULE_NAME}\" must not match the regular expression \"${MITK_MODULE_NAME_REGEX_NOT_MATCH}\".")
     endif()
   endif()
 
@@ -144,7 +151,7 @@ function(mitk_create_module)
   endif()
 
   if (MODULE_QT_MODULE)
-    message(WARNING "QT_MODULE keyword is deprecated (in module ${MODULE_NAME}). Please use PACKAGE_DEPENDS Qt4|QtCore and/or PACKAGE_DEPENDS Qt5|Core instead")
+    message(WARNING "QT_MODULE keyword is deprecated (in ${_module_type} ${MODULE_NAME}). Please use PACKAGE_DEPENDS Qt4|QtCore and/or PACKAGE_DEPENDS Qt5|Core instead")
     if (NOT "${MODULE_PACKAGE_DEPENDS}" MATCHES "^.*Qt4.*$")
       list(APPEND MODULE_PACKAGE_DEPENDS Qt4|QtGui)
     endif()
@@ -200,7 +207,7 @@ function(mitk_create_module)
 
     if(_MISSING_DEP)
       if(MODULE_NO_FEATURE_INFO)
-        message("Module ${MODULE_NAME} won't be built, missing dependency: ${_MISSING_DEP}")
+        message("${_Module_type} ${MODULE_NAME} won't be built, missing dependency: ${_MISSING_DEP}")
       endif()
       set(MODULE_IS_ENABLED 0)
     else()
@@ -209,7 +216,7 @@ function(mitk_create_module)
       # MITK_CHECK_MODULE ...
       foreach(_package ${PACKAGE_NAMES})
         if((DEFINED MITK_USE_${_package}) AND NOT (MITK_USE_${_package}))
-          message("Module ${MODULE_NAME} won't be built. Turn on MITK_USE_${_package} if you want to use it.")
+          message("${_Module_type} ${MODULE_NAME} won't be built. Turn on MITK_USE_${_package} if you want to use it.")
           set(MODULE_IS_ENABLED 0)
           break()
         endif()
@@ -373,24 +380,17 @@ function(mitk_create_module)
         add_custom_target(${MODULE_NAME}-autoload)
 
         if(NOT MODULE_HEADERS_ONLY)
-          if(NOT MODULE_NO_INIT)
+          if(NOT MODULE_NO_INIT OR RESOURCE_FILES)
             find_package(CppMicroServices QUIET NO_MODULE REQUIRED)
-            if(MODULE_EXECUTABLE)
-              usFunctionGenerateExecutableInit(CPP_FILES
-                                               IDENTIFIER ${MODULE_TARGET}
-                                              )
-            else()
-              usFunctionGenerateModuleInit(CPP_FILES
-                                           NAME ${MODULE_NAME}
-                                           LIBRARY_NAME ${MODULE_TARGET}
-                                          )
-            endif()
+          endif()
+          if(NOT MODULE_NO_INIT)
+            usFunctionGenerateModuleInit(CPP_FILES)
           endif()
 
+          set(binary_res_files )
+          set(source_res_files )
           if(RESOURCE_FILES)
             set(res_dir Resources)
-            set(binary_res_files )
-            set(source_res_files )
             foreach(res_file ${RESOURCE_FILES})
               if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}/${res_file})
                 list(APPEND binary_res_files "${res_file}")
@@ -399,21 +399,14 @@ function(mitk_create_module)
               endif()
             endforeach()
 
-            set(res_macro_args )
-            if(binary_res_files)
-              list(APPEND res_macro_args ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}
-                                         FILES ${binary_res_files})
-            endif()
+            # Add a source level dependencies on resource files
             if(source_res_files)
-              list(APPEND res_macro_args ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${res_dir}
-                                         FILES ${source_res_files})
+              list(APPEND CPP_FILES ${MODULE_TARGET}_resources.cpp)
             endif()
-
-            usFunctionEmbedResources(CPP_FILES
-                                     LIBRARY_NAME ${MODULE_TARGET}
-                                     ${res_macro_args})
+            if(binary_res_files)
+              list(APPEND CPP_FILES ${CMAKE_CURRENT_BINARY_DIR}/${MODULE_TARGET}_binary_resources.cpp)
+            endif()
           endif()
-
         endif()
 
         # Qt 4 case
@@ -492,11 +485,15 @@ function(mitk_create_module)
             add_executable(${MODULE_TARGET}
                            ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
                            ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+            set(_us_module_name main)
           else()
             add_library(${MODULE_TARGET} ${_STATIC}
                         ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
                         ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+            set(_us_module_name ${MODULE_TARGET})
           endif()
+          set_property(TARGET ${MODULE_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${_us_module_name})
+          set_property(TARGET ${MODULE_TARGET} PROPERTY US_MODULE_NAME ${_us_module_name})
 
           if(MODULE_TARGET_DEPENDS)
             add_dependencies(${MODULE_TARGET} ${MODULE_TARGET_DEPENDS})
@@ -572,6 +569,19 @@ function(mitk_create_module)
             # add the auto-load module name as a property
             set_property(TARGET ${MODULE_AUTOLOAD_WITH} APPEND PROPERTY MITK_AUTOLOAD_TARGETS ${MODULE_TARGET})
           endif()
+
+          if(binary_res_files)
+            usFunctionAddResources(TARGET ${MODULE_TARGET}
+                                   SOURCE_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${MODULE_TARGET}_binary_resources.cpp
+                                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}
+                                   FILES ${binary_res_files})
+          endif()
+          if(source_res_files)
+            usFunctionAddResources(TARGET ${MODULE_TARGET}
+                                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${res_dir}
+                                   FILES ${source_res_files})
+          endif()
+
         endif()
 
       endif()

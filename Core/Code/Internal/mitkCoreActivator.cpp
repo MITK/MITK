@@ -32,8 +32,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkFileWriter.h>
 #include "mitkLegacyFileWriterService.h"
+#include "mitkDicomSeriesReaderService.h"
 
 #include <itkNiftiImageIO.h>
+#include <itkGDCMImageIO.h>
 
 // Micro Services
 #include <usGetModuleContext.h>
@@ -302,6 +304,7 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
   // Add custom Reader / Writer Services
   m_FileReaders.push_back(new mitk::PointSetReaderService());
   m_FileWriters.push_back(new mitk::PointSetWriterService());
+  m_FileReaders.push_back(new mitk::DicomSeriesReaderService());
   m_FileReaders.push_back(new mitk::RawImageFileReaderService());
 
   m_ShaderRepositoryTracker->Open();
@@ -356,6 +359,12 @@ void MitkCoreActivator::Unload(us::ModuleContext* )
   m_MimeTypeProviderReg.Unregister();
   m_MimeTypeProvider->Stop();
 
+  for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = m_DefaultMimeTypes.begin(),
+       iterEnd = m_DefaultMimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
+  {
+    delete *mimeTypeIter;
+  }
+
   m_ShaderRepositoryTracker->Close();
 }
 
@@ -363,12 +372,12 @@ void MitkCoreActivator::RegisterDefaultMimeTypes()
 {
   // Register some default mime-types
 
-  std::vector<mitk::CustomMimeType> mimeTypes = mitk::IOMimeTypes::Get();
-  for (std::vector<mitk::CustomMimeType>::const_iterator mimeTypeIter = mimeTypes.begin(),
+  std::vector<mitk::CustomMimeType*> mimeTypes = mitk::IOMimeTypes::Get();
+  for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = mimeTypes.begin(),
        iterEnd = mimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
   {
     m_DefaultMimeTypes.push_back(*mimeTypeIter);
-    m_Context->RegisterService(&m_DefaultMimeTypes.back());
+    m_Context->RegisterService(m_DefaultMimeTypes.back());
   }
 }
 
@@ -376,6 +385,7 @@ void MitkCoreActivator::RegisterItkReaderWriter()
 {
   std::list<itk::LightObject::Pointer> allobjects =
     itk::ObjectFactoryBase::CreateAllInstance("itkImageIOBase");
+
   for (std::list<itk::LightObject::Pointer >::iterator i = allobjects.begin(),
        endIter = allobjects.end(); i != endIter; ++i)
   {
@@ -384,6 +394,13 @@ void MitkCoreActivator::RegisterItkReaderWriter()
     // NiftiImageIO does not provide a correct "SupportsDimension()" methods
     // and the supported read/write extensions are not ordered correctly
     if (dynamic_cast<itk::NiftiImageIO*>(io)) continue;
+
+    // Use a custom mime-type for GDCMImageIO below
+    if (dynamic_cast<itk::GDCMImageIO*>(i->GetPointer()))
+    {
+      // MITK provides its own DICOM reader (which internally uses GDCMImageIO).
+      continue;
+    }
 
     if (io)
     {
@@ -396,9 +413,10 @@ void MitkCoreActivator::RegisterItkReaderWriter()
     }
   }
 
-  mitk::ItkImageIO* io = new mitk::ItkImageIO(mitk::CustomMimeType(mitk::IOMimeTypes::NIFTI_MIMETYPE_NAME()),
-                                              new FixedNiftiImageIO(), 0);
-  m_FileIOs.push_back(io);
+  FixedNiftiImageIO::Pointer itkNiftiIO = FixedNiftiImageIO::New();
+  mitk::ItkImageIO* niftiIO = new mitk::ItkImageIO(mitk::CustomMimeType(mitk::IOMimeTypes::NIFTI_MIMETYPE_NAME()),
+                                                   itkNiftiIO.GetPointer(), 0);
+  m_FileIOs.push_back(niftiIO);
 }
 
 void MitkCoreActivator::RegisterVtkReaderWriter()
@@ -434,10 +452,10 @@ void MitkCoreActivator::RegisterLegacyWriter()
   }
 }
 
-US_EXPORT_MODULE_ACTIVATOR(MitkCore, MitkCoreActivator)
+US_EXPORT_MODULE_ACTIVATOR(MitkCoreActivator)
 
 // Call CppMicroservices initialization code at the end of the file.
 // This especially ensures that VTK object factories have already
 // been registered (VTK initialization code is injected by implicitly
 // include VTK header files at the top of this file).
-US_INITIALIZE_MODULE("MitkCore", "MitkCore")
+US_INITIALIZE_MODULE

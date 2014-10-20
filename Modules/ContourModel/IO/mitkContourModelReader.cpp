@@ -15,46 +15,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkContourModelReader.h"
+#include <mitkCustomMimeType.h>
 #include <iostream>
 #include <fstream>
 #include <locale>
 
-mitk::ContourModelReader::ContourModelReader()
+mitk::ContourModelReader::ContourModelReader(const mitk::ContourModelReader& other)
+  : mitk::AbstractFileReader(other)
 {
-  m_Success = false;
 }
 
+mitk::ContourModelReader::ContourModelReader()
+  : AbstractFileReader()
+{
+  std::string category = "Contour File";
+  mitk::CustomMimeType customMimeType;
+  customMimeType.SetCategory(category);
+  customMimeType.AddExtension("cnt");
+
+  this->SetDescription(category);
+  this->SetMimeType(customMimeType);
+
+  m_ServiceReg = this->RegisterService();
+}
 
 mitk::ContourModelReader::~ContourModelReader()
-{}
-
-
-void mitk::ContourModelReader::GenerateData()
 {
-    std::locale::global(std::locale("C"));
+}
 
-    m_Success = false;
-    if ( m_FileName == "" )
-    {
-      itkWarningMacro( << "Sorry, filename has not been set!" );
-        return ;
-    }
-    if ( ! this->CanReadFile( m_FileName.c_str() ) )
-    {
-      itkWarningMacro( << "Sorry, can't read file " << m_FileName << "!" );
-        return ;
-    }
+std::vector<itk::SmartPointer<mitk::BaseData> > mitk::ContourModelReader::Read()
+{
+  std::vector<itk::SmartPointer<mitk::BaseData> > result;
+  std::string location = GetInputLocation();
+
+  std::locale::global(std::locale("C"));
+
 
   try{
-    TiXmlDocument doc(m_FileName.c_str());
+    TiXmlDocument doc(location.c_str());
     bool loadOkay = doc.LoadFile();
     if (loadOkay)
     {
       TiXmlHandle docHandle( &doc );
 
       /*++++ handle n contourModels within data tags ++++*/
-      unsigned int contourCounter(0);
-
       for( TiXmlElement* currentContourElement = docHandle.FirstChildElement("contourModel").ToElement();
         currentContourElement != NULL; currentContourElement = currentContourElement->NextSiblingElement())
       {
@@ -95,8 +99,7 @@ void mitk::ContourModelReader::GenerateData()
           //newContourModel = this->ReadPoint(newContourModel, currentContourElement, 0);
         }
         newContourModel->UpdateOutputInformation();
-        this->SetNthOutput( contourCounter, newContourModel );
-        contourCounter++;
+        result.push_back(dynamic_cast<mitk::BaseData*>(newContourModel.GetPointer()));
       }
       /*++++ END handle n contourModels within data tags ++++*/
     }
@@ -105,11 +108,16 @@ void mitk::ContourModelReader::GenerateData()
       MITK_WARN << "XML parser error!";
     }
   }catch(...)
-   {
-      MITK_ERROR  << "Cannot read contourModel.";
-      m_Success = false;
-   }
-    m_Success = true;
+  {
+    MITK_ERROR  << "Cannot read contourModel.";
+  }
+
+  return result;
+}
+
+mitk::ContourModelReader* mitk::ContourModelReader::Clone() const
+{
+  return new ContourModelReader(*this);
 }
 
 void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContourModel,
@@ -149,69 +157,4 @@ void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContour
     //nothing to read
   }
 
-}
-
-void mitk::ContourModelReader::GenerateOutputInformation()
-{
-}
-
-int mitk::ContourModelReader::CanReadFile ( const char *name )
-{
-    std::ifstream in( name );
-    bool isGood = in.good();
-    in.close();
-    return isGood;
-}
-
-bool mitk::ContourModelReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
-{
-  // First check the extension
-  if(  filename == "" )
-  {
-      //MITK_INFO<<"No filename specified."<<std::endl;
-    return false;
-  }
-
-  // check if image is serie
-  if( filePattern != "" && filePrefix != "" )
-    return false;
-
-  bool extensionFound = false;
-  std::string::size_type MPSPos = filename.rfind(".cnt");
-  if ((MPSPos != std::string::npos)
-      && (MPSPos == filename.length() - 4))
-    {
-    extensionFound = true;
-    }
-
-  MPSPos = filename.rfind(".CNT");
-  if ((MPSPos != std::string::npos)
-      && (MPSPos == filename.length() - 4))
-    {
-    extensionFound = true;
-    }
-
-  if( !extensionFound )
-    {
-      //MITK_INFO<<"The filename extension is not recognized."<<std::endl;
-    return false;
-    }
-
-  return true;
-}
-
-void mitk::ContourModelReader::ResizeOutputs( const unsigned int& num )
-{
-    unsigned int prevNum = this->GetNumberOfOutputs();
-    this->SetNumberOfIndexedOutputs( num );
-    for ( unsigned int i = prevNum; i < num; ++i )
-    {
-        this->SetNthOutput( i, this->MakeOutput( i ).GetPointer() );
-    }
-}
-
-
-bool mitk::ContourModelReader::GetSuccess() const
-{
-    return m_Success;
 }

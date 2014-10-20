@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOUtil.h>
 #include <mitkCustomMimeType.h>
+#include <mitkStandaloneDataStorage.h>
 
 #include <Internal/mitkFileReaderWriterBase.h>
 
@@ -98,7 +99,6 @@ AbstractFileReader::~AbstractFileReader()
 AbstractFileReader::AbstractFileReader(const AbstractFileReader& other)
   : IFileReader(),
     d(new Impl(*other.d.get()))
-
 {
 }
 
@@ -110,6 +110,21 @@ AbstractFileReader::AbstractFileReader(const CustomMimeType& mimeType, const std
 }
 
 ////////////////////// Reading /////////////////////////
+
+std::vector<BaseData::Pointer> AbstractFileReader::Read()
+{
+  std::vector<BaseData::Pointer> result;
+
+  DataStorage::Pointer ds = StandaloneDataStorage::New().GetPointer();
+  this->Read(*ds);
+  DataStorage::SetOfObjects::ConstPointer dataNodes = ds->GetAll();
+  for (DataStorage::SetOfObjects::ConstIterator iter = dataNodes->Begin(),
+       iterEnd = dataNodes->End(); iter != iterEnd; ++iter)
+  {
+    result.push_back(iter.Value()->GetData());
+  }
+  return result;
+}
 
 DataStorage::SetOfObjects::Pointer AbstractFileReader::Read(DataStorage& ds)
 {
@@ -157,7 +172,7 @@ us::ServiceRegistration<IFileReader> AbstractFileReader::RegisterService(us::Mod
 
   d->RegisterMimeType(context);
 
-  if (this->GetMimeType().GetName().empty())
+  if (this->GetMimeType()->GetName().empty())
   {
     MITK_WARN << "Not registering reader due to empty MIME type.";
     return us::ServiceRegistration<IFileReader>();
@@ -204,7 +219,7 @@ us::ServiceProperties AbstractFileReader::GetServiceProperties() const
   us::ServiceProperties result;
 
   result[IFileReader::PROP_DESCRIPTION()] = this->GetDescription();
-  result[IFileReader::PROP_MIMETYPE()] = this->GetMimeType().GetName();
+  result[IFileReader::PROP_MIMETYPE()] = this->GetMimeType()->GetName();
   result[us::ServiceConstants::SERVICE_RANKING()]  = this->GetRanking();
   return result;
 }
@@ -340,7 +355,7 @@ void AbstractFileReader::RemoveProgressCallback(const ProgressCallback& callback
 ////////////////// µS related Getters //////////////////
 
 
-CustomMimeType AbstractFileReader::GetMimeType() const
+const CustomMimeType* AbstractFileReader::GetMimeType() const
 {
   return d->GetMimeType();
 }

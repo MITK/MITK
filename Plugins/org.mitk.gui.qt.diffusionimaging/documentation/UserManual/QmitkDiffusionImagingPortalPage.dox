@@ -20,6 +20,7 @@ Register or denoise original data and convert it into tensor or q-ball images.
   \li \subpage QmitkDiffusionImagingDWIRegistrationPage
   \li \subpage QmitkDiffusionImagingPreprocessingPage
   \li \subpage QmitkDiffusionImagingReconstructionPage
+  \li \subpage QmitkDiffusionImagingVisualization
   \li \subpage org_mitk_views_odfdetails
   \li \subpage org_mitk_views_odfmaximaextraction
   \li \subpage org_mitk_views_denoisingview
@@ -41,6 +42,7 @@ Create and work with fiber tractographies.
 
 Create parameter maps and quantify different properties.
   
+  \li \subpage QmitkDiffusionImagingQuantificationPage
   \li \subpage org_mitk_views_ivim
   \li \subpage org_mitk_views_partialvolumeanalysisview
   \li \subpage org_mitk_views_tractbasedspatialstatistics

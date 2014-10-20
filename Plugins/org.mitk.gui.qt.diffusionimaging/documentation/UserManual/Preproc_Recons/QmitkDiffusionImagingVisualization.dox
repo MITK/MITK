@@ -1,7 +1,7 @@
 /**
 \page QmitkDiffusionImagingVisualization ODF Visualization
 
-\section QmitkDiffusionImagingUserManualVisualizationSettings ODF Visualization Setting
+\section QmitkDiffusionImagingVisualizationSettings ODF Visualization Setting
 
 In this small view, the visualization of ODFs and diffusion images can be configured. Depending on the selected image in the data storage, different options are shown here.
 

@@ -346,18 +346,10 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
             ss << it->Index();
             l.append(ss.str());
           }
-          if (unselectedColor != NULL)
-          {
-            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-            float rgb[3];//yellow
-            rgb[0] = unselectedColor[0]; rgb[1] = unselectedColor[1]; rgb[2] = unselectedColor[2];
-            OpenGLrenderer->WriteSimpleText(l, pt2d[0] + text2dDistance, pt2d[1] + text2dDistance,rgb[0], rgb[1],rgb[2]);
-          }
-          else
-          {
-            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-            OpenGLrenderer->WriteSimpleText(l, pt2d[0] + text2dDistance, pt2d[1] + text2dDistance,0.0,1.0,0.0);
-          }
+          mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+          float rgb[3];//yellow
+          rgb[0] = unselectedColor[0]; rgb[1] = unselectedColor[1]; rgb[2] = unselectedColor[2];
+          OpenGLrenderer->WriteSimpleText(l, pt2d[0] + text2dDistance, pt2d[1] + text2dDistance,rgb[0], rgb[1],rgb[2]);
         }
 
         if((m_ShowPoints) && (scalardiff<4.0))

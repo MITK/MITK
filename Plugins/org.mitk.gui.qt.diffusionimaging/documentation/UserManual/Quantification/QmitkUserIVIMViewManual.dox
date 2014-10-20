@@ -11,21 +11,21 @@ The "neglect b<" threshold allows you to ignore b-values smaller then a threshol
 
 The exact values of the current fit are always given in the legend underneath the figure.
 
-\section QmitkDiffusionImagingUserManualInputData Region of interest analysis
+\section QmitkIVIMViewROIAnalysis Region of interest analysis
 
 Create region of interest: To create a new segmentatin, open the "quantification" perspective, select the tab "Segmentation", and create a segmentation of the structure of interest. Alternatively, of course, you may also load a binary image from file or generate your segmentation in any other possible way. 
 
 IVIM in region of interset: Go back to the "IVIM" perspective and select both, the diffusion image and the segmentation (holding the CTRL key). A red message should appear "Averaging N voxels". 
 
-\section QmitkDiffusionImagingUserManualInputData Export
+\section QmitkIVIMViewExport Export
 
 All model parameters and corresponding curves can be exported to clipboard using the buttons underneath the figure.
 
-\section QmitkDiffusionImagingUserManualInputData Advanced Settings
+\section QmitkIVIMViewAdvanced Advanced Settings
 
 Advanced users, that know what they are doing, can change the method for the model-fit under "Advanced Settings" on the very bottom of the view. 3-param fit, linear fit of f/D, and fix D* are among the options.
 
-\section QmitkDiffusionImagingUserManualInputData Suggested Readings
+\section QmitkIVIMViewReferences Suggested Readings
 
 Toward an optimal distribution of b values for intravoxel incoherent motion imaging.
 Lemke A, Stieltjes B, Schad LR, Laun FB.

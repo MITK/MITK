@@ -1,0 +1,16 @@
+/**
+\page QmitkDiffusionImagingDWIRegistrationPage DWI Registration
+
+\section QmitkDiffusionImagingUserManualDWIRegistration DWI Registration
+
+The DWI registration view allows head-motion and eddy-current correction. First the b=0 images (if more than 1) are registered and averaged. The averaged image then serves as fixed image for the alignment of the remaining (weighted, b>0) images.
+
+\imageMacro{registration_basic.png,"Basic DWI Registration Interface",8.00}
+
+In the basic settings, a selected DW image in the Data Manager is marked as Input Data and the <i> Start Head Motion Correction </i> button is enabled. If more than one DW images are selected, they will be processed in a consecutive manner. For larger sets of dw images to be processed, the <i> Advanced </i> settings can be used.
+
+\imageMacro{registration_batch.png,"Batch Processing DWI Registration Interface",8.00}
+
+Here all valid .dwi data located in the given input folder will be processed through the head motion correction and the output will be stored in the current working directory or in a custom folder if specified in the user interface. The output image will have the _MC postfix attached to the input's name.
+
+*/

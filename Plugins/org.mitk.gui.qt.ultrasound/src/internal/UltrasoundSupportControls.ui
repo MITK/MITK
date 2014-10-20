@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>410</width>
-    <height>241</height>
+    <width>307</width>
+    <height>355</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -38,6 +38,11 @@
       <bool>false</bool>
      </property>
      <widget class="QWidget" name="tab">
+      <attribute name="icon">
+       <iconset resource="../../../../Modules/USUI/resources/USUI.qrc">
+        <normaloff>:/USUI/ultrasound01-probe-300ppi.png</normaloff>
+        <normalon>:/USUI/ultrasound01-probe-300ppi.png</normalon>:/USUI/ultrasound01-probe-300ppi.png</iconset>
+      </attribute>
       <attribute name="title">
        <string>Device Management</string>
       </attribute>
@@ -55,7 +60,7 @@
               <widget class="QLabel" name="m_Headline">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <pointsize>10</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
                 </font>
@@ -87,7 +92,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>Active Ultrasound Devices:</string>
+                <string>Active Devices:</string>
                </property>
               </widget>
              </item>
@@ -118,6 +123,19 @@
             </layout>
            </widget>
           </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </widget>
        </item>
@@ -127,13 +145,16 @@
       <property name="enabled">
        <bool>false</bool>
       </property>
+      <attribute name="icon">
+       <iconset resource="../../../../Modules/USUI/resources/USUI.qrc">
+        <normaloff>:/USUI/ultrasound02-scan-300ppi.png</normaloff>
+        <disabledoff>:/USUI/ultrasound02-scan-72ppi-deactivated.png</disabledoff>
+        <disabledon>:/USUI/ultrasound02-scan-300ppi.png</disabledon>:/USUI/ultrasound02-scan-300ppi.png</iconset>
+      </attribute>
       <attribute name="title">
        <string>US Imaging</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <property name="margin">
-        <number>2</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
         <layout class="QVBoxLayout" name="probesWidgetContainer"/>
        </item>
@@ -161,70 +182,86 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="m_FreezeButton">
+        <widget class="QCheckBox" name="m_RunImageTimer">
          <property name="text">
-          <string>Freeze</string>
+          <string>Update Image Automatically</string>
          </property>
-         <property name="icon">
-          <iconset resource="../../../../Modules/USUI/resources/USUI.qrc">
-           <normaloff>:/USUI/system-lock-screen.png</normaloff>:/USUI/system-lock-screen.png</iconset>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <widget class="QWidget" name="m_TimerWidget" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QPushButton" name="m_FreezeButton">
+            <property name="text">
+             <string>Freeze</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../../../Modules/USUI/resources/USUI.qrc">
+              <normaloff>:/USUI/system-lock-screen.png</normaloff>:/USUI/system-lock-screen.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Framrate Settings:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="m_FramerateLabel">
+            <property name="text">
+             <string>Current Framerate: 0 FPS</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Framerate Limit:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="m_FrameRate">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>50</number>
+              </property>
+              <property name="value">
+               <number>30</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="m_FramerateLabel">
-         <property name="text">
-          <string>Current Framerate: 0 FPS</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Framerate Limit:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="m_FrameRate">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>50</number>
-           </property>
-           <property name="value">
-            <number>30</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </item>
       </layout>
      </widget>

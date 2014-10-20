@@ -107,6 +107,9 @@ namespace mitk {
       */
     virtual void OnFreeze(bool freeze);
 
+    /** @return Returns the current image source of this device. */
+    USImageSource::Pointer GetUSImageSource( );
+
     /**
       * \brief Getter for main Telemed API object.
       * This method is for being called by Telemed control interfaces.
@@ -150,8 +153,6 @@ namespace mitk {
       */
     USTelemedDevice(std::string manufacturer, std::string model);
     virtual ~USTelemedDevice();
-
-    USImageSource::Pointer GetUSImageSource( );
 
     void ReleaseUsgControls( );
 

@@ -69,6 +69,12 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
                corrupt or not valid the user gets an error message. If the file was loaded successfully the tools are show in the tool status widget. */
     void OnLoadTools();
 
+    /** Starts tracking if tracking is stopped / stops tracking if tracking is started. */
+    void OnStartStopTracking();
+
+    /** Connects the device if it is disconnected / disconnects the device if it is connected. */
+    void OnConnectDisconnect();
+
     /** @brief This slot connects to the device. In status "connected" configuration of the device is disabled. */
     void OnConnect();
 
@@ -121,6 +127,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     /** @brief This slot is called if the user cancels the creation of a new tool. */
     void OnAddSingleToolCanceled();
 
+    void OnTimeOut();
+
   protected slots:
 
    //help slots for enable/disable buttons
@@ -147,6 +155,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     QmitkStdMultiWidget* m_MultiWidget;
 
     bool m_tracking;    ///> bool which is true if tracking is running, false if not
+    bool m_connected;   ///> bool that is true when a tracking device is connected
     bool m_logging;     ///> bool which is true if logging is running, false if not
     int m_loggedFrames; ///> stores the current number of logged frames if logging is on
 
@@ -170,6 +179,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
    /** @brief This timer updates the IGT pipline and also the logging filter if logging is activated.*/
    QTimer* m_TrackingTimer;
+   QTimer* m_TimeoutTimer;
 
    /** Replaces the current navigation tool storage which is stored in m_toolStorage.
     *  Basically handles the microservice stuff: unregisteres the old storage, then
@@ -186,6 +196,11 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     * \brief Loads the properties of some QWidgets (and the tool storage file name) from QSettings.
     */
    void LoadUISettings();
+   /**
+    * Help method for updating the tool label
+    */
+   void UpdateToolStorageLabel(QString pathOfLoadedStorage);
+
    //members for worker thread
    QThread* m_WorkerThread;
    QmitkMITKIGTTrackingToolboxViewWorker* m_Worker;
@@ -243,11 +258,14 @@ public:
     mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource; ///> member for the source of the IGT pipeline
     mitk::TrackingDeviceData m_TrackingDeviceData; ///> stores the tracking device data as long as this is not handled by the tracking device configuration widget
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter; ///> holds the tool visualization filter (second filter of the IGT pipeline)
-    bool m_InverseMode;
+
+    //members some internal flags
+    bool m_InverseMode;     //flag that is true when the inverse mode is enabled
 
     //stores the original colors of the tracking tools
     std::map<mitk::DataNode::Pointer,mitk::Color> m_OriginalColors;
 
+    //internal methods
     void AutoDetectTools();
     void ConnectDevice();
     void StartTracking();

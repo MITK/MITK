@@ -353,7 +353,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
         ls->m_VtkTextActor->SetInput(l.c_str());
         ls->m_VtkTextActor->GetTextProperty()->SetOpacity( 100 );
 
-        float unselectedColor[4];
+        float unselectedColor[4] = {1.0, 1.0, 0.0, 1.0};
 
         //check if there is a color property
         GetDataNode()->GetColor(unselectedColor);

@@ -24,7 +24,7 @@ set(MODULE_TESTS
    mitkNavigationDataLandmarkTransformFilterTest.cpp
    mitkNavigationDataObjectVisualizationFilterTest.cpp
    mitkNavigationDataSetTest.cpp
-   mitkNavigationDataTest.cpp
+   # mitkNavigationDataTest.cpp # see bug 18306
    mitkNavigationDataRecorderTest.cpp
    mitkNavigationDataReferenceTransformFilterTest.cpp
    mitkNavigationDataSequentialPlayerTest.cpp
@@ -43,8 +43,8 @@ set(MODULE_TESTS
    mitkTrackingDeviceTest.cpp
    mitkTrackingToolTest.cpp
    mitkVirtualTrackingDeviceTest.cpp
-  #  mitkNavigationDataPlayerTest.cpp # random fails see bug 16485.
-  #  We decided to won't fix because of complete restructuring via bug 15959.
+   # mitkNavigationDataPlayerTest.cpp # random fails see bug 16485.
+   # We decided to won't fix because of complete restructuring via bug 15959.
    mitkTrackingDeviceSourceTest.cpp
    mitkTrackingDeviceSourceConfiguratorTest.cpp
    mitkNavigationDataEvaluationFilterTest.cpp

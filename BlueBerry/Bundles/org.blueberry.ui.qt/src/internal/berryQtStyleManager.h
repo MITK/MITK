@@ -50,6 +50,10 @@ public:
   Style GetDefaultStyle() const;
   void SetDefaultStyle();
 
+  void GetIconThemes(IconThemeList& iconThemes) const;
+
+  void SetIconTheme(const QString& themeName);
+
   bool Contains(const QString& fileName) const;
 
   bool IsA( const std::type_info& type ) const;
@@ -63,6 +67,8 @@ private:
 
   void SetStyle(const QString& fileName, bool update);
   void SetDefaultStyle(bool update);
+
+  void SetIconTheme(const QString& themeName, bool update);
 
   struct ExtStyle : public Style
   {

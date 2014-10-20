@@ -23,7 +23,7 @@ Optional Input:
 \section OdfMaxUserManualOutputData Output Data
 
 \li Vector field: 3D representation of the resulting peaks. Only for visualization purposes (the peaks are scaled additionally to the specified normalization to improve the visualization)!
-\li \#Directions per Voxel: Image containing the number of extracted peaks per voxel as image value.
+\li \# Directions per Voxel: Image containing the number of extracted peaks per voxel as image value.
 \li Direction Images: One image for each of the extracted peaks per voxel. Each voxel contains one direction vector as image value. Use this output for evaluation purposes of the extracted peaks.
 
 \section OdfMaxUserManualMethods Peak Extraction Methods

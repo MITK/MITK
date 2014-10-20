@@ -33,6 +33,8 @@ int mitkDWHeadMotionCorrectionTest( int argc, char* argv[] )
 
   MITK_TEST_CONDITION_REQUIRED( argc > 2, "Specify input and output.");
 
+//  itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
+
   mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage( argv[1] );
   DiffusionImageType* dwimage =
       static_cast<DiffusionImageType*>( inputImage.GetPointer() );
@@ -41,6 +43,7 @@ int mitkDWHeadMotionCorrectionTest( int argc, char* argv[] )
       mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>::New();
 
   corrfilter->SetInput( dwimage );
+  corrfilter->SetAverageUnweighted(false);
   corrfilter->Update();
 
   try

@@ -16,10 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSceneReaderV1.h"
 #include "mitkSerializerMacros.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPropertyListDeserializer.h"
 #include "mitkProgressBar.h"
+#include "mitkIOUtil.h"
 #include "Poco/Path.h"
 #include <mitkRenderingModeProperty.h>
 
@@ -248,16 +248,18 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlEleme
 
   if (dataElement)
   {
-    const char* filename( dataElement->Attribute("file") );
+    const char* filename = dataElement->Attribute("file");
     if ( filename )
     {
-      DataNodeFactory::Pointer factory = DataNodeFactory::New();
-      factory->SetFileName( workingDirectory + Poco::Path::separator() + filename );
-
       try
       {
-        factory->Update();
-        node = factory->GetOutput();
+        std::vector<BaseData::Pointer> baseData = IOUtil::Load( workingDirectory + Poco::Path::separator() + filename );
+        if (baseData.size() > 1)
+        {
+          MITK_WARN << "Discarding multiple base data results from " << filename << " except the first one.";
+        }
+        node = DataNode::New();
+        node->SetData(baseData.front());
       }
       catch (std::exception& e)
       {

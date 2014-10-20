@@ -160,9 +160,6 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::IOExtObjectFactory::GetSaveFileE
 
 void mitk::IOExtObjectFactory::CreateFileExtensionsMap()
 {
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.mitk", "MITK scene files")); //a better place to add this file ending might be the scene serialization class
-                                                                                                 //at the moment this is not done because there is a plan to restructure the
-                                                                                                 //ObjectFactories. When this is done we have to check where we want to add this file ending.
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtu", "VTK Unstructured Grid"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "VTK Unstructured Grid"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pvtu", "VTK Unstructured Grid"));

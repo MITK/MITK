@@ -105,18 +105,18 @@ int ExtractImageStatistics(int argc, char* argv[])
   if ( geometry != NULL )
   {
     const mitk::Vector3D &spacing = inputImage->GetGeometry()->GetSpacing();
-    volume = spacing[0] * spacing[1] * spacing[2] * (double) statisticsStruct.N;
+    volume = spacing[0] * spacing[1] * spacing[2] * (double) statisticsStruct.GetN();
   }
 
   // Write Results to file
   std::ofstream output;
   output.open(outFile.c_str());
-  output << statisticsStruct.Mean << " , ";
-  output << statisticsStruct.Sigma << " , ";
-  output << statisticsStruct.RMS << " , ";
-  output << statisticsStruct.Max << " , ";
-  output << statisticsStruct.Min << " , ";
-  output << statisticsStruct.N << " , ";
+  output << statisticsStruct.GetMean() << " , ";
+  output << statisticsStruct.GetSigma() << " , ";
+  output << statisticsStruct.GetRMS() << " , ";
+  output << statisticsStruct.GetMax() << " , ";
+  output << statisticsStruct.GetMin() << " , ";
+  output << statisticsStruct.GetN() << " , ";
   output << volume << "\n";
 
   output.flush();

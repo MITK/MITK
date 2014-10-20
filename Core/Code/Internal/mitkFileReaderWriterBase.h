@@ -34,7 +34,7 @@ public:
   typedef mitk::MessageAbstractDelegate1<float> ProgressCallback;
 
   FileReaderWriterBase();
-  ~FileReaderWriterBase();
+  virtual ~FileReaderWriterBase();
 
   Options GetOptions() const;
   us::Any GetOption(const std::string &name) const;

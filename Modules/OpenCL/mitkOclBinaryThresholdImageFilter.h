@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITKOCLBINARYTHRESHOLDIMAGEFILTER_H_
 
 #include "mitkOclImageToImageFilter.h"
+#include <itkObject.h>
 
 namespace mitk
 {
@@ -31,19 +32,16 @@ class OclImageToImageFilter;
   *
   * The filter requires two threshold values ( the upper and the lower threshold ) and two image values ( inside and outside ). The resulting voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
   */
-class MitkOpenCL_EXPORT OclBinaryThresholdImageFilter : public OclImageToImageFilter
+class MitkOpenCL_EXPORT OclBinaryThresholdImageFilter : public OclImageToImageFilter, public itk::Object
 {
-  typedef OclFilter Superclass;
 
 public:
+  mitkClassMacro(OclBinaryThresholdImageFilter, OclImageToImageFilter);
+  itkNewMacro(Self);
+
+
   /** Update the filter */
   void Update();
-
-  /** Constructor */
-  OclBinaryThresholdImageFilter();
-
-  /** Destructor */
-  virtual ~OclBinaryThresholdImageFilter();
 
   /** Set the lower threshold
     @param thr Threshold value
@@ -79,6 +77,13 @@ public:
   }
 
 protected:
+
+  /** Constructor */
+  OclBinaryThresholdImageFilter();
+
+  /** Destructor */
+  virtual ~OclBinaryThresholdImageFilter();
+
   /** Initialize the filter */
   bool Initialize();
 

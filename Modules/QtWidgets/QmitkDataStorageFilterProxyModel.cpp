@@ -73,7 +73,7 @@ bool QmitkDataStorageFilterProxyModel::filterAcceptsRow(int sourceRow, const QMo
 
     QModelIndex index0 = sourceModel()->index(sourceRow, 0, sourceParent);
 
-    for (FilterPredicatesCollection::iterator iter = m_Predicates.begin(); iter != m_Predicates.end(); ++iter) {
+    for (FilterPredicatesCollection::const_iterator iter = m_Predicates.begin(); iter != m_Predicates.end(); ++iter) {
         if ((*iter)->CheckNode(model->GetNode(index0))) {
             return false;
         }

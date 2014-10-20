@@ -74,6 +74,7 @@ public:
 
 int main(int argc, char** argv)
 {
+
   // Create a QApplication instance first
   QtSafeApplication qSafeApp(argc, argv);
   qSafeApp.setApplicationName("MitkDiffusion");

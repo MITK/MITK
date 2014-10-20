@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
+#include <mitkSceneFileReader.h>
 
 namespace mitk {
 
@@ -32,17 +33,20 @@ public:
   {
     m_SceneDataNodeReader.reset(new mitk::SceneDataNodeReader);
     context->RegisterService(m_SceneDataNodeReader.get());
+
+    m_SceneFileReader = new SceneFileReader();
   }
 
   void Unload(us::ModuleContext* )
   {
+    delete m_SceneFileReader;
   }
 
 private:
 
   std::auto_ptr<IDataNodeReader> m_SceneDataNodeReader;
+  mitk::SceneFileReader* m_SceneFileReader;
 };
-
 }
 
 US_EXPORT_MODULE_ACTIVATOR(MitkSceneSerialization, mitk::SceneSerializationActivator)

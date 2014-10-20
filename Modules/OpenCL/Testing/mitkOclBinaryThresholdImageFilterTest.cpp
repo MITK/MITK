@@ -60,8 +60,8 @@ int mitkOclBinaryThresholdImageFilterTest( int argc, char* argv[] )
   int outsideVal = 0;
   int insideVal = 100;
 
-  mitk::OclBinaryThresholdImageFilter* oclFilter = new mitk::OclBinaryThresholdImageFilter;
-  MITK_TEST_CONDITION_REQUIRED( oclFilter != NULL, "Filter was created. ");
+  mitk::OclBinaryThresholdImageFilter::Pointer oclFilter = mitk::OclBinaryThresholdImageFilter::New();
+  MITK_TEST_CONDITION_REQUIRED( oclFilter.GetPointer() != NULL, "Filter was created. ");
 
   oclFilter->SetInput( inputImage );
   oclFilter->SetUpperThreshold( upperThr );

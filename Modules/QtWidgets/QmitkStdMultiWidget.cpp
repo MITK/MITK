@@ -412,7 +412,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitk::Point2D offset;
   offset.Fill(0.03);
   m_LogoRendering->SetOffsetVector(offset);
-  m_LogoRendering->SetRelativeSize(0.2);
+  m_LogoRendering->SetRelativeSize(0.15);
   m_LogoRendering->SetCornerPosition(1);
   renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(),renderer4);
 
@@ -1624,6 +1624,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   mitk::Image::Pointer image;
   bool isBinary = false;
   node = this->GetTopLayerNode(nodes);
+  int component = 0;
   if(node.IsNotNull())
   {
     node->GetBoolProperty("binary",isBinary);
@@ -1637,15 +1638,18 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       if(topSourceNode.IsNotNull())
       {
         image = dynamic_cast<mitk::Image*>(topSourceNode->GetData());
+        topSourceNode->GetIntProperty("Image.Displayed Component", component);
       }
       else
       {
         image = dynamic_cast<mitk::Image*>(node->GetData());
+        node->GetIntProperty("Image.Displayed Component", component);
       }
     }
     else
     {
       image = dynamic_cast<mitk::Image*>(node->GetData());
+      node->GetIntProperty("Image.Displayed Component", component);
     }
   }
 
@@ -1662,7 +1666,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     stream.precision(2);
     stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";
     stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
-    mitk::ScalarType pixelValue = image->GetPixelValueByIndex(p, timestep);
+    mitk::ScalarType pixelValue = image->GetPixelValueByIndex(p, timestep, component);
     if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
     {
       stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<< std::scientific<< pixelValue <<"  ";
@@ -1985,6 +1989,9 @@ void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper
 void QmitkStdMultiWidget::SetDepartmentLogoPath( const char * path )
 {
   m_LogoRendering->SetLogoImagePath(path);
+  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
+  m_LogoRendering->Update(renderer);
+  RequestUpdate();
 }
 
 void QmitkStdMultiWidget::SetWidgetPlaneModeToSlicing( bool activate )

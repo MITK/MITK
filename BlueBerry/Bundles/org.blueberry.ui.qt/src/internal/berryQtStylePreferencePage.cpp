@@ -57,6 +57,7 @@ void QtStylePreferencePage::CreateQtControl(QWidget* parent)
   Update();
 
   connect(controls.m_StylesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(StyleChanged(int)));
+  connect(controls.m_IconThemeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(IconThemeChanged(int)));
   connect(controls.m_PathList, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePathListButtons()));
   connect(controls.m_AddButton, SIGNAL(clicked(bool)), this, SLOT(AddPathClicked(bool)));
   connect(controls.m_EditButton, SIGNAL(clicked(bool)), this, SLOT(EditPathClicked(bool)));
@@ -77,6 +78,27 @@ void QtStylePreferencePage::FillStyleCombo(const berry::IQtStyleManager::Style& 
   controls.m_StylesCombo->setCurrentIndex(styles.indexOf(currentStyle));
 }
 
+void QtStylePreferencePage::FillIconThemeComboBox()
+{
+  controls.m_IconThemeComboBox->clear();
+  berry::IQtStyleManager::IconThemeList iconThemes;
+  styleManager->GetIconThemes(iconThemes);
+
+  qSort(iconThemes);
+  for (int i = 0; i < iconThemes.size(); ++i)
+  {
+    controls.m_IconThemeComboBox->addItem(iconThemes.at(i).name);
+  }
+
+  QString currentTheme = QIcon::themeName();
+  if(currentTheme == QString(""))
+  {
+    currentTheme = QString("<<default>>");
+  }
+
+  controls.m_IconThemeComboBox->setCurrentIndex(iconThemes.indexOf( currentTheme ));
+}
+
 void QtStylePreferencePage::AddPath(const QString& path, bool updateCombo)
 {
   if (!controls.m_PathList->findItems(path, Qt::MatchCaseSensitive).isEmpty()) return;
@@ -93,6 +115,12 @@ void QtStylePreferencePage::StyleChanged(int /*index*/)
 {
   QString fileName = controls.m_StylesCombo->itemData(controls.m_StylesCombo->currentIndex()).toString();
   styleManager->SetStyle(fileName);
+}
+
+void QtStylePreferencePage::IconThemeChanged(int /*index*/)
+{
+  QString themeName = controls.m_IconThemeComboBox->currentText();
+  styleManager->SetIconTheme(themeName);
 }
 
 void QtStylePreferencePage::AddPathClicked(bool /*checked*/)
@@ -177,8 +205,13 @@ bool QtStylePreferencePage::PerformOk()
     QString path = controls.m_PathList->item(i)->text() + ";";
     paths += path.toStdString();
   }
-
+  QString currentTheme = QIcon::themeName();
+  if(currentTheme == QString(""))
+  {
+    currentTheme = QString("<<default>>");
+  }
   m_StylePref->Put(berry::QtPreferences::QT_STYLE_SEARCHPATHS, paths);
+  m_StylePref->Put(berry::QtPreferences::QT_ICON_THEME, currentTheme.toStdString());
   return true;
 }
 
@@ -199,11 +232,15 @@ void QtStylePreferencePage::Update()
     AddPath(it.next(), false);
   }
 
+  QString iconTheme = QString::fromStdString(m_StylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>"));
+  styleManager->SetIconTheme( iconTheme );
+
   std::string name = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
   styleManager->SetStyle(QString::fromStdString(name));
   oldStyle = styleManager->GetStyle();
 
   FillStyleCombo(oldStyle);
+  FillIconThemeComboBox();
 }
 
 }

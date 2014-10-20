@@ -153,7 +153,7 @@ void AccessPixel( const mitk::PixelType ptype, void* data, const unsigned int of
 
 }
 
-double mitk::Image::GetPixelValueByIndex(const itk::Index<3> &position, unsigned int timestep)
+double mitk::Image::GetPixelValueByIndex(const itk::Index<3> &position, unsigned int timestep, unsigned int component)
 {
   double value = 0;
   if (this->GetTimeSteps() < timestep)
@@ -184,7 +184,7 @@ double mitk::Image::GetPixelValueByIndex(const itk::Index<3> &position, unsigned
   }
   else
   {
-    const unsigned int offset = position[0] + position[1]*imageDims[0] + position[2]*imageDims[0]*imageDims[1] + timestep*imageDims[0]*imageDims[1]*imageDims[2];
+    const unsigned int offset = component + ptype.GetNumberOfComponents()*(position[0] + position[1]*imageDims[0] + position[2]*imageDims[0]*imageDims[1] + timestep*imageDims[0]*imageDims[1]*imageDims[2]);
 
     mitkPixelTypeMultiplex3( AccessPixel, ptype, this->GetData(), offset, value );
   }
@@ -192,7 +192,7 @@ double mitk::Image::GetPixelValueByIndex(const itk::Index<3> &position, unsigned
   return value;
 }
 
-double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep)
+double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep, unsigned int component)
 {
   double value = 0.0;
   if (this->GetTimeSteps() < timestep)
@@ -203,7 +203,7 @@ double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D& position
   itk::Index<3> itkIndex;
   this->GetGeometry()->WorldToIndex(position, itkIndex);
 
-  value = this->GetPixelValueByIndex( itkIndex, timestep);
+  value = this->GetPixelValueByIndex( itkIndex, timestep, component);
 
   return value;
 }

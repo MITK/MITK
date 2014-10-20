@@ -100,5 +100,5 @@ bool mitk::OclBinaryThresholdImageFilter::Initialize()
     buildErr |= CHECK_OCL_ERR( clErr );
   }
 
-  return (Superclass::IsInitialized() && buildErr );
+  return (OclFilter::IsInitialized() && buildErr );
 }

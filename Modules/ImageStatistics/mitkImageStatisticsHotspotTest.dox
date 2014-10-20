@@ -1,0 +1,107 @@
+/**
+ \defgroup hotspottestdoc mitkImageStatisticsHotspotTest
+ \section hotspotCalculationTestCases Testcases
+
+ To check the correctness of the hotspot calculation, this special class has been created, which
+ generates images with known hotspot location and statistics. A number of unit tests use this class to first generate
+ an image of known properties and then verify that \ref mitk::ImageStatisticsCalculator is able to reproduce the known statistics.
+
+ Every testcase has a defined hotspot, maximum and minimum including their corresponding index-values and mean value.
+ The XML-files to each testcase is located in Modules/ImageStatistics/Testing/Data.
+
+ This test checks the hotspot-statistics of images with a spacing[x,y,z] of [3,3,3], [4,4,3] and [5,5,5], according to common PET-resolutions.
+
+ The following cases describe situations of hotspot-calculation and their supposed results.
+
+ <b>Note:</b> Below only the behaviour of maximum is mentioned mostly, but the other statistics (minimum and mean) behave
+    in the same way like maximum.
+
+ <b> Testcase 1: No values outside of hotspot are used for statistic-calculation </b>
+
+  The purpose of this testcase is primarily to confirm the correct detection of the hotspot even if there is an global maximum
+  which is "hotter" than the mean value itself. On the other hand the test verifies that only voxels are used for statistic-calculation
+  which are located in the hotspot.
+
+   Description:
+ - Defined location of hotspot in image: left upper corner
+ - Defined location of maximum in image: bottom right corner
+ - Segmentation is not available
+
+ \image html mitkimagestatisticshotspottestcase1.jpg
+
+   Assumed results:
+ - Hotspot is calculated correctly in the left upper corner of the image
+ - Defined maximum is not inside hotspot
+ - A maximum inside the hotspot is calculated
+
+ <b> Testcase 2: Correct detection of hotspot </b>
+
+ In this testcase we want to make sure that when a segmentation is available the origin of the hotspot-sphere is located within it. The
+ image is so structured that there are two hot regions: One region inside and another one, which is hotter than the other region, outside the segmentation.
+ So we can assume that the segmentation is also considered when detecting the hotspot, even an actual hotspot outside the segmentation exists.
+
+   Description:
+ - Segmentation is available
+ - Defined location of hotspot: inside segmentation
+ - Defined location of maximum: inside hotspot
+ - Another "hotter" region outside of the segmentation
+
+ \image html mitkimagestatisticshotspottestcase2.jpg
+
+   Assumed results:
+ - Defined hotspot is correctly calculated inside segmentation
+ - Defined maximum is correctly calculated inside hotspot
+ - "Hotter" region outside of segmentation is disregarded
+
+ <b> Testcase 3: Correct calculation of statistics in hotspot, although the whole hotspot is not inside segmentation </b>
+
+ The difficulty of calculating the hotspot statistics in testcase 3 is that the origin of the hotspot is close to the segmentation-borders. So
+ if the whole hotspot is not inside the segmentation (or even the segmentation is smaller than the hotspot itself) this test checks that
+ calculation of hotspot statistics is possible anyway.
+
+   Description:
+ - Segmentation is available
+ - Defined location of hotspot: inside segmentation
+ - Defined location of maximum: outside of segmentation, but inside of hotspot
+
+ \image html mitkimagestatisticshotspottestcase3.jpg
+
+   Assumed results:
+ - Defined hotspot is correctly calculated inside segmentation
+ - Defined maximum is correctly calculated inside hotspot although it is located outside of the segmentation
+
+ <b> Testcase 4 and 5: Hotspot must (not) be  completely inside image </b>
+
+ Testcase 4 and 5 are very similar so we mention it at the same time: In testcase 4 the hotspot is not completely inside the image and just
+ voxels are considered for calculation which are located inside the image. But in testcase 5 the hotspot must be completely inside the image
+ even there is an possible hotspot-location at the borders of the image.
+
+   Description:
+ - Defined location of hotspot: At the border of the image
+ - Defined location of maximum: Inside hotspot
+ - Segmentation is not available
+
+ \image html mitkimagestatisticshotspottestcase5.jpg
+
+ Assumed results in testcase 4:
+ - Just the part of the hotspot, which is located in the image, is used for statistics-calculation
+ - Defined statistics are calculated correctly
+
+ Assumed results in testcase 5:
+ - Defined hotspot and statistics are not calculated, because hotspot is not completely inside image
+ - A hotspot, which is not as hot as the defined one but is inside the image, is calculated
+
+
+ <b> Testcase 6: Multi label mask </b>
+
+ This testcase confirms that mitkImageStatisticsCalculator has the possibility to calculate hotspot statistics even if
+ there are multiple regions of interest.
+
+   Description:
+ - Two defined regions of interest with defined statistics for each one.
+
+ \image html mitkimagestatisticshotspottestcase6.jpg
+
+   Assumed results:
+ - In every region of interest there are correctly calculated hotspot-statistics
+ */

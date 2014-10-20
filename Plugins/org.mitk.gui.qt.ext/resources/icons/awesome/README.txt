@@ -1,0 +1,1 @@
+This icon theme is based on Font Awesome by Dave Gandy - http://fontawesome.io

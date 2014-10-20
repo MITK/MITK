@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkEditorPerspective.h"
 
-void QmitkEditorPerspective::CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/)
+void QmitkEditorPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
+    std::string editorArea = layout->GetEditorArea();
 }

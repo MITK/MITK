@@ -24,7 +24,7 @@ set(MODULE_TESTS
    mitkNavigationDataLandmarkTransformFilterTest.cpp
    mitkNavigationDataObjectVisualizationFilterTest.cpp
    mitkNavigationDataSetTest.cpp
-   # mitkNavigationDataTest.cpp # see bug 18306
+   mitkNavigationDataTest.cpp
    mitkNavigationDataRecorderTest.cpp
    mitkNavigationDataReferenceTransformFilterTest.cpp
    mitkNavigationDataSequentialPlayerTest.cpp

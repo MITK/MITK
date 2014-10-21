@@ -474,7 +474,7 @@ void mitk::FiberBundleX::DoColorCodingFaBased()
         return;
 
     this->SetColorCoding(COLORCODING_FA_BASED);
-//    this->GenerateFiberIds();
+    //    this->GenerateFiberIds();
 }
 
 void mitk::FiberBundleX::DoUseFaFiberOpacity()
@@ -495,7 +495,7 @@ void mitk::FiberBundleX::DoUseFaFiberOpacity()
     }
 
     this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
-//    this->GenerateFiberIds();
+    //    this->GenerateFiberIds();
 }
 
 void mitk::FiberBundleX::ResetFiberOpacity() {
@@ -1393,6 +1393,67 @@ void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
+    UpdateColorCoding();
+    UpdateFiberGeometry();
+}
+
+void mitk::FiberBundleX::RemoveDir(vnl_vector_fixed<double,3> dir, double threshold)
+{
+    dir.normalize();
+    vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
+
+    boost::progress_display disp(m_FiberPolyData->GetNumberOfCells());
+    for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
+    {
+        ++disp ;
+        vtkCell* cell = m_FiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
+
+        // calculate curvatures
+        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+        bool discard = false;
+        for (int j=0; j<numPoints-1; j++)
+        {
+            double p1[3];
+            points->GetPoint(j, p1);
+            double p2[3];
+            points->GetPoint(j+1, p2);
+
+            vnl_vector_fixed< double, 3 > v1;
+            v1[0] = p2[0]-p1[0];
+            v1[1] = p2[1]-p1[1];
+            v1[2] = p2[2]-p1[2];
+            if (v1.magnitude()>0.001)
+            {
+                v1.normalize();
+
+                if (fabs(dot_product(v1,dir))>threshold)
+                {
+                    discard = true;
+                    break;
+                }
+            }
+        }
+        if (!discard)
+        {
+            for (int j=0; j<numPoints; j++)
+            {
+                double p1[3];
+                points->GetPoint(j, p1);
+
+                vtkIdType id = vtkNewPoints->InsertNextPoint(p1);
+                container->GetPointIds()->InsertNextId(id);
+            }
+            vtkNewCells->InsertNextCell(container);
+        }
+    }
+
+    m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+    m_FiberPolyData->SetPoints(vtkNewPoints);
+    m_FiberPolyData->SetLines(vtkNewCells);
+
     UpdateColorCoding();
     UpdateFiberGeometry();
 }

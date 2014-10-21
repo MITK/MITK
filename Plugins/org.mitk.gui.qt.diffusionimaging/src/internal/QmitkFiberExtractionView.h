@@ -84,6 +84,7 @@ protected slots:
   void ExtractPassingMask();        ///< extract all fibers passing the selected segmentation
   void ExtractNotPassingMask();     ///< extract all fibers NOT passing the selected segmentation
   void ExtractEndingInMask();       ///< extract all fibers passing the selected segmentation
+  void ExtractDir();
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name, const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
 

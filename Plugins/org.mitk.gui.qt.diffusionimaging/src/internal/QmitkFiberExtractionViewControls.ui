@@ -220,7 +220,7 @@
         </layout>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QFrame" name="frame_2">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -620,6 +620,57 @@
            </property>
            <property name="text">
             <string>NOT</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="1">
+          <widget class="QDoubleSpinBox" name="m_ExtractDirX"/>
+         </item>
+         <item row="0" column="2">
+          <widget class="QDoubleSpinBox" name="m_ExtractDirY"/>
+         </item>
+         <item row="0" column="4">
+          <widget class="QDoubleSpinBox" name="m_ExtractAngle">
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.900000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QDoubleSpinBox" name="m_ExtractDirZ"/>
+         </item>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="m_ExtractDirBox">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QCommandLinkButton" name="m_ExtractDirButton">
+           <property name="text">
+            <string>CommandLinkButton</string>
            </property>
           </widget>
          </item>

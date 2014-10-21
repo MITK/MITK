@@ -145,8 +145,8 @@ public:
     // Swap X and Y for partial overlapping registration
     aICP->SetMovingSurface(m_MovingSurface);
     aICP->SetFixedSurface(m_FixedSurface);
-    aICP->SetCovarianceMatricesMovingSurface(m_SigmasFixedSurface);
-    aICP->SetCovarianceMatricesFixedSurface(m_SigmasMovingSurface);
+    aICP->SetCovarianceMatricesMovingSurface(m_SigmasMovingSurface);
+    aICP->SetCovarianceMatricesFixedSurface(m_SigmasFixedSurface);
     aICP->SetFRENormalizationFactor(m_FRENormalizationFactor);
     aICP->SetThreshold(0.000001);
     aICP->SetTrimmFactor(0.50);

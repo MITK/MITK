@@ -664,8 +664,8 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 #endif
 
         m_Controls->m_OpacitySlider->setRange(0.0,1.0);
-        m_Controls->m_OpacitySlider->setLowerValue(0.0);
-        m_Controls->m_OpacitySlider->setUpperValue(0.0);
+        m_Controls->m_OpacitySlider->setMinimumValue(0.0);
+        m_Controls->m_OpacitySlider->setMaximumValue(0.0);
 
         m_Controls->m_ScalingFrame->setVisible(false);
         m_Controls->m_NormalizationFrame->setVisible(false);

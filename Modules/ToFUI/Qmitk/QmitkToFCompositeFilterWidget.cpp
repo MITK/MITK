@@ -16,9 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkToFCompositeFilterWidget.h>
 
-//QT headers
-#include <QPlastiqueStyle>
-
 #include <mitkProperties.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
@@ -46,16 +43,12 @@ void QmitkToFCompositeFilterWidget::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkToFCompositeFilterWidgetControls;
     m_Controls->setupUi(parent);
 
-    QPlastiqueStyle *sliderStyle = new QPlastiqueStyle();
-
     int min = m_Controls->m_ThresholdFilterMinValueSpinBox->value();
     int max = m_Controls->m_ThresholdFilterMaxValueSpinBox->value();
     m_Controls->m_ThresholdFilterRangeSlider->setMinimum(min);
     m_Controls->m_ThresholdFilterRangeSlider->setMaximum(max);
-    m_Controls->m_ThresholdFilterRangeSlider->setLowerValue(min);
-    m_Controls->m_ThresholdFilterRangeSlider->setUpperValue(max);
-    m_Controls->m_ThresholdFilterRangeSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
-    m_Controls->m_ThresholdFilterRangeSlider->setStyle(sliderStyle);
+    m_Controls->m_ThresholdFilterRangeSlider->setMinimumValue(min);
+    m_Controls->m_ThresholdFilterRangeSlider->setMaximumValue(max);
     this->CreateConnections();
 
     this->OnShowAdvancedOptionsCheckboxChecked(false);
@@ -171,24 +164,24 @@ void QmitkToFCompositeFilterWidget::OnAverageFilterCheckBoxChecked(bool checked)
 
 void QmitkToFCompositeFilterWidget::OnShowAdvancedOptionsCheckboxChecked(bool checked)
 {
-  this->m_Controls->m_AverageFilterCheckBox->setShown(checked);
-  this->m_Controls->m_BilateralFilterCheckBox->setShown(checked);
-  this->m_Controls->m_BilateralFilterDomainSigmaSpinBox->setShown(checked);
-  this->m_Controls->m_BilateralFilterKernelRadiusSpinBox->setShown(checked);
-  this->m_Controls->m_BilateralFilterRangeSigmaSpinBox->setShown(checked);
-  this->m_Controls->m_MedianFilterCheckBox->setShown(checked);
-  this->m_Controls->m_TemporalMedianFilterCheckBox->setShown(checked);
-  this->m_Controls->m_TemporalMedianFilterNumOfFramesSpinBox->setShown(checked);
-  this->m_Controls->m_ThresholdFilterCheckBox->setShown(checked);
-  this->m_Controls->m_ThresholdFilterMaxValueSpinBox->setShown(checked);
-  this->m_Controls->m_ThresholdFilterMinValueSpinBox->setShown(checked);
-  this->m_Controls->m_ThresholdFilterRangeSlider->setShown(checked);
-  this->m_Controls->m_ThresholdFilterRangeSliderReset->setShown(checked);
-  this->m_Controls->label_3->setShown(checked);
-  this->m_Controls->label_4->setShown(checked);
-  this->m_Controls->label_12->setShown(checked);
-  this->m_Controls->maskImageComboBox->setShown(checked);
-  this->m_Controls->maskSegmentationCheckBox->setShown(checked);
+  this->m_Controls->m_AverageFilterCheckBox->setVisible(checked);
+  this->m_Controls->m_BilateralFilterCheckBox->setVisible(checked);
+  this->m_Controls->m_BilateralFilterDomainSigmaSpinBox->setVisible(checked);
+  this->m_Controls->m_BilateralFilterKernelRadiusSpinBox->setVisible(checked);
+  this->m_Controls->m_BilateralFilterRangeSigmaSpinBox->setVisible(checked);
+  this->m_Controls->m_MedianFilterCheckBox->setVisible(checked);
+  this->m_Controls->m_TemporalMedianFilterCheckBox->setVisible(checked);
+  this->m_Controls->m_TemporalMedianFilterNumOfFramesSpinBox->setVisible(checked);
+  this->m_Controls->m_ThresholdFilterCheckBox->setVisible(checked);
+  this->m_Controls->m_ThresholdFilterMaxValueSpinBox->setVisible(checked);
+  this->m_Controls->m_ThresholdFilterMinValueSpinBox->setVisible(checked);
+  this->m_Controls->m_ThresholdFilterRangeSlider->setVisible(checked);
+  this->m_Controls->m_ThresholdFilterRangeSliderReset->setVisible(checked);
+  this->m_Controls->label_3->setVisible(checked);
+  this->m_Controls->label_4->setVisible(checked);
+  this->m_Controls->label_12->setVisible(checked);
+  this->m_Controls->maskImageComboBox->setVisible(checked);
+  this->m_Controls->maskSegmentationCheckBox->setVisible(checked);
 }
 
 void QmitkToFCompositeFilterWidget::OnThresholdFilterCheckBoxChecked(bool checked)
@@ -242,13 +235,13 @@ void QmitkToFCompositeFilterWidget::OnBilateralFilterKernelRadiusSpinBoxValueCha
 
 void QmitkToFCompositeFilterWidget::OnThresholdFilterMinValueChanged(int value)
 {
-  m_Controls->m_ThresholdFilterRangeSlider->setLowerValue(value);
+  m_Controls->m_ThresholdFilterRangeSlider->setMinimumValue(value);
   SetThresholdFilterParameter();
 }
 
 void QmitkToFCompositeFilterWidget::OnThresholdFilterMaxValueChanged(int value)
 {
-  m_Controls->m_ThresholdFilterRangeSlider->setUpperValue(value);
+  m_Controls->m_ThresholdFilterRangeSlider->setMaximumValue(value);
   SetThresholdFilterParameter();
 }
 
@@ -270,8 +263,8 @@ void QmitkToFCompositeFilterWidget::SetBilateralFilterParameter()
 
 void QmitkToFCompositeFilterWidget::OnSpanChanged(int lower, int upper)
 {
-  int lowerVal =  m_Controls->m_ThresholdFilterRangeSlider->lowerValue();
-  int upperVal =  m_Controls->m_ThresholdFilterRangeSlider->upperValue();
+  int lowerVal =  m_Controls->m_ThresholdFilterRangeSlider->minimumValue();
+  int upperVal =  m_Controls->m_ThresholdFilterRangeSlider->maximumValue();
 
   m_Controls->m_ThresholdFilterMinValueSpinBox->setValue(lowerVal);
   m_Controls->m_ThresholdFilterMaxValueSpinBox->setValue(upperVal);
@@ -282,8 +275,8 @@ void QmitkToFCompositeFilterWidget::OnResetThresholdFilterRangeSlider()
   int lower =  1;
   int upper =  7000;
 
-  m_Controls->m_ThresholdFilterRangeSlider->setLowerValue(lower);
-  m_Controls->m_ThresholdFilterRangeSlider->setUpperValue(upper);
+  m_Controls->m_ThresholdFilterRangeSlider->setMinimumValue(lower);
+  m_Controls->m_ThresholdFilterRangeSlider->setMaximumValue(upper);
 
   m_Controls->m_ThresholdFilterMinValueSpinBox->setValue(lower);
   m_Controls->m_ThresholdFilterMaxValueSpinBox->setValue(upper);

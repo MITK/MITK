@@ -290,7 +290,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     QString newname;
     newname = newname.append(nodename.c_str());
     newname = newname.append("_DWI");
-    node->SetName(newname.toAscii());
+    node->SetName(newname.toLatin1());
 
 
     GetDefaultDataStorage()->Add(node);
@@ -472,21 +472,21 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     m_Controls->m_UpperLabel->setText(upper);
     m_Controls->m_LowerLabel->setText(lower);
 
-    QGraphicsScene* scene = new QGraphicsScene;
-    QGraphicsScene* scene2 = new QGraphicsScene;
-
-
     QPixmap pixmap(QPixmap::fromImage(qImage));
-    QGraphicsPixmapItem *item = new QGraphicsPixmapItem( pixmap, 0, scene);
-    item->scale(10.0, 3.0);
+    QGraphicsPixmapItem *item = new QGraphicsPixmapItem(pixmap);
+    item->setTransform(QTransform::fromScale(10.0, 3.0), true);
 
     QPixmap pixmap2(QPixmap::fromImage(legend));
-    QGraphicsPixmapItem *item2 = new QGraphicsPixmapItem( pixmap2, 0, scene2);
-    item2->scale(20.0, 1.0);
+    QGraphicsPixmapItem *item2 = new QGraphicsPixmapItem(pixmap2);
+    item2->setTransform(QTransform::fromScale(20.0, 1.0), true);
 
     m_Controls->m_PerSliceView->SetResidualPixmapItem(item);
 
+    QGraphicsScene* scene = new QGraphicsScene;
+    QGraphicsScene* scene2 = new QGraphicsScene;
 
+    scene->addItem(item);
+    scene2->addItem(item2);
 
     m_Controls->m_PerSliceView->setScene(scene);
     m_Controls->m_LegendView->setScene(scene2);
@@ -543,7 +543,7 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
 
             // TENSOR RECONSTRUCTION
             MITK_INFO << "Tensor reconstruction with correction for negative eigenvalues";
-            mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Tensor reconstruction for %s", nodename.c_str()).toAscii());
+            mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Tensor reconstruction for %s", nodename.c_str()).toLatin1());
 
             typedef itk::TensorReconstructionWithEigenvalueCorrectionFilter< DiffusionPixelType, TTensorPixelType > ReconstructionFilter;
 
@@ -604,7 +604,7 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
             ++itemiter;
         }
 
-        mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toAscii());
+        mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toLatin1());
         m_MultiWidget->RequestUpdate();
     }
     catch (itk::ExceptionObject &ex)
@@ -642,7 +642,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
             // TENSOR RECONSTRUCTION
             clock.Start();
             MITK_DEBUG << "Tensor reconstruction ";
-            mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Tensor reconstruction for %s", nodename.c_str()).toAscii());
+            mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Tensor reconstruction for %s", nodename.c_str()).toLatin1());
             typedef itk::DiffusionTensor3DReconstructionImageFilter<
                     DiffusionPixelType, DiffusionPixelType, TTensorPixelType > TensorReconstructionImageFilterType;
             TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter =
@@ -713,7 +713,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
             ++itemiter;
         }
 
-        mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toAscii());
+        mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toLatin1());
         m_MultiWidget->RequestUpdate();
     }
     catch (itk::ExceptionObject &ex)
@@ -930,7 +930,7 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
             clock.Start();
             MBI_INFO << "DWI Estimation ";
             mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
-                                                            "DWI Estimation for %s", nodename.c_str()).toAscii());
+                                                            "DWI Estimation for %s", nodename.c_str()).toLatin1());
             FilterType::Pointer filter = FilterType::New();
             filter->SetInput( itkvol );
             filter->SetBValue(bVal);
@@ -957,7 +957,7 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
         }
 
 
-        mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toAscii());
+        mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toLatin1());
         m_MultiWidget->RequestUpdate();
 
     }

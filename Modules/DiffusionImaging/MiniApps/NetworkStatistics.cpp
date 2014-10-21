@@ -70,9 +70,9 @@ int NetworkStatistics(int argc, char* argv[])
   bool binaryConnectivity( false );
   bool rescaleConnectivity( false );
   bool createConnectivityMatriximage( false );
-  unsigned int granularity( 1 );
+  int granularity( 1 );
   double startDensity( 1.0 );
-  unsigned int thresholdStepSize( 3 );
+  int thresholdStepSize( 3 );
 
 
   // parse command line arguments
@@ -124,11 +124,11 @@ int NetworkStatistics(int argc, char* argv[])
   if (parsedArgs.count("createConnectivityMatriximage"))
     createConnectivityMatriximage = us::any_cast<bool>(parsedArgs["createConnectivityMatriximage"]);
   if (parsedArgs.count("granularity"))
-    granularity = us::any_cast<unsigned int>(parsedArgs["granularity"]);
+    granularity = us::any_cast<int>(parsedArgs["granularity"]);
   if (parsedArgs.count("startDensity"))
     startDensity = us::any_cast<float>(parsedArgs["startDensity"]);
   if (parsedArgs.count("thresholdStepSize"))
-    thresholdStepSize = us::any_cast<unsigned int>(parsedArgs["thresholdStepSize"]);
+    thresholdStepSize = us::any_cast<int>(parsedArgs["thresholdStepSize"]);
 
   try
   {

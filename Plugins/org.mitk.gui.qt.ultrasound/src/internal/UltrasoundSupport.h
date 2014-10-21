@@ -112,7 +112,7 @@ protected:
 
   /** The old geometry of m_Image. It is needed to check if the geometry changed (e.g. because
    *  the zoom factor was modified) and the image needs to be reinitialized. */
-  mitk::Geometry3D::Pointer m_OldGeometry;
+  mitk::SlicedGeometry3D::Pointer m_OldGeometry;
 
   Ui::UltrasoundSupportControls m_Controls;
 

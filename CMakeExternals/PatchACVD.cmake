@@ -1,3 +1,11 @@
+if(DESIRED_QT_VERSION MATCHES "5")
+  set(path "CMakeLists.txt")
+  file(STRINGS ${path} contents NEWLINE_CONSUME)
+  string(REPLACE "find_package(VTK" "find_package(Qt5Widgets REQUIRED)\nfind_package(VTK" contents ${contents})
+  set(CONTENTS ${contents})
+  configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+endif()
+
 # Create <name>Config.cmake file to make ACVD findable through config mode of find_package()
 
 file(WRITE "ACVDConfig.cmake.in"

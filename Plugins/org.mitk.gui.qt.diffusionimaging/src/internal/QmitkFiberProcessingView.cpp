@@ -206,13 +206,14 @@ void QmitkFiberProcessingView::UpdateGui()
     // are fiber bundles selected?
     if ( m_SelectedFB.empty() )
     {
-        if (m_SelectedSurfaces.size()>0)
+        if (m_SelectedSurfaces.size()>0 )
             m_Controls->m_MirrorFibersButton->setEnabled(true);
         else
             m_Controls->m_MirrorFibersButton->setEnabled(false);
     }
     else
     {
+        m_Controls->m_MirrorFibersButton->setEnabled(true);
         if (m_SelectedImage.IsNotNull())
             m_Controls->m_FaColorFibersButton->setEnabled(true);
     }

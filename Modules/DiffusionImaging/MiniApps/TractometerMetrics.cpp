@@ -93,6 +93,7 @@ int TractometerMetrics(int argc, char* argv[])
         std::vector< bool > detected;
         std::vector< std::pair< int, int > > labelsvector;
         std::vector< ItkUcharImgType::Pointer > bundleMasks;
+        std::vector< ItkUcharImgType::Pointer > bundleMasksCoverage;
         short max = 0;
         for (unsigned int i=0; i<labelpairs.size()-1; i+=2)
         {
@@ -109,13 +110,25 @@ int TractometerMetrics(int argc, char* argv[])
             labelsvector.push_back(l);
             detected.push_back(false);
 
-            mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(path+"/Bundle"+boost::lexical_cast<string>(labelsvector.size())+"_MASK.nrrd")->GetData());
-            typedef mitk::ImageToItk< ItkUcharImgType > CasterType;
-            CasterType::Pointer caster = CasterType::New();
-            caster->SetInput(img);
-            caster->Update();
-            ItkUcharImgType::Pointer bundle = caster->GetOutput();
-            bundleMasks.push_back(bundle);
+            {
+                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(path+"/Bundle"+boost::lexical_cast<string>(labelsvector.size())+"_MASK.nrrd")->GetData());
+                typedef mitk::ImageToItk< ItkUcharImgType > CasterType;
+                CasterType::Pointer caster = CasterType::New();
+                caster->SetInput(img);
+                caster->Update();
+                ItkUcharImgType::Pointer bundle = caster->GetOutput();
+                bundleMasks.push_back(bundle);
+            }
+
+            {
+                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(path+"/Bundle"+boost::lexical_cast<string>(labelsvector.size())+"_MASK_COVERAGE.nrrd")->GetData());
+                typedef mitk::ImageToItk< ItkUcharImgType > CasterType;
+                CasterType::Pointer caster = CasterType::New();
+                caster->SetInput(img);
+                caster->Update();
+                ItkUcharImgType::Pointer bundle = caster->GetOutput();
+                bundleMasksCoverage.push_back(bundle);
+            }
         }
         vnl_matrix< unsigned char > matrix; matrix.set_size(max, max); matrix.fill(0);
 
@@ -324,9 +337,9 @@ int TractometerMetrics(int argc, char* argv[])
         while(!it.IsAtEnd())
         {
             bool wm = false;
-            for (unsigned int i=0; i<bundleMasks.size(); i++)
+            for (unsigned int i=0; i<bundleMasksCoverage.size(); i++)
             {
-                ItkUcharImgType::Pointer bundle = bundleMasks.at(i);
+                ItkUcharImgType::Pointer bundle = bundleMasksCoverage.at(i);
                 if (bundle->GetPixel(it.GetIndex())>0)
                 {
                     wm = true;
@@ -371,6 +384,12 @@ int TractometerMetrics(int argc, char* argv[])
             sens.append(",");
 
             sens.append(boost::lexical_cast<string>(nc));
+            sens.append(",");
+
+            sens.append(boost::lexical_cast<string>(vc));
+            sens.append(",");
+
+            sens.append(boost::lexical_cast<string>(ic));
             sens.append(",");
 
             sens.append(boost::lexical_cast<string>(validBundles));

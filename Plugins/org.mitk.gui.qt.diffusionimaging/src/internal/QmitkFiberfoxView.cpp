@@ -1253,8 +1253,8 @@ void QmitkFiberfoxView::LoadParameters()
                 mitk::TensorModel<>* model = dynamic_cast<mitk::TensorModel<>*>(signalModel);
                 m_Controls->m_TensorWidget1->SetT2(model->GetT2());
                 m_Controls->m_TensorWidget1->SetD1(model->GetDiffusivity1());
-                m_Controls->m_TensorWidget1->SetD2(model->GetDiffusivity1());
-                m_Controls->m_TensorWidget1->SetD3(model->GetDiffusivity1());
+                m_Controls->m_TensorWidget1->SetD2(model->GetDiffusivity2());
+                m_Controls->m_TensorWidget1->SetD3(model->GetDiffusivity3());
                 m_Controls->m_Compartment1Box->setCurrentIndex(2);
                 break;
             }
@@ -1286,8 +1286,8 @@ void QmitkFiberfoxView::LoadParameters()
                 mitk::TensorModel<>* model = dynamic_cast<mitk::TensorModel<>*>(signalModel);
                 m_Controls->m_TensorWidget2->SetT2(model->GetT2());
                 m_Controls->m_TensorWidget2->SetD1(model->GetDiffusivity1());
-                m_Controls->m_TensorWidget2->SetD2(model->GetDiffusivity1());
-                m_Controls->m_TensorWidget2->SetD3(model->GetDiffusivity1());
+                m_Controls->m_TensorWidget2->SetD2(model->GetDiffusivity2());
+                m_Controls->m_TensorWidget2->SetD3(model->GetDiffusivity3());
                 m_Controls->m_Compartment2Box->setCurrentIndex(3);
                 break;
             }

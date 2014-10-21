@@ -305,6 +305,9 @@
       </item>
       <item row="10" column="1">
        <widget class="QDoubleSpinBox" name="m_FiberErrorBox">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="toolTip">
          <string>Maximum error in mm.</string>
         </property>

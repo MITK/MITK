@@ -297,6 +297,13 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls = new Ui::QmitkFiberfoxViewControls;
         m_Controls->setupUi( parent );
 
+        // commented out
+        m_Controls->m_DiffusionDirectionBox->setVisible(false);
+        m_Controls->label_3->setVisible(false);
+        m_Controls->m_SeparationAngleBox->setVisible(false);
+        m_Controls->label_4->setVisible(false);
+        //
+
         m_Controls->m_StickWidget1->setVisible(true);
         m_Controls->m_StickWidget2->setVisible(false);
         m_Controls->m_ZeppelinWidget1->setVisible(false);

@@ -77,12 +77,19 @@ void QmitkPointListModel::ObserveNewPointSet( mitk::DataNode* pointSetNode )
   //remove old observers
   if (m_PointSetNode != NULL)
   {
-    mitk::PointSet::Pointer oldPointSet = dynamic_cast<mitk::PointSet*>(m_PointSetNode->GetData());
-    if (oldPointSet.IsNotNull())
-    {
-      oldPointSet->RemoveObserver(m_PointSetModifiedObserverTag);
-      oldPointSet->RemoveObserver(m_PointSetDeletedObserverTag);
-    }
+    try //here sometimes an exception is thrown which leads to a crash. So catch this exception but give an error message. See bug 18316 for details.
+      {
+      mitk::PointSet::Pointer oldPointSet = dynamic_cast<mitk::PointSet*>(m_PointSetNode->GetData());
+      if (oldPointSet.IsNotNull())
+        {
+        oldPointSet->RemoveObserver(m_PointSetModifiedObserverTag);
+        oldPointSet->RemoveObserver(m_PointSetDeletedObserverTag);
+        }
+      }
+    catch(std::exception& e)
+      {
+        MITK_ERROR << "Exception while removing observer from old point set node: " << e.what();
+      }
   }
 
   //get the new pointset

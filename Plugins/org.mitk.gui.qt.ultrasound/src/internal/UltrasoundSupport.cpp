@@ -83,7 +83,7 @@ m_Node->SetName("US Support Viewing Stream");
 //create a dummy image (gray values 0..255) for correct initialization of level window, etc.
 mitk::Image::Pointer dummyImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 1, 1, 1, 255,0);
 m_Node->SetData(dummyImage);
-m_OldGeometry = dynamic_cast<mitk::Geometry3D*>(dummyImage->GetGeometry());
+m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(dummyImage->GetGeometry());
 }
 
 m_Controls.tabWidget->setTabEnabled(1, false);
@@ -124,7 +124,7 @@ if(m_Controls.m_ShowImageStream->isChecked())
     }
     m_CurrentImageWidth = curOutput->GetDimension(0);
     m_CurrentImageHeight = curOutput->GetDimension(1);
-    m_OldGeometry = dynamic_cast<mitk::Geometry3D*>(curOutput->GetGeometry());
+    m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(curOutput->GetGeometry());
   }
   //if not: only update the view
   else

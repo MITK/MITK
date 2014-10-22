@@ -121,18 +121,24 @@ mitk::SurfaceInterpolationController* mitk::SurfaceInterpolationController::GetI
 
 void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer newContour)
 {
-  ContourPositionInformation contourInfo = CreateContourPositionInformation(newContour);
-  this->AddToInterpolationPipeline(contourInfo);
+  if( newContour->GetVtkPolyData()->GetNumberOfPoints() > 0)
+  {
+    ContourPositionInformation contourInfo = CreateContourPositionInformation(newContour);
+    this->AddToInterpolationPipeline(contourInfo);
 
-  this->Modified();
+    this->Modified();
+  }
 }
 
 void mitk::SurfaceInterpolationController::AddNewContours(std::vector<mitk::Surface::Pointer> newContours)
 {
   for (unsigned int i = 0; i < newContours.size(); ++i)
   {
-    ContourPositionInformation contourInfo = CreateContourPositionInformation(newContours.at(i));
-    this->AddToInterpolationPipeline(contourInfo);
+    if( newContours.at(i)->GetVtkPolyData()->GetNumberOfPoints() > 0)
+    {
+      ContourPositionInformation contourInfo = CreateContourPositionInformation(newContours.at(i));
+      this->AddToInterpolationPipeline(contourInfo);
+    }
   }
   this->Modified();
 }

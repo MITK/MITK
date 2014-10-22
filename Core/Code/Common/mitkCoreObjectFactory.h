@@ -135,8 +135,11 @@ private:
   void RegisterLegacyReaders(mitk::CoreObjectFactoryBase* factory);
   void RegisterLegacyWriters(mitk::CoreObjectFactoryBase* factory);
 
-  std::list< mitk::LegacyFileReaderService* > m_LegacyReaders;
-  std::list< mitk::LegacyFileWriterService* > m_LegacyWriters;
+  void UnRegisterLegacyReaders(mitk::CoreObjectFactoryBase* factory);
+  void UnRegisterLegacyWriters(mitk::CoreObjectFactoryBase* factory);
+
+  std::map<mitk::CoreObjectFactoryBase*, std::list<mitk::LegacyFileReaderService*> > m_LegacyReaders;
+  std::map<mitk::CoreObjectFactoryBase*, std::list<mitk::LegacyFileWriterService*> > m_LegacyWriters;
 
 };
 

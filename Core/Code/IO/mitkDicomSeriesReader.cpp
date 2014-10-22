@@ -1566,10 +1566,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       std::string patientName = "NoName";
       if(node.GetProperty("dicom.patient.PatientsName"))
         patientName = node.GetProperty("dicom.patient.PatientsName")->GetValueAsString();
-      else if(node.GetProperty("dicom.series.SeriesDescription"))
-        patientName = node.GetProperty("dicom.series.SeriesDescription")->GetValueAsString();
-      else if(node.GetProperty("dicom.study.StudyDescription"))
-        patientName = node.GetProperty("dicom.study.StudyDescription")->GetValueAsString();
 
       node.SetData( image );
       node.SetName(patientName);

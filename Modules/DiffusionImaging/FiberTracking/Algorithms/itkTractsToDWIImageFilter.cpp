@@ -510,7 +510,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         minSpacing = m_UpsampledSpacing[2];
     m_FiberBundleWorkingCopy = m_FiberBundle->GetDeepCopy();
     double volumeAccuracy = 10;
-    m_FiberBundleWorkingCopy->ResampleFibers(minSpacing/volumeAccuracy);
+    m_FiberBundleWorkingCopy->ResampleLinear(minSpacing/volumeAccuracy);
     double mmRadius = m_Parameters.m_SignalGen.m_AxonRadius/1000;
     if (mmRadius>0)
         segmentVolume = M_PI*mmRadius*mmRadius*minSpacing/volumeAccuracy;

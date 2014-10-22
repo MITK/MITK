@@ -74,18 +74,21 @@ public:
     void DoUseFaFiberOpacity();
     void ResetFiberOpacity();
 
-    // fiber smoothing/resampling
-    void CompressFibers(float error = 0.0);
-    void ResampleFibers(float pointDistance = 1);
-    void DoFiberSmoothing(float pointDistance);
-    void DoFiberSmoothing(float pointDistance, double tension, double continuity, double bias );
+    // fiber compression
+    void Compress(float error = 0.0);
+
+    // fiber resampling
+    void ResampleLinear(float pointDistance = 1);
+    void ResampleSpline(float pointDistance=1);
+    void ResampleSpline(float pointDistance, double tension, double continuity, double bias );
+
     bool RemoveShortFibers(float lengthInMM);
     bool RemoveLongFibers(float lengthInMM);
     bool ApplyCurvatureThreshold(float minRadius, bool deleteFibers);
     void MirrorFibers(unsigned int axis);
     void RotateAroundAxis(double x, double y, double z);
     void TranslateFibers(double x, double y, double z);
-    void ScaleFibers(double x, double y, double z);
+    void ScaleFibers(double x, double y, double z, bool subtractCenter=true);
     void TransformFibers(double rx, double ry, double rz, double tx, double ty, double tz);
     itk::Point<float, 3> TransformPoint(vnl_vector_fixed< double, 3 > point, double rx, double ry, double rz, double tx, double ty, double tz);
     itk::Matrix< double, 3, 3 > TransformMatrix(itk::Matrix< double, 3, 3 > m, double rx, double ry, double rz);

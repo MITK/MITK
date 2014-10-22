@@ -42,7 +42,7 @@ int FiberExtraction(int argc, char* argv[])
     parser.setDescription("");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::String, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
     parser.addArgument("out", "o", ctkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
     parser.addArgument("planfirgure1", "pf1", ctkCommandLineParser::String, "Figure 1:", "first ROI", us::Any(), false);
     parser.addArgument("planfirgure2", "pf2", ctkCommandLineParser::String, "Figure 2:", "second ROI", us::Any());

@@ -504,7 +504,7 @@ void QmitkFiberProcessingView::ResampleSelectedBundles()
     for (int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        fib->DoFiberSmoothing(factor);
+        fib->ResampleSpline(factor);
     }
     GenerateStats();
     RenderingManager::GetInstance()->RequestUpdateAll();
@@ -516,7 +516,7 @@ void QmitkFiberProcessingView::CompressSelectedBundles()
     for (int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        fib->CompressFibers(factor);
+        fib->Compress(factor);
     }
     GenerateStats();
     RenderingManager::GetInstance()->RequestUpdateAll();

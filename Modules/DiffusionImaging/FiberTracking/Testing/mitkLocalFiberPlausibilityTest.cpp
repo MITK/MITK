@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkCompareImageDataFilter.h>
 #include <mitkFiberBundleXWriter.h>
+#include <mitkCoreObjectFactory.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -138,22 +139,33 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         mitk::Image::Pointer gtNumTestDirImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(LDFP_NUM_DIRECTIONS)->GetData());
         mitk::FiberBundleX::Pointer gtTestDirections = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(LDFP_VECTOR_FIELD)->GetData());
 
-//        if (!mitk::Equal(gtNumTestDirImage, mitkNumDirImage, 0.1, true))
-//        {
-//            MITK_INFO << "SAVING FILES TO " << mitk::IOUtil::GetTempPath();
-////            std::string out1 = mitk::IOUtil::GetTempPath().append("test.nrrd");
-////            std::string out2 = mitk::IOUtil::GetTempPath().append("reference.nrrd");
+        if (!testDirections->Equals(gtTestDirections))
+        {
+            MITK_INFO << "SAVING FILES TO " << mitk::IOUtil::GetTempPath();
+//            std::string out1 = mitk::IOUtil::GetTempPath().append("test.nrrd");
+//            std::string out2 = mitk::IOUtil::GetTempPath().append("reference.nrrd");
 
-////            mitk::FiberBundleXWriter::Pointer fibWriter = mitk::FiberBundleXWriter::New();
-////            fibWriter->SetFileName(out1.c_str());
-////            fibWriter->DoWrite(testDirections.GetPointer());
+            mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
+            for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
+            {
+                if ( (*it)->CanWriteBaseDataType(testDirections.GetPointer()) ) {
+                    (*it)->SetFileName( (mitk::IOUtil::GetTempPath()+"test.fib").c_str() );
+                    (*it)->DoWrite( testDirections.GetPointer() );
+                }
+            }
 
-////            fibWriter->SetFileName(out2.c_str());
-////            fibWriter->DoWrite(gtTestDirections.GetPointer());
+            for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
+            {
+                if ( (*it)->CanWriteBaseDataType(gtTestDirections.GetPointer()) ) {
+                    (*it)->SetFileName( "/local/gt.fib" );
+                    (*it)->DoWrite( gtTestDirections.GetPointer() );
+                }
+            }
+
 //            mitk::IOUtil::SaveBaseData(mitkNumDirImage, mitk::IOUtil::GetTempPath()+"testImage.nrrd");
 //            mitk::IOUtil::SaveBaseData(gtNumTestDirImage, mitk::IOUtil::GetTempPath()+"refImage.nrrd");
-//            return EXIT_FAILURE;
-//        }
+            return EXIT_FAILURE;
+        }
 
         MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImageIgnore, mitkAngularErrorImageIgnore, 0.01, true), "Check if error images are equal (ignored missing directions).");
         MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImage, mitkAngularErrorImage, 0.01, true), "Check if error images are equal.");

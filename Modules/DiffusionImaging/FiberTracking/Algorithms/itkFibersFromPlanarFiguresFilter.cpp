@@ -229,7 +229,7 @@ void FibersFromPlanarFiguresFilter::GenerateData()
         fiberPolyData->SetPoints(m_VtkPoints);
         fiberPolyData->SetLines(m_VtkCellArray);
         mitk::FiberBundleX::Pointer mitkFiberBundle = mitk::FiberBundleX::New(fiberPolyData);
-        mitkFiberBundle->DoFiberSmoothing(m_Parameters.m_Sampling, m_Parameters.m_Tension, m_Parameters.m_Continuity, m_Parameters.m_Bias);
+        mitkFiberBundle->ResampleSpline(m_Parameters.m_Sampling, m_Parameters.m_Tension, m_Parameters.m_Continuity, m_Parameters.m_Bias);
         m_FiberBundles.push_back(mitkFiberBundle);
     }
 }

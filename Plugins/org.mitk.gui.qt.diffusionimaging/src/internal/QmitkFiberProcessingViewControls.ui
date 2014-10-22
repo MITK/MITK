@@ -615,7 +615,7 @@
       <item row="2" column="1">
        <widget class="QDoubleSpinBox" name="m_PeakThreshold">
         <property name="toolTip">
-         <string>Directions shorter than the defined threshold are discarded. The threshold is applied before normalizing the vectors (if enebaled).</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Directions shorter than the defined threshold are discarded.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="decimals">
          <number>3</number>
@@ -696,7 +696,7 @@
       <item row="3" column="0">
        <widget class="QCheckBox" name="m_NormalizeDirectionsBox">
         <property name="toolTip">
-         <string>Normalize output directions to length 1 otherwise directions are max normalized (voxel-wise),</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Normalize output directions to length 1 otherwise directions are max normalized (voxel-wise).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Normalize directions</string>

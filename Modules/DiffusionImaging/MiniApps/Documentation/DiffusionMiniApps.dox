@@ -96,8 +96,11 @@ See \ref QmitkDiffusionImagingUserManualQBallReconstruction for the GUI equivale
 
 \subsection PeakExtraction Peak Extraction
 
+Extracts ODF peaks from the given spherical harmonics coefficient image. Input image type is an image that contains a vector with the spherical harmonics coefficients as pixel type: Image< Vector< float, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder >, 3 >
 
 \subsection PeakAngularErr Peak Angular Error
+
+Calculates the angular error between two sets of input directions. The directions are stored as images. Each image voxel contains one direction vector. Such images are for example the output of the fiber direction extraction miniapp.
 
 \section DiffusionMeasures Diffusion Related Measures
 
@@ -117,36 +120,37 @@ Tensor, Q-ball or FSL/MRTrix SH-coefficient image. E.g. to compute the fraction 
 Similar to \ref DiffusionIndices . But computes all of the following indices FA, RA, MD, CA, RD, AD at once.
 Also the input is a regular .dwi file, the tensor reconstruction is done implicitly (using a b0 threshold of 50).
 
-
 \section FibTracking Fiber Tracking and Processing Methods
 
 \subsection FibDirection Fiber Direction Extraction
 
-TODO Peter ?
+Extracts the voxel-wise main fiber directions from a tractogram.
 
 \subsection Streamline Streamline Tracking
 
 See \ref org_mitk_views_streamlinetracking for the GUI equivalent of this tool.
 
-Performs a streamline tracking on a tensor image.
+Performs streamline tractography on a tensor image.
 
 \subsection GibbsTracking Gibbs Fiber Tracking
 
 See \ref org_mitk_views_gibbstracking for the GUI equivalent of this tool.
 
-Performs a Gibbs tracking on a tensor image.
+Performs global Gibbs tractography on a tensor/Q-ball/SH-coefficient image.
 
 \subsection FibProcessing Fiber Processing
 
 Post-process a fiber bundle. Provides the possibility to
 
 \li remove short/long fiber tracks
-\li combine fiber bundles
-\li resample a fiber bundle
-\li scale bundle in each direction independently
+\li apply curvature threshold
+\li resample a fiber bundle (linear and spline based)
+\li compress a fiber bundle (lossy)
+\li transform fiber bundle (scale, translate, rotate)
+\li mirror fiber bundle
 
 
-\subsection FibFoxProcessing Fiber Fox Processing
+\subsection FibFoxProcessing Fiberfox
 
 See \ref QmitkFiberfoxViewUserManualSignalGeneration for the GUI equivalent of this tool.
 

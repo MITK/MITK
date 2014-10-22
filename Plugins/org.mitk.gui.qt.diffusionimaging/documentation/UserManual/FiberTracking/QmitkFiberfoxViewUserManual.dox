@@ -62,7 +62,6 @@ A diffusion weighted image is generated from the fibers by selecting the accordi
 
 
 <b>Advanced Image Settings (activate checkbox "Advanced Options"):</b>
-\li <b>Repetitions</b>: Specifies the number of averages used for the acquisition to reduce noise.
 \li <b>Signal Scale</b>: Additional scaling factor for the signal in each voxel. The default value of 125 results in a maximum signal amplitude of 1000 for <em>2x2x2</em> mm voxels. Beware that changing this value without changing the noise variance results in a changed SNR. Adjustment of this value might be needed if the overall signal values are much too high or much too low (depends on a variety of factors like voxel size and relaxation times).
 \li <b>Echo Time <em>TE</em></b>: Time between the 90° excitation pulse and the first spin echo. Increasing this time results in a stronger <em>T2</em>-relaxation effect (<a href="http://en.wikipedia.org/wiki/Relaxation_%28NMR%29">Wikipedia</a>).
 \li <b>Line Readout Time</b>: Time to read one line in k-space. Increasing this time results in a stronger <em>T2*</em> effect which causes an attenuation of the higher frequencies in phase direction (here along y-axis) which again results in a blurring effect of sharp edges perpendicular to the phase direction.
@@ -82,8 +81,9 @@ The group-boxes "Intra-axonal Compartment", "Inter-axonal Compartment" and "Extr
 \li <b>Ball</b>: Isotropic compartment. Parameter: Diffusivity <em>d</em>
 \li <b>Astrosticks</b>: Consists of multiple stick models pointing in different directions. The single stick orientations can either be distributed equally over the sphere or are sampled randomly. The model represents signal coming from a type of glial cell called astrocytes, or populations of axons with arbitrary orientation. Parameters: randomization of the stick orientations and diffusivity of the sticks <em>d</em>.
 \li <b>Dot</b>: Isotropically restricted compartment. No parameter.
+\li <b>Prototype Signal</b>: The signal is not generated from a paranmetric model but a prototype signal is sampled from the selected diffusion-weighted image. Parameters: The number of prototype signals that are used for the signal generation (at each fiber position one is picked randomly) and the constraining diffusion parameters for a voxel signal to be included in the list. For a fiber signal one would for example probably select a high <em>FA</em> and for a CSF voxel a low <em>FA</em>.
 
-For a detailed description of the single models, please refer to Panagiotaki <em>et al.</em> "Compartment models of the diffusion MR signal in brain white matter: A taxonomy and comparison". Additionally to the model parameters, each compartment has its own <em>T2</em> signal relaxation constant (in <em>ms</em>).
+For a detailed description of the single models, please refer to Panagiotaki <em>et al.</em> "Compartment models of the diffusion MR signal in brain white matter: A taxonomy and comparison". Additionally to the model parameters, each compartment has its own <em>T2</em> signal relaxation constant (in <em>ms</em>). This constant is not relevant if the prototype signal model is used, since in this case signal relaxation is disabled.
 
 
 <b>Noise and Artifacts:</b>

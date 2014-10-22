@@ -17,6 +17,7 @@ Fiber bundle postprocessing:
 \li If a float image with pixel values between 0 and 1 is selcted, the fiber bundle can be colored according to the pixel values (e.g. using an FA image).
 
 Calculate main fiber directions:
+
 Extracts the voxel-wise main fiber directions from a tractogram.
 
 \imageMacro{DirectionExtractionFib.png, "Input fiber bundle",10}

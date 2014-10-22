@@ -22,8 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFileReader.h"
 #include "vnl/vnl_vector_fixed.h"
 #include "vnl/vnl_matrix_fixed.h"
-#include "mitkDiffusionImageSource.h"
+
 #include "itkVectorImage.h"
+#include "mitkAbstractFileReader.h"
+#include "mitkDiffusionImage.h"
 
 namespace mitk
 {
@@ -31,57 +33,40 @@ namespace mitk
   /** \brief
   */
 
-  template < class TPixelType >
-  class NrrdDiffusionImageReader : public mitk::DiffusionImageSource<TPixelType>, public FileReader
+  class NrrdDiffusionImageReader : public mitk::AbstractFileReader
   {
   public:
 
-    typedef mitk::DiffusionImage<TPixelType> OutputType;
-    typedef itk::VectorImage<TPixelType,3>     ImageType;
-    typedef DiffusionImageSource<TPixelType> DiffVolSourceType;
-    typedef vnl_vector_fixed< double, 3 >      GradientDirectionType;
-    typedef vnl_matrix_fixed< double, 3, 3 >      MeasurementFrameType;
-    typedef itk::VectorContainer< unsigned int,
-      GradientDirectionType >                  GradientDirectionContainerType;
+    NrrdDiffusionImageReader(const NrrdDiffusionImageReader & other);
+    NrrdDiffusionImageReader();
+    virtual ~NrrdDiffusionImageReader();
 
-    mitkClassMacro( NrrdDiffusionImageReader, DiffVolSourceType );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData> > Read();
 
-    const char* GetFileName() const;
-    void SetFileName(const char* aFileName);
-    const char* GetFilePrefix() const;
-    void SetFilePrefix(const char* aFilePrefix);
-    const char* GetFilePattern() const;
-    void SetFilePattern(const char* aFilePattern);
-
-    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
+    typedef mitk::DiffusionImage<short>                                 OutputType;
+    typedef itk::VectorImage<short,3>                                   ImageType;
+    typedef vnl_vector_fixed< double, 3 >                               GradientDirectionType;
+    typedef vnl_matrix_fixed< double, 3, 3 >                            MeasurementFrameType;
+    typedef itk::VectorContainer< unsigned int,GradientDirectionType >  GradientDirectionContainerType;
 
   protected:
-
-    /** Does the real work. */
-    virtual void GenerateData();
-    virtual void GenerateOutputInformation();
-
-    std::string m_FileName;
-    std::string m_FilePrefix;
-    std::string m_FilePattern;
-
-    typename OutputType::Pointer m_OutputCache;
+    OutputType::Pointer m_OutputCache;
     itk::TimeStamp m_CacheTime;
-
     GradientDirectionContainerType::Pointer m_OriginalDiffusionVectors;
     GradientDirectionContainerType::Pointer m_DiffusionVectors;
     float m_B_Value;
-
     MeasurementFrameType m_MeasurementFrame;
 
+    void InternalRead();
+
   private:
-    void operator=(const Self&); //purposely not implemented
+
+    NrrdDiffusionImageReader* Clone() const;
+    us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
   };
 
 } //namespace MITK
 
-#include "mitkNrrdDiffusionImageReader.cpp"
 
 #endif // __mitkNrrdDiffusionImageReader_h

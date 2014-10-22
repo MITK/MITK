@@ -412,6 +412,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     parameters.m_Misc.m_OutputPath = "";
     parameters.m_Misc.m_CheckAdvancedFiberOptionsBox = m_Controls->m_AdvancedOptionsBox->isChecked();
     parameters.m_Misc.m_CheckAdvancedSignalOptionsBox = m_Controls->m_AdvancedOptionsBox_2->isChecked();
+    parameters.m_Misc.m_CheckOutputVolumeFractionsBox = m_Controls->m_VolumeFractionsBox->isChecked();
 
     string outputPath = m_Controls->m_SavePathEdit->text().toStdString();
     if (outputPath.compare("-")!=0)
@@ -700,7 +701,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         case 3:
         {
             mitk::RawShModel<ScalarType>* model = new mitk::RawShModel<ScalarType>();
-            parameters.m_SignalGen.m_SimulateKspaceAcquisition = false;
+            parameters.m_SignalGen.m_DoSimulateRelaxation = false;
             model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
             model->SetMaxNumKernels(m_Controls->m_PrototypeWidget1->GetNumberOfSamples());
             model->SetFaRange(m_Controls->m_PrototypeWidget1->GetMinFa(), m_Controls->m_PrototypeWidget1->GetMaxFa());
@@ -829,7 +830,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         case 3:
         {
             mitk::RawShModel<ScalarType>* model = new mitk::RawShModel<ScalarType>();
-            parameters.m_SignalGen.m_SimulateKspaceAcquisition = false;
+            parameters.m_SignalGen.m_DoSimulateRelaxation = false;
             model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
             model->SetMaxNumKernels(m_Controls->m_PrototypeWidget3->GetNumberOfSamples());
             model->SetFaRange(m_Controls->m_PrototypeWidget3->GetMinFa(), m_Controls->m_PrototypeWidget3->GetMaxFa());
@@ -972,7 +973,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             case 4:
             {
                 mitk::RawShModel<ScalarType>* model = new mitk::RawShModel<ScalarType>();
-                parameters.m_SignalGen.m_SimulateKspaceAcquisition = false;
+                parameters.m_SignalGen.m_DoSimulateRelaxation = false;
                 model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
                 model->SetMaxNumKernels(m_Controls->m_PrototypeWidget4->GetNumberOfSamples());
                 model->SetFaRange(m_Controls->m_PrototypeWidget4->GetMinFa(), m_Controls->m_PrototypeWidget4->GetMaxFa());

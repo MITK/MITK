@@ -36,7 +36,7 @@ int mitkFiberTransformationTest(int argc, char* argv[])
         groundTruthFibs->ScaleFibers(1, 0.1, 1.3);
         groundTruthFibs->RemoveLongFibers(150);
         groundTruthFibs->RemoveShortFibers(20);
-        groundTruthFibs->DoFiberSmoothing(1.0);
+        groundTruthFibs->ResampleSpline(1.0);
         groundTruthFibs->ApplyCurvatureThreshold(3.0, true);
         groundTruthFibs->MirrorFibers(0);
         groundTruthFibs->MirrorFibers(1);

@@ -33,6 +33,8 @@ Optional Input:
 
 By default the image values are not interpolated. Enable corresponding checkbox to use trilinear interpolation of the tensors as well as the FA values. Keep in mind that in the noninterpolated case, the TEND term is only applied once per voxel. In the interpolated case the TEND term is applied at each integration step which results in much higher curvatures and has to be compensated by an according choice of f and g.
 
+Whole brain tractograms obtained with a small step size can contain billions of points. The tractograms can be compressed by removing points that do not really contribute to the fiber shape, such as many points on a straight line. An error threshold (in mm) can be defined to specify which points should be removed and which not.
+
 \section StrTrackUserManualReferences References
 
 [1] Mori et al. Annals Neurology 1999\n

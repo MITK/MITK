@@ -123,7 +123,7 @@ void QmitkFiberProcessingView::CalculateFiberDirections()
     // extract directions from fiber bundle
     fOdfFilter->SetFiberBundle(inputTractogram);
     fOdfFilter->SetAngularThreshold(cos(m_Controls->m_AngularThreshold->value()*M_PI/180));
-    fOdfFilter->SetNormalizeVectors(true);
+    fOdfFilter->SetNormalizeVectors(m_Controls->m_NormalizeDirectionsBox->isChecked());
     fOdfFilter->SetUseWorkingCopy(true);
     fOdfFilter->SetCreateDirectionImages(m_Controls->m_DirectionImagesBox->isChecked());
     fOdfFilter->SetSizeThreshold(m_Controls->m_PeakThreshold->value());
@@ -504,7 +504,7 @@ void QmitkFiberProcessingView::ResampleSelectedBundles()
     for (int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        fib->DoFiberSmoothing(factor);
+        fib->ResampleSpline(factor);
     }
     GenerateStats();
     RenderingManager::GetInstance()->RequestUpdateAll();
@@ -516,7 +516,7 @@ void QmitkFiberProcessingView::CompressSelectedBundles()
     for (int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        fib->CompressFibers(factor);
+        fib->Compress(factor);
     }
     GenerateStats();
     RenderingManager::GetInstance()->RequestUpdateAll();

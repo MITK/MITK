@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>443</width>
-    <height>2332</height>
+    <width>479</width>
+    <height>2338</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1083,7 +1083,7 @@
             </item>
             <item>
              <property name="text">
-              <string>PrototypeSignal</string>
+              <string>Prototype Signal</string>
              </property>
             </item>
            </widget>
@@ -2920,7 +2920,7 @@
             </item>
             <item>
              <property name="text">
-              <string>PrototypeSignal</string>
+              <string>Prototype Signal</string>
              </property>
             </item>
            </widget>

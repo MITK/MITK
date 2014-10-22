@@ -474,7 +474,7 @@ void mitk::FiberBundleX::DoColorCodingFaBased()
         return;
 
     this->SetColorCoding(COLORCODING_FA_BASED);
-//    this->GenerateFiberIds();
+    //    this->GenerateFiberIds();
 }
 
 void mitk::FiberBundleX::DoUseFaFiberOpacity()
@@ -495,7 +495,7 @@ void mitk::FiberBundleX::DoUseFaFiberOpacity()
     }
 
     this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
-//    this->GenerateFiberIds();
+    //    this->GenerateFiberIds();
 }
 
 void mitk::FiberBundleX::ResetFiberOpacity() {
@@ -575,7 +575,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
             minSpacing = mask->GetSpacing()[2];
 
         mitk::FiberBundleX::Pointer fibCopy = this->GetDeepCopy();
-        fibCopy->ResampleFibers(minSpacing/5);
+        fibCopy->ResampleLinear(minSpacing/5);
         polyData = fibCopy->GetFiberPolyData();
     }
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
@@ -703,7 +703,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::RemoveFibersOutside(ItkUcharImgT
         minSpacing = mask->GetSpacing()[2];
 
     mitk::FiberBundleX::Pointer fibCopy = this->GetDeepCopy();
-    fibCopy->ResampleFibers(minSpacing/10);
+    fibCopy->ResampleLinear(minSpacing/10);
     vtkSmartPointer<vtkPolyData> polyData =fibCopy->GetFiberPolyData();
 
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
@@ -766,7 +766,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::RemoveFibersOutside(ItkUcharImgT
     newPolyData->SetPoints(vtkNewPoints);
     newPolyData->SetLines(vtkNewCells);
     mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(newPolyData);
-    newFib->ResampleFibers(minSpacing/2);
+    newFib->ResampleLinear(minSpacing/2);
     return newFib;
 }
 
@@ -1290,7 +1290,7 @@ void mitk::FiberBundleX::RotateAroundAxis(double x, double y, double z)
     UpdateFiberGeometry();
 }
 
-void mitk::FiberBundleX::ScaleFibers(double x, double y, double z)
+void mitk::FiberBundleX::ScaleFibers(double x, double y, double z, bool subtractCenter)
 {
     MITK_INFO << "Scaling fibers";
     boost::progress_display disp(m_NumFibers);
@@ -1312,11 +1312,17 @@ void mitk::FiberBundleX::ScaleFibers(double x, double y, double z)
         for (int j=0; j<numPoints; j++)
         {
             double* p = points->GetPoint(j);
-            p[0] -= c[0]; p[1] -= c[1]; p[2] -= c[2];
+            if (subtractCenter)
+            {
+                p[0] -= c[0]; p[1] -= c[1]; p[2] -= c[2];
+            }
             p[0] *= x;
             p[1] *= y;
             p[2] *= z;
-            p[0] += c[0]; p[1] += c[1]; p[2] += c[2];
+            if (subtractCenter)
+            {
+                p[0] += c[0]; p[1] += c[1]; p[2] += c[2];
+            }
             vtkIdType id = vtkNewPoints->InsertNextPoint(p);
             container->GetPointIds()->InsertNextId(id);
         }
@@ -1577,7 +1583,7 @@ bool mitk::FiberBundleX::RemoveLongFibers(float lengthInMM)
     return true;
 }
 
-void mitk::FiberBundleX::DoFiberSmoothing(float pointDistance, double tension, double continuity, double bias )
+void mitk::FiberBundleX::ResampleSpline(float pointDistance, double tension, double continuity, double bias )
 {
     if (pointDistance<=0)
         return;
@@ -1647,9 +1653,9 @@ void mitk::FiberBundleX::DoFiberSmoothing(float pointDistance, double tension, d
     m_FiberSampling = 10/pointDistance;
 }
 
-void mitk::FiberBundleX::DoFiberSmoothing(float pointDistance)
+void mitk::FiberBundleX::ResampleSpline(float pointDistance)
 {
-    DoFiberSmoothing(pointDistance, 0, 0, 0 );
+    ResampleSpline(pointDistance, 0, 0, 0 );
 }
 
 unsigned long mitk::FiberBundleX::GetNumberOfPoints()
@@ -1663,7 +1669,7 @@ unsigned long mitk::FiberBundleX::GetNumberOfPoints()
     return points;
 }
 
-void mitk::FiberBundleX::CompressFibers(float error)
+void mitk::FiberBundleX::Compress(float error)
 {
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
@@ -1776,7 +1782,7 @@ void mitk::FiberBundleX::CompressFibers(float error)
 }
 
 // Resample fiber to get equidistant points
-void mitk::FiberBundleX::ResampleFibers(float pointDistance)
+void mitk::FiberBundleX::ResampleLinear(float pointDistance)
 {
     if (pointDistance<=0.00001)
         return;

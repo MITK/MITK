@@ -169,7 +169,7 @@
          <string/>
         </property>
         <property name="text">
-         <string>Iterations: 10^7</string>
+         <string>Iterations: 10^8</string>
         </property>
        </widget>
       </item>
@@ -182,7 +182,7 @@
          <number>9</number>
         </property>
         <property name="value">
-         <number>6</number>
+         <number>8</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -611,7 +611,7 @@
          <number>1</number>
         </property>
         <property name="value">
-         <number>40</number>
+         <number>20</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -662,7 +662,7 @@
          <string/>
         </property>
         <property name="text">
-         <string>40mm</string>
+         <string>20mm</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1108,8 +1108,8 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
   <include location="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc"/>
+  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
  </resources>
  <connections/>
 </ui>

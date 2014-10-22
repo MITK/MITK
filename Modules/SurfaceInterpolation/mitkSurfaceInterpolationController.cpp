@@ -139,10 +139,6 @@ void mitk::SurfaceInterpolationController::AddNewContours(std::vector<mitk::Surf
       ContourPositionInformation contourInfo = CreateContourPositionInformation(newContours.at(i));
       this->AddToInterpolationPipeline(contourInfo);
     }
-    else
-    {
-      return;
-    }
   }
   this->Modified();
 }

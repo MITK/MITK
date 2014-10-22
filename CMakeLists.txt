@@ -217,7 +217,7 @@ set(MITK_USE_CableSwig ${MITK_USE_Python})
 
 option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
 set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
-set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS Custom Default All)
+set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS Custom Default mitkDiffusion All)
 
 mitkFunctionEnableBuildConfiguration()
 

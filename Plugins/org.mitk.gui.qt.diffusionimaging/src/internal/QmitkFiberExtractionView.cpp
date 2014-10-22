@@ -802,6 +802,7 @@ void QmitkFiberExtractionView::OnSelectionChanged( std::vector<mitk::DataNode*> 
                 nodes->at(i)->GetPropertyValue("layer", layer);
                 if (layer>=maxLayer)
                 {
+                    maxLayer = layer;
                     m_SelectedFB.clear();
                     m_SelectedFB.push_back(nodes->at(i));
                 }
@@ -823,6 +824,7 @@ void QmitkFiberExtractionView::OnSelectionChanged( std::vector<mitk::DataNode*> 
                 nodes->at(i)->GetPropertyValue("layer", layer);
                 if (layer>=maxLayer)
                 {
+                    maxLayer = layer;
                     m_SelectedPF.clear();
                     m_SelectedPF.push_back(nodes->at(i));
                 }

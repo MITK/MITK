@@ -439,7 +439,7 @@ void MitkCoreActivator::RegisterLegacyWriter()
     mitk::FileWriter::Pointer io = dynamic_cast<mitk::FileWriter*>(i->GetPointer());
     if(io)
     {
-      std::string description = std::string("Legacy ") + io->GetNameOfClass() + " Reader";
+      std::string description = std::string("Legacy ") + io->GetNameOfClass() + " Writer";
       mitk::IFileWriter* writer = new mitk::LegacyFileWriterService(io, description);
       m_LegacyWriters.push_back(writer);
     }

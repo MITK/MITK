@@ -14,9 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include <usModuleActivator.h>
-
-//#include <mitkFiberBundleXReader.h>
-//#include <mitkFiberBundleXWriter.h>
+#include <mitkNrrdDiffusionImageReader.h>
 
 namespace mitk
 {
@@ -29,20 +27,17 @@ namespace mitk
 
     void Load(us::ModuleContext* /*context*/)
     {
-//        m_FiberBundleXReader = new FiberBundleXReader();
-//        m_FiberBundleXWriter = new FiberBundleXWriter();
+        m_NrrdDiffusionImageReader = new NrrdDiffusionImageReader();
     }
 
     void Unload(us::ModuleContext*)
     {
-//      delete m_FiberBundleXReader;
-//      delete m_FiberBundleXWriter;
+      delete m_NrrdDiffusionImageReader;
     }
 
   private:
 
-//    FiberBundleXReader * m_FiberBundleXReader;
-//    FiberBundleXWriter * m_FiberBundleXWriter;
+    NrrdDiffusionImageReader * m_NrrdDiffusionImageReader;
 
   };
 }

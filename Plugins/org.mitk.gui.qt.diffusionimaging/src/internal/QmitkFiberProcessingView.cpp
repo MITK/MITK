@@ -123,7 +123,7 @@ void QmitkFiberProcessingView::CalculateFiberDirections()
     // extract directions from fiber bundle
     fOdfFilter->SetFiberBundle(inputTractogram);
     fOdfFilter->SetAngularThreshold(cos(m_Controls->m_AngularThreshold->value()*M_PI/180));
-    fOdfFilter->SetNormalizeVectors(true);
+    fOdfFilter->SetNormalizeVectors(m_Controls->m_NormalizeDirectionsBox->isChecked());
     fOdfFilter->SetUseWorkingCopy(true);
     fOdfFilter->SetCreateDirectionImages(m_Controls->m_DirectionImagesBox->isChecked());
     fOdfFilter->SetSizeThreshold(m_Controls->m_PeakThreshold->value());

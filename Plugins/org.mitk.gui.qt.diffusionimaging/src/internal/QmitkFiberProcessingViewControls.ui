@@ -558,67 +558,21 @@
       <string>Calculate Main Fiber Directions</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Peak threshold:</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Angular threshold:</string>
+         <string>Angular Threshold:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="m_AngularThreshold">
-        <property name="toolTip">
-         <string>Minimum radius of circle created by three consecutive points of a fiber</string>
-        </property>
-        <property name="decimals">
-         <number>2</number>
-        </property>
-        <property name="minimum">
-         <double>0.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>90.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>30.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Maximum Number of Fibers:</string>
+         <string>Size Threshold:</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QCheckBox" name="m_DirectionImagesBox">
-        <property name="text">
-         <string>Output Direction images</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="m_VectorFieldBox">
-        <property name="text">
-         <string>Output Vector Field</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
+      <item row="8" column="0">
        <widget class="QCommandLinkButton" name="m_ExtractFiberPeaks">
         <property name="enabled">
          <bool>false</bool>
@@ -648,20 +602,20 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="m_MaxNumDirections">
-        <property name="maximum">
-         <number>100</number>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="m_VectorFieldBox">
+        <property name="text">
+         <string>Output Vector Field</string>
         </property>
-        <property name="value">
-         <number>3</number>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="QDoubleSpinBox" name="m_PeakThreshold">
         <property name="toolTip">
-         <string>Minimum radius of circle created by three consecutive points of a fiber</string>
+         <string>Directions shorter than the defined threshold are discarded. The threshold is applied before normalizing the vectors (if enebaled).</string>
         </property>
         <property name="decimals">
          <number>3</number>
@@ -677,10 +631,78 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Max. clusters:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="m_MaxNumDirections">
+        <property name="toolTip">
+         <string>Maximum number of fiber directions per voxel.</string>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>3</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="m_AngularThreshold">
+        <property name="toolTip">
+         <string>Fiber directions with an angle smaller than the defined threshold are clustered.</string>
+        </property>
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>90.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>30.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QCheckBox" name="m_DirectionImagesBox">
+        <property name="toolTip">
+         <string>One image per extracted direction. Each voxel contains a direction vector.</string>
+        </property>
+        <property name="text">
+         <string>Output Direction images</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
        <widget class="QCheckBox" name="m_NumDirectionsBox">
+        <property name="toolTip">
+         <string>Image containing the number of distinct fiber clusters per voxel.</string>
+        </property>
         <property name="text">
          <string>Output #Directions per Voxel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="m_NormalizeDirectionsBox">
+        <property name="toolTip">
+         <string>Normalize output directions to length 1 otherwise directions are max normalized (voxel-wise),</string>
+        </property>
+        <property name="text">
+         <string>Normalize directions</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

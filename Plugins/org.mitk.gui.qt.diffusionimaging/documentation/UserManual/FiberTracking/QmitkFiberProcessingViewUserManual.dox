@@ -14,6 +14,12 @@ Fiber bundle postprocessing:
 \li The selected fiber bundle can be smoothed by interpolating the fiber points using Kochanek splines.
 \li The fiber bundle can be pruned using a length or curvature threshold.
 \li The fiber bundle can be mirrored in aqll three dimensions.
+\li If a float image with pixel values between 0 and 1 is selcted, the fiber bundle can be colored according to the pixel values (e.g. using an FA image).
 
-If a float image with pixel values between 0 and 1 is selcted, the fiber bundle can be colored according to the pixel values (e.g. using an FA image).
+Calculate main fiber directions:
+Extracts the voxel-wise main fiber directions from a tractogram.
+
+\imageMacro{DirectionExtractionFib.png, "Input fiber bundle",10}
+\imageMacro{DirectionExtractionPeaks.png, "Output main fiber directions",10}
+
 */

@@ -254,6 +254,9 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
                 continue;
             count++;
 
+            if (m_NormalizeVectors)
+                dir.normalize();
+
             if (m_CreateDirectionImages && i<10)
             {
                 if (i==m_DirectionImageContainer->size())
@@ -384,7 +387,7 @@ TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer TractsTo
 
     if (inDirs->size()==outDirs->size())
     {
-        if (!m_NormalizeVectors && max>0)
+        if (max>0)
             for (unsigned int i=0; i<outDirs->size(); i++)
                 outDirs->SetElement(i, outDirs->at(i)*newLengths.at(i)/max);
         return outDirs;

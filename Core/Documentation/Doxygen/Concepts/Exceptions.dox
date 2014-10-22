@@ -59,7 +59,7 @@ try
   //call of a method which may throw an exception
   myObject->MyExampleMethod();
   }
-catch (mitk::Exception e)
+catch (const mitk::Exception& e)
   {
   //This code is executed if an exception of the given type was thrown above.
   //For example log an error message here or do some other proper handling of the exception.

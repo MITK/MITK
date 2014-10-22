@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-
 NrrdDiffusionImageReader::
 NrrdDiffusionImageReader(const NrrdDiffusionImageReader & other)
   : AbstractFileReader(other)
@@ -62,14 +61,13 @@ NrrdDiffusionImageReader()
   customMimeType.AddExtension("hdwi");
   customMimeType.AddExtension("dwi");
   customMimeType.AddExtension("fsl");
-  customMimeType.AddExtension("fsl.gz");
+  customMimeType.AddExtension("fslgz");
 
   this->SetDescription(category);
   this->SetMimeType(customMimeType);
 
   m_ServiceReg = this->RegisterService();
 }
-
 
 std::vector<itk::SmartPointer<mitk::BaseData> >
 NrrdDiffusionImageReader::

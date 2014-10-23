@@ -383,7 +383,6 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
   {
   mitk::TrackingDevice::Pointer returnValue;
   //#### Step 1: configure tracking device:
-  MITK_INFO << "Current Index: " << m_Controls->m_trackingDeviceChooser->currentIndex();
   if (m_Controls->m_trackingDeviceChooser->currentIndex()==0)//NDI Polaris
       {
       if(m_Controls->m_radioPolaris5D->isChecked()) //5D Tracking
@@ -586,7 +585,6 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
     {selectedDeviceChecked = 0;} //0 = Polaris (default)
   else if (SelectedDevice==3 && !mitk::OptitrackTrackingDevice::New()->IsDeviceInstalled())
     {selectedDeviceChecked = 0;}
-  MITK_INFO << "SelectedDeviceChecked: " << selectedDeviceChecked;
   m_Controls->m_TrackingSystemWidget->setCurrentIndex(selectedDeviceChecked);
   m_Controls->m_trackingDeviceChooser->setCurrentIndex(selectedDeviceChecked);
 

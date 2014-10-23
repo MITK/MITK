@@ -545,6 +545,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QS
 
     //enable controls again
     this->m_Controls->m_MainWidget->setEnabled(true);
+    EnableTrackingConfigurationButtons();
 
     if(!success)
     {
@@ -558,62 +559,26 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QS
 
     //save detected tools in member
     this->ReplaceCurrentToolStorage(autoDetectedStorage,"Autodetected NDI Aurora Storage");
-  //auto save the new storage to hard disc (for persistence)
-  MITK_INFO << "Auto saving autodetected tools for persistence.";
-  AutoSaveToolStorage();
+    //auto save the new storage to hard disc (for persistence)
+    AutoSaveToolStorage();
     //update label
     QString toolLabel = QString::number(m_toolStorage->GetToolCount()) + " Tools (Auto Detected)";
     m_Controls->m_toolLabel->setText(toolLabel);
     //update tool preview
     m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
     m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
-
-
-    EnableTrackingConfigurationButtons();
-
-    if (m_toolStorage->GetToolCount()>0)
-      {
-      //ask the user if he wants to save the detected tools
-      QMessageBox msgBox;
-      switch(m_toolStorage->GetToolCount())
+    //print a logging message about the detected tools
+    switch(m_toolStorage->GetToolCount())
         {
+        case 0:
+          MITK_INFO("IGT Tracking Toolbox") <<  "Found no tools. Empty ToolStorage was autosaved to " << m_ToolStorageFilename.toStdString();
+          break;
         case 1:
-          msgBox.setText("Found one tool!");
+          MITK_INFO("IGT Tracking Toolbox") <<  "Found one tool. ToolStorage was autosaved to " << m_ToolStorageFilename.toStdString();
           break;
         default:
-          msgBox.setText("Found " + QString::number(m_toolStorage->GetToolCount()) + " tools!");
+          MITK_INFO("IGT Tracking Toolbox") << "Found " << m_toolStorage->GetToolCount() << " tools. ToolStorage was autosaved to " << m_ToolStorageFilename.toStdString();
         }
-      msgBox.setInformativeText("Do you want to save this tools as tool storage, so you can load them again?");
-      msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-      msgBox.setDefaultButton(QMessageBox::No);
-      int ret = msgBox.exec();
-
-      if (ret == 16384) //yes
-        {
-        //ask the user for a filename
-        QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save File"),"/",tr("*.IGTToolStorage"));
-        //check for empty filename
-        if(fileName == "") {return;}
-        mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-
-        //when Serialize method is used exceptions are thrown, need to be adapted
-        //try-catch block for exception handling in Serializer
-        try
-        {
-        mySerializer->Serialize(fileName.toStdString(),m_toolStorage);
-        }
-        catch(mitk::IGTException)
-        {
-        std::string errormessage = "Error during serialization. Please check the Zip file.";
-        QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());}
-        return;
-        }
-        else if (ret == 65536) //no
-        {
-        return;
-        }
-      }
-
 }
 
 void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)

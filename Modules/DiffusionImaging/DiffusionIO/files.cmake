@@ -28,8 +28,6 @@ set(CPP_FILES
 
   mitkNrrdQBallImageReader.cpp
   mitkNrrdQBallImageWriter.cpp
-  mitkNrrdQBallImageIOFactory.cpp
-  mitkNrrdQBallImageWriterFactory.cpp
   mitkQBallImageSerializer.cpp
 
   mitkFiberBundleXMapper2D.cpp

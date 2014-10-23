@@ -17,8 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkNrrdDiffusionImageReader.h>
 #include <mitkNrrdTensorImageReader.h>
+#include <mitkNrrdQBallImageReader.h>
 
 #include <mitkNrrdTensorImageWriter.h>
+#include <mitkNrrdQBallImageWriter.h>
 
 namespace mitk
 {
@@ -33,24 +35,30 @@ namespace mitk
     {
         m_NrrdDiffusionImageReader = new NrrdDiffusionImageReader();
         m_NrrdTensorImageReader = new NrrdTensorImageReader();
+        m_NrrdQBallImageReader = new NrrdQBallImageReader();
 
         m_NrrdTensorImageWriter = new NrrdTensorImageWriter();
+        m_NrrdQBallImageWriter = new NrrdQBallImageWriter();
     }
 
     void Unload(us::ModuleContext*)
     {
       delete m_NrrdDiffusionImageReader;
       delete m_NrrdTensorImageReader;
+      delete m_NrrdQBallImageReader;
 
       delete m_NrrdTensorImageWriter;
+      delete m_NrrdQBallImageWriter;
     }
 
   private:
 
     NrrdDiffusionImageReader * m_NrrdDiffusionImageReader;
     NrrdTensorImageReader * m_NrrdTensorImageReader;
+    NrrdQBallImageReader * m_NrrdQBallImageReader;
 
     NrrdTensorImageWriter * m_NrrdTensorImageWriter;
+    NrrdQBallImageWriter * m_NrrdQBallImageWriter;
 
   };
 }

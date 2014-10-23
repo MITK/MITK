@@ -24,10 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNrrdDiffusionImageWriter.h"
 #include "mitkDiffusionImage.h"
 
-#include "mitkNrrdQBallImageIOFactory.h"
-#include "mitkNrrdQBallImageWriterFactory.h"
-#include "mitkNrrdQBallImageWriter.h"
-
 #include "mitkCompositeMapper.h"
 #include "mitkDiffusionImageMapper.h"
 #include "mitkGPUVolumeMapper3D.h"
@@ -41,9 +37,7 @@ typedef std::multimap<std::string, std::string> MultimapType;
 
 mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory()
   : CoreObjectFactoryBase()
-  , m_NrrdQBallImageIOFactory(mitk::NrrdQBallImageIOFactory::New().GetPointer())
   , m_NrrdDiffusionImageWriterFactory(mitk::NrrdDiffusionImageWriterFactory::New().GetPointer())
-  , m_NrrdQBallImageWriterFactory(mitk::NrrdQBallImageWriterFactory::New().GetPointer())
 {
 
   static bool alreadyDone = false;
@@ -51,13 +45,9 @@ mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory()
   {
     MITK_DEBUG << "DiffusionCoreObjectFactory c'tor" << std::endl;
 
-    itk::ObjectFactoryBase::RegisterFactory(m_NrrdQBallImageIOFactory);
-
     itk::ObjectFactoryBase::RegisterFactory(m_NrrdDiffusionImageWriterFactory);
-    itk::ObjectFactoryBase::RegisterFactory(m_NrrdQBallImageWriterFactory);
 
     m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
-    m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
 
 
     CreateFileExtensionsMap();
@@ -69,10 +59,8 @@ mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory()
 
 mitk::DiffusionCoreObjectFactory::~DiffusionCoreObjectFactory()
 {
-  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdQBallImageIOFactory);
 
   itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdDiffusionImageWriterFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdQBallImageWriterFactory);
 
 }
 
@@ -180,9 +168,6 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::DiffusionCoreObjectFactory::GetS
 
 void mitk::DiffusionCoreObjectFactory::CreateFileExtensionsMap()
 {
-
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", "Q-Ball Images"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", "Q-Ball Images"));
   //  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
 
 
@@ -191,8 +176,6 @@ void mitk::DiffusionCoreObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", "Diffusion Weighted Images for FSL"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.fsl", "Diffusion Weighted Images for FSL"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.fslgz", "Diffusion Weighted Images for FSL"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", "Q-Ball Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", "Q-Ball Images"));
   // m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
 
 }

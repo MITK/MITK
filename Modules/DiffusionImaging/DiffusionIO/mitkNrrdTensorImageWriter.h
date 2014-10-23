@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_NRRDDTI_WRITER__H_
 #define _MITK_NRRDDTI_WRITER__H_
 
-#include <itkProcessObject.h>
 #include <mitkAbstractFileWriter.h>
 #include <mitkTensorImage.h>
 

@@ -197,6 +197,10 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     * Help method for updating the tool label
     */
    void UpdateToolStorageLabel(QString pathOfLoadedStorage);
+   /**
+    * Auto saves the current tool storage to a temporary file. This ist used for persistence.
+  */
+   void AutoSaveToolStorage();
 
    //members for worker thread
    QThread* m_WorkerThread;

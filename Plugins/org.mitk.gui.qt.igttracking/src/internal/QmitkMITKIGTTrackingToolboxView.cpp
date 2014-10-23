@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkProgressBar.h>
+#include <mitkIOUtil.h>
 
 // vtk
 #include <vtkSphereSource.h>
@@ -231,9 +232,8 @@ void QmitkMITKIGTTrackingToolboxView::OnResetTools()
 {
   this->ReplaceCurrentToolStorage(mitk::NavigationToolStorage::New(GetDataStorage()),"TrackingToolbox Default Storage");
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
-  QString toolLabel = QString("Loaded Tools: <none>");
+  QString toolLabel = QString("<none>");
   m_Controls->m_toolLabel->setText(toolLabel);
-
   m_ToolStorageFilename = "";
 }
 
@@ -537,10 +537,13 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QS
 
     mitk::NavigationToolStorage::Pointer autoDetectedStorage = m_Worker->GetNavigationToolStorage();
 
-    //save detected tools
+    //save detected tools in member
     this->ReplaceCurrentToolStorage(autoDetectedStorage,"Autodetected NDI Aurora Storage");
+  //auto save the new storage to hard disc (for persistence)
+  MITK_INFO << "Auto saving autodetected tools for persistence.";
+  AutoSaveToolStorage();
     //update label
-    QString toolLabel = QString("Loaded Tools: ") + QString::number(m_toolStorage->GetToolCount()) + " Tools (Auto Detected)";
+    QString toolLabel = QString::number(m_toolStorage->GetToolCount()) + " Tools (Auto Detected)";
     m_Controls->m_toolLabel->setText(toolLabel);
     //update tool preview
     m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
@@ -817,7 +820,11 @@ void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolFinished()
     }
   m_toolStorage->AddTool(m_Controls->m_NavigationToolCreationWidget->GetCreatedTool());
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
-  QString toolLabel = QString("Loaded Tools: <manually added>");
+  m_Controls->m_toolLabel->setText("<manually added>");
+
+  //auto save current storage for persistence
+  MITK_INFO << "Auto saving manually added tools for persistence.";
+  AutoSaveToolStorage();
 
   //enable tracking volume again
   if (lastTrackingVolumeState) m_Controls->m_ShowTrackingVolume->click();
@@ -987,13 +994,20 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
 void QmitkMITKIGTTrackingToolboxView::UpdateToolStorageLabel(QString pathOfLoadedStorage)
 {
   Poco::Path myPath = Poco::Path(pathOfLoadedStorage.toStdString()); //use this to seperate filename from path
-  QString toolLabel = QString("Loaded ") + QString::number(m_toolStorage->GetToolCount()) + " Tools from " + myPath.getFileName().c_str();
-  if (toolLabel.size() > 55) //if the tool storage name is to long trimm the string
+  QString toolLabel = myPath.getFileName().c_str();
+  if (toolLabel.size() > 45) //if the tool storage name is to long trimm the string
     {
-    toolLabel.resize(50);
+    toolLabel.resize(40);
     toolLabel+="[...]";
     }
   m_Controls->m_toolLabel->setText(toolLabel);
+}
+
+void QmitkMITKIGTTrackingToolboxView::AutoSaveToolStorage()
+{
+  m_ToolStorageFilename = QString(mitk::IOUtil::GetTempPath().c_str()) + "TrackingToolboxAutoSave.IGTToolStorage";
+  mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
+  mySerializer->Serialize(m_ToolStorageFilename.toStdString(),m_toolStorage);
 }
 
 

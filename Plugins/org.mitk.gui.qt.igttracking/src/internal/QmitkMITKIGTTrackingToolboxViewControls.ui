@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>346</width>
+    <width>292</width>
     <height>592</height>
    </rect>
   </property>
@@ -102,11 +102,35 @@ p, li { white-space: pre-wrap; }
             <widget class="QWidget" name="page">
              <layout class="QVBoxLayout" name="verticalLayout_11">
               <item>
-               <widget class="QLabel" name="m_toolLabel">
-                <property name="text">
-                 <string>Loaded Tools: &lt;none&gt;</string>
-                </property>
-               </widget>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>ToolStorage:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="m_toolLabel">
+                  <property name="text">
+                   <string>&lt;none&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
               <item>
                <widget class="QmitkToolTrackingStatusWidget" name="m_TrackingToolsStatusWidget" native="true">
@@ -225,7 +249,7 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QLabel" name="m_TrackingControlLabel">
             <property name="text">
-             <string>Status: &lt;not configured&gt;</string>
+             <string>Status: disconnected</string>
             </property>
            </widget>
           </item>

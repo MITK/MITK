@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3D.h>
 #include "ctkCommandLineParser.h"
 #include <mitkCoreObjectFactory.h>
-#include <mitkFiberBundleXWriter.h>
 
 int StreamlineTracking(int argc, char* argv[])
 {

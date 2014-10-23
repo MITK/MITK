@@ -96,7 +96,9 @@ try
   }
 catch(std::exception& e) {MITK_WARN << "Unexpected exception during clean up of tracking toolbox view: " << e.what();}
 catch(...) {MITK_WARN << "Unexpected unknown error during clean up of tracking toolbox view!";}
-  this->StoreUISettings();
+//store tool storage and UI settings for persistence
+this->AutoSaveToolStorage();
+this->StoreUISettings();
 }
 
 

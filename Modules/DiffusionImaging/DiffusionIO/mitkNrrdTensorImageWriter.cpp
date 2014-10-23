@@ -48,7 +48,7 @@ void mitk::NrrdTensorImageWriter::Write()
     MITK_ERROR <<"Sorry, input to NrrdTensorImageWriter is NULL!";
     return;
   }
-  if ( this->GetOutputLocation().c_str() == "" )
+  if ( this->GetOutputLocation().empty() )
   {
     MITK_ERROR << "Sorry, filename has not been set!" ;
     return ;

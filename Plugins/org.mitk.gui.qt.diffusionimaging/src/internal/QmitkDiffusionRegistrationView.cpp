@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkProgressBar.h>
+#include <mitkIOUtil.h>
 
 // Qt
 #include <QMessageBox>
@@ -40,7 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <mitkDWIHeadMotionCorrectionFilter.h>
-#include <mitkNrrdDiffusionImageWriter.h>
 
 
 #define _USE_MATH_DEFINES
@@ -131,19 +131,13 @@ void QmitkRegistrationWorker::run()
       }
       else
       {
-        mitk::NrrdDiffusionImageWriter< DiffusionPixelType >::Pointer dwiwriter =
-            mitk::NrrdDiffusionImageWriter< DiffusionPixelType >::New();
-
-        dwiwriter->SetInput( m_View->m_GlobalRegisterer->GetOutput() );
-
         QString name = m_View->m_BatchList.at(i);
         name = name.replace(".dwi", "_MC.dwi", Qt::CaseInsensitive);
         name = name.replace(inputPath, outputPath, Qt::CaseInsensitive);
-        dwiwriter->SetFileName(  name.toStdString().c_str() );
 
         try
         {
-          dwiwriter->Update();
+          mitk::IOUtil::Save(m_View->m_GlobalRegisterer->GetOutput(), name.toStdString().c_str());
         }
         catch( const itk::ExceptionObject& e)
         {

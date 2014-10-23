@@ -25,12 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <itksys/Directory.hxx>
 
-#include "mitkNrrdDiffusionImageWriter.h"
 #include "mitkDiffusionDICOMFileReader.h"
 #include "mitkDICOMTagBasedSorter.h"
 #include "mitkDICOMSortByTag.h"
 
 #include "itkMergeDiffusionImagesFilter.h"
+#include <mitkIOUtil.h>
 
 static mitk::StringList& GetInputFilenames()
 {
@@ -203,14 +203,9 @@ int DICOMLoader(int argc, char* argv[])
     MITK_INFO << "Got " << GetInputFilenames().size() << " input files.";
     mitk::DiffusionImage<short>::Pointer d_img = ReadInDICOMFiles( GetInputFilenames(), outputFile );
 
-    mitk::NrrdDiffusionImageWriter<short>::Pointer writer =
-        mitk::NrrdDiffusionImageWriter<short>::New();
-    writer->SetFileName( outputFile.c_str() );
-    writer->SetInput(d_img );
-
     try
     {
-      writer->Update();
+      mitk::IOUtil::Save(d_img, outputFile.c_str());
     }
     catch( const itk::ExceptionObject& e)
     {
@@ -262,16 +257,11 @@ int DICOMLoader(int argc, char* argv[])
       image = output_container.at(0);
     }
 
-    mitk::NrrdDiffusionImageWriter<DiffusionPixelType>::Pointer writer =
-        mitk::NrrdDiffusionImageWriter<DiffusionPixelType>::New();
-    writer->SetFileName( outputFile.c_str() );
-    writer->SetInput( image );
-
     MITK_INFO("dicom.import.writeout") << " [OutputFile] " << outputFile.c_str();
 
     try
     {
-      writer->Update();
+      mitk::IOUtil::Save(image, outputFile.c_str());
     }
     catch( const itk::ExceptionObject& e)
     {

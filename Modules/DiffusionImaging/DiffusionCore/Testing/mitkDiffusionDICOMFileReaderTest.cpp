@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMTagBasedSorter.h"
 #include "mitkDICOMSortByTag.h"
 
-#include "mitkNrrdDiffusionImageWriter.h"
+#include <mitkIOUtil.h>
 
 #include "mitkTestingMacros.h"
 
@@ -102,14 +102,9 @@ int mitkDiffusionDICOMFileReaderTest(int argc, char* argv[])
 
   mitk::DiffusionImage<short>::Pointer d_img = static_cast<mitk::DiffusionImage<short>*>( loaded_image.GetPointer() );
 
-  mitk::NrrdDiffusionImageWriter<short>::Pointer writer =
-      mitk::NrrdDiffusionImageWriter<short>::New();
-  writer->SetFileName( output_filename.c_str() );
-  writer->SetInput(d_img );
-
   try
   {
-    writer->Update();
+    mitk::IOUtil::Save(d_img, output_filename.c_str());
   }
   catch( const itk::ExceptionObject& e)
   {

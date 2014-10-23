@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleXReader.h>
 #include <mitkConnectomicsNetworkReader.h>
 
+#include <mitkNrrdDiffusionImageWriter.h>
 #include <mitkNrrdTensorImageWriter.h>
 #include <mitkNrrdQBallImageWriter.h>
 #include <mitkFiberBundleXWriter.h>
@@ -56,6 +57,7 @@ namespace mitk
       m_FiberBundleXReader = new FiberBundleXReader();
       m_ConnectomicsNetworkReader = new ConnectomicsNetworkReader();
 
+      m_NrrdDiffusionImageWriter = new NrrdDiffusionImageWriter();
       m_NrrdTensorImageWriter = new NrrdTensorImageWriter();
       m_NrrdQBallImageWriter = new NrrdQBallImageWriter();
       m_FiberBundleXWriter = new FiberBundleXWriter();
@@ -70,6 +72,7 @@ namespace mitk
       delete m_FiberBundleXReader;
       delete m_ConnectomicsNetworkReader;
 
+      delete m_NrrdDiffusionImageWriter;
       delete m_NrrdTensorImageWriter;
       delete m_NrrdQBallImageWriter;
       delete m_FiberBundleXWriter;
@@ -84,6 +87,7 @@ namespace mitk
     FiberBundleXReader * m_FiberBundleXReader;
     ConnectomicsNetworkReader * m_ConnectomicsNetworkReader;
 
+    NrrdDiffusionImageWriter * m_NrrdDiffusionImageWriter;
     NrrdTensorImageWriter * m_NrrdTensorImageWriter;
     NrrdQBallImageWriter * m_NrrdQBallImageWriter;
     FiberBundleXWriter * m_FiberBundleXWriter;

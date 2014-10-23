@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkDiffusionImage.h>
-#include "mitkNrrdDiffusionImageWriter.h"
 #include <mitkImageTimeSelector.h>
 // ITK
 #include <itksys/SystemTools.hxx>
@@ -210,12 +209,9 @@ static void SaveImage(std::string fileName, mitk::Image* image, std::string file
 
   if (fileType == "dwi") // IOUtil does not handle dwi files properly Bug 15772
   {
-    mitk::NrrdDiffusionImageWriter< short >::Pointer dwiwriter = mitk::NrrdDiffusionImageWriter< short >::New();
-    dwiwriter->SetInput( dynamic_cast<mitk::DiffusionImage<short>* > (image));
-    dwiwriter->SetFileName( fileName );
     try
     {
-      dwiwriter->Update();
+      mitk::IOUtil::Save(dynamic_cast<mitk::DiffusionImage<short>*>(image), fileName.c_str());
     }
     catch( const itk::ExceptionObject& e)
     {

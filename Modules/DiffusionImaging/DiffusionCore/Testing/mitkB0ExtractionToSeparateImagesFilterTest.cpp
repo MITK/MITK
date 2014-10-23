@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageFileWriter.h"
 
 #include "itkB0ImageExtractionToSeparateImageFilter.h"
-#include "mitkNrrdDiffusionImageReader.h"
 #include "mitkDiffusionImage.h"
 
 #include "mitkDiffusionCoreObjectFactory.h"

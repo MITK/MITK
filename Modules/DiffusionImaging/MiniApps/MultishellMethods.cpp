@@ -42,8 +42,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkADCAverageFunctor.h>
 #include <itkBiExpFitFunctor.h>
 #include <itkKurtosisFitFunctor.h>
-#include <mitkNrrdDiffusionImageWriter.h>
 #include <itkDwiGradientLengthCorrectionFilter.h>
+#include <mitkIOUtil.h>
 
 int MultishellMethods(int argc, char* argv[])
 {
@@ -150,10 +150,7 @@ int MultishellMethods(int argc, char* argv[])
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 
-        mitk::NrrdDiffusionImageWriter<short>::Pointer writer = mitk::NrrdDiffusionImageWriter<short>::New();
-        writer->SetFileName((string(outName) + "_ADC.dwi"));
-        writer->SetInput(outImage);
-        writer->Update();
+        mitk::IOUtil::Save(outImage, (outName + "_ADC.dwi").c_str());
       }
       if(applyAKC)
       {
@@ -176,10 +173,7 @@ int MultishellMethods(int argc, char* argv[])
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 
-        mitk::NrrdDiffusionImageWriter<short>::Pointer writer = mitk::NrrdDiffusionImageWriter<short>::New();
-        writer->SetFileName((string(outName) + "_AKC.dwi"));
-        writer->SetInput(outImage);
-        writer->Update();
+        mitk::IOUtil::Save(outImage, (string(outName) + "_AKC.dwi").c_str());
       }
       if(applyBiExp)
       {
@@ -202,10 +196,7 @@ int MultishellMethods(int argc, char* argv[])
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 
-        mitk::NrrdDiffusionImageWriter<short>::Pointer writer = mitk::NrrdDiffusionImageWriter<short>::New();
-        writer->SetFileName((string(outName) + "_BiExp.dwi"));
-        writer->SetInput(outImage);
-        writer->Update();
+        mitk::IOUtil::Save(outImage, (string(outName) + "_BiExp.dwi").c_str());
       }
     }
   }

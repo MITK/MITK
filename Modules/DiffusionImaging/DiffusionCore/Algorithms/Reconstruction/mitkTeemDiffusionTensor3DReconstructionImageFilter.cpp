@@ -93,7 +93,7 @@ mitk::TeemDiffusionTensor3DReconstructionImageFilter<D,T>
 
   try
   {
-    mitk::IOUtil::Save(m_Input, filename.c_str());
+    mitk::IOUtil::Save(m_Input, filename);
   }
   catch (itk::ExceptionObject e)
   {

@@ -18,28 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsObjectFactory.h"
 
 #include "mitkConnectomicsNetwork.h"
-#include "mitkConnectomicsNetworkIOFactory.h"
-#include "mitkConnectomicsNetworkWriter.h"
-#include "mitkConnectomicsNetworkWriterFactory.h"
 #include "mitkConnectomicsNetworkMapper3D.h"
 
 mitk::ConnectomicsObjectFactory::ConnectomicsObjectFactory()
   : CoreObjectFactoryBase()
-  , m_ConnectomicsNetworkIOFactory(mitk::ConnectomicsNetworkIOFactory::New().GetPointer())
-  , m_ConnectomicsNetworkWriterFactory(mitk::ConnectomicsNetworkWriterFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
     MITK_DEBUG << "ConnectomicsObjectFactory c'tor" << std::endl;
-
-    itk::ObjectFactoryBase::RegisterFactory(m_ConnectomicsNetworkIOFactory);
-
-    itk::ObjectFactoryBase::RegisterFactory(m_ConnectomicsNetworkWriterFactory);
-
-    m_FileWriters.push_back( mitk::ConnectomicsNetworkWriter::New().GetPointer() );
-
-    CreateFileExtensionsMap();
 
     alreadyDone = true;
   }
@@ -48,8 +35,6 @@ mitk::ConnectomicsObjectFactory::ConnectomicsObjectFactory()
 
 mitk::ConnectomicsObjectFactory::~ConnectomicsObjectFactory()
 {
-  itk::ObjectFactoryBase::UnRegisterFactory(m_ConnectomicsNetworkIOFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_ConnectomicsNetworkWriterFactory);
 }
 
 mitk::Mapper::Pointer mitk::ConnectomicsObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
@@ -105,9 +90,6 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::ConnectomicsObjectFactory::GetSa
 
 void mitk::ConnectomicsObjectFactory::CreateFileExtensionsMap()
 {
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnf", "Connectomics Network File"));
-
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnf", "Connectomics Network File"));
 }
 
 struct RegisterConnectomicsObjectFactory{

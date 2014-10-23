@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkProgressBar.h>
-#include <mitkFiberBundleXWriter.h>
 
 // Qt
 #include <QMessageBox>

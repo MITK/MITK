@@ -27,21 +27,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCleanPolyData.h>
 #include <mitkTrackvis.h>
 #include <mitkCustomMimeType.h>
+#include "mitkDiffusionIOMimeTypes.h"
 
 
 mitk::FiberBundleXReader::FiberBundleXReader()
-  :mitk::AbstractFileReader()
+  : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_DESCRIPTION )
 {
-  std::string category = "Fiber Bundle File";
-  mitk::CustomMimeType customMimeType;
-  customMimeType.SetCategory(category);
-  customMimeType.AddExtension("fib");
-  customMimeType.AddExtension("trk");
-  customMimeType.AddExtension("vtk");
-
-  this->SetDescription(category);
-  this->SetMimeType(customMimeType);
-
   m_ServiceReg = this->RegisterService();
 }
 

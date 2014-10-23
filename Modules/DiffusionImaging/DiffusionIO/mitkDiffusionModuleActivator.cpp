@@ -14,9 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include <usModuleActivator.h>
+#include <usModuleContext.h>
 
-//#include <mitkFiberBundleXReader.h>
-//#include <mitkFiberBundleXWriter.h>
+#include <mitkNrrdDiffusionImageReader.h>
+#include <mitkNrrdTensorImageReader.h>
+#include <mitkNrrdQBallImageReader.h>
+#include <mitkFiberBundleXReader.h>
+#include <mitkConnectomicsNetworkReader.h>
+
+#include <mitkNrrdTensorImageWriter.h>
+#include <mitkNrrdQBallImageWriter.h>
+#include <mitkFiberBundleXWriter.h>
+#include <mitkConnectomicsNetworkWriter.h>
+
+#include "mitkDiffusionIOMimeTypes.h"
 
 namespace mitk
 {
@@ -27,22 +38,56 @@ namespace mitk
   {
   public:
 
-    void Load(us::ModuleContext* /*context*/)
+    void Load(us::ModuleContext* context)
     {
-//        m_FiberBundleXReader = new FiberBundleXReader();
-//        m_FiberBundleXWriter = new FiberBundleXWriter();
+      us::ServiceProperties props;
+      props[ us::ServiceConstants::SERVICE_RANKING() ] = 10;
+
+      std::vector<mitk::CustomMimeType*> mimeTypes = mitk::DiffusionIOMimeTypes::Get();
+      for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = mimeTypes.begin(),
+        iterEnd = mimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
+      {
+        context->RegisterService(*mimeTypeIter, props);
+      }
+
+      m_NrrdDiffusionImageReader = new NrrdDiffusionImageReader();
+      m_NrrdTensorImageReader = new NrrdTensorImageReader();
+      m_NrrdQBallImageReader = new NrrdQBallImageReader();
+      m_FiberBundleXReader = new FiberBundleXReader();
+      m_ConnectomicsNetworkReader = new ConnectomicsNetworkReader();
+
+      m_NrrdTensorImageWriter = new NrrdTensorImageWriter();
+      m_NrrdQBallImageWriter = new NrrdQBallImageWriter();
+      m_FiberBundleXWriter = new FiberBundleXWriter();
+      m_ConnectomicsNetworkWriter = new ConnectomicsNetworkWriter();
     }
 
     void Unload(us::ModuleContext*)
     {
-//      delete m_FiberBundleXReader;
-//      delete m_FiberBundleXWriter;
+      delete m_NrrdDiffusionImageReader;
+      delete m_NrrdTensorImageReader;
+      delete m_NrrdQBallImageReader;
+      delete m_FiberBundleXReader;
+      delete m_ConnectomicsNetworkReader;
+
+      delete m_NrrdTensorImageWriter;
+      delete m_NrrdQBallImageWriter;
+      delete m_FiberBundleXWriter;
+      delete m_ConnectomicsNetworkWriter;
     }
 
   private:
 
-//    FiberBundleXReader * m_FiberBundleXReader;
-//    FiberBundleXWriter * m_FiberBundleXWriter;
+    NrrdDiffusionImageReader * m_NrrdDiffusionImageReader;
+    NrrdTensorImageReader * m_NrrdTensorImageReader;
+    NrrdQBallImageReader * m_NrrdQBallImageReader;
+    FiberBundleXReader * m_FiberBundleXReader;
+    ConnectomicsNetworkReader * m_ConnectomicsNetworkReader;
+
+    NrrdTensorImageWriter * m_NrrdTensorImageWriter;
+    NrrdQBallImageWriter * m_NrrdQBallImageWriter;
+    FiberBundleXWriter * m_FiberBundleXWriter;
+    ConnectomicsNetworkWriter * m_ConnectomicsNetworkWriter;
 
   };
 }

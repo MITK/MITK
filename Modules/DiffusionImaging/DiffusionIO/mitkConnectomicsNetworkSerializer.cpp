@@ -55,10 +55,10 @@ std::string mitk::ConnectomicsNetworkSerializer::Serialize()
 
   try
   {
-    ConnectomicsNetworkWriter::Pointer writer = ConnectomicsNetworkWriter::New();
-    writer->SetFileName(fullname);
-    writer->SetInputConnectomicsNetwork(const_cast<ConnectomicsNetwork*>(conNet));
-    writer->Write();
+    ConnectomicsNetworkWriter writer;
+    writer.SetOutputLocation(fullname);
+    writer.SetInput(const_cast<ConnectomicsNetwork*>(conNet));
+    writer.Write();
   }
   catch (std::exception& e)
   {

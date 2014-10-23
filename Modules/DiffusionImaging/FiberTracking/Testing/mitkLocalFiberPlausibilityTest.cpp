@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <mitkTestingMacros.h>
 #include <mitkCompareImageDataFilter.h>
-#include <mitkFiberBundleXWriter.h>
 #include <mitkCoreObjectFactory.h>
 
 #define _USE_MATH_DEFINES

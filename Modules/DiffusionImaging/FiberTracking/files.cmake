@@ -4,9 +4,6 @@ set(CPP_FILES
 
   ## IO datastructures
   IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
-  IODataStructures/FiberBundleX/mitkFiberBundleXWriter.cpp
-  IODataStructures/FiberBundleX/mitkFiberBundleXReader.cpp
-  IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
   IODataStructures/FiberBundleX/mitkTrackvis.cpp
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
 
@@ -25,9 +22,6 @@ set(CPP_FILES
 set(H_FILES
   # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.h
-  IODataStructures/FiberBundleX/mitkFiberBundleXWriter.h
-  IODataStructures/FiberBundleX/mitkFiberBundleXReader.h
-  IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
   IODataStructures/FiberBundleX/mitkTrackvis.h
   IODataStructures/mitkFiberfoxParameters.h
 

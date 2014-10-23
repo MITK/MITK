@@ -55,10 +55,10 @@ std::string mitk::QBallImageSerializer::Serialize()
 
   try
   {
-    NrrdQBallImageWriter::Pointer writer = NrrdQBallImageWriter::New();
-    writer->SetFileName(fullname);
-    writer->SetInput(const_cast<QBallImage*>(image));
-    writer->Write();
+    NrrdQBallImageWriter writer;
+    writer.SetOutputLocation(fullname);
+    writer.SetInput(const_cast<QBallImage*>(image));
+    writer.Write();
   }
   catch (std::exception& e)
   {

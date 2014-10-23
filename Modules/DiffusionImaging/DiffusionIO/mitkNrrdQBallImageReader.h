@@ -19,11 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "itkVectorContainer.h"
-#include "mitkFileReader.h"
 #include "vnl/vnl_vector_fixed.h"
 #include "mitkQBallImage.h"
-#include "mitkQBallImageSource.h"
 #include "itkVectorImage.h"
+#include <mitkAbstractFileReader.h>
+#include <mitkBaseData.h>
+#include <mitkMimeType.h>
 
 namespace mitk
 {
@@ -31,38 +32,27 @@ namespace mitk
   /** \brief
   */
 
-  class NrrdQBallImageReader : public mitk::QBallImageSource, public FileReader
+  class NrrdQBallImageReader : public mitk::AbstractFileReader
   {
   public:
 
     typedef mitk::QBallImage OutputType;
-    typedef mitk::QBallImageSource QBImgSourceType;
 
-    mitkClassMacro( NrrdQBallImageReader, QBImgSourceType );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    NrrdQBallImageReader(const NrrdQBallImageReader& other);
+    NrrdQBallImageReader();
+    virtual ~NrrdQBallImageReader();
 
-    const char* GetFileName() const;
-    void SetFileName(const char* aFileName);
-    const char* GetFilePrefix() const;
-    void SetFilePrefix(const char* aFilePrefix);
-    const char* GetFilePattern() const;
-    void SetFilePattern(const char* aFilePattern);
-
-    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData> > Read();
 
   protected:
 
-    /** Does the real work. */
-    virtual void GenerateData();
-    virtual void GenerateOutputInformation();
-
-    std::string m_FileName;
-    std::string m_FilePrefix;
-    std::string m_FilePattern;
 
   private:
-    void operator=(const Self&); //purposely not implemented
+  private:
+    NrrdQBallImageReader* Clone() const;
+
+    us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
   };
 
 } //namespace MITK

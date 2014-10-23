@@ -1,5 +1,4 @@
 set(MODULE_TESTS
-  mitkFactoryRegistrationTest.cpp
   mitkDiffusionImageEqualTest.cpp
   mitkNonLocalMeansDenoisingTest.cpp
   mitkDiffusionImageEqualTest.cpp

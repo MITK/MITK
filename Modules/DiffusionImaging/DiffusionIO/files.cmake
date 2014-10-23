@@ -21,6 +21,8 @@ set(CPP_FILES
   mitkNrrdTbssImageIOFactory.cpp
   mitkDiffusionCoreObjectFactory.cpp
 
+  mitkDiffusionIOMimeTypes.cpp
+
   mitkNrrdDiffusionImageReader.cpp
 #  mitkNrrdDiffusionImageIOFactory.cpp
   mitkNrrdDiffusionImageWriterFactory.cpp
@@ -30,6 +32,9 @@ set(CPP_FILES
   mitkNrrdQBallImageWriter.cpp
   mitkQBallImageSerializer.cpp
 
+  mitkFiberBundleXReader.cpp
+  mitkFiberBundleXWriter.cpp
+  mitkFiberBundleXSerializer.cpp
   mitkFiberBundleXMapper2D.cpp
   mitkFiberBundleXMapper3D.cpp
   mitkCompositeMapper.cpp

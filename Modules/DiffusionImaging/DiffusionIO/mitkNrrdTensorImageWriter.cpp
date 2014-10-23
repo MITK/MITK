@@ -21,21 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageFileWriter.h"
 #include "itkDiffusionTensor3D.h"
 #include "mitkImageCast.h"
-#include "mitkIOMimeTypes.h"
+#include "mitkDiffusionIOMimeTypes.h"
 
 
 mitk::NrrdTensorImageWriter::NrrdTensorImageWriter()
-  : AbstractFileWriter(mitk::TensorImage::GetStaticNameOfClass())
+  : AbstractFileWriter(mitk::TensorImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::DTI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::DTI_MIMETYPE_DESCRIPTION )
 {
-  std::string category = "Tensor Images";
-  mitk::CustomMimeType customMimeType;
-  customMimeType.SetCategory(category);
-  customMimeType.AddExtension("dti");
-  customMimeType.AddExtension("hdti");
-
-  this->SetDescription(category);
-  this->SetMimeType(customMimeType);
-
   RegisterService();
 }
 

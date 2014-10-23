@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNrrdQBallImageReader.h"
 #include <mitkCustomMimeType.h>
+#include "mitkDiffusionIOMimeTypes.h"
 
 #include "itkImageFileReader.h"
 #include "itkImageRegionIterator.h"
@@ -32,16 +33,8 @@ namespace mitk
   }
 
   NrrdQBallImageReader::NrrdQBallImageReader()
+    : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_DESCRIPTION )
   {
-    std::string category = "Q-Ball Images";
-    mitk::CustomMimeType customMimeType;
-    customMimeType.SetCategory(category);
-    customMimeType.AddExtension("qbi");
-    customMimeType.AddExtension("hqbi");
-
-    this->SetDescription(category);
-    this->SetMimeType(customMimeType);
-
     m_ServiceReg = this->RegisterService();
   }
 

@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkFiberBundleXSerializer_h_included
 #define mitkFiberBundleXSerializer_h_included
 
-#include <MitkFiberTrackingExports.h>
 #include "mitkBaseDataSerializer.h"
 
 namespace mitk
@@ -25,7 +24,7 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class MitkFiberTracking_EXPORT FiberBundleXSerializer : public BaseDataSerializer
+class FiberBundleXSerializer : public BaseDataSerializer
 {
   public:
     mitkClassMacro( FiberBundleXSerializer, BaseDataSerializer );

@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itksys/SystemTools.hxx"
 #include "mitkCustomMimeType.h"
+#include "mitkDiffusionIOMimeTypes.h"
 
 namespace mitk
 {
@@ -53,19 +54,8 @@ NrrdDiffusionImageReader::
 
 NrrdDiffusionImageReader::
 NrrdDiffusionImageReader()
-  : AbstractFileReader()
+  : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_DESCRIPTION )
 {
-  std::string category = "Diffusion Weighted Image";
-  CustomMimeType customMimeType;
-  customMimeType.SetCategory(category);
-  customMimeType.AddExtension("hdwi");
-  customMimeType.AddExtension("dwi");
-  customMimeType.AddExtension("fsl");
-  customMimeType.AddExtension("fslgz");
-
-  this->SetDescription(category);
-  this->SetMimeType(customMimeType);
-
   m_ServiceReg = this->RegisterService();
 }
 

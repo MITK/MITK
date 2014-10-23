@@ -21,20 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageFileWriter.h"
 #include "mitkImageCast.h"
 #include "mitkIOMimeTypes.h"
+#include "mitkDiffusionIOMimeTypes.h"
 
 
 mitk::NrrdQBallImageWriter::NrrdQBallImageWriter()
-  : AbstractFileWriter(mitk::QBallImage::GetStaticNameOfClass())
+  : AbstractFileWriter(mitk::QBallImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_DESCRIPTION)
 {
-  std::string category = "Q-Ball Images";
-  mitk::CustomMimeType customMimeType;
-  customMimeType.SetCategory(category);
-  customMimeType.AddExtension("qbi");
-  customMimeType.AddExtension("hqbi");
-
-  this->SetDescription(category);
-  this->SetMimeType(customMimeType);
-
   RegisterService();
 }
 

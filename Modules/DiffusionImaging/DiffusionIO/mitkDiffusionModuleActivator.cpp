@@ -20,10 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNrrdTensorImageReader.h>
 #include <mitkNrrdQBallImageReader.h>
 #include <mitkFiberBundleXReader.h>
+#include <mitkConnectomicsNetworkReader.h>
 
 #include <mitkNrrdTensorImageWriter.h>
 #include <mitkNrrdQBallImageWriter.h>
 #include <mitkFiberBundleXWriter.h>
+#include <mitkConnectomicsNetworkWriter.h>
 
 #include "mitkDiffusionIOMimeTypes.h"
 
@@ -52,10 +54,12 @@ namespace mitk
       m_NrrdTensorImageReader = new NrrdTensorImageReader();
       m_NrrdQBallImageReader = new NrrdQBallImageReader();
       m_FiberBundleXReader = new FiberBundleXReader();
+      m_ConnectomicsNetworkReader = new ConnectomicsNetworkReader();
 
       m_NrrdTensorImageWriter = new NrrdTensorImageWriter();
       m_NrrdQBallImageWriter = new NrrdQBallImageWriter();
       m_FiberBundleXWriter = new FiberBundleXWriter();
+      m_ConnectomicsNetworkWriter = new ConnectomicsNetworkWriter();
     }
 
     void Unload(us::ModuleContext*)
@@ -64,10 +68,12 @@ namespace mitk
       delete m_NrrdTensorImageReader;
       delete m_NrrdQBallImageReader;
       delete m_FiberBundleXReader;
+      delete m_ConnectomicsNetworkReader;
 
       delete m_NrrdTensorImageWriter;
       delete m_NrrdQBallImageWriter;
       delete m_FiberBundleXWriter;
+      delete m_ConnectomicsNetworkWriter;
     }
 
   private:
@@ -76,10 +82,12 @@ namespace mitk
     NrrdTensorImageReader * m_NrrdTensorImageReader;
     NrrdQBallImageReader * m_NrrdQBallImageReader;
     FiberBundleXReader * m_FiberBundleXReader;
+    ConnectomicsNetworkReader * m_ConnectomicsNetworkReader;
 
     NrrdTensorImageWriter * m_NrrdTensorImageWriter;
     NrrdQBallImageWriter * m_NrrdQBallImageWriter;
     FiberBundleXWriter * m_FiberBundleXWriter;
+    ConnectomicsNetworkWriter * m_ConnectomicsNetworkWriter;
 
   };
 }

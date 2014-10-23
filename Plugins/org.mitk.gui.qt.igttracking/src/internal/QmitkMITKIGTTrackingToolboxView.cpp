@@ -37,9 +37,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkProgressBar.h>
 #include <mitkIOUtil.h>
+#include <mitkLog.h>
 
 // vtk
 #include <vtkSphereSource.h>
+
 //for exceptions
 #include <mitkIGTException.h>
 #include <mitkIGTIOException.h>
@@ -58,6 +60,21 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   m_connected = false;
   m_logging = false;
   m_loggedFrames = 0;
+
+  //create filename for autosaving of tool storage
+  QString loggingPathWithoutFilename = QString(mitk::LoggingBackend::GetLogFile().c_str());
+  if (!loggingPathWithoutFilename.isEmpty()) //if there already is a path for the MITK logging file use this one
+    {
+    //extract path from path+filename (if someone knows a better way to do this feel free to change it)
+    int lengthOfFilename = Poco::Path(mitk::LoggingBackend::GetLogFile()).getFileName().size();
+    loggingPathWithoutFilename.resize(loggingPathWithoutFilename.size()-lengthOfFilename);
+    m_AutoSaveFilename = loggingPathWithoutFilename + "TrackingToolboxAutoSave.IGTToolStorage";
+    }
+  else //if not: use a temporary path from IOUtil
+    {
+    m_AutoSaveFilename = QString(mitk::IOUtil::GetTempPath().c_str()) + "TrackingToolboxAutoSave.IGTToolStorage";
+    }
+  MITK_INFO("IGT Tracking Toolbox") << "Filename for auto saving of IGT ToolStorages: " << m_AutoSaveFilename.toStdString();
 
   //initialize worker thread
   m_WorkerThread = new QThread();
@@ -1005,7 +1022,7 @@ void QmitkMITKIGTTrackingToolboxView::UpdateToolStorageLabel(QString pathOfLoade
 
 void QmitkMITKIGTTrackingToolboxView::AutoSaveToolStorage()
 {
-  m_ToolStorageFilename = QString(mitk::IOUtil::GetTempPath().c_str()) + "TrackingToolboxAutoSave.IGTToolStorage";
+  m_ToolStorageFilename = m_AutoSaveFilename;
   mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
   mySerializer->Serialize(m_ToolStorageFilename.toStdString(),m_toolStorage);
 }

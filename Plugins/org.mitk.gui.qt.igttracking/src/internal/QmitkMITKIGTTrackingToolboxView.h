@@ -162,6 +162,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     bool lastTrackingVolumeState;                        ///>temporary holds the state of the tracking volume (activated/not activated) during some methods
 
     QString m_ToolStorageFilename; ///>stores the filename of the current tool storage
+    QString m_AutoSaveFilename; ///>a filename for auto saving tools if no m_ToolStorageFilename was given by the user
 
     /** @brief Shows a message box with the text given as parameter. */
     void MessageBox(std::string s);

@@ -22,8 +22,7 @@ set(CPP_FILES
   mitkDiffusionIOMimeTypes.cpp
 
   mitkNrrdDiffusionImageReader.cpp
-#  mitkNrrdDiffusionImageIOFactory.cpp
-  mitkNrrdDiffusionImageWriterFactory.cpp
+  mitkNrrdDiffusionImageWriter.cpp
   mitkDiffusionImageSerializer.cpp
 
   mitkNrrdQBallImageReader.cpp

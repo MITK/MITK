@@ -24,34 +24,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkNiftiImageIO.h"
 #include "itkImageFileWriter.h"
 #include "itksys/SystemTools.hxx"
+#include "mitkDiffusionIOMimeTypes.h"
 
 #include <iostream>
 #include <fstream>
 
-template<typename TPixelType>
-mitk::NrrdDiffusionImageWriter<TPixelType>::NrrdDiffusionImageWriter()
-  : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
+
+mitk::NrrdDiffusionImageWriter::NrrdDiffusionImageWriter()
+  : AbstractFileWriter(mitk::DiffusionImage<short>::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_DESCRIPTION)
 {
-  this->SetNumberOfRequiredInputs( 1 );
+  RegisterService();
 }
 
-template<typename TPixelType>
-mitk::NrrdDiffusionImageWriter<TPixelType>::~NrrdDiffusionImageWriter()
+mitk::NrrdDiffusionImageWriter::NrrdDiffusionImageWriter(const mitk::NrrdDiffusionImageWriter& other)
+  : AbstractFileWriter(other)
+{
+}
+
+mitk::NrrdDiffusionImageWriter::~NrrdDiffusionImageWriter()
 {}
 
-template<typename TPixelType>
-void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
+void mitk::NrrdDiffusionImageWriter::Write()
 {
-  m_Success = false;
-  InputType* input = this->GetInput();
-  if (input == NULL)
+  InputType::ConstPointer input = dynamic_cast<const InputType*>(this->GetInput());
+  if (input.IsNull())
   {
-    itkWarningMacro(<<"Sorry, input to NrrdDiffusionImageWriter is NULL!");
+    MITK_ERROR <<"Sorry, input to NrrdDiffusionImageWriter is NULL!";
     return;
   }
-  if ( m_FileName == "" )
+  if ( this->GetOutputLocation().empty() )
   {
-    itkWarningMacro( << "Sorry, filename has not been set!" );
+    MITK_ERROR << "Sorry, filename has not been set!";
     return ;
   }
   const std::string& locale = "C";
@@ -76,8 +79,8 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
 
   vnl_matrix_fixed<double,3,3> measurementFrame = input->GetMeasurementFrame();
   if (measurementFrame(0,0) || measurementFrame(0,1) || measurementFrame(0,2) ||
-      measurementFrame(1,0) || measurementFrame(1,1) || measurementFrame(1,2) ||
-      measurementFrame(2,0) || measurementFrame(2,1) || measurementFrame(2,2))
+    measurementFrame(1,0) || measurementFrame(1,1) || measurementFrame(1,2) ||
+    measurementFrame(2,0) || measurementFrame(2,1) || measurementFrame(2,2))
   {
     sprintf( valbuffer, " (%lf,%lf,%lf) (%lf,%lf,%lf) (%lf,%lf,%lf)", measurementFrame(0,0), measurementFrame(0,1), measurementFrame(0,2), measurementFrame(1,0), measurementFrame(1,1), measurementFrame(1,2), measurementFrame(2,0), measurementFrame(2,1), measurementFrame(2,2));
     itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("measurement frame"),std::string(valbuffer));
@@ -97,18 +100,18 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     sprintf( keybuffer, "DWMRI_gradient_%04d", i );
 
     /*if(itk::ExposeMetaData<std::string>(input->GetMetaDataDictionary(),
-      std::string(keybuffer),tmp))
-      continue;*/
+    std::string(keybuffer),tmp))
+    continue;*/
 
     sprintf( valbuffer, "%1f %1f %1f", input->GetDirections()->ElementAt(i).get(0),
-             input->GetDirections()->ElementAt(i).get(1), input->GetDirections()->ElementAt(i).get(2));
+      input->GetDirections()->ElementAt(i).get(1), input->GetDirections()->ElementAt(i).get(2));
 
     itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
   }
 
-  typedef itk::VectorImage<TPixelType,3> ImageType;
+  typedef itk::VectorImage<short,3> ImageType;
 
-  std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
+  std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetOutputLocation());
   ext = itksys::SystemTools::LowerCase(ext);
   if (ext == ".hdwi" || ext == ".dwi")
   {
@@ -118,11 +121,11 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     io->UseCompressionOn();
 
     typedef itk::ImageFileWriter<ImageType> WriterType;
-    typename WriterType::Pointer nrrdWriter = WriterType::New();
+    WriterType::Pointer nrrdWriter = WriterType::New();
     nrrdWriter->UseInputMetaDataDictionaryOn();
     nrrdWriter->SetInput( input->GetVectorImage() );
     nrrdWriter->SetImageIO(io);
-    nrrdWriter->SetFileName(m_FileName);
+    nrrdWriter->SetFileName(this->GetOutputLocation());
     nrrdWriter->UseCompressionOn();
     nrrdWriter->SetImageIO(io);
     try
@@ -139,27 +142,27 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
   else if (ext == ".fsl" || ext == ".fslgz")
   {
     MITK_INFO << "Writing Nifti-Image for FSL";
-    typename ImageType::Pointer vecimg = input->GetVectorImage();
+    ImageType::Pointer vecimg = input->GetVectorImage();
 
-    typedef itk::Image<TPixelType,4> ImageType4D;
-    typename ImageType4D::Pointer img4 = ImageType4D::New();
+    typedef itk::Image<short,4> ImageType4D;
+    ImageType4D::Pointer img4 = ImageType4D::New();
 
-    typename ImageType::SpacingType spacing = vecimg->GetSpacing();
-    typename ImageType4D::SpacingType spacing4;
+    ImageType::SpacingType spacing = vecimg->GetSpacing();
+    ImageType4D::SpacingType spacing4;
     for(int i=0; i<3; i++)
       spacing4[i] = spacing[i];
     spacing4[3] = 1;
     img4->SetSpacing( spacing4 );   // Set the image spacing
 
-    typename ImageType::PointType origin = vecimg->GetOrigin();
-    typename ImageType4D::PointType origin4;
+    ImageType::PointType origin = vecimg->GetOrigin();
+    ImageType4D::PointType origin4;
     for(int i=0; i<3; i++)
       origin4[i] = origin[i];
     origin4[3] = 0;
     img4->SetOrigin( origin4 );     // Set the image origin
 
-    typename ImageType::DirectionType direction = vecimg->GetDirection();
-    typename ImageType4D::DirectionType direction4;
+    ImageType::DirectionType direction = vecimg->GetDirection();
+    ImageType4D::DirectionType direction4;
     for(int i=0; i<3; i++)
       for(int j=0; j<3; j++)
         direction4[i][j] = direction[i][j];
@@ -170,18 +173,18 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     direction4[3][3] = 1;
     img4->SetDirection( direction4 );  // Set the image direction
 
-    typename ImageType::RegionType region = vecimg->GetLargestPossibleRegion();
-    typename ImageType4D::RegionType region4;
+    ImageType::RegionType region = vecimg->GetLargestPossibleRegion();
+    ImageType4D::RegionType region4;
 
-    typename ImageType::RegionType::SizeType size = region.GetSize();
-    typename ImageType4D::RegionType::SizeType size4;
+    ImageType::RegionType::SizeType size = region.GetSize();
+    ImageType4D::RegionType::SizeType size4;
 
     for(int i=0; i<3; i++)
       size4[i] = size[i];
     size4[3] = vecimg->GetVectorLength();
 
-    typename ImageType::RegionType::IndexType index = region.GetIndex();
-    typename ImageType4D::RegionType::IndexType index4;
+    ImageType::RegionType::IndexType index = region.GetIndex();
+    ImageType4D::RegionType::IndexType index4;
     for(int i=0; i<3; i++)
       index4[i] = index[i];
     index4[3] = 0;
@@ -193,12 +196,12 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     img4->Allocate();
 
     itk::ImageRegionIterator<ImageType>   it (vecimg, vecimg->GetLargestPossibleRegion() );
-    typedef typename ImageType::PixelType VecPixType;
+    typedef ImageType::PixelType VecPixType;
 
     for (it.GoToBegin(); !it.IsAtEnd(); ++it)
     {
       VecPixType vec = it.Get();
-      typename ImageType::IndexType currentIndex = it.GetIndex();
+      ImageType::IndexType currentIndex = it.GetIndex();
       for(unsigned int ind=0; ind<vec.Size(); ind++)
       {
 
@@ -210,7 +213,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     }
 
     // create copy of file with correct ending for mitk
-    std::string fname3 = m_FileName;
+    std::string fname3 = this->GetOutputLocation();
     std::string::iterator itend = fname3.end();
     if (ext == ".fsl")
       fname3.replace( itend-3, itend, "nii");
@@ -219,9 +222,9 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
 
     itk::NiftiImageIO::Pointer io4 = itk::NiftiImageIO::New();
 
-    typedef itk::VectorImage<TPixelType,3> ImageType;
+    typedef itk::VectorImage<short,3> ImageType;
     typedef itk::ImageFileWriter<ImageType4D> WriterType4;
-    typename WriterType4::Pointer nrrdWriter4 = WriterType4::New();
+    WriterType4::Pointer nrrdWriter4 = WriterType4::New();
     nrrdWriter4->UseInputMetaDataDictionaryOn();
     nrrdWriter4->SetInput( img4 );
     nrrdWriter4->SetFileName(fname3);
@@ -237,12 +240,12 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
       throw;
     }
 
-    itksys::SystemTools::CopyAFile(fname3.c_str(), m_FileName.c_str());
+    itksys::SystemTools::CopyAFile(fname3.c_str(), this->GetOutputLocation().c_str());
 
     if(input->GetDirections()->Size())
     {
       std::ofstream myfile;
-      std::string fname = m_FileName;
+      std::string fname = this->GetOutputLocation();
       fname += ".bvals";
       myfile.open (fname.c_str());
       for(unsigned int i=0; i<input->GetDirections()->Size(); i++)
@@ -253,7 +256,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
       myfile.close();
 
       std::ofstream myfile2;
-      std::string fname2 = m_FileName;
+      std::string fname2 = this->GetOutputLocation();
       fname2 += ".bvecs";
       myfile2.open (fname2.c_str());
       for(int j=0; j<3; j++)
@@ -261,8 +264,8 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
         for(unsigned int i=0; i<input->GetDirections()->Size(); i++)
         {
           //need to modify the length
-          typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer grads = input->GetDirections();
-          typename mitk::DiffusionImage<TPixelType>::GradientDirectionType direction = grads->ElementAt(i);
+          mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer grads = input->GetDirections();
+          mitk::DiffusionImage<short>::GradientDirectionType direction = grads->ElementAt(i);
           direction.normalize();
           myfile2 << direction.get(j) << " ";
           //myfile2 << input->GetDirections()->ElementAt(i).get(j) << " ";
@@ -271,7 +274,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
       }
 
       std::ofstream myfile3;
-      std::string fname4 = m_FileName;
+      std::string fname4 = this->GetOutputLocation();
       fname4 += ".ttk";
       myfile3.open (fname4.c_str());
       for(unsigned int i=0; i<input->GetDirections()->Size(); i++)
@@ -292,43 +295,24 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
   {
     MITK_INFO << "Could not reset locale " << currLocale;
   }
-  m_Success = true;
 }
 
-template<typename TPixelType>
-void mitk::NrrdDiffusionImageWriter<TPixelType>::SetInput( InputType* diffVolumes )
+mitk::NrrdDiffusionImageWriter* mitk::NrrdDiffusionImageWriter::Clone() const
 {
-  this->ProcessObject::SetNthInput( 0, diffVolumes );
+  return new NrrdDiffusionImageWriter(*this);
 }
 
-template<typename TPixelType>
-mitk::DiffusionImage<TPixelType>* mitk::NrrdDiffusionImageWriter<TPixelType>::GetInput()
+mitk::IFileWriter::ConfidenceLevel mitk::NrrdDiffusionImageWriter::GetConfidenceLevel() const
 {
-  if ( this->GetNumberOfInputs() < 1 )
+  InputType::ConstPointer input = dynamic_cast<const InputType*>(this->GetInput());
+  if (input.IsNull() )
   {
-    return NULL;
+    return Unsupported;
   }
   else
   {
-    return dynamic_cast<InputType*> ( this->ProcessObject::GetInput( 0 ) );
+    return Supported;
   }
-}
-
-template<typename TPixelType>
-std::vector<std::string> mitk::NrrdDiffusionImageWriter<TPixelType>::GetPossibleFileExtensions()
-{
-  std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(".dwi");
-  possibleFileExtensions.push_back(".hdwi");
-  possibleFileExtensions.push_back(".fsl");
-  possibleFileExtensions.push_back(".fslgz");
-  return possibleFileExtensions;
-}
-
-template<typename TPixelType>
-std::string mitk::NrrdDiffusionImageWriter<TPixelType>::GetSupportedBaseData() const
-{
-  return DiffusionImage<TPixelType>::GetStaticNameOfClass();
 }
 
 #endif //__mitkNrrdDiffusionImageWriter__cpp

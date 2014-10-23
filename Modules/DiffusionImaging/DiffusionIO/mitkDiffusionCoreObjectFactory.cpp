@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
 
-#include "mitkNrrdDiffusionImageWriterFactory.h"
 #include "mitkNrrdDiffusionImageWriter.h"
 #include "mitkDiffusionImage.h"
 
@@ -37,18 +36,12 @@ typedef std::multimap<std::string, std::string> MultimapType;
 
 mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory()
   : CoreObjectFactoryBase()
-  , m_NrrdDiffusionImageWriterFactory(mitk::NrrdDiffusionImageWriterFactory::New().GetPointer())
 {
 
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
     MITK_DEBUG << "DiffusionCoreObjectFactory c'tor" << std::endl;
-
-    itk::ObjectFactoryBase::RegisterFactory(m_NrrdDiffusionImageWriterFactory);
-
-    m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
-
 
     CreateFileExtensionsMap();
 
@@ -59,8 +52,6 @@ mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory()
 
 mitk::DiffusionCoreObjectFactory::~DiffusionCoreObjectFactory()
 {
-
-  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdDiffusionImageWriterFactory);
 
 }
 
@@ -168,15 +159,6 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::DiffusionCoreObjectFactory::GetS
 
 void mitk::DiffusionCoreObjectFactory::CreateFileExtensionsMap()
 {
-  //  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
-
-
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", "Diffusion Weighted Images for FSL"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.fsl", "Diffusion Weighted Images for FSL"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.fslgz", "Diffusion Weighted Images for FSL"));
-  // m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
 
 }
 

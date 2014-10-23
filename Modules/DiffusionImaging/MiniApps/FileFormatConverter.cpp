@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
-#include <mitkNrrdDiffusionImageWriter.h>
 #include <mitkFiberBundleX.h>
 #include "ctkCommandLineParser.h"
 #include "ctkCommandLineParser.cpp"
@@ -55,11 +54,7 @@ int FileFormatConverter(int argc, char* argv[])
 
         if ( dynamic_cast<DiffusionImage<short>*>(baseData.GetPointer()) )
         {
-            DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(baseData.GetPointer());
-            NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-            writer->SetFileName(outName);
-            writer->SetInput(dwi);
-            writer->Update();
+          mitk::IOUtil::Save(dynamic_cast<DiffusionImage<short>*>(baseData.GetPointer()), outName.c_str());
         }
         else if ( dynamic_cast<Image*>(baseData.GetPointer()) )
         {

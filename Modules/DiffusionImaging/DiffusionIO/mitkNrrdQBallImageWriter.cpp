@@ -47,7 +47,7 @@ void mitk::NrrdQBallImageWriter::Write()
         MITK_ERROR <<"Sorry, input to NrrdQBallImageWriter is NULL!";
         return;
     }
-    if ( this->GetOutputLocation().c_str() == "" )
+    if ( this->GetOutputLocation().empty() )
     {
         MITK_ERROR << "Sorry, filename has not been set!";
         return ;

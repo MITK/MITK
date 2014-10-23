@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkNrrdDiffusionImageWriter.h>
 #include <mitkFiberBundleX.h>
-#include <mitkFiberBundleXWriter.h>
 #include "ctkCommandLineParser.h"
 #include "ctkCommandLineParser.cpp"
 

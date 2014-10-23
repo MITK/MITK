@@ -4,6 +4,14 @@ set(CPP_FILES
   mitkPointSetDifferenceStatisticsCalculator.cpp
 )
 
+set(H_FILES
+  mitkImageStatisticsCalculator.h
+  mitkPointSetDifferenceStatisticsCalculator.h
+  mitkPointSetStatisticsCalculator.h
+  mitkStatisticsImageFilter.h
+  mitkLabelStatisticsImageFilter.h
+)
+
 if( ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} VERSION_LESS 5.8 )
   message(STATUS "Using VTK 5.8 classes from MITK respository")
   set(CPP_FILES ${CPP_FILES}

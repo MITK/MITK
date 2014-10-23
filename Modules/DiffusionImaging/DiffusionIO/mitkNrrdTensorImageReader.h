@@ -19,12 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "itkVectorContainer.h"
-#include "mitkFileReader.h"
 #include "vnl/vnl_vector_fixed.h"
 #include "mitkTensorImage.h"
-#include "mitkTensorImageSource.h"
 #include "itkVectorImage.h"
 #include "itkDiffusionTensor3D.h"
+#include <mitkAbstractFileReader.h>
+#include <mitkBaseData.h>
+#include <mitkMimeType.h>
 
 namespace mitk
 {
@@ -32,39 +33,28 @@ namespace mitk
   /** \brief
   */
 
-  class NrrdTensorImageReader : public mitk::TensorImageSource, public FileReader
+  class NrrdTensorImageReader : public mitk::AbstractFileReader
   {
   public:
 
     typedef mitk::TensorImage OutputType;
-    typedef mitk::TensorImageSource DTImgSourceType;
     typedef itk::Matrix< float, 3, 3 > MeasurementFrameType;
 
-    mitkClassMacro( NrrdTensorImageReader, DTImgSourceType );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    NrrdTensorImageReader(const NrrdTensorImageReader& other);
+    NrrdTensorImageReader();
+    virtual ~NrrdTensorImageReader();
 
-    const char* GetFileName() const;
-    void SetFileName(const char* aFileName);
-    const char* GetFilePrefix() const;
-    void SetFilePrefix(const char* aFilePrefix);
-    const char* GetFilePattern() const;
-    void SetFilePattern(const char* aFilePattern);
-
-    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData> > Read();
 
   protected:
 
-    /** Does the real work. */
-    virtual void GenerateData();
-    virtual void GenerateOutputInformation();
-
-    std::string m_FileName;
-    std::string m_FilePrefix;
-    std::string m_FilePattern;
 
   private:
-    void operator=(const Self&); //purposely not implemented
+    NrrdTensorImageReader* Clone() const;
+
+    us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
+
     itk::DiffusionTensor3D<float> ConvertMatrixTypeToFixedArrayType(const itk::DiffusionTensor3D<float>::Superclass::MatrixType & matrix);
   };
 

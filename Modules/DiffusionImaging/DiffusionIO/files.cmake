@@ -13,8 +13,6 @@ set(CPP_FILES
   mitkNrrdTbssRoiImageWriterFactory.cpp
   mitkNrrdTensorImageReader.cpp
   mitkNrrdTensorImageWriter.cpp
-  mitkNrrdTensorImageIOFactory.cpp
-  mitkNrrdTensorImageWriterFactory.cpp
   mitkTensorImageSerializer.cpp
   mitkTensorImageSource.cpp
   mitkFiberTrackingObjectFactory.cpp

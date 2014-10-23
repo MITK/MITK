@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_NRRDDTI_WRITER__H_
 
 #include <itkProcessObject.h>
-#include <mitkFileWriterWithInformation.h>
+#include <mitkAbstractFileWriter.h>
 #include <mitkTensorImage.h>
 
 
@@ -29,102 +29,24 @@ namespace mitk
  * Writes diffusion volumes to a file
  * @ingroup Process
  */
-class NrrdTensorImageWriter : public mitk::FileWriterWithInformation
+class NrrdTensorImageWriter : public mitk::AbstractFileWriter
 {
 public:
 
-    mitkClassMacro( NrrdTensorImageWriter, mitk::FileWriterWithInformation );
-
-    mitkWriterMacro;
-
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
     typedef mitk::TensorImage InputType;
 
-    /**
-     * Sets the filename of the file to write.
-     * @param FileName the name of the file to write.
-     */
-    itkSetStringMacro( FileName );
+    NrrdTensorImageWriter();
+    virtual ~NrrdTensorImageWriter();
 
-    /**
-     * @returns the name of the file to be written to disk.
-     */
-    itkGetStringMacro( FileName );
+    using AbstractFileWriter::Write;
+    virtual void Write();
 
-    /**
-     * @warning multiple write not (yet) supported
-     */
-    itkSetStringMacro( FilePrefix );
-
-    /**
-     * @warning multiple write not (yet) supported
-     */
-    itkGetStringMacro( FilePrefix );
-
-    /**
-     * @warning multiple write not (yet) supported
-     */
-    itkSetStringMacro( FilePattern );
-
-    /**
-     * @warning multiple write not (yet) supported
-     */
-    itkGetStringMacro( FilePattern );
-
-    /**
-     * Sets the input object for the filter.
-     * @param input the diffusion volumes to write to file.
-     */
-    using itk::ProcessObject::SetInput;
-    void SetInput( InputType* input );
-
-    /**
-     * @returns the 0'th input object of the filter.
-     */
-    InputType* GetInput();
-
-    /**
-     * Returns false if an error happened during writing
-     */
-    itkGetMacro( Success, bool );
-
-    /**
-    * @return possible file extensions for the data type associated with the writer
-    */
-    virtual std::vector<std::string> GetPossibleFileExtensions();
-
-    std::string GetSupportedBaseData() const;
-
-    // FileWriterWithInformation methods
-    virtual const char * GetDefaultFilename() { return "Tensors.dti"; }
-    virtual const char * GetFileDialogPattern() { return "Tensor Images (*.dti *.hdti)"; }
-    virtual const char * GetDefaultExtension() { return ".dti"; }
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::TensorImage*>(data.GetPointer()) != NULL); };
-    virtual void DoWrite(BaseData::Pointer data) {
-      if (CanWriteBaseDataType(data)) {
-        this->SetInput(dynamic_cast<mitk::TensorImage*>(data.GetPointer()));
-        this->Update();
-      }
-    };
+    virtual ConfidenceLevel GetConfidenceLevel() const;
 
 protected:
 
-    NrrdTensorImageWriter();
-
-    virtual ~NrrdTensorImageWriter();
-
-    virtual void GenerateData();
-
-    std::string m_FileName;
-
-    std::string m_FilePrefix;
-
-    std::string m_FilePattern;
-
-    bool m_Success;
-
+  NrrdTensorImageWriter(const NrrdTensorImageWriter& other);
+  virtual mitk::NrrdTensorImageWriter* Clone() const;
 };
 
 

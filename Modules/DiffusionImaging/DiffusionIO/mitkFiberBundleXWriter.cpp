@@ -78,6 +78,13 @@ void mitk::FiberBundleXWriter::Write()
     mitk::FiberBundleX::ConstPointer input = dynamic_cast<const mitk::FiberBundleX*>(this->GetInput());
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetOutputLocation().c_str());
 
+    // default extension is .fib
+    if(ext == "")
+    {
+      ext = ".fib";
+      this->SetOutputLocation(this->GetOutputLocation() + ext);
+    }
+
     if (ext==".fib" || ext==".vtk")
     {
         MITK_INFO << "Writing fiber bundle as binary VTK";

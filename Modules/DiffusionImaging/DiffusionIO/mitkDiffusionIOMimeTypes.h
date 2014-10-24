@@ -36,7 +36,7 @@ public:
 
   static std::string FIBERBUNDLE_MIMETYPE_NAME();
 
-  static const std::string FIBERBUNDLE_MIMETYPE_DESCRIPTION;
+  static std::string FIBERBUNDLE_MIMETYPE_DESCRIPTION();
 
   // ------------------------- Image formats (ITK based) --------------------------
 
@@ -48,9 +48,9 @@ public:
   static std::string DTI_MIMETYPE_NAME();
   static std::string QBI_MIMETYPE_NAME();
 
-  static const std::string DWI_MIMETYPE_DESCRIPTION;
-  static const std::string DTI_MIMETYPE_DESCRIPTION;
-  static const std::string QBI_MIMETYPE_DESCRIPTION;
+  static std::string DWI_MIMETYPE_DESCRIPTION();
+  static std::string DTI_MIMETYPE_DESCRIPTION();
+  static std::string QBI_MIMETYPE_DESCRIPTION();
 
   // ------------------------------ MITK formats ----------------------------------
 
@@ -58,7 +58,7 @@ public:
 
   static std::string CONNECTOMICS_MIMETYPE_NAME();
 
-  static const std::string CONNECTOMICS_MIMETYPE_DESCRIPTION;
+  static std::string CONNECTOMICS_MIMETYPE_DESCRIPTION();
 
 private:
 

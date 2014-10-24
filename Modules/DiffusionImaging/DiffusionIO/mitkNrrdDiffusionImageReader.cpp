@@ -54,7 +54,7 @@ NrrdDiffusionImageReader::
 
 NrrdDiffusionImageReader::
 NrrdDiffusionImageReader()
-  : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_DESCRIPTION )
+  : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_DESCRIPTION() )
 {
   m_ServiceReg = this->RegisterService();
 }

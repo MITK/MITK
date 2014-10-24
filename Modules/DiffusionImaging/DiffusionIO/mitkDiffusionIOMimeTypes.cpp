@@ -128,11 +128,34 @@ std::string DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_NAME()
 }
 
 // Descriptions
-const std::string DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_DESCRIPTION = "Fiberbundles";
+std::string DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_DESCRIPTION()
+{
+  static std::string description = "Fiberbundles";
+  return description;
+}
 
-const std::string DiffusionIOMimeTypes::DWI_MIMETYPE_DESCRIPTION = "Diffusion Weighted Images";
-const std::string DiffusionIOMimeTypes::DTI_MIMETYPE_DESCRIPTION = "Diffusion Tensor Images";
-const std::string DiffusionIOMimeTypes::QBI_MIMETYPE_DESCRIPTION = "Q-Ball Images";
+std::string DiffusionIOMimeTypes::DWI_MIMETYPE_DESCRIPTION()
+{
+  static std::string description = "Diffusion Weighted Images";
+  return description;
+}
 
-const std::string DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_DESCRIPTION = "Connectomics Networks";
+std::string DiffusionIOMimeTypes::DTI_MIMETYPE_DESCRIPTION()
+{
+  static std::string description = "Diffusion Tensor Images";
+  return description;
+}
+
+std::string DiffusionIOMimeTypes::QBI_MIMETYPE_DESCRIPTION()
+{
+  static std::string description = "Q-Ball Images";
+  return description;
+}
+
+std::string DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_DESCRIPTION()
+{
+  static std::string description = "Connectomics Networks";
+  return description;
+}
+
 }

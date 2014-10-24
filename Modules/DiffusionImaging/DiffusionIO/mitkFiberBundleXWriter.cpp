@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionIOMimeTypes.h"
 
 mitk::FiberBundleXWriter::FiberBundleXWriter()
-  : mitk::AbstractFileWriter(mitk::FiberBundleX::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_DESCRIPTION)
+  : mitk::AbstractFileWriter(mitk::FiberBundleX::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_DESCRIPTION())
 {
   RegisterService();
 }

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseDataIOFactory.h>
 #include "mitkConnectomicsNetworkCreator.h"
 #include <mitkCoreObjectFactory.h>
+#include <mitkIOUtil.h>
 
 int NetworkCreation(int argc, char* argv[])
 {
@@ -109,16 +110,8 @@ int NetworkCreation(int argc, char* argv[])
     mitk::ConnectomicsNetwork::Pointer network = connectomicsNetworkCreator->GetNetwork();
 
     MITK_INFO << "searching writer";
-    mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-    for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-    {
-      if ( (*it)->CanWriteBaseDataType(network.GetPointer()) )
-      {
-        MITK_INFO << "writing";
-        (*it)->SetFileName( outputFilename.c_str() );
-        (*it)->DoWrite( network.GetPointer() );
-      }
-    }
+
+    mitk::IOUtil::SaveBaseData(network.GetPointer(), outputFilename );
 
     return EXIT_SUCCESS;
   }

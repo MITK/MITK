@@ -223,14 +223,7 @@ int GibbsTracking(int argc, char* argv[])
         mitk::FiberBundleX::Pointer mitkFiberBundle = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());
         mitkFiberBundle->SetReferenceGeometry(mitkImage->GetGeometry());
 
-        mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-        for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-        {
-            if ( (*it)->CanWriteBaseDataType(mitkFiberBundle.GetPointer()) ) {
-                (*it)->SetFileName( outFileName.c_str() );
-                (*it)->DoWrite( mitkFiberBundle.GetPointer() );
-            }
-        }
+        mitk::IOUtil::SaveBaseData(mitkFiberBundle.GetPointer(), outFileName );
     }
     catch (itk::ExceptionObject e)
     {

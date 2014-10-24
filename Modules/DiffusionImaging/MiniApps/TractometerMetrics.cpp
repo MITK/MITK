@@ -289,37 +289,31 @@ int TractometerMetrics(int argc, char* argv[])
             noConnPolyData->SetPoints(noConnPoints);
             noConnPolyData->SetLines(noConnCells);
             mitk::FiberBundleX::Pointer noConnFib = mitk::FiberBundleX::New(noConnPolyData);
-            for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-            {
-                if ( (*it)->CanWriteBaseDataType(noConnFib.GetPointer()) ) {
-                    (*it)->SetFileName( (outRoot+"_NC.fib").c_str() );
-                    (*it)->DoWrite( noConnFib.GetPointer() );
-                }
-            }
+
+            string ncfilename = outRoot;
+            ncfilename.append("_NC.fib");
+
+            mitk::IOUtil::SaveBaseData(noConnFib.GetPointer(), ncfilename );
 
             vtkSmartPointer<vtkPolyData> invalidPolyData = vtkSmartPointer<vtkPolyData>::New();
             invalidPolyData->SetPoints(invalidPoints);
             invalidPolyData->SetLines(invalidCells);
             mitk::FiberBundleX::Pointer invalidFib = mitk::FiberBundleX::New(invalidPolyData);
-            for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-            {
-                if ( (*it)->CanWriteBaseDataType(invalidFib.GetPointer()) ) {
-                    (*it)->SetFileName( (outRoot+"_IC.fib").c_str() );
-                    (*it)->DoWrite( invalidFib.GetPointer() );
-                }
-            }
+
+            string icfilename = outRoot;
+            icfilename.append("_IC.fib");
+
+            mitk::IOUtil::SaveBaseData(invalidFib.GetPointer(), icfilename );
 
             vtkSmartPointer<vtkPolyData> validPolyData = vtkSmartPointer<vtkPolyData>::New();
             validPolyData->SetPoints(validPoints);
             validPolyData->SetLines(validCells);
             mitk::FiberBundleX::Pointer validFib = mitk::FiberBundleX::New(validPolyData);
-            for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-            {
-                if ( (*it)->CanWriteBaseDataType(validFib.GetPointer()) ) {
-                    (*it)->SetFileName( (outRoot+"_VC.fib").c_str() );
-                    (*it)->DoWrite( validFib.GetPointer() );
-                }
-            }
+
+            string vcfilename = outRoot;
+            vcfilename.append("_VC.fib");
+
+            mitk::IOUtil::SaveBaseData(validFib.GetPointer(), vcfilename );
 
             {
                 typedef itk::ImageFileWriter< ItkUcharImgType > WriterType;

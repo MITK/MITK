@@ -58,6 +58,13 @@ void mitk::ConnectomicsNetworkWriter::Write()
   std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetOutputLocation());
   ext = itksys::SystemTools::LowerCase(ext);
 
+  // default extension is .cnf
+  if(ext == "")
+  {
+    ext = ".cnf";
+    this->SetOutputLocation(this->GetOutputLocation() + ext);
+  }
+
   if (ext == ".cnf")
   {
     // Get geometry of the network

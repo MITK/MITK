@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkCommandLineParser.h"
 #include <boost/lexical_cast.hpp>
 #include <mitkCoreObjectFactory.h>
+#include <mitkIOUtil.h>
 
 
 mitk::FiberBundleX::Pointer LoadFib(std::string filename)
@@ -194,14 +195,8 @@ int FiberProcessing(int argc, char* argv[])
         if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
             fib->ScaleFibers(scaleX, scaleY, scaleZ);
 
-        mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-        for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-        {
-            if ( (*it)->CanWriteBaseDataType(fib.GetPointer()) ) {
-                (*it)->SetFileName( outFileName.c_str() );
-                (*it)->DoWrite( fib.GetPointer() );
-            }
-        }
+        mitk::IOUtil::SaveBaseData(fib.GetPointer(), outFileName );
+
     }
     catch (itk::ExceptionObject e)
     {

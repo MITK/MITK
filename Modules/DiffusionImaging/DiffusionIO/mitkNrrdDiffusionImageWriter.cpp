@@ -113,6 +113,14 @@ void mitk::NrrdDiffusionImageWriter::Write()
 
   std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetOutputLocation());
   ext = itksys::SystemTools::LowerCase(ext);
+
+  // default extension is .dwi
+  if( ext == "")
+  {
+    ext = ".dwi";
+    this->SetOutputLocation(this->GetOutputLocation() + ext);
+  }
+
   if (ext == ".hdwi" || ext == ".dwi")
   {
     itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();

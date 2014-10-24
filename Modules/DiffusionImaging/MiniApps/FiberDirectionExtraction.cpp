@@ -136,16 +136,11 @@ int FiberDirectionExtraction(int argc, char* argv[])
         {
             // write vector field
             mitk::FiberBundleX::Pointer directions = fOdfFilter->GetOutputFiberBundle();
-            mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-            for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-            {
-                if ( (*it)->CanWriteBaseDataType(directions.GetPointer()) ) {
-                    string outfilename = outRoot;
-                    outfilename.append("_VECTOR_FIELD.fib");
-                    (*it)->SetFileName( outfilename.c_str() );
-                    (*it)->DoWrite( directions.GetPointer() );
-                }
-            }
+
+            string outfilename = outRoot;
+            outfilename.append("_VECTOR_FIELD.fib");
+
+            mitk::IOUtil::SaveBaseData(directions.GetPointer(), outfilename );
 
             // write num direction image
             {

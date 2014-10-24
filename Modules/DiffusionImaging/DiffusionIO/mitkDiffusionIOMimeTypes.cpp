@@ -47,7 +47,7 @@ CustomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE()
   mimeType.SetCategory(category);
   mimeType.AddExtension("fib");
   mimeType.AddExtension("trk");
-  mimeType.AddExtension("vtk");
+  //mimeType.AddExtension("vtk");
   return mimeType;
 }
 

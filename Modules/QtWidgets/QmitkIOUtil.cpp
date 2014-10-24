@@ -398,7 +398,7 @@ struct QmitkIOUtil::SaveFilter::Impl
     for (std::vector<mitk::MimeType>::const_reverse_iterator iter = mimeTypes.rbegin(),
          iterEnd = mimeTypes.rend(); iter != iterEnd; ++iter)
     {
-      QSet<QString> filterExtensions;
+      QList<QString> filterExtensions;
       mitk::MimeType mimeType = *iter;
       std::vector<std::string> extensions = mimeType.GetExtensions();
       for (std::vector<std::string>::iterator extIter = extensions.begin(), extIterEnd = extensions.end();

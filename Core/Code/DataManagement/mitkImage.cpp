@@ -143,7 +143,7 @@ void AccessPixel( const mitk::PixelType ptype, void* data, const unsigned int of
   }
   else
   {
-    const unsigned int rgboffset = 3 * offset;
+    const unsigned int rgboffset = offset;
 
     double returnvalue = (((T*) data)[rgboffset ]);
     returnvalue += (((T*) data)[rgboffset + 1]);

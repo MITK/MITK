@@ -22,6 +22,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace  mitk {
 
+class FindCaseInsensitive
+{
+public:
+  FindCaseInsensitive(std::string value)
+  {
+    lcValue.resize(value.size());
+    std::transform(value.begin(), value.end(), lcValue.begin(), ::tolower);
+  }
+
+  bool operator()(std::string elem)
+  {
+    std::transform(elem.begin(), elem.end(), elem.begin(), ::tolower);
+    return elem == lcValue;
+  }
+
+private:
+  std::string lcValue;
+};
+
 struct CustomMimeType::Impl
 {
   std::string m_Name;
@@ -106,7 +125,8 @@ bool CustomMimeType::AppliesTo(const std::string& path) const
   {
     if (!iter->empty() && path.size() >= iter->size())
     {
-      if (path.substr(path.size() - iter->size()) == *iter)
+      FindCaseInsensitive cmp(*iter);
+      if (cmp(path.substr(path.size() - iter->size())))
       {
         return true;
       }
@@ -133,7 +153,7 @@ void CustomMimeType::SetExtension(const std::string& extension)
 
 void CustomMimeType::AddExtension(const std::string& extension)
 {
-  if (std::find(d->m_Extensions.begin(), d->m_Extensions.end(), extension) ==
+  if (std::find_if(d->m_Extensions.begin(), d->m_Extensions.end(), FindCaseInsensitive(extension)) ==
       d->m_Extensions.end())
   {
     d->m_Extensions.push_back(extension);

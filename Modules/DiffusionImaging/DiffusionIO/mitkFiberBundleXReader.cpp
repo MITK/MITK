@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::FiberBundleXReader::FiberBundleXReader()
-  : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_DESCRIPTION )
+  : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_DESCRIPTION() )
 {
   m_ServiceReg = this->RegisterService();
 }

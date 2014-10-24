@@ -3,8 +3,7 @@
 
 \imageMacro{icon.png,"Icon of Eventrecorder",2.00}
 
-Available sections:
-  - \ref org_mitk_gui_qt_eventrecorderOverview
+\tableofcontents
 
 \section org_mitk_gui_qt_eventrecorderOverview
 Describe the features of your awesome plugin here

@@ -807,11 +807,12 @@ if(MITK_USE_BLUEBERRY)
     include(berryTestingHelpers)
 
     set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp")
-    get_target_property(_is_macosx_bundle CoreApp MACOSX_BUNDLE)
-    if(APPLE AND _is_macosx_bundle)
-      set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.app/Contents/MacOS/CoreApp")
+    if(TARGET CoreApp)
+      get_target_property(_is_macosx_bundle CoreApp MACOSX_BUNDLE)
+      if(APPLE AND _is_macosx_bundle)
+        set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.app/Contents/MacOS/CoreApp")
+      endif()
     endif()
-
     set(BLUEBERRY_TEST_APP_ID "org.mitk.qt.coreapplication")
   endif()
 

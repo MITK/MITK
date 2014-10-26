@@ -18,7 +18,7 @@ if( MITK_USE_Python )
   MITK_CREATE_MODULE(
     DEPENDS MitkCore MitkQtWidgets
     EXPORT_DEFINE MITK_PYTHON_EXPORT
-    PACKAGE_DEPENDS Qt4|QtGui CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets PythonLibs VTK|vtkPython+vtkWrappingPythonCore Numpy ${SimpleITK_DEP} ${OpenCV_DEP}
+    PACKAGE_DEPENDS Qt4|QtGui Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets PythonLibs VTK|vtkPython+vtkWrappingPythonCore Numpy ${SimpleITK_DEP} ${OpenCV_DEP}
   )
   configure_file(PythonPath.h.in "${CMAKE_CURRENT_BINARY_DIR}/PythonPath.h" @ONLY)
 

@@ -87,8 +87,9 @@ set(project_policies
   CMP0011 # NEW: Included scripts do automatic cmake_policy PUSH and POP.
   CMP0012 # NEW: if() recognizes numbers and boolean constants.
   CMP0013 # NEW: Duplicate binary directories are not allowed.
-  CMP0014 # NEW: Input directories must have CMakeLists.txt
-  CMP0020 # NEW: Automatically link Qt executables to qtmain target on Windows
+  CMP0014 # NEW: Input directories must have CMakeLists.txt.
+  CMP0020 # NEW: Automatically link Qt executables to qtmain target on Windows.
+  CMP0028 # NEW: Double colon in target name means ALIAS or IMPORTED target.
   )
 foreach(policy ${project_policies})
   if(POLICY ${policy})
@@ -184,7 +185,15 @@ if(MITK_USE_QT)
     set(QT5_INSTALL_PREFIX "" CACHE PATH "The install location of Qt5")
     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${QT5_INSTALL_PREFIX})
     find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5Concurrent ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5OpenGL ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5PrintSupport ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5Sql ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5Svg ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5WebKit ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5WebKitWidgets ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
     find_package(Qt5Widgets ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5Xml ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
   endif()
 else()
   set(MITK_USE_Qt4 FALSE)

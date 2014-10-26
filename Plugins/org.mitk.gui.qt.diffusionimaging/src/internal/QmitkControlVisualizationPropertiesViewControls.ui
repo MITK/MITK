@@ -336,7 +336,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QmitkFloatingPointSpanSlider" name="m_OpacitySlider">
+          <widget class="ctkRangeSlider" name="m_OpacitySlider">
            <property name="maximum">
             <number>100</number>
            </property>
@@ -950,9 +950,9 @@ p, li { white-space: pre-wrap; }
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkFloatingPointSpanSlider</class>
-   <extends>QSlider</extends>
-   <header>QmitkFloatingPointSpanSlider.h</header>
+   <class>ctkRangeSlider</class>
+   <extends>QWidget</extends>
+   <header>ctkRangeSlider.h</header>
   </customwidget>
  </customwidgets>
  <includes>

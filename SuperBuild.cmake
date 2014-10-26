@@ -359,6 +359,14 @@ if(MITK_USE_Python)
   endif()
 endif()
 
+if(MITK_USE_QT)
+  if(DESIRED_QT_VERSION MATCHES "5")
+    list(APPEND mitk_optional_cache_args
+      -DQT5_INSTALL_PREFIX:PATH=${QT5_INSTALL_PREFIX}
+    )
+  endif()
+endif()
+
 set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}

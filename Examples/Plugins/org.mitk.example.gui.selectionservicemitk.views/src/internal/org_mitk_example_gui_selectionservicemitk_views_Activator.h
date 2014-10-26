@@ -24,6 +24,9 @@ class org_mitk_example_gui_selectionservicemitk_views_Activator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+  Q_PLUGIN_METADATA(IID "org_mitk_example_gui_selectionservicemitk_views")
+#endif
   Q_INTERFACES(ctkPluginActivator)
 
 public:

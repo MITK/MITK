@@ -297,6 +297,13 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls = new Ui::QmitkFiberfoxViewControls;
         m_Controls->setupUi( parent );
 
+        // commented out
+        m_Controls->m_DiffusionDirectionBox->setVisible(false);
+        m_Controls->label_3->setVisible(false);
+        m_Controls->m_SeparationAngleBox->setVisible(false);
+        m_Controls->label_4->setVisible(false);
+        //
+
         m_Controls->m_StickWidget1->setVisible(true);
         m_Controls->m_StickWidget2->setVisible(false);
         m_Controls->m_ZeppelinWidget1->setVisible(false);
@@ -405,6 +412,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     parameters.m_Misc.m_OutputPath = "";
     parameters.m_Misc.m_CheckAdvancedFiberOptionsBox = m_Controls->m_AdvancedOptionsBox->isChecked();
     parameters.m_Misc.m_CheckAdvancedSignalOptionsBox = m_Controls->m_AdvancedOptionsBox_2->isChecked();
+    parameters.m_Misc.m_CheckOutputVolumeFractionsBox = m_Controls->m_VolumeFractionsBox->isChecked();
 
     string outputPath = m_Controls->m_SavePathEdit->text().toStdString();
     if (outputPath.compare("-")!=0)
@@ -693,7 +701,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         case 3:
         {
             mitk::RawShModel<ScalarType>* model = new mitk::RawShModel<ScalarType>();
-            parameters.m_SignalGen.m_SimulateKspaceAcquisition = false;
+            parameters.m_SignalGen.m_DoSimulateRelaxation = false;
             model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
             model->SetMaxNumKernels(m_Controls->m_PrototypeWidget1->GetNumberOfSamples());
             model->SetFaRange(m_Controls->m_PrototypeWidget1->GetMinFa(), m_Controls->m_PrototypeWidget1->GetMaxFa());
@@ -822,7 +830,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         case 3:
         {
             mitk::RawShModel<ScalarType>* model = new mitk::RawShModel<ScalarType>();
-            parameters.m_SignalGen.m_SimulateKspaceAcquisition = false;
+            parameters.m_SignalGen.m_DoSimulateRelaxation = false;
             model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
             model->SetMaxNumKernels(m_Controls->m_PrototypeWidget3->GetNumberOfSamples());
             model->SetFaRange(m_Controls->m_PrototypeWidget3->GetMinFa(), m_Controls->m_PrototypeWidget3->GetMaxFa());
@@ -965,7 +973,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             case 4:
             {
                 mitk::RawShModel<ScalarType>* model = new mitk::RawShModel<ScalarType>();
-                parameters.m_SignalGen.m_SimulateKspaceAcquisition = false;
+                parameters.m_SignalGen.m_DoSimulateRelaxation = false;
                 model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
                 model->SetMaxNumKernels(m_Controls->m_PrototypeWidget4->GetNumberOfSamples());
                 model->SetFaRange(m_Controls->m_PrototypeWidget4->GetMinFa(), m_Controls->m_PrototypeWidget4->GetMaxFa());
@@ -1253,8 +1261,8 @@ void QmitkFiberfoxView::LoadParameters()
                 mitk::TensorModel<>* model = dynamic_cast<mitk::TensorModel<>*>(signalModel);
                 m_Controls->m_TensorWidget1->SetT2(model->GetT2());
                 m_Controls->m_TensorWidget1->SetD1(model->GetDiffusivity1());
-                m_Controls->m_TensorWidget1->SetD2(model->GetDiffusivity1());
-                m_Controls->m_TensorWidget1->SetD3(model->GetDiffusivity1());
+                m_Controls->m_TensorWidget1->SetD2(model->GetDiffusivity2());
+                m_Controls->m_TensorWidget1->SetD3(model->GetDiffusivity3());
                 m_Controls->m_Compartment1Box->setCurrentIndex(2);
                 break;
             }
@@ -1286,8 +1294,8 @@ void QmitkFiberfoxView::LoadParameters()
                 mitk::TensorModel<>* model = dynamic_cast<mitk::TensorModel<>*>(signalModel);
                 m_Controls->m_TensorWidget2->SetT2(model->GetT2());
                 m_Controls->m_TensorWidget2->SetD1(model->GetDiffusivity1());
-                m_Controls->m_TensorWidget2->SetD2(model->GetDiffusivity1());
-                m_Controls->m_TensorWidget2->SetD3(model->GetDiffusivity1());
+                m_Controls->m_TensorWidget2->SetD2(model->GetDiffusivity2());
+                m_Controls->m_TensorWidget2->SetD3(model->GetDiffusivity3());
                 m_Controls->m_Compartment2Box->setCurrentIndex(3);
                 break;
             }

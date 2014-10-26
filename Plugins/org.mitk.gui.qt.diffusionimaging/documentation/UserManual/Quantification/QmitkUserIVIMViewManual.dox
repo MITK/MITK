@@ -1,0 +1,41 @@
+/**
+\page org_mitk_views_ivim Intra-voxel incoherent motion estimation (IVIM)
+
+The required input for the "Intra-voxel incoherent motion estimation" (IVIM) is a diffusion weighted image (.dwi or .hdwi) that was acquired with several different b-values.
+
+\imageMacro{ivimview.png,"The IVIM View",13.91}
+
+Once an input image is selected in the datamanager, the IVIM view allows for interactive exploration of the dataset (click around in the image and watch the estimated parameters in the figure of the view) as well as generation of f-, D-, and D*-maps (activate the checkmarks and press "Generate Output Images").
+
+The "neglect b<" threshold allows you to ignore b-values smaller then a threshold for the initial fit of f and D. D* is then estimated using all measurements.
+
+The exact values of the current fit are always given in the legend underneath the figure.
+
+\section QmitkIVIMViewROIAnalysis Region of interest analysis
+
+Create region of interest: To create a new segmentatin, open the "quantification" perspective, select the tab "Segmentation", and create a segmentation of the structure of interest. Alternatively, of course, you may also load a binary image from file or generate your segmentation in any other possible way. 
+
+IVIM in region of interset: Go back to the "IVIM" perspective and select both, the diffusion image and the segmentation (holding the CTRL key). A red message should appear "Averaging N voxels". 
+
+\section QmitkIVIMViewExport Export
+
+All model parameters and corresponding curves can be exported to clipboard using the buttons underneath the figure.
+
+\section QmitkIVIMViewAdvanced Advanced Settings
+
+Advanced users, that know what they are doing, can change the method for the model-fit under "Advanced Settings" on the very bottom of the view. 3-param fit, linear fit of f/D, and fix D* are among the options.
+
+\section QmitkIVIMViewReferences Suggested Readings
+
+Toward an optimal distribution of b values for intravoxel incoherent motion imaging.
+Lemke A, Stieltjes B, Schad LR, Laun FB.
+Magn Reson Imaging. 2011 Jul;29(6):766-76. Epub 2011 May 5.
+PMID: 21549538
+
+Differentiation of pancreas carcinoma from healthy pancreatic tissue using multiple b-values: comparison of apparent diffusion coefficient and intravoxel incoherent motion derived parameters.
+Lemke A, Laun FB, Klauss M, Re TJ, Simon D, Delorme S, Schad LR, Stieltjes B.
+Invest Radiol. 2009 Dec;44(12):769-75.
+PMID: 19838121
+
+
+*/

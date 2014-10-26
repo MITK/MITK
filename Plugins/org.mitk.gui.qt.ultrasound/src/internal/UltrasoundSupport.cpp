@@ -27,10 +27,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "UltrasoundSupport.h"
-#include <QTimer>
 
 // Qt
 #include <QMessageBox>
+#include <QSettings>
+#include <QTimer>
 
 // Ultrasound
 #include "mitkUSDevice.h"
@@ -57,6 +58,7 @@ m_Controls.setupUi( parent );
 connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this, SLOT(OnClickedAddNewDevice()) ); // Change Widget Visibilities
 connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
 connect( m_Controls.m_ActiveVideoDevices, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnChangedActiveDevice()) );
+connect( m_Controls.m_RunImageTimer, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()) );
 connect( m_Controls.m_ShowImageStream, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()) );
 connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
 connect( m_Controls.m_FrameRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit(int)) );
@@ -81,10 +83,12 @@ m_Node->SetName("US Support Viewing Stream");
 //create a dummy image (gray values 0..255) for correct initialization of level window, etc.
 mitk::Image::Pointer dummyImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 1, 1, 1, 255,0);
 m_Node->SetData(dummyImage);
-m_OldGeometry = dynamic_cast<mitk::Geometry3D*>(dummyImage->GetGeometry());
+m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(dummyImage->GetGeometry());
 }
 
 m_Controls.tabWidget->setTabEnabled(1, false);
+
+LoadUISettings();
 }
 
 void UltrasoundSupport::OnClickedAddNewDevice()
@@ -120,7 +124,7 @@ if(m_Controls.m_ShowImageStream->isChecked())
     }
     m_CurrentImageWidth = curOutput->GetDimension(0);
     m_CurrentImageHeight = curOutput->GetDimension(1);
-    m_OldGeometry = dynamic_cast<mitk::Geometry3D*>(curOutput->GetGeometry());
+    m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(curOutput->GetGeometry());
   }
   //if not: only update the view
   else
@@ -192,9 +196,17 @@ if(m_Controls.m_ShowImageStream->isChecked())
 {this->GetDataStorage()->Add(m_Node);}
 
 //start timer
-int interval = (1000 / m_Controls.m_FrameRate->value());
-m_Timer->setInterval(interval);
-m_Timer->start();
+if(m_Controls.m_RunImageTimer->isChecked())
+  {
+  int interval = (1000 / m_Controls.m_FrameRate->value());
+  m_Timer->setInterval(interval);
+  m_Timer->start();
+  m_Controls.m_TimerWidget->setEnabled(true);
+  }
+else
+  {
+  m_Controls.m_TimerWidget->setEnabled(false);
+  }
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()
@@ -214,49 +226,47 @@ m_Controls.probesWidgetContainer->addWidget(m_ControlProbesWidget);
 m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.m_ToolBoxControlWidgets);
 m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlBModeWidget, "B Mode Controls");
 if ( ! m_Device->GetControlInterfaceBMode() )
-{
-m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
-}
+{m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);}
 
 // create doppler widget for current device
 m_ControlDopplerWidget = new QmitkUSControlsDopplerWidget(m_Device->GetControlInterfaceDoppler(), m_Controls.m_ToolBoxControlWidgets);
 m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlDopplerWidget, "Doppler Controls");
 if ( ! m_Device->GetControlInterfaceDoppler() )
-{
-m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
-}
+{m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);}
 
 ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
 if ( pluginContext )
 {
-std::string filter = "(ork.mitk.services.UltrasoundCustomWidget.deviceClass=" + m_Device->GetDeviceClass() + ")";
+  std::string filter = "(ork.mitk.services.UltrasoundCustomWidget.deviceClass=" + m_Device->GetDeviceClass() + ")";
 
 QString interfaceName = QString::fromStdString(us_service_interface_iid<QmitkUSAbstractCustomWidget>() );
 m_CustomWidgetServiceReference = pluginContext->getServiceReferences(interfaceName, QString::fromStdString(filter));
 
-if (m_CustomWidgetServiceReference.size() > 0)
-{
-m_ControlCustomWidget = pluginContext->getService<QmitkUSAbstractCustomWidget>
-(m_CustomWidgetServiceReference.at(0))->CloneForQt(m_Controls.tab2);
-m_ControlCustomWidget->SetDevice(m_Device);
-m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlCustomWidget, "Custom Controls");
-}
-else
-{
-m_Controls.m_ToolBoxControlWidgets->addItem(new QWidget(m_Controls.m_ToolBoxControlWidgets), "Custom Controls");
-m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
-}
+  if (m_CustomWidgetServiceReference.size() > 0)
+  {
+    m_ControlCustomWidget = pluginContext->getService<QmitkUSAbstractCustomWidget>
+    (m_CustomWidgetServiceReference.at(0))->CloneForQt(m_Controls.tab2);
+    m_ControlCustomWidget->SetDevice(m_Device);
+    m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlCustomWidget, "Custom Controls");
+  }
+  else
+  {
+    m_Controls.m_ToolBoxControlWidgets->addItem(new QWidget(m_Controls.m_ToolBoxControlWidgets), "Custom Controls");
+    m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
+  }
+
 }
 
 // select first enabled control widget
 for ( int n = 0; n < m_Controls.m_ToolBoxControlWidgets->count(); ++n)
 {
-if ( m_Controls.m_ToolBoxControlWidgets->isItemEnabled(n) )
-{
-m_Controls.m_ToolBoxControlWidgets->setCurrentIndex(n);
-break;
+  if ( m_Controls.m_ToolBoxControlWidgets->isItemEnabled(n) )
+  {
+    m_Controls.m_ToolBoxControlWidgets->setCurrentIndex(n);
+    break;
+  }
 }
-}
+
 }
 
 void UltrasoundSupport::RemoveControlWidgets()
@@ -266,7 +276,7 @@ if(!m_ControlProbesWidget) {return;} //widgets do not exist... nothing to do
 // remove all control widgets from the tool box widget
 while (m_Controls.m_ToolBoxControlWidgets->count() > 0)
 {
-m_Controls.m_ToolBoxControlWidgets->removeItem(0);
+  m_Controls.m_ToolBoxControlWidgets->removeItem(0);
 }
 
 // remove probes widget (which is not part of the tool box widget)
@@ -283,13 +293,12 @@ m_ControlDopplerWidget = 0;
 // delete custom widget if it is present
 if ( m_ControlCustomWidget )
 {
-ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
-delete m_ControlCustomWidget; m_ControlCustomWidget = 0;
-
-if ( m_CustomWidgetServiceReference.size() > 0 )
-{
-pluginContext->ungetService(m_CustomWidgetServiceReference.at(0));
-}
+  ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
+  delete m_ControlCustomWidget; m_ControlCustomWidget = 0;
+  if ( m_CustomWidgetServiceReference.size() > 0 )
+  {
+    pluginContext->ungetService(m_CustomWidgetServiceReference.at(0));
+  }
 }
 }
 
@@ -332,12 +341,32 @@ ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
 
 if ( pluginContext )
 {
-// to be notified about service event of an USDevice
-pluginContext->connectServiceListener(this, "OnDeciveServiceEvent",
-QString::fromStdString("(" + us::ServiceConstants::OBJECTCLASS() + "=" + us_service_interface_iid<mitk::USDevice>() + ")"));
+  // to be notified about service event of an USDevice
+  pluginContext->connectServiceListener(this, "OnDeciveServiceEvent",
+  QString::fromStdString("(" + us::ServiceConstants::OBJECTCLASS() + "=" + us_service_interface_iid<mitk::USDevice>() + ")"));
 }
+
 }
 
 UltrasoundSupport::~UltrasoundSupport()
 {
+  StoreUISettings();
+}
+
+void UltrasoundSupport::StoreUISettings()
+{
+  QSettings settings;
+  settings.beginGroup(QString::fromStdString(VIEW_ID));
+  settings.setValue("DisplayImage", QVariant(m_Controls.m_ShowImageStream->isChecked()));
+  settings.setValue("RunImageTimer", QVariant(m_Controls.m_RunImageTimer->isChecked()));
+  settings.endGroup();
+}
+
+void UltrasoundSupport::LoadUISettings()
+{
+  QSettings settings;
+  settings.beginGroup(QString::fromStdString(VIEW_ID));
+  m_Controls.m_ShowImageStream->setChecked(settings.value("DisplayImage", true).toBool());
+  m_Controls.m_RunImageTimer->setChecked(settings.value("RunImageTimer", true).toBool());
+  settings.endGroup();
 }

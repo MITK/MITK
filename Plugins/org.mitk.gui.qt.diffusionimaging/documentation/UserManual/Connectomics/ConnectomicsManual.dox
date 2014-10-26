@@ -11,6 +11,8 @@ The connectomics perspective is a collection of views which provide functionalit
 
 \subpage org_mitk_views_connectomicsstatistics provides statistical measures for networks.
 
+\subpage org_mitk_views_randomparcellationview provides a method to randomly parcellate a segmentation using different criteria
+
 \section org_mitk_diffusionimagingapp_perspectives_connectomicsNetworkRenderingCustomization Network Rendering Customization
 
 The rendering of the connectomics networks can be customized by changing the associated properties using the property list. A selection of possible options are:
@@ -104,5 +106,48 @@ Furthermore some statistics are calculated on a per node basis and displayed as 
   <li> The (unweighted) betweenness centrality of each node
   <li> The spread of shortest paths between each pair of nodes (For disconnected graphs the shortest paths with infinite length are omitted for readability)
 </ul>
+
+*/
+
+/**
+\page org_mitk_views_randomparcellationview The Random Parcellation View
+
+\imageMacro{QmitkRandomParcellationIcon.png,"Icon of the Random Parcellation View",2.00}
+
+\tableofcontents
+
+\section org_mitk_views_randomparcellationviewSummary Summary
+This view is used to create a random parcellation of a segmented image.
+It was designed to parcellate grey matter to acquire random nodes for network analysis.
+This document describes how to use this view.
+
+\section org_mitk_views_randomparcellationviewOverview Overview
+
+When parcellating an image you can either do a parcellation and use the generated parcellation. In which case it will have as many parcellation as seed points were specified. Instead you can choose to merge some of the original parcels untill either none below a threshold size remain, or until a specified minimum number of parcels has been reached.
+A further option is to "Just Merge Small Parcels". This will result in only neighbouring parcels below a threshold size being merged. Using this option may result in final parcels below the given threshold size if they are not adjacent to another parcel below the threshold size.
+
+In all there are four possibilities to get a random parcellation
+<ul>
+<li>Without merging
+<li>Merging with respect to the number of nodes afterwards
+<li>Merging with respect to the number of voxels of the smallest parcel
+<li>Merging with respect to the number of voxels of the smallest parcel, where just small parcels are merged
+</ul>
+
+\section org_mitk_views_randomparcellationviewUsage Usage
+
+First you have to get a segmentation of the target structure. You can use the Segmentation View to create one.
+Select it in the Data Manager. Now you can choose which of the possible ways of parcellation you would like.
+See \ref org_mitk_views_randomparcellationviewOverview for these possibilities.
+Start the parcellation process using the "Select Random Nodes" button. 
+You will get a new image in the Data Manager. Every voxel of a given parcel will have the same value (0 for background).
+
+\section org_mitk_views_randomparcellationviewMethods Methods
+
+This Plug-In uses a kind of region growing algorithm. Random seed voxels are set on the segmentation and each is an own region at the beginning. Then voxels are added iteratively to each smallest region, first just the 6-connected ones and later the 26-connected ones and isolated voxels.
+Specific constraints have to be fulfilled before a voxel is added to a region.
+The algorithm stops when all voxels are contained in the regions.
+For merging it is checked which regions are neighbors of the smallest parcel and then a suitable one,
+according to a cost function, is merged to this parcel. When the merging algorithm stops depends on which stop-mechanism is chosen.
 
 */

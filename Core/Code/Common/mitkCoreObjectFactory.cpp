@@ -68,6 +68,8 @@ void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase* factor
 void mitk::CoreObjectFactory::UnRegisterExtraFactory(CoreObjectFactoryBase *factory)
 {
   MITK_DEBUG << "CoreObjectFactory: un-registering extra factory of type " << factory->GetNameOfClass();
+  this->UnRegisterLegacyWriters(factory);
+  this->UnRegisterLegacyReaders(factory);
   try
   {
     m_ExtraFactories.erase(factory);
@@ -89,16 +91,24 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
 
 mitk::CoreObjectFactory::~CoreObjectFactory()
 {
-  for (std::list< mitk::LegacyFileReaderService* >::iterator it = m_LegacyReaders.begin();
-       it != m_LegacyReaders.end(); ++it)
+  for (std::map<mitk::CoreObjectFactoryBase*, std::list< mitk::LegacyFileReaderService* > >::iterator iter = m_LegacyReaders.begin();
+       iter != m_LegacyReaders.end(); ++iter)
   {
-    delete *it;
+    for (std::list<mitk::LegacyFileReaderService*>::iterator readerIter = iter->second.begin(),
+      readerIterEnd = iter->second.end(); readerIter != readerIterEnd; ++readerIter)
+    {
+      delete *readerIter;
+    }
   }
 
-  for (std::list< mitk::LegacyFileWriterService* >::iterator it = m_LegacyWriters.begin();
-       it != m_LegacyWriters.end(); ++it)
+  for (std::map<mitk::CoreObjectFactoryBase*, std::list< mitk::LegacyFileWriterService* > >::iterator iter = m_LegacyWriters.begin();
+       iter != m_LegacyWriters.end(); ++iter)
   {
-    delete *it;
+    for (std::list<mitk::LegacyFileWriterService*>::iterator writerIter = iter->second.begin(),
+      writerIterEnd = iter->second.end(); writerIter != writerIterEnd; ++writerIter)
+    {
+      delete *writerIter;
+    }
   }
 }
 
@@ -351,7 +361,22 @@ void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase*
   for(std::map<std::string, std::vector<std::string> >::iterator iter = extensionsByCategories.begin(),
       endIter = extensionsByCategories.end(); iter != endIter; ++iter)
   {
-    m_LegacyReaders.push_back(new mitk::LegacyFileReaderService(iter->second, iter->first));
+    m_LegacyReaders[factory].push_back(new mitk::LegacyFileReaderService(iter->second, iter->first));
+  }
+}
+
+void mitk::CoreObjectFactory::UnRegisterLegacyReaders(mitk::CoreObjectFactoryBase* factory)
+{
+  std::map<mitk::CoreObjectFactoryBase*, std::list<mitk::LegacyFileReaderService*> >::iterator iter = m_LegacyReaders.find(factory);
+  if (iter != m_LegacyReaders.end())
+  {
+    for (std::list<mitk::LegacyFileReaderService*>::iterator readerIter = iter->second.begin(),
+      readerIterEnd = iter->second.end(); readerIter != readerIterEnd; ++readerIter)
+    {
+      delete *readerIter;
+    }
+
+    m_LegacyReaders.erase(iter);
   }
 }
 
@@ -406,7 +431,23 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(mitk::CoreObjectFactoryBase*
 
     mitk::FileWriter::Pointer fileWriter(it->GetPointer());
     mitk::LegacyFileWriterService* lfws = new mitk::LegacyFileWriterService(fileWriter, description);
-    m_LegacyWriters.push_back(lfws);
+    m_LegacyWriters[factory].push_back(lfws);
   }
 
 }
+
+void mitk::CoreObjectFactory::UnRegisterLegacyWriters(mitk::CoreObjectFactoryBase* factory)
+{
+  std::map<mitk::CoreObjectFactoryBase*, std::list<mitk::LegacyFileWriterService*> >::iterator iter = m_LegacyWriters.find(factory);
+  if (iter != m_LegacyWriters.end())
+  {
+    for (std::list<mitk::LegacyFileWriterService*>::iterator writerIter = iter->second.begin(),
+      writerIterEnd = iter->second.end(); writerIter != writerIterEnd; ++writerIter)
+    {
+      delete *writerIter;
+    }
+
+    m_LegacyWriters.erase(iter);
+  }
+}
+

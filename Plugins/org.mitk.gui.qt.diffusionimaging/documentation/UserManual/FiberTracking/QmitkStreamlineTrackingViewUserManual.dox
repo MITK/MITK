@@ -1,0 +1,43 @@
+/**
+\page org_mitk_views_streamlinetracking Streamline Tracking View
+
+This view provides the user interface for basic streamline fiber tractography on diffusion tensor images (single and multi-tensor tracking). FACT and TEND tracking methods are available.
+
+Available sections:
+  - \ref StrTrackUserManualInputData
+  - \ref StrTrackUserManualParameters
+  - \ref StrTrackUserManualReferences
+
+\imageMacro{streamlinetrackingview.png,"Streamline Tracking View",10.41}
+
+\section StrTrackUserManualInputData Input Data
+
+Mandatory Input:
+
+\li One or multiple DTI Image images selected in the datamanager.
+
+Optional Input:
+
+\li FA image used to determine streamline termination. If no image is specified, the FA image is automatically calculated from the input tensor images. If multiple tensor images are used as input, it is recommended to provide such an FA image since the FA maps calculated from the individual input tensor images can not provide a suitable termination criterion.
+\li Binary mask used to define the seed voxels. If no seed mask is specified, the whole image volume is seeded.
+\li Binary mask used to constrain the generated streamlines. Streamlines can not leave the mask area.
+
+\section StrTrackUserManualParameters Input Parameters
+
+\li FA Threshold: If the streamline reaches a position with an FA value lower than the speciefied threshold, it is not tracked any further.
+\li Min. Curvature Radius: If the streamline has a higher curvature than specified, it is not tracked any further. It is defined as the radius of the circle specified by three successive streamline positions.
+\li f and g values to balance between FACT [1] and TEND [2,3] tracking. For further information please refer to [2,3]
+\li Step Size: The algorithm proceeds along the streamline with a fixed stepsize. Default is 0.1*minSpacing.
+\li Min. Tract Length: Shorter fibers are discarded.
+\li Seeds per voxel: If set to 1, the seed is defined as the voxel center. If > 1 the seeds are distributet randomly inside the voxel.
+
+By default the image values are not interpolated. Enable corresponding checkbox to use trilinear interpolation of the tensors as well as the FA values. Keep in mind that in the noninterpolated case, the TEND term is only applied once per voxel. In the interpolated case the TEND term is applied at each integration step which results in much higher curvatures and has to be compensated by an according choice of f and g.
+
+Whole brain tractograms obtained with a small step size can contain billions of points. The tractograms can be compressed by removing points that do not really contribute to the fiber shape, such as many points on a straight line. An error threshold (in mm) can be defined to specify which points should be removed and which not.
+
+\section StrTrackUserManualReferences References
+
+[1] Mori et al. Annals Neurology 1999\n
+[2] Weinstein et al. Proceedings of IEEE Visualization 1999\n
+[3] Lazar et al. Human Brain Mapping 2003\n
+*/

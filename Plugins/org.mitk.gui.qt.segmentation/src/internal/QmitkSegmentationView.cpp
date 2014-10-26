@@ -358,6 +358,12 @@ void QmitkSegmentationView::CreateNewSegmentation()
 void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
 {
    mitk::DataNode* selectedNode = m_Controls->segImageSelector->GetSelectedNode();
+   if ( !selectedNode )
+   {
+     this->SetToolSelectionBoxesEnabled(false);
+     return;
+   }
+
    bool selectedNodeIsVisible = selectedNode->IsVisible(mitk::BaseRenderer::GetInstance(
       mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
 

@@ -1,20 +1,38 @@
 <RCC>
-    <qresource prefix="/USUI">
-        <file>go-next.png</file>
-        <file>go-previous.png</file>
-        <file>zoom-in.png</file>
-        <file>zoom-out.png</file>
-        <file>plus.png</file>
-        <file>minus.png</file>
-        <file>restart.png</file>
-        <file>star.png</file>
-        <file>preferences.png</file>
-        <file>document-open.png</file>
-        <file>document-save.png</file>
-        <file>system-lock-screen.png</file>
-        <file>accept.png</file>
-        <file>process-stop.png</file>
-        <file>record.png</file>
-        <file>record-gray.png</file>
-    </qresource>
+  <qresource prefix="/USUI">
+    <file>ultrasound01-probe-300ppi.png</file>
+    <file>ultrasound01-probe-72ppi-deactivated.png</file>
+    <file>ultrasound02-scan-72ppi-deactivated.png</file>
+    <file>ultrasound03-targeting-72ppi-deactivated.png</file>
+    <file>ultrasound04-warning-72ppi-deactivated.png</file>
+    <file>ultrasound05-criticalStructures-72ppi-deactivated.png</file>
+    <file>ultrasound06-criticalScan-72ppi-deactivated.png</file>
+    <file>ultrasound01-probe-300ppi-deactivated.png</file>
+    <file>ultrasound02-scan-300ppi.png</file>
+    <file>ultrasound02-scan-300ppi-deactivated.png</file>
+    <file>ultrasound03-targeting-300ppi.png</file>
+    <file>ultrasound03-targeting-300ppi-deactivated.png</file>
+    <file>ultrasound04-warning-300ppi.png</file>
+    <file>ultrasound04-warning-300ppi-deactivated.png</file>
+    <file>ultrasound05-criticalStructures-300ppi.png</file>
+    <file>ultrasound05-criticalStructures-300ppi-deactivated.png</file>
+    <file>ultrasound06-criticalScan-300ppi.png</file>
+    <file>ultrasound06-criticalScan-300ppi-deactivated.png</file>
+    <file>go-next.png</file>
+    <file>go-previous.png</file>
+    <file>zoom-in.png</file>
+    <file>zoom-out.png</file>
+    <file>plus.png</file>
+    <file>minus.png</file>
+    <file>restart.png</file>
+    <file>star.png</file>
+    <file>preferences.png</file>
+    <file>document-open.png</file>
+    <file>document-save.png</file>
+    <file>system-lock-screen.png</file>
+    <file>accept.png</file>
+    <file>process-stop.png</file>
+    <file>record.png</file>
+    <file>record-gray.png</file>
+  </qresource>
 </RCC>

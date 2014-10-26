@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkCommandLineParser.h"
 #include <boost/lexical_cast.hpp>
 #include <mitkCoreObjectFactory.h>
+#include <mitkIOUtil.h>
 
 
 mitk::FiberBundleX::Pointer LoadFib(std::string filename)
@@ -59,15 +60,13 @@ int FiberProcessing(int argc, char* argv[])
     parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input fiber bundle (.fib)", us::Any(), false);
     parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output:", "output fiber bundle (.fib)", us::Any(), false);
 
-    parser.addArgument("resample", "r", ctkCommandLineParser::Float, "Resample:", "Resample fiber with the given point distance (in mm)");
-    parser.addArgument("smooth", "s", ctkCommandLineParser::Float, "Smooth:", "Smooth fiber with the given point distance (in mm)");
+    parser.addArgument("resample", "r", ctkCommandLineParser::Float, "Linear resampling:", "Linearly resample fiber with the given point distance (in mm)");
+    parser.addArgument("smooth", "s", ctkCommandLineParser::Float, "Spline resampling:", "Resample fiber using splines with the given point distance (in mm)");
+    parser.addArgument("compress", "c", ctkCommandLineParser::Float, "Compress:", "Compress fiber using the given error threshold (in mm)");
     parser.addArgument("minLength", "l", ctkCommandLineParser::Float, "Minimum length:", "Minimum fiber length (in mm)");
     parser.addArgument("maxLength", "m", ctkCommandLineParser::Float, "Maximum length:", "Maximum fiber length (in mm)");
     parser.addArgument("minCurv", "a", ctkCommandLineParser::Float, "Minimum curvature radius:", "Minimum curvature radius (in mm)");
     parser.addArgument("mirror", "p", ctkCommandLineParser::Int, "Invert coordinates:", "Invert fiber coordinates XYZ (e.g. 010 to invert y-coordinate of each fiber point)");
-
-    parser.addArgument("copyAndJoin", "c", ctkCommandLineParser::Bool, "Copy & Join:", "Create a copy of the input fiber bundle (applied after resample/smooth/minLength/maxLength/minCurv/mirror) and join copy with original (applied after rotate/scale/translate)");
-    //parser.addArgument("join", "j", ctkCommandLineParser::Bool, "Join the original and copied fiber bundle (applied after rotate/scale/translate)");
 
     parser.addArgument("rotate-x", "rx", ctkCommandLineParser::Float, "Rotate x-axis:", "Rotate around x-axis (if copy is given the copy is rotated, in deg)");
     parser.addArgument("rotate-y", "ry", ctkCommandLineParser::Float, "Rotate y-axis:", "Rotate around y-axis (if copy is given the copy is rotated, in deg)");
@@ -94,6 +93,10 @@ int FiberProcessing(int argc, char* argv[])
     if (parsedArgs.count("smooth"))
         smoothDist = us::any_cast<float>(parsedArgs["smooth"]);
 
+    float compress = -1;
+    if (parsedArgs.count("compress"))
+        compress = us::any_cast<float>(parsedArgs["compress"]);
+
     float minFiberLength = -1;
     if (parsedArgs.count("minLength"))
         minFiberLength = us::any_cast<float>(parsedArgs["minLength"]);
@@ -109,10 +112,6 @@ int FiberProcessing(int argc, char* argv[])
     int axis = 0;
     if (parsedArgs.count("mirror"))
         axis = us::any_cast<int>(parsedArgs["mirror"]);
-
-    bool copyAndJoin = false;
-    if(parsedArgs.count("copyAndJoin"))
-        copyAndJoin = us::any_cast<bool>(parsedArgs["copyAndJoin"]);
 
     float rotateX = 0;
     if (parsedArgs.count("rotate-x"))
@@ -168,10 +167,13 @@ int FiberProcessing(int argc, char* argv[])
             fib->ApplyCurvatureThreshold(curvThres, false);
 
         if (pointDist>0)
-            fib->ResampleFibers(pointDist);
+            fib->ResampleLinear(pointDist);
 
         if (smoothDist>0)
-            fib->DoFiberSmoothing(smoothDist);
+            fib->ResampleSpline(smoothDist);
+
+        if (compress>0)
+            fib->Compress(compress);
 
         if (axis/100==1)
             fib->MirrorFibers(0);
@@ -182,43 +184,19 @@ int FiberProcessing(int argc, char* argv[])
         if (axis%10==1)
             fib->MirrorFibers(2);
 
-        if (copyAndJoin == true)
-        {
-            MITK_INFO << "Create copy";
-            mitk::FiberBundleX::Pointer fibCopy = fib->GetDeepCopy();
 
-            if (rotateX > 0 || rotateY > 0 || rotateZ > 0){
-                MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
-                fibCopy->RotateAroundAxis(rotateX, rotateY, rotateZ);
-            }
-            if (translateX > 0 || translateY > 0 || translateZ > 0)
-                fibCopy->TranslateFibers(translateX, translateY, translateZ);
-            if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
-                fibCopy->ScaleFibers(scaleX, scaleY, scaleZ);
-
-            MITK_INFO << "Join copy with original";
-            fib = fib->AddBundle(fibCopy.GetPointer());
-
-        } else {
-            if (rotateX > 0 || rotateY > 0 || rotateZ > 0){
-                MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
-                fib->RotateAroundAxis(rotateX, rotateY, rotateZ);
-            }
-            if (translateX > 0 || translateY > 0 || translateZ > 0){
-                fib->TranslateFibers(translateX, translateY, translateZ);
-            }
-            if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
-                fib->ScaleFibers(scaleX, scaleY, scaleZ);
+        if (rotateX > 0 || rotateY > 0 || rotateZ > 0){
+            MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
+            fib->RotateAroundAxis(rotateX, rotateY, rotateZ);
         }
-
-        mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-        for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-        {
-            if ( (*it)->CanWriteBaseDataType(fib.GetPointer()) ) {
-                (*it)->SetFileName( outFileName.c_str() );
-                (*it)->DoWrite( fib.GetPointer() );
-            }
+        if (translateX > 0 || translateY > 0 || translateZ > 0){
+            fib->TranslateFibers(translateX, translateY, translateZ);
         }
+        if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
+            fib->ScaleFibers(scaleX, scaleY, scaleZ);
+
+        mitk::IOUtil::SaveBaseData(fib.GetPointer(), outFileName );
+
     }
     catch (itk::ExceptionObject e)
     {

@@ -336,7 +336,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 
         // and check the distance
         distance = this->CalculateDistanceValue(currentPoint);
-        if ( abs(distance) <= m_DistanceImageSpacing )
+        if ( (std::fabs(distance)) <= m_DistanceImageSpacing )
         {
           nIt.SetPixel(*relativeNb, distance);
           narrowbandPoints.push(currentIndex);

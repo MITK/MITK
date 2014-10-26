@@ -125,7 +125,7 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
 
     MITK_INFO << "TractDensityImageFilter: resampling fibers to ensure sufficient voxel coverage";
     m_FiberBundle = m_FiberBundle->GetDeepCopy();
-    m_FiberBundle->ResampleFibers(minSpacing/10);
+    m_FiberBundle->ResampleLinear(minSpacing/10);
 
     MITK_INFO << "TractDensityImageFilter: starting image generation";
     vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();

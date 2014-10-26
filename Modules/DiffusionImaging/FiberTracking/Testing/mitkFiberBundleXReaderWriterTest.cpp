@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 #include <mitkFiberBundleX.h>
-#include <mitkFiberBundleXReader.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <itksys/SystemTools.hxx>

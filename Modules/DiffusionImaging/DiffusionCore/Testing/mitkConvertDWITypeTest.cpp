@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOUtil.h"
 
 #include "mitkDWIHeadMotionCorrectionFilter.h"
-#include "mitkNrrdDiffusionImageWriter.h"
 
 typedef short                                       DiffusionPixelType;
 typedef mitk::DiffusionImage< DiffusionPixelType >  DiffusionImageType;
@@ -38,16 +37,9 @@ int mitkConvertDWITypeTest( int argc, char* argv[] )
   DiffusionImageType* dwimage =
       static_cast<DiffusionImageType*>( inputImage.GetPointer() );
 
-
-  mitk::NrrdDiffusionImageWriter< DiffusionPixelType >::Pointer dwiwriter =
-      mitk::NrrdDiffusionImageWriter< DiffusionPixelType >::New();
-
-  dwiwriter->SetInput( dwimage );
-  dwiwriter->SetFileName( argv[2] );
-
   try
   {
-    dwiwriter->Update();
+    mitk::IOUtil::Save(dwimage, argv[2]);
   }
   catch( const itk::ExceptionObject& e)
   {

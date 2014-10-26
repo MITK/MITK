@@ -20,18 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
 
-#include "mitkNrrdDiffusionImageIOFactory.h"
-#include "mitkNrrdDiffusionImageWriterFactory.h"
 #include "mitkNrrdDiffusionImageWriter.h"
 #include "mitkDiffusionImage.h"
-
-#include "mitkNrrdQBallImageIOFactory.h"
-#include "mitkNrrdQBallImageWriterFactory.h"
-#include "mitkNrrdQBallImageWriter.h"
-
-#include "mitkNrrdTensorImageIOFactory.h"
-#include "mitkNrrdTensorImageWriterFactory.h"
-#include "mitkNrrdTensorImageWriter.h"
 
 #include "mitkCompositeMapper.h"
 #include "mitkDiffusionImageMapper.h"
@@ -46,31 +36,12 @@ typedef std::multimap<std::string, std::string> MultimapType;
 
 mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory()
   : CoreObjectFactoryBase()
-  , m_NrrdDiffusionImageIOFactory(mitk::NrrdDiffusionImageIOFactory::New().GetPointer())
-  , m_NrrdQBallImageIOFactory(mitk::NrrdQBallImageIOFactory::New().GetPointer())
-  , m_NrrdTensorImageIOFactory(mitk::NrrdTensorImageIOFactory::New().GetPointer())
-  , m_NrrdDiffusionImageWriterFactory(mitk::NrrdDiffusionImageWriterFactory::New().GetPointer())
-  , m_NrrdQBallImageWriterFactory(mitk::NrrdQBallImageWriterFactory::New().GetPointer())
-  , m_NrrdTensorImageWriterFactory(mitk::NrrdTensorImageWriterFactory::New().GetPointer())
 {
 
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
     MITK_DEBUG << "DiffusionCoreObjectFactory c'tor" << std::endl;
-
-    itk::ObjectFactoryBase::RegisterFactory(m_NrrdDiffusionImageIOFactory);
-    itk::ObjectFactoryBase::RegisterFactory(m_NrrdQBallImageIOFactory);
-    itk::ObjectFactoryBase::RegisterFactory(m_NrrdTensorImageIOFactory);
-
-    itk::ObjectFactoryBase::RegisterFactory(m_NrrdDiffusionImageWriterFactory);
-    itk::ObjectFactoryBase::RegisterFactory(m_NrrdQBallImageWriterFactory);
-    itk::ObjectFactoryBase::RegisterFactory(m_NrrdTensorImageWriterFactory);
-
-    m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
-    m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
-    m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
-
 
     CreateFileExtensionsMap();
 
@@ -81,13 +52,6 @@ mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory()
 
 mitk::DiffusionCoreObjectFactory::~DiffusionCoreObjectFactory()
 {
-  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdDiffusionImageIOFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdQBallImageIOFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdTensorImageIOFactory);
-
-  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdDiffusionImageWriterFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdQBallImageWriterFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdTensorImageWriterFactory);
 
 }
 
@@ -195,28 +159,6 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::DiffusionCoreObjectFactory::GetS
 
 void mitk::DiffusionCoreObjectFactory::CreateFileExtensionsMap()
 {
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", "Diffusion Weighted Images for FSL"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.fsl", "Diffusion Weighted Images for FSL"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.fslgz", "Diffusion Weighted Images for FSL"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", "Q-Ball Images"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", "Q-Ball Images"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dti", "Tensor Images"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdti", "Tensor Images"));
-  //  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
-
-
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", "Diffusion Weighted Images for FSL"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.fsl", "Diffusion Weighted Images for FSL"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.fslgz", "Diffusion Weighted Images for FSL"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", "Q-Ball Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", "Q-Ball Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dti", "Tensor Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdti", "Tensor Images"));
-  // m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure File"));
 
 }
 

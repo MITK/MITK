@@ -304,15 +304,28 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
   QCheckBox* distanceImageCheckBox = new QCheckBox;
   distanceImageCheckBox->setText("Distance image");
   distanceImageCheckBox->setChecked(distanceImageSelected);
+
   QCheckBox* amplitudeImageCheckBox = new QCheckBox;
   amplitudeImageCheckBox->setText("Amplitude image");
   amplitudeImageCheckBox->setChecked(amplitudeImageSelected);
+  amplitudeImageCheckBox->setEnabled(amplitudeImageSelected);
+  if(!amplitudeImageSelected)
+    amplitudeImageCheckBox->setToolTip(QString("This device does not provide amplitude data."));
+
   QCheckBox* intensityImageCheckBox = new QCheckBox;
   intensityImageCheckBox->setText("Intensity image");
   intensityImageCheckBox->setChecked(intensityImageSelected);
+  intensityImageCheckBox->setEnabled(intensityImageSelected);
+  if(!intensityImageSelected)
+    intensityImageCheckBox->setToolTip(QString("This device does not provide intensity data."));
+
   QCheckBox* rgbImageCheckBox = new QCheckBox;
   rgbImageCheckBox->setText("RGB image");
   rgbImageCheckBox->setChecked(rgbImageSelected);
+  rgbImageCheckBox->setEnabled(rgbImageSelected);
+  if(!rgbImageSelected)
+    rgbImageCheckBox->setToolTip(QString("This device does not provide RGB data."));
+
   QCheckBox* rawDataCheckBox = new QCheckBox;
   rawDataCheckBox->setText("Raw data");
   rawDataCheckBox->setChecked(false);

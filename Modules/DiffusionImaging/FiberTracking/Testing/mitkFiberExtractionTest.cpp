@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureComposite.h>
 #include <mitkImageCast.h>
-#include <mitkFiberBundleXWriter.h>
 
 #include <vtkDebugLeaks.h>
 

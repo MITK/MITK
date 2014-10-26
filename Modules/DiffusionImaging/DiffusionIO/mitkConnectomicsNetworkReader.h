@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkConnectomicsNetworkReader_h
 
 #include "mitkCommon.h"
-#include "mitkFileReader.h"
+#include <mitkAbstractFileReader.h>
+#include <mitkBaseData.h>
+#include <mitkMimeType.h>
 #include "mitkConnectomicsNetwork.h"
 
 namespace mitk
@@ -27,46 +29,23 @@ namespace mitk
   /** \brief The reader for connectomics network files (.cnf)
   */
 
-  class ConnectomicsNetworkReader : public FileReader, public BaseDataSource
+  class ConnectomicsNetworkReader : public mitk::AbstractFileReader
   {
   public:
 
-
     typedef mitk::ConnectomicsNetwork OutputType;
 
-    mitkClassMacro( ConnectomicsNetworkReader, BaseDataSource );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    ConnectomicsNetworkReader(const ConnectomicsNetworkReader& other);
+    ConnectomicsNetworkReader();
+    virtual ~ConnectomicsNetworkReader();
 
-    const char* GetFileName() const;
-    void SetFileName(const char* aFileName);
-    const char* GetFilePrefix() const;
-    void SetFilePrefix(const char* aFilePrefix);
-    const char* GetFilePattern() const;
-    void SetFilePattern(const char* aFilePattern);
-
-    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
-
-    virtual void Update();
-
-    BaseDataSource::DataObjectPointer MakeOutput(const DataObjectIdentifierType &name);
-
-    BaseDataSource::DataObjectPointer MakeOutput( DataObjectPointerArraySizeType idx);
-
-  protected:
-
-    /** Does the real work. */
-    virtual void GenerateData();
-    virtual void GenerateOutputInformation();
-
-    OutputType::Pointer m_OutputCache;
-
-    std::string m_FileName;
-    std::string m_FilePrefix;
-    std::string m_FilePattern;
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData> > Read();
 
   private:
-    void operator=(const Self&); //purposely not implemented
+    ConnectomicsNetworkReader* Clone() const;
+
+    us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
   };
 
 } //namespace MITK

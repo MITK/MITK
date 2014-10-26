@@ -55,12 +55,9 @@ private:
 
     itk::ObjectFactoryBase::Pointer m_NrrdDiffusionImageIOFactory;
     itk::ObjectFactoryBase::Pointer m_NrrdQBallImageIOFactory;
-    itk::ObjectFactoryBase::Pointer m_NrrdTensorImageIOFactory;
 
     itk::ObjectFactoryBase::Pointer m_NrrdDiffusionImageWriterFactory;
     itk::ObjectFactoryBase::Pointer m_NrrdQBallImageWriterFactory;
-    itk::ObjectFactoryBase::Pointer m_NrrdTensorImageWriterFactory;
-
 };
 
 }

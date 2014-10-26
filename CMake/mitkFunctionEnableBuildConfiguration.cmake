@@ -10,7 +10,7 @@ function(mitkFunctionEnableBuildConfiguration)
     return()
   endif()
 
-  message("------- Using build configuration \"${MITK_BUILD_CONFIGURATION}\" -------")
+  message(STATUS "------- Using build configuration \"${MITK_BUILD_CONFIGURATION}\" -------")
   include(${_build_config_file})
 
   if(MITK_CONFIG_PACKAGES)

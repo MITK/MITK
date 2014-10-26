@@ -43,7 +43,7 @@ int FiberDirectionExtraction(int argc, char* argv[])
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
     parser.addArgument("out", "o", ctkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
     parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask:", "mask image");
     parser.addArgument("athresh", "a", ctkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
@@ -136,16 +136,11 @@ int FiberDirectionExtraction(int argc, char* argv[])
         {
             // write vector field
             mitk::FiberBundleX::Pointer directions = fOdfFilter->GetOutputFiberBundle();
-            mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-            for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-            {
-                if ( (*it)->CanWriteBaseDataType(directions.GetPointer()) ) {
-                    string outfilename = outRoot;
-                    outfilename.append("_VECTOR_FIELD.fib");
-                    (*it)->SetFileName( outfilename.c_str() );
-                    (*it)->DoWrite( directions.GetPointer() );
-                }
-            }
+
+            string outfilename = outRoot;
+            outfilename.append("_VECTOR_FIELD.fib");
+
+            mitk::IOUtil::SaveBaseData(directions.GetPointer(), outfilename );
 
             // write num direction image
             {

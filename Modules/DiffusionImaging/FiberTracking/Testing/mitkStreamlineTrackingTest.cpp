@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkStreamlineTrackingFilter.h>
 #include <itkDiffusionTensor3D.h>
 #include <mitkTestingMacros.h>
-#include <mitkFiberBundleXWriter.h>
 
 using namespace std;
 

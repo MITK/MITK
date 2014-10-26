@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3D.h>
 #include "ctkCommandLineParser.h"
 #include <mitkCoreObjectFactory.h>
-#include <mitkFiberBundleXWriter.h>
 
 int StreamlineTracking(int argc, char* argv[])
 {
@@ -158,14 +157,8 @@ int StreamlineTracking(int argc, char* argv[])
         mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberBundle);
         fib->SetReferenceGeometry(mitkImage->GetGeometry());
 
-        mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-        for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-        {
-            if ( (*it)->CanWriteBaseDataType(fib.GetPointer()) ) {
-                (*it)->SetFileName( outFileName.c_str() );
-                (*it)->DoWrite( fib.GetPointer() );
-            }
-        }
+        mitk::IOUtil::SaveBaseData(fib.GetPointer(), outFileName );
+
     }
     catch (itk::ExceptionObject e)
     {

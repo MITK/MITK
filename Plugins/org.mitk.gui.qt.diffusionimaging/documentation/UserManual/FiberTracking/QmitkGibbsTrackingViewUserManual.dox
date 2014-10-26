@@ -1,0 +1,40 @@
+/**
+\page org_mitk_views_gibbstracking Gibbs Tracking View
+
+This view provides the user interface for the Gibbs Tracking algorithm, a global fiber tracking algorithm, originally proposed by Reisert et.al. [1].
+
+\tableofcontents
+
+\imageMacro{gibbstrackingview.png,"The Gibbs Tracking View",2}
+
+\section QmitkGibbsTrackingUserManualInputData Input Data
+
+Mandatory Input:
+\li One Q-Ball or tensor image selected in the datamanager
+
+Optional Input:
+\li Mask Image: White matter probability mask. Corresponds to the probability to generate fiber segments in the respective voxel.
+
+\section QmitkGibbsTrackingUserManualParameters Q-Ball Reconstruction
+
+\li Number of iterations: More iterations causes the algorithm to be more stable but also to take longer to finish the tracking. Recommended: 10^8 to 5x10^8 iterations for full brain tractography.
+\li Particle length/width/weight controlling the contribution of each particle to the model M
+\li Start and end temperature controlling how fast the process reaches a stable state. (usually no change needed)
+\li Weighting between the internal (affinity of the model to long and straigt fibers) and external energy (affinity of the model towards the data). (usually no change needed).
+\li Minimum fiber length constraint (in mm). Shorter fibers are discarded after the tracking.
+
+The automatic selection of parameters for the particle length/width and weight are determined directly from the input image using information about the image spacing and GFA.
+
+\imageMacro{gibbstrackingviewadvanced.png,"Advanced Tracking Parameters",10.08}
+
+\section QmitkGibbsTrackingUserManualTrackingSurveillance Surveilance of the tracking process
+
+Once started, the tracking can be monitored via the textual output that informs about the tracking progress and several stats of the current state of the algorithm.
+If enabled, the intermediate tracking results are displayed in the renderwindows each second. This live visualization should usually be disabled for performance reasons. It can be turned on and off during the tracking process via the according checkbox. The button next to this checkbox allows the visualization of only the next iteration step.
+
+\section QmitkGibbsTrackingUserManualReferences References
+
+[1] Reisert, M., Mader, I., Anastasopoulos, C., Weigel, M., Schnell, S., Kiselev, V.: Global fiber reconstruction becomes practical. Neuroimage 54 (2011) 955-962
+
+
+*/

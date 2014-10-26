@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNrrdQBallImageReader.h"
+#include <mitkCustomMimeType.h>
+#include "mitkDiffusionIOMimeTypes.h"
 
 #include "itkImageFileReader.h"
 #include "itkImageRegionIterator.h"
@@ -25,11 +27,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-  void NrrdQBallImageReader
-    ::GenerateData()
+  NrrdQBallImageReader::NrrdQBallImageReader(const NrrdQBallImageReader& other)
+    : mitk::AbstractFileReader(other)
   {
-    if ( m_FileName == "")
+  }
+
+  NrrdQBallImageReader::NrrdQBallImageReader()
+    : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_DESCRIPTION() )
+  {
+    m_ServiceReg = this->RegisterService();
+  }
+
+  NrrdQBallImageReader::~NrrdQBallImageReader()
+  {
+  }
+
+  std::vector<itk::SmartPointer<BaseData> > NrrdQBallImageReader::Read()
+  {
+    std::vector<itk::SmartPointer<mitk::BaseData> > result;
+    std::string location = GetInputLocation();
+
+    if ( location == "")
     {
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename of the vessel tree to be read is empty!");
     }
@@ -57,7 +75,7 @@ namespace mitk
         typedef itk::ImageFileReader<ImageType> FileReaderType;
         FileReaderType::Pointer reader = FileReaderType::New();
         reader->SetImageIO(io);
-        reader->SetFileName(this->m_FileName);
+        reader->SetFileName(location);
         reader->Update();
         ImageType::Pointer img = reader->GetOutput();
 
@@ -86,8 +104,10 @@ namespace mitk
           ++ot;
         }
 
-        this->GetOutput()->InitializeByItk(vecImg.GetPointer());
-        this->GetOutput()->SetVolume(vecImg->GetBufferPointer());
+        OutputType::Pointer resultImage = OutputType::New();
+        resultImage->InitializeByItk( vecImg.GetPointer() );
+        resultImage->SetVolume( vecImg->GetBufferPointer() );
+        result.push_back( resultImage.GetPointer() );
 
         try
         {
@@ -107,74 +127,12 @@ namespace mitk
         throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, an error occurred while reading the requested vessel tree file!");
       }
     }
-  }
-
-  void NrrdQBallImageReader::GenerateOutputInformation()
-  {
-
-  }
-
-
-
-  const char* NrrdQBallImageReader
-    ::GetFileName() const
-  {
-    return m_FileName.c_str();
-  }
-
-
-  void NrrdQBallImageReader
-    ::SetFileName(const char* aFileName)
-  {
-    m_FileName = aFileName;
-  }
-
-
-  const char* NrrdQBallImageReader
-    ::GetFilePrefix() const
-  {
-    return m_FilePrefix.c_str();
-  }
-
-
-  void NrrdQBallImageReader
-    ::SetFilePrefix(const char* aFilePrefix)
-  {
-    m_FilePrefix = aFilePrefix;
-  }
-
-
-  const char* NrrdQBallImageReader
-    ::GetFilePattern() const
-  {
-    return m_FilePattern.c_str();
-  }
-
-
-  void NrrdQBallImageReader
-    ::SetFilePattern(const char* aFilePattern)
-  {
-    m_FilePattern = aFilePattern;
-  }
-
-
-  bool NrrdQBallImageReader
-    ::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/)
-  {
-    // First check the extension
-    if(  filename == "" )
-    {
-      return false;
-    }
-    std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
-    ext = itksys::SystemTools::LowerCase(ext);
-
-    if (ext == ".hqbi" || ext == ".qbi")
-    {
-      return true;
-    }
-
-    return false;
+    return result;
   }
 
 } //namespace MITK
+
+mitk::NrrdQBallImageReader* mitk::NrrdQBallImageReader::Clone() const
+{
+  return new NrrdQBallImageReader(*this);
+}

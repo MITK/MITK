@@ -55,10 +55,10 @@ std::string mitk::DiffusionImageSerializer::Serialize()
 
   try
   {
-    NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-    writer->SetFileName(fullname);
-    writer->SetInput(const_cast<DiffusionImage<short>*>(image));
-    writer->Write();
+    NrrdDiffusionImageWriter writer;
+    writer.SetOutputLocation(fullname);
+    writer.SetInput(const_cast<DiffusionImage<short>*>(image));
+    writer.Write();
   }
   catch (std::exception& e)
   {

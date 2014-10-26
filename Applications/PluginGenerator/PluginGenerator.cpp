@@ -239,7 +239,7 @@ int main(int argc, char** argv)
   parser.addArgument("help", "h", QVariant::Bool, "  Show this help text");
   parser.addArgument("out-dir", "o", QVariant::String, "  Output directory", QDir::tempPath());
   parser.addArgument("license", "l", QVariant::String, "  Path to a file containing license information", ":/MITKLicense.txt");
-  parser.addArgument("vendor", "v", QVariant::String, "  The vendor of the generated code", "DKFZ, Medical and Biological Informatics");
+  parser.addArgument("vendor", "v", QVariant::String, "  The vendor of the generated code", "DKFZ");
   parser.addArgument("quiet", "q", QVariant::Bool, "  Do not print additional information");
   parser.addArgument("confirm-all", "y", QVariant::Bool, "  Answer all questions with 'yes'");
   parser.addArgument("check-update", "u", QVariant::Bool, "  Check for updates and exit");

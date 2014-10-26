@@ -43,7 +43,7 @@ double vtkThickPlane::EvaluateFunction(double x,double y,double z)
     this->Normal[1]*y +
     this->Normal[2]*z );
 
-  if( abs(ppd) <= Thickness )
+  if( std::abs(ppd) <= Thickness )
   {
     count++;
     return 0;
@@ -52,7 +52,7 @@ double vtkThickPlane::EvaluateFunction(double x,double y,double z)
   if( ppd >= 0 )
     return ppd - Thickness;
 
-  return abs(ppd + Thickness);
+  return std::abs(ppd + Thickness);
 }
 
 // Evaluate function gradient at point x[3].
@@ -120,7 +120,7 @@ void vtkThickPlane::SetOrigin (double _arg[3])
 
 void vtkThickPlane::SetThickness (double _arg)
 {
-  Thickness = abs(_arg);
+  Thickness = std::abs(_arg);
 }
 
 #define VTK_PLANE_TOL 1.0e-06

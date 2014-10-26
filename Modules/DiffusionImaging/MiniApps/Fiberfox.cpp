@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
-#include <mitkNrrdDiffusionImageWriter.h>
 #include <mitkFiberBundleX.h>
 #include <mitkFiberfoxParameters.h>
 #include "ctkCommandLineParser.h"
@@ -74,10 +73,7 @@ int Fiberfox(int argc, char* argv[])
         image->SetDirections( parameters.m_SignalGen.GetGradientDirections() );
         image->InitializeFromVectorImage();
 
-        NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-        writer->SetFileName(outName);
-        writer->SetInput(image);
-        writer->Update();
+        mitk::IOUtil::Save(image, outName.c_str());
     }
     return EXIT_SUCCESS;
 }

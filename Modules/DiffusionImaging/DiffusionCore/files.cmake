@@ -21,7 +21,6 @@ set(CPP_FILES
   # DataStructures -> DWI
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageHeaderInformation.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSource.cpp
-  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriter.cpp
 
   IODataStructures/DiffusionWeightedImages/mitkImageToDiffusionImageSource.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageCorrectionFilter.cpp

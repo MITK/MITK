@@ -20,31 +20,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkNrrdImageIO.h"
 #include "itkImageFileWriter.h"
 #include "mitkImageCast.h"
+#include "mitkIOMimeTypes.h"
+#include "mitkDiffusionIOMimeTypes.h"
 
 
 mitk::NrrdQBallImageWriter::NrrdQBallImageWriter()
-    : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
+  : AbstractFileWriter(mitk::QBallImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_DESCRIPTION())
 {
-    this->SetNumberOfRequiredInputs( 1 );
+  RegisterService();
 }
 
+mitk::NrrdQBallImageWriter::NrrdQBallImageWriter(const mitk::NrrdQBallImageWriter& other)
+  : AbstractFileWriter(other)
+{
+}
 
 mitk::NrrdQBallImageWriter::~NrrdQBallImageWriter()
 {}
 
 
-void mitk::NrrdQBallImageWriter::GenerateData()
+void mitk::NrrdQBallImageWriter::Write()
 {
-    m_Success = false;
-    InputType* input = this->GetInput();
-    if (input == NULL)
+  InputType::ConstPointer input = dynamic_cast<const InputType*>(this->GetInput());
+    if (input.IsNull())
     {
-        itkWarningMacro(<<"Sorry, input to NrrdQBallImageWriter is NULL!");
+        MITK_ERROR <<"Sorry, input to NrrdQBallImageWriter is NULL!";
         return;
     }
-    if ( m_FileName == "" )
+    if ( this->GetOutputLocation().empty() )
     {
-        itkWarningMacro( << "Sorry, filename has not been set!" );
+        MITK_ERROR << "Sorry, filename has not been set!";
         return ;
     }
 
@@ -102,7 +107,7 @@ void mitk::NrrdQBallImageWriter::GenerateData()
 
     nrrdWriter->SetInput( vecImg );
     nrrdWriter->SetImageIO(io);
-    nrrdWriter->SetFileName(m_FileName);
+    nrrdWriter->SetFileName(this->GetOutputLocation().c_str());
     nrrdWriter->UseCompressionOn();
 
 
@@ -123,38 +128,22 @@ void mitk::NrrdQBallImageWriter::GenerateData()
     {
       MITK_INFO << "Could not reset locale " << currLocale;
     }
-    m_Success = true;
 }
 
-
-void mitk::NrrdQBallImageWriter::SetInput( InputType* diffVolumes )
+mitk::NrrdQBallImageWriter* mitk::NrrdQBallImageWriter::Clone() const
 {
-    this->ProcessObject::SetNthInput( 0, diffVolumes );
+  return new NrrdQBallImageWriter(*this);
 }
 
-
-mitk::QBallImage* mitk::NrrdQBallImageWriter::GetInput()
+mitk::IFileWriter::ConfidenceLevel mitk::NrrdQBallImageWriter::GetConfidenceLevel() const
 {
-    if ( this->GetNumberOfInputs() < 1 )
-    {
-        return NULL;
-    }
-    else
-    {
-        return dynamic_cast<InputType*> ( this->ProcessObject::GetInput( 0 ) );
-    }
-}
-
-
-std::vector<std::string> mitk::NrrdQBallImageWriter::GetPossibleFileExtensions()
-{
-  std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(".qbi");
-  possibleFileExtensions.push_back(".hqbi");
-  return possibleFileExtensions;
-}
-
-std::string mitk::NrrdQBallImageWriter::GetSupportedBaseData() const
-{
-  return InputType::GetStaticNameOfClass();
+  InputType::ConstPointer input = dynamic_cast<const InputType*>(this->GetInput());
+  if (input.IsNull() )
+  {
+    return Unsupported;
+  }
+  else
+  {
+    return Supported;
+  }
 }

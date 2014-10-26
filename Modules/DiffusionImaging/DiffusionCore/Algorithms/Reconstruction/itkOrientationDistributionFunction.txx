@@ -526,7 +526,7 @@ namespace itk
           double *tmpPoint = points->GetPoint(pts[i]);
           double az = tmpPoint[0];
           double elev = tmpPoint[1];
-          if((abs(az)>ODF_PI-0.5) || (abs(elev)>ODF_PI/2-0.5))
+          if((std::abs(az)>ODF_PI-0.5) || (std::abs(elev)>ODF_PI/2-0.5))
             insert = false;
         }
         if(insert)
@@ -559,7 +559,7 @@ namespace itk
           double *tmpPoint = points2->GetPoint(pts[i]);
           double az = tmpPoint[0];
           double elev = tmpPoint[1];
-          if((abs(az)>ODF_PI-0.5) || (abs(elev)>ODF_PI/2-0.5))
+          if((std::abs(az)>ODF_PI-0.5) || (std::abs(elev)>ODF_PI/2-0.5))
             insert = false;
         }
         if(insert)

@@ -18,36 +18,52 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsNetworkDefinitions.h"
 #include <tinyxml.h>
 #include "itksys/SystemTools.hxx"
+#include "mitkDiffusionIOMimeTypes.h"
 
 mitk::ConnectomicsNetworkWriter::ConnectomicsNetworkWriter()
-: m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
+  : AbstractFileWriter(mitk::ConnectomicsNetwork::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_DESCRIPTION() )
 {
-  this->SetNumberOfRequiredInputs( 1 );
+  RegisterService();
+}
+
+mitk::ConnectomicsNetworkWriter::ConnectomicsNetworkWriter(const mitk::ConnectomicsNetworkWriter& other)
+  : AbstractFileWriter(other)
+{
 }
 
 
 mitk::ConnectomicsNetworkWriter::~ConnectomicsNetworkWriter()
 {}
 
+mitk::ConnectomicsNetworkWriter* mitk::ConnectomicsNetworkWriter::Clone() const
+{
+  return new ConnectomicsNetworkWriter(*this);
+}
 
-void mitk::ConnectomicsNetworkWriter::GenerateData()
+void mitk::ConnectomicsNetworkWriter::Write()
 {
   MITK_INFO << "Writing connectomics network";
-  m_Success = false;
-  InputType* input = this->GetInput();
-  if (input == NULL)
+  InputType::ConstPointer input = dynamic_cast<const InputType*>(this->GetInput());
+  if (input.IsNull() )
   {
-    itkWarningMacro(<<"Sorry, input to ConnectomicsNetworkWriter is NULL!");
+    MITK_ERROR <<"Sorry, input to ConnectomicsNetworkWriter is NULL!";
     return;
   }
-  if ( m_FileName == "" )
+  if ( this->GetOutputLocation().empty() )
   {
-    itkWarningMacro( << "Sorry, filename has not been set!" );
+    MITK_ERROR << "Sorry, filename has not been set!" ;
     return ;
   }
 
-  std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
+  std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetOutputLocation());
   ext = itksys::SystemTools::LowerCase(ext);
+
+  // default extension is .cnf
+  if(ext == "")
+  {
+    ext = ".cnf";
+    this->SetOutputLocation(this->GetOutputLocation() + ext);
+  }
 
   if (ext == ".cnf")
   {
@@ -89,7 +105,7 @@ void mitk::ConnectomicsNetworkWriter::GenerateData()
 
       TiXmlElement* verticesXML = new TiXmlElement(mitk::ConnectomicsNetworkDefinitions::XML_VERTICES);
       { // begin vertices section
-        VertexVectorType vertexVector = this->GetInput()->GetVectorOfAllNodes();
+        VertexVectorType vertexVector = dynamic_cast<const InputType*>(this->GetInput())->GetVectorOfAllNodes();
         for( unsigned int index = 0; index < vertexVector.size(); index++ )
         {
           // not localized as of yet TODO
@@ -106,7 +122,7 @@ void mitk::ConnectomicsNetworkWriter::GenerateData()
 
       TiXmlElement* edgesXML = new TiXmlElement(mitk::ConnectomicsNetworkDefinitions::XML_EDGES);
       { // begin edges section
-        EdgeVectorType edgeVector = this->GetInput()->GetVectorOfAllEdges();
+        EdgeVectorType edgeVector = dynamic_cast<const InputType*>(this->GetInput())->GetVectorOfAllEdges();
         for(unsigned  int index = 0; index < edgeVector.size(); index++ )
         {
           TiXmlElement* edgeXML = new TiXmlElement(mitk::ConnectomicsNetworkDefinitions::XML_EDGE );
@@ -120,43 +136,8 @@ void mitk::ConnectomicsNetworkWriter::GenerateData()
       mainXML->LinkEndChild(edgesXML);
 
     } // end document
-    documentXML.SaveFile( m_FileName );
-
-    m_Success = true;
-
+    documentXML.SaveFile( this->GetOutputLocation().c_str() );
     MITK_INFO << "Connectomics network written";
 
   }
-}
-
-
-void mitk::ConnectomicsNetworkWriter::SetInputConnectomicsNetwork( InputType* conNetwork )
-{
-  this->ProcessObject::SetNthInput( 0, conNetwork );
-}
-
-
-mitk::ConnectomicsNetwork* mitk::ConnectomicsNetworkWriter::GetInput()
-{
-  if ( this->GetNumberOfInputs() < 1 )
-  {
-    return NULL;
-  }
-  else
-  {
-    return dynamic_cast<InputType*> ( this->ProcessObject::GetInput( 0 ) );
-  }
-}
-
-
-std::vector<std::string> mitk::ConnectomicsNetworkWriter::GetPossibleFileExtensions()
-{
-  std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(".cnf");
-  return possibleFileExtensions;
-}
-
-std::string mitk::ConnectomicsNetworkWriter::GetSupportedBaseData() const
-{
-  return InputType::GetStaticNameOfClass();
 }

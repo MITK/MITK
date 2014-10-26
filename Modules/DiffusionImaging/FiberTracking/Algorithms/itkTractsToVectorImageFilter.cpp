@@ -136,7 +136,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
         m_FiberBundle = m_FiberBundle->GetDeepCopy();
 
     // resample fiber bundle for sufficient voxel coverage
-    m_FiberBundle->ResampleFibers(minSpacing/10);
+    m_FiberBundle->ResampleLinear(minSpacing/10);
 
     // iterate over all fibers
     vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
@@ -253,6 +253,9 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
             if (dir.magnitude()<m_SizeThreshold)
                 continue;
             count++;
+
+//            if (m_NormalizeVectors)
+//                dir.normalize();
 
             if (m_CreateDirectionImages && i<10)
             {

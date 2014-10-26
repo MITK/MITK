@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPixelType.h"
 #include "itkImageRegionIterator.h"
 #include "itkImageFileReader.h"
-#include "mitkNrrdDiffusionImageWriter.h"
+#include <mitkIOUtil.h>
 
 template< class D, class T >
 mitk::TeemDiffusionTensor3DReconstructionImageFilter<D,T>
@@ -91,15 +91,9 @@ mitk::TeemDiffusionTensor3DReconstructionImageFilter<D,T>
   int random_integer = rand();
   sprintf( filename, "dwi_%d.nhdr",random_integer);
 
-  typedef mitk::NrrdDiffusionImageWriter<D> WriterType;
-  typename WriterType::Pointer nrrdWriter = WriterType::New();
-  nrrdWriter->SetInput( m_Input );
-  //nrrdWriter->SetDirections(m_Input->GetDirections());
-  //nrrdWriter->SetB_Value(m_Input->GetB_Value());
-  nrrdWriter->SetFileName(filename);
   try
   {
-    nrrdWriter->Update();
+    mitk::IOUtil::Save(m_Input, filename);
   }
   catch (itk::ExceptionObject e)
   {

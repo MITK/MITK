@@ -32,7 +32,7 @@ mitk::NavigationData::NavigationData(const mitk::NavigationData& toCopy) : itk::
     m_Position(toCopy.GetPosition()), m_Orientation(toCopy.GetOrientation()), m_CovErrorMatrix(toCopy.GetCovErrorMatrix()),
         m_HasPosition(toCopy.GetHasPosition()), m_HasOrientation(toCopy.GetHasOrientation()), m_DataValid(toCopy.IsDataValid()), m_IGTTimeStamp(toCopy.GetIGTTimeStamp()),
         m_Name(toCopy.GetName())
-{/* TODO SW: This constructor is not tested! TODO SW: Graft does the same, remove code duplications, set Graft to deprecated, remove duplication in tescode */}
+{/* TODO SW: Graft does the same, remove code duplications, set Graft to deprecated, remove duplication in tescode */}
 
 mitk::NavigationData::~NavigationData()
 {
@@ -255,7 +255,7 @@ mitk::NavigationData::GetInverse() const
   if (Equal(zeroQuaternion, this->GetOrientation()))
     mitkThrow() << "tried to invert zero quaternion in NavigationData";
 
-  mitk::NavigationData::Pointer navigationDataInverse = NavigationData::Clone();
+  mitk::NavigationData::Pointer navigationDataInverse = this->Clone();
   navigationDataInverse->SetOrientation(this->GetOrientation().inverse());
 
   // To vnl_vector
@@ -318,4 +318,68 @@ mitk::NavigationData::getComposition(const mitk::NavigationData::Pointer nd1,
   nd3->ResetCovarianceValidity();
 
   return nd3;
+}
+
+bool mitk::Equal(const mitk::NavigationData& leftHandSide, const mitk::NavigationData& rightHandSide, ScalarType eps, bool verbose)
+{
+  bool returnValue = true;
+
+  // Dimensionality
+  if( !mitk::Equal(rightHandSide.GetPosition(),leftHandSide.GetPosition()) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( NavigationData )] Position differs.";
+      MITK_INFO << "leftHandSide is " << leftHandSide.GetPosition()
+       << "rightHandSide is " << rightHandSide.GetPosition();
+    }
+    returnValue = false;
+  }
+
+  // Dimensionality
+  if( !mitk::Equal(rightHandSide.GetOrientation(),leftHandSide.GetOrientation()) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( NavigationData )] Orientation differs.";
+      MITK_INFO << "leftHandSide is " << leftHandSide.GetOrientation()
+       << "rightHandSide is " << rightHandSide.GetOrientation();
+    }
+    returnValue = false;
+  }
+
+  if( rightHandSide.GetCovErrorMatrix() != leftHandSide.GetCovErrorMatrix() )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( NavigationData )] CovErrorMatrix differs.";
+      MITK_INFO << "leftHandSide is " << leftHandSide.GetCovErrorMatrix()
+       << "rightHandSide is " << rightHandSide.GetCovErrorMatrix();
+    }
+    returnValue = false;
+  }
+
+  if( std::string(rightHandSide.GetName()) != std::string(leftHandSide.GetName()) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( NavigationData )] Name differs.";
+      MITK_INFO << "leftHandSide is " << leftHandSide.GetName()
+       << "rightHandSide is " << rightHandSide.GetName();
+    }
+    returnValue = false;
+  }
+
+  if( rightHandSide.GetIGTTimeStamp() != leftHandSide.GetIGTTimeStamp() )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( NavigationData )] IGTTimeStamp differs.";
+      MITK_INFO << "leftHandSide is " << leftHandSide.GetIGTTimeStamp()
+       << "rightHandSide is " << rightHandSide.GetIGTTimeStamp();
+    }
+    returnValue = false;
+  }
+
+  return returnValue;
 }

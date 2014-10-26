@@ -93,6 +93,7 @@ int TractometerMetrics(int argc, char* argv[])
         std::vector< bool > detected;
         std::vector< std::pair< int, int > > labelsvector;
         std::vector< ItkUcharImgType::Pointer > bundleMasks;
+        std::vector< ItkUcharImgType::Pointer > bundleMasksCoverage;
         short max = 0;
         for (unsigned int i=0; i<labelpairs.size()-1; i+=2)
         {
@@ -109,13 +110,25 @@ int TractometerMetrics(int argc, char* argv[])
             labelsvector.push_back(l);
             detected.push_back(false);
 
-            mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(path+"/Bundle"+boost::lexical_cast<string>(labelsvector.size())+"_MASK.nrrd")->GetData());
-            typedef mitk::ImageToItk< ItkUcharImgType > CasterType;
-            CasterType::Pointer caster = CasterType::New();
-            caster->SetInput(img);
-            caster->Update();
-            ItkUcharImgType::Pointer bundle = caster->GetOutput();
-            bundleMasks.push_back(bundle);
+            {
+                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(path+"/Bundle"+boost::lexical_cast<string>(labelsvector.size())+"_MASK.nrrd")->GetData());
+                typedef mitk::ImageToItk< ItkUcharImgType > CasterType;
+                CasterType::Pointer caster = CasterType::New();
+                caster->SetInput(img);
+                caster->Update();
+                ItkUcharImgType::Pointer bundle = caster->GetOutput();
+                bundleMasks.push_back(bundle);
+            }
+
+            {
+                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(path+"/Bundle"+boost::lexical_cast<string>(labelsvector.size())+"_MASK_COVERAGE.nrrd")->GetData());
+                typedef mitk::ImageToItk< ItkUcharImgType > CasterType;
+                CasterType::Pointer caster = CasterType::New();
+                caster->SetInput(img);
+                caster->Update();
+                ItkUcharImgType::Pointer bundle = caster->GetOutput();
+                bundleMasksCoverage.push_back(bundle);
+            }
         }
         vnl_matrix< unsigned char > matrix; matrix.set_size(max, max); matrix.fill(0);
 
@@ -276,37 +289,31 @@ int TractometerMetrics(int argc, char* argv[])
             noConnPolyData->SetPoints(noConnPoints);
             noConnPolyData->SetLines(noConnCells);
             mitk::FiberBundleX::Pointer noConnFib = mitk::FiberBundleX::New(noConnPolyData);
-            for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-            {
-                if ( (*it)->CanWriteBaseDataType(noConnFib.GetPointer()) ) {
-                    (*it)->SetFileName( (outRoot+"_NC.fib").c_str() );
-                    (*it)->DoWrite( noConnFib.GetPointer() );
-                }
-            }
+
+            string ncfilename = outRoot;
+            ncfilename.append("_NC.fib");
+
+            mitk::IOUtil::SaveBaseData(noConnFib.GetPointer(), ncfilename );
 
             vtkSmartPointer<vtkPolyData> invalidPolyData = vtkSmartPointer<vtkPolyData>::New();
             invalidPolyData->SetPoints(invalidPoints);
             invalidPolyData->SetLines(invalidCells);
             mitk::FiberBundleX::Pointer invalidFib = mitk::FiberBundleX::New(invalidPolyData);
-            for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-            {
-                if ( (*it)->CanWriteBaseDataType(invalidFib.GetPointer()) ) {
-                    (*it)->SetFileName( (outRoot+"_IC.fib").c_str() );
-                    (*it)->DoWrite( invalidFib.GetPointer() );
-                }
-            }
+
+            string icfilename = outRoot;
+            icfilename.append("_IC.fib");
+
+            mitk::IOUtil::SaveBaseData(invalidFib.GetPointer(), icfilename );
 
             vtkSmartPointer<vtkPolyData> validPolyData = vtkSmartPointer<vtkPolyData>::New();
             validPolyData->SetPoints(validPoints);
             validPolyData->SetLines(validCells);
             mitk::FiberBundleX::Pointer validFib = mitk::FiberBundleX::New(validPolyData);
-            for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-            {
-                if ( (*it)->CanWriteBaseDataType(validFib.GetPointer()) ) {
-                    (*it)->SetFileName( (outRoot+"_VC.fib").c_str() );
-                    (*it)->DoWrite( validFib.GetPointer() );
-                }
-            }
+
+            string vcfilename = outRoot;
+            vcfilename.append("_VC.fib");
+
+            mitk::IOUtil::SaveBaseData(validFib.GetPointer(), vcfilename );
 
             {
                 typedef itk::ImageFileWriter< ItkUcharImgType > WriterType;
@@ -324,9 +331,9 @@ int TractometerMetrics(int argc, char* argv[])
         while(!it.IsAtEnd())
         {
             bool wm = false;
-            for (unsigned int i=0; i<bundleMasks.size(); i++)
+            for (unsigned int i=0; i<bundleMasksCoverage.size(); i++)
             {
-                ItkUcharImgType::Pointer bundle = bundleMasks.at(i);
+                ItkUcharImgType::Pointer bundle = bundleMasksCoverage.at(i);
                 if (bundle->GetPixel(it.GetIndex())>0)
                 {
                     wm = true;
@@ -371,6 +378,12 @@ int TractometerMetrics(int argc, char* argv[])
             sens.append(",");
 
             sens.append(boost::lexical_cast<string>(nc));
+            sens.append(",");
+
+            sens.append(boost::lexical_cast<string>(vc));
+            sens.append(",");
+
+            sens.append(boost::lexical_cast<string>(ic));
             sens.append(",");
 
             sens.append(boost::lexical_cast<string>(validBundles));

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkElectrostaticRepulsionDiffusionGradientReductionFilter.h>
 
 #include "mitkDWIHeadMotionCorrectionFilter.h"
-#include "mitkNrrdDiffusionImageWriter.h"
 
 typedef short                                       DiffusionPixelType;
 typedef mitk::DiffusionImage< DiffusionPixelType >  DiffusionImageType;
@@ -83,15 +82,9 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
   /*
    * 3. Write output data
    **/
-  mitk::NrrdDiffusionImageWriter< DiffusionPixelType >::Pointer dwiwriter =
-      mitk::NrrdDiffusionImageWriter< DiffusionPixelType >::New();
-
-  dwiwriter->SetInput( image );
-  dwiwriter->SetFileName( argv[2] );
-
   try
   {
-    dwiwriter->Update();
+    mitk::IOUtil::Save(image, argv[2]);
   }
   catch( const itk::ExceptionObject& e)
   {

@@ -161,7 +161,7 @@ m_CrosshairNavigationEnabled(false)
   //Create RenderWindows 2
   mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, name + ".widget2", NULL, m_RenderingManager,renderingMode);
   mitkWidget2->setMaximumSize(2000,2000);
-  mitkWidget2->setEnabled( TRUE );
+  mitkWidget2->setEnabled( true );
   mitkWidget2->SetLayoutIndex( SAGITTAL );
   mitkWidgetLayout2->addWidget(mitkWidget2);
 

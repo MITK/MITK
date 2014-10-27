@@ -38,16 +38,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QWebView>
 #include <QWebPage>
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#  include <QUrlQuery>
+#endif
 #include <QString>
 #include <QStringList>
 #include <QRegExp>
 #include <QChar>
 #include <QByteArray>
 #include <QDesktopServices>
-
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-#   include <QUrlQuery>
-#endif
 
 #include "QmitkDiffusionApplicationPlugin.h"
 #include "mitkDataStorageEditorInput.h"

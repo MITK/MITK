@@ -55,6 +55,7 @@ set(INTERNAL_CPP_FILES
   Perspectives/QmitkProbabilisticTractographyPerspective.cpp
   Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.cpp
   Perspectives/QmitkDIAppIVIMPerspective.cpp
+  Perspectives/QmitkDiffusionDefaultPerspective.cpp
 )
 
 set(UI_FILES
@@ -145,6 +146,7 @@ set(MOC_H_FILES
   src/internal/Perspectives/QmitkProbabilisticTractographyPerspective.h
   src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h
   src/internal/Perspectives/QmitkDIAppIVIMPerspective.h
+  src/internal/Perspectives/QmitkDiffusionDefaultPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES

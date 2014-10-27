@@ -20,4 +20,6 @@ void $(activator-class-name)::stop(ctkPluginContext* context)
 
 }
 
-Q_EXPORT_PLUGIN2($(plugin-target), mitk::$(activator-class-name))
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2($(plugin-target), mitk::$(activator-class-name))
+#endif

@@ -8,11 +8,7 @@
 
 This view allows for creating and editing NavigationToolStorages. These storages contains naviagtion tools of a tracking device, can be saved permanently and used later for any other IGT application.
 
-Available sections:
-  - \ref QmitkMITKIGTNavigationToolManager
-  - \ref QmitkMITKIGTNavigationToolManagerToolOverview
-  - \ref QmitkMITKIGTNavigationToolManagerManagingNavigationToolStorage
-  - \ref QmitkMITKIGTNavigationToolManagerAddingEditingNavigationTools
+\tableofcontents
 
 \section QmitkMITKIGTNavigationToolManagerToolOverview Navigation Tools Overview
 

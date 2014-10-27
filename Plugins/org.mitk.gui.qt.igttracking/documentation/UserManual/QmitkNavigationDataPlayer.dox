@@ -1,10 +1,9 @@
 /**
-\page org_mitk_views_navigationdataplayer NavigationData Player
+\page org_mitk_views_navigationdataplayer The NavigationData Player
 
 \imageMacro{QmitkIGTTracking_IconNavigationDataPlayer.png,"Icon of the NavigationData Player",2.00}
 
-Available sections:
-  - \ref NavigationDataPlayerOverview
+\tableofcontents
 
 \section NavigationDataPlayerOverview
 The navigation data player plays recorded or artificial navigation data of one ore more tracking tools and visualizes their trajectory.

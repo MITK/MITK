@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_igttracking IGT Tracking
+\page org_mitk_gui_qt_igttracking The IGT Tracking Plugin
 
 This plugin offers basic tracking functionalities. This includes connecting to a tracking system, logging and recording of tracking data, managing tracking tools and playing recorded tracking data.
 

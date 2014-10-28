@@ -400,12 +400,7 @@ function(mitk_create_module)
             endforeach()
 
             # Add a source level dependencies on resource files
-            if(source_res_files)
-              list(APPEND CPP_FILES ${MODULE_TARGET}_resources.cpp)
-            endif()
-            if(binary_res_files)
-              list(APPEND CPP_FILES ${CMAKE_CURRENT_BINARY_DIR}/${MODULE_TARGET}_binary_resources.cpp)
-            endif()
+            usFunctionGetResourceSource(TARGET ${MODULE_TARGET} OUT CPP_FILES)
           endif()
         endif()
 
@@ -572,7 +567,6 @@ function(mitk_create_module)
 
           if(binary_res_files)
             usFunctionAddResources(TARGET ${MODULE_TARGET}
-                                   SOURCE_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${MODULE_TARGET}_binary_resources.cpp
                                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}
                                    FILES ${binary_res_files})
           endif()
@@ -580,6 +574,9 @@ function(mitk_create_module)
             usFunctionAddResources(TARGET ${MODULE_TARGET}
                                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${res_dir}
                                    FILES ${source_res_files})
+          endif()
+          if(binary_res_files OR source_res_files)
+            usFunctionEmbedResources(TARGET ${MODULE_TARGET})
           endif()
 
         endif()

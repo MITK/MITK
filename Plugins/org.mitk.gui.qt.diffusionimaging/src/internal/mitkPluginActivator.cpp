@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/Perspectives/QmitkStreamlineTractographyPerspective.h"
 #include "src/internal/Perspectives/QmitkProbabilisticTractographyPerspective.h"
 #include "src/internal/Perspectives/QmitkFiberProcessingPerspective.h"
+#include "src/internal/Perspectives/QmitkDiffusionDefaultPerspective.h"
 
 #include "src/internal/QmitkQBallReconstructionView.h"
 #include "src/internal/QmitkPreprocessingView.h"
@@ -64,6 +65,7 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppSyntheticDataGenerationPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppIVIMPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberProcessingPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionDefaultPerspective, context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkQBallReconstructionView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkPreprocessingView, context)

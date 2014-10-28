@@ -17,17 +17,17 @@ var moduleNames = new Array("Dicom Import",
                             "MITK Downloads & News");
 
 // add the MITK-link to your module
-var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.dicomimport?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.ivim?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.preprocessingreconstruction?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.quantification?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.tractography?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.connectomics?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.syntheticdata?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.registration?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.imageprocessing?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.visualization?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.diffusionimagingapp.perspectives.utility?clear=false",
+var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
                             "http://www.mitk.org");
 
 // add the filename of your icon for the module. Place the picture in subdirectory "pics".
@@ -76,17 +76,17 @@ var experimental = new Array(false,
                              false);
 
 // add the description for your module. The description is displayed in a PopUp-window.
-var moduleDescriptions = new Array("'Dicom Import' supports direct import of Siemens diffusion weighted DICOM files.",
-                                   "'IVIM' stands for Intravoxel Incoherent Motion. The technique allows for the estimation of tissue perfusion on basis of diffusion measurements. Several models are supported by this module. Interactive exploration of the data is supported.",
-                            "'Preprocessing & Reconstruction' lets you estimate diffusion tensors or q-balls using different reconstruction methods and calculates scalar indices (FA, GFA, ...). It also includes an ODF Peak Extraction view and preprocessing steps like gradient avaraging or reduction and baseline image extraction.",
-                            "'Quantification' allows partial volume analysis and the evaluation and exploration of Tract Based Spatial Statistic datasets (it does NOT reimplement the TBSS methods available in FSL). The Partial Volume Analysis view provides a very robust method for semi-automatic ROI analysis. It uses EM clustering to probabilistically segment fiber vs. non-fiber vs. partial volume.",
-                            "'Tractography' implements several fiber tractography algorithms (global, probabilistic and streamline). The fiber bundle operations view allows for extraction, join, and substraction of bundles. It also generates a variety of images from given fiber tracts and gives detailed information about the fiberbundle itself.",
-                            "'Connectomics' aims at building graphs (nodes and edges) from a global tractogram and applying graph theory for data analysis. fMRI-data might be incorporated in future.",
-                                   "'Synthetic Data' contains the Fiberfox software phantom tool as well as instruments like tract density image or fiber envelope generation.",
-                            "'Registration' provides views for rigid and point based image registration (only non-diffusion!).",
-                            "'Image Processing' provides tools for image segmentation and diffusion unrelated image processing.",
-                            "'Visualization' provides easy to use and fast volume rendering of images, means to capture high resolution screenshots as well as movies of the 3D sceen.",
-                            "'Utilities' provides the property list view to modify the properties of the selected data node as well as a logging view for debugging purposes.",
+var moduleDescriptions = new Array("MITK Diffusion supports direct import of Siemens diffusion weighted DICOM files.",
+                                   "You can use Intravoxel Incoherent Motion to estimate tissue perfusion on basis of diffusion measurements. Several models and interactive exploration of the data are supported.",
+                            "You can use MITK Diffusion to preprocess diffusion weighted MR Images using techniques like gradient averaging or reduction and baseline image extraction. Then you can estimate diffusion tensors or q-balls using different reconstruction methods and calculates scalar indices (FA, GFA, ...).",
+                            "MITK Diffusion allows partial volume analysis and the evaluation and exploration of Tract Based Spatial Statistic datasets (it does NOT reimplement the TBSS methods available in FSL). The Partial Volume Analysis view provides a very robust method for semi-automatic ROI analysis. It uses EM clustering to probabilistically segment fiber vs. non-fiber vs. partial volume.",
+                            "The tractography components of MITK Diffusion implement several fiber tractography algorithms (global, probabilistic and streamline). The fiber bundle operations view allows for extraction, join, and substraction of bundles. It also generates a variety of images from given fiber tracts and gives detailed information about the fiberbundle itself.",
+                            "Connectomics aims at building graphs (nodes and edges) from a global tractogram and applying graph theory for data analysis.",
+                            "The Fiberfox software phantom tool allows you to create synthetic phantoms easily and with a wide variety of properties and options.",
+                            "Registration views allow for rigid and point based image registration (only non-diffusion!).",
+                            "MITK Diffusion provides tools for image segmentation and diffusion unrelated image processing.",
+                            "In order to visually present your research MITK Diffusion contains fast volume rendering of images, means to capture high resolution screenshots as well as movies of the 3D sceen.",
+                            "Further utilites include the property list view to modify the properties of the selected data node as well as a logging view for debugging purposes.",
                             "Open the MITK website in an external browser.");
 
 var bttns = new Array();
@@ -250,7 +250,7 @@ function showPopUpWindow(){
   // append text-elements to their container
   contHeadline.appendChild(headline);
   contDescription.appendChild(description);
-  contModLink.appendChild(moduleLink);
+  //contModLink.appendChild(moduleLink);
 }
 
 function getPos(id,prefix){

@@ -95,6 +95,11 @@
   <keyword label="mean" id="org.mitk.views.diffusionquantification.Keyword"/>
   <keyword label="generalized" id="org.mitk.views.diffusionquantification.Keyword"/>
   <keyword label="derived" id="org.mitk.views.diffusionquantification.Keyword"/>
+  
+  <keyword label="default" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
+  <keyword label="diffusion" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
+  <keyword label="data" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
+  <keyword label="standard" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
 
   </extension>
 
@@ -352,6 +357,13 @@
     class="QmitkDIAppIVIMPerspective"
     icon="resources/ivim.png">
     <keywordReference id="org.mitk.perspectives.ivim.Keyword"/>
+    </perspective>
+    
+    <perspective id="org.mitk.perspectives.diffusiondefault"
+    name="Diffusion"
+    class="QmitkDiffusionDefaultPerspective"
+    icon="resources/dwi.png">
+    <keywordReference id="org.mitk.perspectives.diffusiondefault.Keyword"/>
     </perspective>
 
   </extension>

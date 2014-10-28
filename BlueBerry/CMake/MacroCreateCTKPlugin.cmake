@@ -90,7 +90,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
 
       set(_tag_file "${plugin_tag_dir}/${_dep_target}.tag")
       if(EXISTS ${_tag_file})
-        set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} ${_tag_file}=qthelp://${_dep}/bundle/")
+        set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} \"${_tag_file}=qthelp://${_dep}/bundle/\"")
       endif()
     endforeach()
     if(_PLUGIN_DOXYGEN_TAGFILES)

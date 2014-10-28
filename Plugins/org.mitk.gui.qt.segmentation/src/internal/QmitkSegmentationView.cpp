@@ -336,6 +336,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
                   this->OnSelectionChanged( emptySegmentation );
 
                   m_Controls->segImageSelector->SetSelectedNode(emptySegmentation);
+                  mitk::RenderingManager::GetInstance()->InitializeViews(emptySegmentation->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
                }
                catch (std::bad_alloc)
                {
@@ -1058,13 +1059,14 @@ void QmitkSegmentationView::RenderingManagerReinitialized()
    */
    mitk::DataNode* workingNode = m_Controls->segImageSelector->GetSelectedNode();
    const mitk::BaseGeometry* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
+
    if (workingNode && worldGeo)
    {
+
       const mitk::BaseGeometry* workingNodeGeo = workingNode->GetData()->GetGeometry();
       const mitk::BaseGeometry* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
-      //if (mitk::Equal(workingNodeGeo->GetBoundingBox(), worldGeo->GetBoundingBox(), mitk::eps, true))
-      if (mitk::Equal(workingNodeGeo->GetCornerPoint(false,false,false), worldGeo->GetCornerPoint(false,false,false), mitk::eps) &&
-        mitk::Equal(workingNodeGeo->GetCornerPoint(true,true,true), worldGeo->GetCornerPoint(true,true,true), mitk::eps))
+
+      if (mitk::Equal(workingNodeGeo->GetBoundingBox(), worldGeo->GetBoundingBox(), mitk::eps, true))
       {
          this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
          this->SetToolSelectionBoxesEnabled(true);

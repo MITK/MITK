@@ -180,6 +180,7 @@ set(CACHED_RESOURCE_FILES
   resources/qball.png
   resources/StreamlineTracking.png
   resources/dwi2.png
+  resources/dwi.png
   resources/odf.png
   resources/refresh.xpm
   resources/diffusionregistration.png

@@ -48,7 +48,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkTrackingWorker::QmitkTrackingWorker(QmitkGibbsTrackingView* view)
     : m_View(view)
 {
-
 }
 
 void QmitkTrackingWorker::run()
@@ -99,6 +98,7 @@ QmitkGibbsTrackingView::QmitkGibbsTrackingView()
     , m_LastStep(0)
     , m_GlobalTracker(NULL)
     , m_TrackingWorker(this)
+    , m_TrackingNode(NULL)
 {
     m_TrackingWorker.moveToThread(&m_TrackingThread);
     connect(&m_TrackingThread, SIGNAL(started()), this, SLOT(BeforeThread()));
@@ -138,6 +138,7 @@ void QmitkGibbsTrackingView::StopGibbsTracking()
     m_GlobalTracker->SetAbortTracking(true);
     m_Controls->m_TrackingStop->setEnabled(false);
     m_Controls->m_TrackingStop->setText("Stopping Tractography ...");
+    m_TrackingNode = NULL;
 }
 
 // update gui elements and generate fiber bundle after tracking is finished
@@ -329,7 +330,6 @@ void QmitkGibbsTrackingView::SetIterations(int value)
         m_Iterations = 500000000;
         break;
     }
-
 }
 
 void QmitkGibbsTrackingView::StdMultiWidgetAvailable(QmitkStdMultiWidget &stdMultiWidget)
@@ -369,6 +369,18 @@ void QmitkGibbsTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     }
 
     UpdateGUI();
+}
+
+
+void QmitkGibbsTrackingView::NodeRemoved(const mitk::DataNode * node)
+{
+  if (m_ThreadIsRunning)
+  {
+    if (node==m_TrackingNode.GetPointer())
+    {
+      StopGibbsTracking();
+    }
+  }
 }
 
 // update gui elements displaying trackings status
@@ -503,6 +515,7 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
         return;
 
     // cast qbi to itk
+    m_TrackingNode = m_ImageNode;
     m_ItkTensorImage = NULL;
     m_ItkQBallImage = NULL;
     m_MaskImage = NULL;
@@ -753,4 +766,3 @@ void QmitkGibbsTrackingView::LoadTrackingParameters()
     m_Controls->m_CurvatureThresholdSlider->setValue(curvThres.toInt());
     m_Controls->m_CurvatureThresholdLabel->setText(curvThres+"°");
 }
-

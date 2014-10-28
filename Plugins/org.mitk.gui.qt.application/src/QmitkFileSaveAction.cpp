@@ -50,7 +50,10 @@ public:
 
   ~QmitkFileSaveActionPrivate()
   {
-    m_Window.Lock()->GetSelectionService()->RemoveSelectionListener(m_SelectionListener);
+    if (!m_Window.Expired())
+    {
+      m_Window.Lock()->GetSelectionService()->RemoveSelectionListener(m_SelectionListener);
+    }
   }
 
   void init ( berry::IWorkbenchWindow::Pointer window, QmitkFileSaveAction* action )

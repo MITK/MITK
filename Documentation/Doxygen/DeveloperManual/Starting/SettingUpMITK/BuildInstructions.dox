@@ -217,8 +217,8 @@ Please see \ref NewPluginPage
 
 To use MITK in your external project, add the CMake command
 <code>find_package(MITK REQUIRED)</code> to your CMakeLists.txt and make use of
-the CMake macros <code>MITK_CHECK_MODULE(result_var <module-list>)</code> and
-<code>MITK_USE_MODULE(<module-list>)</code> provided by MITK.
+the CMake macros <code>mitk_create_module()</code> and
+<code>mitk_create_executable()</code> provided by MITK.
 
 Here is an example CMakeLists.txt (from the Examples/QtAppExample/ directory)
 which allows you to create a Qt based application using MITK to display an image.

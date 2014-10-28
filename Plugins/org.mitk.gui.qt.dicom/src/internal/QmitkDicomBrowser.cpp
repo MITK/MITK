@@ -18,6 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDicomBrowser.h"
 #include "mitkPluginActivator.h"
 
+#include "berryIQtPreferencePage.h"
+#include <berryIPreferences.h>
+#include <berryIPreferencesService.h>
+#include <berryIBerryPreferences.h>
+#include <berryPlatform.h>
 
 const std::string QmitkDicomBrowser::EDITOR_ID = "org.mitk.editors.dicombrowser";
 const QString QmitkDicomBrowser::TEMP_DICOM_FOLDER_SUFFIX="TmpDicomFolder";
@@ -152,7 +157,6 @@ void QmitkDicomBrowser::StartStoreSCP()
     connect(m_StoreSCPLauncher ,SIGNAL(SignalStoreSCPError(const QString&)),m_DicomDirectoryListener,SLOT(OnDicomNetworkError(const QString&)),Qt::DirectConnection);
     connect(m_StoreSCPLauncher ,SIGNAL(SignalStoreSCPError(const QString&)),this,SLOT(OnDicomNetworkError(const QString&)),Qt::DirectConnection);
     m_StoreSCPLauncher->StartStoreSCP();
-
 }
 
 void QmitkDicomBrowser::OnStoreSCPStatusChanged(const QString& status)
@@ -173,28 +177,36 @@ void QmitkDicomBrowser::StopStoreSCP()
 void QmitkDicomBrowser::SetPluginDirectory()
 {
      m_PluginDirectory = mitk::PluginActivator::getContext()->getDataFile("").absolutePath();
-     m_PluginDirectory.append("/");
+     m_PluginDirectory.append("/database");
 }
 
 void QmitkDicomBrowser::SetDatabaseDirectory(const QString& databaseDirectory)
 {
-    m_DatabaseDirectory.clear();
-    m_DatabaseDirectory.append(m_PluginDirectory);
-    m_DatabaseDirectory.append(databaseDirectory);
-    m_Controls.internalDataWidget->SetDatabaseDirectory(m_DatabaseDirectory);
+  SetPluginDirectory();
+  berry::IPreferencesService::Pointer prefService=
+    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  std::string targetPath = prefService->GetSystemPreferences()->Node("/org.mitk.views.dicomreader")->Get("default dicom path", m_PluginDirectory.toStdString());
+
+  m_DatabaseDirectory.clear();
+  m_DatabaseDirectory.append(targetPath.c_str());
+  m_Controls.internalDataWidget->SetDatabaseDirectory(m_DatabaseDirectory);
 }
 
 void QmitkDicomBrowser::CreateTemporaryDirectory()
 {
-    QDir tmp;
-    QString tmpPath = QDir::tempPath();
-    m_TempDirectory.clear();
-    m_TempDirectory.append(tmpPath);
-    m_TempDirectory.append(QString("/"));
-    m_TempDirectory.append(TEMP_DICOM_FOLDER_SUFFIX);
-    m_TempDirectory.append(QString("."));
-    m_TempDirectory.append(QTime::currentTime().toString("hhmmsszzz"));
-    m_TempDirectory.append(QString::number(QCoreApplication::applicationPid()));
-    tmp.mkdir(QDir::toNativeSeparators( m_TempDirectory ));
+  QDir tmp;
+  QString tmpPath = QDir::tempPath();
+  m_TempDirectory.clear();
+  m_TempDirectory.append(tmpPath);
+  m_TempDirectory.append(QString("/"));
+  m_TempDirectory.append(TEMP_DICOM_FOLDER_SUFFIX);
+  m_TempDirectory.append(QString("."));
+  m_TempDirectory.append(QTime::currentTime().toString("hhmmsszzz"));
+  m_TempDirectory.append(QString::number(QCoreApplication::applicationPid()));
+  tmp.mkdir(QDir::toNativeSeparators( m_TempDirectory ));
+}
 
+void QmitkDicomBrowser::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
+{
+  this->SetDatabaseDirectory("");
 }

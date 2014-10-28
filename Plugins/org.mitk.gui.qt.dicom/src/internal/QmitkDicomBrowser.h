@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Blueberry
 #include <berryIPartListener.h>
+#include <berryIBerryPreferences.h>
 #include <berryISelectionListener.h>
 #include <berryQtEditorPart.h>
 
@@ -76,6 +77,8 @@ public:
     void DoSaveAs() {}
     bool IsDirty() const { return false; }
     bool IsSaveAsAllowed() const { return false; }
+
+    virtual void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
 
 signals:
 

@@ -75,6 +75,7 @@ set(external_projects
   Swig
   SimpleITK
   Eigen
+  raptor2
   )
 
 # Qxt supports Qt5. We need to also support it in QxtCMakeLists.txt
@@ -97,6 +98,10 @@ if(MITK_USE_QT)
   #if(MITK_USE_Qt4)
     set(MITK_USE_Qxt 1) #TODO: Check how Qxt builds with Qt 5
   #endif()
+endif()
+
+if(MITK_USE_Redland)
+  set(MITK_USE_raptor2 1)
 endif()
 
 if(MITK_USE_SOFA)
@@ -260,6 +265,7 @@ set(mitk_cmake_boolean_args
   MITK_USE_DCMTK
   MITK_USE_OpenCV
   MITK_USE_Poco
+  MITK_USE_Redland
   MITK_USE_SOFA
   MITK_USE_Python
   MITK_USE_OpenCL
@@ -307,6 +313,7 @@ ExternalProject_Add(${proj}
     ${DCMTK_DEPENDS}
     ${OpenCV_DEPENDS}
     ${Poco_DEPENDS}
+    ${raptor2_DEPENDS}
     ${SOFA_DEPENDS}
     ${MITK-Data_DEPENDS}
     ${Qwt_DEPENDS}
@@ -434,6 +441,7 @@ ExternalProject_Add(${proj}
     -DACVD_DIR:PATH=${ACVD_DIR}
     -DOpenCV_DIR:PATH=${OpenCV_DIR}
     -DPoco_DIR:PATH=${Poco_DIR}
+    -Draptor2_DIR:PATH=${raptor2_DIR}
     -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}

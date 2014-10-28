@@ -115,9 +115,6 @@ protected:
     /// \brief TestHandler initializes event handler.
     void TestHandler();
 
-    /// \brief Sets database directory.
-    void SetDatabaseDirectory(const QString& databaseDirectory);
-
     /// \brief CreateTemporaryDirectory creates temporary directory in which temorary dicom objects are stored.
     void CreateTemporaryDirectory();
 

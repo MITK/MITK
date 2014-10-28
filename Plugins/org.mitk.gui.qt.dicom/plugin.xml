@@ -15,6 +15,6 @@
     </page>
   </extension>
   <extension point="org.blueberry.ui.keywords">
-    <keyword id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords" label="data manager"/>
+    <keyword id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords" label="DICOM Browser Preferences"/>
   </extension>
 </plugin>

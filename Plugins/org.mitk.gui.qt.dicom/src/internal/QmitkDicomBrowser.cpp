@@ -55,8 +55,7 @@ void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent )
 
     TestHandler();
 
-    SetPluginDirectory();
-    SetDatabaseDirectory("DatabaseDirectory");
+    OnPreferencesChanged(0);
     CreateTemporaryDirectory();
     StartDicomDirectoryListener();
 
@@ -180,18 +179,6 @@ void QmitkDicomBrowser::SetPluginDirectory()
      m_PluginDirectory.append("/database");
 }
 
-void QmitkDicomBrowser::SetDatabaseDirectory(const QString& databaseDirectory)
-{
-  SetPluginDirectory();
-  berry::IPreferencesService::Pointer prefService=
-    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-  std::string targetPath = prefService->GetSystemPreferences()->Node("/org.mitk.views.dicomreader")->Get("default dicom path", m_PluginDirectory.toStdString());
-
-  m_DatabaseDirectory.clear();
-  m_DatabaseDirectory.append(targetPath.c_str());
-  m_Controls.internalDataWidget->SetDatabaseDirectory(m_DatabaseDirectory);
-}
-
 void QmitkDicomBrowser::CreateTemporaryDirectory()
 {
   QDir tmp;
@@ -208,5 +195,12 @@ void QmitkDicomBrowser::CreateTemporaryDirectory()
 
 void QmitkDicomBrowser::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
-  this->SetDatabaseDirectory("");
+  SetPluginDirectory();
+  berry::IPreferencesService::Pointer prefService=
+    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  std::string targetPath = prefService->GetSystemPreferences()->Node("/org.mitk.views.dicomreader")->Get("default dicom path", m_PluginDirectory.toStdString());
+
+  m_DatabaseDirectory.clear();
+  m_DatabaseDirectory.append(targetPath.c_str());
+  m_Controls.internalDataWidget->SetDatabaseDirectory(m_DatabaseDirectory);
 }

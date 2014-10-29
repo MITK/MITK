@@ -67,7 +67,7 @@ namespace mitk {
   typedef Line<ScalarType, 3> Line3D;
 
   class PlaneGeometry;
-  /** \deprecatedSince{2014_06} This class is deprecated. Please use PlaneGeometry instead. */
+  /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometry instead. */
   DEPRECATED( typedef PlaneGeometry Geometry2D);
 
   /**

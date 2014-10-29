@@ -41,7 +41,7 @@ namespace mitk {
   class DataStorage;
 
   class PlaneGeometryDataVtkMapper3D;
-  /** \deprecatedSince{2014_06} This class is deprecated. Please use PlaneGeometryDataVTKMapper3D instead. */
+  /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometryDataVTKMapper3D instead. */
   DEPRECATED( typedef PlaneGeometryDataVtkMapper3D Geometry2DDataVtkMapper3D);
 
   /**

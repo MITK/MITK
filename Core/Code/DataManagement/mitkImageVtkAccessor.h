@@ -24,7 +24,7 @@ namespace mitk {
 /**
  * @brief ImageVtkAccessor class provides any image read access which is required by Vtk methods
  * @ingroup Data
- * @deprecatedSince{next_release} Use ImageVtkWriteAccessor instead
+ * @deprecatedSince{2014_10} Use ImageVtkWriteAccessor instead
  */
 class ImageVtkAccessor : public ImageVtkWriteAccessor
 {

@@ -94,13 +94,13 @@ namespace mitk {
       */
       virtual mitk::PlaneGeometry* GetPlaneGeometry( int s ) const;
         /**
-    * \deprecatedSince{2014_06} Please use GetPlaneGeometry
+    * \deprecatedSince{2014_10} Please use GetPlaneGeometry
     */
     DEPRECATED(const PlaneGeometry* GetGeometry2D(int s)){return GetPlaneGeometry(s);};
 
 
     /**
-    * \deprecatedSince{2014_06} Please use SetPlaneGeometry
+    * \deprecatedSince{2014_10} Please use SetPlaneGeometry
     */
     DEPRECATED(void SetGeometry2D(PlaneGeometry* geo, int s)){SetPlaneGeometry(geo, s);};
 

@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QString>
 #include <QStringList>
 
-#include "ui_DicomPreferencePage.h"
-#include "berryIQtPreferencePage.h"
 #include "berryIQtPreferencePage.h"
 #include <org_mitk_gui_qt_dicom_Export.h>
 #include <berryIPreferences.h>
@@ -29,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QWidget;
 class QCheckBox;
 class QLineEdit;
+class QPushButton;
 
 class DICOM_EXPORT QmitkDicomPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -63,19 +62,14 @@ public:
 
 protected:
     QWidget* m_MainControl;
-    Ui::DicomPreferencePage* m_Controls;
     berry::IPreferences::Pointer m_DicomPreferencesNode;
 
-    QFormLayout *formLayout;
-    QLabel *label;
-    QLineEdit *DatabaseLineEdit;
-    QLabel *label_2;
-    QLineEdit *ListenerLineEdit;
-    QFrame *frame;
-    QHBoxLayout *horizontalLayout;
-    QPushButton *pushButton;
-    QPushButton *pushButton_2;
+    QLineEdit* m_PathEdit;
+    QPushButton* m_PathSelect;
+    QPushButton* m_PathDefault;
 
-
+protected slots:
+    void DefaultButtonPushed();
+    void PathSelectButtonPushed();
 };
 #endif // QmitkQmitkDicomPreferencePage_h

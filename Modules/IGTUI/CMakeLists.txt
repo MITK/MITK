@@ -2,7 +2,6 @@ MITK_CREATE_MODULE(
   SUBPROJECTS MITK-IGT
   INCLUDE_DIRS Qmitk
   DEPENDS MitkIGT MitkQtWidgetsExt MitkPersistence
-  GENERATED_CPP ${TOOL_GUI_CPPS} ${TOOL_CPPS}
 )
 
 ## create IGTUI config

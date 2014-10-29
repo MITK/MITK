@@ -42,7 +42,7 @@ class mitkToolInteractionTestSuite : public mitk::TestFixture
   MITK_TEST(AddToolInteractionTest);
   MITK_TEST(SubtractToolInteractionTest);
   MITK_TEST(PaintToolInteractionTest);
-  MITK_TEST(WipeToolInteractionTest);
+//    MITK_TEST(WipeToolInteractionTest);
   MITK_TEST(RegionGrowingToolInteractionTest);
   MITK_TEST(CorrectionToolInteractionTest);
   MITK_TEST(EraseToolInteractionTest);

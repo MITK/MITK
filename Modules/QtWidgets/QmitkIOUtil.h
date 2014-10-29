@@ -192,7 +192,7 @@ public:
    * @param data BaseData holding the data you wish to save.
    * @param fileName The file name where to save the data (including path and extension).
    * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the screen.
-   * @deprecatedSince{2014_03} Use Save() instead.
+   * @deprecatedSince{2014_10} Use Save() instead.
    */
   DEPRECATED(static void SaveBaseDataWithDialog(mitk::BaseData *data, std::string fileName, QWidget* parent = NULL));
 
@@ -201,7 +201,7 @@ public:
    * @param surface The surface to save.
    * @param fileName The file name where to save the data (including path and extension).
    * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the screen.
-   * @deprecatedSince{2014_03} Use Save() instead.
+   * @deprecatedSince{2014_10} Use Save() instead.
    */
   DEPRECATED(static void SaveSurfaceWithDialog(mitk::Surface::Pointer surface, std::string fileName = "", QWidget* parent = NULL));
 
@@ -210,7 +210,7 @@ public:
    * @param image The image to save.
    * @param fileName The file name where to save the data (including path and extension).
    * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the screen.
-   * @deprecatedSince{2014_03} Use Save() instead.
+   * @deprecatedSince{2014_10} Use Save() instead.
    */
   DEPRECATED(static void SaveImageWithDialog(mitk::Image::Pointer image, std::string fileName = "", QWidget* parent = NULL));
 
@@ -219,7 +219,7 @@ public:
    * @param pointset The pointset to save.
    * @param fileName The file name where to save the data (including path and extension).
    * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the screen.
-   * @deprecatedSince{2014_03} Use Save() instead.
+   * @deprecatedSince{2014_10} Use Save() instead.
    */
   DEPRECATED(static void SavePointSetWithDialog(mitk::PointSet::Pointer pointset, std::string fileName = "", QWidget* parent = NULL));
 

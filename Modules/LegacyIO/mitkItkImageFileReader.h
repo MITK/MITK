@@ -26,7 +26,7 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read file formats supported by itk
 //## @ingroup IO
-//## @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+//## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 class MitkLegacyIO_EXPORT ItkImageFileReader : public ImageSource, public FileReader
 {
 public:

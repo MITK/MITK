@@ -31,7 +31,7 @@ class Image;
  * Uses the given extension (SetExtension) to decide the format to write
  * (.mhd is default, .pic, .tif, .png, .jpg supported yet).
  * @ingroup IO
- * @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileWriterRegistry instead.
+ * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileWriterRegistry instead.
  */
 class MitkLegacyIO_EXPORT ImageWriter :  public mitk::FileWriterWithInformation
 {

@@ -25,7 +25,7 @@ namespace mitk {
  * \brief Interface for FileWriters with extra information.
  * Should be merged into FileWriter.
  *
- * \deprecatedSince{2014_03} Use mitk::IFileWriter instead.
+ * \deprecatedSince{2014_10} Use mitk::IFileWriter instead.
 */
 class FileWriterWithInformation : public FileWriter {
   public:

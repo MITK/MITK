@@ -346,8 +346,10 @@ public:
   /** \brief Retrieve the histogram depending on the current masking mode (for all image labels. */
   const HistogramContainer &GetHistogramVector(  unsigned int timeStep = 0 ) const;
 
-    const std::map<int, double>  *BinsAndFreuqencyForHistograms( unsigned int timeStep = 0, unsigned int label = 0) const;
+  typedef std::map<int, double> BinFrequencyType;
   /* Returning a map including bin and Freuqeuncy*/
+  BinFrequencyType BinsAndFreuqencyForHistograms( unsigned int timeStep = 0, unsigned int label = 0) const;
+
 
   /** \brief Retrieve statistics depending on the current masking mode.
    *

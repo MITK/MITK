@@ -286,14 +286,9 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( image );
     mitk::DiffusionImageMapper<short>::SetDefaultProperties(node);
+    node->SetName("Estimated DWI");
 
-    QString newname;
-    newname = newname.append(nodename.c_str());
-    newname = newname.append("_DWI");
-    node->SetName(newname.toAscii());
-
-
-    GetDefaultDataStorage()->Add(node);
+    GetDefaultDataStorage()->Add(node, m_TensorImage);
 
     mitk::DiffusionImage<DiffusionPixelType>::BValueMap map =image->GetBValueMap();
     mitk::DiffusionImage<DiffusionPixelType>::IndicesVector b0Indices = map[0];
@@ -353,7 +348,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
     mitk::DataNode::Pointer resNode=mitk::DataNode::New();
     resNode->SetData( mitkResImg );
-    resNode->SetName("Residual Image");
+    resNode->SetName("Residuals");
 
     resNode->SetProperty("LookupTable", lutProp);
 
@@ -361,7 +356,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     resNode->GetBoolProperty("use color", b);
     resNode->SetBoolProperty("use color", false);
 
-    GetDefaultDataStorage()->Add(resNode);
+    GetDefaultDataStorage()->Add(resNode, m_TensorImage);
 
     m_MultiWidget->RequestUpdate();
 
@@ -707,7 +702,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
             image->SetVolume( tensorReconstructionFilter->GetOutput()->GetBufferPointer() );
             mitk::DataNode::Pointer node=mitk::DataNode::New();
             node->SetData( image );
-            SetDefaultNodeProperties(node, nodename+"_WeightedLinearLeastSquares_DT");
+            SetDefaultNodeProperties(node, nodename+"_LinearLeastSquares_DT");
             GetDefaultDataStorage()->Add(node, *itemiter);
             mitk::ProgressBar::GetInstance()->Progress();
             ++itemiter;

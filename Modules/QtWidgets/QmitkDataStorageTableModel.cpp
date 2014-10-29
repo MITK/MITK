@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //# Toolkit includes
 #include <itkCommand.h>
 #include <QIcon>
+#include <QFile>
 
 //#CTORS/DTOR
 QmitkDataStorageTableModel::QmitkDataStorageTableModel(mitk::DataStorage::Pointer _DataStorage
@@ -147,7 +148,7 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
       // get name of node (may also be edited)
       if (role == Qt::DisplayRole || role == Qt::EditRole)
       {
-        data = nodeName.c_str();
+        data = QFile::encodeName(nodeName.c_str());
       }
       else if (role == QmitkDataNodeRole)
       {

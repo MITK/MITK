@@ -43,7 +43,7 @@ public:
 
   static bool SetPlaneGeometry(const mitkIpPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry);
         /**
-    * \deprecatedSince{2014_06} Please use SetPlaneGeometry
+    * \deprecatedSince{2014_10} Please use SetPlaneGeometry
     */
     DEPRECATED(static bool SetGeometry2D(const mitkIpPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry)){return SetPlaneGeometry(pic,s,slicedgeometry);};
 

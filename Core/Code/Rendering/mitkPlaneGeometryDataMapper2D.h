@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
   class BaseRenderer;
   class PlaneGeometryDataMapper2D;
-  /** \deprecatedSince{2014_06} This class is deprecated. Please use PlaneGeometryDataMapper2D instead. */
+  /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometryDataMapper2D instead. */
   DEPRECATED( typedef PlaneGeometryDataMapper2D Geometry2DDataMapper2D);
 
   /**

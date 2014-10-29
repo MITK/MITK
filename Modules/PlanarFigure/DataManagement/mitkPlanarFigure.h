@@ -62,7 +62,7 @@ public:
 
   /** \brief Treat as Point2D by implicitly using conversion operators.
     *
-    * \deprecatedSince{2014_06} "struct PolyLineElement {...};" will be changed to "typedef Point2D PolyLineElement;".
+    * \deprecatedSince{2014_10} "struct PolyLineElement {...};" will be changed to "typedef Point2D PolyLineElement;".
     */
   struct MitkPlanarFigure_EXPORT PolyLineElement
   {
@@ -93,7 +93,7 @@ public:
    */
   virtual void SetPlaneGeometry( mitk::PlaneGeometry *geometry );
               /**
-    * \deprecatedSince{2014_06} Please use SetPlaneGeometry
+    * \deprecatedSince{2014_10} Please use SetPlaneGeometry
     */
     DEPRECATED(void SetGeometry2D(PlaneGeometry* geo)){SetPlaneGeometry(geo);};
 
@@ -101,7 +101,7 @@ public:
   /** \brief Returns (previously set) 2D geometry of this figure. */
   virtual const PlaneGeometry *GetPlaneGeometry() const;
         /**
-    * \deprecatedSince{2014_06} Please use GetPlaneGeometry
+    * \deprecatedSince{2014_10} Please use GetPlaneGeometry
     */
     DEPRECATED(const PlaneGeometry* GetGeometry2D()){return GetPlaneGeometry();};
 

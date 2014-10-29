@@ -227,8 +227,8 @@ public:
     mitkSetGetConstMacro(MaxIndex, vnl_vector<int>)
     mitkSetGetConstMacro(HotspotIndex, vnl_vector<int>)
 
-    mitkSetGetConstMacro(m_Skewness, double)
-    mitkSetGetConstMacro(m_Kurtosis, double)
+    mitkSetGetConstMacro(Skewness, double)
+    mitkSetGetConstMacro(Kurtosis, double)
 
 
   private:
@@ -246,8 +246,8 @@ public:
 
    Statistics* m_HotspotStatistics;
 
-   double m_Skewness;
-   double m_Kurtosis;
+   double Skewness;
+   double Kurtosis;
 
    bool m_HasHotspotStatistics;
     vnl_vector<int> HotspotIndex;     //< index of hotspotsphere origin
@@ -347,9 +347,9 @@ public:
   const HistogramContainer &GetHistogramVector(  unsigned int timeStep = 0 ) const;
 
   typedef std::map<int, double> BinFrequencyType;
-  /* Returning a map including bin and Freuqeuncy*/
-  BinFrequencyType BinsAndFreuqencyForHistograms( unsigned int timeStep = 0, unsigned int label = 0) const;
 
+  /* Returning a map including bin and Frequency*/
+  BinFrequencyType GetBinsAndFreuqencyForHistograms( unsigned int timeStep = 0, unsigned int label = 0) const;
 
   /** \brief Retrieve statistics depending on the current masking mode.
    *
@@ -360,6 +360,7 @@ public:
 
   /** \brief Retrieve statistics depending on the current masking mode (for all image labels). */
   const StatisticsContainer &GetStatisticsVector( unsigned int timeStep = 0 ) const;
+
 
 
 
@@ -386,6 +387,11 @@ protected:
    * image. If masking is disabled, the original image is simply passed
    * through. */
   void ExtractImageAndMask( unsigned int timeStep = 0 );
+
+  /*calculate the min and max value, this is done because we need the min and max value before execution the statistics filter to have the wright range for the histogramm*/
+  template < typename TPixel, unsigned int VImageDimension >
+  void  GetMinAndMaxValue(double &minimum, double &maximum, const itk::Image< TPixel, VImageDimension > *InputImage,
+    itk::Image< unsigned short, VImageDimension > *MaskImageType);
 
 
   /** \brief If the passed vector matches any of the three principal axes

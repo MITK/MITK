@@ -32,8 +32,7 @@
 namespace itk
 {
   /** \class LabelStatisticsImageFilter
-  ,Get statistical properties of labeled regions in an image}
-  * \endwiki
+  *
   */
   template< class TInputImage, class TLabelImage >
   class /*ImageStatistics_EXPORT*/ ExtendedLabelStatisticsImageFilter : public LabelStatisticsImageFilter< TInputImage,  TLabelImage >
@@ -53,17 +52,18 @@ namespace itk
     class CoefficientsClass
     {
     public:
-      /* the new memeber coefficients*/
-      double m_Kurtosis;
-      double m_Skewness;
 
-      ~CoefficientsClass(){};
-      CoefficientsClass(){
-
+      CoefficientsClass()
+      {
         m_Kurtosis = 0;
         m_Skewness = 0;
-
       };
+
+      ~CoefficientsClass(){};
+
+      /* the new member coefficients*/
+      double m_Kurtosis;
+      double m_Skewness;
 
     };
 
@@ -74,7 +74,11 @@ namespace itk
     RealType GetSkewness(LabelPixelType label) const;
     RealType GetKurtosis(LabelPixelType label) const;
 
-    /* this method will calculate the new coefficients with sigma and mean value of the threaded generate data of the base class*/
+    /**
+    * \brief Calculate Skewness and Curtosis.
+    *
+    * This method will calculate the new coefficients with sigma and mean value of the threaded generate data of the base class
+    */
     void ComputeTheSkewnessAndCurtosis();
 
   protected:

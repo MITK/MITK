@@ -71,14 +71,12 @@ public:
 
   const RealObjectType* GetKurtosisOutput() const;
 
-  //using Superclass::MakeOutput;
-
   virtual DataObject::Pointer MakeOutput( ProcessObject::DataObjectPointerArraySizeType idx );
 
-  /* Compute the Skewness Curtosis*/
-  void computeTheSkewnessAndCurtosis();
-
-
+  /**
+  * \brief Compute the Skewness Curtosis.
+  */
+  void ComputeTheSkewnessAndCurtosis();
 
 protected:
 
@@ -87,11 +85,6 @@ protected:
   virtual ~ExtendedStatisticsImageFilter(){};
 
   void AfterThreadedGenerateData();
-
-
-private:
-
-//  Array< RealType >       m_ThreadSum;
 
 
 }; // end of class

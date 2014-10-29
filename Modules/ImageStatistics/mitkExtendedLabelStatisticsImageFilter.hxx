@@ -15,8 +15,9 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef _mitkExtendedLabelStatisticsImageFilter_h
-#define _mitkExtendedLabelStatisticsImageFilter_h
+#ifndef _mitkExtendedLabelStatisticsImageFilter_hxx
+#define _mitkExtendedLabelStatisticsImageFilter_hxx
+
 #include "mitkExtendedLabelStatisticsImageFilter.h"
 
 #include "itkImageRegionIterator.h"

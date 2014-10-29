@@ -519,8 +519,10 @@ bool ImageStatisticsCalculator::GetHotspotMustBeCompletlyInsideImage() const
 
 /* Implementation of the min max values for setting the range of the histogram */
 template < typename TPixel, unsigned int VImageDimension >
-void  ImageStatisticsCalculator::GetMinAndMaxValue(double &min, double &max,
-                                                   const itk::Image< TPixel, VImageDimension > *InputImage,  itk::Image< unsigned short, VImageDimension > *MaskedImage)
+void  ImageStatisticsCalculator::GetMinAndMaxValue( double &min,
+                                                    double &max,
+                                                    const itk::Image< TPixel, VImageDimension > *InputImage,
+                                                    itk::Image< unsigned short, VImageDimension > *MaskedImage )
 {
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
   typedef itk::Image< TPixel, VImageDimension > ImageType;
@@ -540,7 +542,6 @@ void  ImageStatisticsCalculator::GetMinAndMaxValue(double &min, double &max,
 
   for( labelIterator2.GoToBegin(); !labelIterator2.IsAtEnd(); ++labelIterator2, ++labelIterator3)
   {
-
     if( labelIterator2.Value()== 1.0)
     {
       Pixel++;
@@ -745,13 +746,13 @@ ImageStatisticsCalculator::GetBinsAndFreuqencyForHistograms( unsigned int timeSt
   // ToDo: map should be created on stack not on heap
   std::map<int, double> *returnedHistogramMap;
 
-  std::cout << "Aus" << binsAndFrequencyToCalculate->Size() << std::endl;
-
-  for( unsigned int bin=0; bin < binsAndFrequencyToCalculate->Size(); bin++ )
+  unsigned int size = binsAndFrequencyToCalculate->Size();
+  for( unsigned int bin=0; bin < size; ++bin )
   {
-    if( binsAndFrequencyToCalculate->GetFrequency( bin, 0 ) != 0)
+    double frequency = binsAndFrequencyToCalculate->GetFrequency( bin, 0 );
+    if( frequency < mitk::eps )
     {
-      returnedHistogramMap.insert( std::pair<int, double>(binsAndFrequencyToCalculate->GetMeasurement( bin, 0 ), binsAndFrequencyToCalculate->GetFrequency( bin, 0 )));
+      returnedHistogramMap.insert( std::pair<int, double>(binsAndFrequencyToCalculate->GetMeasurement( bin, 0 ), frequency ) );
     }
   }
 

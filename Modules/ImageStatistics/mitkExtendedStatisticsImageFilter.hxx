@@ -20,15 +20,13 @@
 
 #include "mitkStatisticsImageFilter.h"
 
-
-
 namespace itk
 {
 template< class TInputImage >
 ExtendedStatisticsImageFilter< TInputImage >::ExtendedStatisticsImageFilter()
 : StatisticsImageFilter()
 {
-
+  // add comment
   for ( int i = 7; i < 9; ++i )
   {
     typename RealObjectType::Pointer output =
@@ -105,50 +103,37 @@ ExtendedStatisticsImageFilter< TInputImage >
 {
   Superclass::AfterThreadedGenerateData();
 
-  double variance = GetVariance();
-  double mean = GetMean();
-
   computeTheSkewnessAndCurtosis();
-
 }
 
 template< class TInputImage >
 void
 ExtendedStatisticsImageFilter< TInputImage >
-::computeTheSkewnessAndCurtosis()
+::ComputeTheSkewnessAndCurtosis()
 {
-RealType mean = GetMean();
-RealType sigma = GetSigma();
-RealType baseOfSkewnessAndCurtosis;
-RealType Kurtosis = 0;
-RealType Skewness = 0;
+  RealType mean = GetMean();
+  RealType sigma = GetSigma();
+  RealType baseOfSkewnessAndCurtosis;
+  RealType Kurtosis = 0;
+  RealType Skewness = 0;
 
+  ImageRegionConstIterator< TInputImage > it (this->GetInput(), this->GetInput()->GetLargestPossibleRegion ()  );
 
-ImageRegionConstIterator< TInputImage > it (this->GetInput(), this->GetInput()->GetLargestPossibleRegion ()  );
+  int counter = 0;
+  for (it.GoToBegin(); !it.IsAtEnd(); ++it)
+  {
+   baseOfSkewnessAndCurtosis = (it.Get() - mean) / sigma ;
+   Kurtosis += baseOfSkewnessAndCurtosis * baseOfSkewnessAndCurtosis * baseOfSkewnessAndCurtosis * baseOfSkewnessAndCurtosis;
+   Skewness += baseOfSkewnessAndCurtosis * baseOfSkewnessAndCurtosis * baseOfSkewnessAndCurtosis;
+   counter++;
+  }
 
+  Kurtosis = Kurtosis / counter;
+  Skewness = Skewness / counter;
 
-int counter = 0;
-
-
-for (it.GoToBegin(); !it.IsAtEnd(); ++it)
-{
- baseOfSkewnessAndCurtosis = it.Get()-mean / sigma ;
- Kurtosis += baseOfSkewnessAndCurtosis*baseOfSkewnessAndCurtosis*baseOfSkewnessAndCurtosis*baseOfSkewnessAndCurtosis;
- Skewness += baseOfSkewnessAndCurtosis*baseOfSkewnessAndCurtosis*baseOfSkewnessAndCurtosis;
- counter++;
-}
-
-
-Kurtosis = Kurtosis/ counter;
-Skewness = Skewness/ counter;
-
-
-this->GetKurtosisOutput()->Set(Kurtosis);
-this->GetSkewnessOutput()->Set(Skewness);
-
-}
-
-
+  this->GetKurtosisOutput()->Set( Kurtosis );
+  this->GetSkewnessOutput()->Set( Skewness );
+  }
 }
 
 #endif

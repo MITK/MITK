@@ -11,7 +11,7 @@
       <action name="Move" ID="90" />
     </transition>
     <transition event_class="MouseMoveEvent" event_variant="CtrlMouseMove" name="CTRL+move" target="inverted" EVENT_ID="529">
-      <action name="Move" ID="90" />
+      <action name="MouseMove" />
       <action name="InvertLogic" ID="49014" />
     </transition>
     <transition event_class="MouseMoveEvent" event_variant="CtrlPrimaryButtonMoved" name="CTRL+move" target="inverted" EVENT_ID="534">
@@ -32,15 +32,16 @@
     </transition>
     <transition event_class="MouseMoveEvent" event_variant="MouseMove" name="move" target="neutral" EVENT_ID="520">
       <action name="InvertLogic" ID="49014" />
-      <action name="Move" ID="90" />
+      <action name="MouseMove" />
     </transition>
     <transition event_class="MouseMoveEvent" event_variant="CtrlMouseMove" name="CTRL+move" target="inverted" EVENT_ID="529">
-        <action name="Move" ID="90" />
+        <action name="MouseMove" />
     </transition>
     <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" name="CTRL+press" target="inverted" EVENT_ID="5">
       <action name="PrimaryButtonPressed" ID="80" />
     </transition>
     <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" name="press" target="neutral" EVENT_ID="1">
+      <action name="InvertLogic" ID="49014" />
       <action name="PrimaryButtonPressed" ID="80" />
     </transition>
     <transition event_class="MouseMoveEvent" event_variant="CtrlPrimaryButtonMoved" name="CTRL+move   w/ left button" target="inverted" EVENT_ID="534">

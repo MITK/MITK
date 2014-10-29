@@ -620,7 +620,6 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
         m_Controls->m_lblRotatedPlanesWarning->hide();
 
         m_MyMenu = new QMenu(parent);
-        connect( m_MyMenu, SIGNAL( aboutToShow() ), this, SLOT(OnMenuAboutToShow()) );
 
         // button for changing rotation mode
         m_Controls->m_TSMenu->setMenu( m_MyMenu );
@@ -681,104 +680,6 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_IsInitialized = true;
 }
 
-void QmitkControlVisualizationPropertiesView::OnMenuAboutToShow ()
-{
-    // THICK SLICE SUPPORT
-    QMenu *myMenu = m_MyMenu;
-    myMenu->clear();
-
-    QActionGroup* thickSlicesActionGroup = new QActionGroup(myMenu);
-    thickSlicesActionGroup->setExclusive(true);
-
-    mitk::BaseRenderer::Pointer renderer =
-            this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
-
-    int currentTSMode = 0;
-    {
-        mitk::ResliceMethodProperty::Pointer m = dynamic_cast<mitk::ResliceMethodProperty*>(renderer->GetCurrentWorldGeometry2DNode()->GetProperty( "reslice.thickslices" ));
-        if( m.IsNotNull() )
-            currentTSMode = m->GetValueAsId();
-    }
-
-    int maxTS = 30;
-
-    itk::VectorContainer<unsigned int, mitk::DataNode::Pointer>::ConstPointer nodes = this->GetDataStorage()->GetAll();
-    for (int i=0; i<nodes->Size(); i++)
-    {
-        mitk::Image* image = dynamic_cast<mitk::Image*>(nodes->ElementAt(i)->GetData());
-        if (image)
-        {
-            int size = std::max(image->GetDimension(0), std::max(image->GetDimension(1), image->GetDimension(2)));
-            if (size>maxTS)
-                maxTS=size;
-        }
-    }
-    maxTS /= 2;
-
-    int currentNum = 0;
-    {
-        mitk::IntProperty::Pointer m = dynamic_cast<mitk::IntProperty*>(renderer->GetCurrentWorldGeometry2DNode()->GetProperty( "reslice.thickslices.num" ));
-        if( m.IsNotNull() )
-        {
-            currentNum = m->GetValue();
-            if(currentNum < 0) currentNum = 0;
-            if(currentNum > maxTS) currentNum = maxTS;
-        }
-    }
-
-    if(currentTSMode==0)
-        currentNum=0;
-
-    QSlider *m_TSSlider = new QSlider(myMenu);
-    m_TSSlider->setMinimum(0);
-    m_TSSlider->setMaximum(maxTS-1);
-    m_TSSlider->setValue(currentNum);
-
-    m_TSSlider->setOrientation(Qt::Horizontal);
-
-    connect( m_TSSlider, SIGNAL( valueChanged(int) ), this, SLOT( OnTSNumChanged(int) ) );
-
-    QHBoxLayout* _TSLayout = new QHBoxLayout;
-    _TSLayout->setContentsMargins(4,4,4,4);
-    _TSLayout->addWidget(m_TSSlider);
-    _TSLayout->addWidget(m_TSLabel=new QLabel(QString::number(currentNum*2+1),myMenu));
-
-    QWidget* _TSWidget = new QWidget;
-    _TSWidget->setLayout(_TSLayout);
-
-    QActionGroup* thickSliceModeActionGroup = new QActionGroup(myMenu);
-    thickSliceModeActionGroup->setExclusive(true);
-
-    QWidgetAction *m_TSSliderAction = new QWidgetAction(myMenu);
-    m_TSSliderAction->setDefaultWidget(_TSWidget);
-    myMenu->addAction(m_TSSliderAction);
-
-    QAction* mipThickSlicesAction = new QAction(myMenu);
-    mipThickSlicesAction->setActionGroup(thickSliceModeActionGroup);
-    mipThickSlicesAction->setText("MIP (max. intensity proj.)");
-    mipThickSlicesAction->setCheckable(true);
-    mipThickSlicesAction->setChecked(currentThickSlicesMode==1);
-    mipThickSlicesAction->setData(1);
-    myMenu->addAction( mipThickSlicesAction );
-
-    QAction* sumThickSlicesAction = new QAction(myMenu);
-    sumThickSlicesAction->setActionGroup(thickSliceModeActionGroup);
-    sumThickSlicesAction->setText("SUM (sum intensity proj.)");
-    sumThickSlicesAction->setCheckable(true);
-    sumThickSlicesAction->setChecked(currentThickSlicesMode==2);
-    sumThickSlicesAction->setData(2);
-    myMenu->addAction( sumThickSlicesAction );
-
-    QAction* weightedThickSlicesAction = new QAction(myMenu);
-    weightedThickSlicesAction->setActionGroup(thickSliceModeActionGroup);
-    weightedThickSlicesAction->setText("WEIGHTED (gaussian proj.)");
-    weightedThickSlicesAction->setCheckable(true);
-    weightedThickSlicesAction->setChecked(currentThickSlicesMode==3);
-    weightedThickSlicesAction->setData(3);
-    myMenu->addAction( weightedThickSlicesAction );
-
-    connect( thickSliceModeActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(OnThickSlicesModeSelected(QAction*)) );
-}
 void QmitkControlVisualizationPropertiesView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
     m_MultiWidget = &stdMultiWidget;
@@ -829,7 +730,6 @@ void QmitkControlVisualizationPropertiesView::StdMultiWidgetNotAvailable()
 
 void QmitkControlVisualizationPropertiesView::NodeRemoved(const mitk::DataNode* node)
 {
-    OnMenuAboutToShow();
 }
 
 #include <mitkMessage.h>
@@ -921,7 +821,6 @@ void QmitkControlVisualizationPropertiesView::NodeAdded(const mitk::DataNode *no
 
         notConst->SetIntProperty("DisplayChannel", displayChannelPropertyValue );
     }
-    OnMenuAboutToShow();
 }
 
 /* OnSelectionChanged is registered to SelectionService, therefore no need to
@@ -1003,6 +902,109 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
                 this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
     m_CurrentSelection = sel.Cast<const IStructuredSelection>();
     m_SelListener.Cast<CvpSelListener>()->DoSelectionChanged(sel);
+
+    // adapt thick slice controls
+    // THICK SLICE SUPPORT
+
+    if( nodes.size() < 1)
+      return;
+
+    mitk::DataNode::Pointer node = nodes.at(0);
+
+    if( node.IsNull() )
+      return;
+
+    QMenu *myMenu = m_MyMenu;
+    myMenu->clear();
+
+    QActionGroup* thickSlicesActionGroup = new QActionGroup(myMenu);
+    thickSlicesActionGroup->setExclusive(true);
+
+    int currentTSMode = 0;
+    {
+      mitk::ResliceMethodProperty::Pointer m = dynamic_cast<mitk::ResliceMethodProperty*>(node->GetProperty( "reslice.thickslices" ));
+      if( m.IsNotNull() )
+        currentTSMode = m->GetValueAsId();
+    }
+
+    int maxTS = 30;
+
+    itk::VectorContainer<unsigned int, mitk::DataNode::Pointer>::ConstPointer nodes = this->GetDataStorage()->GetAll();
+    for (int i=0; i<nodes->Size(); i++)
+    {
+      mitk::Image* image = dynamic_cast<mitk::Image*>(nodes->ElementAt(i)->GetData());
+      if (image)
+      {
+        int size = std::max(image->GetDimension(0), std::max(image->GetDimension(1), image->GetDimension(2)));
+        if (size>maxTS)
+          maxTS=size;
+      }
+    }
+    maxTS /= 2;
+
+    int currentNum = 0;
+    {
+      mitk::IntProperty::Pointer m = dynamic_cast<mitk::IntProperty*>(node->GetProperty( "reslice.thickslices.num" ));
+      if( m.IsNotNull() )
+      {
+        currentNum = m->GetValue();
+        if(currentNum < 0) currentNum = 0;
+        if(currentNum > maxTS) currentNum = maxTS;
+      }
+    }
+
+    if(currentTSMode==0)
+      currentNum=0;
+
+    QSlider *m_TSSlider = new QSlider(myMenu);
+    m_TSSlider->setMinimum(0);
+    m_TSSlider->setMaximum(maxTS-1);
+    m_TSSlider->setValue(currentNum);
+
+    m_TSSlider->setOrientation(Qt::Horizontal);
+
+    connect( m_TSSlider, SIGNAL( valueChanged(int) ), this, SLOT( OnTSNumChanged(int) ) );
+
+    QHBoxLayout* _TSLayout = new QHBoxLayout;
+    _TSLayout->setContentsMargins(4,4,4,4);
+    _TSLayout->addWidget(m_TSSlider);
+    _TSLayout->addWidget(m_TSLabel=new QLabel(QString::number(currentNum*2+1),myMenu));
+
+    QWidget* _TSWidget = new QWidget;
+    _TSWidget->setLayout(_TSLayout);
+
+    QActionGroup* thickSliceModeActionGroup = new QActionGroup(myMenu);
+    thickSliceModeActionGroup->setExclusive(true);
+
+    QWidgetAction *m_TSSliderAction = new QWidgetAction(myMenu);
+    m_TSSliderAction->setDefaultWidget(_TSWidget);
+    myMenu->addAction(m_TSSliderAction);
+
+    QAction* mipThickSlicesAction = new QAction(myMenu);
+    mipThickSlicesAction->setActionGroup(thickSliceModeActionGroup);
+    mipThickSlicesAction->setText("MIP (max. intensity proj.)");
+    mipThickSlicesAction->setCheckable(true);
+    mipThickSlicesAction->setChecked(currentThickSlicesMode==1);
+    mipThickSlicesAction->setData(1);
+    myMenu->addAction( mipThickSlicesAction );
+
+    QAction* sumThickSlicesAction = new QAction(myMenu);
+    sumThickSlicesAction->setActionGroup(thickSliceModeActionGroup);
+    sumThickSlicesAction->setText("SUM (sum intensity proj.)");
+    sumThickSlicesAction->setCheckable(true);
+    sumThickSlicesAction->setChecked(currentThickSlicesMode==2);
+    sumThickSlicesAction->setData(2);
+    myMenu->addAction( sumThickSlicesAction );
+
+    QAction* weightedThickSlicesAction = new QAction(myMenu);
+    weightedThickSlicesAction->setActionGroup(thickSliceModeActionGroup);
+    weightedThickSlicesAction->setText("WEIGHTED (gaussian proj.)");
+    weightedThickSlicesAction->setCheckable(true);
+    weightedThickSlicesAction->setChecked(currentThickSlicesMode==3);
+    weightedThickSlicesAction->setData(3);
+    myMenu->addAction( weightedThickSlicesAction );
+
+    connect( thickSliceModeActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(OnThickSlicesModeSelected(QAction*)) );
 
 }
 

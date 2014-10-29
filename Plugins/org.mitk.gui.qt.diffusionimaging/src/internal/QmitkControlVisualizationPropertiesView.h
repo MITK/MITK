@@ -100,7 +100,6 @@ protected slots:
 
   void OnThickSlicesModeSelected( QAction* action );
   void OnTSNumChanged(int num);
-  void OnMenuAboutToShow ();
 
   void BundleRepresentationColor();
   void BundleRepresentationResetColoring();

@@ -38,7 +38,7 @@ endif()
 set(MITK_DOXYGEN_TAGFILE_NAME ${MITK_DOXYGEN_OUTPUT_DIR}/MITK.tag CACHE INTERNAL "MITK Doxygen tag file")
 
 # This is relative to the working directory of the doxygen command
-set(MITK_DOXYGEN_STYLESHEET mitk_doxygen.css)
+set(MITK_DOXYGEN_STYLESHEET mitk_doxygen_extra.css)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${MITK_DOXYGEN_STYLESHEET}
                ${CMAKE_CURRENT_BINARY_DIR}/${MITK_DOXYGEN_STYLESHEET} @COPYONLY)
 

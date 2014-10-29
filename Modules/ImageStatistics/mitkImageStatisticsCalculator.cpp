@@ -696,28 +696,10 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 
   for( unsigned int bin=0; bin < binsAndFrequencyToCalculate->Size(); bin++ )
   {
-    returnedHistogramMap->insert( std::pair<int, double>(bin, binsAndFrequencyToCalculate->GetFrequency( bin, 0 )));
+   returnedHistogramMap.insert( std::pair<int, double>(bin, binsAndFrequencyToCalculate->GetFrequency( bin, 0 )));
 
   }
-  /*}
 
-            fstream ff;
-          ff.open("C:\\Users\\tmueller\\Documents\\TestPics\\Duality.dat", ios::out);
-
-for( unsigned int bin=0; bin < histogramContainer->at(i)->Size(); bin++ )
-          {
-
-
-            //std::cout << histogramContainer->at(i)->GetFrequency( bin, 0 ) << std::endl;
-            //std::cout << histogramContainer->at(i)->GetTotalFrequency() << std::endl;
-           // std::cout<< histogramContainer->at(i)->GetMeasurement( bin, 0 )  << std::endl;
-            //std::cout<< "_________" << std::endl;
-
-             ff << histogramContainer->at(i)->GetFrequency( bin, 0 ) << "\t" << histogramContainer->at(i)->GetMeasurement( bin, 0 ) << "\t" <<
-               histogramContainer->at(i)->GetTotalFrequency() << "\t"  << histogramContainer->at(i)->GetBinMin( 0,bin ) << "\t" << endl;
-
-          }
-ff.close();*/
  return returnedHistogramMap;
 }
 

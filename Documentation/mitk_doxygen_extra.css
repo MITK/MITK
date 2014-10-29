@@ -1,0 +1,202 @@
+/* Main Doxygen CSS overrides */
+
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+
+body, table, div, p, dl {
+  font-family: 'Open Sans', Lucida Grande, Verdana, Geneva, Arial, sans-serif;
+}
+
+a {
+  color: #2d5c88;
+}
+
+#top {
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.navpath ul {
+  background-image:none;
+  color:#dddddd;
+}
+
+.navpath li.navelem a {
+  color: inherit;
+  font-family: inherit;
+  text-shadow: none;
+}
+
+#projectname {
+  visibility: hidden;
+  height: 70px;
+}
+
+#projectbrief {
+  display: none;
+}
+
+#projectnumber {
+  font: inherit;
+  visibility: visible;
+  font-size: 12px;
+  position: relative;
+  top: 17px;
+  left: 80px;
+}
+
+#titlearea table tbody>tr:first-child>td:first-child {
+  background: url(mitkLogo.jpg) 0 0 no-repeat;
+  padding-right: 15px;
+}
+
+/* Doxygen navtree.css overrides */
+
+#nav-tree .label {
+  font: inherit;
+}
+
+#nav-tree {
+  background-color: inherit;
+}
+
+#nav-tree {
+  background-image:none;
+  background-color: inherit;
+}
+
+/* Doxygen tabs.css overrides */
+
+.tabs, .tabs2, .tabs3 {
+  background-image: none;
+  font-family: inherit;
+}
+
+.tabs2 {
+  font-size: 12px;
+}
+
+.tablist {
+  margin: 0 auto;
+}
+
+.tablist li {
+  background-image: none;
+}
+
+.tablist a {
+  background-image:none;
+  color: #808080;
+  transition:all .3s ease-out;
+  border-bottom:2px solid transparent;
+}
+
+.tablist a:hover {
+  background-image:none;
+  text-shadow: none;
+  color: #333333;
+  border-bottom: 2px solid #2d5c88;
+}
+
+.tablist li.current a {
+  background-image:none;
+  text-shadow: none;
+  color: #333333;
+  border-bottom: 2px solid #2d5c88;
+}
+
+/* Search field */
+
+#MSearchBox .left {
+  border-style: solid none solid solid;
+  border-width: 1px;
+  background: none;
+  border-color: #000000;
+}
+
+#MSearchField {
+  margin-top: -1px;
+  border-style: solid none;
+  border-width: 1px;
+  border-color: #000000;
+  background: none;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+#MSearchBox .right {
+  border-style: solid solid solid none;
+  border-width: 1px;
+  background: none;
+  border-color: #000000;
+}
+
+#MSearchResultsWindow {
+  background-color: #ffffff;
+}
+
+#MSearchSelectWindow {
+  border-color: #000000;
+  background-color: #ffffff;
+}
+
+/* CSS for the generated extension point documentation, copied from schema.css */
+
+H6.SchemaHeader {
+  font-size:16px;
+  display:inline
+}
+
+P.SchemaCopyright {
+  font-size: smaller;
+  font-style: normal;
+  color: #336699;
+  display:inline;
+  margin-top: 3.000000pt;
+  margin-bottom: 11.000000pt;
+  margin-right: 0.000000pt;
+  margin-left: 0.000000pt;
+}
+
+P.SchemaDtd {
+  color: #800000;
+  margin-top: 0.000000pt;
+  margin-bottom: 0.000000pt;
+  margin-right: 0.000000pt;
+  margin-left: 10.000000pt;
+}
+
+P.SchemaDtdAttlist {
+  color: #800000;
+  margin-top: 0.000000pt;
+  margin-bottom: 0.000000pt;
+  margin-right: 0.000000pt;
+  margin-left: 20.000000pt;
+}
+
+span.SchemaTag {
+  color: #000080;
+}
+
+span.SchemaCstring {
+  color: #008000;
+}
+
+pre.Example {
+  margin-top: 0.000000pt;
+}
+
+.ConfigMarkupElementDesc {
+  color: black;
+  margin-top: 0.000000pt;
+  margin-bottom: 0.000000pt;
+  margin-right: 0.000000pt;
+  margin-left: 10.000000pt;
+}
+
+.ConfigMarkupAttlistDesc {
+  color: black;
+  margin-top: 0.000000pt;
+  margin-bottom: 0.000000pt;
+  margin-right: 0.000000pt;
+  margin-left: 32.000000pt;
+}
+

@@ -531,7 +531,13 @@ void
   mitk::Vector3D rightDV, bottomDV;
   BoundingBox::BoundsArrayType bounds;
 
-  assert(aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0);
+  // Check for valid spacing
+  if(!(aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0))
+  {
+    mitkThrow() << "You try to set a spacing with at least one element equal or "
+    "smaller to \"0\". This might lead to a crash during rendering. Please double"
+    " check your data!";
+  }
 
   // In case of evenly-spaced data: re-initialize instances of PlaneGeometry,
   // since the spacing influences them

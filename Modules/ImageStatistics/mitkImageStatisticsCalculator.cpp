@@ -22,13 +22,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkITKImageImport.h"
 
+#include <mitkStatisticsImageFilter.h>
+#include <mitkLabelStatisticsImageFilter.h>
+
 #include <itkScalarImageToHistogramGenerator.h>
 
 #include <itkChangeInformationImageFilter.h>
 #include <itkExtractImageFilter.h>
 #include <itkMinimumMaximumImageCalculator.h>
-#include <itkStatisticsImageFilter.h>
-#include <itkLabelStatisticsImageFilter.h>
+
+//#include <itkStatisticsImageFilter.h>
+//#include <itkLabelStatisticsImageFilter.h>
+
 #include <itkMaskImageFilter.h>
 #include <itkImageFileWriter.h>
 #include <itkRescaleIntensityImageFilter.h>
@@ -65,6 +70,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <exception>
 
 
+#include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
+#include "itkImage.h"
+#include <itkNrrdImageIO.h>
+#include <itkGDCMImageIO.h>
+#include <itkImageRegionConstIteratorWithIndex.h>
+#include <itkImageRegionIteratorWithIndex.h>
+
+//#define DEBUG_HOTSPOTSEARCH
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+#if ( ( VTK_MAJOR_VERSION <= 5 ) && ( VTK_MINOR_VERSION<=8)  )
+  #include "mitkvtkLassoStencilSource.h"
+#else
+  #include "vtkLassoStencilSource.h"
+#endif
+
+
 namespace mitk
 {
 ImageStatisticsCalculator::ImageStatisticsCalculator()
@@ -93,6 +118,8 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_EmptyStatistics.Reset();
 
 }
+
+
 
 ImageStatisticsCalculator::~ImageStatisticsCalculator()
 {
@@ -652,12 +679,50 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   m_InternalImage = mitk::Image::ConstPointer();
   m_InternalImageMask3D = MaskImage3DType::Pointer();
   m_InternalImageMask2D = MaskImage2DType::Pointer();
+
+
+
   return true;
 }
 
 
+ const std::map<int, double>  *
+  ImageStatisticsCalculator::BinsAndFreuqencyForHistograms( unsigned int timeStep , unsigned int label ) const
+{
+  const HistogramType *binsAndFrequencyToCalculate = this->GetHistogram(timeStep,label);
+
+  // ToDo: map should be created on stack not on heap
+  std::map<int, double> *returnedHistogramMap;
+
+  for( unsigned int bin=0; bin < binsAndFrequencyToCalculate->Size(); bin++ )
+  {
+    returnedHistogramMap->insert( std::pair<int, double>(bin, binsAndFrequencyToCalculate->GetFrequency( bin, 0 )));
+
+  }
+  /*}
+
+            fstream ff;
+          ff.open("C:\\Users\\tmueller\\Documents\\TestPics\\Duality.dat", ios::out);
+
+for( unsigned int bin=0; bin < histogramContainer->at(i)->Size(); bin++ )
+          {
+
+
+            //std::cout << histogramContainer->at(i)->GetFrequency( bin, 0 ) << std::endl;
+            //std::cout << histogramContainer->at(i)->GetTotalFrequency() << std::endl;
+           // std::cout<< histogramContainer->at(i)->GetMeasurement( bin, 0 )  << std::endl;
+            //std::cout<< "_________" << std::endl;
+
+             ff << histogramContainer->at(i)->GetFrequency( bin, 0 ) << "\t" << histogramContainer->at(i)->GetMeasurement( bin, 0 ) << "\t" <<
+               histogramContainer->at(i)->GetTotalFrequency() << "\t"  << histogramContainer->at(i)->GetBinMin( 0,bin ) << "\t" << endl;
+
+          }
+ff.close();*/
+ return returnedHistogramMap;
+}
+
 const ImageStatisticsCalculator::HistogramType *
-ImageStatisticsCalculator::GetHistogram( unsigned int timeStep, unsigned int label ) const
+  ImageStatisticsCalculator::GetHistogram( unsigned int timeStep, unsigned int label ) const
 {
   if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
   {
@@ -997,7 +1062,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   }
 
   // Calculate statistics (separate filter)
-  typedef itk::StatisticsImageFilter< ImageType > StatisticsFilterType;
+  typedef itk::ExtendedStatisticsImageFilter< ImageType > StatisticsFilterType;
   typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
   statisticsFilter->SetInput( image );
 
@@ -1023,6 +1088,8 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   statistics.SetMean(statisticsFilter->GetMean());
   statistics.SetMedian(0.0);
   statistics.SetVariance(statisticsFilter->GetVariance());
+  statistics.Setm_Skewness(statisticsFilter->GetSkewness());
+  statistics.Setm_Kurtosis(statisticsFilter->GetKurtosis());
   statistics.SetSigma(statisticsFilter->GetSigma());
   statistics.SetRMS(sqrt( statistics.GetMean() * statistics.GetMean() + statistics.GetSigma() * statistics.GetSigma() ));
 
@@ -1096,8 +1163,17 @@ void ImageStatisticsCalculator::InternalMaskIgnoredPixels(
   const itk::Image< TPixel, VImageDimension > *image,
   itk::Image< unsigned short, VImageDimension > *maskImage )
 {
+
+
+
+
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
+
+
+
+
+
 
   itk::ImageRegionIterator<MaskImageType>
       itmask(maskImage, maskImage->GetLargestPossibleRegion());
@@ -1129,15 +1205,22 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
 
+
+
   typedef typename ImageType::IndexType IndexType;
   typedef typename ImageType::PointType PointType;
   typedef typename ImageType::SpacingType SpacingType;
 
-  typedef itk::LabelStatisticsImageFilter< ImageType, MaskImageType > LabelStatisticsFilterType;
+    typedef typename ImageType::Pointer ImagePointer;
+
+  typedef itk::ExtendedLabelStatisticsImageFilter< ImageType, MaskImageType > LabelStatisticsFilterType;
 
   typedef itk::ChangeInformationImageFilter< MaskImageType > ChangeInformationFilterType;
 
   typedef itk::ExtractImageFilter< ImageType, ImageType > ExtractImageFilterType;
+
+
+
 
   statisticsContainer->clear();
   histogramContainer->clear();
@@ -1208,6 +1291,11 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   adaptMaskFilter->Update();
   typename MaskImageType::Pointer adaptedMaskImage = adaptMaskFilter->GetOutput();
 
+
+
+
+
+
   // Make sure that mask region is contained within image region
   if ( !image->GetLargestPossibleRegion().IsInside( adaptedMaskImage->GetLargestPossibleRegion() ) )
   {
@@ -1242,6 +1330,52 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     adaptedImage = image;
   }
 
+ // Auslagern als methode
+
+  //Find min und max before runnig the filter pipeline for a smaller region of the Histogramm
+  typedef itk::ImageRegionConstIteratorWithIndex<ImageType> Imageie;
+  typedef itk::ImageRegionConstIteratorWithIndex<MaskImageType> Imageie2;
+  Imageie2 labelIterator2( maskImage, maskImage->GetRequestedRegion() );
+  Imageie labelIterator3( image, image->GetRequestedRegion() );
+
+  double maximum = 0;
+  double minimum = 0;
+  double actualPielValue = 0;
+  int counterOfPixelsInROI = 0;
+
+
+  for( labelIterator2.GoToBegin(); !labelIterator2.IsAtEnd(); ++labelIterator2, ++labelIterator3)
+  {
+
+    if( labelIterator2.Value()== 1.0)
+    {
+
+      counterOfPixelsInROI++;
+      actualPielValue = labelIterator3.Value();
+
+        if(counterOfPixelsInROI == 1)
+        {
+          maximum = actualPielValue;
+          minimum = actualPielValue;
+        }
+
+        if(actualPielValue >= maximum)
+        {
+          maximum = actualPielValue;
+        }
+        else if(actualPielValue <= minimum)
+        {
+          minimum = actualPielValue;
+        }
+
+    }
+
+  }
+
+
+
+  std::cout << "Maxi1: " << maximum << std::endl;
+  std::cout << "Min1: " << minimum << std::endl;
   // Initialize Filter
   typedef itk::StatisticsImageFilter< ImageType > StatisticsFilterType;
   typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
@@ -1249,14 +1383,13 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
   statisticsFilter->Update();
 
-  int numberOfBins = std::floor( ( (statisticsFilter->GetMaximum() - statisticsFilter->GetMinimum() + 1) / m_HistogramBinSize) + 0.5 );
-
-  typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
-  labelStatisticsFilter = LabelStatisticsFilterType::New();
+  int numberOfBins = ( m_DoIgnorePixelValue && (m_MaskingMode == MASKING_MODE_NONE) ) ? 768 : 384;
+  typename LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();
   labelStatisticsFilter->SetInput( adaptedImage );
   labelStatisticsFilter->SetLabelInput( adaptedMaskImage );
   labelStatisticsFilter->UseHistogramsOn();
-  labelStatisticsFilter->SetHistogramParameters( numberOfBins, statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum() );
+  labelStatisticsFilter->SetHistogramParameters( numberOfBins,minimum , maximum);   //statisticsFilter->GetMinimum() statisticsFilter->GetMaximum()
+
 
 
   // Add progress listening
@@ -1312,8 +1445,84 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.SetMedian(labelStatisticsFilter->GetMedian( *it ));
       statistics.SetVariance(labelStatisticsFilter->GetVariance( *it ));
       statistics.SetSigma(labelStatisticsFilter->GetSigma( *it ));
+      statistics.Setm_Skewness(labelStatisticsFilter->GetSkewness( *it ));
+      statistics.Setm_Kurtosis(labelStatisticsFilter->GetKurtosis( *it ));
       statistics.SetRMS(sqrt( statistics.GetMean() * statistics.GetMean()
         + statistics.GetSigma() * statistics.GetSigma() ));
+
+  //_____________________________________________________________________________________________________________________//
+ //_____________________________________________________________________________________________________________________//
+ //_____________________________________________________________________________________________________________________//
+ std::cout << "HalloooooooooooooooooooooooooooooooooooooooooooooooooooooooooAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+
+          fstream ff;
+          ff.open("C:\\Users\\tmueller\\Documents\\TestPics\\Duality.dat", ios::out);
+
+for( unsigned int bin=0; bin < histogramContainer->at(i)->Size(); bin++ )
+          {
+
+
+            //std::cout << histogramContainer->at(i)->GetFrequency( bin, 0 ) << std::endl;
+            //std::cout << histogramContainer->at(i)->GetTotalFrequency() << std::endl;
+           // std::cout<< histogramContainer->at(i)->GetMeasurement( bin, 0 )  << std::endl;
+            //std::cout<< "_________" << std::endl;
+
+             ff << histogramContainer->at(i)->GetFrequency( bin, 0 ) << "\t" << histogramContainer->at(i)->GetMeasurement( bin, 0 ) << "\t" <<
+               histogramContainer->at(i)->GetTotalFrequency() << "\t"  << histogramContainer->at(i)->GetBinMin( 0,bin ) << "\t" << endl;
+
+          }
+ff.close();
+
+  std::cout << "HalloooooooooooooooooooooooooooooooooooooooooooooooooooooooooAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+ //std::cout<< statistics.Mean << std::endl;
+ std::cout<< statistics.GetMean() << std::endl;
+ std::cout<< statistics.GetSigma() << std::endl;
+ std::cout<< statistics.Getm_Skewness() << std::endl;
+ std::cout<< statistics.Getm_Kurtosis() << std::endl;
+ std::cout << "......" << std::endl;
+ std::cout << labelStatisticsFilter->GetMinimum( *it ) << std::endl;
+ std::cout << statisticsFilter->GetMinimum() << std::endl;
+ std::cout << "HalloooooooooooooooooooooooooooooooooooooooooooooooooooooooooAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+
+ itk::NrrdImageIO::Pointer nrrdImageIO = itk::NrrdImageIO::New();
+
+ /* itk::ImageFileWriter<MaskImageType>:: Pointer writer = itk::ImageFileWriter<MaskImageType>::New();
+ // writer->SetImageIO(nrrdImageIO);
+  writer->SetFileName("C:\\Users\\tmueller\\Documents\\TestPics\\SeedsFG_TEST.nrrd");
+  writer->SetInput(adaptedMaskImage);
+  writer->Update();
+  //std::cout << "Wrote: " << outputImageFile << std::endl;
+
+ itk::ImageFileWriter<ImageType>:: Pointer writer2 = itk::ImageFileWriter<ImageType>::New();
+ // writer->SetImageIO(nrrdImageIO);
+  writer2->SetFileName("C:\\Users\\tmueller\\Documents\\TestPics\\SeedsFG_TEST2222222.nrrd");
+  writer2->SetInput(adaptedImage);
+  writer2->Update();
+  //std::cout << "Wrote: " << outputImageFile << std::endl;*/
+
+/*  itk::ImageFileWriter<MaskImageType>:: Pointer writer3 = itk::ImageFileWriter<MaskImageType>::New();
+ // writer->SetImageIO(nrrdImageIO);
+  writer3->SetFileName("C:\\Users\\tmueller\\Documents\\SeedsFG_TEST2.nrrd");
+  writer3->SetInput( labelStatisticsFilter->GetLabelInput () );
+  writer3->Update();
+  //std::cout << "Wrote: " << outputImageFile << std::endl;*/
+
+
+  MaskImageType::RegionType aa = labelStatisticsFilter->GetRegion(*it);
+  MaskImageType::RegionType bb = maskImage->GetLargestPossibleRegion() ;
+
+  std::cout << "*it: " <<  *it << std::endl;
+  std::cout << "Index:  " << aa.GetIndex () << std::endl;
+  std::cout << "Size: "   << aa.GetSize () << std::endl;
+  std::cout << "Index2:  " << bb.GetIndex () << std::endl;
+  std::cout << "Size2: "   << bb.GetSize ()  << std::endl;
+
+ // std::cout << labelStatisticsFilter->GetNumberOfLabels() << std::endl;
+
+
+  //_____________________________________________________________________________________________________________________//
+ //_____________________________________________________________________________________________________________________//
+ //_____________________________________________________________________________________________________________________//
 
       // restrict image to mask area for min/max index calculation
       typedef itk::MaskImageFilter< ImageType, MaskImageType, ImageType > MaskImageFilterType;
@@ -1773,7 +1982,7 @@ ImageStatisticsCalculator::CalculateHotspotStatistics(
     this->FillHotspotMaskPixels(hotspotMaskITK.GetPointer(), maskCenter, radiusInMM);
 
     // calculate statistics within the binary mask
-    typedef itk::LabelStatisticsImageFilter< InputImageType, MaskImageType> LabelStatisticsFilterType;
+    typedef itk::ExtendedLabelStatisticsImageFilter< InputImageType, MaskImageType> LabelStatisticsFilterType;
     typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
     labelStatisticsFilter = LabelStatisticsFilterType::New();
     labelStatisticsFilter->SetInput( inputImage );

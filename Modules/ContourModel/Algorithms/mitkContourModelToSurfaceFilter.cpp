@@ -95,7 +95,7 @@ void mitk::ContourModelToSurfaceFilter::GenerateData()
 
     // if the contour has less than 3 points, set empty PolyData for current timestep
     // polygon needs at least 3 points
-    if( inputContour->GetNumberOfVertices() <= 2)
+    if( inputContour->GetNumberOfVertices(currentTimeStep) <= 2)
     {
       vtkSmartPointer<vtkPolyData> emptyPolyData = vtkSmartPointer<vtkPolyData>::New();
       surface->SetVtkPolyData(emptyPolyData, currentTimeStep);

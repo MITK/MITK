@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyLine.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
+#include <vtkCell.h>
 
 // misc
 #include <math.h>
@@ -59,7 +60,7 @@ template< class OutputImageType >
 void TractDensityImageFilter< OutputImageType >::GenerateData()
 {
     // generate upsampled image
-  mitk::BaseGeometry::Pointer geometry = m_FiberBundle->GetGeometry();
+    mitk::BaseGeometry::Pointer geometry = m_FiberBundle->GetGeometry();
     typename OutputImageType::Pointer outImage = this->GetOutput();
 
     // calculate new image parameters
@@ -103,7 +104,9 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
     outImage->SetSpacing( newSpacing );
     outImage->SetOrigin( newOrigin );
     outImage->SetDirection( newDirection );
-    outImage->SetRegions( upsampledRegion );
+    outImage->SetLargestPossibleRegion( upsampledRegion );
+    outImage->SetBufferedRegion( upsampledRegion );
+    outImage->SetRequestedRegion( upsampledRegion );
     outImage->Allocate();
     outImage->FillBuffer(0.0);
 
@@ -128,6 +131,7 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
     m_FiberBundle->ResampleSpline(minSpacing/10);
 
     MITK_INFO << "TractDensityImageFilter: starting image generation";
+
     vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
     vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
     vLines->InitTraversal();
@@ -149,7 +153,7 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
             outImage->TransformPhysicalPointToIndex(vertex, index);
             outImage->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
 
-            if (!m_UseTrilinearInterpolation)
+            if (!m_UseTrilinearInterpolation && outImage->GetLargestPossibleRegion().IsInside(index))
             {
                 if (m_BinaryOutput)
                     outImage->SetPixel(index, 1);

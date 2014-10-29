@@ -135,8 +135,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
   // Prepare filters
   m_HelperObjectFilterPredicate = mitk::NodePredicateOr::New(
-  mitk::NodePredicateProperty::New("helper object"),
-  mitk::NodePredicateProperty::New("hidden object"));
+    mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)),
+    mitk::NodePredicateProperty::New("hidden object"));
   m_NodeWithNoDataFilterPredicate = mitk::NodePredicateData::New(0);
 
   m_FilterModel = new QmitkDataStorageFilterProxyModel();

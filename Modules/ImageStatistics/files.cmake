@@ -10,5 +10,5 @@ set(H_FILES
   mitkPointSetDifferenceStatisticsCalculator.h
   mitkPointSetStatisticsCalculator.h
   mitkStatisticsImageFilter.h
-  mitkLabelStatisticsImageFilter.h
+  mitkExtendedLabelStatisticsImageFilter.h
 )

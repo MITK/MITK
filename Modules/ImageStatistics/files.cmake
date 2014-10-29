@@ -9,7 +9,7 @@ set(H_FILES
   mitkPointSetDifferenceStatisticsCalculator.h
   mitkPointSetStatisticsCalculator.h
   mitkStatisticsImageFilter.h
-  mitkLabelStatisticsImageFilter.h
+  mitkExtendedLabelStatisticsImageFilter.h
 )
 
 if( ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} VERSION_LESS 5.8 )

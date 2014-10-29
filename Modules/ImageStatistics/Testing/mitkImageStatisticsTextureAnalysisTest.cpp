@@ -18,7 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkPointSetStatisticsCalculator.h"
 #include "itkImage.h"
-#include "mitkLabelStatisticsImageFilter.h"
+#include "mitkExtendedLabelStatisticsImageFilter.h"
+#include "itkDiscreteGaussianImageFilter.h"
 
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>

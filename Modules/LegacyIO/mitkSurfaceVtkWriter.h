@@ -51,7 +51,7 @@ namespace mitk
  * yet supported.
  * @ingroup Process
  *
- * @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+ * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 */
 template <class VTKWRITER>
 class MitkLegacyIO_EXPORT SurfaceVtkWriter : public mitk::FileWriterWithInformation

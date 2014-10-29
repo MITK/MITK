@@ -31,7 +31,7 @@ namespace mitk
 
  @todo Add file writing method, move writers into a similar factory scheme
  @ingroup IO
- @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+ @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 */
 class DEPRECATED() MitkLegacyIO_EXPORT BaseDataIO : public itk::Object
 {

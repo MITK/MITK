@@ -235,7 +235,7 @@ public:
    * @param storage The data storage to which the constructed data nodes are added.
    * @return The number of added mitk::DataNode instances.
    *
-   * @deprecatedSince{2014_03} Use Load() instead
+   * @deprecatedSince{2014_10} Use Load() instead
    */
   DEPRECATED(static int LoadFiles(const std::vector<std::string>&fileNames, DataStorage& storage));
 
@@ -248,7 +248,7 @@ public:
    *
    * @see LoadFiles(std::vector<std::string>,DataStorage)
    *
-   * @deprecatedSince{2014_03} Use Load() instead
+   * @deprecatedSince{2014_10} Use Load() instead
    */
   DEPRECATED(static DataStorage::Pointer LoadFiles(const std::vector<std::string>& fileNames));
 
@@ -258,7 +258,7 @@ public:
    * @throws mitk::Exception In case of an error when reading the file.
    * @return Returns the created BaseData object.
    *
-   * @deprecatedSince{2014_03} Use Load() or FileReaderRegistry::Read() instead.
+   * @deprecatedSince{2014_10} Use Load() or FileReaderRegistry::Read() instead.
    */
   DEPRECATED(static mitk::BaseData::Pointer LoadBaseData(const std::string& path));
 
@@ -269,7 +269,7 @@ public:
    * or the DataNode is NULL.
    * @return Returns the DataNode.
    *
-   * @deprecatedSince{2014_03} Use Load() instead.
+   * @deprecatedSince{2014_10} Use Load() instead.
    */
   DEPRECATED(static mitk::DataNode::Pointer LoadDataNode(const std::string& path));
 
@@ -372,7 +372,7 @@ public:
    * @throws mitk::Exception This exception is thrown when the writer is not able to write the image.
    * @return Returns true for success else false.
    *
-   * @deprecatedSince{2014_03} Use Save() instead.
+   * @deprecatedSince{2014_10} Use Save() instead.
    */
   DEPRECATED(static bool SaveImage(mitk::Image::Pointer image, const std::string& path));
 
@@ -384,7 +384,7 @@ public:
    * @throws mitk::Exception This exception is thrown when the writer is not able to write the image.
    * @return Returns true for success else false.
    *
-   * @deprecatedSince{2014_03} Use Save() instead.
+   * @deprecatedSince{2014_10} Use Save() instead.
    */
   DEPRECATED(static bool SaveBaseData(mitk::BaseData* data, const std::string& path));
 
@@ -396,7 +396,7 @@ public:
    * or if the fileextension is not suitable for writing.
    * @return Returns true for success else false.
    *
-   * @deprecatedSince{2014_03} Use Save() instead.
+   * @deprecatedSince{2014_10} Use Save() instead.
    */
   DEPRECATED(static bool SaveSurface(mitk::Surface::Pointer surface, const std::string& path));
 
@@ -407,15 +407,15 @@ public:
    * @throws mitk::Exception This exception is thrown when the writer is not able to write the pointset.
    * @return Returns true for success else false.
    *
-   * @deprecatedSince{2014_03} Use Save() instead.
+   * @deprecatedSince{2014_10} Use Save() instead.
    */
   DEPRECATED(static bool SavePointSet(mitk::PointSet::Pointer pointset, const std::string& path));
 
-  /** @deprecatedSince{2014_03} Use GetDefaultWriteExtension() instead */
+  /** @deprecatedSince{2014_10} */
   DEPRECATED(static const std::string DEFAULTIMAGEEXTENSION);
-  /** @deprecatedSince{2014_03} Use GetDefaultWriteExtension() instead */
+  /** @deprecatedSince{2014_10} */
   DEPRECATED(static const std::string DEFAULTSURFACEEXTENSION);
-  /** @deprecatedSince{2014_03} Use GetDefaultWriteExtension() instead */
+  /** @deprecatedSince{2014_10} */
   DEPRECATED(static const std::string DEFAULTPOINTSETEXTENSION);
 
 protected:

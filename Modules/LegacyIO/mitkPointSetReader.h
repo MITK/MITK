@@ -43,7 +43,7 @@ namespace mitk
  * @ingroup PSIO
  * @ingroup IO
  *
- * @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+ * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 */
 class MitkLegacyIO_EXPORT PointSetReader: public PointSetSource, public FileReader
 {

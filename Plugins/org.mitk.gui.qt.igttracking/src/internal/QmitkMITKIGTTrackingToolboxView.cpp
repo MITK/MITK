@@ -1185,14 +1185,26 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
 
   //The tools are maybe reordered after initialization, e.g. in case of auto-detected tools of NDI Aurora
   mitk::NavigationToolStorage::Pointer toolsInNewOrder = myTrackingDeviceSourceFactory->GetUpdatedNavigationToolStorage();
+
   if ((toolsInNewOrder.IsNotNull()) && (toolsInNewOrder->GetToolCount() > 0))
   {
     //so delete the old tools in wrong order and add them in the right order
     //we cannot simply replace the tool storage because the new storage is
     //not correctly initialized with the right data storage
+
+    /*
     m_NavigationToolStorage->DeleteAllTools();
     for (int i=0; i < toolsInNewOrder->GetToolCount(); i++) {m_NavigationToolStorage->AddTool(toolsInNewOrder->GetTool(i));}
+
+    This was replaced and thereby fixed Bug 18318 DeleteAllTools() is not Threadsafe!
+    */
+    for(int i = 0; i < toolsInNewOrder->GetToolCount(); i++ )
+    {
+      m_NavigationToolStorage->AssignToolNumber(toolsInNewOrder->GetTool(i)->GetIdentifier(),i);
+    }
+
   }
+
   mitk::ProgressBar::GetInstance()->Progress();
 
   //connect to device

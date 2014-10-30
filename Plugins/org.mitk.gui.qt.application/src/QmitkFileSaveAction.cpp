@@ -115,7 +115,6 @@ public:
       {
         if ((*nodeIter)->GetData() != NULL)
         {
-          qDebug() << "Got non-empty data-node: " << (*nodeIter)->GetData()->GetNameOfClass();
           enable = true;
           break;
         }

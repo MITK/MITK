@@ -32,7 +32,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = MITK
+PROJECT_NAME           = "Medical Imaging Interaction Toolkit"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -234,7 +234,7 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "bundlemainpage{1}=\page \1" \
                          "embmainpage{1}=\page \1" \
                          "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
-                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" " \
+                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \"\" \"Functions deprecated as of \1\" \deprecated (as of \1) " \
                          "minimumCMakeVersion=@CMAKE_MINIMUM_REQUIRED_VERSION@" \
                          "minimumQt4Version=@MITK_QT4_MINIMUM_VERSION@" \
                          "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
@@ -859,6 +859,8 @@ EXCLUDE_PATTERNS       = README* \
                          */.git/* \
                          *_p.h \
                          *Private.* \
+                         */Internal/* \
+                         */internal/* \
                          */Snippets/* \
                          */snippets/* \
                          */testing/* \

@@ -34,7 +34,7 @@ namespace mitk
  * This class implements the XMLParser interface of the vtkXMLParser which is based
  * on expat. It is used by the mitk::PointSetReader and is NOT INTENDED TO BE USED
  * FROM THE END-USER. If you want to read point sets, use the mitk::PointSetReader.
- * @ingroup Process
+ * @ingroup MitkLegacyIOModule
  *
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */

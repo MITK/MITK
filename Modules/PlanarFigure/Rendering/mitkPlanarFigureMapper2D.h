@@ -103,7 +103,7 @@ class Contour;
 *   </ul>
 * </ol>
 *
-* \ingroup Mapper
+* @ingroup MitkPlanarFigureModule
 */
 
 class MitkPlanarFigure_EXPORT PlanarFigureMapper2D : public GLMapper

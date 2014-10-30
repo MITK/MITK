@@ -53,8 +53,7 @@ namespace mitk
  *      </data>
  *    </contourModel>
  *
- * @ingroup PSIO
- * @ingroup Process
+ * @ingroup MitkContourModelModule
  */
 
 class TimeSlicedGeometry;

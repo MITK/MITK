@@ -23,11 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  /** \brief Interface of property descriptions service.
-    *
-    * This service allows you to manage descriptions for properties.
-    * The property view displays descriptions of selected properties (in rich text format) at its bottom.
-    */
+  /**
+   * \ingroup MicroServices_Interfaces
+   * \brief Interface of property descriptions service.
+   *
+   * This service allows you to manage descriptions for properties.
+   * The property view displays descriptions of selected properties (in rich text format) at its bottom.
+   */
   class MITK_CORE_EXPORT IPropertyDescriptions
   {
   public:

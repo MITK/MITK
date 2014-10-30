@@ -49,7 +49,7 @@ namespace mitk
  * (S=start, E=end, T=time).
  * Writing of multiple files according to a given filename pattern is not
  * yet supported.
- * @ingroup Process
+ * @ingroup MitkLegacyIOModule
  *
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 */

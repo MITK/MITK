@@ -29,6 +29,9 @@ namespace mitk {
 namespace mitk {
 
 /**
+ * \ingroup IO
+ * \ingroup MicroServices_Interfaces
+ *
  * \brief The common interface of all MITK file writers.
  *
  * Implementations of this interface must be registered as a service

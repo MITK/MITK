@@ -27,12 +27,14 @@ namespace mitk
 {
   class PropertyFilter;
 
-  /** \brief Interface of property filters service.
-    *
-    * This service allows you manage property name filters.
-    * A mitk::PropertyFilter consist of blacklist and whitelist entries and can be restricted to certain data node types.
-    * The property view only displays filtered properties if filters were found.
-    */
+  /**
+   * \ingroup MicroServices_Interfaces
+   * \brief Interface of property filters service.
+   *
+   * This service allows you manage property name filters.
+   * A mitk::PropertyFilter consist of blacklist and whitelist entries and can be restricted to certain data node types.
+   * The property view only displays filtered properties if filters were found.
+   */
   class MITK_CORE_EXPORT IPropertyFilters
   {
   public:

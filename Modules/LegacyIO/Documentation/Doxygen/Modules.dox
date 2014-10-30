@@ -1,0 +1,11 @@
+/**
+  \defgroup MitkLegacyIOModule LegacyIO
+  \ingroup MITKModules
+
+  \brief Legay reader and writer extensions for MITK
+
+  This module provides the legacy reader and writer implementations for
+  core data types.
+
+  \deprecatedSince{2014_10} Use mitk::IOUtil instead.
+*/

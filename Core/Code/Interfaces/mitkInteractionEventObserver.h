@@ -24,6 +24,9 @@
 namespace mitk
 {
  /**
+  * \ingroup Interaction
+  * \ingroup MicroServices_Interfaces
+  *
   * \class InteractionEventObserver
   * \brief Base class to implement InteractionEventObservers.
   *

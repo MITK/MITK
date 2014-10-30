@@ -1,5 +1,5 @@
 /**
-  \defgroup MitkMapperExtModule MitkMapperExt
+  \defgroup MitkMapperExtModule MapperExt
   \ingroup MITKModules
 
   \brief MITK mapper classes for data type extensions.

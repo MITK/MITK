@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkODFDetailsView.h"
-#include <QmitkStdMultiWidget.h>
 #include <QTableWidgetItem>
 #include <vtkFloatArray.h>
 #include <vtkPointData.h>
@@ -37,9 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkODFDetailsView::VIEW_ID = "org.mitk.views.odfdetails";
 
 QmitkODFDetailsView::QmitkODFDetailsView()
-  : QmitkFunctionality()
+  : QmitkAbstractView()
   , m_Controls( 0 )
-  , m_MultiWidget( NULL )
   , m_OdfNormalization(0)
   , m_ImageNode(NULL)
 {
@@ -50,11 +48,70 @@ QmitkODFDetailsView::QmitkODFDetailsView()
   m_RenderWindowInteractor = vtkRenderWindowInteractor::New();
   m_Camera = vtkCamera::New();
   m_VtkRenderWindow->SetSize(300,300);
+
 }
 
 QmitkODFDetailsView::~QmitkODFDetailsView()
 {
+  if (m_ImageNode.IsNotNull())
+    m_ImageNode->RemoveObserver( m_PropertyObserverTag );
+}
 
+void QmitkODFDetailsView::Visible()
+{
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+
+  if (renderWindow)
+  {
+    {
+      mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
+      itk::ReceptorMemberCommand<QmitkODFDetailsView>::Pointer command = itk::ReceptorMemberCommand<QmitkODFDetailsView>::New();
+      command->SetCallbackFunction( this, &QmitkODFDetailsView::OnSliceChanged );
+      m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+    }
+
+    {
+      mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
+      itk::ReceptorMemberCommand<QmitkODFDetailsView>::Pointer command = itk::ReceptorMemberCommand<QmitkODFDetailsView>::New();
+      command->SetCallbackFunction( this, &QmitkODFDetailsView::OnSliceChanged );
+      m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+    }
+
+    {
+      mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
+      itk::ReceptorMemberCommand<QmitkODFDetailsView>::Pointer command = itk::ReceptorMemberCommand<QmitkODFDetailsView>::New();
+      command->SetCallbackFunction( this, &QmitkODFDetailsView::OnSliceChanged );
+      m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+    }
+  }
+}
+
+void QmitkODFDetailsView::Hidden()
+{
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+
+  if (renderWindow)
+  {
+    mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
+    slicer->RemoveObserver(m_SliceObserverTag1);
+    slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
+    slicer->RemoveObserver(m_SliceObserverTag2);
+    slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
+    slicer->RemoveObserver(m_SliceObserverTag3);
+  }
+}
+
+void QmitkODFDetailsView::Activated()
+{
+}
+
+void QmitkODFDetailsView::Deactivated()
+{
+}
+
+void QmitkODFDetailsView::SetFocus()
+{
+  this->m_Controls->m_ODFRenderWidget->setFocus();
 }
 
 void QmitkODFDetailsView::CreateQtPartControl( QWidget *parent )
@@ -70,54 +127,8 @@ void QmitkODFDetailsView::CreateQtPartControl( QWidget *parent )
   }
 }
 
-void QmitkODFDetailsView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-  m_MultiWidget = &stdMultiWidget;
-
-  {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
-    itk::ReceptorMemberCommand<QmitkODFDetailsView>::Pointer command = itk::ReceptorMemberCommand<QmitkODFDetailsView>::New();
-    command->SetCallbackFunction( this, &QmitkODFDetailsView::OnSliceChanged );
-    m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
-  }
-
-  {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
-    itk::ReceptorMemberCommand<QmitkODFDetailsView>::Pointer command = itk::ReceptorMemberCommand<QmitkODFDetailsView>::New();
-    command->SetCallbackFunction( this, &QmitkODFDetailsView::OnSliceChanged );
-    m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
-  }
-
-  {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
-    itk::ReceptorMemberCommand<QmitkODFDetailsView>::Pointer command = itk::ReceptorMemberCommand<QmitkODFDetailsView>::New();
-    command->SetCallbackFunction( this, &QmitkODFDetailsView::OnSliceChanged );
-    m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
-  }
-}
-
-void QmitkODFDetailsView::StdMultiWidgetNotAvailable()
-{
-
-  {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
-    slicer->RemoveObserver( m_SliceObserverTag1 );
-  }
-
-  {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
-    slicer->RemoveObserver( m_SliceObserverTag2 );
-  }
-
-  {
-    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
-    slicer->RemoveObserver( m_SliceObserverTag3 );
-  }
-
-  m_MultiWidget = NULL;
-}
-
-void QmitkODFDetailsView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkODFDetailsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+    const QList<mitk::DataNode::Pointer>& nodes )
 {
   if (m_ImageNode.IsNotNull())
     m_ImageNode->RemoveObserver( m_PropertyObserverTag );
@@ -128,9 +139,8 @@ void QmitkODFDetailsView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes
   m_ImageNode = NULL;
 
   // iterate selection
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+  foreach( mitk::DataNode::Pointer node, nodes )
   {
-    mitk::DataNode::Pointer node = *it;
 
     if( node.IsNotNull() && (dynamic_cast<mitk::QBallImage*>(node->GetData()) || dynamic_cast<mitk::TensorImage*>(node->GetData())) )
     {
@@ -152,11 +162,10 @@ void QmitkODFDetailsView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes
 
 void QmitkODFDetailsView::UpdateOdf()
 {
-
   try
   {
     m_Controls->m_OverviewBox->setVisible(true);
-    if (m_ImageNode.IsNull() || !m_MultiWidget)
+    if (m_ImageNode.IsNull() || !this->GetRenderWindowPart())
     {
       m_Controls->m_ODFRenderWidget->setVisible(false);
       m_Controls->m_OdfBox->setVisible(false);
@@ -179,7 +188,7 @@ void QmitkODFDetailsView::UpdateOdf()
     m_OdfSource = vtkSmartPointer<vtkOdfSource>::New();
     itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> odf;
 
-    mitk::Point3D world = m_MultiWidget->GetCrossPosition();
+    mitk::Point3D world = this->GetRenderWindowPart()->GetSelectedPosition();
     mitk::Point3D index;
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
     unsigned int *img_dimension = img->GetDimensions();

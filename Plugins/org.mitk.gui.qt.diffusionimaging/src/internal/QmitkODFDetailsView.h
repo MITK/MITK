@@ -19,7 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
+#include "mitkILifecycleAwarePart.h"
 
 #include "ui_QmitkODFDetailsViewControls.h"
 
@@ -45,7 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   \ingroup Functionalities
 */
 
-class QmitkODFDetailsView : public QmitkFunctionality
+class QmitkODFDetailsView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -67,9 +68,6 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
-
   void OnSliceChanged(const itk::EventObject& e);
 
 protected slots:
@@ -77,12 +75,18 @@ protected slots:
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+    const QList<mitk::DataNode::Pointer>& nodes );
+
+  virtual void SetFocus();
+  void Visible();
+  void Hidden();
+  void Activated();
+  void Deactivated();
 
   void UpdateOdf(); ///< called if slice position or datamanager selection has changed
 
   Ui::QmitkODFDetailsViewControls*  m_Controls;
-  QmitkStdMultiWidget*              m_MultiWidget;
 
   /** observer flags */
   int m_SliceObserverTag1;

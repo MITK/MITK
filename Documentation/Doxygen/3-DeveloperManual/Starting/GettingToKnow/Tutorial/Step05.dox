@@ -1,0 +1,40 @@
+ /**
+
+ \page Step05Page MITK Tutorial - Step 5: Interactively add points
+
+ \li \ref Step5.cpp "Step5.cpp"\n
+ Contains the code for this step.
+ \li Path to files used in this step: \n
+http://mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
+http://mitk.org/download/tutorial-data/lungs.vtk (surface)
+
+ In addition to Step 4 where 3 views were created on the data, we now want to interactively add points.
+
+ A node containing a PointSet as data is added to the data tree and a PointSetDataInteractor is associated with the node, which handles the interaction.
+ The @em interaction @em pattern is defined in a state-machine, stored in an external XML file. Thus, we need to load a state-machine.
+
+ A state machine describes interaction pattern with different states (states beeing something like "a point is selected") and transitions to these states (e.g. "select a point").
+ These transitions are associated with actions. In this way it is possible to model complex interaction schemes.
+ By what these transitions and actions are triggered is described in a configuration file. It maps user events to identifiers that are used in the state machine patterns.
+ In this way the user interaction can be changed by simply loading a different configuration file for a state machine, and the user may add points now with a right click instead of
+ left click + SHIFT, as in our case.
+
+ Therefore after loading the state machine pattern the PointSetDataInteractor is also given a event configuration file.
+
+ More information about interaction in MITK can be found \ref InteractionPage "here".
+
+ In order to add a point the shift key has to be pressed while left clicking in a render window.
+ You can also move points or remove them (left click while pressing ALT).
+
+ \image html step5_result.png
+
+ \dontinclude Step5.cpp
+
+ A PointSet and a node for it have to be created to be able to interactively adding points:
+
+ \skipline mitk::PointSet
+ \until interactor->SetDataNode(pointSetNode)
+
+ \ref Step04Page "[Previous step]" \ref Step06Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+
+  */

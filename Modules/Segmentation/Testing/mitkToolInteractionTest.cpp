@@ -39,10 +39,11 @@ class mitkToolInteractionTestSuite : public mitk::TestFixture
 
   MITK_TEST(AddToolInteraction_4D_Test);
   #########################*/
+  /// \todo fix crash when wipe tool test is called after another test
+  MITK_TEST(WipeToolInteractionTest);
   MITK_TEST(AddToolInteractionTest);
   MITK_TEST(SubtractToolInteractionTest);
   MITK_TEST(PaintToolInteractionTest);
-  MITK_TEST(WipeToolInteractionTest);
   MITK_TEST(RegionGrowingToolInteractionTest);
   MITK_TEST(CorrectionToolInteractionTest);
   MITK_TEST(EraseToolInteractionTest);

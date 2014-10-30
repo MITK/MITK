@@ -30,6 +30,14 @@ void mitk::NavigationDataSetWriterCSV::Write (std::string path, mitk::Navigation
 
 void mitk::NavigationDataSetWriterCSV::Write (std::ostream* stream, mitk::NavigationDataSet::Pointer data)
 {
+  //save old locale
+  char * oldLocale;
+  oldLocale = setlocale( LC_ALL, 0 );
+
+  //define own locale
+  std::locale C("C");
+  setlocale( LC_ALL, "C" );
+
   //write header
   int numberOfTools = data->GetNumberOfTools();
   for (unsigned int index = 0; index < numberOfTools; index++){ *stream << "TimeStamp_Tool" << index <<
@@ -65,6 +73,9 @@ void mitk::NavigationDataSetWriterCSV::Write (std::ostream* stream, mitk::Naviga
     }
     *stream << "\n";
   }
+
+  //switch back to old locale
+  setlocale( LC_ALL, oldLocale );
 }
 
 mitk::NavigationDataSetWriterCSV::NavigationDataSetWriterCSV()

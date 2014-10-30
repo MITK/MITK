@@ -147,6 +147,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     CACHED_RESOURCEFILES ${_PLUGIN_CACHED_RESOURCE_FILES}
     TRANSLATIONS ${_PLUGIN_TRANSLATION_FILES}
     OUTPUT_DIR ${_output_dir}
+    NO_INSTALL # we install the plug-in ourselves
     ${is_test_plugin}
   )
 

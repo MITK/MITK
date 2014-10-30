@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModuleInitialization.h>
 
-US_INITIALIZE_MODULE("MitkXNAT", "MitkXNAT")
+US_INITIALIZE_MODULE
 
 namespace mitk {
 

@@ -28,6 +28,7 @@ a {
 #projectname {
   visibility: hidden;
   height: 70px;
+  margin-left: -520px;
 }
 
 #projectbrief {

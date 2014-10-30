@@ -2,7 +2,7 @@
   <!-- Navigation index tabs for HTML output -->
   <navindex>
     <tab type="mainpage" visible="yes" title="Home"/>
-    <tab type="pages" visible="yes" title="" intro=""/>
+    <tab type="pages" visible="yes" title="Manual" intro=""/>
     <tab type="usergroup" title="API Reference">
       <tab type="modules" visible="yes" title="Groups" intro="Here is a list of all groups:"/>
       <tab type="namespaces" visible="yes" title="">
@@ -20,13 +20,9 @@
         <tab type="globals" visible="yes" title="" intro=""/>
       </tab>
       <tab type="examples" visible="yes" title="" intro=""/>
-      <tab type="usergroup" title="Deprecated">
-        <tab type="user" url="@ref deprecated" title="Deprecated List"/>
-        <tab type="user" url="@ref deprecatedSince2013_03" title="Deprecated as of MITK 2013.03"/>
-        <tab type="user" url="@ref deprecatedSince2012_09" title="Deprecated as of MITK 2012.09"/>
-      </tab>
     </tab>
-    <tab type="user" url="@ref BlueBerryIntro" title="BlueBerry Application Framework"/>
+    <tab type="user" url="http://mitk.org/Download" title="Download"/>
+    <tab type="user" url="http://bugs.mitk.org" title="Bugzilla"/>
   </navindex>
 
   <!-- Layout definition for a class page -->

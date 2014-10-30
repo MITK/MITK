@@ -180,3 +180,35 @@ bool mitk::NavigationToolStorage::isLocked()
   {
   return m_storageLocked;
   }
+
+bool mitk::NavigationToolStorage::AssignToolNumber(std::string identifier1, int number2)
+  {
+  if (this->GetTool(identifier1).IsNull())
+    {
+    MITK_WARN << "Identifier does not exist, cannot assign new number";
+    return false;
+    }
+
+  if ((number2 >= m_ToolCollection.size()) || (number2 < 0))
+    {
+    MITK_WARN << "Invalid number, cannot assign new number";
+    return false;
+    }
+
+  mitk::NavigationTool::Pointer tool2 = m_ToolCollection.at(number2);
+
+  int number1 = -1;
+
+  for(int i = 0; i<m_ToolCollection.size(); i++)
+    {
+    if (m_ToolCollection.at(i)->GetIdentifier() == identifier1) {number1=i;}
+    }
+
+  m_ToolCollection[number2] = m_ToolCollection.at(number1);
+
+  m_ToolCollection[number1] = tool2;
+
+  MITK_DEBUG << "Swapped tool " << number2 << " with tool " << number1;
+
+  return true;
+}

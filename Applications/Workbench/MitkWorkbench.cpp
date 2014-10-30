@@ -185,7 +185,7 @@ int main(int argc, char** argv)
     if (!preloadLibrary.exists())
     {
       // In case the application is started from a build tree
-      relPath = "/../../../plugins/" + preloadLib + libSuffix;
+      QString relPath = "/../../../plugins/" + preloadLib + libSuffix;
       tempLibraryPath = QCoreApplication::applicationDirPath() + relPath;
       preloadLibrary.setFileName(tempLibraryPath);
     }

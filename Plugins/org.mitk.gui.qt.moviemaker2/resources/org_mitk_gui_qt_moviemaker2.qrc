@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/org_gui_qt_moviemaker2" >
+    <file>delay.svg</file>
+    <file>duration.svg</file>
+  </qresource>
+</RCC>

@@ -19,7 +19,7 @@ macro(MITK_INSTALL_HELPER_APP)
     list(APPEND DIRS "/usr/lib")
   endif(APPLE)
 
-  if(QT_LIBRARY_DIR MATCHES "^(/lib/|/lib32/|/lib64/|/usr/lib/|/usr/lib32/|/usr/lib64/|/usr/X11R6/)")
+  if(QT_LIBRARY_DIR MATCHES "^(/lib|/lib32|/lib64|/usr/lib|/usr/lib32|/usr/lib64|/usr/X11R6)(/.*)?$")
     set(_qt_is_system_qt 1)
   endif()
 

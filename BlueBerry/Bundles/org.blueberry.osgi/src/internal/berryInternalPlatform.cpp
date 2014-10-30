@@ -188,8 +188,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   }
   m_ctkPluginFrameworkFactory = new ctkPluginFrameworkFactory(fwProps);
   QSharedPointer<ctkPluginFramework> pfw = m_ctkPluginFrameworkFactory->getFramework();
-  pfw->init();
-  ctkPluginContext* pfwContext = pfw->getPluginContext();
+  ctkPluginContext* pfwContext = NULL;
 
   std::string provisioningFile = this->GetConfiguration().getString(Platform::ARG_PROVISIONING);
   if (!provisioningFile.empty())
@@ -217,6 +216,9 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     {
       ctkPluginFrameworkLauncher::addSearchPath(pluginPath);
     }
+
+    pfw->init();
+    pfwContext = pfw->getPluginContext();
 
     bool forcePluginOverwrite = this->GetConfiguration().hasOption(Platform::ARG_FORCE_PLUGIN_INSTALL);
     QList<QUrl> pluginsToStart = provInfo.getPluginsToStart();
@@ -246,6 +248,8 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   }
   else
   {
+    pfw->init();
+    pfwContext = pfw->getPluginContext();
     BERRY_INFO << "No provisioning file set.";
   }
 

@@ -29,6 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ctkXnatWidget
 #include "ctkXnatTreeModel.h"
 
+// MitkXNAT Module
+#include "mitkXnatSessionTracker.h"
+
 /*!
 \brief QmitkXnatTreeBrowserView
 
@@ -58,7 +61,10 @@ public:
     void OnActivatedNode(const QModelIndex& index);
 
     /// \brief Updates the ctkXnatSession and the user interface
-    void UpdateSession();
+    void UpdateSession(ctkXnatSession* session);
+
+    /// \brief Cleans the tree model
+    void CleanTreeModel(ctkXnatSession* session);
 
 protected:
 
@@ -71,8 +77,8 @@ private:
   berry::QtSelectionProvider::Pointer m_SelectionProvider;
   void SetSelectionProvider();
 
-  ctkXnatSession* m_Session;
   ctkXnatTreeModel* m_TreeModel;
+  mitk::XnatSessionTracker* m_Tracker;
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H

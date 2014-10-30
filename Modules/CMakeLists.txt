@@ -53,6 +53,7 @@ set(module_dirs
     VtkShaders
     DicomRT
     IOExt
+    XNAT
 )
 
 if(MITK_ENABLE_PIC_READER)

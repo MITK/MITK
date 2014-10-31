@@ -28,6 +28,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.dtiatlasapp:OFF
   org.mitk.gui.qt.igtexamples:OFF
   org.mitk.gui.qt.igttracking:OFF
+  org.mitk.gui.qt.igtlplugin:OFF
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.viewnavigator:OFF

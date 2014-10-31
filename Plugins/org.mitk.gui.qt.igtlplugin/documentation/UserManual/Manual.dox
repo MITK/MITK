@@ -1,0 +1,17 @@
+/**
+\page org_mitk_gui_qt_igtlplugin The Igtlplugin
+
+\imageMacro{icon.png,"Icon of Igtlplugin",2.00}
+
+\tableofcontents
+
+\section org_mitk_gui_qt_igtlpluginOverview Overview
+Describe the features of your awesome plugin here
+<ul>
+<li>Increases productivity
+<li>Creates beautiful images
+<li>Generates PhD thesis
+<li>Brings world peace
+</ul>
+
+*/

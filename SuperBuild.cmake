@@ -75,6 +75,7 @@ set(external_projects
   Swig
   SimpleITK
   Eigen
+  OpenIGTLink
   )
 
 # Qxt supports Qt5. We need to also support it in QxtCMakeLists.txt
@@ -259,6 +260,7 @@ set(mitk_cmake_boolean_args
   MITK_USE_CTK
   MITK_USE_DCMTK
   MITK_USE_OpenCV
+  MITK_USE_OpenIGTLink
   MITK_USE_Poco
   MITK_USE_SOFA
   MITK_USE_Python
@@ -306,6 +308,7 @@ ExternalProject_Add(${proj}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
     ${OpenCV_DEPENDS}
+    ${OpenIGTLink_DEPENDS}
     ${Poco_DEPENDS}
     ${SOFA_DEPENDS}
     ${MITK-Data_DEPENDS}
@@ -433,6 +436,7 @@ ExternalProject_Add(${proj}
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR
     -DACVD_DIR:PATH=${ACVD_DIR}
     -DOpenCV_DIR:PATH=${OpenCV_DIR}
+    -DOpenIGTLink_DIR:PATH=${OpenIGTLink_DIR}
     -DPoco_DIR:PATH=${Poco_DIR}
     -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}

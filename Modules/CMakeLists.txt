@@ -30,6 +30,7 @@ set(module_dirs
     GPGPU
     IGTBase
     IGT
+    OpenIGTLink
     CameraCalibration
     RigidRegistration
     RigidRegistrationUI

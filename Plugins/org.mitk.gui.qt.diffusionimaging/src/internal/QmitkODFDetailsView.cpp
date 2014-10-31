@@ -262,7 +262,7 @@ void QmitkODFDetailsView::UpdateOdf()
         m_Controls->m_InputImageLabel->setText("<font color='green'>Click image to restore rendering!</font>");
       }
     }
-    else if (dynamic_cast<mitk::TensorImage*>(m_ImageNode->GetData()))
+    else if (dynamic_cast<mitk::TensorImage*>(m_ImageNode->GetData()) && ( m_ImageNode->GetData()->GetGeometry()->IsInside(world) ) )
     {
       m_Controls->m_ODFRenderWidget->setVisible(true);
       m_Controls->m_OdfBox->setVisible(false);

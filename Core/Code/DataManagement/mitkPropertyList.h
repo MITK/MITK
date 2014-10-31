@@ -79,6 +79,7 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
      * the value consists of the actual property object (BaseProperty).
      */
     typedef std::map< std::string, BaseProperty::Pointer> PropertyMap;
+    typedef std::pair< std::string, BaseProperty::Pointer> PropertyMapElementType;
 
     /**
      * @brief Get a property by its name.

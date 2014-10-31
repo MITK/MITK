@@ -163,7 +163,7 @@ if(MITK_USE_IGT)
 endif()
 
 # Install rules for ToF libraries loaded at runtime
-if(mitkToFHardware_IS_ENABLED)
+if(EXISTS "@MITK_BINARY_DIR@/mitkToFHardwareInstallRules.cmake")
   include("@MITK_BINARY_DIR@/mitkToFHardwareInstallRules.cmake")
 endif()
 

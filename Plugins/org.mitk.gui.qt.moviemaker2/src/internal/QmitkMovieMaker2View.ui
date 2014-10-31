@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkMovieMaker2ViewControls</class>
- <widget class="QWidget" name="QmitkMovieMaker2ViewControls">
+ <class>QmitkMovieMaker2View</class>
+ <widget class="QWidget" name="QmitkMovieMaker2View">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -10,46 +10,20 @@
     <x>0</x>
     <y>0</y>
     <width>320</width>
-    <height>480</height>
+    <height>640</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Movie Maker 2</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QLabel" name="animationsLabel">
-     <property name="text">
-      <string>Animations</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0" rowspan="3" colspan="3">
-      <widget class="QListView" name="animationListView">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>100</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>100</height>
-        </size>
-       </property>
-      </widget>
-     </item>
+    <layout class="QGridLayout" name="animationTreeViewLayout">
      <item row="0" column="3">
       <widget class="QToolButton" name="moveAnimationUpButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
         <string>Move animation up</string>
        </property>
@@ -70,6 +44,9 @@
      </item>
      <item row="1" column="3">
       <widget class="QToolButton" name="moveAnimationDownButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
         <string>Move animation down</string>
        </property>
@@ -110,6 +87,9 @@
      </item>
      <item row="3" column="1">
       <widget class="QToolButton" name="removeAnimationButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
         <string>Remove animation</string>
        </property>
@@ -128,14 +108,48 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="0" rowspan="3" colspan="3">
+      <widget class="QTreeView" name="animationTreeView">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="rootIsDecorated">
+        <bool>false</bool>
+       </property>
+       <property name="uniformRowHeights">
+        <bool>true</bool>
+       </property>
+       <attribute name="headerDefaultSectionSize">
+        <number>80</number>
+       </attribute>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
     <widget class="QGroupBox" name="animationGroupBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Animation</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="QLabel" name="startIconLabel">
         <property name="sizePolicy">
@@ -193,12 +207,12 @@
         </property>
         <item>
          <property name="text">
-          <string>With previous</string>
+          <string>After previous</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>After previous</string>
+          <string>With previous</string>
          </property>
         </item>
        </widget>
@@ -330,7 +344,15 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="animationWidgetGroupBox">
+     <layout class="QVBoxLayout" name="animationWidgetGroupBoxLayout"/>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="playbackAndRecordingGroupBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Playback &amp;&amp; Recording</string>
      </property>
@@ -360,6 +382,9 @@
       </item>
       <item>
        <widget class="QToolButton" name="stopButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="toolTip">
          <string>Stop</string>
         </property>
@@ -449,7 +474,7 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>animationListView</tabstop>
+  <tabstop>animationTreeView</tabstop>
   <tabstop>moveAnimationUpButton</tabstop>
   <tabstop>moveAnimationDownButton</tabstop>
   <tabstop>addAnimationButton</tabstop>

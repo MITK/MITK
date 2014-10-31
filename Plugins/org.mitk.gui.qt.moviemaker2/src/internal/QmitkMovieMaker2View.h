@@ -18,7 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkMovieMaker2View_h
 
 #include <QmitkAbstractView.h>
-#include <ui_QmitkMovieMaker2ViewControls.h>
+
+class QmitkAnimationItem;
+class QMenu;
+class QStandardItemModel;
+
+namespace Ui
+{
+  class QmitkMovieMaker2View;
+}
 
 class QmitkMovieMaker2View : public QmitkAbstractView
 {
@@ -33,8 +41,35 @@ public:
   void CreateQtPartControl(QWidget* parent);
   void SetFocus();
 
+private slots:
+  void OnMoveAnimationUpButtonClicked();
+  void OnMoveAnimationDownButtonClicked();
+  void OnAddAnimationButtonClicked();
+  void OnRemoveAnimationButtonClicked();
+  void OnAnimationTreeViewRowsInserted(const QModelIndex& parent, int start, int end);
+  void OnAnimationTreeViewRowsRemoved(const QModelIndex& parent, int start, int end);
+  void OnAnimationTreeViewSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+  void OnStartComboBoxCurrentIndexChanged(int index);
+  void OnDurationSpinBoxValueChanged(double value);
+  void OnDelaySpinBoxValueChanged(double value);
+
 private:
-  Ui::QmitkMovieMaker2ViewControls m_Controls;
+  void InitializeAnimationWidgets();
+  void InitializeAnimationTreeViewWidgets();
+  void InitializeAnimationModel();
+  void InitializeAddAnimationMenu();
+  void ConnectAnimationTreeViewWidgets();
+  void ConnectAnimationWidgets();
+  void UpdateWidgets();
+  void UpdateAnimationWidgets();
+  void HideCurrentAnimationWidget();
+  void ShowAnimationWidget(const QString& key);
+  QmitkAnimationItem* GetSelectedAnimationItem() const;
+
+  Ui::QmitkMovieMaker2View* m_Ui;
+  QStandardItemModel* m_AnimationModel;
+  QMap<QString, QWidget*> m_AnimationWidgets;
+  QMenu* m_AddAnimationMenu;
 };
 
 #endif

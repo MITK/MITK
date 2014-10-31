@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "mitkIGTTimeStamp.h"
 #include <itkMutexLockHolder.h>
 #include <itksys/SystemTools.hxx>
+#include <cstring>
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
@@ -225,25 +226,33 @@ bool mitk::IGTLDevice::TestConnection()
 
 bool mitk::IGTLDevice::CloseConnection()
 {
-  if (this->GetState() != Setup)
+  if (this->GetState() == Setup)
   {
+    return true;
+  }
+  else if (this->GetState() == Running)
+  {
+    this->StopCommunication();
+  }
+
+  m_Socket->CloseSocket();
 //    //init before closing to force the field generator from aurora to switch itself off
 //    m_DeviceProtocol->INIT();
 //    /* close the serial connection */
 //    m_SerialCommunication->CloseConnection();
 //    /* invalidate all tools */
 //    this->InvalidateAll();
-//    /* return to setup mode */
-//    this->SetState(Setup);
+  /* return to setup mode */
+  this->SetState(Setup);
 //    m_SerialCommunication = NULL;
-  }
   return true;
 }
 
 ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartCommunication(void* pInfoStruct)
 {
   /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
+  struct itk::MultiThreader::ThreadInfoStruct * pInfo =
+    (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
   if (pInfo == NULL)
   {
     return ITK_THREAD_RETURN_VALUE;
@@ -269,8 +278,8 @@ void mitk::IGTLDevice::RunCommunication()
   // keep lock until end of scope
   MutexLockHolder communicationFinishedLockHolder(*m_CommunicationFinishedMutex);
 
-  // Because m_StopCommunication is used by two threads, access has to be guarded by
-  // a mutex. To minimize thread locking, a local copy is used here
+  // Because m_StopCommunication is used by two threads, access has to be guarded
+  // by a mutex. To minimize thread locking, a local copy is used here
   bool localStopCommunication;
 
   // update the local copy of m_StopCommunication
@@ -280,6 +289,46 @@ void mitk::IGTLDevice::RunCommunication()
   while ((this->GetState() == Running) && (localStopCommunication == false))
   {
     //POLLLING
+    // Create a message buffer to receive header
+    igtl::MessageHeader::Pointer headerMsg;
+    headerMsg = igtl::MessageHeader::New();
+
+    // Initialize receive buffer
+    headerMsg->InitPack();
+
+    // Receive generic header from the socket
+    int r =
+      m_Socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize());
+
+    if(r == 0)
+    {
+      this->StopCommunication();
+    }
+    else if (r == headerMsg->GetPackSize())
+    {
+      // Deserialize the header
+      headerMsg->Unpack();
+
+      // Allocate a time stamp
+      igtl::TimeStamp::Pointer ts;
+      ts = igtl::TimeStamp::New();
+
+      // Get time stamp
+      igtlUint32 sec;
+      igtlUint32 nanosec;
+
+      headerMsg->GetTimeStamp(ts);
+      ts->GetTimeStamp(&sec, &nanosec);
+
+      std::cerr << "Time stamp: "
+                << sec << "."
+                << nanosec << std::endl;
+
+      if (strcmp(headerMsg->GetDeviceType(), "IMAGE") == 0)
+      {
+        //ReceiveImage(socket, headerMsg);
+      }
+    }
 
 //    m_MarkerPointsMutex->Lock(); // lock points data structure
 //    returnvalue = this->m_DeviceProtocol->POS3D(&m_MarkerPoints); // update points data structure with new position data from tracking device
@@ -311,7 +360,7 @@ bool mitk::IGTLDevice::StartCommunication()
   if (this->GetState() != Ready)
     return false;
 
-  this->SetState(Running);      // go to mode Tracking
+  this->SetState(Running);      // go to mode Running
   // update the local copy of m_StopCommunication
   this->m_StopCommunicationMutex->Lock();
   this->m_StopCommunication = false;
@@ -320,7 +369,7 @@ bool mitk::IGTLDevice::StartCommunication()
   // transfer the execution rights to tracking thread
   m_CommunicationFinishedMutex->Unlock();
 
-  // start a new thread that executes the TrackTools() method
+  // start a new thread that executes the communication
   m_ThreadID =
     m_MultiThreader->SpawnThread(this->ThreadStartCommunication, this);
 //  mitk::IGTTimeStamp::GetInstance()->Start(this);

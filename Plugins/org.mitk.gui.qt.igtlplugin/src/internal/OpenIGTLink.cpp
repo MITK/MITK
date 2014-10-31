@@ -64,13 +64,20 @@ void OpenIGTLink::ConnectWithServer()
 {
     if(m_Controls.butConnectWithServer->text() == "Connect")
     {
-        m_Controls.editIP->setEnabled(false);
-        m_Controls.editPort->setEnabled(false);
-        m_Controls.butConnectWithServer->setText("Disconnect");
-
         m_IGTLClient->SetPortNumber(m_Controls.editPort->text().toInt());
         m_IGTLClient->SetHostname(m_Controls.editIP->text().toStdString());
         m_IGTLClient->OpenConnection();
+        if ( m_IGTLClient->StartCommunication() )
+        {
+          m_Controls.editIP->setEnabled(false);
+          m_Controls.editPort->setEnabled(false);
+          m_Controls.butConnectWithServer->setText("Disconnect");
+        }
+        else
+        {
+          MITK_ERROR("OpenIGTLink") << "Could not start a communication with the"
+          "server. Please check the hostname and port.";
+        }
     }
     else
     {

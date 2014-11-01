@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkAnimationItem.h"
+#include "QmitkAnimationItemDelegate.h"
 #include "QmitkMovieMaker2View.h"
 #include "QmitkSliceAnimationWidget.h"
 #include <ui_QmitkMovieMaker2View.h>
@@ -74,7 +75,7 @@ void QmitkMovieMaker2View::InitializeAnimationModel()
   m_AnimationModel->setHorizontalHeaderLabels(QStringList() << "Animation" << "Timeline");
   m_Ui->animationTreeView->setModel(m_AnimationModel);
 
-  // TODO: Either make first column not editable or derive according animation widget from second column
+  m_Ui->animationTreeView->setItemDelegateForColumn(1, new QmitkAnimationItemDelegate(m_Ui->animationTreeView));
 }
 
 void QmitkMovieMaker2View::InitializeAddAnimationMenu()
@@ -160,7 +161,13 @@ void QmitkMovieMaker2View::OnAddAnimationButtonClicked()
   QAction* action = m_AddAnimationMenu->exec(QCursor::pos());
 
   if (action != NULL)
-    m_AnimationModel->appendRow(QList<QStandardItem*>() << new QStandardItem(action->text()) << new QmitkAnimationItem(2.0));
+  {
+    const QString widgetKey = action->text();
+
+    m_AnimationModel->appendRow(QList<QStandardItem*>()
+      << new QStandardItem(widgetKey)
+      << new QmitkAnimationItem(widgetKey, 2.0));
+  }
 }
 
 void QmitkMovieMaker2View::OnRemoveAnimationButtonClicked()
@@ -193,7 +200,10 @@ void QmitkMovieMaker2View::OnStartComboBoxCurrentIndexChanged(int index)
   QmitkAnimationItem* item = this->GetSelectedAnimationItem();
 
   if (item != NULL)
+  {
     item->SetStartWithPrevious(index);
+    this->RedrawTimeline();
+  }
 }
 
 void QmitkMovieMaker2View::OnDurationSpinBoxValueChanged(double value)
@@ -201,7 +211,10 @@ void QmitkMovieMaker2View::OnDurationSpinBoxValueChanged(double value)
   QmitkAnimationItem* item = this->GetSelectedAnimationItem();
 
   if (item != NULL)
+  {
     item->SetDuration(value);
+    this->RedrawTimeline();
+  }
 }
 
 void QmitkMovieMaker2View::OnDelaySpinBoxValueChanged(double value)
@@ -209,7 +222,10 @@ void QmitkMovieMaker2View::OnDelaySpinBoxValueChanged(double value)
   QmitkAnimationItem* item = this->GetSelectedAnimationItem();
 
   if (item != NULL)
+  {
     item->SetDelay(value);
+    this->RedrawTimeline();
+  }
 }
 
 void QmitkMovieMaker2View::UpdateWidgets()
@@ -233,7 +249,7 @@ void QmitkMovieMaker2View::UpdateWidgets()
     m_Ui->moveAnimationDownButton->setEnabled(rowCount > 1 && selectedRow < rowCount - 1);
     m_Ui->removeAnimationButton->setEnabled(true);
 
-    this->ShowAnimationWidget(m_AnimationModel->item(selectedRow)->text());
+    this->ShowAnimationWidget(m_AnimationModel->item(selectedRow, 1)->data(QmitkAnimationItem::WidgetKeyRole).toString());
   }
 
   this->UpdateAnimationWidgets();
@@ -290,6 +306,16 @@ void QmitkMovieMaker2View::ShowAnimationWidget(const QString& key)
   }
 
   m_Ui->animationWidgetGroupBox->setVisible(widget != NULL);
+}
+
+void QmitkMovieMaker2View::RedrawTimeline()
+{
+  if (m_AnimationModel->rowCount() > 1)
+  {
+    m_Ui->animationTreeView->dataChanged(
+      m_AnimationModel->index(0, 1),
+      m_AnimationModel->index(m_AnimationModel->rowCount() - 1, 1));
+  }
 }
 
 QmitkAnimationItem* QmitkMovieMaker2View::GetSelectedAnimationItem() const

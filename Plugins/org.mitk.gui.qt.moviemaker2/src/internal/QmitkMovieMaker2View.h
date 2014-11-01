@@ -64,6 +64,7 @@ private:
   void UpdateAnimationWidgets();
   void HideCurrentAnimationWidget();
   void ShowAnimationWidget(const QString& key);
+  void RedrawTimeline();
   QmitkAnimationItem* GetSelectedAnimationItem() const;
 
   Ui::QmitkMovieMaker2View* m_Ui;

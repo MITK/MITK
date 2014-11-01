@@ -24,13 +24,17 @@ class QmitkAnimationItem : public QStandardItem
 public:
   enum AnimationItemDataRole
   {
-    DurationRole = Qt::UserRole + 2,
+    WidgetKeyRole = Qt::UserRole + 2,
+    DurationRole,
     DelayRole,
     StartWithPreviousRole
   };
 
-  explicit QmitkAnimationItem(double duration, double delay = 0.0, bool startWithPrevious = false);
+  QmitkAnimationItem(const QString& widgetKey, double duration, double delay = 0.0, bool startWithPrevious = false);
   ~QmitkAnimationItem();
+
+  QString GetWidgetKey() const;
+  void SetWidgetKey(const QString& widgetKey);
 
   double GetDuration() const;
   void SetDuration(double duration);

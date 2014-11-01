@@ -4,6 +4,7 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_moviemaker2_Activator.cpp
   QmitkAnimationItem.cpp
+  QmitkAnimationItemDelegate.cpp
   QmitkMovieMaker2View.cpp
   QmitkSliceAnimationWidget.cpp
 )
@@ -15,6 +16,7 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_moviemaker2_Activator.h
+  src/internal/QmitkAnimationItemDelegate.h
   src/internal/QmitkMovieMaker2View.h
   src/internal/QmitkSliceAnimationWidget.h
 )

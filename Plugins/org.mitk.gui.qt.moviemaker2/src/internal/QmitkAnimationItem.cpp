@@ -16,8 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkAnimationItem.h"
 
-QmitkAnimationItem::QmitkAnimationItem(double duration, double delay, bool startWithPrevious)
+QmitkAnimationItem::QmitkAnimationItem(const QString& widgetKey, double duration, double delay, bool startWithPrevious)
 {
+  this->SetWidgetKey(widgetKey);
   this->SetDuration(duration);
   this->SetDelay(delay);
   this->SetStartWithPrevious(startWithPrevious);
@@ -27,6 +28,16 @@ QmitkAnimationItem::QmitkAnimationItem(double duration, double delay, bool start
 
 QmitkAnimationItem::~QmitkAnimationItem()
 {
+}
+
+QString QmitkAnimationItem::GetWidgetKey() const
+{
+  return this->data(WidgetKeyRole).toString();
+}
+
+void QmitkAnimationItem::SetWidgetKey(const QString& widgetKey)
+{
+  this->setData(widgetKey, WidgetKeyRole);
 }
 
 double QmitkAnimationItem::GetDuration() const

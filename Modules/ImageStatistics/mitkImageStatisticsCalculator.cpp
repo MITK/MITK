@@ -744,15 +744,15 @@ ImageStatisticsCalculator::GetBinsAndFreuqencyForHistograms( unsigned int timeSt
   const HistogramType *binsAndFrequencyToCalculate = this->GetHistogram(0);
 
   // ToDo: map should be created on stack not on heap
-  std::map<int, double> *returnedHistogramMap;
+  std::map<int, double> returnedHistogramMap;
 
   unsigned int size = binsAndFrequencyToCalculate->Size();
   for( unsigned int bin=0; bin < size; ++bin )
   {
     double frequency = binsAndFrequencyToCalculate->GetFrequency( bin, 0 );
-    if( frequency < mitk::eps )
+    if( frequency > mitk::eps )
     {
-      returnedHistogramMap.insert( std::pair<int, double>(binsAndFrequencyToCalculate->GetMeasurement( bin, 0 ), frequency ) );
+      returnedHistogramMap.insert( std::pair<int, double>(binsAndFrequencyToCalculate->GetMeasurement( bin, 0 ), binsAndFrequencyToCalculate->GetFrequency( bin, 0 ) ) );
     }
   }
 

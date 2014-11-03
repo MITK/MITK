@@ -106,7 +106,7 @@ namespace itk
     double variance = GetVariance();
     double mean = GetMean();
 
-    computeTheSkewnessAndCurtosis();
+    ComputeTheSkewnessAndCurtosis();
 
   }
 
@@ -114,7 +114,7 @@ namespace itk
   template< class TInputImage >
   void
     ExtendedStatisticsImageFilter< TInputImage >
-    ::computeTheSkewnessAndCurtosis()
+    ::ComputeTheSkewnessAndCurtosis()
   {
     RealType mean = GetMean();
     RealType sigma = GetSigma();

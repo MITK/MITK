@@ -88,6 +88,11 @@ namespace mitk {
       IGTLDeviceState GetState() const;
 
       /**
+       * \brief Returns the latest received message
+       */
+      igtl::MessageBase* GetLatestMessage();
+
+      /**
        * \brief return device data
        */
 //      igtl::MessageBase::Pointer GetData() const;

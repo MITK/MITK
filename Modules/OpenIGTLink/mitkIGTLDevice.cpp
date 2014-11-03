@@ -422,3 +422,8 @@ bool mitk::IGTLDevice::CloseConnection()
 //    m_SerialCommunication = NULL;
   return true;
 }
+
+igtl::MessageBase* mitk::IGTLDevice::GetLatestMessage()
+{
+  return igtl::MessageBase::New();
+}

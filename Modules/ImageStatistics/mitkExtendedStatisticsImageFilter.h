@@ -31,7 +31,9 @@ namespace itk
 /**
 * \class ExtendedStatisticsImageFilter
 * \brief
-*
+* this class inherits from the itkStatisticsImageFilter and
+* calculate with the Results of the Statistics two new coefficients:
+* the Skewness and Kurtosis. Both will be added in this new class
 */
 template< class TInputImage >
 class ImageStatistics_EXPORT ExtendedStatisticsImageFilter : public StatisticsImageFilter< TInputImage >
@@ -61,7 +63,7 @@ public:
   const RealObjectType* GetSkewnessOutput() const;
 
 
-  /** Return the computed Kurtosis. */
+  /*Return the computed Kurtosis. */
   RealType GetKurtosis() const
   {
     return this->GetKurtosisOutput()->Get();
@@ -73,8 +75,10 @@ public:
 
   virtual DataObject::Pointer MakeOutput( ProcessObject::DataObjectPointerArraySizeType idx );
 
-  /**
-  * \brief Compute the Skewness Curtosis.
+  /*brief
+  * Compute the Skewness Kurtosis.
+  * the Skewness and Kurtosis will be calculated with the Sigma and Mean Value of the
+  * itkStatisticsImageFilter which comes out of the threaded Generate Data
   */
   void ComputeTheSkewnessAndCurtosis();
 

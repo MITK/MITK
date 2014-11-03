@@ -38,6 +38,26 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <item>
+      <property name="text">
+       <string>Axial</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Sagittal</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Coronal</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>3D</string>
+      </property>
+     </item>
     </widget>
    </item>
    <item row="1" column="0">

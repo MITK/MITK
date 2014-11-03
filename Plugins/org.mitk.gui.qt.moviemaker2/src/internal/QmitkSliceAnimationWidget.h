@@ -17,14 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkSliceAnimationWidget_h
 #define QmitkSliceAnimationWidget_h
 
-#include <QWidget>
+#include "QmitkAnimationWidget.h"
+
+class QmitkSliceAnimationItem;
 
 namespace Ui
 {
   class QmitkSliceAnimationWidget;
 }
 
-class QmitkSliceAnimationWidget : public QWidget
+class QmitkSliceAnimationWidget : public QmitkAnimationWidget
 {
   Q_OBJECT
 
@@ -32,8 +34,17 @@ public:
   explicit QmitkSliceAnimationWidget(QWidget* parent = NULL);
   ~QmitkSliceAnimationWidget();
 
+  void SetAnimationItem(QmitkAnimationItem* sliceAnimationItem);
+
+private slots:
+  void OnRenderWindowChanged(int renderWindow);
+  void OnFromChanged(double from);
+  void OnToChanged(double to);
+  void OnReverseChanged(bool reverse);
+
 private:
   Ui::QmitkSliceAnimationWidget* m_Ui;
+  QmitkSliceAnimationItem* m_AnimationItem;
 };
 
 #endif

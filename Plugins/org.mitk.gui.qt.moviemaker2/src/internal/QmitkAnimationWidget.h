@@ -14,22 +14,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkOrbitAnimationItem_h
-#define QmitkOrbitAnimationItem_h
+#ifndef QmitkAnimationWidget_h
+#define QmitkAnimationWidget_h
 
-#include "QmitkAnimationItem.h"
+#include <QWidget>
 
-class QmitkOrbitAnimationItem : public QmitkAnimationItem
+class QmitkAnimationItem;
+
+class QmitkAnimationWidget : public QWidget
 {
+  Q_OBJECT
+
 public:
-  QmitkOrbitAnimationItem(double angle, bool reverse, double duration = 2.0, double delay = 0.0, bool startWithPrevious = false);
-  virtual ~QmitkOrbitAnimationItem();
+  explicit QmitkAnimationWidget(QWidget* parent = NULL);
+  virtual ~QmitkAnimationWidget();
 
-  int GetAngle() const;
-  void SetAngle(int angle);
-
-  bool GetReverse() const;
-  void SetReverse(bool reverse);
+  virtual void SetAnimationItem(QmitkAnimationItem* animationItem) = 0;
 };
 
 #endif

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>304</width>
-    <height>96</height>
+    <width>345</width>
+    <height>63</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,32 +15,6 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QLabel" name="windowLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Window:</string>
-     </property>
-     <property name="buddy">
-      <cstring>windowComboBox</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1" colspan="2">
-    <widget class="QComboBox" name="windowComboBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
     <widget class="QLabel" name="angleLabel">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -51,22 +25,48 @@
      <property name="text">
       <string>Angle:</string>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="1" colspan="2">
-    <widget class="ctkDoubleSlider" name="angleSlider">
-     <property name="value">
-      <double>360.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>360.000000000000000</double>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+     <property name="buddy">
+      <cstring>angleSlider</cstring>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="0" column="1" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QSlider" name="angleSlider">
+       <property name="maximum">
+        <number>360</number>
+       </property>
+       <property name="value">
+        <number>360</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="angleSpinBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="suffix">
+        <string>°</string>
+       </property>
+       <property name="maximum">
+        <number>360</number>
+       </property>
+       <property name="value">
+        <number>360</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="1">
     <widget class="QCheckBox" name="reverseCheckBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -81,15 +81,9 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>ctkDoubleSlider</class>
-   <extends>QWidget</extends>
-   <header>ctkDoubleSlider.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
-  <tabstop>windowComboBox</tabstop>
+  <tabstop>angleSlider</tabstop>
+  <tabstop>angleSpinBox</tabstop>
   <tabstop>reverseCheckBox</tabstop>
  </tabstops>
  <resources/>

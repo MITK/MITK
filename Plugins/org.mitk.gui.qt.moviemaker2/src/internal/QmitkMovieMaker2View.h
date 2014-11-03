@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 class QmitkAnimationItem;
+class QmitkAnimationWidget;
 class QMenu;
 class QStandardItemModel;
 
@@ -67,13 +68,13 @@ private:
   void UpdateWidgets();
   void UpdateAnimationWidgets();
   void HideCurrentAnimationWidget();
-  void ShowAnimationWidget(const QString& key);
+  void ShowAnimationWidget(QmitkAnimationItem* animationItem);
   void RedrawTimeline();
   QmitkAnimationItem* GetSelectedAnimationItem() const;
 
   Ui::QmitkMovieMaker2View* m_Ui;
   QStandardItemModel* m_AnimationModel;
-  QMap<QString, QWidget*> m_AnimationWidgets;
+  QMap<QString, QmitkAnimationWidget*> m_AnimationWidgets;
   QMenu* m_AddAnimationMenu;
   QMenu* m_RecordMenu;
 };

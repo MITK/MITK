@@ -28,6 +28,7 @@ public:
     DurationRole,
     DelayRole,
     StartWithPreviousRole,
+    RenderWindowRole,
     FromRole,
     ToRole,
     ReverseRole,

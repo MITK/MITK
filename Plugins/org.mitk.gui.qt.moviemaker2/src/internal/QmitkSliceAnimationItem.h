@@ -22,8 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkSliceAnimationItem : public QmitkAnimationItem
 {
 public:
-  QmitkSliceAnimationItem(int from, int to, bool reverse, double duration = 2.0, double delay = 0.0, bool startWithPrevious = false);
+  QmitkSliceAnimationItem(int renderWindow, int from, int to, bool reverse, double duration = 2.0, double delay = 0.0, bool startWithPrevious = false);
   virtual ~QmitkSliceAnimationItem();
+
+  int GetRenderWindow() const;
+  void SetRenderWindow(int renderWindow);
 
   int GetFrom() const;
   void SetFrom(int from);

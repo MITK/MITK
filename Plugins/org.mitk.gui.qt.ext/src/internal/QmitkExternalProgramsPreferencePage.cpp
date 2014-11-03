@@ -44,6 +44,7 @@ QmitkExternalProgramsPreferencePage::QmitkExternalProgramsPreferencePage()
   : m_Preferences(GetPreferences()),
     m_Ui(new Ui::QmitkExternalProgramsPreferencePage),
     m_Control(NULL),
+    m_FFmpegProcess(NULL),
     m_GnuplotProcess(NULL)
 {
 }
@@ -55,9 +56,14 @@ QmitkExternalProgramsPreferencePage::~QmitkExternalProgramsPreferencePage()
 void QmitkExternalProgramsPreferencePage::CreateQtControl(QWidget* parent)
 {
   m_Control = new QWidget(parent);
+  m_FFmpegProcess = new QProcess(m_Control);
   m_GnuplotProcess = new QProcess(m_Control);
 
   m_Ui->setupUi(m_Control);
+
+  connect(m_FFmpegProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(OnFFmpegProcessError(QProcess::ProcessError)));
+  connect(m_FFmpegProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(OnFFmpegProcessFinished(int, QProcess::ExitStatus)));
+  connect(m_Ui->ffmpegButton, SIGNAL(clicked()), this, SLOT(OnFFmpegButtonClicked()));
 
   connect(m_GnuplotProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(OnGnuplotProcessError(QProcess::ProcessError)));
   connect(m_GnuplotProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(OnGnuplotProcessFinished(int, QProcess::ExitStatus)));
@@ -66,9 +72,52 @@ void QmitkExternalProgramsPreferencePage::CreateQtControl(QWidget* parent)
   this->Update();
 }
 
+void QmitkExternalProgramsPreferencePage::OnFFmpegButtonClicked()
+{
+  QString filter = "FFmpeg executable ";
+
+#if defined(WIN32)
+  filter += "(ffmpeg.exe)";
+#else
+  filter += "(ffmpeg)";
+#endif
+
+  QString ffmpegPath = QFileDialog::getOpenFileName(m_Control, "FFmpeg", "", filter);
+
+  if (!ffmpegPath.isEmpty())
+  {
+    m_FFmpegPath = ffmpegPath;
+    m_FFmpegProcess->start(ffmpegPath, QStringList() << "-version", QProcess::ReadOnly);
+  }
+}
+
+void QmitkExternalProgramsPreferencePage::OnFFmpegProcessError(QProcess::ProcessError)
+{
+  m_FFmpegPath.clear();
+  m_Ui->ffmpegLineEdit->clear();
+}
+
+void QmitkExternalProgramsPreferencePage::OnFFmpegProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+  if (exitStatus == QProcess::NormalExit && exitCode == 0)
+  {
+    QString version = QTextCodec::codecForName("UTF-8")->toUnicode(m_FFmpegProcess->readAllStandardOutput()).trimmed();
+
+    if (version.startsWith("ffmpeg"))
+    {
+      version = version.section(' ', 0, 2, QString::SectionSkipEmpty);
+      m_Ui->ffmpegLineEdit->setText(QString("%1 (%2)").arg(m_FFmpegPath).arg(version));
+      return;
+    }
+  }
+
+  m_FFmpegPath.clear();
+  m_Ui->ffmpegLineEdit->clear();
+}
+
 void QmitkExternalProgramsPreferencePage::OnGnuplotButtonClicked()
 {
-  QString filter = "Gnuplot executable ";
+  QString filter = "gnuplot executable ";
 
 #if defined(WIN32)
   filter += "(gnuplot.exe)";
@@ -99,7 +148,7 @@ void QmitkExternalProgramsPreferencePage::OnGnuplotProcessFinished(int exitCode,
 
     if (version.startsWith("gnuplot"))
     {
-      m_Ui->gnuplotLineEdit->setText(QString("%1 (%2)").arg(m_GnuplotPath).arg(version.trimmed()));
+      m_Ui->gnuplotLineEdit->setText(QString("%1 (%2)").arg(m_GnuplotPath).arg(version));
       return;
     }
   }
@@ -123,12 +172,18 @@ void QmitkExternalProgramsPreferencePage::PerformCancel()
 
 bool QmitkExternalProgramsPreferencePage::PerformOk()
 {
+  m_Preferences->Put("ffmpeg", m_FFmpegPath.toStdString());
   m_Preferences->Put("gnuplot", m_GnuplotPath.toStdString());
   return true;
 }
 
 void QmitkExternalProgramsPreferencePage::Update()
 {
+  m_FFmpegPath = QString::fromStdString(m_Preferences->Get("ffmpeg", ""));
+
+  if (!m_FFmpegPath.isEmpty())
+    m_FFmpegProcess->start(m_FFmpegPath, QStringList() << "-version", QProcess::ReadOnly);
+
   m_GnuplotPath = QString::fromStdString(m_Preferences->Get("gnuplot", ""));
 
   if (!m_GnuplotPath.isEmpty())

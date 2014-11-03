@@ -16,9 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSliceAnimationItem.h"
 
-QmitkSliceAnimationItem::QmitkSliceAnimationItem(int from, int to, bool reverse, double duration, double delay, bool startWithPrevious)
+QmitkSliceAnimationItem::QmitkSliceAnimationItem(int renderWindow, int from, int to, bool reverse, double duration, double delay, bool startWithPrevious)
   : QmitkAnimationItem("Slice", duration, delay, startWithPrevious)
 {
+  this->SetRenderWindow(renderWindow);
   this->SetFrom(from);
   this->SetTo(to);
   this->SetReverse(reverse);
@@ -26,6 +27,16 @@ QmitkSliceAnimationItem::QmitkSliceAnimationItem(int from, int to, bool reverse,
 
 QmitkSliceAnimationItem::~QmitkSliceAnimationItem()
 {
+}
+
+int QmitkSliceAnimationItem::GetRenderWindow() const
+{
+  return this->data(RenderWindowRole).toInt();
+}
+
+void QmitkSliceAnimationItem::SetRenderWindow(int renderWindow)
+{
+  this->setData(renderWindow, RenderWindowRole);
 }
 
 int QmitkSliceAnimationItem::GetFrom() const

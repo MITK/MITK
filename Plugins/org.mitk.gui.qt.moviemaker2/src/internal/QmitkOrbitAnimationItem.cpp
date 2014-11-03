@@ -27,12 +27,12 @@ QmitkOrbitAnimationItem::~QmitkOrbitAnimationItem()
 {
 }
 
-double QmitkOrbitAnimationItem::GetAngle() const
+int QmitkOrbitAnimationItem::GetAngle() const
 {
-  return this->data(AngleRole).toDouble();
+  return this->data(AngleRole).toInt();
 }
 
-void QmitkOrbitAnimationItem::SetAngle(double angle)
+void QmitkOrbitAnimationItem::SetAngle(int angle)
 {
   this->setData(angle, AngleRole);
 }

@@ -17,14 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkOrbitAnimationWidget_h
 #define QmitkOrbitAnimationWidget_h
 
-#include <QWidget>
+#include "QmitkAnimationWidget.h"
+
+class QmitkOrbitAnimationItem;
 
 namespace Ui
 {
   class QmitkOrbitAnimationWidget;
 }
 
-class QmitkOrbitAnimationWidget : public QWidget
+class QmitkOrbitAnimationWidget : public QmitkAnimationWidget
 {
   Q_OBJECT
 
@@ -32,8 +34,15 @@ public:
   explicit QmitkOrbitAnimationWidget(QWidget* parent = NULL);
   ~QmitkOrbitAnimationWidget();
 
+  void SetAnimationItem(QmitkAnimationItem* orbitAnimationItem);
+
+private slots:
+  void OnAngleChanged(int angle);
+  void OnReverseChanged(bool reverse);
+
 private:
   Ui::QmitkOrbitAnimationWidget* m_Ui;
+  QmitkOrbitAnimationItem* m_AnimationItem;
 };
 
 #endif

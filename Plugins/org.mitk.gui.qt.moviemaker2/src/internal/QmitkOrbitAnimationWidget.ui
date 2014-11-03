@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkSliceAnimationWidget</class>
- <widget class="QWidget" name="QmitkSliceAnimationWidget">
+ <class>QmitkOrbitAnimationWidget</class>
+ <widget class="QWidget" name="QmitkOrbitAnimationWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>QmitkSliceAnimationWidget</string>
+   <string>QmitkOrbitAnimationWidget</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -41,7 +41,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="sliceRangeLabel">
+    <widget class="QLabel" name="angleLabel">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -49,20 +49,20 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Slice range:</string>
+      <string>Angle:</string>
      </property>
     </widget>
    </item>
    <item row="1" column="1" colspan="2">
-    <widget class="ctkRangeWidget" name="sliceRangeWidget">
-     <property name="decimals">
-      <number>0</number>
+    <widget class="ctkDoubleSlider" name="angleSlider">
+     <property name="value">
+      <double>360.000000000000000</double>
      </property>
      <property name="maximum">
-      <double>999.000000000000000</double>
+      <double>360.000000000000000</double>
      </property>
-     <property name="maximumValue">
-      <double>999.000000000000000</double>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
@@ -83,9 +83,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ctkRangeWidget</class>
+   <class>ctkDoubleSlider</class>
    <extends>QWidget</extends>
-   <header>ctkRangeWidget.h</header>
+   <header>ctkDoubleSlider.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

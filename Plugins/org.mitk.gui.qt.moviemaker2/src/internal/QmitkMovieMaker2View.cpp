@@ -14,20 +14,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkAnimationItem.h"
 #include "QmitkAnimationItemDelegate.h"
 #include "QmitkMovieMaker2View.h"
+#include "QmitkOrbitAnimationItem.h"
+#include "QmitkOrbitAnimationWidget.h"
+#include "QmitkSliceAnimationItem.h"
 #include "QmitkSliceAnimationWidget.h"
 #include <ui_QmitkMovieMaker2View.h>
 #include <QMenu>
+#include <QMessageBox>
 #include <QStandardItemModel>
+#include <mitkBaseRenderer.h>
+
+static QmitkOrbitAnimationItem* CreateDefaultOrbitAnimation()
+{
+  return new QmitkOrbitAnimationItem(360.0, false);
+}
+
+static QmitkSliceAnimationItem* CreateDefaultSliceAnimation()
+{
+  return new QmitkSliceAnimationItem(0, 0, false);
+}
+
+static QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
+{
+  if (widgetKey == "Orbit")
+    return CreateDefaultOrbitAnimation();
+
+  if (widgetKey == "Slice")
+    return CreateDefaultSliceAnimation();
+
+  return NULL;
+}
+
+static QString GetPrettyRenderWindowName(const QString& name)
+{
+  QMap<QString, QString> map;
+  map["stdmulti.widget1"] = "Axial";
+  map["stdmulti.widget2"] = "Sagittal";
+  map["stdmulti.widget3"] = "Coronal";
+  map["stdmulti.widget4"] = "3D";
+
+  return map.contains(name)
+    ? map[name]
+    : name;
+}
 
 const std::string QmitkMovieMaker2View::VIEW_ID = "org.mitk.views.moviemaker2";
 
 QmitkMovieMaker2View::QmitkMovieMaker2View()
   : m_Ui(new Ui::QmitkMovieMaker2View),
     m_AnimationModel(NULL),
-    m_AddAnimationMenu(NULL)
+    m_AddAnimationMenu(NULL),
+    m_RecordMenu(NULL)
 {
 }
 
@@ -41,13 +80,14 @@ void QmitkMovieMaker2View::CreateQtPartControl(QWidget* parent)
 
   this->InitializeAnimationWidgets();
   this->InitializeAnimationTreeViewWidgets();
+  this->InitializePlaybackAndRecordWidgets();
 
   m_Ui->animationWidgetGroupBox->setVisible(false);
 }
 
 void QmitkMovieMaker2View::InitializeAnimationWidgets()
 {
-  m_AnimationWidgets["Orbit"] = NULL;
+  m_AnimationWidgets["Orbit"] = new QmitkOrbitAnimationWidget;
   m_AnimationWidgets["Slice"] = new QmitkSliceAnimationWidget;
 
   Q_FOREACH(QWidget* widget, m_AnimationWidgets.values())
@@ -69,6 +109,11 @@ void QmitkMovieMaker2View::InitializeAnimationTreeViewWidgets()
   this->ConnectAnimationTreeViewWidgets();
 }
 
+void QmitkMovieMaker2View::InitializePlaybackAndRecordWidgets()
+{
+  this->ConnectPlaybackAndRecordWidgets();
+}
+
 void QmitkMovieMaker2View::InitializeAnimationModel()
 {
   m_AnimationModel = new QStandardItemModel(m_Ui->animationTreeView);
@@ -85,6 +130,27 @@ void QmitkMovieMaker2View::InitializeAddAnimationMenu()
   Q_FOREACH(const QString& key, m_AnimationWidgets.keys())
   {
     m_AddAnimationMenu->addAction(key);
+  }
+}
+
+void QmitkMovieMaker2View::InitializeRecordMenu()
+{
+  if (m_RecordMenu == NULL)
+  {
+    m_RecordMenu = new QMenu(m_Ui->recordButton);
+  }
+  else
+  {
+    m_RecordMenu->clear();
+  }
+
+  const mitk::RenderingManager::RenderWindowVector& renderWindows
+    = mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
+
+  Q_FOREACH(const mitk::RenderingManager::RenderWindowVector::value_type renderWindow, renderWindows)
+  {
+    QString name = mitk::BaseRenderer::GetInstance(renderWindow)->GetName();
+    m_RecordMenu->addAction(GetPrettyRenderWindowName(name));
   }
 }
 
@@ -122,6 +188,12 @@ void QmitkMovieMaker2View::ConnectAnimationWidgets()
 
   this->connect(m_Ui->delaySpinBox, SIGNAL(valueChanged(double)),
     this, SLOT(OnDelaySpinBoxValueChanged(double)));
+}
+
+void QmitkMovieMaker2View::ConnectPlaybackAndRecordWidgets()
+{
+  this->connect(m_Ui->recordButton, SIGNAL(clicked()),
+    this, SLOT(OnRecordButtonClicked()));
 }
 
 void QmitkMovieMaker2View::SetFocus()
@@ -166,7 +238,24 @@ void QmitkMovieMaker2View::OnAddAnimationButtonClicked()
 
     m_AnimationModel->appendRow(QList<QStandardItem*>()
       << new QStandardItem(widgetKey)
-      << new QmitkAnimationItem(widgetKey, 2.0));
+      << CreateDefaultAnimation(widgetKey));
+
+    m_Ui->playbackAndRecordingGroupBox->setEnabled(true);
+  }
+}
+
+void QmitkMovieMaker2View::OnRecordButtonClicked()
+{
+  this->InitializeRecordMenu();
+
+  if (m_RecordMenu->isEmpty())
+    QMessageBox::warning(NULL, QString::fromStdString(this->GetPartName()), "Could not find any render window.");
+
+  QAction* action = m_RecordMenu->exec(QCursor::pos());
+
+  if (action != NULL)
+  {
+    // TODO
   }
 }
 
@@ -175,7 +264,13 @@ void QmitkMovieMaker2View::OnRemoveAnimationButtonClicked()
   const QItemSelection selection = m_Ui->animationTreeView->selectionModel()->selection();
 
   if (!selection.isEmpty())
+  {
     m_AnimationModel->removeRow(selection[0].top());
+  }
+  else
+  {
+    m_Ui->playbackAndRecordingGroupBox->setEnabled(false);
+  }
 }
 
 void QmitkMovieMaker2View::OnAnimationTreeViewRowsInserted(const QModelIndex& parent, int start, int)
@@ -279,18 +374,16 @@ void QmitkMovieMaker2View::HideCurrentAnimationWidget()
   {
     m_Ui->animationWidgetGroupBox->setVisible(false);
 
-    if (m_Ui->animationWidgetGroupBoxLayout->count() > 0)
-      m_Ui->animationWidgetGroupBoxLayout->itemAt(0)->widget()->setVisible(false);
+    int numWidgets = m_Ui->animationWidgetGroupBoxLayout->count();
+
+    for (int i = 0; i < numWidgets; ++i)
+      m_Ui->animationWidgetGroupBoxLayout->itemAt(i)->widget()->setVisible(false);
   }
 }
 
 void QmitkMovieMaker2View::ShowAnimationWidget(const QString& key)
 {
-  if (m_Ui->animationWidgetGroupBox->isVisible())
-  {
-    if (m_Ui->animationWidgetGroupBoxLayout->count() > 0)
-      m_Ui->animationWidgetGroupBoxLayout->itemAt(0)->widget()->setVisible(false);
-  }
+  this->HideCurrentAnimationWidget();
 
   QWidget* widget = NULL;
 

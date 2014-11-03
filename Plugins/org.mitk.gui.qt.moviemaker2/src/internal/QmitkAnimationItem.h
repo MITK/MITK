@@ -27,11 +27,15 @@ public:
     WidgetKeyRole = Qt::UserRole + 2,
     DurationRole,
     DelayRole,
-    StartWithPreviousRole
+    StartWithPreviousRole,
+    FromRole,
+    ToRole,
+    ReverseRole,
+    AngleRole
   };
 
-  QmitkAnimationItem(const QString& widgetKey, double duration, double delay = 0.0, bool startWithPrevious = false);
-  ~QmitkAnimationItem();
+  explicit QmitkAnimationItem(const QString& widgetKey, double duration = 2.0, double delay = 0.0, bool startWithPrevious = false);
+  virtual ~QmitkAnimationItem();
 
   QString GetWidgetKey() const;
   void SetWidgetKey(const QString& widgetKey);

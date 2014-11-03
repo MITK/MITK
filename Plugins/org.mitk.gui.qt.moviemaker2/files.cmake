@@ -6,11 +6,15 @@ set(INTERNAL_CPP_FILES
   QmitkAnimationItem.cpp
   QmitkAnimationItemDelegate.cpp
   QmitkMovieMaker2View.cpp
+  QmitkOrbitAnimationItem.cpp
+  QmitkOrbitAnimationWidget.cpp
+  QmitkSliceAnimationItem.cpp
   QmitkSliceAnimationWidget.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkMovieMaker2View.ui
+  src/internal/QmitkOrbitAnimationWidget.ui
   src/internal/QmitkSliceAnimationWidget.ui
 )
 
@@ -18,6 +22,7 @@ set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_moviemaker2_Activator.h
   src/internal/QmitkAnimationItemDelegate.h
   src/internal/QmitkMovieMaker2View.h
+  src/internal/QmitkOrbitAnimationWidget.h
   src/internal/QmitkSliceAnimationWidget.h
 )
 

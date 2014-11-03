@@ -60,7 +60,7 @@ void QmitkAnimationItemDelegate::paint(QPainter* painter, const QStyleOptionView
       thisStart = previousStart;
   }
 
-  QColor color("DarkKhaki");
+  QColor color("CornflowerBlue");
 
   painter->setBrush(color);
   painter->setPen(Qt::NoPen);

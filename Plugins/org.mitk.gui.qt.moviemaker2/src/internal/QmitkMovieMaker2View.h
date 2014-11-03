@@ -52,14 +52,18 @@ private slots:
   void OnStartComboBoxCurrentIndexChanged(int index);
   void OnDurationSpinBoxValueChanged(double value);
   void OnDelaySpinBoxValueChanged(double value);
+  void OnRecordButtonClicked();
 
 private:
   void InitializeAnimationWidgets();
   void InitializeAnimationTreeViewWidgets();
   void InitializeAnimationModel();
   void InitializeAddAnimationMenu();
+  void InitializePlaybackAndRecordWidgets();
+  void InitializeRecordMenu();
   void ConnectAnimationTreeViewWidgets();
   void ConnectAnimationWidgets();
+  void ConnectPlaybackAndRecordWidgets();
   void UpdateWidgets();
   void UpdateAnimationWidgets();
   void HideCurrentAnimationWidget();
@@ -71,6 +75,7 @@ private:
   QStandardItemModel* m_AnimationModel;
   QMap<QString, QWidget*> m_AnimationWidgets;
   QMenu* m_AddAnimationMenu;
+  QMenu* m_RecordMenu;
 };
 
 #endif

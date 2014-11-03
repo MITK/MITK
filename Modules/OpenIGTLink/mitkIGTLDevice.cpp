@@ -33,6 +33,7 @@ mitk::IGTLDevice::IGTLDevice() :
 {
   m_StopCommunicationMutex = itk::FastMutexLock::New();
   m_StateMutex = itk::FastMutexLock::New();
+  m_SocketMutex = itk::FastMutexLock::New();
   m_CommunicationFinishedMutex = itk::FastMutexLock::New();
   // execution rights are owned by the application thread at the beginning
   m_CommunicationFinishedMutex->Lock();
@@ -88,27 +89,6 @@ void mitk::IGTLDevice::SetState( IGTLDeviceState state )
 //void mitk::IGTLDevice::SetData(mitk::IGTLDeviceData data){
 //  m_Data = data;
 //}
-
-
-bool mitk::IGTLDevice::StopCommunication()
-{
-  if (this->GetState() == Running) // Only if the object is in the correct state
-  {
-    // m_StopCommunication is used by two threads, so we have to ensure correct
-    // thread handling
-    m_StopCommunicationMutex->Lock();
-    m_StopCommunication = true;
-    m_StopCommunicationMutex->Unlock();
-    // we have to wait here that the other thread recognizes the STOP-command
-    // and executes it
-    m_CommunicationFinishedMutex->Lock();
-//    mitk::IGTTimeStamp::GetInstance()->Stop(this); // notify realtime clock
-    // StopTracking was called, thus the mode should be changed back
-    // to Ready now that the tracking loop has ended.
-    this->SetState(Ready);
-  }
-  return true;
-}
 
 
 bool mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
@@ -224,30 +204,6 @@ bool mitk::IGTLDevice::TestConnection()
 }
 
 
-bool mitk::IGTLDevice::CloseConnection()
-{
-  if (this->GetState() == Setup)
-  {
-    return true;
-  }
-  else if (this->GetState() == Running)
-  {
-    this->StopCommunication();
-  }
-
-  m_Socket->CloseSocket();
-//    //init before closing to force the field generator from aurora to switch itself off
-//    m_DeviceProtocol->INIT();
-//    /* close the serial connection */
-//    m_SerialCommunication->CloseConnection();
-//    /* invalidate all tools */
-//    this->InvalidateAll();
-  /* return to setup mode */
-  this->SetState(Setup);
-//    m_SerialCommunication = NULL;
-  return true;
-}
-
 ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartCommunication(void* pInfoStruct)
 {
   /* extract this pointer from Thread Info structure */
@@ -297,37 +253,58 @@ void mitk::IGTLDevice::RunCommunication()
     headerMsg->InitPack();
 
     // Receive generic header from the socket
+    this->m_SocketMutex->Lock();
     int r =
-      m_Socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize());
+      m_Socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize(),1);
+    this->m_SocketMutex->Unlock();
 
     if(r == 0)
     {
-      this->StopCommunication();
+      //this->StopCommunication();
+      // an error was received, therefor the communication must be stopped
+      m_StopCommunicationMutex->Lock();
+      m_StopCommunication = true;
+      m_StopCommunicationMutex->Unlock();
     }
     else if (r == headerMsg->GetPackSize())
     {
-      // Deserialize the header
-      headerMsg->Unpack();
-
-      // Allocate a time stamp
-      igtl::TimeStamp::Pointer ts;
-      ts = igtl::TimeStamp::New();
-
-      // Get time stamp
-      igtlUint32 sec;
-      igtlUint32 nanosec;
-
-      headerMsg->GetTimeStamp(ts);
-      ts->GetTimeStamp(&sec, &nanosec);
-
-      std::cerr << "Time stamp: "
-                << sec << "."
-                << nanosec << std::endl;
-
-      if (strcmp(headerMsg->GetDeviceType(), "IMAGE") == 0)
+      // Deserialize the header and check the CRC
+      int crcCheck = headerMsg->Unpack(1);
+      if (crcCheck & igtl::MessageHeader::UNPACK_HEADER)
       {
-        //ReceiveImage(socket, headerMsg);
+        // Allocate a time stamp
+        igtl::TimeStamp::Pointer ts;
+        ts = igtl::TimeStamp::New();
+
+        // Get time stamp
+        igtlUint32 sec;
+        igtlUint32 nanosec;
+
+        headerMsg->GetTimeStamp(ts);
+        ts->GetTimeStamp(&sec, &nanosec);
+
+        //check for invalid timestamps
+        if(sec != 0)
+        {
+          std::cerr << "Time stamp: "
+                    << sec << "."
+                    << nanosec << std::endl;
+
+          std::cerr << "Dev type and name: " << headerMsg->GetDeviceType() << " "
+            << headerMsg->GetDeviceName() << std::endl;
+
+          headerMsg->Print(std::cout);
+
+          if (strcmp(headerMsg->GetDeviceType(), "IMAGE") == 0)
+          {
+            //ReceiveImage(socket, headerMsg);
+          }
+        }
       }
+    }
+    else
+    {
+      //Message size information and actual data size don't match.
     }
 
 //    m_MarkerPointsMutex->Lock(); // lock points data structure
@@ -344,9 +321,10 @@ void mitk::IGTLDevice::RunCommunication()
 
     itksys::SystemTools::Delay(1);
   }
-  // StopTracking was called, thus the mode should be changed back to Ready now
+  // StopCommunication was called, thus the mode should be changed back to Ready now
   // that the tracking loop has ended.
   this->SetState(Ready);
+  MITK_DEBUG("IGTLDevice::RunCommunication") << "Reached end of communication.";
   // returning from this function (and ThreadStartCommunication())
   // this will end the thread
   return;
@@ -373,5 +351,49 @@ bool mitk::IGTLDevice::StartCommunication()
   m_ThreadID =
     m_MultiThreader->SpawnThread(this->ThreadStartCommunication, this);
 //  mitk::IGTTimeStamp::GetInstance()->Start(this);
+  return true;
+}
+
+bool mitk::IGTLDevice::StopCommunication()
+{
+  if (this->GetState() == Running) // Only if the object is in the correct state
+  {
+    // m_StopCommunication is used by two threads, so we have to ensure correct
+    // thread handling
+    m_StopCommunicationMutex->Lock();
+    m_StopCommunication = true;
+    m_StopCommunicationMutex->Unlock();
+    // we have to wait here that the other thread recognizes the STOP-command
+    // and executes it
+    m_CommunicationFinishedMutex->Lock();
+//    mitk::IGTTimeStamp::GetInstance()->Stop(this); // notify realtime clock
+    // StopCommunication was called, thus the mode should be changed back
+    // to Ready now that the tracking loop has ended.
+    this->SetState(Ready);
+  }
+  return true;
+}
+
+bool mitk::IGTLDevice::CloseConnection()
+{
+  if (this->GetState() == Setup)
+  {
+    return true;
+  }
+  else if (this->GetState() == Running)
+  {
+    this->StopCommunication();
+  }
+
+  m_Socket->CloseSocket();
+//    //init before closing to force the field generator from aurora to switch itself off
+//    m_DeviceProtocol->INIT();
+//    /* close the serial connection */
+//    m_SerialCommunication->CloseConnection();
+//    /* invalidate all tools */
+//    this->InvalidateAll();
+  /* return to setup mode */
+  this->SetState(Setup);
+//    m_SerialCommunication = NULL;
   return true;
 }

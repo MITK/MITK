@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <cstring>
 
+#include <igtlTransformMessage.h>
+
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
@@ -284,7 +286,7 @@ void mitk::IGTLDevice::RunCommunication()
         ts->GetTimeStamp(&sec, &nanosec);
 
         //check for invalid timestamps
-        if(sec != 0)
+//        if(sec != 0)
         {
           std::cerr << "Time stamp: "
                     << sec << "."
@@ -295,9 +297,32 @@ void mitk::IGTLDevice::RunCommunication()
 
           headerMsg->Print(std::cout);
 
-          if (strcmp(headerMsg->GetDeviceType(), "IMAGE") == 0)
+          if (strcmp(headerMsg->GetDeviceType(), "TRANSFORM") == 0)
           {
             //ReceiveImage(socket, headerMsg);
+
+            // Create a message buffer to receive transform data
+            igtl::TransformMessage::Pointer transMsg;
+            transMsg = igtl::TransformMessage::New();
+            transMsg->SetMessageHeader(headerMsg);
+            transMsg->AllocatePack();
+
+            // Receive transform data from the socket
+            m_Socket->Receive(transMsg->GetPackBodyPointer(),
+                              transMsg->GetPackBodySize());
+
+            // Deserialize the transform data
+            // If you want to skip CRC check, call Unpack() without argument.
+            int c = transMsg->Unpack(1);
+
+            if (c & igtl::MessageHeader::UNPACK_BODY) // if CRC check is OK
+            {
+              // Retrive the transform data
+              igtl::Matrix4x4 matrix;
+              transMsg->GetMatrix(matrix);
+              igtl::PrintMatrix(matrix);
+              std::cerr << std::endl;
+            }
           }
         }
       }

@@ -117,6 +117,12 @@ namespace mitk {
        * first applying self to the source, followed by other. */
       void Compose(const mitk::IGTLMessage::Pointer n, const bool pre = false);
 
+      /** Returns the OpenIGTL Message type
+       **/
+      const char* GetIGTLMessageType() const;
+
+      template < typename IGTLMessageType > IGTLMessageType* GetMessage() const;
+
     protected:
       mitkCloneMacro(Self);
 

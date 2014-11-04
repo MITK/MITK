@@ -112,6 +112,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="butStart">
+       <property name="text">
+        <string>Start</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="spacer2">
        <property name="orientation">
         <enum>Qt::Vertical</enum>

@@ -156,3 +156,14 @@ bool mitk::Equal(const mitk::IGTLMessage& leftHandSide,
 
   return returnValue;
 }
+
+const char* mitk::IGTLMessage::GetIGTLMessageType() const
+{
+  return this->m_Message->GetDeviceType();
+}
+
+template < typename IGTLMessageType >
+IGTLMessageType* mitk::IGTLMessage::GetMessage() const
+{
+  return dynamic_cast<IGTLMessageType*>(this->m_Message);
+}

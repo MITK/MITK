@@ -35,12 +35,13 @@ mitk::IGTLDevice::IGTLDevice() :
 {
   m_StopCommunicationMutex = itk::FastMutexLock::New();
   m_StateMutex = itk::FastMutexLock::New();
-  m_SocketMutex = itk::FastMutexLock::New();
+  m_LatestMessageMutex = itk::FastMutexLock::New();
   m_CommunicationFinishedMutex = itk::FastMutexLock::New();
   // execution rights are owned by the application thread at the beginning
   m_CommunicationFinishedMutex->Lock();
   m_MultiThreader = itk::MultiThreader::New();
 //  m_Data = mitk::DeviceDataUnspecified;
+  m_LatestMessage = igtl::MessageBase::New();
 }
 
 
@@ -255,10 +256,10 @@ void mitk::IGTLDevice::RunCommunication()
     headerMsg->InitPack();
 
     // Receive generic header from the socket
-    this->m_SocketMutex->Lock();
+//    this->m_SocketMutex->Lock();
     int r =
       m_Socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize(),1);
-    this->m_SocketMutex->Unlock();
+//    this->m_SocketMutex->Unlock();
 
     if(r == 0)
     {
@@ -297,33 +298,69 @@ void mitk::IGTLDevice::RunCommunication()
 
           headerMsg->Print(std::cout);
 
-          if (strcmp(headerMsg->GetDeviceType(), "TRANSFORM") == 0)
+          //Create a message buffer to receive transform data
+          igtl::MessageBase::Pointer curMessage;
+          curMessage = igtl::MessageBase::New();
+          curMessage->SetMessageHeader(headerMsg);
+          curMessage->AllocatePack();
+
+          // Receive transform data from the socket
+          int receiveCheck = 0;
+          receiveCheck = m_Socket->Receive(curMessage->GetPackBodyPointer(),
+                                           curMessage->GetPackBodySize());
+
+          if ( receiveCheck > 0 )
           {
-            //ReceiveImage(socket, headerMsg);
+            //copy the current message into the latest message member
+            bool copyCheck = false;
+            m_LatestMessageMutex->Lock();
+            copyCheck = (bool)m_LatestMessage->Copy(curMessage);
+            m_LatestMessageMutex->Unlock();
 
-            // Create a message buffer to receive transform data
-            igtl::TransformMessage::Pointer transMsg;
-            transMsg = igtl::TransformMessage::New();
-            transMsg->SetMessageHeader(headerMsg);
-            transMsg->AllocatePack();
-
-            // Receive transform data from the socket
-            m_Socket->Receive(transMsg->GetPackBodyPointer(),
-                              transMsg->GetPackBodySize());
-
-            // Deserialize the transform data
-            // If you want to skip CRC check, call Unpack() without argument.
-            int c = transMsg->Unpack(1);
-
-            if (c & igtl::MessageHeader::UNPACK_BODY) // if CRC check is OK
+            //check if the copying was successful, otherwise invalidate the
+            //latest message
+            if ( !copyCheck )
             {
-              // Retrive the transform data
-              igtl::Matrix4x4 matrix;
-              transMsg->GetMatrix(matrix);
-              igtl::PrintMatrix(matrix);
-              std::cerr << std::endl;
+              m_LatestMessageMutex->Lock();
+              m_LatestMessage = igtl::MessageBase::New();
+              m_LatestMessageMutex->Unlock();
+              MITK_ERROR("IGTLDevice") << "Could not copy the received message.";
             }
           }
+          else
+          {
+            MITK_ERROR("IGTLDevice") << "Received a valid header but could not "
+                                     << "read the whole message.";
+          }
+
+
+//          if (strcmp(headerMsg->GetDeviceType(), "TRANSFORM") == 0)
+//          {
+//            //ReceiveImage(socket, headerMsg);
+
+//            // Create a message buffer to receive transform data
+//            igtl::TransformMessage::Pointer transMsg;
+//            transMsg = igtl::TransformMessage::New();
+//            transMsg->SetMessageHeader(headerMsg);
+//            transMsg->AllocatePack();
+
+//            // Receive transform data from the socket
+//            m_Socket->Receive(transMsg->GetPackBodyPointer(),
+//                              transMsg->GetPackBodySize());
+
+//            // Deserialize the transform data
+//            // If you want to skip CRC check, call Unpack() without argument.
+//            int c = transMsg->Unpack(1);
+
+//            if (c & igtl::MessageHeader::UNPACK_BODY) // if CRC check is OK
+//            {
+//              // Retrive the transform data
+//              igtl::Matrix4x4 matrix;
+//              transMsg->GetMatrix(matrix);
+//              igtl::PrintMatrix(matrix);
+//              std::cerr << std::endl;
+//            }
+//          }
         }
       }
     }
@@ -423,7 +460,12 @@ bool mitk::IGTLDevice::CloseConnection()
   return true;
 }
 
-igtl::MessageBase* mitk::IGTLDevice::GetLatestMessage()
+bool mitk::IGTLDevice::GetLatestMessage(igtl::MessageBase::Pointer msg)
 {
-  return igtl::MessageBase::New();
+  bool copySuccesful = false;
+  //copy the latest message into the given msg
+  m_LatestMessageMutex->Lock();
+  copySuccesful = msg->Copy(m_LatestMessage);
+  m_LatestMessageMutex->Unlock();
+  return copySuccesful;
 }

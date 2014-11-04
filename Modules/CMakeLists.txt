@@ -31,6 +31,7 @@ set(module_dirs
     IGTBase
     IGT
     OpenIGTLink
+    IGTLink
     CameraCalibration
     RigidRegistration
     RigidRegistrationUI

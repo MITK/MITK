@@ -23,8 +23,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 #include "ui_OpenIGTLinkControls.h"
-
 #include "mitkIGTLClient.h"
+#include "mitkIGTLDeviceSource.h"
+#include "mitkNavigationDataObjectVisualizationFilter.h"
+#include "mitkIGTLMessageToNavigationDataFilter.h"
+
+#include "qtimer.h"
 
 /**
   \brief OpenIGTLink
@@ -50,17 +54,27 @@ class OpenIGTLink : public QmitkAbstractView
     void ChangePort();
     void ChangeIP();
 
+    void Start();
+    void UpdatePipeline();
+
+
   protected:
 
     virtual void CreateQtPartControl(QWidget *parent);
 
     virtual void SetFocus();
 
+    void CreatePipeline();
+    void DestroyPipeline();
 
     Ui::OpenIGTLinkControls m_Controls;
-
     mitk::IGTLClient::Pointer m_IGTLClient;
+    mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;
+    mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
+    mitk::NavigationDataObjectVisualizationFilter::Pointer m_VisFilter;
+    mitk::DataNode::Pointer m_DemoNode;
 
+    QTimer m_Timer;
 };
 
 #endif // OpenIGTLink_h

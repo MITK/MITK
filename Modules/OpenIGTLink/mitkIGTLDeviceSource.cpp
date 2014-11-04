@@ -51,11 +51,18 @@ void mitk::IGTLDeviceSource::GenerateData()
   /* update output with message from the device */
   IGTLMessage* msgOut = this->GetOutput();
   assert(msgOut);
-  igtl::MessageBase* msgIn = m_IGTLDevice->GetLatestMessage();
-  assert(msgIn);
+  igtl::MessageBase::Pointer msgIn = igtl::MessageBase::New();
+  if ( m_IGTLDevice->GetLatestMessage(msgIn) )
+  {
+    assert(msgIn);
 
-  msgOut->SetMessage(msgIn);
-  msgOut->SetName(msgIn->GetDeviceName());
+    msgOut->SetMessage(msgIn);
+    msgOut->SetName(msgIn->GetDeviceName());
+  }
+  else
+  {
+    MITK_ERROR("IGTLDeviceSource") << "Could not get the latest message.";
+  }
 }
 
 void mitk::IGTLDeviceSource::SetIGTLDevice( mitk::IGTLDevice* igtlDevice )

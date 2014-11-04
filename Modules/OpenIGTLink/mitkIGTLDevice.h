@@ -89,8 +89,13 @@ namespace mitk {
 
       /**
        * \brief Returns the latest received message
+       * \param msg A smartpointer to the message base where the latest message
+       * shall be copied into
+       * \retval true The latest message is stored in msg
+       * \retval false The latest message could not been copied, do not use this
+       * data
        */
-      igtl::MessageBase* GetLatestMessage();
+      bool GetLatestMessage(igtl::MessageBase::Pointer msg);
 
       /**
        * \brief return device data
@@ -163,13 +168,17 @@ namespace mitk {
       /** mutex to control access to m_State */
       itk::FastMutexLock::Pointer m_StateMutex;
       /** mutex to control access to m_Socket */
-      itk::FastMutexLock::Pointer m_SocketMutex;
+//      itk::FastMutexLock::Pointer m_SocketMutex;
+      /** mutex to control access to m_LatestMessage */
+      itk::FastMutexLock::Pointer m_LatestMessageMutex;
       /** the hostname or ip of the device */
       std::string m_Hostname;
       /** the port number of the device */
       int m_PortNumber;
       /** the socket used to communicate with other IGTL devices */
       igtl::Socket::Pointer m_Socket;
+      /** the latest received message */
+      igtl::MessageBase::Pointer m_LatestMessage;
 
     private:
       /** creates worker thread that continuously polls interface for new

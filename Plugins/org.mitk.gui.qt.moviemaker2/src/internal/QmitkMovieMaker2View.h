@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QmitkAnimationItem;
 class QmitkAnimationWidget;
+class QmitkFFmpegWriter;
 class QMenu;
 class QStandardItemModel;
 
@@ -72,6 +73,7 @@ private:
   void RedrawTimeline();
   QmitkAnimationItem* GetSelectedAnimationItem() const;
 
+  QmitkFFmpegWriter* m_FFmpegWriter;
   Ui::QmitkMovieMaker2View* m_Ui;
   QStandardItemModel* m_AnimationModel;
   QMap<QString, QmitkAnimationWidget*> m_AnimationWidgets;

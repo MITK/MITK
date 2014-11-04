@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkAnimationItemDelegate.h"
+#include "QmitkFFmpegWriter.h"
 #include "QmitkMovieMaker2View.h"
 #include "QmitkOrbitAnimationItem.h"
 #include "QmitkOrbitAnimationWidget.h"
@@ -25,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QStandardItemModel>
 #include <mitkBaseRenderer.h>
+#include <mitkGL.h>
 
 static QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
 {
@@ -37,10 +39,25 @@ static QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
   return NULL;
 }
 
+static unsigned char* ReadPixels(vtkRenderWindow* renderWindow, int x, int y, int width, int height)
+{
+  if (renderWindow == NULL)
+    return NULL;
+
+  const int* size = renderWindow->GetSize();
+  unsigned char* frame = new unsigned char[width * height * 3];
+
+  renderWindow->MakeCurrent();
+  glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, frame);
+
+  return frame;
+}
+
 const std::string QmitkMovieMaker2View::VIEW_ID = "org.mitk.views.moviemaker2";
 
 QmitkMovieMaker2View::QmitkMovieMaker2View()
-  : m_Ui(new Ui::QmitkMovieMaker2View),
+  : m_FFmpegWriter(NULL),
+    m_Ui(new Ui::QmitkMovieMaker2View),
     m_AnimationModel(NULL),
     m_AddAnimationMenu(NULL),
     m_RecordMenu(NULL)
@@ -53,6 +70,8 @@ QmitkMovieMaker2View::~QmitkMovieMaker2View()
 
 void QmitkMovieMaker2View::CreateQtPartControl(QWidget* parent)
 {
+  m_FFmpegWriter = new QmitkFFmpegWriter(parent);
+
   m_Ui->setupUi(parent);
 
   this->InitializeAnimationWidgets();
@@ -113,12 +132,24 @@ void QmitkMovieMaker2View::InitializeAddAnimationMenu()
 
 void QmitkMovieMaker2View::InitializeRecordMenu()
 {
+  typedef QPair<QString, QString> PairOfStrings;
+
   m_RecordMenu = new QMenu(m_Ui->recordButton);
 
-  m_RecordMenu->addAction("Axial");
-  m_RecordMenu->addAction("Sagittal");
-  m_RecordMenu->addAction("Coronal");
-  m_RecordMenu->addAction("3D");
+  QVector<PairOfStrings> renderWindows;
+  renderWindows.push_back(qMakePair(QString("Axial"), QString("stdmulti.widget1")));
+  renderWindows.push_back(qMakePair(QString("Sagittal"), QString("stdmulti.widget2")));
+  renderWindows.push_back(qMakePair(QString("Coronal"), QString("stdmulti.widget3")));
+  renderWindows.push_back(qMakePair(QString("3D"), QString("stdmulti.widget4")));
+
+  Q_FOREACH(const PairOfStrings& renderWindow, renderWindows)
+  {
+    QAction* action = new QAction(m_RecordMenu);
+    action->setText(renderWindow.first);
+    action->setData(renderWindow.second);
+
+    m_RecordMenu->addAction(action);
+  }
 }
 
 void QmitkMovieMaker2View::ConnectAnimationTreeViewWidgets()
@@ -215,11 +246,48 @@ void QmitkMovieMaker2View::OnRecordButtonClicked()
 {
   QAction* action = m_RecordMenu->exec(QCursor::pos());
 
-  if (action != NULL)
+  if (action == NULL)
+    return;
+
+  vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName(action->data().toString().toStdString());
+
+  if (renderWindow == NULL)
+    return;
+
+  // TODO: Refactor size calculation
+
+  const int border = 3;
+  const int x = border;
+  const int y = border;
+  int width = renderWindow->GetSize()[0] - border * 2;
+  int height = renderWindow->GetSize()[1] - border * 2;
+
+  if (width & 1)
+    --width;
+
+  if (height & 1)
+    --height;
+
+  if (width < 16 || height < 16)
+    return;
+
+  m_FFmpegWriter->SetFFmpegPath("D:\\FFmpeg\\bin\\ffmpeg.exe"); //TODO: Get FFmpeg path from preferences
+  m_FFmpegWriter->SetSize(width, height);
+  m_FFmpegWriter->SetFramerate(m_Ui->fpsSpinBox->value());
+  m_FFmpegWriter->SetOutputPath("C:\\Users\\Stefan\\Desktop\\output.mp4"); // TODO: Ask user for output path
+
+  m_FFmpegWriter->Start();
+
+  // TODO: Play animation
+
+  for (int i = 0; i < 30; ++i)
   {
-    // TODO: Ensure render window is opened
-    // TODO
+    unsigned char* frame = ReadPixels(renderWindow, x, y, width, height);
+    m_FFmpegWriter->WriteFrame(frame);
+    delete[] frame;
   }
+
+  m_FFmpegWriter->Stop();
 }
 
 void QmitkMovieMaker2View::OnRemoveAnimationButtonClicked()

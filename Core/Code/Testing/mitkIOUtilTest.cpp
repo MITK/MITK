@@ -27,6 +27,7 @@ class mitkIOUtilTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkIOUtilTestSuite);
   MITK_TEST(TestTempMethods);
+  MITK_TEST(TestSaveEmptyData);
   MITK_TEST(TestLoadAndSaveImage);
   MITK_TEST(TestLoadAndSavePointSet);
   MITK_TEST(TestLoadAndSaveSurface);
@@ -46,6 +47,12 @@ public:
     m_ImagePath = GetTestDataFilePath("Pic3D.nrrd");
     m_SurfacePath = GetTestDataFilePath("binary.stl");
     m_PointSetPath = GetTestDataFilePath("pointSet.mps");
+  }
+
+  void TestSaveEmptyData()
+  {
+    mitk::Surface::Pointer data = mitk::Surface::New();
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(data, "/tmp/dummy"), mitk::Exception);
   }
 
   void TestTempMethods()

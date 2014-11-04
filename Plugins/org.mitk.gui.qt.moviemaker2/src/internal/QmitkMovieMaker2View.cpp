@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSliceAnimationItem.h"
 #include "QmitkSliceAnimationWidget.h"
 #include <ui_QmitkMovieMaker2View.h>
+#include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
 #include <QStandardItemModel>
@@ -37,6 +38,16 @@ static QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
     return new QmitkSliceAnimationItem(0, 0, 999, false);
 
   return NULL;
+}
+
+static QString GetFFmpegPath()
+{
+  berry::IPreferencesService::Pointer preferencesService =
+    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+
+  berry::IPreferences::Pointer preferences = preferencesService->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
+
+  return QString::fromStdString(preferences->Get("ffmpeg", ""));
 }
 
 static unsigned char* ReadPixels(vtkRenderWindow* renderWindow, int x, int y, int width, int height)
@@ -242,8 +253,16 @@ void QmitkMovieMaker2View::OnAddAnimationButtonClicked()
   }
 }
 
-void QmitkMovieMaker2View::OnRecordButtonClicked()
+void QmitkMovieMaker2View::OnRecordButtonClicked() // TODO: Refactor
 {
+  m_FFmpegWriter->SetFFmpegPath(GetFFmpegPath());
+
+  if (m_FFmpegWriter->GetFFmpegPath().isEmpty())
+  {
+    QMessageBox::critical(NULL, "Movie Maker 2", "Path to FFmpeg executable is not set in preferences!");
+    return;
+  }
+
   QAction* action = m_RecordMenu->exec(QCursor::pos());
 
   if (action == NULL)
@@ -253,8 +272,6 @@ void QmitkMovieMaker2View::OnRecordButtonClicked()
 
   if (renderWindow == NULL)
     return;
-
-  // TODO: Refactor size calculation
 
   const int border = 3;
   const int x = border;
@@ -271,10 +288,18 @@ void QmitkMovieMaker2View::OnRecordButtonClicked()
   if (width < 16 || height < 16)
     return;
 
-  m_FFmpegWriter->SetFFmpegPath("D:\\FFmpeg\\bin\\ffmpeg.exe"); //TODO: Get FFmpeg path from preferences
   m_FFmpegWriter->SetSize(width, height);
   m_FFmpegWriter->SetFramerate(m_Ui->fpsSpinBox->value());
-  m_FFmpegWriter->SetOutputPath("C:\\Users\\Stefan\\Desktop\\output.mp4"); // TODO: Ask user for output path
+
+  QString saveFileName = QFileDialog::getSaveFileName(NULL, "Specify a filename", "", "Movie (*.mp4)");
+
+  if (saveFileName.isEmpty())
+    return;
+
+  if(!saveFileName.endsWith(".mp4"))
+    saveFileName += ".mp4";
+
+  m_FFmpegWriter->SetOutputPath(saveFileName);
 
   m_FFmpegWriter->Start();
 

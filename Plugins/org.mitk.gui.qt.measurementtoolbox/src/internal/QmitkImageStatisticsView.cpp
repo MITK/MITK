@@ -424,6 +424,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
 
   std::string maskName = std::string();
   std::string maskType = std::string();
+  std::string featureImageName = std::string();
   unsigned int maskDimension = 0;
 
   // reset data from last run
@@ -455,6 +456,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
           this->m_SelectedImage = static_cast<mitk::Image*>(this->m_SelectedDataNodes.at(i)->GetData());
           this->m_ImageObserverTag = this->m_SelectedImage->AddObserver(itk::ModifiedEvent(), changeListener);
         }
+        featureImageName = this->m_SelectedDataNodes.at(i)->GetName();
       }
     }
     else if (planarFig.IsNotNull())
@@ -484,6 +486,11 @@ void QmitkImageStatisticsView::UpdateStatistics()
     maskName = "None";
     maskType = "";
     maskDimension = 0;
+  }
+
+  if(featureImageName == "")
+  {
+    featureImageName = "None";
   }
 
   if (m_SelectedPlanarFigure != NULL && m_SelectedImage == NULL)
@@ -543,6 +550,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       maskLabel << "  [" << maskDimension << "D " << maskType << "]";
     }
     m_Controls->m_SelectedMaskLabel->setText( maskLabel.str().c_str() );
+    m_Controls->m_SelectedFeatureImageLabel->setText(featureImageName.c_str());
 
     // check time step validity
     if(m_SelectedImage->GetDimension() <= 3 && timeStep > m_SelectedImage->GetDimension(3)-1)

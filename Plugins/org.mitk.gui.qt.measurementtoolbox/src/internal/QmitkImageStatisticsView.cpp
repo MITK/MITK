@@ -716,7 +716,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       {
         outOfBounds = true;
         std::stringstream message;
-        message << "<font color='red'>Planar figure is outside the images bounds.</font>";
+        message << "<font color='red'>Planar figure is on a rotated image plane or outside the image bounds.</font>";
         m_Controls->m_InfoLabel->setText(message.str().c_str());
       }
 

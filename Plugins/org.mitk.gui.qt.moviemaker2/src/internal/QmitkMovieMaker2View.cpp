@@ -201,6 +201,9 @@ void QmitkMovieMaker2View::ConnectAnimationWidgets()
 
 void QmitkMovieMaker2View::ConnectPlaybackAndRecordWidgets()
 {
+  this->connect(m_Ui->playButton, SIGNAL(toggled(bool)),
+    this, SLOT(OnPlayButtonToggled(bool)));
+
   this->connect(m_Ui->recordButton, SIGNAL(clicked()),
     this, SLOT(OnRecordButtonClicked()));
 }
@@ -250,6 +253,24 @@ void QmitkMovieMaker2View::OnAddAnimationButtonClicked()
       << CreateDefaultAnimation(widgetKey));
 
     m_Ui->playbackAndRecordingGroupBox->setEnabled(true);
+  }
+}
+
+void QmitkMovieMaker2View::OnPlayButtonToggled(bool checked)
+{
+  vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4");
+  mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice();
+
+  unsigned int startPos = stepper->GetPos();
+
+  for (unsigned int i = 1; i < 30; ++i)
+  {
+    unsigned int newPos = startPos + 360.0 / 29.0 * i;
+    if (newPos > 360)
+      newPos -= 360;
+    stepper->SetPos(newPos);
+
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(renderWindow);
   }
 }
 
@@ -307,9 +328,12 @@ void QmitkMovieMaker2View::OnRecordButtonClicked() // TODO: Refactor
 
   for (int i = 0; i < 30; ++i)
   {
+    renderWindow->MakeCurrent();
     unsigned char* frame = ReadPixels(renderWindow, x, y, width, height);
     m_FFmpegWriter->WriteFrame(frame);
     delete[] frame;
+    mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice()->Next();
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(renderWindow);
   }
 
   m_FFmpegWriter->Stop();

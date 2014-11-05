@@ -54,6 +54,7 @@ private slots:
   void OnStartComboBoxCurrentIndexChanged(int index);
   void OnDurationSpinBoxValueChanged(double value);
   void OnDelaySpinBoxValueChanged(double value);
+  void OnPlayButtonToggled(bool checked);
   void OnRecordButtonClicked();
 
 private:

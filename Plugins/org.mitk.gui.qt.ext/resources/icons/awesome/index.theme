@@ -1,7 +1,7 @@
 [Icon Theme]
 Name=awesome
 Comment=An icon theme using the awesome font
-Directories=scalable/actions scalable/status
+Directories=scalable/actions scalable/status scalable/places
 
 [scalable/actions]
 Size=48
@@ -16,3 +16,10 @@ Type=Scalable
 MinSize=1
 MaxSize=256
 Context=Status
+
+[scalable/places]
+Size=48
+Type=Scalable
+MinSize=1
+MaxSize=256
+Context=Places

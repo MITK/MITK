@@ -315,6 +315,8 @@ void WorkbenchPlugin::stop(ctkPluginContext* context)
   AbstractUICTKPlugin::stop(context);
 
   delete perspRegistry;
+  // avoid possible crash, see bug #18399
+  perspRegistry = 0;
 }
 
 bool WorkbenchPlugin::GetDataPath(Poco::Path& path)

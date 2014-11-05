@@ -113,7 +113,10 @@ if(m_Controls.m_ShowImageStream->isChecked())
   m_Node->SetData(curOutput);
 
   // if the geometry changed: reinitialize the ultrasound image
-  if(!mitk::Equal(m_OldGeometry.GetPointer(),curOutput->GetGeometry(),0.0001,false))
+  if((m_OldGeometry.IsNotNull()) &&
+     (curOutput->GetGeometry() != NULL) &&
+     (!mitk::Equal(m_OldGeometry.GetPointer(),curOutput->GetGeometry(),0.0001,false))
+    )
   {
     mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
     if ( (renderWindow != NULL) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()) )

@@ -31,6 +31,9 @@ QmitkAnimationItemDelegate::~QmitkAnimationItemDelegate()
 
 void QmitkAnimationItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
+  if (option.state & QStyle::State_Selected)
+    painter->fillRect(option.rect, option.palette.highlight());
+
   const QStandardItemModel* model = dynamic_cast<const QStandardItemModel*>(index.model());
   const QmitkAnimationItem* thisItem = dynamic_cast<QmitkAnimationItem*>(model->item(index.row(), 1));
   QList<const QmitkAnimationItem*> items;
@@ -96,6 +99,4 @@ void QmitkAnimationItemDelegate::paint(QPainter* painter, const QStyleOptionView
       rect.x() + static_cast<int>(widthPerSecond * (thisStart + thisItem->GetDelay())) - 1,
       rect.y() + rect.height() / 2);
   }
-
-  QStyledItemDelegate::paint(painter, option, index);
 }

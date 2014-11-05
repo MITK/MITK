@@ -19,7 +19,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="ffmpegLabel">
        <property name="text">
-        <string>FFmpeg executable:</string>
+        <string>FFmpeg/Libav:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::PlainText</enum>
@@ -46,7 +46,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="gnuplotLabel">
        <property name="text">
-        <string>gnuplot executable:</string>
+        <string>gnuplot:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::PlainText</enum>

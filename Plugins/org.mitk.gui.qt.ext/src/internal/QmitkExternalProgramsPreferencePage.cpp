@@ -74,15 +74,15 @@ void QmitkExternalProgramsPreferencePage::CreateQtControl(QWidget* parent)
 
 void QmitkExternalProgramsPreferencePage::OnFFmpegButtonClicked()
 {
-  QString filter = "FFmpeg executable ";
+  QString filter = "ffmpeg/avconv executable ";
 
 #if defined(WIN32)
-  filter += "(ffmpeg.exe)";
+  filter += "(ffmpeg.exe avconv.exe)";
 #else
-  filter += "(ffmpeg)";
+  filter += "(ffmpeg avconv)";
 #endif
 
-  QString ffmpegPath = QFileDialog::getOpenFileName(m_Control, "FFmpeg", "", filter);
+  QString ffmpegPath = QFileDialog::getOpenFileName(m_Control, "FFmpeg/Libav", "", filter);
 
   if (!ffmpegPath.isEmpty())
   {
@@ -101,12 +101,11 @@ void QmitkExternalProgramsPreferencePage::OnFFmpegProcessFinished(int exitCode, 
 {
   if (exitStatus == QProcess::NormalExit && exitCode == 0)
   {
-    QString version = QTextCodec::codecForName("UTF-8")->toUnicode(m_FFmpegProcess->readAllStandardOutput()).trimmed();
+    QString output = QTextCodec::codecForName("UTF-8")->toUnicode(m_FFmpegProcess->readAllStandardOutput());
 
-    if (version.startsWith("ffmpeg"))
+    if (output.startsWith("ffmpeg") || output.startsWith("avconv"))
     {
-      version = version.section(' ', 0, 2, QString::SectionSkipEmpty);
-      m_Ui->ffmpegLineEdit->setText(QString("%1 (%2)").arg(m_FFmpegPath).arg(version));
+      m_Ui->ffmpegLineEdit->setText(m_FFmpegPath);
       return;
     }
   }
@@ -144,11 +143,11 @@ void QmitkExternalProgramsPreferencePage::OnGnuplotProcessFinished(int exitCode,
 {
   if (exitStatus == QProcess::NormalExit && exitCode == 0)
   {
-    QString version = QTextCodec::codecForName("UTF-8")->toUnicode(m_GnuplotProcess->readAllStandardOutput()).trimmed();
+    QString output = QTextCodec::codecForName("UTF-8")->toUnicode(m_GnuplotProcess->readAllStandardOutput());
 
-    if (version.startsWith("gnuplot"))
+    if (output.startsWith("gnuplot"))
     {
-      m_Ui->gnuplotLineEdit->setText(QString("%1 (%2)").arg(m_GnuplotPath).arg(version));
+      m_Ui->gnuplotLineEdit->setText(m_GnuplotPath);
       return;
     }
   }

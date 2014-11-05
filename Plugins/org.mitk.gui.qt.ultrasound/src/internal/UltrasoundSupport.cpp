@@ -350,7 +350,29 @@ if ( pluginContext )
 
 UltrasoundSupport::~UltrasoundSupport()
 {
-  StoreUISettings();
+  try
+  {
+    m_Timer->stop();
+
+    // Get all active devicesand deactivate them to prevent freeze
+    std::vector<mitk::USDevice*> devices = this->m_Controls.m_ActiveVideoDevices->GetAllServices<mitk::USDevice>();
+    for (int i = 0; i < devices.size(); i ++)
+    {
+        mitk::USDevice::Pointer device = devices[i];
+        if (device.IsNotNull() && device->GetIsActive())
+        {
+          device->Deactivate();
+          device->Disconnect();
+        }
+    }
+
+    StoreUISettings();
+  }
+  catch(std::exception &e)
+  {
+    MITK_ERROR << "Exception during call of destructor! Message: " << e.what();
+  }
+
 }
 
 void UltrasoundSupport::StoreUISettings()

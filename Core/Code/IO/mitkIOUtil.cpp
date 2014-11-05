@@ -664,7 +664,14 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
 
     if (readers.empty())
     {
-      errMsg += "No reader available for '" + infoIter->m_Path + "'\n";
+      if (!itksys::SystemTools::FileExists(infoIter->m_Path.c_str()))
+      {
+        errMsg += "File '" + infoIter->m_Path + "' does not exist\n";
+      }
+      else
+      {
+        errMsg += "No reader available for '" + infoIter->m_Path + "'\n";
+      }
       continue;
     }
 

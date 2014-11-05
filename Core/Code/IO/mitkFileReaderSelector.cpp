@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include <usAny.h>
 
+#include <itksys/SystemTools.hxx>
+
 namespace mitk {
 
 struct FileReaderSelector::Item::Impl : us::SharedData
@@ -69,6 +71,11 @@ FileReaderSelector::FileReaderSelector(const FileReaderSelector& other)
 FileReaderSelector::FileReaderSelector(const std::string& path)
   : m_Data(new Impl)
 {
+  if (!itksys::SystemTools::FileExists(path.c_str()))
+  {
+    return;
+  }
+
   mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
 
   // Get all mime types and associated readers for the given file path

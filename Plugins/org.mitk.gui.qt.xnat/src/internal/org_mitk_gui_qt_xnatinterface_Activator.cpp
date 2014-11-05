@@ -22,9 +22,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkXnatTreeBrowserView.h"
 #include "QmitkXnatConnectionPreferencePage.h"
 
+#include <usGetModuleContext.h>
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 namespace mitk {
 
 ctkPluginContext* org_mitk_gui_qt_xnatinterface_Activator::m_Context = 0;
+us::ModuleContext* org_mitk_gui_qt_xnatinterface_Activator::m_ModuleContext = 0;
 
 QmitkXnatSessionManager* org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()
 {
@@ -37,9 +43,15 @@ ctkPluginContext* org_mitk_gui_qt_xnatinterface_Activator::GetContext()
   return m_Context;
 }
 
+us::ModuleContext* org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()
+{
+  return m_ModuleContext;
+}
+
 void org_mitk_gui_qt_xnatinterface_Activator::start(ctkPluginContext* context)
 {
   this->m_Context = context;
+  this->m_ModuleContext = us::GetModuleContext();
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkXnatEditor, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkXnatTreeBrowserView, context)
@@ -49,7 +61,9 @@ void org_mitk_gui_qt_xnatinterface_Activator::start(ctkPluginContext* context)
 void org_mitk_gui_qt_xnatinterface_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
+  Q_UNUSED(us::GetModuleContext())
   this->m_Context = 0;
+  this->m_ModuleContext = 0;
 }
 
 }

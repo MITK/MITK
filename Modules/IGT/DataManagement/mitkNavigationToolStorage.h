@@ -108,14 +108,20 @@ namespace mitk {
      */
     mitk::NavigationTool::Pointer GetToolByName(std::string name);
 
+    /** Assigns the given number to the tool with the given identifier. This means the tool is swapped with another tool in the internal tool vector.
+     *  @return Returns true if the assignment was successfull. Returns false if assignment is not possible, e.g. because the identifier does not exist or if the given number is not available.
+     **/
+    bool AssignToolNumber(std::string identifier1, int number2);
 
     /**
      * @brief Deletes a tool from the collection.
+     * Warning, this method operates on the data storage and is not thread save. Calling it from outside the main thread may cause crashes.
      */
     bool DeleteTool(int number);
 
     /**
      * @brief Deletes all tools from the collection.
+     * Warning, this method operates on the data storage and is not thread save. Calling it from outside the main thread may cause crashes.
      */
     bool DeleteAllTools();
 

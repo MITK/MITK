@@ -43,6 +43,10 @@ void mitk::NavigationDataSetWriterXML::Write (std::string path, mitk::Navigation
 
 void mitk::NavigationDataSetWriterXML::Write (std::ostream* stream, mitk::NavigationDataSet::Pointer data)
 {
+  //save old locale
+  char * oldLocale;
+  oldLocale = setlocale( LC_ALL, 0 );
+
   StreamHeader(stream, data);
   StreamData(stream, data);
   StreamFooter(stream);
@@ -50,6 +54,9 @@ void mitk::NavigationDataSetWriterXML::Write (std::ostream* stream, mitk::Naviga
   // Cleanup
 
   stream->flush();
+
+  //switch back to old locale
+  setlocale( LC_ALL, oldLocale );
 }
 
 void mitk::NavigationDataSetWriterXML::StreamHeader (std::ostream* stream, mitk::NavigationDataSet::Pointer data)

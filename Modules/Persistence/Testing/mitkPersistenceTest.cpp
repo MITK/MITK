@@ -83,8 +83,8 @@ public:
 
   void PersistenceTest()
   {
-      // dummy load of SceneIO, otherwise PersistenceService won't be available
-      //mitk::PersistenceService::LoadModule();
+    // dummy load of SceneIO, otherwise PersistenceService won't be available
+    mitk::PersistenceService::LoadModule();
 
     PERSISTENCE_GET_SERVICE_MACRO
       CPPUNIT_ASSERT_MESSAGE("Testing availability of the PersistenceService.", persistenceService != NULL);

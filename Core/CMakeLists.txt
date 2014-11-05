@@ -8,8 +8,8 @@ set(US_ENABLE_THREADING_SUPPORT ON)
 # Don't create a "doc" target and don't install the documentation files
 set(US_NO_DOCUMENTATION ON)
 
-# Don't use an install component for SDK artifacts
-set(US_SDK_INSTALL_COMPONENT "")
+# Don't install anything for now (we use the CMake BundleUtilities script)
+set(US_NO_INSTALL 1)
 
 if(BUILD_TESTING)
   set(US_BUILD_TESTING ON)

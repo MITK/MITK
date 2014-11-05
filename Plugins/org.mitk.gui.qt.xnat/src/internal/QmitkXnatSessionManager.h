@@ -20,8 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIPreferencesService.h>
 
-#include "ctkXnatSession.h"
 #include "ctkXnatLoginProfile.h"
+
+#include "mitkXnatSessionTracker.h"
 
 class QmitkXnatSessionManager
 {
@@ -32,15 +33,21 @@ public:
   ~QmitkXnatSessionManager();
 
   /// \brief Opens a xnat session.
-  ctkXnatSession* GetXnatSession();
+  void OpenXnatSession();
 
-  /// \brief Updates the xnat session.
-  void UpdateXnatSession();
+  /// \brief Creates the xnat session.
+  void CreateXnatSession();
+
+  void CloseXnatSession();
+
+  bool LastSessionIsValid();
+  int AmountOfCreatedSessions();
 
 private:
 
-  ctkXnatSession* m_Session;
+  us::ServiceRegistration<ctkXnatSession> m_SessionRegistration;
   berry::IPreferencesService::WeakPtr m_PreferencesService;
+  ctkXnatSession* m_Session;
 
 };
 

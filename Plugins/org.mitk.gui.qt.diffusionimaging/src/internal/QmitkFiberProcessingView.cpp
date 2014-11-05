@@ -198,7 +198,7 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->m_CompressFibersButton->setEnabled(!m_SelectedFB.empty());
     m_Controls->m_ProcessFiberBundleButton->setEnabled(!m_SelectedFB.empty());
     m_Controls->m_ResampleFibersButton->setEnabled(!m_SelectedFB.empty());
-    m_Controls->m_FaColorFibersButton->setEnabled(!m_SelectedFB.empty());
+    m_Controls->m_FaColorFibersButton->setEnabled(false);
     m_Controls->m_PruneFibersButton->setEnabled(!m_SelectedFB.empty());
     m_Controls->m_CurvatureThresholdButton->setEnabled(!m_SelectedFB.empty());
     m_Controls->m_ExtractFiberPeaks->setEnabled(!m_SelectedFB.empty());

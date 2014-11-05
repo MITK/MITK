@@ -1662,7 +1662,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
       const std::string& modality = tagToValueMap.find(tagModality)->second;
       if ( modality.compare("RTIMAGE ") == 0 || modality.compare("RTIMAGE") == 0 )
       {
-        MITK_WARN << "Modality "<< modality <<" is only partially supported.";
+        MITK_WARN << "Modality "<< modality <<" is only not fully supported yet.";
         numberOfBlocks = 1;
         break;
       } else {

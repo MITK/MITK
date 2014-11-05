@@ -128,7 +128,7 @@ void QmitkMovieMaker2View::InitializeAnimationModel()
   m_AnimationModel->setHorizontalHeaderLabels(QStringList() << "Animation" << "Timeline");
   m_Ui->animationTreeView->setModel(m_AnimationModel);
 
-  m_Ui->animationTreeView->setItemDelegateForColumn(1, new QmitkAnimationItemDelegate(m_Ui->animationTreeView));
+  m_Ui->animationTreeView->setItemDelegate(new QmitkAnimationItemDelegate(m_Ui->animationTreeView));
 }
 
 void QmitkMovieMaker2View::InitializeAddAnimationMenu()

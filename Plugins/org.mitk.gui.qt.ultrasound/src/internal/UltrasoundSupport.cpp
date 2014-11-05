@@ -113,7 +113,10 @@ if(m_Controls.m_ShowImageStream->isChecked())
   m_Node->SetData(curOutput);
 
   // if the geometry changed: reinitialize the ultrasound image
-  if(!mitk::Equal(m_OldGeometry.GetPointer(),curOutput->GetGeometry(),0.0001,false))
+  if((m_OldGeometry.IsNotNull()) &&
+     (curOutput->GetGeometry() != NULL) &&
+     (!mitk::Equal(m_OldGeometry.GetPointer(),curOutput->GetGeometry(),0.0001,false))
+    )
   {
     mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
     if ( (renderWindow != NULL) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()) )
@@ -182,7 +185,6 @@ m_Node->ReleaseData();
 m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
 if (m_Device.IsNull())
 {
-MITK_WARN << "Selected device is not valid, aborting";
 m_Controls.tabWidget->setTabEnabled(1, false);
 return;
 }
@@ -350,7 +352,29 @@ if ( pluginContext )
 
 UltrasoundSupport::~UltrasoundSupport()
 {
-  StoreUISettings();
+  try
+  {
+    m_Timer->stop();
+
+    // Get all active devicesand deactivate them to prevent freeze
+    std::vector<mitk::USDevice*> devices = this->m_Controls.m_ActiveVideoDevices->GetAllServices<mitk::USDevice>();
+    for (int i = 0; i < devices.size(); i ++)
+    {
+        mitk::USDevice::Pointer device = devices[i];
+        if (device.IsNotNull() && device->GetIsActive())
+        {
+          device->Deactivate();
+          device->Disconnect();
+        }
+    }
+
+    StoreUISettings();
+  }
+  catch(std::exception &e)
+  {
+    MITK_ERROR << "Exception during call of destructor! Message: " << e.what();
+  }
+
 }
 
 void UltrasoundSupport::StoreUISettings()

@@ -92,6 +92,7 @@ protected:
 private:
   mitk::DataStorage::SetOfObjects::ConstPointer GetAllClippingPlanes();
   mitk::Color GetLabelColor(int label);
+  void DeactivateInteractionButtons();
 
   mitk::DataNode::Pointer m_ReferenceNode;
   mitk::DataNode::Pointer m_WorkingNode;

@@ -182,7 +182,6 @@ m_Node->ReleaseData();
 m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
 if (m_Device.IsNull())
 {
-MITK_WARN << "Selected device is not valid, aborting";
 m_Controls.tabWidget->setTabEnabled(1, false);
 return;
 }

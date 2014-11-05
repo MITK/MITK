@@ -11,6 +11,7 @@
      <file>icons/awesome/scalable/actions/go-next.svg</file>
      <file>icons/awesome/scalable/actions/go-previous.svg</file>
      <file>icons/awesome/scalable/actions/system-log-out.svg</file>
+     <file>icons/awesome/scalable/places/folder.svg</file>
      <file>icons/awesome/scalable/status/dialog-error.svg</file>
      <file>icons/awesome/scalable/status/dialog-information.svg</file>
      <file>icons/awesome/scalable/status/dialog-question.svg</file>
@@ -26,6 +27,8 @@
      <file>icons/tango/scalable/actions/go-next.svg</file>
      <file>icons/tango/scalable/actions/go-previous.svg</file>
      <file>icons/tango/scalable/actions/system-log-out.svg</file>
+     <file>icons/tango/scalable/places/folder.svg</file>
+     <file>icons/tango/scalable/places/folder-remote.svg</file>
      <file>icons/tango/scalable/status/dialog-error.svg</file>
      <file>icons/tango/scalable/status/dialog-information.svg</file>
      <file>icons/tango/scalable/status/dialog-question.svg</file>

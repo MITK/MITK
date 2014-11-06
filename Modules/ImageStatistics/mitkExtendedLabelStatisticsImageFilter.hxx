@@ -74,7 +74,7 @@ namespace itk
   template< class TInputImage, class TLabelImage >
   void
     ExtendedLabelStatisticsImageFilter< TInputImage, TLabelImage >::
-    ComputeTheSkewnessAndCurtosis()
+    ComputeTheSkewnessAndKurtosis()
   {
     MapIterator mapIt;
     TLabelImage::RegionType Subregion;
@@ -135,7 +135,7 @@ namespace itk
   {
     Superclass::AfterThreadedGenerateData();
 
-    ComputeTheSkewnessAndCurtosis();
+    ComputeTheSkewnessAndKurtosis();
   }
 
 } // end namespace itk

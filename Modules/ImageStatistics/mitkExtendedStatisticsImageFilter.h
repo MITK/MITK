@@ -28,10 +28,11 @@ namespace itk
 {
   /**
   * \class ExtendedStatisticsImageFilter
-  * \brief
-  * this class inherits from the itkStatisticsImageFilter and
-  * calculate with the Results of the Statistics two new coefficients:
-  * the Skewness and Kurtosis. Both will be added in this new class
+  * \brief Extension of the itkStatisticsImageFilter that also calculates the Skewness and Kurtosis.
+  *
+  * This class inherits from the itkStatisticsImageFilter and
+  * uses its Results for the calculation of the two new coefficients:
+  * the Skewness and Kurtosis. Both will be added in this class.
   */
   template< class TInputImage >
   class ImageStatistics_EXPORT ExtendedStatisticsImageFilter : public StatisticsImageFilter< TInputImage >
@@ -49,36 +50,21 @@ namespace itk
     /** Runtime information support. */
     itkTypeMacro(ExtendedStatisticsImageFilter, StatisticsImageFilter);
 
-    typedef typename Superclass::DataObjectPointer DataObjectPointer;
-
-    /** Return the computed Skewness. */
+    /**
+    * \brief Return the computed Skewness.
+    */
     RealType GetSkewness() const
     {
       return this->GetSkewnessOutput()->Get();
     }
-    RealObjectType* GetSkewnessOutput();
 
-    const RealObjectType* GetSkewnessOutput() const;
-
-
-    /*Return the computed Kurtosis. */
+    /**
+    * \brief Return the computed Kurtosis.
+    */
     RealType GetKurtosis() const
     {
       return this->GetKurtosisOutput()->Get();
     }
-
-    RealObjectType* GetKurtosisOutput();
-
-    const RealObjectType* GetKurtosisOutput() const;
-
-    virtual DataObject::Pointer MakeOutput( ProcessObject::DataObjectPointerArraySizeType idx );
-
-    /*brief
-    * Compute the Skewness Kurtosis.
-    * the Skewness and Kurtosis will be calculated with the Sigma and Mean Value of the
-    * itkStatisticsImageFilter which comes out of the threaded Generate Data
-    */
-    void ComputeTheSkewnessAndCurtosis();
 
   protected:
 
@@ -87,6 +73,25 @@ namespace itk
     virtual ~ExtendedStatisticsImageFilter(){};
 
     void AfterThreadedGenerateData();
+
+    /**
+    * \brief Compute the Skewness Kurtosis.
+    *
+    * The Skewness and Kurtosis will be calculated with the Sigma and Mean Value of the
+    * itkStatisticsImageFilter which comes out of the threadedGenerateData().
+    */
+    void ComputeTheSkewnessAndKurtosis();
+
+
+    RealObjectType* GetSkewnessOutput();
+
+    const RealObjectType* GetSkewnessOutput() const;
+
+    RealObjectType* GetKurtosisOutput();
+
+    const RealObjectType* GetKurtosisOutput() const;
+
+    virtual DataObject::Pointer MakeOutput( ProcessObject::DataObjectPointerArraySizeType idx );
 
 
   }; // end of class

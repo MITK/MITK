@@ -30,7 +30,7 @@ namespace itk
 {
   /**
   * \class ExtendedLabelStatisticsImageFilter
-  * \brief Extension of the itkStatisticsImageFilter that also calculates the Skewness and Kurtosis.
+  * \brief Extension of the itkLabelStatisticsImageFilter that also calculates the Skewness and Kurtosis.
   *
   * This class inherits from the itkLabelStatisticsImageFilter and
   * uses its results for the calculation of two new coefficients of the statistics:
@@ -92,7 +92,7 @@ namespace itk
     *
     * This method will calculate the new coefficients with sigma and mean value of the threaded generate data of the base class.
     */
-    void ComputeTheSkewnessAndCurtosis();
+    void ComputeTheSkewnessAndKurtosis();
 
 
   private:

@@ -13,10 +13,10 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkStatisticsImageFilter_hxx
-#define __mitkStatisticsImageFilter_hxx
+#ifndef __mitkExtendedStatisticsImageFilter_hxx
+#define __mitkExtendedStatisticsImageFilter_hxx
 
-#include "mitkStatisticsImageFilter.h"
+#include "mitkExtendedStatisticsImageFilter.h"
 
 namespace itk
 {
@@ -24,8 +24,7 @@ namespace itk
   ExtendedStatisticsImageFilter< TInputImage >::ExtendedStatisticsImageFilter()
     : StatisticsImageFilter()
   {
-    /**
-    /* brief
+    /*
     * add the Skewness and Kurtosis to the other statistical calculated Values
     * of the mitkStatisticsImageFilter
     */
@@ -105,36 +104,36 @@ namespace itk
   {
     Superclass::AfterThreadedGenerateData();
 
-    computeTheSkewnessAndCurtosis();
+    ComputeTheSkewnessAndKurtosis();
   }
 
   template< class TInputImage >
   void
     ExtendedStatisticsImageFilter< TInputImage >
-    ::ComputeTheSkewnessAndCurtosis()
+    ::ComputeTheSkewnessAndKurtosis()
   {
     RealType mean = GetMean();
     RealType sigma = GetSigma();
-    RealType baseOfSkewnessAndCurtosis;
-    RealType Kurtosis = 0;
-    RealType Skewness = 0;
+    RealType baseOfSkewnessAndKurtosis;
+    RealType kurtosis = 0;
+    RealType skewness = 0;
 
     ImageRegionConstIterator< TInputImage > it (this->GetInput(), this->GetInput()->GetLargestPossibleRegion ()  );
 
     int counter = 0;
     for (it.GoToBegin(); !it.IsAtEnd(); ++it)
     {
-      baseOfSkewnessAndCurtosis = (it.Get() - mean) / sigma ;
-      Kurtosis += baseOfSkewnessAndCurtosis * baseOfSkewnessAndCurtosis * baseOfSkewnessAndCurtosis * baseOfSkewnessAndCurtosis;
-      Skewness += baseOfSkewnessAndCurtosis * baseOfSkewnessAndCurtosis * baseOfSkewnessAndCurtosis;
+      baseOfSkewnessAndKurtosis = (it.Get() - mean) / sigma ;
+      kurtosis += std::pow( baseOfSkewnessAndKurtosis, 4.0 );
+      skewness += std::pow( baseOfSkewnessAndKurtosis, 3.0 );
       counter++;
     }
 
-    Kurtosis = Kurtosis / counter;
-    Skewness = Skewness / counter;
+    kurtosis = kurtosis / counter;
+    skewness = skewness / counter;
 
-    this->GetKurtosisOutput()->Set( Kurtosis );
-    this->GetSkewnessOutput()->Set( Skewness );
+    this->GetKurtosisOutput()->Set( kurtosis );
+    this->GetSkewnessOutput()->Set( skewness );
   }
 }
 

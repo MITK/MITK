@@ -80,13 +80,13 @@ namespace itk
     TLabelImage::RegionType Subregion;
 
     double baseOfSkewnessAndCurtosis;
-    double Kurtosis = 0.0;
-    double Skewness = 0.0;
+    double kurtosis = 0.0;
+    double skewness = 0.0;
 
     std::list< LabelPixelType> relevantLabels;
     bool maskNonEmpty = false;
     LabelPixelType i;
-    for ( i = 1; i < 100; ++i )
+    for ( i = 1; i < 4096; ++i )
     {
       if ( this->HasLabel( i ) )
       {
@@ -103,8 +103,8 @@ namespace itk
         it != relevantLabels.end();
         ++it, ++i )
       {
-        double Sigma = GetSigma( *it );
-        double Mean     = GetMean( *it );
+        double sigma = GetSigma( *it );
+        double mean  = GetMean( *it );
         Subregion = Superclass::GetRegion(*it);
 
         ImageRegionConstIteratorWithIndex< TInputImage > it1 (this->GetInput(),
@@ -116,14 +116,14 @@ namespace itk
         {
           if (labelIt.Get() == *it)
           {
-            baseOfSkewnessAndCurtosis = (  it1.Get() -Mean ) / Sigma ;
-            Kurtosis += baseOfSkewnessAndCurtosis*baseOfSkewnessAndCurtosis*baseOfSkewnessAndCurtosis*baseOfSkewnessAndCurtosis;
-            Skewness += baseOfSkewnessAndCurtosis*baseOfSkewnessAndCurtosis*baseOfSkewnessAndCurtosis;
+            baseOfSkewnessAndCurtosis = (it1.Get() -mean) / sigma;
+            kurtosis += std::pow( baseOfSkewnessAndCurtosis, 4.0 );
+            skewness += std::pow( baseOfSkewnessAndCurtosis, 3.0 );
           }
         }
 
-        m_LabelStatisticsCoefficients[*it].m_Skewness = double(Skewness/GetCount(*it));
-        m_LabelStatisticsCoefficients[*it].m_Kurtosis = double(Kurtosis/GetCount(*it));
+        m_LabelStatisticsCoefficients[*it].m_Skewness = double(skewness/GetCount(*it));
+        m_LabelStatisticsCoefficients[*it].m_Kurtosis = double(kurtosis/GetCount(*it));
       }
     }
   }

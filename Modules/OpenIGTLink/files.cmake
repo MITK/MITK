@@ -4,4 +4,5 @@ set(CPP_FILES
   mitkIGTLMessageSource.cpp
   mitkIGTLDeviceSource.cpp
   mitkIGTLMessage.cpp
+  mitkIGTLMessageCommon.cpp
 )

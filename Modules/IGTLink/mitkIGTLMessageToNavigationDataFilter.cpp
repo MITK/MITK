@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLMessageToNavigationDataFilter.h"
 #include "igtlTrackingDataMessage.h"
 #include "igtlQuaternionTrackingDataMessage.h"
+#include "igtlTransformMessage.h"
 #include "mitkQuaternion.h"
 
 
@@ -155,10 +156,60 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
       continue;
     }
 
-//    const char* a = input->GetIGTLMessageType();
-
     //check if the IGTL message has the proper type
     if( strcmp(input->GetIGTLMessageType(), "TRANSFORM") == 0 )
+    {
+      //get the tracking data message
+//      igtl::TransformMessage::Pointer tMsg =
+//        dynamic_cast<igtl::TransformMessage*>(test.GetPointer());
+
+      igtl::TransformMessage* tMsg =
+          (igtl::TransformMessage*)(input->GetMessage().GetPointer());
+
+//      igtl::TransformMessage::Pointer tMsg =
+//          igtl::TransformMessage::Pointer(input->GetMessage().GetPointer());
+////      tMsg->Copy(test);
+
+      //check if cast was successful
+      if ( !tMsg )
+      {
+        mitkThrow() << "Cast from igtl::MessageBase to igtl::TransformMessage "
+                    << "failed! Please check the message.";
+        continue;
+      }
+
+      tMsg->Print(std::cout);
+
+      //get the transformation matrix and convert it into an affinetransformation
+      igtl::Matrix4x4 transformation_;
+      tMsg->GetMatrix(transformation_);
+      mitk::AffineTransform3D::Pointer affineTransformation =
+          mitk::AffineTransform3D::New();
+      mitk::Matrix3D transformation;
+      mitk::Vector3D offset;
+      for ( unsigned int r = 0; r < 3; r++ )
+      {
+        for ( unsigned int c = 0; c < 3; c++ )
+        {
+          transformation.GetVnlMatrix().set( r , c , transformation_[r][c] );
+        }
+        offset.SetElement(r, transformation_[r][4]);
+      }
+      //convert the igtl matrix here and set it in the affine transformation
+      affineTransformation->SetMatrix(transformation);
+      affineTransformation->SetOffset(offset);
+
+      //create a new navigation data here, there is a neat constructor for
+      //affine transformations that sets the orientation, position according to
+      //the affine transformation. The other values are initialized with standard
+      //values
+      mitk::NavigationData::Pointer nd =
+          mitk::NavigationData::New(affineTransformation, true);
+      output->Graft(nd);
+
+      nd->Print(std::cout);
+    }
+    else if( strcmp(input->GetIGTLMessageType(), "TDATA") == 0 )
     {
       //get the tracking data message
       igtl::TrackingDataMessage::Pointer tdMsg =
@@ -169,8 +220,21 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
       unsigned int numTrackingDataElements =
           tdMsg->GetNumberOfTrackingDataElements();
 
-      //here should be a for loop over all tracking data elements
-      //CHECK SIZE HERE
+      //one message can contain several tracking data elements, but is this
+      //really used? If yes, what is a tracking element? If there is one tracking
+      //element per connected tracker, then we definitely have check all of them.
+      //Moreover, we have to read the message, check how many elements there are
+      //and then adapt the number of outputs to the number of tracking element.
+      //Every tracker should have a seperate output.
+      //at the moment I just want the first one
+      //check if there is at least one tracking data element
+      if ( !numTrackingDataElements )
+      {
+        output->SetDataValid(false);
+        MITK_ERROR("IGTLMsgToNavDataFilter") << "There are no tracking data "
+                                                "elements in this message";
+        continue;
+      }
 
       //get the tracking data element which holds all the data
       igtl::TrackingDataElement::Pointer td;
@@ -254,6 +318,8 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
     output->SetIGTTimeStamp(input->GetTimeStamp());
     //set the name
     output->SetName(input->GetName());
+
+    output->Print(std::cout);
   }
 }
 

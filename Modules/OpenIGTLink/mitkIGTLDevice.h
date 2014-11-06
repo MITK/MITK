@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <vector>
 #include "igtlSocket.h"
 #include "igtlMessageBase.h"
+#include "igtlTransformMessage.h"
 
 
 namespace mitk {
@@ -95,7 +96,7 @@ namespace mitk {
        * \retval false The latest message could not been copied, do not use this
        * data
        */
-      bool GetLatestMessage(igtl::MessageBase::Pointer msg);
+      igtl::MessageBase::Pointer GetLatestMessage();
 
       /**
        * \brief return device data
@@ -178,7 +179,7 @@ namespace mitk {
       /** the socket used to communicate with other IGTL devices */
       igtl::Socket::Pointer m_Socket;
       /** the latest received message */
-      igtl::MessageBase::Pointer m_LatestMessage;
+      igtl::TransformMessage::Pointer m_LatestMessage;
 
     private:
       /** creates worker thread that continuously polls interface for new

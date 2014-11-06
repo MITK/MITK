@@ -51,8 +51,8 @@ void mitk::IGTLDeviceSource::GenerateData()
   /* update output with message from the device */
   IGTLMessage* msgOut = this->GetOutput();
   assert(msgOut);
-  igtl::MessageBase::Pointer msgIn = igtl::MessageBase::New();
-  if ( m_IGTLDevice->GetLatestMessage(msgIn) )
+  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetLatestMessage();
+  if ( msgIn.IsNotNull() )
   {
     assert(msgIn);
 

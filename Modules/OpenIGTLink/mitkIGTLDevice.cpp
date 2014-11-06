@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cstring>
 
 #include <igtlTransformMessage.h>
+#include <mitkIGTLMessageCommon.h>
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
@@ -41,7 +42,7 @@ mitk::IGTLDevice::IGTLDevice() :
   m_CommunicationFinishedMutex->Lock();
   m_MultiThreader = itk::MultiThreader::New();
 //  m_Data = mitk::DeviceDataUnspecified;
-  m_LatestMessage = igtl::MessageBase::New();
+  m_LatestMessage = igtl::TransformMessage::New();
 }
 
 
@@ -299,8 +300,14 @@ void mitk::IGTLDevice::RunCommunication()
           headerMsg->Print(std::cout);
 
           //Create a message buffer to receive transform data
-          igtl::MessageBase::Pointer curMessage;
+          /*igtl::MessageBase::Pointer curMessage;
           curMessage = igtl::MessageBase::New();
+          curMessage->SetMessageHeader(headerMsg);
+          curMessage->AllocatePack();*/
+
+          //Create a message buffer to receive transform data
+          igtl::TransformMessage::Pointer curMessage;
+          curMessage = igtl::TransformMessage::New();
           curMessage->SetMessageHeader(headerMsg);
           curMessage->AllocatePack();
 
@@ -311,10 +318,18 @@ void mitk::IGTLDevice::RunCommunication()
 
           if ( receiveCheck > 0 )
           {
+            int c = curMessage->Unpack(1);
+            if ( !(c & igtl::MessageHeader::UNPACK_BODY) )
+            {
+              mitkThrow() << "crc error";
+            }
+
             //copy the current message into the latest message member
             bool copyCheck = false;
             m_LatestMessageMutex->Lock();
-            copyCheck = (bool)m_LatestMessage->Copy(curMessage);
+            copyCheck = IGTLMessageCommon::Clone(m_LatestMessage, curMessage);
+//            m_LatestMessage->Copy(curMessage);
+//            copyCheck = m_LatestMessage->Copy(curMessage);
             m_LatestMessageMutex->Unlock();
 
             //check if the copying was successful, otherwise invalidate the
@@ -322,7 +337,7 @@ void mitk::IGTLDevice::RunCommunication()
             if ( !copyCheck )
             {
               m_LatestMessageMutex->Lock();
-              m_LatestMessage = igtl::MessageBase::New();
+              m_LatestMessage = igtl::TransformMessage::New();
               m_LatestMessageMutex->Unlock();
               MITK_ERROR("IGTLDevice") << "Could not copy the received message.";
             }
@@ -460,12 +475,12 @@ bool mitk::IGTLDevice::CloseConnection()
   return true;
 }
 
-bool mitk::IGTLDevice::GetLatestMessage(igtl::MessageBase::Pointer msg)
+igtl::MessageBase::Pointer mitk::IGTLDevice::GetLatestMessage()
 {
-  bool copySuccesful = false;
   //copy the latest message into the given msg
   m_LatestMessageMutex->Lock();
-  copySuccesful = msg->Copy(m_LatestMessage);
+  igtl::MessageBase::Pointer msg =
+      mitk::IGTLMessageCommon::Clone(m_LatestMessage);
   m_LatestMessageMutex->Unlock();
-  return copySuccesful;
+  return msg;
 }

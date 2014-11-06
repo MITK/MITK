@@ -45,7 +45,7 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    //using Superclass::SetInput;
+    using Superclass::SetInput;
 
     /**
     * \brief Set the input of this filter
@@ -69,6 +69,9 @@ namespace mitk
     * number of inputs will not change.
     */
     virtual void SetInput( unsigned int idx, const IGTLMessage* msg);
+
+    /** Set an input */
+//    virtual void SetInput(const DataObjectIdentifierType & key, DataObject *input);
 
     /**
     * \brief Get the input of this filter

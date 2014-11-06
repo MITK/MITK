@@ -79,7 +79,10 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
   QFileInfo path = context->getDataFile(logFilenamePrefix);
   try
     {
-    mitk::LoggingBackend::RotateLogFiles(path.absoluteFilePath().toStdString());
+		// FIXME 
+		// using local8bit, because ofstream is not unicode aware
+		// to using utf-8 with ofstream need use lib "nowide.boots"
+		mitk::LoggingBackend::RotateLogFiles(path.absoluteFilePath().toLocal8Bit().constData());
     }
   catch(mitk::Exception& e)
     {

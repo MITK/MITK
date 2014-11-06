@@ -1,20 +1,18 @@
-/*=========================================================================
-*
-*  Copyright Insight Software Consortium
-*
-*  Licensed under the Apache License, Version 2.0 (the "License");
-*  you may not use this file except in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*         http://www.apache.org/licenses/LICENSE-2.0.txt
-*
-*  Unless required by applicable law or agreed to in writing, software
-*  distributed under the License is distributed on an "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*  See the License for the specific language governing permissions and
-*  limitations under the License.
-*
-*=========================================================================*/
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 #ifndef __mitkExtendedLabelStatisticsImageFilter_h
 #define __mitkExtendedLabelStatisticsImageFilter_h
 
@@ -32,10 +30,11 @@
 namespace itk
 {
   /**
-  /* \class ExtendedLabelStatisticsImageFilter
-  * \brief
-  * this class inherits from the itkStatisticsImageFilter and
-  * calculate with the Results of the Statistics two new coefficients:
+  * \class ExtendedLabelStatisticsImageFilter
+  * \brief Extension of the itkStatisticsImageFilter that also calculates the Skewness and Kurtosis.
+  *
+  * This class inherits from the itkStatisticsImageFilter and
+  * uses its results for the calculation of two new coefficients of the statistics :
   * the Skewness and Kurtosis. Both will be added in this new class. This class can be
   * used for calculating the statistics for a multilabelImage
   */

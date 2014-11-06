@@ -71,7 +71,7 @@ private:
 };
 
 mitk::LiveWireTool2D::LiveWireTool2D()
-  : SegTool2D("LiveWireTool")
+  : SegTool2D("LiveWireTool"), m_PlaneGeometry(NULL)
 {
 }
 
@@ -177,8 +177,8 @@ void mitk::LiveWireTool2D::Deactivated()
 void mitk::LiveWireTool2D::EnableContourLiveWireInteraction(bool on)
 {
   std::for_each(m_LiveWireInteractors.begin(), m_LiveWireInteractors.end(), on
-    ? AddInteractorToGlobalInteraction
-    : RemoveInteractorFromGlobalInteraction);
+                ? AddInteractorToGlobalInteraction
+                : RemoveInteractorFromGlobalInteraction);
 }
 
 void mitk::LiveWireTool2D::ConfirmSegmentation()
@@ -331,6 +331,8 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
   //set initial start point
   m_Contour->AddVertex( click, true, timestep );
   m_LiveWireFilter->SetStartPoint(click);
+  // remember plane geometry to determine if events were triggered in same plane
+  m_PlaneGeometry = interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry();
 
   m_CreateAndUseDynamicCosts = true;
 
@@ -358,6 +360,16 @@ bool mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* i
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
 
+  if (m_PlaneGeometry != NULL)
+  {
+    // this checks that the point is in the correct slice
+    if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPositionInWorld()) > mitk::eps)
+      return false;
+    // this also covers the cases where points are outside of the images bounding box
+    if (!m_PlaneGeometry->IsInside(positionEvent->GetPositionInWorld()))
+      return false;
+  }
+
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
   //add repulsive points to avoid to get the same path again
@@ -365,10 +377,10 @@ bool mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* i
   mitk::ContourModel::ConstVertexIterator iter = m_LiveWireContour->IteratorBegin(timestep);
   for (;iter != m_LiveWireContour->IteratorEnd(timestep); iter++)
   {
-      IndexType idx;
-      this->m_WorkingSlice->GetGeometry()->WorldToIndex((*iter)->Coordinates, idx);
+    IndexType idx;
+    this->m_WorkingSlice->GetGeometry()->WorldToIndex((*iter)->Coordinates, idx);
 
-      this->m_LiveWireFilter->AddRepulsivePoint( idx );
+    this->m_LiveWireFilter->AddRepulsivePoint( idx );
   }
 
   //remove duplicate first vertex, it's already contained in m_Contour

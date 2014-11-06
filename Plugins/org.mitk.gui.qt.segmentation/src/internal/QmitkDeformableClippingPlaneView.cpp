@@ -113,6 +113,7 @@ void QmitkDeformableClippingPlaneView::Deactivated()
 
 void QmitkDeformableClippingPlaneView::OnComboBoxSelectionChanged( const mitk::DataNode* node )
 {
+  this->DeactivateInteractionButtons();
   mitk::DataNode* selectedNode = const_cast<mitk::DataNode*>(node);
   if( selectedNode != NULL )
   {
@@ -257,6 +258,7 @@ void QmitkDeformableClippingPlaneView::UpdateView()
 
 void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
 {
+  this->DeactivateInteractionButtons();
   //the new clipping plane
   mitk::Surface::Pointer plane = mitk::Surface::New();
   mitk::Image::Pointer referenceImage = mitk::Image::New();
@@ -451,10 +453,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
   }
 
   // deactivate Tools
-  m_Controls.translationPushButton->setChecked(false);
-  m_Controls.rotationPushButton->setChecked(false);
-  m_Controls.deformationPushButton->setChecked(false);
-
+  this->DeactivateInteractionButtons();
   //Clear the list of volumes, before calculating the new values
   m_Controls.volumeList->clear();
 
@@ -624,4 +623,11 @@ void QmitkDeformableClippingPlaneView::OnDeformationMode(bool check)
   }
   else
     m_WorkingNode->SetDataInteractor(NULL);
+}
+
+void QmitkDeformableClippingPlaneView::DeactivateInteractionButtons()
+{
+  m_Controls.translationPushButton->setChecked(false);
+  m_Controls.rotationPushButton->setChecked(false);
+  m_Controls.deformationPushButton->setChecked(false);
 }

@@ -109,6 +109,15 @@ us::ServiceReferenceU QmitkServiceListWidget::GetSelectedServiceReference(){
   return this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
 }
 
+std::vector<us::ServiceReferenceU>  QmitkServiceListWidget::GetAllServiceReferences()
+{
+  std::vector<us::ServiceReferenceU> result;
+  for (int i = 0; i < m_ListContent.size(); i++){
+    result.push_back(m_ListContent[i].service);
+  }
+  return result;
+}
+
 ///////////////// Methods & Slots Handling Logic //////////////////////////
 
 void QmitkServiceListWidget::OnServiceEvent(const us::ServiceEvent event){

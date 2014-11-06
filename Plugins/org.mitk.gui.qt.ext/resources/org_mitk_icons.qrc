@@ -7,10 +7,15 @@
      <file>icons/awesome/scalable/actions/edit-delete.svg</file>
      <file>icons/awesome/scalable/actions/edit-redo.svg</file>
      <file>icons/awesome/scalable/actions/edit-undo.svg</file>
+     <file>icons/awesome/scalable/actions/go-down.svg</file>
      <file>icons/awesome/scalable/actions/go-home.svg</file>
      <file>icons/awesome/scalable/actions/go-next.svg</file>
      <file>icons/awesome/scalable/actions/go-previous.svg</file>
+     <file>icons/awesome/scalable/actions/go-up.svg</file>
      <file>icons/awesome/scalable/actions/system-log-out.svg</file>
+     <file>icons/awesome/scalable/actions/view-list-details.svg</file>
+     <file>icons/awesome/scalable/actions/view-list-icons.svg</file>
+     <file>icons/awesome/scalable/actions/view-refresh.svg</file>
      <file>icons/awesome/scalable/places/folder.svg</file>
      <file>icons/awesome/scalable/status/dialog-error.svg</file>
      <file>icons/awesome/scalable/status/dialog-information.svg</file>
@@ -23,11 +28,19 @@
      <file>icons/tango/scalable/actions/edit-delete.svg</file>
      <file>icons/tango/scalable/actions/edit-redo.svg</file>
      <file>icons/tango/scalable/actions/edit-undo.svg</file>
+     <file>icons/tango/scalable/actions/go-bottom.svg</file>
      <file>icons/tango/scalable/actions/go-down.svg</file>
+     <file>icons/tango/scalable/actions/go-first.svg</file>
      <file>icons/tango/scalable/actions/go-home.svg</file>
+     <file>icons/tango/scalable/actions/go-last.svg</file>
      <file>icons/tango/scalable/actions/go-next.svg</file>
      <file>icons/tango/scalable/actions/go-previous.svg</file>
+     <file>icons/tango/scalable/actions/go-top.svg</file>
      <file>icons/tango/scalable/actions/go-up.svg</file>
+     <file>icons/tango/scalable/actions/system-log-out.svg</file>
+     <file>icons/tango/scalable/actions/view-list-details.svg</file>
+     <file>icons/tango/scalable/actions/view-list-icons.svg</file>
+     <file>icons/tango/scalable/actions/view-refresh.svg</file>
      <file>icons/tango/scalable/actions/list-add.svg</file>
      <file>icons/tango/scalable/actions/list-remove.svg</file>
      <file>icons/tango/scalable/actions/media-playback-pause.svg</file>

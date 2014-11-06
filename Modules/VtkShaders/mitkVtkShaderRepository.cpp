@@ -482,7 +482,6 @@ mitk::VtkShaderRepository::UpdateShaderProgram(ShaderProgram* shaderProgram,
     if( s.IsNull() )
     {
       mitkVtkShaderProgram->SetVtkShaderProgram(0);
-      MITK_INFO << "disabling shader";
       mitkVtkShaderProgram->GetShaderTimestampUpdate().Modified();
       return;
     }

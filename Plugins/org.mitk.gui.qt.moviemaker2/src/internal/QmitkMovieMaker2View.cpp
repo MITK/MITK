@@ -55,7 +55,6 @@ static unsigned char* ReadPixels(vtkRenderWindow* renderWindow, int x, int y, in
   if (renderWindow == NULL)
     return NULL;
 
-  const int* size = renderWindow->GetSize();
   unsigned char* frame = new unsigned char[width * height * 3];
 
   renderWindow->MakeCurrent();
@@ -256,7 +255,7 @@ void QmitkMovieMaker2View::OnAddAnimationButtonClicked()
   }
 }
 
-void QmitkMovieMaker2View::OnPlayButtonToggled(bool checked)
+void QmitkMovieMaker2View::OnPlayButtonToggled(bool /*checked*/)
 {
   vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4");
   mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice();

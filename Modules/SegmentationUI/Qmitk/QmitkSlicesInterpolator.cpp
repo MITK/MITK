@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSelectableGLWidget.h"
 
 #include "mitkToolManager.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"

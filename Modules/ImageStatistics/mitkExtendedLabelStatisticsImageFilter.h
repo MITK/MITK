@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 #include "itkDataObject.h"
 
-#include "ImageStatisticsExports.h"
 #include "mitkCommon.h"
 
 namespace itk
@@ -33,28 +32,27 @@ namespace itk
   * \class ExtendedLabelStatisticsImageFilter
   * \brief Extension of the itkStatisticsImageFilter that also calculates the Skewness and Kurtosis.
   *
-  * This class inherits from the itkStatisticsImageFilter and
-  * uses its results for the calculation of two new coefficients of the statistics :
+  * This class inherits from the itkLabelStatisticsImageFilter and
+  * uses its results for the calculation of two new coefficients of the statistics:
   * the Skewness and Kurtosis. Both will be added in this new class. This class can be
   * used for calculating the statistics for a multilabelImage
   */
   template< class TInputImage, class TLabelImage >
-  class /*ImageStatistics_EXPORT*/ ExtendedLabelStatisticsImageFilter : public LabelStatisticsImageFilter< TInputImage,  TLabelImage >
+  class ExtendedLabelStatisticsImageFilter : public LabelStatisticsImageFilter< TInputImage,  TLabelImage >
   {
   public:
 
-    typedef ExtendedLabelStatisticsImageFilter             Self;
+    typedef ExtendedLabelStatisticsImageFilter                      Self;
     typedef LabelStatisticsImageFilter < TInputImage, TLabelImage > Superclass;
-    typedef SmartPointer< Self >                           Pointer;
-    typedef SmartPointer< const Self >                     ConstPointer;
+    typedef SmartPointer< Self >                                    Pointer;
+    typedef SmartPointer< const Self >                              ConstPointer;
 
     itkNewMacro(Self);
 
     itkTypeMacro(ExtendedLabelStatisticsImageFilter, LabelStatisticsImageFilter);
 
     /**
-    /* brief
-    *adding an internal class which invokes a class with the new calculated coefficients; Skewness and Curtosis
+    * \brief Internal class which stores the calculated coefficients Skewness and Kurtosis.
     */
     class CoefficientsClass
     {
@@ -81,12 +79,6 @@ namespace itk
     RealType GetSkewness(LabelPixelType label) const;
     RealType GetKurtosis(LabelPixelType label) const;
 
-    /**
-    * \brief Calculate Skewness and Kurtosis.
-    * This method will calculate the new coefficients with sigma and mean value of the threaded generate data of the base class
-    */
-    void ComputeTheSkewnessAndCurtosis();
-
   protected:
 
     ExtendedLabelStatisticsImageFilter();
@@ -94,6 +86,13 @@ namespace itk
     virtual ~ExtendedLabelStatisticsImageFilter(){};
 
     void AfterThreadedGenerateData();
+
+    /**
+    * \brief Calculate Skewness and Kurtosis.
+    *
+    * This method will calculate the new coefficients with sigma and mean value of the threaded generate data of the base class.
+    */
+    void ComputeTheSkewnessAndCurtosis();
 
 
   private:

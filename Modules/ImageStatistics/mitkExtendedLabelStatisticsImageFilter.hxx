@@ -18,11 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkExtendedLabelStatisticsImageFilter.h"
 
-#include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
-#include "itkProgressReporter.h"
-
-#include "itkImageFileWriter.h"
 
 namespace itk
 {

@@ -1408,7 +1408,6 @@ namespace mitk
         statistics.SetVariance(labelStatisticsFilter->GetVariance( *it ));
         statistics.SetSigma(labelStatisticsFilter->GetSigma( *it ));
         statistics.SetSkewness(labelStatisticsFilter->GetSkewness( *it ));
-        std::cout << "Zwischenwerte" << labelStatisticsFilter->GetSkewness( *it ) << ".." << statistics.GetSkewness()<< std::endl;
         statistics.SetKurtosis(labelStatisticsFilter->GetKurtosis( *it ));
         statistics.SetRMS(sqrt( statistics.GetMean() * statistics.GetMean()
           + statistics.GetSigma() * statistics.GetSigma() ));

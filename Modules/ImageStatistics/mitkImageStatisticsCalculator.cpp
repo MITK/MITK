@@ -217,6 +217,9 @@ namespace mitk
     SetSigma( 0.0 );
     SetRMS( 0.0 );
 
+    SetSkewness( 0.0 );
+    SetKurtosis( 0.0 );
+
     vnl_vector<int> zero;
     zero.set_size(dimension);
     for(unsigned int i = 0; i < dimension; ++i)
@@ -278,6 +281,9 @@ namespace mitk
     this->SetMinIndex( other.GetMinIndex() );
     this->SetMaxIndex( other.GetMaxIndex() );
     this->SetHotspotIndex( other.GetHotspotIndex() );
+    this->SetSkewness( other.GetSkewness() );
+    this->SetKurtosis( other.GetKurtosis() );
+
 
     delete this->m_HotspotStatistics;
     this->m_HotspotStatistics = NULL;

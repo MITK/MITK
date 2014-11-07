@@ -825,7 +825,7 @@ void QmitkTensorReconstructionView::OnSelectionChanged( std::vector<mitk::DataNo
             continue;
 
         // only look at interesting types
-        if(dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()))
+        if(dynamic_cast<mitk::DiffusionImage<DiffusionPixelType>*>(node->GetData()))
         {
             foundDwiVolume = true;
             m_Controls->m_DiffusionImageLabel->setText(node->GetName().c_str());

@@ -1001,7 +1001,6 @@ void QmitkQBallReconstructionView::SetDefaultNodeProperties(mitk::DataNode::Poin
 
 void QmitkQBallReconstructionView::GenerateShellSelectionUI(mitk::DataStorage::SetOfObjects::Pointer set)
 {
-
   m_DiffusionImages = set;
 
   std::map<const mitk::DataNode * , QbrShellSelection * > tempMap;

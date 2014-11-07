@@ -38,6 +38,11 @@ class MITK_QT_COMMON_EXT_EXPORT QmitkExtWorkbenchWindowAdvisor : public QObject,
 
 public:
 
+	static QString MI_FILE;
+	static QString MI_EDIT;
+	static QString MI_WINDOW;
+	static QString MI_HELP;
+
     QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor,
         berry::IWorkbenchWindowConfigurer::Pointer configurer);
 

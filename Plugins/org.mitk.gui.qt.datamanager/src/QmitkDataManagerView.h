@@ -61,7 +61,22 @@ class MITK_QT_DATAMANAGER QmitkDataManagerView : public QmitkAbstractView
 
 public:
 
+
   static const QString VIEW_ID; // = "org.mitk.extapp.defaultperspective"
+
+  static QString TR_GLOBAL_REINIT;
+  static QString TR_SAVE;
+  static QString TR_REMOVE;
+  static QString TR_REINIT;
+  static QString TR_OPACITY;
+  static QString TR_COLOR;
+  static QString TR_TEXTURE_INTERPOLATION;
+  static QString TR_SURFACE_REPRESENTATION;
+  static QString TR_SHOW_ONLY_SELECTED_NOTES;
+  static QString TR_TOGGLE_VISIBILITY;
+  static QString TR_DETAILS;
+  static QString TR_COLORMAP;
+
   ///
   /// \brief Standard ctor.
   ///

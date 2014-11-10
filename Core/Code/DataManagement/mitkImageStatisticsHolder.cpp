@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkHistogramGenerator.h"
 //#include "mitkImageTimeSelector.h"
+#include <mitkProperties.h>
 
 mitk::ImageStatisticsHolder::ImageStatisticsHolder( mitk::Image* image)
   : m_Image(image)/*, m_TimeSelectorForExtremaObject(NULL)*/
@@ -290,6 +291,7 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int com
   if( m_ScalarMin[t] != itk::NumericTraits<ScalarType>::max() ||
       m_Scalar2ndMin[t] != itk::NumericTraits<ScalarType>::max() ) return; // Values already calculated before...
 
+  mitk::BoolProperty* isqball = dynamic_cast< mitk::BoolProperty* >( m_Image->GetProperty( "IsQballImage" ).GetPointer() );
   const mitk::PixelType pType = m_Image->GetPixelType(0);
   if(pType.GetNumberOfComponents() == 1 && (pType.GetPixelType() != itk::ImageIOBase::UNKNOWNPIXELTYPE) && (pType.GetPixelType() != itk::ImageIOBase::VECTOR) )
   {
@@ -303,7 +305,7 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int com
       AccessByItk_2( image, _ComputeExtremaInItkImage, this, t );
     }
   }
-  else if (pType.GetPixelType() == itk::ImageIOBase::VECTOR)  // we have a vector image
+  else if (pType.GetPixelType() == itk::ImageIOBase::VECTOR && !isqball)  // we have a vector image
   {
       // recompute
       mitk::ImageTimeSelector::Pointer timeSelector = this->GetTimeSelector();

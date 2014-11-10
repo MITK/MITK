@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::QBallImage::QBallImage() : Image()
 {
   m_RgbImage = 0;
+  // not needed anymore as soon as all diffusion images are identified via properties anyway
   this->SetProperty("IsQballImage", mitk::BoolProperty::New(true));
 }
 

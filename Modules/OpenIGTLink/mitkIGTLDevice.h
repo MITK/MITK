@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "igtlMessageBase.h"
 #include "igtlTransformMessage.h"
 #include "mitkIGTLMessageFactory.h"
+#include "mitkIGTLMessageQueue.h"
 
 
 namespace mitk {
@@ -172,7 +173,7 @@ namespace mitk {
       /** mutex to control access to m_Socket */
 //      itk::FastMutexLock::Pointer m_SocketMutex;
       /** mutex to control access to m_LatestMessage */
-      itk::FastMutexLock::Pointer m_LatestMessageMutex;
+//      itk::FastMutexLock::Pointer m_LatestMessageMutex;
       /** the hostname or ip of the device */
       std::string m_Hostname;
       /** the port number of the device */
@@ -180,7 +181,9 @@ namespace mitk {
       /** the socket used to communicate with other IGTL devices */
       igtl::Socket::Pointer m_Socket;
       /** the latest received message */
-      igtl::MessageBase::Pointer m_LatestMessage;
+//      igtl::MessageBase::Pointer m_LatestMessage;
+      /** The message queue */
+      mitk::IGTLMessageQueue::Pointer m_Queue;
       /** the latest received message */
       mitk::IGTLMessageFactory::Pointer m_MessageFactory;
 

@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "igtlPositionMessage.h"
 #include "igtlStatusMessage.h"
 
+//own types
+#include "mitkIGTLDummyMessage.h"
+
 #include "mitkIGTLMessageCommon.h"
 
 #include "itksys/SystemTools.hxx"
@@ -80,6 +83,7 @@ igtl::MessageBase::Pointer TransformMsgCloneHandler::Clone(igtl::MessageBase* or
   return igtl::MessageBase::Pointer(clone_.GetPointer());
 }
 
+
 mitk::IGTLMessageFactory::IGTLMessageFactory()
 {
   //create clone handlers
@@ -95,7 +99,7 @@ mitk::IGTLMessageFactory::IGTLMessageFactory()
 //  this->AddMessageType("CAPABILITY", (PointerToCloneMessageFunction)&igtl::StatusMessage::New);
 
 //  //OpenIGTLink Types V2
-//  this->AddMessageType("IMGMETA", (PointerToCloneMessageFunction)&igtl::PlusClientInfoMessage::New);
+//  this->AddMessageType("IMGMETA", (PointerToCloneMessageFunction)&igtl::IGTLDummyMessage::New);
 //  this->AddMessageType("LBMETA", (PointerToCloneMessageFunction)&igtl::PlusTrackedFrameMessage::New);
 //  this->AddMessageType("COLORT", (PointerToCloneMessageFunction)&igtl::PlusUsMessage::New);
 //  this->AddMessageType("POINT", (PointerToCloneMessageFunction)&igtl::PlusUsMessage::New);
@@ -108,8 +112,8 @@ mitk::IGTLMessageFactory::IGTLMessageFactory()
 //  this->AddMessageType("BIND", (PointerToCloneMessageFunction)&igtl::PlusUsMessage::New);
 //  this->AddMessageType("POLYDATA", (PointerToCloneMessageFunction)&igtl::PlusUsMessage::New);
 
-//  //Own Types
-//  this->AddMessageType("MITKXXX", (PointerToCloneMessageFunction)&igtl::PlusUsMessage::New);
+  //Own Types
+  this->AddMessageType("DUMMY", (PointerToMessageBaseNew)&mitk::IGTLDummyMessage::New, DummyMsgCloneHandler::New().GetPointer());
 }
 
 mitk::IGTLMessageFactory::~IGTLMessageFactory()

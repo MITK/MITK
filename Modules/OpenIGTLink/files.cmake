@@ -7,4 +7,6 @@ set(CPP_FILES
   mitkIGTLMessageCommon.cpp
   mitkIGTLMessageFactory.cpp
   mitkIGTLMessageCloneHandler.h
+  mitkIGTLDummyMessage.cpp
+  mitkIGTLMessageQueue.cpp
 )

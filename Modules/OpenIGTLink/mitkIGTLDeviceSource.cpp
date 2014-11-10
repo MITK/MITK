@@ -59,10 +59,10 @@ void mitk::IGTLDeviceSource::GenerateData()
     msgOut->SetMessage(msgIn);
     msgOut->SetName(msgIn->GetDeviceName());
   }
-  else
-  {
-    MITK_ERROR("IGTLDeviceSource") << "Could not get the latest message.";
-  }
+//  else
+//  {
+//    MITK_ERROR("IGTLDeviceSource") << "Could not get the latest message.";
+//  }
 }
 
 void mitk::IGTLDeviceSource::SetIGTLDevice( mitk::IGTLDevice* igtlDevice )

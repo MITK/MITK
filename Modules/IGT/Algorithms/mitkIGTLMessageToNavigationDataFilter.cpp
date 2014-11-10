@@ -159,16 +159,9 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
     //check if the IGTL message has the proper type
     if( strcmp(input->GetIGTLMessageType(), "TRANSFORM") == 0 )
     {
-      //get the tracking data message
-//      igtl::TransformMessage::Pointer tMsg =
-//        dynamic_cast<igtl::TransformMessage*>(test.GetPointer());
-
+      //cast the input message into the proper type
       igtl::TransformMessage* tMsg =
           (igtl::TransformMessage*)(input->GetMessage().GetPointer());
-
-//      igtl::TransformMessage::Pointer tMsg =
-//          igtl::TransformMessage::Pointer(input->GetMessage().GetPointer());
-////      tMsg->Copy(test);
 
       //check if cast was successful
       if ( !tMsg )
@@ -178,6 +171,7 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
         continue;
       }
 
+      //debug output
       tMsg->Print(std::cout);
 
       //get the transformation matrix and convert it into an affinetransformation
@@ -211,10 +205,17 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
     }
     else if( strcmp(input->GetIGTLMessageType(), "TDATA") == 0 )
     {
-      //get the tracking data message
-      igtl::TrackingDataMessage::Pointer tdMsg =
-          dynamic_cast<igtl::TrackingDataMessage*>(
-            input->GetMessage().GetPointer());
+      //cast the input message into the proper type
+      igtl::TrackingDataMessage* tdMsg =
+          (igtl::TrackingDataMessage*)(input->GetMessage().GetPointer());
+
+      //check if cast was successful
+      if ( !tdMsg )
+      {
+        mitkThrow() << "Cast from igtl::MessageBase to igtl::TransformMessage "
+                    << "failed! Please check the message.";
+        continue;
+      }
 
       //get the number of tracking data elements
       unsigned int numTrackingDataElements =

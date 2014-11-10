@@ -42,16 +42,16 @@ namespace mitk {
       itkCloneMacro(Self);
 
       /**
-      * \brief Copies the content of a transform message original into another one
-      * (clone)
+      * \brief Clones the input message and returns a igtl::MessageBase::Pointer
+      * to the clone
       */
-      static bool Clone(igtl::TransformMessage::Pointer clone, igtl::TransformMessage::Pointer original);
+//      static igtl::MessageBase::Pointer Clone(igtl::TransformMessage::Pointer original);
 
       /**
-      * \brief Copies the content of a transform message original into another one
-      * (clone)
+      * \brief Clones the input message and returns a igtl::MessageBase::Pointer
+      * to the clone
       */
-      static igtl::MessageBase::Pointer Clone(igtl::TransformMessage::Pointer original);
+//      static igtl::MessageBase::Pointer Clone(igtl::MessageBase::Pointer original);
 
 
     protected:

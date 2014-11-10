@@ -5,4 +5,6 @@ set(CPP_FILES
   mitkIGTLDeviceSource.cpp
   mitkIGTLMessage.cpp
   mitkIGTLMessageCommon.cpp
+  mitkIGTLMessageFactory.cpp
+  mitkIGTLMessageCloneHandler.h
 )

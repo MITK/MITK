@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "igtlSocket.h"
 #include "igtlMessageBase.h"
 #include "igtlTransformMessage.h"
+#include "mitkIGTLMessageFactory.h"
 
 
 namespace mitk {
@@ -179,7 +180,9 @@ namespace mitk {
       /** the socket used to communicate with other IGTL devices */
       igtl::Socket::Pointer m_Socket;
       /** the latest received message */
-      igtl::TransformMessage::Pointer m_LatestMessage;
+      igtl::MessageBase::Pointer m_LatestMessage;
+      /** the latest received message */
+      mitk::IGTLMessageFactory::Pointer m_MessageFactory;
 
     private:
       /** creates worker thread that continuously polls interface for new

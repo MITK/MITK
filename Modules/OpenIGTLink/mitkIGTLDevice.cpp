@@ -42,7 +42,9 @@ mitk::IGTLDevice::IGTLDevice() :
   m_CommunicationFinishedMutex->Lock();
   m_MultiThreader = itk::MultiThreader::New();
 //  m_Data = mitk::DeviceDataUnspecified;
-  m_LatestMessage = igtl::TransformMessage::New();
+  m_LatestMessage = igtl::MessageBase::New();
+
+  m_MessageFactory = mitk::IGTLMessageFactory::New();
 }
 
 
@@ -306,8 +308,8 @@ void mitk::IGTLDevice::RunCommunication()
           curMessage->AllocatePack();*/
 
           //Create a message buffer to receive transform data
-          igtl::TransformMessage::Pointer curMessage;
-          curMessage = igtl::TransformMessage::New();
+          igtl::MessageBase::Pointer curMessage;
+          curMessage = m_MessageFactory->CreateInstance(headerMsg);
           curMessage->SetMessageHeader(headerMsg);
           curMessage->AllocatePack();
 
@@ -325,22 +327,9 @@ void mitk::IGTLDevice::RunCommunication()
             }
 
             //copy the current message into the latest message member
-            bool copyCheck = false;
             m_LatestMessageMutex->Lock();
-            copyCheck = IGTLMessageCommon::Clone(m_LatestMessage, curMessage);
-//            m_LatestMessage->Copy(curMessage);
-//            copyCheck = m_LatestMessage->Copy(curMessage);
+            m_LatestMessage = m_MessageFactory->Clone(curMessage);
             m_LatestMessageMutex->Unlock();
-
-            //check if the copying was successful, otherwise invalidate the
-            //latest message
-            if ( !copyCheck )
-            {
-              m_LatestMessageMutex->Lock();
-              m_LatestMessage = igtl::TransformMessage::New();
-              m_LatestMessageMutex->Unlock();
-              MITK_ERROR("IGTLDevice") << "Could not copy the received message.";
-            }
           }
           else
           {
@@ -480,7 +469,7 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetLatestMessage()
   //copy the latest message into the given msg
   m_LatestMessageMutex->Lock();
   igtl::MessageBase::Pointer msg =
-      mitk::IGTLMessageCommon::Clone(m_LatestMessage);
+      this->m_MessageFactory->Clone(m_LatestMessage);
   m_LatestMessageMutex->Unlock();
   return msg;
 }

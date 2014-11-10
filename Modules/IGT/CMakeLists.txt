@@ -20,8 +20,8 @@ MITK_CREATE_MODULE(
   SUBPROJECTS MITK-IGT
   INCLUDE_DIRS Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices TestingHelper
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  DEPENDS MitkImageStatistics MitkSceneSerialization MitkIGTBase
-  PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml
+  DEPENDS MitkImageStatistics MitkSceneSerialization MitkIGTBase MitkOpenIGTLink
+  PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml OpenIGTLink
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
   #WARNINGS_AS_ERRORS disabled for release 2014-03 because of bug 17463
 )

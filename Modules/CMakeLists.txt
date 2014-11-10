@@ -29,9 +29,8 @@ set(module_dirs
     DiffusionImaging
     GPGPU
     IGTBase
-    IGT
     OpenIGTLink
-    IGTLink
+    IGT
     CameraCalibration
     RigidRegistration
     RigidRegistrationUI

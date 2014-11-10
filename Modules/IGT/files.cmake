@@ -12,6 +12,7 @@ set(CPP_FILES
   Algorithms/mitkNavigationDataToNavigationDataFilter.cpp
   Algorithms/mitkNavigationDataToPointSetFilter.cpp
   Algorithms/mitkNavigationDataTransformFilter.cpp
+  Algorithms/mitkIGTLMessageToNavigationDataFilter.cpp
 
   Common/mitkIGTTimeStamp.cpp
   Common/mitkSerialCommunication.cpp

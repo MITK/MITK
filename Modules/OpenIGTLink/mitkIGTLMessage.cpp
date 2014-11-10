@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIGTLMessage.h"
 #include "mitkException.h"
+#include "mitkIGTLMessageCommon.h"
 
 mitk::IGTLMessage::IGTLMessage() : itk::DataObject(),
 m_DataValid(false), m_IGTTimeStamp(0.0), m_Name()
@@ -73,9 +74,9 @@ void mitk::IGTLMessage::Graft( const DataObject *data )
   this->SetName(nd->GetName());
 }
 
-void mitk::IGTLMessage::SetMessage(igtl::MessageBase* msg)
+void mitk::IGTLMessage::SetMessage(igtl::MessageBase::Pointer msg)
 {
-  m_Message->Copy(msg);
+  m_Message = msg;
   unsigned int ts = 0;
   unsigned int frac = 0;
   m_Message->GetTimeStamp(&ts, &frac);

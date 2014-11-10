@@ -193,7 +193,7 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
         {
           transformation.GetVnlMatrix().set( r , c , transformation_[r][c] );
         }
-        offset.SetElement(r, transformation_[r][4]);
+        offset.SetElement(r, transformation_[r][3]);
       }
       //convert the igtl matrix here and set it in the affine transformation
       affineTransformation->SetMatrix(transformation);

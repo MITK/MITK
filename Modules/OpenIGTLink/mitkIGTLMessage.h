@@ -52,7 +52,7 @@ namespace mitk {
       /**
       * \brief Sets the OpenIGTLink message
       */
-      void SetMessage(igtl::MessageBase* msg);
+      void SetMessage(igtl::MessageBase::Pointer msg);
       /**
       * \brief returns the OpenIGTLink message
       */

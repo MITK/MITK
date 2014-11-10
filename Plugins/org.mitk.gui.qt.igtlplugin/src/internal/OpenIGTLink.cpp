@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 
 // Qmitk
-#include "OpenIGTLink.h"
+#include "QmitkRenderWindow.h"
 
 // Qt
 #include <QMessageBox>
@@ -28,12 +28,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk
 #include <mitkImage.h>
 #include <mitkSurface.h>
+#include <mitkIGTLMessageToNavigationDataFilter.h>
 
 // vtk
 #include <vtkSphereSource.h>
 
 //
-#include <mitkIGTLMessageToNavigationDataFilter.h>
+#include "OpenIGTLink.h"
 
 
 const std::string OpenIGTLink::VIEW_ID = "org.mitk.views.openigtlink";
@@ -153,10 +154,12 @@ void OpenIGTLink::CreatePipeline()
   mySphere->SetVtkPolyData(vtkData->GetOutput());
   vtkData->Delete();
   m_DemoNode->SetData(mySphere);
-  m_VisFilter->SetRepresentationObject(0, mySphere);
 
   // add node to DataStorage
   this->GetDataStorage()->Add(m_DemoNode);
+
+  //use this sphere as representation object
+  m_VisFilter->SetRepresentationObject(0, mySphere);
 }
 
 void OpenIGTLink::DestroyPipeline()
@@ -167,11 +170,17 @@ void OpenIGTLink::DestroyPipeline()
 
 void OpenIGTLink::Start()
 {
-  m_Timer.setInterval(100);
+  m_Timer.setInterval(1000);
   m_Timer.start();
 }
 
 void OpenIGTLink::UpdatePipeline()
 {
   m_VisFilter->Update();
+
+  //Update rendering
+  QmitkRenderWindow* renWindow =
+      this->GetRenderWindowPart()->GetQmitkRenderWindow("3d");
+  renWindow->GetRenderer()->GetVtkRenderer()->Render();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

@@ -82,8 +82,8 @@ void QmitkAnimationItemDelegate::paint(QPainter* painter, const QStyleOptionView
     }
 
     QColor color = thisItem->GetStartWithPrevious()
-      ? QColor("Khaki")
-      : QColor("DarkKhaki");
+      ? QColor("DarkGray")
+      : QColor("DimGray");
 
     painter->setBrush(color);
     painter->setPen(Qt::NoPen);

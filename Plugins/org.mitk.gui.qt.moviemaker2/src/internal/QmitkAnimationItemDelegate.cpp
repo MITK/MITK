@@ -81,15 +81,15 @@ void QmitkAnimationItemDelegate::paint(QPainter* painter, const QStyleOptionView
         thisStart = previousStart;
     }
 
+    const QRect& rect = option.rect;
+    const double widthPerSecond = rect.width() / totalDuration;
+
     QColor color = thisItem->GetStartWithPrevious()
       ? QColor("DarkGray")
       : QColor("DimGray");
 
     painter->setBrush(color);
     painter->setPen(Qt::NoPen);
-
-    const QRect& rect = option.rect;
-    const double widthPerSecond = rect.width() / totalDuration;
 
     painter->drawRect(
       rect.x() + static_cast<int>(widthPerSecond * (thisStart + thisItem->GetDelay())),

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>345</width>
-    <height>63</height>
+    <width>192</width>
+    <height>87</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QLabel" name="angleLabel">
+    <widget class="QLabel" name="startAngleLabel">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -23,50 +23,66 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Angle:</string>
+      <string>Start angle:</string>
      </property>
      <property name="buddy">
-      <cstring>angleSlider</cstring>
+      <cstring>startAngleSlider</cstring>
      </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QSlider" name="angleSlider">
-       <property name="maximum">
-        <number>360</number>
-       </property>
-       <property name="value">
-        <number>360</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="angleSpinBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="suffix">
-        <string>°</string>
-       </property>
-       <property name="maximum">
-        <number>360</number>
-       </property>
-       <property name="value">
-        <number>360</number>
-       </property>
-      </widget>
-     </item>
-    </layout>
+   <item row="0" column="1">
+    <widget class="QSlider" name="startAngleSlider">
+     <property name="maximum">
+      <number>360</number>
+     </property>
+     <property name="value">
+      <number>180</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
    </item>
-   <item row="1" column="1">
+   <item row="0" column="2">
+    <widget class="QSpinBox" name="startAngleSpinBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximum">
+      <number>360</number>
+     </property>
+     <property name="value">
+      <number>180</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="orbitLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Orbit:</string>
+     </property>
+     <property name="buddy">
+      <cstring>startAngleSlider</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="2">
+    <widget class="QLineEdit" name="orbitLineEdit">
+     <property name="text">
+      <string>360</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
     <widget class="QCheckBox" name="reverseCheckBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -82,8 +98,8 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>angleSlider</tabstop>
-  <tabstop>angleSpinBox</tabstop>
+  <tabstop>startAngleSlider</tabstop>
+  <tabstop>startAngleSpinBox</tabstop>
   <tabstop>reverseCheckBox</tabstop>
  </tabstops>
  <resources/>

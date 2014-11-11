@@ -15,11 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkOrbitAnimationItem.h"
+#include <mitkBaseRenderer.h>
 
-QmitkOrbitAnimationItem::QmitkOrbitAnimationItem(double angle, bool reverse, double duration, double delay, bool startWithPrevious)
+QmitkOrbitAnimationItem::QmitkOrbitAnimationItem(int startAngle, int orbit, bool reverse, double duration, double delay, bool startWithPrevious)
   : QmitkAnimationItem("Orbit", duration, delay, startWithPrevious)
 {
-  this->SetAngle(angle);
+  this->SetStartAngle(startAngle);
+  this->SetOrbit(orbit);
   this->SetReverse(reverse);
 }
 
@@ -27,14 +29,24 @@ QmitkOrbitAnimationItem::~QmitkOrbitAnimationItem()
 {
 }
 
-int QmitkOrbitAnimationItem::GetAngle() const
+int QmitkOrbitAnimationItem::GetStartAngle() const
 {
-  return this->data(AngleRole).toInt();
+  return this->data(StartAngleRole).toInt();
 }
 
-void QmitkOrbitAnimationItem::SetAngle(int angle)
+void QmitkOrbitAnimationItem::SetStartAngle(int angle)
 {
-  this->setData(angle, AngleRole);
+  this->setData(angle, StartAngleRole);
+}
+
+int QmitkOrbitAnimationItem::GetOrbit() const
+{
+  return this->data(OrbitRole).toInt();
+}
+
+void QmitkOrbitAnimationItem::SetOrbit(int angle)
+{
+  this->setData(angle, OrbitRole);
 }
 
 bool QmitkOrbitAnimationItem::GetReverse() const
@@ -45,4 +57,22 @@ bool QmitkOrbitAnimationItem::GetReverse() const
 void QmitkOrbitAnimationItem::SetReverse(bool reverse)
 {
   this->setData(reverse, ReverseRole);
+}
+
+void QmitkOrbitAnimationItem::Animate(double s)
+{
+  vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4");
+  mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice();
+
+  int newPos = this->GetReverse()
+    ? this->GetStartAngle() - this->GetOrbit() * s
+    : this->GetStartAngle() + this->GetOrbit() * s;
+
+  while (newPos < 0)
+    newPos += 360;
+
+  while (newPos > 360)
+    newPos -= 360;
+
+  stepper->SetPos(static_cast<unsigned int>(newPos));
 }

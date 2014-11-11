@@ -72,7 +72,9 @@ private:
   void HideCurrentAnimationWidget();
   void ShowAnimationWidget(QmitkAnimationItem* animationItem);
   void RedrawTimeline();
+  double CalculateTotalDuration() const;
   QmitkAnimationItem* GetSelectedAnimationItem() const;
+  QVector<QPair<QmitkAnimationItem*, double> > QmitkMovieMaker2View::GetActiveAnimations(double t) const;
 
   QmitkFFmpegWriter* m_FFmpegWriter;
   Ui::QmitkMovieMaker2View* m_Ui;

@@ -68,3 +68,7 @@ void QmitkSliceAnimationItem::SetReverse(bool reverse)
 {
   this->setData(reverse, ReverseRole);
 }
+
+void QmitkSliceAnimationItem::Animate(double /*s*/)
+{
+}

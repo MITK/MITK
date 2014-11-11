@@ -32,7 +32,8 @@ public:
     FromRole,
     ToRole,
     ReverseRole,
-    AngleRole
+    StartAngleRole,
+    OrbitRole
   };
 
   explicit QmitkAnimationItem(const QString& widgetKey, double duration = 2.0, double delay = 0.0, bool startWithPrevious = false);
@@ -49,6 +50,8 @@ public:
 
   bool GetStartWithPrevious() const;
   void SetStartWithPrevious(bool startWithPrevious);
+
+  virtual void Animate(double s) = 0;
 };
 
 #endif

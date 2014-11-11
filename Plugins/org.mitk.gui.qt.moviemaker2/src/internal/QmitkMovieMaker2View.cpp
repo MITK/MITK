@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 static QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
 {
   if (widgetKey == "Orbit")
-    return new QmitkOrbitAnimationItem(360.0, false);
+    return new QmitkOrbitAnimationItem;
 
   if (widgetKey == "Slice")
     return new QmitkSliceAnimationItem(0, 0, 999, false);
@@ -255,9 +255,37 @@ void QmitkMovieMaker2View::OnAddAnimationButtonClicked()
   }
 }
 
-void QmitkMovieMaker2View::OnPlayButtonToggled(bool /*checked*/)
+void QmitkMovieMaker2View::OnPlayButtonToggled(bool checked) // TODO: Refactor
 {
-  vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4");
+  typedef QPair<QmitkAnimationItem*, double> AnimationIterpolationFactorPair;
+  if (checked)
+  {
+    m_Ui->playButton->setIcon(QIcon(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-pause.svg"));
+    m_Ui->playButton->repaint();
+
+    const double totalDuration = this->CalculateTotalDuration(); // TODO totalDuration == 0
+    const int numFrames = static_cast<int>(totalDuration * m_Ui->fpsSpinBox->value()); // TODO numFrames < 2
+    const double deltaT = totalDuration / (numFrames - 1);
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+      QVector<AnimationIterpolationFactorPair> activeAnimations = this->GetActiveAnimations(i * deltaT);
+
+      Q_FOREACH(const AnimationIterpolationFactorPair& animation, activeAnimations)
+      {
+        animation.first->Animate(animation.second);
+      }
+
+      mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+    }
+  }
+  else
+  {
+    m_Ui->playButton->setIcon(QIcon(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg"));
+    m_Ui->playButton->repaint();
+  }
+
+  /*vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4");
   mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice();
 
   unsigned int startPos = stepper->GetPos();
@@ -270,7 +298,7 @@ void QmitkMovieMaker2View::OnPlayButtonToggled(bool /*checked*/)
     stepper->SetPos(newPos);
 
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(renderWindow);
-  }
+  }*/
 }
 
 void QmitkMovieMaker2View::OnRecordButtonClicked() // TODO: Refactor
@@ -505,4 +533,72 @@ QmitkAnimationItem* QmitkMovieMaker2View::GetSelectedAnimationItem() const
   return !selection.isEmpty()
     ? dynamic_cast<QmitkAnimationItem*>(m_AnimationModel->item(selection[0].top(), 1))
     : NULL;
+}
+
+double QmitkMovieMaker2View::CalculateTotalDuration() const
+{
+  const int rowCount = m_AnimationModel->rowCount();
+
+  double totalDuration = 0.0;
+  double previousStart = 0.0;
+
+  for (int i = 0; i < rowCount; ++i)
+  {
+    QmitkAnimationItem* item = dynamic_cast<QmitkAnimationItem*>(m_AnimationModel->item(i, 1));
+
+    if (item == NULL)
+      continue;
+
+    if (item->GetStartWithPrevious())
+    {
+      totalDuration = std::max(totalDuration, previousStart + item->GetDelay() + item->GetDuration());
+    }
+    else
+    {
+      previousStart = totalDuration;
+      totalDuration += item->GetDelay() + item->GetDuration();
+    }
+  }
+
+  return totalDuration;
+}
+
+QVector<QPair<QmitkAnimationItem*, double> > QmitkMovieMaker2View::GetActiveAnimations(double t) const
+{
+  const int rowCount = m_AnimationModel->rowCount();
+
+  QVector<QPair<QmitkAnimationItem*, double> > activeAnimations;
+
+  double totalDuration = 0.0;
+  double previousStart = 0.0;
+
+  for (int i = 0; i < rowCount; ++i)
+  {
+    QmitkAnimationItem* item = dynamic_cast<QmitkAnimationItem*>(m_AnimationModel->item(i, 1));
+
+    if (item == NULL)
+      continue;
+
+    if (item->GetDuration() > 0.0)
+    {
+      double start = item->GetStartWithPrevious()
+        ? previousStart + item->GetDelay()
+        : totalDuration + item->GetDelay();
+
+      if (start <= t && t <= start + item->GetDuration())
+        activeAnimations.push_back(qMakePair(item, (t - start) / item->GetDuration()));
+    }
+
+    if (item->GetStartWithPrevious())
+    {
+      totalDuration = std::max(totalDuration, previousStart + item->GetDelay() + item->GetDuration());
+    }
+    else
+    {
+      previousStart = totalDuration;
+      totalDuration += item->GetDelay() + item->GetDuration();
+    }
+  }
+
+  return activeAnimations;
 }

@@ -36,6 +36,8 @@ public:
 
   bool GetReverse() const;
   void SetReverse(bool reverse);
+
+  void Animate(double s);
 };
 
 #endif

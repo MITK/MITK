@@ -321,21 +321,28 @@ void QmitkMovieMaker2View::OnRecordButtonClicked() // TODO: Refactor
 
   m_FFmpegWriter->SetOutputPath(saveFileName);
 
-  m_FFmpegWriter->Start();
-
-  // TODO: Play animation
-
-  for (int i = 0; i < 30; ++i)
+  try
   {
-    renderWindow->MakeCurrent();
-    unsigned char* frame = ReadPixels(renderWindow, x, y, width, height);
-    m_FFmpegWriter->WriteFrame(frame);
-    delete[] frame;
-    mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice()->Next();
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(renderWindow);
-  }
+    m_FFmpegWriter->Start();
 
-  m_FFmpegWriter->Stop();
+    // TODO: Play animation
+
+    for (int i = 0; i < 30; ++i)
+    {
+      renderWindow->MakeCurrent();
+      unsigned char* frame = ReadPixels(renderWindow, x, y, width, height);
+      m_FFmpegWriter->WriteFrame(frame);
+      delete[] frame;
+      mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice()->Next();
+      mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(renderWindow);
+    }
+
+    m_FFmpegWriter->Stop();
+  }
+  catch (const mitk::Exception& exception)
+  {
+    QMessageBox::critical(NULL, "Movie Maker 2", exception.GetDescription());
+  }
 }
 
 void QmitkMovieMaker2View::OnRemoveAnimationButtonClicked()

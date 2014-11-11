@@ -17,10 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkFFmpegWriter.h"
 #include <QMessageBox>
 #include <mitkLogMacros.h>
+#include <mitkExceptionMacro.h>
 
 QmitkFFmpegWriter::QmitkFFmpegWriter(QObject* parent)
   : QObject(parent),
-    m_Process(new QProcess(this))
+    m_Process(new QProcess(this)),
+    m_Framerate(0)
 {
   this->connect(m_Process, SIGNAL(error(QProcess::ProcessError)),
     this, SLOT(OnProcessError(QProcess::ProcessError)));
@@ -80,6 +82,18 @@ void QmitkFFmpegWriter::SetOutputPath(const QString& path)
 
 void QmitkFFmpegWriter::Start()
 {
+  if (m_FFmpegPath.isEmpty())
+    mitkThrow() << "FFmpeg/Libav path is empty!";
+
+  if (m_Size.isNull())
+    mitkThrow() << "Invalid video frame size!";
+
+  if (m_Framerate <= 0)
+    mitkThrow() << "Invalid framerate!";
+
+  if (m_OutputPath.isEmpty())
+    mitkThrow() << "Output path is empty!";
+
   m_Process->start(m_FFmpegPath, QStringList()
     << "-y"
     << "-f" << "rawvideo"
@@ -111,34 +125,28 @@ void QmitkFFmpegWriter::Stop()
 
 void QmitkFFmpegWriter::OnProcessError(QProcess::ProcessError error)
 {
+  MITK_ERROR << QString::fromLatin1(m_Process->readAllStandardError()).toStdString();
+
   switch (error)
   {
-  case QProcess::FailedToStart:
-    QMessageBox::critical(NULL, "FFmpeg Writer", "FFmpeg failed to start!");
-    break;
+    case QProcess::FailedToStart:
+      mitkThrow() << "FFmpeg/Libav failed to start!";
 
-  case QProcess::Crashed:
-    QMessageBox::critical(NULL, "FFmpeg Writer", "FFmpeg crashed!");
-    break;
+    case QProcess::Crashed:
+      mitkThrow() << "FFmpeg/Libav crashed!";
 
-  case QProcess::Timedout:
-     QMessageBox::critical(NULL, "FFmpeg Writer", "FFmpeg timed out!");
-    break;
+    case QProcess::Timedout:
+      mitkThrow() << "FFmpeg/Libav timed out!";
 
-  case QProcess::WriteError:
-     QMessageBox::critical(NULL, "FFmpeg Writer", "Could not write to FFmpeg!");
-    break;
+    case QProcess::WriteError:
+      mitkThrow() << "Could not write to FFmpeg/Libav!";
 
-  case QProcess::ReadError:
-    QMessageBox::critical(NULL, "FFmpeg Writer", "Could not read from FFmpeg!");
-    break;
+    case QProcess::ReadError:
+      mitkThrow() << "Could not read from FFmpeg/Libav!";
 
-  default:
-    QMessageBox::critical(NULL, "FFmpeg Writer", "An unknown error occurred!");
-    break;
+    default:
+      mitkThrow() << "An unknown error occurred!";
   }
-
-  MITK_ERROR << QString::fromLatin1(m_Process->readAllStandardError()).toStdString();
 }
 
 void QmitkFFmpegWriter::OnProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -147,8 +155,8 @@ void QmitkFFmpegWriter::OnProcessFinished(int exitCode, QProcess::ExitStatus exi
   {
     if (exitCode != 0)
     {
-      QMessageBox::critical(NULL, "FFmpeg Writer", QString("FFmpeg exit code: %1").arg(exitCode));
-      MITK_ERROR << QString::fromLatin1(m_Process->readAllStandardError()).toStdString();
+      m_Process->close();
+      mitkThrow() << QString("FFmpeg/Libav exit code: %1").arg(exitCode).toStdString().c_str();
     }
   }
 

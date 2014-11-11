@@ -51,6 +51,7 @@ set(module_dirs
     Python
     Persistence
     IGTUI
+    OpenIGTLinkUI
     VtkShaders
     DicomRT
     IOExt

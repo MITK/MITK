@@ -23,7 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "mitkIGTException.h"
 
 mitk::IGTLDeviceSource::IGTLDeviceSource()
-  : mitk::IGTLMessageSource(), m_IGTLDevice(NULL)
+  : mitk::IGTLMessageSource(), m_IGTLDevice(NULL)/*,
+    m_Name("IGTLDeviceSource")*/
 {
 }
 

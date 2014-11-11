@@ -100,29 +100,23 @@ void mitk::IGTLDevice::SetState( IGTLDeviceState state )
 
 bool mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
 {
-//  if (input == NULL)
-//    return SERIALSENDERROR;
+  //check the input message
+  if ( msg.IsNull() )
+  {
+    MITK_ERROR("IGTLDevice") << "Could not send message because message is not "
+                                "valid. Please check.";
+    return false;
+  }
 
-//  std::string message;
+  // Pack (serialize) and send
+  msg->Pack();
+  int sendSuccess =
+      this->m_Socket->Send(msg->GetPackPointer(), msg->GetPackSize());
 
-//  if (addCRC == true)
-//    message = *input + CalcCRC(input) + std::string(1, CR);
-//  else
-//    message = *input + std::string(1, CR);
-
-//  //unsigned int messageLength = message.length() + 1; // +1 for CR
-
-//  // Clear send buffer
-//  this->ClearSendBuffer();
-//  // Send the date to the device
-//  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
-//  long returnvalue = m_SerialCommunication->Send(message);
-
-//  if (returnvalue == 0)
-//    return SERIALSENDERROR;
-//  else
-//    return NDIOKAY;
-  return true;
+  if (sendSuccess)
+    return true;
+  else
+    return false;
 }
 
 //mitk::NDIErrorCode mitk::IGTLDevice::Receive(std::string* answer, unsigned int numberOfBytes)

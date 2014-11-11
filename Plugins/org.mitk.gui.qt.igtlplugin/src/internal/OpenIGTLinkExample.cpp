@@ -34,17 +34,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSphereSource.h>
 
 //
-#include "OpenIGTLink.h"
+#include "OpenIGTLinkExample.h"
+
+//igtl
+#include "igtlStringMessage.h"
 
 
-const std::string OpenIGTLink::VIEW_ID = "org.mitk.views.openigtlink";
+const std::string OpenIGTLinkExample::VIEW_ID = "org.mitk.views.openigtlink";
 
-void OpenIGTLink::SetFocus()
+void OpenIGTLinkExample::SetFocus()
 {
 //  m_Controls.buttonPerformImageProcessing->setFocus();
 }
 
-void OpenIGTLink::CreateQtPartControl( QWidget *parent )
+void OpenIGTLinkExample::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
@@ -59,6 +62,7 @@ void OpenIGTLink::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.butStart, SIGNAL(clicked()),
            this, SLOT(Start()) );
   connect( &m_Timer, SIGNAL(timeout()), this, SLOT(UpdatePipeline()));
+  connect( m_Controls.butSend, SIGNAL(clicked()), this, SLOT(SendMessage()));
 
   // set the validator for the ip edit box (values must be between 0 and 255 and
   // there are four of them, seperated with a point
@@ -76,7 +80,7 @@ void OpenIGTLink::CreateQtPartControl( QWidget *parent )
 //  m_VisFilter->Update();
 }
 
-void OpenIGTLink::ConnectWithServer()
+void OpenIGTLinkExample::ConnectWithServer()
 {
     if(m_Controls.butConnectWithServer->text() == "Connect")
     {
@@ -87,53 +91,57 @@ void OpenIGTLink::ConnectWithServer()
         {
           m_Controls.editIP->setEnabled(false);
           m_Controls.editPort->setEnabled(false);
+          m_Controls.editSend->setEnabled(true);
           m_Controls.butConnectWithServer->setText("Disconnect");
         }
         else
         {
-          MITK_ERROR("OpenIGTLink") << "Could not start a communication with the"
+          MITK_ERROR("OpenIGTLinkExample") << "Could not start a communication with the"
           "server. Please check the hostname and port.";
         }
-        Start();
+//        Start();
     }
     else
     {
         m_Controls.editIP->setEnabled(true);
         m_Controls.editPort->setEnabled(true);
+        m_Controls.editSend->setEnabled(false);
         m_Controls.butConnectWithServer->setText("Connect");
         m_IGTLClient->CloseConnection();
     }
 }
 
-void OpenIGTLink::ChangePort()
+void OpenIGTLinkExample::ChangePort()
 {
 
 }
 
-void OpenIGTLink::ChangeIP()
+void OpenIGTLinkExample::ChangeIP()
 {
 
 }
 
-void OpenIGTLink::CreatePipeline()
+void OpenIGTLinkExample::CreatePipeline()
 {
-  //create a new OpenIGTLink Client
+  //create a new OpenIGTLinkExample Client
   m_IGTLClient = mitk::IGTLClient::New();
 
-  //create a new OpenIGTLink Device source
+  //create a new OpenIGTLinkExample Device source
   m_IGTLDeviceSource = mitk::IGTLDeviceSource::New();
 
   //set the client as the source for the device source
   m_IGTLDeviceSource->SetIGTLDevice(m_IGTLClient);
 
-  //create a filter that converts OpenIGTLink messages into navigation data
+  m_IGTLDeviceSource->RegisterAsMicroservice();
+
+  //create a filter that converts OpenIGTLinkExample messages into navigation data
   m_IGTLMsgToNavDataFilter = mitk::IGTLMessageToNavigationDataFilter::New();
 
   //create a visualization filter
   m_VisFilter = mitk::NavigationDataObjectVisualizationFilter::New();
 
   //connect the filters with each other
-  //the OpenIGTLink messages will be passed to the first filter that converts
+  //the OpenIGTLinkExample messages will be passed to the first filter that converts
   //it to navigation data, then it is passed to the visualization filter that
   //will visualize the transformation
   m_IGTLMsgToNavDataFilter->ConnectTo(m_IGTLDeviceSource);
@@ -162,19 +170,19 @@ void OpenIGTLink::CreatePipeline()
   m_VisFilter->SetRepresentationObject(0, mySphere);
 }
 
-void OpenIGTLink::DestroyPipeline()
+void OpenIGTLinkExample::DestroyPipeline()
 {
   m_VisFilter = NULL;
   this->GetDataStorage()->Remove(m_DemoNode);
 }
 
-void OpenIGTLink::Start()
+void OpenIGTLinkExample::Start()
 {
   m_Timer.setInterval(1000);
   m_Timer.start();
 }
 
-void OpenIGTLink::UpdatePipeline()
+void OpenIGTLinkExample::UpdatePipeline()
 {
   m_VisFilter->Update();
 
@@ -183,4 +191,20 @@ void OpenIGTLink::UpdatePipeline()
       this->GetRenderWindowPart()->GetQmitkRenderWindow("3d");
   renWindow->GetRenderer()->GetVtkRenderer()->Render();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void OpenIGTLinkExample::SendMessage()
+{
+  std::string toBeSend = m_Controls.editSend->text().toStdString();
+
+  igtl::StringMessage::Pointer msg = igtl::StringMessage::New().GetPointer();
+  msg->SetString(toBeSend);
+  if ( m_IGTLClient->SendMessage(msg.GetPointer()) )
+  {
+    MITK_INFO("OpenIGTLinkExample") << "Successfully sent the message.";
+  }
+  else
+  {
+    MITK_ERROR("OpenIGTLinkExample") << "Could not send the message.";
+  }
 }

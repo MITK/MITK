@@ -46,7 +46,7 @@ namespace mitk {
     /**
     * \brief returns the OpenIGTLink device that is used by this filter
     */
-    itkGetConstObjectMacro(IGTLDevice, mitk::IGTLDevice);
+    itkGetObjectMacro(IGTLDevice, mitk::IGTLDevice);
 
     /**
     * \brief Establishes a connection to the OpenIGTLink device. If there is

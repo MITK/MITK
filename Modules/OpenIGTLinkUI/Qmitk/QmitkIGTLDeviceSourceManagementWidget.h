@@ -1,0 +1,120 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+#ifndef QMITKIGTLDeviceSourceMANAGEMENTWIDGET_H
+#define QMITKIGTLDeviceSourceMANAGEMENTWIDGET_H
+
+//QT headers
+#include <QWidget>
+
+//mitk headers
+#include "MitkIGTUIExports.h"
+#include "mitkIGTLDeviceSource.h"
+#include "mitkIGTLClient.h"
+#include "mitkDataStorage.h"
+
+//ui header
+#include "ui_QmitkIGTLDeviceSourceManagementWidgetControls.h"
+
+ /** Documentation:
+  *   \brief An object of this class offers an UI to manage OpenIGTLink Device
+  *       Sources and OpenIGTLink Devices.
+  *
+  *      Be sure to call the Initialize-methode before you start the widget
+  *      otherwise some errors might occure.
+  *
+  *   \ingroup OpenIGTLinkUI
+  */
+class MitkIGTUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public QWidget
+{
+  Q_OBJECT
+
+  public:
+    static const std::string VIEW_ID;
+
+    /** Initializes the widget. Has to be called before any action,
+     *  otherwise errors might occur. */
+    void Initialize(mitk::DataStorage*);
+
+    /** Loads a source to the widget. The old source is dropped, so be careful,
+     *  if the source is not saved somewhere else it might be lost. You might
+     *  want to ask the user if he wants to save the changes before calling this
+     *  method.
+     *  @param sourceToLoad This source will be loaded and might be modified
+     *  by the user.
+     */
+    void LoadSource(mitk::IGTLDeviceSource::Pointer sourceToLoad);
+
+    QmitkIGTLDeviceSourceManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    ~QmitkIGTLDeviceSourceManagementWidget();
+
+  signals:
+
+    /** This signal is emmited if a new source was added by the widget itself,
+     *  e.g. because a source was loaded.
+     *  @param newSource Holds the new source which was added.
+     *  @param sourceName Name of the new source
+     */
+    void NewSourceAdded(mitk::IGTLDeviceSource::Pointer newSource,
+                        std::string sourceName);
+
+  protected slots:
+
+    void OnConnect();
+    void OnPortChanged();
+    void OnHostnameChanged();
+
+    void OnSendMessage();
+
+//    //main widget page:
+//    void OnAddTool();
+//    void OnDeleteTool();
+//    void OnEditTool();
+//    void OnLoadTool();
+//    void OnSaveTool();
+//    void OnLoadSource();
+//    void OnSaveSource();
+//    void OnCreateSource();
+
+//    //widget page "add tool":
+//    void OnAddToolCancel();
+//    void OnAddToolSave();
+
+  protected:
+
+    /// \brief Creation of the connections
+    virtual void CreateConnections();
+
+    virtual void CreateQtPartControl(QWidget *parent);
+
+    Ui::QmitkIGTLDeviceSourceManagementWidgetControls* m_Controls;
+
+    /** @brief holds the OpenIGTLink device */
+    mitk::IGTLClient* m_IGTLClient;
+
+    /** @brief holds the IGTLDeviceSource we are working with. */
+    mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;
+
+    /** @brief shows if we are in edit mode, if not we create new source. */
+    bool m_edit;
+
+    //############## private help methods #######################
+    void MessageBox(std::string s);
+    void UpdateToolTable();
+    void DisableSourceControls();
+    void EnableSourceControls();
+};
+#endif

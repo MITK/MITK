@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>OpenIGTLinkControls</class>
- <widget class="QWidget" name="OpenIGTLinkControls">
+ <class>OpenIGTLinkExampleControls</class>
+ <widget class="QWidget" name="OpenIGTLinkExampleControls">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -114,9 +114,23 @@
      <item>
       <widget class="QPushButton" name="butStart">
        <property name="text">
-        <string>Start</string>
+        <string>Start Pipeline</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLineEdit" name="editSend"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="butSend">
+         <property name="text">
+          <string>Send</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <spacer name="spacer2">

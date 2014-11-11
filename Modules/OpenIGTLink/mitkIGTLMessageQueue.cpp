@@ -53,5 +53,5 @@ mitk::IGTLMessageQueue::IGTLMessageQueue()
 
 mitk::IGTLMessageQueue::~IGTLMessageQueue()
 {
-  this->m_Mutex->Delete();
+  this->m_Mutex->Unlock();
 }

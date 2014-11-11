@@ -39,6 +39,7 @@ mitk::IGTLMessageSource::IGTLMessageSource()
 
 mitk::IGTLMessageSource::~IGTLMessageSource()
 {
+  this->UnRegisterMicroservice();
 }
 
 mitk::IGTLMessage* mitk::IGTLMessageSource::GetOutput()

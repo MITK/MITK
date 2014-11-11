@@ -1,0 +1,4 @@
+/*
+  mitkIGTUIConfig.h
+  this file is generated. Do not change!
+*/

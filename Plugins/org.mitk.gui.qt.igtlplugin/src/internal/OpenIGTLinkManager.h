@@ -15,30 +15,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef OpenIGTLink_h
-#define OpenIGTLink_h
+#ifndef OpenIGTLinkManager_h
+#define OpenIGTLinkManager_h
 
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
 
-#include "ui_OpenIGTLinkControls.h"
+#include "ui_OpenIGTLinkManagerControls.h"
 #include "mitkIGTLClient.h"
 #include "mitkIGTLDeviceSource.h"
-#include "mitkNavigationDataObjectVisualizationFilter.h"
-#include "mitkIGTLMessageToNavigationDataFilter.h"
-
-#include "qtimer.h"
 
 /**
-  \brief OpenIGTLink
+  \brief OpenIGTLinkManager
 
   \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */
-class OpenIGTLink : public QmitkAbstractView
+class OpenIGTLinkManager : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -48,15 +44,13 @@ class OpenIGTLink : public QmitkAbstractView
 
     static const std::string VIEW_ID;
 
-  protected slots:
+    OpenIGTLinkManager();
+    virtual ~OpenIGTLinkManager();
 
-    void ConnectWithServer();
-    void ChangePort();
-    void ChangeIP();
-
-    void Start();
-    void UpdatePipeline();
-
+  public slots:
+    void NewSourceByWidget(mitk::IGTLDeviceSource::Pointer source,
+                           std::string sourceName);
+    void SourceSelected(mitk::IGTLDeviceSource::Pointer source);
 
   protected:
 
@@ -67,14 +61,12 @@ class OpenIGTLink : public QmitkAbstractView
     void CreatePipeline();
     void DestroyPipeline();
 
-    Ui::OpenIGTLinkControls m_Controls;
-    mitk::IGTLClient::Pointer m_IGTLClient;
-    mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;
-    mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
-    mitk::NavigationDataObjectVisualizationFilter::Pointer m_VisFilter;
-    mitk::DataNode::Pointer m_DemoNode;
+    Ui::OpenIGTLinkManagerControls m_Controls;
 
-    QTimer m_Timer;
+    /** Someone needs to hold the smart pointers of new sources, otherwise the
+     * objects will be lost although they are listed as microservice.
+     */
+    std::vector<mitk::IGTLDeviceSource::Pointer> m_AllSourcesHandledByThisWidget;
 };
 
-#endif // OpenIGTLink_h
+#endif // OpenIGTLinkManager_h

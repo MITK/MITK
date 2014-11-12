@@ -23,9 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "mitkIGTException.h"
 
 mitk::IGTLDeviceSource::IGTLDeviceSource()
-  : mitk::IGTLMessageSource(), m_IGTLDevice(NULL)/*,
-    m_Name("IGTLDeviceSource")*/
+  : mitk::IGTLMessageSource(), m_IGTLDevice(NULL)
 {
+  this->SetName("IGTLDeviceSource (no defined type)");
 }
 
 mitk::IGTLDeviceSource::~IGTLDeviceSource()
@@ -74,7 +74,7 @@ void mitk::IGTLDeviceSource::SetIGTLDevice( mitk::IGTLDevice* igtlDevice )
     this->m_IGTLDevice = igtlDevice;
     this->CreateOutputs();
     std::stringstream name; // create a human readable name for the source
-    name << "OpenIGTLink Message Source";
+    name << "OIGTL Device Source ( " << igtlDevice->GetName() << " )";
     this->SetName(name.str());
   }
 }

@@ -74,5 +74,5 @@ set(MOC_H_FILES
 )
 
 set(QRC_FILES
-  resources/OpenIGTLinkUI.qrc
+  #resources/OpenIGTLinkUI.qrc
 )

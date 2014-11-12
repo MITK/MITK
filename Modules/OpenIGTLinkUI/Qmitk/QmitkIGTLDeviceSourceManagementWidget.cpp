@@ -364,6 +364,7 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
       m_Controls->editIP->setEnabled(false);
       m_Controls->editPort->setEnabled(false);
       m_Controls->editSend->setEnabled(true);
+      m_Controls->butSend->setEnabled(true);
       m_Controls->butConnectWithServer->setText("Disconnect");
     }
     else
@@ -378,6 +379,7 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
     m_Controls->editIP->setEnabled(true);
     m_Controls->editPort->setEnabled(true);
     m_Controls->editSend->setEnabled(false);
+    m_Controls->butSend->setEnabled(false);
     m_Controls->butConnectWithServer->setText("Connect");
     m_IGTLClient->CloseConnection();
   }

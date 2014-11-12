@@ -131,6 +131,16 @@ namespace mitk {
       itkGetMacro(Hostname,std::string);
 
       /**
+       * \brief Returns the name of this device
+       */
+      itkGetConstMacro(Name,std::string);
+
+      /**
+       * \brief Sets the name of this device
+       */
+      itkSetMacro(Name,std::string);
+
+      /**
        * \brief static start method for the tracking thread.
        */
       static ITK_THREAD_RETURN_TYPE ThreadStartCommunication(void* data);
@@ -186,6 +196,8 @@ namespace mitk {
       mitk::IGTLMessageQueue::Pointer m_Queue;
       /** the latest received message */
       mitk::IGTLMessageFactory::Pointer m_MessageFactory;
+      /** the name of this device */
+      std::string m_Name;
 
     private:
       /** creates worker thread that continuously polls interface for new

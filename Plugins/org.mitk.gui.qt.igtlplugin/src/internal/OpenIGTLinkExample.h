@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 
-#include "ui_OpenIGTLinkControls.h"
+#include "ui_OpenIGTLinkExampleControls.h"
 #include "mitkIGTLClient.h"
 #include "mitkIGTLDeviceSource.h"
 #include "mitkNavigationDataObjectVisualizationFilter.h"
@@ -50,14 +50,8 @@ class OpenIGTLinkExample : public QmitkAbstractView
 
   protected slots:
 
-    void ConnectWithServer();
-    void ChangePort();
-    void ChangeIP();
-
     void Start();
     void UpdatePipeline();
-
-    void SendMessage();
 
 
   protected:
@@ -69,7 +63,7 @@ class OpenIGTLinkExample : public QmitkAbstractView
     void CreatePipeline();
     void DestroyPipeline();
 
-    Ui::OpenIGTLinkControls m_Controls;
+    Ui::OpenIGTLinkExampleControls m_Controls;
     mitk::IGTLClient::Pointer m_IGTLClient;
     mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;
     mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;

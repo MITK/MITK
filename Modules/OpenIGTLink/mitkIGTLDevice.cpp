@@ -31,8 +31,8 @@ mitk::IGTLDevice::IGTLDevice() :
   m_State(mitk::IGTLDevice::Setup),
   m_StopCommunication(false),
   m_PortNumber(-1),
-  m_MultiThreader(NULL), m_ThreadID(0)
-
+  m_MultiThreader(NULL), m_ThreadID(0),
+  m_Name("Unspecified Device")
 {
   m_StopCommunicationMutex = itk::FastMutexLock::New();
   m_StateMutex = itk::FastMutexLock::New();

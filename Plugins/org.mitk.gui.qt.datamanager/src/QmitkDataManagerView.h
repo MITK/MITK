@@ -193,7 +193,7 @@ protected:
   ///
   /// React to node changes. Overridden from QmitkAbstractView.
   ///
-  virtual void NodeChanged(const mitk::DataNode* node);
+  virtual void NodeChanged(const mitk::DataNode* /*node*/);
 protected:
 
   QWidget* m_Parent;

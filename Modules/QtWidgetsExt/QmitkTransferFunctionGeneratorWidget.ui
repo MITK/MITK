@@ -26,7 +26,16 @@
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_4">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -66,8 +75,8 @@
        <string>Presets</string>
       </attribute>
       <attribute name="toolTip">
-       <string notr="true">Apply internal MITK transferfunction presets.
-Or save and load your own created transferfunctions in a folder in XML format.</string>
+       <string notr="true">Apply internal MITK transfer function presets.
+Or save and load your own created transfer functions in a folder in XML format.</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -101,7 +110,7 @@ Or save and load your own created transferfunctions in a folder in XML format.</
           </size>
          </property>
          <property name="toolTip">
-          <string>Choose one of generic MITK internal presets to apply on standard CT data or MR data.</string>
+          <string>Choose one of generic MITK internal presets to apply to standard CT data or MR data.</string>
          </property>
          <property name="statusTip">
           <string>Load a MITK internal preset</string>
@@ -177,8 +186,8 @@ Or save and load your own created transferfunctions in a folder in XML format.</
             </size>
            </property>
            <property name="toolTip">
-            <string>Load a transferfunction in xml-format from the filesystem.
-The load includes all transferfunctions: grayvalue, color and gradient.</string>
+            <string>Load a transfer function in xml-format from the filesystem.
+The load includes all transfer functions: grayvalue, color and gradient.</string>
            </property>
            <property name="text">
             <string>Load</string>
@@ -200,8 +209,8 @@ The load includes all transferfunctions: grayvalue, color and gradient.</string>
             </size>
            </property>
            <property name="toolTip">
-            <string>Save a transferfunction in xml-format in the filesystem.
-The save includes all transferfunctions: grayvalue, color and gradient.</string>
+            <string>Save a transfer function in xml-format in the filesystem.
+The save includes all transfer functions: grayvalue, color and gradient.</string>
            </property>
            <property name="text">
             <string>Save</string>
@@ -249,7 +258,7 @@ The save includes all transferfunctions: grayvalue, color and gradient.</string>
          <property name="toolTip">
           <string>Click and hold left mouse button on the cross.
 Move the mouse to the top and the function will be flatter.
-Move the mouse to the  bottom and the function will be steeper.
+Move the mouse to the bottom and the function will be steeper.
 Move the mouse to the left and the function moves to the left.
 Move the mouse to the right and the function moves to the right. </string>
          </property>
@@ -260,7 +269,7 @@ Move the mouse to the right and the function moves to the right. </string>
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="resources/QmitkResources.qrc">:/QtWidgetsExt/cross.png</pixmap>
+          <pixmap resource="resources/QtWidgetsExt.qrc">:/QtWidgetsExt/cross.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -296,7 +305,7 @@ Move the mouse to the right and the function moves to the right. </string>
           </font>
          </property>
          <property name="text">
-          <string>Click and hold left mouse button on the cross to interactively generate a threshold transferfunction</string>
+          <string>Click and hold left mouse button on the cross to interactively generate a threshold transfer function</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -345,15 +354,15 @@ Move the mouse to the right and the function moves to the right. </string>
          <property name="toolTip">
           <string>Click and hold left mouse button on the cross.
 Move the mouse to the top and the bell will be wider.
-Move the mouse to the  bottom and the bell will be flattened.
+Move the mouse to the bottom and the bell will be narrowed.
 Move the mouse to the left and the center of the bell moves to the left.
-Move the mouse to the  right and the center of the bell moves to the right.</string>
+Move the mouse to the right and the center of the bell moves to the right.</string>
          </property>
          <property name="text">
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="resources/QmitkResources.qrc">:/QtWidgetsExt/cross.png</pixmap>
+          <pixmap resource="resources/QtWidgetsExt.qrc">:/QtWidgetsExt/cross.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -386,7 +395,7 @@ Move the mouse to the  right and the center of the bell moves to the right.</str
           </font>
          </property>
          <property name="text">
-          <string>Click and hold left mouse button on the cross to interactively generate a bell transferfunction</string>
+          <string>Click and hold left mouse button on the cross to interactively generate a bell transfer function</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -410,7 +419,7 @@ Move the mouse to the  right and the center of the bell moves to the right.</str
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="resources/QmitkResources.qrc"/>
+  <include location="resources/QtWidgetsExt.qrc"/>
  </resources>
  <connections/>
 </ui>

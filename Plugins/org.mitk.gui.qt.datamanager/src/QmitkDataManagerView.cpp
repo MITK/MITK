@@ -252,7 +252,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       && (*cmActionsIt)->GetAttribute("label", cmLabel)
       && (*cmActionsIt)->GetAttribute("class", cmClass))
     {
-      (*cmActionsIt)->GetAttribute("icon", cmIcon);
       // create context menu entry here
       tmpDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(QString::fromStdString(cmNodeDescriptorName));
       if(!tmpDescriptor)
@@ -260,7 +259,16 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
         MITK_WARN << "cannot add action \"" << cmLabel << "\" because descriptor " << cmNodeDescriptorName << " does not exist";
         continue;
       }
-      contextMenuAction = new QAction( QString::fromStdString(cmLabel), parent);
+      // check if the user specified an icon attribute
+      if ( (*cmActionsIt)->GetAttribute("icon", cmIcon) )
+      {
+        contextMenuAction = new QAction( QIcon( QString::fromStdString(cmIcon)),
+                                         QString::fromStdString(cmLabel), parent);
+      }
+      else
+      {
+        contextMenuAction = new QAction( QString::fromStdString(cmLabel), parent);
+      }
       tmpDescriptor->AddAction(contextMenuAction);
       m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(tmpDescriptor,contextMenuAction));
       m_ConfElements[contextMenuAction] = *cmActionsIt;
@@ -916,7 +924,7 @@ void QmitkDataManagerView::ShowInfoDialogForSelectedNodes( bool )
   _QmitkInfoDialog.exec();
 }
 
-void QmitkDataManagerView::NodeChanged(const mitk::DataNode* node)
+void QmitkDataManagerView::NodeChanged(const mitk::DataNode* /*node*/)
 {
   // m_FilterModel->invalidate();
   // fix as proposed by R. Khlebnikov in the mitk-users mail from 02.09.2014

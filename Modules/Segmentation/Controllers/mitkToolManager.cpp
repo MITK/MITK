@@ -225,7 +225,7 @@ bool mitk::ToolManager::ActivateTool(int id)
                     // remember the original configuration
                     m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
                     // here the alternative configuration is loaded
-                    displayInteractor->SetEventConfig("Legacy/DisplayConfigMITKTools.xml");
+                    displayInteractor->SetEventConfig("DisplayConfigMITK.xml");
                   }
                 }
       }

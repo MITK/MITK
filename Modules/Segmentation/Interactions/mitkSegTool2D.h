@@ -149,8 +149,9 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
 
     void WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image*, unsigned int timeStep);
 
-    void WriteBackSegmentationResult (std::vector<SliceInformation> sliceList);
+    void WriteBackSegmentationResult (std::vector<SliceInformation> sliceList, bool writeSliceToVolume = true);
 
+    void WriteSliceToVolume (SliceInformation sliceInfo);
     /**
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure.
              By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry
@@ -164,7 +165,6 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
 
   private:
 
-    void WriteSliceToVolume (SliceInformation sliceInfo);
 
     //The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string     m_Contourmarkername;

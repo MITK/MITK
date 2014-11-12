@@ -293,7 +293,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::SegTool2D::WriteBackSegmentationResult(std::vector<mitk::SegTool2D::SliceInformation> sliceList)
+void mitk::SegTool2D::WriteBackSegmentationResult(std::vector<mitk::SegTool2D::SliceInformation> sliceList, bool writeSliceToVolume)
 {
   std::vector<mitk::Surface::Pointer> contourList;
   contourList.reserve(sliceList.size());
@@ -306,7 +306,8 @@ void mitk::SegTool2D::WriteBackSegmentationResult(std::vector<mitk::SegTool2D::S
   for (unsigned int i = 0; i < sliceList.size(); ++i)
   {
     SliceInformation currentSliceInfo = sliceList.at(i);
-    this->WriteSliceToVolume(currentSliceInfo);
+    if(writeSliceToVolume)
+      this->WriteSliceToVolume(currentSliceInfo);
     if (m_SurfaceInterpolationEnabled && image->GetDimension() == 3)
     {
       currentSliceInfo.slice->DisconnectPipeline();

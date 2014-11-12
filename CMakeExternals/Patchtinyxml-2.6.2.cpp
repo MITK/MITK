@@ -1248,8 +1248,20 @@ int TiXmlAttribute::QueryIntValue( int* ival ) const
 
 int TiXmlAttribute::QueryDoubleValue( double* dval ) const
 {
+  //save old locale
+  char * oldLocale;
+  oldLocale = setlocale( LC_ALL, 0 );
+
+  //set new locale
+  setlocale( LC_ALL, "C" );
   if ( TIXML_SSCANF( value.c_str(), "%lf", dval ) == 1 )
+  {
+    //restore locale
+    setlocale( LC_ALL, oldLocale );
     return TIXML_SUCCESS;
+  }
+  //restore locale
+  setlocale( LC_ALL, oldLocale );
   return TIXML_WRONG_TYPE;
 }
 
@@ -1271,20 +1283,35 @@ void TiXmlAttribute::SetDoubleValue( double _value, const unsigned int requiredD
 {
 #if defined(TIXML_USE_STL)
   std::ostringstream ss;
-  ss.imbue(std::locale("C"));
+  //save old locale
+  char * oldLocale;
+  oldLocale = setlocale( LC_ALL, 0 );
+
+  //set new locale
+  setlocale( LC_ALL, "C" );
   ss.precision(TiXmlBase::Precision(_value, requiredDecimalPlaces));
   ss << _value;
   SetValue( ss.str() );
+  //restore locale
+  setlocale( LC_ALL, oldLocale );
 #else
   char buf [256];
+
+  //save old locale
+  char * oldLocale;
+  oldLocale = setlocale( LC_ALL, 0 );
+
+  //set new locale
+  setlocale( LC_ALL, "C" );
 #if defined(TIXML_SNPRINTF)
   TIXML_SNPRINTF( buf, sizeof(buf), TiXmlBase::Format(_value, requiredDecimalPlaces).c_str(), _value);
 #else
   sprintf (buf, TiXmlBase::Format(_value, requiredDecimalPlaces).c_str(), _value);
 #endif
   SetValue (buf);
+  //restore locale
+  setlocale( LC_ALL, oldLocale );
 #endif
-
 }
 
 
@@ -1945,6 +1972,3 @@ TIXML_STRING TiXmlBase::Format( const double value, const unsigned int requiredD
 
   return(TIXML_STRING(buf));
 }
-
-
-

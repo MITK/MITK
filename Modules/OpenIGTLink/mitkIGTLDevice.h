@@ -101,6 +101,11 @@ namespace mitk {
       igtl::MessageBase::Pointer GetLatestMessage();
 
       /**
+       * \brief Returns information about the oldest message in the receive queue
+       */
+      std::string GetOldestMessageInformation();
+
+      /**
        * \brief return device data
        */
 //      igtl::MessageBase::Pointer GetData() const;
@@ -133,12 +138,17 @@ namespace mitk {
       /**
        * \brief Returns the name of this device
        */
-      itkGetConstMacro(Name,std::string);
+      itkGetConstMacro(Name, std::string);
 
       /**
        * \brief Sets the name of this device
        */
-      itkSetMacro(Name,std::string);
+      itkSetMacro(Name, std::string);
+
+      /**
+       * \brief Returns the message factory
+       */
+      itkGetMacro(MessageFactory, mitk::IGTLMessageFactory::Pointer);
 
       /**
        * \brief static start method for the tracking thread.
@@ -229,6 +239,12 @@ namespace mitk {
       itk::MultiThreader::Pointer m_MultiThreader;
       int m_ThreadID; ///< ID of polling thread
     };
+
+    /**Documentation
+    * @brief connect to this Event to get noticed when a message was received
+    * */
+    itkEventMacro( MessageReceivedEvent , itk::AnyEvent );
+
 } // namespace mitk
 
 #endif /* MITKIGTLDEVICE_H */

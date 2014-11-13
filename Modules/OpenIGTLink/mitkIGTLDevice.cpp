@@ -33,8 +33,8 @@ mitk::IGTLDevice::IGTLDevice() :
   m_State(mitk::IGTLDevice::Setup),
   m_StopCommunication(false),
   m_PortNumber(-1),
-  m_MultiThreader(NULL), m_ThreadID(0),
-  m_Name("Unspecified Device")
+  m_Name("Unspecified Device"),
+  m_MultiThreader(NULL), m_ThreadID(0)
 {
   m_StopCommunicationMutex = itk::FastMutexLock::New();
   m_StateMutex = itk::FastMutexLock::New();
@@ -106,6 +106,9 @@ bool mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg)
                                 "valid. Please check.";
     return false;
   }
+
+  // add the name of this device to the message
+  msg->SetDeviceName(this->GetName().c_str());
 
   // Pack (serialize) and send
   msg->Pack();
@@ -193,6 +196,7 @@ void mitk::IGTLDevice::Receive()
 
         //push the current message into the queue
         m_ReceiveQueue->PushMessage(curMessage);
+        this->InvokeEvent(MessageReceivedEvent());
       }
       else
       {
@@ -345,6 +349,11 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetLatestMessage()
   igtl::MessageBase::Pointer msg = this->m_ReceiveQueue->PullMessage();
 //  m_ReceiveQueueMutex->Unlock();
   return msg;
+}
+
+std::string mitk::IGTLDevice::GetOldestMessageInformation()
+{
+  return this->m_ReceiveQueue->GetOldestMsgInformation();
 }
 
 ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartCommunication(void* pInfoStruct)

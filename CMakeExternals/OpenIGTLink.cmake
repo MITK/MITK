@@ -32,8 +32,8 @@ if(MITK_USE_OpenIGTLink)
        SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
        BINARY_DIR ${proj}-build
        PREFIX ${proj}-cmake
-       URL /projects/openigtlink-OpenIGTLink-61cb0a8.tar.gz
-       URL_MD5 e53ddf152e7938cd5eefe2e043cbbe18
+       URL /projects/OpenIGTLink-54df50de62511f8fd07a7ce5b308f1202b30933a.tar.gz
+       URL_MD5 b9fd8351b059f4ec615f2dfd74ab2458
        INSTALL_COMMAND ""
        #PATCH_COMMAND ${ITK_PATCH_COMMAND}
        CMAKE_GENERATOR ${gen}

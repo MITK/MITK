@@ -41,6 +41,23 @@ igtl::MessageBase::Pointer mitk::IGTLMessageQueue::PullMessage()
   return ret;
 }
 
+std::string mitk::IGTLMessageQueue::GetOldestMsgInformation()
+{
+  this->m_Mutex->Lock();
+  std::stringstream s;
+  if ( this->m_Queue.size() > 0 )
+  {
+    s << "Device Type: " << this->m_Queue.front()->GetDeviceType() << std::endl;
+    s << "Device Name: " << this->m_Queue.front()->GetDeviceName() << std::endl;
+  }
+  else
+  {
+    s << "No Msg";
+  }
+  this->m_Mutex->Unlock();
+  return s.str();
+}
+
 int mitk::IGTLMessageQueue::GetSize()
 {
   return this->m_Queue.size();

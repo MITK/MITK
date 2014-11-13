@@ -47,25 +47,12 @@
       </font>
      </property>
      <property name="text">
-      <string>Setup Device:</string>
+      <string>Manage Device:</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QmitkIGTLDeviceSourceManagementWidget" name="m_SourceManagerWidget" native="true"/>
-   </item>
-   <item>
-    <spacer name="spacer2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>220</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

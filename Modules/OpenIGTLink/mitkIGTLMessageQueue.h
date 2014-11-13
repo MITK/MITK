@@ -45,6 +45,8 @@ namespace mitk {
 
     int GetSize();
 
+    std::string GetOldestMsgInformation();
+
   protected:
     IGTLMessageQueue();
     virtual ~IGTLMessageQueue();

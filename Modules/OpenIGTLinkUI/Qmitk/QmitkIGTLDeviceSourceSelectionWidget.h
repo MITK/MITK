@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   *
   *   \ingroup OpenIGTLinkUI
   */
-class MitkOpenIGTLinkUI_EXPORT QmitkIGTLDeviceSourceSelectionWidget : public QWidget
+class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceSelectionWidget : public QWidget
 {
   Q_OBJECT
 

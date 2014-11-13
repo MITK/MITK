@@ -19,12 +19,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //QT headers
 #include <QWidget>
+#include <QTimer>
 
 //mitk headers
-#include "MitkIGTUIExports.h"
+#include "MitkOpenIGTLinkUIExports.h"
 #include "mitkIGTLDeviceSource.h"
 #include "mitkIGTLClient.h"
 #include "mitkDataStorage.h"
+
+//itk
+#include <itkCommand.h>
 
 //ui header
 #include "ui_QmitkIGTLDeviceSourceManagementWidgetControls.h"
@@ -38,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   *
   *   \ingroup OpenIGTLinkUI
   */
-class MitkIGTUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public QWidget
+class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public QWidget
 {
   Q_OBJECT
 
@@ -61,6 +65,9 @@ class MitkIGTUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public QWidget
     QmitkIGTLDeviceSourceManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkIGTLDeviceSourceManagementWidget();
 
+    /// \brief Is called when the current device received a message
+    void OnMessageReceived(itk::Object* caller, const itk::EventObject&);
+
   signals:
 
     /** This signal is emmited if a new source was added by the widget itself,
@@ -71,13 +78,20 @@ class MitkIGTUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public QWidget
     void NewSourceAdded(mitk::IGTLDeviceSource::Pointer newSource,
                         std::string sourceName);
 
+
   protected slots:
 
     void OnConnect();
     void OnPortChanged();
     void OnHostnameChanged();
+    void OnCommandChanged(const QString& curCommand);
 
     void OnSendMessage();
+    void OnSendCommand();
+
+    void ResetOutput();
+    void AddOutput(std::string s);
+    void OnUpdateLoggingWindow();
 
 //    //main widget page:
 //    void OnAddTool();
@@ -94,6 +108,8 @@ class MitkIGTUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public QWidget
 //    void OnAddToolSave();
 
   protected:
+    /// \brief Fills the commands combo box with available commands
+    void FillCommandsComboBox();
 
     /// \brief Creation of the connections
     virtual void CreateConnections();
@@ -111,9 +127,23 @@ class MitkIGTUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public QWidget
     /** @brief shows if we are in edit mode, if not we create new source. */
     bool m_edit;
 
+
+    igtl::MessageBase::Pointer m_CurrentCommand;
+
+    /** mutex to control access to m_State */
+    itk::FastMutexLock::Pointer m_OutputMutex;
+    /** @brief a string stream used for logging */
+    std::stringstream m_Output;
+
+    /** @brief a string stream used for logging */
+    QTimer m_UpdateLoggingWindowTimer;
+
+
+    itk::MemberCommand< QmitkIGTLDeviceSourceManagementWidget >::Pointer m_MessageReceivedCommand;
+
     //############## private help methods #######################
     void MessageBox(std::string s);
-    void UpdateToolTable();
+//    void UpdateToolTable();
     void DisableSourceControls();
     void EnableSourceControls();
 };

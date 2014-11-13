@@ -134,6 +134,11 @@ namespace mitk {
   //  PlusStatus PackMessages(const std::vector<std::string>& igtlMessageTypes, std::vector<igtl::MessageBase::Pointer>& igtMessages, TrackedFrame& trackedFrame,
   //    std::vector<PlusTransformName>& transformNames, std::vector<PlusIgtlClientInfo::ImageStream>& imageStreams, bool packValidTransformsOnly, vtkTransformRepository* transformRepository=NULL);
 
+    /*!
+    * Returns available get messages
+    */
+    std::list<std::string> GetAvailableMessageRequestTypes();
+
   protected:
     IGTLMessageFactory();
     virtual ~IGTLMessageFactory();

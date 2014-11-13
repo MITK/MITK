@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 #include <mitkIGTLDeviceSource.h>
 #include <mitkDataStorage.h>
+#include <mitkIGTLMessageFactory.h>
 
 //qt headers
 #include <qfiledialog.h>
@@ -40,6 +41,7 @@ QmitkIGTLDeviceSourceManagementWidget::QmitkIGTLDeviceSourceManagementWidget(
   : QWidget(parent, f)
 {
   m_Controls = NULL;
+  m_OutputMutex = itk::FastMutexLock::New();
   CreateQtPartControl(this);
 }
 
@@ -57,6 +59,9 @@ void QmitkIGTLDeviceSourceManagementWidget::CreateQtPartControl(QWidget *parent)
     // setup GUI widgets
     m_Controls->setupUi(parent);
   }
+
+  //every 100ms the logging window has to be updated
+  m_UpdateLoggingWindowTimer.setInterval(100);
 
   // set the validator for the ip edit box (values must be between 0 and 255 and
   // there are four of them, seperated with a point
@@ -82,7 +87,15 @@ void QmitkIGTLDeviceSourceManagementWidget::CreateConnections()
              this, SLOT(OnPortChanged()) );
     connect( m_Controls->editIP, SIGNAL(editingFinished()),
              this, SLOT(OnHostnameChanged()) );
-    connect( m_Controls->butSend, SIGNAL(clicked()), this, SLOT(OnSendMessage()));
+    connect( m_Controls->butSend, SIGNAL(clicked()),
+             this, SLOT(OnSendMessage()));
+    connect( m_Controls->butSendCommand, SIGNAL(clicked()),
+             this, SLOT(OnSendCommand()));
+    connect( m_Controls->commandsComboBox,
+             SIGNAL(currentIndexChanged(const QString &)),
+             this, SLOT(OnCommandChanged(const QString &)));
+    connect( &m_UpdateLoggingWindowTimer, SIGNAL(timeout()),
+             this, SLOT(OnUpdateLoggingWindow()));
   }
 
 //  //main widget page:
@@ -154,14 +167,36 @@ void QmitkIGTLDeviceSourceManagementWidget::LoadSource(
     this->m_IGTLDeviceSource = sourceToLoad;
     this->m_IGTLClient = (mitk::IGTLClient*)this->m_IGTLDeviceSource->GetIGTLDevice();
     m_Controls->selectedSourceLabel->setText(m_IGTLDeviceSource->GetName().c_str());
+
+    //add observer for new message receiving
+//    typedef itk::MemberCommand< QmitkIGTLDeviceSourceManagementWidget > CurCommandType;
+//    CurCommandType::Pointer messageReceivedCommand = CurCommandType::New();
+//    messageReceivedCommand->SetCallbackFunction(
+//      this, &QmitkIGTLDeviceSourceManagementWidget::OnMessageReceived );
+//    this->m_IGTLClient->AddObserver(mitk::MessageReceivedEvent(), messageReceivedCommand);
+
+    typedef itk::MemberCommand< QmitkIGTLDeviceSourceManagementWidget > CurCommandType;
+    m_MessageReceivedCommand = CurCommandType::New();
+    m_MessageReceivedCommand->SetCallbackFunction(
+      this, &QmitkIGTLDeviceSourceManagementWidget::OnMessageReceived );
+    this->m_IGTLClient->AddObserver(mitk::MessageReceivedEvent(), m_MessageReceivedCommand);
+
+    //Fill the commands combo box with all available commands
+    FillCommandsComboBox();
+
+    //enable the controls of this widget
     EnableSourceControls();
+
+    //start to update the logging window
+    this->m_UpdateLoggingWindowTimer.start();
   }
   else
   {
     m_IGTLDeviceSource = NULL;
     DisableSourceControls();
   }
-//  UpdateToolTable();
+  //reset the loggin text edit
+  ResetOutput();
 }
 
 ////##################################################################################
@@ -354,23 +389,40 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
 {
   if(m_Controls->butConnectWithServer->text() == "Connect")
   {
-    m_IGTLClient->SetPortNumber(m_Controls->editPort->text().toInt());
-    m_IGTLClient->SetHostname(m_Controls->editIP->text().toStdString());
-    m_IGTLClient->OpenConnection();
-    if ( m_IGTLClient->StartCommunication() )
+    QString port = m_Controls->editPort->text();
+    m_IGTLClient->SetPortNumber(port.toInt());
+    std::string hostname = m_Controls->editIP->text().toStdString();
+    m_IGTLClient->SetHostname(hostname);
+    if ( m_IGTLClient->OpenConnection() )
     {
-      m_Controls->editIP->setEnabled(false);
-      m_Controls->editPort->setEnabled(false);
-      m_Controls->editSend->setEnabled(true);
-      m_Controls->butSend->setEnabled(true);
-      m_Controls->butConnectWithServer->setText("Disconnect");
+      if ( m_IGTLClient->StartCommunication() )
+      {
+        m_Controls->editIP->setEnabled(false);
+        m_Controls->editPort->setEnabled(false);
+        m_Controls->editSend->setEnabled(true);
+        m_Controls->butSend->setEnabled(true);
+        m_Controls->commandsComboBox->setEnabled(true);
+        m_Controls->butConnectWithServer->setText("Disconnect");
+        std::stringstream s;
+        s << "<br>Successfully connected to " << hostname
+          << " on port " << port.toStdString();
+        this->AddOutput(s.str());
+      }
+      else
+      {
+        MITK_ERROR("QmitkIGTLDeviceSourceManagementWidget") <<
+                             "Could not start a communication with the"
+                             "server because the client is in the wrong state";
+        this->AddOutput("<br>Connection is not working.");
+      }
     }
     else
     {
-      MITK_ERROR("OpenIGTLinkExample") << "Could not start a communication with the"
-                                          "server. Please check the hostname and port.";
+      MITK_ERROR("QmitkIGTLDeviceSourceManagementWidget") <<
+                            "Could not connect to the server. "
+                             "Please check the hostname and port.";
+      this->AddOutput("<br>Connection is not working. Please Check Host and Port.");
     }
-    //        Start();
   }
   else
   {
@@ -378,8 +430,10 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
     m_Controls->editPort->setEnabled(true);
     m_Controls->editSend->setEnabled(false);
     m_Controls->butSend->setEnabled(false);
+    m_Controls->commandsComboBox->setEnabled(false);
     m_Controls->butConnectWithServer->setText("Connect");
     m_IGTLClient->CloseConnection();
+    this->AddOutput("<br>Closed connection.");
   }
 }
 
@@ -395,6 +449,26 @@ void QmitkIGTLDeviceSourceManagementWidget::OnHostnameChanged()
 
 }
 
+void QmitkIGTLDeviceSourceManagementWidget::OnSendCommand()
+{
+  m_IGTLClient->SendMessage(m_CurrentCommand.GetPointer());
+  std::stringstream s;
+  s << "<br>Sent command with DeviceType: " << m_CurrentCommand->GetDeviceType();
+  this->AddOutput(s.str());
+}
+
+void QmitkIGTLDeviceSourceManagementWidget::OnCommandChanged(
+    const QString & curCommand)
+{
+  mitk::IGTLMessageFactory::Pointer msgFactory =
+      this->m_IGTLClient->GetMessageFactory();
+  //create a new message that fits to the selected get message type command
+  this->m_CurrentCommand = msgFactory->GetMessageTypeNewPointer(
+        curCommand.toStdString())();
+  //enable the send command button
+  this->m_Controls->butSendCommand->setEnabled(true);
+}
+
 
 void QmitkIGTLDeviceSourceManagementWidget::OnSendMessage()
 {
@@ -403,6 +477,9 @@ void QmitkIGTLDeviceSourceManagementWidget::OnSendMessage()
   igtl::StringMessage::Pointer msg = igtl::StringMessage::New().GetPointer();
   msg->SetString(toBeSend);
   m_IGTLClient->SendMessage(msg.GetPointer());
+  std::stringstream s;
+  s << "<br>Sent message with DeviceType: " << msg->GetDeviceType();
+  this->AddOutput(s.str());
 //  if ( m_IGTLClient->SendMessage(msg.GetPointer()) )
 //  {
 //    MITK_INFO("OpenIGTLinkExample") << "Successfully sent the message.";
@@ -411,4 +488,60 @@ void QmitkIGTLDeviceSourceManagementWidget::OnSendMessage()
 //  {
 //    MITK_ERROR("OpenIGTLinkExample") << "Could not send the message.";
 //  }
+}
+
+void QmitkIGTLDeviceSourceManagementWidget::OnMessageReceived(itk::Object* caller, const itk::EventObject&/*event*/)
+{
+  //get the IGTL device that invoked this event
+  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
+
+  std::stringstream s;
+  s << "<br>Received a message:<br>"
+    << dev->GetOldestMessageInformation();
+
+  this->AddOutput(s.str());
+}
+
+void QmitkIGTLDeviceSourceManagementWidget::OnUpdateLoggingWindow()
+{
+  m_OutputMutex->Lock();
+  m_Controls->m_Logging->setHtml(QString(m_Output.str().c_str()));
+  m_Controls->m_Logging->update();
+  m_OutputMutex->Unlock();
+}
+
+void QmitkIGTLDeviceSourceManagementWidget::FillCommandsComboBox()
+{
+  //load the msg factory from the client (maybe this will be moved later on)
+  mitk::IGTLMessageFactory::Pointer msgFactory =
+      this->m_IGTLClient->GetMessageFactory();
+  //get the available commands as std::list<std::string>
+  std::list<std::string> commandsList_ =
+      msgFactory->GetAvailableMessageRequestTypes();
+  //create a string list to convert the std::list
+  QStringList commandsList;
+  while ( commandsList_.size() )
+  {
+    commandsList.append(QString::fromStdString(commandsList_.front()));
+    commandsList_.pop_front();
+  }
+  //fill the combo box with life
+  this->m_Controls->commandsComboBox->addItems(commandsList);
+}
+
+void QmitkIGTLDeviceSourceManagementWidget::ResetOutput()
+{
+  m_OutputMutex->Lock();
+  m_Output.str("");
+  m_Output <<"<body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7pt; font-weight:400; font-style:normal;\" bgcolor=black><span style=\"color:#ffffff;\"><u>output:</u>";
+  m_Controls->m_Logging->setHtml(QString(m_Output.str().c_str()));
+  m_OutputMutex->Unlock();
+}
+
+void QmitkIGTLDeviceSourceManagementWidget::AddOutput(std::string s)
+{
+  //print output
+  m_OutputMutex->Lock();
+  m_Output << s;
+  m_OutputMutex->Unlock();
 }

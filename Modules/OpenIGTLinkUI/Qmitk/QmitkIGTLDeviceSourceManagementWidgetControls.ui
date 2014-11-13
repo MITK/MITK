@@ -50,6 +50,9 @@
      </item>
      <item row="2" column="1">
       <widget class="QLineEdit" name="editPort">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>18944</string>
        </property>
@@ -70,7 +73,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="editIP">
        <property name="enabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="text">
         <string>127.0.0.1</string>
@@ -84,6 +87,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="butConnectWithServer">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="toolTip">
       <string>Do image processing</string>
      </property>
@@ -110,10 +116,17 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="editSend"/>
+      <widget class="QLineEdit" name="editSend">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="butSend">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Send</string>
        </property>

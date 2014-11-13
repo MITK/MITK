@@ -80,10 +80,10 @@ namespace mitk {
        * \brief Sends a message via the open IGT Link.
        *
        * This may only be called after the connection to the device has been
-       * established with a call to OpenConnection() (E.g. object is in Ready
-       * mode). This will change the object state from Ready to Running
+       * established with a call to OpenConnection(). Note that the message
+       * is not send directly. This method just adds it to the send queue.
        */
-      bool SendMessage(igtl::MessageBase::Pointer msg);
+      void SendMessage(igtl::MessageBase::Pointer msg);
 
       /**
        * \brief return current object state (Setup, Ready or Running)
@@ -161,6 +161,26 @@ namespace mitk {
       virtual bool TestConnection();
 
     protected:
+      /**
+       * \brief Sends a message via the open IGT Link.
+       *
+       * This may only be called after the connection to the device has been
+       * established with a call to OpenConnection()
+       */
+      bool SendMessagePrivate(igtl::MessageBase::Pointer msg);
+
+
+      /**
+      * \brief Call this method to receive a message. The message will be saved
+      * in the queue
+      */
+      void Receive();
+
+      /**
+      * \brief Call this method to send a message. The message will be read from
+      * the queue
+      */
+      void Send();
 
       /**
       * \brief  change object state
@@ -182,8 +202,10 @@ namespace mitk {
       itk::FastMutexLock::Pointer m_StateMutex;
       /** mutex to control access to m_Socket */
 //      itk::FastMutexLock::Pointer m_SocketMutex;
-      /** mutex to control access to m_LatestMessage */
-//      itk::FastMutexLock::Pointer m_LatestMessageMutex;
+      /** mutex to control access to m_ReceiveQueue */
+//      itk::FastMutexLock::Pointer m_ReceiveQueueMutex;
+      /** mutex to control access to m_SendQueue */
+//      itk::FastMutexLock::Pointer m_SendQueueMutex;
       /** the hostname or ip of the device */
       std::string m_Hostname;
       /** the port number of the device */
@@ -192,8 +214,10 @@ namespace mitk {
       igtl::Socket::Pointer m_Socket;
       /** the latest received message */
 //      igtl::MessageBase::Pointer m_LatestMessage;
-      /** The message queue */
-      mitk::IGTLMessageQueue::Pointer m_Queue;
+      /** The message receive queue */
+      mitk::IGTLMessageQueue::Pointer m_ReceiveQueue;
+      /** The message send queue */
+      mitk::IGTLMessageQueue::Pointer m_SendQueue;
       /** the latest received message */
       mitk::IGTLMessageFactory::Pointer m_MessageFactory;
       /** the name of this device */

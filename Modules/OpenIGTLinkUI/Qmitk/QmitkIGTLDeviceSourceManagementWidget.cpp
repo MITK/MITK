@@ -58,9 +58,6 @@ void QmitkIGTLDeviceSourceManagementWidget::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
   }
 
-  //Disable certain controls in the beginning, because there is no storage to edit
-  m_Controls->butSend->setEnabled(false);
-
   // set the validator for the ip edit box (values must be between 0 and 255 and
   // there are four of them, seperated with a point
   QRegExpValidator *v = new QRegExpValidator(this);
@@ -339,6 +336,7 @@ void QmitkIGTLDeviceSourceManagementWidget::EnableSourceControls()
 {
   m_Controls->editIP->setEnabled(true);
   m_Controls->editPort->setEnabled(true);
+  m_Controls->butConnectWithServer->setEnabled(true);
 //  m_Controls->editSend->setEnabled(false);
 //  m_Controls->m_AddTool->setEnabled(true);
 //  m_Controls->m_LoadTool->setEnabled(true);
@@ -404,12 +402,13 @@ void QmitkIGTLDeviceSourceManagementWidget::OnSendMessage()
 
   igtl::StringMessage::Pointer msg = igtl::StringMessage::New().GetPointer();
   msg->SetString(toBeSend);
-  if ( m_IGTLClient->SendMessage(msg.GetPointer()) )
-  {
-    MITK_INFO("OpenIGTLinkExample") << "Successfully sent the message.";
-  }
-  else
-  {
-    MITK_ERROR("OpenIGTLinkExample") << "Could not send the message.";
-  }
+  m_IGTLClient->SendMessage(msg.GetPointer());
+//  if ( m_IGTLClient->SendMessage(msg.GetPointer()) )
+//  {
+//    MITK_INFO("OpenIGTLinkExample") << "Successfully sent the message.";
+//  }
+//  else
+//  {
+//    MITK_ERROR("OpenIGTLinkExample") << "Could not send the message.";
+//  }
 }

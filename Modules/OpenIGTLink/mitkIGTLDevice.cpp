@@ -23,8 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <igtlTransformMessage.h>
 #include <mitkIGTLMessageCommon.h>
 
-typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
+static const int SOCKET_SEND_RECEIVE_TIMEOUT_MSEC = 100;
+
+typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 mitk::IGTLDevice::IGTLDevice() :
 //  m_Data(mitk::DeviceDataUnspecified),
@@ -45,7 +47,8 @@ mitk::IGTLDevice::IGTLDevice() :
 //  m_LatestMessage = igtl::MessageBase::New();
 
   m_MessageFactory = mitk::IGTLMessageFactory::New();
-  m_Queue = mitk::IGTLMessageQueue::New();
+  m_SendQueue = mitk::IGTLMessageQueue::New();
+  m_ReceiveQueue = mitk::IGTLMessageQueue::New();
 }
 
 
@@ -88,17 +91,13 @@ void mitk::IGTLDevice::SetState( IGTLDeviceState state )
   this->Modified();
 }
 
-//mitk::IGTLDeviceData mitk::IGTLDevice::GetData() const{
-//  return m_Data;
-//}
+void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
+{
+  //add the message to the queue
+  m_SendQueue->PushMessage(msg);
+}
 
-
-//void mitk::IGTLDevice::SetData(mitk::IGTLDeviceData data){
-//  m_Data = data;
-//}
-
-
-bool mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
+bool mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg)
 {
   //check the input message
   if ( msg.IsNull() )
@@ -119,113 +118,116 @@ bool mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
     return false;
 }
 
-//mitk::NDIErrorCode mitk::IGTLDevice::Receive(std::string* answer, unsigned int numberOfBytes)
-//{
-//  if (answer == NULL)
-//    return SERIALRECEIVEERROR;
-
-//  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
-//  long returnvalue = m_SerialCommunication->Receive(*answer, numberOfBytes);  // never read more bytes than the device has send, the function will block until enough bytes are send...
-
-//  if (returnvalue == 0)
-//    return SERIALRECEIVEERROR;
-//  else
-//    return NDIOKAY;
-//}
-
 
 bool mitk::IGTLDevice::TestConnection()
 {
-//  if (this->GetState() != Setup)
-//  {
-//    return mitk::TrackingSystemNotSpecified;
-//  }
 
-//  m_SerialCommunication = mitk::SerialCommunication::New();
-//  //m_DeviceProtocol =  mitk::NDIProtocol::New();
-//  //m_DeviceProtocol->SetTrackingDevice(this);
-//  //m_DeviceProtocol->UseCRCOn();
-//  /* init local com port to standard com settings for a NDI tracking device:
-//  9600 baud, 8 data bits, no parity, 1 stop bit, no hardware handshake
-//  */
-//  if (m_DeviceName.empty())
-//    m_SerialCommunication->SetPortNumber(m_PortNumber);
-//  else
-//    m_SerialCommunication->SetDeviceName(m_DeviceName);
-
-//  m_SerialCommunication->SetBaudRate(mitk::SerialCommunication::BaudRate9600);
-//  m_SerialCommunication->SetDataBits(mitk::SerialCommunication::DataBits8);
-//  m_SerialCommunication->SetParity(mitk::SerialCommunication::None);
-//  m_SerialCommunication->SetStopBits(mitk::SerialCommunication::StopBits1);
-//  m_SerialCommunication->SetSendTimeout(5000);
-//  m_SerialCommunication->SetReceiveTimeout(5000);
-//  if (m_SerialCommunication->OpenConnection() == 0) // error
-//  {
-//    m_SerialCommunication = NULL;
-//    return mitk::TrackingSystemNotSpecified;
-//  }
-
-//  /* Reset Tracking device by sending a serial break for 500ms */
-//  m_SerialCommunication->SendBreak(400);
-
-//  /* Read answer from tracking device (RESETBE6F) */
-//  static const std::string reset("RESETBE6F\r");
-//  std::string answer = "";
-//  this->Receive(&answer, reset.length());  // read answer (should be RESETBE6F)
-//  this->ClearReceiveBuffer();     // flush the receive buffer of all remaining data (carriage return, strings other than reset
-//  if (reset.compare(answer) != 0)  // check for RESETBE6F
-//  {
-//    m_SerialCommunication->CloseConnection();
-//    m_SerialCommunication = NULL;
-//    mitkThrowException(mitk::IGTHardwareException) << "Hardware Reset of tracking device did not work";
-//  }
-
-//  /* Now the tracking device is reset, start initialization */
-//  NDIErrorCode returnvalue;
-
-//  /* initialize the tracking device */
-//  //returnvalue = m_DeviceProtocol->INIT();
-//  //if (returnvalue != NDIOKAY)
-//  //{
-//  //  this->SetErrorMessage("Could not initialize the tracking device");
-//  //  return mitk::TrackingSystemNotSpecified;
-//  //}
-
-
-//    mitk::TrackingDeviceType deviceType;
-//    returnvalue = m_DeviceProtocol->VER(deviceType);
-//    if ((returnvalue != NDIOKAY) || (deviceType == mitk::TrackingSystemNotSpecified))
-//    {
-//      m_SerialCommunication = NULL;
-//      return mitk::TrackingSystemNotSpecified;
-//    }
-//    m_SerialCommunication = NULL;
-//    return deviceType;
   return true;
 }
 
-
-ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartCommunication(void* pInfoStruct)
+void mitk::IGTLDevice::Receive()
 {
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo =
-    (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == NULL)
+  // Create a message buffer to receive header
+  igtl::MessageHeader::Pointer headerMsg;
+  headerMsg = igtl::MessageHeader::New();
+
+  // Initialize receive buffer
+  headerMsg->InitPack();
+
+  // Receive generic header from the socket
+  int r =
+    m_Socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize(),1);
+
+  if(r == 0)
   {
-    return ITK_THREAD_RETURN_VALUE;
+    //this->StopCommunication();
+    // an error was received, therefor the communication must be stopped
+    m_StopCommunicationMutex->Lock();
+    m_StopCommunication = true;
+    m_StopCommunicationMutex->Unlock();
   }
-  if (pInfo->UserData == NULL)
+  else if (r == headerMsg->GetPackSize())
   {
-    return ITK_THREAD_RETURN_VALUE;
+    // Deserialize the header and check the CRC
+    int crcCheck = headerMsg->Unpack(1);
+    if (crcCheck & igtl::MessageHeader::UNPACK_HEADER)
+    {
+      // Allocate a time stamp
+      igtl::TimeStamp::Pointer ts;
+      ts = igtl::TimeStamp::New();
+
+      // Get time stamp
+      igtlUint32 sec;
+      igtlUint32 nanosec;
+
+      headerMsg->GetTimeStamp(ts);
+      ts->GetTimeStamp(&sec, &nanosec);
+
+      std::cerr << "Time stamp: "
+                << sec << "."
+                << nanosec << std::endl;
+
+      std::cerr << "Dev type and name: " << headerMsg->GetDeviceType() << " "
+                << headerMsg->GetDeviceName() << std::endl;
+
+      headerMsg->Print(std::cout);
+
+      //Create a message buffer to receive transform data
+      igtl::MessageBase::Pointer curMessage;
+      curMessage = m_MessageFactory->CreateInstance(headerMsg);
+      curMessage->SetMessageHeader(headerMsg);
+      curMessage->AllocatePack();
+
+      // Receive transform data from the socket
+      int receiveCheck = 0;
+      receiveCheck = m_Socket->Receive(curMessage->GetPackBodyPointer(),
+                                       curMessage->GetPackBodySize());
+
+      if ( receiveCheck > 0 )
+      {
+        int c = curMessage->Unpack(1);
+        if ( !(c & igtl::MessageHeader::UNPACK_BODY) )
+        {
+          mitkThrow() << "crc error";
+        }
+
+        //push the current message into the queue
+        m_ReceiveQueue->PushMessage(curMessage);
+      }
+      else
+      {
+        MITK_ERROR("IGTLDevice") << "Received a valid header but could not "
+                                 << "read the whole message.";
+      }
+    }
   }
-  IGTLDevice *igtlDevice = (IGTLDevice*)pInfo->UserData;
-  if (igtlDevice != NULL)
+  else
   {
-    igtlDevice->RunCommunication();
+    //Message size information and actual data size don't match.
   }
-  igtlDevice->m_ThreadID = 0;  // erase thread id because thread will end.
-  return ITK_THREAD_RETURN_VALUE;
 }
+
+void mitk::IGTLDevice::Send()
+{
+  igtl::MessageBase::Pointer curMessage;
+
+  //get the latest message from the queue
+  curMessage = m_SendQueue->PullMessage();
+
+  // there is no message => return
+  if ( curMessage.IsNull() )
+    return;
+
+  if ( this->SendMessagePrivate(curMessage.GetPointer()) )
+  {
+    MITK_INFO("IGTLDevice") << "Successfully sent the message.";
+  }
+  else
+  {
+    MITK_ERROR("IGTLDevice") << "Could not send the message.";
+  }
+}
+
 
 void mitk::IGTLDevice::RunCommunication()
 {
@@ -245,113 +247,18 @@ void mitk::IGTLDevice::RunCommunication()
   this->m_StopCommunicationMutex->Unlock();
   while ((this->GetState() == Running) && (localStopCommunication == false))
   {
-    //POLLLING
-    // Create a message buffer to receive header
-    igtl::MessageHeader::Pointer headerMsg;
-    headerMsg = igtl::MessageHeader::New();
+    // Check if there is something to receive and store it in the message queue
+    this->Receive();
 
-    // Initialize receive buffer
-    headerMsg->InitPack();
+    // Check if there is something to send
+    this->Send();
 
-    // Receive generic header from the socket
-//    this->m_SocketMutex->Lock();
-    int r =
-      m_Socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize(),1);
-//    this->m_SocketMutex->Unlock();
-
-    if(r == 0)
-    {
-      //this->StopCommunication();
-      // an error was received, therefor the communication must be stopped
-      m_StopCommunicationMutex->Lock();
-      m_StopCommunication = true;
-      m_StopCommunicationMutex->Unlock();
-    }
-    else if (r == headerMsg->GetPackSize())
-    {
-      // Deserialize the header and check the CRC
-      int crcCheck = headerMsg->Unpack(1);
-      if (crcCheck & igtl::MessageHeader::UNPACK_HEADER)
-      {
-        // Allocate a time stamp
-        igtl::TimeStamp::Pointer ts;
-        ts = igtl::TimeStamp::New();
-
-        // Get time stamp
-        igtlUint32 sec;
-        igtlUint32 nanosec;
-
-        headerMsg->GetTimeStamp(ts);
-        ts->GetTimeStamp(&sec, &nanosec);
-
-        //check for invalid timestamps
-//        if(sec != 0)
-        {
-          std::cerr << "Time stamp: "
-                    << sec << "."
-                    << nanosec << std::endl;
-
-          std::cerr << "Dev type and name: " << headerMsg->GetDeviceType() << " "
-            << headerMsg->GetDeviceName() << std::endl;
-
-          headerMsg->Print(std::cout);
-
-          //Create a message buffer to receive transform data
-          /*igtl::MessageBase::Pointer curMessage;
-          curMessage = igtl::MessageBase::New();
-          curMessage->SetMessageHeader(headerMsg);
-          curMessage->AllocatePack();*/
-
-          //Create a message buffer to receive transform data
-          igtl::MessageBase::Pointer curMessage;
-          curMessage = m_MessageFactory->CreateInstance(headerMsg);
-          curMessage->SetMessageHeader(headerMsg);
-          curMessage->AllocatePack();
-
-          // Receive transform data from the socket
-          int receiveCheck = 0;
-          receiveCheck = m_Socket->Receive(curMessage->GetPackBodyPointer(),
-                                           curMessage->GetPackBodySize());
-
-          if ( receiveCheck > 0 )
-          {
-            int c = curMessage->Unpack(1);
-            if ( !(c & igtl::MessageHeader::UNPACK_BODY) )
-            {
-              mitkThrow() << "crc error";
-            }
-
-            //copy the current message into the latest message member
-//            m_LatestMessageMutex->Lock();
-            m_Queue->PushMessage(curMessage);
-//            m_LatestMessage = m_MessageFactory->Clone(curMessage);
-//            m_LatestMessageMutex->Unlock();
-          }
-          else
-          {
-            MITK_ERROR("IGTLDevice") << "Received a valid header but could not "
-                                     << "read the whole message.";
-          }
-        }
-      }
-    }
-    else
-    {
-      //Message size information and actual data size don't match.
-    }
-
-//    m_MarkerPointsMutex->Lock(); // lock points data structure
-//    returnvalue = this->m_DeviceProtocol->POS3D(&m_MarkerPoints); // update points data structure with new position data from tracking device
-//    m_MarkerPointsMutex->Unlock();
-//    if (!((returnvalue == NDIOKAY) || (returnvalue == NDICRCERROR) || (returnvalue == NDICRCDOESNOTMATCH))) // right now, do not stop on crc errors
-//    {
-//      std::cout << "Error in POS3D: could not read data. Possibly no markers present." << std::endl;
-//    }
     /* Update the local copy of m_StopCommunication */
     this->m_StopCommunicationMutex->Lock();
     localStopCommunication = m_StopCommunication;
     this->m_StopCommunicationMutex->Unlock();
 
+    // time to relax
     itksys::SystemTools::Delay(1);
   }
   // StopCommunication was called, thus the mode should be changed back to Ready now
@@ -371,7 +278,12 @@ bool mitk::IGTLDevice::StartCommunication()
   if (this->GetState() != Ready)
     return false;
 
-  this->SetState(Running);      // go to mode Running
+  // go to mode Running
+  this->SetState(Running);
+
+  // set a timeout for the sending and receiving
+  this->m_Socket->SetTimeout(SOCKET_SEND_RECEIVE_TIMEOUT_MSEC);
+
   // update the local copy of m_StopCommunication
   this->m_StopCommunicationMutex->Lock();
   this->m_StopCommunication = false;
@@ -419,12 +331,7 @@ bool mitk::IGTLDevice::CloseConnection()
   }
 
   m_Socket->CloseSocket();
-//    //init before closing to force the field generator from aurora to switch itself off
-//    m_DeviceProtocol->INIT();
-//    /* close the serial connection */
-//    m_SerialCommunication->CloseConnection();
-//    /* invalidate all tools */
-//    this->InvalidateAll();
+
   /* return to setup mode */
   this->SetState(Setup);
 //    m_SerialCommunication = NULL;
@@ -434,10 +341,30 @@ bool mitk::IGTLDevice::CloseConnection()
 igtl::MessageBase::Pointer mitk::IGTLDevice::GetLatestMessage()
 {
   //copy the latest message into the given msg
-//  m_LatestMessageMutex->Lock();
-//  igtl::MessageBase::Pointer msg =
-//      this->m_MessageFactory->Clone(m_LatestMessage);
-//  m_LatestMessageMutex->Unlock();
-//  return msg;
-  return this->m_Queue->PullMessage();
+//  m_ReceiveQueueMutex->Lock();
+  igtl::MessageBase::Pointer msg = this->m_ReceiveQueue->PullMessage();
+//  m_ReceiveQueueMutex->Unlock();
+  return msg;
+}
+
+ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartCommunication(void* pInfoStruct)
+{
+  /* extract this pointer from Thread Info structure */
+  struct itk::MultiThreader::ThreadInfoStruct * pInfo =
+    (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
+  if (pInfo == NULL)
+  {
+    return ITK_THREAD_RETURN_VALUE;
+  }
+  if (pInfo->UserData == NULL)
+  {
+    return ITK_THREAD_RETURN_VALUE;
+  }
+  IGTLDevice *igtlDevice = (IGTLDevice*)pInfo->UserData;
+  if (igtlDevice != NULL)
+  {
+    igtlDevice->RunCommunication();
+  }
+  igtlDevice->m_ThreadID = 0;  // erase thread id because thread will end.
+  return ITK_THREAD_RETURN_VALUE;
 }

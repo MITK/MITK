@@ -221,14 +221,14 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
           //write back to image volume
           SliceInformation sliceInfo (workingSlice, itWorkingContours->second, currentTimestep);
           sliceList.push_back(sliceInfo);
+          this->WriteSliceToVolume(sliceInfo);
         }
       }
     }
-
     ++itWorkingContours;
   }
 
-  this->WriteBackSegmentationResult(sliceList);
+  this->WriteBackSegmentationResult(sliceList, false);
   this->ClearSegmentation();
 }
 

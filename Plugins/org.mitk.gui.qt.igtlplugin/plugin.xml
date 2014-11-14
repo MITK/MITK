@@ -8,9 +8,15 @@
           icon="resources/icon.xpm" />
   </extension>
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.openigtlinkexample"
+    <view id="org.mitk.views.OpenIGTLinkExample"
           name="OpenIGTLinkExample"
           class="OpenIGTLinkExample"
+          icon="resources/icon.xpm" />
+  </extension>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.OpenIGTLinkProviderExample"
+          name="OpenIGTLinkProviderExample"
+          class="OpenIGTLinkProviderExample"
           icon="resources/icon.xpm" />
   </extension>
 

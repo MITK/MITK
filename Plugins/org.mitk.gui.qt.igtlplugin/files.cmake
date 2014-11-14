@@ -6,15 +6,18 @@ set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_igtlplugin_Activator.cpp
   OpenIGTLinkManager.cpp
   OpenIGTLinkExample.cpp
+  OpenIGTLinkProviderExample.cpp
 )
 
 set(UI_FILES
+  src/internal/OpenIGTLinkProviderExampleControls.ui
   src/internal/OpenIGTLinkExampleControls.ui
   src/internal/OpenIGTLinkManagerControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_igtlplugin_Activator.h
+  src/internal/OpenIGTLinkProviderExample.h
   src/internal/OpenIGTLinkExample.h
   src/internal/OpenIGTLinkManager.h
 )

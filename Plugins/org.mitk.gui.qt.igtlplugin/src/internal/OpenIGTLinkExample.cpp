@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "igtlStringMessage.h"
 
 
-const std::string OpenIGTLinkExample::VIEW_ID = "org.mitk.views.openigtlinkexample";
+const std::string OpenIGTLinkExample::VIEW_ID = "org.mitk.views.OpenIGTLinkExample";
 
 void OpenIGTLinkExample::SetFocus()
 {

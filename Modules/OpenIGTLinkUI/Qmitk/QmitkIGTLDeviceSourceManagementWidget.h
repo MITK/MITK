@@ -134,6 +134,8 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
     itk::FastMutexLock::Pointer m_OutputMutex;
     /** @brief a string stream used for logging */
     std::stringstream m_Output;
+    /** @brief flag to indicate if the output has to be updated */
+    bool m_OutputChanged;
 
     /** @brief a string stream used for logging */
     QTimer m_UpdateLoggingWindowTimer;

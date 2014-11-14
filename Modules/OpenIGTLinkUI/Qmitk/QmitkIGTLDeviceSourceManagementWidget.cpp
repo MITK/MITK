@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qfiledialog.h>
 #include <qinputdialog.h>
 #include <qmessagebox.h>
+#include <qscrollbar.h>
 
 //igtl
 #include <igtlStringMessage.h>
@@ -38,7 +39,7 @@ const std::string QmitkIGTLDeviceSourceManagementWidget::VIEW_ID =
 
 QmitkIGTLDeviceSourceManagementWidget::QmitkIGTLDeviceSourceManagementWidget(
     QWidget* parent, Qt::WindowFlags f)
-  : QWidget(parent, f)
+  : QWidget(parent, f), m_OutputChanged(false)
 {
   m_Controls = NULL;
   m_OutputMutex = itk::FastMutexLock::New();
@@ -505,8 +506,15 @@ void QmitkIGTLDeviceSourceManagementWidget::OnMessageReceived(itk::Object* calle
 void QmitkIGTLDeviceSourceManagementWidget::OnUpdateLoggingWindow()
 {
   m_OutputMutex->Lock();
-  m_Controls->m_Logging->setHtml(QString(m_Output.str().c_str()));
-  m_Controls->m_Logging->update();
+//  m_Controls->m_Logging->setHtml(QString(m_Output.str().c_str()));
+//  m_Controls->m_Logging->update();
+  if ( m_OutputChanged )
+  {
+    m_Controls->m_Logging->setText(QString(m_Output.str().c_str()));
+    QScrollBar* sb = m_Controls->m_Logging->verticalScrollBar();
+    sb->setValue(sb->maximum());
+    m_OutputChanged = false;
+  }
   m_OutputMutex->Unlock();
 }
 
@@ -543,5 +551,6 @@ void QmitkIGTLDeviceSourceManagementWidget::AddOutput(std::string s)
   //print output
   m_OutputMutex->Lock();
   m_Output << s;
+  m_OutputChanged = true;
   m_OutputMutex->Unlock();
 }

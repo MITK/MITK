@@ -58,8 +58,8 @@ void QmitkIGTLDeviceSourceSelectionWidget::CreateConnections()
 
     //initialize service list widget
     std::string empty = "";
-    m_Controls->m_ServiceListWidget->Initialize<mitk::IGTLMessageSource>(
-          mitk::IGTLMessageSource::US_PROPKEY_DEVICENAME,empty);
+    m_Controls->m_ServiceListWidget->Initialize<mitk::IGTLDeviceSource>(
+          mitk::IGTLDeviceSource::US_PROPKEY_IGTLDEVICENAME,empty);
   }
 }
 
@@ -76,7 +76,7 @@ void QmitkIGTLDeviceSourceSelectionWidget::IGTLDeviceSourceSelected(us::ServiceR
     // Get storage
     us::ModuleContext* context = us::GetModuleContext();
     this->m_CurrentIGTLDeviceSource =
-        (mitk::IGTLDeviceSource*)context->GetService<mitk::IGTLMessageSource>(s);
+        context->GetService<mitk::IGTLDeviceSource>(s);
     emit IGTLDeviceSourceSelected(this->m_CurrentIGTLDeviceSource);
   }
 

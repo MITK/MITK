@@ -22,6 +22,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "mitkIGTTimeStamp.h"
 //#include "mitkIGTException.h"
 
+//Microservices
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usServiceProperties.h>
+#include <usModuleContext.h>
+
+//itk
+#include <itkCommand.h>
+
+
+const std::string mitk::IGTLDeviceSource::US_PROPKEY_IGTLDEVICENAME =
+    mitk::IGTLMessageSource::US_INTERFACE_NAME + ".igtldevicename";
+
 mitk::IGTLDeviceSource::IGTLDeviceSource()
   : mitk::IGTLMessageSource(), m_IGTLDevice(NULL)
 {
@@ -76,6 +89,15 @@ void mitk::IGTLDeviceSource::SetIGTLDevice( mitk::IGTLDevice* igtlDevice )
     std::stringstream name; // create a human readable name for the source
     name << "OIGTL Device Source ( " << igtlDevice->GetName() << " )";
     this->SetName(name.str());
+
+    //setup a observer that listens to new messages
+    typedef itk::SimpleMemberCommand<mitk::IGTLDeviceSource> CurCommandType;
+    CurCommandType::Pointer messageReceivedCommand = CurCommandType::New();
+    messageReceivedCommand->SetCallbackFunction(
+      this, &IGTLDeviceSource::OnIncomingMessage );
+    this->m_IGTLDevice->AddObserver(mitk::MessageReceivedEvent(),
+                                    messageReceivedCommand);
+
   }
 }
 
@@ -177,4 +199,25 @@ bool mitk::IGTLDeviceSource::IsCommunicating()
     return false;
 
   return m_IGTLDevice->GetState() == mitk::IGTLDevice::Running;
+}
+
+void mitk::IGTLDeviceSource::RegisterAsMicroservice()
+{
+  // Get Context
+  us::ModuleContext* context = us::GetModuleContext();
+
+  // Define ServiceProps
+  us::ServiceProperties props;
+  mitk::UIDGenerator uidGen =
+      mitk::UIDGenerator ("org.mitk.services.IGTLDeviceSource.id_", 16);
+  props[ US_PROPKEY_ID ] = uidGen.GetUID();
+  props[ US_PROPKEY_DEVICENAME ] = this->GetName();
+  props[ US_PROPKEY_IGTLDEVICENAME ] = m_Name;
+  m_ServiceRegistration = context->RegisterService(this, props);
+}
+
+
+void mitk::IGTLDeviceSource::OnIncomingMessage()
+{
+
 }

@@ -39,6 +39,11 @@ namespace mitk {
     itkCloneMacro(Self)
 
     /**
+    *\brief These Constants are used in conjunction with Microservices
+    */
+    static const std::string US_PROPKEY_IGTLDEVICENAME;
+
+    /**
     * \brief sets the OpenIGTLink device that will be used as a data source
     */
     virtual void SetIGTLDevice(mitk::IGTLDevice* td);
@@ -47,6 +52,12 @@ namespace mitk {
     * \brief returns the OpenIGTLink device that is used by this filter
     */
     itkGetObjectMacro(IGTLDevice, mitk::IGTLDevice);
+
+    /**
+    *\brief Registers this object as a Microservice, making it available to every
+    * module and/or plugin. To unregister, call UnregisterMicroservice().
+    */
+    virtual void RegisterAsMicroservice();
 
     /**
     * \brief Establishes a connection to the OpenIGTLink device. If there is
@@ -121,6 +132,12 @@ namespace mitk {
     * Outputs are deleted when called.
     **/
     void CreateOutputs();
+
+    /**
+    * \brief This method is called when the IGTL device hold by this class
+    * receives a new message
+    **/
+    virtual void OnIncomingMessage();
 
     /** the OpenIGTLink device that is used as a source for this filter object*/
     mitk::IGTLDevice::Pointer m_IGTLDevice;

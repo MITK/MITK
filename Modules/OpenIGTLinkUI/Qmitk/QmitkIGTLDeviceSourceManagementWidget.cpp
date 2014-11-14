@@ -482,14 +482,6 @@ void QmitkIGTLDeviceSourceManagementWidget::OnSendMessage()
   std::stringstream s;
   s << "<br>Sent message with DeviceType: " << msg->GetDeviceType();
   this->AddOutput(s.str());
-//  if ( m_IGTLClient->SendMessage(msg.GetPointer()) )
-//  {
-//    MITK_INFO("OpenIGTLinkExample") << "Successfully sent the message.";
-//  }
-//  else
-//  {
-//    MITK_ERROR("OpenIGTLinkExample") << "Could not send the message.";
-//  }
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::OnMessageReceived(itk::Object* caller, const itk::EventObject&/*event*/)

@@ -169,8 +169,6 @@ namespace mitk {
 
     std::string m_Name;
 
-
-  private:
     us::ServiceRegistration<Self> m_ServiceRegistration;
   };
 } // namespace mitk

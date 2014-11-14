@@ -357,6 +357,7 @@ void QmitkIGTLDeviceSourceManagementWidget::DisableSourceControls()
   m_Controls->editIP->setEnabled(false);
   m_Controls->editPort->setEnabled(false);
   m_Controls->editSend->setEnabled(false);
+  m_Controls->butSendCommand->setEnabled(false);
 //  m_Controls->m_AddTool->setEnabled(false);
 //  m_Controls->m_LoadTool->setEnabled(false);
 //  m_Controls->m_selectedLabel->setEnabled(false);
@@ -398,12 +399,13 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
     {
       if ( m_IGTLClient->StartCommunication() )
       {
-        m_Controls->editIP->setEnabled(false);
-        m_Controls->editPort->setEnabled(false);
-        m_Controls->editSend->setEnabled(true);
-        m_Controls->butSend->setEnabled(true);
-        m_Controls->commandsComboBox->setEnabled(true);
-        m_Controls->butConnectWithServer->setText("Disconnect");
+        this->m_Controls->editIP->setEnabled(false);
+        this->m_Controls->editPort->setEnabled(false);
+        this->m_Controls->editSend->setEnabled(true);
+        this->m_Controls->butSend->setEnabled(true);
+        this->m_Controls->commandsComboBox->setEnabled(true);
+        this->m_Controls->butSendCommand->setEnabled(true);
+        this->m_Controls->butConnectWithServer->setText("Disconnect");
         std::stringstream s;
         s << "<br>Successfully connected to " << hostname
           << " on port " << port.toStdString();
@@ -431,6 +433,7 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
     m_Controls->editPort->setEnabled(true);
     m_Controls->editSend->setEnabled(false);
     m_Controls->butSend->setEnabled(false);
+    m_Controls->butSendCommand->setEnabled(false);
     m_Controls->commandsComboBox->setEnabled(false);
     m_Controls->butConnectWithServer->setText("Connect");
     m_IGTLClient->CloseConnection();
@@ -466,8 +469,6 @@ void QmitkIGTLDeviceSourceManagementWidget::OnCommandChanged(
   //create a new message that fits to the selected get message type command
   this->m_CurrentCommand = msgFactory->GetMessageTypeNewPointer(
         curCommand.toStdString())();
-  //enable the send command button
-  this->m_Controls->butSendCommand->setEnabled(true);
 }
 
 

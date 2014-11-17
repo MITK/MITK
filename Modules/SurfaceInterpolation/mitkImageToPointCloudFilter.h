@@ -26,6 +26,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+struct MitkSurfaceInterpolation_EXPORT DetectConstants
+{
+  static const int LAPLACIAN_STD_DEV2 = 0;
+  static const int LAPLACIAN_STD_DEV3 = 1;
+  static const int CANNY_EDGE = 2;
+  static const int THRESHOLD = 3;
+};
+
 class MitkSurfaceInterpolation_EXPORT ImageToPointCloudFilter: public ImageToSurfaceFilter
 {
 
@@ -41,6 +49,9 @@ public:
   typedef itk::Image<double, 3> FloatImageType;
   typedef itk::CastImageFilter< ImageType, FloatImageType > ImagePTypeToFloatPTypeCasterType;
   typedef itk::LaplacianImageFilter< FloatImageType, FloatImageType > LaplacianFilterType;
+  typedef int DetectionMethod;
+
+  void SetDetectionMethod(DetectionMethod method);
 
 protected:
 
@@ -55,9 +66,14 @@ protected:
 private:
 
   template<typename TPixel, unsigned int VImageDimension>
-  void StdDeviations(itk::Image<TPixel, VImageDimension>* image, double mean, double stdDev);
+  void StdDeviations(itk::Image<TPixel, VImageDimension>* image, double mean, double stdDev, int amount);
+
+  void LaplacianStdDev(itk::Image<short, 3>::Pointer image, int amount);
 
   mitk::Surface::Pointer m_PointSurface;
+  mitk::Image::Pointer m_EdgeImage;
+
+  DetectionMethod m_method;
 
 };
 

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 #include "ui_OpenIGTLinkProviderExampleControls.h"
-#include "mitkIGTLClient.h"
+#include "mitkIGTLServer.h"
 #include "mitkIGTLMessageProvider.h"
 #include "mitkNavigationDataToIGTLMessageFilter.h"
 #include "mitkNavigationDataPlayer.h"
@@ -64,7 +64,7 @@ class OpenIGTLinkProviderExample : public QmitkAbstractView
     void DestroyPipeline();
 
     Ui::OpenIGTLinkProviderExampleControls m_Controls;
-    mitk::IGTLClient::Pointer m_IGTLClient;
+    mitk::IGTLServer::Pointer m_IGTLServer;
     mitk::IGTLMessageProvider::Pointer m_IGTLMessageProvider;
     mitk::NavigationDataToIGTLMessageFilter::Pointer m_NavDataToIGTLMsgFilter;
     mitk::NavigationDataPlayer::Pointer m_NavDataPlayer;

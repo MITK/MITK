@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_OpenIGTLinkExampleControls.h"
 #include "mitkIGTLClient.h"
+#include "mitkIGTLServer.h"
 #include "mitkIGTLDeviceSource.h"
 #include "mitkNavigationDataObjectVisualizationFilter.h"
 #include "mitkIGTLMessageToNavigationDataFilter.h"
@@ -69,6 +70,10 @@ class OpenIGTLinkExample : public QmitkAbstractView
     mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_VisFilter;
     mitk::DataNode::Pointer m_DemoNode;
+
+    //REMOVE LATER
+    mitk::IGTLServer::Pointer m_IGTLServer;
+    mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource2;
 
     QTimer m_Timer;
 };

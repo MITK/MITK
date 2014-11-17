@@ -18,9 +18,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIGTLDevice.h"
 #include "mitkIGTLMessage.h"
+#include "mitkIGTLMessageFactory.h"
 
 //#include "mitkIGTTimeStamp.h"
 //#include "mitkIGTException.h"
+
+//Microservices
+#include "usServiceReference.h"
+#include "usModuleContext.h"
+#include "usServiceEvent.h"
+#include "mitkServiceInterface.h"
+#include "usGetModuleContext.h"
 
 mitk::IGTLMessageProvider::IGTLMessageProvider()
   : mitk::IGTLDeviceSource()
@@ -41,7 +49,7 @@ void mitk::IGTLMessageProvider::GenerateData()
   /* update output with message from the device */
   IGTLMessage* msgOut = this->GetOutput();
   assert(msgOut);
-  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetLatestMessage();
+  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetNextMessage();
   if ( msgIn.IsNotNull() )
   {
     assert(msgIn);
@@ -83,9 +91,67 @@ void mitk::IGTLMessageProvider::CreateOutputs()
 
 void mitk::IGTLMessageProvider::OnIncomingMessage()
 {
-  //check type of incoming message, it must be a request type (GET_ or STT_)
-  //otherwise ignore it
+
+}
+
+std::string RemoveRequestPrefixes(std::string requestType)
+{
+  return requestType.substr(4);
+}
+
+void mitk::IGTLMessageProvider::OnIncomingCommand()
+{
+  //get the next command
+  igtl::MessageBase::Pointer curCommand = this->m_IGTLDevice->GetNextCommand();
+  //extract the type
+  const char * requestType = curCommand->GetDeviceType();
+  //get the type from the request type (remove STT_, STP_ or GET_)
+  std::string type = RemoveRequestPrefixes(requestType);
   //check all microservices if there is a fitting source for the requested type
-  //if it is a single value return the value
-  //if it is a stream start streaming
+  mitk::IGTLMessageSource::Pointer source = this->GetFittingSource(type.c_str());
+  //if there is no fitting source return an RTS message
+  if ( source.IsNull() )
+  {
+    std::string returnType("RTS_");
+    returnType.append(type);
+    mitk::IGTLMessageFactory::Pointer msgFactory =
+        this->GetIGTLDevice()->GetMessageFactory();
+    mitk::IGTLMessageFactory::PointerToMessageBaseNew retMsgNew =
+        msgFactory->GetMessageTypeNewPointer(returnType);
+    //if retMsgNew is NULL there is no return message defined and thus it is not
+    //necessary to send one back
+    if ( retMsgNew != NULL )
+    {
+      igtl::MessageBase::Pointer rtsMsg = retMsgNew();
+      this->GetIGTLDevice()->SendMessage(rtsMsg);
+    }
+  }
+  else
+  {
+    //if it is a single value return the value
+    source->GetOutput();
+    //if it is a stream start streaming
+  }
+}
+
+mitk::IGTLMessageSource::Pointer mitk::IGTLMessageProvider::GetFittingSource(const char* requestedType)
+{
+  us::ModuleContext* context = us::GetModuleContext();
+  std::string interface = mitk::IGTLMessageSource::US_INTERFACE_NAME;
+  std::string filter = "(" + us::ServiceConstants::OBJECTCLASS() + "=" + interface + ")";
+  std::vector<us::ServiceReferenceU> serviceReferences =
+      context->GetServiceReferences(interface, "");
+  std::vector<us::ServiceReferenceU>::iterator it = serviceReferences.begin();
+  std::vector<us::ServiceReferenceU>::iterator end = serviceReferences.end();
+  for ( ; it != end; it++ )
+  {
+    mitk::IGTLMessageSource::Pointer curSource =
+        context->GetService<mitk::IGTLMessageSource>(*it);
+    std::string type = curSource->GetType();
+    if ( std::strcmp(type.c_str(), requestedType) == 0 )
+    {
+      return curSource;
+    }
+  }
+  return NULL;
 }

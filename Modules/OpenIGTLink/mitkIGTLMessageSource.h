@@ -57,6 +57,20 @@ namespace mitk {
      */
     itkSetMacro(Name,std::string);
 
+    /** @return Returns a human readable type of this source. There will be a
+     * default type, or you can set the name with the method SetType(). You have
+     * to set this parameter otherwise it will not be found by the message
+     * provider.
+     */
+    itkGetMacro(Type,std::string);
+
+    /** @return Returns a human readable type of this source. There will be a
+     * default type, or you can set the name with the method SetType(). You have
+     * to set this parameter otherwise it will not be found by the message
+     * provider.
+     */
+    itkSetMacro(Type,std::string);
+
     /**
     *\brief return the output (output with id 0) of the filter
     */
@@ -105,6 +119,7 @@ namespace mitk {
     */
     static const std::string US_INTERFACE_NAME;
     static const std::string US_PROPKEY_DEVICENAME;
+    static const std::string US_PROPKEY_DEVICETYPE;
     static const std::string US_PROPKEY_ID;
     static const std::string US_PROPKEY_ISACTIVE; //NOT IMPLEMENTED YET!
 
@@ -168,6 +183,7 @@ namespace mitk {
     virtual ~IGTLMessageSource();
 
     std::string m_Name;
+    std::string m_Type;
 
     us::ServiceRegistration<Self> m_ServiceRegistration;
   };

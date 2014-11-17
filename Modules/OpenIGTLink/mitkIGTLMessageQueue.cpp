@@ -41,7 +41,7 @@ igtl::MessageBase::Pointer mitk::IGTLMessageQueue::PullMessage()
   return ret;
 }
 
-std::string mitk::IGTLMessageQueue::GetOldestMsgInformation()
+std::string mitk::IGTLMessageQueue::GetNextMsgInformationString()
 {
   this->m_Mutex->Lock();
   std::stringstream s;
@@ -53,6 +53,55 @@ std::string mitk::IGTLMessageQueue::GetOldestMsgInformation()
   else
   {
     s << "No Msg";
+  }
+  this->m_Mutex->Unlock();
+  return s.str();
+}
+
+std::string mitk::IGTLMessageQueue::GetNextMsgDeviceType()
+{
+  this->m_Mutex->Lock();
+  std::stringstream s;
+  if ( this->m_Queue.size() > 0 )
+  {
+    s << this->m_Queue.front()->GetDeviceType();
+  }
+  else
+  {
+    s << "";
+  }
+  this->m_Mutex->Unlock();
+  return s.str();
+}
+
+std::string mitk::IGTLMessageQueue::GetLatestMsgInformationString()
+{
+  this->m_Mutex->Lock();
+  std::stringstream s;
+  if ( this->m_Queue.size() > 0 )
+  {
+    s << "Device Type: " << this->m_Queue.back()->GetDeviceType() << std::endl;
+    s << "Device Name: " << this->m_Queue.back()->GetDeviceName() << std::endl;
+  }
+  else
+  {
+    s << "No Msg";
+  }
+  this->m_Mutex->Unlock();
+  return s.str();
+}
+
+std::string mitk::IGTLMessageQueue::GetLatestMsgDeviceType()
+{
+  this->m_Mutex->Lock();
+  std::stringstream s;
+  if ( this->m_Queue.size() > 0 )
+  {
+    s << this->m_Queue.back()->GetDeviceType();
+  }
+  else
+  {
+    s << "";
   }
   this->m_Mutex->Unlock();
   return s.str();

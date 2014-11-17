@@ -139,6 +139,12 @@ namespace mitk {
     **/
     virtual void OnIncomingMessage();
 
+    /**
+    * \brief This method is called when the IGTL device hold by this class
+    * receives a new command
+    **/
+    virtual void OnIncomingCommand();
+
     /** the OpenIGTLink device that is used as a source for this filter object*/
     mitk::IGTLDevice::Pointer m_IGTLDevice;
   };

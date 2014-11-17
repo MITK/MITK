@@ -91,19 +91,44 @@ namespace mitk {
       IGTLDeviceState GetState() const;
 
       /**
-       * \brief Returns the latest received message
+       * \brief Returns the oldest command message
+       * \param msg A smartpointer to the message base where the oldest command
+       * shall be copied into
+       * \retval true The latest message is stored in msg
+       * \retval false The latest message could not been copied, do not use this
+       * data
+       */
+      igtl::MessageBase::Pointer GetNextCommand();
+
+      /**
+       * \brief Returns the oldest received message
        * \param msg A smartpointer to the message base where the latest message
        * shall be copied into
        * \retval true The latest message is stored in msg
        * \retval false The latest message could not been copied, do not use this
        * data
        */
-      igtl::MessageBase::Pointer GetLatestMessage();
+      igtl::MessageBase::Pointer GetNextMessage();
 
-      /**
-       * \brief Returns information about the oldest message in the receive queue
-       */
-      std::string GetOldestMessageInformation();
+//      /**
+//       * \brief Returns information about the oldest message in the receive queue
+//       */
+//      std::string GetNextMessageInformation();
+
+//      /**
+//       * \brief Returns device type about the oldest message in the receive queue
+//       */
+//      std::string GetNextMessageDeviceType();
+
+//      /**
+//       * \brief Returns information about the oldest message in the command queue
+//       */
+//      std::string GetNextCommandInformation();
+
+//      /**
+//       * \brief Returns device type about the oldest message in the command queue
+//       */
+//      std::string GetNextCommandDeviceType();
 
       /**
        * \brief return device data
@@ -146,6 +171,22 @@ namespace mitk {
       itkSetMacro(Name, std::string);
 
       /**
+       * \brief Returns a const reference to the receive queue
+       */
+      itkGetConstMacro(ReceiveQueue, mitk::IGTLMessageQueue::Pointer);
+
+      /**
+       * \brief Returns a const reference to the command queue
+       */
+      itkGetConstMacro(CommandQueue, mitk::IGTLMessageQueue::Pointer);
+
+      /**
+       * \brief Returns a const reference to the send queue
+       */
+      itkGetConstMacro(SendQueue, mitk::IGTLMessageQueue::Pointer);
+
+
+      /**
        * \brief Returns the message factory
        */
       itkGetMacro(MessageFactory, mitk::IGTLMessageFactory::Pointer);
@@ -177,20 +218,45 @@ namespace mitk {
        * This may only be called after the connection to the device has been
        * established with a call to OpenConnection()
        */
-      bool SendMessagePrivate(igtl::MessageBase::Pointer msg);
+      bool SendMessagePrivate(igtl::MessageBase::Pointer msg,
+                              igtl::Socket::Pointer socket);
 
 
       /**
-      * \brief Call this method to receive a message. The message will be saved
-      * in the queue
+      * \brief Call this method to receive a message.
+      *
+      * The message will be saved in the receive queue.
       */
-      void Receive();
+      virtual void Receive() = 0;
+
+      /**
+      * \brief Call this method to receive a message from the given client.
+      *
+      * The message will be saved in the receive queue.
+      */
+      void ReceivePrivate(igtl::Socket* client);
 
       /**
       * \brief Call this method to send a message. The message will be read from
       * the queue
       */
-      void Send();
+      virtual void Send() = 0;
+
+      /**
+      * \brief Call this method to check for other devices that want to connect
+      * to this one.
+      *
+      * In case of a client this method is doing nothing. In case of a server it
+      * is checking for other devices and if there is one it establishes a
+      * connection.
+      */
+      virtual void Connect() = 0;
+
+      /**
+      * \brief Stops the communication with the given socket
+      *
+      */
+      virtual void StopCommunicationWithSocket(igtl::Socket* socket) = 0;
 
       /**
       * \brief  change object state
@@ -228,7 +294,9 @@ namespace mitk {
       mitk::IGTLMessageQueue::Pointer m_ReceiveQueue;
       /** The message send queue */
       mitk::IGTLMessageQueue::Pointer m_SendQueue;
-      /** the latest received message */
+      /** A queue that stores just command messages received by this device */
+      mitk::IGTLMessageQueue::Pointer m_CommandQueue;
+      /** A message factory that provides the New() method for all msg types */
       mitk::IGTLMessageFactory::Pointer m_MessageFactory;
       /** the name of this device */
       std::string m_Name;
@@ -244,6 +312,17 @@ namespace mitk {
     * @brief connect to this Event to get noticed when a message was received
     * */
     itkEventMacro( MessageReceivedEvent , itk::AnyEvent );
+
+    /**Documentation
+    * @brief connect to this Event to get noticed when a command was received
+    * */
+    itkEventMacro( CommandReceivedEvent , itk::AnyEvent );
+
+    /**Documentation
+    * @brief connect to this Event to get noticed when another igtl device
+    * connects with this device.
+    * */
+    itkEventMacro( NewClientConnectionEvent , itk::AnyEvent );
 
 } // namespace mitk
 

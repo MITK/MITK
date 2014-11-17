@@ -68,6 +68,9 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
     /// \brief Is called when the current device received a message
     void OnMessageReceived(itk::Object* caller, const itk::EventObject&);
 
+    /// \brief Is called when the current device received a command
+    void OnCommandReceived(itk::Object* caller, const itk::EventObject&);
+
   signals:
 
     /** This signal is emmited if a new source was added by the widget itself,
@@ -119,7 +122,7 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
     Ui::QmitkIGTLDeviceSourceManagementWidgetControls* m_Controls;
 
     /** @brief holds the OpenIGTLink device */
-    mitk::IGTLClient* m_IGTLClient;
+    mitk::IGTLDevice* m_IGTLDevice;
 
     /** @brief holds the IGTLDeviceSource we are working with. */
     mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;
@@ -136,6 +139,9 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
     std::stringstream m_Output;
     /** @brief flag to indicate if the output has to be updated */
     bool m_OutputChanged;
+    /** @brief flag to indicate if the IGTL device is a client or a server */
+    bool m_IsClient;
+
 
     /** @brief a string stream used for logging */
     QTimer m_UpdateLoggingWindowTimer;

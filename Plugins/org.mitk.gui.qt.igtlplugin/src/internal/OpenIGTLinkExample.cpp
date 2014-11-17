@@ -64,7 +64,7 @@ void OpenIGTLinkExample::CreatePipeline()
 {
   //create a new OpenIGTLinkExample Client
   m_IGTLClient = mitk::IGTLClient::New();
-  m_IGTLClient->SetName("OIGTL Example Device");
+  m_IGTLClient->SetName("OIGTL Example Client Device");
 
   //create a new OpenIGTLinkExample Device source
   m_IGTLDeviceSource = mitk::IGTLDeviceSource::New();
@@ -108,6 +108,21 @@ void OpenIGTLinkExample::CreatePipeline()
 
   //use this sphere as representation object
   m_VisFilter->SetRepresentationObject(0, mySphere);
+
+
+  //REMOVE THIS CODE LATER
+  //create a new OpenIGTLinkExample Server
+  m_IGTLServer = mitk::IGTLServer::New();
+  m_IGTLServer->SetName("OIGTL Example Server Device");
+
+  //create a new OpenIGTLinkExample Device source
+  m_IGTLDeviceSource2 = mitk::IGTLDeviceSource::New();
+
+  //set the client as the source for the device source
+  m_IGTLDeviceSource2->SetIGTLDevice(m_IGTLServer);
+
+  m_IGTLDeviceSource2->RegisterAsMicroservice();
+
 }
 
 void OpenIGTLinkExample::DestroyPipeline()

@@ -1,5 +1,6 @@
 set(CPP_FILES
   mitkIGTLClient.cpp
+  mitkIGTLServer.cpp
   mitkIGTLDevice.cpp
   mitkIGTLMessageSource.cpp
   mitkIGTLDeviceSource.cpp

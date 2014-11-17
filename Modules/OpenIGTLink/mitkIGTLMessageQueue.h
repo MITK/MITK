@@ -45,7 +45,10 @@ namespace mitk {
 
     int GetSize();
 
-    std::string GetOldestMsgInformation();
+    std::string GetNextMsgInformationString();
+    std::string GetNextMsgDeviceType();
+    std::string GetLatestMsgInformationString();
+    std::string GetLatestMsgDeviceType();
 
   protected:
     IGTLMessageQueue();

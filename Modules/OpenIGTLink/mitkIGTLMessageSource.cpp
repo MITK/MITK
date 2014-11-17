@@ -27,13 +27,16 @@ const std::string mitk::IGTLMessageSource::US_INTERFACE_NAME =
     "org.mitk.services.IGTLMessageSource";
 const std::string mitk::IGTLMessageSource::US_PROPKEY_DEVICENAME =
     US_INTERFACE_NAME + ".devicename";
+const std::string mitk::IGTLMessageSource::US_PROPKEY_DEVICETYPE =
+    US_INTERFACE_NAME + ".devicetype";
 const std::string mitk::IGTLMessageSource::US_PROPKEY_ID =
     US_INTERFACE_NAME + ".id";
 const std::string mitk::IGTLMessageSource::US_PROPKEY_ISACTIVE =
     US_INTERFACE_NAME + ".isActive";
 
 mitk::IGTLMessageSource::IGTLMessageSource()
-  : itk::ProcessObject(), m_Name("IGTLMessageSource (no defined type)")
+  : itk::ProcessObject(), m_Name("IGTLMessageSource (no defined type)"),
+    m_Type("NONE")
 {
 }
 
@@ -106,6 +109,7 @@ void mitk::IGTLMessageSource::RegisterAsMicroservice()
       mitk::UIDGenerator ("org.mitk.services.IGTLMessageSource.id_", 16);
   props[ US_PROPKEY_ID ] = uidGen.GetUID();
   props[ US_PROPKEY_DEVICENAME ] = m_Name;
+  props[ US_PROPKEY_DEVICETYPE ] = m_Type;
   m_ServiceRegistration = context->RegisterService(this, props);
 }
 

@@ -65,7 +65,7 @@ void mitk::IGTLDeviceSource::GenerateData()
   /* update output with message from the device */
   IGTLMessage* msgOut = this->GetOutput();
   assert(msgOut);
-  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetLatestMessage();
+  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetNextMessage();
   if ( msgIn.IsNotNull() )
   {
     assert(msgIn);
@@ -90,13 +90,18 @@ void mitk::IGTLDeviceSource::SetIGTLDevice( mitk::IGTLDevice* igtlDevice )
     name << "OIGTL Device Source ( " << igtlDevice->GetName() << " )";
     this->SetName(name.str());
 
-    //setup a observer that listens to new messages
+    //setup a observer that listens to new messages and new commands
     typedef itk::SimpleMemberCommand<mitk::IGTLDeviceSource> CurCommandType;
-    CurCommandType::Pointer messageReceivedCommand = CurCommandType::New();
-    messageReceivedCommand->SetCallbackFunction(
+    CurCommandType::Pointer msgReceivedCommand = CurCommandType::New();
+    msgReceivedCommand->SetCallbackFunction(
       this, &IGTLDeviceSource::OnIncomingMessage );
     this->m_IGTLDevice->AddObserver(mitk::MessageReceivedEvent(),
-                                    messageReceivedCommand);
+                                    msgReceivedCommand);
+    CurCommandType::Pointer cmdReceivedCommand = CurCommandType::New();
+    cmdReceivedCommand->SetCallbackFunction(
+      this, &IGTLDeviceSource::OnIncomingCommand );
+    this->m_IGTLDevice->AddObserver(mitk::CommandReceivedEvent(),
+                                    cmdReceivedCommand);
 
   }
 }
@@ -213,11 +218,17 @@ void mitk::IGTLDeviceSource::RegisterAsMicroservice()
   props[ US_PROPKEY_ID ] = uidGen.GetUID();
   props[ US_PROPKEY_DEVICENAME ] = this->GetName();
   props[ US_PROPKEY_IGTLDEVICENAME ] = m_Name;
+  props[ US_PROPKEY_DEVICETYPE ] = m_Type;
   m_ServiceRegistration = context->RegisterService(this, props);
 }
 
 
 void mitk::IGTLDeviceSource::OnIncomingMessage()
+{
+
+}
+
+void mitk::IGTLDeviceSource::OnIncomingCommand()
 {
 
 }

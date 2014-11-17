@@ -92,7 +92,7 @@
        </layout>
       </item>
       <item row="1" column="0">
-       <widget class="QPushButton" name="butConnectWithServer">
+       <widget class="QPushButton" name="butConnect">
         <property name="enabled">
          <bool>false</bool>
         </property>

@@ -57,6 +57,38 @@ namespace mitk
   protected:
     IGTLClient();          ///< Constructor
     virtual ~IGTLClient(); ///< Destructor
+
+    /**
+    * \brief Call this method to receive a message.
+    *
+    * The message will be saved in the receive queue.
+    */
+    virtual void Receive();
+
+    /**
+    * \brief Call this method to send a message. The message will be read from
+    * the queue
+    */
+    virtual void Send();
+
+    /**
+    * \brief Call this method to check for other devices that want to connect
+    * to this one.
+    *
+    * In case of a client this method is doing nothing. In case of a server it
+    * is checking for other devices and if there is one it establishes a
+    * connection.
+    */
+    virtual void Connect();
+
+    /**
+      * \brief Stops the communication with the given socket.
+      *
+      * The client uses just one socket. Therefore, calling this function causes
+      * the stop of the communication.
+      *
+      */
+    virtual void StopCommunicationWithSocket(igtl::Socket*);
   };
 } // namespace mitk
 #endif /* MITKIGTLCLIENT_H */

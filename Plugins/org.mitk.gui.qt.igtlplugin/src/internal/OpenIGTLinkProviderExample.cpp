@@ -64,14 +64,14 @@ void OpenIGTLinkProviderExample::CreateQtPartControl( QWidget *parent )
 void OpenIGTLinkProviderExample::CreatePipeline()
 {
   //create a new OpenIGTLink Client
-  m_IGTLClient = mitk::IGTLClient::New();
-  m_IGTLClient->SetName("OIGTL Provider Example Device");
+  m_IGTLServer = mitk::IGTLServer::New();
+  m_IGTLServer->SetName("OIGTL Provider Example Device");
 
   //create a new OpenIGTLink Device source
   m_IGTLMessageProvider = mitk::IGTLMessageProvider::New();
 
   //set the client as the source for the device source
-  m_IGTLMessageProvider->SetIGTLDevice(m_IGTLClient);
+  m_IGTLMessageProvider->SetIGTLDevice(m_IGTLServer);
 
   //register the provider so that it can be configured with the IGTL manager
   //plugin. This could be hardcoded but now I already have the fancy plugin.
@@ -85,6 +85,10 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //requested this data type then the provider will connect with this filter
   //automatically
   m_NavDataToIGTLMsgFilter->RegisterAsMicroservice();
+
+  //define the operation mode for this filter
+  m_NavDataToIGTLMsgFilter->SetOperationMode(
+        mitk::NavigationDataToIGTLMessageFilter::ModeSendQTransMsg);
 
   //create a navigation data player object that will play nav data from a
   //recorded file
@@ -100,7 +104,7 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //create an object that will be moved respectively to the navigation data
   m_DemoNode = mitk::DataNode::New();
   QString name =
-      "IGTLDevice " + QString::fromStdString(m_IGTLClient->GetHostname());
+      "IGTLDevice " + QString::fromStdString(m_IGTLServer->GetHostname());
   m_DemoNode->SetName(name.toStdString());
 
   //create small sphere and use it as surface

@@ -67,6 +67,18 @@ namespace mitk {
     * receives a new message
     **/
     virtual void OnIncomingMessage();
+
+    /**
+    * \brief This method is called when the IGTL device hold by this class
+    * receives a new command
+    **/
+    virtual void OnIncomingCommand();
+
+    /**
+    * \brief Looks for microservices that provide messages with the requested
+    * type.
+    **/
+    mitk::IGTLMessageSource::Pointer GetFittingSource(const char* requestedType);
   };
 } // namespace mitk
 #endif /* MITKIGTLMESSAGEPROVIDER_H_HEADER_INCLUDED_ */

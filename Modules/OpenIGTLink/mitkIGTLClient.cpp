@@ -75,3 +75,41 @@ bool mitk::IGTLClient::OpenConnection()
 
   return true;
 }
+
+void mitk::IGTLClient::Connect()
+{
+
+}
+
+void mitk::IGTLClient::Receive()
+{
+  this->ReceivePrivate(this->m_Socket);
+}
+
+void mitk::IGTLClient::Send()
+{
+  igtl::MessageBase::Pointer curMessage;
+
+  //get the latest message from the queue
+  curMessage = this->m_SendQueue->PullMessage();
+
+  // there is no message => return
+  if ( curMessage.IsNull() )
+    return;
+
+  if ( this->SendMessagePrivate(curMessage.GetPointer(), this->m_Socket) )
+  {
+    MITK_INFO("IGTLDevice") << "Successfully sent the message.";
+  }
+  else
+  {
+    MITK_ERROR("IGTLDevice") << "Could not send the message.";
+  }
+}
+
+void mitk::IGTLClient::StopCommunicationWithSocket(igtl::Socket* /*socket*/)
+{
+  m_StopCommunicationMutex->Lock();
+  m_StopCommunication = true;
+  m_StopCommunicationMutex->Unlock();
+}

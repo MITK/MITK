@@ -47,8 +47,9 @@ mitk::IGTLDevice::IGTLDevice() :
 //  m_LatestMessage = igtl::MessageBase::New();
 
   m_MessageFactory = mitk::IGTLMessageFactory::New();
-  m_SendQueue = mitk::IGTLMessageQueue::New();
-  m_ReceiveQueue = mitk::IGTLMessageQueue::New();
+  m_SendQueue      = mitk::IGTLMessageQueue::New();
+  m_ReceiveQueue   = mitk::IGTLMessageQueue::New();
+  m_CommandQueue   = mitk::IGTLMessageQueue::New();
 }
 
 
@@ -91,36 +92,6 @@ void mitk::IGTLDevice::SetState( IGTLDeviceState state )
   this->Modified();
 }
 
-void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
-{
-  //add the message to the queue
-  m_SendQueue->PushMessage(msg);
-}
-
-bool mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg)
-{
-  //check the input message
-  if ( msg.IsNull() )
-  {
-    MITK_ERROR("IGTLDevice") << "Could not send message because message is not "
-                                "valid. Please check.";
-    return false;
-  }
-
-  // add the name of this device to the message
-  msg->SetDeviceName(this->GetName().c_str());
-
-  // Pack (serialize) and send
-  msg->Pack();
-  int sendSuccess =
-      this->m_Socket->Send(msg->GetPackPointer(), msg->GetPackSize());
-
-  if (sendSuccess)
-    return true;
-  else
-    return false;
-}
-
 
 bool mitk::IGTLDevice::TestConnection()
 {
@@ -128,7 +99,7 @@ bool mitk::IGTLDevice::TestConnection()
   return true;
 }
 
-void mitk::IGTLDevice::Receive()
+void mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
 {
   // Create a message buffer to receive header
   igtl::MessageHeader::Pointer headerMsg;
@@ -139,15 +110,14 @@ void mitk::IGTLDevice::Receive()
 
   // Receive generic header from the socket
   int r =
-    m_Socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize(),1);
+    socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize(), 1);
 
   if(r == 0)
   {
-    //this->StopCommunication();
-    // an error was received, therefor the communication must be stopped
-    m_StopCommunicationMutex->Lock();
-    m_StopCommunication = true;
-    m_StopCommunicationMutex->Unlock();
+    // an error was received, therefor the communication with this socket
+    // must be stopped
+
+    this->StopCommunicationWithSocket(socket);
   }
   else if (r == headerMsg->GetPackSize())
   {
@@ -175,33 +145,46 @@ void mitk::IGTLDevice::Receive()
 
       headerMsg->Print(std::cout);
 
-      //Create a message buffer to receive transform data
-      igtl::MessageBase::Pointer curMessage;
-      curMessage = m_MessageFactory->CreateInstance(headerMsg);
-      curMessage->SetMessageHeader(headerMsg);
-      curMessage->AllocatePack();
-
-      // Receive transform data from the socket
-      int receiveCheck = 0;
-      receiveCheck = m_Socket->Receive(curMessage->GetPackBodyPointer(),
-                                       curMessage->GetPackBodySize());
-
-      if ( receiveCheck > 0 )
+      //check the type of the received message
+      //if it is a command push it into the command queue
+      //otherwise into the normal receive queue
+      const char* curDevType = headerMsg->GetDeviceType();
+      if ( std::strstr( curDevType, "GET_" ) != NULL ||
+           std::strstr( curDevType, "STT_" ) != NULL ||
+           std::strstr( curDevType, "STP_" ) != NULL)
       {
-        int c = curMessage->Unpack(1);
-        if ( !(c & igtl::MessageHeader::UNPACK_BODY) )
-        {
-          mitkThrow() << "crc error";
-        }
-
-        //push the current message into the queue
-        m_ReceiveQueue->PushMessage(curMessage);
-        this->InvokeEvent(MessageReceivedEvent());
+        this->m_CommandQueue->PushMessage(headerMsg);
+        this->InvokeEvent(CommandReceivedEvent());
       }
       else
       {
-        MITK_ERROR("IGTLDevice") << "Received a valid header but could not "
-                                 << "read the whole message.";
+        //Create a message buffer to receive transform data
+        igtl::MessageBase::Pointer curMessage;
+        curMessage = m_MessageFactory->CreateInstance(headerMsg);
+        curMessage->SetMessageHeader(headerMsg);
+        curMessage->AllocatePack();
+
+        // Receive transform data from the socket
+        int receiveCheck = 0;
+        receiveCheck = socket->Receive(curMessage->GetPackBodyPointer(),
+                                         curMessage->GetPackBodySize());
+
+        if ( receiveCheck > 0 )
+        {
+          int c = curMessage->Unpack(1);
+          if ( !(c & igtl::MessageHeader::UNPACK_BODY) )
+          {
+            mitkThrow() << "crc error";
+          }
+
+          this->m_ReceiveQueue->PushMessage(curMessage);
+          this->InvokeEvent(MessageReceivedEvent());
+        }
+        else
+        {
+          MITK_ERROR("IGTLDevice") << "Received a valid header but could not "
+                                   << "read the whole message.";
+        }
       }
     }
   }
@@ -211,25 +194,34 @@ void mitk::IGTLDevice::Receive()
   }
 }
 
-void mitk::IGTLDevice::Send()
+void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
 {
-  igtl::MessageBase::Pointer curMessage;
+  //add the message to the queue
+  m_SendQueue->PushMessage(msg);
+}
 
-  //get the latest message from the queue
-  curMessage = m_SendQueue->PullMessage();
-
-  // there is no message => return
-  if ( curMessage.IsNull() )
-    return;
-
-  if ( this->SendMessagePrivate(curMessage.GetPointer()) )
+bool mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg,
+                                          igtl::Socket::Pointer socket)
+{
+  //check the input message
+  if ( msg.IsNull() )
   {
-    MITK_INFO("IGTLDevice") << "Successfully sent the message.";
+    MITK_ERROR("IGTLDevice") << "Could not send message because message is not "
+                                "valid. Please check.";
+    return false;
   }
+
+  // add the name of this device to the message
+  msg->SetDeviceName(this->GetName().c_str());
+
+  // Pack (serialize) and send
+  msg->Pack();
+  int sendSuccess = socket->Send(msg->GetPackPointer(), msg->GetPackSize());
+
+  if (sendSuccess)
+    return true;
   else
-  {
-    MITK_ERROR("IGTLDevice") << "Could not send the message.";
-  }
+    return false;
 }
 
 
@@ -251,6 +243,11 @@ void mitk::IGTLDevice::RunCommunication()
   this->m_StopCommunicationMutex->Unlock();
   while ((this->GetState() == Running) && (localStopCommunication == false))
   {
+    // Check if other igtl devices want to connect with this one. This method
+    // is overwritten for igtl servers but is doing nothing in case of a igtl
+    // client
+    this->Connect();
+
     // Check if there is something to receive and store it in the message queue
     this->Receive();
 
@@ -342,19 +339,39 @@ bool mitk::IGTLDevice::CloseConnection()
   return true;
 }
 
-igtl::MessageBase::Pointer mitk::IGTLDevice::GetLatestMessage()
+igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMessage()
 {
-  //copy the latest message into the given msg
-//  m_ReceiveQueueMutex->Lock();
+  //copy the next message into the given msg
   igtl::MessageBase::Pointer msg = this->m_ReceiveQueue->PullMessage();
-//  m_ReceiveQueueMutex->Unlock();
   return msg;
 }
 
-std::string mitk::IGTLDevice::GetOldestMessageInformation()
+igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextCommand()
 {
-  return this->m_ReceiveQueue->GetOldestMsgInformation();
+  //copy the next command into the given msg
+  igtl::MessageBase::Pointer msg = this->m_CommandQueue->PullMessage();
+  return msg;
 }
+
+//std::string mitk::IGTLDevice::GetNextMessageInformation()
+//{
+//  return this->m_ReceiveQueue->GetNextMsgInformationString();
+//}
+
+//std::string mitk::IGTLDevice::GetNextMessageDeviceType()
+//{
+//  return this->m_ReceiveQueue->GetNextMsgDeviceType();
+//}
+
+//std::string mitk::IGTLDevice::GetNextCommandInformation()
+//{
+//  return this->m_CommandQueue->GetNextMsgInformationString();
+//}
+
+//std::string mitk::IGTLDevice::GetNextCommandDeviceType()
+//{
+//  return this->m_CommandQueue->GetNextMsgDeviceType();
+//}
 
 ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartCommunication(void* pInfoStruct)
 {

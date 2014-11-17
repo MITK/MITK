@@ -103,18 +103,26 @@ void mitk::NavigationDataToIGTLMessageFilter::CreateOutputsForAllInputs()
   case ModeSendQTDataMsg:
     // create one message output for each navigation data input
     this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
+    // set the type for this filter
+    this->SetType("QTDATA");
     break;
   case ModeSendTDataMsg:
     // create one message output for each navigation data input
     this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
+    // set the type for this filter
+    this->SetType("TDATA");
     break;
   case ModeSendQTransMsg:
     // create one message output for all navigation data input together
     this->SetNumberOfIndexedOutputs(1);
+    // set the type for this filter
+    this->SetType("POSITION");
     break;
   case ModeSendTransMsg:
     // create one message output for all navigation data input together
     this->SetNumberOfIndexedOutputs(1);
+    // set the type for this filter
+    this->SetType("TRANSFORM");
     break;
   default:
     break;

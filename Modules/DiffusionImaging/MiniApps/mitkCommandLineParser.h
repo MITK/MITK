@@ -33,8 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 =========================================================================*/
 
-#ifndef __ctkCommandLineParser_h
-#define __ctkCommandLineParser_h
+#ifndef __mitkCommandLineParser_h
+#define __mitkCommandLineParser_h
 
 #include <usAny.h>
 #include <map>
@@ -115,7 +115,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace std;
 
-class ctkCommandLineParser
+class mitkCommandLineParser
 {
 
 public:
@@ -145,9 +145,9 @@ public:
    *
    * @param newParent The QObject parent.
    */
-    ctkCommandLineParser();
+    mitkCommandLineParser();
 
-    ~ctkCommandLineParser();
+    ~mitkCommandLineParser();
 
     /**
    * Parse a given list of command line arguments.

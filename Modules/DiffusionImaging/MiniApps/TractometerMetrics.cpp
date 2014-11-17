@@ -37,8 +37,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int TractometerMetrics(int argc, char* argv[])
 {
-    MITK_INFO << "TractometerMetrics";
-    ctkCommandLineParser parser;
+    std::cout << "TractometerMetrics";
+    mitkCommandLineParser parser;
 
     parser.setTitle("Tractometer Metrics");
     parser.setCategory("Fiber Tracking and Processing Methods");
@@ -46,19 +46,19 @@ int TractometerMetrics(int argc, char* argv[])
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
-    parser.addArgument("labels", "l", ctkCommandLineParser::StringList, "Label pairs:", "label pairs", false);
-    parser.addArgument("labelimage", "li", ctkCommandLineParser::String, "Label image:", "label image", false);
-    parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "Verbose:", "output valid, invalid and no connections as fiber bundles");
+    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
+    parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
+    parser.addArgument("labels", "l", mitkCommandLineParser::StringList, "Label pairs:", "label pairs", false);
+    parser.addArgument("labelimage", "li", mitkCommandLineParser::String, "Label image:", "label image", false);
+    parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output valid, invalid and no connections as fiber bundles");
 
-    parser.addArgument("fileID", "id", ctkCommandLineParser::String, "ID:", "optional ID field");
+    parser.addArgument("fileID", "id", mitkCommandLineParser::String, "ID:", "optional ID field");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    ctkCommandLineParser::StringContainerType labelpairs = us::any_cast<ctkCommandLineParser::StringContainerType>(parsedArgs["labels"]);
+    mitkCommandLineParser::StringContainerType labelpairs = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["labels"]);
 
     string fibFile = us::any_cast<string>(parsedArgs["input"]);
     string labelImageFile = us::any_cast<string>(parsedArgs["labelimage"]);
@@ -100,8 +100,8 @@ int TractometerMetrics(int argc, char* argv[])
             std::pair< short, short > l;
             l.first = boost::lexical_cast<short>(labelpairs.at(i));
             l.second = boost::lexical_cast<short>(labelpairs.at(i+1));
-            MITK_INFO << labelpairs.at(i);
-            MITK_INFO << labelpairs.at(i+1);
+            std::cout << labelpairs.at(i);
+            std::cout << labelpairs.at(i+1);
             if (l.first>max)
                 max=l.first;
             if (l.second>max)
@@ -360,12 +360,12 @@ int TractometerMetrics(int argc, char* argv[])
         int ib = invalidBundles;
         double abc = (double)coveredVoxels/wmVoxels;
 
-        MITK_INFO << "NC: " << nc;
-        MITK_INFO << "VC: " << vc;
-        MITK_INFO << "IC: " << ic;
-        MITK_INFO << "VB: " << vb;
-        MITK_INFO << "IB: " << ib;
-        MITK_INFO << "ABC: " << abc;
+        std::cout << "NC: " << nc;
+        std::cout << "VC: " << vc;
+        std::cout << "IC: " << ic;
+        std::cout << "VB: " << vb;
+        std::cout << "IB: " << ib;
+        std::cout << "ABC: " << abc;
 
         string logFile = outRoot;
         logFile.append("_TRACTOMETER.csv");
@@ -400,17 +400,17 @@ int TractometerMetrics(int argc, char* argv[])
     }
     catch (itk::ExceptionObject e)
     {
-        MITK_INFO << e;
+        std::cout << e;
         return EXIT_FAILURE;
     }
     catch (std::exception e)
     {
-        MITK_INFO << e.what();
+        std::cout << e.what();
         return EXIT_FAILURE;
     }
     catch (...)
     {
-        MITK_INFO << "ERROR!?!";
+        std::cout << "ERROR!?!";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

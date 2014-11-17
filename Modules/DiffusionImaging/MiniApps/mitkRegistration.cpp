@@ -14,10 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 
 // CTK
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 
 #include <mitkIOUtil.h>
 #include <mitkRegistrationWrapper.h>
@@ -240,29 +239,29 @@ static void CopyResources(FileListType fileList, std::string outputPath)
   }
 }
 
-int BatchedFolderRegistration( int argc, char* argv[] )
+int main( int argc, char* argv[] )
 {
-  ctkCommandLineParser parser;
+  mitkCommandLineParser parser;
   parser.setArgumentPrefix("--","-");
 
   parser.setTitle("Batched Folder Registraton");
   parser.setCategory("Preprocessing Tools");
-  parser.setDescription("");
+  parser.setDescription("http://docs.mitk.org/nightly-qt4/DiffusionMiniApps.html");
   parser.setContributor("MBI");
 
   // Add command line argument names
-  parser.addArgument("help", "h",ctkCommandLineParser::Bool, "Help", "Show this help text");
+  parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help", "Show this help text");
   //parser.addArgument("usemask", "u", QVariant::Bool, "Use segmentations (derived resources) to exclude areas from registration metrics");
-  parser.addArgument("input", "i", ctkCommandLineParser::InputDirectory, "Input:", "Input folder",us::Any(),false);
-  parser.addArgument("output", "o", ctkCommandLineParser::OutputDirectory, "Output:", "Output folder (ending with /)",us::Any(),false);
-  parser.addArgument("fixed", "f", ctkCommandLineParser::String, "Fixed images:", "Suffix for fixed image (if none is supplied first file matching moving pattern is chosen)",us::Any(),true);
-  parser.addArgument("moving", "m", ctkCommandLineParser::String, "Moving images:", "Suffix for moving images",us::Any(),false);
-  parser.addArgument("derived", "d", ctkCommandLineParser::String, "Derived resources:", "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);
-  parser.addArgument("silent", "s", ctkCommandLineParser::Bool, "Silent:" "No xml progress output.");
-  parser.addArgument("resample", "r", ctkCommandLineParser::String, "Resample (x,y,z)mm:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
-  parser.addArgument("binary", "b", ctkCommandLineParser::Bool, "Binary:", "Speficies that derived resource are binary (interpolation using nearest neighbor)",us::Any());
-  parser.addArgument("correct-origin", "c", ctkCommandLineParser::Bool, "Origin correction:", "Correct for large origin displacement. Switch when you reveive:  Joint PDF summed to zero ",us::Any());
-  parser.addArgument("sinc-int", "s", ctkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
+  parser.addArgument("input", "i", mitkCommandLineParser::InputDirectory, "Input:", "Input folder",us::Any(),false);
+  parser.addArgument("output", "o", mitkCommandLineParser::OutputDirectory, "Output:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("fixed", "f", mitkCommandLineParser::String, "Fixed images:", "Suffix for fixed image (if none is supplied first file matching moving pattern is chosen)",us::Any(),true);
+  parser.addArgument("moving", "m", mitkCommandLineParser::String, "Moving images:", "Suffix for moving images",us::Any(),false);
+  parser.addArgument("derived", "d", mitkCommandLineParser::String, "Derived resources:", "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);
+  parser.addArgument("silent", "s", mitkCommandLineParser::Bool, "Silent:" "No xml progress output.");
+  parser.addArgument("resample", "r", mitkCommandLineParser::String, "Resample (x,y,z)mm:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
+  parser.addArgument("binary", "b", mitkCommandLineParser::Bool, "Binary:", "Speficies that derived resource are binary (interpolation using nearest neighbor)",us::Any());
+  parser.addArgument("correct-origin", "c", mitkCommandLineParser::Bool, "Origin correction:", "Correct for large origin displacement. Switch when you reveive:  Joint PDF summed to zero ",us::Any());
+  parser.addArgument("sinc-int", "s", mitkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
 
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -275,14 +274,7 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   {
     if (parsedArgs.size() == 0)
     {
-      MITK_ERROR << "Missig arguements" ;
       return EXIT_FAILURE;
-    }
-
-    if (parsedArgs.count("xml"))
-    {
-      MITK_ERROR << "This is to be handled by shell script";
-      return EXIT_SUCCESS;
     }
 
     if (parsedArgs.count("sinc-int"))
@@ -479,5 +471,3 @@ int BatchedFolderRegistration( int argc, char* argv[] )
     std::cout << "<filter-end/>";
   return EXIT_SUCCESS;
 }
-
-RegisterDiffusionMiniApp(BatchedFolderRegistration);

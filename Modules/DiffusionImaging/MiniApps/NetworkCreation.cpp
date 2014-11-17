@@ -30,14 +30,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int NetworkCreation(int argc, char* argv[])
 {
-  ctkCommandLineParser parser;
+  mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("fiberImage", "f", ctkCommandLineParser::InputFile, "Input image", "input fiber image (.fib)", us::Any(), false);
-  parser.addArgument("parcellation", "p", ctkCommandLineParser::InputFile, "Parcellation image", "parcellation image", us::Any(), false);
-  parser.addArgument("outputNetwork", "o", ctkCommandLineParser::String, "Output network", "where to save the output (.cnf)", us::Any(), false);
+  parser.addArgument("fiberImage", "f", mitkCommandLineParser::InputFile, "Input image", "input fiber image (.fib)", us::Any(), false);
+  parser.addArgument("parcellation", "p", mitkCommandLineParser::InputFile, "Parcellation image", "parcellation image", us::Any(), false);
+  parser.addArgument("outputNetwork", "o", mitkCommandLineParser::String, "Output network", "where to save the output (.cnf)", us::Any(), false);
 
-  parser.addArgument("radius", "r", ctkCommandLineParser::Int, "Radius", "Search radius in mm", 15, true);
-  parser.addArgument("noCenterOfMass", "com", ctkCommandLineParser::Bool, "No center of mass", "Do not use center of mass for node positions");
+  parser.addArgument("radius", "r", mitkCommandLineParser::Int, "Radius", "Search radius in mm", 15, true);
+  parser.addArgument("noCenterOfMass", "com", mitkCommandLineParser::Bool, "No center of mass", "Do not use center of mass for node positions");
 
   parser.setCategory("Connectomics");
   parser.setTitle("Network Creation");
@@ -109,7 +109,7 @@ int NetworkCreation(int argc, char* argv[])
 
     mitk::ConnectomicsNetwork::Pointer network = connectomicsNetworkCreator->GetNetwork();
 
-    MITK_INFO << "searching writer";
+    std::cout << "searching writer";
 
     mitk::IOUtil::SaveBaseData(network.GetPointer(), outputFilename );
 
@@ -117,20 +117,20 @@ int NetworkCreation(int argc, char* argv[])
   }
   catch (itk::ExceptionObject e)
   {
-    MITK_INFO << e;
+    std::cout << e;
     return EXIT_FAILURE;
   }
   catch (std::exception e)
   {
-    MITK_INFO << e.what();
+    std::cout << e.what();
     return EXIT_FAILURE;
   }
   catch (...)
   {
-    MITK_INFO << "ERROR!?!";
+    std::cout << "ERROR!?!";
     return EXIT_FAILURE;
   }
-  MITK_INFO << "DONE";
+  std::cout << "DONE";
   return EXIT_SUCCESS;
 }
 RegisterDiffusionMiniApp(NetworkCreation);

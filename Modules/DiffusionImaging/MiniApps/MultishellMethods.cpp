@@ -47,8 +47,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int MultishellMethods(int argc, char* argv[])
 {
-    MITK_INFO << "MultishellMethods";
-  ctkCommandLineParser parser;
+    std::cout << "MultishellMethods";
+  mitkCommandLineParser parser;
 
   parser.setTitle("Multishell Methods");
   parser.setCategory("Fiber Tracking and Processing Methods");
@@ -56,12 +56,12 @@ int MultishellMethods(int argc, char* argv[])
   parser.setContributor("MBI");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("in", "i", ctkCommandLineParser::InputFile, "Input:", "input file", us::Any(), false);
-  parser.addArgument("out", "o", ctkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
-  parser.addArgument("adc", "D", ctkCommandLineParser::Bool, "ADC:", "ADC Average", us::Any(), false);
-  parser.addArgument("akc", "K", ctkCommandLineParser::Bool, "Kurtosis fit:", "Kurtosis Fit", us::Any(), false);
-  parser.addArgument("biexp", "B", ctkCommandLineParser::Bool, "BiExp fit:", "BiExp fit", us::Any(), false);
-  parser.addArgument("targetbvalue", "b", ctkCommandLineParser::String, "b Value:", "target bValue (mean, min, max)", us::Any(), false);
+  parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input:", "input file", us::Any(), false);
+  parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
+  parser.addArgument("adc", "D", mitkCommandLineParser::Bool, "ADC:", "ADC Average", us::Any(), false);
+  parser.addArgument("akc", "K", mitkCommandLineParser::Bool, "Kurtosis fit:", "Kurtosis Fit", us::Any(), false);
+  parser.addArgument("biexp", "B", mitkCommandLineParser::Bool, "BiExp fit:", "BiExp fit", us::Any(), false);
+  parser.addArgument("targetbvalue", "b", mitkCommandLineParser::String, "b Value:", "target bValue (mean, min, max)", us::Any(), false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -77,7 +77,7 @@ int MultishellMethods(int argc, char* argv[])
 
   try
   {
-    MITK_INFO << "Loading " << inName;
+    std::cout << "Loading " << inName;
     const std::string s1="", s2="";
     std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inName, s1, s2, false );
     mitk::BaseData::Pointer baseData = infile.at(0);
@@ -202,17 +202,17 @@ int MultishellMethods(int argc, char* argv[])
   }
   catch (itk::ExceptionObject e)
   {
-    MITK_INFO << e;
+    std::cout << e;
     return EXIT_FAILURE;
   }
   catch (std::exception e)
   {
-    MITK_INFO << e.what();
+    std::cout << e.what();
     return EXIT_FAILURE;
   }
   catch (...)
   {
-    MITK_INFO << "ERROR!?!";
+    std::cout << "ERROR!?!";
     return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;

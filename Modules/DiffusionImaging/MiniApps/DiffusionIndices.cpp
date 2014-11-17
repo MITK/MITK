@@ -34,8 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 int DiffusionIndices(int argc, char* argv[])
 {
-    MITK_INFO << "DiffusionIndices";
-    ctkCommandLineParser parser;
+    std::cout << "DiffusionIndices";
+    mitkCommandLineParser parser;
 
     parser.setTitle("Diffusion Indices");
     parser.setCategory("Diffusion Related Measures");
@@ -43,9 +43,9 @@ int DiffusionIndices(int argc, char* argv[])
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
-    parser.addArgument("index", "idx", ctkCommandLineParser::String, "Index:", "index (fa, gfa, ra, ad, rd, ca, l2, l3, md)", us::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
+    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
+    parser.addArgument("index", "idx", mitkCommandLineParser::String, "Index:", "index (fa, gfa, ra, ad, rd, ca, l2, l3, md)", us::Any(), false);
+    parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -126,21 +126,21 @@ int DiffusionIndices(int argc, char* argv[])
             fileWriter->Update();
         }
         else
-            MITK_INFO << "Diffusion index " << index << " not supported for supplied file type.";
+            std::cout << "Diffusion index " << index << " not supported for supplied file type.";
     }
     catch (itk::ExceptionObject e)
     {
-        MITK_INFO << e;
+        std::cout << e;
         return EXIT_FAILURE;
     }
     catch (std::exception e)
     {
-        MITK_INFO << e.what();
+        std::cout << e.what();
         return EXIT_FAILURE;
     }
     catch (...)
     {
-        MITK_INFO << "ERROR!?!";
+        std::cout << "ERROR!?!";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

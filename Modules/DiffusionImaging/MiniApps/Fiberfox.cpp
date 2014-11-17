@@ -38,12 +38,12 @@ namespace mitk
 {
 int Fiberfox(int argc, char* argv[])
 {
-    MITK_INFO << "Fiberfox";
-    ctkCommandLineParser parser;
+    std::cout << "Fiberfox";
+    mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("out", "o", ctkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);
-    parser.addArgument("parameters", "p", ctkCommandLineParser::InputFile, "Parameter file:", "fiberfox parameter file", us::Any(), false);
-    parser.addArgument("fiberbundle", "f", ctkCommandLineParser::String, "Fiberbundle:", "", us::Any(), false);
+    parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);
+    parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameter file:", "fiberfox parameter file", us::Any(), false);
+    parser.addArgument("fiberbundle", "f", mitkCommandLineParser::String, "Fiberbundle:", "", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

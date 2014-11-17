@@ -208,10 +208,12 @@ void QmitkPointListWidget::OnBtnSavePoints()
   if ((dynamic_cast<mitk::PointSet*>(m_PointSetNode->GetData()))->GetSize() == 0)
     return;
 
-  // let the user choose a file
-  std::string name("");
+  // take the previously defined name of node as proposal for filename
+  std::string nodeName = m_PointSetNode->GetName();
+  nodeName = "/" + nodeName + ".mps";
+  QString fileNameProposal = QString();
+  fileNameProposal.append(nodeName.c_str());
 
-  QString fileNameProposal = QString("/PointSet.mps");
   QString aFilename = QFileDialog::getSaveFileName( NULL, "Save point set", QDir::currentPath() + fileNameProposal, "MITK Pointset (*.mps)" );
   if ( aFilename.isEmpty() )
     return;

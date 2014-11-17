@@ -186,6 +186,8 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
 
 bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformation contourInfo)
 {
+  if(!m_SelectedSegmentation)
+    return false;
   ContourPositionInformationList::iterator it = m_ListOfInterpolationSessions[m_SelectedSegmentation].begin();
   while (it !=  m_ListOfInterpolationSessions[m_SelectedSegmentation].end())
   {

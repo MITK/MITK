@@ -222,7 +222,7 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPropertySerializer::Deseri
     TransferFunction::Pointer tf = tfp->GetValue();
     return tf;
   }
-  MITK_WARN << "Can't deserialize transferfunction";
+  MITK_WARN << "Can't deserialize transfer function";
   return NULL;
 }
 

@@ -197,6 +197,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QmitkNodeDescriptor* imageDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
 
+  QmitkNodeDescriptor* diffusionImageDataNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("DiffusionImage");
+
   QmitkNodeDescriptor* surfaceDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Surface");
 
@@ -249,7 +252,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       && (*cmActionsIt)->GetAttribute("label", cmLabel)
       && (*cmActionsIt)->GetAttribute("class", cmClass))
     {
-      (*cmActionsIt)->GetAttribute("icon", cmIcon);
       // create context menu entry here
       tmpDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(QString::fromStdString(cmNodeDescriptorName));
       if(!tmpDescriptor)
@@ -257,7 +259,16 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
         MITK_WARN << "cannot add action \"" << cmLabel << "\" because descriptor " << cmNodeDescriptorName << " does not exist";
         continue;
       }
-      contextMenuAction = new QAction( QString::fromStdString(cmLabel), parent);
+      // check if the user specified an icon attribute
+      if ( (*cmActionsIt)->GetAttribute("icon", cmIcon) )
+      {
+        contextMenuAction = new QAction( QIcon( QString::fromStdString(cmIcon)),
+                                         QString::fromStdString(cmLabel), parent);
+      }
+      else
+      {
+        contextMenuAction = new QAction( QString::fromStdString(cmLabel), parent);
+      }
       tmpDescriptor->AddAction(contextMenuAction);
       m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(tmpDescriptor,contextMenuAction));
       m_ConfElements[contextMenuAction] = *cmActionsIt;
@@ -335,6 +346,11 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( ComponentActionChanged() ) );
   imageDataNodeDescriptor->AddAction(componentAction, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,componentAction));
+  if (diffusionImageDataNodeDescriptor!=NULL)
+  {
+      diffusionImageDataNodeDescriptor->AddAction(componentAction, false);
+      m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(diffusionImageDataNodeDescriptor,componentAction));
+  }
 
   m_TextureInterpolation = new QAction("Texture Interpolation", this);
   m_TextureInterpolation->setCheckable ( true );
@@ -344,6 +360,11 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( TextureInterpolationToggled(bool) ) );
   imageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,m_TextureInterpolation));
+  if (diffusionImageDataNodeDescriptor!=NULL)
+  {
+      diffusionImageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
+      m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(diffusionImageDataNodeDescriptor,m_TextureInterpolation));
+  }
 
   m_ColormapAction = new QAction("Colormap", this);
   m_ColormapAction->setMenu(new QMenu);
@@ -351,6 +372,11 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( ColormapMenuAboutToShow() ) );
   imageDataNodeDescriptor->AddAction(m_ColormapAction, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor, m_ColormapAction));
+  if (diffusionImageDataNodeDescriptor!=NULL)
+  {
+      diffusionImageDataNodeDescriptor->AddAction(m_ColormapAction, false);
+      m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(diffusionImageDataNodeDescriptor, m_ColormapAction));
+  }
 
   m_SurfaceRepresentation = new QAction("Surface Representation", this);
   m_SurfaceRepresentation->setMenu(new QMenu);
@@ -898,7 +924,7 @@ void QmitkDataManagerView::ShowInfoDialogForSelectedNodes( bool )
   _QmitkInfoDialog.exec();
 }
 
-void QmitkDataManagerView::NodeChanged(const mitk::DataNode* node)
+void QmitkDataManagerView::NodeChanged(const mitk::DataNode* /*node*/)
 {
   // m_FilterModel->invalidate();
   // fix as proposed by R. Khlebnikov in the mitk-users mail from 02.09.2014

@@ -78,6 +78,11 @@ protected slots:
   void Reconstruct();
   void ResidualCalculation();
   void ResidualClicked(int slice, int volume);
+  /**
+   * @brief PreviewThreshold Generates a preview of the values that are cut off by the thresholds
+   * @param threshold
+   */
+  void PreviewThreshold(int threshold);
 
 protected:
 

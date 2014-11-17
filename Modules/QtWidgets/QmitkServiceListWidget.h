@@ -97,6 +97,32 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     us::ServiceReferenceU GetSelectedServiceReference();
 
     /**
+     * @return Returns all service references that are displayed in this widget.
+     */
+    std::vector<us::ServiceReferenceU> GetAllServiceReferences();
+
+
+    /**
+    * \brief Use this function to return the all listed services as a class directly.
+    *
+    *  Make sure you pass the appropriate type, or else this call will fail.
+    *  Usually, you will pass the class itself, not the SmartPointer, but the function returns a pointer.
+    */
+    template <class T>
+    std::vector<T*> GetAllServices()
+    {
+      // if (this->m_Controls->m_ServiceList->currentRow()==-1) return NULL;
+      std::vector<us::ServiceReferenceU> refs = GetAllServiceReferences();
+      std::vector<T*> result;
+      for (int i = 0; i < refs.size(); i++)
+      {
+        result.push_back(m_Context->GetService(us::ServiceReference<T>(refs[i])));
+      }
+      return result;
+    }
+
+
+    /**
     * \brief Use this function to return the currently selected service as a class directly.
     *
     *  Make sure you pass the appropriate type, or else this call will fail.

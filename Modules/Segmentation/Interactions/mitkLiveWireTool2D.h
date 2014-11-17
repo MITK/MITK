@@ -149,6 +149,8 @@ class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
     void RemoveHelperObjects();
     void ReleaseHelperObjects();
     void ReleaseInteractors();
+
+    const PlaneGeometry* m_PlaneGeometry;
 };
 
 } // namespace

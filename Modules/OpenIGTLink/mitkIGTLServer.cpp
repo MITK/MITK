@@ -114,6 +114,11 @@ void mitk::IGTLServer::Send()
 
   //the server can be connected with several clients, therefore it has to check
   //all registered clients
+  //sending a message to all registered clients might not be the best solution,
+  //it could be better to store the client together with the requested type. Then
+  //the data would be send to the appropriate client and to noone else.
+  //(I know it is no excuse but PLUS is doing exactly the same, they broadcast
+  //everything)
   std::list<igtl::Socket::Pointer>::iterator it;
   std::list<igtl::Socket::Pointer>::iterator it_end =
       this->m_RegisteredClients.end();

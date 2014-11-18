@@ -233,7 +233,8 @@ mitk::IGTLMessageFactory::GetAvailableMessageRequestTypes()
   {
     if ( it->first.find("GET_") != std::string::npos ||
          it->first.find("STT_") != std::string::npos ||
-         it->first.find("STP_") != std::string::npos)
+         it->first.find("STP_") != std::string::npos ||
+         it->first.find("RTS_") != std::string::npos)
     {
       allGetMessages.push_back(it->first);
     }

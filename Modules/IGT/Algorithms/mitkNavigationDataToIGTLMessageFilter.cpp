@@ -122,7 +122,7 @@ void mitk::NavigationDataToIGTLMessageFilter::CreateOutputsForAllInputs()
     // create one message output for all navigation data input together
     this->SetNumberOfIndexedOutputs(1);
     // set the type for this filter
-    this->SetType("TRANSFORM");
+    this->SetType("TRANS");
     break;
   default:
     break;

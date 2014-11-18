@@ -80,19 +80,22 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //create a filter that converts navigation data into IGTL messages
   m_NavDataToIGTLMsgFilter = mitk::NavigationDataToIGTLMessageFilter::New();
 
+  //define the operation mode for this filter
+  m_NavDataToIGTLMsgFilter->SetOperationMode(
+        mitk::NavigationDataToIGTLMessageFilter::ModeSendTransMsg);
+
   //register this filter as micro service. The message provider looks for
   //provided IGTLMessageSources, once it found this microservice and someone
   //requested this data type then the provider will connect with this filter
   //automatically
   m_NavDataToIGTLMsgFilter->RegisterAsMicroservice();
 
-  //define the operation mode for this filter
-  m_NavDataToIGTLMsgFilter->SetOperationMode(
-        mitk::NavigationDataToIGTLMessageFilter::ModeSendQTransMsg);
-
   //create a navigation data player object that will play nav data from a
   //recorded file
   m_NavDataPlayer = mitk::NavigationDataPlayer::New();
+
+  //set the currently read navigation data set
+  m_NavDataPlayer->SetNavigationDataSet(m_NavDataSet);
 
   //connect the filters with each other
   //the navigation data player reads a file with recorded navigation data,
@@ -120,8 +123,8 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   // add node to DataStorage
   this->GetDataStorage()->Add(m_DemoNode);
 
-  //use this sphere as representation object
-  m_NavDataPlayer->SetNavigationDataSet(m_NavDataSet);
+  //for testing, remove later
+  m_NavDataToIGTLMsgFilter->Update();
 }
 
 void OpenIGTLinkProviderExample::DestroyPipeline()

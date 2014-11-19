@@ -317,6 +317,10 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
     if (i == selectedNodes.size()) return;
   }
 
+  //reset the feature image and image mask field
+  m_Controls->m_SelectedFeatureImageLabel->setText("None");
+  m_Controls->m_SelectedMaskLabel->setText("None");
+
   this->ReinitData();
   if (selectedNodes.isEmpty())
   {

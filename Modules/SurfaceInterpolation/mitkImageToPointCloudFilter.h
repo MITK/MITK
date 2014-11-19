@@ -26,12 +26,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-struct MitkSurfaceInterpolation_EXPORT DetectConstants
+enum MitkSurfaceInterpolation_EXPORT DetectConstant
 {
-  static const int LAPLACIAN_STD_DEV2 = 0;
-  static const int LAPLACIAN_STD_DEV3 = 1;
-  static const int CANNY_EDGE = 2;
-  static const int THRESHOLD = 3;
+  LAPLACIAN_STD_DEV2,
+  LAPLACIAN_STD_DEV3,
+  CANNY_EDGE,
+  THRESHOLD
 };
 
 class MitkSurfaceInterpolation_EXPORT ImageToPointCloudFilter: public ImageToSurfaceFilter
@@ -47,11 +47,14 @@ public:
   typedef itk::Image<short, 3> ImageType;
   typedef itk::Image<double, 3>  DoubleImageType;
   typedef itk::Image<double, 3> FloatImageType;
-  typedef itk::CastImageFilter< ImageType, FloatImageType > ImagePTypeToFloatPTypeCasterType;
   typedef itk::LaplacianImageFilter< FloatImageType, FloatImageType > LaplacianFilterType;
-  typedef int DetectionMethod;
+  typedef DetectConstant DetectionMethod;
 
   void SetDetectionMethod(DetectionMethod method);
+
+  mitk::Image::Pointer GetEdgeImage();
+  mitk::Image::Pointer GetEdgePoints();
+  int GetNumberOfExtractedPoints();
 
 protected:
 
@@ -66,12 +69,18 @@ protected:
 private:
 
   template<typename TPixel, unsigned int VImageDimension>
-  void StdDeviations(itk::Image<TPixel, VImageDimension>* image, double mean, double stdDev, int amount);
+  void StdDeviations(itk::Image<TPixel, VImageDimension>* image, int amount);
 
-  void LaplacianStdDev(itk::Image<short, 3>::Pointer image, int amount);
+  void LaplacianStdDev(Image::ConstPointer image, int amount);
 
   mitk::Surface::Pointer m_PointSurface;
+
+  mitk::BaseGeometry* m_Geometry;
+
   mitk::Image::Pointer m_EdgeImage;
+  mitk::Image::Pointer m_EdgePoints;
+
+  int m_NumberOfExtractedPoints;
 
   DetectionMethod m_method;
 

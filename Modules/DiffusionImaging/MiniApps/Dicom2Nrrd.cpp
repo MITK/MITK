@@ -39,6 +39,8 @@ int main(int argc, char* argv[])
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
+  if (parsedArgs.size()==0)
+      return EXIT_FAILURE;
 
   // Show a help message
   if ( parsedArgs.count("help") || parsedArgs.count("h"))

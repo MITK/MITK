@@ -174,8 +174,7 @@ int main(int argc, char* argv[])
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
   {
-    MITK_ERROR << "No input arguments were specified. Please provide all non-optional arguments. ";
-    return 0;
+    return EXIT_FAILURE;
   }
 
   std::string inputDirectory = us::any_cast<std::string>( parsedArgs["inputdir"] );

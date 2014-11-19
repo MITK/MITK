@@ -33,11 +33,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 /** TODO: Tarball aus images und parametern? */
 /** TODO: Artefakte auf bild in miniapp */
 
-namespace mitk
-{
+using namespace mitk;
+
 int main(int argc, char* argv[])
 {
-    std::cout << "Fiberfox";
     mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);
@@ -76,4 +75,4 @@ int main(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-}
+

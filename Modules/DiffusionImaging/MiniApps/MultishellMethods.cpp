@@ -42,9 +42,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDwiGradientLengthCorrectionFilter.h>
 #include <mitkIOUtil.h>
 
-int MultishellMethods(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    std::cout << "MultishellMethods";
   mitkCommandLineParser parser;
 
   parser.setTitle("Multishell Methods");

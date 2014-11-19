@@ -129,7 +129,8 @@ public:
         InputDirectory = 5,
         InputFile = 6,
         OutputDirectory = 7,
-        OutputFile = 8
+        OutputFile = 8,
+        InputImage = 9
     };
 
     typedef std::vector< std::string > StringContainerType;

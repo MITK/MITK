@@ -328,7 +328,7 @@ int StartPeakExtraction(int argc, char* argv[])
     return EXIT_SUCCESS;
 }
 
-int PeakExtraction(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");

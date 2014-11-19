@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include <mitkImageCast.h>
 #include <mitkTensorImage.h>
 #include <mitkIOUtil.h>
@@ -22,12 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleX.h>
 #include <itkStreamlineTrackingFilter.h>
 #include <itkDiffusionTensor3D.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <mitkCoreObjectFactory.h>
 
-int StreamlineTracking(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    std::cout << "StreamlineTracking";
     mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::StringList, "Input image", "input tensor image (.dti)", us::Any(), false);
@@ -177,4 +175,3 @@ int StreamlineTracking(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(StreamlineTracking);

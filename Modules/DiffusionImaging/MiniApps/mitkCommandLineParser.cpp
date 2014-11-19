@@ -106,6 +106,11 @@ public:
             NumberOfParametersToProcess = 1;
         }
             break;
+        case mitkCommandLineParser::InputImage:
+        {
+            NumberOfParametersToProcess = 1;
+        }
+          break;
 
         default:
             std::cout << "Type not supported: " << static_cast<int>(type);
@@ -196,6 +201,7 @@ bool CommandLineParserArgumentDescription::addParameter(const string &value)
       break;
 
     case mitkCommandLineParser::InputFile:
+    case mitkCommandLineParser::InputImage:
     case mitkCommandLineParser::OutputFile:
     {
       Value = value;
@@ -815,6 +821,10 @@ void mitkCommandLineParser::generateXmlOutput()
         type = "directory";
         break;
 
+      case mitkCommandLineParser::InputImage:
+        type = "image";
+        break;
+
       case mitkCommandLineParser::OutputFile:
       case mitkCommandLineParser::InputFile:
         type = "file";
@@ -840,7 +850,7 @@ void mitkCommandLineParser::generateXmlOutput()
     xml << "<longflag>" << (*it)->LongArg << "</longflag>" << endl;
     xml << "<flag>" << (*it)->ShortArg << "</flag>" << endl;
 
-    if ((*it)->ValueType == mitkCommandLineParser::InputDirectory || (*it)->ValueType == mitkCommandLineParser::InputFile)
+    if ((*it)->ValueType == mitkCommandLineParser::InputDirectory || (*it)->ValueType == mitkCommandLineParser::InputFile || (*it)->ValueType == mitkCommandLineParser::InputImage)
     {
       xml << "<channel>input</channel>" << endl;
     }

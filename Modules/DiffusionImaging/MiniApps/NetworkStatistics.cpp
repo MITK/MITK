@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConnectomicsNetworkThresholder.h>
 #include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
 
-int NetworkStatistics(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");

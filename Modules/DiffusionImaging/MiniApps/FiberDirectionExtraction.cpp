@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int main(int argc, char* argv[])
 {
-    std::cout << "FiberDirectionExtraction";
     mitkCommandLineParser parser;
 
     parser.setTitle("Fiber Direction Extraction");

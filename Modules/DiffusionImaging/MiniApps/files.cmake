@@ -1,3 +1,4 @@
+# Empty file needed, until CMake Macros are fixed.
 #set(CPP_FILES
 #    mitkCommandLineParser.cpp
 

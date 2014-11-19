@@ -1,5 +1,5 @@
-set(CPP_FILES
-    mitkCommandLineParser.cpp
+#set(CPP_FILES
+#    mitkCommandLineParser.cpp
 
 
 #    QballReconstruction.cpp
@@ -24,4 +24,4 @@ set(CPP_FILES
 #    FiberExtraction.cpp
 #    FiberJoin.cpp
 #    TractometerMetrics.cpp
-)
+#)

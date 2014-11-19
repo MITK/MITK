@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
-
 #include <mitkImageCast.h>
 #include <itkExceptionObject.h>
 #include <itkImageFileWriter.h>
@@ -24,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTensorDerivedMeasurementsFilter.h>
 #include <itkDiffusionQballGeneralizedFaImageFilter.h>
 #include <mitkTensorImage.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <boost/algorithm/string.hpp>
 #include <itksys/SystemTools.hxx>
 #include <itkMultiThreader.h>
@@ -32,9 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
  * Calculate indices derived from Qball or tensor images
  */
-int DiffusionIndices(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    std::cout << "DiffusionIndices";
     mitkCommandLineParser parser;
 
     parser.setTitle("Diffusion Indices");
@@ -145,5 +142,3 @@ int DiffusionIndices(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-
-RegisterDiffusionMiniApp(DiffusionIndices);

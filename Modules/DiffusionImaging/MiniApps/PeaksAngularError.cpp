@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 #include <itkEvaluateDirectionImagesFilter.h>
 #include <metaCommand.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <itkTractsToVectorImageFilter.h>
 #include <usAny.h>
 #include <itkImageFileWriter.h>
@@ -33,9 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-int PeaksAngularError(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    std::cout << "PeaksAngularError";
     mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("test", "t", mitkCommandLineParser::StringList, "Test images", "test direction images", us::Any(), false);
@@ -205,4 +203,3 @@ int PeaksAngularError(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(PeaksAngularError);

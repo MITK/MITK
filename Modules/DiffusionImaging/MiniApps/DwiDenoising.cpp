@@ -14,11 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
-
 #include <mitkImageCast.h>
 #include <mitkBaseDataIOFactory.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <boost/algorithm/string.hpp>
 #include <DiffusionWeightedImages/mitkDiffusionImage.h>
 #include <itkNonLocalMeansDenoisingFilter.h>
@@ -48,7 +46,7 @@ mitk::BaseData::Pointer LoadFile(std::string filename)
 /**
  * Denoises DWI using the Nonlocal - Means algorithm
  */
-int DwiDenoising(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     std::cout << "DwiDenoising";
   mitkCommandLineParser parser;
@@ -156,7 +154,3 @@ int DwiDenoising(int argc, char* argv[])
   }
   return EXIT_SUCCESS;
 }
-
-
-
-RegisterDiffusionMiniApp(DwiDenoising);

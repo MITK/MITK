@@ -13,9 +13,6 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
-#include "MiniAppManager.h"
-
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -35,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkQBallImage.h>
 #include <mitkBaseData.h>
 #include <mitkFiberBundleX.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <boost/lexical_cast.hpp>
 
 #include <itkRadialMultishellToSingleshellImageFilter.h>
@@ -217,4 +214,3 @@ int MultishellMethods(int argc, char* argv[])
   }
   return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(MultishellMethods);

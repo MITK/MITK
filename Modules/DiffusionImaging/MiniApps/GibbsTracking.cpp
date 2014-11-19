@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
-
 #include <mitkImageCast.h>
 #include <mitkQBallImage.h>
 #include <mitkTensorImage.h>
@@ -26,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkShCoefficientImageImporter.h>
 #include <mitkImageToItk.h>
 #include <mitkIOUtil.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <boost/algorithm/string.hpp>
 #include <itkFlipImageFilter.h>
 #include <mitkCoreObjectFactory.h>
@@ -84,7 +82,7 @@ typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Poin
     return filter->GetQballImage();
 }
 
-int GibbsTracking(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     std::cout << "GibbsTracking";
     mitkCommandLineParser parser;
@@ -242,4 +240,3 @@ int GibbsTracking(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(GibbsTracking);

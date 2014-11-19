@@ -126,6 +126,7 @@ function(mitk_create_module)
       ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
       FILES_CMAKE            # file name of a CMake file setting source list variables
                              # (defaults to files.cmake)
+      FILES
       DEPRECATED_SINCE       # marks this modules as deprecated
       DESCRIPTION            # a description for this module
      )
@@ -502,7 +503,7 @@ function(mitk_create_module)
 
           if(MODULE_EXECUTABLE)
             add_executable(${MODULE_TARGET}
-                           ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
+                           ${MODULE_FILES} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
                            ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
             set(_us_module_name main)
           else()

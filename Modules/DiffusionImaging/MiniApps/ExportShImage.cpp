@@ -14,13 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 #include <metaCommand.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <usAny.h>
 #include <itkImageFileWriter.h>
 #include <itkImageFileReader.h>
@@ -98,9 +97,9 @@ int StartShConversion(int argc, char* argv[])
     return EXIT_SUCCESS;
 }
 
-int ExportShImage(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    std::cout << "ExportShImage";
+
     mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input image", "MITK SH image", us::Any(), false);
@@ -135,4 +134,3 @@ int ExportShImage(int argc, char* argv[])
     }
     return EXIT_FAILURE;
 }
-RegisterDiffusionMiniApp(ExportShImage);

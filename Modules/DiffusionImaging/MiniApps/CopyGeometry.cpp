@@ -14,17 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include <mitkImageCast.h>
 #include <mitkDiffusionImage.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 
 using namespace mitk;
-#include "ctkCommandLineParser.h"
 
-int CopyGeometry(int argc, char* argv[])
+
+int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
 
@@ -85,4 +84,3 @@ int CopyGeometry(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(CopyGeometry);

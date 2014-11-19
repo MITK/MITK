@@ -14,14 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
-
 #include "mitkBaseDataIOFactory.h"
 #include <mitkCoreObjectFactory.h>
 #include "mitkDiffusionImage.h"
 #include "itkAnalyticalDiffusionQballReconstructionImageFilter.h"
 #include <boost/lexical_cast.hpp>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <mitkIOUtil.h>
 #include <itksys/SystemTools.hxx>
 
@@ -30,9 +28,8 @@ using namespace mitk;
 /**
  * Perform Q-ball reconstruction using a spherical harmonics basis
  */
-int QballReconstruction(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    std::cout << "QballReconstruction";
     mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
@@ -240,4 +237,3 @@ int QballReconstruction(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(QballReconstruction);

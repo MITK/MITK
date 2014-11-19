@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
-
 #include <itkImageFileWriter.h>
 #include <itkResampleImageFilter.h>
 #include <itkFiniteDiffOdfMaximaExtractionFilter.h>
@@ -28,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTensorImage.h>
 
 #include <mitkCoreObjectFactory.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <itkShCoefficientImageImporter.h>
 #include <itkFlipImageFilter.h>
 #include <boost/lexical_cast.hpp>
@@ -57,7 +55,6 @@ mitk::Image::Pointer LoadData(std::string filename)
 template<int shOrder>
 int StartPeakExtraction(int argc, char* argv[])
 {
-    std::cout << "StartPeakExtraction";
     mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("image", "i", mitkCommandLineParser::InputFile, "Input image", "sh coefficient image", us::Any(), false);
@@ -375,4 +372,3 @@ int PeakExtraction(int argc, char* argv[])
     }
     return EXIT_FAILURE;
 }
-RegisterDiffusionMiniApp(PeakExtraction);

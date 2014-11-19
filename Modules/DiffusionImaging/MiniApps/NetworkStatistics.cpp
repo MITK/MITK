@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <MiniAppManager.h>
-
 // std includes
 #include <string>
 #include <sstream>
@@ -31,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileWriter.h>
 
 // CTK includes
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 
 // MITK includes
 #include <mitkBaseDataIOFactory.h>
@@ -515,4 +513,3 @@ int NetworkStatistics(int argc, char* argv[])
   std::cout << "DONE";
   return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(NetworkStatistics);

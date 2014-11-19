@@ -14,13 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
-
 // std includes
 #include <string>
 
 // CTK includes
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 
 // MITK includes
 #include <mitkBaseDataIOFactory.h>
@@ -133,4 +131,3 @@ int NetworkCreation(int argc, char* argv[])
   std::cout << "DONE";
   return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(NetworkCreation);

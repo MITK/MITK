@@ -181,9 +181,14 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
       mitk::Image* image = dynamic_cast<mitk::Image*>(m_InputImageNode->GetData());
 
+
       mitk::Point3D seedPoint = pointSet->GetPointSet(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep())->GetPoints()->ElementAt(0);
 
-      mitkPixelTypeMultiplex3(AccessPixel,image->GetChannelDescriptor().GetPixelType(),image,seedPoint,m_SeedpointValue);
+
+      if (image->GetGeometry()->IsInside(seedPoint))
+        mitkPixelTypeMultiplex3(AccessPixel,image->GetChannelDescriptor().GetPixelType(),image,seedPoint,m_SeedpointValue)
+      else
+        return;
 
       /* In this case the seedpoint is placed e.g. in the lung or bronchialtree
        * The lowerFactor sets the windowsize depending on the regiongrowing direction

@@ -287,4 +287,17 @@ void mitk::BaseData::PrintSelf(std::ostream& os, itk::Indent indent) const
     os << "NULL" << std::endl;
   else
     GetTimeGeometry()->Print(os, indent);
+  // print out all properties
+  PropertyList::Pointer propertyList = this->GetPropertyList();
+  if (propertyList.IsNotNull() && !propertyList->IsEmpty())
+  {
+    //general headline
+    os << "Properties of BaseData:" << std::endl;
+
+    const PropertyList::PropertyMap* map = propertyList->GetMap();
+    for (PropertyList::PropertyMap::const_iterator iter = map->begin(); iter != map->end(); iter++)
+    {
+      os << "  " << (*iter).first << "   " << (*iter).second->GetValueAsString() << std::endl;
+    }
+  }
 }

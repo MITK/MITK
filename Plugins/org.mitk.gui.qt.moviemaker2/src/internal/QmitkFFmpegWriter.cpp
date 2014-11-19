@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkFFmpegWriter::QmitkFFmpegWriter(QObject* parent)
   : QObject(parent),
     m_Process(new QProcess(this)),
-    m_Framerate(0)
+    m_Framerate(0),
+    m_IsRunning(false)
 {
   this->connect(m_Process, SIGNAL(error(QProcess::ProcessError)),
     this, SLOT(OnProcessError(QProcess::ProcessError)));
@@ -107,6 +108,12 @@ void QmitkFFmpegWriter::Start()
     << m_OutputPath);
 
   m_Process->waitForStarted();
+  m_IsRunning = true;
+}
+
+bool QmitkFFmpegWriter::IsRunning() const
+{
+  return m_IsRunning;
 }
 
 void QmitkFFmpegWriter::WriteFrame(const unsigned char* frame)
@@ -120,11 +127,14 @@ void QmitkFFmpegWriter::WriteFrame(const unsigned char* frame)
 
 void QmitkFFmpegWriter::Stop()
 {
+  m_IsRunning = false;
   m_Process->closeWriteChannel();
 }
 
 void QmitkFFmpegWriter::OnProcessError(QProcess::ProcessError error)
 {
+  m_IsRunning = false;
+
   MITK_ERROR << QString::fromLatin1(m_Process->readAllStandardError()).toStdString();
 
   switch (error)
@@ -151,6 +161,8 @@ void QmitkFFmpegWriter::OnProcessError(QProcess::ProcessError error)
 
 void QmitkFFmpegWriter::OnProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+  m_IsRunning = false;
+
   if (exitStatus != QProcess::CrashExit)
   {
     if (exitCode != 0)

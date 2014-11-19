@@ -24,6 +24,7 @@ class QmitkAnimationWidget;
 class QmitkFFmpegWriter;
 class QMenu;
 class QStandardItemModel;
+class QTimer;
 
 namespace Ui
 {
@@ -55,7 +56,10 @@ private slots:
   void OnDurationSpinBoxValueChanged(double value);
   void OnDelaySpinBoxValueChanged(double value);
   void OnPlayButtonToggled(bool checked);
+  void OnStopButtonClicked();
   void OnRecordButtonClicked();
+  void OnFPSSpinBoxValueChanged(int value);
+  void OnTimerTimeout();
 
 private:
   void InitializeAnimationWidgets();
@@ -64,15 +68,18 @@ private:
   void InitializeAddAnimationMenu();
   void InitializePlaybackAndRecordWidgets();
   void InitializeRecordMenu();
+  void InitializeTimer(QWidget* parent);
   void ConnectAnimationTreeViewWidgets();
   void ConnectAnimationWidgets();
   void ConnectPlaybackAndRecordWidgets();
+  void ConnectTimer();
+  void RenderCurrentFrame();
   void UpdateWidgets();
   void UpdateAnimationWidgets();
   void HideCurrentAnimationWidget();
   void ShowAnimationWidget(QmitkAnimationItem* animationItem);
   void RedrawTimeline();
-  double CalculateTotalDuration() const;
+  void CalculateTotalDuration();
   QmitkAnimationItem* GetSelectedAnimationItem() const;
   QVector<QPair<QmitkAnimationItem*, double> > QmitkMovieMaker2View::GetActiveAnimations(double t) const;
 
@@ -82,6 +89,10 @@ private:
   QMap<QString, QmitkAnimationWidget*> m_AnimationWidgets;
   QMenu* m_AddAnimationMenu;
   QMenu* m_RecordMenu;
+  QTimer* m_Timer;
+  double m_TotalDuration;
+  int m_NumFrames;
+  int m_CurrentFrame;
 };
 
 #endif

@@ -16,7 +16,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSliceAnimationItem.h"
 #include "QmitkSliceAnimationWidget.h"
+#include <mitkBaseRenderer.h>
 #include <ui_QmitkSliceAnimationWidget.h>
+
+static unsigned int GetNumberOfSlices(int renderWindow)
+{
+  const QString renderWindowName = QString("stdmulti.widget%1").arg(renderWindow + 1);
+  vtkRenderWindow* theRenderWindow = mitk::BaseRenderer::GetRenderWindowByName(renderWindowName.toStdString());
+
+  if (theRenderWindow != NULL)
+  {
+    mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(theRenderWindow)->GetSliceNavigationController()->GetSlice();
+
+    if (stepper != NULL)
+      return std::max(1U, stepper->GetSteps());
+  }
+
+  return 1;
+}
 
 QmitkSliceAnimationWidget::QmitkSliceAnimationWidget(QWidget* parent)
   : QmitkAnimationWidget(parent),
@@ -49,6 +66,7 @@ void QmitkSliceAnimationWidget::SetAnimationItem(QmitkAnimationItem* sliceAnimat
     return;
 
   m_Ui->windowComboBox->setCurrentIndex(m_AnimationItem->GetRenderWindow());
+  m_Ui->sliceRangeWidget->setMaximum(GetNumberOfSlices(m_AnimationItem->GetRenderWindow()) - 1);
   m_Ui->sliceRangeWidget->setValues(m_AnimationItem->GetFrom(), m_AnimationItem->GetTo());
   m_Ui->reverseCheckBox->setChecked(m_AnimationItem->GetReverse());
 }
@@ -57,6 +75,14 @@ void QmitkSliceAnimationWidget::OnRenderWindowChanged(int renderWindow)
 {
   if (m_AnimationItem == NULL)
     return;
+
+  const int lastSlice = static_cast<int>(GetNumberOfSlices(renderWindow) - 1);
+
+  m_AnimationItem->SetFrom(0);
+  m_AnimationItem->SetTo(lastSlice);
+
+  m_Ui->sliceRangeWidget->setMaximum(lastSlice);
+  m_Ui->sliceRangeWidget->setValues(m_AnimationItem->GetFrom(), m_AnimationItem->GetTo());
 
   if (m_AnimationItem->GetRenderWindow() != renderWindow)
     m_AnimationItem->SetRenderWindow(renderWindow);

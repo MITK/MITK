@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMenu>
 #include <QMessageBox>
 #include <QStandardItemModel>
+#include <QTimer>
 #include <mitkBaseRenderer.h>
 #include <mitkGL.h>
 
@@ -35,7 +36,7 @@ static QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
     return new QmitkOrbitAnimationItem;
 
   if (widgetKey == "Slice")
-    return new QmitkSliceAnimationItem(0, 0, 999, false);
+    return new QmitkSliceAnimationItem;
 
   return NULL;
 }
@@ -70,7 +71,11 @@ QmitkMovieMaker2View::QmitkMovieMaker2View()
     m_Ui(new Ui::QmitkMovieMaker2View),
     m_AnimationModel(NULL),
     m_AddAnimationMenu(NULL),
-    m_RecordMenu(NULL)
+    m_RecordMenu(NULL),
+    m_Timer(NULL),
+    m_TotalDuration(0.0),
+    m_NumFrames(0),
+    m_CurrentFrame(0)
 {
 }
 
@@ -87,6 +92,7 @@ void QmitkMovieMaker2View::CreateQtPartControl(QWidget* parent)
   this->InitializeAnimationWidgets();
   this->InitializeAnimationTreeViewWidgets();
   this->InitializePlaybackAndRecordWidgets();
+  this->InitializeTimer(parent);
 
   m_Ui->animationWidgetGroupBox->setVisible(false);
 }
@@ -162,6 +168,14 @@ void QmitkMovieMaker2View::InitializeRecordMenu()
   }
 }
 
+void QmitkMovieMaker2View::InitializeTimer(QWidget* parent)
+{
+  m_Timer = new QTimer(parent);
+
+  this->OnFPSSpinBoxValueChanged(m_Ui->fpsSpinBox->value());
+  this->ConnectTimer();
+}
+
 void QmitkMovieMaker2View::ConnectAnimationTreeViewWidgets()
 {
   this->connect(m_AnimationModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)),
@@ -203,8 +217,20 @@ void QmitkMovieMaker2View::ConnectPlaybackAndRecordWidgets()
   this->connect(m_Ui->playButton, SIGNAL(toggled(bool)),
     this, SLOT(OnPlayButtonToggled(bool)));
 
+  this->connect(m_Ui->stopButton, SIGNAL(clicked()),
+    this, SLOT(OnStopButtonClicked()));
+
   this->connect(m_Ui->recordButton, SIGNAL(clicked()),
     this, SLOT(OnRecordButtonClicked()));
+
+  this->connect(m_Ui->fpsSpinBox, SIGNAL(valueChanged(int)),
+    this, SLOT(OnFPSSpinBoxValueChanged(int)));
+}
+
+void QmitkMovieMaker2View::ConnectTimer()
+{
+  this->connect(m_Timer, SIGNAL(timeout()),
+    this, SLOT(OnTimerTimeout()));
 }
 
 void QmitkMovieMaker2View::SetFocus()
@@ -223,6 +249,8 @@ void QmitkMovieMaker2View::OnMoveAnimationUpButtonClicked()
     if (selectedRow > 0)
       m_AnimationModel->insertRow(selectedRow - 1, m_AnimationModel->takeRow(selectedRow));
   }
+
+  this->CalculateTotalDuration();
 }
 
 void QmitkMovieMaker2View::OnMoveAnimationDownButtonClicked()
@@ -237,6 +265,8 @@ void QmitkMovieMaker2View::OnMoveAnimationDownButtonClicked()
     if (selectedRow < rowCount - 1)
       m_AnimationModel->insertRow(selectedRow + 1, m_AnimationModel->takeRow(selectedRow));
   }
+
+  this->CalculateTotalDuration();
 }
 
 void QmitkMovieMaker2View::OnAddAnimationButtonClicked()
@@ -255,50 +285,31 @@ void QmitkMovieMaker2View::OnAddAnimationButtonClicked()
   }
 }
 
-void QmitkMovieMaker2View::OnPlayButtonToggled(bool checked) // TODO: Refactor
+void QmitkMovieMaker2View::OnPlayButtonToggled(bool checked)
 {
-  typedef QPair<QmitkAnimationItem*, double> AnimationIterpolationFactorPair;
   if (checked)
   {
     m_Ui->playButton->setIcon(QIcon(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-pause.svg"));
     m_Ui->playButton->repaint();
 
-    const double totalDuration = this->CalculateTotalDuration(); // TODO totalDuration == 0
-    const int numFrames = static_cast<int>(totalDuration * m_Ui->fpsSpinBox->value()); // TODO numFrames < 2
-    const double deltaT = totalDuration / (numFrames - 1);
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-      QVector<AnimationIterpolationFactorPair> activeAnimations = this->GetActiveAnimations(i * deltaT);
-
-      Q_FOREACH(const AnimationIterpolationFactorPair& animation, activeAnimations)
-      {
-        animation.first->Animate(animation.second);
-      }
-
-      mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-    }
+    m_Timer->start(static_cast<int>(1000.0 / m_Ui->fpsSpinBox->value()));
   }
   else
   {
+    m_Timer->stop();
+
     m_Ui->playButton->setIcon(QIcon(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg"));
     m_Ui->playButton->repaint();
   }
+}
 
-  /*vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4");
-  mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice();
+void QmitkMovieMaker2View::OnStopButtonClicked()
+{
+  m_Ui->playButton->setChecked(false);
+  m_Ui->stopButton->setEnabled(false);
 
-  unsigned int startPos = stepper->GetPos();
-
-  for (unsigned int i = 1; i < 30; ++i)
-  {
-    unsigned int newPos = startPos + 360.0 / 29.0 * i;
-    if (newPos > 360)
-      newPos -= 360;
-    stepper->SetPos(newPos);
-
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(renderWindow);
-  }*/
+  m_CurrentFrame = 0;
+  this->RenderCurrentFrame();
 }
 
 void QmitkMovieMaker2View::OnRecordButtonClicked() // TODO: Refactor
@@ -353,22 +364,26 @@ void QmitkMovieMaker2View::OnRecordButtonClicked() // TODO: Refactor
   {
     m_FFmpegWriter->Start();
 
-    // TODO: Play animation
-
-    for (int i = 0; i < 30; ++i)
+    for (m_CurrentFrame = 0; m_CurrentFrame < m_NumFrames; ++m_CurrentFrame)
     {
+      this->RenderCurrentFrame();
+
       renderWindow->MakeCurrent();
       unsigned char* frame = ReadPixels(renderWindow, x, y, width, height);
       m_FFmpegWriter->WriteFrame(frame);
       delete[] frame;
-      mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice()->Next();
-      mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(renderWindow);
     }
 
     m_FFmpegWriter->Stop();
+
+    m_CurrentFrame = 0;
+    this->RenderCurrentFrame();
   }
   catch (const mitk::Exception& exception)
   {
+    m_CurrentFrame = 0;
+    this->RenderCurrentFrame();
+
     QMessageBox::critical(NULL, "Movie Maker 2", exception.GetDescription());
   }
 }
@@ -383,6 +398,8 @@ void QmitkMovieMaker2View::OnRemoveAnimationButtonClicked()
 
 void QmitkMovieMaker2View::OnAnimationTreeViewRowsInserted(const QModelIndex& parent, int start, int)
 {
+  this->CalculateTotalDuration();
+
   m_Ui->animationTreeView->selectionModel()->select(
     m_AnimationModel->index(start, 0, parent),
     QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
@@ -390,6 +407,7 @@ void QmitkMovieMaker2View::OnAnimationTreeViewRowsInserted(const QModelIndex& pa
 
 void QmitkMovieMaker2View::OnAnimationTreeViewRowsRemoved(const QModelIndex&, int, int)
 {
+  this->CalculateTotalDuration();
   this->UpdateWidgets();
 }
 
@@ -406,6 +424,7 @@ void QmitkMovieMaker2View::OnStartComboBoxCurrentIndexChanged(int index)
   {
     item->SetStartWithPrevious(index);
     this->RedrawTimeline();
+    this->CalculateTotalDuration();
   }
 }
 
@@ -417,6 +436,7 @@ void QmitkMovieMaker2View::OnDurationSpinBoxValueChanged(double value)
   {
     item->SetDuration(value);
     this->RedrawTimeline();
+
   }
 }
 
@@ -428,7 +448,46 @@ void QmitkMovieMaker2View::OnDelaySpinBoxValueChanged(double value)
   {
     item->SetDelay(value);
     this->RedrawTimeline();
+    this->CalculateTotalDuration();
   }
+}
+
+void QmitkMovieMaker2View::OnFPSSpinBoxValueChanged(int value)
+{
+  this->CalculateTotalDuration();
+  m_Timer->setInterval(static_cast<int>(1000.0 / value));
+}
+
+void QmitkMovieMaker2View::OnTimerTimeout()
+{
+  this->RenderCurrentFrame();
+
+  m_CurrentFrame = std::min(m_NumFrames, m_CurrentFrame + 1);
+
+  if (m_CurrentFrame >= m_NumFrames)
+  {
+    m_Ui->playButton->setChecked(false);
+
+    m_CurrentFrame = 0;
+    this->RenderCurrentFrame();
+  }
+
+  m_Ui->stopButton->setEnabled(m_CurrentFrame != 0);
+}
+
+void QmitkMovieMaker2View::RenderCurrentFrame()
+{
+  typedef QPair<QmitkAnimationItem*, double> AnimationIterpolationFactorPair;
+
+  const double deltaT = m_TotalDuration / (m_NumFrames - 1);
+  const QVector<AnimationIterpolationFactorPair> activeAnimations = this->GetActiveAnimations(m_CurrentFrame * deltaT);
+
+  Q_FOREACH(const AnimationIterpolationFactorPair& animation, activeAnimations)
+  {
+    animation.first->Animate(animation.second);
+  }
+
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 }
 
 void QmitkMovieMaker2View::UpdateWidgets()
@@ -535,7 +594,7 @@ QmitkAnimationItem* QmitkMovieMaker2View::GetSelectedAnimationItem() const
     : NULL;
 }
 
-double QmitkMovieMaker2View::CalculateTotalDuration() const
+void QmitkMovieMaker2View::CalculateTotalDuration()
 {
   const int rowCount = m_AnimationModel->rowCount();
 
@@ -560,7 +619,8 @@ double QmitkMovieMaker2View::CalculateTotalDuration() const
     }
   }
 
-  return totalDuration;
+  m_TotalDuration = totalDuration; // TODO totalDuration == 0
+  m_NumFrames = static_cast<int>(totalDuration * m_Ui->fpsSpinBox->value()); // TODO numFrames < 2
 }
 
 QVector<QPair<QmitkAnimationItem*, double> > QmitkMovieMaker2View::GetActiveAnimations(double t) const

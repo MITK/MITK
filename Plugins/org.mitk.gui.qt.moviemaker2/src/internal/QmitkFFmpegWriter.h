@@ -42,6 +42,7 @@ public:
   void SetOutputPath(const QString& path);
 
   void Start();
+  bool IsRunning() const;
   void WriteFrame(const unsigned char* frame);
   void Stop();
 
@@ -55,6 +56,7 @@ private:
   QSize m_Size;
   int m_Framerate;
   QString m_OutputPath;
+  bool m_IsRunning;
 };
 
 #endif

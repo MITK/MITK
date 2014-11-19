@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkSliceAnimationItem.h"
+#include <mitkBaseRenderer.h>
 
 QmitkSliceAnimationItem::QmitkSliceAnimationItem(int renderWindow, int from, int to, bool reverse, double duration, double delay, bool startWithPrevious)
   : QmitkAnimationItem("Slice", duration, delay, startWithPrevious)
@@ -69,6 +70,22 @@ void QmitkSliceAnimationItem::SetReverse(bool reverse)
   this->setData(reverse, ReverseRole);
 }
 
-void QmitkSliceAnimationItem::Animate(double /*s*/)
+void QmitkSliceAnimationItem::Animate(double s)
 {
+  const QString renderWindowName = QString("stdmulti.widget%1").arg(this->GetRenderWindow() + 1);
+  vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName(renderWindowName.toStdString());
+
+  if (renderWindow == NULL)
+    return;
+
+  mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController()->GetSlice();
+
+  if (stepper == NULL)
+    return;
+
+  int newPos = this->GetReverse()
+    ? this->GetTo() - static_cast<int>((this->GetTo() - this->GetFrom()) * s)
+    : this->GetFrom() + static_cast<int>((this->GetTo() - this->GetFrom()) * s);
+
+  stepper->SetPos(static_cast<unsigned int>(newPos));
 }

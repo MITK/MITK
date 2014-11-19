@@ -62,7 +62,14 @@ void QmitkOrbitAnimationItem::SetReverse(bool reverse)
 void QmitkOrbitAnimationItem::Animate(double s)
 {
   vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4");
+
+  if (renderWindow == NULL)
+    return;
+
   mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice();
+
+  if (stepper == NULL)
+    return;
 
   int newPos = this->GetReverse()
     ? this->GetStartAngle() - this->GetOrbit() * s

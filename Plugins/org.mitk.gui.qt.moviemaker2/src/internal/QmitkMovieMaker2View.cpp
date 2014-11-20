@@ -436,7 +436,7 @@ void QmitkMovieMaker2View::OnDurationSpinBoxValueChanged(double value)
   {
     item->SetDuration(value);
     this->RedrawTimeline();
-
+    this->CalculateTotalDuration();
   }
 }
 

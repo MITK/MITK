@@ -30,6 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkServiceInterface.h"
 #include "usGetModuleContext.h"
 
+//igt (remove this later)
+#include "igtlBindMessage.h"
+#include "igtlQuaternionTrackingDataMessage.h"
+#include "igtlTrackingDataMessage.h"
+
 mitk::IGTLMessageProvider::IGTLMessageProvider()
   : mitk::IGTLDeviceSource()
 {
@@ -158,6 +163,53 @@ void mitk::IGTLMessageProvider::OnIncomingCommand()
     else if ( isSTTMsg )
     {
       //if it is a stream start streaming
+
+      //read the requested frames per second
+      int fps = 10;
+
+      //this solution is not nice but if you want to change it you have to change
+      //OpenIGTLink code. I have to check the type here because the STT_ messages
+      //do not have a common base class. In fact they have one MessageBase. But
+      //it is necessary to have a STTMessageBase that implements SetFPS and
+      //GetFPS in order to set the FPS.
+      //On my request the OpenIGTLink developers wrote me that they will
+      //implement this
+      igtl::MessageBase* curCommandPt = curCommand.GetPointer();
+      if ( std::strcmp( curCommand->GetDeviceType(), "STT_BIND" ) == 0 )
+      {
+        fps = ((igtl::StartBindMessage*)curCommandPt)->GetResolution();
+      }
+      else if ( std::strcmp( curCommand->GetDeviceType(), "STT_QTDATA" ) == 0 )
+      {
+        fps = ((igtl::StartQuaternionTrackingDataMessage*)curCommandPt)->GetResolution();
+      }
+      else if ( std::strcmp( curCommand->GetDeviceType(), "STT_TDATA" ) == 0 )
+      {
+        fps = ((igtl::StartTrackingDataMessage*)curCommandPt)->GetResolution();
+      }
+
+      //this is also a kind of workaround:
+      //Problem: This method we are in at the moment is called from another
+      //thread (not the main thread). The pipeline normally runs in the main
+      //thread and has no thread-safety. Therefore, it would be a bad idea to
+      //call the update method from here directly, it should be called from the
+      //main thread. To call it from the main thread a timer is needed. That
+      //results in two options: 1. boost timer or 2. qt timer
+      //I chose the second option. So the way this works in detail is described
+      //in QmitkIGTLStreamingConnector.
+      //brief: Here, the fps are set. The streaming connector checks this fps
+      //in the main thread. Once it is changed it adapts its timer. Everytime the
+      //timer is fired the pipeline is updated and the result is added to the
+      //send message queue. So the connections between the threads are the queue
+      //and the fps variable. They are implemented thread safe.
+
+      //set the fps in the current source object
+      source->SetFPS(fps);
+    }
+    else if ( isSTPMsg )
+    {
+      //set the fps to 0 to stop streaming
+      source->SetFPS(0);
     }
     else
     {
@@ -191,4 +243,10 @@ mitk::IGTLMessageSource::Pointer mitk::IGTLMessageProvider::GetFittingSource(con
   }
   //no service reference was found or found service reference has no valid source
   return NULL;
+}
+
+void mitk::IGTLMessageProvider::Send(mitk::IGTLMessage* msg)
+{
+  if (msg != NULL)
+    this->m_IGTLDevice->SendMessage(msg);
 }

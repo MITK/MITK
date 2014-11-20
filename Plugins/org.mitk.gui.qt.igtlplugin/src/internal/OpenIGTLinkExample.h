@@ -46,6 +46,7 @@ class OpenIGTLinkExample : public QmitkAbstractView
   Q_OBJECT
 
   public:
+    ~OpenIGTLinkExample();
 
     static const std::string VIEW_ID;
 
@@ -64,16 +65,20 @@ class OpenIGTLinkExample : public QmitkAbstractView
     void CreatePipeline();
     void DestroyPipeline();
 
+    void GlobalReinit();
+
     Ui::OpenIGTLinkExampleControls m_Controls;
     mitk::IGTLClient::Pointer m_IGTLClient;
     mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;
     mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_VisFilter;
-    mitk::DataNode::Pointer m_DemoNode;
+    mitk::DataNode::Pointer m_DemoNodeT1;
+    mitk::DataNode::Pointer m_DemoNodeT2;
+    mitk::DataNode::Pointer m_DemoNodeT3;
 
     //REMOVE LATER
-    mitk::IGTLServer::Pointer m_IGTLServer;
-    mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource2;
+//    mitk::IGTLServer::Pointer m_IGTLServer;
+//    mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource2;
 
     QTimer m_Timer;
 };

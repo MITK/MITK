@@ -36,8 +36,9 @@ const std::string mitk::IGTLMessageSource::US_PROPKEY_ISACTIVE =
 
 mitk::IGTLMessageSource::IGTLMessageSource()
   : itk::ProcessObject(), m_Name("IGTLMessageSource (no defined type)"),
-    m_Type("NONE")
+    m_Type("NONE"), m_StreamingFPS(0)
 {
+  m_StreamingFPSMutex = itk::FastMutexLock::New();
 }
 
 mitk::IGTLMessageSource::~IGTLMessageSource()
@@ -175,4 +176,21 @@ mitk::PropertyList::ConstPointer mitk::IGTLMessageSource::GetParameters() const
   // add properties to p like this:
   //p->SetProperty("MyFilter_MyParameter", mitk::PropertyDataType::New(m_MyParameter));
   return mitk::PropertyList::ConstPointer(p);
+}
+
+void mitk::IGTLMessageSource::SetFPS(unsigned int fps)
+{
+  this->m_StreamingFPSMutex->Lock();
+  this->m_StreamingFPS = fps;
+  this->m_StreamingFPSMutex->Unlock();
+}
+
+
+unsigned int mitk::IGTLMessageSource::GetFPS()
+{
+  unsigned int fps = 0;
+  this->m_StreamingFPSMutex->Lock();
+  fps = this->m_StreamingFPS;
+  this->m_StreamingFPSMutex->Unlock();
+  return fps;
 }

@@ -23,6 +23,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <igtlTransformMessage.h>
 #include <mitkIGTLMessageCommon.h>
 
+#include <igtl_status.h>
+
+//remove later
+#include <igtlTrackingDataMessage.h>
+
+#include <igtlTrackingDataMessage.h>
 
 static const int SOCKET_SEND_RECEIVE_TIMEOUT_MSEC = 100;
 
@@ -99,7 +105,7 @@ bool mitk::IGTLDevice::TestConnection()
   return true;
 }
 
-void mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
+unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
 {
   // Create a message buffer to receive header
   igtl::MessageHeader::Pointer headerMsg;
@@ -112,12 +118,16 @@ void mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   int r =
     socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize(), 1);
 
-  if(r == 0)
+  if (r == 0) //connection error
   {
     // an error was received, therefor the communication with this socket
     // must be stopped
-
-    this->StopCommunicationWithSocket(socket);
+    return IGTL_STATUS_NOT_PRESENT;
+  }
+  else if (r == -1 ) //timeout
+  {
+    // a timeout was received, this is no error state, thus, do nothing
+    return IGTL_STATUS_TIME_OUT;
   }
   else if (r == headerMsg->GetPackSize())
   {
@@ -146,61 +156,104 @@ void mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       headerMsg->Print(std::cout);
 
       //check the type of the received message
-      //if it is a command push it into the command queue
-      //otherwise into the normal receive queue
+      //if it is a GET_, STP_ or RTS_ command push it into the command queue
+      //otherwise continue reading the whole message from the socket
       const char* curDevType = headerMsg->GetDeviceType();
       if ( std::strstr( curDevType, "GET_" ) != NULL ||
-           std::strstr( curDevType, "STT_" ) != NULL ||
-           std::strstr( curDevType, "STP_" ) != NULL)
+           std::strstr( curDevType, "STP_" ) != NULL ||
+           std::strstr( curDevType, "RTS_" ) != NULL)
       {
         this->m_CommandQueue->PushMessage(headerMsg);
         this->InvokeEvent(CommandReceivedEvent());
+        return IGTL_STATUS_OK;
       }
-      else
+
+      //Create a message according to the header message
+      igtl::MessageBase::Pointer curMessage;
+      curMessage = m_MessageFactory->CreateInstance(headerMsg);
+
+      //check if the curMessage is created properly, if not the message type is
+      //not supported and the message has to be skipped
+      if ( curMessage.IsNull() )
       {
-        //Create a message buffer to receive transform data
-        igtl::MessageBase::Pointer curMessage;
-        curMessage = m_MessageFactory->CreateInstance(headerMsg);
-        curMessage->SetMessageHeader(headerMsg);
-        curMessage->AllocatePack();
+        socket->Skip(headerMsg->GetBodySizeToRead(), 0);
+        MITK_ERROR("IGTLDevice") << "The received type is not supported. Please "
+                                    "add it to the message factory.";
+        return IGTL_STATUS_NOT_FOUND;
+      }
 
-        // Receive transform data from the socket
-        int receiveCheck = 0;
-        receiveCheck = socket->Receive(curMessage->GetPackBodyPointer(),
-                                         curMessage->GetPackBodySize());
+      //insert the header to the message and allocate the pack
+      curMessage->SetMessageHeader(headerMsg);
+      curMessage->AllocatePack();
 
-        if ( receiveCheck > 0 )
+      // Receive transform data from the socket
+      int receiveCheck = 0;
+      receiveCheck = socket->Receive(curMessage->GetPackBodyPointer(),
+                                     curMessage->GetPackBodySize());
+
+      if ( receiveCheck > 0 )
+      {
+        int c = curMessage->Unpack(1);
+        if ( !(c & igtl::MessageHeader::UNPACK_BODY) )
         {
-          int c = curMessage->Unpack(1);
-          if ( !(c & igtl::MessageHeader::UNPACK_BODY) )
-          {
-            mitkThrow() << "crc error";
-          }
+//            mitkThrow() << "crc error";
+          return IGTL_STATUS_CHECKSUM_ERROR;
+        }
 
-          this->m_ReceiveQueue->PushMessage(curMessage);
-          this->InvokeEvent(MessageReceivedEvent());
+        //check the type of the received message
+        //if it is a command push it into the command queue
+        //otherwise into the normal receive queue
+        //STP_ commands are handled here because they implemented additional
+        //member variables that are not stored in the header message
+        if ( std::strstr( curDevType, "STT_" ) != NULL )
+        {
+          this->m_CommandQueue->PushMessage(curMessage);
+          this->InvokeEvent(CommandReceivedEvent());
         }
         else
         {
-          MITK_ERROR("IGTLDevice") << "Received a valid header but could not "
-                                   << "read the whole message.";
+          this->m_ReceiveQueue->PushMessage(curMessage);
+          this->InvokeEvent(MessageReceivedEvent());
         }
+        return IGTL_STATUS_OK;
       }
+      else
+      {
+        MITK_ERROR("IGTLDevice") << "Received a valid header but could not "
+                                 << "read the whole message.";
+        return IGTL_STATUS_UNKNOWN_ERROR;
+      }
+    }
+    else
+    {
+      //CRC check failed
+      return IGTL_STATUS_CHECKSUM_ERROR;
     }
   }
   else
   {
     //Message size information and actual data size don't match.
+    //this state is not suppossed to be reached, return unknown error
+    return IGTL_STATUS_UNKNOWN_ERROR;
   }
+}
+
+void mitk::IGTLDevice::SendMessage(mitk::IGTLMessage* msg)
+{
+  this->SendMessage(msg->GetMessage());
 }
 
 void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
 {
+  //create some debug output
+  igtl::TrackingDataMessage::Pointer tdMsg = (igtl::TrackingDataMessage*)msg.GetPointer();
+
+
   //add the message to the queue
   m_SendQueue->PushMessage(msg);
 }
 
-bool mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg,
+unsigned int mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg,
                                           igtl::Socket::Pointer socket)
 {
   //check the input message
@@ -219,9 +272,9 @@ bool mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg,
   int sendSuccess = socket->Send(msg->GetPackPointer(), msg->GetPackSize());
 
   if (sendSuccess)
-    return true;
+    return IGTL_STATUS_OK;
   else
-    return false;
+    return IGTL_STATUS_UNKNOWN_ERROR;
 }
 
 

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMutexLockHolder.h>
 
 #include <igtlServerSocket.h>
+#include <igtl_status.h>
 
 
 mitk::IGTLServer::IGTLServer() :
@@ -84,21 +85,35 @@ void mitk::IGTLServer::Connect()
     this->m_RegisteredClients.push_back(socket);
     //inform observers about this new client
     this->InvokeEvent(NewClientConnectionEvent());
+    MITK_INFO("IGTLServer") << "Connected to a new client.";
   }
 }
 
 void mitk::IGTLServer::Receive()
 {
+  unsigned int status = IGTL_STATUS_OK;
+  SocketListType socketsToBeRemoved;
+
   //the server can be connected with several clients, therefore it has to check
   //all registered clients
-  std::list<igtl::Socket::Pointer>::iterator it;
-  std::list<igtl::Socket::Pointer>::iterator it_end =
-      this->m_RegisteredClients.end();
+  SocketListIteratorType it;
+  SocketListIteratorType it_end = this->m_RegisteredClients.end();
   for ( it = this->m_RegisteredClients.begin(); it != it_end; ++it )
   {
-    //maybe there should be a check here if the current socket is still active
-    this->ReceivePrivate(*it);
+    //it is possible that ReceivePrivate detects that the current socket is
+    //already disconnected. Therefore, it is necessary to remove this socket
+    //from the registered clients list
+    status = this->ReceivePrivate(*it);
+    if ( status == IGTL_STATUS_NOT_PRESENT )
+    {
+      //remember the this socket for later, it is not a good idea to remove it
+      //from the list directly because we iterator over the list at this point
+      socketsToBeRemoved.push_back(*it);
+      MITK_WARN("IGTLServer") << "Lost connection to a client socket. ";
+    }
   }
+  //remove the sockets that are not connected anymore
+  this->StopCommunicationWithSocket(socketsToBeRemoved);
 }
 
 void mitk::IGTLServer::Send()
@@ -119,8 +134,8 @@ void mitk::IGTLServer::Send()
   //the data would be send to the appropriate client and to noone else.
   //(I know it is no excuse but PLUS is doing exactly the same, they broadcast
   //everything)
-  std::list<igtl::Socket::Pointer>::iterator it;
-  std::list<igtl::Socket::Pointer>::iterator it_end =
+  SocketListIteratorType it;
+  SocketListIteratorType it_end =
       this->m_RegisteredClients.end();
   for ( it = this->m_RegisteredClients.begin(); it != it_end; ++it )
   {
@@ -129,21 +144,29 @@ void mitk::IGTLServer::Send()
   }
 }
 
-
+void mitk::IGTLServer::StopCommunicationWithSocket(
+    SocketListType& toBeRemovedSockets)
+{
+  SocketListIteratorType it    = toBeRemovedSockets.begin();
+  SocketListIteratorType itEnd = toBeRemovedSockets.end();
+  for (; it != itEnd; ++it )
+  {
+    this->StopCommunicationWithSocket(*it);
+  }
+}
 
 void mitk::IGTLServer::StopCommunicationWithSocket(igtl::Socket* client)
 {
-  std::list<igtl::Socket::Pointer>::iterator it =
-      this->m_RegisteredClients.begin();
-  std::list<igtl::Socket::Pointer>::iterator itEnd =
-      this->m_RegisteredClients.end();
+  SocketListIteratorType it    = this->m_RegisteredClients.begin();
+  SocketListIteratorType itEnd = this->m_RegisteredClients.end();
 
   for (; it != itEnd; ++it )
   {
-    if ( (*it).GetPointer() == client )
+    if ( (*it) == client )
     {
       this->m_RegisteredClients.remove(*it);
       break;
     }
   }
+  MITK_INFO("IGTLServer") << "Removed client socket from server client list.";
 }

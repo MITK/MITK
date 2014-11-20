@@ -18,6 +18,7 @@ set(CPP_FILES
   #Qmitk/QmitkInteractiveTransformationWidget.cpp
   Qmitk/QmitkIGTLDeviceSourceSelectionWidget.cpp
   Qmitk/QmitkIGTLDeviceSourceManagementWidget.cpp
+  Qmitk/QmitkIGTLStreamingConnector.cpp
 
 #  Qmitk/QmitkNavigationDataPlayerControlWidget.cpp
 #  Qmitk/QmitkNavigationDataSequentialPlayerControlWidget.cpp
@@ -68,6 +69,7 @@ set(MOC_H_FILES
  # Qmitk/QmitkInteractiveTransformationWidget.h
   Qmitk/QmitkIGTLDeviceSourceSelectionWidget.h
   Qmitk/QmitkIGTLDeviceSourceManagementWidget.h
+  Qmitk/QmitkIGTLStreamingConnector.h
 
   #Qmitk/QmitkNavigationDataPlayerControlWidget.h
  # Qmitk/QmitkNavigationDataSequentialPlayerControlWidget.h

@@ -30,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //igtl
 #include <igtlStringMessage.h>
+#include <igtlBindMessage.h>
+#include <igtlQuaternionTrackingDataMessage.h>
+#include <igtlTrackingDataMessage.h>
 
 //poco headers
 #include <Poco/Path.h>
@@ -235,6 +238,7 @@ void QmitkIGTLDeviceSourceManagementWidget::DisableSourceControls()
   m_Controls->editPort->setEnabled(false);
   m_Controls->editSend->setEnabled(false);
   m_Controls->butSendCommand->setEnabled(false);
+  m_Controls->fpsSpinBox->setEnabled(false);
 //  m_Controls->m_AddTool->setEnabled(false);
 //  m_Controls->m_LoadTool->setEnabled(false);
 //  m_Controls->m_selectedLabel->setEnabled(false);
@@ -251,14 +255,11 @@ void QmitkIGTLDeviceSourceManagementWidget::EnableSourceControls()
   if ( this->m_IsClient )
   {
     m_Controls->editIP->setEnabled(true);
-    m_Controls->editPort->setEnabled(true);
-    m_Controls->butConnect->setEnabled(true);
   }
-  else
-  {
-    m_Controls->editPort->setEnabled(true);
-    m_Controls->butConnect->setEnabled(true);
-  }
+
+  m_Controls->editPort->setEnabled(true);
+  m_Controls->butConnect->setEnabled(true);
+  m_Controls->fpsSpinBox->setEnabled(true);
 //  m_Controls->editSend->setEnabled(false);
 //  m_Controls->m_AddTool->setEnabled(true);
 //  m_Controls->m_LoadTool->setEnabled(true);
@@ -345,6 +346,27 @@ void QmitkIGTLDeviceSourceManagementWidget::OnHostnameChanged()
 
 void QmitkIGTLDeviceSourceManagementWidget::OnSendCommand()
 {
+  //this solution is not nice but if you want to change it you have to change
+  //OpenIGTLink code. I have to check the type here because the STT_ messages
+  //do not have a common base class. In fact they have one MessageBase. But it
+  //is necessary to have a STTMessageBase that implements SetFPS and GetFPS in
+  //order to set the FPS.
+  if ( std::strcmp( m_CurrentCommand->GetDeviceType(), "STT_BIND" ) == 0 )
+  {
+    ((igtl::StartBindMessage*)this->m_CurrentCommand.GetPointer())->
+        SetResolution(this->m_Controls->fpsSpinBox->value());
+  }
+  else if ( std::strcmp( m_CurrentCommand->GetDeviceType(), "STT_QTDATA" ) == 0 )
+  {
+    ((igtl::StartQuaternionTrackingDataMessage*)m_CurrentCommand.GetPointer())->
+        SetResolution(this->m_Controls->fpsSpinBox->value());
+  }
+  else if ( std::strcmp( m_CurrentCommand->GetDeviceType(), "STT_TDATA" ) == 0 )
+  {
+    ((igtl::StartTrackingDataMessage*)this->m_CurrentCommand.GetPointer())->
+        SetResolution(this->m_Controls->fpsSpinBox->value());
+  }
+
   m_IGTLDevice->SendMessage(m_CurrentCommand.GetPointer());
   std::stringstream s;
   s << "<br>Sent command with DeviceType: " << m_CurrentCommand->GetDeviceType();
@@ -357,8 +379,9 @@ void QmitkIGTLDeviceSourceManagementWidget::OnCommandChanged(
   mitk::IGTLMessageFactory::Pointer msgFactory =
       this->m_IGTLDevice->GetMessageFactory();
   //create a new message that fits to the selected get message type command
-  this->m_CurrentCommand = msgFactory->GetMessageTypeNewPointer(
-        curCommand.toStdString())();
+  this->m_CurrentCommand = msgFactory->CreateInstance( curCommand.toStdString());
+  //enable/disable the FPS spinbox
+  this->m_Controls->fpsSpinBox->setEnabled(curCommand.contains("STT_"));
 }
 
 

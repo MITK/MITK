@@ -101,14 +101,14 @@ void mitk::NavigationDataToIGTLMessageFilter::CreateOutputsForAllInputs()
   switch (m_OperationMode)
   {
   case ModeSendQTDataMsg:
-    // create one message output for each navigation data input
-    this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
+    // create one message output for all navigation data inputs
+    this->SetNumberOfIndexedOutputs(1);
     // set the type for this filter
     this->SetType("QTDATA");
     break;
   case ModeSendTDataMsg:
-    // create one message output for each navigation data input
-    this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
+    // create one message output for all navigation data inputs
+    this->SetNumberOfIndexedOutputs(1);
     // set the type for this filter
     this->SetType("TDATA");
     break;
@@ -184,6 +184,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
     posMsg->SetQuaternion(ori[0], ori[1], ori[2], ori[3]);
     posMsg->SetTimeStamp((unsigned int)input->GetIGTTimeStamp(), 0);
     posMsg->SetDeviceName(input->GetName());
+    posMsg->Pack();
 
     //add the igtl message to the mitk::IGTLMessage
     output->SetMessage(posMsg.GetPointer());
@@ -217,6 +218,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTransMsg()
     transMsg->SetPosition(position[0], position[1], position[2]);
     transMsg->SetTimeStamp((unsigned int)input->GetIGTTimeStamp(), 0);
     transMsg->SetDeviceName(input->GetName());
+    transMsg->Pack();
 
     //add the igtl message to the mitk::IGTLMessage
     output->SetMessage(transMsg.GetPointer());
@@ -258,6 +260,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTDataMsg()
     //todo find a better way to do that
     qtdMsg->SetTimeStamp((unsigned int)nd->GetIGTTimeStamp(), 0);
   }
+  qtdMsg->Pack();
 
   //add the igtl message to the mitk::IGTLMessage
   output->SetMessage(qtdMsg.GetPointer());
@@ -303,7 +306,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
     //todo find a better way to do that
     tdMsg->SetTimeStamp((unsigned int)nd->GetIGTTimeStamp(), 0);
   }
-
+  tdMsg->Pack();
   //add the igtl message to the mitk::IGTLMessage
   output->SetMessage(tdMsg.GetPointer());
 }

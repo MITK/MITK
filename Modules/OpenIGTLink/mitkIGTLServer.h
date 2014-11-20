@@ -40,6 +40,9 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
+    typedef std::list<igtl::Socket::Pointer> SocketListType;
+    typedef SocketListType::iterator SocketListIteratorType;
+
     /**
     * \brief initialize the connection for the IGTL device
     *
@@ -82,6 +85,14 @@ namespace mitk
     virtual void Send();
 
     /**
+      * \brief Stops the communication with the given sockets.
+      *
+      * This method removes the given sockets from the registered clients list
+      *
+      */
+    virtual void StopCommunicationWithSocket(SocketListType& toBeRemovedSockets);
+
+    /**
       * \brief Stops the communication with the given socket.
       *
       * This method removes the given socket from the registered clients list
@@ -92,7 +103,7 @@ namespace mitk
     /**
      * @brief A list with all registered clients
      */
-    std::list<igtl::Socket::Pointer> m_RegisteredClients;
+    SocketListType m_RegisteredClients;
   };
 } // namespace mitk
 #endif /* MITKIGTLSERVER_H */

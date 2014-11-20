@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMutexLockHolder.h>
 
 #include <igtlClientSocket.h>
+#include <igtl_status.h>
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
@@ -83,7 +84,14 @@ void mitk::IGTLClient::Connect()
 
 void mitk::IGTLClient::Receive()
 {
-  this->ReceivePrivate(this->m_Socket);
+  //try to receive a message, if the socket is not present anymore stop the
+  //communication
+  unsigned int status = this->ReceivePrivate(this->m_Socket);
+  if ( status == IGTL_STATUS_NOT_PRESENT )
+  {
+    this->StopCommunicationWithSocket(this->m_Socket);
+    MITK_WARN("IGTLClient") << "Lost connection to server socket.";
+  }
 }
 
 void mitk::IGTLClient::Send()
@@ -103,7 +111,7 @@ void mitk::IGTLClient::Send()
   }
   else
   {
-    MITK_ERROR("IGTLDevice") << "Could not send the message.";
+    MITK_WARN("IGTLDevice") << "Could not send the message.";
   }
 }
 

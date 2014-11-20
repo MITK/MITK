@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkServiceInterface.h>
 #include <usServiceRegistration.h>
 
+//itk
+#include <itkFastMutexLock.h>
+
 namespace mitk {
 
   /**Documentation
@@ -178,12 +181,28 @@ namespace mitk {
     */
     virtual mitk::PropertyList::ConstPointer GetParameters() const;
 
+    /**
+    *\brief Sets the fps used for streaming this source
+    */
+    void SetFPS(unsigned int fps);
+
+    /**
+    *\brief Gets the fps used for streaming this source
+    */
+    unsigned int GetFPS();
+
   protected:
     IGTLMessageSource();
     virtual ~IGTLMessageSource();
 
     std::string m_Name;
     std::string m_Type;
+
+
+    /** mutex to control access to m_StreamingFPS */
+    itk::FastMutexLock::Pointer m_StreamingFPSMutex;
+    /** The frames per second used for streaming */
+    unsigned int m_StreamingFPS;
 
     us::ServiceRegistration<Self> m_ServiceRegistration;
   };

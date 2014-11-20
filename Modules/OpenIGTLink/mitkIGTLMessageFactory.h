@@ -83,6 +83,15 @@ namespace mitk {
         std::string messageTypeName);
 
     /**
+    * \brief Creates a new message instance fitting to the given type.
+    *
+    * If this type is not registered it returns NULL
+    * Usage:
+    * igtl::MessageBase::Pointer message = CreateInstance("IMAGE");
+    */
+    igtl::MessageBase::Pointer CreateInstance(std::string messageTypeName);
+
+    /**
     * \brief Creates a new message according to the given header
     * \param msg The message header that defines the type of the message
     * This method checks the data type and creates a new message according to the

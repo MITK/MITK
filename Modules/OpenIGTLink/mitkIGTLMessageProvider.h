@@ -40,6 +40,13 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
+    /**
+    * \brief sends the msg to the requesting client
+    *
+    * Note: so far it broadcasts the message to all registered clients
+    */
+    void Send(mitk::IGTLMessage* msg);
+
   protected:
     IGTLMessageProvider();
     virtual ~IGTLMessageProvider();

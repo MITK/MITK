@@ -104,11 +104,24 @@ namespace mitk
     */
     virtual void ConnectTo(mitk::IGTLMessageSource * UpstreamFilter);
 
+    /**
+    *\brief Sets the number of expected outputs.
+    *
+    * Normally, this is done automatically by the filter concept. However, in our
+    * case we can not know, for example, how many tracking elements are stored
+    * in the incoming igtl message. Therefore, we have to set the number here to
+    * the expected value.
+    */
+    void SetNumberOfExpectedOutputs(unsigned int numOutputs);
+
   protected:
     IGTLMessageToNavigationDataFilter();
     virtual ~IGTLMessageToNavigationDataFilter();
 
     virtual void GenerateData();
+    void GenerateTransformData();
+    void GenerateTrackingDataData();
+    void GenerateQuaternionTrackingDataData();
 
     /**
     * \brief Create an output for each input

@@ -223,6 +223,21 @@ mitk::IGTLMessageFactory::GetMessageTypeNewPointer(std::string messageTypeName)
   return NULL;
 }
 
+igtl::MessageBase::Pointer
+mitk::IGTLMessageFactory::CreateInstance(std::string messageTypeName)
+{
+  mitk::IGTLMessageFactory::PointerToMessageBaseNew newPointer =
+      this->GetMessageTypeNewPointer(messageTypeName);
+  if ( newPointer != NULL )
+  {
+    return newPointer();
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
 std::list<std::string>
 mitk::IGTLMessageFactory::GetAvailableMessageRequestTypes()
 {

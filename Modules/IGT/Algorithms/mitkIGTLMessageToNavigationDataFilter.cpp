@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "igtlQuaternionTrackingDataMessage.h"
 #include "igtlTransformMessage.h"
 #include "mitkQuaternion.h"
+#include <vnl/vnl_det.h>
 
 
 mitk::IGTLMessageToNavigationDataFilter::IGTLMessageToNavigationDataFilter()
@@ -118,11 +119,18 @@ void mitk::IGTLMessageToNavigationDataFilter::ConnectTo(
   }
 }
 
+void mitk::IGTLMessageToNavigationDataFilter::SetNumberOfExpectedOutputs(
+    unsigned int numOutputs)
+{
+  this->SetNumberOfIndexedOutputs(numOutputs);
+  this->CreateOutputsForAllInputs();
+}
+
 
 void mitk::IGTLMessageToNavigationDataFilter::CreateOutputsForAllInputs()
 {
   // create outputs for all inputs
-  this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
+//  this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
   bool isModified = false;
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
   {
@@ -138,17 +146,27 @@ void mitk::IGTLMessageToNavigationDataFilter::CreateOutputsForAllInputs()
     this->Modified();
 }
 
-void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
+void mitk::IGTLMessageToNavigationDataFilter::GenerateTransformData()
 {
-  this->CreateOutputsForAllInputs(); // make sure that we have the same number of outputs as inputs
+  const mitk::IGTLMessage* input = this->GetInput(0);
+  assert(input);
+
+  //cast the input message into the proper type
+  igtl::TransformMessage* tMsg =
+      (igtl::TransformMessage*)(input->GetMessage().GetPointer());
+
+  //check if cast was successful
+  if ( !tMsg )
+  {
+    mitkThrow() << "Cast from igtl::MessageBase to igtl::TransformMessage "
+                << "failed! Please check the message.";
+  }
 
   /* update outputs with tracking data from tools */
   for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
   {
     mitk::NavigationData* output = this->GetOutput(i);
     assert(output);
-    const mitk::IGTLMessage* input = this->GetInput(i);
-    assert(input);
 
     if (input->IsDataValid() == false)
     {
@@ -156,171 +174,251 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
       continue;
     }
 
-    //check if the IGTL message has the proper type
-    if( strcmp(input->GetIGTLMessageType(), "TRANSFORM") == 0 )
+    //debug output
+    tMsg->Print(std::cout);
+
+    //get the transformation matrix and convert it into an affinetransformation
+    igtl::Matrix4x4 transformation_;
+    tMsg->GetMatrix(transformation_);
+    mitk::AffineTransform3D::Pointer affineTransformation =
+        mitk::AffineTransform3D::New();
+    mitk::Matrix3D transformation;
+    mitk::Vector3D offset;
+    for ( unsigned int r = 0; r < 3; r++ )
     {
-      //cast the input message into the proper type
-      igtl::TransformMessage* tMsg =
-          (igtl::TransformMessage*)(input->GetMessage().GetPointer());
-
-      //check if cast was successful
-      if ( !tMsg )
+      for ( unsigned int c = 0; c < 3; c++ )
       {
-        mitkThrow() << "Cast from igtl::MessageBase to igtl::TransformMessage "
-                    << "failed! Please check the message.";
-        continue;
+        transformation.GetVnlMatrix().set( r , c , transformation_[r][c] );
       }
-
-      //debug output
-      tMsg->Print(std::cout);
-
-      //get the transformation matrix and convert it into an affinetransformation
-      igtl::Matrix4x4 transformation_;
-      tMsg->GetMatrix(transformation_);
-      mitk::AffineTransform3D::Pointer affineTransformation =
-          mitk::AffineTransform3D::New();
-      mitk::Matrix3D transformation;
-      mitk::Vector3D offset;
-      for ( unsigned int r = 0; r < 3; r++ )
-      {
-        for ( unsigned int c = 0; c < 3; c++ )
-        {
-          transformation.GetVnlMatrix().set( r , c , transformation_[r][c] );
-        }
-        offset.SetElement(r, transformation_[r][3]);
-      }
-      //convert the igtl matrix here and set it in the affine transformation
-      affineTransformation->SetMatrix(transformation);
-      affineTransformation->SetOffset(offset);
-
-      //create a new navigation data here, there is a neat constructor for
-      //affine transformations that sets the orientation, position according to
-      //the affine transformation. The other values are initialized with standard
-      //values
-      mitk::NavigationData::Pointer nd =
-          mitk::NavigationData::New(affineTransformation, true);
-      output->Graft(nd);
-
-      nd->Print(std::cout);
+      offset.SetElement(r, transformation_[r][3]);
     }
-    else if( strcmp(input->GetIGTLMessageType(), "TDATA") == 0 )
+    //convert the igtl matrix here and set it in the affine transformation
+    affineTransformation->SetMatrix(transformation);
+    affineTransformation->SetOffset(offset);
+
+    //create a new navigation data here, there is a neat constructor for
+    //affine transformations that sets the orientation, position according to
+    //the affine transformation. The other values are initialized with standard
+    //values
+    mitk::NavigationData::Pointer nd =
+        mitk::NavigationData::New(affineTransformation, true);
+    //set the time stamp
+    nd->SetIGTTimeStamp(input->GetTimeStamp());
+    //set the name
+//    nd->SetName(td->GetName());
+
+    output->Graft(nd);
+
+    nd->Print(std::cout);
+  }
+}
+
+void mitk::IGTLMessageToNavigationDataFilter::GenerateTrackingDataData()
+{
+  const mitk::IGTLMessage* input = this->GetInput(0);
+  assert(input);
+
+  //cast the input message into the proper type
+  igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(input->GetMessage().GetPointer());
+
+  //check if cast was successful
+  if ( !tdMsg )
+  {
+    mitkThrow() << "Cast from igtl::MessageBase to igtl::TrackingDataMessage "
+                << "failed! Please check the message.";
+  }
+
+  //get the number of tracking data elements
+  unsigned int numTrackingDataElements =
+      tdMsg->GetNumberOfTrackingDataElements();
+
+  if ( !numTrackingDataElements )
+  {
+    MITK_ERROR("IGTLMsgToNavDataFilter") << "There are no tracking data "
+                                            "elements in this message";
+  }
+
+  /* update outputs with tracking data from tools */
+  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
+  {
+    mitk::NavigationData* output = this->GetOutput(i);
+    assert(output);
+
+    //invalidate the output
+    output->SetDataValid(false);
+
+    //check if the current index, all outputs that have no corresponding input
+    //tracking element stay invalidated, the others are validated according to
+    //the tracking element
+    if ( input->IsDataValid() == false || i >= numTrackingDataElements )
     {
-      //cast the input message into the proper type
-      igtl::TrackingDataMessage* tdMsg =
-          (igtl::TrackingDataMessage*)(input->GetMessage().GetPointer());
-
-      //check if cast was successful
-      if ( !tdMsg )
-      {
-        mitkThrow() << "Cast from igtl::MessageBase to igtl::TransformMessage "
-                    << "failed! Please check the message.";
-        continue;
-      }
-
-      //get the number of tracking data elements
-      unsigned int numTrackingDataElements =
-          tdMsg->GetNumberOfTrackingDataElements();
-
-      //one message can contain several tracking data elements, but is this
-      //really used? If yes, what is a tracking element? If there is one tracking
-      //element per connected tracker, then we definitely have check all of them.
-      //Moreover, we have to read the message, check how many elements there are
-      //and then adapt the number of outputs to the number of tracking element.
-      //Every tracker should have a seperate output.
-      //at the moment I just want the first one
-      //check if there is at least one tracking data element
-      if ( !numTrackingDataElements )
-      {
-        output->SetDataValid(false);
-        MITK_ERROR("IGTLMsgToNavDataFilter") << "There are no tracking data "
-                                                "elements in this message";
-        continue;
-      }
-
-      //get the tracking data element which holds all the data
-      igtl::TrackingDataElement::Pointer td;
-      tdMsg->GetTrackingDataElement(0, td);
-
-      //get the transformation matrix and convert it into an affinetransformation
-      igtl::Matrix4x4 transformation_;
-      td->GetMatrix(transformation_);
-      mitk::AffineTransform3D::Pointer affineTransformation;
-      mitk::Matrix3D transformation;
-      mitk::Vector3D offset;
-      for ( unsigned int r = 0; r < 3; r++ )
-      {
-        for ( unsigned int c = 0; c < 3; c++ )
-        {
-          transformation.GetVnlMatrix().set( r , c , transformation_[r][c] );
-        }
-        offset.SetElement(r, transformation_[r][4]);
-      }
-      //convert the igtl matrix here and set it in the affine transformation
-      affineTransformation->SetMatrix(transformation);
-      affineTransformation->SetOffset(offset);
-
-//      //get the position and set it in the affine transformation
-//      mitk::NavigationData::PositionType position;
-//      td->GetPosition(position.pointer);
-//      affineTransformation->SetOffset(position);
-
-      //create a new navigation data here, there is a neat constructor for
-      //affine transformations that sets the orientation, position according to
-      //the affine transformation. The other values are initialized with standard
-      //values
-      mitk::NavigationData::Pointer nd =
-          mitk::NavigationData::New(affineTransformation, true);
-      output->Graft(nd);
+      continue;
     }
-    else if( strcmp(input->GetIGTLMessageType(), "QTDATA") == 0 )
+    output->SetDataValid(true);
+
+    //get the tracking data element which holds all the data
+    igtl::TrackingDataElement::Pointer td;
+    tdMsg->GetTrackingDataElement(i, td);
+
+    //get the transformation matrix and convert it into an affinetransformation
+    igtl::Matrix4x4 transformation_;
+    td->GetMatrix(transformation_);
+    mitk::AffineTransform3D::Pointer affineTransformation =
+        mitk::AffineTransform3D::New();
+    mitk::Matrix3D transformation;
+    mitk::Vector3D offset;
+    for ( unsigned int r = 0; r < 3; r++ )
     {
-      //get the tracking data message
-      igtl::QuaternionTrackingDataMessage::Pointer tdMsg =
-          dynamic_cast<igtl::QuaternionTrackingDataMessage*>(
-            input->GetMessage().GetPointer());
+      for ( unsigned int c = 0; c < 3; c++ )
+      {
+        transformation.GetVnlMatrix().set( r , c , transformation_[r][c] );
+      }
+      offset.SetElement(r, transformation_[r][3]);
+    }
+    //convert the igtl matrix here and set it in the affine transformation
+    affineTransformation->SetMatrix(transformation);
+    affineTransformation->SetOffset(offset);
 
-      //get the tracking data element which holds all the data
-      igtl::QuaternionTrackingDataElement::Pointer td;
-      tdMsg->GetQuaternionTrackingDataElement(0, td);
+    mitk::NavigationData::Pointer nd;
 
-      //get the quaternion and set it
-      float quaternion_[4];                          //igtl quat type
-      td->GetQuaternion(quaternion_);
-      mitk::Quaternion quaternion;
-      quaternion.put(0, quaternion_[0]);
-      quaternion.put(1, quaternion_[1]);
-      quaternion.put(2, quaternion_[2]);
-      output->SetOrientation(quaternion);
-      output->SetHasOrientation(true);
-
-      //get the position and set it
-      float position_[3];                          //igtl position type
-      td->GetPosition(position_);
-      mitk::NavigationData::PositionType position; //mitk position type
-      position.SetElement(0, position_[0]);
-      position.SetElement(1, position_[1]);
-      position.SetElement(2, position_[2]);
-      output->SetPosition(position);
-      output->SetHasPosition(true);
-
-      //the data is valid and there is no explicit covarience matrix
-      output->SetDataValid(true);
-      output->SetCovErrorMatrix(mitk::NavigationData::CovarianceMatrixType());
+    //check the rotation matrix
+    vnl_matrix_fixed<ScalarType, 3, 3> rotationMatrix =
+        affineTransformation->GetMatrix().GetVnlMatrix();
+    vnl_matrix_fixed<ScalarType, 3, 3> rotationMatrixTransposed =
+        rotationMatrix.transpose();
+    // a quadratic matrix is a rotation matrix exactly when determinant is 1
+    // and transposed is inverse
+    if (!Equal(1.0, vnl_det(rotationMatrix), 0.1)
+        || !((rotationMatrix*rotationMatrixTransposed).is_identity(0.1)))
+    {
+      MITK_ERROR("IGTLMsgToNavDataFilter") << "tried to initialize NavData "
+          << "with non-rotation matrix :" << rotationMatrix << " (Does your "
+             "AffineTransform3D object include spacing? This is not "
+             "supported by NavigationData objects!)";
+      nd = mitk::NavigationData::New();
     }
     else
     {
-      //the message has another type
-      //set the output invalid and try the next input
-      output->SetDataValid(false);
+      //create a new navigation data here, there is a neat constructor for
+      //affine transformations that sets the orientation, position according to
+      //the affine transformation. The other values are initialized with standard
+      //values
+      nd = mitk::NavigationData::New(affineTransformation, true);
+    }
+    //set the time stamp
+    nd->SetIGTTimeStamp(input->GetTimeStamp());
+    //set the name
+    nd->SetName(td->GetName());
+    output->Graft(nd);
+  }
+}
+
+void
+mitk::IGTLMessageToNavigationDataFilter::GenerateQuaternionTrackingDataData()
+{
+  const mitk::IGTLMessage* input = this->GetInput(0);
+  assert(input);
+
+  //cast the input message into the proper type
+  igtl::QuaternionTrackingDataMessage* tdMsg =
+      (igtl::QuaternionTrackingDataMessage*)(input->GetMessage().GetPointer());
+
+  //check if cast was successful
+  if ( !tdMsg )
+  {
+    mitkThrow() << "Cast from igtl::MessageBase to igtl::TrackingDataMessage "
+                << "failed! Please check the message.";
+  }
+
+  //get the number of tracking data elements
+  unsigned int numTrackingDataElements =
+      tdMsg->GetNumberOfQuaternionTrackingDataElements();
+
+  if ( !numTrackingDataElements )
+  {
+    MITK_ERROR("IGTLMsgToNavDataFilter") << "There are no tracking data "
+                                            "elements in this message";
+  }
+
+  /* update outputs with tracking data from tools */
+  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
+  {
+    mitk::NavigationData* output = this->GetOutput(i);
+    assert(output);
+
+    //invalidate the output
+    output->SetDataValid(false);
+
+    //check if the current index, all outputs that have no corresponding input
+    //tracking element stay invalidated, the others are validated according to
+    //the tracking element
+    if ( input->IsDataValid() == false || i >= numTrackingDataElements )
+    {
       continue;
     }
+    output->SetDataValid(true);
 
+
+    //get the tracking data element which holds all the data
+    igtl::QuaternionTrackingDataElement::Pointer td;
+    tdMsg->GetQuaternionTrackingDataElement(i, td);
+
+    //get the quaternion and set it
+    float quaternion_[4];                          //igtl quat type
+    td->GetQuaternion(quaternion_);
+    mitk::Quaternion quaternion;
+    quaternion.put(0, quaternion_[0]);
+    quaternion.put(1, quaternion_[1]);
+    quaternion.put(2, quaternion_[2]);
+    output->SetOrientation(quaternion);
+    output->SetHasOrientation(true);
+
+    //get the position and set it
+    float position_[3];                          //igtl position type
+    td->GetPosition(position_);
+    mitk::NavigationData::PositionType position; //mitk position type
+    position.SetElement(0, position_[0]);
+    position.SetElement(1, position_[1]);
+    position.SetElement(2, position_[2]);
+    output->SetPosition(position);
+    output->SetHasPosition(true);
     //set the time stamp
     output->SetIGTTimeStamp(input->GetTimeStamp());
     //set the name
-    output->SetName(input->GetName());
+    output->SetName(td->GetName());
 
-    output->Print(std::cout);
+    //there is no explicit covarience matrix
+    output->SetCovErrorMatrix(mitk::NavigationData::CovarianceMatrixType());
+  }
+}
+
+void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
+{
+//  this->CreateOutputsForAllInputs(); // make sure that we have the same number of outputs as inputs
+
+  const mitk::IGTLMessage* input = this->GetInput(0);
+  assert(input);
+
+  //check if the IGTL message has the proper type
+  if( strcmp(input->GetIGTLMessageType(), "TRANSFORM") == 0 )
+  {
+    this->GenerateTransformData();
+  }
+  else if( strcmp(input->GetIGTLMessageType(), "TDATA") == 0 )
+  {
+    this->GenerateTrackingDataData();
+  }
+  else if( strcmp(input->GetIGTLMessageType(), "QTDATA") == 0 )
+  {
+    this->GenerateQuaternionTrackingDataData();
+  }
+  else
+  {
+    //the message has another type
+    //ignore
+    MITK_INFO("IGTLMessageToNavigationDataFilter") << "The input has a unknown "
+                                                   << "message type.";
   }
 }
 

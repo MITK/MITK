@@ -18,17 +18,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIGTLDEVICE_H
 #define MITKIGTLDEVICE_H
 
-#include <MitkOpenIGTLinkExports.h>
-#include "itkObject.h"
 #include "mitkCommon.h"
+
+//itk
+#include "itkObject.h"
 #include "itkFastMutexLock.h"
-#include <itkMultiThreader.h>
-//#include <vector>
+#include "itkMultiThreader.h"
+
+//igtl
 #include "igtlSocket.h"
 #include "igtlMessageBase.h"
 #include "igtlTransformMessage.h"
+
+//mitkIGTL
+#include "MitkOpenIGTLinkExports.h"
 #include "mitkIGTLMessageFactory.h"
 #include "mitkIGTLMessageQueue.h"
+#include "mitkIGTLMessage.h"
 
 
 namespace mitk {
@@ -84,6 +90,13 @@ namespace mitk {
        * is not send directly. This method just adds it to the send queue.
        */
       void SendMessage(igtl::MessageBase::Pointer msg);
+
+      /**
+       * \brief Sends a message via the open IGT Link.
+       *
+       * Convenience function to work with mitk::IGTLMessage directly.
+       */
+      void SendMessage(mitk::IGTLMessage* msg);
 
       /**
        * \brief return current object state (Setup, Ready or Running)
@@ -217,9 +230,13 @@ namespace mitk {
        *
        * This may only be called after the connection to the device has been
        * established with a call to OpenConnection()
+       *
+       * \retval IGTL_STATUS_OK the message was sent
+       * \retval IGTL_STATUS_UNKONWN_ERROR the message was not sent because an
+       * unknown error occurred
        */
-      bool SendMessagePrivate(igtl::MessageBase::Pointer msg,
-                              igtl::Socket::Pointer socket);
+      unsigned int SendMessagePrivate(igtl::MessageBase::Pointer msg,
+                                      igtl::Socket::Pointer socket);
 
 
       /**
@@ -233,8 +250,15 @@ namespace mitk {
       * \brief Call this method to receive a message from the given client.
       *
       * The message will be saved in the receive queue.
+      *
+      * \retval IGTL_STATUS_OK a message or a command was received
+      * \retval IGTL_STATUS_NOT_PRESENT the socket is not connected anymore
+      * \retval IGTL_STATUS_TIME_OUT the socket timed out
+      * \retval IGTL_STATUS_CHECKSUM_ERROR the checksum of the received msg was
+      * incorrect
+      * \retval IGTL_STATUS_UNKNOWN_ERROR an unknown error occurred
       */
-      void ReceivePrivate(igtl::Socket* client);
+      unsigned int ReceivePrivate(igtl::Socket* client);
 
       /**
       * \brief Call this method to send a message. The message will be read from

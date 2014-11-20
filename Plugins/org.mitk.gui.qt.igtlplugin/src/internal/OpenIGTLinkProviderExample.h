@@ -21,12 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
+#include <QmitkIGTLStreamingConnector.h>
 
 #include "ui_OpenIGTLinkProviderExampleControls.h"
 #include "mitkIGTLServer.h"
 #include "mitkIGTLMessageProvider.h"
 #include "mitkNavigationDataToIGTLMessageFilter.h"
 #include "mitkNavigationDataPlayer.h"
+#include "mitkNavigationDataObjectVisualizationFilter.h"
 
 #include "qtimer.h"
 
@@ -45,6 +47,7 @@ class OpenIGTLinkProviderExample : public QmitkAbstractView
   Q_OBJECT
 
   public:
+    ~OpenIGTLinkProviderExample();
 
     static const std::string VIEW_ID;
 
@@ -52,6 +55,7 @@ class OpenIGTLinkProviderExample : public QmitkAbstractView
 
     void Start();
     void OnOpenFile();
+    void UpdateVisualization();
 
 
   protected:
@@ -63,13 +67,21 @@ class OpenIGTLinkProviderExample : public QmitkAbstractView
     void CreatePipeline();
     void DestroyPipeline();
 
+    void GlobalReinit();
+
     Ui::OpenIGTLinkProviderExampleControls m_Controls;
     mitk::IGTLServer::Pointer m_IGTLServer;
     mitk::IGTLMessageProvider::Pointer m_IGTLMessageProvider;
     mitk::NavigationDataToIGTLMessageFilter::Pointer m_NavDataToIGTLMsgFilter;
     mitk::NavigationDataPlayer::Pointer m_NavDataPlayer;
-    mitk::DataNode::Pointer m_DemoNode;
+    mitk::NavigationDataObjectVisualizationFilter::Pointer m_NavDataVisualizer;
+    mitk::DataNode::Pointer m_DemoNodeT1;
+    mitk::DataNode::Pointer m_DemoNodeT2;
+    mitk::DataNode::Pointer m_DemoNodeT3;
     mitk::NavigationDataSet::Pointer m_NavDataSet;
+    QmitkIGTLStreamingConnector m_StreamingConnector;
+
+    QTimer m_VisualizerTimer;
 };
 
 #endif // OpenIGTLinkProviderExample_h

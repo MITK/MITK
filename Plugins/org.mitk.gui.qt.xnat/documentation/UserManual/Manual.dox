@@ -1,10 +1,9 @@
 /**
-\page org_mitk_gui_qt_xnat XNAT Plugin
+\page org_mitk_gui_qt_xnat The XNAT Plugin
 
 \imageMacro{icon.png,"Icon of XNAT Plugin",2.00}
 
-Available sections:
-  - \ref org_mitk_gui_qt_xnatOverview
+\tableofcontents
 
 \section org_mitk_gui_qt_xnatOverview Overview
 This plug-in is a new possibility of communication with a XNAT server in MITK.

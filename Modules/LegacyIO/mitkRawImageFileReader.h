@@ -29,7 +29,7 @@ namespace mitk
 //## @brief Reader to read raw image files
 /**  The user must set the dimensionality, the dimensions and the pixel type. If they are incorrect, the image will not be opened or the visualization will be incorrect. */
 //## @ingroup IO
-//## @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+//## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 class DEPRECATED() MitkLegacyIO_EXPORT RawImageFileReader : public ImageSource, public FileReader
 {
 public:

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPixmap>
 #include <QBitmap>
 #include <QTimer>
+#include <QTime>
 
 class QtSafeApplication : public QtSingleApplication
 {
@@ -124,12 +125,62 @@ int main(int argc, char** argv)
   diffConfig->setString(berry::Platform::ARG_PROVISIONING, provFile.toString());
   diffConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.diffusionimagingapp");
 
+  QStringList preloadLibs;
+
   // Preload the org.mitk.gui.qt.ext plug-in (and hence also QmitkExt) to speed
   // up a clean-cache start. This also works around bugs in older gcc and glibc implementations,
   // which have difficulties with multiple dynamic opening and closing of shared libraries with
   // many global static initializers. It also helps if dependent libraries have weird static
   // initialization methods and/or missing de-initialization code.
-  diffConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, "liborg_mitk_gui_qt_ext");
+  preloadLibs << "liborg_mitk_gui_qt_ext";
+
+  QMap<QString, QString> preloadLibVersion;
+
+#ifdef Q_OS_MAC
+  const QString libSuffix = ".dylib";
+#elif defined(Q_OS_UNIX)
+  const QString libSuffix = ".so";
+#elif defined(Q_OS_WIN)
+  const QString libSuffix = ".dll";
+#else
+  const QString libSuffix;
+#endif
+
+  for (QStringList::Iterator preloadLibIter = preloadLibs.begin(),
+       iterEnd = preloadLibs.end(); preloadLibIter != iterEnd; ++preloadLibIter)
+  {
+    QString& preloadLib = *preloadLibIter;
+    // In case the application is started from an install directory
+    QString tempLibraryPath = QCoreApplication::applicationDirPath() + "/plugins/" + preloadLib + libSuffix;
+    QFile preloadLibrary (tempLibraryPath);
+#ifdef Q_OS_MAC
+    if (!preloadLibrary.exists())
+    {
+      // In case the application is started from a build tree
+      QString relPath = "/../../../plugins/" + preloadLib + libSuffix;
+      tempLibraryPath = QCoreApplication::applicationDirPath() + relPath;
+      preloadLibrary.setFileName(tempLibraryPath);
+    }
+#endif
+    if(preloadLibrary.exists())
+    {
+      preloadLib = tempLibraryPath;
+    }
+    // Else fall back to the QLibrary search logic
+  }
+
+  QString preloadConfig;
+  Q_FOREACH(const QString& preloadLib, preloadLibs)
+  {
+    preloadConfig += preloadLib + preloadLibVersion[preloadLib] + ",";
+  }
+  preloadConfig.chop(1);
+
+  diffConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, preloadConfig.toStdString());
+
+  // Seed the random number generator, once at startup.
+  QTime time = QTime::currentTime();
+  qsrand((uint)time.msec());
 
   return berry::Starter::Run(argc, argv, diffConfig);
 }

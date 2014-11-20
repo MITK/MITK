@@ -575,7 +575,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
             minSpacing = mask->GetSpacing()[2];
 
         mitk::FiberBundleX::Pointer fibCopy = this->GetDeepCopy();
-        fibCopy->ResampleLinear(minSpacing/5);
+        fibCopy->ResampleSpline(minSpacing/5);
         polyData = fibCopy->GetFiberPolyData();
     }
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
@@ -703,7 +703,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::RemoveFibersOutside(ItkUcharImgT
         minSpacing = mask->GetSpacing()[2];
 
     mitk::FiberBundleX::Pointer fibCopy = this->GetDeepCopy();
-    fibCopy->ResampleLinear(minSpacing/10);
+    fibCopy->ResampleSpline(minSpacing/10);
     vtkSmartPointer<vtkPolyData> polyData =fibCopy->GetFiberPolyData();
 
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
@@ -766,7 +766,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::RemoveFibersOutside(ItkUcharImgT
     newPolyData->SetPoints(vtkNewPoints);
     newPolyData->SetLines(vtkNewCells);
     mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(newPolyData);
-    newFib->ResampleLinear(minSpacing/2);
+    newFib->ResampleSpline(minSpacing/2);
     return newFib;
 }
 
@@ -1779,92 +1779,6 @@ void mitk::FiberBundleX::Compress(float error)
         UpdateColorCoding();
         UpdateFiberGeometry();
     }
-}
-
-// Resample fiber to get equidistant points
-void mitk::FiberBundleX::ResampleLinear(float pointDistance)
-{
-    if (pointDistance<=0.00001)
-        return;
-
-    vtkSmartPointer<vtkPolyData> newPoly = vtkSmartPointer<vtkPolyData>::New();
-    vtkSmartPointer<vtkCellArray> newCellArray = vtkSmartPointer<vtkCellArray>::New();
-    vtkSmartPointer<vtkPoints>    newPoints = vtkSmartPointer<vtkPoints>::New();
-
-    int numberOfLines = m_NumFibers;
-
-    MITK_INFO << "Resampling fibers";
-    boost::progress_display disp(m_NumFibers);
-    for (int i=0; i<numberOfLines; i++)
-    {
-        ++disp;
-        vtkCell* cell = m_FiberPolyData->GetCell(i);
-        int numPoints = cell->GetNumberOfPoints();
-        vtkPoints* points = cell->GetPoints();
-
-        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-
-        double* point = points->GetPoint(0);
-        vtkIdType pointId = newPoints->InsertNextPoint(point);
-        container->GetPointIds()->InsertNextId(pointId);
-
-        float dtau = 0;
-        int cur_p = 1;
-        itk::Vector<float,3> dR;
-        float normdR = 0;
-
-        for (;;)
-        {
-            while (dtau <= pointDistance && cur_p < numPoints)
-            {
-                itk::Vector<float,3> v1;
-                point = points->GetPoint(cur_p-1);
-                v1[0] = point[0];
-                v1[1] = point[1];
-                v1[2] = point[2];
-                itk::Vector<float,3> v2;
-                point = points->GetPoint(cur_p);
-                v2[0] = point[0];
-                v2[1] = point[1];
-                v2[2] = point[2];
-
-                dR  = v2 - v1;
-                normdR = std::sqrt(dR.GetSquaredNorm());
-                dtau += normdR;
-                cur_p++;
-            }
-
-            if (dtau >= pointDistance)
-            {
-                itk::Vector<float,3> v1;
-                point = points->GetPoint(cur_p-1);
-                v1[0] = point[0];
-                v1[1] = point[1];
-                v1[2] = point[2];
-
-                itk::Vector<float,3> v2 = v1 - dR*( (dtau-pointDistance)/normdR );
-                pointId = newPoints->InsertNextPoint(v2.GetDataPointer());
-                container->GetPointIds()->InsertNextId(pointId);
-            }
-            else
-            {
-                point = points->GetPoint(numPoints-1);
-                pointId = newPoints->InsertNextPoint(point);
-                container->GetPointIds()->InsertNextId(pointId);
-                break;
-            }
-            dtau = dtau-pointDistance;
-        }
-
-        newCellArray->InsertNextCell(container);
-    }
-
-    newPoly->SetPoints(newPoints);
-    newPoly->SetLines(newCellArray);
-    m_FiberPolyData = newPoly;
-    UpdateFiberGeometry();
-    UpdateColorCoding();
-    m_FiberSampling = 10/pointDistance;
 }
 
 // reapply selected colorcoding in case polydata structure has changed

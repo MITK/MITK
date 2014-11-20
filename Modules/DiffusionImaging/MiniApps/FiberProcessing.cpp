@@ -60,7 +60,6 @@ int FiberProcessing(int argc, char* argv[])
     parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input fiber bundle (.fib)", us::Any(), false);
     parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output:", "output fiber bundle (.fib)", us::Any(), false);
 
-    parser.addArgument("resample", "r", ctkCommandLineParser::Float, "Linear resampling:", "Linearly resample fiber with the given point distance (in mm)");
     parser.addArgument("smooth", "s", ctkCommandLineParser::Float, "Spline resampling:", "Resample fiber using splines with the given point distance (in mm)");
     parser.addArgument("compress", "c", ctkCommandLineParser::Float, "Compress:", "Compress fiber using the given error threshold (in mm)");
     parser.addArgument("minLength", "l", ctkCommandLineParser::Float, "Minimum length:", "Minimum fiber length (in mm)");
@@ -84,10 +83,6 @@ int FiberProcessing(int argc, char* argv[])
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
-
-    float pointDist = -1;
-    if (parsedArgs.count("resample"))
-        pointDist = us::any_cast<float>(parsedArgs["resample"]);
 
     float smoothDist = -1;
     if (parsedArgs.count("smooth"))
@@ -165,9 +160,6 @@ int FiberProcessing(int argc, char* argv[])
 
         if (curvThres>0)
             fib->ApplyCurvatureThreshold(curvThres, false);
-
-        if (pointDist>0)
-            fib->ResampleLinear(pointDist);
 
         if (smoothDist>0)
             fib->ResampleSpline(smoothDist);

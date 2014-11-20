@@ -4,15 +4,7 @@
 
 \imageMacro{QmitkIGTTracking_IconTrackingToolbox.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
 
-Available sections:
-  - \ref QmitkMITKIGTTrackingToolboxIntroduction
-  - \ref QmitkMITKIGTTrackingToolboxWorkflow
-  - \ref QmitkMITKIGTTrackingToolboxConnecting
-  - \ref QmitkMITKIGTTrackingToolboxLoadingTools
-  - \ref QmitkMITKIGTTrackingToolboxAutoDetection
-  - \ref QmitkMITKIGTTrackingToolboxStartTracking
-  - \ref QmitkMITKIGTTrackingToolboxLogging
-  - \ref QmitkMITKIGTTrackingOptions
+\tableofcontents
 
 \section QmitkMITKIGTTrackingToolboxIntroduction Introduction
 

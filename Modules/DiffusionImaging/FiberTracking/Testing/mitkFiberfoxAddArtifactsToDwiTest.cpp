@@ -111,6 +111,8 @@ public:
 
         if (refImage.IsNotNull())
         {
+            if (!CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage()))
+                mitk::IOUtil::SaveBaseData(testImage, mitk::IOUtil::GetTempPath()+"testImage.dwi");
             CPPUNIT_ASSERT_MESSAGE(testFileName, CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage()));
         }
     }

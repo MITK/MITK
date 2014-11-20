@@ -110,6 +110,11 @@ void SurfaceVtkXmlIO::Write()
   {
     std::string fileName;
     vtkSmartPointer<vtkPolyData> polyData = this->GetPolyData(t, fileName);
+    if (polyData.Get() == NULL)
+    {
+      mitkThrow() << "Cannot write empty surface";
+    }
+
     vtkSmartPointer<VtkXMLPolyDataWriter> writer = vtkSmartPointer<VtkXMLPolyDataWriter>::New();
     writer->SetInputData(polyData);
 
@@ -129,7 +134,9 @@ void SurfaceVtkXmlIO::Write()
 
     if (writer->Write() == 0 || writer->GetErrorCode() != 0 )
     {
-      mitkThrow() << "Error during surface writing: " << vtkErrorCode::GetStringFromErrorCode(writer->GetErrorCode());
+      mitkThrow() << "Error during surface writing" << (writer->GetErrorCode() ?
+                                                          std::string(": ") + vtkErrorCode::GetStringFromErrorCode(writer->GetErrorCode()) :
+                                                          std::string());
     }
 
     if (this->GetOutputStream()) break;

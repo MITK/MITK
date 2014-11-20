@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
   class PlaneGeometryData;
-  /** \deprecatedSince{2014_06} This class is deprecated. Please use PlaneGeometryData instead. */
+  /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometryData instead. */
   DEPRECATED( typedef PlaneGeometryData Geometry2DData);
   //##Documentation
   //## @brief Data class containing PlaneGeometry objects
@@ -50,7 +50,7 @@ namespace mitk {
     //## by the object
     virtual void SetPlaneGeometry(mitk::PlaneGeometry* geometry2d);
     /**
-    * \deprecatedSince{2014_06} Please use SetPlaneGeometry
+    * \deprecatedSince{2014_10} Please use SetPlaneGeometry
     */
     DEPRECATED(void SetGeometry2D(PlaneGeometry* geo)){SetPlaneGeometry(geo);};
 
@@ -62,7 +62,7 @@ namespace mitk {
       return static_cast<mitk::PlaneGeometry *>(GetGeometry());
     };
     /**
-    * \deprecatedSince{2014_06} Please use GetPlaneGeometry
+    * \deprecatedSince{2014_10} Please use GetPlaneGeometry
     */
     DEPRECATED(const PlaneGeometry* GetGeometry2D()){return GetPlaneGeometry();};
 

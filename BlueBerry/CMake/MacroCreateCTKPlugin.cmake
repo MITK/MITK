@@ -90,7 +90,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
 
       set(_tag_file "${plugin_tag_dir}/${_dep_target}.tag")
       if(EXISTS ${_tag_file})
-        set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} ${_tag_file}=qthelp://${_dep}/bundle/")
+        set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} \"${_tag_file}=qthelp://${_dep}/bundle/\"")
       endif()
     endforeach()
     if(_PLUGIN_DOXYGEN_TAGFILES)
@@ -147,6 +147,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     CACHED_RESOURCEFILES ${_PLUGIN_CACHED_RESOURCE_FILES}
     TRANSLATIONS ${_PLUGIN_TRANSLATION_FILES}
     OUTPUT_DIR ${_output_dir}
+    NO_INSTALL # we install the plug-in ourselves
     ${is_test_plugin}
   )
 

@@ -188,9 +188,9 @@ void QmitkImageStatisticsView::JumpToCoordinates(int row ,int col)
   }
 
   mitk::Point3D world;
-  if (row==4)
+  if (row==4 && !m_WorldMinList.empty())
     world = m_WorldMinList[col];
-  else if (row==3)
+  else if (row==3 && !m_WorldMaxList.empty())
     world = m_WorldMaxList[col];
   else
     return;
@@ -317,6 +317,10 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
     if (i == selectedNodes.size()) return;
   }
 
+  //reset the feature image and image mask field
+  m_Controls->m_SelectedFeatureImageLabel->setText("None");
+  m_Controls->m_SelectedMaskLabel->setText("None");
+
   this->ReinitData();
   if (selectedNodes.isEmpty())
   {
@@ -424,6 +428,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
 
   std::string maskName = std::string();
   std::string maskType = std::string();
+  std::string featureImageName = std::string();
   unsigned int maskDimension = 0;
 
   // reset data from last run
@@ -455,6 +460,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
           this->m_SelectedImage = static_cast<mitk::Image*>(this->m_SelectedDataNodes.at(i)->GetData());
           this->m_ImageObserverTag = this->m_SelectedImage->AddObserver(itk::ModifiedEvent(), changeListener);
         }
+        featureImageName = this->m_SelectedDataNodes.at(i)->GetName();
       }
     }
     else if (planarFig.IsNotNull())
@@ -484,6 +490,11 @@ void QmitkImageStatisticsView::UpdateStatistics()
     maskName = "None";
     maskType = "";
     maskDimension = 0;
+  }
+
+  if(featureImageName == "")
+  {
+    featureImageName = "None";
   }
 
   if (m_SelectedPlanarFigure != NULL && m_SelectedImage == NULL)
@@ -543,6 +554,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       maskLabel << "  [" << maskDimension << "D " << maskType << "]";
     }
     m_Controls->m_SelectedMaskLabel->setText( maskLabel.str().c_str() );
+    m_Controls->m_SelectedFeatureImageLabel->setText(featureImageName.c_str());
 
     // check time step validity
     if(m_SelectedImage->GetDimension() <= 3 && timeStep > m_SelectedImage->GetDimension(3)-1)
@@ -716,7 +728,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       {
         outOfBounds = true;
         std::stringstream message;
-        message << "<font color='red'>Planar figure is outside the images bounds.</font>";
+        message << "<font color='red'>Planar figure is on a rotated image plane or outside the image bounds.</font>";
         m_Controls->m_InfoLabel->setText(message.str().c_str());
       }
 

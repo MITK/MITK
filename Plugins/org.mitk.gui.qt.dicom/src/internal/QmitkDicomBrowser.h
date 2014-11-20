@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Blueberry
 #include <berryIPartListener.h>
+#include <berryIBerryPreferences.h>
 #include <berryISelectionListener.h>
 #include <berryQtEditorPart.h>
 
@@ -77,6 +78,8 @@ public:
     bool IsDirty() const { return false; }
     bool IsSaveAsAllowed() const { return false; }
 
+    virtual void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
+
 signals:
 
    /**
@@ -111,9 +114,6 @@ protected:
 
     /// \brief TestHandler initializes event handler.
     void TestHandler();
-
-    /// \brief Sets database directory.
-    void SetDatabaseDirectory(const QString& databaseDirectory);
 
     /// \brief CreateTemporaryDirectory creates temporary directory in which temorary dicom objects are stored.
     void CreateTemporaryDirectory();

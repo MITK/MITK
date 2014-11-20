@@ -50,6 +50,8 @@ namespace mitk{
       void UpdateVolumePreview(bool volumeRendering);
       void ShowMultiLabelResultNode(bool);
 
+      int GetNumberOfBins();
+
     protected:
       OtsuTool3D();
       virtual ~OtsuTool3D();

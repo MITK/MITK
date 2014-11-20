@@ -115,6 +115,9 @@ endif()
 # Prerequesites
 #-----------------------------------------------------------------------------
 
+set(${PROJECT_NAME}_MODULES_PACKAGE_DEPENDS_DIR "${PROJECT_SOURCE_DIR}/CMake/PackageDepends")
+set(MODULES_PACKAGE_DEPENDS_DIRS ${${PROJECT_NAME}_MODULES_PACKAGE_DEPENDS_DIR})
+
 find_package(MITK 2014.03.99 REQUIRED)
 
 if(COMMAND mitkFunctionCheckMitkCompatibility)
@@ -154,9 +157,6 @@ mark_as_advanced(${PROJECT_NAME}_SHOW_CONSOLE_WINDOW)
 if(NOT UNIX AND NOT MINGW)
   set(MITK_WIN32_FORCE_STATIC "STATIC")
 endif()
-
-set(${PROJECT_NAME}_MODULES_PACKAGE_DEPENDS_DIR "${PROJECT_SOURCE_DIR}/CMake/PackageDepends")
-list(APPEND MODULES_PACKAGE_DEPENDS_DIRS ${${PROJECT_NAME}_MODULES_PACKAGE_DEPENDS_DIR})
 
 #-----------------------------------------------------------------------------
 # Get project version info

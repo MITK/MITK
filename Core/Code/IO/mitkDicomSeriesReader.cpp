@@ -1563,7 +1563,9 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       // forward some image properties to node
       node.GetPropertyList()->ConcatenatePropertyList( image->GetPropertyList(), true );
 
-      std::string patientName = node.GetProperty("dicom.patient.PatientsName")->GetValueAsString();
+      std::string patientName = "NoName";
+      if(node.GetProperty("dicom.patient.PatientsName"))
+        patientName = node.GetProperty("dicom.patient.PatientsName")->GetValueAsString();
 
       node.SetData( image );
       node.SetName(patientName);
@@ -1648,6 +1650,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
   unsigned int numberOfBlocks(0); // number of 3D image blocks
 
   static const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); //Image position (Patient)
+  const gdcm::Tag tagModality(0x0008,0x0060);
 
   // loop files to determine number of image blocks
   for (StringContainer::const_iterator fileIter = sorted_filenames.begin();
@@ -1658,10 +1661,18 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
 
     if(tagToValueMap.find(tagImagePositionPatient) == tagToValueMap.end())
     {
-      // we expect to get images w/ missing position information ONLY as separated blocks.
-      assert( presortedFilenames.size() == 1 );
-      numberOfBlocks = 1;
-      break;
+      const std::string& modality = tagToValueMap.find(tagModality)->second;
+      if ( modality.compare("RTIMAGE ") == 0 || modality.compare("RTIMAGE") == 0 )
+      {
+        MITK_WARN << "Modality "<< modality <<" is not fully supported yet.";
+        numberOfBlocks = 1;
+        break;
+      } else {
+        // we expect to get images w/ missing position information ONLY as separated blocks.
+        assert( presortedFilenames.size() == 1 );
+        numberOfBlocks = 1;
+        break;
+      }
     }
 
     std::string position = tagToValueMap.find(tagImagePositionPatient)->second;

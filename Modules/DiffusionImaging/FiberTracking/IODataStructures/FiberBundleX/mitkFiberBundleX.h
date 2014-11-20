@@ -78,7 +78,6 @@ public:
     void Compress(float error = 0.0);
 
     // fiber resampling
-    void ResampleLinear(float pointDistance = 1);
     void ResampleSpline(float pointDistance=1);
     void ResampleSpline(float pointDistance, double tension, double continuity, double bias );
 

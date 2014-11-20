@@ -8,7 +8,7 @@ Available sections:
   - \ref org_mitk_gui_qt_PythonSnippets
 
 \section org_mitk_gui_qt_pythonOverview Overview
-The Python view provides the graphical front end to run Python code through the mitkPython module. Furthermore the ITK/VTK/OpenCV Python wrapping can be used.
+The Python view provides the graphical front end to run Python code through the mitkPython module. Furthermore the SimpleITK/VTK/OpenCV Python wrapping can be used.
 Images and surfaces in the DataManager can be transferred via a drag & drop mechanism into the MITK Python Console.
 
 \section org_mitk_gui_qt_pythonUsage Transfer data 
@@ -21,15 +21,13 @@ same properties. When a two dimensional image is transferred the user can choose
 image object. Surfaces are fully memory mapped as a vtkPolyData object. To transfer an image or surface
 from the python runtime to the data manager just double click on the corresponding entry in the Variable Stack View.
 
-\imageMacro{QmitkPythonView.png,"Screenshot of the MITK Python Plugin",20}
+\imageMacro{MitkPythonPluginView.png,"Screenshot of the MITK Python Plugin",20}
 
-\section org_mitk_gui_qt_PythonConsole
+\section org_mitk_gui_qt_PythonConsole Console
 The Python console can be used for interactive programming. All items in the data storage can be accessed
 in the python console. The console can also be used to load python scripts and run them.
 
-\section org_mitk_gui_qt_PythonSnippets
+\section org_mitk_gui_qt_PythonSnippets Snippets
 The python plugin contains some code snippets of SimpleITK/VTK/OpenCV that can be run in the python console.
 Snippets can be modified and saved by the user.
-
-
 */

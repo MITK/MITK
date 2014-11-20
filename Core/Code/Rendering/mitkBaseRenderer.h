@@ -214,7 +214,7 @@ namespace mitk
       //## @brief Get the current 2D-worldgeometry (m_CurrentWorldPlaneGeometry) used for 2D-rendering
       itkGetConstObjectMacro(CurrentWorldPlaneGeometry, PlaneGeometry)
       /**
-      * \deprecatedSince{2014_06} Please use GetCurrentWorldPlaneGeometry
+      * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometry
       */
       DEPRECATED(const PlaneGeometry* GetCurrentWorldGeometry2D()){return GetCurrentWorldPlaneGeometry();};
 
@@ -321,7 +321,7 @@ namespace mitk
       //## @brief Get a DataNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldPlaneGeometry (for 2D rendering)
       itkGetObjectMacro(CurrentWorldPlaneGeometryNode, DataNode)
       /**
-      * \deprecatedSince{2014_06} Please use GetCurrentWorldPlaneGeometryNode
+      * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometryNode
       */
       DEPRECATED(DataNode* GetCurrentWorldGeometry2DNode()){return GetCurrentWorldPlaneGeometryNode();};
 
@@ -336,7 +336,7 @@ namespace mitk
       return m_CurrentWorldPlaneGeometryUpdateTime;
     }
     /**
-    * \deprecatedSince{2014_06} Please use GetCurrentWorldPlaneGeometryUpdateTime
+    * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometryUpdateTime
     */
     DEPRECATED(unsigned long GetCurrentWorldGeometry2DUpdateTime()){return GetCurrentWorldPlaneGeometryUpdateTime();};
 
@@ -529,7 +529,7 @@ namespace mitk
     //## @brief Sets m_CurrentWorldPlaneGeometry
     virtual void SetCurrentWorldPlaneGeometry(PlaneGeometry* geometry2d);
     /**
-    * \deprecatedSince{2014_06} Please use SetCurrentWorldPlaneGeometry
+    * \deprecatedSince{2014_10} Please use SetCurrentWorldPlaneGeometry
     */
     DEPRECATED(void SetCurrentWorldGeometry2D(PlaneGeometry* geometry2d)){SetCurrentWorldPlaneGeometry(geometry2d);};
 

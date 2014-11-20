@@ -15,6 +15,10 @@ http://www.cs.umd.edu/~mount/ANN/
 
 http://www.boost.org/
 
+\par CppUnit
+
+http://sourceforge.net/projects/cppunit/
+
 \par CTK
 
 http://www.commontk.org/
@@ -29,7 +33,11 @@ http://gdcm.sourceforge.net/
 
 \par GLEW (The OpenGL Extension Wrangler Library)
 
-http://glew.sourceforge.net/ (Version 1.5.1?)
+http://glew.sourceforge.net/
+
+\par GLUT
+
+https://www.opengl.org/resources/libraries/glut/
 
 \par ITK
 
@@ -43,9 +51,25 @@ http://public.kitware.com/KWStyle/
 
 http://www.libqxt.org/
 
+\par NumPy
+
+http://www.numpy.org/
+
 \par OpenCV
 
 http://opencv.willowgarage.com/wiki/Welcome
+
+\par PCRE
+
+http://www.pcre.org/
+
+\par POCO (Portable Components)
+
+http://pocoproject.org
+
+\par Python
+
+https://www.python.org/
 
 \par Qt
 
@@ -55,9 +79,17 @@ http://qt.nokia.com/
 
 http://qwt.sourceforge.net/
 
+\par SimpleITK
+
+http://www.simpleitk.org/
+
 \par SOFA
 
 http://www.sofa-framework.org/
+
+\par SWIG
+
+http://swig.org/
 
 \par tinyxml
 
@@ -67,12 +99,10 @@ http://sourceforge.net/projects/tinyxml/
 
 http://www.vtk.org/
 
+\par zlib
 
-The following third-party libraries are distributed with MITK and used in several places.
+https://github.com/commontk/zlib
 
-\par POCO (Portable Components, Basic Edition)
-
-http://pocoproject.org (Version 1.3.5)
 
 
 For copyright information on any of the above toolkits see the corresponding home page or the corresponding source folder.

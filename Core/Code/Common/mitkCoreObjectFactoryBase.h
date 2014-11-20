@@ -51,22 +51,22 @@ class MITK_CORE_EXPORT CoreObjectFactoryBase : public itk::Object
     virtual void SetDefaultProperties(mitk::DataNode* node) = 0;
 
     /**
-     * @deprecatedSince{2014_03} See mitk::FileReaderRegistry and QmitkIOUtil
+     * @deprecatedSince{2014_10} See mitk::FileReaderRegistry and QmitkIOUtil
      */
     virtual const char* GetFileExtensions() = 0;
 
     /**
-     * @deprecatedSince{2014_03} See mitk::FileReaderRegistry and QmitkIOUtil
+     * @deprecatedSince{2014_10} See mitk::FileReaderRegistry and QmitkIOUtil
      */
     virtual MultimapType GetFileExtensionsMap() = 0;
 
     /**
-     * @deprecatedSince{2014_03} See mitk::FileWriterRegistry and QmitkIOUtil
+     * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
     virtual const char* GetSaveFileExtensions() = 0;
 
     /**
-     * @deprecatedSince{2014_03} See mitk::FileWriterRegistry and QmitkIOUtil
+     * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
     virtual MultimapType GetSaveFileExtensionsMap() = 0;
 
@@ -80,7 +80,7 @@ class MITK_CORE_EXPORT CoreObjectFactoryBase : public itk::Object
     }
 
     /**
-     * @deprecatedSince{2014_03} See mitk::FileWriterRegistry
+     * @deprecatedSince{2014_10} See mitk::FileWriterRegistry
      */
     FileWriterList GetFileWriters()
     {
@@ -95,7 +95,7 @@ class MITK_CORE_EXPORT CoreObjectFactoryBase : public itk::Object
      * @param fileExtensions the converted output string, suitable for the QT QFileDialog widget
      *                       e.g. "all (*.dcm *.DCM *.dc3 ... *.vti *.hdr *.nrrd *.nhdr );;Q-Ball Images (*.hqbi *qbi)"
      *
-     * @deprecatedSince{2014_03}
+     * @deprecatedSince{2014_10}
      */
     static void CreateFileExtensions(MultimapType fileExtensionsMap, std::string& fileExtensions);
 

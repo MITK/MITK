@@ -126,6 +126,8 @@ private:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  /// \brief called when DataNode is removed to stop gibbs tracking after node is removed
+  virtual void NodeRemoved(const mitk::DataNode * node);
 
   void UpdateIteraionsGUI(unsigned long iterations);    ///< update iterations label text
 
@@ -133,6 +135,7 @@ private:
   QmitkStdMultiWidget* m_MultiWidget;
 
   /** data objects */
+  mitk::DataNode::Pointer       m_TrackingNode;     ///< actual node that is tracked
   mitk::FiberBundleX::Pointer   m_FiberBundle;      ///< tracking output
   ItkFloatImageType::Pointer    m_MaskImage;        ///< used to reduce the algorithms search space. tracking only inside of the mask.
   mitk::TensorImage::Pointer    m_TensorImage;      ///< actual image that is tracked
@@ -162,4 +165,3 @@ private:
 };
 
 #endif // _QMITKGibbsTrackingVIEW_H_INCLUDED
-

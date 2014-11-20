@@ -88,7 +88,7 @@ QmitkDiffusionImagingAppIntroPart::~QmitkDiffusionImagingAppIntroPart()
     == "org.mitk.diffusionimagingapp.perspectives.welcome"
       && !this->GetIntroSite()->GetPage()->GetWorkbenchWindow()->GetWorkbench()->IsClosing())
     {
-    berry::IPerspectiveDescriptor::Pointer perspective = this->GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->GetPerspectiveRegistry()->FindPerspectiveWithId("org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp");
+    berry::IPerspectiveDescriptor::Pointer perspective = this->GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->GetPerspectiveRegistry()->FindPerspectiveWithId("org.mitk.perspectives.diffusiondefault");
     if (perspective)
     {
       this->GetIntroSite()->GetPage()->SetPerspective(perspective);

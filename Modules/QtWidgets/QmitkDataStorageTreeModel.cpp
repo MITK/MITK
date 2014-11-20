@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QIcon>
 #include <QMimeData>
 #include <QTextStream>
+#include <QFile>
 
 #include <map>
 
@@ -319,11 +320,13 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
     mitk::BaseProperty* studyDescription = (dataNode->GetProperty("dicom.study.StudyDescription"));
     mitk::BaseProperty* patientsName = (dataNode->GetProperty("dicom.patient.PatientsName"));
 
-    nodeName.append(patientsName->GetValueAsString().c_str()).append("\n");
-    nodeName.append(studyDescription->GetValueAsString().c_str()).append("\n");
-    nodeName.append(seriesDescription->GetValueAsString().c_str());
-  }else{
-      nodeName = QString::fromStdString(dataNode->GetName());
+    nodeName += QFile::encodeName(patientsName->GetValueAsString().c_str()) + "\n";
+    nodeName += QFile::encodeName(studyDescription->GetValueAsString().c_str()) +  "\n";
+    nodeName += QFile::encodeName(seriesDescription->GetValueAsString().c_str());
+  }
+  else
+  {
+    nodeName = QFile::encodeName(dataNode->GetName().c_str());
   }
   if(nodeName.isEmpty())
   {

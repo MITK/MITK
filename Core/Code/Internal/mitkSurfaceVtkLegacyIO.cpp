@@ -90,7 +90,9 @@ void SurfaceVtkLegacyIO::Write()
 
     if (writer->Write() == 0 || writer->GetErrorCode() != 0 )
     {
-      mitkThrow() << "Error during surface writing: " << vtkErrorCode::GetStringFromErrorCode(writer->GetErrorCode());
+      mitkThrow() << "Error during surface writing" << (writer->GetErrorCode() ?
+                                                          std::string(": ") + vtkErrorCode::GetStringFromErrorCode(writer->GetErrorCode()) :
+                                                          std::string());
     }
 
     if (this->GetOutputStream() && input->GetTimeGeometry()->CountTimeSteps() > 1)

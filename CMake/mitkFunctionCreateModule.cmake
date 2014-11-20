@@ -26,23 +26,22 @@ endfunction()
 #! USAGE:
 #!
 #! \code
-#! MITK_CREATE_MODULE([<moduleName>]
+#! mitk_create_module([<moduleName>]
 #!     [INCLUDE_DIRS <include directories>]
 #!     [INTERNAL_INCLUDE_DIRS <internally used include directories>]
 #!     [DEPENDS <modules we need>]
 #!     [PACKAGE_DEPENDS <packages we need, like ITK, VTK, QT>]
 #!     [TARGET_DEPENDS <list of additional dependencies>
 #!     [EXPORT_DEFINE <declspec macro name for dll exports>]
-#!     [QT_MODULE]
 #!     [HEADERS_ONLY]
 #!     [WARNINGS_AS_ERRORS]
 #! \endcode
 #!
 #! The <moduleName> parameter specifies the name of the module which is used
-#! create a logical target name. The parameter is options in case the
+#! to create a logical target name. The parameter is optional in case the
 #! MITK_MODULE_NAME_DEFAULTS_TO_DIRECTORY_NAME variable evaluates to TRUE. The
 #! module name will then be derived from the directory name in which this
-#! macro is called.
+#! function is called.
 #!
 #! If set, the following variables will be used to validate the module name:
 #!
@@ -73,8 +72,42 @@ endfunction()
 #! - MODULE_SUBPROJECTS
 #! - ALL_META_DEPENDENCIES
 #!
-#! \param QT_MODULE deprecated. Just use Qt4 or Qt5 in the PACKAGE_DEPENDS argument.
-#! \param HEADERS_ONLY specify this if the modules just contains header files.
+#! \sa mitk_create_executable
+#!
+#! Parameters (all optional):
+#!
+#! \param <moduleName> The module name (also used as target name)
+#! \param SUBPROJECTS List of CDash labels
+#! \param VERSION Module version number, e.g. "1.2.0"
+#! \param INCLUDE_DIRS Public include dirs (used in mitkMacroCreateModuleConf.cmake)
+#! \param INTERNAL_INCLUDE_DIRS Private include dirs internal to this module
+#! \param DEPENDS List of public module dependencies
+#! \param DEPENDS_INTERNAL List of private module dependencies
+#! \param PACKAGE_DEPENDS List of public packages dependencies (e.g. Qt, VTK, etc.).
+#!        Package dependencies have the following syntax:
+#!        \verbatim
+#! PACKAGE[|COMPONENT1[+COMPONENT2]...]
+#! \endverbatim
+#! \param TARGET_DEPENDS List of CMake targets this module depends on
+#! \param EXPORT_DEFINE Export macro name for public symbols of this module
+#! \param AUTOLOAD_WITH A module target name identifying the module which will
+#!        trigger the automatic loading of this module
+#! \param ADDITIONAL_LIBS List of addidtional libraries linked to this module
+#! \param FILES_CMAKE File name of a CMake file setting source list variables
+#!        (defaults to files.cmake)
+#! \param DEPRECATED_SINCE Marks this modules as deprecated since <arg>
+#! \param DESCRIPTION A description for this module
+#!
+#! Options (optional)
+#!
+#! \param FORCE_STATIC Force building this module as a static library
+#! \param HEADERS_ONLY This module is a headers-only library
+#! \param GCC_DEFAULT_VISIBILITY Do not use gcc visibility flags - all
+#!        symbols will be exported
+#! \param NO_INIT Do not create CppMicroServices initialization code
+#! \param NO_FEATURE_INFO Do not create a feature info by calling add_feature_info()
+#! \param WARNINGS_AS_ERRORS Treat compiler warnings as errors
+#
 ##################################################################
 function(mitk_create_module)
 
@@ -93,13 +126,11 @@ function(mitk_create_module)
       ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
       FILES_CMAKE            # file name of a CMake file setting source list variables
                              # (defaults to files.cmake)
-      GENERATED_CPP          # not used (?)
       DEPRECATED_SINCE       # marks this modules as deprecated
       DESCRIPTION            # a description for this module
      )
 
   set(_macro_options
-      QT_MODULE              # the module makes use of Qt4 features and needs moc and ui generated files
       FORCE_STATIC           # force building this module as a static library
       HEADERS_ONLY           # this module is a headers-only library
       GCC_DEFAULT_VISIBILITY # do not use gcc visibility flags - all symbols will be exported
@@ -148,13 +179,6 @@ function(mitk_create_module)
   endif()
   if(NOT IS_ABSOLUTE ${MODULE_FILES_CMAKE})
     set(MODULE_FILES_CMAKE ${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_FILES_CMAKE})
-  endif()
-
-  if (MODULE_QT_MODULE)
-    message(WARNING "QT_MODULE keyword is deprecated (in ${_module_type} ${MODULE_NAME}). Please use PACKAGE_DEPENDS Qt4|QtCore and/or PACKAGE_DEPENDS Qt5|Core instead")
-    if (NOT "${MODULE_PACKAGE_DEPENDS}" MATCHES "^.*Qt4.*$")
-      list(APPEND MODULE_PACKAGE_DEPENDS Qt4|QtGui)
-    endif()
   endif()
 
   if(MODULE_HEADERS_ONLY)
@@ -400,12 +424,7 @@ function(mitk_create_module)
             endforeach()
 
             # Add a source level dependencies on resource files
-            if(source_res_files)
-              list(APPEND CPP_FILES ${MODULE_TARGET}_resources.cpp)
-            endif()
-            if(binary_res_files)
-              list(APPEND CPP_FILES ${CMAKE_CURRENT_BINARY_DIR}/${MODULE_TARGET}_binary_resources.cpp)
-            endif()
+            usFunctionGetResourceSource(TARGET ${MODULE_TARGET} OUT CPP_FILES)
           endif()
         endif()
 
@@ -572,7 +591,6 @@ function(mitk_create_module)
 
           if(binary_res_files)
             usFunctionAddResources(TARGET ${MODULE_TARGET}
-                                   SOURCE_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${MODULE_TARGET}_binary_resources.cpp
                                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}
                                    FILES ${binary_res_files})
           endif()
@@ -580,6 +598,9 @@ function(mitk_create_module)
             usFunctionAddResources(TARGET ${MODULE_TARGET}
                                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${res_dir}
                                    FILES ${source_res_files})
+          endif()
+          if(binary_res_files OR source_res_files)
+            usFunctionEmbedResources(TARGET ${MODULE_TARGET})
           endif()
 
         endif()

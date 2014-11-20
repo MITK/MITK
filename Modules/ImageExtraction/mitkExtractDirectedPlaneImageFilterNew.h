@@ -69,7 +69,7 @@ public:
       itkSetMacro(CurrentWorldPlaneGeometry, BaseGeometry* );
 
     /**
-     * \deprecatedSince{2014_06} Please use SetCurrentWorldPlaneGeometry
+     * \deprecatedSince{2014_10} Please use SetCurrentWorldPlaneGeometry
      */
     DEPRECATED(void SetCurrentWorldGeometry2D(BaseGeometry* geo)){SetCurrentWorldPlaneGeometry(geo);};
 

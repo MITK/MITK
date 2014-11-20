@@ -132,23 +132,6 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
     //emit StartBlockControls();
 
     mitk::DataNode* n;
-    n = this->m_MultiWidget->GetWidgetPlane1();
-    if(n)
-    {
-        n->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ) );
-    }
-
-    n = this->m_MultiWidget->GetWidgetPlane2();
-    if(n)
-    {
-        n->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ) );
-    }
-
-    n = this->m_MultiWidget->GetWidgetPlane3();
-    if(n)
-    {
-        n->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ) );
-    }
 
     QString fileName = "/axial.png";
     int c = 1;
@@ -216,6 +199,8 @@ void QmitkScreenshotMaker::Generate3DHighresScreenshot()
     if (fileName.size()>0)
         m_LastFile = fileName;
     GenerateHR3DAtlasScreenshots(fileName);
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkScreenshotMaker::GenerateMultiplanar3DHighresScreenshot()
@@ -270,6 +255,8 @@ void QmitkScreenshotMaker::GenerateMultiplanar3DHighresScreenshot()
     GetCam()->Elevation( 90 );
     GetCam()->Roll( -2.5 );
     GenerateHR3DAtlasScreenshots(filePath+fileName);
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName)

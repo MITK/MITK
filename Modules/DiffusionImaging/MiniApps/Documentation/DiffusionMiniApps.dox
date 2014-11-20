@@ -70,11 +70,26 @@ and therefore registration fails. In this case you can try the -c option which u
 
 Copies the geometry (origin) of the source image to the target image.
 
-\subsection DicomLoad Dicom Loader
 
-Dicom Tools allow to parse dicom folders and export NRRD or DWI files, using standard naming.
+\subsection ImageResampler Resampling of Images
 
-TODO enhance Docu, when MiniApp is ready ..
+This tool can be used to resample images in different ways. One way is by specifying the spacing.
+Transforming an image test.nrrd to have a spacing of 1x1x3 mm can be done using this command:
+
+\code
+$./MitkDiffusionMiniApps ImageResampler -i test.nrrd -s 1,1,3 -o resampledImage.nrrd
+\endcode
+
+Alternatively this program can be used to resample by reference. This will resample the input image to the grid provided by the reference image
+and also ensure they occupy the same physical space (that is the input image will have the same origin and voxel dimensions)
+
+\code
+$./MitkDiffusionMiniApps ImageResampler -i test.nrrd -r referenceImage.nrrd -o resampledImage.nrrd
+\endcode
+
+\note Resampling by reference image can also be applied to MR Diffusion data (.dwi files).
+
+
 
 \subsection TensorRecon Tensor Reconstruction
 See \ref QmitkDiffusionImagingUserManualTensorReconstruction for the GUI equivalent of this tool.

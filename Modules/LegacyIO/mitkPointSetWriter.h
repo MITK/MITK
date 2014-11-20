@@ -37,7 +37,7 @@ namespace mitk
  * @ingroup PSIO
  * @ingroup Process
  *
- * @deprecatedSince{2014_03} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+ * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
 class MitkLegacyIO_EXPORT PointSetWriter : public mitk::FileWriter
 {

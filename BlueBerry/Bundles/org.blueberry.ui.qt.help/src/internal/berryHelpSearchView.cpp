@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMenu>
 #include <QEvent>
 #include <QMouseEvent>
+#include <QMimeData>
 #include <QTextBrowser>
 #include <QClipboard>
 #include <QHelpSearchQueryWidget>
@@ -81,7 +82,7 @@ void HelpSearchView::CreateQtPartControl(QWidget* parent)
     connect(m_SearchEngine, SIGNAL(searchingFinished(int)), this,
             SLOT(searchingFinished(int)));
 
-    QTextBrowser* browser = qFindChild<QTextBrowser*>(m_ResultWidget);
+    QTextBrowser* browser = m_ResultWidget->findChild<QTextBrowser*>();
     if (browser) // Will be null if QtHelp was configured not to use CLucene.
     {
       browser->viewport()->installEventFilter(this);
@@ -102,7 +103,7 @@ void HelpSearchView::SetFocus()
 
 void HelpSearchView::zoomIn()
 {
-  QTextBrowser* browser = qFindChild<QTextBrowser*>(m_ResultWidget);
+  QTextBrowser* browser = m_ResultWidget->findChild<QTextBrowser*>();
   if (browser && m_ZoomCount != 10)
   {
     m_ZoomCount++;
@@ -112,7 +113,7 @@ void HelpSearchView::zoomIn()
 
 void HelpSearchView::zoomOut()
 {
-  QTextBrowser* browser = qFindChild<QTextBrowser*>(m_ResultWidget);
+  QTextBrowser* browser = m_ResultWidget->findChild<QTextBrowser*>();
   if (browser && m_ZoomCount != -5)
   {
     m_ZoomCount--;
@@ -125,7 +126,7 @@ void HelpSearchView::resetZoom()
   if (m_ZoomCount == 0)
     return;
 
-  QTextBrowser* browser = qFindChild<QTextBrowser*>(m_ResultWidget);
+  QTextBrowser* browser = m_ResultWidget->findChild<QTextBrowser*>();
   if (browser)
   {
     browser->zoomOut(m_ZoomCount);
@@ -158,7 +159,7 @@ void HelpSearchView::requestShowLink(const QUrl &link)
 
 bool HelpSearchView::eventFilter(QObject* o, QEvent *e)
 {
-  QTextBrowser* browser = qFindChild<QTextBrowser*>(m_ResultWidget);
+  QTextBrowser* browser = m_ResultWidget->findChild<QTextBrowser*>();
   if (browser && o == browser->viewport()
       && e->type() == QEvent::MouseButtonRelease)
   {
@@ -182,7 +183,7 @@ void HelpSearchView::showContextMenu(const QPoint& point)
 {
   QMenu menu;
 
-  QTextBrowser* browser = qFindChild<QTextBrowser*>(m_ResultWidget);
+  QTextBrowser* browser = m_ResultWidget->findChild<QTextBrowser*>();
   if (!browser)
     return;
 

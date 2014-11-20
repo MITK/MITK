@@ -125,7 +125,11 @@ int main(int argc, char** argv)
 
     // Append a hash value of the absolute path of the executable to the data location.
     // This allows to start the same application from different build or install trees.
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    storageDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + '_';
+#else
     storageDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + '_';
+#endif
     storageDir += QString::number(qHash(QCoreApplication::applicationDirPath())) + QDir::separator();
   }
   us::ModuleSettings::SetStoragePath((storageDir + QString("us") + QDir::separator()).toStdString());

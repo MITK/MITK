@@ -92,7 +92,7 @@ public:
         plugin->start(ctkPlugin::START_TRANSIENT);
 
         QString typeName = plugin->getSymbolicName() + "_" + QString::fromStdString(className);
-        int extensionTypeId = ExtensionType::type(typeName.toAscii().data());
+        int extensionTypeId = ExtensionType::type(typeName.toLatin1().data());
         if (extensionTypeId == 0)
         {
           BERRY_WARN << "The class " << className << " was not registered as an Extension Type using BERRY_REGISTER_EXTENSION_CLASS(type, pluginContext) or you forgot to run Qt's moc on the header file. "

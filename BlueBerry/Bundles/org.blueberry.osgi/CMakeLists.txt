@@ -5,6 +5,9 @@ MACRO_CREATE_CTK_PLUGIN(
   EXPORTED_INCLUDE_SUFFIXES src src/application src/event src/service
   )
 
+if(MITK_USE_Qt5)
+  qt5_use_modules(${PLUGIN_TARGET} Concurrent Gui Sql)
+endif()
 
 add_executable(${OSGI_APP} MACOSX_BUNDLE "src/application/berryMain.cpp")
 
@@ -20,6 +23,10 @@ configure_file(src/application/solstice.ini
 
 
 add_executable(${OSGI_UI_APP} MACOSX_BUNDLE "src/application/berryMainUI.cpp")
+
+if(MITK_USE_Qt5)
+  qt5_use_modules(${OSGI_UI_APP} Widgets)
+endif()
 
 target_link_libraries(${OSGI_UI_APP} ${PROJECT_NAME} mbilog)
 if(_ctk_test_plugins)

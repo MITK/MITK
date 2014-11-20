@@ -12,4 +12,9 @@ MITK_CREATE_MODULE(
   WARNINGS_AS_ERRORS
 )
 
+if(MSVC)
+    list(APPEND module_compile_flags /wd4005)
+    set_target_properties(${MODULE_TARGET} PROPERTIES COMPILE_FLAGS "${module_compile_flags}")
+  endif()
+
 add_subdirectory(Testing)

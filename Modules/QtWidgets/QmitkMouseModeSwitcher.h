@@ -21,7 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkMouseModeSwitcher.h"
 
-#include <QtGui>
+#include <QActionGroup>
+#include <QToolBar>
 
 /**
  * \ingroup QmitkModule

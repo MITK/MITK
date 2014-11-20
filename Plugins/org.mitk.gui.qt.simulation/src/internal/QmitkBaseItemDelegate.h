@@ -18,17 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkBaseItemDelegate_h
 
 #include <QStyledItemDelegate>
-
-namespace sofa
-{
-  namespace core
-  {
-    namespace objectmodel
-    {
-      class BaseData;
-    }
-  }
-}
+#include <sofa/core/objectmodel/BaseData.h>
 
 class QmitkBaseItemDelegate : public QStyledItemDelegate
 {

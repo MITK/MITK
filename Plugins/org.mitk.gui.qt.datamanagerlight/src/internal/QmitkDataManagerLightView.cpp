@@ -16,7 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDataManagerLightView.h"
 #include "mitkNodePredicateDataType.h"
-#include <QtGui>
+#include <QApplication>
+#include <QFileDialog>
+#include <QGridLayout>
+#include <QIcon>
+#include <QLabel>
+#include <QListWidget>
+#include <QMessageBox>
+#include <QPushButton>
 #include <mitkCoreObjectFactory.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
@@ -162,7 +169,7 @@ void QmitkDataManagerLightView::on_Load_pressed()
   QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Load data", "", mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
-    FileOpen((*it).toAscii(), 0);
+    FileOpen((*it).toLatin1(), 0);
   }
 }
 

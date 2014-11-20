@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "berryEditorReference.h"
-
 #include "tweaklets/berryWorkbenchPageTweaklet.h"
+
+#include "berryEditorReference.h"
 
 #include "berryEditorManager.h"
 #include "berryEditorDescriptor.h"

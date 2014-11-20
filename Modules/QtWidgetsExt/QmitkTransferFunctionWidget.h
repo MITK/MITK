@@ -48,8 +48,6 @@ class MitkQtWidgetsExt_EXPORT QmitkTransferFunctionWidget : public QWidget, publ
 
     void SetDataNode(mitk::DataNode* node, const mitk::BaseRenderer* renderer = NULL);
 
-   void SetIntegerMode(bool intMode);
-
    void SetScalarLabel(const QString& scalarLabel);
 
    void ShowScalarOpacityFunction(bool show);
@@ -72,15 +70,15 @@ class MitkQtWidgetsExt_EXPORT QmitkTransferFunctionWidget : public QWidget, publ
     void UpdateRanges();
     void OnResetSlider();
 
-   void OnSpanChanged (double lower, double upper);
+   void OnSpanChanged (int lower, int upper);
 
 
   protected:
 
     mitk::TransferFunctionProperty::Pointer tfpToChange;
 
-    double m_RangeSliderMin;
-    double m_RangeSliderMax;
+    int m_RangeSliderMin;
+    int m_RangeSliderMax;
 
     mitk::SimpleHistogramCache histogramCache;
 

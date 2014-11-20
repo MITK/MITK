@@ -35,4 +35,6 @@ namespace mitk {
 
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_moviemaker, mitk::MovieMakerPluginActivator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_moviemaker, mitk::MovieMakerPluginActivator)
+#endif

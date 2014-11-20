@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtPlugin>
 #include "QmitkToFUtilView.h"
 #include "QmitkToFDeviceGeneration.h"
+#include "QmitkToFScreenshotMaker.h"
 
 namespace mitk {
 
@@ -25,6 +26,7 @@ void PluginActivator::start(ctkPluginContext* context)
 {
     BERRY_REGISTER_EXTENSION_CLASS(QmitkToFUtilView, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkToFDeviceGeneration, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkToFScreenshotMaker, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

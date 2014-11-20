@@ -11,6 +11,10 @@
           name="ToFDeviceGeneration"
           class="QmitkToFDeviceGeneration"
           icon="resources/iconGenerationView.xpm" />
+    <view id="org.mitk.views.tofscreenshotmaker"
+          name="ToFScreenshotMaker"
+          class="QmitkToFScreenshotMaker"
+          icon="resources/iconToFScrenshotMaker.xpm" />
   </extension>
 
 </plugin>

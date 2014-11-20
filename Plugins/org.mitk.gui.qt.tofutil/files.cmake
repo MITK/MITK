@@ -6,17 +6,20 @@ set(INTERNAL_CPP_FILES
   QmitkToFUtilView.cpp
   QmitkToFDeviceGeneration.cpp
   QmitkToFImageBackground.cpp
+  QmitkToFScreenshotMaker.cpp
   mitkPluginActivator.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkToFDeviceGenerationControls.ui
   src/internal/QmitkToFUtilViewControls.ui
+  src/internal/QmitkToFScreenshotMakerControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/QmitkToFUtilView.h
   src/internal/QmitkToFDeviceGeneration.h
+  src/internal/QmitkToFScreenshotMaker.h
   src/internal/QmitkToFImageBackground.h
   src/internal/mitkPluginActivator.h
 )
@@ -25,6 +28,7 @@ set(CACHED_RESOURCE_FILES
   plugin.xml
   resources/iconGenerationView.xpm
   resources/iconToFUtilView.xpm
+  resources/iconToFScrenshotMaker.xpm
 )
 
 set(QRC_FILES

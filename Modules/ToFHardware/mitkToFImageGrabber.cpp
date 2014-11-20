@@ -14,7 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkToFImageGrabber.h"
-#include "itkCommand.h"
+#include <itkCommand.h>
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
 
 namespace mitk
 {
@@ -130,11 +132,17 @@ bool ToFImageGrabber::DisconnectCamera()
 void ToFImageGrabber::StartCamera()
 {
   m_ToFCameraDevice->StartCamera();
+  us::ModuleContext* context = us::GetModuleContext();
+  us::ServiceProperties deviceProps;
+  deviceProps["ToFImageSourceName"] = std::string("Image Grabber");
+  m_ServiceRegistration = context->RegisterService<mitk::ToFImageSource>(this,deviceProps);
 }
 
 void ToFImageGrabber::StopCamera()
 {
   m_ToFCameraDevice->StopCamera();
+  if (m_ServiceRegistration != NULL) m_ServiceRegistration.Unregister();
+  m_ServiceRegistration = 0;
 }
 
 bool ToFImageGrabber::IsCameraActive()

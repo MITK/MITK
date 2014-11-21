@@ -290,8 +290,11 @@ void QmitkIGTLDeviceSourceManagementWidget::OnSendCommand()
   }
 
   m_IGTLDevice->SendMessage(m_CurrentCommand.GetPointer());
-  MITK_INFO("IGTLDeviceSourceManagementWidget")
-      << "Sent command with DeviceType: " << m_CurrentCommand->GetDeviceType();
+  if ( this->m_Controls->logSendReceiveMsg->isChecked() )
+  {
+    MITK_INFO("IGTLDeviceSourceManagementWidget")
+        << "Sent command with DeviceType: " << m_CurrentCommand->GetDeviceType();
+  }
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::OnCommandChanged(
@@ -313,8 +316,11 @@ void QmitkIGTLDeviceSourceManagementWidget::OnSendMessage()
   igtl::StringMessage::Pointer msg = igtl::StringMessage::New();
   msg->SetString(toBeSend);
   m_IGTLDevice->SendMessage(msg.GetPointer());
-  MITK_INFO("IGTLDeviceSourceManagementWidget")
-      << "Sent message with DeviceType: " << msg->GetDeviceType();
+  if ( this->m_Controls->logSendReceiveMsg->isChecked() )
+  {
+    MITK_INFO("IGTLDeviceSourceManagementWidget")
+        << "Sent message with DeviceType: " << msg->GetDeviceType();
+  }
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::OnMessageReceived(
@@ -323,8 +329,11 @@ void QmitkIGTLDeviceSourceManagementWidget::OnMessageReceived(
   //get the IGTL device that invoked this event
   mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
 
-  MITK_INFO("IGTLDeviceSourceManagementWidget") << "Received a message: "
-      << dev->GetReceiveQueue()->GetLatestMsgInformationString();
+  if ( this->m_Controls->logSendReceiveMsg->isChecked() )
+  {
+    MITK_INFO("IGTLDeviceSourceManagementWidget") << "Received a message: "
+        << dev->GetReceiveQueue()->GetLatestMsgInformationString();
+  }
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::OnCommandReceived(
@@ -333,8 +342,11 @@ void QmitkIGTLDeviceSourceManagementWidget::OnCommandReceived(
   //get the IGTL device that invoked this event
   mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
 
-  MITK_INFO("IGTLDeviceSourceManagementWidget") << "Received a command: "
-      << dev->GetCommandQueue()->GetLatestMsgInformationString();
+  if ( this->m_Controls->logSendReceiveMsg->isChecked() )
+  {
+    MITK_INFO("IGTLDeviceSourceManagementWidget") << "Received a command: "
+        << dev->GetCommandQueue()->GetLatestMsgInformationString();
+  }
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::FillCommandsComboBox()

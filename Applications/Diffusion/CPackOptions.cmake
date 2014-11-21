@@ -6,9 +6,9 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MITK application for processing of MR dif
 # Major version is the year of release
 set(CPACK_PACKAGE_VERSION_MAJOR "2014")
 # Minor version is the month of release
-set(CPACK_PACKAGE_VERSION_MINOR "04")
+set(CPACK_PACKAGE_VERSION_MINOR "10")
 # Patch versioning is not intended to be done
-set(CPACK_PACKAGE_VERSION_PATCH "99")
+set(CPACK_PACKAGE_VERSION_PATCH "00")
 
 # this should result in names like 2011.09, 2012.06, ...
 # version has to be set explicitly to avoid such things as CMake creating the install directory "MITK Diffusion 2011.."

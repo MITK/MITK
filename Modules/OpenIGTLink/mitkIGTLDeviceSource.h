@@ -145,6 +145,48 @@ namespace mitk {
     **/
     virtual void OnIncomingCommand();
 
+
+    using Superclass::SetInput;
+
+    /**
+    * \brief Set input with id idx of this filter
+    *
+    */
+    virtual void SetInput( unsigned int idx, const IGTLMessage* msg );
+
+    /**
+    * \brief Get the input of this filter
+    */
+    const IGTLMessage* GetInput(void) const;
+
+    /**
+    * \brief Get the input with id idx of this filter
+    */
+    const IGTLMessage* GetInput(unsigned int idx) const;
+
+    /**
+    * \brief Get the input with name messageName of this filter
+    */
+    const IGTLMessage* GetInput(std::string msgName) const;
+
+    /**
+    *\brief return the index of the input with name msgName, throw
+    * std::invalid_argument exception if that name was not found
+    *
+    * \warning if a subclass has inputs that have different data type than
+    * mitk::IGTLMessage, they have to overwrite this method
+    */
+    DataObjectPointerArraySizeType GetInputIndex(std::string msgName);
+
+    /**
+    *\brief return the index of the output with name msgName, -1 if no output
+    * with that name was found
+    *
+    * \warning if a subclass has outputs that have different data type than
+    * mitk::IGTLMessage, they have to overwrite this method
+    */
+    DataObjectPointerArraySizeType GetOutputIndex(std::string msgName);
+
     /** the OpenIGTLink device that is used as a source for this filter object*/
     mitk::IGTLDevice::Pointer m_IGTLDevice;
   };

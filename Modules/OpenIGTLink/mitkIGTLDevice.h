@@ -96,7 +96,7 @@ namespace mitk {
        *
        * Convenience function to work with mitk::IGTLMessage directly.
        */
-      void SendMessage(mitk::IGTLMessage* msg);
+      void SendMessage(const IGTLMessage* msg);
 
       /**
        * \brief return current object state (Setup, Ready or Running)

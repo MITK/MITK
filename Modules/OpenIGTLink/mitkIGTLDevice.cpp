@@ -238,17 +238,13 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   }
 }
 
-void mitk::IGTLDevice::SendMessage(mitk::IGTLMessage* msg)
+void mitk::IGTLDevice::SendMessage(const mitk::IGTLMessage* msg)
 {
   this->SendMessage(msg->GetMessage());
 }
 
 void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
 {
-  //create some debug output
-  igtl::TrackingDataMessage::Pointer tdMsg = (igtl::TrackingDataMessage*)msg.GetPointer();
-
-
   //add the message to the queue
   m_SendQueue->PushMessage(msg);
 }

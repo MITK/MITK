@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLDevice.h"
 #include "mitkIGTLDeviceSource.h"
 
+//itk
+#include "itkCommand.h"
+
 namespace mitk {
   /**Documentation
   * \brief Provides information/objects from a MITK-Pipeline to other OpenIGTLink
@@ -40,12 +43,14 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
+    typedef itk::SimpleMemberCommand<mitk::IGTLMessageProvider> ProviderCommand;
+
     /**
     * \brief sends the msg to the requesting client
     *
     * Note: so far it broadcasts the message to all registered clients
     */
-    void Send(mitk::IGTLMessage* msg);
+    void Send(const IGTLMessage* msg);
 
   protected:
     IGTLMessageProvider();
@@ -82,10 +87,52 @@ namespace mitk {
     virtual void OnIncomingCommand();
 
     /**
+    *\brief Connects the input of this filter to the outputs of the given
+    * IGTLMessageSource
+    *
+    * This method does not support smartpointer. use FilterX.GetPointer() to
+    * retrieve a dumbpointer.
+    */
+    void ConnectTo( mitk::IGTLMessageSource* UpstreamFilter );
+
+    /**
     * \brief Looks for microservices that provide messages with the requested
     * type.
     **/
     mitk::IGTLMessageSource::Pointer GetFittingSource(const char* requestedType);
+
+  private:
+    /**
+     * \brief a command that has to be executed in the main thread
+     */
+    ProviderCommand::Pointer m_StreamingCommand;
+
+    /**
+     * \brief Timer thread for generating a continuous time signal for the stream
+     *
+     * Everyt time the time is passed a time signal is invoked.
+     *
+     * \param pInfoStruct pointer to the mitkIGTLMessageProvider object
+     * \return
+     */
+    static ITK_THREAD_RETURN_TYPE TimerThread(void* pInfoStruct);
+
+    int                                       m_ThreadId;
+
+    /** \brief timer thread will terminate after the next wakeup if set to true */
+    bool                                      m_StopStreamingThread;
+
+    itk::SmartPointer<itk::MultiThreader>     m_MultiThreader;
+
+    /** \brief the time used for streaming */
+    unsigned int     m_StreamingTime;
+
+    /** \brief mutex for guarding m_Time */
+    itk::SmartPointer<itk::FastMutexLock>     m_StreamingTimeMutex;
+
+    /** \brief mutex for guarding m_StopStreamingThread */
+    itk::SmartPointer<itk::FastMutexLock>     m_StopStreamingThreadMutex;
+
   };
 } // namespace mitk
 #endif /* MITKIGTLMESSAGEPROVIDER_H_HEADER_INCLUDED_ */

@@ -189,6 +189,20 @@ void mitk::IGTLDeviceSource::UpdateOutputInformation()
   Superclass::UpdateOutputInformation();
 }
 
+void mitk::IGTLDeviceSource::SetInput( unsigned int idx, const IGTLMessage* msg )
+{
+  if ( msg == NULL ) // if an input is set to NULL, remove it
+  {
+    this->RemoveInput(idx);
+  }
+  else
+  {
+    // ProcessObject is not const-correct so a const_cast is required here
+    this->ProcessObject::SetNthInput(idx, const_cast<IGTLMessage*>(msg));
+  }
+//  this->CreateOutputsForAllInputs();
+}
+
 bool mitk::IGTLDeviceSource::IsConnected()
 {
   if (m_IGTLDevice.IsNull())
@@ -231,4 +245,47 @@ void mitk::IGTLDeviceSource::OnIncomingMessage()
 void mitk::IGTLDeviceSource::OnIncomingCommand()
 {
 
+}
+
+const mitk::IGTLMessage* mitk::IGTLDeviceSource::GetInput( void ) const
+{
+  if (this->GetNumberOfInputs() < 1)
+    return NULL;
+
+  return static_cast<const IGTLMessage*>(this->ProcessObject::GetInput(0));
+}
+
+
+const mitk::IGTLMessage*
+mitk::IGTLDeviceSource::GetInput( unsigned int idx ) const
+{
+  if (this->GetNumberOfInputs() < 1)
+    return NULL;
+
+  return static_cast<const IGTLMessage*>(this->ProcessObject::GetInput(idx));
+}
+
+
+const mitk::IGTLMessage*
+mitk::IGTLDeviceSource::GetInput(std::string msgName) const
+{
+  const DataObjectPointerArray& inputs = const_cast<Self*>(this)->GetInputs();
+  for (DataObjectPointerArray::const_iterator it = inputs.begin();
+       it != inputs.end(); ++it)
+    if (std::string(msgName) ==
+        (static_cast<IGTLMessage*>(it->GetPointer()))->GetName())
+      return static_cast<IGTLMessage*>(it->GetPointer());
+  return NULL;
+}
+
+
+itk::ProcessObject::DataObjectPointerArraySizeType
+mitk::IGTLDeviceSource::GetInputIndex( std::string msgName )
+{
+  DataObjectPointerArray outputs = this->GetInputs();
+  for (DataObjectPointerArray::size_type i = 0; i < outputs.size(); ++i)
+    if (msgName ==
+        (static_cast<IGTLMessage*>(outputs.at(i).GetPointer()))->GetName())
+      return i;
+  throw std::invalid_argument("output name does not exist");
 }

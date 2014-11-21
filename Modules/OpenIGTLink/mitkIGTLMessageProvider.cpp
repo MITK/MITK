@@ -20,8 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLMessage.h"
 #include "mitkIGTLMessageFactory.h"
 
-//#include "mitkIGTTimeStamp.h"
-//#include "mitkIGTException.h"
+#include "mitkCallbackFromGUIThread.h"
 
 //Microservices
 #include "usServiceReference.h"
@@ -35,32 +34,54 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "igtlQuaternionTrackingDataMessage.h"
 #include "igtlTrackingDataMessage.h"
 
+#ifndef WIN32
+#include <unistd.h>
+#endif
+
 mitk::IGTLMessageProvider::IGTLMessageProvider()
   : mitk::IGTLDeviceSource()
 {
   this->SetName("IGTLMessageProvider");
+  m_MultiThreader = itk::MultiThreader::New();
+  m_StreamingTimeMutex = itk::FastMutexLock::New();
+  m_StopStreamingThreadMutex = itk::FastMutexLock::New();
+  m_ThreadId = 0;
 }
 
 mitk::IGTLMessageProvider::~IGTLMessageProvider()
 {
-
+  // terminate worker thread on destruction
+  this->m_StopStreamingThreadMutex->Lock();
+  this->m_StopStreamingThread = true;
+  this->m_StopStreamingThreadMutex->Unlock();
+  if ( m_ThreadId >= 0)
+  {
+    this->m_MultiThreader->TerminateThread(m_ThreadId);
+  }
 }
 
 void mitk::IGTLMessageProvider::GenerateData()
 {
-  if (m_IGTLDevice.IsNull())
+  if (this->m_IGTLDevice.IsNull())
     return;
 
-  /* update output with message from the device */
-  IGTLMessage* msgOut = this->GetOutput();
-  assert(msgOut);
-  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetNextMessage();
-  if ( msgIn.IsNotNull() )
+  for (unsigned int index = 0; index < this->GetNumberOfIndexedInputs(); index++)
   {
-    assert(msgIn);
+    const IGTLMessage* msg = this->GetInput(index);
+    assert(msg);
 
-    msgOut->SetMessage(msgIn);
-    msgOut->SetName(msgIn->GetDeviceName());
+    if ( !msg->IsDataValid() )
+    {
+      continue;
+    }
+
+    igtl::MessageBase::Pointer igtlMsg = msg->GetMessage();
+
+    if ( igtlMsg.IsNotNull() )
+    {
+      //send the message
+      this->m_IGTLDevice->SendMessage(igtlMsg);
+    }
   }
 }
 
@@ -132,13 +153,12 @@ void mitk::IGTLMessageProvider::OnIncomingCommand()
     //as microservice
     mitk::IGTLMessageFactory::Pointer msgFactory =
         this->GetIGTLDevice()->GetMessageFactory();
-    mitk::IGTLMessageFactory::PointerToMessageBaseNew retMsgNew =
-        msgFactory->GetMessageTypeNewPointer(returnType);
-    //if retMsgNew is NULL there is no return message defined and thus it is not
+    //create a return message
+    igtl::MessageBase::Pointer rtsMsg = msgFactory->CreateInstance(returnType);
+    //if retMsg is NULL there is no return message defined and thus it is not
     //necessary to send one back
-    if ( retMsgNew != NULL )
+    if ( rtsMsg.IsNotNull() )
     {
-      igtl::MessageBase::Pointer rtsMsg = retMsgNew();
       this->GetIGTLDevice()->SendMessage(rtsMsg);
     }
   }
@@ -162,18 +182,14 @@ void mitk::IGTLMessageProvider::OnIncomingCommand()
     }
     else if ( isSTTMsg )
     {
-      //if it is a stream start streaming
+      //if it is a stream establish a connection between the provider and the
+      //source
+      this->ConnectTo(source);
 
       //read the requested frames per second
       int fps = 10;
 
-      //this solution is not nice but if you want to change it you have to change
-      //OpenIGTLink code. I have to check the type here because the STT_ messages
-      //do not have a common base class. In fact they have one MessageBase. But
-      //it is necessary to have a STTMessageBase that implements SetFPS and
-      //GetFPS in order to set the FPS.
-      //On my request the OpenIGTLink developers wrote me that they will
-      //implement this
+      //read the fps from the command
       igtl::MessageBase* curCommandPt = curCommand.GetPointer();
       if ( std::strcmp( curCommand->GetDeviceType(), "STT_BIND" ) == 0 )
       {
@@ -188,28 +204,29 @@ void mitk::IGTLMessageProvider::OnIncomingCommand()
         fps = ((igtl::StartTrackingDataMessage*)curCommandPt)->GetResolution();
       }
 
-      //this is also a kind of workaround:
-      //Problem: This method we are in at the moment is called from another
-      //thread (not the main thread). The pipeline normally runs in the main
-      //thread and has no thread-safety. Therefore, it would be a bad idea to
-      //call the update method from here directly, it should be called from the
-      //main thread. To call it from the main thread a timer is needed. That
-      //results in two options: 1. boost timer or 2. qt timer
-      //I chose the second option. So the way this works in detail is described
-      //in QmitkIGTLStreamingConnector.
-      //brief: Here, the fps are set. The streaming connector checks this fps
-      //in the main thread. Once it is changed it adapts its timer. Everytime the
-      //timer is fired the pipeline is updated and the result is added to the
-      //send message queue. So the connections between the threads are the queue
-      //and the fps variable. They are implemented thread safe.
+      // calculate the streaming time
+      this->m_StreamingTimeMutex->Lock();
+      this->m_StreamingTime = 1.0 / (double) fps * 1000.0;
+      this->m_StreamingTimeMutex->Unlock();
 
-      //set the fps in the current source object
-      source->SetFPS(fps);
+      // Create a command object. The function will be called later from the
+      // main thread
+      this->m_StreamingCommand = ProviderCommand::New();
+      m_StreamingCommand->SetCallbackFunction(this,
+          &mitk::IGTLMessageProvider::Update);
+
+      // For streaming we need a continues time signal, since there is no timer
+      // available we start a thread that generates a timing signal
+      // This signal is invoked from the other thread the update of the pipeline
+      // has to be executed from the main thread. Thus, we use the
+      // callbackfromGUIThread class to pass the execution to the main thread
+      this->m_ThreadId = m_MultiThreader->SpawnThread(this->TimerThread, this);
     }
     else if ( isSTPMsg )
     {
-      //set the fps to 0 to stop streaming
-      source->SetFPS(0);
+      this->m_StopStreamingThreadMutex->Lock();
+      this->m_StopStreamingThread = false;
+      this->m_StopStreamingThreadMutex->Unlock();
     }
     else
     {
@@ -245,8 +262,92 @@ mitk::IGTLMessageSource::Pointer mitk::IGTLMessageProvider::GetFittingSource(con
   return NULL;
 }
 
-void mitk::IGTLMessageProvider::Send(mitk::IGTLMessage* msg)
+void mitk::IGTLMessageProvider::Send(const mitk::IGTLMessage* msg)
 {
   if (msg != NULL)
     this->m_IGTLDevice->SendMessage(msg);
+}
+
+void
+mitk::IGTLMessageProvider::ConnectTo( mitk::IGTLMessageSource* UpstreamFilter )
+{
+  for (DataObjectPointerArraySizeType i = 0;
+       i < UpstreamFilter->GetNumberOfOutputs(); i++)
+  {
+    this->SetInput(i, UpstreamFilter->GetOutput(i));
+  }
+}
+
+ITK_THREAD_RETURN_TYPE mitk::IGTLMessageProvider::TimerThread(void* pInfoStruct)
+{
+  // extract this pointer from thread info structure
+  struct itk::MultiThreader::ThreadInfoStruct * pInfo =
+      (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
+  mitk::IGTLMessageProvider* thisObject =
+      static_cast<mitk::IGTLMessageProvider*>(pInfo->UserData);
+
+  itk::SimpleMutexLock mutex;
+  mutex.Lock();
+
+  thisObject->m_StreamingTimeMutex->Lock();
+  unsigned int waitingTime = thisObject->m_StreamingTime;
+  thisObject->m_StreamingTimeMutex->Unlock();
+
+  while (true)
+  {
+    thisObject->m_StopStreamingThreadMutex->Lock();
+    bool stopThread = thisObject->m_StopStreamingThread;
+    thisObject->m_StopStreamingThreadMutex->Unlock();
+
+    if (stopThread)
+    {
+      break;
+    }
+
+    //wait for the time given
+    //I know it is not the nicest solution but we just need an approximate time
+    //sleeps for 20 ms
+    #if defined (WIN32) || defined (_WIN32)
+    Sleep(waitingTime);
+    #else
+    usleep(waitingTime * 1000);
+    #endif
+
+    // Ask to execute that command from the GUI thread
+    mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(
+          thisObject->m_StreamingCommand);
+
+//    thisObject->m_WorkerBarrier->Wait(&mutex);
+
+//    if (thisObject->m_StopThread) { break; }
+
+//    thisObject->m_ImageMutex->Lock();
+//    cv::Mat image = thisObject->m_InputImage.clone();
+//    int inputImageId = thisObject->m_InputImageId;
+//    thisObject->m_ImageMutex->Unlock();
+
+//    cv::Mat mask = thisObject->GetMaskFromPointSets();
+
+//    cv::Mat result;
+//    if (thisObject->m_UseOnlyRegionAroundModelPoints)
+//    {
+//      result = cv::Mat(mask.rows, mask.cols, mask.type(), 0.0);
+//      thisObject->m_BoundingBox = thisObject->GetBoundingRectFromMask(mask);
+//      thisObject->RunSegmentation(image(thisObject->m_BoundingBox), mask(thisObject->m_BoundingBox)).copyTo(result(thisObject->m_BoundingBox));
+//    }
+//    else
+//    {
+//      result = thisObject->RunSegmentation(image, mask);
+//    }
+
+//    // save result to member attribute
+//    thisObject->m_ResultMutex->Lock();
+//    thisObject->m_ResultMask = result;
+//    thisObject->m_ResultImageId = inputImageId;
+//    thisObject->m_ResultMutex->Unlock();
+  }
+
+  mutex.Unlock();
+
+  return ITK_THREAD_RETURN_VALUE;
 }

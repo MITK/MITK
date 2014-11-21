@@ -146,14 +146,14 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       headerMsg->GetTimeStamp(ts);
       ts->GetTimeStamp(&sec, &nanosec);
 
-      std::cerr << "Time stamp: "
-                << sec << "."
-                << nanosec << std::endl;
+//      std::cerr << "Time stamp: "
+//                << sec << "."
+//                << nanosec << std::endl;
 
-      std::cerr << "Dev type and name: " << headerMsg->GetDeviceType() << " "
-                << headerMsg->GetDeviceName() << std::endl;
+//      std::cerr << "Dev type and name: " << headerMsg->GetDeviceType() << " "
+//                << headerMsg->GetDeviceName() << std::endl;
 
-      headerMsg->Print(std::cout);
+//      headerMsg->Print(std::cout);
 
       //check the type of the received message
       //if it is a GET_, STP_ or RTS_ command push it into the command queue

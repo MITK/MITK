@@ -139,13 +139,15 @@ void OpenIGTLinkExample::DestroyPipeline()
 {
   m_VisFilter = NULL;
   this->GetDataStorage()->Remove(m_DemoNodeT1);
+  this->GetDataStorage()->Remove(m_DemoNodeT2);
+  this->GetDataStorage()->Remove(m_DemoNodeT3);
 }
 
 void OpenIGTLinkExample::Start()
 {
   if ( this->m_Controls.butStart->text().contains("Start Pipeline") )
   {
-    m_Timer.setInterval(100);
+    m_Timer.setInterval(90);
     m_Timer.start();
     this->m_Controls.butStart->setText("Stop Pipeline");
   }
@@ -161,26 +163,12 @@ void OpenIGTLinkExample::Start()
 
 void OpenIGTLinkExample::UpdatePipeline()
 {
+  //update the pipeline
   m_VisFilter->Update();
 
+  //update the boundings
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+
   //Update rendering
-  QmitkRenderWindow* renWindow =
-      this->GetRenderWindowPart()->GetQmitkRenderWindow("3d");
-  renWindow->GetRenderer()->GetVtkRenderer()->Render();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  this->GlobalReinit();
-}
-
-void OpenIGTLinkExample::GlobalReinit()
-{
-  // get all nodes that have not set "includeInBoundingBox" to false
-  mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
-
-  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
-  // calculate bounding geometry of these nodes
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
-
-  // initialize the views to the bounding geometry
-  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }

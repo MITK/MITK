@@ -162,7 +162,7 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //start the player
   this->Start();
 
-  this->GlobalReinit();
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 }
 
 void OpenIGTLinkProviderExample::DestroyPipeline()
@@ -224,26 +224,12 @@ void OpenIGTLinkProviderExample::OnOpenFile(){
 
 void OpenIGTLinkProviderExample::UpdateVisualization()
 {
+  //update the filter
   this->m_NavDataVisualizer->Update();
 
-  //Update rendering
-  QmitkRenderWindow* renWindow =
-      this->GetRenderWindowPart()->GetQmitkRenderWindow("3d");
-  renWindow->GetRenderer()->GetVtkRenderer()->Render();
+  //update the bounds
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+
+  //update rendering
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  this->GlobalReinit();
-}
-
-void OpenIGTLinkProviderExample::GlobalReinit()
-{
-  // get all nodes that have not set "includeInBoundingBox" to false
-  mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
-
-  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
-  // calculate bounding geometry of these nodes
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
-
-  // initialize the views to the bounding geometry
-  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }

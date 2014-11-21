@@ -65,8 +65,6 @@ class OpenIGTLinkExample : public QmitkAbstractView
     void CreatePipeline();
     void DestroyPipeline();
 
-    void GlobalReinit();
-
     Ui::OpenIGTLinkExampleControls m_Controls;
     mitk::IGTLClient::Pointer m_IGTLClient;
     mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;

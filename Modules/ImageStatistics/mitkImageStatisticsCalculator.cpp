@@ -1443,7 +1443,7 @@ bool ImageStatisticsCalculator::GetPrincipalAxis(
 
 
    // double classWidth = (3.49 * sig) / std::pow( counter, (1/3) );
-    int numberOfBins = int ( (b - a) / 10 );
+    int numberOfBins = int ( (b - a) / 1 );
 
     std::cout << "test3:" << numberOfBins << std::endl;
     typename  LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();

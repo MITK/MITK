@@ -42,7 +42,7 @@ Create and work with fiber tractographies.
 
 Create parameter maps and quantify different properties.
   
-  \li \subpage QmitkDiffusionImagingQuantificationPage
+  \li \subpage org_mitk_views_diffusionquantification
   \li \subpage org_mitk_views_ivim
   \li \subpage org_mitk_views_partialvolumeanalysisview
   \li \subpage org_mitk_views_tractbasedspatialstatistics

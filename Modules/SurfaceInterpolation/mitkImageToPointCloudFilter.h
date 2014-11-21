@@ -34,12 +34,13 @@ enum MitkSurfaceInterpolation_EXPORT DetectConstant
   THRESHOLD
 };
 
-class MitkSurfaceInterpolation_EXPORT ImageToPointCloudFilter: public ImageToSurfaceFilter
+class MitkSurfaceInterpolation_EXPORT ImageToPointCloudFilter:
+    public ImageToSurfaceFilter
 {
 
 public:
 
-  mitkClassMacro( ImageToPointCloudFilter, ImageToSurfaceFilter);
+  mitkClassMacro( ImageToPointCloudFilter, ImageToSurfaceFilter)
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -47,14 +48,16 @@ public:
   typedef itk::Image<short, 3> ImageType;
   typedef itk::Image<double, 3>  DoubleImageType;
   typedef itk::Image<double, 3> FloatImageType;
-  typedef itk::LaplacianImageFilter< FloatImageType, FloatImageType > LaplacianFilterType;
+  typedef itk::LaplacianImageFilter< FloatImageType, FloatImageType >
+          LaplacianFilterType;
   typedef DetectConstant DetectionMethod;
 
-  void SetDetectionMethod(DetectionMethod method);
+  itkGetMacro(Method,DetectionMethod)
+  itkGetMacro(EdgeImage,mitk::Image::Pointer)
+  itkGetMacro(EdgePoints,mitk::Image::Pointer)
+  itkGetMacro(NumberOfExtractedPoints,int)
 
-  mitk::Image::Pointer GetEdgeImage();
-  mitk::Image::Pointer GetEdgePoints();
-  int GetNumberOfExtractedPoints();
+  itkSetMacro(Method,DetectionMethod)
 
 protected:
 
@@ -82,7 +85,7 @@ private:
 
   int m_NumberOfExtractedPoints;
 
-  DetectionMethod m_method;
+  DetectionMethod m_Method;
 
 };
 

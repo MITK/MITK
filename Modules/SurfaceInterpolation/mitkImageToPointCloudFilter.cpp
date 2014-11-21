@@ -29,7 +29,7 @@ mitk::ImageToPointCloudFilter::ImageToPointCloudFilter():
   m_NumberOfExtractedPoints(0)
 {
   m_PointSurface = mitk::Surface::New();
-  m_method = DetectConstant(0);
+  m_Method = DetectConstant(0);
   m_EdgeImage = mitk::Image::New();
   m_EdgePoints = mitk::Image::New();
 
@@ -41,11 +41,6 @@ mitk::ImageToPointCloudFilter::ImageToPointCloudFilter():
 
 mitk::ImageToPointCloudFilter::~ImageToPointCloudFilter(){}
 
-void mitk::ImageToPointCloudFilter::SetDetectionMethod(DetectionMethod method)
-{
-  this->m_method = method;
-}
-
 void mitk::ImageToPointCloudFilter::GenerateData()
 {
   mitk::Image::ConstPointer image = ImageToSurfaceFilter::GetInput();
@@ -53,11 +48,12 @@ void mitk::ImageToPointCloudFilter::GenerateData()
 
   if ( image.IsNull() )
   {
-    MITK_ERROR << "mitk::ImageToContourFilter: No input available. Please set the input!" << std::endl;
+    MITK_ERROR << "mitk::ImageToContourFilter: No input available. "
+                  "Please set the input!" << std::endl;
     return;
   }
 
-  switch(m_method)
+  switch(m_Method)
   {
   case 0:
     this->LaplacianStdDev(image, 2);
@@ -73,23 +69,24 @@ void mitk::ImageToPointCloudFilter::GenerateData()
   }
 }
 
-
-//! TODO GetEdgeImage und Bildkoordinaten in weltkoodinaten
-
-void mitk::ImageToPointCloudFilter::LaplacianStdDev(mitk::Image::ConstPointer image, int amount)
+void mitk::ImageToPointCloudFilter::
+                    LaplacianStdDev(mitk::Image::ConstPointer image, int amount)
 {
   mitk::Image::Pointer notConstImage = image->Clone();
-  AccessByItk_1(notConstImage.GetPointer(), StdDeviations, amount);
+  AccessByItk_1(notConstImage.GetPointer(), StdDeviations, amount)
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::ImageToPointCloudFilter::StdDeviations(itk::Image<TPixel, VImageDimension>* image, int amount)
+void mitk::ImageToPointCloudFilter::
+           StdDeviations(itk::Image<TPixel, VImageDimension>* image, int amount)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
-  typedef itk::CastImageFilter< InputImageType, FloatImageType > ImagePTypeToFloatPTypeCasterType;
-  typename itk::LaplacianImageFilter< FloatImageType, FloatImageType >::Pointer lapFilter = itk::LaplacianImageFilter< FloatImageType, FloatImageType >::New();
+  typedef itk::CastImageFilter< InputImageType, FloatImageType >
+          ImagePTypeToFloatPTypeCasterType;
+  typename LaplacianFilterType::Pointer lapFilter = LaplacianFilterType::New();
 
-  typename ImagePTypeToFloatPTypeCasterType::Pointer caster = ImagePTypeToFloatPTypeCasterType::New();
+  typename ImagePTypeToFloatPTypeCasterType::Pointer caster =
+           ImagePTypeToFloatPTypeCasterType::New();
   caster->SetInput( image );
   caster->Update();
   FloatImageType::Pointer fImage = caster->GetOutput();
@@ -98,7 +95,8 @@ void mitk::ImageToPointCloudFilter::StdDeviations(itk::Image<TPixel, VImageDimen
   lapFilter->UpdateLargestPossibleRegion();
   m_EdgeImage = mitk::ImportItkImage(lapFilter->GetOutput())->Clone();
 
-  mitk::ImageStatisticsCalculator::Pointer statCalc = mitk::ImageStatisticsCalculator::New();
+  mitk::ImageStatisticsCalculator::Pointer statCalc =
+                                         mitk::ImageStatisticsCalculator::New();
   statCalc->SetImage(m_EdgeImage);
   statCalc->ComputeStatistics();
   mitk::ImageStatisticsCalculator::Statistics stats = statCalc->GetStatistics();
@@ -109,7 +107,7 @@ void mitk::ImageToPointCloudFilter::StdDeviations(itk::Image<TPixel, VImageDimen
   double lowerThreshold = mean - stdDev * amount;
 
   typename itk::ImageRegionIterator<FloatImageType> it(lapFilter->GetOutput(),
-                                              lapFilter->GetOutput()->GetRequestedRegion());
+                                 lapFilter->GetOutput()->GetRequestedRegion());
 
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 
@@ -152,19 +150,4 @@ void mitk::ImageToPointCloudFilter::StdDeviations(itk::Image<TPixel, VImageDimen
 void mitk::ImageToPointCloudFilter::GenerateOutputInformation()
 {
   Superclass::GenerateOutputInformation();
-}
-
-mitk::Image::Pointer mitk::ImageToPointCloudFilter::GetEdgeImage()
-{
-  return this->m_EdgeImage;
-}
-
-mitk::Image::Pointer mitk::ImageToPointCloudFilter::GetEdgePoints()
-{
-  return this->m_EdgePoints;
-}
-
-int mitk::ImageToPointCloudFilter::GetNumberOfExtractedPoints()
-{
-  return this->m_NumberOfExtractedPoints;
 }

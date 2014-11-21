@@ -121,6 +121,9 @@
       </item>
       <item row="2" column="0">
        <widget class="QCheckBox" name="logSendReceiveMsg">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Log Send and Receive Messages</string>
         </property>
@@ -188,6 +191,9 @@
         </item>
         <item>
          <widget class="QSpinBox" name="fpsSpinBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
             <horstretch>0</horstretch>

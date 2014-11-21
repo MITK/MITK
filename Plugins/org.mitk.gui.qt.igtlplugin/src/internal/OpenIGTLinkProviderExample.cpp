@@ -149,8 +149,8 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //initialize the streaming connector
   //the streaming connector is checking if the data from the filter has to be
   //streamed. The message provider is used for sending the messages.
-  m_StreamingConnector.Initialize(m_NavDataToIGTLMsgFilter.GetPointer(),
-                                  m_IGTLMessageProvider);
+//  m_StreamingConnector.Initialize(m_NavDataToIGTLMsgFilter.GetPointer(),
+//                                  m_IGTLMessageProvider);
 
   //also create a visualize filter to visualize the data
   m_NavDataVisualizer = mitk::NavigationDataObjectVisualizationFilter::New();

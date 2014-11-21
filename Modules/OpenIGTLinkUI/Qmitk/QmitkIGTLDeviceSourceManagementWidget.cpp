@@ -100,26 +100,62 @@ void QmitkIGTLDeviceSourceManagementWidget::CreateConnections()
 void QmitkIGTLDeviceSourceManagementWidget::LoadSource(
     mitk::IGTLDeviceSource::Pointer sourceToLoad)
 {
-
+  //reset the GUI
   DisableSourceControls();
+  //reset the observers
+  if ( this->m_IGTLDevice != NULL )
+  {
+    this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
+    this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
+  }
 
   if(sourceToLoad.IsNotNull())
   {
     this->m_IGTLDeviceSource = sourceToLoad;
+
+    //get the device
+    this->m_IGTLDevice = this->m_IGTLDeviceSource->GetIGTLDevice();
+
+    //check the state of the device
+    mitk::IGTLDevice::IGTLDeviceState state = this->m_IGTLDevice->GetState();
+
     //check if the device is a server or a client
     if ( dynamic_cast<mitk::IGTLClient*>(
            this->m_IGTLDeviceSource->GetIGTLDevice()) == NULL )
     {
       m_IsClient = false;
-      m_Controls->butConnect->setText("Go Online");
     }
     else
     {
       m_IsClient = true;
-      m_Controls->butConnect->setText("Connect");
     }
-    //get the device
-    this->m_IGTLDevice = this->m_IGTLDeviceSource->GetIGTLDevice();
+
+    switch (state) {
+    case mitk::IGTLDevice::Setup:
+      if ( !m_IsClient )
+      {
+        m_Controls->butConnect->setText("Go Online");
+      }
+      else
+      {
+        m_Controls->butConnect->setText("Connect");
+      }
+      break;
+    case mitk::IGTLDevice::Ready:
+    case mitk::IGTLDevice::Running:
+      this->m_Controls->butConnect->setText("Disconnect");
+      this->m_Controls->editIP->setEnabled(false);
+      this->m_Controls->editPort->setEnabled(false);
+      this->m_Controls->editSend->setEnabled(true);
+      this->m_Controls->butSend->setEnabled(true);
+      this->m_Controls->commandsComboBox->setEnabled(true);
+      this->m_Controls->butSendCommand->setEnabled(true);
+      this->m_Controls->logSendReceiveMsg->setEnabled(true);
+      break;
+    default:
+      mitkThrow() << "Invalid Device State";
+      break;
+    }
     m_Controls->selectedSourceLabel->setText(m_IGTLDeviceSource->GetName().c_str());
 
     //add observer for new message receiving
@@ -133,13 +169,15 @@ void QmitkIGTLDeviceSourceManagementWidget::LoadSource(
     m_MessageReceivedCommand = CurCommandType::New();
     m_MessageReceivedCommand->SetCallbackFunction(
       this, &QmitkIGTLDeviceSourceManagementWidget::OnMessageReceived );
-    this->m_IGTLDevice->AddObserver(mitk::MessageReceivedEvent(), m_MessageReceivedCommand);
+    this->m_MessageReceivedObserverTag =
+        this->m_IGTLDevice->AddObserver(mitk::MessageReceivedEvent(), m_MessageReceivedCommand);
 
     typedef itk::MemberCommand< QmitkIGTLDeviceSourceManagementWidget > CurCommandType;
     CurCommandType::Pointer commandReceivedCommand = CurCommandType::New();
     commandReceivedCommand->SetCallbackFunction(
       this, &QmitkIGTLDeviceSourceManagementWidget::OnCommandReceived );
-    this->m_IGTLDevice->AddObserver(mitk::CommandReceivedEvent(), commandReceivedCommand);
+    this->m_CommandReceivedObserverTag =
+        this->m_IGTLDevice->AddObserver(mitk::CommandReceivedEvent(), commandReceivedCommand);
 
     //Fill the commands combo box with all available commands
     FillCommandsComboBox();
@@ -168,6 +206,8 @@ void QmitkIGTLDeviceSourceManagementWidget::DisableSourceControls()
   m_Controls->editSend->setEnabled(false);
   m_Controls->butSendCommand->setEnabled(false);
   m_Controls->fpsSpinBox->setEnabled(false);
+  m_Controls->commandsComboBox->setEnabled(false);
+  m_Controls->butSend->setEnabled(false);
 //  m_Controls->m_AddTool->setEnabled(false);
 //  m_Controls->m_LoadTool->setEnabled(false);
 //  m_Controls->m_selectedLabel->setEnabled(false);
@@ -188,7 +228,7 @@ void QmitkIGTLDeviceSourceManagementWidget::EnableSourceControls()
 
   m_Controls->editPort->setEnabled(true);
   m_Controls->butConnect->setEnabled(true);
-  m_Controls->fpsSpinBox->setEnabled(true);
+//  m_Controls->fpsSpinBox->setEnabled(true);
 //  m_Controls->editSend->setEnabled(false);
 //  m_Controls->m_AddTool->setEnabled(true);
 //  m_Controls->m_LoadTool->setEnabled(true);
@@ -221,6 +261,7 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
         this->m_Controls->butSend->setEnabled(true);
         this->m_Controls->commandsComboBox->setEnabled(true);
         this->m_Controls->butSendCommand->setEnabled(true);
+        this->m_Controls->logSendReceiveMsg->setEnabled(true);
         this->m_Controls->butConnect->setText("Disconnect");
         if ( this->m_IsClient )
         {
@@ -300,6 +341,9 @@ void QmitkIGTLDeviceSourceManagementWidget::OnSendCommand()
 void QmitkIGTLDeviceSourceManagementWidget::OnCommandChanged(
     const QString & curCommand)
 {
+  if ( curCommand.isEmpty() )
+    return;
+
   mitk::IGTLMessageFactory::Pointer msgFactory =
       this->m_IGTLDevice->GetMessageFactory();
   //create a new message that fits to the selected get message type command
@@ -358,12 +402,12 @@ void QmitkIGTLDeviceSourceManagementWidget::FillCommandsComboBox()
   std::list<std::string> commandsList_ =
       msgFactory->GetAvailableMessageRequestTypes();
   //create a string list to convert the std::list
-  QStringList commandsList;
+  this->m_Controls->commandsComboBox->clear();
   while ( commandsList_.size() )
   {
-    commandsList.append(QString::fromStdString(commandsList_.front()));
+    //fill the combo box with life
+    this->m_Controls->commandsComboBox->addItem(
+          QString::fromStdString(commandsList_.front()));
     commandsList_.pop_front();
   }
-  //fill the combo box with life
-  this->m_Controls->commandsComboBox->addItems(commandsList);
 }

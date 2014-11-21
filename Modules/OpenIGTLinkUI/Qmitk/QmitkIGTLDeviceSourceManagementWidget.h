@@ -124,6 +124,9 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
     /** @brief a string stream used for logging */
 //    QTimer m_UpdateLoggingWindowTimer;
 
+    unsigned long m_MessageReceivedObserverTag;
+    unsigned long m_CommandReceivedObserverTag;
+
 
     itk::MemberCommand< QmitkIGTLDeviceSourceManagementWidget >::Pointer m_MessageReceivedCommand;
 

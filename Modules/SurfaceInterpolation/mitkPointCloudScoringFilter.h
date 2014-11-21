@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkImageToPointCloudFilter_h_Included
-#define mitkImageToPointCloudFilter_h_Included
+#ifndef mitkPointCloudScoringFilter_h_Included
+#define mitkPointCloudScoringFilter_h_Included
 
 #include <MitkSurfaceInterpolationExports.h>
 #include <mitkSurfaceToSurfaceFilter.h>
@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
+// TODO Testing if its working
 
 class MitkSurfaceInterpolation_EXPORT PointCloudScoringFilter:
     public SurfaceToSurfaceFilter

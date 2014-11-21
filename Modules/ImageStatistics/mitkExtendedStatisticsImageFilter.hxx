@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkExtendedStatisticsImageFilter.h"
 
+
 namespace itk
 {
   template< class TInputImage >
@@ -118,19 +119,32 @@ namespace itk
     RealType kurtosis = 0;
     RealType skewness = 0;
 
-    ImageRegionConstIterator< TInputImage > it (this->GetInput(), this->GetInput()->GetLargestPossibleRegion ()  );
-
-    int counter = 0;
-    for (it.GoToBegin(); !it.IsAtEnd(); ++it)
+    if ( sigma != 0 )
     {
-      baseOfSkewnessAndKurtosis = (it.Get() - mean) / sigma ;
-      kurtosis += std::pow( baseOfSkewnessAndKurtosis, 4.0 );
-      skewness += std::pow( baseOfSkewnessAndKurtosis, 3.0 );
-      counter++;
-    }
+      ImageRegionConstIterator< TInputImage > it (this->GetInput(), this->GetInput()->GetLargestPossibleRegion() );
 
-    kurtosis = kurtosis / counter;
-    skewness = skewness / counter;
+      int counter = 0;
+      for (it.GoToBegin(); !it.IsAtEnd(); ++it)
+      {
+        baseOfSkewnessAndKurtosis = (it.Get() - mean) / sigma ;
+        kurtosis += std::pow( baseOfSkewnessAndKurtosis, 4.0 );
+        skewness += std::pow( baseOfSkewnessAndKurtosis, 3.0 );
+        counter++;
+      }
+
+      if ( counter == 0 )
+      {
+        throw std::logic_error( "Empty segmentation" );
+      }
+
+      kurtosis = kurtosis / counter;
+      skewness = skewness / counter;
+    }
+    else
+    {
+      kurtosis = -1;
+      skewness = -1;
+    }
 
     this->GetKurtosisOutput()->Set( kurtosis );
     this->GetSkewnessOutput()->Set( skewness );

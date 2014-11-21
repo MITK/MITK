@@ -35,7 +35,7 @@ namespace itk
   * the Skewness and Kurtosis. Both will be added in this class.
   */
   template< class TInputImage >
-  class ImageStatistics_EXPORT ExtendedStatisticsImageFilter : public StatisticsImageFilter< TInputImage >
+  class ExtendedStatisticsImageFilter : public StatisticsImageFilter< TInputImage >
   {
   public:
     /** Standard Self typedef */
@@ -99,7 +99,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "mitkStatisticsImageFilter.hxx"
+#include "mitkExtendedStatisticsImageFilter.hxx"
 #endif
 
 #endif

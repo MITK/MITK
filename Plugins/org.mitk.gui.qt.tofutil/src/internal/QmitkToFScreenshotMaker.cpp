@@ -34,7 +34,6 @@ QmitkToFScreenshotMaker::QmitkToFScreenshotMaker()
   : QmitkAbstractView(),
     m_SavingCounter(0)
 {
-//  m_ToFImageGrabber = mitk::ToFImageGrabber::New();
 }
 
 QmitkToFScreenshotMaker::~QmitkToFScreenshotMaker()
@@ -60,44 +59,17 @@ void QmitkToFScreenshotMaker::CreateQtPartControl( QWidget *parent )
 
   std::string defaultPath = "/tmp/";
 #ifdef _WIN32
-  defaultPath = "C:\tmp\";
+  defaultPath = "C:/tmp/";
 #endif
   m_Controls.m_PathToSaveFiles->setText(defaultPath.c_str());
 }
 
 void QmitkToFScreenshotMaker::OnSelectCamera()
 {
-  //Update gui accordingly
+  //Update gui according to device properties
   mitk::ToFImageGrabber* source = static_cast<mitk::ToFImageGrabber*>(m_Controls.m_ConnectedDeviceServiceListWidget->GetSelectedService<mitk::ToFImageSource>());
   mitk::ToFCameraDevice* device = source->GetCameraDevice();
-//  m_Controls.m_MakeScreenshot->setEnabled(device->IsCameraActive());
-
-  //usually you want to save depth data
-  m_Controls.m_SaveDepth->setChecked(true);
-  m_Controls.m_SaveDepth->setEnabled(true);
-
-  //If the device provides an amplitude (or infrared) image, we propably want to save it
-  bool amplitude = false;
-  device->GetBoolProperty("HasAmplitudeImage", amplitude);
-  m_Controls.m_SaveAmplitude->setChecked(amplitude);
-  m_Controls.m_SaveAmplitude->setEnabled(amplitude);
-  //If the device provides an intensity image, we propably want to save it
-  bool intensity = false;
-  device->GetBoolProperty("HasIntensityImage", intensity);
-  m_Controls.m_SaveIntensity->setChecked(intensity);
-  m_Controls.m_SaveIntensity->setEnabled(intensity);
-
-  //If the device provides an RGB image, we propably want to save it
-  bool color = false;
-  device->GetBoolProperty("HasRGBImage", color);
-  m_Controls.m_SaveColor->setChecked(color);
-  m_Controls.m_SaveColor->setEnabled(color);
-
-  //If the device provides Raw image, we propably want to save it
-  bool raw = false;
-  device->GetBoolProperty("HasRawImage", raw);
-  m_Controls.m_SaveRaw->setChecked(raw);
-  m_Controls.m_SaveRaw->setEnabled(raw);
+  m_Controls.m_MakeScreenshot->setEnabled(device->IsCameraActive());
 
   //todo: where do i get correct file extensions?
   mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
@@ -107,28 +79,44 @@ void QmitkToFScreenshotMaker::OnSelectCamera()
   {
     extensions.append(QString(fileExtensions.at(i).c_str()));
   }
-  this->UpdateFileExtensionComboBox(true, m_Controls.m_DepthFormat, extensions, ".nrrd"); //usually you want to save depth data
-  this->UpdateFileExtensionComboBox(amplitude, m_Controls.m_AmplitudeFormat, extensions, ".nrrd");
-  this->UpdateFileExtensionComboBox(intensity, m_Controls.m_IntensityFormat, extensions, ".nrrd");
-  this->UpdateFileExtensionComboBox(color, m_Controls.m_ColorFormat, extensions, ".png"); //png is nice default for calibration
-  this->UpdateFileExtensionComboBox(raw, m_Controls.m_RawFormat, extensions, ".nrrd");
+  this->UpdateGUIElements(device, "no depth property available", m_Controls.m_SaveDepth, m_Controls.m_DepthFormat, extensions, ".nrrd");
+  //usually you want to save depth data, but there is no "HasDepthImage" property, because every depth
+  //camera should provide a depth iamge
+  m_Controls.m_SaveDepth->setChecked(true);
+  m_Controls.m_SaveDepth->setEnabled(true);
+  m_Controls.m_DepthFormat->setEnabled(true);
+
+  this->UpdateGUIElements(device, "HasAmplitudeImage", m_Controls.m_SaveAmplitude ,
+                          m_Controls.m_AmplitudeFormat, extensions, ".nrrd");
+  this->UpdateGUIElements(device, "HasIntensityImage", m_Controls.m_SaveIntensity,
+                          m_Controls.m_IntensityFormat, extensions, ".nrrd");
+  this->UpdateGUIElements(device, "HasRGBImage", m_Controls.m_SaveColor,
+                          m_Controls.m_ColorFormat, extensions, ".png"); //png is nice default for calibration
+  this->UpdateGUIElements(device, "HasRawImage", m_Controls.m_SaveRaw,
+                          m_Controls.m_RawFormat, extensions, ".nrrd");
 }
 
-void QmitkToFScreenshotMaker::UpdateFileExtensionComboBox(bool active, QComboBox* box, QStringList fileExentions, const char* preferredFormat)
+void QmitkToFScreenshotMaker::UpdateGUIElements(mitk::ToFCameraDevice* device, const char* ToFImageType,
+                                                QCheckBox* saveCheckBox, QComboBox* saveTypeComboBox,
+                                                QStringList fileExentions, const char* preferredFormat)
 {
-  box->clear();
-  box->setEnabled(active);
-  box->addItems(fileExentions);
-  int index = box->findText(preferredFormat);
+  bool isTypeProvidedByDevice = false;
+  device->GetBoolProperty(ToFImageType, isTypeProvidedByDevice);
+  saveCheckBox->setChecked(isTypeProvidedByDevice);
+  saveCheckBox->setEnabled(isTypeProvidedByDevice);
+
+  saveTypeComboBox->clear();
+  saveTypeComboBox->setEnabled(isTypeProvidedByDevice);
+  saveTypeComboBox->addItems(fileExentions);
+  int index = saveTypeComboBox->findText(preferredFormat);
   if ( index != -1 ) { // -1 for not found
-     box->setCurrentIndex(index);
+     saveTypeComboBox->setCurrentIndex(index);
   }
 }
 
 void QmitkToFScreenshotMaker::OnMakeScreenshotClicked()
 {
   mitk::ToFImageGrabber* source = static_cast<mitk::ToFImageGrabber*>(m_Controls.m_ConnectedDeviceServiceListWidget->GetSelectedService<mitk::ToFImageSource>());
-
   source->Update();
 
   //### Save Images
@@ -148,7 +136,6 @@ void QmitkToFScreenshotMaker::OnMakeScreenshotClicked()
 
   //todo what about the surface or pre-processed data?
   m_SavingCounter++;
-  MITK_INFO << m_SavingCounter;
 }
 
 void QmitkToFScreenshotMaker::SaveImage(mitk::Image::Pointer image, bool saveImage, std::string path, std::string name, std::string extension)
@@ -157,7 +144,6 @@ void QmitkToFScreenshotMaker::SaveImage(mitk::Image::Pointer image, bool saveIma
   {
     std::stringstream outdepthimage;
     outdepthimage << path << name<< m_SavingCounter << extension;
-    MITK_INFO << outdepthimage.str();
     mitk::IOUtil::SaveImage( image, outdepthimage.str() );
   }
 }

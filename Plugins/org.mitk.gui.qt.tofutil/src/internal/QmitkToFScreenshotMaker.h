@@ -20,17 +20,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ui_QmitkToFScreenshotMakerControls.h>
 #include <QmitkAbstractView.h>
-
 #include <QStringList>
-
 #include <ui_QmitkToFUtilViewControls.h>
 
 
 /*!
-  \brief QmitkToFScreenshotMaker
+  \brief QmitkToFScreenshotMaker Select a ToF image source in the GUI to make a screenshot of the provided data.
+  If a camera is active, the Make Screenshot button will become enabled. Select the data including format you
+  want to save at the given path. To activate a camera, you can for example use the ToF Util view. Note you can
+  only select data which is provided by the device. Screenshots will be saved at the respective path with a
+  counter indicating the order.
 
-  \sa QmitkFunctionality
-  \ingroup Functionalities
+  \ingroup ToFUtil
 */
 class QmitkToFScreenshotMaker : public QmitkAbstractView
 {
@@ -52,11 +53,14 @@ class QmitkToFScreenshotMaker : public QmitkAbstractView
 
 protected slots:
 
-    /*!
-    \brief Slot called when the "Make screenshot" button is pressed.
-    */
+    /**
+     * @brief OnMakeScreenshotClicked Slot called when the "Make screenshot" button is pressed.
+     */
     void OnMakeScreenshotClicked();
 
+    /**
+     * @brief OnSelectCamera Slot called to update the GUI according to the selected image source.
+     */
     void OnSelectCamera();
 
   protected:
@@ -66,26 +70,28 @@ protected slots:
   private:
 
     /**
-     * @brief UpdateFileExtensionComboBox
-     * @param active
-     * @param box
-     * @param fileExentions
-     * @param preferredFormat
+     * @brief UpdateGUIElements Internal helper method to update the GUI.
+     * @param device The device of the selected image source.
+     * @param ToFImageType Type of the image (e.g. depth, RGB, intensity, etc.)
+     * @param saveCheckBox Checkbox indicating whether the type should be saved.
+     * @param saveTypeComboBox Combobox to chose in which format the data should be saved (e.g. nrrd)
+     * @param fileExentions Other possible file extensions.
+     * @param preferredFormat Default format for this type (e.g. png for RGB).
      */
-    void UpdateFileExtensionComboBox(bool active, QComboBox* box, QStringList fileExentions, const char *preferredFormat);
+    void UpdateGUIElements(mitk::ToFCameraDevice* device, const char *ToFImageType, QCheckBox *saveCheckBox,
+                           QComboBox *saveTypeComboBox, QStringList fileExentions, const char *preferredFormat);
 
     /**
-     * @brief SaveImage
-     * @param image
-     * @param saveImage
-     * @param path
-     * @param name
-     * @param extension
+     * @brief SaveImage Saves a ToF image.
+     * @param image The image to save.
+     * @param saveImage Should it be saved?
+     * @param path Path where to save the image.
+     * @param name Name of the image.
+     * @param extension Type extension (e.g. .nrrd).
      */
     void SaveImage(mitk::Image::Pointer image, bool saveImage, std::string path, std::string name, std::string extension);
 
     int m_SavingCounter;
-    mitk::ToFImageGrabber::Pointer m_ToFImageGrabber;
 };
 
 #endif // _QmitkToFScreenshotMaker_H_INCLUDED

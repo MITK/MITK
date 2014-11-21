@@ -268,16 +268,18 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTDataMsg()
 
 void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
 {
+  bool isValidData = true;
   mitk::IGTLMessage* output = this->GetOutput();
   assert(output);
 
   //create a output igtl message
-  igtl::TrackingDataMessage::Pointer tdMsg =
-      igtl::TrackingDataMessage::New();
+  igtl::TrackingDataMessage::Pointer tdMsg = igtl::TrackingDataMessage::New();
 
   mitk::AffineTransform3D::Pointer transform;
   Vector3D position;
   igtl::Matrix4x4 igtlTransform;
+  vnl_matrix_fixed<ScalarType, 3, 3> rotationMatrix;
+  vnl_matrix_fixed<ScalarType, 3, 3> rotationMatrixTransposed;
 
   for (unsigned int index = 0; index < this->GetNumberOfIndexedInputs(); index++)
   {
@@ -290,6 +292,18 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
     //get the navigation data components
     transform = nd->GetAffineTransform3D();
     position = transform->GetOffset();
+
+    //check the rotation matrix
+    rotationMatrix = transform->GetMatrix().GetVnlMatrix();
+    rotationMatrixTransposed = rotationMatrix.transpose();
+    // a quadratic matrix is a rotation matrix exactly when determinant is 1
+    // and transposed is inverse
+    if (!Equal(1.0, vnl_det(rotationMatrix), 0.1)
+        || !((rotationMatrix*rotationMatrixTransposed).is_identity(0.1)))
+    {
+      //the rotation matrix is not valid! => invalidate the current element
+      isValidData = false;
+    }
 
     //convert the transform into a igtl type
     ConvertAffineTransformationIntoIGTLMatrix(transform, igtlTransform);
@@ -309,6 +323,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
   tdMsg->Pack();
   //add the igtl message to the mitk::IGTLMessage
   output->SetMessage(tdMsg.GetPointer());
+  output->SetDataValid(isValidData);
 }
 
 void mitk::NavigationDataToIGTLMessageFilter::SetOperationMode( OperationMode mode )

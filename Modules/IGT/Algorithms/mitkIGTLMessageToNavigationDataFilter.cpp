@@ -395,21 +395,31 @@ mitk::IGTLMessageToNavigationDataFilter::GenerateQuaternionTrackingDataData()
 
 void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
 {
-//  this->CreateOutputsForAllInputs(); // make sure that we have the same number of outputs as inputs
-
+  //get the IGTLMessage from the previous filter
   const mitk::IGTLMessage* input = this->GetInput(0);
   assert(input);
 
+  //check if the message is valid, if it is not valid we do not generate new
+  //outputs
+  if ( !input->IsDataValid() )
+  {
+    MITK_DEBUG("IGTLMessageToNavigationDataFilter") << "Input data is invalid.";
+    return;
+  }
+
+  //get the message type
+  const char* msgType = input->GetIGTLMessageType();
+
   //check if the IGTL message has the proper type
-  if( strcmp(input->GetIGTLMessageType(), "TRANSFORM") == 0 )
+  if( strcmp(msgType, "TRANSFORM") == 0 )
   {
     this->GenerateTransformData();
   }
-  else if( strcmp(input->GetIGTLMessageType(), "TDATA") == 0 )
+  else if( strcmp(msgType, "TDATA") == 0 )
   {
     this->GenerateTrackingDataData();
   }
-  else if( strcmp(input->GetIGTLMessageType(), "QTDATA") == 0 )
+  else if( strcmp(msgType, "QTDATA") == 0 )
   {
     this->GenerateQuaternionTrackingDataData();
   }
@@ -418,7 +428,8 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
     //the message has another type
     //ignore
     MITK_INFO("IGTLMessageToNavigationDataFilter") << "The input has a unknown "
-                                                   << "message type.";
+                                                   << "message type: "
+                                                   << msgType;
   }
 }
 

@@ -42,10 +42,9 @@ const std::string QmitkIGTLDeviceSourceManagementWidget::VIEW_ID =
 
 QmitkIGTLDeviceSourceManagementWidget::QmitkIGTLDeviceSourceManagementWidget(
     QWidget* parent, Qt::WindowFlags f)
-  : QWidget(parent, f), m_OutputChanged(false), m_IsClient(false)
+  : QWidget(parent, f), m_IsClient(false)
 {
   m_Controls = NULL;
-  m_OutputMutex = itk::FastMutexLock::New();
   CreateQtPartControl(this);
 }
 
@@ -63,9 +62,6 @@ void QmitkIGTLDeviceSourceManagementWidget::CreateQtPartControl(QWidget *parent)
     // setup GUI widgets
     m_Controls->setupUi(parent);
   }
-
-  //every 100ms the logging window has to be updated
-  m_UpdateLoggingWindowTimer.setInterval(100);
 
   // set the validator for the ip edit box (values must be between 0 and 255 and
   // there are four of them, seperated with a point
@@ -98,69 +94,7 @@ void QmitkIGTLDeviceSourceManagementWidget::CreateConnections()
     connect( m_Controls->commandsComboBox,
              SIGNAL(currentIndexChanged(const QString &)),
              this, SLOT(OnCommandChanged(const QString &)));
-    connect( &m_UpdateLoggingWindowTimer, SIGNAL(timeout()),
-             this, SLOT(OnUpdateLoggingWindow()));
   }
-
-//  //main widget page:
-//  connect( (QObject*)(m_Controls->m_AddTool), SIGNAL(clicked()), this, SLOT(OnAddTool()) );
-//  connect( (QObject*)(m_Controls->m_DeleteTool), SIGNAL(clicked()), this, SLOT(OnDeleteTool()) );
-//  connect( (QObject*)(m_Controls->m_EditTool), SIGNAL(clicked()), this, SLOT(OnEditTool()) );
-//  connect( (QObject*)(m_Controls->m_LoadStorage), SIGNAL(clicked()), this, SLOT(OnLoadStorage()) );
-//  connect( (QObject*)(m_Controls->m_SaveStorage), SIGNAL(clicked()), this, SLOT(OnSaveStorage()) );
-//  connect( (QObject*)(m_Controls->m_LoadTool), SIGNAL(clicked()), this, SLOT(OnLoadTool()) );
-//  connect( (QObject*)(m_Controls->m_SaveTool), SIGNAL(clicked()), this, SLOT(OnSaveTool()) );
-//  connect( (QObject*)(m_Controls->m_CreateNewStorage), SIGNAL(clicked()), this, SLOT(OnCreateStorage()) );
-
-
-//  //widget page "add tool":
-//  connect( (QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(Canceled()), this, SLOT(OnAddToolCancel()) );
-//  connect( (QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(NavigationToolFinished()), this, SLOT(OnAddToolSave()) );
-}
-
-//void QmitkIGTLDeviceSourceManagementWidget::OnLoadTool()
-//{
-//  if(m_IGTLDeviceSource->isLocked())
-//  {
-//    MessageBox("Storage is locked, cannot modify it. Maybe the tracking device which uses this storage is connected. If you want to modify the storage please disconnect the device first.");
-//   return;
-//  }
-//  mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
-//  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Add Navigation Tool"), "/", "*.IGTTool").toAscii().data();
-//  if (filename == "") return;
-//  mitk::NavigationTool::Pointer readTool = myReader->DoRead(filename);
-//  if (readTool.IsNull()) MessageBox("Error: " + myReader->GetErrorMessage());
-//  else
-//    {
-//    if (!m_IGTLDeviceSource->AddTool(readTool))
-//      {
-//      MessageBox("Error: Can't add tool!");
-//      m_DataStorage->Remove(readTool->GetDataNode());
-//      }
-//    UpdateToolTable();
-//    }
-//}
-
-//void QmitkIGTLDeviceSourceManagementWidget::OnSaveTool()
-//{
-//    //if no item is selected, show error message:
-//    if (m_Controls->m_ToolList->currentItem() == NULL) {MessageBox("Error: Please select tool first!");return;}
-
-//    mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
-//    std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.IGTTool").toAscii().data();
-//    if (filename == "") return;
-//    if (!myWriter->DoWrite(filename,m_IGTLDeviceSource->GetTool(m_Controls->m_ToolList->currentIndex().row())))
-//      MessageBox("Error: "+ myWriter->GetErrorMessage());
-
-//}
-
-
-
-void QmitkIGTLDeviceSourceManagementWidget::Initialize(
-    mitk::DataStorage* /*dataStorage*/)
-{
-//  m_DataStorage = dataStorage;
-//  m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage,"Tool0");
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::LoadSource(
@@ -212,16 +146,11 @@ void QmitkIGTLDeviceSourceManagementWidget::LoadSource(
 
     //enable the controls of this widget
     EnableSourceControls();
-
-    //start to update the logging window
-    this->m_UpdateLoggingWindowTimer.start();
   }
   else
   {
     m_IGTLDeviceSource = NULL;
   }
-  //reset the loggin text edit
-  ResetOutput();
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::MessageBox(std::string s)
@@ -295,10 +224,9 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
         this->m_Controls->butConnect->setText("Disconnect");
         if ( this->m_IsClient )
         {
-          std::stringstream s;
-          s << "<br>Successfully connected to " << hostname
-            << " on port " << port.toStdString();
-          this->AddOutput(s.str());
+          MITK_INFO("IGTLDeviceSourceManagementWidget")
+              << "Successfully connected to " << hostname
+              << " on port " << port.toStdString();
         }
       }
       else
@@ -306,7 +234,6 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
         MITK_ERROR("QmitkIGTLDeviceSourceManagementWidget") <<
                              "Could not start a communication with the"
                              "server because the client is in the wrong state";
-        this->AddOutput("<br>Connection is not working.");
       }
     }
     else
@@ -314,7 +241,6 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
       MITK_ERROR("QmitkIGTLDeviceSourceManagementWidget") <<
                             "Could not connect to the server. "
                              "Please check the hostname and port.";
-      this->AddOutput("<br>Connection is not working. Please Check Host and Port.");
     }
   }
   else
@@ -328,7 +254,7 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
     m_Controls->commandsComboBox->setEnabled(false);
     m_Controls->butConnect->setText("Connect");
     m_IGTLDevice->CloseConnection();
-    this->AddOutput("<br>Closed connection.");
+    MITK_INFO("QmitkIGTLDeviceSourceManagementWidget") << "Closed connection";
   }
 }
 
@@ -346,11 +272,7 @@ void QmitkIGTLDeviceSourceManagementWidget::OnHostnameChanged()
 
 void QmitkIGTLDeviceSourceManagementWidget::OnSendCommand()
 {
-  //this solution is not nice but if you want to change it you have to change
-  //OpenIGTLink code. I have to check the type here because the STT_ messages
-  //do not have a common base class. In fact they have one MessageBase. But it
-  //is necessary to have a STTMessageBase that implements SetFPS and GetFPS in
-  //order to set the FPS.
+  //Set the frames per second of the current command in case of a STT_ command
   if ( std::strcmp( m_CurrentCommand->GetDeviceType(), "STT_BIND" ) == 0 )
   {
     ((igtl::StartBindMessage*)this->m_CurrentCommand.GetPointer())->
@@ -368,9 +290,8 @@ void QmitkIGTLDeviceSourceManagementWidget::OnSendCommand()
   }
 
   m_IGTLDevice->SendMessage(m_CurrentCommand.GetPointer());
-  std::stringstream s;
-  s << "<br>Sent command with DeviceType: " << m_CurrentCommand->GetDeviceType();
-  this->AddOutput(s.str());
+  MITK_INFO("IGTLDeviceSourceManagementWidget")
+      << "Sent command with DeviceType: " << m_CurrentCommand->GetDeviceType();
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::OnCommandChanged(
@@ -389,12 +310,11 @@ void QmitkIGTLDeviceSourceManagementWidget::OnSendMessage()
 {
   std::string toBeSend = m_Controls->editSend->text().toStdString();
 
-  igtl::StringMessage::Pointer msg = igtl::StringMessage::New().GetPointer();
+  igtl::StringMessage::Pointer msg = igtl::StringMessage::New();
   msg->SetString(toBeSend);
   m_IGTLDevice->SendMessage(msg.GetPointer());
-  std::stringstream s;
-  s << "<br>Sent message with DeviceType: " << msg->GetDeviceType();
-  this->AddOutput(s.str());
+  MITK_INFO("IGTLDeviceSourceManagementWidget")
+      << "Sent message with DeviceType: " << msg->GetDeviceType();
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::OnMessageReceived(
@@ -403,11 +323,8 @@ void QmitkIGTLDeviceSourceManagementWidget::OnMessageReceived(
   //get the IGTL device that invoked this event
   mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
 
-  std::stringstream s;
-  s << "<br>Received a message:<br>"
-    << dev->GetReceiveQueue()->GetLatestMsgInformationString();
-
-  this->AddOutput(s.str());
+  MITK_INFO("IGTLDeviceSourceManagementWidget") << "Received a message: "
+      << dev->GetReceiveQueue()->GetLatestMsgInformationString();
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::OnCommandReceived(
@@ -416,26 +333,8 @@ void QmitkIGTLDeviceSourceManagementWidget::OnCommandReceived(
   //get the IGTL device that invoked this event
   mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
 
-  std::stringstream s;
-  s << "<br>Received a command:<br>"
-    << dev->GetCommandQueue()->GetLatestMsgInformationString();
-
-  this->AddOutput(s.str());
-}
-
-void QmitkIGTLDeviceSourceManagementWidget::OnUpdateLoggingWindow()
-{
-  m_OutputMutex->Lock();
-//  m_Controls->m_Logging->setHtml(QString(m_Output.str().c_str()));
-//  m_Controls->m_Logging->update();
-  if ( m_OutputChanged )
-  {
-    m_Controls->m_Logging->setText(QString(m_Output.str().c_str()));
-    QScrollBar* sb = m_Controls->m_Logging->verticalScrollBar();
-    sb->setValue(sb->maximum());
-    m_OutputChanged = false;
-  }
-  m_OutputMutex->Unlock();
+  MITK_INFO("IGTLDeviceSourceManagementWidget") << "Received a command: "
+      << dev->GetCommandQueue()->GetLatestMsgInformationString();
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::FillCommandsComboBox()
@@ -456,165 +355,3 @@ void QmitkIGTLDeviceSourceManagementWidget::FillCommandsComboBox()
   //fill the combo box with life
   this->m_Controls->commandsComboBox->addItems(commandsList);
 }
-
-void QmitkIGTLDeviceSourceManagementWidget::ResetOutput()
-{
-  m_OutputMutex->Lock();
-  m_Output.str("");
-  m_Output <<"<body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7pt; font-weight:400; font-style:normal;\" bgcolor=black><span style=\"color:#ffffff;\"><u>output:</u>";
-  m_Controls->m_Logging->setHtml(QString(m_Output.str().c_str()));
-  m_OutputMutex->Unlock();
-}
-
-void QmitkIGTLDeviceSourceManagementWidget::AddOutput(std::string s)
-{
-  //print output
-  m_OutputMutex->Lock();
-  m_Output << s;
-  m_OutputChanged = true;
-  m_OutputMutex->Unlock();
-}
-
-
-
-
-////##################################################################################
-////############################## slots: main widget ################################
-////##################################################################################
-
-//void QmitkIGTLDeviceSourceManagementWidget::OnAddTool()
-//  {
-//    if(m_IGTLDeviceSource->isLocked())
-//    {
-//      MessageBox("Storage is locked, cannot modify it. Maybe the tracking device which uses this storage is connected. If you want to modify the storage please disconnect the device first.");
-//      return;
-//    }
-//    QString defaultIdentifier = "NavigationTool#"+QString::number(m_IGTLDeviceSource->GetToolCount());
-//    m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage,defaultIdentifier.toStdString());
-//    m_edit = false;
-//    m_Controls->m_MainWidgets->setCurrentIndex(1);
-//  }
-
-//void QmitkIGTLDeviceSourceManagementWidget::OnDeleteTool()
-//  {
-//    //first: some checks
-//    if(m_IGTLDeviceSource->isLocked())
-//    {
-//      MessageBox("Storage is locked, cannot modify it. Maybe the tracking device which uses this storage is connected. If you want to modify the storage please disconnect the device first.");
-//      return;
-//    }
-//    else if (m_Controls->m_ToolList->currentItem() == NULL) //if no item is selected, show error message:
-//    {
-//      MessageBox("Error: Please select tool first!");
-//      return;
-//    }
-
-//    m_DataStorage->Remove(m_IGTLDeviceSource->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetDataNode());
-//    m_IGTLDeviceSource->DeleteTool(m_Controls->m_ToolList->currentIndex().row());
-//    UpdateToolTable();
-
-//  }
-
-//void QmitkIGTLDeviceSourceManagementWidget::OnEditTool()
-//  {
-//    if(m_IGTLDeviceSource->isLocked())
-//    {
-//      MessageBox("Storage is locked, cannot modify it. Maybe the tracking device which uses this storage is connected. If you want to modify the storage please disconnect the device first.");
-//      return;
-//    }
-//    else if (m_Controls->m_ToolList->currentItem() == NULL) //if no item is selected, show error message:
-//    {
-//      MessageBox("Error: Please select tool first!");
-//      return;
-//    }
-//    mitk::NavigationTool::Pointer selectedTool = m_IGTLDeviceSource->GetTool(m_Controls->m_ToolList->currentIndex().row());
-//    m_Controls->m_ToolCreationWidget->SetDefaultData(selectedTool);
-//    m_edit = true;
-//    m_Controls->m_MainWidgets->setCurrentIndex(1);
-//  }
-
-//void QmitkIGTLDeviceSourceManagementWidget::OnCreateStorage()
-//  {
-//    QString storageName = QInputDialog::getText(NULL,"Storage Name","Name of the new tool storage:");
-//    if (storageName.isNull()) return;
-//    m_IGTLDeviceSource = mitk::NavigationToolStorage::New(this->m_DataStorage);
-//    m_IGTLDeviceSource->SetName(storageName.toStdString());
-//    m_Controls->m_StorageName->setText(m_IGTLDeviceSource->GetName().c_str());
-//    EnableStorageControls();
-//    emit NewStorageAdded(m_IGTLDeviceSource, storageName.toStdString());
-//  }
-
-//void QmitkIGTLDeviceSourceManagementWidget::OnLoadStorage()
-//  {
-//    mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(m_DataStorage);
-//    std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Navigation Tool Storage"), "/", tr("IGT Tool Storage (*.IGTToolStorage)")).toStdString();
-//    if (filename == "") return;
-
-//    try
-//    {
-//      mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(filename);
-
-//      if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
-//      else
-//      {
-//        Poco::Path myPath = Poco::Path(filename.c_str());
-//        tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
-//        this->LoadStorage(tempStorage);
-//        emit NewStorageAdded(m_IGTLDeviceSource,myPath.getFileName());
-//      }
-//    }
-//    catch (const mitk::Exception& exception)
-//    {
-//      MessageBox(exception.GetDescription());
-//    }
-//  }
-
-//void QmitkIGTLDeviceSourceManagementWidget::OnSaveStorage()
-//  {
-//    //read in filename
-//    QString filename = QFileDialog::getSaveFileName(NULL, tr("Save Navigation Tool Storage"), "/", tr("IGT Tool Storage (*.IGTToolStorage)"));
-//    if (filename.isEmpty()) return; //canceled by the user
-
-//    // add file extension if it wasn't added by the file dialog
-//    if ( filename.right(15) != ".IGTToolStorage" ) { filename += ".IGTToolStorage"; }
-
-//    //serialize tool storage
-//    mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-//    if (!mySerializer->Serialize(filename.toStdString(),m_IGTLDeviceSource))
-//      {
-//      MessageBox("Error: " + mySerializer->GetErrorMessage());
-//      return;
-//      }
-//    Poco::Path myPath = Poco::Path(filename.toStdString());
-//    m_Controls->m_StorageName->setText(QString::fromStdString(myPath.getFileName()));
-
-//  }
-
-
-////##################################################################################
-////############################## slots: add tool widget ############################
-////##################################################################################
-
-//void QmitkIGTLDeviceSourceManagementWidget::OnAddToolSave()
-//  {
-//    mitk::NavigationTool::Pointer newTool = m_Controls->m_ToolCreationWidget->GetCreatedTool();
-
-//    if (m_edit) //here we edit a existing tool
-//      {
-//      mitk::NavigationTool::Pointer editedTool = m_IGTLDeviceSource->GetTool(m_Controls->m_ToolList->currentIndex().row());
-//      editedTool->Graft(newTool);
-//      }
-//    else //here we create a new tool
-//      {
-//      m_IGTLDeviceSource->AddTool(newTool);
-//      }
-
-//    UpdateToolTable();
-
-//    m_Controls->m_MainWidgets->setCurrentIndex(0);
-//  }
-
-//void QmitkIGTLDeviceSourceManagementWidget::OnAddToolCancel()
-//  {
-//    m_Controls->m_MainWidgets->setCurrentIndex(0);
-//  }

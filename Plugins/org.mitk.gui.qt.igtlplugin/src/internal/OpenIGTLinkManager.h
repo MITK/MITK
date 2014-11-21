@@ -48,8 +48,7 @@ class OpenIGTLinkManager : public QmitkAbstractView
     virtual ~OpenIGTLinkManager();
 
   public slots:
-    void NewSourceByWidget(mitk::IGTLDeviceSource::Pointer source,
-                           std::string sourceName);
+    void NewSourceByWidget(mitk::IGTLDeviceSource::Pointer source, std::string);
     void SourceSelected(mitk::IGTLDeviceSource::Pointer source);
 
   protected:

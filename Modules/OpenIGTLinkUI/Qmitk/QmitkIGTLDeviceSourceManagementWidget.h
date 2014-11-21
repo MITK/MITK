@@ -37,8 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
   *   \brief An object of this class offers an UI to manage OpenIGTLink Device
   *       Sources and OpenIGTLink Devices.
   *
-  *      Be sure to call the Initialize-methode before you start the widget
-  *      otherwise some errors might occure.
   *
   *   \ingroup OpenIGTLinkUI
   */
@@ -48,10 +46,6 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
 
   public:
     static const std::string VIEW_ID;
-
-    /** Initializes the widget. Has to be called before any action,
-     *  otherwise errors might occur. */
-    void Initialize(mitk::DataStorage*);
 
     /** Loads a source to the widget. The old source is dropped, so be careful,
      *  if the source is not saved somewhere else it might be lost. You might
@@ -92,24 +86,6 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
     void OnSendMessage();
     void OnSendCommand();
 
-    void ResetOutput();
-    void AddOutput(std::string s);
-    void OnUpdateLoggingWindow();
-
-//    //main widget page:
-//    void OnAddTool();
-//    void OnDeleteTool();
-//    void OnEditTool();
-//    void OnLoadTool();
-//    void OnSaveTool();
-//    void OnLoadSource();
-//    void OnSaveSource();
-//    void OnCreateSource();
-
-//    //widget page "add tool":
-//    void OnAddToolCancel();
-//    void OnAddToolSave();
-
   protected:
     /// \brief Fills the commands combo box with available commands
     void FillCommandsComboBox();
@@ -134,17 +110,19 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
     igtl::MessageBase::Pointer m_CurrentCommand;
 
     /** mutex to control access to m_State */
-    itk::FastMutexLock::Pointer m_OutputMutex;
+//    itk::FastMutexLock::Pointer m_OutputMutex;
     /** @brief a string stream used for logging */
-    std::stringstream m_Output;
+//    std::stringstream m_Output;
     /** @brief flag to indicate if the output has to be updated */
-    bool m_OutputChanged;
+//    bool m_OutputChanged;
+
+
     /** @brief flag to indicate if the IGTL device is a client or a server */
     bool m_IsClient;
 
 
     /** @brief a string stream used for logging */
-    QTimer m_UpdateLoggingWindowTimer;
+//    QTimer m_UpdateLoggingWindowTimer;
 
 
     itk::MemberCommand< QmitkIGTLDeviceSourceManagementWidget >::Pointer m_MessageReceivedCommand;

@@ -55,13 +55,11 @@ void OpenIGTLinkManager::CreateQtPartControl( QWidget *parent )
            SIGNAL(IGTLDeviceSourceSelected(mitk::IGTLDeviceSource::Pointer)),
            this,
            SLOT(SourceSelected(mitk::IGTLDeviceSource::Pointer)) );
-
-  m_Controls.m_SourceManagerWidget->Initialize(this->GetDataStorage());
 }
 
 
 void OpenIGTLinkManager::NewSourceByWidget(
-    mitk::IGTLDeviceSource::Pointer source,std::string sourceName)
+    mitk::IGTLDeviceSource::Pointer source,std::string /*sourceName*/)
 {
   source->RegisterAsMicroservice(/*sourceName*/);
   m_AllSourcesHandledByThisWidget.push_back(source);

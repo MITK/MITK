@@ -96,6 +96,13 @@ void QmitkIGTLStreamingConnector::OnUpdateSource()
   //update the message source
   this->m_IGTLMessageSource->Update();
 
-  //send the latest output to the message provider
-  this->m_IGTLMessageProvider->Send(this->m_IGTLMessageSource->GetOutput());
+  //get the latest message
+  mitk::IGTLMessage* curMsg = this->m_IGTLMessageSource->GetOutput();
+
+  //check if this message is valid
+  if ( curMsg->IsDataValid() )
+  {
+    //send the latest output to the message provider
+    this->m_IGTLMessageProvider->Send(curMsg);
+  }
 }

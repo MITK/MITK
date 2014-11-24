@@ -1120,7 +1120,10 @@ void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
 
 void QmitkSlicesInterpolator::CheckSupportedImageDimension()
 {
-  if (m_3DInterpolationEnabled && m_Segmentation->GetDimension() != 3)
+  if (m_ToolManager->GetWorkingData(0))
+    m_Segmentation = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
+
+  if (m_3DInterpolationEnabled && m_Segmentation && m_Segmentation->GetDimension() != 3)
   {
     QMessageBox info;
     info.setWindowTitle("3D Interpolation Process");

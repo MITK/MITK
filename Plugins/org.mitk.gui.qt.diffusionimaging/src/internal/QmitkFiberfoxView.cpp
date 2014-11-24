@@ -1932,12 +1932,14 @@ void QmitkFiberfoxView::GenerateFibers()
                     {
                         radius = v.GetVnlVector().magnitude();
                         ellipse->SetControlPoint(1, p);
+                        ellipse->Modified();
                     }
                     else
                     {
                         v.Normalize();
                         v *= radius;
                         ellipse->SetControlPoint(1, c+v);
+                        ellipse->Modified();
                     }
                 }
                 fib.push_back(ellipse);

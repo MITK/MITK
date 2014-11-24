@@ -23,7 +23,7 @@ namespace itk
 {
   template< class TInputImage >
   ExtendedStatisticsImageFilter< TInputImage >::ExtendedStatisticsImageFilter()
-    : StatisticsImageFilter()
+    : StatisticsImageFilter< TInputImage >()
   {
     /*
     * add the Skewness and Kurtosis to the other statistical calculated Values
@@ -113,8 +113,8 @@ namespace itk
     ExtendedStatisticsImageFilter< TInputImage >
     ::ComputeTheSkewnessAndKurtosis()
   {
-    RealType mean = GetMean();
-    RealType sigma = GetSigma();
+    RealType mean = this->GetMean();
+    RealType sigma = this->GetSigma();
     RealType baseOfSkewnessAndKurtosis;
     RealType kurtosis = 0;
     RealType skewness = 0;

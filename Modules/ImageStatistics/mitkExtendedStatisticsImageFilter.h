@@ -43,6 +43,8 @@ namespace itk
     typedef StatisticsImageFilter< TInputImage >             Superclass;
     typedef SmartPointer< Self >                             Pointer;
     typedef SmartPointer< const Self >                       ConstPointer;
+    typedef typename Superclass::RealType                             RealType;
+    typedef typename Superclass::RealObjectType                       RealObjectType;
 
     /** Method for creation through the object factory. */
     itkNewMacro( Self );

@@ -46,6 +46,10 @@ namespace itk
     typedef LabelStatisticsImageFilter < TInputImage, TLabelImage > Superclass;
     typedef SmartPointer< Self >                                    Pointer;
     typedef SmartPointer< const Self >                              ConstPointer;
+    typedef typename Superclass::LabelPixelType                     LabelPixelType;
+    typedef typename Superclass::RealType                           RealType;
+    typedef typename Superclass::PixelType                          PixelType;
+    typedef typename Superclass::MapIterator                        MapIterator;
 
     itkNewMacro(Self);
 

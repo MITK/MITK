@@ -422,8 +422,9 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
          + direction[1] * (point[1] - projectedPoint[1])
          + direction[2] * (point[2] - projectedPoint[2]) >= 0 )
       {
-        bestSlice = (int)(plane->Distance( point )
-          / slicedWorldGeometry->GetSpacing()[2] + 0.5);
+        mitk::ScalarType spacing = slicedWorldGeometry->GetSpacing()[2];
+        mitk::ScalarType dist = plane->Distance( point ) - 0.5 * spacing;
+        bestSlice = (int)( dist / spacing + 0.5);
       }
     }
     else

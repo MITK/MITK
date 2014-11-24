@@ -390,7 +390,7 @@ protected:
 
   /*calculate the min and max value, this is done because we need the min and max value before execution the statistics filter to have the wright range for the histogramm*/
   template < typename TPixel, unsigned int VImageDimension >
-  void  GetMinAndMaxValue(double &minimum, double &maximum, const itk::Image< TPixel, VImageDimension > *InputImage,
+  void  GetMinAndMaxValue(double &minimum, double &maximum, int &counter, double &sigma, const itk::Image< TPixel, VImageDimension > *InputImage,
     itk::Image< unsigned short, VImageDimension > *MaskImageType);
 
 

@@ -787,7 +787,8 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     stream << "3D-interpolation";
     segSurface->SetName(stream.str());
     segSurface->SetProperty( "opacity", mitk::FloatProperty::New(0.7) );
-    segSurface->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
+    segSurface->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(true));
+    segSurface->SetProperty( "3DInterpolationResult", mitk::BoolProperty::New(true));
     m_DataStorage->Add(segSurface, segmentationNode);
     this->Show3DInterpolationResult(false);
   }
@@ -942,6 +943,17 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
       {
         bool isInterpolationResult(false);
         workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
+        mitk::NodePredicateAnd::Pointer pred = mitk::NodePredicateAnd::New(mitk::NodePredicateProperty::New("3DInterpolationResult", mitk::BoolProperty::New(true)),
+                                                                           mitk::NodePredicateDataType::New("Surface"));
+        mitk::DataStorage::SetOfObjects::ConstPointer interpolationResults =
+            m_DataStorage->GetDerivations(workingNode, pred);
+
+        for (unsigned int i = 0; i < interpolationResults->Size(); ++i)
+        {
+          mitk::DataNode::Pointer currNode = interpolationResults->at(i);
+          if (currNode.IsNotNull())
+            m_DataStorage->Remove(currNode);
+        }
 
         if ((workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) &&
             !isInterpolationResult && m_3DInterpolationEnabled)

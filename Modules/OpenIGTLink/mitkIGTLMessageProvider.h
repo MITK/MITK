@@ -24,17 +24,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkCommand.h"
 
 namespace mitk {
-  /**Documentation
+  /**
   * \brief Provides information/objects from a MITK-Pipeline to other OpenIGTLink
   * devices
   *
   * This class is intended as the drain of the pipeline. Other OpenIGTLink
-  * devices connect with the device hold by this provider. The other device asks
-  * for a special data. The provider checks if there are other IGTLMessageSources
-  * available that provide this data type. If yes, they connect with this source
-  * and send the message to the requesting device.
+  * devices connect with the IGTLDevice hold by this provider. The other device
+  * asks for a certain data type. The provider checks if there are other
+  * IGTLMessageSources available that provide this data type. If yes the provider
+  * connects with this source and sends the message to the requesting device.
   *
+  * If a STT message was received the provider looks for fitting messageSources.
+  * Once found it connects with it, starts a timing thread (which updates the
+  * pipeline) and sends the result to the requesting device.
   *
+  * If a GET message was received the provider just calls an update of the
+  * found source and sends the result without connecting to the source.
+  *
+  * If a STP message was received it stops the thread and disconnects from the
+  * previous source.
+  *
+  * So far the provider can just connect with one source.
+  *
+  * \ingroup OpenIGTLink
   */
   class MITK_OPENIGTLINK_EXPORT IGTLMessageProvider : public IGTLDeviceSource
   {

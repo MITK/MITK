@@ -18,6 +18,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QLabel" name="label">
+       <property name="toolTip">
+        <string>The selected IGTL device source</string>
+       </property>
        <property name="text">
         <string>Selected IGTL Device Source: </string>
        </property>
@@ -38,6 +41,19 @@
       <string>Setup Connection</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="logSendReceiveMsg">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Enable this checkbox to log the send and receive message events</string>
+        </property>
+        <property name="text">
+         <string>Log Send and Receive Messages</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="2" column="0">
@@ -58,6 +74,9 @@
          <widget class="QLineEdit" name="editPort">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Enter the port number of the host</string>
           </property>
           <property name="text">
            <string>18944</string>
@@ -81,6 +100,9 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="toolTip">
+           <string>Enter the IP address of the host</string>
+          </property>
           <property name="text">
            <string>127.0.0.1</string>
           </property>
@@ -97,7 +119,7 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>Do image processing</string>
+         <string>Connect with the host/Start server</string>
         </property>
         <property name="text">
          <string>Connect</string>
@@ -119,13 +141,19 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="logSendReceiveMsg">
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="bufferMsgCheckBox">
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="toolTip">
+         <string>If this checkbox is set the device stores all incoming messages in the queue. If it is not set it always overwrites the current value.</string>
+        </property>
         <property name="text">
-         <string>Log Send and Receive Messages</string>
+         <string>Buffer Incoming Messages</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -143,12 +171,18 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="toolTip">
+         <string>Enter the string to be sent</string>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="butSend">
         <property name="enabled">
          <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Sends a message with the given string to the connected device</string>
         </property>
         <property name="text">
          <string>Send String</string>
@@ -184,6 +218,9 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="toolTip">
+           <string>Frames per second</string>
+          </property>
           <property name="text">
            <string>FPS:</string>
           </property>
@@ -200,6 +237,9 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="toolTip">
+           <string>Set the frames per second of the stream</string>
+          </property>
           <property name="value">
            <number>10</number>
           </property>
@@ -211,6 +251,9 @@
        <widget class="QPushButton" name="butSendCommand">
         <property name="enabled">
          <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Send the command</string>
         </property>
         <property name="text">
          <string>Send Command</string>

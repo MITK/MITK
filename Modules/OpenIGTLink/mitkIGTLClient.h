@@ -26,12 +26,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  /** Documentation
-  * \brief superclass for open IGT link client
+  /**
+  * \brief Superclass for OpenIGTLink clients
   *
-  * implements the IGTLDevice interface for IGTL clients
+  * Implements the IGTLDevice interface for IGTLClients. In certain points it
+  * behaves different than the IGTLServer. The client connects directly to a
+  * server (it cannot connect to two different servers). Therefore, it has to
+  * check only this one connection.
   *
-  * \ingroup IGT
+  * \ingroup OpenIGTLink
   */
   class MITK_OPENIGTLINK_EXPORT IGTLClient : public IGTLDevice
   {
@@ -41,53 +44,42 @@ namespace mitk
     itkCloneMacro(Self)
 
     /**
-    * \brief initialize the connection to the IGTL device
+    * \brief Establishes the connection between this client and the IGTL server.
     *
-    * \todo check this description
-    *
-    * OpenConnection() establishes the connection to the IGTL server by:
-    * - connection to the IGTL device
-    * - initializing the device
-    * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
-    * @throw mitk::IGTException Throws a normal IGT exception if an error occures which is not related to the hardware.
+    * @throw mitk::Exception Throws an exception if the client is not in Setup
+    * mode or if it cannot connect to the defined host.
     */
     virtual bool OpenConnection();
 
 
   protected:
-    IGTLClient();          ///< Constructor
-    virtual ~IGTLClient(); ///< Destructor
+    /** Constructor */
+    IGTLClient();
+    /** Destructor */
+    virtual ~IGTLClient();
 
     /**
     * \brief Call this method to receive a message.
     *
-    * The message will be saved in the receive queue.
+    * The message will be saved in the receive queue. If the connection is lost
+    * it will stop the communication.
     */
     virtual void Receive();
 
     /**
-    * \brief Call this method to send a message. The message will be read from
-    * the queue
+    * \brief Call this method to send a message.
+    *
+    * The message will be read from the queue.
     */
     virtual void Send();
 
     /**
-    * \brief Call this method to check for other devices that want to connect
-    * to this one.
+    * \brief Stops the communication with the given socket.
     *
-    * In case of a client this method is doing nothing. In case of a server it
-    * is checking for other devices and if there is one it establishes a
-    * connection.
+    * The client uses just one socket. Therefore, calling this function causes
+    * the stop of the communication.
+    *
     */
-    virtual void Connect();
-
-    /**
-      * \brief Stops the communication with the given socket.
-      *
-      * The client uses just one socket. Therefore, calling this function causes
-      * the stop of the communication.
-      *
-      */
     virtual void StopCommunicationWithSocket(igtl::Socket*);
   };
 } // namespace mitk

@@ -21,9 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLMessageSource.h"
 
 namespace mitk {
-  /**Documentation
+  /**
   * \brief Connects a mitk::IGTLDevice to a
-  *        MITK-OpenIGTLink Message-Filterpipeline
+  *        MITK-OpenIGTLink-Message-Filter-Pipeline
   *
   * This class is the source of most OpenIGTLink pipelines. It encapsulates a
   * mitk::IGTLDevice and provides the information/messages of the connected

@@ -38,10 +38,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 namespace mitk {
-    /**Documentation
-    * \brief Interface for all Open IGT Link Devices
+    /**
+    * \brief Interface for all OpenIGTLink Devices
     *
-    * Defines the methods that are common for all devices using Open IGT Link.
+    * Defines the methods that are common for all devices using OpenIGTLink. It
+    * can open/close a connection, start/stop a communication and send/receive
+    * messages.
+    *
+    * It uses message queues to store the incoming and outgoing mails. They are
+    * configurable, you can set buffering on and off.
+    *
+    * The device is in one of three different states: Setup, Ready or Running.
+    * Setup is the initial state. From this state on you can call
+    * OpenConnection() and arrive in the Ready state. From the Ready state you
+    * call StartCommunication() to arrive in the Running state. Now the device
+    * is continuosly checking for new connections, receiving messages and
+    * sending messages. This runs in a seperate thread. To stop the communication
+    * call StopCommunication() (to arrive in Ready state) or CloseConnection()
+    * (to arrive in the Setup state).
+    *
+    * \ingroup OpenIGTLink
     *
     */
     class MITK_OPENIGTLINK_EXPORT IGTLDevice : public itk::Object
@@ -50,7 +66,9 @@ namespace mitk {
       mitkClassMacro(IGTLDevice, itk::Object)
 
       /**
-       * Type for state variable. The IGTLDevice is always in one of these states
+       * \brief Type for state variable.
+       * The IGTLDevice is always in one of these states.
+       *
       */
       enum IGTLDeviceState {Setup, Ready, Running};
 
@@ -59,7 +77,7 @@ namespace mitk {
        *
        * This may only be called if there is currently no connection to the
        * device. If OpenConnection() is successful, the object will change from
-       * Setup state to Ready state
+       * Setup state to Ready state.
        */
       virtual bool OpenConnection() = 0;
 
@@ -74,84 +92,60 @@ namespace mitk {
       /**
        * \brief Stops the communication between the two devices
        *
-       * This may only be called if there the device is in Running state
+       * This may only be called if the device is in Running state.
        */
       virtual bool StopCommunication();
 
+      /**
+       * \brief Starts the communication between the two devices
+       *
+       * This may only be called if the device is in Ready state.
+       */
       bool StartCommunication();
 
+      /**
+       * \brief Continuously checks for new connections, receives messages and
+       * sends messages.
+       *
+       * This may only be called if the device is in Running state and only from
+       * a seperate thread.
+       */
       void RunCommunication();
 
       /**
-       * \brief Sends a message via the open IGT Link.
+       * \brief Adds the given message to the sending queue
        *
        * This may only be called after the connection to the device has been
        * established with a call to OpenConnection(). Note that the message
        * is not send directly. This method just adds it to the send queue.
+       * \param msg The message to be added to the sending queue
        */
       void SendMessage(igtl::MessageBase::Pointer msg);
 
       /**
-       * \brief Sends a message via the open IGT Link.
+       * \brief Adds the given message to the sending queue
        *
        * Convenience function to work with mitk::IGTLMessage directly.
+       * \param msg The message to be added to the sending queue
        */
       void SendMessage(const IGTLMessage* msg);
 
       /**
-       * \brief return current object state (Setup, Ready or Running)
+       * \brief Returns current object state (Setup, Ready or Running)
        */
       IGTLDeviceState GetState() const;
 
       /**
-       * \brief Returns the oldest command message
-       * \param msg A smartpointer to the message base where the oldest command
-       * shall be copied into
-       * \retval true The latest message is stored in msg
-       * \retval false The latest message could not been copied, do not use this
-       * data
+       * \brief Returns the oldest message in the command queue
+       * \return The oldest message from the command queue.
        */
       igtl::MessageBase::Pointer GetNextCommand();
 
       /**
-       * \brief Returns the oldest received message
-       * \param msg A smartpointer to the message base where the latest message
-       * shall be copied into
-       * \retval true The latest message is stored in msg
-       * \retval false The latest message could not been copied, do not use this
-       * data
+       * \brief Returns the oldest message in the receive queue
+       * \return The oldest message from the receive queue
        */
       igtl::MessageBase::Pointer GetNextMessage();
-
-//      /**
-//       * \brief Returns information about the oldest message in the receive queue
-//       */
-//      std::string GetNextMessageInformation();
-
-//      /**
-//       * \brief Returns device type about the oldest message in the receive queue
-//       */
-//      std::string GetNextMessageDeviceType();
-
-//      /**
-//       * \brief Returns information about the oldest message in the command queue
-//       */
-//      std::string GetNextCommandInformation();
-
-//      /**
-//       * \brief Returns device type about the oldest message in the command queue
-//       */
-//      std::string GetNextCommandDeviceType();
-
-      /**
-       * \brief return device data
-       */
-//      igtl::MessageBase::Pointer GetData() const;
-
-      /**
-       * \brief set device data
-       */
-//      void SetData(IGTLDeviceData data);
 
       /**
        * \brief Sets the port number of the device
@@ -198,7 +192,6 @@ namespace mitk {
        */
       itkGetConstMacro(SendQueue, mitk::IGTLMessageQueue::Pointer);
 
-
       /**
        * \brief Returns the message factory
        */
@@ -206,20 +199,22 @@ namespace mitk {
 
       /**
        * \brief static start method for the tracking thread.
+       * \param data a void pointer to the IGTLDevice object.
        */
       static ITK_THREAD_RETURN_TYPE ThreadStartCommunication(void* data);
 
      /**
-      * \brief TestConnection() tries to connect to a IGTL server on the current
+      * \brief TestConnection() tries to connect to a IGTL device on the current
       * ip and port
       *
-      * \todo check this description
+      * \todo Implement this method. Send a status message and check the answer.
       *
       * TestConnection() tries to connect to a IGTL server on the current
       * ip and port and returns which device it has found.
-      * \return It returns the type of the device that answers. Throws an exception
+      * \return It returns the type of the device that answers. Throws an
+      * exception
       * if no device is available on that ip/port.
-      * @throw mitk::IGTHardwareException Throws an exception if there are errors
+      * @throw mitk::Exception Throws an exception if there are errors
       * while connecting to the device.
       */
       virtual bool TestConnection();
@@ -229,12 +224,22 @@ namespace mitk {
        */
       bool SendRTSMessage(const char* type);
 
+      /**
+      * \brief Sets the buffering mode of the given queue
+      */
+      void EnableInfiniteBufferingMode(mitk::IGTLMessageQueue::Pointer queue,
+                                       bool enable = true);
+
     protected:
       /**
-       * \brief Sends a message via the open IGT Link.
+       * \brief Sends a message.
        *
        * This may only be called after the connection to the device has been
-       * established with a call to OpenConnection()
+       * established with a call to OpenConnection(). This method uses the given
+       * socket to send the given MessageReceivedEvent
+       *
+       * \param msg the message to be sent
+       * \param socket the socket used to communicate with the other device
        *
        * \retval IGTL_STATUS_OK the message was sent
        * \retval IGTL_STATUS_UNKONWN_ERROR the message was not sent because an
@@ -252,9 +257,11 @@ namespace mitk {
       virtual void Receive() = 0;
 
       /**
-      * \brief Call this method to receive a message from the given client.
+      * \brief Call this method to receive a message from the given device.
       *
       * The message will be saved in the receive queue.
+      *
+      * \param device the socket that connects this device with the other one.
       *
       * \retval IGTL_STATUS_OK a message or a command was received
       * \retval IGTL_STATUS_NOT_PRESENT the socket is not connected anymore
@@ -263,11 +270,11 @@ namespace mitk {
       * incorrect
       * \retval IGTL_STATUS_UNKNOWN_ERROR an unknown error occurred
       */
-      unsigned int ReceivePrivate(igtl::Socket* client);
+      unsigned int ReceivePrivate(igtl::Socket* device);
 
       /**
       * \brief Call this method to send a message. The message will be read from
-      * the queue
+      * the queue.
       */
       virtual void Send() = 0;
 
@@ -279,7 +286,7 @@ namespace mitk {
       * is checking for other devices and if there is one it establishes a
       * connection.
       */
-      virtual void Connect() = 0;
+      virtual void Connect();
 
       /**
       * \brief Stops the communication with the given socket
@@ -288,66 +295,62 @@ namespace mitk {
       virtual void StopCommunicationWithSocket(igtl::Socket* socket) = 0;
 
       /**
-      * \brief  change object state
+      * \brief change object state
       */
       void SetState(IGTLDeviceState state);
-
 
       IGTLDevice();
       virtual ~IGTLDevice();
 
-//      IGTLDeviceData m_Data; ///< current device Data
-      IGTLDeviceState m_State; ///< current object state (Setup, Ready or Running)
-      bool m_StopCommunication;       ///< signal stop to thread
-      /** mutex to control access to m_StopThread */
+      /** current object state (Setup, Ready or Running) */
+      IGTLDeviceState m_State;
+      /** the name of this device */
+      std::string m_Name;
+
+      /** signal used to stop the thread*/
+      bool m_StopCommunication;
+      /** mutex to control access to m_StopCommunication */
       itk::FastMutexLock::Pointer m_StopCommunicationMutex;
-      /** mutex to manage control flow of StopTracking() */
+      /** mutex used to make sure that the thread is just started once */
       itk::FastMutexLock::Pointer m_CommunicationFinishedMutex;
       /** mutex to control access to m_State */
       itk::FastMutexLock::Pointer m_StateMutex;
-      /** mutex to control access to m_Socket */
-//      itk::FastMutexLock::Pointer m_SocketMutex;
-      /** mutex to control access to m_ReceiveQueue */
-//      itk::FastMutexLock::Pointer m_ReceiveQueueMutex;
-      /** mutex to control access to m_SendQueue */
-//      itk::FastMutexLock::Pointer m_SendQueueMutex;
       /** the hostname or ip of the device */
       std::string m_Hostname;
       /** the port number of the device */
       int m_PortNumber;
       /** the socket used to communicate with other IGTL devices */
       igtl::Socket::Pointer m_Socket;
-      /** the latest received message */
-//      igtl::MessageBase::Pointer m_LatestMessage;
+
       /** The message receive queue */
       mitk::IGTLMessageQueue::Pointer m_ReceiveQueue;
       /** The message send queue */
       mitk::IGTLMessageQueue::Pointer m_SendQueue;
       /** A queue that stores just command messages received by this device */
       mitk::IGTLMessageQueue::Pointer m_CommandQueue;
+
       /** A message factory that provides the New() method for all msg types */
       mitk::IGTLMessageFactory::Pointer m_MessageFactory;
-      /** the name of this device */
-      std::string m_Name;
 
     private:
       /** creates worker thread that continuously polls interface for new
       messages */
       itk::MultiThreader::Pointer m_MultiThreader;
-      int m_ThreadID; ///< ID of polling thread
+      /** ID of polling thread */
+      int m_ThreadID;
     };
 
-    /**Documentation
+    /**
     * @brief connect to this Event to get noticed when a message was received
     * */
     itkEventMacro( MessageReceivedEvent , itk::AnyEvent );
 
-    /**Documentation
+    /**
     * @brief connect to this Event to get noticed when a command was received
     * */
     itkEventMacro( CommandReceivedEvent , itk::AnyEvent );
 
-    /**Documentation
+    /**
     * @brief connect to this Event to get noticed when another igtl device
     * connects with this device.
     * */

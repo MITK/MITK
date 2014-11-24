@@ -77,11 +77,6 @@ bool mitk::IGTLClient::OpenConnection()
   return true;
 }
 
-void mitk::IGTLClient::Connect()
-{
-
-}
-
 void mitk::IGTLClient::Receive()
 {
   //try to receive a message, if the socket is not present anymore stop the

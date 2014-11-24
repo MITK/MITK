@@ -45,6 +45,7 @@ QmitkIGTLDeviceSourceManagementWidget::QmitkIGTLDeviceSourceManagementWidget(
   : QWidget(parent, f), m_IsClient(false)
 {
   m_Controls = NULL;
+  this->m_IGTLDevice = NULL;
   CreateQtPartControl(this);
 }
 
@@ -94,6 +95,8 @@ void QmitkIGTLDeviceSourceManagementWidget::CreateConnections()
     connect( m_Controls->commandsComboBox,
              SIGNAL(currentIndexChanged(const QString &)),
              this, SLOT(OnCommandChanged(const QString &)));
+    connect( m_Controls->bufferMsgCheckBox, SIGNAL(stateChanged(int)),
+             this, SLOT(OnBufferIncomingMessages(int)));
   }
 }
 
@@ -151,6 +154,7 @@ void QmitkIGTLDeviceSourceManagementWidget::LoadSource(
       this->m_Controls->commandsComboBox->setEnabled(true);
       this->m_Controls->butSendCommand->setEnabled(true);
       this->m_Controls->logSendReceiveMsg->setEnabled(true);
+      this->m_Controls->bufferMsgCheckBox->setEnabled(true);
       break;
     default:
       mitkThrow() << "Invalid Device State";
@@ -208,6 +212,7 @@ void QmitkIGTLDeviceSourceManagementWidget::DisableSourceControls()
   m_Controls->fpsSpinBox->setEnabled(false);
   m_Controls->commandsComboBox->setEnabled(false);
   m_Controls->butSend->setEnabled(false);
+  m_Controls->bufferMsgCheckBox->setEnabled(false);
 //  m_Controls->m_AddTool->setEnabled(false);
 //  m_Controls->m_LoadTool->setEnabled(false);
 //  m_Controls->m_selectedLabel->setEnabled(false);
@@ -262,6 +267,7 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
         this->m_Controls->commandsComboBox->setEnabled(true);
         this->m_Controls->butSendCommand->setEnabled(true);
         this->m_Controls->logSendReceiveMsg->setEnabled(true);
+        this->m_Controls->bufferMsgCheckBox->setEnabled(true);
         this->m_Controls->butConnect->setText("Disconnect");
         if ( this->m_IsClient )
         {
@@ -293,6 +299,7 @@ void QmitkIGTLDeviceSourceManagementWidget::OnConnect()
     m_Controls->butSend->setEnabled(false);
     m_Controls->butSendCommand->setEnabled(false);
     m_Controls->commandsComboBox->setEnabled(false);
+    m_Controls->bufferMsgCheckBox->setEnabled(false);
     m_Controls->butConnect->setText("Connect");
     m_IGTLDevice->CloseConnection();
     MITK_INFO("QmitkIGTLDeviceSourceManagementWidget") << "Closed connection";
@@ -390,6 +397,15 @@ void QmitkIGTLDeviceSourceManagementWidget::OnCommandReceived(
   {
     MITK_INFO("IGTLDeviceSourceManagementWidget") << "Received a command: "
         << dev->GetCommandQueue()->GetLatestMsgInformationString();
+  }
+}
+
+void QmitkIGTLDeviceSourceManagementWidget::OnBufferIncomingMessages(int state)
+{
+  if ( this->m_IGTLDevice )
+  {
+    this->m_IGTLDevice->EnableInfiniteBufferingMode(
+          this->m_IGTLDevice->GetReceiveQueue(), (bool)state);
   }
 }
 

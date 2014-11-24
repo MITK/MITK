@@ -26,11 +26,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLMessageCloneHandler.h"
 
 namespace mitk {
-  /**Documentation
+  /**
   * \brief Factory class of supported OpenIGTLink message types
   *
-  * This class is a factory class of supported OpenIGTLink message types to
-  * localize the message creation code.
+  * This class is a factory for the creation of OpenIGTLink messages. It stores
+  * pairs of type and pointer to the message new method. Available standard types
+  * are already added but you can also add your custom types at runtime.
   *
   */
   class MITK_OPENIGTLINK_EXPORT IGTLMessageFactory : public itk::Object
@@ -39,9 +40,6 @@ namespace mitk {
     mitkClassMacro(IGTLMessageFactory, itk::Object)
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
-
-
-//    virtual void PrintSelf(ostream& os);
 
     /**
     * \brief Function pointer for storing New() static methods of
@@ -55,8 +53,7 @@ namespace mitk {
     * \param messageTypeName The name of the message type
     * \param messageTypeNewPointer Function pointer to the message type new
     * function (e.g. (PointerToMessageBaseNew)&igtl::ImageMessage::New )
-    * \param msgClonePointer Function pointer to the message clone function
-    * (e.g. TBD )
+    * \param cloneHandler pointer to the message clone object
     */
     void AddMessageType(std::string messageTypeName,
                IGTLMessageFactory::PointerToMessageBaseNew messageTypeNewPointer,
@@ -100,21 +97,24 @@ namespace mitk {
     igtl::MessageBase::Pointer CreateInstance(igtl::MessageHeader::Pointer msg);
 
     /**
-    * \brief Add a clone function for the specified message type
+    * \brief Adds a clone function for the specified message type
     * \param msgTypeName The name of the message type
-    * \param msgClonePointer Function pointer to the message clone function
+    * \param msgCloneHandler Function pointer to the message clone function
     * (e.g. TBD )
     */
     virtual void AddMessageCloneHandler(std::string msgTypeName,
                       mitk::IGTLMessageCloneHandler::Pointer msgCloneHandler);
 
     /**
-    * \brief Get pointer to message type clone function, or NULL if the message type is
-    * not registered
-    * Usage: igtl::TransformMessage::Pointer original = igtl::TransformMessage::New();
-    * igtl::MessageBase::Pointer message = GetMessageTypeClonePointer("IMAGE")(original);
+    * \brief Get pointer to message type clone function, or NULL if the message
+    * type is not registered
+    * Usage:
+    * igtl::TransformMessage::Pointer original = igtl::TransformMessage::New();
+    * igtl::MessageBase::Pointer message =
+    * GetCloneHandler("IMAGE")->Clone(original);
     */
-    virtual mitk::IGTLMessageCloneHandler::Pointer GetCloneHandler(std::string messageTypeName);
+    virtual mitk::IGTLMessageCloneHandler::Pointer
+    GetCloneHandler(std::string messageTypeName);
 
     /**
     * \brief Clones the given message according to the available clone methods
@@ -124,27 +124,8 @@ namespace mitk {
     */
     igtl::MessageBase::Pointer Clone(igtl::MessageBase::Pointer msg);
 
-    /*! Print all supported OpenIGTLink message types */
-  //  virtual void PrintAvailableMessageTypes(ostream& os, vtkIndent indent);
-
-    /*! Create a new igtl::MessageBase instance from message type, delete previous igtl::MessageBase if's not NULL */
-  //  PlusStatus CreateInstance(const char* aIgtlMessageType, igtl::MessageBase::Pointer& aMessageBase);
-
-    /*!
-    Generate and pack IGTL messages from tracked frame
-    \param packValidTransformsOnly Control whether or not to pack transform messages if they contain invalid transforms
-    \param igtlMessageTypes List of message types to generate for a client
-    \param igtMessages Output list for the generated IGTL messages
-    \param trackedFrame Input tracked frame data used for IGTL message generation
-    \param transformNames List of transform names to send
-    \param imageTransformName Image transform name used in the IGTL image message
-    \param transformRepository Transform repository used for computing the selected transforms
-    */
-  //  PlusStatus PackMessages(const std::vector<std::string>& igtlMessageTypes, std::vector<igtl::MessageBase::Pointer>& igtMessages, TrackedFrame& trackedFrame,
-  //    std::vector<PlusTransformName>& transformNames, std::vector<PlusIgtlClientInfo::ImageStream>& imageStreams, bool packValidTransformsOnly, vtkTransformRepository* transformRepository=NULL);
-
-    /*!
-    * Returns available get messages
+    /**
+    * \brief Returns available get messages
     */
     std::list<std::string> GetAvailableMessageRequestTypes();
 
@@ -153,20 +134,18 @@ namespace mitk {
     virtual ~IGTLMessageFactory();
 
     /**
-     * Map igt message types and the Clone() methods
+     * \brief Map igt message types and the Clone() methods
     */
     std::map<std::string,mitk::IGTLMessageCloneHandler::Pointer> m_CloneHandlers;
 
     /**
-     * Map igt message types and the New() static methods of igtl::MessageBase
+     * \brief Map igt message types and the New() static methods of igtl::MessageBase
      * classes
     */
     std::map<std::string, PointerToMessageBaseNew> m_NewMethods;
 
   private:
     IGTLMessageFactory(const IGTLMessageFactory&);
-  //  void operator=(const IGTLMessageFactory&);
-
   };
 }
 

@@ -86,6 +86,11 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
     void OnSendMessage();
     void OnSendCommand();
 
+    /**
+     * \brief Enables/Disables the buffering of incoming messages
+     */
+    void OnBufferIncomingMessages(int state);
+
   protected:
     /// \brief Fills the commands combo box with available commands
     void FillCommandsComboBox();

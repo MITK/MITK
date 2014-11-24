@@ -23,7 +23,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 void mitk::IGTLMessageQueue::PushMessage( igtl::MessageBase::Pointer message )
 {
   this->m_Mutex->Lock();
-  this->m_Queue.push_back( message );
+  if ( this->m_BufferingType == IGTLMessageQueue::Infinit )
+  {
+    this->m_Queue.push_back( message );
+  }
+  else //NoBuffering
+  {
+    this->m_Queue.clear();
+    this->m_Queue.push_back( message );
+  }
   this->m_Mutex->Unlock();
 }
 
@@ -112,9 +120,20 @@ int mitk::IGTLMessageQueue::GetSize()
   return this->m_Queue.size();
 }
 
+void mitk::IGTLMessageQueue::EnableInfiniteBuffering(bool enable)
+{
+  this->m_Mutex->Lock();
+  if ( enable )
+    this->m_BufferingType = IGTLMessageQueue::Infinit;
+  else
+    this->m_BufferingType = IGTLMessageQueue::NoBuffering;
+  this->m_Mutex->Unlock();
+}
+
 mitk::IGTLMessageQueue::IGTLMessageQueue()
 {
   this->m_Mutex = itk::FastMutexLock::New();
+  this->m_BufferingType = IGTLMessageQueue::Infinit;
 }
 
 mitk::IGTLMessageQueue::~IGTLMessageQueue()

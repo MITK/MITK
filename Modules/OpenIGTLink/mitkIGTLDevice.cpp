@@ -37,9 +37,9 @@ typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 mitk::IGTLDevice::IGTLDevice() :
 //  m_Data(mitk::DeviceDataUnspecified),
   m_State(mitk::IGTLDevice::Setup),
+  m_Name("Unspecified Device"),
   m_StopCommunication(false),
   m_PortNumber(-1),
-  m_Name("Unspecified Device"),
   m_MultiThreader(NULL), m_ThreadID(0)
 {
   m_StopCommunicationMutex = itk::FastMutexLock::New();
@@ -410,6 +410,11 @@ bool mitk::IGTLDevice::SendRTSMessage(const char* type)
   }
 }
 
+void mitk::IGTLDevice::Connect()
+{
+
+}
+
 igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMessage()
 {
   //copy the next message into the given msg
@@ -422,6 +427,13 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextCommand()
   //copy the next command into the given msg
   igtl::MessageBase::Pointer msg = this->m_CommandQueue->PullMessage();
   return msg;
+}
+
+void mitk::IGTLDevice::EnableInfiniteBufferingMode(
+                                          mitk::IGTLMessageQueue::Pointer queue,
+                                          bool enable)
+{
+  queue->EnableInfiniteBuffering(enable);
 }
 
 //std::string mitk::IGTLDevice::GetNextMessageInformation()

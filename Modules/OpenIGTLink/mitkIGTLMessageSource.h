@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  /**Documentation
+  /**
   * \brief OpenIGTLink message source
   *
   * Base class for all OpenIGTLink filters that produce OpenIGTLink message

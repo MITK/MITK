@@ -26,12 +26,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  /** Documentation
-  * \brief superclass for open IGT link server
+  /**
+  * \brief Superclass for OpenIGTLink server
   *
-  * implements the IGTLDevice interface for IGTL servers
+  * Implements the IGTLDevice interface for IGTLServers. In certain points it
+  * behaves different than the IGTLClient. The client connects directly to a
+  * server (it cannot connect to two different servers) while the server can
+  * connect to several clients. Therefore, it is necessary for the server to
+  * have a list with registered sockets.
   *
-  * \ingroup IGT
+  * \ingroup OpenIGTLink
   */
   class MITK_OPENIGTLINK_EXPORT IGTLServer : public IGTLDevice
   {
@@ -44,22 +48,21 @@ namespace mitk
     typedef SocketListType::iterator SocketListIteratorType;
 
     /**
-    * \brief initialize the connection for the IGTL device
+    * \brief Initialize the connection for the IGTLServer
     *
-    * \todo check this description
     *
-    * OpenConnection() starts the IGTL server so that clients can connect to it
-    * @throw mitk::IGTHardwareException Throws an exception if there are errors
-    * while connecting to the device.
-    * @throw mitk::IGTException Throws a normal IGT exception if an error occures
-    *  which is not related to the hardware.
+    * OpenConnection() starts the IGTLServer socket so that clients can connect
+    * to it.
+    * @throw mitk::Exception Throws an exception if the given port is occupied.
     */
     virtual bool OpenConnection();
 
 
   protected:
-    IGTLServer();          ///< Constructor
-    virtual ~IGTLServer(); ///< Destructor
+    /** Constructor */
+    IGTLServer();
+    /** Destructor */
+    virtual ~IGTLServer();
 
     /**
     * \brief Call this method to check for other devices that want to connect
@@ -67,7 +70,7 @@ namespace mitk
     *
     * In case of a client this method is doing nothing. In case of a server it
     * is checking for other devices and if there is one it establishes a
-    * connection.
+    * connection and adds the socket to m_RegisteredClients.
     */
     virtual void Connect();
 
@@ -79,8 +82,9 @@ namespace mitk
     virtual void Receive();
 
     /**
-    * \brief Call this method to send a message. The message will be read from
-    * the queue
+    * \brief Call this method to send a message.
+    * The message will be read from the queue. So far the message is send to all
+    * connected sockets (broadcast).
     */
     virtual void Send();
 
@@ -101,7 +105,7 @@ namespace mitk
     virtual void StopCommunicationWithSocket(igtl::Socket* client);
 
     /**
-     * @brief A list with all registered clients
+     * \brief A list with all registered clients
      */
     SocketListType m_RegisteredClients;
   };

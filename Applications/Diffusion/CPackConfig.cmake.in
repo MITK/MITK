@@ -1,5 +1,5 @@
 
-include("@MITK_BINARY_DIR@/MITKCPackOptions.cmake")
+#include("@MITK_BINARY_DIR@/MITKCPackOptions.cmake")
 
 if(CPACK_GENERATOR MATCHES "NSIS")
 

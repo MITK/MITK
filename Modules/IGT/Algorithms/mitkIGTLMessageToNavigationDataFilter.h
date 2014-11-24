@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataSource.h>
 #include "mitkIGTLMessage.h"
 #include "mitkIGTLMessageSource.h"
-#include "MitkIGTLinkExports.h"
+#include "MitkIGTExports.h"
 
 namespace mitk
 {
@@ -37,7 +37,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MITK_IGTLINK_EXPORT
+  class MitkIGT_EXPORT
       IGTLMessageToNavigationDataFilter : public NavigationDataSource
   {
   public:

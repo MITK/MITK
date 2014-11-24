@@ -225,6 +225,9 @@ public:
     mitkSetGetConstMacro(MaxIndex, vnl_vector<int>)
     mitkSetGetConstMacro(HotspotIndex, vnl_vector<int>)
 
+    mitkSetGetConstMacro(Skewness, double)
+    mitkSetGetConstMacro(Kurtosis, double)
+
   public:
 
     // this section is all deprecated. Get/Set methods should be used
@@ -256,12 +259,16 @@ public:
 
    Statistics* m_HotspotStatistics;
 
+   double Skewness;
+   double Kurtosis;
+
    bool m_HasHotspotStatistics;
     vnl_vector<int> HotspotIndex;     //< index of hotspotsphere origin
   };
 
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
   typedef std::vector< Statistics > StatisticsContainer;
+
 
   mitkClassMacro( ImageStatisticsCalculator, itk::Object );
   itkNewMacro( ImageStatisticsCalculator );
@@ -342,14 +349,21 @@ public:
   /** \brief Retrieve the histogram depending on the current masking mode (for all image labels. */
   const HistogramContainer &GetHistogramVector(  unsigned int timeStep = 0 ) const;
 
+  typedef std::map<int, double> BinFrequencyType;
+
+  /* Returning a map including bin and Frequency*/
+  BinFrequencyType GetBinsAndFreuqencyForHistograms( unsigned int timeStep = 0, unsigned int label = 0) const;
+
   /** \brief Retrieve statistics depending on the current masking mode.
    *
+
    * \param label The label for which to retrieve the statistics in multi-label situations (ascending order).
    */
   const Statistics &GetStatistics( unsigned int timeStep = 0, unsigned int label = 0 ) const;
 
   /** \brief Retrieve statistics depending on the current masking mode (for all image labels). */
   const StatisticsContainer &GetStatisticsVector( unsigned int timeStep = 0 ) const;
+
 
 
 
@@ -376,6 +390,11 @@ protected:
    * image. If masking is disabled, the original image is simply passed
    * through. */
   void ExtractImageAndMask( unsigned int timeStep = 0 );
+
+  /*calculate the min and max value, this is done because we need the min and max value before execution the statistics filter to have the wright range for the histogramm*/
+  template < typename TPixel, unsigned int VImageDimension >
+  void  GetMinAndMaxValue(double &minimum, double &maximum, int &counter, double &sigma, const itk::Image< TPixel, VImageDimension > *InputImage,
+    itk::Image< unsigned short, VImageDimension > *MaskImageType);
 
 
   /** \brief If the passed vector matches any of the three principal axes

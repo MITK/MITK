@@ -509,7 +509,7 @@ namespace mitk
   /* Implementation of the min max values for setting the range of the histogram */
   template < typename TPixel, unsigned int VImageDimension >
   void  ImageStatisticsCalculator::GetMinAndMaxValue( double &min,
-    double &max,
+    double &max, int &counter, double &sigma,
     const itk::Image< TPixel, VImageDimension > *InputImage,
     itk::Image< unsigned short, VImageDimension > *MaskedImage )
   {
@@ -524,37 +524,57 @@ namespace mitk
 
     max = 0;
     min = 0;
+    counter = 0;
+    sigma = 0;
+    double SumOfSquares = 0;
+    double sumSquared = 0;
 
     double actualPielValue = 0;
     int counterOfPixelsInROI = 0;
-    int Pixel = 0;
+
 
     for( labelIterator2.GoToBegin(); !labelIterator2.IsAtEnd(); ++labelIterator2, ++labelIterator3)
     {
       if( labelIterator2.Value()== 1.0)
       {
-        Pixel++;
+        counter++;
 
         counterOfPixelsInROI++;
         actualPielValue = labelIterator3.Value();
 
-        if(counterOfPixelsInROI == 1)
-        {
-          max = actualPielValue;
-          min = actualPielValue;
-        }
+        sumSquared = sumSquared + actualPielValue;
+          SumOfSquares = SumOfSquares + std::pow(actualPielValue,2);
 
-        if(actualPielValue >= max)
-        {
-          max = actualPielValue;
-        }
-        else if(actualPielValue <= min)
-        {
-          min = actualPielValue;
-        }
+          if(counterOfPixelsInROI == 1)
+          {
+            max = actualPielValue;
+            min = actualPielValue;
+          }
+
+          if(actualPielValue >= max)
+          {
+            max = actualPielValue;
+          }
+          else if(actualPielValue <= min)
+          {
+            min = actualPielValue;
+          }
 
       }
     }
+
+    if (counter > 1)
+    {
+      sigma = ( SumOfSquares - std::pow( sumSquared, 2) / counter ) / ( counter-1 );
+    }
+    else
+    {
+      sigma = 0;
+    }
+
+
+    std::cout << "Test2:" << max << std::endl;
+    std::cout << "Test1:" << min << std::endl;
   }
 
 
@@ -1216,6 +1236,18 @@ namespace mitk
     typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
 
 
+   /* typedef  itk::ImageFileWriter< MaskImageType  > WriterType;
+    WriterType::Pointer writer = WriterType::New();
+    writer->SetFileName("C:\\Users\\tmueller\\Documents\\TestPics\\ROI.nrrd");
+    writer->SetInput(maskImage);
+    writer->Update();
+
+   typedef  itk::ImageFileWriter<ImageType> WriterType22;
+    WriterType22::Pointer writer2 = WriterType22::New();
+    writer2->SetFileName("C:\\Users\\tmueller\\Documents\\TestPics\\ROI2.nrrd");
+    writer2->SetInput(image);
+    writer2->Update();*/
+
 
     typedef typename ImageType::IndexType IndexType;
     typedef typename ImageType::PointType PointType;
@@ -1338,9 +1370,11 @@ namespace mitk
 
     double maximum = 0;
     double minimum = 0;
+    double sig = 0;
+    int counter = 0;
 
     //Find the min and max values for the Roi to set the range for the histogram
-    GetMinAndMaxValue( minimum, maximum, image, maskImage);
+    GetMinAndMaxValue( minimum, maximum, counter, sig, image, maskImage);
 
     // Initialize Filter
     typedef itk::ExtendedStatisticsImageFilter< ImageType > StatisticsFilterType;
@@ -1350,14 +1384,38 @@ namespace mitk
     statisticsFilter->Update();
 
     //int numberOfBins = ( m_DoIgnorePixelValue && (m_MaskingMode == MASKING_MODE_NONE) ) ? 768 : 384;
+   int a = floor(minimum);
+   int b = ceil(maximum);
 
-    int numberOfBins = int ( (maximum - minimum) / 10);
+   std::cout << "Testneu4444: " << b << std::endl;
+   std::cout << "Testn3333: " << a << std::endl;
+
+
+
+      while( a % 10 != 0 )
+      {
+         a--;
+      }
+
+
+
+      while( b % 10 != 0 )
+      {
+        b++;
+      }
+
+
+   // double classWidth = (3.49 * sig) / std::pow( counter, (1/3) );
+    int numberOfBins = int ( (b - a) / 10 );
+
+    std::cout << "test3:" << numberOfBins << std::endl;
     typename  LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();
     labelStatisticsFilter->SetInput( adaptedImage );
     labelStatisticsFilter->SetLabelInput( adaptedMaskImage );
     labelStatisticsFilter->UseHistogramsOn();
-    labelStatisticsFilter->SetHistogramParameters( numberOfBins,minimum , maximum);   //statisticsFilter->GetMinimum() statisticsFilter->GetMaximum()
+    labelStatisticsFilter->SetHistogramParameters( numberOfBins, a, b);   //statisticsFilter->GetMinimum() statisticsFilter->GetMaximum()
 
+     std::cout << "test4444:" << std::endl;
 
 
     // Add progress listening

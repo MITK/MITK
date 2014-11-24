@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-// TODO Testing if its working
-
 class MitkSurfaceInterpolation_EXPORT PointCloudScoringFilter:
     public SurfaceToSurfaceFilter
 {

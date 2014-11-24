@@ -25,8 +25,6 @@ mitk::PointCloudScoringFilter::PointCloudScoringFilter():
   m_NumberOfOutpPoints(0)
 {
   m_OutpSurface = mitk::Surface::New();
-  this->SetNumberOfRequiredInputs(2);
-  this->SetNumberOfRequiredOutputs(1);
 
   this->SetNthOutput(0, m_OutpSurface);
 }
@@ -47,8 +45,10 @@ void mitk::PointCloudScoringFilter::GenerateData()
 
   if(edgeSurface->IsEmpty() || segmSurface->IsEmpty())
   {
-    MITK_ERROR << "Cannot convert input into Surfaces" << std::endl;
-    return;
+    if(edgeSurface->IsEmpty())
+      MITK_ERROR << "Cannot convert EdgeSurface into Surfaces" << std::endl;
+    if(segmSurface->IsEmpty())
+      MITK_ERROR << "Cannot convert SegmSurface into Surfaces" << std::endl;
   }
 
   vtkSmartPointer<vtkPolyData> edgePolyData = edgeSurface->GetVtkPolyData();

@@ -41,7 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/QmitkPartialVolumeAnalysisView.h"
 #include "src/internal/QmitkIVIMView.h"
 #include "src/internal/QmitkTractbasedSpatialStatisticsView.h"
-#include "src/internal/QmitkTbssSkeletonizationView.h"
 #include "src/internal/QmitkStreamlineTrackingView.h"
 #include "src/internal/Connectomics/QmitkConnectomicsDataView.h"
 #include "src/internal/Connectomics/QmitkConnectomicsNetworkOperationsView.h"
@@ -80,7 +79,6 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkPartialVolumeAnalysisView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkIVIMView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkTractbasedSpatialStatisticsView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkTbssSkeletonizationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConnectomicsDataView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConnectomicsNetworkOperationsView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConnectomicsStatisticsView, context)

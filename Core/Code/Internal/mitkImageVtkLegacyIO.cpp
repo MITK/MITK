@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 ImageVtkLegacyIO::ImageVtkLegacyIO()
-  : AbstractFileIO(Image::GetStaticNameOfClass(), IOMimeTypes::VTK_IMAGE_MIMETYPE(), "VTK XML Image")
+  : AbstractFileIO(Image::GetStaticNameOfClass(), IOMimeTypes::VTK_IMAGE_LEGACY_MIMETYPE(), "VTK Legacy Image")
 {
   this->RegisterService();
 }

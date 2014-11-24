@@ -34,7 +34,7 @@ set(INTERNAL_CPP_FILES
   QmitkTractbasedSpatialStatisticsView.cpp
   QmitkTbssTableModel.cpp
   QmitkTbssMetaTableModel.cpp
-  QmitkTbssSkeletonizationView.cpp
+#  QmitkTbssSkeletonizationView.cpp
   Connectomics/QmitkConnectomicsDataView.cpp
   Connectomics/QmitkConnectomicsNetworkOperationsView.cpp
   Connectomics/QmitkConnectomicsStatisticsView.cpp
@@ -74,7 +74,7 @@ set(UI_FILES
   src/internal/QmitkPartialVolumeAnalysisViewControls.ui
   src/internal/QmitkIVIMViewControls.ui
   src/internal/QmitkTractbasedSpatialStatisticsViewControls.ui
-  src/internal/QmitkTbssSkeletonizationViewControls.ui
+#  src/internal/QmitkTbssSkeletonizationViewControls.ui
   src/internal/Connectomics/QmitkConnectomicsDataViewControls.ui
   src/internal/Connectomics/QmitkConnectomicsNetworkOperationsViewControls.ui
   src/internal/Connectomics/QmitkConnectomicsStatisticsViewControls.ui
@@ -115,7 +115,7 @@ set(MOC_H_FILES
   src/QmitkPartialVolumeAnalysisWidget.h
   src/internal/QmitkIVIMView.h
   src/internal/QmitkTractbasedSpatialStatisticsView.h
-  src/internal/QmitkTbssSkeletonizationView.h
+#  src/internal/QmitkTbssSkeletonizationView.h
   src/QmitkTbssRoiAnalysisWidget.h
   src/QmitkResidualAnalysisWidget.h
   src/QmitkResidualViewWidget.h

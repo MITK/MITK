@@ -462,7 +462,7 @@ mitk::GPGPU::GPGPU()
     std::cout << "failed creating window\n";
                  */
 
-  HWND desktopWindow=QApplication::topLevelWidgets().at(0)->winId();
+  HWND desktopWindow= (HWND)QApplication::topLevelWidgets().at(0)->winId();
 
   windowsContext = GetDC(desktopWindow);
 

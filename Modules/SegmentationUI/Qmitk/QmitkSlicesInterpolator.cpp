@@ -766,7 +766,14 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     s2iFilter->Update();
 
     mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
-    segmentationNode->SetData(s2iFilter->GetOutput());
+    mitk::Image* oldSeg = dynamic_cast<mitk::Image*>(segmentationNode->GetData());
+    mitk::Image::Pointer newSeg = s2iFilter->GetOutput();
+    if (oldSeg)
+      m_SurfaceInterpolator->ReplaceInterpolationSession(oldSeg, newSeg);
+    else
+      return;
+
+    segmentationNode->SetData(newSeg);
     m_CmbInterpolation->setCurrentIndex(0);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     mitk::DataNode::Pointer segSurface = mitk::DataNode::New();

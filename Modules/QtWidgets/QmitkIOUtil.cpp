@@ -121,7 +121,7 @@ QString QmitkIOUtil::GetFileOpenFilterString()
     filter = filter.replace(filter.size()-1, 1, ')');
     filters += ";;" + filter;
   }
-  filters.prepend("All (*.*)");
+  filters.prepend("All (*)");
   return filters;
 }
 

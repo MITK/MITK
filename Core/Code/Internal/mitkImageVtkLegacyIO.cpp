@@ -81,7 +81,7 @@ void ImageVtkLegacyIO::Write()
   LocalFile localFile(this);
   writer->SetFileName(localFile.GetFileName().c_str());
 
-  ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, NULL);
+  ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, input->GetVtkImageData());
   writer->SetInputData(const_cast<vtkImageData*>(vtkReadAccessor.GetVtkImageData()));
 
   if (writer->Write() == 0 || writer->GetErrorCode() != 0 )

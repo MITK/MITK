@@ -96,6 +96,15 @@ namespace mitk {
     void ConnectTo( mitk::IGTLMessageSource* UpstreamFilter );
 
     /**
+    *\brief Disconnects this filter from the outputs of the given
+    * IGTLMessageSource
+    *
+    * This method does not support smartpointer. use FilterX.GetPointer() to
+    * retrieve a dumbpointer.
+    */
+    void DisconnectFrom( mitk::IGTLMessageSource* UpstreamFilter );
+
+    /**
     * \brief Looks for microservices that provide messages with the requested
     * type.
     **/

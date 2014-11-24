@@ -388,6 +388,28 @@ bool mitk::IGTLDevice::CloseConnection()
   return true;
 }
 
+bool mitk::IGTLDevice::SendRTSMessage(const char* type)
+{
+  //construct the device type for the return message, it starts with RTS_ and
+  //continues with the requested type
+  std::string returnType("RTS_");
+  returnType.append(type);
+  //create a return message
+  igtl::MessageBase::Pointer rtsMsg =
+      this->m_MessageFactory->CreateInstance(returnType);
+  //if retMsg is NULL there is no return message defined and thus it is not
+  //necessary to send one back
+  if ( rtsMsg.IsNotNull() )
+  {
+    this->SendMessage(rtsMsg);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMessage()
 {
   //copy the next message into the given msg

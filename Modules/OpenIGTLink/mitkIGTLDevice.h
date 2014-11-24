@@ -224,6 +224,11 @@ namespace mitk {
       */
       virtual bool TestConnection();
 
+      /**
+       * \brief Send RTS message of given type
+       */
+      bool SendRTSMessage(const char* type);
+
     protected:
       /**
        * \brief Sends a message via the open IGT Link.

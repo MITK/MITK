@@ -798,7 +798,7 @@ void ImageStatisticsCalculator::SetHotspotRadiusInMM(double value)
     for( unsigned int bin=0; bin < size; ++bin )
     {
       double frequency = binsAndFrequencyToCalculate->GetFrequency( bin, 0 );
-      if( frequency > mitk::eps )
+      //if( frequency > mitk::eps )
       {
         returnedHistogramMap.insert( std::pair<int, double>(binsAndFrequencyToCalculate->GetMeasurement( bin, 0 ), binsAndFrequencyToCalculate->GetFrequency( bin, 0 ) ) );
       }
@@ -1420,40 +1420,11 @@ bool ImageStatisticsCalculator::GetPrincipalAxis(
 
     statisticsFilter->Update();
 
-    //int numberOfBins = ( m_DoIgnorePixelValue && (m_MaskingMode == MASKING_MODE_NONE) ) ? 768 : 384;
-    int a = floor(minimum);
-    int b = ceil(maximum);
-
-    //std::cout << "Testneu4444: " << b << std::endl;
-    //std::cout << "Testn3333: " << a << std::endl;
-
-
-
-    while( a % 10 != 0 )
-    {
-      a--;
-    }
-
-
-
-    while( b % 10 != 0 )
-    {
-      b++;
-    }
-
-
-    // double classWidth = (3.49 * sig) / std::pow( counter, (1/3) );
-    int numberOfBins = int ( (b - a) / 1 );
-
-    //std::cout << "test3:" << numberOfBins << std::endl;
     typename  LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();
     labelStatisticsFilter->SetInput( adaptedImage );
     labelStatisticsFilter->SetLabelInput( adaptedMaskImage );
     labelStatisticsFilter->UseHistogramsOn();
-    labelStatisticsFilter->SetHistogramParameters( numberOfBins, a, b);   //statisticsFilter->GetMinimum() statisticsFilter->GetMaximum()
-
-    // std::cout << "test4444:" << std::endl;
-
+    labelStatisticsFilter->SetHistogramParameters( (maximum - minimum), minimum, maximum);   //statisticsFilter->GetMinimum() statisticsFilter->GetMaximum()
 
     // Add progress listening
     typedef itk::SimpleMemberCommand< ImageStatisticsCalculator > ITKCommandType;

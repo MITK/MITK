@@ -121,7 +121,7 @@ QString QmitkIOUtil::GetFileOpenFilterString()
     filter = filter.replace(filter.size()-1, 1, ')');
     filters += ";;" + filter;
   }
-  filters.prepend("All (*.*)");
+  filters.prepend("All (*)");
   return filters;
 }
 
@@ -266,72 +266,87 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
     QFileInfo fileInfo(fileName);
     currentPath = fileInfo.absolutePath();
     QString suffix = fileInfo.completeSuffix();
-    mitk::MimeType mimeType = filters.GetMimeTypeForFilter(selectedFilter);
+    mitk::MimeType filterMimeType = filters.GetMimeTypeForFilter(selectedFilter);
+    mitk::MimeType selectedMimeType;
 
-    mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
-    // If the filename contains a suffix, use it but check if it is valid
-    if (!suffix.isEmpty())
+    if (fileInfo.exists() && !fileInfo.isFile())
     {
-      std::vector<mitk::MimeType> availableTypes = mimeTypeProvider->GetMimeTypesForFile(stdFileName);
+      QMessageBox::warning(parent, "Saving not possible", QString("The path \"%1\" is not a file").arg(fileName));
+      continue;
+    }
 
-      // Check if the selected mime-type is related to the specified suffix (file extension).
-      // If not, get the best matching mime-type for the suffix.
-      if (std::find(availableTypes.begin(), availableTypes.end(), mimeType) == availableTypes.end())
+    // Check if one of the available mime-types match the filename
+    std::vector<mitk::MimeType> filterMimeTypes = filters.GetMimeTypes();
+    for (std::vector<mitk::MimeType>::const_iterator mimeTypeIter = filterMimeTypes.begin(),
+         mimeTypeIterEnd = filterMimeTypes.end(); mimeTypeIter != mimeTypeIterEnd; ++mimeTypeIter)
+    {
+      if (mimeTypeIter->AppliesTo(stdFileName))
       {
-        mimeType = mitk::MimeType();
-        for (std::vector<mitk::MimeType>::const_iterator availIter = availableTypes.begin(),
-             availIterEnd = availableTypes.end(); availIter != availIterEnd; ++availIter)
-        {
-          if (filters.ContainsMimeType(availIter->GetName()))
-          {
-            mimeType = *availIter;
-            break;
-          }
-        }
-      }
-
-      if (!mimeType.IsValid())
-      {
-        // The extension is not valid (no mime-type found), bail out
-        QMessageBox::warning(parent,
-                             "Saving not possible",
-                             QString("Extension \"%1\" unknown for type \"%2\"")
-                             .arg(suffix)
-                             .arg(QString::fromStdString((*dataIter)->GetNameOfClass())));
-        continue;
+        selectedMimeType = *mimeTypeIter;
+        break;
       }
     }
-    else
+
+    if (!selectedMimeType.IsValid())
     {
-      // Create a default suffix, unless the file already exists and the user
-      // already confirmed to overwrite it (without using a suffix)
-      if (mimeType == SaveFilter::ALL_MIMETYPE())
-      {
-        // Use the highest ranked mime-type from the list
-        mimeType = filters.GetDefaultMimeType();
-      }
+      // The file name either does not contain an extension or the
+      // extension is unknown.
+
+      // If the file already exists, we stop here because we are not able
+      // to (over)write the file without adding a custom suffix. If the file
+      // does not exist, we add the default extension from the currently
+      // selected filter. If the "All" filter was selected, we only add the
+      // default extensions if the file name itself does not already contain
+      // an extension.
       if (!fileInfo.exists())
       {
-        suffix = QString::fromStdString(mimeType.GetExtensions().front());
-        fileName += "." + suffix;
-        // We changed the file name (added a suffix) so ask in case
-        // the file aready exists.
-        fileInfo = QFileInfo(fileName);
-        if (fileInfo.exists())
+        if (filterMimeType == SaveFilter::ALL_MIMETYPE())
         {
-          if (!fileInfo.isFile())
+          if (suffix.isEmpty())
           {
-            QMessageBox::warning(parent, "Saving not possible", QString("The path \"%1\" is not a file").arg(fileName));
-            continue;
+            // Use the highest ranked mime-type from the list
+            selectedMimeType = filters.GetDefaultMimeType();
           }
-          if (QMessageBox::question(parent, "Replace File",
-                                    QString("A file named \"%1\" already exists. Do you want to replace it?").arg(fileName)) ==
-              QMessageBox::No)
+        }
+        else
+        {
+          selectedMimeType = filterMimeType;
+        }
+
+        if (selectedMimeType.IsValid())
+        {
+          suffix = QString::fromStdString(selectedMimeType.GetExtensions().front());
+          fileName += "." + suffix;
+          stdFileName = QFile::encodeName(fileName).constData();
+          // We changed the file name (added a suffix) so ask in case
+          // the file aready exists.
+          fileInfo = QFileInfo(fileName);
+          if (fileInfo.exists())
           {
-            continue;
+            if (!fileInfo.isFile())
+            {
+              QMessageBox::warning(parent, "Saving not possible", QString("The path \"%1\" is not a file").arg(fileName));
+              continue;
+            }
+            if (QMessageBox::question(parent, "Replace File",
+                                      QString("A file named \"%1\" already exists. Do you want to replace it?").arg(fileName)) ==
+                QMessageBox::No)
+            {
+              continue;
+            }
           }
         }
       }
+    }
+
+    if (!selectedMimeType.IsValid())
+    {
+      // The extension/filename is not valid (no mime-type found), bail out
+      QMessageBox::warning(parent,
+                           "Saving not possible",
+                           QString("No mime-type available which can handle \"%1\".")
+                           .arg(fileName));
+      continue;
     }
 
     if (!QFileInfo(fileInfo.absolutePath()).isWritable())
@@ -342,9 +357,9 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
 
     fileNames.push_back(fileName);
     saveInfo.m_Path = stdFileName;
-    saveInfo.m_MimeType = mimeType;
+    saveInfo.m_MimeType = selectedMimeType;
     // pre-select the best writer for the chosen mime-type
-    saveInfo.m_WriterSelector.Select(mimeType.GetName());
+    saveInfo.m_WriterSelector.Select(selectedMimeType.GetName());
     saveInfos.push_back(saveInfo);
   }
 
@@ -448,6 +463,11 @@ QmitkIOUtil::SaveFilter& QmitkIOUtil::SaveFilter::operator=(const QmitkIOUtil::S
 {
   d.reset(new Impl(*other.d));
   return *this;
+}
+
+std::vector<mitk::MimeType> QmitkIOUtil::SaveFilter::GetMimeTypes() const
+{
+  return d->m_MimeTypes;
 }
 
 QString QmitkIOUtil::SaveFilter::GetFilterForMimeType(const std::string& mimeType) const

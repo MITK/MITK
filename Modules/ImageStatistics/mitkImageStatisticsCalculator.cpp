@@ -611,9 +611,6 @@ void ImageStatisticsCalculator::SetHotspotRadiusInMM(double value)
       sigma = 0;
     }
 
-
-    std::cout << "Test2:" << max << std::endl;
-    std::cout << "Test1:" << min << std::endl;
   }
 
 
@@ -1420,11 +1417,18 @@ bool ImageStatisticsCalculator::GetPrincipalAxis(
 
     statisticsFilter->Update();
 
+    double diff = maximum - minimum;
+
+    if(maximum - minimum <= 1)
+    {
+      diff = 1;
+    }
+
     typename  LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();
     labelStatisticsFilter->SetInput( adaptedImage );
     labelStatisticsFilter->SetLabelInput( adaptedMaskImage );
     labelStatisticsFilter->UseHistogramsOn();
-    labelStatisticsFilter->SetHistogramParameters( (maximum - minimum), minimum, maximum);   //statisticsFilter->GetMinimum() statisticsFilter->GetMaximum()
+    labelStatisticsFilter->SetHistogramParameters( diff, minimum, maximum);   //statisticsFilter->GetMinimum() statisticsFilter->GetMaximum()
 
     // Add progress listening
     typedef itk::SimpleMemberCommand< ImageStatisticsCalculator > ITKCommandType;

@@ -18,12 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImageIterator.h>
 #include <itkImageRegionIterator.h>
+#include <vtkPolyLine.h>
 
 #include <mitkDataNode.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkImageStatisticsCalculator.h>
+#include <vtkCellArray.h>
 
 mitk::ImageToPointCloudFilter::ImageToPointCloudFilter():
   m_NumberOfExtractedPoints(0)
@@ -137,10 +139,23 @@ void mitk::ImageToPointCloudFilter::
     ++it;
   }
 
-  m_EdgePoints = mitk::ImportItkImage(lapFilter->GetOutput())->Clone();
+  vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
+  polyLine->GetPointIds()->SetNumberOfIds(m_NumberOfExtractedPoints);
+
+  for(unsigned int i = 0; i < m_NumberOfExtractedPoints; i++)
+  {
+    polyLine->GetPointIds()->SetId(i,i);
+  }
+
+  vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+  cells->InsertNextCell(polyLine);
 
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData->SetPoints(points);
+  polyData->SetLines(cells);
+
+  m_EdgePoints = mitk::ImportItkImage(lapFilter->GetOutput())->Clone();
+
   polyData->BuildCells();
   polyData->BuildLinks();
   m_PointSurface->SetVtkPolyData(polyData);

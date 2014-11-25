@@ -20,11 +20,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkKdTree.h>
 #include <vtkPolyData.h>
+#include <vtkPolyLine.h>
+#include <vtkCellArray.h>
 
 mitk::PointCloudScoringFilter::PointCloudScoringFilter():
   m_NumberOfOutpPoints(0)
 {
   m_OutpSurface = mitk::Surface::New();
+//  this->SetNumberOfRequiredInputs(2);
+//  this->SetNumberOfRequiredOutputs(1);
 
   this->SetNthOutput(0, m_OutpSurface);
 }
@@ -109,8 +113,27 @@ void mitk::PointCloudScoringFilter::GenerateData()
     filteredPoints->InsertNextPoint(point[0],point[1],point[2]);
   }
 
-  outpSurface->SetPoints(filteredPoints);
-  m_OutpSurface->SetVtkPolyData(outpSurface);
+  unsigned int numPoints = filteredPoints->GetNumberOfPoints();
+
+  vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
+  polyLine->GetPointIds()->SetNumberOfIds(numPoints);
+
+  for(unsigned int i = 0; i < numPoints; i++)
+  {
+    polyLine->GetPointIds()->SetId(i,i);
+  }
+
+  vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+  cells->InsertNextCell(polyLine);
+
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+
+  polyData->SetPoints(filteredPoints);
+  polyData->SetLines(cells);
+
+  outpSurface->BuildCells();
+  outpSurface->BuildLinks();
+  m_OutpSurface->SetVtkPolyData(polyData);
 }
 
 void mitk::PointCloudScoringFilter::GenerateOutputInformation()

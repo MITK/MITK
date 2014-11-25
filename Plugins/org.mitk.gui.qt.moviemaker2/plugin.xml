@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<plugin>
-  <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.moviemaker2"
-          name="Movie Maker 2"
-          class="QmitkMovieMaker2View"
-          icon="resources/camera-video.png" />
-  </extension>
-</plugin>

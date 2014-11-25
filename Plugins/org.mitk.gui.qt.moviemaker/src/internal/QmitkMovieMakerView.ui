@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkMovieMaker2View</class>
- <widget class="QWidget" name="QmitkMovieMaker2View">
+ <class>QmitkMovieMakerView</class>
+ <widget class="QWidget" name="QmitkMovieMakerView">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Movie Maker 2</string>
+   <string>Movie Maker</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -241,7 +241,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../../resources/org_mitk_gui_qt_moviemaker2.qrc">:/org_gui_qt_moviemaker2/duration.svg</pixmap>
+         <pixmap resource="../../resources/QmitkMovieMaker.qrc">:/QmitkMovieMakerView/duration.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -310,7 +310,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../../resources/org_mitk_gui_qt_moviemaker2.qrc">:/org_gui_qt_moviemaker2/delay.svg</pixmap>
+         <pixmap resource="../../resources/QmitkMovieMaker.qrc">:/QmitkMovieMakerView/delay.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -501,7 +501,7 @@
  </tabstops>
  <resources>
   <include location="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc"/>
-  <include location="../../resources/org_mitk_gui_qt_moviemaker2.qrc"/>
+  <include location="../../resources/QmitkMovieMaker.qrc"/>
  </resources>
  <connections/>
 </ui>

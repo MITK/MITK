@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkMovieMaker2View_h
-#define QmitkMovieMaker2View_h
+#ifndef QmitkMovieMakerView_h
+#define QmitkMovieMakerView_h
 
 #include <QmitkAbstractView.h>
 
@@ -28,18 +28,18 @@ class QTimer;
 
 namespace Ui
 {
-  class QmitkMovieMaker2View;
+  class QmitkMovieMakerView;
 }
 
-class QmitkMovieMaker2View : public QmitkAbstractView
+class QmitkMovieMakerView : public QmitkAbstractView
 {
   Q_OBJECT
 
 public:
   static const std::string VIEW_ID;
 
-  QmitkMovieMaker2View();
-  ~QmitkMovieMaker2View();
+  QmitkMovieMakerView();
+  ~QmitkMovieMakerView();
 
   void CreateQtPartControl(QWidget* parent);
   void SetFocus();
@@ -81,10 +81,10 @@ private:
   void RedrawTimeline();
   void CalculateTotalDuration();
   QmitkAnimationItem* GetSelectedAnimationItem() const;
-  QVector<QPair<QmitkAnimationItem*, double> > QmitkMovieMaker2View::GetActiveAnimations(double t) const;
+  QVector<QPair<QmitkAnimationItem*, double> > QmitkMovieMakerView::GetActiveAnimations(double t) const;
 
   QmitkFFmpegWriter* m_FFmpegWriter;
-  Ui::QmitkMovieMaker2View* m_Ui;
+  Ui::QmitkMovieMakerView* m_Ui;
   QStandardItemModel* m_AnimationModel;
   QMap<QString, QmitkAnimationWidget*> m_AnimationWidgets;
   QMenu* m_AddAnimationMenu;

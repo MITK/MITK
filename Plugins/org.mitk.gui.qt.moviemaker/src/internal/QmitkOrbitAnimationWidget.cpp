@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkOrbitAnimationItem.h"
 #include "QmitkOrbitAnimationWidget.h"
+#include <limits>
 #include <ui_QmitkOrbitAnimationWidget.h>
 
 QmitkOrbitAnimationWidget::QmitkOrbitAnimationWidget(QWidget* parent)

@@ -81,7 +81,7 @@ private:
   void RedrawTimeline();
   void CalculateTotalDuration();
   QmitkAnimationItem* GetSelectedAnimationItem() const;
-  QVector<QPair<QmitkAnimationItem*, double> > QmitkMovieMakerView::GetActiveAnimations(double t) const;
+  QVector<QPair<QmitkAnimationItem*, double> > GetActiveAnimations(double t) const;
 
   QmitkFFmpegWriter* m_FFmpegWriter;
   Ui::QmitkMovieMakerView* m_Ui;

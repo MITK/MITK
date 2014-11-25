@@ -1,6 +1,0 @@
-SET(CPP_FILES
- mitkCovarianceMatrixCalculator.cpp
- mitkAnisotropicIterativeClosestPointRegistration.cpp
- mitkWeightedPointTransform.cpp
- mitkAnisotropicRegistrationCommon.cpp
-)

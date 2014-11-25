@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __WEIGHTEDPOINTTRANSFORM_H__
 
 //EXPORTS
-#include "MitkAnisotropicRegistrationExports.h"
+#include "MitkAlgorithmsExtExports.h"
 
 //ITK
 #include <itkVariableSizeMatrix.h>
@@ -54,7 +54,7 @@ namespace mitk
  * \note Some methods are accelerated when OpenMP is enabled.
  *
  */
-class MitkAnisotropicRegistration_EXPORT WeightedPointTransform : public itk::Object
+class MitkAlgorithmsExt_EXPORT WeightedPointTransform : public itk::Object
 {
   /** Definition of a 3x3 matrix.*/
   typedef itk::Matrix<double,3,3> Matrix3x3;

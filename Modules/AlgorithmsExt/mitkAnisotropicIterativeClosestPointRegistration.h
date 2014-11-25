@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVector.h>
 
 //EXPORTS
-#include "MitkAnisotropicRegistrationExports.h"
+#include "MitkAlgorithmsExtExports.h"
 
 // STL
 #include <vector>
@@ -116,7 +116,7 @@ class WeightedPointTransform;
   * \endcode
   *
   */
-class MitkAnisotropicRegistration_EXPORT AnisotropicIterativeClosestPointRegistration : public itk::Object
+class MitkAlgorithmsExt_EXPORT AnisotropicIterativeClosestPointRegistration : public itk::Object
 {
 
 protected:

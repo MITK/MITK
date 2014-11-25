@@ -1058,8 +1058,12 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
       {
         QWidget::setEnabled( true );
 
-        //TODO Aufruf hier pruefen!
-        mitk::Vector3D spacing = workingNode->GetData()->GetGeometry( m_LastSNC->GetTime()->GetPos() )->GetSpacing();
+        // In case the time is not valid use 0 to access the time geometry of the working node
+        unsigned int time_position = 0;
+        if( m_LastSNC->GetTime() != NULL )
+          time_position = m_LastSNC->GetTime()->GetPos();
+
+        mitk::Vector3D spacing = workingNode->GetData()->GetGeometry( time_position )->GetSpacing();
         double minSpacing (100);
         double maxSpacing (0);
         for (int i =0; i < 3; i++)

@@ -19,7 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "QmitkMovieMakerControls.h"
 #include "QmitkStepperAdapter.h"
 #include "QmitkStdMultiWidget.h"
-#include "QmitkMovieMaker.h"
+#ifdef WIN32
+  #include <mitkMovieGeneratorWin32.h>
+#else
+  #include <mitkMovieGeneratorOpenCV.h>
+#endif
 //#include "QmitkMovieMakerControls.h"
 #include "QmitkStepperAdapter.h"
 #include "QmitkStdMultiWidget.h"
@@ -73,7 +77,11 @@ QmitkMovieMaker::QmitkMovieMaker(QObject *parent, const char * /*name*/)
   m_FocusManagerCallback = MemberCommand::New();
   m_FocusManagerCallback->SetCallbackFunction(this, &QmitkMovieMaker::FocusChange);
 
-  m_movieGenerator = mitk::MovieGenerator::New();
+#ifdef WIN32
+  m_movieGenerator = mitk::MovieGeneratorWin32::New();
+#else
+  m_movieGenerator = mitk::MovieGeneratorOpenCV::New();
+#endif
 
   if (m_movieGenerator.IsNull())
   {

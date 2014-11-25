@@ -33,9 +33,6 @@ public:
 
   mitkClassMacro(MovieGenerator, itk::LightObject);
 
-  // delivers Win32 or Linux-versions of MovieGenerator
-  static Pointer New(void);
-
   //!  stepper  used to  control  movie  generation
   virtual void SetStepper( Stepper *stepper ) { m_stepper = stepper; }
 

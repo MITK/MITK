@@ -21,31 +21,53 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::MovieGeneratorOpenCV::MovieGeneratorOpenCV()
+: m_sFile("")
+, m_dwRate(20)
+, m_aviWriter(NULL)
+, m_currentFrame(NULL)
+, m_FourCCCodec(NULL)
+, m_lFrame(0)
+, m_RemoveColouredFrame(true)
+, m_FlipVertical(true)
 {
-  m_initialized = false;
-  m_aviWriter   = NULL;
-  m_dwRate = 20;
-
-  m_FourCCCodec = NULL;
-  m_RemoveColouredFrame = true;
 }
 
 
 void mitk::MovieGeneratorOpenCV::SetFileName( const char *fileName )
 {
-
   m_sFile = fileName;
 }
+
 
 void mitk::MovieGeneratorOpenCV::SetFrameRate(int rate)
 {
   m_dwRate = rate;
 }
 
-void mitk::MovieGeneratorOpenCV::SetRemoveColouredFrame(bool RemoveColouredFrame)
+
+void mitk::MovieGeneratorOpenCV::SetRemoveColouredFrame(bool removeColouredFrame)
 {
-  m_RemoveColouredFrame = RemoveColouredFrame;
+  m_RemoveColouredFrame = removeColouredFrame;
 }
+
+
+bool mitk::MovieGeneratorOpenCV::GetRemoveColouredFrame() const
+{
+  return m_RemoveColouredFrame;
+}
+
+
+void mitk::MovieGeneratorOpenCV::SetFlipVertical(bool flipVertical)
+{
+  m_FlipVertical = flipVertical;
+}
+
+
+bool mitk::MovieGeneratorOpenCV::GetFlipVertical() const
+{
+  return m_FlipVertical;
+}
+
 
 bool mitk::MovieGeneratorOpenCV::InitGenerator()
 {
@@ -118,8 +140,24 @@ bool mitk::MovieGeneratorOpenCV::InitGenerator()
 
 bool mitk::MovieGeneratorOpenCV::AddFrame( void *data )
 {
-  //cvSetImageData(m_currentFrame,data,m_width*3);
-  memcpy(m_currentFrame->imageData,data,m_width*m_height*3);
+  if (m_FlipVertical)
+  {
+    // MattClarkson: I tried cvFlip, but it did not appear to work.
+    unsigned char* inputData = static_cast<unsigned char*>(data);
+    unsigned int offsetTop = 0;
+    unsigned int offsetBottom = 0;
+
+    for (int r = 0; r < m_height; r++)
+    {
+      offsetTop = r*m_currentFrame->widthStep;
+      offsetBottom = (m_height - 1 - r)*m_currentFrame->widthStep;
+      memcpy(m_currentFrame->imageData + offsetBottom, inputData + offsetTop, m_currentFrame->widthStep);
+    }
+  }
+  else
+  {
+    memcpy(m_currentFrame->imageData,data,m_width*m_height*3);
+  }
   cvWriteFrame(m_aviWriter,m_currentFrame);
   return true;
 }
@@ -130,6 +168,10 @@ bool mitk::MovieGeneratorOpenCV::TerminateGenerator()
   if (m_aviWriter)
   {
     cvReleaseVideoWriter(&m_aviWriter);
+  }
+  if (m_currentFrame)
+  {
+    cvReleaseImage(&m_currentFrame);
   }
   return true;
 }

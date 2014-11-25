@@ -20,15 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGL.h"
 #include "mitkConfig.h"
 
-#if WIN32
-#ifndef __GNUC__
-//#if ! (_MSC_VER >= 1400)
-#include "mitkMovieGeneratorWin32.h"
-//#endif
-#else
-#include "GL/glext.h"
-#endif
-#endif
 #ifndef GL_BGR
 #define GL_BGR GL_BGR_EXT
 #endif
@@ -42,28 +33,6 @@ m_initialized(false),
 m_FrameRate(20)
 {
   m_fileName[0]  =  0;
-}
-
-
-mitk::MovieGenerator::Pointer mitk::MovieGenerator::New()
-{
-  Pointer smartPtr;
-  MovieGenerator *rawPtr = ::itk::ObjectFactory<MovieGenerator>::Create();
-  if(rawPtr == NULL) {
-
-
-#ifdef WIN32
-#ifndef __GNUC__
-//#if ! (_MSC_VER >= 1400)
-    mitk::MovieGenerator::Pointer wp = static_cast<mitk::MovieGenerator*>(mitk::MovieGeneratorWin32::New());
-    return wp;
-//#endif
-#endif
-#endif
-  }
-  smartPtr = rawPtr;
-  if(rawPtr != NULL) rawPtr->UnRegister();
-  return smartPtr;
 }
 
 

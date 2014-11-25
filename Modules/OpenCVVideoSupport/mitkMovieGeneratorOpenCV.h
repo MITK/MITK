@@ -54,6 +54,15 @@ public:
   /// default: true
   ///
   void SetRemoveColouredFrame(bool);
+  bool GetRemoveColouredFrame() const;
+
+  ///
+  /// \brief If true (the default for the class), will flip the image in the
+  /// vertical direction before writing to the output video file.
+  ///
+  void SetFlipVertical(bool);
+  bool GetFlipVertical() const;
+
 protected:
 
   MovieGeneratorOpenCV();
@@ -85,6 +94,7 @@ private:
   long m_lFrame;
 
   bool m_RemoveColouredFrame;
+  bool m_FlipVertical;
 };
 
 } // namespace mitk

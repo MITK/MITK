@@ -57,6 +57,18 @@ namespace mitk
     */
     virtual bool OpenConnection();
 
+    /**
+     * \brief Closes the connection to the device
+     *
+     * This may only be called if there is currently a connection to the
+     * device, but device is not running (e.g. object is in Ready state)
+     */
+    virtual bool CloseConnection();
+
+    /**
+    * \brief Returns the number of client connections of this device
+    */
+    virtual unsigned int GetNumberOfConnections();
 
   protected:
     /** Constructor */

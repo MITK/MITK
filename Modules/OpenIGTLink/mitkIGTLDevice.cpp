@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <igtlTrackingDataMessage.h>
 
-static const int SOCKET_SEND_RECEIVE_TIMEOUT_MSEC = 100;
+static const int SOCKET_SEND_RECEIVE_TIMEOUT_MSEC = 1;
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
@@ -89,12 +89,16 @@ void mitk::IGTLDevice::SetState( IGTLDeviceState state )
 {
   itkDebugMacro("setting  m_State to " << state);
 
-  MutexLockHolder lock(*m_StateMutex); // lock and unlock the mutex
+  m_StateMutex->Lock();
+//  MutexLockHolder lock(*m_StateMutex); // lock and unlock the mutex
+
   if (m_State == state)
   {
+    m_StateMutex->Unlock();
     return;
   }
   m_State = state;
+  m_StateMutex->Unlock();
   this->Modified();
 }
 
@@ -309,7 +313,7 @@ void mitk::IGTLDevice::RunCommunication()
     this->m_StopCommunicationMutex->Unlock();
 
     // time to relax
-    itksys::SystemTools::Delay(1);
+//    itksys::SystemTools::Delay(1);
   }
   // StopCommunication was called, thus the mode should be changed back to Ready now
   // that the tracking loop has ended.
@@ -384,7 +388,9 @@ bool mitk::IGTLDevice::CloseConnection()
 
   /* return to setup mode */
   this->SetState(Setup);
-//    m_SerialCommunication = NULL;
+
+//  this->InvokeEvent(mitk::LostConnectionEvent());
+
   return true;
 }
 

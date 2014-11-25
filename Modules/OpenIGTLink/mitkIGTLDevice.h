@@ -230,6 +230,11 @@ namespace mitk {
       void EnableInfiniteBufferingMode(mitk::IGTLMessageQueue::Pointer queue,
                                        bool enable = true);
 
+      /**
+      * \brief Returns the number of connections of this device
+      */
+      virtual unsigned int GetNumberOfConnections() = 0;
+
     protected:
       /**
        * \brief Sends a message.
@@ -341,20 +346,38 @@ namespace mitk {
     };
 
     /**
-    * @brief connect to this Event to get noticed when a message was received
+    * \brief connect to this Event to get noticed when a message was received
+    *
+    * \note Check if you can invoke this events like this or if you have to make
+    * it thread-safe. They are not invoked in the main thread!!!
     * */
     itkEventMacro( MessageReceivedEvent , itk::AnyEvent );
 
     /**
-    * @brief connect to this Event to get noticed when a command was received
+    * \brief connect to this Event to get noticed when a command was received
+    *
+    * \note Check if you can invoke this events like this or if you have to make
+    * it thread-safe. They are not invoked in the main thread!!!
     * */
     itkEventMacro( CommandReceivedEvent , itk::AnyEvent );
 
     /**
-    * @brief connect to this Event to get noticed when another igtl device
+    * \brief connect to this Event to get noticed when another igtl device
     * connects with this device.
+    *
+    * \note Check if you can invoke this events like this or if you have to make
+    * it thread-safe. They are not invoked in the main thread!!!
     * */
     itkEventMacro( NewClientConnectionEvent , itk::AnyEvent );
+
+    /**
+    * \brief connect to this Event to get noticed when this device looses the
+    * connection to a socket.
+    *
+    * \note Check if you can invoke this events like this or if you have to make
+    * it thread-safe. They are not invoked in the main thread!!!
+    * */
+    itkEventMacro( LostConnectionEvent , itk::AnyEvent );
 
 } // namespace mitk
 

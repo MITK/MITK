@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKIGTLDeviceSourceMANAGEMENTWIDGET_H
-#define QMITKIGTLDeviceSourceMANAGEMENTWIDGET_H
+#ifndef QmitkIGTLDeviceSetupConnectionWidget_H
+#define QmitkIGTLDeviceSetupConnectionWidget_H
 
 //QT headers
 #include <QWidget>
@@ -31,43 +31,46 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 
 //ui header
-#include "ui_QmitkIGTLDeviceSourceManagementWidgetControls.h"
+#include "ui_QmitkIGTLDeviceSetupConnectionWidgetControls.h"
 
  /** Documentation:
-  *   \brief An object of this class offers an UI to manage OpenIGTLink Device
-  *       Sources and OpenIGTLink Devices.
+  *   \brief An object of this class offers an UI to setup the connection of an
+  * OpenIGTLink device.
   *
   *
   *   \ingroup OpenIGTLinkUI
   */
-class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public QWidget
+class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QWidget
 {
   Q_OBJECT
 
   public:
     static const std::string VIEW_ID;
 
-    /** Loads a source to the widget. The old source is dropped, so be careful,
-     *  if the source is not saved somewhere else it might be lost. You might
-     *  want to ask the user if he wants to save the changes before calling this
-     *  method.
-     *  @param sourceToLoad This source will be loaded and might be modified
-     *  by the user.
+    /**
+     * \brief Initializes the widget with the given device.
+     *
+     * The old device is
+     * dropped, so be careful, if the source is not saved somewhere else it might
+     * be lost. You might want to ask the user if he wants to save the changes
+     * before calling this method.
+     * \param device The widget will be initialized corresponding to the state of
+     * this device.
      */
-    void LoadSource(mitk::IGTLDeviceSource::Pointer sourceToLoad);
+    void Initialize(mitk::IGTLDevice::Pointer device);
 
-    QmitkIGTLDeviceSourceManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-    ~QmitkIGTLDeviceSourceManagementWidget();
+    QmitkIGTLDeviceSetupConnectionWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    ~QmitkIGTLDeviceSetupConnectionWidget();
 
-    /**
-    * \brief Is called when the current device received a message
-    */
-    void OnMessageReceived();
+//    /**
+//    * \brief Is called when the current device received a message
+//    */
+//    void OnMessageReceived(itk::Object* caller, const itk::EventObject&);
 
-    /**
-     * \brief Is called when the current device received a command
-    */
-    void OnCommandReceived();
+//    /**
+//     * \brief Is called when the current device received a command
+//    */
+//    void OnCommandReceived(itk::Object* caller, const itk::EventObject&);
 
     /**
      * \brief Is called when the current device lost a connection to one of its
@@ -80,11 +83,19 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
     */
     void OnNewConnection();
 
-
   protected slots:
-    void OnSendMessage();
+
+    void OnConnect();
+    void OnPortChanged();
+    void OnHostnameChanged();
+
+    /**
+     * \brief Enables/Disables the buffering of incoming messages
+     */
+    void OnBufferIncomingMessages(int state);
 
   protected:
+
     /**
      * \brief Adapts the GUI to the state of the device
      */
@@ -95,32 +106,25 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
      */
     void OnDeviceStateChanged();
 
-    /// \brief Fills the commands combo box with available commands
-    void FillCommandsComboBox();
-
-    /// \brief Creation of the connections
+    /** \brief Creation of the connections */
     virtual void CreateConnections();
 
     virtual void CreateQtPartControl(QWidget *parent);
 
-    Ui::QmitkIGTLDeviceSourceManagementWidgetControls* m_Controls;
+    Ui::QmitkIGTLDeviceSetupConnectionWidgetControls* m_Controls;
 
     /** @brief holds the OpenIGTLink device */
     mitk::IGTLDevice::Pointer m_IGTLDevice;
 
-    /** @brief holds the IGTLDeviceSource we are working with. */
-    mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;
-
     /** @brief flag to indicate if the IGTL device is a client or a server */
     bool m_IsClient;
 
-    unsigned long m_MessageReceivedObserverTag;
-    unsigned long m_CommandReceivedObserverTag;
     unsigned long m_LostConnectionObserverTag;
     unsigned long m_NewConnectionObserverTag;
     unsigned long m_StateModifiedObserverTag;
 
     //############## private help methods #######################
     void DisableSourceControls();
+//    void EnableSourceControls();
 };
 #endif

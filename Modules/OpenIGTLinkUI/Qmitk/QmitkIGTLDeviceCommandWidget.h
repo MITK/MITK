@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKIGTLDeviceSourceMANAGEMENTWIDGET_H
-#define QMITKIGTLDeviceSourceMANAGEMENTWIDGET_H
+#ifndef QMITKIGTLDeviceCommandWIDGET_H
+#define QMITKIGTLDeviceCommandWIDGET_H
 
 //QT headers
 #include <QWidget>
@@ -31,33 +31,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 
 //ui header
-#include "ui_QmitkIGTLDeviceSourceManagementWidgetControls.h"
+#include "ui_QmitkIGTLDeviceCommandWidgetControls.h"
 
  /** Documentation:
-  *   \brief An object of this class offers an UI to manage OpenIGTLink Device
-  *       Sources and OpenIGTLink Devices.
+  *   \brief An object of this class offers an UI to send OpenIGTLink commands.
   *
   *
   *   \ingroup OpenIGTLinkUI
   */
-class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public QWidget
+class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceCommandWidget : public QWidget
 {
   Q_OBJECT
 
   public:
     static const std::string VIEW_ID;
 
-    /** Loads a source to the widget. The old source is dropped, so be careful,
-     *  if the source is not saved somewhere else it might be lost. You might
-     *  want to ask the user if he wants to save the changes before calling this
-     *  method.
-     *  @param sourceToLoad This source will be loaded and might be modified
-     *  by the user.
+    /**
+     * \brief Initializes the widget with the given device.
+     *
+     * The old device is
+     * dropped, so be careful, if the source is not saved somewhere else it might
+     * be lost. You might want to ask the user if he wants to save the changes
+     * before calling this method.
+     * \param device The widget will be initialized corresponding to the state of
+     * this device.
      */
-    void LoadSource(mitk::IGTLDeviceSource::Pointer sourceToLoad);
+    void Initialize(mitk::IGTLDevice::Pointer device);
 
-    QmitkIGTLDeviceSourceManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-    ~QmitkIGTLDeviceSourceManagementWidget();
+    QmitkIGTLDeviceCommandWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    ~QmitkIGTLDeviceCommandWidget();
 
     /**
     * \brief Is called when the current device received a message
@@ -82,9 +84,12 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
 
 
   protected slots:
-    void OnSendMessage();
+    void OnCommandChanged(const QString& curCommand);
+
+    void OnSendCommand();
 
   protected:
+
     /**
      * \brief Adapts the GUI to the state of the device
      */
@@ -103,13 +108,13 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
 
     virtual void CreateQtPartControl(QWidget *parent);
 
-    Ui::QmitkIGTLDeviceSourceManagementWidgetControls* m_Controls;
+    Ui::QmitkIGTLDeviceCommandWidgetControls* m_Controls;
 
     /** @brief holds the OpenIGTLink device */
     mitk::IGTLDevice::Pointer m_IGTLDevice;
 
-    /** @brief holds the IGTLDeviceSource we are working with. */
-    mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;
+    igtl::MessageBase::Pointer m_CurrentCommand;
+
 
     /** @brief flag to indicate if the IGTL device is a client or a server */
     bool m_IsClient;
@@ -122,5 +127,6 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceManagementWidget : public Q
 
     //############## private help methods #######################
     void DisableSourceControls();
+    void EnableSourceControls();
 };
 #endif

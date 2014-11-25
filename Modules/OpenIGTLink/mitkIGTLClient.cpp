@@ -74,6 +74,9 @@ bool mitk::IGTLClient::OpenConnection()
   // everything is initialized and connected so the communication can be started
   this->SetState(Ready);
 
+  //inform observers about this new client
+  this->InvokeEvent(NewClientConnectionEvent());
+
   return true;
 }
 
@@ -85,6 +88,8 @@ void mitk::IGTLClient::Receive()
   if ( status == IGTL_STATUS_NOT_PRESENT )
   {
     this->StopCommunicationWithSocket(this->m_Socket);
+    //inform observers about loosing the connection to this socket
+    this->InvokeEvent(LostConnectionEvent());
     MITK_WARN("IGTLClient") << "Lost connection to server socket.";
   }
 }
@@ -115,4 +120,9 @@ void mitk::IGTLClient::StopCommunicationWithSocket(igtl::Socket* /*socket*/)
   m_StopCommunicationMutex->Lock();
   m_StopCommunication = true;
   m_StopCommunicationMutex->Unlock();
+}
+
+unsigned int mitk::IGTLClient::GetNumberOfConnections()
+{
+  return this->m_Socket->GetConnected();
 }

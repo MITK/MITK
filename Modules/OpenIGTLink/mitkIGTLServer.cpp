@@ -72,12 +72,21 @@ bool mitk::IGTLServer::OpenConnection()
   return true;
 }
 
+bool mitk::IGTLServer::CloseConnection()
+{
+  //remove all registered clients
+  SocketListType allRegisteredSockets = m_RegisteredClients;
+  this->StopCommunicationWithSocket(allRegisteredSockets);
+
+  return mitk::IGTLDevice::CloseConnection();
+}
+
 void mitk::IGTLServer::Connect()
 {
   igtl::Socket::Pointer socket;
   //check if another igtl device wants to connect to this socket
   socket =
-    ((igtl::ServerSocket*)(this->m_Socket.GetPointer()))->WaitForConnection(10);
+    ((igtl::ServerSocket*)(this->m_Socket.GetPointer()))->WaitForConnection(1);
   //if there is a new connection the socket is not null
   if ( socket.IsNotNull() )
   {
@@ -106,7 +115,7 @@ void mitk::IGTLServer::Receive()
     status = this->ReceivePrivate(*it);
     if ( status == IGTL_STATUS_NOT_PRESENT )
     {
-      //remember the this socket for later, it is not a good idea to remove it
+      //remember this socket for later, it is not a good idea to remove it
       //from the list directly because we iterator over the list at this point
       socketsToBeRemoved.push_back(*it);
       MITK_WARN("IGTLServer") << "Lost connection to a client socket. ";
@@ -114,6 +123,8 @@ void mitk::IGTLServer::Receive()
   }
   //remove the sockets that are not connected anymore
   this->StopCommunicationWithSocket(socketsToBeRemoved);
+  //inform observers about loosing the connection to these sockets
+  this->InvokeEvent(LostConnectionEvent());
 }
 
 void mitk::IGTLServer::Send()
@@ -164,9 +175,17 @@ void mitk::IGTLServer::StopCommunicationWithSocket(igtl::Socket* client)
   {
     if ( (*it) == client )
     {
+      //close the socket
+      (*it)->CloseSocket();
+      //and remove it from the list
       this->m_RegisteredClients.remove(*it);
       break;
     }
   }
   MITK_INFO("IGTLServer") << "Removed client socket from server client list.";
+}
+
+unsigned int mitk::IGTLServer::GetNumberOfConnections()
+{
+  return this->m_RegisteredClients.size();
 }

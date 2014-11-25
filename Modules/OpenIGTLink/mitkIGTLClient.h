@@ -51,6 +51,13 @@ namespace mitk
     */
     virtual bool OpenConnection();
 
+    /**
+    * \brief Returns the number of connections of this device
+    *
+    * A client can connect to one sever only, therefore, the number is either 0
+    * or 1
+    */
+    virtual unsigned int GetNumberOfConnections();
 
   protected:
     /** Constructor */

@@ -230,7 +230,7 @@ void mitk::IGTLMessageProvider::OnIncomingCommand()
       this->DisconnectFrom(source);
 
       this->m_StopStreamingThreadMutex->Lock();
-      this->m_StopStreamingThread = false;
+      this->m_StopStreamingThread = true;
       this->m_StopStreamingThreadMutex->Unlock();
     }
     else
@@ -303,6 +303,10 @@ ITK_THREAD_RETURN_TYPE mitk::IGTLMessageProvider::TimerThread(void* pInfoStruct)
 
   itk::SimpleMutexLock mutex;
   mutex.Lock();
+
+  thisObject->m_StopStreamingThreadMutex->Lock();
+  thisObject->m_StopStreamingThread = false;
+  thisObject->m_StopStreamingThreadMutex->Unlock();
 
   thisObject->m_StreamingTimeMutex->Lock();
   unsigned int waitingTime = thisObject->m_StreamingTime;

@@ -30,7 +30,7 @@ macro(mitk_create_executable)
       ADDITIONAL_LIBS        # list of additional libraries linked to this executable
       FILES_CMAKE            # file name of a CMake file setting source list variables
                              # (defaults to files.cmake)
-      FILES
+      CPP_FILES              # (optional) list of cpp files
       DESCRIPTION            # a description for the executable
      )
 
@@ -63,7 +63,7 @@ macro(mitk_create_executable)
                      TARGET_DEPENDS ${EXEC_TARGET_DEPENDS}
                      ADDITIONAL_LIBS ${EXEC_ADDITIONAL_LIBS}
                      FILES_CMAKE ${EXEC_FILES_CMAKE}
-                     FILES ${EXEC_FILES}
+                     CPP_FILES ${EXEC_CPP_FILES}
                      DESCRIPTION "${DESCRIPTION}"
                      ${_EXEC_OPTIONS}
                     )

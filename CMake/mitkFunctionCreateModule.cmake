@@ -126,7 +126,7 @@ function(mitk_create_module)
       ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
       FILES_CMAKE            # file name of a CMake file setting source list variables
                              # (defaults to files.cmake)
-      FILES
+      CPP_FILES              # list of cpp files
       DEPRECATED_SINCE       # marks this modules as deprecated
       DESCRIPTION            # a description for this module
      )
@@ -315,7 +315,11 @@ function(mitk_create_module)
         endif(MITK_GENERATE_MODULE_DOT)
 
         # ok, now create the module itself
-        include(${MODULE_FILES_CMAKE})
+        if (EXISTS ${MODULE_FILES_CMAKE})
+          include(${MODULE_FILES_CMAKE})
+        elseif(NOT MODULE_CPP_FILES AND NOT MODULE_HEADERS_ONLY)
+          message("WARNING No cmake file found AND no cpp files specified... ")
+        endif()
 
         set(module_c_flags )
         set(module_c_flags_debug )
@@ -503,7 +507,7 @@ function(mitk_create_module)
 
           if(MODULE_EXECUTABLE)
             add_executable(${MODULE_TARGET}
-                           ${MODULE_FILES} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
+                           ${MODULE_CPP_FILES} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
                            ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
             set(_us_module_name main)
           else()

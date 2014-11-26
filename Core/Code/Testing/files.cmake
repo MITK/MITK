@@ -106,6 +106,7 @@ set(MODULE_TESTS
   mitkArrayTypeConversionTest.cpp
   mitkSurfaceToImageFilterTest.cpp
   mitkBaseGeometryTest.cpp
+  mitkGeometryTransformHolderTest.cpp
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
   mitkLineTest.cpp

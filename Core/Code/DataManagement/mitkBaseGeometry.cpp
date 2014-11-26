@@ -28,35 +28,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkModifiedLock.h"
+#include "mitkGeometryTransformHolder.h"
 
 mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
   m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0), m_ImageGeometry(false), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
 {
-  m_VtkMatrix = vtkMatrix4x4::New();
-  m_VtkIndexToWorldTransform = vtkMatrixToLinearTransform::New();
-  m_VtkIndexToWorldTransform->SetInput(m_VtkMatrix);
+  m_GeometryTransform = new GeometryTransformHolder();
   Initialize();
 }
 
 mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), mitk::OperationActor(), //m_TimeBounds(other.m_TimeBounds),
-  m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_Origin(other.m_Origin),
+  m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified),
   m_ImageGeometry(other.m_ImageGeometry), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
 {
-  m_VtkMatrix = vtkMatrix4x4::New();
-  m_VtkIndexToWorldTransform = vtkMatrixToLinearTransform::New();
-  m_VtkIndexToWorldTransform->SetInput(m_VtkMatrix);
+  m_GeometryTransform = new GeometryTransformHolder(*other.GetGeometryTransformHolder());
   other.InitializeGeometry(this);
 }
 
 mitk::BaseGeometry::~BaseGeometry()
 {
-  m_VtkMatrix->Delete();
-  m_VtkIndexToWorldTransform->Delete();
+  delete m_GeometryTransform;
 }
 
-const mitk::Point3D& mitk::BaseGeometry::GetOrigin() const
+void mitk::BaseGeometry::SetVtkMatrixDeepCopy(vtkTransform *vtktransform)
 {
-  return m_Origin;
+  m_GeometryTransform->SetVtkMatrixDeepCopy(vtktransform);
+}
+
+const mitk::Point3D mitk::BaseGeometry::GetOrigin() const
+{
+  return m_GeometryTransform->GetOrigin();
 }
 
 void mitk::BaseGeometry::SetOrigin(const Point3D & origin)
@@ -65,30 +66,14 @@ void mitk::BaseGeometry::SetOrigin(const Point3D & origin)
 
   if(origin!=GetOrigin())
   {
-    m_Origin = origin;
-    m_IndexToWorldTransform->SetOffset(m_Origin.GetVectorFromOrigin());
+    m_GeometryTransform->SetOrigin(origin);
     Modified();
-    TransferItkToVtkTransform();
   }
 }
 
-void mitk::BaseGeometry::TransferItkToVtkTransform()
+const mitk::Vector3D mitk::BaseGeometry::GetSpacing() const
 {
-  mitk::ModifiedLock lock(this);
-  // copy m_IndexToWorldTransform into m_VtkIndexToWorldTransform
-
-  TransferItkTransformToVtkMatrix(m_IndexToWorldTransform.GetPointer(), m_VtkMatrix);
-  m_VtkIndexToWorldTransform->Modified();
-}
-
-static void CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::Vector3D& spacing)
-{
-  mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
-  vnlmatrix = transform->GetMatrix().GetVnlMatrix();
-
-  spacing[0]=vnlmatrix.get_column(0).magnitude();
-  spacing[1]=vnlmatrix.get_column(1).magnitude();
-  spacing[2]=vnlmatrix.get_column(2).magnitude();
+  return m_GeometryTransform->GetSpacing();
 }
 
 void mitk::BaseGeometry::Initialize()
@@ -96,27 +81,13 @@ void mitk::BaseGeometry::Initialize()
   float b[6] = {0,1,0,1,0,1};
   SetFloatBounds(b);
 
-  if(m_IndexToWorldTransform.IsNull())
-    m_IndexToWorldTransform = TransformType::New();
-  else
-    m_IndexToWorldTransform->SetIdentity();
-  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
-
-  m_VtkMatrix->Identity();
-
-  //m_TimeBounds[0]=ScalarTypeNumericTraits::NonpositiveMin(); m_TimeBounds[1]=ScalarTypeNumericTraits::max();
+  m_GeometryTransform->Initialize();
 
   m_FrameOfReferenceID = 0;
 
   m_ImageGeometry = false;
 
   this->PostInitialize();
-}
-
-void mitk::BaseGeometry::PostInitializeGeometry(BaseGeometry * newGeometry) const
-{
-  newGeometry->m_ImageGeometry = m_ImageGeometry;
 }
 
 void mitk::BaseGeometry::SetFloatBounds(const float bounds[6])
@@ -142,20 +113,19 @@ void
   mitk::BaseGeometry::InitializeGeometry(BaseGeometry* newGeometry) const
 {
   newGeometry->SetBounds(m_BoundingBox->GetBounds());
-  // we have to create a new transform!!
-  //newGeometry->SetTimeBounds(m_TimeBounds);
+
   newGeometry->SetFrameOfReferenceID(GetFrameOfReferenceID());
 
-  if(m_IndexToWorldTransform)
-  {
-    TransformType::Pointer indexToWorldTransform = m_IndexToWorldTransform->Clone();
-    newGeometry->SetIndexToWorldTransform(indexToWorldTransform);
-  }
+  newGeometry->InitializeGeometryTransformHolder(this);
+
+  newGeometry->m_ImageGeometry = m_ImageGeometry;
 
   this->PostInitializeGeometry(newGeometry);
 }
-void mitk::BaseGeometry::PostInitialize()
+
+void mitk::BaseGeometry::InitializeGeometryTransformHolder(const BaseGeometry* otherGeometry)
 {
+  this->m_GeometryTransform->Initialize(otherGeometry->GetGeometryTransformHolder());
 }
 
 /** Set the bounds */
@@ -163,7 +133,7 @@ void mitk::BaseGeometry::SetBounds(const BoundsArrayType& bounds)
 {
   mitk::ModifiedLock lock(this);
 
-  PreSetBounds(bounds);
+  this->PreSetBounds(bounds);
 
   m_BoundingBox = BoundingBoxType::New();
 
@@ -187,28 +157,17 @@ void mitk::BaseGeometry::SetBounds(const BoundsArrayType& bounds)
   this->Modified();
 }
 
-void mitk::BaseGeometry::PreSetBounds(const BoundsArrayType& /*bounds*/){};
-
 void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* transform)
 {
   mitk::ModifiedLock lock(this);
 
   PreSetIndexToWorldTransform(transform);
 
-  m_IndexToWorldTransform = transform;
-  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
-  TransferItkToVtkTransform();
+  m_GeometryTransform->SetIndexToWorldTransform(transform);
   Modified();
 
   PostSetIndexToWorldTransform(transform);
-
 }
-
-void mitk::BaseGeometry::PreSetIndexToWorldTransform(mitk::AffineTransform3D* /*transform*/)
-{}
-void mitk::BaseGeometry::PostSetIndexToWorldTransform(mitk::AffineTransform3D* /*transform*/)
-{}
 
 const  mitk::BaseGeometry::BoundsArrayType  mitk::BaseGeometry::GetBounds() const
 {
@@ -227,39 +186,14 @@ void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D& aSpacing, bool enforce
   _SetSpacing(aSpacing, enforceSetSpacing);
 }
 
-void mitk::BaseGeometry::PreSetSpacing(const mitk::Vector3D& /*aSpacing*/)
-{}
 void mitk::BaseGeometry::_SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing){
-  if(mitk::Equal(m_Spacing, aSpacing) == false || enforceSetSpacing)
-  {
-    assert(aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0);
-
-    m_Spacing = aSpacing;
-
-    AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
-
-    vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
-
-    mitk::VnlVector col;
-    col = vnlmatrix.get_column(0); col.normalize(); col*=aSpacing[0]; vnlmatrix.set_column(0, col);
-    col = vnlmatrix.get_column(1); col.normalize(); col*=aSpacing[1]; vnlmatrix.set_column(1, col);
-    col = vnlmatrix.get_column(2); col.normalize(); col*=aSpacing[2]; vnlmatrix.set_column(2, col);
-
-    Matrix3D matrix;
-    matrix = vnlmatrix;
-
-    AffineTransform3D::Pointer transform = AffineTransform3D::New();
-    transform->SetMatrix(matrix);
-    transform->SetOffset(m_IndexToWorldTransform->GetOffset());
-
-    SetIndexToWorldTransform(transform.GetPointer());
-  }
+  m_GeometryTransform->SetSpacing(aSpacing, enforceSetSpacing);
 }
 
 mitk::Vector3D mitk::BaseGeometry::GetAxisVector(unsigned int direction) const
 {
   Vector3D frontToBack;
-  frontToBack.SetVnlVector(m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction));
+  frontToBack.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction));
   frontToBack *= GetExtent(direction);
   return frontToBack;
 }
@@ -306,7 +240,7 @@ bool mitk::BaseGeometry::Is2DConvertable()
 mitk::Point3D mitk::BaseGeometry::GetCenter() const
 {
   assert(m_BoundingBox.IsNotNull());
-  return m_IndexToWorldTransform->TransformPoint(m_BoundingBox->GetCenter());
+  return this->GetIndexToWorldTransform()->TransformPoint(m_BoundingBox->GetCenter());
 }
 
 double mitk::BaseGeometry::GetDiagonalLength2() const
@@ -315,9 +249,6 @@ double mitk::BaseGeometry::GetDiagonalLength2() const
   return diagonalvector.GetSquaredNorm();
 }
 
-//##Documentation
-//## @brief Get the length of the diagonal of the bounding-box in mm
-//##
 double mitk::BaseGeometry::GetDiagonalLength() const
 {
   return sqrt(GetDiagonalLength2());
@@ -376,7 +307,7 @@ mitk::Point3D mitk::BaseGeometry::GetCornerPoint(bool xFront, bool yFront, bool 
 
 mitk::ScalarType mitk::BaseGeometry::GetExtentInMM(int direction) const
 {
-  return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction);
+  return this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction);
 }
 
 void mitk::BaseGeometry::SetExtentInMM(int direction, ScalarType extentInMM)
@@ -387,21 +318,19 @@ void mitk::BaseGeometry::SetExtentInMM(int direction, ScalarType extentInMM)
   if(fabs(len - extentInMM)>=mitk::eps)
   {
     AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
-    vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
+    vnlmatrix = m_GeometryTransform->GetVnlMatrix();
     if(len>extentInMM)
       vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)/len*extentInMM);
     else
       vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)*extentInMM/len);
     Matrix3D matrix;
     matrix = vnlmatrix;
-    m_IndexToWorldTransform->SetMatrix(matrix);
-    TransferItkToVtkTransform();
+    m_GeometryTransform->SetMatrix(matrix);
+
     Modified();
   }
   PostSetExtentInMM(direction,extentInMM);
 }
-
-void mitk::BaseGeometry::PostSetExtentInMM(int /*direction*/, ScalarType /*extentInMM*/){};
 
 bool mitk::BaseGeometry::IsInside(const mitk::Point3D& p) const
 {
@@ -453,14 +382,17 @@ void mitk::BaseGeometry::WorldToIndex( const mitk::Vector3D &vec_mm, mitk::Vecto
 void mitk::BaseGeometry::BackTransform(const mitk::Vector3D& in, mitk::Vector3D& out) const
 {
   // Get WorldToIndex transform
-  if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())
+  if (m_IndexToWorldTransformLastModified != this->GetIndexToWorldTransform()->GetMTime())
   {
-    m_InvertedTransform = TransformType::New();
-    if (!m_IndexToWorldTransform->GetInverse( m_InvertedTransform.GetPointer() ))
+    if (!m_InvertedTransform)
+    {
+      m_InvertedTransform = TransformType::New();
+    }
+    if (!this->GetIndexToWorldTransform()->GetInverse( m_InvertedTransform.GetPointer() ))
     {
       itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
     }
-    m_IndexToWorldTransformLastModified = m_IndexToWorldTransform->GetMTime();
+    m_IndexToWorldTransformLastModified = this->GetIndexToWorldTransform()->GetMTime();
   }
 
   // Check for valid matrix inversion
@@ -468,102 +400,47 @@ void mitk::BaseGeometry::BackTransform(const mitk::Vector3D& in, mitk::Vector3D&
   if(inverse.GetVnlMatrix().has_nans())
   {
     itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
-      << m_IndexToWorldTransform->GetMatrix() << "Suggested inverted matrix is:" << std::endl
+      << this->GetIndexToWorldTransform()->GetMatrix() << "Suggested inverted matrix is:" << std::endl
       << inverse );
   }
 
-  // Transform vector
-  for (unsigned int i = 0; i < 3; i++)
-  {
-    out[i] = 0.0;
-    for (unsigned int j = 0; j < 3; j++)
-    {
-      out[i] += inverse[i][j]*in[j];
-    }
-  }
+  out = inverse * in;
 }
 
 void mitk::BaseGeometry::BackTransform(const mitk::Point3D &in, mitk::Point3D& out) const
 {
-  ScalarType temp[3];
-  unsigned int i, j;
-  const TransformType::OffsetType& offset = m_IndexToWorldTransform->GetOffset();
+  mitk::Vector3D tempIn, tempOut;
+  const TransformType::OffsetType& offset = this->GetIndexToWorldTransform()->GetOffset();
+  tempIn = in.GetVectorFromOrigin() - offset;
 
-  // Remove offset
-  for (j = 0; j < 3; j++)
-  {
-    temp[j] = in[j] - offset[j];
-  }
+  BackTransform(tempIn, tempOut);
 
-  // Get WorldToIndex transform
-  if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())
-  {
-    m_InvertedTransform = TransformType::New();
-    if (!m_IndexToWorldTransform->GetInverse( m_InvertedTransform.GetPointer() ))
-    {
-      itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
-    }
-    m_IndexToWorldTransformLastModified = m_IndexToWorldTransform->GetMTime();
-  }
-
-  // Check for valid matrix inversion
-  const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
-  if(inverse.GetVnlMatrix().has_nans())
-  {
-    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
-      << m_IndexToWorldTransform->GetMatrix() << "Suggested inverted matrix is:" << std::endl
-      << inverse );
-  }
-
-  // Transform point
-  for (i = 0; i < 3; i++)
-  {
-    out[i] = 0.0;
-    for (j = 0; j < 3; j++)
-    {
-      out[i] += inverse[i][j]*temp[j];
-    }
-  }
+  out = tempOut;
 }
 
 mitk::VnlVector mitk::BaseGeometry::GetOriginVnl() const
 {
-  return const_cast<Self*>(this)->m_Origin.GetVnlVector();
+  return const_cast<Self*>(this)->GetOrigin().GetVnlVector();
 }
 
 vtkLinearTransform* mitk::BaseGeometry::GetVtkTransform() const
 {
-  return (vtkLinearTransform*)m_VtkIndexToWorldTransform;
+  return m_GeometryTransform->GetVtkTransform();
 }
 
 void mitk::BaseGeometry::SetIdentity()
 {
   mitk::ModifiedLock lock(this);
 
-  m_IndexToWorldTransform->SetIdentity();
-  m_Origin.Fill(0);
-  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
+  m_GeometryTransform->SetIdentity();
   Modified();
-  TransferItkToVtkTransform();
-}
-
-void mitk::BaseGeometry::TransferVtkToItkTransform()
-{
-  TransferVtkMatrixToItkTransform(m_VtkMatrix, m_IndexToWorldTransform.GetPointer());
-  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
-  TransferItkToVtkTransform();
 }
 
 void mitk::BaseGeometry::Compose( const mitk::BaseGeometry::TransformType * other, bool pre )
 {
   mitk::ModifiedLock lock(this);
-
-  m_IndexToWorldTransform->Compose(other, pre);
-  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
+  m_GeometryTransform->Compose(other,pre);
   Modified();
-  TransferItkToVtkTransform();
 }
 
 void mitk::BaseGeometry::Compose( const vtkMatrix4x4 * vtkmatrix, bool pre )
@@ -577,27 +454,26 @@ void mitk::BaseGeometry::Translate(const Vector3D & vector)
 {
   if((vector[0] != 0) || (vector[1] != 0) || (vector[2] != 0))
   {
-    this->SetOrigin(m_Origin + vector);
+    this->SetOrigin(this->GetOrigin() + vector);
   }
 }
 
 void mitk::BaseGeometry::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const
 {
-  pt_mm = m_IndexToWorldTransform->TransformPoint(pt_units);
+  pt_mm = this->GetIndexToWorldTransform()->TransformPoint(pt_units);
 }
 
 void mitk::BaseGeometry::IndexToWorld(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
 {
-  vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
+  vec_mm = this->GetIndexToWorldTransform()->TransformVector(vec_units);
 }
 
-#include <vtkTransform.h>
 void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
 {
   mitk::ModifiedLock lock(this);
 
   vtkTransform *vtktransform = vtkTransform::New();
-  vtktransform->SetMatrix(m_VtkMatrix);
+  vtktransform->SetMatrix(this->GetVtkMatrix());
   switch (operation->GetOperationType())
   {
   case OpNOTHING:
@@ -684,15 +560,14 @@ void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
     vtktransform->Delete();
     return;
   }
-  m_VtkMatrix->DeepCopy(vtktransform->GetMatrix());
-  TransferVtkToItkTransform();
+  this->SetVtkMatrixDeepCopy(vtktransform);
   Modified();
   vtktransform->Delete();
 }
 
 mitk::VnlVector mitk::BaseGeometry::GetMatrixColumn(unsigned int direction) const
 {
-  return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction);
+  return this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction);
 }
 
 mitk::BoundingBox::Pointer mitk::BaseGeometry::CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D* transform) const
@@ -722,21 +597,6 @@ mitk::BoundingBox::Pointer mitk::BaseGeometry::CalculateBoundingBoxRelativeToTra
   return result;
 }
 
-//void mitk::BaseGeometry::SetTimeBounds(const TimeBounds& timebounds)
-//{
-//  mitk::ModifiedLock lock(this);
-//
-//  if(m_TimeBounds != timebounds)
-//  {
-//    m_TimeBounds = timebounds;
-//    Modified();
-//  }
-//  PostSetTimeBounds(timebounds);
-//}
-//
-//void mitk::BaseGeometry::PostSetTimeBounds(const TimeBounds& timebounds)
-//{}
-
 const std::string mitk::BaseGeometry::GetTransformAsString( TransformType* transformType )
 {
   std::ostringstream out;
@@ -763,8 +623,7 @@ const std::string mitk::BaseGeometry::GetTransformAsString( TransformType* trans
 
 void mitk::BaseGeometry::SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix)
 {
-  m_VtkMatrix->DeepCopy(vtkmatrix);
-  TransferVtkToItkTransform();
+  m_GeometryTransform->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
 }
 
 void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D & /*atPt3d_mm*/, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
@@ -784,40 +643,11 @@ void mitk::BaseGeometry::IndexToWorld(const mitk::Point3D &/*atPt3d_units*/, con
 void mitk::BaseGeometry::BackTransform(const mitk::Point3D &/*at*/, const mitk::Vector3D &in, mitk::Vector3D& out) const
 {
   MITK_INFO<<"Warning! Call of the deprecated function BaseGeometry::BackTransform(point, vec, vec). Use BaseGeometry::BackTransform(vec, vec) instead!";
-  //// Get WorldToIndex transform
-  //if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())
-  //{
-  //  m_InvertedTransform = TransformType::New();
-  //  if (!m_IndexToWorldTransform->GetInverse( m_InvertedTransform.GetPointer() ))
-  //  {
-  //    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
-  //  }
-  //  m_IndexToWorldTransformLastModified = m_IndexToWorldTransform->GetMTime();
-  //}
-
-  //// Check for valid matrix inversion
-  //const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
-  //if(inverse.GetVnlMatrix().has_nans())
-  //{
-  //  itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
-  //    << m_IndexToWorldTransform->GetMatrix() << "Suggested inverted matrix is:" << std::endl
-  //    << inverse );
-  //}
-
-  //// Transform vector
-  //for (unsigned int i = 0; i < 3; i++)
-  //{
-  //  out[i] = 0.0;
-  //  for (unsigned int j = 0; j < 3; j++)
-  //  {
-  //    out[i] += inverse[i][j]*in[j];
-  //  }
-  //}
   this->BackTransform(in, out);
 }
 
 vtkMatrix4x4* mitk::BaseGeometry::GetVtkMatrix(){
-  return m_VtkMatrix;
+  return m_GeometryTransform->GetVtkMatrix();
 }
 
 bool mitk::BaseGeometry::IsBoundingBoxNull() const{
@@ -825,7 +655,7 @@ bool mitk::BaseGeometry::IsBoundingBoxNull() const{
 }
 
 bool mitk::BaseGeometry::IsIndexToWorldTransformNull() const{
-  return m_IndexToWorldTransform.IsNull();
+  return m_GeometryTransform->IsIndexToWorldTransformNull();
 }
 
 void
@@ -866,12 +696,6 @@ void
 
   this->SetImageGeometry(isAnImageGeometry);
 }
-//itk::LightObject::Pointer mitk::BaseGeometry::InternalClone() const
-//{
-//  Self::Pointer newGeometry = new Self(*this);
-//  newGeometry->UnRegister();
-//  return newGeometry.GetPointer();
-//}
 
 void mitk::BaseGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
@@ -934,7 +758,6 @@ void mitk::BaseGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
   os << indent << " Origin: " << this->GetOrigin() << std::endl;
   os << indent << " ImageGeometry: " << this->GetImageGeometry() << std::endl;
   os << indent << " Spacing: " << this->GetSpacing() << std::endl;
-  //os << indent << " TimeBounds: " << this->GetTimeBounds() << std::endl;
 }
 
 void mitk::BaseGeometry::Modified() const{
@@ -942,6 +765,22 @@ void mitk::BaseGeometry::Modified() const{
     Superclass::Modified();
   else
     m_ModifiedCalledFlag = true;
+}
+
+mitk::AffineTransform3D* mitk::BaseGeometry::GetIndexToWorldTransform()
+{
+  return m_GeometryTransform->GetIndexToWorldTransform();
+}
+
+const mitk::AffineTransform3D*   mitk::BaseGeometry::GetIndexToWorldTransform() const
+{
+  return m_GeometryTransform->GetIndexToWorldTransform();
+}
+
+const mitk::GeometryTransformHolder*
+  mitk::BaseGeometry::GetGeometryTransformHolder() const
+{
+  return m_GeometryTransform;
 }
 
 bool mitk::Equal( const mitk::BaseGeometry::BoundingBoxType *leftHandSide, const mitk::BaseGeometry::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose )
@@ -1062,7 +901,7 @@ bool mitk::Equal(const mitk::BaseGeometry& leftHandSide, const mitk::BaseGeometr
   return result;
 }
 
-bool mitk::Equal(const BaseGeometry::TransformType *leftHandSide, const BaseGeometry::TransformType *rightHandSide, ScalarType eps, bool verbose )
+bool mitk::Equal(const mitk::BaseGeometry::TransformType *leftHandSide, const mitk::BaseGeometry::TransformType *rightHandSide, ScalarType eps, bool verbose )
 {
   if(( leftHandSide == NULL) || ( rightHandSide == NULL ))
   {
@@ -1072,7 +911,7 @@ bool mitk::Equal(const BaseGeometry::TransformType *leftHandSide, const BaseGeom
   return Equal( *leftHandSide, *rightHandSide, eps, verbose);
 }
 
-bool mitk::Equal(const BaseGeometry::TransformType& leftHandSide, const BaseGeometry::TransformType& rightHandSide, ScalarType eps, bool verbose )
+bool mitk::Equal(const mitk::BaseGeometry::TransformType& leftHandSide, const mitk::BaseGeometry::TransformType& rightHandSide, ScalarType eps, bool verbose )
 {
   //Compare IndexToWorldTransform Matrix
   if( !mitk::MatrixEqualElementWise(  leftHandSide.GetMatrix(),

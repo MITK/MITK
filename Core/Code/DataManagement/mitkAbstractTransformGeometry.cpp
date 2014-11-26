@@ -42,6 +42,7 @@ mitk::AbstractTransformGeometry::~AbstractTransformGeometry()
 void mitk::AbstractTransformGeometry::PostInitialize()
 {
   m_ItkVtkAbstractTransform = itk::VtkAbstractTransform<ScalarType>::New();
+  Superclass::PostInitialize();
 }
 
 vtkAbstractTransform* mitk::AbstractTransformGeometry::GetVtkAbstractTransform() const

@@ -734,7 +734,7 @@ namespace mitk
         this->SetIndexToWorldTransform(transform2);
         ScalarType bounds[6] = {0, op->GetWidth(), 0, op->GetHeight(), 0 ,1 };
         this->SetBounds(bounds);
-        TransferItkToVtkTransform();
+        //wird schon in SetITWT aufgreufen xxxxxxxxxxxx TransferItkToVtkTransform();
         this->Modified();
         transform->Delete();
         return;
@@ -745,8 +745,7 @@ namespace mitk
       return;
     }
 
-    this->GetVtkMatrix()->DeepCopy(transform->GetMatrix());
-    this->TransferVtkToItkTransform();
+    this->SetVtkMatrixDeepCopy(transform);
     this->Modified();
     transform->Delete();
   }

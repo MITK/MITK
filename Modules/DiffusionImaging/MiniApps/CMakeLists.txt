@@ -111,7 +111,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     CPP_FILES QballReconstruction.cpp mitkCommandLineParser.cpp
   )
 
-  mitk_create_executable(Registration
+  mitk_create_executable(FolderRegistration
     DEPENDS MitkCore MitkDiffusionCore
     PACKAGE_DEPENDS ITK
     CPP_FILES mitkRegistration.cpp mitkCommandLineParser.cpp

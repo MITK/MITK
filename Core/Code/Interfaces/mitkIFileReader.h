@@ -35,6 +35,7 @@ namespace mitk {
 /**
  * \brief The common interface for all MITK file readers.
  * \ingroup IO
+ * \ingroup MicroServices_Interfaces
  *
  * Implementations of this interface must be registered as a service
  * to make themselve available via the service registry. If the

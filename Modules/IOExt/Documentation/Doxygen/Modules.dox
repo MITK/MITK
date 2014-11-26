@@ -1,5 +1,5 @@
 /**
-  \defgroup MitkIOExtModule MitkIOExt
+  \defgroup MitkIOExtModule IOExt
   \ingroup MITKModules
 
   \brief Reader, writer, and mapper extensions for MITK

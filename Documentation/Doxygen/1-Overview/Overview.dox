@@ -1,0 +1,30 @@
+/**
+\page Overview An Overview
+\ingroup index
+
+The Medical Imaging Interaction Toolkit (MITK) is a versatile and flexible open-source
+project. It can be used as a C++ toolkit or application framework for software development.
+The following sections describe the most common usage scenarios.
+
+<b> I want to use MITK as an application </b>
+
+You will use the MITK Workbench as an end user and will find user manuals in \ref UserManualPortal and \ref PluginListPage.
+
+<b> I want to develop my own software framework, and use some of MITK's data structures and algorithms</b>
+
+You will use MITK as a toolkit and probably benefit most from the \ref BuildInstructionsPage and <a
+href="modules.html">MITK API Documentation</a>.
+
+<b>I want to use the MITK and BlueBerry software framework to develop my own software </b>
+
+Here you have again two options.
+
+<b>I want use the MITK Workbench and extend its capabilities</b>
+
+You are using MITK as software framework and writing your own modules and plugins for MITK. You want to read the \ref BuildInstructionsPage and further on \ref Development. Also you might want to take a look at our \ref CMAKE_FAQ.
+
+<b>I want to create my own application based on MITK</b>
+
+This is probably the most common way to use MITK. You are using MITK as software framework and building your own project and application using MITK. You want to read \ref HowToNewProject and the general information in \ref Development. Also you might want to take a look at our \ref CMAKE_FAQ.
+
+*/

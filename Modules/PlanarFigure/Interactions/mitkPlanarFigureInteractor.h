@@ -59,7 +59,7 @@ itkEventMacro( ContextMenuPlanarFigureEvent, PlanarFigureEvent );
 /**
   * \brief Interaction with mitk::PlanarFigure objects via control-points
   *
-  * \ingroup Interaction
+  * @ingroup MitkPlanarFigureModule
   */
 class MitkPlanarFigure_EXPORT PlanarFigureInteractor : public DataInteractor
 {

@@ -1,0 +1,21 @@
+/**
+\usersguidemainpage{UserManualPortal} User Manual
+
+To get an introduction to the usage of any MITK based application please read \ref MITKUserManualPage. It will give you an overview of most of the common questions, such as how to load or save data or navigate within it. This is a good starting point for first questions.
+
+Depending on what kind of work you intend do perform with MITK, certain applications are better suited to your needs than others. MITK offers a number of these Applications, each of which features a set of Plugins, which can solve certain tasks. To Learn more about MITK applications, please visit the \ref ApplicationsPage.
+
+For more specific information on how a plugin operates you can find the plugin documentation in \ref PluginListPage. The Plugin documentation usually explains the functionality in depth and should solve most problems you might encounter with the plugin. Depending on the application you are using you might have only some or all of the listed plugins available.
+
+Lastly, if your question is not answered here, please use our <a href="https://lists.sourceforge.net/lists/listinfo/mitk-users">Mailinglist</a> to let us know about your problem.
+Alternatively, you can <a href="http://www.mitk.org/Contact">contact us directly</a>.
+
+<h2>List of topics</h2>
+<ul>
+  <li> \subpage MITKUserManualPage </li>
+  <li> \subpage ApplicationsPage </li>
+  <li> \subpage PluginListPage </li>
+  <li> \subpage PerspectiveListPage </li>
+  <li> \subpage MiniAppExplainPage </li>
+</ul>
+*/

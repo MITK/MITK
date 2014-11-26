@@ -1,0 +1,499 @@
+/**
+
+\page Step10Page MITK Tutorial - Step 10: Adding new Interaction
+
+\tableofcontents
+
+
+\section HowToUseDataInteractor Step 01 - How to use an existing DataInteractor in your Module/Plugin/...
+
+MITK provides finished DataInteractors for a variety of tasks, they can be found in Core/Code/Interactions. They can be used with
+state machine patterns and config files located under Core/Code/Resources/Interactions.
+
+A mitk::DataInteractor consists of four parts. The class describing the functionality and two XML files; one describes the state machine pattern, that is the workflow of an interaction and
+the second describes the user events which trigger an action. Lastly every mitk::DataInteractor works on a mitk::DataNode in which it stores and manipulates data.
+To use a mitk::DataInteractor these parts have to be brought together.
+
+
+** TODO add code of mitk::PointSetDataInteractor Plugin ..
+
+<b>This code demonstrates the use of an existing mitk::DataInteractor exemplary for the mitk::PointSetDataInteractor:</b>
+
+First we need a mitk::DataNode in which the PointSets is stored. It has to be added to the mitk::DataStorage.
+\code
+
+  mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
+  GetDataStorage()->Add(dataNode.GetPointer());
+\endcode
+
+Then we create an instance of a mitk::PointSetDataInteractor and load a predefined statemachine pattern as well as a configuration
+for it:
+
+\code
+  m_CurrentInteractor = mitk::PointSetDataInteractor::New();
+  m_CurrentInteractor->LoadStateMachine("PointSet.xml");
+  m_CurrentInteractor->SetEventConfig("PointSetConfig.xml");
+\endcode
+
+Lastly the mitk::DataNode is added to the mitk::DataInteractor
+
+\code
+  m_CurrentInteractor->SetDataNode(dataNode);
+\endcode
+
+now the mitk::DataInteractor is ready for usage.
+
+\section HowToModifyInteraction Step 02 - How to modify the behaviour of a DataInteractor
+
+The behavior of a mitk::DataInteractor is determined by two aspects. One, the state machine pattern which describes the flow/order of actions
+that are performed. Secondly the configuration which determines which user interaction triggers the actions.
+
+
+\subsection ModifyDisplayInteractorBehavior How to modify the display interactor behavior
+
+Sometimes it may be desirable to change the behaviour of the mitk::DisplayInteractor which controls zooming, panning and scrolling, e.g. when a
+Tool is activated that reacts to the same events. Changing the behavior of the DisplayInteractor (or possibly any other EventHandler) can be achieved from anywhere
+in the code by requesting the InteractionEventObserver and assigning an alternative configuration to it, as demonstrated in this example:
+
+\code
+
+std::ifstream* configStream = new std::ifstream( #path to alternative configuration file# );
+mitk::EventConfig newConfig(configStream);
+
+// Requesting all registered EventObservers
+std::list<mitk::ServiceReference> listEventObserver = GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
+
+for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+{
+    DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(GetModuleContext()->GetService<InteractionEventObserver>(*it));
+    // filtering: only adjust the DisplayInteractor
+    if (displayInteractor != NULL)
+    {
+        displayInteractor->SetEventConfig(newConfig);
+    }
+}
+
+\endcode
+
+
+
+\section SectionImplementationDataInteractor How to implement a new DataInteractor
+
+This second part of the tutorial step goes beyond the activation of an interactor, that modifies data by user interaction) as shown above. It shows what needs to be implemented to add a new way of interaction within your MITK application.
+Please see \ref DataInteractionPage as an introduction to the MITK interaction mechanism, you may also want to read \ref DataInteractionTechnicalPage.
+
+This tutorial is structured as follows: The first section deals with config files, describing all the parameters of events and how to use them
+in a configuration file. In the second section the basics are described that are needed to write a state machine pattern. The last section
+deals with brining configuration, state machine pattern and code together and gives an exemplary implementation of a mitk::DataInteractor.
+
+\section ConfigFileDescriptionSection How to create a Config-File
+
+\subsection EventDescriptionSection Event Description
+
+Events are described by their parameters. Each event type has its own set of parameters that can be set in the configuration file.
+If a parameter is omitted it is set to its default value. All possible parameters are listed and described below. Event parameters
+are also described in the documentation of the event class itself.
+
+Mandatory for each event description is the event class and the event variant. The parameters of an event are set by attribute tags.
+\note Refer to \ref EventClassSection for the meaning of event class.
+
+\b Mouse \b Buttons \n
+
+mitk::InteractionEvent::MouseButtons represent the buttons. They can be used for two attributes. First the EventButton attribute which describes
+the button that triggered the event,
+this always is a single button. Secondly the ButtonState attribute that describes which buttons were pressed at the moment the event has been generated.
+For example assume the right mouse button and the middle mouse button are already pressed, now the left mouse button is pressed too and generates a second event,
+this would be described as follows:
+
+\code
+<attribute name="EventButton" value="LeftMouseButton"/>
+<attribute name="ButtonState" value="RightMouseButton,MiddleMouseButton"/>
+\endcode
+
+Note: Technically the LeftMouseButton is also pressed and should be listed in the ButtonState, but this is taken care of by the mitk::EventFactory .
+
+
+
+<b> Key Events</b> \n
+
+mitk::InteractionKeyEvent represents a pressed key, which key is pressed is provided with the Key attribute like this
+
+\code
+    <attribute name="Key" value="A"/>
+\endcode
+or
+\code
+    <attribute name="Key" value="Escape"/>
+\endcode
+
+\note Key Events do not require an explicit configuration, for all key events there exists
+a predefined event variant with the name 'Std' + value, that is key a is named 'StdA'.
+
+The names for special keys are listed here:
+
+\dontinclude mitkInteractionEvent.h
+\skipline  // Special Keys
+\until // End special keys
+
+
+<b> Modifier Keys</b> \n
+
+mitk::InteractionEvent::ModifierKeys represent the combination of pressed modifier keys, several modifier keys pressed at the same time
+are denoted by listing them all separated by commas.
+
+\code
+<!-- shift and control key are pressed -->
+<attribute name="Modifiers" value="shift,ctrl"/>
+\endcode
+
+
+\b ScrollDirection \n
+
+This attribute is unique to the mitk::MouseWheelEvent and describes the direction in which the mouse wheel is rotated. In the event description actual only the direction is provided,
+but the event is generated with the actual value, and this value can be retrieved from the object.
+
+\code
+ <attribute name="ScrollDirection" value="up"/>
+ <!-- or -->
+ <attribute name="ScrollDirection" value="down"/>
+\endcode
+
+
+\subsection ExamplesSection Examples
+
+
+Examples for key events:
+\code
+<config>
+  <!-- Event of key 'a' pressed -->
+  <event_variant class="InteractionKeyEvent" name="StdA">
+    <attribute name="Key" value="A"/>
+  </event_variant>
+  <!-- Event of key 'b' pressed  while modifiers ctrl and shift are pressed-->
+  <event_variant class="InteractionKeyEvent" name="StdB">
+    <attribute name="Key" value="B"/>
+    <attribute name="Modifiers" value="shift,ctrl"/>
+  </event_variant>
+</config>
+\endcode
+
+
+Examples for MousePress events:
+\code
+ <!-- Standard left click -->
+<config>
+  <event_variant class="MousePressEvent" name="StdMousePressPrimaryButton">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+<!-- right click with control key pressed-->
+  <event_variant class="MousePressEvent" name="RightWithCTRL">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+</config>
+\endcode
+
+There exists a standard configuration file for the most common events called GlobalConfig.xml that can be used to as a default and can be extended
+by a specific definition.
+
+\subsection ParameterDescriptionSection Parameter Description
+
+It is also possible to store parameters in the config file. Those are stored using the param-tag, like this:
+
+\code
+<config name="example2">
+ <param name="property1" value="yes"/>
+ <param name="scrollModus" value="leftright"/>
+</config>
+\endcode
+
+Within the application these properties can then be access via a mitk::PropertyList like this:
+
+\code
+  // sm - state machine loaded with config file example2
+
+  mitk::PropertyList::Pointer properties = GetAttributes();
+  std::string prop1;
+  properties->GetStringProperty("property1",prop1);
+\endcode
+
+
+\section HowToStateMachine HowTo Write a State Machine
+
+A state machine pattern is described in a XML file.
+
+\subsection StateSection States
+
+States are described using the state-tag. Each state has to have a name. Exactly one state has to be a start state in
+each state machine to indicate the state in which the state machine is set when it is constructed.
+So a valid, but rather useless state machine would like like this:
+
+\code
+<statemachine>
+ <state name="start" startstate="true"/>
+</statemachine>
+\endcode
+
+Optionally a state can be assigned a special mode that influences the event distribution.
+These modes are GRAB_INPUT , PREFER_INPUT and REGULAR (where REGULAR is default and does not need to be indicated).
+See \ref DataInteractionTechnicalPage_DispatcherEventDistSection for a description of these modes. Use the special modes only when necessary as they prevent other DataInteractors to
+receive events.
+
+\code
+<!-- example -->
+<state name="someState" startstate="true" state_mode="GRAB_INPUT"/>
+\endcode
+
+\subsection TransitionSection Transitions
+Transitions are part of a state and describe all possible state switches, and are therefore important for modeling an interaction scheme.
+Transitions consist a part that describes the event which triggers the transition (event class and event variant) and a target which is state
+to which the state machine switches after executing a transition.
+An event class describes the event type (see mitk::InteractionEvent for the different classes) and the event variant is a specification thereof
+and the exact description is taken from  a config file. Together they determine which event can trigger this transition.
+For example this state machine will switch from state A to state B when the StdMousePressPrimaryButton event (left mouse button is pressed) occurs.
+
+\subsubsection EventClassSection Event Class
+The event class description supports the polymorphism of the event classes. Therefore state machine patters should be written in the most
+general ways possible.
+So for a given class hierarchy like this:
+\dot
+digraph {
+  node [shape=record, fontname=Helvetica, fontsize=10];
+  a [ label="{InteractionPositionEvent}"];
+  b [ label="{MousePressEvent}" ];
+  c [ label="MouseReleaseEvent" ];
+  d [ label="TouchEvent", style=dotted ];
+  a -> b;
+  a -> c;
+  a -> d;
+}
+\enddot
+
+in the state machine pattern the mitk::InteractionPositionEvent can be declared as event class to restrict to the events which hold a position information.
+The actual implementation is then given in the configuration file. In this case it allows to define events of the classes mitk::InteractionPositionEvent
+itself, or mitk::MousePressEvent, mitk::MouseReleaseEvent, mitk::TouchEvent.
+This has the advantage that the patterns remain the same no matter what input devices are used, and the state machine patterns can be configured
+for newly added event classes as long as they match the class hierarchy (this ensures they hold the necessary properties).
+
+\code
+<statemachine>
+ <state name="A" startstate="true">
+   <transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="B"/>
+ <state/>
+ <state name="B" />
+</statemachine>
+\endcode
+
+\subsection ActionSection Actions
+Actions can be added to transitions and represent functions in the mitk::DataInteractor that are executed on taking a transition.
+The following simple state machine will listen for left mouse clicks and execute two actions (and actually never stop).
+\code
+<statemachine>
+    <state name="start" startstate="true">
+        <transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="start">
+            <action name="addPoint"/>
+            <action name="countClicks"/>
+        </transition>
+    </state>
+</statemachine>
+\endcode
+
+In order to tell the mitk::DataInteractor which function to execute these actions are made known to the mitk::DataInteractor using
+the CONNECT_FUNCTION macro.  This example assumes that there exists an ExampleInteractor which inherits from mitkDataInteractor.
+This class implements the functions AddPoint and CountClicks. The actions are introduced by implementing the virtual method
+ConnectActionsAndFunctions():
+
+\code
+void mitk::ExampleInteractor::ConnectActionsAndFunctions()
+{
+  CONNECT_FUNCTION("addPoint", AddPoint);
+  CONNECT_FUNCTION("countClicks", CountClicks);
+}
+\endcode
+
+\subsection ConditionSection Conditions
+Conditions can be added to transitions and represent functions in the mitk::DataInteractor that are executed on taking a transition.
+A condition is used to determine if a following action should be executed or not.
+\code
+<statemachine>
+    <state name="start" startstate="true">
+        <transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="start">
+            <condition name="checkPoint"/>
+            <action name="addPoint"/>
+            <action name="countClicks"/>
+        </transition>
+    </state>
+</statemachine>
+\endcode
+
+In order to tell the mitk::DataInteractor which function to execute these conditions are made known to the mitk::DataInteractor using
+the CONNECT_CONDITION macro. The ConnectActionsAndFunctions() method has to be augmented accordingly:
+
+\code
+void mitk::ExampleInteractor::ConnectActionsAndFunctions()
+{
+  CONNECT_CONDITION("checkPoint", CheckPoint);
+  CONNECT_FUNCTION("addPoint", AddPoint);
+  CONNECT_FUNCTION("countClicks", CountClicks);
+}
+\endcode
+
+\section ReferenceToIncludeFiles Integration of the pattern and configuration files
+
+The usage of custom files slightly differs from the existing ones.
+Custom pattern and config files have to be stored in the /Resources/Interactions directory of the Module that they were designed for.
+When loading files from a module location into an interactor, the module has to be supplied as a parameter:
+
+\code
+  m_CurrentInteractor = mitk::CustomDataInteractor::New();
+  m_CurrentInteractor->LoadStateMachine("CustomStateMachinePattern.xml", us::GetModuleContext()->GetModule());
+  m_CurrentInteractor->SetEventConfig("CustomConfig.xml", us::GetModuleContext()->GetModule());
+\endcode
+
+See \ref IncludeFiles for a description.
+
+
+\section HowToDataInteractor Implementation of a new mitk::DataInteractor
+
+DataInteractors are to inherit from mitk::DataInteractor. Their functionality is implemented in functions that follow this interface:
+For Actions:
+\code
+bool SomeFunctionality(StateMachineAction* , InteractionEvent*);
+\endcode
+
+For Conditions:
+\code
+bool SomeFunctionality(const InteractionEvent*);
+\endcode
+
+Your functions are connected with actions and conditions by implementing the function ConnectActionsAndFunctions(), e.g.
+
+\code
+void mitk::ExampleInteractor::ConnectActionsAndFunctions()
+{
+ CONNECT_CONDITION("checkPoint", CheckPoint);
+ CONNECT_FUNCTION("addPoint", AddPoint);
+ CONNECT_FUNCTION("enoughPoints", EnoughPoints);
+}
+\endcode
+
+Now all that is left is to write a state machine pattern and a config file as is described in the tutorials.
+
+To provide a useful example the mitk::PointSetDataInteractor is annotated with comments that describe the important parts for an implementation
+of a mitk::DataInteractor.
+
+This step assumes knowledge of the Interaction concept described in \ref DataInteractionPage and some background of the implementation which is described in
+\ref DataInteractionPageTechnical. Please refer to these pages before proceeding.
+
+Now all that is left it to write a state machine pattern and a config file as is described in the tutorials.
+
+\subsection ExampleInternalEvent Example Interactor using InternalEvent
+
+A useful tool in creating DataInteractors is mitk::InternalEvent which allows the mitk::DataInteractor to send signals on its own.
+The following will describe how to build a mitk::DataInteractor that allows to add points until a certain number of points is reached.
+The number of accepted points is provided in the config file as a parameter.
+So we start by writing a state machine pattern that add points until it receives an mitk::InternalEvent telling it, that enough points
+have been added.
+
+\code
+<statemachine>
+    <state name="start" startstate="true" >
+        <transition event_class="MousePressEvent" event_variant="AddPointClick" target="start">
+            <condition name="checkPoint"/>
+            <action name="addPoint"/>
+        </transition>
+        <transition event_class="InternalEvent" event_variant="enoughPointsAdded" target="final">
+            <action name="enoughPoints"/>
+        </transition>
+    </state>
+    <state name="final">
+    <--! dead state, nothing happens any more, once we reached this -->
+    </state>
+</statemachine>
+\endcode
+<b> </b>
+
+In our config file we set the number of maximal points to 10, and define AddPointClick as a right mouse click with the
+ctrl button pressed.
+\code
+<config>
+  <param name="NumberOfPoints" value="10">
+   <event_variant class="MousePressEvent" name="AddPointClick">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+</config>
+\endcode
+
+
+The implementation is described in the following. \see Step10.h \see Step10.cpp
+
+
+\dontinclude Step10.h
+
+Implementation of protected functions:
+\skipline protected:
+\until virtual void ConfigurationChanged();
+
+<b> ConnectActionsAndFunctions </b> - Is inherited from mitk::InteractionStateMachine, here action strings from the xml are connected with
+functions in the mitk::DataInteractor (as seen above). In our example this looks like this:
+
+\dontinclude Step10.cpp
+
+\skipline void mitk::ExampleInteractor::ConnectActionsAndFunctions()
+\until }
+
+
+<b> ConfigurationChanged </b> - Is called whenever a new configuration file is loaded (by the mitk::InteractionEventHandler super class),
+this function allows to implement initialization code that depends on configuration values. In our example we want to set the limit of
+allowed points:
+
+
+\dontinclude Step10.cpp
+
+\skipline void mitk::ExampleInteractor::ConfigurationChang
+\until }
+
+Next the actual functionality of the DataInteractor is implemented, by providing one function per action, following this prototype described before.
+
+\dontinclude Step10.h
+
+\skipline private:
+\until bool CheckPoint(cons
+
+\dontinclude Step10.cpp
+
+\skipline bool mitk::ExampleInteractor::AddPoint(StateM
+\until //-
+
+If the conditions returns false the calling transition and the included actions will not be executed.
+If a condition fails the event is considered as untreated, and will be offered to other Interactors.
+
+\dontinclude Step10.cpp
+\skipline bool mitk::ExampleInteractor::CheckPoint(
+\until //end
+
+Here we see an internal event used to signal that the point set reached the maximal number of allowed points.
+The event is created and added to the Dispatchers event queue.
+
+\dontinclude Step10.cpp
+\skipline  // create internal
+\until positionEvent->GetSender(
+
+\note Internal events do not need any mapping to event variants. Their signal name is equivalent with the event variant.
+
+
+<b> There are also two documented classes implementing a mitk::DataInteractor and a mitk::InteractionEventObserver which can be looked at for further
+understanding: </b>
+\see mitk::PointSetDataInteractor
+\see mitk::DisplayInteractor
+
+
+Have fun with creating your own interaction and please think about contributing it to MITK!
+
+<b>
+If you meet any difficulties during this step, don't hesitate to ask on the MITK mailing list mitk-users@lists.sourceforge.net!
+People there are kind and will try to help you. </b>
+
+\ref Step09Page "[Previous step]" \ref TutorialPage "[Main tutorial page]"
+*/

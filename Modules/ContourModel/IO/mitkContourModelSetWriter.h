@@ -29,8 +29,7 @@ namespace mitk
   *
   * Uses the regular ContourModel writer to write each contour of the ContourModelSet to a single file.
   *
-  * @ingroup PSIO
-  * @ingroup Process
+  * @ingroup MitkContourModelModule
   */
   class ContourModelSetWriter : public mitk::AbstractFileWriter
   {

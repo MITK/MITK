@@ -1,0 +1,33 @@
+/**
+\page ApplicationsPage Using MITK and Applications
+
+\tableofcontents
+
+\section ApplicationsPageApplications What are Applications?
+
+Applications are special versions of MITK which contain functionality aimed at solving a special task.
+Usually they are aimed at a selective audience or solving a particular problem.
+As such they focus on certain capabilities of MITK, while ignoring others.
+The main reason for this is to supply the users of the application with the power of MITK for solving their tasks, without daunting them with an overwhelming number of menus and options.
+At the same time, this allows the creation of an elegant and easily comprehensible workflow for your task.
+The Diffusion Imaging Application for example contains all the functionality necessary for the field of neuro-imaging, but does not contain support for ultrasound imaging.
+
+A typical example of this would be an application which contains only views related to the analysis of the human brain (particular question) or one which contains only what is necessary for displaying medical data in the classroom (specific audience).
+
+\section ApplicationsPageWhatAmIUsing Which Application am I using?
+
+If you are unsure which application you are currently using, start the application and have a look in the Title Bar.
+You should see it's name there.
+
+\imageMacro{ApplicationTitle.jpg,"The application name is displayed in the title bar",16}
+
+\section ApplicationsPageApplicationsList List of Applications
+
+If you are interested in using a specific application, currently developed by the MITK team you might want to take a look first at the \ref MITKUserManualPage . Further information on any application can be found here:
+<ul>
+  <li> \subpage org_mitkworkbench
+  <li> \subpage org_dti_atlas_application
+  <li> \subpage org_mitk_gui_qt_diffusionimagingapp
+</ul>
+
+*/

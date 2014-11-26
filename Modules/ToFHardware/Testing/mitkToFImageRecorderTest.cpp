@@ -58,9 +58,13 @@ public:
   void setUp()
   {
     m_ToFImageRecorder = mitk::ToFImageRecorder::New();
-    m_DistanceImageName = "test_DistanceImage.nrrd";
-    m_AmplitudeImageName = "test_AmplitudeImage.nrrd";
-    m_IntensityImageName = "test_IntensityImage.nrrd";
+    m_DistanceImageName = mitk::IOUtil::CreateTemporaryFile();//"test_DistanceImage.nrrd";
+    m_AmplitudeImageName = mitk::IOUtil::CreateTemporaryFile();//"test_AmplitudeImage.nrrd";
+    m_IntensityImageName = mitk::IOUtil::CreateTemporaryFile();//"test_IntensityImage.nrrd";
+
+    m_DistanceImageName.append(".nrrd");
+    m_AmplitudeImageName.append(".nrrd");
+    m_IntensityImageName.append(".nrrd");
 
 
     m_PlayerDevice = mitk::ToFCameraMITKPlayerDevice::New();
@@ -107,7 +111,7 @@ public:
 
     if( remove( m_DistanceImageName.c_str() ) != 0 )
     {
-      MITK_ERROR<<"File: test_distance.nrrd not successfully deleted!";
+      MITK_ERROR<<"File: "<< m_DistanceImageName << " not successfully deleted!";
     }
   }
 
@@ -125,7 +129,7 @@ public:
 
     if( remove( m_AmplitudeImageName.c_str() ) != 0 )
     {
-      MITK_ERROR<<"File: test_amplitude.nrrd not successfully deleted!";
+      MITK_ERROR<<"File: "<< m_AmplitudeImageName << " not successfully deleted!";
     }
   }
 
@@ -143,7 +147,7 @@ public:
 
     if( remove( m_IntensityImageName.c_str() ) != 0 )
     {
-      MITK_ERROR<<"File: test_intensity.nrrd not successfully deleted!";
+      MITK_ERROR<<"File: "<< m_IntensityImageName << " not successfully deleted!";
     }
   }
 };

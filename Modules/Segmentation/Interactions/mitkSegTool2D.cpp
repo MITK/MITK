@@ -380,6 +380,9 @@ void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
 
 unsigned int mitk::SegTool2D::AddContourmarker()
 {
+  if (m_LastEventSender == NULL)
+    return;
+
   us::ServiceReference<PlanePositionManagerService> serviceRef =
       us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
   PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);

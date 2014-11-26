@@ -244,7 +244,7 @@ int main( int argc, char* argv[] )
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--","-");
 
-  parser.setTitle("Batched Folder Registraton");
+  parser.setTitle("Folder Registraton");
   parser.setCategory("Preprocessing Tools");
   parser.setDescription("http://docs.mitk.org/nightly-qt4/DiffusionMiniApps.html");
   parser.setContributor("MBI");

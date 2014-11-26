@@ -9,7 +9,7 @@ if(MITK_USE_SWIG)
   if(NOT SWIG_DIR)
     set(SWIG_TARGET_VERSION 3.0.2)
     set(proj Swig)
-    set(Swig_DEPENDENCIES )
+    set(Swig_DEPENDENCIES PCRE)
     set(Swig_DEPENDS )
 
     # binary SWIG for windows

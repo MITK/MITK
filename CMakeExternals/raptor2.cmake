@@ -2,6 +2,8 @@
 # raptor2
 #-----------------------------------------------------------------------------
 
+if(MITK_USE_raptor2)
+
 # Sanity checks
 if(DEFINED raptor2_DIR AND NOT EXISTS ${raptor2_DIR})
   message(FATAL_ERROR "raptor2_DIR variable is defined but corresponds to non-existing directory")
@@ -16,10 +18,11 @@ if(NOT DEFINED raptor2_DIR)
   ExternalProject_Add(${proj}
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
-     INSTALL_DIR ${proj}-install
+     INSTALL_DIR ${REDLAND_INSTALL_DIR}
      PREFIX ${proj}-cmake
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/raptor2-2.0.14-patched.tar.gz
-     URL_MD5 28f16fd07bf15bd3769ec066aafc24e5
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/raptor2-2.0.15.tar.gz
+     URL_MD5 a39f6c07ddb20d7dd2ff1f95fa21e2cd
+     PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/raptor2-2.0.15.patch
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
@@ -43,16 +46,18 @@ if(NOT DEFINED raptor2_DIR)
        -DRAPTOR_SERIALIZER_NQUADS:BOOL=ON
        -DRAPTOR_SERIALIZER_NTRIPLES:BOOL=ON
        -DRAPTOR_SERIALIZER_RDFXML:BOOL=OFF
-       -DRAPTOR_SERIALIZER_RDFXML_ABBRE:BOOL=OFF
+       -DRAPTOR_SERIALIZER_RDFXML_ABBREV:BOOL=OFF
        -DRAPTOR_SERIALIZER_RSS_1_0:BOOL=OFF
        -DRAPTOR_SERIALIZER_TURTLE:BOOL=ON
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  set(${proj}_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
+  set(${proj}_DIR ${REDLAND_INSTALL_DIR}/lib/raptor2/cmake/)
 
 else()
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+
+endif()
 
 endif()

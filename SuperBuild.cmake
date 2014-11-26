@@ -3,6 +3,10 @@
 # Convenient macro allowing to download a file
 #-----------------------------------------------------------------------------
 
+if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL)
+  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL http://mitk.org/download/thirdparty)
+endif()
+
 macro(downloadFile url dest)
   file(DOWNLOAD ${url} ${dest} STATUS status)
   list(GET status 0 error_code)
@@ -29,6 +33,19 @@ if(UNIX AND NOT APPLE)
   # Check for libwrap0-dev
   mitkFunctionCheckPackageHeader(tcpd.h libwrap0-dev)
 
+endif()
+
+# We need a proper patch program. On Linux and MacOS, we assume
+# that "patch" is available. On Windows, we download patch.exe
+# if not patch program is found.
+find_program(PATCH_COMMAND patch)
+if((NOT PATCH_COMMAND OR NOT EXISTS ${PATCH_COMMAND}) AND WIN32)
+  downloadFile(${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/patch.exe
+               ${CMAKE_CURRENT_BINARY_DIR}/patch.exe)
+  find_program(PATCH_COMMAND patch ${CMAKE_CURRENT_BINARY_DIR})
+endif()
+if(NOT PATCH_COMMAND)
+  message(FATAL_ERROR "No patch program found.")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -76,6 +93,8 @@ set(external_projects
   SimpleITK
   Eigen
   raptor2
+  rasqal
+  redland
   )
 
 # Qxt supports Qt5. We need to also support it in QxtCMakeLists.txt
@@ -101,7 +120,11 @@ if(MITK_USE_QT)
 endif()
 
 if(MITK_USE_Redland)
+  set(REDLAND_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/Redland-install)
   set(MITK_USE_raptor2 1)
+  set(MITK_USE_PCRE 1)
+  set(MITK_USE_rasqal 1)
+  set(MITK_USE_redland 1)
 endif()
 
 if(MITK_USE_SOFA)
@@ -176,10 +199,6 @@ set(ep_source_dir ${ep_base}/Source)
 #set(ep_parallelism_level)
 set(ep_build_shared_libs ON)
 set(ep_build_testing OFF)
-
-if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL)
-  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL http://mitk.org/download/thirdparty)
-endif()
 
 # Compute -G arg for configuring external projects with the same CMake generator:
 if(CMAKE_EXTRA_GENERATOR)
@@ -313,7 +332,11 @@ ExternalProject_Add(${proj}
     ${DCMTK_DEPENDS}
     ${OpenCV_DEPENDS}
     ${Poco_DEPENDS}
+    ${PCRE_DEPENDS}
+    ${Swig_DEPENDS}
     ${raptor2_DEPENDS}
+    ${rasqal_DEPENDS}
+    ${redland_DEPENDS}
     ${SOFA_DEPENDS}
     ${MITK-Data_DEPENDS}
     ${Qwt_DEPENDS}
@@ -441,7 +464,11 @@ ExternalProject_Add(${proj}
     -DACVD_DIR:PATH=${ACVD_DIR}
     -DOpenCV_DIR:PATH=${OpenCV_DIR}
     -DPoco_DIR:PATH=${Poco_DIR}
-    -Draptor2_DIR:PATH=${raptor2_DIR}
+    -DPCRE_DIR:PATH=${PCRE_DIR}
+    -DSwig_DIR:PATH=${Swig_DIR}
+    -DRaptor2_DIR:PATH=${raptor2_DIR}
+    -DRasqal_DIR:PATH=${rasqal_DIR}
+    -DRedland_DIR:PATH=${redland_DIR}
     -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}

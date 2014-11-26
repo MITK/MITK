@@ -53,6 +53,7 @@ int mitkOclBinaryThresholdImageFilterTest( int argc, char* argv[] )
   if( resources->GetMaximumImageSize(2, CL_MEM_OBJECT_IMAGE3D) != 0 ) //3D Ok
   {
     //Create a random reference image
+    MITK_WARN << "Generating 3D image";
     inputImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 52, 1, // dimension
                                                                                       1.0f, 1.0f, 1.0f, // spacing
                                                                                       255, 0); // max, min
@@ -60,6 +61,7 @@ int mitkOclBinaryThresholdImageFilterTest( int argc, char* argv[] )
   else
   {
     //Create a random reference image
+    MITK_WARN << "Generating 2D image";
     inputImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 0, 0, // dimension
                                                                                       1.0f, 1.0f, 1.0f, // spacing
                                                                                       255, 0); // max, min

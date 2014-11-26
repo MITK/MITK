@@ -33,7 +33,7 @@ if(NOT DEFINED redland_DIR)
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  set(${proj}_DIR ${CMAKE_CURRENT_BINARY_DIR}/${REDLAND_INSTALL_DIR}/lib/redland/cmake/)
+  set(${proj}_DIR ${REDLAND_INSTALL_DIR}/lib/redland/cmake/)
 
 else()
 

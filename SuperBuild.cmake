@@ -469,6 +469,7 @@ ExternalProject_Add(${proj}
     -DRaptor2_DIR:PATH=${raptor2_DIR}
     -DRasqal_DIR:PATH=${rasqal_DIR}
     -DRedland_DIR:PATH=${redland_DIR}
+    -DREDLAND_INSTALL_DIR:PATH=${REDLAND_INSTALL_DIR}
     -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}

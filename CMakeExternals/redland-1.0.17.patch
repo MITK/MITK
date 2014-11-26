@@ -1,6 +1,6 @@
-diff -urNb redland-1.0.17-orig/CMakeLists.txt redland-1.0.17-patched/CMakeLists.txt
+diff -burN redland-1.0.17-orig/CMakeLists.txt redland-1.0.17-patched/CMakeLists.txt
 --- redland-1.0.17-orig/CMakeLists.txt	1970-01-01 01:00:00.000000000 +0100
-+++ redland-1.0.17-patched/CMakeLists.txt	2014-11-19 04:51:54.088581687 +0100
++++ redland-1.0.17-patched/CMakeLists.txt	2014-11-26 14:03:18.518283855 +0100
 @@ -0,0 +1,298 @@
 +# redland/CMakeLists.txt
 +#
@@ -300,9 +300,26 @@ diff -urNb redland-1.0.17-orig/CMakeLists.txt redland-1.0.17-patched/CMakeLists.
 +)
 +
 +# end redland/CMakeLists.txt
-diff -urNb redland-1.0.17-orig/RedlandConfig.cmake.in redland-1.0.17-patched/RedlandConfig.cmake.in
+diff -burN redland-1.0.17-orig/RedlandConfig.cmake.in redland-1.0.17-patched/RedlandConfig.cmake.in
 --- redland-1.0.17-orig/RedlandConfig.cmake.in	1970-01-01 01:00:00.000000000 +0100
-+++ redland-1.0.17-patched/RedlandConfig.cmake.in	2014-11-18 01:58:58.476582684 +0100
++++ redland-1.0.17-patched/RedlandConfig.cmake.in	2014-11-26 14:08:47.781299653 +0100
+@@ -0,0 +1,13 @@
++set(Redland_VERSION @VERSION@)
++
++@PACKAGE_INIT@
++
++set_and_check(Redland_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
++
++find_package(Raptor2 REQUIRED)
++find_package(Rasqal REQUIRED)
++list(APPEND Redland_INCLUDE_DIR ${Rasqal_INCLUDE_DIR} ${Raptor2_INCLUDE_DIR})
++
++if(NOT TARGET rdf AND EXISTS ${CMAKE_CURRENT_LIST_DIR}/RedlandTargets.cmake)
++  include(${CMAKE_CURRENT_LIST_DIR}/RedlandTargets.cmake)
++endif()
+diff -burN redland-1.0.17-orig/RedlandConfig.cmake.in~ redland-1.0.17-patched/RedlandConfig.cmake.in~
+--- redland-1.0.17-orig/RedlandConfig.cmake.in~	1970-01-01 01:00:00.000000000 +0100
++++ redland-1.0.17-patched/RedlandConfig.cmake.in~	2014-11-26 14:03:18.518283855 +0100
 @@ -0,0 +1,9 @@
 +set(Redland_VERSION @VERSION@)
 +
@@ -313,9 +330,9 @@ diff -urNb redland-1.0.17-orig/RedlandConfig.cmake.in redland-1.0.17-patched/Red
 +if(NOT TARGET rdf AND EXISTS ${CMAKE_CURRENT_LIST_DIR}/RedlandTargets.cmake)
 +  include(${CMAKE_CURRENT_LIST_DIR}/RedlandTargets.cmake)
 +endif()
-diff -urNb redland-1.0.17-orig/src/CMakeLists.txt redland-1.0.17-patched/src/CMakeLists.txt
+diff -burN redland-1.0.17-orig/src/CMakeLists.txt redland-1.0.17-patched/src/CMakeLists.txt
 --- redland-1.0.17-orig/src/CMakeLists.txt	1970-01-01 01:00:00.000000000 +0100
-+++ redland-1.0.17-patched/src/CMakeLists.txt	2014-11-18 03:05:23.608582208 +0100
++++ redland-1.0.17-patched/src/CMakeLists.txt	2014-11-26 14:03:18.518283855 +0100
 @@ -0,0 +1,171 @@
 +# redland/src/CMakeLists.txt
 +#
@@ -488,9 +505,9 @@ diff -urNb redland-1.0.17-orig/src/CMakeLists.txt redland-1.0.17-patched/src/CMa
 +INSTALL(EXPORT RedlandTargets DESTINATION ${CMAKE_INSTALL_DIR})
 +
 +# end redland/src/CMakeLists.txt
-diff -urNb redland-1.0.17-orig/src/rdf_config_cmake.h.in redland-1.0.17-patched/src/rdf_config_cmake.h.in
+diff -burN redland-1.0.17-orig/src/rdf_config_cmake.h.in redland-1.0.17-patched/src/rdf_config_cmake.h.in
 --- redland-1.0.17-orig/src/rdf_config_cmake.h.in	1970-01-01 01:00:00.000000000 +0100
-+++ redland-1.0.17-patched/src/rdf_config_cmake.h.in	2014-11-19 04:58:44.804581637 +0100
++++ redland-1.0.17-patched/src/rdf_config_cmake.h.in	2014-11-26 14:03:18.519283855 +0100
 @@ -0,0 +1,508 @@
 +/* src/rdf_config_cmake.h.in.*/
 +
@@ -1000,9 +1017,9 @@ diff -urNb redland-1.0.17-orig/src/rdf_config_cmake.h.in redland-1.0.17-patched/
 +# endif
 +
 +#endif
-diff -urNb redland-1.0.17-orig/src/win32_rdf_config.h redland-1.0.17-patched/src/win32_rdf_config.h
+diff -burN redland-1.0.17-orig/src/win32_rdf_config.h redland-1.0.17-patched/src/win32_rdf_config.h
 --- redland-1.0.17-orig/src/win32_rdf_config.h	2013-12-28 17:31:20.000000000 +0100
-+++ redland-1.0.17-patched/src/win32_rdf_config.h	2014-11-19 04:21:48.112581902 +0100
++++ redland-1.0.17-patched/src/win32_rdf_config.h	2014-11-26 14:03:18.520283855 +0100
 @@ -21,6 +21,7 @@
   *
   */
@@ -1016,9 +1033,9 @@ diff -urNb redland-1.0.17-orig/src/win32_rdf_config.h redland-1.0.17-patched/src
  
  #endif
 +#endif
-diff -urNb redland-1.0.17-orig/src/win32_rdf_config.h.in redland-1.0.17-patched/src/win32_rdf_config.h.in
+diff -burN redland-1.0.17-orig/src/win32_rdf_config.h.in redland-1.0.17-patched/src/win32_rdf_config.h.in
 --- redland-1.0.17-orig/src/win32_rdf_config.h.in	2013-04-05 19:17:40.000000000 +0200
-+++ redland-1.0.17-patched/src/win32_rdf_config.h.in	2014-11-19 04:20:56.204581908 +0100
++++ redland-1.0.17-patched/src/win32_rdf_config.h.in	2014-11-26 14:03:18.521283855 +0100
 @@ -21,6 +21,7 @@
   *
   */

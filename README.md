@@ -4,6 +4,16 @@ The [Medical Imaging Interaction Toolkit][mitk] (MITK) is a free open-source sof
 system for development of interactive medical image processing software. MITK
 combines the [Insight Toolkit][itk] (ITK) and the [Visualization Toolkit][vtk] (VTK) with an application framework.
 
+The links below provide high-level and reference documentation targeting different
+usage scenarios:
+
+ - Get a [high-level overview][mitk-overview] about MITK with pointers to further
+   documentation
+ - End-users looking for help with MITK applications should read the
+   [MITK User Manual][mitk-usermanual]
+ - Developers contributing to or using MITK, please see the [MITK Developer Manual][mitk-devmanual]
+   as well as the [MITK API Reference][mitk-apiref]
+
 See the [MITK homepage][mitk] for details.
 
 Supported Platforms
@@ -67,6 +77,10 @@ Useful Links
 [mitk]: http://mitk.org
 [itk]: http://www.itk.org
 [vtk]: http://www.vtk.org
+[mitk-overview]: http://docs.mitk.org/nightly-qt4/Overview.html
+[mitk-usermanual]: http://docs.mitk.org/nightly-qt4/UserManualPortal.html
+[mitk-devmanual]: http://docs.mitk.org/nightly-qt4/DeveloperManualPortal.html
+[mitk-apiref]: http://docs.mitk.org/nightly-qt4/usergroup0.html
 [platforms]: http://docs.mitk.org/nightly-qt4/SupportedPlatformsPage.html
 [dkfz]: http://www.dkfz.de
 [license]: http://mitk.org/git/?p=MITK.git;a=blob_plain;f=LICENSE.txt

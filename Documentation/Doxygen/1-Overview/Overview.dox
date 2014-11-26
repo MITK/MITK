@@ -2,11 +2,9 @@
 \page Overview An Overview
 \ingroup index
 
-The Medical Imaging Interaction Toolkit (MITK) is a powerful application and can also be used as either a framework or a toolkiit for Software development. The following options are  the most common usage scenarios.
-
-
-
-
+The Medical Imaging Interaction Toolkit (MITK) is a versatile and flexible open-source
+project. It can be used as a C++ toolkit or application framework for software development.
+The following sections describe the most common usage scenarios.
 
 <b> I want to use MITK as an application </b>
 

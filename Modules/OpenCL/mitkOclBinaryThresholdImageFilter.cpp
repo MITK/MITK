@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::OclBinaryThresholdImageFilter::OclBinaryThresholdImageFilter()
 : m_ckBinaryThreshold( NULL )
 {
-  this->AddSourceFile("BinaryThresholdFilter2D.cl");
+  this->AddSourceFile("BinaryThresholdFilter.cl");
   this->m_FilterID = "BinaryThreshold";
 
   this->m_LowerThreshold = 10;

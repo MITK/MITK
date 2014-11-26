@@ -20,5 +20,4 @@ set(CPP_FILES
 
 set(RESOURCE_FILES
   BinaryThresholdFilter.cl
-  BinaryThresholdFilter2D.cl
 )

@@ -57,16 +57,16 @@ public:
   void setUp()
   {
     m_ToFImageRecorder = mitk::ToFImageRecorder::New();
-    m_DistanceImageName = mitk::IOUtil::CreateTemporaryFile();//"test_DistanceImage.nrrd";
-    m_AmplitudeImageName = mitk::IOUtil::CreateTemporaryFile();//"test_AmplitudeImage.nrrd";
-    m_IntensityImageName = mitk::IOUtil::CreateTemporaryFile();//"test_IntensityImage.nrrd";
+    m_DistanceImageName = mitk::IOUtil::CreateTemporaryFile();
+    m_AmplitudeImageName = mitk::IOUtil::CreateTemporaryFile();
+    m_IntensityImageName = mitk::IOUtil::CreateTemporaryFile();
 
     //The recorder would automatically append the default extension ".nrrd"
     //but we have to append it here, because the data is later loaded with
     //IOUtil which does not know what kind of data to load/look for.
-    m_DistanceImageName.append(".nrrd");
-    m_AmplitudeImageName.append(".nrrd");
-    m_IntensityImageName.append(".nrrd");
+    m_DistanceImageName.append("Distance.nrrd");
+    m_AmplitudeImageName.append("Amplitude.nrrd");
+    m_IntensityImageName.append("Intensity.nrrd");
 
     m_PlayerDevice = mitk::ToFCameraMITKPlayerDevice::New();
     m_ToFImageRecorder->SetCameraDevice(m_PlayerDevice);

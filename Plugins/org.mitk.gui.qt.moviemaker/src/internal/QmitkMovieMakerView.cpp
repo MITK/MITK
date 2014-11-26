@@ -479,14 +479,28 @@ void QmitkMovieMakerView::OnTimerTimeout()
 
 void QmitkMovieMakerView::RenderCurrentFrame()
 {
-  typedef QPair<QmitkAnimationItem*, double> AnimationIterpolationFactorPair;
+  typedef QPair<QmitkAnimationItem*, double> AnimationInterpolationFactorPair;
 
   const double deltaT = m_TotalDuration / (m_NumFrames - 1);
-  const QVector<AnimationIterpolationFactorPair> activeAnimations = this->GetActiveAnimations(m_CurrentFrame * deltaT);
+  const QVector<AnimationInterpolationFactorPair> activeAnimations = this->GetActiveAnimations(m_CurrentFrame * deltaT);
 
-  Q_FOREACH(const AnimationIterpolationFactorPair& animation, activeAnimations)
+  Q_FOREACH(const AnimationInterpolationFactorPair& animation, activeAnimations)
   {
-    animation.first->Animate(animation.second);
+    const QVector<AnimationInterpolationFactorPair> nextActiveAnimations = this->GetActiveAnimations((m_CurrentFrame + 1) * deltaT);
+    bool lastFrameForAnimation = true;
+
+    Q_FOREACH(const AnimationInterpolationFactorPair& nextAnimation, nextActiveAnimations)
+    {
+      if (nextAnimation.first == animation.first)
+      {
+        lastFrameForAnimation = false;
+        break;
+      }
+    }
+
+    animation.first->Animate(!lastFrameForAnimation
+      ? animation.second
+      : 1.0);
   }
 
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();

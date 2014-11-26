@@ -9,17 +9,28 @@
 
 \section org_mitk_gui_qt_segmentationUserManualOverview Overview
 
-The <b>Segmentation perspective</b> allows you to create segmentations of anatomical and pathological structures in medical images of the human body.
-The perspective groups a number of tools which can be used for:
+The <b>Segmentation plugin</b> allows you to create segmentations of anatomical and pathological structures in medical images of the human body.
+The plugin consists of a number of view which can be used for:
 <ul>
-  <li> (semi-)automatic segmentation of organs on CT or MR image volumes
-  <li> semi-automatic segmentation of lesions such as enlarged lymph nodes or tumors
-  <li> manual segmentation of any structures you might want to delineate
+  <li> manual and (semi-)automatic segmentation of organs on CT or MR image volumes via the <b>Segmentation View</b>
+  <li> segmentation postprocessing via the \subpage org_mitk_views_segmentationutilities
+  <li> clipping of existing segmentations using a resection plane via the \subpage org_mitk_views_deformableclippingplane
 </ul>
 
-For more detailed information on the clipping plane view see \subpage org_mitk_views_deformableclippingplane.
+\imageMacro{QmitkSegmentation_IMGApplication.png,"Segmentation Plugin consisting of the Segmentation View, the Segmentation Utilities View and the Clipping Plane View",16.00}
 
-\imageMacro{QmitkSegmentation_IMGApplication.png,"Segmentation perspective consisting of the Data Manager view and the Segmentation view",16.00}
+The segmentation plugin offers a number of preferences which can be set via the MITK Workbench application preference dialog:
+
+\imageMacro{QmitkSegmentation_IMGPreferences.png,"Segmentation Plugin consisting of the Segmentation View, the Segmentation Utilities View and the Clipping Plane View",16.00}
+
+The following preferences can be set:
+<ul>
+  <li> <b>Slim view:</b> Allows you to show or hide the tool button description of the Segmentation View
+  <li> <b>2D display:</b> Specify whether the segmentation is drawn as outline or as a transparent overlay
+  <li> <b>3D display:</b> Activate 3D volume rendering for your segmentation
+  <li> <b>Data node selection mode:</b> If activated the segmentation image combo box is always sychronized with the data manager selection. 
+  <li> <b>Smoothed surface creation:</b> Set certain smoothing parameters for surface creation
+</ul>
 
 If you wonder what segmentations are good for, we shortly revisit the concept of a segmentation here.
 A CT or MR image is made up of volume of physical measurements (volume elements are called voxels).
@@ -52,8 +63,11 @@ The Segmentation perspective makes use of the Data Manager view to give you an o
 
 \imageMacro{QmitkSegmentation_IMGSelection.png,"Data Manager is used for selecting the current segmentation. The reference image is selected in the drop down box of the control area.",5.50}
 
-To select the reference image (e.g. the original CT/MR image) use the drop down box in the control area of the Segmentation view. The segmentation image selected in the Data Manager is displayed below the drop down box. If no segmentation image exists or none is selected create a new segmentation image by using the "New segmentation" button.
-Some items of the graphical user interface might be disabled when no image is selected.
+To select the reference image (e.g. the original CT/MR image) use the patient image drop down box in the control area of the Segmentation view. The segmentation image selected in the Data Manager is displayed below in the segmentation drop down box.
+By default the auto selection mode is enabled, which always keeps the selection of the segmentation drop down box in synch with the selection in the data manager.
+If you disable the auto selection mode the selection of the right segmentation image has to be done via the drop down box.
+If no segmentation image exists or none is selected create a new segmentation image by using the "New segmentation" button on the right of the Segmentation drop down box.
+Some items of the graphical user interface might be disabled when no image is selected or the selected image does not fit to the patient image's geoemtry.
 In any case, the application will give you hints if a selection is needed.
 
 \section org_mitk_gui_qt_segmentationUserManualManualKringeling Manual Contouring
@@ -163,6 +177,11 @@ The LiveWire Tool acts as a magnetic lasso with a contour snapping to edges of o
 
 The contour will be transfered to its binary image representation by deactivating the tool.
 
+\imageMacro{QmitkSegmentation_IMG2DFastMarchingUsage.png,"2D Fast Marching Tool",3.01}
+
+Provides a fast marching based 2D interaction segmentation tool. You start with setting seedpoints in an image slice. Via several sliders you can
+adapt parameters and see the fast marching result instantly.
+
 \subsection org_mitk_gui_qt_segmentationUserManualManualKringeling5 Interpolation
 
 Creating segmentations for modern CT volumes is very time-consuming, because structures of interest can easily cover a range of 50 or more slices.
@@ -185,6 +204,7 @@ In this case the 3D interpolation will be deactivated automatically so that the 
 has finished the surface is shown yellow with a small opacity. Additional to the surface, black contours are shown in the 3D render window. They mark the positions of all the drawn contours which were used for the interpolation.
 You can navigate between the drawn contours by clicking on the „Position“ - Nodes in the datamanager which are located below the selected segmentation. If you don't want to see these nodes just unckeck the „Show Position Nodes“ Checkbox and these nodes will be hidden.
 If you want to delete a drawn contour we recommend to use the Erase-Tool since Redo/Undo is not yet working for 3D interpolation.
+The current state of the 3D interpolation can be saved accross application restart. Therefor just click on save project during the interpolation is active. After restarting the application and load your project you can click on "Reinit Interpolation" within the 3D interpolation GUI area.
 
 <br>
 <b>The 2D Interpolation</b> creates suggestions for a segmentation whenever you have a slice that

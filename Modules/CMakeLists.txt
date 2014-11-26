@@ -1,6 +1,7 @@
 
 # Modules must be listed according to their dependencies
 set(module_dirs
+    RDF
     LegacyIO
     DataTypesExt
     AlgorithmsExt

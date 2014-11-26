@@ -208,6 +208,8 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
   typedef typename itk::CorrelationImageToImageMetricv4< ItkRegistrationImageType, ItkRegistrationImageType > NCMetricType;
   typedef typename itk::ImageToImageMetricv4< ItkRegistrationImageType, ItkRegistrationImageType > BaseMetricType;
 
+  typedef typename itk::ImageRegistrationMethodv4< ItkRegistrationImageType, ItkRegistrationImageType, RigidTransformType> RigidRegistrationType;
+
   typedef itk::GradientDescentLineSearchOptimizerv4 OptimizerType;
 
   typename ItkImageTypeFixed::Pointer referenceImage = itkImage1;
@@ -386,40 +388,7 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
     base_metric->SetFixedImageMask( fixedMaskSpatialObject );
   }
 
-  // [Prepare Registration]
-  //  combine all components to set-up registration
-  typename RegistrationType::Pointer registration = RegistrationType::New();
 
-  registration->SetFixedImage( 0, caster_f->GetOutput() );
-  registration->SetMovingImage( 0, caster_m->GetOutput() );
-  registration->SetMetric( base_metric );
-  registration->SetOptimizer( optimizer );
-  registration->SetMovingInitialTransform( transform.GetPointer() );
-  registration->SetNumberOfLevels(max_pyramid_lvl);
-  registration->SetShrinkFactorsPerLevel( shrink_factors );
-
-  // observe the pyramid level change in order to adapt parameters
-  typename PyramidOptControlCommandv4<RegistrationType>::Pointer pyramid_observer =
-      PyramidOptControlCommandv4<RegistrationType>::New();
-  unsigned int pyramid_tag =  registration->AddObserver( itk::InitializeEvent(), pyramid_observer );
-
-
-  try
-  {
-    registration->Update();
-  }
-  catch( const itk::ExceptionObject &e)
-  {
-    registration->Print( std::cout );
-
-    MITK_ERROR << "[Registration Update] Caught ITK exception: ";
-    MITK_ERROR("itk.exception") << e.what();
-
-    mitkThrow() << "Registration failed with exception: " << e.what();
-  }
-
-  // [Post Registration]
-  //   Retrieve the last transformation parameters from the performed registration task
   if( m_EstimatedParameters != NULL)
   {
     delete [] m_EstimatedParameters;
@@ -427,13 +396,117 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
 
   m_EstimatedParameters = new double[paramDim];
 
-  typename BaseTransformType::ParametersType finalParameters = registration->GetOptimizer()->GetCurrentPosition();
-  for( unsigned int i=0; i<paramDim; i++)
-  {
-    m_EstimatedParameters[i] = finalParameters[i];
-  }
+  //-----------------
+  //-----------------
 
-  MITK_INFO("Params") << optimizer->GetValue() << " :: " << finalParameters;
+  // [Prepare Registration]
+  //  combine all components to set-up registration
+  if( m_UseAffineTransform )
+  {
+
+    typename RegistrationType::Pointer registration = RegistrationType::New();
+
+    registration->SetFixedImage( 0, caster_f->GetOutput() );
+    registration->SetMovingImage( 0, caster_m->GetOutput() );
+    registration->SetMetric( base_metric );
+    registration->SetOptimizer( optimizer );
+    registration->SetMovingInitialTransform( transform.GetPointer() );
+    registration->SetNumberOfLevels(max_pyramid_lvl);
+    registration->SetShrinkFactorsPerLevel( shrink_factors );
+
+    // observe the pyramid level change in order to adapt parameters
+    typename PyramidOptControlCommandv4<RegistrationType>::Pointer pyramid_observer =
+        PyramidOptControlCommandv4<RegistrationType>::New();
+    unsigned int pyramid_tag =  registration->AddObserver( itk::InitializeEvent(), pyramid_observer );
+
+
+    try
+    {
+      registration->Update();
+    }
+    catch( const itk::ExceptionObject &e)
+    {
+      registration->Print( std::cout );
+
+      MITK_ERROR << "[Registration Update] Caught ITK exception: ";
+      MITK_ERROR("itk.exception") << e.what();
+
+      mitkThrow() << "Registration failed with exception: " << e.what();
+    }
+
+    // [Post Registration]
+    //   Retrieve the last transformation parameters from the performed registration task
+    typename BaseTransformType::ParametersType finalParameters = registration->GetOptimizer()->GetCurrentPosition();
+    for( unsigned int i=0; i<paramDim; i++)
+    {
+      m_EstimatedParameters[i] = finalParameters[i];
+    }
+
+    if( m_Verbose )
+    {
+      MITK_INFO("Params") << optimizer->GetValue() << " :: " << finalParameters;
+    }
+
+    if( pyramid_tag )
+    {
+      registration->RemoveObserver( pyramid_tag );
+    }
+
+  }
+  //-----------
+  //-----------
+  else
+  {
+
+    typename RigidRegistrationType::Pointer registration = RigidRegistrationType::New();
+
+    registration->SetFixedImage( 0, caster_f->GetOutput() );
+    registration->SetMovingImage( 0, caster_m->GetOutput() );
+    registration->SetMetric( base_metric );
+    registration->SetOptimizer( optimizer );
+    registration->SetMovingInitialTransform( transform.GetPointer() );
+    registration->SetNumberOfLevels(max_pyramid_lvl);
+    registration->SetShrinkFactorsPerLevel( shrink_factors );
+
+    // observe the pyramid level change in order to adapt parameters
+    typename PyramidOptControlCommandv4<RigidRegistrationType>::Pointer pyramid_observer =
+        PyramidOptControlCommandv4<RigidRegistrationType>::New();
+    unsigned int pyramid_tag =  registration->AddObserver( itk::InitializeEvent(), pyramid_observer );
+
+
+    try
+    {
+      registration->Update();
+    }
+    catch( const itk::ExceptionObject &e)
+    {
+      registration->Print( std::cout );
+
+      MITK_ERROR << "[Registration Update] Caught ITK exception: ";
+      MITK_ERROR("itk.exception") << e.what();
+
+      mitkThrow() << "Registration failed with exception: " << e.what();
+    }
+
+    // [Post Registration]
+    //   Retrieve the last transformation parameters from the performed registration task
+    typename BaseTransformType::ParametersType finalParameters = registration->GetOptimizer()->GetCurrentPosition();
+    for( unsigned int i=0; i<paramDim; i++)
+    {
+      m_EstimatedParameters[i] = finalParameters[i];
+    }
+
+    if( m_Verbose )
+    {
+      MITK_INFO("Params") << optimizer->GetValue() << " :: " << finalParameters;
+    }
+
+    if( pyramid_tag )
+    {
+      registration->RemoveObserver( pyramid_tag );
+    }
+
+  }
 
   if( m_Verbose )
   {
@@ -446,10 +519,8 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
     optimizer->RemoveObserver( vopt_tag );
   }
 
-  if( pyramid_tag )
-  {
-    registration->RemoveObserver( pyramid_tag );
-  }
+
+
 
 
 }

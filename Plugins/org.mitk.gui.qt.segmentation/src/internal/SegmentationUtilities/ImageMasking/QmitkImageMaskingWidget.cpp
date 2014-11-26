@@ -103,7 +103,7 @@ void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::D
       mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(0)->GetData() );
       mitk::Image::Pointer maskImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(1)->GetData() );
 
-      if( referenceImage->GetLargestPossibleRegion().GetSize() != maskImage->GetLargestPossibleRegion().GetSize() )
+      if( maskImage.IsNull() || referenceImage->GetLargestPossibleRegion().GetSize() != maskImage->GetLargestPossibleRegion().GetSize() )
       {
         dataSelectionWidget->SetHelpText("Different image sizes cannot be masked");
         this->EnableButtons(false);

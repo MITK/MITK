@@ -67,15 +67,15 @@ mitk::SegTool2D::~SegTool2D()
 {
 }
 
-float mitk::SegTool2D::CanHandleEvent( InteractionEvent const *stateEvent) const
+bool mitk::SegTool2D::FilterEvents(InteractionEvent* interactionEvent, DataNode*dataNode)
 {
-  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>( stateEvent );
-  if (!positionEvent) return 0.0;
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>( interactionEvent );
 
-  if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D )
-    return 0.0; // we don't want anything but 2D
-
-  return 1.0;
+  bool isValidEvent = (
+                       positionEvent && // Only events of type mitk::InteractionPositionEvent
+                       interactionEvent->GetSender()->GetMapperID() == BaseRenderer::Standard2D // Only events from the 2D renderwindows
+                      );
+  return isValidEvent;
 }
 
 

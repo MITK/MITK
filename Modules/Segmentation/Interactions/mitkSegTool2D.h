@@ -114,10 +114,12 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
     };
 
     /**
-    * \brief Calculates how good the data, this statemachine handles, is hit by the event.
+    * \brief Filters events that cannot be handle by 2D segmentation tools
     *
+    * Current an event is discarded if it was not sent by a 2D renderwindow and if it is
+    * not of type InteractionPositionEvent
     */
-    virtual float CanHandleEvent( InteractionEvent const *stateEvent) const;
+    virtual bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode);
 
     /**
       \brief Extract the slice of an image that the user just scribbles on.

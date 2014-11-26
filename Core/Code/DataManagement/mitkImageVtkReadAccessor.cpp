@@ -28,7 +28,7 @@ const mitk::Image* mitk::ImageVtkReadAccessor::GetImage() const
 mitk::ImageVtkReadAccessor::ImageVtkReadAccessor(
     ImageConstPointer iP, const mitk::ImageDataItem* iDI,
     const vtkImageData* imageDataVtk)
-  : ImageAccessorBase(NULL, iDI)
+  : ImageAccessorBase(iP, iDI)
   , m_Image(iP.GetPointer())
   , m_ImageDataVtk(imageDataVtk)
 {

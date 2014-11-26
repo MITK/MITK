@@ -41,6 +41,22 @@
      <file>icons/tango/scalable/actions/view-list-details.svg</file>
      <file>icons/tango/scalable/actions/view-list-icons.svg</file>
      <file>icons/tango/scalable/actions/view-refresh.svg</file>
+     <file>icons/tango/scalable/actions/list-add.svg</file>
+     <file>icons/tango/scalable/actions/list-remove.svg</file>
+     <file>icons/tango/scalable/actions/media-playback-pause.svg</file>
+     <file>icons/tango/scalable/actions/media-playback-start.svg</file>
+     <file>icons/tango/scalable/actions/media-playback-stop.svg</file>
+     <file>icons/tango/scalable/actions/media-record.svg</file>
+     <file>icons/tango/scalable/actions/media-seek-backward.svg</file>
+     <file>icons/tango/scalable/actions/media-seek-forward.svg</file>
+     <file>icons/tango/scalable/actions/media-skip-backward.svg</file>
+     <file>icons/tango/scalable/actions/media-skip-forward.svg</file>
+     <file>icons/tango/scalable/actions/system-log-out.svg</file>
+     <file>icons/tango/scalable/categories/applications-multimedia.svg</file>
+     <file>icons/tango/scalable/devices/camera-photo.svg</file>
+     <file>icons/tango/scalable/devices/camera-video.svg</file>
+     <file>icons/tango/scalable/mimetypes/image-x-generic.svg</file>
+     <file>icons/tango/scalable/mimetypes/video-x-generic.svg</file>
      <file>icons/tango/scalable/places/folder.svg</file>
      <file>icons/tango/scalable/places/folder-remote.svg</file>
      <file>icons/tango/scalable/status/dialog-error.svg</file>

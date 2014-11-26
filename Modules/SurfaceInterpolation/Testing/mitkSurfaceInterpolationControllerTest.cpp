@@ -26,6 +26,7 @@ class mitkSurfaceInterpolationControllerTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkSurfaceInterpolationControllerTestSuite);
   MITK_TEST(TestSingleton);
   MITK_TEST(TestSetCurrentInterpolationSession);
+  MITK_TEST(TestReplaceInterpolationSession);
   MITK_TEST(TestRemoveAllInterpolationSessions);
   MITK_TEST(TestRemoveInterpolationSession);
   MITK_TEST(TestOnSegmentationDeleted);
@@ -106,6 +107,72 @@ public:
     m_Controller->SetCurrentInterpolationSession(0);
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().IsNull());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2", m_Controller->GetNumberOfInterpolationSessions() == 2);
+  }
+
+  void TestReplaceInterpolationSession()
+  {
+    // Create segmentation image
+    unsigned int dimensions1[] = {10, 10, 10};
+    mitk::Image::Pointer segmentation_1 = createImage(dimensions1);
+    m_Controller->SetCurrentInterpolationSession(segmentation_1);
+
+    // Create some contours
+    double center_1[3] = {1.25f ,3.43f ,4.44f};
+    double normal_1[3] = {0.25f ,1.76f, 0.93f};
+    vtkSmartPointer<vtkRegularPolygonSource> p_source = vtkSmartPointer<vtkRegularPolygonSource>::New();
+    p_source->SetNumberOfSides(20);
+    p_source->SetCenter(center_1);
+    p_source->SetRadius(4);
+    p_source->SetNormal(normal_1);
+    p_source->Update();
+    vtkPolyData* poly_1 = p_source->GetOutput();
+    mitk::Surface::Pointer surf_1 = mitk::Surface::New();
+    surf_1->SetVtkPolyData(poly_1);
+
+    double center_2[3] = {4.0f ,4.0f ,4.0f};
+    double normal_2[3] = {1.0f ,0.0f, 0.0f};
+    vtkSmartPointer<vtkRegularPolygonSource> p_source_2 = vtkSmartPointer<vtkRegularPolygonSource>::New();
+    p_source_2->SetNumberOfSides(80);
+    p_source_2->SetCenter(center_2);
+    p_source_2->SetRadius(4);
+    p_source_2->SetNormal(normal_2);
+    p_source_2->Update();
+    vtkPolyData* poly_2 = p_source_2->GetOutput();
+    mitk::Surface::Pointer surf_2 = mitk::Surface::New();
+    surf_2->SetVtkPolyData(poly_2);
+
+    // Add contours
+    m_Controller->AddNewContour(surf_1);
+    m_Controller->AddNewContour(surf_2);
+
+    // Check if all contours are there
+    mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo1;
+    contourInfo1.contourNormal = normal_1;
+    contourInfo1.contourPoint = center_1;
+
+    mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo2;
+    contourInfo2.contourNormal = normal_2;
+    contourInfo2.contourPoint = center_2;
+
+    mitk::Image::Pointer segmentation_2 = createImage(dimensions1);
+    bool success = m_Controller->ReplaceInterpolationSession(segmentation_1, segmentation_2);
+    const mitk::Surface* contour_1 = m_Controller->GetContour(contourInfo1);
+    const mitk::Surface* contour_2 = m_Controller->GetContour(contourInfo2);
+
+    CPPUNIT_ASSERT_MESSAGE("Replace session failed!", success == true);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 2);
+    CPPUNIT_ASSERT_MESSAGE("Contours not equal!", mitk::Equal(*(surf_1->GetVtkPolyData()), *(contour_1->GetVtkPolyData()), 0.000001, true));
+    CPPUNIT_ASSERT_MESSAGE("Contours not equal!", mitk::Equal(*(surf_2->GetVtkPolyData()), *(contour_2->GetVtkPolyData()), 0.000001, true));
+    CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 1", m_Controller->GetNumberOfInterpolationSessions() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_2.GetPointer());
+
+    unsigned int dimensions2[] = {10, 20, 10};
+    mitk::Image::Pointer segmentation_3 = createImage(dimensions2);
+    success = m_Controller->ReplaceInterpolationSession(segmentation_2, segmentation_3);
+    CPPUNIT_ASSERT_MESSAGE("Replace session failed!", success == false);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 2);
+    CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 1", m_Controller->GetNumberOfInterpolationSessions() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_2.GetPointer());
   }
 
   void TestRemoveAllInterpolationSessions()

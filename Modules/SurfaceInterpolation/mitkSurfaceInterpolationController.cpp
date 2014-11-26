@@ -351,6 +351,36 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
   this->ReinitializeInterpolation();
 }
 
+bool mitk::SurfaceInterpolationController::ReplaceInterpolationSession(mitk::Image::Pointer oldSession, mitk::Image::Pointer newSession)
+{
+  if (oldSession.IsNull() || newSession.IsNull())
+    return false;
+
+  if (oldSession.GetPointer() == newSession.GetPointer())
+    return false;
+
+  if (!mitk::Equal(*(oldSession->GetGeometry()), *(newSession->GetGeometry()), mitk::eps, false))
+    return false;
+
+  ContourListMap::iterator it = m_ListOfInterpolationSessions.find(oldSession.GetPointer());
+
+  if (it == m_ListOfInterpolationSessions.end())
+    return false;
+
+  ContourPositionInformationList oldList = (*it).second;
+  m_ListOfInterpolationSessions.insert(std::pair<mitk::Image*, ContourPositionInformationList>(newSession.GetPointer(), oldList));
+  itk::MemberCommand<SurfaceInterpolationController>::Pointer command = itk::MemberCommand<SurfaceInterpolationController>::New();
+  command->SetCallbackFunction(this, &SurfaceInterpolationController::OnSegmentationDeleted);
+  m_SegmentationObserverTags.insert( std::pair<mitk::Image*, unsigned long>( newSession, newSession->AddObserver( itk::DeleteEvent(), command ) ) );
+
+  if (m_SelectedSegmentation == oldSession)
+    m_SelectedSegmentation = newSession;
+  m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);
+
+  this->RemoveInterpolationSession(oldSession);
+  return true;
+}
+
 void mitk::SurfaceInterpolationController::RemoveSegmentationFromContourList(mitk::Image *segmentation)
 {
   this->RemoveInterpolationSession(segmentation);

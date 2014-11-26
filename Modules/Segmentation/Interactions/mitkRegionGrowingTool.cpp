@@ -118,9 +118,6 @@ void mitk::RegionGrowingTool::Deactivated()
  */
 bool mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-      return false;
-
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -131,86 +128,84 @@ bool mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
   //ToolLogger::SetVerboseness(3);
 
   MITK_DEBUG << "OnMousePressed" << std::endl;
-  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) > 0.0 )
+
+  MITK_DEBUG << "OnMousePressed: FeedbackContourTool says ok" << std::endl;
+
+  // 1. Find out which slice the user clicked, find out which slice of the toolmanager's reference and working image corresponds to that
+  if (positionEvent)
   {
-    MITK_DEBUG << "OnMousePressed: FeedbackContourTool says ok" << std::endl;
+    MITK_DEBUG << "OnMousePressed: got positionEvent" << std::endl;
 
-    // 1. Find out which slice the user clicked, find out which slice of the toolmanager's reference and working image corresponds to that
-    if (positionEvent)
+    m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
+    m_WorkingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
+
+    if ( m_WorkingSlice.IsNotNull() ) // can't do anything without the segmentation
     {
-      MITK_DEBUG << "OnMousePressed: got positionEvent" << std::endl;
+      MITK_DEBUG << "OnMousePressed: got working slice" << std::endl;
 
-      m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
-      m_WorkingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
+      // 2. Determine if the user clicked inside or outside of the segmentation
+      const BaseGeometry* workingSliceGeometry = m_WorkingSlice->GetGeometry();
+      Point3D mprojectedPointIn2D;
+      workingSliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), mprojectedPointIn2D);
+      itk::Index<2> projectedPointInWorkingSlice2D;
+      projectedPointInWorkingSlice2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
+      projectedPointInWorkingSlice2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
 
-      if ( m_WorkingSlice.IsNotNull() ) // can't do anything without the segmentation
+      if ( workingSliceGeometry->IsIndexInside( projectedPointInWorkingSlice2D ) )
       {
-        MITK_DEBUG << "OnMousePressed: got working slice" << std::endl;
+        MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates " << projectedPointInWorkingSlice2D << ") IS in working slice" << std::endl;
 
-        // 2. Determine if the user clicked inside or outside of the segmentation
-          const BaseGeometry* workingSliceGeometry = m_WorkingSlice->GetGeometry();
-          Point3D mprojectedPointIn2D;
-          workingSliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), mprojectedPointIn2D);
-          itk::Index<2> projectedPointInWorkingSlice2D;
-          projectedPointInWorkingSlice2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
-          projectedPointInWorkingSlice2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
+        // Convert to ipMITKSegmentationTYPE (because getting pixels relys on that data type)
+        itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
+        CastToItkImage( m_WorkingSlice, correctPixelTypeImage );
+        assert (correctPixelTypeImage.IsNotNull() );
 
-          if ( workingSliceGeometry->IsIndexInside( projectedPointInWorkingSlice2D ) )
-          {
-            MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates " << projectedPointInWorkingSlice2D << ") IS in working slice" << std::endl;
+        // possible bug in CastToItkImage ?
+        // direction maxtrix is wrong/broken/not working after CastToItkImage, leading to a failed assertion in
+        // mitk/Core/DataStructures/mitkSlicedGeometry3D.cpp, 479:
+        // virtual void mitk::SlicedGeometry3D::SetSpacing(const mitk::Vector3D&): Assertion `aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0' failed
+        // solution here: we overwrite it with an unity matrix
+        itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
+        imageDirection.SetIdentity();
+        correctPixelTypeImage->SetDirection(imageDirection);
 
-            // Convert to ipMITKSegmentationTYPE (because getting pixels relys on that data type)
-            itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
-            CastToItkImage( m_WorkingSlice, correctPixelTypeImage );
-            assert (correctPixelTypeImage.IsNotNull() );
-
-          // possible bug in CastToItkImage ?
-          // direction maxtrix is wrong/broken/not working after CastToItkImage, leading to a failed assertion in
-          // mitk/Core/DataStructures/mitkSlicedGeometry3D.cpp, 479:
-          // virtual void mitk::SlicedGeometry3D::SetSpacing(const mitk::Vector3D&): Assertion `aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0' failed
-          // solution here: we overwrite it with an unity matrix
-          itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
-          imageDirection.SetIdentity();
-          correctPixelTypeImage->SetDirection(imageDirection);
-
-          Image::Pointer temporarySlice = Image::New();
+        Image::Pointer temporarySlice = Image::New();
         //  temporarySlice = ImportItkImage( correctPixelTypeImage );
-          CastToMitkImage( correctPixelTypeImage, temporarySlice );
+        CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
-          mitkIpPicDescriptor* workingPicSlice = mitkIpPicNew();
-          CastToIpPicDescriptor(temporarySlice, workingPicSlice);
+        mitkIpPicDescriptor* workingPicSlice = mitkIpPicNew();
+        CastToIpPicDescriptor(temporarySlice, workingPicSlice);
 
-          int initialWorkingOffset = projectedPointInWorkingSlice2D[1] * workingPicSlice->n[0] + projectedPointInWorkingSlice2D[0];
+        int initialWorkingOffset = projectedPointInWorkingSlice2D[1] * workingPicSlice->n[0] + projectedPointInWorkingSlice2D[0];
 
-          if ( initialWorkingOffset < static_cast<int>( workingPicSlice->n[0] * workingPicSlice->n[1] ) &&
-               initialWorkingOffset >= 0 )
+        if ( initialWorkingOffset < static_cast<int>( workingPicSlice->n[0] * workingPicSlice->n[1] ) &&
+             initialWorkingOffset >= 0 )
+        {
+          // 3. determine the pixel value under the last click
+          bool inside = static_cast<ipMITKSegmentationTYPE*>(workingPicSlice->data)[initialWorkingOffset] != 0;
+          m_PaintingPixelValue = inside ? 0 : 1; // if inside, we want to remove a part, otherwise we want to add something
+
+          if ( m_LastWorkingSeed >= static_cast<int>( workingPicSlice->n[0] * workingPicSlice->n[1] ) ||
+               m_LastWorkingSeed < 0 )
           {
-            // 3. determine the pixel value under the last click
-            bool inside = static_cast<ipMITKSegmentationTYPE*>(workingPicSlice->data)[initialWorkingOffset] != 0;
-            m_PaintingPixelValue = inside ? 0 : 1; // if inside, we want to remove a part, otherwise we want to add something
+            inside = false;
+          }
 
-            if ( m_LastWorkingSeed >= static_cast<int>( workingPicSlice->n[0] * workingPicSlice->n[1] ) ||
-                 m_LastWorkingSeed < 0 )
+          if ( m_ReferenceSlice.IsNotNull() )
+          {
+            MITK_DEBUG << "OnMousePressed: got reference slice" << std::endl;
+
+            m_OriginalPicSlice = mitkIpPicNew();
+            CastToIpPicDescriptor(m_ReferenceSlice, m_OriginalPicSlice);
+
+            // 3.1. Switch depending on the pixel value
+            if (inside)
             {
-              inside = false;
+              OnMousePressedInside( NULL, interactionEvent, workingPicSlice, initialWorkingOffset);
             }
-
-            if ( m_ReferenceSlice.IsNotNull() )
+            else
             {
-              MITK_DEBUG << "OnMousePressed: got reference slice" << std::endl;
-
-              m_OriginalPicSlice = mitkIpPicNew();
-              CastToIpPicDescriptor(m_ReferenceSlice, m_OriginalPicSlice);
-
-              // 3.1. Switch depending on the pixel value
-              if (inside)
-              {
-                OnMousePressedInside( NULL, interactionEvent, workingPicSlice, initialWorkingOffset);
-              }
-              else
-              {
-                OnMousePressedOutside( NULL, interactionEvent);
-              }
+              OnMousePressedOutside( NULL, interactionEvent);
             }
           }
         }
@@ -229,9 +224,6 @@ bool mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
 */
 bool mitk::RegionGrowingTool::OnMousePressedInside( StateMachineAction*, InteractionEvent* interactionEvent, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset)
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-      return false;
-
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
   // 3.1.1. Create a skeletonization of the segmentation and try to find a nice cut
@@ -296,9 +288,6 @@ bool mitk::RegionGrowingTool::OnMousePressedInside( StateMachineAction*, Interac
 */
 bool mitk::RegionGrowingTool::OnMousePressedOutside( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-      return false;
-
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
   // 3.2 If we have a reference image, then perform an initial region growing, considering the reference image's level window
@@ -365,9 +354,6 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside( StateMachineAction*, Intera
 */
 bool mitk::RegionGrowingTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-    return false;
-
   if ( m_ReferenceSlice.IsNotNull() && m_OriginalPicSlice )
   {
     mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
@@ -397,9 +383,6 @@ bool mitk::RegionGrowingTool::OnMouseMoved( StateMachineAction*, InteractionEven
 */
 bool mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-    return false;
-
   // 1. If we have a working slice, use the contour to fill a new piece on segmentation on it (or erase a piece that was selected by ipMITKSegmentationGetCutPoints)
   if ( m_WorkingSlice.IsNotNull() && m_OriginalPicSlice )
   {

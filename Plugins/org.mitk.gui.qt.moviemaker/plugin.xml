@@ -5,8 +5,8 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.moviemaker"
           name="Movie Maker"
-          class="QmitkMovieMaker"
-          icon="resources/icon.xpm" >
+          class="QmitkMovieMakerView"
+          icon="resources/camera-video.png" >
           <description>Take movies of your data</description>
           <keywordReference id="org.mitk.views.moviemaker.Keyword"/>
         </view>

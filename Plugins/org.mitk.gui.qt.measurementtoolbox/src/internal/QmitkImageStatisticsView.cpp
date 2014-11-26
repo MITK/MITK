@@ -873,6 +873,8 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     t);
   this->OnTimeChanged(timeEvent);
 
+  t = std::min(image->GetTimeSteps() - 1, t);
+
   QString hotspotMean; hotspotMean.append(QString("%1").arg(s[t].GetHotspotStatistics().GetMean(), 0, 'f', decimals));
     hotspotMean += " (";
     for (int i=0; i<s[t].GetHotspotIndex().size(); i++)

@@ -10,6 +10,27 @@ MinSize=1
 MaxSize=256
 Context=Actions
 
+[scalable/categories]
+Size=48
+Type=Scalable
+MinSize=1
+MaxSize=256
+Context=Categories
+
+[scalable/devices]
+Size=48
+Type=Scalable
+MinSize=1
+MaxSize=256
+Context=Devices
+
+[scalable/mimetypes]
+Size=48
+Type=Scalable
+MinSize=1
+MaxSize=256
+Context=MimeTypes
+
 [scalable/status]
 Size=48
 Type=Scalable

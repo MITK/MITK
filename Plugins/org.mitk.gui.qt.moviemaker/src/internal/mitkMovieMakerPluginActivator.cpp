@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkMovieMakerPluginActivator.h"
 
-#include "QmitkMovieMaker.h"
+#include "QmitkMovieMakerView.h"
 #include "QmitkScreenshotMaker.h"
 
 #include <QtPlugin>
@@ -24,7 +24,7 @@ namespace mitk {
 
   void MovieMakerPluginActivator::start(ctkPluginContext* context)
   {
-    BERRY_REGISTER_EXTENSION_CLASS(QmitkMovieMaker, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkMovieMakerView, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkScreenshotMaker, context)
   }
 

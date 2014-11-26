@@ -80,6 +80,7 @@ void mitk::OclImage::InitializeByMitkImage(mitk::Image::Pointer _image)
   // compute the size of the GMEM buffer
   this->m_dim = this->m_Image->GetDimension();
   this->m_Dims = this->m_Image->GetDimensions();
+  MITK_WARN << "m_Image->GetDimension() " << m_Image->GetDimension();
   MITK_INFO << "Image: " << this->m_Dims[0] <<"x"<< this->m_Dims[1] <<"x"<< this->m_Dims[2];
 
   // get the dimensions

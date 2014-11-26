@@ -59,9 +59,6 @@ void mitk::SetRegionTool::Deactivated()
 
 bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-      return false;
-
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -69,9 +66,6 @@ bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
   int timeStep = positionEvent->GetSender()->GetTimeStep();
-
-  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
-
 
   // 1. Get the working image
   Image::Pointer workingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
@@ -255,14 +249,10 @@ bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
 
 bool mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-      return false;
-
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
 
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -271,8 +261,6 @@ bool mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent
   int timeStep = positionEvent->GetSender()->GetTimeStep();
 
   if (!m_FillContour && !m_StatusFillWholeSlice) return true;
-
-  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;
@@ -310,10 +298,7 @@ bool mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent
 */
 bool mitk::SetRegionTool::OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
-
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   if (m_StatusFillWholeSlice)

@@ -38,20 +38,17 @@ using namespace mitk;
   This test runs successfull if the 2 filters are initialized, run
   and deleted without any crash.
   */
-int mitkOclReferenceCountTest( int argc, char* argv[] )
+int mitkOclReferenceCountTest( int /*argc*/, char* /*argv*/[] )
 {
   MITK_TEST_BEGIN("mitkOclReferenceCountTest");
 
   // instancate uService
   us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
   OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
-  cl_context gpuContext = resources->GetContext();
-  cl_device_id gpuDevice = resources->GetCurrentDevice();
 
-  //Create a random reference image
-  mitk::Image::Pointer inputImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 0, 1, // dimension
-                                                                                    1.0f, 1.0f, 1.0f, // spacing
-                                                                                    255, 0); // max, min
+  mitk::Image::Pointer inputImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 0, 0, // dimension
+                                                                                      1.0f, 1.0f, 1.0f, // spacing
+                                                                                      255, 0); // max, min
   int upperThr = 255;
   int lowerThr = 60;
   int outsideVal = 0;

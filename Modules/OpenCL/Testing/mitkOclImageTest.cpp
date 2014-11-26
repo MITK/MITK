@@ -41,10 +41,23 @@ int mitkOclImageTest( int /*argc*/, char* /*argv*/[] )
   cl_device_id gpuDevice = resources->GetCurrentDevice();
   MITK_TEST_CONDITION_REQUIRED( gpuDevice != NULL, "Got not-null OpenCL device.");
 
-  //Create a random reference image
-  mitk::Image::Pointer reference = mitk::ImageGenerator::GenerateRandomImage<float>(119, 204, 52, 1, // dimension
-                                                                                    1.0f, 1.0f, 1.0f, // spacing
-                                                                                    1024, 0); // max, min
+  //create a random image
+  mitk::Image::Pointer reference;
+  //check if 3D images are supported by the device and initialize image accordingly
+  if( resources->GetMaximumImageSize(2, CL_MEM_OBJECT_IMAGE3D) != 0 ) //3D Ok
+  {
+    //Create a random reference image
+    reference = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 52, 1, // dimension
+                                                                                      1.0f, 1.0f, 1.0f, // spacing
+                                                                                      255, 0); // max, min
+  }
+  else
+  {
+    //Create a random reference image
+    reference = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 0, 0, // dimension
+                                                                                      1.0f, 1.0f, 1.0f, // spacing
+                                                                                      255, 0); // max, min
+  }
   MITK_TEST_CONDITION_REQUIRED( reference.IsNotNull(), "Reference mitk::Image object instantiated.");
 
   mitk::OclImage::Pointer first = mitk::OclImage::New();

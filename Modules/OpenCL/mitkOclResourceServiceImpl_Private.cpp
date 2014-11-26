@@ -229,26 +229,26 @@ unsigned int OclResourceServiceImpl::GetMaximumImageSize(unsigned int dimension,
   if( ! m_ContextCollection->CanProvideContext() )
     return 0;
 
-  unsigned int retValue = 0;
+  size_t retValue = 0;
 
   switch(dimension)
   {
   case 0:
     if ( _imagetype == CL_MEM_OBJECT_IMAGE2D)
-      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof( cl_uint ), &retValue, NULL );
+      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof( size_t ), &retValue, NULL );
     else
-      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_WIDTH, sizeof( cl_uint ), &retValue, NULL );
+      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_WIDTH, sizeof( size_t ), &retValue, NULL );
 
     break;
   case 1:
     if ( _imagetype == CL_MEM_OBJECT_IMAGE2D)
-      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof( cl_uint ), &retValue, NULL );
+      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof( size_t ), &retValue, NULL );
     else
-      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_HEIGHT, sizeof( cl_uint ), &retValue, NULL );
+      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_HEIGHT, sizeof( size_t ), &retValue, NULL );
     break;
   case 2:
     if ( _imagetype == CL_MEM_OBJECT_IMAGE3D)
-      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_DEPTH, sizeof( cl_uint ), &retValue, NULL);
+      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_DEPTH, sizeof( size_t ), &retValue, NULL);
     break;
   default:
     MITK_WARN << "Could not recieve info. Desired dimension or object type does not exist. ";

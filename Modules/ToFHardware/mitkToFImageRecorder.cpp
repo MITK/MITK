@@ -148,55 +148,55 @@ namespace mitk
     this->m_AbortMutex->Lock();
     this->m_Abort = false;
     this->m_AbortMutex->Unlock();
-    this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->RecordData, this);
+//    this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->RecordData, this);
 
-//    ToFCameraDevice::Pointer toFCameraDevice = this->GetCameraDevice();
+    ToFCameraDevice::Pointer toFCameraDevice = this->GetCameraDevice();
 
-//    mitk::RealTimeClock::Pointer realTimeClock;
-//    realTimeClock = mitk::RealTimeClock::New();
-//    double t1 = 0;
-//    t1 = realTimeClock->GetCurrentStamp();
-//    int requiredImageSequence = 0;
-//    int numOfFramesRecorded = 0;
+    mitk::RealTimeClock::Pointer realTimeClock;
+    realTimeClock = mitk::RealTimeClock::New();
+    double t1 = 0;
+    t1 = realTimeClock->GetCurrentStamp();
+    int requiredImageSequence = 0;
+    int numOfFramesRecorded = 0;
 
-//    bool abort = false;
-//    this->m_AbortMutex->Lock();
-//    abort = this->m_Abort;
-//    this->m_AbortMutex->Unlock();
+    bool abort = false;
+    this->m_AbortMutex->Lock();
+    abort = this->m_Abort;
+    this->m_AbortMutex->Unlock();
 
-//    while ( !abort )
-//    {
-//      if ( ((this->m_RecordMode == ToFImageRecorder::PerFrames) && (numOfFramesRecorded < this->m_NumOfFrames)) ||
-//            (this->m_RecordMode == ToFImageRecorder::Infinite) )
-//      {
+    while ( !abort )
+    {
+      if ( ((this->m_RecordMode == ToFImageRecorder::PerFrames) && (numOfFramesRecorded < this->m_NumOfFrames)) ||
+            (this->m_RecordMode == ToFImageRecorder::Infinite) )
+      {
 
-//        toFCameraDevice->GetAllImages(this->m_DistanceArray, this->m_AmplitudeArray,
-//          this->m_IntensityArray, this->m_SourceDataArray, requiredImageSequence, this->m_ImageSequence, this->m_RGBArray );
+        toFCameraDevice->GetAllImages(this->m_DistanceArray, this->m_AmplitudeArray,
+          this->m_IntensityArray, this->m_SourceDataArray, requiredImageSequence, this->m_ImageSequence, this->m_RGBArray );
 
-//        if (this->m_ImageSequence >= requiredImageSequence)
-//        {
-//          if (this->m_ImageSequence > requiredImageSequence)
-//          {
-//            MITK_INFO << "Problem! required: " << requiredImageSequence << " captured: " << this->m_ImageSequence;
-//          }
-//          requiredImageSequence = this->m_ImageSequence + 1;
-//          this->m_ToFImageWriter->Add( this->m_DistanceArray,
-//            this->m_AmplitudeArray, this->m_IntensityArray, this->m_RGBArray );
-//          numOfFramesRecorded++;
-//        }
-//        this->m_AbortMutex->Lock();
-//        abort = this->m_Abort;
-//        this->m_AbortMutex->Unlock();
-//      }
-//      else
-//      {
-//        abort = true;
-//      }
-//    }  // end of while loop
+        if (this->m_ImageSequence >= requiredImageSequence)
+        {
+          if (this->m_ImageSequence > requiredImageSequence)
+          {
+            MITK_INFO << "Problem! required: " << requiredImageSequence << " captured: " << this->m_ImageSequence;
+          }
+          requiredImageSequence = this->m_ImageSequence + 1;
+          this->m_ToFImageWriter->Add( this->m_DistanceArray,
+            this->m_AmplitudeArray, this->m_IntensityArray, this->m_RGBArray );
+          numOfFramesRecorded++;
+        }
+        this->m_AbortMutex->Lock();
+        abort = this->m_Abort;
+        this->m_AbortMutex->Unlock();
+      }
+      else
+      {
+        abort = true;
+      }
+    }  // end of while loop
 
-//    this->InvokeEvent(itk::AbortEvent());
+    this->InvokeEvent(itk::AbortEvent());
 
-//    this->m_ToFImageWriter->Close();
+    this->m_ToFImageWriter->Close();
   }
 
   void ToFImageRecorder::WaitForThreadBeingTerminated()

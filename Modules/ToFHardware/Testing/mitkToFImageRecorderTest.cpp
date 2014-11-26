@@ -27,7 +27,6 @@ class mitkToFImageRecorderTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkToFImageRecorderTestSuite);
-  //Removed due to random fails on linux continuous bug #12977
   MITK_TEST(StartRecording_ValidDepthImage_WritesImageToFile);
   MITK_TEST(StartRecording_ValidAmplitudeImage_WritesImageToFile);
   MITK_TEST(StartRecording_ValidIntensityImage_WritesImageToFile);
@@ -62,10 +61,12 @@ public:
     m_AmplitudeImageName = mitk::IOUtil::CreateTemporaryFile();//"test_AmplitudeImage.nrrd";
     m_IntensityImageName = mitk::IOUtil::CreateTemporaryFile();//"test_IntensityImage.nrrd";
 
+    //The recorder would automatically append the default extension ".nrrd"
+    //but we have to append it here, because the data is later loaded with
+    //IOUtil which does not know what kind of data to load/look for.
     m_DistanceImageName.append(".nrrd");
     m_AmplitudeImageName.append(".nrrd");
     m_IntensityImageName.append(".nrrd");
-
 
     m_PlayerDevice = mitk::ToFCameraMITKPlayerDevice::New();
     m_ToFImageRecorder->SetCameraDevice(m_PlayerDevice);
@@ -90,7 +91,6 @@ public:
 
     m_PlayerDevice->ConnectCamera();
     m_PlayerDevice->StartCamera();
-
   }
 
   void tearDown()
@@ -103,12 +103,13 @@ public:
   {
     m_ToFImageRecorder->SetDistanceImageFileName(m_DistanceImageName);
     m_ToFImageRecorder->StartRecording();
-    m_ToFImageRecorder->WaitForThreadBeingTerminated(); // wait to allow recording
+    m_ToFImageRecorder->WaitForThreadBeingTerminated();
     m_ToFImageRecorder->StopRecording();
 
     mitk::Image::Pointer recordedImage = mitk::IOUtil::LoadImage(m_DistanceImageName);
     MITK_ASSERT_EQUAL( m_GroundTruthDepthImage, recordedImage, "Recorded image should be equal to the test data.");
 
+    //delete the tmp image
     if( remove( m_DistanceImageName.c_str() ) != 0 )
     {
       MITK_ERROR<<"File: "<< m_DistanceImageName << " not successfully deleted!";
@@ -121,12 +122,13 @@ public:
     m_ToFImageRecorder->SetAmplitudeImageSelected(true);
     m_ToFImageRecorder->SetDistanceImageSelected(false);
     m_ToFImageRecorder->StartRecording();
-    m_ToFImageRecorder->WaitForThreadBeingTerminated(); // wait to allow recording
+    m_ToFImageRecorder->WaitForThreadBeingTerminated();
     m_ToFImageRecorder->StopRecording();
 
     mitk::Image::Pointer recordedImage = mitk::IOUtil::LoadImage(m_AmplitudeImageName);
     MITK_ASSERT_EQUAL( m_GroundTruthAmplitudeImage, recordedImage, "Recorded image should be equal to the test data.");
 
+    //delete the tmp image
     if( remove( m_AmplitudeImageName.c_str() ) != 0 )
     {
       MITK_ERROR<<"File: "<< m_AmplitudeImageName << " not successfully deleted!";
@@ -139,12 +141,13 @@ public:
     m_ToFImageRecorder->SetIntensityImageSelected(true);
     m_ToFImageRecorder->SetDistanceImageSelected(false);
     m_ToFImageRecorder->StartRecording();
-    m_ToFImageRecorder->WaitForThreadBeingTerminated(); // wait to allow recording
+    m_ToFImageRecorder->WaitForThreadBeingTerminated();
     m_ToFImageRecorder->StopRecording();
 
     mitk::Image::Pointer recordedImage = mitk::IOUtil::LoadImage(m_IntensityImageName);
     MITK_ASSERT_EQUAL( m_GroundTruthIntensityImage, recordedImage, "Recorded image should be equal to the test data.");
 
+    //delete the tmp image
     if( remove( m_IntensityImageName.c_str() ) != 0 )
     {
       MITK_ERROR<<"File: "<< m_IntensityImageName << " not successfully deleted!";

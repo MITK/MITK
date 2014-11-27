@@ -16,15 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkTimeSliceAnimationItem.h"
 #include "QmitkTimeSliceAnimationWidget.h"
-#include <mitkBaseRenderer.h>
+#include <mitkRenderingManager.h>
+#include <mitkSliceNavigationController.h>
+#include <mitkStepper.h>
 #include <ui_QmitkTimeSliceAnimationWidget.h>
 
-static unsigned int GetNumberOfSlices()
+static int GetNumberOfSlices()
 {
   mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
 
   if (stepper != NULL)
-    return std::max(1U, stepper->GetSteps());
+    return std::max(1, static_cast<int>(stepper->GetSteps()));
 
   return 1;
 }
@@ -56,8 +58,15 @@ void QmitkTimeSliceAnimationWidget::SetAnimationItem(QmitkAnimationItem* sliceAn
   if (m_AnimationItem == NULL)
     return;
 
-  m_Ui->sliceRangeWidget->setMaximum(GetNumberOfSlices());
-  m_Ui->sliceRangeWidget->setValues(m_AnimationItem->GetFrom(), m_AnimationItem->GetTo());
+  const int maximum = GetNumberOfSlices() - 1;
+  const int from = std::min(m_AnimationItem->GetFrom(), maximum);
+  const int to = std::min(m_AnimationItem->GetTo(), maximum);
+
+  m_AnimationItem->SetFrom(from);
+  m_AnimationItem->SetTo(to);
+
+  m_Ui->sliceRangeWidget->setMaximum(maximum);
+  m_Ui->sliceRangeWidget->setValues(from, to);
   m_Ui->reverseCheckBox->setChecked(m_AnimationItem->GetReverse());
 }
 

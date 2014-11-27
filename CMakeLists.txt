@@ -217,6 +217,7 @@ env_option(MITK_USE_DCMTK "EXPERIMENTAL, superbuild only: Use DCMTK in MITK" ${M
 env_option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 env_option(MITK_USE_Poco "Use the Poco library" ON)
+env_option(MITK_USE_Redland "Use the Redland RDF library" OFF)
 env_option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
 env_option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 env_option(MITK_USE_SimpleITK "Use the SimpleITK library" OFF)

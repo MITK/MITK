@@ -10,6 +10,7 @@ CMakeLists.txt.user*
 *.orig
 
 !Utilities/qtsingleapplication/*.patch
+!CMakeExternals/*.patch
 
 ########## IDE specific
 

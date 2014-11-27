@@ -53,4 +53,13 @@ Check "Reverse" in order to slice from the higher slice number to the lower slic
 
 \imageMacro{QmitkMovieMaker_Slice.png,"The Slice animation.",12.00}
 
+\subsection org_mitk_gui_qt_moviemakerTimeUsage Time Animation
+
+The Time animation steps through the individual time steps of the current scene.
+You can specify the range of the animated time steps.
+Use the image navigator in the bottom left of the Workbench to get an idea of the desired values.
+Check "Reverse" in order to step from later time steps to previous time steps.
+
+\imageMacro{QmitkMovieMaker_Time.gif,"The Time animation.",12.00}
+
 */

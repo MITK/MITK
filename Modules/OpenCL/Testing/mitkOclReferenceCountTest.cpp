@@ -15,16 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkTestingMacros.h>
-
 #include <mitkImageGenerator.h>
-#include <mitkImageCast.h>
-
 #include <mitkOclBinaryThresholdImageFilter.h>
-
-// itk filter for reference computation
-#include <itkBinaryThresholdImageFilter.h>
-#include <itkSubtractImageFilter.h>
-#include <itkStatisticsImageFilter.h>
 
 using namespace mitk;
 
@@ -42,11 +34,7 @@ int mitkOclReferenceCountTest( int /*argc*/, char* /*argv*/[] )
 {
   MITK_TEST_BEGIN("mitkOclReferenceCountTest");
 
-  // instancate uService
-  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
-  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
-
-  mitk::Image::Pointer inputImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 0, 0, // dimension
+  mitk::Image::Pointer inputImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 52, 1, // dimension
                                                                                       1.0f, 1.0f, 1.0f, // spacing
                                                                                       255, 0); // max, min
   int upperThr = 255;

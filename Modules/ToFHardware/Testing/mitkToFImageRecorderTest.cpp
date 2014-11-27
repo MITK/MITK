@@ -27,9 +27,10 @@ class mitkToFImageRecorderTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkToFImageRecorderTestSuite);
-  MITK_TEST(StartRecording_ValidDepthImage_WritesImageToFile);
-  MITK_TEST(StartRecording_ValidAmplitudeImage_WritesImageToFile);
-  MITK_TEST(StartRecording_ValidIntensityImage_WritesImageToFile);
+  //See bug #12997
+//  MITK_TEST(StartRecording_ValidDepthImage_WritesImageToFile);
+//  MITK_TEST(StartRecording_ValidAmplitudeImage_WritesImageToFile);
+//  MITK_TEST(StartRecording_ValidIntensityImage_WritesImageToFile);
   CPPUNIT_TEST_SUITE_END();
 
 private:

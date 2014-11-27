@@ -70,6 +70,15 @@ If no segmentation image exists or none is selected create a new segmentation im
 Some items of the graphical user interface might be disabled when no image is selected or the selected image does not fit to the patient image's geoemtry.
 In any case, the application will give you hints if a selection is needed.
 
+\section org_mitk_gui_qt_segmentationUserManualToolOverview Tool overview
+
+MITK comes with a comprehensive set of segmentation tools. These tools can be differenciated between manual slice-based 2D segmentation tools and (semi-)automated 3D tools.
+The manual 2D tools require a big amount of user interaction and can only be applied to a single image slice whereas the 3D tools operate on the hole image. The 3D tools usually
+require a small amount of interaction like placin seedpoints of setting some parameters.
+You can switch between the different toolsets by switching the 2D/3D tab in the segmentation view.
+
+\imageMacro{QmitkSegmentation_ToolOverview.png,"An overview of the existing tools in MITK. There are interactive 2D tools as well as (semi-)automated 3D tools",5.50}
+
 \section org_mitk_gui_qt_segmentationUserManualManualKringeling Manual Contouring
 
 With manual contouring you define which voxels are part of the segmentation and which are not.
@@ -216,6 +225,61 @@ The current state of the 3D interpolation can be saved accross application resta
 Interpolated suggestions are displayed in a different way than manual segmentations are, until you "accept" them as part of the segmentation.
 To accept single slices, click the "Accept" button below the toolbox.
 If you have segmented a whole organ in every-x-slice, you may also review the interpolations and then accept all of them at once by clicking "... all slices".
+
+\section org_mitk_gui_qt_segmentationUserManual3DSegmentationTools 3D Segmenation tools
+
+The 3D tools operate on the hole image and require usually a small amount of interaction like placing seed-points or specifying certain parameters. All 3D tools provide
+an immediate segmentation feedback, which is displayed as a transparent green overlay. For accepting a preview you have to press the "Comfirm" button of the selected tool.
+The following 3D tools are at your disposal:
+
+\subsection org_mitk_gui_qt_segmentationUserManual3DThresholdTool 3D Threshold tool
+
+The Thresholding tool simply applies a 3D threshold to the patient image. All pixels with values equal or above the selected threshold are labeled.
+You can change the threshold by either moving the slider of setting a certain value in the spinbox.
+
+\imageMacro{QmitkSegmentation_3DThresholdTool.png,"3D Threshold tool",10.00}
+
+\subsection org_mitk_gui_qt_segmentationUserManual3DULTool 3D Upper/Lower Threshold tool
+
+The Upper/Lower Thresholding tool works similar to the simple 3D threshold tool but allows you to define an upper and lower threshold. All pixels with
+values within this threshold intervall will be labeled
+
+\imageMacro{QmitkSegmentation_3DULThresholdTool.png,"3D Upper/Lower Threshold tool",10.00}
+
+\subsection org_mitk_gui_qt_segmentationUserManual3DOtsuTool 3D Otsu tool
+
+The 3D Otsu tool provides a more sophisticated thresholding algorithm. It allows you to define a number of regions. Based on the image histogram the pixels will
+then divided into different regions. There more regions you define the longer will the calculation take.
+
+\imageMacro{QmitkSegmentation_3DOtsuTool.png,"3D Otsu tool",10.00}
+
+\subsection org_mitk_gui_qt_segmentationUserManual3DFMTool 3D Fast Marching tool
+
+The 3D Fast Marching tools works similar to the 2D pendant but on the hole image. Depending on you image's size the calculation will take some time.
+You can interactive set the parameters of the algorithm via the tool GUI.
+
+\imageMacro{QmitkSegmentation_3DFMTool.png,"3D Fast Marching tool",10.00}
+
+\subsection org_mitk_gui_qt_segmentationUserManual3DRGTool 3D Region Growing tool
+
+The 3D Region Growing tool works similar to the 2D pendant. At the beginning you have to place a seedpoint and define a threshold intervall. If you press
+"Run segmentation" a preview is calculated, if the "3D preview" box is checked you will also see the result in 3D. By moving the "Adapt region growing slider"
+you can interactively adapt the result to you image.
+
+\imageMacro{QmitkSegmentation_3DRGTool.png,"3D Region Growing tool",10.00}
+
++\subsection org_mitk_gui_qt_segmentationUserManual3DWatershedTool 3D Watershed tool
+
+This tool provides a watershed based segmentation algorithm.
+
+\imageMacro{QmitkSegmentation_3DWatershedTool.png,"3D Watershed tool",10.00}
+
+\subsection org_mitk_gui_qt_segmentationUserManualPickingTool Picking tool
+
+The Picking tool allows you to select islands within your segmentation. This is especially usefull if e.g. a thresholding delivered your several areas within
+your image but you are just interested in one special region.
+
+\imageMacro{QmitkSegmentation_PickingTool.png,"Picking tool",10.00}
 
 \section org_mitk_gui_qt_segmentationUserManualPostprocessing Things you can do with segmentations
 

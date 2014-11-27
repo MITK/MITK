@@ -3,19 +3,20 @@
 
 \imageMacro{SegmentationUtilities.png,"Icon of the Segmentation Utilities View",5.00}
 
+\imageMacro{QmitkSegmentationUtilities_Overview.png,"The Segmentation Utilities view",16.00}
+
 \tableofcontents
 
 \section org_mitk_views_segmentationUtilitiesManualOverview Overview
 
 The <b>Segmentation Utilities View</b> allows you to postprocess existing segmentations
 
-\imageMacro{QmitkSegmentation_IMGApplication.png,"Clipping Plane view with segmentation and two clipping planes",10.00}
 
 \section org_mitk_views_segmentationUtilitiesImageSelection Image Selection
 
 Usually the data selection in the Segmentation Utilities View is done via drop down box which let you just select the appropriate data.
 
-\section org_mitk_views_segmentationUtilitiesBooleanOperations Using Boolean Operations
+\section org_mitk_views_segmentationUtilitiesBooleanOperations Boolean Operations
 
 Boolean operations allow you to create the
 

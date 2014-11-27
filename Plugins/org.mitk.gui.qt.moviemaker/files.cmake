@@ -11,6 +11,8 @@ set(INTERNAL_CPP_FILES
   QmitkOrbitAnimationWidget.cpp
   QmitkSliceAnimationItem.cpp
   QmitkSliceAnimationWidget.cpp
+  QmitkTimeSliceAnimationItem.cpp
+  QmitkTimeSliceAnimationWidget.cpp
   mitkMovieMakerPluginActivator.cpp
   QmitkScreenshotMaker.cpp
 )
@@ -19,6 +21,7 @@ set(UI_FILES
   src/internal/QmitkMovieMakerView.ui
   src/internal/QmitkOrbitAnimationWidget.ui
   src/internal/QmitkSliceAnimationWidget.ui
+  src/internal/QmitkTimeSliceAnimationWidget.ui
   src/internal/QmitkScreenshotMakerControls.ui
 )
 
@@ -30,6 +33,7 @@ set(MOC_H_FILES
   src/internal/QmitkMovieMakerView.h
   src/internal/QmitkOrbitAnimationWidget.h
   src/internal/QmitkSliceAnimationWidget.h
+  src/internal/QmitkTimeSliceAnimationWidget.h
   src/internal/QmitkScreenshotMaker.h
 )
 

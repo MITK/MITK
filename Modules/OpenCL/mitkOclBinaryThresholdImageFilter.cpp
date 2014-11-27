@@ -110,5 +110,5 @@ void mitk::OclBinaryThresholdImageFilter::SetInput(mitk::Image::Pointer image)
     mitkThrowException(mitk::Exception) << "Input for " << this->GetNameOfClass() <<
                                            " is not 3D. The filter only supports 3D. Please change your input.";
   }
-  OclBinaryThresholdImageFilter::SetInput(image);
+  OclImageToImageFilter::SetInput(image);
 }

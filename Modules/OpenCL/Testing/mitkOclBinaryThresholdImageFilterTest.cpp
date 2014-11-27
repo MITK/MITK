@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //ITK Filter as reference computation
 #include <itkBinaryThresholdImageFilter.h>
 
-
 class mitkOclBinaryThresholdImageFilterTestSuite : public mitk::TestFixture
 {
 
@@ -55,7 +54,7 @@ public:
   void setUp()
   {
     //Random input images
-    m_Random3DImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(5, 5, 2, 1,  // dimension
+    m_Random3DImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 52, 1,  // dimension
                                                                                1.0f, 1.0f, 1.0f, // spacing
                                                                                255, 0); // max, min
 
@@ -85,9 +84,11 @@ public:
 
     us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
     OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
+    resources->GetContext(); //todo why do i need to call this before GetMaximumImageSize()?
     if(resources->GetMaximumImageSize(2, CL_MEM_OBJECT_IMAGE3D) == 0)
     {
       //GPU device does not support 3D images. Skip this test.
+      MITK_INFO << "Skipping test.";
       return;
     }
 

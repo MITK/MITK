@@ -7,55 +7,55 @@
 
 \section org_mitk_views_segmentationUtilitiesManualOverview Overview
 
-The <b>Segmentation Utilities View</b> allows you to postprocess existing segmentations 
+The <b>Segmentation Utilities View</b> allows you to postprocess existing segmentations
 
-\imageMacro{QmitkClippingPlane_Overview.png,"Clipping Plane view with segmentation and two clipping planes",16.00}
+\imageMacro{QmitkSegmentation_IMGApplication.png,"Clipping Plane view with segmentation and two clipping planes",10.00}
 
-\section org_mitk_views_clippingPlaneManualImageSelection Image Selection
+\section org_mitk_views_segmentationUtilitiesImageSelection Image Selection
 
 Usually the data selection in the Segmentation Utilities View is done via drop down box which let you just select the appropriate data.
 
-\section org_mitk_views_clippingPlaneCreating Using Boolean Operations
+\section org_mitk_views_segmentationUtilitiesBooleanOperations Using Boolean Operations
 
-If you want to create a new clipping plane select an image from the Data Manager and press the button "Create new clipping plane". Optionally you can enable the "...with surface model" option.
+Boolean operations allow you to create the
 
-\section org_mitk_views_clippingPlaneInteraction Interaction with the planes
-\imageMacro{QmitkClippingPlane_Interaction.png,"The interaction buttons",5.00}
+<ul>
+<li> <b>Union:</b> Combines two existing segmentations
+<li> <b>Intersection:</b> Keeps just the overlapping areas of two existing segmentations
+<li> <b>Difference:</b> Subtracts one segmentation from the other
+</ul>
 
-You have different options to interact with the clipping planes:
+of two segmentations. The selected segmentations must have the same geometry (size, spacing, ...)
 
-\subsection org_mitk_views_clippingPlaneTranslation Translation
+\imageMacro{QmitkSegmentationUtilities_IMGBooleanOperations.png,"Boolean operations of the SegmentationUtlitiesView",6.00}
 
-In Translation mode you can change the position of the clipping plane.
- - Click the Translation Button
- - Move mouse over the selected clipping plane (the plane changes its color from blue to green)
- - Hold mouse-left button and move the mouse orthogonally to the plane
+\section org_mitk_views_segmentationUtilitiesImageMasking Image masking
 
-\subsection org_mitk_views_clippingPlaneRotation Rotation
+You can mask your grey value image with either an existing segmentation or a surface. The result will be an image containing only
+the pixels that are cover by the respective mask.
 
-In Rotation mode you can change the angle of the clipping plane.
- - Click the Rotation Button
- - Move mouse over the selected clipping plane (the plane changes its color from blue to green)
- - Hold mouse-left button and move the mouse in the direction it should be rotated
+\imageMacro{QmitkSegmentationUtilities_IMGImageMasking.png,"Image masking widget of the Segmentation Utilities View",6.00}
 
-\subsection org_mitk_views_clippingPlaneDeformation Deformation
+\section org_mitk_views_segmentationUtilitiesMorphologicalOperators Morphological Operators
 
-In Deformation mode you can change the surface of the clipping plane.
- - Click the Deformation Button
- - Move mouse over the selected clipping plane (the plane changes its color from blue to green). The deformation area is highlighted in red and yellow.
- - On mouse-scrolling you can change the size of the deformation area (Scroll-Down = smaller / Scroll-Up = bigger).
- - Hold mouse-left button and move the mouse orthogonally to the plane to deformate the plane
+The morphological operators are applied to a single segmentation image. Based on a given structuring element the underlying segmentation will be modfied.
+MITK provides a <b>ball</b> and a <b>cross</b> as structuring elements. The follow operators are at your disposal:
 
-\section org_mitk_views_clippingPlaneUpdateVolumina Update Volumina
+<ul>
+<li> <b>Dilation:</b> Each labeled pixel within the segmentation will be dilated based on the selected structuring element
+<li> <b>Erosion:</b> Each labeled pixel within the segmentation will be eroded based on the selected structuring element
+<li> <b>Opening:</b> A dilation followed by an erosion, used for smoothing edges or eliminating small objects
+<li> <b>Closing</b> An erosion followed by an dilation, used for filling small holes
+<li> <b>Fill Holes</b> Fills bigger holes within a segmentation
+</ul>
 
-\imageMacro{QmitkClippingPlane_UpdateVolumina.png,"The 'Update Volumina' button",5.00}
+\imageMacro{QmitkSegmentationUtilities_IMGMorphologicalOperators.png,"Morphological operators widget of the Segmentation Utilities View",6.00}
 
-Calculating the volumina of the segmentation parts, which are devided by the clipping plane(s).
- - Create a segmentation (see Segmentation-Manual)
- - Create one or more clipping plane(s)
- - Use the interaction buttons (Translation, Rotation, Deformation) to adjust the clipping plane for intersecting the segmentation
- - (You can decide which planes shouldnt be included for the calculation by changing their visibility to invisible)
- - Click button "Update Volumina" button
- - The intersected parts are displayed in different colors and their volumina are shown beneath the "Update Volumina" button
+\section org_mitk_views_segmentationUtilitiesSurfaceToImage Surface to binary image
+
+This widget lets you fill you meshes into an empty binary image. It is required that a reference grey value image is present.
+The created binary image will have the same geometrical properties like the reference image
+
+\imageMacro{QmitkSegmentationUtilities_IMGSurfaceToImage.png,"Surface to image widget of the Segmentation Utilities View",6.00}
 
 **/

@@ -35,6 +35,10 @@ class CustomMimeType;
 /**
  * @ingroup IO
  *
+ * @brief The MimeType class represens a registered mime-type.
+ *
+ * MimeType instances support the MITK I/O system and represent mime-types
+ * for data formats.
  */
 class MITK_CORE_EXPORT MimeType
 {

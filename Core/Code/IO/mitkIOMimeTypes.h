@@ -23,6 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+/**
+ * @ingroup IO
+ * @brief The IOMimeTypes class
+ */
 class MITK_CORE_EXPORT IOMimeTypes
 {
 public:

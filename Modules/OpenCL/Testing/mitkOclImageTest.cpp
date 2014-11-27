@@ -15,9 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkTestingMacros.h>
-
 #include <mitkImageGenerator.h>
-
 #include <mitkOclImage.h>
 
 using namespace mitk;
@@ -44,17 +42,17 @@ int mitkOclImageTest( int /*argc*/, char* /*argv*/[] )
   //create a random image
   mitk::Image::Pointer reference;
   //check if 3D images are supported by the device and initialize image accordingly
-  if( resources->GetMaximumImageSize(2, CL_MEM_OBJECT_IMAGE3D) != 0 ) //3D Ok
-  {
-    //Create a random reference image
-    reference = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 52, 1, // dimension
-                                                                                      1.0f, 1.0f, 1.0f, // spacing
-                                                                                      255, 0); // max, min
-  }
-  else
+  if( resources->GetMaximumImageSize(2, CL_MEM_OBJECT_IMAGE3D) == 0 ) //2D required
   {
     //Create a random reference image
     reference = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 0, 0, // dimension
+                                                                                      1.0f, 1.0f, 1.0f, // spacing
+                                                                                      255, 0); // max, min
+  }
+  else //3D ok
+  {
+    //Create a random reference image
+    reference = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(119, 204, 52, 1, // dimension
                                                                                       1.0f, 1.0f, 1.0f, // spacing
                                                                                       255, 0); // max, min
   }

@@ -1,5 +1,5 @@
 /**
-  \defgroup QmitkModule Qmitk
+  \defgroup QmitkModule QtWidgets
   \ingroup MITKModules
 
   \brief Basic Qt widgets and classes for MITK.

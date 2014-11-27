@@ -24,12 +24,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  /** \brief Interface of property aliases service.
-    *
-    * This service allows you to manage aliases of property names.
-    * A property name can be mapped to more than one alias and aliases can be restricted to specific data node types.
-    * The property view prefers to display aliases instead of genuine property names.
-    */
+  /**
+   * \ingroup MicroServices_Interfaces
+   * \brief Interface of property aliases service.
+   *
+   * This service allows you to manage aliases of property names.
+   * A property name can be mapped to more than one alias and aliases can be restricted to specific data node types.
+   * The property view prefers to display aliases instead of genuine property names.
+   */
   class MITK_CORE_EXPORT IPropertyAliases
   {
   public:

@@ -1,0 +1,6 @@
+/**
+  \defgroup MitkPlanarFigureModule PlanarFigure
+  \ingroup MITKModules
+
+  \brief Planar figure data types.
+*/

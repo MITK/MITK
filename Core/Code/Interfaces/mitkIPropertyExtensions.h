@@ -24,13 +24,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  /** \brief Interface of property extensions service.
-    *
-    * This service allows you to manage extensions for properties.
-    * An extension is a class that derives from mitk::PropertyExtension.
-    * Use extensions to attach useful metadata to your properties, e.g. the allowed range of values.
-    * Note that you have to extend the property view if you want it to respect your custom metadata.
-    */
+  /**
+   * \ingroup MicroServices_Interfaces
+   * \brief Interface of property extensions service.
+   *
+   * This service allows you to manage extensions for properties.
+   * An extension is a class that derives from mitk::PropertyExtension.
+   * Use extensions to attach useful metadata to your properties, e.g. the allowed range of values.
+   * Note that you have to extend the property view if you want it to respect your custom metadata.
+   */
   class MITK_CORE_EXPORT IPropertyExtensions
   {
   public:

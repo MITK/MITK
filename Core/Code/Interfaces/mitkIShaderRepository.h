@@ -33,6 +33,7 @@ class DataNode;
 class BaseRenderer;
 
 /**
+ * \ingroup MicroServices_Interfaces
  * \brief Management class for vtkShader XML descriptions.
  *
  * Loads XML shader files from std::istream objects and adds default properties

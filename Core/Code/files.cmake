@@ -325,20 +325,14 @@ set(CPP_FILES
   IO/mitkFileWriterRegistry.cpp
   IO/mitkFileWriterSelector.cpp
   IO/mitkIFileIO.cpp
-# IO/mitkIpPicGet.c
   IO/mitkImageGenerator.cpp
+  IO/mitkIOAdapter.h
   IO/mitkIOConstants.cpp
   IO/mitkIOUtil.cpp
   IO/mitkIOMimeTypes.cpp
   IO/mitkItkLoggingAdapter.cpp
   IO/mitkMimeType.cpp
   IO/mitkOperation.cpp
-# IO/mitkPicFileIOFactory.cpp
-# IO/mitkPicFileReader.cpp
-# IO/mitkPicFileWriter.cpp
-# IO/mitkPicHelper.cpp
-# IO/mitkPicVolumeTimeSeriesIOFactory.cpp
-# IO/mitkPicVolumeTimeSeriesReader.cpp
   IO/mitkPixelType.cpp
   IO/mitkStandardFileLocations.cpp
   IO/mitkVtkLoggingAdapter.cpp

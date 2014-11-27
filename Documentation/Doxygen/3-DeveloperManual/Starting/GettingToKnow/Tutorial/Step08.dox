@@ -1,0 +1,25 @@
+ /**
+
+ \page Step08Page MITK Tutorial - Step 8: Use QmitkStdMultiWidget as widget
+
+ \li \ref Step8.cpp "Step8.cpp"\n
+ \li \ref Step8.h "Step8.h"\n
+ \li \ref Step8main.cpp "Step8main.cpp"\n
+ \li Path to files used in this step: \n
+http://mitk.org/download/tutorial-data/Pic3D.nrrd (image)
+
+ In this step a QmitkStdMultiWidget is used. It offers four views of the data.
+ From top left to bottom left the views are initialized as axial, sagittal and coronar. The bottom right view is initialized as 3D view.
+
+ \image html step8_result.png
+
+ Step8 inherits from Step6. The method SetupWidgets() is changed: A QmitkStdMultiWidget is used instead of one QmitkRenderWindow and two instances of QmitkSliceWidget.
+
+ \dontinclude Step8.cpp
+ \skipline Part Ia
+ \until EnableNavigationControllerEventListening
+
+
+ \ref Step07Page "[Previous step]" \ref Step09Page "[Next step]"
+
+  */

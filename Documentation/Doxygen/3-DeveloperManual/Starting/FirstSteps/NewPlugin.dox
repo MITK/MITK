@@ -1,0 +1,97 @@
+/**
+\page NewPluginPage How to create a new MITK Plugin
+
+The MITK Plugin Generator is a command line tool to simplify the process of creating your own MITK project
+(optional) and plugins. It can either be downloaded <a href="http://www.mitk.org/wiki/Download">here</a>
+or used from an existing MITK build.
+
+The Plugin Generator takes the following command line arguments:
+
+\verbatim
+./MitkPluginGenerator -h
+A CTK plugin generator for MITK (version 1.2.0)
+
+  -h, --help                      Show this help text
+  -o, --out-dir                   Output directory (default: /tmp)
+  -l, --license                   Path to a file containing license information (default: :/MITKLicense.txt)
+  -v, --vendor                    The vendor of the generated code (default: DKFZ, Medical and Biological Informatics)
+  -q, --quiet                     Do not print additional information
+  -y, --confirm-all               Answer all questions with 'yes'
+  -u, --check-update              Check for updates and exit
+  -n, --no-networking             Disable all network requests
+
+Plugin View options
+  -vc, --view-class               The View's' class name
+  -vn, --view-name              * The View's human readable name
+
+Plugin options
+  -ps, --plugin-symbolic-name   * The plugin's symbolic name
+  -pn, --plugin-name              The plugin's human readable name
+
+Project options
+  --project-copyright             Path to a file containing copyright information (default: :/LICENSE.txt)
+  --project-name                  The project name
+  --project-app-name              The application name
+
+[* - options are required]
+\endverbatim
+
+If a project name is provided via the <tt>--project-name</tt> argument, the new plugin will be generated
+as part of a new project.
+
+\section NewPluginOnly Creating a new MITK plugin
+
+Here is an example call to the Plugin Generator, creating one plugin with the symbolic name
+<tt>com.mycompany.myplugin</tt> and a View named <tt>My View</tt>:
+
+\verbatim
+./MitkPluginGenerator --plugin-symbolic-name org.mycompany.myplugin --view-name "My View"
+\endverbatim
+
+If you did not already specify the final location of the plugin via the <tt>--out-dir</tt> argument, move the
+directory (in our example <tt>/tmp/org.mycompany.myplugin</tt>) to your existing project. Do not forget to add the
+plugin in your project's build system (usually in the file <tt>&lt;your-project&gt;/Plugins/Plugins.cmake</tt>).
+
+\section NewPluginWithProject Creating a new MITK project
+
+\subsection NewPluginProjectPrerequisites Prerequisites
+
+MITK-based projects created with the Plugin Generator need the same prerequisites as MITK itself. See the
+\ref BuildInstructionsPage for MITK for details.
+
+Here is an example call to the Plugin Generator, creating the same plugin as above but integrated in a new project:
+
+\verbatim
+./MitkPluginGenerator --plugin-symbolic-name org.mycompany.myplugin --view-name "My View" --project-name "MyProject" --project-app-name "MyApp"
+\endverbatim
+
+The generated project is completely self-contained and can be configured via CMake immediately. When building the
+generated project, it will first download all required dependencies (like MITK itself). For an explanation of the
+project's build directory layout and how to configure MITK from your project's superbuild CMake configuration,
+see \ref HowToNewProject.
+
+
+\subsection NewPluginLimitations Limitations
+
+The Plugin Generator supports only a very limited set of possible configuration options. For more customizations of your
+project or plugin, you must familiarize yourself with CMake and the generated build system.
+
+Further, the generator is not able to modify existing projects, it can only create new ones.
+
+
+\section NewPluginBuildSystem Build system for plugins
+
+Just put new files in your plugin's \c src or \c src/internal directory and edit the \c files.cmake file there.
+If you have any fancy stuff like external libraries and include directories you should have a look at the CMake manual and general MITK build system documentation.
+
+
+\section NewPluginTroubleshooting Troubleshooting
+
+\par I get "Could not find library" messages and similar stuff when I try to start my project's executable.
+This is mostly due to wrong environment settings. On Windows, make sure that you use the supplied batch files to start
+Visual Studio or your project's executable. If you still get errors, double check the value of the PATH variable in
+your batch files (it must contain MITK's binary directory and paths to the ITK, VTK and Qt libraries.
+
+\par
+On Linux, set your LD_LIBRARY_PATH variable accordingly.
+*/

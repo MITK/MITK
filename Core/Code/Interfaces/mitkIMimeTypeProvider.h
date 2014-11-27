@@ -29,6 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 /**
+ * @ingroupg IO
+ * @ingroup MicroServices_Interfaces
+ *
  * @brief The IMimeTypeProvider service interface allows to query all registered
  *        mime types.
  *

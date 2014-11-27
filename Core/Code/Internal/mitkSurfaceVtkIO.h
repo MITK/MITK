@@ -27,6 +27,7 @@ namespace mitk
 {
 
 /**
+ * @internal
  * @brief VTK-based reader and writer for mitk::Surface
  *
  * If the mitk::Surface contains multiple points of
@@ -37,7 +38,6 @@ namespace mitk
  * (S=start, E=end, T=time).
  * Writing of multiple files according to a given filename pattern is not
  * yet supported.
- * @ingroup Process
  */
 class SurfaceVtkIO : public mitk::AbstractFileIO
 {

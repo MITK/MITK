@@ -1,0 +1,69 @@
+/**
+
+\page Step04Page MITK Tutorial - Step 4: Use several views to explore data
+
+\li \ref Step4.cpp "Step4.cpp"\n
+Contains the code of step 4a + b.
+\li Path to files used in this step: \n
+http://mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
+http://mitk.org/download/tutorial-data/lungs.vtk (surface)
+
+As in Step 2 and Step 3 one or more data sets may be loaded.
+
+This now creates three views on the data.
+The QmitkRenderWindow is used for displaying a 3D view as in Step 3, but without volume-rendering.
+Furthermore two 2D views for slicing through the data are created.
+The class QmitkSliceWidget is used, which is based on the class QmitkRenderWindow, but additionally provides sliders to slice through the data. We create two instances of
+QmitkSliceWidget, one for axial and one for sagittal slicing.
+Step 4b enhances the program in that the two slices are also shown at their correct position in 3D as well as intersection-line, each in the other 2D view.
+
+As in the previous steps, to obtain the result the program has to be executed using the image file Pic3D.nrrd and the surface file lungs.vtk.
+
+\section Step4aSection Step 4a - Create axial and sagittal view
+
+\imageMacro{step4a_result.png,"",11.01}
+
+\dontinclude Step4.cpp
+
+Create a Qt horizontal box for the layout:
+
+\skipline QHBox
+
+Then create a renderwindow:
+
+\skipline QmitkRenderWindow
+\until SetMapperID
+
+Create a 2D view for slicing axially:
+
+\skipline view2
+\until view2.SetData
+
+Then create a 2D view for slicing sagitally.
+
+\skipline view3
+\until view3.SetData
+
+The toplevelWidget is now the new main widget:
+
+\skipline qtapplication
+\skipline toplevelWidget.show
+
+\section Step4bSection Step 4b - Display slice positions
+
+\imageMacro{step4b_result.png,"",11.01}
+
+We now want to see the position of the slice in 2D and the slice itself in 3D.
+Therefore it has to be added to the tree:
+
+\dontinclude Step4.cpp
+\skipline ds->Add(view2.GetRenderer()
+\skipline ds->Add(view3.GetRenderer()
+
+Slice positions are now displayed as shown in the picture.
+
+\dontinclude Step4.cpp
+
+\ref Step03Page "[Previous step]" \ref Step05Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+
+*/

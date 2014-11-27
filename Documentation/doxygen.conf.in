@@ -32,7 +32,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = MITK
+PROJECT_NAME           = "Medical Imaging Interaction Toolkit"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -234,7 +234,7 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "bundlemainpage{1}=\page \1" \
                          "embmainpage{1}=\page \1" \
                          "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
-                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" " \
+                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \"\" \"Functions deprecated as of \1\" \deprecated (as of \1) " \
                          "minimumCMakeVersion=@CMAKE_MINIMUM_REQUIRED_VERSION@" \
                          "minimumQt4Version=@MITK_QT4_MINIMUM_VERSION@" \
                          "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
@@ -828,6 +828,7 @@ EXCLUDE                = @MITK_SOURCE_DIR@/BlueBerry/Documentation/reference/api
                          @MITK_SOURCE_DIR@/CMake/QBundleTemplate \
                          @MITK_SOURCE_DIR@/CMakeExternals \
                          @MITK_SOURCE_DIR@/Modules/QmitkExt/vtkQtChartHeaders/ \
+                         @MITK_BINARY_DIR@/Documentation/Doxygen \
                          @MITK_BINARY_DIR@/bin/ \
                          @MITK_BINARY_DIR@/PT/ \
                          @MITK_BINARY_DIR@/GP/ \
@@ -859,6 +860,8 @@ EXCLUDE_PATTERNS       = README* \
                          */.git/* \
                          *_p.h \
                          *Private.* \
+                         */Internal/* \
+                         */internal/* \
                          */Snippets/* \
                          */snippets/* \
                          */testing/* \
@@ -889,8 +892,6 @@ EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/ \
                          @MITK_SOURCE_DIR@/Core/CppMicroServices/core/doc/snippets/ \
                          @MITK_SOURCE_DIR@/Core/CppMicroServices/core/examples/ \
                          @MITK_DOXYGEN_OUTPUT_DIR@/html/extension-points/html/ \
-                         @MITK_SOURCE_DIR@/Documentation/Snippets/ \
-                         @MITK_SOURCE_DIR@/Documentation/Doxygen/ExampleCode/ \
                          @MITK_SOURCE_DIR@/Modules/OpenCL/Documentation/doxygen/snippets/ \
                          @MITK_SOURCE_DIR@/Modules/IGT/Tutorial/
 
@@ -913,8 +914,6 @@ EXAMPLE_RECURSIVE      = YES
 # \image command).
 
 IMAGE_PATH             = @MITK_SOURCE_DIR@/Documentation/Doxygen/ \
-                         @MITK_SOURCE_DIR@/Documentation/Doxygen/Modules/ \
-                         @MITK_SOURCE_DIR@/Documentation/Doxygen/Tutorial/ \
                          @MITK_SOURCE_DIR@
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
@@ -963,7 +962,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE =
+USE_MDFILE_AS_MAINPAGE = README.md
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
@@ -1164,7 +1163,7 @@ HTML_EXTRA_STYLESHEET  = @MITK_DOXYGEN_STYLESHEET@
 # files will be copied as-is; there are no commands or markers available.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_FILES       =
+HTML_EXTRA_FILES       = @MITK_SOURCE_DIR@/Documentation/Doxygen/mitkLogo.jpg
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the stylesheet and background images according to

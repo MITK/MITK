@@ -32,6 +32,13 @@
 */
 
 /**
+  \defgroup DeprecatedIO Deprecated IO Classes
+  \ingroup Core
+
+  \brief This subcategory includes the Deprecated IO classes to read or write data objects.
+*/
+
+/**
   \defgroup DataStorage Data Storage Classes
   \ingroup Core
 

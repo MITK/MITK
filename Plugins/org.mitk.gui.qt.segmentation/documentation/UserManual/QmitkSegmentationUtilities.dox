@@ -1,0 +1,62 @@
+/**
+\page org_mitk_views_segmentationutilities The Segmentation Utilities View
+
+\imageMacro{SegmentationUtilities.png,"Icon of the Segmentation Utilities View",5.00}
+
+\imageMacro{QmitkSegmentationUtilities_Overview.png,"The Segmentation Utilities view",16.00}
+
+\tableofcontents
+
+\section org_mitk_views_segmentationUtilitiesManualOverview Overview
+
+The <b>Segmentation Utilities View</b> allows you to postprocess existing segmentations
+
+
+\section org_mitk_views_segmentationUtilitiesImageSelection Image Selection
+
+Usually the data selection in the Segmentation Utilities View is done via drop down box which let you just select the appropriate data.
+
+\section org_mitk_views_segmentationUtilitiesBooleanOperations Boolean Operations
+
+Boolean operations allow you to create the
+
+<ul>
+<li> <b>Union:</b> Combines two existing segmentations
+<li> <b>Intersection:</b> Keeps just the overlapping areas of two existing segmentations
+<li> <b>Difference:</b> Subtracts one segmentation from the other
+</ul>
+
+of two segmentations. The selected segmentations must have the same geometry (size, spacing, ...)
+
+\imageMacro{QmitkSegmentationUtilities_IMGBooleanOperations.png,"Boolean operations of the SegmentationUtlitiesView",6.00}
+
+\section org_mitk_views_segmentationUtilitiesImageMasking Image masking
+
+You can mask your grey value image with either an existing segmentation or a surface. The result will be an image containing only
+the pixels that are cover by the respective mask.
+
+\imageMacro{QmitkSegmentationUtilities_IMGImageMasking.png,"Image masking widget of the Segmentation Utilities View",6.00}
+
+\section org_mitk_views_segmentationUtilitiesMorphologicalOperators Morphological Operators
+
+The morphological operators are applied to a single segmentation image. Based on a given structuring element the underlying segmentation will be modfied.
+MITK provides a <b>ball</b> and a <b>cross</b> as structuring elements. The follow operators are at your disposal:
+
+<ul>
+<li> <b>Dilation:</b> Each labeled pixel within the segmentation will be dilated based on the selected structuring element
+<li> <b>Erosion:</b> Each labeled pixel within the segmentation will be eroded based on the selected structuring element
+<li> <b>Opening:</b> A dilation followed by an erosion, used for smoothing edges or eliminating small objects
+<li> <b>Closing</b> An erosion followed by an dilation, used for filling small holes
+<li> <b>Fill Holes</b> Fills bigger holes within a segmentation
+</ul>
+
+\imageMacro{QmitkSegmentationUtilities_IMGMorphologicalOperators.png,"Morphological operators widget of the Segmentation Utilities View",6.00}
+
+\section org_mitk_views_segmentationUtilitiesSurfaceToImage Surface to binary image
+
+This widget lets you fill you meshes into an empty binary image. It is required that a reference grey value image is present.
+The created binary image will have the same geometrical properties like the reference image
+
+\imageMacro{QmitkSegmentationUtilities_IMGSurfaceToImage.png,"Surface to image widget of the Segmentation Utilities View",6.00}
+
+**/

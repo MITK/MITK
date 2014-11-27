@@ -24,17 +24,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageWriteAccessor.h"
 
 namespace mitk {
-//##Documentation
-//## @brief generator for synthetic MITK images
-//## This is a helper class to  generate synthetic MITK images (random or gradient).
-//## @ingroup IO
+/**
+ * @brief generator for synthetic MITK images
+ * This is a helper class to  generate synthetic MITK images (random or gradient).
+ *
+ * @ingroup IO
+ */
 class MITK_CORE_EXPORT ImageGenerator
 {
 public:
 
-    /*!
-    \brief Generates gradient image with the defined size and spacing
-    */
+    /**
+     * \brief Generates gradient image with the defined size and spacing
+     */
     template <typename TPixelType>
     static mitk::Image::Pointer GenerateGradientImage(unsigned int dimX,
                                                       unsigned int dimY,

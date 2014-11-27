@@ -1,0 +1,15 @@
+/**
+
+\page Step00Page MITK Tutorial - Step 0: Getting started
+
+To build the tutorials follow the \ref BuildInstructionsPage and make sure that MITK_BUILD_EXAMPLES is checked/set to ON.
+
+\imageMacro{configureCMake.PNG,"",16.00}
+
+The tutorial source files can be found in the Examples\\Tutorial\\ subdirectory of the source tree. The tutorial executables are in the bin\\Release\\ or bin\\Debug\\ subdirectory (Windows) respectively the bin\\ subdirectory (Linux/Mac) of the binary tree after compilation (called MitkStepX, corresponding to the tutorial step).
+
+
+
+\ref Step01Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+
+*/

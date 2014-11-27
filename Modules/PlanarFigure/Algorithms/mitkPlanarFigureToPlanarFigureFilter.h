@@ -31,7 +31,7 @@ namespace mitk
  *
  * Base class for all filters which have an object of type mitk::PlanarFigure
  * as input and output.
- * @ingroup MitkPlanarFigure_EXPORT
+ * @ingroup MitkPlanarFigureModule
  */
 class MitkPlanarFigure_EXPORT PlanarFigureToPlanarFigureFilter : public mitk::PlanarFigureSource
 {

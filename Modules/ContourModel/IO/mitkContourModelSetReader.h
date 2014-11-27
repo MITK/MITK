@@ -32,8 +32,7 @@ namespace mitk
 {
 /**
  * @brief
- * @ingroup PSIO
- * @ingroup IO
+ * @ingroup MitkContourModelModule
 */
 class ContourModelSetReader : public mitk::AbstractFileReader
 {

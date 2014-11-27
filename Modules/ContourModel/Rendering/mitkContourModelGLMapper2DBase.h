@@ -34,7 +34,7 @@ namespace mitk {
   * @brief Base class for OpenGL based 2D mappers.
   * Provides functionality to draw a contour.
   *
-  * @ingroup Mapper
+  * @ingroup MitkContourModelModule
   */
   class MitkContourModel_EXPORT ContourModelGLMapper2DBase : public GLMapper
   {

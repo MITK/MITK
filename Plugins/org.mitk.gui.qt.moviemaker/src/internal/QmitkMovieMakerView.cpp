@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkOrbitAnimationWidget.h"
 #include "QmitkSliceAnimationItem.h"
 #include "QmitkSliceAnimationWidget.h"
+#include "QmitkTimeSliceAnimationWidget.h"
+#include "QmitkTimeSliceAnimationItem.h"
 #include <ui_QmitkMovieMakerView.h>
 #include <QFileDialog>
 #include <QMenu>
@@ -37,6 +39,9 @@ static QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
 
   if (widgetKey == "Slice")
     return new QmitkSliceAnimationItem;
+
+  if (widgetKey == "Time")
+    return new QmitkTimeSliceAnimationItem;
 
   return NULL;
 }
@@ -101,6 +106,7 @@ void QmitkMovieMakerView::InitializeAnimationWidgets()
 {
   m_AnimationWidgets["Orbit"] = new QmitkOrbitAnimationWidget;
   m_AnimationWidgets["Slice"] = new QmitkSliceAnimationWidget;
+  m_AnimationWidgets["Time"] = new QmitkTimeSliceAnimationWidget;
 
   Q_FOREACH(QWidget* widget, m_AnimationWidgets.values())
   {

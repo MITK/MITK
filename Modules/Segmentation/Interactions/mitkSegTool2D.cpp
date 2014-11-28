@@ -67,15 +67,15 @@ mitk::SegTool2D::~SegTool2D()
 {
 }
 
-float mitk::SegTool2D::CanHandleEvent( InteractionEvent const *stateEvent) const
+bool mitk::SegTool2D::FilterEvents(InteractionEvent* interactionEvent, DataNode*dataNode)
 {
-  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>( stateEvent );
-  if (!positionEvent) return 0.0;
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>( interactionEvent );
 
-  if ( positionEvent->GetSender()->GetMapperID() != BaseRenderer::Standard2D )
-    return 0.0; // we don't want anything but 2D
-
-  return 1.0;
+  bool isValidEvent = (
+                       positionEvent && // Only events of type mitk::InteractionPositionEvent
+                       interactionEvent->GetSender()->GetMapperID() == BaseRenderer::Standard2D // Only events from the 2D renderwindows
+                      );
+  return isValidEvent;
 }
 
 
@@ -378,8 +378,11 @@ void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
   m_SurfaceInterpolationEnabled = enabled;
 }
 
-unsigned int mitk::SegTool2D::AddContourmarker()
+int mitk::SegTool2D::AddContourmarker()
 {
+  if (m_LastEventSender == NULL)
+    return -1;
+
   us::ServiceReference<PlanePositionManagerService> serviceRef =
       us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
   PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);

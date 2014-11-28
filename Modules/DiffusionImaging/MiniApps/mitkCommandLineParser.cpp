@@ -35,10 +35,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // STL includes
 #include <stdexcept>
+#include <iostream>
 
 
-// CTK includes
-#include "ctkCommandLineParser.h"
+// MITK includes
+#include "mitkCommandLineParser.h"
+
 
 using namespace std;
 
@@ -53,7 +55,7 @@ public:
     CommandLineParserArgumentDescription(
             const string& longArg, const string& longArgPrefix,
             const string& shortArg, const string& shortArgPrefix,
-            ctkCommandLineParser::Type type, const string& argHelp, const string& argLabel,
+            mitkCommandLineParser::Type type, const string& argHelp, const string& argLabel,
             const us::Any& defaultValue, bool ignoreRest,
             bool deprecated, bool optional, string& argGroup, string& groupDescription)
         : LongArg(longArg), LongArgPrefix(longArgPrefix),
@@ -65,48 +67,53 @@ public:
 
         switch (type)
         {
-        case ctkCommandLineParser::String:
+        case mitkCommandLineParser::String:
         {
             NumberOfParametersToProcess = 1;
         }
             break;
-        case ctkCommandLineParser::Bool:
+        case mitkCommandLineParser::Bool:
         {
             NumberOfParametersToProcess = 0;
         }
             break;
-        case ctkCommandLineParser::StringList:
+        case mitkCommandLineParser::StringList:
         {
             NumberOfParametersToProcess = -1;
         }
             break;
-        case ctkCommandLineParser::Int:
+        case mitkCommandLineParser::Int:
         {
             NumberOfParametersToProcess = 1;
         }
             break;
-        case ctkCommandLineParser::Float:
-        {
-            NumberOfParametersToProcess = 1;
-        }
-            break;
-
-        case ctkCommandLineParser::OutputDirectory:
-        case ctkCommandLineParser::InputDirectory:
+        case mitkCommandLineParser::Float:
         {
             NumberOfParametersToProcess = 1;
         }
             break;
 
-        case ctkCommandLineParser::OutputFile:
-        case ctkCommandLineParser::InputFile:
+        case mitkCommandLineParser::OutputDirectory:
+        case mitkCommandLineParser::InputDirectory:
         {
             NumberOfParametersToProcess = 1;
         }
             break;
+
+        case mitkCommandLineParser::OutputFile:
+        case mitkCommandLineParser::InputFile:
+        {
+            NumberOfParametersToProcess = 1;
+        }
+            break;
+        case mitkCommandLineParser::InputImage:
+        {
+            NumberOfParametersToProcess = 1;
+        }
+          break;
 
         default:
-            MITK_INFO << "Type not supported: " << static_cast<int>(type);
+            std::cout << "Type not supported: " << static_cast<int>(type);
         }
 
     }
@@ -132,7 +139,7 @@ public:
 
     us::Any                   DefaultValue;
     us::Any                   Value;
-    ctkCommandLineParser::Type  ValueType;
+    mitkCommandLineParser::Type  ValueType;
 };
 
 // --------------------------------------------------------------------------
@@ -140,12 +147,12 @@ bool CommandLineParserArgumentDescription::addParameter(const string &value)
 {
     switch (ValueType)
     {
-    case ctkCommandLineParser::String:
+    case mitkCommandLineParser::String:
     {
         Value = value;
     }
         break;
-    case ctkCommandLineParser::Bool:
+    case mitkCommandLineParser::Bool:
     {
         if (value.compare("true")==0)
             Value = true;
@@ -153,23 +160,23 @@ bool CommandLineParserArgumentDescription::addParameter(const string &value)
             Value = false;
     }
         break;
-    case ctkCommandLineParser::StringList:
+    case mitkCommandLineParser::StringList:
     {
         try
         {
-            ctkCommandLineParser::StringContainerType list = us::any_cast<ctkCommandLineParser::StringContainerType>(Value);
+            mitkCommandLineParser::StringContainerType list = us::any_cast<mitkCommandLineParser::StringContainerType>(Value);
             list.push_back(value);
             Value = list;
         }
         catch(...)
         {
-            ctkCommandLineParser::StringContainerType list;
+            mitkCommandLineParser::StringContainerType list;
             list.push_back(value);
             Value = list;
         }
     }
         break;
-    case ctkCommandLineParser::Int:
+    case mitkCommandLineParser::Int:
     {
         stringstream ss(value);
         int i;
@@ -177,7 +184,7 @@ bool CommandLineParserArgumentDescription::addParameter(const string &value)
         Value = i;
     }
         break;
-    case ctkCommandLineParser::Float:
+    case mitkCommandLineParser::Float:
     {
         stringstream ss(value);
         float f;
@@ -186,15 +193,16 @@ bool CommandLineParserArgumentDescription::addParameter(const string &value)
     }
         break;
 
-    case ctkCommandLineParser::InputDirectory:
-    case ctkCommandLineParser::OutputDirectory:
+    case mitkCommandLineParser::InputDirectory:
+    case mitkCommandLineParser::OutputDirectory:
     {
       Value = value;
     }
       break;
 
-    case ctkCommandLineParser::InputFile:
-    case ctkCommandLineParser::OutputFile:
+    case mitkCommandLineParser::InputFile:
+    case mitkCommandLineParser::InputImage:
+    case mitkCommandLineParser::OutputFile:
     {
       Value = value;
     }
@@ -250,7 +258,7 @@ string CommandLineParserArgumentDescription::helpText()
 // ctkCommandLineParser::ctkInternal class
 
 // --------------------------------------------------------------------------
-class ctkCommandLineParser::ctkInternal
+class mitkCommandLineParser::ctkInternal
 {
 public:
     ctkInternal()
@@ -283,7 +291,7 @@ public:
 
 // --------------------------------------------------------------------------
 CommandLineParserArgumentDescription*
-ctkCommandLineParser::ctkInternal::argumentDescription(const string& argument)
+mitkCommandLineParser::ctkInternal::argumentDescription(const string& argument)
 {
     string unprefixedArg = argument;
 
@@ -319,7 +327,7 @@ ctkCommandLineParser::ctkInternal::argumentDescription(const string& argument)
 // ctkCommandLineParser methods
 
 // --------------------------------------------------------------------------
-ctkCommandLineParser::ctkCommandLineParser()
+mitkCommandLineParser::mitkCommandLineParser()
 {
     this->Internal = new ctkInternal();
     this->Category = string();
@@ -331,13 +339,13 @@ ctkCommandLineParser::ctkCommandLineParser()
 }
 
 // --------------------------------------------------------------------------
-ctkCommandLineParser::~ctkCommandLineParser()
+mitkCommandLineParser::~mitkCommandLineParser()
 {
     delete this->Internal;
 }
 
 // --------------------------------------------------------------------------
-map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerType& arguments,
+map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainerType& arguments,
                                                               bool* ok)
 {
     // Reset
@@ -362,7 +370,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
     {
         string argument = arguments.at(i);
 
-        if (this->Internal->Debug) { MITK_DEBUG << "Processing" << argument; }
+        if (this->Internal->Debug) { std::cout << "Processing" << argument; }
         if (!argument.compare("--xml") || !argument.compare("-xml") || !argument.compare("--XML") || !argument.compare("-XML"))
         {
           this->generateXmlOutput();
@@ -374,7 +382,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
         {
             if (this->Internal->Debug)
             {
-                MITK_DEBUG << "  Skipping: IgnoreRest flag was been set";
+                std::cout << "  Skipping: IgnoreRest flag was been set";
             }
             this->Internal->UnparsedArguments.push_back(argument);
             continue;
@@ -393,7 +401,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
             }
             if (this->Internal->Debug)
             {
-                MITK_DEBUG << "  Skipping: It does not start with the defined prefix";
+                std::cout << "  Skipping: It does not start with the defined prefix";
             }
             this->Internal->UnparsedArguments.push_back(argument);
             continue;
@@ -420,7 +428,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
             }
             if (this->Internal->Debug)
             {
-                MITK_DEBUG << "  Skipping: Already processed !";
+                std::cout << "  Skipping: Already processed !";
             }
             continue;
         }
@@ -434,7 +442,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
             // If the argument is deprecated, print the help text but continue processing
             if (currentArgDesc->Deprecated)
             {
-                MITK_WARN << "Deprecated argument " << argument << ": "  << currentArgDesc->ArgHelp;
+                std::cout << "Deprecated argument " << argument << ": "  << currentArgDesc->ArgHelp;
             }
             else
             {
@@ -447,7 +455,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
             ignoreRest = currentArgDesc->IgnoreRest;
             if (this->Internal->Debug && ignoreRest)
             {
-                MITK_DEBUG << "  IgnoreRest flag is True";
+                std::cout << "  IgnoreRest flag is True";
             }
 
             // Is the number of parameters associated with the argument being processed known ?
@@ -465,20 +473,20 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
                     {
 //                        this->Internal->ErrorString =
 //                                missingParameterError.arg(argument).arg(j-1).arg(numberOfParametersToProcess);
-//                        if (this->Internal->Debug) { MITK_DEBUG << this->Internal->ErrorString; }
+//                        if (this->Internal->Debug) { std::cout << this->Internal->ErrorString; }
                         if (ok) { *ok = false; }
                         return map<string, us::Any>();
                     }
                     string parameter = arguments.at(i + j);
                     if (this->Internal->Debug)
                     {
-                        MITK_DEBUG << "  Processing parameter" << j << ", value:" << parameter;
+                        std::cout << "  Processing parameter" << j << ", value:" << parameter;
                     }
                     if (this->argumentAdded(parameter))
                     {
 //                        this->Internal->ErrorString =
 //                                missingParameterError.arg(argument).arg(j-1).arg(numberOfParametersToProcess);
-//                        if (this->Internal->Debug) { MITK_DEBUG << this->Internal->ErrorString; }
+//                        if (this->Internal->Debug) { std::cout << this->Internal->ErrorString; }
                         if (ok) { *ok = false; }
                         return map<string, us::Any>();
                     }
@@ -487,7 +495,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
 //                        this->Internal->ErrorString = string(
 //                                    "Value(s) associated with argument %1 are incorrect. %2").
 //                                arg(argument).arg(currentArgDesc->ExactMatchFailedMessage);
-//                        if (this->Internal->Debug) { MITK_DEBUG << this->Internal->ErrorString; }
+//                        if (this->Internal->Debug) { std::cout << this->Internal->ErrorString; }
                         if (ok) { *ok = false; }
                         return map<string, us::Any>();
                     }
@@ -499,7 +507,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
             {
                 if (this->Internal->Debug)
                 {
-                    MITK_DEBUG << "  Proccessing StringList ...";
+                    std::cout << "  Proccessing StringList ...";
                 }
                 int j = 1;
                 while(j + i < arguments.size())
@@ -508,7 +516,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
                     {
                         if (this->Internal->Debug)
                         {
-                            MITK_DEBUG << "  No more parameter for" << argument;
+                            std::cout << "  No more parameter for" << argument;
                         }
                         break;
                     }
@@ -523,14 +531,14 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
 
                     if (this->Internal->Debug)
                     {
-                        MITK_DEBUG << "  Processing parameter" << j << ", value:" << parameter;
+                        std::cout << "  Processing parameter" << j << ", value:" << parameter;
                     }
                     if (!currentArgDesc->addParameter(parameter))
                     {
 //                        this->Internal->ErrorString = string(
 //                                    "Value(s) associated with argument %1 are incorrect. %2").
 //                                arg(argument).arg(currentArgDesc->ExactMatchFailedMessage);
-//                        if (this->Internal->Debug) { MITK_DEBUG << this->Internal->ErrorString; }
+//                        if (this->Internal->Debug) { std::cout << this->Internal->ErrorString; }
                         if (ok) { *ok = false; }
                         return map<string, us::Any>();
                     }
@@ -551,7 +559,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
             }
             if (this->Internal->Debug)
             {
-                MITK_DEBUG << "  Skipping: Unknown argument";
+                std::cout << "  Skipping: Unknown argument";
             }
             this->Internal->UnparsedArguments.push_back(argument);
         }
@@ -606,7 +614,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
 }
 
 // -------------------------------------------------------------------------
-map<string, us::Any> ctkCommandLineParser::parseArguments(int argc, char** argv, bool* ok)
+map<string, us::Any> mitkCommandLineParser::parseArguments(int argc, char** argv, bool* ok)
 {
     StringContainerType arguments;
 
@@ -618,19 +626,19 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(int argc, char** argv,
 }
 
 // -------------------------------------------------------------------------
-string ctkCommandLineParser::errorString() const
+string mitkCommandLineParser::errorString() const
 {
     return this->Internal->ErrorString;
 }
 
 // -------------------------------------------------------------------------
-const ctkCommandLineParser::StringContainerType& ctkCommandLineParser::unparsedArguments() const
+const mitkCommandLineParser::StringContainerType& mitkCommandLineParser::unparsedArguments() const
 {
     return this->Internal->UnparsedArguments;
 }
 
 // --------------------------------------------------------------------------
-void ctkCommandLineParser::addArgument(const string& longarg, const string& shortarg,
+void mitkCommandLineParser::addArgument(const string& longarg, const string& shortarg,
                                        Type type, const string& argLabel, const string& argHelp,
                                        const us::Any& defaultValue, bool optional, bool ignoreRest,
                                        bool deprecated)
@@ -673,32 +681,32 @@ void ctkCommandLineParser::addArgument(const string& longarg, const string& shor
 }
 
 // --------------------------------------------------------------------------
-void ctkCommandLineParser::addDeprecatedArgument(
+void mitkCommandLineParser::addDeprecatedArgument(
         const string& longarg, const string& shortarg, const string& argLabel, const string& argHelp)
 {
     addArgument(longarg, shortarg, StringList, argLabel, argHelp, us::Any(), false, true, false);
 }
 
 // --------------------------------------------------------------------------
-int ctkCommandLineParser::fieldWidth() const
+int mitkCommandLineParser::fieldWidth() const
 {
     return this->Internal->FieldWidth;
 }
 
 // --------------------------------------------------------------------------
-void ctkCommandLineParser::beginGroup(const string& description)
+void mitkCommandLineParser::beginGroup(const string& description)
 {
     this->Internal->CurrentGroup = description;
 }
 
 // --------------------------------------------------------------------------
-void ctkCommandLineParser::endGroup()
+void mitkCommandLineParser::endGroup()
 {
     this->Internal->CurrentGroup.clear();
 }
 
 // --------------------------------------------------------------------------
-string ctkCommandLineParser::helpText() const
+string mitkCommandLineParser::helpText() const
 {
     string text;
     vector<CommandLineParserArgumentDescription*> deprecatedArgs;
@@ -742,13 +750,13 @@ string ctkCommandLineParser::helpText() const
 }
 
 // --------------------------------------------------------------------------
-bool ctkCommandLineParser::argumentAdded(const string& argument) const
+bool mitkCommandLineParser::argumentAdded(const string& argument) const
 {
     return this->Internal->ArgNameToArgumentDescriptionMap.count(argument);
 }
 
 // --------------------------------------------------------------------------
-bool ctkCommandLineParser::argumentParsed(const string& argument) const
+bool mitkCommandLineParser::argumentParsed(const string& argument) const
 {
     for (unsigned int i=0; i<Internal->ProcessedArguments.size(); i++)
         if (argument.compare(Internal->ProcessedArguments.at(i))==0)
@@ -757,19 +765,19 @@ bool ctkCommandLineParser::argumentParsed(const string& argument) const
 }
 
 // --------------------------------------------------------------------------
-void ctkCommandLineParser::setArgumentPrefix(const string& longPrefix, const string& shortPrefix)
+void mitkCommandLineParser::setArgumentPrefix(const string& longPrefix, const string& shortPrefix)
 {
     this->Internal->LongPrefix = longPrefix;
     this->Internal->ShortPrefix = shortPrefix;
 }
 
 // --------------------------------------------------------------------------
-void ctkCommandLineParser::setStrictModeEnabled(bool strictMode)
+void mitkCommandLineParser::setStrictModeEnabled(bool strictMode)
 {
     this->Internal->StrictMode = strictMode;
 }
 
-void ctkCommandLineParser::generateXmlOutput()
+void mitkCommandLineParser::generateXmlOutput()
 {
   std::stringstream xml;
 
@@ -788,33 +796,37 @@ void ctkCommandLineParser::generateXmlOutput()
     std::string type;
     switch ((*it)->ValueType)
     {
-      case ctkCommandLineParser::String:
+      case mitkCommandLineParser::String:
         type = "string";
         break;
 
-      case ctkCommandLineParser::Bool:
+      case mitkCommandLineParser::Bool:
         type = "boolean";
         break;
 
-      case ctkCommandLineParser::StringList:
+      case mitkCommandLineParser::StringList:
         type = "string-vector";
         break;
 
-      case ctkCommandLineParser::Int:
+      case mitkCommandLineParser::Int:
         type = "integer";
         break;
 
-      case ctkCommandLineParser::Float:
+      case mitkCommandLineParser::Float:
         type = "float";
         break;
 
-      case ctkCommandLineParser::OutputDirectory:
-      case ctkCommandLineParser::InputDirectory:
+      case mitkCommandLineParser::OutputDirectory:
+      case mitkCommandLineParser::InputDirectory:
         type = "directory";
         break;
 
-      case ctkCommandLineParser::OutputFile:
-      case ctkCommandLineParser::InputFile:
+      case mitkCommandLineParser::InputImage:
+        type = "image";
+        break;
+
+      case mitkCommandLineParser::OutputFile:
+      case mitkCommandLineParser::InputFile:
         type = "file";
         break;
     }
@@ -838,11 +850,11 @@ void ctkCommandLineParser::generateXmlOutput()
     xml << "<longflag>" << (*it)->LongArg << "</longflag>" << endl;
     xml << "<flag>" << (*it)->ShortArg << "</flag>" << endl;
 
-    if ((*it)->ValueType == ctkCommandLineParser::InputDirectory || (*it)->ValueType == ctkCommandLineParser::InputFile)
+    if ((*it)->ValueType == mitkCommandLineParser::InputDirectory || (*it)->ValueType == mitkCommandLineParser::InputFile || (*it)->ValueType == mitkCommandLineParser::InputImage)
     {
       xml << "<channel>input</channel>" << endl;
     }
-    else if ((*it)->ValueType == ctkCommandLineParser::OutputDirectory || (*it)->ValueType == ctkCommandLineParser::OutputFile)
+    else if ((*it)->ValueType == mitkCommandLineParser::OutputDirectory || (*it)->ValueType == mitkCommandLineParser::OutputFile)
     {
       xml << "<channel>output</channel>" << endl;
     }
@@ -855,26 +867,26 @@ void ctkCommandLineParser::generateXmlOutput()
   cout << xml.str();
 }
 
-void ctkCommandLineParser::setTitle(string title)
+void mitkCommandLineParser::setTitle(string title)
 {
   Title = title;
 }
-void ctkCommandLineParser::setContributor(string contributor)
+void mitkCommandLineParser::setContributor(string contributor)
 {
   Contributor = contributor;
 }
 
-void ctkCommandLineParser::setCategory(string category)
+void mitkCommandLineParser::setCategory(string category)
 {
   Category = category;
 }
 
-void ctkCommandLineParser::setDescription(string description)
+void mitkCommandLineParser::setDescription(string description)
 {
   Description = description;
 }
 
-void ctkCommandLineParser::changeParameterGroup(string name, string tooltip)
+void mitkCommandLineParser::changeParameterGroup(string name, string tooltip)
 {
   ParameterGroupName = name;
   ParameterGroupDescription = tooltip;

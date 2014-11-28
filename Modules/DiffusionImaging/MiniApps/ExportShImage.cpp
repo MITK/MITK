@@ -14,13 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 #include <metaCommand.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <usAny.h>
 #include <itkImageFileWriter.h>
 #include <itkImageFileReader.h>
@@ -35,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 template<int shOrder>
 int StartShConversion(int argc, char* argv[])
 {
-    ctkCommandLineParser parser;
+    mitkCommandLineParser parser;
 
     parser.setTitle("Export SH Image");
     parser.setCategory("Preprocessing Tools");
@@ -43,9 +42,9 @@ int StartShConversion(int argc, char* argv[])
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "MITK SH image", us::Any(), false);
-    parser.addArgument("output", "o", ctkCommandLineParser::InputFile, "Output", "MRtrix SH image", us::Any(), false);
-    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "SH order:", "spherical harmonics order");
+    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "MITK SH image", us::Any(), false);
+    parser.addArgument("output", "o", mitkCommandLineParser::InputFile, "Output", "MRtrix SH image", us::Any(), false);
+    parser.addArgument("shOrder", "sh", mitkCommandLineParser::Int, "SH order:", "spherical harmonics order");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -63,7 +62,7 @@ int StartShConversion(int argc, char* argv[])
         typename InputImageType::Pointer itkInImage = InputImageType::New();
         typedef itk::ImageFileReader< InputImageType > ReaderType;
         typename ReaderType::Pointer reader = ReaderType::New();
-        MITK_INFO << "reading " << inFile;
+        std::cout << "reading " << inFile;
         reader->SetFileName(inFile.c_str());
         reader->Update();
         itkInImage = reader->GetOutput();
@@ -82,30 +81,30 @@ int StartShConversion(int argc, char* argv[])
     }
     catch (itk::ExceptionObject e)
     {
-        MITK_INFO << e;
+        std::cout << e;
         return EXIT_FAILURE;
     }
     catch (std::exception e)
     {
-        MITK_INFO << e.what();
+        std::cout << e.what();
         return EXIT_FAILURE;
     }
     catch (...)
     {
-        MITK_INFO << "ERROR!?!";
+        std::cout << "ERROR!?!";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }
 
-int ExportShImage(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    MITK_INFO << "ExportShImage";
-    ctkCommandLineParser parser;
+
+    mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input image", "MITK SH image", us::Any(), false);
-    parser.addArgument("output", "o", ctkCommandLineParser::OutputFile, "Output image", "MRtrix SH image", us::Any(), false);
-    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order");
+    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input image", "MITK SH image", us::Any(), false);
+    parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output image", "MRtrix SH image", us::Any(), false);
+    parser.addArgument("shOrder", "sh", mitkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order");
 
     parser.setCategory("Preprocessing Tools");
     parser.setTitle("Export SH Image");
@@ -135,4 +134,3 @@ int ExportShImage(int argc, char* argv[])
     }
     return EXIT_FAILURE;
 }
-RegisterDiffusionMiniApp(ExportShImage);

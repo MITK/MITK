@@ -14,13 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 #include <metaCommand.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <usAny.h>
 #include <itkImageFileWriter.h>
 #include <mitkIOUtil.h>
@@ -32,10 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-int FiberDirectionExtraction(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    MITK_INFO << "FiberDirectionExtraction";
-    ctkCommandLineParser parser;
+    mitkCommandLineParser parser;
 
     parser.setTitle("Fiber Direction Extraction");
     parser.setCategory("Fiber Tracking and Processing Methods");
@@ -43,14 +41,14 @@ int FiberDirectionExtraction(int argc, char* argv[])
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask:", "mask image");
-    parser.addArgument("athresh", "a", ctkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
-    parser.addArgument("peakthresh", "t", ctkCommandLineParser::Float, "Peak size threshold:", "peak size threshold relative to largest peak in voxel", 0.2, true);
-    parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
-    parser.addArgument("numdirs", "d", ctkCommandLineParser::Int, "Max. num. directions:", "maximum number of fibers per voxel", 3, true);
-    parser.addArgument("normalize", "n", ctkCommandLineParser::Bool, "Normalize:", "normalize vectors");
+    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
+    parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
+    parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Mask:", "mask image");
+    parser.addArgument("athresh", "a", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
+    parser.addArgument("peakthresh", "t", mitkCommandLineParser::Float, "Peak size threshold:", "peak size threshold relative to largest peak in voxel", 0.2, true);
+    parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
+    parser.addArgument("numdirs", "d", mitkCommandLineParser::Int, "Max. num. directions:", "maximum number of fibers per voxel", 3, true);
+    parser.addArgument("normalize", "n", mitkCommandLineParser::Bool, "Normalize:", "normalize vectors");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -97,7 +95,7 @@ int FiberDirectionExtraction(int argc, char* argv[])
         ItkUcharImgType::Pointer itkMaskImage = NULL;
         if (maskImage.compare("")!=0)
         {
-            MITK_INFO << "Using mask image";
+            std::cout << "Using mask image";
             itkMaskImage = ItkUcharImgType::New();
             mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(maskImage)->GetData());
             mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMaskImage);
@@ -159,19 +157,18 @@ int FiberDirectionExtraction(int argc, char* argv[])
     }
     catch (itk::ExceptionObject e)
     {
-        MITK_INFO << e;
+        std::cout << e;
         return EXIT_FAILURE;
     }
     catch (std::exception e)
     {
-        MITK_INFO << e.what();
+        std::cout << e.what();
         return EXIT_FAILURE;
     }
     catch (...)
     {
-        MITK_INFO << "ERROR!?!";
+        std::cout << "ERROR!?!";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(FiberDirectionExtraction);

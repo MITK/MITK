@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include <mitkImageCast.h>
 #include <mitkDiffusionImage.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkFiberBundleX.h>
 #include <mitkFiberfoxParameters.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 
 #include <itkAddArtifactsToDwiImageFilter.h>
 #include <itkTractsToDWIImageFilter.h>
@@ -34,16 +33,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 /** TODO: Tarball aus images und parametern? */
 /** TODO: Artefakte auf bild in miniapp */
 
-namespace mitk
+using namespace mitk;
+
+int main(int argc, char* argv[])
 {
-int Fiberfox(int argc, char* argv[])
-{
-    MITK_INFO << "Fiberfox";
-    ctkCommandLineParser parser;
+    mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("out", "o", ctkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);
-    parser.addArgument("parameters", "p", ctkCommandLineParser::InputFile, "Parameter file:", "fiberfox parameter file", us::Any(), false);
-    parser.addArgument("fiberbundle", "f", ctkCommandLineParser::String, "Fiberbundle:", "", us::Any(), false);
+    parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);
+    parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameter file:", "fiberfox parameter file", us::Any(), false);
+    parser.addArgument("fiberbundle", "f", mitkCommandLineParser::String, "Fiberbundle:", "", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -77,5 +75,4 @@ int Fiberfox(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-}
-RegisterDiffusionMiniApp(Fiberfox);
+

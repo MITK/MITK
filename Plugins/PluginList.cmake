@@ -46,4 +46,5 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.eventrecorder:OFF
   org.mitk.gui.qt.xnat:OFF
+  org.mitk.gui.qt.rdftriplestore:OFF
 )

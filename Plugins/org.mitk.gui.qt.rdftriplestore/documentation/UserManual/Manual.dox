@@ -1,0 +1,18 @@
+/**
+\bundlemainpage{org.mitk.gui.qt.rdftriplestore} Rdftriplestore
+
+imageMacro{"icon.xpm","Icon of Rdftriplestore",2.00}
+
+Available sections:
+  - \ref org.mitk.gui.qt.rdftriplestoreOverview
+
+\section org.mitk.gui.qt.rdftriplestoreOverview
+Describe the features of your awesome plugin here
+<ul>
+<li>Increases productivity
+<li>Creates beautiful images
+<li>Generates PhD thesis
+<li>Brings world peace
+</ul>
+
+*/

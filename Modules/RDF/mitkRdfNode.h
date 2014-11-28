@@ -14,26 +14,46 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKRDFNODE_H
 #define MITKRDFNODE_H
 
 #include <MitkRDFExports.h>
 
+#include "MitkRdfUri.h"
+
+#include <stdio.h>
+#include <string>
+
 namespace mitk {
+  /**
+  * \ingroup MitkRDFModule
+  */
+  class MitkRDF_EXPORT RdfNode
+  {
+  public:
 
-/**
- * \ingroup MitkRDFModule
- */
-class MitkRDF_EXPORT RdfNode
-{
+    enum Type { Nothing, URI, Literal, Blank};
 
-public:
+    // Construct a empty Node
+    RdfNode();
 
-  bool dummy();
+    RdfNode(RdfUri uri);
 
-};
+    RdfNode(std::string text);
 
+    RdfNode(std::string text, RdfUri dataType);
+
+    virtual ~RdfNode();
+
+    Type type;
+    RdfUri datatype;
+    std::string value;
+
+    // dummy method for dummy test
+    bool dummy();
+  };
+
+  MitkRDF_EXPORT std::ostream & operator<<(std::ostream &out, const mitk::RdfNode &n);
 }
 
 #endif

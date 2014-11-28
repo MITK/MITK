@@ -37,10 +37,34 @@ mitk::AffineDataInteractor3D::AffineDataInteractor3D()
   m_ObjectNormal[0] = 0.0;
   m_ObjectNormal[1] = 0.0;
   m_ObjectNormal[2] = 1.0;
+
+  //define the colors for selected/deselected state
+  m_DataNode->AddProperty( "AffineDataInteractor3D.SelectedColor", ColorProperty::New(0.0,1.0,0.0) );
+  m_DataNode->AddProperty( "AffineDataInteractor3D.DeselectedColor", ColorProperty::New(0.0,0.0,1.0) );
+  //save the previous color of the node, in order to restore it after the interactor is destroyed
+  mitk::ColorProperty::Pointer priorColor = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
+  if ( priorColor.IsNotNull() )
+  {
+      mitk::ColorProperty::Pointer tmpCopyOfPriorColor = mitk::ColorProperty::New();
+      tmpCopyOfPriorColor->SetColor( priorColor->GetColor() );
+      m_DataNode->AddProperty( "AffineDataInteractor3D.PriorColor", tmpCopyOfPriorColor );
+  }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 mitk::AffineDataInteractor3D::~AffineDataInteractor3D()
 {
+  mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("AffineDataInteractor3D.PriorColor"));
+  if ( color.IsNotNull() )
+  {
+      m_DataNode->GetPropertyList()->SetProperty("color", color);
+  }
+
+  m_DataNode->GetPropertyList()->DeleteProperty("AffineDataInteractor3D.SelectedColor");
+  m_DataNode->GetPropertyList()->DeleteProperty("AffineDataInteractor3D.DeselectedColor");
+  m_DataNode->GetPropertyList()->DeleteProperty("AffineDataInteractor3D.PriorColor");
+  //update rendering
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::AffineDataInteractor3D::ConnectActionsAndFunctions()

@@ -69,6 +69,7 @@ set(H_FILES
   DataManagement/mitkMatrix.h
 
   Interactions/mitkEventMapperAddOn.h
+  Interactions/mitkInteractionConst.h
 
   Interfaces/mitkIDataNodeReader.h
   Interfaces/mitkIFileWriter.h

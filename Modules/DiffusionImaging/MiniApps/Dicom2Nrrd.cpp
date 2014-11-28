@@ -14,19 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#include "MiniAppManager.h"
-
 #include "mitkDicomSeriesReader.h"
 #include "mitkProperties.h"
-// CTK
-#include "ctkCommandLineParser.h"
+
+#include "mitkCommandLineParser.h"
 #include "mitkIOUtil.h"
 
 
-int DicomFolderDump(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-  ctkCommandLineParser parser;
+  mitkCommandLineParser parser;
 
   parser.setTitle("Dicom Loader");
   parser.setCategory("Preprocessing Tools");
@@ -35,14 +32,15 @@ int DicomFolderDump(int argc, char* argv[])
 
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
-  parser.addArgument("help", "h",ctkCommandLineParser::Bool, "Help:", "Show this help text");
-//  parser.addArgument("xml", "x",ctkCommandLineParser::Bool, "Print a XML description of this modules command line interface");
-  parser.addArgument("input", "i", ctkCommandLineParser::InputDirectory, "Input folder:", "Input folder",us::Any(),false);
-  parser.addArgument("output", "o", ctkCommandLineParser::OutputDirectory, "Output folder:", "Output folder (ending with /)",us::Any(),false);
-  parser.addArgument("filename", "f", ctkCommandLineParser::String, "Output name:", "Output filename (incl. .nrrd)",us::Any(),false);
+  parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
+  parser.addArgument("input", "i", mitkCommandLineParser::InputDirectory, "Input folder:", "Input folder",us::Any(),false);
+  parser.addArgument("output", "o", mitkCommandLineParser::OutputDirectory, "Output folder:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("filename", "f", mitkCommandLineParser::String, "Output name:", "Output filename (incl. .nrrd)",us::Any(),false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
+  if (parsedArgs.size()==0)
+      return EXIT_FAILURE;
 
   // Show a help message
   if ( parsedArgs.count("help") || parsedArgs.count("h"))
@@ -88,4 +86,3 @@ int DicomFolderDump(int argc, char* argv[])
   }
   return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(DicomFolderDump);

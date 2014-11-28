@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 #include <itkEvaluateDirectionImagesFilter.h>
 #include <metaCommand.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <itkTractsToVectorImageFilter.h>
 #include <usAny.h>
 #include <itkImageFileWriter.h>
@@ -33,17 +32,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-int PeaksAngularError(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    MITK_INFO << "PeaksAngularError";
-    ctkCommandLineParser parser;
+    mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("test", "t", ctkCommandLineParser::StringList, "Test images", "test direction images", us::Any(), false);
-    parser.addArgument("reference", "r", ctkCommandLineParser::StringList, "Reference images", "reference direction images", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask", "mask image");
-    parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "Verbose", "output optional and intermediate calculation results");
-    parser.addArgument("ignore", "i", ctkCommandLineParser::Bool, "Ignore", "don't increase error for missing or too many directions");
+    parser.addArgument("test", "t", mitkCommandLineParser::StringList, "Test images", "test direction images", us::Any(), false);
+    parser.addArgument("reference", "r", mitkCommandLineParser::StringList, "Reference images", "reference direction images", us::Any(), false);
+    parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
+    parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Mask", "mask image");
+    parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose", "output optional and intermediate calculation results");
+    parser.addArgument("ignore", "i", mitkCommandLineParser::Bool, "Ignore", "don't increase error for missing or too many directions");
 
     parser.setCategory("Preprocessing Tools");
     parser.setTitle("Peaks Angular Error");
@@ -54,8 +52,8 @@ int PeaksAngularError(int argc, char* argv[])
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    ctkCommandLineParser::StringContainerType testImages = us::any_cast<ctkCommandLineParser::StringContainerType>(parsedArgs["test"]);
-    ctkCommandLineParser::StringContainerType referenceImages = us::any_cast<ctkCommandLineParser::StringContainerType>(parsedArgs["reference"]);
+    mitkCommandLineParser::StringContainerType testImages = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["test"]);
+    mitkCommandLineParser::StringContainerType referenceImages = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["reference"]);
 
     string maskImage("");
     if (parsedArgs.count("mask"))
@@ -91,7 +89,7 @@ int PeaksAngularError(int argc, char* argv[])
                 ItkDirectionImage3DType::Pointer itkImg = caster->GetOutput();
                 directionImageContainer->InsertElement(directionImageContainer->Size(),itkImg);
             }
-            catch(...){ MITK_INFO << "could not load: " << referenceImages.at(i); }
+            catch(...){ std::cout << "could not load: " << referenceImages.at(i); }
         }
 
         // load reference directions
@@ -108,7 +106,7 @@ int PeaksAngularError(int argc, char* argv[])
                 ItkDirectionImage3DType::Pointer itkImg = caster->GetOutput();
                 referenceImageContainer->InsertElement(referenceImageContainer->Size(),itkImg);
             }
-            catch(...){ MITK_INFO << "could not load: " << referenceImages.at(i); }
+            catch(...){ std::cout << "could not load: " << referenceImages.at(i); }
         }
 
         // load/create mask image
@@ -190,19 +188,18 @@ int PeaksAngularError(int argc, char* argv[])
     }
     catch (itk::ExceptionObject e)
     {
-        MITK_INFO << e;
+        std::cout << e;
         return EXIT_FAILURE;
     }
     catch (std::exception e)
     {
-        MITK_INFO << e.what();
+        std::cout << e.what();
         return EXIT_FAILURE;
     }
     catch (...)
     {
-        MITK_INFO << "ERROR!?!";
+        std::cout << "ERROR!?!";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(PeaksAngularError);

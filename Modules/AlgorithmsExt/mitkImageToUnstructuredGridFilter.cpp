@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ImageToUnstructuredGridFilter::ImageToUnstructuredGridFilter():
 m_NumberOfExtractedPoints(0),
-m_Threshold(0.0)
+m_Threshold(-0.1)
 {
   this->m_UnstructGrid = mitk::UnstructuredGrid::New();
 }
@@ -46,6 +46,8 @@ void mitk::ImageToUnstructuredGridFilter::GenerateData()
   }
 
   m_Geometry = image->GetGeometry();
+
+  m_NumberOfExtractedPoints = 0;
 
   AccessByItk(image, ExtractPoints)
 }
@@ -102,9 +104,14 @@ void mitk::ImageToUnstructuredGridFilter::
   m_UnstructGrid->SetVtkUnstructuredGrid(vtkUnstructGrid);
 }
 
-void mitk::ImageToUnstructuredGridFilter::SetThreshold(int threshold)
+void mitk::ImageToUnstructuredGridFilter::SetThreshold(double threshold)
 {
   this->m_Threshold = threshold;
+}
+
+double mitk::ImageToUnstructuredGridFilter::GetThreshold()
+{
+  return this->m_Threshold;
 }
 
 

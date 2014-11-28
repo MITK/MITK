@@ -60,9 +60,11 @@ namespace mitk {
        * Set the threshold for extracting points. Every pixel, which value
        * is higher than this value, will be a point.
       */
-      void SetThreshold(int threshold);
+      void SetThreshold(double threshold);
 
-      itkGetMacro(Threshold, double)
+      /** Returns the threshold */
+      double GetThreshold();
+
       itkGetMacro(NumberOfExtractedPoints, int)
 
     protected:

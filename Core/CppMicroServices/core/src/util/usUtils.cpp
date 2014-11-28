@@ -64,7 +64,21 @@ std::string library_suffix()
 }
 #endif
 
-#ifdef US_PLATFORM_POSIX
+#ifdef US_PLATFORM_APPLE
+
+const char DIR_SEP = '/';
+
+bool load_impl(const std::string& modulePath)
+{
+  void* handle = dlopen(modulePath.c_str(), RTLD_NOW);
+  if (handle == NULL)
+  {
+    US_WARN << dlerror();
+  }
+  return (handle != NULL);
+}
+
+#elif defined(US_PLATFORM_POSIX)
 
 const char DIR_SEP = '/';
 

@@ -17,10 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkAffineDataInteractor3D_h_
 #define mitkAffineDataInteractor3D_h_
 
-#include "mitkBaseRenderer.h"
-#include "mitkDataInteractor.h"
+#include <mitkDataInteractor.h>
+#include <mitkGeometry3D.h>
 #include "MitkDataTypesExtExports.h"
-#include "mitkGeometry3D.h"
 
 namespace mitk
 {
@@ -38,6 +37,9 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
+  virtual void SetDataNode(NodeType node);
+  void TranslateGeometry(mitk::Vector3D translate);
+  void RotateGeometry(mitk::ScalarType angle, int rotationaxis);
 protected:
   AffineDataInteractor3D();
   virtual ~AffineDataInteractor3D();
@@ -51,26 +53,40 @@ protected:
     */
   virtual void DataNodeChanged();
 
+
   /**
     * Initializes the movement, stores starting position.
     */
-  virtual bool CheckOverObject (const InteractionEvent *);
+  virtual bool CheckOverObject (const InteractionEvent*);
   virtual bool SelectObject (StateMachineAction*, InteractionEvent*);
   virtual bool DeselectObject (StateMachineAction*, InteractionEvent*);
   virtual bool InitTranslate (StateMachineAction*, InteractionEvent*);
   virtual bool InitRotate (StateMachineAction*, InteractionEvent*);
   virtual bool TranslateObject (StateMachineAction*, InteractionEvent*);
   virtual bool RotateObject (StateMachineAction*, InteractionEvent*);
+  virtual bool TranslateUpKey(StateMachineAction*, InteractionEvent*);
+  virtual bool TranslateDownKey(StateMachineAction*, InteractionEvent*);
+  virtual bool TranslateLeftKey(StateMachineAction*, InteractionEvent*);
+  virtual bool TranslateRightKey(StateMachineAction*, InteractionEvent*);
+  virtual bool TranslateUpModifierKey(StateMachineAction*, InteractionEvent*);
+  virtual bool TranslateDownModifierKey(StateMachineAction*, InteractionEvent*);
+
+  virtual bool RotateUpKey(StateMachineAction*, InteractionEvent*);
+  virtual bool RotateDownKey(StateMachineAction*, InteractionEvent*);
+  virtual bool RotateLeftKey(StateMachineAction*, InteractionEvent*);
+  virtual bool RotateRightKey(StateMachineAction*, InteractionEvent*);
+  virtual bool RotateUpModifierKey(StateMachineAction*, InteractionEvent*);
+  virtual bool RotateDownModifierKey(StateMachineAction*, InteractionEvent*);
+
+  virtual bool ScaleGeometry(mitk::StateMachineAction *, mitk::InteractionEvent *);
+
+
+  virtual void RestoreNodeColor();
 
 private:
 
-  bool ColorizeSurface(BaseRenderer::Pointer renderer, double scalar = 0.0);
-
   double m_InitialPickedWorldPoint[4];
   Point2D m_InitialPickedDisplayPoint;
-
-  //Point3D m_CurrentPickedPoint;
-  //Point2D m_CurrentPickedDisplayPoint;
 
   Geometry3D::Pointer m_OriginalGeometry;
 

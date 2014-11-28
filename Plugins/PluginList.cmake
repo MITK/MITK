@@ -25,6 +25,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.dicom:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
   org.mitk.gui.qt.dtiatlasapp:OFF
+  org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.igtexamples:OFF
   org.mitk.gui.qt.igttracking:OFF
   org.mitk.gui.qt.imagecropper:OFF

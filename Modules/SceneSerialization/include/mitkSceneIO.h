@@ -57,6 +57,11 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
                                             DataStorage* storage = NULL,
                                             bool clearStorageFirst = false );
 
+    virtual DataStorage::Pointer LoadWorkspace( const std::string& filename,
+                                            DataStorage* storage = NULL,
+                                            bool clearStorageFirst = false );
+
+
     /**
      * \brief Save a scene of objects to file
      * \return True if complete success, false if any problem occurred. Note that a scene file might still be written if false is returned,

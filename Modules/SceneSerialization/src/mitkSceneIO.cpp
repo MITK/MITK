@@ -85,6 +85,57 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
   return returnValue;
 }
 
+mitk::DataStorage::Pointer mitk::SceneIO::LoadWorkspace( const std::string& workDir,
+                                                     DataStorage* pStorage,
+                                                     bool clearStorageFirst )
+{
+
+  // prepare data storage
+  DataStorage::Pointer storage = pStorage;
+  if ( storage.IsNull() )
+  {
+    storage = StandaloneDataStorage::New().GetPointer();
+  }
+
+  if ( clearStorageFirst )
+  {
+    try
+    {
+      storage->Remove( storage->GetAll() );
+    }
+    catch(...)
+    {
+      MITK_ERROR << "DataStorage cannot be cleared properly.";
+    }
+  }
+
+  // test input filename
+  if ( workDir.empty() )
+  {
+    MITK_ERROR << "No workDir given. Not possible to load scene.";
+    return storage;
+  }
+
+  // test if index.xml exists
+  // parse index.xml with TinyXML
+  TiXmlDocument document( workDir + Poco::Path::separator() + "index.xml" );
+  if (!document.LoadFile())
+  {
+    MITK_ERROR << "Could not open/read/parse " << workDir << "/index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    return storage;
+  }
+
+  SceneReader::Pointer reader = SceneReader::New();
+  if ( !reader->LoadScene( document, workDir, storage ) )
+  {
+    MITK_ERROR << "There were errors while loading scene file in " << workDir << ". Your data may be corrupted";
+  }
+
+  // return new data storage, even if empty or uncomplete (return as much as possible but notify calling method)
+  return storage;
+
+}
+
 mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename,
                                                     DataStorage* pStorage,
                                                     bool clearStorageFirst )

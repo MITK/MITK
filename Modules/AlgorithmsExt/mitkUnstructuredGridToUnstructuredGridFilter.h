@@ -37,9 +37,6 @@ namespace mitk {
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
-      /** This method is called by Update(). */
-      virtual void GenerateData();
-
       /** Initializes the output information */
       virtual void GenerateOutputInformation();
 

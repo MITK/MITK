@@ -32,19 +32,6 @@ mitk::UnstructuredGridToUnstructuredGridFilter::UnstructuredGridToUnstructuredGr
 
 mitk::UnstructuredGridToUnstructuredGridFilter::~UnstructuredGridToUnstructuredGridFilter(){}
 
-void mitk::UnstructuredGridToUnstructuredGridFilter::GenerateData()
-{
-  const mitk::UnstructuredGrid* grid = this->GetInput();
-
-  if(grid == NULL || !grid->IsInitialized())
-  {
-    MITK_ERROR << "Wrong input UnstructuredGrid set" << std::endl;
-    return;
-  }
-
-//  m_UnstructGrid = grid->Clone();
-}
-
 void mitk::UnstructuredGridToUnstructuredGridFilter::SetInput(const mitk::UnstructuredGrid* image)
 {
   this->ProcessObject::SetNthInput(0, const_cast< mitk::UnstructuredGrid* >( image ) );

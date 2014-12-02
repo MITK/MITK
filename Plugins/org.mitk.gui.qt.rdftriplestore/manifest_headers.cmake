@@ -1,4 +1,4 @@
-set(Plugin-Name "Rdftriplestore")
+set(Plugin-Name "RDF Triplestore Plugin")
 set(Plugin-Version "0.1")
 set(Plugin-Vendor "DKFZ, Medical and Biological Informatics")
 set(Plugin-ContactAddress "")

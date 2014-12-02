@@ -21,7 +21,7 @@ set(MOC_H_FILES
 # for example the icon used in the menu and tabs for the
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
-  resources/icon.xpm
+  resources/rdf_flyer.xpm
   plugin.xml
 )
 
@@ -31,7 +31,9 @@ set(QRC_FILES
 
 )
 
-set(CPP_FILES )
+set(CPP_FILES
+
+)
 
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})

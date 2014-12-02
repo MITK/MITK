@@ -2,10 +2,10 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.qmitkrdftriplestoreview"
-          name="QmitkRdfTriplestoreView"
-          class="QmitkRdfTriplestoreView"
-          icon="resources/icon.xpm" />
+    <view id="org.mitk.views.rdftriplestore"
+      name="RDF Triplestore"
+      class="QmitkRdfTriplestoreView"
+      icon="resources/rdf_flyer.xpm"/>
   </extension>
 
 </plugin>

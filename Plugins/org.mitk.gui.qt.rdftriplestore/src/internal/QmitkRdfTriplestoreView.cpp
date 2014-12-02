@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRdfNode.h>
 #include <mitkRdfUri.h>
 
-const std::string QmitkRdfTriplestoreView::VIEW_ID = "org.mitk.views.qmitkrdftriplestoreview";
+const std::string QmitkRdfTriplestoreView::VIEW_ID = "org.mitk.views.rdftriplestore";
 
 void QmitkRdfTriplestoreView::SetFocus()
 {

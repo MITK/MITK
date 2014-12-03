@@ -169,6 +169,28 @@ void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* trans
   PostSetIndexToWorldTransform(transform);
 }
 
+void mitk::BaseGeometry::SetIndexToWorldTransformWithoutChangingSpacing(mitk::AffineTransform3D* transform)
+{
+  //security check
+  mitk::Vector3D originalSpacing = this->GetSpacing();
+
+  mitk::ModifiedLock lock(this);
+
+  PreSetIndexToWorldTransform(transform);
+
+  m_GeometryTransform->SetIndexToWorldTransformWithoutChangingSpacing(transform);
+  Modified();
+
+  PostSetIndexToWorldTransform(transform);
+
+  //Security check. Spacig must not have changed
+  if(mitk::Equal(originalSpacing,this->GetSpacing()))
+  {
+    MITK_WARN << "Spacing has changed in a method, where the spacing must not change.";
+    assert(false);
+  }
+}
+
 const  mitk::BaseGeometry::BoundsArrayType  mitk::BaseGeometry::GetBounds() const
 {
   assert(m_BoundingBox.IsNotNull());
@@ -624,6 +646,11 @@ const std::string mitk::BaseGeometry::GetTransformAsString( TransformType* trans
 void mitk::BaseGeometry::SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix)
 {
   m_GeometryTransform->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
+}
+
+void mitk::BaseGeometry::SetIndexToWorldTransformByVtkMatrixWithoutChangingSpacing(vtkMatrix4x4* vtkmatrix)
+{
+  m_GeometryTransform->SetIndexToWorldTransformByVtkMatrixWithoutChangingSpacing(vtkmatrix);
 }
 
 void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D & /*atPt3d_mm*/, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const

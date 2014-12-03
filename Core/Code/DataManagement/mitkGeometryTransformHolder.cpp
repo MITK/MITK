@@ -186,13 +186,31 @@ namespace mitk {
     TransferVtkToItkTransform();
   }
 
+  //## @brief Set the transformation used to convert from index
+  //## to world coordinates.This function keeps the original spacing.
+  void GeometryTransformHolder::SetIndexToWorldTransformWithoutChangingSpacing(mitk::AffineTransform3D* transform){
+    mitk::Vector3D originalSpacing = this->GetSpacing();
+    this->SetIndexToWorldTransform(transform);
+    this->SetSpacing(originalSpacing);
+  }
+
+  //##Documentation
+  //## @brief Convenience method for setting the ITK transform
+  //## (m_IndexToWorldTransform) via an vtkMatrix4x4. This function keeps the original spacing.
+  //## \sa SetIndexToWorldTransform
+  void GeometryTransformHolder::SetIndexToWorldTransformByVtkMatrixWithoutChangingSpacing(vtkMatrix4x4* vtkmatrix){
+    mitk::Vector3D originalSpacing = this->GetSpacing();
+    this->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
+    this->SetSpacing(originalSpacing);
+  }
+
   //## Get the Vtk Matrix which describes the transform.
   vtkMatrix4x4* GeometryTransformHolder::GetVtkMatrix()
   {
     return m_VtkMatrix;
   }
 
-    //## Get the Vtk Matrix which describes the transform.
+  //## Get the Vtk Matrix which describes the transform.
   const vtkMatrix4x4* GeometryTransformHolder::GetVtkMatrix() const
   {
     return m_VtkMatrix;

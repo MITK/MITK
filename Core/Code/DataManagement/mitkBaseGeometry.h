@@ -103,9 +103,9 @@ namespace mitk {
     mitkClassMacro(BaseGeometry, itk::Object);
     itkCloneMacro(Self)
 
-    // ********************************** TypeDef **********************************
+      // ********************************** TypeDef **********************************
 
-    typedef GeometryTransformHolder::TransformType         TransformType;
+      typedef GeometryTransformHolder::TransformType         TransformType;
     typedef itk::BoundingBox<unsigned long, 3, ScalarType> BoundingBoxType;
     typedef BoundingBoxType::BoundsArrayType               BoundsArrayType;
     typedef BoundingBoxType::Pointer                       BoundingBoxPointer;
@@ -196,6 +196,16 @@ namespace mitk {
     //## the new transform is copied to m_spacing.
     //## \sa SetIndexToWorldTransform
     virtual void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
+
+    //## @brief Set the transformation used to convert from index
+    //## to world coordinates.This function keeps the original spacing.
+    void SetIndexToWorldTransformWithoutChangingSpacing(mitk::AffineTransform3D* transform);
+
+    //##Documentation
+    //## @brief Convenience method for setting the ITK transform
+    //## (m_IndexToWorldTransform) via an vtkMatrix4x4. This function keeps the original spacing.
+    //## \sa SetIndexToWorldTransform
+    void SetIndexToWorldTransformByVtkMatrixWithoutChangingSpacing(vtkMatrix4x4* vtkmatrix);
 
     //## Get the Vtk Matrix which describes the transform.
     vtkMatrix4x4* GetVtkMatrix();
@@ -557,8 +567,6 @@ namespace mitk {
     //## @brief Deprecated
     void BackTransform(const mitk::Point3D& at, const mitk::Vector3D& in, mitk::Vector3D& out) const;
 
-
-
     static const std::string GetTransformAsString( TransformType* transformType );
 
     itkGetConstMacro(NDimensions, unsigned int);
@@ -595,8 +603,6 @@ namespace mitk {
     //## @brief Bounding Box, which is axes-parallel in intrinsic coordinates
     //## (often integer indices of pixels)
     BoundingBoxPointer m_BoundingBox;
-
-
 
     unsigned int m_FrameOfReferenceID;
 

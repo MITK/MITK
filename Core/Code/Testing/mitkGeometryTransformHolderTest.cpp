@@ -51,6 +51,7 @@ class mitkGeometryTransformHolderTestSuite : public mitk::TestFixture
   //Set
   MITK_TEST(TestSetOrigin);
   MITK_TEST(TestSetIndexToWorldTransform);
+  MITK_TEST(TestSetIndexToWorldTransformWithoutChangingSpacing);
   MITK_TEST(TestSetSpacing);
   MITK_TEST(TestTransferItkToVtkTransform);
   MITK_TEST(TestSetIndexToWorldTransformByVtkMatrix);
@@ -209,13 +210,33 @@ public:
     CPPUNIT_ASSERT(mitk::Equal(dummyGeoHolder,dummyGeoHolder_Unchanged,mitk::eps,true));
   }
 
+  void TestSetIndexToWorldTransformWithoutChangingSpacing()
+  {
+    dummyGeoHolder->SetIndexToWorldTransformWithoutChangingSpacing(anotherTransform);
+    CPPUNIT_ASSERT(mitk::Equal(aSpacing,dummyGeoHolder->GetSpacing(),mitk::eps,true));
+
+    //calculate a new version of anotherTransform, so that the spacing should be the same as the original spacing of aTransform.
+    mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
+    vnlmatrix = anotherTransform->GetMatrix().GetVnlMatrix();
+
+    mitk::VnlVector col;
+    col = vnlmatrix.get_column(0); col.normalize(); col*=aSpacing[0]; vnlmatrix.set_column(0, col);
+    col = vnlmatrix.get_column(1); col.normalize(); col*=aSpacing[1]; vnlmatrix.set_column(1, col);
+    col = vnlmatrix.get_column(2); col.normalize(); col*=aSpacing[2]; vnlmatrix.set_column(2, col);
+
+    mitk::Matrix3D matrix;
+    matrix = vnlmatrix;
+    anotherTransform->SetMatrix(matrix);
+
+    CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummyGeoHolder->GetIndexToWorldTransform(),mitk::eps,true));
+  }
+
   void TestSetIndexToWorldTransformByVtkMatrix()
   {
     dummyGeoHolder->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
     CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummyGeoHolder->GetIndexToWorldTransform(),mitk::eps,true));
     // spacing has to change if index to world transform was changed to a matrix with different spacing
     CPPUNIT_ASSERT(!mitk::Equal(dummyGeoHolder->GetIndexToWorldTransform(), dummyGeoHolder_Unchanged->GetIndexToWorldTransform(), mitk::eps, true));
-
 
     //test needs to fail now
     vtkmatrix->SetElement(1,1,7);

@@ -75,4 +75,10 @@ void OpenIGTLinkManager::SourceSelected(
   }
 
   this->m_Controls.m_SourceManagerWidget->LoadSource(source);
+
+  //check if the current selected source is also a message provider
+  mitk::IGTLMessageProvider::Pointer msgProvider =
+      mitk::IGTLMessageProvider::New();
+  msgProvider = dynamic_cast<mitk::IGTLMessageProvider*>(source.GetPointer());
+  this->m_Controls.m_StreamManagerWidget->LoadSource(msgProvider);
 }

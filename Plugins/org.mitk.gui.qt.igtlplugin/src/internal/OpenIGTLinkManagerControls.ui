@@ -54,6 +54,23 @@
    <item>
     <widget class="QmitkIGTLDeviceSourceManagementWidget" name="m_SourceManagerWidget" native="true"/>
    </item>
+   <item>
+    <widget class="QLabel" name="label_3">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Mange Streams:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkIGTLStreamingManagementWidget" name="m_StreamManagerWidget" native="true"/>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -67,6 +84,12 @@
    <class>QmitkIGTLDeviceSourceManagementWidget</class>
    <extends>QWidget</extends>
    <header>QmitkIGTLDeviceSourceManagementWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkIGTLStreamingManagementWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkIGTLStreamingManagementWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

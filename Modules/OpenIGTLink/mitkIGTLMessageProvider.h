@@ -64,6 +64,17 @@ namespace mitk {
     */
     void Send(const IGTLMessage* msg);
 
+    /**
+    * \brief Starts the streaming of the given message source with the given fps.
+    */
+    void StartStreamingOfSource(mitk::IGTLMessageSource* src,
+                                unsigned int fps);
+
+    /**
+    * \brief Stops the streaming of the given message source.
+    */
+    void StopStreamingOfSource(mitk::IGTLMessageSource* src);
+
   protected:
     IGTLMessageProvider();
     virtual ~IGTLMessageProvider();

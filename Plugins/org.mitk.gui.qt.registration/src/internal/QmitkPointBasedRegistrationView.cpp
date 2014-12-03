@@ -151,7 +151,8 @@ struct SelListenerPointBasedRegistration : ISelectionListener
                     }
                     else
                     {
-                      m_View->SetImagesVisible(selection);
+                      // method deleted for more information see bug-18492
+                      // m_View->SetImagesVisible(selection);
                       m_View->FixedSelected(fixedNode);
                       m_View->MovingSelected(node);
                       m_View->m_Controls.m_StatusLabel->hide();
@@ -1316,36 +1317,6 @@ void QmitkPointBasedRegistrationView::calculate()
   else
   {
     this->calculateLandmarkWarping();
-  }
-}
-
-void QmitkPointBasedRegistrationView::SetImagesVisible(berry::ISelection::ConstPointer /*selection*/)
-{
-  if (this->m_CurrentSelection->Size() == 0)
-  {
-    // show all images
-    mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
-    for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
-      ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
-    {
-      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::PlaneGeometryData*>(nodeIt->Value()->GetData())==NULL)
-      {
-        nodeIt->Value()->SetVisibility(true);
-      }
-    }
-  }
-  else
-  {
-    // hide all images
-    mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
-    for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
-      ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
-    {
-      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::PlaneGeometryData*>(nodeIt->Value()->GetData())==NULL)
-      {
-        nodeIt->Value()->SetVisibility(false);
-      }
-    }
   }
 }
 

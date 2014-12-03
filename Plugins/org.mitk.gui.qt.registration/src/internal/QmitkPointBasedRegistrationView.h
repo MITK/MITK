@@ -246,8 +246,6 @@ public:
     */
     void calculate();
 
-    void SetImagesVisible(berry::ISelection::ConstPointer /*selection*/);
-
     void SwitchImages();
 
 protected:

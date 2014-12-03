@@ -184,7 +184,7 @@ void mitk::BaseGeometry::SetIndexToWorldTransformWithoutChangingSpacing(mitk::Af
   PostSetIndexToWorldTransform(transform);
 
   //Security check. Spacig must not have changed
-  if(mitk::Equal(originalSpacing,this->GetSpacing()))
+  if(!mitk::Equal(originalSpacing,this->GetSpacing()))
   {
     MITK_WARN << "Spacing has changed in a method, where the spacing must not change.";
     assert(false);

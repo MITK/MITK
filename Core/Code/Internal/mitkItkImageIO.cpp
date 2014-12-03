@@ -28,7 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageIORegion.h>
 #include <itkMetaDataObject.h>
 
-#include <clocale>
+#include <mitkLocaleSwitch.h>
+
 
 namespace mitk {
 
@@ -336,39 +337,6 @@ void ItkImageIO::Write()
     mitkThrow() << "Cannot write non-image data";
   }
 
-  struct LocaleSwitch
-  {
-    LocaleSwitch(const std::string& newLocale)
-      : m_OldLocale(std::setlocale(LC_ALL, NULL))
-      , m_NewLocale(newLocale)
-    {
-      if (m_OldLocale == NULL)
-      {
-        m_OldLocale = "";
-      }
-      else if (m_NewLocale != m_OldLocale)
-      {
-        // set the locale
-        if (std::setlocale(LC_ALL, m_NewLocale.c_str()) == NULL)
-        {
-          MITK_INFO << "Could not set locale " << m_NewLocale;
-          m_OldLocale = NULL;
-        }
-      }
-    }
-
-    ~LocaleSwitch()
-    {
-      if (m_OldLocale != NULL && std::setlocale(LC_ALL, m_OldLocale) == NULL)
-      {
-        MITK_INFO << "Could not reset locale " << m_OldLocale;
-      }
-    }
-
-  private:
-    const char* m_OldLocale;
-    const std::string m_NewLocale;
-  };
 
   // Switch the current locale to "C"
   LocaleSwitch localeSwitch("C");

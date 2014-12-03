@@ -115,7 +115,7 @@ void mitk::PlanarArrow::SetArrowTipScaleFactor( float scale )
   m_ArrowTipScaleFactor = scale;
 }
 
-bool mitk::PlanarArrow::Equals(mitk::PlanarFigure& other)
+bool mitk::PlanarArrow::Equals(const mitk::PlanarFigure& other)
 {
   mitk::PlanarArrow* otherArrow = dynamic_cast<mitk::PlanarArrow*>(&other);
   if ( otherArrow )

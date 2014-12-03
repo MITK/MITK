@@ -2313,8 +2313,7 @@ void QmitkFiberfoxView::CopyBundles()
                 mitk::DataNode::Pointer fiducialNode = *it2;
                 if ( fiducialNode.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData()) )
                 {
-                    mitk::PlanarEllipse::Pointer pe = mitk::PlanarEllipse::New();
-                    pe->DeepCopy(dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData()));
+                    mitk::PlanarEllipse::Pointer pe = dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData())->Clone();
                     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
                     newNode->SetData(pe);
                     newNode->SetName(fiducialNode->GetName());

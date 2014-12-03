@@ -57,8 +57,8 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
                                                             mitk::PlanarFigure *startRoi,
                                                             mitk::PlanarFigure *endRoi)
 {
-    mitk::PlaneGeometry* startGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(startRoi->GetGeometry2D()) );
-    mitk::PlaneGeometry* endGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(endRoi->GetGeometry2D()) );
+    mitk::PlaneGeometry* startGeometry2D = const_cast<mitk::PlaneGeometry*>(startRoi->GetPlaneGeometry());
+    mitk::PlaneGeometry* endGeometry2D = const_cast<mitk::PlaneGeometry*>(endRoi->GetPlaneGeometry());
 
 
     mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi

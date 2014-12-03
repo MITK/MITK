@@ -442,7 +442,7 @@ void QmitkFiberExtractionView::InternalCalculateMaskFromPlanarFigure( itk::Image
     // (The polyline points are shifted by -0.5 in z-direction to make sure
     // that the extrusion filter, which afterwards elevates all points by +0.5
     // in z-direction, creates a 3D object which is cut by the the plane z=0)
-    const Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
+    const PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
     const PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
     const BaseGeometry *imageGeometry3D = m_InternalImage->GetGeometry( 0 );
 
@@ -478,12 +478,12 @@ void QmitkFiberExtractionView::InternalCalculateMaskFromPlanarFigure( itk::Image
         Point3D point3D;
 
         // Convert 2D point back to the local index coordinates of the selected image
-        Point2D point2D = it->Point;
-        planarFigureGeometry2D->WorldToIndex(point2D, point2D);
+        Point2D point2D = *it;
+        planarFigurePlaneGeometry->WorldToIndex(point2D, point2D);
         point2D[0] -= 0.5/m_UpsamplingFactor;
         point2D[1] -= 0.5/m_UpsamplingFactor;
-        planarFigureGeometry2D->IndexToWorld(point2D, point2D);
-        planarFigureGeometry2D->Map( point2D, point3D );
+        planarFigurePlaneGeometry->IndexToWorld(point2D, point2D);
+        planarFigurePlaneGeometry->Map( point2D, point3D );
 
         // Polygons (partially) outside of the image bounds can not be processed further due to a bug in vtkPolyDataToImageStencil
         if ( !imageGeometry3D->IsInside( point3D ) )
@@ -864,7 +864,7 @@ void QmitkFiberExtractionView::AddFigureToDataStorage(mitk::PlanarFigure* figure
 {
     // initialize figure's geometry with empty geometry
     mitk::PlaneGeometry::Pointer emptygeometry = mitk::PlaneGeometry::New();
-    figure->SetGeometry2D( emptygeometry );
+    figure->SetPlaneGeometry( emptygeometry );
 
     //set desired data to DataNode where Planarfigure is stored
     mitk::DataNode::Pointer newNode = mitk::DataNode::New();

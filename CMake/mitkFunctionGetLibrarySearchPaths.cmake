@@ -49,7 +49,6 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
   # the structure of the build directories, pointed to by
   # the *_DIR variables. Instead, we should rely on package
   # specific "LIBRARY_DIRS" variables, if they exist.
-
   if(WIN32)
     if(DCMTK_DIR)
       list(APPEND _dir_candidates "${DCMTK_DIR}/bin")
@@ -65,6 +64,9 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     endif()
     if(SimpleITK_DIR)
       list(APPEND _dir_candidates "${SimpleITK_DIR}/bin")
+    endif()
+    if(REDLAND_INSTALL_DIR)
+      list(APPEND _dir_candidates "${REDLAND_INSTALL_DIR}/bin")
     endif()
     list(APPEND _dir_candidates "${ITK_DIR}/bin")
   else()

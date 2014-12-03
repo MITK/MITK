@@ -14,10 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 
-// CTK
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 
 #include <mitkIOUtil.h>
 #include <mitkRegistrationWrapper.h>
@@ -172,7 +170,7 @@ static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing
 /// Save images according to file type
 static void SaveImage(std::string fileName, mitk::Image* image, std::string fileType )
 {
-  MITK_INFO << "----Save to " << fileName;
+  std::cout << "----Save to " << fileName;
 
   if (fileType == "dwi") // IOUtil does not handle dwi files properly Bug 15772
   {
@@ -217,23 +215,23 @@ DiffusionImageType::Pointer ResampleDWIbySpacing(DiffusionImageType::Pointer inp
   return output;
 }
 
-int ImageResampler( int argc, char* argv[] )
+int main( int argc, char* argv[] )
 {
-  ctkCommandLineParser parser;
+  mitkCommandLineParser parser;
   parser.setArgumentPrefix("--","-");
 
   parser.setTitle("Image Resampler");
   parser.setCategory("Preprocessing Tools");
   parser.setContributor("MBI");
-  parser.setDescription("");
+  parser.setDescription("Resample an image to eigther a specific spacing or to a reference image.");
 
   // Add command line argument names
-  parser.addArgument("help", "h",ctkCommandLineParser::Bool, "Show this help text");
-  parser.addArgument("input", "i", ctkCommandLineParser::String, "Input:", "Input file",us::Any(),false);
-  parser.addArgument("output", "o", ctkCommandLineParser::String, "Output:", "Output folder (ending with /)",us::Any(),false);
-  parser.addArgument("spacing", "s", ctkCommandLineParser::String, "Spacing:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
-  parser.addArgument("reference", "r", ctkCommandLineParser::String, "Reference:", "Resample using supplied reference image. Also cuts image to same dimensions");
-  parser.addArgument("sinc-int", "s", ctkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
+  parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Show this help text");
+  parser.addArgument("input", "i", mitkCommandLineParser::InputImage, "Input:", "Input file",us::Any(),false);
+  parser.addArgument("output", "o", mitkCommandLineParser::OutputDirectory, "Output:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("spacing", "s", mitkCommandLineParser::String, "Spacing:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
+  parser.addArgument("reference", "r", mitkCommandLineParser::String, "Reference:", "Resample using supplied reference image. Also cuts image to same dimensions",us::Any());
+  parser.addArgument("win-sinc", "w", mitkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
 
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -244,14 +242,7 @@ int ImageResampler( int argc, char* argv[] )
   {
     if (parsedArgs.size() == 0)
     {
-      MITK_ERROR << "Missig arguements" ;
       return EXIT_FAILURE;
-    }
-
-    if (parsedArgs.count("xml"))
-    {
-      MITK_ERROR << "This is to be handled by shell script";
-      return EXIT_SUCCESS;
     }
 
     if (parsedArgs.count("sinc-int"))
@@ -333,5 +324,3 @@ int ImageResampler( int argc, char* argv[] )
 
   return EXIT_SUCCESS;
 }
-
-RegisterDiffusionMiniApp(ImageResampler);

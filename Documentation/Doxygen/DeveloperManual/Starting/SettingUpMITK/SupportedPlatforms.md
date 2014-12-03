@@ -28,8 +28,7 @@ Errors or bugs discovered in these platforms are prioritized and corrected as so
 | ----------------------------------- | -----------------------------
 | Ubuntu Linux 12.04 (64-bit)         | gcc as provided by Ubuntu
 | Microsoft Windows 7 (64-bit)        | MSVC 2010 Professional SP1 (x64)
-| Apple Mac OS X 10.7 "Lion"          | LLVM-GCC as provided by Apple
-| Apple OS X 10.8 "Mountain Lion"     | LLVM-GCC as provided by Apple
+| Apple OS X 10.9 "Mavericks"         | LLVM-Clang 6.0 as provided by Apple (XCode)
 
 
 Tier 2 Platforms
@@ -45,7 +44,7 @@ as well as in the current master branch.
 | Fedora 20 (64-bit)                 | gcc as provided by Fedora
 | Fedora 20 (64-bit)                 | Clang as provided by Fedora
 | Microsoft Windows 7 (32-bit)       | MSVC 2012 Express (x64)
-| Apple OS X 10.9 "Mavericks"        | Clang as provided by Apple (XCode)
+| Apple OS X 10.7 "Lion"             | LLVM-Clang as provided by Apple (XCode)
 
 
 All platforms not listed above are not officially supported by the MITK team. However, we will happily accept

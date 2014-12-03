@@ -1,0 +1,71 @@
+/**
+\page org_mitk_gui_qt_remeshing The Remeshing Plugin
+
+\imageMacro{QmitkRemeshing_Icon.png,"Icon of the Remeshing Plugin.",2.00}
+
+\tableofcontents
+
+\section org_mitk_gui_qt_remeshingOverview Overview
+
+The Remeshing View allows you to remesh surfaces.
+If done right, remeshing can dramatically increase the quality of your surface mesh.
+However, you might lose precision if you reduce your surface mesh too strong.
+Even when you keep the detail of your mesh there might be a tiny distance between your original surface and the remeshed surface.
+Hence, be careful when using remeshed surfaces for evaluation purposes and always keep the original versions.
+
+\section org_mitk_gui_qt_remeshingUsage Usage
+
+\imageMacro{QmitkRemeshing_RemeshingView.png,"Basic and advanced mode of the Remeshing View.",13.29}
+
+There are two basic and about a handful of advanced settings that influence remeshing.
+Most of the time you should be able to gain satisfying results by adjusting only the two basic settings or even without changing any of the default parameters.
+In the following the effects of all settings are described in more detail. Image examples are based on the following surface:
+
+\imageMacro{QmitkRemeshing_OriginalMesh.png,"The surface from which all examples below originate from.",10.08}
+
+\subsection org_mitk_gui_qt_remeshingBasicSettings Basic Settings
+
+The <b>Vertices</b> setting is the number of vertices the remeshed surface will consist of.
+This is exact as long as <b>Boundary fixing</b> is turned off (default).
+The maximum number of vertices is limited to the number of vertices of the input surface, however, you can increase this limit by adjusting the <b>Max. # of vertices</b> setting.
+
+The <b>Gradation</b> setting controls the distribution of vertices in the remeshed surface.
+If set to zero the vertices are distributed equally all over the remeshed surface.
+You can push more vertices towards surface regions with high curvature, i.e., more detailed regions, by increasing this setting.
+
+\imageMacro{QmitkRemeshing_Gradation10Percent.png,"Vertex count reduced to 10 percent\, gradation 0 vs. 1.",16.00}
+
+\subsection org_mitk_gui_qt_remeshingAdvancedSettings Advanced Settings
+
+You can arbirarily increase the maximum adjustable number of vertices by changing the <b>Max. # of vertices</b> setting.
+
+<b>Edge splitting</b> is disabled by default and might take a long time during remeshing when enabled.
+This setting represents a number by which the average edge length of the input surface is multiplied to serve as a threshold which regulates edge splitting.
+Long edges are split recursively until all edges satisfy the threshold.
+Edge splitting is useful for surfaces that contain thin and long polygons.
+
+\imageMacro{QmitkRemeshing_Cylinder.png,"A surface that contains extremely long polygons.",16.00}
+
+<br>
+
+\imageMacro{QmitkRemeshing_CylinderBad.png,"A remeshing attempt without edge splitting.",16.00}
+
+<br>
+
+\imageMacro{QmitkRemeshing_CylinderGood.png,"Increased max. # of vertices\, enabled edge splitting\, followed by a second remeshing run without edge splitting.",16.00}
+
+The <b>Subsampling</b> setting has direct impact on the quality of the remeshed surface.
+The input surface is recursively subdivided until the total number of vertices exceeds its initial vertex count times this setting.
+
+\imageMacro{QmitkRemeshing_Subsampling20Percent.png,"Vertex count reduced to 20 percent\, subsampling 10 vs. 500.",16.00}
+
+You usually leave the <b>Optimization level</b> set to its default value 1.
+When disabled, the remeshed surface has usually a slightly smaller volume than the original surface.
+The optimization process minimizes the distance between the two surfaces but values higher than 1 introduce degenerated triangles to the remeshed surface.
+
+If your surface is open, i.e., it has holes in it, boundaries tend to shrink irregularly during remeshing.
+If the position and smoothness of your surface boundaries are important, you should activate the <b>Boundary fixing</b> setting.
+This results in additional vertices that make up extra polygons at the remeshed boundaries to keep the original boundaries.
+
+\imageMacro{QmitkRemeshing_NoBoundaryFixing10Percent.png,"Vertex count reduced to 10 percent\, no boundary fixing.",10.08}
+*/

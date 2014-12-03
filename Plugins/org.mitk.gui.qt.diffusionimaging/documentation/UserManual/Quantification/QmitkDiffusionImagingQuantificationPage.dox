@@ -1,8 +1,8 @@
 /**
 
-\page QmitkDiffusionImagingQuantificationPage Quantification
+\page org_mitk_views_diffusionquantification Scalar Indices
 
-The quantification view allows the derivation of different scalar anisotropy measures for the reconstructed tensors (Fractional Anisotropy, Relative Anisotropy, Axial Diffusivity, Radial Diffusivity) or q-balls (Generalized Fractional Anisotropy).
+The scalar indices view allows the derivation of different scalar anisotropy measures for the reconstructed tensors (Fractional Anisotropy, Relative Anisotropy, Axial Diffusivity, Radial Diffusivity) or q-balls (Generalized Fractional Anisotropy).
 
-\imageMacro{quantification.png,"Anisotropy quantification",2}
+\imageMacro{ScalarIndicesGUI.png,"Anisotropy quantification",2}
 */

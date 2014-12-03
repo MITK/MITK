@@ -224,7 +224,7 @@
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <widget class="QxtSpanSlider" name="m_RangeSlider">
+          <widget class="ctkRangeSlider" name="m_RangeSlider">
            <property name="toolTip">
             <string>modify actual seen window by dragging left and right slider. </string>
            </property>
@@ -428,9 +428,9 @@ Double-click left mouse button to change color of a point.</string>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QxtSpanSlider</class>
-   <extends>QSlider</extends>
-   <header location="global">qxtspanslider.h</header>
+   <class>ctkRangeSlider</class>
+   <extends>QWidget</extends>
+   <header location="global">ctkRangeSlider.h</header>
   </customwidget>
   <customwidget>
    <class>QmitkColorTransferFunctionCanvas</class>

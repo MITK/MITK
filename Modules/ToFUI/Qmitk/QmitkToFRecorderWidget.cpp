@@ -18,12 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToFRecorderWidget.h"
 
 //QT headers
-#include <qmessagebox.h>
+#include <QMessageBox>
 #include <QComboBox>
 #include <QLabel>
 #include <QLayout>
 #include <QGridLayout>
 #include <QCheckBox>
+#include <QFileDialog>
 
 //mitk headers
 #include <mitkToFImageWriter.h>
@@ -361,7 +362,7 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
   {
     if (selectedFilter)
     {
-      *selectedFilter = fileDialog->selectedFilter();
+      *selectedFilter = fileDialog->selectedNameFilter();
     }
 
     if (combo->currentIndex() == 0)

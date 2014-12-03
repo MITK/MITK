@@ -45,6 +45,7 @@ ctkPluginContext* org_mitk_example_gui_customviewer_Activator::GetPluginContext(
   return PluginContext;
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_example_gui_customviewer, org_mitk_example_gui_customviewer_Activator)
-
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_example_gui_customviewer, org_mitk_example_gui_customviewer_Activator)
+#endif
 

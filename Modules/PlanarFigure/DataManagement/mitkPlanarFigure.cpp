@@ -22,54 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <algorithm>
 
-#ifdef __GNUC__
-#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#elif __clang__
-#  pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif _MSC_VER
-#  pragma warning (push)
-#  pragma warning (disable: 4996)
-#endif
-
-mitk::PlanarFigure::PolyLineElement::PolyLineElement(Point2D point, int index)
-  : Point(point),
-    Index(index)
-{
-}
-
-mitk::PlanarFigure::PolyLineElement::PolyLineElement(const Point2D& point)
-  : Point(point),
-    Index(-1)
-{
-}
-
-mitk::PlanarFigure::PolyLineElement::PolyLineElement(const PolyLineElement &other)
-  : Point(other.Point),
-    Index(other.Index)
-{
-}
-
-mitk::PlanarFigure::PolyLineElement& mitk::PlanarFigure::PolyLineElement::operator=(const PolyLineElement &other)
-{
-  if (this != &other)
-  {
-    Point = other.Point;
-    Index = other.Index;
-  }
-
-  return *this;
-}
-
-mitk::PlanarFigure::PolyLineElement::operator mitk::Point2D&()
-{
-  return Point;
-}
-
-mitk::PlanarFigure::PolyLineElement::operator const mitk::Point2D&() const
-{
-  return Point;
-}
-
 mitk::PlanarFigure::PlanarFigure()
 : m_SelectedControlPoint( -1 ),
   m_PreviewControlPointVisible( false ),
@@ -692,43 +644,6 @@ void mitk::PlanarFigure::RemoveLastControlPoint()
   RemoveControlPoint( m_ControlPoints.size()-1 );
 }
 
-void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
-{
-  //DeepCopy only same types of planar figures
-  //Notice to get typeid polymorph you have to use the *operator
-  if(typeid(*oldFigure) != typeid(*this))
-  {
-    itkExceptionMacro( << "DeepCopy(): Inconsistent type of source (" << typeid(*oldFigure).name() << ") and destination figure (" << typeid(*this).name() << ")!" );
-    return;
-  }
-
-  m_ControlPoints.clear();
-  this->ClearPolyLines();
-  this->ClearHelperPolyLines();
-
-  // clone base data members
-  SetPropertyList(oldFigure->GetPropertyList()->Clone());
-
-  /// deep copy members
-  m_FigurePlaced                = oldFigure->m_FigurePlaced;
-  m_SelectedControlPoint        = oldFigure->m_SelectedControlPoint;
-  m_FeaturesMTime               = oldFigure->m_FeaturesMTime;
-  m_Features                    = oldFigure->m_Features;
-  m_NumberOfControlPoints       = oldFigure->m_NumberOfControlPoints;
-
-  //copy geometry 2D of planar figure
-  PlaneGeometry::Pointer affineGeometry = oldFigure->m_PlaneGeometry->Clone();
-  SetPlaneGeometry(affineGeometry.GetPointer());
-
-  for(unsigned long index=0; index < oldFigure->GetNumberOfControlPoints(); index++)
-  {
-    m_ControlPoints.push_back( oldFigure->GetControlPoint( index ));
-  }
-
-  //After setting the control points we can generate the polylines
-  this->GeneratePolyLine();
-}
-
 void mitk::PlanarFigure::SetNumberOfPolyLines( unsigned int numberOfPolyLines )
 {
   m_PolyLines.resize(numberOfPolyLines);
@@ -743,9 +658,6 @@ void mitk::PlanarFigure::AppendPointToPolyLine( unsigned int index, PolyLineElem
 {
   if ( index < m_PolyLines.size() )
   {
-    if(element.Index == -1)
-      element.Index = m_PolyLines[index].size();
-
     m_PolyLines[index].push_back(element);
     m_PolyLineUpToDate = false;
   }
@@ -759,9 +671,6 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
 {
   if ( index < m_HelperPolyLines.size() )
   {
-    if(element.Index == -1)
-      element.Index = m_HelperPolyLines[index].size();
-
     m_HelperPolyLines[index].push_back(element);
     m_HelperLinesUpToDate = false;
   }
@@ -770,14 +679,6 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
     MITK_ERROR << "Tried to add point to HelperPolyLine " << index+1 << ", although only " << m_HelperPolyLines.size() << " exists";
   }
 }
-
-#ifdef __GNUC__
-#  pragma GCC diagnostic error "-Wdeprecated-declarations"
-#elif __clang__
-#  pragma clang diagnostic error "-Wdeprecated-declarations"
-#elif _MSC_VER
-#  pragma warning (pop)
-#endif
 
 bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
 {

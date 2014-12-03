@@ -1,39 +1,50 @@
 set(SRC_CPP_FILES
-
 )
 
 set(INTERNAL_CPP_FILES
-  QmitkMovieMaker.cpp
+  QmitkAnimationItem.cpp
+  QmitkAnimationItemDelegate.cpp
+  QmitkAnimationWidget.cpp
+  QmitkFFmpegWriter.cpp
+  QmitkMovieMakerView.cpp
+  QmitkOrbitAnimationItem.cpp
+  QmitkOrbitAnimationWidget.cpp
+  QmitkSliceAnimationItem.cpp
+  QmitkSliceAnimationWidget.cpp
+  QmitkTimeSliceAnimationItem.cpp
+  QmitkTimeSliceAnimationWidget.cpp
   mitkMovieMakerPluginActivator.cpp
   QmitkScreenshotMaker.cpp
-
 )
 
 set(UI_FILES
-  src/internal/QmitkMovieMakerControls.ui
+  src/internal/QmitkMovieMakerView.ui
+  src/internal/QmitkOrbitAnimationWidget.ui
+  src/internal/QmitkSliceAnimationWidget.ui
+  src/internal/QmitkTimeSliceAnimationWidget.ui
   src/internal/QmitkScreenshotMakerControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkMovieMakerPluginActivator.h
-  src/internal/QmitkMovieMaker.h
+  src/internal/QmitkAnimationItemDelegate.h
+  src/internal/QmitkAnimationWidget.h
+  src/internal/QmitkFFmpegWriter.h
+  src/internal/QmitkMovieMakerView.h
+  src/internal/QmitkOrbitAnimationWidget.h
+  src/internal/QmitkSliceAnimationWidget.h
+  src/internal/QmitkTimeSliceAnimationWidget.h
   src/internal/QmitkScreenshotMaker.h
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/icon.xpm
-  plugin.xml
- resources/play.xpm
- resources/stop.xpm
- resources/pause.xpm
+  resources/camera-video.png
   resources/screenshot_maker.png
+  plugin.xml
 )
 
-set(RES_FILES
+set(QRC_FILES
  resources/QmitkMovieMaker.qrc
- resources/play.xpm
- resources/stop.xpm
- resources/pause.xpm
 )
 
 foreach(file ${SRC_CPP_FILES})

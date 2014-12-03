@@ -221,14 +221,14 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
           //write back to image volume
           SliceInformation sliceInfo (workingSlice, itWorkingContours->second, currentTimestep);
           sliceList.push_back(sliceInfo);
+          this->WriteSliceToVolume(sliceInfo);
         }
       }
     }
-
     ++itWorkingContours;
   }
 
-  this->WriteBackSegmentationResult(sliceList);
+  this->WriteBackSegmentationResult(sliceList, false);
   this->ClearSegmentation();
 }
 
@@ -241,13 +241,7 @@ void mitk::LiveWireTool2D::ClearSegmentation()
 
 bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-    return false;
-
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-
-  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
-    return false;
 
   if (!positionEvent) return false;
 
@@ -346,16 +340,9 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
 
 bool mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-    return false;
-
   //complete LiveWire interaction for last segment
   //add current LiveWire contour to the finished contour and reset
   //to start new segment and computation
-
-  /* check if event can be handled */
-  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
-    return false;
 
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
@@ -364,9 +351,6 @@ bool mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* i
   {
     // this checks that the point is in the correct slice
     if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPositionInWorld()) > mitk::eps)
-      return false;
-    // this also covers the cases where points are outside of the images bounding box
-    if (!m_PlaneGeometry->IsInside(positionEvent->GetPositionInWorld()))
       return false;
   }
 
@@ -415,12 +399,7 @@ bool mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* i
 
 bool mitk::LiveWireTool2D::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-    return false;
-
   //compute LiveWire segment from last control point to current mouse position
-  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
-    return false;
 
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
@@ -462,9 +441,6 @@ bool mitk::LiveWireTool2D::OnCheckPoint( const InteractionEvent* interactionEven
   //Transition YES if click close to first control point
   //
 
-  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
-    return false;
-
   const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<const mitk::InteractionPositionEvent*>( interactionEvent );
   if (positionEvent)
   {
@@ -490,13 +466,7 @@ bool mitk::LiveWireTool2D::OnCheckPoint( const InteractionEvent* interactionEven
 
 bool mitk::LiveWireTool2D::OnFinish( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-    return false;
-
   // finish livewire tool interaction
-
-  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
-    return false;
 
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;

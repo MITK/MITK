@@ -49,11 +49,13 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
   QObject* eventFilter = new QtGlobalEventFilter(qApp);
   qApp->installEventFilter(eventFilter);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   // character strings should be interpreted as UTF-8 encoded strings
   // e.g. plugin.xml files are UTF-8 encoded
   QTextCodec* utf8Codec = QTextCodec::codecForName("UTF-8");
   QTextCodec::setCodecForCStrings(utf8Codec);
   QTextCodec::setCodecForTr(utf8Codec);
+#endif
 }
 
 }

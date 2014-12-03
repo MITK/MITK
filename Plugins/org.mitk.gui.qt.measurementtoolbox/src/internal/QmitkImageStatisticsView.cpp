@@ -317,6 +317,10 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
     if (i == selectedNodes.size()) return;
   }
 
+  //reset the feature image and image mask field
+  m_Controls->m_SelectedFeatureImageLabel->setText("None");
+  m_Controls->m_SelectedMaskLabel->setText("None");
+
   this->ReinitData();
   if (selectedNodes.isEmpty())
   {
@@ -868,6 +872,8 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   mitk::SliceNavigationController::GeometryTimeEvent timeEvent(this->m_SelectedImage->GetTimeGeometry(),
     t);
   this->OnTimeChanged(timeEvent);
+
+  t = std::min(image->GetTimeSteps() - 1, t);
 
   QString hotspotMean; hotspotMean.append(QString("%1").arg(s[t].GetHotspotStatistics().GetMean(), 0, 'f', decimals));
     hotspotMean += " (";

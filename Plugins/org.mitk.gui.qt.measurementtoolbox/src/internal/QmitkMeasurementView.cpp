@@ -18,7 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkMeasurementView.h"
 
-#include <QtGui>
+#include <QAction>
+#include <QApplication>
+#include <QClipboard>
+#include <QGridLayout>
+#include <QToolBar>
+#include <QTextBrowser>
 
 #include <mitkIPropertyFilters.h>
 #include <mitkPropertyFilter.h>
@@ -497,6 +502,10 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
   // bug 16600: deselecting all planarfigures by clicking on datamanager when no node is selected
   if(d->m_CurrentSelection.size() == 0)
   {
+    // bug 18440: resetting the selected image label here because unselecting the
+    // current node did not reset the label
+    d->m_SelectedImageLabel->setText( "No visible image available." );
+
     mitk::TNodePredicateDataType<mitk::PlanarFigure>::Pointer isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
     mitk::DataStorage::SetOfObjects::ConstPointer planarFigures = this->GetDataStorage()->GetSubset( isPlanarFigure );
     // setting all planar figures which are not helper objects not selected

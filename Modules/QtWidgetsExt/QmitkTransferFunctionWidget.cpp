@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkTransferFunctionWidget.h"
 
 #include <mitkTransferFunctionProperty.h>
-#include <QPlastiqueStyle>
 
 QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
                                                          Qt::WindowFlags f) :
@@ -36,13 +35,9 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
 
   connect(m_XEditColor, SIGNAL( textEdited ( const QString & ) ), this, SLOT(SetXValueColor( const QString & )));
 
-  QPlastiqueStyle *sliderStyle = new QPlastiqueStyle();
-
-  m_RangeSlider->setMaximum(2048);
   m_RangeSlider->setMinimum(-2048);
-  m_RangeSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
-  m_RangeSlider->setStyle(sliderStyle);
-  connect(m_RangeSlider, SIGNAL(spanChanged(double,double)),this, SLOT(OnSpanChanged(double,double)));
+  m_RangeSlider->setMaximum(2048);
+  connect(m_RangeSlider, SIGNAL(valuesChanged(int,int)),this, SLOT(OnSpanChanged(int,int)));
 
   //reset button
   connect(m_RangeSliderReset, SIGNAL(pressed()), this, SLOT(OnResetSlider()));
@@ -59,11 +54,6 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
 
 QmitkTransferFunctionWidget::~QmitkTransferFunctionWidget()
 {
-}
-
-void QmitkTransferFunctionWidget::SetIntegerMode(bool intMode)
-{
-  m_RangeSlider->setIntegerMode(intMode);
 }
 
 void QmitkTransferFunctionWidget::SetScalarLabel(const QString& scalarLabel)
@@ -136,7 +126,8 @@ void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode* node, const mitk::
       m_RangeSlider->blockSignals(true);
       m_RangeSlider->setMinimum(m_RangeSliderMin);
       m_RangeSlider->setMaximum(m_RangeSliderMax);
-      m_RangeSlider->setSpan( m_RangeSliderMin, m_RangeSliderMax);
+      m_RangeSlider->setMinimumValue(m_RangeSliderMin);
+      m_RangeSlider->setMaximumValue(m_RangeSliderMax);
       m_RangeSlider->blockSignals(false);
 
       m_ScalarOpacityFunctionCanvas->SetHistogram( h );
@@ -230,8 +221,8 @@ void QmitkTransferFunctionWidget::SetXValueColor( const QString text )
 
 void QmitkTransferFunctionWidget::UpdateRanges()
 {
-  double lower =  m_RangeSlider->lowerValue();
-  double upper =  m_RangeSlider->upperValue();
+  int lower =  m_RangeSlider->minimumValue();
+  int upper =  m_RangeSlider->maximumValue();
 
   m_ScalarOpacityFunctionCanvas->SetMin(lower);
   m_ScalarOpacityFunctionCanvas->SetMax(upper);
@@ -244,7 +235,7 @@ void QmitkTransferFunctionWidget::UpdateRanges()
 }
 
 
-void QmitkTransferFunctionWidget::OnSpanChanged(double, double)
+void QmitkTransferFunctionWidget::OnSpanChanged(int, int)
 {
   UpdateRanges();
 
@@ -256,8 +247,8 @@ void QmitkTransferFunctionWidget::OnSpanChanged(double, double)
 void QmitkTransferFunctionWidget::OnResetSlider()
 {
   m_RangeSlider->blockSignals(true);
-  m_RangeSlider->setUpperValue(m_RangeSliderMax);
-  m_RangeSlider->setLowerValue(m_RangeSliderMin);
+  m_RangeSlider->setMaximumValue(m_RangeSliderMax);
+  m_RangeSlider->setMinimumValue(m_RangeSliderMin);
   m_RangeSlider->blockSignals(false);
 
   UpdateRanges();

@@ -97,7 +97,7 @@ void QmitkTransferFunctionGeneratorWidget::OnSavePreset( )
   std::string fileName;
   std::string fileNameOutput;
 
-  presetFileName = QFileDialog::getSaveFileName( this,"Choose a filename to save the transferfunction",presetFileName, "Transferfunction (*.xml)" );
+  presetFileName = QFileDialog::getSaveFileName( this,"Choose a filename to save the transfer function", presetFileName, "Transferfunction (*.xml)" );
 
 
   fileName=presetFileName.toLocal8Bit().constData();
@@ -121,7 +121,7 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
   std::string fileName;
   std::string fileNameOutput;
 
-  presetFileName = QFileDialog::getOpenFileName( this,"Choose a file to open the transferfunction from",presetFileName, "Transferfunction (*.xml)"  );
+  presetFileName = QFileDialog::getOpenFileName( this,"Choose a file to open the transfer function from",presetFileName, "Transferfunction (*.xml)"  );
 
   fileName=presetFileName.toLocal8Bit().constData();
 

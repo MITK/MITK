@@ -765,7 +765,14 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     s2iFilter->Update();
 
     mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
-    segmentationNode->SetData(s2iFilter->GetOutput());
+    mitk::Image* oldSeg = dynamic_cast<mitk::Image*>(segmentationNode->GetData());
+    mitk::Image::Pointer newSeg = s2iFilter->GetOutput();
+    if (oldSeg)
+      m_SurfaceInterpolator->ReplaceInterpolationSession(oldSeg, newSeg);
+    else
+      return;
+
+    segmentationNode->SetData(newSeg);
     m_CmbInterpolation->setCurrentIndex(0);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     mitk::DataNode::Pointer segSurface = mitk::DataNode::New();
@@ -779,7 +786,8 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     stream << "3D-interpolation";
     segSurface->SetName(stream.str());
     segSurface->SetProperty( "opacity", mitk::FloatProperty::New(0.7) );
-    segSurface->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
+    segSurface->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(true));
+    segSurface->SetProperty( "3DInterpolationResult", mitk::BoolProperty::New(true));
     m_DataStorage->Add(segSurface, segmentationNode);
     this->Show3DInterpolationResult(false);
   }
@@ -934,6 +942,17 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
       {
         bool isInterpolationResult(false);
         workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
+        mitk::NodePredicateAnd::Pointer pred = mitk::NodePredicateAnd::New(mitk::NodePredicateProperty::New("3DInterpolationResult", mitk::BoolProperty::New(true)),
+                                                                           mitk::NodePredicateDataType::New("Surface"));
+        mitk::DataStorage::SetOfObjects::ConstPointer interpolationResults =
+            m_DataStorage->GetDerivations(workingNode, pred);
+
+        for (unsigned int i = 0; i < interpolationResults->Size(); ++i)
+        {
+          mitk::DataNode::Pointer currNode = interpolationResults->at(i);
+          if (currNode.IsNotNull())
+            m_DataStorage->Remove(currNode);
+        }
 
         if ((workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) &&
             !isInterpolationResult && m_3DInterpolationEnabled)
@@ -1057,8 +1076,12 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
       {
         QWidget::setEnabled( true );
 
-        //TODO Aufruf hier pruefen!
-        mitk::Vector3D spacing = workingNode->GetData()->GetGeometry( m_LastSNC->GetTime()->GetPos() )->GetSpacing();
+        // In case the time is not valid use 0 to access the time geometry of the working node
+        unsigned int time_position = 0;
+        if( m_LastSNC->GetTime() != NULL )
+          time_position = m_LastSNC->GetTime()->GetPos();
+
+        mitk::Vector3D spacing = workingNode->GetData()->GetGeometry( time_position )->GetSpacing();
         double minSpacing (100);
         double maxSpacing (0);
         for (int i =0; i < 3; i++)
@@ -1112,7 +1135,10 @@ void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
 
 void QmitkSlicesInterpolator::CheckSupportedImageDimension()
 {
-  if (m_3DInterpolationEnabled && m_Segmentation->GetDimension() != 3)
+  if (m_ToolManager->GetWorkingData(0))
+    m_Segmentation = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
+
+  if (m_3DInterpolationEnabled && m_Segmentation && m_Segmentation->GetDimension() != 3)
   {
     QMessageBox info;
     info.setWindowTitle("3D Interpolation Process");

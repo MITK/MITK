@@ -83,7 +83,7 @@ QmitkDTIAtlasAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   viewExcludeList.push_back( std::string("org.mitk.views.measurement") );
   viewExcludeList.push_back( std::string("org.mitk.views.moviemaker") );
   viewExcludeList.push_back( std::string("org.mitk.views.odfdetails") );
-  viewExcludeList.push_back( std::string("org.mitk.views.propertylistview") );
+  viewExcludeList.push_back( std::string("org.mitk.views.properties") );
   viewExcludeList.push_back( std::string("org.mitk.views.screenshotmaker") );
   viewExcludeList.push_back( std::string("org.mitk.views.segmentation") );
   viewExcludeList.push_back( std::string("org.mitk.views.imagestatistics") );

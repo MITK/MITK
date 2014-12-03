@@ -14,11 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// needed under windows to suppress the definition of the
-// min/max macros in windows.h, which would clash with
-// std::numeric_limits<>::max()
-#define NOMINMAX
-
 #include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 #include "berryGeometry.h"

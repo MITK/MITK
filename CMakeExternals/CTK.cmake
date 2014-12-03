@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag 9331130f)
+    set(revision_tag 9331130f+65420ed0+e57224a2)
     #IF(${proj}_REVISION_TAG)
     #  SET(revision_tag ${${proj}_REVISION_TAG})
     #ENDIF()
@@ -53,6 +53,14 @@ if(MITK_USE_CTK)
           )
     endif()
 
+    set (ctk_qt_args -DCTK_QT_VERSION:STRING=${DESIRED_QT_VERSION})
+
+    if (DESIRED_QT_VERSION MATCHES "5")
+      list(APPEND ctk_qt_args -DQT5_INSTALL_PREFIX:FILEPATH=${QT5_INSTALL_PREFIX})
+    else()
+      list(APPEND ctk_qt_args -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE})
+    endif()
+
     FOREACH(type RUNTIME ARCHIVE LIBRARY)
       IF(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
         LIST(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
@@ -64,15 +72,14 @@ if(MITK_USE_CTK)
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 c6f66556103c8d0dcae4e7db5eb0f77e
+      URL_MD5 0ee6baf7333b3bb53480453311f4a3ee
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
         ${ctk_optional_cache_args}
-        -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION}
-        -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+        ${ctk_qt_args}
         -DGit_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DCTK_LIB_CommandLineModules/Backend/LocalProcess:BOOL=ON

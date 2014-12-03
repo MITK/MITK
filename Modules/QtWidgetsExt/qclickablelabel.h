@@ -37,9 +37,13 @@ class MitkQtWidgetsExt_EXPORT QClickableLabel : public QLabel
   Q_OBJECT
 
   public:
-
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QClickableLabel( QWidget* parent, Qt::WFlags f = 0 );
     QClickableLabel( const QString& text, QWidget* parent, Qt::WFlags f = 0 );
+#else
+    QClickableLabel( QWidget* parent, Qt::WindowFlags f = 0 );
+    QClickableLabel( const QString& text, QWidget* parent, Qt::WindowFlags f = 0 );
+#endif
     virtual ~QClickableLabel();
 
     void AddHotspot( const QString& name, const QRect position );

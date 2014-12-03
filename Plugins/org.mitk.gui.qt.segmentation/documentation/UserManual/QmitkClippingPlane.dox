@@ -2,6 +2,7 @@
 \page org_mitk_views_deformableclippingplane The Clipping Plane
 
 \imageMacro{QmitkClippingPlane_Icon.png,"Icon of the Clipping Plane Plugin",5.00}
+\imageMacro{QmitkClippingPlane_Overview2.png,"Clipping Plane view",16.00}
 
 \tableofcontents
 
@@ -9,7 +10,6 @@
 
 The <b>Clipping Plane view</b> allows you to create clipping planes and calculate the volumina of the devided parts.
 
-\imageMacro{QmitkClippingPlane_Overview.png,"Clipping Plane view with segmentation and two clipping planes",16.00}
 
 \section org_mitk_views_clippingPlaneTechnicalIssue Technical Issue
 

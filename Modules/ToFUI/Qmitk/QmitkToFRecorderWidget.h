@@ -23,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //QT headers
 #include <QWidget>
 #include <QString>
-#include <QtGui/qdialog.h>
-#include <qfiledialog.h>
+#include <QDialog>
+#include <QFileDialog>
 
 //itk headers
 #include "itkCommand.h"

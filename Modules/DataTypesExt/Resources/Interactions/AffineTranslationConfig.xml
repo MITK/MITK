@@ -1,15 +1,8 @@
 <config>
-  <event_variant name="MovePointer" class="MouseMoveEvent" >
-  </event_variant>
-  <event_variant name="InitTranslation" class="MousePressEvent">
+  <event_variant name="ClickSelect" class="MousePressEvent" >
       <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
-  <event_variant name="ObjectTranslation" class="MouseMoveEvent">
-      <attribute name="ButtonState" value="LeftMouseButton"/>
-  </event_variant>
-  <event_variant name="EndTranslation" class="MouseReleaseEvent">
-      <attribute name="EventButton" value="LeftMouseButton"/>
-  </event_variant>
+<!-- Translation -->
   <event_variant name="TranslateUpKey" class="InteractionKeyEvent">
       <attribute name="Key" value="ArrowUp"/>
   </event_variant>
@@ -30,7 +23,36 @@
       <attribute name="Key" value="ArrowDown"/>
       <attribute name="Modifiers" value="shift"/>
   </event_variant>
-  <event_variant name="ScaleKey" class="InteractionKeyEvent">
-      <attribute name="Key" value="PageUp"/>
+<!-- Scaling -->
+  <event_variant name="ScaleUpKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="+"/>
+  </event_variant>
+  <event_variant name="ScaleDownKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="-"/>
+  </event_variant>
+<!-- Rotation -->
+  <event_variant name="RotateUpKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowUp"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="RotateDownKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowDown"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="RotateLeftKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowLeft"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="RotateRightKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowRight"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="RotateUpModifierKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowUp"/>
+      <attribute name="Modifiers" value="shift,ctrl"/>
+  </event_variant>
+  <event_variant name="RotateDownModifierKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowDown"/>
+      <attribute name="Modifiers" value="shift,ctrl"/>
   </event_variant>
 </config>

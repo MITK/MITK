@@ -38,8 +38,10 @@ public:
   itkCloneMacro(Self)
 
   virtual void SetDataNode(NodeType node);
-  void TranslateGeometry(mitk::Vector3D translate);
-  void RotateGeometry(mitk::ScalarType angle, int rotationaxis);
+  void TranslateGeometry(mitk::Vector3D translate, mitk::BaseGeometry* geometry);
+  void RotateGeometry(mitk::ScalarType angle, int rotationaxis, mitk::BaseGeometry* geometry);
+  void ScaleGeometry(mitk::Point3D newScale, mitk::BaseGeometry* geometry);
+  mitk::BaseGeometry *GetUpdatedTimeGeometry(mitk::InteractionEvent *interactionEvent);
 protected:
   AffineDataInteractor3D();
   virtual ~AffineDataInteractor3D();
@@ -64,24 +66,25 @@ protected:
   virtual bool InitRotate (StateMachineAction*, InteractionEvent*);
   virtual bool TranslateObject (StateMachineAction*, InteractionEvent*);
   virtual bool RotateObject (StateMachineAction*, InteractionEvent*);
-  virtual bool TranslateUpKey(StateMachineAction*, InteractionEvent*);
-  virtual bool TranslateDownKey(StateMachineAction*, InteractionEvent*);
-  virtual bool TranslateLeftKey(StateMachineAction*, InteractionEvent*);
-  virtual bool TranslateRightKey(StateMachineAction*, InteractionEvent*);
-  virtual bool TranslateUpModifierKey(StateMachineAction*, InteractionEvent*);
-  virtual bool TranslateDownModifierKey(StateMachineAction*, InteractionEvent*);
+  virtual bool TranslateUpKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual bool TranslateDownKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual bool TranslateLeftKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual bool TranslateRightKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual bool TranslateUpModifierKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual bool TranslateDownModifierKey(StateMachineAction*, InteractionEvent* interactionEvent);
 
-  virtual bool RotateUpKey(StateMachineAction*, InteractionEvent*);
-  virtual bool RotateDownKey(StateMachineAction*, InteractionEvent*);
-  virtual bool RotateLeftKey(StateMachineAction*, InteractionEvent*);
-  virtual bool RotateRightKey(StateMachineAction*, InteractionEvent*);
-  virtual bool RotateUpModifierKey(StateMachineAction*, InteractionEvent*);
-  virtual bool RotateDownModifierKey(StateMachineAction*, InteractionEvent*);
+  virtual bool RotateUpKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual bool RotateDownKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual bool RotateLeftKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual bool RotateRightKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual bool RotateUpModifierKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual bool RotateDownModifierKey(StateMachineAction*, InteractionEvent* interactionEvent);
 
-  virtual bool ScaleGeometry(mitk::StateMachineAction *, mitk::InteractionEvent *);
+  virtual bool ScaleDownKey(mitk::StateMachineAction *, mitk::InteractionEvent* interactionEvent);
+  virtual bool ScaleUpKey(mitk::StateMachineAction *, mitk::InteractionEvent* interactionEvent);
 
 
-  virtual void RestoreNodeColor();
+  virtual void RestoreNodeProperties();
 
 private:
 

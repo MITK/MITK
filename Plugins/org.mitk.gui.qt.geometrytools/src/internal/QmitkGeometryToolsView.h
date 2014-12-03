@@ -15,25 +15,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef mitkGeometryToolsView_h
-#define mitkGeometryToolsView_h
+#ifndef QmitkGeometryToolsView_h
+#define QmitkGeometryToolsView_h
 
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
+#include <mitkAffineDataInteractor3D.h>
 
-#include "ui_mitkGeometryToolsViewControls.h"
+#include "ui_QmitkGeometryToolsViewControls.h"
 
 
 /**
-  \brief mitkGeometryToolsView
+  \brief QmitkGeometryToolsView
 
   \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */
-class mitkGeometryToolsView : public QmitkAbstractView
+class QmitkGeometryToolsView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -45,9 +46,12 @@ class mitkGeometryToolsView : public QmitkAbstractView
 
 protected slots:
 
-    /// \brief Called when the user clicks the GUI button
-    void DoImageProcessing();
-    void AddRotationInteractor();
+    void RemoveInteractor();
+    void AddInteractor();
+    void OnRotationSpinBoxChanged(double step);
+    void OnScaleSpinBoxChanged(double factor);
+    void OnTranslationSpinBoxChanged(double step);
+    void OnUsageInfoBoxChanged(bool flag);
 
   protected:
 
@@ -59,8 +63,7 @@ protected slots:
     virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
                                      const QList<mitk::DataNode::Pointer>& nodes );
 
-    Ui::mitkGeometryToolsViewControls m_Controls;
-
+    Ui::QmitkGeometryToolsViewControls m_Controls;
 };
 
-#endif // mitkGeometryToolsView_h
+#endif // QmitkGeometryToolsView_h

@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtPlugin>
 
-#include "mitkGeometryToolsView.h"
+#include "QmitkGeometryToolsView.h"
 
 namespace mitk {
 
 void org_mitk_gui_qt_geometrytools_Activator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(mitkGeometryToolsView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkGeometryToolsView, context)
 }
 
 void org_mitk_gui_qt_geometrytools_Activator::stop(ctkPluginContext* context)

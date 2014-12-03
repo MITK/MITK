@@ -10,24 +10,4 @@
   <event_variant name="EndRotation" class="MouseReleaseEvent">
       <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
-  <event_variant name="RotateUpKey" class="InteractionKeyEvent">
-      <attribute name="Key" value="ArrowUp"/>
-  </event_variant>
-  <event_variant name="RotateDownKey" class="InteractionKeyEvent">
-      <attribute name="Key" value="ArrowDown"/>
-  </event_variant>
-  <event_variant name="RotateLeftKey" class="InteractionKeyEvent">
-      <attribute name="Key" value="ArrowLeft"/>
-  </event_variant>
-  <event_variant name="RotateRightKey" class="InteractionKeyEvent">
-      <attribute name="Key" value="ArrowRight"/>
-  </event_variant>
-  <event_variant name="RotateUpModifierKey" class="InteractionKeyEvent">
-      <attribute name="Key" value="ArrowUp"/>
-      <attribute name="Modifiers" value="shift"/>
-  </event_variant>
-  <event_variant name="RotateDownModifierKey" class="InteractionKeyEvent">
-      <attribute name="Key" value="ArrowDown"/>
-      <attribute name="Modifiers" value="shift"/>
-  </event_variant>
 </config>

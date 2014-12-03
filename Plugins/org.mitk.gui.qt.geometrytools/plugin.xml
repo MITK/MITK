@@ -4,7 +4,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.geometrytools"
           name="Geometry Tools"
-          class="mitkGeometryToolsView"
+          class="QmitkGeometryToolsView"
           icon="resources/icon.xpm" />
   </extension>
 

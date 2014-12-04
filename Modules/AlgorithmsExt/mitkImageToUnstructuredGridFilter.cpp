@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkPoints.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkPolyVertex.h>
 
 #include <itkImageRegionIterator.h>
 
@@ -98,10 +99,21 @@ void mitk::ImageToUnstructuredGridFilter::
     ++it;
   }
 
-  vtkSmartPointer<vtkUnstructuredGrid> vtkUnstructGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
-  vtkUnstructGrid->SetPoints(points);
+  vtkSmartPointer<vtkPolyVertex> verts = vtkSmartPointer<vtkPolyVertex>::New();
 
-  m_UnstructGrid->SetVtkUnstructuredGrid(vtkUnstructGrid);
+  verts->GetPointIds()->SetNumberOfIds(m_NumberOfExtractedPoints);
+  for(int i=0; i<m_NumberOfExtractedPoints; i++)
+  {
+    verts->GetPointIds()->SetId(i,i);
+  }
+
+  vtkSmartPointer<vtkUnstructuredGrid> uGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+  uGrid->Allocate(1);
+
+  uGrid->InsertNextCell(verts->GetCellType(), verts->GetPointIds());
+  uGrid->SetPoints(points);
+
+  m_UnstructGrid->SetVtkUnstructuredGrid(uGrid);
 }
 
 void mitk::ImageToUnstructuredGridFilter::SetThreshold(double threshold)

@@ -18,22 +18,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPointCloudScoringFilter_h_Included
 
 #include <MitkSurfaceInterpolationExports.h>
-#include <mitkSurfaceToSurfaceFilter.h>
-
-#include "mitkSurface.h"
+#include <mitkUnstructuredGridToUnstructuredGridFilter.h>
+#include <mitkUnstructuredGrid.h>
 
 namespace mitk
 {
 
 class MitkSurfaceInterpolation_EXPORT PointCloudScoringFilter:
-    public SurfaceToSurfaceFilter
+    public UnstructuredGridToUnstructuredGridFilter
 {
 
 public:
 
   typedef std::pair<int, double> ScorePair;
 
-  mitkClassMacro( PointCloudScoringFilter, SurfaceToSurfaceFilter)
+  mitkClassMacro( PointCloudScoringFilter, UnstructuredGridToUnstructuredGridFilter)
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -53,7 +52,7 @@ protected:
 
 private:
 
-  mitk::Surface::Pointer m_OutpSurface;
+  mitk::UnstructuredGrid::Pointer m_OutpGrid;
 
   std::vector< ScorePair > m_FilteredScores;
 

@@ -22,49 +22,51 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkPolyLine.h>
 #include <vtkCellArray.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkPolyVertex.h>
 
 mitk::PointCloudScoringFilter::PointCloudScoringFilter():
   m_NumberOfOutpPoints(0)
 {
-  m_OutpSurface = mitk::Surface::New();
+  m_OutpGrid = mitk::UnstructuredGrid::New();
 //  this->SetNumberOfRequiredInputs(2);
 //  this->SetNumberOfRequiredOutputs(1);
 
-  this->SetNthOutput(0, m_OutpSurface);
+  this->SetNthOutput(0, m_OutpGrid);
 }
 
 mitk::PointCloudScoringFilter::~PointCloudScoringFilter(){}
 
 void mitk::PointCloudScoringFilter::GenerateData()
 {
-  if(SurfaceToSurfaceFilter::GetNumberOfInputs()!=2)
+  if(UnstructuredGridToUnstructuredGridFilter::GetNumberOfInputs()!=2)
   {
     MITK_ERROR << "Not enough input arguments for PointCloudScoringFilter" << std::endl;
     return;
   }
 
-  DataObjectPointerArray inputs = SurfaceToSurfaceFilter::GetInputs();
-  mitk::Surface::Pointer edgeSurface = dynamic_cast<mitk::Surface*>(inputs.at(0).GetPointer());
-  mitk::Surface::Pointer segmSurface = dynamic_cast<mitk::Surface*>(inputs.at(1).GetPointer());
+  DataObjectPointerArray inputs = UnstructuredGridToUnstructuredGridFilter::GetInputs();
+  mitk::UnstructuredGrid::Pointer edgeGrid = dynamic_cast<mitk::UnstructuredGrid*>(inputs.at(0).GetPointer());
+  mitk::UnstructuredGrid::Pointer segmGrid = dynamic_cast<mitk::UnstructuredGrid*>(inputs.at(1).GetPointer());
 
-  if(edgeSurface->IsEmpty() || segmSurface->IsEmpty())
+  if(edgeGrid->IsEmpty() || segmGrid->IsEmpty())
   {
-    if(edgeSurface->IsEmpty())
-      MITK_ERROR << "Cannot convert EdgeSurface into Surfaces" << std::endl;
-    if(segmSurface->IsEmpty())
-      MITK_ERROR << "Cannot convert SegmSurface into Surfaces" << std::endl;
+    if(edgeGrid->IsEmpty())
+      MITK_ERROR << "Cannot convert edgeGrid into Surfaces" << std::endl;
+    if(segmGrid->IsEmpty())
+      MITK_ERROR << "Cannot convert segmGrid into Surfaces" << std::endl;
   }
 
-  vtkSmartPointer<vtkPolyData> edgePolyData = edgeSurface->GetVtkPolyData();
-  vtkSmartPointer<vtkPolyData> segmPolyData = segmSurface->GetVtkPolyData();
+  vtkSmartPointer<vtkUnstructuredGrid> edgevtkGrid = edgeGrid->GetVtkUnstructuredGrid();
+  vtkSmartPointer<vtkUnstructuredGrid> segmvtkGrid = segmGrid->GetVtkUnstructuredGrid();
 
   // KdTree from here
   vtkSmartPointer<vtkPoints> kdPoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkKdTree> kdTree = vtkSmartPointer<vtkKdTree>::New();
 
-  for(int i=0; i<edgePolyData->GetNumberOfPoints(); i++)
+  for(int i=0; i<edgevtkGrid->GetNumberOfPoints(); i++)
   {
-    kdPoints->InsertNextPoint(edgePolyData->GetPoint(i));
+    kdPoints->InsertNextPoint(edgevtkGrid->GetPoint(i));
   }
 
   kdTree->BuildLocatorFromPoints(kdPoints);
@@ -72,9 +74,9 @@ void mitk::PointCloudScoringFilter::GenerateData()
 
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 
-  for(int i=0; i<segmPolyData->GetNumberOfPoints(); i++)
+  for(int i=0; i<segmvtkGrid->GetNumberOfPoints(); i++)
   {
-    points->InsertNextPoint(segmPolyData->GetPoint(i));
+    points->InsertNextPoint(segmvtkGrid->GetPoint(i));
   }
 
   std::vector< ScorePair > score;
@@ -103,37 +105,32 @@ void mitk::PointCloudScoringFilter::GenerateData()
 
   m_NumberOfOutpPoints = m_FilteredScores.size();
 
-  vtkSmartPointer<vtkPolyData> outpSurface = vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkPoints> filteredPoints = vtkSmartPointer<vtkPoints>::New();
 
   for(unsigned int i=0; i<m_FilteredScores.size(); i++)
   {
     mitk::Point3D point;
-    point = segmPolyData->GetPoint(m_FilteredScores.at(i).first);
+    point = segmvtkGrid->GetPoint(m_FilteredScores.at(i).first);
     filteredPoints->InsertNextPoint(point[0],point[1],point[2]);
   }
 
   unsigned int numPoints = filteredPoints->GetNumberOfPoints();
 
-  vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
-  polyLine->GetPointIds()->SetNumberOfIds(numPoints);
+  vtkSmartPointer<vtkPolyVertex> verts = vtkSmartPointer<vtkPolyVertex>::New();
 
-  for(unsigned int i = 0; i < numPoints; i++)
+  verts->GetPointIds()->SetNumberOfIds(numPoints);
+  for(unsigned int i=0; i<numPoints; i++)
   {
-    polyLine->GetPointIds()->SetId(i,i);
+    verts->GetPointIds()->SetId(i,i);
   }
 
-  vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-  cells->InsertNextCell(polyLine);
+  vtkSmartPointer<vtkUnstructuredGrid> uGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+  uGrid->Allocate(1);
 
-  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+  uGrid->InsertNextCell(verts->GetCellType(), verts->GetPointIds());
+  uGrid->SetPoints(filteredPoints);
 
-  polyData->SetPoints(filteredPoints);
-  polyData->SetLines(cells);
-
-  outpSurface->BuildCells();
-  outpSurface->BuildLinks();
-  m_OutpSurface->SetVtkPolyData(polyData);
+  m_OutpGrid->SetVtkUnstructuredGrid(uGrid);
 }
 
 void mitk::PointCloudScoringFilter::GenerateOutputInformation()

@@ -81,8 +81,6 @@ public:
 
     int numberOfPoints2 = testFilter2->GetNumberOfExtractedPoints();
 
-    std::cout << "1: " << numberOfPoints1 << " 2: " << numberOfPoints2 << std::endl;
-
     CPPUNIT_ASSERT_MESSAGE("Testing Threshold", numberOfPoints1 > numberOfPoints2);
   }
 

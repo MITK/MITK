@@ -10,6 +10,7 @@ set(_package_excludes
   SUPERBUILD
 
   KWSTYLE
+  MICROBIRD_TRACKER
   MICRON_TRACKER
   OPTITRACK_TRACKER
   TOF_KINECT
@@ -17,6 +18,7 @@ set(_package_excludes
   TOF_MESASR4000
   TOF_PMDCAMBOARD
   TOF_PMDCAMCUBE
+  US_TELEMED_SDK
 )
 
 get_cmake_property(_cache_vars CACHE_VARIABLES)

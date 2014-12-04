@@ -1,6 +1,15 @@
 set(MITK_CONFIG_PACKAGES )
 
+set(_apple_package_excludes)
+
+if(APPLE)
+  set(_apple_package_excludes
+    SOFA
+  )
+endif()
+
 set(_package_excludes
+  ${_apple_package_excludes}
   Python
   OpenCL
   SYSTEM_Boost

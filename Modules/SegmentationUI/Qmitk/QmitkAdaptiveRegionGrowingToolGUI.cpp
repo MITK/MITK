@@ -72,6 +72,7 @@ QmitkAdaptiveRegionGrowingToolGUI::~QmitkAdaptiveRegionGrowingToolGUI()
     if (m_RegionGrow3DTool->GetPointSetNode().IsNotNull())
     {
         m_RegionGrow3DTool->GetPointSetNode()->GetData()->RemoveObserver(m_PointSetAddObserverTag);
+        m_RegionGrow3DTool->GetPointSetNode()->GetData()->RemoveObserver(m_PointSetMoveObserverTag);
     }
     this->RemoveHelperNodes();
 }
@@ -90,7 +91,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
     itk::SimpleMemberCommand<QmitkAdaptiveRegionGrowingToolGUI>::Pointer pointAddedCommand = itk::SimpleMemberCommand<QmitkAdaptiveRegionGrowingToolGUI>::New();
     pointAddedCommand->SetCallbackFunction(this, &QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded);
     m_PointSetAddObserverTag = m_RegionGrow3DTool->GetPointSetNode()->GetData()->AddObserver( mitk::PointSetAddEvent(), pointAddedCommand);
-    m_PointSetAddObserverTag = m_RegionGrow3DTool->GetPointSetNode()->GetData()->AddObserver( mitk::PointSetMoveEvent(), pointAddedCommand);
+    m_PointSetMoveObserverTag = m_RegionGrow3DTool->GetPointSetNode()->GetData()->AddObserver( mitk::PointSetMoveEvent(), pointAddedCommand);
   }
   else
   {
@@ -180,9 +181,14 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
       mitk::Image* image = dynamic_cast<mitk::Image*>(m_InputImageNode->GetData());
 
+
       mitk::Point3D seedPoint = pointSet->GetPointSet(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep())->GetPoints()->ElementAt(0);
 
-      mitkPixelTypeMultiplex3(AccessPixel,image->GetChannelDescriptor().GetPixelType(),image,seedPoint,m_SeedpointValue);
+
+      if (image->GetGeometry()->IsInside(seedPoint))
+        mitkPixelTypeMultiplex3(AccessPixel,image->GetChannelDescriptor().GetPixelType(),image,seedPoint,m_SeedpointValue)
+      else
+        return;
 
       /* In this case the seedpoint is placed e.g. in the lung or bronchialtree
        * The lowerFactor sets the windowsize depending on the regiongrowing direction

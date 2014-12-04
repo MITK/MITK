@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkMouseModeSwitcher.h"
-
+#include <QActionGroup>
 
 QmitkMouseModeSwitcher::QmitkMouseModeSwitcher( QWidget* parent )
 :QToolBar(parent)

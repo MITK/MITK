@@ -113,7 +113,7 @@ typedef uint _Flags;
 {\
   QString typeName = _PluginContext->getPlugin()->getSymbolicName();\
   typeName = (typeName + "_") + _ClassType::staticMetaObject.className();\
-  ::berry::registerExtensionType<_ClassType>(typeName.toAscii().data());\
+  ::berry::registerExtensionType<_ClassType>(typeName.toLatin1().data());\
 }
 
 #endif /*__BERRY_MACROS_H__*/

@@ -69,4 +69,6 @@ QmitkCommonActivator::stop(ctkPluginContext* context)
   this->m_Instance = 0;
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_common, QmitkCommonActivator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_common, QmitkCommonActivator)
+#endif

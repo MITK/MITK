@@ -41,6 +41,6 @@ ctkPluginContext *org_mitk_gui_common_Activator::GetContext()
 
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_common, mitk::org_mitk_gui_common_Activator)
-
-
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_gui_common, mitk::org_mitk_gui_common_Activator)
+#endif

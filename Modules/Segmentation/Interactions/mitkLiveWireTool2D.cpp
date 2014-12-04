@@ -221,14 +221,14 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
           //write back to image volume
           SliceInformation sliceInfo (workingSlice, itWorkingContours->second, currentTimestep);
           sliceList.push_back(sliceInfo);
+          this->WriteSliceToVolume(sliceInfo);
         }
       }
     }
-
     ++itWorkingContours;
   }
 
-  this->WriteBackSegmentationResult(sliceList);
+  this->WriteBackSegmentationResult(sliceList, false);
   this->ClearSegmentation();
 }
 
@@ -364,9 +364,6 @@ bool mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* i
   {
     // this checks that the point is in the correct slice
     if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPositionInWorld()) > mitk::eps)
-      return false;
-    // this also covers the cases where points are outside of the images bounding box
-    if (!m_PlaneGeometry->IsInside(positionEvent->GetPositionInWorld()))
       return false;
   }
 

@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <internal/berryTweaklets.h>
+
 #include "berryQtShell.h"
 
 #include "berryQtWidgetsTweakletImpl.h"
@@ -21,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <internal/berryQtControlWidget.h>
 
 #include <berryConstants.h>
-#include <internal/berryTweaklets.h>
 #include <tweaklets/berryGuiWidgetsTweaklet.h>
 
 #include <QApplication>

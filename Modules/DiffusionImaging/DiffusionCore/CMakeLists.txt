@@ -13,8 +13,7 @@ MITK_CREATE_MODULE(
 )
 
 if(MSVC)
-    list(APPEND module_compile_flags /wd4005)
-    set_target_properties(${MODULE_TARGET} PROPERTIES COMPILE_FLAGS "${module_compile_flags}")
-  endif()
+  mitkFunctionCheckCAndCXXCompilerFlags("/wd4005" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+endif()
 
 add_subdirectory(Testing)

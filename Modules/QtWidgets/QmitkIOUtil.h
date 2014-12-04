@@ -69,6 +69,7 @@ public:
 
     SaveFilter& operator=(const SaveFilter& other);
 
+    std::vector<mitk::MimeType> GetMimeTypes() const;
     QString GetFilterForMimeType(const std::string& mimeType) const;
     mitk::MimeType GetMimeTypeForFilter(const QString& filter) const;
     QString GetDefaultFilter() const;
@@ -140,23 +141,17 @@ public:
    *     defines the default file name suffix via its associated mime-type. If the
    *     file name is empty (the user cancelled the dialog), the remaining
    *     BaseData objects are skipped.
-   * <li>The file name suffix is extracted from the user-supplied file name and validated.
-   *     If the suffix is not empty and it is either not contained in the
-   *     extension list of the selected filter (from the QFileDialog) or the mime-type
-   *     containing the suffix as an extension is not contained in the original
-   *     list of compatible mime-types, a message box displays a warning and
-   *     the process starts from the beginning with the next BaseData object.
-   *     If the suffix is empty, a default suffix is created if the file name does
-   *     not point to an already existing file (in that case, the user already
-   *     confirmed to overwrite that file). The default suffix is the first entry
-   *     in the extension list of the selected filter. If the special "all"
-   *     filter is selected, the first entry from the extensions list of the
-   *     highest-ranked compatible mime-type for the current base data object is used.
-   *     The base data object is associated with the mime-type containing the suffix
-   *     in its extension list. If the suffix is empty (the user is overwriting an
-   *     existing file without an extension, the associated mime-type is the one
-   *     of the selected filter or the mime-type of the best matching IFileWriter
-   *     if the special "all" filter was selected.</li>
+   * <li>The file name is matched against valid mime-types. The first mime-type
+   *     which accepts the file name is associated with the current BaseData object.
+   *     If no mime-type accepts the supplied file name and the file already
+   *     exists, the process starts from the beginning with the next BaseData object.
+   *     Otherwise, if the selected filter is the special "all" filter and the
+   *     file name does not contain periods (which may or may not mark the start of
+   *     a file extension), the current BaseData object is associated with the
+   *     default mime-type. If the selected filter is not the special "all" filter,
+   *     the mime-type for this filter is associated with the current BaseData object.
+   *     The default extension of the associated mime-type is then appended to the
+   *     supplied file name.
    * <li>The selected/derived file name and associated mime-type is stored in a list
    *     and the process starts from the beginning for the next BaseData object.</li>
    * </ol>

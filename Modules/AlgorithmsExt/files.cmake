@@ -14,6 +14,7 @@ set(CPP_FILES
   mitkPointLocator.cpp
   mitkSimpleHistogram.cpp
   mitkSimpleUnstructuredGridHistogram.cpp
+  mitkUnstructuredGridToUnstructuredGridFilter.cpp
 )
 
 if(WIN32 AND NOT MINGW)

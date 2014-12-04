@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkMovieMakerView</class>
+ <widget class="QWidget" name="QmitkMovieMakerView">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>320</width>
+    <height>640</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Movie Maker</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QGridLayout" name="animationTreeViewLayout">
+     <item row="0" column="3">
+      <widget class="QToolButton" name="moveAnimationUpButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Move animation up</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+         <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/go-up.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/go-up.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QToolButton" name="moveAnimationDownButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Move animation down</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+         <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/go-down.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/go-down.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QToolButton" name="addAnimationButton">
+       <property name="toolTip">
+        <string>Add animation</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+         <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/list-add.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/list-add.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QToolButton" name="removeAnimationButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Remove animation</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+         <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/list-remove.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/list-remove.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" rowspan="3" colspan="3">
+      <widget class="QTreeView" name="animationTreeView">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="rootIsDecorated">
+        <bool>false</bool>
+       </property>
+       <property name="uniformRowHeights">
+        <bool>true</bool>
+       </property>
+       <attribute name="headerDefaultSectionSize">
+        <number>80</number>
+       </attribute>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="animationGroupBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Animation</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="startIconLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">:/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="startLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Start:</string>
+        </property>
+        <property name="buddy">
+         <cstring>startComboBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="2">
+       <widget class="QComboBox" name="startComboBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <item>
+         <property name="text">
+          <string>After previous</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>With previous</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="durationIconLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../../resources/QmitkMovieMaker.qrc">:/QmitkMovieMakerView/duration.svg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="durationLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Duration:</string>
+        </property>
+        <property name="buddy">
+         <cstring>durationSpinBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QDoubleSpinBox" name="durationSpinBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="suffix">
+         <string> s</string>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.500000000000000</double>
+        </property>
+        <property name="value">
+         <double>2.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="delayIconLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../../resources/QmitkMovieMaker.qrc">:/QmitkMovieMakerView/delay.svg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="delaylabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Delay:</string>
+        </property>
+        <property name="buddy">
+         <cstring>delaySpinBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QDoubleSpinBox" name="delaySpinBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="suffix">
+         <string> s</string>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.500000000000000</double>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="animationWidgetGroupBox">
+     <layout class="QVBoxLayout" name="animationWidgetGroupBoxLayout"/>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="playbackAndRecordingGroupBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Playback &amp;&amp; Recording</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QToolButton" name="playButton">
+        <property name="toolTip">
+         <string>Play</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+          <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="stopButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Stop</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+          <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-stop.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-stop.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="recordButton">
+        <property name="toolTip">
+         <string>Record</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+          <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-record.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-record.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="fpsSpinBox">
+        <property name="toolTip">
+         <string>Frames per second</string>
+        </property>
+        <property name="suffix">
+         <string> FPS</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>120</number>
+        </property>
+        <property name="value">
+         <number>30</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>227</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>animationTreeView</tabstop>
+  <tabstop>moveAnimationUpButton</tabstop>
+  <tabstop>moveAnimationDownButton</tabstop>
+  <tabstop>addAnimationButton</tabstop>
+  <tabstop>removeAnimationButton</tabstop>
+  <tabstop>startComboBox</tabstop>
+  <tabstop>durationSpinBox</tabstop>
+  <tabstop>delaySpinBox</tabstop>
+  <tabstop>playButton</tabstop>
+  <tabstop>stopButton</tabstop>
+  <tabstop>recordButton</tabstop>
+  <tabstop>fpsSpinBox</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc"/>
+  <include location="../../resources/QmitkMovieMaker.qrc"/>
+ </resources>
+ <connections/>
+</ui>

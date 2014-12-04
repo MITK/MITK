@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageIterator.h>
 #include <itkImageRegionIterator.h>
 #include <vtkPolyLine.h>
+#include <vtkPolyVertex.h>
+#include <vtkUnstructuredGrid.h>
 
 #include <mitkDataNode.h>
 #include <mitkImageAccessByItk.h>
@@ -30,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ImageToPointCloudFilter::ImageToPointCloudFilter():
   m_NumberOfExtractedPoints(0)
 {
-  m_PointSurface = mitk::Surface::New();
+  m_PointGrid = mitk::UnstructuredGrid::New();
   m_Method = DetectConstant(0);
   m_EdgeImage = mitk::Image::New();
   m_EdgePoints = mitk::Image::New();
@@ -38,14 +40,14 @@ mitk::ImageToPointCloudFilter::ImageToPointCloudFilter():
   this->SetNumberOfRequiredInputs(1);
   this->SetNumberOfRequiredOutputs(1);
 
-  this->SetNthOutput(0, m_PointSurface);
+  this->SetNthOutput(0, m_PointGrid);
 }
 
 mitk::ImageToPointCloudFilter::~ImageToPointCloudFilter(){}
 
 void mitk::ImageToPointCloudFilter::GenerateData()
 {
-  mitk::Image::ConstPointer image = ImageToSurfaceFilter::GetInput();
+  mitk::Image::ConstPointer image = ImageToUnstructuredGridFilter::GetInput();
   m_Geometry = image->GetGeometry();
 
   if ( image.IsNull() )
@@ -113,6 +115,8 @@ void mitk::ImageToPointCloudFilter::
 
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 
+  double greatX=0, greatY=0, greatZ=0;
+
   it.GoToBegin();
   while( !it.IsAtEnd() )
   {
@@ -133,32 +137,36 @@ void mitk::ImageToPointCloudFilter::
 
       m_Geometry->IndexToWorld(imagePoint, worldPoint);
 
+      if(worldPoint[0]>greatX)
+        greatX=worldPoint[0];
+      if(worldPoint[1]>greatY)
+        greatY=worldPoint[1];
+      if(worldPoint[2]>greatZ)
+        greatZ=worldPoint[2];
+
       points->InsertNextPoint(worldPoint[0],worldPoint[1],worldPoint[2]);
       m_NumberOfExtractedPoints++;
     }
     ++it;
   }
 
-  vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
-  polyLine->GetPointIds()->SetNumberOfIds(m_NumberOfExtractedPoints);
-
-  for(unsigned int i = 0; i < m_NumberOfExtractedPoints; i++)
-  {
-    polyLine->GetPointIds()->SetId(i,i);
-  }
-
-  vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-  cells->InsertNextCell(polyLine);
-
-  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-  polyData->SetPoints(points);
-  polyData->SetLines(cells);
-
   m_EdgePoints = mitk::ImportItkImage(lapFilter->GetOutput())->Clone();
 
-  polyData->BuildCells();
-  polyData->BuildLinks();
-  m_PointSurface->SetVtkPolyData(polyData);
+  vtkSmartPointer<vtkPolyVertex> verts = vtkSmartPointer<vtkPolyVertex>::New();
+
+  verts->GetPointIds()->SetNumberOfIds(m_NumberOfExtractedPoints);
+  for(int i=0; i<m_NumberOfExtractedPoints; i++)
+  {
+    verts->GetPointIds()->SetId(i,i);
+  }
+
+  vtkSmartPointer<vtkUnstructuredGrid> uGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+  uGrid->Allocate(1);
+
+  uGrid->InsertNextCell(verts->GetCellType(), verts->GetPointIds());
+  uGrid->SetPoints(points);
+
+  m_PointGrid->SetVtkUnstructuredGrid(uGrid);
 }
 
 

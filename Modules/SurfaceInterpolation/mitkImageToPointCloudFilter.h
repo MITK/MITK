@@ -18,7 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkImageToPointCloudFilter_h_Included
 
 #include <MitkSurfaceInterpolationExports.h>
-#include <mitkImageToSurfaceFilter.h>
+#include <mitkImageToUnstructuredGridFilter.h>
+#include <mitkUnstructuredGrid.h>
 
 #include <itkCastImageFilter.h>
 #include <itkLaplacianImageFilter.h>
@@ -35,12 +36,12 @@ enum MitkSurfaceInterpolation_EXPORT DetectConstant
 };
 
 class MitkSurfaceInterpolation_EXPORT ImageToPointCloudFilter:
-    public ImageToSurfaceFilter
+    public ImageToUnstructuredGridFilter
 {
 
 public:
 
-  mitkClassMacro( ImageToPointCloudFilter, ImageToSurfaceFilter)
+  mitkClassMacro( ImageToPointCloudFilter, ImageToUnstructuredGridFilter)
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -76,7 +77,7 @@ private:
 
   void LaplacianStdDev(Image::ConstPointer image, int amount);
 
-  mitk::Surface::Pointer m_PointSurface;
+  mitk::UnstructuredGrid::Pointer m_PointGrid;
 
   mitk::BaseGeometry* m_Geometry;
 

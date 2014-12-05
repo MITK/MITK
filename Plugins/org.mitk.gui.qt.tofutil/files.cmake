@@ -5,7 +5,6 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   QmitkToFUtilView.cpp
   QmitkToFDeviceGeneration.cpp
-  QmitkToFImageBackground.cpp
   QmitkToFScreenshotMaker.cpp
   mitkPluginActivator.cpp
 )
@@ -20,7 +19,6 @@ set(MOC_H_FILES
   src/internal/QmitkToFUtilView.h
   src/internal/QmitkToFDeviceGeneration.h
   src/internal/QmitkToFScreenshotMaker.h
-  src/internal/QmitkToFImageBackground.h
   src/internal/mitkPluginActivator.h
 )
 

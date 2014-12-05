@@ -448,9 +448,9 @@ mitk::DataNode::Pointer QmitkToFUtilView::ReplaceNodeData( std::string nodeName,
   if (node.IsNull())
   {
     node = mitk::DataNode::New();
-    node->SetData(data);
     node->SetName(nodeName);
     node->SetBoolProperty("binary",false);
+    node->SetData(data);
     this->GetDataStorage()->Add(node);
   }
   else

@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkQBallImage.h>
 #include <mitkDiffusionImage.h>
 #include <mitkIOUtil.h>
-#include <mitkBaseDataIOFactory.h>
 #include <itkDiffusionTensor3D.h>
 #include <mitkTestingMacros.h>
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>

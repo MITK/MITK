@@ -15,8 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSImageLoggingFilter.h"
+#include <mitkCoreServices.h>
+#include <mitkIMimeTypeProvider.h>
+#include <mitkIOMimeTypes.h>
 #include <mitkIOUtil.h>
-#include <mitkImageWriter.h>
 #include <mitkUIDGenerator.h>
 #include <Poco/Path.h>
 
@@ -42,34 +44,6 @@ void mitk::USImageLoggingFilter::GenerateData()
 
   //a clone is needed for a output and to store it.
   mitk::Image::Pointer inputClone = inputImage->Clone();
-
-
-  //simply redirecy the input to the output
-  //this->SetNumberOfRequiredOutputs(1);
-  //this->SetNthOutput(0, inputClone->Clone());
-  //outputImage->Graft(inputImage);
-  //this->SetOutput(this->GetInput());
-  /*if (!this->GetOutput()->IsInitialized())
-    {
-    this->SetNumberOfRequiredOutputs(1);
-    mitk::Image::Pointer newOutput = mitk::Image::New();
-    this->SetNthOutput(0, newOutput);
-    }
-  memcpy(this->GetOutput(),this->GetInput());*/
-
-  //this->SetNthOutput(0,inputImage.);
-  //this->AllocateOutputs();
-  //this->GraftOutput(inputClone);
-
-  /*
-  if (!this->GetOutput()->IsInitialized())
-    {
-    mitk::Image::Pointer newOutput = mitk::Image::New();
-    this->SetNthOutput(0, newOutput);
-    }
-  this->GetOutput()Graft(this->GetInput());
-  */
-
 
   m_LoggedImages.push_back(inputClone);
   m_LoggedMITKSystemTimes.push_back(m_SystemTimeClock->GetCurrentStamp());
@@ -139,16 +113,29 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
 }
 
 bool mitk::USImageLoggingFilter::SetImageFilesExtension(std::string extension)
- {
- mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
- if(!imageWriter->IsExtensionValid(extension))
+{
+  bool isKnownExtension = false;
+
+  CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(CoreServices::GetMimeTypeProvider());
+  std::vector<MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForCategory(IOMimeTypes::CATEGORY_IMAGES());
+
+  for (std::vector<MimeType>::const_iterator iter = mimeTypes.begin(); iter != mimeTypes.end(); ++iter)
   {
-  MITK_WARN << "Extension " << extension << " is not supported; still using " << m_ImageExtension << " as before.";
-  return false;
+    std::vector<std::string> extensions = iter->GetExtensions();
+
+    if (!extensions.empty() && std::find(extensions.begin(), extensions.end(), extension) != extensions.end())
+    {
+      isKnownExtension = true;
+      break;
+    }
   }
- else
+
+  if(!isKnownExtension)
   {
+    MITK_WARN << "Extension " << extension << " is not supported; still using " << m_ImageExtension << " as before.";
+    return false;
+  }
+
   m_ImageExtension = extension;
   return true;
-  }
- }
+}

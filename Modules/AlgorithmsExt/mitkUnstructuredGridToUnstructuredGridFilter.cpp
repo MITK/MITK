@@ -32,23 +32,51 @@ mitk::UnstructuredGridToUnstructuredGridFilter::UnstructuredGridToUnstructuredGr
 
 mitk::UnstructuredGridToUnstructuredGridFilter::~UnstructuredGridToUnstructuredGridFilter(){}
 
-void mitk::UnstructuredGridToUnstructuredGridFilter::SetInput(const mitk::UnstructuredGrid* image)
+void mitk::UnstructuredGridToUnstructuredGridFilter::SetInput(const mitk::UnstructuredGrid* grid)
 {
-  this->ProcessObject::SetNthInput(0, const_cast< mitk::UnstructuredGrid* >( image ) );
+  this->ProcessObject::SetNthInput(0, const_cast< mitk::UnstructuredGrid* >( grid ) );
 }
 
+void mitk::UnstructuredGridToUnstructuredGridFilter::CreateOutputsForAllInputs(unsigned int  /*idx*/)
+{
+  this->SetNumberOfIndexedOutputs( this->GetNumberOfIndexedInputs() );
+  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedInputs(); ++idx)
+  {
+    if (this->GetOutput(idx) == NULL)
+    {
+      DataObjectPointer newOutput = this->MakeOutput(idx);
+      this->SetNthOutput(idx, newOutput);
+    }
+    this->GetOutput( idx )->Graft( this->GetInput( idx) );
+  }
+  this->Modified();
+}
+
+void mitk::UnstructuredGridToUnstructuredGridFilter::SetInput(unsigned int idx, const mitk::UnstructuredGrid* grid )
+{
+  if ( this->GetInput(idx) != grid )
+  {
+    this->SetNthInput( idx, const_cast<mitk::UnstructuredGrid*>( grid ) );
+    this->CreateOutputsForAllInputs(idx);
+    this->Modified();
+  }
+}
 
 const mitk::UnstructuredGrid* mitk::UnstructuredGridToUnstructuredGridFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
-  {
-    MITK_ERROR << "No input set" << std::endl;
-    return 0;
-  }
+    return NULL;
 
   return static_cast<const mitk::UnstructuredGrid* >( this->ProcessObject::GetInput(0) );
 }
 
+const mitk::UnstructuredGrid* mitk::UnstructuredGridToUnstructuredGridFilter::GetInput( unsigned int idx)
+{
+  if (this->GetNumberOfInputs() < 1)
+    return NULL;
+
+  return static_cast<const mitk::UnstructuredGrid*>(this->ProcessObject::GetInput(idx));
+}
 
 void mitk::UnstructuredGridToUnstructuredGridFilter::GenerateOutputInformation()
 {

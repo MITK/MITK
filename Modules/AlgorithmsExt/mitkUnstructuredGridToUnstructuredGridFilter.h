@@ -43,9 +43,15 @@ namespace mitk {
       /** Returns a const reference to the input image */
       const mitk::UnstructuredGrid* GetInput(void);
 
+      virtual const mitk::UnstructuredGrid* GetInput( unsigned int idx );
+
       /** Set the source grid. As input every mitk unstructured grid can be used. */
       using itk::ProcessObject::SetInput;
-      virtual void SetInput(const UnstructuredGrid *image);
+      virtual void SetInput(const UnstructuredGrid *grid);
+
+      virtual void SetInput(unsigned int idx, const UnstructuredGrid *grid );
+
+      virtual void CreateOutputsForAllInputs(unsigned int idx);
 
 
     protected:

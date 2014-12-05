@@ -110,7 +110,7 @@ public:
     aICP->SetCovarianceMatricesMovingSurface(m_SigmasMovingSurface);
     aICP->SetCovarianceMatricesFixedSurface(m_SigmasFixedSurface);
     aICP->SetFRENormalizationFactor(m_FRENormalizationFactor);
-    aICP->SetThreshold(0.000001);
+    aICP->SetThreshold(0.0001);
 
     // run the algorithm
     aICP->Update();
@@ -148,7 +148,7 @@ public:
     aICP->SetCovarianceMatricesMovingSurface(m_SigmasMovingSurface);
     aICP->SetCovarianceMatricesFixedSurface(m_SigmasFixedSurface);
     aICP->SetFRENormalizationFactor(m_FRENormalizationFactor);
-    aICP->SetThreshold(0.000001);
+    aICP->SetThreshold(0.0001);
     aICP->SetTrimmFactor(0.50);
 
     // run the algorithm

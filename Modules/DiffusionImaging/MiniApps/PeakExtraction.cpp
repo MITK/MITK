@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkResampleImageFilter.h>
 #include <itkFiniteDiffOdfMaximaExtractionFilter.h>
 
-#include <mitkBaseDataIOFactory.h>
 #include <mitkDiffusionImage.h>
 #include <mitkQBallImage.h>
 #include <mitkImageCast.h>
@@ -39,8 +38,7 @@ mitk::Image::Pointer LoadData(std::string filename)
     if( filename.empty() )
         return NULL;
 
-    const std::string s1="", s2="";
-    std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( filename, s1, s2, false );
+    std::vector<mitk::BaseData::Pointer> infile = mitk::IOUtil::Load( filename );
     if( infile.empty() )
     {
         std::cout << "File " << filename << " could not be read!";

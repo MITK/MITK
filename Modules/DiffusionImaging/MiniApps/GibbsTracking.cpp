@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkQBallImage.h>
 #include <mitkTensorImage.h>
-#include <mitkBaseDataIOFactory.h>
 #include <mitkFiberBundleX.h>
 #include <itkGibbsTrackingFilter.h>
 #include <itkDiffusionTensor3D.h>
@@ -121,8 +120,7 @@ int main(int argc, char* argv[])
         GibbsTrackingFilterType::Pointer gibbsTracker = GibbsTrackingFilterType::New();
 
         // load input image
-        const std::string s1="", s2="";
-        std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
+        std::vector<mitk::BaseData::Pointer> infile = mitk::IOUtil::Load( inFileName );
 
         mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(infile.at(0).GetPointer());
 

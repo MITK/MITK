@@ -202,7 +202,7 @@ void mitk::WeightedPointTransform::E_maker( vtkPoints* X,
                                           )
 {
 #pragma omp parallel for
-  for( unsigned int i = 0; i < X->GetNumberOfPoints(); ++i )
+  for( vtkIdtype i = 0; i < X->GetNumberOfPoints(); ++i )
   {
     unsigned int index = 3u * i;
     double pX[3];

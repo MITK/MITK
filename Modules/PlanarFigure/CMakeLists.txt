@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(
   INCLUDE_DIRS Algorithms DataManagement Interactions IO Rendering
-  DEPENDS MitkLegacyIO MitkSceneSerializationBase
+  DEPENDS MitkSceneSerializationBase
   WARNINGS_AS_ERRORS
 )
 

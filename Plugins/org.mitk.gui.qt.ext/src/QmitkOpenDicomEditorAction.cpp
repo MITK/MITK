@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFileDialog>
 #include <QFileInfo>
-#include <mitkDataNodeFactory.h>
 
 #include "mitkCoreObjectFactory.h"
 #include "mitkSceneIO.h"

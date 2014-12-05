@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk headers
 #include "mitkTrackingTypes.h"
-#include <mitkSTLFileReader.h>
+#include <mitkIOUtil.h>
 #include <mitkSurface.h>
 #include "mitkNavigationData.h"
 #include "mitkRenderingManager.h"
@@ -200,25 +200,25 @@ emit Canceled();
 
 void QmitkNavigationToolCreationWidget::OnLoadSurface()
 {
-std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", tr("STL (*.stl)")).toLatin1().data();
-mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
-try
-{
-stlReader->SetFileName( filename.c_str() );
-stlReader->Update();
-}
-catch (...)
-{
-}
+  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", tr("STL (*.stl)")).toLatin1().data();
 
-if ( stlReader->GetOutput() == NULL );
-else
-{
-mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-newNode->SetName(filename);
-newNode->SetData(stlReader->GetOutput());
-m_DataStorage->Add(newNode);
-}
+  mitk::Surface::Pointer surface;
+
+  try
+  {
+    surface = mitk::IOUtil::LoadSurface(filename);
+  }
+  catch (...)
+  {
+  }
+
+  if (surface.IsNotNull())
+  {
+    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+    newNode->SetName(filename);
+    newNode->SetData(surface);
+    m_DataStorage->Add(newNode);
+  }
 }
 
 void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()

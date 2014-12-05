@@ -24,11 +24,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkModuleView.h"
 
-#include <mitkDataNodeFactory.h>
 #include <mitkIDataStorageService.h>
 #include <mitkSceneIO.h>
 #include <mitkProgressBar.h>
 #include <mitkRenderingManager.h>
+#include <mitkIOUtil.h>
 
 #include <berryPlatformUI.h>
 #include <berryIPreferencesService.h>
@@ -108,22 +108,23 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
          }
          else
          {
-           mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
            try
            {
-             nodeReader->SetFileName(arguments[i].toStdString());
-             nodeReader->Update();
-             for (unsigned int j = 0 ; j < nodeReader->GetNumberOfOutputs( ); ++j)
+             std::vector<mitk::BaseData::Pointer> baseDataVector = mitk::IOUtil::Load(arguments[i].toStdString());
+
+             Q_FOREACH(const mitk::BaseData::Pointer& baseData, baseDataVector)
              {
-               mitk::DataNode::Pointer node = nodeReader->GetOutput(j);
-               if (node->GetData() != 0)
+               if (baseData.IsNotNull())
                {
-                 dataStorage->Add(node);
-                 argumentsAdded++;
+                 mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
+                 dataNode->SetData(baseData);
+                 dataStorage->Add(dataNode);
+
+                 ++argumentsAdded;
                }
              }
            }
-           catch(...)
+           catch (...)
            {
              MITK_WARN << "Failed to load command line argument: " << arguments[i].toStdString();
            }

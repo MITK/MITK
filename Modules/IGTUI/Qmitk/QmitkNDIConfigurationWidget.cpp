@@ -22,9 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDir>
 #include <QFileInfo>
 
+#include <mitkIOUtil.h>
 #include <mitkNavigationToolWriter.h>
 #include <mitkNavigationToolReader.h>
-#include <mitkSTLFileReader.h>
 #include <mitkIGTException.h>
 
 #include "QmitkCustomVariants.h"
@@ -875,17 +875,13 @@ mitk::Surface::Pointer QmitkNDIConfigurationWidget::LoadSurfaceFromSTLFile(QStri
   QFile surfaceFile(surfaceFilename);
   if(surfaceFile.exists())
   {
-    mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
-
-    try{
-      stlReader->SetFileName(surfaceFilename.toStdString().c_str());
-      stlReader->Update();//load surface
-      toolSurface = stlReader->GetOutput();
-    }
-    catch(std::exception& e )
+    try
     {
-      MBI_ERROR<<"Could not load surface for tool!";
-      MBI_ERROR<< e.what();
+      toolSurface = mitk::IOUtil::LoadSurface(surfaceFilename.toStdString());
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_ERROR << "Could not load surface for tool!";
       throw e;
     }
   }

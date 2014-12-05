@@ -1,4 +1,4 @@
-MITK_CREATE_MODULE(DEPENDS MitkDataTypesExt
+MITK_CREATE_MODULE(DEPENDS MitkDataTypesExt MitkGLMappers
                    PACKAGE_DEPENDS ITK|ITKThresholding ANN
                    WARNINGS_AS_ERRORS
                   )

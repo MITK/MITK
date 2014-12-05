@@ -2,6 +2,7 @@
 # Modules must be listed according to their dependencies
 set(module_dirs
     LegacyIO
+    GLMappers
     DataTypesExt
     AlgorithmsExt
     MapperExt

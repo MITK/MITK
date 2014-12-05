@@ -347,21 +347,20 @@ set(CPP_FILES
   Rendering/mitkBaseRenderer.cpp
   Rendering/mitkVtkMapper.cpp
   Rendering/mitkRenderWindowFrame.cpp
-  Rendering/mitkPlaneGeometryDataMapper2D.cpp
+  #Rendering/mitkPlaneGeometryDataMapper2D.cpp Moved to deprecated GLMappers Module
   Rendering/mitkPlaneGeometryDataVtkMapper3D.cpp
-  Rendering/mitkGLMapper.cpp
+  #Rendering/mitkGLMapper.cpp Moved to deprecated GLMappers Module
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkManufacturerLogo.cpp
   Rendering/mitkMapper.cpp
-  Rendering/mitkPointSetGLMapper2D.cpp
   Rendering/mitkPointSetVtkMapper2D.cpp
   Rendering/mitkPointSetVtkMapper3D.cpp
-  Rendering/mitkSurfaceGLMapper2D.cpp
+  #Rendering/mitkSurfaceGLMapper2D.cpp Moved to deprecated GLMappers Module
   Rendering/mitkSurfaceVtkMapper3D.cpp
   Rendering/mitkVolumeDataVtkMapper3D.cpp
   Rendering/mitkVtkPropRenderer.cpp
   Rendering/mitkVtkWidgetRendering.cpp
-  Rendering/vtkMitkRectangleProp.cpp
+#  Rendering/vtkMitkRectangleProp.cpp Moved to deprecated GLMappers Module
   Rendering/vtkMitkRenderProp.cpp
   Rendering/mitkVtkEventProvider.cpp
   Rendering/mitkRenderWindow.cpp

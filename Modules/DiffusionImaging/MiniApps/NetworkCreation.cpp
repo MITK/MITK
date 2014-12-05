@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 
 // MITK includes
-#include <mitkBaseDataIOFactory.h>
 #include "mitkConnectomicsNetworkCreator.h"
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
@@ -64,12 +63,8 @@ int main(int argc, char* argv[])
 
   try
   {
-
-    const std::string s1="", s2="";
-
     // load fiber image
-    std::vector<mitk::BaseData::Pointer> fiberInfile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( fiberFilename, s1, s2, false );
+    std::vector<mitk::BaseData::Pointer> fiberInfile = mitk::IOUtil::Load( fiberFilename );
     if( fiberInfile.empty() )
     {
       std::string errorMessage = "Fiber Image at " + fiberFilename + " could not be read. Aborting.";
@@ -81,7 +76,7 @@ int main(int argc, char* argv[])
 
     // load parcellation
     std::vector<mitk::BaseData::Pointer> parcellationInFile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( parcellationFilename, s1, s2, false );
+      mitk::IOUtil::Load( parcellationFilename );
     if( parcellationInFile.empty() )
     {
       std::string errorMessage = "Parcellation at " + parcellationFilename + " could not be read. Aborting.";

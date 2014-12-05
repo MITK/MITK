@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkBaseDataIOFactory.h"
 #include "mitkDiffusionImage.h"
 #include "mitkBaseData.h"
 

@@ -1,5 +1,6 @@
 set(MODULE_TESTS
   mitkComputeContourSetNormalsFilterTest.cpp
+  mitkPointCloudScoringFilterTest
   mitkReduceContourSetFilterTest.cpp
   mitkSurfaceInterpolationControllerTest.cpp
 )

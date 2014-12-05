@@ -114,10 +114,12 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
     };
 
     /**
-    * \brief Calculates how good the data, this statemachine handles, is hit by the event.
+    * \brief Filters events that cannot be handle by 2D segmentation tools
     *
+    * Current an event is discarded if it was not sent by a 2D renderwindow and if it is
+    * not of type InteractionPositionEvent
     */
-    virtual float CanHandleEvent( InteractionEvent const *stateEvent) const;
+    virtual bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode);
 
     /**
       \brief Extract the slice of an image that the user just scribbles on.
@@ -149,13 +151,14 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
 
     void WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image*, unsigned int timeStep);
 
-    void WriteBackSegmentationResult (std::vector<SliceInformation> sliceList);
+    void WriteBackSegmentationResult (std::vector<SliceInformation> sliceList, bool writeSliceToVolume = true);
 
+    void WriteSliceToVolume (SliceInformation sliceInfo);
     /**
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure.
              By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry
     */
-    unsigned int AddContourmarker ();
+    int AddContourmarker();
 
     void InteractiveSegmentationBugMessage( const std::string& message );
 
@@ -164,7 +167,6 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
 
   private:
 
-    void WriteSliceToVolume (SliceInformation sliceInfo);
 
     //The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string     m_Contourmarkername;

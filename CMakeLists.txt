@@ -84,8 +84,9 @@ set(project_policies
   CMP0011 # NEW: Included scripts do automatic cmake_policy PUSH and POP.
   CMP0012 # NEW: if() recognizes numbers and boolean constants.
   CMP0013 # NEW: Duplicate binary directories are not allowed.
-  CMP0014 # NEW: Input directories must have CMakeLists.txt
-  CMP0020 # NEW: Automatically link Qt executables to qtmain target on Windows
+  CMP0014 # NEW: Input directories must have CMakeLists.txt.
+  CMP0020 # NEW: Automatically link Qt executables to qtmain target on Windows.
+  CMP0028 # NEW: Double colon in target name means ALIAS or IMPORTED target.
   )
 foreach(policy ${project_policies})
   if(POLICY ${policy})
@@ -181,6 +182,15 @@ if(MITK_USE_QT)
     set(QT5_INSTALL_PREFIX "" CACHE PATH "The install location of Qt5")
     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${QT5_INSTALL_PREFIX})
     find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5Concurrent ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5OpenGL ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5PrintSupport ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5Sql ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5Svg ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5WebKit ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5WebKitWidgets ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5Widgets ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    find_package(Qt5Xml ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
   endif()
 else()
   set(MITK_USE_Qt4 FALSE)
@@ -201,8 +211,8 @@ if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
 endif()
 env_option(MITK_USE_GLEW "Use the GLEW library" ON)
 env_option(MITK_USE_Boost "Use the Boost C++ library" OFF)
-env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ${MITK_USE_Qt4})
-env_option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_Qt4})
+env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
+env_option(MITK_USE_CTK "Use CTK in MITK" ON)
 env_option(MITK_USE_DCMTK "EXPERIMENTAL, superbuild only: Use DCMTK in MITK" ${MITK_USE_CTK})
 env_option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
@@ -214,7 +224,7 @@ set(MITK_USE_CableSwig ${MITK_USE_Python})
 
 option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
 set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
-set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS Custom Default mitkDiffusion All)
+set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS Custom Default WorkbenchRelease mitkDiffusion All)
 
 mitkFunctionEnableBuildConfiguration()
 
@@ -248,16 +258,6 @@ endif()
 if(MITK_USE_Boost)
   option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
   set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
-endif()
-
-if(MITK_USE_BLUEBERRY AND NOT MITK_USE_Qt4)
-  message("> Forcing MITK_USE_BLUEBERRY to OFF because Qt4 is not used.")
-  set(MITK_USE_BLUEBERRY OFF CACHE BOOL "Build the BlueBerry application platform" FORCE)
-endif()
-
-if(MITK_USE_CTK AND NOT MITK_USE_Qt4)
-  message("> Forcing MITK_USE_CTK to OFF because Qt4 is not used.")
-  set(MITK_USE_CTK OFF CACHE BOOL "Use CTK in MITK" FORCE)
 endif()
 
 if(MITK_USE_BLUEBERRY)
@@ -560,8 +560,9 @@ set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
 
 if(WIN32)
-  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
-  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} /wd4231") # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
+  mitkFunctionCheckCompilerFlags("/wd4005" MITK_CXX_FLAGS) # warning C4005: macro redefinition
+  mitkFunctionCheckCompilerFlags("/wd4231" MITK_CXX_FLAGS) # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
   # the following line should be removed after fixing bug 17637
   mitkFunctionCheckCompilerFlags("/wd4316" MITK_CXX_FLAGS) # warning C4316: object alignment on heap
 endif()

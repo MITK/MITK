@@ -27,4 +27,6 @@ void mitk::org_mitk_gui_qt_remeshing_Activator::stop(ctkPluginContext*)
 {
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_remeshing, mitk::org_mitk_gui_qt_remeshing_Activator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_remeshing, mitk::org_mitk_gui_qt_remeshing_Activator)
+#endif

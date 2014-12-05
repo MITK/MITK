@@ -690,7 +690,7 @@ void QmitkIVIMView::OutputToDatastorage(std::vector<mitk::DataNode*> nodes)
         QString newname2 = basename; newname2 = newname2.append("_DStarMap_%1").arg(m_Controls->m_MethodCombo->currentText());
         mitk::DataNode::Pointer node2=mitk::DataNode::New();
         node2->SetData( dstarimage );
-        node2->SetName(newname2.toAscii());
+        node2->SetName(newname2.toLatin1());
         GetDefaultDataStorage()->Add(node2);
     }
 
@@ -702,7 +702,7 @@ void QmitkIVIMView::OutputToDatastorage(std::vector<mitk::DataNode*> nodes)
         QString newname1 = basename; newname1 = newname1.append("_DMap_%1").arg(m_Controls->m_MethodCombo->currentText());
         mitk::DataNode::Pointer node1=mitk::DataNode::New();
         node1->SetData( dimage );
-        node1->SetName(newname1.toAscii());
+        node1->SetName(newname1.toLatin1());
         GetDefaultDataStorage()->Add(node1);
     }
 
@@ -714,7 +714,7 @@ void QmitkIVIMView::OutputToDatastorage(std::vector<mitk::DataNode*> nodes)
         QString newname0 = basename; newname0 = newname0.append("_fMap_%1").arg(m_Controls->m_MethodCombo->currentText());
         mitk::DataNode::Pointer node=mitk::DataNode::New();
         node->SetData( image );
-        node->SetName(newname0.toAscii());
+        node->SetName(newname0.toLatin1());
         GetDefaultDataStorage()->Add(node);
     }
 

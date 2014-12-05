@@ -43,7 +43,10 @@ namespace mitk
 
     if( extension.length() != 0 && extension != this->m_Extension)
     {
-      MITK_ERROR << "Wrong file extension! The default extension is " << this->m_Extension.c_str() << ", currently the requested file extension is " << extension.c_str() <<"!";
+      MITK_ERROR << "Wrong file extension for " << baseFilename <<
+                    " The default extension is " << this->m_Extension.c_str() <<
+                    ", currently the requested file extension is " <<
+                    extension.c_str() <<"!";
       this->m_Extension = extension;
     }
 

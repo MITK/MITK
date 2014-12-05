@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>323</width>
+    <width>324</width>
     <height>679</height>
    </rect>
   </property>
@@ -276,6 +276,9 @@
          <horstretch>0</horstretch>
          <verstretch>1</verstretch>
         </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Select render mode</string>
        </property>
       </widget>
      </item>

@@ -17,7 +17,7 @@ if(MITK_USE_ACVD)
     -DVTK_DIR:PATH=${VTK_DIR}
   )
 
-  set(ACVD_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchACVD.cmake)
+  set(ACVD_PATCH_COMMAND ${CMAKE_COMMAND} -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchACVD.cmake)
 
   if(NOT DEFINED ACVD_DIR)
     ExternalProject_Add(${proj}

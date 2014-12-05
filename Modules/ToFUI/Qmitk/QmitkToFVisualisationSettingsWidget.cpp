@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageStatisticsHolder.h>
 
 //QT headers
-#include <QPlastiqueStyle>
 #include <QString>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkTransferFunction.h>
@@ -74,11 +73,8 @@ void QmitkToFVisualisationSettingsWidget::CreateConnections()
     connect(m_Controls->m_RangeSlider, SIGNAL(spanChanged(int, int)  ),this, SLOT( OnSpanChanged(int , int ) ));
     connect(m_Controls->m_AdvancedOptionsCheckbox, SIGNAL(toggled(bool)  ),this, SLOT( OnShowAdvancedOptionsCheckboxChecked(bool) ));
 
-    QPlastiqueStyle *sliderStyle = new QPlastiqueStyle();
     m_Controls->m_RangeSlider->setMaximum(2048);
     m_Controls->m_RangeSlider->setMinimum(-2048);
-    m_Controls->m_RangeSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
-    m_Controls->m_RangeSlider->setStyle(sliderStyle);
 
     m_Controls->m_ColorTransferFunctionCanvas->SetQLineEdits(m_Controls->m_XEditColor, 0);
     m_Controls->m_ColorTransferFunctionCanvas->SetTitle(""/*"Value -> Grayscale/Color"*/);
@@ -115,8 +111,8 @@ void QmitkToFVisualisationSettingsWidget::OnSpanChanged(int /*lower*/, int /*upp
 
 void QmitkToFVisualisationSettingsWidget::OnResetSlider()
 {
-  m_Controls->m_RangeSlider->setUpperValue(m_RangeSliderMax);
-  m_Controls->m_RangeSlider->setLowerValue(m_RangeSliderMin);
+  m_Controls->m_RangeSlider->setMaximumValue(m_RangeSliderMax);
+  m_Controls->m_RangeSlider->setMinimumValue(m_RangeSliderMin);
 
   UpdateRanges();
   m_Controls->m_ColorTransferFunctionCanvas->update();
@@ -124,8 +120,8 @@ void QmitkToFVisualisationSettingsWidget::OnResetSlider()
 
 void QmitkToFVisualisationSettingsWidget::UpdateRanges()
 {
-  int lower =  m_Controls->m_RangeSlider->lowerValue();
-  int upper =  m_Controls->m_RangeSlider->upperValue();
+  int lower =  m_Controls->m_RangeSlider->minimumValue();
+  int upper =  m_Controls->m_RangeSlider->maximumValue();
 
   m_Controls->m_ColorTransferFunctionCanvas->SetMin(lower);
   m_Controls->m_ColorTransferFunctionCanvas->SetMax(upper);
@@ -219,10 +215,10 @@ void QmitkToFVisualisationSettingsWidget::OnTransferFunctionTypeSelected(int ind
 
 void QmitkToFVisualisationSettingsWidget::OnShowAdvancedOptionsCheckboxChecked(bool checked)
 {
-  this->m_Controls->m_MappingGroupBox->setShown(checked);
-  this->m_Controls->m_SelectTransferFunctionTypeCombobox->setShown(checked);
-  this->m_Controls->m_SelectWidgetCombobox->setShown(checked);
-  this->m_Controls->m_TransferFunctionResetButton->setShown(checked);
+  this->m_Controls->m_MappingGroupBox->setVisible(checked);
+  this->m_Controls->m_SelectTransferFunctionTypeCombobox->setVisible(checked);
+  this->m_Controls->m_SelectWidgetCombobox->setVisible(checked);
+  this->m_Controls->m_TransferFunctionResetButton->setVisible(checked);
 }
 
 void QmitkToFVisualisationSettingsWidget::OnWidgetSelected(int index)
@@ -270,7 +266,7 @@ void QmitkToFVisualisationSettingsWidget::OnWidgetSelected(int index)
   m_Controls->m_RangeSlider->setMaximum(m_RangeSliderMax + border);
   m_Controls->m_RangeSliderMinEdit->setText(QString("").setNum(m_RangeSliderMin - border));
   m_Controls->m_RangeSliderMaxEdit->setText(QString("").setNum(m_RangeSliderMax + border));
-  m_Controls->m_RangeSlider->setSpan( m_RangeSliderMin, m_RangeSliderMax);
+  m_Controls->m_RangeSlider->setRange( m_RangeSliderMin, m_RangeSliderMax);
   UpdateRanges();
   m_Controls->m_ColorTransferFunctionCanvas->update();
   this->UpdateSurfaceProperty();
@@ -375,7 +371,7 @@ void QmitkToFVisualisationSettingsWidget::OnTransferFunctionReset()
   m_Controls->m_RangeSlider->setMaximum(m_RangeSliderMax + border);
   m_Controls->m_RangeSliderMinEdit->setText(QString("").setNum(m_RangeSliderMin - border));
   m_Controls->m_RangeSliderMaxEdit->setText(QString("").setNum(m_RangeSliderMax + border));
-  m_Controls->m_RangeSlider->setSpan( m_RangeSliderMin, m_RangeSliderMax);
+  m_Controls->m_RangeSlider->setRange( m_RangeSliderMin, m_RangeSliderMax);
   UpdateRanges();
   m_Controls->m_ColorTransferFunctionCanvas->update();
   this->UpdateSurfaceProperty();

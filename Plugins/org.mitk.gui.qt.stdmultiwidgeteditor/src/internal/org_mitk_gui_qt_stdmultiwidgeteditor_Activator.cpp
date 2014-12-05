@@ -35,4 +35,6 @@ org_mitk_gui_qt_stdmultiwidgeteditor_Activator::stop(ctkPluginContext* context)
   Q_UNUSED(context)
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_stdmultiwidgeteditor, org_mitk_gui_qt_stdmultiwidgeteditor_Activator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_stdmultiwidgeteditor, org_mitk_gui_qt_stdmultiwidgeteditor_Activator)
+#endif

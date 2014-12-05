@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "usServiceRegistration.h"
 
+
 namespace mitk
 {
 
@@ -300,7 +301,7 @@ class MitkSegmentation_EXPORT ToolManager : public itk::Object
 
   private:
 
-    //std::map<ServiceReference, EventConfig> m_DisplayInteractorConfigs;
+    std::map<us::ServiceReferenceU, EventConfig> m_DisplayInteractorConfigs;
 };
 
 } // namespace

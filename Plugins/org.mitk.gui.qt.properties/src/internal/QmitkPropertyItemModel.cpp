@@ -95,7 +95,8 @@ void QmitkPropertyItemModel::CreateRootItem()
 
     m_RootItem.reset(new QmitkPropertyItem(rootData));
 
-    this->reset();
+    this->beginResetModel();
+    this->endResetModel();
 }
 
 QVariant QmitkPropertyItemModel::data(const QModelIndex& index, int role) const

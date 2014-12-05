@@ -3,15 +3,12 @@
 
 \tableofcontents
 
-The respective MiniApp is called MitkDiffusionMiniApp and is shipped with the current MITK Diffusion installer.
-This page intends to provide an overview of all tools that are included in the DiffusionMiniApp. Also it relates them
-to the respective Plugin in the MITK Diffusion application (if one exists).
+This page intends to provide an overview of all tools that are included with the current MITK Diffusion Installer and refer to the respective Plugin in the MITK Diffusion application (if one exists).
 For a detailed list of parameters call the according tool without any arguments (see \ref MiniAppExplainPage for details on this) or refer its Plugin equivalent.
 
 \section Preprocessing Preprocessing Tools
 
-
-\subsection BatchedFolderRegistratuion Batched Folder Registration
+\subsection SecFolderRegistration Folder Registration
 
 Allows to register a series of images (of different modalities, including diffusion weighted) to one reference image. It allows to register derived resources (e.g. a segmentation on
 a T2 image) using the transformation of the original (T2) image.
@@ -40,15 +37,15 @@ Patien01_2010-4_ROI.nrrd
 All T2 and DWI images are to be co-registered to the first T2 image, this can be achieved by the following two calls:
 
 \code
- $./MitkDiffusionMiniApps BatchedFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m T2.nrrd
- $./MitkDiffusionMiniApps BatchedFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m .dwi
+  $./MitkFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m T2.nrrd
+  $./MitkFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m .dwi
 \endcode
 
 The segmentations where performed on the T1 image and are therefore related to the image space of the respective T1 image,
 so they can be bound to these images by marking them as derived resources. To register them both you would call
 
 \code
-$./bin/MitkDiffusionMiniApps BatchedFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m _T1.nrrd -d _ROI.nrrd -b
+ $./MitkFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m _T1.nrrd -d _ROI.nrrd -b
 \endcode
 
 \note the suffixes of '_T1.nrrd' and '_ROI.nrrd' must have the same length!
@@ -59,7 +56,7 @@ All images (execpt for DWI files) are resample to the reference image, to resamp
 spacing like this (e.g. 1 x 1 x 2 mm)
 
 \code
-$./MitkDiffusionMiniApps BatchedFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m .dwi -r 1,1,2
+ $./MitkFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m .dwi -r 1,1,2
 \endcode
 
 \note Registration methods assume that both images occupy roughly the same space. It may happend that this is not the case,
@@ -77,14 +74,14 @@ This tool can be used to resample images in different ways. One way is by specif
 Transforming an image test.nrrd to have a spacing of 1x1x3 mm can be done using this command:
 
 \code
-$./MitkDiffusionMiniApps ImageResampler -i test.nrrd -s 1,1,3 -o resampledImage.nrrd
+ $./MitkImageResampler -i test.nrrd -s 1,1,3 -o resampledImage.nrrd
 \endcode
 
 Alternatively this program can be used to resample by reference. This will resample the input image to the grid provided by the reference image
 and also ensure they occupy the same physical space (that is the input image will have the same origin and voxel dimensions)
 
 \code
-$./MitkDiffusionMiniApps ImageResampler -i test.nrrd -r referenceImage.nrrd -o resampledImage.nrrd
+ $./MitkImageResampler -i test.nrrd -r referenceImage.nrrd -o resampledImage.nrrd
 \endcode
 
 \note Resampling by reference image can also be applied to MR Diffusion data (.dwi files).
@@ -98,7 +95,7 @@ Takes a .dwi, .fsl/.fslgz file as input and saves the computed reconstructed ten
 It also allows for a threshold to be set, to exclude low b values from the reconstruction process.
 
 \code
-./MitkDiffusionMiniApps TensorReconstruction -i /home/user/sample.dwi -o /home/user/tensors.dti -t 50
+$./MitkTensorReconstruction -i /home/user/sample.dwi -o /home/user/tensors.dti -t 50
 \endcode
 
 \subsection QballRecon  Qball Reconstruction
@@ -106,7 +103,7 @@ It also allows for a threshold to be set, to exclude low b values from the recon
 See \ref QmitkDiffusionImagingUserManualQBallReconstruction for the GUI equivalent of this tool.
 
 \code
-./MitkDiffusionMiniApps QballReconstruction -i /home/user/sample.dwi -o /home/user/tensors.qbi -t 50 -r .006 -shc /home/user/coeffs.csv
+./MitkQballReconstruction -i /home/user/sample.dwi -o /home/user/tensors.qbi -t 50 -r .006 -shc /home/user/coeffs.csv
 \endcode
 
 \subsection PeakExtraction Peak Extraction
@@ -127,7 +124,7 @@ Computes a selected tensor derived indices (fa, gfa, ra, ad, rd, ca, l2, l3, md)
 Tensor, Q-ball or FSL/MRTrix SH-coefficient image. E.g. to compute the fraction anisotropy call
 
 \code
-./MitkDiffusionMiniApps DiffusionIndices -i /home/user/input.dti -idx fa -o /home/user/fa_image.nrrd
+./MitkDiffusionIndices -i /home/user/input.dti -idx fa -o /home/user/fa_image.nrrd
 \endcode
 
 \subsection AllDiffusionIndices Tensor Derived Maps Extraction

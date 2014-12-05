@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
-#include <mitkDataNodeFactory.h>
 
 #include <itkDiffusionTensor3D.h>
 

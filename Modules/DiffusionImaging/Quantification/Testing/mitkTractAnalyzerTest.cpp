@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkTractAnalyzer.h>
 #include <itkImageFileReader.h>
-#include <mitkPointSetReader.h>
 #include <mitkNrrdTbssRoiImageReader.h>
+#include <mitkIOUtil.h>
 
 /**Documentation
  *  test for the class "mitkTractAnalyzer".
@@ -44,13 +44,16 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
 
   // load point set
 
-  mitk::PointSetReader::Pointer pointSetReader = mitk::PointSetReader::New();
-  pointSetReader->SetFileName(argv[2]);
-  pointSetReader->Update();
+  mitk::PointSet::Pointer pointSet;
 
-  mitk::PointSet::Pointer pointSet = pointSetReader->GetOutput();
-
-
+  try
+  {
+    pointSet = mitk::IOUtil::LoadPointSet(argv[2]);
+  }
+  catch (const mitk::Exception&)
+  {
+    return EXIT_FAILURE;
+  }
 
   mitk::TractAnalyzer analyzer;
 
@@ -61,11 +64,7 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
 
   mitk::TbssRoiImage::Pointer tbssRoi = analyzer.GetRoiImage();
 
-
-
   std::vector< itk::Index<3> > roi = tbssRoi->GetRoi();
-
-
 
   // Output roi for debug purposes
   std::cout << "ROI\n";
@@ -74,7 +73,6 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
      itk::Index<3> ix = roi.at(t);
      std::cout << ix[0] << ", " << ix[1] << ", " << ix[2] << "\n";
   }
-
 
   std::cout << std::endl;
 
@@ -86,7 +84,6 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
   bool equal = mitk::Equal(cost, 5162.854, 0.001);
 
   MITK_TEST_CONDITION(equal, "Checking cost of found ROI");
-
 
   MITK_TEST_END();
 }

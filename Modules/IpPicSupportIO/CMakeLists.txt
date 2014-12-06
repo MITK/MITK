@@ -1,7 +1,7 @@
 #mitkFunctionCheckCompilerFlags("-Wno-deprecated-declarations" CMAKE_CXX_FLAGS)
 
 MITK_CREATE_MODULE(
-  DEPENDS MitkIpPic MitkLegacyAdaptors
+  DEPENDS MitkIpPic MitkLegacyAdaptors MitkLegacyIO
   AUTOLOAD_WITH MitkCore
   )
 

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkIOUtil.h"
 
 #include <mitkIOUtil.h>
+#include <mitkImageWriter.h>
 #include <mitkCoreObjectFactory.h>
 #include "mitkCoreServices.h"
 #include "mitkIMimeTypeProvider.h"

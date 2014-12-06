@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkImageCast.h>
 #include <mitkQBallImage.h>
+#include <mitkBaseDataIOFactory.h>
 #include <itkGibbsTrackingFilter.h>
 #include <mitkFiberBundleX.h>
-#include <mitkIOUtil.h>
 
 using namespace mitk;
 
@@ -43,15 +43,16 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     MITK_INFO << "Parameter file: " << argv[3];
     MITK_INFO << "Reference bundle: " << argv[4];
 
-    std::vector<mitk::BaseData::Pointer> infile = mitk::IOUtil::Load( argv[1] );
+    const std::string s1="", s2="";
+    std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[1], s1, s2, false );
     mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());
     MITK_TEST_CONDITION_REQUIRED(mitkQballImage.IsNotNull(),"check qball image")
 
-    infile = mitk::IOUtil::Load( argv[2] );
+    infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[2], s1, s2, false );
     mitkMaskImage = dynamic_cast<mitk::Image*>(infile.at(0).GetPointer());
     MITK_TEST_CONDITION_REQUIRED(mitkMaskImage.IsNotNull(),"check mask image")
 
-    infile = mitk::IOUtil::Load( argv[4] );
+    infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[4], s1, s2, false );
     fib1 = dynamic_cast<mitk::FiberBundleX*>(infile.at(0).GetPointer());
     MITK_TEST_CONDITION_REQUIRED(fib1.IsNotNull(),"check fiber bundle")
 

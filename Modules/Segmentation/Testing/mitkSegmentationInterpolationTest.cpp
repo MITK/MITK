@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegmentationInterpolationController.h"
 #include "mitkCoreObjectFactory.h"
 #include "mitkStandardFileLocations.h"
+#include "mitkDataNodeFactory.h"
 #include "ipSegmentation.h"
 #include "mitkCompareImageSliceTestHelper.h"
-#include <mitkIOUtil.h>
 
 class mitkSegmentationInterpolationTestClass
 {
@@ -252,20 +252,20 @@ bool mitkSegmentationInterpolationTestClass::LoadTestImages(std::string filename
 
 mitk::Image::Pointer mitkSegmentationInterpolationTestClass::LoadImage(const std::string& filename)
 {
-  std::vector<mitk::BaseData::Pointer> baseData;
-  mitk::Image::Pointer image;
-
+  mitk::Image::Pointer image = NULL;
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   try
   {
-    baseData = mitk::IOUtil::Load(filename);
+    factory->SetFileName( filename );
+    factory->Update();
 
-    if(baseData.empty())
+    if(factory->GetNumberOfOutputs()<1)
     {
       std::cerr<<"File " << filename << " could not be loaded [FAILED]"<<std::endl;
       return NULL;
     }
-
-    image = dynamic_cast<mitk::Image*>(baseData.at(0).GetPointer());
+    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
+    image = dynamic_cast<mitk::Image*>(node->GetData());
     if(image.IsNull())
     {
       std::cout<<"File " << filename << " is not an image! [FAILED]"<<std::endl;

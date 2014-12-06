@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 #include <mitkFiberBundleX.h>
+#include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkTestingConfig.h>
@@ -43,8 +44,12 @@ public:
     fib1 = NULL;
     fib2 = NULL;
 
-    std::vector<mitk::BaseData::Pointer> baseData = mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/fiberBundleX.fib"));
-    fib1 = dynamic_cast<mitk::FiberBundleX*>(baseData.at(0).GetPointer());
+    const std::string s1="", s2="";
+    std::string filename = GetTestDataFilePath("DiffusionImaging/fiberBundleX.fib");
+
+    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::BaseDataIO::LoadBaseDataFromFile( filename, s1, s2, false );
+    mitk::BaseData::Pointer baseData = fibInfile.at(0);
+    fib1 = dynamic_cast<mitk::FiberBundleX*>(baseData.GetPointer());
   }
 
   void tearDown()
@@ -55,8 +60,9 @@ public:
 
   void Equal_SaveLoad_ReturnsTrue()
   {
+    const std::string s1="", s2="";
     mitk::IOUtil::Save(fib1.GetPointer(), std::string(MITK_TEST_OUTPUT_DIR)+"/writerTest.fib");
-    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::IOUtil::Load(std::string(MITK_TEST_OUTPUT_DIR)+"/writerTest.fib");
+    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::BaseDataIO::LoadBaseDataFromFile( std::string(MITK_TEST_OUTPUT_DIR)+"/writerTest.fib", s1, s2, false );
     mitk::BaseData::Pointer baseData = fibInfile.at(0);
     fib2 = dynamic_cast<mitk::FiberBundleX*>(baseData.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Should be equal", fib1->Equals(fib2));

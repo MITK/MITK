@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <itkExceptionObject.h>
 #include <itkImageFileWriter.h>
-#include <mitkIOUtil.h>
+#include <mitkBaseDataIOFactory.h>
 #include <mitkQBallImage.h>
 #include <itkTensorDerivedMeasurementsFilter.h>
 #include <itkDiffusionQballGeneralizedFaImageFilter.h>
@@ -59,7 +59,8 @@ int main(int argc, char* argv[])
     try
     {
         // load input image
-        std::vector<mitk::BaseData::Pointer> infile = mitk::IOUtil::Load( inFileName );
+        const std::string s1="", s2="";
+        std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
 
         if( boost::algorithm::ends_with(inFileName, ".qbi") && index=="gfa" )
         {

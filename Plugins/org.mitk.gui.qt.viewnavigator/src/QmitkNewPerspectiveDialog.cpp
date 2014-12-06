@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringListModel>
 #include <QAbstractItemModel>
 
+#include <mitkDataNodeFactory.h>
+
 QmitkNewPerspectiveDialog::QmitkNewPerspectiveDialog(QWidget* parent)
     :QDialog(parent)
 {

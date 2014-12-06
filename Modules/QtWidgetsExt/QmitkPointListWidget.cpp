@@ -15,7 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "QmitkPointListWidget.h"
 #include <mitkGlobalInteraction.h>
-#include <mitkIOUtil.h>
+#include <mitkPointSetReader.h>
+#include <mitkPointSetWriter.h>
 
 #include <QHBoxLayout>
 #include <QFileDialog>
@@ -219,9 +220,13 @@ void QmitkPointListWidget::OnBtnSavePoints()
 
   try
   {
-    mitk::IOUtil::Save(m_PointSetNode->GetData(), aFilename.toStdString());
+    // instantiate the writer and add the point-sets to write
+    mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
+    writer->SetInput( dynamic_cast<mitk::PointSet*>(m_PointSetNode->GetData()) );
+    writer->SetFileName( aFilename.toLatin1() );
+    writer->Update();
   }
-  catch (const mitk::Exception&)
+  catch(...)
   {
     QMessageBox::warning( this, "Save point set",
                           QString("File writer reported problems writing %1\n\n"
@@ -236,22 +241,27 @@ void QmitkPointListWidget::OnBtnLoadPoints()
   if ( filename.isEmpty() ) return;
 
   // attempt to load file
-  mitk::PointSet::Pointer pointSet;
-
   try
   {
-    pointSet = mitk::IOUtil::LoadPointSet(filename.toStdString());
+    mitk::PointSetReader::Pointer reader = mitk::PointSetReader::New();
+    reader->SetFileName( filename.toLatin1() );
+    reader->Update();
+
+    mitk::PointSet::Pointer pointSet = reader->GetOutput();
+    if ( pointSet.IsNull() )
+    {
+      QMessageBox::warning( this, "Load point set", QString("File reader could not read %1").arg(filename) );
+      return;
+    }
+
+    // loading successful
+
+    this->SetPointSet(pointSet);
   }
-  catch(const mitk::Exception&)
+  catch(...)
   {
-    QMessageBox::warning( this, "Load point set", QString("File reader could not read %1").arg(filename) );
-    return;
+    QMessageBox::warning( this, "Load point set", QString("File reader collapsed while reading %1").arg(filename) );
   }
-
-  // loading successful
-
-  this->SetPointSet(pointSet);
-
   emit PointListChanged();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

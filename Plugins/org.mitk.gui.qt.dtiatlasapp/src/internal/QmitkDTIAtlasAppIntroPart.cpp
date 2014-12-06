@@ -49,11 +49,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDTIAtlasAppApplicationPlugin.h"
 #include "mitkDataStorageEditorInput.h"
 
+#include "mitkBaseDataIOFactory.h"
 #include "mitkSceneIO.h"
 #include "mitkProgressBar.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
-#include <mitkIOUtil.h>
 
 QmitkDTIAtlasAppIntroPart::QmitkDTIAtlasAppIntroPart()
   : m_Controls(NULL)
@@ -206,16 +207,17 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
       }
       else
       {
+        mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
         try
         {
-          std::vector<mitk::BaseData::Pointer> baseData = mitk::IOUtil::Load(fileName->toLocal8Bit().data());
-
-          for ( unsigned int i = 0 ; i < baseData.size(); ++i )
+          nodeReader->SetFileName(fileName->toLocal8Bit().data());
+          nodeReader->Update();
+          for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
           {
-            if (baseData[i].IsNotNull())
+            mitk::DataNode::Pointer node;
+            node = nodeReader->GetOutput(i);
+            if ( node->GetData() != NULL )
             {
-              mitk::DataNode::Pointer node = mitk::DataNode::New();
-              node->SetData(baseData[i]);
               dataStorage->Add(node);
               dsmodified = true;
             }
@@ -290,7 +292,7 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
 
 #endif
 
-void QmitkDTIAtlasAppIntroPart::StandbyStateChanged(bool)
+void QmitkDTIAtlasAppIntroPart::StandbyStateChanged(bool standby)
 {
 
 }

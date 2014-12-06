@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
+#include "mitkImageWriter.h"
+#include "mitkSurfaceVtkWriter.h"
 #include "mitkImageToSurfaceFilter.h"
 
 #include "mitkImageAccessByItk.h"
@@ -198,6 +200,18 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
   m_ReduceFilter = NULL;
   itkImage = NULL;
 
+  // If this bool flag is true, the distanceImage will be written to the
+  // filesystem as nrrd-image and as surface-representation.
+  bool debugOutput(false);
+  if ( debugOutput )
+  {
+    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
+    imageWriter->SetInput( distanceImage );
+    imageWriter->SetExtension( ".nrrd" );
+    imageWriter->SetFileName( "v:/DistanceImage" );
+    imageWriter->Update();
+  }
+
   mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
   imageToSurfaceFilter->SetInput( distanceImage );
   imageToSurfaceFilter->SetThreshold( 0 );
@@ -208,6 +222,16 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
   // Cleanup the pipeline
   segmentationAsSurface->DisconnectPipeline();
   imageToSurfaceFilter = NULL;
+
+  if ( debugOutput )
+  {
+    mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer surfaceWriter = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
+    surfaceWriter->SetInput( segmentationAsSurface );
+    surfaceWriter->SetExtension( ".vtk" );
+    surfaceWriter->SetFileName( "v:/DistanceImageAsSurface.vtk" );
+    surfaceWriter->Update();
+  }
+
 
   mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
   surfaceToImageFilter->SetInput( segmentationAsSurface );

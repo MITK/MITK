@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImageCast.h>
 #include <mitkDiffusionImage.h>
+#include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkFiberBundleX.h>
 #include <mitkFiberfoxParameters.h>

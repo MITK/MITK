@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkBaseDataIOFactory.h"
 #include "mitkDiffusionImage.h"
 #include "mitkBaseData.h"
-#include <mitkIOUtil.h>
 
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>
 #include <itkDiffusionTensor3D.h>
@@ -26,11 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 
 using namespace mitk;
-
 /**
  * Convert files from one ending to the other
  */
-
 int main(int argc, char* argv[])
 {
     std::cout << "TensorReconstruction";
@@ -60,7 +58,8 @@ int main(int argc, char* argv[])
 
     try
     {
-        std::vector<BaseData::Pointer> infile = IOUtil::Load( inFileName );
+        const std::string s1="", s2="";
+        std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
         DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer());
 
         typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, float > TensorReconstructionImageFilterType;

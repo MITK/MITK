@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRenderWindow.h"
 #include "QmitkSliceWidget.h"
 
+#include "mitkDataNodeFactory.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 #include "mitkStandaloneDataStorage.h"
-#include "mitkIOUtil.h"
 
 #include "mitkPointSet.h"
 // NEW INCLUDE
@@ -75,21 +75,21 @@ int main(int argc, char* argv[])
     // For testing
     if(strcmp(argv[i], "-testing")==0) continue;
 
-    // Read supported data formats by using the IOUtil helper class.
+    // Create a DataNodeFactory to read a data format supported
+    // by the DataNodeFactory (many image formats, surface formats, etc.)
+    mitk::DataNodeFactory::Pointer nodeReader=mitk::DataNodeFactory::New();
     const char * filename = argv[i];
     try
     {
-      std::vector<mitk::BaseData::Pointer> baseData = mitk::IOUtil::Load(filename);
-
+      nodeReader->SetFileName(filename);
+      nodeReader->Update();
       //*********************************************************************
       // Part III: Put the data into the datastorage
       //*********************************************************************
 
-      // First, put the data into a data node
-      mitk::DataNode::Pointer node = mitk::DataNode::New();
-      node->SetData(baseData.at(0));
-
-      // Then, add the newly created data node into the datastorage
+      // Since the DataNodeFactory directly creates a node,
+      // use the iterator to add the read node to the tree
+      mitk::DataNode::Pointer node = nodeReader->GetOutput();
       ds->Add(node);
     }
     catch(...)

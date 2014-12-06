@@ -26,9 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 */
 
+#include "mitkDataNodeFactory.h"
 #include "mitkStandardFileLocations.h"
 #include "mitkDicomSeriesReader.h"
-#include "mitkIOUtil.h"
 
 #include "mitkTestingMacros.h"
 
@@ -56,20 +56,14 @@ bool mitkDICOMLocaleTestChangeLocale(const std::string& locale)
 
 void mitkDICOMLocaleTestWithReferenceImage(std::string filename)
 {
-  std::vector<mitk::BaseData::Pointer> baseData;
   mitk::Image::Pointer image;
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
+  factory->SetFileName( filename );
+  factory->Update();
+  MITK_TEST_CONDITION_REQUIRED(factory->GetNumberOfOutputs() > 0, "file " << filename << " loaded");
 
-  try
-  {
-    baseData = mitk::IOUtil::Load(filename);
-  }
-  catch (...)
-  {
-  }
-
-  MITK_TEST_CONDITION_REQUIRED(!baseData.empty(), "file " << filename << " loaded");
-
-  image = dynamic_cast<mitk::Image*>(baseData.at(0).GetPointer());
+  mitk::DataNode::Pointer node = factory->GetOutput( 0 );
+  image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNull())
   {
     MITK_TEST_FAILED_MSG(<< "File "<< filename << " is not an image - test will not be applied." );

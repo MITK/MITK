@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTrackingVolumeGenerator.h"
+#include "mitkSTLFileReader.h"
 #include "mitkStandardFileLocations.h"
 #include "mitkConfig.h"
 #include <vtkCubeSource.h>
@@ -99,19 +100,18 @@ void mitk::TrackingVolumeGenerator::GenerateData()
     return;
   }
 
-  mitk::Surface::Pointer surface;
+  mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
+  stlReader->SetFileName( tmpFilePath.c_str() );
+  stlReader->Update();
 
-  try
-  {
-    surface = mitk::IOUtil::LoadSurface(tmpFilePath);
-  }
-  catch (const mitk::Exception&)
+  std::remove(tmpFilePath.c_str());
+
+  if ( stlReader->GetOutput() == NULL)
   {
     MITK_ERROR << "Error while reading file";
     return ;
   }
-
-  output->SetVtkPolyData( surface->GetVtkPolyData());//set the visible trackingvolume
+  output->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());//set the visible trackingvolume
 }
 
 void mitk::TrackingVolumeGenerator::SetTrackingDeviceType(mitk::TrackingDeviceType deviceType)

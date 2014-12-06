@@ -52,8 +52,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorageEditorInput.h"
 #include <string>
 
+#include "mitkBaseDataIOFactory.h"
 #include "mitkSceneIO.h"
 #include "mitkProgressBar.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 

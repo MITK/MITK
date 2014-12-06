@@ -208,7 +208,7 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
       {
         try
         {
-          std::vector<mitk::BaseData::Pointer> baseData = mitk::IOUtil::Load(fileName->toLocal8Bit().data());
+          std::vector<BaseData::Pointer> baseData = mitk::IOUtil::Load(fileName->toLocal8Bit().data());
 
           for ( unsigned int i = 0 ; i < baseData.size(); ++i )
           {

@@ -35,4 +35,6 @@ void org_mitk_gui_qt_aicpregistration_Activator::stop(ctkPluginContext* context)
 
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_aicpregistration, mitk::org_mitk_gui_qt_aicpregistration_Activator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_aicpregistration, mitk::org_mitk_gui_qt_aicpregistration_Activator)
+#endif

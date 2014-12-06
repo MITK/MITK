@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRTDoseReader.h"
 
 #include <mitkIOUtil.h>
+#include <mitkDataNodeFactory.h>
 #include <mitkImagePixelWriteAccessor.h>
 #include <mitkImageAccessByItk.h>
 #include <itkImageIterator.h>

@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkInteractionConst.h>
 #include <mitkPositionEvent.h>
 #include <mitkVtkPropRenderer.h>
+#include <mitkDataNodeFactory.h>
 #include <mitkVtkRepresentationProperty.h>
 
 #include <vtkRenderer.h>

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkShowSegmentationAsSurface.h"
 #include "mitkManualSegmentationToSurfaceFilter.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkVtkRepresentationProperty.h"
 #include <mitkCoreObjectFactory.h>
 

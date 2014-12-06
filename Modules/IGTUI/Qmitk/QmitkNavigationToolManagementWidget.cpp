@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk headers
 #include "mitkTrackingTypes.h"
+#include <mitkSTLFileReader.h>
 #include <mitkSurface.h>
 #include <mitkNavigationToolReader.h>
 #include <mitkNavigationToolWriter.h>

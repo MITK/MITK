@@ -86,7 +86,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStatusBar.h"
 #include "mitkTeemDiffusionTensor3DReconstructionImageFilter.h"
 #include "mitkSurface.h"
-#include "mitkDataNodeFactory.h"
 
 #include "vtkPolyData.h"
 #include "vtkPoints.h"

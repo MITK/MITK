@@ -18,9 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 
-#include <mitkDataNodeFactory.h>
 #include <mitkPointSet.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkIOUtil.h>
 
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
@@ -60,20 +60,22 @@ int main(int argc, char* argv[])
   // Part II: Create some data by reading a file
   //*************************************************************************
 
-  // Create a DataNodeFactory to read a data format supported
-  // by the DataNodeFactory (many image formats, surface formats, etc.)
-  mitk::DataNodeFactory::Pointer reader=mitk::DataNodeFactory::New();
+  // Read supported data formats by using the IOUtil helper class.
   const char * filename = argv[1];
   try
   {
-    reader->SetFileName(filename);
-    reader->Update();
-    //*************************************************************************
-    // Part III: Put the data into the datastorage
-    //*************************************************************************
+    std::vector<mitk::BaseData::Pointer> baseData = mitk::IOUtil::Load(filename);
 
-    // Add the node to the DataStorage
-    dataStorage->Add(reader->GetOutput());
+    //*********************************************************************
+    // Part III: Put the data into the datastorage
+    //*********************************************************************
+
+    // First, put the data into a data node
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(baseData.at(0));
+
+    // Then, add the newly created data node into the datastorage
+    dataStorage->Add(node);
   }
   catch(...)
   {

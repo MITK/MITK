@@ -20,9 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk
 #include "mitkGlobalInteraction.h"
 #include "mitkCoreExtConstants.h"
-#include <mitkDataNodeFactory.h>
 #include <mitkBaseRenderer.h>
 #include <mitkIDataStorageService.h>
+#include <mitkIOUtil.h>
 
 mitk::WiiMoteActivator::WiiMoteActivator()
 : m_IsRegistered(false)
@@ -132,17 +132,14 @@ mitk::DataStorage::Pointer mitk::WiiMoteActivator::GetDataStorage()
 
 void mitk::WiiMoteActivator::AddSurfaceInteractor()
 {
-    mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-
     // model was designed by Patrick Grubb
     std::string fileName = MITK_ROOT;
     fileName += "Modules/InputDevices/WiiMote/WiiMoteModel.obj";
 
     try
     {
-      nodeReader->SetFileName(fileName.c_str());
-      nodeReader->Update();
-      m_Node = nodeReader->GetOutput();
+      mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(fileName);
+      m_Node->SetData(surface.GetPointer());
 
       if(m_Interactor.IsNull())
       {

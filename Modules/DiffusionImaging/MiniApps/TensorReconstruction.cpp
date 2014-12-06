@@ -26,11 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 
 using namespace mitk;
-
 /**
  * Convert files from one ending to the other
  */
-
 int main(int argc, char* argv[])
 {
     std::cout << "TensorReconstruction";

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkResampleImageFilter.h>
 #include <itkFiniteDiffOdfMaximaExtractionFilter.h>
 
+#include <mitkBaseDataIOFactory.h>
 #include <mitkDiffusionImage.h>
 #include <mitkQBallImage.h>
 #include <mitkImageCast.h>
@@ -81,7 +82,8 @@ int mitkPeakExtractionTest(int argc, char* argv[])
         mitk::FiberBundleX::Pointer fib1 = filter->GetOutputFiberBundle();
 
         MITK_INFO << "Loading reference ...";
-        std::vector<mitk::BaseData::Pointer> infile = mitk::IOUtil::Load( referenceFileName );
+        const std::string s1="", s2="";
+        std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( referenceFileName, s1, s2, false );
         mitk::FiberBundleX::Pointer fib2 = dynamic_cast<mitk::FiberBundleX*>(infile.at(0).GetPointer());
 
         // TODO: reduce epsilon. strange issues with differing values between windows and linux.

@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkImageCast.h>
+#include <mitkBaseDataIOFactory.h>
 #include "mitkCommandLineParser.h"
 #include <boost/algorithm/string.hpp>
 #include <DiffusionWeightedImages/mitkDiffusionImage.h>
@@ -30,7 +31,8 @@ mitk::BaseData::Pointer LoadFile(std::string filename)
   if( filename.empty() )
     return NULL;
 
-  std::vector<mitk::BaseData::Pointer> infile = mitk::IOUtil::Load( filename );
+  const std::string s1="", s2="";
+  std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( filename, s1, s2, false );
   if( infile.empty() )
   {
     std::cout << "File " << filename << " could not be read!";

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImageCast.h>
 #include <mitkDiffusionImage.h>
+#include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
 #include "mitkCommandLineParser.h"
 
@@ -47,9 +48,10 @@ int main(int argc, char* argv[])
 
     try
     {
-        std::vector<BaseData::Pointer> infile = IOUtil::Load( refImage );
+        const std::string s1="", s2="";
+        std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( refImage, s1, s2, false );
         Image::Pointer source = dynamic_cast<Image*>(infile.at(0).GetPointer());
-        infile = IOUtil::Load( imageName );
+        infile = BaseDataIO::LoadBaseDataFromFile( imageName, s1, s2, false );
         Image::Pointer target = dynamic_cast<Image*>(infile.at(0).GetPointer());
 
         mitk::BaseGeometry* s_geom = source->GetGeometry();

@@ -87,6 +87,7 @@ set(project_policies
   CMP0014 # NEW: Input directories must have CMakeLists.txt.
   CMP0020 # NEW: Automatically link Qt executables to qtmain target on Windows.
   CMP0028 # NEW: Double colon in target name means ALIAS or IMPORTED target.
+  CMP0043 # NEW: Ignore COMPILE_DEFINITIONS_<Config> properties.
   )
 foreach(policy ${project_policies})
   if(POLICY ${policy})

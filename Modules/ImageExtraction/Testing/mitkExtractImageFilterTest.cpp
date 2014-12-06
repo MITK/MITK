@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkExtractImageFilter.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkCompareImageSliceTestHelper.h"
 #include "mitkImageTimeSelector.h"
+#include <mitkIOUtil.h>
 
 unsigned int CompareImageSliceTestHelper::m_Dimension0 = 0;
 unsigned int CompareImageSliceTestHelper::m_Dimension1 = 0;
@@ -372,21 +372,21 @@ int mitkExtractImageFilterTest(int argc, char* argv[])
 
   // load the image
 
-    mitk::Image::Pointer image = NULL;
-    mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
+    std::vector<mitk::BaseData::Pointer> baseData;
+    mitk::Image::Pointer image;
+
     try
     {
       std::cout << "Testing with parameter '" << argv[1] << "'" << std::endl;
-      factory->SetFileName( argv[1] );
-      factory->Update();
+      baseData = mitk::IOUtil::Load(argv[1]);
 
-      if(factory->GetNumberOfOutputs()<1)
+      if(baseData.empty())
       {
         std::cerr<<"File could not be loaded [FAILED]"<<std::endl;
         return EXIT_FAILURE;
       }
-      mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-      image = dynamic_cast<mitk::Image*>(node->GetData());
+
+      image = dynamic_cast<mitk::Image*>(baseData.at(0).GetPointer());
       if(image.IsNull())
       {
         std::cout<<"File not an image - test will not be applied [PASSED]"<<std::endl;

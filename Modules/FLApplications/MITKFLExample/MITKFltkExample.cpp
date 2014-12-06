@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLevelWindowProperty.h"
 #include "mitkSliceNavigationController.h"
 
-#include "mitkDataNodeFactory.h"
+#include <mitkIOUtil.h>
 #include "mitkSample.h"
 
 int main(int argc, char **argv) {
@@ -48,15 +48,22 @@ int main(int argc, char **argv) {
   ui.mainWid->GetRenderer()->SetMapperID(1);
   mitk::DataTree::Pointer tree = mitk::DataTree::New();
 
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
+  std::vector<mitk::BaseData::Pointer> baseData;
 
-  factory->SetFileName( fileName );
-  factory->Update();
-  if (factory->GetNumberOfOutputs() > 1) {
+  try
+  {
+    baseData = mitk::IOUtil::Load(fileName);
+  }
+  catch(const mitk::Exception&)
+  {
+  }
+
+  if (baseData.size() > 1) {
     fl_alert("WARNING: More than one image in file. Only showing first one.");
   }
   mitk::DataTreePreOrderIterator it(tree);
-  mitk::DataNode::Pointer node = factory->GetOutput( 0 );
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  node->SetData(baseData.at(0));
   assert(node.IsNotNull());
   {
     it.Add( node );

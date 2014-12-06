@@ -5,7 +5,7 @@
 #include <QtQuick>
 
 #include "mitkStandaloneDataStorage.h"
-#include "mitkDataNodeFactory.h"
+#include "mitkIOUtil.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkImage.h"
 
@@ -32,18 +32,21 @@ mitk::DataStorage::Pointer FillDataStorage(int argc, char **argv)
     if (strcmp(argv[i], "-testing") == 0)
       continue;
 
-    // Create a DataNodeFactory to read a data format supported
-    // by the DataNodeFactory (many image formats, surface formats, etc.)
-    mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
+     // Read supported data formats by using the IOUtil helper class.
     const char * filename = argv[i];
     try
     {
-      nodeReader->SetFileName(filename);
-      nodeReader->Update();
+      std::vector<mitk::BaseData::Pointer> baseData = mitk::IOUtil::Load(filename);
 
-      // Since the DataNodeFactory directly creates a node,
-      // use the datastorage to add the read node
-      mitk::DataNode::Pointer node = nodeReader->GetOutput();
+      //*********************************************************************
+      // Part III: Put the data into the datastorage
+      //*********************************************************************
+
+      // First, put the data into a data node
+      mitk::DataNode::Pointer node = mitk::DataNode::New();
+      node->SetData(baseData.at(0));
+
+      // Then, add the newly created data node into the datastorage
       storage->Add(node);
 
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());

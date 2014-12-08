@@ -227,6 +227,10 @@ public:
     mitkSetGetConstMacro(MaxIndex, vnl_vector<int>)
     mitkSetGetConstMacro(HotspotIndex, vnl_vector<int>)
 
+    mitkSetGetConstMacro(m_Skewness, double)
+    mitkSetGetConstMacro(m_Kurtosis, double)
+
+
   private:
    unsigned int Label;
    unsigned int N;
@@ -242,12 +246,16 @@ public:
 
    Statistics* m_HotspotStatistics;
 
+   double m_Skewness;
+   double m_Kurtosis;
+
    bool m_HasHotspotStatistics;
     vnl_vector<int> HotspotIndex;     //< index of hotspotsphere origin
   };
 
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
   typedef std::vector< Statistics > StatisticsContainer;
+
 
   mitkClassMacro( ImageStatisticsCalculator, itk::Object );
   itkFactorylessNewMacro(Self)
@@ -338,8 +346,12 @@ public:
   /** \brief Retrieve the histogram depending on the current masking mode (for all image labels. */
   const HistogramContainer &GetHistogramVector(  unsigned int timeStep = 0 ) const;
 
+    const std::map<int, double>  *BinsAndFreuqencyForHistograms( unsigned int timeStep = 0, unsigned int label = 0) const;
+  /* Returning a map including bin and Freuqeuncy*/
+
   /** \brief Retrieve statistics depending on the current masking mode.
    *
+
    * \param label The label for which to retrieve the statistics in multi-label situations (ascending order).
    */
   const Statistics &GetStatistics( unsigned int timeStep = 0, unsigned int label = 0 ) const;

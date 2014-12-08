@@ -19,6 +19,7 @@ set(CPP_FILES
   mitkAnisotropicIterativeClosestPointRegistration.cpp
   mitkWeightedPointTransform.cpp
   mitkAnisotropicRegistrationCommon.cpp
+  mitkUnstructuredGridToUnstructuredGridFilter.cpp
 )
 
 if(WIN32 AND NOT MINGW)

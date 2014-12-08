@@ -4,6 +4,7 @@ set(CPP_FILES
   mitkBoundingObjectToSegmentationFilter.cpp
   mitkGeometryClipImageFilter.cpp
   mitkHeightFieldSurfaceClipImageFilter.cpp
+  mitkImageToUnstructuredGridFilter.cpp
   mitkLabeledImageToSurfaceFilter.cpp
   mitkMaskAndCutRoiImageFilter.cpp
   mitkMaskImageFilter.cpp

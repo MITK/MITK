@@ -80,11 +80,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#if ( ( VTK_MAJOR_VERSION <= 5 ) && ( VTK_MINOR_VERSION<=8)  )
-#include "mitkvtkLassoStencilSource.h"
-#else
 #include "vtkLassoStencilSource.h"
-#endif
 
 
 namespace mitk
@@ -498,20 +494,6 @@ void ImageStatisticsCalculator::SetHistogramBinSize(unsigned int size)
 unsigned int ImageStatisticsCalculator::GetHistogramBinSize()
 {
   return this->m_HistogramBinSize;
-}
-
-void ImageStatisticsCalculator::SetHotspotRadiusInMM(double value)
-{
-  if ( m_HotspotRadiusInMM != value )
-  {
-    m_HotspotRadiusInMM = value;
-    if(m_CalculateHotspot)
-    {
-      m_HotspotRadiusInMMChanged = true;
-      //MITK_INFO <<"Hotspot radius changed, new convolution required";
-    }
-    this->Modified();
-  }
 }
 
   void ImageStatisticsCalculator::SetCalculateHotspot(bool on)
@@ -957,29 +939,36 @@ void ImageStatisticsCalculator::SetHotspotRadiusInMM(double value)
 
     case MASKING_MODE_IMAGE:
       {
-        if ( timeStep >= m_ImageMask->GetTimeSteps() )
+        if ( m_ImageMask.IsNotNull() && (m_ImageMask->GetReferenceCount() > 1) )
         {
-          // Use the last mask time step in case the current time step is bigger than the total
-          // number of mask time steps.
-          // It makes more sense setting this to the last mask time step than to 0.
-          // For instance if you have a mask with 2 time steps and an image with 5:
-          // If time step 0 is selected, the mask will use time step 0.
-          // If time step 1 is selected, the mask will use time step 1.
-          // If time step 2+ is selected, the mask will use time step 1.
-          // If you have a mask with only one time step instead, this will always default to 0.
-          timeStep = m_ImageMask->GetTimeSteps() - 1;
+          if ( timeStep >= m_ImageMask->GetTimeSteps() )
+          {
+            // Use the last mask time step in case the current time step is bigger than the total
+            // number of mask time steps.
+            // It makes more sense setting this to the last mask time step than to 0.
+            // For instance if you have a mask with 2 time steps and an image with 5:
+            // If time step 0 is selected, the mask will use time step 0.
+            // If time step 1 is selected, the mask will use time step 1.
+            // If time step 2+ is selected, the mask will use time step 1.
+            // If you have a mask with only one time step instead, this will always default to 0.
+            timeStep = m_ImageMask->GetTimeSteps() - 1;
+          }
+
+          ImageTimeSelector::Pointer maskedImageTimeSelector = ImageTimeSelector::New();
+          maskedImageTimeSelector->SetInput( m_ImageMask );
+          maskedImageTimeSelector->SetTimeNr( timeStep );
+          maskedImageTimeSelector->UpdateLargestPossibleRegion();
+          mitk::Image *timeSliceMaskedImage = maskedImageTimeSelector->GetOutput();
+
+          m_InternalImage = timeSliceImage;
+          CastToItkImage( timeSliceMaskedImage, m_InternalImageMask3D );
         }
-
-        ImageTimeSelector::Pointer maskedImageTimeSelector = ImageTimeSelector::New();
-        maskedImageTimeSelector->SetInput( m_ImageMask );
-        maskedImageTimeSelector->SetTimeNr( timeStep );
-        maskedImageTimeSelector->UpdateLargestPossibleRegion();
-        mitk::Image *timeSliceMaskedImage = maskedImageTimeSelector->GetOutput();
-
-        m_InternalImage = timeSliceImage;
-        CastToItkImage( timeSliceMaskedImage, m_InternalImageMask3D );
+        else
+        {
+          throw std::runtime_error( "Error: image mask empty!" );
+        }
+        break;
       }
-
     case MASKING_MODE_PLANARFIGURE:
       {
         m_InternalImageMask2D = NULL;
@@ -993,31 +982,33 @@ void ImageStatisticsCalculator::SetHotspotRadiusInMM(double value)
           throw std::runtime_error( "Masking not possible for non-closed figures" );
         }
 
-        const Geometry3D *imageGeometry = timeSliceImage->GetGeometry();
+        const BaseGeometry *imageGeometry = timeSliceImage->GetGeometry();
         if ( imageGeometry == NULL )
         {
           throw std::runtime_error( "Image geometry invalid!" );
         }
 
-      const BaseGeometry *imageGeometry = timeSliceImage->GetGeometry();
-      if ( imageGeometry == NULL )
-      {
-        throw std::runtime_error( "Image geometry invalid!" );
-      }
+        const PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
+        if ( planarFigurePlaneGeometry == NULL )
+        {
+          throw std::runtime_error( "Planar-Figure not yet initialized!" );
+        }
 
-      const PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
-      if ( planarFigurePlaneGeometry == NULL )
-      {
-        throw std::runtime_error( "Planar-Figure not yet initialized!" );
-      }
+        const PlaneGeometry *planarFigureGeometry =
+          dynamic_cast< const PlaneGeometry * >( planarFigurePlaneGeometry );
+        if ( planarFigureGeometry == NULL )
+        {
+          throw std::runtime_error( "Non-planar planar figures not supported!" );
+        }
 
-      const PlaneGeometry *planarFigureGeometry =
-        dynamic_cast< const PlaneGeometry * >( planarFigurePlaneGeometry );
-      if ( planarFigureGeometry == NULL )
-      {
-        throw std::runtime_error( "Non-planar planar figures not supported!" );
-      }
+        // Find principal direction of PlanarFigure in input image
+        unsigned int axis;
+        if ( !this->GetPrincipalAxis( imageGeometry, planarFigureGeometry->GetNormal(), axis ) )
+        {
+          throw std::runtime_error( "Non-aligned planar figures not supported!" );
+        }
 
+        m_PlanarFigureAxis = axis;
         // Find slice number corresponding to PlanarFigure in input image
         MaskImage3DType::IndexType index;
         imageGeometry->WorldToIndex( planarFigureGeometry->GetOrigin(), index );

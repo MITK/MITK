@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkDataObject.h"
 
-#include "ImageStatisticsExports.h"
+#include "MitkImageStatisticsExports.h"
 
 #include "mitkCommon.h"
 

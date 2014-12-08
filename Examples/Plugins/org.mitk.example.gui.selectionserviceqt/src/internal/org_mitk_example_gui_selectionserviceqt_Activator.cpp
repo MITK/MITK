@@ -38,4 +38,6 @@ void org_mitk_example_gui_selectionserviceqt_Activator::stop(ctkPluginContext* c
 }
 
 
-Q_EXPORT_PLUGIN2(org_mitk_example_gui_selectionserviceqt, org_mitk_example_gui_selectionserviceqt_Activator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_example_gui_selectionserviceqt, org_mitk_example_gui_selectionserviceqt_Activator)
+#endif

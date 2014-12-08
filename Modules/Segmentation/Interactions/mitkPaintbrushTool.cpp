@@ -283,9 +283,6 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
   */
 bool mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-      return false;
-
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -313,9 +310,6 @@ bool mitk::PaintbrushTool::OnPrimaryButtonPressedMoved( StateMachineAction*, Int
   */
 bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, bool leftMouseButtonPressed)
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-      return false;
-
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
 
@@ -425,10 +419,7 @@ bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
 
 bool mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-      return false;
-
-    //When mouse is released write segmentationresult back into image
+  //When mouse is released write segmentationresult back into image
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;

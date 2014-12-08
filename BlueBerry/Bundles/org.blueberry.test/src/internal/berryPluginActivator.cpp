@@ -40,4 +40,6 @@ void org_blueberry_test_Activator::stop(ctkPluginContext* context)
 
 }
 
-Q_EXPORT_PLUGIN2(org_blueberry_test, berry::org_blueberry_test_Activator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_blueberry_test, berry::org_blueberry_test_Activator)
+#endif

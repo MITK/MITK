@@ -14,19 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include <mitkImageCast.h>
 #include <mitkDiffusionImage.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 
 using namespace mitk;
-#include "ctkCommandLineParser.h"
 
-int CopyGeometry(int argc, char* argv[])
+
+int main(int argc, char* argv[])
 {
-    ctkCommandLineParser parser;
+    mitkCommandLineParser parser;
 
     parser.setTitle("Copy Geometry");
     parser.setCategory("Preprocessing Tools");
@@ -34,9 +33,9 @@ int CopyGeometry(int argc, char* argv[])
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("in", "i", ctkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
-    parser.addArgument("ref", "r", ctkCommandLineParser::InputFile, "Reference:", "reference image", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
+    parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
+    parser.addArgument("ref", "r", mitkCommandLineParser::InputFile, "Reference:", "reference image", us::Any(), false);
+    parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -70,19 +69,18 @@ int CopyGeometry(int argc, char* argv[])
     }
     catch (itk::ExceptionObject e)
     {
-        MITK_INFO << e;
+        std::cout << e;
         return EXIT_FAILURE;
     }
     catch (std::exception e)
     {
-        MITK_INFO << e.what();
+        std::cout << e.what();
         return EXIT_FAILURE;
     }
     catch (...)
     {
-        MITK_INFO << "ERROR!?!";
+        std::cout << "ERROR!?!";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(CopyGeometry);

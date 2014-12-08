@@ -130,7 +130,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_CrosshairModeButton->setIconSize(size);
   m_CrosshairModeButton->setFlat( true );
   m_CrosshairModeButton->setMenu( m_CrosshairMenu );
-  m_CrosshairModeButton->setIcon( QIcon( iconCrosshairMode_xpm ) );
+  m_CrosshairModeButton->setIcon(QIcon(QPixmap(iconCrosshairMode_xpm)));
   layout->addWidget( m_CrosshairModeButton );
 
   //fullScreenButton
@@ -138,7 +138,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_FullScreenButton->setMaximumSize(15, 15);
   m_FullScreenButton->setIconSize(size);
   m_FullScreenButton->setFlat( true );
-  m_FullScreenButton->setIcon( QIcon( iconFullScreen_xpm ));
+  m_FullScreenButton->setIcon(QIcon(QPixmap(iconFullScreen_xpm)));
   layout->addWidget( m_FullScreenButton );
 
   //settingsButton
@@ -146,7 +146,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_SettingsButton->setMaximumSize(15, 15);
   m_SettingsButton->setIconSize(size);
   m_SettingsButton->setFlat( true );
-  m_SettingsButton->setIcon( QIcon( iconSettings_xpm ));
+  m_SettingsButton->setIcon(QIcon(QPixmap(iconSettings_xpm)));
   layout->addWidget( m_SettingsButton );
 
   //Create Connections -- coming soon?
@@ -790,17 +790,9 @@ void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
 
 void QmitkRenderWindowMenu::ChangeFullScreenIcon()
 {
-
- if( m_FullScreenMode )
- {
-   const QIcon icon( iconLeaveFullScreen_xpm );
-   m_FullScreenButton->setIcon(icon);
- }
-  else
-  {
-    const QIcon icon( iconFullScreen_xpm );
-    m_FullScreenButton->setIcon(icon);
- }
+  m_FullScreenButton->setIcon(m_FullScreenMode
+    ? QPixmap(iconLeaveFullScreen_xpm)
+    : QPixmap(iconFullScreen_xpm));
 }
 
 void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction* action)

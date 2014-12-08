@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include "mitkBaseDataIOFactory.h"
 #include "mitkDiffusionImage.h"
 #include "mitkBaseData.h"
 
 #include <itkImageFileWriter.h>
 #include <itkNrrdImageIO.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <itksys/SystemTools.hxx>
 #include <itksys/Directory.hxx>
 
@@ -163,20 +162,19 @@ using namespace mitk;
  * Read DICOM Files through the new (refactored) Diffusion DICOM Loader. It serves also as a first test of the new functionality, it will replace the
  * current loading mechanism after the necessary parts are merged into the master branch.
  */
-int DICOMLoader(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-  ctkCommandLineParser parser;
+  mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("inputdir", "i", ctkCommandLineParser::String, "Input Directory" ,"input directory containing dicom files", us::Any(), false);
-  parser.addArgument("output", "o", ctkCommandLineParser::String, "Output File Name", "output file", us::Any(), false);
-  parser.addArgument("dwprefix", "p", ctkCommandLineParser::String, "Recursive Scan Prefix", "prefix for subfolders search rootdir is specified by the 'inputdir' argument value", us::Any(), true);
-  parser.addArgument("dryrun", "-s", ctkCommandLineParser::Bool, "Dry run","do not read, only look for input files ", us::Any(), true );
+  parser.addArgument("inputdir", "i", mitkCommandLineParser::String, "Input Directory" ,"input directory containing dicom files", us::Any(), false);
+  parser.addArgument("output", "o", mitkCommandLineParser::String, "Output File Name", "output file", us::Any(), false);
+  parser.addArgument("dwprefix", "p", mitkCommandLineParser::String, "Recursive Scan Prefix", "prefix for subfolders search rootdir is specified by the 'inputdir' argument value", us::Any(), true);
+  parser.addArgument("dryrun", "-s", mitkCommandLineParser::Bool, "Dry run","do not read, only look for input files ", us::Any(), true );
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
   {
-    MITK_ERROR << "No input arguments were specified. Please provide all non-optional arguments. ";
-    return 0;
+    return EXIT_FAILURE;
   }
 
   std::string inputDirectory = us::any_cast<std::string>( parsedArgs["inputdir"] );
@@ -272,4 +270,3 @@ int DICOMLoader(int argc, char* argv[])
 
   return 1;
 }
-RegisterDiffusionMiniApp(DICOMLoader);

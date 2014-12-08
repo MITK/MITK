@@ -48,9 +48,15 @@ QmitkModulesDialog::QmitkModulesDialog(QWidget *parent, Qt::WindowFlags f) :
   tableView->setSortingEnabled(true);
   tableView->sortByColumn(0, Qt::AscendingOrder);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   tableView->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
   tableView->horizontalHeader()->setResizeMode(2, QHeaderView::ResizeToContents);
   tableView->horizontalHeader()->setResizeMode(5, QHeaderView::ResizeToContents);
+#else
+  tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  tableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+  tableView->horizontalHeader()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
+#endif
   tableView->horizontalHeader()->setStretchLastSection(true);
   tableView->horizontalHeader()->setCascadingSectionResizes(true);
 

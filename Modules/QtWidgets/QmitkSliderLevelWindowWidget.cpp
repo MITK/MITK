@@ -108,12 +108,10 @@ void QmitkSliderLevelWindowWidget::OnPropertyModified(const itk::EventObject& )
 void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
 {
   QPixmap pm(width(), height());
-  //pm.fill( static_cast<QWidget*>(parent())->paletteBackgroundColor() );
-  pm.fill(this, 0, 0);
+  pm.fill(this->palette().color(this->backgroundRole()));
   QPainter painter(&pm);
 
   painter.setFont( m_Font );
-  //painter.setPen(static_cast<QWidget*>(parent())->paletteForegroundColor());
   painter.setPen(this->palette().color(this->foregroundRole()));
 
   QColor c(93,144,169);

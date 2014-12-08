@@ -4,6 +4,7 @@ set(CPP_FILES
   mitkBoundingObjectToSegmentationFilter.cpp
   mitkGeometryClipImageFilter.cpp
   mitkHeightFieldSurfaceClipImageFilter.cpp
+  mitkImageToUnstructuredGridFilter.cpp
   mitkLabeledImageToSurfaceFilter.cpp
   mitkMaskAndCutRoiImageFilter.cpp
   mitkMaskImageFilter.cpp
@@ -14,6 +15,11 @@ set(CPP_FILES
   mitkPointLocator.cpp
   mitkSimpleHistogram.cpp
   mitkSimpleUnstructuredGridHistogram.cpp
+  mitkCovarianceMatrixCalculator.cpp
+  mitkAnisotropicIterativeClosestPointRegistration.cpp
+  mitkWeightedPointTransform.cpp
+  mitkAnisotropicRegistrationCommon.cpp
+  mitkUnstructuredGridToUnstructuredGridFilter.cpp
 )
 
 if(WIN32 AND NOT MINGW)

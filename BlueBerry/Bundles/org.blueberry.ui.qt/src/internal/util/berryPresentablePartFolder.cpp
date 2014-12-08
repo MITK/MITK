@@ -14,10 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "internal/berryQtWidgetsTweaklet.h"
+
 #include "berryPresentablePartFolder.h"
 #include "berryAbstractTabItem.h"
 
-#include "internal/berryQtWidgetsTweaklet.h"
 #include <internal/berryQtControlWidget.h>
 
 #include <berryConstants.h>

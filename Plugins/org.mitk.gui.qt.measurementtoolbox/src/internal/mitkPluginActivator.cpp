@@ -39,4 +39,6 @@ void mitk::PluginActivator::stop(ctkPluginContext* context)
   m_Context = NULL;
 }
 
-Q_EXPORT_PLUGIN2(org.mitk.gui.qt.measurementtoolbox, mitk::PluginActivator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org.mitk.gui.qt.measurementtoolbox, mitk::PluginActivator)
+#endif

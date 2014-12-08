@@ -315,6 +315,8 @@ void WorkbenchPlugin::stop(ctkPluginContext* context)
   AbstractUICTKPlugin::stop(context);
 
   delete perspRegistry;
+  // avoid possible crash, see bug #18399
+  perspRegistry = 0;
 }
 
 bool WorkbenchPlugin::GetDataPath(Poco::Path& path)
@@ -326,4 +328,6 @@ bool WorkbenchPlugin::GetDataPath(Poco::Path& path)
 
 }
 
-Q_EXPORT_PLUGIN2(org_blueberry_ui, berry::WorkbenchPlugin)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_blueberry_ui, berry::WorkbenchPlugin)
+#endif

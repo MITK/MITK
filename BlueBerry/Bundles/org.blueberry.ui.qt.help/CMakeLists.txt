@@ -9,5 +9,9 @@ MACRO_CREATE_CTK_PLUGIN(
   EXPORTED_INCLUDE_SUFFIXES src
 )
 
+if(MITK_USE_Qt5)
+  qt5_use_modules(${PLUGIN_TARGET} Help OpenGL PrintSupport WebKitWidgets Xml)
+endif()
+
 target_link_libraries(${PROJECT_NAME}
   ${QT_QTHELP_LIBRARY} ${QT_QTWEBKIT_LIBRARY} ${QT_QTNETWORK_LIBRARY})

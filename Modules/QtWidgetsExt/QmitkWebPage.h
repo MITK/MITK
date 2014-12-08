@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <QtWebKit/QtWebKit>
+#include <QWebPage>
 
 #ifndef QMITK_WEBPAGE_H
 #define QMITK_WEBPAGE_H

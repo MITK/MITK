@@ -268,7 +268,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
         clock.Start();
         MBI_INFO << "Computing GFA ";
         mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
-                                                        "Computing GFA for %s", nodename.c_str()).toAscii());
+                                                        "Computing GFA for %s", nodename.c_str()).toLatin1());
         typedef OdfVectorType::ValueType                 RealValueType;
         typedef itk::Image< RealValueType, 3 >                 RAImageType;
         typedef itk::DiffusionQballGeneralizedFaImageFilter<TOdfPixelType,TOdfPixelType,odfsize>
@@ -359,7 +359,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
             gfaFilter->SetComputationMethod(GfaFilterType::GFA_PRINCIPLE_CURVATURE);
             QString paramString;
             paramString = paramString.append("PC%1-%2").arg(p1).arg(p2);
-            newname.append(paramString.toAscii());
+            newname.append(paramString.toLatin1());
             gfaFilter->SetParam1(p1);
             gfaFilter->SetParam2(p2);
             break;
@@ -369,7 +369,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
             gfaFilter->SetComputationMethod(GfaFilterType::GFA_GENERALIZED_GFA);
             QString paramString;
             paramString = paramString.append("GFAK%1P%2").arg(p1).arg(p2);
-            newname.append(paramString.toAscii());
+            newname.append(paramString.toLatin1());
             gfaFilter->SetParam1(p1);
             gfaFilter->SetParam2(p2);
             break;
@@ -458,7 +458,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
         clock.Start();
         MBI_INFO << "Computing FA ";
         mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
-                                                        "Computing FA for %s", nodename.c_str()).toAscii());
+                                                        "Computing FA for %s", nodename.c_str()).toLatin1());
         typedef itk::Image< TTensorPixelType, 3 >              FAImageType;
 
         typedef itk::ShiftScaleImageFilter<FAImageType, FAImageType>

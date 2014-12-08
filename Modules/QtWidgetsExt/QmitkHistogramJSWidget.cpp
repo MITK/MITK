@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkExtractSliceFilter.h"
+#include <QWebFrame>
 
 
 QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :

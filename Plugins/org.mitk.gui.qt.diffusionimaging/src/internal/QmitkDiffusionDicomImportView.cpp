@@ -238,7 +238,7 @@ bool SortBySeqName(gdcm::DataSet const & ds1, gdcm::DataSet const & ds2 )
 
 void QmitkDiffusionDicomImport::Status(QString status)
 {
-  mitk::StatusBar::GetInstance()->DisplayText(status.toAscii());
+  mitk::StatusBar::GetInstance()->DisplayText(status.toLatin1());
   MITK_INFO << status.toStdString().c_str();
 }
 
@@ -256,7 +256,7 @@ void QmitkDiffusionDicomImport::Status(const char* status)
 
 void QmitkDiffusionDicomImport::Error(QString status)
 {
-  mitk::StatusBar::GetInstance()->DisplayErrorText(status.toAscii());
+  mitk::StatusBar::GetInstance()->DisplayErrorText(status.toLatin1());
   MITK_ERROR << status.toStdString().c_str();
 }
 

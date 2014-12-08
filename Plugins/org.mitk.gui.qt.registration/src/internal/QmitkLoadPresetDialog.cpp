@@ -73,7 +73,7 @@ QmitkLoadPresetDialog::~QmitkLoadPresetDialog()
 
 std::string QmitkLoadPresetDialog::GetPresetName()
 {
-  std::string presetName = std::string(lstPresets->currentItem()->text().toAscii());
+  std::string presetName = std::string(lstPresets->currentItem()->text().toLatin1());
   return presetName;
 }
 

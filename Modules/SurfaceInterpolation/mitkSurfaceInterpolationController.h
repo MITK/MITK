@@ -166,6 +166,16 @@ namespace mitk
     void RemoveInterpolationSession(mitk::Image::Pointer segmentationImage);
 
     /**
+     * Replaces the current interpolation session with a new one. All contours form the old
+     * session will be applied to the new session. This only works if the two images have the
+     * geometry
+     * @param oldSession the session which should be replaced
+     * @param newSession the new session which replaces the old one
+     * @return true it the the replacement was successful, false if not (e.g. the image's geometry differs)
+     */
+    bool ReplaceInterpolationSession(mitk::Image::Pointer oldSession, mitk::Image::Pointer newSession);
+
+    /**
      * @brief Removes all sessions
      */
     void RemoveAllInterpolationSessions();

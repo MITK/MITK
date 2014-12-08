@@ -214,6 +214,9 @@ void QmitkNavigationDataPlayerView::CreatePipeline(){
     m_RenderingNodes.push_back(node);
   }
   m_VisFilter->Update();
+
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkNavigationDataPlayerView::DestroyPipeline(){

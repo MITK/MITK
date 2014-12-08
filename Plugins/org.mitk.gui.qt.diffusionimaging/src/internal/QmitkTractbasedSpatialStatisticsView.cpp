@@ -529,11 +529,11 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
 
   mitk::BaseData* startData = m_CurrentStartRoi->GetData();
   mitk::PlanarFigure* startRoi = static_cast<mitk::PlanarFigure*>(startData);
-  mitk::PlaneGeometry* startGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(startRoi->GetGeometry2D()) );
+  mitk::PlaneGeometry* startGeometry2D = const_cast<mitk::PlaneGeometry*>(startRoi->GetPlaneGeometry());
 
   mitk::BaseData* endData = m_CurrentEndRoi->GetData();
   mitk::PlanarFigure* endRoi = static_cast<mitk::PlanarFigure*>(endData);
-  mitk::PlaneGeometry* endGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(endRoi->GetGeometry2D()) );
+  mitk::PlaneGeometry* endGeometry2D = const_cast<mitk::PlaneGeometry*>(endRoi->GetPlaneGeometry());
 
   mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
   mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi

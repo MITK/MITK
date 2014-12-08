@@ -5,3 +5,6 @@ MACRO_CREATE_CTK_PLUGIN(
   EXPORTED_INCLUDE_SUFFIXES src
 )
 
+if(MITK_USE_Qt5)
+  qt5_use_modules(${PLUGIN_TARGET} Widgets)
+endif()

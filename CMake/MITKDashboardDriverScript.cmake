@@ -36,6 +36,8 @@ foreach(var ${expected_variables})
   endif()
 endforeach()
 
+string(REPLACE " " "%20" _build_name_escaped "${CTEST_BUILD_NAME}")
+
 # Check if "mbits" is reachable
 file(DOWNLOAD "http://mbits" "${CTEST_SCRIPT_DIRECTORY}/mbits.html" TIMEOUT 2 STATUS _status)
 list(GET _status 0 _status_code)
@@ -207,8 +209,8 @@ macro(run_ctest)
   # Check if a forced run was requested
   set(cdash_remove_rerun_url )
   if(CDASH_ADMIN_URL_PREFIX)
-    set(cdash_rerun_url "${CDASH_ADMIN_URL_PREFIX}/rerun/${CTEST_BUILD_NAME}")
-    set(cdash_remove_rerun_url "${CDASH_ADMIN_URL_PREFIX}/rerun/rerun.php?name=${CTEST_BUILD_NAME}&remove=1")
+    set(cdash_rerun_url "${CDASH_ADMIN_URL_PREFIX}/rerun/${_build_name_escaped}")
+    set(cdash_remove_rerun_url "${CDASH_ADMIN_URL_PREFIX}/rerun/rerun.php?name=${_build_name_escaped}&remove=1")
     file(DOWNLOAD
          "${cdash_rerun_url}"
          "${CTEST_BINARY_DIRECTORY}/tmp.txt"
@@ -451,7 +453,6 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     if(CDASH_ADMIN_URL_PREFIX)
       set(cdash_admin_url "${CDASH_ADMIN_URL_PREFIX}/cdashadmin-web/index.php?pw=4da12ca9c06d46d3171d7f73974c900f")
       string(REGEX REPLACE ".*\\?project=(.*)&?" "\\1" _ctest_project "${CTEST_DROP_LOCATION}")
-      string(REPLACE " " "%20" _build_name_escaped "${CTEST_BUILD_NAME}")
       file(DOWNLOAD
            "${cdash_admin_url}&action=submit&name=${_build_name_escaped}&hasTestErrors=${test_errors}&hasBuildErrors=${build_errors}&hasBuildWarnings=${build_warnings}&ctestDropSite=${CTEST_DROP_SITE}&ctestProject=${_ctest_project}"
            "${CTEST_BINARY_DIRECTORY}/cdashadmin.txt"

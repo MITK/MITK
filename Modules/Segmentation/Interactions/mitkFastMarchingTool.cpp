@@ -323,9 +323,6 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
 
 bool mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
-      return false;
-
   // Add a new seed point for FastMarching algorithm
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* p = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());

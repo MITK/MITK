@@ -32,7 +32,7 @@ QmitkPopupColorChooser::QmitkPopupColorChooser(QWidget* parent, unsigned int ste
   setSteps(steps);
 
   setLineWidth(2);
-  setMouseTracking ( TRUE );
+  setMouseTracking ( true );
 
   setFrameStyle ( QFrame::Panel | QFrame::Raised );
   setLineWidth( 1 );

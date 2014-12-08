@@ -418,7 +418,9 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     std::vector< QStandardItem* > categoryItems;
     QStandardItem *perspectiveRootItem = new QStandardItem("Workflows");
     perspectiveRootItem->setEditable(false);
+    perspectiveRootItem->setFont(QFont("", 12, QFont::Normal));
     treeRootItem->appendRow(perspectiveRootItem);
+
     for (unsigned int i=0; i<perspectiveDescriptors.size(); i++)
     {
         berry::IPerspectiveDescriptor::Pointer p = perspectiveDescriptors.at(i);
@@ -468,6 +470,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
             }
             categoryItem->setEditable(false);
             categoryItem->appendRow(pItem);
+            categoryItem->setFont(QFont("", 12, QFont::Normal));
         }
     }
     std::sort(categoryItems.begin(), categoryItems.end(), compareQStandardItems);
@@ -479,15 +482,19 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     std::vector<berry::IViewDescriptor::Pointer> viewDescriptors(viewRegistry->GetViews());
     std::vector<berry::IViewPart::Pointer> viewParts(page->GetViews());
     std::sort(viewDescriptors.begin(), viewDescriptors.end(), compareViews);
-
+    QStandardItem* emptyItem = new QStandardItem();
+    emptyItem->setFlags(Qt::ItemIsEnabled);
+    treeRootItem->appendRow(emptyItem);
     std::vector<std::string> viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
     QStandardItem* viewRootItem = new QStandardItem(QIcon(),"Views");
+    viewRootItem->setFont(QFont("", 12, QFont::Normal));
     viewRootItem->setEditable(false);
     treeRootItem->appendRow(viewRootItem);
 
     categoryItems.clear();
     QStandardItem* noCategoryItem = new QStandardItem(QIcon(),"Miscellaneous");
     noCategoryItem->setEditable(false);
+    noCategoryItem->setFont(QFont("", 12, QFont::Normal));
 
     for (unsigned int i = 0; i < viewDescriptors.size(); ++i)
     {
@@ -542,6 +549,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
             }
             categoryItem->setEditable(false);
             categoryItem->appendRow(vItem);
+            categoryItem->setFont(QFont("", 12, QFont::Normal));
         }
     }
     std::sort(categoryItems.begin(), categoryItems.end(), compareQStandardItems);

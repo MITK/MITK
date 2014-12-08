@@ -56,10 +56,15 @@ void QmitkModuleView::CreateQtPartControl(QWidget *parent)
   tableView->setSortingEnabled(true);
   tableView->sortByColumn(0, Qt::AscendingOrder);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   // Fixed size for "Id" column
   tableView->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
   // Fixed size for "Version" column
   tableView->horizontalHeader()->setResizeMode(2, QHeaderView::ResizeToContents);
+#else
+  tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  tableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+#endif
   tableView->horizontalHeader()->setStretchLastSection(true);
   tableView->horizontalHeader()->setCascadingSectionResizes(true);
 

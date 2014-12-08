@@ -16,10 +16,18 @@ set(_source_ui_files
 # this is a workaround for Visual Studio. The relative include paths in the generated
 # moc files can get very long and can't be resolved by the MSVC compiler.
 foreach(_moc_src ${_source_moc_h_files})
-  qt4_wrap_cpp(_source_files ${_moc_src} OPTIONS -f${_moc_src})
+  if (DESIRED_QT_VERSION MATCHES "5")
+    qt5_wrap_cpp(_source_files ${_moc_src} OPTIONS -f${_moc_src})
+  else()
+    qt4_wrap_cpp(_source_files ${_moc_src} OPTIONS -f${_moc_src})
+  endif()
 endforeach()
 
-qt4_wrap_ui(_source_files ${_source_ui_files})
+if (DESIRED_QT_VERSION MATCHES "5")
+  qt5_wrap_ui(_source_files ${_source_ui_files})
+else()
+  qt4_wrap_ui(_source_files ${_source_ui_files})
+endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR}
@@ -74,7 +82,7 @@ FunctionCreateBlueBerryApplication(
   NO_INSTALL
   SHOW_CONSOLE
 )
-mitk_use_modules(TARGET ${PROJECT_NAME} PACKAGES Qt4|QtGui)
+mitk_use_modules(TARGET ${PROJECT_NAME} PACKAGES Qt4|QtGui Qt5|Widgets)
 
 add_dependencies(${PROJECT_NAME} ${ALL_REQUIRED_PLUGIN_TARGETS})
 

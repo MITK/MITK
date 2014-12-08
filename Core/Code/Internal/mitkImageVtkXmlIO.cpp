@@ -116,7 +116,7 @@ void ImageVtkXmlIO::Write()
     writer->SetFileName(this->GetOutputLocation().c_str());
   }
 
-  ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, NULL);
+  ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, input->GetVtkImageData());
   writer->SetInputData(const_cast<vtkImageData*>(vtkReadAccessor.GetVtkImageData()));
 
   if (writer->Write() == 0 || writer->GetErrorCode() != 0 )

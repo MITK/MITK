@@ -1,3 +1,12 @@
+set(path "CMakeLists.txt")
+file(STRINGS ${path} contents NEWLINE_CONSUME)
+if(DESIRED_QT_VERSION MATCHES "5")
+  string(REPLACE "find_package(VTK" "find_package(Qt5Widgets REQUIRED)\nfind_package(VTK" contents ${contents})
+endif()
+string(REPLACE "ENDIF(BUILD_VOLUMEPROCESSING)" "ENDIF(BUILD_VOLUMEPROCESSING)\n\nCONFIGURE_FILE(ACVDConfig.cmake.in ACVDConfig.cmake @ONLY)" contents ${contents})
+set(CONTENTS ${contents})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
 # Create <name>Config.cmake file to make ACVD findable through config mode of find_package()
 
 file(WRITE "ACVDConfig.cmake.in"
@@ -5,8 +14,6 @@ file(WRITE "ACVDConfig.cmake.in"
 set(ACVD_LIBRARY_DIRS \"@PROJECT_BINARY_DIR@/bin\")
 set(ACVD_LIBRARIES vtkSurface vtkDiscreteRemeshing vtkVolumeProcessing)
 add_definitions(-DDOmultithread)")
-
-file(APPEND "CMakeLists.txt" "CONFIGURE_FILE(ACVDConfig.cmake.in ACVDConfig.cmake @ONLY)")
 
 # Add vtkVersionMacros.h header file
 

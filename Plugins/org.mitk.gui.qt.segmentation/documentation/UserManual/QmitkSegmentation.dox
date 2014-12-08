@@ -9,17 +9,28 @@
 
 \section org_mitk_gui_qt_segmentationUserManualOverview Overview
 
-The <b>Segmentation perspective</b> allows you to create segmentations of anatomical and pathological structures in medical images of the human body.
-The perspective groups a number of tools which can be used for:
+The <b>Segmentation plugin</b> allows you to create segmentations of anatomical and pathological structures in medical images of the human body.
+The plugin consists of a number of view which can be used for:
 <ul>
-  <li> (semi-)automatic segmentation of organs on CT or MR image volumes
-  <li> semi-automatic segmentation of lesions such as enlarged lymph nodes or tumors
-  <li> manual segmentation of any structures you might want to delineate
+  <li> manual and (semi-)automatic segmentation of organs on CT or MR image volumes via the <b>Segmentation View</b>
+  <li> segmentation postprocessing via the \subpage org_mitk_views_segmentationutilities
+  <li> clipping of existing segmentations using a resection plane via the \subpage org_mitk_views_deformableclippingplane
 </ul>
 
-For more detailed information on the clipping plane view see \subpage org_mitk_views_deformableclippingplane.
+\imageMacro{QmitkSegmentation_IMGApplication.png,"Segmentation Plugin consisting of the Segmentation View the Segmentation Utilities View and the Clipping Plane View", 16.00}
 
-\imageMacro{QmitkSegmentation_IMGApplication.png,"Segmentation perspective consisting of the Data Manager view and the Segmentation view",16.00}
+The segmentation plugin offers a number of preferences which can be set via the MITK Workbench application preference dialog:
+
+\imageMacro{QmitkSegmentation_IMGPreferences.png,"Segmentation Plugin consisting of the Segmentation View the Segmentation Utilities View and the Clipping Plane View", 10.00}
+
+The following preferences can be set:
+<ul>
+  <li> <b>Slim view:</b> Allows you to show or hide the tool button description of the Segmentation View
+  <li> <b>2D display:</b> Specify whether the segmentation is drawn as outline or as a transparent overlay
+  <li> <b>3D display:</b> Activate 3D volume rendering for your segmentation
+  <li> <b>Data node selection mode:</b> If activated the segmentation image combo box is always sychronized with the data manager selection. 
+  <li> <b>Smoothed surface creation:</b> Set certain smoothing parameters for surface creation
+</ul>
 
 If you wonder what segmentations are good for, we shortly revisit the concept of a segmentation here.
 A CT or MR image is made up of volume of physical measurements (volume elements are called voxels).
@@ -52,9 +63,21 @@ The Segmentation perspective makes use of the Data Manager view to give you an o
 
 \imageMacro{QmitkSegmentation_IMGSelection.png,"Data Manager is used for selecting the current segmentation. The reference image is selected in the drop down box of the control area.",5.50}
 
-To select the reference image (e.g. the original CT/MR image) use the drop down box in the control area of the Segmentation view. The segmentation image selected in the Data Manager is displayed below the drop down box. If no segmentation image exists or none is selected create a new segmentation image by using the "New segmentation" button.
-Some items of the graphical user interface might be disabled when no image is selected.
+To select the reference image (e.g. the original CT/MR image) use the patient image drop down box in the control area of the Segmentation view. The segmentation image selected in the Data Manager is displayed below in the segmentation drop down box.
+By default the auto selection mode is enabled, which always keeps the selection of the segmentation drop down box in synch with the selection in the data manager.
+If you disable the auto selection mode the selection of the right segmentation image has to be done via the drop down box.
+If no segmentation image exists or none is selected create a new segmentation image by using the "New segmentation" button on the right of the Segmentation drop down box.
+Some items of the graphical user interface might be disabled when no image is selected or the selected image does not fit to the patient image's geoemtry.
 In any case, the application will give you hints if a selection is needed.
+
+\section org_mitk_gui_qt_segmentationUserManualToolOverview Tool overview
+
+MITK comes with a comprehensive set of segmentation tools. These tools can be differenciated between manual slice-based 2D segmentation tools and (semi-)automated 3D tools.
+The manual 2D tools require a big amount of user interaction and can only be applied to a single image slice whereas the 3D tools operate on the hole image. The 3D tools usually
+require a small amount of interaction like placin seedpoints of setting some parameters.
+You can switch between the different toolsets by switching the 2D/3D tab in the segmentation view.
+
+\imageMacro{QmitkSegmentation_ToolOverview.png,"An overview of the existing tools in MITK. There are interactive 2D tools as well as (semi-)automated 3D tools",5.50}
 
 \section org_mitk_gui_qt_segmentationUserManualManualKringeling Manual Contouring
 
@@ -163,6 +186,11 @@ The LiveWire Tool acts as a magnetic lasso with a contour snapping to edges of o
 
 The contour will be transfered to its binary image representation by deactivating the tool.
 
+\imageMacro{QmitkSegmentation_IMG2DFastMarchingUsage.png,"2D Fast Marching Tool",3.01}
+
+Provides a fast marching based 2D interaction segmentation tool. You start with setting seedpoints in an image slice. Via several sliders you can
+adapt parameters and see the fast marching result instantly.
+
 \subsection org_mitk_gui_qt_segmentationUserManualManualKringeling5 Interpolation
 
 Creating segmentations for modern CT volumes is very time-consuming, because structures of interest can easily cover a range of 50 or more slices.
@@ -185,6 +213,7 @@ In this case the 3D interpolation will be deactivated automatically so that the 
 has finished the surface is shown yellow with a small opacity. Additional to the surface, black contours are shown in the 3D render window. They mark the positions of all the drawn contours which were used for the interpolation.
 You can navigate between the drawn contours by clicking on the „Position“ - Nodes in the datamanager which are located below the selected segmentation. If you don't want to see these nodes just unckeck the „Show Position Nodes“ Checkbox and these nodes will be hidden.
 If you want to delete a drawn contour we recommend to use the Erase-Tool since Redo/Undo is not yet working for 3D interpolation.
+The current state of the 3D interpolation can be saved accross application restart. Therefor just click on save project during the interpolation is active. After restarting the application and load your project you can click on "Reinit Interpolation" within the 3D interpolation GUI area.
 
 <br>
 <b>The 2D Interpolation</b> creates suggestions for a segmentation whenever you have a slice that
@@ -197,65 +226,60 @@ Interpolated suggestions are displayed in a different way than manual segmentati
 To accept single slices, click the "Accept" button below the toolbox.
 If you have segmented a whole organ in every-x-slice, you may also review the interpolations and then accept all of them at once by clicking "... all slices".
 
-\section org_mitk_gui_qt_segmentationUserManualOrganSegmentation Organ Segmentation
+\section org_mitk_gui_qt_segmentationUserManual3DSegmentationTools 3D Segmenation tools
 
-\note This feature is only available in our 3M3 Demo Application (http://www.mint-medical.de/productssolutions/mitk3m3/mitk3m3/#downloads) but not in the open source part of MITK
+The 3D tools operate on the hole image and require usually a small amount of interaction like placing seed-points or specifying certain parameters. All 3D tools provide
+an immediate segmentation feedback, which is displayed as a transparent green overlay. For accepting a preview you have to press the "Comfirm" button of the selected tool.
+The following 3D tools are at your disposal:
 
-The manual contouring described above is a fallback option that will work for any kind of images and structures of interest.
-However, manual contouring is very time-consuming and tedious.
-This is why a major part of image analysis research is working towards automatic segmentation methods.
-The Segmentation View comprises a number of easy-to-use tools for segmentation of CT images (Liver) and MR image (left ventricle and wall, left and right lung).
+\subsection org_mitk_gui_qt_segmentationUserManual3DThresholdTool 3D Threshold tool
 
-\subsection org_mitk_gui_qt_segmentationUserManualOrganSegmentation1 Liver on CT Images
+The Thresholding tool simply applies a 3D threshold to the patient image. All pixels with values equal or above the selected threshold are labeled.
+You can change the threshold by either moving the slider of setting a certain value in the spinbox.
 
-On CT image volumes, preferrably with a contrast agent in the portal venous phase, the Liver tool will fully automatically analyze and segment the image.
-All you have to do is to load and select the image, then click the "Liver" button.
-During the process, which takes a minute or two, you will get visual progress feedback by means of a contour that moves closer and closer to the real liver boundaries.
+\imageMacro{QmitkSegmentation_3DThresholdTool.png,"3D Threshold tool",10.00}
 
-\subsection org_mitk_gui_qt_segmentationUserManualOrganSegmentation2 Heart, Lung, and Hippocampus on MRI
+\subsection org_mitk_gui_qt_segmentationUserManual3DULTool 3D Upper/Lower Threshold tool
 
-While liver segmentation is performed fully automatic, the following tools for segmentation of the heart, the lungs, and the hippocampus need a minimum amount of guidance.
-Click one of the buttons on the "Organ segmentation" page to add an average %model of the respective organ to the image.
-This %model can be dragged to the right position by using the left mouse button while holding down the CTRL key.
-You can also use CTRL + middle mouse button to rotate or CTRL + right mouse button to scale the %model.
+The Upper/Lower Thresholding tool works similar to the simple 3D threshold tool but allows you to define an upper and lower threshold. All pixels with
+values within this threshold intervall will be labeled
 
-Before starting the automatic segmentation process by clicking the "Start segmentation" button, try placing the %model closely to the organ in the MR image
-(in most cases, you do not need to rotate or scale the %model).
-During the segmentation process, a green contour that moves closer and closer to the real liver boundaries will provide you with visual feedback of the segmentation progress.
+\imageMacro{QmitkSegmentation_3DULThresholdTool.png,"3D Upper/Lower Threshold tool",10.00}
 
-The algorithms used for segmentation of the heart and lung are method which need training by a number of example images.
-They will not work well with other kind of images, so here is a list of the image types that were used for training:
-<ul>
-<li> Hippocampus segmentation: T1-weighted MR images, 1.5 Tesla scanner (Magnetom Vision, Siemens Medical Solutions), 1.0 mm isotropic resolution
-<li> Heart: Left ventricle inner segmentation (LV Model): MRI; velocity encoded cine (VEC-cine) MRI sequence; trained on systole and diastole
-<li> Heart: Left ventricular wall segmentation (LV Inner Wall, LV Outer Wall): 4D MRI; short axis 12 slice spin lock sequence(SA_12_sl); trained on whole heart cycle
-<li> Lung segmentation: 3D and 4D MRI; works best on FLASH3D and TWIST4D sequences
-</ul>
+\subsection org_mitk_gui_qt_segmentationUserManual3DOtsuTool 3D Otsu tool
 
-\subsection org_mitk_gui_qt_segmentationUserManualOrganSegmentation99 Other Organs
+The 3D Otsu tool provides a more sophisticated thresholding algorithm. It allows you to define a number of regions. Based on the image histogram the pixels will
+then divided into different regions. There more regions you define the longer will the calculation take.
 
-As mentioned in the Heart/Lung section, most of the underlying methods are based on "training".
-The basic algorithm is versatile and can be applied on all kinds of segmentation problems where the structure of interest is topologically like a sphere (and not like a torus etc.).
-If you are interested in other organs than those offered by the current version of the Segmentation view,
-please contact our research team.
+\imageMacro{QmitkSegmentation_3DOtsuTool.png,"3D Otsu tool",10.00}
 
-\section org_mitk_gui_qt_segmentationUserManualLesionSegmentation Lesion Segmentation
+\subsection org_mitk_gui_qt_segmentationUserManual3DFMTool 3D Fast Marching tool
 
-\note This feature is only available in our 3M3 Demo Application (http://www.mint-medical.de/productssolutions/mitk3m3/mitk3m3/#downloads) but not in the open source part of MITK
+The 3D Fast Marching tools works similar to the 2D pendant but on the hole image. Depending on you image's size the calculation will take some time.
+You can interactive set the parameters of the algorithm via the tool GUI.
 
-Lesion segmentation is a little different from organ segmentation. Since lesions are not part of the healthy body, they sometimes have a diffused border,
-and are often found in varying places all over the body.
-The tools in this section offer efficient ways to create 3D segmentations of such lesions.
+\imageMacro{QmitkSegmentation_3DFMTool.png,"3D Fast Marching tool",10.00}
 
-The Segmentation View currently offers supoprt for enlarged lymph nodes.
+\subsection org_mitk_gui_qt_segmentationUserManual3DRGTool 3D Region Growing tool
 
-To segment an enlarged lymph node, find a more or less central slice of it, activate the "Lymph Node" tool and draw a rough contour on the inside of the lymph node.
-When releaseing the mouse button, a segmentation algorithm is started in a background task. The result will become visible after a couple of seconds, but you do not have to wait for it.
-If you need to segment several lymph nodes, you can continue to inspect the image right after closing the drawn contour.
+The 3D Region Growing tool works similar to the 2D pendant. At the beginning you have to place a seedpoint and define a threshold intervall. If you press
+"Run segmentation" a preview is calculated, if the "3D preview" box is checked you will also see the result in 3D. By moving the "Adapt region growing slider"
+you can interactively adapt the result to you image.
 
-If the lymph node segmentation is not to your content, you can select the "Lymph Node Correction" tool and drag %parts of the lymph node surface towards the right position (works in 3D, not slice-by-slice).
-This kind of correction helps in many cases.
-If nothing else helps, you can still use the pure manual tools as a fallback.
+\imageMacro{QmitkSegmentation_3DRGTool.png,"3D Region Growing tool",10.00}
+
++\subsection org_mitk_gui_qt_segmentationUserManual3DWatershedTool 3D Watershed tool
+
+This tool provides a watershed based segmentation algorithm.
+
+\imageMacro{QmitkSegmentation_3DWatershedTool.png,"3D Watershed tool",10.00}
+
+\subsection org_mitk_gui_qt_segmentationUserManualPickingTool Picking tool
+
+The Picking tool allows you to select islands within your segmentation. This is especially usefull if e.g. a thresholding delivered your several areas within
+your image but you are just interested in one special region.
+
+\imageMacro{QmitkSegmentation_PickingTool.png,"Picking tool",10.00}
 
 \section org_mitk_gui_qt_segmentationUserManualPostprocessing Things you can do with segmentations
 
@@ -268,7 +292,6 @@ These %actions are accessible through the context-menu of segmentations in Data 
 <ul>
 <li> <b>Create polygon %model</b> applies the marching cubes algorithms to the segmentation. This polygon %model can be used for visualization in 3D or other things such as stereolithography (3D printing).
 <li> <b>Create smoothed polygon %model</b> uses smoothing in addition to the marching cubes algorithms, which creates models that do not follow the exact outlines of the segmentation, but look smoother.
-<li> <b>Statistics</b> goes through all the voxels in the patient image that are part of the segmentation and calculates some statistical measures (minumum, maximum, median, histogram, etc.). Note that the statistics are ALWAYS calculated for the parent element of the segmentation as shown in Data Manager.
 <li> <b>Autocrop</b> can save memory. Manual segmentations have the same extent as the patient image, even if the segmentation comprises only a small sub-volume. This invisible and meaningless margin is removed by autocropping.
 </ul>
 

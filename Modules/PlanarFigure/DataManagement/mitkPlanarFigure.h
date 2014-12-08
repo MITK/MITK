@@ -60,24 +60,7 @@ public:
   mitkClassMacro( PlanarFigure, BaseData )
   itkCloneMacro( Self )
 
-  /** \brief Treat as Point2D by implicitly using conversion operators.
-    *
-    * \deprecatedSince{2014_10} "struct PolyLineElement {...};" will be changed to "typedef Point2D PolyLineElement;".
-    */
-  struct MitkPlanarFigure_EXPORT PolyLineElement
-  {
-    DEPRECATED(PolyLineElement(Point2D point, int index));
-    PolyLineElement(const Point2D& point);
-
-    PolyLineElement(const PolyLineElement &other);
-    PolyLineElement& operator=(const PolyLineElement &other);
-
-    operator Point2D&();
-    operator const Point2D&() const;
-
-    DEPRECATED(Point2D Point);
-    DEPRECATED(int Index);
-  };
+  typedef Point2D PolyLineElement;
 
   typedef itk::VectorContainer< unsigned long, bool>  BoolContainerType;
 
@@ -92,19 +75,9 @@ public:
    * performed.
    */
   virtual void SetPlaneGeometry( mitk::PlaneGeometry *geometry );
-              /**
-    * \deprecatedSince{2014_10} Please use SetPlaneGeometry
-    */
-    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo)){SetPlaneGeometry(geo);};
-
 
   /** \brief Returns (previously set) 2D geometry of this figure. */
   virtual const PlaneGeometry *GetPlaneGeometry() const;
-        /**
-    * \deprecatedSince{2014_10} Please use GetPlaneGeometry
-    */
-    DEPRECATED(const PlaneGeometry* GetGeometry2D()){return GetPlaneGeometry();};
-
 
   /** \brief True if the planar figure is closed.
    *
@@ -283,14 +256,6 @@ public:
 
   /** \brief Removes last control point */
   virtual void RemoveLastControlPoint();
-
-  /** \brief Copies contents and state of a figre provided as parameter to the current object.
-    *
-    * Requires a matching type of both figures.
-    *
-    * \note Deprecated, use Clone() instead.
-    */
-  DEPRECATED(void DeepCopy(Self::Pointer oldFigure));
 
   /** \brief Allow sub-classes to apply constraints on control points.
   *

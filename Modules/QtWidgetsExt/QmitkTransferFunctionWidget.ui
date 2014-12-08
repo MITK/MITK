@@ -35,7 +35,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QmitkFloatingPointSpanSlider" name="m_RangeSlider">
+      <widget class="ctkRangeSlider" name="m_RangeSlider">
        <property name="toolTip">
         <string>Change transfer function window range.</string>
        </property>
@@ -547,9 +547,9 @@ Click right mouse button to delete a point.</string>
    <header>QmitkColorTransferFunctionCanvas.h</header>
   </customwidget>
   <customwidget>
-   <class>QmitkFloatingPointSpanSlider</class>
-   <extends>QSlider</extends>
-   <header location="global">QmitkFloatingPointSpanSlider.h</header>
+   <class>ctkRangeSlider</class>
+   <extends>QWidget</extends>
+   <header location="global">ctkRangeSlider.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

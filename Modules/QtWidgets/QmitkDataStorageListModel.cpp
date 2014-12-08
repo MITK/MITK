@@ -134,7 +134,8 @@ void QmitkDataStorageListModel::SetPredicate(mitk::NodePredicateBase* pred)
 {
   m_NodePredicate = pred;
   reset();
-  QAbstractListModel::reset();
+  QAbstractListModel::beginResetModel();
+  QAbstractListModel::endResetModel();
 }
 
 mitk::NodePredicateBase* QmitkDataStorageListModel::GetPredicate() const

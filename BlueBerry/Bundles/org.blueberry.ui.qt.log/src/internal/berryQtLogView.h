@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYQTLOGVIEW_H
 #define BERRYQTLOGVIEW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QSortFilterProxyModel>
 
 #include "ui_berryQtLogView.h"

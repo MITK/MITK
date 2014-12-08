@@ -50,6 +50,8 @@ set(project_policies
   CMP0012 # NEW: if() recognizes numbers and boolean constants.
   CMP0013 # NEW: Duplicate binary directories are not allowed.
   CMP0014 # NEW: Input directories must have CMakeLists.txt
+  CMP0020 # NEW: Automatically link Qt executables to qtmain target on Windows.
+  CMP0028 # NEW: Double colon in target name means ALIAS or IMPORTED target.
   )
 foreach(policy ${project_policies})
   if(POLICY ${policy})
@@ -116,7 +118,7 @@ endif()
 set(${PROJECT_NAME}_MODULES_PACKAGE_DEPENDS_DIR "${PROJECT_SOURCE_DIR}/CMake/PackageDepends")
 set(MODULES_PACKAGE_DEPENDS_DIRS ${${PROJECT_NAME}_MODULES_PACKAGE_DEPENDS_DIR})
 
-find_package(MITK 2014.03.99 REQUIRED)
+find_package(MITK 2014.10.99 REQUIRED)
 
 if(COMMAND mitkFunctionCheckMitkCompatibility)
   mitkFunctionCheckMitkCompatibility(VERSIONS MITK_VERSION_PLUGIN_SYSTEM 1 REQUIRED)

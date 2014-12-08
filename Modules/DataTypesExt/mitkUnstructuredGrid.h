@@ -57,6 +57,8 @@ public:
 
   virtual void SetRequestedRegion(UnstructuredGrid::RegionType *region);
 
+  virtual void Graft(const DataObject* data);
+
   virtual void CopyInformation(const itk::DataObject *data);
 
   virtual void Update();

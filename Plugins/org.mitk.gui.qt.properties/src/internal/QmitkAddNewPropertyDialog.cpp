@@ -56,7 +56,7 @@ void QmitkAddNewPropertyDialog::AddNewProperty()
     return;
   }
 
-  m_DataNode->SetProperty(m_Controls.nameLineEdit->text().toAscii(), this->CreateProperty(), m_Renderer);
+  m_DataNode->SetProperty(m_Controls.nameLineEdit->text().toLatin1(), this->CreateProperty(), m_Renderer);
 
   this->accept();
 }

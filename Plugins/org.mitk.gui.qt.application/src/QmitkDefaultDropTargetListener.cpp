@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDefaultDropTargetListener.h"
 #include <QDebug>
 #include <QDropEvent>
+#include <QMimeData>
 #include <QStringList>
 #include <QUrl>
 

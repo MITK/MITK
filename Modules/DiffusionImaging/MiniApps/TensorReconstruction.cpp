@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include "mitkBaseDataIOFactory.h"
 #include "mitkDiffusionImage.h"
 #include "mitkBaseData.h"
@@ -23,21 +22,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3D.h>
 #include <itkImageFileWriter.h>
 #include <itkNrrdImageIO.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <itksys/SystemTools.hxx>
 
 using namespace mitk;
 /**
  * Convert files from one ending to the other
  */
-int TensorReconstruction(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    MITK_INFO << "TensorReconstruction";
-    ctkCommandLineParser parser;
+    std::cout << "TensorReconstruction";
+    mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
-    parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
+    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
+    parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
+    parser.addArgument("b0Threshold", "t", mitkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
 
     parser.setCategory("Preprocessing Tools");
     parser.setTitle("Tensor Reconstruction");
@@ -84,17 +83,16 @@ int TensorReconstruction(int argc, char* argv[])
     }
     catch ( itk::ExceptionObject &err)
     {
-        MITK_INFO << "Exception: " << err;
+        std::cout << "Exception: " << err;
     }
     catch ( std::exception err)
     {
-        MITK_INFO << "Exception: " << err.what();
+        std::cout << "Exception: " << err.what();
     }
     catch ( ... )
     {
-        MITK_INFO << "Exception!";
+        std::cout << "Exception!";
     }
     return EXIT_SUCCESS;
 
 }
-RegisterDiffusionMiniApp(TensorReconstruction);

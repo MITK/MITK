@@ -1,8 +1,7 @@
-if(MITK_USE_ACVD)
-  MITK_CREATE_MODULE(
+mitk_create_module(
     DEPENDS MitkCore
     PACKAGE_DEPENDS ACVD VTK|vtkIOPLY+vtkIOMINC
   )
 
-  add_subdirectory(Testing)
-endif()
+add_subdirectory(Testing)
+

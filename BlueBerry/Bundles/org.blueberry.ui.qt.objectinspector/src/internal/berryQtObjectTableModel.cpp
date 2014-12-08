@@ -361,7 +361,8 @@ void QtObjectTableModel::ResetData()
 {
   indexData.clear();
   DebugUtil::ResetObjectSummary();
-  QAbstractItemModel::reset();
+  QAbstractItemModel::beginResetModel();
+  QAbstractItemModel::endResetModel();
 }
 
 void QtObjectTableModel::ObjectCreated(const Object* obj)

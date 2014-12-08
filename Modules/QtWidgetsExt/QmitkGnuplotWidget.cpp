@@ -149,11 +149,11 @@ void QmitkGnuplotWidget::OnProcessStateChanged(QProcess::ProcessState state)
   {
     m_UpdateTime = m_ModifiedTime;
 
-    m_Process->write(this->CreateSetTermCommand().toAscii());
+    m_Process->write(this->CreateSetTermCommand().toLatin1());
 
     Q_FOREACH(const QString& command, m_Commands)
     {
-      m_Process->write(QString("%1\n").arg(command).toAscii());
+      m_Process->write(QString("%1\n").arg(command).toLatin1());
     }
 
     m_Process->write("exit\n");

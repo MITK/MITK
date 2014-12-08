@@ -160,9 +160,9 @@ newNode->SetName(m_Controls->m_ToolNameEdit->text().toLatin1());
 m_CreatedTool->SetDataNode(newNode);
 
 //fill NavigationTool object
-m_CreatedTool->SetCalibrationFile(m_Controls->m_CalibrationFileName->text().toAscii().data());
-m_CreatedTool->SetIdentifier(m_Controls->m_IdentifierEdit->text().toAscii().data());
-m_CreatedTool->SetSerialNumber(m_Controls->m_SerialNumberEdit->text().toAscii().data());
+m_CreatedTool->SetCalibrationFile(m_Controls->m_CalibrationFileName->text().toLatin1().data());
+m_CreatedTool->SetIdentifier(m_Controls->m_IdentifierEdit->text().toLatin1().data());
+m_CreatedTool->SetSerialNumber(m_Controls->m_SerialNumberEdit->text().toLatin1().data());
 
 //Tracking Device
 if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Aurora") m_CreatedTool->SetTrackingDeviceType(mitk::NDIAurora);

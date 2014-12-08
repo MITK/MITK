@@ -379,7 +379,8 @@ void QmitkPropertiesTableModel::sort( int column, Qt::SortOrder order /*= Qt::As
     PropertyDataSetCompareFunction compareFunc(_CompareCriteria, _CompareOperator);
     std::sort(m_SelectedProperties.begin(), m_SelectedProperties.end(), compareFunc);
 
-    QAbstractTableModel::reset();
+    QAbstractTableModel::beginResetModel();
+    QAbstractTableModel::endResetModel();
 
   }
 }
@@ -491,7 +492,8 @@ void QmitkPropertiesTableModel::Reset()
   this->sort(m_SortDescending);
 
   // model was resetted
-  QAbstractTableModel::reset();
+  QAbstractTableModel::beginResetModel();
+  QAbstractTableModel::endResetModel();
 }
 
 void QmitkPropertiesTableModel::SetFilterPropertiesKeyWord( std::string _FilterKeyWord )

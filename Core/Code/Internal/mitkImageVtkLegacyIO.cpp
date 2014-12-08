@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 ImageVtkLegacyIO::ImageVtkLegacyIO()
-  : AbstractFileIO(Image::GetStaticNameOfClass(), IOMimeTypes::VTK_IMAGE_MIMETYPE(), "VTK XML Image")
+  : AbstractFileIO(Image::GetStaticNameOfClass(), IOMimeTypes::VTK_IMAGE_LEGACY_MIMETYPE(), "VTK Legacy Image")
 {
   this->RegisterService();
 }
@@ -81,7 +81,7 @@ void ImageVtkLegacyIO::Write()
   LocalFile localFile(this);
   writer->SetFileName(localFile.GetFileName().c_str());
 
-  ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, NULL);
+  ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, input->GetVtkImageData());
   writer->SetInputData(const_cast<vtkImageData*>(vtkReadAccessor.GetVtkImageData()));
 
   if (writer->Write() == 0 || writer->GetErrorCode() != 0 )

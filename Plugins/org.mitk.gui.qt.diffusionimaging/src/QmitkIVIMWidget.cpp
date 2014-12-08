@@ -80,7 +80,7 @@ void QmitkIVIMWidget::SetParameters( IVIMFilterType::IVIMSnapshot snap )
   s = s.arg(snap.currentF,4);
   s = s.arg(snap.currentD,4);
   s = s.arg(snap.currentDStar,4);
-  int curveId = this->InsertCurve( s.toAscii() );
+  int curveId = this->InsertCurve( s.toLatin1() );
   this->SetCurvePen( curveId, QPen( Qt::NoPen ) );
 
   curveId = this->InsertCurve( "ignored measurement points" );

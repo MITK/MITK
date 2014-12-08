@@ -86,7 +86,7 @@ void QmitkBSplineRegistrationView::SelectDeformationField()
   // SELECT FOLDER DIALOG
   QFileDialog* w = new QFileDialog( this, "Select Deformation Field" );
   w->setFileMode( QFileDialog::ExistingFiles );
-  w->setFilter( "Images (*.mhd)" );
+  w->setNameFilter( "Images (*.mhd)" );
   w->setDirectory("G:\\home\\vanbrugg\\testimages\\deformable");
 
   // RETRIEVE SELECTION

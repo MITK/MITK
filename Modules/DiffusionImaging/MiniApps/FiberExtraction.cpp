@@ -33,8 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int FiberExtraction(int argc, char* argv[])
 {
-    MITK_INFO << "FiberExtraction";
-    ctkCommandLineParser parser;
+    std::cout << "FiberExtraction";
+    mitkCommandLineParser parser;
 
     parser.setTitle("Fiber Extraction");
     parser.setCategory("Fiber Tracking and Processing Methods");
@@ -42,11 +42,11 @@ int FiberExtraction(int argc, char* argv[])
     parser.setDescription("");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
-    parser.addArgument("planfirgure1", "pf1", ctkCommandLineParser::String, "Figure 1:", "first ROI", us::Any(), false);
-    parser.addArgument("planfirgure2", "pf2", ctkCommandLineParser::String, "Figure 2:", "second ROI", us::Any());
-    parser.addArgument("operation", "op", ctkCommandLineParser::String, "Operation:", "logical operation (AND, OR, NOT)", us::Any());
+    parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
+    parser.addArgument("out", "o", mitkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
+    parser.addArgument("planfirgure1", "pf1", mitkCommandLineParser::String, "Figure 1:", "first ROI", us::Any(), false);
+    parser.addArgument("planfirgure2", "pf2", mitkCommandLineParser::String, "Figure 2:", "second ROI", us::Any());
+    parser.addArgument("operation", "op", mitkCommandLineParser::String, "Operation:", "logical operation (AND, OR, NOT)", us::Any());
 
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -115,10 +115,10 @@ int FiberExtraction(int argc, char* argv[])
             }
             else
             {
-                MITK_INFO << "Could not process input:";
-                MITK_INFO << pf1_path;
-                MITK_INFO << pf2_path;
-                MITK_INFO << operation;
+                std::cout << "Could not process input:";
+                std::cout << pf1_path;
+                std::cout << pf2_path;
+                std::cout << operation;
             }
         }
         else
@@ -136,21 +136,21 @@ int FiberExtraction(int argc, char* argv[])
         if (result.IsNotNull())
             mitk::IOUtil::SaveBaseData(result, outFib);
         else
-            MITK_INFO << "No valid fiber bundle extracted.";
+            std::cout << "No valid fiber bundle extracted.";
     }
     catch (itk::ExceptionObject e)
     {
-        MITK_INFO << e;
+        std::cout << e;
         return EXIT_FAILURE;
     }
     catch (std::exception e)
     {
-        MITK_INFO << e.what();
+        std::cout << e.what();
         return EXIT_FAILURE;
     }
     catch (...)
     {
-        MITK_INFO << "ERROR!?!";
+        std::cout << "ERROR!?!";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

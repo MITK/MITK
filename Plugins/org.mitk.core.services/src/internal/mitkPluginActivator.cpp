@@ -281,4 +281,6 @@ org_mitk_core_services_Activator::org_mitk_core_services_Activator()
 
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_core_services, mitk::org_mitk_core_services_Activator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_core_services, mitk::org_mitk_core_services_Activator)
+#endif

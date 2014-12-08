@@ -216,7 +216,8 @@ void QmitkPythonVariableStackTableModel::CommandExecuted(const std::string& pyth
 {
   MITK_DEBUG("QmitkPythonVariableStackTableModel") << "command was executed " << pythonCommand;
     m_VariableStack = m_PythonService->GetVariableStack();
-    QAbstractTableModel::reset();
+    QAbstractTableModel::beginResetModel();
+    QAbstractTableModel::endResetModel();
 }
 
 std::vector<mitk::PythonVariable> QmitkPythonVariableStackTableModel::GetVariableStack() const

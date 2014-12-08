@@ -80,4 +80,6 @@ mitk::PlanarFigureActivator::stop(ctkPluginContext* /*context*/)
 {
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_planarfigure, mitk::PlanarFigureActivator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_planarfigure, mitk::PlanarFigureActivator)
+#endif

@@ -20,14 +20,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 QClickableLabel::QClickableLabel( QWidget* parent, Qt::WFlags f )
+#else
+QClickableLabel::QClickableLabel( QWidget* parent, Qt::WindowFlags f )
+#endif
 :QLabel(parent, f)
 {
 
 }
 
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 QClickableLabel::QClickableLabel( const QString& text, QWidget* parent, Qt::WFlags f )
+#else
+QClickableLabel::QClickableLabel( const QString& text, QWidget* parent, Qt::WindowFlags f )
+#endif
 :QLabel(text, parent, f)
 {
 

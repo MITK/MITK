@@ -39,6 +39,12 @@ public:
   mitkClassMacro(OclBinaryThresholdImageFilter, OclImageToImageFilter);
   itkNewMacro(Self);
 
+  /**
+  * @brief SetInput Set the input image. Only 3D images are supported for now.
+  * @param image a 3D image.
+  * @throw mitk::Exception if the dimesion is not 3.
+  */
+  void SetInput(Image::Pointer image);
 
   /** Update the filter */
   void Update();

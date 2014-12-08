@@ -16,3 +16,7 @@ set(PLUGIN_exported_include_suffixes
 
 MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE BERRY_UI
                         EXPORTED_INCLUDE_SUFFIXES ${PLUGIN_exported_include_suffixes})
+
+if(MITK_USE_Qt5)
+  qt5_use_modules(${PLUGIN_TARGET} Widgets)
+endif()

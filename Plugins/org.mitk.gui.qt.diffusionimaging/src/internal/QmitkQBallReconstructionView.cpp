@@ -561,7 +561,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
       clock.Start();
       MITK_INFO << "QBall reconstruction ";
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
-                                                    "QBall reconstruction for %s", nodename.c_str()).toAscii());
+                                                    "QBall reconstruction for %s", nodename.c_str()).toLatin1());
 
       typedef itk::DiffusionQballReconstructionImageFilter
           <DiffusionPixelType, DiffusionPixelType, TTensorPixelType, QBALL_ODFSIZE>
@@ -624,7 +624,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
       ++itemiter;
     }
 
-    mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toAscii());
+    mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toLatin1());
     m_MultiWidget->RequestUpdate();
 
   }
@@ -666,7 +666,7 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
       // QBALL RECONSTRUCTION
       clock.Start();
       MITK_INFO << "QBall reconstruction ";
-      mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("QBall reconstruction for %s", (*itemiter)->GetName().c_str()).toAscii());
+      mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("QBall reconstruction for %s", (*itemiter)->GetName().c_str()).toLatin1());
 
       for(int i=0; i<nLambdas; i++)
       {
@@ -717,7 +717,7 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
 
     m_MultiWidget->RequestUpdate();
 
-    mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toAscii());
+    mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toLatin1());
 
   }
   catch (itk::ExceptionObject &ex)
@@ -854,7 +854,7 @@ void QmitkQBallReconstructionView::MultiQBallReconstruction(mitk::DataStorage::S
       // QBALL RECONSTRUCTION
       clock.Start();
       MITK_INFO << "QBall reconstruction ";
-      mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("QBall reconstruction for %s", nodename.c_str()).toAscii());
+      mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("QBall reconstruction for %s", nodename.c_str()).toLatin1());
 
       for(int i=0; i<nLambdas; i++)
       {
@@ -901,7 +901,7 @@ void QmitkQBallReconstructionView::MultiQBallReconstruction(mitk::DataStorage::S
       }
     }
     m_MultiWidget->RequestUpdate();
-    mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toAscii());
+    mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toLatin1());
   }
   catch (itk::ExceptionObject &ex)
   {

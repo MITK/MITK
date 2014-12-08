@@ -114,9 +114,9 @@ void QmitkDenoisingView::Activated()
   QmitkFunctionality::Activated();
 
   m_Controls->m_SelectFilterComboBox->clear();
-  m_Controls->m_SelectFilterComboBox->insertItem(NOFILTERSELECTED, QString( QApplication::translate("QmitkDenoisingView", "Please select a filter", 0, QApplication::UnicodeUTF8) ));
-  m_Controls->m_SelectFilterComboBox->insertItem(NLM, QString( QApplication::translate("QmitkDenoisingView", "Non-local means filter", 0, QApplication::UnicodeUTF8) ));
-  m_Controls->m_SelectFilterComboBox->insertItem(GAUSS, QString( QApplication::translate("QmitkDenoisingView", "Discrete gaussian filter", 0, QApplication::UnicodeUTF8) ));
+  m_Controls->m_SelectFilterComboBox->insertItem(NOFILTERSELECTED, "Please select a filter");
+  m_Controls->m_SelectFilterComboBox->insertItem(NLM, "Non-local means filter");
+  m_Controls->m_SelectFilterComboBox->insertItem(GAUSS, "Discrete gaussian filter");
 }
 
 void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )

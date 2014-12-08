@@ -119,14 +119,12 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
       nextIndex = (((i - 1) >> this->GetSubdivisionRounds()) + 1) % m_ControlPoints.size();
       if(!isInitiallyPlaced && nextIndex > m_ControlPoints.size()-2)
       {
-
-        PolyLineElement elem( m_ControlPoints[m_ControlPoints.size()-1], nextIndex );
-        this->AppendPointToPolyLine( 0, elem );
+        this->AppendPointToPolyLine( 0, m_ControlPoints[m_ControlPoints.size()-1] );
         break;
       }
     }
-    PolyLineElement elem( *it, nextIndex );
-    this->AppendPointToPolyLine( 0, elem );
+
+    this->AppendPointToPolyLine( 0, *it );
   }
   subdivisionPoints.clear();
 }

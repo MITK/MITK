@@ -31,8 +31,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QtCore/qconfig.h>
 #ifdef QT_WEBKIT
-#include <QWebView>
-#include <QWebPage>
+#  include <QWebView>
+#  include <QWebPage>
+#  if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#    include <QUrlQuery>
+#  endif
 #endif
 #include <QString>
 #include <QStringList>
@@ -129,10 +132,18 @@ void QmitkDTIAtlasAppIntroPart::CreateConnections()
 void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
 {
   QString scheme          = showMeNext.scheme();
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   QByteArray urlHostname  = showMeNext.encodedHost();
   QByteArray urlPath      = showMeNext.encodedPath();
   QByteArray dataset      = showMeNext.encodedQueryItemValue("dataset");
   QByteArray clear        = showMeNext.encodedQueryItemValue("clear");
+#else
+  QByteArray urlHostname  = QUrl::toAce(showMeNext.host());
+  QByteArray urlPath      = showMeNext.path().toLatin1();
+  QUrlQuery query(showMeNext);
+  QByteArray dataset      = query.queryItemValue("dataset").toLatin1();
+  QByteArray clear        = query.queryItemValue("clear").toLatin1();//showMeNext.encodedQueryItemValue("clear");
+#endif
 
   if (scheme.isEmpty()) MITK_INFO << " empty scheme of the to be delegated link" ;
 

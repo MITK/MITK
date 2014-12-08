@@ -197,7 +197,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
   if ( closed )
   {
     mitk::Point2D displayPoint;
-    this->TransformObjectToDisplay( vertices.begin()->Point, displayPoint,
+    this->TransformObjectToDisplay( vertices.begin()[0], displayPoint,
       planarFigurePlaneGeometry, rendererPlaneGeometry, displayGeometry );
 
     pointlist.push_back( displayPoint );

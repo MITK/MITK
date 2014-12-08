@@ -67,4 +67,6 @@ namespace mitk
   } // end method StartInputDeviceModules
 } // end namespace mitk
 
-Q_EXPORT_PLUGIN2(org_mitk_core_ext, mitk::CoreExtActivator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_core_ext, mitk::CoreExtActivator)
+#endif

@@ -76,7 +76,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidgetAction>
 #include <QSplitter>
 #include <QPushButton>
-#include <QMotifStyle>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QToolBar>

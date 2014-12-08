@@ -86,8 +86,8 @@ QtPlatformLogModel::SetShowAdvancedFiels( bool showAdvancedFiels )
   if( m_ShowAdvancedFiels != showAdvancedFiels )
   {
     m_ShowAdvancedFiels = showAdvancedFiels;
-    this->reset();
-
+    this->beginResetModel();
+    this->endResetModel();
   }
 }
 
@@ -96,7 +96,8 @@ void QtPlatformLogModel::SetShowCategory( bool showCategory )
   if( m_ShowCategory != showCategory )
   {
     m_ShowCategory = showCategory;
-    this->reset();
+    this->beginResetModel();
+    this->endResetModel();
   }
 }
 

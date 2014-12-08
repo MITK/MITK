@@ -80,7 +80,7 @@ void QmitkNDIToolDelegate::setEditorData(QWidget *editor, const QModelIndex &ind
       QLabel* l = qobject_cast<QLabel*>(editor);
       if (l->text().isEmpty())
       {
-        QString fileName = qVariantValue<QString>(index.data(/*mitk::FileNameRole*/));
+        QString fileName = index.data(/*mitk::FileNameRole*/).value<QString>();
         fileName = QFileDialog::getOpenFileName(editor, "Open SROM file", fileName, "SROM files (*.rom)");
         QLabel* l = qobject_cast<QLabel*>(editor);
         l->setText(fileName);
@@ -89,7 +89,7 @@ void QmitkNDIToolDelegate::setEditorData(QWidget *editor, const QModelIndex &ind
     }
   case TypeCol:
     {
-      QString type = qVariantValue<QString>(index.data(/*mitk::TypeRole*/));
+      QString type = index.data(/*mitk::TypeRole*/).value<QString>();
       QComboBox* c = qobject_cast<QComboBox*>(editor);
       c->setCurrentIndex(c->findText(type));
       connect(c, SIGNAL(currentIndexChanged(int)), this, SLOT(ComboBoxCurrentIndexChanged(int)));
@@ -97,7 +97,7 @@ void QmitkNDIToolDelegate::setEditorData(QWidget *editor, const QModelIndex &ind
     }
   case NodeCol:
     {
-      mitk::DataNode::Pointer n = qVariantValue<mitk::DataNode::Pointer>(index.data(/*mitk::OrganNodeRole*/));
+      mitk::DataNode::Pointer n = index.data(/*mitk::OrganNodeRole*/).value<mitk::DataNode::Pointer>();
       if (n.IsNotNull())
       {
         QmitkDataStorageComboBox* dsc = qobject_cast<QmitkDataStorageComboBox*>(editor);

@@ -41,7 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIRenderingManager.h>
 
 #include <QToolTip>
-#include <qxtspanslider.h>
 
 const std::string QmitkVolumeVisualizationView::VIEW_ID =
 "org.mitk.views.volumevisualization";
@@ -72,8 +71,6 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
   {
     m_Controls = new Ui::QmitkVolumeVisualizationViewControls;
     m_Controls->setupUi(parent);
-
-    m_Controls->m_TransferFunctionWidget->SetIntegerMode(true);
 
     // Fill the tf presets in the generator widget
     std::vector<std::string> names;

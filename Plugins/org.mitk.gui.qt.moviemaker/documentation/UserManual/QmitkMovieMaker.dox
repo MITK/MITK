@@ -1,44 +1,65 @@
 /**
+\page org_mitk_gui_qt_moviemaker The Movie Maker Plugin
 
-\page org_mitk_views_moviemaker The Movie Maker View
+\imageMacro{QmitkMovieMaker_Icon.png,"Icon of the Movie Maker Plugin.",2.00}
 
-\imageMacro{QmitkMovieMaker_Icon.png,"Icon of the Movie Maker View",2.00}
+\tableofcontents
 
-Available sections:
-  - \ref QmitkMovieMakerUserManualOverview
-  - \ref QmitkMovieMakerUserManualFeatures
-  - \ref QmitkMovieMakerUserManualUsage
+\section org_mitk_gui_qt_moviemakerOverview Overview
 
-\section QmitkMovieMakerUserManualOverview Overview
+The Movie Maker View allows you to create basic animations of your scene and to record them to video files.
+Individual animations are arranged in a timeline and can be played back sequential or in parallel.
 
-MovieMaker is a functionality for easily creating fancy movies from scenes displayed in MITK widgets.
-It is also possible to slide through your data, automatically rotate 3D scenes and take screenshots of widgets.
+The Movie Maker View uses external FFmpeg/Libav command line utilities to write compressed video files.
 
-\section QmitkMovieMakerUserManualFeatures Features
+<b>You have to manually install either FFmpeg or Libav and set the corresponding path in "External Programs" in the MITK Workbench Preferences (Ctrl+P) in order to record your movies to video files.</b>
 
- The Movie Maker allows you to create movies and screenshots from within MITK. It can automatically scroll thorugh timesteps and slices while recording a movie. This way, you can record visualizations like a beating heart or a rotating skull.
+\imageMacro{QmitkMovieMaker_Preferences.png,"The External Programs preferences page.",12.00}
 
-\section QmitkMovieMakerUserManualUsage Usage
+\section org_mitk_gui_qt_moviemakerUsage Usage
 
-\imageMacro{QmitkMovieMaker_ControlArea.png,"A view of the command area of QmitkMovieMaker",9.84}
+\imageMacro{QmitkMovieMaker_MovieMakerView.png,"The Movie Maker View.",16.00}
 
-\subsection QmitkMovieMakerUserManualWindowSelection Window selection
-With the first two drop down boxes, you can choose which window you want to step through and which window you want to record in. Left clicking inside a window will set both drop down boxes to that window, but you can choose different windows for stepping and recording.
+To create a movie you have to add an animation to the timeline by clicking the "Add animation" button.
+You can choose between the available types of animations, e.g., Orbit or Slice.
 
-The first drop down box defines the window along which slices will be stepped through if stepping is set to spatial (see below). The second denotes the window from which the content will be recorded.
+The timeline surrounding bottons allow you to arrange, remove, or add further animations to your movie.
 
-\subsection QmitkMovieMakerUserManualRecordingOptions Recording Options
+Each animation can be set to either begin with the previous animation, i.e., run in parallel, or to start after the previous animation, i.e., run sequential.
+In combination with delays, rather complex animation arrangements are possible.
 
-The slider can be used to step through the slices manually while not recording. Start and stop control a preview of what a video would look like.
+To set animation specific parameters, select the corresponding animation in the timeline first.
 
-The buttons in the bottom part of this section can be used to create movies (windows only) or screenshots. Clicking opens a file %dialog where a name can be selected. After confirmation, a screenshot or movie is created according to the playing options.
+You can play back, pause and stop your movie with the according controls at the bottom of the Movie Maker View.
+Click the "Record" button to finally record your movie to a video file with the specified number of frames per second.
+You have to choose the render window which you want to record.
 
-\subsection QmitkMovieMakerUserManualPlayingOptions Playing Options
+\subsection org_mitk_gui_qt_moviemakerOrbitUsage Orbit Animation
 
-The first section controls whether the movie steps through slices (if a 2D view is selected), rotate the shown scene (if a 3D view is selected), or step through time steps (if set to temporal and a time resolved dataset is selected). If set to combined, a combination of both above options is used, with their speed relation set via the S/T Relation Spinbox.
+The Orbit animation rotates the camera in the 3D window around the scene.
+Align the camera directly in the 3D window and enter the number of degrees for the orbitting.
+You usually do not need to adjust the "Start angle" setting - leave it at 180 degrees.
+If you are planning to have a specific view in the middle of your movie you can play the movie and pause it at the specific frame of interest.
+Adjust the camera in the 3D window and restart the animation.
 
-In the second section the direction of stepping can be set. Options are: Forward, backward and Ping-Pong, which is back-and-forth.The stepping speed can be set via the spinbox(total time in seconds).
+\imageMacro{QmitkMovieMaker_Orbit.png,"The Orbit animation.",12.00}
 
-Although stepping speed is a total time in sec., this can not always be achieved. As a minimal frame rate of 25 fps is assumed to provide smooth movies, a dataset with only 25 slices will always be stepped through in 1 sec or faster.
+\subsection org_mitk_gui_qt_moviemakerSliceUsage Slice Animation
+
+The Slice animation slices through an image.
+You can choose the image plane (axial, sagittal, or coronal), as well as the start and end points of the slicing.
+Use the image navigator in the bottom left of the Workbench to get an idea of the desired values.
+Check "Reverse" in order to slice from the higher slice number to the lower slice number.
+
+\imageMacro{QmitkMovieMaker_Slice.png,"The Slice animation.",12.00}
+
+\subsection org_mitk_gui_qt_moviemakerTimeUsage Time Animation
+
+The Time animation steps through the individual time steps of the current scene.
+You can specify the range of the animated time steps.
+Use the image navigator in the bottom left of the Workbench to get an idea of the desired values.
+Check "Reverse" in order to step from later time steps to previous time steps.
+
+\imageMacro{QmitkMovieMaker_Time.gif,"The Time animation.",12.00}
 
 */

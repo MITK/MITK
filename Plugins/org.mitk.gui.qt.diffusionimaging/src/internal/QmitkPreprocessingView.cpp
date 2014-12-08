@@ -111,11 +111,17 @@ void QmitkPreprocessingView::CreateQtPartControl(QWidget *parent)
         m_Controls->setupUi(parent);
         this->CreateConnections();
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         m_Controls->m_MeasurementFrameTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
         m_Controls->m_MeasurementFrameTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
-
         m_Controls->m_DirectionMatrixTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
         m_Controls->m_DirectionMatrixTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
+#else
+        m_Controls->m_MeasurementFrameTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        m_Controls->m_MeasurementFrameTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        m_Controls->m_DirectionMatrixTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        m_Controls->m_DirectionMatrixTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+#endif
     }
 }
 

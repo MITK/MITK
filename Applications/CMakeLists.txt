@@ -2,14 +2,14 @@ set(MITK_CPACK_PACKAGE_EXECUTABLES "" CACHE INTERNAL "Collecting windows shortcu
 set(MITK_DIR ${PROJECT_BINARY_DIR})
 set(MITK_EXPORTS_FILE_INCLUDED 1)
 
-if(MITK_USE_QT AND QT4_FOUND)
+if(MITK_USE_QT)
 
   if(MITK_USE_CTK)
     add_subdirectory(PluginGenerator)
   endif()
-  
+
   if(MITK_USE_BLUEBERRY)
-  
+
     foreach(mitk_app ${MITK_APPS})
       # extract target_dir and option_name
       string(REPLACE "^^" "\\;" target_info ${mitk_app})
@@ -21,7 +21,7 @@ if(MITK_USE_QT AND QT4_FOUND)
         add_subdirectory(${target_dir})
       endif()
     endforeach()
-  
+
   endif()
 
 endif()

@@ -74,7 +74,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QxtSpanSlider" name="m_ThresholdFilterRangeSlider">
+         <widget class="ctkRangeSlider" name="m_ThresholdFilterRangeSlider">
           <property name="toolTip">
            <string>modify actual seen window by dragging left and right slider. </string>
           </property>
@@ -229,9 +229,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QxtSpanSlider</class>
-   <extends>QSlider</extends>
-   <header location="global">qxtspanslider.h</header>
+   <class>ctkRangeSlider</class>
+   <extends>QWidget</extends>
+   <header location="global">ctkRangeSlider.h</header>
   </customwidget>
   <customwidget>
    <class>QmitkDataStorageComboBox</class>

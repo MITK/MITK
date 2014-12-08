@@ -12,4 +12,8 @@ MITK_CREATE_MODULE(
   WARNINGS_AS_ERRORS
 )
 
+if(MSVC)
+  mitkFunctionCheckCAndCXXCompilerFlags("/wd4005" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+endif()
+
 add_subdirectory(Testing)

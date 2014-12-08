@@ -41,4 +41,6 @@ ChangeTextRegistry* org_mitk_example_gui_extensionpointdefinition_Activator::get
   return &registry;
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_example_gui_extensionpointdefinition, org_mitk_example_gui_extensionpointdefinition_Activator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_example_gui_extensionpointdefinition, org_mitk_example_gui_extensionpointdefinition_Activator)
+#endif

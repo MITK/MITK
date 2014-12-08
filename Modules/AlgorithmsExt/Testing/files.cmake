@@ -5,6 +5,7 @@ set(MODULE_TESTS
   mitkSimpleHistogramTest.cpp
   mitkCovarianceMatrixCalculatorTest.cpp
   mitkAnisotropicIterativeClosestPointRegistrationTest.cpp
+  mitkUnstructuredGridToUnstructuredGridFilterTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

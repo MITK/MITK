@@ -93,6 +93,23 @@ vtkUnstructuredGrid* mitk::UnstructuredGrid::GetVtkUnstructuredGrid(unsigned int
     return 0;
 }
 
+void mitk::UnstructuredGrid::Graft(const DataObject* data)
+{
+  const UnstructuredGrid* grid = dynamic_cast<const UnstructuredGrid*>(data);
+
+  if(grid == NULL)
+    mitkThrow() << "Data object used to graft surface is not a mitk::Surface.";
+
+  this->CopyInformation(data);
+  m_GridSeries.clear();
+
+  for (unsigned int i = 0; i < grid->m_GridSeries.size(); ++i)
+  {
+    m_GridSeries.push_back(vtkUnstructuredGrid::New());
+    m_GridSeries.back()->DeepCopy(const_cast<mitk::UnstructuredGrid*>(grid)->GetVtkUnstructuredGrid(i));
+  }
+}
+
 mitk::UnstructuredGrid::UnstructuredGrid() : m_CalculateBoundingBox( false )
 {
   this->InitializeEmpty();

@@ -42,6 +42,7 @@ mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
   m_ZMin = 0;
   m_ZMax = 0;
   m_VtkOutputRequested = false;
+  m_BackgroundLevel = -32768.0;
 }
 
 mitk::ExtractSliceFilter::~ExtractSliceFilter(){
@@ -167,7 +168,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
     // Set background level to BLACK instead of translucent, to avoid
     // boundary artifacts (see PlaneGeometryDataVtkMapper3D)
-    m_Reslicer->SetBackgroundLevel( -1023 );
+    m_Reslicer->SetBackgroundLevel( m_BackgroundLevel );
   }
   else{
     if ( planeGeometry != NULL )
@@ -230,7 +231,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
       // Set background level to TRANSLUCENT (see PlaneGeometryDataVtkMapper3D),
       // else the background of the image turns out gray
-      m_Reslicer->SetBackgroundLevel( -32768 );
+      m_Reslicer->SetBackgroundLevel( m_BackgroundLevel );
     }
     else
     {

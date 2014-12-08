@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(
   INCLUDE_DIRS Algorithms DataManagement IO Rendering
-  DEPENDS MitkCore MitkSceneSerializationBase MitkGLMappers
+  DEPENDS MitkCore MitkSceneSerializationBase MitkLegacyGL
   PACKAGE_DEPENDS ITK|ITKReview
   WARNINGS_AS_ERRORS
 )

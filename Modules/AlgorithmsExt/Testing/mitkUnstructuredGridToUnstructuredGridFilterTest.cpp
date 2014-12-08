@@ -24,10 +24,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkPoints.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkDebugLeaks.h>
 
 class mitkUnstructuredGridToUnstructuredGridFilterTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkUnstructuredGridToUnstructuredGridFilterTestSuite);
+
+  vtkDebugLeaks::SetExitError(0);
+
   MITK_TEST(testUnstructuredGridToUnstructuredGridFilterInitialization);
   MITK_TEST(testInput);
   MITK_TEST(testMultipleInputs);

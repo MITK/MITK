@@ -67,24 +67,24 @@ mitk::SurfaceVtkMapper2D::SurfaceVtkMapper2D()
   : m_DrawNormals(false),
     m_FrontNormalLengthInPixels(10.0),
     m_BackNormalLengthInPixels(10.0)
-  {
-    // default for normals on front side = green
-    m_FrontSideColor[0] = 0.0;
-    m_FrontSideColor[1] = 1.0;
-    m_FrontSideColor[2] = 0.0;
-    m_FrontSideColor[3] = 1.0;
+{
+  // default for normals on front side = green
+  m_FrontSideColor[0] = 0.0;
+  m_FrontSideColor[1] = 1.0;
+  m_FrontSideColor[2] = 0.0;
+  m_FrontSideColor[3] = 1.0;
 
-    // default for normals on back side = red
-    m_BackSideColor[0] = 1.0;
-    m_BackSideColor[1] = 0.0;
-    m_BackSideColor[2] = 0.0;
-    m_BackSideColor[3] = 1.0;
+  // default for normals on back side = red
+  m_BackSideColor[0] = 1.0;
+  m_BackSideColor[1] = 0.0;
+  m_BackSideColor[2] = 0.0;
+  m_BackSideColor[3] = 1.0;
 
-    // default for line color = yellow
-    m_LineColor[0] = 1.0;
-    m_LineColor[1] = 1.0;
-    m_LineColor[2] = 0.0;
-    m_LineColor[3] = 1.0;
+  // default for line color = yellow
+  m_LineColor[0] = 1.0;
+  m_LineColor[1] = 1.0;
+  m_LineColor[2] = 0.0;
+  m_LineColor[3] = 1.0;
 }
 
 mitk::SurfaceVtkMapper2D::~SurfaceVtkMapper2D()
@@ -204,21 +204,21 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
   //the normals to NULL produces our desired (clean) output.
   localStorage->m_Cutter->GetOutput()->GetPointData()->SetNormals(NULL);
 
-//  vtkSmartPointer<vtkRenderer> vtktmprenderer = vtkSmartPointer<vtkRenderer>::New();
-//  vtktmprenderer->AddActor(localStorage->m_Actor); //display the cube
+  //  vtkSmartPointer<vtkRenderer> vtktmprenderer = vtkSmartPointer<vtkRenderer>::New();
+  //  vtktmprenderer->AddActor(localStorage->m_Actor); //display the cube
 
-//  //Add renderer to renderwindow and render
-//  vtkSmartPointer<vtkRenderWindow> renderWindow =
-//    vtkSmartPointer<vtkRenderWindow>::New();
-//  renderWindow->AddRenderer(vtktmprenderer);
-//  renderWindow->SetSize(600, 600);
+  //  //Add renderer to renderwindow and render
+  //  vtkSmartPointer<vtkRenderWindow> renderWindow =
+  //    vtkSmartPointer<vtkRenderWindow>::New();
+  //  renderWindow->AddRenderer(vtktmprenderer);
+  //  renderWindow->SetSize(600, 600);
 
-//  vtkSmartPointer<vtkRenderWindowInteractor> interactor =
-//    vtkSmartPointer<vtkRenderWindowInteractor>::New();
-//  interactor->SetRenderWindow(renderWindow);
-//  renderWindow->Render();
+  //  vtkSmartPointer<vtkRenderWindowInteractor> interactor =
+  //    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  //  interactor->SetRenderWindow(renderWindow);
+  //  renderWindow->Render();
 
-//  interactor->Start();
+  //  interactor->Start();
 }
 
 void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)

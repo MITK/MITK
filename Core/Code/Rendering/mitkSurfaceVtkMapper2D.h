@@ -30,6 +30,9 @@ class vtkPropAssembly;
 class vtkCutter;
 class vtkPlane;
 class vtkLookupTable;
+class vtkGlyph3D;
+class vtkArrowSource;
+class vtkReverseSense;
 
 namespace mitk {
 
@@ -69,6 +72,8 @@ public:
        * \brief Actor of a 2D render window.
       */
     vtkSmartPointer<vtkActor> m_Actor;
+    vtkSmartPointer<vtkActor> m_NormalActor;
+    vtkSmartPointer<vtkActor> m_InverseNormalActor;
     /**
        * @brief m_Mapper VTK mapper for all types of 2D polydata e.g. werewolves.
        */
@@ -81,6 +86,14 @@ public:
        * @brief m_CuttingPlane The plane where to cut off the 2D slice.
        */
     vtkSmartPointer<vtkPlane> m_CuttingPlane;
+
+    vtkSmartPointer<vtkPolyDataMapper> m_NormalMapper;
+    vtkSmartPointer<vtkPolyDataMapper> m_InverseNormalMapper;
+    vtkSmartPointer<vtkGlyph3D> m_NormalGlyph;
+    vtkSmartPointer<vtkGlyph3D> m_InverseNormalGlyph;
+
+    vtkSmartPointer<vtkArrowSource> m_ArrowSource;
+    vtkSmartPointer<vtkReverseSense> m_ReverseSense;
 
     /** \brief Default constructor of the local storage. */
     LocalStorage();
@@ -129,16 +142,6 @@ protected:
      * @param renderer The respective renderer of the mitkRenderWindow.
      */
   void Update(BaseRenderer* renderer);
-
-  int m_LineWidth;
-
-  bool m_DrawNormals;
-
-  float m_FrontSideColor[4];
-  float m_BackSideColor[4];
-  float m_LineColor[4];
-  float m_FrontNormalLengthInPixels;
-  float m_BackNormalLengthInPixels;
 };
 } // namespace mitk
 

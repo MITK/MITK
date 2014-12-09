@@ -23,6 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkVtkScalarModeProperty.h>
+#include <mitkCoreServices.h>
+#include <mitkIPropertyAliases.h>
+#include <mitkIPropertyDescriptions.h>
 
 //vtk includes
 #include <vtkActor.h>
@@ -33,9 +36,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPropAssembly.h>
 #include <vtkPointData.h>
 
+#include <vtkGlyph3D.h>
+#include <vtkReverseSense.h>
+#include <vtkArrowSource.h>
+#include <mitkIOUtil.h>
+
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <mitkSmartPointerProperty.h>
 
 // constructor LocalStorage
 mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
@@ -50,6 +59,45 @@ mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
   m_Cutter = vtkSmartPointer<vtkCutter>::New();
   m_Cutter->SetCutFunction(m_CuttingPlane);
   m_Mapper->SetInputConnection( m_Cutter->GetOutputPort() );
+
+  m_NormalGlyph = vtkSmartPointer<vtkGlyph3D>::New();
+
+  m_InverseNormalGlyph = vtkSmartPointer<vtkGlyph3D>::New();
+
+  // Source for the glyph filter
+  m_ArrowSource = vtkSmartPointer<vtkArrowSource>::New();
+  //set small default values for fast/fluent rendering
+  m_ArrowSource->SetTipRadius(0.05);
+  m_ArrowSource->SetTipLength(0.20);
+  m_ArrowSource->SetTipResolution(5);
+  m_ArrowSource->SetShaftResolution(5);
+  m_ArrowSource->SetShaftRadius(0.01);
+
+  m_NormalGlyph->SetSourceConnection(m_ArrowSource->GetOutputPort());
+  m_NormalGlyph->SetVectorModeToUseNormal();
+  m_NormalGlyph->OrientOn();
+
+  m_InverseNormalGlyph->SetSourceConnection(m_ArrowSource->GetOutputPort());
+  m_InverseNormalGlyph->SetVectorModeToUseNormal();
+  m_InverseNormalGlyph->OrientOn();
+
+  m_NormalMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_NormalMapper->SetInputConnection(m_NormalGlyph->GetOutputPort());
+  m_NormalMapper->ScalarVisibilityOff();
+
+  m_InverseNormalMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_InverseNormalMapper->SetInputConnection(m_NormalGlyph->GetOutputPort());
+  m_InverseNormalMapper->ScalarVisibilityOff();
+
+  m_NormalActor = vtkSmartPointer<vtkActor>::New();
+  m_NormalActor->SetMapper(m_NormalMapper);
+
+  m_InverseNormalActor = vtkSmartPointer<vtkActor>::New();
+  m_InverseNormalActor->SetMapper(m_InverseNormalMapper);
+
+  m_ReverseSense = vtkSmartPointer<vtkReverseSense>::New();
+
+  m_PropAssembly->AddPart( m_NormalActor );
 }
 
 // destructor LocalStorage
@@ -64,27 +112,7 @@ const mitk::Surface* mitk::SurfaceVtkMapper2D::GetInput() const
 
 // constructor PointSetVtkMapper2D
 mitk::SurfaceVtkMapper2D::SurfaceVtkMapper2D()
-  : m_DrawNormals(false),
-    m_FrontNormalLengthInPixels(10.0),
-    m_BackNormalLengthInPixels(10.0)
 {
-  // default for normals on front side = green
-  m_FrontSideColor[0] = 0.0;
-  m_FrontSideColor[1] = 1.0;
-  m_FrontSideColor[2] = 0.0;
-  m_FrontSideColor[3] = 1.0;
-
-  // default for normals on back side = red
-  m_BackSideColor[0] = 1.0;
-  m_BackSideColor[1] = 0.0;
-  m_BackSideColor[2] = 0.0;
-  m_BackSideColor[3] = 1.0;
-
-  // default for line color = yellow
-  m_LineColor[0] = 1.0;
-  m_LineColor[1] = 1.0;
-  m_LineColor[2] = 0.0;
-  m_LineColor[3] = 1.0;
 }
 
 mitk::SurfaceVtkMapper2D::~SurfaceVtkMapper2D()
@@ -157,7 +185,7 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 
 void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-  const mitk::DataNode* node = GetDataNode();
+  mitk::DataNode* node = GetDataNode();
   mitk::Surface* surface  = static_cast<mitk::Surface *>( node->GetData() );
   const mitk::TimeGeometry *dataTimeGeometry = surface->GetTimeGeometry();
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
@@ -197,12 +225,45 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
   localStorage->m_Cutter->SetInputData(inputPolyData);
   localStorage->m_Cutter->Update();
 
-  //By default, the cutter will also copy/compute normals of the cut
-  //to the output polydata. The normals will be rendered by the
-  //vtkPolyDataMapper in a (weird) way. It seems that there is no way
-  //to turn off that rendering or to stop the computation. Setting
-  //the normals to NULL produces our desired (clean) output.
-  localStorage->m_Cutter->GetOutput()->GetPointData()->SetNormals(NULL);
+  bool generateNormals = false;
+  node->GetBoolProperty("draw normals 2D", generateNormals);
+  if(generateNormals)
+  {
+    localStorage->m_NormalGlyph->SetInputConnection( localStorage->m_Cutter->GetOutputPort() );
+    localStorage->m_NormalGlyph->Update();
+
+    localStorage->m_NormalMapper->SetInputConnection( localStorage->m_NormalGlyph->GetOutputPort() );
+
+    localStorage->m_PropAssembly->AddPart( localStorage->m_NormalActor );
+  }
+  else
+  {
+    localStorage->m_NormalGlyph->SetInputConnection( NULL );
+    localStorage->m_PropAssembly->RemovePart( localStorage->m_NormalActor );
+  }
+
+  bool generateInverseNormals = false;
+  node->GetBoolProperty("invert normals", generateInverseNormals);
+  if(generateInverseNormals)
+  {
+
+    localStorage->m_ReverseSense->SetInputConnection( localStorage->m_Cutter->GetOutputPort() );
+    localStorage->m_ReverseSense->ReverseCellsOff();
+    localStorage->m_ReverseSense->ReverseNormalsOn();
+
+    localStorage->m_InverseNormalGlyph->SetInputConnection( localStorage->m_ReverseSense->GetOutputPort() );
+    localStorage->m_InverseNormalGlyph->Update();
+
+    localStorage->m_InverseNormalMapper->SetInputConnection( localStorage->m_InverseNormalGlyph->GetOutputPort() );
+
+    localStorage->m_PropAssembly->AddPart( localStorage->m_InverseNormalActor );
+  }
+  else
+  {
+    localStorage->m_ReverseSense->SetInputConnection( NULL );
+    localStorage->m_PropAssembly->RemovePart( localStorage->m_InverseNormalActor );
+  }
+
 
   //  vtkSmartPointer<vtkRenderer> vtktmprenderer = vtkSmartPointer<vtkRenderer>::New();
   //  vtktmprenderer->AddActor(localStorage->m_Actor); //display the cube
@@ -230,8 +291,6 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
     return;
   }
 
-  node->GetBoolProperty("draw normals 2D", m_DrawNormals, renderer);
-
   float lineWidth = 1.0f;
   node->GetFloatProperty("line width", lineWidth, renderer);
 
@@ -243,47 +302,61 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
   float opacity = 1.0f;
   node->GetOpacity(opacity, renderer, "opacity");
 
+  //Pass properties to VTK
   localStorage->m_Actor->GetProperty()->SetColor(color[0], color[1], color[2]);
   localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
   localStorage->m_Actor->GetProperty()->SetLineWidth(lineWidth);
+  //By default, the cutter will also copy/compute normals of the cut
+  //to the output polydata. The normals will influence the
+  //vtkPolyDataMapper lightning. To view a clean cut the lighting has
+  //to be disabled.
+  localStorage->m_Actor->GetProperty()->SetLighting(0);
 
-  bool invertNormals(false);
-  node->GetBoolProperty("invert normals", invertNormals, renderer);
+  bool scalarVisibility = false;
+  node->GetBoolProperty("scalar visibility", scalarVisibility);
+  localStorage->m_Mapper->SetScalarVisibility(scalarVisibility);
 
-  if (!invertNormals)
-  {
-    node->GetColor(m_FrontSideColor, renderer, "front color");
-    node->GetOpacity(m_FrontSideColor[3], renderer, "opacity");
+  //color for inverse normals
+  float inverseNormalsColor[3]= { 1.0f, 0.0f, 0.0f };
+  node->GetColor(inverseNormalsColor, renderer, "back color");
+  localStorage->m_InverseNormalActor->GetProperty()->SetColor(inverseNormalsColor[0],
+      inverseNormalsColor[1], inverseNormalsColor[2]);
 
-    node->GetColor(m_BackSideColor, renderer, "back color");
-    node->GetOpacity(m_BackSideColor[3], renderer, "opacity");
+  //color for normals
+  float normalsColor[3]= { 0.0f, 1.0f, 0.0f };
+  node->GetColor(normalsColor, renderer, "front color");
+  localStorage->m_NormalActor->GetProperty()->SetColor(normalsColor[0],
+      normalsColor[1], normalsColor[2]);
 
-    node->GetFloatProperty( "front normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
-    node->GetFloatProperty( "back normal lenth (px)", m_BackNormalLengthInPixels, renderer );
-  }
-  else
-  {
-    node->GetColor(m_FrontSideColor, renderer, "back color");
-    node->GetOpacity(m_FrontSideColor[3], renderer, "opacity");
+  //normals scaling
+  float normalScaleFactor = 10.0f;
+  node->GetFloatProperty( "front normal lenth (px)", normalScaleFactor, renderer );
+  localStorage->m_NormalGlyph->SetScaleFactor(normalScaleFactor);
 
-    node->GetColor(m_BackSideColor, renderer, "front color");
-    node->GetOpacity(m_BackSideColor[3], renderer, "opacity");
-
-    node->GetFloatProperty( "back normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
-    node->GetFloatProperty( "front normal lenth (px)", m_BackNormalLengthInPixels, renderer );
-  }
+  //inverse normals scaling
+  float inverseNormalScaleFactor = 10.0f;
+  node->GetFloatProperty( "back normal lenth (px)", inverseNormalScaleFactor, renderer );
+  localStorage->m_InverseNormalGlyph->SetScaleFactor(inverseNormalScaleFactor);
 }
 
 void mitk::SurfaceVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
+  mitk::IPropertyAliases* aliases = mitk::CoreServices::GetPropertyAliases();
   node->AddProperty( "line width", FloatProperty::New(2.0f), renderer, overwrite );
+  aliases->AddAlias( "line width", "Surface.2D.Line Width", "Surface");
   node->AddProperty( "scalar mode", VtkScalarModeProperty::New(), renderer, overwrite );
   node->AddProperty( "draw normals 2D", BoolProperty::New(false), renderer, overwrite );
+  aliases->AddAlias( "draw normals 2D", "Surface.2D.Draw Normals", "Surface");
   node->AddProperty( "invert normals", BoolProperty::New(false), renderer, overwrite );
+  aliases->AddAlias( "invert normals", "Surface.2D.Draw Inverse Normals", "Surface");
   node->AddProperty( "front color", ColorProperty::New(0.0, 1.0, 0.0), renderer, overwrite );
+  aliases->AddAlias( "front color", "Surface.2D.Normals Color", "Surface");
   node->AddProperty( "back color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite );
+  aliases->AddAlias( "back color", "Surface.2D.Inverse Normals Color", "Surface");
   node->AddProperty( "front normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
+  aliases->AddAlias( "front normal lenth (px)", "Surface.2D.Normals Scale Factor", "Surface");
   node->AddProperty( "back normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
+  aliases->AddAlias( "back normal lenth (px)", "Surface.2D.Inverse Normals Scale Factor", "Surface");
   node->AddProperty( "layer", IntProperty::New(100), renderer, overwrite);
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

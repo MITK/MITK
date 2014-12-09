@@ -114,6 +114,7 @@ include(mitkMacroEmptyExternalProject)
 include(mitkFunctionGenerateProjectXml)
 include(mitkFunctionSuppressWarnings)
 include(mitkFunctionEnableBuildConfiguration)
+include(mitkFunctionEnableModules)
 include(FeatureSummary)
 
 SUPPRESS_VC_DEPRECATED_WARNINGS()
@@ -239,6 +240,35 @@ set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
 
 mitkFunctionEnableBuildConfiguration()
 
+set(MITK_WHITELISTS_PATH "${MITK_SOURCE_DIR}/CMake/Whitelists")
+set(MITK_EXTERNAL_WHITELISTS_PATH ".MITK/Whitelists")
+
+if(UNIX)
+  set(MITK_EXTERNAL_WHITELISTS_PATH "$ENV{HOME}/${MITK_EXTERNAL_WHITELISTS_PATH}")
+else()
+  set(MITK_EXTERNAL_WHITELISTS_PATH "$ENV{HOMEDRIVE}$ENV{HOMEPATH}/${MITK_EXTERNAL_WHITELISTS_PATH}")
+endif()
+
+FILE(TO_CMAKE_PATH ${MITK_EXTERNAL_WHITELISTS_PATH} MITK_EXTERNAL_WHITELISTS_PATH)
+
+set(_whitelists "None")
+
+file(GLOB _whitelistFiles ${MITK_WHITELISTS_PATH}/*.cmake)
+file(GLOB _externalWhitelistFiles "${MITK_EXTERNAL_WHITELISTS_PATH}/*.cmake")
+
+foreach(_whitelistFile ${_whitelistFiles})
+  get_filename_component(_whitelistFile ${_whitelistFile} NAME_WE)
+  list(APPEND _whitelists "${_whitelistFile}")
+endforeach()
+
+foreach(_whitelistFile ${_externalWhitelistFiles})
+  get_filename_component(_whitelistFile ${_whitelistFile} NAME_WE)
+  list(APPEND _whitelists "${_whitelistFile} (external)")
+endforeach()
+
+set(MITK_WHITELIST "None" CACHE STRING "")
+set_property(CACHE MITK_WHITELIST PROPERTY STRINGS ${_whitelists})
+
 mark_as_advanced(MITK_BUILD_ALL_APPS
                  MITK_USE_CppUnit
                  MITK_USE_GLEW
@@ -246,6 +276,7 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
                  MITK_USE_DCMTK
                  MITK_ENABLE_PIC_READER
                  MITK_BUILD_CONFIGURATION
+                 MITK_WHITELIST
                 )
 
 if(MITK_USE_Python)

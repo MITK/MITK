@@ -1,0 +1,33 @@
+function(mitkFunctionEnableModules)
+  if(NOT DEFINED modules)
+    message(FATAL_ERROR "Variable 'modules' not set!")
+  endif()
+
+  if(MITK_WHITELIST STREQUAL "None")
+    foreach(module ${modules})
+      add_subdirectory(${module})
+    endforeach()
+  else()
+    string(FIND "${MITK_WHITELIST}" " (external)" index REVERSE)
+
+    if(${index} EQUAL -1)
+      set(_whitelistFile "${MITK_WHITELISTS_PATH}/${_whiteListFile}.cmake")
+    else()
+      string(SUBSTRING "${MITK_WHITELIST}" 0 ${index} _whitelistFile)
+      set(_whitelistFile "${MITK_EXTERNAL_WHITELISTS_PATH}/${_whitelistFile}.cmake")
+    endif()
+
+    include(${_whitelistFile})
+
+    if(NOT DEFINED enabled_modules)
+      message(FATAL_ERROR "Variable 'enabled_modules' not set in whitelist file '${_whitelistFile}'!")
+    endif()
+
+    foreach(module ${modules})
+      list(FIND enabled_modules ${module} index)
+      if(NOT index EQUAL -1)
+        add_subdirectory(${module})
+      endif()
+    endforeach()
+  endif()
+endfunction()

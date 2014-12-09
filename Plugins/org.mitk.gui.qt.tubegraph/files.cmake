@@ -15,7 +15,7 @@ SET(INTERNAL_CPP_FILES
 )
 SET(UI_FILES
   src/internal/QmitkTubeGraphViewControls.ui
-  src/internal/QmitkTubeGraphConverterViewControls.ui
+  #src/internal/QmitkTubeGraphConverterViewControls.ui
 )
 
 SET(MOC_H_FILES

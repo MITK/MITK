@@ -3,5 +3,5 @@ PROJECT(org_mitk_gui_qt_tubegraph)
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE TUBEGRAPH_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDENCIES QmitkExt MitkTubeGraph SegmentationUI
+  MODULE_DEPENDS  MitkTubeGraph MitkSegmentationUI MitkQtWidgetsExt #QmitkExt
 )

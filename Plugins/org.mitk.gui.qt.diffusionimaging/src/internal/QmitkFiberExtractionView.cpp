@@ -82,34 +82,107 @@ void QmitkFiberExtractionView::CreateQtPartControl( QWidget *parent )
         // create GUI widgets from the Qt Designer's .ui file
         m_Controls = new Ui::QmitkFiberExtractionViewControls;
         m_Controls->setupUi( parent );
-        m_Controls->doExtractFibersButton->setDisabled(true);
-        m_Controls->PFCompoANDButton->setDisabled(true);
-        m_Controls->PFCompoORButton->setDisabled(true);
-        m_Controls->PFCompoNOTButton->setDisabled(true);
-        m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
-        m_Controls->m_RectangleButton->setVisible(false);
+//        m_Controls->m_ExtractFibersButton->setDisabled(true);
+//        m_Controls->PFCompoANDButton->setDisabled(true);
+//        m_Controls->PFCompoORButton->setDisabled(true);
+//        m_Controls->PFCompoNOTButton->setDisabled(true);
+//        m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
+//        m_Controls->m_RectangleButton->setVisible(false);
+
+//        m_Controls->m_ExtractionBoxMask->setVisible(false);
 
         connect( m_Controls->m_CircleButton, SIGNAL( clicked() ), this, SLOT( OnDrawCircle() ) );
         connect( m_Controls->m_PolygonButton, SIGNAL( clicked() ), this, SLOT( OnDrawPolygon() ) );
         connect(m_Controls->PFCompoANDButton, SIGNAL(clicked()), this, SLOT(GenerateAndComposite()) );
         connect(m_Controls->PFCompoORButton, SIGNAL(clicked()), this, SLOT(GenerateOrComposite()) );
         connect(m_Controls->PFCompoNOTButton, SIGNAL(clicked()), this, SLOT(GenerateNotComposite()) );
-        connect(m_Controls->m_JoinBundles, SIGNAL(clicked()), this, SLOT(JoinBundles()) );
-        connect(m_Controls->m_SubstractBundles, SIGNAL(clicked()), this, SLOT(SubstractBundles()) );
         connect(m_Controls->m_GenerateRoiImage, SIGNAL(clicked()), this, SLOT(GenerateRoiImage()) );
 
-        connect(m_Controls->m_Extract3dButton_2, SIGNAL(clicked()), this, SLOT(ExtractNotPassingMask()));
-        connect(m_Controls->m_Extract3dButton, SIGNAL(clicked()), this, SLOT(ExtractPassingMask()));
-        connect( m_Controls->m_ExtractMask, SIGNAL(clicked()), this, SLOT(ExtractEndingInMask()) );
-        connect( m_Controls->doExtractFibersButton, SIGNAL(clicked()), this, SLOT(DoFiberExtraction()) );
+        connect(m_Controls->m_JoinBundles, SIGNAL(clicked()), this, SLOT(JoinBundles()) );
+        connect(m_Controls->m_SubstractBundles, SIGNAL(clicked()), this, SLOT(SubstractBundles()) );
 
-        connect( m_Controls->m_RemoveOutsideMaskButton, SIGNAL(clicked()), this, SLOT(DoRemoveOutsideMask()));
-        connect( m_Controls->m_RemoveInsideMaskButton, SIGNAL(clicked()), this, SLOT(DoRemoveInsideMask()));
-        connect( m_Controls->m_ExtractDirButton, SIGNAL(clicked()), this, SLOT(ExtractDir()));
+        connect(m_Controls->m_ExtractFibersButton, SIGNAL(clicked()), this, SLOT(Extract()));
+        connect(m_Controls->m_RemoveButton, SIGNAL(clicked()), this, SLOT(Remove()));
+
+        connect(m_Controls->m_ExtractionMethodBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
+        connect(m_Controls->m_RemovalMethodBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
+    }
+
+    UpdateGui();
+}
+
+void QmitkFiberExtractionView::Remove()
+{
+    switch (m_Controls->m_RemovalMethodBox->currentIndex())
+    {
+    case 0:
+    {
+        RemoveDir();
+        break;
+    }
+    case 1:
+    {
+        RemoveOutsideMask();
+        break;
+    }
+    case 2:
+    {
+        RemoveInsideMask();
+        break;
+    }
+    case 3:
+    {
+        MITK_INFO << "Not implemented";
+        break;
+    }
+    case 4:
+    {
+        MITK_INFO << "Not implemented";
+        break;
+    }
     }
 }
 
-void QmitkFiberExtractionView::ExtractDir()
+void QmitkFiberExtractionView::Extract()
+{
+    switch (m_Controls->m_ExtractionMethodBox->currentIndex())
+    {
+    case 0:
+    {
+        ExtractWithPlanarFigure();
+        break;
+    }
+    case 1:
+    {
+        switch (m_Controls->m_ExtractionBoxMask->currentIndex())
+        {
+        {
+        case 0:
+            ExtractWithMask(true, false);
+            break;
+        }
+        {
+        case 1:
+            ExtractWithMask(true, true);
+            break;
+        }
+        {
+        case 2:
+            ExtractWithMask(false, false);
+            break;
+        }
+        {
+        case 3:
+            ExtractWithMask(false, true);
+            break;
+        }
+        }
+        break;
+    }
+    }
+}
+
+void QmitkFiberExtractionView::RemoveDir()
 {
     for (unsigned int i=0; i<m_SelectedFB.size(); i++)
     {
@@ -122,7 +195,7 @@ void QmitkFiberExtractionView::ExtractDir()
     }
 }
 
-void QmitkFiberExtractionView::DoRemoveInsideMask()
+void QmitkFiberExtractionView::RemoveInsideMask()
 {
     if (m_MaskImageNode.IsNull())
         return;
@@ -143,14 +216,14 @@ void QmitkFiberExtractionView::DoRemoveInsideMask()
         }
         DataNode::Pointer newNode = DataNode::New();
         newNode->SetData(newFib);
-        name += "_Cut";
+        name += "_Inside";
         newNode->SetName(name.toStdString());
         GetDefaultDataStorage()->Add(newNode);
         m_SelectedFB.at(i)->SetVisibility(false);
     }
 }
 
-void QmitkFiberExtractionView::DoRemoveOutsideMask()
+void QmitkFiberExtractionView::RemoveOutsideMask()
 {
     if (m_MaskImageNode.IsNull())
         return;
@@ -171,14 +244,14 @@ void QmitkFiberExtractionView::DoRemoveOutsideMask()
         }
         DataNode::Pointer newNode = DataNode::New();
         newNode->SetData(newFib);
-        name += "_Cut";
+        name += "_Outside";
         newNode->SetName(name.toStdString());
         GetDefaultDataStorage()->Add(newNode);
         m_SelectedFB.at(i)->SetVisibility(false);
     }
 }
 
-void QmitkFiberExtractionView::ExtractEndingInMask()
+void QmitkFiberExtractionView::ExtractWithMask(bool onlyEnds, bool invert)
 {
     if (m_MaskImageNode.IsNull())
         return;
@@ -191,7 +264,7 @@ void QmitkFiberExtractionView::ExtractEndingInMask()
 
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
         mitk::CastToItkImage(mitkMask, mask);
-        mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, false);
+        mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, onlyEnds, invert);
         if (newFib->GetNumFibers()<=0)
         {
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
@@ -200,63 +273,24 @@ void QmitkFiberExtractionView::ExtractEndingInMask()
 
         DataNode::Pointer newNode = DataNode::New();
         newNode->SetData(newFib);
-        name += "_ending-in-mask";
-        newNode->SetName(name.toStdString());
-        GetDefaultDataStorage()->Add(newNode);
-        m_SelectedFB.at(i)->SetVisibility(false);
-    }
-}
 
-void QmitkFiberExtractionView::ExtractNotPassingMask()
-{
-    if (m_MaskImageNode.IsNull())
-        return;
-
-    mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
-    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
-    {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        QString name(m_SelectedFB.at(i)->GetName().c_str());
-
-        itkUCharImageType::Pointer mask = itkUCharImageType::New();
-        mitk::CastToItkImage<itkUCharImageType>(mitkMask, mask);
-        mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, true, true);
-        if (newFib->GetNumFibers()<=0)
+        if (invert)
         {
-            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
-            continue;
+            name += "_not";
+
+            if (onlyEnds)
+                name += "-ending-in-mask";
+            else
+                name += "-passing-mask";
         }
-        DataNode::Pointer newNode = DataNode::New();
-        newNode->SetData(newFib);
-        name += "_not-passing-mask";
-        newNode->SetName(name.toStdString());
-        GetDefaultDataStorage()->Add(newNode);
-        m_SelectedFB.at(i)->SetVisibility(false);
-    }
-}
-
-void QmitkFiberExtractionView::ExtractPassingMask()
-{
-    if (m_MaskImageNode.IsNull())
-        return;
-
-    mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
-    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
-    {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        QString name(m_SelectedFB.at(i)->GetName().c_str());
-
-        itkUCharImageType::Pointer mask = itkUCharImageType::New();
-        mitk::CastToItkImage(mitkMask, mask);
-        mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, true);
-        if (newFib->GetNumFibers()<=0)
+        else
         {
-            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
-            continue;
+            if (onlyEnds)
+                name += "_ending-in-mask";
+            else
+                name += "_passing-mask";
         }
-        DataNode::Pointer newNode = DataNode::New();
-        newNode->SetData(newFib);
-        name += "_passing-mask";
+
         newNode->SetName(name.toStdString());
         GetDefaultDataStorage()->Add(newNode);
         m_SelectedFB.at(i)->SetVisibility(false);
@@ -703,39 +737,79 @@ void QmitkFiberExtractionView::UpdateGui()
     m_Controls->m_PfLabel->setText("<font color='grey'>needed for extraction</font>");
     m_Controls->m_InputData->setTitle("Please Select Input Data");
 
-    m_Controls->m_Extract3dButton_2->setEnabled(false);
-    m_Controls->m_Extract3dButton->setEnabled(false);
-    m_Controls->m_ExtractMask->setEnabled(false);
-    m_Controls->m_RemoveOutsideMaskButton->setEnabled(false);
-    m_Controls->m_RemoveInsideMaskButton->setEnabled(false);
+    m_Controls->m_RemoveButton->setEnabled(false);
 
-    m_Controls->doExtractFibersButton->setEnabled(false);
     m_Controls->PFCompoANDButton->setEnabled(false);
     m_Controls->PFCompoORButton->setEnabled(false);
     m_Controls->PFCompoNOTButton->setEnabled(false);
+
     m_Controls->m_GenerateRoiImage->setEnabled(false);
+    m_Controls->m_ExtractFibersButton->setEnabled(false);
 
     m_Controls->m_JoinBundles->setEnabled(false);
     m_Controls->m_SubstractBundles->setEnabled(false);
-    m_Controls->doExtractFibersButton->setEnabled(false);
+
+    m_Controls->m_ExtractionBoxMask->setVisible(false);
+    m_Controls->m_ExtactionFramePF->setVisible(false);
+    m_Controls->m_RemoveDirectionFrame->setVisible(false);
+    m_Controls->m_RemoveLengthFrame->setVisible(false);
+    m_Controls->m_RemoveCurvatureFrame->setVisible(false);
+
     m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
 
-    // are fiber bundles selected?
-    if ( !m_SelectedFB.empty() )
+    bool pfSelected = !m_SelectedPF.empty();
+    bool fibSelected = !m_SelectedFB.empty();
+    bool multipleFibsSelected = (m_SelectedFB.size()>1);
+    bool maskSelected = m_MaskImageNode.IsNotNull();
+    bool imageSelected = m_SelectedImage.IsNotNull();
+
+    // toggle visibility of elements according to selected method
+    switch ( m_Controls->m_ExtractionMethodBox->currentIndex() )
     {
-        m_Controls->m_FibLabel->setText(QString(m_SelectedFB.at(0)->GetName().c_str()));
+    case 0:
+        m_Controls->m_ExtactionFramePF->setVisible(true);
+        break;
+    case 1:
+        m_Controls->m_ExtractionBoxMask->setVisible(true);
+        break;
+    }
+
+    switch ( m_Controls->m_RemovalMethodBox->currentIndex() )
+    {
+    case 0:
+        m_Controls->m_RemoveDirectionFrame->setVisible(true);
+        if ( fibSelected )
+            m_Controls->m_RemoveButton->setEnabled(true);
+        break;
+    case 1:
+        break;
+    case 2:
+        break;
+    case 3:
+        m_Controls->m_RemoveLengthFrame->setVisible(true);
+        break;
+    case 4:
+        m_Controls->m_RemoveCurvatureFrame->setVisible(true);
+        break;
+    }
+
+
+    // are fiber bundles selected?
+    if ( fibSelected )
+    {
         m_Controls->m_PlanarFigureButtonsFrame->setEnabled(true);
+        m_Controls->m_FibLabel->setText(QString(m_SelectedFB.at(0)->GetName().c_str()));
 
         // one bundle and one planar figure needed to extract fibers
-        if (!m_SelectedPF.empty())
+        if (pfSelected)
         {
             m_Controls->m_InputData->setTitle("Input Data");
             m_Controls->m_PfLabel->setText(QString(m_SelectedPF.at(0)->GetName().c_str()));
-            m_Controls->doExtractFibersButton->setEnabled(true);
+            m_Controls->m_ExtractFibersButton->setEnabled(true);
         }
 
         // more than two bundles needed to join/subtract
-        if (m_SelectedFB.size() > 1)
+        if (multipleFibsSelected)
         {
             m_Controls->m_FibLabel->setText("multiple bundles selected");
 
@@ -743,20 +817,17 @@ void QmitkFiberExtractionView::UpdateGui()
             m_Controls->m_SubstractBundles->setEnabled(true);
         }
 
-        if (m_MaskImageNode.IsNotNull())
+        if (maskSelected)
         {
-            m_Controls->m_Extract3dButton_2->setEnabled(true);
-            m_Controls->m_Extract3dButton->setEnabled(true);
-            m_Controls->m_ExtractMask->setEnabled(true);
-            m_Controls->m_RemoveOutsideMaskButton->setEnabled(true);
-            m_Controls->m_RemoveInsideMaskButton->setEnabled(true);
+            m_Controls->m_RemoveButton->setEnabled(true);
+            m_Controls->m_ExtractFibersButton->setEnabled(true);
         }
     }
 
     // are planar figures selected?
-    if ( !m_SelectedPF.empty() )
+    if (pfSelected)
     {
-        if ( !m_SelectedFB.empty() || m_SelectedImage.IsNotNull())
+        if ( fibSelected || m_SelectedImage.IsNotNull())
             m_Controls->m_GenerateRoiImage->setEnabled(true);
 
         if (m_SelectedPF.size() > 1)
@@ -766,6 +837,12 @@ void QmitkFiberExtractionView::UpdateGui()
         }
         else
             m_Controls->PFCompoNOTButton->setEnabled(true);
+    }
+
+    // is image selected
+    if (imageSelected || maskSelected)
+    {
+        m_Controls->m_PlanarFigureButtonsFrame->setEnabled(true);
     }
 }
 
@@ -908,7 +985,7 @@ void QmitkFiberExtractionView::AddFigureToDataStorage(mitk::PlanarFigure* figure
     UpdateGui();
 }
 
-void QmitkFiberExtractionView::DoFiberExtraction()
+void QmitkFiberExtractionView::ExtractWithPlanarFigure()
 {
     if ( m_SelectedFB.empty() || m_SelectedPF.empty() ){
         QMessageBox::information( NULL, "Warning", "No fibe bundle selected!");

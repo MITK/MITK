@@ -72,23 +72,28 @@ protected slots:
 
   void OnDrawCircle();          ///< add circle interactors etc.
   void OnDrawPolygon();         ///< add circle interactors etc.
-  void DoFiberExtraction();     ///< Extract fibers from selected bundle
   void GenerateAndComposite();
   void GenerateOrComposite();
   void GenerateNotComposite();
-  void DoRemoveOutsideMask();
-  void DoRemoveInsideMask();
+
   void JoinBundles();               ///< merge selected fiber bundles
   void SubstractBundles();          ///< subtract bundle A from bundle B. Not commutative! Defined by order of selection.
   void GenerateRoiImage();          ///< generate binary image of selected planar figures.
-  void ExtractPassingMask();        ///< extract all fibers passing the selected segmentation
-  void ExtractNotPassingMask();     ///< extract all fibers NOT passing the selected segmentation
-  void ExtractEndingInMask();       ///< extract all fibers passing the selected segmentation
-  void ExtractDir();
+
+  void Remove();
+  void Extract();
+  void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name, const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
 
 protected:
+
+  void RemoveOutsideMask();
+  void RemoveInsideMask();
+  void RemoveDir();
+
+  void ExtractWithMask(bool onlyEnds, bool invert);
+  void ExtractWithPlanarFigure();
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
@@ -144,8 +149,6 @@ protected:
   template < typename TPixel, unsigned int VImageDimension >
       void InternalReorientImagePlane(
         const itk::Image< TPixel, VImageDimension > *image, mitk::BaseGeometry* planegeo3D, int additionalIndex );
-
-  void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
 
   int m_CircleCounter;                                      ///< used for data node naming
   int m_PolygonCounter;                                     ///< used for data node naming

@@ -43,6 +43,7 @@ set(module_dirs
     ToFProcessing
     ToFUI
     US
+    TubeGraph
     USUI
     DicomUI
     Simulation

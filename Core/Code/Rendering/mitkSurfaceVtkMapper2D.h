@@ -23,25 +23,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkLocalStorageHandler.h"
-#include <vtkSmartPointer.h>
-#include <mitkSurface.h>
 
-//class vtkActor;
+//VTK
+#include <vtkSmartPointer.h>
 class vtkPropAssembly;
 class vtkCutter;
 class vtkPlane;
 class vtkLookupTable;
-class vtkLinearTransform;
-class vtkPKdTree;
-class vtkStripper;
-
 
 namespace mitk {
 
   class Surface;
 
   /**
-  * @brief Vtk-based 2D mapper for Surfaces
+  * @brief Vtk-based mapper for cutting 2D slices out of Surfaces.
   * @ingroup Mapper
   */
   class MITK_CORE_EXPORT SurfaceVtkMapper2D : public VtkMapper
@@ -54,7 +49,7 @@ namespace mitk {
 
     virtual const mitk::Surface* GetInput() const;
 
-    /** \brief returns the a prop assembly */
+    /** \brief returns the prop assembly */
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
     /** \brief set the default properties for this mapper */
@@ -66,13 +61,25 @@ namespace mitk {
     public:
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;
-
+      /**
+       * @brief m_PropAssembly Contains all vtkProps for the final rendering.
+       */
       vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
+      /**
+       * \brief Actor of a 2D render window.
+      */
       vtkSmartPointer<vtkActor> m_Actor;
+      /**
+       * @brief m_Mapper VTK mapper for all types of 2D polydata e.g. werewolves.
+       */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
-      /** \brief Actor of a 2D render window. */
-      vtkSmartPointer<vtkPolyData> m_PolyData;
+      /**
+       * @brief m_Cutter Filter to cut out the 2D slice.
+       */
       vtkSmartPointer<vtkCutter> m_Cutter;
+      /**
+       * @brief m_CuttingPlane The plane where to cut off the 2D slice.
+       */
       vtkSmartPointer<vtkPlane> m_CuttingPlane;
 
       /** \brief Default constructor of the local storage. */
@@ -86,23 +93,42 @@ namespace mitk {
 
 
   protected:
-
-    /* constructor */
+    /**
+     * @brief SurfaceVtkMapper2D default constructor.
+     */
     SurfaceVtkMapper2D();
 
-    /* destructor */
+    /**
+     * @brief ~SurfaceVtkMapper2D default destructor.
+     */
     virtual ~SurfaceVtkMapper2D();
 
-    /* \brief Applies the color and opacity properties and calls CreateVTKRenderObjects */
+    /**
+     * @brief GenerateDataForRenderer produces all the data.
+     * @param renderer The respective renderer of the mitkRenderWindow.
+     */
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
-    /* \brief Called in mitk::Mapper::Update
-    * If TimeSlicedGeometry or time step is not valid of point set: reset mapper so that nothing is
-    * displayed e.g. toggle visiblity of the propassembly */
+
+    /**
+     * @brief ResetMapper Called in mitk::Mapper::Update to hide objects.
+     * If TimeSlicedGeometry or time step is not valid, reset the mapper.
+     * so that nothing is displayed e.g. toggle visiblity of the propassembly.
+     *
+     * @param renderer The respective renderer of the mitkRenderWindow.
+     */
     virtual void ResetMapper( BaseRenderer* renderer );
 
-    void ApplyAllProperties(mitk::BaseRenderer *renderer);
+    /**
+     * @brief ApplyAllProperties Pass all the properties to VTK.
+     * @param renderer The respective renderer of the mitkRenderWindow.
+     */
+    void ApplyAllProperties( BaseRenderer* renderer);
 
-    void Update(mitk::BaseRenderer *renderer);
+    /**
+     * @brief Update Check if data should be generated.
+     * @param renderer The respective renderer of the mitkRenderWindow.
+     */
+    void Update(BaseRenderer* renderer);
 
     int m_LineWidth;
 
@@ -114,8 +140,6 @@ namespace mitk {
     float m_FrontNormalLengthInPixels;
     float m_BackNormalLengthInPixels;
   };
-
-
 } // namespace mitk
 
 #endif /* mitkSurfaceVtkMapper2D_h */

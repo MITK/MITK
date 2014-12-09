@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include "mitkVtkPropRenderer.h"
 #include <mitkSurface.h>
-#include <mitkAbstractTransformGeometry.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkVtkScalarModeProperty.h>
 
@@ -29,36 +28,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkActor.h>
 #include <vtkCutter.h>
 #include <vtkLookupTable.h>
-#include <vtkPKdTree.h>
 #include <vtkPlane.h>
 #include <vtkPolyData.h>
 #include <vtkPropAssembly.h>
-#include <vtkStripper.h>
-#include <vtkLinearTransform.h>
-#include <vtkContourFilter.h>
+#include <vtkPointData.h>
 
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkMath.h>
-
 
 // constructor LocalStorage
 mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
 {
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  m_Mapper->ScalarVisibilityOn();
+  m_Mapper->ScalarVisibilityOff();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Actor->SetMapper( m_Mapper );
   m_PropAssembly = vtkSmartPointer <vtkPropAssembly>::New();
   m_PropAssembly->AddPart( m_Actor );
-
   m_CuttingPlane = vtkSmartPointer<vtkPlane>::New();
   m_Cutter = vtkSmartPointer<vtkCutter>::New();
   m_Cutter->SetCutFunction(m_CuttingPlane);
-
-//  m_Mapper->SetInputConnection( m_Cutter->GetOutputPort() );
-
+  m_Mapper->SetInputConnection( m_Cutter->GetOutputPort() );
 }
 
 // destructor LocalStorage
@@ -96,7 +87,6 @@ mitk::SurfaceVtkMapper2D::SurfaceVtkMapper2D()
     m_LineColor[3] = 1.0;
 }
 
-// destructor
 mitk::SurfaceVtkMapper2D::~SurfaceVtkMapper2D()
 {
 }
@@ -108,16 +98,11 @@ void mitk::SurfaceVtkMapper2D::ResetMapper( BaseRenderer* renderer )
   ls->m_PropAssembly->VisibilityOff();
 }
 
-// returns propassembly
 vtkProp* mitk::SurfaceVtkMapper2D::GetVtkProp(mitk::BaseRenderer * renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
   return ls->m_PropAssembly;
 }
-
-//void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* renderer)
-//{
-//}
 
 void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 {
@@ -152,7 +137,7 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   }
 
   surface->UpdateOutputInformation();
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
 
   //check if something important has changed and we need to rerender
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
@@ -190,7 +175,7 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
   //apply color and opacity read from the PropertyList
   this->ApplyAllProperties(renderer);
 
-  const PlaneGeometry *planeGeometry = renderer->GetCurrentWorldPlaneGeometry();
+  const PlaneGeometry* planeGeometry = renderer->GetCurrentWorldPlaneGeometry();
   if( ( planeGeometry == NULL ) || ( !planeGeometry->IsValid() ) || ( !planeGeometry->HasReferenceGeometry() ))
   {
     return;
@@ -212,18 +197,12 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
   localStorage->m_Cutter->SetInputData(inputPolyData);
   localStorage->m_Cutter->Update();
 
-  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-  polyData->SetLines( localStorage->m_Cutter->GetOutput()->GetLines() );
-  polyData->SetVerts( localStorage->m_Cutter->GetOutput()->GetVerts() );
-  polyData->SetPoints( localStorage->m_Cutter->GetOutput()->GetPoints() );
-  polyData->SetStrips( localStorage->m_Cutter->GetOutput()->GetStrips() );
-//  polyData->Print(std::cout);
-
-//  polyData = localStorage->m_Cutter->GetOutput();
-//  std::cout << "###################" << std::endl;
-//  polyData->Print(std::cout);
-  localStorage->m_Mapper->SetInputData( polyData );
-//  localStorage->m_Mapper->SetInputData( localStorage->m_Cutter->GetOutput() );
+  //By default, the cutter will also copy/compute normals of the cut
+  //to the output polydata. The normals will be rendered by the
+  //vtkPolyDataMapper in a (weird) way. It seems that there is no way
+  //to turn off that rendering or to stop the computation. Setting
+  //the normals to NULL produces our desired (clean) output.
+  localStorage->m_Cutter->GetOutput()->GetPointData()->SetNormals(NULL);
 
 //  vtkSmartPointer<vtkRenderer> vtktmprenderer = vtkSmartPointer<vtkRenderer>::New();
 //  vtktmprenderer->AddActor(localStorage->m_Actor); //display the cube
@@ -237,7 +216,6 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
 //  vtkSmartPointer<vtkRenderWindowInteractor> interactor =
 //    vtkSmartPointer<vtkRenderWindowInteractor>::New();
 //  interactor->SetRenderWindow(renderWindow);
-////  vtktmprenderer->SetBackground(.1, .2, .3);
 //  renderWindow->Render();
 
 //  interactor->Start();

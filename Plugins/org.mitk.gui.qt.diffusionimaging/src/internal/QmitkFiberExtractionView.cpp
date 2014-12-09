@@ -105,6 +105,20 @@ void QmitkFiberExtractionView::CreateQtPartControl( QWidget *parent )
 
         connect( m_Controls->m_RemoveOutsideMaskButton, SIGNAL(clicked()), this, SLOT(DoRemoveOutsideMask()));
         connect( m_Controls->m_RemoveInsideMaskButton, SIGNAL(clicked()), this, SLOT(DoRemoveInsideMask()));
+        connect( m_Controls->m_ExtractDirButton, SIGNAL(clicked()), this, SLOT(ExtractDir()));
+    }
+}
+
+void QmitkFiberExtractionView::ExtractDir()
+{
+    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
+    {
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+        vnl_vector_fixed<double,3> dir;
+        dir[0] = m_Controls->m_ExtractDirX->value();
+        dir[1] = m_Controls->m_ExtractDirY->value();
+        dir[2] = m_Controls->m_ExtractDirZ->value();
+        fib->RemoveDir(dir,m_Controls->m_ExtractAngle->value());
     }
 }
 

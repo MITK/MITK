@@ -50,6 +50,7 @@ endif()
 # ExternalProjects
 #-----------------------------------------------------------------------------
 
+# These are ordered by dependencies
 set(external_projects
   ZLIB
   Python
@@ -79,8 +80,6 @@ set(external_projects
 
 # These are "hard" dependencies and always set to ON
 set(MITK_USE_tinyxml 1)
-set(MITK_USE_ANN 1)
-set(MITK_USE_Eigen 1)
 set(MITK_USE_GLEW 1)
 set(MITK_USE_GDCM 1)
 set(MITK_USE_ITK 1)
@@ -242,19 +241,22 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_ALL_APPS
   MITK_BUILD_TUTORIAL # Deprecated. Use MITK_BUILD_EXAMPLES instead
   MITK_BUILD_EXAMPLES
+
   MITK_USE_ACVD
-  MITK_USE_CppUnit
-  MITK_USE_GLEW
-  MITK_USE_Boost
-  MITK_USE_SYSTEM_Boost
+  MITK_USE_ANN
   MITK_USE_BLUEBERRY
+  MITK_USE_Boost
+  MITK_USE_CppUnit
   MITK_USE_CTK
   MITK_USE_DCMTK
+  MITK_USE_Eigen
+  MITK_USE_GLEW
+  MITK_USE_OpenCL
   MITK_USE_OpenCV
   MITK_USE_Poco
-  MITK_USE_SOFA
   MITK_USE_Python
-  MITK_USE_OpenCL
+  MITK_USE_SOFA
+  MITK_USE_SYSTEM_Boost
 
   MITK_ENABLE_PIC_READER
   )

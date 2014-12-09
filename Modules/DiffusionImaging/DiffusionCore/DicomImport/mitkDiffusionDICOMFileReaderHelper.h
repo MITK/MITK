@@ -245,7 +245,7 @@ public:
 
         typename MosaicImageType::IndexType mosaic_index;
 
-        mosaic_index[2] = 1;
+        mosaic_index[2] = 0;
 
         // first find the corresponding tile in the mosaic
         // this is defined by the z-position of the vector (3D) image iterator
@@ -254,7 +254,7 @@ public:
         //
         // the remaining is just computing the correct position in the mosaic, done by
         //                --------- index of (0,0,z) -----        + --- current 2d position ---
-        mosaic_index[0] = (threeD_index[2] % images_per_row) * dx + threeD_index[0] + images_per_row;
+        mosaic_index[0] = (threeD_index[2] % images_per_row) * dx + threeD_index[0];
         mosaic_index[1] = (threeD_index[2] / images_per_row) * dy + threeD_index[1];
 
         typename MosaicImageType::PixelType mosaic_pixel = current_mosaic->GetPixel( mosaic_index );

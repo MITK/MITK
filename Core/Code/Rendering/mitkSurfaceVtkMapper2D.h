@@ -66,13 +66,24 @@ public:
     itk::TimeStamp m_LastUpdateTime;
     /**
        * @brief m_PropAssembly Contains all vtkProps for the final rendering.
+       *
+       * Consists of 3 actors:
+       * The surface cut (the slice from the 3D surface).
+       * The normals and the inverse normals.
        */
     vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
+
     /**
-       * \brief Actor of a 2D render window.
-      */
+     * @brief m_Actor actor for the surface cut.
+     */
     vtkSmartPointer<vtkActor> m_Actor;
+    /**
+     * @brief m_NormalActor actor for the normals.
+     */
     vtkSmartPointer<vtkActor> m_NormalActor;
+    /**
+     * @brief m_InverseNormalActor actor for the inverse normals.
+     */
     vtkSmartPointer<vtkActor> m_InverseNormalActor;
     /**
        * @brief m_Mapper VTK mapper for all types of 2D polydata e.g. werewolves.
@@ -87,12 +98,34 @@ public:
        */
     vtkSmartPointer<vtkPlane> m_CuttingPlane;
 
+    /**
+     * @brief m_NormalMapper Mapper for the normals.
+     */
     vtkSmartPointer<vtkPolyDataMapper> m_NormalMapper;
+
+    /**
+     * @brief m_InverseNormalMapper Mapper for the inverse normals.
+     */
     vtkSmartPointer<vtkPolyDataMapper> m_InverseNormalMapper;
+
+    /**
+     * @brief m_NormalGlyph Glyph for creating normals.
+     */
     vtkSmartPointer<vtkGlyph3D> m_NormalGlyph;
+
+    /**
+     * @brief m_InverseNormalGlyph Glyph for creating inverse normals.
+     */
     vtkSmartPointer<vtkGlyph3D> m_InverseNormalGlyph;
 
+    /**
+     * @brief m_ArrowSource Arrow representation of the normals.
+     */
     vtkSmartPointer<vtkArrowSource> m_ArrowSource;
+
+    /**
+     * @brief m_ReverseSense Filter to invert the normals.
+     */
     vtkSmartPointer<vtkReverseSense> m_ReverseSense;
 
     /** \brief Default constructor of the local storage. */

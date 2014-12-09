@@ -41,11 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkArrowSource.h>
 #include <mitkIOUtil.h>
 
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <mitkSmartPointerProperty.h>
-
 // constructor LocalStorage
 mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
 {
@@ -138,19 +133,13 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   if( node == NULL )
     return;
   bool visible = true;
-
   node->GetVisibility(visible, renderer, "visible");
-
   if ( !visible )
-  {
     return;
-  }
 
   mitk::Surface* surface  = static_cast<mitk::Surface *>( node->GetData() );
   if ( surface == NULL )
-  {
     return;
-  }
 
   // Calculate time step of the input data for the specified renderer (integer value)
   this->CalculateTimeStep( renderer );
@@ -263,23 +252,6 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
     localStorage->m_ReverseSense->SetInputConnection( NULL );
     localStorage->m_PropAssembly->RemovePart( localStorage->m_InverseNormalActor );
   }
-
-
-  //  vtkSmartPointer<vtkRenderer> vtktmprenderer = vtkSmartPointer<vtkRenderer>::New();
-  //  vtktmprenderer->AddActor(localStorage->m_Actor); //display the cube
-
-  //  //Add renderer to renderwindow and render
-  //  vtkSmartPointer<vtkRenderWindow> renderWindow =
-  //    vtkSmartPointer<vtkRenderWindow>::New();
-  //  renderWindow->AddRenderer(vtktmprenderer);
-  //  renderWindow->SetSize(600, 600);
-
-  //  vtkSmartPointer<vtkRenderWindowInteractor> interactor =
-  //    vtkSmartPointer<vtkRenderWindowInteractor>::New();
-  //  interactor->SetRenderWindow(renderWindow);
-  //  renderWindow->Render();
-
-  //  interactor->Start();
 }
 
 void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)

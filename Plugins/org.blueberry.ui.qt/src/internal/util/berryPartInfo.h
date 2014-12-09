@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYPARTINFO_H_
 
 #include <QIcon>
+#include <QString>
+#include <QStringList>
 #include <berryIPresentablePart.h>
 
 namespace berry {
@@ -30,6 +32,9 @@ struct PartInfo {
      QString toolTip;
      QIcon image;
      bool dirty;
+
+     static const QString plugingTranslateNames[];
+     QStringList plugingSrcNames;
 
      PartInfo();
 

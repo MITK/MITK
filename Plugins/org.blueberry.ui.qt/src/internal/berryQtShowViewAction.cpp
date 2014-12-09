@@ -22,13 +22,49 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
+// TODO ism temporary translate
+// it hart to find point, when plugin name read from file
+
+const QString QtShowViewAction::plugingTranslateNames[] = { 
+  QAction::tr("BasicImageProcessing"),   
+  QAction::tr("Display"),
+  QAction::tr("Data Manager"),
+  QAction::tr("Image Navigator"),
+  QAction::tr("LiverSegmentation"),
+  QAction::tr("Measurement"),
+  QAction::tr("PointSet Interaction"),
+  QAction::tr("RegionGrowing Segmentation"),
+  QAction::tr("Segmentation"),
+  QAction::tr("Segmentation Utilities"),
+  QAction::tr("Statistics"),
+  QAction::tr("Vascular Structure Segmentation"),
+  QAction::tr("Volume Visualization")
+};
+
+
 QtShowViewAction::QtShowViewAction(IWorkbenchWindow::Pointer window,
     IViewDescriptor::Pointer desc) :
   QAction(nullptr)
 {
+  plugingSrcNames << "BasicImageProcessing" << "Display" << "Data Manager" << "Image Navigator" << "LiverSegmentation" <<
+    "Measurement" << "PointSet Interaction" << "RegionGrowing Segmentation" << "Segmentation" << "Segmentation Utilities" <<
+    "Statistics" << "Vascular Structure Segmentation" << "Volume Visualization";
+
   this->setParent(static_cast<QWidget*>(window->GetShell()->GetControl()));
-  this->setText(desc->GetLabel());
-  this->setToolTip(desc->GetLabel());
+
+  bool findTranslate = false;
+  for (int i=0; i<plugingSrcNames.size(); i++) {
+    if (plugingSrcNames[i].compare(QString(desc->GetLabel().toUtf8().constData())) == 0) {
+      this->setText(plugingTranslateNames[i]);
+      this->setToolTip(plugingTranslateNames[i]);    
+      findTranslate = true;
+      break;
+    }
+  }
+  if (!findTranslate) {
+    this->setToolTip(QString(desc->GetLabel().toUtf8().constData()));
+    this->setText(QString(desc->GetLabel().toUtf8().constData()));
+  }
   this->setIconVisibleInMenu(true);
 
   QIcon icon = desc->GetImageDescriptor();

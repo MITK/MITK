@@ -44,6 +44,8 @@ private:
 
   IViewDescriptor::Pointer m_Desc;
 
+  static const QString plugingTranslateNames[];
+  QStringList plugingSrcNames;
 
 public:
 

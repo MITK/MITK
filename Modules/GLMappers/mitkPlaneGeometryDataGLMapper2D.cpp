@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkGL.h"
-#include "mitkPlaneGeometryDataMapper2D.h"
+#include "mitkPlaneGeometryDataGLMapper2D.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAbstractTransformGeometry.h"
 
 
-mitk::PlaneGeometryDataMapper2D::PlaneGeometryDataMapper2D()
+mitk::PlaneGeometryDataGLMapper2D::PlaneGeometryDataGLMapper2D()
 : m_SurfaceMapper( NULL ), m_DataStorage(NULL), m_ParentNode(NULL),
   m_OtherPlaneGeometries(), m_RenderOrientationArrows( false ),
   m_ArrowOrientationPositive( true )
@@ -40,17 +40,17 @@ mitk::PlaneGeometryDataMapper2D::PlaneGeometryDataMapper2D()
 }
 
 
-mitk::PlaneGeometryDataMapper2D::~PlaneGeometryDataMapper2D()
+mitk::PlaneGeometryDataGLMapper2D::~PlaneGeometryDataGLMapper2D()
 {
 }
 
 
-const mitk::PlaneGeometryData* mitk::PlaneGeometryDataMapper2D::GetInput(void)
+const mitk::PlaneGeometryData* mitk::PlaneGeometryDataGLMapper2D::GetInput(void)
 {
   return static_cast<const PlaneGeometryData * > ( GetDataNode()->GetData() );
 }
 
-void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
+void mitk::PlaneGeometryDataGLMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
   BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
@@ -86,7 +86,7 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer
 }
 
 
-void mitk::PlaneGeometryDataMapper2D::Paint(BaseRenderer *renderer)
+void mitk::PlaneGeometryDataGLMapper2D::Paint(BaseRenderer *renderer)
 {
   bool visible = true;
 
@@ -440,7 +440,7 @@ void mitk::PlaneGeometryDataMapper2D::Paint(BaseRenderer *renderer)
   }
 }
 
-void mitk::PlaneGeometryDataMapper2D::DrawOrientationArrow( mitk::Point2D &outerPoint, mitk::Point2D &innerPoint,
+void mitk::PlaneGeometryDataGLMapper2D::DrawOrientationArrow( mitk::Point2D &outerPoint, mitk::Point2D &innerPoint,
   const mitk::PlaneGeometry *planeGeometry,
   const mitk::PlaneGeometry *rendererPlaneGeometry,
   const mitk::DisplayGeometry *displayGeometry,
@@ -480,7 +480,7 @@ void mitk::PlaneGeometryDataMapper2D::DrawOrientationArrow( mitk::Point2D &outer
 }
 
 
-void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer )
+void mitk::PlaneGeometryDataGLMapper2D::ApplyAllProperties( BaseRenderer *renderer )
 {
   Superclass::ApplyColorAndOpacityProperties(renderer);
 
@@ -508,7 +508,7 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer
 }
 
 
-void mitk::PlaneGeometryDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent )
+void mitk::PlaneGeometryDataGLMapper2D::SetDatastorageAndGeometryBaseNode( mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent )
 {
   if (ds.IsNotNull())
   {
@@ -520,7 +520,7 @@ void mitk::PlaneGeometryDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::D
   }
 }
 
-void mitk::PlaneGeometryDataMapper2D::DrawLine( BaseRenderer* renderer,
+void mitk::PlaneGeometryDataGLMapper2D::DrawLine( BaseRenderer* renderer,
                                             ScalarType lengthInDisplayUnits,
                                             Line<ScalarType,2> &line,
                                             std::vector<ScalarType> &gapPositions,
@@ -625,7 +625,7 @@ void mitk::PlaneGeometryDataMapper2D::DrawLine( BaseRenderer* renderer,
 
 }
 
-int mitk::PlaneGeometryDataMapper2D::DetermineThickSliceMode( DataNode * dn, int &thickSlicesNum )
+int mitk::PlaneGeometryDataGLMapper2D::DetermineThickSliceMode( DataNode * dn, int &thickSlicesNum )
 {
   int thickSlicesMode = 0;
   // determine the state and the extend of the thick-slice mode
@@ -647,7 +647,7 @@ int mitk::PlaneGeometryDataMapper2D::DetermineThickSliceMode( DataNode * dn, int
   return thickSlicesMode;
 }
 
-void mitk::PlaneGeometryDataMapper2D::DetermineParametricCrossPositions( Line< mitk::ScalarType, 2 > &mainLine,
+void mitk::PlaneGeometryDataGLMapper2D::DetermineParametricCrossPositions( Line< mitk::ScalarType, 2 > &mainLine,
                                                                      Line< mitk::ScalarType, 2 > &otherLine,
                                                                      std::vector< mitk::ScalarType > &crossPositions )
 {

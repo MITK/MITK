@@ -347,7 +347,7 @@ set(CPP_FILES
   Rendering/mitkBaseRenderer.cpp
   Rendering/mitkVtkMapper.cpp
   Rendering/mitkRenderWindowFrame.cpp
-  #Rendering/mitkPlaneGeometryDataMapper2D.cpp Moved to deprecated GLMappers Module
+  Rendering/mitkPlaneGeometryDataMapper2D.cpp
   Rendering/mitkPlaneGeometryDataVtkMapper3D.cpp
   #Rendering/mitkGLMapper.cpp Moved to deprecated GLMappers Module
   Rendering/mitkGradientBackground.cpp

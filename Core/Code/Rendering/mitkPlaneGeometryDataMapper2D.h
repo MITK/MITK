@@ -1,0 +1,135 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+
+#ifndef MITKPlaneGeometryDataMapper2D_H_HEADER_INCLUDED_C1902626
+#define MITKPlaneGeometryDataMapper2D_H_HEADER_INCLUDED_C1902626
+
+
+#include <MitkCoreExports.h>
+#include "mitkVtkMapper.h"
+#include "mitkBaseRenderer.h"
+#include "mitkPointSetShapeProperty.h"
+#include <vtkSmartPointer.h>
+#include "mitkWeakPointer.h"
+
+class vtkActor;
+class vtkPropAssembly;
+class vtkPolyData;
+class vtkPolyDataMapper;
+class vtkGlyphSource2D;
+class vtkGlyph3D;
+class vtkFloatArray;
+class vtkCellArray;
+
+
+namespace mitk {
+
+  class PointSet;
+
+  /**
+  * @brief Vtk-based 2D mapper
+  * @ingroup Mapper
+  */
+  class MITK_CORE_EXPORT PlaneGeometryDataMapper2D : public VtkMapper
+  {
+  public:
+    mitkClassMacro(PlaneGeometryDataMapper2D, VtkMapper);
+
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
+
+    virtual const mitk::PlaneGeometryData* GetInput() const;
+
+    /** \brief returns the a prop assembly */
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+
+    /** Applies properties specific to this mapper */
+    virtual void ApplyAllProperties( BaseRenderer *renderer );
+
+    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
+
+    /** \brief set the default properties for this mapper */
+    static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+
+    /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
+    class LocalStorage : public mitk::Mapper::BaseLocalStorage
+    {
+
+    public:
+
+      /* constructor */
+      LocalStorage();
+
+      /* destructor */
+      ~LocalStorage();
+
+      // actor
+      vtkSmartPointer<vtkActor> m_CrosshairActor;
+      vtkSmartPointer<vtkPropAssembly> m_CrosshairAssembly;
+
+    };
+
+    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
+
+  protected:
+
+    /* constructor */
+    PlaneGeometryDataMapper2D();
+
+    /* destructor */
+    virtual ~PlaneGeometryDataMapper2D();
+
+    /* \brief Applies the color and opacity properties and calls CreateVTKRenderObjects */
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+
+    void CreateVtkCrosshair(BaseRenderer *renderer);
+
+    /**
+    * \brief Returns the thick slice mode for the given datanode.
+    *
+    * This method returns the value of the 'reslice.thickslices' property for
+    * the given datanode.
+    *   '0': thick slice mode disabled
+    *   '1': thick slice mode enabled
+    *
+    * The variable 'thickSlicesNum' contains the value of the 'reslice.thickslices.num'
+    * property that defines how many slices are shown at once.
+    */
+    int DetermineThickSliceMode( DataNode * dn, int &thickSlicesNum );
+
+    void DrawLine(Point3D p0, Point3D p1,
+                  vtkCellArray *lines,
+                  vtkPoints *points);
+
+    // member variables holding the current value of the properties used in this mapper
+    typedef std::vector<DataNode*> NodesVectorType;
+    NodesVectorType m_OtherPlaneGeometries;
+
+    typedef std::set<Self*> AllInstancesContainer;
+    static AllInstancesContainer s_AllInstances;
+
+    bool m_RenderOrientationArrows;
+    bool m_ArrowOrientationPositive;
+    mitk::ScalarType m_DepthValue;
+
+  };
+
+
+} // namespace mitk
+
+#endif /* MITKPlaneGeometryDataMapper2D_H_HEADER_INCLUDED_C1902626 */

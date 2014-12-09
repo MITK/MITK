@@ -27,9 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
   class BaseRenderer;
-  class PlaneGeometryDataMapper2D;
-  /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometryDataMapper2D instead. */
-  DEPRECATED( typedef PlaneGeometryDataMapper2D Geometry2DDataMapper2D);
+  class PlaneGeometryDataGLMapper2D;
+  /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometryDataGLMapper2D instead. */
+  DEPRECATED( typedef PlaneGeometryDataGLMapper2D Geometry2DDataMapper2D);
 
   /**
   * \brief OpenGL-based mapper to display a PlaneGeometry in a 2D window
@@ -39,17 +39,17 @@ namespace mitk {
   * the orientation of the slices displayed in other 2D windows.
   *
   *
-  * Properties that can be set and influence the PlaneGeometryDataMapper2D are:
+  * Properties that can be set and influence the PlaneGeometryDataGLMapper2D are:
   *
   *   - \b "PlaneOrientationProperty": (PlaneOrientationProperty)
 
   * \todo implement for AbstractTransformGeometry.
   * \ingroup Mapper
   */
-  class MITK_CORE_EXPORT PlaneGeometryDataMapper2D : public GLMapper
+  class MITK_CORE_EXPORT PlaneGeometryDataGLMapper2D : public GLMapper
   {
   public:
-    mitkClassMacro(PlaneGeometryDataMapper2D, GLMapper);
+    mitkClassMacro(PlaneGeometryDataGLMapper2D, GLMapper);
 
     itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
@@ -69,9 +69,9 @@ namespace mitk {
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 
   protected:
-    PlaneGeometryDataMapper2D();
+    PlaneGeometryDataGLMapper2D();
 
-    virtual ~PlaneGeometryDataMapper2D();
+    virtual ~PlaneGeometryDataGLMapper2D();
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
     /**

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkRDFExports.h>
 
-#include "MitkRdfUri.h"
+#include "mitkRdfUri.h"
 
 #include <stdio.h>
 #include <string>
@@ -32,9 +32,9 @@ namespace mitk {
   {
   public:
 
-    enum Type { Nothing, URI, Literal, Blank};
+    enum Type { NOTHING, URI, LITERAL, BLANK};
 
-    // Construct a empty Node
+    // Construct a empty invalid Node
     RdfNode();
 
     RdfNode(RdfUri uri);

@@ -22,8 +22,13 @@ RdfTriple::RdfTriple()
 {
 }
 
-RdfTriple::RdfTriple(RdfNode x, RdfNode y, RdfNode z)
-  : subject(x), predicate(y), object(z)
+RdfTriple::RdfTriple(RdfNode subject, RdfNode predicate, RdfNode object)
+  : subject(subject), predicate(predicate), object(object)
+{
+}
+
+RdfTriple::RdfTriple(RdfNode subject, RdfNode property, std::string value)
+  : subject(subject), predicate(property), object(RdfNode(value))
 {
 }
 

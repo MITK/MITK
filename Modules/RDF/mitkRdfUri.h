@@ -27,7 +27,7 @@ class MitkRDF_EXPORT RdfUri
 {
 public:
   RdfUri();
-  RdfUri(std::string uri);
+  explicit RdfUri(std::string uri);
 
   virtual ~RdfUri();
 

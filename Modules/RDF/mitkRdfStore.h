@@ -22,12 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <redland.h>
 
-#include "mitkRdfUri.h"
+#include "mitkRdfTriple.h"
 
 namespace mitk {
-
-class RdfTriple;
-class RdfNode;
 
 class MitkRDF_EXPORT RdfStore
 {
@@ -46,12 +43,11 @@ public:
 
   bool Contains(RdfTriple triple);
 
-  void Save(std::string filename);
-  void SaveAs(std::string filename, std::string format);
+  // Supported formats are: "ntriples", "turtle"(default), "nquads"
+  void Save(std::string filename, std::string format = "");
 
-  void Import(std::string url, std::string format);
-
-  static RdfStore* Load(std::string baseUri, std::string format="");
+  // Supported formats are: "ntriples", "turtle"(default), "nquads"
+  void Import(std::string url, std::string format = "");
 
 private:
   RdfUri m_BaseUri;

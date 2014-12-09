@@ -15,11 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkRdfStore.h"
-#include "mitkRdfUri.h"
-#include "mitkRdfTriple.h"
-#include "mitkRdfNode.h"
 
-#include <redland.h>
+#include <iostream>
 
 namespace mitk {
 
@@ -31,7 +28,7 @@ public:
 };
 
 RdfStore::RdfStore()
-  : m_BaseUri(0), m_World(0), m_Storage(0), m_Model(0)
+  : m_World(0), m_Storage(0), m_Model(0)
 {
   // SetUp base prefixes
   m_Prefixes["rdf"] = RdfUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
@@ -90,7 +87,7 @@ bool RdfStore::Add(RdfTriple triple)
 {
   librdf_statement* statement = RdfTripleToStatement(triple);
 
-  if (CheckComplete(statement))
+  if (!CheckComplete(statement))
   {
     librdf_free_statement(statement);
     return false;
@@ -108,14 +105,13 @@ bool RdfStore::Add(RdfTriple triple)
     librdf_free_statement(statement);
     return true;
   }
-  return true;
 }
 
 bool RdfStore::Remove(RdfTriple triple)
 {
   librdf_statement* statement = RdfTripleToStatement(triple);
 
-  if (CheckComplete(statement))
+  if (!CheckComplete(statement))
   {
     librdf_free_statement(statement);
     return false;
@@ -153,22 +149,22 @@ bool RdfStore::Contains(RdfTriple triple)
   return false;
 }
 
-void RdfStore::Save(std::string filename)
+void RdfStore::Save(std::string filename, std::string format)
 {
-  SaveAs(filename, "turtle");
-}
+  if (format == "") format = "turtle";
 
-void RdfStore::SaveAs(std::string filename, std::string format)
-{
   librdf_uri* baseUri = RdfUriToLibRdfUri(m_BaseUri);
   librdf_serializer* s = librdf_new_serializer(m_World, format.c_str(), 0, 0);
 
-  for (PrefixMap::const_iterator i = m_Prefixes.begin(); i != m_Prefixes.end(); ++i)
+  for (PrefixMap::const_iterator i = m_Prefixes.begin(); i != m_Prefixes.end(); i++)
   {
     librdf_serializer_set_namespace(s, RdfUriToLibRdfUri(i->second), i->first.c_str());
   }
   // May this is not relevant
-  librdf_serializer_set_namespace(s, RdfUriToLibRdfUri(m_BaseUri), "");
+  int error = librdf_serializer_set_namespace(s, librdf_new_uri(m_World,
+    (const unsigned char*) m_BaseUri.ToString().append("#").c_str()), ""); //FAILED
+
+  if (error != 0) std::cout << "________FAIL________" << std::endl;
 
   FILE* f = fopen(filename.c_str(), "w+");
 
@@ -176,6 +172,7 @@ void RdfStore::SaveAs(std::string filename, std::string format)
 
   librdf_free_serializer(s);
   librdf_free_uri(baseUri);
+  fclose(f);
 }
 
 void RdfStore::Import(std::string url, std::string format)
@@ -185,21 +182,46 @@ void RdfStore::Import(std::string url, std::string format)
   if (baseUri.empty())
   {
     baseUri = url;
+    SetBaseUri(RdfUri(baseUri));
   }
 
-  // Redland uses relative paths like file:readme.txt
-  if (false)
+  if (format == "")
   {
-    /* TODO */
+    format= "turtle";
   }
-}
 
-RdfStore* RdfStore::Load(std::string baseUri, std::string format)
-{
-  RdfStore* store = new RdfStore();
-  store->SetBaseUri(RdfUri(baseUri));
-  store->Import(baseUri, format);
-  return store;
+  // Redland uses file paths like file:D:/home/readme.txt
+  librdf_uri* uri = librdf_new_uri(m_World, (const unsigned char*) url.c_str());
+  librdf_uri* libRdfBaseUri = librdf_new_uri(m_World, (const unsigned char*) baseUri.c_str());
+
+  librdf_parser* p = librdf_new_parser(m_World, format.c_str(), 0, 0);
+
+  if (librdf_parser_parse_into_model(p, uri, libRdfBaseUri, m_Model) != 0 )
+  {
+    librdf_free_parser(p);
+    std::cout << "Parsing failed.";
+    return;
+  }
+
+  int namespaces = librdf_parser_get_namespaces_seen_count(p);
+
+  for (int i = 0; i < namespaces; i++) {
+    const char* prefixChar = librdf_parser_get_namespaces_seen_prefix(p, i);
+
+    if ( !prefixChar ) continue;
+
+    std::string prefix = prefixChar;
+    RdfUri uri = LibRdfUriToRdfUri(librdf_parser_get_namespaces_seen_uri(p, i));
+
+    if (uri == RdfUri()) return;
+
+    RdfStore::PrefixMap::iterator it = m_Prefixes.find(prefix);
+
+    // map iterator is equal to iterator-end so it is not already added
+    if (it == m_Prefixes.end()) {
+      AddPrefix(prefix, uri);
+    }
+  }
 }
 
 /*****************************************************************************
@@ -219,22 +241,22 @@ librdf_statement* RdfStore::RdfTripleToStatement(RdfTriple triple)
   librdf_node* object = RdfNodeToLibRdfNode(triple.GetObject());
 
   librdf_statement* statement = librdf_new_statement_from_nodes(m_World, subject, predicate, object);
-  if(!statement) return NULL;
+  if(!statement) return 0;
   return statement;
 }
 
 librdf_node* RdfStore::RdfNodeToLibRdfNode(RdfNode node)
 {
-  librdf_node* newNode = NULL;
+  librdf_node* newNode = 0;
 
   switch (node.type)
   {
-  case RdfNode::Nothing:
+  case RdfNode::NOTHING:
     break;
-  case RdfNode::Blank:
+  case RdfNode::BLANK:
     newNode = librdf_new_node_from_blank_identifier(m_World, (const unsigned char*) node.value.c_str());
     break;
-  case RdfNode::Literal:
+  case RdfNode::LITERAL:
     {
       if (node.datatype != RdfUri())
       {
@@ -259,7 +281,7 @@ librdf_node* RdfStore::RdfNodeToLibRdfNode(RdfNode node)
 librdf_uri* RdfStore::RdfUriToLibRdfUri(RdfUri uri)
 {
   librdf_uri* libUri = librdf_new_uri(m_World, (const unsigned char*) uri.ToString().c_str());
-  if (!libUri) return NULL;
+  if (!libUri) return 0;
   return libUri;
 }
 
@@ -278,9 +300,9 @@ RdfTriple RdfStore::StatementToRdfTriple(librdf_statement* statement)
 
 RdfNode RdfStore::LibRdfNodeToRdfNode(librdf_node* node)
 {
-  RdfNode mitkNode = NULL;
+  RdfNode mitkNode;
 
-  if (!node) return mitkNode;
+  if (!node) return 0;
 
   if (librdf_node_is_resource(node))
   {
@@ -290,7 +312,7 @@ RdfNode RdfStore::LibRdfNodeToRdfNode(librdf_node* node)
   }
   else if (librdf_node_is_literal(node))
   {
-    mitkNode.type = RdfNode::Literal;
+    mitkNode.type = RdfNode::LITERAL;
     std::string value = (const char*) librdf_node_get_literal_value(node);
     if (!value.empty()) mitkNode.value = value;
     librdf_uri* typeUri = librdf_node_get_literal_value_datatype_uri(node);
@@ -298,7 +320,7 @@ RdfNode RdfStore::LibRdfNodeToRdfNode(librdf_node* node)
   }
   else if (librdf_node_is_blank(node))
   {
-    mitkNode.type = RdfNode::Blank;
+    mitkNode.type = RdfNode::BLANK;
     std::string str = (const char*) librdf_node_get_blank_identifier(node);
     if (!str.empty()) mitkNode.value = str;
   }

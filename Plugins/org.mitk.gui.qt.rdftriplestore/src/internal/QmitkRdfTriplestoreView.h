@@ -46,7 +46,8 @@ public:
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
-    void DoImageProcessing();
+    void GenerateRdfFile();
+    void ImportRdfFile();
 
 protected:
 

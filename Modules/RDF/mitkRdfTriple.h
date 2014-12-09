@@ -30,7 +30,9 @@ public:
   RdfTriple();
 
   // Construct a triple with three nodes
-  RdfTriple(RdfNode x, RdfNode y, RdfNode z);
+  RdfTriple(RdfNode subject, RdfNode predicate, RdfNode object);
+
+  RdfTriple(RdfNode subject, RdfNode property, std::string value);
 
   virtual ~RdfTriple();
 

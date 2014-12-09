@@ -1,7 +1,6 @@
 
 # Modules must be listed according to their dependencies
 set(module_dirs
-    RDF
     LegacyIO
     DataTypesExt
     AlgorithmsExt
@@ -55,6 +54,7 @@ set(module_dirs
     DicomRT
     IOExt
     XNAT
+    RDF
 )
 
 if(MITK_ENABLE_PIC_READER)

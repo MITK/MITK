@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkRdfNode.h"
-#include "mitkRdfUri.h"
 
 #include <stdio.h>
 #include <ctype.h>
@@ -24,23 +23,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <redland.h>
 
 namespace mitk {
+
   RdfNode::RdfNode()
-    : type(Nothing), value(), datatype("")
+    : type(NOTHING)
   {
   }
 
   RdfNode::RdfNode(RdfUri uri)
-    : type(URI), value(uri.ToString()), datatype("")
+    : type(URI), value(uri.ToString())
   {
   }
 
   RdfNode::RdfNode(std::string text)
-    : type(Literal), value(text), datatype(RdfUri(""))
+    : type(LITERAL), value(text)
   {
   }
 
   RdfNode::RdfNode(std::string text, RdfUri dataType)
-    : type(Literal), value(text), datatype(dataType)
+    : type(LITERAL), value(text), datatype(dataType)
   {
   }
 
@@ -89,27 +89,28 @@ namespace mitk {
   }
 
   // Define outstream of a Node
-  std::ostream & operator<<(std::ostream &out, const mitk::RdfNode &n)
+  std::ostream & operator<<(std::ostream &out, const RdfNode &n)
   {
     switch (n.type) {
-    case mitk::RdfNode::Nothing:
+    case RdfNode::NOTHING:
       out << "[]";
       break;
-    case mitk::RdfNode::URI:
+    case RdfNode::URI:
       if (n.value == "") {
         out << "[empty-uri]";
       } else {
         out << "<" << n.value << ">";
       }
       break;
-    case mitk::RdfNode::Literal:
+    case RdfNode::LITERAL:
       out << "\"" << n.value << "\"";
-      if (n.datatype != mitk::RdfUri()) out << "^^" << n.datatype;
+      if (n.datatype != RdfUri()) out << "^^" << n.datatype;
       break;
-    case mitk::RdfNode::Blank:
+    case RdfNode::BLANK:
       out << "[blank " << n.value << "]";
       break;
     }
     return out;
   }
+
 }

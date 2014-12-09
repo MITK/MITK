@@ -64,13 +64,25 @@ set(_exclude_plugins
   org.mitk.gui.qt.extapplication
 )
 
+set(_src_files
+  MitkDiffusion.cpp
+)
+
+if(MITK_USE_Qt4)
+  qt4_add_resources(_src_files splashscreen.qrc)
+else()
+  qt5_add_resources(_src_files splashscreen.qrc)
+endif()
+
 FunctionCreateBlueBerryApplication(
   NAME ${DIFFUSIONAPP_NAME}
   DESCRIPTION "MITK Diffusion"
   PLUGINS ${_plugins}
   EXCLUDE_PLUGINS ${_exclude_plugins}
+  SOURCES ${_src_files}
   ${_app_options}
 )
+
 mitk_use_modules(TARGET ${DIFFUSIONAPP_NAME} MODULES qtsingleapplication)
 
 # Add meta dependencies (e.g. on auto-load modules from depending modules)

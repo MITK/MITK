@@ -4,7 +4,7 @@ function(mitkFunctionEnableBuildConfiguration)
     return()
   endif()
 
-  set(_build_config_file "${MITK_CMAKE_DIR}/mitkBuildConfiguration${MITK_BUILD_CONFIGURATION}.cmake")
+  set(_build_config_file "${MITK_CMAKE_DIR}/BuildConfigurations/${MITK_BUILD_CONFIGURATION}.cmake")
   if(NOT EXISTS ${_build_config_file})
     message(WARNING "Unknown build configuration \"${MITK_BUILD_CONFIGURATION}\", falling back to \"Custom\" configuration.")
     return()

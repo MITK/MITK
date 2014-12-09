@@ -277,6 +277,8 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
   //Pass properties to VTK
   localStorage->m_Actor->GetProperty()->SetColor(color[0], color[1], color[2]);
   localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
+  localStorage->m_NormalActor->GetProperty()->SetOpacity(opacity);
+  localStorage->m_InverseNormalActor->GetProperty()->SetOpacity(opacity);
   localStorage->m_Actor->GetProperty()->SetLineWidth(lineWidth);
   //By default, the cutter will also copy/compute normals of the cut
   //to the output polydata. The normals will influence the

@@ -23,18 +23,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRegressionTestImage.h>
 
 
-int mitkSurfaceGLMapper2DColorTest(int argc, char* argv[])
+int mitkSurfaceVtkMapper2DOpacityTest(int argc, char* argv[])
 {
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
   // render the datastorage
   // compare rendering to reference image
-  MITK_TEST_BEGIN("mitkSurfaceGLMapper2DColorTest")
+  MITK_TEST_BEGIN("mitkSurfaceVtkMapper2DOpacityTest")
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
   //Set the opacity for all images
 
-  renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("Surface"))->SetProperty("color", mitk::ColorProperty::New(255.0f, 0.0f, 0.0f));
+  renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("Surface"))->SetProperty("opacity", mitk::FloatProperty::New(0.5f));
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
   MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );

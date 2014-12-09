@@ -80,7 +80,6 @@ set(external_projects
 
 # These are "hard" dependencies and always set to ON
 set(MITK_USE_tinyxml 1)
-set(MITK_USE_ANN 1)
 set(MITK_USE_Eigen 1)
 set(MITK_USE_GLEW 1)
 set(MITK_USE_GDCM 1)
@@ -245,6 +244,7 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_EXAMPLES
 
   MITK_USE_ACVD
+  MITK_USE_ANN
   MITK_USE_BLUEBERRY
   MITK_USE_Boost
   MITK_USE_CppUnit

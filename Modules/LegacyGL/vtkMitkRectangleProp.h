@@ -20,9 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "vtkActor2D.h"
 #include "vtkRenderWindow.h"
-#include <MitkCoreExports.h>
+#include <MitkLegacyGLExports.h>
 
-class MITK_CORE_EXPORT vtkMitkRectangleProp : public vtkProp
+class MitkLegacyGL_EXPORT vtkMitkRectangleProp : public vtkProp
 {
   public:
     static vtkMitkRectangleProp* New();

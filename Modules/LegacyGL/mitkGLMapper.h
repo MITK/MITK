@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKGLMAPPER_H_HEADER_INCLUDED_C197C872
 #define MITKGLMAPPER_H_HEADER_INCLUDED_C197C872
 
-#include <MitkCoreExports.h>
+#include <MitkLegacyGLExports.h>
 #include "mitkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkVtkPropRenderer.h"
@@ -44,7 +44,7 @@ namespace mitk {
 * or vtkMapper
 * \ingroup Mapper
 */
-class MITK_CORE_EXPORT GLMapper : public Mapper
+class MitkLegacyGL_EXPORT GLMapper : public Mapper
 {
   public:
     /** \brief Do the painting into the \a renderer */

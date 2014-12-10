@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPointSetMAPPER2D_H_HEADER_INCLUDED
 #define MITKPointSetMAPPER2D_H_HEADER_INCLUDED
 
-#include <MitkCoreExports.h>
+#include <MitkLegacyGLExports.h>
 #include "mitkGLMapper.h"
 
 namespace mitk {
@@ -58,7 +58,7 @@ class PointSet;
 /** \deprecatedSince{2013_06} This mapper is replaced by PointSetVtkMapper2D. The child classes of this class are deprecated.
  * To further ensure their functionality PointSetGLMapper2D cannot be removed and is set deprecated too.
  */
-class MITK_CORE_EXPORT PointSetGLMapper2D : public GLMapper
+class MitkLegacyGL_EXPORT PointSetGLMapper2D : public GLMapper
 {
 public:
   mitkClassMacro(PointSetGLMapper2D, GLMapper);

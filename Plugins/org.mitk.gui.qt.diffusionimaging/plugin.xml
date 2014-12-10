@@ -197,7 +197,7 @@
     </view>
 
     <view id="org.mitk.views.fiberprocessing"
-    name="Fiber Processing"
+    name="Fiber Quantification"
     category="Fiber processing"
     class="QmitkFiberProcessingView"
     icon="resources/FiberBundleOperations.png">
@@ -205,7 +205,7 @@
     </view>
 
     <view id="org.mitk.views.fiberextraction"
-    name="Fiber Extraction"
+    name="Fiber Processing"
     category="Fiber processing"
     class="QmitkFiberExtractionView"
     icon="resources/FiberBundleOperations.png">

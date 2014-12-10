@@ -82,12 +82,6 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
         m_Controls->setupUi( parent );
 
         connect( m_Controls->m_ProcessFiberBundleButton, SIGNAL(clicked()), this, SLOT(ProcessSelectedBundles()) );
-        connect( m_Controls->m_ResampleFibersButton, SIGNAL(clicked()), this, SLOT(ResampleSelectedBundles()) );
-        connect(m_Controls->m_FaColorFibersButton, SIGNAL(clicked()), this, SLOT(DoImageColorCoding()));
-        connect( m_Controls->m_PruneFibersButton, SIGNAL(clicked()), this, SLOT(PruneBundle()) );
-        connect( m_Controls->m_CurvatureThresholdButton, SIGNAL(clicked()), this, SLOT(ApplyCurvatureThreshold()) );
-        connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
-        connect( m_Controls->m_CompressFibersButton, SIGNAL(clicked()), this, SLOT(CompressSelectedBundles()) );
         connect( m_Controls->m_ExtractFiberPeaks, SIGNAL(clicked()), this, SLOT(CalculateFiberDirections()) );
     }
 }
@@ -195,28 +189,8 @@ void QmitkFiberProcessingView::CalculateFiberDirections()
 
 void QmitkFiberProcessingView::UpdateGui()
 {
-    m_Controls->m_CompressFibersButton->setEnabled(!m_SelectedFB.empty());
     m_Controls->m_ProcessFiberBundleButton->setEnabled(!m_SelectedFB.empty());
-    m_Controls->m_ResampleFibersButton->setEnabled(!m_SelectedFB.empty());
-    m_Controls->m_FaColorFibersButton->setEnabled(false);
-    m_Controls->m_PruneFibersButton->setEnabled(!m_SelectedFB.empty());
-    m_Controls->m_CurvatureThresholdButton->setEnabled(!m_SelectedFB.empty());
     m_Controls->m_ExtractFiberPeaks->setEnabled(!m_SelectedFB.empty());
-
-    // are fiber bundles selected?
-    if ( m_SelectedFB.empty() )
-    {
-        if (m_SelectedSurfaces.size()>0 )
-            m_Controls->m_MirrorFibersButton->setEnabled(true);
-        else
-            m_Controls->m_MirrorFibersButton->setEnabled(false);
-    }
-    else
-    {
-        m_Controls->m_MirrorFibersButton->setEnabled(true);
-        if (m_SelectedImage.IsNotNull())
-            m_Controls->m_FaColorFibersButton->setEnabled(true);
-    }
 }
 
 void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
@@ -247,36 +221,6 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
 void QmitkFiberProcessingView::Activated()
 {
 
-}
-
-void QmitkFiberProcessingView::PruneBundle()
-{
-    int minLength = this->m_Controls->m_PruneFibersSpinBox->value();
-    int maxLength = this->m_Controls->m_MaxPruneFibersSpinBox->value();
-    for (int i=0; i<m_SelectedFB.size(); i++)
-    {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        if (!fib->RemoveShortFibers(minLength))
-            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
-        else if (!fib->RemoveLongFibers(maxLength))
-            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
-    }
-    GenerateStats();
-    RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-
-void QmitkFiberProcessingView::ApplyCurvatureThreshold()
-{
-    int mm = this->m_Controls->m_MinCurvatureRadiusBox->value();
-    for (int i=0; i<m_SelectedFB.size(); i++)
-    {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        if (!fib->ApplyCurvatureThreshold(mm, this->m_Controls->m_RemoveFiberDueToCurvatureCheckbox->isChecked()))
-            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
-    }
-    GenerateStats();
-    RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkFiberProcessingView::GenerateStats()
@@ -496,78 +440,4 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData(img);
     return node;
-}
-
-void QmitkFiberProcessingView::ResampleSelectedBundles()
-{
-    double factor = this->m_Controls->m_ResampleFibersSpinBox->value();
-    for (int i=0; i<m_SelectedFB.size(); i++)
-    {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        fib->ResampleSpline(factor);
-    }
-    GenerateStats();
-    RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkFiberProcessingView::CompressSelectedBundles()
-{
-    double factor = this->m_Controls->m_FiberErrorSpinBox->value();
-    for (int i=0; i<m_SelectedFB.size(); i++)
-    {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        fib->Compress(factor);
-    }
-    GenerateStats();
-    RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkFiberProcessingView::MirrorFibers()
-{
-    unsigned int axis = this->m_Controls->m_AxisSelectionBox->currentIndex();
-    for (int i=0; i<m_SelectedFB.size(); i++)
-    {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        fib->MirrorFibers(axis);
-    }
-    if (m_SelectedFB.size()>0)
-        GenerateStats();
-
-    if (m_SelectedSurfaces.size()>0)
-    {
-        for (int i=0; i<m_SelectedSurfaces.size(); i++)
-        {
-            mitk::Surface::Pointer surf = m_SelectedSurfaces.at(i);
-            vtkSmartPointer<vtkPolyData> poly = surf->GetVtkPolyData();
-            vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
-
-            for (int i=0; i<poly->GetNumberOfPoints(); i++)
-            {
-                double* point = poly->GetPoint(i);
-                point[axis] *= -1;
-                vtkNewPoints->InsertNextPoint(point);
-            }
-            poly->SetPoints(vtkNewPoints);
-            surf->CalculateBoundingBox();
-        }
-    }
-
-    RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkFiberProcessingView::DoImageColorCoding()
-{
-    if (m_SelectedImage.IsNull())
-        return;
-
-    for( int i=0; i<m_SelectedFB.size(); i++ )
-    {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        fib->SetFAMap(m_SelectedImage);
-        fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_FA_BASED);
-        fib->DoColorCodingFaBased();
-    }
-
-    if(m_MultiWidget)
-        m_MultiWidget->RequestUpdate();
 }

@@ -82,15 +82,22 @@ protected slots:
 
   void Remove();
   void Extract();
+  void Modify();
   void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name, const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
 
 protected:
 
-  void RemoveOutsideMask();
-  void RemoveInsideMask();
+  void MirrorFibers();              ///< mirror bundle on the specified plane
+  void ResampleSelectedBundles();   ///< smooth fiber bundle using the specified number of sampling points per cm.
+  void DoImageColorCoding();        ///< color fibers by selected scalar image
+  void CompressSelectedBundles();   ///< remove points below certain error threshold
+
+  void RemoveWithMask(bool removeInside);
   void RemoveDir();
+  void ApplyCurvatureThreshold();   ///< remove/split fibers with a too high curvature threshold
+  void PruneBundle();               ///< remove too short/too long fibers
 
   void ExtractWithMask(bool onlyEnds, bool invert);
   void ExtractWithPlanarFigure();

@@ -112,23 +112,27 @@ endfunction()
 function(mitk_create_module)
 
   set(_macro_params
-      SUBPROJECTS            # list of CDash labels
       VERSION                # module version number, e.g. "1.2.0"
-      INCLUDE_DIRS           # exported include dirs (used in mitkMacroCreateModuleConf.cmake)
-      INTERNAL_INCLUDE_DIRS  # include dirs internal to this module
-      DEPENDS                # list of modules this module depends on
-      DEPENDS_INTERNAL       # list of modules this module internally depends on
-      PACKAGE_DEPENDS        # list of "packages this module depends on (e.g. Qt, VTK, etc.)
-      TARGET_DEPENDS         # list of CMake targets this module should depend on
       EXPORT_DEFINE          # export macro name for public symbols of this module (DEPRECATED)
       AUTOLOAD_WITH          # a module target name identifying the module which will trigger the
                              # automatic loading of this module
-      ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
       FILES_CMAKE            # file name of a CMake file setting source list variables
                              # (defaults to files.cmake)
-      CPP_FILES              # list of cpp files
       DEPRECATED_SINCE       # marks this modules as deprecated
       DESCRIPTION            # a description for this module
+     )
+
+  set(_macro_multiparams
+      SUBPROJECTS            # list of CDash labels
+      INCLUDE_DIRS           # include directories: [PUBLIC|PRIVATE|INTERFACE] <list>
+      INTERNAL_INCLUDE_DIRS  # include dirs internal to this module (DEPRECATED)
+      DEPENDS                # list of modules this module depends on: [PUBLIC|PRIVATE|INTERFACE] <list>
+      DEPENDS_INTERNAL       # list of modules this module internally depends on (DEPRECATED)
+      PACKAGE_DEPENDS        # list of "packages this module depends on (e.g. Qt, VTK, etc.)
+      TARGET_DEPENDS         # list of CMake targets this module should depend on
+      ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
+      CPP_FILES              # list of cpp files
+      H_FILES                # list of header files: [PUBLIC|PRIVATE] <list>
      )
 
   set(_macro_options
@@ -141,9 +145,9 @@ function(mitk_create_module)
       EXECUTABLE             # create an executable; do not use directly, use mitk_create_executable() instead
      )
 
-  MACRO_PARSE_ARGUMENTS(MODULE "${_macro_params}" "${_macro_options}" ${ARGN})
+  cmake_parse_arguments(MODULE "${_macro_options}" "${_macro_params}" "${_macro_multiparams}" ${ARGN})
 
-  set(MODULE_NAME ${MODULE_DEFAULT_ARGS})
+  set(MODULE_NAME ${MODULE_UNPARSED_ARGUMENTS})
 
   if(NOT MODULE_NAME)
     if(MITK_MODULE_NAME_DEFAULTS_TO_DIRECTORY_NAME)

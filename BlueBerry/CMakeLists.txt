@@ -5,7 +5,7 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
 
-include(MacroParseArguments)
+include(CMakeParseArguments)
 include(MacroConvertSchema)
 include(MacroOrganizeSources)
 include(MacroCreateCTKPlugin)

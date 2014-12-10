@@ -27,7 +27,7 @@
 #!
 function(FunctionInstallThirdPartyCTKPlugins)
 
-  macro_parse_arguments(_INSTALL "EXCLUDE" "" ${ARGN})
+  cmake_parse_arguments(_INSTALL "" "" "EXCLUDE" ${ARGN})
 
   set(install_directories "")
   if(NOT MACOSX_BUNDLE_NAMES)

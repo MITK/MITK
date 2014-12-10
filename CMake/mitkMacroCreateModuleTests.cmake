@@ -6,8 +6,8 @@
 # EXTRA_DRIVER_INIT is inserted as c++ code in the testdriver and will be executed before each test
 #
 macro(MITK_CREATE_MODULE_TESTS)
-  MACRO_PARSE_ARGUMENTS(MODULE_TEST
-                        "EXTRA_DRIVER_INIT;EXTRA_DRIVER_INCLUDE;EXTRA_DEPENDS" "US_MODULE" ${ARGN})
+  cmake_parse_arguments(MODULE_TEST
+                        "US_MODULE" "EXTRA_DRIVER_INIT;EXTRA_DRIVER_INCLUDE" "EXTRA_DEPENDS" ${ARGN})
 
   if(BUILD_TESTING AND MODULE_IS_ENABLED)
     include(files.cmake)

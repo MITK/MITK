@@ -13,16 +13,19 @@
 function(mitk_check_module_dependencies)
 
   set(_macro_params
-      MODULES                  # MITK modules which the given TARGET uses
-      PACKAGES                 # MITK packages which the given TARGET uses
       MISSING_DEPENDENCIES_VAR # variable for storing missing dependencies
       MODULE_DEPENDENCIES_VAR  # variable for storing all module dependencies
       PACKAGE_DEPENDENCIES_VAR # variable for storing all package dependencies
      )
 
+  set(_macro_multiparams
+      MODULES                  # MITK modules which the given TARGET uses
+      PACKAGES                 # MITK packages which the given TARGET uses
+     )
+
   set(_macro_options )
 
-  MACRO_PARSE_ARGUMENTS(CHECK "${_macro_params}" "${_macro_options}" ${ARGN})
+  cmake_parse_arguments(CHECK "" "${_macro_params}" "${_macro_multiparams}" ${ARGN})
 
   set(missing_deps )
   set(depends ${CHECK_MODULES})

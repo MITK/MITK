@@ -83,13 +83,16 @@ function(mitk_use_modules)
 
   set(_macro_params
       TARGET           # The target name (required)
+     )
+
+  set(_macro_multiparams
       MODULES          # MITK modules which the given TARGET uses
       PACKAGES         # MITK packages which the given TARGET uses
      )
 
   set(_macro_options )
 
-  MACRO_PARSE_ARGUMENTS(USE "${_macro_params}" "${_macro_options}" ${ARGN})
+  cmake_parse_arguments(USE "${_macro_options}" "${_macro_params}" "${_macro_multiparams}" ${ARGN})
 
   # Sanity checks
   if(NOT USE_TARGET)

@@ -23,8 +23,6 @@
 #include "MitkOverlaysExports.h"
 
 class vtkTextActor;
-class vtkImageMapper;
-class vtkImageData;
 
 namespace mitk {
 
@@ -36,9 +34,7 @@ public:
   {
   public:
     /** \brief Actor of a 2D render window. */
-    vtkSmartPointer<vtkActor2D> m_textActor;
-    vtkSmartPointer<vtkImageData> m_textImage;
-    vtkSmartPointer<vtkImageMapper> m_imageMapper;
+    vtkSmartPointer<vtkTextActor> m_TextActor;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;

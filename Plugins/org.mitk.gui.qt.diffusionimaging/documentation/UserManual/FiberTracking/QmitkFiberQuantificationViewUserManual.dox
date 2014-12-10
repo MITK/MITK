@@ -1,0 +1,16 @@
+/**
+\page org_mitk_views_fiberquantification Fiber Processing View
+
+This view provides tools to derive additional information from exsisting fiber bundles and to quantify them:
+
+\li Tract density image: generate a 2D heatmap from a fiber bundle
+\li Binary envelope: generate a binary image from a fiber bundle
+\li Fiber bundle image: generate a 2D rgba image representation of the fiber bundle
+\li Fiber endings image: generate a 2D image showing the locations of fiber endpoints
+\li Fiber endings pointset: generate a poinset containing the locations of fiber endpoints
+\li Calculate the voxel-wise main fiber directions from a tractogram.
+
+\imageMacro{DirectionExtractionFib.png, "Input fiber bundle",10}
+\imageMacro{DirectionExtractionPeaks.png, "Output main fiber directions",10}
+
+*/

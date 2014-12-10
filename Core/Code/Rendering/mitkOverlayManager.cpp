@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverlayManager.h"
 #include "mitkBaseRenderer.h"
 
+#include <mitkVtkLayerController.h>
+
 mitk::OverlayManager::OverlayManager()
 {
 }
@@ -28,6 +30,8 @@ mitk::OverlayManager::~OverlayManager()
 
 void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
 {
+  vtkRenderer*
+  mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertForegroundRenderer(m_Renderer,false);
   std::pair<BaseRendererSet::iterator,bool> inSet;
   inSet = m_BaseRendererSet.insert(renderer);
   if(inSet.second)

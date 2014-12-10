@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D
-#define MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D
+#ifndef mitkVtkPropRenderer_h
+#define mitkVtkPropRenderer_h
 
 #include <MitkCoreExports.h>
 #include "mitkBaseRenderer.h"
@@ -111,8 +111,6 @@ public:
   int WriteSimpleText(std::string text, double posX, double posY, double color1 = 0.0, double color2 = 1.0, double color3 = 0.0, float opacity = 1.0);
 
   vtkTextProperty * GetTextLabelProperty(int text_id);
-
-  // Initialization / geometry handling
 
   /** This method calculates the bounds of the DataStorage (if it contains any
    * valid data), creates a geometry from these bounds and sets it as world
@@ -215,10 +213,6 @@ private:
   */
   void AdjustCameraToScene();
 
-  // switch between orthogonal opengl projection (2D rendering via mitk::GLMapper2D) and perspective projection (3D rendering)
-  void Enable2DOpenGL();
-  void Disable2DOpenGL();
-
   // prepare all mitk::mappers for rendering
   void PrepareMapperQueue();
 
@@ -227,7 +221,6 @@ private:
 
   bool m_InitNeeded;
   bool m_ResizeNeeded;
-  bool m_VtkMapperPresent;
   MapperSlotId m_CameraInitializedForMapperID;
 
   // Picking
@@ -255,4 +248,4 @@ private:
 };
 } // namespace mitk
 
-#endif /* MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D */
+#endif /* mitkVtkPropRenderer_h */

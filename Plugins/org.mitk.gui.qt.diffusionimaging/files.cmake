@@ -27,7 +27,7 @@ set(INTERNAL_CPP_FILES
   QmitkGibbsTrackingView.cpp
   QmitkStochasticFiberTrackingView.cpp
   QmitkStreamlineTrackingView.cpp
-  QmitkFiberProcessingView.cpp
+  QmitkFiberQuantificationView.cpp
 #  QmitkFiberBundleDeveloperView.cpp
   QmitkPartialVolumeAnalysisView.cpp
   QmitkIVIMView.cpp
@@ -43,7 +43,7 @@ set(INTERNAL_CPP_FILES
   QmitkDwiSoftwarePhantomView.cpp
   QmitkOdfMaximaExtractionView.cpp
   QmitkFiberfoxView.cpp
-  QmitkFiberExtractionView.cpp
+  QmitkFiberProcessingView.cpp
   QmitkFieldmapGeneratorView.cpp
   QmitkDiffusionRegistrationView.cpp
   QmitkDenoisingView.cpp
@@ -69,7 +69,7 @@ set(UI_FILES
   src/internal/QmitkGibbsTrackingViewControls.ui
   src/internal/QmitkStochasticFiberTrackingViewControls.ui
   src/internal/QmitkStreamlineTrackingViewControls.ui
-  src/internal/QmitkFiberProcessingViewControls.ui
+  src/internal/QmitkFiberQuantificationViewControls.ui
 #  src/internal/QmitkFiberBundleDeveloperViewControls.ui
   src/internal/QmitkPartialVolumeAnalysisViewControls.ui
   src/internal/QmitkIVIMViewControls.ui
@@ -82,7 +82,7 @@ set(UI_FILES
   src/internal/QmitkDwiSoftwarePhantomViewControls.ui
   src/internal/QmitkOdfMaximaExtractionViewControls.ui
   src/internal/QmitkFiberfoxViewControls.ui
-  src/internal/QmitkFiberExtractionViewControls.ui
+  src/internal/QmitkFiberProcessingViewControls.ui
   src/QmitkTensorModelParametersWidgetControls.ui
   src/QmitkZeppelinModelParametersWidgetControls.ui
   src/QmitkStickModelParametersWidgetControls.ui
@@ -109,7 +109,7 @@ set(MOC_H_FILES
   src/internal/QmitkGibbsTrackingView.h
   src/internal/QmitkStochasticFiberTrackingView.h
   src/internal/QmitkStreamlineTrackingView.h
-  src/internal/QmitkFiberProcessingView.h
+  src/internal/QmitkFiberQuantificationView.h
 #  src/internal/QmitkFiberBundleDeveloperView.h
   src/internal/QmitkPartialVolumeAnalysisView.h
   src/QmitkPartialVolumeAnalysisWidget.h
@@ -127,7 +127,7 @@ set(MOC_H_FILES
   src/internal/QmitkDwiSoftwarePhantomView.h
   src/internal/QmitkOdfMaximaExtractionView.h
   src/internal/QmitkFiberfoxView.h
-  src/internal/QmitkFiberExtractionView.h
+  src/internal/QmitkFiberProcessingView.h
   src/QmitkTensorModelParametersWidget.h
   src/QmitkZeppelinModelParametersWidget.h
   src/QmitkStickModelParametersWidget.h

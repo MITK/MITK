@@ -2271,7 +2271,7 @@ void QmitkFiberfoxView::CopyBundles()
 {
     if ( m_SelectedBundles.size()<1 ){
         QMessageBox::information( NULL, "Warning", "Select at least one fiber bundle!");
-        MITK_WARN("QmitkFiberProcessingView") << "Select at least one fiber bundle!";
+        MITK_WARN("QmitkFiberFoxView") << "Select at least one fiber bundle!";
         return;
     }
 
@@ -2331,7 +2331,7 @@ void QmitkFiberfoxView::JoinBundles()
 {
     if ( m_SelectedBundles.size()<2 ){
         QMessageBox::information( NULL, "Warning", "Select at least two fiber bundles!");
-        MITK_WARN("QmitkFiberProcessingView") << "Select at least two fiber bundles!";
+        MITK_WARN("QmitkFiberFoxView") << "Select at least two fiber bundles!";
         return;
     }
 

@@ -174,15 +174,15 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 
 void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-  mitk::DataNode* node = GetDataNode();
-  mitk::Surface* surface  = static_cast<mitk::Surface *>( node->GetData() );
-  const mitk::TimeGeometry *dataTimeGeometry = surface->GetTimeGeometry();
+  const DataNode* node = GetDataNode();
+  Surface* surface  = static_cast<Surface *>( node->GetData() );
+  const TimeGeometry *dataTimeGeometry = surface->GetTimeGeometry();
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
 
   ScalarType time =renderer->GetTime();
   int timestep=0;
 
-  if( time > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() )
+  if( time > itk::NumericTraits<ScalarType>::NonpositiveMin() )
     timestep = dataTimeGeometry->TimePointToTimeStep( time );
 
   vtkSmartPointer<vtkPolyData> inputPolyData = surface->GetVtkPolyData( timestep );
@@ -256,7 +256,7 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
 
 void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
 {
-  DataNode * node = GetDataNode();
+  const DataNode * node = GetDataNode();
 
   if(node == NULL)
   {

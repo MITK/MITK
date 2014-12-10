@@ -24,9 +24,9 @@ namespace mitk {
 
 typedef double ScalarType;
 
-MITK_CORE_EXPORT extern const ScalarType eps;
-MITK_CORE_EXPORT extern const ScalarType sqrteps;
-MITK_CORE_EXPORT extern const double large;
+MITKCORE_EXPORT extern const ScalarType eps;
+MITKCORE_EXPORT extern const ScalarType sqrteps;
+MITKCORE_EXPORT extern const double large;
 
 }
 

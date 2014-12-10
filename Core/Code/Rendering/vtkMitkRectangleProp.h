@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkRenderWindow.h"
 #include <MitkCoreExports.h>
 
-class MITK_CORE_EXPORT vtkMitkRectangleProp : public vtkProp
+class MITKCORE_EXPORT vtkMitkRectangleProp : public vtkProp
 {
   public:
     static vtkMitkRectangleProp* New();

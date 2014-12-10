@@ -59,7 +59,7 @@ namespace mitk {
 * a convenient way to modify the interaction behavior.
 *
 ***********************************************************************/
-  class MITK_CORE_EXPORT MouseModeSwitcher : public itk::Object
+  class MITKCORE_EXPORT MouseModeSwitcher : public itk::Object
   {
   public:
 

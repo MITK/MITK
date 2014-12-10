@@ -32,7 +32,7 @@ class vtkEventProvider;
  *
  * \ingroup Renderer
  */
-class MITK_CORE_EXPORT RenderWindow: public mitk::RenderWindowBase, public itk::Object
+class MITKCORE_EXPORT RenderWindow: public mitk::RenderWindowBase, public itk::Object
 {
 public:
   mitkClassMacro(RenderWindow, itk::Object);

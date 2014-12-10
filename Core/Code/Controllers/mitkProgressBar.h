@@ -33,7 +33,7 @@ namespace mitk
   //## All mitk-classes use this class to display progress on GUI-ProgressBar.
   //## The mainapplication has to set the internal held ProgressBarImplementation with SetImplementationInstance(..).
   //## @ingroup Interaction
-  class MITK_CORE_EXPORT ProgressBar : public itk::Object
+  class MITKCORE_EXPORT ProgressBar : public itk::Object
   {
 
   public:

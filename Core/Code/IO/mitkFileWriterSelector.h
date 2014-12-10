@@ -30,11 +30,11 @@ namespace mitk {
 
 class BaseData;
 
-class MITK_CORE_EXPORT FileWriterSelector
+class MITKCORE_EXPORT FileWriterSelector
 {
 public:
 
-  class MITK_CORE_EXPORT Item
+  class MITKCORE_EXPORT Item
   {
   public:
 

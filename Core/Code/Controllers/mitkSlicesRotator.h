@@ -89,7 +89,7 @@ namespace mitk {
 
   \sa SlicesSwiveller
  */
-class MITK_CORE_EXPORT SlicesRotator : public SlicesCoordinator
+class MITKCORE_EXPORT SlicesRotator : public SlicesCoordinator
 {
   public:
 

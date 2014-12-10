@@ -307,7 +307,7 @@ Stacked slices:
 
 class Image;
 
-class MITK_CORE_EXPORT DicomSeriesReader
+class MITKCORE_EXPORT DicomSeriesReader
 {
 public:
 
@@ -357,7 +357,7 @@ public:
     of this class. Relevant descriptive properties can be used to provide
     the application user with meaningful choices.
   */
-  class MITK_CORE_EXPORT ImageBlockDescriptor
+  class MITKCORE_EXPORT ImageBlockDescriptor
   {
     public:
 

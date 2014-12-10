@@ -27,7 +27,7 @@ namespace mitk {
   //## @brief Thin-plate-spline-based landmark-based curved geometry
   //##
   //## @ingroup Geometry
-  class MITK_CORE_EXPORT ThinPlateSplineCurvedGeometry : public LandmarkProjectorBasedCurvedGeometry
+  class MITKCORE_EXPORT ThinPlateSplineCurvedGeometry : public LandmarkProjectorBasedCurvedGeometry
   {
   public:
   mitkClassMacro(ThinPlateSplineCurvedGeometry, LandmarkProjectorBasedCurvedGeometry);

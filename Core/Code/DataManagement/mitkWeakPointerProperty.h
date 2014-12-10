@@ -33,7 +33,7 @@ namespace mitk {
   //## @brief Property containing a smart-pointer
   //##
   //## @ingroup DataManagement
-  class MITK_CORE_EXPORT WeakPointerProperty : public BaseProperty
+  class MITKCORE_EXPORT WeakPointerProperty : public BaseProperty
   {
   public:
     mitkClassMacro(WeakPointerProperty, BaseProperty);

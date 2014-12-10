@@ -53,7 +53,7 @@ std::string PixelTypeToString()
  * GetComponentTypeAsString, GetPixelType, GetPixelTypeAsString.
  * @ingroup Data
  */
-class MITK_CORE_EXPORT PixelType
+class MITKCORE_EXPORT PixelType
 {
 public:
 

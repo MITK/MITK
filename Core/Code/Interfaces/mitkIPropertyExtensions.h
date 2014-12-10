@@ -31,7 +31,7 @@ namespace mitk
     * Use extensions to attach useful metadata to your properties, e.g. the allowed range of values.
     * Note that you have to extend the property view if you want it to respect your custom metadata.
     */
-  class MITK_CORE_EXPORT IPropertyExtensions
+  class MITKCORE_EXPORT IPropertyExtensions
   {
   public:
     virtual ~IPropertyExtensions();

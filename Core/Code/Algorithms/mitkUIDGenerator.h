@@ -41,7 +41,7 @@ namespace mitk {
   should assure a unique ID on a very high probability. Still, there is a very small chance to get
   identical random numbers. A feature request for improved UID generation is handled in BUG 14333.
 */
-class MITK_CORE_EXPORT UIDGenerator
+class MITKCORE_EXPORT UIDGenerator
 {
   public:
     UIDGenerator(const char* prefix = "UID_", unsigned int lengthOfRandomPart = 8);

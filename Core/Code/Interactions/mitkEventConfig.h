@@ -44,7 +44,7 @@ namespace mitk
    *
    * @ingroup Interaction
    **/
-  class MITK_CORE_EXPORT EventConfig
+  class MITKCORE_EXPORT EventConfig
   {
 
   public:

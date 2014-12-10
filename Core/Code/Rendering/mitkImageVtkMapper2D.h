@@ -114,7 +114,7 @@ namespace mitk {
 
  * \ingroup Mapper
  */
-class MITK_CORE_EXPORT ImageVtkMapper2D : public VtkMapper
+class MITKCORE_EXPORT ImageVtkMapper2D : public VtkMapper
 {
 
 public:
@@ -144,7 +144,7 @@ public:
      * internal helper class LocalStorage. This allows rendering n views with just
      * 1 mitkMapper using n vtkMapper.
      * */
-  class MITK_CORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
+  class MITKCORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
   public:
     /** \brief Actor of a 2D render window. */

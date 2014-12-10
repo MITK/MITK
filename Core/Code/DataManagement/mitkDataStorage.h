@@ -45,7 +45,7 @@ namespace mitk {
   //##
   //##
   //## \ingroup DataStorage
-  class MITK_CORE_EXPORT DataStorage : public itk::Object
+  class MITKCORE_EXPORT DataStorage : public itk::Object
   {
   public:
     mitkClassMacro(DataStorage, itk::Object);

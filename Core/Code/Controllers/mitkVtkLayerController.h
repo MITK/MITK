@@ -40,7 +40,7 @@ namespace mitk
  * Renderers can be registered via the insert... functions and
  * removed via the RemoveRenderer function.
  */
-class MITK_CORE_EXPORT VtkLayerController
+class MITKCORE_EXPORT VtkLayerController
 {
   public:
     static VtkLayerController* GetInstance(vtkRenderWindow* renWin);

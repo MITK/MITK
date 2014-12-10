@@ -36,7 +36,7 @@ namespace mitk
  *
  * \ingroup Interaction
  */
-  class MITK_CORE_EXPORT EventFactory
+  class MITKCORE_EXPORT EventFactory
   {
 
   public:

@@ -30,7 +30,7 @@ namespace mitk {
  * @brief The VtkOverlay2D class is the basis for all VTK based Overlays which create
  * a vtkActor2D element that will be drawn on the renderer.
  */
-class MITK_CORE_EXPORT VtkOverlay2D : public VtkOverlay {
+class MITKCORE_EXPORT VtkOverlay2D : public VtkOverlay {
 public:
 
   mitkClassMacro(VtkOverlay2D, VtkOverlay);

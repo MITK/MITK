@@ -30,7 +30,7 @@ namespace mitk
   Call mitk::StandardFileLocations::FindFile(filename) to look for configuration files.
   Call mitk::StandardFileLocations::GetOptionDirectory() to look for/save option files.
   */
-  class MITK_CORE_EXPORT StandardFileLocations : public itk::Object
+  class MITKCORE_EXPORT StandardFileLocations : public itk::Object
   {
   public:
     typedef  StandardFileLocations   Self;

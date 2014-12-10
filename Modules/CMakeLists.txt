@@ -61,6 +61,7 @@ if(MITK_ENABLE_PIC_READER)
 endif()
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)
+set(MITK_LEGACY_EXPORT_MACRO_NAME 1)
 
 foreach(module_dir ${module_dirs})
   add_subdirectory(${module_dir})

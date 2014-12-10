@@ -34,7 +34,7 @@ class OperationActor;
 //##
 //## all necessary operations, that all UndoModels share.
 //## @ingroup Undo
-class MITK_CORE_EXPORT UndoModel : public itk::Object
+class MITKCORE_EXPORT UndoModel : public itk::Object
 {
   public:
   mitkClassMacro(UndoModel, itk::Object);

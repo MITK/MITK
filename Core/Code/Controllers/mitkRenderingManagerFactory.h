@@ -43,7 +43,7 @@ namespace mitk
  * cannot easily be controlled).
  * \ingroup Renderer
  */
-class MITK_CORE_EXPORT RenderingManagerFactory
+class MITKCORE_EXPORT RenderingManagerFactory
 {
 public:
   virtual ~RenderingManagerFactory() {};
@@ -64,7 +64,7 @@ private:
 /**
  * Factory for the TestingRenderingManager
  */
-class MITK_CORE_EXPORT TestingRenderingManagerFactory : public RenderingManagerFactory
+class MITKCORE_EXPORT TestingRenderingManagerFactory : public RenderingManagerFactory
 {
 public:
   TestingRenderingManagerFactory()

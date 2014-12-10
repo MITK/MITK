@@ -50,7 +50,7 @@ namespace mitk {
 *
 * \ingroup Mapper
 */
-class MITK_CORE_EXPORT VtkMapper : public Mapper
+class MITKCORE_EXPORT VtkMapper : public Mapper
 {
   public:
     mitkClassMacro(VtkMapper,Mapper);

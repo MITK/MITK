@@ -26,7 +26,7 @@ namespace mitk {
  * @brief ImageWriteAccessor class to get locked write-access for a particular image part.
  * @ingroup Data
  */
-class MITK_CORE_EXPORT ImageWriteAccessor : public ImageAccessorBase
+class MITKCORE_EXPORT ImageWriteAccessor : public ImageAccessorBase
 {
 
   template <class TPixel, unsigned int VDimension>

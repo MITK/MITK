@@ -33,7 +33,7 @@ namespace mitk {
  * \brief Property for annotations
  * \ingroup DataManagement
  */
-class MITK_CORE_EXPORT AnnotationProperty : public BaseProperty
+class MITKCORE_EXPORT AnnotationProperty : public BaseProperty
 {
 public:
   mitkClassMacro(AnnotationProperty, BaseProperty);

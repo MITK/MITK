@@ -61,7 +61,7 @@ namespace mitk
 
  \ingroup Geometry
   */
-  class MITK_CORE_EXPORT DisplayGeometry : public PlaneGeometry
+  class MITKCORE_EXPORT DisplayGeometry : public PlaneGeometry
   {
   public:
 

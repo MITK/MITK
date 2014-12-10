@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-struct MITK_CORE_EXPORT IFileIO
+struct MITKCORE_EXPORT IFileIO
 {
   // The order of the enum values is important: it is used
   // to rank writer implementations

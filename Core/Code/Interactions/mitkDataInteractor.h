@@ -52,7 +52,7 @@ namespace mitk
   };
 
   class DataNode;
-  class MITK_CORE_EXPORT DataInteractor: public EventStateMachine
+  class MITKCORE_EXPORT DataInteractor: public EventStateMachine
   {
 
   public:

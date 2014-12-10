@@ -30,7 +30,7 @@ namespace mitk {
 //## by a set of landmarks.
 //##
 //## @ingroup Geometry
-class MITK_CORE_EXPORT LandmarkProjectorBasedCurvedGeometry : public AbstractTransformGeometry
+class MITKCORE_EXPORT LandmarkProjectorBasedCurvedGeometry : public AbstractTransformGeometry
 {
 public:
   mitkClassMacro(LandmarkProjectorBasedCurvedGeometry, AbstractTransformGeometry);

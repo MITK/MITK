@@ -28,7 +28,7 @@ namespace mitk {
 //## @brief generator for synthetic MITK images
 //## This is a helper class to  generate synthetic MITK images (random or gradient).
 //## @ingroup IO
-class MITK_CORE_EXPORT ImageGenerator
+class MITKCORE_EXPORT ImageGenerator
 {
 public:
 

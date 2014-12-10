@@ -26,7 +26,7 @@ namespace mitk
     *
     * The property view uses this extension to configure the corresponding property editor.
     */
-  class MITK_CORE_EXPORT FloatPropertyExtension : public PropertyExtension
+  class MITKCORE_EXPORT FloatPropertyExtension : public PropertyExtension
   {
   public:
     mitkClassMacro(FloatPropertyExtension, PropertyExtension);

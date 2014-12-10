@@ -29,7 +29,7 @@ namespace mitk {
   //## @brief represents an action, that is executed after a certain event (in statemachine-mechanism)
   //##
   //## @ingroup Interaction
-  class MITK_CORE_EXPORT Action : public itk::Object
+  class MITKCORE_EXPORT Action : public itk::Object
   {
   public:
     mitkClassMacro(Action, itk::Object);

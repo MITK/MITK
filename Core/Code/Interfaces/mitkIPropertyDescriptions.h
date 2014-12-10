@@ -28,7 +28,7 @@ namespace mitk
     * This service allows you to manage descriptions for properties.
     * The property view displays descriptions of selected properties (in rich text format) at its bottom.
     */
-  class MITK_CORE_EXPORT IPropertyDescriptions
+  class MITKCORE_EXPORT IPropertyDescriptions
   {
   public:
     virtual ~IPropertyDescriptions();

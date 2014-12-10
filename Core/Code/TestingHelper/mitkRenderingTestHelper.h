@@ -28,7 +28,7 @@ class vtkRenderer;
 
 namespace mitk
 {
-class MITK_TESTINGHELPER_EXPORT RenderingTestHelper
+class MITKTESTINGHELPER_EXPORT RenderingTestHelper
 {
 public:
   /** @brief Generate a rendering test helper object including a render window of the size width * height (in pixel).

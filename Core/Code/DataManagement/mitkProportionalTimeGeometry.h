@@ -38,7 +38,7 @@ namespace mitk {
   *
   * \addtogroup geometry
   */
-  class MITK_CORE_EXPORT ProportionalTimeGeometry : public TimeGeometry
+  class MITKCORE_EXPORT ProportionalTimeGeometry : public TimeGeometry
   {
   public:
     mitkClassMacro(ProportionalTimeGeometry, TimeGeometry);

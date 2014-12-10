@@ -75,7 +75,7 @@ namespace mitk {
   * @ingroup Mapper
   */
 
-class MITK_CORE_EXPORT SurfaceVtkMapper3D : public VtkMapper
+class MITKCORE_EXPORT SurfaceVtkMapper3D : public VtkMapper
 {
 public:
 

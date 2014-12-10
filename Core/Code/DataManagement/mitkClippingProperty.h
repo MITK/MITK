@@ -39,7 +39,7 @@ namespace mitk {
  * clipping planes are possible
  * \ingroup DataManagement
  */
-class MITK_CORE_EXPORT ClippingProperty : public BaseProperty
+class MITKCORE_EXPORT ClippingProperty : public BaseProperty
 {
 public:
   mitkClassMacro(ClippingProperty, BaseProperty);

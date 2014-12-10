@@ -49,7 +49,7 @@ struct ImageAccessorWaitLock
   #define MITK_USE_RECURSIVE_MUTEX_PREVENTION
 #endif
 
-class MITK_CORE_EXPORT ImageAccessorBase
+class MITKCORE_EXPORT ImageAccessorBase
 {
 
   friend class Image;

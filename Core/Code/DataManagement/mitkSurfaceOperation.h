@@ -26,7 +26,7 @@ namespace mitk {
   /*
    * @brief Operation that stores polydata for changing surfaces
    */
-  class MITK_CORE_EXPORT SurfaceOperation : public Operation
+  class MITKCORE_EXPORT SurfaceOperation : public Operation
   {
   public:
 

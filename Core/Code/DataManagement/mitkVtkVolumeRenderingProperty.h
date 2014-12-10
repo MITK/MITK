@@ -36,7 +36,7 @@ namespace mitk
  * VTK_RAY_CAST_COMPOSITE_FUNCTION
  * Default is NULL
  */
-class MITK_CORE_EXPORT VtkVolumeRenderingProperty : public EnumerationProperty
+class MITKCORE_EXPORT VtkVolumeRenderingProperty : public EnumerationProperty
 {
 public:
 

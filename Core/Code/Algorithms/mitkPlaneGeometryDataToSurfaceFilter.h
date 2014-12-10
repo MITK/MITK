@@ -58,7 +58,7 @@ namespace mitk {
   *  \todo make extension easier
   *  \ingroup Process
   */
-  class MITK_CORE_EXPORT PlaneGeometryDataToSurfaceFilter : public SurfaceSource
+  class MITKCORE_EXPORT PlaneGeometryDataToSurfaceFilter : public SurfaceSource
   {
   public:
     mitkClassMacro(PlaneGeometryDataToSurfaceFilter, SurfaceSource);

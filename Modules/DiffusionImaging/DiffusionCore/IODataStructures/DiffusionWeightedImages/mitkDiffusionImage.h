@@ -32,7 +32,7 @@ namespace mitk
   * yet supported by mitkImage)
   */
 template< class TPixelType >
-class MITK_EXPORT DiffusionImage : public Image
+class MitkDiffusionCore_EXPORT DiffusionImage : public Image
 {
 
 public:

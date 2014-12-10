@@ -28,7 +28,7 @@ namespace mitk {
 //## @ingroup IO
 
 // this class is used to send output to stdout and not the itk window
-class MITK_CORE_EXPORT ItkLoggingAdapter : public itk::OutputWindow
+class MITKCORE_EXPORT ItkLoggingAdapter : public itk::OutputWindow
 {
 public:
   typedef ItkLoggingAdapter                Self;

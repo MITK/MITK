@@ -22,7 +22,7 @@ namespace mitk
 {
 
 #define InstantiateAccessFunction_CastToItkImage(pixelType, dim) \
-template MITK_CORE_EXPORT void CastToItkImage(const mitk::Image *, itk::SmartPointer<ImageTypeTrait<pixelType,dim>::ImageType>&);
+template MITKCORE_EXPORT void CastToItkImage(const mitk::Image *, itk::SmartPointer<ImageTypeTrait<pixelType,dim>::ImageType>&);
 
 InstantiateAccessFunctionForFixedType(CastToItkImage, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 

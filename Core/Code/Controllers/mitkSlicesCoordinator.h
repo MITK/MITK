@@ -46,7 +46,7 @@ itkEventMacro( SliceRotationEvent, itk::AnyEvent);
  * rotation, is done in subclasses. This separation is done for the case that
  * some other multi-slice coordination should be implemented.
  */
-class MITK_CORE_EXPORT SlicesCoordinator : public StateMachine
+class MITKCORE_EXPORT SlicesCoordinator : public StateMachine
 {
 public:
 

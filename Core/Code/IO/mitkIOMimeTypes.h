@@ -23,11 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class MITK_CORE_EXPORT IOMimeTypes
+class MITKCORE_EXPORT IOMimeTypes
 {
 public:
 
-  class MITK_CORE_EXPORT DicomMimeType : public CustomMimeType
+  class MITKCORE_EXPORT DicomMimeType : public CustomMimeType
   {
   public:
     DicomMimeType();

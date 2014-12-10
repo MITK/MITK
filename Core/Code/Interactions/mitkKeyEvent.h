@@ -37,7 +37,7 @@ namespace mitk {
    * \deprecatedSince{2013_03} KeyEvent is deprecated. Use mitk::InteractionKeyEvent instead.
    * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
    */
-class MITK_CORE_EXPORT KeyEvent : public Event
+class MITKCORE_EXPORT KeyEvent : public Event
 {
   public:
     //##Documentation

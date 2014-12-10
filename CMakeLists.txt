@@ -1,17 +1,4 @@
-set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
-
-if(DESIRED_QT_VERSION MATCHES "4")
-  cmake_minimum_required(VERSION 2.8.9)
-else()
-  cmake_minimum_required(VERSION 2.8.12)
-endif()
-
-#-----------------------------------------------------------------------------
-# Include ctest launchers for dashboard in case of makefile generator
-#-----------------------------------------------------------------------------
-if(${CMAKE_VERSION} VERSION_GREATER "2.8.9")
-  include(CTestUseLaunchers)
-endif()
+cmake_minimum_required(VERSION 3.0.0)
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
@@ -38,6 +25,34 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
   project(MITK)
+endif()
+
+#-----------------------------------------------------------------------------
+# Check miminum compiler versions
+#-----------------------------------------------------------------------------
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  # require at least gcc 4.6 as provided by Ubuntu 12.04
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.6)
+    message(FATAL_ERROR "GCC version must be at least 4.6")
+  endif()
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  # require at least clang 3.2 for correct RTTI handling and C++11 support
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.2)
+    message(FATAL_ERROR "Clang version must be at least 3.2")
+  endif()
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+  # require at least clang 5.0
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0)
+    message(FATAL_ERROR "Apple Clang version must be at least 5.0")
+  endif()
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  # require at least Visual Studio 2010 (msvc ...)
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16)
+    message(FATAL_ERROR "Micorsoft Visual Studio 2010 or newer required (MSVC 16.0)")
+  endif()
+else()
+  message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -70,25 +85,7 @@ endif()
 # See http://cmake.org/cmake/help/cmake-2-8-docs.html#section_Policies for details
 #-----------------------------------------------------------------------------
 
-set(project_policies
-  CMP0001 # NEW: CMAKE_BACKWARDS_COMPATIBILITY should no longer be used.
-  CMP0002 # NEW: Logical target names must be globally unique.
-  CMP0003 # NEW: Libraries linked via full path no longer produce linker search paths.
-  CMP0004 # NEW: Libraries linked may NOT have leading or trailing whitespace.
-  CMP0005 # NEW: Preprocessor definition values are now escaped automatically.
-  CMP0006 # NEW: Installing MACOSX_BUNDLE targets requires a BUNDLE DESTINATION.
-  CMP0007 # NEW: List command no longer ignores empty elements.
-  CMP0008 # NEW: Libraries linked by full-path must have a valid library file name.
-  CMP0009 # NEW: FILE GLOB_RECURSE calls should not follow symlinks by default.
-  CMP0010 # NEW: Bad variable reference syntax is an error.
-  CMP0011 # NEW: Included scripts do automatic cmake_policy PUSH and POP.
-  CMP0012 # NEW: if() recognizes numbers and boolean constants.
-  CMP0013 # NEW: Duplicate binary directories are not allowed.
-  CMP0014 # NEW: Input directories must have CMakeLists.txt.
-  CMP0020 # NEW: Automatically link Qt executables to qtmain target on Windows.
-  CMP0028 # NEW: Double colon in target name means ALIAS or IMPORTED target.
-  CMP0043 # NEW: Ignore COMPILE_DEFINITIONS_<Config> properties.
-  )
+set(project_policies )
 foreach(policy ${project_policies})
   if(POLICY ${policy})
     cmake_policy(SET ${policy} NEW)
@@ -115,6 +112,7 @@ include(mitkFunctionGenerateProjectXml)
 include(mitkFunctionSuppressWarnings)
 include(mitkFunctionEnableBuildConfiguration)
 include(FeatureSummary)
+include(CTestUseLaunchers)
 
 SUPPRESS_VC_DEPRECATED_WARNINGS()
 
@@ -165,6 +163,7 @@ endmacro()
 # -----------------------------------------
 # Qt version related variables
 
+set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
 env_option(MITK_USE_QT "Use Nokia's Qt library" ON)
 set(MITK_DESIRED_QT_VERSION ${DESIRED_QT_VERSION})
 
@@ -444,6 +443,7 @@ endif()
 
 include(WriteBasicConfigVersionFile)
 include(CheckCXXSourceCompiles)
+include(GenerateExportHeader)
 include(mitkFunctionCheckCompilerFlags)
 include(mitkFunctionGetGccVersion)
 include(MacroParseArguments)
@@ -526,15 +526,6 @@ if(MITK_USE_BLUEBERRY AND APPLE)
 endif()
 
 #-----------------------------------------------------------------------------
-# Set symbol visibility Flags
-#-----------------------------------------------------------------------------
-
-# MinGW does not export all symbols automatically, so no need to set flags
-if(CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
-  set(VISIBILITY_CXX_FLAGS ) #"-fvisibility=hidden -fvisibility-inlines-hidden")
-endif()
-
-#-----------------------------------------------------------------------------
 # Set coverage Flags
 #-----------------------------------------------------------------------------
 
@@ -553,7 +544,7 @@ endif()
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS}")
 set(MITK_C_FLAGS_DEBUG )
 set(MITK_C_FLAGS_RELEASE )
-set(MITK_CXX_FLAGS "${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS}")
+set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS}")
 set(MITK_CXX_FLAGS_DEBUG )
 set(MITK_CXX_FLAGS_RELEASE )
 
@@ -1013,15 +1004,6 @@ configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactoryLoader.cpp.in
                ${MITK_BINARY_DIR}/ToolExtensionITKFactoryLoader.cpp.in COPYONLY)
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in
                ${MITK_BINARY_DIR}/ToolGUIExtensionITKFactory.cpp.in COPYONLY)
-
-set(VISIBILITY_AVAILABLE 0)
-set(visibility_test_flag "")
-mitkFunctionCheckCompilerFlags("-fvisibility=hidden" visibility_test_flag)
-if(visibility_test_flag)
-  # The compiler understands -fvisiblity=hidden (probably gcc >= 4 or Clang)
-  set(VISIBILITY_AVAILABLE 1)
-endif()
-configure_file(mitkExportMacros.h.in ${MITK_BINARY_DIR}/mitkExportMacros.h)
 
 configure_file(mitkVersion.h.in ${MITK_BINARY_DIR}/mitkVersion.h)
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)

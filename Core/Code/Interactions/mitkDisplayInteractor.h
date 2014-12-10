@@ -34,7 +34,7 @@ namespace mitk
    * Inherits from mitk::InteractionEventObserver since it doesn't alter any data (only their representation),
    * and its actions cannot be associated with a DataNode. Also inherits from EventStateMachine
    */
-  class MITK_CORE_EXPORT DisplayInteractor: public EventStateMachine, public InteractionEventObserver
+  class MITKCORE_EXPORT DisplayInteractor: public EventStateMachine, public InteractionEventObserver
   {
   public:
     mitkClassMacro(DisplayInteractor, EventStateMachine)

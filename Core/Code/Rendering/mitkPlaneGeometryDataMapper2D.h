@@ -46,7 +46,7 @@ namespace mitk {
   * \todo implement for AbstractTransformGeometry.
   * \ingroup Mapper
   */
-  class MITK_CORE_EXPORT PlaneGeometryDataMapper2D : public GLMapper
+  class MITKCORE_EXPORT PlaneGeometryDataMapper2D : public GLMapper
   {
   public:
     mitkClassMacro(PlaneGeometryDataMapper2D, GLMapper);

@@ -83,7 +83,7 @@ private:
 
 #endif // DOXYGEN_SKIP
 
-class MITK_CORE_EXPORT AbstractFileIO : public AbstractFileIOReader, public AbstractFileIOWriter
+class MITKCORE_EXPORT AbstractFileIO : public AbstractFileIOReader, public AbstractFileIOWriter
 {
 public:
 

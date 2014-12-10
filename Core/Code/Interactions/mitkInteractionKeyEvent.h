@@ -40,7 +40,7 @@ namespace mitk
    * \ingroup Interaction.
    */
 
-  class MITK_CORE_EXPORT InteractionKeyEvent : public InteractionEvent {
+  class MITKCORE_EXPORT InteractionKeyEvent : public InteractionEvent {
 
   public:
     mitkClassMacro(InteractionKeyEvent,InteractionEvent)

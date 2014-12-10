@@ -44,7 +44,7 @@ namespace mitk {
  * @sa CustomMimeType
  * @sa CoreServices::GetMimeTypeProvider()
  */
-struct MITK_CORE_EXPORT IMimeTypeProvider
+struct MITKCORE_EXPORT IMimeTypeProvider
 {
 
   virtual ~IMimeTypeProvider();

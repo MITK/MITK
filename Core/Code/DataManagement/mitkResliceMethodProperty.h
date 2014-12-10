@@ -30,7 +30,7 @@ namespace mitk
 /**
  * Encapsulates the thick slices method enumeration
  */
-class MITK_CORE_EXPORT ResliceMethodProperty : public EnumerationProperty
+class MITKCORE_EXPORT ResliceMethodProperty : public EnumerationProperty
 {
 public:
 

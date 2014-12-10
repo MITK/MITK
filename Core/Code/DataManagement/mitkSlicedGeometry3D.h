@@ -62,7 +62,7 @@ namespace mitk {
   *
   * \ingroup Geometry
   */
-  class MITK_CORE_EXPORT SlicedGeometry3D : public mitk::BaseGeometry
+  class MITKCORE_EXPORT SlicedGeometry3D : public mitk::BaseGeometry
   {
   public:
     mitkClassMacro(SlicedGeometry3D, BaseGeometry);

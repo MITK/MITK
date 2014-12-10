@@ -53,7 +53,7 @@ namespace mitk
   *
   * @ingroup Adaptor
   */
- template <typename ItkOutputImageType> extern void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage);
+ template <typename ItkOutputImageType> extern void MITKCORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage);
 
   /**
    * @brief Cast an mitk::Image to an itk::VectorImage with a specific type.
@@ -62,7 +62,7 @@ namespace mitk
    * @ingroup Adaptor
    */
   template <typename TPixelType, unsigned int VImageDimension>
-  extern void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itk::VectorImage<TPixelType,VImageDimension> >& itkOutputImage);
+  extern void MITKCORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itk::VectorImage<TPixelType,VImageDimension> >& itkOutputImage);
 
   /**
    * @brief Cast an itk::Image (with a specific type) to an mitk::Image.

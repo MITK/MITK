@@ -37,7 +37,7 @@ namespace mitk {
 //## from itk::DataObject and thus can be included in a pipeline.
 //## Inherits also from OperationActor and can be used as a destination for Undo
 //## @ingroup Data
-class MITK_CORE_EXPORT BaseData : public itk::DataObject, public OperationActor
+class MITKCORE_EXPORT BaseData : public itk::DataObject, public OperationActor
 {
 public:
   mitkClassMacro(BaseData,itk::DataObject)

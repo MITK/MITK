@@ -30,7 +30,7 @@ class AbstractOverlayLayouter;
 This class contains an internal Propertylist, and another PropertyList for each BaseRenderer.
 A property that is specified for a specific renderer always overrides the general internal property of the same name.
 AddOverlay, RemoveOverlay and UpdateOverlay methods have to be implemented.*/
-class MITK_CORE_EXPORT Overlay : public itk::Object {
+class MITKCORE_EXPORT Overlay : public itk::Object {
   friend class AbstractOverlayLayouter;
 public:
 
@@ -45,7 +45,7 @@ public:
 
   /** \brief Base class for mapper specific rendering ressources.
    */
-  class MITK_CORE_EXPORT BaseLocalStorage
+  class MITKCORE_EXPORT BaseLocalStorage
   {
   public:
 

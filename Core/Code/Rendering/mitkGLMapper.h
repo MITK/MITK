@@ -41,7 +41,7 @@ namespace mitk {
 *
 * \ingroup Mapper
 */
-class MITK_CORE_EXPORT GLMapper : public Mapper
+class MITKCORE_EXPORT GLMapper : public Mapper
 {
   public:
     /** \brief Do the painting into the \a renderer */

@@ -78,7 +78,7 @@ namespace mitk {
  * \ingroup PSIO
  * \ingroup Data
  */
-class MITK_CORE_EXPORT PointSet : public BaseData
+class MITKCORE_EXPORT PointSet : public BaseData
 {
 public:
   mitkClassMacro(PointSet, BaseData);
@@ -95,7 +95,7 @@ public:
   /**
    * \brief struct for data of a point
    */
-  struct MITK_CORE_EXPORT PointDataType
+  struct MITKCORE_EXPORT PointDataType
   {
     unsigned int id;  //to give the point a special ID
     bool selected;  //information about if the point is selected
@@ -288,7 +288,7 @@ protected:
  * @param verbose Flag indicating if the user wants detailed console output or not.
  * @return True, if all subsequent comparisons are true, false otherwise
  */
-DEPRECATED( MITK_CORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose ));
+DEPRECATED( MITKCORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose ));
 
 /**
  * @brief Equal A function comparing two pointsets for beeing identical.
@@ -304,7 +304,7 @@ DEPRECATED( MITK_CORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, con
  * @param verbose Flag indicating if the user wants detailed console output or not.
  * @return True, if all subsequent comparisons are true, false otherwise
  */
-MITK_CORE_EXPORT bool Equal( const mitk::PointSet& leftHandSide, const mitk::PointSet& rightHandSide, mitk::ScalarType eps, bool verbose );
+MITKCORE_EXPORT bool Equal( const mitk::PointSet& leftHandSide, const mitk::PointSet& rightHandSide, mitk::ScalarType eps, bool verbose );
 
 itkEventMacro( PointSetEvent, itk::AnyEvent );
 itkEventMacro( PointSetMoveEvent, PointSetEvent );

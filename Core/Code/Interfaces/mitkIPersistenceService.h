@@ -39,7 +39,7 @@ namespace mitk
     * the user will be asked whether to save/load the propertlists in/from the current ".mitk" file that is selected
     * by the user.
     */
-    class MITK_CORE_EXPORT IPersistenceService
+    class MITKCORE_EXPORT IPersistenceService
     {
     public:
         /**

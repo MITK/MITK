@@ -55,7 +55,7 @@ class IPropertyFilters;
  *
  * @see CoreServicePointer
  */
-class MITK_CORE_EXPORT CoreServices
+class MITKCORE_EXPORT CoreServices
 {
 public:
 

@@ -38,7 +38,7 @@ namespace mitk {
   * \deprecatedSince{2013_03} mitk::Event is deprecated. Use mitk::InteractionEvent instead.
   * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
   */
-  class MITK_CORE_EXPORT Event
+  class MITKCORE_EXPORT Event
   {
   public:
     //##Documentation

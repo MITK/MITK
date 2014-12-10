@@ -42,7 +42,7 @@ class MimeType;
  * \note The life-time of all mitk::IFileReader objects returned by an
  * instance of this class ends with the destruction of that instance.
  */
-class MITK_CORE_EXPORT FileReaderRegistry
+class MITKCORE_EXPORT FileReaderRegistry
 {
 
 public:

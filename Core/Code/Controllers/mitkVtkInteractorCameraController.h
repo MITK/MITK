@@ -29,7 +29,7 @@ namespace mitk {
 //##Documentation
 //## @brief vtk-based camera controller
 //## @ingroup NavigationControl
-class MITK_CORE_EXPORT VtkInteractorCameraController : public CameraController
+class MITKCORE_EXPORT VtkInteractorCameraController : public CameraController
 {
 public:
   mitkClassMacro(VtkInteractorCameraController, CameraController);

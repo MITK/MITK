@@ -42,7 +42,7 @@ class CustomMimeType;
  * @brief Base class for creating mitk::BaseData objects from files or streams.
  * @ingroup IO
  */
-class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
+class MITKCORE_EXPORT AbstractFileReader : public mitk::IFileReader
 {
 
 public:

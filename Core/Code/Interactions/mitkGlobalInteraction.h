@@ -71,7 +71,7 @@ namespace mitk {
    *  Please use the new implementation described in \see DataInteractionPage .
    */
 
- class MITK_CORE_EXPORT GlobalInteraction : public StateMachine
+ class MITKCORE_EXPORT GlobalInteraction : public StateMachine
   {
   public:
     mitkClassMacro(GlobalInteraction, StateMachine);

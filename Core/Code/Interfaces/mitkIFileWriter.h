@@ -52,7 +52,7 @@ namespace mitk {
  * \sa FileWriterRegistry
  * \sa IFileReader
  */
-struct MITK_CORE_EXPORT IFileWriter : public IFileIO
+struct MITKCORE_EXPORT IFileWriter : public IFileIO
 {
   virtual ~IFileWriter();
 

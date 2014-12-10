@@ -30,7 +30,7 @@ namespace mitk
 /**
  * Encapsulates the shader enumeration
  */
-class MITK_CORE_EXPORT ShaderProperty : public EnumerationProperty
+class MITKCORE_EXPORT ShaderProperty : public EnumerationProperty
 {
 public:
 

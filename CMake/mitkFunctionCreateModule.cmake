@@ -120,7 +120,7 @@ function(mitk_create_module)
       DEPENDS_INTERNAL       # list of modules this module internally depends on
       PACKAGE_DEPENDS        # list of "packages this module depends on (e.g. Qt, VTK, etc.)
       TARGET_DEPENDS         # list of CMake targets this module should depend on
-      EXPORT_DEFINE          # export macro name for public symbols of this module
+      EXPORT_DEFINE          # export macro name for public symbols of this module (DEPRECATED)
       AUTOLOAD_WITH          # a module target name identifying the module which will trigger the
                              # automatic loading of this module
       ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
@@ -284,7 +284,7 @@ function(mitk_create_module)
           get_filename_component(_abs_dir ${dir} ABSOLUTE)
           list(APPEND MODULE_INCLUDE_DIRS ${_abs_dir})
         endforeach()
-        list(APPEND MODULE_INCLUDE_DIRS ${MITK_BINARY_DIR} ${MODULES_CONF_DIRS})
+        list(APPEND MODULE_INCLUDE_DIRS ${MITK_BINARY_DIR})
 
         # Convert relative internal include dirs to absolute dirs
         set(_include_dirs ${MODULE_INTERNAL_INCLUDE_DIRS})
@@ -303,9 +303,11 @@ function(mitk_create_module)
         if(NOT MODULE_EXECUTABLE)
           _MITK_CREATE_MODULE_CONF()
         endif()
-        if(NOT MODULE_EXPORT_DEFINE)
+        if(MODULE_EXPORT_DEFINE)
+          message(WARNING "The EXPORT_DEFINE argument is deprecated")
+        else()
           set(MODULE_EXPORT_DEFINE ${MODULE_NAME}_EXPORT)
-        endif(NOT MODULE_EXPORT_DEFINE)
+        endif()
 
         if(MITK_GENERATE_MODULE_DOT)
           message("MODULEDOTNAME ${MODULE_NAME}")
@@ -329,41 +331,12 @@ function(mitk_create_module)
         set(module_cxx_flags_release )
 
         if(MODULE_GCC_DEFAULT_VISIBILITY)
-          set(use_visibility_flags 0)
+          set(CMAKE_CXX_VISIBILITY_PRESET default)
+          set(CMAKE_VISIBILITY_INLINES_HIDDEN 0)
         else()
-          # We only support hidden visibility for gcc for now. Clang 3.0 still has troubles with
-          # correctly marking template declarations and explicit template instantiations as exported.
-          # See http://comments.gmane.org/gmane.comp.compilers.clang.scm/50028
-          # and http://llvm.org/bugs/show_bug.cgi?id=10113
-          if(CMAKE_COMPILER_IS_GNUCXX)
-            set(use_visibility_flags 1)
-          else()
-          #  set(use_visibility_flags 0)
-          endif()
+          set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+          set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
         endif()
-
-        if(CMAKE_COMPILER_IS_GNUCXX)
-          # MinGW does not export all symbols automatically, so no need to set flags.
-          #
-          # With gcc < 4.5, RTTI symbols from classes declared in third-party libraries
-          # which are not "gcc visibility aware" are marked with hidden visibility in
-          # DSOs which include the class declaration and which are compiled with
-          # hidden visibility. This leads to dynamic_cast and exception handling problems.
-          # While this problem could be worked around by sandwiching the include
-          # directives for the third-party headers between "#pragma visibility push/pop"
-          # statements, it is generally safer to just use default visibility with
-          # gcc < 4.5.
-          if(${GCC_VERSION} VERSION_LESS "4.5" OR MINGW)
-            set(use_visibility_flags 0)
-          endif()
-        endif()
-
-        if(use_visibility_flags)
-          mitkFunctionCheckCAndCXXCompilerFlags("-fvisibility=hidden" module_c_flags module_cxx_flags)
-          mitkFunctionCheckCAndCXXCompilerFlags("-fvisibility-inlines-hidden" module_c_flags module_cxx_flags)
-        endif()
-
-        configure_file(${MITK_SOURCE_DIR}/CMake/moduleExports.h.in ${CMAKE_BINARY_DIR}/${MODULES_CONF_DIRNAME}/${MODULE_NAME}Exports.h @ONLY)
 
         if(MODULE_WARNINGS_AS_ERRORS)
           if(MSVC_VERSION)
@@ -516,6 +489,7 @@ function(mitk_create_module)
                         ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
             set(_us_module_name ${MODULE_TARGET})
           endif()
+
           set_property(TARGET ${MODULE_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${_us_module_name})
           set_property(TARGET ${MODULE_TARGET} PROPERTY US_MODULE_NAME ${_us_module_name})
 
@@ -608,6 +582,23 @@ function(mitk_create_module)
             usFunctionEmbedResources(TARGET ${MODULE_TARGET})
           endif()
 
+        endif()
+
+        # create export macros for all modules (also header-only)
+        if (NOT MODULE_EXECUTABLE)
+          set(_export_macro_name )
+          if(MITK_LEGACY_EXPORT_MACRO_NAME)
+            set(_export_macro_names
+              EXPORT_MACRO_NAME ${MODULE_EXPORT_DEFINE}
+              NO_EXPORT_MACRO_NAME ${MODULE_NAME}_NO_EXPORT
+              DEPRECATED_MACRO_NAME ${MODULE_NAME}_DEPRECATED
+              NO_DEPRECATED_MACRO_NAME ${MODULE_NAME}_NO_DEPRECATED
+            )
+          endif()
+          generate_export_header(${MODULE_NAME}
+            ${_export_macro_names}
+            EXPORT_FILE_NAME ${MODULE_NAME}Exports.h
+          )
         endif()
 
       endif()

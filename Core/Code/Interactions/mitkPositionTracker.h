@@ -31,7 +31,7 @@ namespace mitk
   //##
   //## Tracks a Point from an input device (usaly mouse pointer)
   //## @ingroup Interaction
-  class MITK_CORE_EXPORT PositionTracker : public StateMachine
+  class MITKCORE_EXPORT PositionTracker : public StateMachine
   {
   public:
     mitkClassMacro(PositionTracker, StateMachine);

@@ -32,7 +32,7 @@ namespace mitk {
 
 class CustomMimeType;
 
-class MITK_CORE_EXPORT MimeType
+class MITKCORE_EXPORT MimeType
 {
 
 public:

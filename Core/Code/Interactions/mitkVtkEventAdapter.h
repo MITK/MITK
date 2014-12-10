@@ -45,7 +45,7 @@ namespace mitk
 
 class BaseRenderer;
 
-class MITK_EXPORT VtkEventAdapter
+class MITKCORE_EXPORT VtkEventAdapter
 {
 public:
   /**

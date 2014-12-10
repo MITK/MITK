@@ -48,7 +48,7 @@ namespace mitk
   Note that this class is not thread safe at the moment!
 */
 
-  class MITK_CORE_EXPORT LevelWindowManager : public itk::Object
+  class MITKCORE_EXPORT LevelWindowManager : public itk::Object
   {
   public:
 

@@ -29,7 +29,7 @@ namespace mitk {
  * @brief The VtkOverlay class is the base for all Overlays which are using the VTK framework to render
  *the elements.
  */
-class MITK_CORE_EXPORT VtkOverlay : public Overlay {
+class MITKCORE_EXPORT VtkOverlay : public Overlay {
 public:
 
   mitkClassMacro(VtkOverlay, Overlay);

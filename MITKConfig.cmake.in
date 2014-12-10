@@ -6,6 +6,7 @@ set(CppMicroServices_DIR "@CppMicroServices_DIR@")
 
 # Include MITK macros
 include(MacroParseArguments)
+include(GenerateExportHeader)
 include(mitkFunctionCheckMitkCompatibility)
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionCreateWindowsBatchScript)
@@ -61,6 +62,7 @@ set(MITK_CMAKE_DIR "@MITK_CMAKE_DIR@")
 set(UTILITIES_DIR "@UTILITIES_DIR@")
 set(REGISTER_QFUNCTIONALITY_CPP_IN "@REGISTER_QFUNCTIONALITY_CPP_IN@")
 set(MITK_DOXYGEN_TAGFILE_NAME "@MITK_DOXYGEN_TAGFILE_NAME@")
+set(MITK_LEGACY_EXPORT_MACRO_NAME 1)
 
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR "@MITK_MODULES_PACKAGE_DEPENDS_DIR@")
 if(MODULES_PACKAGE_DEPENDS_DIRS)

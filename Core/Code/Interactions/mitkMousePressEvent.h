@@ -30,7 +30,7 @@
 namespace mitk
 {
 
-  class MITK_CORE_EXPORT MousePressEvent: public InteractionPositionEvent
+  class MITKCORE_EXPORT MousePressEvent: public InteractionPositionEvent
   {
 
   public:

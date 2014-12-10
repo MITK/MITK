@@ -39,9 +39,9 @@ namespace mitk {
   *
   * The 'window'-value and also be adjusted by moving the mouse-curser up (increase) and down (decrease).
   *
-  * @ingroup MITK_CORE_EXPORT
+  * @ingroup MITKCORE_EXPORT
   **/
-  class MITK_CORE_EXPORT DisplayVectorInteractorLevelWindow : public StateMachine
+  class MITKCORE_EXPORT DisplayVectorInteractorLevelWindow : public StateMachine
   {
   public:
     mitkClassMacro(DisplayVectorInteractorLevelWindow, StateMachine);

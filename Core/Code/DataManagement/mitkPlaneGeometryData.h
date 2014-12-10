@@ -30,7 +30,7 @@ namespace mitk {
   //## @brief Data class containing PlaneGeometry objects
   //## @ingroup Geometry
   //##
-  class MITK_CORE_EXPORT PlaneGeometryData : public GeometryData
+  class MITKCORE_EXPORT PlaneGeometryData : public GeometryData
   {
   public:
     mitkClassMacro(PlaneGeometryData, GeometryData);

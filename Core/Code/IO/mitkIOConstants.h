@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-struct MITK_CORE_EXPORT IOConstants
+struct MITKCORE_EXPORT IOConstants
 {
   static std::string PIXEL_TYPE();
   static std::string PIXEL_TYPE_CHAR();

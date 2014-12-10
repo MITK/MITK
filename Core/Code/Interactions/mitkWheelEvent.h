@@ -35,7 +35,7 @@ namespace mitk {
   * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
   */
 
-  class MITK_CORE_EXPORT WheelEvent : public DisplayPositionEvent
+  class MITKCORE_EXPORT WheelEvent : public DisplayPositionEvent
   {
   public:
     //##Documentation

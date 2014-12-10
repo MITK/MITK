@@ -38,7 +38,7 @@ namespace mitk {
 * @ingroup Adaptor
 */
 template <class TInputImage>
-class MITK_EXPORT ITKImageImport : public ImageSource
+class MITKCORE_EXPORT ITKImageImport : public ImageSource
 {
 public:
 

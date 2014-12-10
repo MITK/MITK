@@ -49,7 +49,7 @@ namespace mitk
    *
    * \ingroup Interaction
    */
-  class MITK_CORE_EXPORT MoveBaseDataInteractor : public Interactor
+  class MITKCORE_EXPORT MoveBaseDataInteractor : public Interactor
   {
   public:
     mitkClassMacro(MoveBaseDataInteractor, Interactor);

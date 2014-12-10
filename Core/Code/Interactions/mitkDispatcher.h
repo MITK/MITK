@@ -44,7 +44,7 @@ namespace mitk
   * \ingroup Interaction
   */
 
-  class MITK_CORE_EXPORT Dispatcher: public itk::LightObject
+  class MITKCORE_EXPORT Dispatcher: public itk::LightObject
   {
 
   public:

@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "vtkThreadedImageAlgorithm.h"
 
-class MITK_CORE_EXPORT vtkMitkThickSlicesFilter : public vtkThreadedImageAlgorithm
+class MITKCORE_EXPORT vtkMitkThickSlicesFilter : public vtkThreadedImageAlgorithm
 {
 public:
   static vtkMitkThickSlicesFilter *New();

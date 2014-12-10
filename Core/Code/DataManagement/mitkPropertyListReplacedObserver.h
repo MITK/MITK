@@ -27,7 +27,7 @@ namespace mitk
     /// a PropertyListReplacedObserver gets informed as soon as a PropertyList with a given id was replaced during a Load() process
     /// \see IPersistenceService::AddPropertyListReplacedObserver()
     ///
-    class MITK_CORE_EXPORT PropertyListReplacedObserver
+    class MITKCORE_EXPORT PropertyListReplacedObserver
     {
     public:
         ///

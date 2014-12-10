@@ -28,7 +28,7 @@ namespace mbilog{
  * File: output generated to a file
  * Other: all other kinds of output
  */
-enum MBILOG_DLL_API OutputType{
+enum MBILOG_EXPORT OutputType{
   Console = 0,
   File,
   Other = 100
@@ -38,7 +38,7 @@ enum MBILOG_DLL_API OutputType{
    *
    *  \ingroup mbilog
    */
-  class MBILOG_DLL_API BackendBase
+  class MBILOG_EXPORT BackendBase
   {
   public:
 

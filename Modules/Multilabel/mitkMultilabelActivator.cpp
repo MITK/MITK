@@ -19,32 +19,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 #include <usModule.h>
 
-#include "mitkToolManagerProvider.h"
+#include "mitkLabelSetImageIO.h"
 
 namespace mitk
 {
 
+std::vector<AbstractFileIO*> m_FileIOs;
+
   /**
-  \brief Registers services for segmentation module.
+  \brief Registers services for multilabel module.
   */
-  class SegmentationModuleActivator : public us::ModuleActivator
+  class MultilabelModuleActivator : public us::ModuleActivator
   {
   public:
 
-    void Load(us::ModuleContext* context)
+    void Load(us::ModuleContext* /*context*/)
     {
-      /*register ToolManager provider service*/
-      m_ToolManagerProvider = mitk::ToolManagerProvider::New();
-      context->RegisterService<mitk::ToolManagerProvider>(m_ToolManagerProvider);
+      m_FileIOs.push_back(new LabelSetImageIO());
     }
 
     void Unload(us::ModuleContext*)
     {
+      for(std::vector<mitk::AbstractFileIO*>::iterator iter = m_FileIOs.begin(),
+          endIter = m_FileIOs.end(); iter != endIter; ++iter)
+      {
+        delete *iter;
+      }
     }
-
-  private:
-    mitk::ToolManagerProvider::Pointer m_ToolManagerProvider;
   };
 }
 
-US_EXPORT_MODULE_ACTIVATOR(mitk::SegmentationModuleActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::MultilabelModuleActivator)

@@ -18,6 +18,7 @@ set(module_dirs
     GraphAlgorithms
     ContourModel
     SurfaceInterpolation
+    Multilabel
     Segmentation
     PlanarFigureSegmentation
     OpenViewCore

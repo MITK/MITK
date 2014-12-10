@@ -13,6 +13,7 @@ set(CPP_FILES
   mitkPadImageFilter.cpp
   mitkPlaneLandmarkProjector.cpp
   mitkPointLocator.cpp
+  mitkSegmentationSink.cpp
   mitkSimpleHistogram.cpp
   mitkSimpleUnstructuredGridHistogram.cpp
   mitkCovarianceMatrixCalculator.cpp

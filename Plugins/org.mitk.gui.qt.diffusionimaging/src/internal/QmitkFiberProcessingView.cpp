@@ -56,6 +56,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegion.h>
 #include <itkTractsToRgbaImageFilter.h>
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 

@@ -202,11 +202,10 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
 
       ScalarType lineLength = point1.EuclideanDistanceTo(point2);
       DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
-      Point2D lengthBounds;
-      lengthBounds.Fill(lineLength);
-      displayGeometry->WorldToDisplay(lengthBounds,lengthBounds);
 
-      float gapSizeParam = (1/lengthBounds[0]*gapsize)/2;
+      ScalarType gapinmm = gapsize * displayGeometry->GetScaleFactorMMPerDisplayUnit();
+
+      float gapSizeParam = gapinmm / lineLength;
 
       while ( otherPlanesIt != otherPlanesEnd )
       {
@@ -219,17 +218,26 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
           otherPlane->IntersectionPoint(crossLine,planeIntersection);
           ScalarType sectionLength = point1.EuclideanDistanceTo(planeIntersection);
           ScalarType lineValue = sectionLength/lineLength;
-          intersections.push_back(crossLine.GetPoint(lineValue-gapSizeParam));
-          intersections.push_back(crossLine.GetPoint(lineValue+gapSizeParam));
+          if(lineValue-gapSizeParam > 0.0)
+            intersections.push_back(crossLine.GetPoint(lineValue-gapSizeParam));
+          else intersections.pop_back();
+          if(lineValue+gapSizeParam < 1.0)
+            intersections.push_back(crossLine.GetPoint(lineValue+gapSizeParam));
         }
         ++otherPlanesIt;
       }
-      intersections.push_back(point2);
+      if(intersections.size()%2 == 1)
+        intersections.push_back(point2);
 
-      for(unsigned int i = 0 ; i< intersections.size()-1 ; i+=2)
+      if(intersections.empty())
       {
-        this->DrawLine(intersections[i],intersections[i+1],lines,points);
+        this->DrawLine(point1,point2,lines,points);
       }
+      else
+        for(unsigned int i = 0 ; i< intersections.size()-1 ; i+=2)
+        {
+          this->DrawLine(intersections[i],intersections[i+1],lines,points);
+        }
 
       // Add the points to the dataset
       linesPolyData->SetPoints(points);

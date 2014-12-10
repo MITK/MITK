@@ -7,7 +7,7 @@ function(mitkFunctionEnableModules)
     string(FIND "${MITK_WHITELIST}" " (external)" index REVERSE)
 
     if(${index} EQUAL -1)
-      set(whitelistFile "${MITK_WHITELISTS_PATH}/${whitelistFile}.cmake")
+      set(whitelistFile "${MITK_WHITELISTS_PATH}/${MITK_WHITELIST}.cmake")
     else()
       string(SUBSTRING "${MITK_WHITELIST}" 0 ${index} whitelistFile)
       set(whitelistFile "${MITK_EXTERNAL_WHITELISTS_PATH}/${whitelistFile}.cmake")

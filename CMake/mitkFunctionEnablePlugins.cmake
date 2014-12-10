@@ -6,16 +6,16 @@ function(mitkFunctionEnablePlugins)
   string(FIND "${MITK_WHITELIST}" " (external)" index REVERSE)
 
   if(${index} EQUAL -1)
-    set(_whitelistFile "${MITK_WHITELISTS_PATH}/${_whiteListFile}.cmake")
+    set(whitelistFile "${MITK_WHITELISTS_PATH}/${whitelistFile}.cmake")
   else()
-    string(SUBSTRING "${MITK_WHITELIST}" 0 ${index} _whitelistFile)
-    set(_whitelistFile "${MITK_EXTERNAL_WHITELISTS_PATH}/${_whitelistFile}.cmake")
+    string(SUBSTRING "${MITK_WHITELIST}" 0 ${index} whitelistFile)
+    set(whitelistFile "${MITK_EXTERNAL_WHITELISTS_PATH}/${whitelistFile}.cmake")
   endif()
 
-  include(${_whitelistFile})
+  include(${whitelistFile})
 
   if(NOT DEFINED enabled_plugins)
-    message(FATAL_ERROR "Variable 'enabled_plugins' not set in whitelist file '${_whitelistFile}'!")
+    message(FATAL_ERROR "Variable 'enabled_plugins' not set in whitelist file '${whitelistFile}'!")
   endif()
 
   set(plugins)

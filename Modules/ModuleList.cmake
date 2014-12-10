@@ -1,4 +1,4 @@
-set(modules
+set(mitk_modules
   LegacyIO
   DataTypesExt
   AlgorithmsExt
@@ -55,5 +55,5 @@ set(modules
 )
 
 if(MITK_ENABLE_PIC_READER)
-  list(APPEND modules IpPicSupportIO)
+  list(APPEND mitk_modules IpPicSupportIO)
 endif()

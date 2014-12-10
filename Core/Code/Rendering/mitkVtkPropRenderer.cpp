@@ -59,7 +59,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm, mitk::BaseRenderer::RenderingMode::Type renderingMode )
   : BaseRenderer(name,renWin, rm, renderingMode ),
-  m_CameraInitializedForMapperID(0)
+    m_CameraInitializedForMapperID(0)
 {
   didCount=false;
 
@@ -358,101 +358,101 @@ void mitk::VtkPropRenderer::MakeCurrent()
 
 void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk::Point3D& worldPoint) const
 {
-    switch ( m_PickingMode )
-    {
-    case (WorldPointPicking) :
-      {
-        m_WorldPointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
-        vtk2itk(m_WorldPointPicker->GetPickPosition(), worldPoint);
-        break;
-      }
-    case (PointPicking) :
-      {
-        m_PointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
-        vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
-        break;
-      }
-    case(CellPicking) :
-      {
-        m_CellPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
-        vtk2itk(m_CellPicker->GetPickPosition(), worldPoint);
-        break;
-      }
-    }
-//todo: is this picking in 2D renderwindows?
-//    Superclass::PickWorldPoint(displayPoint, worldPoint);
+  switch ( m_PickingMode )
+  {
+  case (WorldPointPicking) :
+  {
+    m_WorldPointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+    vtk2itk(m_WorldPointPicker->GetPickPosition(), worldPoint);
+    break;
+  }
+  case (PointPicking) :
+  {
+    m_PointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+    vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
+    break;
+  }
+  case(CellPicking) :
+  {
+    m_CellPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+    vtk2itk(m_CellPicker->GetPickPosition(), worldPoint);
+    break;
+  }
+  }
+  //todo: is this picking in 2D renderwindows?
+  //    Superclass::PickWorldPoint(displayPoint, worldPoint);
 }
 
 mitk::DataNode *
-    mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const
+mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const
 {
-    m_CellPicker->InitializePickList();
+  m_CellPicker->InitializePickList();
 
-    // Iterate over all DataStorage objects to determine all vtkProps intended
-    // for picking
-    DataStorage::SetOfObjects::ConstPointer allObjects = m_DataStorage->GetAll();
-    for ( DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();
-    it != allObjects->End();
-    ++it )
-    {
-      DataNode *node = it->Value();
-      if ( node == NULL )
-        continue;
+  // Iterate over all DataStorage objects to determine all vtkProps intended
+  // for picking
+  DataStorage::SetOfObjects::ConstPointer allObjects = m_DataStorage->GetAll();
+  for ( DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();
+        it != allObjects->End();
+        ++it )
+  {
+    DataNode *node = it->Value();
+    if ( node == NULL )
+      continue;
 
-      bool pickable = false;
-      node->GetBoolProperty( "pickable", pickable );
-      if ( !pickable )
-        continue;
+    bool pickable = false;
+    node->GetBoolProperty( "pickable", pickable );
+    if ( !pickable )
+      continue;
 
-      VtkMapper *mapper = dynamic_cast < VtkMapper * >  ( node->GetMapper( m_MapperID ) );
-      if ( mapper == NULL )
-        continue;
+    VtkMapper *mapper = dynamic_cast < VtkMapper * >  ( node->GetMapper( m_MapperID ) );
+    if ( mapper == NULL )
+      continue;
 
-      vtkProp *prop = mapper->GetVtkProp( (mitk::BaseRenderer *)this );
-      if ( prop == NULL )
-        continue;
-
-      m_CellPicker->AddPickList( prop );
-    }
-
-    // Do the picking and retrieve the picked vtkProp (if any)
-    m_CellPicker->PickFromListOn();
-    m_CellPicker->Pick( displayPosition[0], displayPosition[1], 0.0, m_VtkRenderer );
-    m_CellPicker->PickFromListOff();
-
-    vtk2itk( m_CellPicker->GetPickPosition(), worldPosition );
-    vtkProp *prop = m_CellPicker->GetViewProp();
-
+    vtkProp *prop = mapper->GetVtkProp( (mitk::BaseRenderer *)this );
     if ( prop == NULL )
-    {
-      return NULL;
-    }
+      continue;
 
-    // Iterate over all DataStorage objects to determine if the retrieved
-    // vtkProp is owned by any associated mapper.
-    for ( DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();
-    it != allObjects->End();
-    ++it)
-    {
-      DataNode::Pointer node = it->Value();
-      if ( node.IsNull() )
-        continue;
+    m_CellPicker->AddPickList( prop );
+  }
 
-      mitk::Mapper * mapper = node->GetMapper( m_MapperID );
-      if ( mapper == NULL)
-        continue;
+  // Do the picking and retrieve the picked vtkProp (if any)
+  m_CellPicker->PickFromListOn();
+  m_CellPicker->Pick( displayPosition[0], displayPosition[1], 0.0, m_VtkRenderer );
+  m_CellPicker->PickFromListOff();
 
-      mitk::VtkMapper * vtkmapper = dynamic_cast< VtkMapper * >(mapper);
+  vtk2itk( m_CellPicker->GetPickPosition(), worldPosition );
+  vtkProp *prop = m_CellPicker->GetViewProp();
 
-      if(vtkmapper){
-        //if vtk-based, then ...
-       if ( vtkmapper->HasVtkProp( prop, const_cast< mitk::VtkPropRenderer * >( this ) ) )
-       {
-          return node;
-       }
+  if ( prop == NULL )
+  {
+    return NULL;
+  }
+
+  // Iterate over all DataStorage objects to determine if the retrieved
+  // vtkProp is owned by any associated mapper.
+  for ( DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();
+        it != allObjects->End();
+        ++it)
+  {
+    DataNode::Pointer node = it->Value();
+    if ( node.IsNull() )
+      continue;
+
+    mitk::Mapper * mapper = node->GetMapper( m_MapperID );
+    if ( mapper == NULL)
+      continue;
+
+    mitk::VtkMapper * vtkmapper = dynamic_cast< VtkMapper * >(mapper);
+
+    if(vtkmapper){
+      //if vtk-based, then ...
+      if ( vtkmapper->HasVtkProp( prop, const_cast< mitk::VtkPropRenderer * >( this ) ) )
+      {
+        return node;
       }
     }
-    return NULL;
+  }
+  return NULL;
 }
 //todo: is this 2D renderwindow picking?
 //    return Superclass::PickObject( displayPosition, worldPosition );
@@ -506,29 +506,29 @@ void mitk::VtkPropRenderer::InitPathTraversal()
 
 int mitk::VtkPropRenderer::GetNumberOfPaths()
 {
-    if (m_DataStorage.IsNull()) {
-        return 0;
-    }
+  if (m_DataStorage.IsNull()) {
+    return 0;
+  }
 
-    int nPaths = 0;
-    DataStorage::SetOfObjects::ConstPointer objects = m_DataStorage->GetAll();
-    for (DataStorage::SetOfObjects::const_iterator iter = objects->begin(); iter != objects->end(); ++iter) {
-        Mapper* mapper = (*iter)->GetMapper(BaseRenderer::Standard3D);
-        if (mapper)
+  int nPaths = 0;
+  DataStorage::SetOfObjects::ConstPointer objects = m_DataStorage->GetAll();
+  for (DataStorage::SetOfObjects::const_iterator iter = objects->begin(); iter != objects->end(); ++iter) {
+    Mapper* mapper = (*iter)->GetMapper(BaseRenderer::Standard3D);
+    if (mapper)
+    {
+      VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>(mapper);
+      if (vtkmapper)
+      {
+        vtkProp* prop = vtkmapper->GetVtkProp(this);
+        if (prop && prop->GetVisibility())
         {
-            VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>(mapper);
-            if (vtkmapper)
-            {
-                vtkProp* prop = vtkmapper->GetVtkProp(this);
-                if (prop && prop->GetVisibility())
-                {
-                    ++nPaths;
-                }
-            }
+          ++nPaths;
         }
+      }
     }
+  }
 
-    return nPaths;
+  return nPaths;
 }
 
 vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
@@ -597,16 +597,16 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow* /*renWin*/)
     if ( node.IsNull() )
       continue;
 
-      Mapper * mapper = node->GetMapper(m_MapperID);
+    Mapper * mapper = node->GetMapper(m_MapperID);
 
-      if (mapper)
-      {
-        VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>( mapper );
+    if (mapper)
+    {
+      VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>( mapper );
 
-       if(vtkmapper)
-         vtkmapper->ReleaseGraphicsResources(this);
-      }
-   }
+      if(vtkmapper)
+        vtkmapper->ReleaseGraphicsResources(this);
+    }
+  }
 }
 
 const vtkWorldPointPicker *mitk::VtkPropRenderer::GetWorldPointPicker() const

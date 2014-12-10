@@ -54,7 +54,7 @@ void QmitkFiberProcessingPerspective::CreateInitialLayout(berry::IPageLayout::Po
     // here goes the perspective specific stuff
     /////////////////////////////////////////////
 
-    left->AddView("org.mitk.views.fiberextraction");
     left->AddView("org.mitk.views.fiberprocessing");
+    left->AddView("org.mitk.views.fiberquantification");
     left->AddView("org.mitk.views.segmentation");
 }

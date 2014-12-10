@@ -67,8 +67,7 @@ mitk::PlaneGeometryDataMapper2D::~PlaneGeometryDataMapper2D()
 vtkProp* mitk::PlaneGeometryDataMapper2D::GetVtkProp(mitk::BaseRenderer * renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
-//  return ls->m_CrosshairAssembly;
-  return ls->m_CrosshairActor;
+  return ls->m_CrosshairAssembly;
 }
 
 void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
@@ -252,7 +251,61 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       LocalStorage* ls = m_LSH.GetLocalStorage(renderer);
       ls->m_CrosshairActor->SetMapper(mapper);
 
-      ls->m_CrosshairAssembly->AddPart(ls->m_CrosshairActor);
+      // Determine if we should draw the area covered by the thick slicing, default is false.
+      // This will also show the area of slices that do not have thick slice mode enabled
+      bool showAreaOfThickSlicing = false;
+      GetDataNode()->GetBoolProperty( "reslice.thickslices.showarea", showAreaOfThickSlicing );
+
+      // get the normal of the inputPlaneGeometry
+      Vector3D normal = inputPlaneGeometry->GetNormal();
+      // determine the pixelSpacing in that direction
+      double thickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
+
+      IntProperty *intProperty=0;
+      if( GetDataNode()->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
+          thickSliceDistance *= intProperty->GetValue()+0.5;
+      else
+          showAreaOfThickSlicing = false;
+
+      // not the nicest place to do it, but we have the width of the visible bloc in MM here
+      // so we store it in this fancy property
+      GetDataNode()->SetFloatProperty( "reslice.thickslices.sizeinmm", thickSliceDistance*2 );
+
+      if ( showAreaOfThickSlicing )
+      {
+        vtkSmartPointer<vtkCellArray> helperlines = vtkSmartPointer<vtkCellArray>::New();
+        vtkSmartPointer<vtkPolyData> helperlinesPolyData = vtkSmartPointer<vtkPolyData>::New();
+        // vectorToHelperLine defines how to reach the helperLine from the mainLine
+        Vector3D vectorToHelperLine;
+        vectorToHelperLine = normal;
+        vectorToHelperLine.Normalize();
+        // got the right direction, so we multiply the width
+        vectorToHelperLine *= thickSliceDistance;
+
+        this->DrawLine(point1 - vectorToHelperLine, point2 - vectorToHelperLine,helperlines,points);
+        this->DrawLine(point1 + vectorToHelperLine, point2 + vectorToHelperLine,helperlines,points);
+
+        // Add the points to the dataset
+        helperlinesPolyData->SetPoints(points);
+
+        // Add the lines to the dataset
+        helperlinesPolyData->SetLines(helperlines);
+
+        // Visualize
+        vtkSmartPointer<vtkPolyDataMapper> helperLinesmapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        helperLinesmapper->SetInputData(helperlinesPolyData);
+
+        ls->m_CrosshairActor->GetProperty()->SetLineStipplePattern(0xf0f0);
+        ls->m_CrosshairActor->GetProperty()->SetLineStippleRepeatFactor(1);
+
+        ls->m_CrosshairHelperLineActor->SetMapper(helperLinesmapper);
+        ls->m_CrosshairAssembly->AddPart(ls->m_CrosshairHelperLineActor);
+      }
+      else
+      {
+        ls->m_CrosshairAssembly->RemovePart(ls->m_CrosshairHelperLineActor);
+        ls->m_CrosshairActor->GetProperty()->SetLineStipplePattern(0xffff);
+      }
     }
   }
 }
@@ -300,6 +353,7 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
   Superclass::ApplyColorAndOpacityProperties(renderer, ls->m_CrosshairActor);
+  Superclass::ApplyColorAndOpacityProperties(renderer, ls->m_CrosshairHelperLineActor);
 
   PlaneOrientationProperty* decorationProperty;
   this->GetDataNode()->GetProperty( decorationProperty, "decoration", renderer );
@@ -343,6 +397,9 @@ mitk::PlaneGeometryDataMapper2D::LocalStorage::LocalStorage()
 {
   m_CrosshairAssembly = vtkSmartPointer <vtkPropAssembly>::New();
   m_CrosshairActor = vtkSmartPointer <vtkActor>::New();
+  m_CrosshairHelperLineActor = vtkSmartPointer <vtkActor>::New();
+  m_CrosshairAssembly->AddPart(m_CrosshairActor);
+  m_CrosshairAssembly->AddPart(m_CrosshairHelperLineActor);
 }
 // destructor LocalStorage
 mitk::PlaneGeometryDataMapper2D::LocalStorage::~LocalStorage()

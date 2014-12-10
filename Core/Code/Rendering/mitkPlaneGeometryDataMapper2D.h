@@ -79,7 +79,9 @@ namespace mitk {
 
       // actor
       vtkSmartPointer<vtkActor> m_CrosshairActor;
+      vtkSmartPointer<vtkActor> m_CrosshairHelperLineActor;
       vtkSmartPointer<vtkPropAssembly> m_CrosshairAssembly;
+
 
     };
 

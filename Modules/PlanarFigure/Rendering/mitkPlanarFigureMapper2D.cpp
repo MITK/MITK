@@ -1,4 +1,4 @@
-/*===================================================================
+﻿/*===================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
@@ -23,6 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkGL.h"
 #include "mitkVtkPropRenderer.h"
+
+#include "mitkTextOverlay2D.h"
+#include "mitkOverlayManager.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -143,7 +146,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
   // draw name near the anchor point (point located on the right)
   std::string name = node->GetName();
-  if ( m_DrawName && !name.empty() )
+  if ( true || m_DrawName && !name.empty() )
   {
     RenderAnnotations(renderer, name, anchorPoint, globalOpacity, lineDisplayMode, annotationOffset);
   }
@@ -684,26 +687,45 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
                                                     PlanarFigureDisplayMode lineDisplayMode,
                                                     double &annotationOffset )
 {
-  mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-  if ( openGLrenderer )
+//   mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+//   if ( openGLrenderer )
+//   {
+//     openGLrenderer->WriteSimpleText( name,
+//       anchorPoint[0] + 6.0, anchorPoint[1] + 4.0,
+//       0,
+//       0,
+//       0,
+//       globalOpacity ); //this is a shadow
+//
+//     openGLrenderer->WriteSimpleText( name,
+//       anchorPoint[0] + 5.0, anchorPoint[1] + 5.0,
+//        m_LineColor[lineDisplayMode][0],
+//        m_LineColor[lineDisplayMode][1],
+//        m_LineColor[lineDisplayMode][2],
+//       globalOpacity );
+//
+//     // If drawing is successful, add approximate height to annotation offset
+//     annotationOffset -= 15.0;
+//   }
+
+  if ( m_TextOverlay.IsNull() )
   {
-    openGLrenderer->WriteSimpleText( name,
-      anchorPoint[0] + 6.0, anchorPoint[1] + 4.0,
-      0,
-      0,
-      0,
-      globalOpacity ); //this is a shadow
-
-    openGLrenderer->WriteSimpleText( name,
-      anchorPoint[0] + 5.0, anchorPoint[1] + 5.0,
-      m_LineColor[lineDisplayMode][0],
-      m_LineColor[lineDisplayMode][1],
-      m_LineColor[lineDisplayMode][2],
-      globalOpacity );
-
-    // If drawing is successful, add approximate height to annotation offset
-    annotationOffset -= 15.0;
+    m_TextOverlay = mitk::TextOverlay2D::New();
+    m_TextOverlay->SetText( name );
+    m_TextOverlay->SetColor( m_LineColor[lineDisplayMode][0],
+                             m_LineColor[lineDisplayMode][1],
+                             m_LineColor[lineDisplayMode][2] );
+    m_TextOverlay->SetFontSize( 12 );
+    m_TextOverlay->SetBoolProperty( "drawShadow", m_DrawShadow );
+    renderer->GetOverlayManager()->AddOverlay( m_TextOverlay.GetPointer(), renderer );
   }
+
+  mitk::Point2D pos = anchorPoint;
+  pos[0] += 5;
+  pos[1] += 5;
+  m_TextOverlay->SetPosition2D( pos );
+
+
 }
 
 void mitk::PlanarFigureMapper2D::RenderQuantities( mitk::PlanarFigure * planarFigure,

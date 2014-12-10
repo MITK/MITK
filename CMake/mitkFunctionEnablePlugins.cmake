@@ -18,7 +18,7 @@ function(mitkFunctionEnablePlugins)
     message(FATAL_ERROR "Variable 'enabled_plugins' not set in whitelist file '${whitelistFile}'!")
   endif()
 
-  set(plugins)
+  set(plugins "")
 
   foreach(plugin ${${ARGV0}})
     string(FIND ${plugin} ":" index REVERSE)

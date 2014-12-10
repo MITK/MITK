@@ -1,6 +1,7 @@
 
 # Modules must be listed according to their dependencies
 set(module_dirs
+    Overlays
     LegacyIO
     LegacyGL
     DataTypesExt
@@ -23,7 +24,6 @@ set(module_dirs
     PlanarFigureSegmentation
     OpenViewCore
     QmlItems
-    Overlays
     QtWidgets
     QtWidgetsExt
     SegmentationUI

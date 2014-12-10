@@ -35,7 +35,7 @@ namespace mitk {
   It provides getters and setters to all transformation related information. Implementation is hidden and may be
   subject to changes.
   */
-  class MITK_CORE_EXPORT GeometryTransformHolder
+  class GeometryTransformHolder
   {
   private:
     //##Documentation

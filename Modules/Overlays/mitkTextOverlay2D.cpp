@@ -95,4 +95,3 @@ vtkActor2D* mitk::TextOverlay2D::GetVtkActor2D(BaseRenderer *renderer) const
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
   return ls->m_TextActor;
 }
-

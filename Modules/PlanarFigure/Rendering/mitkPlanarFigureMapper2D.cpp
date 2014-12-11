@@ -56,10 +56,10 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
   bool visible = true;
 
-  renderer->GetOverlayManager()->AddOverlay( m_AnnotationOverlay.GetPointer(), renderer );
+  //renderer->GetOverlayManager()->AddOverlay( m_AnnotationOverlay.GetPointer(), renderer );
   m_AnnotationOverlay->SetVisibility( false, renderer );
 
-  renderer->GetOverlayManager()->AddOverlay( m_QuantityOverlay.GetPointer(), renderer );
+  //renderer->GetOverlayManager()->AddOverlay( m_QuantityOverlay.GetPointer(), renderer );
   m_QuantityOverlay->SetVisibility( false, renderer );
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
@@ -711,6 +711,7 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
   pos[1] += 5;
   m_AnnotationOverlay->SetPosition2D( pos );
 
+  m_AnnotationOverlay->Paint( renderer );
 }
 
 void mitk::PlanarFigureMapper2D::RenderQuantities( mitk::PlanarFigure * planarFigure,
@@ -754,6 +755,8 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( mitk::PlanarFigure * planarFi
   pos[1] += 5 + annotationOffset;
   m_QuantityOverlay->SetPosition2D( pos );
   annotationOffset -= m_QuantityOverlay->GetBoundsOnDisplay( renderer ).Size[1];
+
+  m_QuantityOverlay->Paint( renderer );
 
 }
 

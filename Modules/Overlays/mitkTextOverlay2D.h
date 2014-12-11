@@ -52,6 +52,7 @@ public:
   virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const;
   virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds& bounds);
 
+
 protected:
 
   /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
@@ -73,7 +74,6 @@ private:
 
   /** \brief assignment operator */
   TextOverlay2D &operator=(const TextOverlay2D &);
-
 };
 
 } // namespace mitk

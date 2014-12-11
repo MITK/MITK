@@ -39,13 +39,13 @@ mitk::ContourModelGLMapper2DBase::ContourModelGLMapper2DBase()
 
 mitk::ContourModelGLMapper2DBase::~ContourModelGLMapper2DBase()
 {
-  RendererListType::const_iterator iter;
-  for ( iter=m_RendererList.begin(); iter != m_RendererList.end(); ++iter)
-  {
-    (*iter)->GetOverlayManager()->RemoveOverlay( m_PointNumbersOverlay.GetPointer() );
-    (*iter)->GetOverlayManager()->RemoveOverlay( m_ControlPointNumbersOverlay.GetPointer() );
-  }
-  m_RendererList.clear();
+//   RendererListType::const_iterator iter;
+//   for ( iter=m_RendererList.begin(); iter != m_RendererList.end(); ++iter)
+//   {
+//     (*iter)->GetOverlayManager()->RemoveOverlay( m_PointNumbersOverlay.GetPointer() );
+//     (*iter)->GetOverlayManager()->RemoveOverlay( m_ControlPointNumbersOverlay.GetPointer() );
+//   }
+//   m_RendererList.clear();
 }
 
 void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* renderingContour, mitk::BaseRenderer* renderer)

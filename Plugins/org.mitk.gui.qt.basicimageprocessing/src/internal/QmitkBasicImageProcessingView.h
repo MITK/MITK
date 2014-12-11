@@ -112,6 +112,29 @@ public:
 
 private:
 
+  static const QString TR_NO_PARAM;
+  static const QString TR_VARIANCE;
+  static const QString TR_RADIUS;
+  static const QString TR_NEMBER_ITERATIONS;
+  static const QString TR_REGULAR;
+  static const QString TR_GAUSSIAN_KERNEL;
+  static const QString TR_LOWER_THRESHOLD;
+  static const QString TR_UPPER_THRESHOLD;
+  static const QString TR_DOWNSAMPLING;
+  static const QString TR_FLIP;
+  static const QString TR_X_SPACING;
+  static const QString TR_Y_SPACING;
+  static const QString TR_Z_SPACING;
+  static const QString TR_INTERPOLATION;
+  static const QString TR_LOADING_ERROR;
+  static const QString TR_BASIC_IMAGE_PROCESSING;
+  static const QString TR_INIT_ERROR;
+  static const QString TR_SELECT_IMAGE;
+  static const QString TR_NOT_IMAGE;
+  static const QString TR_NO_SUPPORT_2D;
+  static const QString TR_PARAM1;
+  static const QString TR_PARAM2;
+
   /*
   * After a one image operation, reset the "one image ops" panel
   */

@@ -10,4 +10,6 @@ set(CPP_FILES
   mitkGLMapper.cpp
   mitkPointSetGLMapper2D.cpp
   mitkSurfaceGLMapper2D.cpp
+  mitkVtkGLMapperWrapper.cpp
+  vtkGLMapperProp.cpp
 )

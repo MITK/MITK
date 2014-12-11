@@ -79,7 +79,7 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     GetBoolProperty( "drawShadow", drawShadow );
     prop->SetShadow( drawShadow );
 
-    int offset[2] = {21, -21};
+    int offset[2] = {1, -1};
     prop->SetShadowOffset( offset );
 
     ls->m_TextActor->SetInput( GetText().c_str() );

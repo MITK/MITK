@@ -30,8 +30,12 @@ mitk::OverlayManager::~OverlayManager()
 
 void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
 {
-  vtkRenderer*
-  mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertForegroundRenderer(m_Renderer,false);
+  vtkRenderer* forgroundRenderer = m_ForegroundRenderer[renderer];
+  if(!forgroundRenderer)
+  {
+    forgroundRenderer = vtkRenderer::New();
+    mitk::VtkLayerController::GetInstance(renderer->GetRenderWindow())->InsertForegroundRenderer(forgroundRenderer,false);
+  }
   std::pair<BaseRendererSet::iterator,bool> inSet;
   inSet = m_BaseRendererSet.insert(renderer);
   if(inSet.second)

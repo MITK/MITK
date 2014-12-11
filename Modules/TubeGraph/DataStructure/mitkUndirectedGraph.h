@@ -98,7 +98,7 @@ namespace mitk {
     void SetVertex(const VertexDescriptorType& vertex, const VertexType& vertexData);
 
     /**Returns the descriptor if the vertex exist in the graph, otherwise undefined*/
-    VertexDescriptorType GetVertexDescriptor (const VertexType& vertexData);
+    VertexDescriptorType GetVertexDescriptor (const VertexType& vertexData) const;
 
      /** Add a new edge between the given vertices to the graph */
     EdgeDescriptorType AddEdge(const VertexDescriptorType& vertexA, const VertexDescriptorType& vertexB, const EdgeType& edgeData);
@@ -113,7 +113,7 @@ namespace mitk {
     void SetEdge(const EdgeDescriptorType& edge, const EdgeType& edgeData);
 
     /**Returns the descriptor if the edge exist in the graph, otherwise undefined*/
-    EdgeDescriptorType GetEdgeDescriptor (const EdgeType& edgeData);
+    EdgeDescriptorType GetEdgeDescriptor (const EdgeType& edgeData) const;
 
     /** Get parent and target vertex of the given edge*/
     std::pair< VertexType, VertexType > GetVerticesOfAnEdge (const EdgeDescriptorType& edge)const;

@@ -84,7 +84,7 @@ UndirectedGraph< TVertex, TEdge >
 template <class TVertex,class TEdge>
 typename UndirectedGraph<TVertex, TEdge>::VertexDescriptorType
 UndirectedGraph<TVertex, TEdge>
-::GetVertexDescriptor(const typename UndirectedGraph<TVertex, TEdge>::VertexType& vertexData)
+::GetVertexDescriptor(const typename UndirectedGraph<TVertex, TEdge>::VertexType& vertexData) const
 {
  typename UndirectedGraph<TVertex, TEdge>::VertexIteratorType iterator, end;
 
@@ -155,7 +155,7 @@ UndirectedGraph< TVertex, TEdge >
 template <class TVertex,class TEdge>
 typename UndirectedGraph<TVertex, TEdge>::EdgeDescriptorType
 UndirectedGraph<TVertex, TEdge>
-::GetEdgeDescriptor(const typename UndirectedGraph<TVertex, TEdge>::EdgeType& edgeData)
+::GetEdgeDescriptor(const typename UndirectedGraph<TVertex, TEdge>::EdgeType& edgeData) const
 {
   typename UndirectedGraph<TVertex, TEdge>::EdgeIteratorType iterator, end;
   boost::tie(iterator, end) = boost::edges(m_Graph);

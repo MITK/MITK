@@ -608,7 +608,7 @@ void QmitkTubeGraphView::SetTabsEnable(bool enable)
 void QmitkTubeGraphView::UpdateGraphInformation()
 {
   mitk::TubeGraph::TubeDescriptorType root = m_ActiveTubeGraph->GetRootTube();
-  mitk::Geometry3D::Pointer geometry = m_ActiveTubeGraph->GetGeometry();
+  mitk::BaseGeometry::Pointer geometry = m_ActiveTubeGraph->GetGeometry();
   mitk::Point3D origin = geometry->GetOrigin();
   mitk::Vector3D spacing = geometry->GetSpacing();
   QString information;

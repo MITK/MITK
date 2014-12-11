@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtPlugin>
 
 #include "src/internal/QmitkTubeGraphView.h"
-#include "src/internal/QmitkTubeGraphConverterView.h"
-
 
 namespace mitk
 {

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkTubeGraphExports.h"
 
-#include "mitkVector.h"
+#include "mitkPoint.h"
 
 namespace mitk {
   /**

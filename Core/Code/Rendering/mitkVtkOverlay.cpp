@@ -65,3 +65,8 @@ void mitk::VtkOverlay::RemoveFromBaseRenderer(mitk::BaseRenderer *renderer)
     renderer->GetVtkRenderer()->RemoveViewProp(vtkProp);
   }
 }
+
+void mitk::VtkOverlay::Paint( BaseRenderer* renderer )
+{
+  GetVtkProp( renderer )->RenderOverlay( renderer->GetVtkRenderer() );
+}

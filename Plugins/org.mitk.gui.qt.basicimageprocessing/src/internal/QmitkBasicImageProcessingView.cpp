@@ -140,6 +140,30 @@ typedef itk::LinearInterpolateImageFunction< ImageType, double >                
 typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double >               NearestInterpolatorType;
 
 
+const QString QmitkBasicImageProcessing::TR_NO_PARAM = QLabel::tr("No Parameters");
+const QString QmitkBasicImageProcessing::TR_VARIANCE = QLabel::tr("Variance");
+const QString QmitkBasicImageProcessing::TR_RADIUS = QLabel::tr("Radius");
+const QString QmitkBasicImageProcessing::TR_NEMBER_ITERATIONS = QLabel::tr("Number Iterations:");
+const QString QmitkBasicImageProcessing::TR_REGULAR = QLabel::tr("Regularization\n(Lambda/1000):");
+const QString QmitkBasicImageProcessing::TR_GAUSSIAN_KERNEL = QLabel::tr("Sigma of Gaussian Kernel:\n(in Image Spacing Units)");
+const QString QmitkBasicImageProcessing::TR_LOWER_THRESHOLD = QLabel::tr("Lower threshold:");
+const QString QmitkBasicImageProcessing::TR_UPPER_THRESHOLD = QLabel::tr("Upper threshold:");
+const QString QmitkBasicImageProcessing::TR_DOWNSAMPLING = QLabel::tr("Downsampling by Factor:");
+const QString QmitkBasicImageProcessing::TR_FLIP = QLabel::tr("Flip across axis:");
+const QString QmitkBasicImageProcessing::TR_X_SPACING = QLabel::tr("x-spacing:");
+const QString QmitkBasicImageProcessing::TR_Y_SPACING = QLabel::tr("y-spacing:");
+const QString QmitkBasicImageProcessing::TR_Z_SPACING = QLabel::tr("z-spacing:");
+const QString QmitkBasicImageProcessing::TR_INTERPOLATION = QLabel::tr("Interpolation:");
+const QString QmitkBasicImageProcessing::TR_LOADING_ERROR = QLabel::tr("An error occured during image loading:\n");
+const QString QmitkBasicImageProcessing::TR_BASIC_IMAGE_PROCESSING = QLabel::tr("Basic Image Processing");
+const QString QmitkBasicImageProcessing::TR_INIT_ERROR = QLabel::tr("Input image is broken or not initialized. Returning.");
+const QString QmitkBasicImageProcessing::TR_SELECT_IMAGE = QLabel::tr("Select an Image in Data Manager");
+const QString QmitkBasicImageProcessing::TR_NOT_IMAGE = QLabel::tr("Not an image.");
+const QString QmitkBasicImageProcessing::TR_NO_SUPPORT_2D = QLabel::tr("2D images are not supported.");
+const QString QmitkBasicImageProcessing::TR_PARAM1 = QLabel::tr("Param1");
+const QString QmitkBasicImageProcessing::TR_PARAM2 = QLabel::tr("Param2");
+
+
 QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 : QmitkAbstractView(),
   m_Controls(NULL),
@@ -267,7 +291,7 @@ void QmitkBasicImageProcessing::OnSelectionChanged(berry::IWorkbenchPart::Pointe
   // reset GUI
 //  this->ResetOneImageOpPanel();
   m_Controls->sliceNavigatorTime->setEnabled(false);
-  m_Controls->leImage1->setText("Select an Image in Data Manager");
+  m_Controls->leImage1->setText(TR_SELECT_IMAGE);
   m_Controls->tlWhat1->setEnabled(false);
   m_Controls->cbWhat1->setEnabled(false);
   m_Controls->tlWhat2->setEnabled(false);
@@ -283,14 +307,14 @@ void QmitkBasicImageProcessing::OnSelectionChanged(berry::IWorkbenchPart::Pointe
     //no image
     if( tempImage.IsNull() || (tempImage->IsInitialized() == false) )
     {
-      m_Controls->leImage1->setText("Not an image.");
+      m_Controls->leImage1->setText(TR_NOT_IMAGE);
       return;
     }
 
     //2D image
     if( tempImage->GetDimension() < 3)
     {
-      m_Controls->leImage1->setText("2D images are not supported.");
+      m_Controls->leImage1->setText(TR_NO_SUPPORT_2D);
       return;
     }
 
@@ -329,8 +353,8 @@ void QmitkBasicImageProcessing::ChangeGUI()
 
 void QmitkBasicImageProcessing::ResetOneImageOpPanel()
 {
-  m_Controls->tlParam1->setText("Param1");
-  m_Controls->tlParam2->setText("Param2");
+  m_Controls->tlParam1->setText(TR_PARAM1);
+  m_Controls->tlParam2->setText(TR_PARAM2);
 
   m_Controls->cbWhat1->setCurrentIndex(0);
 
@@ -391,10 +415,10 @@ void QmitkBasicImageProcessing::SelectAction(int action)
   m_Controls->btnDoIt->setEnabled(false);
   m_Controls->cbHideOrig->setEnabled(false);
 
-  QString text1 = "No Parameters";
-  QString text2 = "No Parameters";
-  QString text3 = "No Parameters";
-  QString text4 = "No Parameters";
+  QString text1 = TR_NO_PARAM;
+  QString text2 = TR_NO_PARAM;
+  QString text3 = TR_NO_PARAM;
+  QString text4 = TR_NO_PARAM;
 
   if (action != 19)
   {
@@ -416,6 +440,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
     {
       m_SelectedAction = GAUSSIAN;
       m_Controls->tlParam1->setEnabled(true);
+
       m_Controls->sbParam1->hide();
       m_Controls->dsbParam1->show();
       m_Controls->dsbParam1->setEnabled(true);
@@ -434,7 +459,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_SelectedAction = MEDIAN;
       m_Controls->tlParam1->setEnabled(true);
       m_Controls->sbParam1->setEnabled(true);
-      text1 = "&Radius:";
+      text1 = TR_RADIUS;
       m_Controls->sbParam1->setMinimum( 0 );
       m_Controls->sbParam1->setMaximum( 200 );
       m_Controls->sbParam1->setValue( 3 );
@@ -448,8 +473,8 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->sbParam1->setEnabled(true);
       m_Controls->tlParam2->setEnabled(true);
       m_Controls->sbParam2->setEnabled(true);
-      text1 = "Number Iterations:";
-      text2 = "Regularization\n(Lambda/1000):";
+      text1 = TR_NEMBER_ITERATIONS;
+      text2 = TR_REGULAR;
       m_Controls->sbParam1->setMinimum( 1 );
       m_Controls->sbParam1->setMaximum( 1000 );
       m_Controls->sbParam1->setValue( 40 );
@@ -464,7 +489,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_SelectedAction = DILATION;
       m_Controls->tlParam1->setEnabled(true);
       m_Controls->sbParam1->setEnabled(true);
-      text1 = "&Radius:";
+      text1 = TR_RADIUS;
       m_Controls->sbParam1->setMinimum( 0 );
       m_Controls->sbParam1->setMaximum( 200 );
       m_Controls->sbParam1->setValue( 3 );
@@ -476,7 +501,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_SelectedAction = EROSION;
       m_Controls->tlParam1->setEnabled(true);
       m_Controls->sbParam1->setEnabled(true);
-      text1 = "&Radius:";
+      text1 = TR_RADIUS;
       m_Controls->sbParam1->setMinimum( 0 );
       m_Controls->sbParam1->setMaximum( 200 );
       m_Controls->sbParam1->setValue( 3 );
@@ -488,7 +513,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_SelectedAction = OPENING;
       m_Controls->tlParam1->setEnabled(true);
       m_Controls->sbParam1->setEnabled(true);
-      text1 = "&Radius:";
+      text1 = TR_RADIUS;
       m_Controls->sbParam1->setMinimum( 0 );
       m_Controls->sbParam1->setMaximum( 200 );
       m_Controls->sbParam1->setValue( 3 );
@@ -500,7 +525,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_SelectedAction = CLOSING;
       m_Controls->tlParam1->setEnabled(true);
       m_Controls->sbParam1->setEnabled(true);
-      text1 = "&Radius:";
+      text1 = TR_RADIUS;
       m_Controls->sbParam1->setMinimum( 0 );
       m_Controls->sbParam1->setMaximum( 200 );
       m_Controls->sbParam1->setValue( 3 );
@@ -511,6 +536,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
     {
       m_SelectedAction = GRADIENT;
       m_Controls->tlParam1->setEnabled(true);
+
       m_Controls->sbParam1->hide();
       m_Controls->dsbParam1->show();
       m_Controls->dsbParam1->setEnabled(true);
@@ -521,6 +547,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->dsbParam1->setMinimum( 0 );
       m_Controls->dsbParam1->setMaximum( 200 );
       m_Controls->dsbParam1->setValue( 2 );
+
       break;
     }
 
@@ -543,8 +570,8 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->sbParam1->setEnabled(true);
       m_Controls->tlParam2->setEnabled(true);
       m_Controls->sbParam2->setEnabled(true);
-      text1 = "Lower threshold:";
-      text2 = "Upper threshold:";
+      text1 = TR_LOWER_THRESHOLD;
+      text2 = TR_UPPER_THRESHOLD;
       m_Controls->sbParam1->setMinimum( -100000 );
       m_Controls->sbParam1->setMaximum( 100000 );
       m_Controls->sbParam1->setValue( 0 );
@@ -565,7 +592,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_SelectedAction = DOWNSAMPLING;
       m_Controls->tlParam1->setEnabled(true);
       m_Controls->sbParam1->setEnabled(true);
-      text1 = "Downsampling by Factor:";
+      text1 = TR_DOWNSAMPLING;
       m_Controls->sbParam1->setMinimum( 1 );
       m_Controls->sbParam1->setMaximum( 100 );
       m_Controls->sbParam1->setValue( 2 );
@@ -577,7 +604,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_SelectedAction = FLIPPING;
       m_Controls->tlParam1->setEnabled(true);
       m_Controls->sbParam1->setEnabled(true);
-      text1 = "Flip across axis:";
+      text1 = TR_FLIP;
       m_Controls->sbParam1->setMinimum( 0 );
       m_Controls->sbParam1->setMaximum( 2 );
       m_Controls->sbParam1->setValue( 1 );
@@ -619,10 +646,10 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->dsbParam3->setSingleStep(0.1);
       m_Controls->dsbParam3->setValue(1.5);
 
-      text1 = "x-spacing:";
-      text2 = "y-spacing:";
-      text3 = "z-spacing:";
-      text4 = "Interplation:";
+      text1 = TR_X_SPACING;
+      text2 = TR_Y_SPACING;
+      text3 = TR_Z_SPACING;
+      text4 = TR_INTERPOLATION;
       break;
     }
 
@@ -679,9 +706,9 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   }
   catch ( std::exception &e )
   {
-  QString exceptionString = "An error occured during image loading:\n";
-  exceptionString.append( e.what() );
-    QMessageBox::warning( NULL, "Basic Image Processing", exceptionString , QMessageBox::Ok, QMessageBox::NoButton );
+    QString exceptionString = TR_LOADING_ERROR;
+    exceptionString.append( e.what() );
+    QMessageBox::warning( NULL, TR_BASIC_IMAGE_PROCESSING, exceptionString , QMessageBox::Ok, QMessageBox::NoButton );
     this->BusyCursorOff();
     return;
   }
@@ -691,7 +718,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   {
     this->BusyCursorOff();
 
-    QMessageBox::warning( NULL, "Basic Image Processing", "Input image is broken or not initialized. Returning.", QMessageBox::Ok, QMessageBox::NoButton );
+    QMessageBox::warning( NULL, TR_BASIC_IMAGE_PROCESSING, TR_INIT_ERROR, QMessageBox::Ok, QMessageBox::NoButton );
     return;
   }
 

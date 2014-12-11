@@ -23,7 +23,7 @@ namespace berry
 {
 
 // TODO ism temporary translate
-// it hart to find point, when plugin name read from file
+// it is hard to find point, where plugin name is read from file
 
 const QString QtShowViewAction::plugingTranslateNames[] = { 
   QAction::tr("BasicImageProcessing"),   

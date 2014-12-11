@@ -199,7 +199,7 @@ set(_ctk_plugins_include_dirs
   ${Poco_INCLUDE_DIRS}
 )
 
-include_directories(${_ctk_plugins_include_dirs})
+include_directories(SYSTEM ${_ctk_plugins_include_dirs})
 
 if(BLUEBERRY_BUILD_TESTING)
   find_package(CppUnit REQUIRED)

@@ -1,2 +1,2 @@
 include(ModuleList.cmake)
-mitkFunctionEnableModules(mitk_modules)
+mitkFunctionWhitelistModules(MITK mitk_modules)

@@ -112,7 +112,7 @@ us::ServiceReferenceU QmitkServiceListWidget::GetSelectedServiceReference(){
 std::vector<us::ServiceReferenceU>  QmitkServiceListWidget::GetAllServiceReferences()
 {
   std::vector<us::ServiceReferenceU> result;
-  for (int i = 0; i < m_ListContent.size(); i++){
+  for (size_t i = 0; i < m_ListContent.size(); i++){
     result.push_back(m_ListContent[i].service);
   }
   return result;

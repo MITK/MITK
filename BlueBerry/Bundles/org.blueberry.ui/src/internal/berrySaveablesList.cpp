@@ -305,9 +305,9 @@ void SaveablesList::HandleLifecycleEvent(SaveablesLifecycleEvent::Pointer event)
   else if (eventType == SaveablesLifecycleEvent::DIRTY_CHANGED)
   {
     Object::Pointer source(this);
-    SaveablesLifecycleEvent::Pointer event(
+    SaveablesLifecycleEvent::Pointer lifeCycleEvent(
       new SaveablesLifecycleEvent(source, event->GetEventType(), event->GetSaveables(), false));
-    this->FireModelLifecycleEvent(event);
+    this->FireModelLifecycleEvent(lifeCycleEvent);
   }
 }
 

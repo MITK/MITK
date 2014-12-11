@@ -50,7 +50,7 @@ private:
   {
     try
     {
-      dynamic_cast<const OperationCanceledException&> (e);
+      static_cast<void>(dynamic_cast<const OperationCanceledException&> (e));
     } catch (const std::bad_cast&)
     {
       // TODO logging

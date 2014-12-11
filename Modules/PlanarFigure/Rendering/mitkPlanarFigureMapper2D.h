@@ -302,7 +302,9 @@ private:
   // Bool flag that indicates if a node modified observer was added
   bool m_NodeModifiedObserverAdded;
 
-  itk::SmartPointer<mitk::TextOverlay2D> m_TextOverlay;
+  itk::SmartPointer<mitk::TextOverlay2D> m_AnnotationOverlay;
+  itk::SmartPointer<mitk::TextOverlay2D> m_QuantityOverlay;
+
 };
 
 } // namespace mitk

@@ -374,6 +374,9 @@ public:
   /** \brief Removes the overlay from the specified renderer. It is not visible anymore then.*/
   virtual void RemoveFromBaseRenderer(BaseRenderer *renderer) = 0;
 
+  /** \brief Removes the overlay from the specified renderer. It is not visible anymore then.*/
+  virtual void RemoveFromRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer){}
+
   /** \brief Applies all properties and should be called before the rendering procedure.*/
   virtual void Update(BaseRenderer *renderer) = 0;
 
@@ -382,6 +385,10 @@ public:
 
   /** \brief Sets position and size of the overlay on the display.*/
   virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds&);
+
+  void SetForceInForeground(bool forceForeground);
+
+  bool IsForceInForeground() const;
 
   mitkClassMacro(Overlay, itk::Object);
 
@@ -412,6 +419,9 @@ protected:
   itk::TimeStamp m_DataReferenceChangedTime;
 
 private:
+
+  /** \brief render this overlay on a foreground renderer */
+  bool m_ForceInForeground;
 
   /** \brief copy constructor */
   Overlay( const Overlay &);

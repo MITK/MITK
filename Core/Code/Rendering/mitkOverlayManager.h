@@ -45,8 +45,8 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  void AddOverlay(const Overlay::Pointer& overlay);
-  void AddOverlay(const Overlay::Pointer& overlay, BaseRenderer* renderer);
+  void AddOverlay(const Overlay::Pointer& overlay, bool ForceInForeground = true);
+  void AddOverlay(const Overlay::Pointer& overlay, BaseRenderer* renderer, bool ForceInForeground = true);
   void RemoveOverlay(const Overlay::Pointer& overlay);
 
   /** \brief Clears the manager of all Overlays.*/
@@ -70,6 +70,9 @@ public:
   void UpdateOverlays(BaseRenderer *baseRenderer);
 
   void RemoveBaseRenderer(mitk::BaseRenderer *renderer);
+
+  void RemoveAllBaseRenderers();
+
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */

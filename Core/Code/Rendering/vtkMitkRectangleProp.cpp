@@ -53,12 +53,10 @@ vtkMitkRectangleProp::~vtkMitkRectangleProp()
 
 int vtkMitkRectangleProp::RenderOverlay(vtkViewport* viewport)
 {
-//  m_RenderWindow->MakeCurrent();
-
   double right = m_RenderWindow->GetSize()[0];
   double top = m_RenderWindow->GetSize()[1];
-  double bottom = 1.0;
-  double left = 1.0;
+  double bottom = 0.5;
+  double left = 0.5;
   double defaultDepth = 0.0;
 
   vtkSmartPointer<vtkPoints> points = m_PolyData->GetPoints();
@@ -81,8 +79,8 @@ void vtkMitkRectangleProp::CreateRectangle()
   vtkSmartPointer<vtkPoints> points = m_PolyData->GetPoints();
   vtkSmartPointer<vtkCellArray> lines = m_PolyData->GetLines();
 
-  double bottom = 1.0;
-  double left = 1.0;
+  double bottom = 0.5;
+  double left = 0.5;
   double right = 199.0;
   double top = 199.0;
   double defaultDepth = 0.0;

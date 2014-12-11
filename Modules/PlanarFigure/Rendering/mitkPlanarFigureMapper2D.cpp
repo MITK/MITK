@@ -146,7 +146,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
   // draw name near the anchor point (point located on the right)
   std::string name = node->GetName();
-  if ( true || m_DrawName && !name.empty() )
+  if ( true || (m_DrawName && !name.empty()) )
   {
     RenderAnnotations(renderer, name, anchorPoint, globalOpacity, lineDisplayMode, annotationOffset);
   }

@@ -206,7 +206,7 @@ if(BLUEBERRY_BUILD_TESTING)
   include(berryTestingHelpers)
 
   set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}")
-  get_target_property(_is_macosx_bundle ${OSGI_APP} MACOSX_BUNDLE)
+  # get_target_property(_is_macosx_bundle ${OSGI_APP} MACOSX_BUNDLE)
   if(APPLE AND _is_macosx_bundle)
     set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.app/Contents/MacOS/${OSGI_APP}")
   endif()

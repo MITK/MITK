@@ -76,6 +76,8 @@ void QCHPluginListener::pluginChanged(const ctkPluginEvent& event)
     case ctkPluginEvent::UNRESOLVED :
       removePlugin(plugin);
       break;
+    default:
+      break;
   }
 }
 

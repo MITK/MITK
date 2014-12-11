@@ -65,6 +65,9 @@ endfunction()
 #! The function mitkFunctionCreateWhitelistPaths must be called
 #! with the same <prefix> prior to this function.
 #!
+#! Whitelists are *.cmake files which set the two list variables
+#! enabled_modules and enabled_plugins.
+#!
 #! List of variables available after the function is called:
 #! - <prefix>_WHITELIST
 #!

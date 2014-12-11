@@ -78,12 +78,9 @@ void QmitkIGTLStreamingManagementWidget::CreateConnections()
              SLOT(SourceSelected(mitk::IGTLMessageSource::Pointer)) );
     connect( m_Controls->startStreamPushButton, SIGNAL(clicked()),
              this, SLOT(OnStartStreaming()));
+    connect( m_Controls->stopStreamPushButton, SIGNAL(clicked()),
+             this, SLOT(OnStopStreaming()));
   }
-}
-
-void QmitkIGTLStreamingManagementWidget::OnDeviceStateChanged()
-{
-  this->AdaptGUIToState();
 }
 
 void QmitkIGTLStreamingManagementWidget::AdaptGUIToState()
@@ -108,10 +105,12 @@ void QmitkIGTLStreamingManagementWidget::AdaptGUIToState()
         m_Controls->fpsSpinBox->setEnabled(false);
         break;
       case mitk::IGTLDevice::Running:
-        //check if the user already selected a source to stream
-        if ( this->m_IGTLMsgSource.IsNull() ) // he did not so far
+        //check the number of connections of the device, a server can be in
+        //the running state even if there is no connected device, this part of
+        //the GUI shall just be available when there is a connection
+        if ( this->m_IGTLDevice->GetNumberOfConnections() == 0 )
         {
-          m_Controls->messageSourceSelectionWidget->setEnabled(true);
+          m_Controls->messageSourceSelectionWidget->setEnabled(false);
           m_Controls->selectedSourceLabel->setText("<none>");
           m_Controls->startStreamPushButton->setEnabled(false);
           m_Controls->selectedSourceLabel->setEnabled(false);
@@ -120,20 +119,45 @@ void QmitkIGTLStreamingManagementWidget::AdaptGUIToState()
           m_Controls->fpsLabel->setEnabled(false);
           m_Controls->fpsSpinBox->setEnabled(false);
         }
-        else //user already selected a source
+        else //there is a connection
         {
-          QString nameOfSource =
-              QString::fromStdString(m_IGTLMsgSource->GetName());
-          m_Controls->messageSourceSelectionWidget->setEnabled(true);
-          m_Controls->selectedSourceLabel->setText(nameOfSource);
-          m_Controls->startStreamPushButton->setEnabled(true);
-          m_Controls->selectedSourceLabel->setEnabled(true);
-          m_Controls->label->setEnabled(true);
-          m_Controls->stopStreamPushButton->setEnabled(false);
-          m_Controls->fpsLabel->setEnabled(true);
-          m_Controls->fpsSpinBox->setEnabled(true);
-          //check here if the current source is already streaming if yes adapt
-          //the send and stop button
+          //check if the user already selected a source to stream
+          if ( this->m_IGTLMsgSource.IsNull() ) // he did not so far
+          {
+            m_Controls->messageSourceSelectionWidget->setEnabled(true);
+            m_Controls->selectedSourceLabel->setText("<none>");
+            m_Controls->startStreamPushButton->setEnabled(false);
+            m_Controls->selectedSourceLabel->setEnabled(false);
+            m_Controls->label->setEnabled(false);
+            m_Controls->stopStreamPushButton->setEnabled(false);
+            m_Controls->fpsLabel->setEnabled(false);
+            m_Controls->fpsSpinBox->setEnabled(false);
+          }
+          else //user already selected a source
+          {
+            QString nameOfSource =
+                QString::fromStdString(m_IGTLMsgSource->GetName());
+            m_Controls->messageSourceSelectionWidget->setEnabled(true);
+            m_Controls->selectedSourceLabel->setText(nameOfSource);
+            m_Controls->selectedSourceLabel->setEnabled(true);
+            m_Controls->label->setEnabled(true);
+
+            //check if the streaming is already running
+            if (this->m_IGTLMsgProvider->IsStreaming())
+            {
+              m_Controls->startStreamPushButton->setEnabled(false);
+              m_Controls->stopStreamPushButton->setEnabled(true);
+              m_Controls->fpsLabel->setEnabled(false);
+              m_Controls->fpsSpinBox->setEnabled(false);
+            }
+            else
+            {
+              m_Controls->startStreamPushButton->setEnabled(true);
+              m_Controls->stopStreamPushButton->setEnabled(false);
+              m_Controls->fpsLabel->setEnabled(true);
+              m_Controls->fpsSpinBox->setEnabled(true);
+            }
+          }
         }
         break;
       default:
@@ -156,15 +180,15 @@ void QmitkIGTLStreamingManagementWidget::LoadSource(
   if ( provider.IsNull() )
     return;
 
-//  //reset the observers
-//  if ( this->m_IGTLDevice.IsNotNull() )
-//  {
+  //reset the observers
+  if ( this->m_IGTLDevice.IsNotNull() )
+  {
 //    this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
 //    this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
-//    this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
-//    this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
-//    this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
-//  }
+    this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
+    this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
+    this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
+  }
 
 
     this->m_IGTLMsgProvider = provider;
@@ -183,7 +207,7 @@ void QmitkIGTLStreamingManagementWidget::LoadSource(
       m_IsClient = true;
     }
 
-//    typedef itk::SimpleMemberCommand< QmitkIGTLStreamingManagementWidget > CurCommandType;
+    typedef itk::SimpleMemberCommand< QmitkIGTLStreamingManagementWidget > CurCommandType;
 //    CurCommandType::Pointer messageReceivedCommand = CurCommandType::New();
 //    messageReceivedCommand->SetCallbackFunction(
 //      this, &QmitkIGTLStreamingManagementWidget::OnMessageReceived );
@@ -196,23 +220,23 @@ void QmitkIGTLStreamingManagementWidget::LoadSource(
 //    this->m_CommandReceivedObserverTag =
 //        this->m_IGTLDevice->AddObserver(mitk::CommandReceivedEvent(), commandReceivedCommand);
 
-//    CurCommandType::Pointer connectionLostCommand = CurCommandType::New();
-//    connectionLostCommand->SetCallbackFunction(
-//      this, &QmitkIGTLStreamingManagementWidget::OnLostConnection );
-//    this->m_LostConnectionObserverTag = this->m_IGTLDevice->AddObserver(
-//          mitk::LostConnectionEvent(), connectionLostCommand);
+    CurCommandType::Pointer connectionLostCommand = CurCommandType::New();
+    connectionLostCommand->SetCallbackFunction(
+      this, &QmitkIGTLStreamingManagementWidget::OnLostConnection );
+    this->m_LostConnectionObserverTag = this->m_IGTLDevice->AddObserver(
+          mitk::LostConnectionEvent(), connectionLostCommand);
 
-//    CurCommandType::Pointer newConnectionCommand = CurCommandType::New();
-//    newConnectionCommand->SetCallbackFunction(
-//      this, &QmitkIGTLStreamingManagementWidget::OnNewConnection );
-//    this->m_NewConnectionObserverTag = this->m_IGTLDevice->AddObserver(
-//          mitk::NewClientConnectionEvent(), newConnectionCommand);
+    CurCommandType::Pointer newConnectionCommand = CurCommandType::New();
+    newConnectionCommand->SetCallbackFunction(
+      this, &QmitkIGTLStreamingManagementWidget::OnNewConnection );
+    this->m_NewConnectionObserverTag = this->m_IGTLDevice->AddObserver(
+          mitk::NewClientConnectionEvent(), newConnectionCommand);
 
-//    CurCommandType::Pointer stateModifiedCommand = CurCommandType::New();
-//    stateModifiedCommand->SetCallbackFunction(
-//      this, &QmitkIGTLStreamingManagementWidget::OnDeviceStateChanged );
-//    this->m_StateModifiedObserverTag = this->m_IGTLDevice->AddObserver(
-//          itk::ModifiedEvent(), stateModifiedCommand);
+    CurCommandType::Pointer stateModifiedCommand = CurCommandType::New();
+    stateModifiedCommand->SetCallbackFunction(
+      this, &QmitkIGTLStreamingManagementWidget::OnDeviceStateChanged );
+    this->m_StateModifiedObserverTag = this->m_IGTLDevice->AddObserver(
+          itk::ModifiedEvent(), stateModifiedCommand);
 
   this->AdaptGUIToState();
 }
@@ -243,98 +267,41 @@ void QmitkIGTLStreamingManagementWidget::SourceSelected(
   this->AdaptGUIToState();
 }
 
-
 void QmitkIGTLStreamingManagementWidget::OnStartStreaming()
 {
   unsigned int fps = this->m_Controls->fpsSpinBox->value();
   this->m_IGTLMsgProvider->StartStreamingOfSource(this->m_IGTLMsgSource, fps);
+  this->AdaptGUIToState();
+}
+
+void QmitkIGTLStreamingManagementWidget::OnStopStreaming()
+{
+  this->m_IGTLMsgProvider->StopStreamingOfSource(this->m_IGTLMsgSource);
+  this->AdaptGUIToState();
 }
 
 void QmitkIGTLStreamingManagementWidget::OnMessageReceived()
 {
-//  //get the IGTL device that invoked this event
-//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
-
-//  if ( this->m_Controls->logSendReceiveMsg->isChecked() )
-//  {
-//    MITK_INFO("IGTLDeviceSourceManagementWidget") << "Received a message: "
-//        << dev->GetReceiveQueue()->GetLatestMsgInformationString();
-//  }
 }
 
 void QmitkIGTLStreamingManagementWidget::OnCommandReceived()
 {
-//  //get the IGTL device that invoked this event
-//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
+}
 
-//  if ( this->m_Controls->logSendReceiveMsg->isChecked() )
-//  {
-//    MITK_INFO("IGTLDeviceSourceManagementWidget") << "Received a command: "
-//        << dev->GetCommandQueue()->GetLatestMsgInformationString();
-//  }
+void QmitkIGTLStreamingManagementWidget::OnDeviceStateChanged()
+{
+  this->AdaptGUIToState();
 }
 
 void QmitkIGTLStreamingManagementWidget::OnLostConnection()
 {
   this->AdaptGUIToState();
-//  //get the IGTL device that invoked this event
-//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
-
-//  unsigned int numConnections = dev->GetNumberOfConnections();
-
-//  if ( numConnections == 0 )
-//  {
-//    if ( this->m_IsClient )
-//    {
-//      //Setup connection groupbox
-//      m_Controls->editIP->setEnabled(true);
-//      m_Controls->editPort->setEnabled(true);
-//      m_Controls->butConnect->setText("Connect");
-//      m_Controls->logSendReceiveMsg->setEnabled(false);
-//      m_Controls->bufferMsgCheckBox->setEnabled(false);
-//      //send string messages groupbox
-//      m_Controls->editSend->setEnabled(false);
-//      m_Controls->butSend->setEnabled(false);
-//      //send command messages groupbox
-//      m_Controls->butSendCommand->setEnabled(false);
-//      m_Controls->fpsSpinBox->setEnabled(false);
-//      m_Controls->commandsComboBox->setEnabled(false);
-//    }
-//    else
-//    {
-//      //send string messages groupbox
-//      m_Controls->editSend->setEnabled(false);
-//      m_Controls->butSend->setEnabled(false);
-//      //send command messages groupbox
-//      m_Controls->butSendCommand->setEnabled(false);
-//      m_Controls->fpsSpinBox->setEnabled(false);
-//      m_Controls->commandsComboBox->setEnabled(false);
-//    }
-//  }
 }
 
 void QmitkIGTLStreamingManagementWidget::OnNewConnection()
 {
-  this->AdaptGUIToState();
-//  //get the IGTL device that invoked this event
-//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
-
-//  unsigned int numConnections = dev->GetNumberOfConnections();
-
-//  if ( numConnections != 0 )
-//  {
-//    //Setup connection groupbox
-//    m_Controls->editIP->setEnabled(false);
-//    m_Controls->editPort->setEnabled(false);
-//    m_Controls->butConnect->setText("Disconnect");
-//    m_Controls->logSendReceiveMsg->setEnabled(true);
-//    m_Controls->bufferMsgCheckBox->setEnabled(true);
-//    //send string messages groupbox
-//    m_Controls->editSend->setEnabled(true);
-//    m_Controls->butSend->setEnabled(true);
-//    //send command messages groupbox
-//    m_Controls->butSendCommand->setEnabled(true);
-////      m_Controls->fpsSpinBox->setEnabled(false);
-//    m_Controls->commandsComboBox->setEnabled(true);
-//  }
+  //get the current selection and call SourceSelected which will call AdaptGUI
+  mitk::IGTLMessageSource::Pointer curSelSrc =
+      m_Controls->messageSourceSelectionWidget->GetSelectedIGTLMessageSource();
+  SourceSelected(curSelSrc);
 }

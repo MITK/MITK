@@ -121,10 +121,13 @@ void mitk::IGTLServer::Receive()
       MITK_WARN("IGTLServer") << "Lost connection to a client socket. ";
     }
   }
-  //remove the sockets that are not connected anymore
-  this->StopCommunicationWithSocket(socketsToBeRemoved);
-  //inform observers about loosing the connection to these sockets
-  this->InvokeEvent(LostConnectionEvent());
+  if ( socketsToBeRemoved.size() > 0 )
+  {
+    //remove the sockets that are not connected anymore
+    this->StopCommunicationWithSocket(socketsToBeRemoved);
+    //inform observers about loosing the connection to these sockets
+    this->InvokeEvent(LostConnectionEvent());
+  }
 }
 
 void mitk::IGTLServer::Send()

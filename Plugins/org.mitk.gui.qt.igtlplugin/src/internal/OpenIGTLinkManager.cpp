@@ -47,10 +47,10 @@ void OpenIGTLinkManager::CreateQtPartControl( QWidget *parent )
   m_Controls.setupUi( parent );
 
   // create GUI widgets from the Qt Designer's .ui file
-  connect( (QObject*)(m_Controls.m_SourceManagerWidget),
-           SIGNAL(NewSourceAdded(mitk::IGTLDeviceSource::Pointer, std::string)),
-           this,
-           SLOT(NewSourceByWidget(mitk::IGTLDeviceSource::Pointer,std::string)) );
+//  connect( (QObject*)(m_Controls.m_SourceManagerWidget),
+//           SIGNAL(NewSourceAdded(mitk::IGTLDeviceSource::Pointer, std::string)),
+//           this,
+//           SLOT(NewSourceByWidget(mitk::IGTLDeviceSource::Pointer,std::string)) );
   connect( (QObject*)(m_Controls.m_SourceListWidget),
            SIGNAL(IGTLDeviceSourceSelected(mitk::IGTLDeviceSource::Pointer)),
            this,

@@ -46,6 +46,7 @@ mitk::IGTLMessageProvider::IGTLMessageProvider()
   m_StreamingTimeMutex = itk::FastMutexLock::New();
   m_StopStreamingThreadMutex = itk::FastMutexLock::New();
   m_ThreadId = 0;
+  m_IsStreaming = false;
 }
 
 mitk::IGTLMessageProvider::~IGTLMessageProvider()
@@ -206,6 +207,11 @@ void mitk::IGTLMessageProvider::OnIncomingCommand()
   }
 }
 
+bool mitk::IGTLMessageProvider::IsStreaming()
+{
+  return m_IsStreaming;
+}
+
 void mitk::IGTLMessageProvider::StartStreamingOfSource(IGTLMessageSource* src,
                                                        unsigned int fps)
 {
@@ -214,7 +220,7 @@ void mitk::IGTLMessageProvider::StartStreamingOfSource(IGTLMessageSource* src,
 
   //so far the provider allows the streaming of a single source only
   //if the streaming thread is already running return a RTS message
-  if ( this->m_ThreadId == 0 )
+  if ( !m_IsStreaming )
   {
     //if it is a stream establish a connection between the provider and the
     //source
@@ -237,6 +243,7 @@ void mitk::IGTLMessageProvider::StartStreamingOfSource(IGTLMessageSource* src,
     // has to be executed from the main thread. Thus, we use the
     // callbackfromGUIThread class to pass the execution to the main thread
     this->m_ThreadId = m_MultiThreader->SpawnThread(this->TimerThread, this);
+    this->m_IsStreaming = true;
   }
   else
   {
@@ -252,6 +259,9 @@ void mitk::IGTLMessageProvider::StopStreamingOfSource(IGTLMessageSource* src)
   this->m_StopStreamingThreadMutex->Lock();
   this->m_StopStreamingThread = true;
   this->m_StopStreamingThreadMutex->Unlock();
+
+  //does this flag needs a mutex???
+  this->m_IsStreaming = false;
 }
 
 mitk::IGTLMessageSource::Pointer mitk::IGTLMessageProvider::GetFittingSource(const char* requestedType)

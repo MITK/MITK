@@ -96,6 +96,9 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   m_NavDataToIGTLMsgFilter->SetOperationMode(
         mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);
 
+  //set the name of this filter to identify it easier
+  m_NavDataToIGTLMsgFilter->SetName("Tracking Data Source From Example");
+
   //register this filter as micro service. The message provider looks for
   //provided IGTLMessageSources, once it found this microservice and someone
   //requested this data type then the provider will connect with this filter

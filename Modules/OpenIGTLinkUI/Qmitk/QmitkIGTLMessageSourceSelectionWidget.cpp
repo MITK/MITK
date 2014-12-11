@@ -26,6 +26,7 @@ QmitkIGTLMessageSourceSelectionWidget::QmitkIGTLMessageSourceSelectionWidget(
     QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
   m_Controls = NULL;
+  m_CurrentIGTLMessageSource = NULL;
   CreateQtPartControl(this);
 }
 
@@ -81,6 +82,6 @@ void QmitkIGTLMessageSourceSelectionWidget::IGTLMessageSourceSelected(us::Servic
   }
 
 mitk::IGTLMessageSource::Pointer QmitkIGTLMessageSourceSelectionWidget::GetSelectedIGTLMessageSource()
-  {
+{
   return this->m_CurrentIGTLMessageSource;
-  }
+}

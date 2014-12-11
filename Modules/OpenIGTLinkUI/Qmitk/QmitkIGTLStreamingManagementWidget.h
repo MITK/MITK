@@ -56,11 +56,6 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLStreamingManagementWidget : public QWid
      */
     void LoadSource(mitk::IGTLMessageProvider::Pointer provider);
 
-    /** \brief Is called when a new source is selected.
-     *  @param source the newly selected source
-     */
-    void SourceSelected(mitk::IGTLMessageSource::Pointer source);
-
     QmitkIGTLStreamingManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkIGTLStreamingManagementWidget();
 
@@ -88,6 +83,12 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLStreamingManagementWidget : public QWid
 
   protected slots:
     void OnStartStreaming();
+    void OnStopStreaming();
+
+    /** \brief Is called when a new source is selected.
+     *  @param source the newly selected source
+     */
+    void SourceSelected(mitk::IGTLMessageSource::Pointer source);
 
   protected:
     /**

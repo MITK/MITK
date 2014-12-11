@@ -75,6 +75,11 @@ namespace mitk {
     */
     void StopStreamingOfSource(mitk::IGTLMessageSource* src);
 
+    /**
+    * \brief Returns the streaming state.
+    */
+    bool IsStreaming();
+
   protected:
     IGTLMessageProvider();
     virtual ~IGTLMessageProvider();
@@ -157,13 +162,16 @@ namespace mitk {
     itk::SmartPointer<itk::MultiThreader>     m_MultiThreader;
 
     /** \brief the time used for streaming */
-    unsigned int     m_StreamingTime;
+    unsigned int                              m_StreamingTime;
 
     /** \brief mutex for guarding m_Time */
     itk::SmartPointer<itk::FastMutexLock>     m_StreamingTimeMutex;
 
     /** \brief mutex for guarding m_StopStreamingThread */
     itk::SmartPointer<itk::FastMutexLock>     m_StopStreamingThreadMutex;
+
+    /** \brief flag to indicate if the provider is streaming */
+    bool                                      m_IsStreaming;
 
   };
 } // namespace mitk

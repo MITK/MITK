@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderWindowFrame.h"
 
 #include "mitkVtkLayerController.h"
+#include "vtkMitkRectangleProp.h"
 
 #include <mitkStandardFileLocations.h>
 #include <mitkConfig.h>
@@ -45,7 +46,6 @@ mitk::RenderWindowFrame::~RenderWindowFrame()
 
   if ( m_RectangleRenderer != NULL )
     m_RectangleRenderer->Delete();
-
 }
 
 /**
@@ -97,19 +97,14 @@ void mitk::RenderWindowFrame::Disable()
  */
 void mitk::RenderWindowFrame::Enable(float col1, float col2, float col3)
 {
-//  vtkMitkRectangleProp* rect = vtkMitkRectangleProp::New();
-//  rect->SetRenderWindow(m_RenderWindow);
-//  rect->SetColor(col1, col2, col3);
+  vtkSmartPointer<vtkMitkRectangleProp> rect = vtkSmartPointer<vtkMitkRectangleProp>::New();
+  rect->SetRenderWindow(m_RenderWindow);
+  rect->SetColor(col1, col2, col3);
 
-//  m_RectangleRenderer->AddViewProp(rect);
-
-//  rect->Delete();
-
+  m_RectangleRenderer->AddActor(rect);
   if(!mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted( m_RectangleRenderer ))
   {
-
     m_RectangleRenderer->EraseOff();
-
     m_RectangleRenderer->SetInteractive(0);
 
     mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertForegroundRenderer(m_RectangleRenderer,true);

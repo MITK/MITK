@@ -361,7 +361,7 @@ set(CPP_FILES
   Rendering/mitkVolumeDataVtkMapper3D.cpp
   Rendering/mitkVtkPropRenderer.cpp
   Rendering/mitkVtkWidgetRendering.cpp
-#  Rendering/vtkMitkRectangleProp.cpp Moved to deprecated LegacyGL Module
+  Rendering/vtkMitkRectangleProp.cpp
   Rendering/vtkMitkRenderProp.cpp
   Rendering/mitkVtkEventProvider.cpp
   Rendering/mitkRenderWindow.cpp

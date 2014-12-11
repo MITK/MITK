@@ -2,29 +2,33 @@
 # Eigen
 #-----------------------------------------------------------------------------
 
-# Sanity checks
-if(DEFINED Eigen_DIR AND NOT EXISTS ${Eigen_DIR})
-  message(FATAL_ERROR "Eigen_DIR variable is defined but corresponds to non-existing directory")
-endif()
+if(MITK_USE_Eigen)
 
-set(proj Eigen)
-set(proj_DEPENDENCIES )
-set(Eigen_DEPENDS ${proj})
+  # Sanity checks
+  if(DEFINED Eigen_DIR AND NOT EXISTS ${Eigen_DIR})
+    message(FATAL_ERROR "Eigen_DIR variable is defined but corresponds to non-existing directory")
+  endif()
 
-if(NOT DEFINED Eigen_DIR)
+  set(proj Eigen)
+  set(proj_DEPENDENCIES )
+  set(Eigen_DEPENDS ${proj})
 
-  ExternalProject_Add(${proj}
-    PREFIX ${CMAKE_BINARY_DIR}/${proj}-cmake
-    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/Eigen-3.2.2-headers-only.tar.gz
-    URL_MD5 d0a7fe82ab7bd39bf577afebe287aa20
-    CMAKE_ARGS
-      -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-src
-  )
+  if(NOT DEFINED Eigen_DIR)
 
-  set(Eigen_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src)
+    ExternalProject_Add(${proj}
+      PREFIX ${CMAKE_BINARY_DIR}/${proj}-cmake
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/Eigen-3.2.2-headers-only.tar.gz
+      URL_MD5 d0a7fe82ab7bd39bf577afebe287aa20
+      CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-src
+    )
 
-else()
+    set(Eigen_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src)
 
-  mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+  else()
+
+    mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+
+  endif()
 
 endif()

@@ -41,6 +41,11 @@ public:
 
   itkNewMacro( Self );
 
+  typedef unsigned short PixelType;
+
+  /// The maximum value a label can get: Since the value is of type unsigned short MAX_LABEL_VALUE = 65535
+  static const PixelType MAX_LABEL_VALUE;
+
   void SetLocked(bool locked);
   bool GetLocked() const;
 
@@ -62,11 +67,11 @@ public:
   void SetColor(const mitk::Color&);
   const mitk::Color& GetColor() const;
 
-  void SetValue(int pixelValue);
-  int GetValue() const;
+  void SetValue(PixelType pixelValue);
+  PixelType GetValue() const;
 
-  void SetLayer(int layer);
-  int GetLayer() const;
+  void SetLayer(unsigned int layer);
+  unsigned int GetLayer() const;
 
   void SetProperty(const std::string &propertyKey, BaseProperty *property);
 

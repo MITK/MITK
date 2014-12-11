@@ -42,7 +42,9 @@ public:
     mitkClassMacro( LabelSet, itk::Object );
     itkNewMacro(Self);
 
-    typedef std::map <unsigned int, Label::Pointer>             LabelContainerType;
+    typedef mitk::Label::PixelType PixelType;
+
+    typedef std::map <PixelType, Label::Pointer>             LabelContainerType;
     typedef LabelContainerType::const_iterator    LabelContainerConstIteratorType;
     typedef LabelContainerType::iterator          LabelContainerIteratorType;
 
@@ -85,7 +87,7 @@ public:
     /**
     * \brief ActiveLabelEvent is emitted whenever a label has been set as active in the LabelSet.
     */
-    Message1<int> ActiveLabelEvent;
+    Message1<PixelType> ActiveLabelEvent;
 
     /**
     * \brief AllLabelsModifiedEvent is emitted whenever a new label has been removed from the LabelSet.
@@ -122,19 +124,19 @@ public:
 
     /** \brief
     */
-    void SetLayer(int);
+    void SetLayer(unsigned int);
 
     /** \brief
     */
-    void SetActiveLabel(int);
+    void SetActiveLabel(PixelType);
 
     /** \brief
     */
-    void RemoveLabel(unsigned int);
+    void RemoveLabel(PixelType);
 
     /** \brief
     */
-    bool ExistLabel(int pixelValue);
+    bool ExistLabel(PixelType);
 
     /** \brief
     */
@@ -146,7 +148,7 @@ public:
 
     /** \brief
     */
-    void RenameLabel(int, const std::string&, const Color&);
+    void RenameLabel(PixelType, const std::string&, const Color&);
 
     /** \brief
     */
@@ -174,11 +176,11 @@ public:
 
     /** \brief
     */
-    Label* GetLabel(int pixelValue);
+    Label* GetLabel(PixelType pixelValue);
 
     /** \brief
     */
-    const Label* GetLabel(int pixelValue) const;
+    const Label* GetLabel(PixelType pixelValue) const;
 
     itkGetMacro(Layer,int)
     itkGetConstMacro(Layer,int)
@@ -190,7 +192,7 @@ public:
 
     /** \brief
     */
-    void UpdateLookupTable(int pixelValue);
+    void UpdateLookupTable(PixelType pixelValue);
 
 protected:
 
@@ -207,9 +209,9 @@ protected:
 
     LookupTable::Pointer m_LookupTable;
 
-    int m_ActiveLabelValue;
+    PixelType m_ActiveLabelValue;
 
-    int m_Layer;
+    unsigned int m_Layer;
 };
 
 /**

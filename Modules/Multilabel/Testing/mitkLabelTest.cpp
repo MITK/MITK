@@ -128,8 +128,8 @@ public:
   void TestSetValue()
   {
     mitk::Label::Pointer label = mitk::Label::New();
-    int initialValue(-1);
-    int valueToBeCompared = label->GetValue();
+    mitk::Label::PixelType initialValue(0);
+    mitk::Label::PixelType valueToBeCompared = label->GetValue();
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong value", initialValue == valueToBeCompared);
 
     label->SetValue(12345);
@@ -141,14 +141,14 @@ public:
   void TestSetLayer()
   {
     mitk::Label::Pointer label = mitk::Label::New();
-    int initialLayer(-1);
+    int initialLayer(0);
     int valueToBeCompared = label->GetValue();
-    CPPUNIT_ASSERT_MESSAGE("Initial label has wrong value", initialLayer == valueToBeCompared);
+    CPPUNIT_ASSERT_MESSAGE("Initial label has wrong layer", initialLayer == valueToBeCompared);
 
     label->SetLayer(2);
     valueToBeCompared = 2;
     initialLayer = label->GetLayer();
-    CPPUNIT_ASSERT_MESSAGE("Label has wrong value", initialLayer == valueToBeCompared);
+    CPPUNIT_ASSERT_MESSAGE("Label has wrong layer", initialLayer == valueToBeCompared);
   }
 
   void TestSetProperty()

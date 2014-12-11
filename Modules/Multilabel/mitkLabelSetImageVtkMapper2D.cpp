@@ -331,7 +331,7 @@ mitk::LabelSetImageVtkMapper2D::CreateOutlinePolyData(mitk::BaseRenderer* render
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
 
   // We take the pointer to the first pixel of the image
-  unsigned char* currentPixel = static_cast< unsigned char* >( image->GetScalarPointer() );
+  mitk::Label::PixelType* currentPixel = static_cast< mitk::Label::PixelType* >( image->GetScalarPointer() );
 
   while (y <= yMax)
   {

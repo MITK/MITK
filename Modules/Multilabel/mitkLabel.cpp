@@ -24,8 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkStringProperty.h>
 
+const mitk::Label::PixelType mitk::Label::MAX_LABEL_VALUE = std::numeric_limits<mitk::Label::PixelType>::max();
 
-mitk::Label::Label():
+mitk::Label::Label() :
   PropertyList()
 {
   if(GetProperty("locked") == NULL) SetLocked(true);
@@ -54,8 +55,8 @@ mitk::Label::Label():
     SetColor(col);
   }
   if(GetProperty("name") == NULL) SetName("noName!");
-  if(GetProperty("value") == NULL) SetValue(-1);
-  if(GetProperty("layer") == NULL) SetLayer(-1);
+  if(GetProperty("value") == NULL) SetValue(0);
+  if(GetProperty("layer") == NULL) SetLayer(0);
 }
 
 mitk::Label::Label(const Label& other)
@@ -74,8 +75,6 @@ mitk::Label::Label(const Label& other)
     command->SetCallbackFunction(this, &Label::Modified);
     it->second->AddObserver( itk::ModifiedEvent(), command );
   }
-
-
 }
 
 mitk::Label::~Label()
@@ -159,27 +158,29 @@ std::string mitk::Label::GetName() const
   return name;
 }
 
-void mitk::Label::SetValue(int pixelValue)
+void mitk::Label::SetValue(PixelType pixelValue)
 {
-  mitk::IntProperty* property = dynamic_cast<mitk::IntProperty *>(GetProperty("value"));
+  mitk::UShortProperty* property = dynamic_cast<mitk::UShortProperty*>(GetProperty("value"));
   if(property != NULL)
     // Update Property
     property->SetValue(pixelValue);
   else
     // Create new Property
-    SetIntProperty("value", pixelValue);
+    SetProperty("value", mitk::UShortProperty::New(pixelValue));
 }
 
-int mitk::Label::GetValue() const
+mitk::Label::PixelType mitk::Label::GetValue() const
 {
-  int pixelValue;
-  GetIntProperty("value",pixelValue);
+  PixelType pixelValue;
+  mitk::UShortProperty *property = dynamic_cast<UShortProperty*>( GetProperty("value") );
+  assert(property);
+  pixelValue = property->GetValue();
   return pixelValue;
 }
 
-void mitk::Label::SetLayer(int layer)
+void mitk::Label::SetLayer(unsigned int layer)
 {
-  mitk::IntProperty* property = dynamic_cast<mitk::IntProperty *>(GetProperty("layer"));
+  mitk::UIntProperty* property = dynamic_cast<mitk::UIntProperty *>(GetProperty("layer"));
   if(property != NULL)
     // Update Property
     property->SetValue(layer);
@@ -188,7 +189,7 @@ void mitk::Label::SetLayer(int layer)
     SetIntProperty("layer", layer);
 }
 
-int mitk::Label::GetLayer() const
+unsigned int mitk::Label::GetLayer() const
 {
   int layer;
   GetIntProperty("layer",layer);
@@ -197,7 +198,7 @@ int mitk::Label::GetLayer() const
 
 const mitk::Color & mitk::Label::GetColor() const
 {
-   mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty *>(GetProperty("color"));
+  mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty *>(GetProperty("color"));
   return colorProp->GetColor();
 }
 

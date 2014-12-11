@@ -127,8 +127,8 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
       points->InsertPoint(ptIndex, vtkpoint);
       if ( ptIndex > 0 )
       {
-        int cell[2] = {ptIndex-1,ptIndex};
-        lines->InsertNextCell((vtkIdType)2,(vtkIdType*) cell);
+        vtkIdType cell[2] = {ptIndex-1,ptIndex};
+        lines->InsertNextCell((vtkIdType)2,cell);
       }
       lastPointIndex = ptIndex;
       ++ptIndex;
@@ -147,8 +147,8 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
 
     if ( input->GetClosed() )
     {
-      int cell[2] = {lastPointIndex,0};
-      lines->InsertNextCell((vtkIdType)2,(vtkIdType*) cell);
+      vtkIdType cell[2] = {lastPointIndex,0};
+      lines->InsertNextCell((vtkIdType)2, cell);
     }
 
     m_Contour->SetPoints(points);

@@ -16,27 +16,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTubeGraphObjectFactory.h"
 
-#include "mitkBaseRenderer.h"
-#include "mitkDataNode.h"
-#include "mitkTubeGraph.h"
-#include "mitkProperties.h"
-#include "mitkTubeGraphIOFactory.h"
-#include "mitkTubeGraphVtkMapper3D.h"
-#include "mitkTubeGraphWriter.h"
-#include "mitkTubeGraphWriterFactory.h"
+#include <mitkBaseRenderer.h>
+#include <mitkDataNode.h>
+#include <mitkProperties.h>
+#include <mitkTubeGraph.h>
+#include <mitkTubeGraphVtkMapper3D.h>
 
-mitk::TubeGraphObjectFactory::TubeGraphObjectFactory(bool /*registerSelf*/)
+mitk::TubeGraphObjectFactory::TubeGraphObjectFactory()
 :CoreObjectFactoryBase()
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
     MITK_INFO << "TubeGraphObjectFactory c'tor" << std::endl;
-    RegisterIOFactories();
-
-    m_FileWriters.push_back( mitk::TubeGraphWriter::New().GetPointer() );
-
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     CreateFileExtensionsMap();
 
     alreadyDone = true;
@@ -61,7 +53,6 @@ mitk::Mapper::Pointer mitk::TubeGraphObjectFactory::CreateMapper(mitk::DataNode*
 
 void mitk::TubeGraphObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-  std::string classname = "Graph";
   if ((dynamic_cast<mitk::TubeGraph*>(node->GetData()) != NULL))
   {
     node->SetProperty( "Tube Graph.Clip Structures", mitk::BoolProperty::New( false ) );
@@ -93,27 +84,22 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::TubeGraphObjectFactory::GetSaveF
   return m_SaveFileExtensionsMap;
 }
 
-void mitk::TubeGraphObjectFactory::RegisterIOFactories()
-{
-  mitk::TubeGraphIOFactory::RegisterOneFactory();
-
-  mitk::TubeGraphWriterFactory::RegisterOneFactory();
-}
-
 void mitk::TubeGraphObjectFactory::CreateFileExtensionsMap()
-{ //TODO: Think about file extension
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tsf", "Tube Graph Structure File"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tsf", "Tube Graph Structure File"));
-}
-
-void RegisterTubeGraphObjectFactory()
 {
-  static bool oneTubeGraphObjectFactoryRegistered = false;
-  if ( ! oneTubeGraphObjectFactoryRegistered )
-  {
-    MITK_INFO << "Registering TubeGraphObjectFactory..." << std::endl;
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::TubeGraphObjectFactory::New());
-
-    oneTubeGraphObjectFactoryRegistered = true;
-  }
 }
+
+struct RegisterTubeGraphObjectFactory
+{
+  RegisterTubeGraphObjectFactory()
+    : m_Factory( mitk::TubeGraphObjectFactory::New() )
+  {
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( m_Factory );
+  }
+  ~RegisterTubeGraphObjectFactory()
+  {
+    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory( m_Factory );
+  }
+  mitk::TubeGraphObjectFactory::Pointer m_Factory;
+};
+
+static RegisterTubeGraphObjectFactory registerTubeGraphObjectFactory;

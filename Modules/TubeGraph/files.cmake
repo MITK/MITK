@@ -8,13 +8,9 @@ set (H_FILES
   DataStructure/mitkTubeGraphVertex.h
   Interactions/mitkTubeGraphDataInteractor.h
   Interactions/mitkTubeGraphPicker.h
-  IODataStructures/mitkTubeGraphDefinitions.h
-  IODataStructures/mitkTubeGraphIOFactory.h
-  IODataStructures/mitkTubeGraphObjectFactory.h
-  IODataStructures/mitkTubeGraphReader.h
-  IODataStructures/mitkTubeGraphSerializer.h
-  IODataStructures/mitkTubeGraphWriter.h
-  IODataStructures/mitkTubeGraphWriterFactory.h
+  IO/mitkTubeGraphDefinitions.h
+  IO/mitkTubeGraphIO.h
+  IO/mitkTubeGraphObjectFactory.h
   Rendering/mitkTubeGraphGeometry3D.h
   Rendering/mitkTubeGraphProperty.h
   Rendering/mitkTubeGraphVtkMapper3D.h
@@ -26,13 +22,10 @@ set(CPP_FILES
   DataStructure/mitkTubeGraphVertex.cpp
   Interactions/mitkTubeGraphDataInteractor.cpp
   Interactions/mitkTubeGraphPicker.cpp
-  IODataStructures/mitkTubeGraphDefinitions.cpp
-  IODataStructures/mitkTubeGraphIOFactory.cpp
-  IODataStructures/mitkTubeGraphObjectFactory.cpp
-  IODataStructures/mitkTubeGraphReader.cpp
-  IODataStructures/mitkTubeGraphSerializer.cpp
-  IODataStructures/mitkTubeGraphWriter.cpp
-  IODataStructures/mitkTubeGraphWriterFactory.cpp
+  IO/mitkTubeGraphDefinitions.cpp
+  IO/mitkTubeGraphIO.cpp
+  IO/mitkTubeGraphModuleActivator.cpp
+  IO/mitkTubeGraphObjectFactory.cpp
   Rendering/mitkTubeGraphGeometry3D.cpp
   Rendering/mitkTubeGraphProperty.cpp
   Rendering/mitkTubeGraphVtkMapper3D.cpp

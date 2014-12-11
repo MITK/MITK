@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkNodePredicateDataType.h"
-#include "mitkTubeGraphObjectFactory.h"
 #include "usModuleRegistry.h"
 #include "QmitkTubeGraphLabelGroupWidget.h"
 #include "QmitkTubeGraphDeleteLabelGroupDialog.h"
@@ -37,8 +36,6 @@ QmitkTubeGraphView::QmitkTubeGraphView()
   m_ActiveProperty(),
   m_ActivationMode(mitk::TubeGraphDataInteractor::None)
 {
-  // Has to be called to register Reader/Writer/Renderer etc .. for TubeGraph
-  RegisterTubeGraphObjectFactory();
 }
 
 QmitkTubeGraphView::~QmitkTubeGraphView()

@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(
   DEPENDS MitkSceneSerializationBase
-  INCLUDE_DIRS Algorithms DataStructure Interactions IODataStructures Rendering
+  INCLUDE_DIRS Algorithms DataStructure Interactions Rendering IO
   PACKAGE_DEPENDS Boost
   WARNINGS_AS_ERRORS
 )

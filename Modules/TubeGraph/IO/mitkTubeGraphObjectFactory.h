@@ -17,10 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef TubeGraphObjectFactory_H_INCLUDED
 #define TubeGraphObjectFactory_H_INCLUDED
 
-#include "MitkTubeGraphExports.h"
+#include <MitkTubeGraphExports.h>
 
-#include "mitkCoreObjectFactory.h"
-
+#include <mitkCoreObjectFactory.h>
 
 namespace mitk {
 
@@ -29,7 +28,8 @@ namespace mitk {
 
   public:
     mitkClassMacro(TubeGraphObjectFactory, CoreObjectFactoryBase);
-    itkNewMacro(TubeGraphObjectFactory);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
     virtual void SetDefaultProperties(mitk::DataNode* node);
@@ -40,7 +40,7 @@ namespace mitk {
     void RegisterIOFactories();
 
   protected:
-    TubeGraphObjectFactory(bool registerSelf = true);
+    TubeGraphObjectFactory();
 
   private:
     void CreateFileExtensionsMap();
@@ -53,8 +53,5 @@ namespace mitk {
   };
 
 }
-// global declaration for simple call by
-// applications
-void MitkTubeGraph_EXPORT RegisterTubeGraphObjectFactory();
 
 #endif

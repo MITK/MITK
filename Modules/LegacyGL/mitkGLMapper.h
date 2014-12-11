@@ -47,6 +47,9 @@ namespace mitk {
 class MitkLegacyGL_EXPORT GLMapper : public Mapper
 {
   public:
+
+  mitkClassMacro(GLMapper, Mapper);
+
     /** \brief Do the painting into the \a renderer */
     virtual void Paint(mitk::BaseRenderer *renderer) = 0;
 

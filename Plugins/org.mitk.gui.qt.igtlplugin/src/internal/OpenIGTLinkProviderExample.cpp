@@ -95,6 +95,7 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //messages
   m_NavDataToIGTLMsgFilter->SetOperationMode(
         mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);
+//       mitk::NavigationDataToIGTLMessageFilter::ModeSendTransMsg);
 
   //set the name of this filter to identify it easier
   m_NavDataToIGTLMsgFilter->SetName("Tracking Data Source From Example");

@@ -27,7 +27,9 @@ set(MOC_H_FILES
 # for example the icon used in the menu and tabs for the
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
-  resources/icon.xpm
+  resources/manager.png
+  resources/example.png
+  resources/provider.png
   plugin.xml
 )
 

@@ -72,6 +72,11 @@ class QmitkMeasurementView : public QmitkAbstractView
     void CopyToClipboard( bool checked = false );
 
   private:
+
+    const static QString TR_REF_IMAGE; 
+    const static QString TR_CLIPBOARD_COPY; 
+    const static QString TR_NO_AVAIBLE_IMAGE; 
+
     void CreateConnections();
     mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
     void UpdateMeasurementText();

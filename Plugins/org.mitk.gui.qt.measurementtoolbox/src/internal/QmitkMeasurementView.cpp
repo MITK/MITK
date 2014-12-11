@@ -129,6 +129,11 @@ struct QmitkMeasurementViewData
 
 const std::string QmitkMeasurementView::VIEW_ID = "org.mitk.views.measurement";
 
+
+const QString QmitkMeasurementView::TR_REF_IMAGE = QLabel::tr("Reference Image: "); 
+const QString QmitkMeasurementView::TR_CLIPBOARD_COPY = QPushButton::tr("Copy to Clipboard"); 
+const QString QmitkMeasurementView::TR_NO_AVAIBLE_IMAGE = QLabel::tr("No visible image available."); 
+
 QmitkMeasurementView::QmitkMeasurementView()
   : d( new QmitkMeasurementViewData )
 {
@@ -143,7 +148,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_Parent = parent;
 
   // image label
-  QLabel* selectedImageLabel = new QLabel("Reference Image: ");
+  QLabel* selectedImageLabel = new QLabel(TR_REF_IMAGE);
   d->m_SelectedImageLabel = new QLabel;
   d->m_SelectedImageLabel->setStyleSheet("font-weight: bold;");
 
@@ -233,7 +238,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_SelectedPlanarFiguresText = new QTextBrowser;
 
   // copy to clipboard button
-  d->m_CopyToClipboard = new QPushButton("Copy to Clipboard");
+  d->m_CopyToClipboard = new QPushButton(TR_CLIPBOARD_COPY);
 
   d->m_Layout = new QGridLayout;
   d->m_Layout->addWidget(selectedImageLabel, 0, 0, 1, 1);
@@ -380,7 +385,7 @@ void QmitkMeasurementView::CheckForTopMostVisibleImage(mitk::DataNode* _NodeToNe
   {
     MEASUREMENT_DEBUG << "No reference image available. Will disable actions for creating new planarfigures";
     if( d->m_UnintializedPlanarFigure == false )
-      d->m_SelectedImageLabel->setText( "No visible data available." );
+      d->m_SelectedImageLabel->setText(TR_NO_AVAIBLE_IMAGE);
 
     d->m_DrawActionsToolBar->setEnabled(false);
   }

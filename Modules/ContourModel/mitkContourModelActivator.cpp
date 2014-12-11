@@ -32,7 +32,7 @@ class ContourModelActivator : public us::ModuleActivator
 {
 public:
 
-  void Load(us::ModuleContext* context)
+  void Load(us::ModuleContext* /*context*/)
   {
     m_ContourModelReader = new ContourModelReader();
     m_ContourModelSetReader = new ContourModelSetReader();

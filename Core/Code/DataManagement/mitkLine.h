@@ -174,14 +174,6 @@ public:
   }
 
   //##Documentation
-  //## @brief Distance between two lines
-  double Distance( const Line<TCoordRep,NPointDimension>& line ) const
-  {
-    MITK_WARN << "Not implemented yet!";
-    return -1;
-  }
-
-  //##Documentation
   //## @brief Distance of a point from the line
   double Distance( const itk::Point<TCoordRep,NPointDimension>& point ) const
   {

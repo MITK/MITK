@@ -158,7 +158,6 @@ IFileIO::ConfidenceLevel LabelSetImageIO::GetReaderConfidenceLevel() const
   itk::ExposeMetaData<std::string> (imgMetaDataDictionary, "modality", value);
   if (value.compare("org.mitk.image.multilabel") == 0)
   {
-    MITK_INFO << "Supported MultilabelImage detected!";
     return Supported;
   }
   else

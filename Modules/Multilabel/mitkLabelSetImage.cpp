@@ -963,7 +963,7 @@ void mitk::LabelSetImage::ImageToLayerContainerProcessing( ImageType* source, in
 }
 
 template < typename ImageType >
-void mitk::LabelSetImage::EraseLabelProcessing(ImageType* itkImage, int pixelValue, int layer)
+void mitk::LabelSetImage::EraseLabelProcessing(ImageType* itkImage, int pixelValue, int /*layer*/)
 {
   typedef itk::ImageRegionIterator< ImageType > IteratorType;
 

@@ -34,6 +34,7 @@ int mitkTextOverlay3DRendering3DTest(int argc, char* argv[])
   MITK_TEST_BEGIN("mitkTextOverlay3DRendering3DTest")
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
+//  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
 
   renderingHelper.SetMapperIDToRender3D();
 

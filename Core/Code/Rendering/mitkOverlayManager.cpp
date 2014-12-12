@@ -34,8 +34,10 @@ void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
   if(!m_ForegroundRenderer[renderer])
   {
     m_ForegroundRenderer[renderer] = vtkRenderer::New();
-    mitk::VtkLayerController::GetInstance(renderer->GetRenderWindow())->InsertForegroundRenderer(m_ForegroundRenderer[renderer],false);
-    m_ForegroundRenderer[renderer]->SetInteractive(false);
+    vtkRenderer* rendererVtk = m_ForegroundRenderer[renderer];
+    rendererVtk->SetActiveCamera(renderer->GetVtkRenderer()->GetActiveCamera());
+    mitk::VtkLayerController::GetInstance(renderer->GetRenderWindow())->InsertForegroundRenderer(rendererVtk,false);
+    rendererVtk->SetInteractive(false);
   }
   std::pair<BaseRendererSet::iterator,bool> inSet;
   inSet = m_BaseRendererSet.insert(renderer);

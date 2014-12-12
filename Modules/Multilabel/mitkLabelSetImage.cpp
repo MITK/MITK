@@ -277,7 +277,7 @@ void mitk::LabelSetImage::RemoveLayer()
   this->Modified();
 }
 
-int mitk::LabelSetImage::AddLayer()
+int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)
 {
   mitk::Image::Pointer newImage = mitk::Image::New();
   newImage->Initialize(this);
@@ -289,14 +289,22 @@ int mitk::LabelSetImage::AddLayer()
   // get upcoming new labelset id
   int newLabelSetId = m_LayerContainer.size();
 
-  // Create new LabelSet
-  mitk::LabelSet::Pointer ls = mitk::LabelSet::New();
-  ls->SetLayer(newLabelSetId);
+  // Add labelset to layer
+  mitk::LabelSet::Pointer ls;
+  if (lset.IsNotNull())
+  {
+    ls = lset;
+  }
+  else
+  {
+    ls = mitk::LabelSet::New();
+    ls->AddLabel(GetExteriorLabel());
+    ls->SetActiveLabel(0 /*Exterior Label*/);
+  }
 
+  ls->SetLayer(newLabelSetId);
   // Add exterior Label to label set
   //mitk::Label::Pointer exteriorLabel = CreateExteriorLabel();
-  ls->AddLabel(GetExteriorLabel());
-  ls->SetActiveLabel(0 /*Exterior Label*/);
 
   // push a new working image for the new layer
   m_LayerContainer.push_back(newImage);

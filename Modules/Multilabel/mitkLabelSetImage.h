@@ -183,7 +183,7 @@ public:
 
   /**
     * \brief  */
-  int AddLayer();
+  int AddLayer(mitk::LabelSet::Pointer=0);
 
   /**
     * \brief  */

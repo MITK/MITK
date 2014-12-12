@@ -232,7 +232,7 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
     sprintf( keybuffer, "layer_%03d", layerIdx );
     int numberOfLabels = GetIntByKey(imgMetaDictionary,keybuffer);
 
-    output->AddLayer();
+    mitk::LabelSet::Pointer labelSet = mitk::LabelSet::New();
 
     for(int labelIdx=0; labelIdx < numberOfLabels; labelIdx++)
     {
@@ -245,8 +245,9 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
 
       if(label->GetValue() == 0) // set exterior label is needed to hold exterior information
         output->SetExteriorLabel(label);
-      output->GetLabelSet()->AddLabel(label);
+      labelSet->AddLabel(label);
     }
+    output->AddLayer(labelSet);
   }
 
   // set vector image

@@ -157,7 +157,7 @@ public:
 
     mitk::StringProperty::Pointer prop = mitk::StringProperty::New("abc");
     label->SetProperty("cba",prop);
-    std::string propVal("");
+    std::string propVal;
     label->GetStringProperty("cba", propVal);
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong value", propVal.compare("abc") == 0);
   }

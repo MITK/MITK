@@ -152,9 +152,7 @@ public:
 
     mitk::BaseGeometry::Pointer imageGeometry = image->GetGeometry();
 
-    bool matrixEqual = mitk::Equal(imageGeometry, planegeometry, mitk::eps, false);
-
-    MITK_TEST_CONDITION(matrixEqual, "Matrix elements of cloned matrix equal original matrix");
+    MITK_ASSERT_EQUAL(imageGeometry, planegeometry,"Matrix elements of cloned matrix equal original matrix");
 
   }
 };

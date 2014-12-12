@@ -47,7 +47,7 @@ public:
 
     typedef itk::Statistics::Histogram<double> HistogramType;
 
-    virtual const HistogramType* GetScalarHistogram(int t=0, unsigned int component=0);
+    virtual const HistogramType* GetScalarHistogram(int t=0, unsigned int =0);
 
     //##Documentation
     //## \brief Get the minimum for scalar images

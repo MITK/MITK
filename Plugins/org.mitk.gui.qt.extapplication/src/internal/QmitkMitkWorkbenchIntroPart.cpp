@@ -202,7 +202,7 @@ void QmitkMitkWorkbenchIntroPart::DelegateMeTo(const QUrl& showMeNext)
 
 #endif
 
-void QmitkMitkWorkbenchIntroPart::StandbyStateChanged(bool standby)
+void QmitkMitkWorkbenchIntroPart::StandbyStateChanged(bool /*standby*/)
 {
 
 }

@@ -298,7 +298,7 @@ void mitk::DiffusionDICOMFileReader
 
 
 bool mitk::DiffusionDICOMFileReader
-::CanHandleFile(const std::string &filename)
+::CanHandleFile(const std::string & /* filename */)
 {
   //FIXME :
   return true;

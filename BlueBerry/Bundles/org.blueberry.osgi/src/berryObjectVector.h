@@ -32,7 +32,7 @@ public:
   bool operator==(const Object* obj) const
   {
     if (const ObjectVector* other = dynamic_cast<const ObjectVector*>(obj))
-      static_cast<const std::vector<T> &>(*this) == static_cast<const std::vector<T>& >(*other);
+      return static_cast<const std::vector<T> &>(*this) == static_cast<const std::vector<T>& >(*other);
 
     return false;
   }

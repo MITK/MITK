@@ -315,16 +315,16 @@ public:
   {
     DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetIndexToWorldTransform(anotherTransform);
-    CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummy->GetIndexToWorldTransform(),mitk::eps,true));
+    MITK_ASSERT_EQUAL(anotherTransform,mitk::AffineTransform3D::Pointer(dummy->GetIndexToWorldTransform()),"Compare IndexToWorldTransform 1");
 
     //Test needs to fail now
     dummy->SetIndexToWorldTransform(aThirdTransform);
-    CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummy->GetIndexToWorldTransform(),mitk::eps,false)==false);
+    MITK_ASSERT_NOT_EQUAL(anotherTransform,mitk::AffineTransform3D::Pointer(dummy->GetIndexToWorldTransform()),"Compare IndexToWorldTransform 2");
 
     //undo changes, new and changed object need to be the same!
     dummy->SetIndexToWorldTransform(aTransform);
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Compare IndexToWorldTransform 3");
   }
 
   void TestSetIndexToWorldTransform_WithPointerToSameTransform()
@@ -354,19 +354,19 @@ public:
     vtkmatrix->SetElement(1,1,2);
     DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
-    CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummy->GetIndexToWorldTransform(),mitk::eps,true));
+    MITK_ASSERT_EQUAL(anotherTransform,mitk::AffineTransform3D::Pointer(dummy->GetIndexToWorldTransform()),"Compare IndexToWorldTransformByVtkMatrix 1");
 
     //test needs to fail now
     vtkmatrix->SetElement(1,1,7);
     dummy->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
-    CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummy->GetIndexToWorldTransform(),mitk::eps,false)==false);
+    MITK_ASSERT_NOT_EQUAL(anotherTransform,mitk::AffineTransform3D::Pointer(dummy->GetIndexToWorldTransform()),"Compare IndexToWorldTransformByVtkMatrix 2");
 
     //undo changes, new and changed object need to be the same!
     vtkmatrix->SetElement(1,1,1);
     dummy->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
     vtkmatrix->Delete();
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Compare IndexToWorldTransformByVtkMatrix 3");
   }
 
   void TestSetIdentity()
@@ -379,13 +379,13 @@ public:
     //Set Identity should reset ITWT and Origin
     dummy->SetIdentity();
 
-    CPPUNIT_ASSERT(mitk::Equal(aTransform,dummy->GetIndexToWorldTransform(),mitk::eps,true));
+    MITK_ASSERT_EQUAL(aTransform,mitk::AffineTransform3D::Pointer(dummy->GetIndexToWorldTransform()),"Test set identity 1");
     CPPUNIT_ASSERT(mitk::Equal(aPoint,dummy->GetOrigin()));
     CPPUNIT_ASSERT(mitk::Equal(aSpacing,dummy->GetSpacing()));
 
     //new and changed object need to be the same!
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Test set identity 2");
   }
 
   void TestSetSpacing()
@@ -397,7 +397,7 @@ public:
     //undo changes, new and changed object need to be the same!
     dummy->SetSpacing(aSpacing);
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Dummy spacing");
   }
 
   void TestTransferItkToVtkTransform()
@@ -422,9 +422,9 @@ public:
 
     CPPUNIT_ASSERT(dummy1->GetImageGeometry()==false);
 
-    CPPUNIT_ASSERT(mitk::Equal( dummy1->GetIndexToWorldTransform(), aTransform, mitk::eps, true));
+    MITK_ASSERT_EQUAL(mitk::AffineTransform3D::Pointer(dummy1->GetIndexToWorldTransform()), aTransform,"Contructor test 1");
 
-    CPPUNIT_ASSERT(mitk::Equal( dummy1->GetBoundingBox(), aBoundingBox, mitk::eps, true));
+    MITK_ASSERT_EQUAL(mitk::BaseGeometry::BoundingBoxType::ConstPointer(dummy1->GetBoundingBox()), aBoundingBox, "Constructor test 2");
 
     DummyTestClass::Pointer dummy2 = DummyTestClass::New();
     dummy2->SetOrigin(anotherPoint);
@@ -434,42 +434,41 @@ public:
     dummy2->SetSpacing(anotherSpacing);
 
     DummyTestClass::Pointer dummy3 = DummyTestClass::New(*dummy2);
-    CPPUNIT_ASSERT(mitk::Equal(dummy3,dummy2,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy3,dummy2,"Dummy contructor");
   }
 
   //Equal Tests
 
   void Equal_CloneAndOriginal_ReturnsTrue()
   {
-    CPPUNIT_ASSERT( mitk::Equal(aDummyGeometry, anotherDummyGeometry, mitk::eps,true));
+    MITK_ASSERT_EQUAL( aDummyGeometry, anotherDummyGeometry, "Clone test");
   }
 
   void Equal_DifferentOrigin_ReturnsFalse()
   {
     anotherDummyGeometry->SetOrigin(anotherPoint);
 
-    CPPUNIT_ASSERT( mitk::Equal(aDummyGeometry, anotherDummyGeometry, mitk::eps,false)==false);
+    MITK_ASSERT_NOT_EQUAL(aDummyGeometry, anotherDummyGeometry, "Different origin test");
   }
 
   void Equal_DifferentIndexToWorldTransform_ReturnsFalse()
   {
     anotherDummyGeometry->SetIndexToWorldTransform(anotherTransform);
 
-    CPPUNIT_ASSERT( mitk::Equal(aDummyGeometry, anotherDummyGeometry, mitk::eps,false)==false);
+    MITK_ASSERT_NOT_EQUAL( aDummyGeometry, anotherDummyGeometry, "Different index to world");
   }
 
   void Equal_DifferentSpacing_ReturnsFalse()
   {
     anotherDummyGeometry->SetSpacing(anotherSpacing);
 
-    CPPUNIT_ASSERT( mitk::Equal(aDummyGeometry, anotherDummyGeometry, mitk::eps,false)==false);
+    MITK_ASSERT_NOT_EQUAL( aDummyGeometry, anotherDummyGeometry, "Different spacing");
   }
 
   void Equal_InputIsNull_ReturnsFalse()
   {
     DummyTestClass::Pointer geometryNull = NULL;
-    MITK_INFO<<"Test, if a Null pointer throws an error. The next line needs to display an error.";
-    CPPUNIT_ASSERT( mitk::Equal(geometryNull, anotherDummyGeometry, mitk::eps,false)==false);
+    CPPUNIT_ASSERT_THROW( MITK_ASSERT_EQUAL(geometryNull,anotherDummyGeometry,"Input is null") , mitk::Exception );
   }
 
   void Equal_DifferentBoundingBox_ReturnsFalse()
@@ -478,7 +477,7 @@ public:
     mitk::ScalarType bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     anotherDummyGeometry->SetBounds(bounds);
 
-    CPPUNIT_ASSERT( mitk::Equal(aDummyGeometry, anotherDummyGeometry, mitk::eps,false)==false);
+    MITK_ASSERT_NOT_EQUAL( aDummyGeometry, anotherDummyGeometry , "Different bounding box");
   }
 
   void TestComposeTransform(){
@@ -520,12 +519,12 @@ public:
     dummy->SetIndexToWorldTransform(transform1);  //Spacing = 2
     dummy->Compose(transform2); //Spacing = 4
     CPPUNIT_ASSERT(mitk::Equal(dummy->GetSpacing(), expectedSpacing));
-    CPPUNIT_ASSERT(mitk::Equal(transform3,dummy->GetIndexToWorldTransform(),mitk::eps,true)); // 4=4
+    MITK_ASSERT_EQUAL(transform3,mitk::AffineTransform3D::Pointer(dummy->GetIndexToWorldTransform()),"Compose transform 2"); // 4=4
 
     //undo changes, new and changed object need to be the same!
     dummy->Compose(transform4); //Spacing = 1
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true)); // 1=1
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Compose transform 3"); // 1=1
   }
 
   void TestComposeVtkMatrix(){
@@ -564,14 +563,14 @@ public:
     dummy->Compose(vtkmatrix2); //Spacing = 4
     vtkmatrix2->Delete();
 
-    CPPUNIT_ASSERT(mitk::Equal(transform3,dummy->GetIndexToWorldTransform(),mitk::eps,true)); // 4=4
+    MITK_ASSERT_EQUAL(transform3, mitk::AffineTransform3D::Pointer(dummy->GetIndexToWorldTransform()),"Compose vtk matrix"); // 4=4
     CPPUNIT_ASSERT(mitk::Equal(dummy->GetSpacing(), expectedSpacing));
 
     //undo changes, new and changed object need to be the same!
     dummy->Compose(vtkmatrix4); //Spacing = 1
     vtkmatrix4->Delete();
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true)); // 1=1
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Compose vtk"); // 1=1
   }
 
   void TestTranslate(){
@@ -602,7 +601,7 @@ public:
     dummy->Translate(translationVector);
 
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Translate test");
   }
 
   // a part of the test requires axis-parallel coordinates
@@ -800,7 +799,7 @@ public:
 
     //Geometry must not have changed
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Dummy index to world");
 
     //Test with other geometries
     dummy->SetOrigin(anotherPoint);
@@ -833,14 +832,14 @@ public:
     //Test operation Nothing
     mitk::Operation* opN = new mitk::Operation(mitk::OpNOTHING);
     dummy->ExecuteOperation(opN);
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Dummy execute operation 1");
 
     //Test operation Move
     mitk::PointOperation* opP = new mitk::PointOperation(mitk::OpMOVE,anotherPoint);
     dummy->ExecuteOperation(opP);
     CPPUNIT_ASSERT(mitk::Equal(anotherPoint,dummy->GetOrigin()));
     newDummy->SetOrigin(anotherPoint);
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Dummy execute operation 2");
 
     //Test operation Scale, Scale sets spacing to scale+1
     mitk::Point3D spacing;
@@ -852,7 +851,7 @@ public:
     dummy->ExecuteOperation(opS);
     CPPUNIT_ASSERT(mitk::Equal(anotherSpacing,dummy->GetSpacing()));
     newDummy->SetSpacing(anotherSpacing);
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Dummy execute operation 3");
 
     //change Geometry to test more cases
     dummy->SetIndexToWorldTransform(anotherTransform);
@@ -899,14 +898,14 @@ public:
     result->SetPoints(pointscontainer);
     result->ComputeBoundingBox();
 
-    CPPUNIT_ASSERT(mitk::Equal(result,dummyBoundingBox,mitk::eps,true));
+    MITK_ASSERT_EQUAL(result,dummyBoundingBox,"BBox rel to transform");
 
     //dummy still needs to be unchanged, except for extend
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
     newDummy->SetExtentInMM(0,15);
     newDummy->SetExtentInMM(1,20);
     newDummy->SetExtentInMM(2,8);
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Dummy BBox");
   }
 
   //void TestSetTimeBounds(){
@@ -987,7 +986,7 @@ public:
     dummyMatrix.SetIdentity();
     dummyTransform->SetMatrix( dummyMatrix );
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Is 2D convertable");
   }
 
   void TestGetCornerPoint(){
@@ -1069,7 +1068,7 @@ public:
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
     newDummy->SetIndexToWorldTransform(anotherTransform);
     newDummy->SetFloatBounds(bounds);
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Corner point");
   }
 
   void TestExtentInMM()
@@ -1142,7 +1141,7 @@ public:
     //dummy must not have changed
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
     newDummy->SetFloatBounds(bounds);
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Diagonal length");
   }
 
   void TestGetExtent(){
@@ -1157,7 +1156,7 @@ public:
     //dummy must not have changed
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
     newDummy->SetFloatBounds(bounds);
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Extend");
   }
 
   void TestIsInside(){
@@ -1183,7 +1182,7 @@ public:
     //dummy must not have changed
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
     newDummy->SetFloatBounds(bounds);
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"Is inside");
   }
 
   void TestInitialize()
@@ -1203,12 +1202,12 @@ public:
 
     dummy1->InitializeGeometry(dummy2);
 
-    CPPUNIT_ASSERT(mitk::Equal(dummy1,dummy2,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy1,dummy2,"Initialize 1");
 
     dummy1->Initialize();
 
     DummyTestClass::Pointer dummy3 = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy3,dummy1,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy3,dummy1,"Initialize 2");
   }
 
   void TestGetMatrixColumn(){
@@ -1231,7 +1230,7 @@ public:
     //dummy must not have changed
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
     newDummy->SetIndexToWorldTransform(anotherTransform);
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+    MITK_ASSERT_EQUAL(dummy,newDummy,"GetMatrixColumn");
   }
 
   /*

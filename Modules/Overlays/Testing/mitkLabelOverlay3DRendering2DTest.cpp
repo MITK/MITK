@@ -36,6 +36,7 @@ int mitkLabelOverlay3DRendering2DTest(int argc, char* argv[])
   MITK_TEST_BEGIN("mitkLabelOverlay3DRendering2DTest")
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
+//  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
 
 //  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
   mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderingHelper.GetVtkRenderWindow());

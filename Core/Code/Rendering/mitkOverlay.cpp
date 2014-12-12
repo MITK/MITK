@@ -303,3 +303,13 @@ void mitk::Overlay::SetBoundsOnDisplay(mitk::BaseRenderer*, const mitk::Overlay:
 {
 }
 
+void mitk::Overlay::SetForceInForeground(bool forceForeground)
+{
+  m_ForceInForeground = forceForeground;
+}
+
+bool mitk::Overlay::IsForceInForeground() const
+{
+  return m_ForceInForeground;
+}
+

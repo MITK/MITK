@@ -35,6 +35,8 @@ public:
   mitkClassMacro(VtkOverlay, Overlay);
   void Update(BaseRenderer *renderer);
   void AddToBaseRenderer(BaseRenderer *renderer);
+  void AddToRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer);
+  void RemoveFromRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer);
   void RemoveFromBaseRenderer(BaseRenderer *renderer);
 
 protected:

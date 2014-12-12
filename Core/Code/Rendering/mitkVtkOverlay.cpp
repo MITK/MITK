@@ -56,9 +56,9 @@ void mitk::VtkOverlay::AddToRenderer(mitk::BaseRenderer *renderer, vtkRenderer *
     return;
   Update(renderer);
   vtkSmartPointer<vtkProp> vtkProp = GetVtkProp(renderer);
-  if(renderer && renderer->GetVtkRenderer() && !renderer->GetVtkRenderer()->HasViewProp(vtkProp))
+  if(renderer && vtkrenderer && !vtkrenderer->HasViewProp(vtkProp))
   {
-    renderer->GetVtkRenderer()->AddViewProp(vtkProp);
+    vtkrenderer->AddViewProp(vtkProp);
   }
 }
 

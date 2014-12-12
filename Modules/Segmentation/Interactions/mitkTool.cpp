@@ -156,6 +156,11 @@ void mitk::Tool::Deactivated()
   m_DisplayInteractorConfigs.clear();
 }
 
+const char* mitk::Tool::GetCaption() const
+{
+  return GetName();
+}
+
 itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix)
 {
   itk::Object::Pointer object;

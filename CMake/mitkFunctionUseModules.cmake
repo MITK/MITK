@@ -171,7 +171,7 @@ function(mitk_use_modules)
 
   if(ALL_INCLUDE_DIRECTORIES)
     foreach(_include_dir ${ALL_INCLUDE_DIRECTORIES})
-      if(_include_dir MATCHES ^${CMAKE_SOURCE_DIR} OR _include_dir MATCHES ^${CMAKE_BINARY_DIR})
+      if(_include_dir MATCHES "^${CMAKE_SOURCE_DIR}" OR _include_dir MATCHES "^${CMAKE_BINARY_DIR}")
         include_directories(${_include_dir})
       else()
         include_directories(SYSTEM ${_include_dir})

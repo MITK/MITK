@@ -161,6 +161,11 @@ const char* mitk::LiveWireTool2D::GetName() const
   return "Live Wire";
 }
 
+const char* mitk::LiveWireTool2D::GetCaption() const
+{
+  return "Live Wire";
+}
+
 void mitk::LiveWireTool2D::Activated()
 {
   Superclass::Activated();

@@ -507,8 +507,8 @@ void QmitkToolSelectionBox::RecreateButtons()
     {
       label += "&";
     }
-    label += tool->GetName();
-    QString tooltip = tool->GetName();
+    label += tool->GetCaption();
+    QString tooltip = tool->GetCaption();
     MITK_DEBUG << tool->GetName() << ", " << label.toLocal8Bit().constData() << ", '" << tooltip.toLocal8Bit().constData();
 
     if ( m_ShowNames )

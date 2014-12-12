@@ -117,6 +117,11 @@ void mitk::Tool::Deactivated()
   //StateMachine::ResetStatemachineToStartState(); // forget about the past
 }
 
+const char* mitk::Tool::GetCaption() const
+{
+  return GetName();
+}
+
 itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix)
 {
   itk::Object::Pointer object;

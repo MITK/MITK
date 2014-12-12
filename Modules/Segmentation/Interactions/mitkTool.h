@@ -147,6 +147,8 @@ namespace mitk
     */
     virtual const char* GetName() const = 0;
 
+    virtual const char* GetCaption() const;
+
     /**
     \brief Name of a group.
 

@@ -26,6 +26,7 @@ class mitkVtkLogoRepresentation;
 class vtkLogoWidget;
 class vtkImageData;
 class vtkImageReader2Factory;
+class vtkImageImport;
 
 namespace mitk {
 
@@ -91,6 +92,8 @@ protected:
   virtual ~LogoOverlay();
 
 private:
+
+  vtkSmartPointer <vtkImageImport> m_VtkImageImport;
 
   /** \brief copy constructor */
   LogoOverlay( const LogoOverlay &);

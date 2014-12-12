@@ -41,6 +41,7 @@ mitk::LogoOverlay::LogoOverlay()
   SetOffsetVector(offset);
   SetRelativeSize(0.2);
   SetCornerPosition(4);
+  m_VtkImageImport = vtkSmartPointer<vtkImageImport>::New();
 }
 
 
@@ -101,11 +102,10 @@ void mitk::LogoOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
 
 vtkImageData *mitk::LogoOverlay::CreateMbiLogo()
 {
-  vtkImageImport*     VtkImageImport = vtkImageImport::New();
-  VtkImageImport->SetDataScalarTypeToUnsignedChar();
-  VtkImageImport->SetNumberOfScalarComponents(mbiLogo_NumberOfScalars);
-  VtkImageImport->SetWholeExtent(0,mbiLogo_Width-1,0,mbiLogo_Height-1,0,1-1);
-  VtkImageImport->SetDataExtentToWholeExtent();
+  m_VtkImageImport->SetDataScalarTypeToUnsignedChar();
+  m_VtkImageImport->SetNumberOfScalarComponents(mbiLogo_NumberOfScalars);
+  m_VtkImageImport->SetWholeExtent(0,mbiLogo_Width-1,0,mbiLogo_Height-1,0,1-1);
+  m_VtkImageImport->SetDataExtentToWholeExtent();
 
   char *              ImageData;
   // flip mbi logo around y axis and change color order
@@ -129,10 +129,10 @@ vtkImageData *mitk::LogoOverlay::CreateMbiLogo()
         *dest++ = a;
       }
 
-  VtkImageImport->SetImportVoidPointer(ImageData);
-  VtkImageImport->Modified();
-  VtkImageImport->Update();
-  return VtkImageImport->GetOutput();
+  m_VtkImageImport->SetImportVoidPointer(ImageData);
+  m_VtkImageImport->Modified();
+  m_VtkImageImport->Update();
+  return m_VtkImageImport->GetOutput();
 }
 
 void mitk::LogoOverlay::SetLogoImagePath(std::string path)

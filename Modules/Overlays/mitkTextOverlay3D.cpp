@@ -72,7 +72,7 @@ void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
     ls->m_follower->SetScale(this->GetFontSize());
     vtkRenderer* vtkRender = renderer->GetVtkRenderer();
     if(vtkRender)
-      ls->m_follower->SetCamera(ls->rendereer->GetActiveCamera());
+      ls->m_follower->SetCamera(vtkRender->GetActiveCamera());
     ls->UpdateGenerateDataTime();
   }
 }

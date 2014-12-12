@@ -662,8 +662,8 @@ class MeshUtil
       return m_QuadCells->InsertNextCell(4, pts);
     }
 
-    vtkIdType InsertTetra(vtkIdType */*pts*/) { return -1; } // ignored
-    vtkIdType InsertHexahedron(vtkIdType */*pts*/) { return -1; } // ignored
+    vtkIdType InsertTetra(vtkIdType * /*pts*/) { return -1; } // ignored
+    vtkIdType InsertHexahedron(vtkIdType * /*pts*/) { return -1; } // ignored
   };
 
   //typedef typename MeshType::CellType                CellType;

@@ -174,6 +174,21 @@ protected:
    mitk::NodePredicateNot::Pointer m_IsNotBinaryPredicate;
    mitk::NodePredicateAnd::Pointer m_IsNotABinaryImagePredicate;
    mitk::NodePredicateAnd::Pointer m_IsABinaryImagePredicate;
+
+private:
+const static QString TR_CREATE_NEW_SEGM;
+const static QString TR_ALLOCATE_ERROR;
+const static QString TR_SEGMENTATION;
+const static QString TR_SEGM_2D_ERROR;
+const static QString TR_SELECTED_SEGM_NOT_VISIBLE;
+const static QString TR_SELECT_OR_CREATE_SEGM;
+const static QString TR_PATIENT_NOT_MATCH_SEGM;
+const static QString TR_LOAD_IMAGE;
+const static QString TR_SEGM_NOT_MATCH_PATIENT;
+const static QString TR_LOAD_ACCORDING_PATIENT_IMAGE;
+const static QString TR_NEED_REINIT_SEGM;
+
+
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

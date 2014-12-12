@@ -1419,8 +1419,8 @@ bool mitk::Equal(const mitk::Image& leftHandSide, const mitk::Image& rightHandSi
   }
 
   // Geometries
-  if( !mitk::Equal(  leftHandSide.GetGeometry(),
-                     rightHandSide.GetGeometry(), eps, verbose) )
+  if( !mitk::Equal(  *leftHandSide.GetGeometry(),
+                     *rightHandSide.GetGeometry(), eps, verbose) )
   {
     if(verbose)
     {

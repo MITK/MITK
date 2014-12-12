@@ -39,7 +39,7 @@ public:
   typedef std::set<Overlay::Pointer> OverlaySet;
   typedef std::map<const std::string,AbstractOverlayLayouter::Pointer > LayouterMap;
   typedef std::map<const BaseRenderer*,LayouterMap > LayouterRendererMap;
-  typedef std::map<const BaseRenderer*,vtkRenderer* > ForegroundRendererMap;
+  typedef std::map<const BaseRenderer*,vtkSmartPointer<vtkRenderer> > ForegroundRendererMap;
 
   mitkClassMacro(OverlayManager, itk::LightObject);
   itkFactorylessNewMacro(Self)

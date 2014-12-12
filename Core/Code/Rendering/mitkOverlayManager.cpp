@@ -33,7 +33,7 @@ void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
 {
   if(!m_ForegroundRenderer[renderer])
   {
-    m_ForegroundRenderer[renderer] = vtkRenderer::New();
+    m_ForegroundRenderer[renderer] = vtkSmartPointer<vtkRenderer>::New();
     vtkRenderer* rendererVtk = m_ForegroundRenderer[renderer];
     rendererVtk->SetActiveCamera(renderer->GetVtkRenderer()->GetActiveCamera());
     mitk::VtkLayerController::GetInstance(renderer->GetRenderWindow())->InsertForegroundRenderer(rendererVtk,false);
@@ -73,6 +73,8 @@ void mitk::OverlayManager::RemoveBaseRenderer(mitk::BaseRenderer* renderer)
     return;
 
   m_BaseRendererSet.erase(i);
+
+  m_ForegroundRenderer[renderer] = NULL;
 }
 
 void mitk::OverlayManager::RemoveAllBaseRenderers()

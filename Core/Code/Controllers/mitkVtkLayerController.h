@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 #include <map>
 #include <MitkCoreExports.h>
+#include <vtkSmartPointer.h>
 
 class vtkRenderWindow;
 class vtkRenderer;
@@ -110,12 +111,12 @@ class MITK_CORE_EXPORT VtkLayerController
     void UpdateLayers();
 
     // Layer Management
-    typedef std::vector<vtkRenderer*> RendererVectorType;
+    typedef std::vector< vtkSmartPointer<vtkRenderer> > RendererVectorType;
     RendererVectorType m_BackgroundRenderers;
     RendererVectorType m_SceneRenderers;
     RendererVectorType m_ForegroundRenderers;
 
-    typedef std::map<const vtkRenderWindow*,mitk::VtkLayerController*> vtkLayerControllerMapType;
+    typedef std::map<const vtkSmartPointer<vtkRenderWindow>,mitk::VtkLayerController*> vtkLayerControllerMapType;
     static vtkLayerControllerMapType s_LayerControllerMap;
 
 };

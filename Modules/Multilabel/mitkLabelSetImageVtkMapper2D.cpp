@@ -595,10 +595,9 @@ void mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, 
   mitk::RenderingModeProperty::Pointer renderingModeProperty = mitk::RenderingModeProperty::New( RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
   node->SetProperty( "Image Rendering.Mode", renderingModeProperty, renderer );
 
-  mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
-  mitk::LevelWindow levelwindow;
-  levelwindow.SetLevelWindow(127.5, 255);
-  levelwindow.SetRangeMinMax(0, 255);
+  mitk::LevelWindow levelwindow(32767.5,65535);
+  mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New(levelwindow);
+
   levWinProp->SetLevelWindow(levelwindow);
   node->SetProperty( "levelwindow", levWinProp, renderer);
 

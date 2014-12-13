@@ -34,62 +34,62 @@ class vtkPolyData;
  */
 class MITK_EXPORT vtkMitkRectangleProp : public vtkProp
 {
-  public:
-    static vtkMitkRectangleProp* New();
-    vtkTypeMacro(vtkMitkRectangleProp,vtkProp);
+public:
+  static vtkMitkRectangleProp* New();
+  vtkTypeMacro(vtkMitkRectangleProp,vtkProp);
 
-    /**
+  /**
      * @brief RenderOverlay Calls the render method of the actor and renders it.
      * @param viewport viewport of the renderwindow.
      * @return
      */
-    int RenderOverlay(vtkViewport* viewport);
+  int RenderOverlay(vtkViewport* viewport);
 
-    /**
+  /**
      * @brief SetRenderWindow Set the renderwindow.
      * @param renWin
      */
-    void SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renWin);
+  void SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renWin);
 
-    /**
+  /**
      * @brief SetColor Set the color of the rectangle.
      * @param col1 red
      * @param col2 green
      * @param col3 blue
      */
-    void SetColor(float col1, float col2, float col3);
+  void SetColor(float col1, float col2, float col3);
 
-  protected:
+protected:
 
-    vtkMitkRectangleProp();
-    virtual ~vtkMitkRectangleProp();
+  vtkMitkRectangleProp();
+  virtual ~vtkMitkRectangleProp();
 
-    /**
+  /**
      * @brief m_RenderWindow renderwindow to add the rectangle to.
      */
-    vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
+  vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
 
-    /**
-     * @brief m_Color color of thr rectangle.
+  /**
+     * @brief m_Color color of the rectangle.
      */
-    float m_Color[3];
+  float m_Color[3];
 
-    /**
+  /**
      * @brief CreateRectangle internal helper to fill a vtkPolydata with a rectangle.
      */
-    void CreateRectangle();
-    /**
+  void CreateRectangle();
+  /**
      * @brief m_PolyData holds the rectangle.
      */
-    vtkSmartPointer<vtkPolyData> m_PolyData;
-    /**
+  vtkSmartPointer<vtkPolyData> m_PolyData;
+  /**
      * @brief m_RectangleActor actor to render the rectangle.
      */
-    vtkSmartPointer<vtkActor2D> m_RectangleActor;
+  vtkSmartPointer<vtkActor2D> m_RectangleActor;
 
-    /**
+  /**
      * @brief IDs of the corner points (the corners of the renderwindow).
      */
-    vtkIdType m_BottomLeft, m_BottomRight, m_TopRight, m_TopLeft;
+  vtkIdType m_BottomLeft, m_BottomRight, m_TopRight, m_TopLeft;
 };
 #endif /* vtkMitkRectangleProp_h */

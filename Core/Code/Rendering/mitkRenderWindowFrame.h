@@ -20,11 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <itkObject.h>
 #include <MitkCoreExports.h>
-#include <mitkBaseData.h>
+#include <mitkCommon.h>
 
 class vtkRenderer;
 class vtkRenderWindow;
-
 
 namespace mitk {
 
@@ -97,8 +96,6 @@ protected:
   vtkSmartPointer<vtkRenderWindow>    m_RenderWindow;
   vtkSmartPointer<vtkRenderer>        m_RectangleRenderer;
   bool                m_IsEnabled;
-
 };
-
 } //end of namespace mitk
 #endif //mitkRenderWindowFrame_h

@@ -42,30 +42,30 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   m_Ui->setupUi(m_Control);
 
   berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+      = berry::Platform::GetServiceRegistry()
+      .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
   m_Preferences = prefService->GetSystemPreferences()->Node(QmitkStdMultiWidgetEditor::EDITOR_ID);
 
   QObject::connect( m_Ui->m_ColorButton1, SIGNAL( clicked() )
-    , this, SLOT( FirstColorChanged() ) );
+                    , this, SLOT( FirstColorChanged() ) );
 
   QObject::connect( m_Ui->m_ColorButton2, SIGNAL( clicked() )
-    , this, SLOT( SecondColorChanged() ) );
+                    , this, SLOT( SecondColorChanged() ) );
 
   QObject::connect( m_Ui->m_ResetButton, SIGNAL( clicked() )
-    , this, SLOT( ResetColors() ) );
+                    , this, SLOT( ResetColors() ) );
 
   QObject::connect( m_Ui->m_RenderingMode, SIGNAL(activated(int) )
-    , this, SLOT( ChangeRenderingMode(int) ) );
+                    , this, SLOT( ChangeRenderingMode(int) ) );
 
   QObject::connect( m_Ui->m_RenderWindowDecorationColor, SIGNAL( clicked() )
-    , this, SLOT( WidgetColorChanged() ) );
+                    , this, SLOT( WidgetColorChanged() ) );
 
   QObject::connect( m_Ui->m_RenderWindowChooser, SIGNAL(activated(int) )
-    , this, SLOT( OnWidgetComboBoxChanged(int) ) );
+                    , this, SLOT( OnWidgetComboBoxChanged(int) ) );
   QObject::connect( m_Ui->m_RenderWindowDecorationText, SIGNAL(textChanged(QString) )
-  , this, SLOT( AnnotationTextChanged(QString) ) );
+                    , this, SLOT( AnnotationTextChanged(QString) ) );
 
   this->Update();
 }
@@ -98,7 +98,7 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
   m_Preferences->PutInt("crosshair gap size", m_Ui->m_CrosshairGapSize->value());
 
   m_Preferences->PutBool("Use constrained zooming and padding"
-                                        , m_Ui->m_EnableFlexibleZooming->isChecked());
+                         , m_Ui->m_EnableFlexibleZooming->isChecked());
   m_Preferences->PutBool("Show level/window widget", m_Ui->m_ShowLevelWindowWidget->isChecked());
   m_Preferences->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
   m_Preferences->PutInt("Rendering Mode", m_Ui->m_RenderingMode->currentIndex());
@@ -289,7 +289,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
   }
   else if( i == 1 )
   {
-   m_CurrentRenderingMode = "Multisampling";
+    m_CurrentRenderingMode = "Multisampling";
   }
   else if( i == 2 )
   {

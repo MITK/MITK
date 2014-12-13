@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace Ui
 {
-  class QmitkStdMultiWidgetEditorPreferencePage;
+class QmitkStdMultiWidgetEditorPreferencePage;
 }
 
 class QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage

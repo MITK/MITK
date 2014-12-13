@@ -17,32 +17,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometryDataMapper2D.h"
 
 //mitk includes
-#include "mitkDataNode.h"
-#include "mitkProperties.h"
 #include "mitkVtkPropRenderer.h"
-#include "mitkPointSet.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkPlaneOrientationProperty.h"
-#include "mitkLine.h"
-
-//vtk includes
-#include <vtkActor.h>
-
+#include <mitkProperties.h>
+#include <mitkDataNode.h>
+#include <mitkPointSet.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkPlaneOrientationProperty.h>
+#include <mitkLine.h>
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkResliceMethodProperty.h>
 #include <mitkSlicedGeometry3D.h>
-#include <stdlib.h>
+
+//vtk includes
+#include <vtkActor.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkLine.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
-#include <vtkSphereSource.h>
-#include <vtkUnsignedCharArray.h>
 
 mitk::PlaneGeometryDataMapper2D::AllInstancesContainer mitk::PlaneGeometryDataMapper2D::s_AllInstances;
 
-// input for this mapper ( = point set)
+// input for this mapper ( = PlaneGeometryData)
 const mitk::PlaneGeometryData* mitk::PlaneGeometryDataMapper2D::GetInput() const
 {
   return static_cast< PlaneGeometryData * >(GetDataNode()->GetData());
@@ -50,9 +46,9 @@ const mitk::PlaneGeometryData* mitk::PlaneGeometryDataMapper2D::GetInput() const
 
 // constructor PlaneGeometryDataMapper2D
 mitk::PlaneGeometryDataMapper2D::PlaneGeometryDataMapper2D()
-: m_RenderOrientationArrows( false ),
-  m_ArrowOrientationPositive( true ),
-  m_DepthValue(1.0f)
+  : m_RenderOrientationArrows( false ),
+    m_ArrowOrientationPositive( true ),
+    m_DepthValue(1.0f)
 {
   s_AllInstances.insert(this);
 }
@@ -88,7 +84,7 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer( mitk::BaseRendere
     if (generateDataRequired) break;
   }
 
-//  if (!generateDataRequired) return;
+  //  if (!generateDataRequired) return;
 
   ls->UpdateGenerateDataTime();
 
@@ -144,7 +140,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
   const PlaneGeometry *inputPlaneGeometry = dynamic_cast< const PlaneGeometry * >( input->GetPlaneGeometry() );
 
   const PlaneGeometry* worldPlaneGeometry = dynamic_cast< const PlaneGeometry* >(
-    rendererWorldPlaneGeometryData->GetPlaneGeometry() );
+        rendererWorldPlaneGeometryData->GetPlaneGeometry() );
 
   if ( worldPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(worldPlaneGeometry)==NULL
        && inputPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(input->GetPlaneGeometry() )==NULL
@@ -171,10 +167,10 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       // Then, clip this line with the (transformed) bounding box of the
       // reference geometry.
       crossLine.BoxLineIntersection(
-        boundingBoxMin[0], boundingBoxMin[1], boundingBoxMin[2],
-        boundingBoxMax[0], boundingBoxMax[1], boundingBoxMax[2],
-        crossLine.GetPoint(), crossLine.GetDirection(),
-        point1, point2 );
+            boundingBoxMin[0], boundingBoxMin[1], boundingBoxMin[2],
+          boundingBoxMax[0], boundingBoxMax[1], boundingBoxMax[2],
+          crossLine.GetPoint(), crossLine.GetDirection(),
+          point1, point2 );
 
       crossLine.SetPoints(point1,point2);
 
@@ -209,7 +205,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       while ( otherPlanesIt != otherPlanesEnd )
       {
         PlaneGeometry *otherPlane = static_cast< PlaneGeometry * >(
-          static_cast< PlaneGeometryData * >((*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
+              static_cast< PlaneGeometryData * >((*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
 
         if (otherPlane != inputPlaneGeometry && otherPlane != worldPlaneGeometry)
         {
@@ -263,9 +259,9 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
 
       IntProperty *intProperty=0;
       if( GetDataNode()->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
-          thickSliceDistance *= intProperty->GetValue()+0.5;
+        thickSliceDistance *= intProperty->GetValue()+0.5;
       else
-          showAreaOfThickSlicing = false;
+        showAreaOfThickSlicing = false;
 
       // not the nicest place to do it, but we have the width of the visible bloc in MM here
       // so we store it in this fancy property
@@ -360,13 +356,13 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer
   if ( decorationProperty != NULL )
   {
     if ( decorationProperty->GetPlaneDecoration() ==
-      PlaneOrientationProperty::PLANE_DECORATION_POSITIVE_ORIENTATION )
+         PlaneOrientationProperty::PLANE_DECORATION_POSITIVE_ORIENTATION )
     {
       m_RenderOrientationArrows = true;
       m_ArrowOrientationPositive = true;
     }
     else if ( decorationProperty->GetPlaneDecoration() ==
-      PlaneOrientationProperty::PLANE_DECORATION_NEGATIVE_ORIENTATION )
+              PlaneOrientationProperty::PLANE_DECORATION_NEGATIVE_ORIENTATION )
     {
       m_RenderOrientationArrows = true;
       m_ArrowOrientationPositive = false;
@@ -388,7 +384,7 @@ void mitk::PlaneGeometryDataMapper2D::SetDefaultProperties(mitk::DataNode* node,
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
-void mitk::PlaneGeometryDataMapper2D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
+void mitk::PlaneGeometryDataMapper2D::UpdateVtkTransform(mitk::BaseRenderer* /*renderer*/)
 {
 
 }

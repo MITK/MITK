@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkRenderWindowFrame.h"
-
 #include "mitkVtkLayerController.h"
 #include "vtkMitkRectangleProp.h"
 

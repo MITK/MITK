@@ -335,8 +335,8 @@ void mitk::VtkLayerController::SetEraseForAllRenderers(int i)
     (*it)->SetErase(i);
 
   for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); it++)
-   (*it)->SetErase(i);
+    (*it)->SetErase(i);
 
   for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); it++)
-   (*it)->SetErase(i);
+    (*it)->SetErase(i);
 }

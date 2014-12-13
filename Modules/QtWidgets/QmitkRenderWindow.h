@@ -37,12 +37,12 @@ class QInputEvent;
  */
 class QMITK_EXPORT QmitkRenderWindow: public QVTKWidget, public mitk::RenderWindowBase
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
 
   QmitkRenderWindow(QWidget *parent = 0, QString name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL,
-    mitk::RenderingManager* renderingManager = NULL,mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
+                    mitk::RenderingManager* renderingManager = NULL,mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
   virtual ~QmitkRenderWindow();
 
   /**

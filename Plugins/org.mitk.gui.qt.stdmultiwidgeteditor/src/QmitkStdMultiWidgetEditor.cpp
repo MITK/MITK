@@ -287,7 +287,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     d->m_MouseModeToolbar->setMouseModeSwitcher( d->m_StdMultiWidget->GetMouseModeSwitcher() );
     connect( d->m_MouseModeToolbar, SIGNAL( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ),
-      d->m_StdMultiWidget, SLOT( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ) );
+             d->m_StdMultiWidget, SLOT( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ) );
 
     layout->addWidget(d->m_StdMultiWidget);
 
@@ -303,7 +303,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     // Initialize bottom-right view as 3D view
     d->m_StdMultiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(
-      mitk::BaseRenderer::Standard3D );
+          mitk::BaseRenderer::Standard3D );
 
     // Enable standard handler for levelwindow-slider
     d->m_StdMultiWidget->EnableStandardLevelWindow();

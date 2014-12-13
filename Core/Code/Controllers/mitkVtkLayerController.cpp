@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::VtkLayerController::vtkLayerControllerMapType mitk::VtkLayerController::s_LayerControllerMap;
 
-mitk::VtkLayerController * mitk::VtkLayerController::GetInstance(vtkRenderWindow* renWin)
+mitk::VtkLayerController* mitk::VtkLayerController::GetInstance(vtkSmartPointer<vtkRenderWindow> renWin)
 {
   for(vtkLayerControllerMapType::iterator mapit = s_LayerControllerMap.begin();
       mapit != s_LayerControllerMap.end(); mapit++)
@@ -36,7 +36,8 @@ mitk::VtkLayerController * mitk::VtkLayerController::GetInstance(vtkRenderWindow
   return NULL;
 }
 
-void  mitk::VtkLayerController::AddInstance(vtkRenderWindow* renWin, vtkRenderer * mitkSceneRenderer)
+void  mitk::VtkLayerController::AddInstance(vtkSmartPointer<vtkRenderWindow> renWin,
+                                            vtkSmartPointer<vtkRenderer> mitkSceneRenderer)
 {
   // ensure that no vtkRenderWindow is managed twice
   mitk::VtkLayerController::RemoveInstance(renWin);
@@ -48,7 +49,7 @@ void  mitk::VtkLayerController::AddInstance(vtkRenderWindow* renWin, vtkRenderer
   s_LayerControllerMap.insert(vtkLayerControllerMapType::value_type(renWin,ControllerInstance));
 }
 
-void  mitk::VtkLayerController::RemoveInstance(vtkRenderWindow* renWin)
+void  mitk::VtkLayerController::RemoveInstance(vtkSmartPointer<vtkRenderWindow> renWin)
 {
   vtkLayerControllerMapType::iterator mapit = s_LayerControllerMap.find(renWin);
   if(mapit != s_LayerControllerMap.end())
@@ -58,7 +59,7 @@ void  mitk::VtkLayerController::RemoveInstance(vtkRenderWindow* renWin)
   }
 }
 
-mitk::VtkLayerController::VtkLayerController(vtkRenderWindow* renderWindow)
+mitk::VtkLayerController::VtkLayerController(vtkSmartPointer<vtkRenderWindow> renderWindow)
 {
   m_RenderWindow = renderWindow;
   m_RenderWindow->Register( NULL );
@@ -81,7 +82,8 @@ mitk::VtkLayerController::~VtkLayerController()
  * With forceAbsoluteBackground set true a renderer can be placed at the absolute background of the scene.
  * Multiple calls with forceAbsoluteBackground set true will set the latest registered renderer as background.
  */
-void mitk::VtkLayerController::InsertBackgroundRenderer(vtkRenderer* renderer, bool forceAbsoluteBackground)
+void mitk::VtkLayerController::InsertBackgroundRenderer(vtkSmartPointer<vtkRenderer>
+                                                        renderer, bool forceAbsoluteBackground)
 {
 
   if(renderer == NULL)
@@ -104,7 +106,8 @@ void mitk::VtkLayerController::InsertBackgroundRenderer(vtkRenderer* renderer, b
  * With forceAbsoluteBackground set true a renderer can be placed at the absolute foreground of the scene.
  * Multiple calls with forceAbsoluteForeground set true will set the latest registered renderer as foreground.
  */
-void mitk::VtkLayerController::InsertForegroundRenderer(vtkRenderer* renderer, bool forceAbsoluteForeground)
+void mitk::VtkLayerController::InsertForegroundRenderer(vtkSmartPointer<vtkRenderer> renderer,
+                                                        bool forceAbsoluteForeground)
 {
 
   if(renderer == NULL)
@@ -126,7 +129,7 @@ void mitk::VtkLayerController::InsertForegroundRenderer(vtkRenderer* renderer, b
 /**
  * Returns the Scene Renderer
  */
-vtkRenderer* mitk::VtkLayerController::GetSceneRenderer()
+vtkSmartPointer<vtkRenderer> mitk::VtkLayerController::GetSceneRenderer()
 {
   if(m_SceneRenderers.size() > 0)
   {
@@ -140,7 +143,7 @@ vtkRenderer* mitk::VtkLayerController::GetSceneRenderer()
  * Connects a VTK renderer with a vtk renderwindow. The renderer will be rendered between background renderers and
  * foreground renderers.
  */
-void mitk::VtkLayerController::InsertSceneRenderer(vtkRenderer* renderer)
+void mitk::VtkLayerController::InsertSceneRenderer(vtkSmartPointer<vtkRenderer> renderer)
 {
 
   if(renderer == NULL)
@@ -156,7 +159,7 @@ void mitk::VtkLayerController::InsertSceneRenderer(vtkRenderer* renderer)
  * A renderer which has been inserted via a insert... function can be removed from the vtkRenderWindow with
  * RemoveRenderer.
  */
-void mitk::VtkLayerController::RemoveRenderer(vtkRenderer* renderer)
+void mitk::VtkLayerController::RemoveRenderer(vtkSmartPointer<vtkRenderer> renderer)
 {
   RendererVectorType::iterator it;
   // background layers
@@ -196,7 +199,7 @@ void mitk::VtkLayerController::RemoveRenderer(vtkRenderer* renderer)
 /**
  * Connects a VtkRenderWindow with the layer controller.
  */
-void mitk::VtkLayerController::SetRenderWindow(vtkRenderWindow* renwin)
+void mitk::VtkLayerController::SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renwin)
 {
   if(renwin != NULL)
   {
@@ -224,7 +227,7 @@ void mitk::VtkLayerController::SetRenderWindow(vtkRenderWindow* renwin)
 /**
 * Returns true if a renderer has been inserted
 */
-bool mitk::VtkLayerController::IsRendererInserted(vtkRenderer* renderer)
+bool mitk::VtkLayerController::IsRendererInserted(vtkSmartPointer<vtkRenderer> renderer)
 {
   RendererVectorType::iterator it;
   // background layers
@@ -265,7 +268,7 @@ bool mitk::VtkLayerController::IsRendererInserted(vtkRenderer* renderer)
 void mitk::VtkLayerController::UpdateLayers()
 {
   // Remove all Renderers from renderwindow
-  vtkRendererCollection* v = m_RenderWindow->GetRenderers();
+  vtkSmartPointer<vtkRendererCollection> v = m_RenderWindow->GetRenderers();
   v->RemoveAllItems();
 
 
@@ -325,7 +328,6 @@ unsigned int mitk::VtkLayerController::GetNumberOfRenderers()
 
 void mitk::VtkLayerController::SetEraseForAllRenderers(int i)
 {
-
   this->m_RenderWindow->SetErase(i);
 
   RendererVectorType::iterator it;
@@ -337,6 +339,4 @@ void mitk::VtkLayerController::SetEraseForAllRenderers(int i)
 
   for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); it++)
    (*it)->SetErase(i);
-
 }
-

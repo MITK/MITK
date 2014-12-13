@@ -14,12 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKVTKLAYERCONTROLLER_H_HEADER_INCLUDED_C1EDO02D
-#define MITKVTKLAYERCONTROLLER_H_HEADER_INCLUDED_C1EDO02D
+#ifndef mitkVtkLayerController_h
+#define mitkVtkLayerController_h
 
 #include <vector>
 #include <map>
 #include <MitkCoreExports.h>
+#include <vtkSmartPointer.h>
 
 class vtkRenderWindow;
 class vtkRenderer;
@@ -43,53 +44,53 @@ namespace mitk
 class MITK_CORE_EXPORT VtkLayerController
 {
   public:
-    static VtkLayerController* GetInstance(vtkRenderWindow* renWin);
-    static void AddInstance(vtkRenderWindow* renWin, vtkRenderer * mitkSceneRenderer);
-    static void RemoveInstance(vtkRenderWindow* renWin);
+    static VtkLayerController* GetInstance(vtkSmartPointer<vtkRenderWindow> renWin);
+    static void AddInstance(vtkSmartPointer<vtkRenderWindow> renWin, vtkSmartPointer<vtkRenderer> mitkSceneRenderer);
+    static void RemoveInstance(vtkSmartPointer<vtkRenderWindow> renWin);
 
-    VtkLayerController(vtkRenderWindow* renderWindow);
+    VtkLayerController(vtkSmartPointer<vtkRenderWindow> renderWindow);
     virtual ~VtkLayerController();
 
     /**
     * Returns the current vtkRenderer of the Scene
     */
-    vtkRenderer* GetSceneRenderer();
+    vtkSmartPointer<vtkRenderer> GetSceneRenderer();
 
     /**
     * Connects a VTK renderer with a vtk renderwindow. The renderer will be rendered in the background.
     * With forceAbsoluteBackground set true a renderer can be placed at the absolute background of the scene.
     * Multiple calls with forceAbsoluteBackground set true will set the latest registered renderer as background.
     */
-    void InsertBackgroundRenderer(vtkRenderer* renderer, bool forceAbsoluteBackground);
+    void InsertBackgroundRenderer(vtkSmartPointer<vtkRenderer> renderer, bool forceAbsoluteBackground);
 
     /**
     * Connects a VTK renderer with a vtk renderwindow. The renderer will be rendered in the foreground.
     * With forceAbsoluteBackground set true a renderer can be placed at the absolute foreground of the scene.
     * Multiple calls with forceAbsoluteForeground set true will set the latest registered renderer as foreground.
     */
-    void InsertForegroundRenderer(vtkRenderer* renderer, bool forceAbsoluteForeground);
+    void InsertForegroundRenderer(vtkSmartPointer<vtkRenderer> renderer, bool forceAbsoluteForeground);
 
     /**
     * Connects a VTK renderer with a vtk renderwindow. The renderer will be rendered between background renderers and
     * foreground renderers.
     */
-    void InsertSceneRenderer(vtkRenderer* renderer);
+    void InsertSceneRenderer(vtkSmartPointer<vtkRenderer> renderer);
 
     /**
     * Connects a VtkRenderWindow with the layer controller.
     */
-    void SetRenderWindow(vtkRenderWindow* renwin);
+    void SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renwin);
 
     /**
     * A renderer which has been inserted via a insert... function can be removed from the vtkRenderWindow with
     * RemoveRenderer.
     */
-    void RemoveRenderer(vtkRenderer* renderer);
+    void RemoveRenderer(vtkSmartPointer<vtkRenderer> renderer);
 
     /**
     * Returns true if a renderer has been inserted
     */
-    bool IsRendererInserted(vtkRenderer* renderer);
+    bool IsRendererInserted(vtkSmartPointer<vtkRenderer> renderer);
 
     /**
     * Returns the number of renderers in the renderwindow.
@@ -98,7 +99,7 @@ class MITK_CORE_EXPORT VtkLayerController
 
     void SetEraseForAllRenderers(int i);
   protected:
-    vtkRenderWindow*    m_RenderWindow;
+    vtkSmartPointer<vtkRenderWindow>    m_RenderWindow;
 
   private:
 
@@ -110,12 +111,12 @@ class MITK_CORE_EXPORT VtkLayerController
     void UpdateLayers();
 
     // Layer Management
-    typedef std::vector<vtkRenderer*> RendererVectorType;
+    typedef std::vector< vtkSmartPointer<vtkRenderer> > RendererVectorType;
     RendererVectorType m_BackgroundRenderers;
     RendererVectorType m_SceneRenderers;
     RendererVectorType m_ForegroundRenderers;
 
-    typedef std::map<const vtkRenderWindow*,mitk::VtkLayerController*> vtkLayerControllerMapType;
+    typedef std::map<const vtkSmartPointer<vtkRenderWindow>,mitk::VtkLayerController*> vtkLayerControllerMapType;
     static vtkLayerControllerMapType s_LayerControllerMap;
 
 };
@@ -126,9 +127,4 @@ class MITK_CORE_EXPORT VtkLayerController
 
 } // Namespace MITK
 
-
-
-
-#endif /* MITKVTKLAYERCONTROLLER_H_HEADER_INCLUDED_C1EDO02D */
-
-
+#endif /* mitkVtkLayerController_h */

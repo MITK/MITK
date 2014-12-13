@@ -14,21 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _vtk_Colored_Rectangle_Rendering_h_
-#define _vtk_Colored_Rectangle_Rendering_h_
+#ifndef mitkRenderWindowFrame_h
+#define mitkRenderWindowFrame_h
 
-
-#include <vtkSystemIncludes.h>
+#include <vtkSmartPointer.h>
+#include <itkObject.h>
+#include <MitkCoreExports.h>
 #include <mitkBaseData.h>
-
-#include <vector>
-#include <map>
 
 class vtkRenderer;
 class vtkRenderWindow;
-class vtkCamera;
-class vtkTextProperty;
-class vtkTextActor;
 
 
 namespace mitk {
@@ -40,11 +35,11 @@ namespace mitk {
  * vtkProp (vtkMitkRectangleProp).
  * This class instantiates the vtkProp and a corresponding vtkRenderer instance.
  */
-class MITK_CORE_EXPORT RenderWindowFrame : public BaseData
+class MITK_CORE_EXPORT RenderWindowFrame : public itk::Object
 {
 public:
 
-  mitkClassMacro( RenderWindowFrame, BaseData );
+  mitkClassMacro( RenderWindowFrame, itk::Object );
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
@@ -53,7 +48,7 @@ public:
    * Make sure, you have called this function
    * before calling Enable()
    */
-  virtual void SetRenderWindow( vtkRenderWindow* renderWindow );
+  virtual void SetRenderWindow( vtkSmartPointer<vtkRenderWindow> renderWindow );
 
   /**
    * Enables drawing of the colored rectangle.
@@ -74,41 +69,17 @@ public:
   virtual bool IsEnabled();
 
   /**
-   * Empty implementation, since the rectangle rendering doesn't
-   * support the requested region concept
-   */
-  virtual void SetRequestedRegionToLargestPossibleRegion();
-
-  /**
-   * Empty implementation, since the rectangle rendering doesn't
-   * support the requested region concept
-   */
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-
-  /**
-   * Empty implementation, since the rectangle rendering doesn't
-   * support the requested region concept
-   */
-  virtual bool VerifyRequestedRegion();
-
-  /**
-   * Empty implementation, since the rectangle rendering doesn't
-   * support the requested region concept
-   */
-  virtual void SetRequestedRegion( const itk::DataObject*);
-
-  /**
    * Returns the vtkRenderWindow, which is used
    * for displaying the text
    */
-  virtual vtkRenderWindow* GetRenderWindow();
+  virtual vtkSmartPointer<vtkRenderWindow> GetRenderWindow();
 
   /**
    * Returns the renderer responsible for
    * rendering the text into the
    * vtkRenderWindow
    */
-  virtual vtkRenderer* GetVtkRenderer();
+  virtual vtkSmartPointer<vtkRenderer> GetVtkRenderer();
 
 
 protected:
@@ -123,11 +94,11 @@ protected:
    */
   ~RenderWindowFrame();
 
-  vtkRenderWindow*    m_RenderWindow;
-  vtkRenderer*        m_RectangleRenderer;
+  vtkSmartPointer<vtkRenderWindow>    m_RenderWindow;
+  vtkSmartPointer<vtkRenderer>        m_RectangleRenderer;
   bool                m_IsEnabled;
 
 };
 
 } //end of namespace mitk
-#endif
+#endif //mitkRenderWindowFrame_h

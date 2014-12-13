@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef vtkMitkRectangleProp2_h
-#define vtkMitkRectangleProp2_h
+#ifndef vtkMitkRectangleProp_h
+#define vtkMitkRectangleProp_h
 
 #include <MitkCoreExports.h>
 
@@ -49,7 +49,7 @@ class MITK_EXPORT vtkMitkRectangleProp : public vtkProp
      * @brief SetRenderWindow Set the renderwindow.
      * @param renWin
      */
-    void SetRenderWindow(vtkRenderWindow* renWin);
+    void SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renWin);
 
     /**
      * @brief SetColor Set the color of the rectangle.
@@ -67,7 +67,7 @@ class MITK_EXPORT vtkMitkRectangleProp : public vtkProp
     /**
      * @brief m_RenderWindow renderwindow to add the rectangle to.
      */
-    vtkRenderWindow* m_RenderWindow;
+    vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
 
     /**
      * @brief m_Color color of thr rectangle.
@@ -92,4 +92,4 @@ class MITK_EXPORT vtkMitkRectangleProp : public vtkProp
      */
     vtkIdType m_BottomLeft, m_BottomRight, m_TopRight, m_TopLeft;
 };
-#endif /* vtkMitkRectangleProp2_h */
+#endif /* vtkMitkRectangleProp_h */

@@ -103,7 +103,7 @@ void vtkMitkRectangleProp::CreateRectangle()
   lines->InsertNextCell(lineVtk);
 }
 
-void vtkMitkRectangleProp::SetRenderWindow(vtkRenderWindow* renWin)
+void vtkMitkRectangleProp::SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renWin)
 {
   m_RenderWindow = renWin;
 }

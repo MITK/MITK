@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKSTDMULTIWIDGETEDITOR_H_
-#define QMITKSTDMULTIWIDGETEDITOR_H_
+#ifndef QmitkStdMultiWidgetEditor_h
+#define QmitkStdMultiWidgetEditor_h
 
 #include <QmitkAbstractRenderEditor.h>
 
@@ -111,11 +111,15 @@ protected:
 
   void CreateQtPartControl(QWidget* parent);
 
+  /**
+   * @brief GetColorForWidget helper method to convert a saved color string to mitk::Color.
+   * @param widgetName the widget (1-4)
+   * @param prefs the Berry preferences.
+   * @return the color in mitk format.
+   */
   mitk::Color GetColorForWidget(std::string widgetName, const berry::IBerryPreferences* prefs);
 private:
 
   const QScopedPointer<QmitkStdMultiWidgetEditorPrivate> d;
-
 };
-
-#endif /*QMITKSTDMULTIWIDGETEDITOR_H_*/
+#endif /*QmitkStdMultiWidgetEditor_h*/

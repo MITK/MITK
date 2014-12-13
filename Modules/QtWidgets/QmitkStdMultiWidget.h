@@ -14,21 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKSTDMULTIWIDGET_H_
-#define QMITKSTDMULTIWIDGET_H_
+#ifndef QmitkStdMultiWidget_h
+#define QmitkStdMultiWidget_h
 
-#include <MitkQtWidgetsExports.h>
+#include "MitkQtWidgetsExports.h"
 
-#include "mitkPositionTracker.h"
-#include "mitkSlicesRotator.h"
-#include "mitkSlicesSwiveller.h"
-#include "mitkRenderWindowFrame.h"
-#include "mitkLogoOverlay.h"
-#include "mitkGradientBackground.h"
-#include "mitkCoordinateSupplier.h"
-#include "mitkDataStorage.h"
+#include <mitkPositionTracker.h>
+#include <mitkSlicesRotator.h>
+#include <mitkSlicesSwiveller.h>
+#include <mitkRenderWindowFrame.h>
+#include <mitkLogoOverlay.h>
+#include <mitkGradientBackground.h>
+#include <mitkCoordinateSupplier.h>
+#include <mitkDataStorage.h>
 
-#include "mitkMouseModeSwitcher.h"
+#include <mitkMouseModeSwitcher.h>
 
 #include <qwidget.h>
 #include <qsplitter.h>
@@ -37,10 +37,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkRenderWindow.h>
 #include <QmitkLevelWindowWidget.h>
 
-#include "vtkTextProperty.h"
-#include "vtkCornerAnnotation.h"
+#include <vtkTextProperty.h>
+#include <vtkCornerAnnotation.h>
 
-#include "mitkBaseRenderer.h"
+#include <mitkBaseRenderer.h>
 
 class QHBoxLayout;
 class QVBoxLayout;
@@ -307,6 +307,11 @@ public:
   };
 
   void SetCornerAnnotation(std::string text, mitk::Color color, int widgetNumber);
+  /**
+   * @brief GetRenderWindow convinience method to get a widget.
+   * @param number of the widget (0-3)
+   * @return The renderwindow widget.
+   */
   QmitkRenderWindow *GetRenderWindow(unsigned int number);
 protected:
 
@@ -317,17 +322,20 @@ protected:
 
   mitk::RenderingManager* m_RenderingManager;
 
-  mitk::RenderWindowFrame::Pointer m_RectangleRendering3;
-  mitk::RenderWindowFrame::Pointer m_RectangleRendering2;
+  /**
+   * @brief m_RectangleRendering1 the 4 frames of the renderwindow.
+   */
   mitk::RenderWindowFrame::Pointer m_RectangleRendering1;
+  mitk::RenderWindowFrame::Pointer m_RectangleRendering2;
+  mitk::RenderWindowFrame::Pointer m_RectangleRendering3;
   mitk::RenderWindowFrame::Pointer m_RectangleRendering4;
 
   mitk::LogoOverlay::Pointer m_LogoRendering;
 
   mitk::GradientBackground::Pointer m_GradientBackground1;
   mitk::GradientBackground::Pointer m_GradientBackground2;
-  mitk::GradientBackground::Pointer m_GradientBackground4;
   mitk::GradientBackground::Pointer m_GradientBackground3;
+  mitk::GradientBackground::Pointer m_GradientBackground4;
   bool m_GradientBackgroundFlag;
 
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
@@ -340,6 +348,9 @@ protected:
   mitk::DataNode::Pointer m_PositionTrackerNode;
   mitk::DataStorage::Pointer m_DataStorage;
 
+  /**
+   * @brief m_PlaneNode1 the 3 helper objects which contain the plane geometry.
+   */
   mitk::DataNode::Pointer m_PlaneNode1;
   mitk::DataNode::Pointer m_PlaneNode2;
   mitk::DataNode::Pointer m_PlaneNode3;
@@ -367,6 +378,9 @@ protected:
   QWidget *mitkWidget3Container;
   QWidget *mitkWidget4Container;
 
+  /**
+   * @brief The CornerAnnotation struct to hold the 4 corner annotations.
+   */
   struct CornerAnnotation
   {
     vtkSmartPointer<vtkCornerAnnotation> cornerText;
@@ -376,6 +390,12 @@ protected:
 
   bool m_PendingCrosshairPositionEvent;
   bool m_CrosshairNavigationEnabled;
+  /**
+   * @brief CreateCornerAnnotation helper method to create a corner annotation.
+   * @param text of the annotation.
+   * @param color of the annotation.
+   * @return the complete struct.
+   */
   CornerAnnotation CreateCornerAnnotation(std::string text, mitk::Color color);
 };
-#endif /*QMITKSTDMULTIWIDGET_H_*/
+#endif /*QmitkStdMultiWidget_h*/

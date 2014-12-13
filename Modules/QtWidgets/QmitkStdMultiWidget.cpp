@@ -26,27 +26,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMouseEvent>
 #include <QTimer>
 
-#include "mitkProperties.h"
-#include "mitkPlaneGeometryDataMapper2D.h"
-#include "mitkGlobalInteraction.h"
-#include "mitkDisplayInteractor.h"
-#include "mitkPointSet.h"
-#include "mitkPositionEvent.h"
-#include "mitkStateEvent.h"
-#include "mitkLine.h"
-#include "mitkInteractionConst.h"
-#include "mitkDataStorage.h"
-#include "mitkOverlayManager.h"
-
-#include "mitkNodePredicateBase.h"
-#include "mitkNodePredicateDataType.h"
-
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkStatusBar.h"
-#include "mitkImage.h"
-
-#include "mitkVtkLayerController.h"
+#include <mitkProperties.h>
+#include <mitkPlaneGeometryDataMapper2D.h>
+#include <mitkGlobalInteraction.h>
+#include <mitkDisplayInteractor.h>
+#include <mitkPointSet.h>
+#include <mitkPositionEvent.h>
+#include <mitkStateEvent.h>
+#include <mitkLine.h>
+#include <mitkInteractionConst.h>
+#include <mitkDataStorage.h>
+#include <mitkOverlayManager.h>
+#include <mitkNodePredicateBase.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkStatusBar.h>
+#include <mitkImage.h>
+#include <mitkVtkLayerController.h>
 
 #include <iomanip>
 

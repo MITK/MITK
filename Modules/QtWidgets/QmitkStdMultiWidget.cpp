@@ -231,10 +231,19 @@ void QmitkStdMultiWidget::InitializeWidget()
   // transfer colors in WorldGeometry-Nodes of the associated Renderer
   mitk::IntProperty::Pointer  layer;
 
-  float colorWidget1[3]= { 1.0f, 0.0f, 0.0f };
-  float colorWidget2[3]= { 0.0f, 1.0f, 0.0f };
-  float colorWidget3[3]= { 0.0f, 0.0f, 1.0f };
-  float colorWidget4[3]= { 1.0f, 1.0f, 0.0f };
+  mitk::Color colorWidget1, colorWidget2, colorWidget3;
+  colorWidget1[0] = 1.0f;
+  colorWidget1[1] = 0.0f;
+  colorWidget1[2] = 0.0f;
+  colorWidget2[0] = 0.0f;
+  colorWidget2[1] = 1.0f;
+  colorWidget2[2] = 0.0f;
+  colorWidget3[0] = 0.0f;
+  colorWidget3[1] = 0.0f;
+  colorWidget3[2] = 1.0f;
+  m_DecorationColorWidget4[0] = 1.0f;
+  m_DecorationColorWidget4[1] = 1.0f;
+  m_DecorationColorWidget4[2] = 0.0f;
 
   // of widget 1
   m_PlaneNode1 = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
@@ -255,10 +264,9 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_PlaneNode3->SetProperty("layer",layer);
 
   // ... of widget 4
-  m_Node = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
-  m_Node->SetColor(colorWidget4[0],colorWidget4[1],colorWidget4[2]);
+  m_ParentNodeForGeometryPlanes = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
   layer = mitk::IntProperty::New(1000);
-  m_Node->SetProperty("layer",layer);
+  m_ParentNodeForGeometryPlanes->SetProperty("layer",layer);
 
   mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetOverlayManager(OverlayManager);
@@ -298,42 +306,24 @@ void QmitkStdMultiWidget::InitializeWidget()
   //  //write LayoutName --> Viewer 3D shoudn't write the layoutName.
 
   //Render Window 1 == axial
-  m_CornerAnnotaions[0].cornerText = vtkCornerAnnotation::New();
-  m_CornerAnnotaions[0].cornerText->SetText(0, "Axial");
-  m_CornerAnnotaions[0].cornerText->SetMaximumFontSize(12);
-  m_CornerAnnotaions[0].textProp = vtkTextProperty::New();
-  m_CornerAnnotaions[0].textProp->SetColor( colorWidget1[0],colorWidget1[1],colorWidget1[2] );
-  m_CornerAnnotaions[0].cornerText->SetTextProperty( m_CornerAnnotaions[0].textProp );
-  m_CornerAnnotaions[0].ren = vtkRenderer::New();
-  m_CornerAnnotaions[0].ren->AddActor(m_CornerAnnotaions[0].cornerText);
-  m_CornerAnnotaions[0].ren->InteractiveOff();
-  mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[0].ren,true);
+  this->SetCornerAnnotation("Axial", colorWidget1, 0);
+  this->SetCornerAnnotation("Sagittal", colorWidget2, 1);
+  this->SetCornerAnnotation("Coronal", colorWidget3, 2);
+  this->SetCornerAnnotation("3D", m_DecorationColorWidget4, 3);
+//  m_CornerAnnotaions[0] = this->CreateCornerAnnotation();
+//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[0].ren,true);
 
   //Render Window 2 == sagittal
-  m_CornerAnnotaions[1].cornerText = vtkCornerAnnotation::New();
-  m_CornerAnnotaions[1].cornerText->SetText(0, "Sagittal");
-  m_CornerAnnotaions[1].cornerText->SetMaximumFontSize(12);
-  m_CornerAnnotaions[1].textProp = vtkTextProperty::New();
-  m_CornerAnnotaions[1].textProp->SetColor( colorWidget2[0],colorWidget2[1],colorWidget2[2] );
-  m_CornerAnnotaions[1].cornerText->SetTextProperty( m_CornerAnnotaions[1].textProp );
-  m_CornerAnnotaions[1].ren = vtkRenderer::New();
-  m_CornerAnnotaions[1].ren->AddActor(m_CornerAnnotaions[1].cornerText);
-  m_CornerAnnotaions[1].ren->InteractiveOff();
-  mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[1].ren,true);
+//  m_CornerAnnotaions[1] = this->CreateCornerAnnotation("Sagittal", colorWidget2);
+//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[1].ren,true);
 
-  //Render Window 3 == coronal
-  m_CornerAnnotaions[2].cornerText = vtkCornerAnnotation::New();
-  m_CornerAnnotaions[2].cornerText->SetText(0, "Coronal");
-  m_CornerAnnotaions[2].cornerText->SetMaximumFontSize(12);
-  m_CornerAnnotaions[2].textProp = vtkTextProperty::New();
-  m_CornerAnnotaions[2].textProp->SetColor( colorWidget3[0],colorWidget3[1],colorWidget3[2] );
-  m_CornerAnnotaions[2].cornerText->SetTextProperty( m_CornerAnnotaions[2].textProp );
-  m_CornerAnnotaions[2].ren = vtkRenderer::New();
-  m_CornerAnnotaions[2].ren->AddActor(m_CornerAnnotaions[2].cornerText);
-  m_CornerAnnotaions[2].ren->InteractiveOff();
-  mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[2].ren,true);
+//  //Render Window 3 == coronal
+//  m_CornerAnnotaions[2] = this->CreateCornerAnnotation("Coronal", colorWidget3);
+//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[2].ren,true);
 
-  /*************************************************/
+//  m_CornerAnnotaions[3] = this->CreateCornerAnnotation("3D", m_DecorationColorWidget4);
+//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[3].ren,true);
+//  /*************************************************/
 
   // create a slice rotator
   // m_SlicesRotator = mitk::SlicesRotator::New();
@@ -437,7 +427,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_RectangleRendering1->Enable(colorWidget1[0], colorWidget1[1], colorWidget1[2]);
   m_RectangleRendering2->Enable(colorWidget2[0], colorWidget2[1], colorWidget2[2]);
   m_RectangleRendering3->Enable(colorWidget3[0], colorWidget3[1], colorWidget3[2]);
-  m_RectangleRendering4->Enable(colorWidget4[0], colorWidget4[1], colorWidget4[2]);
+  m_RectangleRendering4->Enable(m_DecorationColorWidget4[0], m_DecorationColorWidget4[1], m_DecorationColorWidget4[2]);
 }
 
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
@@ -450,48 +440,50 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
   m_TimeNavigationController->Disconnect(mitkWidget3->GetSliceNavigationController());
   m_TimeNavigationController->Disconnect(mitkWidget4->GetSliceNavigationController());
 
-  mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[0].ren );
-  mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[1].ren );
-  mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[2].ren );
+//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[0].ren );
+//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[1].ren );
+//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[2].ren );
+}
 
-  //Delete CornerAnnotation
-  m_CornerAnnotaions[0].cornerText->Delete();
-  m_CornerAnnotaions[0].textProp->Delete();
-  m_CornerAnnotaions[0].ren->Delete();
-
-  m_CornerAnnotaions[1].cornerText->Delete();
-  m_CornerAnnotaions[1].textProp->Delete();
-  m_CornerAnnotaions[1].ren->Delete();
-
-  m_CornerAnnotaions[2].cornerText->Delete();
-  m_CornerAnnotaions[2].textProp->Delete();
-  m_CornerAnnotaions[2].ren->Delete();
+QmitkStdMultiWidget::CornerAnnotation QmitkStdMultiWidget::CreateCornerAnnotation(std::string text, mitk::Color color)
+{
+  CornerAnnotation annotation;
+  annotation.cornerText = vtkSmartPointer<vtkCornerAnnotation>::New();
+  annotation.cornerText->SetText(0, text.c_str());
+  annotation.cornerText->SetMaximumFontSize(12);
+  annotation.textProp = vtkSmartPointer<vtkTextProperty>::New();
+  annotation.textProp->SetColor( color[0],color[1],color[2] );
+  annotation.cornerText->SetTextProperty( annotation.textProp );
+  annotation.ren = vtkSmartPointer<vtkRenderer>::New();
+  annotation.ren->AddActor(annotation.cornerText);
+  annotation.ren->InteractiveOff();
+  return annotation;
 }
 
 void QmitkStdMultiWidget::RemovePlanesFromDataStorage()
 {
-  if (m_PlaneNode1.IsNotNull() && m_PlaneNode2.IsNotNull() && m_PlaneNode3.IsNotNull() && m_Node.IsNotNull())
+  if (m_PlaneNode1.IsNotNull() && m_PlaneNode2.IsNotNull() && m_PlaneNode3.IsNotNull() && m_ParentNodeForGeometryPlanes.IsNotNull())
   {
     if(m_DataStorage.IsNotNull())
     {
       m_DataStorage->Remove(m_PlaneNode1);
       m_DataStorage->Remove(m_PlaneNode2);
       m_DataStorage->Remove(m_PlaneNode3);
-      m_DataStorage->Remove(m_Node);
+      m_DataStorage->Remove(m_ParentNodeForGeometryPlanes);
     }
   }
 }
 
 void QmitkStdMultiWidget::AddPlanesToDataStorage()
 {
-  if (m_PlaneNode1.IsNotNull() && m_PlaneNode2.IsNotNull() && m_PlaneNode3.IsNotNull() && m_Node.IsNotNull())
+  if (m_PlaneNode1.IsNotNull() && m_PlaneNode2.IsNotNull() && m_PlaneNode3.IsNotNull() && m_ParentNodeForGeometryPlanes.IsNotNull())
   {
     if (m_DataStorage.IsNotNull())
     {
-      m_DataStorage->Add(m_Node);
-      m_DataStorage->Add(m_PlaneNode1, m_Node);
-      m_DataStorage->Add(m_PlaneNode2, m_Node);
-      m_DataStorage->Add(m_PlaneNode3, m_Node);
+      m_DataStorage->Add(m_ParentNodeForGeometryPlanes);
+      m_DataStorage->Add(m_PlaneNode1, m_ParentNodeForGeometryPlanes);
+      m_DataStorage->Add(m_PlaneNode2, m_ParentNodeForGeometryPlanes);
+      m_DataStorage->Add(m_PlaneNode3, m_ParentNodeForGeometryPlanes);
     }
   }
 }
@@ -636,6 +628,45 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
 
   //update Alle Widgets
   this->UpdateAllWidgets();
+}
+
+void QmitkStdMultiWidget::SetCornerAnnotation( std::string text,
+                                               mitk::Color color, int widgetNumber)
+{
+  if( widgetNumber > 3)
+  {
+    MITK_ERROR << "Unknown render window for annotation.";
+    return;
+  }
+  mitk::VtkLayerController* layercontroller = mitk::VtkLayerController::GetInstance(this->GetRenderWindow(widgetNumber)->GetRenderWindow());
+  //remove the old renderer, because the layercontroller holds a list (vector) of all renderes
+  //which needs to be updated
+  if(m_CornerAnnotaions[widgetNumber].ren != NULL)
+  {
+    layercontroller->RemoveRenderer(m_CornerAnnotaions[widgetNumber].ren);
+  }
+  //make a new one
+  m_CornerAnnotaions[widgetNumber] = this->CreateCornerAnnotation(text, color);
+  //add it to the list
+  layercontroller->InsertForegroundRenderer(m_CornerAnnotaions[widgetNumber].ren,true);
+}
+
+QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(unsigned int number)
+{
+  switch (number) {
+  case 0:
+    return this->GetRenderWindow1();
+  case 1:
+    return this->GetRenderWindow2();
+  case 2:
+    return this->GetRenderWindow3();
+  case 3:
+    return this->GetRenderWindow4();
+  default:
+    MITK_ERROR << "Requested unknown render window";
+    break;
+  }
+  return NULL;
 }
 
 void QmitkStdMultiWidget::changeLayoutToDefault()
@@ -1255,7 +1286,7 @@ void QmitkStdMultiWidget::SetDataStorage( mitk::DataStorage* ds )
 
 void QmitkStdMultiWidget::Fit()
 {
-  vtkRenderer * vtkrenderer;
+  vtkSmartPointer<vtkRenderer> vtkrenderer;
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetDisplayGeometry()->Fit();
   mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->GetDisplayGeometry()->Fit();
   mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->GetDisplayGeometry()->Fit();
@@ -1338,9 +1369,9 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   mapper = mitk::PlaneGeometryDataMapper2D::New();
   m_PlaneNode3->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
-  m_Node = mitk::DataNode::New();
-  m_Node->SetProperty("name", mitk::StringProperty::New("Widgets"));
-  m_Node->SetProperty("helper object", mitk::BoolProperty::New(true));
+  m_ParentNodeForGeometryPlanes = mitk::DataNode::New();
+  m_ParentNodeForGeometryPlanes->SetProperty("name", mitk::StringProperty::New("Widgets"));
+  m_ParentNodeForGeometryPlanes->SetProperty("helper object", mitk::BoolProperty::New(true));
 }
 
 mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationController()
@@ -2126,6 +2157,16 @@ bool QmitkStdMultiWidget::IsMenuWidgetEnabled() const
   return mitkWidget1->GetActivateMenuWidgetFlag();
 }
 
+void QmitkStdMultiWidget::SetDecorationColorWidget4(mitk::Color color)
+{
+  m_DecorationColorWidget4 = color;
+}
+
+mitk::Color QmitkStdMultiWidget::GetDecorationColorWidget4()
+{
+  return m_DecorationColorWidget4;
+}
+
 void QmitkStdMultiWidget::ResetCrosshair()
 {
   if (m_DataStorage.IsNotNull())
@@ -2142,15 +2183,13 @@ void QmitkStdMultiWidget::EnableColoredRectangles()
   float colorWidget1[3]= { 1.0f, 0.0f, 0.0f };
   float colorWidget2[3]= { 0.0f, 1.0f, 0.0f };
   float colorWidget3[3]= { 0.0f, 0.0f, 1.0f };
-  float colorWidget4[3]= { 1.0f, 1.0f, 0.0f };
   m_PlaneNode1->GetColor(colorWidget1);
   m_PlaneNode2->GetColor(colorWidget2);
   m_PlaneNode3->GetColor(colorWidget3);
-  m_Node->GetColor(colorWidget4);
   m_RectangleRendering1->Enable(colorWidget1[0], colorWidget1[1], colorWidget1[2]);
   m_RectangleRendering2->Enable(colorWidget2[0], colorWidget2[1], colorWidget2[2]);
   m_RectangleRendering3->Enable(colorWidget3[0], colorWidget3[1], colorWidget3[2]);
-  m_RectangleRendering4->Enable(colorWidget4[0], colorWidget4[1], colorWidget4[2]);
+  m_RectangleRendering4->Enable(m_DecorationColorWidget4[0], m_DecorationColorWidget4[1], m_DecorationColorWidget4[2]);
 }
 
 void QmitkStdMultiWidget::DisableColoredRectangles()

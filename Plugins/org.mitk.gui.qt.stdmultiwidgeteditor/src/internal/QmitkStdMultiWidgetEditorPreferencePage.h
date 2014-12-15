@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIQtPreferencePage.h>
 #include <QProcess>
 #include <QScopedPointer>
+#include <QPushButton>
 
 namespace Ui
 {
@@ -54,16 +55,28 @@ public slots:
 
   void WidgetColorChanged();
 
+  void OnWidgetComboBoxChanged(int i);
+
+  void AnnotationTextChanged(QString text);
+
 protected:
   std::string m_CurrentRenderingMode;
 
   std::string m_FirstColor;
   std::string m_SecondColor;
   std::string m_Widget1Color;
-  QString m_FirstColorStyleSheet;
-  QString m_SecondColorStyleSheet;
-  QString m_Widget1ColorStyleSheet;
+  std::string m_Widget2Color;
+  std::string m_Widget3Color;
+  std::string m_Widget4Color;
+  std::string m_Widget1Annotation;
+  std::string m_Widget2Annotation;
+  std::string m_Widget3Annotation;
+  std::string m_Widget4Annotation;
+
   berry::IPreferences::Pointer m_Preferences;
+
+  void SetStyleSheetToColorChooserButton(QColor backgroundcolor, QPushButton* button);
+  QColor StringToColor(std::string colorInHex);
 
 private:
   QScopedPointer<Ui::QmitkStdMultiWidgetEditorPreferencePage> m_Ui;

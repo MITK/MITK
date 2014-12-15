@@ -329,7 +329,6 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
 {
   // Enable change of logo. If no DepartmentLogo was set explicitly, MBILogo is used.
   // Set new department logo by prefs->Set("DepartmentLogo", "PathToImage");
-
   // If no logo was set for this plug-in specifically, walk the parent preference nodes
   // and lookup a logo value there.
   const berry::IPreferences* currentNode = prefs;
@@ -373,14 +372,26 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   d->m_StdMultiWidget->EnableGradientBackground();
 
   // preferences for renderWindows
+  mitk::Color colorWidget1 = GetColorForWidget("widget1 color", prefs);
+  mitk::Color colorWidget2 = GetColorForWidget("widget2 color", prefs);
+  mitk::Color colorWidget3 = GetColorForWidget("widget3 color", prefs);
+  mitk::Color colorWidget4 = GetColorForWidget("widget4 color", prefs);
   mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow1()->GetVtkRenderWindow())
-      ->GetCurrentWorldPlaneGeometryNode()->SetColor(GetColorForWidget("widget1 color", prefs));
+      ->GetCurrentWorldPlaneGeometryNode()->SetColor(colorWidget1);
   mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow2()->GetVtkRenderWindow())
-      ->GetCurrentWorldPlaneGeometryNode()->SetColor(GetColorForWidget("widget2 color", prefs));
+      ->GetCurrentWorldPlaneGeometryNode()->SetColor(colorWidget2);
   mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow3()->GetVtkRenderWindow())
-      ->GetCurrentWorldPlaneGeometryNode()->SetColor(GetColorForWidget("widget3 color", prefs));
-  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow4()->GetVtkRenderWindow())
-      ->GetCurrentWorldPlaneGeometryNode()->SetColor(GetColorForWidget("widget4 color", prefs));
+      ->GetCurrentWorldPlaneGeometryNode()->SetColor(colorWidget3);
+  d->m_StdMultiWidget->SetDecorationColorWidget4(colorWidget4);
+
+  //The crosshair gap
+  int crosshairgapsize = prefs->GetInt("crosshair gap size", 32);
+  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow1()->GetVtkRenderWindow())
+      ->GetCurrentWorldPlaneGeometryNode()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
+  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow2()->GetVtkRenderWindow())
+      ->GetCurrentWorldPlaneGeometryNode()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
+  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow3()->GetVtkRenderWindow())
+      ->GetCurrentWorldPlaneGeometryNode()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
 
   //refresh colors of rectangles
   d->m_StdMultiWidget->EnableColoredRectangles();
@@ -409,6 +420,15 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   bool newMode = prefs->GetBool("PACS like mouse interaction", false);
   d->m_MouseModeToolbar->setVisible( newMode );
   d->m_StdMultiWidget->GetMouseModeSwitcher()->SetInteractionScheme( newMode ? mitk::MouseModeSwitcher::PACS : mitk::MouseModeSwitcher::MITK );
+
+  d->m_StdMultiWidget->SetCornerAnnotation(
+        prefs->GetByteArray("widget1 corner annotation", "Axial"), colorWidget1, 0);
+  d->m_StdMultiWidget->SetCornerAnnotation(
+        prefs->GetByteArray("widget2 corner annotation", "Sagittal"), colorWidget2, 1);
+  d->m_StdMultiWidget->SetCornerAnnotation(
+        prefs->GetByteArray("widget3 corner annotation", "Coronal"), colorWidget3, 2);
+  d->m_StdMultiWidget->SetCornerAnnotation(
+        prefs->GetByteArray("widget4 corner annotation", "3D"), colorWidget4, 3);
 }
 
 mitk::Color QmitkStdMultiWidgetEditor::GetColorForWidget(std::string widgetName, const berry::IBerryPreferences* prefs)
@@ -422,7 +442,7 @@ mitk::Color QmitkStdMultiWidgetEditor::GetColorForWidget(std::string widgetName,
     widgetColor[0] = 1.0;
     widgetColor[1] = 1.0;
     widgetColor[2] = 1.0;
-    MITK_ERROR << "Default color " << widgetName;
+    MITK_ERROR << "Using default color for unknown widget " << widgetName;
   }
   else
   {

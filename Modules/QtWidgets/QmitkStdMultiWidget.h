@@ -146,6 +146,17 @@ public:
 
   bool IsMenuWidgetEnabled() const;
 
+  /**
+   * @brief SetColorWidget4 Get/Set the color of the decoration of the widget 4.
+   *
+   * This is used to color the frame of the renderwindow and the corner annatation.
+   * For the other 3 widgets, this color is a property of the helper object nodes
+   * which contain the respective plane geometry. The color can be modified via:
+   * GetWidgetPlane1()->SetColor();
+   */
+  void SetDecorationColorWidget4(mitk::Color color);
+  mitk::Color GetDecorationColorWidget4();
+
 protected:
 
   void UpdateAllWidgets();
@@ -295,6 +306,8 @@ public:
     THREE_D
   };
 
+  void SetCornerAnnotation(std::string text, mitk::Color color, int widgetNumber);
+  QmitkRenderWindow *GetRenderWindow(unsigned int number);
 protected:
 
   QHBoxLayout* QmitkStdMultiWidgetLayout;
@@ -330,7 +343,19 @@ protected:
   mitk::DataNode::Pointer m_PlaneNode1;
   mitk::DataNode::Pointer m_PlaneNode2;
   mitk::DataNode::Pointer m_PlaneNode3;
-  mitk::DataNode::Pointer m_Node;
+  /**
+   * @brief m_ParentNodeForGeometryPlanes This helper object is added to the datastorage
+   * and contains the 3 planes for displaying the image geometry (crosshair and 3D planes).
+   */
+  mitk::DataNode::Pointer m_ParentNodeForGeometryPlanes;
+
+  /**
+   * @brief m_DecorationColorWidget4 color for annotation and rectangle of widget 4.
+   *
+   * For other widgets1-3, the color is a property of the respective data node.
+   * There is no node for widget 4, hence, we need an extra member.
+   */
+  mitk::Color m_DecorationColorWidget4;
 
   QSplitter *m_MainSplit;
   QSplitter *m_LayoutSplit;
@@ -342,14 +367,15 @@ protected:
   QWidget *mitkWidget3Container;
   QWidget *mitkWidget4Container;
 
-  struct
+  struct CornerAnnotation
   {
-    vtkCornerAnnotation *cornerText;
-    vtkTextProperty *textProp;
-    vtkRenderer *ren;
-  } m_CornerAnnotaions[3];
+    vtkSmartPointer<vtkCornerAnnotation> cornerText;
+    vtkSmartPointer<vtkTextProperty> textProp;
+    vtkSmartPointer<vtkRenderer> ren;
+  } m_CornerAnnotaions[4];
 
   bool m_PendingCrosshairPositionEvent;
   bool m_CrosshairNavigationEnabled;
+  CornerAnnotation CreateCornerAnnotation(std::string text, mitk::Color color);
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

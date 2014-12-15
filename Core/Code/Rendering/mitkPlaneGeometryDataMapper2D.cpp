@@ -196,7 +196,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
 
       otherPlanesIt = m_OtherPlaneGeometries.begin();
       int gapsize = 32;
-      this->GetDataNode()->GetPropertyValue( "Gap size",gapsize, NULL );
+      this->GetDataNode()->GetPropertyValue( "Crosshair.Gap Size",gapsize, NULL );
 
 
       ScalarType lineLength = point1.EuclideanDistanceTo(point2);
@@ -381,7 +381,7 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer
 void mitk::PlaneGeometryDataMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "Line width", mitk::IntProperty::New(2), renderer, overwrite );
-  node->AddProperty( "Gap size", mitk::IntProperty::New(32), renderer, overwrite );
+  node->AddProperty( "Crosshair.Gap Size", mitk::IntProperty::New(32), renderer, overwrite );
   node->AddProperty( "decoration", mitk::PlaneOrientationProperty
                      ::New(PlaneOrientationProperty::PLANE_DECORATION_NONE), renderer, overwrite );
 

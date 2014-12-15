@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>518</width>
-    <height>511</height>
+    <height>523</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -155,14 +155,14 @@
      </property>
     </widget>
    </item>
-   <item row="12" column="0">
+   <item row="14" column="0">
     <widget class="QLabel" name="label_6">
      <property name="text">
       <string>Render windows</string>
      </property>
     </widget>
    </item>
-   <item row="12" column="1">
+   <item row="14" column="1">
     <widget class="QComboBox" name="m_RenderWindowChooser">
      <item>
       <property name="text">
@@ -186,49 +186,50 @@
      </item>
     </widget>
    </item>
-   <item row="13" column="0">
+   <item row="15" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
       <string>Color</string>
      </property>
     </widget>
    </item>
-   <item row="13" column="1">
+   <item row="15" column="1">
     <widget class="QPushButton" name="m_RenderWindowDecorationColor">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
-   <item row="14" column="0">
+   <item row="16" column="0">
     <widget class="QLabel" name="label_8">
      <property name="text">
       <string>Text</string>
      </property>
     </widget>
    </item>
-   <item row="14" column="1">
+   <item row="16" column="1">
     <widget class="QLineEdit" name="m_RenderWindowDecorationText"/>
    </item>
-   <item row="16" column="0">
+   <item row="19" column="0">
     <widget class="QLabel" name="label_11">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
-   <item row="16" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="13" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Crosshair gap size</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
+    </widget>
+   </item>
+   <item row="13" column="1">
+    <widget class="QSpinBox" name="m_CrosshairGapSize">
+     <property name="value">
+      <number>32</number>
      </property>
-    </spacer>
+    </widget>
    </item>
    </widget>
   </layout>

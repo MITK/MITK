@@ -162,6 +162,8 @@ Called by the vtkMitkRenderProp in order to start MITK rendering process.
 */
 int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 {
+  //Update all overlays in any case
+  this->UpdateOverlays();
   // Do we have objects to render?
   if ( this->GetEmptyWorldGeometry())
     return 0;
@@ -201,6 +203,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     mapper->MitkRender(this, type);
   }
 
+  //Update overlays in case a mapper has changed them
   this->UpdateOverlays();
 
   if (lastVtkBased == false)

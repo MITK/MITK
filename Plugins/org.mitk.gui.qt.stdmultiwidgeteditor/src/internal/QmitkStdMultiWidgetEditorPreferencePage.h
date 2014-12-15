@@ -46,16 +46,6 @@ public:
 
 public slots:
   /**
-   * @brief FirstColorChanged slot for the first gradient background color.
-   */
-  void FirstColorChanged();
-
-  /**
-   * @brief SecondColorChanged slot for the second gradient background color.
-   */
-  void SecondColorChanged();
-
-  /**
    * @brief ResetColors set default gradient background colors.
    */
   void ResetColors();
@@ -65,11 +55,6 @@ public slots:
    * @param i index of the box.
    */
   void ChangeRenderingMode(int i);
-
-  /**
-   * @brief WidgetColorChanged slot for the color chooser button of the widgets.
-   */
-  void WidgetColorChanged();
 
   /**
    * @brief OnWidgetComboBoxChanged slot called when the QComboBox to chose the widget was modified.
@@ -90,35 +75,24 @@ protected:
   std::string m_CurrentRenderingMode;
 
   /**
-   * @brief m_Widget1DecorationColor the background color.
+   * @brief m_WidgetBackgroundColor1 the background colors.
    *
-   * If two different colors are chosen, are gradient background appears.
+   * If two different colors are chosen, a gradient background appears.
    */
-  std::string m_Widget1BackgroundColor1;
-  std::string m_Widget1BackgroundColor2;
-  std::string m_Widget2BackgroundColor1;
-  std::string m_Widget2BackgroundColor2;
-  std::string m_Widget3BackgroundColor1;
-  std::string m_Widget3BackgroundColor2;
-  std::string m_Widget4BackgroundColor1;
-  std::string m_Widget4BackgroundColor2;
+  std::string m_WidgetBackgroundColor1[4];
+  std::string m_WidgetBackgroundColor2[4];
 
   /**
-   * @brief m_Widget1DecorationColor the decoration color.
+   * @brief m_WidgetDecorationColor the decoration color.
    *
    * The rectangle prop, the crosshair, the 3D planes and the corner annotation use this.
    */
-  std::string m_Widget1DecorationColor;
-  std::string m_Widget2DecorationColor;
-  std::string m_Widget3DecorationColor;
-  std::string m_Widget4DecorationColor;
+  std::string m_WidgetDecorationColor[4];
+
   /**
    * @brief m_Widget1Annotation the text of the corner annotation.
    */
-  std::string m_Widget1Annotation;
-  std::string m_Widget2Annotation;
-  std::string m_Widget3Annotation;
-  std::string m_Widget4Annotation;
+  std::string m_WidgetAnnotation[4];
 
   /**
    * @brief m_Preferences the berry preferences.
@@ -137,7 +111,14 @@ protected:
    * @param colorInHex string in the form of "#123456" where each digit is a hex value (0-F).
    * @return color in Qt format.
    */
-  QColor StringToColor(std::string colorInHex);
+  QColor HexStringToQtColor(std::string colorInHex);
+
+protected slots:
+
+  /**
+   * @brief ColorChooserButtonClicked slot called when a button to choose color was clicked.
+   */
+  void ColorChooserButtonClicked();
 
 private:
   QScopedPointer<Ui::QmitkStdMultiWidgetEditorPreferencePage> m_Ui;

@@ -59,7 +59,6 @@ class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
   Q_OBJECT
 
 public:
-
   QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, const QString& name = "stdmulti");
   virtual ~QmitkStdMultiWidget();
 
@@ -334,10 +333,10 @@ protected:
 
   mitk::LogoOverlay::Pointer m_LogoRendering;
 
-  mitk::GradientBackground::Pointer m_GradientBackground1;
-  mitk::GradientBackground::Pointer m_GradientBackground2;
-  mitk::GradientBackground::Pointer m_GradientBackground3;
-  mitk::GradientBackground::Pointer m_GradientBackground4;
+  mitk::GradientBackground::Pointer m_GradientBackground[4];
+//  mitk::GradientBackground::Pointer m_GradientBackground2;
+//  mitk::GradientBackground::Pointer m_GradientBackground3;
+//  mitk::GradientBackground::Pointer m_GradientBackground4;
   bool m_GradientBackgroundFlag;
 
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;

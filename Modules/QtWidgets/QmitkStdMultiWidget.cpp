@@ -373,26 +373,26 @@ void QmitkStdMultiWidget::InitializeWidget()
     m_LastLeftClickPositionSupplier
     );
   // setup gradient background
-  m_GradientBackground1 = mitk::GradientBackground::New();
-  m_GradientBackground1->SetRenderWindow(
+  m_GradientBackground[0] = mitk::GradientBackground::New();
+  m_GradientBackground[0]->SetRenderWindow(
     mitkWidget1->GetRenderWindow() );
-  m_GradientBackground1->Disable();
+  m_GradientBackground[0]->Disable();
 
-  m_GradientBackground2 = mitk::GradientBackground::New();
-  m_GradientBackground2->SetRenderWindow(
+  m_GradientBackground[1] = mitk::GradientBackground::New();
+  m_GradientBackground[1]->SetRenderWindow(
     mitkWidget2->GetRenderWindow() );
-  m_GradientBackground2->Disable();
+  m_GradientBackground[1]->Disable();
 
-  m_GradientBackground3 = mitk::GradientBackground::New();
-  m_GradientBackground3->SetRenderWindow(
+  m_GradientBackground[2] = mitk::GradientBackground::New();
+  m_GradientBackground[2]->SetRenderWindow(
     mitkWidget3->GetRenderWindow() );
-  m_GradientBackground3->Disable();
+  m_GradientBackground[2]->Disable();
 
-  m_GradientBackground4 = mitk::GradientBackground::New();
-  m_GradientBackground4->SetRenderWindow(
+  m_GradientBackground[3]  = mitk::GradientBackground::New();
+  m_GradientBackground[3]->SetRenderWindow(
     mitkWidget4->GetRenderWindow() );
-  m_GradientBackground4->SetGradientColors(0.1,0.1,0.1,0.5,0.5,0.5);
-  m_GradientBackground4->Enable();
+  m_GradientBackground[3]->SetGradientColors(0.1,0.1,0.1,0.5,0.5,0.5);
+  m_GradientBackground[3]->Enable();
 
   // setup the department logo rendering
   m_LogoRendering = mitk::LogoOverlay::New();
@@ -436,10 +436,6 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
   m_TimeNavigationController->Disconnect(mitkWidget2->GetSliceNavigationController());
   m_TimeNavigationController->Disconnect(mitkWidget3->GetSliceNavigationController());
   m_TimeNavigationController->Disconnect(mitkWidget4->GetSliceNavigationController());
-
-//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[0].ren );
-//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[1].ren );
-//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[2].ren );
 }
 
 QmitkStdMultiWidget::CornerAnnotation QmitkStdMultiWidget::CreateCornerAnnotation(std::string text, mitk::Color color)
@@ -1790,19 +1786,19 @@ void QmitkStdMultiWidget::EnableGradientBackground()
 {
   // gradient background is by default only in widget 4, otherwise
   // interferences between 2D rendering and VTK rendering may occur.
-  m_GradientBackground1->Enable();
-  m_GradientBackground2->Enable();
-  m_GradientBackground3->Enable();
-  m_GradientBackground4->Enable();
+  for(unsigned int i = 0; i < 4; ++i)
+  {
+    m_GradientBackground[i]->Enable();
+  }
   m_GradientBackgroundFlag = true;
 }
 
 void QmitkStdMultiWidget::DisableGradientBackground()
 {
-  m_GradientBackground1->Disable();
-  m_GradientBackground2->Disable();
-  m_GradientBackground3->Disable();
-  m_GradientBackground4->Disable();
+  for(unsigned int i = 0; i < 4; ++i)
+  {
+    m_GradientBackground[i]->Disable();
+  }
   m_GradientBackgroundFlag = false;
 }
 
@@ -2007,32 +2003,24 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int userMode )
 
 void QmitkStdMultiWidget::SetGradientBackgroundColorForRenderWindow( const mitk::Color & upper, const mitk::Color & lower, unsigned int widgetNumber )
 {
-  switch (widgetNumber) {
-  case 0:
-    m_GradientBackground1->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
-    break;
-  case 1:
-    m_GradientBackground2->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
-    break;
-  case 2:
-    m_GradientBackground3->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
-    break;
-  case 3:
-    m_GradientBackground4->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
-    break;
-  default:
+
+  if(widgetNumber > 3)
+  {
     MITK_ERROR << "Gradientbackground for unknown widget!";
-    break;
+    return;
   }
+  m_GradientBackground[widgetNumber]->SetGradientColors(upper[0], upper[1], upper[2],
+      lower[0], lower[1], lower[2]);
   m_GradientBackgroundFlag = true;
 }
 
 void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper, const mitk::Color & lower )
 {
-  m_GradientBackground1->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
-  m_GradientBackground2->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
-  m_GradientBackground3->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
-  m_GradientBackground4->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
+  for(unsigned int i = 0; i < 4; ++i)
+  {
+    m_GradientBackground[i]->SetGradientColors(upper[0], upper[1], upper[2],
+        lower[0], lower[1], lower[2]);
+  }
   m_GradientBackgroundFlag = true;
 }
 

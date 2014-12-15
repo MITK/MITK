@@ -113,11 +113,10 @@ protected:
 
   /**
    * @brief GetColorForWidget helper method to convert a saved color string to mitk::Color.
-   * @param widgetName the widget (1-4)
-   * @param prefs the Berry preferences.
+   * @param widgetColorInHex color in hex format (#12356) where each diget is in the form (0-F).
    * @return the color in mitk format.
    */
-  mitk::Color GetColorForWidget(std::string widgetName, const berry::IBerryPreferences* prefs);
+  mitk::Color HexColorToMitkColor(std::string widgetColorInHex);
 private:
 
   const QScopedPointer<QmitkStdMultiWidgetEditorPrivate> d;

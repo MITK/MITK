@@ -366,25 +366,25 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   }
 
   // preferences for gradient background
-  mitk::Color upper = GetColorForWidget("widget1 first background color", prefs);
-  mitk::Color lower = GetColorForWidget("widget1 second background color", prefs);
+  mitk::Color upper = HexColorToMitkColor(prefs->GetByteArray("widget1 first background color", "#000000"));
+  mitk::Color lower = HexColorToMitkColor(prefs->GetByteArray("widget1 second background color", "#000000"));
   d->m_StdMultiWidget->SetGradientBackgroundColorForRenderWindow(upper, lower, 0);
-  upper = GetColorForWidget("widget2 first background color", prefs);
-  lower = GetColorForWidget("widget2 second background color", prefs);
+  upper = HexColorToMitkColor(prefs->GetByteArray("widget2 first background color", "#000000"));
+  lower = HexColorToMitkColor(prefs->GetByteArray("widget2 second background color", "#000000"));
   d->m_StdMultiWidget->SetGradientBackgroundColorForRenderWindow(upper, lower, 1);
-  upper = GetColorForWidget("widget3 first background color", prefs);
-  lower = GetColorForWidget("widget3 second background color", prefs);
+  upper = HexColorToMitkColor(prefs->GetByteArray("widget3 first background color", "#000000"));
+  lower = HexColorToMitkColor(prefs->GetByteArray("widget3 second background color", "#000000"));
   d->m_StdMultiWidget->SetGradientBackgroundColorForRenderWindow(upper, lower, 2);
-  upper = GetColorForWidget("widget4 first background color", prefs);
-  lower = GetColorForWidget("widget4 second background color", prefs);
+  upper = HexColorToMitkColor(prefs->GetByteArray("widget4 first background color", "#191919"));
+  lower = HexColorToMitkColor(prefs->GetByteArray("widget4 second background color", "#7F7F7F"));
   d->m_StdMultiWidget->SetGradientBackgroundColorForRenderWindow(upper, lower, 3);
   d->m_StdMultiWidget->EnableGradientBackground();
 
   // preferences for renderWindows
-  mitk::Color colorDecorationWidget1 = GetColorForWidget("widget1 decoration color", prefs);
-  mitk::Color colorDecorationWidget2 = GetColorForWidget("widget2 decoration color", prefs);
-  mitk::Color colorDecorationWidget3 = GetColorForWidget("widget3 decoration color", prefs);
-  mitk::Color colorDecorationWidget4 = GetColorForWidget("widget4 decoration color", prefs);
+  mitk::Color colorDecorationWidget1 = HexColorToMitkColor(prefs->GetByteArray("widget1 decoration color", "#FF0000"));
+  mitk::Color colorDecorationWidget2 = HexColorToMitkColor(prefs->GetByteArray("widget2 decoration color", "#00FF00"));
+  mitk::Color colorDecorationWidget3 = HexColorToMitkColor(prefs->GetByteArray("widget3 decoration color", "#0000FF"));
+  mitk::Color colorDecorationWidget4 = HexColorToMitkColor(prefs->GetByteArray("widget4 decoration color", "#FFFF00"));
   mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow1()->GetVtkRenderWindow())
       ->GetCurrentWorldPlaneGeometryNode()->SetColor(colorDecorationWidget1);
   mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow2()->GetVtkRenderWindow())
@@ -440,26 +440,26 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
         prefs->GetByteArray("widget4 corner annotation", "3D"), colorDecorationWidget4, 3);
 }
 
-mitk::Color QmitkStdMultiWidgetEditor::GetColorForWidget(std::string widgetName, const berry::IBerryPreferences* prefs)
+mitk::Color QmitkStdMultiWidgetEditor::HexColorToMitkColor(std::string widgetColorInHex)
 {
-  QString widgetColorQt = QString::fromStdString(prefs->GetByteArray(widgetName, ""));
+  QString widgetColorQt = QString::fromStdString(widgetColorInHex);
   QColor qColor(widgetColorQt);
-  mitk::Color widgetColor;
+  mitk::Color returnColor;
   float colorMax = 255.0f;
   if (widgetColorQt=="") // default value
   {
-    widgetColor[0] = 1.0;
-    widgetColor[1] = 1.0;
-    widgetColor[2] = 1.0;
-    MITK_ERROR << "Using default color for unknown widget " << widgetName;
+    returnColor[0] = 1.0;
+    returnColor[1] = 1.0;
+    returnColor[2] = 1.0;
+    MITK_ERROR << "Using default color for unknown widget " << widgetColorInHex;
   }
   else
   {
-    widgetColor[0] = qColor.red() / colorMax;
-    widgetColor[1] = qColor.green() / colorMax;
-    widgetColor[2] = qColor.blue() / colorMax;
+    returnColor[0] = qColor.red() / colorMax;
+    returnColor[1] = qColor.green() / colorMax;
+    returnColor[2] = qColor.blue() / colorMax;
   }
-  return widgetColor;
+  return returnColor;
 }
 
 void QmitkStdMultiWidgetEditor::SetFocus()

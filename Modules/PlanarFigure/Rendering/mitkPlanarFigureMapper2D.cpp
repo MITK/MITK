@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkGL.h"
-#include "mitkVtkPropRenderer.h"
 
 #include "mitkTextOverlay2D.h"
 #include "mitkOverlayManager.h"
@@ -39,6 +38,9 @@ mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
   , m_NodeModifiedObserverTag(0)
   , m_NodeModifiedObserverAdded(false)
 {
+  m_AnnotationOverlay = mitk::TextOverlay2D::New();
+  m_QuantityOverlay = mitk::TextOverlay2D::New();
+
   this->InitializeDefaultPlanarFigureProperties();
 }
 
@@ -53,6 +55,12 @@ mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
 void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
   bool visible = true;
+
+  renderer->GetOverlayManager()->AddOverlay( m_AnnotationOverlay.GetPointer(), renderer );
+  m_AnnotationOverlay->SetVisibility( false, renderer );
+
+  renderer->GetOverlayManager()->AddOverlay( m_QuantityOverlay.GetPointer(), renderer );
+  m_QuantityOverlay->SetVisibility( false, renderer );
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if ( !visible ) return;
@@ -146,7 +154,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
   // draw name near the anchor point (point located on the right)
   std::string name = node->GetName();
-  if ( true || (m_DrawName && !name.empty()) )
+  if ( m_DrawName && !name.empty() )
   {
     RenderAnnotations(renderer, name, anchorPoint, globalOpacity, lineDisplayMode, annotationOffset);
   }
@@ -687,44 +695,21 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
                                                     PlanarFigureDisplayMode lineDisplayMode,
                                                     double &annotationOffset )
 {
-//   mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-//   if ( openGLrenderer )
-//   {
-//     openGLrenderer->WriteSimpleText( name,
-//       anchorPoint[0] + 6.0, anchorPoint[1] + 4.0,
-//       0,
-//       0,
-//       0,
-//       globalOpacity ); //this is a shadow
-//
-//     openGLrenderer->WriteSimpleText( name,
-//       anchorPoint[0] + 5.0, anchorPoint[1] + 5.0,
-//        m_LineColor[lineDisplayMode][0],
-//        m_LineColor[lineDisplayMode][1],
-//        m_LineColor[lineDisplayMode][2],
-//       globalOpacity );
-//
-//     // If drawing is successful, add approximate height to annotation offset
-//     annotationOffset -= 15.0;
-//   }
+  m_AnnotationOverlay->SetText( name );
+  m_AnnotationOverlay->SetColor( m_LineColor[lineDisplayMode][0],
+                                 m_LineColor[lineDisplayMode][1],
+                                 m_LineColor[lineDisplayMode][2] );
+  m_AnnotationOverlay->SetOpacity( globalOpacity );
+  m_AnnotationOverlay->SetFontSize( 16 );
+  m_AnnotationOverlay->SetBoolProperty( "drawShadow", m_DrawShadow );
+  m_AnnotationOverlay->SetVisibility( true, renderer );
+  m_AnnotationOverlay->Update( renderer );
 
-  if ( m_TextOverlay.IsNull() )
-  {
-    m_TextOverlay = mitk::TextOverlay2D::New();
-    m_TextOverlay->SetText( name );
-    m_TextOverlay->SetColor( m_LineColor[lineDisplayMode][0],
-                             m_LineColor[lineDisplayMode][1],
-                             m_LineColor[lineDisplayMode][2] );
-    m_TextOverlay->SetFontSize( 12 );
-    m_TextOverlay->SetBoolProperty( "drawShadow", m_DrawShadow );
-    renderer->GetOverlayManager()->AddOverlay( m_TextOverlay.GetPointer(), renderer );
-  }
-
+  annotationOffset -= m_AnnotationOverlay->GetBoundsOnDisplay( renderer ).Size[1];
   mitk::Point2D pos = anchorPoint;
   pos[0] += 5;
   pos[1] += 5;
-  m_TextOverlay->SetPosition2D( pos );
-
+  m_AnnotationOverlay->SetPosition2D( pos );
 
 }
 
@@ -754,26 +739,22 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( mitk::PlanarFigure * planarFi
     }
   }
 
-  mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-  if ( openGLrenderer )
-  {
-    openGLrenderer->WriteSimpleText( quantityString.str().c_str(),
-      anchorPoint[0] + 6.0, anchorPoint[1] + 4.0 + annotationOffset,
-      0,
-      0,
-      0,
-      globalOpacity ); //this is a shadow
+  m_QuantityOverlay->SetColor( m_LineColor[lineDisplayMode][0],
+                               m_LineColor[lineDisplayMode][1],
+                               m_LineColor[lineDisplayMode][2] );
 
-    openGLrenderer->WriteSimpleText( quantityString.str().c_str(),
-      anchorPoint[0] + 5.0, anchorPoint[1] + 5.0 + annotationOffset,
-      m_LineColor[lineDisplayMode][0],
-      m_LineColor[lineDisplayMode][1],
-      m_LineColor[lineDisplayMode][2],
-      globalOpacity );
+  m_QuantityOverlay->SetOpacity( globalOpacity );
+  m_QuantityOverlay->SetFontSize( 16 );
+  m_QuantityOverlay->SetBoolProperty( "drawShadow", m_DrawShadow );
+  m_QuantityOverlay->SetVisibility( true, renderer );
 
-    // If drawing is successful, add approximate height to annotation offset
-    annotationOffset -= 15.0;
-  }
+  m_QuantityOverlay->SetText( quantityString.str().c_str() );
+  mitk::Point2D pos = anchorPoint;
+  pos[0] += 5;
+  pos[1] += 5 + annotationOffset;
+  m_QuantityOverlay->SetPosition2D( pos );
+  annotationOffset -= m_QuantityOverlay->GetBoundsOnDisplay( renderer ).Size[1];
+
 }
 
 void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDisplayMode,

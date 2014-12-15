@@ -1790,18 +1790,18 @@ void QmitkStdMultiWidget::EnableGradientBackground()
 {
   // gradient background is by default only in widget 4, otherwise
   // interferences between 2D rendering and VTK rendering may occur.
-  //m_GradientBackground1->Enable();
-  //m_GradientBackground2->Enable();
-  //m_GradientBackground3->Enable();
+  m_GradientBackground1->Enable();
+  m_GradientBackground2->Enable();
+  m_GradientBackground3->Enable();
   m_GradientBackground4->Enable();
   m_GradientBackgroundFlag = true;
 }
 
 void QmitkStdMultiWidget::DisableGradientBackground()
 {
-  //m_GradientBackground1->Disable();
-  //m_GradientBackground2->Disable();
-  //m_GradientBackground3->Disable();
+  m_GradientBackground1->Disable();
+  m_GradientBackground2->Disable();
+  m_GradientBackground3->Disable();
   m_GradientBackground4->Disable();
   m_GradientBackgroundFlag = false;
 }

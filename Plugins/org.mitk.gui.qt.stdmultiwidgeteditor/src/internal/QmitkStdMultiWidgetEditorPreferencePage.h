@@ -90,19 +90,28 @@ protected:
   std::string m_CurrentRenderingMode;
 
   /**
-   * @brief m_FirstColor, m_SecondColor Colors of gradient background of widget4 (3D renderwindow)
+   * @brief m_Widget1DecorationColor the background color.
+   *
+   * If two different colors are chosen, are gradient background appears.
    */
-  std::string m_FirstColor;
-  std::string m_SecondColor;
+  std::string m_Widget1BackgroundColor1;
+  std::string m_Widget1BackgroundColor2;
+  std::string m_Widget2BackgroundColor1;
+  std::string m_Widget2BackgroundColor2;
+  std::string m_Widget3BackgroundColor1;
+  std::string m_Widget3BackgroundColor2;
+  std::string m_Widget4BackgroundColor1;
+  std::string m_Widget4BackgroundColor2;
+
   /**
-   * @brief m_Widget1Color the decoration color.
+   * @brief m_Widget1DecorationColor the decoration color.
    *
    * The rectangle prop, the crosshair, the 3D planes and the corner annotation use this.
    */
-  std::string m_Widget1Color;
-  std::string m_Widget2Color;
-  std::string m_Widget3Color;
-  std::string m_Widget4Color;
+  std::string m_Widget1DecorationColor;
+  std::string m_Widget2DecorationColor;
+  std::string m_Widget3DecorationColor;
+  std::string m_Widget4DecorationColor;
   /**
    * @brief m_Widget1Annotation the text of the corner annotation.
    */

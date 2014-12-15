@@ -85,16 +85,23 @@ void QmitkStdMultiWidgetEditorPreferencePage::PerformCancel()
 
 bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
 {
-  m_Preferences->PutByteArray("first background color", m_FirstColor);
-  m_Preferences->PutByteArray("second background color", m_SecondColor);
-  m_Preferences->PutByteArray("widget1 color", m_Widget1Color);
-  m_Preferences->PutByteArray("widget2 color", m_Widget2Color);
-  m_Preferences->PutByteArray("widget3 color", m_Widget3Color);
-  m_Preferences->PutByteArray("widget4 color", m_Widget4Color);
-  m_Preferences->PutByteArray("widget1 corner annotation", m_Widget1Annotation);
-  m_Preferences->PutByteArray("widget2 corner annotation", m_Widget2Annotation);
-  m_Preferences->PutByteArray("widget3 corner annotation", m_Widget3Annotation);
-  m_Preferences->PutByteArray("widget4 corner annotation", m_Widget4Annotation);
+  m_Preferences->PutByteArray("widget1 first background color", m_Widget1DecorationColor);
+  m_Preferences->PutByteArray("widget2 first background color", m_Widget2DecorationColor);
+  m_Preferences->PutByteArray("widget3 first background color", m_Widget3DecorationColor);
+  m_Preferences->PutByteArray("widget4 first background color", m_Widget4DecorationColor);
+  m_Preferences->PutByteArray("widget1 color", m_Widget1DecorationColor);
+  m_Preferences->PutByteArray("widget2 color", m_Widget2DecorationColor);
+  m_Preferences->PutByteArray("widget3 color", m_Widget3DecorationColor);
+  m_Preferences->PutByteArray("widget4 color", m_Widget4DecorationColor);
+
+  m_Preferences->PutByteArray("widget1 color", m_Widget1BackgroundColor1);
+  m_Preferences->PutByteArray("widget2 color", m_Widget2BackgroundColor1);
+  m_Preferences->PutByteArray("widget3 color", m_Widget3BackgroundColor1);
+  m_Preferences->PutByteArray("widget4 color", m_Widget4BackgroundColor1);
+  m_Preferences->PutByteArray("widget1 second background corner annotation", m_Widget1BackgroundColor2);
+  m_Preferences->PutByteArray("widget2 second background corner annotation", m_Widget2BackgroundColor2);
+  m_Preferences->PutByteArray("widget3 second background corner annotation", m_Widget3BackgroundColor2);
+  m_Preferences->PutByteArray("widget4 second background corner annotation", m_Widget4BackgroundColor2);
   m_Preferences->PutInt("crosshair gap size", m_Ui->m_CrosshairGapSize->value());
 
   m_Preferences->PutBool("Use constrained zooming and padding"
@@ -111,12 +118,18 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   m_Ui->m_EnableFlexibleZooming->setChecked(m_Preferences->GetBool("Use constrained zooming and padding", true));
   m_Ui->m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
   m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
-  m_FirstColor = m_Preferences->GetByteArray("first background color", "#191919");
-  m_SecondColor = m_Preferences->GetByteArray("second background color", "7F7F7F");
-  m_Widget1Color = m_Preferences->GetByteArray("widget1 color", "#FF0000");
-  m_Widget2Color = m_Preferences->GetByteArray("widget2 color", "#00FF00");
-  m_Widget3Color = m_Preferences->GetByteArray("widget3 color", "#0000FF");
-  m_Widget4Color = m_Preferences->GetByteArray("widget4 color", "#FFFF00");
+  m_Widget1BackgroundColor1 = m_Preferences->GetByteArray("widget1 first background color", "#000000");
+  m_Widget1BackgroundColor2 = m_Preferences->GetByteArray("widget1 second background color", "#000000");
+  m_Widget2BackgroundColor1 = m_Preferences->GetByteArray("widget2 first background color", "#000000");
+  m_Widget2BackgroundColor2 = m_Preferences->GetByteArray("widget2 second background color", "#000000");
+  m_Widget3BackgroundColor1 = m_Preferences->GetByteArray("widget3 first background color", "#000000");
+  m_Widget3BackgroundColor2 = m_Preferences->GetByteArray("widget3 second background color", "#000000");
+  m_Widget4BackgroundColor1 = m_Preferences->GetByteArray("widget4 first background color", "#191919");
+  m_Widget4BackgroundColor2 = m_Preferences->GetByteArray("widget4 second background color", "#7F7F7F");
+  m_Widget1DecorationColor = m_Preferences->GetByteArray("widget1 color", "#FF0000");
+  m_Widget2DecorationColor = m_Preferences->GetByteArray("widget2 color", "#00FF00");
+  m_Widget3DecorationColor = m_Preferences->GetByteArray("widget3 color", "#0000FF");
+  m_Widget4DecorationColor = m_Preferences->GetByteArray("widget4 color", "#FFFF00");
 
   m_Ui->m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
 
@@ -125,9 +138,9 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   m_Widget3Annotation = m_Preferences->GetByteArray("widget3 corner annotation", "Coronal");
   m_Widget4Annotation = m_Preferences->GetByteArray("widget4 corner annotation", "3D");
 
-  QColor firstBackgroundColor = this->StringToColor(m_FirstColor);
-  QColor secondBackgroundColor = this->StringToColor(m_SecondColor);
-  QColor widgetColor = this->StringToColor(m_Widget1Color);
+  QColor firstBackgroundColor = this->StringToColor(m_Widget1BackgroundColor1);
+  QColor secondBackgroundColor = this->StringToColor(m_Widget1BackgroundColor2);
+  QColor widgetColor = this->StringToColor(m_Widget1DecorationColor);
 
   this->SetStyleSheetToColorChooserButton(firstBackgroundColor, m_Ui->m_ColorButton1);
   this->SetStyleSheetToColorChooserButton(secondBackgroundColor, m_Ui->m_ColorButton2);
@@ -166,7 +179,23 @@ void QmitkStdMultiWidgetEditorPreferencePage::FirstColorChanged()
 
   QStringList firstColor;
   firstColor << color.name();
-  m_FirstColor = firstColor.replaceInStrings(";","\\;").join(";").toStdString();
+  switch (m_Ui->m_RenderWindowChooser->currentIndex()) {
+  case 0: //widget 1
+    m_Widget1BackgroundColor1 = firstColor.replaceInStrings(";","\\;").join(";").toStdString();
+    break;
+  case 1: //widget 1
+    m_Widget2BackgroundColor1 = firstColor.replaceInStrings(";","\\;").join(";").toStdString();
+    break;
+  case 2: //widget 1
+    m_Widget3BackgroundColor1 = firstColor.replaceInStrings(";","\\;").join(";").toStdString();
+    break;
+  case 3: //widget 1
+    m_Widget4BackgroundColor1 = firstColor.replaceInStrings(";","\\;").join(";").toStdString();
+    break;
+  default:
+    MITK_INFO << "error selected wrong index.";
+    break;
+  }
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::SetStyleSheetToColorChooserButton(QColor backgroundcolor,
@@ -191,7 +220,23 @@ void QmitkStdMultiWidgetEditorPreferencePage::SecondColorChanged()
 
   QStringList secondColor;
   secondColor << color.name();
-  m_SecondColor = secondColor.replaceInStrings(";","\\;").join(";").toStdString();
+  switch (m_Ui->m_RenderWindowChooser->currentIndex()) {
+  case 0: //widget 1
+    m_Widget1BackgroundColor2 = secondColor.replaceInStrings(";","\\;").join(";").toStdString();
+    break;
+  case 1: //widget 1
+    m_Widget2BackgroundColor2 = secondColor.replaceInStrings(";","\\;").join(";").toStdString();
+    break;
+  case 2: //widget 1
+    m_Widget3BackgroundColor2 = secondColor.replaceInStrings(";","\\;").join(";").toStdString();
+    break;
+  case 3: //widget 1
+    m_Widget4BackgroundColor2 = secondColor.replaceInStrings(";","\\;").join(";").toStdString();
+    break;
+  default:
+    MITK_INFO << "error selected wrong index.";
+    break;
+  }
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::WidgetColorChanged()
@@ -205,16 +250,16 @@ void QmitkStdMultiWidgetEditorPreferencePage::WidgetColorChanged()
 
   switch (m_Ui->m_RenderWindowChooser->currentIndex()) {
   case 0: //widget 1
-    m_Widget1Color = qtColor.replaceInStrings(";","\\;").join(";").toStdString();
+    m_Widget1DecorationColor = qtColor.replaceInStrings(";","\\;").join(";").toStdString();
     break;
   case 1: //widget 1
-    m_Widget2Color = qtColor.replaceInStrings(";","\\;").join(";").toStdString();
+    m_Widget2DecorationColor = qtColor.replaceInStrings(";","\\;").join(";").toStdString();
     break;
   case 2: //widget 1
-    m_Widget3Color = qtColor.replaceInStrings(";","\\;").join(";").toStdString();
+    m_Widget3DecorationColor = qtColor.replaceInStrings(";","\\;").join(";").toStdString();
     break;
   case 3: //widget 1
-    m_Widget4Color = qtColor.replaceInStrings(";","\\;").join(";").toStdString();
+    m_Widget4DecorationColor = qtColor.replaceInStrings(";","\\;").join(";").toStdString();
     break;
   default:
     MITK_INFO << "error selected wrong index.";
@@ -246,32 +291,40 @@ void QmitkStdMultiWidgetEditorPreferencePage::AnnotationTextChanged(QString text
 void QmitkStdMultiWidgetEditorPreferencePage::ResetColors()
 {
   //default gradient background values
-  m_FirstColor = "#191919";
-  m_SecondColor = "#7F7F7F";
-  QColor firstColor = this->StringToColor(m_FirstColor);
-  this->SetStyleSheetToColorChooserButton(firstColor, m_Ui->m_ColorButton1);
-  QColor secondColor = this->StringToColor(m_SecondColor);
-  this->SetStyleSheetToColorChooserButton(secondColor, m_Ui->m_ColorButton2);
+//  m_FirstColor = "#191919";
+//  m_SecondColor = "#7F7F7F";
+//  QColor firstColor = this->StringToColor(m_FirstColor);
+//  this->SetStyleSheetToColorChooserButton(firstColor, m_Ui->m_ColorButton1);
+//  QColor secondColor = this->StringToColor(m_SecondColor);
+//  this->SetStyleSheetToColorChooserButton(secondColor, m_Ui->m_ColorButton2);
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::OnWidgetComboBoxChanged(int i)
 {
-  QColor widgetColor;
+  QColor widgetColor, gradientBackground1, gradientBackground2;
   switch (i) {
   case 0: //widget 1
-    widgetColor = StringToColor(m_Widget1Color);
+    gradientBackground1 = StringToColor(m_Widget1BackgroundColor1);
+    gradientBackground2 = StringToColor(m_Widget1BackgroundColor2);
+    widgetColor = StringToColor(m_Widget1DecorationColor);
     m_Ui->m_RenderWindowDecorationText->setText(QString::fromStdString(m_Widget1Annotation));
     break;
   case 1: //widget 1
-    widgetColor = StringToColor(m_Widget2Color);
+    gradientBackground1 = StringToColor(m_Widget2BackgroundColor1);
+    gradientBackground2 = StringToColor(m_Widget2BackgroundColor2);
+    widgetColor = StringToColor(m_Widget2DecorationColor);
     m_Ui->m_RenderWindowDecorationText->setText(QString::fromStdString(m_Widget2Annotation));
     break;
   case 2: //widget 1
-    widgetColor = StringToColor(m_Widget3Color);
+    gradientBackground1 = StringToColor(m_Widget3BackgroundColor1);
+    gradientBackground2 = StringToColor(m_Widget3BackgroundColor2);
+    widgetColor = StringToColor(m_Widget3DecorationColor);
     m_Ui->m_RenderWindowDecorationText->setText(QString::fromStdString(m_Widget3Annotation));
     break;
   case 3: //widget 1
-    widgetColor = StringToColor(m_Widget4Color);
+    gradientBackground1 = StringToColor(m_Widget4BackgroundColor1);
+    gradientBackground2 = StringToColor(m_Widget4BackgroundColor2);
+    widgetColor = StringToColor(m_Widget4DecorationColor);
     m_Ui->m_RenderWindowDecorationText->setText(QString::fromStdString(m_Widget4Annotation));
     break;
   default:
@@ -279,6 +332,8 @@ void QmitkStdMultiWidgetEditorPreferencePage::OnWidgetComboBoxChanged(int i)
     break;
   }
   this->SetStyleSheetToColorChooserButton(widgetColor, m_Ui->m_RenderWindowDecorationColor);
+  this->SetStyleSheetToColorChooserButton(gradientBackground1, m_Ui->m_ColorButton1);
+  this->SetStyleSheetToColorChooserButton(gradientBackground2, m_Ui->m_ColorButton2);
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)

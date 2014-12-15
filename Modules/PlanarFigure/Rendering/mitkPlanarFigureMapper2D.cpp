@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGL.h"
 
 #include "mitkTextOverlay2D.h"
-#include "mitkOverlayManager.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -56,10 +55,8 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
   bool visible = true;
 
-  //renderer->GetOverlayManager()->AddOverlay( m_AnnotationOverlay.GetPointer(), renderer );
   m_AnnotationOverlay->SetVisibility( false, renderer );
 
-  //renderer->GetOverlayManager()->AddOverlay( m_QuantityOverlay.GetPointer(), renderer );
   m_QuantityOverlay->SetVisibility( false, renderer );
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");

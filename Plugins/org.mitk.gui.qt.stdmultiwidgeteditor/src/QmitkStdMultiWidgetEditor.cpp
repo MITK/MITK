@@ -332,7 +332,6 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
 
   // If no logo was set for this plug-in specifically, walk the parent preference nodes
   // and lookup a logo value there.
-
   const berry::IPreferences* currentNode = prefs;
 
   while(currentNode)
@@ -368,40 +367,23 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   }
 
   // preferences for gradient background
-  float color = 255.0;
-  QString firstColorName = QString::fromStdString (prefs->GetByteArray("first background color", ""));
-  QColor firstColor(firstColorName);
-  mitk::Color upper;
-  if (firstColorName=="") // default values
-  {
-    upper[0] = 0.1;
-    upper[1] = 0.1;
-    upper[2] = 0.1;
-  }
-  else
-  {
-    upper[0] = firstColor.red() / color;
-    upper[1] = firstColor.green() / color;
-    upper[2] = firstColor.blue() / color;
-  }
-
-  QString secondColorName = QString::fromStdString (prefs->GetByteArray("second background color", ""));
-  QColor secondColor(secondColorName);
-  mitk::Color lower;
-  if (secondColorName=="") // default values
-  {
-    lower[0] = 0.5;
-    lower[1] = 0.5;
-    lower[2] = 0.5;
-  }
-  else
-  {
-    lower[0] = secondColor.red() / color;
-    lower[1] = secondColor.green() / color;
-    lower[2] = secondColor.blue() / color;
-  }
+  mitk::Color upper = GetColorForWidget("first background color", prefs);
+  mitk::Color lower = GetColorForWidget("second background color", prefs);
   d->m_StdMultiWidget->SetGradientBackgroundColors(upper, lower);
   d->m_StdMultiWidget->EnableGradientBackground();
+
+  // preferences for renderWindows
+  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow1()->GetVtkRenderWindow())
+      ->GetCurrentWorldPlaneGeometryNode()->SetColor(GetColorForWidget("widget1 color", prefs));
+  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow2()->GetVtkRenderWindow())
+      ->GetCurrentWorldPlaneGeometryNode()->SetColor(GetColorForWidget("widget2 color", prefs));
+  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow3()->GetVtkRenderWindow())
+      ->GetCurrentWorldPlaneGeometryNode()->SetColor(GetColorForWidget("widget3 color", prefs));
+  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow4()->GetVtkRenderWindow())
+      ->GetCurrentWorldPlaneGeometryNode()->SetColor(GetColorForWidget("widget4 color", prefs));
+
+  //refresh colors of rectangles
+  d->m_StdMultiWidget->EnableColoredRectangles();
 
   // Set preferences respecting zooming and padding
   bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", false);
@@ -427,6 +409,28 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   bool newMode = prefs->GetBool("PACS like mouse interaction", false);
   d->m_MouseModeToolbar->setVisible( newMode );
   d->m_StdMultiWidget->GetMouseModeSwitcher()->SetInteractionScheme( newMode ? mitk::MouseModeSwitcher::PACS : mitk::MouseModeSwitcher::MITK );
+}
+
+mitk::Color QmitkStdMultiWidgetEditor::GetColorForWidget(std::string widgetName, const berry::IBerryPreferences* prefs)
+{
+  QString widgetColorQt = QString::fromStdString(prefs->GetByteArray(widgetName, ""));
+  QColor qColor(widgetColorQt);
+  mitk::Color widgetColor;
+  float colorMax = 255.0f;
+  if (widgetColorQt=="") // default value
+  {
+    widgetColor[0] = 1.0;
+    widgetColor[1] = 1.0;
+    widgetColor[2] = 1.0;
+    MITK_ERROR << "Default color " << widgetName;
+  }
+  else
+  {
+    widgetColor[0] = qColor.red() / colorMax;
+    widgetColor[1] = qColor.green() / colorMax;
+    widgetColor[2] = qColor.blue() / colorMax;
+  }
+  return widgetColor;
 }
 
 void QmitkStdMultiWidgetEditor::SetFocus()

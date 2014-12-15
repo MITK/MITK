@@ -229,34 +229,36 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_PositionTracker = NULL;
 
   // transfer colors in WorldGeometry-Nodes of the associated Renderer
-  QColor qcolor;
-  //float color[3] = {1.0f,1.0f,1.0f};
-  mitk::DataNode::Pointer planeNode;
   mitk::IntProperty::Pointer  layer;
 
+  float colorWidget1[3]= { 1.0f, 0.0f, 0.0f };
+  float colorWidget2[3]= { 0.0f, 1.0f, 0.0f };
+  float colorWidget3[3]= { 0.0f, 0.0f, 1.0f };
+  float colorWidget4[3]= { 1.0f, 1.0f, 0.0f };
+
   // of widget 1
-  planeNode = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
-  planeNode->SetColor(1.0,0.0,0.0);
+  m_PlaneNode1 = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
+  m_PlaneNode1->SetColor(colorWidget1[0],colorWidget1[1],colorWidget1[2]);
   layer = mitk::IntProperty::New(1000);
-  planeNode->SetProperty("layer",layer);
+  m_PlaneNode1->SetProperty("layer",layer);
 
   // ... of widget 2
-  planeNode = mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
-  planeNode->SetColor(0.0,1.0,0.0);
+  m_PlaneNode2 = mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
+  m_PlaneNode2->SetColor(colorWidget2[0],colorWidget2[1],colorWidget2[2]);
   layer = mitk::IntProperty::New(1000);
-  planeNode->SetProperty("layer",layer);
+  m_PlaneNode2->SetProperty("layer",layer);
 
   // ... of widget 3
-  planeNode = mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
-  planeNode->SetColor(0.0,0.0,1.0);
+  m_PlaneNode3 = mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
+  m_PlaneNode3->SetColor(colorWidget3[0],colorWidget3[1],colorWidget3[2]);
   layer = mitk::IntProperty::New(1000);
-  planeNode->SetProperty("layer",layer);
+  m_PlaneNode3->SetProperty("layer",layer);
 
   // ... of widget 4
-  planeNode = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
-  planeNode->SetColor(1.0,1.0,0.0);
+  m_Node = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
+  m_Node->SetColor(colorWidget4[0],colorWidget4[1],colorWidget4[2]);
   layer = mitk::IntProperty::New(1000);
-  planeNode->SetProperty("layer",layer);
+  m_Node->SetProperty("layer",layer);
 
   mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetOverlayManager(OverlayManager);
@@ -300,7 +302,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_CornerAnnotaions[0].cornerText->SetText(0, "Axial");
   m_CornerAnnotaions[0].cornerText->SetMaximumFontSize(12);
   m_CornerAnnotaions[0].textProp = vtkTextProperty::New();
-  m_CornerAnnotaions[0].textProp->SetColor( 1.0, 0.0, 0.0 );
+  m_CornerAnnotaions[0].textProp->SetColor( colorWidget1[0],colorWidget1[1],colorWidget1[2] );
   m_CornerAnnotaions[0].cornerText->SetTextProperty( m_CornerAnnotaions[0].textProp );
   m_CornerAnnotaions[0].ren = vtkRenderer::New();
   m_CornerAnnotaions[0].ren->AddActor(m_CornerAnnotaions[0].cornerText);
@@ -312,7 +314,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_CornerAnnotaions[1].cornerText->SetText(0, "Sagittal");
   m_CornerAnnotaions[1].cornerText->SetMaximumFontSize(12);
   m_CornerAnnotaions[1].textProp = vtkTextProperty::New();
-  m_CornerAnnotaions[1].textProp->SetColor( 0.0, 1.0, 0.0 );
+  m_CornerAnnotaions[1].textProp->SetColor( colorWidget2[0],colorWidget2[1],colorWidget2[2] );
   m_CornerAnnotaions[1].cornerText->SetTextProperty( m_CornerAnnotaions[1].textProp );
   m_CornerAnnotaions[1].ren = vtkRenderer::New();
   m_CornerAnnotaions[1].ren->AddActor(m_CornerAnnotaions[1].cornerText);
@@ -324,7 +326,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_CornerAnnotaions[2].cornerText->SetText(0, "Coronal");
   m_CornerAnnotaions[2].cornerText->SetMaximumFontSize(12);
   m_CornerAnnotaions[2].textProp = vtkTextProperty::New();
-  m_CornerAnnotaions[2].textProp->SetColor( 0.295, 0.295, 1.0 );
+  m_CornerAnnotaions[2].textProp->SetColor( colorWidget3[0],colorWidget3[1],colorWidget3[2] );
   m_CornerAnnotaions[2].cornerText->SetTextProperty( m_CornerAnnotaions[2].textProp );
   m_CornerAnnotaions[2].ren = vtkRenderer::New();
   m_CornerAnnotaions[2].ren->AddActor(m_CornerAnnotaions[2].cornerText);
@@ -419,22 +421,23 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_RectangleRendering1 = mitk::RenderWindowFrame::New();
   m_RectangleRendering1->SetRenderWindow(
     mitkWidget1->GetRenderWindow() );
-  m_RectangleRendering1->Enable(1.0,0.0,0.0);
 
   m_RectangleRendering2 = mitk::RenderWindowFrame::New();
   m_RectangleRendering2->SetRenderWindow(
     mitkWidget2->GetRenderWindow() );
-  m_RectangleRendering2->Enable(0.0,1.0,0.0);
 
   m_RectangleRendering3 = mitk::RenderWindowFrame::New();
   m_RectangleRendering3->SetRenderWindow(
     mitkWidget3->GetRenderWindow() );
-  m_RectangleRendering3->Enable(0.0,0.0,1.0);
 
   m_RectangleRendering4 = mitk::RenderWindowFrame::New();
   m_RectangleRendering4->SetRenderWindow(
     mitkWidget4->GetRenderWindow() );
-  m_RectangleRendering4->Enable(1.0,1.0,0.0);
+
+  m_RectangleRendering1->Enable(colorWidget1[0], colorWidget1[1], colorWidget1[2]);
+  m_RectangleRendering2->Enable(colorWidget2[0], colorWidget2[1], colorWidget2[2]);
+  m_RectangleRendering3->Enable(colorWidget3[0], colorWidget3[1], colorWidget3[2]);
+  m_RectangleRendering4->Enable(colorWidget4[0], colorWidget4[1], colorWidget4[2]);
 }
 
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
@@ -2136,10 +2139,18 @@ void QmitkStdMultiWidget::ResetCrosshair()
 
 void QmitkStdMultiWidget::EnableColoredRectangles()
 {
-  m_RectangleRendering1->Enable(1.0, 0.0, 0.0);
-  m_RectangleRendering2->Enable(0.0, 1.0, 0.0);
-  m_RectangleRendering3->Enable(0.0, 0.0, 1.0);
-  m_RectangleRendering4->Enable(1.0, 1.0, 0.0);
+  float colorWidget1[3]= { 1.0f, 0.0f, 0.0f };
+  float colorWidget2[3]= { 0.0f, 1.0f, 0.0f };
+  float colorWidget3[3]= { 0.0f, 0.0f, 1.0f };
+  float colorWidget4[3]= { 1.0f, 1.0f, 0.0f };
+  m_PlaneNode1->GetColor(colorWidget1);
+  m_PlaneNode2->GetColor(colorWidget2);
+  m_PlaneNode3->GetColor(colorWidget3);
+  m_Node->GetColor(colorWidget4);
+  m_RectangleRendering1->Enable(colorWidget1[0], colorWidget1[1], colorWidget1[2]);
+  m_RectangleRendering2->Enable(colorWidget2[0], colorWidget2[1], colorWidget2[2]);
+  m_RectangleRendering3->Enable(colorWidget3[0], colorWidget3[1], colorWidget3[2]);
+  m_RectangleRendering4->Enable(colorWidget4[0], colorWidget4[1], colorWidget4[2]);
 }
 
 void QmitkStdMultiWidget::DisableColoredRectangles()

@@ -14,78 +14,60 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKSTDMULTIWIDGETEDITORPREFERENCEPAGE_H_
-#define QMITKSTDMULTIWIDGETEDITORPREFERENCEPAGE_H_
+#ifndef QmitkStdMultiWidgetEditorPreferencePage_h
+#define QmitkStdMultiWidgetEditorPreferencePage_h
 
-#include "berryIQtPreferencePage.h"
 #include <berryIPreferences.h>
+#include <berryIQtPreferencePage.h>
+#include <QProcess>
+#include <QScopedPointer>
 
-class QWidget;
-class QCheckBox;
-class QPushButton;
-class QWidgetAction;
-class QComboBox;
+namespace Ui
+{
+  class QmitkStdMultiWidgetEditorPreferencePage;
+}
 
-struct QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
+class QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPreferencePage)
 
 public:
   QmitkStdMultiWidgetEditorPreferencePage();
+  ~QmitkStdMultiWidgetEditorPreferencePage();
 
-  void Init(berry::IWorkbench::Pointer workbench);
-
-  void CreateQtControl(QWidget* widget);
-
+  void CreateQtControl(QWidget* parent);
   QWidget* GetQtControl() const;
-
-  ///
-  /// \see IPreferencePage::PerformOk()
-  ///
-  virtual bool PerformOk();
-
-  ///
-  /// \see IPreferencePage::PerformCancel()
-  ///
-  virtual void PerformCancel();
-
-  ///
-  /// \see IPreferencePage::Update()
-  ///
-  virtual void Update();
+  void Init(berry::IWorkbench::Pointer);
+  void PerformCancel();
+  bool PerformOk();
+  void Update();
 
 public slots:
   void FirstColorChanged();
 
   void SecondColorChanged();
 
-  void UseGradientBackgroundSelected();
-
-  void ColorActionChanged();
-
   void ResetColors();
 
   void ChangeRenderingMode(int i);
 
-protected:
-  QWidget* m_MainControl;
-  QCheckBox* m_EnableFlexibleZooming;
-  QCheckBox* m_ShowLevelWindowWidget;
-  QCheckBox* m_UseGradientBackground;
-  QCheckBox* m_ChangeBackgroundColors;
-  QCheckBox* m_PACSLikeMouseMode;
-  QComboBox* m_RenderingMode;
+  void WidgetColorChanged();
 
+protected:
   std::string m_CurrentRenderingMode;
 
-  QPushButton* m_ColorButton1;
-  QPushButton* m_ColorButton2;
   std::string m_FirstColor;
   std::string m_SecondColor;
+  std::string m_Widget1Color;
   QString m_FirstColorStyleSheet;
   QString m_SecondColorStyleSheet;
-  berry::IPreferences::Pointer m_StdMultiWidgetEditorPreferencesNode;
+  QString m_Widget1ColorStyleSheet;
+  berry::IPreferences::Pointer m_Preferences;
+
+private:
+  QScopedPointer<Ui::QmitkStdMultiWidgetEditorPreferencePage> m_Ui;
+  QWidget* m_Control;
 };
 
-#endif /* QMITKDATAMANAGERPREFERENCEPAGE_H_ */
+#endif

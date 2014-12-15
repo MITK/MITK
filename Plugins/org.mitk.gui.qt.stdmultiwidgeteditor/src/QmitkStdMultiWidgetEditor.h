@@ -111,6 +111,7 @@ protected:
 
   void CreateQtPartControl(QWidget* parent);
 
+  mitk::Color GetColorForWidget(std::string widgetName, const berry::IBerryPreferences* prefs);
 private:
 
   const QScopedPointer<QmitkStdMultiWidgetEditorPrivate> d;

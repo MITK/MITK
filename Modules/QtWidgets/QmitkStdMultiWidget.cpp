@@ -2005,6 +2005,28 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int userMode )
   emit WidgetPlaneModeChange(m_PlaneMode);
 }
 
+void QmitkStdMultiWidget::SetGradientBackgroundColorForRenderWindow( const mitk::Color & upper, const mitk::Color & lower, unsigned int widgetNumber )
+{
+  switch (widgetNumber) {
+  case 0:
+    m_GradientBackground1->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
+    break;
+  case 1:
+    m_GradientBackground2->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
+    break;
+  case 2:
+    m_GradientBackground3->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
+    break;
+  case 3:
+    m_GradientBackground4->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
+    break;
+  default:
+    MITK_ERROR << "Gradientbackground for unknown widget!";
+    break;
+  }
+  m_GradientBackgroundFlag = true;
+}
+
 void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper, const mitk::Color & lower )
 {
   m_GradientBackground1->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);

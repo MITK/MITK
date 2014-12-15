@@ -313,6 +313,8 @@ public:
    * @return The renderwindow widget.
    */
   QmitkRenderWindow *GetRenderWindow(unsigned int number);
+
+  void SetGradientBackgroundColorForRenderWindow(const mitk::Color &upper, const mitk::Color &lower, unsigned int widgetNumber);
 protected:
 
   QHBoxLayout* QmitkStdMultiWidgetLayout;

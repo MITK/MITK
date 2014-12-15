@@ -85,23 +85,24 @@ void QmitkStdMultiWidgetEditorPreferencePage::PerformCancel()
 
 bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
 {
-  m_Preferences->PutByteArray("widget1 first background color", m_Widget1DecorationColor);
-  m_Preferences->PutByteArray("widget2 first background color", m_Widget2DecorationColor);
-  m_Preferences->PutByteArray("widget3 first background color", m_Widget3DecorationColor);
-  m_Preferences->PutByteArray("widget4 first background color", m_Widget4DecorationColor);
-  m_Preferences->PutByteArray("widget1 color", m_Widget1DecorationColor);
-  m_Preferences->PutByteArray("widget2 color", m_Widget2DecorationColor);
-  m_Preferences->PutByteArray("widget3 color", m_Widget3DecorationColor);
-  m_Preferences->PutByteArray("widget4 color", m_Widget4DecorationColor);
+  m_Preferences->PutByteArray("widget1 corner annotation", m_Widget1Annotation);
+  m_Preferences->PutByteArray("widget2 corner annotation", m_Widget2Annotation);
+  m_Preferences->PutByteArray("widget3 corner annotation", m_Widget3Annotation);
+  m_Preferences->PutByteArray("widget4 corner annotation", m_Widget4Annotation);
 
-  m_Preferences->PutByteArray("widget1 color", m_Widget1BackgroundColor1);
-  m_Preferences->PutByteArray("widget2 color", m_Widget2BackgroundColor1);
-  m_Preferences->PutByteArray("widget3 color", m_Widget3BackgroundColor1);
-  m_Preferences->PutByteArray("widget4 color", m_Widget4BackgroundColor1);
-  m_Preferences->PutByteArray("widget1 second background corner annotation", m_Widget1BackgroundColor2);
-  m_Preferences->PutByteArray("widget2 second background corner annotation", m_Widget2BackgroundColor2);
-  m_Preferences->PutByteArray("widget3 second background corner annotation", m_Widget3BackgroundColor2);
-  m_Preferences->PutByteArray("widget4 second background corner annotation", m_Widget4BackgroundColor2);
+  m_Preferences->PutByteArray("widget1 decoration color", m_Widget1DecorationColor);
+  m_Preferences->PutByteArray("widget2 decoration color", m_Widget2DecorationColor);
+  m_Preferences->PutByteArray("widget3 decoration color", m_Widget3DecorationColor);
+  m_Preferences->PutByteArray("widget4 decoration color", m_Widget4DecorationColor);
+
+  m_Preferences->PutByteArray("widget1 first background color", m_Widget1BackgroundColor1);
+  m_Preferences->PutByteArray("widget2 first background color", m_Widget2BackgroundColor1);
+  m_Preferences->PutByteArray("widget3 first background color", m_Widget3BackgroundColor1);
+  m_Preferences->PutByteArray("widget4 first background color", m_Widget4BackgroundColor1);
+  m_Preferences->PutByteArray("widget1 second background color", m_Widget1BackgroundColor2);
+  m_Preferences->PutByteArray("widget2 second background color", m_Widget2BackgroundColor2);
+  m_Preferences->PutByteArray("widget3 second background color", m_Widget3BackgroundColor2);
+  m_Preferences->PutByteArray("widget4 second background color", m_Widget4BackgroundColor2);
   m_Preferences->PutInt("crosshair gap size", m_Ui->m_CrosshairGapSize->value());
 
   m_Preferences->PutBool("Use constrained zooming and padding"
@@ -115,9 +116,7 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
 
 void QmitkStdMultiWidgetEditorPreferencePage::Update()
 {
-  m_Ui->m_EnableFlexibleZooming->setChecked(m_Preferences->GetBool("Use constrained zooming and padding", true));
-  m_Ui->m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
-  m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
+  //gradient background colors
   m_Widget1BackgroundColor1 = m_Preferences->GetByteArray("widget1 first background color", "#000000");
   m_Widget1BackgroundColor2 = m_Preferences->GetByteArray("widget1 second background color", "#000000");
   m_Widget2BackgroundColor1 = m_Preferences->GetByteArray("widget2 first background color", "#000000");
@@ -126,18 +125,20 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   m_Widget3BackgroundColor2 = m_Preferences->GetByteArray("widget3 second background color", "#000000");
   m_Widget4BackgroundColor1 = m_Preferences->GetByteArray("widget4 first background color", "#191919");
   m_Widget4BackgroundColor2 = m_Preferences->GetByteArray("widget4 second background color", "#7F7F7F");
-  m_Widget1DecorationColor = m_Preferences->GetByteArray("widget1 color", "#FF0000");
-  m_Widget2DecorationColor = m_Preferences->GetByteArray("widget2 color", "#00FF00");
-  m_Widget3DecorationColor = m_Preferences->GetByteArray("widget3 color", "#0000FF");
-  m_Widget4DecorationColor = m_Preferences->GetByteArray("widget4 color", "#FFFF00");
 
-  m_Ui->m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
+  //decoration colors
+  m_Widget1DecorationColor = m_Preferences->GetByteArray("widget1 decoration color", "#FF0000");
+  m_Widget2DecorationColor = m_Preferences->GetByteArray("widget2 decoration color", "#00FF00");
+  m_Widget3DecorationColor = m_Preferences->GetByteArray("widget3 decoration color", "#0000FF");
+  m_Widget4DecorationColor = m_Preferences->GetByteArray("widget4 decoration color", "#FFFF00");
 
+  //annotation text
   m_Widget1Annotation = m_Preferences->GetByteArray("widget1 corner annotation", "Axial");
   m_Widget2Annotation = m_Preferences->GetByteArray("widget2 corner annotation", "Sagittal");
   m_Widget3Annotation = m_Preferences->GetByteArray("widget3 corner annotation", "Coronal");
   m_Widget4Annotation = m_Preferences->GetByteArray("widget4 corner annotation", "3D");
 
+  //Ui stuff
   QColor firstBackgroundColor = this->StringToColor(m_Widget1BackgroundColor1);
   QColor secondBackgroundColor = this->StringToColor(m_Widget1BackgroundColor2);
   QColor widgetColor = this->StringToColor(m_Widget1DecorationColor);
@@ -148,8 +149,12 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
 
   m_Ui->m_RenderWindowDecorationText->setText(QString::fromStdString(m_Widget1Annotation));
 
+  m_Ui->m_EnableFlexibleZooming->setChecked(m_Preferences->GetBool("Use constrained zooming and padding", true));
+  m_Ui->m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
+  m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
   int index= m_Preferences->GetInt("Rendering Mode",0);
   m_Ui->m_RenderingMode->setCurrentIndex(index);
+  m_Ui->m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
 }
 
 QColor QmitkStdMultiWidgetEditorPreferencePage::StringToColor(std::string colorInHex)

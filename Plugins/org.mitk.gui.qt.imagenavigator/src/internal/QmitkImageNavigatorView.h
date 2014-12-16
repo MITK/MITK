@@ -91,6 +91,12 @@ protected:
   QWidget* m_Parent;
 
   mitk::IRenderWindowPart* m_IRenderWindowPart;
+  /**
+   * @brief GetDecorationColorOfGeometry helper method to get the color of a helper geometry node.
+   * @param renderWindow The renderwindow of the geometry
+   * @return the color for decoration in QString format (#RRGGBB).
+   */
+  QString GetDecorationColorOfGeometry(QmitkRenderWindow *renderWindow);
 };
 
 #endif // _QMITKIMAGENAVIGATORVIEW_H_INCLUDED

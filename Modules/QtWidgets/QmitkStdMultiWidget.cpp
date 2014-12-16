@@ -405,26 +405,26 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_LogoRendering->SetCornerPosition(1);
   renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(),renderer4);
 
-  m_RectangleRendering1 = mitk::RenderWindowFrame::New();
-  m_RectangleRendering1->SetRenderWindow(
+  m_RectangleRendering[0] = mitk::RenderWindowFrame::New();
+  m_RectangleRendering[0]->SetRenderWindow(
     mitkWidget1->GetRenderWindow() );
 
-  m_RectangleRendering2 = mitk::RenderWindowFrame::New();
-  m_RectangleRendering2->SetRenderWindow(
+  m_RectangleRendering[1] = mitk::RenderWindowFrame::New();
+  m_RectangleRendering[1]->SetRenderWindow(
     mitkWidget2->GetRenderWindow() );
 
-  m_RectangleRendering3 = mitk::RenderWindowFrame::New();
-  m_RectangleRendering3->SetRenderWindow(
+  m_RectangleRendering[2] = mitk::RenderWindowFrame::New();
+  m_RectangleRendering[2]->SetRenderWindow(
     mitkWidget3->GetRenderWindow() );
 
-  m_RectangleRendering4 = mitk::RenderWindowFrame::New();
-  m_RectangleRendering4->SetRenderWindow(
+  m_RectangleRendering[3] = mitk::RenderWindowFrame::New();
+  m_RectangleRendering[3]->SetRenderWindow(
     mitkWidget4->GetRenderWindow() );
 
-  m_RectangleRendering1->Enable(colorWidget1[0], colorWidget1[1], colorWidget1[2]);
-  m_RectangleRendering2->Enable(colorWidget2[0], colorWidget2[1], colorWidget2[2]);
-  m_RectangleRendering3->Enable(colorWidget3[0], colorWidget3[1], colorWidget3[2]);
-  m_RectangleRendering4->Enable(m_DecorationColorWidget4[0], m_DecorationColorWidget4[1], m_DecorationColorWidget4[2]);
+  m_RectangleRendering[0]->Enable(colorWidget1[0], colorWidget1[1], colorWidget1[2]);
+  m_RectangleRendering[1]->Enable(colorWidget2[0], colorWidget2[1], colorWidget2[2]);
+  m_RectangleRendering[2]->Enable(colorWidget3[0], colorWidget3[1], colorWidget3[2]);
+  m_RectangleRendering[3]->Enable(m_DecorationColorWidget4[0], m_DecorationColorWidget4[1], m_DecorationColorWidget4[2]);
 }
 
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
@@ -2193,23 +2193,23 @@ void QmitkStdMultiWidget::EnableColoredRectangles()
   m_PlaneNode1->GetColor(colorWidget1);
   m_PlaneNode2->GetColor(colorWidget2);
   m_PlaneNode3->GetColor(colorWidget3);
-  m_RectangleRendering1->Enable(colorWidget1[0], colorWidget1[1], colorWidget1[2]);
-  m_RectangleRendering2->Enable(colorWidget2[0], colorWidget2[1], colorWidget2[2]);
-  m_RectangleRendering3->Enable(colorWidget3[0], colorWidget3[1], colorWidget3[2]);
-  m_RectangleRendering4->Enable(m_DecorationColorWidget4[0], m_DecorationColorWidget4[1], m_DecorationColorWidget4[2]);
+  m_RectangleRendering[0]->Enable(colorWidget1[0], colorWidget1[1], colorWidget1[2]);
+  m_RectangleRendering[1]->Enable(colorWidget2[0], colorWidget2[1], colorWidget2[2]);
+  m_RectangleRendering[2]->Enable(colorWidget3[0], colorWidget3[1], colorWidget3[2]);
+  m_RectangleRendering[3]->Enable(m_DecorationColorWidget4[0], m_DecorationColorWidget4[1], m_DecorationColorWidget4[2]);
 }
 
 void QmitkStdMultiWidget::DisableColoredRectangles()
 {
-  m_RectangleRendering1->Disable();
-  m_RectangleRendering2->Disable();
-  m_RectangleRendering3->Disable();
-  m_RectangleRendering4->Disable();
+  m_RectangleRendering[0]->Disable();
+  m_RectangleRendering[1]->Disable();
+  m_RectangleRendering[2]->Disable();
+  m_RectangleRendering[3]->Disable();
 }
 
 bool QmitkStdMultiWidget::IsColoredRectanglesEnabled() const
 {
-  return m_RectangleRendering1->IsEnabled();
+  return m_RectangleRendering[0]->IsEnabled();
 }
 
 mitk::MouseModeSwitcher* QmitkStdMultiWidget::GetMouseModeSwitcher()

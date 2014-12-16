@@ -326,17 +326,14 @@ protected:
   /**
    * @brief m_RectangleRendering1 the 4 frames of the renderwindow.
    */
-  mitk::RenderWindowFrame::Pointer m_RectangleRendering1;
-  mitk::RenderWindowFrame::Pointer m_RectangleRendering2;
-  mitk::RenderWindowFrame::Pointer m_RectangleRendering3;
-  mitk::RenderWindowFrame::Pointer m_RectangleRendering4;
+  mitk::RenderWindowFrame::Pointer m_RectangleRendering[4];
+//  mitk::RenderWindowFrame::Pointer m_RectangleRendering;
+//  mitk::RenderWindowFrame::Pointer m_RectangleRendering;
+//  mitk::RenderWindowFrame::Pointer m_RectangleRendering;
 
   mitk::LogoOverlay::Pointer m_LogoRendering;
 
   mitk::GradientBackground::Pointer m_GradientBackground[4];
-//  mitk::GradientBackground::Pointer m_GradientBackground2;
-//  mitk::GradientBackground::Pointer m_GradientBackground3;
-//  mitk::GradientBackground::Pointer m_GradientBackground4;
   bool m_GradientBackgroundFlag;
 
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;

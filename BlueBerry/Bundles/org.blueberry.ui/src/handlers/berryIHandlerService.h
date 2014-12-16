@@ -29,8 +29,8 @@ class ExecutionEvent;
 class ParameterizedCommand;
 class Expression;
 class UIElement;
-class IEvaluationContext;
 
+struct IEvaluationContext;
 struct IHandler;
 struct IHandlerActivation;
 

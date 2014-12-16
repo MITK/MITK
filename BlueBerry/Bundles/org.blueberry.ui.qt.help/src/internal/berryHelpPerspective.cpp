@@ -30,7 +30,7 @@ void HelpPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
   std::string editorArea = layout->GetEditorArea();
 
   layout->AddView("org.blueberry.views.helpsearch",
-                  berry::IPageLayout::LEFT, 0.3, editorArea);
+                  berry::IPageLayout::LEFT, 0.3f, editorArea);
 
   berry::IFolderLayout::Pointer leftFolder =
       layout->CreateFolder("lefttop", berry::IPageLayout::TOP, 0.65f, "org.blueberry.views.helpsearch");

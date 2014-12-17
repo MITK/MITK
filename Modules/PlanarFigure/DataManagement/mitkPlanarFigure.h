@@ -270,6 +270,9 @@ public:
   */
   virtual bool Equals(const mitk::PlanarFigure& other) const;
 
+  /** \brief Copies contents and state of a figure provided as parameter to the current object. */
+  void DeepCopy(Self::Pointer oldFigure);
+
 
 protected:
   PlanarFigure();

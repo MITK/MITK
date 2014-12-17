@@ -47,7 +47,7 @@ public:
 
 protected:
 
-  vtkProp* GetVtkProp(BaseRenderer *renderer) const;
+  virtual vtkProp* GetVtkProp(BaseRenderer *renderer) const;
   virtual void UpdateVtkOverlay(BaseRenderer *renderer);
   virtual void UpdateVtkOverlay2D(BaseRenderer *renderer) = 0;
   virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer) const = 0;

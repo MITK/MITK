@@ -23,6 +23,7 @@
 #include "MitkOverlaysExports.h"
 
 class vtkTextActor;
+class vtkPropAssembly;
 
 namespace mitk {
 
@@ -35,6 +36,14 @@ public:
   public:
     /** \brief Actor of a 2D render window. */
     vtkSmartPointer<vtkTextActor> m_TextActor;
+
+    vtkSmartPointer<vtkTextProperty> m_TextProp;
+
+    vtkSmartPointer<vtkTextActor> m_STextActor;
+
+    vtkSmartPointer<vtkTextProperty> m_STextProp;
+
+    vtkSmartPointer<vtkPropAssembly> m_Assembly;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;
@@ -58,6 +67,7 @@ protected:
   /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
   mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
+  vtkProp* GetVtkProp(BaseRenderer *renderer) const;
   virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer) const;
   void UpdateVtkOverlay2D(mitk::BaseRenderer *renderer);
 

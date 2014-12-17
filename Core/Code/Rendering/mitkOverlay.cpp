@@ -141,20 +141,24 @@ bool mitk::Overlay::GetStringProperty(const std::string&  propertyKey, std::stri
 void mitk::Overlay::SetIntProperty(const std::string&  propertyKey, int intValue, mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::IntProperty::New(intValue));
+  Modified();
 }
 void mitk::Overlay::SetBoolProperty( const std::string&  propertyKey, bool boolValue, mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::BoolProperty::New(boolValue));
+  Modified();
 }
 
 void mitk::Overlay::SetFloatProperty( const std::string&  propertyKey, float floatValue, mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::FloatProperty::New(floatValue));
+  Modified();
 }
 
 void mitk::Overlay::SetStringProperty( const std::string&  propertyKey, const std::string&  stringValue, mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::StringProperty::New(stringValue));
+  Modified();
 }
 
 std::string mitk::Overlay::GetName() const

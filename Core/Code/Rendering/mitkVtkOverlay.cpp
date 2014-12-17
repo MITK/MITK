@@ -68,5 +68,6 @@ void mitk::VtkOverlay::RemoveFromBaseRenderer(mitk::BaseRenderer *renderer)
 
 void mitk::VtkOverlay::Paint( BaseRenderer* renderer )
 {
+  GetVtkProp( renderer )->RenderOpaqueGeometry(renderer->GetVtkRenderer() );
   GetVtkProp( renderer )->RenderOverlay( renderer->GetVtkRenderer() );
 }

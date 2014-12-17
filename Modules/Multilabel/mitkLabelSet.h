@@ -152,7 +152,7 @@ public:
 
     /** \brief
     */
-    int GetNumberOfLabels() const;
+    unsigned int GetNumberOfLabels() const;
 
     /** \brief
     */

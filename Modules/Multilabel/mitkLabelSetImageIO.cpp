@@ -86,13 +86,13 @@ void LabelSetImageIO::Write()
   sprintf( valbuffer, "%1d", input->GetNumberOfLayers());
   itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
 
-  for (int layerIdx=0; layerIdx<input->GetNumberOfLayers(); layerIdx++)
+  for (unsigned int layerIdx=0; layerIdx<input->GetNumberOfLayers(); layerIdx++)
   {
     sprintf( keybuffer, "layer_%03d", layerIdx ); // layer idx
     sprintf( valbuffer, "%1d", input->GetTotalNumberOfLabels()); // number of labels for the layer
     itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
 
-    for (int labelIdx=0; labelIdx<input->GetNumberOfLabels(layerIdx); labelIdx++)
+    for (unsigned int labelIdx=0; labelIdx<input->GetNumberOfLabels(layerIdx); labelIdx++)
     {
       std::auto_ptr<TiXmlDocument> document;
       document.reset(new TiXmlDocument());
@@ -476,7 +476,7 @@ bool LabelSetImageIO::SaveLabelSetImagePreset(const std::string & presetFilename
 
   presetXmlDoc->LinkEndChild(presetElement);
 
-  for (int layerIdx=0; layerIdx<inputImage->GetNumberOfLayers(); layerIdx++)
+  for (unsigned int layerIdx=0; layerIdx<inputImage->GetNumberOfLayers(); layerIdx++)
   {
     TiXmlElement * layerElement = new TiXmlElement("Layer");
     layerElement->SetAttribute("index", layerIdx);
@@ -484,7 +484,7 @@ bool LabelSetImageIO::SaveLabelSetImagePreset(const std::string & presetFilename
 
     presetElement->LinkEndChild(layerElement);
 
-    for (int labelIdx=0; labelIdx<inputImage->GetNumberOfLabels(layerIdx); labelIdx++)
+    for (unsigned int labelIdx=0; labelIdx<inputImage->GetNumberOfLabels(layerIdx); labelIdx++)
     {
       TiXmlElement * labelAsXml = LabelSetImageIO::GetLabelAsTiXmlElement(inputImage->GetLabel(labelIdx,layerIdx));
       layerElement->LinkEndChild(labelAsXml);

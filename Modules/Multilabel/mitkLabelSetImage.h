@@ -45,7 +45,7 @@ public:
   mitkClassMacro(LabelSetImage, Image)
   itkNewMacro(Self)
 
-  typedef unsigned short PixelType;
+  typedef mitk::Label::PixelType PixelType;
 
   typedef itk::Image< PixelType, 3 >                     LabelSetImageType;
   typedef itk::VariableLengthVector< PixelType >         VariableVectorType;
@@ -67,10 +67,11 @@ public:
   Message<> AfterchangeLayerEvent;
 
   /**
-    * \brief  */
+   * @brief Initialize an empty mitk::LabelSetImage using the information
+   *        of an mitk::Image
+   * @param image the image which is used for initializing the mitk::LabelSetImage
+   */
   virtual void Initialize(const mitk::Image* image);
-
-  PixelType* GetImageLayer(int layer);
 
   /**
     * \brief  */
@@ -83,36 +84,36 @@ public:
   /**
     * \brief
   */
-  void MergeLabels(std::vector<int>& VectorOfLablePixelValues, int index, int layer = -1);
+  void MergeLabels(std::vector<PixelType>& VectorOfLablePixelValues, PixelType index, unsigned int layer = 0);
 
   /**
     * \brief
   */
-  void MergeLabel(int targetPixelValue, int layer = -1);
+  void MergeLabel(PixelType targetPixelValue, unsigned int layer = 0);
 
   /**
     * \brief  */
-  void UpdateCenterOfMass(int pixelValue, int layer = -1);
+  void UpdateCenterOfMass(PixelType pixelValue, unsigned int layer =0);
 
   /**
     * \brief  */
-  void CalculateLabelVolume(int index, int layer = -1);
+//  void CalculateLabelVolume(PixelType index, int layer = -1);
 
   /**
     * \brief  */
-  void RemoveLabels(std::vector<int>& VectorOfLabelPixelValues, int layer = -1);
+  void RemoveLabels(std::vector<PixelType>& VectorOfLabelPixelValues, unsigned int layer = 0);
 
   /**
     * \brief  */
-  void EraseLabel(int pixelValue, int layer = -1);
+  void EraseLabel(PixelType pixelValue, unsigned int layer = 0);
 
   /**
     * \brief  */
-  void EraseLabels(std::vector<int>& VectorOfLabelPixelValues, int layer = -1);
+  void EraseLabels(std::vector<PixelType>& VectorOfLabelPixelValues, unsigned int layer = 0);
 
   /**
     * \brief  Returns true if the value exists in one of the labelsets*/
-  bool ExistLabel(const unsigned int pixelValue);
+  bool ExistLabel(const PixelType pixelValue);
 
 
   /**
@@ -121,11 +122,11 @@ public:
 
   /**
     * \brief  */
-  mitk::Label* GetActiveLabel(int layer = -1);
+  mitk::Label* GetActiveLabel(unsigned int layer = 0);
 
   /**
     * \brief  */
-  mitk::Label* GetLabel(int pixelValue, int layer = -1) const;
+  mitk::Label* GetLabel(PixelType pixelValue, unsigned int layer = 0) const;
 
   /**
     * \brief  */
@@ -133,21 +134,21 @@ public:
 
   /**
     * \brief  */
-  mitk::LabelSet * GetLabelSet(int layer = -1);
+  mitk::LabelSet * GetLabelSet(unsigned int layer = 0);
 
-  const mitk::LabelSet * GetLabelSet(int layer = -1) const;
+  const mitk::LabelSet * GetLabelSet(unsigned int layer = 0) const;
 
   /**
   * \brief  */
-  int GetActiveLayer() const;
+  unsigned int GetActiveLayer() const;
 
   /**
     * \brief  */
-  int GetNumberOfLabels(int layer = -1) const;
+  unsigned int GetNumberOfLabels(unsigned int layer = 0) const;
 
   /**
     * \brief  */
-  int GetTotalNumberOfLabels() const;
+  unsigned int GetTotalNumberOfLabels() const;
 
   /**
     * \brief  */
@@ -155,10 +156,15 @@ public:
 
   /**
     * \brief  */
-  mitk::Image::Pointer CreateLabelMask(int index);
+  mitk::Image::Pointer CreateLabelMask(PixelType index);
 
   /**
-    * \brief  */
+   * @brief Initialize a new mitk::LabelSetImage by an given image.
+   * For all distinct pixel values of the parameter image new labels will
+   * be created. If the number of distinct pixel values exceeds mitk::Label::MAX_LABEL_VALUE
+   * a new layer will be created
+   * @param image the image which is used for initialization
+   */
   void InitializeByLabeledImage(mitk::Image::Pointer image);
 
   /**
@@ -167,11 +173,11 @@ public:
 
   /**
     * \brief  */
-  void SetActiveLayer(int layer);
+  void SetActiveLayer(unsigned int layer);
 
   /**
     * \brief  */
-  int GetNumberOfLayers() const;
+  unsigned int GetNumberOfLayers() const;
 
   /**
     * \brief  */
@@ -183,7 +189,7 @@ public:
 
   /**
     * \brief  */
-  int AddLayer(mitk::LabelSet::Pointer=0);
+  unsigned int AddLayer(mitk::LabelSet::Pointer=0);
 
   /**
     * \brief  */
@@ -191,9 +197,9 @@ public:
 
   /**
     * \brief  */
-  mitk::Image* GetLayerImage(int layer);
+  mitk::Image* GetLayerImage(unsigned int layer);
 
-  const mitk::Image* GetLayerImage(int layer) const;
+  const mitk::Image* GetLayerImage(unsigned int layer) const;
 
   void OnLabelSetModified();
 
@@ -215,25 +221,25 @@ protected:
   void ChangeLayerProcessing( ImageType1* source, ImageType2* target );
 
   template < typename ImageType >
-  void LayerContainerToImageProcessing( ImageType* source, int layer);
+  void LayerContainerToImageProcessing( ImageType* source, unsigned int layer);
 
   template < typename ImageType >
-  void ImageToLayerContainerProcessing( ImageType* source, int layer) const;
+  void ImageToLayerContainerProcessing( ImageType* source, unsigned int layer) const;
 
   template < typename ImageType >
-  void CalculateCenterOfMassProcessing( ImageType* input, int index, int layer);
+  void CalculateCenterOfMassProcessing( ImageType* input, PixelType index, unsigned int layer);
 
   template < typename ImageType >
   void ClearBufferProcessing( ImageType* input);
 
   template < typename ImageType >
-  void EraseLabelProcessing( ImageType* input, int index, int layer);
+  void EraseLabelProcessing( ImageType* input, PixelType index, unsigned int layer);
 
 //  template < typename ImageType >
 //  void ReorderLabelProcessing( ImageType* input, int index, int layer);
 
   template < typename ImageType >
-  void MergeLabelProcessing( ImageType* input, int pixelValue, int index);
+  void MergeLabelProcessing( ImageType* input, PixelType pixelValue, PixelType index);
 
   template < typename ImageType >
   void ConcatenateProcessing( ImageType* input, mitk::LabelSetImage* other);
@@ -242,7 +248,7 @@ protected:
   void MaskStampProcessing( ImageType* input, mitk::Image* mask, bool forceOverwrite);
 
   template < typename ImageType >
-  void CreateLabelMaskProcessing( ImageType* input, mitk::Image* mask, int index);
+  void CreateLabelMaskProcessing( ImageType* input, mitk::Image* mask, PixelType index);
 
   template < typename ImageType1, typename ImageType2 >
   void InitializeByLabeledImageProcessing( ImageType1* input, ImageType2* other);

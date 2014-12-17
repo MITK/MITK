@@ -36,11 +36,11 @@ class mitkLabelSetTestSuite : public mitk::TestFixture
 
 private:
   mitk::LabelSet::Pointer m_LabelSet;
-  int m_InitialNumberOfLabels;
+  mitk::LabelSet::PixelType m_InitialNumberOfLabels;
 
-  void AddLabels(int numOfLabels)
+  void AddLabels(mitk::LabelSet::PixelType numOfLabels)
   {
-    for (mitk::Label::PixelType i = 0; i < static_cast<unsigned short>(numOfLabels); ++i)
+    for (mitk::Label::PixelType i = 0; i < numOfLabels; ++i)
     {
       mitk::Label::Pointer label = mitk::Label::New();
       std::stringstream nameStream;

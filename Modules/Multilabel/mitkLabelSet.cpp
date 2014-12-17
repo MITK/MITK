@@ -77,7 +77,7 @@ mitk::LabelSet::LabelContainerIteratorType mitk::LabelSet::IteratorBegin()
 }
 
 
-int mitk::LabelSet::GetNumberOfLabels() const
+unsigned int mitk::LabelSet::GetNumberOfLabels() const
 {
   return m_LabelContainer.size();
 }

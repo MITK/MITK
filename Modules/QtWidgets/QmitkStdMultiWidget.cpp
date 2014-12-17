@@ -634,14 +634,14 @@ void QmitkStdMultiWidget::SetCornerAnnotation( std::string text,
   mitk::VtkLayerController* layercontroller = mitk::VtkLayerController::GetInstance(this->GetRenderWindow(widgetNumber)->GetRenderWindow());
   //remove the old renderer, because the layercontroller holds a list (vector) of all renderes
   //which needs to be updated
-  if(m_CornerAnnotaions[widgetNumber].ren != NULL)
+  if(m_CornerAnnotations[widgetNumber].ren != NULL)
   {
-    layercontroller->RemoveRenderer(m_CornerAnnotaions[widgetNumber].ren);
+    layercontroller->RemoveRenderer(m_CornerAnnotations[widgetNumber].ren);
   }
   //make a new one
-  m_CornerAnnotaions[widgetNumber] = this->CreateCornerAnnotation(text, color);
+  m_CornerAnnotations[widgetNumber] = this->CreateCornerAnnotation(text, color);
   //add it to the list
-  layercontroller->InsertForegroundRenderer(m_CornerAnnotaions[widgetNumber].ren,true);
+  layercontroller->InsertForegroundRenderer(m_CornerAnnotations[widgetNumber].ren,true);
 }
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(unsigned int number)
@@ -1326,13 +1326,11 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   // add the displayed planes of the multiwidget to a node to which the subtree
   // @a planesSubTree points ...
 
-  float white[3] = {1.0f,1.0f,1.0f};
   mitk::PlaneGeometryDataMapper2D::Pointer mapper;
 
   // ... of widget 1
   mitk::BaseRenderer* renderer1 = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow());
   m_PlaneNode1 = renderer1->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode1->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
   m_PlaneNode1->SetProperty("visible", mitk::BoolProperty::New(true));
   m_PlaneNode1->SetProperty("name", mitk::StringProperty::New(std::string(renderer1->GetName()) + ".plane"));
   m_PlaneNode1->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
@@ -1343,7 +1341,6 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   // ... of widget 2
   mitk::BaseRenderer* renderer2 = mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow());
   m_PlaneNode2 = renderer2->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode2->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
   m_PlaneNode2->SetProperty("visible", mitk::BoolProperty::New(true));
   m_PlaneNode2->SetProperty("name", mitk::StringProperty::New(std::string(renderer2->GetName()) + ".plane"));
   m_PlaneNode2->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
@@ -1354,7 +1351,6 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   // ... of widget 3
   mitk::BaseRenderer* renderer3 = mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow());
   m_PlaneNode3 = renderer3->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode3->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
   m_PlaneNode3->SetProperty("visible", mitk::BoolProperty::New(true));
   m_PlaneNode3->SetProperty("name", mitk::StringProperty::New(std::string(renderer3->GetName()) + ".plane"));
   m_PlaneNode3->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
@@ -2190,6 +2186,7 @@ void QmitkStdMultiWidget::EnableColoredRectangles()
   float colorWidget1[3]= { 1.0f, 0.0f, 0.0f };
   float colorWidget2[3]= { 0.0f, 1.0f, 0.0f };
   float colorWidget3[3]= { 0.0f, 0.0f, 1.0f };
+
   m_PlaneNode1->GetColor(colorWidget1);
   m_PlaneNode2->GetColor(colorWidget2);
   m_PlaneNode3->GetColor(colorWidget3);

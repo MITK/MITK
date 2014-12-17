@@ -384,7 +384,7 @@ protected:
     vtkSmartPointer<vtkCornerAnnotation> cornerText;
     vtkSmartPointer<vtkTextProperty> textProp;
     vtkSmartPointer<vtkRenderer> ren;
-  } m_CornerAnnotaions[4];
+  } m_CornerAnnotations[4];
 
   bool m_PendingCrosshairPositionEvent;
   bool m_CrosshairNavigationEnabled;

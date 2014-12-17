@@ -889,6 +889,43 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
   return true;
 }
 
+void mitk::PlanarFigure::DeepCopy( Self::Pointer oldFigure )
+{
+  //DeepCopy only same types of planar figures
+  //Notice to get typeid polymorph you have to use the *operator
+  if( typeid(*oldFigure) != typeid(*this) )
+  {
+    itkExceptionMacro( << "DeepCopy(): Inconsistent type of source (" << typeid(*oldFigure).name() << ") and destination figure (" << typeid(*this).name() << ")!" );
+    return;
+  }
+
+  m_ControlPoints.clear();
+  this->ClearPolyLines();
+  this->ClearHelperPolyLines();
+
+  // clone base data members
+  SetPropertyList(oldFigure->GetPropertyList()->Clone());
+
+  /// deep copy members
+  m_FigurePlaced                = oldFigure->m_FigurePlaced;
+  m_SelectedControlPoint        = oldFigure->m_SelectedControlPoint;
+  m_FeaturesMTime               = oldFigure->m_FeaturesMTime;
+  m_Features                    = oldFigure->m_Features;
+  m_NumberOfControlPoints       = oldFigure->m_NumberOfControlPoints;
+
+  //copy geometry 2D of planar figure
+  SetPlaneGeometry( oldFigure->m_PlaneGeometry->Clone().GetPointer() );
+
+  for(unsigned long index=0; index < oldFigure->GetNumberOfControlPoints(); index++)
+  {
+    m_ControlPoints.push_back( oldFigure->GetControlPoint( index ));
+  }
+
+  //After setting the control points we can generate the polylines
+  this->GeneratePolyLine();
+}
+
+
 bool mitk::Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose )
 {
   return leftHandSide.Equals(rightHandSide);

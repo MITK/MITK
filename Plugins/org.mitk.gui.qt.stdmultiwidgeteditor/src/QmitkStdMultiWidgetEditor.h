@@ -119,6 +119,8 @@ protected:
   mitk::Color HexColorToMitkColor(std::string widgetColorInHex);
 private:
 
+  void InitializePreferences(berry::IBerryPreferences *preferences);
+
   const QScopedPointer<QmitkStdMultiWidgetEditorPrivate> d;
 };
 #endif /*QmitkStdMultiWidgetEditor_h*/

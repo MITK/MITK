@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkMouseModeSwitcher.h>
 #include <QmitkStdMultiWidget.h>
+#include <berryIBerryPreferences.h>
 
 #include <mbilogo.h>
 
@@ -319,7 +320,9 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     this->GetSite()->GetPage()->AddPartListener(d->m_PartListener);
 
-    this->OnPreferencesChanged(dynamic_cast<berry::IBerryPreferences*>(prefs.GetPointer()));
+    berry::IBerryPreferences* berryprefs = dynamic_cast<berry::IBerryPreferences*>(prefs.GetPointer());
+    InitializePreferences(berryprefs);
+    this->OnPreferencesChanged(berryprefs);
 
     this->RequestUpdate();
   }
@@ -460,6 +463,53 @@ mitk::Color QmitkStdMultiWidgetEditor::HexColorToMitkColor(std::string widgetCol
     returnColor[2] = qColor.blue() / colorMax;
   }
   return returnColor;
+}
+
+void QmitkStdMultiWidgetEditor::InitializePreferences(berry::IBerryPreferences * preferences)
+{
+  std::string widgetBackgroundColor1[4];
+  std::string widgetBackgroundColor2[4];
+  std::string widgetDecorationColor[4];
+  std::string widgetAnnotation[4];
+  widgetBackgroundColor1[0] = preferences->GetByteArray("widget1 first background color", "#000000");
+  widgetBackgroundColor2[0] = preferences->GetByteArray("widget1 second background color", "#000000");
+  widgetBackgroundColor1[1] = preferences->GetByteArray("widget2 first background color", "#000000");
+  widgetBackgroundColor2[1] = preferences->GetByteArray("widget2 second background color", "#000000");
+  widgetBackgroundColor1[2] = preferences->GetByteArray("widget3 first background color", "#000000");
+  widgetBackgroundColor2[2] = preferences->GetByteArray("widget3 second background color", "#000000");
+  widgetBackgroundColor1[3] = preferences->GetByteArray("widget4 first background color", "#191919");
+  widgetBackgroundColor2[3] = preferences->GetByteArray("widget4 second background color", "#7F7F7F");
+
+  //decoration colors
+  widgetDecorationColor[0] = preferences->GetByteArray("widget1 decoration color", "#C00000");
+  widgetDecorationColor[1] = preferences->GetByteArray("widget2 decoration color", "#00B000");
+  widgetDecorationColor[2] = preferences->GetByteArray("widget3 decoration color", "#0080FF");
+  widgetDecorationColor[3] = preferences->GetByteArray("widget4 decoration color", "#FFFF00");
+
+  //annotation text
+  widgetAnnotation[0] = preferences->GetByteArray("widget1 corner annotation", "Axial");
+  widgetAnnotation[1] = preferences->GetByteArray("widget2 corner annotation", "Sagittal");
+  widgetAnnotation[2] = preferences->GetByteArray("widget3 corner annotation", "Coronal");
+  widgetAnnotation[3] = preferences->GetByteArray("widget4 corner annotation", "3D");
+
+  preferences->PutByteArray("widget1 corner annotation", widgetAnnotation[0]);
+  preferences->PutByteArray("widget2 corner annotation", widgetAnnotation[1]);
+  preferences->PutByteArray("widget3 corner annotation", widgetAnnotation[2]);
+  preferences->PutByteArray("widget4 corner annotation", widgetAnnotation[3]);
+
+  preferences->PutByteArray("widget1 decoration color", widgetDecorationColor[0]);
+  preferences->PutByteArray("widget2 decoration color", widgetDecorationColor[1]);
+  preferences->PutByteArray("widget3 decoration color", widgetDecorationColor[2]);
+  preferences->PutByteArray("widget4 decoration color", widgetDecorationColor[3]);
+
+  preferences->PutByteArray("widget1 first background color", widgetBackgroundColor1[0]);
+  preferences->PutByteArray("widget2 first background color", widgetBackgroundColor1[1]);
+  preferences->PutByteArray("widget3 first background color", widgetBackgroundColor1[2]);
+  preferences->PutByteArray("widget4 first background color", widgetBackgroundColor1[3]);
+  preferences->PutByteArray("widget1 second background color", widgetBackgroundColor2[0]);
+  preferences->PutByteArray("widget2 second background color", widgetBackgroundColor2[1]);
+  preferences->PutByteArray("widget3 second background color", widgetBackgroundColor2[2]);
+  preferences->PutByteArray("widget4 second background color", widgetBackgroundColor2[3]);
 }
 
 void QmitkStdMultiWidgetEditor::SetFocus()

@@ -351,6 +351,11 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer
   Superclass::ApplyColorAndOpacityProperties(renderer, ls->m_CrosshairActor);
   Superclass::ApplyColorAndOpacityProperties(renderer, ls->m_CrosshairHelperLineActor);
 
+  float thickness;
+  this->GetDataNode()->GetFloatProperty("Line width",thickness,renderer);
+  ls->m_CrosshairActor->GetProperty()->SetLineWidth(thickness);
+  ls->m_CrosshairHelperLineActor->GetProperty()->SetLineWidth(thickness);
+
   PlaneOrientationProperty* decorationProperty;
   this->GetDataNode()->GetProperty( decorationProperty, "decoration", renderer );
   if ( decorationProperty != NULL )
@@ -376,7 +381,7 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer
 
 void mitk::PlaneGeometryDataMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "Line width", mitk::IntProperty::New(2), renderer, overwrite );
+  node->AddProperty( "Line width", mitk::FloatProperty::New(1), renderer, overwrite );
   node->AddProperty( "Crosshair.Gap Size", mitk::IntProperty::New(32), renderer, overwrite );
   node->AddProperty( "decoration", mitk::PlaneOrientationProperty
                      ::New(PlaneOrientationProperty::PLANE_DECORATION_NONE), renderer, overwrite );

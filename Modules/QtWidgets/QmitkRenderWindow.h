@@ -20,7 +20,8 @@
 #include "mitkRenderWindowBase.h"
 
 #include <MitkQtWidgetsExports.h>
-#include "QVTKWidget.h"
+#include "QVTKWidget2.h"
+#include <vtkGenericOpenGLRenderWindow.h>
 #include "QmitkRenderWindowMenu.h"
 
 #include "mitkInteractionEventConst.h"
@@ -35,7 +36,7 @@ class QInputEvent;
  * \ingroup QmitkModule
  * \brief MITK implementation of the QVTKWidget
  */
-class QMITK_EXPORT QmitkRenderWindow: public QVTKWidget, public mitk::RenderWindowBase
+class QMITK_EXPORT QmitkRenderWindow: public QVTKWidget2, public mitk::RenderWindowBase
 {
 Q_OBJECT
 

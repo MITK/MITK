@@ -58,12 +58,12 @@ void mitk::LabelSet::OnLabelModified()
 
 mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorConstEnd() const
 {
-  return m_LabelContainer.cend();
+  return m_LabelContainer.end();
 }
 
 mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorConstBegin() const
 {
-  return m_LabelContainer.cbegin();
+  return m_LabelContainer.begin();
 }
 
 mitk::LabelSet::LabelContainerIteratorType mitk::LabelSet::IteratorEnd()

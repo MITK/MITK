@@ -320,17 +320,17 @@ void mitk::SurfaceVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::
   aliases->AddAlias( "line width", "Surface.2D.Line Width", "Surface");
   node->AddProperty( "scalar mode", VtkScalarModeProperty::New(), renderer, overwrite );
   node->AddProperty( "draw normals 2D", BoolProperty::New(false), renderer, overwrite );
-  aliases->AddAlias( "draw normals 2D", "Surface.2D.Draw Normals", "Surface");
+  aliases->AddAlias( "draw normals 2D", "Surface.2D.Normals.Draw Normals", "Surface");
   node->AddProperty( "invert normals", BoolProperty::New(false), renderer, overwrite );
-  aliases->AddAlias( "invert normals", "Surface.2D.Draw Inverse Normals", "Surface");
+  aliases->AddAlias( "invert normals", "Surface.2D.Normals.Draw Inverse Normals", "Surface");
   node->AddProperty( "front color", ColorProperty::New(0.0, 1.0, 0.0), renderer, overwrite );
-  aliases->AddAlias( "front color", "Surface.2D.Normals Color", "Surface");
+  aliases->AddAlias( "front color", "Surface.2D.Normals.Normals Color", "Surface");
   node->AddProperty( "back color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite );
-  aliases->AddAlias( "back color", "Surface.2D.Inverse Normals Color", "Surface");
+  aliases->AddAlias( "back color", "Surface.2D.Normals.Inverse Normals Color", "Surface");
   node->AddProperty( "front normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
-  aliases->AddAlias( "front normal lenth (px)", "Surface.2D.Normals Scale Factor", "Surface");
+  aliases->AddAlias( "front normal lenth (px)", "Surface.2D.Normals.Normals Scale Factor", "Surface");
   node->AddProperty( "back normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
-  aliases->AddAlias( "back normal lenth (px)", "Surface.2D.Inverse Normals Scale Factor", "Surface");
+  aliases->AddAlias( "back normal lenth (px)", "Surface.2D.Normals.Inverse Normals Scale Factor", "Surface");
   node->AddProperty( "layer", IntProperty::New(100), renderer, overwrite);
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

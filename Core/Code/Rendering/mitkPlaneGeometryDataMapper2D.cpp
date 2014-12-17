@@ -134,7 +134,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
   // intersecting with ourself?
   if ( input.IsNull() || input.GetPointer() == rendererWorldPlaneGeometryData)
   {
-    return; // do rectangle stuff!
+    return; //nothing to do in this case
   }
 
   const PlaneGeometry *inputPlaneGeometry = dynamic_cast< const PlaneGeometry * >( input->GetPlaneGeometry() );

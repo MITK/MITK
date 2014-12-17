@@ -254,6 +254,8 @@ void mitk::IGTLMessageProvider::StartStreamingOfSource(IGTLMessageSource* src,
 
 void mitk::IGTLMessageProvider::StopStreamingOfSource(IGTLMessageSource* src)
 {
+  //this is something bad!!! The streaming thread has to be stopped before the
+  //source is disconnected otherwise it can cause a crash. This has to be added!!
   this->DisconnectFrom(src);
 
   this->m_StopStreamingThreadMutex->Lock();

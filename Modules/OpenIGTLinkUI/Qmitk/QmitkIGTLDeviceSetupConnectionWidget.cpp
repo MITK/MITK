@@ -108,13 +108,14 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
     if ( !m_IsClient )
     {
       m_Controls->butConnect->setText("Go Online");
+      this->m_Controls->editIP->setEnabled(false);
     }
     else
     {
       m_Controls->butConnect->setText("Connect");
+      this->m_Controls->editIP->setEnabled(true);
     }
     this->m_Controls->editPort->setEnabled(true);
-    this->m_Controls->editIP->setEnabled(true);
     this->m_Controls->logSendReceiveMsg->setEnabled(false);
     this->m_Controls->bufferMsgCheckBox->setEnabled(false);
     this->m_Controls->butConnect->setEnabled(true);

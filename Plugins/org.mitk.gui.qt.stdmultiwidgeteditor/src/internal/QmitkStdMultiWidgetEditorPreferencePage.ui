@@ -98,7 +98,7 @@
    <item row="14" column="0">
     <widget class="QLabel" name="label_8">
      <property name="text">
-      <string>Text</string>
+      <string>Corner annotation</string>
      </property>
     </widget>
    </item>
@@ -201,5 +201,7 @@
     </widget>
    </item>
   </layout>
-  </widget>
+ </widget>
+ <resources/>
+ <connections/>
 </ui>

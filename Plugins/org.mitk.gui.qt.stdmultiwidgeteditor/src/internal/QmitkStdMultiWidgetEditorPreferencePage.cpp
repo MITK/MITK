@@ -187,19 +187,23 @@ void QmitkStdMultiWidgetEditorPreferencePage::ColorChooserButtonClicked()
   }
 
   //get the new color
-  QColor color = QColorDialog::getColor(initialColor);
-  this->SetStyleSheetToColorChooserButton(color, static_cast<QPushButton*>(senderObj));
+  QColor newcolor = QColorDialog::getColor(initialColor);
+  if(!newcolor.isValid())
+  {
+    newcolor = initialColor;
+  }
+  this->SetStyleSheetToColorChooserButton(newcolor, static_cast<QPushButton*>(senderObj));
 
   //convert it to std string and apply it
   if( senderObj->objectName() == m_Ui->m_ColorButton1->objectName())
   {
-    m_WidgetBackgroundColor1[widgetIndex] = color.name().toStdString();
+    m_WidgetBackgroundColor1[widgetIndex] = newcolor.name().toStdString();
   }else if( senderObj->objectName() == m_Ui->m_ColorButton2->objectName())
   {
-    m_WidgetBackgroundColor2[widgetIndex] = color.name().toStdString();
+    m_WidgetBackgroundColor2[widgetIndex] = newcolor.name().toStdString();
   }else if( senderObj->objectName() == m_Ui->m_RenderWindowDecorationColor->objectName())
   {
-    m_WidgetDecorationColor[widgetIndex] = color.name().toStdString();
+    m_WidgetDecorationColor[widgetIndex] = newcolor.name().toStdString();
   }
 }
 

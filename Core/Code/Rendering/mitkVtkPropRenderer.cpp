@@ -22,19 +22,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkMapper.h"
 #include "mitkPlaneGeometryDataVtkMapper3D.h"
 
-#include "mitkImageSliceSelector.h"
-#include "mitkRenderingManager.h"
-#include "mitkGeometry3D.h"
-#include "mitkDisplayGeometry.h"
-#include "mitkLevelWindow.h"
-#include "mitkCameraController.h"
-#include "mitkVtkInteractorCameraController.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
-#include "mitkSurface.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkVtkInteractorStyle.h"
-#include "mitkAbstractTransformGeometry.h"
+#include <mitkImageSliceSelector.h>
+#include <mitkRenderingManager.h>
+#include <mitkGeometry3D.h>
+#include <mitkDisplayGeometry.h>
+#include <mitkLevelWindow.h>
+#include <mitkCameraController.h>
+#include <mitkVtkInteractorCameraController.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
+#include <mitkSurface.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkVtkInteractorStyle.h>
+#include <mitkAbstractTransformGeometry.h>
 
 // VTK
 #include <vtkRenderer.h>
@@ -457,10 +457,6 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
 //todo: is this 2D renderwindow picking?
 //    return Superclass::PickObject( displayPosition, worldPosition );
 
-/*!
-\brief Writes some 2D text as overlay. Function returns an unique int Text_ID for each call, which can be used via the GetTextLabelProperty(int text_id) function
-in order to get a vtkTextProperty. This property enables the setup of font, font size, etc.
-*/
 int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double posY, double color1, double color2, double color3, float opacity)
 {
   this->GetVtkRenderer()->ViewToDisplay();
@@ -488,9 +484,6 @@ int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double
   }
 }
 
-/*!
-\brief Can be used in order to get a vtkTextProperty for a specific text_id. This property enables the setup of font, font size, etc.
-*/
 vtkTextProperty* mitk::VtkPropRenderer::GetTextLabelProperty(int text_id)
 {
   return this->m_TextCollection[text_id]->GetTextProperty();

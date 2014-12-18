@@ -307,3 +307,26 @@ void mitk::Overlay::SetBoundsOnDisplay(mitk::BaseRenderer*, const mitk::Overlay:
 {
 }
 
+mitk::Point2D mitk::Overlay::TransformDisplayPointToViewport( mitk::Point2D point , mitk::BaseRenderer* renderer)
+{
+  double* iViewport = renderer->GetVtkRenderer()->GetViewport();
+
+  const mitk::DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
+
+  float displayGeometryWidth = displayGeometry->GetSizeInDisplayUnits()[0];
+  float displayGeometryHeight = displayGeometry->GetSizeInDisplayUnits()[1];
+
+  float viewportWidth = (iViewport[2]-iViewport[0]) * displayGeometryWidth;
+  float viewportHeight = (iViewport[3]-iViewport[1]) * displayGeometryHeight; // seemingly right
+
+  float zoom = (iViewport[3]-iViewport[1]);
+
+  point[0] +=
+    0.5 * (viewportWidth/viewportHeight-1.0)*displayGeometryHeight
+    - 0.5 * (displayGeometryWidth - displayGeometryHeight);
+
+  point[0] *= zoom;
+  point[1] *= zoom;
+  return point;
+}
+

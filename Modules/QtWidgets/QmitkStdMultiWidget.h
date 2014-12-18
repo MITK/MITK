@@ -305,6 +305,12 @@ public:
     THREE_D
   };
 
+  /**
+   * @brief SetCornerAnnotation Create a corner annotation for a widget.
+   * @param text The text of the annotation.
+   * @param color The color.
+   * @param widgetNumber The widget (0-3).
+   */
   void SetCornerAnnotation(std::string text, mitk::Color color, int widgetNumber);
   /**
    * @brief GetRenderWindow convinience method to get a widget.
@@ -313,6 +319,15 @@ public:
    */
   QmitkRenderWindow *GetRenderWindow(unsigned int number);
 
+  /**
+   * @brief SetGradientBackgroundColorForRenderWindow background for a widget.
+   *
+   * If two different input colors are, a gradient background is generated.
+   *
+   * @param upper Upper color of the gradient background.
+   * @param lower Lower color of the gradient background.
+   * @param widgetNumber The widget (0-3).
+   */
   void SetGradientBackgroundColorForRenderWindow(const mitk::Color &upper, const mitk::Color &lower, unsigned int widgetNumber);
 protected:
 

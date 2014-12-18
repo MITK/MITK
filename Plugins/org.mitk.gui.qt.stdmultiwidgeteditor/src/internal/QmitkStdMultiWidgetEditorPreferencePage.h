@@ -46,9 +46,9 @@ public:
 
 public slots:
   /**
-   * @brief ResetColors set default gradient background colors.
+   * @brief ResetColors set default colors and refresh the GUI.
    */
-  void ResetColors();
+  void ResetPreferencesAndGUI();
 
   /**
    * @brief ChangeRenderingMode slot to chose the rendering mode via QComboBox.

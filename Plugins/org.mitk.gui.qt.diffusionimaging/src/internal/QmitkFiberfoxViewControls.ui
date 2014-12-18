@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>479</width>
-    <height>2338</height>
+    <height>2397</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1789,83 +1789,6 @@
           <string>Data</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_10">
-          <item row="3" column="0" colspan="2">
-           <widget class="QLabel" name="m_TensorsToDWIBValueLabel_3">
-            <property name="toolTip">
-             <string/>
-            </property>
-            <property name="statusTip">
-             <string/>
-            </property>
-            <property name="whatsThis">
-             <string/>
-            </property>
-            <property name="text">
-             <string>Tissue Mask:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QLabel" name="m_TissueMaskLabel">
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" rowspan="2" colspan="2">
-           <widget class="QLabel" name="m_TensorsToDWIBValueLabel_16">
-            <property name="toolTip">
-             <string/>
-            </property>
-            <property name="statusTip">
-             <string/>
-            </property>
-            <property name="whatsThis">
-             <string/>
-            </property>
-            <property name="text">
-             <string>Fiber Bundle:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2" rowspan="2">
-           <widget class="QLabel" name="m_FiberBundleLabel">
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="m_TensorsToDWIBValueLabel_10">
-            <property name="toolTip">
-             <string/>
-            </property>
-            <property name="statusTip">
-             <string/>
-            </property>
-            <property name="whatsThis">
-             <string/>
-            </property>
-            <property name="text">
-             <string>Save path:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
           <item row="4" column="2">
            <widget class="QFrame" name="frame_6">
             <property name="frameShape">
@@ -1905,6 +1828,103 @@
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskComboBox">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a binary image to define the area of signal generation. Outside of the mask image only noise will be actively generated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" rowspan="2" colspan="2">
+           <widget class="QLabel" name="m_TensorsToDWIBValueLabel_16">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Fiber Bundle:</string>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="m_TensorsToDWIBValueLabel_10">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Save path:</string>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="m_TensorsToDWIBValueLabel_3">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Tissue Mask:</string>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_FiberBundleComboBox">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a fiber bundle to generate the white matter signal from. You can either use the fiber definition tab to manually define an input fiber bundle or you can also use any existing bundle, e.g. yielded by a tractography algorithm.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="m_TensorsToDWIBValueLabel_11">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Template Image:</string>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TemplateComboBox">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The parameters for the simulation (e.g. spacing, size, diffuison-weighted gradients, b-value) are adopted from this image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
            </widget>
           </item>
          </layout>
@@ -2998,6 +3018,11 @@
    <extends>QWidget</extends>
    <header>QmitkPrototypeSignalParametersWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageComboBoxWithSelectNone</class>
+   <extends>QComboBox</extends>
+   <header location="global">QmitkDataStorageComboBoxWithSelectNone.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

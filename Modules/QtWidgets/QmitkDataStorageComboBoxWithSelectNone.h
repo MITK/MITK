@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkDataStorageComboBoxWithSelectNone_h
 #define QmitkDataStorageComboBoxWithSelectNone_h
 
+#include <MitkQtWidgetsExports.h>
+
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkCustomVariants.h"
 #include "mitkDataNode.h"
@@ -31,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  * \sa QmitkDataStorageComboBox
  */
-class QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
+class QMITK_EXPORT QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
 {
 
   Q_OBJECT
@@ -110,6 +112,11 @@ class QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
      * \brief Set the current file path.
      */
     virtual void setCurrentValue(const QString& path);
+
+    /**
+     * \brief Set the string that will be present on index 0.
+     */
+    void SetZeroEntryText(const QString& zeroEntryString);
 
   protected:
 

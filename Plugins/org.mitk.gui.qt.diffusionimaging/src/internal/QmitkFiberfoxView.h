@@ -141,6 +141,9 @@ protected slots:
     void OnAddSpikes(int value);
     void OnAddAliasing(int value);
     void OnAddMotion(int value);
+    void OnMaskSelected(int value);
+    void OnFibSelected(int value);
+    void OnTemplateSelected(int value);
 
 protected:
 
@@ -184,12 +187,10 @@ protected:
     std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;   ///< map each planar figure uniquely to a QmitkPlanarFigureData
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
     mitk::DataNode::Pointer                             m_SelectedImage;
-    mitk::DataNode::Pointer                             m_SelectedDWI;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles2;
     vector< mitk::DataNode::Pointer >                   m_SelectedFiducials;
     vector< mitk::DataNode::Pointer >                   m_SelectedImages;
-    mitk::DataNode::Pointer                             m_MaskImageNode;
 
     QString m_ParameterFile;    ///< parameter file name
 

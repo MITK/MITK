@@ -394,7 +394,8 @@ void QmitkDataStorageComboBox::Reset()
   while( !m_Nodes.empty() )
   {
     // remove last node
-    this->RemoveNode( m_Nodes.size() - 1 );
+    // explicietely calling RemoveNode of QmitkDataStorageComboBox since derived classes may prevent the removal of all nodes in their respective RemoveNode implementation. This is happening for example in QmitkDataStorageComboBoxWithSelectNone.
+    QmitkDataStorageComboBox::RemoveNode( m_Nodes.size() - 1 );
   }
 
   // clear combobox

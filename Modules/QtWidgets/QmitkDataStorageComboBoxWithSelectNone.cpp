@@ -176,6 +176,13 @@ void QmitkDataStorageComboBoxWithSelectNone::Reset()
 
 
 //-----------------------------------------------------------------------------
+void QmitkDataStorageComboBoxWithSelectNone::SetZeroEntryText(const QString& zeroEntryString)
+{
+  this->setItemText(0, zeroEntryString);
+}
+
+
+//-----------------------------------------------------------------------------
 QString QmitkDataStorageComboBoxWithSelectNone::currentValue() const
 {
   return m_CurrentPath;

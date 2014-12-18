@@ -3,7 +3,6 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkDirectoryListWidget.cpp
   QmitkFileListWidget.cpp
   QmitkCmdLineModuleGui.cpp
@@ -25,7 +24,6 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/QmitkCmdLineModuleMenuComboBox.h
-  src/internal/QmitkDataStorageComboBoxWithSelectNone.h
   src/internal/QmitkDirectoryListWidget.h
   src/internal/QmitkFileListWidget.h
   src/internal/QmitkCmdLineModuleGui.h

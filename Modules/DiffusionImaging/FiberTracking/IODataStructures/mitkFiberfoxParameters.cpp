@@ -177,6 +177,21 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
     if(".ffp"!=filename.substr(filename.size()-4, 4))
         filename += ".ffp";
 
+    const std::string& locale = "C";
+    const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+    if ( locale.compare(currLocale)!=0 )
+    {
+      try
+      {
+        setlocale(LC_ALL, locale.c_str());
+      }
+      catch(...)
+      {
+        MITK_INFO << "Could not set locale " << locale;
+      }
+    }
+
     boost::property_tree::ptree parameters;
 
     // fiber generation parameters
@@ -392,6 +407,8 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
     {
         MITK_INFO << "No mask image saved.";
     }
+
+    setlocale(LC_ALL, currLocale.c_str());
 }
 
 template< class ScalarType >
@@ -399,6 +416,21 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 {
     if(filename.empty())
         return;
+
+    const std::string& locale = "C";
+    const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+    if ( locale.compare(currLocale)!=0 )
+    {
+      try
+      {
+        setlocale(LC_ALL, locale.c_str());
+      }
+      catch(...)
+      {
+        MITK_INFO << "Could not set locale " << locale;
+      }
+    }
 
     boost::property_tree::ptree parameterTree;
     boost::property_tree::xml_parser::read_xml(filename, parameterTree);
@@ -680,6 +712,8 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
     {
         MITK_INFO << "No mask image saved.";
     }
+
+    setlocale(LC_ALL, currLocale.c_str());
 }
 
 template< class ScalarType >

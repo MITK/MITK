@@ -96,8 +96,16 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     ls->m_TextActor->SetInput( GetText().c_str() );
     ls->m_STextActor->SetInput( GetText().c_str() );
 
-    ls->m_TextActor->SetPosition(GetPosition2D(renderer)[0]+GetOffsetVector(renderer)[0], GetPosition2D(renderer)[1]+GetOffsetVector(renderer)[1]);
-    ls->m_STextActor->SetPosition(GetPosition2D(renderer)[0]+GetOffsetVector(renderer)[0]+1, GetPosition2D(renderer)[1]+GetOffsetVector(renderer)[1]-1);
+    mitk::Point2D posT, posS;
+    posT[0] = GetPosition2D(renderer)[0]+GetOffsetVector(renderer)[0];
+    posT[1] = GetPosition2D(renderer)[1]+GetOffsetVector(renderer)[1];
+    posS[0] = posT[0]+1;
+    posS[1] = posT[1]-1;
+    posT = TransformDisplayPointToViewport(posT,renderer);
+    posS = TransformDisplayPointToViewport(posS,renderer);
+
+    ls->m_TextActor->SetPosition(posT[0],posT[1]);
+    ls->m_STextActor->SetPosition(posS[0],posS[1]);
     ls->UpdateGenerateDataTime();
   }
 

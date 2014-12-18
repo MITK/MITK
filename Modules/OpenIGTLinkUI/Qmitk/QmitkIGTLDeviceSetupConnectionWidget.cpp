@@ -100,6 +100,12 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnDeviceStateChanged()
 
 void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
 {
+  //check the validity of the device
+  if ( this->m_IGTLDevice.IsNull() )
+  {
+    return;
+  }
+
   //check the state of the device
   mitk::IGTLDevice::IGTLDeviceState state = this->m_IGTLDevice->GetState();
 
@@ -150,8 +156,8 @@ void QmitkIGTLDeviceSetupConnectionWidget::Initialize(
   //reset the observers
   if ( this->m_IGTLDevice.IsNotNull() )
   {
-//    this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
-//    this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
+    this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
+    this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
     this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
     this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
     this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
@@ -175,17 +181,17 @@ void QmitkIGTLDeviceSetupConnectionWidget::Initialize(
     this->AdaptGUIToState();
 
     typedef itk::SimpleMemberCommand< QmitkIGTLDeviceSetupConnectionWidget > CurCommandType;
-//    CurCommandType::Pointer messageReceivedCommand = CurCommandType::New();
-//    messageReceivedCommand->SetCallbackFunction(
-//      this, &QmitkIGTLDeviceSetupConnectionWidget::OnMessageReceived );
-//    this->m_MessageReceivedObserverTag =
-//        this->m_IGTLDevice->AddObserver(mitk::MessageReceivedEvent(), messageReceivedCommand);
+    CurCommandType::Pointer messageReceivedCommand = CurCommandType::New();
+    messageReceivedCommand->SetCallbackFunction(
+      this, &QmitkIGTLDeviceSetupConnectionWidget::OnMessageReceived );
+    this->m_MessageReceivedObserverTag = this->m_IGTLDevice->AddObserver(
+          mitk::MessageReceivedEvent(), messageReceivedCommand);
 
-//    CurCommandType::Pointer commandReceivedCommand = CurCommandType::New();
-//    commandReceivedCommand->SetCallbackFunction(
-//      this, &QmitkIGTLDeviceSetupConnectionWidget::OnCommandReceived );
-//    this->m_CommandReceivedObserverTag =
-//        this->m_IGTLDevice->AddObserver(mitk::CommandReceivedEvent(), commandReceivedCommand);
+    CurCommandType::Pointer commandReceivedCommand = CurCommandType::New();
+    commandReceivedCommand->SetCallbackFunction(
+      this, &QmitkIGTLDeviceSetupConnectionWidget::OnCommandReceived );
+    this->m_CommandReceivedObserverTag = this->m_IGTLDevice->AddObserver(
+          mitk::CommandReceivedEvent(), commandReceivedCommand);
 
     CurCommandType::Pointer connectionLostCommand = CurCommandType::New();
     connectionLostCommand->SetCallbackFunction(
@@ -319,6 +325,30 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnNewConnection()
 //    m_Controls->logSendReceiveMsg->setEnabled(true);
 //    m_Controls->bufferMsgCheckBox->setEnabled(true);
 //  }
+}
+
+void QmitkIGTLDeviceSetupConnectionWidget::OnMessageReceived()
+{
+//  //get the IGTL device that invoked this event
+//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
+
+  if ( this->m_Controls->logSendReceiveMsg->isChecked() )
+  {
+    MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a message: "
+        << this->m_IGTLDevice->GetReceiveQueue()->GetLatestMsgInformationString();
+  }
+}
+
+void QmitkIGTLDeviceSetupConnectionWidget::OnCommandReceived()
+{
+//  //get the IGTL device that invoked this event
+//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
+
+  if ( this->m_Controls->logSendReceiveMsg->isChecked() )
+  {
+    MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a command: "
+        << this->m_IGTLDevice->GetCommandQueue()->GetLatestMsgInformationString();
+  }
 }
 
 

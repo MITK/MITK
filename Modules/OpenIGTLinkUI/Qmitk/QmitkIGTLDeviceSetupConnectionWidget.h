@@ -83,6 +83,16 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QW
     */
     void OnNewConnection();
 
+    /**
+    * \brief Is called when the current device received a message
+    */
+    void OnMessageReceived();
+
+    /**
+     * \brief Is called when the current device received a command
+    */
+    void OnCommandReceived();
+
   protected slots:
 
     void OnConnect();
@@ -119,6 +129,8 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QW
     /** @brief flag to indicate if the IGTL device is a client or a server */
     bool m_IsClient;
 
+    unsigned long m_MessageReceivedObserverTag;
+    unsigned long m_CommandReceivedObserverTag;
     unsigned long m_LostConnectionObserverTag;
     unsigned long m_NewConnectionObserverTag;
     unsigned long m_StateModifiedObserverTag;

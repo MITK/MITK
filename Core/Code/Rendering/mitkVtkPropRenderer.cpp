@@ -463,6 +463,7 @@ in order to get a vtkTextProperty. This property enables the setup of font, font
 */
 int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double posY, double color1, double color2, double color3, float opacity)
 {
+  this->GetVtkRenderer()->ViewToDisplay();
   if(!text.empty())
   {
     Point2D p;
@@ -804,7 +805,24 @@ void mitk::VtkPropRenderer::AdjustCameraToScene(){
 
 mitk::Point2D mitk::VtkPropRenderer::TransformOpenGLPointToViewport( mitk::Point2D point )
 {
-  point[0] = -1;
-  point[1] = -1;
+  double* iViewport = this->GetVtkRenderer()->GetViewport();
+
+  const mitk::DisplayGeometry* displayGeometry = this->GetDisplayGeometry();
+
+  float displayGeometryWidth = displayGeometry->GetSizeInDisplayUnits()[0];
+  float displayGeometryHeight = displayGeometry->GetSizeInDisplayUnits()[1];
+
+  float viewportWidth = (iViewport[2]-iViewport[0]) * displayGeometryWidth;
+  float viewportHeight = (iViewport[3]-iViewport[1]) * displayGeometryHeight; // seemingly right
+
+  float zoom = (iViewport[3]-iViewport[1]);
+
+  point[0] +=
+    0.5 * (viewportWidth/viewportHeight-1.0)*displayGeometryHeight
+    - 0.5 * (displayGeometryWidth - displayGeometryHeight)
+    ;
+
+  point[0] *= zoom;
+  point[1] *= zoom;
   return point;
 }

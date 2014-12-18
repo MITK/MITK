@@ -369,13 +369,13 @@ public:
   virtual void AddToBaseRenderer(BaseRenderer *renderer) = 0;
 
   /** \brief Adds the overlay to the specified renderer. Update Overlay should be called soon in order to apply all properties*/
-  virtual void AddToRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer){}
+  virtual void AddToRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer) = 0;
 
   /** \brief Removes the overlay from the specified renderer. It is not visible anymore then.*/
   virtual void RemoveFromBaseRenderer(BaseRenderer *renderer) = 0;
 
   /** \brief Removes the overlay from the specified renderer. It is not visible anymore then.*/
-  virtual void RemoveFromRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer){}
+  virtual void RemoveFromRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer) = 0;
 
   /** \brief Applies all properties and should be called before the rendering procedure.*/
   virtual void Update(BaseRenderer *renderer) = 0;

@@ -14,6 +14,7 @@ set(_package_excludes
   OpenCL
   SYSTEM_Boost
   Boost_LIBRARIES
+  SYSTEM_PYTHON
   SOFA_PLUGINS
   SOFA_PLUGINS_DIR
   SUPERBUILD

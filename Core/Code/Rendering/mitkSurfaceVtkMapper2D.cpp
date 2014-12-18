@@ -35,11 +35,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkPropAssembly.h>
 #include <vtkPointData.h>
-
 #include <vtkGlyph3D.h>
 #include <vtkReverseSense.h>
 #include <vtkArrowSource.h>
-#include <mitkIOUtil.h>
 
 // constructor LocalStorage
 mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
@@ -61,7 +59,7 @@ mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
 
   // Source for the glyph filter
   m_ArrowSource = vtkSmartPointer<vtkArrowSource>::New();
-  //set small default values for fast/fluent rendering
+  //set small default values for fast rendering
   m_ArrowSource->SetTipRadius(0.05);
   m_ArrowSource->SetTipLength(0.20);
   m_ArrowSource->SetTipResolution(5);

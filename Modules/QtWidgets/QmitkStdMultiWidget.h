@@ -327,9 +327,6 @@ protected:
    * @brief m_RectangleRendering1 the 4 frames of the renderwindow.
    */
   mitk::RenderWindowFrame::Pointer m_RectangleRendering[4];
-//  mitk::RenderWindowFrame::Pointer m_RectangleRendering;
-//  mitk::RenderWindowFrame::Pointer m_RectangleRendering;
-//  mitk::RenderWindowFrame::Pointer m_RectangleRendering;
 
   mitk::LogoOverlay::Pointer m_LogoRendering;
 

@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSurfaceVtkMapper2D_h
 #define mitkSurfaceVtkMapper2D_h
 
-
 #include <MitkCoreExports.h>
 #include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
@@ -40,6 +39,21 @@ class Surface;
 
 /**
   * @brief Vtk-based mapper for cutting 2D slices out of Surfaces.
+  *
+  * The mapper uses a vtkCutter filter to cut out slices of the 3D
+  * volume and render these slices as vtkPolyData.
+  *
+  * Properties:
+  * \b Surface.2D.Line Width: Thickness of the rendered lines in 2D.
+  * \b Surface.2D.Normals.Draw Normals: enables drawing of normals as 3D arrows
+  * in the 2D render window. The normals are created with a vtkGlyph3D from
+  * the vtkPolyData.
+  * \b Surface.2D.Normals.Draw Inverse Normals: same as normals, but in the
+  * other direction. The inverse normals are computed with a vtkReverseSense
+  * filter.
+  * \b Surface.2D.Normals.(Inverse) Normals Color: Color of the (inverse) normals.
+  * \b Surface.2D.Normals.(Inverse) Normals Scale Factor: Regulates the size of the normals.
+  *
   * @ingroup Mapper
   */
 class MITK_CORE_EXPORT SurfaceVtkMapper2D : public VtkMapper
@@ -137,7 +151,6 @@ public:
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
   mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-
 protected:
   /**
      * @brief SurfaceVtkMapper2D default constructor.
@@ -177,5 +190,4 @@ protected:
   void Update(BaseRenderer* renderer);
 };
 } // namespace mitk
-
 #endif /* mitkSurfaceVtkMapper2D_h */

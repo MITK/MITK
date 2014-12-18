@@ -34,6 +34,7 @@ set(MODULE_TESTS
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp
    mitkNavigationDataToPointSetFilterTest.cpp
+   mitkNavigationDataToIGTLMessageFilterTest.cpp
    mitkNavigationDataTransformFilterTest.cpp
    mitkNDIPassiveToolTest.cpp
    mitkNDIProtocolTest.cpp

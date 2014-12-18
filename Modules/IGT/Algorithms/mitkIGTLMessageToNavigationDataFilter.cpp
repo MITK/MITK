@@ -371,6 +371,7 @@ mitk::IGTLMessageToNavigationDataFilter::GenerateQuaternionTrackingDataData()
     quaternion.put(0, quaternion_[0]);
     quaternion.put(1, quaternion_[1]);
     quaternion.put(2, quaternion_[2]);
+    quaternion.put(3, quaternion_[3]);
     output->SetOrientation(quaternion);
     output->SetHasOrientation(true);
 

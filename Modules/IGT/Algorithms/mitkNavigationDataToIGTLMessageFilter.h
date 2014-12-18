@@ -62,25 +62,6 @@ namespace mitk {
       ModeSendTDataMsg
     };
 
-    /**Documentation
-    * \brief Sets the size for the ring buffer.
-    *
-    * The size determines the maximum number of timesteps in 4D mode and the number of points in 3D mode of the output PointSet
-    */
-//    itkSetMacro(RingBufferSize, unsigned int)
-
-
-    /**
-    * \brief Sets the number of Navigation Data, which should be averaged.
-    */
-//    itkSetMacro(NumberForMean, unsigned int)
-
-    /**
-    * \brief Gets the number of Navigation Data, which should be averaged.
-    */
-//    itkGetMacro(NumberForMean, unsigned int);
-
-
     /**
     * \brief filter execute method
     */

@@ -20,3 +20,10 @@ MITK_CREATE_MODULE(
   #INCLUDE_DIRS /projects/OIGTL-build ${OpenIGTLink_BINARY_DIR} ${OpenIGTLink_SOURCE_DIR}/Source
   EXPORT_DEFINE MITK_OPENIGTLINK_EXPORT
 )
+
+if(MODULE_IS_ENABLED)
+## create IGT config
+#configure_file(mitkIGTConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTConfig.h @ONLY)
+
+add_subdirectory(Testing)
+endif()

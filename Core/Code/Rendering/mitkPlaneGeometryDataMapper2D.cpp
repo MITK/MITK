@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSlicedGeometry3D.h>
 
 //vtk includes
+#include <mitkIPropertyAliases.h>
 #include <vtkActor.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
@@ -44,7 +45,6 @@ const mitk::PlaneGeometryData* mitk::PlaneGeometryDataMapper2D::GetInput() const
   return static_cast< PlaneGeometryData * >(GetDataNode()->GetData());
 }
 
-// constructor PlaneGeometryDataMapper2D
 mitk::PlaneGeometryDataMapper2D::PlaneGeometryDataMapper2D()
   : m_RenderOrientationArrows( false ),
     m_ArrowOrientationPositive( true ),
@@ -53,13 +53,11 @@ mitk::PlaneGeometryDataMapper2D::PlaneGeometryDataMapper2D()
   s_AllInstances.insert(this);
 }
 
-// destructor
 mitk::PlaneGeometryDataMapper2D::~PlaneGeometryDataMapper2D()
 {
   s_AllInstances.erase(this);
 }
 
-// returns propassembly
 vtkProp* mitk::PlaneGeometryDataMapper2D::GetVtkProp(mitk::BaseRenderer * renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
@@ -72,7 +70,7 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer( mitk::BaseRendere
 
   // The PlaneGeometryDataMapper2D mapper is special in that the rendering of
   // OTHER PlaneGeometryDatas affects how we render THIS PlaneGeometryData
-  // (for the gap at the point where they intersect).  A change in any of the
+  // (for the gap at the point where they intersect). A change in any of the
   // other PlaneGeometryData nodes could mean that we render ourself
   // differently, so we check for that here.
   bool generateDataRequired = false;
@@ -83,8 +81,6 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer( mitk::BaseRendere
     generateDataRequired = ls->IsGenerateDataRequired(renderer, this, (*it)->GetDataNode());
     if (generateDataRequired) break;
   }
-
-  //  if (!generateDataRequired) return;
 
   ls->UpdateGenerateDataTime();
 
@@ -381,17 +377,19 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer
 
 void mitk::PlaneGeometryDataMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
+  mitk::IPropertyAliases* aliases = mitk::CoreServices::GetPropertyAliases();
   node->AddProperty( "Line width", mitk::FloatProperty::New(1), renderer, overwrite );
+  aliases->AddAlias( "line width", "Crosshair.Line Width", "");
   node->AddProperty( "Crosshair.Gap Size", mitk::IntProperty::New(32), renderer, overwrite );
   node->AddProperty( "decoration", mitk::PlaneOrientationProperty
                      ::New(PlaneOrientationProperty::PLANE_DECORATION_NONE), renderer, overwrite );
+  aliases->AddAlias( "decoration", "Crosshair.Orientation Decoration", "");
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
 void mitk::PlaneGeometryDataMapper2D::UpdateVtkTransform(mitk::BaseRenderer* /*renderer*/)
 {
-
 }
 
 mitk::PlaneGeometryDataMapper2D::LocalStorage::LocalStorage()
@@ -402,7 +400,7 @@ mitk::PlaneGeometryDataMapper2D::LocalStorage::LocalStorage()
   m_CrosshairAssembly->AddPart(m_CrosshairActor);
   m_CrosshairAssembly->AddPart(m_CrosshairHelperLineActor);
 }
-// destructor LocalStorage
+
 mitk::PlaneGeometryDataMapper2D::LocalStorage::~LocalStorage()
 {
 }

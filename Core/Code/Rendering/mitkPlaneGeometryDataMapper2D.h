@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef mitkPlaneGeometryDataMapper2D_h
 #define mitkPlaneGeometryDataMapper2D_h
 
@@ -33,6 +32,17 @@ namespace mitk {
 
 /**
   * @brief Vtk-based 2D mapper for rendering a crosshair with the plane geometry.
+  *
+  * This mapper uses the mitkPlaneGeometryData from the three helper objects in
+  * the StdMultiWidget to render a crosshair in all 2D render windows. The crosshair
+  * is assembled as lines and rendered with a vtkPolyDataMapper. The mapper
+  * requires multiple plane geometry to compute the correct crosshair position.
+  * The mapper offers the following properties:
+  * \b Crosshair.Line width: The thickness of the crosshair.
+  * \b Crosshair.Gap Size: The gap between the lines in pixels.
+  * \b Crosshair.Orientation Decoration: Adds a PlaneOrientationProperty, which
+  * indicates the direction of the plane normal. See mitkPlaneOrientationProperty.
+  *
   * @ingroup Mapper
   */
 class MITK_CORE_EXPORT PlaneGeometryDataMapper2D : public VtkMapper
@@ -72,8 +82,6 @@ public:
     vtkSmartPointer<vtkActor> m_CrosshairActor;
     vtkSmartPointer<vtkActor> m_CrosshairHelperLineActor;
     vtkSmartPointer<vtkPropAssembly> m_CrosshairAssembly;
-
-
   };
 
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkProperty2D.h>
 #include <vtkActor2D.h>
 #include <vtkPolyDataMapper2D.h>
+#include <vtkViewport.h>
 
 
 vtkStandardNewMacro(vtkMitkRectangleProp);
@@ -53,10 +54,12 @@ vtkMitkRectangleProp::~vtkMitkRectangleProp()
 
 int vtkMitkRectangleProp::RenderOverlay(vtkViewport* viewport)
 {
-  double right = m_RenderWindow->GetSize()[0];
-  double top = m_RenderWindow->GetSize()[1];
-  double bottom = 0.5;
-  double left = 0.5;
+  double right = viewport->GetSize()[0];
+  double top = viewport->GetSize()[1];
+//  double bottom = 0.0;
+  double left = viewport->GetOrigin()[0] + 0.5;
+  double bottom = viewport->GetOrigin()[1] + 0.5;
+//  double left = 0.0;
   double defaultDepth = 0.0;
 
   vtkSmartPointer<vtkPoints> points = m_PolyData->GetPoints();
@@ -79,10 +82,11 @@ void vtkMitkRectangleProp::CreateRectangle()
   vtkSmartPointer<vtkPoints> points = m_PolyData->GetPoints();
   vtkSmartPointer<vtkCellArray> lines = m_PolyData->GetLines();
 
-  double bottom = 0.5;
-  double left = 0.5;
-  double right = 199.0;
-  double top = 199.0;
+  //just some default values until a renderwindow/viewport is initialized
+  double bottom = 0.0;
+  double left = 0.0;
+  double right = 200.0;
+  double top = 200.0;
   double defaultDepth = 0.0;
 
   //4 corner points

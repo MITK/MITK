@@ -238,6 +238,8 @@ void mitk::MorphologicalOperations::itkClosing(itk::Image<TPixel, VDimension>* s
 
       mitk::CastToMitkImage(closingFilter->GetOutput(), resultImage);
    }
+    BallType ball = CreateStructuringElement<BallType>(structuralElementFlags,factor);
+    CrossType cross = CreateStructuringElement<CrossType>(structuralElementFlags,factor);
 }
 
 template<typename TPixel, unsigned int VDimension>
@@ -276,6 +278,8 @@ void mitk::MorphologicalOperations::itkErode(itk::Image<TPixel, VDimension>* sou
 
       mitk::CastToMitkImage(erodeFilter->GetOutput(), resultImage);
    }
+    BallType ball = CreateStructuringElement<BallType>(structuralElementFlags,factor);
+    CrossType cross = CreateStructuringElement<CrossType>(structuralElementFlags,factor);
 }
 
 template<typename TPixel, unsigned int VDimension>
@@ -315,6 +319,8 @@ void mitk::MorphologicalOperations::itkDilate(itk::Image<TPixel, VDimension>* so
 
       mitk::CastToMitkImage(dilateFilter->GetOutput(), resultImage);
    }
+    BallType ball = CreateStructuringElement<BallType>(structuralElementFlags,factor);
+    CrossType cross = CreateStructuringElement<CrossType>(structuralElementFlags,factor);
 }
 
 template<typename TPixel, unsigned int VDimension>
@@ -355,6 +361,8 @@ void mitk::MorphologicalOperations::itkOpening(itk::Image<TPixel, VDimension>* s
 
       mitk::CastToMitkImage(openingFilter->GetOutput(), resultImage);
    }
+    BallType ball = CreateStructuringElement<BallType>(structuralElementFlags,factor);
+    CrossType cross = CreateStructuringElement<CrossType>(structuralElementFlags,factor);
 }
 
 template<typename TPixel, unsigned int VDimension>

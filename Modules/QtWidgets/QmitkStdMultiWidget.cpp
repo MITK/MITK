@@ -91,9 +91,6 @@ m_CrosshairNavigationEnabled(false)
   //Set Layout to widget
   this->setLayout(QmitkStdMultiWidgetLayout);
 
-//  QmitkNavigationToolBar* toolBar = new QmitkNavigationToolBar();
-//  QmitkStdMultiWidgetLayout->addWidget( toolBar );
-
   //create main splitter
   m_MainSplit = new QSplitter( this );
   QmitkStdMultiWidgetLayout->addWidget( m_MainSplit );
@@ -225,38 +222,53 @@ void QmitkStdMultiWidget::InitializeWidget()
 {
   m_PositionTracker = NULL;
 
+  //Default colors were chosen for decent visibitliy.
+  //Feel free to change your preferences in the workbench.
+  //This is #C00000 in hex
+  m_DecorationColorWidget[0][0] = 0.753f;
+  m_DecorationColorWidget[0][1] = 0.0f;
+  m_DecorationColorWidget[0][2] = 0.0f;
+  //This is #00B000 in hex
+  m_DecorationColorWidget[1][0] = 0.0f;
+  m_DecorationColorWidget[1][1] = 0.69f;
+  m_DecorationColorWidget[1][2] = 0.0f;
+  //This is #0080FF in hex
+  m_DecorationColorWidget[2][0] = 0.0f;
+  m_DecorationColorWidget[2][1] = 0.502f;
+  m_DecorationColorWidget[2][2] = 1.0f;
+  //This is #FFFF00 in hex
+  m_DecorationColorWidget[3][0] = 1.0f;
+  m_DecorationColorWidget[3][1] = 1.0f;
+  m_DecorationColorWidget[3][2] = 0.0f;
+
+  //Make all black and overwrite renderwindow 4
+  this->FillGradientBackgroundWithBlack();
+  //This is #191919 in hex
+  m_GradientBackgroundColors[3][0][0] = 0.098f;
+  m_GradientBackgroundColors[3][0][1] = 0.098f;
+  m_GradientBackgroundColors[3][0][2] = 0.098f;
+  //This is #7F7F7F in hex
+  m_GradientBackgroundColors[3][1][0] = 0.498f;
+  m_GradientBackgroundColors[3][1][1] = 0.498f;
+  m_GradientBackgroundColors[3][1][2] = 0.498f;
+
   // transfer colors in WorldGeometry-Nodes of the associated Renderer
   mitk::IntProperty::Pointer  layer;
-
-  mitk::Color colorWidget1, colorWidget2, colorWidget3;
-  colorWidget1[0] = 1.0f;
-  colorWidget1[1] = 0.0f;
-  colorWidget1[2] = 0.0f;
-  colorWidget2[0] = 0.0f;
-  colorWidget2[1] = 1.0f;
-  colorWidget2[2] = 0.0f;
-  colorWidget3[0] = 0.0f;
-  colorWidget3[1] = 0.0f;
-  colorWidget3[2] = 1.0f;
-  m_DecorationColorWidget4[0] = 1.0f;
-  m_DecorationColorWidget4[1] = 1.0f;
-  m_DecorationColorWidget4[2] = 0.0f;
-
   // of widget 1
   m_PlaneNode1 = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode1->SetColor(colorWidget1[0],colorWidget1[1],colorWidget1[2]);
+  m_PlaneNode1->SetColor(m_DecorationColorWidget[0]);
   layer = mitk::IntProperty::New(1000);
   m_PlaneNode1->SetProperty("layer",layer);
 
   // ... of widget 2
   m_PlaneNode2 = mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode2->SetColor(colorWidget2[0],colorWidget2[1],colorWidget2[2]);
+  m_PlaneNode2->SetColor(m_DecorationColorWidget[1]);
   layer = mitk::IntProperty::New(1000);
   m_PlaneNode2->SetProperty("layer",layer);
 
   // ... of widget 3
   m_PlaneNode3 = mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode3->SetColor(colorWidget3[0],colorWidget3[1],colorWidget3[2]);
+  m_PlaneNode3->SetColor(m_DecorationColorWidget[2]);
   layer = mitk::IntProperty::New(1000);
   m_PlaneNode3->SetProperty("layer",layer);
 
@@ -285,47 +297,12 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Original );
 
-  /*************************************************/
-  //Write Layout Names into the viewers -- hardCoded
-
-  //Info for later:
-  //int view = this->GetRenderWindow1()->GetSliceNavigationController()->GetDefaultViewDirection();
-  //QString layoutName;
-  //if( view == mitk::SliceNavigationController::Axial )
-  //  layoutName = "Axial";
-  //else if( view == mitk::SliceNavigationController::Sagittal )
-  //  layoutName = "Sagittal";
-  //else if( view == mitk::SliceNavigationController::Frontal )
-  //  layoutName = "Coronal";
-  //else if( view == mitk::SliceNavigationController::Original )
-  //  layoutName = "Original";
-  //if( view >= 0 && view < 4 )
-  //  //write LayoutName --> Viewer 3D shoudn't write the layoutName.
-
-  //Render Window 1 == axial
-  this->SetCornerAnnotation("Axial", colorWidget1, 0);
-  this->SetCornerAnnotation("Sagittal", colorWidget2, 1);
-  this->SetCornerAnnotation("Coronal", colorWidget3, 2);
-  this->SetCornerAnnotation("3D", m_DecorationColorWidget4, 3);
-//  m_CornerAnnotaions[0] = this->CreateCornerAnnotation();
-//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[0].ren,true);
-
-  //Render Window 2 == sagittal
-//  m_CornerAnnotaions[1] = this->CreateCornerAnnotation("Sagittal", colorWidget2);
-//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[1].ren,true);
-
-//  //Render Window 3 == coronal
-//  m_CornerAnnotaions[2] = this->CreateCornerAnnotation("Coronal", colorWidget3);
-//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[2].ren,true);
-
-//  m_CornerAnnotaions[3] = this->CreateCornerAnnotation("3D", m_DecorationColorWidget4);
-//  mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[3].ren,true);
-//  /*************************************************/
+  this->SetCornerAnnotation("Axial", m_DecorationColorWidget[0], 0);
+  this->SetCornerAnnotation("Sagittal", m_DecorationColorWidget[1], 1);
+  this->SetCornerAnnotation("Coronal", m_DecorationColorWidget[2], 2);
+  this->SetCornerAnnotation("3D", m_DecorationColorWidget[3], 3);
 
   // create a slice rotator
-  // m_SlicesRotator = mitk::SlicesRotator::New();
-  // @TODO next line causes sure memory leak
-  // rotator will be created nonetheless (will be switched on and off)
   m_SlicesRotator = mitk::SlicesRotator::New("slices-rotator");
   m_SlicesRotator->AddSliceController(
     mitkWidget1->GetSliceNavigationController() );
@@ -372,27 +349,6 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitk::GlobalInteraction::GetInstance()->AddListener(
     m_LastLeftClickPositionSupplier
     );
-  // setup gradient background
-  m_GradientBackground[0] = mitk::GradientBackground::New();
-  m_GradientBackground[0]->SetRenderWindow(
-    mitkWidget1->GetRenderWindow() );
-  m_GradientBackground[0]->Disable();
-
-  m_GradientBackground[1] = mitk::GradientBackground::New();
-  m_GradientBackground[1]->SetRenderWindow(
-    mitkWidget2->GetRenderWindow() );
-  m_GradientBackground[1]->Disable();
-
-  m_GradientBackground[2] = mitk::GradientBackground::New();
-  m_GradientBackground[2]->SetRenderWindow(
-    mitkWidget3->GetRenderWindow() );
-  m_GradientBackground[2]->Disable();
-
-  m_GradientBackground[3]  = mitk::GradientBackground::New();
-  m_GradientBackground[3]->SetRenderWindow(
-    mitkWidget4->GetRenderWindow() );
-  m_GradientBackground[3]->SetGradientColors(0.1,0.1,0.1,0.5,0.5,0.5);
-  m_GradientBackground[3]->Enable();
 
   // setup the department logo rendering
   m_LogoRendering = mitk::LogoOverlay::New();
@@ -405,26 +361,44 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_LogoRendering->SetCornerPosition(1);
   renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(),renderer4);
 
-  m_RectangleRendering[0] = mitk::RenderWindowFrame::New();
-  m_RectangleRendering[0]->SetRenderWindow(
-    mitkWidget1->GetRenderWindow() );
+  // setup gradient background and renderwindow rectangle frame
+  for(unsigned int i = 0; i < 4; ++i)
+  {
+    m_GradientBackground[i] = mitk::GradientBackground::New();
+    m_GradientBackground[i]->SetRenderWindow(GetRenderWindow(i)->GetVtkRenderWindow());
+    m_GradientBackground[i]->Enable();
+    m_RectangleRendering[i] = mitk::RenderWindowFrame::New();
+    m_RectangleRendering[i]->SetRenderWindow(GetRenderWindow(i)->GetVtkRenderWindow());
+    m_RectangleRendering[i]->Enable(m_DecorationColorWidget[i][0], m_DecorationColorWidget[i][1], m_DecorationColorWidget[i][2]);
+  }
+}
 
-  m_RectangleRendering[1] = mitk::RenderWindowFrame::New();
-  m_RectangleRendering[1]->SetRenderWindow(
-    mitkWidget2->GetRenderWindow() );
+void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()
+{
+  //We have 4 widgets and ...
+  for(unsigned int i = 0; i < 4; ++i)
+  {
+    //... each has 2 background colors
+    for(unsigned int j = 0; j < 2; ++j)
+    {
+      //Each color element set 0.0f;
+      for(unsigned int k = 0; k < 3; ++k)
+      {
+        m_GradientBackgroundColors[i][j][k] = 0.0f;
+      }
+    }
+  }
+}
 
-  m_RectangleRendering[2] = mitk::RenderWindowFrame::New();
-  m_RectangleRendering[2]->SetRenderWindow(
-    mitkWidget3->GetRenderWindow() );
-
-  m_RectangleRendering[3] = mitk::RenderWindowFrame::New();
-  m_RectangleRendering[3]->SetRenderWindow(
-    mitkWidget4->GetRenderWindow() );
-
-  m_RectangleRendering[0]->Enable(colorWidget1[0], colorWidget1[1], colorWidget1[2]);
-  m_RectangleRendering[1]->Enable(colorWidget2[0], colorWidget2[1], colorWidget2[2]);
-  m_RectangleRendering[2]->Enable(colorWidget3[0], colorWidget3[1], colorWidget3[2]);
-  m_RectangleRendering[3]->Enable(m_DecorationColorWidget4[0], m_DecorationColorWidget4[1], m_DecorationColorWidget4[2]);
+mitk::Color QmitkStdMultiWidget::GetDecorationColorForWidget(unsigned int widgetNumber)
+{
+  if(widgetNumber > 3)
+  {
+    MITK_ERROR << "Decoration color for unknown widget!";
+    float tmp[3] = { 0.0f, 0.0f, 0.0f};
+    return mitk::Color(tmp);
+  }
+  return m_DecorationColorWidget[widgetNumber];
 }
 
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
@@ -1233,14 +1207,8 @@ void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
 
   //set SplitterSize for splitter top
    QList<int> splitterSize;
-//   splitterSize.push_back(1000);
-//   splitterSize.push_back(1000);
-//   splitterSize.push_back(1000);
-//   m_SubSplit1->setSizes( splitterSize );
-
   //insert Widget Container into splitter bottom
   m_SubSplit2->addWidget( mitkWidget4Container );
-
   //set SplitterSize for splitter m_LayoutSplit
   splitterSize.clear();
   splitterSize.push_back(700);
@@ -1538,7 +1506,6 @@ void QmitkStdMultiWidget::MoveCrossToPosition(const mitk::Point3D& newPosition)
 {
   // create a PositionEvent with the given position and
   // tell the slice navigation controllers to move there
-
   mitk::Point2D p2d;
   mitk::PositionEvent event( mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow()), 0, 0, 0,
     mitk::Key_unknown, p2d, newPosition );
@@ -1635,7 +1602,6 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   m_PendingCrosshairPositionEvent = false;
 
   // find image with highest layer
-
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
   mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
 
@@ -2005,8 +1971,7 @@ void QmitkStdMultiWidget::SetGradientBackgroundColorForRenderWindow( const mitk:
     MITK_ERROR << "Gradientbackground for unknown widget!";
     return;
   }
-  m_GradientBackground[widgetNumber]->SetGradientColors(upper[0], upper[1], upper[2],
-      lower[0], lower[1], lower[2]);
+  m_GradientBackground[widgetNumber]->SetGradientColors(upper, lower);
   m_GradientBackgroundFlag = true;
 }
 
@@ -2014,8 +1979,7 @@ void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper
 {
   for(unsigned int i = 0; i < 4; ++i)
   {
-    m_GradientBackground[i]->SetGradientColors(upper[0], upper[1], upper[2],
-        lower[0], lower[1], lower[2]);
+    m_GradientBackground[i]->SetGradientColors(upper, lower);
   }
   m_GradientBackgroundFlag = true;
 }
@@ -2162,12 +2126,12 @@ bool QmitkStdMultiWidget::IsMenuWidgetEnabled() const
 
 void QmitkStdMultiWidget::SetDecorationColorWidget4(mitk::Color color)
 {
-  m_DecorationColorWidget4 = color;
+  m_DecorationColorWidget[3] = color;
 }
 
 mitk::Color QmitkStdMultiWidget::GetDecorationColorWidget4()
 {
-  return m_DecorationColorWidget4;
+  return m_DecorationColorWidget[3];
 }
 
 void QmitkStdMultiWidget::ResetCrosshair()
@@ -2193,7 +2157,7 @@ void QmitkStdMultiWidget::EnableColoredRectangles()
   m_RectangleRendering[0]->Enable(colorWidget1[0], colorWidget1[1], colorWidget1[2]);
   m_RectangleRendering[1]->Enable(colorWidget2[0], colorWidget2[1], colorWidget2[2]);
   m_RectangleRendering[2]->Enable(colorWidget3[0], colorWidget3[1], colorWidget3[2]);
-  m_RectangleRendering[3]->Enable(m_DecorationColorWidget4[0], m_DecorationColorWidget4[1], m_DecorationColorWidget4[2]);
+  m_RectangleRendering[3]->Enable(m_DecorationColorWidget[3][0], m_DecorationColorWidget[3][1], m_DecorationColorWidget[3][2]);
 }
 
 void QmitkStdMultiWidget::DisableColoredRectangles()

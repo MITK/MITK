@@ -329,6 +329,14 @@ public:
    * @param widgetNumber The widget (0-3).
    */
   void SetGradientBackgroundColorForRenderWindow(const mitk::Color &upper, const mitk::Color &lower, unsigned int widgetNumber);
+
+  /**
+   * @brief GetDecorationColorForWidget Get the color for annotation, crosshair and rectangle.
+   * @param widgetNumber Number of the renderwindow (0-3)
+   * @return Color in mitk format.
+   */
+  mitk::Color GetDecorationColorForWidget(unsigned int widgetNumber);
+
 protected:
 
   QHBoxLayout* QmitkStdMultiWidgetLayout;
@@ -376,7 +384,14 @@ protected:
    * For other widgets1-3, the color is a property of the respective data node.
    * There is no node for widget 4, hence, we need an extra member.
    */
-  mitk::Color m_DecorationColorWidget4;
+  mitk::Color m_DecorationColorWidget[4];
+
+  /**
+   * @brief m_GradientBackgroundColors Contains the colors of the gradient background.
+   *
+   */
+  mitk::Color m_GradientBackgroundColors[4][2];
+
 
   QSplitter *m_MainSplit;
   QSplitter *m_LayoutSplit;
@@ -407,5 +422,11 @@ protected:
    * @return the complete struct.
    */
   CornerAnnotation CreateCornerAnnotation(std::string text, mitk::Color color);
+
+  /**
+   * @brief FillGradientBackgroundWithBlack Internal helper method to initialize the
+   * gradient background colors with black.
+   */
+  void FillGradientBackgroundWithBlack();
 };
 #endif /*QmitkStdMultiWidget_h*/

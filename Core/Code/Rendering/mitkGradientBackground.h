@@ -19,14 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkObject.h>
 #include <mitkCommon.h>
+#include <mitkColorProperty.h>
 #include <vtkSmartPointer.h>
 
 class vtkRenderer;
-class vtkMapper;
-class vtkActor;
-class vtkPolyDataMapper;
-class vtkLookupTable;
-class vtkPolyData;
 class vtkRenderWindow;
 
 namespace mitk {
@@ -70,23 +66,15 @@ public:
   virtual vtkSmartPointer<vtkRenderer> GetVtkRenderer();
 
   /**
-   * Returns the actor associated with the color gradient
-   */
-  virtual vtkSmartPointer<vtkActor> GetActor();
-
-  /**
-   * Returns the mapper associated with the color
-   * gradient.
-   */
-  virtual vtkSmartPointer<vtkPolyDataMapper> GetMapper();
-
-  /**
    * Sets the gradient colors. The gradient
    * will smoothly fade from color1 to color2
    */
-  virtual void SetGradientColors( double r1, double g1, double b1, double r2, double g2, double b2);
+  virtual void SetGradientColors(double r1, double g1, double b1, double r2, double g2, double b2);
+  virtual void SetGradientColors(Color upper, Color lower);
   virtual void SetUpperColor(double r, double g, double b );
   virtual void SetLowerColor(double r, double g, double b );
+  virtual void SetUpperColor(Color upper);
+  virtual void SetLowerColor(Color lower);
 
   /**
    * Enables drawing of the color gradient background.
@@ -114,14 +102,6 @@ protected:
   vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
 
   vtkSmartPointer<vtkRenderer> m_Renderer;
-
-  vtkSmartPointer<vtkActor> m_Actor;
-
-  vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
-
-  vtkSmartPointer<vtkLookupTable> m_Lut;
-
-  vtkSmartPointer<vtkPolyData> m_Plane;
 };
 } //end of namespace mitk
 #endif //mitkGradientBackground_h

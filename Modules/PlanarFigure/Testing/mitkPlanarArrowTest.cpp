@@ -114,7 +114,7 @@ int mitkPlanarArrowTest(int /* argc */, char* /*argv*/[])
   for ( unsigned int i=0; i<clonedArrow->GetPolyLinesSize(); ++i )
   {
     mitk::PlanarFigure::PolyLineType polyLine = clonedArrow->GetPolyLine( i );
-    for ( int j=0; j<polyLine.size(); ++j )
+    for ( unsigned int j=0; j<polyLine.size(); ++j )
     {
       identical &= polyLine.at(j) == PlanarArrow->GetPolyLine(i).at(j);
     }

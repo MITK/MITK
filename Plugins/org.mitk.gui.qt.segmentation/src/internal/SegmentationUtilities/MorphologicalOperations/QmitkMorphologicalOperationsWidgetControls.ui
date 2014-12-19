@@ -40,6 +40,30 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QComboBox" name="planeSelectionComboBox">
+        <item>
+         <property name="text">
+          <string>3D Operation</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2D Operation - Axial</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2D Operation - Sagital</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2D Operation - Coronal</string>
+         </property>
+        </item>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -227,40 +251,6 @@
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextUnderIcon</enum>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QCheckBox" name="m_AxialCheckbox">
-       <property name="text">
-        <string>Axial</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="m_CornalCheckbox">
-       <property name="text">
-        <string>Coronal</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="m_SagitalCheckbox">
-       <property name="text">
-        <string>Sagiatl</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
        </property>
       </widget>
      </item>

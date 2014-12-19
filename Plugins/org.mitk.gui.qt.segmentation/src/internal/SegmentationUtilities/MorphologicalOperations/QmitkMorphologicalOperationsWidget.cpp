@@ -225,13 +225,15 @@ mitk::MorphologicalOperations::StructuralElementType QmitkMorphologicalOperation
   bool ball = m_Controls.radioButtonMorphoBall->isChecked();
   int accum_flag = 0;
   if(ball){
-   if(m_Controls.m_AxialCheckbox->isChecked()) accum_flag |= mitk::MorphologicalOperations::Ball_Axial;
-   if(m_Controls.m_SagitalCheckbox->isChecked()) accum_flag |= mitk::MorphologicalOperations::Ball_Sagital;
-   if(m_Controls.m_CornalCheckbox->isChecked()) accum_flag |= mitk::MorphologicalOperations::Ball_Coronal;
+   if(m_Controls.planeSelectionComboBox->currentIndex() == 0) accum_flag = mitk::MorphologicalOperations::Ball; // 3D Operation
+   if(m_Controls.planeSelectionComboBox->currentIndex() == 1) accum_flag = mitk::MorphologicalOperations::Ball_Axial; // 2D Operation - Axial plane
+   if(m_Controls.planeSelectionComboBox->currentIndex() == 2) accum_flag = mitk::MorphologicalOperations::Ball_Sagital; // 2D Operation - Sagital plane
+   if(m_Controls.planeSelectionComboBox->currentIndex() == 3) accum_flag = mitk::MorphologicalOperations::Ball_Coronal; // 2D Operation - Coronal plane
   }else{
-    if(m_Controls.m_AxialCheckbox->isChecked()) accum_flag |= mitk::MorphologicalOperations::Cross_Axial;
-    if(m_Controls.m_SagitalCheckbox->isChecked()) accum_flag |= mitk::MorphologicalOperations::Cross_Sagital;
-    if(m_Controls.m_CornalCheckbox->isChecked()) accum_flag |= mitk::MorphologicalOperations::Cross_Coronal;
+    if(m_Controls.planeSelectionComboBox->currentIndex() == 0) accum_flag = mitk::MorphologicalOperations::Cross;
+    if(m_Controls.planeSelectionComboBox->currentIndex() == 1) accum_flag = mitk::MorphologicalOperations::Cross_Axial;
+    if(m_Controls.planeSelectionComboBox->currentIndex() == 2) accum_flag = mitk::MorphologicalOperations::Cross_Sagital;
+    if(m_Controls.planeSelectionComboBox->currentIndex() == 3) accum_flag = mitk::MorphologicalOperations::Cross_Coronal;
   }
   return (mitk::MorphologicalOperations::StructuralElementType)accum_flag;
 }

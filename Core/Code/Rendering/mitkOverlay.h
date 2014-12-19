@@ -392,6 +392,8 @@ public:
 
   mitkClassMacro(Overlay, itk::Object);
 
+  static mitk::Point2D TransformDisplayPointToViewport(mitk::Point2D point, mitk::BaseRenderer *renderer);
+
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */

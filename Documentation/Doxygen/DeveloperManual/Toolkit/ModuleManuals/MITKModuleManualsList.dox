@@ -9,6 +9,7 @@ The modules are shared libraries that provide functionality that can be used by 
 
   \li \subpage IGTGeneralModulePage
   \li \subpage MitkOpenCL_Overview
+  \li \subpage LegacyGLModule
   \li \subpage GeneratingDeviceModulesPage
   \li \subpage mitkPython_Overview
   \li \subpage USModulePage

@@ -14,21 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKSTDMULTIWIDGET_H_
-#define QMITKSTDMULTIWIDGET_H_
+#ifndef QmitkStdMultiWidget_h
+#define QmitkStdMultiWidget_h
 
-#include <MitkQtWidgetsExports.h>
+#include "MitkQtWidgetsExports.h"
 
-#include "mitkPositionTracker.h"
-#include "mitkSlicesRotator.h"
-#include "mitkSlicesSwiveller.h"
-#include "mitkRenderWindowFrame.h"
-#include "mitkLogoOverlay.h"
-#include "mitkGradientBackground.h"
-#include "mitkCoordinateSupplier.h"
-#include "mitkDataStorage.h"
+#include <mitkPositionTracker.h>
+#include <mitkSlicesRotator.h>
+#include <mitkSlicesSwiveller.h>
+#include <mitkRenderWindowFrame.h>
+#include <mitkLogoOverlay.h>
+#include <mitkGradientBackground.h>
+#include <mitkCoordinateSupplier.h>
+#include <mitkDataStorage.h>
 
-#include "mitkMouseModeSwitcher.h"
+#include <mitkMouseModeSwitcher.h>
 
 #include <qwidget.h>
 #include <qsplitter.h>
@@ -37,10 +37,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkRenderWindow.h>
 #include <QmitkLevelWindowWidget.h>
 
-#include "vtkTextProperty.h"
-#include "vtkCornerAnnotation.h"
+#include <vtkTextProperty.h>
+#include <vtkCornerAnnotation.h>
 
-#include "mitkBaseRenderer.h"
+#include <mitkBaseRenderer.h>
 
 class QHBoxLayout;
 class QVBoxLayout;
@@ -59,7 +59,6 @@ class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
   Q_OBJECT
 
 public:
-
   QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, const QString& name = "stdmulti");
   virtual ~QmitkStdMultiWidget();
 
@@ -146,6 +145,17 @@ public:
 
   bool IsMenuWidgetEnabled() const;
 
+  /**
+   * @brief SetColorWidget4 Get/Set the color of the decoration of the widget 4.
+   *
+   * This is used to color the frame of the renderwindow and the corner annatation.
+   * For the other 3 widgets, this color is a property of the helper object nodes
+   * which contain the respective plane geometry. The color can be modified via:
+   * GetWidgetPlane1()->SetColor();
+   */
+  void SetDecorationColorWidget4(mitk::Color color);
+  mitk::Color GetDecorationColorWidget4();
+
 protected:
 
   void UpdateAllWidgets();
@@ -208,7 +218,7 @@ public slots:
   void leaveEvent ( QEvent * e  );
 
   void EnsureDisplayContainsPoint(
-    mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p);
+      mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p);
 
   void MoveCrossToPosition(const mitk::Point3D& newPosition);
 
@@ -282,11 +292,11 @@ public:
 
   enum { PLANE_MODE_SLICING = 0, PLANE_MODE_ROTATION, PLANE_MODE_SWIVEL };
   enum { LAYOUT_DEFAULT = 0, LAYOUT_2D_IMAGES_UP, LAYOUT_2D_IMAGES_LEFT,
-    LAYOUT_BIG_3D, LAYOUT_WIDGET1, LAYOUT_WIDGET2, LAYOUT_WIDGET3,
-    LAYOUT_2X_2D_AND_3D_WIDGET, LAYOUT_ROW_WIDGET_3_AND_4,
-    LAYOUT_COLUMN_WIDGET_3_AND_4, LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4 ,
-    LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4,LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET,
-    LAYOUT_2D_UP_AND_3D_DOWN};
+         LAYOUT_BIG_3D, LAYOUT_WIDGET1, LAYOUT_WIDGET2, LAYOUT_WIDGET3,
+         LAYOUT_2X_2D_AND_3D_WIDGET, LAYOUT_ROW_WIDGET_3_AND_4,
+         LAYOUT_COLUMN_WIDGET_3_AND_4, LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4 ,
+         LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4,LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET,
+         LAYOUT_2D_UP_AND_3D_DOWN};
 
   enum {
     AXIAL,
@@ -294,6 +304,38 @@ public:
     CORONAL,
     THREE_D
   };
+
+  /**
+   * @brief SetCornerAnnotation Create a corner annotation for a widget.
+   * @param text The text of the annotation.
+   * @param color The color.
+   * @param widgetNumber The widget (0-3).
+   */
+  void SetCornerAnnotation(std::string text, mitk::Color color, int widgetNumber);
+  /**
+   * @brief GetRenderWindow convinience method to get a widget.
+   * @param number of the widget (0-3)
+   * @return The renderwindow widget.
+   */
+  QmitkRenderWindow *GetRenderWindow(unsigned int number);
+
+  /**
+   * @brief SetGradientBackgroundColorForRenderWindow background for a widget.
+   *
+   * If two different input colors are, a gradient background is generated.
+   *
+   * @param upper Upper color of the gradient background.
+   * @param lower Lower color of the gradient background.
+   * @param widgetNumber The widget (0-3).
+   */
+  void SetGradientBackgroundColorForRenderWindow(const mitk::Color &upper, const mitk::Color &lower, unsigned int widgetNumber);
+
+  /**
+   * @brief GetDecorationColorForWidget Get the color for annotation, crosshair and rectangle.
+   * @param widgetNumber Number of the renderwindow (0-3)
+   * @return Color in mitk format.
+   */
+  mitk::Color GetDecorationColorForWidget(unsigned int widgetNumber);
 
 protected:
 
@@ -304,17 +346,14 @@ protected:
 
   mitk::RenderingManager* m_RenderingManager;
 
-  mitk::RenderWindowFrame::Pointer m_RectangleRendering3;
-  mitk::RenderWindowFrame::Pointer m_RectangleRendering2;
-  mitk::RenderWindowFrame::Pointer m_RectangleRendering1;
-  mitk::RenderWindowFrame::Pointer m_RectangleRendering4;
+  /**
+   * @brief m_RectangleRendering1 the 4 frames of the renderwindow.
+   */
+  mitk::RenderWindowFrame::Pointer m_RectangleRendering[4];
 
   mitk::LogoOverlay::Pointer m_LogoRendering;
 
-  mitk::GradientBackground::Pointer m_GradientBackground1;
-  mitk::GradientBackground::Pointer m_GradientBackground2;
-  mitk::GradientBackground::Pointer m_GradientBackground4;
-  mitk::GradientBackground::Pointer m_GradientBackground3;
+  mitk::GradientBackground::Pointer m_GradientBackground[4];
   bool m_GradientBackgroundFlag;
 
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
@@ -327,10 +366,32 @@ protected:
   mitk::DataNode::Pointer m_PositionTrackerNode;
   mitk::DataStorage::Pointer m_DataStorage;
 
+  /**
+   * @brief m_PlaneNode1 the 3 helper objects which contain the plane geometry.
+   */
   mitk::DataNode::Pointer m_PlaneNode1;
   mitk::DataNode::Pointer m_PlaneNode2;
   mitk::DataNode::Pointer m_PlaneNode3;
-  mitk::DataNode::Pointer m_Node;
+  /**
+   * @brief m_ParentNodeForGeometryPlanes This helper object is added to the datastorage
+   * and contains the 3 planes for displaying the image geometry (crosshair and 3D planes).
+   */
+  mitk::DataNode::Pointer m_ParentNodeForGeometryPlanes;
+
+  /**
+   * @brief m_DecorationColorWidget4 color for annotation and rectangle of widget 4.
+   *
+   * For other widgets1-3, the color is a property of the respective data node.
+   * There is no node for widget 4, hence, we need an extra member.
+   */
+  mitk::Color m_DecorationColorWidget[4];
+
+  /**
+   * @brief m_GradientBackgroundColors Contains the colors of the gradient background.
+   *
+   */
+  mitk::Color m_GradientBackgroundColors[4][2];
+
 
   QSplitter *m_MainSplit;
   QSplitter *m_LayoutSplit;
@@ -342,14 +403,30 @@ protected:
   QWidget *mitkWidget3Container;
   QWidget *mitkWidget4Container;
 
-  struct
+  /**
+   * @brief The CornerAnnotation struct to hold the 4 corner annotations.
+   */
+  struct CornerAnnotation
   {
-    vtkCornerAnnotation *cornerText;
-    vtkTextProperty *textProp;
-    vtkRenderer *ren;
-  } m_CornerAnnotaions[3];
+    vtkSmartPointer<vtkCornerAnnotation> cornerText;
+    vtkSmartPointer<vtkTextProperty> textProp;
+    vtkSmartPointer<vtkRenderer> ren;
+  } m_CornerAnnotations[4];
 
   bool m_PendingCrosshairPositionEvent;
   bool m_CrosshairNavigationEnabled;
+  /**
+   * @brief CreateCornerAnnotation helper method to create a corner annotation.
+   * @param text of the annotation.
+   * @param color of the annotation.
+   * @return the complete struct.
+   */
+  CornerAnnotation CreateCornerAnnotation(std::string text, mitk::Color color);
+
+  /**
+   * @brief FillGradientBackgroundWithBlack Internal helper method to initialize the
+   * gradient background colors with black.
+   */
+  void FillGradientBackgroundWithBlack();
 };
-#endif /*QMITKSTDMULTIWIDGET_H_*/
+#endif /*QmitkStdMultiWidget_h*/

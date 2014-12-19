@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPropAssembly.h>
 
 #include "mitkVtkMapper.h"
-#include "mitkGLMapper.h"
+//#include "mitkGLMapper.h"
 
 
 vtkStandardNewMacro(vtkMitkRenderProp);

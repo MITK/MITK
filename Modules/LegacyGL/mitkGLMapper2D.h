@@ -15,18 +15,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKGL_H_HEADER_INCLUDED_C1C53722
-#define MITKGL_H_HEADER_INCLUDED_C1C53722
+#ifndef MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872
+#define MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872
 
-#ifdef WIN32
-  #include <windows.h>
-#endif
+#include "mitkGLMapper.h"
 
-#ifndef __APPLE__
-  #include "GL/gl.h"
-#else
-  #include "OpenGL/gl.h"
-#endif
+namespace mitk {
 
-#endif /* MITKGL_H_HEADER_INCLUDED_C1C53722 */
+  // typedef allows integration of mappers into the new mapper architecture
+  // \deprecatedSince{2013_03} Use GLMapper instead
+  DEPRECATED(typedef GLMapper GLMapper2D);
 
+} // namespace mitk
+
+
+
+#endif /* MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872 */

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKGLMAPPER_H_HEADER_INCLUDED_C197C872
 #define MITKGLMAPPER_H_HEADER_INCLUDED_C197C872
 
-#include <MitkCoreExports.h>
+#include <MitkLegacyGLExports.h>
 #include "mitkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkVtkPropRenderer.h"
@@ -39,11 +39,17 @@ namespace mitk {
 * ApplyColorAndOpacity() can be used in the subclasses to apply color and opacity properties
 * read from the PropertyList.
 *
+* @deprecatedSince{2015_03} GLMappers are no longer supported in the rendering pipeline.
+* Please use mitkVtkMapper instead or consider writing your own vtk classes, such as vtkActor
+* or vtkMapper
 * \ingroup Mapper
 */
-class MITK_CORE_EXPORT GLMapper : public Mapper
+class MitkLegacyGL_EXPORT GLMapper : public Mapper
 {
   public:
+
+  mitkClassMacro(GLMapper, Mapper);
+
     /** \brief Do the painting into the \a renderer */
     virtual void Paint(mitk::BaseRenderer *renderer) = 0;
 

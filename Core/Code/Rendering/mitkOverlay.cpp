@@ -141,20 +141,24 @@ bool mitk::Overlay::GetStringProperty(const std::string&  propertyKey, std::stri
 void mitk::Overlay::SetIntProperty(const std::string&  propertyKey, int intValue, mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::IntProperty::New(intValue));
+  Modified();
 }
 void mitk::Overlay::SetBoolProperty( const std::string&  propertyKey, bool boolValue, mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::BoolProperty::New(boolValue));
+  Modified();
 }
 
 void mitk::Overlay::SetFloatProperty( const std::string&  propertyKey, float floatValue, mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::FloatProperty::New(floatValue));
+  Modified();
 }
 
 void mitk::Overlay::SetStringProperty( const std::string&  propertyKey, const std::string&  stringValue, mitk::BaseRenderer* renderer/*=NULL*/ )
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::StringProperty::New(stringValue));
+  Modified();
 }
 
 std::string mitk::Overlay::GetName() const
@@ -313,3 +317,25 @@ bool mitk::Overlay::IsForceInForeground() const
   return m_ForceInForeground;
 }
 
+mitk::Point2D mitk::Overlay::TransformDisplayPointToViewport( mitk::Point2D point , mitk::BaseRenderer* renderer)
+{
+  double* iViewport = renderer->GetVtkRenderer()->GetViewport();
+
+  const mitk::DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
+
+  float displayGeometryWidth = displayGeometry->GetSizeInDisplayUnits()[0];
+  float displayGeometryHeight = displayGeometry->GetSizeInDisplayUnits()[1];
+
+  float viewportWidth = (iViewport[2]-iViewport[0]) * displayGeometryWidth;
+  float viewportHeight = (iViewport[3]-iViewport[1]) * displayGeometryHeight; // seemingly right
+
+  float zoom = (iViewport[3]-iViewport[1]);
+
+  point[0] +=
+    0.5 * (viewportWidth/viewportHeight-1.0)*displayGeometryHeight
+    - 0.5 * (displayGeometryWidth - displayGeometryHeight);
+
+  point[0] *= zoom;
+  point[1] *= zoom;
+  return point;
+}

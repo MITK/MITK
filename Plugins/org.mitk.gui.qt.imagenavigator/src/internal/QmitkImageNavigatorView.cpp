@@ -206,6 +206,7 @@ void QmitkImageNavigatorView::SetBorderColors()
   if (m_IRenderWindowPart)
   {
     QmitkRenderWindow* renderWindow = m_IRenderWindowPart->GetQmitkRenderWindow("axial");
+    QString decoColor = GetDecorationColorOfGeometry(renderWindow);
     if (renderWindow)
     {
       mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
@@ -213,11 +214,12 @@ void QmitkImageNavigatorView::SetBorderColors()
       {
         mitk::Vector3D normal = geometry->GetNormal();
         int axis = this->GetClosestAxisIndex(normal);
-        this->SetBorderColor(axis, QString("red"));
+        this->SetBorderColor(axis, decoColor);
       }
     }
 
     renderWindow = m_IRenderWindowPart->GetQmitkRenderWindow("sagittal");
+    decoColor = GetDecorationColorOfGeometry(renderWindow);
     if (renderWindow)
     {
       mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
@@ -225,11 +227,12 @@ void QmitkImageNavigatorView::SetBorderColors()
       {
         mitk::Vector3D normal = geometry->GetNormal();
         int axis = this->GetClosestAxisIndex(normal);
-        this->SetBorderColor(axis, QString("green"));
+        this->SetBorderColor(axis, decoColor);
       }
     }
 
     renderWindow = m_IRenderWindowPart->GetQmitkRenderWindow("coronal");
+    decoColor = GetDecorationColorOfGeometry(renderWindow);
     if (renderWindow)
     {
       mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
@@ -237,10 +240,23 @@ void QmitkImageNavigatorView::SetBorderColors()
       {
         mitk::Vector3D normal = geometry->GetNormal();
         int axis = this->GetClosestAxisIndex(normal);
-        this->SetBorderColor(axis, QString("blue"));
+        this->SetBorderColor(axis, decoColor);
       }
     }
   }
+}
+
+QString QmitkImageNavigatorView::GetDecorationColorOfGeometry(QmitkRenderWindow* renderWindow)
+{
+  QColor color;
+  float rgb[3] = {1.0f, 1.0f, 1.0f};
+  float rgbMax = 255.0f;
+  mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow())->GetCurrentWorldPlaneGeometryNode()->GetColor(rgb);
+  color.setRed(static_cast<int>(rgb[0]*rgbMax + 0.5));
+  color.setGreen(static_cast<int>(rgb[1]*rgbMax + 0.5));
+  color.setBlue(static_cast<int>(rgb[2]*rgbMax + 0.5));
+  QString colorAsString = QString(color.name());
+  return colorAsString;
 }
 
 void QmitkImageNavigatorView::SetBorderColor(int axis, QString colorAsStyleSheetString)

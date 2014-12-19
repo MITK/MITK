@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKSURFACEDATAMAPPER2D_H_HEADER_INCLUDED_C10EB2E8
 #define MITKSURFACEDATAMAPPER2D_H_HEADER_INCLUDED_C10EB2E8
 
-#include <MitkCoreExports.h>
+#include <MitkLegacyGLExports.h>
 #include "mitkGLMapper.h"
 #include "mitkSurface.h"
 
@@ -75,7 +75,7 @@ class DisplayGeometry;
  *   - \b "back normal length (px)": (FloatProperty) Length of the back side normals in pixels.
  *
  */
-class MITK_CORE_EXPORT SurfaceGLMapper2D : public GLMapper
+class MitkLegacyGL_EXPORT SurfaceGLMapper2D : public GLMapper
 {
 public:
   mitkClassMacro(SurfaceGLMapper2D, GLMapper);
@@ -153,4 +153,3 @@ protected:
 } // namespace mitk
 
 #endif /* MITKSURFACEDATAMAPPER2D_H_HEADER_INCLUDED_C10EB2E8 */
-

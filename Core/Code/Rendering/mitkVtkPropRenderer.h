@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D
-#define MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D
+#ifndef mitkVtkPropRenderer_h
+#define mitkVtkPropRenderer_h
 
 #include <MitkCoreExports.h>
 #include "mitkBaseRenderer.h"
-#include "mitkDataStorage.h"
-#include "mitkRenderingManager.h"
-
+#include <mitkDataStorage.h>
+#include <mitkRenderingManager.h>
 #include <itkCommand.h>
 
 #include <map>
@@ -107,12 +106,25 @@ public:
   virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const;
   virtual mitk::DataNode *PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const;
 
-  // Simple text rendering method
-  int WriteSimpleText(std::string text, double posX, double posY, double color1 = 0.0, double color2 = 1.0, double color3 = 0.0, float opacity = 1.0);
+  /**
+  * @brief WriteSimpleText Write a text in a renderwindow.
+  *
+  * Writes some 2D text as overlay. Function returns an unique int Text_ID for each call, which can be used via the GetTextLabelProperty(int text_id) function
+in order to get a vtkTextProperty. This property enables the setup of font, font size, etc.
+  *
+  * @deprecatedSince{next_release} Please use mitkTextOverlay2D instead.
+  * See mitkTextOverlay2DRenderingTest for an example.
+  */
+  DEPRECATED(int WriteSimpleText(std::string text, double posX, double posY, double color1 = 0.0, double color2 = 1.0, double color3 = 0.0, float opacity = 1.0));
 
-  vtkTextProperty * GetTextLabelProperty(int text_id);
-
-  // Initialization / geometry handling
+  /**
+   * @brief CGetTextLabelProperty an be used in order to get a vtkTextProperty for
+   * a specific text_id. This property enables the setup of font, font size, etc.
+   * @param text_id the id of the text property.
+   * @deprecatedSince{next_release} Please use mitkTextOverlay2D instead.
+   * See mitkTextOverlay2DRenderingTest for an example.
+   */
+  DEPRECATED(vtkTextProperty* GetTextLabelProperty(int text_id));
 
   /** This method calculates the bounds of the DataStorage (if it contains any
    * valid data), creates a geometry from these bounds and sets it as world
@@ -215,10 +227,6 @@ private:
   */
   void AdjustCameraToScene();
 
-  // switch between orthogonal opengl projection (2D rendering via mitk::GLMapper2D) and perspective projection (3D rendering)
-  void Enable2DOpenGL();
-  void Disable2DOpenGL();
-
   // prepare all mitk::mappers for rendering
   void PrepareMapperQueue();
 
@@ -227,7 +235,6 @@ private:
 
   bool m_InitNeeded;
   bool m_ResizeNeeded;
-  bool m_VtkMapperPresent;
   MapperSlotId m_CameraInitializedForMapperID;
 
   // Picking
@@ -255,4 +262,4 @@ private:
 };
 } // namespace mitk
 
-#endif /* MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D */
+#endif /* mitkVtkPropRenderer_h */

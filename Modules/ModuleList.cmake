@@ -1,4 +1,5 @@
 set(mitk_modules
+  LegacyGL
   LegacyIO
   DataTypesExt
   AlgorithmsExt

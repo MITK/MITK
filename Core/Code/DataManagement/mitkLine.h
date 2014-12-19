@@ -392,8 +392,18 @@ public:
         int k = (j + 1) % 3;
         int l = (j + 2) % 3;
 
-        if ( (point[k] >= box[k*2]) && (point[k] <= box[k*2+1])
-          && (point[l] >= box[l*2]) && (point[l] <= box[l*2+1]) )
+        if (
+            (
+               ((point[k] >= box[k*2]) && (point[k] <= box[k*2+1]))
+            || ((point[k] <= box[k*2]) && (point[k] >= box[k*2+1]))
+            )
+            &&
+            (
+               ((point[l] >= box[l*2]) && (point[l] <= box[l*2+1]))
+            || ((point[l] <= box[l*2]) && (point[l] >= box[l*2+1]))
+            )
+
+           )
         {
           if ( num == 0 )
           {

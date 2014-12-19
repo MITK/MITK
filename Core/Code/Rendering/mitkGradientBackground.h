@@ -14,18 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _vtk_Gradient_Background_h_
-#define _vtk_Gradient_Background_h_
+#ifndef mitkGradientBackground_h
+#define mitkGradientBackground_h
 
-
-#include <mitkBaseData.h>
+#include <itkObject.h>
+#include <mitkCommon.h>
+#include <mitkColorProperty.h>
+#include <vtkSmartPointer.h>
 
 class vtkRenderer;
-class vtkMapper;
-class vtkActor;
-class vtkPolyDataMapper;
-class vtkLookupTable;
-class vtkPolyData;
 class vtkRenderWindow;
 
 namespace mitk {
@@ -39,11 +36,11 @@ class RenderWindow;
  * scene. After setting the renderwindow, the gradient may be
  * activated by calling Enable()
  */
-class MITK_CORE_EXPORT GradientBackground : public BaseData
+class MITK_CORE_EXPORT GradientBackground : public itk::Object
 {
 public:
 
-  mitkClassMacro( GradientBackground, BaseData );
+  mitkClassMacro( GradientBackground, itk::Object );
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -53,39 +50,31 @@ public:
    * will be shown. Make sure, you have called this function
    * before calling Enable()
    */
-  virtual void SetRenderWindow( vtkRenderWindow* renderWindow );
+  virtual void SetRenderWindow( vtkSmartPointer<vtkRenderWindow> renderWindow );
 
   /**
    * Returns the vtkRenderWindow, which is used
    * for displaying the gradient background
    */
-  virtual vtkRenderWindow* GetRenderWindow();
+  virtual vtkSmartPointer<vtkRenderWindow> GetRenderWindow();
 
   /**
    * Returns the renderer responsible for
    * rendering the color gradient into the
    * vtkRenderWindow
    */
-  virtual vtkRenderer* GetVtkRenderer();
-
-  /**
-   * Returns the actor associated with the color gradient
-   */
-  virtual vtkActor* GetActor();
-
-  /**
-   * Returns the mapper associated with the color
-   * gradient.
-   */
-  virtual vtkPolyDataMapper* GetMapper();
+  virtual vtkSmartPointer<vtkRenderer> GetVtkRenderer();
 
   /**
    * Sets the gradient colors. The gradient
    * will smoothly fade from color1 to color2
    */
-  virtual void SetGradientColors( double r1, double g1, double b1, double r2, double g2, double b2);
+  virtual void SetGradientColors(double r1, double g1, double b1, double r2, double g2, double b2);
+  virtual void SetGradientColors(Color upper, Color lower);
   virtual void SetUpperColor(double r, double g, double b );
   virtual void SetLowerColor(double r, double g, double b );
+  virtual void SetUpperColor(Color upper);
+  virtual void SetLowerColor(Color lower);
 
   /**
    * Enables drawing of the color gradient background.
@@ -105,56 +94,14 @@ public:
    */
   virtual bool IsEnabled();
 
-  /**
-   * Empty implementation, since the GradientBackground doesn't
-   * support the requested region concept
-   */
-  virtual void SetRequestedRegionToLargestPossibleRegion();
-
-  /**
-   * Empty implementation, since the GradientBackground doesn't
-   * support the requested region concept
-   */
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-
-  /**
-   * Empty implementation, since the GradientBackground doesn't
-   * support the requested region concept
-   */
-  virtual bool VerifyRequestedRegion();
-
-  /**
-   * Empty implementation, since the GradientBackground doesn't
-   * support the requested region concept
-   */
-  virtual void SetRequestedRegion( const itk::DataObject*);
-
 protected:
 
-  /**
-   * Constructor
-   */
   GradientBackground();
-
-  /**
-   * Destructor
-   */
   ~GradientBackground();
 
-  vtkRenderWindow* m_RenderWindow;
+  vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
 
-  vtkRenderer* m_Renderer;
-
-  vtkActor* m_Actor;
-
-  vtkPolyDataMapper* m_Mapper;
-
-  vtkLookupTable* m_Lut;
-
-  vtkPolyData* m_Plane;
+  vtkSmartPointer<vtkRenderer> m_Renderer;
 };
-
 } //end of namespace mitk
-#endif
-
-
+#endif //mitkGradientBackground_h

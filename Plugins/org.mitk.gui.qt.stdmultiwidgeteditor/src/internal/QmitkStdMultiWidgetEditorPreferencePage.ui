@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkStdMultiWidgetEditorPreferencePage</class>
+ <widget class="QWidget" name="QmitkStdMultiWidgetEditorPreferencePage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>518</width>
+    <height>431</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>External Programs</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="10" column="1">
+    <widget class="QComboBox" name="m_RenderWindowChooser">
+     <item>
+      <property name="text">
+       <string>stdmulti.widget1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>stdmulti.widget2</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>stdmulti.widget3</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>stdmulti.widget4</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If two colors are set, a gradient background is generated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Background color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="0">
+    <widget class="QPushButton" name="m_ResetButton">
+     <property name="text">
+      <string>Reset preferences</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1" colspan="2">
+    <widget class="QComboBox" name="m_RenderingMode">
+     <item>
+      <property name="text">
+       <string>Standard Rendering</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Enable Multisampling (Antialiasing)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Enable Depth Peeling</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="3">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>* Changes require restart of MITK.
+ Depth Peeling is only supported by Windows.
+ For other OS, use Standard Rendering and enable
+ the property 'Depth Sorting' in the property list of the surface data node.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QSpinBox" name="m_CrosshairGapSize">
+     <property name="value">
+      <number>32</number>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0" colspan="3">
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="toolTip">
+      <string>The small text on the button left of each renderwindow.</string>
+     </property>
+     <property name="text">
+      <string>Corner annotation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The gap in the middle of the crosshair in pixels.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Crosshair gap size</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The color is used for the following decorations (of each renderwindow):&lt;/p&gt;&lt;p&gt;Rectangle border&lt;/p&gt;&lt;p&gt;Corner annotation&lt;/p&gt;&lt;p&gt;Crosshair&lt;/p&gt;&lt;p&gt;Plane geometry helper objects (3D Planes)&lt;/p&gt;&lt;p&gt;Image navigator borders&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Decoration color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="1">
+    <widget class="QPushButton" name="m_RenderWindowDecorationColor">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose the renderwindow from the multi widget.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Render windows</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <widget class="QCheckBox" name="m_ShowLevelWindowWidget">
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="text">
+      <string>Show level/window widget</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QCheckBox" name="m_PACSLikeMouseMode">
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="text">
+      <string>Use PACS like mouse interaction (select left mouse button action)</string>
+     </property>
+     <property name="tristate">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="2">
+    <widget class="QPushButton" name="m_ColorButton2">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="3">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Rendering Mode*</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="1" colspan="2">
+    <widget class="QLineEdit" name="m_RenderWindowDecorationText"/>
+   </item>
+   <item row="11" column="1">
+    <widget class="QPushButton" name="m_ColorButton1">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="3">
+    <widget class="QCheckBox" name="m_EnableFlexibleZooming">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If activated, zooming and panning is limited to a certain space arround each image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="text">
+      <string>Use constraint zooming and padding</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

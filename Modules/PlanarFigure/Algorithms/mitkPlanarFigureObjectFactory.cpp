@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarFigureMapper2D.h"
 #include "mitkPlanarFigureVtkMapper3D.h"
+#include "mitkVtkGLMapperWrapper.h"
 
 typedef std::multimap<std::string, std::string> MultimapType;
 
@@ -60,7 +61,7 @@ mitk::Mapper::Pointer mitk::PlanarFigureObjectFactory::CreateMapper(mitk::DataNo
   {
     if ( id == mitk::BaseRenderer::Standard2D )
     {
-      newMapper = mitk::PlanarFigureMapper2D::New();
+      newMapper = mitk::VtkGLMapperWrapper::New(mitk::PlanarFigureMapper2D::New().GetPointer());
       newMapper->SetDataNode(node);
     }
     else if ( id == mitk::BaseRenderer::Standard3D )

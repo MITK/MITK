@@ -106,12 +106,12 @@ int mitkPlanarArrowTest(int /* argc */, char* /*argv*/[])
   identical &= clonedArrow->GetHelperPolyLinesSize() == PlanarArrow->GetHelperPolyLinesSize();
   identical &= clonedArrow->ResetOnPointSelect() == PlanarArrow->ResetOnPointSelect();
 
-  for ( int i=0; i<clonedArrow->GetNumberOfControlPoints(); ++i )
+  for ( unsigned int i=0; i<clonedArrow->GetNumberOfControlPoints(); ++i )
   {
     identical &= clonedArrow->GetControlPoint(i) == PlanarArrow->GetControlPoint(i);
   }
 
-  for ( int i=0; i<clonedArrow->GetPolyLinesSize(); ++i )
+  for ( unsigned int i=0; i<clonedArrow->GetPolyLinesSize(); ++i )
   {
     mitk::PlanarFigure::PolyLineType polyLine = clonedArrow->GetPolyLine( i );
     for ( int j=0; j<polyLine.size(); ++j )

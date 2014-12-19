@@ -89,6 +89,39 @@ int mitkPlanarArrowTest(int /* argc */, char* /*argv*/[])
 
   // Test placement of PlanarArrow by control points
   mitkPlanarArrowTestClass::TestPlanarArrowPlacement( PlanarArrow );
+  PlanarArrow->EvaluateFeatures();
+
+  mitk::PlanarArrow::Pointer clonedArrow = PlanarArrow->Clone();
+  MITK_TEST_CONDITION_REQUIRED( clonedArrow.IsNotNull(), "Testing cloning" );
+  bool identical( true );
+  identical &= clonedArrow->GetMinimumNumberOfControlPoints() == PlanarArrow->GetMinimumNumberOfControlPoints();
+  identical &= clonedArrow->GetMaximumNumberOfControlPoints() == PlanarArrow->GetMaximumNumberOfControlPoints();
+  identical &= clonedArrow->IsClosed() == PlanarArrow->IsClosed();
+  identical &= clonedArrow->IsPlaced() == PlanarArrow->IsPlaced();
+  identical &= clonedArrow->GetNumberOfControlPoints() == PlanarArrow->GetNumberOfControlPoints();
+  identical &= clonedArrow->GetNumberOfControlPoints() == PlanarArrow->GetNumberOfControlPoints();
+  identical &= clonedArrow->GetSelectedControlPoint() == PlanarArrow->GetSelectedControlPoint();
+  identical &= clonedArrow->IsPreviewControlPointVisible() == PlanarArrow->IsPreviewControlPointVisible();
+  identical &= clonedArrow->GetPolyLinesSize() == PlanarArrow->GetPolyLinesSize();
+  identical &= clonedArrow->GetHelperPolyLinesSize() == PlanarArrow->GetHelperPolyLinesSize();
+  identical &= clonedArrow->ResetOnPointSelect() == PlanarArrow->ResetOnPointSelect();
+
+  for ( int i=0; i<clonedArrow->GetNumberOfControlPoints(); ++i )
+  {
+    identical &= clonedArrow->GetControlPoint(i) == PlanarArrow->GetControlPoint(i);
+  }
+
+  for ( int i=0; i<clonedArrow->GetPolyLinesSize(); ++i )
+  {
+    mitk::PlanarFigure::PolyLineType polyLine = clonedArrow->GetPolyLine( i );
+    for ( int j=0; j<polyLine.size(); ++j )
+    {
+      identical &= polyLine.at(j) == PlanarArrow->GetPolyLine(i).at(j);
+    }
+  }
+
+
+  MITK_TEST_CONDITION_REQUIRED( identical, "Cloning completely successful" );
 
   // always end with this!
   MITK_TEST_END();

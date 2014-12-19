@@ -32,7 +32,7 @@ namespace mitk {
  * @brief Color Standard RGB color typedef (float)
  *
  * Standard RGB color typedef to get rid of template argument (float).
- * Color range is from 0.0f to 255.0f for each component.
+ * Color range is from 0.0f to 1.0f for each component.
  *
  * @ingroup Property
  */

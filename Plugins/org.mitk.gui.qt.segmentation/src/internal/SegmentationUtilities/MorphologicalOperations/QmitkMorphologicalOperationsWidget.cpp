@@ -88,12 +88,7 @@ void QmitkMorphologicalOperationsWidget::OnClosingButtonClicked()
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-  bool ball = m_Controls.radioButtonMorphoBall->isChecked();
-
-  mitk::MorphologicalOperations::StructuralElementType structuralElement = ball
-    ? mitk::MorphologicalOperations::Ball
-    : mitk::MorphologicalOperations::Cross;
-
+  mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateStructerElement_UI();
   try
   {
     mitk::MorphologicalOperations::Closing(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
@@ -120,11 +115,8 @@ void QmitkMorphologicalOperationsWidget::OnOpeningButtonClicked()
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-  bool ball = m_Controls.radioButtonMorphoBall->isChecked();
 
-  mitk::MorphologicalOperations::StructuralElementType structuralElement = ball
-    ? mitk::MorphologicalOperations::Ball
-    : mitk::MorphologicalOperations::Cross;
+  mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateStructerElement_UI();
 
   try
   {
@@ -152,11 +144,7 @@ void QmitkMorphologicalOperationsWidget::OnDilatationButtonClicked()
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-  bool ball = m_Controls.radioButtonMorphoBall->isChecked();
-
-  mitk::MorphologicalOperations::StructuralElementType structuralElement = ball
-    ? mitk::MorphologicalOperations::Ball
-    : mitk::MorphologicalOperations::Cross;
+  mitk::MorphologicalOperations::StructuralElementType structuralElement = this->CreateStructerElement_UI();
 
   try
   {
@@ -184,11 +172,7 @@ void QmitkMorphologicalOperationsWidget::OnErosionButtonClicked()
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-  bool ball = m_Controls.radioButtonMorphoBall->isChecked();
-
-  mitk::MorphologicalOperations::StructuralElementType structuralElement = ball
-    ? mitk::MorphologicalOperations::Ball
-    : mitk::MorphologicalOperations::Cross;
+mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateStructerElement_UI();
 
   try
   {

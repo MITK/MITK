@@ -1,7 +1,8 @@
 set(mitk_modules
-  LegacyGL
   LegacyIO
   DataTypesExt
+  Overlays
+  LegacyGL
   AlgorithmsExt
   MapperExt
   DICOMReader
@@ -21,7 +22,6 @@ set(mitk_modules
   PlanarFigureSegmentation
   OpenViewCore
   QmlItems
-  Overlays
   QtWidgets
   QtWidgetsExt
   SegmentationUI

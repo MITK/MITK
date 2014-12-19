@@ -191,12 +191,6 @@ void AddDisplayPlaneSubTree()
       m_DataStorage->Add(m_PlaneNode1, m_Node);
       m_DataStorage->Add(m_PlaneNode2, m_Node);
       m_DataStorage->Add(m_PlaneNode3, m_Node);
-      static_cast<mitk::PlaneGeometryDataMapper2D*>(m_PlaneNode1->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(
-          m_DataStorage, m_Node);
-      static_cast<mitk::PlaneGeometryDataMapper2D*>(m_PlaneNode2->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(
-          m_DataStorage, m_Node);
-      static_cast<mitk::PlaneGeometryDataMapper2D*>(m_PlaneNode3->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(
-          m_DataStorage, m_Node);
     }
   }
 }

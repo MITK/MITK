@@ -111,7 +111,6 @@ void QmlMitkRenderWindowItem::init()
     planeNode->SetProperty("helper object", mitk::BoolProperty::New(true) );
 
     mitk::PlaneGeometryDataMapper2D::Pointer mapper = mitk::PlaneGeometryDataMapper2D::New();
-    mapper->SetDatastorageAndGeometryBaseNode( m_DataStorage, m_PlaneNodeParent );
     planeNode->SetMapper( mitk::BaseRenderer::Standard2D, mapper );
 
     m_DataStorage->Add( planeNode, m_PlaneNodeParent );

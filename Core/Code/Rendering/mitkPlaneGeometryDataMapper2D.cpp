@@ -154,11 +154,8 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
     if ( worldPlaneGeometry->IntersectionLine( inputPlaneGeometry, crossLine ) )
     {
       Point3D boundingBoxMin, boundingBoxMax;
-      boundingBoxMin = referenceGeometry->GetBoundingBox()->GetMinimum();
-      boundingBoxMax = referenceGeometry->GetBoundingBox()->GetMaximum();
-
-      referenceGeometry->IndexToWorld(boundingBoxMin,boundingBoxMin);
-      referenceGeometry->IndexToWorld(boundingBoxMax,boundingBoxMax);
+      boundingBoxMin = referenceGeometry->GetCornerPoint(0);
+      boundingBoxMax = referenceGeometry->GetCornerPoint(7);
 
       // Then, clip this line with the (transformed) bounding box of the
       // reference geometry.
@@ -307,7 +304,6 @@ void mitk::PlaneGeometryDataMapper2D::DrawLine( mitk::Point3D p0,mitk::Point3D p
                                                 vtkPoints* points
                                                 )
 {
-
   vtkIdType pidStart = points->InsertNextPoint(p0[0],p0[1], p0[2]);
   vtkIdType pidEnd = points->InsertNextPoint(p1[0],p1[1], p1[2]);
 

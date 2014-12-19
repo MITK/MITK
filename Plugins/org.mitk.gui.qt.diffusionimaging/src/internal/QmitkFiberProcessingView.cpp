@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include <mitkTensorImage.h>
 #include "usModuleRegistry.h"
+#include <itkFiberCurvatureFilter.h>
 
 #include "mitkNodePredicateDataType.h"
 #include <mitkNodePredicateProperty.h>
@@ -238,12 +239,32 @@ void QmitkFiberProcessingView::PruneBundle()
 
 void QmitkFiberProcessingView::ApplyCurvatureThreshold()
 {
-    int mm = this->m_Controls->m_CurvSpinBox->value();
-    for (int i=0; i<m_SelectedFB.size(); i++)
+    int angle = this->m_Controls->m_CurvSpinBox->value();
+    int dist = this->m_Controls->m_CurvDistanceSpinBox->value();
+    std::vector< DataNode::Pointer > nodes = m_SelectedFB;
+    for (int i=0; i<nodes.size(); i++)
     {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        if (!fib->ApplyCurvatureThreshold(mm, this->m_Controls->m_RemoveCurvedFibersBox->isChecked()))
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(nodes.at(i)->GetData());
+
+        itk::FiberCurvatureFilter::Pointer filter = itk::FiberCurvatureFilter::New();
+        filter->SetInputFiberBundle(fib);
+        filter->SetAngularDeviation(angle);
+        filter->SetDistance(dist);
+        filter->SetRemoveFibers(m_Controls->m_RemoveCurvedFibersBox->isChecked());
+        filter->Update();
+        mitk::FiberBundleX::Pointer newFib = filter->GetOutputFiberBundle();
+        if (newFib->GetNumFibers()>0)
+        {
+            nodes.at(i)->SetVisibility(false);
+            DataNode::Pointer newNode = DataNode::New();
+            newNode->SetData(newFib);
+            newNode->SetName(nodes.at(i)->GetName()+"_Curvature");
+            GetDefaultDataStorage()->Add(newNode, nodes.at(i));
+        }
+        else
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+//        if (!fib->ApplyCurvatureThreshold(mm, this->m_Controls->m_RemoveCurvedFibersBox->isChecked()))
+//            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
     }
     RenderingManager::GetInstance()->RequestUpdateAll();
 }

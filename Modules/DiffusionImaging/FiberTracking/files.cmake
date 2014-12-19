@@ -40,6 +40,7 @@ set(H_FILES
   Algorithms/itkFieldmapGeneratorFilter.h
   Algorithms/itkEvaluateDirectionImagesFilter.h
   Algorithms/itkEvaluateTractogramDirectionsFilter.h
+  Algorithms/itkFiberCurvatureFilter.h
 
   # (old) Tractography
   Algorithms/itkGibbsTrackingFilter.h

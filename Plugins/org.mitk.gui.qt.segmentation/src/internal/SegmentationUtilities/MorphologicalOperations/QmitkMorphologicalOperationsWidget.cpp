@@ -15,9 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkMorphologicalOperationsWidget.h"
-#include <mitkMorphologicalOperations.h>
 #include <mitkProgressBar.h>
 #include <mitkSliceNavigationController.h>
+#include <QCheckBox>
 
 static const char* const HelpText = "Select a segmentation above";
 
@@ -233,4 +233,21 @@ void QmitkMorphologicalOperationsWidget::OnFillHolesButtonClicked()
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   QApplication::restoreOverrideCursor();
+}
+
+
+mitk::MorphologicalOperations::StructuralElementType QmitkMorphologicalOperationsWidget::CreateStructerElement_UI()
+{
+  bool ball = m_Controls.radioButtonMorphoBall->isChecked();
+  int accum_flag = 0;
+  if(ball){
+   if(m_Controls.m_AxialCheckbox->isChecked()) accum_flag |= mitk::MorphologicalOperations::Ball_Axial;
+   if(m_Controls.m_SagitalCheckbox->isChecked()) accum_flag |= mitk::MorphologicalOperations::Ball_Sagital;
+   if(m_Controls.m_CornalCheckbox->isChecked()) accum_flag |= mitk::MorphologicalOperations::Ball_Coronal;
+  }else{
+    if(m_Controls.m_AxialCheckbox->isChecked()) accum_flag |= mitk::MorphologicalOperations::Cross_Axial;
+    if(m_Controls.m_SagitalCheckbox->isChecked()) accum_flag |= mitk::MorphologicalOperations::Cross_Sagital;
+    if(m_Controls.m_CornalCheckbox->isChecked()) accum_flag |= mitk::MorphologicalOperations::Cross_Coronal;
+  }
+  return (mitk::MorphologicalOperations::StructuralElementType)accum_flag;
 }

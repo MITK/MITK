@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "../QmitkSegmentationUtilityWidget.h"
 #include <ui_QmitkMorphologicalOperationsWidgetControls.h>
+#include <mitkMorphologicalOperations.h>
 
 /** \brief GUI class for morphological segmentation tools.
  */
@@ -44,6 +45,7 @@ protected:
 
 private:
   Ui::QmitkMorphologicalOperationsWidgetControls m_Controls;
+  mitk::MorphologicalOperations::StructuralElementType CreateStructerElement_UI();
 };
 
 #endif

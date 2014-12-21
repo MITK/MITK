@@ -585,6 +585,7 @@ namespace mitk
     }
     if(m_Actor != NULL)
     {
+      m_Actor->ReleaseGraphicsResources(0);
       m_Actor->Delete();
     }
   }

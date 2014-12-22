@@ -423,7 +423,7 @@ diff -burN redland-1.0.17-orig/src/CMakeLists.txt redland-1.0.17-patched/src/CMa
 +  ${internal_headers}
 +)
 +
-+if(HAVE_MEMCMP)
++if(NOT HAVE_MEMCMP)
 +  list(APPEND srcs memcmp.c)
 +endif()
 +

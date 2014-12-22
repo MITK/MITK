@@ -114,7 +114,8 @@ void mitk::LabelSet::AddLabel(mitk::Label * label)
 
   PixelType pixelValue = m_LabelContainer.rbegin()->first;
 
-  if (m_LabelContainer.empty() == false && pixelValue >= newLabel->GetValue())
+  if (m_LabelContainer.empty() == false && pixelValue >= newLabel->GetValue() &&
+      m_LabelContainer.find(newLabel->GetValue()) != m_LabelContainer.end())
   {
     ++pixelValue;
     newLabel->SetValue( pixelValue );

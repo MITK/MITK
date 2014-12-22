@@ -1,0 +1,64 @@
+<statemachine NAME="Affine">
+    <state name="start" startstate="true" >
+        <transition event_class="InteractionPositionEvent" event_variant="ClickSelect" target="select">
+            <condition name="isOverObject"/>
+            <action name="selectObject"/>
+        </transition>
+    </state>
+    <state name="select" >
+        <transition event_class="InteractionPositionEvent" event_variant="ClickSelect" target="start">
+            <condition name="isOverObject" inverted="true" />
+            <action name="deselectObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="ClickSelect" target="select">
+            <condition name="isOverObject"/>
+            <action name="selectObject"/>
+        </transition>
+
+        <transition event_class="InteractionKeyEvent" event_variant="TranslateUpKey" target="select">
+            <action name="translateUpKey"/>
+        </transition>
+<!-- Translation Key events -->
+        <transition event_class="InteractionKeyEvent" event_variant="TranslateDownKey" target="select">
+            <action name="translateDownKey"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="TranslateLeftKey" target="select">
+            <action name="translateLeftKey"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="TranslateRightKey" target="select">
+            <action name="translateRightKey"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="TranslateUpModifierKey" target="select">
+            <action name="translateUpModifierKey"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="TranslateDownModifierKey" target="select">
+            <action name="translateDownModifierKey"/>
+        </transition>
+<!-- Rotation Key events -->
+        <transition event_class="InteractionKeyEvent" event_variant="RotateUpKey" target="select">
+            <action name="rotateUpKey"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="RotateDownKey" target="select">
+            <action name="rotateDownKey"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="RotateLeftKey" target="select">
+            <action name="rotateLeftKey"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="RotateRightKey" target="select">
+            <action name="rotateRightKey"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="RotateUpModifierKey" target="select">
+            <action name="rotateUpModifierKey"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="RotateDownModifierKey" target="select">
+            <action name="rotateDownModifierKey"/>
+        </transition>
+<!-- Scale Key events -->
+        <transition event_class="InteractionKeyEvent" event_variant="ScaleUpKey" target="select">
+            <action name="scaleUpKey"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="ScaleDownKey" target="select">
+            <action name="scaleDownKey"/>
+        </transition>
+    </state>
+</statemachine>

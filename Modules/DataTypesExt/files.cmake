@@ -1,4 +1,5 @@
 set(CPP_FILES
+  mitkAffineDataInteractor3D.cpp
   mitkApplyDiffImageOperation.cpp
   mitkBoundingObject.cpp
   mitkBoundingObjectGroup.cpp
@@ -32,10 +33,9 @@ set(CPP_FILES
 )
 
 set(RESOURCE_FILES
-  #Interactions/AffineInteraction3D.xml
-  #Interactions/AffineTranslationConfig.xml
-  #Interactions/AffineRotationConfig.xml
-  #Interactions/AffineDeformationConfig.xml
+  Interactions/AffineInteraction3D.xml
+  Interactions/AffineTranslationConfig.xml
+  Interactions/AffineRotationConfig.xml
 
   Interactions/ClippingPlaneInteraction3D.xml
   Interactions/ClippingPlaneTranslationConfig.xml

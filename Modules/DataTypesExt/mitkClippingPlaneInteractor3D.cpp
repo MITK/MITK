@@ -14,12 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkAffineDataInteractor3D.h"
+#include "mitkClippingPlaneInteractor3D.h"
 
-#include "mitkInteractionConst.h"
-#include "mitkInteractionPositionEvent.h"
-#include "mitkRotationOperation.h"
-#include "mitkSurface.h"
+#include <mitkInteractionConst.h>
+#include <mitkInteractionPositionEvent.h>
+#include <mitkRotationOperation.h>
+#include <mitkSurface.h>
 
 #include <vtkCamera.h>
 #include <vtkInteractorStyle.h>
@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkInteractorObserver.h>
 
 
-mitk::AffineDataInteractor3D::AffineDataInteractor3D()
+mitk::ClippingPlaneInteractor3D::ClippingPlaneInteractor3D()
 {
   m_OriginalGeometry = Geometry3D::New();
 
@@ -39,11 +39,11 @@ mitk::AffineDataInteractor3D::AffineDataInteractor3D()
   m_ObjectNormal[2] = 1.0;
 }
 
-mitk::AffineDataInteractor3D::~AffineDataInteractor3D()
+mitk::ClippingPlaneInteractor3D::~ClippingPlaneInteractor3D()
 {
 }
 
-void mitk::AffineDataInteractor3D::ConnectActionsAndFunctions()
+void mitk::ClippingPlaneInteractor3D::ConnectActionsAndFunctions()
 {
   // **Conditions** that can be used in the state machine, to ensure that certain conditions are met, before actually executing an action
   CONNECT_CONDITION("isOverObject", CheckOverObject);
@@ -57,11 +57,11 @@ void mitk::AffineDataInteractor3D::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("rotateObject",RotateObject);
 }
 
-void mitk::AffineDataInteractor3D::DataNodeChanged()
+void mitk::ClippingPlaneInteractor3D::DataNodeChanged()
 {
 }
 
-bool mitk::AffineDataInteractor3D::CheckOverObject(const InteractionEvent* interactionEvent)
+bool mitk::ClippingPlaneInteractor3D::CheckOverObject(const InteractionEvent* interactionEvent)
 {
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
@@ -74,7 +74,7 @@ bool mitk::AffineDataInteractor3D::CheckOverObject(const InteractionEvent* inter
   return false;
 }
 
-bool mitk::AffineDataInteractor3D::SelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::ClippingPlaneInteractor3D::SelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   DataNode::Pointer node = this->GetDataNode();
 
@@ -91,7 +91,7 @@ bool mitk::AffineDataInteractor3D::SelectObject(StateMachineAction*, Interaction
   return true;
 }
 
-bool mitk::AffineDataInteractor3D::DeselectObject(StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::ClippingPlaneInteractor3D::DeselectObject(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   DataNode::Pointer node = this->GetDataNode();
 
@@ -108,7 +108,7 @@ bool mitk::AffineDataInteractor3D::DeselectObject(StateMachineAction*, Interacti
   return true;
 }
 
-bool mitk::AffineDataInteractor3D::InitTranslate(StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::ClippingPlaneInteractor3D::InitTranslate(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
@@ -135,7 +135,7 @@ bool mitk::AffineDataInteractor3D::InitTranslate(StateMachineAction*, Interactio
   return true;
 }
 
-bool mitk::AffineDataInteractor3D::InitRotate(StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::ClippingPlaneInteractor3D::InitRotate(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
@@ -160,7 +160,7 @@ bool mitk::AffineDataInteractor3D::InitRotate(StateMachineAction*, InteractionEv
   return true;
 }
 
-bool mitk::AffineDataInteractor3D::TranslateObject (StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::ClippingPlaneInteractor3D::TranslateObject (StateMachineAction*, InteractionEvent* interactionEvent)
 {
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
@@ -216,7 +216,7 @@ bool mitk::AffineDataInteractor3D::TranslateObject (StateMachineAction*, Interac
   return true;
 }
 
-bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::ClippingPlaneInteractor3D::RotateObject (StateMachineAction*, InteractionEvent* interactionEvent)
 {
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
@@ -303,12 +303,12 @@ bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, Interactio
 }
 
 
-bool mitk::AffineDataInteractor3D::ColorizeSurface(BaseRenderer::Pointer renderer, double scalar)
+bool mitk::ClippingPlaneInteractor3D::ColorizeSurface(BaseRenderer::Pointer renderer, double scalar)
 {
   BaseData::Pointer data = this->GetDataNode()->GetData();
   if(data.IsNull())
   {
-    MITK_ERROR << "AffineInteractor3D: No data object present!";
+    MITK_ERROR << "ClippingPlaneInteractor3D: No data object present!";
     return false;
   }
 
@@ -326,21 +326,21 @@ bool mitk::AffineDataInteractor3D::ColorizeSurface(BaseRenderer::Pointer rendere
 
   if (polyData == NULL)
   {
-    MITK_ERROR << "AffineInteractor3D: No poly data present!";
+    MITK_ERROR << "ClippingPlaneInteractor3D: No poly data present!";
     return false;
   }
 
   vtkPointData* pointData = polyData->GetPointData();
   if (pointData == NULL)
   {
-    MITK_ERROR << "AffineInteractor3D: No point data present!";
+    MITK_ERROR << "ClippingPlaneInteractor3D: No point data present!";
     return false;
   }
 
   vtkDataArray* scalars = pointData->GetScalars();
   if (scalars == NULL)
   {
-    MITK_ERROR << "AffineInteractor3D: No scalars for point data present!";
+    MITK_ERROR << "ClippingPlaneInteractor3D: No scalars for point data present!";
     return false;
   }
 

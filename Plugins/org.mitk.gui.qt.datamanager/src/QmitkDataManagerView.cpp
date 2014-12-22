@@ -103,10 +103,18 @@ QString QmitkDataManagerView::TR_TOGGLE_VISIBILITY = QAction::tr("Toggle visibil
 QString QmitkDataManagerView::TR_DETAILS = QAction::tr("Details...");
 QString QmitkDataManagerView::TR_COLORMAP = QAction::tr("Colormap");
 
+const QString QmitkDataManagerView::contextMenuExtTranslateNames[] = { 
+  QAction::tr("Create polygon model"),   
+  QAction::tr("Create smoothed polygon model"),
+  QAction::tr("Autocrop")
+};
+
 QmitkDataManagerView::QmitkDataManagerView()
     : m_GlobalReinitOnNodeDelete(true),
       m_ItemDelegate(NULL)
 {
+
+  contextMenuExtSrcNames << "Create polygon model" << "Create smoothed polygon model" << "Autocrop";
 }
 
 QmitkDataManagerView::~QmitkDataManagerView()
@@ -270,15 +278,25 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
         MITK_WARN << "cannot add action \"" << cmLabel << "\" because descriptor " << cmNodeDescriptorName << " does not exist";
         continue;
       }
+
+      QString translatedLabel = QString(cmLabel.toUtf8().constData());
+      for (int i=0; i<contextMenuExtSrcNames.size(); i++) {
+        if (contextMenuExtSrcNames[i].compare(QString(cmLabel.toUtf8().constData())) == 0) {
+          translatedLabel  = contextMenuExtTranslateNames[i];
+          break;
+        }
+      }
+
       // check if the user specified an icon attribute
-      if ( !cmIcon.isEmpty() )
+      if (!cmIcon.isEmpty())
       {
-        contextMenuAction = new QAction( QIcon(cmIcon), cmLabel, parent);
+        contextMenuAction = new QAction(QIcon(cmIcon), translatedLabel, parent);
       }
       else
       {
-        contextMenuAction = new QAction( cmLabel, parent);
+        contextMenuAction = new QAction(translatedLabel, parent);
       }
+
       tmpDescriptor->AddAction(contextMenuAction);
       m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(tmpDescriptor,contextMenuAction));
       m_ConfElements[contextMenuAction] = *cmActionsIt;

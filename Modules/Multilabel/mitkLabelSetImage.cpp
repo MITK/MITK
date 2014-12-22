@@ -111,7 +111,6 @@ void mitk::LabelSetImage::Initialize(const mitk::Image* other)
 
   // Add a inital LabelSet ans corresponding image data to the stack
   AddLayer();
-
 }
 
 mitk::LabelSetImage::~LabelSetImage()
@@ -395,7 +394,7 @@ void mitk::LabelSetImage::ClearBuffer()
   }
 }
 
-bool mitk::LabelSetImage::ExistLabel(const PixelType pixelValue)
+bool mitk::LabelSetImage::ExistLabel(PixelType pixelValue) const
 {
   bool exist = false;
   for(unsigned int lidx = 0 ; lidx < GetNumberOfLayers(); lidx++)
@@ -403,13 +402,19 @@ bool mitk::LabelSetImage::ExistLabel(const PixelType pixelValue)
   return exist;
 }
 
-bool mitk::LabelSetImage::ExistLabelSet(const unsigned int layer)
+bool mitk::LabelSetImage::ExistLabel(PixelType pixelValue, unsigned int layer) const
+{
+  bool exist = m_LabelSetContainer[layer]->ExistLabel(pixelValue);
+  return exist;
+}
+
+bool mitk::LabelSetImage::ExistLabelSet(unsigned int layer) const
 {
   return layer < m_LabelSetContainer.size();
 }
 
 
-void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, unsigned int layer)
+void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, unsigned int /*layer*/)
 {
   int targetPixelValue = GetActiveLabel()->GetValue();
   try
@@ -472,22 +477,34 @@ void mitk::LabelSetImage::EraseLabel(PixelType pixelValue, unsigned int layer)
 
 mitk::Label *mitk::LabelSetImage::GetActiveLabel(unsigned int layer)
 {
-  return m_LabelSetContainer[layer]->GetActiveLabel();
+  if (m_LabelSetContainer.size() > layer)
+    return m_LabelSetContainer[layer]->GetActiveLabel();
+  else
+    return NULL;
 }
 
 mitk::Label *mitk::LabelSetImage::GetLabel(PixelType pixelValue, unsigned int layer) const
 {
-  return m_LabelSetContainer[layer]->GetLabel(pixelValue);
+  if(m_LabelSetContainer.size() <= layer)
+    return NULL;
+  else
+    return m_LabelSetContainer[layer]->GetLabel(pixelValue);
 }
 
 mitk::LabelSet* mitk::LabelSetImage::GetLabelSet(unsigned int layer)
 {
-  return m_LabelSetContainer[layer].GetPointer();
+  if(m_LabelSetContainer.size() <= layer)
+    return NULL;
+  else
+    return m_LabelSetContainer[layer].GetPointer();
 }
 
 const mitk::LabelSet* mitk::LabelSetImage::GetLabelSet(unsigned int layer) const
 {
-  return m_LabelSetContainer[layer].GetPointer();
+  if(m_LabelSetContainer.size() <= layer)
+    return NULL;
+  else
+    return m_LabelSetContainer[layer].GetPointer();
 }
 
 mitk::LabelSet* mitk::LabelSetImage::GetActiveLabelSet()
@@ -516,7 +533,6 @@ unsigned int mitk::LabelSetImage::GetTotalNumberOfLabels() const
 
 void mitk::LabelSetImage::MaskStamp(mitk::Image* mask, bool forceOverwrite)
 {
-  MITK_INFO<<"###################### MASK STAMP";
   try
   {
     mitk::PadImageFilter::Pointer padImageFilter = mitk::PadImageFilter::New();
@@ -736,7 +752,7 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output,
 
   while ( !sourceIter.IsAtEnd() )
   {
-    int sourceValue = static_cast<int>(sourceIter.Get());
+    PixelType sourceValue = static_cast<PixelType>(sourceIter.Get());
     targetIter.Set( sourceValue );
 
     if(!ExistLabel(sourceValue))
@@ -757,8 +773,7 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output,
 
       GetLabelSet()->AddLabel(label);
 
-      MITK_INFO << GetActiveLabelSet()->GetNumberOfLabels();
-      if(GetActiveLabelSet()->GetNumberOfLabels() >= 255 || sourceValue >= 255)
+      if(GetActiveLabelSet()->GetNumberOfLabels() >= mitk::Label::MAX_LABEL_VALUE || sourceValue >= mitk::Label::MAX_LABEL_VALUE)
       {
         AddLayer();
       }

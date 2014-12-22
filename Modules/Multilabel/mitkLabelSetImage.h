@@ -81,73 +81,113 @@ public:
     * \brief  */
   void ClearBuffer();
 
-  /**
-    * \brief
-  */
-  void MergeLabels(std::vector<PixelType>& VectorOfLablePixelValues, PixelType index, unsigned int layer = 0);
 
   /**
-    * \brief
-  */
+   * @brief Merges the mitk::Label with a given target value with the active label
+   * @param targetPixelValue the value of the mitk::Label that should be merged with the active one
+   * @param layer the layer in which the merge should be performed
+   */
   void MergeLabel(PixelType targetPixelValue, unsigned int layer = 0);
+
+  /**
+   * @brief Merges a list of mitk::Labels with the mitk::Label that has a specific value
+   * @param VectorOfLablePixelValues the list of labels that should be merge with the specified one
+   * @param index the value of the label into which the other should be merged
+   * @param layer the layer in which the merge should be performed
+   */
+  void MergeLabels(std::vector<PixelType>& VectorOfLablePixelValues, PixelType index, unsigned int layer = 0);
 
   /**
     * \brief  */
   void UpdateCenterOfMass(PixelType pixelValue, unsigned int layer =0);
 
-  /**
-    * \brief  */
-//  void CalculateLabelVolume(PixelType index, int layer = -1);
 
   /**
-    * \brief  */
+   * @brief Removes labels from the mitk::LabelSet of given layer.
+   *        Calls mitk::LabelSetImage::EraseLabels() which also removes the labels from within the image.
+   * @param VectorOfLabelPixelValues a list of labels to be removed
+   * @param layer the layer in which the labels should be removed
+   */
   void RemoveLabels(std::vector<PixelType>& VectorOfLabelPixelValues, unsigned int layer = 0);
 
   /**
-    * \brief  */
+   * @brief Erases the label with the given value in the given layer from the underlying image.
+   *        The label itself will not be erased from the respective mitk::LabelSet. In order to
+   *        remove the label itself use mitk::LabelSetImage::RemoveLabels()
+   * @param pixelValue the label which will be remove from the image
+   * @param layer the layer in which the label should be removed
+   */
   void EraseLabel(PixelType pixelValue, unsigned int layer = 0);
 
   /**
-    * \brief  */
+   * @brief Similar to mitk::LabelSetImage::EraseLabel() this funtion erase a list of labels from the image
+   * @param VectorOfLabelPixelValues the list of labels that should be remove
+   * @param layer the layer for which the labels should be removed
+   */
   void EraseLabels(std::vector<PixelType>& VectorOfLabelPixelValues, unsigned int layer = 0);
 
   /**
     * \brief  Returns true if the value exists in one of the labelsets*/
-  bool ExistLabel(const PixelType pixelValue);
+  bool ExistLabel(PixelType pixelValue) const;
 
+  /**
+   * @brief Checks if a label exists in a certain layer
+   * @param pixelValue the label value
+   * @param layer the layer in which should be searched for the label
+   * @return true if the label exists otherwise false
+   */
+  bool ExistLabel(PixelType pixelValue, unsigned int layer) const;
 
   /**
     * \brief  Returns true if the labelset exists*/
-  bool ExistLabelSet(const unsigned int layer);
+  bool ExistLabelSet(unsigned int layer) const;
 
   /**
-    * \brief  */
+   * @brief Returns the active label of a specific layer
+   * @param layer the layer ID for which the active label should be returned
+   * @return the active label of the specified layer
+   */
   mitk::Label* GetActiveLabel(unsigned int layer = 0);
 
   /**
-    * \brief  */
+   * @brief Returns the mitk::Label with the given pixelValue and for the given layer
+   * @param pixelValue the pixel value of the label
+   * @param layer the layer in which the labels should be located
+   * @return the mitk::Label if available otherwise NULL
+   */
   mitk::Label* GetLabel(PixelType pixelValue, unsigned int layer = 0) const;
 
   /**
-    * \brief  */
+   * @brief Returns the currently active mitk::LabelSet
+   * @return the mitk::LabelSet of the active layer or NULL if non is present
+   */
   mitk::LabelSet* GetActiveLabelSet();
 
   /**
-    * \brief  */
+   * @brief Gets the mitk::LabelSet for the given layer
+   * @param layer the layer for which the mitk::LabelSet should be retrieved
+   * @return the respective mitk::LabelSet or NULL if non exists for the given layer
+   */
   mitk::LabelSet * GetLabelSet(unsigned int layer = 0);
-
   const mitk::LabelSet * GetLabelSet(unsigned int layer = 0) const;
 
   /**
-  * \brief  */
+   * @brief Gets the ID of the currently active layer
+   * @return the ID of the active layer
+   */
   unsigned int GetActiveLayer() const;
 
   /**
-    * \brief  */
+   * @brief Get the number of all existing mitk::Labels for a given layer
+   * @param layer the layer ID for which the active mitk::Labels should be retrieved
+   * @return the number of all existing mitk::Labels for the given layer
+   */
   unsigned int GetNumberOfLabels(unsigned int layer = 0) const;
 
   /**
-    * \brief  */
+   * @brief Returns the number of all labels summed up across all layers
+   * @return the overall number of labels across all layers
+   */
   unsigned int GetTotalNumberOfLabels() const;
 
   /**
@@ -188,11 +228,16 @@ public:
   void SetVectorImage(VectorImageType::Pointer image );
 
   /**
-    * \brief  */
-  unsigned int AddLayer(mitk::LabelSet::Pointer=0);
+   * @brief Adds a new layer to the LabelSetImage. The new layer will be set as the active one
+   * @param layer a mitk::LabelSet which will be set as new layer.
+   * @return the layer ID of the new layer
+   */
+  unsigned int AddLayer(mitk::LabelSet::Pointer layer =0);
 
   /**
-    * \brief  */
+   * @brief Removes the active layer and the respective mitk::LabelSet and image information.
+   *        The new active layer is the one below, if exists
+   */
   void RemoveLayer();
 
   /**
@@ -203,8 +248,16 @@ public:
 
   void OnLabelSetModified();
 
+  /**
+   * @brief Sets the label which is used as default exterior label when creating a new layer
+   * @param label the label which will be used as new exterior label
+   */
   void SetExteriorLabel(mitk::Label * label);
 
+  /**
+   * @brief Gets the mitk::Label which is used as default exterior label
+   * @return the exterior mitk::Label
+   */
   mitk::Label* GetExteriorLabel();
 
   const mitk::Label* GetExteriorLabel() const;

@@ -186,13 +186,14 @@ void mitk::Label::SetLayer(unsigned int layer)
     property->SetValue(layer);
   else
     // Create new Property
-    SetIntProperty("layer", layer);
+    SetProperty("layer", mitk::UIntProperty::New(layer));
 }
 
 unsigned int mitk::Label::GetLayer() const
 {
-  int layer;
-  GetIntProperty("layer",layer);
+  unsigned int layer;
+  mitk::UIntProperty* prop = dynamic_cast<mitk::UIntProperty*>(GetProperty("layer"));
+  layer = prop->GetValue();
   return layer;
 }
 

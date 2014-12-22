@@ -89,7 +89,7 @@ void LabelSetImageIO::Write()
   for (unsigned int layerIdx=0; layerIdx<input->GetNumberOfLayers(); layerIdx++)
   {
     sprintf( keybuffer, "layer_%03d", layerIdx ); // layer idx
-    sprintf( valbuffer, "%1d", input->GetTotalNumberOfLabels()); // number of labels for the layer
+    sprintf( valbuffer, "%1d", input->GetNumberOfLabels(layerIdx)); // number of labels for the layer
     itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
 
     for (unsigned int labelIdx=0; labelIdx<input->GetNumberOfLabels(layerIdx); labelIdx++)

@@ -92,14 +92,16 @@ void LabelSetImageIO::Write()
     sprintf( valbuffer, "%1d", input->GetNumberOfLabels(layerIdx)); // number of labels for the layer
     itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
 
-    for (unsigned int labelIdx=0; labelIdx<input->GetNumberOfLabels(layerIdx); labelIdx++)
+    mitk::LabelSet::LabelContainerConstIteratorType iter = input->GetLabelSet(layerIdx)->IteratorConstBegin();
+    unsigned int count(0);
+    while (iter != input->GetLabelSet(layerIdx)->IteratorConstEnd())
     {
       std::auto_ptr<TiXmlDocument> document;
       document.reset(new TiXmlDocument());
 
       TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
       document->LinkEndChild( decl );
-      TiXmlElement * labelElem = GetLabelAsTiXmlElement(input->GetLabel(labelIdx,layerIdx));
+      TiXmlElement * labelElem = GetLabelAsTiXmlElement(iter->second);
       document->LinkEndChild( labelElem );
       TiXmlPrinter printer;
       printer.SetIndent("");
@@ -107,8 +109,10 @@ void LabelSetImageIO::Write()
 
       document->Accept(&printer);
 
-      sprintf( keybuffer, "label_%03d_%03d", layerIdx, labelIdx );
+      sprintf( keybuffer, "org.mitk.label_%03u_%05u", layerIdx, count );
       itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), printer.Str());
+      ++iter;
+      ++count;
     }
   }
 
@@ -236,7 +240,7 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
     for(int labelIdx=0; labelIdx < numberOfLabels; labelIdx++)
     {
       TiXmlDocument doc;
-      sprintf( keybuffer, "label_%03d_%03d", layerIdx, labelIdx );
+      sprintf( keybuffer, "label_%03d_%05d", layerIdx, labelIdx );
       _xmlStr = GetStringByKey(imgMetaDictionary,keybuffer);
       doc.Parse(_xmlStr.c_str());
 

@@ -43,6 +43,11 @@ public:
   // -------------- AbstractFileReader -------------
 
   using AbstractFileReader::Read;
+  /**
+   * @brief Reads a number of mitk::LabelSetImages from the file system
+   * @return a vector of mitk::LabelSetImages
+   * @throws throws an mitk::Exception if an error ocurrs during parsing the nrrd header
+   */
   virtual std::vector<BaseData::Pointer> Read();
   virtual ConfidenceLevel GetReaderConfidenceLevel() const;
 

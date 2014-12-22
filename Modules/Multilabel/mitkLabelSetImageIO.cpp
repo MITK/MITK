@@ -244,7 +244,11 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
       _xmlStr = GetStringByKey(imgMetaDictionary,keybuffer);
       doc.Parse(_xmlStr.c_str());
 
-      label = LoadLabelFromTiXmlDocument(doc.FirstChildElement("Label"));
+      TiXmlElement * labelElem = doc.FirstChildElement("Label");
+      if (labelElem == 0)
+        mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage IO";
+
+      label = LoadLabelFromTiXmlDocument(labelElem);
 
       if(label->GetValue() == 0) // set exterior label is needed to hold exterior information
         output->SetExteriorLabel(label);

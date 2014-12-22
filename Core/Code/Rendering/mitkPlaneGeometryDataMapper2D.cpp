@@ -157,14 +157,25 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       boundingBoxMin = referenceGeometry->GetCornerPoint(0);
       boundingBoxMax = referenceGeometry->GetCornerPoint(7);
 
+      Point3D indexLinePoint;
+      Vector3D indexLineDirection;
+
+      referenceGeometry->WorldToIndex(crossLine.GetPoint(),indexLinePoint);
+      referenceGeometry->WorldToIndex(crossLine.GetDirection(),indexLineDirection);
+
+      referenceGeometry->WorldToIndex(boundingBoxMin,boundingBoxMin);
+      referenceGeometry->WorldToIndex(boundingBoxMax,boundingBoxMax);
+
       // Then, clip this line with the (transformed) bounding box of the
       // reference geometry.
-      crossLine.BoxLineIntersection(
+      Line3D::BoxLineIntersection(
             boundingBoxMin[0], boundingBoxMin[1], boundingBoxMin[2],
           boundingBoxMax[0], boundingBoxMax[1], boundingBoxMax[2],
-          crossLine.GetPoint(), crossLine.GetDirection(),
+          indexLinePoint, indexLineDirection,
           point1, point2 );
 
+      referenceGeometry->IndexToWorld(point1,point1);
+      referenceGeometry->IndexToWorld(point2,point2);
       crossLine.SetPoints(point1,point2);
 
       vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();

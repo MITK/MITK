@@ -25,11 +25,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkGeometryToolsViewControls.h"
 
-
 /**
-  \brief QmitkGeometryToolsView
+  \brief QmitkGeometryToolsView to modify geometry of mitkBaseData via interaction.
 
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
+  \warning This is an experimental view to play with the geometry of all mitkBaseDatas.
+  The current implementation allows to translate, rotate and scale objects with the
+  keyboard.
+
+  \warning Scaling is not supported for images, yet, and will not happen in coordinate origin.
+  \warning Surfaces
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
@@ -46,11 +50,23 @@ class QmitkGeometryToolsView : public QmitkAbstractView
 
 protected slots:
 
-    void RemoveInteractor();
+    /**
+     * @brief Add/remove the affine interactor.
+     */
     void AddInteractor();
+    void RemoveInteractor();
+
+    /**
+     * @brief Slots to adapt the step size for interaction.
+     */
     void OnRotationSpinBoxChanged(double step);
     void OnScaleSpinBoxChanged(double factor);
     void OnTranslationSpinBoxChanged(double step);
+
+    /**
+     * @brief OnUsageInfoBoxChanged show help.
+     * @param flag yes/no.
+     */
     void OnUsageInfoBoxChanged(bool flag);
 
   protected:

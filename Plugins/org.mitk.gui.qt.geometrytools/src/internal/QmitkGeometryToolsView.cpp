@@ -15,19 +15,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-// Blueberry
+//Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 
-// Qmitk
+//Qmitk
 #include "QmitkGeometryToolsView.h"
 
-// Qt
-#include <QMessageBox>
-
-//mitk image
+//mitk
 #include <mitkImage.h>
 #include <mitkAffineDataInteractor3D.h>
+
+//micro services
 #include <usModuleRegistry.h>
 #include <usGetModuleContext.h>
 
@@ -80,7 +79,7 @@ void QmitkGeometryToolsView::AddInteractor()
     {
       mitk::AffineDataInteractor3D::Pointer affineDataInteractor = mitk::AffineDataInteractor3D::New();
       affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
-      affineDataInteractor->SetEventConfig("AffineTranslationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+      affineDataInteractor->SetEventConfig("AffineConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
       affineDataInteractor->SetDataNode(node);
       node->SetBoolProperty("pickable", true);
       node->SetFloatProperty("AffineDataInteractor3D.Translation Step Size", m_Controls.m_TranslationStep->value());

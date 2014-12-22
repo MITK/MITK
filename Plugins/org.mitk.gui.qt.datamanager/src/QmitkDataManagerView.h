@@ -272,6 +272,9 @@ protected:
 
 private:
 
+  static const QString contextMenuExtTranslateNames[];
+  QStringList contextMenuExtSrcNames;
+
   QItemSelectionModel* GetDataNodeSelectionModel() const override;
 
   /// Reopen multi widget editor if it has been closed

@@ -145,17 +145,6 @@ public:
 
   bool IsMenuWidgetEnabled() const;
 
-  /**
-   * @brief SetColorWidget4 Get/Set the color of the decoration of the widget 4.
-   *
-   * This is used to color the frame of the renderwindow and the corner annatation.
-   * For the other 3 widgets, this color is a property of the helper object nodes
-   * which contain the respective plane geometry. The color can be modified via:
-   * GetWidgetPlane1()->SetColor();
-   */
-  void SetDecorationColorWidget4(mitk::Color color);
-  mitk::Color GetDecorationColorWidget4();
-
 protected:
 
   void UpdateAllWidgets();
@@ -332,11 +321,34 @@ public:
 
   /**
    * @brief GetDecorationColorForWidget Get the color for annotation, crosshair and rectangle.
-   * @param widgetNumber Number of the renderwindow (0-3)
+   * @param widgetNumber Number of the renderwindow (0-3).
    * @return Color in mitk format.
    */
-  mitk::Color GetDecorationColorForWidget(unsigned int widgetNumber);
+  mitk::Color GetDecorationColor(unsigned int widgetNumber);
 
+  /**
+   * @brief SetDecorationColor Set the color of the decoration of the 4 widgets.
+   *
+   * This is used to color the frame of the renderwindow and the corner annatation.
+   * For the first 3 widgets, this color is a property of the helper object nodes
+   * which contain the respective plane geometry. For widget 4, this is a member,
+   * since there is no data node for this widget.
+   */
+  void SetDecorationColor(unsigned int widgetNumber, mitk::Color color);
+
+  /**
+   * @brief GetCornerAnnotationText Getter for corner annotation text.
+   * @param widgetNumber the widget number (0-3).
+   * @return The text in the corner annotation.
+   */
+  std::string GetCornerAnnotationText(unsigned int widgetNumber);
+
+  /**
+   * @brief GetGradientColors Getter for gradientbackground colors.
+   * @param widgetNumber the widget number (0-3).
+   * @return A pair of colors. First: upper, second: lower.
+   */
+  std::pair<mitk::Color, mitk::Color> GetGradientColors(unsigned int widgetNumber);
 protected:
 
   QHBoxLayout* QmitkStdMultiWidgetLayout;
@@ -384,14 +396,13 @@ protected:
    * For other widgets1-3, the color is a property of the respective data node.
    * There is no node for widget 4, hence, we need an extra member.
    */
-  mitk::Color m_DecorationColorWidget[4];
+  mitk::Color m_DecorationColorWidget4;
 
   /**
    * @brief m_GradientBackgroundColors Contains the colors of the gradient background.
    *
    */
-  mitk::Color m_GradientBackgroundColors[4][2];
-
+  std::pair<mitk::Color, mitk::Color> m_GradientBackgroundColors[4];
 
   QSplitter *m_MainSplit;
   QSplitter *m_LayoutSplit;

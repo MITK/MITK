@@ -46,8 +46,15 @@ public:
 
   QmitkStdMultiWidget* m_StdMultiWidget;
   QmitkMouseModeSwitcher* m_MouseModeToolbar;
-  std::string m_FirstBackgroundColor;
-  std::string m_SecondBackgroundColor;
+
+  /**
+  * @brief Members for the MultiWidget decorations.
+  */
+  std::string m_WidgetBackgroundColor1[4];
+  std::string m_WidgetBackgroundColor2[4];
+  std::string m_WidgetDecorationColor[4];
+  std::string m_WidgetAnnotation[4];
+
   bool m_MenuWidgetsEnabled;
   berry::IPartListener::Pointer m_PartListener;
 
@@ -368,42 +375,45 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
     currentNode = currentNode->Parent().GetPointer();
   }
 
-  // preferences for gradient background
-  mitk::Color upper = HexColorToMitkColor(prefs->GetByteArray("widget1 first background color", "#000000"));
-  mitk::Color lower = HexColorToMitkColor(prefs->GetByteArray("widget1 second background color", "#000000"));
+  //Upadte internal members
+  this->FillMembersWithCurrentDecorations();
+  this->GetPreferenceDecorations(prefs);
+  //Now the members can be used to modify the stdmultiwidget
+  mitk::Color upper = HexColorToMitkColor(d->m_WidgetBackgroundColor1[0]);
+  mitk::Color lower = HexColorToMitkColor(d->m_WidgetBackgroundColor2[0]);
   d->m_StdMultiWidget->SetGradientBackgroundColorForRenderWindow(upper, lower, 0);
-  upper = HexColorToMitkColor(prefs->GetByteArray("widget2 first background color", "#000000"));
-  lower = HexColorToMitkColor(prefs->GetByteArray("widget2 second background color", "#000000"));
+  upper = HexColorToMitkColor(d->m_WidgetBackgroundColor1[1]);
+  lower = HexColorToMitkColor(d->m_WidgetBackgroundColor2[1]);
   d->m_StdMultiWidget->SetGradientBackgroundColorForRenderWindow(upper, lower, 1);
-  upper = HexColorToMitkColor(prefs->GetByteArray("widget3 first background color", "#000000"));
-  lower = HexColorToMitkColor(prefs->GetByteArray("widget3 second background color", "#000000"));
+  upper = HexColorToMitkColor(d->m_WidgetBackgroundColor1[2]);
+  lower = HexColorToMitkColor(d->m_WidgetBackgroundColor2[2]);
   d->m_StdMultiWidget->SetGradientBackgroundColorForRenderWindow(upper, lower, 2);
-  upper = HexColorToMitkColor(prefs->GetByteArray("widget4 first background color", "#191919"));
-  lower = HexColorToMitkColor(prefs->GetByteArray("widget4 second background color", "#7F7F7F"));
+  upper = HexColorToMitkColor(d->m_WidgetBackgroundColor1[3]);
+  lower = HexColorToMitkColor(d->m_WidgetBackgroundColor2[3]);
   d->m_StdMultiWidget->SetGradientBackgroundColorForRenderWindow(upper, lower, 3);
   d->m_StdMultiWidget->EnableGradientBackground();
 
   // preferences for renderWindows
-  mitk::Color colorDecorationWidget1 = HexColorToMitkColor(prefs->GetByteArray("widget1 decoration color", "#FF0000"));
-  mitk::Color colorDecorationWidget2 = HexColorToMitkColor(prefs->GetByteArray("widget2 decoration color", "#00FF00"));
-  mitk::Color colorDecorationWidget3 = HexColorToMitkColor(prefs->GetByteArray("widget3 decoration color", "#0000FF"));
-  mitk::Color colorDecorationWidget4 = HexColorToMitkColor(prefs->GetByteArray("widget4 decoration color", "#FFFF00"));
-  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow1()->GetVtkRenderWindow())
-      ->GetCurrentWorldPlaneGeometryNode()->SetColor(colorDecorationWidget1);
-  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow2()->GetVtkRenderWindow())
-      ->GetCurrentWorldPlaneGeometryNode()->SetColor(colorDecorationWidget2);
-  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow3()->GetVtkRenderWindow())
-      ->GetCurrentWorldPlaneGeometryNode()->SetColor(colorDecorationWidget3);
-  d->m_StdMultiWidget->SetDecorationColorWidget4(colorDecorationWidget4);
+  mitk::Color colorDecorationWidget1 = HexColorToMitkColor(d->m_WidgetDecorationColor[0]);
+  mitk::Color colorDecorationWidget2 = HexColorToMitkColor(d->m_WidgetDecorationColor[1]);
+  mitk::Color colorDecorationWidget3 = HexColorToMitkColor(d->m_WidgetDecorationColor[2]);
+  mitk::Color colorDecorationWidget4 = HexColorToMitkColor(d->m_WidgetDecorationColor[3]);
+  d->m_StdMultiWidget->SetDecorationColor(0, colorDecorationWidget1);
+  d->m_StdMultiWidget->SetDecorationColor(1, colorDecorationWidget2);
+  d->m_StdMultiWidget->SetDecorationColor(2, colorDecorationWidget3);
+  d->m_StdMultiWidget->SetDecorationColor(3, colorDecorationWidget4);
+
+  for(unsigned int i = 0; i < 4; ++i)
+  {
+    d->m_StdMultiWidget->SetCornerAnnotation(d->m_WidgetAnnotation[i],
+                                             HexColorToMitkColor(d->m_WidgetDecorationColor[i]), i);
+  }
 
   //The crosshair gap
   int crosshairgapsize = prefs->GetInt("crosshair gap size", 32);
-  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow1()->GetVtkRenderWindow())
-      ->GetCurrentWorldPlaneGeometryNode()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
-  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow2()->GetVtkRenderWindow())
-      ->GetCurrentWorldPlaneGeometryNode()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
-  mitk::BaseRenderer::GetInstance(d->m_StdMultiWidget->GetRenderWindow3()->GetVtkRenderWindow())
-      ->GetCurrentWorldPlaneGeometryNode()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
+  d->m_StdMultiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
+  d->m_StdMultiWidget->GetWidgetPlane2()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
+  d->m_StdMultiWidget->GetWidgetPlane3()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
 
   //refresh colors of rectangles
   d->m_StdMultiWidget->EnableColoredRectangles();
@@ -432,15 +442,6 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   bool newMode = prefs->GetBool("PACS like mouse interaction", false);
   d->m_MouseModeToolbar->setVisible( newMode );
   d->m_StdMultiWidget->GetMouseModeSwitcher()->SetInteractionScheme( newMode ? mitk::MouseModeSwitcher::PACS : mitk::MouseModeSwitcher::MITK );
-
-  d->m_StdMultiWidget->SetCornerAnnotation(
-        prefs->GetByteArray("widget1 corner annotation", "Axial"), colorDecorationWidget1, 0);
-  d->m_StdMultiWidget->SetCornerAnnotation(
-        prefs->GetByteArray("widget2 corner annotation", "Sagittal"), colorDecorationWidget2, 1);
-  d->m_StdMultiWidget->SetCornerAnnotation(
-        prefs->GetByteArray("widget3 corner annotation", "Coronal"), colorDecorationWidget3, 2);
-  d->m_StdMultiWidget->SetCornerAnnotation(
-        prefs->GetByteArray("widget4 corner annotation", "3D"), colorDecorationWidget4, 3);
 }
 
 mitk::Color QmitkStdMultiWidgetEditor::HexColorToMitkColor(std::string widgetColorInHex)
@@ -465,51 +466,75 @@ mitk::Color QmitkStdMultiWidgetEditor::HexColorToMitkColor(std::string widgetCol
   return returnColor;
 }
 
+std::string QmitkStdMultiWidgetEditor::MitkColorToHex(mitk::Color color)
+{
+  QColor returnColor;
+  float colorMax = 255.0f;
+  returnColor.setRed(static_cast<int>(color[0]* colorMax + 0.5));
+  returnColor.setGreen(static_cast<int>(color[1]* colorMax + 0.5));
+  returnColor.setBlue(static_cast<int>(color[2]* colorMax + 0.5));
+  return returnColor.name().toStdString();
+}
+
+void QmitkStdMultiWidgetEditor::FillMembersWithCurrentDecorations()
+{
+  //fill members with current values (or default values) from the std multi widget
+  for(unsigned int i = 0; i < 4; ++i)
+  {
+    d->m_WidgetDecorationColor[i] = MitkColorToHex(d->m_StdMultiWidget->GetDecorationColor(i));
+    d->m_WidgetBackgroundColor1[i] = MitkColorToHex(d->m_StdMultiWidget->GetGradientColors(i).first);
+    d->m_WidgetBackgroundColor2[i] = MitkColorToHex(d->m_StdMultiWidget->GetGradientColors(i).second);
+    d->m_WidgetAnnotation[i] = d->m_StdMultiWidget->GetCornerAnnotationText(i);
+  }
+}
+
+void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPreferences * preferences)
+{
+  //overwrite members with values from the preferences, if they the prefrence is defined
+  d->m_WidgetBackgroundColor1[0] = preferences->GetByteArray("widget1 first background color", d->m_WidgetBackgroundColor1[0]);
+  d->m_WidgetBackgroundColor2[0] = preferences->GetByteArray("widget1 second background color", d->m_WidgetBackgroundColor2[0]);
+  d->m_WidgetBackgroundColor1[1] = preferences->GetByteArray("widget2 first background color", d->m_WidgetBackgroundColor1[1]);
+  d->m_WidgetBackgroundColor2[1] = preferences->GetByteArray("widget2 second background color", d->m_WidgetBackgroundColor2[1]);
+  d->m_WidgetBackgroundColor1[2] = preferences->GetByteArray("widget3 first background color", d->m_WidgetBackgroundColor1[2]);
+  d->m_WidgetBackgroundColor2[2] = preferences->GetByteArray("widget3 second background color", d->m_WidgetBackgroundColor2[2]);
+  d->m_WidgetBackgroundColor1[3] = preferences->GetByteArray("widget4 first background color", d->m_WidgetBackgroundColor1[3]);
+  d->m_WidgetBackgroundColor2[3] = preferences->GetByteArray("widget4 second background color", d->m_WidgetBackgroundColor2[3]);
+
+  d->m_WidgetDecorationColor[0] = preferences->GetByteArray("widget1 decoration color", d->m_WidgetDecorationColor[0]);
+  d->m_WidgetDecorationColor[1] = preferences->GetByteArray("widget2 decoration color", d->m_WidgetDecorationColor[1]);
+  d->m_WidgetDecorationColor[2] = preferences->GetByteArray("widget3 decoration color", d->m_WidgetDecorationColor[2]);
+  d->m_WidgetDecorationColor[3] = preferences->GetByteArray("widget4 decoration color", d->m_WidgetDecorationColor[3]);
+
+  d->m_WidgetAnnotation[0] = preferences->GetByteArray("widget1 corner annotation", d->m_WidgetAnnotation[0]);
+  d->m_WidgetAnnotation[1] = preferences->GetByteArray("widget2 corner annotation", d->m_WidgetAnnotation[1]);
+  d->m_WidgetAnnotation[2] = preferences->GetByteArray("widget3 corner annotation", d->m_WidgetAnnotation[2]);
+  d->m_WidgetAnnotation[3] = preferences->GetByteArray("widget4 corner annotation", d->m_WidgetAnnotation[3]);
+}
+
 void QmitkStdMultiWidgetEditor::InitializePreferences(berry::IBerryPreferences * preferences)
 {
-  std::string widgetBackgroundColor1[4];
-  std::string widgetBackgroundColor2[4];
-  std::string widgetDecorationColor[4];
-  std::string widgetAnnotation[4];
-  widgetBackgroundColor1[0] = preferences->GetByteArray("widget1 first background color", "#000000");
-  widgetBackgroundColor2[0] = preferences->GetByteArray("widget1 second background color", "#000000");
-  widgetBackgroundColor1[1] = preferences->GetByteArray("widget2 first background color", "#000000");
-  widgetBackgroundColor2[1] = preferences->GetByteArray("widget2 second background color", "#000000");
-  widgetBackgroundColor1[2] = preferences->GetByteArray("widget3 first background color", "#000000");
-  widgetBackgroundColor2[2] = preferences->GetByteArray("widget3 second background color", "#000000");
-  widgetBackgroundColor1[3] = preferences->GetByteArray("widget4 first background color", "#191919");
-  widgetBackgroundColor2[3] = preferences->GetByteArray("widget4 second background color", "#7F7F7F");
+  this->FillMembersWithCurrentDecorations(); //fill members
+  this->GetPreferenceDecorations(preferences); //overwrite if preferences are defined
 
-  //decoration colors
-  widgetDecorationColor[0] = preferences->GetByteArray("widget1 decoration color", "#C00000");
-  widgetDecorationColor[1] = preferences->GetByteArray("widget2 decoration color", "#00B000");
-  widgetDecorationColor[2] = preferences->GetByteArray("widget3 decoration color", "#0080FF");
-  widgetDecorationColor[3] = preferences->GetByteArray("widget4 decoration color", "#FFFF00");
+  //create new preferences
+  preferences->PutByteArray("widget1 corner annotation", d->m_WidgetAnnotation[0]);
+  preferences->PutByteArray("widget2 corner annotation", d->m_WidgetAnnotation[1]);
+  preferences->PutByteArray("widget3 corner annotation", d->m_WidgetAnnotation[2]);
+  preferences->PutByteArray("widget4 corner annotation", d->m_WidgetAnnotation[3]);
 
-  //annotation text
-  widgetAnnotation[0] = preferences->GetByteArray("widget1 corner annotation", "Axial");
-  widgetAnnotation[1] = preferences->GetByteArray("widget2 corner annotation", "Sagittal");
-  widgetAnnotation[2] = preferences->GetByteArray("widget3 corner annotation", "Coronal");
-  widgetAnnotation[3] = preferences->GetByteArray("widget4 corner annotation", "3D");
+  preferences->PutByteArray("widget1 decoration color", d->m_WidgetDecorationColor[0]);
+  preferences->PutByteArray("widget2 decoration color", d->m_WidgetDecorationColor[1]);
+  preferences->PutByteArray("widget3 decoration color", d->m_WidgetDecorationColor[2]);
+  preferences->PutByteArray("widget4 decoration color", d->m_WidgetDecorationColor[3]);
 
-  preferences->PutByteArray("widget1 corner annotation", widgetAnnotation[0]);
-  preferences->PutByteArray("widget2 corner annotation", widgetAnnotation[1]);
-  preferences->PutByteArray("widget3 corner annotation", widgetAnnotation[2]);
-  preferences->PutByteArray("widget4 corner annotation", widgetAnnotation[3]);
-
-  preferences->PutByteArray("widget1 decoration color", widgetDecorationColor[0]);
-  preferences->PutByteArray("widget2 decoration color", widgetDecorationColor[1]);
-  preferences->PutByteArray("widget3 decoration color", widgetDecorationColor[2]);
-  preferences->PutByteArray("widget4 decoration color", widgetDecorationColor[3]);
-
-  preferences->PutByteArray("widget1 first background color", widgetBackgroundColor1[0]);
-  preferences->PutByteArray("widget2 first background color", widgetBackgroundColor1[1]);
-  preferences->PutByteArray("widget3 first background color", widgetBackgroundColor1[2]);
-  preferences->PutByteArray("widget4 first background color", widgetBackgroundColor1[3]);
-  preferences->PutByteArray("widget1 second background color", widgetBackgroundColor2[0]);
-  preferences->PutByteArray("widget2 second background color", widgetBackgroundColor2[1]);
-  preferences->PutByteArray("widget3 second background color", widgetBackgroundColor2[2]);
-  preferences->PutByteArray("widget4 second background color", widgetBackgroundColor2[3]);
+  preferences->PutByteArray("widget1 first background color", d->m_WidgetBackgroundColor1[0]);
+  preferences->PutByteArray("widget2 first background color", d->m_WidgetBackgroundColor1[1]);
+  preferences->PutByteArray("widget3 first background color", d->m_WidgetBackgroundColor1[2]);
+  preferences->PutByteArray("widget4 first background color", d->m_WidgetBackgroundColor1[3]);
+  preferences->PutByteArray("widget1 second background color", d->m_WidgetBackgroundColor2[0]);
+  preferences->PutByteArray("widget2 second background color", d->m_WidgetBackgroundColor2[1]);
+  preferences->PutByteArray("widget3 second background color", d->m_WidgetBackgroundColor2[2]);
+  preferences->PutByteArray("widget4 second background color", d->m_WidgetBackgroundColor2[3]);
 }
 
 void QmitkStdMultiWidgetEditor::SetFocus()

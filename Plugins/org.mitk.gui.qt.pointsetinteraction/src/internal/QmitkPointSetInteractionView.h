@@ -36,6 +36,12 @@ class QmitkPointSetInteractionView : public QmitkFunctionality
   Q_OBJECT
 
 public:
+
+  static QString TR_ADD_POINTSET;
+  static QString TR_ENTER_NAME;
+  static QString TR_POINTSET;
+
+
   QmitkPointSetInteractionView(QObject *parent=0);
   virtual ~QmitkPointSetInteractionView();
 

@@ -28,6 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNodeSelection.h>
 
 
+QString QmitkPointSetInteractionView::TR_ADD_POINTSET = QLabel::tr("Add point set...");
+QString QmitkPointSetInteractionView::TR_ENTER_NAME = QLabel::tr("Enter name for the new point set");
+QString QmitkPointSetInteractionView::TR_POINTSET = QLabel::tr("PointSet");
+
 QmitkPointSetInteractionView::QmitkPointSetInteractionView( QObject* /*parent*/ )
 : m_Controls(0)
 {
@@ -66,7 +70,7 @@ void QmitkPointSetInteractionView::OnAddPointSetClicked()
   //Ask for the name of the point set
   bool ok = false;
   QString name = QInputDialog::getText( QApplication::activeWindow()
-    , "Add point set...", "Enter name for the new point set", QLineEdit::Normal, "PointSet", &ok );
+    , TR_ADD_POINTSET, TR_ENTER_NAME, QLineEdit::Normal, TR_POINTSET, &ok );
   if ( ! ok || name.isEmpty() )
     return;
 

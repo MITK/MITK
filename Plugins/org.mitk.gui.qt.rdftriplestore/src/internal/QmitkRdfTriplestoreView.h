@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkRdfTriplestoreViewControls.h"
 
+#include "mitkRdfStore.h"
+
 /*!
 \brief QmitkRdfTriplestoreView
 
@@ -48,6 +50,7 @@ public:
     /// \brief Called when the user clicks the GUI button
     void GenerateRdfFile();
     void ImportRdfFile();
+    void DataStorageToTriples();
 
 protected:
 
@@ -58,6 +61,8 @@ protected:
     const QList<mitk::DataNode::Pointer>& nodes );
 
   Ui::QmitkRdfTriplestoreViewControls m_Controls;
+
+  mitk::RdfStore m_Store;
 };
 
 #endif // QmitkRdfTriplestoreView_h

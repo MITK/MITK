@@ -29,6 +29,10 @@ namespace mitk {
 class MitkRDF_EXPORT RdfStore
 {
 public:
+
+  typedef std::map<std::string, RdfNode> ResultMap;
+  typedef std::map<std::string, RdfUri> PrefixMap;
+
   RdfStore();
   ~RdfStore();
 
@@ -42,6 +46,7 @@ public:
   bool Remove(RdfTriple triple);
 
   bool Contains(RdfTriple triple);
+  ResultMap Query(std::string query);
 
   // Supported formats are: "ntriples", "turtle"(default), "nquads"
   void Save(std::string filename, std::string format = "");
@@ -50,9 +55,9 @@ public:
   void Import(std::string url, std::string format = "");
 
 private:
+
   RdfUri m_BaseUri;
 
-  typedef std::map<std::string, RdfUri> PrefixMap;
   PrefixMap m_Prefixes;
 
   librdf_model* m_Model;

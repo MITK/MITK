@@ -31,7 +31,7 @@ public:
 
   virtual ~RdfUri();
 
-  std::string ToString();
+  std::string ToString() const;
 
   bool operator==(const RdfUri &u) const;
   bool operator!=(const RdfUri &u) const;

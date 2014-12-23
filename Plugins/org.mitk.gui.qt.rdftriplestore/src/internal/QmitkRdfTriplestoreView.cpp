@@ -28,6 +28,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MitkRdf
 #include <mitkRdfStore.h>
 
+// NodePredicateNot
+//#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateProperty.h>
+//#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+
+// GDCM
+#include <gdcmUUIDGenerator.h>
+
 const std::string QmitkRdfTriplestoreView::VIEW_ID = "org.mitk.views.rdftriplestore";
 
 typedef mitk::RdfStore Store;
@@ -44,21 +53,27 @@ void QmitkRdfTriplestoreView::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-  connect( m_Controls.buttonPerformGenerate, SIGNAL(clicked()), this, SLOT(GenerateRdfFile()) );
-  connect( m_Controls.buttonPerformImport, SIGNAL(clicked()), this, SLOT(ImportRdfFile()) );
 
   m_Controls.lineEditDataNode->setEnabled( false );
   m_Controls.comboBoxProperty->setAutoCompletionCaseSensitivity(Qt::CaseInsensitive);
   m_Controls.comboBoxProperty->setAutoCompletion(true);
   m_Controls.comboBoxProperty->setEditable(false);
 
-  QStringList s;
-  s << "";
-  s << "hasA";
-  m_Controls.comboBoxProperty->addItems(s);
+  //QStringList s;
+  //s << "";
+  //s << "hasA";
+  //m_Controls.comboBoxProperty->addItems(s);
   m_Controls.comboBoxProperty->addItem("title");
   m_Controls.comboBoxProperty->addItem("source");
   m_Controls.comboBoxProperty->addItem("format");
+
+  // Set up the Triplestore
+  m_Store.SetBaseUri(Uri("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf"));
+  m_Store.Import("file:D:/home/knorr/builds/tripleStore/Ontologies/dcterms.ttl");
+
+  connect( m_Controls.buttonPerformGenerate, SIGNAL(clicked()), this, SLOT(GenerateRdfFile()) );
+  connect( m_Controls.buttonPerformImport, SIGNAL(clicked()), this, SLOT(ImportRdfFile()) );
+  connect( m_Controls.buttonDataStorageToTriples, SIGNAL(clicked()), this, SLOT(DataStorageToTriples()) );
 }
 
 void QmitkRdfTriplestoreView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
@@ -74,11 +89,12 @@ void QmitkRdfTriplestoreView::OnSelectionChanged( berry::IWorkbenchPart::Pointer
       m_Controls.lineEditDataNode->setText(QString(node->GetName().c_str()));
       //m_Controls.lineEditProperty->setText(QString(node->GetProperty("path")->GetValueAsString().c_str()));
 
-      for( mitk::PropertyList::PropertyMap::const_iterator i = node->GetPropertyList()->GetMap()->begin();
-        i != node->GetPropertyList()->GetMap()->end(); i++ )
+      for( mitk::PropertyList::PropertyMap::const_iterator i = node->GetData()->GetPropertyList()->GetMap()->begin();
+        i != node->GetData()->GetPropertyList()->GetMap()->end(); i++ )
       {
         //MITK_INFO << i->first << " " << i->second->GetValueAsString();
       }
+
       return;
     }
   }
@@ -98,26 +114,46 @@ void QmitkRdfTriplestoreView::GenerateRdfFile()
 
   store.SetBaseUri(baseUri);
   store.Import("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf");
+  store.AddPrefix("bomrdf", Uri("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf"));
+  store.AddPrefix("sfm", Uri("file:C:/Users/knorr/Desktop/storeFromMitk.rdf"));
 
   // Create some nodes
-  mitk::RdfNode project1(mitk::RdfUri("Project1"));
-  mitk::RdfNode subject1(mitk::RdfUri("Subject1"));
+  mitk::RdfNode project1(mitk::RdfUri("sfm:Project1"));
+  mitk::RdfNode subject1(mitk::RdfUri("sfm:Subject1"));
+  mitk::RdfNode proj(mitk::RdfUri("bomrdf:Project"));
+  mitk::RdfNode subj(mitk::RdfUri("bomrdf:Subject"));
 
   // Create some predicate(/property) nodes
-  mitk::RdfNode hasA(mitk::RdfUri("hasA"));
-  mitk::RdfNode name(mitk::RdfUri("name"));
+  mitk::RdfNode hasA(mitk::RdfUri("bomrdf:has"));
+  mitk::RdfNode name(mitk::RdfUri("bomrdf:name"));
+  mitk::RdfNode a(mitk::RdfUri("rdf:type"));
 
   // Create some triples
+
   mitk::RdfTriple t1(project1, hasA, subject1);
-  mitk::RdfTriple t2(project1, name, mitk::RdfNode("MyProject"));
+  mitk::RdfTriple t2(project1, name, "MyProject");
+  Triple t3(project1, a, proj);
+  Triple t4(subject1, a, subj);
+  Triple t5(subject1, name, "MySubject");
 
   // Add triples to store
   store.Add(t1);
-  store.Add(t1);
+  store.Add(t3);
   store.Add(t2);
+  store.Add(t4);
+  store.Add(t5);
 
   // Save the store in a local path
   store.Save("C:/Users/knorr/Desktop/storeFromMitk.rdf");
+
+  //std::string query = "SELECT ?x WHERE {?x bomrdf:name [] .}";
+
+  //Store::ResultMap map = store.Query(query);
+  //for (Store::ResultMap::const_iterator i = map.begin(); i != map.end(); i++)
+  //{
+  //  MITK_INFO << i->first << " " << i->second.value << " " << i->second.type << " " << i->second.datatype;
+  //}
+
   store.CleanUp();
 }
 
@@ -126,9 +162,76 @@ void QmitkRdfTriplestoreView::ImportRdfFile()
   Store store;
   //store.SetBaseUri(Uri("http://mitk.org/wiki/MITK"));
   store.Import("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf");
-  store.Import("file:C:/Users/knorr/Desktop/BaseOntologyMITK.owl");
-  //store.Import("http://dublincore.org/documents/2012/06/14/dcmi-terms/?v=elements#");
-
+  //store.Import("http://dublincore.org/documents/2012/06/14/dcmi-terms/?v=elements");
+  //store.AddPrefix("bomowl", Uri("file:C:/Users/knorr/Desktop/BaseOntologyMitk.owl#"));
 
   store.Save("C:/Users/knorr/Desktop/storeFromMitkWithDC.rdf");
+
+  //std::string query = "SELECT ?x FROM <file:C:/Users/knorr/Desktop/storeFromMitkWithDC.rdf> WHERE {?x dc:title ?title .}";
+
+  //Store::ResultMap map = store.Query(query);
+  //for (Store::ResultMap::const_iterator i = map.begin(); i != map.end(); i++)
+  //{
+  //  MITK_INFO << i->first << " " << i->second.value << " " << i->second.type << " " << i->second.datatype;
+  //}
+}
+
+void QmitkRdfTriplestoreView::DataStorageToTriples()
+{
+  gdcm::UUIDGenerator generator;
+
+  // Take all BaseData nodes but dont take helper objects
+  mitk::NodePredicateNot::Pointer isNotHelperObject =
+    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"));
+  //mitk::TNodePredicateDataType<mitk::BaseData>::Pointer isBaseData =
+  //  mitk::TNodePredicateDataType<mitk::BaseData>::New();
+  //mitk::NodePredicateAnd::Pointer isNotHelperButBaseData =
+  //  mitk::NodePredicateAnd::New( isBaseData, isNotHelperObject );
+
+  mitk::DataStorage::SetOfObjects::ConstPointer nodeContainer = GetDataStorage()->GetSubset(isNotHelperObject);
+
+  for( mitk::DataStorage::SetOfObjects::ConstIterator iter = nodeContainer->Begin();
+    iter != nodeContainer->End(); iter++ )
+  {
+    const mitk::DataNode::Pointer node = iter->Value();
+
+    if (!node->GetData()) continue;
+
+    std::string name = node->GetProperty("name")->GetValueAsString();
+
+    //const mitk::PropertyList::PropertyMap* map = node->GetData()->GetPropertyList()->GetMap();
+    //for (mitk::PropertyList::PropertyMap::const_iterator i = map->begin(); i != map->end(); i++)
+    //{
+    //  MITK_INFO << i->first << " " << i->second;
+    //}
+
+    // Get the parent of a DataNode
+    mitk::DataStorage::SetOfObjects::ConstPointer sourceContainer = GetDataStorage()->GetSources(iter->Value(), isNotHelperObject);
+
+    for( mitk::DataStorage::SetOfObjects::ConstIterator sources = nodeContainer->Begin();
+      sources != nodeContainer->End(); sources++ )
+    {
+      const mitk::DataNode::Pointer sourceNode = sources->Value();
+
+      if ( sourceNode == node || sourceNode->GetData() ) continue;
+
+      // TODO add to triplestore
+    }
+    /*
+    std::string first, second;
+    first = ":" + iter.Value()->GetName();
+    first.append(generator.Generate());
+    second = ":" + GetDataStorage()->GetSources(iter->Value())->at(0)->GetData()->GetProperty("name")->GetValueAsString();
+    second.append(generator.Generate());
+
+    Node sub(Uri((std::string)first));
+    Node pred(Uri("dcterms:source"));
+    Node obj(Uri((std::string)second));
+
+    // TODO: Generate a UUID and add it to objects with UUID Generator of MITK in the following
+
+    Triple t(sub, pred, obj);
+    m_Store.Add(t);
+    std::cout << t;*/
+  }
 }

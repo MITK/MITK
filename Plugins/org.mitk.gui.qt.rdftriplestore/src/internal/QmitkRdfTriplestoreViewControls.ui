@@ -26,14 +26,21 @@
       <string>Do image processing</string>
      </property>
      <property name="text">
-      <string>Generate Rdf File</string>
+      <string>Generate Test Rdf File</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QPushButton" name="buttonPerformImport">
      <property name="text">
-      <string>Import Generated Rdf File</string>
+      <string>Import Generated Test Rdf File</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="buttonDataStorageToTriples">
+     <property name="text">
+      <string>DataStorage To Triplestore</string>
      </property>
     </widget>
    </item>

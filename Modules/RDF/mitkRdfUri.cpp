@@ -19,34 +19,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 
 namespace mitk {
+  RdfUri::RdfUri()
+  {
+  }
 
-RdfUri::RdfUri()
-{
-}
+  RdfUri::RdfUri(std::string uri)
+    : m_Uri(uri)
+  {
+  }
 
-RdfUri::RdfUri(std::string uri)
-  : m_Uri(uri)
-{
-}
+  RdfUri::~RdfUri()
+  {
+  }
 
-RdfUri::~RdfUri()
-{
-}
+  std::string RdfUri::ToString() const
+  {
+    return m_Uri;
+  }
 
-std::string RdfUri::ToString()
-{
-  return m_Uri;
-}
+  bool RdfUri::operator==(const RdfUri &u) const
+  {
+    if (this->m_Uri.compare(u.m_Uri) != 0) return false;
+    return true;
+  }
 
-bool RdfUri::operator==(const RdfUri &u) const
-{
-  if (this->m_Uri.compare(u.m_Uri) != 0) return false;
-  return true;
-}
-
-bool RdfUri::operator!=(const RdfUri &u) const
-{
-  return !operator==(u);
-}
-
+  bool RdfUri::operator!=(const RdfUri &u) const
+  {
+    return !operator==(u);
+  }
 } // end of namespace mitk

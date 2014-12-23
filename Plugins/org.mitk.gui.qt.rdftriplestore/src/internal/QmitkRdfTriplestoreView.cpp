@@ -25,13 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <qcompleter.h>
 
-// MitkRdf
+// Mitk
 #include <mitkRdfStore.h>
-
-// NodePredicateNot
-//#include <mitkNodePredicateDataType.h>
+#include <mitkStringProperty.h>
 #include <mitkNodePredicateProperty.h>
-//#include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
 
 // GDCM
@@ -161,8 +158,8 @@ void QmitkRdfTriplestoreView::ImportRdfFile()
 {
   Store store;
   //store.SetBaseUri(Uri("http://mitk.org/wiki/MITK"));
-  store.Import("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf");
-  //store.Import("http://dublincore.org/documents/2012/06/14/dcmi-terms/?v=elements");
+  store.Import("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf#");
+  store.Import("file:///D:/home/knorr/builds/tripleStore/Ontologies/dcterms.ttl");
   //store.AddPrefix("bomowl", Uri("file:C:/Users/knorr/Desktop/BaseOntologyMitk.owl#"));
 
   store.Save("C:/Users/knorr/Desktop/storeFromMitkWithDC.rdf");
@@ -198,6 +195,8 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
     if (!node->GetData()) continue;
 
     std::string name = node->GetProperty("name")->GetValueAsString();
+    std::string nodeUUID = generator.Generate();
+    node->SetProperty("uuid", mitk::StringProperty::New(nodeUUID));
 
     //const mitk::PropertyList::PropertyMap* map = node->GetData()->GetPropertyList()->GetMap();
     //for (mitk::PropertyList::PropertyMap::const_iterator i = map->begin(); i != map->end(); i++)
@@ -206,32 +205,28 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
     //}
 
     // Get the parent of a DataNode
-    mitk::DataStorage::SetOfObjects::ConstPointer sourceContainer = GetDataStorage()->GetSources(iter->Value(), isNotHelperObject);
+    mitk::DataStorage::SetOfObjects::ConstPointer sourceContainer = GetDataStorage()->GetSources(node);
 
     for( mitk::DataStorage::SetOfObjects::ConstIterator sources = nodeContainer->Begin();
       sources != nodeContainer->End(); sources++ )
     {
       const mitk::DataNode::Pointer sourceNode = sources->Value();
 
-      if ( sourceNode == node || sourceNode->GetData() ) continue;
+      std::string sourceName = sourceNode->GetProperty("name")->GetValueAsString();
+      std::string sourceUUID = generator.Generate();
+      sourceNode->SetProperty("uuid", mitk::StringProperty::New(sourceUUID));
 
-      // TODO add to triplestore
+      Uri first(":" + nodeUUID);
+      Uri second(":" + sourceUUID);
+
+      Node sub(first);
+      Node pred(Uri("dcterms:source"));
+      Node obj(second);
+
+      Triple t(sub, pred, obj);
+
+      m_Store.Add(t);
+      std::cout << t;
     }
-    /*
-    std::string first, second;
-    first = ":" + iter.Value()->GetName();
-    first.append(generator.Generate());
-    second = ":" + GetDataStorage()->GetSources(iter->Value())->at(0)->GetData()->GetProperty("name")->GetValueAsString();
-    second.append(generator.Generate());
-
-    Node sub(Uri((std::string)first));
-    Node pred(Uri("dcterms:source"));
-    Node obj(Uri((std::string)second));
-
-    // TODO: Generate a UUID and add it to objects with UUID Generator of MITK in the following
-
-    Triple t(sub, pred, obj);
-    m_Store.Add(t);
-    std::cout << t;*/
   }
 }

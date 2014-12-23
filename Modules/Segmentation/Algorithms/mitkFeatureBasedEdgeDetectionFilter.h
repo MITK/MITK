@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkFeatureBasedEdgeDetectionFilter_h_Included
 #define mitkFeatureBasedEdgeDetectionFilter_h_Included
 
-#include <MitkSurfaceInterpolationExports.h>
+#include <MitkSegmentationExports.h>
 #include <mitkImageToUnstructuredGridFilter.h>
 #include <mitkUnstructuredGrid.h>
 
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkSurfaceInterpolation_EXPORT FeatureBasedEdgeDetectionFilter:
+class MitkSegmentation_EXPORT FeatureBasedEdgeDetectionFilter:
     public ImageToUnstructuredGridFilter
 {
 

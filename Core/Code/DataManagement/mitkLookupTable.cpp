@@ -491,8 +491,8 @@ void mitk::LookupTable::BuildPET20LookupTable()
 void mitk::LookupTable::BuildMultiLabelLookupTable()
 {
   vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-  lut->SetNumberOfTableValues (256);
-  lut->SetTableRange ( 0, 255 );
+  lut->SetNumberOfTableValues (65536);
+  lut->SetTableRange ( 0, 65536 );
   lut->SetTableValue (0, 0.0, 0.0, 0.0, 0.0); // background
 
   lut->SetTableValue (1, 1.0, 1.0, 0.0, 0.4);
@@ -522,7 +522,7 @@ void mitk::LookupTable::BuildMultiLabelLookupTable()
   lut->SetTableValue (24, 0.76, 0.3, 0.4, 0.4);
   lut->SetTableValue (25, 1.0, 0.3, 0.4, 0.4);
 
-  for (int i = 26; i < 256; i++)
+  for (int i = 26; i < 65536; i++)
   {
     if (i%12 == 0)
       lut->SetTableValue (i, 1.0, 0.0, 0.0, 0.4);

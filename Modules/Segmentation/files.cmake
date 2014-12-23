@@ -19,7 +19,6 @@ set(CPP_FILES
   Algorithms/mitkOverwriteDirectedPlaneImageFilter.cpp
   Algorithms/mitkOverwriteSliceImageFilter.cpp
   Algorithms/mitkSegmentationObjectFactory.cpp
-  Algorithms/mitkSegmentationSink.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp

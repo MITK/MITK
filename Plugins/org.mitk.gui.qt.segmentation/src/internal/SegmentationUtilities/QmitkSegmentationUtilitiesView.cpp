@@ -24,6 +24,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SurfaceToImage/QmitkSurfaceToImageWidget.h"
 #include "CTKWidgets/QmitkCTKWidgetsWidget.h"
 
+static QString const TR_BOOLEAN_OPERATIONS = QWidget::tr("Boolean Operations"); 
+static QString const TR_IMAGE_MASKING = QWidget::tr("Image Masking"); 
+static QString const TR_MORPHOLOGICAL_OPERATIONS = QWidget::tr("Morphological Operations"); 
+static QString const TR_SURFACE_TO_IMAGE = QWidget::tr("Surface To Image"); 
+static QString const TR_COUNTOUR_TO_IMAGE = QWidget::tr("Contour To Image");
+
 QmitkSegmentationUtilitiesView::QmitkSegmentationUtilitiesView()
   : m_BooleanOperationsWidget(nullptr),
     m_ContourModelToImageWidget(nullptr),
@@ -54,11 +60,11 @@ void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
   m_MorphologicalOperationsWidget = new QmitkMorphologicalOperationsWidget(timeNavigationController, parent);
   m_SurfaceToImageWidget = new QmitkSurfaceToImageWidget(timeNavigationController, parent);
 
-  this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
-  this->AddUtilityWidget(m_ContourModelToImageWidget, QIcon(":/SegmentationUtilities/ContourModelSetToImage_48x48.png"), "Contour To Image");
-  this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/SegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
-  this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/SegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
-  this->AddUtilityWidget(m_SurfaceToImageWidget, QIcon(":/SegmentationUtilities/SurfaceToImage_48x48.png"), "Surface To Image");
+  this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), TR_BOOLEAN_OPERATIONS);
+  this->AddUtilityWidget(m_ContourModelToImageWidget, QIcon(":/SegmentationUtilities/ContourModelSetToImage_48x48.png"), TR_COUNTOUR_TO_IMAGE);
+  this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/SegmentationUtilities/ImageMasking_48x48.png"), TR_IMAGE_MASKING);
+  this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/SegmentationUtilities/MorphologicalOperations_48x48.png"), TR_MORPHOLOGICAL_OPERATIONS);
+  this->AddUtilityWidget(m_SurfaceToImageWidget, QIcon(":/SegmentationUtilities/SurfaceToImage_48x48.png"), TR_SURFACE_TO_IMAGE);
 
 #ifdef ENABLE_CTK_WIDGETS_WIDGET
   m_CTKWidgetsWidget = new QmitkCTKWidgetsWidget(timeNavigationController, parent);

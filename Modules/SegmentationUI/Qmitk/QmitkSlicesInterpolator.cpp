@@ -52,6 +52,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 
+const QString QmitkSlicesInterpolator::TR_INTERPOLATION = QGroupBox::tr("Interpolation");
+const QString QmitkSlicesInterpolator::TR_DISABLED = QGroupBox::tr("Disabled");
+const QString QmitkSlicesInterpolator::TR_2D = QGroupBox::tr("2-Dimensional");
+const QString QmitkSlicesInterpolator::TR_3D = QGroupBox::tr("3-Dimensional");
+const QString QmitkSlicesInterpolator::TR_CONFIRM_SINGLE = QPushButton::tr("Confirm for single slice");
+const QString QmitkSlicesInterpolator::TR_CONFIRM_ALL = QPushButton::tr("Confirm for all slices");
+const QString QmitkSlicesInterpolator::TR_CONFIRM = QPushButton::tr("Confirm");
+const QString QmitkSlicesInterpolator::TR_SHOW_POSITION_NODE = QCheckBox::tr("Show Position Nodes");
+const QString QmitkSlicesInterpolator::TR_INTERPOLATION_ENB = QGroupBox::tr("Interpolation (Enabled)");
+const QString QmitkSlicesInterpolator::TR_INTERPOLATION_PROC = QMessageBox::tr("Interpolation Process");
+const QString QmitkSlicesInterpolator::TR_INTERPOLATION_ERROR = QMessageBox::tr("An error occurred during interpolation. Possible cause: Not enough memory!");
+const QString QmitkSlicesInterpolator::TR_INTERPOLATION_SLOW = QMessageBox::tr("Due to short handed system memory the 3D interpolation may be very slow!");
+const QString QmitkSlicesInterpolator::TR_INTERPOLATION_SURE = QMessageBox::tr("Are you sure you want to activate the 3D interpolation?");
+const QString QmitkSlicesInterpolator::TR_INTERPOLATION_3D_PROC = QMessageBox::tr("3D Interpolation Process");
+const QString QmitkSlicesInterpolator::TR_INTERPOLATION_3D_SUPPORT = QMessageBox::tr("3D Interpolation is only supported for 3D images at the moment!");
+const QString QmitkSlicesInterpolator::TR_INTERPOLATION_REINIT = QMessageBox::tr("Reinit Interpolation");
+
 //#define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
 float SURFACE_COLOR_RGB [3] = {0.49f, 1.0f, 0.16f};
@@ -80,31 +97,32 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
     m_2DInterpolationEnabled(false),
     m_3DInterpolationEnabled(false)
 {
-  m_GroupBoxEnableExclusiveInterpolationMode = new QGroupBox("Interpolation", this);
+  m_GroupBoxEnableExclusiveInterpolationMode = new QGroupBox(TR_INTERPOLATION, this);
 
 
 
   QVBoxLayout* vboxLayout = new QVBoxLayout(m_GroupBoxEnableExclusiveInterpolationMode);
 
   m_CmbInterpolation = new QComboBox(m_GroupBoxEnableExclusiveInterpolationMode);
-  m_CmbInterpolation->addItem("Disabled");
-  m_CmbInterpolation->addItem("2-Dimensional");
-  m_CmbInterpolation->addItem("3-Dimensional");
+  m_CmbInterpolation->addItem(TR_DISABLED);
+  m_CmbInterpolation->addItem(TR_2D);
+  m_CmbInterpolation->addItem(TR_3D);
   vboxLayout->addWidget(m_CmbInterpolation);
 
-  m_BtnApply2D = new QPushButton("Confirm for single slice", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnApply2D = new QPushButton(TR_CONFIRM_SINGLE, m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply2D);
 
-  m_BtnApplyForAllSlices2D = new QPushButton("Confirm for all slices", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnApplyForAllSlices2D = new QPushButton(TR_CONFIRM_ALL, m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApplyForAllSlices2D);
 
-  m_BtnApply3D = new QPushButton("Confirm", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnApply3D = new QPushButton(TR_CONFIRM, m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply3D);
 
-  m_BtnReinit3DInterpolation = new QPushButton("Reinit Interpolation", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnReinit3DInterpolation = new QPushButton(TR_INTERPOLATION_REINIT, m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnReinit3DInterpolation);
 
-  m_ChkShowPositionNodes = new QCheckBox("Show Position Nodes", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_ChkShowPositionNodes = new QCheckBox(TR_SHOW_POSITION_NODE, m_GroupBoxEnableExclusiveInterpolationMode);
+
   vboxLayout->addWidget(m_ChkShowPositionNodes);
 
 
@@ -368,7 +386,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
   switch(index)
   {
     case 0: // Disabled
-      m_GroupBoxEnableExclusiveInterpolationMode->setTitle("Interpolation");
+      m_GroupBoxEnableExclusiveInterpolationMode->setTitle(TR_INTERPOLATION);
       this->HideAllInterpolationControls();
       this->OnInterpolationActivated(false);
       this->On3DInterpolationActivated(false);
@@ -377,7 +395,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       break;
 
     case 1: // 2D
-      m_GroupBoxEnableExclusiveInterpolationMode->setTitle("Interpolation (Enabled)");
+      m_GroupBoxEnableExclusiveInterpolationMode->setTitle(TR_INTERPOLATION_ENB);
       this->HideAllInterpolationControls();
       this->Show2DInterpolationControls(true);
       this->OnInterpolationActivated(true);
@@ -386,7 +404,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       break;
 
     case 2: // 3D
-      m_GroupBoxEnableExclusiveInterpolationMode->setTitle("Interpolation (Enabled)");
+      m_GroupBoxEnableExclusiveInterpolationMode->setTitle(TR_INTERPOLATION_ENB);
       this->HideAllInterpolationControls();
       this->Show3DInterpolationControls(true);
       this->OnInterpolationActivated(false);
@@ -842,9 +860,9 @@ void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction* action)
   {
     /* Showing message box with possible memory error */
     QMessageBox errorInfo;
-    errorInfo.setWindowTitle("Interpolation Process");
+    errorInfo.setWindowTitle(TR_INTERPOLATION_PROC);
     errorInfo.setIcon(QMessageBox::Critical);
-    errorInfo.setText("An error occurred during interpolation. Possible cause: Not enough memory!");
+    errorInfo.setText(TR_INTERPOLATION_ERROR);
     errorInfo.exec();
 
     //additional error message on std::cerr
@@ -974,8 +992,8 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
           if (m_SurfaceInterpolator->EstimatePortionOfNeededMemory() > 0.5)
           {
             QMessageBox msgBox;
-            msgBox.setText("Due to short handed system memory the 3D interpolation may be very slow!");
-            msgBox.setInformativeText("Are you sure you want to activate the 3D interpolation?");
+            msgBox.setText(TR_INTERPOLATION_SLOW);
+            msgBox.setInformativeText(TR_INTERPOLATION_SLOW);
             msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
             ret = msgBox.exec();
           }
@@ -1157,9 +1175,9 @@ void QmitkSlicesInterpolator::CheckSupportedImageDimension()
   /*if (m_3DInterpolationEnabled && m_Segmentation && m_Segmentation->GetDimension() != 3)
   {
     QMessageBox info;
-    info.setWindowTitle("3D Interpolation Process");
+    info.setWindowTitle(TR_INTERPOLATION_3D_PROC);
     info.setIcon(QMessageBox::Information);
-    info.setText("3D Interpolation is only supported for 3D images at the moment!");
+    info.setText(TR_INTERPOLATION_3D_SUPPORT);
     info.exec();
     m_CmbInterpolation->setCurrentIndex(0);
   }*/

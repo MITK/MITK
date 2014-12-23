@@ -28,6 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringListModel>
 #include <QAbstractItemModel>
 
+const QString QmitkNewSegmentationDialog::TR_NAME_AND_COLOR = QLabel::tr("Name and color of the segmentation");
+const QString QmitkNewSegmentationDialog::TR_OK = QPushButton::tr("OK");
+const QString QmitkNewSegmentationDialog::TR_CANCEL = QPushButton::tr("Cancel");
+
 QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
 :QDialog(parent), // true, modal
  selectedOrgan("undefined"),
@@ -42,7 +46,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   mitk::OrganTypeProperty::Pointer organTypes = mitk::OrganTypeProperty::New();
 
   // to enter a name for the segmentation
-  lblPrompt = new QLabel( "Name and color of the segmentation", this );
+  lblPrompt = new QLabel(TR_NAME_AND_COLOR, this );
   verticalLayout->addWidget( lblPrompt );
 
   // to choose a color
@@ -70,11 +74,11 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
 
 
   //buttons for closing the dialog
-  btnOk = new QPushButton( tr("Ok"), this );
+  btnOk = new QPushButton(TR_OK, this );
   btnOk->setDefault(true);
   connect( btnOk, SIGNAL(clicked()), this, SLOT(onAcceptClicked()) );
 
-  QPushButton* btnCancel = new QPushButton( tr("Cancel"), this );
+  QPushButton* btnCancel = new QPushButton(TR_CANCEL, this );
   connect( btnCancel, SIGNAL(clicked()), this, SLOT(reject()) );
 
   QBoxLayout * horizontalLayout = new QHBoxLayout();

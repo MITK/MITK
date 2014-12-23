@@ -20,8 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSliceNavigationController.h>
 #include <cassert>
 #include <QMessageBox>
+#include <QWidget>
 
-static const char* const HelpText = "Select two different segmentations above";
+static QString const HelpText = QWidget::tr("Select two different segmentations above");
 
 std::string GetPrefix(mitk::BooleanOperation::Type type)
 {

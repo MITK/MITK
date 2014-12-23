@@ -28,7 +28,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <qmessagebox.h>
 
-static const char* const HelpText = "Select a regular image and a binary image";
+static QString const HelpText = QWidget::tr("Select a regular image and a binary image");
+static QString const TR_SELECT_IGM_SRF = QWidget::tr("Select a regular image and a surface");
+static QString const TR_SELECT_TWO_DIFF = QWidget::tr("Select two different images above");
+static QString const TR_DIF_IMG_SIZE = QWidget::tr("Different image sizes cannot be masked");
+static QString const TR_SELECT_REG_IMAGE_OR_BIN = QWidget::tr("Select a regular image and a binary image");
+
+static QString const TR_IMAGE_SURF_MASKING = QMessageBox::tr("Image and Surface Masking");
+static QString const TR_SELECTION_NOT_CONTAIN_IMG = QMessageBox::tr("Selection does not contain an image");
+static QString const TR_SELECTION_NOT_CONTAIN_BIN_IMG = QMessageBox::tr("Selection does not contain a binary image");
+static QString const TR_SELECTION_NOT_CONTAIN_SURFACE = QMessageBox::tr("Selection does not contain a surface");
+static QString const TR_MASKING_FAILED = QMessageBox::tr("Masking failed. For more information please see logging window.");
 
 QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
@@ -73,7 +83,7 @@ void QmitkImageMaskingWidget::OnSelectionChanged(unsigned int index, const mitk:
     }
     else
     {
-      dataSelectionWidget->SetHelpText("Select a regular image and a surface");
+      dataSelectionWidget->SetHelpText(TR_SELECT_IGM_SRF);
     }
     this->EnableButtons(false);
   }
@@ -93,7 +103,7 @@ void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::D
   {
     if( dataSelectionWidget->GetSelection(0) == dataSelectionWidget->GetSelection(1) )
     {
-      dataSelectionWidget->SetHelpText("Select two different images above");
+      dataSelectionWidget->SetHelpText(TR_SELECT_TWO_DIFF);
       this->EnableButtons(false);
       return;
     }
@@ -105,7 +115,7 @@ void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::D
 
       if( maskImage.IsNull() || referenceImage->GetLargestPossibleRegion().GetSize() != maskImage->GetLargestPossibleRegion().GetSize() )
       {
-        dataSelectionWidget->SetHelpText("Different image sizes cannot be masked");
+        dataSelectionWidget->SetHelpText(TR_DIF_IMG_SIZE);
         this->EnableButtons(false);
         return;
       }
@@ -131,7 +141,7 @@ void QmitkImageMaskingWidget::OnImageMaskingToggled(bool status)
 {
   if (status)
   {
-    m_Controls.dataSelectionWidget->SetHelpText("Select a regular image and a binary image");
+    m_Controls.dataSelectionWidget->SetHelpText(TR_SELECT_REG_IMAGE_OR_BIN);
     m_Controls.dataSelectionWidget->SetPredicate(1, QmitkDataSelectionWidget::SegmentationPredicate);
   }
 }
@@ -140,7 +150,7 @@ void QmitkImageMaskingWidget::OnSurfaceMaskingToggled(bool status)
 {
   if (status)
   {
-    m_Controls.dataSelectionWidget->SetHelpText("Select a regular image and a surface");
+    m_Controls.dataSelectionWidget->SetHelpText(TR_SELECT_IGM_SRF);
     m_Controls.dataSelectionWidget->SetPredicate(1, QmitkDataSelectionWidget::SurfacePredicate);
   }
 }
@@ -163,7 +173,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   if(referenceImage.IsNull() || maskingNode.IsNull() )
   {
     MITK_ERROR << "Selection does not contain an image";
-    QMessageBox::information( this, "Image and Surface Masking", "Selection does not contain an image", QMessageBox::Ok );
+    QMessageBox::information( this, TR_IMAGE_SURF_MASKING, TR_SELECTION_NOT_CONTAIN_IMG, QMessageBox::Ok );
     m_Controls.btnMaskImage->setEnabled(true);
     return;
   }
@@ -178,7 +188,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
     if(maskImage.IsNull() )
     {
       MITK_ERROR << "Selection does not contain a binary image";
-      QMessageBox::information( this, "Image and Surface Masking", "Selection does not contain a binary image", QMessageBox::Ok );
+      QMessageBox::information( this, TR_IMAGE_SURF_MASKING, TR_SELECTION_NOT_CONTAIN_BIN_IMG, QMessageBox::Ok );
       this->EnableButtons();
       return;
     }
@@ -203,7 +213,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
     if(surface.IsNull())
     {
       MITK_ERROR << "Selection does not contain a surface";
-      QMessageBox::information( this, "Image and Surface Masking", "Selection does not contain a surface", QMessageBox::Ok );
+      QMessageBox::information( this, TR_IMAGE_SURF_MASKING, TR_SELECTION_NOT_CONTAIN_SURFACE, QMessageBox::Ok );
       this->EnableButtons();
       return;
     }
@@ -223,7 +233,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   if( resultImage.IsNull() )
   {
     MITK_ERROR << "Masking failed";
-    QMessageBox::information( this, "Image and Surface Masking", "Masking failed. For more information please see logging window.", QMessageBox::Ok );
+    QMessageBox::information( this, TR_IMAGE_SURF_MASKING, TR_MASKING_FAILED, QMessageBox::Ok );
     this->EnableButtons();
     mitk::ProgressBar::GetInstance()->Progress(4);
     return;

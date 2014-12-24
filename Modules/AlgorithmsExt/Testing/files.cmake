@@ -1,6 +1,7 @@
 set(MODULE_TESTS
   mitkAutoCropImageFilterTest.cpp
   mitkBoundingObjectCutterTest.cpp
+  mitkPlaneFitTest.cpp
   mitkSimpleHistogramTest.cpp
 )
 

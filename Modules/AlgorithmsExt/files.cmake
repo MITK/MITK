@@ -3,6 +3,7 @@ set(CPP_FILES
   mitkBoundingObjectCutter.cpp
   mitkBoundingObjectToSegmentationFilter.cpp
   mitkGeometryClipImageFilter.cpp
+  mitkGeometryDataSource.cpp
   mitkHeightFieldSurfaceClipImageFilter.cpp
   mitkLabeledImageToSurfaceFilter.cpp
   mitkMaskAndCutRoiImageFilter.cpp
@@ -10,6 +11,7 @@ set(CPP_FILES
   mitkMovieGenerator.cpp
   mitkNonBlockingAlgorithm.cpp
   mitkPadImageFilter.cpp
+  mitkPlaneFit.cpp
   mitkPlaneLandmarkProjector.cpp
   mitkPointLocator.cpp
   mitkSimpleHistogram.cpp

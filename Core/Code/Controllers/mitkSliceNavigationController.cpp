@@ -63,6 +63,7 @@ SliceNavigationController::SliceNavigationController( const char *type )
   m_FrontSide( false ),
   m_Rotated( false ),
   m_BlockUpdate( false ),
+  m_BlockSignals( false ),
   m_SliceLocked( false ),
   m_SliceRotationLocked( false ),
   m_OldPos(0)
@@ -219,6 +220,7 @@ SliceNavigationController::Update(
   }
 
   m_BlockUpdate = true;
+  bool signalsWereBlocked = this->BlockSignals(true);
 
   if ( m_InputWorldTimeGeometry.IsNotNull() &&
     m_LastUpdateTime < m_InputWorldTimeGeometry->GetMTime() )
@@ -326,14 +328,11 @@ SliceNavigationController::Update(
     }
     else
     {
-      m_BlockUpdate = true;
       m_Time->SetSteps( worldTimeGeometry->CountTimeSteps() );
       m_Time->SetPos( 0 );
 
       const TimeBounds &timeBounds = worldTimeGeometry->GetTimeBounds();
       m_Time->SetRange( timeBounds[0], timeBounds[1] );
-
-      m_BlockUpdate = false;
 
       assert( worldTimeGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() ).IsNotNull() );
 
@@ -351,6 +350,7 @@ SliceNavigationController::Update(
   // unblock update; we may do this now, because if m_BlockUpdate was already
   // true before this method was entered, then we will never come here.
   m_BlockUpdate = false;
+  this->BlockSignals(signalsWereBlocked);
 
   // Send the geometry. Do this even if nothing was changed, because maybe
   // Update() was only called to re-send the old geometry and time/slice data.
@@ -367,7 +367,7 @@ SliceNavigationController::SendCreatedWorldGeometry()
 {
   // Send the geometry. Do this even if nothing was changed, because maybe
   // Update() was only called to re-send the old geometry.
-  if ( !m_BlockUpdate )
+  if ( !m_BlockSignals )
   {
     this->InvokeEvent( GeometrySendEvent(m_CreatedWorldGeometry, 0) );
   }
@@ -376,7 +376,7 @@ SliceNavigationController::SendCreatedWorldGeometry()
 void
 SliceNavigationController::SendCreatedWorldGeometryUpdate()
 {
-  if ( !m_BlockUpdate )
+  if ( !m_BlockSignals )
   {
     this->InvokeEvent(
       GeometryUpdateEvent(m_CreatedWorldGeometry, m_Slice->GetPos()) );
@@ -386,7 +386,7 @@ SliceNavigationController::SendCreatedWorldGeometryUpdate()
 void
 SliceNavigationController::SendSlice()
 {
-  if ( !m_BlockUpdate )
+  if ( !m_BlockSignals )
   {
     if ( m_CreatedWorldGeometry.IsNotNull() )
     {
@@ -405,7 +405,7 @@ SliceNavigationController::SendSlice()
 void
 SliceNavigationController::SendTime()
 {
-  if ( !m_BlockUpdate )
+  if ( !m_BlockSignals )
   {
     if ( m_CreatedWorldGeometry.IsNotNull() )
     {
@@ -637,6 +637,15 @@ SliceNavigationController::AdjustSliceStepperRange()
   {
     m_Slice->InvalidateRange();
   }
+}
+
+
+bool
+SliceNavigationController::BlockSignals(bool blocked)
+{
+  bool wereBlocked = m_BlockSignals;
+  m_BlockSignals = blocked;
+  return wereBlocked;
 }
 
 

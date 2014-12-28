@@ -83,14 +83,14 @@ function(mitkFunctionFindWhitelists)
 
   file(GLOB internalWhitelistFiles "${${ARGV0}_WHITELISTS_INTERNAL_PATH}/*.cmake")
 
-  foreach(whitelistFile "${internalWhitelistFiles}")
+  foreach(whitelistFile ${internalWhitelistFiles})
     get_filename_component(whitelistFile "${whitelistFile}" NAME_WE)
     list(APPEND whitelists "${whitelistFile}")
   endforeach()
 
   file(GLOB externalWhitelistFiles "${${ARGV0}_WHITELISTS_EXTERNAL_PATH}/*.cmake")
 
-  foreach(whitelistFile "${externalWhitelistFiles}")
+  foreach(whitelistFile ${externalWhitelistFiles})
     get_filename_component(whitelistFile "${whitelistFile}" NAME_WE)
     list(APPEND whitelists "${whitelistFile} (external)")
   endforeach()

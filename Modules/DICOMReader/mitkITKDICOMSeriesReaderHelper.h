@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkGDCMImageIO.h>
 
-#include <Poco/DateTime.h>
+#include <ofdatime.h>
 
 namespace mitk
 {
@@ -42,7 +42,7 @@ class ITKDICOMSeriesReaderHelper
   private:
 
     typedef std::vector<TimeBounds> TimeBoundsList;
-    typedef itk::FixedArray<Poco::DateTime,2>  DateTimeBounds;
+    typedef itk::FixedArray<OFDateTime,2>  DateTimeBounds;
 
     /** Scans the given files for the acquisition time and returns the lowest and
      highest acquisition time as time bounds via bounds. If no acquisition times can be found

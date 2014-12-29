@@ -16,13 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#define MBILOG_ENABLE_DEBUG
 
+#include <dcvrdt.h>
+
+#define BOOST_DATE_TIME_NO_LIB
+
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+
 #include "mitkITKDICOMSeriesReaderHelper.h"
 #include "mitkITKDICOMSeriesReaderHelper.txx"
 
 #include "mitkDICOMGDCMTagScanner.h"
 #include "mitkArbitraryTimeGeometry.h"
-
-#include <Poco/DateTimeParser.h>
 
 #define switch3DCase(IOType, T) \
   case IOType: return LoadDICOMByITK< T >(filenames, correctTilt, tiltInfo, io);
@@ -223,26 +227,67 @@ mitk::Image::Pointer
   return NULL;
 }
 
-bool ConvertDICOMDateTimeString(const std::string& dateString, const std::string& timeString, Poco::DateTime& time)
+bool ConvertDICOMDateTimeString(const std::string& dateString, const std::string& timeString, OFDateTime& time)
 {
-  std::string formatNoFract = "%H%M%S.%F";
-  std::string content = timeString;
+  OFString content(timeString.c_str());
 
   if (!dateString.empty())
   {
-    formatNoFract = "%Y%m%d" + formatNoFract;
-    content = dateString+timeString;
+    content = OFString(dateString.c_str()).append(content);
   }
 
-  std::string format = formatNoFract+".%F";
+  OFCondition result = DcmDateTime::getOFDateTimeFromString(content,time);
 
-  int zoneDiff;
-  bool result = Poco::DateTimeParser::tryParse(format, content, time, zoneDiff);
+  return result.good();
+}
 
-  if (!result)
+boost::posix_time::ptime ConvertOFDateTimeToPTime(const OFDateTime& time)
+{
+  boost::gregorian::date boostDate(time.getDate().getYear(),time.getDate().getMonth(),time.getDate().getDay());
+  boost::posix_time::time_duration boostTime = boost::posix_time::hours(time.getTime().getHour())
+                                              +boost::posix_time::minutes(time.getTime().getMinute())
+                                              +boost::posix_time::seconds(time.getTime().getSecond())
+                                              +boost::posix_time::milliseconds(time.getTime().getMilliSecond());
+
+  boost::posix_time::ptime result(boostDate,boostTime);
+
+  return result;
+}
+
+OFDateTime GetLowerDateTime(const OFDateTime& time1, const OFDateTime& time2)
+{
+  OFDateTime result = time1;
+
+  if ((time2.getDate()<time1.getDate()) ||
+      ((time2.getDate() == time1.getDate()) && (time2.getTime()<time1.getTime())))
   {
-    result = Poco::DateTimeParser::tryParse(formatNoFract, content, time, zoneDiff);
+    result = time2;
   }
+
+  return result;
+}
+
+OFDateTime GetUpperDateTime(const OFDateTime& time1, const OFDateTime& time2)
+{
+  OFDateTime result = time1;
+
+  if ((time2.getDate()>time1.getDate()) ||
+      ((time2.getDate() == time1.getDate()) && (time2.getTime()>time1.getTime())))
+  {
+    result = time2;
+  }
+
+  return result;
+}
+
+double ComputeMiliSecDuration(const OFDateTime& start, const OFDateTime& stop)
+{
+  boost::posix_time::ptime startTime = ConvertOFDateTimeToPTime(start);
+  boost::posix_time::ptime stopTime = ConvertOFDateTimeToPTime(stop);
+
+  ::boost::posix_time::time_duration duration = stopTime - startTime;
+
+  double result = duration.total_milliseconds();
 
   return result;
 }
@@ -260,29 +305,35 @@ bool
 
   DICOMGDCMImageFrameList frameList = filescanner->GetFrameInfoList();
 
-  std::set<Poco::DateTime> times;
+  bool result = false;
+  bool first = true;
 
   for (DICOMGDCMImageFrameList::const_iterator pos = frameList.begin(); pos != frameList.end(); ++pos)
   {
     std::string dateStr = (*pos)->GetTagValueAsString(acquisitionDateTag);
     std::string timeStr = (*pos)->GetTagValueAsString(acquisitionTimeTag);
 
-    Poco::DateTime time;
-    bool result = ConvertDICOMDateTimeString(dateStr, timeStr, time);
+    OFDateTime time;
+    bool convertResult = ConvertDICOMDateTimeString(dateStr, timeStr, time);
 
-    if (result)
+    if (convertResult)
     {
-      times.insert(time);
+      if (first)
+      {
+        bounds[0] = time;
+        bounds[1] = time;
+        first = false;
+      }
+      else
+      {
+        bounds[0] = GetLowerDateTime(bounds[0], time);
+        bounds[1] = GetUpperDateTime(bounds[1], time);
+      }
+      result = true;
     }
   }
 
-  if (!times.empty())
-  {
-    bounds[0] = *(times.begin());
-    bounds[1] = *(times.rbegin());
-  }
-
-  return !times.empty();
+  return result;
 };
 
 mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
@@ -290,7 +341,7 @@ mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
 {
   TimeBoundsList result;
 
-  Poco::DateTime baseLine;
+  OFDateTime baseLine;
   bool baseLineSet = false;
 
   for(StringContainerList::const_iterator pos = filenamesOfTimeSteps.begin(); pos!=filenamesOfTimeSteps.end(); ++pos)
@@ -306,11 +357,8 @@ mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
         baseLine = dateTimeBounds[0];
       }
 
-      Poco::Timespan lowerTS = dateTimeBounds[0] - baseLine;
-      Poco::Timespan upperTS = dateTimeBounds[1] - baseLine;
-
-      bounds[0] = lowerTS.totalMilliseconds();
-      bounds[1] = upperTS.totalMilliseconds();
+      bounds[0] = ComputeMiliSecDuration(baseLine, dateTimeBounds[0]);
+      bounds[1] = ComputeMiliSecDuration(baseLine, dateTimeBounds[1]);
     }
 
     result.push_back(bounds);

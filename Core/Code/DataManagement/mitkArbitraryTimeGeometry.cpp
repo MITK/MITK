@@ -169,6 +169,14 @@ void mitk::ArbitraryTimeGeometry::Expand(mitk::TimeStepType size)
   }
 }
 
+void mitk::ArbitraryTimeGeometry::ReplaceTimeStepGeometries(const Geometry3D* geometry)
+{
+    for (std::vector<Geometry3D::Pointer>::iterator pos = m_GeometryVector.begin(); pos != m_GeometryVector.end(); ++pos)
+    {
+      *pos = geometry->Clone();
+    }
+}
+
 void mitk::ArbitraryTimeGeometry::SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep)
 {
   assert(timeStep<m_GeometryVector.size());

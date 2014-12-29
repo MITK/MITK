@@ -169,6 +169,19 @@ namespace mitk {
     * Shrinking is not supported.
     */
     virtual void Expand(TimeStepType size);
+
+    /**
+    * \brief Replaces the geometry instances with clones ot the passed geometry.
+    *
+    * Replaces the geometries of all time steps with clones of the passed
+    * geometry. Replacment strategy depends on the implementation of TimeGeometry
+    * sub class.
+    * @remark The time points itself stays untouched. Use this method if you want
+    * to change the spatial properties of a TimeGeometry and preserve the time
+    * "grid".
+    */
+    virtual void ReplaceTimeStepGeometries(const Geometry3D* geometry);
+
     /**
     * \brief Sets the geometry for the given time step
     *

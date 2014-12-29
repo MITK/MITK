@@ -167,6 +167,18 @@ namespace mitk {
     virtual void SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep);
 
     /**
+    * \brief Replaces the geometry instances with clones ot the passed geometry.
+    *
+    * Replaces the geometries of all time steps with clones of the passed
+    * geometry. Replacment strategy depends on the implementation of TimeGeometry
+    * sub class.
+    * @remark The time points itself stays untouched. Use this method if you want
+    * to change the spatial properties of a TimeGeometry and preserve the time
+    * "grid".
+    */
+    virtual void ReplaceTimeStepGeometries(const Geometry3D* geometry);
+
+    /**
     * \brief Makes a deep copy of the current object
     */
     virtual itk::LightObject::Pointer InternalClone () const;
@@ -186,7 +198,7 @@ namespace mitk {
     *
     * Saves a copy for each time step.
     */
-    void Initialize (Geometry3D* geometry, TimeStepType timeSteps);
+    void Initialize (const Geometry3D* geometry, TimeStepType timeSteps);
     /**
     * \brief Initialize the TimeGeometry with empty Geometry3D
     */

@@ -34,6 +34,7 @@ public:
   mitk::Geometry3D::Pointer m_Geometry4;
   mitk::Geometry3D::Pointer m_Geometry5;
   mitk::Geometry3D::Pointer m_InvalidGeometry;
+  mitk::Geometry3D::Pointer m_NewGeometry;
 
   mitk::ArbitraryTimeGeometry::Pointer m_emptyTimeGeometry;
   mitk::ArbitraryTimeGeometry::Pointer m_initTimeGeometry;
@@ -59,6 +60,10 @@ public:
     m_Geometry3_5 = GenerateGeometry3D(3.5,3.9);
     m_Geometry4 = GenerateGeometry3D(4,4.9);
     m_Geometry5 = GenerateGeometry3D(5,5.9);
+
+    m_NewGeometry = GenerateGeometry3D(20,21.9);
+    mitk::Point3D origin(42);
+    m_NewGeometry->SetOrigin(origin);
 
     m_emptyTimeGeometry = mitk::ArbitraryTimeGeometry::New();
     m_emptyTimeGeometry->ClearAllGeometries();
@@ -210,6 +215,13 @@ int mitkArbitraryTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.m_12345TimeGeometry->Expand(7);
   MITK_TEST_CONDITION_REQUIRED(testClass.m_12345TimeGeometry->CountTimeSteps() == 7, "Testing Expand(7) with m_12345TimeGeometry");
 
+  //Test replace time step geometries
+  testClass.m_12345TimeGeometry->ReplaceTimeStepGeometries(testClass.m_NewGeometry);
+  MITK_TEST_CONDITION_REQUIRED(testClass.m_12345TimeGeometry->CountTimeSteps() == 7, "Testing ReplaceTimeStepGeometries() with m_12345TimeGeometry");
+  MITK_TEST_CONDITION_REQUIRED(testClass.m_12345TimeGeometry->GetGeometryForTimeStep(0)->GetOrigin() == testClass.m_NewGeometry->GetOrigin(), "Testing ReplaceTimeStepGeometries(): check if first geometry of m_12345TimeGeometry was replaced m_12345TimeGeometry");
+  MITK_TEST_CONDITION_REQUIRED(testClass.m_12345TimeGeometry->GetGeometryForTimeStep(6)->GetOrigin() == testClass.m_NewGeometry->GetOrigin(), "Testing ReplaceTimeStepGeometries(): check if last geometry of m_12345TimeGeometry was replaced m_12345TimeGeometry");
+
+  //Test clear all geometries
   testClass.m_12345TimeGeometry->ClearAllGeometries();
   MITK_TEST_CONDITION_REQUIRED(testClass.m_12345TimeGeometry->CountTimeSteps() == 0, "Testing ClearAllGeometries() with m_12345TimeGeometry");
   MITK_TEST_CONDITION_REQUIRED(testClass.m_12345TimeGeometry->GetMinimumTimePoint() == 0, "Testing ClearAllGeometries() with m_12345TimeGeometry");

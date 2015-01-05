@@ -4,13 +4,17 @@
   
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.tofutil"
-          name="ToFUtil"
+          name="ToF Util"
           class="QmitkToFUtilView" 
           icon="resources/iconToFUtilView.xpm" />
     <view id="org.mitk.views.tofgeneration"
-          name="ToFDeviceGeneration"
+          name="ToF Device Generation"
           class="QmitkToFDeviceGeneration"
           icon="resources/iconGenerationView.xpm" />
+    <view id="org.mitk.views.tofscreenshotmaker"
+          name="ToF Screenshot Maker"
+          class="QmitkToFScreenshotMaker"
+          icon="resources/iconToFScrenshotMaker.xpm" />
   </extension>
 
 </plugin>

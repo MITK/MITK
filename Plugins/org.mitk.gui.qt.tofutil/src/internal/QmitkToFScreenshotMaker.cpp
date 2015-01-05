@@ -16,17 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkToFScreenshotMaker.h"
+#include <QmitkServiceListWidget.h>
+
+// Mitk
+#include <mitkToFCameraDevice.h>
+#include <mitkIOUtil.h>
+#include <mitkImageWriter.h>
 
 // Qt
 #include <QString>
 #include <QStringList>
 #include <QMessageBox>
-
-#include <mitkToFCameraDevice.h>
-#include <QmitkServiceListWidget.h>
-
-#include <mitkIOUtil.h>
-#include <mitkImageWriter.h>
 
 const std::string QmitkToFScreenshotMaker::VIEW_ID = "org.mitk.views.tofscreenshotmaker";
 
@@ -53,8 +53,6 @@ void QmitkToFScreenshotMaker::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_ConnectedDeviceServiceListWidget, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnSelectCamera()));
 
   std::string filter = "";
-//  std::string filter = "(&(IsActive=true))";
-
   m_Controls.m_ConnectedDeviceServiceListWidget->Initialize<mitk::ToFImageSource>("ToFImageSourceName", filter);
 
   std::string defaultPath = "/tmp/";

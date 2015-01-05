@@ -39,37 +39,37 @@ class QmitkToFScreenshotMaker : public QmitkAbstractView
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
 
-    QmitkToFScreenshotMaker();
-    ~QmitkToFScreenshotMaker();
+  QmitkToFScreenshotMaker();
+  ~QmitkToFScreenshotMaker();
 
-    void SetFocus();
+  void SetFocus();
 
-    virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent);
 
 
 protected slots:
 
-    /**
-     * @brief OnMakeScreenshotClicked Slot called when the "Make screenshot" button is pressed.
-     */
-    void OnMakeScreenshotClicked();
+  /**
+    * @brief OnMakeScreenshotClicked Slot called when the "Make screenshot" button is pressed.
+    */
+  void OnMakeScreenshotClicked();
 
-    /**
-     * @brief OnSelectCamera Slot called to update the GUI according to the selected image source.
-     */
-    void OnSelectCamera();
+  /**
+    * @brief OnSelectCamera Slot called to update the GUI according to the selected image source.
+    */
+  void OnSelectCamera();
 
-  protected:
+protected:
 
-    Ui::QmitkToFScreenshotMakerControls m_Controls;
+  Ui::QmitkToFScreenshotMakerControls m_Controls;
 
-  private:
+private:
 
-    /**
+  /**
      * @brief UpdateGUIElements Internal helper method to update the GUI.
      * @param device The device of the selected image source.
      * @param ToFImageType Type of the image (e.g. depth, RGB, intensity, etc.)
@@ -78,10 +78,10 @@ protected slots:
      * @param fileExentions Other possible file extensions.
      * @param preferredFormat Default format for this type (e.g. png for RGB).
      */
-    void UpdateGUIElements(mitk::ToFCameraDevice* device, const char *ToFImageType, QCheckBox *saveCheckBox,
-                           QComboBox *saveTypeComboBox, QStringList fileExentions, const char *preferredFormat);
+  void UpdateGUIElements(mitk::ToFCameraDevice* device, const char *ToFImageType, QCheckBox *saveCheckBox,
+                         QComboBox *saveTypeComboBox, QStringList fileExentions, const char *preferredFormat);
 
-    /**
+  /**
      * @brief SaveImage Saves a ToF image.
      * @param image The image to save.
      * @param saveImage Should it be saved?
@@ -89,9 +89,12 @@ protected slots:
      * @param name Name of the image.
      * @param extension Type extension (e.g. .nrrd).
      */
-    void SaveImage(mitk::Image::Pointer image, bool saveImage, std::string path, std::string name, std::string extension);
+  void SaveImage(mitk::Image::Pointer image, bool saveImage, std::string path, std::string name, std::string extension);
 
-    int m_SavingCounter;
+  /**
+   * @brief m_SavingCounter Internal counter for saving images with higher number.
+   */
+  int m_SavingCounter;
 };
 
-#endif // _QmitkToFScreenshotMaker_H_INCLUDED
+#endif // QmitkToFScreenshotMaker_h

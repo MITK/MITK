@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkGeometryToolsViewControls</class>
+ <widget class="QWidget" name="QmitkGeometryToolsViewControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>372</width>
+    <height>607</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="1" column="0">
+    <widget class="QRadioButton" name="radioButton_2">
+     <property name="text">
+      <string>Keyboard Mode (default)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="m_RemoveInteractor">
+     <property name="text">
+      <string>Remove Interactor</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QRadioButton" name="radioButton">
+     <property name="text">
+      <string>Mouse Mode (not implemented, yet)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Rotation step size (°)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QDoubleSpinBox" name="m_RotationStep">
+     <property name="maximum">
+      <double>360.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Scale factor (%)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QDoubleSpinBox" name="m_ScaleFactor">
+     <property name="maximum">
+      <double>200.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+     <property name="value">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QCheckBox" name="m_ScaleInOrigin">
+     <property name="text">
+      <string>Scale in origin (not implemented, yet)</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QCheckBox" name="m_UsageInfoCheckBox">
+     <property name="text">
+      <string>Show usage information</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0">
+    <widget class="QWidget" name="m_UsageInfo" native="true">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <layout class="QGridLayout" name="m_UsageInfoLayout">
+        <item row="4" column="6">
+         <widget class="QLabel" name="label_24">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_up.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLabel" name="label_18">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_shift.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>+</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="6">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_up.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>+</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_right.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_left.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_up.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="5">
+         <widget class="QLabel" name="label_28">
+          <property name="text">
+           <string>+</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_19">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Translate &lt;br/&gt;Coronal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="5">
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QLabel" name="label_25">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_ctrl.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_27">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate &lt;br/&gt;Coronal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_ctrl.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="7">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate &lt;br/&gt;Sagittal/Axial&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="3">
+         <widget class="QLabel" name="label_20">
+          <property name="text">
+           <string>+</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="5">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="5">
+         <widget class="QLabel" name="label_21">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="7">
+         <widget class="QLabel" name="label_22">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="4">
+         <widget class="QLabel" name="label_26">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_shift.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="4">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_up.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_17">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Translate &lt;br/&gt;Sagittal/Axial&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_left.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_23">
+          <property name="text">
+           <string>Scale*</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2">
+         <widget class="QLabel" name="label_29">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_plus.png</pixmap>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="3">
+         <widget class="QLabel" name="label_30">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_dash.png</pixmap>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_31">
+        <property name="text">
+         <string>*currently does not work with images</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QPushButton" name="m_AddInteractor">
+     <property name="toolTip">
+      <string>Do image processing</string>
+     </property>
+     <property name="text">
+      <string>Add Interactor</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Translation step size (mm)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QDoubleSpinBox" name="m_TranslationStep">
+     <property name="decimals">
+      <number>2</number>
+     </property>
+     <property name="maximum">
+      <double>1000.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../../../../../mitk-super-master/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc"/>
+ </resources>
+ <connections/>
+</ui>

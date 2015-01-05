@@ -35,7 +35,11 @@ namespace mitk
   * This class represents a recorder for ToF data. A ToFCameraDevice is used to acquire the data. The acquired images
   * are then added to a ToFImageWriter that performs the actual writing.
   *
-  * Recording can be performed either frame-based or continuously
+  * Recording can be performed either frame-based or continuously.
+  *
+  * @warning It is currently not guaranteed that all acquired images are recorded, since the recording
+  * is done in a newly spawned thread. However, in practise only very few images are lost. See bug #12997
+  * for more details.
   *
   * @ingroup ToFHardware
   */

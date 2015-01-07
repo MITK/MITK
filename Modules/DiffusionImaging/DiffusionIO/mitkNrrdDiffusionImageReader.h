@@ -18,14 +18,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkNrrdDiffusionImageReader_h
 
 #include "mitkCommon.h"
-#include "itkVectorContainer.h"
-#include "mitkFileReader.h"
-#include "vnl/vnl_vector_fixed.h"
-#include "vnl/vnl_matrix_fixed.h"
 
+// MITK includes
+#include "mitkImageSource.h"
+#include "mitkFileReader.h"
+
+#include <mitkDiffusionPropertyHelper.h>
+
+// ITK includes
 #include "itkVectorImage.h"
 #include "mitkAbstractFileReader.h"
-#include "mitkDiffusionImage.h"
+
+
 
 namespace mitk
 {
@@ -44,19 +48,17 @@ namespace mitk
     using AbstractFileReader::Read;
     virtual std::vector<itk::SmartPointer<BaseData> > Read();
 
-    typedef mitk::DiffusionImage<short>                                 OutputType;
-    typedef itk::VectorImage<short,3>                                   ImageType;
-    typedef vnl_vector_fixed< double, 3 >                               GradientDirectionType;
-    typedef vnl_matrix_fixed< double, 3, 3 >                            MeasurementFrameType;
-    typedef itk::VectorContainer< unsigned int,GradientDirectionType >  GradientDirectionContainerType;
+    typedef short                                                           DiffusionPixelType;
+
+    typedef mitk::Image                                                     OutputType;
+    typedef mitk::DiffusionPropertyHelper::ImageType                        VectorImageType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
+    typedef mitk::DiffusionPropertyHelper::MeasurementFrameType             MeasurementFrameType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
 
   protected:
     OutputType::Pointer m_OutputCache;
     itk::TimeStamp m_CacheTime;
-    GradientDirectionContainerType::Pointer m_OriginalDiffusionVectors;
-    GradientDirectionContainerType::Pointer m_DiffusionVectors;
-    float m_B_Value;
-    MeasurementFrameType m_MeasurementFrame;
 
     void InternalRead();
 
@@ -67,6 +69,5 @@ namespace mitk
   };
 
 } //namespace MITK
-
 
 #endif // __mitkNrrdDiffusionImageReader_h

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_NRRDDIFFVOL_WRITER__H_
 
 #include <mitkAbstractFileWriter.h>
-#include <mitkDiffusionImage.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 namespace mitk
 {
@@ -31,8 +31,6 @@ class NrrdDiffusionImageWriter : public mitk::AbstractFileWriter
 {
 public:
 
-    typedef mitk::DiffusionImage<short> InputType;
-
     NrrdDiffusionImageWriter();
     virtual ~NrrdDiffusionImageWriter();
 
@@ -40,6 +38,11 @@ public:
     virtual void Write();
 
     virtual ConfidenceLevel GetConfidenceLevel() const;
+
+    typedef mitk::DiffusionPropertyHelper::ImageType                        VectorImageType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
+    typedef mitk::DiffusionPropertyHelper::MeasurementFrameType             MeasurementFrameType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
 
   protected:
 

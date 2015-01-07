@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>
 #include <itkAdcImageFilter.h>
 #include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkImageCast.h>
+#include <mitkProperties.h>
 
 using namespace mitk;
 using namespace boost::math;
@@ -67,19 +70,24 @@ unsigned int RawShModel< ScalarType >::GetNumberOfKernels()
 }
 
 template< class ScalarType >
-bool RawShModel< ScalarType >::SampleKernels(DiffusionImage<short>::Pointer diffImg, ItkUcharImageType::Pointer maskImage, TensorImageType::Pointer tensorImage, QballFilterType::CoefficientImageType::Pointer itkFeatureImage, ItkDoubleImageType::Pointer adcImage)
+bool RawShModel< ScalarType >::SampleKernels(Image::Pointer diffImg, ItkUcharImageType::Pointer maskImage, TensorImageType::Pointer tensorImage, QballFilterType::CoefficientImageType::Pointer itkFeatureImage, ItkDoubleImageType::Pointer adcImage)
 {
     if (diffImg.IsNull())
         return false;
+
+    typedef itk::VectorImage<short, 3> ITKDiffusionImageType;
+        ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+  mitk::CastToItkImage(diffImg, itkVectorImagePointer);
 
     const int shOrder = 2;
 
     if (tensorImage.IsNull())
     {
         typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
+
         TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
-        filter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
-        filter->SetBValue(diffImg->GetReferenceBValue());
+        filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+        filter->SetBValue(static_cast<mitk::FloatProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
         filter->Update();
         tensorImage = filter->GetOutput();
     }
@@ -88,8 +96,8 @@ bool RawShModel< ScalarType >::SampleKernels(DiffusionImage<short>::Pointer diff
     if (itkFeatureImage.IsNull())
     {
         QballFilterType::Pointer qballfilter = QballFilterType::New();
-        qballfilter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
-        qballfilter->SetBValue(diffImg->GetReferenceBValue());
+        qballfilter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+        qballfilter->SetBValue(static_cast<mitk::FloatProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
         qballfilter->SetLambda(0.006);
         qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
         qballfilter->Update();
@@ -99,16 +107,16 @@ bool RawShModel< ScalarType >::SampleKernels(DiffusionImage<short>::Pointer diff
     if (adcImage.IsNull())
     {
         itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
-        adcFilter->SetInput(diffImg->GetVectorImage());
-        adcFilter->SetGradientDirections(diffImg->GetDirections());
-        adcFilter->SetB_value(diffImg->GetReferenceBValue());
+        adcFilter->SetInput(itkVectorImagePointer);
+        adcFilter->SetGradientDirections(static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer());
+        adcFilter->SetB_value(static_cast<mitk::FloatProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
         adcFilter->Update();
         adcImage = adcFilter->GetOutput();
     }
 
     int b0Index;
-    for (unsigned int i=0; i<diffImg->GetDirectionsWithoutMeasurementFrame()->Size(); i++)
-        if ( diffImg->GetDirectionsWithoutMeasurementFrame()->GetElement(i).magnitude()<0.001 )
+    for (unsigned int i=0; i<static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->Size(); i++)
+        if ( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->GetElement(i).magnitude()<0.001 )
         {
             b0Index = i;
             break;
@@ -116,7 +124,7 @@ bool RawShModel< ScalarType >::SampleKernels(DiffusionImage<short>::Pointer diff
 
     double max = 0;
     {
-        itk::ImageRegionIterator< itk::VectorImage< short, 3 > >  it(diffImg->GetVectorImage(), diffImg->GetVectorImage()->GetLargestPossibleRegion());
+        itk::ImageRegionIterator< itk::VectorImage< short, 3 > >  it(itkVectorImagePointer, itkVectorImagePointer->GetLargestPossibleRegion());
         while(!it.IsAtEnd())
         {
             if (maskImage.IsNotNull() && maskImage->GetPixel(it.GetIndex())<=0)
@@ -141,9 +149,9 @@ bool RawShModel< ScalarType >::SampleKernels(DiffusionImage<short>::Pointer diff
             ++it;
             continue;
         }
-        for (unsigned int i=0; i<diffImg->GetDirections()->Size(); i++)
+        for (unsigned int i=0; i<static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->Size(); i++)
         {
-            if (diffImg->GetVectorImage()->GetPixel(it.GetIndex())[i]!=diffImg->GetVectorImage()->GetPixel(it.GetIndex())[i] || diffImg->GetVectorImage()->GetPixel(it.GetIndex())[i]<=0 || diffImg->GetVectorImage()->GetPixel(it.GetIndex())[i]>diffImg->GetVectorImage()->GetPixel(it.GetIndex())[b0Index])
+            if (itkVectorImagePointer->GetPixel(it.GetIndex())[i]!=itkVectorImagePointer->GetPixel(it.GetIndex())[i] || itkVectorImagePointer->GetPixel(it.GetIndex())[i]<=0 || itkVectorImagePointer->GetPixel(it.GetIndex())[i]>itkVectorImagePointer->GetPixel(it.GetIndex())[b0Index])
             {
                 skipPixel = true;
                 break;
@@ -168,7 +176,7 @@ bool RawShModel< ScalarType >::SampleKernels(DiffusionImage<short>::Pointer diff
 
         if ( this->GetMaxNumKernels()>this->GetNumberOfKernels() && FA>m_FaRange.first && FA<m_FaRange.second && ADC>m_AdcRange.first && ADC<m_AdcRange.second)
         {
-            if (this->SetShCoefficients( coeffs, (double)diffImg->GetVectorImage()->GetPixel(it.GetIndex())[b0Index]/max ))
+            if (this->SetShCoefficients( coeffs, (double)itkVectorImagePointer->GetPixel(it.GetIndex())[b0Index]/max ))
             {
                 tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
                 itk::Vector<double,3> dir;

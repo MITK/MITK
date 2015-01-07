@@ -148,7 +148,7 @@ void mitk::SignalGenerationParameters::SetGradienDirections(GradientListType gra
     }
 }
 
-void mitk::SignalGenerationParameters::SetGradienDirections(mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer gradientList)
+void mitk::SignalGenerationParameters::SetGradienDirections(mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientList)
 {
     m_NumGradients = 0;
     m_NumBaseline = 0;

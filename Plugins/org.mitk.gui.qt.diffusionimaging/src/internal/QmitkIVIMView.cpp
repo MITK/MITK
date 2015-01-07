@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "qclipboard.h"
 
 // mitk
-#include "mitkDiffusionImage.h"
+#include "mitkImage.h"
 #include "mitkImageCast.h"
 
 // itk
@@ -293,7 +293,9 @@ void QmitkIVIMView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
-            if( dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()) )
+          bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())) );
+
+            if( isDiffusionImage )
             {
                 m_DiffusionImageNode = node;
                 foundOneDiffusionImage = true;
@@ -345,8 +347,7 @@ void QmitkIVIMView::AutoThreshold()
         return;
     }
 
-    typedef mitk::DiffusionImage<short> DiffImgType;
-    DiffImgType* dimg = dynamic_cast<DiffImgType*>(nodes.front()->GetData());
+    mitk::Image* dimg = dynamic_cast<mitk::Image*>(nodes.front()->GetData());
 
     if (!dimg)
     {
@@ -357,18 +358,18 @@ void QmitkIVIMView::AutoThreshold()
 
     // find bzero index
     int index = -1;
-    DiffImgType::GradientDirectionContainerType::Pointer directions = dimg->GetDirections();
-    for(DiffImgType::GradientDirectionContainerType::ConstIterator it = directions->Begin();
+    DirContainerType::Pointer directions = static_cast<mitk::GradientDirectionsProperty*>( dimg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+    for(DirContainerType::ConstIterator it = directions->Begin();
         it != directions->End(); ++it)
     {
         index++;
-        DiffImgType::GradientDirectionType g = it.Value();
+        GradientDirectionType g = it.Value();
         if(g[0] == 0 && g[1] == 0 && g[2] == 0 )
             break;
     }
 
-    typedef itk::VectorImage<short,3> VecImgType;
-    VecImgType::Pointer vecimg = dimg->GetVectorImage();
+    VecImgType::Pointer vecimg = VecImgType::New();
+    mitk::CastToItkImage(dimg, vecimg);
 
     int vecLength = vecimg->GetVectorLength();
     index = index > vecLength-1 ? vecLength-1 : index;
@@ -429,25 +430,30 @@ void QmitkIVIMView::FittIVIMStart()
 
     std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
 
-    mitk::DiffusionImage<short>* img = 0;
+    mitk::Image* img = 0;
     for ( unsigned int i=0; i<nodes.size(); i++ )
     {
-        img = dynamic_cast<mitk::DiffusionImage<short>*>(nodes.at(i)->GetData());
-        if (img)
+        img = dynamic_cast<mitk::Image*>(nodes.at(i)->GetData());
+
+        bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(nodes.at(i)->GetData())) );
+
+        if (img && isDiffusionImage)
             break;
     }
+
     if (!img)
     {
         QMessageBox::information( NULL, "Template", "No valid diffusion image was found.");
         return;
     }
 
-    typedef itk::VectorImage<short,3> VecImgType;
-    VecImgType::Pointer vecimg = img->GetVectorImage();
+
+    VecImgType::Pointer vecimg = VecImgType::New();
+    mitk::CastToItkImage(img, vecimg);
 
     OutImgType::IndexType dummy;
 
-    FittIVIM(vecimg, img->GetDirections(), img->GetReferenceBValue(), true, dummy);
+    FittIVIM(vecimg, static_cast<mitk::GradientDirectionsProperty*>( img->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), static_cast<mitk::FloatProperty*>(img->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(), true, dummy);
     OutputToDatastorage(nodes);
 }
 
@@ -462,15 +468,15 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
 
     m_Controls->m_VisualizeResultsWidget->setVisible(false);
 
-    mitk::DiffusionImage<short>::Pointer diffusionImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_DiffusionImageNode->GetData());
+    mitk::Image::Pointer diffusionImg = dynamic_cast<mitk::Image*>(m_DiffusionImageNode->GetData());
     mitk::Image::Pointer maskImg = NULL;
     if (m_MaskImageNode.IsNotNull())
         maskImg = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
 
     if (!m_MultiWidget) return;
 
-    typedef itk::VectorImage<short,3> VecImgType;
-    VecImgType::Pointer vecimg = (VecImgType*)diffusionImg->GetVectorImage().GetPointer();
+    VecImgType::Pointer vecimg = VecImgType::New();
+    mitk::CastToItkImage(diffusionImg, vecimg);
 
     VecImgType::Pointer roiImage = VecImgType::New();
 
@@ -527,7 +533,7 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
         roiImage->Allocate();
         roiImage->SetPixel(newstart, vecimg->GetPixel(index));
 
-        success = FittIVIM(roiImage, diffusionImg->GetDirections(), diffusionImg->GetReferenceBValue(), false, crosspos);
+        success = FittIVIM(roiImage, static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(), false, crosspos);
     }
     else
     {
@@ -594,7 +600,7 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
         roiImage->Allocate();
         roiImage->SetPixel(index, avg);
 
-        success = FittIVIM(roiImage, diffusionImg->GetDirections(), diffusionImg->GetReferenceBValue(), false, index);
+        success = FittIVIM(roiImage, static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(), false, index);
     }
 
     vecimg->SetRegions( vecimg->GetLargestPossibleRegion() );

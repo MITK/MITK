@@ -23,11 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkQBallReconstructionViewControls.h"
 
-#include "mitkDiffusionImage.h"
-
 #include <berryIPartListener.h>
 #include <berryISelectionListener.h>
 #include <berryIStructuredSelection.h>
+
+#include <mitkImage.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <itkVectorImage.h>
 
 typedef short DiffusionPixelType;
 
@@ -50,6 +52,11 @@ class QmitkQBallReconstructionView : public QmitkFunctionality
   friend struct QbrSelListener;
 
   friend struct QbrShellSelection;
+
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
+  typedef mitk::DiffusionPropertyHelper::BValueMapType                    BValueMapType;
+  typedef itk::VectorImage< DiffusionPixelType, 3 >                       ITKDiffusionImageType;
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT

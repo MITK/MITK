@@ -211,7 +211,20 @@ namespace mitk {
     virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
 
     mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
-  private:
+
+    //##Documentation
+    //## @brief Pre- and Post-functions are empty in BaseGeometry
+    //##
+    //## These virtual functions allow for a different beahiour in subclasses.
+    //## Do implement them in every subclass of BaseGeometry. If not needed, use {}.
+    //## If this class is inherited from a subclass of BaseGeometry, call {Superclass::Pre...();};, example: DisplayGeometry class
+    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * newGeometry) const{Superclass::PostInitializeGeometry(newGeometry);};
+    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){Superclass::PreSetSpacing(aSpacing);};
+    virtual void PreSetBounds( const BoundingBox::BoundsArrayType &bounds ){Superclass::PreSetBounds(bounds);};
+    virtual void PreSetIndexToWorldTransform( AffineTransform3D *transform){Superclass::PreSetIndexToWorldTransform(transform);};
+    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM){Superclass::PostSetExtentInMM(direction,extentInMM);};
+    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform){Superclass::PostSetIndexToWorldTransform(transform);};
+
     virtual void PostInitialize();
   };
 } // namespace mitk

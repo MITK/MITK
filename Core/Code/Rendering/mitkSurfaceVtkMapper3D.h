@@ -14,12 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKSURFACEDATAVTKMAPPER3D_H_HEADER_INCLUDED_C1907273
-#define MITKSURFACEDATAVTKMAPPER3D_H_HEADER_INCLUDED_C1907273
+#ifndef mitkSurfaceVtkMapper3D_h
+#define mitkSurfaceVtkMapper3D_h
 
 #include <MitkCoreExports.h>
+#include <mitkSurface.h>
 #include "mitkVtkMapper.h"
-#include "mitkSurface.h"
 #include "mitkBaseRenderer.h"
 #include "mitkLocalStorageHandler.h"
 
@@ -152,4 +152,4 @@ public:
 };
 } // namespace mitk
 
-#endif /* MITKSURFACEDATAVTKMAPPER3D_H_HEADER_INCLUDED_C1907273 */
+#endif /* mitkSurfaceVtkMapper3D_h */

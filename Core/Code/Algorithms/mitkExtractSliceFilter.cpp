@@ -168,6 +168,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
     // Set background level to BLACK instead of translucent, to avoid
     // boundary artifacts (see PlaneGeometryDataVtkMapper3D)
+    // Note: Backgroundlevel was hardcoded before to -1023
     m_Reslicer->SetBackgroundLevel( m_BackgroundLevel );
   }
   else{
@@ -231,6 +232,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
       // Set background level to TRANSLUCENT (see PlaneGeometryDataVtkMapper3D),
       // else the background of the image turns out gray
+      // Note: Backgroundlevel was hardcoded to -32768
       m_Reslicer->SetBackgroundLevel( m_BackgroundLevel );
     }
     else

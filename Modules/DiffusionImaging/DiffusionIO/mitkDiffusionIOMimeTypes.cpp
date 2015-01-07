@@ -16,6 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDiffusionIOMimeTypes.h"
 #include "mitkIOMimeTypes.h"
+#include <itksys/SystemTools.hxx>
+#include <itkNrrdImageIO.h>
+#include <itkMetaDataDictionary.h>
+#include <itkMetaDataObject.h>
 
 namespace mitk
 {
@@ -51,17 +55,77 @@ CustomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE()
   return mimeType;
 }
 
-CustomMimeType DiffusionIOMimeTypes::DWI_MIMETYPE()
+DiffusionIOMimeTypes::DwiMimeType::DwiMimeType()
+  : CustomMimeType(DWI_MIMETYPE_NAME())
 {
-  CustomMimeType mimeType(DWI_MIMETYPE_NAME());
   std::string category = "Diffusion Weighted Image";
-  mimeType.SetComment("Diffusion Weighted Images");
-  mimeType.SetCategory(category);
-  mimeType.AddExtension("dwi");
-  mimeType.AddExtension("hdwi");
-  mimeType.AddExtension("fsl");
-  mimeType.AddExtension("fslgz");
-  return mimeType;
+  this->SetCategory(category);
+  this->SetComment("Diffusion Weighted Images");
+
+  this->AddExtension("dwi");
+  this->AddExtension("hdwi");
+  this->AddExtension("fsl");
+  this->AddExtension("fslgz");
+  this->AddExtension("nrrd");
+}
+
+bool DiffusionIOMimeTypes::DwiMimeType::AppliesTo(const std::string &path) const
+{
+  bool canRead( CustomMimeType::AppliesTo(path) );
+
+  // fix for bug 18572
+  // Currently this function is called for writing as well as reading, in that case
+  // the image information can of course not be read
+  // This is a bug, this function should only be called for reading.
+  if( ! itksys::SystemTools::FileExists( path.c_str() ) )
+  {
+    return canRead;
+  }
+  //end fix for bug 18572
+
+  std::string ext = itksys::SystemTools::GetFilenameLastExtension( path );
+  ext = itksys::SystemTools::LowerCase( ext );
+
+  // Simple NRRD files should only be considered for this mime type if they contain
+  // corresponding tags
+  if( ext == ".nrrd" )
+  {
+    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+    io->SetFileName(path);
+    io->ReadImageInformation();
+
+    itk::MetaDataDictionary imgMetaDictionary = io->GetMetaDataDictionary();
+    std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
+    std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+    std::string metaString;
+
+    for (; itKey != imgMetaKeys.end(); itKey ++)
+    {
+      itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+      if (itKey->find("modality") != std::string::npos)
+      {
+        if (metaString.find("DWMRI") != std::string::npos)
+        {
+          return canRead;
+        }
+      }
+    }
+
+    canRead = false;
+  }
+
+  return canRead;
+}
+
+DiffusionIOMimeTypes::DwiMimeType* DiffusionIOMimeTypes::DwiMimeType::Clone() const
+{
+  return new DwiMimeType(*this);
+}
+
+
+DiffusionIOMimeTypes::DwiMimeType DiffusionIOMimeTypes::DWI_MIMETYPE()
+{
+  return DwiMimeType();
 }
 
 CustomMimeType DiffusionIOMimeTypes::DTI_MIMETYPE()

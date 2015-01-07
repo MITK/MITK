@@ -25,6 +25,18 @@ set(CPP_FILES
   IODataStructures/DiffusionWeightedImages/mitkImageToDiffusionImageSource.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageCorrectionFilter.cpp
 
+  # Properties
+  IODataStructures/Properties/mitkBValueMapProperty.cpp
+  IODataStructures/Properties/mitkGradientDirectionsProperty.cpp
+  IODataStructures/Properties/mitkMeasurementFrameProperty.cpp
+  IODataStructures/Properties/mitkDiffusionPropertyHelper.cpp
+  IODataStructures/Properties/mitkNodePredicateIsDWI.cpp
+
+  # Serializer
+  IODataStructures/Properties/mitkBValueMapPropertySerializer.cpp
+  IODataStructures/Properties/mitkGradientDirectionsPropertySerializer.cpp
+  IODataStructures/Properties/mitkMeasurementFramePropertySerializer.cpp
+
   # DataStructures -> QBall
   IODataStructures/QBallImages/mitkQBallImageSource.cpp
   IODataStructures/QBallImages/mitkQBallImage.cpp

@@ -541,16 +541,25 @@ namespace mitk {
 
     mitk::BaseGeometry *m_ReferenceGeometry;
 
-  private:
 
-    virtual void PreSetBounds( const BoundingBox::BoundsArrayType &bounds );
 
+
+
+    //##Documentation
+    //## @brief Pre- and Post-functions are empty in BaseGeometry
+    //##
+    //## These virtual functions allow for a different beahiour in subclasses.
+    //## Do implement them in every subclass. If not needed, use {}.
+    virtual void PostInitialize(){};
+    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * newGeometry) const{};
+    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){};
+
+    virtual void PreSetBounds(const BoundsArrayType& bounds);
     virtual void PreSetIndexToWorldTransform( AffineTransform3D *transform);
-
     virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
-
     virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
+  private:
     /**
     * \brief Compares plane with another plane: \a true if IsOnPlane
     * (bounding-box \em not considered)

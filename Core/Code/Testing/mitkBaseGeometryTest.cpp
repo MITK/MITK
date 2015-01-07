@@ -65,8 +65,21 @@ public:
     return newGeometry.GetPointer();
   }
 
+protected:
   virtual void PrintSelf(std::ostream& /*os*/, itk::Indent /*indent*/) const{};
-
+  //##Documentation
+  //## @brief Pre- and Post-functions are empty in BaseGeometry
+  //##
+  //## These virtual functions allow for a different beahiour in subclasses.
+  //## Do implement them in every subclass of BaseGeometry. If not needed, use {}.
+  //## If this class is inherited from a subclass of BaseGeometry, call {Superclass::Pre...();};, example: DisplayGeometry class
+  virtual void PreSetBounds(const BoundsArrayType& bounds){};
+  virtual void PostInitialize(){};
+  virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * newGeometry) const{};
+  virtual void PostSetExtentInMM(int direction, mitk::ScalarType extentInMM){};
+  virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* transform){};
+  virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform){};
+  virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){};
 };
 
 class mitkBaseGeometryTestSuite : public mitk::TestFixture
@@ -85,6 +98,7 @@ class mitkBaseGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestSetFloatBoundsDouble);
   MITK_TEST(TestSetFrameOfReferenceID);
   MITK_TEST(TestSetIndexToWorldTransform);
+  MITK_TEST(TestSetIndexToWorldTransformWithoutChangingSpacing);
   MITK_TEST(TestSetIndexToWorldTransform_WithPointerToSameTransform);
   MITK_TEST(TestSetSpacing);
   MITK_TEST(TestTransferItkToVtkTransform);
@@ -325,6 +339,28 @@ public:
     dummy->SetIndexToWorldTransform(aTransform);
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
     MITK_ASSERT_EQUAL(dummy,newDummy,"Compare IndexToWorldTransform 3");
+  }
+
+  void TestSetIndexToWorldTransformWithoutChangingSpacing()
+  {
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
+    dummy->SetIndexToWorldTransformWithoutChangingSpacing(anotherTransform);
+    CPPUNIT_ASSERT(mitk::Equal(aSpacing,dummy->GetSpacing(),mitk::eps,true));
+
+    //calculate a new version of anotherTransform, so that the spacing should be the same as the original spacing of aTransform.
+    mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
+    vnlmatrix = anotherTransform->GetMatrix().GetVnlMatrix();
+
+    mitk::VnlVector col;
+    col = vnlmatrix.get_column(0); col.normalize(); col*=aSpacing[0]; vnlmatrix.set_column(0, col);
+    col = vnlmatrix.get_column(1); col.normalize(); col*=aSpacing[1]; vnlmatrix.set_column(1, col);
+    col = vnlmatrix.get_column(2); col.normalize(); col*=aSpacing[2]; vnlmatrix.set_column(2, col);
+
+    mitk::Matrix3D matrix;
+    matrix = vnlmatrix;
+    anotherTransform->SetMatrix(matrix);
+
+    CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummy->GetIndexToWorldTransform(),mitk::eps,true));
   }
 
   void TestSetIndexToWorldTransform_WithPointerToSameTransform()

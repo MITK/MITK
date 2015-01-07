@@ -140,6 +140,7 @@ set(CPP_FILES
   DataManagement/mitkApplicationCursor.cpp
   DataManagement/mitkBaseData.cpp
   DataManagement/mitkBaseGeometry.cpp
+  DataManagement/mitkGeometryTransformHolder.cpp
   DataManagement/mitkBaseProperty.cpp
   DataManagement/mitkClippingProperty.cpp
   DataManagement/mitkChannelDescriptor.cpp

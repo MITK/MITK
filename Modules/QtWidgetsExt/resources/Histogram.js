@@ -247,7 +247,7 @@ function linePlot()
   svg.call(zoombie);
   /*
    * Elements to animate transitions from barchart to linegraph.
-   * Different transition when an intesity profile is generated.
+   * Different transition when an intensity profile is generated.
    */
   if(!histogramData.intensityProfile)
   {
@@ -495,7 +495,7 @@ function myMouseOut()
 }
 
 /*
- * Show tooltip, while mouse is over a circle in an intesity profile.
+ * Show tooltip, while mouse is over a circle in an intensity profile.
  */
 function myMouseOverLine()
 {
@@ -511,7 +511,7 @@ function myMouseOverLine()
   myCircle.attr("opacity", 1);
   d3.select(".infobox").style("display", "block");
   d3.select(".measurement").text("Distance: " + (Math.round(x*100)/100) + " mm");
-  d3.select(".frequency").text("Intesity: " + y);
+  d3.select(".frequency").text("Intensity: " + y);
 }
 
 /*

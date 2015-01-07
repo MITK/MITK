@@ -763,7 +763,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(false);
 //      m_Controls->m_HistogramBinSizeLabel->setEnabled(false);
       std::stringstream message;
-      message << "<font color='red'>Only linegraph available for an intesityprofile!</font>";
+      message << "<font color='red'>Only linegraph available for an intensity profile!</font>";
       m_Controls->m_InfoLabel->setText(message.str().c_str());
     }
   }

@@ -97,7 +97,7 @@ bool mitk::CorrectorTool2D::OnMousePressed ( StateMachineAction*, InteractionEve
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
-  contour->Clear();
+  contour->Initialize();
   contour->Expand(timestep + 1);
   contour->SetClosed(false, timestep);
   mitk::Point3D point = positionEvent->GetPositionInWorld();
@@ -188,4 +188,3 @@ bool mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
 
   return true;
 }
-

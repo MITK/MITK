@@ -21,7 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 vtkStandardNewMacro(vtkGLMapperProp);
 
-vtkGLMapperProp::vtkGLMapperProp()
+vtkGLMapperProp::vtkGLMapperProp() :
+  m_WrappedGLMapper(0),
+  m_BaseRenderer(0)
 {
 }
 

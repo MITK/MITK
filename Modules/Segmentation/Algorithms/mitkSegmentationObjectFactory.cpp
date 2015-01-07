@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourSetVtkMapper3D.h"
 #include "mitkContourVtkMapper3D.h"
 
+#include <mitkVtkGLMapperWrapper.h>
+
 
 mitk::SegmentationObjectFactory::SegmentationObjectFactory()
 :CoreObjectFactoryBase()
@@ -49,14 +51,15 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
 
   if ( id == mitk::BaseRenderer::Standard2D )
   {
-    if((dynamic_cast<Contour*>(data)!=NULL))
+    std::string classname("ContourModel");
+    if( dynamic_cast<mitk::Contour*>(node->GetData())!=NULL )
     {
-      newMapper = mitk::ContourMapper2D::New();
+      newMapper = mitk::VtkGLMapperWrapper::New(mitk::ContourMapper2D::New().GetPointer());
       newMapper->SetDataNode(node);
     }
-    else if((dynamic_cast<ContourSet*>(data)!=NULL))
+    else if( dynamic_cast<mitk::ContourSet*>(node->GetData())!=NULL )
     {
-      newMapper = mitk::ContourSetMapper2D::New();
+      newMapper = mitk::VtkGLMapperWrapper::New(mitk::ContourSetMapper2D::New().GetPointer());
       newMapper->SetDataNode(node);
     }
   }
@@ -78,7 +81,6 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
 
 void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-
   if(node==NULL)
     return;
 
@@ -95,7 +97,6 @@ void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 //  {
 //    mitk::UnstructuredGridVtkMapper3D::SetDefaultProperties(node);
 //  }
-
 }
 
 const char* mitk::SegmentationObjectFactory::GetFileExtensions()
@@ -117,7 +118,6 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::SegmentationObjectFactory::GetSa
 
 void mitk::SegmentationObjectFactory::CreateFileExtensionsMap()
 {
-
 }
 
 const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()

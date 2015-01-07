@@ -135,6 +135,8 @@ namespace mitk
       return this->m_Reslicer->GetResliceAxes();
     }
 
+    void SetBackgroundLevel(double backgroundLevel) { m_BackgroundLevel = backgroundLevel; }
+
     enum ResliceInterpolation { RESLICE_NEAREST=0, RESLICE_LINEAR=1, RESLICE_CUBIC=3 };
 
     void SetInterpolationMode( ExtractSliceFilter::ResliceInterpolation interpolation){ this->m_InterpolationMode = interpolation; }
@@ -169,6 +171,8 @@ namespace mitk
     mitk::ScalarType* m_OutPutSpacing;
 
     bool m_VtkOutputRequested;
+
+    double m_BackgroundLevel;
   };
 }
 

@@ -137,7 +137,7 @@ void mitk::SimulationVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer
   if (dataNode == NULL)
     return;
 
-  Simulation* simulation = static_cast<Simulation*>(dataNode->GetData());
+  Simulation* simulation = dynamic_cast<Simulation*>(dataNode->GetData());
 
   if (simulation == NULL)
     return;

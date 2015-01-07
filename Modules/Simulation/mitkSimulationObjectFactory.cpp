@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulationWriter.h"
 #include "mitkVtkModel.h"
 #include <mitkCoreObjectFactory.h>
+#include <mitkVtkGLMapperWrapper.h>
 #include <sofa/helper/system/glut.h>
 #include <sofa/component/init.h>
 #include <sofa/core/ObjectFactory.h>
@@ -81,7 +82,7 @@ mitk::Mapper::Pointer mitk::SimulationObjectFactory::CreateMapper(mitk::DataNode
   {
     if (slotId == BaseRenderer::Standard2D)
     {
-      mapper = SimulationGLMapper2D::New();
+      mapper = VtkGLMapperWrapper::New(SimulationGLMapper2D::New().GetPointer());
     }
     else if (slotId == BaseRenderer::Standard3D)
     {

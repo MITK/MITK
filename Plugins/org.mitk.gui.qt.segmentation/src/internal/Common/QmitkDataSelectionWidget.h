@@ -39,7 +39,8 @@ public:
     ImagePredicate,
     SegmentationPredicate,
     SurfacePredicate,
-    ImageAndSegmentationPredicate
+    ImageAndSegmentationPredicate,
+    ContourModelPredicate
   };
 
   explicit QmitkDataSelectionWidget(QWidget* parent = NULL);

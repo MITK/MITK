@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * \brief Widget which shows a histogram using JavaScript.
 *
 * This class is a QWebView. It shows the histogram for a selected image
-* or segmentation. It also can display an intesity profile for
+* or segmentation. It also can display an intensity profile for
 * path elements, which lais over an image.
 */
 class MitkQtWidgetsExt_EXPORT QmitkHistogramJSWidget : public QWebView
@@ -70,10 +70,10 @@ class MitkQtWidgetsExt_EXPORT QmitkHistogramJSWidget : public QWebView
              READ GetUseLineGraph)
 
   /**
-  * @brief Intesity profile property.
+  * @brief intensity profile property.
   *
   * This property is used in JavaScript as member of the current object.
-  * It holds a boolean, which sais wether to use an intesity profile or not.
+  * It holds a boolean, which sais wether to use an intensity profile or not.
   * @see GetIntensityProfile()
   */
   Q_PROPERTY(bool intensityProfile
@@ -110,7 +110,7 @@ public:
   void ComputeHistogram(HistogramType* histogram);
 
   /**
-  * \brief Calculates the intesityprofile.
+  * \brief Calculates the intensityprofile.
   *
   * If an image and a pathelement are set, this function
   * calculates an intensity profile for a pathelement which lies over an image.
@@ -151,7 +151,7 @@ public:
   /**
   * \brief Getter for intensity profile.
   *
-  * @return True if current histogram is an intesityprofile
+  * @return True if current histogram is an intensityprofile
   */
   bool GetIntensityProfile();
 
@@ -190,14 +190,14 @@ private:
   /**
   * \brief Reference image.
   *
-  * Holds the image to calculate an intesity profile.
+  * Holds the image to calculate an intensity profile.
   */
   mitk::Image::Pointer m_Image;
 
   /**
   * \brief Pathelement.
   *
-  * Holds a not closed planar figure to calculate an intesity profile.
+  * Holds a not closed planar figure to calculate an intensity profile.
   */
   mitk::PlanarFigure::ConstPointer m_PlanarFigure;
 
@@ -262,7 +262,7 @@ signals:
   /**
   * \brief Signal data has changed.
   *
-  * It has to be called when the data of the histogram or intesity profile has changed.
+  * It has to be called when the data of the histogram or intensity profile has changed.
   */
   void SignalDataChanged();
 

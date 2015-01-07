@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageDuplicator.h"
 #include "itkImageRegionIterator.h"
 
+#include <mitkIOUtil.h>
 
 mitk::CorrectorAlgorithm::CorrectorAlgorithm()
 :ImageToImageFilter()
@@ -263,14 +264,23 @@ static itk::Index<2> GetFirstPoint(const mitk::CorrectorAlgorithm::TSegData &seg
   mitkThrow() << "No Starting point is found next to the curve.";
 }
 
-static std::vector<itk::Index<2> > FindSeedPoints(const itk::Index<2> startIndex, const mitk::CorrectorAlgorithm::TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic, int fillColor)
+static std::vector<itk::Index<2> > FindSeedPoints(const mitk::CorrectorAlgorithm::TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic, int fillColor)
 {
   typedef itk::Image< ipMITKSegmentationTYPE, 2 > ItkImageType;
   typedef itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer ItkImagePointerType;
 
   int colorMode = (pic->GetPixel(segment.points[0]) == fillColor);
   std::vector<itk::Index<2> > seedPoints;
-  seedPoints.push_back(startIndex);
+
+  try
+  {
+    itk::Index<2> firstPoint = GetFirstPoint(segment,  pic, fillColor);
+    seedPoints.push_back(firstPoint);
+  }
+  catch (mitk::Exception e)
+  {
+    return seedPoints;
+  }
 
   if (segment.points.size() < 4)
     return seedPoints;
@@ -283,13 +293,15 @@ static std::vector<itk::Index<2> > FindSeedPoints(const itk::Index<2> startIndex
 
   ItkImagePointerType listOfPoints = CloneImage(pic);
   listOfPoints->FillBuffer(0);
-  listOfPoints->SetPixel(startIndex,1);
+  listOfPoints->SetPixel(seedPoints[0],1);
   for (; indexIterator != indexEnd; ++indexIterator)
   {
     listOfPoints->SetPixel(*indexIterator, 2);
   }
   indexIterator = segment.points.begin();
   indexIterator++;
+  indexIterator++;
+  indexEnd--;
   indexEnd--;
   for (; indexIterator != indexEnd; ++indexIterator)
   {
@@ -385,6 +397,7 @@ static int FillRegion(const std::vector<itk::Index<2> > &seedPoints, itk::Image<
     if (pic->GetLargestPossibleRegion().IsInside(currentIndex) &&  (pic->GetPixel(currentIndex) == fillColor) == mode)
       workPoints.push_back(currentIndex);
   }
+
   return numberOfPixel;
 }
 
@@ -407,43 +420,28 @@ static void OverwriteImage(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer sour
 
 bool  mitk::CorrectorAlgorithm::ModifySegment(const TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic)
 {
-  try
-  {
     typedef itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer ItkImagePointerType;
-    // Find the current ColorMode:
 
-      // Kein erster Punkt
-        // Erster Punkt finden
     ItkImagePointerType firstSideImage = CloneImage(pic);
     ColorSegment(segment, firstSideImage, m_FillColor, m_EraseColor);
     ItkImagePointerType secondSideImage = CloneImage(firstSideImage);
-    itk::Index<2> firstPoint = GetFirstPoint(segment,  firstSideImage, m_FillColor);
-    std::vector<itk::Index<2> > seedPoints = FindSeedPoints(firstPoint,segment,firstSideImage,m_FillColor);
+
+    std::vector<itk::Index<2> > seedPoints = FindSeedPoints(segment,firstSideImage,m_FillColor);
+    if (seedPoints.size() < 1)
+      return false;
     int firstSidePixel = FillRegion(seedPoints, firstSideImage, m_FillColor, m_EraseColor);
 
-    // TODO  Problem: Was ist wenn keine Zweite Seite vorhanden?
-    try
-    {
-      itk::Index<2> secondPoint = GetFirstPoint(segment, firstSideImage, m_FillColor);
-      std::vector<itk::Index<2> > secondSeedPoints = FindSeedPoints(secondPoint,segment,firstSideImage,m_FillColor);
-      int secondSidePixel = FillRegion(secondSeedPoints, secondSideImage, m_FillColor, m_EraseColor);
+    std::vector<itk::Index<2> > secondSeedPoints = FindSeedPoints(segment,firstSideImage,m_FillColor);
+    if ( secondSeedPoints.size() < 1)
+      return false;
+    int secondSidePixel = FillRegion(secondSeedPoints, secondSideImage, m_FillColor, m_EraseColor);
 
-      if (firstSidePixel < secondSidePixel)
-      {
-        OverwriteImage(firstSideImage, pic);
-      } else
-      {
-        OverwriteImage(secondSideImage, pic);
-      }
-    }
-    catch (mitk::Exception e)
+    if (firstSidePixel < secondSidePixel)
     {
-      e.what();
+      OverwriteImage(firstSideImage, pic);
+    } else
+    {
+      OverwriteImage(secondSideImage, pic);
     }
     return true;
-  }
-  catch(...)
-  {
-    return false;
-  }
 }

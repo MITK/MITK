@@ -22,8 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionHeaderSiemensMosaicDICOMFileReader.h"
 #include "mitkDiffusionHeaderGEDICOMFileReader.h"
 #include "mitkDiffusionHeaderPhilipsDICOMFileReader.h"
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkITKImageImport.h>
 
 #include "mitkStringProperty.h"
+#include <mitkImageCast.h>
 
 static void PerformHeaderAnalysis( mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType headers )
 {
@@ -104,11 +107,10 @@ bool mitk::DiffusionDICOMFileReader
 
   // TODO : only prototyping to test loading of diffusion images
   // we need some solution for the different types
-  typedef mitk::DiffusionImage<short> DiffusionImageType;
-  DiffusionImageType::Pointer output_image = DiffusionImageType::New();
+  mitk::Image::Pointer output_image = mitk::Image::New();
 
-  DiffusionImageType::GradientDirectionContainerType::Pointer directions =
-      DiffusionImageType::GradientDirectionContainerType::New();
+  mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer directions =
+      mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::New();
 
 
   double max_bvalue = 0;
@@ -124,7 +126,7 @@ bool mitk::DiffusionDICOMFileReader
   for( int idx = 0; idx < numberOfDWImages; idx++ )
   {
     DiffusionImageDICOMHeaderInformation header = retrievedHeader.at(idx);
-    DiffusionImageType::GradientDirectionType grad = header.g_vector;
+    mitk::DiffusionPropertyHelper::GradientDirectionType grad = header.g_vector;
 
     grad.normalize();
     grad *= sqrt( header.b_value / max_bvalue );
@@ -133,8 +135,8 @@ bool mitk::DiffusionDICOMFileReader
   }
 
   // initialize the output image
-  output_image->SetReferenceBValue( max_bvalue );
-  output_image->SetDirections( directions );
+  output_image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( directions ) );
+  output_image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( max_bvalue ) );
 
   if( is_mosaic && this->m_ResolveMosaic )
   {
@@ -146,14 +148,17 @@ bool mitk::DiffusionDICOMFileReader
     mosaic_reader->RetrieveMosaicInformation( filenames.at(0).at(0) );
 
     mitk::MosaicDescriptor mdesc = mosaic_reader->GetMosaicDescriptor();
-    output_image->SetVectorImage( helper.LoadMosaicToVector<short, 3>( filenames, mdesc ) );
+    mitk::CastToMitkImage( helper.LoadMosaicToVector<short, 3>( filenames, mdesc ), output_image );
 
   }
   else
   {
-    output_image->SetVectorImage( helper.LoadToVector<short, 3>( filenames ) );
+    mitk::CastToMitkImage( helper.LoadToVector<short, 3>( filenames ), output_image );
   }
-  output_image->InitializeFromVectorImage();
+
+  mitk::DiffusionPropertyHelper propertyHelper( output_image );
+  propertyHelper.InitializeImage();
+
   output_image->SetProperty("diffusion.dicom.importname", mitk::StringProperty::New( helper.GetOutputName(filenames) ) );
   block.SetMitkImage( (mitk::Image::Pointer) output_image );
 

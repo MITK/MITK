@@ -24,7 +24,7 @@ This file is based heavily on a corresponding ITK filter.
 
 #include "itkImageToImageFilter.h"
 #include "itkVectorImage.h"
-#include <mitkDiffusionImage.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 namespace itk{
 /** \class AdcImageFilter
@@ -41,8 +41,8 @@ public:
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ImageToImageFilter< VectorImage< TInPixelType, 3 >, Image< TOutPixelType, 3 > >  Superclass;
-    typedef mitk::DiffusionImage< short >::GradientDirectionType GradientDirectionType;
-    typedef mitk::DiffusionImage< short >::GradientDirectionContainerType::Pointer GradientContainerType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionType GradientDirectionType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer GradientContainerType;
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)

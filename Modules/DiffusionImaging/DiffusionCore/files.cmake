@@ -20,9 +20,6 @@ set(CPP_FILES
 
   # DataStructures -> DWI
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageHeaderInformation.cpp
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSource.cpp
-
-  IODataStructures/DiffusionWeightedImages/mitkImageToDiffusionImageSource.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageCorrectionFilter.cpp
 
   # Properties
@@ -61,6 +58,7 @@ set(CPP_FILES
   Algorithms/Registration/mitkRegistrationWrapper.cpp
   Algorithms/Registration/mitkPyramidImageRegistrationMethod.cpp
   # Algorithms/Registration/mitkRegistrationMethodITK4.cpp
+  Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.cpp
 
 
   # MultishellProcessing
@@ -78,7 +76,6 @@ set(H_FILES
   mitkDiffusionFunctionCollection.h
 
   # Rendering
-  Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
 
   # Reconstruction
@@ -98,8 +95,11 @@ set(H_FILES
   Algorithms/Reconstruction/MultishellProcessing/itkBiExpFitFunctor.h
   Algorithms/Reconstruction/MultishellProcessing/itkADCFitFunctor.h
 
-  # IO Datastructures
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
+  # Properties
+  IODataStructures/Properties/mitkBValueMapProperty.h
+  IODataStructures/Properties/mitkGradientDirectionsProperty.h
+  IODataStructures/Properties/mitkMeasurementFrameProperty.h
+  IODataStructures/Properties/mitkDiffusionPropertyHelper.h
 
   # Algorithms
   Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h
@@ -138,7 +138,6 @@ set(H_FILES
   Algorithms/itkExtractDwiChannelFilter.h
 
   Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.h
-  Algorithms/mitkDiffusionImageToDiffusionImageFilter.h
   Algorithms/itkNonLocalMeansDenoisingFilter.h
   Algorithms/itkVectorImageToImageFilter.h
 

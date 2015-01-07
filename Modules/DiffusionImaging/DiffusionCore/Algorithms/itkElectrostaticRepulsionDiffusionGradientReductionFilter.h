@@ -91,6 +91,9 @@ namespace itk
     void SetShellSelectionBValueMap(BValueMap inp){m_InputBValueMap = inp;}
     void SetNumGradientDirections(std::vector<unsigned int> numDirs){m_NumGradientDirections = numDirs;}
 
+
+    void UpdateOutputInformation();
+
   protected:
     ElectrostaticRepulsionDiffusionGradientReductionFilter();
     ~ElectrostaticRepulsionDiffusionGradientReductionFilter() {}

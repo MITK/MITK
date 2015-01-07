@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "gdcmScanner.h"
 #include "gdcmReader.h"
 
+#include <vnl/vnl_math.h>
 
 /**
  * @brief Extract b value from the siemens diffusion tag

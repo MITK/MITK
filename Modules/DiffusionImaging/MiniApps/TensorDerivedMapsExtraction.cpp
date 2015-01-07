@@ -23,7 +23,8 @@
 #include <iostream>
 #include <fstream>
 #include <mitkTensorImage.h>
-#include <mitkDiffusionImage.h>
+#include <mitkImage.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 #include "itkTensorDerivedMeasurementsFilter.h"
 #include "itkDiffusionTensor3DReconstructionImageFilter.h"
@@ -136,36 +137,34 @@ int main(int argc, char* argv[])
   std::cout << "BaseFileName: " << baseFileName;
 
 
-  mitk::Image::Pointer inputImage =  mitk::IOUtil::LoadImage(inputFile);
-  mitk::DiffusionImage<short>* diffusionImage =   static_cast<mitk::DiffusionImage<short>*>(inputImage.GetPointer());
-  if (diffusionImage == NULL) // does NULL pointer check make sense after static cast ?
+  mitk::Image::Pointer diffusionImage =  mitk::IOUtil::LoadImage(inputFile);
+
+  if (diffusionImage.IsNull() || !mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(diffusionImage)) // does NULL pointer check make sense after static cast ?
   {
     MITK_ERROR << "Invalid Input Image. Must be DWI. Aborting.";
     return -1;
   }
 
-  mitk::DiffusionImage<DiffusionPixelType>* vols = dynamic_cast <mitk::DiffusionImage<DiffusionPixelType>*> (inputImage.GetPointer());
-
   typedef itk::DiffusionTensor3DReconstructionImageFilter< DiffusionPixelType, DiffusionPixelType, TTensorPixelType > TensorReconstructionImageFilterType;
   TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter = TensorReconstructionImageFilterType::New();
 
-  typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageType;
-  typedef DiffusionImageType::GradientDirectionContainerType GradientDirectionContainerType;
-
-  GradientDirectionContainerType::Pointer gradientContainerCopy = GradientDirectionContainerType::New();
-  for(GradientDirectionContainerType::ConstIterator it = vols->GetDirections()->Begin(); it != vols->GetDirections()->End(); it++)
+  mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientContainerCopy = mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::New();
+  for( mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::ConstIterator it = mitk::DiffusionPropertyHelper::GetGradientContainer(diffusionImage)->Begin(); it != mitk::DiffusionPropertyHelper::GetGradientContainer(diffusionImage)->End(); it++)
   {
     gradientContainerCopy->push_back(it.Value());
   }
 
-  tensorReconstructionFilter->SetGradientImage( gradientContainerCopy, vols->GetVectorImage() );
-  tensorReconstructionFilter->SetBValue(vols->GetReferenceBValue());
+  mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+  mitk::CastToItkImage(diffusionImage, itkVectorImagePointer);
+
+  tensorReconstructionFilter->SetGradientImage( gradientContainerCopy, itkVectorImagePointer );
+  tensorReconstructionFilter->SetBValue( mitk::DiffusionPropertyHelper::GetReferenceBValue( diffusionImage ) );
   tensorReconstructionFilter->SetThreshold(50);
   tensorReconstructionFilter->Update();
 
   typedef itk::Image<itk::DiffusionTensor3D<TTensorPixelType>, 3> TensorImageType;
   TensorImageType::Pointer tensorImage = tensorReconstructionFilter->GetOutput();
-  tensorImage->SetDirection( vols->GetVectorImage()->GetDirection() );
+  tensorImage->SetDirection( itkVectorImagePointer->GetDirection() );
 
   mitk::TensorImage::Pointer tensorImageMitk = mitk::TensorImage::New();
   tensorImageMitk->InitializeByItk(tensorImage.GetPointer());

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkResampleImageFilter.h>
 
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionImage.h>
+#include <mitkImage.h>
 #include <mitkQBallImage.h>
 #include <mitkBaseData.h>
 #include <mitkFiberBundleX.h>
@@ -41,6 +41,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkKurtosisFitFunctor.h>
 #include <itkDwiGradientLengthCorrectionFilter.h>
 #include <mitkIOUtil.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkProperties.h>
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
 
 int main(int argc, char* argv[])
 {
@@ -78,34 +82,34 @@ int main(int argc, char* argv[])
     std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inName, s1, s2, false );
     mitk::BaseData::Pointer baseData = infile.at(0);
 
-    if ( dynamic_cast<mitk::DiffusionImage<short>*>(baseData.GetPointer()) )
+    if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image*>(baseData.GetPointer()) ) )
     {
-      mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(baseData.GetPointer());
+      mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(baseData.GetPointer());
       typedef itk::RadialMultishellToSingleshellImageFilter<short, short> FilterType;
 
       typedef itk::DwiGradientLengthCorrectionFilter  CorrectionFilterType;
 
       CorrectionFilterType::Pointer roundfilter = CorrectionFilterType::New();
       roundfilter->SetRoundingValue( 1000 );
-      roundfilter->SetReferenceBValue(dwi->GetReferenceBValue());
-      roundfilter->SetReferenceGradientDirectionContainer(dwi->GetDirections());
+      roundfilter->SetReferenceBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue( dwi ));
+      roundfilter->SetReferenceGradientDirectionContainer(mitk::DiffusionPropertyHelper::GetGradientContainer(dwi));
       roundfilter->Update();
 
-      dwi->SetReferenceBValue( roundfilter->GetNewBValue() );
-      dwi->SetDirections( roundfilter->GetOutputGradientDirectionContainer());
+      dwi->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( roundfilter->GetNewBValue()  ) );
+      dwi->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( roundfilter->GetOutputGradientDirectionContainer() ) );
 
       // filter input parameter
-      const mitk::DiffusionImage<short>::BValueMap
-          &originalShellMap  = dwi->GetBValueMap();
+      const mitk::DiffusionPropertyHelper::BValueMapType
+        &originalShellMap  = mitk::DiffusionPropertyHelper::GetBValueMap(dwi);
 
-      const mitk::DiffusionImage<short>::ImageType
-          *vectorImage       = dwi->GetVectorImage();
+      mitk::DiffusionPropertyHelper::ImageType::Pointer vectorImage = mitk::DiffusionPropertyHelper::ImageType::New();
+      mitk::CastToItkImage(dwi, vectorImage);
 
-      const mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer
-          gradientContainer = dwi->GetDirections();
+      const mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer
+          gradientContainer = mitk::DiffusionPropertyHelper::GetGradientContainer(dwi);
 
       const unsigned int
-          &bValue            = dwi->GetReferenceBValue();
+          &bValue            = mitk::DiffusionPropertyHelper::GetReferenceBValue( dwi );
 
       // filter call
 
@@ -113,7 +117,7 @@ int main(int argc, char* argv[])
       vnl_vector<double> bValueList(originalShellMap.size()-1);
       double targetBValue = bValueList.mean();
 
-      mitk::DiffusionImage<short>::BValueMap::const_iterator it = originalShellMap.begin();
+      mitk::DiffusionPropertyHelper::BValueMapType::const_iterator it = originalShellMap.begin();
       ++it; int i = 0 ;
       for(; it != originalShellMap.end(); ++it)
         bValueList.put(i++,it->first);
@@ -140,11 +144,11 @@ int main(int argc, char* argv[])
         filter->SetFunctor(functor);
         filter->Update();
         // create new DWI image
-        mitk::DiffusionImage<short>::Pointer outImage = mitk::DiffusionImage<short>::New();
-        outImage->SetVectorImage( filter->GetOutput() );
-        outImage->SetReferenceBValue( targetBValue );
-        outImage->SetDirections( filter->GetTargetGradientDirections() );
-        outImage->InitializeFromVectorImage();
+        mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
+        outImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( targetBValue  ) );
+        outImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
+        mitk::DiffusionPropertyHelper propertyHelper( outImage );
+        propertyHelper.InitializeImage();
 
         mitk::IOUtil::Save(outImage, (outName + "_ADC.dwi").c_str());
       }
@@ -163,11 +167,11 @@ int main(int argc, char* argv[])
         filter->SetFunctor(functor);
         filter->Update();
         // create new DWI image
-        mitk::DiffusionImage<short>::Pointer outImage = mitk::DiffusionImage<short>::New();
-        outImage->SetVectorImage( filter->GetOutput() );
-        outImage->SetReferenceBValue( targetBValue );
-        outImage->SetDirections( filter->GetTargetGradientDirections() );
-        outImage->InitializeFromVectorImage();
+        mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
+        outImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( targetBValue  ) );
+        outImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
+        mitk::DiffusionPropertyHelper propertyHelper( outImage );
+        propertyHelper.InitializeImage();
 
         mitk::IOUtil::Save(outImage, (string(outName) + "_AKC.dwi").c_str());
       }
@@ -186,11 +190,11 @@ int main(int argc, char* argv[])
         filter->SetFunctor(functor);
         filter->Update();
         // create new DWI image
-        mitk::DiffusionImage<short>::Pointer outImage = mitk::DiffusionImage<short>::New();
-        outImage->SetVectorImage( filter->GetOutput() );
-        outImage->SetReferenceBValue( targetBValue );
-        outImage->SetDirections( filter->GetTargetGradientDirections() );
-        outImage->InitializeFromVectorImage();
+        mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
+        outImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( targetBValue  ) );
+        outImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
+        mitk::DiffusionPropertyHelper propertyHelper( outImage );
+        propertyHelper.InitializeImage();
 
         mitk::IOUtil::Save(outImage, (string(outName) + "_BiExp.dwi").c_str());
       }

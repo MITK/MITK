@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
             std::cout << "Using mask image";
             itkMaskImage = ItkUcharImgType::New();
             mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(maskImage)->GetData());
-            mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMaskImage);
+            mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
         }
 
         // extract directions from fiber bundle

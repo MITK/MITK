@@ -16,12 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseDataIOFactory.h"
 #include <mitkCoreObjectFactory.h>
-#include "mitkDiffusionImage.h"
+#include "mitkImage.h"
 #include "itkAnalyticalDiffusionQballReconstructionImageFilter.h"
 #include <boost/lexical_cast.hpp>
 #include "mitkCommandLineParser.h"
 #include <mitkIOUtil.h>
 #include <itksys/SystemTools.hxx>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkITKImageImport.h>
+#include <mitkImageCast.h>
+#include <mitkProperties.h>
 
 using namespace mitk;
 
@@ -82,8 +86,10 @@ int main(int argc, char* argv[])
     {
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
-        DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer());
-        dwi->AverageRedundantGradients(0.001);
+        Image::Pointer dwi = dynamic_cast<Image*>(infile.at(0).GetPointer());
+        mitk::DiffusionPropertyHelper propertyHelper(dwi);
+        propertyHelper.AverageRedundantGradients(0.001);
+        propertyHelper.InitializeImage();
 
         mitk::QBallImage::Pointer image = mitk::QBallImage::New();
         mitk::Image::Pointer coeffsImage = mitk::Image::New();
@@ -96,9 +102,12 @@ int main(int argc, char* argv[])
         case 4:
         {
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
+            mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+            mitk::CastToItkImage(dwi, itkVectorImagePointer);
+
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetReferenceBValue());
+            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
+            filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);
@@ -116,9 +125,12 @@ int main(int argc, char* argv[])
         case 6:
         {
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,6,QBALL_ODFSIZE> FilterType;
+            mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+            mitk::CastToItkImage(dwi, itkVectorImagePointer);
+
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetReferenceBValue());
+            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
+            filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);
@@ -136,9 +148,12 @@ int main(int argc, char* argv[])
         case 8:
         {
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,8,QBALL_ODFSIZE> FilterType;
+            mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+            mitk::CastToItkImage(dwi, itkVectorImagePointer);
+
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetReferenceBValue());
+            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
+            filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);
@@ -156,9 +171,12 @@ int main(int argc, char* argv[])
         case 10:
         {
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,10,QBALL_ODFSIZE> FilterType;
+            mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+            mitk::CastToItkImage(dwi, itkVectorImagePointer);
+
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetReferenceBValue());
+            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
+            filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);
@@ -176,9 +194,12 @@ int main(int argc, char* argv[])
         case 12:
         {
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,12,QBALL_ODFSIZE> FilterType;
+            mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+            mitk::CastToItkImage(dwi, itkVectorImagePointer);
+
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetReferenceBValue());
+            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
+            filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             if (normalization==0)
@@ -196,9 +217,12 @@ int main(int argc, char* argv[])
         {
             std::cout << "Supplied SH order not supported. Using default order of 4.";
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
+            mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+            mitk::CastToItkImage(dwi, itkVectorImagePointer);
+
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetReferenceBValue());
+            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
+            filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);

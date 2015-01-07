@@ -71,6 +71,7 @@ set(H_FILES
   Interactions/mitkEventMapperAddOn.h
   Interactions/mitkInteractionConst.h
 
+
   Interfaces/mitkIDataNodeReader.h
   Interfaces/mitkIFileWriter.h
   Interfaces/mitkIFileWriter.cpp
@@ -84,6 +85,7 @@ set(H_FILES
   Rendering/Colortables/PETColor.h
 
   IO/mitkPixelTypeTraits.h
+  IO/mitkLocaleSwitch.h
 )
 
 set(CPP_FILES

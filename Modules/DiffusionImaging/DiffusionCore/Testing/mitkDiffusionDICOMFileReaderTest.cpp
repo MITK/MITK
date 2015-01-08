@@ -100,11 +100,9 @@ int mitkDiffusionDICOMFileReaderTest(int argc, char* argv[])
 
   mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(0).GetMitkImage();
 
-  mitk::DiffusionImage<short>::Pointer d_img = static_cast<mitk::DiffusionImage<short>*>( loaded_image.GetPointer() );
-
   try
   {
-    mitk::IOUtil::Save(d_img, output_filename.c_str());
+    mitk::IOUtil::Save(loaded_image, output_filename.c_str());
   }
   catch( const itk::ExceptionObject& e)
   {

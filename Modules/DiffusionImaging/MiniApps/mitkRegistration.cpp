@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
-#include <mitkDiffusionImage.h>
 #include <mitkImageTimeSelector.h>
 // ITK
 #include <itksys/SystemTools.hxx>
@@ -206,22 +205,7 @@ static void SaveImage(std::string fileName, mitk::Image* image, std::string file
 {
   MITK_INFO << "----Save to " << fileName;
 
-  if (fileType == "dwi") // IOUtil does not handle dwi files properly Bug 15772
-  {
-    try
-    {
-      mitk::IOUtil::Save(dynamic_cast<mitk::DiffusionImage<short>*>(image), fileName.c_str());
-    }
-    catch( const itk::ExceptionObject& e)
-    {
-      MITK_ERROR << "Caught exception: " << e.what();
-      mitkThrow() << "Failed with exception from subprocess!";
-    }
-  }
-  else
-  {
-    mitk::IOUtil::SaveImage(image, fileName);
-  }
+  mitk::IOUtil::Save(image, fileName);
 }
 
 /// Copy derived resources from first time step. Append _reg tag, but leave data untouched.

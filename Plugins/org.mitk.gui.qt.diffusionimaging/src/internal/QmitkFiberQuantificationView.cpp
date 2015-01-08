@@ -37,7 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGlobalInteraction.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkDataNodeObject.h>
-#include <mitkDiffusionImage.h>
 #include <mitkTensorImage.h>
 
 // ITK

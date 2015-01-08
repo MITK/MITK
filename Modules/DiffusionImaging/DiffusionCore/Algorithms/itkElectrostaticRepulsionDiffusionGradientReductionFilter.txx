@@ -242,6 +242,20 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
     MITK_INFO << "...done";
 }
 
+template <class TInputScalarType, class TOutputScalarType>
+void
+ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutputScalarType>
+::UpdateOutputInformation()
+{
+  Superclass::UpdateOutputInformation();
 
+  int vecLength = 0 ;
+    for(unsigned int index = 0; index < m_NumGradientDirections.size(); index++)
+    {
+      vecLength += m_NumGradientDirections[index];
+    }
+
+  this->GetOutput()->SetVectorLength( vecLength );
+}
 
 } // end of namespace

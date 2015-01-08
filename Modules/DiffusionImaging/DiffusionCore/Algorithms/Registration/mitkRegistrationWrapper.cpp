@@ -1,7 +1,7 @@
 #include "mitkRegistrationWrapper.h"
 
 #include "mitkPyramidImageRegistrationMethod.h"
-#include "mitkDiffusionImage.h"
+#include "mitkImage.h"
 #include <mitkDiffusionImageCorrectionFilter.h>
 #include "itkB0ImageExtractionImageFilter.h"
 #include <itkResampleImageFilter.h>
@@ -9,14 +9,16 @@
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkNearestNeighborExtrapolateImageFunction.h>
 #include <itkBSplineInterpolateImageFunction.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 #include <vnl/vnl_inverse.h>
 
 void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer img, const mitk::RegistrationWrapper::RidgidTransformType &transformation,double* offset, mitk::Image* resampleReference,  bool binary)
 {
-  typedef mitk::DiffusionImage<short> DiffusionImageType;
+  mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientDirections =
+  static_cast<mitk::GradientDirectionsProperty*>( img->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
 
-  if (dynamic_cast<DiffusionImageType*> (img.GetPointer()) == NULL)
+  if (gradientDirections.IsNull() || ( gradientDirections->Size() == 0) )
   {
 
     ItkImageType::Pointer itkImage = ItkImageType::New();
@@ -95,7 +97,7 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
   }
   else
   {
-    DiffusionImageType::Pointer diffImages = dynamic_cast<DiffusionImageType*>(img.GetPointer());
+    mitk::Image::Pointer diffImages = dynamic_cast<mitk::Image*>(img.GetPointer());
 
     typedef itk::Euler3DTransform< double > RigidTransformType;
     RigidTransformType::Pointer rtransform = RigidTransformType::New();
@@ -108,22 +110,26 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
 
     rtransform->SetParameters( parameters );
 
-    mitk::Point3D b0origin = diffImages->GetVectorImage()->GetOrigin();
+    typedef itk::VectorImage<short, 3> ITKDiffusionImageType;
+    ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+    mitk::CastToItkImage(diffImages, itkVectorImagePointer);
+
+    mitk::Point3D b0origin = itkVectorImagePointer->GetOrigin();
     b0origin[0]-=offset[0];
     b0origin[1]-=offset[1];
     b0origin[2]-=offset[2];
 
     mitk::Point3D newOrigin = rtransform->GetInverseTransform()->TransformPoint(b0origin);
 
-    itk::Matrix<double,3,3> dir = diffImages->GetVectorImage()->GetDirection();
+    itk::Matrix<double,3,3> dir = itkVectorImagePointer->GetDirection();
     itk::Matrix<double,3,3> transM  ( vnl_inverse(rtransform->GetMatrix().GetVnlMatrix()));
     itk::Matrix<double,3,3> newDirection = transM * dir;
 
-    diffImages->GetVectorImage()->SetOrigin(newOrigin);
-    diffImages->GetVectorImage()->SetDirection(newDirection);
+    itkVectorImagePointer->SetOrigin(newOrigin);
+    itkVectorImagePointer->SetDirection(newDirection);
     diffImages->Modified();
 
-    mitk::DiffusionImageCorrectionFilter<short>::Pointer correctionFilter = mitk::DiffusionImageCorrectionFilter<short>::New();
+    mitk::DiffusionImageCorrectionFilter::Pointer correctionFilter = mitk::DiffusionImageCorrectionFilter::New();
 
     // For Diff. Images: Need to rotate the gradients (works in-place)
     correctionFilter->SetImage(diffImages);
@@ -135,24 +141,38 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
 void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, RidgidTransformType transformation,double* offset, bool useSameOrigin, mitk::Image* mask)
 {
   // Handle the case that fixed/moving image is a DWI image
-  mitk::DiffusionImage<short>* fixedDwi = dynamic_cast<mitk::DiffusionImage<short>*> (fixedImage.GetPointer());
-  mitk::DiffusionImage<short>* movingDwi = dynamic_cast<mitk::DiffusionImage<short>*> (movingImage.GetPointer());
+  mitk::Image* fixedDwi = dynamic_cast<mitk::Image*> (fixedImage.GetPointer());
+  mitk::Image* movingDwi = dynamic_cast<mitk::Image*> (movingImage.GetPointer());
   itk::B0ImageExtractionImageFilter<short,short >::Pointer b0Extraction = itk::B0ImageExtractionImageFilter<short,short>::New();
   offset[0]=offset[1]=offset[2]=0;
-  if (fixedDwi != NULL)
+
+  typedef itk::VectorImage<short, 3> ITKDiffusionImageType;
+  ITKDiffusionImageType::Pointer itkFixedDwiPointer = ITKDiffusionImageType::New();
+  mitk::CastToItkImage(fixedDwi, itkFixedDwiPointer);
+
+  ITKDiffusionImageType::Pointer itkMovingDwiPointer = ITKDiffusionImageType::New();
+  mitk::CastToItkImage(movingDwi, itkMovingDwiPointer);
+
+  mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer fixedGradientDirections =
+    static_cast<mitk::GradientDirectionsProperty*>( fixedDwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+
+  mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer movingGradientDirections =
+    static_cast<mitk::GradientDirectionsProperty*>( movingDwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+
+  if (fixedGradientDirections.IsNull() || ( fixedGradientDirections->Size() == 0))
   { // Set b0 extraction as fixed image
-    b0Extraction->SetInput(fixedDwi->GetVectorImage());
-    b0Extraction->SetDirections(fixedDwi->GetDirections());
+    b0Extraction->SetInput( itkFixedDwiPointer );
+    b0Extraction->SetDirections(fixedGradientDirections);
     b0Extraction->Update();
     mitk::Image::Pointer tmp = mitk::Image::New();
     tmp->InitializeByItk(b0Extraction->GetOutput());
     tmp->SetVolume(b0Extraction->GetOutput()->GetBufferPointer());
     fixedImage = tmp;
   }
-  if (movingDwi != NULL)
+  if (movingGradientDirections || ( movingGradientDirections->Size() == 0))
   { // Set b0 extraction as moving image
-    b0Extraction->SetInput(movingDwi->GetVectorImage());
-    b0Extraction->SetDirections(movingDwi->GetDirections());
+    b0Extraction->SetInput( itkMovingDwiPointer );
+    b0Extraction->SetDirections(movingGradientDirections);
     b0Extraction->Update();
     mitk::Image::Pointer tmp = mitk::Image::New();
     tmp->InitializeByItk(b0Extraction->GetOutput());

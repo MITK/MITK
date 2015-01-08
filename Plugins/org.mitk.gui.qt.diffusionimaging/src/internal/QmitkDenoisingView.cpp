@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDenoisingView.h"
 #include <mitkImageCast.h>
 #include <mitkProgressBar.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkITKImageImport.h>
 
 QmitkDenoisingWorker::QmitkDenoisingWorker(QmitkDenoisingView *view)
   : m_View(view)
@@ -143,7 +145,13 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
   {
     mitk::DataNode::Pointer node = *it;
 
-    if( node.IsNotNull() && dynamic_cast<DiffusionImageType*>(node->GetData()))
+    bool isDiffusionImage(false);
+    if(node.IsNotNull())
+    {
+      isDiffusionImage = mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData()));
+    }
+
+    if( node.IsNotNull() && isDiffusionImage)
     {
       m_Controls->m_InputImageLabel->setText(node->GetName().c_str());
       m_ImageNode = node;
@@ -182,7 +190,7 @@ void QmitkDenoisingView::StartDenoising()
         case NLM:
         {
           // initialize NLM
-          m_InputImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
+          m_InputImage = dynamic_cast<mitk::Image*> (m_ImageNode->GetData());
           m_NonLocalMeansFilter = NonLocalMeansDenoisingFilterType::New();
 
           if (m_BrainMaskNode.IsNotNull())
@@ -230,8 +238,10 @@ void QmitkDenoisingView::StartDenoising()
 
           mitk::ProgressBar::GetInstance()->AddStepsToDo(m_MaxProgressCount);
 
+          ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+  mitk::CastToItkImage(m_InputImage, itkVectorImagePointer);
 
-          m_NonLocalMeansFilter->SetInputImage(m_InputImage->GetVectorImage());
+          m_NonLocalMeansFilter->SetInputImage( itkVectorImagePointer );
           m_NonLocalMeansFilter->SetUseRicianAdaption(m_Controls->m_RicianCheckbox->isChecked());
           m_NonLocalMeansFilter->SetUseJointInformation(m_Controls->m_JointInformationCheckbox->isChecked());
           m_NonLocalMeansFilter->SetSearchRadius(m_Controls->m_SpinBoxParameter1->value());
@@ -250,13 +260,16 @@ void QmitkDenoisingView::StartDenoising()
         case GAUSS:
         {
           // initialize GAUSS and run
-          m_InputImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
+          m_InputImage = dynamic_cast<mitk::Image*> (m_ImageNode->GetData());
+
+          ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+          mitk::CastToItkImage(m_InputImage, itkVectorImagePointer);
 
           ExtractFilterType::Pointer extractor = ExtractFilterType::New();
-          extractor->SetInput(m_InputImage->GetVectorImage());
+          extractor->SetInput( itkVectorImagePointer );
           ComposeFilterType::Pointer composer = ComposeFilterType::New();
 
-          for (unsigned int i = 0; i < m_InputImage->GetVectorImage()->GetVectorLength(); ++i)
+          for (unsigned int i = 0; i < itkVectorImagePointer->GetVectorLength(); ++i)
           {
             extractor->SetIndex(i);
             extractor->Update();
@@ -287,11 +300,14 @@ void QmitkDenoisingView::StartDenoising()
           composer->Update();
 
 
-          DiffusionImageType::Pointer image = DiffusionImageType::New();
-          image->SetVectorImage(composer->GetOutput());
-          image->SetReferenceBValue(m_InputImage->GetReferenceBValue());
-          image->SetDirections(m_InputImage->GetDirections());
-          image->InitializeFromVectorImage();
+          mitk::Image::Pointer image = mitk::GrabItkImageMemory(composer->GetOutput());
+
+          image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( m_InputImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
+          image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_InputImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
+
+          mitk::DiffusionPropertyHelper propertyHelper( image );
+          propertyHelper.InitializeImage();
+
           mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
           imageNode->SetData( image );
           QString name = m_ImageNode->GetName().c_str();
@@ -451,14 +467,15 @@ void QmitkDenoisingView::AfterThread()
       }
 
       case NLM:
-      {
-        DiffusionImageType::Pointer image = DiffusionImageType::New();
-        image->SetVectorImage(m_NonLocalMeansFilter->GetOutput());
-        image->SetReferenceBValue(m_InputImage->GetReferenceBValue());
-        image->SetDirections(m_InputImage->GetDirections());
-        image->InitializeFromVectorImage();
-        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-        imageNode->SetData( image );
+        {
+          mitk::Image::Pointer image = mitk::GrabItkImageMemory( m_NonLocalMeansFilter->GetOutput() );
+          image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( m_InputImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
+          image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_InputImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
+          mitk::DiffusionPropertyHelper propertyHelper( image );
+          propertyHelper.InitializeImage();
+
+          mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+          imageNode->SetData( image );
         QString name = m_ImageNode->GetName().c_str();
 
         //TODO: Rician adaption & joint information in name

@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileReader.h>
 #include <itkImageIOFactory.h>
 #include <itkImageIORegion.h>
+#include <itkMetaDataObject.h>
 //#include <itkImageSeriesReader.h>
 //#include <itkDICOMImageIO2.h>
 //#include <itkDICOMSeriesFileNames.h>
@@ -197,6 +198,31 @@ bool mitk::ItkImageFileReader::CanReadFile(const std::string filename, const std
   itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO( filename.c_str(), itk::ImageIOFactory::ReadMode );
   if ( imageIO.IsNull() )
     return false;
+
+  try
+  {
+    imageIO->SetFileName( filename.c_str() );
+    imageIO->ReadImageInformation();
+    itk::MetaDataDictionary imgMetaDictionary = imageIO->GetMetaDataDictionary();
+    std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
+    std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+    std::string metaString;
+
+    for (; itKey != imgMetaKeys.end(); itKey ++)
+    {
+      itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+      if (itKey->find("modality") != std::string::npos)
+      {
+        if (metaString.find("DWMRI") != std::string::npos)
+        {
+          return false; // DiffusionImageReader should handle this
+        }
+      }
+    }
+  }catch(...)
+  {
+    MITK_INFO("mitkItkImageFileReader") << "Could not read ImageInformation ";
+  }
 
   return true;
 }

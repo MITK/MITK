@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkIOUtil.h"
 
-#include "mitkDWIHeadMotionCorrectionFilter.h"
+#include <mitkDWIHeadMotionCorrectionFilter.h>
 
 typedef short                                       DiffusionPixelType;
-typedef mitk::DiffusionImage< DiffusionPixelType >  DiffusionImageType;
+typedef mitk::Image  DiffusionImageType;
 
 /**
  * @brief Custom test to provide CMD-line access to the mitk::DWIHeadMotionCorrectionFilter
@@ -39,8 +39,8 @@ int mitkDWHeadMotionCorrectionTest( int argc, char* argv[] )
   DiffusionImageType* dwimage =
       static_cast<DiffusionImageType*>( inputImage.GetPointer() );
 
-  mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>::Pointer corrfilter =
-      mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>::New();
+  mitk::DWIHeadMotionCorrectionFilter::Pointer corrfilter =
+      mitk::DWIHeadMotionCorrectionFilter::New();
 
   corrfilter->SetInput( dwimage );
   corrfilter->SetAverageUnweighted(false);

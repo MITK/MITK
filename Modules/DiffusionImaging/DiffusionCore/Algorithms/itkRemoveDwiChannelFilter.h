@@ -24,9 +24,8 @@ This file is based heavily on a corresponding ITK filter.
 
 #include "itkImageToImageFilter.h"
 #include "itkVectorImage.h"
-#include <mitkDiffusionImage.h>
 #include <itkImageRegionIteratorWithIndex.h>
-#include <mitkDiffusionImage.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 namespace itk{
 /** \class RemoveDwiChannelFilter
@@ -55,8 +54,8 @@ public:
     typedef typename Superclass::InputImageType                                             InputImageType;
     typedef typename Superclass::OutputImageType                                            OutputImageType;
     typedef typename Superclass::OutputImageRegionType                                      OutputImageRegionType;
-    typedef typename mitk::DiffusionImage< TInPixelType >::GradientDirectionType            DirectionType;
-    typedef typename mitk::DiffusionImage< TInPixelType >::GradientDirectionContainerType   DirectionContainerType;
+    typedef typename mitk::DiffusionPropertyHelper::GradientDirectionType            DirectionType;
+    typedef typename mitk::DiffusionPropertyHelper::GradientDirectionsContainerType   DirectionContainerType;
 
     void SetChannelIndices( std::vector< unsigned int > indices ){ m_ChannelIndices = indices; }
     void SetDirections( typename DirectionContainerType::Pointer directions ){ m_Directions = directions; }

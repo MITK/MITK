@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 #include <mitkProgressBar.h>
 #include <mitkIOUtil.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 // Qt
 #include <QMessageBox>
@@ -55,8 +56,7 @@ QmitkRegistrationWorker::QmitkRegistrationWorker(QmitkDiffusionRegistrationView*
 void QmitkRegistrationWorker::run()
 {
 
-  typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
-  typedef DiffusionImageType::BValueMap BValueMap;
+  typedef mitk::DiffusionPropertyHelper::BValueMapType BValueMap;
 
   unsigned int totalImagesCount;
   if( !m_View->m_IsBatch )
@@ -84,22 +84,23 @@ void QmitkRegistrationWorker::run()
     m_View->m_GlobalRegisterer = QmitkDiffusionRegistrationView::DWIHeadMotionCorrectionFilterType::New();
 
     //mitk::DataNode::Pointer node = m_View->m_SelectedDiffusionNodes.at(i);
-    DiffusionImageType::Pointer inImage;
+    mitk::Image::Pointer inImage;
     mitk::DataNode::Pointer node;
 
     if( !m_View->m_IsBatch )
     {
       node = m_View->m_SelectedDiffusionNodes.at(i);
-      inImage = dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData());
+      inImage = dynamic_cast<mitk::Image*>(node->GetData());
     }
     else
     {
-      mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage( m_View->m_BatchList.at(i).toStdString() );
-      inImage = static_cast<DiffusionImageType*>( inputImage.GetPointer() );
+      mitk::Image::Pointer inImage = mitk::IOUtil::LoadImage( m_View->m_BatchList.at(i).toStdString() );
+      mitk::GradientDirectionsProperty::Pointer gradDir = static_cast<mitk::GradientDirectionsProperty*>(inImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer());
     }
 
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( inImage ) );
 
-    if(inImage.IsNull())
+    if(!isDiffusionImage)
     {
       MITK_ERROR << "Error occured: can't get input image. \nAborting";
       return;
@@ -119,10 +120,9 @@ void QmitkRegistrationWorker::run()
 
     if( m_View->m_GlobalRegisterer->GetIsInValidState() )
     {
-
       if(! m_View->m_IsBatch)
       {
-        DiffusionImageType::Pointer image = m_View->m_GlobalRegisterer->GetOutput();
+        mitk::Image::Pointer image = m_View->m_GlobalRegisterer->GetOutput();
         mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
         imageNode->SetData( image );
         QString name = node->GetName().c_str();
@@ -275,7 +275,13 @@ void QmitkDiffusionRegistrationView::OnSelectionChanged( berry::IWorkbenchPart::
   {
     mitk::DataNode::Pointer node = nodes.at(i);
 
-    if( node.IsNotNull() && dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()) )
+    bool isDiffusionImage(false);
+    if( node.IsNotNull() )
+    {
+      isDiffusionImage = mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData()));
+    }
+
+    if( isDiffusionImage )
     {
       foundDwiVolume = true;
       m_SelectedDiffusionNodes.push_back(node);

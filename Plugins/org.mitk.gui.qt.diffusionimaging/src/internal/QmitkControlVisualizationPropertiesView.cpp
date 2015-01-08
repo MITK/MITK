@@ -32,7 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigureInteractor.h"
 #include <mitkQBallImage.h>
 #include <mitkTensorImage.h>
-#include <mitkDiffusionImage.h>
+#include <mitkImage.h>
+#include <mitkDiffusionPropertyHelper.h>
 #include <mitkConnectomicsNetwork.h>
 #include "mitkGlobalInteraction.h"
 #include "usModuleRegistry.h"
@@ -324,7 +325,10 @@ struct CvpSelListener : ISelectionListener
                 label = label.arg(val);
                 m_View->m_Controls->label_channel->setText(label);
 
-                int maxVal = (dynamic_cast<mitk::DiffusionImage<short>* >(nodeData))->GetVectorImage()->GetVectorLength();
+                mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+                mitk::CastToItkImage(dynamic_cast<mitk::Image*>(nodeData), itkVectorImagePointer);
+
+                int maxVal = itkVectorImagePointer->GetVectorLength();
                 m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
                 m_View->m_Controls->m_DisplayIndexSpinBox->setMaximum(maxVal-1);
               }
@@ -808,14 +812,18 @@ int QmitkControlVisualizationPropertiesView::ComputePreferredSize(bool width, in
 void QmitkControlVisualizationPropertiesView::NodeAdded(const mitk::DataNode *node)
 {
   mitk::DataNode* notConst = const_cast<mitk::DataNode*>(node);
-  if (dynamic_cast<mitk::DiffusionImage<short>*>(notConst->GetData()))
+
+  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())) );
+
+  if (isDiffusionImage)
   {
-    mitk::DiffusionImage<short>::Pointer dimg = dynamic_cast<mitk::DiffusionImage<short>*>(notConst->GetData());
+    mitk::Image::Pointer dimg = dynamic_cast<mitk::Image*>(notConst->GetData());
 
     // if there is no b0 image in the dataset, the GetB0Indices() returns a vector of size 0
     // and hence we cannot set the Property directly to .front()
     int displayChannelPropertyValue = 0;
-    mitk::DiffusionImage<short>::BValueMap map = dimg->GetBValueMap();
+    mitk::BValueMapProperty* bmapproperty = static_cast<mitk::BValueMapProperty*>(dimg->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() );
+    mitk::DiffusionPropertyHelper::BValueMapType map = bmapproperty->GetBValueMap();
     if( map[0].size() > 0)
       displayChannelPropertyValue = map[0].front();
 
@@ -843,8 +851,11 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
     if(nodeData == NULL)
       continue;
 
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())) );
+
+
     if (node.IsNotNull() && (dynamic_cast<mitk::TbssImage*>(nodeData) ||
-      dynamic_cast<mitk::DiffusionImage<short>*>(nodeData)))
+      isDiffusionImage))
     {
       m_Controls->m_DisplayIndex->setVisible(true);
       m_Controls->m_DisplayIndexSpinBox->setVisible(true);
@@ -1143,7 +1154,6 @@ void QmitkControlVisualizationPropertiesView::DisplayIndexChanged(int dispIndex)
   m_Controls->label_channel->setText(label);
 
   std::vector<std::string> sets;
-  sets.push_back("DiffusionImage");
   sets.push_back("TbssImage");
 
   std::vector<std::string>::iterator it = sets.begin();

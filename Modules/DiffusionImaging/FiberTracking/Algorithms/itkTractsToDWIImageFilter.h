@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberfoxParameters.h>
 #include <itkTimeProbe.h>
 #include <mitkRawShModel.h>
-#include <mitkDiffusionImage.h>
 #include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
 
 namespace itk

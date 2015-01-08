@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkImageCast.h>
-#include <mitkDiffusionImage.h>
+#include <mitkImage.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkFiberBundleX.h>
@@ -50,11 +50,7 @@ int main(int argc, char* argv[])
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inName, s1, s2, false );
         mitk::BaseData::Pointer baseData = infile.at(0);
 
-        if ( dynamic_cast<DiffusionImage<short>*>(baseData.GetPointer()) )
-        {
-          mitk::IOUtil::Save(dynamic_cast<DiffusionImage<short>*>(baseData.GetPointer()), outName.c_str());
-        }
-        else if ( dynamic_cast<Image*>(baseData.GetPointer()) )
+        if ( dynamic_cast<Image*>(baseData.GetPointer()) )
         {
             mitk::IOUtil::Save(dynamic_cast<Image*>(baseData.GetPointer()), outName.c_str());
         }

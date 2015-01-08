@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkImage.h>
-#include <mitkDiffusionImage.h>
 #include <mitkImageToItk.h>
 #include <mitkImageCast.h>
 #include <mitkProperties.h>
@@ -47,6 +46,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateIsDWI.h>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/foreach.hpp>
@@ -61,6 +62,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDialogButtonBox>
 #include <itkAdcImageFilter.h>
 #include <itkShiftScaleImageFilter.h>
+#include <mitkITKImageImport.h>
 
 #include "mitkNodePredicateDataType.h"
 #include <mitkNodePredicateProperty.h>
@@ -152,7 +154,7 @@ void QmitkFiberfoxView::AfterThread()
 
     QString statusText;
     FiberfoxParameters<double> parameters;
-    mitk::DiffusionImage<short>::Pointer mitkImage = mitk::DiffusionImage<short>::New();
+    mitk::Image::Pointer mitkImage = mitk::Image::New();
     switch (m_Worker.m_FilterType)
     {
     case 0:
@@ -166,10 +168,11 @@ void QmitkFiberfoxView::AfterThread()
 
         parameters = m_TractsToDwiFilter->GetParameters();
 
-        mitkImage->SetVectorImage( m_TractsToDwiFilter->GetOutput() );
-        mitkImage->SetReferenceBValue(parameters.m_SignalGen.m_Bvalue);
-        mitkImage->SetDirections(parameters.m_SignalGen.GetGradientDirections());
-        mitkImage->InitializeFromVectorImage();
+        mitkImage = mitk::GrabItkImageMemory( m_TractsToDwiFilter->GetOutput() );
+        mitkImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New(  parameters.m_SignalGen.GetGradientDirections()  ));
+        mitkImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( parameters.m_SignalGen.m_Bvalue ));
+        mitk::DiffusionPropertyHelper propertyHelper( mitkImage );
+        propertyHelper.InitializeImage();
         parameters.m_Misc.m_ResultNode->SetData( mitkImage );
 
         parameters.m_Misc.m_ResultNode->SetName(parameters.m_Misc.m_ParentNode->GetName()
@@ -216,12 +219,14 @@ void QmitkFiberfoxView::AfterThread()
 
         parameters = m_ArtifactsToDwiFilter->GetParameters().CopyParameters<double>();
 
-        mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(parameters.m_Misc.m_ParentNode->GetData());
-        mitkImage = mitk::DiffusionImage<short>::New();
-        mitkImage->SetVectorImage( m_ArtifactsToDwiFilter->GetOutput() );
-        mitkImage->SetReferenceBValue(diffImg->GetReferenceBValue());
-        mitkImage->SetDirections(diffImg->GetDirections());
-        mitkImage->InitializeFromVectorImage();
+        mitk::Image::Pointer diffImg = dynamic_cast<mitk::Image*>(parameters.m_Misc.m_ParentNode->GetData());
+        mitkImage = mitk::GrabItkImageMemory( m_ArtifactsToDwiFilter->GetOutput() );
+
+        mitkImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
+        mitkImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
+        mitk::DiffusionPropertyHelper propertyHelper( mitkImage );
+        propertyHelper.InitializeImage();
+
         parameters.m_Misc.m_ResultNode->SetData( mitkImage );
         parameters.m_Misc.m_ResultNode->SetName(parameters.m_Misc.m_ParentNode->GetName()+parameters.m_Misc.m_ArtifactModelString);
         GetDataStorage()->Add(parameters.m_Misc.m_ResultNode, parameters.m_Misc.m_ParentNode);
@@ -364,7 +369,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
 
         mitk::TNodePredicateDataType<mitk::FiberBundleX>::Pointer isFiberBundle = mitk::TNodePredicateDataType<mitk::FiberBundleX>::New();
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-        mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
+        mitk::NodePredicateIsDWI::Pointer isDwi = mitk::NodePredicateIsDWI::New( );
         mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
         mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
         mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isDwi, isDti);
@@ -471,15 +476,19 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_SignalGen.m_MaskImage = duplicator->GetOutput();
     }
 
-    if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull() && dynamic_cast<mitk::DiffusionImage<short>*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData()))  // use parameters of selected DWI
+    if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull() && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData())))  // use parameters of selected DWI
     {
-        mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
-        parameters.m_SignalGen.m_ImageRegion = dwi->GetVectorImage()->GetLargestPossibleRegion();
-        parameters.m_SignalGen.m_ImageSpacing = dwi->GetVectorImage()->GetSpacing();
-        parameters.m_SignalGen.m_ImageOrigin = dwi->GetVectorImage()->GetOrigin();
-        parameters.m_SignalGen.m_ImageDirection = dwi->GetVectorImage()->GetDirection();
-        parameters.m_SignalGen.m_Bvalue = dwi->GetReferenceBValue();
-        parameters.m_SignalGen.SetGradienDirections(dwi->GetDirections());
+        mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
+
+        ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+        mitk::CastToItkImage(dwi, itkVectorImagePointer);
+
+        parameters.m_SignalGen.m_ImageRegion = itkVectorImagePointer->GetLargestPossibleRegion();
+        parameters.m_SignalGen.m_ImageSpacing = itkVectorImagePointer->GetSpacing();
+        parameters.m_SignalGen.m_ImageOrigin = itkVectorImagePointer->GetOrigin();
+        parameters.m_SignalGen.m_ImageDirection = itkVectorImagePointer->GetDirection();
+        parameters.m_SignalGen.m_Bvalue = static_cast<mitk::FloatProperty*>(dwi->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue();
+        parameters.m_SignalGen.SetGradienDirections(static_cast<mitk::GradientDirectionsProperty*>( dwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer());
     }
     else if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull())   // use geometry of selected image
     {
@@ -1113,7 +1122,7 @@ void QmitkFiberfoxView::SaveParameters()
     bool ok = true;
     bool first = true;
     bool dosampling = false;
-    mitk::DiffusionImage<short>::Pointer diffImg = NULL;
+    mitk::Image::Pointer diffImg = NULL;
     itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = NULL;
     const int shOrder = 2;
     typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,QBALL_ODFSIZE> QballFilterType;
@@ -1136,37 +1145,40 @@ void QmitkFiberfoxView::SaveParameters()
                     dosampling = true;
 
                 first = false;
-                if (dosampling && (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNull() || !dynamic_cast<mitk::DiffusionImage<short>*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData())))
+                if (dosampling && (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNull() || !mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData()))))
                 {
                     QMessageBox::information(NULL, "Parameter file not saved", "No diffusion-weighted image selected to sample signal from.");
                     return;
                 }
                 else if (dosampling)
                 {
-                    diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
+                  diffImg = dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
 
-                    typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
-                    TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
-                    filter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
-                    filter->SetBValue(diffImg->GetReferenceBValue());
-                    filter->Update();
-                    tensorImage = filter->GetOutput();
+                  typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
+                  TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
+                  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+                  mitk::CastToItkImage(diffImg, itkVectorImagePointer);
+                  filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+                  filter->SetBValue( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
 
-                    const int NumCoeffs = (shOrder*shOrder + shOrder + 2)/2 + shOrder;
-                    QballFilterType::Pointer qballfilter = QballFilterType::New();
-                    qballfilter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
-                    qballfilter->SetBValue(diffImg->GetReferenceBValue());
-                    qballfilter->SetLambda(0.006);
-                    qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
-                    qballfilter->Update();
-                    itkFeatureImage = qballfilter->GetCoefficientImage();
+                  filter->Update();
+                  tensorImage = filter->GetOutput();
 
-                    itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
-                    adcFilter->SetInput(diffImg->GetVectorImage());
-                    adcFilter->SetGradientDirections(diffImg->GetDirections());
-                    adcFilter->SetB_value(diffImg->GetReferenceBValue());
-                    adcFilter->Update();
-                    adcImage = adcFilter->GetOutput();
+                  const int NumCoeffs = (shOrder*shOrder + shOrder + 2)/2 + shOrder;
+                  QballFilterType::Pointer qballfilter = QballFilterType::New();
+                  qballfilter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+                  qballfilter->SetBValue( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+                  qballfilter->SetLambda(0.006);
+                  qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
+                  qballfilter->Update();
+                  itkFeatureImage = qballfilter->GetCoefficientImage();
+
+                  itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
+                  adcFilter->SetInput( itkVectorImagePointer );
+                  adcFilter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+                  adcFilter->SetB_value( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+                  adcFilter->Update();
+                  adcImage = adcFilter->GetOutput();
                 }
             }
 
@@ -2061,8 +2073,11 @@ void QmitkFiberfoxView::GenerateImage()
 
 void QmitkFiberfoxView::SimulateForExistingDwi(mitk::DataNode* imageNode)
 {
-    if (!dynamic_cast<mitk::DiffusionImage<short>*>(imageNode->GetData()))
-        return;
+  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(imageNode->GetData())) );
+  if ( !isDiffusionImage )
+  {
+    return;
+  }
 
     FiberfoxParameters<short> parameters = UpdateImageParameters<short>();
 
@@ -2078,9 +2093,13 @@ void QmitkFiberfoxView::SimulateForExistingDwi(mitk::DataNode* imageNode)
         return;
     }
 
-    mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(imageNode->GetData());
+    mitk::Image::Pointer diffImg = dynamic_cast<mitk::Image*>(imageNode->GetData());
+
+    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+    mitk::CastToItkImage(diffImg, itkVectorImagePointer);
+
     m_ArtifactsToDwiFilter = itk::AddArtifactsToDwiImageFilter< short >::New();
-    m_ArtifactsToDwiFilter->SetInput(diffImg->GetVectorImage());
+    m_ArtifactsToDwiFilter->SetInput(itkVectorImagePointer);
     parameters.m_Misc.m_ParentNode = imageNode;
     m_ArtifactsToDwiFilter->SetParameters(parameters);
     m_Worker.m_FilterType = 1;
@@ -2097,11 +2116,11 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
 
     m_TractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
     parameters.m_Misc.m_ParentNode = fiberNode;
-    if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull() && dynamic_cast<mitk::DiffusionImage<short>*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData()))
+    if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull() && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData())))
     {
         bool first = true;
         bool ok = true;
-        mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
+        mitk::Image::Pointer diffImg = dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
         itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = NULL;
         const int shOrder = 2;
         typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,QBALL_ODFSIZE> QballFilterType;
@@ -2120,26 +2139,29 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
             {
                 if (first==true)
                 {
+                  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+                  mitk::CastToItkImage(diffImg, itkVectorImagePointer);
+
                     typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
                     TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
-                    filter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
-                    filter->SetBValue(diffImg->GetReferenceBValue());
+                    filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+                    filter->SetBValue( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
                     filter->Update();
                     tensorImage = filter->GetOutput();
 
                     const int NumCoeffs = (shOrder*shOrder + shOrder + 2)/2 + shOrder;
                     QballFilterType::Pointer qballfilter = QballFilterType::New();
-                    qballfilter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
-                    qballfilter->SetBValue(diffImg->GetReferenceBValue());
+                    qballfilter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+                    qballfilter->SetBValue( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
                     qballfilter->SetLambda(0.006);
                     qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
                     qballfilter->Update();
                     itkFeatureImage = qballfilter->GetCoefficientImage();
 
                     itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
-                    adcFilter->SetInput(diffImg->GetVectorImage());
-                    adcFilter->SetGradientDirections(diffImg->GetDirections());
-                    adcFilter->SetB_value(diffImg->GetReferenceBValue());
+                    adcFilter->SetInput( itkVectorImagePointer );
+                    adcFilter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+                    adcFilter->SetB_value( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
                     adcFilter->Update();
                     adcImage = adcFilter->GetOutput();
                 }
@@ -2446,7 +2468,7 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_GeometryFrame->setEnabled(false);
     }
 
-    if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull() && dynamic_cast<mitk::DiffusionImage<short>*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData()))
+    if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull() && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData())))
     {
         m_Controls->m_DiffusionPropsMessage->setVisible(true);
         m_Controls->m_BvalueBox->setEnabled(false);
@@ -2469,6 +2491,19 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     for( int i=0; i<nodes.size(); i++)
     {
         mitk::DataNode::Pointer node = nodes.at(i);
+
+//        bool isDiffusionImage(false);
+//        if ( node.IsNotNull() )
+//        {
+//          isDiffusionImage = mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData()));
+//        }
+
+//        if ( node.IsNotNull() && isDiffusionImage )
+//        {
+//            m_SelectedDWI = node;
+//            m_SelectedImage = node;
+//            m_SelectedImages.push_back(node);
+//        }
 
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {

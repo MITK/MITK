@@ -23,8 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkTensorReconstructionViewControls.h"
 
-#include <mitkDiffusionImage.h>
 #include <mitkTensorImage.h>
+#include <mitkImage.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <itkVectorImage.h>
 
 typedef short DiffusionPixelType;
 
@@ -48,6 +50,11 @@ class QmitkTensorReconstructionView : public QmitkFunctionality
   Q_OBJECT
 
   public:
+
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
+    typedef mitk::DiffusionPropertyHelper::BValueMapType                    BValueMapType;
+    typedef itk::VectorImage< DiffusionPixelType, 3 >                       ITKDiffusionImageType;
 
   static const std::string VIEW_ID;
 
@@ -99,7 +106,7 @@ protected:
   template<int ndirs> itk::VectorContainer<unsigned int, vnl_vector_fixed<double,3> >::Pointer MakeGradientList();
 
   template<int L>
-  void TemplatedAnalyticalTensorReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols,
+  void TemplatedAnalyticalTensorReconstruction(mitk::Image* vols,
     float lambda, std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes, int normalization);
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);

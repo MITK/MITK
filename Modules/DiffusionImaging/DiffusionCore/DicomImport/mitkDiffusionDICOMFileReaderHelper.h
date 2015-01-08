@@ -1,8 +1,6 @@
 #ifndef MITKDIFFUSIONDICOMFILEREADERHELPER_H
 #define MITKDIFFUSIONDICOMFILEREADERHELPER_H
 
-#include "mitkDiffusionImage.h"
-
 #include "itkImageSeriesReader.h"
 #include "itkVectorImage.h"
 

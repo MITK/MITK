@@ -42,6 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTime>
 #include <mitkFiberfoxParameters.h>
 #include <itkStatisticsImageFilter.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 /*!
 \brief View for fiber based diffusion software phantoms (Fiberfox). See "Fiberfox: Facilitating the creation of realistic white matter software phantoms" (DOI: 10.1002/mrm.25045) for details.
@@ -90,10 +91,13 @@ public:
     virtual void CreateQtPartControl(QWidget *parent);
     void SetFocus();
 
-    typedef itk::Image<double, 3>           ItkDoubleImgType;
-    typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
     typedef itk::Vector<double,3>           GradientType;
     typedef vector<GradientType>            GradientListType;
+    typedef itk::VectorImage< short, 3 >                                    ItkDwiType;
+    typedef itk::Image<double, 3>           ItkDoubleImgType;
+    typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
 
     template<int ndirs> vector<itk::Vector<double,3> > MakeGradientList();
 

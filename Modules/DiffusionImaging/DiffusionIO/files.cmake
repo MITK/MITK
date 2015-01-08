@@ -23,7 +23,6 @@ set(CPP_FILES
 
   mitkNrrdDiffusionImageReader.cpp
   mitkNrrdDiffusionImageWriter.cpp
-  mitkDiffusionImageSerializer.cpp
 
   mitkNrrdQBallImageReader.cpp
   mitkNrrdQBallImageWriter.cpp
@@ -35,5 +34,6 @@ set(CPP_FILES
   mitkFiberBundleXMapper2D.cpp
   mitkFiberBundleXMapper3D.cpp
   mitkCompositeMapper.cpp
+
 )
 

@@ -15,7 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkImageCast.h>
-#include <mitkDiffusionImage.h>
+#include <mitkITKImageImport.h>
+#include <mitkProperties.h>
+#include <mitkImage.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkFiberBundleX.h>
@@ -65,11 +67,11 @@ int main(int argc, char* argv[])
         tractsToDwiFilter->SetFiberBundle(inputTractogram);
         tractsToDwiFilter->Update();
 
-        DiffusionImage<short>::Pointer image = DiffusionImage<short>::New();
-        image->SetVectorImage( tractsToDwiFilter->GetOutput() );
-        image->SetReferenceBValue( parameters.m_SignalGen.m_Bvalue );
-        image->SetDirections( parameters.m_SignalGen.GetGradientDirections() );
-        image->InitializeFromVectorImage();
+        mitk::Image::Pointer image = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
+        image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( parameters.m_SignalGen.GetGradientDirections() ) );
+        image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( parameters.m_SignalGen.m_Bvalue ) );
+        mitk::DiffusionPropertyHelper propertyHelper( image );
+        propertyHelper.InitializeImage();
 
         mitk::IOUtil::Save(image, outName.c_str());
     }

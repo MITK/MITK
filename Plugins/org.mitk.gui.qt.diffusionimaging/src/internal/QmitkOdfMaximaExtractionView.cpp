@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkFiberBundleX.h>
 #include <mitkImage.h>
-#include <mitkDiffusionImage.h>
 #include <mitkImageToItk.h>
 #include <mitkTensorImage.h>
 

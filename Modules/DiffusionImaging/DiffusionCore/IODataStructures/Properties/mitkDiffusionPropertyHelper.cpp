@@ -183,7 +183,7 @@ void mitk::DiffusionPropertyHelper::ApplyMeasurementFrame()
 
   GradientDirectionsContainerType::Pointer  originalDirections = static_cast<mitk::GradientDirectionsProperty*>( m_Image->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer())->GetGradientDirectionsContainer();
 
-  MeasurementFrameType  measurementFrame = static_cast<mitk::MeasurementFrameProperty*>( m_Image->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame();
+  MeasurementFrameType  measurementFrame = GetMeasurementFrame(m_Image);
 
   GradientDirectionsContainerType::Pointer directions = GradientDirectionsContainerType::New();
 
@@ -280,6 +280,14 @@ void mitk::DiffusionPropertyHelper::InitializeImage()
   this->UpdateBValueMap();
 
   // initialize missing properties
+  mitk::MeasurementFrameProperty::Pointer mf = dynamic_cast<mitk::MeasurementFrameProperty *>( m_Image->GetProperty(MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer());
+  if( mf.IsNull() )
+  {
+    //no measurement frame present, identity is assumed
+    MeasurementFrameType identity;
+    identity.set_identity();
+    m_Image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( identity ));
+  }
 }
 
 
@@ -343,7 +351,16 @@ float mitk::DiffusionPropertyHelper::GetReferenceBValue(const mitk::Image *image
 
 const mitk::DiffusionPropertyHelper::MeasurementFrameType & mitk::DiffusionPropertyHelper::GetMeasurementFrame(const mitk::Image *image)
 {
-  return dynamic_cast<mitk::MeasurementFrameProperty *>(image->GetProperty(MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer())->GetMeasurementFrame();
+  mitk::MeasurementFrameProperty::Pointer mf = dynamic_cast<mitk::MeasurementFrameProperty *>( image->GetProperty(MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer());
+  if( mf.IsNull() )
+  {
+    //no measurement frame present, identity is assumed
+    MeasurementFrameType identity;
+    identity.set_identity();
+    mf = mitk::MeasurementFrameProperty::New( identity );
+  }
+
+  return mf->GetMeasurementFrame();
 }
 
 mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(const mitk::Image *image)

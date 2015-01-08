@@ -71,7 +71,12 @@ namespace mitk
     static const BValueMapType & GetBValueMap(const mitk::Image *);
     /// Convenience method to get the BValue
     static float GetReferenceBValue(const mitk::Image *);
-    /// Convenience method to get the measurement frame
+    /** \brief Convenience method to get the measurement frame
+     *
+     * This method will return the measurement frame of the image.
+     *
+     * \note If the image has no associated measurement frame the identity will be returned.
+     */
     static const MeasurementFrameType & GetMeasurementFrame(const mitk::Image *);
     /// Convenience method to get the original gradient directions
     static GradientDirectionsContainerType::Pointer GetOriginalGradientContainer(const mitk::Image *);

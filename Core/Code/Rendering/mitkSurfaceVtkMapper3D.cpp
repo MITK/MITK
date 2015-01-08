@@ -73,7 +73,7 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
   // set the input-object at time t for the mapper
   //
   mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
-  vtkPolyData * polydata = input->GetVtkPolyData( this->GetTimestep() );
+  vtkSmartPointer<vtkPolyData> polydata = input->GetVtkPolyData( this->GetTimestep() );
   if(polydata == NULL)
   {
     ls->m_Actor->VisibilityOff();
@@ -439,13 +439,11 @@ void mitk::SurfaceVtkMapper3D::CheckForClippingProperty( mitk::BaseRenderer* ren
     const Point3D &origin = clippingProperty->GetOrigin();
     const Vector3D &normal = clippingProperty->GetNormal();
 
-    vtkPlane *clippingPlane = vtkPlane::New();
+    vtkSmartPointer<vtkPlane> clippingPlane = vtkSmartPointer<vtkPlane>::New();
     clippingPlane->SetOrigin( origin[0], origin[1], origin[2] );
     clippingPlane->SetNormal( normal[0], normal[1], normal[2] );
 
     ls->m_ClippingPlaneCollection->AddItem( clippingPlane );
-
-    clippingPlane->UnRegister( NULL );
   }
 }
 

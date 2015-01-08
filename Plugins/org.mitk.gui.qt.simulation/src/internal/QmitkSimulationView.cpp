@@ -80,7 +80,6 @@ void QmitkSimulationView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.resetButton, SIGNAL(clicked()), this, SLOT(OnResetButtonClicked()));
   connect(m_Controls.dtSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnDtChanged(double)));
   connect(m_Controls.sceneTreeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(OnSelectedBaseChanged()));
-  connect(m_Controls.pushButton, SIGNAL(clicked()), this, SLOT(OnButtonClicked()));
 
   if (m_Controls.simulationComboBox->GetSelectedNode().IsNotNull())
   {
@@ -266,36 +265,3 @@ void QmitkSimulationView::SetFocus()
 {
   m_Controls.animateButton->setFocus();
 }
-
-void QmitkSimulationView::OnButtonClicked()
-{
-}
-
-/*#include <QmitkRenderWindow.h>
-#include <vtkImageShiftScale.h>
-#include <vtkPNGWriter.h>
-#include <vtkSmartPointer.h>
-#include <vtkWindowToImageFilter.h>
-
-void QmitkSimulationView::OnButtonClicked()
-{
-  vtkRenderWindow* renderWindow = this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetVtkRenderWindow();
-
-  vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilter = vtkSmartPointer<vtkWindowToImageFilter>::New();
-
-  windowToImageFilter->SetInput(renderWindow);
-  windowToImageFilter->SetInputBufferTypeToZBuffer();
-
-  vtkSmartPointer<vtkImageShiftScale> imageShiftScaleFilter = vtkSmartPointer<vtkImageShiftScale>::New();
-
-  imageShiftScaleFilter->SetInputConnection(windowToImageFilter->GetOutputPort());
-  imageShiftScaleFilter->SetOutputScalarTypeToUnsignedChar();
-  imageShiftScaleFilter->SetShift(0);
-  imageShiftScaleFilter->SetScale(-255);
-
-  vtkSmartPointer<vtkPNGWriter> pngWriter = vtkSmartPointer<vtkPNGWriter>::New();
-
-  pngWriter->SetInputConnection(imageShiftScaleFilter->GetOutputPort());
-  pngWriter->SetFileName("C:\\Users\\Stefan\\Desktop\\DepthBuffer.png");
-  pngWriter->Write();
-}*/

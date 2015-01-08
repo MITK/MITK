@@ -95,10 +95,28 @@ string(REPLACE "GLEW REQUIRED" "GLEW REQUIRED CONFIG" CONTENTS ${CONTENTS})
 string(REPLACE "graph " "" CONTENTS ${CONTENTS})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
+# Changes of CMakeLists.txt are commented separately below
+
+set(path "CMakeLists.txt")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+
+# Set CMake policies to prevent configure warnings
+
+string(REPLACE "set(SOLUTION_NAME" "cmake_policy(SET CMP0039 OLD)
+cmake_policy(SET CMP0043 OLD)
+cmake_policy(SET CMP0054 OLD)
+
+set(SOLUTION_NAME"
+CONTENTS ${CONTENTS})
+
+# Use configure file (see below)
+
+string(REPLACE "\nendif()" "\nendif()\n\nconfigure_file(SOFAConfig.cmake.in SOFAConfig.cmake @ONLY)" CONTENTS ${CONTENTS})
+
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
 # Create SOFAConfig.cmake.in file to make SOFA findable through the config mode
 # of find_package()
-
-file(APPEND "CMakeLists.txt" "\nconfigure_file(SOFAConfig.cmake.in SOFAConfig.cmake @ONLY)\n")
 
 file(WRITE "SOFAConfig.cmake.in"
 "add_definitions(-DSOFA_XML_PARSER_TINYXML;-DTIXML_USE_STL;-DMINI_FLOWVR;-DSOFA_HAVE_BOOST;-DSOFA_HAVE_CSPARSE;-DSOFA_HAVE_DAG;-DSOFA_HAVE_EIGEN2;-DSOFA_HAVE_FREEGLUT;-DSOFA_HAVE_GLEW;-DSOFA_HAVE_METIS)

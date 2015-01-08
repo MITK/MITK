@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
-
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -29,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <mitkFiberBundleX.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <boost/lexical_cast.hpp>
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
@@ -46,7 +44,7 @@ mitk::FiberBundleX::Pointer LoadFib(std::string filename)
     return dynamic_cast<mitk::FiberBundleX*>(baseData.GetPointer());
 }
 
-int FiberProcessing(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     std::cout << "FiberProcessing";
     mitkCommandLineParser parser;
@@ -207,4 +205,3 @@ int FiberProcessing(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(FiberProcessing);

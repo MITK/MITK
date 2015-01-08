@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkGlyph3D.h>
 #include <vtkReverseSense.h>
 #include <vtkArrowSource.h>
+#include <vtkTransformPolyDataFilter.h>
 
 // constructor LocalStorage
 mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
@@ -46,7 +47,8 @@ mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
   m_Mapper->ScalarVisibilityOff();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Actor->SetMapper( m_Mapper );
-  m_PropAssembly = vtkSmartPointer <vtkPropAssembly>::New();
+//  m_PropAssembly = vtkSmartPointer <vtkPropAssembly>::New();
+  m_PropAssembly = vtkSmartPointer <vtkAssembly>::New();
   m_PropAssembly->AddPart( m_Actor );
   m_CuttingPlane = vtkSmartPointer<vtkPlane>::New();
   m_Cutter = vtkSmartPointer<vtkCutter>::New();
@@ -208,8 +210,11 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
 
   localStorage->m_CuttingPlane->SetOrigin(origin);
   localStorage->m_CuttingPlane->SetNormal(normal);
-
-  localStorage->m_Cutter->SetInputData(inputPolyData);
+  vtkSmartPointer<vtkLinearTransform> vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
+  vtkSmartPointer<vtkTransformPolyDataFilter> filter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+  filter->SetTransform(vtktransform);
+  filter->SetInputData(inputPolyData);
+  localStorage->m_Cutter->SetInputConnection(filter->GetOutputPort());
   localStorage->m_Cutter->Update();
 
   bool generateNormals = false;

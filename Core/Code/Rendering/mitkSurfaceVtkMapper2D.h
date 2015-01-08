@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLocalStorageHandler.h"
 
 //VTK
+#include <vtkAssembly.h>
 #include <vtkSmartPointer.h>
 class vtkPropAssembly;
 class vtkCutter;
@@ -85,7 +86,8 @@ public:
        * The surface cut (the slice from the 3D surface).
        * The normals and the inverse normals.
        */
-    vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
+    vtkSmartPointer<vtkAssembly> m_PropAssembly;
+//    vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
 
     /**
      * @brief m_Actor actor for the surface cut.
@@ -150,6 +152,14 @@ public:
 
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
   mitk::LocalStorageHandler<LocalStorage> m_LSH;
+
+  /**
+   * @brief UpdateVtkTransform todo
+   * @param renderer
+   */
+  void UpdateVtkTransform(mitk::BaseRenderer */*renderer*/)
+  {
+  }
 
 protected:
   /**

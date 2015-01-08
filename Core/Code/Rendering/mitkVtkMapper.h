@@ -100,7 +100,14 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
     /** \brief Set the vtkTransform of the m_Prop3D for
     * the current time step of \a renderer
     *
-    * Called by mitk::VtkPropRenderer::Update before rendering
+    * Called by mitk::VtkPropRenderer::Update before rendering. This
+    * method will transform all actors (e.g. of an vtkAssembly) according
+    * the geometry.
+    *
+    * \warning This method transforms only props which derive
+    * from vtkProp3D. Make sure to use vtkAssembly, if you have
+    * multiple props. vtkPropAssembly does not work, since it derives
+    * from vtkProp.
     */
     virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
 

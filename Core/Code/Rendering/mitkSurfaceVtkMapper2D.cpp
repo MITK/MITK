@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLookupTable.h>
 #include <vtkPlane.h>
 #include <vtkPolyData.h>
-#include <vtkPropAssembly.h>
+#include <vtkAssembly.h>
 #include <vtkPointData.h>
 #include <vtkGlyph3D.h>
 #include <vtkReverseSense.h>
@@ -47,7 +47,6 @@ mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
   m_Mapper->ScalarVisibilityOff();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Actor->SetMapper( m_Mapper );
-//  m_PropAssembly = vtkSmartPointer <vtkPropAssembly>::New();
   m_PropAssembly = vtkSmartPointer <vtkAssembly>::New();
   m_PropAssembly->AddPart( m_Actor );
   m_CuttingPlane = vtkSmartPointer<vtkPlane>::New();
@@ -210,6 +209,8 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
 
   localStorage->m_CuttingPlane->SetOrigin(origin);
   localStorage->m_CuttingPlane->SetNormal(normal);
+  //Transform the data according to its geometry.
+  //See UpdateVtkTransform documentation for details.
   vtkSmartPointer<vtkLinearTransform> vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
   vtkSmartPointer<vtkTransformPolyDataFilter> filter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   filter->SetTransform(vtktransform);

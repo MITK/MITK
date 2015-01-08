@@ -24,9 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLocalStorageHandler.h"
 
 //VTK
-#include <vtkAssembly.h>
 #include <vtkSmartPointer.h>
-class vtkPropAssembly;
+class vtkAssembly;
 class vtkCutter;
 class vtkPlane;
 class vtkLookupTable;
@@ -41,8 +40,10 @@ class Surface;
 /**
   * @brief Vtk-based mapper for cutting 2D slices out of Surfaces.
   *
-  * The mapper uses a vtkCutter filter to cut out slices of the 3D
-  * volume and render these slices as vtkPolyData.
+  * The mapper uses a vtkCutter filter to cut out slices (contours) of the 3D
+  * volume and render these slices as vtkPolyData. The data is transformed
+  * according to its geometry before cutting, to support the geometry concept
+  * of MITK.
   *
   * Properties:
   * \b Surface.2D.Line Width: Thickness of the rendered lines in 2D.
@@ -87,7 +88,6 @@ public:
        * The normals and the inverse normals.
        */
     vtkSmartPointer<vtkAssembly> m_PropAssembly;
-//    vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
 
     /**
      * @brief m_Actor actor for the surface cut.
@@ -154,8 +154,14 @@ public:
   mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   /**
-   * @brief UpdateVtkTransform todo
-   * @param renderer
+   * @brief UpdateVtkTransform Overwrite the method of the base class.
+   *
+   * The base class transforms the actor according to the respective
+   * geometry which is correct for most cases. This mapper, however,
+   * uses a vtkCutter to cut out a contour. To cut out the correct
+   * contour, the data has to be transformed beforehand. Else the
+   * current plane geometry will point the cutter to en empty location
+   * (if the surface does have a geometry, which is a rather rare case).
    */
   void UpdateVtkTransform(mitk::BaseRenderer */*renderer*/)
   {

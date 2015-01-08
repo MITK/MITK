@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkNrrdImageIO.h>
 #include <itkMetaDataDictionary.h>
 #include <itkMetaDataObject.h>
+#include <mitkLogMacros.h>
 
 namespace mitk
 {
@@ -92,25 +93,32 @@ bool DiffusionIOMimeTypes::DwiMimeType::AppliesTo(const std::string &path) const
   {
     itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
     io->SetFileName(path);
-    io->ReadImageInformation();
-
-    itk::MetaDataDictionary imgMetaDictionary = io->GetMetaDataDictionary();
-    std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
-    std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-    std::string metaString;
-
-    for (; itKey != imgMetaKeys.end(); itKey ++)
+    try
     {
-      itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-      if (itKey->find("modality") != std::string::npos)
+      io->ReadImageInformation();
+
+      itk::MetaDataDictionary imgMetaDictionary = io->GetMetaDataDictionary();
+      std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
+      std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+      std::string metaString;
+
+      for (; itKey != imgMetaKeys.end(); itKey ++)
       {
-        if (metaString.find("DWMRI") != std::string::npos)
+        itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+        if (itKey->find("modality") != std::string::npos)
         {
-          return canRead;
+          if (metaString.find("DWMRI") != std::string::npos)
+          {
+            return canRead;
+          }
         }
       }
-    }
 
+    }
+    catch( const itk::ExceptionObject &e )
+    {
+      MITK_ERROR << "ITK Exception: " << e.what();
+    }
     canRead = false;
   }
 

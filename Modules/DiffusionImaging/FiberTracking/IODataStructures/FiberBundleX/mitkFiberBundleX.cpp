@@ -1225,8 +1225,7 @@ void mitk::FiberBundleX::TransformFibers(double rx, double ry, double rz, double
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
-    UpdateColorCoding();
-    UpdateFiberGeometry();
+    this->SetFiberPolyData(m_FiberPolyData, true);
 }
 
 void mitk::FiberBundleX::RotateAroundAxis(double x, double y, double z)
@@ -1286,8 +1285,7 @@ void mitk::FiberBundleX::RotateAroundAxis(double x, double y, double z)
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
-    UpdateColorCoding();
-    UpdateFiberGeometry();
+    this->SetFiberPolyData(m_FiberPolyData, true);
 }
 
 void mitk::FiberBundleX::ScaleFibers(double x, double y, double z, bool subtractCenter)
@@ -1332,8 +1330,7 @@ void mitk::FiberBundleX::ScaleFibers(double x, double y, double z, bool subtract
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
-    UpdateColorCoding();
-    UpdateFiberGeometry();
+    this->SetFiberPolyData(m_FiberPolyData, true);
 }
 
 void mitk::FiberBundleX::TranslateFibers(double x, double y, double z)
@@ -1363,8 +1360,7 @@ void mitk::FiberBundleX::TranslateFibers(double x, double y, double z)
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
-    UpdateColorCoding();
-    UpdateFiberGeometry();
+    this->SetFiberPolyData(m_FiberPolyData, true);
 }
 
 void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
@@ -1399,8 +1395,7 @@ void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
-    UpdateColorCoding();
-    UpdateFiberGeometry();
+    this->SetFiberPolyData(m_FiberPolyData, true);
 }
 
 void mitk::FiberBundleX::RemoveDir(vnl_vector_fixed<double,3> dir, double threshold)
@@ -1460,8 +1455,10 @@ void mitk::FiberBundleX::RemoveDir(vnl_vector_fixed<double,3> dir, double thresh
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
 
-    UpdateColorCoding();
-    UpdateFiberGeometry();
+    this->SetFiberPolyData(m_FiberPolyData, true);
+
+//    UpdateColorCoding();
+//    UpdateFiberGeometry();
 }
 
 bool mitk::FiberBundleX::ApplyCurvatureThreshold(float minRadius, bool deleteFibers)
@@ -1540,9 +1537,7 @@ bool mitk::FiberBundleX::ApplyCurvatureThreshold(float minRadius, bool deleteFib
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
-
-    UpdateColorCoding();
-    UpdateFiberGeometry();
+    this->SetFiberPolyData(m_FiberPolyData, true);
     return true;
 }
 
@@ -1594,9 +1589,7 @@ bool mitk::FiberBundleX::RemoveShortFibers(float lengthInMM)
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
-
-    UpdateColorCoding();
-    UpdateFiberGeometry();
+    this->SetFiberPolyData(m_FiberPolyData, true);
     return true;
 }
 
@@ -1639,8 +1632,7 @@ bool mitk::FiberBundleX::RemoveLongFibers(float lengthInMM)
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
-    UpdateColorCoding();
-    UpdateFiberGeometry();
+    this->SetFiberPolyData(m_FiberPolyData, true);
     return true;
 }
 
@@ -1709,8 +1701,7 @@ void mitk::FiberBundleX::ResampleSpline(float pointDistance, double tension, dou
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     m_FiberPolyData->SetPoints(vtkSmoothPoints);
     m_FiberPolyData->SetLines(vtkSmoothCells);
-    UpdateColorCoding();
-    UpdateFiberGeometry();
+    this->SetFiberPolyData(m_FiberPolyData, true);
     m_FiberSampling = 10/pointDistance;
 }
 
@@ -1836,9 +1827,7 @@ void mitk::FiberBundleX::Compress(float error)
         m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
         m_FiberPolyData->SetPoints(vtkNewPoints);
         m_FiberPolyData->SetLines(vtkNewCells);
-
-        UpdateColorCoding();
-        UpdateFiberGeometry();
+        this->SetFiberPolyData(m_FiberPolyData, true);
     }
 }
 

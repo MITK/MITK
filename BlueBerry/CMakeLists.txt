@@ -102,6 +102,10 @@ if(BLUEBERRY_USE_QT_HELP)
   endif()
 endif(BLUEBERRY_USE_QT_HELP)
 
+if(BLUEBERRY_QT_HELP_REQUIRED AND NOT BLUEBERRY_USE_QT_HELP)
+  message(FATAL_ERROR "BLUEBERRY_USE_QT_HELP is required to be set to ON")
+endif()
+
 if(MITK_USE_Qt4)
   include(${QT_USE_FILE})
 endif()

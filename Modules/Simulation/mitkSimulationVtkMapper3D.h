@@ -27,7 +27,7 @@ namespace mitk
 
   class MitkSimulation_EXPORT SimulationVtkMapper3D : public VtkMapper
   {
-    class LocalStorage
+    class LocalStorage : public Mapper::BaseLocalStorage
     {
     public:
       LocalStorage();

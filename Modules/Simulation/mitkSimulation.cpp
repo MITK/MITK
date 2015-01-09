@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSimulation.h"
-#include <sofa/simulation/tree/TreeSimulation.h>
+#include <sofa/simulation/graph/DAGSimulation.h>
 #include "mitkGeometry3D.h"
 
 static sofa::simulation::Simulation::SPtr CreateSimulation()
@@ -25,7 +25,7 @@ static sofa::simulation::Simulation::SPtr CreateSimulation()
   if (sofa::simulation::xml::BaseElement::NodeFactory::HasKey(key))
     sofa::simulation::xml::BaseElement::NodeFactory::ResetEntry(key);
 
-  return sofa::core::objectmodel::New<sofa::simulation::tree::TreeSimulation>();
+  return sofa::core::objectmodel::New<sofa::simulation::graph::DAGSimulation>();
 }
 
 mitk::Simulation::Simulation()

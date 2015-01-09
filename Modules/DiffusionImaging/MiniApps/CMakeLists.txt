@@ -63,6 +63,18 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     CPP_FILES PeakExtraction.cpp mitkCommandLineParser.cpp
   )
 
+  mitk_create_executable(FiberExtraction
+    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking
+    PACKAGE_DEPENDS ITK
+    CPP_FILES FiberExtraction.cpp mitkCommandLineParser.cpp
+  )
+
+  mitk_create_executable(FiberProcessing
+    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking
+    PACKAGE_DEPENDS ITK
+    CPP_FILES FiberProcessing.cpp mitkCommandLineParser.cpp
+  )
+
   mitk_create_executable(FiberDirectionExtraction
     DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking
     PACKAGE_DEPENDS ITK

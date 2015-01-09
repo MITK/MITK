@@ -40,7 +40,7 @@ namespace mitk
    * In this case, the amount of managed points is set to 1.
    * \ingroup Interaction
    */
-  class MITK_CORE_EXPORT PointSetInteractor : public Interactor
+  class MITKCORE_EXPORT PointSetInteractor : public Interactor
   {
   public:
     mitkClassMacro(PointSetInteractor, Interactor);

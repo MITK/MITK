@@ -38,7 +38,7 @@ namespace mitk {
   //## It is derived from mitk::DataStorage and implements its interface,
   //## including AddNodeEvent and RemoveNodeEvent.
   //## @ingroup StandaloneDataStorage
-  class MITK_CORE_EXPORT StandaloneDataStorage : public mitk::DataStorage
+  class MITKCORE_EXPORT StandaloneDataStorage : public mitk::DataStorage
   {
   public:
     mitkClassMacro(StandaloneDataStorage, mitk::DataStorage);

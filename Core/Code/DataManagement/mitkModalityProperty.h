@@ -34,7 +34,7 @@ namespace mitk
 
   \ingroup DataManagement
 */
-class MITK_CORE_EXPORT ModalityProperty : public EnumerationProperty
+class MITKCORE_EXPORT ModalityProperty : public EnumerationProperty
 {
   public:
 

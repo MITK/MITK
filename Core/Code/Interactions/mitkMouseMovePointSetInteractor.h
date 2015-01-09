@@ -38,7 +38,7 @@ namespace mitk
   * Refer to \ref DataInteractionPage for general information about the concept of the new implementation.
   */
 
-  class MITK_CORE_EXPORT MouseMovePointSetInteractor : public PointSetInteractor
+  class MITKCORE_EXPORT MouseMovePointSetInteractor : public PointSetInteractor
   {
   public:
     mitkClassMacro(MouseMovePointSetInteractor, Interactor);

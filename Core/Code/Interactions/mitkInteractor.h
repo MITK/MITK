@@ -50,7 +50,7 @@ class BaseData;
  * \deprecatedSince{2013_03} mitk::Interactor is deprecated. Use mitk::DataInteractor instead.
  * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
  */
-class MITK_CORE_EXPORT Interactor : public StateMachine
+class MITKCORE_EXPORT Interactor : public StateMachine
 {
 public:
     mitkClassMacro(Interactor, StateMachine);

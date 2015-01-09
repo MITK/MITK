@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkCoreExports.h>
 
 namespace mitk {
-  class MITK_CORE_EXPORT TestManager {
+  class MITKCORE_EXPORT TestManager {
     public:
       TestManager() : m_FailedTests(0), m_PassedTests(0) {}
       static TestManager* GetInstance();

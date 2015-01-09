@@ -30,7 +30,7 @@ namespace mitk
   be registered with mitk::ApplicationCursor. See the (very simple) implmentation of
   QmitkApplicationCursor for an example.
 */
-class MITK_CORE_EXPORT ApplicationCursorImplementation
+class MITKCORE_EXPORT ApplicationCursorImplementation
 {
   public:
 
@@ -65,7 +65,7 @@ class MITK_CORE_EXPORT ApplicationCursorImplementation
   reset the cursor to its former state. This is mimicking Qt's Application::setOverrideCuror()
   behaviour, but should be ok for most cases where you want to switch a cursor.
 */
-class MITK_CORE_EXPORT ApplicationCursor
+class MITKCORE_EXPORT ApplicationCursor
 {
   public:
 

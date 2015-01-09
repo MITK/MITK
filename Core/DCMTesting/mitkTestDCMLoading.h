@@ -26,7 +26,7 @@ namespace mitk
 
 class Image;
 
-class MitkDCMTesting_EXPORT TestDCMLoading
+class MITKDCMTESTING_EXPORT TestDCMLoading
 {
   public:
 

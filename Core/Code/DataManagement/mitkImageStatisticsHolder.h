@@ -36,7 +36,7 @@ namespace mitk
   Each mitk::Image holds a normal pointer to its StatisticsHolder object. To get access to the methods, use the GetStatistics() method
   in mitk::Image class.
   */
-class MITK_CORE_EXPORT ImageStatisticsHolder
+class MITKCORE_EXPORT ImageStatisticsHolder
 {
 public:
     /** Constructor */

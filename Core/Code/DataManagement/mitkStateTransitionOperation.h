@@ -28,7 +28,7 @@ namespace mitk {
   //## transition to an other state.
   //##
   //## @ingroup Undo
-  class MITK_CORE_EXPORT StateTransitionOperation : public Operation
+  class MITKCORE_EXPORT StateTransitionOperation : public Operation
   {
   public:
     /**

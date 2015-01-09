@@ -88,7 +88,7 @@ private:
  *
  * @brief Abstract class for implementing a reader and writer.
  */
-class MITK_CORE_EXPORT AbstractFileIO : public AbstractFileIOReader, public AbstractFileIOWriter
+class MITKCORE_EXPORT AbstractFileIO : public AbstractFileIOReader, public AbstractFileIOWriter
 {
 public:
 

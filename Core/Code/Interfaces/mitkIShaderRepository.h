@@ -42,12 +42,12 @@ class BaseRenderer;
  * Additionally, it provides a utility function for applying properties for shaders
  * in mappers.
  */
-struct MITK_CORE_EXPORT IShaderRepository
+struct MITKCORE_EXPORT IShaderRepository
 {
 
   struct ShaderPrivate;
 
-  class MITK_CORE_EXPORT Shader : public itk::LightObject
+  class MITKCORE_EXPORT Shader : public itk::LightObject
   {
 
   public:
@@ -79,7 +79,7 @@ struct MITK_CORE_EXPORT IShaderRepository
 
   };
 
-  class MITK_CORE_EXPORT ShaderProgram : public itk::LightObject
+  class MITKCORE_EXPORT ShaderProgram : public itk::LightObject
   {
   public:
     virtual void Activate() = 0;

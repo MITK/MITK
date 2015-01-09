@@ -30,7 +30,7 @@ namespace mitk {
    * m_StateMode .
    */
 
-  class MITK_CORE_EXPORT StateMachineState : public itk::LightObject
+  class MITKCORE_EXPORT StateMachineState : public itk::LightObject
   {
   public:
     mitkClassMacro(StateMachineState, itk::LightObject);

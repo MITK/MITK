@@ -47,7 +47,7 @@ namespace mitk {
 
 */
 template <typename T>
-class MITK_EXPORT GenericProperty : public BaseProperty
+class MITKCORE_EXPORT GenericProperty : public BaseProperty
 {
   public:
 

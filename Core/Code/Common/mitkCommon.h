@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObject.h"
 #include "mitkConfig.h"
 #include "mitkLogMacros.h"
-#include "mitkExportMacros.h"
 #include "mitkExceptionMacro.h"
 #include "mitkGetClassHierarchy.h"
 

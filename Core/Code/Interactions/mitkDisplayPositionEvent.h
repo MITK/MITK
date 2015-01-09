@@ -39,7 +39,7 @@ namespace mitk {
  * \deprecatedSince{2013_03} mitk::DisplayPositionEvent is deprecated. Use mitk::InteractionPositionEvent instead.
  * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
  */
-class MITK_CORE_EXPORT DisplayPositionEvent : public Event
+class MITKCORE_EXPORT DisplayPositionEvent : public Event
 {
 public:
   /** \brief Constructor with all necessary arguments.

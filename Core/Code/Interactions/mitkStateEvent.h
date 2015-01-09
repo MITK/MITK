@@ -38,7 +38,7 @@ namespace mitk {
   * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
   */
 
-  class MITK_CORE_EXPORT StateEvent
+  class MITKCORE_EXPORT StateEvent
   {
   public:
     StateEvent();

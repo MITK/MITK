@@ -28,7 +28,7 @@ namespace mitk {
 //##
 //## Only implements pipeline methods which are abstract in BaseData.
 //## @ingroup Geometry
-class MITK_CORE_EXPORT GeometryData : public BaseData
+class MITKCORE_EXPORT GeometryData : public BaseData
 {
 public:
   mitkClassMacro(GeometryData, BaseData);

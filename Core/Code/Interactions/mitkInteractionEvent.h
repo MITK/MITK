@@ -28,7 +28,7 @@
 namespace mitk
 {
 
-  class MITK_CORE_EXPORT InteractionEvent: public itk::LightObject
+  class MITKCORE_EXPORT InteractionEvent: public itk::LightObject
   {
 
   public:
@@ -101,7 +101,7 @@ namespace mitk
     InteractionEvent(BaseRenderer*);
     virtual ~InteractionEvent();
 
-    friend MITK_CORE_EXPORT bool operator==(const InteractionEvent&, const InteractionEvent&);
+    friend MITKCORE_EXPORT bool operator==(const InteractionEvent&, const InteractionEvent&);
     virtual bool IsEqual(const InteractionEvent& other) const;
 
   private:
@@ -117,8 +117,8 @@ namespace mitk
    * E.g. for a mouse event press event, it is important which modifiers are used,
    * which mouse button was used to triggered the event, but the mouse position is irrelevant.
    */
-  MITK_CORE_EXPORT bool operator==(const InteractionEvent& a, const InteractionEvent& b);
-  MITK_CORE_EXPORT bool operator!=(const InteractionEvent& a, const InteractionEvent& b);
+  MITKCORE_EXPORT bool operator==(const InteractionEvent& a, const InteractionEvent& b);
+  MITKCORE_EXPORT bool operator!=(const InteractionEvent& a, const InteractionEvent& b);
 
   /*
    * Allow bitwise OR operation on enums.

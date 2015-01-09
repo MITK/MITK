@@ -57,7 +57,7 @@ namespace mitk {
  * code example how to use the mitk::TransferFunction check the
  * mitkImageVtkMapper2DTransferFunctionTest.cpp in Core\Code\Testing.
  */
-class MITK_CORE_EXPORT TransferFunction : public itk::Object
+class MITKCORE_EXPORT TransferFunction : public itk::Object
 {
 public:
   typedef std::vector<std::pair<double, double> > ControlPoints;

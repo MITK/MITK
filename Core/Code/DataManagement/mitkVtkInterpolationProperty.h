@@ -33,7 +33,7 @@ namespace mitk
  * VTK_FLAT/0/Flat, VTK_GOURAUD/1/Gouraud, VTK_PHONG/2/Phong
  * Default is the Gouraud interpolation
  */
-class MITK_CORE_EXPORT VtkInterpolationProperty : public EnumerationProperty
+class MITKCORE_EXPORT VtkInterpolationProperty : public EnumerationProperty
 {
 public:
 

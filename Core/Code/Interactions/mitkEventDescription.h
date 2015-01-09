@@ -41,7 +41,7 @@ namespace mitk {
    * All necessary information is now store in the event classes derived from mitk::InteractionEvent .
    * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
    */
-  class MITK_CORE_EXPORT EventDescription : public Event
+  class MITKCORE_EXPORT EventDescription : public Event
   {
   public:
     EventDescription(int type, int button, int buttonState,int key, std::string name, int id);

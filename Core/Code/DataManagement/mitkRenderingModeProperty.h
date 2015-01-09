@@ -88,7 +88,7 @@ namespace mitk
  * See VTK documentation for examples how to use vtkTransferfunction and vtkLookupTable.
  */
 
-class MITK_CORE_EXPORT RenderingModeProperty : public EnumerationProperty
+class MITKCORE_EXPORT RenderingModeProperty : public EnumerationProperty
 {
 public:
 

@@ -28,7 +28,7 @@ namespace mitk
   * as input and output
   * @ingroup Process
   */
-  class MITK_CORE_EXPORT PointSetToPointSetFilter : public PointSetSource
+  class MITKCORE_EXPORT PointSetToPointSetFilter : public PointSetSource
   {
   public:
     mitkClassMacro( PointSetToPointSetFilter, PointSetSource );

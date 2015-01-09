@@ -30,7 +30,7 @@ namespace mitk
     * If whitelist entries were added, all other property names are filtered out.
     * In addition, whitelist entries are reduced by blacklist entries.
     */
-  class MITK_CORE_EXPORT PropertyFilter
+  class MITKCORE_EXPORT PropertyFilter
   {
   public:
     /** \brief Specifies the type of a filter entry.

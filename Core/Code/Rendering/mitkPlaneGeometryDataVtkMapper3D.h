@@ -84,7 +84,7 @@ namespace mitk {
   *  \image html mitkPlaneGeometryDataVtkMapper3D.png "Internal filter pipeline"
   *
   */
-  class MITK_CORE_EXPORT PlaneGeometryDataVtkMapper3D : public VtkMapper
+  class MITKCORE_EXPORT PlaneGeometryDataVtkMapper3D : public VtkMapper
   {
   public:
     mitkClassMacro(PlaneGeometryDataVtkMapper3D, VtkMapper);
@@ -185,7 +185,7 @@ namespace mitk {
     /** \brief The DataStorage defines which part of the data tree is traversed for renderering. */
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
-    class MITK_CORE_EXPORT ActorInfo
+    class MITKCORE_EXPORT ActorInfo
     {
     public:
       vtkActor * m_Actor;

@@ -45,7 +45,7 @@ namespace mitk {
   *
   * @ingroup Mapper
   */
-class MITK_CORE_EXPORT PlaneGeometryDataMapper2D : public VtkMapper
+class MITKCORE_EXPORT PlaneGeometryDataMapper2D : public VtkMapper
 {
 public:
   mitkClassMacro(PlaneGeometryDataMapper2D, VtkMapper);

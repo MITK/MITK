@@ -48,7 +48,7 @@ namespace mitk
   * \sa EventFactory
   * \sa EventRecorder
 */
-class MITK_TESTINGHELPER_EXPORT InteractionTestHelper
+class MITKTESTINGHELPER_EXPORT InteractionTestHelper
 {
 
 public:

@@ -39,7 +39,7 @@ namespace mitk {
  * and this property check the mitkImageVtkMapper2DLookupTableTest.cpp in
  * Core\Code\Testing.
  */
-class MITK_CORE_EXPORT LookupTableProperty : public BaseProperty
+class MITKCORE_EXPORT LookupTableProperty : public BaseProperty
   {
 
   protected:

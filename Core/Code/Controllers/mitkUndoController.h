@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 //## @ingroup Undo
-class MITK_CORE_EXPORT UndoController
+class MITKCORE_EXPORT UndoController
 {
   public:
   //different UndoModels:

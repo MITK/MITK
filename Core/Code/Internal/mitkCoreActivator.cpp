@@ -19,16 +19,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 // File IO
 #include <mitkIOUtil.h>
 #include <mitkIOMimeTypes.h>
-#include <Internal/mitkItkImageIO.h>
-#include <Internal/mitkMimeTypeProvider.h>
-#include <Internal/mitkPointSetReaderService.h>
-#include <Internal/mitkPointSetWriterService.h>
-#include <Internal/mitkRawImageFileReader.h>
-#include <Internal/mitkSurfaceStlIO.h>
-#include <Internal/mitkSurfaceVtkLegacyIO.h>
-#include <Internal/mitkSurfaceVtkXmlIO.h>
-#include <Internal/mitkImageVtkXmlIO.h>
-#include <Internal/mitkImageVtkLegacyIO.h>
+#include <mitkItkImageIO.h>
+#include <mitkMimeTypeProvider.h>
+#include <mitkPointSetReaderService.h>
+#include <mitkPointSetWriterService.h>
+#include <mitkRawImageFileReader.h>
+#include <mitkSurfaceStlIO.h>
+#include <mitkSurfaceVtkLegacyIO.h>
+#include <mitkSurfaceVtkXmlIO.h>
+#include <mitkImageVtkXmlIO.h>
+#include <mitkImageVtkLegacyIO.h>
 
 #include <mitkFileWriter.h>
 #include "mitkLegacyFileWriterService.h"

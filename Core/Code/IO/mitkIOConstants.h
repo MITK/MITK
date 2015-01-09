@@ -27,7 +27,7 @@ namespace mitk {
  * @ingroup IO
  * @brief The IOConstants struct
  */
-struct MITK_CORE_EXPORT IOConstants
+struct MITKCORE_EXPORT IOConstants
 {
   static std::string PIXEL_TYPE();
   static std::string PIXEL_TYPE_CHAR();

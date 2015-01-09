@@ -30,7 +30,7 @@ namespace mbilog{
    *
    *  \ingroup mbilog
    */
-  class MBILOG_DLL_API TextBackendBase : public BackendBase
+  class MBILOG_EXPORT TextBackendBase : public BackendBase
   {
   public:
 

@@ -13,7 +13,7 @@
 #! \param DESTINATION (optional) The install destination. Defaults to "bin/".
 macro(MACRO_INSTALL_CTK_PLUGIN)
 
-  MACRO_PARSE_ARGUMENTS(_INSTALL "TARGETS;DESTINATION" "" ${ARGN})
+  cmake_parse_arguments(_INSTALL "" "DESTINATION" "TARGETS" ${ARGN})
 
   if(NOT _INSTALL_DESTINATION)
     set(_INSTALL_DESTINATION "bin/")

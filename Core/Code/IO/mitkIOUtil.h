@@ -43,12 +43,12 @@ namespace mitk {
  *
  * \see QmitkIOUtil
  */
-class MITK_CORE_EXPORT IOUtil
+class MITKCORE_EXPORT IOUtil
 {
 
 public:
 
-  struct MITK_CORE_EXPORT LoadInfo
+  struct MITKCORE_EXPORT LoadInfo
   {
     LoadInfo(const std::string& path);
 
@@ -59,7 +59,7 @@ public:
     bool m_Cancel;
   };
 
-  struct MITK_CORE_EXPORT SaveInfo
+  struct MITKCORE_EXPORT SaveInfo
   {
     SaveInfo(const BaseData* baseData, const MimeType& mimeType, const std::string& path);
 

@@ -33,7 +33,7 @@ namespace mitk {
     //##          If you need it working, inform us.
     //##
     //## @ingroup DataStorage
-    class MITK_CORE_EXPORT NodePredicateFirstLevel : public NodePredicateBase
+    class MITKCORE_EXPORT NodePredicateFirstLevel : public NodePredicateBase
     {
     public:
       mitkClassMacro(NodePredicateFirstLevel, NodePredicateBase);

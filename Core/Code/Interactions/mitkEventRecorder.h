@@ -47,7 +47,7 @@ namespace mitk
    *   </events>
    *  </interactions>
    **/
-class MITK_CORE_EXPORT EventRecorder: public InteractionEventObserver
+class MITKCORE_EXPORT EventRecorder: public InteractionEventObserver
 {
 public:
   EventRecorder();

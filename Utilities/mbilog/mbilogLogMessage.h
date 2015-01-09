@@ -36,7 +36,7 @@ namespace mbilog{
   */
 
 //todo convert to Struct
- class MBILOG_DLL_API LogMessage {
+ class MBILOG_EXPORT LogMessage {
 
     public:
       //TODO: all member names m_[...]

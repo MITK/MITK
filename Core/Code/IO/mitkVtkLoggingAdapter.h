@@ -28,7 +28,7 @@ namespace mitk {
  * @brief Adapter that overwrites the standard vtk logging output window and sends the logging messages to the MITK logging instead.
  * @ingroup IO
  */
-class MITK_CORE_EXPORT VtkLoggingAdapter : public vtkOutputWindow
+class MITKCORE_EXPORT VtkLoggingAdapter : public vtkOutputWindow
 {
 public:
 

@@ -40,7 +40,7 @@ itkEventMacro(RotateEvent, AffineInteractionEvent);
 itkEventMacro(TranslateEvent, AffineInteractionEvent);
 #pragma GCC visibility pop
 
-class MITK_CORE_EXPORT AffineInteractor : public Interactor
+class MITKCORE_EXPORT AffineInteractor : public Interactor
 {
 public:
   mitkClassMacro(AffineInteractor,Interactor);

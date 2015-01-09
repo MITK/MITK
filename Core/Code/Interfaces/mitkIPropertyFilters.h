@@ -35,7 +35,7 @@ namespace mitk
    * A mitk::PropertyFilter consist of blacklist and whitelist entries and can be restricted to certain data node types.
    * The property view only displays filtered properties if filters were found.
    */
-  class MITK_CORE_EXPORT IPropertyFilters
+  class MITKCORE_EXPORT IPropertyFilters
   {
   public:
     virtual ~IPropertyFilters();

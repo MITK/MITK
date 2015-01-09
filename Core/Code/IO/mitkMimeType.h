@@ -40,7 +40,7 @@ class CustomMimeType;
  * MimeType instances support the MITK I/O system and represent mime-types
  * for data formats.
  */
-class MITK_CORE_EXPORT MimeType
+class MITKCORE_EXPORT MimeType
 {
 
 public:

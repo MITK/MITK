@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 //##Documentation
 //## @brief GUI indepentent Interface for all Gui depentent implementations of a StatusBar.
-class MITK_CORE_EXPORT StatusBarImplementation
+class MITKCORE_EXPORT StatusBarImplementation
 {
 public:
   //##Documentation

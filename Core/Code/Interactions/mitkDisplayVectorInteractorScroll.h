@@ -35,9 +35,9 @@ namespace mitk {
   *
   * Thus it is possible to scroll through the slices of an image rapidly, without using the mousewheel.
   *
-  * @ingroup MITK_CORE_EXPORT
+  * @ingroup MITKCORE_EXPORT
   **/
-  class MITK_CORE_EXPORT DisplayVectorInteractorScroll : public StateMachine
+  class MITKCORE_EXPORT DisplayVectorInteractorScroll : public StateMachine
   {
   public:
     mitkClassMacro(DisplayVectorInteractorScroll, StateMachine);

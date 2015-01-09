@@ -44,7 +44,7 @@ namespace mitk
  * code example how to use the mitk::LookupTable check the
  * mitkImageVtkMapper2DLookupTableTest.cpp in Core\Code\Testing.
  */
-class MITK_CORE_EXPORT LookupTable : public itk::DataObject
+class MITKCORE_EXPORT LookupTable : public itk::DataObject
 {
 public:
   /**

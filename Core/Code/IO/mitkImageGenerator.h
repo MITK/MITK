@@ -30,7 +30,7 @@ namespace mitk {
  *
  * @ingroup IO
  */
-class MITK_CORE_EXPORT ImageGenerator
+class MITKCORE_EXPORT ImageGenerator
 {
 public:
 

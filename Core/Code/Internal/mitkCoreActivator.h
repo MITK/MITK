@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyDescriptions.h>
 #include <mitkPropertyExtensions.h>
 #include <mitkPropertyFilters.h>
-#include <Internal/mitkMimeTypeProvider.h>
+#include <mitkMimeTypeProvider.h>
 
 // Micro Services
 #include <usModuleActivator.h>

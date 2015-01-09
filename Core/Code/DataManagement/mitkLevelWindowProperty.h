@@ -38,7 +38,7 @@ namespace mitk {
  * mitk::LevelWindowProperty check the mitkImageVtkMapper2DLevelWindowTest.cpp
  * in Core\Code\Testing.
  */
-class MITK_CORE_EXPORT LevelWindowProperty : public BaseProperty
+class MITKCORE_EXPORT LevelWindowProperty : public BaseProperty
 {
 
 protected:

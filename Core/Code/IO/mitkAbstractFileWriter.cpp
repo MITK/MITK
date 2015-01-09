@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCustomMimeType.h>
 #include <mitkExceptionMacro.h>
 
-#include <Internal/mitkFileReaderWriterBase.h>
+#include <mitkFileReaderWriterBase.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>

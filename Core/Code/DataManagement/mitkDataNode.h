@@ -63,7 +63,7 @@ class Mapper;
  * \warning Change in semantics of SetProperty() since Aug 25th 2006. Check your usage of this method if you do
  *          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
  */
-class MITK_CORE_EXPORT DataNode : public itk::DataObject
+class MITKCORE_EXPORT DataNode : public itk::DataObject
 {
 public:
 
@@ -583,16 +583,16 @@ protected:
 
 
 #if (_MSC_VER > 1200) || !defined(_MSC_VER)
-MITK_CORE_EXPORT MBI_STD::istream& operator>>( MBI_STD::istream& i, DataNode::Pointer& dtn );
+MITKCORE_EXPORT MBI_STD::istream& operator>>( MBI_STD::istream& i, DataNode::Pointer& dtn );
 
-MITK_CORE_EXPORT MBI_STD::ostream& operator<<( MBI_STD::ostream& o, DataNode::Pointer& dtn);
+MITKCORE_EXPORT MBI_STD::ostream& operator<<( MBI_STD::ostream& o, DataNode::Pointer& dtn);
 #endif
 } // namespace mitk
 
 #if ((defined(_MSC_VER)) && (_MSC_VER <= 1200))
-MITK_CORE_EXPORT MBI_STD::istream& operator>>( MBI_STD::istream& i, mitk::DataNode::Pointer& dtn );
+MITKCORE_EXPORT MBI_STD::istream& operator>>( MBI_STD::istream& i, mitk::DataNode::Pointer& dtn );
 
-MITK_CORE_EXPORT MBI_STD::ostream& operator<<( MBI_STD::ostream& o, mitk::DataNode::Pointer& dtn);
+MITKCORE_EXPORT MBI_STD::ostream& operator<<( MBI_STD::ostream& o, mitk::DataNode::Pointer& dtn);
 #endif
 
 

@@ -33,15 +33,15 @@ if(NOT DEFINED GDCM_DIR)
      PREFIX ${proj}-cmake
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/gdcm-2.4.1.tar.bz2
      URL_MD5 1120f9a5ebcef7df6933ca83545f514d
-     INSTALL_COMMAND ""
      PATCH_COMMAND ${GDCM_PATCH_COMMAND}
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
        -DGDCM_BUILD_SHARED_LIBS:BOOL=ON
+       -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
      DEPENDS ${proj_DEPENDENCIES}
     )
-  set(GDCM_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  set(GDCM_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/lib/gdcm-2.4)
 
 else()
 

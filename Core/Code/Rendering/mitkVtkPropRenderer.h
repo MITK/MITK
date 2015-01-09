@@ -50,7 +50,7 @@ VtkPropRenderer replaces the old OpenGLRenderer.
 \sa rendering
 \ingroup rendering
 */
-class MITK_CORE_EXPORT VtkPropRenderer : public BaseRenderer
+class MITKCORE_EXPORT VtkPropRenderer : public BaseRenderer
 {
   // Workaround for Displaylistbug
 private:

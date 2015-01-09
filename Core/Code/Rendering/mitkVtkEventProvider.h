@@ -32,7 +32,7 @@ namespace mitk
 * This class is NON-QT dependent pandon to the current MITK event handling code in QmitkRenderWindow.
 * \ingroup Renderer
 */
-class MITK_CORE_EXPORT vtkEventProvider : public vtkInteractorObserver
+class MITKCORE_EXPORT vtkEventProvider : public vtkInteractorObserver
 {
   public:
     static vtkEventProvider *New();

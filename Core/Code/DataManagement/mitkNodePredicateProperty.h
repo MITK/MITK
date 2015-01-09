@@ -34,7 +34,7 @@ namespace mitk {
     //##
     //##
     //## @ingroup DataStorage
-    class MITK_CORE_EXPORT NodePredicateProperty : public NodePredicateBase
+    class MITKCORE_EXPORT NodePredicateProperty : public NodePredicateBase
     {
     public:
       mitkClassMacro(NodePredicateProperty, NodePredicateBase);

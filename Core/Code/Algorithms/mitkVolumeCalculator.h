@@ -34,7 +34,7 @@ namespace mitk
    *
    * The filter works for 2D, 3D and 3D+t. In the 3D+t case a vector of volumes is provided (see GetVolumes()).
    */
-  class MITK_CORE_EXPORT VolumeCalculator : public itk::Object
+  class MITKCORE_EXPORT VolumeCalculator : public itk::Object
   {
   public:
     mitkClassMacro(VolumeCalculator,itk::Object);

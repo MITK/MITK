@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class MITK_CORE_EXPORT LevelWindowPreset : public vtkXMLParser
+class MITKCORE_EXPORT LevelWindowPreset : public vtkXMLParser
 {
 public:
   static LevelWindowPreset *New();

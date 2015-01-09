@@ -26,7 +26,7 @@ class vtkRenderWindow;
 namespace mitk {
 
 
-class MITK_CORE_EXPORT CameraRotationController : public BaseController
+class MITKCORE_EXPORT CameraRotationController : public BaseController
 {
 public:
   mitkClassMacro(CameraRotationController,BaseController);

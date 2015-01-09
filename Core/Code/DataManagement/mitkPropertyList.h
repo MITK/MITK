@@ -61,7 +61,7 @@ class XMLWriter;
  *
  * @ingroup DataManagement
  */
-class MITK_CORE_EXPORT PropertyList : public itk::Object
+class MITKCORE_EXPORT PropertyList : public itk::Object
 {
 
   public:

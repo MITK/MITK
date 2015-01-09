@@ -27,7 +27,7 @@ namespace mitk {
   //## will be collected and only be carried out at the end of the function / section,
   //## when the deconstructor of the ModifiedLock object is called.
   //##
-  class MITK_CORE_EXPORT ModifiedLock
+  class MITKCORE_EXPORT ModifiedLock
   {
   public:
     ModifiedLock();

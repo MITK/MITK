@@ -220,6 +220,8 @@ public:
         parentWidget->UpdateTreeList();
     }
 
+    using IPerspectiveListener::PerspectiveChanged;
+
     void PerspectiveChanged(berry::IWorkbenchPage::Pointer,
                             berry::IPerspectiveDescriptor::Pointer,
                             berry::IWorkbenchPartReference::Pointer partRef, const std::string& changeId)

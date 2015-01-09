@@ -36,7 +36,7 @@ namespace mitk {
  * from IFileWriter and IFileReader and a default implementation is provided
  * in AbstractFileIO via AbstractFileWriter and AbstractFileReader.
  */
-struct MITK_CORE_EXPORT IFileIO
+struct MITKCORE_EXPORT IFileIO
 {
   // The order of the enum values is important: it is used
   // to rank writer implementations

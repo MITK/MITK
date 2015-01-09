@@ -27,11 +27,11 @@ namespace mitk {
  * @ingroup IO
  * @brief The IOMimeTypes class
  */
-class MITK_CORE_EXPORT IOMimeTypes
+class MITKCORE_EXPORT IOMimeTypes
 {
 public:
 
-  class MITK_CORE_EXPORT DicomMimeType : public CustomMimeType
+  class MITKCORE_EXPORT DicomMimeType : public CustomMimeType
   {
   public:
     DicomMimeType();

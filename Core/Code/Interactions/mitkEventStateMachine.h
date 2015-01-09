@@ -105,7 +105,7 @@ namespace mitk
    * is triggered by an event and it is associated with actions that are to be executed when the state change is performed.
    *
    */
-  class MITK_CORE_EXPORT EventStateMachine : public mitk::InteractionEventHandler
+  class MITKCORE_EXPORT EventStateMachine : public mitk::InteractionEventHandler
   {
 
   public:

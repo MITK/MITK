@@ -50,7 +50,7 @@ namespace mitk
  *
  * @ingroup DataManagement
  */
-class MITK_CORE_EXPORT EnumerationProperty : public BaseProperty
+class MITKCORE_EXPORT EnumerationProperty : public BaseProperty
 {
 public:
 

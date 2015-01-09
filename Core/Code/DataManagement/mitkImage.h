@@ -73,7 +73,7 @@ class ImageStatisticsHolder;
 //##
 //## For more information, see \ref MitkImagePage .
 //## @ingroup Data
-class MITK_CORE_EXPORT Image : public SlicedData
+class MITKCORE_EXPORT Image : public SlicedData
 {
   friend class SubImageSelector;
 
@@ -692,7 +692,7 @@ private:
  * @param verbose Flag indicating if the user wants detailed console output or not.
  * @return true, if all subsequent comparisons are true, false otherwise
  */
-DEPRECATED (MITK_CORE_EXPORT bool Equal( const mitk::Image* leftHandSide, const mitk::Image* rightHandSide, ScalarType eps, bool verbose ));
+DEPRECATED (MITKCORE_EXPORT bool Equal( const mitk::Image* leftHandSide, const mitk::Image* rightHandSide, ScalarType eps, bool verbose ));
 
 /**
 * @brief Equal A function comparing two images for beeing equal in meta- and imagedata
@@ -711,7 +711,7 @@ DEPRECATED (MITK_CORE_EXPORT bool Equal( const mitk::Image* leftHandSide, const 
 * @param verbose Flag indicating if the user wants detailed console output or not.
 * @return true, if all subsequent comparisons are true, false otherwise
 */
-MITK_CORE_EXPORT bool Equal( const mitk::Image& leftHandSide, const mitk::Image& rightHandSide, ScalarType eps, bool verbose );
+MITKCORE_EXPORT bool Equal( const mitk::Image& leftHandSide, const mitk::Image& rightHandSide, ScalarType eps, bool verbose );
 
 } // namespace mitk
 

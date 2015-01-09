@@ -41,7 +41,7 @@ namespace mitk {
  * \note The life-time of all mitk::IFileWriter objects returned by an
  * instance of this class ends with the destruction of that instance.
  */
-class MITK_CORE_EXPORT FileWriterRegistry
+class MITKCORE_EXPORT FileWriterRegistry
 {
 
 public:

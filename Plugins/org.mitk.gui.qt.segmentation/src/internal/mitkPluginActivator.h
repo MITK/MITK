@@ -19,11 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Parent classes
 #include <QObject>
 #include <ctkPluginActivator.h>
-#include <mitkExportMacros.h>
 
 namespace mitk
 {
-  class MITK_LOCAL PluginActivator : public QObject, public ctkPluginActivator
+  class PluginActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)

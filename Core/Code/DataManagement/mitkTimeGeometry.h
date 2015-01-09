@@ -49,7 +49,7 @@ namespace mitk {
   *
   * \addtogroup geometry
   */
-  class MITK_CORE_EXPORT TimeGeometry : public itk::Object, public OperationActor
+  class MITKCORE_EXPORT TimeGeometry : public itk::Object, public OperationActor
   {
   protected:
     TimeGeometry();

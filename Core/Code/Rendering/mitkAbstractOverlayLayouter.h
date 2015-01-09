@@ -34,7 +34,7 @@ class BaseRenderer;
  *One type of layouter should always have a unique identifier.
  *@ingroup Overlays
 */
-class MITK_CORE_EXPORT AbstractOverlayLayouter : public itk::LightObject {
+class MITKCORE_EXPORT AbstractOverlayLayouter : public itk::LightObject {
 public:
 
   mitkClassMacro(AbstractOverlayLayouter, itk::LightObject);

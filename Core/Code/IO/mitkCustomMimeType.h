@@ -39,7 +39,7 @@ class MimeType;
  * They wire files to specific IFileReader instances and provide data format
  * meta-data for selecting compatible IFileWriter instances.
  */
-class MITK_CORE_EXPORT CustomMimeType
+class MITKCORE_EXPORT CustomMimeType
 {
 public:
 

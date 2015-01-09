@@ -33,7 +33,7 @@ namespace mitk
  * DataObject.
  * @ingroup Process
  */
-class MITK_CORE_EXPORT PointSetSource : public BaseDataSource
+class MITKCORE_EXPORT PointSetSource : public BaseDataSource
 {
 public:
     mitkClassMacro( PointSetSource, BaseDataSource )

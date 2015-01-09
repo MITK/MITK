@@ -29,7 +29,7 @@ namespace mitk {
 //##Documentation
 //## TODO
 
-class MITK_CORE_EXPORT RestorePlanePositionOperation : public Operation
+class MITKCORE_EXPORT RestorePlanePositionOperation : public Operation
 {
   public:
   //##Documentation

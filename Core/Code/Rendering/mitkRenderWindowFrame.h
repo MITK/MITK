@@ -34,7 +34,7 @@ namespace mitk {
  * vtkProp (vtkMitkRectangleProp).
  * This class instantiates the vtkProp and a corresponding vtkRenderer instance.
  */
-class MITK_CORE_EXPORT RenderWindowFrame : public itk::Object
+class MITKCORE_EXPORT RenderWindowFrame : public itk::Object
 {
 public:
 

@@ -50,7 +50,7 @@ class CustomMimeType;
  *
  * @ingroup IO
  */
-class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
+class MITKCORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
 {
 public:
 

@@ -74,7 +74,7 @@ namespace mitk
   //## rendering process also should be reworked to use VTK based classes for
   //## both 2D and 3D rendering.
   //## @ingroup Renderer
-  class MITK_CORE_EXPORT BaseRenderer: public itk::Object
+  class MITKCORE_EXPORT BaseRenderer: public itk::Object
   {
   public:
 

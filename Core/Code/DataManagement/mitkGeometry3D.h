@@ -33,7 +33,7 @@ namespace mitk {
   //## @brief Standard implementation of BaseGeometry.
   //##
   //## @ingroup Geometry
-  class MITK_CORE_EXPORT Geometry3D : public BaseGeometry
+  class MITKCORE_EXPORT Geometry3D : public BaseGeometry
   {
   public:
     mitkClassMacro(Geometry3D, mitk::BaseGeometry);

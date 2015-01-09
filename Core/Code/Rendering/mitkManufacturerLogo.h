@@ -39,7 +39,7 @@ class RenderWindow;
  * of a vtkRenderWindow.
 
  */
-class MITK_CORE_EXPORT ManufacturerLogo : public BaseData
+class MITKCORE_EXPORT ManufacturerLogo : public BaseData
 {
 public:
 

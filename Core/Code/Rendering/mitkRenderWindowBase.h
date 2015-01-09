@@ -40,7 +40,7 @@ namespace mitk
  * \ingroup Renderer
  */
 
-class MITK_CORE_EXPORT RenderWindowBase
+class MITKCORE_EXPORT RenderWindowBase
 {
 public:
 

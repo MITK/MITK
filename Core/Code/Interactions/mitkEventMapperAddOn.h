@@ -29,7 +29,7 @@ namespace mitk {
   * @noimplement This interface is not intended to be implemented by clients.
   * @ingroup Interaction
   */
-  class MITK_CORE_EXPORT EventMapperAddOn : public itk::Object
+  class MITKCORE_EXPORT EventMapperAddOn : public itk::Object
   {
   public:
     /**

@@ -1,5 +1,7 @@
 MITK_CREATE_MODULE(DEPENDS MitkDataTypesExt MitkLegacyGL
-                   PACKAGE_DEPENDS ITK|ITKThresholding ANN
+                   PACKAGE_DEPENDS
+                     PUBLIC ITK|ITKThresholding
+                     PRIVATE ANN
                    WARNINGS_AS_ERRORS
                   )
 

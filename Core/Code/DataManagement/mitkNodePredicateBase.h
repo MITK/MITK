@@ -36,7 +36,7 @@ namespace mitk {
   //##          of these objects and should not keep them alive.
   //##
   //## @ingroup DataStorage
-  class MITK_CORE_EXPORT NodePredicateBase: public itk::Object
+  class MITKCORE_EXPORT NodePredicateBase: public itk::Object
   {
 
   public:

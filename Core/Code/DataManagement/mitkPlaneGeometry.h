@@ -75,7 +75,7 @@ namespace mitk {
   *
   * \ingroup Geometry
   */
-  class MITK_CORE_EXPORT PlaneGeometry : public BaseGeometry
+  class MITKCORE_EXPORT PlaneGeometry : public BaseGeometry
   {
   public:
     mitkClassMacro(PlaneGeometry,BaseGeometry);

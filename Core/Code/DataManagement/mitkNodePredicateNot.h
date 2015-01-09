@@ -29,7 +29,7 @@ namespace mitk {
   //## is a CompositePredicate.
   //##
   //## @ingroup DataStorage
-  class MITK_CORE_EXPORT NodePredicateNot : public mitk::NodePredicateCompositeBase
+  class MITKCORE_EXPORT NodePredicateNot : public mitk::NodePredicateCompositeBase
   {
   public:
     mitkClassMacro(NodePredicateNot, NodePredicateCompositeBase);

@@ -97,7 +97,7 @@ namespace mitk {
   //##
   //## Rule: everything is in mm (ms) if not stated otherwise.
   //## @ingroup Geometry
-  class MITK_CORE_EXPORT BaseGeometry : public itk::Object, public OperationActor
+  class MITKCORE_EXPORT BaseGeometry : public itk::Object, public OperationActor
   {
   public:
     mitkClassMacro(BaseGeometry, itk::Object);
@@ -653,7 +653,7 @@ namespace mitk {
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  DEPRECATED( MITK_CORE_EXPORT bool Equal(const mitk::BaseGeometry* leftHandSide, const mitk::BaseGeometry* rightHandSide, ScalarType eps, bool verbose));
+  DEPRECATED( MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry* leftHandSide, const mitk::BaseGeometry* rightHandSide, ScalarType eps, bool verbose));
 
   /**
   * @brief Equal A function comparing two geometries for beeing identical.
@@ -672,7 +672,7 @@ namespace mitk {
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  MITK_CORE_EXPORT bool Equal(const mitk::BaseGeometry& leftHandSide, const mitk::BaseGeometry& rightHandSide, ScalarType eps, bool verbose);
+  MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry& leftHandSide, const mitk::BaseGeometry& rightHandSide, ScalarType eps, bool verbose);
 
   /**
   * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
@@ -689,7 +689,7 @@ namespace mitk {
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  DEPRECATED( MITK_CORE_EXPORT bool Equal(const mitk::BaseGeometry::TransformType *leftHandSide, const mitk::BaseGeometry::TransformType *rightHandSide, ScalarType eps, bool verbose));
+  DEPRECATED( MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry::TransformType *leftHandSide, const mitk::BaseGeometry::TransformType *rightHandSide, ScalarType eps, bool verbose));
 
   /**
   * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
@@ -705,7 +705,7 @@ namespace mitk {
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  MITK_CORE_EXPORT bool Equal(const mitk::BaseGeometry::TransformType& leftHandSide, const mitk::BaseGeometry::TransformType& rightHandSide, ScalarType eps, bool verbose);
+  MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry::TransformType& leftHandSide, const mitk::BaseGeometry::TransformType& rightHandSide, ScalarType eps, bool verbose);
 
   /**
   * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
@@ -722,7 +722,7 @@ namespace mitk {
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  DEPRECATED( MITK_CORE_EXPORT bool Equal( const mitk::BaseGeometry::BoundingBoxType *leftHandSide, const mitk::BaseGeometry::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose));
+  DEPRECATED( MITKCORE_EXPORT bool Equal( const mitk::BaseGeometry::BoundingBoxType *leftHandSide, const mitk::BaseGeometry::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose));
 
   /**
   * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
@@ -738,7 +738,7 @@ namespace mitk {
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  MITK_CORE_EXPORT bool Equal( const  mitk::BaseGeometry::BoundingBoxType& leftHandSide, const mitk::BaseGeometry::BoundingBoxType& rightHandSide, ScalarType eps, bool verbose);
+  MITKCORE_EXPORT bool Equal( const  mitk::BaseGeometry::BoundingBoxType& leftHandSide, const mitk::BaseGeometry::BoundingBoxType& rightHandSide, ScalarType eps, bool verbose);
 } // namespace mitk
 
 #endif /* BaseGeometry_H_HEADER_INCLUDED */

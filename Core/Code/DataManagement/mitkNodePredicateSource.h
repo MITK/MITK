@@ -32,7 +32,7 @@ namespace mitk {
     //##          Alternatively mitk::StandaloneDataStorage::GetSources() can be used
     //##
     //## @ingroup DataStorage
-    class MITK_CORE_EXPORT NodePredicateSource : public NodePredicateBase
+    class MITKCORE_EXPORT NodePredicateSource : public NodePredicateBase
     {
     public:
 

@@ -29,7 +29,7 @@
 namespace mitk
 {
 
-  class MITK_CORE_EXPORT MouseMoveEvent : public InteractionPositionEvent {
+  class MITKCORE_EXPORT MouseMoveEvent : public InteractionPositionEvent {
 
   public:
     mitkClassMacro(MouseMoveEvent,InteractionPositionEvent);

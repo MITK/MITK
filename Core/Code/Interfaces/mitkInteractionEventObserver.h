@@ -34,7 +34,7 @@ namespace mitk
   * but usage thereof is optional. See the Notify method for more information.
   */
 
-  struct MITK_CORE_EXPORT InteractionEventObserver
+  struct MITKCORE_EXPORT InteractionEventObserver
   {
     InteractionEventObserver();
     virtual ~InteractionEventObserver();

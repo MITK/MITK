@@ -26,7 +26,7 @@ namespace mitk
     *
     * The property view uses this extension to configure the corresponding property editor.
     */
-  class MITK_CORE_EXPORT IntPropertyExtension : public PropertyExtension
+  class MITKCORE_EXPORT IntPropertyExtension : public PropertyExtension
   {
   public:
     mitkClassMacro(IntPropertyExtension, PropertyExtension);

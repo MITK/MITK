@@ -40,7 +40,7 @@ class OperationEvent;
  *
  * \ingroup Undo
  */
-class MITK_CORE_EXPORT OperationActor
+class MITKCORE_EXPORT OperationActor
 {
 public:
   virtual ~OperationActor() {}

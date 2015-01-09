@@ -123,7 +123,7 @@ class GenericLookupTable
 * @param Type the value type of the GenericLookupTable
 */
 #define mitkSpecializeGenericLookupTable(LookupTableName,Type)  \
-class MITK_CORE_EXPORT LookupTableName: public GenericLookupTable< Type >    \
+class MITKCORE_EXPORT LookupTableName: public GenericLookupTable< Type >    \
 {                                                               \
 public:                                                         \
 typedef LookupTableName Self;                                   \
@@ -134,7 +134,7 @@ typedef LookupTableName Self;                                   \
   virtual Superclass& operator=(const Superclass& other) { return Superclass::operator=(other); } \
   virtual ~LookupTableName() {}                                 \
 }; \
-MITK_CORE_EXPORT std::ostream& operator<<(std::ostream& stream, const LookupTableName& /*l*/);
+MITKCORE_EXPORT std::ostream& operator<<(std::ostream& stream, const LookupTableName& /*l*/);
 
 /**
 * Generates the ostream << operator for the lookuptable. This definition

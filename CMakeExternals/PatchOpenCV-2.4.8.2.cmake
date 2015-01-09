@@ -5,6 +5,9 @@
 # fix issues with whitespace in source directories
 file(STRINGS cmake/templates/OpenCVConfig.cmake.in sourceCode NEWLINE_CONSUME)
 string(REPLACE "SET(OpenCV2_INCLUDE_DIRS @OpenCV2_INCLUDE_DIRS_CONFIGCMAKE@)" "SET(OpenCV2_INCLUDE_DIRS \"@OpenCV2_INCLUDE_DIRS_CONFIGCMAKE@\")" sourceCode ${sourceCode})
+# remove direct include_directories commands which would set OpenCV include dirs on *all*
+# targets in the project
+string(REPLACE "include_directories(\$" "# include_directories(\$" sourceCode ${sourceCode})
 # set variable CONTENTS, which is substituted in TEMPLATE_FILE
 set(CONTENTS ${sourceCode})
 configure_file(${TEMPLATE_FILE} cmake/templates/OpenCVConfig.cmake.in @ONLY)

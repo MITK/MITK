@@ -36,7 +36,7 @@ namespace mitk {
  * @brief Property for strings
  * @ingroup DataManagement
  */
-  class MITK_CORE_EXPORT StringProperty : public BaseProperty
+  class MITKCORE_EXPORT StringProperty : public BaseProperty
   {
     protected:
       std::string m_Value;

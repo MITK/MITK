@@ -46,11 +46,7 @@
 #!
 function(FunctionCreateProvisioningFile)
 
-  macro_parse_arguments(_PROV "FILE;INCLUDE;PLUGINS;EXCLUDE_PLUGINS;PLUGIN_DIR" "NO_INSTALL" ${ARGN})
-
-  if(_PROV_PLUGIN_DIR)
-    message(WARNING "The PLUGIN_DIR argument is no longer supported. Either use FunctionCreateProvisioningFile_legacy or adapt your CMake function call.")
-  endif()
+  cmake_parse_arguments(_PROV "NO_INSTALL" "FILE" "INCLUDE;PLUGINS;EXCLUDE_PLUGINS" ${ARGN})
 
   if(NOT _PROV_FILE)
     message(SEND_ERROR "FILE argument must not be empty")
@@ -175,7 +171,7 @@ endfunction()
 
 function(FunctionCreateProvisioningFile_legacy)
 
-  macro_parse_arguments(_PROV "FILE;INCLUDE;PLUGIN_DIR;PLUGINS" "" ${ARGN})
+  cmake_parse_arguments(_PROV "FILE;INCLUDE;PLUGIN_DIR;PLUGINS" "" ${ARGN})
 
   set(out_var )
   set(out_var_install )

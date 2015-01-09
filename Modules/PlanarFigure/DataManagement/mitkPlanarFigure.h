@@ -399,7 +399,7 @@ private:
 
 };
 
-MITK_CORE_EXPORT bool Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose );
+MitkPlanarFigure_EXPORT bool Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose );
 
 } // namespace mitk
 

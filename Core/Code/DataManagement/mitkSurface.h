@@ -28,7 +28,7 @@ namespace mitk
     * \brief Class for storing surfaces (vtkPolyData).
     * \ingroup Data
     */
-  class MITK_CORE_EXPORT Surface : public BaseData
+  class MITKCORE_EXPORT Surface : public BaseData
   {
   public:
     typedef itk::ImageRegion<5> RegionType;
@@ -88,7 +88,7 @@ namespace mitk
   * @param verbose Flag indicating if the method should give a detailed console output.
   * @return True if every comparison is true, false in any other case.
   */
-DEPRECATED( MITK_CORE_EXPORT bool Equal( mitk::Surface* leftHandSide, mitk::Surface* rightHandSide, mitk::ScalarType eps, bool verbose));
+DEPRECATED( MITKCORE_EXPORT bool Equal( mitk::Surface* leftHandSide, mitk::Surface* rightHandSide, mitk::ScalarType eps, bool verbose));
 
 /**
 * @brief Equal Compare two surfaces for equality, returns true if found equal.
@@ -99,7 +99,7 @@ DEPRECATED( MITK_CORE_EXPORT bool Equal( mitk::Surface* leftHandSide, mitk::Surf
 * @param verbose Flag indicating if the method should give a detailed console output.
 * @return True if every comparison is true, false in any other case.
 */
-MITK_CORE_EXPORT bool Equal( mitk::Surface& leftHandSide, mitk::Surface& rightHandSide, mitk::ScalarType eps, bool verbose);
+MITKCORE_EXPORT bool Equal( mitk::Surface& leftHandSide, mitk::Surface& rightHandSide, mitk::ScalarType eps, bool verbose);
 
   /**
   * @brief Equal Compare two vtk PolyDatas for equality, returns true if found equal.
@@ -115,7 +115,7 @@ MITK_CORE_EXPORT bool Equal( mitk::Surface& leftHandSide, mitk::Surface& rightHa
   * all the two poly datas have the same number of points with the same coordinates. It is not checked whether
   * all points are correctly connected.
   */
-DEPRECATED( MITK_CORE_EXPORT bool Equal( vtkPolyData* leftHandSide, vtkPolyData* rightHandSide, mitk::ScalarType eps, bool verbose));
+DEPRECATED( MITKCORE_EXPORT bool Equal( vtkPolyData* leftHandSide, vtkPolyData* rightHandSide, mitk::ScalarType eps, bool verbose));
 
 /**
 * @brief Equal Compare two vtk PolyDatas for equality, returns true if found equal.
@@ -130,7 +130,7 @@ DEPRECATED( MITK_CORE_EXPORT bool Equal( vtkPolyData* leftHandSide, vtkPolyData*
 * all the two poly datas have the same number of points with the same coordinates. It is not checked whether
 * all points are correctly connected.
 */
-MITK_CORE_EXPORT bool Equal( vtkPolyData& leftHandSide, vtkPolyData& rightHandSide, mitk::ScalarType eps, bool verbose);
+MITKCORE_EXPORT bool Equal( vtkPolyData& leftHandSide, vtkPolyData& rightHandSide, mitk::ScalarType eps, bool verbose);
 }
 
 #endif

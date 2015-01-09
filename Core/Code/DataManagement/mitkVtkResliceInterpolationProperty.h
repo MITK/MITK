@@ -35,7 +35,7 @@ namespace mitk
  * VTK_RESLICE_NEAREST, VTK_RESLICE_LINEAR, VTK_RESLICE_CUBIC
  * Default is VTK_RESLICE_NEAREST
  */
-class MITK_CORE_EXPORT VtkResliceInterpolationProperty : public EnumerationProperty
+class MITKCORE_EXPORT VtkResliceInterpolationProperty : public EnumerationProperty
 {
 public:
 

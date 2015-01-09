@@ -37,7 +37,7 @@ namespace mitk {
  * to use the mitk::TransferFunction check the
  * mitkImageVtkMapper2DTransferFunctionTest.cpp in Core\Code\Testing.
  */
-class MITK_CORE_EXPORT TransferFunctionProperty : public BaseProperty
+class MITKCORE_EXPORT TransferFunctionProperty : public BaseProperty
 {
 public:
 

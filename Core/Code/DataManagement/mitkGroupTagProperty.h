@@ -35,7 +35,7 @@ namespace mitk {
     group of datatree nodes. This can be used to build groups of datatreenodes without the
     need to contain them in a specific hiearchic order in the datatree
 */
-class MITK_CORE_EXPORT GroupTagProperty : public BaseProperty
+class MITKCORE_EXPORT GroupTagProperty : public BaseProperty
 {
   public:
     mitkClassMacro(GroupTagProperty, BaseProperty);

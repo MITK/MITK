@@ -32,7 +32,7 @@ class vtkPolyData;
  * This class is a replacement for the deprecated vtkMitkRectangleProp, which
  * used to render the same effect with pure OpenGL.
  */
-class MITK_EXPORT vtkMitkRectangleProp : public vtkProp
+class MITKCORE_EXPORT vtkMitkRectangleProp : public vtkProp
 {
 public:
   static vtkMitkRectangleProp* New();

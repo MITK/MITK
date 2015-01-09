@@ -53,8 +53,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Legacy Support:
 #include <mitkCoreServices.h>
-#include <Internal/mitkLegacyFileReaderService.h>
-#include <Internal/mitkLegacyFileWriterService.h>
+#include <mitkLegacyFileReaderService.h>
+#include <mitkLegacyFileWriterService.h>
 
 
 void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase* factory) {

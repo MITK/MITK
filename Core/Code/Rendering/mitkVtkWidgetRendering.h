@@ -40,7 +40,7 @@ class RenderWindow;
  * configuration such as placement, size, and en-/disabling of interaction
  * mechanisms need to be done in the vtkWidget object.
  */
-class MITK_CORE_EXPORT VtkWidgetRendering : public BaseData
+class MITKCORE_EXPORT VtkWidgetRendering : public BaseData
 {
 public:
 

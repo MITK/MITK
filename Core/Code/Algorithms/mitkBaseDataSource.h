@@ -74,7 +74,7 @@ class BaseData;
  * for example mitk::ImageSource.
  * @ingroup Process
  */
-class MITK_CORE_EXPORT BaseDataSource : public itk::ProcessObject
+class MITKCORE_EXPORT BaseDataSource : public itk::ProcessObject
 {
 public:
 

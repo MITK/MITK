@@ -201,7 +201,7 @@ public:
 
   }
 
-  void Execute(const itk::Object * object, const itk::EventObject & event)
+  void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/)
   {
 
 

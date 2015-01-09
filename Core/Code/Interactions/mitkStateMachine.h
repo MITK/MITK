@@ -33,7 +33,7 @@ namespace mitk {
 
   // base class of statem machine functors
 
-  class MITK_CORE_EXPORT TStateMachineFunctor
+  class MITKCORE_EXPORT TStateMachineFunctor
   {
     public:
       virtual bool DoAction(Action*, const StateEvent*)=0;        // call using function
@@ -136,7 +136,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
   */
 
-  class MITK_CORE_EXPORT StateMachine : public itk::Object, public mitk::OperationActor
+  class MITKCORE_EXPORT StateMachine : public itk::Object, public mitk::OperationActor
   {
 
   public:

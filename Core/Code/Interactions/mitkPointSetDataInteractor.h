@@ -62,7 +62,7 @@ namespace mitk
    */
 
   // Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
-  class MITK_CORE_EXPORT PointSetDataInteractor: public DataInteractor
+  class MITKCORE_EXPORT PointSetDataInteractor: public DataInteractor
   {
 
   public:

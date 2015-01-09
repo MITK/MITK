@@ -105,6 +105,10 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
       // was supplied, we stop here.
       return;
     }
+    else
+    {
+      refs = m_Data->m_WriterRegistry.GetReferences(baseData, destMimeType);
+    }
   }
   else
   {

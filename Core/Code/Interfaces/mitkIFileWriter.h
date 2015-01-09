@@ -59,19 +59,68 @@ struct MITK_CORE_EXPORT IFileWriter : public IFileIO
 {
   virtual ~IFileWriter();
 
+  /**
+   * @brief Set the input data for writing.
+   * @param data The input data.
+   */
   virtual void SetInput(const BaseData* data) = 0;
+
+  /**
+   * @brief Get the input data set via SetInput().
+   * @return The input data.
+   */
   virtual const BaseData* GetInput() const = 0;
 
+  /**
+   * @brief Set the output location.
+   * @param location A file-system path.
+   *
+   * The location argument specifies a file-system path where the input
+   * data must be written. This method must remove any previously set
+   * output stream.
+   */
   virtual void SetOutputLocation(const std::string& location) = 0;
+
+  /**
+   * @brief Get the current output location.
+   * @return The output location.
+   *
+   * If no stream is set (i.e. GetOutputStream returns \c NULL), the
+   * returned location string is required to represent a file-system path.
+   */
   virtual std::string GetOutputLocation() const = 0;
 
+  /**
+   * @brief Set an output stream for writing.
+   * @param location A custom label for the output stream.
+   * @param os The output stream.
+   *
+   * If \c os is \c NULL, this clears the current output stream and \c location
+   * is interpreted as a file-system path. Otherwise, \c location is a custom
+   * label describing the output stream \c os.
+   */
   virtual void SetOutputStream(const std::string& location, std::ostream* os) = 0;
+
+  /**
+   * @brief Get the output stream.
+   * @return The currently set output stream.
+   */
   virtual std::ostream* GetOutputStream() const = 0;
 
+  /**
+   * @brief Write the input data.
+   *
+   * If GetOutputStream() returns a non-null value, this method must use
+   * the returned stream object to write the data set via SetInput(). If no
+   * output stream was set, the data must be written to the path returned
+   * by GetOutputLocation().
+   *
+   * @throws mitk::Exception
+   */
   virtual void Write() = 0;
 
   /**
-   * @brief Service property name for the supported mitk::BaseData sub-class
+   * @brief Service property name for the supported mitk::BaseData sub-class.
    *
    * The property value must be of type \c std::string.
    *

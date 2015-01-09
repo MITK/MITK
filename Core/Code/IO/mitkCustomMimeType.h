@@ -32,6 +32,12 @@ class MimeType;
  * @ingroup IO
  * @ingroup MicroServices_Interfaces
  *
+ * @brief The CustomMimeType class represents a custom mime-type which
+ *        may be registered as a service object.
+ *
+ * Instances of this class are usually created and registered as a service.
+ * They wire files to specific IFileReader instances and provide data format
+ * meta-data for selecting compatible IFileWriter instances.
  */
 class MITK_CORE_EXPORT CustomMimeType
 {

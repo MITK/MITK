@@ -319,7 +319,7 @@ mitk::NrrdDiffusionImageWriter* mitk::NrrdDiffusionImageWriter::Clone() const
 mitk::IFileWriter::ConfidenceLevel mitk::NrrdDiffusionImageWriter::GetConfidenceLevel() const
 {
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
-  if (input.IsNull() )
+  if (input.IsNull() || !mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( input ) )
   {
     return Unsupported;
   }

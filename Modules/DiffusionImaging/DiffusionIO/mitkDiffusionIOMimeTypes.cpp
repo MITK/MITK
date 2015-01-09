@@ -67,9 +67,7 @@ DiffusionIOMimeTypes::DwiMimeType::DwiMimeType()
   this->AddExtension("hdwi");
   this->AddExtension("fsl");
   this->AddExtension("fslgz");
-  // this is commented out to fix the dashboard, should be enabled again
-  // once mime types have a way to check the base data for properties
-  //this->AddExtension("nrrd");
+  this->AddExtension("nrrd");
 }
 
 bool DiffusionIOMimeTypes::DwiMimeType::AppliesTo(const std::string &path) const

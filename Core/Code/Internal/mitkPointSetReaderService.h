@@ -27,6 +27,8 @@ namespace mitk
 {
 
 /**
+ * @internal
+ *
  * @brief reads xml representations of mitk::PointSets from a file
  *
  * Reader for xml files containing one or multiple xml represenations of

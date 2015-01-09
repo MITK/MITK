@@ -1,0 +1,118 @@
+/**
+
+\page Step06Page MITK Tutorial - Step 6: Use an interactive region-grower
+
+The source is now split among several files:
+
+\li \ref Step6.cpp "Step6.cpp"
+\li \ref Step6.h "Step6.h"
+\li \ref Step6RegionGrowing.txx "Step6RegionGrowing.txx"
+\li \ref Step6RegionGrowing1.cpp "Step6RegionGrowing1.cpp"
+\li \ref Step6RegionGrowing2.cpp "Step6RegionGrowing2.cpp"
+\li \ref Step6main.cpp "Step6main.cpp"
+\li Path to files used in this step: \n
+http://mitk.org/download/tutorial-data/Pic3D.nrrd (image)
+
+
+In this step the program is enhanced by the possibility to start a region-grower at interactively added points.
+We will see how MITK images can be accessed as ITK images.
+We now load the image file Pic3D.nrrd only since the surface will be the result of the region-growing.
+
+Add points in the image by pressing SHIFT+left mouse key, then adjust the thresholds and press 'Start region growing'.
+
+\imageMacro{step6_result.png,"",13.55}
+
+The class Step6 inherits from QWidget and provides methods for setting up the widgets.
+Step6RegionGrowing.cpp contains a method for performing the region-growing. Step6main.cpp contains main.
+Like in ITK and VTK class member names start with m_ followed by the proper member name starting with a capital letter (e.g. m_Tree).
+Function names start with capital letters. To learn more about style conventions in MITK read \ref StyleGuideAndNotesPage "The MITK Style Guide".
+
+\dontinclude Step6.cpp
+
+The widgets are initialized as in the previous steps but with an additional QVBox for a button to start the segmentation:
+
+\skipline Create controlsParent
+\until hlayout->addWidget(m_LineEditThresholdMax)
+
+
+This creates a button to start the segmentation and its clicked() signal is connected to the method StartRegionGrowing():
+
+\dontinclude Step6.cpp
+
+\skipline QPushButton* startButton
+\skipline connect(startButton
+
+\section AccessMTIKImagesAsITKImagesSection Access MITK images as ITK images
+
+ITK images are templated whereas mitk::Images are not. To use ITK filters with MITK images, we have to convert from MITK to ITK. To do so, first
+define an access method, which is templated as an ITK image is:
+
+\code
+template<TPixel, VImageDimension>
+MyAccessMethod(itk::Image<TPixel, VImageDimension>* itkImage)
+{
+...
+}
+\endcode
+
+If you don't understand this template syntax, you should read any C++ text book. Understanding template syntax is crucial to successfully using ITK.
+
+To call this templated method with an (untemplated) mitk::Image, you can use the AccessByItk macro from mitkImageAccessByItk.h. This macro checks for
+the actual image type of the mitk::Image and does any neccessary conversions. Look into "Modules / Adaptor classes" for more information.
+
+\code
+AccessByItk(mitkImage, MyAccessMethod)
+\endcode
+
+\dontinclude Step6RegionGrowing.txx
+
+In this step our access method is called RegionGrowing() (defined in \ref Step6RegionGrowing.txx "Step6RegionGrowing.txx"):
+\skipline template
+\until }
+\until }
+
+Additionally the access function has to be instantiated for all datatypes and two/three dimensions as some compilers have memory problems without this explicit instantiation, some even need instantiations in separate files for 2D/3D: \n
+For 2D in \ref Step6RegionGrowing1.cpp "Step6RegionGrowing1.cpp" :
+
+\dontinclude Step6RegionGrowing1.cpp
+
+\skipline InstantiateAccessFunctionForFixedDimension_1
+
+... and for 3D in \ref Step6RegionGrowing2.cpp "Step6RegionGrowing2.cpp":
+
+\dontinclude Step6RegionGrowing2.cpp
+
+\skipline InstantiateAccessFunctionForFixedDimension_1
+
+\dontinclude Step6.cpp
+
+The method StartRegionGrowing() finally calls our access method RegionGrowing():
+\skipline Step6::StartRegionGrowing
+\until }
+
+\section ConvertingITKMITKSection Converting ITK images to MITK images and vice versa
+
+In some cases it is useful to simply convert between ITK and MITK images. The direction ITK to MITK is easy, since mitk::Image can handle most data types. The direction MITK to ITK is more critical, since ITK images have to be instantiated with a fixed pixel type and fixed dimension at compile time.
+
+\li \code mitk::Image mitk::ImportItkImage(itk::Image<...>) \endcode
+\li \code mitk::CastToItkImage(mitkImage, itk::Image<...>) \endcode
+
+
+\section ConnectingMITKToVTKSection Connecting MITK images to VTK
+
+Images are not converted or copied: The data array is just accessed via an encapsulating VTK object.
+
+\li \code vtkImageData* mitk::Image::GetVtkImageData(int time = 0) \endcode
+
+\section SurfacesMITKToVTKSection MITK Surfaces to VTK and vice versa
+
+Again: not a conversion, just accessing.
+
+\li \code vtkPolyData* mitk::Surface::GetVtkPolyData(int time = 0) \endcode
+
+\li \code mitk::Surface::SetVtkPolyData(vtkPolyData*, int time = 0) \endcode
+
+
+\ref Step05Page "[Previous step]" \ref Step07Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+
+*/

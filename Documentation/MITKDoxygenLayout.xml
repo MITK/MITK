@@ -1,9 +1,9 @@
 <doxygenlayout version="1.0">
   <!-- Navigation index tabs for HTML output -->
   <navindex>
-    <tab type="mainpage" visible="yes" title="Portal"/>
-    <tab type="pages" visible="yes" title="" intro=""/>
-    <tab type="usergroup" title="MITK API Documentation">
+    <tab type="mainpage" visible="yes" title="Home"/>
+    <tab type="pages" visible="yes" title="Manual" intro=""/>
+    <tab type="usergroup" title="API Reference">
       <tab type="modules" visible="yes" title="Groups" intro="Here is a list of all groups:"/>
       <tab type="namespaces" visible="yes" title="">
         <tab type="namespacelist" visible="yes" title="" intro=""/>
@@ -20,14 +20,9 @@
         <tab type="globals" visible="yes" title="" intro=""/>
       </tab>
       <tab type="examples" visible="yes" title="" intro=""/>
-      <tab type="usergroup" title="Deprecated">
-        <tab type="user" url="@ref deprecated" title="Deprecated List"/>
-        <tab type="user" url="@ref deprecatedSince2013_03" title="Deprecated as of MITK 2013.03"/>
-        <tab type="user" url="@ref deprecatedSince2012_12" title="Deprecated as of MITK 2012.12"/>
-        <tab type="user" url="@ref deprecatedSince2012_09" title="Deprecated as of MITK 2012.09"/>
-      </tab>
     </tab>
-    <tab type="user" url="@ref BlueBerryIntro" title="BlueBerry Application Framework"/>
+    <tab type="user" url="http://mitk.org/Download" title="Download"/>
+    <tab type="user" url="http://bugs.mitk.org" title="Bugzilla"/>
   </navindex>
 
   <!-- Layout definition for a class page -->
@@ -36,10 +31,11 @@
     <includes visible="$SHOW_INCLUDE_FILES"/>
     <inheritancegraph visible="$CLASS_GRAPH"/>
     <collaborationgraph visible="$COLLABORATION_GRAPH"/>
-    <allmemberslink visible="yes"/>
     <memberdecl>
       <nestedclasses visible="yes" title=""/>
       <publictypes title=""/>
+      <services title=""/>
+      <interfaces title=""/>
       <publicslots title=""/>
       <signals title=""/>
       <publicmethods title=""/>
@@ -74,6 +70,8 @@
       <inlineclasses title=""/>
       <typedefs title=""/>
       <enums title=""/>
+      <services title=""/>
+      <interfaces title=""/>
       <constructors title=""/>
       <functions title=""/>
       <related title=""/>
@@ -81,6 +79,7 @@
       <properties title=""/>
       <events title=""/>
     </memberdef>
+    <allmemberslink visible="yes"/>
     <usedfiles visible="$SHOW_USED_FILES"/>
     <authorsection visible="yes"/>
   </class>
@@ -90,6 +89,7 @@
     <briefdescription visible="yes"/>
     <memberdecl>
       <nestednamespaces visible="yes" title=""/>
+      <constantgroups visible="yes" title=""/>
       <classes visible="yes" title=""/>
       <typedefs title=""/>
       <enums title=""/>
@@ -118,6 +118,7 @@
     <memberdecl>
       <classes visible="yes" title=""/>
       <namespaces visible="yes" title=""/>
+      <constantgroups visible="yes" title=""/>
       <defines title=""/>
       <typedefs title=""/>
       <enums title=""/>

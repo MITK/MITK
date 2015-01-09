@@ -1,5 +1,5 @@
 /**
-  \defgroup MitkDataTypesExtModule MitkDataTypesExt
+  \defgroup MitkDataTypesExtModule DataTypesExt
   \ingroup MITKModules
 
   \brief MITK data types and related classes.

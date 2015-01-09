@@ -32,6 +32,10 @@ namespace mitk {
 
 class CustomMimeType;
 
+/**
+ * @ingroup IO
+ *
+ */
 class MITK_CORE_EXPORT MimeType
 {
 

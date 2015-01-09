@@ -34,7 +34,7 @@ namespace mitk {
   * @brief OpenGL-based mapper to display a mitk::ContourModelSet object containing several contours in a 2D render window
   *
   *
-  * @ingroup Mapper
+  * @ingroup MitkContourModelModule
   */
   class MitkContourModel_EXPORT ContourModelSetGLMapper2D : public ContourModelGLMapper2DBase
   {

@@ -28,6 +28,11 @@ namespace mitk {
 
 class MimeType;
 
+/**
+ * @ingroup IO
+ * @ingroup MicroServices_Interfaces
+ *
+ */
 class MITK_CORE_EXPORT CustomMimeType
 {
 public:

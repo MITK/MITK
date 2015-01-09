@@ -35,7 +35,7 @@ namespace mitk
 
   /**
   * \deprecatedSince{2014_03} mitk::MouseMovePointSetInteractor is deprecated. Needs to be updated to the new interaction-framework.
-  * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
+  * Refer to \ref DataInteractionPage for general information about the concept of the new implementation.
   */
 
   class MITK_CORE_EXPORT MouseMovePointSetInteractor : public PointSetInteractor

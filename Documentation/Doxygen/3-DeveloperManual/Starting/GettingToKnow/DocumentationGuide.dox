@@ -1,0 +1,84 @@
+/**
+\page DocumentationGuide Writing Documentation
+
+\section DocumentationGuideCodeGeneral General remarks
+
+MITK uses <a href="http://www.stack.nl/~dimitri/doxygen/">Doxygen</a> for the generation of our user manual pages as well as for the generation of the on- and offline reference manuals. So on the technical side many questions can be answered by the <a href="http://www.stack.nl/~dimitri/doxygen/manual.html">doxygen documentation</a>, such as the list of commands or a few basic doxygen tutorials.
+
+Therefore this document is not primarily intended as a guide to using doxygen, the doxygen manual does a much better job of that, but as a guide to use doxygen in MITK and a collection of helpful hints and advise about pittfalls.
+
+Also, of course you need to have doxygen installed to generate documentation.
+
+\section DocumentationGuideCode Documenting the source code
+
+MITK is a substantial project and encompasses many different source files by many different developers over quite a considerable timeframe. Many of them have written excellent code which can do a lot of things and is very helpful to people who might apply it in wholly unlooked for ways to completely different problems. To facilitate this sharing and reusing of ressources one first and foremost has to know what kind of ressources are already available.
+
+Few people write code in the intention for it to be difficult to be used by others, but unfortunately what might seem a very efficient and easily understandable piece of code to the author might be nigh unreadable for someone else. Very often it does not in fact matter whether the code itself is understandable, as long as it one can get the information what a function is supposed to do. While comments in the source file help a lot to gain this knowledge in can get quite tedious go through every file looking for the right tool.
+
+This is where using doxygen pays off by giving a short comment in the header file a reference manual is automatically generated.
+
+While doxygen support several different manners of documentation, the MITK documentation should keep a uniform documentation style:
+\warning{
+Use <b>only</b> the \verbatim /** ... */ \endverbatim style for documentation.
+}
+
+In dire emergencies you may consider commenting via the /// style, others must <b>never</b> be used.
+
+An example:
+\verbatim
+  /** \brief Brief description what the commented part does.
+   *
+   * More detailed description. This can be as long as you like,
+   * whereas the brief description should never be more than one sentence.
+   */
+\endverbatim
+
+See \subpage DocumentationExample for an exemplary documentation of a class.
+
+\subsection DocumentationGuideCodeHints Helpful hints:
+<ul>
+ <li> Always put comments intended for doxygen in the header files.
+</ul>
+
+\section DocumentationGuideManual Writing user manuals
+
+While the usage of your view/perspective/application might seem obvious and accessible to you, to most people it is not. Writing a good manual is key for this. It is very difficult to write a manual which is too comprehensive, most often if something can be done in a wrong way, somebody will see this as the only one.
+
+For MITK purposes you should put your documentation in BUNDLEPATH/documentation/UserManual/QmitkMyViewName.dox .
+
+Give them a unique name and remember to only use alphanumeric characters and underscores. Identifiers like "org.placeA.x" and "org.placeB.y" look identical to doxygen because it only parses the "org". Use "org_placeA_x" instead.
+
+Regarding images: Doxygen looks for images globally. To avoid confusion, include the plugin name into the image. E.g. "Checkboxes.png" is a bad name while "QmitkIGTTracking_Checkboxes.png" is a good name.
+
+Include images only via the image Macro! This way it is automatically included in the pdf export of the documentation.
+
+\verbatim
+  // The Macro hast he following form (note the braces!):
+  \imageMacro{imagePath, "Image Description", Image size in cm}
+
+  // e.g.:
+  \imageMacro{QmitkIGTTracking_Checkboxes.png, "Some beautiful Checkboxes!", 5}
+
+  // If you must use commas in the description, escape them!
+ \imageMacro{QmitkIGTTracking_Checkboxes.png, "Some beautiful Checkboxes\, you have never seen better ones! ", 5}
+
+\endverbatim
+
+Image size is only used for the pdf export, but images won't be displayed at all if it is missing. Maximum is 16.
+
+The nightly generated HTML documentation and the Qt Help System documentation can contain different content using the isHTML command.
+
+\subsection DocumentationGuideManualHints Helpful hints:
+<ul>
+ <li> Do not use fullstops (".") in identifiers, it throws doxygen off
+ <li> Think were your page should go in the MITK help page structure and declare it as a subpage accordingly
+ <lI> Use the imageMacro instead of the image command
+ <li> Use structuring elements, such as sections and subsections
+ <li> Use references to allow for fast navigation
+ <li> Images, pictures and sketches are great, use them
+ <li> Use visual help like remark, paragraph and warning
+ <li> BLUEBERRY_USE_QT_HELP should be set to ON
+ <li> The plug-in org.blueberry.ui.qt.help should be set to ON
+</ul>
+
+*/

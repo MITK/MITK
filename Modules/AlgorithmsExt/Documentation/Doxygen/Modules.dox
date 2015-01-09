@@ -1,5 +1,5 @@
 /**
-  \defgroup MitkAlgorithmsExtModule MitkAlgorithmsExt
+  \defgroup MitkAlgorithmsExtModule AlgorithmsExt
   \ingroup MITKModules
 
   \brief General purpose algorithms.

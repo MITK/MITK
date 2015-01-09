@@ -25,6 +25,8 @@ namespace mitk
 {
 
 /**
+ * @internal
+ *
  * @brief XML-based writer for mitk::PointSets
  *
  * XML-based writer for mitk::PointSet. Multiple PointSets can be written in

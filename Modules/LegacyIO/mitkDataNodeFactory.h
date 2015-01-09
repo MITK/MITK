@@ -38,7 +38,7 @@ namespace mitk
 *
 * If you want to add a new file type, you have to register the factory
 * of the file reader in the class mitk::BaseDataIOFactory.
-* @ingroup IO
+* @ingroup MitkLegacyIOModule
 * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 */
 class MitkLegacyIO_EXPORT DataNodeFactory : public DataNodeSource, public FileSeriesReader

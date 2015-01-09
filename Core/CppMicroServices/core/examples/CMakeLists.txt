@@ -1,6 +1,6 @@
 project(CoreExamples)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 find_package(CppMicroServices NO_MODULE REQUIRED)
 

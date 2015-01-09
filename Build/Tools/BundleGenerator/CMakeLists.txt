@@ -1,6 +1,6 @@
 project(MITKBundleGenerator)
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 set(BUNDLE_DEFAULTS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/BundleDefaults.cmake")
 

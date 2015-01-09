@@ -1,17 +1,11 @@
 set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
 
-if(DESIRED_QT_VERSION MATCHES "4")
-  cmake_minimum_required(VERSION 2.8.9)
-else()
-  cmake_minimum_required(VERSION 2.8.12)
-endif()
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 #-----------------------------------------------------------------------------
 # Include ctest launchers for dashboard in case of makefile generator
 #-----------------------------------------------------------------------------
-if(${CMAKE_VERSION} VERSION_GREATER "2.8.9")
-  include(CTestUseLaunchers)
-endif()
+include(CTestUseLaunchers)
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified

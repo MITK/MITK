@@ -1,6 +1,6 @@
 project(BlueBerry)
 if (${CMAKE_SOURCE_DIR} EQUAL ${PROJECT_SOURCE_DIR})
-  cmake_minimum_required(VERSION 2.8.9)
+  cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")

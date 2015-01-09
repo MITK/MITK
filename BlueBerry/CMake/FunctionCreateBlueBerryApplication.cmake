@@ -114,9 +114,9 @@ mitk_use_modules(TARGET ${_APP_NAME} MODULES mbilog PACKAGES Poco Qt4|QtCore Qt5
 set_target_properties(${_APP_NAME} PROPERTIES
                       COMPILE_FLAGS "${_app_compile_flags}")
 
-target_link_libraries(${_APP_NAME} org_blueberry_osgi ${_APP_LINK_LIBRARIES})
+target_link_libraries(${_APP_NAME} PRIVATE org_blueberry_osgi ${_APP_LINK_LIBRARIES})
 if(WIN32)
-  target_link_libraries(${_APP_NAME} ${QT_QTMAIN_LIBRARY})
+  target_link_libraries(${_APP_NAME} PRIVATE ${QT_QTMAIN_LIBRARY})
 endif()
 
 # -----------------------------------------------------------------------

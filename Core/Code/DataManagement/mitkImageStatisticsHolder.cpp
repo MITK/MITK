@@ -45,7 +45,7 @@ mitk::ImageStatisticsHolder::~ImageStatisticsHolder()
   //m_Image = NULL;
 }
 
-const mitk::ImageStatisticsHolder::HistogramType* mitk::ImageStatisticsHolder::GetScalarHistogram(int t, unsigned int component)
+const mitk::ImageStatisticsHolder::HistogramType* mitk::ImageStatisticsHolder::GetScalarHistogram(int t, unsigned int /*component*/)
 {
   mitk::ImageTimeSelector* timeSelector = this->GetTimeSelector();
   if(timeSelector!=NULL)

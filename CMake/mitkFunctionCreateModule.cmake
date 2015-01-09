@@ -1,40 +1,18 @@
-function(_link_directories_for_packages)
-  set(ALL_LIBRARY_DIRS )
-  foreach(package ${ARGN})
-    if(NOT ${package} MATCHES "^(Qt[45].*|ITK|VTK)$")
-      foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
-        if(EXISTS "${dir}/MITK_${package}_Config.cmake")
-          include("${dir}/MITK_${package}_Config.cmake")
-          break()
-        endif()
-      endforeach()
-    endif()
-  endforeach()
-  if(ALL_LIBRARY_DIRS)
-    list(REMOVE_DUPLICATES ALL_LIBRARY_DIRS)
-    link_directories(${ALL_LIBRARY_DIRS})
-  endif()
-endfunction()
-
 ##################################################################
 #
 # mitk_create_module
 #
 #! Creates a module for the automatic module dependency system within MITK.
-#! Configurations are generated in the moduleConf directory.
 #!
-#! USAGE:
+#! Example:
 #!
 #! \code
-#! mitk_create_module([<moduleName>]
-#!     [INCLUDE_DIRS <include directories>]
-#!     [INTERNAL_INCLUDE_DIRS <internally used include directories>]
-#!     [DEPENDS <modules we need>]
-#!     [PACKAGE_DEPENDS <packages we need, like ITK, VTK, QT>]
-#!     [TARGET_DEPENDS <list of additional dependencies>
-#!     [EXPORT_DEFINE <declspec macro name for dll exports>]
-#!     [HEADERS_ONLY]
-#!     [WARNINGS_AS_ERRORS]
+#! mitk_create_module(
+#!     DEPENDS PUBLIC MitkCore
+#!     PACKAGE_DEPENDS
+#!       PRIVATE Qt5|Xml+Networking
+#!       PUBLIC  ITK|Watershed
+#!     WARNINGS_AS_ERRORS
 #! \endcode
 #!
 #! The <moduleName> parameter specifies the name of the module which is used
@@ -77,31 +55,43 @@ endfunction()
 #! Parameters (all optional):
 #!
 #! \param <moduleName> The module name (also used as target name)
-#! \param SUBPROJECTS List of CDash labels
+#! \param FILES_CMAKE File name of a CMake file setting source list variables
+#!        (defaults to files.cmake)
 #! \param VERSION Module version number, e.g. "1.2.0"
-#! \param INCLUDE_DIRS Public include dirs (used in mitkMacroCreateModuleConf.cmake)
-#! \param INTERNAL_INCLUDE_DIRS Private include dirs internal to this module
-#! \param DEPENDS List of public module dependencies
-#! \param DEPENDS_INTERNAL List of private module dependencies
+#! \param AUTOLOAD_WITH A module target name identifying the module which will
+#!        trigger the automatic loading of this module
+#! \param DEPRECATED_SINCE Marks this modules as deprecated since <arg>
+#! \param DESCRIPTION A description for this module
+#!
+#! Multi-value Parameters (all optional):
+#!
+#! \param SUBPROJECTS List of CDash labels
+#! \param INCLUDE_DIRS Include directories for this module:
+#!        \verbatim
+#! [[PUBLIC|PRIVATE|INTERFACE] <dir1>...]...
+#! \endverbatim
+#!        The default scope for include directories is PUBLIC.
+#! \param DEPENDS List of module dependencies:
+#!        \verbatim
+#! [[PUBLIC|PRIVATE|INTERFACE] <module1>...]...
+#! \endverbatim
+#!        The default scope for module dependencies is PUBLIC.
 #! \param PACKAGE_DEPENDS List of public packages dependencies (e.g. Qt, VTK, etc.).
 #!        Package dependencies have the following syntax:
 #!        \verbatim
-#! PACKAGE[|COMPONENT1[+COMPONENT2]...]
+#! [PUBLIC|PRIVATE|INTERFACE] PACKAGE[|COMPONENT1[+COMPONENT2]...]
 #! \endverbatim
-#! \param TARGET_DEPENDS List of CMake targets this module depends on
-#! \param EXPORT_DEFINE Export macro name for public symbols of this module
-#! \param AUTOLOAD_WITH A module target name identifying the module which will
-#!        trigger the automatic loading of this module
-#! \param ADDITIONAL_LIBS List of addidtional libraries linked to this module
-#! \param FILES_CMAKE File name of a CMake file setting source list variables
-#!        (defaults to files.cmake)
-#! \param DEPRECATED_SINCE Marks this modules as deprecated since <arg>
-#! \param DESCRIPTION A description for this module
+#!        The default scope for package dependencies is PRIVATE.
+#! \param ADDITIONAL_LIBS List of addidtional private libraries linked to this module.
+#!        The folder containing the library will be added to the global list of library search paths.
+#! \param CPP_FILES List of source files for this module. If the list is non-empty,
+#!        the module does not need to provide a files.cmake file or FILES_CMAKE argument.
+#! \param H_FILES List of public header files for this module. It is recommended to use
+#!        a files.cmake file instead.
 #!
 #! Options (optional)
 #!
 #! \param FORCE_STATIC Force building this module as a static library
-#! \param HEADERS_ONLY This module is a headers-only library
 #! \param GCC_DEFAULT_VISIBILITY Do not use gcc visibility flags - all
 #!        symbols will be exported
 #! \param NO_INIT Do not create CppMicroServices initialization code
@@ -128,9 +118,9 @@ function(mitk_create_module)
       INTERNAL_INCLUDE_DIRS  # include dirs internal to this module (DEPRECATED)
       DEPENDS                # list of modules this module depends on: [PUBLIC|PRIVATE|INTERFACE] <list>
       DEPENDS_INTERNAL       # list of modules this module internally depends on (DEPRECATED)
-      PACKAGE_DEPENDS        # list of "packages this module depends on (e.g. Qt, VTK, etc.)
+      PACKAGE_DEPENDS        # list of "packages this module depends on (e.g. Qt, VTK, etc.): [PUBLIC|PRIVATE|INTERFACE] <package-list>
       TARGET_DEPENDS         # list of CMake targets this module should depend on
-      ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
+      ADDITIONAL_LIBS        # list of addidtional private libraries linked to this module.
       CPP_FILES              # list of cpp files
       H_FILES                # list of header files: [PUBLIC|PRIVATE] <list>
      )
@@ -139,10 +129,12 @@ function(mitk_create_module)
       FORCE_STATIC           # force building this module as a static library
       HEADERS_ONLY           # this module is a headers-only library
       GCC_DEFAULT_VISIBILITY # do not use gcc visibility flags - all symbols will be exported
+      NO_DEFAULT_INCLUDE_DIRS # do not add default include directories like "include" or "."
       NO_INIT                # do not create CppMicroServices initialization code
       NO_FEATURE_INFO        # do not create a feature info by calling add_feature_info()
       WARNINGS_AS_ERRORS     # treat all compiler warnings as errors
       EXECUTABLE             # create an executable; do not use directly, use mitk_create_executable() instead
+      C_MODULE               # compile all source files as C sources
      )
 
   cmake_parse_arguments(MODULE "${_macro_options}" "${_macro_params}" "${_macro_multiparams}" ${ARGN})
@@ -156,6 +148,13 @@ function(mitk_create_module)
       message(SEND_ERROR "The module name must not be empty")
     endif()
   endif()
+
+  set(_deprecated_args INTERNAL_INCLUDE_DIRS DEPENDS_INTERNAL EXPORT_DEFINE TARGET_DEPENDS HEADERS_ONLY)
+  foreach(_deprecated_arg ${_deprecated_args})
+    if(MODULE_${_deprecated_arg})
+      message(WARNING "The ${_deprecated_arg} argument is deprecated")
+    endif()
+  endforeach()
 
   set(_module_type module)
   set(_Module_type Module)
@@ -193,12 +192,6 @@ function(mitk_create_module)
     endif()
   else()
     set(MODULE_TARGET ${MODULE_NAME})
-  endif()
-
-  if(MODULE_DEPRECATED_SINCE)
-    set(MODULE_IS_DEPRECATED 1)
-  else()
-    set(MODULE_IS_DEPRECATED 0)
   endif()
 
   if(NOT MODULE_SUBPROJECTS)
@@ -281,35 +274,7 @@ function(mitk_create_module)
           endif()
         endif()
 
-        # Convert relative include dirs to absolute dirs
-        set(_include_dirs . ${MODULE_INCLUDE_DIRS})
-        set(MODULE_INCLUDE_DIRS)
-        foreach(dir ${_include_dirs})
-          get_filename_component(_abs_dir ${dir} ABSOLUTE)
-          list(APPEND MODULE_INCLUDE_DIRS ${_abs_dir})
-        endforeach()
-        list(APPEND MODULE_INCLUDE_DIRS ${MITK_BINARY_DIR})
-
-        # Convert relative internal include dirs to absolute dirs
-        set(_include_dirs ${MODULE_INTERNAL_INCLUDE_DIRS})
-        set(MODULE_INTERNAL_INCLUDE_DIRS)
-        foreach(dir ${_include_dirs})
-          get_filename_component(_abs_dir ${dir} ABSOLUTE)
-          list(APPEND MODULE_INTERNAL_INCLUDE_DIRS ${_abs_dir})
-        endforeach()
-
-        # Qt generates headers in the binary tree
-        list(APPEND MODULE_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR})
-
-        # Add the module specific include dirs
-        include_directories(${MODULE_INCLUDE_DIRS} ${MODULE_INTERNAL_INCLUDE_DIRS})
-
-        if(NOT MODULE_EXECUTABLE)
-          _MITK_CREATE_MODULE_CONF()
-        endif()
-        if(MODULE_EXPORT_DEFINE)
-          message(WARNING "The EXPORT_DEFINE argument is deprecated")
-        else()
+        if(NOT MODULE_EXPORT_DEFINE)
           set(MODULE_EXPORT_DEFINE ${MODULE_NAME}_EXPORT)
         endif()
 
@@ -325,6 +290,21 @@ function(mitk_create_module)
           include(${MODULE_FILES_CMAKE})
         elseif(NOT MODULE_CPP_FILES AND NOT MODULE_HEADERS_ONLY)
           message("WARNING No cmake file found AND no cpp files specified... ")
+        endif()
+
+        if(MODULE_CPP_FILES)
+          list(APPEND CPP_FILES ${MODULE_CPP_FILES})
+        endif()
+
+        if(CPP_FILES)
+          set(MODULE_HEADERS_ONLY 0)
+          if(MODULE_C_MODULE)
+            set_source_files_properties(${CPP_FILES} PROPERTIES LANGUAGE C)
+          else()
+            set_source_files_properties(${CPP_FILES} PROPERTIES LANGUAGE CXX)
+          endif()
+        else()
+          set(MODULE_HEADERS_ONLY 1)
         endif()
 
         set(module_c_flags )
@@ -346,7 +326,7 @@ function(mitk_create_module)
           if(MSVC_VERSION)
             mitkFunctionCheckCAndCXXCompilerFlags("/WX" module_c_flags module_cxx_flags)
           else()
-            mitkFunctionCheckCAndCXXCompilerFlags("-Werror" module_c_flags module_cxx_flags)
+            mitkFunctionCheckCAndCXXCompilerFlags(-Werror module_c_flags module_cxx_flags)
 
             # The flag "c++0x-static-nonintegral-init" has been renamed in newer Clang
             # versions to "static-member-init", see
@@ -366,13 +346,6 @@ function(mitk_create_module)
             mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=static-member-init" module_c_flags module_cxx_flags)
             mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unknown-warning" module_c_flags module_cxx_flags)
             mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=gnu" module_c_flags module_cxx_flags)
-
-            # VNL headers throw a lot of these, not fixable for us at least in ITK 3
-            mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unused-parameter" module_c_flags module_cxx_flags)
-
-            # Some DICOM header file in ITK
-            mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=cast-align" module_c_flags module_cxx_flags)
-
           endif()
         endif(MODULE_WARNINGS_AS_ERRORS)
 
@@ -458,30 +431,6 @@ function(mitk_create_module)
 
         if(NOT MODULE_HEADERS_ONLY)
 
-          # We have to include the MITK_<package>_Config.cmake files here because
-          # some external packages do not provide exported targets with an
-          # absolute path to link to. So we need to add link directories *before*
-          # add_library() or add_executable() is called. So far, this is needed only
-          # for GDCM and ACVD.
-
-          _link_directories_for_packages(${PACKAGE_NAMES})
-
-          # Apply properties to the module target.
-          # We cannot use set_target_properties like below since there is no way to
-          # differentiate C/C++ and Releas/Debug flags using target properties.
-          # See http://www.cmake.org/Bug/view.php?id=6493
-          #set_target_properties(${MODULE_TARGET} PROPERTIES
-          #                      COMPILE_FLAGS "${module_compile_flags}")
-          #
-          # Strangely, we need to set the variables below in the parent scope
-          # (outside of the function) to be picked up by the target.
-          set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${module_c_flags}" PARENT_SCOPE)
-          set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${module_c_flags_debug}" PARENT_SCOPE)
-          set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${module_c_flags_release}" PARENT_SCOPE)
-          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${module_cxx_flags}" PARENT_SCOPE)
-          set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${module_cxx_flags_debug}" PARENT_SCOPE)
-          set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${module_cxx_flags_release}" PARENT_SCOPE)
-
           if(MODULE_EXECUTABLE)
             add_executable(${MODULE_TARGET}
                            ${MODULE_CPP_FILES} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
@@ -494,8 +443,40 @@ function(mitk_create_module)
             set(_us_module_name ${MODULE_TARGET})
           endif()
 
-          set_property(TARGET ${MODULE_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${_us_module_name})
+          # Apply properties to the module target.
+          target_compile_definitions(${MODULE_TARGET} PRIVATE US_MODULE_NAME=${_us_module_name})
+          if(MODULE_C_MODULE)
+            if(module_c_flags)
+              string(REPLACE " " ";" module_c_flags "${module_c_flags}")
+              target_compile_options(${MODULE_TARGET} PRIVATE ${module_c_flags})
+            endif()
+            if(module_c_flags_debug)
+              string(REPLACE " " ";" module_c_flags_debug "${module_c_flags_debug}")
+              target_compile_options(${MODULE_TARGET} PRIVATE $<$<CONFIG:Debug>:${module_c_flags_debug}>)
+            endif()
+            if(module_c_flags_release)
+              string(REPLACE " " ";" module_c_flags_release "${module_c_flags_release}")
+              target_compile_options(${MODULE_TARGET} PRIVATE $<$<CONFIG:Release>:${module_c_flags_release}>)
+            endif()
+          else()
+            if(module_cxx_flags)
+              string(REPLACE " " ";" module_cxx_flags "${module_cxx_flags}")
+              target_compile_options(${MODULE_TARGET} PRIVATE ${module_cxx_flags})
+            endif()
+            if(module_cxx_flags_debug)
+              string(REPLACE " " ";" module_cxx_flags_debug "${module_cxx_flags_debug}")
+              target_compile_options(${MODULE_TARGET} PRIVATE $<$<CONFIG:Debug>:${module_cxx_flags_debug}>)
+            endif()
+            if(module_cxx_flags_release)
+              string(REPLACE " " ";" module_cxx_flags_release "${module_cxx_flags_release}")
+              target_compile_options(${MODULE_TARGET} PRIVATE $<$<CONFIG:Release>:${module_cxx_flags_release}>)
+            endif()
+          endif()
+
           set_property(TARGET ${MODULE_TARGET} PROPERTY US_MODULE_NAME ${_us_module_name})
+          if(MODULE_DEPRECATED_SINCE)
+            set_property(TARGET ${MODULE_TARGET} PROPERTY MITK_MODULE_DEPRECATED_SINCE ${MODULE_DEPRECATED_SINCE})
+          endif()
 
           if(MODULE_TARGET_DEPENDS)
             add_dependencies(${MODULE_TARGET} ${MODULE_TARGET_DEPENDS})
@@ -528,7 +509,7 @@ function(mitk_create_module)
           # Add additional library search directories to a global property which
           # can be evaluated by other CMake macros, e.g. our install scripts.
           if(MODULE_ADDITIONAL_LIBS)
-            target_link_libraries(${MODULE_TARGET} ${MODULE_ADDITIONAL_LIBS})
+            target_link_libraries(${MODULE_TARGET} PRIVATE ${MODULE_ADDITIONAL_LIBS})
             get_property(_mitk_additional_library_search_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
             foreach(_lib_filepath ${MODULE_ADDITIONAL_LIBS})
               get_filename_component(_search_path "${_lib_filepath}" PATH)
@@ -605,12 +586,27 @@ function(mitk_create_module)
           )
         endif()
 
+        # add include directories
+        if(MODULE_INTERNAL_INCLUDE_DIRS)
+          target_include_directories(${MODULE_TARGET} PRIVATE ${MODULE_INTERNAL_INCLUDE_DIRS})
+        endif()
+        if(NOT MODULE_NO_DEFAULT_INCDLUE_DIRS)
+          if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/include)
+            target_include_directories(${MODULE_TARGET} PUBLIC include)
+          else()
+            target_include_directories(${MODULE_TARGET} PUBLIC .)
+          endif()
+          if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src)
+            target_include_directories(${MODULE_TARGET} PRIVATE src)
+          endif()
+        endif()
+        target_include_directories(${MODULE_TARGET}
+          PUBLIC ${MODULE_INCLUDE_DIRS}
+          PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
+        )
+
       endif()
     endif()
-  endif()
-
-  if(NOT MODULE_IS_ENABLED AND NOT MODULE_EXECUTABLE)
-    _MITK_CREATE_MODULE_CONF()
   endif()
 
   if(_MISSING_DEP)

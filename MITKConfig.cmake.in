@@ -1,3 +1,6 @@
+if(CMAKE_VERSION VERSION_LESS @MITK_CMAKE_MINIMUM_REQUIRED_VERSION@)
+  message(FATAL_ERROR "MITK requires at least CMake Version @MITK_CMAKE_MINIMUM_REQUIRED_VERSION@")
+endif()
 
 # Update the CMake module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@MITK_SOURCE_DIR@/CMake")
@@ -14,14 +17,11 @@ include(mitkFunctionInstallProvisioningFiles)
 include(mitkFunctionInstallAutoLoadModules)
 include(mitkFunctionGetLibrarySearchPaths)
 include(mitkFunctionUseModules)
-include(mitkMacroCreateModuleConf)
 include(mitkFunctionCheckModuleDependencies)
 include(mitkFunctionCreateModule)
 include(mitkMacroCreateExecutable)
-include(mitkMacroCheckModule)
 include(mitkMacroCreateModuleTests)
 include(mitkFunctionAddCustomModuleTest)
-include(mitkMacroUseModule)
 include(mitkMacroMultiplexPicType)
 include(mitkMacroInstall)
 include(mitkMacroInstallHelperApp)
@@ -72,19 +72,6 @@ else()
   set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR})
 endif()
 
-if(MODULES_CONF_DIRS)
-  list(APPEND MODULES_CONF_DIRS "@MODULES_CONF_DIRS@")
-  list(REMOVE_DUPLICATES MODULES_CONF_DIRS)
-else()
-  set(MODULES_CONF_DIRS "@MODULES_CONF_DIRS@")
-endif()
-
-set(MODULES_CONF_DIRNAME "@MODULES_CONF_DIRNAME@")
-
-foreach(_module @MITK_MODULE_NAMES@)
-  set(${_module}_CONFIG_FILE "@MITK_BINARY_DIR@/@MODULES_CONF_DIRNAME@/${_module}Config.cmake")
-endforeach()
-
 # External projects
 set(CTK_DIR "@CTK_DIR@")
 set(ANN_DIR "@ANN_DIR@")
@@ -127,6 +114,11 @@ set(MITK_USE_SOFA @MITK_USE_SOFA@)
 set(MITK_USE_Python @MITK_USE_Python@)
 set(MITK_USE_SimpleITK @MITK_USE_SimpleITK@)
 set(MITK_USE_ACVD @MITK_USE_ACVD@)
+
+find_package(GDCM PATHS ${GDCM_DIR} REQUIRED)
+if(MITK_USE_OpenCV)
+  find_package(OpenCV PATHS ${OpenCV_DIR} REQUIRED)
+endif()
 
 if(MITK_USE_Qt4)
   set(MITK_QT4_MINIMUM_VERSION @MITK_QT4_MINIMUM_VERSION@)

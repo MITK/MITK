@@ -1,6 +1,8 @@
 mitk_create_module(
-  DEPENDS MitkCore
-  PACKAGE_DEPENDS VTK|vtkTestingRendering CppUnit
+  DEPENDS PUBLIC MitkCore
+  PACKAGE_DEPENDS
+    PUBLIC CppUnit
+    PRIVATE VTK|vtkTestingRendering tinyxml
   WARNINGS_AS_ERRORS
 )
 

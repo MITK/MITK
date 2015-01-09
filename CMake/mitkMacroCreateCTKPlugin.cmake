@@ -27,8 +27,6 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
       set(plugin_no_install)
     endif()
 
-    _link_directories_for_packages(${_package_deps})
-
     MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE ${_PLUGIN_EXPORT_DIRECTIVE}
                             EXPORTED_INCLUDE_SUFFIXES ${_PLUGIN_EXPORTED_INCLUDE_SUFFIXES}
                             DOXYGEN_TAGFILES ${_PLUGIN_DOXYGEN_TAGFILES}

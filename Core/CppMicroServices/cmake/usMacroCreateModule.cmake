@@ -53,13 +53,9 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/include/us${PROJECT_NAME}Config.h.in)
     ${CMAKE_CURRENT_BINARY_DIR}/include/us${PROJECT_NAME}Config.h)
 endif()
 
-include_directories(
-  ${US_INCLUDE_DIRS}
-  ${${PROJECT_NAME}_INCLUDE_DIRS}
-)
-
 set(_internal_include_dirs ${${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS})
 set(${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS )
+
 if(_internal_include_dirs)
   foreach(_internal_include_dir ${_internal_include_dirs})
     if(IS_ABSOLUTE "${_internal_include_dir}")
@@ -68,7 +64,15 @@ if(_internal_include_dirs)
       list(APPEND ${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${_internal_include_dir})
     endif()
   endforeach()
-  include_directories(${${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS})
+endif()
+
+
+if(CMAKE_VERSION VERSION_LESS 2.8.12)
+  include_directories(
+    ${US_INCLUDE_DIRS}
+    ${${PROJECT_NAME}_INCLUDE_DIRS}
+    ${${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS}
+  )
 endif()
 
 #-----------------------------------------------------------------------------
@@ -101,6 +105,17 @@ if(${PROJECT_NAME}_LINK_FLAGS OR US_LINK_FLAGS)
     LINK_FLAGS "${US_LINK_FLAGS} ${${PROJECT_NAME}_LINK_FLAGS}"
   )
 endif()
+
+if(CMAKE_VERSION VERSION_GREATER 2.8.11.99)
+  # Currently, public headers include private header files,
+  # so the internal include dirs need to be in the public
+  # include dir section. This needs to be fixed.
+  target_include_directories(${${PROJECT_NAME}_TARGET}
+    PUBLIC ${US_INCLUDE_DIRS} ${${PROJECT_NAME}_INCLUDE_DIRS}
+    PUBLIC ${${PROJECT_NAME}_INTERNAL_INCLUDE_DIRS}
+   )
+endif()
+
 
 set_target_properties(${${PROJECT_NAME}_TARGET} PROPERTIES
   SOVERSION ${${PROJECT_NAME}_VERSION}

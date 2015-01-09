@@ -1,4 +1,5 @@
 MITK_CREATE_MODULE_TESTS()
+mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|ITKThresholding)
 
 mitkAddCustomModuleTest(mitkKinectReconstructionTest_LegoPhantom mitkKinectReconstructionTest
                         ${MITK_DATA_DIR}/ToF-Data/CalibrationFiles/Kinect_RGB_camera.xml #camera intrinsics

@@ -8,4 +8,4 @@ MACRO_CREATE_CTK_PLUGIN(
   NO_INSTALL
   )
 
-target_link_libraries(${PROJECT_NAME} ${CppUnit_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CppUnit_LIBRARIES})

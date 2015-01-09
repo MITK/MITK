@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.0.0)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.1)
+cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
@@ -447,7 +448,6 @@ include(GenerateExportHeader)
 include(CMakeParseArguments)
 include(mitkFunctionCheckCompilerFlags)
 include(mitkFunctionGetGccVersion)
-include(MacroParseArguments)
 include(mitkFunctionSuppressWarnings) # includes several functions
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionGetVersion)
@@ -458,14 +458,11 @@ include(mitkFunctionInstallAutoLoadModules)
 include(mitkFunctionGetLibrarySearchPaths)
 include(mitkFunctionCompileSnippets)
 include(mitkFunctionUseModules)
-include(mitkMacroCreateModuleConf)
 include(mitkFunctionCheckModuleDependencies)
 include(mitkFunctionCreateModule)
 include(mitkMacroCreateExecutable)
-include(mitkMacroCheckModule)
 include(mitkMacroCreateModuleTests)
 include(mitkFunctionAddCustomModuleTest)
-include(mitkMacroUseModule)
 include(mitkMacroMultiplexPicType)
 include(mitkMacroInstall)
 include(mitkMacroInstallHelperApp)
@@ -621,6 +618,11 @@ set(MITK_EXE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR ${MITK_SOURCE_DIR}/CMake/PackageDepends)
 set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR})
 
+find_package(GDCM PATHS ${GDCM_DIR} REQUIRED)
+if(MITK_USE_OpenCV)
+  find_package(OpenCV PATHS ${OpenCV_DIR} REQUIRED)
+endif()
+
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
@@ -694,15 +696,6 @@ endif()
 #-----------------------------------------------------------------------------
 
 include(mitkSetupVariables)
-
-  #-----------------------------------------------------------------------------
-  # Cleanup
-  #-----------------------------------------------------------------------------
-
-  file(GLOB _MODULES_CONF_FILES ${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME}/*.cmake)
-  if(_MODULES_CONF_FILES)
-    file(REMOVE ${_MODULES_CONF_FILES})
-  endif()
 
 add_subdirectory(Utilities)
 
@@ -995,6 +988,12 @@ set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_TARGETS \"${a
     set(MITK_EXPORTED_TARGET_PROPERTIES "${MITK_EXPORTED_TARGET_PROPERTIES}
 set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_DIRECTORY \"${autoload_dir}\")")
   endif()
+
+  get_target_property(deprecated_module ${target_to_export} MITK_MODULE_DEPRECATED_SINCE)
+  if(deprecated_module)
+    set(MITK_EXPORTED_TARGET_PROPERTIES "${MITK_EXPORTED_TARGET_PROPERTIES}
+set_target_properties(${target_to_export} PROPERTIES MITK_MODULE_DEPRECATED_SINCE \"${deprecated_module}\")")
+  endif()
 endforeach()
 
 get_property(MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS_CONFIG GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
@@ -1011,13 +1010,6 @@ configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 
 set(IPFUNC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipFunc)
 set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
-
-file(GLOB _MODULES_CONF_FILES RELATIVE ${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME} ${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME}/*.cmake)
-set(MITK_MODULE_NAMES)
-foreach(_module ${_MODULES_CONF_FILES})
-  string(REPLACE Config.cmake "" _module_name ${_module})
-  list(APPEND MITK_MODULE_NAMES ${_module_name})
-endforeach()
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)

@@ -1,7 +1,5 @@
 set(CPP_FILES
 QmitkApplicationCursor.cpp
-QmitkEnums.h
-QmitkCustomVariants.h
 QmitkDataStorageComboBox.cpp
 QmitkDataStorageListModel.cpp
 QmitkDataStorageTableModel.cpp
@@ -34,6 +32,11 @@ QmitkSliderLevelWindowWidget.cpp
 QmitkStdMultiWidget.cpp
 QmitkMouseModeSwitcher.cpp
 QmitkDataStorageFilterProxyModel.cpp
+)
+
+set(H_FILES
+QmitkCustomVariants.h
+QmitkEnums.h
 )
 
 set(MOC_H_FILES

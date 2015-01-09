@@ -9,7 +9,7 @@ else()
 endif()
 
 MITK_CREATE_MODULE_TESTS(US_MODULE)
-mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|ITKThresholding)
+mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|ITKThresholding+ITKTestKernel VTK|vtkTestingRendering tinyxml)
 
 mitkAddCustomModuleTest(mitkVolumeCalculatorTest_Png2D-bw mitkVolumeCalculatorTest
                         ${MITK_DATA_DIR}/Png2D-bw.png
@@ -238,5 +238,3 @@ set_property(TEST mitkImageWriterTest_nrrdImage PROPERTY LABELS MITK-Core)
 set_property(TEST mitkImageWriterTest_2DPNGImage PROPERTY LABELS MITK-Core)
 set_property(TEST mitkImageWriterTest_rgbPNGImage PROPERTY LABELS MITK-Core)
 set_property(TEST mitkImageWriterTest_rgbaPNGImage PROPERTY LABELS MITK-Core)
-
-add_subdirectory(DCMTesting)

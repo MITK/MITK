@@ -16,15 +16,16 @@ set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 0)
 
 MITK_CREATE_MODULE(Core
   INCLUDE_DIRS
-    Algorithms Common DataManagement Controllers
-    Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}
-  INTERNAL_INCLUDE_DIRS
-    ${OPENGL_INCLUDE_DIR}
-  DEPENDS mbilog CppMicroServices
-  PACKAGE_DEPENDS tinyxml GDCM
-                  ITK|ITKTransform+ITKImageGrid+ITKImageFeature+ITKTestKernel+ITKIORAW
-                  VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingVolumeOpenGL+vtkRenderingFreeTypeOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
-                  OpenGL
+    PUBLIC Algorithms Common DataManagement Controllers Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}
+    PRIVATE Internal ${OPENGL_INCLUDE_DIR}
+  DEPENDS PUBLIC mbilog CppMicroServices
+  PACKAGE_DEPENDS
+    PRIVATE tinyxml OpenGL
+    # Remove public GDCM and ITKIOGDCM dependency after mitkDicomSeriesReader was removed
+    PUBLIC  GDCM ITK|ITKIOGDCM
+    PUBLIC  ITK|ITKTransform+ITKImageGrid+ITKImageFeature
+    PRIVATE ITK|ITKIORAW+ITKTestKernel
+    PUBLIC  VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingVolumeOpenGL+vtkRenderingFreeTypeOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
   WARNINGS_AS_ERRORS
   # Do not automatically create CppMicroServices initialization code.
   # Because the VTK 6 "auto-init" functionality injects file-local static
@@ -37,6 +38,8 @@ MITK_CREATE_MODULE(Core
   # the mitkCoreActivator.cpp file.
   NO_INIT
 )
+
+set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1)
 
 # this is needed for libraries which link to Mitk and need
 # symbols from explicitly instantiated templates

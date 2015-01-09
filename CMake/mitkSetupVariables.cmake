@@ -41,8 +41,6 @@ endif()
 #-----------------------------------
 # Configuration of module system
 #-----------------------------------
-set(MODULES_CONF_DIRNAME modulesConf)
-set(MODULES_CONF_DIRS ${MITK_BINARY_DIR}/${MODULES_CONF_DIRNAME})
 
 # Configure module naming conventions
 set(MITK_MODULE_NAME_REGEX_MATCH "^[A-Z].*$")

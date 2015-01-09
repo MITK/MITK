@@ -1,4 +1,5 @@
 MITK_CREATE_MODULE_TESTS()
+mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES VTK|vtkTestingRendering)
 
 set(testcaseBasename mitkViewportRenderingTest)
 

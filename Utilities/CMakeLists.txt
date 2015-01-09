@@ -2,6 +2,7 @@ SUPPRESS_ALL_WARNINGS()
 
 # most stuff of these uses itk_zlib.h (via mitkIpPic.h)
 find_package(ITK)
+set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1)
 include(${ITK_USE_FILE})
 
 # some legacy util files include in the old style with prefixed directory,

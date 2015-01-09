@@ -13,4 +13,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mbilogConfig.cmake.in"
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mbilogConfig.h.in"
 "${CMAKE_CURRENT_BINARY_DIR}/mbilogConfig.h" @ONLY)
 
-mitk_create_module(NO_INIT)
+mitk_create_module(
+  NO_INIT
+  WARNINGS_AS_ERRORS
+)

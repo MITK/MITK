@@ -81,6 +81,8 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
 {
   mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
 
+  std::vector<FileWriterRegistry::WriterReference> refs;
+
   std::string destMimeType = mimeType;
   if (destMimeType.empty() && !path.empty())
   {
@@ -88,7 +90,14 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
     std::vector<MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForFile(path);
     if (!mimeTypes.empty())
     {
-      destMimeType = mimeTypes.front().GetName();
+      for( unsigned int index = 0; index < mimeTypes.size(); index++)
+      {
+        std::vector<FileWriterRegistry::WriterReference> tempRefs = m_Data->m_WriterRegistry.GetReferences(baseData, mimeTypes.at(index).GetName());
+        for( unsigned int innerIndex = 0; innerIndex < tempRefs.size(); innerIndex++)
+        {
+          refs.push_back( tempRefs.at(innerIndex) );
+        }
+      }
     }
     else if (!itksys::SystemTools::GetFilenameExtension(path).empty())
     {
@@ -97,11 +106,14 @@ FileWriterSelector::FileWriterSelector(const BaseData* baseData, const std::stri
       return;
     }
   }
+  else
+  {
+    refs = m_Data->m_WriterRegistry.GetReferences(baseData, destMimeType);
+  }
 
   std::vector<std::string> classHierarchy = baseData->GetClassHierarchy();
 
   // Get all writers and their mime types for the given base data type
-  std::vector<FileWriterRegistry::WriterReference> refs = m_Data->m_WriterRegistry.GetReferences(baseData, destMimeType);
   Item bestItem;
   for (std::vector<FileWriterRegistry::WriterReference>::const_iterator iter = refs.begin(),
        iterEnd = refs.end(); iter != iterEnd; ++iter)

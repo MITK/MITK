@@ -1,0 +1,493 @@
+diff -urNb raptor2-2.0.15-orig/CMakeLists.txt raptor2-2.0.15-patched/CMakeLists.txt
+--- raptor2-2.0.15-orig/CMakeLists.txt	2014-11-26 00:11:12.836343793 +0100
++++ raptor2-2.0.15-patched/CMakeLists.txt	2014-11-20 01:16:40.168582633 +0100
+@@ -30,12 +30,24 @@
+ FIND_PACKAGE(LibXslt)
+ #FIND_PACKAGE(YAJL)
+ 
+-INCLUDE_DIRECTORIES(
++IF(CURL_FOUND)
++  INCLUDE_DIRECTORIES(
+ 	${CURL_INCLUDE_DIRS}
++  )
++ENDIF()
++
++IF(LIBXML2_FOUND)
++  INCLUDE_DIRECTORIES(
+ 	${EXPAT_INCLUDE_DIRS}
+ 	${LIBXML2_INCLUDE_DIR}
++  )
++ENDIF()
++
++IF(LIBXSLT_FOUND)
++  INCLUDE_DIRECTORIES(
+ 	${LIBXSLT_INCLUDE_DIR}
+-)
++  )
++ENDIF()
+ 
+ ################################################################
+ 
+@@ -89,6 +101,15 @@
+ CHECK_TYPE_SIZE("unsigned long"		SIZEOF_UNSIGNED_LONG)
+ CHECK_TYPE_SIZE("unsigned long long"	SIZEOF_UNSIGNED_LONG_LONG)
+ 
++CHECK_C_SOURCE_COMPILES("
++int main() {char *function_name = __func__; return 0;}"
++ 	HAVE___FUNC__
++)
++CHECK_C_SOURCE_COMPILES("
++int main() {char *function_name = __FUNCTION__; return 0;}"
++  HAVE___FUNCTION__
++)
++
+ IF(LIBXML2_FOUND)
+ 
+ 	SET(CMAKE_REQUIRED_INCLUDES  ${LIBXML2_INCLUDE_DIR})
+@@ -152,103 +173,142 @@
+ SET(BUILD_SHARED_LIBS OFF CACHE BOOL
+ 	"Build shared libraries instead of static ones.")
+ 
++SET(RAPTOR_ENABLE_TESTING TRUE CACHE BOOL
++  "Enable unit tests")
++
+ IF(BUILD_SHARED_LIBS)
+ 	SET(RAPTOR_STATIC FALSE)
+ ELSE(BUILD_SHARED_LIBS)
+ 	SET(RAPTOR_STATIC TRUE)
+ ENDIF(BUILD_SHARED_LIBS)
+ 
+-SET(RAPTOR_XML_INIT none)
+-IF(LIBXML2_FOUND)
+-	SET(RAPTOR_XML_INIT libxml)
+-ENDIF(LIBXML2_FOUND)
+-
+-SET(RAPTOR_XML ${RAPTOR_XML_INIT} CACHE STRING
+-	"Which XML library to use (any of \"libxml\", \"none\").")
++SET(HAVE_RAPTOR_PARSE_DATE 1)
++SET(RAPTOR_PARSEDATE 1)
+ 
+-SET(RAPTOR_XML_DEFINE RAPTOR_XML_NONE)
+-IF(RAPTOR_XML STREQUAL "libxml")
+-	SET(RAPTOR_XML_DEFINE RAPTOR_XML_LIBXML)
+-ENDIF(RAPTOR_XML STREQUAL "libxml")
++# --------------- XML library ----------------
+ 
+-SET(RAPTOR_WWW_INIT none)
+-IF(LIBXML2_FOUND)
+-	SET(RAPTOR_WWW_INIT xml)
+-ENDIF(LIBXML2_FOUND)
+-IF(CURL_FOUND)
+-	SET(RAPTOR_WWW_INIT curl)
+-ENDIF(CURL_FOUND)
++set(RAPTOR_XML_INIT none)
++if(LIBXML2_FOUND)
++  set(RAPTOR_XML_INIT libxml)
++endif()
+ 
+-SET(RAPTOR_WWW ${RAPTOR_WWW_INIT} CACHE STRING
+-	"Which WWW library to use (any of \"curl\", \"xml\", \"none\").")
++set(RAPTOR_XML ${RAPTOR_XML_INIT} CACHE STRING
++  "Which XML library to use (any of \"libxml\", \"none\").")
+ 
+-SET(RAPTOR_WWW_DEFINE RAPTOR_WWW_NONE)
+-IF(RAPTOR_WWW STREQUAL "curl")
+-	SET(RAPTOR_WWW_DEFINE RAPTOR_WWW_LIBCURL)
+-ELSEIF(RAPTOR_WWW STREQUAL "xml")
+-	SET(RAPTOR_WWW_DEFINE RAPTOR_WWW_LIBXML)
+-ENDIF(RAPTOR_WWW STREQUAL "curl")
++set(RAPTOR_XML_DEFINE RAPTOR_XML_NONE)
++if(RAPTOR_XML STREQUAL "libxml")
++  set(RAPTOR_XML_DEFINE RAPTOR_XML_LIBXML)
++endif()
+ 
+-SET(RAPTOR_XML_1_1 FALSE CACHE BOOL
++set(RAPTOR_XML_1_1 FALSE CACHE BOOL
+ 	"Use XML version 1.1 name checking.")
+ 
+-SET(HAVE_RAPTOR_PARSE_DATE 1)
+-SET(RAPTOR_PARSEDATE 1)
+-
+-SET(RAPTOR_PARSER_RDFXML_INIT FALSE)
+-IF(LIBXML2_FOUND)
+-	SET(RAPTOR_PARSER_RDFXML_INIT TRUE)
+-ENDIF(LIBXML2_FOUND)
++# --------------- WWW library ----------------
+ 
+-SET(RAPTOR_PARSER_GRDDL_INIT FALSE)
+-IF(LIBXML2_FOUND AND LIBXSLT_FOUND)
+-	SET(RAPTOR_PARSER_GRDDL_INIT TRUE)
+-ENDIF(LIBXML2_FOUND AND LIBXSLT_FOUND)
+-
+-SET(RAPTOR_PARSER_RDFXML ${RAPTOR_PARSER_RDFXML_INIT}
+-	CACHE BOOL "Build RDF/XML parser.")
+-SET(RAPTOR_PARSER_NTRIPLES TRUE
+-	CACHE BOOL "Build N-Triples parser.")
+-SET(RAPTOR_PARSER_TURTLE TRUE
+-	CACHE BOOL "Build Turtle parser.")
+-SET(RAPTOR_PARSER_TRIG TRUE
+-	CACHE BOOL "Build TRiG parser.")
+-SET(RAPTOR_PARSER_RSS ${LIBXML2_FOUND}
+-	CACHE BOOL "Build RSS Tag Soup parser.")
+-SET(RAPTOR_PARSER_GRDDL ${RAPTOR_PARSER_GRDDL_INIT}
+-	CACHE BOOL "Build GRDDL parser.")
+-SET(RAPTOR_PARSER_GUESS TRUE
+-	CACHE BOOL "Build guess parser.")
+-SET(RAPTOR_PARSER_RDFA ${LIBXML2_FOUND}
+-	CACHE BOOL "Build RDFA parser.")
+-SET(RAPTOR_PARSER_JSON ${YAJL_FOUND}
+-	CACHE BOOL "Build JSON parser.")
+-SET(RAPTOR_PARSER_NQUADS TRUE
+-	CACHE BOOL "Build N-Quads parser.")
+-
+-SET(RAPTOR_SERIALIZER_RDFXML TRUE
+-	CACHE BOOL "Build RDF/XML serializer.")
+-SET(RAPTOR_SERIALIZER_NTRIPLES TRUE
+-	CACHE BOOL "Build N-Triples serializer.")
+-SET(RAPTOR_SERIALIZER_RDFXML_ABBREV TRUE
+-	CACHE BOOL "Build RDF/XML-abbreviated serializer.")
+-SET(RAPTOR_SERIALIZER_TURTLE TRUE
+-	CACHE BOOL "Build Turtle serializer.")
+-SET(RAPTOR_SERIALIZER_RSS_1_0 TRUE
+-	CACHE BOOL "Build RSS 1.0 serializer.")
+-SET(RAPTOR_SERIALIZER_ATOM TRUE
+-	CACHE BOOL "Build Atom 1.0 serializer.")
+-SET(RAPTOR_SERIALIZER_DOT TRUE
+-	CACHE BOOL "Build GraphViz DOT serializer.")
+-SET(RAPTOR_SERIALIZER_HTML TRUE
+-	CACHE BOOL "Build HTML Table serializer.")
+-SET(RAPTOR_SERIALIZER_JSON TRUE
+-	CACHE BOOL "Build JSON serializer.")
+-SET(RAPTOR_SERIALIZER_NQUADS TRUE
+-	CACHE BOOL "Build N-Quads serializer.")
++set(RAPTOR_WWW_INIT none)
++if(LIBXML2_FOUND)
++  set(RAPTOR_WWW_INIT xml)
++endif()
++if(CURL_FOUND)
++  set(RAPTOR_WWW_INIT curl)
++endif()
++if(FETCH_FOUND)
++  set(RAPTOR_WWW_INIT fetch)
++endif()
++
++set(RAPTOR_WWW ${RAPTOR_WWW_INIT} CACHE STRING
++  "Which WWW library to use (any of \"curl\", \"xml\", \"fetch\", \"none\").")
++
++set(RAPTOR_WWW_DEFINE RAPTOR_WWW_NONE)
++if(RAPTOR_WWW STREQUAL "curl")
++  set(RAPTOR_WWW_DEFINE RAPTOR_WWW_LIBCURL)
++elseif(RAPTOR_WWW STREQUAL "xml")
++  set(RAPTOR_WWW_DEFINE RAPTOR_WWW_LIBXML)
++elseif(RAPTOR_WWW STREQUAL "fetch")
++  set(RAPTOR_WWW_DEFINE RAPTOR_WWW_FETCH)
++endif()
++
++if(RAPTOR_WWW STREQUAL "none")
++  message(WARNING "No WWW library in use - only file: URLs will work")
++  message(WARNING "Install libcurl, libxml2 or BSD libfetch for WWW access")
++endif()
++
++# --------------- RDF parsers ----------------
++
++set(rdf_parsers_available ntriples turtle trig guess nquads)
++set(rdfxml_name "RDF/XML")
++set(ntriples_name "N-Triples")
++set(turtle_name "Turtle")
++set(trig_name "TRiG")
++set(guess_name "guess")
++set(rss_name "RSS Tag Soup")
++set(rdfa_name "RDFA")
++set(nquads_name "N-Quads")
++set(grddl_name "GRDDL")
++set(json_name "JSON")
++
++if(LIBXML2_FOUND)
++  list(APPEND rdf_parsers_available rdfxml rss rdfa grddl)
++endif()
++if(YAJL_FOUND)
++  list(APPEND rdf_parsers_available json)
++endif()
++
++set(RAPTOR_PARSER_RDFXML_INIT ${LIBXML2_FOUND})
++
++set(RAPTOR_PARSER_GRDDL_INIT FALSE)
++if(LIBXML2_FOUND AND LIBXSLT_FOUND)
++  set(RAPTOR_PARSER_GRDDL_INIT TRUE)
++endif()
++
++set(rdf_parsers_enabled )
++foreach(parser ${rdf_parsers_available})
++  string(TOUPPER ${parser} parser_uc)
++  if(DEFINED RAPTOR_PARSER_${parser_uc}_INIT)
++    set(parser_init ${RAPTOR_PARSER_${parser_uc}_INIT})
++  else()
++    set(parser_init TRUE)
++  endif()
++  set(RAPTOR_PARSER_${parser_uc} ${parser_init}
++    CACHE BOOL "Build ${${parser}_name} parser.")
++  if(RAPTOR_PARSER_${parser_uc})
++    list(APPEND rdf_parsers_enabled ${parser})
++  endif()
++endforeach()
++
++# --------------- RDF serializers ----------------
++
++set(rdf_serializers_available rdfxml rdfxml-abbrev turtle ntriples rss-1.0 dot html json atom nquads)
++set(rdfxml-abbrev_name "RDF/XML-abbreviated")
++set(rss-1.0_name "RSS 1.0")
++set(dot_name "GraphViz DOT")
++set(html_name "HTML Table")
++set(atom_name "Atom 1.0")
++
++set(rdf_serializers_enabled )
++foreach(serializer ${rdf_serializers_available})
++  string(TOUPPER ${serializer} serializer_uc)
++  string(REGEX REPLACE "[-\\.]" "_" serializer_uc ${serializer_uc})
++  set(RAPTOR_SERIALIZER_${serializer_uc} TRUE
++    CACHE BOOL "Build ${${serializer}_name} serializer.")
++  if(RAPTOR_SERIALIZER_${serializer_uc})
++    list(APPEND rdf_serializers_enabled ${serializer})
++  endif()
++endforeach()
++
++# --------------- NFC library ----------------
++
++set(use_nfc FALSE)
++if(RAPTOR_PARSER_RDFXML AND LIBXML2_FOUND)
++  set(use_nfc TRUE)
++endif()
++# TODO
++set(nfc_library none)
+ 
+ ################################################################
+ 
++INCLUDE(CMakePackageConfigHelpers)
++
+ CONFIGURE_FILE(
+ 	src/raptor_config_cmake.h.in
+ 	src/raptor_config.h
+@@ -263,6 +323,11 @@
+ 	@ONLY
+ )
+ 
++set(INCLUDE_INSTALL_DIR include/raptor2)
++set(LIB_INSTALL_DIR lib)
++set(BIN_INSTALL_DIR bin)
++set(CMAKE_INSTALL_DIR lib/raptor2/cmake)
++
+ # On Windows, the test/utility programs usually have DLL dependencies that
+ # make them cumbersome to invoke within IDE environments, so we enable the
+ # test suite only when makefiles are being used.
+@@ -273,13 +338,30 @@
+ #
+ # but we don't have a good way of knowing where the third-party DLLs are.
+ #
+-IF(CMAKE_GENERATOR MATCHES "Makefiles")
++IF(RAPTOR_ENABLE_TESTING AND CMAKE_GENERATOR MATCHES "Makefiles")
+ 	ENABLE_TESTING()
+-ENDIF(CMAKE_GENERATOR MATCHES "Makefiles")
++ENDIF(RAPTOR_ENABLE_TESTING AND CMAKE_GENERATOR MATCHES "Makefiles")
+ 
+ SUBDIRS(src)
+ SUBDIRS(utils)
+ 
++configure_package_config_file(Raptor2Config.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/Raptor2Config.cmake
++  INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
++  PATH_VARS INCLUDE_INSTALL_DIR
++  NO_CHECK_REQUIRED_COMPONENTS_MACRO
++)
++
++write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/Raptor2ConfigVersion.cmake
++  VERSION ${VERSION}
++  COMPATIBILITY AnyNewerVersion
++)
++
++install(FILES
++  ${CMAKE_CURRENT_BINARY_DIR}/Raptor2Config.cmake
++  ${CMAKE_CURRENT_BINARY_DIR}/Raptor2ConfigVersion.cmake
++  DESTINATION ${CMAKE_INSTALL_DIR}
++)
++
+ ################################################################
+ 
+ FIND_PROGRAM(JING jing)
+@@ -335,21 +417,33 @@
+ ENDIF(rapper_status EQUAL 0 OR rapper_status EQUAL 2)
+ 
+ IF(NOT rdfdiff_status EQUAL 0)
+-	MESSAGE(FATAL_ERROR "Test failed.")
++	MESSAGE(FATAL_ERROR \"Test failed.\")
+ ENDIF(NOT rdfdiff_status EQUAL 0)
+ ")
+ 
+ 	ADD_TEST(${NAME} ${CMAKE_COMMAND} -P test-${NAME}.cmake)
+ ENDMACRO(RAPPER_RDFDIFF_TEST NAME RAPPER_COMMAND RAPPER_OUTPUT RDFDIFF_COMMAND)
+ 
+-SUBDIRS(tests/feeds)
+-SUBDIRS(tests/grddl)
+-SUBDIRS(tests/json)
+-SUBDIRS(tests/ntriples)
+-SUBDIRS(tests/rdfa)
+-SUBDIRS(tests/rdfa11)
+-SUBDIRS(tests/rdfxml)
+-SUBDIRS(tests/trig)
+-#SUBDIRS(tests/turtle)	# TODO
++IF(RAPTOR_ENABLE_TESTING)
++  SUBDIRS(tests/feeds)
++  SUBDIRS(tests/grddl)
++  SUBDIRS(tests/json)
++  SUBDIRS(tests/ntriples)
++  SUBDIRS(tests/rdfa)
++  SUBDIRS(tests/rdfa11)
++  SUBDIRS(tests/rdfxml)
++  SUBDIRS(tests/trig)
++  #SUBDIRS(tests/turtle)	# TODO
++ENDIF(RAPTOR_ENABLE_TESTING)
++
++message("Raptor build summary:
++  RDF parsers available     : ${rdf_parsers_available}
++  RDF parsers enabled       : ${rdf_parsers_enabled}
++  RDF serializers available : ${rdf_serializers_available}
++  RDF serializers enabled   : ${rdf_serializers_enabled}
++  XML parser                : ${RAPTOR_XML}
++  WWW library               : ${RAPTOR_WWW}
++  NFC check library         : ${nfc_library}"
++)
+ 
+ # end raptor/CMakeLists.txt
+diff -urNb raptor2-2.0.15-orig/Raptor2Config.cmake.in raptor2-2.0.15-patched/Raptor2Config.cmake.in
+--- raptor2-2.0.15-orig/Raptor2Config.cmake.in	1970-01-01 01:00:00.000000000 +0100
++++ raptor2-2.0.15-patched/Raptor2Config.cmake.in	2014-11-17 02:26:45.384582192 +0100
+@@ -0,0 +1,9 @@
++set(Raptor2_VERSION @VERSION@)
++
++@PACKAGE_INIT@
++
++set_and_check(Raptor2_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
++
++if(NOT TARGET raptor2 AND EXISTS ${CMAKE_CURRENT_LIST_DIR}/Raptor2Targets.cmake)
++  include(${CMAKE_CURRENT_LIST_DIR}/Raptor2Targets.cmake)
++endif()
+diff -urNb raptor2-2.0.15-orig/src/CMakeLists.txt raptor2-2.0.15-patched/src/CMakeLists.txt
+--- raptor2-2.0.15-orig/src/CMakeLists.txt	2014-11-26 00:11:12.844343793 +0100
++++ raptor2-2.0.15-patched/src/CMakeLists.txt	2014-11-18 01:23:15.200582940 +0100
+@@ -118,6 +118,7 @@
+ ADD_LIBRARY(raptor2
+ 	raptor_avltree.c
+ 	raptor_concepts.c
++  raptor_escaped.c
+ 	raptor_general.c
+ 	raptor_iostream.c
+ 	raptor_json_writer.c
+@@ -125,6 +126,7 @@
+ 	raptor_log.c
+ 	raptor_memstr.c
+ 	raptor_namespace.c
++  raptor_ntriples.c
+ 	raptor_option.c
+ 	raptor_parse.c
+ 	raptor_qname.c
+@@ -144,6 +146,9 @@
+ 	raptor_xml.c
+ 	raptor_xml_writer.c
+ 	snprintf.c
++	sort_r.c
++	sort_r.h
++	ssort.h
+ 	turtle_common.c
+ 	${raptor_parser_rdfxml_sources}
+ 	${raptor_parser_ntriples_nquads_sources}
+@@ -183,6 +188,8 @@
+ 	COMPILE_DEFINITIONS "LIBRDFA_IN_RAPTOR;RAPTOR_INTERNAL;${LIBXML2_DEFINITIONS};${LIBXSLT_DEFINITIONS}"
+ )
+ 
++IF(RAPTOR_ENABLE_TESTING)
++
+ ADD_EXECUTABLE(turtle_lexer_test turtle_lexer.c)
+ TARGET_LINK_LIBRARIES(turtle_lexer_test raptor2)
+ 
+@@ -291,13 +298,15 @@
+ 	)
+ ENDIF(RAPTOR_PARSER_RDFXML)
+ 
++ENDIF(RAPTOR_ENABLE_TESTING)
++
+ # Generate pkg-config metadata file
+ #
+ FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/raptor2.pc
+ "prefix=${CMAKE_INSTALL_PREFIX}
+ exec_prefix=\${prefix}
+-libdir=\${exec_prefix}/lib
+-includedir=\${prefix}/include/raptor2
++libdir=\${exec_prefix}/${LIB_INSTALL_DIR}
++includedir=\${prefix}/${INCLUDE_INSTALL_DIR}
+ 
+ Name: Raptor RDF Parsing Library
+ Description: RDF Parser Toolkit Library
+@@ -310,22 +319,22 @@
+ INSTALL(FILES
+ 	raptor.h
+ 	${CMAKE_CURRENT_BINARY_DIR}/raptor2.h
+-	DESTINATION include/raptor2
++	DESTINATION ${INCLUDE_INSTALL_DIR}
+ )
+ 
+ INSTALL(FILES
+ 	${CMAKE_CURRENT_BINARY_DIR}/raptor2.pc
+-	DESTINATION lib/pkgconfig
++	DESTINATION ${LIB_INSTALL_DIR}/pkgconfig
+ )
+ 
+ INSTALL(
+ 	TARGETS raptor2
+-	EXPORT  Raptor2Config
+-	ARCHIVE DESTINATION lib
+-	LIBRARY DESTINATION lib
+-	RUNTIME DESTINATION bin
++	EXPORT  Raptor2Targets
++	ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
++	LIBRARY DESTINATION ${LIB_INSTALL_DIR}
++	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
+ )
+ 
+-INSTALL(EXPORT Raptor2Config DESTINATION lib/cmake)
++INSTALL(EXPORT Raptor2Targets DESTINATION ${CMAKE_INSTALL_DIR})
+ 
+ # end raptor/src/CMakeLists.txt
+diff -urNb raptor2-2.0.15-orig/src/raptor_config_cmake.h.in raptor2-2.0.15-patched/src/raptor_config_cmake.h.in
+--- raptor2-2.0.15-orig/src/raptor_config_cmake.h.in	2014-11-26 00:11:12.848343793 +0100
++++ raptor2-2.0.15-patched/src/raptor_config_cmake.h.in	2014-11-16 22:17:24.896583977 +0100
+@@ -44,6 +44,9 @@
+ #define SIZEOF_UNSIGNED_LONG		@SIZEOF_UNSIGNED_LONG@
+ #define SIZEOF_UNSIGNED_LONG_LONG	@SIZEOF_UNSIGNED_LONG_LONG@
+ 
++#cmakedefine HAVE___FUNC__
++#cmakedefine HAVE___FUNCTION__
++
+ #cmakedefine HAVE_XMLCTXTUSEOPTIONS
+ #cmakedefine HAVE_XMLSAX2INTERNALSUBSET
+ #cmakedefine RAPTOR_LIBXML_ENTITY_ETYPE
+@@ -87,8 +90,9 @@
+ #  define _CRT_SECURE_NO_DEPRECATE
+ 
+ #  ifdef _MSC_VER
+-#    if _MSC_VER >= 1300
++#    if (_MSC_VER >= 1300) && !defined(__func__)
+ #      define __func__		__FUNCTION__
++#      define HAVE___FUNC__
+ #    else
+        /* better than nothing */
+ #      define raptor_str(s)	#s
+@@ -126,6 +130,11 @@
+    /* These prevent parsedate.c from declaring malloc() and free() */
+ #  define YYMALLOC malloc
+ #  define YYFREE   free
++
++#  if !defined(YY_NO_UNISTD_H)
++#    define YY_NO_UNISTD_H
++#  endif
++
+ #endif
+ 
+ /* end raptor_config.h */

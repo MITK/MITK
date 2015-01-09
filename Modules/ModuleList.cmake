@@ -1,4 +1,5 @@
 set(mitk_modules
+  RDF
   LegacyIO
   DataTypesExt
   Overlays

@@ -102,9 +102,17 @@ file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
 
 # Set CMake policies to prevent configure warnings
 
-string(REPLACE "set(SOLUTION_NAME" "cmake_policy(SET CMP0039 OLD)
-cmake_policy(SET CMP0043 OLD)
-cmake_policy(SET CMP0054 OLD)
+string(REPLACE "set(SOLUTION_NAME" "if(POLICY CMP0039)
+  cmake_policy(SET CMP0039 OLD)
+endif()
+
+if(POLICY CMP0043)
+  cmake_policy(SET CMP0043 OLD)
+  endif()
+
+if(POLICY CMP0054)
+  cmake_policy(SET CMP0054 OLD)
+endif()
 
 set(SOLUTION_NAME"
 CONTENTS ${CONTENTS})

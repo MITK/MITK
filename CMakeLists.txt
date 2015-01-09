@@ -782,6 +782,11 @@ endif()
 # Set C/CXX and linker flags for MITK code
 #-----------------------------------------------------------------------------
 
+# help keeping cross-platform compatibility
+set(CMAKE_CXX_EXTENSIONS 0)
+
+set(CMAKE_CXX_STANDARD 11)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MITK_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${MITK_CXX_FLAGS_DEBUG}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${MITK_CXX_FLAGS_RELEASE}")

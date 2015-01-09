@@ -92,6 +92,8 @@ protected:
   bool m_MakeOutputBinary;
 
   unsigned int m_TimeStep;
+
+  const mitk::Image* m_ReferenceImage;
 };
 
 }

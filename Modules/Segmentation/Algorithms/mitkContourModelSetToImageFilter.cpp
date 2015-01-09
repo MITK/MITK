@@ -23,14 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProgressBar.h>
 #include <mitkTimeHelper.h>
 
-// TODO Move this one to Core so that this Filter can be in the ContourModel Module!
+// Could move mitkVtkImageOverwrite to Core so that this filter can be moved to the ContourModel module
 #include <mitkVtkImageOverwrite.h>
-// TODO
-
 
 mitk::ContourModelSetToImageFilter::ContourModelSetToImageFilter()
   : m_MakeOutputBinary( true ),
-    m_TimeStep( 0 )
+    m_TimeStep( 0 ),
+    m_ReferenceImage( 0 )
 {
   // Create the output.
   itk::DataObject::Pointer output = this->MakeOutput(0);
@@ -49,30 +48,29 @@ void mitk::ContourModelSetToImageFilter::GenerateInputRequestedRegion()
   if((output->IsInitialized()==false) )
     return;
 
-  GenerateTimeInInputRegion(output, const_cast< mitk::Image * > ( this->GetImage() ));
+  GenerateTimeInInputRegion(output, const_cast< mitk::Image * > ( m_ReferenceImage ));
 }
 
 void mitk::ContourModelSetToImageFilter::GenerateOutputInformation()
 {
-  mitk::Image *inputImage = (mitk::Image*)this->GetImage();
   mitk::Image::Pointer output = this->GetOutput();
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
-  if((inputImage == NULL) ||
-     (inputImage->IsInitialized() == false) ||
-     (inputImage->GetTimeGeometry() == NULL)) return;
+  if((m_ReferenceImage == NULL) ||
+     (m_ReferenceImage->IsInitialized() == false) ||
+     (m_ReferenceImage->GetTimeGeometry() == NULL)) return;
 
   if (m_MakeOutputBinary)
   {
-    output->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeGeometry(),1,1);
+    output->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *m_ReferenceImage->GetTimeGeometry(),1,1);
   }
   else
   {
-    output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeGeometry());
+    output->Initialize(m_ReferenceImage->GetPixelType(), *m_ReferenceImage->GetTimeGeometry());
   }
 
-  output->SetPropertyList(inputImage->GetPropertyList()->Clone());
+  output->SetPropertyList(m_ReferenceImage->GetPropertyList()->Clone());
 }
 
 itk::DataObject::Pointer mitk::ContourModelSetToImageFilter::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
@@ -110,12 +108,12 @@ void mitk::ContourModelSetToImageFilter::SetInput(const ContourModelSet *input)
 
 void mitk::ContourModelSetToImageFilter::SetImage(const mitk::Image *refImage)
 {
-  this->ProcessObject::SetNthInput( 1, const_cast< mitk::Image * >( refImage ) );
+  m_ReferenceImage = refImage;
 }
 
 const mitk::Image* mitk::ContourModelSetToImageFilter::GetImage(void)
 {
-  return static_cast< const mitk::Image * >(this->ProcessObject::GetInput(1));
+  return m_ReferenceImage;
 }
 
 void mitk::ContourModelSetToImageFilter::GenerateData()
@@ -140,7 +138,7 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     return;
   }
 
-  mitk::Geometry3D* outputImageGeo = outputImage->GetGeometry(m_TimeStep);
+  mitk::BaseGeometry* outputImageGeo = outputImage->GetGeometry(m_TimeStep);
 
   // Create mitkVtkImageOverwrite which is needed to write the slice back into the volume
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -171,7 +169,7 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
 
     // Determine plane orientation
     point3D = contour->GetVertexAt(0)->Coordinates;
-    tempPoint = contour->GetVertexAt(contour->GetNumberOfVertices()*0.5)->Coordinates;
+    tempPoint = contour->GetVertexAt(contour->GetNumberOfVertices()*0.25)->Coordinates;
     mitk::Vector3D vec = point3D - tempPoint;
     vec.Normalize();
     outputImageGeo->WorldToIndex(point3D, point3D);
@@ -232,6 +230,7 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     extractor->Modified();
     extractor->Update();
 
+    plane = 0;
     mitk::ProgressBar::GetInstance()->Progress();
     ++it;
   }

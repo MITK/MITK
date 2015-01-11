@@ -639,6 +639,15 @@ find_package(GDCM PATHS ${GDCM_DIR} REQUIRED)
 if(MITK_USE_OpenCV)
   find_package(OpenCV PATHS ${OpenCV_DIR} REQUIRED)
 endif()
+if(MITK_USE_SOFA)
+  # The SOFAConfig.cmake file does not provide exported targets or
+  # libraries with absolute paths, hence we need to make the link
+  # directories globally available until the SOFAConfig.cmake file
+  # supports a proper mechanism for handling targets.
+  # The same code is needed in MITKConfig.cmake.
+  find_package(SOFA PATHS ${SOFA_DIR} CONFIG REQUIRED)
+  link_directories(${SOFA_LIBRARY_DIRS})
+endif()
 
 #-----------------------------------------------------------------------------
 # Testing

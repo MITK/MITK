@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-struct MITK_CORE_EXPORT LocaleSwitch
+struct MITKCORE_EXPORT LocaleSwitch
 {
   LocaleSwitch(const std::string& newLocale)
     : m_OldLocale(std::setlocale(LC_ALL, NULL))

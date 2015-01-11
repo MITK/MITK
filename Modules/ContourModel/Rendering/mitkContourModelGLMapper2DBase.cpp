@@ -362,7 +362,7 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
 void mitk::ContourModelGLMapper2DBase::WriteTextWithOverlay( TextOverlayPointerType textOverlay,
                                                              const char* text,
                                                              float rgb[3],
-                                                             Point2D pt2d,
+                                                             Point2D /*pt2d*/,
                                                              mitk::BaseRenderer* renderer )
 {
 

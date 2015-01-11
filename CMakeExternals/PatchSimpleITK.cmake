@@ -3,7 +3,9 @@
 
 set(path "CMakeLists.txt")
 file(STRINGS ${path} contents NEWLINE_CONSUME)
-string(REPLACE "ITK_LIBRARY_DIRS}\")" "ITK_LIBRARY_DIRS}\" \"\${GDCM_DIR}/bin\")
+string(REPLACE "if(ITK_FOUND)" "if(ITK_FOUND)
+  find_package(GDCM PATHS \${GDCM_DIR} REQUIRED)" contents ${contents})
+string(REPLACE "ITK_LIBRARY_DIRS}\")" "ITK_LIBRARY_DIRS}\" \"\${GDCM_LIBRARY_DIRS}\")
                list(REMOVE_ITEM ITK_LIBRARIES ITKVideoBridgeOpenCV ITKVideoCore ITKVideoIO)" contents ${contents})
 set(CONTENTS ${contents})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)

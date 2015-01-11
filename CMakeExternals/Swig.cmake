@@ -10,7 +10,7 @@ if(MITK_USE_SWIG)
     set(SWIG_TARGET_VERSION 3.0.2)
     set(proj Swig)
     set(Swig_DEPENDENCIES PCRE)
-    set(Swig_DEPENDS )
+    set(Swig_DEPENDS ${proj})
 
     # binary SWIG for windows
     if(WIN32)

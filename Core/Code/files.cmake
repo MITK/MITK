@@ -84,8 +84,9 @@ set(H_FILES
   Rendering/Colortables/PET20.h
   Rendering/Colortables/PETColor.h
 
-  IO/mitkPixelTypeTraits.h
+  IO/mitkIOAdapter.h
   IO/mitkLocaleSwitch.h
+  IO/mitkPixelTypeTraits.h
 )
 
 set(CPP_FILES
@@ -330,7 +331,6 @@ set(CPP_FILES
   IO/mitkFileWriterSelector.cpp
   IO/mitkIFileIO.cpp
   IO/mitkImageGenerator.cpp
-  IO/mitkIOAdapter.h
   IO/mitkIOConstants.cpp
   IO/mitkIOUtil.cpp
   IO/mitkIOMimeTypes.cpp

@@ -8,139 +8,57 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     ${CMAKE_CURRENT_BINARY_DIR}
     )
 
+    # list of diffusion miniapps
+    # if an app requires additional dependencies
+    # they are added after a "^^" and separated by "_"
+    set( diffusionminiapps
+    DwiDenoising^^
+    ImageResampler^^
+    NetworkCreation^^MitkFiberTracking_MitkConnectomics
+    NetworkStatistics^^MitkConnectomics
+    ExportShImage^^
+    Fiberfox^^MitkFiberTracking
+    MultishellMethods^^MitkFiberTracking
+    PeaksAngularError^^MitkFiberTracking
+    PeakExtraction^^MitkFiberTracking
+    FiberExtraction^^MitkFiberTracking
+    FiberProcessing^^MitkFiberTracking
+    FiberDirectionExtraction^^MitkFiberTracking
+    LocalDirectionalFiberPlausibility^^MitkFiberTracking
+    StreamlineTracking^^MitkFiberTracking
+    GibbsTracking^^MitkFiberTracking
+    CopyGeometry^^
+    DiffusionIndices^^
+    TractometerMetrics^^MitkFiberTracking
+    QballReconstruction^^
+    Registration^^
+    FileFormatConverter^^MitkFiberTracking_MitkDiffusionIO
+    TensorReconstruction^^MitkDiffusionIO
+    TensorDerivedMapsExtraction^^MitkDiffusionIO
+    DICOMLoader^^
+    )
 
-  mitk_create_executable(DwiDenoising
-    DEPENDS MitkCore MitkDiffusionCore
-    PACKAGE_DEPENDS ITK
-    CPP_FILES DwiDenoising.cpp mitkCommandLineParser.cpp
-  )
+    foreach(diffusionminiapp ${diffusionminiapps})
+      # extract mini app name and dependencies
+      string(REPLACE "^^" "\\;" miniapp_info ${diffusionminiapp})
+      set(miniapp_info_list ${miniapp_info})
+      list(GET miniapp_info_list 0 appname)
+      list(GET miniapp_info_list 1 raw_dependencies)
+      string(REPLACE "_" "\\;" dependencies "${raw_dependencies}")
+      set(dependencies_list ${dependencies})
 
-  mitk_create_executable(ImageResampler
-    DEPENDS MitkCore MitkDiffusionCore
-    PACKAGE_DEPENDS ITK
-    CPP_FILES ImageResampler.cpp mitkCommandLineParser.cpp
-  )
+      mitk_create_executable(${appname}
+      DEPENDS MitkCore MitkDiffusionCore ${dependencies_list}
+      PACKAGE_DEPENDS ITK
+      CPP_FILES ${appname}.cpp mitkCommandLineParser.cpp
+      )
 
-  mitk_create_executable(NetworkCreation
-    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking MitkConnectomics
-    PACKAGE_DEPENDS ITK
-    CPP_FILES NetworkCreation.cpp mitkCommandLineParser.cpp
-  )
+      if(EXECUTABLE_IS_ENABLED)
+       MITK_INSTALL_TARGETS(EXECUTABLES ${EXECUTABLE_TARGET})
+      endif()
+    endforeach()
 
-  mitk_create_executable(NetworkStatistics
-    DEPENDS MitkCore MitkDiffusionCore MitkConnectomics
-    PACKAGE_DEPENDS ITK
-    CPP_FILES NetworkStatistics.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(ExportShImage
-    DEPENDS MitkCore MitkDiffusionCore
-    PACKAGE_DEPENDS ITK
-    CPP_FILES ExportShImage.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(Fiberfox
-    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking
-    PACKAGE_DEPENDS ITK
-    CPP_FILES Fiberfox.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(MultishellMethods
-    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking
-    PACKAGE_DEPENDS ITK
-    CPP_FILES MultishellMethods.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(PeaksAngularError
-    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking
-    PACKAGE_DEPENDS ITK
-    CPP_FILES PeaksAngularError.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(PeakExtraction
-    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking
-    PACKAGE_DEPENDS ITK
-    CPP_FILES PeakExtraction.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(FiberDirectionExtraction
-    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking
-    PACKAGE_DEPENDS ITK
-    CPP_FILES FiberDirectionExtraction.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(LocalDirectionalFiberPlausibility
-    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking
-    PACKAGE_DEPENDS ITK
-    CPP_FILES LocalDirectionalFiberPlausibility.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(StreamlineTracking
-    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking
-    PACKAGE_DEPENDS ITK
-    CPP_FILES StreamlineTracking.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(GibbsTracking
-    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking
-    PACKAGE_DEPENDS ITK
-    CPP_FILES GibbsTracking.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(CopyGeometry
-    DEPENDS MitkCore MitkDiffusionCore
-    PACKAGE_DEPENDS ITK
-    CPP_FILES CopyGeometry.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(DiffusionIndices
-    DEPENDS MitkCore MitkDiffusionCore
-    PACKAGE_DEPENDS ITK
-    CPP_FILES DiffusionIndices.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(TractometerMetrics
-    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking
-    PACKAGE_DEPENDS ITK
-    CPP_FILES TractometerMetrics.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(QballReconstruction
-    DEPENDS MitkCore MitkDiffusionCore
-    PACKAGE_DEPENDS ITK
-    CPP_FILES QballReconstruction.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(FolderRegistration
-    DEPENDS MitkCore MitkDiffusionCore
-    PACKAGE_DEPENDS ITK
-    CPP_FILES mitkRegistration.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(FileFormatConverter
-    DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking MitkDiffusionIO
-    PACKAGE_DEPENDS ITK
-    CPP_FILES mitkFileFormatConverter.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(TensorReconstruction
-    DEPENDS MitkCore MitkDiffusionCore MitkDiffusionIO
-    PACKAGE_DEPENDS ITK
-    CPP_FILES TensorReconstruction.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(TensorDerivedMapExtraction
-    DEPENDS MitkCore MitkDiffusionCore MitkDiffusionIO
-    PACKAGE_DEPENDS ITK
-    CPP_FILES TensorDerivedMapsExtraction.cpp mitkCommandLineParser.cpp
-  )
-
-  mitk_create_executable(DICOMLoader
-    DEPENDS MitkCore MitkDiffusionCore
-    PACKAGE_DEPENDS ITK
-    CPP_FILES DICOMLoader.cpp mitkCommandLineParser.cpp
-  )
-
+  # This mini app does not depend on mitkDiffusionImaging at all
   mitk_create_executable(Dicom2Nrrd
     DEPENDS MitkCore
     CPP_FILES Dicom2Nrrd.cpp mitkCommandLineParser.cpp

@@ -15,16 +15,13 @@ if(MITK_USE_Poco)
 
   if(NOT DEFINED ${proj}_DIR)
 
-    set(patch_cmd ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/PatchPoco-1.5.2-rc3.cmake)
-
     ExternalProject_Add(${proj}
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.5.2-rc3.tar.gz
-      URL_MD5 3651530070a6fce1db0e9ba17ff6c01e
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.6.0-all.tar.gz
+      URL_MD5 4fed893d4ca57db98b0e10d82545232a
       INSTALL_DIR ${proj}-install
-      PATCH_COMMAND ${patch_cmd}
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}

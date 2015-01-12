@@ -54,7 +54,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
       )
 
       if(EXECUTABLE_IS_ENABLED)
-       MITK_INSTALL_TARGETS(EXECUTABLES ${EXECUTABLE_TARGET})
+       install(TARGETS ${EXECUTABLE_TARGET} RUNTIME DESTINATION bin)
       endif()
     endforeach()
 

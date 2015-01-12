@@ -137,7 +137,7 @@ mark_as_advanced(BLUEBERRY_STATIC)
 option(BLUEBERRY_DEBUG_SMARTPOINTER "Enable code for debugging smart pointers" OFF)
 mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
 
-find_package(Poco REQUIRED)
+find_package(Poco PATHS ${Poco_DIR} COMPONENTS Foundation Util XML REQUIRED)
 find_package(Ant)
 find_package(Eclipse)
 
@@ -198,12 +198,6 @@ set(_ctk_plugins
 )
 
 set(_ctk_test_plugins )
-
-set(_ctk_plugins_include_dirs
-  ${Poco_INCLUDE_DIRS}
-)
-
-include_directories(SYSTEM ${_ctk_plugins_include_dirs})
 
 if(BLUEBERRY_BUILD_TESTING)
   find_package(CppUnit REQUIRED)

@@ -5,13 +5,7 @@ MACRO_CREATE_CTK_PLUGIN(
   EXPORTED_INCLUDE_SUFFIXES src src/application src/event src/service
   )
 
-target_include_directories(${PLUGIN_TARGET} SYSTEM PUBLIC ${Poco_INCLUDE_DIRS})
-
-# Only add the following Poco libraries due to possible name clashes
-# in PocoPDF with libpng when also linking QtGui.
-foreach(lib Foundation Util XML)
-  target_link_libraries(${PLUGIN_TARGET} PUBLIC ${Poco_${lib}_LIBRARY})
-endforeach()
+target_link_libraries(${PLUGIN_TARGET} PUBLIC Poco::Foundation Poco::Util Poco::XML)
 
 # Set compiler flags
 target_compile_definitions(${PLUGIN_TARGET} PUBLIC "$<$<STREQUAL:$<PLATFORM_ID>,Windows>:POCO_NO_UNWINDOWS;WIN32_LEAN_AND_MEAN>")

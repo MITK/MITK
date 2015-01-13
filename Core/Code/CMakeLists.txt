@@ -24,7 +24,9 @@ MITK_CREATE_MODULE(Core
     # Remove public GDCM and ITKIOGDCM dependency after mitkDicomSeriesReader was removed
     PUBLIC  GDCM ITK|ITKIOGDCM
     PUBLIC  ITK|ITKTransform+ITKImageGrid+ITKImageFeature
-    PRIVATE ITK|ITKIORAW+ITKTestKernel
+    # We privately use/link all ITK modules in order to support all IO, Transform, etc.
+    # factories from ITK which are registered "automatically" via a factory manager.
+    PRIVATE ITK
     PUBLIC  VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingVolumeOpenGL+vtkRenderingFreeTypeOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
   WARNINGS_AS_ERRORS
   # Do not automatically create CppMicroServices initialization code.

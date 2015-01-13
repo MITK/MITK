@@ -153,7 +153,7 @@ function(mitk_use_modules)
     # properly set "MODULE_NAME" variable for the current target.
     set(MODULE_NAME ${USE_TARGET})
     # Read all package information
-    foreach(_package_visibility PUBLIC PRIVATE INTERFACE)
+    foreach(_package_visibility INTERFACE PUBLIC PRIVATE)
     foreach(_package ${${_package_visibility}_PACKAGE_NAMES})
       set(ALL_INCLUDE_DIRECTORIES)
       set(ALL_LIBRARIES)

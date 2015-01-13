@@ -12,12 +12,10 @@ if(MITK_USE_ACVD)
   set(proj_DEPENDENCIES VTK)
   set(ACVD_DEPENDS ${proj})
 
-  set(additional_cmake_args
-    -DUSE_MULTITHREADING:BOOL=ON
-    -DVTK_DIR:PATH=${VTK_DIR}
-  )
-
-  set(ACVD_PATCH_COMMAND ${CMAKE_COMMAND} -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchACVD.cmake)
+  set(patch_file ACVD-vtk6_2d8f5ea5.patch)
+  if(MITK_USE_Qt5)
+    set(patch_file ACVD-vtk6_2d8f5ea5_qt5.patch)
+  endif()
 
   if(NOT DEFINED ACVD_DIR)
     ExternalProject_Add(${proj}
@@ -26,12 +24,13 @@ if(MITK_USE_ACVD)
       PREFIX ${proj}-cmake
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ACVD-vtk6_2d8f5ea5.tar.gz
       URL_MD5 ecc97728a86798b35c20eef964b094c9
-      PATCH_COMMAND ${ACVD_PATCH_COMMAND}
+      PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/${patch_file}
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
-        ${additional_cmake_args}
+        -DUSE_MULTITHREADING:BOOL=ON
+        -DVTK_DIR:PATH=${VTK_DIR}
       DEPENDS ${proj_DEPENDENCIES}
     )
 

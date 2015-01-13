@@ -14,14 +14,3 @@ diff -burN ITK-4.5.1/CMake/UseITK.cmake ITK-src/CMake/UseITK.cmake
    include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR}/ITKIOFactoryRegistration)
  
  endif()
-diff -burN ITK-4.5.1/Modules/ThirdParty/GDCM/src/CMakeLists.txt ITK-src/Modules/ThirdParty/GDCM/src/CMakeLists.txt
---- ITK-4.5.1/Modules/ThirdParty/GDCM/src/CMakeLists.txt	2014-02-28 19:46:45.000000000 +0100
-+++ ITK-src/Modules/ThirdParty/GDCM/src/CMakeLists.txt	2015-01-09 16:48:49.490888343 +0100
-@@ -1,6 +1,6 @@
- if(ITK_USE_SYSTEM_GDCM)
-   add_library(ITKGDCM ITK-GDCM.cxx)
--  target_link_libraries(ITKGDCM gdcmDICT gdcmMSFF)
-+  target_link_libraries(ITKGDCM gdcmDICT gdcmMSFF gdcmDSED gdcmCommon)
-   itk_module_target(ITKGDCM)
-   return()
- endif()

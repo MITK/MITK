@@ -1,0 +1,116 @@
+diff -urNb ACVD-vtk6/ACVDConfig.cmake.in ACVD-src/ACVDConfig.cmake.in
+--- ACVD-vtk6/ACVDConfig.cmake.in	1970-01-01 01:00:00.000000000 +0100
++++ ACVD-src/ACVDConfig.cmake.in	2015-01-11 17:23:18.333870738 +0100
+@@ -0,0 +1,4 @@
++set(ACVD_INCLUDE_DIRS "@VTKSURFACE_INCLUDE_DIR@;@VTKDISCRETEREMESHING_INCLUDE_DIR@;@VTKVOLUMEPROCESSING_INCLUDE_DIR@")
++set(ACVD_LIBRARY_DIRS "@PROJECT_BINARY_DIR@/bin")
++set(ACVD_LIBRARIES vtkSurface vtkDiscreteRemeshing vtkVolumeProcessing)
++add_definitions(-DDOmultithread)
+\ No newline at end of file
+diff -urNb ACVD-vtk6/CMakeLists.txt ACVD-src/CMakeLists.txt
+--- ACVD-vtk6/CMakeLists.txt	2014-03-03 14:40:14.000000000 +0100
++++ ACVD-src/CMakeLists.txt	2015-01-11 17:23:18.333870738 +0100
+@@ -1,6 +1,7 @@
+ PROJECT(ACVD)
+ 
+ cmake_minimum_required(VERSION 2.8.7)
++find_package(Qt5Widgets REQUIRED)
+ find_package(VTK REQUIRED NO_MODULE)
+ include(${VTK_USE_FILE})
+ 
+@@ -37,3 +38,6 @@
+     ADD_SUBDIRECTORY(VolumeProcessing)
+ ENDIF(BUILD_VOLUMEPROCESSING)
+ 
++CONFIGURE_FILE(ACVDConfig.cmake.in ACVDConfig.cmake @ONLY)
++
++
+diff -urNb ACVD-vtk6/Common/vtkCurvatureMeasure.cxx ACVD-src/Common/vtkCurvatureMeasure.cxx
+--- ACVD-vtk6/Common/vtkCurvatureMeasure.cxx	2014-03-03 14:40:14.000000000 +0100
++++ ACVD-src/Common/vtkCurvatureMeasure.cxx	2015-01-11 17:23:18.333870738 +0100
+@@ -36,6 +36,7 @@
+ 
+ #include "vtkCurvatureMeasure.h"
+ #include "vtkNeighbourhoodComputation.h"
++#include <vtkVersionMacros.h>
+ 
+ #define DISPLAYINTERVAL 10000
+ 
+@@ -1203,3 +1204,4 @@
+ 	if (this->CellsCurvatureInfo)
+ 		this->CellsCurvatureInfo->Delete();
+ }
++
+diff -urNb ACVD-vtk6/DiscreteRemeshing/CMakeLists.txt ACVD-src/DiscreteRemeshing/CMakeLists.txt
+--- ACVD-vtk6/DiscreteRemeshing/CMakeLists.txt	2014-03-03 14:40:14.000000000 +0100
++++ ACVD-src/DiscreteRemeshing/CMakeLists.txt	2015-01-11 17:23:18.333870738 +0100
+@@ -31,12 +31,12 @@
+ 
+ SET(LIB_ADDED
+ vtkSurface
+-vtkCommon
+-vtkFiltering
+-vtkImaging
+-vtkIO
+-vtkRendering
+-vtkHybrid)
++vtkCommonCore
++vtkFiltersCore
++vtkImagingCore
++vtkIOCore
++vtkRenderingCore
++vtkFiltersHybrid vtkImagingHybrid)
+ 
+ TARGET_LINK_LIBRARIES(vtkDiscreteRemeshing ${LIB_ADDED})
+ 
+@@ -55,10 +55,14 @@
+ ManifoldSimplification
+ )
+ 
++option(ACVD_BUILD_EXAMPLES "build examples" OFF)
++if(ACVD_BUILD_EXAMPLES)
+ FOREACH(loop_var ${DISCRETEREMESHING_EXAMPLES})
+ 	ADD_EXECUTABLE(${loop_var} ${loop_var}.cxx)
+ 	TARGET_LINK_LIBRARIES(${loop_var} vtkSurface vtkDiscreteRemeshing
+-	vtkCommon vtkFiltering vtkGraphics vtkImaging vtkIO vtkRendering vtkHybrid)
+-ENDFOREACH(loop_var)
++	vtkCommonCore vtkFiltersCore vtkGraphics vtkImagingCore vtkIOCore vtkRenderingCore vtkFiltersHybrid vtkImagingHybrid)
++ENDFOREACH()
++endif()
+ 
+ ## eof - CMakeLists.txt
++
+diff -urNb ACVD-vtk6/DiscreteRemeshing/vtkVerticesProcessing.h ACVD-src/DiscreteRemeshing/vtkVerticesProcessing.h
+--- ACVD-vtk6/DiscreteRemeshing/vtkVerticesProcessing.h	2014-03-03 14:40:14.000000000 +0100
++++ ACVD-src/DiscreteRemeshing/vtkVerticesProcessing.h	2015-01-11 17:23:18.333870738 +0100
+@@ -115,7 +115,7 @@
+ 
+ 	void AddItemRingToProcess(vtkIdType Item,int ProcessId)
+ 	{
+-		int NumberOfEdges,*Edges,i;
++		vtkIdType NumberOfEdges,*Edges,i;
+ 		this->GetInput()->GetVertexNeighbourEdges(Item,NumberOfEdges,Edges);
+ 		for (i=0;i<NumberOfEdges;i++)
+ 			this->AddEdgeToProcess(Edges[i],ProcessId);
+@@ -237,3 +237,4 @@
+ 	};
+ };
+ #endif
++
+diff -urNb ACVD-vtk6/VolumeProcessing/vtkImageDataCleanLabels.h ACVD-src/VolumeProcessing/vtkImageDataCleanLabels.h
+--- ACVD-vtk6/VolumeProcessing/vtkImageDataCleanLabels.h	2014-03-03 14:40:14.000000000 +0100
++++ ACVD-src/VolumeProcessing/vtkImageDataCleanLabels.h	2015-01-11 17:23:18.333870738 +0100
+@@ -2,7 +2,7 @@
+ 
+ 
+ 
+-class vtkImageDataCleanLabels : public vtkSimpleImageToImageFilter
++class VTK_EXPORT vtkImageDataCleanLabels : public vtkSimpleImageToImageFilter
+ {
+ 
+ public :
+@@ -25,3 +25,4 @@
+ 	}
+ };
+ 
++

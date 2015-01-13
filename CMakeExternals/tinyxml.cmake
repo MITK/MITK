@@ -18,15 +18,14 @@ if(NOT DEFINED tinyxml_DIR)
     set(additional_cmake_args -DBUILD_SHARED_LIBS:BOOL=OFF)
   endif()
 
-  set(patch_cmd ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=tinyxml -P ${MITK_SOURCE_DIR}/CMakeExternals/Patchtinyxml-2.6.2.cmake)
-
   ExternalProject_Add(${proj}
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/tinyxml_2_6_2.tar.gz
      URL_MD5 c1b864c96804a10526540c664ade67f0
-     PATCH_COMMAND ${patch_cmd}
+     PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/tinyxml-2.6.2.patch
+       COMMAND ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=tinyxml -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake
      INSTALL_COMMAND ""
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS

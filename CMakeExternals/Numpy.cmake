@@ -74,7 +74,10 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       STRING(REPLACE " " "\ " _install_step ${_install_step})
     endif()
 
-    set(NUMPY_PATCH_COMMAND PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${CMAKE_CURRENT_LIST_DIR}/Patch${proj}.cmake)
+    set(NUMPY_PATCH_COMMAND )
+    if(WIN32)
+      set(NUMPY_PATCH_COMMAND PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Numpy-1.4.1-win32.patch)
+    endif()
 
     ExternalProject_Add(${proj}
       URL ${Numpy_URL}

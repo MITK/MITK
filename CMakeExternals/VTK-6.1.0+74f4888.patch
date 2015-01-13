@@ -1,0 +1,12 @@
+diff -urNb VTK-6.1.0+74f4888/Rendering/OpenGL/vtkOpenGL.h VTK-src/Rendering/OpenGL/vtkOpenGL.h
+--- VTK-6.1.0+74f4888/Rendering/OpenGL/vtkOpenGL.h	2014-09-24 14:50:44.000000000 +0200
++++ VTK-src/Rendering/OpenGL/vtkOpenGL.h	2015-01-11 15:10:31.629871688 +0100
+@@ -19,7 +19,7 @@
+ #include "vtkConfigure.h"
+ 
+ // To prevent gl.h to include glext.h provided by the system
+-#define GL_GLEXT_LEGACY
++//#define GL_GLEXT_LEGACY
+ #if defined(__APPLE__) && (defined(VTK_USE_CARBON) || defined(VTK_USE_COCOA))
+ # include <OpenGL/gl.h> // Include OpenGL API.
+ #else

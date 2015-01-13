@@ -24,21 +24,14 @@ if(NOT DEFINED ${proj}_DIR)
      PREFIX ${proj}-cmake
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qwt-6.1.0.tar.bz2
      URL_MD5 aef0437b37f191067a6a9dc01c30ba64
-     PATCH_COMMAND ${patch_cmd}
+     PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Qwt-6.1.0.patch
+       COMMAND ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=qwt -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake
      INSTALL_COMMAND ""
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
        ${qt_project_args}
      DEPENDS ${proj_DEPENDENCIES}
-    )
-
-    ExternalProject_Add_Step(${proj} qt54patch
-      COMMAND ${qt54patch_cmd}
-      WORKING_DIRECTORY ${proj}-src
-      DEPENDEES patch
-      DEPENDERS configure
-      LOG 1
     )
 
   set(${proj}_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)

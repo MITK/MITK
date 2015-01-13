@@ -51,8 +51,6 @@ if(MITK_USE_SimpleITK)
       set(_build_shared OFF)
     endif()
 
-    set(SimpleITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSimpleITK.cmake)
-
     ExternalProject_Add(${proj}
        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SimpleITK-0.8.0.tar.gz
        URL_MD5 "d98f2e5442228e324ef62111febc7446"
@@ -60,7 +58,7 @@ if(MITK_USE_SimpleITK)
        BINARY_DIR ${proj}-build
        PREFIX ${proj}-cmake
        INSTALL_DIR ${proj}-install
-       PATCH_COMMAND ${SimpleITK_PATCH_COMMAND}
+       PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/SimpleITK-0.8.0.patch
        CMAKE_ARGS
          ${ep_common_args}
          # -DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON

@@ -194,7 +194,7 @@ namespace mitk
   repeating most of AnalyzeInputFiles().
 
 */
-class MitkDICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
+class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 {
   public:
 

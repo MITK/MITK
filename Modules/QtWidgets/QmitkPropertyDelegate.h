@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * \see QmitkPropertiesTableModel
  */
-class QMITK_EXPORT QmitkPropertyDelegate : public QStyledItemDelegate
+class MITKQTWIDGETS_EXPORT QmitkPropertyDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 

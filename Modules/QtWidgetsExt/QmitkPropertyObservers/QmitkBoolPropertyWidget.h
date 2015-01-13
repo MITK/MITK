@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class _BoolPropertyWidgetImpl;
 
 /// @ingroup Widgets
-class MitkQtWidgetsExt_EXPORT QmitkBoolPropertyWidget : public QCheckBox
+class MITKQTWIDGETSEXT_EXPORT QmitkBoolPropertyWidget : public QCheckBox
 {
   Q_OBJECT
 

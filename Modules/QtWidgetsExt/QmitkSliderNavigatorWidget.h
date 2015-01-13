@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QString>
 
-class MitkQtWidgetsExt_EXPORT QmitkSliderNavigatorWidget : public QWidget, public Ui::QmitkSliderNavigator
+class MITKQTWIDGETSEXT_EXPORT QmitkSliderNavigatorWidget : public QWidget, public Ui::QmitkSliderNavigator
 {
   Q_OBJECT
 

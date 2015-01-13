@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// \brief A table model for a set of DataNodes defined by a predicate.
 /// \TODO make columns interchangeable, select which properties to show as columns
 ///
-class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
+class MITKQTWIDGETS_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
 {
   Q_OBJECT
 

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkPlanarFigure_EXPORT PlanarFigureVtkMapper3D : public VtkMapper
+  class MITKPLANARFIGURE_EXPORT PlanarFigureVtkMapper3D : public VtkMapper
   {
     class LocalStorage
     {

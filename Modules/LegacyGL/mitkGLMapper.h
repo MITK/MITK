@@ -44,7 +44,7 @@ namespace mitk {
 * or vtkMapper
 * \ingroup Mapper
 */
-class MitkLegacyGL_EXPORT GLMapper : public Mapper
+class MITKLEGACYGL_EXPORT GLMapper : public Mapper
 {
   public:
 

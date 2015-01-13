@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QList>
 
 /// \ingroup QmitkModule
-class QMITK_EXPORT QmitkDataStorageTreeModel : public QAbstractItemModel
+class MITKQTWIDGETS_EXPORT QmitkDataStorageTreeModel : public QAbstractItemModel
 {
 //# CONSTANTS,TYPEDEFS
 public:

@@ -38,7 +38,7 @@ class QmitkLiveWireTool2DGUIControls;
 \brief GUI for mitk::LiveWireTool.
 \sa mitk::LiveWireTool2D
 */
-class MitkSegmentationUI_EXPORT QmitkLiveWireTool2DGUI : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkLiveWireTool2DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

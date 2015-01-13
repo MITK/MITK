@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkPlanarFigure_EXPORT PlanarDoubleEllipse : public PlanarFigure
+  class MITKPLANARFIGURE_EXPORT PlanarDoubleEllipse : public PlanarFigure
   {
   public:
     mitkClassMacro(PlanarDoubleEllipse, PlanarFigure);

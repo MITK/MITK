@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLineEdit>
 
 
-class MitkQtWidgetsExt_EXPORT QmitkTransferFunctionCanvas : public QWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionCanvas : public QWidget
 {
 
   Q_OBJECT

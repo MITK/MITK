@@ -56,7 +56,7 @@ namespace mitk {
 //## @brief Vtk-based mapper for VolumeData
 //##
 //## @ingroup Mapper
-class MitkMapperExt_EXPORT GPUVolumeMapper3D : public VtkMapper
+class MITKMAPPEREXT_EXPORT GPUVolumeMapper3D : public VtkMapper
 {
 public:
   mitkClassMacro(GPUVolumeMapper3D, VtkMapper);

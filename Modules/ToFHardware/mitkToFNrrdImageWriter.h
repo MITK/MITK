@@ -32,7 +32,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFNrrdImageWriter : public ToFImageWriter
+  class MITKTOFHARDWARE_EXPORT ToFNrrdImageWriter : public ToFImageWriter
   {
   public:
     mitkClassMacro( ToFNrrdImageWriter , ToFImageWriter );

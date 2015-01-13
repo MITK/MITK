@@ -31,7 +31,7 @@ namespace Ui
   class QmitkGnuplotWidget;
 }
 
-class MitkQtWidgetsExt_EXPORT QmitkGnuplotWidget : public QWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkGnuplotWidget : public QWidget
 {
   Q_OBJECT
 

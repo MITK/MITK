@@ -26,7 +26,7 @@ namespace mitk {
 //##Documentation
 //## @brief Data class containing an ellipsoid
 //## @ingroup Data
-class MitkDataTypesExt_EXPORT Ellipsoid : public BoundingObject
+class MITKDATATYPESEXT_EXPORT Ellipsoid : public BoundingObject
 {
 public:
   mitkClassMacro(Ellipsoid, BoundingObject);

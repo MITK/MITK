@@ -30,7 +30,7 @@ namespace mitk
 
   Minimal interface to hide actual implementation, which might rely on GDCM.
 */
-class MitkDICOMReader_EXPORT DICOMDatasetAccess
+class MITKDICOMREADER_EXPORT DICOMDatasetAccess
 {
   public:
 

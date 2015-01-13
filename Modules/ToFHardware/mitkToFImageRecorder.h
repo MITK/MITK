@@ -43,7 +43,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-class MITK_TOFHARDWARE_EXPORT ToFImageRecorder : public itk::Object
+class MITKTOFHARDWARE_EXPORT ToFImageRecorder : public itk::Object
 {
 public:
 

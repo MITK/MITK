@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <set>
 
 /// \ingroup QmitkModule
-class QMITK_EXPORT QmitkDataStorageFilterProxyModel : public QSortFilterProxyModel
+class MITKQTWIDGETS_EXPORT QmitkDataStorageFilterProxyModel : public QSortFilterProxyModel
 {
 //# CTORS,DTOR
 public:

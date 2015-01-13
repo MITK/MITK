@@ -34,7 +34,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFCameraMITKPlayerDevice : public ToFCameraDevice
+  class MITKTOFHARDWARE_EXPORT ToFCameraMITKPlayerDevice : public ToFCameraDevice
   {
   public:
 

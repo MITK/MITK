@@ -35,7 +35,7 @@ namespace mitk
  * possible region.
  * @ingroup MitkPlanarFigureModule
  */
-class MitkPlanarFigure_EXPORT PlanarFigureSource : public mitk::BaseDataSource
+class MITKPLANARFIGURE_EXPORT PlanarFigureSource : public mitk::BaseDataSource
 {
 public:
     mitkClassMacro( PlanarFigureSource, BaseDataSource )

@@ -40,7 +40,7 @@ namespace mitk
   * @ingroup ToFHardware
   */
 
-class MITK_PMDMODULE_EXPORT ToFCameraPMDCamCubeDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+class MITKPMD_EXPORT ToFCameraPMDCamCubeDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
   /**

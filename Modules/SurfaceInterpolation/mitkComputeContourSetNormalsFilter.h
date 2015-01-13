@@ -51,7 +51,7 @@ namespace mitk {
 
    $Author: fetzer$
 */
-class MitkSurfaceInterpolation_EXPORT ComputeContourSetNormalsFilter : public SurfaceToSurfaceFilter
+class MITKSURFACEINTERPOLATION_EXPORT ComputeContourSetNormalsFilter : public SurfaceToSurfaceFilter
 {
 public:
 

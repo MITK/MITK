@@ -36,7 +36,7 @@ namespace mitk
   *
   * \ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFImageSource : public mitk::ImageSource
+  class MITKTOFHARDWARE_EXPORT ToFImageSource : public mitk::ImageSource
   {
   public:
 

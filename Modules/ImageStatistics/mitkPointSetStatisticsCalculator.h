@@ -28,7 +28,7 @@ namespace mitk
 /**
  * \brief Class for calculating statistics (like standard derivation, RMS, mean, etc.) for a PointSet.
  */
-class MitkImageStatistics_EXPORT PointSetStatisticsCalculator : public itk::Object
+class MITKIMAGESTATISTICS_EXPORT PointSetStatisticsCalculator : public itk::Object
 {
 public:
 

@@ -30,7 +30,7 @@ namespace mitk
 /**  The user must set the dimensionality, the dimensions and the pixel type. If they are incorrect, the image will not be opened or the visualization will be incorrect. */
 //## @ingroup MitkLegacyIOModule
 //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class DEPRECATED() MitkLegacyIO_EXPORT RawImageFileReader : public ImageSource, public FileReader
+class DEPRECATED() MITKLEGACYIO_EXPORT RawImageFileReader : public ImageSource, public FileReader
 {
 public:
     mitkClassMacro(RawImageFileReader, FileReader);

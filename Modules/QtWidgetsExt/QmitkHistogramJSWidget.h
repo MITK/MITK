@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * or segmentation. It also can display an intensity profile for
 * path elements, which lais over an image.
 */
-class MitkQtWidgetsExt_EXPORT QmitkHistogramJSWidget : public QWebView
+class MITKQTWIDGETSEXT_EXPORT QmitkHistogramJSWidget : public QWebView
 {
   Q_OBJECT
 

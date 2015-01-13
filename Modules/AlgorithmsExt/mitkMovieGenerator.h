@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class MitkAlgorithmsExt_EXPORT  MovieGenerator : public  itk::LightObject
+class MITKALGORITHMSEXT_EXPORT  MovieGenerator : public  itk::LightObject
 {
 public:
 

@@ -52,7 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * @see QwtPlot
 */
 
-class MitkQtWidgetsExt_EXPORT QmitkPlotWidget: public QWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkPlotWidget: public QWidget
 {
 
 private:

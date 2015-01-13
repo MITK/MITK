@@ -32,7 +32,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_PMDMODULE_EXPORT ToFCameraPMDController : public itk::Object
+  class MITKPMD_EXPORT ToFCameraPMDController : public itk::Object
   {
   public:
 

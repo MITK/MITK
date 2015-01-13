@@ -43,7 +43,7 @@ namespace mitk {
   */
 
   template < class TPixelType, unsigned int VImageDimension >
-  class MITK_RIGIDREGISTRATION_EXPORT TransformFactory : public itk::Object
+  class MITKRIGIDREGISTRATION_EXPORT TransformFactory : public itk::Object
   {
   public:
     mitkClassMacro(TransformFactory, itk::Object);

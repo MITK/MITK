@@ -32,7 +32,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFOpenCVImageGrabber : public mitk::OpenCVImageSource
+  class MITKTOFHARDWARE_EXPORT ToFOpenCVImageGrabber : public mitk::OpenCVImageSource
   {
   public:
 

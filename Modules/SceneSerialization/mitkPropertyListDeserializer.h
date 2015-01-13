@@ -27,7 +27,7 @@ namespace mitk
 /**
   \brief Deserializes a mitk::PropertyList
 */
-class MitkSceneSerialization_EXPORT PropertyListDeserializer : public itk::Object
+class MITKSCENESERIALIZATION_EXPORT PropertyListDeserializer : public itk::Object
 {
   public:
 

@@ -25,7 +25,7 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class MitkPlanarFigure_EXPORT PlanarFigureSerializer : public BaseDataSerializer
+class MITKPLANARFIGURE_EXPORT PlanarFigureSerializer : public BaseDataSerializer
 {
   public:
     mitkClassMacro( PlanarFigureSerializer, BaseDataSerializer )

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAutoCropImageFilter.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, AutoCropImageFilter, "Crop tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, AutoCropImageFilter, "Crop tool");
 }
 
 mitk::AutoCropTool::AutoCropTool()

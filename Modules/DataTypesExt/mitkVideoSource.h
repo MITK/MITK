@@ -28,7 +28,7 @@ namespace mitk
   ///
   /// Simple base class for acquiring video data.
   ///
-  class MitkDataTypesExt_EXPORT VideoSource: virtual public itk::Object
+  class MITKDATATYPESEXT_EXPORT VideoSource: virtual public itk::Object
   {
     public:
       ///

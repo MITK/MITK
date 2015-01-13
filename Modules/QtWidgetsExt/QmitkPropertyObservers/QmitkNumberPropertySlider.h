@@ -29,7 +29,7 @@ class DoubleProperty;
 }
 
 /// @ingroup Widgets
-class MitkQtWidgetsExt_EXPORT QmitkNumberPropertySlider : public QSlider
+class MITKQTWIDGETSEXT_EXPORT QmitkNumberPropertySlider : public QSlider
 {
   Q_OBJECT
   Q_PROPERTY( short decimalPlaces READ getDecimalPlaces WRITE setDecimalPlaces )

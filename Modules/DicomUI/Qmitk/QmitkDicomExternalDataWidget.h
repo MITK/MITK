@@ -41,7 +41,7 @@ class ctkFileDialog;
 * \sa QmitkFunctionality
 * \ingroup Functionalities
 */
-class MITK_DICOMUI_EXPORT QmitkDicomExternalDataWidget : public QWidget
+class MITKDICOMUI_EXPORT QmitkDicomExternalDataWidget : public QWidget
 {
    // this is needed for all Qt objects that should have a Qt meta-object
    // (everything that derives from QObject and wants to have signal/slots)

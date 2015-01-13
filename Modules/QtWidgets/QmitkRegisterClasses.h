@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkQtWidgetsExports.h>
 
 /// \ingroup QmitkModule
-QMITK_EXPORT void QmitkRegisterClasses();
+MITKQTWIDGETS_EXPORT void QmitkRegisterClasses();
 
 #endif
 

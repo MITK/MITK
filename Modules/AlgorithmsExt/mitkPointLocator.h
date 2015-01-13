@@ -42,7 +42,7 @@ namespace mitk
  * NOTE: At least 1 point must be contained in the point set.
  */
 
-class MitkAlgorithmsExt_EXPORT PointLocator : public itk::Object
+class MITKALGORITHMSEXT_EXPORT PointLocator : public itk::Object
 {
 public:
 

@@ -37,7 +37,7 @@ namespace mitk
   * by the next IsoDoseLevel greater (higher dose value) than the current iso level.
   * Color and the visibility options are used to indicate the visualization style.
   */
-  class MitkDicomRT_EXPORT IsoDoseLevel: public itk::Object
+  class MITKDICOMRT_EXPORT IsoDoseLevel: public itk::Object
   {
   public:
     typedef ::itk::RGBPixel<float> ColorType;

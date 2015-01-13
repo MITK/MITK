@@ -29,7 +29,7 @@ class QLineEdit;
 ///
 /// Various methods are given to influence the behaviour or presentation
 ///
-class MitkQtWidgetsExt_EXPORT QmitkFileChooser : public QWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkFileChooser : public QWidget
 {
   Q_OBJECT
 

@@ -24,7 +24,7 @@ namespace mitk
 {
   /** \brief Encapsulates several morphological operations that can be performed on segmentations.
     */
-  class MitkSegmentation_EXPORT MorphologicalOperations
+  class MITKSEGMENTATION_EXPORT MorphologicalOperations
   {
   public:
     enum StructuralElementType

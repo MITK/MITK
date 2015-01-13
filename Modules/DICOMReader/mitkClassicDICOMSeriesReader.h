@@ -58,7 +58,7 @@ namespace mitk
   If multiple images occupy the same position in space, it is assumed that this indicated a 3D+t image.
 
 */
-class MitkDICOMReader_EXPORT ClassicDICOMSeriesReader : public ThreeDnTDICOMSeriesReader
+class MITKDICOMREADER_EXPORT ClassicDICOMSeriesReader : public ThreeDnTDICOMSeriesReader
 {
   public:
 

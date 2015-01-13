@@ -50,7 +50,7 @@ class vtkRenderWindow;
 
 //class vtkKWAMRVolumeMapper; // friend class.
 
-class MitkMapperExt_EXPORT vtkMitkGPUVolumeRayCastMapper : public vtkVolumeMapper
+class MITKMAPPEREXT_EXPORT vtkMitkGPUVolumeRayCastMapper : public vtkVolumeMapper
 {
 public:
   vtkTypeMacro(vtkMitkGPUVolumeRayCastMapper,vtkVolumeMapper);

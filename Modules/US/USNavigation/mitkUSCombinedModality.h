@@ -42,7 +42,7 @@ namespace mitk {
    * The ultrasound images are transformed according to this calibration in the
    * GenerateData() method.
    */
-  class MitkUSNavigation_EXPORT USCombinedModality : public USDevice
+  class MITKUSNAVIGATION_EXPORT USCombinedModality : public USDevice
   {
   public:
     static const std::string DeviceClassIdentifier;

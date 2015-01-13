@@ -29,7 +29,7 @@ namespace mitk
 /**
 * \brief Samples new tract from surrounding fiber segments.   */
 
-class MitkFiberTracking_EXPORT SimpSamp
+class MITKFIBERTRACKING_EXPORT SimpSamp
 {
 
     float *P;

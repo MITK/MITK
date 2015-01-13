@@ -37,7 +37,7 @@ class QmitkStdMultiWidget;
 * point.
 *
 */
-class MitkQtWidgetsExt_EXPORT QmitkPointListView : public QListView
+class MITKQTWIDGETSEXT_EXPORT QmitkPointListView : public QListView
 {
   Q_OBJECT
 

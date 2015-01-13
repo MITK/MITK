@@ -36,7 +36,7 @@ namespace mitk {
 class BaseRenderer;
 }
 
-class MitkQtWidgetsExt_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::QmitkTransferFunctionWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::QmitkTransferFunctionWidget
 {
 
   Q_OBJECT

@@ -69,12 +69,12 @@ namespace mitk
           dass von dort aus die Methoden von NonBlockingAlgorithm aufgerufen werden.
           Erben v.a. um die Output-Sachen zu uebernehmen, die Anpassungen das einfuehren einer Zwischenklasse, um die Interaces zu verheiraten.
 */
-class MitkAlgorithmsExt_EXPORT NonBlockingAlgorithm : public itk::Object
+class MITKALGORITHMSEXT_EXPORT NonBlockingAlgorithm : public itk::Object
 {
   public:
 
     // for threading
-    class MitkAlgorithmsExt_EXPORT ThreadParameters
+    class MITKALGORITHMSEXT_EXPORT ThreadParameters
     {
       public:
         itk::SmartPointer<NonBlockingAlgorithm> m_Algorithm;

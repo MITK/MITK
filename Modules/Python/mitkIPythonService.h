@@ -52,7 +52,7 @@ namespace mitk
     /// The class also enables to transfer mitk images to python as itk::Image and vice versa
     /// \see IPythonService::GetVariableStack()
     ///
-    class MITK_PYTHON_EXPORT IPythonService
+    class MITKPYTHON_EXPORT IPythonService
     {
     public:
         ///

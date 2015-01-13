@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkColorTransferFunction.h>
 
-class MitkQtWidgetsExt_EXPORT QmitkColorTransferFunctionCanvas: public QmitkTransferFunctionCanvas
+class MITKQTWIDGETSEXT_EXPORT QmitkColorTransferFunctionCanvas: public QmitkTransferFunctionCanvas
 {
 Q_OBJECT
 

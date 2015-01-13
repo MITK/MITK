@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk \
 { \
  \
-class MitkConnectomics_EXPORT classname ## Serializer : public EnumerationPropertySerializer \
+class MITKCONNECTOMICS_EXPORT classname ## Serializer : public EnumerationPropertySerializer \
 { \
   public: \
      \

@@ -27,7 +27,7 @@ namespace mitk {
 /**
 \brief Property class for dose iso level sets.
 */
-class MitkDicomRT_EXPORT IsoDoseLevelSetProperty : public BaseProperty
+class MITKDICOMRT_EXPORT IsoDoseLevelSetProperty : public BaseProperty
 {
 
 protected:

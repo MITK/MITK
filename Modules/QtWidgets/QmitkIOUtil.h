@@ -52,12 +52,12 @@ struct IFileReader;
 /**
  * @brief QmitkIOUtil Provides static helper methods to open and save files with Qt dialogs.
  */
-class QMITK_EXPORT QmitkIOUtil : public mitk::IOUtil
+class MITKQTWIDGETS_EXPORT QmitkIOUtil : public mitk::IOUtil
 {
 
 public:
 
-  class QMITK_EXPORT SaveFilter
+  class MITKQTWIDGETS_EXPORT SaveFilter
   {
   public:
 

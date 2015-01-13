@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   There is nothing here to copy..
 */
-class MitkQt4Qt5TestModule_EXPORT QWonderString : public QObject
+class MITKQT4QT5TESTMODULE_EXPORT QWonderString : public QObject
 {
   Q_OBJECT
 

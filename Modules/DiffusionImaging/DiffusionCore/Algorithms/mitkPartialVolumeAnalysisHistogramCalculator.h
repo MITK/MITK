@@ -54,7 +54,7 @@ namespace mitk
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
  */
-  class MitkDiffusionCore_EXPORT PartialVolumeAnalysisHistogramCalculator : public itk::Object
+  class MITKDIFFUSIONCORE_EXPORT PartialVolumeAnalysisHistogramCalculator : public itk::Object
   {
   public:
 

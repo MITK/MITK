@@ -29,7 +29,7 @@ namespace mitk {
 //## @brief Operation, that holds everything necessary for an operation on a cell.
 //##
 //## @ingroup Undo
-class MitkDataTypesExt_EXPORT CellOperation : public Operation
+class MITKDATATYPESEXT_EXPORT CellOperation : public Operation
 {
   public:
     mitkClassMacro(CellOperation, Operation);

@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkAlgorithmsExtExports.h>
 
 namespace mitk{
-  class MitkAlgorithmsExt_EXPORT BoundingObjectToSegmentationFilter : public ImageToImageFilter
+  class MITKALGORITHMSEXT_EXPORT BoundingObjectToSegmentationFilter : public ImageToImageFilter
   {
   public:
     mitkClassMacro(BoundingObjectToSegmentationFilter, ImageToImageFilter);

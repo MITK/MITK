@@ -41,7 +41,7 @@ namespace mitk {
   \author Daniel Stein
   */
 
-  class MITK_RIGIDREGISTRATION_EXPORT TransformParameters : public itk::Object
+  class MITKRIGIDREGISTRATION_EXPORT TransformParameters : public itk::Object
   {
   public:
     mitkClassMacro(TransformParameters, ::itk::Object);

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTreeWidget>
 #include <QPushButton>
 
-class MitkQtWidgetsExt_EXPORT QmitkBoundingObjectWidget : public QWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkBoundingObjectWidget : public QWidget
 {
   Q_OBJECT
 

@@ -47,7 +47,7 @@ namespace mitk
 
   $Author$
 */
-class MitkSegmentation_EXPORT SubtractContourTool : public ContourTool
+class MITKSEGMENTATION_EXPORT SubtractContourTool : public ContourTool
 {
   public:
 

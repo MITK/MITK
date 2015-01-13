@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT SimulationWriterFactory : public itk::ObjectFactoryBase
+  class MITKSIMULATION_EXPORT SimulationWriterFactory : public itk::ObjectFactoryBase
   {
   public:
     mitkClassMacro(SimulationWriterFactory, itk::ObjectFactoryBase);

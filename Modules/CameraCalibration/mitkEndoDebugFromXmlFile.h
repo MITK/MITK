@@ -16,7 +16,7 @@ namespace mitk
   ///
   /// read EndoDebug params from xml file
   ///
-  class MitkCameraCalibration_EXPORT EndoDebugFromXmlFile:
+  class MITKCAMERACALIBRATION_EXPORT EndoDebugFromXmlFile:
     public Algorithm
   {
   public:

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataSet.h>
 
 namespace mitk {
-  class MitkIGT_EXPORT NavigationDataSetWriterXML
+  class MITKIGT_EXPORT NavigationDataSetWriterXML
   {
   public:
 

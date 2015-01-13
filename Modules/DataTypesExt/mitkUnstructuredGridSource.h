@@ -33,7 +33,7 @@ class UnstructuredGrid;
 //## DataObject. This is also true for subclasses of mitk::BaseProcess and thus
 //## for mitk::UnstructuredGridSource.
 //## @ingroup Process
-class MitkDataTypesExt_EXPORT UnstructuredGridSource : public BaseDataSource
+class MITKDATATYPESEXT_EXPORT UnstructuredGridSource : public BaseDataSource
 {
 public:
 

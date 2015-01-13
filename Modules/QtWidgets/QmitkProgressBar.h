@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * All mitk-classes will call this class for output:
  * mitk::ProgressBar::GetInstance();
  */
-class QMITK_EXPORT QmitkProgressBar : public QProgressBar, public mitk::ProgressBarImplementation
+class MITKQTWIDGETS_EXPORT QmitkProgressBar : public QProgressBar, public mitk::ProgressBarImplementation
 {
 
   Q_OBJECT

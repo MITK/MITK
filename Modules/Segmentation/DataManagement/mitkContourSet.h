@@ -31,7 +31,7 @@ namespace mitk
 * This class holds stores vertices for drawing a contour
 *
 */
-class MitkSegmentation_EXPORT ContourSet : public BaseData
+class MITKSEGMENTATION_EXPORT ContourSet : public BaseData
 {
 public:
   mitkClassMacro(ContourSet, BaseData);

@@ -39,7 +39,7 @@ namespace mitk
  * ODFN_MINMAX, ODFN_MAX, ODFN_NONE ODFN_GLOBAL_MAX
  * Default is ODFN_MINMAX
  */
-class MitkDiffusionCore_EXPORT OdfNormalizationMethodProperty : public EnumerationProperty
+class MITKDIFFUSIONCORE_EXPORT OdfNormalizationMethodProperty : public EnumerationProperty
 {
 public:
 
@@ -105,7 +105,7 @@ protected:
   virtual void AddInterpolationTypes();
 };
 
-class MitkDiffusionCore_EXPORT OdfNormalizationMethodPropertySerializer : public EnumerationPropertySerializer
+class MITKDIFFUSIONCORE_EXPORT OdfNormalizationMethodPropertySerializer : public EnumerationPropertySerializer
 {
   public:
 

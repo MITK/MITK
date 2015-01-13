@@ -36,7 +36,7 @@ class QInputEvent;
  * \ingroup QmitkModule
  * \brief MITK implementation of the QVTKWidget
  */
-class QMITK_EXPORT QmitkRenderWindow: public QVTKWidget2, public mitk::RenderWindowBase
+class MITKQTWIDGETS_EXPORT QmitkRenderWindow: public QVTKWidget2, public mitk::RenderWindowBase
 {
   Q_OBJECT
 

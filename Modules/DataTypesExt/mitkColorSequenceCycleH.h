@@ -35,7 +35,7 @@ namespace mitk
   Finally repeat colors.
 
 */
-class MitkDataTypesExt_EXPORT ColorSequenceCycleH : public ColorSequence
+class MITKDATATYPESEXT_EXPORT ColorSequenceCycleH : public ColorSequence
 {
   public:
 

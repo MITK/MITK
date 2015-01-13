@@ -57,7 +57,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * assign a QmitkStdMultiWidget and a mitk::DataStorage
  * to the widget (via SetMultiWidget and SetDataStorage).
  */
-class MitkQtWidgetsExt_EXPORT QmitkCorrespondingPointSetsWidget : public QWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkCorrespondingPointSetsWidget : public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(bool QTPropShowButtonBar READ QTPropButtonBarEnabled WRITE QTPropSetButtonBarEnabled)

@@ -34,7 +34,7 @@ namespace mitk
  * </ul>
  * Default is the Wireframe representation
  */
-class MitkDataTypesExt_EXPORT GridRepresentationProperty : public EnumerationProperty
+class MITKDATATYPESEXT_EXPORT GridRepresentationProperty : public EnumerationProperty
 {
 public:
 

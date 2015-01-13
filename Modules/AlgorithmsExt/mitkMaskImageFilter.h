@@ -30,7 +30,7 @@ namespace mitk {
 //##Documentation
 //## @brief
 //## @ingroup Process
-class MitkAlgorithmsExt_EXPORT MaskImageFilter : public ImageToImageFilter
+class MITKALGORITHMSEXT_EXPORT MaskImageFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(MaskImageFilter, ImageToImageFilter);

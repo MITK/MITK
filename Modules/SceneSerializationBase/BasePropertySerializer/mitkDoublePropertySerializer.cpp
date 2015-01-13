@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkSceneSerializationBase_EXPORT DoublePropertySerializer : public BasePropertySerializer
+class MITKSCENESERIALIZATIONBASE_EXPORT DoublePropertySerializer : public BasePropertySerializer
 {
   public:
 

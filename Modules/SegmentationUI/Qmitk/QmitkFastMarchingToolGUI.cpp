@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 
 
-MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkFastMarchingToolGUI, "")
+MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkFastMarchingToolGUI, "")
 
 QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
 :QmitkToolGUI(),

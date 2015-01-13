@@ -27,7 +27,7 @@ namespace mitk {
 //## @brief Reader to read image files in vtk file format
 //## @ingroup MitkLegacyIOModule
 //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class DEPRECATED() MitkLegacyIO_EXPORT VtkImageReader : public ImageSource, public FileReader
+class DEPRECATED() MITKLEGACYIO_EXPORT VtkImageReader : public ImageSource, public FileReader
 {
 public:
   mitkClassMacro(VtkImageReader, FileReader);

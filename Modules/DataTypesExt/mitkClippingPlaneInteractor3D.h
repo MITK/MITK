@@ -30,7 +30,7 @@ namespace mitk
   * \ingroup Interaction
   */
 // Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
-class MitkDataTypesExt_EXPORT ClippingPlaneInteractor3D: public DataInteractor
+class MITKDATATYPESEXT_EXPORT ClippingPlaneInteractor3D: public DataInteractor
 {
 
 public:

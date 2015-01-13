@@ -47,7 +47,7 @@ struct CovarianceMatrixCalculatorData;
  * a clean Surface with non manifold edges and no duplicated vertices. To
  * ensure a clean Surface representation use vtkCleanPolyData.
  */
-class MitkAlgorithmsExt_EXPORT CovarianceMatrixCalculator : public itk::Object
+class MITKALGORITHMSEXT_EXPORT CovarianceMatrixCalculator : public itk::Object
 {
 
 private:

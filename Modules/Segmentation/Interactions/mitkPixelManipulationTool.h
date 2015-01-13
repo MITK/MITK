@@ -25,7 +25,7 @@ namespace mitk
 {
   class Image;
 
-  class MitkSegmentation_EXPORT PixelManipulationTool : public Tool
+  class MITKSEGMENTATION_EXPORT PixelManipulationTool : public Tool
   {
   public:
     mitkClassMacro(PixelManipulationTool, Tool);

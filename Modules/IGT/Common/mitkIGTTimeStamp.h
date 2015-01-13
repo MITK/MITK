@@ -49,7 +49,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT IGTTimeStamp : public itk::Object
+  class MITKIGT_EXPORT IGTTimeStamp : public itk::Object
   {
   public:
 

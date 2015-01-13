@@ -116,7 +116,7 @@ class WeightedPointTransform;
   * \endcode
   *
   */
-class MitkAlgorithmsExt_EXPORT AnisotropicIterativeClosestPointRegistration : public itk::Object
+class MITKALGORITHMSEXT_EXPORT AnisotropicIterativeClosestPointRegistration : public itk::Object
 {
 
 protected:

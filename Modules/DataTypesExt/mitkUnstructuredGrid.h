@@ -29,7 +29,7 @@ namespace mitk {
 //##Documentation
 //## @brief Class for storing unstructured grids (vtkUnstructuredGrid)
 //## @ingroup Data
-class MitkDataTypesExt_EXPORT UnstructuredGrid : public BaseData
+class MITKDATATYPESEXT_EXPORT UnstructuredGrid : public BaseData
 {
 
 public:

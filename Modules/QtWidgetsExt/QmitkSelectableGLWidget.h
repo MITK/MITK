@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QmitkRenderWindow;
 
-class MitkQtWidgetsExt_EXPORT QmitkSelectableGLWidget : public QWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkSelectableGLWidget : public QWidget
 {
   Q_OBJECT
 

@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * Can be used in a GUI to provide a mouse mode selector to the user.
  */
-class QMITK_EXPORT QmitkMouseModeSwitcher : public QToolBar
+class MITKQTWIDGETS_EXPORT QmitkMouseModeSwitcher : public QToolBar
 {
   Q_OBJECT
 

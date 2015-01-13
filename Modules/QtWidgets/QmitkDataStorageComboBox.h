@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ///
 /// Dont forget that this class inherits from QComboBox and you can therefore use the whole API of QComboBox.
 ///
-class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
+class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBox : public QComboBox
 {
   //#CLASS-MACROS,FRIENDS
   Q_OBJECT

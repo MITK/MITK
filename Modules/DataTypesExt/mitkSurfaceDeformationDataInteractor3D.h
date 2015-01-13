@@ -30,7 +30,7 @@ namespace mitk
   */
 
 // Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
-class MitkDataTypesExt_EXPORT SurfaceDeformationDataInteractor3D: public DataInteractor
+class MITKDATATYPESEXT_EXPORT SurfaceDeformationDataInteractor3D: public DataInteractor
 {
 
 public:

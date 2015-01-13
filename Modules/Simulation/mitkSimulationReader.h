@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT SimulationReader : public BaseDataSource, FileReader
+  class MITKSIMULATION_EXPORT SimulationReader : public BaseDataSource, FileReader
   {
   public:
     static bool CanReadFile(const std::string& filename, const std::string& filePrefix, const std::string& filePattern);

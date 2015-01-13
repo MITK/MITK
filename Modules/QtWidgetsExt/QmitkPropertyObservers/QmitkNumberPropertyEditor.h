@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSpinBox>
 
 /// @ingroup Widgets
-class MitkQtWidgetsExt_EXPORT QmitkNumberPropertyEditor : public QSpinBox, public mitk::PropertyEditor
+class MITKQTWIDGETSEXT_EXPORT QmitkNumberPropertyEditor : public QSpinBox, public mitk::PropertyEditor
 {
   Q_OBJECT
   Q_PROPERTY( short decimalPlaces READ getDecimalPlaces WRITE setDecimalPlaces )

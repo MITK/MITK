@@ -50,7 +50,7 @@ namespace mitk
   mitk::ContourModelMapper3D. See these classes for display options which can
   can be set via properties.
   */
-  class MitkContourModel_EXPORT ContourModel : public BaseData
+  class MITKCONTOURMODEL_EXPORT ContourModel : public BaseData
   {
 
   public:

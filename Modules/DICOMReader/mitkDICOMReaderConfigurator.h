@@ -91,7 +91,7 @@ namespace mitk
   Usually it should be enough to keep DE-serializers for all versions. Writers for the most
   recent version should be enough.
 */
-class MitkDICOMReader_EXPORT DICOMReaderConfigurator : public itk::LightObject
+class MITKDICOMREADER_EXPORT DICOMReaderConfigurator : public itk::LightObject
 {
   public:
 

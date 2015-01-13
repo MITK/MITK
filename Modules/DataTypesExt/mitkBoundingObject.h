@@ -29,7 +29,7 @@ namespace mitk {
 //## Manages generic functions and provides an interface for IsInside()
 //## calculates a generic bounding box
 //## @ingroup Data
-class MitkDataTypesExt_EXPORT BoundingObject : public mitk::Surface     //BaseData
+class MITKDATATYPESEXT_EXPORT BoundingObject : public mitk::Surface     //BaseData
 {
 public:
   mitkClassMacro(BoundingObject, mitk::Surface);

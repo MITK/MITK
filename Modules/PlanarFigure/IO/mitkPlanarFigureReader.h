@@ -36,7 +36,7 @@ namespace mitk
  * these are assigned to multiple outputs of the filter.
  * @ingroup MitkPlanarFigureModule
 */
-class MitkPlanarFigure_EXPORT PlanarFigureReader: public PlanarFigureSource, public FileReader
+class MITKPLANARFIGURE_EXPORT PlanarFigureReader: public PlanarFigureSource, public FileReader
 {
 public:
 

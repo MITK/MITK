@@ -54,7 +54,7 @@ class PlaneGeometry;
  *
  * \sa PlanarFigureMapper2D
  */
-class MitkPlanarFigure_EXPORT PlanarCross : public PlanarFigure
+class MITKPLANARFIGURE_EXPORT PlanarCross : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarCross, PlanarFigure );

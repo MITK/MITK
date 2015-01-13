@@ -40,7 +40,7 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
 
   */
-  class MitkSegmentation_EXPORT AdaptiveRegionGrowingTool : public AutoSegmentationTool
+  class MITKSEGMENTATION_EXPORT AdaptiveRegionGrowingTool : public AutoSegmentationTool
   {
   public:
 

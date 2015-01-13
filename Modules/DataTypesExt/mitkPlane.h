@@ -34,7 +34,7 @@ namespace mitk {
  *
  * \ingroup Data
  */
-class MitkDataTypesExt_EXPORT Plane : public BoundingObject
+class MITKDATATYPESEXT_EXPORT Plane : public BoundingObject
 {
 public:
   mitkClassMacro(Plane, BoundingObject);

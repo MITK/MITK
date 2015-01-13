@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 
 /// \ingroup QmitkModule
-class QMITK_EXPORT QmitkLevelWindowWidget : public QWidget, public Ui::QmitkLevelWindow
+class MITKQTWIDGETS_EXPORT QmitkLevelWindowWidget : public QWidget, public Ui::QmitkLevelWindow
 {
   Q_OBJECT
 public:

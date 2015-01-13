@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT PlaneIntersectionVisitor : public sofa::simulation::Visitor
+  class MITKSIMULATION_EXPORT PlaneIntersectionVisitor : public sofa::simulation::Visitor
   {
   public:
     struct Edge

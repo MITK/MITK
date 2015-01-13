@@ -29,7 +29,7 @@ namespace mitk
 ///
 /// \brief A pseudo-Filter for creating OpenCV images from MITK images with the option of copying data or referencing it
 ///
-class MITK_OPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Object
+class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Object
 {
     public:
         typedef itk::RGBPixel< unsigned char > UCRGBPixelType;

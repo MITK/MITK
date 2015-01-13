@@ -44,7 +44,7 @@ namespace mitk
   * @ingroup SurfaceFilters
   * @ingroup ToFProcessing
   */
-  class MitkToFProcessing_EXPORT ToFDistanceImageToPointSetFilter : public PointSetSource
+  class MITKTOFPROCESSING_EXPORT ToFDistanceImageToPointSetFilter : public PointSetSource
   {
   public:
 

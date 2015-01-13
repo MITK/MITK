@@ -107,7 +107,7 @@ class TextOverlay2D;
 * @ingroup MitkPlanarFigureModule
 */
 
-class MitkPlanarFigure_EXPORT PlanarFigureMapper2D : public GLMapper
+class MITKPLANARFIGURE_EXPORT PlanarFigureMapper2D : public GLMapper
 {
 public:
 

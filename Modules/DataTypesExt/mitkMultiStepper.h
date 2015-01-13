@@ -35,7 +35,7 @@ namespace mitk {
 //## position in the list (between 0 and GetSteps()). Provides methods like
 //## First (go to the first element), Next (go to the next one), etc.
 //## @ingroup NavigationControl
-class MitkDataTypesExt_EXPORT MultiStepper : public Stepper
+class MITKDATATYPESEXT_EXPORT MultiStepper : public Stepper
 {
 public:
   mitkClassMacro(MultiStepper, Stepper);

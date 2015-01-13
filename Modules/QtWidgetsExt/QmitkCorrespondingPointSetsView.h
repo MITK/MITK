@@ -44,7 +44,7 @@ class QmitkStdMultiWidget;
 * Alternatively this needs to be updated to the new interaction-framework.
 * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
 */
-class MitkQtWidgetsExt_EXPORT QmitkCorrespondingPointSetsView : public QTableView
+class MITKQTWIDGETSEXT_EXPORT QmitkCorrespondingPointSetsView : public QTableView
 {
   Q_OBJECT
 

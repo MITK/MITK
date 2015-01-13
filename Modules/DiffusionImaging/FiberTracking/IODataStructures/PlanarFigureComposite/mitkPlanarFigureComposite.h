@@ -44,7 +44,7 @@ enum PFCompositionOperation {
 
 
 
-class MitkFiberTracking_EXPORT PlanarFigureComposite : public BaseData
+class MITKFIBERTRACKING_EXPORT PlanarFigureComposite : public BaseData
 {
 
     typedef itk::VectorContainer<unsigned int, BaseData::Pointer> CompositionContainer;

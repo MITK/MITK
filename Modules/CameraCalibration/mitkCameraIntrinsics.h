@@ -34,7 +34,7 @@ namespace mitk
   ///
   /// \brief class representing camera intrinsics and related functions
   ///
-  class MitkCameraCalibration_EXPORT CameraIntrinsics: virtual public itk::Object,
+  class MITKCAMERACALIBRATION_EXPORT CameraIntrinsics: virtual public itk::Object,
     virtual public mitk::XMLSerializable
   {
   public:
@@ -138,7 +138,7 @@ namespace mitk
 
 } // namespace mitk
 
-MitkCameraCalibration_EXPORT std::ostream& operator<<
+MITKCAMERACALIBRATION_EXPORT std::ostream& operator<<
     (std::ostream& os, mitk::CameraIntrinsics::Pointer p);
 
 #endif // mitkCameraIntrinsics_h

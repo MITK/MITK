@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qlistwidget.h>
 #include <QMessageBox>
 
-MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkOtsuTool3DGUI, "")
+MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkOtsuTool3DGUI, "")
 
 QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI()
 :QmitkToolGUI(),

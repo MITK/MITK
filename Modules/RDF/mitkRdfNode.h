@@ -25,7 +25,7 @@ namespace mitk {
 /**
  * \ingroup MitkRDFModule
  */
-class MitkRDF_EXPORT RdfNode
+class MITKRDF_EXPORT RdfNode
 {
 
 public:

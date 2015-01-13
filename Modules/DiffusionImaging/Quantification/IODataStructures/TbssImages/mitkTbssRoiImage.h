@@ -31,7 +31,7 @@ namespace mitk
   * yet supported by mitkImage)
   */
 
-  class MitkQuantification_EXPORT TbssRoiImage : public Image
+  class MITKQUANTIFICATION_EXPORT TbssRoiImage : public Image
   {
 
   public:

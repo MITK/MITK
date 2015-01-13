@@ -31,7 +31,7 @@ class vtkMaskPoints;
  * InputVectors and InputNormals by their field name in the
  * input dataset.
  */
-class MitkMapperExt_EXPORT vtkMaskedGlyph2D : public vtkGlyph2D
+class MITKMAPPEREXT_EXPORT vtkMaskedGlyph2D : public vtkGlyph2D
 {
 public:
   vtkTypeMacro(vtkMaskedGlyph2D,vtkGlyph2D);

@@ -78,7 +78,7 @@ class QmitkLevelWindowWidgetContextMenu;
  * This information is also presented by a tooltip text when moving the
  * mouse on the upper or lower bound of the bar.
  */
-class QMITK_EXPORT QmitkSliderLevelWindowWidget : public QWidget {
+class MITKQTWIDGETS_EXPORT QmitkSliderLevelWindowWidget : public QWidget {
 
   Q_OBJECT
 

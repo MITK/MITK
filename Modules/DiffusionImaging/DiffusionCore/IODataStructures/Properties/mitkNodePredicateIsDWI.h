@@ -31,7 +31,7 @@ namespace mitk {
      * @ingroup DataStorage
      */
 
-    class MitkDiffusionCore_EXPORT NodePredicateIsDWI : public NodePredicateBase
+    class MITKDIFFUSIONCORE_EXPORT NodePredicateIsDWI : public NodePredicateBase
     {
     public:
       mitkClassMacro(NodePredicateIsDWI, NodePredicateBase);

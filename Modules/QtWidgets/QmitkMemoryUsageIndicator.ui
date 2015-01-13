@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <exportmacro>QMITK_EXPORT</exportmacro>
+ <exportmacro>MITKQTWIDGETS_EXPORT</exportmacro>
  <class>QmitkMemoryUsageIndicator</class>
  <widget class="QWidget" name="QmitkMemoryUsageIndicator">
   <property name="geometry">

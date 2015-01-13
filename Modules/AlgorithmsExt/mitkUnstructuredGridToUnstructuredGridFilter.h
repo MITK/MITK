@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  class MitkAlgorithmsExt_EXPORT UnstructuredGridToUnstructuredGridFilter
+  class MITKALGORITHMSEXT_EXPORT UnstructuredGridToUnstructuredGridFilter
       : public UnstructuredGridSource
   {
     public:

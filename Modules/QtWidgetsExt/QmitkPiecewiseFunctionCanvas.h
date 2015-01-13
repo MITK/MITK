@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkPiecewiseFunction.h>
 
-class MitkQtWidgetsExt_EXPORT QmitkPiecewiseFunctionCanvas: public QmitkTransferFunctionCanvas
+class MITKQTWIDGETSEXT_EXPORT QmitkPiecewiseFunctionCanvas: public QmitkTransferFunctionCanvas
 {
 Q_OBJECT
 

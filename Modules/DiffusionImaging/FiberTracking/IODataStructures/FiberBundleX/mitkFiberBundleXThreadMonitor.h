@@ -30,7 +30,7 @@ namespace mitk {
 
   /**
    * \brief Base Class for Fiber Bundles;   */
-  class Mitk FiberTracking_EXPORT FiberBundleXThreadMonitor : public BaseData
+  class MITKFIBERTRACKING_EXPORT FiberBundleXThreadMonitor : public BaseData
   {
 
   public:

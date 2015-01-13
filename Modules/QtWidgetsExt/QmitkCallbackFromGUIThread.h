@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*!
   \brief Qt specific implementation of mitk::CallbackFromGUIThreadImplementation
 */
-class MitkQtWidgetsExt_EXPORT QmitkCallbackFromGUIThread : public QObject, public mitk::CallbackFromGUIThreadImplementation
+class MITKQTWIDGETSEXT_EXPORT QmitkCallbackFromGUIThread : public QObject, public mitk::CallbackFromGUIThreadImplementation
 {
 
   Q_OBJECT

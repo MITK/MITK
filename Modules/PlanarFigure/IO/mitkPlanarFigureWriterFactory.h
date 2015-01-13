@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkPlanarFigure_EXPORT PlanarFigureWriterFactory : public itk::ObjectFactoryBase
+class MITKPLANARFIGURE_EXPORT PlanarFigureWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 

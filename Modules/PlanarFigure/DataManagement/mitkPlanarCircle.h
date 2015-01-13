@@ -31,7 +31,7 @@ class PlaneGeometry;
  * \brief Implementation of PlanarFigure representing a circle
  * through two control points
  */
-class MitkPlanarFigure_EXPORT PlanarCircle : public PlanarFigure
+class MITKPLANARFIGURE_EXPORT PlanarCircle : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarCircle, PlanarFigure );

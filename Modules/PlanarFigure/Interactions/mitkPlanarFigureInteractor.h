@@ -61,7 +61,7 @@ itkEventMacro( ContextMenuPlanarFigureEvent, PlanarFigureEvent );
   *
   * @ingroup MitkPlanarFigureModule
   */
-class MitkPlanarFigure_EXPORT PlanarFigureInteractor : public DataInteractor
+class MITKPLANARFIGURE_EXPORT PlanarFigureInteractor : public DataInteractor
 {
 public:
   mitkClassMacro(PlanarFigureInteractor, DataInteractor);

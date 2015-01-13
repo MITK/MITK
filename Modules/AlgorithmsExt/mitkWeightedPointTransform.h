@@ -54,7 +54,7 @@ namespace mitk
  * \note Some methods are accelerated when OpenMP is enabled.
  *
  */
-class MitkAlgorithmsExt_EXPORT WeightedPointTransform : public itk::Object
+class MITKALGORITHMSEXT_EXPORT WeightedPointTransform : public itk::Object
 {
   /** Definition of a 3x3 matrix.*/
   typedef itk::Matrix<double,3,3> Matrix3x3;

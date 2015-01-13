@@ -27,7 +27,7 @@ namespace mitk
    * All parameters of the boolean operations must be specified during construction.
    * The actual operation is executed when calling GetResult().
    */
-  class MitkSegmentation_EXPORT BooleanOperation
+  class MITKSEGMENTATION_EXPORT BooleanOperation
   {
   public:
     enum Type

@@ -34,7 +34,7 @@ namespace mitk {
   * If no threshold is set, every pixel is extracted as a point.
   */
 
-  class MitkAlgorithmsExt_EXPORT ImageToUnstructuredGridFilter
+  class MITKALGORITHMSEXT_EXPORT ImageToUnstructuredGridFilter
       : public UnstructuredGridSource
   {
     public:

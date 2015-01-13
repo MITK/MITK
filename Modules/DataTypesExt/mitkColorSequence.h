@@ -27,7 +27,7 @@ namespace mitk
 
   See derived classes for implemented sequences.
 */
-class MitkDataTypesExt_EXPORT ColorSequence
+class MITKDATATYPESEXT_EXPORT ColorSequence
 {
 public:
   ColorSequence();

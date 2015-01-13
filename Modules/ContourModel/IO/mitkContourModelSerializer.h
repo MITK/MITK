@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkContourModel_EXPORT ContourModelSerializer : public BaseDataSerializer
+class MITKCONTOURMODEL_EXPORT ContourModelSerializer : public BaseDataSerializer
 {
 
 public:

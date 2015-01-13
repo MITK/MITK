@@ -51,7 +51,7 @@ namespace mitk {
 
   $Author: fetzer $
 */
-class MitkImageExtraction_EXPORT ExtractDirectedPlaneImageFilterNew : public ImageToImageFilter
+class MITKIMAGEEXTRACTION_EXPORT ExtractDirectedPlaneImageFilterNew : public ImageToImageFilter
 {
 
 public:

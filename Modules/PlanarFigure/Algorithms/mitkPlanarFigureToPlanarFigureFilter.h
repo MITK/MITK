@@ -33,7 +33,7 @@ namespace mitk
  * as input and output.
  * @ingroup MitkPlanarFigureModule
  */
-class MitkPlanarFigure_EXPORT PlanarFigureToPlanarFigureFilter : public mitk::PlanarFigureSource
+class MITKPLANARFIGURE_EXPORT PlanarFigureToPlanarFigureFilter : public mitk::PlanarFigureSource
 {
 public:
     mitkClassMacro( PlanarFigureToPlanarFigureFilter, PlanarFigureSource );

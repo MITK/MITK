@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * \sa QmitkDataNodeQmitkNodeDescriptorManager
  */
-class QMITK_EXPORT QmitkNodeDescriptor : public QObject
+class MITKQTWIDGETS_EXPORT QmitkNodeDescriptor : public QObject
 {
   Q_OBJECT
 public:

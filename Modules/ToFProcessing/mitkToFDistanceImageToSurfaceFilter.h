@@ -46,7 +46,7 @@ namespace mitk
   * @ingroup SurfaceFilters
   * @ingroup ToFProcessing
   */
-  class MitkToFProcessing_EXPORT ToFDistanceImageToSurfaceFilter : public SurfaceSource
+  class MITKTOFPROCESSING_EXPORT ToFDistanceImageToSurfaceFilter : public SurfaceSource
   {
   public:
 

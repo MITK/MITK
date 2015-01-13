@@ -36,7 +36,7 @@ namespace mitk
  * specific label, you may call GenerateAllLabelsOff() and set the
  * desired label by SetLabel(label).
  */
-class MitkAlgorithmsExt_EXPORT LabeledImageToSurfaceFilter : public ImageToSurfaceFilter
+class MITKALGORITHMSEXT_EXPORT LabeledImageToSurfaceFilter : public ImageToSurfaceFilter
 {
 public:
 

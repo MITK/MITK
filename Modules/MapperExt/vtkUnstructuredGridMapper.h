@@ -28,7 +28,7 @@ class vtkPolyDataMapper;
 class vtkGeometryFilter;
 class vtkUnstructuredGrid;
 
-class MitkMapperExt_EXPORT vtkUnstructuredGridMapper : public vtkMapper
+class MITKMAPPEREXT_EXPORT vtkUnstructuredGridMapper : public vtkMapper
 {
 public:
   static vtkUnstructuredGridMapper *New();

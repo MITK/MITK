@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkSegmentation_EXPORT CalculateSegmentationVolume : public SegmentationSink
+class MITKSEGMENTATION_EXPORT CalculateSegmentationVolume : public SegmentationSink
 {
   public:
 

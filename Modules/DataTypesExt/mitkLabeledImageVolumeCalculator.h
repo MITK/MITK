@@ -38,7 +38,7 @@ namespace mitk
  *
  * TODO: Extend class for time resolved images
  */
-class MitkDataTypesExt_EXPORT LabeledImageVolumeCalculator : public itk::Object
+class MITKDATATYPESEXT_EXPORT LabeledImageVolumeCalculator : public itk::Object
 {
 public:
 

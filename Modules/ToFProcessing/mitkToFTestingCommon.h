@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class MitkToFProcessing_EXPORT ToFTestingCommon
+class MITKTOFPROCESSING_EXPORT ToFTestingCommon
 {
 public:
 

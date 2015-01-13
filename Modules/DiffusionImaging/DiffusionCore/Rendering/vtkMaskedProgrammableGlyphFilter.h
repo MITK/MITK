@@ -31,7 +31,7 @@ class vtkMaskPoints;
  * InputVectors and InputNormals by their field name in the
  * input dataset.
  */
-class MitkDiffusionCore_EXPORT vtkMaskedProgrammableGlyphFilter : public vtkProgrammableGlyphFilter
+class MITKDIFFUSIONCORE_EXPORT vtkMaskedProgrammableGlyphFilter : public vtkProgrammableGlyphFilter
 {
 public:
   vtkTypeMacro(vtkMaskedProgrammableGlyphFilter,vtkProgrammableGlyphFilter);

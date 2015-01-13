@@ -38,7 +38,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataSource : public itk::ProcessObject
+  class MITKIGT_EXPORT NavigationDataSource : public itk::ProcessObject
   {
   public:
     mitkClassMacro(NavigationDataSource, itk::ProcessObject);

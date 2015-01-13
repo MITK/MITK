@@ -57,7 +57,7 @@ struct TrackVis_header
 
 // Class to handle TrackVis files.
 // -------------------------------
-class MitkFiberTracking_EXPORT TrackVisFiberReader
+class MITKFIBERTRACKING_EXPORT TrackVisFiberReader
 {
 private:
     string              m_Filename;

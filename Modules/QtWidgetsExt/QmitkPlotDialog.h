@@ -44,7 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *    the QwtPlot instance using the method GetQwtPlot().
 * @see QwtPlot, @see QmitkPlotWidget
 */
-class MitkQtWidgetsExt_EXPORT QmitkPlotDialog: public QDialog
+class MITKQTWIDGETSEXT_EXPORT QmitkPlotDialog: public QDialog
 {
 
 public:

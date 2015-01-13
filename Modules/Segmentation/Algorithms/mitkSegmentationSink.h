@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkSegmentation_EXPORT SegmentationSink : public NonBlockingAlgorithm
+class MITKSEGMENTATION_EXPORT SegmentationSink : public NonBlockingAlgorithm
 {
   public:
 

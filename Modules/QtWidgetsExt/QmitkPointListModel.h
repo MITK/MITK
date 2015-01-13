@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNode.h"
 #include "mitkPointSet.h"
 
-class MitkQtWidgetsExt_EXPORT QmitkPointListModel : public QAbstractListModel
+class MITKQTWIDGETSEXT_EXPORT QmitkPointListModel : public QAbstractListModel
 {
   Q_OBJECT
 

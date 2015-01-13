@@ -33,7 +33,7 @@ namespace mitk
   * XML-based writer for mitk::PlanarFigures.
   * @ingroup MitkPlanarFigureModule
   */
-  class MitkPlanarFigure_EXPORT PlanarFigureWriter : public mitk::FileWriterWithInformation
+  class MITKPLANARFIGURE_EXPORT PlanarFigureWriter : public mitk::FileWriterWithInformation
   {
   public:
 

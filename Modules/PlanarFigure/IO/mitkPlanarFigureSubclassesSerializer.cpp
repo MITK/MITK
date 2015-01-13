@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   namespace mitk \
 { \
   \
-class MitkPlanarFigure_EXPORT classname ## Serializer : public PlanarFigureSerializer \
+class MITKPLANARFIGURE_EXPORT classname ## Serializer : public PlanarFigureSerializer \
 { \
 public: \
   \

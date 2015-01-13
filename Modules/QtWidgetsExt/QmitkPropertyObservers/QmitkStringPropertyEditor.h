@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLineEdit>
 
 /// @ingroup Widgets
-class MitkQtWidgetsExt_EXPORT QmitkStringPropertyEditor : public QLineEdit, public mitk::PropertyEditor
+class MITKQTWIDGETSEXT_EXPORT QmitkStringPropertyEditor : public QLineEdit, public mitk::PropertyEditor
 {
   Q_OBJECT
 

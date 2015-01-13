@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-class MitkQtOverlays_EXPORT QmitkScalarBar : public QWidget
+class MITKQTOVERLAYS_EXPORT QmitkScalarBar : public QWidget
   {
     Q_OBJECT
   public:

@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   For output of any kind of information that might be copied into other applications.
 */
-class MitkSegmentationUI_EXPORT QmitkCopyToClipBoardDialog : public QDialog
+class MITKSEGMENTATIONUI_EXPORT QmitkCopyToClipBoardDialog : public QDialog
 {
   Q_OBJECT
 

@@ -28,7 +28,7 @@ namespace mitk{
 
   class Image;
 
-  class MitkSegmentation_EXPORT OtsuTool3D : public AutoSegmentationTool
+  class MITKSEGMENTATION_EXPORT OtsuTool3D : public AutoSegmentationTool
   {
     public:
 

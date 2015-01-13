@@ -51,7 +51,7 @@ class QmitkStdMultiWidget;
  * \sa QmitkStdMultiWidget
  *
  */
-class QMITK_EXPORT QmitkRenderWindowMenu : public QWidget
+class MITKQTWIDGETS_EXPORT QmitkRenderWindowMenu : public QWidget
 {
   Q_OBJECT
 

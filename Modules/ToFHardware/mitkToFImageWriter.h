@@ -35,7 +35,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFImageWriter : public itk::Object
+  class MITKTOFHARDWARE_EXPORT ToFImageWriter : public itk::Object
   {
   public:
 

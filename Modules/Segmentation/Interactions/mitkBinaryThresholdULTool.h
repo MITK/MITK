@@ -41,7 +41,7 @@ namespace mitk
 
   Last contributor: $Author$
   */
-  class MitkSegmentation_EXPORT BinaryThresholdULTool : public AutoSegmentationTool
+  class MITKSEGMENTATION_EXPORT BinaryThresholdULTool : public AutoSegmentationTool
   {
   public:
 

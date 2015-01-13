@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   Specially useful in connection with a pixmap.
   Stretched images should be avoided, because the hotspots will not be adjusted in any way.
 */
-class MitkQtWidgetsExt_EXPORT QClickableLabel : public QLabel
+class MITKQTWIDGETSEXT_EXPORT QClickableLabel : public QLabel
 {
   Q_OBJECT
 

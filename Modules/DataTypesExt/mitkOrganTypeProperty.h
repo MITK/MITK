@@ -39,7 +39,7 @@ namespace mitk
 
   Last contributor $Author$
 */
-class MitkDataTypesExt_EXPORT OrganTypeProperty : public EnumerationProperty
+class MITKDATATYPESEXT_EXPORT OrganTypeProperty : public EnumerationProperty
 {
   public:
 

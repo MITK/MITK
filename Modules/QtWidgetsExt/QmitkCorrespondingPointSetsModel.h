@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
 */
 
-class MitkQtWidgetsExt_EXPORT QmitkCorrespondingPointSetsModel : public QAbstractTableModel
+class MITKQTWIDGETSEXT_EXPORT QmitkCorrespondingPointSetsModel : public QAbstractTableModel
 {
   Q_OBJECT
   Q_PROPERTY(bool QTPropShowCoordinates READ QTPropCoordinatesEnabled WRITE QTPropSetCoordinatesEnabled)

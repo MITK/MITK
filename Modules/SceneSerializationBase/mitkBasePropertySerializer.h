@@ -39,7 +39,7 @@ namespace mitk
   Then the serializer for this class must be called GreenPropertySerializer
   \endverbatim
 */
-class MitkSceneSerializationBase_EXPORT BasePropertySerializer : public itk::Object
+class MITKSCENESERIALIZATIONBASE_EXPORT BasePropertySerializer : public itk::Object
 {
   public:
 

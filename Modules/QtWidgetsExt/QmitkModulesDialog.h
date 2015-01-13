@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkQtWidgetsExtExports.h>
 
-class MitkQtWidgetsExt_EXPORT QmitkModulesDialog : public QDialog
+class MITKQTWIDGETSEXT_EXPORT QmitkModulesDialog : public QDialog
 {
 
 public:

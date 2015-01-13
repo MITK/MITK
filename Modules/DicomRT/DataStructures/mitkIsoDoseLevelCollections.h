@@ -42,7 +42,7 @@ namespace mitk
   * This data structure is used to represent the dose iso level setup used for the
   * visualization of a dose distribution.
   */
-class MitkDicomRT_EXPORT IsoDoseLevelSet:
+class MITKDICOMRT_EXPORT IsoDoseLevelSet:
   public itk::Object
 {
 public:

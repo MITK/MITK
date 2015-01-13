@@ -44,7 +44,7 @@ class PointSet;
  * (@ref PropagateMatrices()) and compute the target registration error (TRE)
  * (@ref ComputeTargetRegistrationError()).
  */
-class MitkAlgorithmsExt_EXPORT  AnisotropicRegistrationCommon
+class MITKALGORITHMSEXT_EXPORT  AnisotropicRegistrationCommon
 {
 
 protected:

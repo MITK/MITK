@@ -34,7 +34,7 @@ namespace mitk
   numbers for better readability and make handling tags
   more easy by offering comparison methods.
 */
-class MitkDICOMReader_EXPORT DICOMTag
+class MITKDICOMREADER_EXPORT DICOMTag
 {
   public:
 

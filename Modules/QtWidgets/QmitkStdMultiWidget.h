@@ -54,7 +54,7 @@ class RenderingManager;
 }
 
 /// \ingroup QmitkModule
-class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
+class MITKQTWIDGETS_EXPORT QmitkStdMultiWidget : public QWidget
 {
   Q_OBJECT
 

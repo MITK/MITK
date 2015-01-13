@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QClickableLabel;
 class vtkRenderWindow;
 
-class MitkQtWidgetsExt_EXPORT QmitkStandardViews : public QWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkStandardViews : public QWidget
 {
 
   Q_OBJECT

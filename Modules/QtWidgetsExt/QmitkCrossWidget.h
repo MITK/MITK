@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkCommon.h>
 
-class MitkQtWidgetsExt_EXPORT QmitkCrossWidget : public QLabel
+class MITKQTWIDGETSEXT_EXPORT QmitkCrossWidget : public QLabel
 {
 
   Q_OBJECT

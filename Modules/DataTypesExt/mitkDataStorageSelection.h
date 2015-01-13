@@ -30,7 +30,7 @@ namespace mitk
   class BaseProperty;
   class PropertyList;
 
-  class MitkDataTypesExt_EXPORT DataStorageSelection: public itk::Object
+  class MITKDATATYPESEXT_EXPORT DataStorageSelection: public itk::Object
   {
   public:
     typedef std::vector<mitk::DataNode*> Nodes;

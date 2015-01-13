@@ -32,7 +32,7 @@ namespace mitk {
   *
   * @ingroup MitkContourModelModule
   */
-  class MitkContourModel_EXPORT ImageToContourModelFilter : public ContourModelSource
+  class MITKCONTOURMODEL_EXPORT ImageToContourModelFilter : public ContourModelSource
   {
 
   public:

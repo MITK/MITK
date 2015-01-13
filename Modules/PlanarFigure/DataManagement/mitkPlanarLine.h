@@ -31,7 +31,7 @@ class PlaneGeometry;
  * \brief Implementation of PlanarFigure representing a line
  * through two control points
  */
-class MitkPlanarFigure_EXPORT PlanarLine : public PlanarFigure
+class MITKPLANARFIGURE_EXPORT PlanarLine : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarLine, PlanarFigure );

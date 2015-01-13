@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 
 /// \ingroup QmitkModule
-class QMITK_EXPORT QmitkLevelWindowPresetDefinitionDialog : public QDialog, public Ui::QmitkLevelWindowPresetDefinition
+class MITKQTWIDGETS_EXPORT QmitkLevelWindowPresetDefinitionDialog : public QDialog, public Ui::QmitkLevelWindowPresetDefinition
 {
   Q_OBJECT
 

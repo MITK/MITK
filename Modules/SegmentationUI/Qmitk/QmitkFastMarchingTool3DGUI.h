@@ -32,7 +32,7 @@ class QPushButton;
 \brief GUI for mitk::FastMarchingTool.
 \sa mitk::FastMarchingTool
 */
-class MitkSegmentationUI_EXPORT QmitkFastMarchingTool3DGUI : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkFastMarchingTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

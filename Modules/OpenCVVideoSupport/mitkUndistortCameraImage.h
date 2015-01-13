@@ -42,7 +42,7 @@ instead of the Set... methods before use.
 namespace mitk
 {
 
-class MITK_OPENCVVIDEOSUPPORT_EXPORT UndistortCameraImage : public itk::Object
+class MITKOPENCVVIDEOSUPPORT_EXPORT UndistortCameraImage : public itk::Object
 {
   public:
 

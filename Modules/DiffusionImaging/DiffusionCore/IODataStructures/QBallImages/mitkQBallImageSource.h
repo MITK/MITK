@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class MitkDiffusionCore_EXPORT QBallImageSource : public ImageSource
+class MITKDIFFUSIONCORE_EXPORT QBallImageSource : public ImageSource
 {
 public:
 

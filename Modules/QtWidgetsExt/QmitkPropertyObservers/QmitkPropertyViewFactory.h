@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QWidget;
 
-class MitkQtWidgetsExt_EXPORT QmitkPropertyViewFactory
+class MITKQTWIDGETSEXT_EXPORT QmitkPropertyViewFactory
 {
   public:
 

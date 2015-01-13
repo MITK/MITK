@@ -24,7 +24,7 @@ namespace mitk {
 //## @brief Reader to read files in stl-format
 //## @ingroup MitkLegacyIOModule
 //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class MitkLegacyIO_EXPORT STLFileReader : public SurfaceSource
+class MITKLEGACYIO_EXPORT STLFileReader : public SurfaceSource
 {
 public:
     mitkClassMacro(STLFileReader, SurfaceSource);

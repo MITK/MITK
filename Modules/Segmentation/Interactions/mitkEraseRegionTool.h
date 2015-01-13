@@ -42,7 +42,7 @@ namespace mitk
 
   $Author$
 */
-class MitkSegmentation_EXPORT EraseRegionTool : public SetRegionTool
+class MITKSEGMENTATION_EXPORT EraseRegionTool : public SetRegionTool
 {
   public:
 

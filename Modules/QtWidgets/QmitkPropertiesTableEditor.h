@@ -37,7 +37,7 @@ class QLineEdit;
  *
  * \see QmitkPropertyDelegate
  */
-class QMITK_EXPORT QmitkPropertiesTableEditor : public QWidget
+class MITKQTWIDGETS_EXPORT QmitkPropertiesTableEditor : public QWidget
 {
   Q_OBJECT
 

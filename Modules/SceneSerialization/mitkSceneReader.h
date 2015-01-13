@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkSceneSerialization_EXPORT SceneReader : public itk::Object
+class MITKSCENESERIALIZATION_EXPORT SceneReader : public itk::Object
 {
   public:
 

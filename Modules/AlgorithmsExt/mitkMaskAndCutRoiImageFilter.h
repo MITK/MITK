@@ -34,7 +34,7 @@ namespace mitk
   The ROI is then used to mask the subvolume. Pixel inside the ROI will have their original value, pixel outside will be replaced by m_OutsideValue
 
   */
-  class MitkAlgorithmsExt_EXPORT MaskAndCutRoiImageFilter : public ImageToImageFilter
+  class MITKALGORITHMSEXT_EXPORT MaskAndCutRoiImageFilter : public ImageToImageFilter
   {
       typedef itk::Image<short, 3> ItkImageType;
       typedef itk::Image<unsigned char, 3> ItkMaskType;

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-class MitkDiffusionCore_EXPORT BiExpFitFunctor : public DWIVoxelFunctor
+class MITKDIFFUSIONCORE_EXPORT BiExpFitFunctor : public DWIVoxelFunctor
 {
 public:
   BiExpFitFunctor(){}

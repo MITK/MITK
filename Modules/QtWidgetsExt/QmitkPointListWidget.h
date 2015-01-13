@@ -51,7 +51,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 
 
-class MitkQtWidgetsExt_EXPORT QmitkPointListWidget : public QWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkPointListWidget : public QWidget
 {
     Q_OBJECT
 

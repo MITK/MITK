@@ -41,7 +41,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationTool : public itk::DataObject
+  class MITKIGT_EXPORT NavigationTool : public itk::DataObject
   {
   public:
 

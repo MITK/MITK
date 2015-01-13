@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkDataTypesExt_EXPORT ColorSequenceRainbow : public ColorSequence
+class MITKDATATYPESEXT_EXPORT ColorSequenceRainbow : public ColorSequence
 {
 public:
   ColorSequenceRainbow();

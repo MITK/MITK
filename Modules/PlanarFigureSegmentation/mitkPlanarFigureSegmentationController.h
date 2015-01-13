@@ -47,7 +47,7 @@ namespace mitk
 * mitkSurfaceToImageFilter.
 */
 
-class MitkPlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : public itk::Object
+class MITKPLANARFIGURESEGMENTATION_EXPORT PlanarFigureSegmentationController : public itk::Object
 {
   public:
 

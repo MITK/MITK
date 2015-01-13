@@ -31,7 +31,7 @@ class PlaneGeometry;
  * \brief Implementation of PlanarFigure representing an arrow
  * through two control points
  */
-class MitkPlanarFigure_EXPORT PlanarArrow : public PlanarFigure
+class MITKPLANARFIGURE_EXPORT PlanarArrow : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarArrow, PlanarFigure );

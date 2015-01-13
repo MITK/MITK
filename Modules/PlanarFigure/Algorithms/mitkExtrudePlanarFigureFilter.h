@@ -27,7 +27,7 @@ namespace mitk
   class PlanarFigure;
   class Surface;
 
-  class MitkPlanarFigure_EXPORT ExtrudePlanarFigureFilter : public itk::ProcessObject
+  class MITKPLANARFIGURE_EXPORT ExtrudePlanarFigureFilter : public itk::ProcessObject
   {
   public:
     mitkClassMacro(ExtrudePlanarFigureFilter, itk::ProcessObject);

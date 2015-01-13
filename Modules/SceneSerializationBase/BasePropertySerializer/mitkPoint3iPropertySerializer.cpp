@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class MitkSceneSerializationBase_EXPORT Point3iPropertySerializer : public BasePropertySerializer
+class MITKSCENESERIALIZATIONBASE_EXPORT Point3iPropertySerializer : public BasePropertySerializer
 {
   public:
     mitkClassMacro( Point3iPropertySerializer, BasePropertySerializer );

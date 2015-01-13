@@ -29,7 +29,7 @@ namespace mitk
   *
   * @ingroup ToFProcessing
   */
-  class MITK_TOFHARDWARE_EXPORT ToFImageRecorderFilter : public ImageToImageFilter
+  class MITKTOFHARDWARE_EXPORT ToFImageRecorderFilter : public ImageToImageFilter
   {
   public:
     mitkClassMacro( ToFImageRecorderFilter , ImageToImageFilter );

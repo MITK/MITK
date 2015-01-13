@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT SimulationGLMapper2D : public GLMapper
+  class MITKSIMULATION_EXPORT SimulationGLMapper2D : public GLMapper
   {
   public:
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);

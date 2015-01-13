@@ -42,7 +42,7 @@ namespace mitk
     - \b "3D+t": true if the image is 3D+t
     - \b "timesteps": number of timesteps of an image (only defined if "3D+t" is true)
 */
-class MitkDICOMReader_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMReader
+class MITKDICOMREADER_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMReader
 {
   public:
 

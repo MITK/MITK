@@ -37,7 +37,7 @@ namespace mitk
 
 
 */
-class MitkSegmentation_EXPORT ContourModelInteractor : public Interactor
+class MITKSEGMENTATION_EXPORT ContourModelInteractor : public Interactor
 {
   public:
 

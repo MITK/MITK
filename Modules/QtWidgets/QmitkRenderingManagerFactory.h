@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * QmitkRenderWindow, forcing the usage of QmitkRenderingManager for the Qt
  * platform.
  */
-class QMITK_EXPORT QmitkRenderingManagerFactory : public mitk::RenderingManagerFactory
+class MITKQTWIDGETS_EXPORT QmitkRenderingManagerFactory : public mitk::RenderingManagerFactory
 {
 public:
 

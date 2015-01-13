@@ -31,7 +31,7 @@ namespace mitk
 /**
   \brief Serializes a mitk::PropertyList
 */
-class MitkSceneSerializationBase_EXPORT PropertyListSerializer : public itk::Object
+class MITKSCENESERIALIZATIONBASE_EXPORT PropertyListSerializer : public itk::Object
 {
   public:
 

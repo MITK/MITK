@@ -42,7 +42,7 @@ namespace mitk {
 
   $Author: fetzer$
 */
-class MitkSegmentation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
+class MITKSEGMENTATION_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
 {
  public:
 

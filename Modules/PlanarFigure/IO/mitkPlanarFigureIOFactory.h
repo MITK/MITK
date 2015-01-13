@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of PlanarFigureReader objects using an object factory.
 //##
 //## @ingroup MitkPlanarFigureModule
-class MitkPlanarFigure_EXPORT PlanarFigureIOFactory : public itk::ObjectFactoryBase
+class MITKPLANARFIGURE_EXPORT PlanarFigureIOFactory : public itk::ObjectFactoryBase
 {
 public:
   /** Standard class typedefs. */

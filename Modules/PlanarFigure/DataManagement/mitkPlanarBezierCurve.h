@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkPlanarFigure_EXPORT PlanarBezierCurve : public PlanarFigure
+  class MITKPLANARFIGURE_EXPORT PlanarBezierCurve : public PlanarFigure
   {
   public:
     mitkClassMacro(PlanarBezierCurve, PlanarFigure)

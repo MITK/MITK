@@ -40,7 +40,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationToolStorage : public itk::Object
+  class MITKIGT_EXPORT NavigationToolStorage : public itk::Object
   {
   public:
     mitkClassMacro(NavigationToolStorage,itk::Object);

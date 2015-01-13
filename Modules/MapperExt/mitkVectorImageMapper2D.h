@@ -40,7 +40,7 @@ class BaseRenderer;
 class PlaneGeometry;
 class DisplayGeometry;
 
-class MitkMapperExt_EXPORT VectorImageMapper2D : public GLMapper
+class MITKMAPPEREXT_EXPORT VectorImageMapper2D : public GLMapper
 {
 public:
     mitkClassMacro( VectorImageMapper2D, GLMapper );

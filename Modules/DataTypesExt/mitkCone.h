@@ -26,7 +26,7 @@ namespace mitk {
 //##Documentation
 //## @brief Data class containing an cylinder
 //## @ingroup Data
-class MitkDataTypesExt_EXPORT Cone : public BoundingObject
+class MITKDATATYPESEXT_EXPORT Cone : public BoundingObject
 {
 public:
   mitkClassMacro(Cone, BoundingObject);

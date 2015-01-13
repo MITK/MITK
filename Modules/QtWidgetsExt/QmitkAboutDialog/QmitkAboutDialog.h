@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ui_QmitkAboutDialogGUI.h>
 #include "MitkQtWidgetsExtExports.h"
 
-class MitkQtWidgetsExt_EXPORT QmitkAboutDialog : public QDialog
+class MITKQTWIDGETSEXT_EXPORT QmitkAboutDialog : public QDialog
 {
   Q_OBJECT
 

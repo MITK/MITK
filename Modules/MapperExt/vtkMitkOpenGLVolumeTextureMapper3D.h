@@ -40,7 +40,7 @@ class vtkVolumeProperty;
 
 #include "mitkCommon.h"
 
-class MitkMapperExt_EXPORT vtkMitkOpenGLVolumeTextureMapper3D : public vtkMitkVolumeTextureMapper3D
+class MITKMAPPEREXT_EXPORT vtkMitkOpenGLVolumeTextureMapper3D : public vtkMitkVolumeTextureMapper3D
 {
 public:
   vtkTypeMacro(vtkMitkOpenGLVolumeTextureMapper3D,vtkMitkVolumeTextureMapper3D);

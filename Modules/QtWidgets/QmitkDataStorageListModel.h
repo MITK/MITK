@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 
 /// \ingroup QmitkModule
-class QMITK_EXPORT QmitkDataStorageListModel: public QAbstractListModel
+class MITKQTWIDGETS_EXPORT QmitkDataStorageListModel: public QAbstractListModel
 {
 public:
   //# Ctors / Dtor

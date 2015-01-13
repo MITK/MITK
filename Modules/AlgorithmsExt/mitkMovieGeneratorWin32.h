@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 
-class MitkAlgorithmsExt_EXPORT MovieGeneratorWin32 : public MovieGenerator
+class MITKALGORITHMSEXT_EXPORT MovieGeneratorWin32 : public MovieGenerator
 {
 
 public:

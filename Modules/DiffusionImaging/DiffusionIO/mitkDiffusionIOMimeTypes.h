@@ -28,7 +28,7 @@ class DiffusionIOMimeTypes
 {
 public:
 
-  class MitkDiffusionIO_EXPORT DwiMimeType : public CustomMimeType
+  class MITKDIFFUSIONIO_EXPORT DwiMimeType : public CustomMimeType
   {
   public:
     DwiMimeType();

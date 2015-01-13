@@ -44,7 +44,7 @@ namespace mitk
 
     This Operation can be used to realize undo-redo functionality for e.g. segmentation purposes.
   */
-  class MitkSegmentation_EXPORT DiffSliceOperation : public Operation
+  class MITKSEGMENTATION_EXPORT DiffSliceOperation : public Operation
   {
 
   public:

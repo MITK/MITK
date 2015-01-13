@@ -24,7 +24,7 @@ namespace mitk
 {
   class Simulation;
 
-  class MitkSimulation_EXPORT SimulationWriter : public FileWriterWithInformation
+  class MITKSIMULATION_EXPORT SimulationWriter : public FileWriterWithInformation
   {
   public:
     mitkClassMacro(SimulationWriter, FileWriterWithInformation);

@@ -156,7 +156,7 @@ namespace mitk
  * ImageStatisticsCalculator is able to reproduce the known statistics.
  *
 */
-class MitkImageStatistics_EXPORT ImageStatisticsCalculator : public itk::Object
+class MITKIMAGESTATISTICS_EXPORT ImageStatisticsCalculator : public itk::Object
 {
 public:
 
@@ -172,7 +172,7 @@ public:
   typedef HistogramType::ConstIterator HistogramConstIteratorType;
 
   /** \brief Class for common statistics, includig hotspot properties. */
-  class MitkImageStatistics_EXPORT Statistics
+  class MITKIMAGESTATISTICS_EXPORT Statistics
   {
   public:
 

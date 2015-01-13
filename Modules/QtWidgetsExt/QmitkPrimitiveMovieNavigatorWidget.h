@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QTimer>
 
-class MitkQtWidgetsExt_EXPORT QmitkPrimitiveMovieNavigatorWidget : public QWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkPrimitiveMovieNavigatorWidget : public QWidget
 {
     Q_OBJECT
 

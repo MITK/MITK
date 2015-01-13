@@ -31,7 +31,7 @@ class DataNode;
 /**
  * @brief The QmitkMimeTypes class prov
  */
-class QMITK_EXPORT QmitkMimeTypes
+class MITKQTWIDGETS_EXPORT QmitkMimeTypes
 {
 public:
 

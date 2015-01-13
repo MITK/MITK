@@ -32,7 +32,7 @@ namespace mitk
 class BaseData;
 class PropertyList;
 
-class MitkSceneSerialization_EXPORT SceneIO : public itk::Object
+class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
 {
   public:
 

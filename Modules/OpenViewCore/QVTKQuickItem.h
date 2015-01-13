@@ -28,7 +28,7 @@ class vtkGenericOpenGLRenderWindow;
 class vtkObject;
 class vtkContextView;
 
-class MitkOpenViewCore_EXPORT QVTKQuickItem : public QQuickItem
+class MITKOPENVIEWCORE_EXPORT QVTKQuickItem : public QQuickItem
 {
   Q_OBJECT
 public:

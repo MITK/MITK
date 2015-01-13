@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkCommand.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, CreateSurfaceTool, "Surface creation tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, CreateSurfaceTool, "Surface creation tool");
 }
 
 mitk::CreateSurfaceTool::CreateSurfaceTool()

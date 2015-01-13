@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   *
   *   \ingroup IGTUI
   */
-class MitkIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
+class MITKIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
 {
   Q_OBJECT
 

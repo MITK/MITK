@@ -42,7 +42,7 @@ class vtkObject;
  * pointer to the data. Also the image dimensions needs to be set correctly before enabling the
  * background.
  */
-class MitkQtWidgetsExt_EXPORT QmitkVideoBackground : public QObject
+class MITKQTWIDGETSEXT_EXPORT QmitkVideoBackground : public QObject
 {
   Q_OBJECT
 

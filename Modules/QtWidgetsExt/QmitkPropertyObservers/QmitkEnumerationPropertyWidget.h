@@ -31,7 +31,7 @@ namespace mitk
 class _EnumPropEditorImpl;
 
 /// @ingroup Widgets
-class MitkQtWidgetsExt_EXPORT QmitkEnumerationPropertyWidget : public QComboBox
+class MITKQTWIDGETSEXT_EXPORT QmitkEnumerationPropertyWidget : public QComboBox
 {
   Q_OBJECT
 

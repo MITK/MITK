@@ -36,7 +36,7 @@ namespace mitk
  * After construction, the default shape is a square.
  *
  */
-class MitkPlanarFigure_EXPORT PlanarFigureControlPointStyleProperty : public EnumerationProperty
+class MITKPLANARFIGURE_EXPORT PlanarFigureControlPointStyleProperty : public EnumerationProperty
 {
 public:
 

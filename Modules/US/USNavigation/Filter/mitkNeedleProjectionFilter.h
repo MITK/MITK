@@ -44,7 +44,7 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUSNavigation_EXPORT NeedleProjectionFilter : public NavigationDataPassThroughFilter
+  class MITKUSNAVIGATION_EXPORT NeedleProjectionFilter : public NavigationDataPassThroughFilter
   {
   public:
     mitkClassMacro(NeedleProjectionFilter, NavigationDataPassThroughFilter);

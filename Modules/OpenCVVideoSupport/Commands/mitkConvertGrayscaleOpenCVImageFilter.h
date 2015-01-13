@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class MITK_OPENCVVIDEOSUPPORT_EXPORT ConvertGrayscaleOpenCVImageFilter : public AbstractOpenCVImageFilter
+class MITKOPENCVVIDEOSUPPORT_EXPORT ConvertGrayscaleOpenCVImageFilter : public AbstractOpenCVImageFilter
 {
 
 public:

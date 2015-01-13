@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLabel>
 
 /// @ingroup Widgets
-class MitkQtWidgetsExt_EXPORT QmitkStringPropertyView : public QLabel, public mitk::PropertyView
+class MITKQTWIDGETSEXT_EXPORT QmitkStringPropertyView : public QLabel, public mitk::PropertyView
 {
   Q_OBJECT
 

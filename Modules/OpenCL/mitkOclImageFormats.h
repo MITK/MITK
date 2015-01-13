@@ -41,7 +41,7 @@ namespace mitk
 
       This class checks whether a format is supported or not and acts accordingly.
       */
-class MitkOpenCL_EXPORT OclImageFormats : public itk::LightObject
+class MITKOPENCL_EXPORT OclImageFormats : public itk::LightObject
 {
 public:
     mitkClassMacro(OclImageFormats, itk::LightObject);

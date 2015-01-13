@@ -53,7 +53,7 @@ namespace mitk
   brings a number of methods that describe its configuration/specifics by
   means of a short label and a (longer) description.
 */
-class MitkDICOMReader_EXPORT DICOMFileReader : public itk::Object
+class MITKDICOMREADER_EXPORT DICOMFileReader : public itk::Object
 {
   public:
 

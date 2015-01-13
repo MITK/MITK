@@ -31,7 +31,7 @@ namespace mitk
   * This offers users the oppertunity to generate new PMD Player Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
-class MITK_PMDMODULE_EXPORT ToFCameraPMDPlayerDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+class MITKPMD_EXPORT ToFCameraPMDPlayerDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
   /**

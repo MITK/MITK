@@ -34,7 +34,7 @@ class _UGCombinedEnumPropEditor;
 class _UGCombinedBoolPropEditor;
 
 /// @ingroup Widgets
-class MitkQtWidgetsExt_EXPORT QmitkUGCombinedRepresentationPropertyWidget : public QComboBox
+class MITKQTWIDGETSEXT_EXPORT QmitkUGCombinedRepresentationPropertyWidget : public QComboBox
 {
   Q_OBJECT
 

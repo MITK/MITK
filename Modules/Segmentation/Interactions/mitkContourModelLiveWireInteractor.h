@@ -39,7 +39,7 @@ namespace mitk
   \warning Make sure the working image is properly set, otherwise the algorithm for computing livewire contour segments will not work!
 
   */
-  class MitkSegmentation_EXPORT ContourModelLiveWireInteractor : public ContourModelInteractor
+  class MITKSEGMENTATION_EXPORT ContourModelLiveWireInteractor : public ContourModelInteractor
   {
   public:
 

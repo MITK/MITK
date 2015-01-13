@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkMemoryUsageIndicator.h"
 
 /// \ingroup QmitkModule
-class QMITK_EXPORT QmitkMemoryUsageIndicatorView : public QWidget, public Ui::QmitkMemoryUsageIndicator
+class MITKQTWIDGETS_EXPORT QmitkMemoryUsageIndicatorView : public QWidget, public Ui::QmitkMemoryUsageIndicator
 {
 
   Q_OBJECT

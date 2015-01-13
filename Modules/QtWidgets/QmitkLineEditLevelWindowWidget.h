@@ -32,7 +32,7 @@ class QLineEdit;
  * window value of the current image and one to change the level value of
  * the current image.
  */
-class QMITK_EXPORT QmitkLineEditLevelWindowWidget : public QWidget {
+class MITKQTWIDGETS_EXPORT QmitkLineEditLevelWindowWidget : public QWidget {
 
   Q_OBJECT
 

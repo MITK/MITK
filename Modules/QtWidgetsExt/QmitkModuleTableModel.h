@@ -30,7 +30,7 @@ class Module;
 
 class QmitkModuleTableModelPrivate;
 
-class MitkQtWidgetsExt_EXPORT QmitkModuleTableModel : public QAbstractTableModel
+class MITKQTWIDGETSEXT_EXPORT QmitkModuleTableModel : public QAbstractTableModel
 {
 public:
 

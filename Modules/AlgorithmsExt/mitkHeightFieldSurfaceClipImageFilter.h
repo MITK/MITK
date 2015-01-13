@@ -44,7 +44,7 @@ namespace mitk {
  *
  * \ingroup Process
  */
-class MitkAlgorithmsExt_EXPORT HeightFieldSurfaceClipImageFilter : public ImageToImageFilter
+class MITKALGORITHMSEXT_EXPORT HeightFieldSurfaceClipImageFilter : public ImageToImageFilter
 {
 public:
 

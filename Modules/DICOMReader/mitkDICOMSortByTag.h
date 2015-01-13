@@ -34,7 +34,7 @@ namespace mitk
   DICOMSortByTag::NextLevelIsLeftBeforeRight().
 
 */
-class MitkDICOMReader_EXPORT DICOMSortByTag : public DICOMSortCriterion
+class MITKDICOMREADER_EXPORT DICOMSortByTag : public DICOMSortCriterion
 {
   public:
 

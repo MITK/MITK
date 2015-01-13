@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk{
 
-class MitkDiffusionCore_EXPORT sh
+class MITKDIFFUSIONCORE_EXPORT sh
 {
 public:
   static double factorial(int number);
@@ -35,7 +35,7 @@ public:
   static double Yj(int m, int k, double theta, double phi);
 };
 
-class MitkDiffusionCore_EXPORT gradients
+class MITKDIFFUSIONCORE_EXPORT gradients
 {
 private:
   typedef std::vector<unsigned int> IndiciesVector;

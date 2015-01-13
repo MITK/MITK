@@ -48,7 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * As QT limits templating possibilities, events only throw ServiceReferences.
  * You can manually dereference them using TranslateServiceReference()
 */
-class QMITK_EXPORT QmitkServiceListWidget :public QWidget
+class MITKQTWIDGETS_EXPORT QmitkServiceListWidget :public QWidget
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

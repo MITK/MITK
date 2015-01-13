@@ -31,7 +31,7 @@ class vtkImageImport;
 namespace mitk {
 
 /** \brief Displays a logo on the renderwindow */
-class MitkOverlays_EXPORT LogoOverlay : public mitk::VtkOverlay {
+class MITKOVERLAYS_EXPORT LogoOverlay : public mitk::VtkOverlay {
 public:
 
   class LocalStorage : public mitk::Overlay::BaseLocalStorage

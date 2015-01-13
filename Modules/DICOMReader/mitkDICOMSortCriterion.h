@@ -38,7 +38,7 @@ namespace mitk
   will always hold a secondary DICOMSortCriterion. In cases of equal tag
   values, the decision is refered to the secondary criterion.
 */
-class MitkDICOMReader_EXPORT DICOMSortCriterion : public itk::LightObject
+class MITKDICOMREADER_EXPORT DICOMSortCriterion : public itk::LightObject
 {
   public:
 

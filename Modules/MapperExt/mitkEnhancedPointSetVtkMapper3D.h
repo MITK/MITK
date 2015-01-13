@@ -66,7 +66,7 @@ namespace mitk {
   *
   * \sa PointSetVtkMapper3D
   */
-  class MitkMapperExt_EXPORT EnhancedPointSetVtkMapper3D : public VtkMapper
+  class MITKMAPPEREXT_EXPORT EnhancedPointSetVtkMapper3D : public VtkMapper
   {
   public:
     mitkClassMacro(EnhancedPointSetVtkMapper3D, VtkMapper);

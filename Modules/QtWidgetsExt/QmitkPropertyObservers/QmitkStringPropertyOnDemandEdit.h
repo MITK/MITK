@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLayout>
 #include <QLabel>
 
-class MitkQtWidgetsExt_EXPORT QClickableLabel2 : public QLabel
+class MITKQTWIDGETSEXT_EXPORT QClickableLabel2 : public QLabel
 {
   Q_OBJECT
 
@@ -44,7 +44,7 @@ class MitkQtWidgetsExt_EXPORT QClickableLabel2 : public QLabel
 
 
 /// @ingroup Widgets
-class MitkQtWidgetsExt_EXPORT QmitkStringPropertyOnDemandEdit : public QFrame, public mitk::PropertyEditor
+class MITKQTWIDGETSEXT_EXPORT QmitkStringPropertyOnDemandEdit : public QFrame, public mitk::PropertyEditor
 {
   Q_OBJECT
 

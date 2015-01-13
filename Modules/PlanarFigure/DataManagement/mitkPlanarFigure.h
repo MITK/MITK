@@ -54,7 +54,7 @@ class PlaneGeometry;
  * TODO: Implement local 2D transform (including center of rotation...)
  *
  */
-class MitkPlanarFigure_EXPORT PlanarFigure : public BaseData
+class MITKPLANARFIGURE_EXPORT PlanarFigure : public BaseData
 {
 public:
   mitkClassMacro( PlanarFigure, BaseData )
@@ -399,7 +399,7 @@ private:
 
 };
 
-MitkPlanarFigure_EXPORT bool Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose );
+MITKPLANARFIGURE_EXPORT bool Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose );
 
 } // namespace mitk
 

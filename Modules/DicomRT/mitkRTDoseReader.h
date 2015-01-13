@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  class MitkDicomRT_EXPORT RTDoseReader: public itk::Object
+  class MITKDICOMRT_EXPORT RTDoseReader: public itk::Object
   {
 
   public:

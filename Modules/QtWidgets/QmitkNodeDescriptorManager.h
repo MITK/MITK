@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * \sa QmitkNodeDescriptor
  */
-class QMITK_EXPORT QmitkNodeDescriptorManager : public QObject
+class MITKQTWIDGETS_EXPORT QmitkNodeDescriptorManager : public QObject
 {
   Q_OBJECT
 public:

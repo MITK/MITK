@@ -27,7 +27,7 @@ namespace mitk
     ///
     /// implementation of the IPersistenceService
     /// \see IPersistenceService
-    class MitkPersistence_EXPORT PersistenceService: public itk::LightObject, public mitk::IPersistenceService
+    class MITKPERSISTENCE_EXPORT PersistenceService: public itk::LightObject, public mitk::IPersistenceService
     {
     public:
         static std::string GetPersistencePropertyName();

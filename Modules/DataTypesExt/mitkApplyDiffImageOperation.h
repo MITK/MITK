@@ -41,7 +41,7 @@ namespace mitk {
  @ingroup Undo
  @ingroup ToolManagerEtAl
 */
-class MitkDataTypesExt_EXPORT ApplyDiffImageOperation : public Operation
+class MITKDATATYPESEXT_EXPORT ApplyDiffImageOperation : public Operation
 {
   protected:
 

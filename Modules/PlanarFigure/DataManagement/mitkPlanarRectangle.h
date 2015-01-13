@@ -31,7 +31,7 @@ class PlaneGeometry;
  * \brief Implementation of PlanarFigure representing a polygon
  * with two or more control points
  */
-class MitkPlanarFigure_EXPORT PlanarRectangle : public PlanarFigure
+class MITKPLANARFIGURE_EXPORT PlanarRectangle : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarRectangle, PlanarFigure );

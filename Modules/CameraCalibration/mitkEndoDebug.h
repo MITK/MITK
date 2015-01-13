@@ -33,7 +33,7 @@ namespace mitk
   /// class responsible for handling debug matters
   /// in endotracking
   ///
-  struct MitkCameraCalibration_EXPORT EndoDebug
+  struct MITKCAMERACALIBRATION_EXPORT EndoDebug
   {
     ///
     /// singleton class

@@ -39,7 +39,7 @@ class QmitkHistogram;
  Offers zoom possibility.
  A marker can be set and shows the frequency at his position.
  */
-class MitkQtWidgetsExt_EXPORT QmitkHistogramWidget: public QDialog
+class MITKQTWIDGETSEXT_EXPORT QmitkHistogramWidget: public QDialog
 {
   Q_OBJECT
 

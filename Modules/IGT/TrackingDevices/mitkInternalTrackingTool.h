@@ -36,7 +36,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT InternalTrackingTool : public TrackingTool
+  class MITKIGT_EXPORT InternalTrackingTool : public TrackingTool
   {
     friend class MicroBirdTrackingDevice; // Add all TrackingDevice subclasses that use InternalTrackingDevice directly
   public:

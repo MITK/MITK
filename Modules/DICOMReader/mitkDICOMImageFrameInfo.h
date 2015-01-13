@@ -32,7 +32,7 @@ namespace mitk
     (think of DICOM multi-frame classes) within a DICOM file.
     To be used by DICOMFileReader%s and as part of DICOMImageBlockDescriptor.
   */
-  class MitkDICOMReader_EXPORT DICOMImageFrameInfo : public itk::LightObject
+  class MITKDICOMREADER_EXPORT DICOMImageFrameInfo : public itk::LightObject
   {
     public:
 

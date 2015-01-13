@@ -27,7 +27,7 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class MitkSceneSerialization_EXPORT SurfaceSerializer : public BaseDataSerializer
+class MITKSCENESERIALIZATION_EXPORT SurfaceSerializer : public BaseDataSerializer
 {
   public:
 

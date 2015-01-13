@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * Displays options for rigid registration.
 */
-class MITK_RIGIDREGISTRATION_UI_EXPORT QmitkRigid3DTransformView : public QmitkRigidRegistrationTransformsGUIBase
+class MITKRIGIDREGISTRATIONUI_EXPORT QmitkRigid3DTransformView : public QmitkRigidRegistrationTransformsGUIBase
 {
 
 public:

@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 Widget for setting up and controlling an update timer in an IGT-Pipeline.
 
 */
-class MitkIGTUI_EXPORT QmitkUpdateTimerWidget : public QWidget
+class MITKIGTUI_EXPORT QmitkUpdateTimerWidget : public QWidget
 {
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
 public:

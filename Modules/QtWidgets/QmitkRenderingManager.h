@@ -40,7 +40,7 @@ class QmitkRenderingManagerFactory;
  * make sure that dangling events do not lead to unexpected behavior.
  *
  */
-class QMITK_EXPORT QmitkRenderingManager : public QObject, public mitk::RenderingManager
+class MITKQTWIDGETS_EXPORT QmitkRenderingManager : public QObject, public mitk::RenderingManager
 {
   Q_OBJECT
 

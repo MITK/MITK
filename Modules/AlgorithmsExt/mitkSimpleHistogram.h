@@ -38,7 +38,7 @@ namespace mitk {
 //## @brief Abstract superclass for histograms with double values.
 //##        Classes which are deriving from this class can be cached
 //##        in the same way.
-class MitkAlgorithmsExt_EXPORT SimpleHistogram
+class MITKALGORITHMSEXT_EXPORT SimpleHistogram
 {
 public:
 
@@ -52,7 +52,7 @@ public:
   virtual float GetRelativeBin( double start, double end ) const = 0;
 };
 
-class MitkAlgorithmsExt_EXPORT SimpleImageHistogram : public SimpleHistogram
+class MITKALGORITHMSEXT_EXPORT SimpleImageHistogram : public SimpleHistogram
 {
   public:
 
@@ -120,13 +120,13 @@ class MitkAlgorithmsExt_EXPORT SimpleImageHistogram : public SimpleHistogram
 
 };
 
-class MitkAlgorithmsExt_EXPORT SimpleHistogramCache
+class MITKALGORITHMSEXT_EXPORT SimpleHistogramCache
 {
   public:
 
     static const unsigned int maxCacheSize = 64;
 
-    class MitkAlgorithmsExt_EXPORT Element
+    class MITKALGORITHMSEXT_EXPORT Element
     {
       public:
         mitk::WeakPointer<BaseData> baseData;

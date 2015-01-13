@@ -53,7 +53,7 @@ namespace mitk
     - whether pixel spacing is meant to be in-patient or on-detector (mitk::PixelSpacingInterpretation)
     - details about a possible gantry tilt (intended for use by file readers, may be hidden later)
 */
-class MitkDICOMReader_EXPORT DICOMImageBlockDescriptor
+class MITKDICOMREADER_EXPORT DICOMImageBlockDescriptor
 {
   public:
 

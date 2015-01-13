@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class MitkAlgorithmsExt_EXPORT SimpleUnstructuredGridHistogram : public SimpleHistogram
+class MITKALGORITHMSEXT_EXPORT SimpleUnstructuredGridHistogram : public SimpleHistogram
 {
 public:
     SimpleUnstructuredGridHistogram();

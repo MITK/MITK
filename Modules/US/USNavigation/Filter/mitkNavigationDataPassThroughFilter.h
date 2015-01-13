@@ -29,7 +29,7 @@ namespace mitk {
  * method in their own GenerateData() implementation to pass through navigation data
  * from all inputs to the outputs.
  */
-class MitkUSNavigation_EXPORT NavigationDataPassThroughFilter : public NavigationDataToNavigationDataFilter
+class MITKUSNAVIGATION_EXPORT NavigationDataPassThroughFilter : public NavigationDataToNavigationDataFilter
 {
 public:
   mitkClassMacro(NavigationDataPassThroughFilter, NavigationDataToNavigationDataFilter)

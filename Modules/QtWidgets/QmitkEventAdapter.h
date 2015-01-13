@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * Refer to \see DataInteractionPage  for general information about the concept of
  * the new implementation
  */
-class QMITK_EXPORT QmitkEventAdapter
+class MITKQTWIDGETS_EXPORT QmitkEventAdapter
 {
 public:
 

@@ -31,7 +31,7 @@ class PlaneGeometry;
  * \brief Implementation of PlanarFigure to display an angle
  * through three control points
  */
-class MitkPlanarFigure_EXPORT PlanarAngle : public PlanarFigure
+class MITKPLANARFIGURE_EXPORT PlanarAngle : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarAngle, PlanarFigure );

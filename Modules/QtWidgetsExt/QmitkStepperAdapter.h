@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //## \warning The \a Navigator has to be aware that it might have caused the changes
 //## of the \a Stepper itself. So take care that no infinite recursion is created!
 //## @ingroup NavigationControl
-class MitkQtWidgetsExt_EXPORT QmitkStepperAdapter : public QObject
+class MITKQTWIDGETSEXT_EXPORT QmitkStepperAdapter : public QObject
 {
   Q_OBJECT
 public:
@@ -49,7 +49,7 @@ public:
     this->Refetch();
   }
 
-  class MitkQtWidgetsExt_EXPORT ItkEventListener : public itk::Command
+  class MITKQTWIDGETSEXT_EXPORT ItkEventListener : public itk::Command
   {
     public:
       mitkClassMacro(ItkEventListener, itk::Command);

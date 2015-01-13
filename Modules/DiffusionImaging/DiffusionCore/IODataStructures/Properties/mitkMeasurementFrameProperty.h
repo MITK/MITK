@@ -26,7 +26,7 @@ namespace mitk
 {
 
   /** This property will store the measurement frame */
-  class MitkDiffusionCore_EXPORT MeasurementFrameProperty : public mitk::BaseProperty
+  class MITKDIFFUSIONCORE_EXPORT MeasurementFrameProperty : public mitk::BaseProperty
   {
   public:
     typedef vnl_matrix_fixed< double, 3, 3 >                            MeasurementFrameType;

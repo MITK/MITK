@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSlicedGeometry3D.h"
 #include <QWidget>
 
-class MitkQtWidgetsExt_EXPORT QmitkSliceWidget : public QWidget, public Ui::QmitkSliceWidgetUi
+class MITKQTWIDGETSEXT_EXPORT QmitkSliceWidget : public QWidget, public Ui::QmitkSliceWidgetUi
 {
   Q_OBJECT
 

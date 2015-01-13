@@ -40,7 +40,7 @@ namespace mitk {
     *
     * \ingroup US
     */
-  class MitkUS_EXPORT USImageVideoSource : public mitk::USImageSource
+  class MITKUS_EXPORT USImageVideoSource : public mitk::USImageSource
   {
   public:
     mitkClassMacro(USImageVideoSource, itk::ProcessObject);

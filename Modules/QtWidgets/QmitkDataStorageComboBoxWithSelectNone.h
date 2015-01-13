@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
  * \sa QmitkDataStorageComboBox
  */
-class QMITK_EXPORT QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
+class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
 {
 
   Q_OBJECT

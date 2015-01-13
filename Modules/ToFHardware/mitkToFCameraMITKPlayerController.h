@@ -32,7 +32,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFCameraMITKPlayerController : public itk::Object
+  class MITKTOFHARDWARE_EXPORT ToFCameraMITKPlayerController : public itk::Object
   {
   public:
 

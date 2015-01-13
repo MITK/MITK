@@ -28,7 +28,7 @@ struct QmitkEditPointDialogData;
  * \brief A dialog for editing points directly (coordinates) via TextEdits
  *
  */
-class MitkQtWidgetsExt_EXPORT QmitkEditPointDialog : public QDialog
+class MITKQTWIDGETSEXT_EXPORT QmitkEditPointDialog : public QDialog
 {
   Q_OBJECT
 

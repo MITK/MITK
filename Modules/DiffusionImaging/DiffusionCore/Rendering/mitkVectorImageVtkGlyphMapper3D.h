@@ -31,7 +31,7 @@ class vtkMaskPoints;
 namespace mitk
 {
 
-class MitkDiffusionCore_EXPORT VectorImageVtkGlyphMapper3D : public VtkMapper
+class MITKDIFFUSIONCORE_EXPORT VectorImageVtkGlyphMapper3D : public VtkMapper
 {
 public:
     mitkClassMacro( VectorImageVtkGlyphMapper3D, VtkMapper );

@@ -27,7 +27,7 @@ namespace mitk {
   //##
   //## Calculates a bounding box that contains all sub-bounding boxes.
   //## @ingroup Data
-  class MitkDataTypesExt_EXPORT BoundingObjectGroup : public mitk::BoundingObject
+  class MITKDATATYPESEXT_EXPORT BoundingObjectGroup : public mitk::BoundingObject
   {
   public:
 

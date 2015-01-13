@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QListBox;
 
 /// @ingroup Widgets
-class MitkQtWidgetsExt_EXPORT QmitkPopupColorChooser : public QFrame
+class MITKQTWIDGETSEXT_EXPORT QmitkPopupColorChooser : public QFrame
 {
   Q_OBJECT
 
@@ -70,7 +70,7 @@ class MitkQtWidgetsExt_EXPORT QmitkPopupColorChooser : public QFrame
 };
 
 /// @ingroup Widgets
-class MitkQtWidgetsExt_EXPORT QmitkColorPropertyEditor : public QmitkColorPropertyView
+class MITKQTWIDGETSEXT_EXPORT QmitkColorPropertyEditor : public QmitkColorPropertyView
 {
   Q_OBJECT
 

@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 
 
-class MitkQtWidgetsExt_EXPORT QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityComponent
+class MITKQTWIDGETSEXT_EXPORT QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityComponent
 {
   Q_OBJECT
 

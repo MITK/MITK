@@ -5,7 +5,6 @@ endif()
 
 mitk_create_module(
   DEPENDS MitkCore MitkQtWidgets
-  EXPORT_DEFINE MITK_PYTHON_EXPORT
   PACKAGE_DEPENDS
     PUBLIC Qt4|QtGui Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
     PRIVATE PythonLibs VTK|vtkPython+vtkWrappingPythonCore Numpy ${OpenCV_DEP}

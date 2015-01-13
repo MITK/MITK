@@ -32,7 +32,7 @@ class PlaneGeometry;
  * angle, which is defined by two non-intersecting lines in 2D. Each of those lines
  * is defined by two control points.
  */
-class MitkPlanarFigure_EXPORT PlanarFourPointAngle : public PlanarFigure
+class MITKPLANARFIGURE_EXPORT PlanarFourPointAngle : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarFourPointAngle, PlanarFigure );

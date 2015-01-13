@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
  * @brief The vtkGLMapperProp class is a VtkProp, wrapping a GLMapper
  */
-class MitkLegacyGL_EXPORT vtkGLMapperProp : public vtkProp
+class MITKLEGACYGL_EXPORT vtkGLMapperProp : public vtkProp
 {
   public:
     static vtkGLMapperProp* New();

@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkDicomRT_EXPORT RTStructureSetReader: public itk::Object
+  class MITKDICOMRT_EXPORT RTStructureSetReader: public itk::Object
   {
     typedef std::deque<mitk::DataNode::Pointer> ContourModelSetNodes;
 

@@ -123,7 +123,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
   case AcADD:
     {
       mitk::Point3D worldPoint = event->GetWorldPosition();
-      std::auto_ptr<StateEvent> newStateEvent;
+      std::unique_ptr<StateEvent> newStateEvent;
       if (this->CheckSelected(worldPoint, m_TimeStep))
       {
         newStateEvent.reset(new mitk::StateEvent(EIDYES, event));

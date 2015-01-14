@@ -965,6 +965,12 @@ bool ImageStatisticsCalculator::GetPrincipalAxis(
 }
 
 
+unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, mitk::ScalarType max)
+{
+  return std::ceil( ( (max - min ) / m_HistogramBinSize) );
+}
+
+
 template < typename TPixel, unsigned int VImageDimension >
 void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   const itk::Image< TPixel, VImageDimension > *image,
@@ -1078,7 +1084,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   if (m_UseDefaultBinSize)
     m_HistogramBinSize = std::ceil( (statistics.GetMax() - statistics.GetMin() + 1)/numberOfBins );
   else
-    numberOfBins = std::ceil( ( (statistics.GetMax() - statistics.GetMin() ) / m_HistogramBinSize) );
+    numberOfBins = calcNumberOfBins(statistics.GetMin(), statistics.GetMax());
 
   typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
   histogramGenerator->SetInput( image );
@@ -1249,7 +1255,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
   statisticsFilter->Update();
 
-  int numberOfBins = std::floor( ( (statisticsFilter->GetMaximum() - statisticsFilter->GetMinimum() + 1) / m_HistogramBinSize) + 0.5 );
+  int numberOfBins = calcNumberOfBins(statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum());
 
   typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
   labelStatisticsFilter = LabelStatisticsFilterType::New();

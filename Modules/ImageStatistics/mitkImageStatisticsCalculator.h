@@ -566,6 +566,12 @@ protected:
   bool m_HotspotRadiusInMMChanged;
   bool m_HotspotMustBeCompletelyInsideImage;
 
+
+private:
+
+  unsigned int calcNumberOfBins(mitk::ScalarType min, mitk::ScalarType max);
+
+
 };
 
 } // namespace

@@ -20,7 +20,7 @@ if(NOT DEFINED CppUnit_DIR)
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/cppunit-1.12.1.tar.gz
      URL_MD5 bd30e9cf5523cdfc019b94f5e1d7fd19
      PATCH_COMMAND
-       ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CppUnit-1.12.1.patch
+       ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CppUnit-1.12.1.patch
        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_LIST_DIR}/${proj}config.h.cmake <SOURCE_DIR>/config/config.h.cmake
        COMMAND ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=cppunit -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake
      INSTALL_COMMAND ""

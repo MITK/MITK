@@ -22,7 +22,7 @@ if(MITK_USE_Poco)
       PREFIX ${proj}-cmake
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.6.0-all.tar.gz
       URL_MD5 4fed893d4ca57db98b0e10d82545232a
-      PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Poco-1.6.0.patch
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Poco-1.6.0.patch
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}

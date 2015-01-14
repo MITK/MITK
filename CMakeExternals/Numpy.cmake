@@ -76,7 +76,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
 
     set(NUMPY_PATCH_COMMAND )
     if(WIN32)
-      set(NUMPY_PATCH_COMMAND PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Numpy-1.4.1-win32.patch)
+      set(NUMPY_PATCH_COMMAND PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Numpy-1.4.1-win32.patch)
     endif()
 
     ExternalProject_Add(${proj}

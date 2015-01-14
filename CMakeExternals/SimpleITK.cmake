@@ -58,7 +58,7 @@ if(MITK_USE_SimpleITK)
        BINARY_DIR ${proj}-build
        PREFIX ${proj}-cmake
        INSTALL_DIR ${proj}-install
-       PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/SimpleITK-0.8.0.patch
+       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/SimpleITK-0.8.0.patch
        CMAKE_ARGS
          ${ep_common_args}
          # -DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON

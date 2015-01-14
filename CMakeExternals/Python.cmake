@@ -28,7 +28,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       URL_MD5  "2cf641732ac23b18d139be077bd906cd"
       PREFIX   ${CMAKE_BINARY_DIR}/${PYTHON_SOURCE_PACKAGE}-cmake
       SOURCE_DIR  "${PYTHON_SOURCE_DIR}"
-      PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Python-2.7.3.patch
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Python-2.7.3.patch
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
       INSTALL_COMMAND ""
@@ -120,7 +120,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       # fix to build python on i686 and i386 with the python cmake build system,
       # the x86 path must be set as default
-      PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/python-cmake-buildsystem-47845c55.patch
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/python-cmake-buildsystem-47845c55.patch
       PREFIX ${proj}-cmake
       BINARY_DIR ${proj}-build
       INSTALL_DIR ${proj}-install

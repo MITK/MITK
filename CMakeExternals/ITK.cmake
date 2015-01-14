@@ -50,7 +50,7 @@ if(NOT DEFINED ITK_DIR)
      URL_MD5 80e433ffc0e81cdc19a03dd02a3c329b
      INSTALL_COMMAND ""
      # work with external GDCM
-     PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.5.1.patch
+     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.5.1.patch
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}

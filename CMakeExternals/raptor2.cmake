@@ -22,7 +22,7 @@ if(NOT DEFINED raptor2_DIR)
      PREFIX ${proj}-cmake
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/raptor2-2.0.15.tar.gz
      URL_MD5 a39f6c07ddb20d7dd2ff1f95fa21e2cd
-     PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/raptor2-2.0.15.patch
+     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/raptor2-2.0.15.patch
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}

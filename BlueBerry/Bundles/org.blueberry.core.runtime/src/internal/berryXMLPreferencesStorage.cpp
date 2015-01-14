@@ -88,6 +88,9 @@ namespace berry
 
   void XMLPreferencesStorage::Flush(IPreferences*  /*_Preferences*/) throw(Poco::Exception, BackingStoreException)
   {
+    std::locale localeBackup;
+    std::locale::global(std::locale(""));
+
     try
     {
       this->ToDOMTree(dynamic_cast<Preferences*>(this->m_Root.GetPointer()), 0);
@@ -108,6 +111,8 @@ namespace berry
     {
       WARNMSG << e.what();
     }
+
+    std::locale::global(localeBackup);
   }
 
   XMLPreferencesStorage::~XMLPreferencesStorage()

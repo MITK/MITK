@@ -143,6 +143,8 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
         vtkIdType   numPoints(0);
         vtkIdType*  points(NULL);
         vLines->GetNextCell ( numPoints, points );
+        float weight = m_FiberBundle->GetFiberWeight(i);
+        MITK_INFO << weight;
 
         // fill output image
         for( int j=0; j<numPoints; j++)
@@ -158,7 +160,7 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
                 if (m_BinaryOutput)
                     outImage->SetPixel(index, 1);
                 else
-                    outImage->SetPixel(index, outImage->GetPixel(index)+0.01);
+                    outImage->SetPixel(index, outImage->GetPixel(index)+0.01*weight);
                 continue;
             }
 
@@ -228,7 +230,11 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
                 max = outImageBufferPointer[i];
         if (max>0)
             for (int i=0; i<w*h*d; i++)
+            {
                 outImageBufferPointer[i] /= max;
+//                if (outImageBufferPointer[i]>0 && outImageBufferPointer[i]<0.2)
+//                    outImageBufferPointer[i] = 0.2;
+            }
     }
     if (m_InvertImage)
     {

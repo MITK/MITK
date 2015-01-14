@@ -108,6 +108,10 @@ public:
     void                            GenerateFiberIds(); // TODO: make protected
 
     // get/set data
+    float GetFiberWeight(unsigned int fiber);
+    void SetFiberWeights(float newWeight);
+    void SetFiberWeight(unsigned int fiber, float weight);
+    void SetFiberWeights(std::vector< float > weights);
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);
     vtkSmartPointer<vtkPolyData> GetFiberPolyData() const;
     std::vector< std::string > GetAvailableColorCodings();
@@ -160,6 +164,7 @@ private:
     char* m_CurrentColorCoding;
     int   m_NumFibers;
 
+    std::vector< float > m_FiberWeights;
     std::vector< float > m_FiberLengths;
     float   m_MinFiberLength;
     float   m_MaxFiberLength;

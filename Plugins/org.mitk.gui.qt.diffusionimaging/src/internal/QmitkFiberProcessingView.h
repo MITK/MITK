@@ -93,6 +93,7 @@ protected:
   void ResampleSelectedBundles();   ///< smooth fiber bundle using the specified number of sampling points per cm.
   void DoImageColorCoding();        ///< color fibers by selected scalar image
   void CompressSelectedBundles();   ///< remove points below certain error threshold
+  void WeightFibers();
 
   void RemoveWithMask(bool removeInside);
   void RemoveDir();

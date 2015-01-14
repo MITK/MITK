@@ -94,6 +94,15 @@ function(_mitk_parse_package_args)
   set(PACKAGE_NAMES ${PUBLIC_PACKAGE_NAMES} ${PRIVATE_PACKAGE_NAMES} ${INTERFACE_PACKAGE_NAMES} PARENT_SCOPE)
 endfunction()
 
+function(_include_package_config pkg_config_file)
+  # wrap the inclusion of the MITK_<pkg>_Config.cmake file in a
+  # function to create a scope for its variables; this allows
+  # multiple inclusions of the file in the parent scope
+  include(${pkg_config_file})
+  set(ALL_INCLUDE_DIRECTORIES ${ALL_INCLUDE_DIRECTORIES} PARENT_SCOPE)
+  set(ALL_LIBRARIES ${ALL_LIBRARIES} PARENT_SCOPE)
+  set(ALL_COMPILE_DEFINITIONS ${ALL_COMPILE_DEFINITIONS} PARENT_SCOPE)
+endfunction()
 
 #! This CMake function sets up the necessary include directories,
 #! linker dependencies, and compile flags for a given target which
@@ -164,7 +173,7 @@ function(mitk_use_modules)
       set(_package_found 0)
       foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
         if((NOT DEFINED MITK_USE_${_package} OR MITK_USE_${_package}) AND EXISTS "${dir}/MITK_${_package}_Config.cmake")
-          include("${dir}/MITK_${_package}_Config.cmake")
+          _include_package_config("${dir}/MITK_${_package}_Config.cmake")
           set(_package_found 1)
           break()
         endif()

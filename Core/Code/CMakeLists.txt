@@ -5,15 +5,6 @@ set(TOOL_CPPS "")
 set_source_files_properties( DataManagement/mitkImage.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
 set_source_files_properties( Controllers/mitkSliceNavigationController.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
 
-# In MITK_ITK_Config.cmake, we set ITK_NO_IO_FACTORY_REGISTER_MANAGER to 1 unless
-# the variable is already defined. Setting it to 1 prevents multiple registrations/
-# unregistrations of ITK IO factories during library loading/unloading (of MITK
-# libraries). However, we need "one" place where the IO factories are registered at
-# least once. This could be the application executable, but every executable would
-# need to take care of that itself. Instead, we allow the auto registration in the
-# Mitk Core library.
-set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 0)
-
 MITK_CREATE_MODULE(Core
   INCLUDE_DIRS
     PUBLIC Algorithms Common DataManagement Controllers Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}
@@ -41,7 +32,28 @@ MITK_CREATE_MODULE(Core
   NO_INIT
 )
 
-set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1)
+function(_itk_create_factory_register_manager)
+  # In MITK_ITK_Config.cmake, we do *not* include ITK_USE_FILE, which
+  # prevents multiple registrations/unregistrations of ITK IO factories
+  # during library loading/unloading (of MITK libraries). However, we need
+  # "one" place where the IO factories are registered at
+  # least once. This could be the application executable, but every executable would
+  # need to take care of that itself. Instead, we allow the auto registration in the
+  # Mitk Core library.
+  set(NO_DIRECTORY_SCOPED_ITK_COMPILE_DEFINITION 1)
+  find_package(ITK)
+  include(${ITK_USE_FILE})
+
+  if(NOT ITK_NO_IO_FACTORY_REGISTER_MANAGER)
+    # We manually add the define which will be of target scope. MITK
+    # patches ITK_USE_FILE to remove the directory scoped compile
+    # definition since it would be propagated to other targets in the
+    # same directory scope but these targets might want to *not*
+    # use the ITK factory manager stuff.
+    target_compile_definitions(${MODULE_TARGET} PRIVATE ITK_IO_FACTORY_REGISTER_MANAGER)
+  endif()
+endfunction()
+_itk_create_factory_register_manager()
 
 # this is needed for libraries which link to Mitk and need
 # symbols from explicitly instantiated templates
@@ -59,7 +71,4 @@ endif(MSVC_IDE OR MSVC_VERSION OR MINGW)
 
 add_subdirectory(TestingHelper)
 
-# build tests?
-if(BUILD_TESTING)
-  add_subdirectory(Testing)
-ENDIF()
+add_subdirectory(Testing)

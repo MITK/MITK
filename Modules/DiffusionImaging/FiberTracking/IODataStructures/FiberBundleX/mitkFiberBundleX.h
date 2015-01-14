@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkDataSet.h>
 #include <vtkTransform.h>
+#include <vtkFloatArray.h>
 
 //#include <QStringList>
 
@@ -108,10 +109,11 @@ public:
     void                            GenerateFiberIds(); // TODO: make protected
 
     // get/set data
+    vtkSmartPointer<vtkFloatArray> GetFiberWeights() const { return m_FiberWeights; }
     float GetFiberWeight(unsigned int fiber);
     void SetFiberWeights(float newWeight);
     void SetFiberWeight(unsigned int fiber, float weight);
-    void SetFiberWeights(std::vector< float > weights);
+    void SetFiberWeights(vtkSmartPointer<vtkFloatArray> weights);
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);
     vtkSmartPointer<vtkPolyData> GetFiberPolyData() const;
     std::vector< std::string > GetAvailableColorCodings();
@@ -164,7 +166,7 @@ private:
     char* m_CurrentColorCoding;
     int   m_NumFibers;
 
-    std::vector< float > m_FiberWeights;
+    vtkSmartPointer<vtkFloatArray> m_FiberWeights;
     std::vector< float > m_FiberLengths;
     float   m_MinFiberLength;
     float   m_MaxFiberLength;

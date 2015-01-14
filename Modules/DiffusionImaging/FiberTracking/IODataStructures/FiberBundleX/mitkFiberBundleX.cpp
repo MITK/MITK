@@ -56,6 +56,9 @@ mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     , m_NumFibers(0)
     , m_FiberSampling(0)
 {
+    m_FiberWeights = vtkSmartPointer<vtkFloatArray>::New();
+    m_FiberWeights->SetName("FIBER_WEIGHTS");
+
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     if (fiberPolyData != NULL)
     {
@@ -175,7 +178,10 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::AddBundle(mitk::FiberBundleX* fi
     vtkSmartPointer<vtkPoints> vNewPoints = vtkSmartPointer<vtkPoints>::New();
 
     // add current fiber bundle
-    std::vector< float > weights;
+    vtkSmartPointer<vtkFloatArray> weights = vtkSmartPointer<vtkFloatArray>::New();
+    weights->SetNumberOfValues(this->GetNumFibers()+fib->GetNumFibers());
+
+    unsigned int counter = 0;
     for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
     {
         vtkCell* cell = m_FiberPolyData->GetCell(i);
@@ -191,8 +197,9 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::AddBundle(mitk::FiberBundleX* fi
             vtkIdType id = vNewPoints->InsertNextPoint(p);
             container->GetPointIds()->InsertNextId(id);
         }
-        weights.push_back(this->GetFiberWeight(i));
+        weights->InsertValue(counter, this->GetFiberWeight(i));
         vNewLines->InsertNextCell(container);
+        counter++;
     }
 
     // add new fiber bundle
@@ -211,8 +218,9 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::AddBundle(mitk::FiberBundleX* fi
             vtkIdType id = vNewPoints->InsertNextPoint(p);
             container->GetPointIds()->InsertNextId(id);
         }
-        weights.push_back(fib->GetFiberWeight(i));
+        weights->InsertValue(counter, fib->GetFiberWeight(i));
         vNewLines->InsertNextCell(container);
+        counter++;
     }
 
     // initialize polydata
@@ -988,8 +996,13 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
     m_LengthStDev = 0;
     m_NumFibers = m_FiberPolyData->GetNumberOfCells();
 
-    if (m_FiberWeights.size()!=m_NumFibers)
-        m_FiberWeights.resize(m_NumFibers, 1.0);
+    if (m_FiberWeights->GetSize()!=m_NumFibers)
+    {
+        m_FiberWeights = vtkSmartPointer<vtkFloatArray>::New();
+        m_FiberWeights->SetName("FIBER_WEIGHTS");
+        m_FiberWeights->SetNumberOfValues(m_NumFibers);
+        this->SetFiberWeights(1);
+    }
 
     if (m_NumFibers<=0) // no fibers present; apply default geometry
     {
@@ -1060,34 +1073,29 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
 
 float mitk::FiberBundleX::GetFiberWeight(unsigned int fiber)
 {
-    if (m_NumFibers!=m_FiberWeights.size())
-        m_FiberWeights.resize(1);
-    return m_FiberWeights.at(fiber);
+    return m_FiberWeights->GetValue(fiber);
 }
 
 void mitk::FiberBundleX::SetFiberWeights(float newWeight)
 {
-    if (m_NumFibers!=m_FiberWeights.size())
-        m_FiberWeights.resize(m_NumFibers, newWeight);
-    for (int i=0; i<m_FiberWeights.size(); i++)
-        m_FiberWeights[i] = newWeight;
-    MITK_INFO << newWeight;
+    for (int i=0; i<m_FiberWeights->GetSize(); i++)
+        m_FiberWeights->SetValue(i, newWeight);
 }
 
-void mitk::FiberBundleX::SetFiberWeights(std::vector< float > weights)
+void mitk::FiberBundleX::SetFiberWeights(vtkSmartPointer<vtkFloatArray> weights)
 {
-    m_FiberWeights = weights;
-    if (m_NumFibers!=m_FiberWeights.size())
-        m_FiberWeights.resize(m_NumFibers, 1);
+    if (m_NumFibers!=weights->GetSize())
+        return;
+
+    for (int i=0; i<weights->GetSize(); i++)
+        m_FiberWeights->SetValue(i, weights->GetValue(i));
+
+    m_FiberWeights->SetName("FIBER_WEIGHTS");
 }
 
 void mitk::FiberBundleX::SetFiberWeight(unsigned int fiber, float weight)
 {
-    if (m_NumFibers!=m_FiberWeights.size())
-        m_FiberWeights.resize(m_NumFibers, 1);
-    if (fiber>=m_NumFibers)
-        mitkThrow() << "Fiber index out of bounds!";
-    m_FiberWeights[fiber] = weight;
+    m_FiberWeights->SetValue(fiber, weight);
 }
 
 std::vector<std::string> mitk::FiberBundleX::GetAvailableColorCodings()

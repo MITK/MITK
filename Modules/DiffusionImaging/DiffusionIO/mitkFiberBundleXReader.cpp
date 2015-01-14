@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMatrix4x4.h>
 #include <vtkPolyLine.h>
 #include <vtkCellArray.h>
+#include <vtkDataArray.h>
+#include <vtkFloatArray.h>
+#include <vtkCellData.h>
 #include <itksys/SystemTools.hxx>
 #include <tinyxml.h>
 #include <vtkCleanPolyData.h>
@@ -83,8 +86,13 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleXReader::Read()
       if ( reader->GetOutput() != NULL )
       {
         vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput();
-        FiberBundleX::Pointer image = FiberBundleX::New(fiberPolyData);
-        result.push_back(image.GetPointer());
+        FiberBundleX::Pointer fiberBundle = FiberBundleX::New(fiberPolyData);
+
+        vtkSmartPointer<vtkFloatArray> weights = vtkFloatArray::SafeDownCast(fiberPolyData->GetCellData()->GetArray("FIBER_WEIGHTS"));
+        if (weights!=NULL)
+            fiberBundle->SetFiberWeights(weights);
+
+        result.push_back(fiberBundle.GetPointer());
         return result;
       }
     }

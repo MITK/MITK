@@ -86,6 +86,44 @@ public:
         return mitkImage;
     }
 
+    /**
+     * \brief Generates gradient image with the defined size and spacing
+     */
+    template <typename TPixelType>
+    static mitk::Image::Pointer GenerateImageWithReference( mitk::Image::Pointer reference,
+                                                            TPixelType fill_value )
+    {
+      mitk::Image::Pointer output = mitk::Image::New();
+      mitk::PixelType output_type = MakeScalarPixelType<TPixelType>();
+
+      // all metadata (except type) come from reference image
+      output->SetGeometry( reference->GetGeometry() );
+      output->Initialize( output_type,
+                          reference->GetDimension(),
+                          reference->GetDimensions() );
+
+      //get a pointer to the image buffer to write into
+      TPixelType* imageBuffer = NULL;
+      try
+      {
+        mitk::ImageWriteAccessor writeAccess( output );
+        imageBuffer = static_cast<TPixelType*>( writeAccess.GetData() );
+      }
+      catch(...)
+      {
+        MITK_ERROR << "Write access not granted on mitk::Image.";
+      }
+
+      // fill the buffer with the specifed value
+      for(unsigned int i = 0; i < output->GetVolumeData(0)->GetSize(); i++)
+      {
+         imageBuffer[i] = fill_value;
+      }
+
+      return output;
+
+    }
+
     /*!
     \brief Generates random image with the defined size and spacing
     */

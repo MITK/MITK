@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProgressBar.h>
 #include <mitkTimeHelper.h>
 
-// Could move mitkVtkImageOverwrite to Core so that this filter can be moved to the ContourModel module
 #include <mitkVtkImageOverwrite.h>
 
 mitk::ContourModelSetToImageFilter::ContourModelSetToImageFilter()

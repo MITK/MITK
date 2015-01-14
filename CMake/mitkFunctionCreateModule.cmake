@@ -135,6 +135,7 @@ function(mitk_create_module)
       WARNINGS_AS_ERRORS     # treat all compiler warnings as errors
       EXECUTABLE             # create an executable; do not use directly, use mitk_create_executable() instead
       C_MODULE               # compile all source files as C sources
+      CXX_MODULE             # compile all source files as C++ sources
      )
 
   cmake_parse_arguments(MODULE "${_macro_options}" "${_macro_params}" "${_macro_multiparams}" ${ARGN})
@@ -300,7 +301,7 @@ function(mitk_create_module)
           set(MODULE_HEADERS_ONLY 0)
           if(MODULE_C_MODULE)
             set_source_files_properties(${CPP_FILES} PROPERTIES LANGUAGE C)
-          else()
+          elseif(MODULE_CXX_MODULE)
             set_source_files_properties(${CPP_FILES} PROPERTIES LANGUAGE CXX)
           endif()
         else()
@@ -567,6 +568,11 @@ function(mitk_create_module)
             usFunctionEmbedResources(TARGET ${MODULE_TARGET})
           endif()
 
+        endif()
+
+        if(NOT MODULE_C_MODULE)
+          # add required compile features
+          target_compile_features(${MODULE_TARGET} PUBLIC ${MITK_CXX_FEATURES})
         endif()
 
         # create export macros for all modules (also header-only)

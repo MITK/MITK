@@ -1,3 +1,4 @@
+include(mitkFunctionCheckCompilerFlags)
 
 #-----------------------------------------------------------------------------
 # Convenient macro allowing to download a file
@@ -208,7 +209,13 @@ if(MSVC_VERSION)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
 endif()
 
+# This is necessary to avoid problems with compile feature checks.
+# CMAKE_CXX_STANDARD seems to only set the -std=c++11 flag for targets.
+mitkFunctionCheckCompilerFlags("-std=c++11" _cxx11_flag)
+
 set(ep_common_args
+  -DCMAKE_CXX_EXTENSIONS:STRING=0
+  -DCMAKE_CXX_STANDARD:STRING=11
   -DBUILD_TESTING:BOOL=${ep_build_testing}
   -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
   -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}
@@ -217,7 +224,7 @@ set(ep_common_args
   -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
   -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
   -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
-  -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
+  "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS} ${_cxx11_flag}"
   #debug flags
   -DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG}
   -DCMAKE_C_FLAGS_DEBUG:STRING=${CMAKE_C_FLAGS_DEBUG}

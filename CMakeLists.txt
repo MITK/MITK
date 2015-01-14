@@ -556,6 +556,15 @@ endif()
 # MITK C/CXX Flags
 #-----------------------------------------------------------------------------
 
+# help keeping cross-platform compatibility
+set(CMAKE_CXX_EXTENSIONS 0)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED 1)
+
+# Required and enabled C++11 features for all MITK code.
+# These are added as PUBLIC compile features to all MITK modules.
+set(MITK_CXX_FEATURES cxx_auto_type cxx_nullptr)
+
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS}")
 set(MITK_C_FLAGS_DEBUG )
 set(MITK_C_FLAGS_RELEASE )
@@ -565,6 +574,8 @@ set(MITK_CXX_FLAGS_RELEASE )
 
 set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
+
+mitkFunctionCheckCompilerFlags("-std=c++11" MITK_CXX_FLAGS)
 
 if(WIN32)
   set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
@@ -718,6 +729,21 @@ if(NOT DEFINED MITK_SUPERBUILD_BINARY_DIR)
 endif()
 
 #-----------------------------------------------------------------------------
+# Set C/CXX and linker flags for MITK code
+#-----------------------------------------------------------------------------
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MITK_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${MITK_CXX_FLAGS_DEBUG}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${MITK_CXX_FLAGS_RELEASE}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MITK_C_FLAGS}")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${MITK_C_FLAGS_DEBUG}")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${MITK_C_FLAGS_RELEASE}")
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MITK_EXE_LINKER_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MITK_SHARED_LINKER_FLAGS}")
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER_FLAGS}")
+
+#-----------------------------------------------------------------------------
 # Compile Utilities and set-up MITK variables
 #-----------------------------------------------------------------------------
 
@@ -772,26 +798,6 @@ if(MITK_USE_BLUEBERRY)
   include(mitkMacroCreateCTKPlugin)
 
 endif()
-
-#-----------------------------------------------------------------------------
-# Set C/CXX and linker flags for MITK code
-#-----------------------------------------------------------------------------
-
-# help keeping cross-platform compatibility
-set(CMAKE_CXX_EXTENSIONS 0)
-
-set(CMAKE_CXX_STANDARD 11)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MITK_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${MITK_CXX_FLAGS_DEBUG}")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${MITK_CXX_FLAGS_RELEASE}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MITK_C_FLAGS}")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${MITK_C_FLAGS_DEBUG}")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${MITK_C_FLAGS_RELEASE}")
-
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MITK_EXE_LINKER_FLAGS}")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MITK_SHARED_LINKER_FLAGS}")
-set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER_FLAGS}")
 
 #-----------------------------------------------------------------------------
 # Add custom targets representing CDash subprojects

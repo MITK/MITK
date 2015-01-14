@@ -2,8 +2,6 @@
 # ITK
 #-----------------------------------------------------------------------------
 
-include(mitkFunctionCheckCompilerFlags)
-
 # Sanity checks
 if(DEFINED ITK_DIR AND NOT EXISTS ${ITK_DIR})
   message(FATAL_ERROR "ITK_DIR variable is defined but corresponds to non-existing directory")
@@ -42,18 +40,6 @@ if(NOT DEFINED ITK_DIR)
   # see MITK bug #17338
   list(APPEND additional_cmake_args
     -DModule_ITKReview:BOOL=ON
-  )
-
-  # this is necessary to avoid some vnl probs
-  # CMAKE_CXX_STANDARD sets the -std=c++11 flag as well but
-  # it seems this is not used during configuration which then
-  # leads to VNL errors since it uses an older C++ style
-  mitkFunctionCheckCompilerFlags("-std=c++11" _itk_cxx_flag)
-
-  list(APPEND additional_cmake_args
-    -DCMAKE_CXX_EXTENSIONS:STRING=0
-    -DCMAKE_CXX_STANDARD:STRING=11
-    -DCMAKE_CXX_FLAGS=${_itk_cxx_flag}
   )
 
   ExternalProject_Add(${proj}

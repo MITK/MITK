@@ -22,6 +22,7 @@ endif()
 mark_as_advanced(CppMicroServices_DIR)
 
 if ("${CppMicroServices_DIR}" STREQUAL "${CppMicroServices_DIR_default}")
+  mitkFunctionCheckCompilerFlags("-std=c++11" US_CXX_FLAGS)
   add_subdirectory(CppMicroServices)
 endif()
 

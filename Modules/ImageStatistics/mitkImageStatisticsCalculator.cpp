@@ -1076,9 +1076,9 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   // Calculate histogram
   unsigned int numberOfBins = 200;
   if (m_UseDefaultBinSize)
-      m_HistogramBinSize = std::ceil( (statistics.GetMax() - statistics.GetMin() + 1)/numberOfBins );
+    m_HistogramBinSize = std::ceil( (statistics.GetMax() - statistics.GetMin() + 1)/numberOfBins );
   else
-    numberOfBins = std::floor( ( (statistics.GetMax() - statistics.GetMin() + 1) / m_HistogramBinSize) + 0.5 );
+    numberOfBins = std::ceil( ( (statistics.GetMax() - statistics.GetMin() ) / m_HistogramBinSize) );
 
   typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
   histogramGenerator->SetInput( image );

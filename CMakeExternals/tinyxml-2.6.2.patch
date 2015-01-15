@@ -1,6 +1,6 @@
-diff -urNb tinyxml-2.6.2/tinyxml.cpp tinyxml-src/tinyxml.cpp
---- tinyxml-2.6.2/tinyxml.cpp	2011-05-15 04:24:57.000000000 +0200
-+++ tinyxml-src/tinyxml.cpp	2015-01-11 15:05:34.793871724 +0100
+diff -burN tinyxml/tinyxml.cpp tinyxml-src/tinyxml.cpp
+--- tinyxml/tinyxml.cpp	2011-05-15 04:24:57.000000000 +0200
++++ tinyxml-src/tinyxml.cpp	2015-01-14 15:19:38.685333149 +0100
 @@ -34,6 +34,9 @@
  FILE* TiXmlFOpen( const char* filename, const char* mode );
  
@@ -37,7 +37,7 @@ diff -urNb tinyxml-2.6.2/tinyxml.cpp tinyxml-src/tinyxml.cpp
  	}
  }
  #endif 
-@@ -1242,33 +1248,73 @@
+@@ -1242,33 +1245,73 @@
  
  int TiXmlAttribute::QueryDoubleValue( double* dval ) const
  {
@@ -120,7 +120,7 @@ diff -urNb tinyxml-2.6.2/tinyxml.cpp tinyxml-src/tinyxml.cpp
  int TiXmlAttribute::IntValue() const
  {
  	return atoi (value.c_str ());
-@@ -1276,10 +1322,18 @@
+@@ -1276,7 +1319,15 @@
  
  double  TiXmlAttribute::DoubleValue() const
  {
@@ -136,10 +136,7 @@ diff -urNb tinyxml-2.6.2/tinyxml.cpp tinyxml-src/tinyxml.cpp
  }
  
  
- TiXmlComment::TiXmlComment( const TiXmlComment& copy ) : TiXmlNode( TiXmlNode::TINYXML_COMMENT )
- {
- 	copy.CopyTo( this );
-@@ -1884,3 +1939,36 @@
+@@ -1884,3 +1935,36 @@
  	return true;
  }
  
@@ -176,9 +173,9 @@ diff -urNb tinyxml-2.6.2/tinyxml.cpp tinyxml-src/tinyxml.cpp
 +
 +  return(TIXML_STRING(buf));
 +}
-diff -urNb tinyxml-2.6.2/tinyxml.h tinyxml-src/tinyxml.h
---- tinyxml-2.6.2/tinyxml.h	2011-05-15 04:24:57.000000000 +0200
-+++ tinyxml-src/tinyxml.h	2015-01-11 15:05:34.801871724 +0100
+diff -burN tinyxml/tinyxml.h tinyxml-src/tinyxml.h
+--- tinyxml/tinyxml.h	2011-05-15 04:24:57.000000000 +0200
++++ tinyxml-src/tinyxml.h	2015-01-14 15:19:38.686333149 +0100
 @@ -20,12 +20,24 @@
  
  3. This notice may not be removed or altered from any source
@@ -229,7 +226,7 @@ diff -urNb tinyxml-2.6.2/tinyxml.h tinyxml-src/tinyxml.h
  protected:
  
  	static const char* SkipWhiteSpace( const char*, TiXmlEncoding encoding );
-@@ -836,14 +856,14 @@
+@@ -836,14 +854,14 @@
  	void SetValue( const char* _value )	{ value = _value; }				///< Set the value.
  
  	void SetIntValue( int _value );										///< Set the value from an integer.
@@ -247,7 +244,7 @@ diff -urNb tinyxml-2.6.2/tinyxml.h tinyxml-src/tinyxml.h
  
  	/// Get the next sibling attribute in the DOM. Returns null at end.
  	const TiXmlAttribute* Next() const;
-@@ -1061,8 +1081,8 @@
+@@ -1061,8 +1079,8 @@
  	///< STL std::string form.
  	void SetAttribute( const std::string& name, int _value );
  	///< STL std::string form.
@@ -258,7 +255,7 @@ diff -urNb tinyxml-2.6.2/tinyxml.h tinyxml-src/tinyxml.h
  
  	/** Sets an attribute of name to a given value. The attribute
  		will be created if it does not exist, or changed if it does.
-@@ -1072,8 +1092,8 @@
+@@ -1072,7 +1090,7 @@
  	/** Sets an attribute of name to a given value. The attribute
  		will be created if it does not exist, or changed if it does.
  	*/
@@ -267,4 +264,3 @@ diff -urNb tinyxml-2.6.2/tinyxml.h tinyxml-src/tinyxml.h
  
  	/** Deletes an attribute with the given name.
  	*/
- 	void RemoveAttribute( const char * name );

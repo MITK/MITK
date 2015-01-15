@@ -51,7 +51,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVBoxLayout>
 #include <QMessageBox>
 
-
 const QString QmitkSlicesInterpolator::TR_INTERPOLATION = QGroupBox::tr("Interpolation");
 const QString QmitkSlicesInterpolator::TR_DISABLED = QGroupBox::tr("Disabled");
 const QString QmitkSlicesInterpolator::TR_2D = QGroupBox::tr("2-Dimensional");
@@ -104,9 +103,11 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   QVBoxLayout* vboxLayout = new QVBoxLayout(m_GroupBoxEnableExclusiveInterpolationMode);
 
   m_CmbInterpolation = new QComboBox(m_GroupBoxEnableExclusiveInterpolationMode);
+
   m_CmbInterpolation->addItem(TR_DISABLED);
   m_CmbInterpolation->addItem(TR_2D);
   m_CmbInterpolation->addItem(TR_3D);
+
   vboxLayout->addWidget(m_CmbInterpolation);
 
   m_BtnApply2D = new QPushButton(TR_CONFIRM_SINGLE, m_GroupBoxEnableExclusiveInterpolationMode);
@@ -993,7 +994,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
           {
             QMessageBox msgBox;
             msgBox.setText(TR_INTERPOLATION_SLOW);
-            msgBox.setInformativeText(TR_INTERPOLATION_SLOW);
+            msgBox.setInformativeText(TR_INTERPOLATION_SURE);
             msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
             ret = msgBox.exec();
           }

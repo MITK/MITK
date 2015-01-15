@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkContourModelSetToImageFilter.h"
 
-#include <mitkExtractSliceFilter.h>
 #include <mitkContourModelSet.h>
 #include <mitkContourModelUtils.h>
+#include <mitkExtractSliceFilter.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkProgressBar.h>
 #include <mitkTimeHelper.h>
@@ -230,7 +230,6 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     extractor->Update();
 
     plane = 0;
-    mitk::ProgressBar::GetInstance()->Progress();
     ++it;
   }
 

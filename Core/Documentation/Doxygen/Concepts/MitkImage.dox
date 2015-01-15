@@ -68,7 +68,7 @@ depicted. Code examples are added to make understanding easier.
 
 \subsection MitkImagePage_ImageAccessors Image accessors
 
-Image accessors provide an image access, which is 
+Image accessors provide an image access, which is
  -# <b>controlled and surveilled:</b> at all time it is known how many instances have
     access to a specific image part.
  -# <b>consistent and thread-safe:</b> a lock-mechanism allows a concurrent read access on
@@ -117,6 +117,9 @@ catch(mitk::Exception& e)
   // deal with the situation not to have access
 }
 \endverbatim
+
+Please note that an explicit call of Modified() method is needed after the write access is done.
+The accessor makes no such call on default.
 
 A more convenient way to access image data is provided by the classes
 mitk::ImagePixelReadAccessor and mitk::ImagePixelWriteAccessor. They are equipped with

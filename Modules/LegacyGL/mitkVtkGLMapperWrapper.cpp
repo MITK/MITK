@@ -51,7 +51,6 @@ vtkProp* mitk::VtkGLMapperWrapper::GetVtkProp(mitk::BaseRenderer * renderer)
 
 void mitk::VtkGLMapperWrapper::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-  m_MitkGLMapper->SetDataNode(GetDataNode());
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
   ls->m_GLMapperProp->SetBaseRenderer(renderer);
   ls->m_GLMapperProp->SetWrappedGLMapper(m_MitkGLMapper);
@@ -69,6 +68,22 @@ void mitk::VtkGLMapperWrapper::MitkRender(mitk::BaseRenderer *renderer, mitk::Vt
   Enable2DOpenGL(renderer);
   Superclass::MitkRender(renderer,type);
   Disable2DOpenGL();
+}
+
+void mitk::VtkGLMapperWrapper::Update(mitk::BaseRenderer* renderer)
+{
+  Superclass::Update(renderer);
+  m_MitkGLMapper->Update(renderer);
+}
+
+void mitk::VtkGLMapperWrapper::SetDataNode(mitk::DataNode *node)
+{
+  m_MitkGLMapper->SetDataNode(node);
+}
+
+mitk::DataNode *mitk::VtkGLMapperWrapper::GetDataNode() const
+{
+  return m_MitkGLMapper->GetDataNode();
 }
 
 /*!

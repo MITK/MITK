@@ -63,6 +63,12 @@ namespace mitk {
 
     void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type);
 
+    virtual void Update(BaseRenderer *renderer);
+
+    virtual void SetDataNode(DataNode* node);
+
+    virtual DataNode* GetDataNode() const;
+
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
     mitk::LocalStorageHandler<LocalStorage> m_LSH;
 

@@ -407,6 +407,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   }
 
   m_SurfaceRepresentation = new QAction(TR_SURFACE_REPRESENTATION, this);
+
   m_SurfaceRepresentation->setMenu(new QMenu(m_NodeTreeView));
 
   QObject::connect( m_SurfaceRepresentation->menu(), SIGNAL( aboutToShow() )

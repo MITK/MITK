@@ -85,6 +85,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSlicesInterpolator : public QWidget
   public:
 
 const static QString TR_INTERPOLATION;
+const static QString TR_REINIT_INTERPOLATION;
 const static QString TR_DISABLED;
 const static QString TR_2D;
 const static QString TR_3D;

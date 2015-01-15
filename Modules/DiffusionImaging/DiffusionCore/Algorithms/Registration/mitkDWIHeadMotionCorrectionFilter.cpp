@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_CPP
-#define MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_CPP
+#ifndef MITKDWIHEADMOTIONCORRECTIONFILTER_CPP
+#define MITKDWIHEADMOTIONCORRECTIONFILTER_CPP
 
 #include "mitkDWIHeadMotionCorrectionFilter.h"
 
@@ -27,19 +27,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPyramidImageRegistrationMethod.h"
 //#include "mitkRegistrationMethodITK4.h"
-#include "mitkImageToDiffusionImageSource.h"
+#include <mitkDiffusionPropertyHelper.h>
 
 #include "mitkDiffusionImageCorrectionFilter.h"
 #include <mitkImageWriteAccessor.h>
+#include <mitkProperties.h>
 
 #include <vector>
 
 #include "mitkIOUtil.h"
 #include <itkImage.h>
 
-template< typename DiffusionPixelType>
-mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
-  ::DWIHeadMotionCorrectionFilter()
+mitk::DWIHeadMotionCorrectionFilter::DWIHeadMotionCorrectionFilter()
   : m_CurrentStep(0),
     m_Steps(100),
     m_IsInValidState(true),
@@ -49,18 +48,19 @@ mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
 
 }
 
-template< typename DiffusionPixelType>
-void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
-::GenerateData()
+
+void mitk::DWIHeadMotionCorrectionFilter::GenerateData()
 {
   typedef itk::SplitDWImageFilter< DiffusionPixelType, DiffusionPixelType> SplitFilterType;
 
-  DiffusionImageType* input = const_cast<DiffusionImageType*>(this->GetInput(0));
+  InputImageType* input = const_cast<InputImageType*>(this->GetInput(0));
+
+  ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+  mitk::CastToItkImage(input, itkVectorImagePointer);
 
   typedef mitk::PyramidImageRegistrationMethod RegistrationMethod;
   // typedef mitk::RegistrationMethodITKV4 RegistrationMethod
-
-  unsigned int numberOfSteps = input->GetVectorImage()->GetNumberOfComponentsPerPixel () ;
+  unsigned int numberOfSteps = itkVectorImagePointer->GetNumberOfComponentsPerPixel () ;
   m_Steps = numberOfSteps;
   //
   //  (1) Extract the b-zero images to a 3d+t image, register them by NCorr metric and
@@ -68,9 +68,9 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   //     the gradient images
   //
   typedef itk::B0ImageExtractionToSeparateImageFilter< DiffusionPixelType, DiffusionPixelType> B0ExtractorType;
-  typename B0ExtractorType::Pointer b0_extractor = B0ExtractorType::New();
-  b0_extractor->SetInput( input->GetVectorImage() );
-  b0_extractor->SetDirections( input->GetDirections() );
+  B0ExtractorType::Pointer b0_extractor = B0ExtractorType::New();
+  b0_extractor->SetInput( itkVectorImagePointer );
+  b0_extractor->SetDirections( static_cast<mitk::GradientDirectionsProperty*>( input->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
   b0_extractor->Update();
 
   mitk::Image::Pointer b0Image = mitk::Image::New();
@@ -152,9 +152,9 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   //
   // (2) Split the diffusion image into a 3d+t regular image, extract only the weighted images
   //
-  typename SplitFilterType::Pointer split_filter = SplitFilterType::New();
-  split_filter->SetInput (input->GetVectorImage() );
-  split_filter->SetExtractAllAboveThreshold(8, input->GetBValueMap() );
+  SplitFilterType::Pointer split_filter = SplitFilterType::New();
+  split_filter->SetInput (itkVectorImagePointer );
+  split_filter->SetExtractAllAboveThreshold(8, static_cast<mitk::BValueMapProperty*>(input->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap() );
 
   try
   {
@@ -264,10 +264,10 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   //
   // (4) Cast the resulting image back to an diffusion weighted image
   //
-  typename DiffusionImageType::GradientDirectionContainerType *gradients = input->GetDirections();
-  typename DiffusionImageType::GradientDirectionContainerType::Pointer gradients_new =
-      DiffusionImageType::GradientDirectionContainerType::New();
-  typename DiffusionImageType::GradientDirectionType bzero_vector;
+  mitk::DiffusionPropertyHelper::GradientDirectionsContainerType *gradients = static_cast<mitk::GradientDirectionsProperty*>( input->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+  mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradients_new =
+    mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::New();
+  mitk::DiffusionPropertyHelper::GradientDirectionType bzero_vector;
   bzero_vector.fill(0);
 
   // compose the direction vector
@@ -275,8 +275,8 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   //  - correct ordering of the directions based on the index list
   gradients_new->push_back( bzero_vector );
 
-  typename SplitFilterType::IndexListType index_list = split_filter->GetIndexList();
-  typename SplitFilterType::IndexListType::const_iterator lIter = index_list.begin();
+  SplitFilterType::IndexListType index_list = split_filter->GetIndexList();
+  SplitFilterType::IndexListType::const_iterator lIter = index_list.begin();
 
   while( lIter != index_list.end() )
   {
@@ -284,31 +284,16 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
     ++lIter;
   }
 
-  typename mitk::ImageToDiffusionImageSource< DiffusionPixelType >::Pointer caster =
-      mitk::ImageToDiffusionImageSource< DiffusionPixelType >::New();
-
-  caster->SetImage( registeredWeighted );
-  caster->SetBValue( input->GetReferenceBValue() );
-  caster->SetGradientDirections( gradients_new.GetPointer() );
-
-  try
-  {
-    caster->Update();
-  }
-  catch( const itk::ExceptionObject& e)
-  {
-    m_IsInValidState = false;
-    MITK_ERROR << "Casting back to diffusion image failed: ";
-    mitkThrow() << "Subprocess failed with exception: " << e.what();
-  }
+  registeredWeighted->SetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( gradients_new.GetPointer() ));
+  registeredWeighted->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(input->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
 
   //
   // (5) Adapt the gradient directions according to the estimated transforms
   //
-  typedef mitk::DiffusionImageCorrectionFilter< DiffusionPixelType > CorrectionFilterType;
-  typename CorrectionFilterType::Pointer corrector = CorrectionFilterType::New();
+  typedef mitk::DiffusionImageCorrectionFilter CorrectionFilterType;
+  CorrectionFilterType::Pointer corrector = CorrectionFilterType::New();
 
-  OutputImagePointerType output = caster->GetOutput();
+  mitk::Image::Pointer output = registeredWeighted;
   corrector->SetImage( output );
   corrector->CorrectDirections( estimated_transforms );
 
@@ -316,12 +301,16 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   // (6) Pass the corrected image to the filters output port
   //
   m_CurrentStep += 1;
-  this->GetOutput()->SetVectorImage(output->GetVectorImage());
-  this->GetOutput()->SetReferenceBValue(output->GetReferenceBValue());
-  this->GetOutput()->SetMeasurementFrame(output->GetMeasurementFrame());
-  this->GetOutput()->SetDirections(output->GetDirections());
-  this->GetOutput()->InitializeFromVectorImage();
+
+  this->GetOutput()->Initialize( output );
+
+  this->GetOutput()->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( output->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
+  this->GetOutput()->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>( output->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
+  this->GetOutput()->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(output->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
+
+  mitk::DiffusionPropertyHelper propertyHelper( this->GetOutput() );
+  propertyHelper.InitializeImage();
   this->GetOutput()->Modified();
 }
 
-#endif // MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_CPP
+#endif // MITKDWIHEADMOTIONCORRECTIONFILTER_CPP

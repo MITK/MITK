@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkImageCast.h>
-#include <mitkDiffusionImage.h>
+#include <mitkImage.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
 #include "mitkCommandLineParser.h"
@@ -60,12 +60,7 @@ int main(int argc, char* argv[])
         t_geom->SetIndexToWorldTransform(s_geom->GetIndexToWorldTransform());
         target->SetGeometry(t_geom);
 
-        if ( dynamic_cast<DiffusionImage<short>*>(target.GetPointer()) )
-        {
-            mitk::IOUtil::Save(dynamic_cast<DiffusionImage<short>*>(target.GetPointer()), outImage.c_str());
-        }
-        else
-            mitk::IOUtil::SaveImage(target, outImage);
+        mitk::IOUtil::Save(target.GetPointer(), outImage.c_str());
     }
     catch (itk::ExceptionObject e)
     {

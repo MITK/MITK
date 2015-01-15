@@ -626,6 +626,8 @@ IWorkbenchPage::Pointer WorkbenchWindow::GetPage(int i)
     }
     if (j==i)
         return *it;
+
+    return IWorkbenchPage::Pointer();
 }
 
 IWorkbenchPage::Pointer WorkbenchWindow::GetActivePage()

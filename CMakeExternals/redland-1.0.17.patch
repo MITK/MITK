@@ -1,0 +1,1051 @@
+diff -burN redland-1.0.17-orig/CMakeLists.txt redland-1.0.17-patched/CMakeLists.txt
+--- redland-1.0.17-orig/CMakeLists.txt	1970-01-01 01:00:00.000000000 +0100
++++ redland-1.0.17-patched/CMakeLists.txt	2014-11-26 14:03:18.518283855 +0100
+@@ -0,0 +1,298 @@
++# redland/CMakeLists.txt
++#
++# This file allows building Redland with the CMake configuration tool.
++# Download CMake in source or binary form from http://www.cmake.org/
++#
++# Based on the CMakeLists.txt file from Raptor.
++# This file is in the public domain.
++#
++
++SET(REDLAND_VERSION_MAJOR 1)
++SET(REDLAND_VERSION_MINOR 0)
++SET(REDLAND_VERSION_RELEASE 17)
++SET(REDLAND_MIN_VERSION_DECIMAL 10017)
++
++SET(VERSION "${REDLAND_VERSION_MAJOR}.${REDLAND_VERSION_MINOR}.${REDLAND_VERSION_RELEASE}")
++MATH(EXPR REDLAND_VERSION_DECIMAL "${REDLAND_VERSION_MAJOR} * 10000 + ${REDLAND_VERSION_MINOR} * 100 + ${REDLAND_VERSION_RELEASE}")
++
++PROJECT(redland C)
++
++CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
++
++SET(CMAKE_INCLUDE_CURRENT_DIR 1)
++
++SET(PROJECT_DESCRIPTION "Redland RDF API Library")
++
++################################################################
++
++# Third-party libraries
++
++SET(RAPTOR_MIN_VERSION 2.0.7)
++FIND_PACKAGE(Raptor2 ${RAPTOR_MIN_VERSION} REQUIRED)
++include_directories(${Raptor2_INCLUDE_DIR})
++
++set(rdf_parsers_available "raptor(${Raptor2_VERSION})")
++
++find_package(Rasqal REQUIRED)
++include_directories(${Rasqal_INCLUDE_DIR})
++
++set(rdf_query "rasqal(${Rasqal_VERSION})")
++
++################################################################
++
++# Configuration checks
++
++INCLUDE(CheckIncludeFile)
++INCLUDE(CheckIncludeFiles)
++INCLUDE(CheckFunctionExists)
++INCLUDE(CheckTypeSize)
++INCLUDE(CheckStructHasMember)
++INCLUDE(CheckCSourceCompiles)
++
++CHECK_INCLUDE_FILE(errno.h HAVE_ERRNO_H)
++CHECK_INCLUDE_FILE(stdlib.h HAVE_STDLIB_H)
++CHECK_INCLUDE_FILE(unistd.h HAVE_UNISTD_H)
++CHECK_INCLUDE_FILE(string.h HAVE_STRING_H)
++CHECK_INCLUDE_FILE(fcntl.h HAVE_FCNTL_H)
++CHECK_INCLUDE_FILE(getopt.h HAVE_GETOPT_H)
++CHECK_INCLUDE_FILE(stddef.h HAVE_STDDEF_H)
++CHECK_INCLUDE_FILE(memory.h HAVE_MEMORY_H)
++CHECK_INCLUDE_FILE(pthread.h HAVE_PTHREAD_H)
++
++CHECK_INCLUDE_FILE(sys/time.h HAVE_SYS_TIME_H)
++CHECK_INCLUDE_FILE(time.h HAVE_TIME_H)
++CHECK_INCLUDE_FILES("sys/time.h;time.h" TIME_WITH_SYS_TIME)
++
++CHECK_INCLUDE_FILE(sys/stat.h HAVE_SYS_STAT_H)
++
++CHECK_FUNCTION_EXISTS(access HAVE_ACCESS)
++CHECK_FUNCTION_EXISTS(_access HAVE__ACCESS)
++CHECK_FUNCTION_EXISTS(getopt HAVE_GETOPT)
++CHECK_FUNCTION_EXISTS(getopt_long HAVE_GETOPT_LONG)
++CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
++CHECK_FUNCTION_EXISTS(snprintf HAVE_SNPRINTF)
++CHECK_FUNCTION_EXISTS(_snprintf HAVE__SNPRINTF)
++CHECK_FUNCTION_EXISTS(strcasecmp HAVE_STRCASECMP)
++CHECK_FUNCTION_EXISTS(stricmp HAVE_STRICMP)
++CHECK_FUNCTION_EXISTS(_stricmp HAVE__STRICMP)
++CHECK_FUNCTION_EXISTS(strnicmp HAVE_STRNICMP)
++CHECK_FUNCTION_EXISTS(_strnicmp HAVE__STRNICMP)
++CHECK_FUNCTION_EXISTS(vasprintf HAVE_VASPRINTF)
++CHECK_FUNCTION_EXISTS(vsnprintf HAVE_VSNPRINTF)
++CHECK_FUNCTION_EXISTS(_vsnprintf HAVE__VSNPRINTF)
++CHECK_FUNCTION_EXISTS(opendir HAVE_OPENDIR)
++CHECK_FUNCTION_EXISTS(readdir HAVE_READDIR)
++CHECK_FUNCTION_EXISTS(shl_load HAVE_SHL_LOAD)
++CHECK_FUNCTION_EXISTS(strlcat HAVE_STRLCAT)
++CHECK_FUNCTION_EXISTS(strlcpy HAVE_STRLCPY)
++
++CHECK_FUNCTION_EXISTS(memcmp HAVE_MEMCMP)
++CHECK_FUNCTION_EXISTS(mkstemp HAVE_MKSTEMP)
++CHECK_FUNCTION_EXISTS(mktemp HAVE_MKTEMP)
++CHECK_FUNCTION_EXISTS(mktemp HAVE__MKTEMP)
++CHECK_FUNCTION_EXISTS(tmpnam HAVE_TMPNAM)
++CHECK_FUNCTION_EXISTS(getenv HAVE_GETENV)
++CHECK_FUNCTION_EXISTS(close HAVE_CLOSE)
++CHECK_FUNCTION_EXISTS(_close HAVE__CLOSE)
++CHECK_FUNCTION_EXISTS(unlink HAVE_UNLINK)
++CHECK_FUNCTION_EXISTS(_unlink HAVE__UNLINK)
++
++CHECK_TYPE_SIZE(byte BYTE)
++CHECK_TYPE_SIZE(u32 U32)
++CHECK_TYPE_SIZE(u64 U64)
++
++CHECK_TYPE_SIZE("unsigned char" SIZEOF_UNSIGNED_CHAR)
++CHECK_TYPE_SIZE("unsigned int" SIZEOF_UNSIGNED_INT)
++CHECK_TYPE_SIZE("unsigned long" SIZEOF_UNSIGNED_LONG)
++CHECK_TYPE_SIZE("unsigned long long" SIZEOF_UNSIGNED_LONG_LONG)
++
++CHECK_C_SOURCE_COMPILES("
++int main() {char *function_name = __func__; return 0;}"
++   HAVE___FUNC__
++)
++CHECK_C_SOURCE_COMPILES("
++int main() {char *function_name = __FUNCTION__; return 0;}"
++  HAVE___FUNCTION__
++)
++
++################################################################
++
++# User-configurable options
++#
++# (Note: The CMake GUI displays these in alphabetical order, regardless of
++# the order we use here)
++
++SET(BUILD_SHARED_LIBS OFF CACHE BOOL
++    "Build shared libraries instead of static ones.")
++
++#SET(REDLAND_ENABLE_TESTING TRUE CACHE BOOL
++#    "Enable unit tests")
++
++IF(BUILD_SHARED_LIBS)
++  SET(REDLAND_STATIC FALSE)
++ELSE()
++  SET(REDLAND_STATIC TRUE)
++ENDIF()
++
++# ---------- Threading -----------
++
++if(HAVE_PTHREAD_H)
++  set(WITH_THREADS OFF CACHE BOOL "With POSIX thread support")
++  if(WITH_THREADS)
++    set(CMAKE_THREAD_PREFER_PTHREAD)
++    find_package(Threads REQUIRED)
++    if(NOT CMAKE_USE_PTHREADS_INIT)
++      message(SEND_ERROR "POSIX pthread library not found")
++    endif()
++  endif()
++endif()
++
++
++########## ------- Storage Backends ------- ###########
++
++set(persistent_storages "file tstore mysql sqlite")
++set(persistent_store 0)
++set(all_storages memory file hashes trees mysql sqlite tstore postgresql virtuoso)
++set(always_available_storages memory file hashes trees)
++set(storages_enabled )
++
++set(ENABLE_ALL_STORAGES OFF CACHE BOOL "Use all available storages")
++
++# default availabilities and enablements
++foreach(storage ${all_storages})
++  set(${storage}_storage_available 0)
++  set(${storage}_storage 0)
++endforeach()
++foreach(storage ${always_available_storages})
++  set(${storage}_storage_available 1)
++  string(TOUPPER ${storage} storage_uc)
++  if(NOT ${storage} STREQUAL "memory")
++    set(ENABLE_${storage_uc} 1 CACHE BOOL "Use ${storage} storage backend")
++  endif()
++endforeach()
++set(ENABLE_MEMORY 1)
++
++# ----------- BerkeleyDB -------------
++
++set(bdb_available "Missing")
++set(bdb_version "n/a")
++set(storages_available ${always_available_storages})
++
++if(HAVE_LIBDB)
++  list(APPEND storages_available "hashes(bdb ${bdb_version})")
++endif()
++
++# ----------- MySql -------------
++
++set(ENABLE_MYSQL_INIT 0)
++set(libmysql_min_version 3.23.56)
++set(mysql_storage_available 0)
++
++find_program(MYSQL_CONFIG mysql_config)
++if(MYSQL_CONFIG)
++  execute_process(COMMAND ${MYSQL_CONFIG} --version
++    OUTPUT_VARIABLE LIBMYSQL_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE
++  )
++  message("mysql version: ${LIBMYSQL_VERSION}")
++  execute_process(COMMAND ${MYSQL_CONFIG} --libs
++    OUTPUT_VARIABLE LIBMYSQL_LIBRARIES OUTPUT_STRIP_TRAILING_WHITESPACE
++  )
++  execute_process(COMMAND ${MYSQL_CONFIG} --include
++    OUTPUT_VARIABLE LIBMYSQL_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE
++  )
++  string(REPLACE "-I" "" LIBMYSQL_INCLUDE_DIR ${LIBMYSQL_INCLUDE_DIR})
++  message("mysql include dir: ${LIBMYSQL_INCLUDE_DIR}")
++  list(APPEND storages_available "mysql(${LIBMYSQL_VERSION})")
++  set(ENABLE_MYSQL_INIT 1)
++  set(mysql_storage_available 1)
++endif()
++
++set(ENABLE_MYSQL ${ENABLE_MYSQL_INIT} CACHE BOOL "Use MySQL 3/4 storage backend")
++
++foreach(storage ${all_storages})
++  string(TOUPPER ${storage} storage_uc)
++  if(${storage}_storage_available AND
++     (ENABLE_${storage_uc} OR ENABLE_ALL_STORAGES))
++    set(STORAGE_${storage_uc} 1)
++    list(APPEND storages_enabled ${storage})
++    list(FIND persistent_storages ${storage} _index)
++    if(${_index} GREATER -1)
++      set(persistent_store 1)
++    endif()
++  endif()
++endforeach()
++
++if(NOT persistent_store)
++  message("WARNING: No persistant storage is available or enabled")
++endif()
++
++########## ------- Digest Modules ------- ###########
++
++set(digest_modules md5 sha1 ripemd160)
++set(digest_modules_available )
++
++set(digest_srcs )
++foreach(module ${digest_modules})
++  string(TOUPPER ${module} module_uc)
++  set(base rdf_digest_${module})
++  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/${base}.c)
++    set(HAVE_LOCAL_${module_uc}_DIGEST 1)
++    list(APPEND digest_srcs ${base}.c)
++    list(APPEND digest_modules_available ${module})
++  endif()
++endforeach()
++
++################################################################
++
++include(CMakePackageConfigHelpers)
++
++CONFIGURE_FILE(
++  src/rdf_config_cmake.h.in
++  src/rdf_config.h
++  @ONLY
++)
++
++ADD_DEFINITIONS(-DHAVE_CONFIG_H)
++
++#CONFIGURE_FILE(
++#  src/rasqal.h.in
++#  src/rasqal.h
++#  @ONLY
++#)
++
++set(INCLUDE_INSTALL_DIR include)
++set(LIB_INSTALL_DIR lib)
++set(BIN_INSTALL_DIR bin)
++set(CMAKE_INSTALL_DIR lib/redland/cmake)
++set(DATA_INSTALL_DIR share/redland)
++
++add_subdirectory(src)
++
++configure_package_config_file(RedlandConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/RedlandConfig.cmake
++  INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
++  PATH_VARS INCLUDE_INSTALL_DIR
++  NO_CHECK_REQUIRED_COMPONENTS_MACRO
++)
++
++write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/RedlandConfigVersion.cmake
++  VERSION ${VERSION}
++  COMPATIBILITY AnyNewerVersion
++)
++
++install(FILES
++  ${CMAKE_CURRENT_BINARY_DIR}/RedlandConfig.cmake
++  ${CMAKE_CURRENT_BINARY_DIR}/RedlandConfigVersion.cmake
++  DESTINATION ${CMAKE_INSTALL_DIR}
++)
++
++
++message("Redland configuration:
++  Oracle Berkeley DB (BDB) : ${bdb_available}
++  Triple stores available  : ${storages_available}
++  Triple stores enabled    : ${storages_enabled}
++  RDF parsers              : ${rdf_parsers_available}
++  RDF query                : ${rdf_query}
++  Content digests          : ${digest_modules_available}"
++)
++
++# end redland/CMakeLists.txt
+diff -burN redland-1.0.17-orig/RedlandConfig.cmake.in redland-1.0.17-patched/RedlandConfig.cmake.in
+--- redland-1.0.17-orig/RedlandConfig.cmake.in	1970-01-01 01:00:00.000000000 +0100
++++ redland-1.0.17-patched/RedlandConfig.cmake.in	2014-11-26 14:08:47.781299653 +0100
+@@ -0,0 +1,13 @@
++set(Redland_VERSION @VERSION@)
++
++@PACKAGE_INIT@
++
++set_and_check(Redland_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
++
++find_package(Raptor2 REQUIRED)
++find_package(Rasqal REQUIRED)
++list(APPEND Redland_INCLUDE_DIR ${Rasqal_INCLUDE_DIR} ${Raptor2_INCLUDE_DIR})
++
++if(NOT TARGET rdf AND EXISTS ${CMAKE_CURRENT_LIST_DIR}/RedlandTargets.cmake)
++  include(${CMAKE_CURRENT_LIST_DIR}/RedlandTargets.cmake)
++endif()
+diff -burN redland-1.0.17-orig/RedlandConfig.cmake.in~ redland-1.0.17-patched/RedlandConfig.cmake.in~
+--- redland-1.0.17-orig/RedlandConfig.cmake.in~	1970-01-01 01:00:00.000000000 +0100
++++ redland-1.0.17-patched/RedlandConfig.cmake.in~	2014-11-26 14:03:18.518283855 +0100
+@@ -0,0 +1,9 @@
++set(Redland_VERSION @VERSION@)
++
++@PACKAGE_INIT@
++
++set_and_check(Redland_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
++
++if(NOT TARGET rdf AND EXISTS ${CMAKE_CURRENT_LIST_DIR}/RedlandTargets.cmake)
++  include(${CMAKE_CURRENT_LIST_DIR}/RedlandTargets.cmake)
++endif()
+diff -burN redland-1.0.17-orig/src/CMakeLists.txt redland-1.0.17-patched/src/CMakeLists.txt
+--- redland-1.0.17-orig/src/CMakeLists.txt	1970-01-01 01:00:00.000000000 +0100
++++ redland-1.0.17-patched/src/CMakeLists.txt	2014-11-26 14:03:18.518283855 +0100
+@@ -0,0 +1,171 @@
++# redland/src/CMakeLists.txt
++#
++# Based on the src/CMakeLists.txt file from Raptor
++# This file is in the public domain.
++#
++
++set(public_headers
++  librdf.h
++  rdf_concepts.h
++  rdf_digest.h
++  rdf_hash.h
++  rdf_init.h
++  rdf_iterator.h
++  rdf_list.h
++  rdf_log.h
++  rdf_model.h
++  rdf_node.h
++  rdf_parser.h
++  rdf_query.h
++  rdf_raptor.h
++  rdf_serializer.h
++  rdf_statement.h
++  rdf_storage.h
++  rdf_storage_module.h
++  rdf_stream.h
++  rdf_uri.h
++  rdf_utf8.h
++  redland.h
++)
++
++set(internal_headers
++  rdf_concepts_internal.h
++  rdf_digest_internal.h
++  rdf_files.h
++  rdf_hash_internal.h
++  rdf_heuristics.h
++  rdf_init_internal.h
++  rdf_internal.h
++  rdf_iterator_internal.h
++  rdf_list_internal.h
++  rdf_log_internal.h
++  rdf_model_internal.h
++  rdf_node_internal.h
++  rdf_parser_internal.h
++  rdf_query_internal.h
++  rdf_raptor_internal.h
++  rdf_serializer_internal.h
++  rdf_statement_internal.h
++  rdf_storage_internal.h
++  rdf_stream_internal.h
++  rdf_types.h
++  rdf_uri_internal.h
++)
++
++set(srcs
++  rdf_concepts.c
++  rdf_digest.c
++  rdf_files.c
++  rdf_hash.c
++  rdf_hash_cursor.c
++  rdf_hash_memory.c
++  rdf_heuristics.c
++  rdf_init.c
++  rdf_iterator.c
++  rdf_list.c
++  rdf_log.c
++  rdf_model.c
++  rdf_model_storage.c
++  rdf_node_common.c
++  rdf_node.c
++  rdf_parser.c
++  rdf_parser_raptor.c
++  rdf_query.c
++  rdf_query_rasqal.c
++  rdf_query_results.c
++  rdf_raptor.c
++  rdf_serializer.c
++  rdf_serializer_raptor.c
++  rdf_statement.c
++  rdf_statement_common.c
++  rdf_storage.c
++  rdf_storage_sql.c
++  rdf_stream.c
++  rdf_uri.c
++  rdf_utf8.c
++  ${digest_srcs}
++  ${internal_headers}
++)
++
++if(NOT HAVE_MEMCMP)
++  list(APPEND srcs memcmp.c)
++endif()
++
++# Storages always built-in
++list(APPEND srcs rdf_storage_list.c rdf_storage_hashes.c rdf_storage_trees.c)
++if(STORAGE_FILE)
++  list(APPEND srcs rdf_storage_file.c)
++endif()
++
++set(storage_libs )
++if(STORAGE_TSTORE)
++  list(APPEND srcs rdf_storage_tstore.c)
++endif()
++if(STORAGE_MYSQL)
++  list(APPEND srcs rdf_storage_mysql.c)
++  include_directories(${LIBMYSQL_INCLUDE_DIR})
++  list(APPEND storage_libs ${LIBMYSQL_LIBRARIES})
++  INSTALL(FILES mysql-v1.ttl mysql-v2.ttl
++    DESTINATION ${DATA_INSTALL_DIR}
++  )
++endif()
++if(STORAGE_SQLITE)
++  list(APPEND srcs rdf_storage_sqlite.c)
++endif()
++if(STORAGE_POSTGRESQL)
++  list(APPEND srcs rdf_storage_postgresql.c)
++endif()
++if(STORAGE_VIRTUOSO)
++  list(APPEND srcs rdf_storage_virtuoso.c rdf_query_virtuoso.c rdf_storage_virtuoso_internal.h)
++endif()
++
++add_library(rdf ${srcs})
++
++target_link_libraries(rdf raptor2 rasqal ${storage_libs})
++if(WITH_THREADS)
++  target_link_libraries(rdf ${CMAKE_THREAD_LIBS_INIT})
++endif()
++
++SET_TARGET_PROPERTIES(
++  rdf
++  PROPERTIES
++  COMPILE_DEFINITIONS "LIBRDF_INTERNAL;PKGDATADIR=\"${CMAKE_INSTALL_PREFIX}/${DATA_INSTALL_DIR}\""
++  PUBLIC_HEADER "${public_headers}"
++)
++
++# Generate pkg-config metadata file
++#
++FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/redland.pc
++"prefix=${CMAKE_INSTALL_PREFIX}
++exec_prefix=\${prefix}
++libdir=\${exec_prefix}/${LIB_INSTALL_DIR}
++includedir=\${prefix}/${INCLUDE_INSTALL_DIR}
++
++have_raptor2_api=1
++
++Name: ${PROJECT_DESCRIPTION}
++Description: Redland RDF API and triple store library
++Requires.private: raptor2 >= ${RAPTOR_MIN_VERSION}, rasqal >= ${RASQAL_MIN_VERSION}, rasqal <= 0.9.99
++Version: ${VERSION}
++Libs: -L\${libdir} -lrdf
++Libs.private: -ldl
++Cflags: -I\${includedir}
++")
++
++INSTALL(FILES
++  ${CMAKE_CURRENT_BINARY_DIR}/redland.pc
++  DESTINATION ${LIB_INSTALL_DIR}/pkgconfig
++)
++
++INSTALL(
++  TARGETS rdf
++  EXPORT  RedlandTargets
++  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
++  LIBRARY DESTINATION ${LIB_INSTALL_DIR}
++  RUNTIME DESTINATION ${BIN_INSTALL_DIR}
++  PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}
++)
++
++INSTALL(EXPORT RedlandTargets DESTINATION ${CMAKE_INSTALL_DIR})
++
++# end redland/src/CMakeLists.txt
+diff -burN redland-1.0.17-orig/src/rdf_config_cmake.h.in redland-1.0.17-patched/src/rdf_config_cmake.h.in
+--- redland-1.0.17-orig/src/rdf_config_cmake.h.in	1970-01-01 01:00:00.000000000 +0100
++++ redland-1.0.17-patched/src/rdf_config_cmake.h.in	2014-11-26 14:03:18.519283855 +0100
+@@ -0,0 +1,508 @@
++/* src/rdf_config_cmake.h.in.*/
++
++/* Release version as a decimal */
++#define LIBRDF_VERSION_DECIMAL @REDLAND_VERSION_DECIMAL@
++
++/* Major version number */
++#define LIBRDF_VERSION_MAJOR @REDLAND_VERSION_MAJOR@
++
++/* Minor version number */
++#define LIBRDF_VERSION_MINOR @REDLAND_VERSION_MINOR@
++
++/* Release version number */
++#define LIBRDF_VERSION_RELEASE @REDLAND_VERSION_RELEASE@
++
++/* ---------- package information ------------ */
++
++/* Name of package */
++#define PACKAGE @PROJECT_NAME@
++
++/* Define to the address where bug reports for this package should be sent. */
++#define PACKAGE_BUGREPORT "http://bugs.librdf.org/"
++
++/* Define to the full name of this package. */
++#define PACKAGE_NAME "@PROJECT_DESCRIPTION@"
++
++/* Define to the full name and version of this package. */
++#define PACKAGE_STRING "@PROJECT_DESCRIPTION@ @VERSION@"
++
++/* Define to the one symbol short name of this package. */
++#define PACKAGE_TARNAME librdf
++
++/* Define to the home page for this package. */
++#define PACKAGE_URL ""
++
++/* Define to the version of this package. */
++#define PACKAGE_VERSION "@VERSION@"
++
++/* Version number of package */
++#define VERSION "@VERSION@"
++
++/* Define if building universal (internal helper macro) */
++#cmakedefine AC_APPLE_UNIVERSAL_BUILD
++
++/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
++   significant byte first (like Motorola and SPARC, unlike Intel). */
++#if defined AC_APPLE_UNIVERSAL_BUILD
++# if defined __BIG_ENDIAN__
++#  define WORDS_BIGENDIAN 1
++# endif
++#else
++# ifndef WORDS_BIGENDIAN
++#  undef WORDS_BIGENDIAN
++# endif
++#endif
++
++/* ------------ header availability --------------- */
++
++/* Define to 1 if you have the <db.h> header file. */
++#cmakedefine HAVE_DB_H
++
++/* Define to 1 if you have the <dirent.h> header file. */
++#cmakedefine HAVE_DIRENT_H
++
++/* Define to 1 if you have the <dld.h> header file. */
++#cmakedefine HAVE_DLD_H
++
++/* Define to 1 if you have the <dlfcn.h> header file. */
++#cmakedefine HAVE_DLFCN_H
++
++/* Define to 1 if you have the <dl.h> header file. */
++#cmakedefine HAVE_DL_H
++
++/* Define if you have the _dyld_func_lookup function. */
++#cmakedefine HAVE_DYLD
++
++/* Define to 1 if you have the <errno.h> header file. */
++#cmakedefine HAVE_ERRNO_H
++
++/* Define to 1 if you have the <fcntl.h> header file. */
++#cmakedefine HAVE_FCNTL_H
++
++/* Define to 1 if you have the <getopt.h> header file. */
++#cmakedefine HAVE_GETOPT_H
++
++/* Define to 1 if you have the <inttypes.h> header file. */
++#cmakedefine HAVE_INTTYPES_H
++
++/* Define to 1 if you have the <libpq-fe.h> header file. */
++#cmakedefine HAVE_LIBPQ_FE_H
++
++/* Define to 1 if you have the <mach-o/dyld.h> header file. */
++#cmakedefine HAVE_MACH_O_DYLD_H
++
++/* Define to 1 if you have the <memory.h> header file. */
++#cmakedefine HAVE_MEMORY_H
++
++/* Define to 1 if you have the <pthread.h> header file. */
++#cmakedefine HAVE_PTHREAD_H
++
++/* Define to 1 if you have the <sqlite3.h> header file. */
++#cmakedefine HAVE_SQLITE3_H
++
++/* Define to 1 if you have the <sqlite.h> header file. */
++#cmakedefine HAVE_SQLITE_H
++
++/* Define to 1 if you have the <stddef.h> header file. */
++#cmakedefine HAVE_STDDEF_H
++
++/* Define to 1 if you have the <stdint.h> header file. */
++#cmakedefine HAVE_STDINT_H
++
++/* Define to 1 if you have the <stdlib.h> header file. */
++#cmakedefine HAVE_STDLIB_H
++
++/* Define to 1 if you have the <strings.h> header file. */
++#cmakedefine HAVE_STRINGS_H
++
++/* Define to 1 if you have the <string.h> header file. */
++#cmakedefine HAVE_STRING_H
++
++/* Define to 1 if you have the <sys/dl.h> header file. */
++#cmakedefine HAVE_SYS_DL_H
++
++/* Define to 1 if you have the <sys/stat.h> header file. */
++#cmakedefine HAVE_SYS_STAT_H
++
++/* Define to 1 if you have the <sys/time.h> header file. */
++#cmakedefine01 HAVE_SYS_TIME_H
++
++/* Define to 1 if you have the <sys/types.h> header file. */
++#cmakedefine HAVE_SYS_TYPES_H
++
++/* Define to 1 if you have the <time.h> header file. */
++#cmakedefine HAVE_TIME_H
++
++/* Define to 1 if you have the <unistd.h> header file. */
++#cmakedefine HAVE_UNISTD_H
++
++
++/* --------- feature availability ------------ */
++
++/* Define so that glibc/gnulib argp.h does not typedef error_t. */
++#undef __error_t_defined
++
++/* Define to a type to use for `error_t' if it is not otherwise available. */
++#undef error_t
++
++/* BDB has close method with 2 args */
++#cmakedefine HAVE_BDB_CLOSE_2_ARGS
++
++/* BDB defines DBC */
++#cmakedefine HAVE_BDB_CURSOR
++
++/* BDB cursor method has 4 arguments */
++#cmakedefine HAVE_BDB_CURSOR_4_ARGS
++
++/* BDB defines DB_TXN */
++#cmakedefine HAVE_BDB_DB_TXN
++
++/* BDB has fd method with 2 args */
++#cmakedefine HAVE_BDB_FD_2_ARGS
++
++/* Have BDB hash support */
++#cmakedefine HAVE_BDB_HASH
++
++/* BDB has open method with 6 args */
++#cmakedefine HAVE_BDB_OPEN_6_ARGS
++
++/* BDB has open method with 7 args */
++#cmakedefine HAVE_BDB_OPEN_7_ARGS
++
++/* BDB has set_flags method */
++#cmakedefine HAVE_BDB_SET_FLAGS
++
++/* Define to 1 if the system has the type `byte'. */
++#cmakedefine HAVE_BYTE
++
++/* Define if you have the GNU dld library. */
++#cmakedefine HAVE_DLD
++
++/* Have local MD5 digest */
++#cmakedefine HAVE_LOCAL_MD5_DIGEST
++
++/* Have local RIPEMD160 digest */
++#cmakedefine HAVE_LOCAL_RIPEMD160_DIGEST
++
++/* Have local SHA1 digest */
++#cmakedefine HAVE_LOCAL_SHA1_DIGEST
++
++/* Define this if a modern libltdl is already installed */
++#cmakedefine HAVE_LTDL
++
++/* Define if you have the libdl library or equivalent. */
++#cmakedefine HAVE_LIBDL
++
++/* Define if libdlloader will be built on this platform */
++#cmakedefine HAVE_LIBDLLOADER
++
++/* have MYSQL_OPT_RECONNECT declared */
++#cmakedefine HAVE_MYSQL_OPT_RECONNECT
++
++/* Define if libtool can extract symbol lists from object files. */
++#cmakedefine HAVE_PRELOADED_SYMBOLS
++
++/* Define to 1 if the system has the type `u32'. */
++#cmakedefine HAVE_U32
++
++/* Define to 1 if the system has the type `u64'. */
++#cmakedefine HAVE_U64
++
++/* This value is set to 1 to indicate that the system argz facility works */
++#cmakedefine HAVE_WORKING_ARGZ
++
++/* Run time assertion checks. */
++#cmakedefine LIBRDF_ASSERT
++
++/* Print run time assertion check failure messages. */
++#cmakedefine LIBRDF_ASSERT_MESSAGES
++
++/* Define if the OS needs help to load dependent libraries for dlopen(). */
++#cmakedefine LTDL_DLOPEN_DEPLIBS
++
++/* Define to the system default library search path. */
++#cmakedefine LT_DLSEARCH_PATH
++
++/* The archive extension */
++#cmakedefine LT_LIBEXT
++
++/* The archive prefix */
++#cmakedefine LT_LIBPREFIX
++
++/* Define to the extension used for runtime loadable modules, say, ".so". */
++#cmakedefine LT_MODULE_EXT
++
++/* Define to the name of the environment variable that determines the run-time
++   module search path. */
++#cmakedefine LT_MODULE_PATH_VAR
++
++/* Define to the sub-directory in which libtool stores uninstalled libraries.
++   */
++#cmakedefine LT_OBJDIR
++
++/* Define to the shared library suffix, say, ".dylib". */
++#cmakedefine LT_SHARED_EXT
++
++/* Build storage backends as modules */
++#cmakedefine MODULAR_LIBRDF
++
++/* Define if dlsym() requires a leading underscore in symbol names. */
++#cmakedefine NEED_USCORE
++
++/* Define to 1 if your C compiler doesn't accept -c and -o together. */
++#cmakedefine NO_MINUS_C_MINUS_O
++
++
++/* The size of `unsigned char', as computed by sizeof. */
++#define SIZEOF_UNSIGNED_CHAR @SIZEOF_UNSIGNED_CHAR@
++
++/* The size of `unsigned int', as computed by sizeof. */
++#define SIZEOF_UNSIGNED_INT @SIZEOF_UNSIGNED_INT@
++
++/* The size of `unsigned long', as computed by sizeof. */
++#define SIZEOF_UNSIGNED_LONG @SIZEOF_UNSIGNED_LONG@
++
++/* The size of `unsigned long long', as computed by sizeof. */
++#define SIZEOF_UNSIGNED_LONG_LONG @SIZEOF_UNSIGNED_LONG_LONG@
++
++/* define to SQLINTEGER if not defined in the ODBC headers */
++#cmakedefine SQLLEN
++
++/* define to SQLUINTEGER if not defined in the ODBC headers */
++#cmakedefine SQLULEN
++
++/* Define to 1 if you have the ANSI C header files. */
++#cmakedefine STDC_HEADERS
++
++/* Building file storage */
++#cmakedefine STORAGE_FILE
++
++/* Building hashes storage */
++#cmakedefine STORAGE_HASHES
++
++/* Building memory storage */
++#cmakedefine STORAGE_MEMORY
++
++/* Building MySQL storage */
++#cmakedefine STORAGE_MYSQL
++
++/* Building PostgreSQL storage */
++#cmakedefine STORAGE_POSTGRESQL
++
++/* Building SQLite storage */
++#cmakedefine STORAGE_SQLITE
++
++/* Building trees storage */
++#cmakedefine STORAGE_TREES
++
++/* Building 3store storage */
++#cmakedefine STORAGE_TSTORE
++
++/* Building Virtuoso storage */
++#cmakedefine STORAGE_VIRTUOSO
++
++/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
++#cmakedefine01 TIME_WITH_SYS_TIME
++
++/* Use POSIX threads */
++#cmakedefine WITH_THREADS
++
++/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
++   significant byte first (like Motorola and SPARC, unlike Intel). */
++#if defined AC_APPLE_UNIVERSAL_BUILD
++# if defined __BIG_ENDIAN__
++#  define WORDS_BIGENDIAN 1
++# endif
++#else
++# ifndef WORDS_BIGENDIAN
++#  undef WORDS_BIGENDIAN
++# endif
++#endif
++
++/* --------- function availability ----------- */
++
++/* Define to 1 if you have the `argz_add' function. */
++#cmakedefine HAVE_ARGZ_ADD
++
++/* Define to 1 if you have the `argz_append' function. */
++#cmakedefine HAVE_ARGZ_APPEND
++
++/* Define to 1 if you have the `argz_count' function. */
++#cmakedefine HAVE_ARGZ_COUNT
++
++/* Define to 1 if you have the `argz_create_sep' function. */
++#cmakedefine HAVE_ARGZ_CREATE_SEP
++
++/* Define to 1 if you have the <argz.h> header file. */
++#cmakedefine HAVE_ARGZ_H
++
++/* Define to 1 if you have the `argz_insert' function. */
++#cmakedefine HAVE_ARGZ_INSERT
++
++/* Define to 1 if you have the `argz_next' function. */
++#cmakedefine HAVE_ARGZ_NEXT
++
++/* Define to 1 if you have the `argz_stringify' function. */
++#cmakedefine HAVE_ARGZ_STRINGIFY
++
++/* Define to 1 if you have the `closedir' function. */
++#cmakedefine HAVE_CLOSEDIR
++
++/* BDB has dbopen method */
++#cmakedefine HAVE_DBOPEN
++
++/* BDB has db_create method */
++#cmakedefine HAVE_DB_CREATE
++
++/* BDB has db_open method */
++#cmakedefine HAVE_DB_OPEN
++
++/* Define to 1 if you have the declaration of `cygwin_conv_path', and to 0 if
++   you don't. */
++#cmakedefine HAVE_DECL_CYGWIN_CONV_PATH
++
++/* Define to 1 if you have the `dlerror' function. */
++#cmakedefine HAVE_DLERROR
++
++/* Define to 1 if the system has the type `error_t'. */
++#cmakedefine HAVE_ERROR_T
++
++/* Define to 1 if you have the `getenv' function. */
++#cmakedefine HAVE_GETENV
++
++/* Define to 1 if you have the `getopt' function. */
++#cmakedefine HAVE_GETOPT
++
++/* Define to 1 if you have the `getopt_long' function. */
++#cmakedefine HAVE_GETOPT_LONG
++
++/* Define to 1 if you have the `gettimeofday' function. */
++#cmakedefine HAVE_GETTIMEOFDAY
++
++#cmakedefine HAVE_ACCESS
++#cmakedefine HAVE__ACCESS
++#cmakedefine HAVE_SNPRINTF
++#cmakedefine HAVE__SNPRINTF
++#cmakedefine HAVE_STRCASECMP
++#cmakedefine HAVE_STRICMP
++#cmakedefine HAVE__STRICMP
++#cmakedefine HAVE_STRNICMP
++#cmakedefine HAVE__STRNICMP
++#cmakedefine HAVE_VASPRINTF
++#cmakedefine HAVE_VSNPRINTF
++#cmakedefine HAVE__VSNPRINTF
++
++/* Define to 1 if you have the `memcmp' function. */
++#cmakedefine HAVE_MEMCMP
++
++/* Define to 1 if you have the `mkstemp' function. */
++#cmakedefine HAVE_MKSTEMP
++
++/* Define to 1 if you have the `mktemp' function. */
++#cmakedefine HAVE_MKTEMP
++#cmakedefine HAVE__MKTEMP
++
++/* Define to 1 if you have the `opendir' function. */
++#cmakedefine HAVE_OPENDIR
++
++/* Define to 1 if you have the `readdir' function. */
++#cmakedefine HAVE_READDIR
++
++/* Define if you have the shl_load function. */
++#cmakedefine HAVE_SHL_LOAD
++
++/* Define to 1 if you have the `strlcat' function. */
++#cmakedefine HAVE_STRLCAT
++
++/* Define to 1 if you have the `strlcpy' function. */
++#cmakedefine HAVE_STRLCPY
++
++/* Define to 1 if you have the `tmpnam' function. */
++#cmakedefine HAVE_TMPNAM
++
++#cmakedefine HAVE_CLOSE
++#cmakedefine HAVE__CLOSE
++
++#cmakedefine HAVE_UNLINK
++#cmakedefine HAVE__UNLINK
++
++
++/* --------- WIN32 config ----------- */
++
++#ifdef WIN32
++
++# ifdef __cplusplus
++  extern "C" {
++# endif
++
++# define WIN32_LEAN_AND_MEAN 1
++# define _CRT_NONSTDC_NO_DEPRECATE
++# define _CRT_SECURE_NO_DEPRECATE
++
++
++  /* MS names for these functions */
++  // next line breaks build on wntmsci12
++  //#define vsnprintf _vsnprintf
++# if !defined(HAVE_SNPRINTF) && defined(HAVE__SNPRINTF)
++#   define snprintf _snprintf
++# endif
++# if !defined(HAVE_STRICMP) && defined(HAVE__STRICMP)
++#   define stricmp _stricmp
++# endif
++# if !defined(HAVE_STRNICMP) && defined(HAVE__STRNICMP)
++#   define strnicmp _strnicmp
++# endif
++
++# if !defined(HAVE_CLOSE) && defined(HAVE__CLOSE)
++#   define close _close
++# endif
++# if !defined(HAVE_UNLINK) && defined(HAVE__UNLINK)
++#   define unlink _unlink
++# endif
++# if !defined(HAVE_MKTEMP) && defined(HAVE__MKTEMP)
++#   define mktemp _mktemp
++# endif
++
++/* Define the following if you are calling the librdf from C# or any language which uses stdcall */
++#define USE_STDCALL_CALLBACKS 1
++
++/* for access() which is POSIX but doesn't seem to have the defines in VC */
++# ifndef R_OK
++# define F_OK 0
++# define R_OK 4
++# endif
++
++# ifdef _MSC_VER
++#   if (_MSC_VER >= 1300) && !defined(__func__)
++#     define __func__ __FUNCTION__
++#     define HAVE___FUNC__
++#   elif !defined(__func__)
++      /* better than nothing */
++#     define rasqal_str(s) #s
++#     define __func__ "func@" __FILE__ ":" rasqal_str(__LINE__)
++#   endif
++# endif
++
++# if !defined(HAVE_ACCESS) && defined(HAVE__ACCESS)
++#   define access(p,m) _access(p,m)
++# endif
++
++# undef REDLAND_INLINE
++# define REDLAND_INLINE __inline
++
++# include <windows.h>
++# include <io.h>
++# include <stdio.h>
++# include <process.h>
++
++  /* get _isnan() since it is not in math.h */
++# include <float.h>
++# ifndef isnan
++# define isnan(d) (_isnan(d))
++# endif
++
++# ifdef __cplusplus
++  }
++# endif
++
++#endif
+diff -burN redland-1.0.17-orig/src/win32_rdf_config.h redland-1.0.17-patched/src/win32_rdf_config.h
+--- redland-1.0.17-orig/src/win32_rdf_config.h	2013-12-28 17:31:20.000000000 +0100
++++ redland-1.0.17-patched/src/win32_rdf_config.h	2014-11-26 14:03:18.520283855 +0100
+@@ -21,6 +21,7 @@
+  *
+  */
+ 
++#if 0
+ #ifndef WIN32_RDF_CONFIG_H
+ #define WIN32_RDF_CONFIG_H
+ 
+@@ -300,3 +301,4 @@
+ #endif
+ 
+ #endif
++#endif
+diff -burN redland-1.0.17-orig/src/win32_rdf_config.h.in redland-1.0.17-patched/src/win32_rdf_config.h.in
+--- redland-1.0.17-orig/src/win32_rdf_config.h.in	2013-04-05 19:17:40.000000000 +0200
++++ redland-1.0.17-patched/src/win32_rdf_config.h.in	2014-11-26 14:03:18.521283855 +0100
+@@ -21,6 +21,7 @@
+  *
+  */
+ 
++#if 0
+ #ifndef WIN32_RDF_CONFIG_H
+ #define WIN32_RDF_CONFIG_H
+ 
+@@ -300,3 +301,4 @@
+ #endif
+ 
+ #endif
++#endif

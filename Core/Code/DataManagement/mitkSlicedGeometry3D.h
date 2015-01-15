@@ -309,13 +309,23 @@ namespace mitk {
     * number of slices due to rotation. */
     //mitk::NavigationController *m_NavigationController;
     mitk::SliceNavigationController *m_SliceNavigationController;
-  private:
 
+
+
+    //##Documentation
+    //## @brief Pre- and Post-functions are empty in BaseGeometry
+    //##
+    //## These virtual functions allow for a different beahiour in subclasses.
+    //## Do implement them in every subclass. If not needed, use {}.
+    virtual void PostInitialize(){};
+    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * newGeometry) const{};
+    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM){};
+    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* transform){};
+    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform){};
     virtual void PreSetBounds(const BoundsArrayType& /*bounds*/){};
 
-        /**
+    /**
     * \brief Set the spacing (m_Spacing), in direction of the plane normal.
-    *
     */
     virtual void PreSetSpacing( const mitk::Vector3D &aSpacing );
   };

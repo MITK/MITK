@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDIFFUSIONIOMIMETYPES_H
 
 #include "mitkCustomMimeType.h"
+#include <MitkDiffusionIOExports.h>
 
 #include <string>
 
@@ -26,6 +27,14 @@ namespace mitk {
 class DiffusionIOMimeTypes
 {
 public:
+
+  class MitkDiffusionIO_EXPORT DwiMimeType : public CustomMimeType
+  {
+  public:
+    DwiMimeType();
+    virtual bool AppliesTo(const std::string &path) const;
+    virtual DwiMimeType* Clone() const;
+  };
 
   // Get all Diffusion Mime Types
   static std::vector<CustomMimeType*> Get();
@@ -40,7 +49,7 @@ public:
 
   // ------------------------- Image formats (ITK based) --------------------------
 
-  static CustomMimeType DWI_MIMETYPE(); // dwi, hdwi
+  static DwiMimeType DWI_MIMETYPE(); // dwi, hdwi
   static CustomMimeType DTI_MIMETYPE(); // dti, hdti
   static CustomMimeType QBI_MIMETYPE(); // qbi, hqbi
 

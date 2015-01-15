@@ -140,7 +140,15 @@ namespace itk
 
     //void GenerateData();
 
-    GradientListPointerType              m_GradientList;
+    virtual void UpdateOutputInformation();
+
+
+  private:
+
+    TensorImageToDiffusionImageFilter (const Self&);
+    void operator=(const Self&);
+
+    GradientListType::Pointer            m_GradientList;
     double                               m_BValue;
     typename BaselineImageType::Pointer  m_BaselineImage;
 
@@ -148,11 +156,6 @@ namespace itk
     OutputScalarType                     m_Max;
 
     MaskImageType::Pointer               m_MaskImage;
-
-  private:
-
-    TensorImageToDiffusionImageFilter (const Self&);
-    void operator=(const Self&);
 
   };
 

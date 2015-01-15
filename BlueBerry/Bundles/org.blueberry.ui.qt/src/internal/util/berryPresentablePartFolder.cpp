@@ -35,7 +35,7 @@ PresentablePartFolder::ContentProxyListener::ContentProxyListener(
 
 GuiTk::IControlListener::Events::Types PresentablePartFolder::ContentProxyListener::GetEventTypes() const
 {
-  return Events::MOVED & Events::RESIZED;
+  return static_cast<GuiTk::IControlListener::Events::Types>(Events::MOVED & Events::RESIZED);
 }
 
 void PresentablePartFolder::ContentProxyListener::ControlMoved(

@@ -48,7 +48,6 @@ private slots:
   void OnStep(bool renderWindowUpdate);
   void OnStepButtonClicked();
   void OnTimeout();
-  void OnButtonClicked();
 
 private:
   void OnNodeRemovedFromDataStorage(const mitk::DataNode* node);

@@ -39,13 +39,14 @@ public:
   typedef std::set<Overlay::Pointer> OverlaySet;
   typedef std::map<const std::string,AbstractOverlayLayouter::Pointer > LayouterMap;
   typedef std::map<const BaseRenderer*,LayouterMap > LayouterRendererMap;
+  typedef std::map<const BaseRenderer*,vtkSmartPointer<vtkRenderer> > ForegroundRendererMap;
 
   mitkClassMacro(OverlayManager, itk::LightObject);
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  void AddOverlay(const Overlay::Pointer& overlay);
-  void AddOverlay(const Overlay::Pointer& overlay, BaseRenderer* renderer);
+  void AddOverlay(const Overlay::Pointer& overlay, bool ForceInForeground = true);
+  void AddOverlay(const Overlay::Pointer& overlay, BaseRenderer* renderer, bool ForceInForeground = true);
   void RemoveOverlay(const Overlay::Pointer& overlay);
 
   /** \brief Clears the manager of all Overlays.*/
@@ -69,6 +70,9 @@ public:
   void UpdateOverlays(BaseRenderer *baseRenderer);
 
   void RemoveBaseRenderer(mitk::BaseRenderer *renderer);
+
+  void RemoveAllBaseRenderers();
+
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */
@@ -83,6 +87,8 @@ private:
   BaseRendererSet m_BaseRendererSet;
 
   LayouterRendererMap m_LayouterMap;
+
+  ForegroundRendererMap m_ForegroundRenderer;
 
   /** \brief copy constructor */
   OverlayManager( const OverlayManager &);

@@ -790,7 +790,8 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
   return true;
 }
 
-bool mitk::Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose )
+bool mitk::Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType /*eps*/, bool /*verbose*/ )
 {
+  // FIXME: use eps and verbose
   return leftHandSide.Equals(rightHandSide);
 }

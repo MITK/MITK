@@ -3,6 +3,10 @@
 # Convenient macro allowing to download a file
 #-----------------------------------------------------------------------------
 
+if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL)
+  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL http://mitk.org/download/thirdparty)
+endif()
+
 macro(downloadFile url dest)
   file(DOWNLOAD ${url} ${dest} STATUS status)
   list(GET status 0 error_code)
@@ -31,6 +35,19 @@ if(UNIX AND NOT APPLE)
 
 endif()
 
+# We need a proper patch program. On Linux and MacOS, we assume
+# that "patch" is available. On Windows, we download patch.exe
+# if not patch program is found.
+find_program(PATCH_COMMAND patch)
+if((NOT PATCH_COMMAND OR NOT EXISTS ${PATCH_COMMAND}) AND WIN32)
+  downloadFile(${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/patch.exe
+               ${CMAKE_CURRENT_BINARY_DIR}/patch.exe)
+  find_program(PATCH_COMMAND patch ${CMAKE_CURRENT_BINARY_DIR})
+endif()
+if(NOT PATCH_COMMAND)
+  message(FATAL_ERROR "No patch program found.")
+endif()
+
 #-----------------------------------------------------------------------------
 # Qt options for external projects and MITK
 #-----------------------------------------------------------------------------
@@ -50,6 +67,7 @@ endif()
 # ExternalProjects
 #-----------------------------------------------------------------------------
 
+# These are ordered by dependencies
 set(external_projects
   ZLIB
   Python
@@ -75,12 +93,13 @@ set(external_projects
   Swig
   SimpleITK
   Eigen
+  raptor2
+  rasqal
+  redland
   )
 
 # These are "hard" dependencies and always set to ON
 set(MITK_USE_tinyxml 1)
-set(MITK_USE_ANN 1)
-set(MITK_USE_Eigen 1)
 set(MITK_USE_GLEW 1)
 set(MITK_USE_GDCM 1)
 set(MITK_USE_ITK 1)
@@ -89,6 +108,14 @@ set(MITK_USE_VTK 1)
 # Semi-hard dependencies, enabled by user-controlled variables
 if(MITK_USE_QT)
   set(MITK_USE_Qwt 1)
+endif()
+
+if(MITK_USE_Redland)
+  set(REDLAND_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/Redland-install)
+  set(MITK_USE_raptor2 1)
+  set(MITK_USE_PCRE 1)
+  set(MITK_USE_rasqal 1)
+  set(MITK_USE_redland 1)
 endif()
 
 if(MITK_USE_SOFA)
@@ -164,10 +191,6 @@ set(ep_source_dir ${ep_base}/Source)
 set(ep_build_shared_libs ON)
 set(ep_build_testing OFF)
 
-if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL)
-  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL http://mitk.org/download/thirdparty)
-endif()
-
 # Compute -G arg for configuring external projects with the same CMake generator:
 if(CMAKE_EXTRA_GENERATOR)
   set(gen "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
@@ -242,19 +265,23 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_ALL_APPS
   MITK_BUILD_TUTORIAL # Deprecated. Use MITK_BUILD_EXAMPLES instead
   MITK_BUILD_EXAMPLES
+
   MITK_USE_ACVD
-  MITK_USE_CppUnit
-  MITK_USE_GLEW
-  MITK_USE_Boost
-  MITK_USE_SYSTEM_Boost
+  MITK_USE_ANN
   MITK_USE_BLUEBERRY
+  MITK_USE_Boost
+  MITK_USE_CppUnit
   MITK_USE_CTK
   MITK_USE_DCMTK
+  MITK_USE_Eigen
+  MITK_USE_GLEW
+  MITK_USE_OpenCL
   MITK_USE_OpenCV
   MITK_USE_Poco
-  MITK_USE_SOFA
   MITK_USE_Python
-  MITK_USE_OpenCL
+  MITK_USE_Redland
+  MITK_USE_SOFA
+  MITK_USE_SYSTEM_Boost
 
   MITK_ENABLE_PIC_READER
   )
@@ -299,6 +326,11 @@ ExternalProject_Add(${proj}
     ${DCMTK_DEPENDS}
     ${OpenCV_DEPENDS}
     ${Poco_DEPENDS}
+    ${PCRE_DEPENDS}
+    ${Swig_DEPENDS}
+    ${raptor2_DEPENDS}
+    ${rasqal_DEPENDS}
+    ${redland_DEPENDS}
     ${SOFA_DEPENDS}
     ${MITK-Data_DEPENDS}
     ${Qwt_DEPENDS}
@@ -348,7 +380,6 @@ if(MITK_USE_Python)
        -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
        -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
        -DMITK_USE_SYSTEM_PYTHON:BOOL=${MITK_USE_SYSTEM_PYTHON}
-       -DMITK_BUILD_org.mitk.gui.qt.python:BOOL=ON
       )
   if( NOT MITK_USE_SYSTEM_PYTHON )
     list(APPEND mitk_optional_cache_args
@@ -411,6 +442,9 @@ ExternalProject_Add(${proj}
     -DMITK_CTEST_SCRIPT_MODE:STRING=${MITK_CTEST_SCRIPT_MODE}
     -DMITK_SUPERBUILD_BINARY_DIR:PATH=${MITK_BINARY_DIR}
     -DMITK_MODULES_TO_BUILD:INTERNAL=${MITK_MODULES_TO_BUILD}
+    -DMITK_WHITELIST:STRING=${MITK_WHITELIST}
+    -DMITK_WHITELISTS_EXTERNAL_PATH:STRING=${MITK_WHITELISTS_EXTERNAL_PATH}
+    -DMITK_WHITELISTS_INTERNAL_PATH:STRING=${MITK_WHITELISTS_INTERNAL_PATH}
     ${qt_project_args}
     -DMITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_FLOATING_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES}
@@ -433,6 +467,12 @@ ExternalProject_Add(${proj}
     -DACVD_DIR:PATH=${ACVD_DIR}
     -DOpenCV_DIR:PATH=${OpenCV_DIR}
     -DPoco_DIR:PATH=${Poco_DIR}
+    -DPCRE_DIR:PATH=${PCRE_DIR}
+    -DSwig_DIR:PATH=${Swig_DIR}
+    -DRaptor2_DIR:PATH=${raptor2_DIR}
+    -DRasqal_DIR:PATH=${rasqal_DIR}
+    -DRedland_DIR:PATH=${redland_DIR}
+    -DREDLAND_INSTALL_DIR:PATH=${REDLAND_INSTALL_DIR}
     -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}

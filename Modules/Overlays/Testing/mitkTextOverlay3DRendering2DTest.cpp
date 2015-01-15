@@ -34,6 +34,7 @@ int mitkTextOverlay3DRendering2DTest(int argc, char* argv[])
   MITK_TEST_BEGIN("mitkTextOverlay3DRendering2DTest")
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
+//  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
 
   mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderingHelper.GetVtkRenderWindow());
   mitk::OverlayManager::Pointer overlayManager = mitk::OverlayManager::New();
@@ -75,7 +76,7 @@ int mitkTextOverlay3DRendering2DTest(int argc, char* argv[])
   renderingHelper.Render();
 
   //use this to generate a reference screenshot or save the file:
-  bool generateReferenceScreenshot = true;
+  bool generateReferenceScreenshot = false;
   if(generateReferenceScreenshot)
   {
     renderingHelper.SaveReferenceScreenShot("d:/tmp/mitkTextOverlay3DRendering2DTest_ball.png");

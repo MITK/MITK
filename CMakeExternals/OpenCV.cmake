@@ -81,7 +81,7 @@ if(MITK_USE_OpenCV)
         -DBUILD_TESTS:BOOL=OFF
         -DBUILD_EXAMPLES:BOOL=OFF
         -DBUILD_DOXYGEN_DOCS:BOOL=OFF
-        -DWITH_CUDA:BOOL=ON
+        -DWITH_CUDA:BOOL=OFF
         ${additional_cmake_args}
       DEPENDS ${proj_DEPENDENCIES}
     )

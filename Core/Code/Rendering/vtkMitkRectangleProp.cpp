@@ -15,59 +15,99 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "vtkMitkRectangleProp.h"
-#include "vtkObjectFactory.h"
 
-#include "mitkGL.h"
+#include <vtkObjectFactory.h>
+#include <vtkCellArray.h>
+#include <vtkPoints.h>
+#include <vtkLine.h>
+#include <vtkPolyData.h>
+#include <vtkSmartPointer.h>
+#include <vtkProperty2D.h>
+#include <vtkActor2D.h>
+#include <vtkPolyDataMapper2D.h>
+#include <vtkViewport.h>
+
 
 vtkStandardNewMacro(vtkMitkRectangleProp);
 
 vtkMitkRectangleProp::vtkMitkRectangleProp()
 {
+  vtkSmartPointer<vtkPolyDataMapper2D> mapper = vtkSmartPointer<vtkPolyDataMapper2D>::New();
+  m_RectangleActor = vtkSmartPointer<vtkActor2D>::New();
+  m_PolyData = vtkSmartPointer<vtkPolyData>::New();
+
+  vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+
+  m_PolyData->SetPoints(points);
+  m_PolyData->SetLines(lines);
+
+  this->CreateRectangle();
+
+  mapper->SetInputData(m_PolyData);
+  m_RectangleActor->SetMapper(mapper);
 }
 
 vtkMitkRectangleProp::~vtkMitkRectangleProp()
 {
 }
 
-double *vtkMitkRectangleProp::GetBounds()
+int vtkMitkRectangleProp::RenderOverlay(vtkViewport* viewport)
 {
-  return NULL;
-}
+  double right = viewport->GetSize()[0];
+  double top = viewport->GetSize()[1];
+//  double bottom = 0.0;
+  double left = viewport->GetOrigin()[0] + 0.5;
+  double bottom = viewport->GetOrigin()[1] + 0.5;
+//  double left = 0.0;
+  double defaultDepth = 0.0;
 
-int vtkMitkRectangleProp::RenderOverlay(vtkViewport* /*viewport*/)
-{
-  m_RenderWindow->MakeCurrent();
+  vtkSmartPointer<vtkPoints> points = m_PolyData->GetPoints();
+  //change the corners to adapt the size of the renderwindow was resized
+  points->SetPoint(m_BottomLeft, left, bottom, defaultDepth);
+  points->SetPoint(m_TopLeft, left, top, defaultDepth);
+  points->SetPoint(m_TopRight, right, top, defaultDepth);
+  points->SetPoint(m_BottomRight, right, bottom, defaultDepth);
 
-  Enable2DOpenGL();
+  //adapt color
+  m_RectangleActor->GetProperty()->SetColor( m_Color[0], m_Color[1], m_Color[2]);
 
-  //make it nicer
-  glEnable(GL_LINE_SMOOTH);
-  glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
-  glDisable(GL_LINE_STIPPLE);
-
-  //size and position
-  int * i = m_RenderWindow->GetSize();
-  GLdouble bbox[8] = {0.f , 0.f, (double)i[0], 0.f, (double)i[0], (double)i[1], 0.f, (double)i[1]};
-
-  //render rectangle
-  glLineWidth(5.0f);
-  glBegin(GL_LINE_LOOP);
-  for (int j = 0; j < 4; j++)
-  {
-    glColor3f(m_Color[0],m_Color[1],m_Color[2]);
-    glVertex2dv(&bbox[2*j]);
-  }
-  glEnd();
-  glLineWidth(1.0f);
-
-  glDisable(GL_LINE_SMOOTH);
-
-  Disable2DOpenGL();
-
+  //render the actor
+  m_RectangleActor->RenderOverlay(viewport);
   return 1;
 }
 
-void vtkMitkRectangleProp::SetRenderWindow(vtkRenderWindow* renWin)
+void vtkMitkRectangleProp::CreateRectangle()
+{
+  vtkSmartPointer<vtkPoints> points = m_PolyData->GetPoints();
+  vtkSmartPointer<vtkCellArray> lines = m_PolyData->GetLines();
+
+  //just some default values until a renderwindow/viewport is initialized
+  double bottom = 0.0;
+  double left = 0.0;
+  double right = 200.0;
+  double top = 200.0;
+  double defaultDepth = 0.0;
+
+  //4 corner points
+  m_BottomLeft = points->InsertNextPoint(left, bottom, defaultDepth);
+  m_BottomRight = points->InsertNextPoint(right, bottom, defaultDepth);
+  m_TopLeft = points->InsertNextPoint(left, top, defaultDepth);
+  m_TopRight = points->InsertNextPoint(right, top, defaultDepth);
+
+  vtkSmartPointer<vtkLine> lineVtk =  vtkSmartPointer<vtkLine>::New();
+  lineVtk->GetPointIds()->SetNumberOfIds(5);
+  //connect the lines
+  lineVtk->GetPointIds()->SetId(0,m_BottomLeft);
+  lineVtk->GetPointIds()->SetId(1,m_BottomRight);
+  lineVtk->GetPointIds()->SetId(2,m_TopRight);
+  lineVtk->GetPointIds()->SetId(3,m_TopLeft);
+  lineVtk->GetPointIds()->SetId(4,m_BottomLeft);
+
+  lines->InsertNextCell(lineVtk);
+}
+
+void vtkMitkRectangleProp::SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renWin)
 {
   m_RenderWindow = renWin;
 }
@@ -78,52 +118,3 @@ void vtkMitkRectangleProp::SetColor(float col1, float col2, float col3)
   m_Color[1] = col2;
   m_Color[2] = col3;
 }
-
-
-int vtkMitkRectangleProp::RenderTranslucentGeometry(vtkViewport* /*viewport*/)
-{
-  return 0;
-}
-
-int vtkMitkRectangleProp::RenderOpaqueGeometry(vtkViewport* /*viewport*/)
-{
-  return 0;
-}
-
-void vtkMitkRectangleProp::Enable2DOpenGL()
-{
-  GLint iViewport[4];
-
-  // Get a copy of the viewport
-  glGetIntegerv( GL_VIEWPORT, iViewport );
-
-  // Save a copy of the projection matrix so that we can restore it
-  // when it's time to do 3D rendering again.
-  glMatrixMode( GL_PROJECTION );
-  glPushMatrix();
-  glLoadIdentity();
-
-  // Set up the orthographic projection
-  glOrtho( iViewport[0], iViewport[0]+iViewport[2],
-  iViewport[1]+iViewport[3], iViewport[1], -1, 1 );
-  glMatrixMode( GL_MODELVIEW );
-  glPushMatrix();
-  glLoadIdentity();
-
-  // Make sure depth testing and lighting are disabled for 2D rendering until
-  // we are finished rendering in 2D
-  glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT | GL_TEXTURE_2D);
-  glDisable( GL_DEPTH_TEST );
-  glDisable( GL_LIGHTING   );
-  glDisable( GL_TEXTURE_2D );
-}
-
-void vtkMitkRectangleProp::Disable2DOpenGL()
-{
-  glPopAttrib();
-  glMatrixMode( GL_PROJECTION );
-  glPopMatrix();
-  glMatrixMode( GL_MODELVIEW );
-  glPopMatrix();
-}
-

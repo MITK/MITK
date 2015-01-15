@@ -18,12 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDIFFUSIONHEADERFILEREADER_H
 
 #include <MitkDiffusionCoreExports.h>
+#include <mitkCommon.h>
 
 #include <itkLightObject.h>
-#include "mitkDiffusionImage.h"
+#include <itkObjectFactory.h>
 
 #include "gdcmScanner.h"
 #include "gdcmReader.h"
+#include <vnl/vnl_vector_fixed.h>
+
 
 namespace mitk
 {

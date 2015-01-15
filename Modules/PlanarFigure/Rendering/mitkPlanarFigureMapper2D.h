@@ -28,6 +28,7 @@ namespace mitk {
 
 class BaseRenderer;
 class Contour;
+class TextOverlay2D;
 
 
 /**
@@ -103,7 +104,7 @@ class Contour;
 *   </ul>
 * </ol>
 *
-* \ingroup Mapper
+* @ingroup MitkPlanarFigureModule
 */
 
 class MitkPlanarFigure_EXPORT PlanarFigureMapper2D : public GLMapper
@@ -300,6 +301,10 @@ private:
 
   // Bool flag that indicates if a node modified observer was added
   bool m_NodeModifiedObserverAdded;
+
+  itk::SmartPointer<mitk::TextOverlay2D> m_AnnotationOverlay;
+  itk::SmartPointer<mitk::TextOverlay2D> m_QuantityOverlay;
+
 };
 
 } // namespace mitk

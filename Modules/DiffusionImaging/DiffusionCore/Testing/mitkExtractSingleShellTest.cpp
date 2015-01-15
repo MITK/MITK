@@ -20,9 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkElectrostaticRepulsionDiffusionGradientReductionFilter.h>
 
 #include "mitkDWIHeadMotionCorrectionFilter.h"
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkImageCast.h>
+#include <mitkProperties.h>
 
 typedef short                                       DiffusionPixelType;
-typedef mitk::DiffusionImage< DiffusionPixelType >  DiffusionImageType;
 
 
 int mitkExtractSingleShellTest( int argc, char* argv[] )
@@ -34,11 +36,11 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
   /*
     1. Get input data
     */
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage( argv[1] );
-  DiffusionImageType* dwimage =
-      static_cast<DiffusionImageType*>( inputImage.GetPointer() );
+  mitk::Image::Pointer dwimage = mitk::IOUtil::LoadImage( argv[1] );
 
-  MITK_TEST_CONDITION_REQUIRED( dwimage != NULL, "Input is a dw-image");
+  mitk::GradientDirectionsProperty::Pointer gradientsProperty = static_cast<mitk::GradientDirectionsProperty *>( dwimage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() );
+
+  MITK_TEST_CONDITION_REQUIRED( gradientsProperty.IsNotNull(), "Input is a dw-image");
 
   unsigned int extract_value = 0;
   std::istringstream input(argv[3]);
@@ -46,19 +48,23 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
   input >> extract_value;
 
   typedef itk::ElectrostaticRepulsionDiffusionGradientReductionFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
-  typedef DiffusionImageType::BValueMap BValueMap;
+  typedef mitk::DiffusionPropertyHelper::BValueMapType BValueMap;
 
   // GetShellSelection from GUI
   BValueMap shellSelectionMap;
-  BValueMap originalShellMap = dwimage->GetBValueMap();
+  BValueMap originalShellMap = static_cast<mitk::BValueMapProperty*>(dwimage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
   std::vector<unsigned int> newNumGradientDirections;
 
   shellSelectionMap[extract_value] = originalShellMap[extract_value];
   newNumGradientDirections.push_back( originalShellMap[extract_value].size() ) ;
 
-  DiffusionImageType::GradientDirectionContainerType::Pointer gradientContainer = dwimage->GetDirections();
+  itk::VectorImage< short, 3 >::Pointer itkVectorImagePointer = itk::VectorImage< short, 3 >::New();
+  mitk::CastToItkImage(dwimage, itkVectorImagePointer);
+  itk::VectorImage< short, 3 > *vectorImage = itkVectorImagePointer.GetPointer();
+
+  mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientContainer = static_cast<mitk::GradientDirectionsProperty*>( dwimage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
   FilterType::Pointer filter = FilterType::New();
-  filter->SetInput(dwimage->GetVectorImage());
+  filter->SetInput(vectorImage);
   filter->SetOriginalGradientDirections(gradientContainer);
   filter->SetNumGradientDirections(newNumGradientDirections);
   filter->SetOriginalBValueMap(originalShellMap);
@@ -73,18 +79,19 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
     MITK_TEST_FAILED_MSG( << "Failed due to ITK exception: " << e.what() );
   }
 
-  DiffusionImageType::Pointer image = DiffusionImageType::New();
-  image->SetVectorImage( filter->GetOutput() );
-  image->SetReferenceBValue(dwimage->GetReferenceBValue());
-  image->SetDirections(filter->GetGradientDirections());
-  image->SetMeasurementFrame(dwimage->GetMeasurementFrame());
-  image->InitializeFromVectorImage();
+  mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
+  outImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetGradientDirections() ) );
+  outImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(dwimage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
+  outImage->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(dwimage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
+  mitk::DiffusionPropertyHelper propertyHelper( outImage );
+  propertyHelper.InitializeImage();
+
   /*
    * 3. Write output data
    **/
   try
   {
-    mitk::IOUtil::Save(image, argv[2]);
+    mitk::IOUtil::Save(outImage, argv[2]);
   }
   catch( const itk::ExceptionObject& e)
   {

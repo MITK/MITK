@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFiniteDiffOdfMaximaExtractionFilter.h>
 
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionImage.h>
 #include <mitkQBallImage.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>

@@ -161,6 +161,16 @@ ResampleDwiImageFilter<TScalarType>
     this->SetNthOutput(0, outImage);
 }
 
+template <class TScalarType>
+void
+ResampleDwiImageFilter<TScalarType>
+::UpdateOutputInformation()
+{
+  // Calls to superclass updateoutputinformation
+  //Superclass::UpdateOutputInformation();
 
+  this->GetOutput()->SetSpacing(m_NewSpacing);
+  this->GetOutput()->SetLargestPossibleRegion(m_NewImageRegion);
+}
 
 } // end of namespace

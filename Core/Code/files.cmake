@@ -69,6 +69,8 @@ set(H_FILES
   DataManagement/mitkMatrix.h
 
   Interactions/mitkEventMapperAddOn.h
+  Interactions/mitkInteractionConst.h
+
 
   Interfaces/mitkIDataNodeReader.h
   Interfaces/mitkIFileWriter.h
@@ -83,6 +85,7 @@ set(H_FILES
   Rendering/Colortables/PETColor.h
 
   IO/mitkPixelTypeTraits.h
+  IO/mitkLocaleSwitch.h
 )
 
 set(CPP_FILES
@@ -139,6 +142,7 @@ set(CPP_FILES
   DataManagement/mitkApplicationCursor.cpp
   DataManagement/mitkBaseData.cpp
   DataManagement/mitkBaseGeometry.cpp
+  DataManagement/mitkGeometryTransformHolder.cpp
   DataManagement/mitkBaseProperty.cpp
   DataManagement/mitkClippingProperty.cpp
   DataManagement/mitkChannelDescriptor.cpp
@@ -325,20 +329,14 @@ set(CPP_FILES
   IO/mitkFileWriterRegistry.cpp
   IO/mitkFileWriterSelector.cpp
   IO/mitkIFileIO.cpp
-# IO/mitkIpPicGet.c
   IO/mitkImageGenerator.cpp
+  IO/mitkIOAdapter.h
   IO/mitkIOConstants.cpp
   IO/mitkIOUtil.cpp
   IO/mitkIOMimeTypes.cpp
   IO/mitkItkLoggingAdapter.cpp
   IO/mitkMimeType.cpp
   IO/mitkOperation.cpp
-# IO/mitkPicFileIOFactory.cpp
-# IO/mitkPicFileReader.cpp
-# IO/mitkPicFileWriter.cpp
-# IO/mitkPicHelper.cpp
-# IO/mitkPicVolumeTimeSeriesIOFactory.cpp
-# IO/mitkPicVolumeTimeSeriesReader.cpp
   IO/mitkPixelType.cpp
   IO/mitkStandardFileLocations.cpp
   IO/mitkVtkLoggingAdapter.cpp
@@ -349,14 +347,14 @@ set(CPP_FILES
   Rendering/mitkRenderWindowFrame.cpp
   Rendering/mitkPlaneGeometryDataMapper2D.cpp
   Rendering/mitkPlaneGeometryDataVtkMapper3D.cpp
-  Rendering/mitkGLMapper.cpp
+  #Rendering/mitkGLMapper.cpp Moved to deprecated LegacyGL Module
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkManufacturerLogo.cpp
   Rendering/mitkMapper.cpp
-  Rendering/mitkPointSetGLMapper2D.cpp
   Rendering/mitkPointSetVtkMapper2D.cpp
   Rendering/mitkPointSetVtkMapper3D.cpp
-  Rendering/mitkSurfaceGLMapper2D.cpp
+  Rendering/mitkSurfaceVtkMapper2D.cpp
+  #Rendering/mitkSurfaceGLMapper2D.cpp Moved to deprecated LegacyGL Module
   Rendering/mitkSurfaceVtkMapper3D.cpp
   Rendering/mitkVolumeDataVtkMapper3D.cpp
   Rendering/mitkVtkPropRenderer.cpp

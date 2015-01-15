@@ -59,9 +59,9 @@ void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
   if(ls->IsGenerateDataRequired(renderer,this))
   {
     ls->m_follower->SetPosition(
-          GetPosition3D(renderer)[0]+GetOffsetVector(renderer)[0],
-        GetPosition3D(renderer)[1]+GetOffsetVector(renderer)[1],
-        GetPosition3D(renderer)[2]+GetOffsetVector(renderer)[2]);
+      GetPosition3D(renderer)[0]+GetOffsetVector(renderer)[0],
+      GetPosition3D(renderer)[1]+GetOffsetVector(renderer)[1],
+      GetPosition3D(renderer)[2]+GetOffsetVector(renderer)[2]);
     ls->m_textSource->SetText(GetText().c_str());
     float color[3] = {1,1,1};
     float opacity = 1.0;
@@ -70,6 +70,9 @@ void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
     ls->m_follower->GetProperty()->SetColor(color[0], color[1], color[2]);
     ls->m_follower->GetProperty()->SetOpacity(opacity);
     ls->m_follower->SetScale(this->GetFontSize());
+    vtkRenderer* vtkRender = renderer->GetVtkRenderer();
+    if(vtkRender)
+      ls->m_follower->SetCamera(vtkRender->GetActiveCamera());
     ls->UpdateGenerateDataTime();
   }
 }
@@ -77,6 +80,5 @@ void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
 vtkProp* mitk::TextOverlay3D::GetVtkProp(BaseRenderer *renderer) const
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
-  ls->m_follower->SetCamera(renderer->GetVtkRenderer()->GetActiveCamera());
   return ls->m_follower;
 }

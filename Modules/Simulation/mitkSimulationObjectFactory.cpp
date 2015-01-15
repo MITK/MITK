@@ -16,11 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIndexROI.h"
 #include "mitkSimulation.h"
+#include "mitkSimulationGLMapper2D.h"
 #include "mitkSimulationObjectFactory.h"
 #include "mitkSimulationVtkMapper3D.h"
 #include "mitkSimulationWriter.h"
 #include "mitkVtkModel.h"
 #include <mitkCoreObjectFactory.h>
+#include <mitkVtkGLMapperWrapper.h>
 #include <sofa/helper/system/glut.h>
 #include <sofa/component/init.h>
 #include <sofa/core/ObjectFactory.h>
@@ -78,8 +80,14 @@ mitk::Mapper::Pointer mitk::SimulationObjectFactory::CreateMapper(mitk::DataNode
 
   if (dynamic_cast<Simulation*>(node->GetData()) != NULL)
   {
-    if (slotId == BaseRenderer::Standard3D)
-      mapper = mitk::SimulationVtkMapper3D::New();
+    if (slotId == BaseRenderer::Standard2D)
+    {
+      mapper = VtkGLMapperWrapper::New(SimulationGLMapper2D::New().GetPointer());
+    }
+    else if (slotId == BaseRenderer::Standard3D)
+    {
+      mapper = SimulationVtkMapper3D::New();
+    }
 
     if (mapper.IsNotNull())
       mapper->SetDataNode(node);
@@ -128,7 +136,10 @@ void mitk::SimulationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
     return;
 
   if (dynamic_cast<Simulation*>(node->GetData()) != NULL)
+  {
+    SimulationGLMapper2D::SetDefaultProperties(node);
     SimulationVtkMapper3D::SetDefaultProperties(node);
+  }
 }
 
 void mitk::RegisterSimulationObjectFactory()
@@ -137,7 +148,7 @@ void mitk::RegisterSimulationObjectFactory()
 
   if (!alreadyRegistered)
   {
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::SimulationObjectFactory::New());
+    CoreObjectFactory::GetInstance()->RegisterExtraFactory(SimulationObjectFactory::New());
     alreadyRegistered = true;
   }
 }

@@ -18,12 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseDataIOFactory.h>
 #include "mitkCommandLineParser.h"
 #include <boost/algorithm/string.hpp>
-#include <DiffusionWeightedImages/mitkDiffusionImage.h>
+#include <mitkImage.h>
 #include <itkNonLocalMeansDenoisingFilter.h>
 #include <itkImage.h>
 #include <mitkIOUtil.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
+#include <mitkProperties.h>
 
-typedef mitk::DiffusionImage<short> DiffusionImageType;
+typedef mitk::Image DiffusionImageType;
 typedef itk::Image<short, 3> ImageType;
 
 mitk::BaseData::Pointer LoadFile(std::string filename)
@@ -102,9 +106,12 @@ int main(int argc, char* argv[])
 
       DiffusionImageType::Pointer dwi = dynamic_cast<DiffusionImageType*>(LoadFile(inFileName).GetPointer());
 
+      mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+      mitk::CastToItkImage(dwi, itkVectorImagePointer);
+
       itk::NonLocalMeansDenoisingFilter<short>::Pointer filter = itk::NonLocalMeansDenoisingFilter<short>::New();
       filter->SetNumberOfThreads(12);
-      filter->SetInputImage(dwi->GetVectorImage());
+      filter->SetInputImage( itkVectorImagePointer );
 
       if (!maskName.empty())
       {
@@ -121,11 +128,11 @@ int main(int argc, char* argv[])
       filter->SetVariance(variance);
       filter->Update();
 
-      DiffusionImageType::Pointer output = DiffusionImageType::New();
-      output->SetVectorImage(filter->GetOutput());
-      output->SetReferenceBValue(dwi->GetReferenceBValue());
-      output->SetDirections(dwi->GetDirections());
-      output->InitializeFromVectorImage();
+      DiffusionImageType::Pointer output = mitk::GrabItkImageMemory( filter->GetOutput() );
+      output->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi) ) );
+      output->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi) ) );
+      mitk::DiffusionPropertyHelper propertyHelper( output );
+      propertyHelper.InitializeImage();
 
 //      std::stringstream name;
 //      name << outFileName << "_NLM_" << search << "-" << compare << "-" << variance << ".dwi";

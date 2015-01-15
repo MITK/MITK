@@ -102,6 +102,10 @@ if(BLUEBERRY_USE_QT_HELP)
   endif()
 endif(BLUEBERRY_USE_QT_HELP)
 
+if(BLUEBERRY_QT_HELP_REQUIRED AND NOT BLUEBERRY_USE_QT_HELP)
+  message(FATAL_ERROR "BLUEBERRY_USE_QT_HELP is required to be set to ON")
+endif()
+
 if(MITK_USE_Qt4)
   include(${QT_USE_FILE})
 endif()
@@ -199,14 +203,14 @@ set(_ctk_plugins_include_dirs
   ${Poco_INCLUDE_DIRS}
 )
 
-include_directories(${_ctk_plugins_include_dirs})
+include_directories(SYSTEM ${_ctk_plugins_include_dirs})
 
 if(BLUEBERRY_BUILD_TESTING)
   find_package(CppUnit REQUIRED)
   include(berryTestingHelpers)
 
   set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}")
-  get_target_property(_is_macosx_bundle ${OSGI_APP} MACOSX_BUNDLE)
+  # get_target_property(_is_macosx_bundle ${OSGI_APP} MACOSX_BUNDLE)
   if(APPLE AND _is_macosx_bundle)
     set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.app/Contents/MacOS/${OSGI_APP}")
   endif()

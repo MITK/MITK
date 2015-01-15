@@ -48,7 +48,11 @@ public:
    *  \throws mitk::MemoryIsLockedException if requested image area is exclusively locked and mitk::ImageAccessorBase::ExceptionIfLocked is set in OptionFlags
    *
    *   Includes a check if typeid of PixelType coincides with templated TPixel
-   *   and a check if VDimension equals to the Dimension of the Image.*/
+   *   and a check if VDimension equals to the Dimension of the Image.
+   *
+   *  \note
+   *  To avoid intermittent Update() calls to a predecessing filter pipeline, a call to Modifed() method after the access is finished is left to the developer.
+   */
   ImagePixelWriteAccessor(
       ImagePointer iP,
       const ImageDataItem* iDI = NULL,

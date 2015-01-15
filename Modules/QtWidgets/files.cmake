@@ -34,6 +34,7 @@ QmitkSliderLevelWindowWidget.cpp
 QmitkStdMultiWidget.cpp
 QmitkMouseModeSwitcher.cpp
 QmitkDataStorageFilterProxyModel.cpp
+QmitkDataStorageComboBoxWithSelectNone.cpp
 )
 
 set(MOC_H_FILES
@@ -60,6 +61,7 @@ QmitkServiceListWidget.h
 QmitkSliderLevelWindowWidget.h
 QmitkStdMultiWidget.h
 QmitkMouseModeSwitcher.h
+QmitkDataStorageComboBoxWithSelectNone.h
 )
 
 set(UI_FILES

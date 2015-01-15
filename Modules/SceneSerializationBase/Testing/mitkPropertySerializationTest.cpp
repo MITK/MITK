@@ -190,7 +190,6 @@ int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
 /* untested base data types:
   BaseDataTestImplementation
   RenderWindowFrame
-  mitk::DiffusionImage< TPixelType >
   GeometryData
   mitk::PlaneGeometryData
   GradientBackground

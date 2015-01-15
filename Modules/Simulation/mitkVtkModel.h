@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkVtkModel_h
 #define mitkVtkModel_h
 
+#include <mitkPoint.h>
+#include <mitkVector.h>
 #include <sofa/component/visualmodel/VisualModelImpl.h>
 #include <sofa/helper/system/gl.h>
 #include <vtkSmartPointer.h>

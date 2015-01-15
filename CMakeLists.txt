@@ -114,6 +114,7 @@ include(mitkMacroEmptyExternalProject)
 include(mitkFunctionGenerateProjectXml)
 include(mitkFunctionSuppressWarnings)
 include(mitkFunctionEnableBuildConfiguration)
+include(mitkFunctionWhitelists)
 include(FeatureSummary)
 
 SUPPRESS_VC_DEPRECATED_WARNINGS()
@@ -205,11 +206,13 @@ env_option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 set(MITK_BUILD_TUTORIAL OFF CACHE INTERNAL "Deprecated! Use MITK_BUILD_EXAMPLES instead!")
 env_option(MITK_BUILD_EXAMPLES "Build the MITK Examples" ${MITK_BUILD_TUTORIAL})
 env_option(MITK_USE_ACVD "Use Approximated Centroidal Voronoi Diagrams" OFF)
+env_option(MITK_USE_ANN "Use Approximate Nearest Neighbor Library" ON)
 env_option(MITK_USE_CppUnit "Use CppUnit for unit tests" ON)
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
   message("> Forcing MITK_USE_CppUnit to ON because BUILD_TESTING=ON")
   set(MITK_USE_CppUnit ON CACHE BOOL "Use CppUnit for unit tests" FORCE)
 endif()
+env_option(MITK_USE_Eigen "Use the Eigen library" ON)
 env_option(MITK_USE_GLEW "Use the GLEW library" ON)
 env_option(MITK_USE_Boost "Use the Boost C++ library" OFF)
 env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
@@ -218,16 +221,30 @@ env_option(MITK_USE_DCMTK "EXPERIMENTAL, superbuild only: Use DCMTK in MITK" ${M
 env_option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 env_option(MITK_USE_Poco "Use the Poco library" ON)
+env_option(MITK_USE_Redland "Use the Redland RDF library" OFF)
 env_option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
 env_option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 env_option(MITK_USE_SimpleITK "Use the SimpleITK library" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 
 option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
+
+set(_buildConfigs "Custom")
+
+file(GLOB _buildConfigFiles CMake/BuildConfigurations/*.cmake)
+
+foreach(_buildConfigFile ${_buildConfigFiles})
+  get_filename_component(_buildConfigFile ${_buildConfigFile} NAME_WE)
+  list(APPEND _buildConfigs ${_buildConfigFile})
+endforeach()
+
 set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
-set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS Custom Default WorkbenchRelease mitkDiffusion All)
+set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
 
 mitkFunctionEnableBuildConfiguration()
+
+mitkFunctionCreateWhitelistPaths(MITK)
+mitkFunctionFindWhitelists(MITK)
 
 mark_as_advanced(MITK_BUILD_ALL_APPS
                  MITK_USE_CppUnit
@@ -816,7 +833,9 @@ if(MITK_USE_BLUEBERRY)
   endif()
 
   include("${CMAKE_CURRENT_SOURCE_DIR}/Plugins/PluginList.cmake")
-  set(mitk_plugins_fullpath )
+  mitkFunctionWhitelistPlugins(MITK MITK_EXT_PLUGINS)
+
+  set(mitk_plugins_fullpath "")
   foreach(mitk_plugin ${MITK_EXT_PLUGINS})
     list(APPEND mitk_plugins_fullpath Plugins/${mitk_plugin})
   endforeach()
@@ -851,7 +870,11 @@ if(MITK_USE_BLUEBERRY)
   include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
   set(mitk_apps_fullpath )
   foreach(mitk_app ${MITK_APPS})
-    list(APPEND mitk_apps_fullpath "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${mitk_app}")
+    string(FIND ${mitk_app} "MITK_BUILD_APP_" _index)
+    string(SUBSTRING ${mitk_app} ${_index} -1 _var)
+    if(${_var})
+      list(APPEND mitk_apps_fullpath "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${mitk_app}")
+    endif()
   endforeach()
 
   if (mitk_plugins_fullpath)
@@ -869,12 +892,6 @@ if(MITK_USE_BLUEBERRY)
     file(REMOVE ${MITK_PLUGIN_USE_FILE})
     set(MITK_PLUGIN_USE_FILE )
   endif()
-
-  # 11.3.13, change, muellerm: activate python bundle if python and blueberry is active
-  if( MITK_USE_Python )
-    set(MITK_BUILD_org.mitk.gui.qt.python ON)
-  endif()
-
 endif()
 
 #-----------------------------------------------------------------------------

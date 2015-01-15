@@ -22,8 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
-#include <mitkDiffusionImage.h>
 #include <mitkImageTimeSelector.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkProperties.h>
 
 // ITK
 #include <itksys/SystemTools.hxx>
@@ -35,7 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkResampleDwiImageFilter.h"
 
 typedef itk::Image<double, 3> InputImageType;
-typedef mitk::DiffusionImage<short> DiffusionImageType;
 
 
 static mitk::Image::Pointer TransformToReference(mitk::Image *reference, mitk::Image *moving, bool sincInterpol = false)
@@ -172,25 +172,10 @@ static void SaveImage(std::string fileName, mitk::Image* image, std::string file
 {
   std::cout << "----Save to " << fileName;
 
-  if (fileType == "dwi") // IOUtil does not handle dwi files properly Bug 15772
-  {
-    try
-    {
-      mitk::IOUtil::Save(dynamic_cast<mitk::DiffusionImage<short>*>(image), fileName.c_str());
-    }
-    catch( const itk::ExceptionObject& e)
-    {
-      MITK_ERROR << "Caught exception: " << e.what();
-      mitkThrow() << "Failed with exception from subprocess!";
-    }
-  }
-  else
-  {
-    mitk::IOUtil::SaveImage(image, fileName);
-  }
+  mitk::IOUtil::Save(image, fileName);
 }
 
-DiffusionImageType::Pointer ResampleDWIbySpacing(DiffusionImageType::Pointer input, float* spacing, bool useLinInt = true)
+mitk::Image::Pointer ResampleDWIbySpacing(mitk::Image::Pointer input, float* spacing, bool useLinInt = true)
 {
 
   itk::Vector<double, 3> spacingVector;
@@ -200,17 +185,20 @@ DiffusionImageType::Pointer ResampleDWIbySpacing(DiffusionImageType::Pointer inp
 
   typedef itk::ResampleDwiImageFilter<short> ResampleFilterType;
 
+  mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+  mitk::CastToItkImage(input, itkVectorImagePointer);
+
   ResampleFilterType::Pointer resampler = ResampleFilterType::New();
-  resampler->SetInput(input->GetVectorImage());
+  resampler->SetInput( itkVectorImagePointer );
   resampler->SetInterpolation(ResampleFilterType::Interpolate_Linear);
   resampler->SetNewSpacing(spacingVector);
   resampler->Update();
 
-  DiffusionImageType::Pointer output = DiffusionImageType::New();
-  output->SetVectorImage(resampler->GetOutput());
-  output->SetDirections(input->GetDirections());
-  output->SetReferenceBValue(input->GetReferenceBValue());
-  output->InitializeFromVectorImage();
+  mitk::Image::Pointer output = mitk::GrabItkImageMemory( resampler->GetOutput() );
+  output->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(input) ) );
+  output->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(input) ) );
+  mitk::DiffusionPropertyHelper propertyHelper( output );
+  propertyHelper.InitializeImage();
 
   return output;
 }
@@ -288,10 +276,10 @@ int main( int argc, char* argv[] )
   if (!useSpacing)
       refImage = mitk::IOUtil::LoadImage(refImageFile);
 
-  DiffusionImageType::Pointer inputDWI = dynamic_cast<DiffusionImageType*>(mitk::IOUtil::LoadBaseData(inputFile).GetPointer());
-  if (inputDWI.IsNotNull())
+  mitk::Image::Pointer inputDWI = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadBaseData(inputFile).GetPointer());
+  if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(inputDWI))
   {
-    DiffusionImageType::Pointer outputImage;
+    mitk::Image::Pointer outputImage;
 
     if (useSpacing)
       outputImage = ResampleDWIbySpacing(inputDWI, spacing);

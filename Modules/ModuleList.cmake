@@ -1,0 +1,61 @@
+set(mitk_modules
+  RDF
+  LegacyIO
+  DataTypesExt
+  Overlays
+  LegacyGL
+  AlgorithmsExt
+  MapperExt
+  DICOMReader
+  DICOMTesting
+  Qt4Qt5TestModule
+  SceneSerializationBase
+  PlanarFigure
+  ImageDenoising
+  ImageExtraction
+  ImageStatistics
+  LegacyAdaptors
+  SceneSerialization
+  GraphAlgorithms
+  ContourModel
+  SurfaceInterpolation
+  Segmentation
+  PlanarFigureSegmentation
+  OpenViewCore
+  QmlItems
+  QtWidgets
+  QtWidgetsExt
+  SegmentationUI
+  DiffusionImaging
+  GPGPU
+  IGTBase
+  IGT
+  CameraCalibration
+  RigidRegistration
+  RigidRegistrationUI
+  DeformableRegistration
+  DeformableRegistrationUI
+  OpenCL
+  OpenCVVideoSupport
+  QtOverlays
+  InputDevices
+  ToFHardware
+  ToFProcessing
+  ToFUI
+  US
+  USUI
+  DicomUI
+  Simulation
+  Remeshing
+  Python
+  Persistence
+  IGTUI
+  VtkShaders
+  DicomRT
+  IOExt
+  XNAT
+)
+
+if(MITK_ENABLE_PIC_READER)
+  list(APPEND mitk_modules IpPicSupportIO)
+endif()

@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPixelTypeTraits.h>
 #include <mitkPlanarFigureComposite.h>
 
+
 namespace mitk {
 
 /**
@@ -89,6 +90,7 @@ public:
     void TranslateFibers(double x, double y, double z);
     void ScaleFibers(double x, double y, double z, bool subtractCenter=true);
     void TransformFibers(double rx, double ry, double rz, double tx, double ty, double tz);
+    void RemoveDir(vnl_vector_fixed<double,3> dir, double threshold);
     itk::Point<float, 3> TransformPoint(vnl_vector_fixed< double, 3 > point, double rx, double ry, double rz, double tx, double ty, double tz);
     itk::Matrix< double, 3, 3 > TransformMatrix(itk::Matrix< double, 3, 3 > m, double rx, double ry, double rz);
 

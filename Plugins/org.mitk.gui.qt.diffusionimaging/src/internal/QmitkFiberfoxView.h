@@ -42,6 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTime>
 #include <mitkFiberfoxParameters.h>
 #include <itkStatisticsImageFilter.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 /*!
 \brief View for fiber based diffusion software phantoms (Fiberfox). See "Fiberfox: Facilitating the creation of realistic white matter software phantoms" (DOI: 10.1002/mrm.25045) for details.
@@ -90,10 +91,13 @@ public:
     virtual void CreateQtPartControl(QWidget *parent);
     void SetFocus();
 
-    typedef itk::Image<double, 3>           ItkDoubleImgType;
-    typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
     typedef itk::Vector<double,3>           GradientType;
     typedef vector<GradientType>            GradientListType;
+    typedef itk::VectorImage< short, 3 >                                    ItkDwiType;
+    typedef itk::Image<double, 3>           ItkDoubleImgType;
+    typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
 
     template<int ndirs> vector<itk::Vector<double,3> > MakeGradientList();
 
@@ -141,6 +145,9 @@ protected slots:
     void OnAddSpikes(int value);
     void OnAddAliasing(int value);
     void OnAddMotion(int value);
+    void OnMaskSelected(int value);
+    void OnFibSelected(int value);
+    void OnTemplateSelected(int value);
 
 protected:
 
@@ -184,12 +191,10 @@ protected:
     std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;   ///< map each planar figure uniquely to a QmitkPlanarFigureData
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
     mitk::DataNode::Pointer                             m_SelectedImage;
-    mitk::DataNode::Pointer                             m_SelectedDWI;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles2;
     vector< mitk::DataNode::Pointer >                   m_SelectedFiducials;
     vector< mitk::DataNode::Pointer >                   m_SelectedImages;
-    mitk::DataNode::Pointer                             m_MaskImageNode;
 
     QString m_ParameterFile;    ///< parameter file name
 

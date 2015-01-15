@@ -25,10 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 
 //Basedata Test
-#include <mitkRenderWindowFrame.h>
 #include <mitkGeometryData.h>
 #include <mitkPlaneGeometryData.h>
-#include <mitkGradientBackground.h>
 #include <mitkManufacturerLogo.h>
 #include <mitkPointSet.h>
 #include <mitkImage.h>
@@ -36,9 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //Mapper Test
 #include <mitkPlaneGeometryDataMapper2D.h>
-#include <mitkPlaneGeometryDataMapper2D.h>
 #include <mitkImageVtkMapper2D.h>
-#include <mitkSurfaceGLMapper2D.h>
+#include <mitkSurfaceVtkMapper2D.h>
 
 #include <mitkPlaneGeometryDataVtkMapper3D.h>
 #include <mitkPointSetVtkMapper3D.h>
@@ -72,11 +69,6 @@ static void TestDataSetting(mitk::DataNode::Pointer dataNode)
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a NULL pointer was set correctly" )
 
-  baseData = mitk::RenderWindowFrame::New();
-  dataNode->SetData(baseData);
-  MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a RenderWindowFrame object was set correctly" )
-//  MITK_TEST_CONDITION( baseData->GetGeometry(0)->GetVtkTransform() == dataNode->GetVtkTransform(0), "Testing if a NULL pointer was set correctly" )
-
   baseData = mitk::GeometryData::New();
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a GeometryData object was set correctly" )
@@ -84,10 +76,6 @@ static void TestDataSetting(mitk::DataNode::Pointer dataNode)
   baseData = mitk::PlaneGeometryData::New();
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a PlaneGeometryData object was set correctly" )
-
-  baseData = mitk::GradientBackground::New();
-  dataNode->SetData(baseData);
-  MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a GradientBackground object was set correctly" )
 
   baseData = mitk::ManufacturerLogo::New();
   dataNode->SetData(baseData);
@@ -131,7 +119,7 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a PointSetVtkMapper2D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
-  mapper = mitk::SurfaceGLMapper2D::New();
+  mapper = mitk::SurfaceVtkMapper2D::New();
   dataNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a SurfaceGLMapper2D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
@@ -155,13 +143,8 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   dataNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a VolumeDataVtkMapper3D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-
-  //linker error
-  //mapper = mitk::LineVtkMapper3D::New();
-  //dataNode->SetMapper(1,mapper);
-  //MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a LineVtkMapper3D was set correctly" )
-  //MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 }
+
 static void TestInteractorSetting(mitk::DataNode::Pointer dataNode)
 {
 

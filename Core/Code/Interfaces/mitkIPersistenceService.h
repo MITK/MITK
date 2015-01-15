@@ -28,17 +28,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
     /**
-    * The central service for the persistence module
-    * Basic idea is to create PropertyLists with a unique id using AddPropertyList(). A consumer
-    * of this interface can write arbitrary information into this propertylist
-    * Calling Save() and Load() will cause the Service to save and load the current set of propertlists from
-    * a file in the user directory.
-    * Using SetAutoLoadAndSave(true) will cause the service to load/save the property lists at application
-    * start/stop.
-    * Moreover, depending on the backend type, the service is connected to the SceneSerialization module, i.e.
-    * the user will be asked whether to save/load the propertlists in/from the current ".mitk" file that is selected
-    * by the user.
-    */
+     * \ingroup MicroServices_Interfaces
+     *
+     * The central service for the persistence module
+     * Basic idea is to create PropertyLists with a unique id using AddPropertyList(). A consumer
+     * of this interface can write arbitrary information into this propertylist
+     * Calling Save() and Load() will cause the Service to save and load the current set of propertlists from
+     * a file in the user directory.
+     * Using SetAutoLoadAndSave(true) will cause the service to load/save the property lists at application
+     * start/stop.
+     * Moreover, depending on the backend type, the service is connected to the SceneSerialization module, i.e.
+     * the user will be asked whether to save/load the propertlists in/from the current ".mitk" file that is selected
+     * by the user.
+     */
     class MITK_CORE_EXPORT IPersistenceService
     {
     public:

@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkVectorImage.h>
 #include <itkImage.h>
-#include <mitkDiffusionImage.h>
 #include <itkOrientationDistributionFunction.h>
 #include <mitkQBallImage.h>
 #include <vtkTransform.h>

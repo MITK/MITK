@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorImage.h"
 #include "itkImage.h"
 
-#include "mitkDiffusionImage.h"
+#include <mitkDiffusionPropertyHelper.h>
 #include "itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h"
 
 /*!
@@ -51,8 +51,10 @@ public:
   QmitkIVIMView();
   virtual ~QmitkIVIMView();
 
-  typedef mitk::DiffusionImage<short>::GradientDirectionContainerType DirContainerType;
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionType GradientDirectionType;
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType DirContainerType;
   typedef itk::DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<short, float> IVIMFilterType;
+  typedef itk::VectorImage<short,3> VecImgType;
   typedef itk::Image<float,3> OutImgType;
 
   virtual void CreateQtPartControl(QWidget *parent);

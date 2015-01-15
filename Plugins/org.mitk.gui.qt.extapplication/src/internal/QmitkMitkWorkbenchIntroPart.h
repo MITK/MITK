@@ -66,7 +66,7 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  void StandbyStateChanged(bool standby);
+  void StandbyStateChanged(bool);
 
   void SetFocus();
 #ifdef QT_WEBKIT

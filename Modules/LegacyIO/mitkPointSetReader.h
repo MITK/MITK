@@ -40,8 +40,8 @@ namespace mitk
  * The reader is able to read the old 3D Pointsets without the "specification" and "timeseries" tags and the new 4D Pointsets.
  * @note loading point sets from multiple files according to a given file pattern
  * is not yet supported!
- * @ingroup PSIO
- * @ingroup IO
+ *
+ * @ingroup MitkLegacyIOModule
  *
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 */

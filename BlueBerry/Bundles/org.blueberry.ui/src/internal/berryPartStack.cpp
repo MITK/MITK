@@ -1100,7 +1100,7 @@ bool PartStack::SaveState(IMemento::Pointer memento)
       LayoutPart::Pointer next = *iter;
 
       PartPane::Pointer part;
-      if (part = next.Cast<PartPane>())
+      if ((part = next.Cast<PartPane>()))
       {
         // Have we already written it out?
         if (cachedIds.find(part->GetPlaceHolderId()) != cachedIds.end())

@@ -23,8 +23,7 @@
 #include "MitkOverlaysExports.h"
 
 class vtkTextActor;
-class vtkImageMapper;
-class vtkImageData;
+class vtkPropAssembly;
 
 namespace mitk {
 
@@ -36,9 +35,15 @@ public:
   {
   public:
     /** \brief Actor of a 2D render window. */
-    vtkSmartPointer<vtkActor2D> m_textActor;
-    vtkSmartPointer<vtkImageData> m_textImage;
-    vtkSmartPointer<vtkImageMapper> m_imageMapper;
+    vtkSmartPointer<vtkTextActor> m_TextActor;
+
+    vtkSmartPointer<vtkTextProperty> m_TextProp;
+
+    vtkSmartPointer<vtkTextActor> m_STextActor;
+
+    vtkSmartPointer<vtkTextProperty> m_STextProp;
+
+    vtkSmartPointer<vtkPropAssembly> m_Assembly;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;
@@ -56,11 +61,13 @@ public:
   virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const;
   virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds& bounds);
 
+
 protected:
 
   /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
   mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
+  vtkProp* GetVtkProp(BaseRenderer *renderer) const;
   virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer) const;
   void UpdateVtkOverlay2D(mitk::BaseRenderer *renderer);
 
@@ -77,7 +84,6 @@ private:
 
   /** \brief assignment operator */
   TextOverlay2D &operator=(const TextOverlay2D &);
-
 };
 
 } // namespace mitk

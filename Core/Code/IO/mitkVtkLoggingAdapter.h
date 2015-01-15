@@ -23,9 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 
 namespace mitk {
-//##Documentation
-//## @brief Adapter that overwrites the standard vtk logging output window and sends the logging messages to the MITK logging instead.
-//## @ingroup IO
+
+/**
+ * @brief Adapter that overwrites the standard vtk logging output window and sends the logging messages to the MITK logging instead.
+ * @ingroup IO
+ */
 class MITK_CORE_EXPORT VtkLoggingAdapter : public vtkOutputWindow
 {
 public:

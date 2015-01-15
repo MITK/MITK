@@ -174,14 +174,6 @@ public:
   }
 
   //##Documentation
-  //## @brief Distance between two lines
-  double Distance( const Line<TCoordRep,NPointDimension>& line ) const
-  {
-    MITK_WARN << "Not implemented yet!";
-    return -1;
-  }
-
-  //##Documentation
   //## @brief Distance of a point from the line
   double Distance( const itk::Point<TCoordRep,NPointDimension>& point ) const
   {
@@ -400,8 +392,18 @@ public:
         int k = (j + 1) % 3;
         int l = (j + 2) % 3;
 
-        if ( (point[k] >= box[k*2]) && (point[k] <= box[k*2+1])
-          && (point[l] >= box[l*2]) && (point[l] <= box[l*2+1]) )
+        if (
+            (
+               ((point[k] >= box[k*2]) && (point[k] <= box[k*2+1]))
+            || ((point[k] <= box[k*2]) && (point[k] >= box[k*2+1]))
+            )
+            &&
+            (
+               ((point[l] >= box[l*2]) && (point[l] <= box[l*2+1]))
+            || ((point[l] <= box[l*2]) && (point[l] >= box[l*2+1]))
+            )
+
+           )
         {
           if ( num == 0 )
           {

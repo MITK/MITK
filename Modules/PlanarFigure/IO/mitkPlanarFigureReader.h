@@ -34,7 +34,7 @@ namespace mitk
  * Reader for xml files containing one or multiple xml represenations of
  * mitk::PlanarFigure. If multiple mitk::PlanarFigure are stored in one file,
  * these are assigned to multiple outputs of the filter.
- * @ingroup IO
+ * @ingroup MitkPlanarFigureModule
 */
 class MitkPlanarFigure_EXPORT PlanarFigureReader: public PlanarFigureSource, public FileReader
 {

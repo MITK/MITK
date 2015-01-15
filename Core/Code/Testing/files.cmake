@@ -166,8 +166,8 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DLookupTableTest.cpp
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
-    mitkSurfaceGLMapper2DColorTest.cpp
-    mitkSurfaceGLMapper2DOpacityTest.cpp
+    mitkSurfaceVtkMapper2DColorTest.cpp
+    mitkSurfaceVtkMapper2DOpacityTest.cpp
     mitkVolumeCalculatorTest.cpp
     mitkLevelWindowManagerTest.cpp
     mitkPointSetVtkMapper2DTest.cpp

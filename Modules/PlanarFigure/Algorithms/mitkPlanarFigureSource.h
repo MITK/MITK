@@ -33,7 +33,7 @@ namespace mitk
  * as output. mitk::PlanarFigureSources do not provide support
  * for streaming, that is, that the requested region is always the largest
  * possible region.
- * @ingroup Process
+ * @ingroup MitkPlanarFigureModule
  */
 class MitkPlanarFigure_EXPORT PlanarFigureSource : public mitk::BaseDataSource
 {

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // STL
 #include <iostream>
 #include <fstream>
-#include <locale>
+#include <mitkLocaleSwitch.h>
 
 #include <tinyxml.h>
 
@@ -36,7 +36,8 @@ mitk::PointSetReaderService::~PointSetReaderService()
 
 std::vector< itk::SmartPointer<mitk::BaseData> > mitk::PointSetReaderService::Read()
 {
-  std::locale::global(std::locale("C"));
+  // Switch the current locale to "C"
+  LocaleSwitch localeSwitch("C");
 
   std::vector< itk::SmartPointer<mitk::BaseData> > result;
 

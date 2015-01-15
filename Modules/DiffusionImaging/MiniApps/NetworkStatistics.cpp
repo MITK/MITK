@@ -41,6 +41,7 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
+
   parser.addArgument("inputNetwork", "i", mitkCommandLineParser::InputFile, "Input network", "input connectomics network (.cnf)", us::Any(), false);
   parser.addArgument("outputFile", "o", mitkCommandLineParser::OutputFile, "Output file", "name of output file", us::Any(), false);
 

@@ -35,7 +35,18 @@ public:
   mitkClassMacro(VtkOverlay, Overlay);
   void Update(BaseRenderer *renderer);
   void AddToBaseRenderer(BaseRenderer *renderer);
+  void AddToRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer);
+  void RemoveFromRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer);
   void RemoveFromBaseRenderer(BaseRenderer *renderer);
+
+  /**
+  * \brief Paints the overlay.
+  *
+  * This method forces a paint of the overlay as it is configured at the moment.
+  * \warn Should only be used as alternative to the OverlayManager mechanism
+  * in GL-Mappers.
+  */
+  void Paint( BaseRenderer* renderer );
 
 protected:
 

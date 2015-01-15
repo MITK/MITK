@@ -15,8 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkBaseDataIOFactory.h"
-#include "mitkDiffusionImage.h"
+#include "mitkImage.h"
+#include <mitkImageCast.h>
 #include "mitkBaseData.h"
+#include <mitkDiffusionPropertyHelper.h>
 
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>
 #include <itkDiffusionTensor3D.h>
@@ -60,12 +62,15 @@ int main(int argc, char* argv[])
     {
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
-        DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer());
+        Image::Pointer dwi = dynamic_cast<Image*>(infile.at(0).GetPointer());
+
+        mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+        mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
         typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, float > TensorReconstructionImageFilterType;
         TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
-        filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-        filter->SetBValue(dwi->GetReferenceBValue());
+        filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
+        filter->SetBValue( mitk::DiffusionPropertyHelper::GetReferenceBValue( dwi ));
         filter->SetThreshold(threshold);
         filter->Update();
 

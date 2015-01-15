@@ -9,7 +9,7 @@ if(MITK_USE_PCRE)
 
     set(proj PCRE)
     set(${proj}_DEPENDENCIES "")
-    set(PCRE_TARGET_VERSION 8.35)
+    set(${proj}_DEPENDS ${proj})
 
     ExternalProject_add(${proj}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/pcre-8.35.tar.gz
@@ -18,12 +18,14 @@ if(MITK_USE_PCRE)
       BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build
       INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
       PREFIX ${proj}-cmake
-      CONFIGURE_COMMAND <SOURCE_DIR>/./configure
-                        CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}
-                        LDFLAGS=${CMAKE_LINKER_FLAGS} ${CMAKE_LINKER_FLAGS_RELEASE}
-                        CXX=${CMAKE_CXX_COMPILER}${CMAKE_CXX_COMPILER_ARG1}
-                        --prefix=<INSTALL_DIR>
-                        --disable-shared
+      CMAKE_ARGS
+       ${ep_common_args}
+       "-DCMAKE_C_FLAGS:STRING=${CMAKE_CXX_FLAGS} -fPIC"
+       -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+       -DBUILD_SHARED_LIBS:BOOL=OFF
+       -DPCRE_BUILD_PCREGREP:BOOL=OFF
+       -DPCRE_BUILD_TESTS:BOOL=OFF
+       -DPCRE_SUPPORT_JIT:BOOL=ON
       DEPENDS "${${proj}_DEPENDENCIES}"
       )
 

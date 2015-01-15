@@ -113,7 +113,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
   set(_additional_target_libraries )
   if(_PLUGIN_TEST_PLUGIN)
     find_package(CppUnit REQUIRED)
-    include_directories(${CppUnit_INCLUDE_DIRS})
+    include_directories(SYSTEM ${CppUnit_INCLUDE_DIRS})
     list(APPEND _additional_target_libraries ${CppUnit_LIBRARIES})
   endif()
 
@@ -155,7 +155,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     target_link_libraries(${PLUGIN_TARGET} mbilog)
   endif()
 
-  include_directories(${Poco_INCLUDE_DIRS})
+  include_directories(SYSTEM ${Poco_INCLUDE_DIRS})
   include_directories(${BlueBerry_BINARY_DIR})
 
   # Only add the following Poco libraries due to possible name clashes

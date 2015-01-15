@@ -144,8 +144,6 @@ endif()
 file(MAKE_DIRECTORY ${MITK_DOXYGEN_OUTPUT_DIR}/Guides/Users_Guide/)
 file(MAKE_DIRECTORY ${MITK_DOXYGEN_OUTPUT_DIR}/Guides/Developers_Guide/)
 
-configure_file(Doxygen/MainPage.dox.in
-               ${CMAKE_CURRENT_BINARY_DIR}/Doxygen/MainPage.dox)
 configure_file(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
 configure_file(doxygen_users_guide.conf.in

@@ -4,6 +4,7 @@ set(CPP_FILES
   mitkBoundingObject.cpp
   mitkBoundingObjectGroup.cpp
   mitkCellOperation.cpp
+  mitkClippingPlaneInteractor3D.cpp
   mitkColorSequence.cpp
   mitkColorSequenceCycleH.cpp
   mitkColorSequenceRainbow.cpp
@@ -33,7 +34,10 @@ set(CPP_FILES
 
 set(RESOURCE_FILES
   Interactions/AffineInteraction3D.xml
-  Interactions/AffineTranslationConfig.xml
-  Interactions/AffineRotationConfig.xml
-  Interactions/AffineDeformationConfig.xml
+  Interactions/AffineConfig.xml
+
+  Interactions/ClippingPlaneInteraction3D.xml
+  Interactions/ClippingPlaneTranslationConfig.xml
+  Interactions/ClippingPlaneRotationConfig.xml
+  Interactions/ClippingPlaneDeformationConfig.xml
 )

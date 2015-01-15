@@ -32,8 +32,8 @@ Create and work with fiber tractographies.
   \li \subpage org_mitk_views_fiberprocessing
   \li \subpage org_mitk_views_gibbstracking
   \li \subpage org_mitk_views_stochasticfibertracking
-  \li \subpage org_mitk_views_fiberextraction
   \li \subpage org_mitk_views_fiberprocessing
+  \li \subpage org_mitk_views_fiberquantification
   \li \subpage org_mitk_views_streamlinetracking
   \li \subpage org_mitk_views_fiberfoxview
   \li \subpage org_mitk_views_fieldmapgenerator

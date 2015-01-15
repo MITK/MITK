@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUnstructuredGrid.h>
 #include <QFileDialog>
 
-#include <MitkSceneSerializationExports.h>
 #include <mitkTransferFunctionPropertySerializer.h>
 
 #include <vtkUnstructuredGrid.h>

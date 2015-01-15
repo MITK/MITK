@@ -16,6 +16,7 @@ set(${proj}_DEPENDS ${proj})
 if(NOT DEFINED ${proj}_DIR)
 
   set(patch_cmd ${CMAKE_COMMAND} -Dproj:STRING=${proj} -Dproj_target:STRING=qwt -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake)
+  set(qt54patch_cmd ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchQwt-6.1.0.cmake)
 
   ExternalProject_Add(${proj}
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
@@ -30,6 +31,14 @@ if(NOT DEFINED ${proj}_DIR)
        ${ep_common_args}
        ${qt_project_args}
      DEPENDS ${proj_DEPENDENCIES}
+    )
+
+    ExternalProject_Add_Step(${proj} qt54patch
+      COMMAND ${qt54patch_cmd}
+      WORKING_DIRECTORY ${proj}-src
+      DEPENDEES patch
+      DEPENDERS configure
+      LOG 1
     )
 
   set(${proj}_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)

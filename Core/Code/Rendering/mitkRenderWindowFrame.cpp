@@ -15,26 +15,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkRenderWindowFrame.h"
-
 #include "mitkVtkLayerController.h"
-
-#include <mitkStandardFileLocations.h>
-#include <mitkConfig.h>
-#include <itkObject.h>
-#include <itkMacro.h>
-#include <itksys/SystemTools.hxx>
+#include "vtkMitkRectangleProp.h"
 
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include <vtkObjectFactory.h>
-#include <vtkConfigure.h>
-
-#include <vtkMitkRectangleProp.h>
 
 mitk::RenderWindowFrame::RenderWindowFrame()
 {
   m_RenderWindow           = NULL;
-  m_RectangleRenderer      = vtkRenderer::New();
+  m_RectangleRenderer      = vtkSmartPointer<vtkRenderer>::New();
 
   m_IsEnabled         = false;
 }
@@ -44,10 +34,6 @@ mitk::RenderWindowFrame::~RenderWindowFrame()
   if ( m_RenderWindow != NULL )
     if ( this->IsEnabled() )
       this->Disable();
-
-  if ( m_RectangleRenderer != NULL )
-    m_RectangleRenderer->Delete();
-
 }
 
 /**
@@ -55,7 +41,7 @@ mitk::RenderWindowFrame::~RenderWindowFrame()
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void mitk::RenderWindowFrame::SetRenderWindow( vtkRenderWindow* renderWindow )
+void mitk::RenderWindowFrame::SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renderWindow )
 {
   m_RenderWindow = renderWindow;
 }
@@ -64,7 +50,7 @@ void mitk::RenderWindowFrame::SetRenderWindow( vtkRenderWindow* renderWindow )
  * Returns the vtkRenderWindow, which is used
  * for displaying the text
  */
-vtkRenderWindow* mitk::RenderWindowFrame::GetRenderWindow()
+vtkSmartPointer<vtkRenderWindow> mitk::RenderWindowFrame::GetRenderWindow()
 {
   return m_RenderWindow;
 }
@@ -74,7 +60,7 @@ vtkRenderWindow* mitk::RenderWindowFrame::GetRenderWindow()
  * rendering the  text into the
  * vtkRenderWindow
  */
-vtkRenderer* mitk::RenderWindowFrame::GetVtkRenderer()
+vtkSmartPointer<vtkRenderer> mitk::RenderWindowFrame::GetVtkRenderer()
 {
   return m_RectangleRenderer;
 }
@@ -99,19 +85,14 @@ void mitk::RenderWindowFrame::Disable()
  */
 void mitk::RenderWindowFrame::Enable(float col1, float col2, float col3)
 {
-  vtkMitkRectangleProp* rect = vtkMitkRectangleProp::New();
+  vtkSmartPointer<vtkMitkRectangleProp> rect = vtkSmartPointer<vtkMitkRectangleProp>::New();
   rect->SetRenderWindow(m_RenderWindow);
   rect->SetColor(col1, col2, col3);
 
-  m_RectangleRenderer->AddViewProp(rect);
-
-  rect->Delete();
-
+  m_RectangleRenderer->AddActor(rect);
   if(!mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted( m_RectangleRenderer ))
   {
-
     m_RectangleRenderer->EraseOff();
-
     m_RectangleRenderer->SetInteractive(0);
 
     mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertForegroundRenderer(m_RectangleRenderer,true);
@@ -127,24 +108,3 @@ bool mitk::RenderWindowFrame::IsEnabled()
 {
   return  m_IsEnabled;
 }
-
-void mitk::RenderWindowFrame::SetRequestedRegionToLargestPossibleRegion()
-{
-    //nothing to do
-}
-
-bool mitk::RenderWindowFrame::RequestedRegionIsOutsideOfTheBufferedRegion()
-{
-    return false;
-}
-
-bool mitk::RenderWindowFrame::VerifyRequestedRegion()
-{
-    return true;
-}
-
-void mitk::RenderWindowFrame::SetRequestedRegion( const itk::DataObject*)
-{
-    //nothing to do
-}
-

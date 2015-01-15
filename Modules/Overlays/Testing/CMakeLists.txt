@@ -5,9 +5,9 @@ mitkAddCustomModuleTest(mitkLabelOverlay3DRendering2DTest mitkLabelOverlay3DRend
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkLabelOverlay3DRendering2DTest.png #corresponding reference screenshot
 )
 
-mitkAddCustomModuleTest(mitkLabelOverlay3DRendering3DTest mitkLabelOverlay3DRendering3DTest #OverlayTest
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkLabelOverlay3DRendering3DTest.png #corresponding reference screenshot
-)
+#mitkAddCustomModuleTest(mitkLabelOverlay3DRendering3DTest mitkLabelOverlay3DRendering3DTest #OverlayTest
+#                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkLabelOverlay3DRendering3DTest.png #corresponding reference screenshot
+#)
 
 mitkAddCustomModuleTest(mitkTextOverlay2DRenderingTest_ball mitkTextOverlay2DRenderingTest #OverlayTest
                         ${MITK_DATA_DIR}/ball.stl #input image to load in data storage

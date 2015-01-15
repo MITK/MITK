@@ -54,7 +54,13 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
       )
 
       if(EXECUTABLE_IS_ENABLED)
-       get_target_property(_is_bundle ${EXECUTABLE_TARGET} MACOSX_BUNDLE)
+
+        # On Linux, create a shell script to start a relocatable application
+        if(UNIX AND NOT APPLE)
+          install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME ${EXECUTABLE_TARGET}.sh)
+        endif()
+
+        get_target_property(_is_bundle ${EXECUTABLE_TARGET} MACOSX_BUNDLE)
 
         if(APPLE)
          if(_is_bundle)
@@ -96,6 +102,11 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     DEPENDS MitkCore
     CPP_FILES Dicom2Nrrd.cpp mitkCommandLineParser.cpp
   )
+
+        # On Linux, create a shell script to start a relocatable application
+        if(UNIX AND NOT APPLE)
+          install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME ${EXECUTABLE_TARGET}.sh)
+        endif()
 
   if(EXECUTABLE_IS_ENABLED)
     MITK_INSTALL_TARGETS(EXECUTABLES ${EXECUTABLE_TARGET})

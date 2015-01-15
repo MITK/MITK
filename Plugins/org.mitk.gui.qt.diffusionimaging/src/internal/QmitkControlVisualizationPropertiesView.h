@@ -67,24 +67,8 @@ class QmitkControlVisualizationPropertiesView : public QmitkFunctionality//, pub
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
   virtual void StdMultiWidgetNotAvailable();
 
-  mitk::DataStorage::SetOfObjects::Pointer ActiveSet(std::string);
-
-  void SetBoolProp (mitk::DataStorage::SetOfObjects::Pointer,std::string,bool);
-  void SetIntProp  (mitk::DataStorage::SetOfObjects::Pointer,std::string,int);
-  void SetFloatProp(mitk::DataStorage::SetOfObjects::Pointer,std::string,float);
-  void SetLevelWindowProp(mitk::DataStorage::SetOfObjects::Pointer,std::string,mitk::LevelWindow);
-  void SetEnumProp (mitk::DataStorage::SetOfObjects::Pointer,std::string,mitk::EnumerationProperty::Pointer);
-
-  virtual int GetSizeFlags(bool width);
-  virtual int ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredResult);
-
 protected slots:
 
-  void DisplayIndexChanged(int);
-  void TextIntON();
-  void Reinit();
-
-  void VisibleOdfsON(int view);
   void VisibleOdfsON_S();
   void VisibleOdfsON_T();
   void VisibleOdfsON_C();
@@ -93,29 +77,20 @@ protected slots:
   void NormalizationDropdownChanged(int);
   void ScalingFactorChanged(double);
   void AdditionalScaling(int);
-  void IndexParam1Changed(double);
-  void IndexParam2Changed(double);
-  void OpacityChanged(double,double);
   void ScalingCheckbox();
 
   void OnThickSlicesModeSelected( QAction* action );
   void OnTSNumChanged(int num);
 
-  void BundleRepresentationColor();
   void BundleRepresentationResetColoring();
   void PlanarFigureFocus();
   void Fiber2DfadingEFX();
   void FiberSlicingThickness2D();
   void FiberSlicingUpdateLabel(int);
+  void LineWidthChanged();
 
   void SetInteractor();
 
-  void PFWidth(int);
-  void PFColor();
-
-  void LineWidthChanged();
-
-  void GenerateTdi();
   void Welcome();
 
 protected:
@@ -139,8 +114,6 @@ protected:
   berry::ISelectionListener::Pointer m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
-  bool m_FoundSingleOdfImage;
-  bool m_IsInitialized;
   mitk::DataNode::Pointer m_NodeUsedForOdfVisualization;
 
   QIcon* m_IconTexOFF;
@@ -162,7 +135,7 @@ protected:
   QMenu* m_MyMenu;
 
   // for planarfigure and bundle handling:
-  mitk::DataNode* m_SelectedNode;
+  mitk::DataNode::Pointer m_SelectedNode;
   mitk::DataNode* m_CurrentPickingNode;
 
   unsigned long m_SlicesRotationObserverTag1;

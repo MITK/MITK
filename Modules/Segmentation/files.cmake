@@ -1,9 +1,6 @@
 set(CPP_FILES
   Algorithms/mitkCalculateSegmentationVolume.cpp
-  #Algorithms/mitkContourModelSource.cpp
-  #Algorithms/mitkContourModelSubDivisionFilter.cpp
-  #Algorithms/mitkContourModelToPointSetFilter.cpp
-  #Algorithms/mitkContourModelToSurfaceFilter.cpp
+  Algorithms/mitkContourModelSetToImageFilter.cpp
   Algorithms/mitkContourSetToPointSetFilter.cpp
   Algorithms/mitkContourUtils.cpp
   Algorithms/mitkCorrectorAlgorithm.cpp

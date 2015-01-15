@@ -48,13 +48,6 @@ mitk::Mapper::Pointer mitk::FiberTrackingObjectFactory::CreateMapper(mitk::DataN
       newMapper = mitk::FiberBundleXMapper3D::New();
       newMapper->SetDataNode(node);
     }
-
-//    classname = "FiberBundleXThreadMonitor";
-//    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-//    {
-//      newMapper = mitk::FiberBundleXThreadMonitorMapper3D::New();
-//      newMapper->SetDataNode(node);
-//    }
   }
 
   return newMapper;
@@ -68,12 +61,6 @@ void mitk::FiberTrackingObjectFactory::SetDefaultProperties(mitk::DataNode* node
     mitk::FiberBundleXMapper3D::SetDefaultProperties(node);
     mitk::FiberBundleXMapper2D::SetDefaultProperties(node);
   }
-
-//  classname = "FiberBundleXThreadMonitor";
-//  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-//  {
-//    mitk::FiberBundleXThreadMonitorMapper3D::SetDefaultProperties(node);
-//  }
 }
 
 const char* mitk::FiberTrackingObjectFactory::GetFileExtensions()

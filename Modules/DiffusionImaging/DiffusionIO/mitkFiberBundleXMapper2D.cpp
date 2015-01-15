@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyDataMapper.h>
 #include <vtkPlane.h>
 #include <vtkPolyData.h>
+#include <vtkPointData.h>
 //#include <vtkPropAssembly.h>
 
 //#include <vtkPainterPolyDataMapper.h>
@@ -147,26 +148,27 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     if ( node == NULL )
         return;
 
+    vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
+    if (fiberPolyData == NULL)
+        return;
+
+    fiberPolyData->GetPointData()->AddArray(fiberBundle->GetFiberColors());
     localStorage->m_FiberMapper->ScalarVisibilityOn();
     localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
     localStorage->m_FiberMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
     localStorage->m_PointActor->GetProperty()->SetOpacity(0.999);
+    localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
 
-    // set color
-    if (fiberBundle->GetCurrentColorCoding() != NULL)
-    {
-        localStorage->m_FiberMapper->SelectColorArray(fiberBundle->GetCurrentColorCoding());
+//        if(fiberBundle->GetCurrentColorCoding() == fiberBundle->COLORCODING_CUSTOM){
+//            float temprgb[3];
+//            this->GetDataNode()->GetColor( temprgb, NULL );
+//            double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
+//            localStorage->m_PointActor->GetProperty()->SetColor(trgb);
+//        }
 
-        if(fiberBundle->GetCurrentColorCoding() == fiberBundle->COLORCODING_CUSTOM){
-            float temprgb[3];
-            this->GetDataNode()->GetColor( temprgb, NULL );
-            double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
-            localStorage->m_PointActor->GetProperty()->SetColor(trgb);
-        }
-    }
     int lineWidth = 1;
     node->GetIntProperty("LineWidth",lineWidth);
-    localStorage->m_FiberMapper->SetInputData(fiberBundle->GetFiberPolyData());
+    localStorage->m_FiberMapper->SetInputData(fiberPolyData);
     localStorage->m_PointActor->SetMapper(localStorage->m_FiberMapper);
     localStorage->m_PointActor->GetProperty()->ShadingOn();
     localStorage->m_PointActor->GetProperty()->SetLineWidth(lineWidth);
@@ -188,6 +190,7 @@ vtkProp* mitk::FiberBundleXMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 
 void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
+    Superclass::SetDefaultProperties(node, renderer, overwrite);
     node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));
 
     // Shaders
@@ -198,10 +201,9 @@ void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
     }
 
     //add other parameters to propertylist
-    node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(2.0f), renderer, overwrite );
+    node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(1.0f), renderer, overwrite );
     node->AddProperty( "Fiber2DfadeEFX", mitk::BoolProperty::New(true), renderer, overwrite );
-
-    Superclass::SetDefaultProperties(node, renderer, overwrite);
+    node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), renderer, overwrite);
 }
 
 

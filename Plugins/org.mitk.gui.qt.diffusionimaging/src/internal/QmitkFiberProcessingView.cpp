@@ -1447,9 +1447,7 @@ void QmitkFiberProcessingView::DoImageColorCoding()
     for(unsigned int i=0; i<m_SelectedFB.size(); i++ )
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        fib->SetFAMap(dynamic_cast<mitk::Image*>(m_Controls->m_ColorMapBox->GetSelectedNode()->GetData()));
-        fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_FA_BASED);
-        fib->DoColorCodingFaBased();
+        fib->ColorFibersByScalarMap(dynamic_cast<mitk::Image*>(m_Controls->m_ColorMapBox->GetSelectedNode()->GetData()), m_Controls->m_FiberOpacityBox->isChecked());
     }
 
     if(m_MultiWidget)

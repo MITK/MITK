@@ -50,9 +50,6 @@ public:
     typedef itk::Image<unsigned char, 3> ItkUcharImgType;
 
     // fiber colorcodings
-    static const char* COLORCODING_ORIENTATION_BASED;
-    static const char* COLORCODING_FA_BASED;
-    static const char* COLORCODING_CUSTOM;
     static const char* FIBER_ID_ARRAY;
 
     virtual void UpdateOutputInformation();
@@ -67,14 +64,15 @@ public:
     mitkNewMacro1Param(Self, vtkSmartPointer<vtkPolyData>) // custom constructor
 
     // colorcoding related methods
-    void SetColorCoding(const char*);
-    void SetFAMap(mitk::Image::Pointer);
+    void ColorFibersByScalarMap(mitk::Image::Pointer, bool opacity);
     template <typename TPixel>
-    void SetFAMap(const mitk::PixelType pixelType, mitk::Image::Pointer);
+    void ColorFibersByScalarMap(const mitk::PixelType pixelType, mitk::Image::Pointer, bool opacity);
     void DoColorCodingOrientationBased();
-    void DoColorCodingFaBased();
-    void DoUseFaFiberOpacity();
+    void SetFiberOpacity(vtkDoubleArray *FAValArray);
     void ResetFiberOpacity();
+    void SetFiberColors(vtkSmartPointer<vtkUnsignedCharArray> fiberColors);
+    void SetFiberColors(float r, float g, float b, float alpha=255);
+    vtkSmartPointer<vtkUnsignedCharArray> GetFiberColors() const { return m_FiberColors; }
 
     // fiber compression
     void Compress(float error = 0.0);
@@ -116,8 +114,6 @@ public:
     void SetFiberWeights(vtkSmartPointer<vtkFloatArray> weights);
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);
     vtkSmartPointer<vtkPolyData> GetFiberPolyData() const;
-    std::vector< std::string > GetAvailableColorCodings();
-    char* GetCurrentColorCoding();
     itkGetMacro( NumFibers, int)
     //itkGetMacro( FiberSampling, int)
     int GetNumFibers() const {return m_NumFibers;}
@@ -130,6 +126,7 @@ public:
     itkGetMacro( UpdateTime3D, itk::TimeStamp )
     void RequestUpdate2D(){ m_UpdateTime2D.Modified(); }
     void RequestUpdate3D(){ m_UpdateTime3D.Modified(); }
+    void RequestUpdate(){ m_UpdateTime2D.Modified(); m_UpdateTime3D.Modified(); }
 
     unsigned long GetNumberOfPoints();
 
@@ -152,9 +149,6 @@ protected:
     // calculate geometry from fiber extent
     void UpdateFiberGeometry();
 
-    // calculate colorcoding values according to m_CurrentColorCoding
-    void UpdateColorCoding();
-
 private:
 
     // actual fiber container
@@ -163,9 +157,9 @@ private:
     // contains fiber ids
     vtkSmartPointer<vtkDataSet>   m_FiberIdDataSet;
 
-    char* m_CurrentColorCoding;
     int   m_NumFibers;
 
+    vtkSmartPointer<vtkUnsignedCharArray> m_FiberColors;
     vtkSmartPointer<vtkFloatArray> m_FiberWeights;
     std::vector< float > m_FiberLengths;
     float   m_MinFiberLength;

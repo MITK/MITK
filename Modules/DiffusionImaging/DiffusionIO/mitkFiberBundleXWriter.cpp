@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkSize.h>
 #include <vtkFloatArray.h>
 #include <vtkCellData.h>
+#include <vtkPointData.h>
 #include <mitkAbstractFileWriter.h>
 #include <mitkCustomMimeType.h>
 #include "mitkDiffusionIOMimeTypes.h"
@@ -80,9 +81,8 @@ void mitk::FiberBundleXWriter::Write()
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetOutputLocation().c_str());
 
     vtkSmartPointer<vtkPolyData> fibPoly = input->GetFiberPolyData();
-
-    vtkSmartPointer<vtkFloatArray> weights = input->GetFiberWeights();
     fibPoly->GetCellData()->AddArray(input->GetFiberWeights());
+    fibPoly->GetPointData()->AddArray(input->GetFiberColors());
 
     // default extension is .fib
     if(ext == "")

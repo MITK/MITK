@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkDataArray.h>
 #include <vtkFloatArray.h>
 #include <vtkCellData.h>
+#include <vtkPointData.h>
 #include <itksys/SystemTools.hxx>
 #include <tinyxml.h>
 #include <vtkCleanPolyData.h>
@@ -90,7 +91,20 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleXReader::Read()
 
         vtkSmartPointer<vtkFloatArray> weights = vtkFloatArray::SafeDownCast(fiberPolyData->GetCellData()->GetArray("FIBER_WEIGHTS"));
         if (weights!=NULL)
+        {
+//            float weight=0;
+//            for (int i=0; i<weights->GetSize(); i++)
+//                if (!mitk::Equal(weights->GetValue(i),weight,0.00001))
+//                {
+//                    MITK_INFO << "Weight: " << weights->GetValue(i);
+//                    weight = weights->GetValue(i);
+//                }
             fiberBundle->SetFiberWeights(weights);
+        }
+
+        vtkSmartPointer<vtkUnsignedCharArray> fiberColors = vtkUnsignedCharArray::SafeDownCast(fiberPolyData->GetPointData()->GetArray("FIBER_COLORS"));
+        if (fiberColors!=NULL)
+            fiberBundle->SetFiberColors(fiberColors);
 
         result.push_back(fiberBundle.GetPointer());
         return result;

@@ -52,12 +52,9 @@ if(MITK_USE_SimpleITK)
     endif()
 
     ExternalProject_Add(${proj}
+       LIST_SEPARATOR ${sep}
        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SimpleITK-0.8.0.tar.gz
        URL_MD5 "d98f2e5442228e324ef62111febc7446"
-       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-       BINARY_DIR ${proj}-build
-       PREFIX ${proj}-cmake
-       INSTALL_DIR ${proj}-install
        PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/SimpleITK-0.8.0.patch
        CMAKE_ARGS
          ${ep_common_args}
@@ -65,12 +62,10 @@ if(MITK_USE_SimpleITK)
       CMAKE_CACHE_ARGS
          ${additional_cmake_args}
          -DBUILD_SHARED_LIBS:BOOL=${_build_shared}
-         -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
          -DCMAKE_INSTALL_NAME_DIR:STRING=<INSTALL_DIR>/lib
          -DSimpleITK_BUILD_DISTRIBUTE:BOOL=ON
          -DSimpleITK_PYTHON_THREADS:BOOL=ON
          -DUSE_SYSTEM_ITK:BOOL=ON
-         -DBUILD_TESTING:BOOL=OFF
          -DBUILD_EXAMPLES:BOOL=OFF
          -DGDCM_DIR:PATH=${GDCM_DIR}
          -DITK_DIR:PATH=${ITK_DIR}
@@ -79,7 +74,7 @@ if(MITK_USE_SimpleITK)
        DEPENDS ${proj_DEPENDENCIES}
       )
 
-    set(SimpleITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+    set(SimpleITK_DIR ${ep_prefix})
 
     if( MITK_USE_Python )
       # PythonDir needs to be fixed for the python interpreter by

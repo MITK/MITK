@@ -24,23 +24,18 @@ if(MITK_USE_DCMTK)
     endif()
 
     ExternalProject_Add(${proj}
-      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-      BINARY_DIR ${proj}-build
-      PREFIX ${proj}-cmake
+      LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.1_20121102.tar.gz
       URL_MD5 39d97456027a4219ce47e566e3ab123b
-      INSTALL_DIR ${proj}-install
       PATCH_COMMAND ${DCMTK_PATCH_COMMAND}
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
          ${ep_common_args}
          #-DDCMTK_OVERWRITE_WIN32_COMPILER_FLAGS:BOOL=OFF
-         -DBUILD_SHARED_LIBS:BOOL=ON
          "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS} ${DCMTK_CXX_FLAGS}"
          "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS} ${DCMTK_C_FLAGS}"
-         -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
-         -DDCMTK_INSTALL_BINDIR:STRING=bin/${CMAKE_CFG_INTDIR}
-         -DDCMTK_INSTALL_LIBDIR:STRING=lib/${CMAKE_CFG_INTDIR}
+         #-DDCMTK_INSTALL_BINDIR:STRING=bin/${CMAKE_CFG_INTDIR}
+         #-DDCMTK_INSTALL_LIBDIR:STRING=lib/${CMAKE_CFG_INTDIR}
          -DDCMTK_WITH_DOXYGEN:BOOL=OFF
          -DDCMTK_WITH_ZLIB:BOOL=OFF # see bug #9894
          -DDCMTK_WITH_OPENSSL:BOOL=OFF # see bug #9894
@@ -51,7 +46,7 @@ if(MITK_USE_DCMTK)
          -DCMAKE_INSTALL_NAME_DIR:STRING=<INSTALL_DIR>/lib
       DEPENDS ${proj_DEPENDENCIES}
       )
-    set(DCMTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
+    set(DCMTK_DIR ${ep_prefix})
 
   else()
 

@@ -10,23 +10,21 @@ if(MITK_USE_ZLIB)
     # Using the ZLIB from CTK:
     # https://github.com/commontk/zlib
     ExternalProject_Add(${proj}
+      LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/zlib-66a75305.tar.gz
       URL_MD5 "4c3f572b487ae7947fd88ec363533bc5"
-      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-      BINARY_DIR ${proj}-build
-      PREFIX ${proj}-cmake
-      INSTALL_DIR ${proj}-install
       CMAKE_ARGS
-      ${ep_common_args}
+        ${ep_common_args}
       CMAKE_CACHE_ARGS
-      -DBUILD_SHARED_LIBS:BOOL=OFF
-      -DZLIB_MANGLE_PREFIX:STRING=mitk_zlib_
-      -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+        -DBUILD_SHARED_LIBS:BOOL=OFF
+        -DZLIB_MANGLE_PREFIX:STRING=mitk_zlib_
+        -DZLIB_INSTALL_INCLUDE_DIR:STRING=include/mitk_zlib
+        
       DEPENDS
       ${ZLIB_DEPENDENCIES}
       )
-    set(ZLIB_DIR ${CMAKE_BINARY_DIR}/${proj}-install)
-    set(ZLIB_INCLUDE_DIR ${ZLIB_DIR}/include)
+    set(ZLIB_DIR ${ep_prefix})
+    set(ZLIB_INCLUDE_DIR ${ZLIB_DIR}/include/mitk_zlib)
     if(WIN32)
       set(ZLIB_LIBRARY ${ZLIB_DIR}/lib/zlib.lib)
     else()

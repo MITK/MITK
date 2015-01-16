@@ -16,17 +16,13 @@ if(MITK_USE_Poco)
   if(NOT DEFINED ${proj}_DIR)
 
     ExternalProject_Add(${proj}
-      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-      BINARY_DIR ${proj}-build
-      INSTALL_DIR ${proj}-install
-      PREFIX ${proj}-cmake
+      LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.6.0-all.tar.gz
       URL_MD5 4fed893d4ca57db98b0e10d82545232a
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Poco-1.6.0.patch
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
-        -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
         #-DCMAKE_INSTALL_NAME_DIR:STRING=<INSTALL_DIR>/lib
         #-DCMAKE_INSTALL_RPATH:STRING=<INSTALL_DIR>/lib
         -DENABLE_XML:BOOL=ON
@@ -52,7 +48,7 @@ if(MITK_USE_Poco)
       DEPENDS ${proj_DEPENDENCIES}
      )
 
-    set(${proj}_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
+    set(${proj}_DIR ${ep_prefix})
 
   else()
 

@@ -24,6 +24,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
 
     # download the source code
     ExternalProject_Add(Python-src
+      LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/${PYTHON_SOURCE_PACKAGE}.tgz
       URL_MD5  "2cf641732ac23b18d139be077bd906cd"
       PREFIX   ${CMAKE_BINARY_DIR}/${PYTHON_SOURCE_PACKAGE}-cmake
@@ -115,18 +116,14 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     # CMake build environment for python from:
     # https://github.com/davidsansome/python-cmake-buildsystem
     ExternalProject_Add(${proj}
+      LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/python-cmake-buildsystem-47845c55.tar.gz
       URL_MD5 "6e49d1ed93a5a0fff7621430c163d2d1"
-      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       # fix to build python on i686 and i386 with the python cmake build system,
       # the x86 path must be set as default
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/python-cmake-buildsystem-47845c55.patch
-      PREFIX ${proj}-cmake
-      BINARY_DIR ${proj}-build
-      INSTALL_DIR ${proj}-install
       CMAKE_ARGS
         ${ep_common_args}
-        -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
       CMAKE_CACHE_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -141,7 +138,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         ${Python_DEPENDENCIES}
     )
 
-    set(Python_DIR "${CMAKE_BINARY_DIR}/${proj}-install")
+    set(Python_DIR "${ep_prefix}")
 
     if(UNIX)
       set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
@@ -171,7 +168,7 @@ ${PYTHON_EXECUTABLE} -m compileall
       # ones will cause conflicts if system libraries are present during the build/configure process
       # of opencv, since they will try to lookup the sys path first if no lib is directly
       # linked with it s path into the executable
-      set(PYTHON_EXECUTABLE "${CMAKE_BINARY_DIR}/${proj}-build/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
+      set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
     else()
       set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include")

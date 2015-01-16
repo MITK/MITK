@@ -80,11 +80,10 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     endif()
 
     ExternalProject_Add(${proj}
+      LIST_SEPARATOR ${sep}
       URL ${Numpy_URL}
       URL_MD5 ${Numpy_MD5}
-      SOURCE_DIR ${proj}-src
       ${NUMPY_PATCH_COMMAND}
-      PREFIX ${proj}-cmake
       BUILD_IN_SOURCE 1
       CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${_configure_step}
       BUILD_COMMAND   ${CMAKE_COMMAND} -P ${_build_step}

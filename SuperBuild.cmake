@@ -112,7 +112,6 @@ if(MITK_USE_QT)
 endif()
 
 if(MITK_USE_Redland)
-  set(REDLAND_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/Redland-install)
   set(MITK_USE_raptor2 1)
   set(MITK_USE_PCRE 1)
   set(MITK_USE_rasqal 1)
@@ -123,7 +122,7 @@ if(MITK_USE_SOFA)
   set(MITK_USE_GLUT 1)
 endif()
 
-if(NOT MITK_USE_SYSTEM_PYTHON)
+if(MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON)
   set(MITK_USE_ZLIB 1)
 endif()
 
@@ -182,15 +181,8 @@ endif()
 
 include(ExternalProject)
 
-set(ep_base "${CMAKE_BINARY_DIR}/CMakeExternals")
-set_property(DIRECTORY PROPERTY EP_BASE ${ep_base})
-
-set(ep_install_dir ${ep_base}/Install)
-#set(ep_build_dir ${ep_base}/Build)
-set(ep_source_dir ${ep_base}/Source)
-#set(ep_parallelism_level)
-set(ep_build_shared_libs ON)
-set(ep_build_testing OFF)
+set(ep_prefix "${CMAKE_BINARY_DIR}/ep")
+set_property(DIRECTORY PROPERTY EP_PREFIX ${ep_prefix})
 
 # Compute -G arg for configuring external projects with the same CMake generator:
 if(CMAKE_EXTRA_GENERATOR)
@@ -216,9 +208,9 @@ mitkFunctionCheckCompilerFlags("-std=c++11" _cxx11_flag)
 set(ep_common_args
   -DCMAKE_CXX_EXTENSIONS:STRING=0
   -DCMAKE_CXX_STANDARD:STRING=11
-  -DBUILD_TESTING:BOOL=${ep_build_testing}
-  -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
-  -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}
+  -DBUILD_TESTING:BOOL=OFF
+  -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+  "-DCMAKE_PREFIX_PATH:PATH=<INSTALL_DIR>^^${CMAKE_PREFIX_PATH}"
   -DBUILD_SHARED_LIBS:BOOL=ON
   -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
   -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -408,14 +400,12 @@ endif()
 set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}
-  LIST_SEPARATOR ^^
+  LIST_SEPARATOR ${sep}
   DOWNLOAD_COMMAND ""
   CMAKE_GENERATOR ${gen}
   CMAKE_CACHE_ARGS
     # --------------- Build options ----------------
-    -DBUILD_TESTING:BOOL=${ep_build_testing}
     -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/MITK-build/install
-    -DBUILD_SHARED_LIBS:BOOL=ON
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     # --------------- Compile options ----------------
     -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -479,7 +469,6 @@ ExternalProject_Add(${proj}
     -DRaptor2_DIR:PATH=${raptor2_DIR}
     -DRasqal_DIR:PATH=${rasqal_DIR}
     -DRedland_DIR:PATH=${redland_DIR}
-    -DREDLAND_INSTALL_DIR:PATH=${REDLAND_INSTALL_DIR}
     -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
@@ -491,6 +480,7 @@ ExternalProject_Add(${proj}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}
+    "-DCMAKE_PREFIX_PATH:PATH=${ep_prefix}^^${CMAKE_PREFIX_PATH}"
 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/MITK-build

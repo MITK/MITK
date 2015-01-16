@@ -39,12 +39,9 @@ if(MITK_USE_SWIG)
       mark_as_advanced( BISON_FLAGS)
 
       ExternalProject_add(${proj}
+        LIST_SEPARATOR ${sep}
         URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swig-${SWIG_TARGET_VERSION}.tar.gz
         URL_MD5 "62f9b0d010cef36a13a010dc530d0d41"
-        SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src
-        BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build
-        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
-        PREFIX ${proj}-cmake
         CONFIGURE_COMMAND <SOURCE_DIR>/./configure
                           CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}
                           LDFLAGS=${CMAKE_LINKER_FLAGS} ${CMAKE_LINKER_FLAGS_RELEASE}
@@ -56,8 +53,8 @@ if(MITK_USE_SWIG)
         DEPENDS ${Swig_DEPENDENCIES}
         )
 
-      set(SWIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/share/swig/${SWIG_TARGET_VERSION})
-      set(SWIG_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/bin/swig)
+      set(SWIG_DIR ${ep_prefix}/share/swig/${SWIG_TARGET_VERSION})
+      set(SWIG_EXECUTABLE ${ep_prefix}/bin/swig)
 
     endif()
   endif(NOT SWIG_DIR)

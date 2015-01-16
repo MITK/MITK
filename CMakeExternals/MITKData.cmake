@@ -17,6 +17,7 @@ if(BUILD_TESTING)
 #                  ^^^^^^^^  these are just to check correct length of hash part
 
   ExternalProject_Add(${proj}
+    SOURCE_DIR ${proj}
     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MITK-Data_${revision_tag}.tar.gz
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
@@ -25,7 +26,7 @@ if(BUILD_TESTING)
     DEPENDS ${proj_DEPENDENCIES}
   )
 
-  set(MITK_DATA_DIR ${ep_source_dir}/${proj})
+  set(MITK_DATA_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj})
 
 else()
 

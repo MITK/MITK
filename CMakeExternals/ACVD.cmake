@@ -12,29 +12,22 @@ if(MITK_USE_ACVD)
   set(proj_DEPENDENCIES VTK)
   set(ACVD_DEPENDS ${proj})
 
-  set(patch_file ACVD-vtk6_2d8f5ea5.patch)
-  if(MITK_USE_Qt5)
-    set(patch_file ACVD-vtk6_2d8f5ea5_qt5.patch)
-  endif()
-
   if(NOT DEFINED ACVD_DIR)
     ExternalProject_Add(${proj}
-      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-      BINARY_DIR ${proj}-build
-      PREFIX ${proj}-cmake
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ACVD-vtk6_2d8f5ea5.tar.gz
-      URL_MD5 ecc97728a86798b35c20eef964b094c9
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/${patch_file}
-      INSTALL_COMMAND ""
+      LIST_SEPARATOR ${sep}
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ACVD-vtk6_3d5ae388.tar.gz
+      URL_MD5 5d47000a6ee3be0ec8ac7dedc04896c0
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ACVD-vtk6_3d5ae388.patch
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
         -DUSE_MULTITHREADING:BOOL=ON
+        -DBUILD_EXAMPLES:BOOL=OFF
         -DVTK_DIR:PATH=${VTK_DIR}
       DEPENDS ${proj_DEPENDENCIES}
     )
 
-    set(ACVD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+    set(ACVD_DIR ${ep_prefix})
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()

@@ -43,26 +43,22 @@ if(NOT DEFINED ITK_DIR)
   )
 
   ExternalProject_Add(${proj}
-     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-     BINARY_DIR ${proj}-build
-     PREFIX ${proj}-cmake
+     LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.5.1-3e550bf8.tar.gz
      URL_MD5 80e433ffc0e81cdc19a03dd02a3c329b
-     INSTALL_COMMAND ""
      # work with external GDCM
      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.5.1.patch
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
        ${additional_cmake_args}
-       -DBUILD_TESTING:BOOL=OFF
        -DBUILD_EXAMPLES:BOOL=OFF
        -DITK_USE_SYSTEM_GDCM:BOOL=ON
        -DGDCM_DIR:PATH=${GDCM_DIR}
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  set(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  set(ITK_DIR ${ep_prefix})
 
 else()
 

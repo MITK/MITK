@@ -16,10 +16,7 @@ set(${proj}_DEPENDS ${proj})
 if(NOT DEFINED rasqal_DIR)
 
   ExternalProject_Add(${proj}
-     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-     BINARY_DIR ${proj}-build
-     INSTALL_DIR ${REDLAND_INSTALL_DIR}
-     PREFIX ${proj}-cmake
+     LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/rasqal-0.9.32.tar.gz
      URL_MD5 dc7c6107de00c47f85f6ab7db164a136
      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/rasqal-0.9.32.patch
@@ -27,8 +24,6 @@ if(NOT DEFINED rasqal_DIR)
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
-       -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-       -DBUILD_SHARED_LIBS:BOOL=ON
        "-DCMAKE_C_FLAGS:STRING=-DPCRE_STATIC ${CMAKE_C_FLAGS}"
        -DRASQAL_REGEX:STRING=pcre
        -DCMAKE_PREFIX_PATH:STRING=${PCRE_DIR}^^${REDLAND_INSTALL_DIR}
@@ -36,7 +31,7 @@ if(NOT DEFINED rasqal_DIR)
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  set(${proj}_DIR ${REDLAND_INSTALL_DIR}/lib/rasqal/cmake/)
+  set(${proj}_DIR ${ep_prefix})
 
 else()
 

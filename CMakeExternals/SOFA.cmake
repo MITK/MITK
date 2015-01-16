@@ -71,13 +71,11 @@ if(MITK_USE_SOFA)
 
   if(NOT DEFINED SOFA_DIR)
     ExternalProject_Add(${proj}
-      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-      BINARY_DIR ${proj}-build
-      PREFIX ${proj}-cmake
+      LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SOFA-${rev}.tar.gz
       URL_MD5 31ca701e985331e96bd52d9e58842a86
       PATCH_COMMAND ${SOFA_PATCH_COMMAND}
-      INSTALL_COMMAND ""
+      #INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
@@ -92,7 +90,7 @@ if(MITK_USE_SOFA)
       LOG 1
     )
 
-    set(SOFA_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+    set(SOFA_DIR ${ep_prefix})
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()

@@ -30,7 +30,6 @@ if(MITK_USE_PCRE)
         CMAKE_ARGS
           ${ep_common_args}
          "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS} -fPIC"
-         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
          -DBUILD_SHARED_LIBS:BOOL=OFF
          -DPCRE_BUILD_PCREGREP:BOOL=OFF
          -DPCRE_BUILD_TESTS:BOOL=OFF
@@ -39,17 +38,14 @@ if(MITK_USE_PCRE)
     endif()
 
     ExternalProject_add(${proj}
+      LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/pcre-8.35.tar.gz
       URL_MD5 "ed58bcbe54d3b1d59e9f5415ef45ce1c"
-      SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src
-      BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build
-      INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
-      PREFIX ${proj}-cmake
       ${configure_cmd}
       DEPENDS "${${proj}_DEPENDENCIES}"
       )
 
-    set(PCRE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
+    set(PCRE_DIR ${ep_prefix})
 
   else()
     mitkMacroEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")

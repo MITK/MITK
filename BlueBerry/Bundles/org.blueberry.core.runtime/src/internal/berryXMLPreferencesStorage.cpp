@@ -50,8 +50,6 @@ using Poco::Exception;
 
 namespace berry
 {
-
-
   XMLPreferencesStorage::XMLPreferencesStorage( const Poco::File& _File )
     : AbstractPreferencesStorage(_File)
   {
@@ -84,12 +82,12 @@ namespace berry
     }
   }
 
-
-
   void XMLPreferencesStorage::Flush(IPreferences*  /*_Preferences*/) throw(Poco::Exception, BackingStoreException)
   {
-    std::locale localeBackup;
-    std::locale::global(std::locale(""));
+    std::locale localeBackup;             // See bug #18575: Do not remove these lines! In case of any issues regarding
+    std::locale::global(std::locale("")); // the formatting of numbers, try to set the numeric facet. The C locale is NOT
+                                          // available here at application shutdown (possibly a bug in MSVC 2013 standard
+                                          // library), i.e., it is already partly deconstructed.
 
     try
     {
@@ -188,6 +186,5 @@ namespace berry
     {
       this->ToDOMTree((*it).GetPointer(), newNode);
     }
-
   }
 }

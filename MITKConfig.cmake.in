@@ -3,6 +3,13 @@ if(CMAKE_VERSION VERSION_LESS @MITK_CMAKE_MINIMUM_REQUIRED_VERSION@)
 endif()
 
 set(MITK_CXX_STANDARD @MITK_CXX_STANDARD@)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+  # CMake 3.1 does not know yet how to enable C++11 for AppleClang
+  # See http://public.kitware.com/Bug/view.php?id=15355
+  set(MITK_NO_CXX_STANDARD_ERROR 1)
+endif()
+
 # We use target_compile_features for GNU and Clang to enusre
 # external projects are compiled with e.g. -std=c++11. For
 # msvc, C++11 support is always enabled by the compiler itself.

@@ -556,11 +556,16 @@ endif()
 # MITK C/CXX Flags
 #-----------------------------------------------------------------------------
 
-# help keeping cross-platform compatibility
 set(MITK_CXX_STANDARD 11)
-set(CMAKE_CXX_EXTENSIONS 0)
-set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
-set(CMAKE_CXX_STANDARD_REQUIRED 1)
+
+# help keeping cross-platform compatibility
+# CMake 3.1 does not yet know how to handle AppleClang...
+# See http://public.kitware.com/Bug/view.php?id=15355
+if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+  set(CMAKE_CXX_EXTENSIONS 0)
+  set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
+  set(CMAKE_CXX_STANDARD_REQUIRED 1)
+endif()
 
 # Required and enabled C++11 features for all MITK code.
 # These are added as PUBLIC compile features to all MITK modules.

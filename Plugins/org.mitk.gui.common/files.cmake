@@ -17,6 +17,7 @@ set(SRC_CPP_FILES
   mitkIZombieViewPart.h
   mitkIZombieViewPart.cpp
   mitkWorkbenchUtil.cpp
+  mitkPickedDataNodeSelectionProvider.cpp
 )
 
 set(INTERNAL_CPP_FILES

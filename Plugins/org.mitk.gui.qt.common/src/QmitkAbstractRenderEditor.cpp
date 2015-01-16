@@ -20,9 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkDataStorageEditorInput.h>
 #include <mitkIRenderingManager.h>
+#include <mitkPickedDataNodeSelectionProvider.h>
 
 #include <berryIPreferencesService.h>
 #include <berryUIException.h>
+#include <berryISelectionService.h>
+#include <berryISelectionListener.h>
+#include <berryINullSelectionListener.h>
 
 #include <ctkServiceTracker.h>
 
@@ -30,8 +34,9 @@ class QmitkAbstractRenderEditorPrivate
 {
 public:
 
-  QmitkAbstractRenderEditorPrivate()
-    : m_RenderingManagerInterface(mitk::MakeRenderingManagerInterface(mitk::RenderingManager::GetInstance()))
+  QmitkAbstractRenderEditorPrivate(QmitkAbstractRenderEditor* qq)
+      : q(qq)
+    , m_RenderingManagerInterface(mitk::MakeRenderingManagerInterface(mitk::RenderingManager::GetInstance()))
     , m_PrefServiceTracker(QmitkCommonActivator::GetContext())
   {
     m_PrefServiceTracker.open();
@@ -42,13 +47,27 @@ public:
     delete m_RenderingManagerInterface;
   }
 
+  /**
+  * reactions to selection events from views
+  */
+  void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
+  {
+      if (sourcepart.IsNull() || sourcepart.GetPointer() == static_cast<berry::IWorkbenchPart*>(q))
+          return;
+
+      m_SelectionProvider->SetSelection(selection);
+  }
+
+  QmitkAbstractRenderEditor* q;
   mitk::IRenderingManager* m_RenderingManagerInterface;
   ctkServiceTracker<berry::IPreferencesService*> m_PrefServiceTracker;
   berry::IBerryPreferences::Pointer m_Prefs;
+  berry::ISelectionListener::Pointer m_BlueBerrySelectionListener;
+  berry::ISelectionProvider::Pointer m_SelectionProvider;
 };
 
 QmitkAbstractRenderEditor::QmitkAbstractRenderEditor()
-  : d(new QmitkAbstractRenderEditorPrivate)
+  : d(new QmitkAbstractRenderEditorPrivate(this))
 {
 }
 
@@ -58,6 +77,12 @@ QmitkAbstractRenderEditor::~QmitkAbstractRenderEditor()
   {
     d->m_Prefs->OnChanged.RemoveListener(berry::MessageDelegate1<QmitkAbstractRenderEditor, const berry::IBerryPreferences*>
                                          (this, &QmitkAbstractRenderEditor::OnPreferencesChanged ) );
+  }
+
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if (s)
+  {
+      s->RemovePostSelectionListener(d->m_BlueBerrySelectionListener);
   }
 }
 
@@ -75,6 +100,14 @@ void QmitkAbstractRenderEditor::Init(berry::IEditorSite::Pointer site, berry::IE
     d->m_Prefs->OnChanged.AddListener(berry::MessageDelegate1<QmitkAbstractRenderEditor, const berry::IBerryPreferences*>
                                       (this, &QmitkAbstractRenderEditor::OnPreferencesChanged ) );
   }
+
+  this->SetSelectionProvider();
+
+  d->m_BlueBerrySelectionListener = berry::ISelectionListener::Pointer(
+      new berry::NullSelectionChangedAdapter<QmitkAbstractRenderEditorPrivate>(d.data(),
+      &QmitkAbstractRenderEditorPrivate::BlueBerrySelectionChanged));
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(d->m_BlueBerrySelectionListener);
+
 }
 
 mitk::IDataStorageReference::Pointer QmitkAbstractRenderEditor::GetDataStorageReference() const
@@ -102,6 +135,12 @@ berry::IPreferences::Pointer QmitkAbstractRenderEditor::GetPreferences() const
     return prefService->GetSystemPreferences()->Node(this->GetSite()->GetId());
   }
   return berry::IPreferences::Pointer(0);
+}
+
+void QmitkAbstractRenderEditor::SetSelectionProvider()
+{
+    d->m_SelectionProvider = berry::ISelectionProvider::Pointer(new mitk::PickedDataNodeSelectionProvider());
+    this->GetSite()->SetSelectionProvider(d->m_SelectionProvider);
 }
 
 mitk::IRenderingManager* QmitkAbstractRenderEditor::GetRenderingManager() const

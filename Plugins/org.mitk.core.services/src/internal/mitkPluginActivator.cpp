@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVtkLoggingAdapter.h>
 #include <mitkItkLoggingAdapter.h>
 
+#include <mitkDataNodePickingEventObserver.h>
+
 
 namespace mitk
 {
@@ -103,6 +105,11 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
   {
     this->AddMitkService(*i);
   }
+
+  dataNodePickingObserver.reset(new DataNodePickingEventObserver());
+  us::ServiceProperties pickingObserverServiceProperties;
+  pickingObserverServiceProperties["name"] = std::string("DataNodePicker");
+  mitkContext->RegisterService(dataNodePickingObserver.get(), pickingObserverServiceProperties);
 
   mitkContext->AddServiceListener(this, &org_mitk_core_services_Activator::MitkServiceChanged);
 }

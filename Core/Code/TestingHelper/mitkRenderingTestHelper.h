@@ -152,7 +152,6 @@ public:
      */
     std::vector<char*> argv;
     std::vector<std::vector<char> > argvec;
-    int size;
 
   public:
     ArgcHelperClass(const std::vector<std::string>& argstrings):

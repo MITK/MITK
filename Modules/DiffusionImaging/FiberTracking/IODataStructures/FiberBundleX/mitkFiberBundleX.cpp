@@ -42,30 +42,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cmath>
 #include <boost/progress.hpp>
 #include <vtkTransformPolyDataFilter.h>
+#include <mitkTransferFunction.h>
+#include <vtkLookupTable.h>
+#include <mitkLookupTable.h>
 
-const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
-//const char* mitk::FiberBundleX::COLORCODING_FA_AS_OPACITY = "Color_Orient_FA_Opacity";
-const char* mitk::FiberBundleX::COLORCODING_FA_BASED = "FA_Values";
-const char* mitk::FiberBundleX::COLORCODING_CUSTOM = "custom";
 const char* mitk::FiberBundleX::FIBER_ID_ARRAY = "Fiber_IDs";
 
 using namespace std;
 
 mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
-    : m_CurrentColorCoding(NULL)
-    , m_NumFibers(0)
+    : m_NumFibers(0)
     , m_FiberSampling(0)
 {
+    m_FiberWeights = vtkSmartPointer<vtkFloatArray>::New();
+    m_FiberWeights->SetName("FIBER_WEIGHTS");
+
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     if (fiberPolyData != NULL)
     {
         m_FiberPolyData = fiberPolyData;
-        //m_FiberPolyData->DeepCopy(fiberPolyData);
         this->DoColorCodingOrientationBased();
     }
 
     this->UpdateFiberGeometry();
-    this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
     this->GenerateFiberIds();
 }
 
@@ -77,41 +76,16 @@ mitk::FiberBundleX::~FiberBundleX()
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::GetDeepCopy()
 {
     mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(m_FiberPolyData);
-    newFib->SetColorCoding(m_CurrentColorCoding);
+    newFib->SetFiberColors(this->m_FiberColors);
+    newFib->SetFiberWeights(this->m_FiberWeights);
     return newFib;
 }
 
 vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GeneratePolyDataByIds(std::vector<long> fiberIds)
 {
-    MITK_DEBUG << "\n=====FINAL RESULT: fib_id ======\n";
-    MITK_DEBUG << "Number of new Fibers: " << fiberIds.size();
-    // iterate through the vectorcontainer hosting all desired fiber Ids
-
     vtkSmartPointer<vtkPolyData> newFiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkCellArray> newLineSet = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints> newPointSet = vtkSmartPointer<vtkPoints>::New();
-
-    // if FA array available, initialize fa double array
-    // if color orient array is available init color array
-    vtkSmartPointer<vtkDoubleArray> faValueArray;
-    vtkSmartPointer<vtkUnsignedCharArray> colorsT;
-    //colors and alpha value for each single point, RGBA = 4 components
-    unsigned char rgba[4] = {0,0,0,0};
-    int componentSize = sizeof(rgba);
-
-    if (m_FiberIdDataSet->GetPointData()->HasArray(COLORCODING_FA_BASED)){
-        MITK_DEBUG << "FA VALUES AVAILABLE, init array for new fiberbundle";
-        faValueArray = vtkSmartPointer<vtkDoubleArray>::New();
-    }
-
-    if (m_FiberIdDataSet->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED)){
-        MITK_DEBUG << "colorValues available, init array for new fiberbundle";
-        colorsT = vtkUnsignedCharArray::New();
-        colorsT->SetNumberOfComponents(componentSize);
-        colorsT->SetName(COLORCODING_ORIENTATION_BASED);
-    }
-
-
 
     std::vector<long>::iterator finIt = fiberIds.begin();
     while ( finIt != fiberIds.end() )
@@ -122,27 +96,14 @@ vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GeneratePolyDataByIds(std::vect
         }
 
         vtkSmartPointer<vtkCell> fiber = m_FiberIdDataSet->GetCell(*finIt);//->DeepCopy(fiber);
-
         vtkSmartPointer<vtkPoints> fibPoints = fiber->GetPoints();
-
         vtkSmartPointer<vtkPolyLine> newFiber = vtkSmartPointer<vtkPolyLine>::New();
         newFiber->GetPointIds()->SetNumberOfIds( fibPoints->GetNumberOfPoints() );
 
         for(int i=0; i<fibPoints->GetNumberOfPoints(); i++)
         {
-            //            MITK_DEBUG << "id: " << fiber->GetPointId(i);
-            //            MITK_DEBUG << fibPoints->GetPoint(i)[0] << " | " << fibPoints->GetPoint(i)[1] << " | " << fibPoints->GetPoint(i)[2];
             newFiber->GetPointIds()->SetId(i, newPointSet->GetNumberOfPoints());
             newPointSet->InsertNextPoint(fibPoints->GetPoint(i)[0], fibPoints->GetPoint(i)[1], fibPoints->GetPoint(i)[2]);
-
-
-            if (m_FiberIdDataSet->GetPointData()->HasArray(COLORCODING_FA_BASED)){
-                //                MITK_DEBUG << m_FiberIdDataSet->GetPointData()->GetArray(FA_VALUE_ARRAY)->GetTuple(fiber->GetPointId(i));
-            }
-
-            if (m_FiberIdDataSet->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED)){
-                //                MITK_DEBUG << "ColorValue: " << m_FiberIdDataSet->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetTuple(fiber->GetPointId(i))[0];
-            }
         }
 
         newLineSet->InsertNextCell(newFiber);
@@ -151,11 +112,6 @@ vtkSmartPointer<vtkPolyData> mitk::FiberBundleX::GeneratePolyDataByIds(std::vect
 
     newFiberPolyData->SetPoints(newPointSet);
     newFiberPolyData->SetLines(newLineSet);
-    MITK_DEBUG << "new fiberbundle polydata points: " << newFiberPolyData->GetNumberOfPoints();
-    MITK_DEBUG << "new fiberbundle polydata lines: " << newFiberPolyData->GetNumberOfLines();
-    MITK_DEBUG << "=====================\n";
-
-    //    mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(newFiberPolyData);
     return newFiberPolyData;
 }
 
@@ -174,6 +130,10 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::AddBundle(mitk::FiberBundleX* fi
     vtkSmartPointer<vtkPoints> vNewPoints = vtkSmartPointer<vtkPoints>::New();
 
     // add current fiber bundle
+    vtkSmartPointer<vtkFloatArray> weights = vtkSmartPointer<vtkFloatArray>::New();
+    weights->SetNumberOfValues(this->GetNumFibers()+fib->GetNumFibers());
+
+    unsigned int counter = 0;
     for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
     {
         vtkCell* cell = m_FiberPolyData->GetCell(i);
@@ -189,7 +149,9 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::AddBundle(mitk::FiberBundleX* fi
             vtkIdType id = vNewPoints->InsertNextPoint(p);
             container->GetPointIds()->InsertNextId(id);
         }
+        weights->InsertValue(counter, this->GetFiberWeight(i));
         vNewLines->InsertNextCell(container);
+        counter++;
     }
 
     // add new fiber bundle
@@ -208,7 +170,9 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::AddBundle(mitk::FiberBundleX* fi
             vtkIdType id = vNewPoints->InsertNextPoint(p);
             container->GetPointIds()->InsertNextId(id);
         }
+        weights->InsertValue(counter, fib->GetFiberWeight(i));
         vNewLines->InsertNextCell(container);
+        counter++;
     }
 
     // initialize polydata
@@ -217,6 +181,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::AddBundle(mitk::FiberBundleX* fi
 
     // initialize fiber bundle
     mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(vNewPolyData);
+    newFib->SetFiberWeights(weights);
     return newFib;
 }
 
@@ -318,7 +283,6 @@ void mitk::FiberBundleX::SetFiberPolyData(vtkSmartPointer<vtkPolyData> fiberPD, 
 
     if (updateGeometry)
         UpdateFiberGeometry();
-    SetColorCoding(COLORCODING_ORIENTATION_BASED);
     GenerateFiberIds();
 }
 
@@ -340,19 +304,6 @@ void mitk::FiberBundleX::DoColorCodingOrientationBased()
     //  + one fiber with 0 points
     //=================================================
 
-    /*  make sure that processing colorcoding is only called when necessary */
-    if ( m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) &&
-         m_FiberPolyData->GetNumberOfPoints() ==
-         m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED)->GetNumberOfTuples() )
-    {
-        // fiberstructure is already colorcoded
-        MITK_DEBUG << " NO NEED TO REGENERATE COLORCODING! " ;
-        this->ResetFiberOpacity();
-        this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
-        return;
-    }
-
-    /* Finally, execute color calculation */
     vtkPoints* extrPoints = NULL;
     extrPoints = m_FiberPolyData->GetPoints();
     int numOfPoints = 0;
@@ -361,15 +312,12 @@ void mitk::FiberBundleX::DoColorCodingOrientationBased()
 
     //colors and alpha value for each single point, RGBA = 4 components
     unsigned char rgba[4] = {0,0,0,0};
-    //    int componentSize = sizeof(rgba);
     int componentSize = 4;
+    m_FiberColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+    m_FiberColors->Allocate(numOfPoints * componentSize);
+    m_FiberColors->SetNumberOfComponents(componentSize);
+    m_FiberColors->SetName("FIBER_COLORS");
 
-    vtkSmartPointer<vtkUnsignedCharArray> colorsT = vtkSmartPointer<vtkUnsignedCharArray>::New();
-    colorsT->Allocate(numOfPoints * componentSize);
-    colorsT->SetNumberOfComponents(componentSize);
-    colorsT->SetName(COLORCODING_ORIENTATION_BASED);
-
-    /* checkpoint: does polydata contain any fibers */
     int numOfFibers = m_FiberPolyData->GetNumberOfLines();
     if (numOfFibers < 1)
         return;
@@ -442,10 +390,9 @@ void mitk::FiberBundleX::DoColorCodingOrientationBased()
                     rgba[1] = (unsigned char) (255.0 * std::fabs(diff2[1]));
                     rgba[2] = (unsigned char) (255.0 * std::fabs(diff2[2]));
                     rgba[3] = (unsigned char) (255.0);
-
                 }
-                colorsT->InsertTupleValue(idList[i], rgba);
-            } //end for loop
+                m_FiberColors->InsertTupleValue(idList[i], rgba);
+            }
         }
         else if (pointsPerFiber == 1)
         {
@@ -457,90 +404,101 @@ void mitk::FiberBundleX::DoColorCodingOrientationBased()
             MITK_DEBUG << "Fiber with 0 points detected... please check your tractography algorithm!" ;
             continue;
         }
-    }//end for loop
-
-    m_FiberPolyData->GetPointData()->AddArray(colorsT);
-
-    this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
-
-    //mini test, shall be ported to MITK TESTINGS!
-    if (colorsT->GetSize() != numOfPoints*componentSize)
-        MITK_DEBUG << "ALLOCATION ERROR IN INITIATING COLOR ARRAY";
+    }
+    m_UpdateTime3D.Modified();
+    m_UpdateTime2D.Modified();
 }
 
-void mitk::FiberBundleX::DoColorCodingFaBased()
+void mitk::FiberBundleX::SetFiberOpacity(vtkDoubleArray* FAValArray)
 {
-    if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_FA_BASED) != 1 )
-        return;
-
-    this->SetColorCoding(COLORCODING_FA_BASED);
-    //    this->GenerateFiberIds();
-}
-
-void mitk::FiberBundleX::DoUseFaFiberOpacity()
-{
-    if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_FA_BASED) != 1 )
-        return;
-
-    if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED) != 1 )
-        return;
-
-    vtkDoubleArray* FAValArray = (vtkDoubleArray*) m_FiberPolyData->GetPointData()->GetArray(COLORCODING_FA_BASED);
-    vtkUnsignedCharArray* ColorArray = dynamic_cast<vtkUnsignedCharArray*>  (m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED));
-
-    for(long i=0; i<ColorArray->GetNumberOfTuples(); i++) {
+    for(long i=0; i<m_FiberColors->GetNumberOfTuples(); i++)
+    {
         double faValue = FAValArray->GetValue(i);
         faValue = faValue * 255.0;
-        ColorArray->SetComponent(i,3, (unsigned char) faValue );
+        m_FiberColors->SetComponent(i,3, (unsigned char) faValue );
     }
-
-    this->SetColorCoding(COLORCODING_ORIENTATION_BASED);
-    //    this->GenerateFiberIds();
+    m_UpdateTime3D.Modified();
+    m_UpdateTime2D.Modified();
 }
 
-void mitk::FiberBundleX::ResetFiberOpacity() {
-    vtkUnsignedCharArray* ColorArray = dynamic_cast<vtkUnsignedCharArray*>  (m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED));
-    if (ColorArray==NULL)
-        return;
-    for(long i=0; i<ColorArray->GetNumberOfTuples(); i++)
-        ColorArray->SetComponent(i,3, 255.0 );
-}
-
-void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
+void mitk::FiberBundleX::ResetFiberOpacity()
 {
-    mitkPixelTypeMultiplex1( SetFAMap, FAimage->GetPixelType(), FAimage );
+    for(long i=0; i<m_FiberColors->GetNumberOfTuples(); i++)
+        m_FiberColors->SetComponent(i,3, 255.0 );
+    m_UpdateTime3D.Modified();
+    m_UpdateTime2D.Modified();
+}
+
+void mitk::FiberBundleX::ColorFibersByScalarMap(mitk::Image::Pointer FAimage, bool opacity)
+{
+    mitkPixelTypeMultiplex2( ColorFibersByScalarMap, FAimage->GetPixelType(), FAimage, opacity );
+    m_UpdateTime3D.Modified();
+    m_UpdateTime2D.Modified();
 }
 
 template <typename TPixel>
-void mitk::FiberBundleX::SetFAMap(const mitk::PixelType, mitk::Image::Pointer FAimage)
+void mitk::FiberBundleX::ColorFibersByScalarMap(const mitk::PixelType, mitk::Image::Pointer image, bool opacity)
 {
-    MITK_DEBUG << "SetFAMap";
-    vtkSmartPointer<vtkDoubleArray> faValues = vtkSmartPointer<vtkDoubleArray>::New();
-    faValues->SetName(COLORCODING_FA_BASED);
-    faValues->Allocate(m_FiberPolyData->GetNumberOfPoints());
-    faValues->SetNumberOfValues(m_FiberPolyData->GetNumberOfPoints());
+    m_FiberColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+    m_FiberColors->Allocate(m_FiberPolyData->GetNumberOfPoints() * 4);
+    m_FiberColors->SetNumberOfComponents(4);
+    m_FiberColors->SetName("FIBER_COLORS");
 
-    mitk::ImagePixelReadAccessor<TPixel,3> readFAimage (FAimage, FAimage->GetVolumeData(0));
+    mitk::ImagePixelReadAccessor<TPixel,3> readimage(image, image->GetVolumeData(0));
 
+    unsigned char rgba[4] = {0,0,0,0};
     vtkPoints* pointSet = m_FiberPolyData->GetPoints();
+
+    mitk::LookupTable::Pointer mitkLookup = mitk::LookupTable::New();
+    vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
+    lookupTable->SetTableRange(0.0, 0.8);
+    lookupTable->Build();
+    mitkLookup->SetVtkLookupTable(lookupTable);
+    mitkLookup->SetType(mitk::LookupTable::JET);
+
     for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
     {
         Point3D px;
         px[0] = pointSet->GetPoint(i)[0];
         px[1] = pointSet->GetPoint(i)[1];
         px[2] = pointSet->GetPoint(i)[2];
-        double faPixelValue = 1-readFAimage.GetPixelByWorldCoordinates(px);
-        faValues->InsertValue(i, faPixelValue);
+        double pixelValue = readimage.GetPixelByWorldCoordinates(px);
+
+        double color[3];
+        lookupTable->GetColor(pixelValue, color);
+
+        rgba[0] = (unsigned char) (255.0 * color[0]);
+        rgba[1] = (unsigned char) (255.0 * color[1]);
+        rgba[2] = (unsigned char) (255.0 * color[2]);
+        if (opacity)
+            rgba[3] = (unsigned char) (255.0 * pixelValue);
+        else
+            rgba[3] = (unsigned char) (255.0);
+        m_FiberColors->InsertTupleValue(i, rgba);
     }
-
-    m_FiberPolyData->GetPointData()->AddArray(faValues);
-    this->GenerateFiberIds();
-
-    if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_FA_BASED))
-        MITK_DEBUG << "FA VALUE ARRAY SET";
-
+    m_UpdateTime3D.Modified();
+    m_UpdateTime2D.Modified();
 }
 
+void mitk::FiberBundleX::SetFiberColors(float r, float g, float b, float alpha)
+{
+    m_FiberColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+    m_FiberColors->Allocate(m_FiberPolyData->GetNumberOfPoints() * 4);
+    m_FiberColors->SetNumberOfComponents(4);
+    m_FiberColors->SetName("FIBER_COLORS");
+
+    unsigned char rgba[4] = {0,0,0,0};
+    for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
+    {
+        rgba[0] = (unsigned char) r;
+        rgba[1] = (unsigned char) g;
+        rgba[2] = (unsigned char) b;
+        rgba[3] = (unsigned char) alpha;
+        m_FiberColors->InsertTupleValue(i, rgba);
+    }
+    m_UpdateTime3D.Modified();
+    m_UpdateTime2D.Modified();
+}
 
 void mitk::FiberBundleX::GenerateFiberIds()
 {
@@ -556,8 +514,6 @@ void mitk::FiberBundleX::GenerateFiberIds()
     idFiberFilter->Update();
 
     m_FiberIdDataSet = idFiberFilter->GetOutput();
-
-    MITK_DEBUG << "Generating Fiber Ids...[done] | " << m_FiberIdDataSet->GetNumberOfCells();
 
 }
 
@@ -983,6 +939,17 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
     m_LengthStDev = 0;
     m_NumFibers = m_FiberPolyData->GetNumberOfCells();
 
+    if (m_FiberColors==NULL || m_FiberColors->GetNumberOfTuples()!=m_FiberPolyData->GetNumberOfPoints())
+        this->DoColorCodingOrientationBased();
+
+    if (m_FiberWeights->GetSize()!=m_NumFibers)
+    {
+        m_FiberWeights = vtkSmartPointer<vtkFloatArray>::New();
+        m_FiberWeights->SetName("FIBER_WEIGHTS");
+        m_FiberWeights->SetNumberOfValues(m_NumFibers);
+        this->SetFiberWeights(1);
+    }
+
     if (m_NumFibers<=0) // no fibers present; apply default geometry
     {
         m_MinFiberLength = 0;
@@ -1050,47 +1017,47 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
     m_UpdateTime2D.Modified();
 }
 
-std::vector<std::string> mitk::FiberBundleX::GetAvailableColorCodings()
+float mitk::FiberBundleX::GetFiberWeight(unsigned int fiber)
 {
-    std::vector<std::string> availableColorCodings;
-    int numColors = m_FiberPolyData->GetPointData()->GetNumberOfArrays();
-    for(int i=0; i<numColors; i++)
-    {
-        availableColorCodings.push_back(m_FiberPolyData->GetPointData()->GetArrayName(i));
-    }
-
-    //this controlstructure shall be implemented by the calling method
-    if (availableColorCodings.empty())
-        MITK_DEBUG << "no colorcodings available in fiberbundleX";
-
-    return availableColorCodings;
+    return m_FiberWeights->GetValue(fiber);
 }
 
-
-char* mitk::FiberBundleX::GetCurrentColorCoding()
+void mitk::FiberBundleX::SetFiberWeights(float newWeight)
 {
-    return m_CurrentColorCoding;
+    for (int i=0; i<m_FiberWeights->GetSize(); i++)
+        m_FiberWeights->SetValue(i, newWeight);
 }
 
-void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
+void mitk::FiberBundleX::SetFiberWeights(vtkSmartPointer<vtkFloatArray> weights)
 {
-    if (requestedColorCoding==NULL)
+    if (m_NumFibers!=weights->GetSize())
         return;
 
-    if( strcmp (COLORCODING_ORIENTATION_BASED,requestedColorCoding) == 0 )    {
-        this->m_CurrentColorCoding = (char*) COLORCODING_ORIENTATION_BASED;
+    for (int i=0; i<weights->GetSize(); i++)
+        m_FiberWeights->SetValue(i, weights->GetValue(i));
 
-    } else if( strcmp (COLORCODING_FA_BASED,requestedColorCoding) == 0 ) {
-        this->m_CurrentColorCoding = (char*) COLORCODING_FA_BASED;
+    m_FiberWeights->SetName("FIBER_WEIGHTS");
+}
 
-    } else if( strcmp (COLORCODING_CUSTOM,requestedColorCoding) == 0 ) {
-        this->m_CurrentColorCoding = (char*) COLORCODING_CUSTOM;
+void mitk::FiberBundleX::SetFiberWeight(unsigned int fiber, float weight)
+{
+    m_FiberWeights->SetValue(fiber, weight);
+}
 
-    } else {
-        MITK_DEBUG << "FIBERBUNDLE X: UNKNOWN COLORCODING in FIBERBUNDLEX Datastructure";
-        this->m_CurrentColorCoding = (char*) COLORCODING_CUSTOM; //will cause blank colorcoding of fibers
+void mitk::FiberBundleX::SetFiberColors(vtkSmartPointer<vtkUnsignedCharArray> fiberColors)
+{
+    for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
+    {
+        unsigned char source[4] = {0,0,0,0};
+        fiberColors->GetTupleValue(i, source);
+
+        unsigned char target[4] = {0,0,0,0};
+        target[0] = source[0];
+        target[1] = source[1];
+        target[2] = source[2];
+        target[3] = source[3];
+        m_FiberColors->InsertTupleValue(i, target);
     }
-
     m_UpdateTime3D.Modified();
     m_UpdateTime2D.Modified();
 }
@@ -1457,8 +1424,8 @@ void mitk::FiberBundleX::RemoveDir(vnl_vector_fixed<double,3> dir, double thresh
 
     this->SetFiberPolyData(m_FiberPolyData, true);
 
-//    UpdateColorCoding();
-//    UpdateFiberGeometry();
+    //    UpdateColorCoding();
+    //    UpdateFiberGeometry();
 }
 
 bool mitk::FiberBundleX::ApplyCurvatureThreshold(float minRadius, bool deleteFibers)
@@ -1829,17 +1796,6 @@ void mitk::FiberBundleX::Compress(float error)
         m_FiberPolyData->SetLines(vtkNewCells);
         this->SetFiberPolyData(m_FiberPolyData, true);
     }
-}
-
-// reapply selected colorcoding in case polydata structure has changed
-void mitk::FiberBundleX::UpdateColorCoding()
-{
-    char* cc = GetCurrentColorCoding();
-
-    if( strcmp (COLORCODING_ORIENTATION_BASED,cc) == 0 )
-        DoColorCodingOrientationBased();
-    else if( strcmp (COLORCODING_FA_BASED,cc) == 0 )
-        DoColorCodingFaBased();
 }
 
 // reapply selected colorcoding in case polydata structure has changed

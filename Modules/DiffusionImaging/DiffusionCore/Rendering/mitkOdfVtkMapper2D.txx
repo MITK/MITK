@@ -831,31 +831,32 @@ template <class T, int N>
 bool mitk::OdfVtkMapper2D<T,N>
 ::IsPlaneRotated(mitk::BaseRenderer* renderer)
 {
-    PlaneGeometry::ConstPointer worldPlaneGeometry =
-            renderer->GetCurrentWorldPlaneGeometry();
+    PlaneGeometry::ConstPointer worldPlaneGeometry = renderer->GetCurrentWorldPlaneGeometry();
 
     double vnormal[ 3 ];
     Vector3D normal = worldPlaneGeometry->GetNormal(); normal.Normalize();
     vnl2vtk( normal.GetVnlVector(), vnormal );
 
-    vtkLinearTransform * vtktransform =
-            this->GetDataNode()->GetVtkTransform(this->GetTimestep());
+    mitk::Image* currentImage = dynamic_cast<mitk::Image* >( this->GetDataNode()->GetData() );
+    if( currentImage == NULL )
+        return false;
+    mitk::Vector3D imageNormal0 = currentImage->GetSlicedGeometry()->GetAxisVector(0);
+    mitk::Vector3D imageNormal1 = currentImage->GetSlicedGeometry()->GetAxisVector(1);
+    mitk::Vector3D imageNormal2 = currentImage->GetSlicedGeometry()->GetAxisVector(2);
+    imageNormal0.Normalize();
+    imageNormal1.Normalize();
+    imageNormal2.Normalize();
 
-    vtkSmartPointer<vtkTransform> inversetransform = vtkSmartPointer<vtkTransform>::New();
-    inversetransform->Identity();
-    inversetransform->Concatenate(vtktransform->GetLinearInverse());
-    double* n = inversetransform->TransformNormal(vnormal);
-
-    int nonZeros = 0;
-    for (int j=0; j<3; j++)
-    {
-        if (fabs(n[j])>mitk::eps){
-            nonZeros++;
-        }
-    }
-    if(nonZeros>1)
+    double eps = 0.000001;
+    int test = 0;
+    if( fabs(fabs(dot_product(normal.GetVnlVector(),imageNormal0.GetVnlVector()))-1) > eps )
+        test++;
+    if( fabs(fabs(dot_product(normal.GetVnlVector(),imageNormal1.GetVnlVector()))-1) > eps )
+        test++;
+    if( fabs(fabs(dot_product(normal.GetVnlVector(),imageNormal2.GetVnlVector()))-1) > eps )
+        test++;
+    if (test==3)
         return true;
-
     return false;
 }
 

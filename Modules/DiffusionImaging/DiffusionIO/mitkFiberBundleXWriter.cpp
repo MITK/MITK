@@ -20,7 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <mitkTrackvis.h>
 #include <itkSize.h>
-
+#include <vtkFloatArray.h>
+#include <vtkCellData.h>
+#include <vtkPointData.h>
 #include <mitkAbstractFileWriter.h>
 #include <mitkCustomMimeType.h>
 #include "mitkDiffusionIOMimeTypes.h"
@@ -78,6 +80,10 @@ void mitk::FiberBundleXWriter::Write()
     mitk::FiberBundleX::ConstPointer input = dynamic_cast<const mitk::FiberBundleX*>(this->GetInput());
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetOutputLocation().c_str());
 
+    vtkSmartPointer<vtkPolyData> fibPoly = input->GetFiberPolyData();
+    fibPoly->GetCellData()->AddArray(input->GetFiberWeights());
+    fibPoly->GetPointData()->AddArray(input->GetFiberColors());
+
     // default extension is .fib
     if(ext == "")
     {
@@ -89,8 +95,8 @@ void mitk::FiberBundleXWriter::Write()
     {
         MITK_INFO << "Writing fiber bundle as binary VTK";
         vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
-        writer->SetInputData(input->GetFiberPolyData());
-        writer->SetFileName(this->GetOutputLocation().c_str());
+        writer->SetInputData(fibPoly);
+        writer->SetFileName(filename.c_str());
         writer->SetFileTypeToBinary();
         writer->Write();
     }
@@ -99,8 +105,8 @@ void mitk::FiberBundleXWriter::Write()
         itksys::SystemTools::ReplaceString(filename,".afib",".fib");
         MITK_INFO << "Writing fiber bundle as ascii VTK";
         vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
-        writer->SetInputData(input->GetFiberPolyData());
-        writer->SetFileName(this->GetOutputLocation().c_str());
+        writer->SetInputData(fibPoly);
+        writer->SetFileName(filename.c_str());
         writer->SetFileTypeToASCII();
         writer->Write();
     }
@@ -109,8 +115,8 @@ void mitk::FiberBundleXWriter::Write()
         itksys::SystemTools::ReplaceString(filename,".avtk",".vtk");
         MITK_INFO << "Writing fiber bundle as ascii VTK";
         vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
-        writer->SetInputData(input->GetFiberPolyData());
-        writer->SetFileName(this->GetOutputLocation().c_str());
+        writer->SetInputData(fibPoly);
+        writer->SetFileName(filename.c_str());
         writer->SetFileTypeToASCII();
         writer->Write();
     }

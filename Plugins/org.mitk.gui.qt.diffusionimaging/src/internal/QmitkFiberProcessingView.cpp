@@ -147,7 +147,23 @@ void QmitkFiberProcessingView::Modify()
         MirrorFibers();
         break;
     }
+    case 4:
+    {
+        WeightFibers();
+        break;
     }
+    }
+}
+
+void QmitkFiberProcessingView::WeightFibers()
+{
+    float weight = this->m_Controls->m_BundleWeightBox->value();
+    for (int i=0; i<m_SelectedFB.size(); i++)
+    {
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+        fib->SetFiberWeights(weight);
+    }
+
 }
 
 void QmitkFiberProcessingView::Remove()
@@ -814,6 +830,7 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->m_SubstractBundles->setEnabled(false);
 
     // disable alle frames
+    m_Controls->m_BundleWeightFrame->setVisible(false);
     m_Controls->m_ExtractionBoxMask->setVisible(false);
     m_Controls->m_ExtactionFramePF->setVisible(false);
     m_Controls->m_RemoveDirectionFrame->setVisible(false);
@@ -878,6 +895,8 @@ void QmitkFiberProcessingView::UpdateGui()
     case 3:
         m_Controls->m_MirrorFibersFrame->setVisible(true);
         break;
+    case 4:
+        m_Controls->m_BundleWeightFrame->setVisible(true);
     }
 
     // are fiber bundles selected?
@@ -1428,9 +1447,7 @@ void QmitkFiberProcessingView::DoImageColorCoding()
     for(unsigned int i=0; i<m_SelectedFB.size(); i++ )
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
-        fib->SetFAMap(dynamic_cast<mitk::Image*>(m_Controls->m_ColorMapBox->GetSelectedNode()->GetData()));
-        fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_FA_BASED);
-        fib->DoColorCodingFaBased();
+        fib->ColorFibersByScalarMap(dynamic_cast<mitk::Image*>(m_Controls->m_ColorMapBox->GetSelectedNode()->GetData()), m_Controls->m_FiberOpacityBox->isChecked());
     }
 
     if(m_MultiWidget)

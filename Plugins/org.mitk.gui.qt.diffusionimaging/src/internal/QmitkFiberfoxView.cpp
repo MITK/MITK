@@ -923,8 +923,8 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
                         ++it;
                         continue;
                     }
-//                    if (it.Get()>900)
-//                        it.Set(900);
+                    if (it.Get()>900)
+                        it.Set(900);
 
                     if (it.Get()>max)
                         max = it.Get();

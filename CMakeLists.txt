@@ -557,13 +557,14 @@ endif()
 #-----------------------------------------------------------------------------
 
 # help keeping cross-platform compatibility
+set(MITK_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS 0)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
 
 # Required and enabled C++11 features for all MITK code.
 # These are added as PUBLIC compile features to all MITK modules.
-set(MITK_CXX_FEATURES cxx_auto_type cxx_nullptr)
+set(MITK_CXX_FEATURES cxx_auto_type cxx_nullptr cxx_override)
 
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS}")
 set(MITK_C_FLAGS_DEBUG )

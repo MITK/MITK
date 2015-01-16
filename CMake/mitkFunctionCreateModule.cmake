@@ -571,8 +571,12 @@ function(mitk_create_module)
         endif()
 
         if(NOT MODULE_C_MODULE)
-          # add required compile features
-          target_compile_features(${MODULE_TARGET} PUBLIC ${MITK_CXX_FEATURES})
+          # Add required compile features, currently works only for GNU (gcc) and Clang (not AppleClang).
+          # For all other cases, MITKConfig.cmake prints an error if CMAKE_CXX_STANDARD is not set to C++11
+          if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
+             CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+            target_compile_features(${MODULE_TARGET} PUBLIC ${MITK_CXX_FEATURES})
+          endif()
         endif()
 
         # create export macros for all modules (also header-only)

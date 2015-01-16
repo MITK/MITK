@@ -2,6 +2,19 @@ if(CMAKE_VERSION VERSION_LESS @MITK_CMAKE_MINIMUM_REQUIRED_VERSION@)
   message(FATAL_ERROR "MITK requires at least CMake Version @MITK_CMAKE_MINIMUM_REQUIRED_VERSION@")
 endif()
 
+set(MITK_CXX_STANDARD @MITK_CXX_STANDARD@)
+# We use target_compile_features for GNU and Clang to enusre
+# external projects are compiled with e.g. -std=c++11. For
+# msvc, C++11 support is always enabled by the compiler itself.
+if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND
+   NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND
+   NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  if(NOT CMAKE_CXX_STANDARD STREQUAL MITK_CXX_STANDARD AND
+     NOT MITK_NO_CXX_STANDARD_ERROR)
+    message(FATAL_ERROR "MITK was compiled with C++11 enabled and we can't figure out if your project is compiled with C++11 enable as well. To silence this error set CMAKE_CXX_STANDARD to \"11\" at the top of your CMakeLists.txt file or set MITK_NO_CXX_STANDARD_ERROR to TRUE.")
+  endif()
+endif()
+
 # Update the CMake module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@MITK_SOURCE_DIR@/CMake")
 

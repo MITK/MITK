@@ -5,6 +5,14 @@ set(MY_PROJECT_NAME $(project-name))
 set(MY_APP_NAME $(project-app-name))
 
 #-----------------------------------------------------------------------------
+# Set the language standard (MITK requires C++11)
+#-----------------------------------------------------------------------------
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED 1)
+set(CMAKE_CXX_EXTENSIONS 0)
+
+#-----------------------------------------------------------------------------
 # Set a default build type if none was specified
 #-----------------------------------------------------------------------------
 

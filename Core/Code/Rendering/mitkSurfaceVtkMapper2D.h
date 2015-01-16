@@ -163,7 +163,7 @@ public:
    * current plane geometry will point the cutter to en empty location
    * (if the surface does have a geometry, which is a rather rare case).
    */
-  void UpdateVtkTransform(mitk::BaseRenderer */*renderer*/)
+  void UpdateVtkTransform(mitk::BaseRenderer* /*renderer*/)
   {
   }
 

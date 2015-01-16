@@ -27,12 +27,8 @@ diff -urNb OpenCV-2.4.8.2/cmake/templates/OpenCVConfig.cmake.in OpenCV-src/cmake
  
  # ======================================================
  # Link directories to add to the user project:
-@@ -121,9 +121,9 @@
- # ==============================================================
- #  Extra include directories, needed by OpenCV 2 new structure
- # ==============================================================
--SET(OpenCV2_INCLUDE_DIRS @OpenCV2_INCLUDE_DIRS_CONFIGCMAKE@)
-+SET(OpenCV2_INCLUDE_DIRS "@OpenCV2_INCLUDE_DIRS_CONFIGCMAKE@")
+@@ -124,6 +124,6 @@
+ SET(OpenCV2_INCLUDE_DIRS @OpenCV2_INCLUDE_DIRS_CONFIGCMAKE@)
  if(OpenCV2_INCLUDE_DIRS)
 -  include_directories(${OpenCV2_INCLUDE_DIRS})
 +  # include_directories(${OpenCV2_INCLUDE_DIRS})

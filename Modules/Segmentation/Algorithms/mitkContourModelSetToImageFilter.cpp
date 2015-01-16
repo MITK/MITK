@@ -213,6 +213,7 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     extractor->Update();
 
     slice = extractor->GetOutput();
+    slice->DisconnectPipeline();
 
     // 3. Fill contour into slice
     mitk::ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice(slice, contour, true, false);
@@ -225,11 +226,10 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     reslice->SetOverwriteMode(true);
     reslice->Modified();
 
-    extractor->SetVtkOutputRequest(true);
     extractor->Modified();
     extractor->Update();
 
-    plane = 0;
+    reslice->SetInputSlice(0);
     ++it;
   }
 

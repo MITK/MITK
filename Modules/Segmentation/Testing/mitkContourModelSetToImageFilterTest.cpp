@@ -53,6 +53,8 @@ public:
     m_ContourFiller->Update();
     mitk::Image::Pointer filledImage = m_ContourFiller->GetOutput();
 
+    filledImage->DisconnectPipeline();
+
     MITK_ASSERT_EQUAL(refImage, filledImage, "Error filling contours into image");
   }
 };

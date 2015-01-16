@@ -36,7 +36,8 @@ bool mitk::ParseInputString( std::string input, std::vector<double>& values, Sie
     offset += 16+strideSize;
   }
 
-  return true;
+  // If there are no values it is invalid
+  return (values.size() > 0);
 }
 
 

@@ -8,7 +8,7 @@ MACRO_CREATE_CTK_PLUGIN(
 target_link_libraries(${PLUGIN_TARGET} PUBLIC Poco::Foundation Poco::Util Poco::XML)
 
 # Set compiler flags
-target_compile_definitions(${PLUGIN_TARGET} PUBLIC "$<$<STREQUAL:$<PLATFORM_ID>,Windows>:POCO_NO_UNWINDOWS;WIN32_LEAN_AND_MEAN>")
+target_compile_definitions(${PLUGIN_TARGET} PUBLIC "$<$<PLATFORM_ID:Windows>:POCO_NO_UNWINDOWS;WIN32_LEAN_AND_MEAN>")
 
 if(MITK_USE_Qt5)
   target_link_libraries(${PLUGIN_TARGET} PRIVATE Concurrent Gui Sql)

@@ -803,49 +803,58 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(BaseData* roi)
     }
     else if ( dynamic_cast<mitk::PlanarFigure*>(roi) )  // actual extraction
     {
-        mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(roi);
-        Vector3D planeNormal = planarFigure->GetPlaneGeometry()->GetNormal();
-        planeNormal.Normalize();
-        Point3D planeOrigin = planarFigure->GetPlaneGeometry()->GetOrigin();
-
-        // define cutting plane by ROI geometry (PlanarFigure)
-        vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
-        plane->SetOrigin(planeOrigin[0],planeOrigin[1],planeOrigin[2]);
-        plane->SetNormal(planeNormal[0],planeNormal[1],planeNormal[2]);
-
-        // get all fiber/plane intersection points
-        vtkSmartPointer<vtkClipPolyData> clipper = vtkSmartPointer<vtkClipPolyData>::New();
-        clipper->SetInputData(m_FiberIdDataSet);
-        clipper->SetClipFunction(plane);
-        clipper->GenerateClipScalarsOn();
-        clipper->GenerateClippedOutputOn();
-        clipper->Update();
-        vtkSmartPointer<vtkPolyData> clipperout = clipper->GetClippedOutput();
-        if (!clipperout->GetCellData()->HasArray(FIBER_ID_ARRAY))
-            return result;
-
-        vtkSmartPointer<vtkDataArray> distanceList = clipperout->GetPointData()->GetScalars();
-        vtkIdType numPoints =  distanceList->GetNumberOfTuples();
-
-        std::vector<int> pointsOnPlane;
-        pointsOnPlane.reserve(numPoints);
-        for (int i=0; i<numPoints; ++i)
+        if ( dynamic_cast<mitk::PlanarPolygon*>(roi) )
         {
-            double distance = distanceList->GetTuple(i)[0];
-            // check if point is on plane
-            if (distance >= -0.01 && distance <= 0.01)
-                pointsOnPlane.push_back(i);
+            mitk::PlanarFigure::Pointer planarPoly = dynamic_cast<mitk::PlanarFigure*>(roi);
+
+            //create vtkPolygon using controlpoints from planarFigure polygon
+            vtkSmartPointer<vtkPolygon> polygonVtk = vtkSmartPointer<vtkPolygon>::New();
+            for (unsigned int i=0; i<planarPoly->GetNumberOfControlPoints(); ++i)
+            {
+                itk::Point<double,3> p = planarPoly->GetWorldControlPoint(i);
+                vtkIdType id = polygonVtk->GetPoints()->InsertNextPoint(p[0], p[1], p[2] );
+                polygonVtk->GetPointIds()->InsertNextId(id);
+            }
+
+            MITK_INFO << "Extracting with polygon";
+            boost::progress_display disp(m_NumFibers);
+            for (int i=0; i<m_NumFibers; i++)
+            {
+                ++disp ;
+                vtkCell* cell = m_FiberPolyData->GetCell(i);
+                int numPoints = cell->GetNumberOfPoints();
+                vtkPoints* points = cell->GetPoints();
+
+                for (int j=0; j<numPoints-1; j++)
+                {
+                    // Inputs
+                    double p1[3] = {0,0,0};
+                    points->GetPoint(j, p1);
+                    double p2[3] = {0,0,0};
+                    points->GetPoint(j+1, p2);
+                    double tolerance = 0.001;
+
+                    // Outputs
+                    double t = 0; // Parametric coordinate of intersection (0 (corresponding to p1) to 1 (corresponding to p2))
+                    double x[3] = {0,0,0}; // The coordinate of the intersection
+                    double pcoords[3] = {0,0,0};
+                    int subId = 0;
+
+                    int iD = polygonVtk->IntersectWithLine(p1, p2, tolerance, t, x, pcoords, subId);
+                    if (iD!=0)
+                    {
+                        result.push_back(i);
+                        break;
+                    }
+                }
+            }
         }
-        if (pointsOnPlane.empty())
-            return result;
-
-        // get all point IDs inside the ROI
-        std::vector<int> pointsInROI;
-        pointsInROI.reserve(pointsOnPlane.size());
-        mitk::PlanarCircle::Pointer circleName = mitk::PlanarCircle::New();
-        mitk::PlanarPolygon::Pointer polyName = mitk::PlanarPolygon::New();
-        if ( planarFigure->GetNameOfClass() == circleName->GetNameOfClass() )
+        else if ( dynamic_cast<mitk::PlanarCircle*>(roi) )
         {
+            mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(roi);
+            Vector3D planeNormal = planarFigure->GetPlaneGeometry()->GetNormal();
+            planeNormal.Normalize();
+
             //calculate circle radius
             mitk::Point3D V1w = planarFigure->GetWorldControlPoint(0); //centerPoint
             mitk::Point3D V2w  = planarFigure->GetWorldControlPoint(1); //radiusPoint
@@ -853,73 +862,42 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(BaseData* roi)
             double radius = V1w.EuclideanDistanceTo(V2w);
             radius *= radius;
 
-            for (unsigned int i=0; i<pointsOnPlane.size(); i++)
+            MITK_INFO << "Extracting with circle";
+            boost::progress_display disp(m_NumFibers);
+            for (int i=0; i<m_NumFibers; i++)
             {
-                double p[3]; clipperout->GetPoint(pointsOnPlane[i], p);
-                double dist = (p[0]-V1w[0])*(p[0]-V1w[0])+(p[1]-V1w[1])*(p[1]-V1w[1])+(p[2]-V1w[2])*(p[2]-V1w[2]);
-                if( dist <= radius)
-                    pointsInROI.push_back(pointsOnPlane[i]);
+                ++disp ;
+                vtkCell* cell = m_FiberPolyData->GetCell(i);
+                int numPoints = cell->GetNumberOfPoints();
+                vtkPoints* points = cell->GetPoints();
+
+                for (int j=0; j<numPoints-1; j++)
+                {
+                    // Inputs
+                    double p1[3] = {0,0,0};
+                    points->GetPoint(j, p1);
+                    double p2[3] = {0,0,0};
+                    points->GetPoint(j+1, p2);
+
+                    // Outputs
+                    double t = 0; // Parametric coordinate of intersection (0 (corresponding to p1) to 1 (corresponding to p2))
+                    double x[3] = {0,0,0}; // The coordinate of the intersection
+
+                    int iD = vtkPlane::IntersectWithLine(p1,p2,planeNormal.GetDataPointer(),V1w.GetDataPointer(),t,x);
+
+                    if (iD!=0)
+                    {
+                        double dist = (x[0]-V1w[0])*(x[0]-V1w[0])+(x[1]-V1w[1])*(x[1]-V1w[1])+(x[2]-V1w[2])*(x[2]-V1w[2]);
+                        if( dist <= radius)
+                        {
+                            result.push_back(i);
+                            break;
+                        }
+                    }
+                }
             }
         }
-        else if ( planarFigure->GetNameOfClass() == polyName->GetNameOfClass() )
-        {
-            //create vtkPolygon using controlpoints from planarFigure polygon
-            vtkSmartPointer<vtkPolygon> polygonVtk = vtkSmartPointer<vtkPolygon>::New();
-            for (unsigned int i=0; i<planarFigure->GetNumberOfControlPoints(); ++i)
-            {
-                itk::Point<double,3> p = planarFigure->GetWorldControlPoint(i);
-                polygonVtk->GetPoints()->InsertNextPoint(p[0], p[1], p[2] );
-            }
-            //prepare everything for using pointInPolygon function
-            double n[3];
-            polygonVtk->ComputeNormal(polygonVtk->GetPoints()->GetNumberOfPoints(), static_cast<double*>(polygonVtk->GetPoints()->GetData()->GetVoidPointer(0)), n);
-            double bounds[6];
-            polygonVtk->GetPoints()->GetBounds(bounds);
-
-            for (unsigned int i=0; i<pointsOnPlane.size(); i++)
-            {
-                double p[3]; clipperout->GetPoint(pointsOnPlane[i], p);
-                int isInPolygon = polygonVtk->PointInPolygon(p, polygonVtk->GetPoints()->GetNumberOfPoints(), static_cast<double*>(polygonVtk->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n);
-                if( isInPolygon )
-                    pointsInROI.push_back(pointsOnPlane[i]);
-            }
-        }
-        if (pointsInROI.empty())
-            return result;
-
-        // get the fiber IDs corresponding to all clipped points
-        std::vector< long > pointToFiberMap; // pointToFiberMap[PointID] = FiberIndex
-        pointToFiberMap.resize(clipperout->GetNumberOfPoints());
-
-        vtkCellArray* clipperlines = clipperout->GetLines();
-        clipperlines->InitTraversal();
-        for (int i=0, ic=0 ; i<clipperlines->GetNumberOfCells(); i++, ic+=3)
-        {
-            // ic is the index counter for the cells hosting the desired information. each cell consits of 3 items.
-            long fiberID = clipperout->GetCellData()->GetArray(FIBER_ID_ARRAY)->GetTuple(i)[0];
-            vtkIdType numPoints;
-            vtkIdType* pointIDs;
-            clipperlines->GetCell(ic, numPoints, pointIDs);
-
-            for (long j=0; j<numPoints; j++)
-                pointToFiberMap[ pointIDs[j] ] = fiberID;
-        }
-
-        // get the fiber IDs corresponding to the ID of a point inside the ROI
-        result.reserve(pointsInROI.size());
-        for (unsigned long k = 0; k < pointsInROI.size(); k++)
-        {
-            if (pointToFiberMap[pointsInROI[k]]<=GetNumFibers() && pointToFiberMap[pointsInROI[k]]>=0)
-                result.push_back( pointToFiberMap[pointsInROI[k]] );
-            else
-                MITK_INFO << "ERROR in ExtractFiberIdSubset; impossible fiber id detected";
-        }
-
-        // remove duplicates
-        std::vector<long>::iterator it;
-        sort(result.begin(), result.end());
-        it = unique (result.begin(), result.end());
-        result.resize( it - result.begin() );
+        return result;
     }
 
     return result;

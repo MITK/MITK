@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGPUVolumeMapper3D.h"
 #include "mitkUnstructuredGridMapper2D.h"
 #include "mitkUnstructuredGridVtkMapper3D.h"
+#include "mitkVtkGLMapperWrapper.h"
 
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
@@ -96,7 +97,7 @@ mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode* nod
     }
     else if((dynamic_cast<UnstructuredGrid*>(data)!=NULL))
     {
-      newMapper = mitk::UnstructuredGridMapper2D::New();
+      newMapper = mitk::VtkGLMapperWrapper::New(mitk::UnstructuredGridMapper2D::New().GetPointer());
       newMapper->SetDataNode(node);
     }
   }

@@ -414,8 +414,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
         if(m_ShowAngles && count > 1) // calculate and print angle between connected lines
         {
           std::stringstream buffer;
-          //(char) 176 is the degree sign
-          buffer << angle(vec.GetVnlVector(), -lastVec.GetVnlVector())*180/vnl_math::pi << (char)176;
+          buffer << angle(vec.GetVnlVector(), -lastVec.GetVnlVector())*180/vnl_math::pi << "°";
 
           //compute desired display position of text
           Vector2D vec2d = pt2d-lastPt2d;             // first arm enclosing the angle

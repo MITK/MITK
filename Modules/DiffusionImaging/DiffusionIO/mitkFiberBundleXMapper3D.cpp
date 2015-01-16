@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPointData.h>
 #include <vtkProperty.h>
 #include <vtkCellArray.h>
+#include <vtkDepthSortPolyData.h>
+#include <vtkCamera.h>
 
 //not essential for mapper
 // #include <QTime>
@@ -62,12 +64,25 @@ void mitk::FiberBundleXMapper3D::InternalGenerateData(mitk::BaseRenderer *render
     if (fiberPolyData == NULL)
         return;
 
-    FBXLocalStorage3D *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
-
+    fiberPolyData->GetPointData()->AddArray(fiberBundle->GetFiberColors());
     float tmpopa;
     this->GetDataNode()->GetOpacity(tmpopa, NULL);
-    fiberPolyData->GetPointData()->AddArray(fiberBundle->GetFiberColors());
-    localStorage->m_FiberMapper->SetInputData(fiberPolyData);
+    FBXLocalStorage3D *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+
+    if (tmpopa<1)
+    {
+        vtkSmartPointer<vtkDepthSortPolyData> depthSort = vtkSmartPointer<vtkDepthSortPolyData>::New();
+        depthSort->SetInputData( fiberPolyData );
+        depthSort->SetCamera( renderer->GetVtkRenderer()->GetActiveCamera() );
+        depthSort->SetDirectionToFrontToBack();
+        depthSort->Update();
+        localStorage->m_FiberMapper->SetInputConnection(depthSort->GetOutputPort());
+    }
+    else
+    {
+        localStorage->m_FiberMapper->SetInputData(fiberPolyData);
+    }
+
     localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
     localStorage->m_FiberMapper->ScalarVisibilityOn();
     localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();

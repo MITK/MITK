@@ -14,10 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include <mitkBaseDataIOFactory.h>
 #include <metaCommand.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <usAny.h>
 #include <mitkIOUtil.h>
 #include <boost/lexical_cast.hpp>
@@ -31,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-int FiberExtraction(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     std::cout << "FiberExtraction";
     mitkCommandLineParser parser;
@@ -155,4 +154,3 @@ int FiberExtraction(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(FiberExtraction);

@@ -15,17 +15,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKPointSetVtkMAPPER2D_H_HEADER_INCLUDED_C1902626
-#define MITKPointSetVtkMAPPER2D_H_HEADER_INCLUDED_C1902626
+#ifndef mitkPointSetVtkMapper2D_h
+#define mitkPointSetVtkMapper2D_h
 
 
 #include <MitkCoreExports.h>
+#include <mitkPointSetShapeProperty.h>
 #include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkLocalStorageHandler.h"
-#include "mitkPointSetShapeProperty.h"
-#include <vtkSmartPointer.h>
 
+//VTK
+#include <vtkSmartPointer.h>
 class vtkActor;
 class vtkPropAssembly;
 class vtkPolyData;
@@ -220,4 +221,4 @@ namespace mitk {
 
 } // namespace mitk
 
-#endif /* MITKPointSetVtkMAPPER2D_H_HEADER_INCLUDED_C1902626 */
+#endif /* mitkPointSetVtkMapper2D_h */

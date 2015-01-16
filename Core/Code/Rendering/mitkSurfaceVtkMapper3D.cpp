@@ -15,18 +15,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSurfaceVtkMapper3D.h"
-#include "mitkDataNode.h"
-#include "mitkProperties.h"
-#include "mitkColorProperty.h"
-#include "mitkLookupTableProperty.h"
-#include "mitkVtkRepresentationProperty.h"
-#include "mitkVtkInterpolationProperty.h"
-#include "mitkVtkScalarModeProperty.h"
-#include "mitkClippingProperty.h"
-#include "mitkSmartPointerProperty.h"
-
-//#include "mitkShaderProperty.h"
-#include "mitkIShaderRepository.h"
+#include <mitkDataNode.h>
+#include <mitkProperties.h>
+#include <mitkColorProperty.h>
+#include <mitkLookupTableProperty.h>
+#include <mitkVtkRepresentationProperty.h>
+#include <mitkVtkInterpolationProperty.h>
+#include <mitkVtkScalarModeProperty.h>
+#include <mitkClippingProperty.h>
+#include <mitkSmartPointerProperty.h>
+#include <mitkIShaderRepository.h>
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageSliceSelector.h>
 #include <mitkCoreServices.h>
@@ -51,13 +49,11 @@ const mitk::Surface* mitk::SurfaceVtkMapper3D::GetInput()
 
 mitk::SurfaceVtkMapper3D::SurfaceVtkMapper3D()
 {
-  // m_Prop3D = vtkActor::New();
   m_GenerateNormals = false;
 }
 
 mitk::SurfaceVtkMapper3D::~SurfaceVtkMapper3D()
 {
-  // m_Prop3D->Delete();
 }
 
 void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
@@ -77,7 +73,7 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
   // set the input-object at time t for the mapper
   //
   mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
-  vtkPolyData * polydata = input->GetVtkPolyData( this->GetTimestep() );
+  vtkSmartPointer<vtkPolyData> polydata = input->GetVtkPolyData( this->GetTimestep() );
   if(polydata == NULL)
   {
     ls->m_Actor->VisibilityOff();
@@ -393,7 +389,6 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
       ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
       ls->m_Actor->GetProperty()->SetSpecular (1);
       ls->m_Actor->GetProperty()->SetSpecularPower (50);
-      //m_Actor->GetProperty()->SetInterpolationToPhong();
     }
 
     // Check whether one or more ClippingProperty objects have been defined for
@@ -435,7 +430,6 @@ vtkProp *mitk::SurfaceVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 void mitk::SurfaceVtkMapper3D::CheckForClippingProperty( mitk::BaseRenderer* renderer, mitk::BaseProperty *property )
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
-  //  m_Prop3D = ls->m_Actor;
 
   ClippingProperty *clippingProperty = dynamic_cast< ClippingProperty * >( property );
 
@@ -445,13 +439,11 @@ void mitk::SurfaceVtkMapper3D::CheckForClippingProperty( mitk::BaseRenderer* ren
     const Point3D &origin = clippingProperty->GetOrigin();
     const Vector3D &normal = clippingProperty->GetNormal();
 
-    vtkPlane *clippingPlane = vtkPlane::New();
+    vtkSmartPointer<vtkPlane> clippingPlane = vtkSmartPointer<vtkPlane>::New();
     clippingPlane->SetOrigin( origin[0], origin[1], origin[2] );
     clippingPlane->SetNormal( normal[0], normal[1], normal[2] );
 
     ls->m_ClippingPlaneCollection->AddItem( clippingPlane );
-
-    clippingPlane->UnRegister( NULL );
   }
 }
 
@@ -465,10 +457,6 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
     node->AddProperty( "material.diffuseCoefficient" , mitk::FloatProperty::New(0.9f)          , renderer, overwrite );
     node->AddProperty( "material.specularCoefficient", mitk::FloatProperty::New(1.0f)          , renderer, overwrite );
     node->AddProperty( "material.specularPower"      , mitk::FloatProperty::New(16.0f)          , renderer, overwrite );
-
-    //node->AddProperty( "material.ambientColor"       , mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
-    //node->AddProperty( "material.diffuseColor"       , mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
-    //node->AddProperty( "material.specularColor"      , mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
 
     node->AddProperty( "material.representation"      , mitk::VtkRepresentationProperty::New()  , renderer, overwrite );
     node->AddProperty( "material.interpolation"       , mitk::VtkInterpolationProperty::New()   , renderer, overwrite );

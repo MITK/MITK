@@ -14,12 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKSURFACEDATAVTKMAPPER3D_H_HEADER_INCLUDED_C1907273
-#define MITKSURFACEDATAVTKMAPPER3D_H_HEADER_INCLUDED_C1907273
+#ifndef mitkSurfaceVtkMapper3D_h
+#define mitkSurfaceVtkMapper3D_h
 
 #include <MitkCoreExports.h>
+#include <mitkSurface.h>
 #include "mitkVtkMapper.h"
-#include "mitkSurface.h"
 #include "mitkBaseRenderer.h"
 #include "mitkLocalStorageHandler.h"
 
@@ -33,13 +33,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 
 namespace mitk {
-//##Documentation
-//## @brief Vtk-based mapper for Surface
-//##
-//## @ingroup Mapper
-
   /**
-  * @brief Vtk-based mapper for Surface
+  * @brief Vtk-based mapper for Surfaces.
+  *
+  * The mapper renders a surface in 3D. The actor is adapted according to the geometry in
+  * the base class in mitk::VtkMapper::UpdateVtkTransform().
   *
 
   * Properties that can be set for surfaces and influence the surfaceVTKMapper3D are:
@@ -117,19 +115,19 @@ public:
   {
     public:
 
-      vtkActor* m_Actor;
-      vtkPolyDataMapper *m_VtkPolyDataMapper;
-      vtkPolyDataNormals *m_VtkPolyDataNormals;
-      vtkPlaneCollection *m_ClippingPlaneCollection;
+      vtkSmartPointer<vtkActor> m_Actor;
+      vtkSmartPointer<vtkPolyDataMapper> m_VtkPolyDataMapper;
+      vtkSmartPointer<vtkPolyDataNormals> m_VtkPolyDataNormals;
+      vtkSmartPointer<vtkPlaneCollection> m_ClippingPlaneCollection;
       vtkSmartPointer<vtkDepthSortPolyData> m_DepthSort;
       itk::TimeStamp m_ShaderTimestampUpdate;
 
       LocalStorage()
       {
-        m_VtkPolyDataMapper = vtkOpenGLPolyDataMapper::New();
-        m_VtkPolyDataNormals = vtkPolyDataNormals::New();
-        m_Actor = vtkActor::New();
-        m_ClippingPlaneCollection = vtkPlaneCollection::New();
+        m_VtkPolyDataMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
+        m_VtkPolyDataNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+        m_Actor = vtkSmartPointer<vtkActor>::New();
+        m_ClippingPlaneCollection = vtkSmartPointer<vtkPlaneCollection>::New();
 
         m_Actor->SetMapper(m_VtkPolyDataMapper);
 
@@ -138,10 +136,6 @@ public:
 
       ~LocalStorage()
       {
-        m_VtkPolyDataMapper->Delete();
-        m_VtkPolyDataNormals->Delete();
-        m_Actor->Delete();
-        m_ClippingPlaneCollection->Delete();
       }
   };
 
@@ -152,4 +146,4 @@ public:
 };
 } // namespace mitk
 
-#endif /* MITKSURFACEDATAVTKMAPPER3D_H_HEADER_INCLUDED_C1907273 */
+#endif /* mitkSurfaceVtkMapper3D_h */

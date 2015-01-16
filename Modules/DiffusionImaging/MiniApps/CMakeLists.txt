@@ -32,9 +32,9 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     TractometerMetrics^^MitkFiberTracking
     QballReconstruction^^
     Registration^^
-    FileFormatConverter^^MitkFiberTracking_MitkDiffusionIO
-    TensorReconstruction^^MitkDiffusionIO
-    TensorDerivedMapsExtraction^^MitkDiffusionIO
+    FileFormatConverter^^MitkFiberTracking
+    TensorReconstruction^^
+    TensorDerivedMapsExtraction^^
     DICOMLoader^^
     )
 

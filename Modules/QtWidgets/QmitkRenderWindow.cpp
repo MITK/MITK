@@ -42,6 +42,10 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
     mitk::RenderingManager* renderingManager,mitk::BaseRenderer::RenderingMode::Type renderingMode) :
     QVTKWidget2(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0)
 {
+  //this will be fixed in VTK source if change 18864 is accepted
+  QGLFormat newform = this->format();
+  newform.setSamples(8);
+  this->setFormat(newform);
   if(renderingMode == mitk::BaseRenderer::RenderingMode::DepthPeeling)
   {
     GetRenderWindow()->SetMultiSamples(0);

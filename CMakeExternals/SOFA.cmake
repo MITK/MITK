@@ -45,8 +45,7 @@ if(MITK_USE_SOFA)
   if(NOT MITK_USE_SYSTEM_Boost)
     list(APPEND preconfigure_cmake_args
       -DBoost_NO_SYSTEM_PATHS:BOOL=ON
-      -DBOOST_INCLUDEDIR:PATH=${CMAKE_BINARY_DIR}/Boost-install/include
-      -DBOOST_LIBRARYDIR:PATH=${CMAKE_BINARY_DIR}/Boost-install/lib
+      -DBOOST_ROOT:PATH=${BOOST_ROOT}
       -DBoost_ADDITIONAL_VERSIONS:STRING=1.56
     )
   endif()
@@ -67,7 +66,7 @@ if(MITK_USE_SOFA)
   set(rev "386a3a7")
 
   set(SOFA_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSOFA-${rev}.cmake)
-  set(SOFA_PRECONFIGURE_COMMAND ${CMAKE_COMMAND} -G${gen} ${ep_common_args} ${preconfigure_cmake_args} ${boost_cmake_args} ${CMAKE_BINARY_DIR}/${proj}-src)
+  set(SOFA_PRECONFIGURE_COMMAND ${CMAKE_COMMAND} -G${gen} ${ep_common_args} ${preconfigure_cmake_args} ${boost_cmake_args} <SOURCE_DIR>)
 
   if(NOT DEFINED SOFA_DIR)
     ExternalProject_Add(${proj}
@@ -75,7 +74,7 @@ if(MITK_USE_SOFA)
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SOFA-${rev}.tar.gz
       URL_MD5 31ca701e985331e96bd52d9e58842a86
       PATCH_COMMAND ${SOFA_PATCH_COMMAND}
-      #INSTALL_COMMAND ""
+      INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
@@ -84,13 +83,17 @@ if(MITK_USE_SOFA)
 
     ExternalProject_Add_Step(${proj} preconfigure
       COMMAND ${SOFA_PRECONFIGURE_COMMAND}
-      WORKING_DIRECTORY ${proj}-build
+      WORKING_DIRECTORY <BINARY_DIR>
       DEPENDEES patch
       DEPENDERS configure
       LOG 1
     )
 
-    set(SOFA_DIR ${ep_prefix})
+    # SOFA does not support "make install" yet
+    # set(SOFA_DIR ${ep_prefix}
+    ExternalProject_Get_Property(${proj} binary_dir)
+    set(SOFA_DIR ${binary_dir})
+
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()

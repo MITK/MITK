@@ -45,8 +45,8 @@ public:
     typedef SmartPointer< const Self >                      ConstPointer;
 
     typedef typename Superclass::OutputImageType                        OutputImageType;
-    typedef itk::Image<float, 3>                                        ItkFloatImgType;
     typedef itk::Image<double, 3>                                       ItkDoubleImgType;
+    typedef itk::Image<float, 3>                                        ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                                ItkUcharImgType;
     typedef mitk::FiberBundleX::Pointer                                 FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
@@ -125,7 +125,10 @@ protected:
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 
     // TEMP
-    ItkFloatImgType::Pointer                   m_HelperTdi;
+    ItkFloatImgType::Pointer                    m_HelperTdi;
+    ItkFloatImgType::Pointer                    m_HelperTdiUpsampled;
+    ItkFloatImgType::Pointer                    m_HelperTdiTransformed;
+    ItkUcharImgType::Pointer                    m_HelperTdiCounter;
 };
 }
 

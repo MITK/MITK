@@ -601,6 +601,33 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     upsampler->Update();
     m_UpsampledMaskImage = upsampler->GetOutput();
 
+    if (m_HelperTdi.IsNotNull())
+    {
+        itk::ResampleImageFilter<ItkFloatImgType, ItkFloatImgType>::Pointer upsampler = itk::ResampleImageFilter<ItkFloatImgType, ItkFloatImgType>::New();
+        upsampler->SetInput(m_HelperTdi);
+        upsampler->SetOutputParametersFromImage(m_HelperTdi);
+        upsampler->SetSize(upsampledImageRegion.GetSize());
+        upsampler->SetOutputSpacing(upsampledSpacing);
+        upsampler->SetOutputOrigin(upsampledOrigin);
+        itk::NearestNeighborInterpolateImageFunction<ItkFloatImgType, double>::Pointer nn_interpolator
+                = itk::NearestNeighborInterpolateImageFunction<ItkFloatImgType, double>::New();
+        upsampler->SetInterpolator(nn_interpolator);
+        upsampler->Update();
+        m_HelperTdiUpsampled = upsampler->GetOutput();
+
+        m_HelperTdiTransformed = ItkFloatImgType::New();
+        itk::ImageDuplicator<ItkFloatImgType>::Pointer duplicator = itk::ImageDuplicator<ItkFloatImgType>::New();
+        duplicator->SetInputImage(m_HelperTdi);
+        duplicator->Update();
+        m_HelperTdiTransformed = duplicator->GetOutput();
+
+        m_HelperTdiCounter = ItkUcharImgType::New();
+        itk::ImageDuplicator<ItkUcharImgType>::Pointer duplicator2 = itk::ImageDuplicator<ItkUcharImgType>::New();
+        duplicator2->SetInputImage(m_MaskImage);
+        duplicator2->Update();
+        m_HelperTdiCounter = duplicator2->GetOutput();
+    }
+
     unsigned long lastTick = 0;
     int signalModelSeed = m_RandGen->GetIntegerVariate();
     switch (m_Parameters.m_SignalGen.m_DiffusionDirectionMode)
@@ -692,10 +719,13 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                             continue;
 
                         double TdCorrectionFactor = 1;
-                        if (m_HelperTdi.IsNotNull())
+                        if (m_HelperTdiTransformed.IsNotNull())
                         {
                             double TD = TDI->GetPixel(idx);
-                            double HTD = m_HelperTdi->GetPixel(idx);
+
+                            itk::Index<3> idx2;
+                            m_HelperTdiTransformed->TransformPhysicalPointToIndex(vertex, idx2);
+                            double HTD = m_HelperTdiTransformed->GetPixel(idx2);
                             if (TD>0)
                                 TdCorrectionFactor = HTD/TD;
                         }
@@ -747,20 +777,20 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                         }
                     }
 
-//                    double w = 1;
-//                    double intraAxonalVolume = intraAxonalVolumeImage->GetPixel(index)*fact;
-//                    if (intraAxonalVolume>0.0001 && intraAxonalVolume<0.3)  // only fiber in voxel
-//                    {
-//                        w = (m_VoxelVolume*0.3)/intraAxonalVolume;
-//                        for (int i=0; i<numFiberCompartments; i++)
-//                        {
-//                            DoubleDwiType::PixelType pix = m_CompartmentImages.at(i)->GetPixel(index);
-//                            pix[g] *= w;
-//                            m_CompartmentImages.at(i)->SetPixel(index, pix);
-//                        }
+                    //                    double w = 1;
+                    //                    double intraAxonalVolume = intraAxonalVolumeImage->GetPixel(index)*fact;
+                    //                    if (intraAxonalVolume>0.0001 && intraAxonalVolume<0.3)  // only fiber in voxel
+                    //                    {
+                    //                        w = (m_VoxelVolume*0.3)/intraAxonalVolume;
+                    //                        for (int i=0; i<numFiberCompartments; i++)
+                    //                        {
+                    //                            DoubleDwiType::PixelType pix = m_CompartmentImages.at(i)->GetPixel(index);
+                    //                            pix[g] *= w;
+                    //                            m_CompartmentImages.at(i)->SetPixel(index, pix);
+                    //                        }
 
-//                        m_VolumeFractions.at(0)->SetPixel(index, 1);
-//                    }
+                    //                        m_VolumeFractions.at(0)->SetPixel(index, 1);
+                    //                    }
 
 
                     // simulate other compartments
@@ -1146,6 +1176,53 @@ void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
                     m_MaskImage->SetPixel(index,100);
                 ++maskIt;
             }
+//            itk::ImageFileWriter<ItkUcharImgType>::Pointer wr = itk::ImageFileWriter<ItkUcharImgType>::New();
+//            wr->SetInput(m_MaskImage);
+//            wr->SetFileName("/local/MASK_transformed.nrrd");
+//            wr->Update();
+        }
+
+        if (m_HelperTdiUpsampled.IsNotNull())
+        {
+            ImageRegionIterator<ItkFloatImgType> maskIt(m_HelperTdiUpsampled, m_HelperTdiUpsampled->GetLargestPossibleRegion());
+            m_HelperTdiTransformed->FillBuffer(0);
+            m_HelperTdiCounter->FillBuffer(0);
+
+            while(!maskIt.IsAtEnd())
+            {
+                DoubleDwiType::IndexType index = maskIt.GetIndex();
+
+                itk::Point<double, 3> point;
+                m_HelperTdiUpsampled->TransformIndexToPhysicalPoint(index, point);
+                if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
+                    point = m_FiberBundleWorkingCopy->TransformPoint(point.GetVnlVector(), m_Rotation[0],m_Rotation[1],m_Rotation[2],m_Translation[0],m_Translation[1],m_Translation[2]);
+                else
+                    point = m_FiberBundleWorkingCopy->TransformPoint(point.GetVnlVector(), m_Rotation[0]*(g+1),m_Rotation[1]*(g+1),m_Rotation[2]*(g+1),m_Translation[0]*(g+1),m_Translation[1]*(g+1),m_Translation[2]*(g+1));
+
+                m_HelperTdiTransformed->TransformPhysicalPointToIndex(point, index);
+                if (m_HelperTdiTransformed->GetLargestPossibleRegion().IsInside(index) && m_MaskImage->GetPixel(index)>0)
+                {
+                    m_HelperTdiTransformed->SetPixel(index, m_HelperTdiTransformed->GetPixel(index)+maskIt.Get());
+                    m_HelperTdiCounter->SetPixel(index, m_HelperTdiCounter->GetPixel(index)+1);
+                }
+                ++maskIt;
+            }
+
+            ImageRegionIterator<ItkFloatImgType> maskIt2(m_HelperTdiTransformed, m_HelperTdiTransformed->GetLargestPossibleRegion());
+            while(!maskIt2.IsAtEnd())
+            {
+                DoubleDwiType::IndexType index = maskIt2.GetIndex();
+                if (m_HelperTdiCounter->GetPixel(index)>0)
+                {
+                    m_HelperTdiTransformed->SetPixel(index, maskIt2.Get()/m_HelperTdiCounter->GetPixel(index));
+                }
+                ++maskIt2;
+            }
+
+//            itk::ImageFileWriter<ItkFloatImgType>::Pointer wr = itk::ImageFileWriter<ItkFloatImgType>::New();
+//            wr->SetInput(m_HelperTdiTransformed);
+//            wr->SetFileName("/local/TDI_transformed.nrrd");
+//            wr->Update();
         }
 
         // rotate fibers
@@ -1206,6 +1283,10 @@ void TractsToDWIImageFilter< PixelType >::SimulateNonFiberSignal(ItkUcharImgType
                 double weight = 0;
                 if (numNonFiberCompartments>1)
                 {
+                    ItkUcharImgType::IndexType maskIndex;
+                    m_UpsampledMaskImage->TransformPhysicalPointToIndex(point, maskIndex);
+                    if (!m_UpsampledMaskImage->GetLargestPossibleRegion().IsInside(maskIndex) || m_UpsampledMaskImage->GetPixel(maskIndex)==0)
+                        continue;
                     DoubleDwiType::IndexType newIndex;
                     m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->TransformPhysicalPointToIndex(point, newIndex);
                     if (!m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion().IsInside(newIndex))
@@ -1262,6 +1343,10 @@ void TractsToDWIImageFilter< PixelType >::SimulateNonFiberSignal(ItkUcharImgType
                 double weight = 1;
                 if (numNonFiberCompartments>1)
                 {
+                    ItkUcharImgType::IndexType maskIndex;
+                    m_UpsampledMaskImage->TransformPhysicalPointToIndex(point, maskIndex);
+                    if (!m_UpsampledMaskImage->GetLargestPossibleRegion().IsInside(maskIndex) || m_UpsampledMaskImage->GetPixel(maskIndex)==0)
+                        continue;
                     DoubleDwiType::IndexType newIndex;
                     m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->TransformPhysicalPointToIndex(point, newIndex);
                     if (!m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion().IsInside(newIndex))

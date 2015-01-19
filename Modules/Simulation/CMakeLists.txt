@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkLegacyGL MitkSceneSerializationBase
+  DEPENDS MitkSceneSerializationBase
   PACKAGE_DEPENDS Boost GLUT GLEW SOFA
 )
 

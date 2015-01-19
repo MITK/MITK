@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGetSimulationService.h"
 #include "mitkISimulationService.h"
-#include "mitkVtkSimulationPolyDataMapper.h"
+#include "mitkVtkSimulationPolyDataMapper3D.h"
 #include <sofa/core/visual/VisualParams.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderer.h>
@@ -24,19 +24,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  vtkStandardNewMacro(vtkSimulationPolyDataMapper);
+  vtkStandardNewMacro(vtkSimulationPolyDataMapper3D);
 }
 
-mitk::vtkSimulationPolyDataMapper::vtkSimulationPolyDataMapper()
+mitk::vtkSimulationPolyDataMapper3D::vtkSimulationPolyDataMapper3D()
   : m_SimulationService(GetSimulationService())
 {
 }
 
-mitk::vtkSimulationPolyDataMapper::~vtkSimulationPolyDataMapper()
+mitk::vtkSimulationPolyDataMapper3D::~vtkSimulationPolyDataMapper3D()
 {
 }
 
-void mitk::vtkSimulationPolyDataMapper::Render(vtkRenderer* renderer, vtkActor* actor)
+void mitk::vtkSimulationPolyDataMapper3D::Render(vtkRenderer* renderer, vtkActor* actor)
 {
   if (renderer->GetRenderWindow()->CheckAbortStatus())
     return;
@@ -56,16 +56,16 @@ void mitk::vtkSimulationPolyDataMapper::Render(vtkRenderer* renderer, vtkActor* 
   sofaSimulation->draw(vParams, rootNode.get());
 }
 
-void mitk::vtkSimulationPolyDataMapper::RenderPiece(vtkRenderer*, vtkActor*)
+void mitk::vtkSimulationPolyDataMapper3D::RenderPiece(vtkRenderer*, vtkActor*)
 {
 }
 
-void mitk::vtkSimulationPolyDataMapper::SetSimulation(Simulation::Pointer simulation)
+void mitk::vtkSimulationPolyDataMapper3D::SetSimulation(Simulation::Pointer simulation)
 {
   m_Simulation = simulation;
 }
 
-double* mitk::vtkSimulationPolyDataMapper::GetBounds()
+double* mitk::vtkSimulationPolyDataMapper3D::GetBounds()
 {
   if (m_Simulation.IsNull())
     return Superclass::GetBounds();

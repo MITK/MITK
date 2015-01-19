@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkSimulationVtkMapper3D_h
-#define mitkSimulationVtkMapper3D_h
+#ifndef mitkSimulationVtkMapper2D_h
+#define mitkSimulationVtkMapper2D_h
 
 #include <mitkVtkMapper.h>
 #include <vtkSmartPointer.h>
@@ -23,9 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class vtkSimulationPolyDataMapper3D;
+  class vtkSimulationPolyDataMapper2D;
 
-  class MitkSimulation_EXPORT SimulationVtkMapper3D : public VtkMapper
+  class MitkSimulation_EXPORT SimulationVtkMapper2D : public VtkMapper
   {
     class LocalStorage : public Mapper::BaseLocalStorage
     {
@@ -33,7 +33,7 @@ namespace mitk
       LocalStorage();
       ~LocalStorage();
 
-      vtkSmartPointer<vtkSimulationPolyDataMapper3D> m_Mapper;
+      vtkSmartPointer<vtkSimulationPolyDataMapper2D> m_Mapper;
       vtkSmartPointer<vtkActor> m_Actor;
 
     private:
@@ -44,22 +44,21 @@ namespace mitk
   public:
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
-    mitkClassMacro(SimulationVtkMapper3D, VtkMapper);
+    mitkClassMacro(SimulationVtkMapper2D, VtkMapper);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
     void ApplyColorAndOpacityProperties(vtkActor*, BaseRenderer*);
-    void ApplySimulationProperties(BaseRenderer* renderer);
     vtkProp* GetVtkProp(BaseRenderer* renderer);
 
   protected:
     void GenerateDataForRenderer(BaseRenderer* renderer);
 
   private:
-    SimulationVtkMapper3D();
-    ~SimulationVtkMapper3D();
+    SimulationVtkMapper2D();
+    ~SimulationVtkMapper2D();
 
-    SimulationVtkMapper3D(const Self&);
+    SimulationVtkMapper2D(const Self&);
     Self& operator=(const Self&);
 
     LocalStorageHandler<LocalStorage> m_LocalStorageHandler;

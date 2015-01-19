@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSetVtkRendererVisitor.h"
 #include "mitkSimulation.h"
 #include "mitkSimulationVtkMapper3D.h"
-#include "mitkVtkSimulationPolyDataMapper.h"
+#include "mitkVtkSimulationPolyDataMapper3D.h"
 #include <sofa/component/visualmodel/VisualStyle.h>
 #include <sofa/core/visual/VisualParams.h>
 
@@ -146,7 +146,7 @@ void mitk::SimulationVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer
 
   if (localStorage->m_Mapper == NULL)
   {
-    localStorage->m_Mapper = vtkSmartPointer<vtkSimulationPolyDataMapper>::New();
+    localStorage->m_Mapper = vtkSmartPointer<vtkSimulationPolyDataMapper3D>::New();
     localStorage->m_Mapper->SetSimulation(simulation);
 
     localStorage->m_Actor->SetMapper(localStorage->m_Mapper);

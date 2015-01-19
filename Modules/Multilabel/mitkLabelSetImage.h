@@ -71,6 +71,7 @@ public:
    *        of an mitk::Image
    * @param image the image which is used for initializing the mitk::LabelSetImage
    */
+  using mitk::Image::Initialize;
   virtual void Initialize(const mitk::Image* image);
 
   /**

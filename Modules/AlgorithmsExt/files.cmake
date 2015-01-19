@@ -19,6 +19,7 @@ set(CPP_FILES
   mitkAnisotropicIterativeClosestPointRegistration.cpp
   mitkWeightedPointTransform.cpp
   mitkAnisotropicRegistrationCommon.cpp
+  mitkUnstructuredGridClusteringFilter.cpp
   mitkUnstructuredGridToUnstructuredGridFilter.cpp
 )
 

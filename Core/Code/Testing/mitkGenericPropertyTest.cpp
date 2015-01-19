@@ -76,6 +76,8 @@ int mitkGenericPropertyTest(int /*argc*/, char* /*argv*/[])
   TestGenericPropertyForDataType<mitk::BoolProperty>(true, false, "1", "0", "bool");
   TestGenericPropertyForDataType<mitk::FloatProperty>(1.0, -1.0, "1", "-1", "float");
   TestGenericPropertyForDataType<mitk::DoubleProperty>(1.0, -1.0, "1", "-1", "double");
+  TestGenericPropertyForDataType<mitk::UIntProperty>(1, 100000, "1", "100000", "unsigned int");
+  TestGenericPropertyForDataType<mitk::UShortProperty>(1, 20000, "1", "20000", "unsigned short");
 
   TestGenericPropertyForDataType<mitk::StringProperty>(std::string("eins"), std::string("zwei"), std::string("eins"), std::string("zwei"), "std::string");
 

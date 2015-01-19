@@ -15,6 +15,7 @@ set(CPP_FILES
   mitkPlaneFit.cpp
   mitkPlaneLandmarkProjector.cpp
   mitkPointLocator.cpp
+  mitkSegmentationSink.cpp
   mitkSimpleHistogram.cpp
   mitkSimpleUnstructuredGridHistogram.cpp
   mitkCovarianceMatrixCalculator.cpp

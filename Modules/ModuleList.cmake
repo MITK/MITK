@@ -17,6 +17,7 @@ set(mitk_modules
   LegacyAdaptors
   SceneSerialization
   GraphAlgorithms
+  Multilabel
   ContourModel
   SurfaceInterpolation
   Segmentation

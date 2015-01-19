@@ -14,43 +14,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITK_SEGMENTATION_SINK_H_INCLUDET_WAD
-#define MITK_SEGMENTATION_SINK_H_INCLUDET_WAD
+#ifndef __mitkLabelSetImageToSurfaceThreadedFilter_H_
+#define __mitkLabelSetImageToSurfaceThreadedFilter_H_
 
-#include "mitkNonBlockingAlgorithm.h"
-#include <MitkSegmentationExports.h>
+#include <MitkMultilabelExports.h>
+#include "mitkSegmentationSink.h"
+#include "mitkSurface.h"
 
 namespace mitk
 {
 
-class MitkSegmentation_EXPORT SegmentationSink : public NonBlockingAlgorithm
+class MitkMultilabel_EXPORT LabelSetImageToSurfaceThreadedFilter : public SegmentationSink
 {
   public:
 
-    mitkClassMacro( SegmentationSink, NonBlockingAlgorithm )
-    mitkAlgorithmNewMacro( SegmentationSink );
+    mitkClassMacro( LabelSetImageToSurfaceThreadedFilter, SegmentationSink )
+    mitkAlgorithmNewMacro( LabelSetImageToSurfaceThreadedFilter );
 
   protected:
 
-    SegmentationSink();  // use smart pointers
-    virtual ~SegmentationSink();
-
+    LabelSetImageToSurfaceThreadedFilter();  // use smart pointers
+    virtual ~LabelSetImageToSurfaceThreadedFilter();
 
     virtual void Initialize(const NonBlockingAlgorithm* other = NULL);
     virtual bool ReadyToRun();
 
     virtual bool ThreadedUpdateFunction(); // will be called from a thread after calling StartAlgorithm
 
-    void InsertBelowGroupNode(mitk::DataNode* node);
-    DataNode* LookForPointerTargetBelowGroupNode(const char* name);
-    DataNode* GetGroupNode();
+    virtual void ThreadedUpdateSuccessful(); // will be called from a thread after calling StartAlgorithm
 
   private:
 
+     int m_RequestedLabel;
+     Surface::Pointer m_Result;
 };
 
 } // namespace
 
-#endif
-
-
+#endif // __mitkLabelSetImageToSurfaceThreadedFilter_H_

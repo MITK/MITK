@@ -358,10 +358,10 @@ void QmitkConnectomicsNetworkOperationsView::TurnIntoRGBA( itk::Image<TPixel, VI
   }
 
   //remove gaps from label image
-  for(it_inputImage.GoToBegin(); !it_inputImage.IsAtEnd(); ++it_inputImage)
-  {
-    it_inputImage.Value() = it_inputImage.Value() - subtractionStorage[int ( it_inputImage.Value() ) - offset ];
-  }
+  //for(it_inputImage.GoToBegin(); !it_inputImage.IsAtEnd(); ++it_inputImage)
+  //{
+  //  it_inputImage.Value() = it_inputImage.Value() - subtractionStorage[int ( it_inputImage.Value() ) - offset ];
+  //}
 
   // create colour vector
   std::vector< RGBAPixelType > lookupTable;
@@ -400,7 +400,7 @@ void QmitkConnectomicsNetworkOperationsView::TurnIntoRGBA( itk::Image<TPixel, VI
 
   for(it_inputImage.GoToBegin(), it_rgbaImage.GoToBegin(); !it_inputImage.IsAtEnd(); ++it_inputImage, ++it_rgbaImage)
   {
-    it_rgbaImage.Value() = lookupTable[ int ( it_inputImage.Value() ) - offset ];
+    it_rgbaImage.Value() = lookupTable[ int ( it_inputImage.Value() - subtractionStorage[int ( it_inputImage.Value() ) - offset ] ) - offset ];
   }
 
   mitk::Image::Pointer mitkRGBAImage = mitk::ImportItkImage( rgbaImage )->Clone();

@@ -1,0 +1,19 @@
+/**
+\page org_mitk_views_screenshotmaker The Screenshot Maker
+
+This view provides the functionality to create and save screenshots of the data.
+
+Available sections:
+  - \ref QmitkScreenshotMakerUserManualUse
+
+\imageMacro{QmitkMovieMaker_ScreenshotMakerInterface.png,"The Screenshot Maker User Interface",7.09}
+
+\section QmitkScreenshotMakerUserManualUse Usage
+
+The first section offers the option of creating a screenshot of the last activated render window (thus the one, which was last clicked into). Upon clicking the button, the Screenshot Maker asks for a filename in which the screenshot is to be stored. The multiplanar Screenshot button asks for a folder, where screenshots of the three 2D views will be stored with default names.
+
+The high resolution screenshot section works the same as the simple screenshot section, aside from the fact, that the user can choose a magnification factor.
+
+In the option section one can rotate the camera in the 3D view by using the buttons. Furthermore one can choose the background colour for the screenshots, default is black.
+
+*/

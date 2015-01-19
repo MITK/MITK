@@ -255,12 +255,12 @@ itk::LightObject::Pointer mitk::Label::InternalClone() const
   return result;
 }
 
-void mitk::Label::PrintSelf(std::ostream &os, itk::Indent indent) const
+void mitk::Label::PrintSelf(std::ostream &/*os*/, itk::Indent /*indent*/) const
 {
  // todo
 }
 
-bool mitk::Equal( const mitk::Label& leftHandSide, const mitk::Label& rightHandSide, ScalarType eps, bool verbose )
+bool mitk::Equal( const mitk::Label& leftHandSide, const mitk::Label& rightHandSide, ScalarType /*eps*/, bool verbose )
 {
   MITK_INFO(verbose) << "--- Label Equal ---";
 

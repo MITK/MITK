@@ -36,6 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h"
 #include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
 #include <mitkConnectomicsNetworkThresholder.h>
+#include <mitkFreeSurferParcellationTranslator.h>
+#include <mitkRenderingModeProperty.h>
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
@@ -68,6 +70,7 @@ void QmitkConnectomicsNetworkOperationsView::CreateQtPartControl( QWidget *paren
     m_Controls->setupUi( parent );
 
     QObject::connect( m_Controls->convertToRGBAImagePushButton, SIGNAL(clicked()), this, SLOT(OnConvertToRGBAImagePushButtonClicked()) );
+    QObject::connect( m_Controls->assignFreeSurferColorsPushButton, SIGNAL(clicked()), this, SLOT(OnAssignFreeSurferColorsPushButtonClicked()) );
     QObject::connect( (QObject*)( m_Controls->modularizePushButton ), SIGNAL(clicked()),  this, SLOT(OnModularizePushButtonClicked()) );
     QObject::connect( (QObject*)( m_Controls->prunePushButton ), SIGNAL(clicked()),  this, SLOT(OnPrunePushButtonClicked()) );
     QObject::connect( (QObject*)( m_Controls->createConnectivityMatrixImagePushButton ), SIGNAL(clicked()),  this, SLOT(OnCreateConnectivityMatrixImagePushButtonClicked()) );
@@ -78,12 +81,14 @@ void QmitkConnectomicsNetworkOperationsView::CreateQtPartControl( QWidget *paren
   if( m_demomode )
   {
     this->m_Controls->convertToRGBAImagePushButton->show();
+    this->m_Controls->assignFreeSurferColorsPushButton->show();
     this->m_Controls->modularizePushButton->hide();
     this->m_Controls->pruneOptionsGroupBox->show();
   }
   else
   {
     this->m_Controls->convertToRGBAImagePushButton->show();
+    this->m_Controls->assignFreeSurferColorsPushButton->show();
     this->m_Controls->modularizePushButton->show();
     this->m_Controls->pruneOptionsGroupBox->show();
   }
@@ -228,6 +233,67 @@ void QmitkConnectomicsNetworkOperationsView::OnConvertToRGBAImagePushButtonClick
   }
 }
 
+void QmitkConnectomicsNetworkOperationsView::OnAssignFreeSurferColorsPushButtonClicked()
+{
+  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  if (nodes.empty()) return;
+
+  mitk::DataNode* node = nodes.front();
+
+  if (!node)
+  {
+    // Nothing selected. Inform the user and return
+    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
+    return;
+  }
+
+  // here we have a valid mitk::DataNode
+
+  // a node itself is not very useful, we need its data item (the image)
+  mitk::BaseData* data = node->GetData();
+  if (data)
+  {
+    // test if this data item is an image or not (could also be a surface or something totally different)
+    mitk::Image* image = dynamic_cast<mitk::Image*>( data );
+    if (image)
+    {
+      std::stringstream message;
+      std::string name;
+      message << mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_PERFORMING_IMAGE_PROCESSING_FOR_IMAGE;
+      if (node->GetName(name))
+      {
+        // a property called "name" was found for this DataNode
+        message << "'" << name << "'";
+      }
+      message << ".";
+      MITK_INFO << message.str();
+
+      // Convert to RGBA
+      AssignFreeSurferColors( node );
+
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    else
+    {
+      QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
+      return;
+    }
+  }
+  else
+  {
+    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
+    return;
+  }
+}
+
+void QmitkConnectomicsNetworkOperationsView::AssignFreeSurferColors( mitk::DataNode::Pointer node )
+{
+  mitk::FreeSurferParcellationTranslator::Pointer translator = mitk::FreeSurferParcellationTranslator::New();
+  //translator->AssignLookupTable(node);
+  translator->AssignTransferFunction(node);
+  node->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR));
+}
+
 template < typename TPixel, unsigned int VImageDimension >
 void QmitkConnectomicsNetworkOperationsView::TurnIntoRGBA( itk::Image<TPixel, VImageDimension>* inputImage)
 {
@@ -292,10 +358,10 @@ void QmitkConnectomicsNetworkOperationsView::TurnIntoRGBA( itk::Image<TPixel, VI
   }
 
   //remove gaps from label image
-  for(it_inputImage.GoToBegin(); !it_inputImage.IsAtEnd(); ++it_inputImage)
-  {
-    it_inputImage.Value() = it_inputImage.Value() - subtractionStorage[int ( it_inputImage.Value() ) - offset ];
-  }
+  //for(it_inputImage.GoToBegin(); !it_inputImage.IsAtEnd(); ++it_inputImage)
+  //{
+  //  it_inputImage.Value() = it_inputImage.Value() - subtractionStorage[int ( it_inputImage.Value() ) - offset ];
+  //}
 
   // create colour vector
   std::vector< RGBAPixelType > lookupTable;
@@ -334,7 +400,7 @@ void QmitkConnectomicsNetworkOperationsView::TurnIntoRGBA( itk::Image<TPixel, VI
 
   for(it_inputImage.GoToBegin(), it_rgbaImage.GoToBegin(); !it_inputImage.IsAtEnd(); ++it_inputImage, ++it_rgbaImage)
   {
-    it_rgbaImage.Value() = lookupTable[ int ( it_inputImage.Value() ) - offset ];
+    it_rgbaImage.Value() = lookupTable[ int ( it_inputImage.Value() - subtractionStorage[int ( it_inputImage.Value() ) - offset ] ) - offset ];
   }
 
   mitk::Image::Pointer mitkRGBAImage = mitk::ImportItkImage( rgbaImage )->Clone();

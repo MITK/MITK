@@ -33,6 +33,7 @@ set(CPP_FILES
   Algorithms/mitkConnectomicsStatisticsCalculator.cpp
   Algorithms/mitkConnectomicsNetworkConverter.cpp
   Algorithms/mitkConnectomicsNetworkThresholder.cpp
+  Algorithms/mitkFreeSurferParcellationTranslator.cpp
 )
 
 set(H_FILES
@@ -73,6 +74,7 @@ set(H_FILES
   Algorithms/BrainParcellation/mitkCostFunctionBase.h
   Algorithms/BrainParcellation/mitkRandomParcellationGenerator.h
   Algorithms/BrainParcellation/mitkRegionVoxelCounter.h
+  Algorithms/mitkFreeSurferParcellationTranslator.h
 )
 
 

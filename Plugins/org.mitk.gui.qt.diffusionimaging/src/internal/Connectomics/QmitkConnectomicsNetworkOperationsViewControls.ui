@@ -63,7 +63,14 @@
       <string>Convert the selected image to RGBA format</string>
      </property>
      <property name="text">
-      <string>Convert to RGBA</string>
+      <string>Turn Into RGBA Image</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="assignFreeSurferColorsPushButton">
+     <property name="text">
+      <string>Assign FreeSurfer Colors</string>
      </property>
     </widget>
    </item>

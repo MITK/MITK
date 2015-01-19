@@ -113,17 +113,25 @@ void mitk::LabelSet::AddLabel(mitk::Label * label)
   // TODO use layer of label parameter
   newLabel->SetLayer( m_Layer );
 
-  PixelType pixelValue = m_LabelContainer.rbegin()->first;
-
-  if (m_LabelContainer.empty() == false && pixelValue >= newLabel->GetValue() &&
-      m_LabelContainer.find(newLabel->GetValue()) != m_LabelContainer.end())
+  PixelType pixelValue;
+  if(m_LabelContainer.empty())
   {
-    ++pixelValue;
-    newLabel->SetValue( pixelValue );
+    pixelValue = newLabel->GetValue();
   }
   else
   {
-    pixelValue = newLabel->GetValue();
+    pixelValue = m_LabelContainer.rbegin()->first;
+
+    if (pixelValue >= newLabel->GetValue() &&
+        m_LabelContainer.find(newLabel->GetValue()) != m_LabelContainer.end())
+    {
+      ++pixelValue;
+      newLabel->SetValue( pixelValue );
+    }
+    else
+    {
+      pixelValue = newLabel->GetValue();
+    }
   }
 
   // new map entry
@@ -163,7 +171,7 @@ void mitk::LabelSet::SetLookupTable( mitk::LookupTable* lut)
   Modified();
 }
 
-void mitk::LabelSet::PrintSelf(std::ostream &os, itk::Indent indent) const
+void mitk::LabelSet::PrintSelf(std::ostream &/*os*/, itk::Indent /*indent*/) const
 {
 }
 

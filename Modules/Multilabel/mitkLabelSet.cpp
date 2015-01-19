@@ -32,6 +32,7 @@ mitk::LabelSet::~LabelSet()
 }
 
 mitk::LabelSet::LabelSet(const LabelSet & other):
+  itk::Object(),
   m_LookupTable(other.GetLookupTable()->Clone()),
   m_ActiveLabelValue(other.GetActiveLabel()->GetValue()),
   m_Layer(other.GetLayer())

@@ -875,11 +875,15 @@ void mitk::LabelSetImage::CalculateCenterOfMassProcessing(ImageType* itkImage, P
   if (!indexVector.empty())
   {
     typename itk::ImageRegionConstIteratorWithIndex< ImageType >::IndexType centerIndex;
-    centerIndex.Fill(0);
     centerIndex = indexVector.at(indexVector.size()/2);
-    pos[0] = centerIndex[0];
-    pos[1] = centerIndex[1];
-    pos[2] = centerIndex[2];
+    if (centerIndex.GetIndexDimension() == 3)
+    {
+      pos[0] = centerIndex[0];
+      pos[1] = centerIndex[1];
+      pos[2] = centerIndex[2];
+    }
+    else
+      return;
   }
 
   GetLabelSet(layer)->GetLabel(pixelValue)->SetCenterOfMassIndex(pos);

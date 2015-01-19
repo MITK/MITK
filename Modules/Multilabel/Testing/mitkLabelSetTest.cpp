@@ -118,7 +118,8 @@ public:
     m_LabelSet->AddLabel(newLabel);
     // Since label with value 199 already exists the new label will get the value 200
     CPPUNIT_ASSERT_MESSAGE("Wrong label value", m_LabelSet->GetActiveLabel()->GetValue() == 200);
-    CPPUNIT_ASSERT_MESSAGE("Wrong number of label", m_LabelSet->GetNumberOfLabels() == (m_InitialNumberOfLabels+1));
+    unsigned int numLabels = m_InitialNumberOfLabels+1;
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of label", m_LabelSet->GetNumberOfLabels() == numLabels);
 
     // Add new labels until the maximum number of labels is reached.
     // Adding more labels should have no effect.

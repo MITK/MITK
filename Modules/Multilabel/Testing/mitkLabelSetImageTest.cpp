@@ -401,7 +401,6 @@ public:
     m_LabelSetImage->GetActiveLabelSet()->SetActiveLabel(6);
     // Merge label 7 with label 0. Result should be that label 7 is not present any more
     m_LabelSetImage->MergeLabel(7);
-    mitk::IOUtil::Save(dynamic_cast<mitk::Image*>(m_LabelSetImage.GetPointer()), "/Users/fetzer/Desktop/lset.nrrd");
     CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not remove from the image", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
     m_LabelSetImage->GetStatistics()->GetScalarValue2ndMax();
 

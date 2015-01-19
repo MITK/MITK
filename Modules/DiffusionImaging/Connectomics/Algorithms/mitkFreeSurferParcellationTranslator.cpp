@@ -14,12 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//#include <boost/lexical_cast.hpp>
 #include <mitkLookupTableProperty.h>
 #include <mitkRenderingModeProperty.h>
 #include <mitkTransferFunctionProperty.h>
 #include "mitkFreeSurferParcellationTranslator.h"
-//using boost::lexical_cast;
 using namespace mitk;
 using namespace std;
 
@@ -45,14 +43,12 @@ void FreeSurferParcellationTranslator::AssignLookupTable(DataNode::Pointer node)
 {
   LookupTableProperty::Pointer lookupTableProp = LookupTableProperty::New( this->GetLookupTable() );
   node->SetProperty( "LookupTable", lookupTableProp );
-  //node->SetProperty( "Image Rendering.Mode", RenderingModeProperty::New( RenderingModeProperty::LOOKUPTABLE_COLOR ) );
 }
 // Assign the color transfer function to the given node
 void FreeSurferParcellationTranslator::AssignTransferFunction(DataNode::Pointer node) const
 {
   TransferFunctionProperty::Pointer transferFunctionProp = TransferFunctionProperty::New( this->GetTransferFunction() );
   node->SetProperty( "Image Rendering.Transfer Function", transferFunctionProp );
-  //node->SetProperty( "Image Rendering.Mode", RenderingModeProperty::New( RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR ) );
 }
 // Get the label assigned to the given name
 const string FreeSurferParcellationTranslator::GetLabel(const string& name) const

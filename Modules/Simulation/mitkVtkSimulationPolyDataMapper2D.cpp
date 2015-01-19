@@ -86,7 +86,6 @@ void mitk::vtkSimulationPolyDataMapper2D::Render(vtkRenderer* renderer, vtkActor
     const std::vector<Edge>& edges = intersectionIt->edges;
     std::vector<Edge>::const_iterator edgesEnd = edges.end();
 
-    //glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, intersectionIt->color);
     glColor4fv(intersectionIt->color);
     glBegin(GL_LINES);
 

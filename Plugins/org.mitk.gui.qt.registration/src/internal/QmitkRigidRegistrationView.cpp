@@ -246,8 +246,6 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_MovingImageCB->hide();
   m_Controls.m_MovingMaskLB->hide();
 
-  m_Controls.m_RigidTransform->removeTab(1);
-
   this->CreateConnections();
   this->CheckCalculateEnabled();
 }

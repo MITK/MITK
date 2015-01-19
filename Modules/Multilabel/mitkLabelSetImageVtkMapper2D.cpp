@@ -584,9 +584,6 @@ void mitk::LabelSetImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer
 
 void mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  mitk::LabelSetImage* image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
-  assert(image);
-
   // add/replace the following properties
   node->SetProperty( "opacity", FloatProperty::New(1.0f), renderer );
   node->SetProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer );

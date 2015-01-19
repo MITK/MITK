@@ -97,15 +97,17 @@ public:
     // Remove a label that is not the active label
     m_LabelSet->SetActiveLabel(12);
     m_LabelSet->RemoveLabel(56);
+    unsigned int numLabels = m_InitialNumberOfLabels-1;
     CPPUNIT_ASSERT_MESSAGE("Label was not removed", m_LabelSet->ExistLabel(56) == false);
-    CPPUNIT_ASSERT_MESSAGE("Wrong number of label", m_LabelSet->GetNumberOfLabels() == m_InitialNumberOfLabels-1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of label", m_LabelSet->GetNumberOfLabels() == numLabels);
     CPPUNIT_ASSERT_MESSAGE("Wrong active label", m_LabelSet->GetActiveLabel()->GetValue() == 12);
 
     // Remove active label - now the succeeding label should be active
     m_LabelSet->RemoveLabel(12);
     CPPUNIT_ASSERT_MESSAGE("Wrong layer", m_LabelSet->GetActiveLabel()->GetValue() == 13);
     CPPUNIT_ASSERT_MESSAGE("Label was not removed", m_LabelSet->ExistLabel(12) == false);
-    CPPUNIT_ASSERT_MESSAGE("Wrong initial number of label", m_LabelSet->GetNumberOfLabels() == m_InitialNumberOfLabels-2);
+    numLabels = m_InitialNumberOfLabels-2;
+    CPPUNIT_ASSERT_MESSAGE("Wrong initial number of label", m_LabelSet->GetNumberOfLabels() == numLabels);
   }
 
   void TestAddLabel()

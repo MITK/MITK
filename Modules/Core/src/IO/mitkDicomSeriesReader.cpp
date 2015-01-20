@@ -92,6 +92,7 @@ const DicomSeriesReader::TagToPropertyMapType& DicomSeriesReader::GetDICOMTagsTo
     dictionary["0020|000d"] = "dicom.study.StudyInstanceUID";
     dictionary["0008|0020"] = "dicom.study.StudyDate";
     dictionary["0008|0030"] = "dicom.study.StudyTime";
+    dictionary["0008|0080"] = "dicom.study.InstitutionName";
     dictionary["0008|0090"] = "dicom.study.ReferringPhysiciansName";
     dictionary["0020|0010"] = "dicom.study.StudyID";
     dictionary["0008|0050"] = "dicom.study.AccessionNumber";

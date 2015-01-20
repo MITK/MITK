@@ -14,27 +14,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkSimulationWriterFactory_h
-#define mitkSimulationWriterFactory_h
+#ifndef mitkSimulationIO_h
+#define mitkSimulationIO_h
 
-#include <itkObjectFactoryBase.h>
-#include <mitkCommon.h>
+#include <mitkAbstractFileIO.h>
 #include <MitkSimulationExports.h>
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT SimulationWriterFactory : public itk::ObjectFactoryBase
+  class MitkSimulation_EXPORT SimulationIO : public AbstractFileIO
   {
   public:
-    mitkClassMacro(SimulationWriterFactory, itk::ObjectFactoryBase);
-    itkFactorylessNewMacro(Self);
+    SimulationIO();
 
-    const char* GetITKSourceVersion() const;
-    const char* GetDescription() const;
+    using AbstractFileReader::Read;
+    std::vector<BaseData::Pointer> Read();
+    ConfidenceLevel GetReaderConfidenceLevel() const;
 
-  protected:
-    SimulationWriterFactory();
-    ~SimulationWriterFactory();
+    void Write();
+    ConfidenceLevel GetWriterConfidenceLevel() const;
+
+  private:
+    SimulationIO* IOClone() const;
   };
 }
 

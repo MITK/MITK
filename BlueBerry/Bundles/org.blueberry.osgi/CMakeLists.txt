@@ -33,7 +33,7 @@ if(MITK_USE_Qt5)
   target_link_libraries(${OSGI_UI_APP} PRIVATE Widgets)
 endif()
 
-target_link_libraries(${OSGI_UI_APP} ${PROJECT_NAME} mbilog)
+target_link_libraries(${OSGI_UI_APP} PRIVATE ${PROJECT_NAME} mbilog)
 if(_ctk_test_plugins)
   add_dependencies(${OSGI_UI_APP} ${_ctk_test_plugins})
   add_dependencies(BlueBerry ${OSGI_UI_APP})

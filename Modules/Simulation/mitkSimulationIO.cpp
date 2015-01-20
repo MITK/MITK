@@ -140,7 +140,7 @@ void mitk::SimulationIO::Write()
   std::string originalContent = simulation->GetProperty("Scene File")->GetValueAsString();
 
   LocalFile localFile(this);
-  std::ofstream scnFile(localFile.GetFileName());
+  std::ofstream scnFile(localFile.GetFileName().c_str());
 
   if (originalContent.size() < 22 || originalContent.substr(0, 21) != "<!-- ORIGINAL_PATH = ")
   {

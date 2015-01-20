@@ -23,9 +23,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkUnstructuredGrid.h>
 #include <mitkUnstructuredGridToUnstructuredGridFilter.h>
+#include <vtkIdList.h>
+#include <vtkPoints.h>
 
 
 namespace mitk {
+
+   /**
+   * @brief The UnstructuredGridClusteringFilter class
+   *
+   * DBSCAN algorithm:
+   *
+   *     DBSCAN(D, eps, MinPts)
+   *     C = 0
+   *     for each unvisited point P in dataset D
+   *       mark P as visited
+   *       N = D.regionQuery(P, eps)
+   *       if sizeof(N) < MinPts
+   *         mark P as NOISE
+   *       else
+   *         C = next cluster
+   *         expandCluster(P, N, C, eps, MinPts)
+   *
+   *     expandCluster(P, N, C, eps, MinPts)
+   *       add P to cluster C
+   *       for each point P' in N
+   *         if P' is not visited
+   *           mark P' as visited
+   *           N' = D.regionQuery(P', eps)
+   *           if sizeof(N') >= MinPts
+   *             N = N joined with N'
+   *         if P' is not yet member of any cluster
+   *           add P' to cluster C
+   */
 
   class MitkAlgorithmsExt_EXPORT UnstructuredGridClusteringFilter
       : public UnstructuredGridToUnstructuredGridFilter
@@ -35,6 +65,12 @@ namespace mitk {
       mitkClassMacro(UnstructuredGridClusteringFilter, UnstructuredGridToUnstructuredGridFilter)
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
+
+      itkSetMacro(eps, double)
+      itkGetMacro(eps, double)
+
+      itkSetMacro(MinPts, int)
+      itkGetMacro(MinPts, int)
 
       virtual void GenerateOutputInformation();
 
@@ -46,7 +82,13 @@ namespace mitk {
 
   private:
 
+      void ExpandCluster(int id, vtkIdList* pointIDs, vtkPoints* cluster, vtkPoints *inpPoints);
+
       mitk::UnstructuredGrid::Pointer m_UnstructGrid;
+
+      double m_eps;
+
+      int m_MinPts;
 
   };
 

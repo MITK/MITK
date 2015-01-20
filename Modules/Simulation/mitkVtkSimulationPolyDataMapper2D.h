@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkVtkSimulationPolyDataMapper_h
-#define mitkVtkSimulationPolyDataMapper_h
+#ifndef mitkVtkSimulationPolyDataMapper2D_h
+#define mitkVtkSimulationPolyDataMapper2D_h
 
 #include <mitkSimulation.h>
 #include <vtkPolyDataMapper.h>
@@ -25,11 +25,11 @@ namespace mitk
 {
   class ISimulationService;
 
-  class MitkSimulation_EXPORT vtkSimulationPolyDataMapper : public vtkPolyDataMapper
+  class MitkSimulation_EXPORT vtkSimulationPolyDataMapper2D : public vtkPolyDataMapper
   {
   public:
-    static vtkSimulationPolyDataMapper* New();
-    vtkTypeMacro(vtkSimulationPolyDataMapper, vtkPolyDataMapper);
+    static vtkSimulationPolyDataMapper2D* New();
+    vtkTypeMacro(vtkSimulationPolyDataMapper2D, vtkPolyDataMapper);
 
     double* GetBounds();
     void Render(vtkRenderer* renderer, vtkActor* actor);
@@ -37,8 +37,8 @@ namespace mitk
     void SetSimulation(mitk::Simulation::Pointer simulation);
 
   private:
-    vtkSimulationPolyDataMapper();
-    ~vtkSimulationPolyDataMapper();
+    vtkSimulationPolyDataMapper2D();
+    ~vtkSimulationPolyDataMapper2D();
 
     Simulation::Pointer m_Simulation;
     ISimulationService* m_SimulationService;

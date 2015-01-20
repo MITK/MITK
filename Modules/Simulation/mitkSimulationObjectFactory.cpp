@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulationObjectFactory.h"
 #include "mitkSimulationVtkMapper2D.h"
 #include "mitkSimulationVtkMapper3D.h"
-#include "mitkSimulationWriter.h"
 #include "mitkVtkModel.h"
 #include <mitkCoreObjectFactory.h>
 #include <sofa/helper/system/glut.h>
@@ -52,25 +51,13 @@ static void RegisterSofaClasses()
 }
 
 mitk::SimulationObjectFactory::SimulationObjectFactory()
-  : m_SimulationIOFactory(SimulationIOFactory::New()),
-    m_SimulationWriterFactory(SimulationWriterFactory::New())
 {
-  itk::ObjectFactoryBase::RegisterFactory(m_SimulationIOFactory);
-  itk::ObjectFactoryBase::RegisterFactory(m_SimulationWriterFactory);
-
-  m_FileWriters.push_back(SimulationWriter::New().GetPointer());
-
-  std::string description = "SOFA Scene Files";
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.scn", description));
-
   InitializeSofa();
   RegisterSofaClasses();
 }
 
 mitk::SimulationObjectFactory::~SimulationObjectFactory()
 {
-  itk::ObjectFactoryBase::UnRegisterFactory(m_SimulationWriterFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_SimulationIOFactory);
 }
 
 mitk::Mapper::Pointer mitk::SimulationObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId slotId)
@@ -102,31 +89,22 @@ const char* mitk::SimulationObjectFactory::GetDescription() const
 
 const char* mitk::SimulationObjectFactory::GetFileExtensions()
 {
-  std::string fileExtensions;
-  this->CreateFileExtensions(m_FileExtensionsMap, fileExtensions);
-  return fileExtensions.c_str();
+  return NULL;
 }
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::SimulationObjectFactory::GetFileExtensionsMap()
 {
-  return m_FileExtensionsMap;
-}
-
-const char* mitk::SimulationObjectFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
+  return MultimapType();
 }
 
 const char* mitk::SimulationObjectFactory::GetSaveFileExtensions()
 {
-  std::string saveFileExtensions;
-  this->CreateFileExtensions(m_FileExtensionsMap, saveFileExtensions);
-  return saveFileExtensions.c_str();
+  return NULL;
 }
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::SimulationObjectFactory::GetSaveFileExtensionsMap()
 {
-  return m_SaveFileExtensionsMap;
+  return MultimapType();
 }
 
 void mitk::SimulationObjectFactory::SetDefaultProperties(mitk::DataNode* node)

@@ -51,32 +51,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iomanip>
 
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode, const QString& name)
-: QWidget(parent, f),
-mitkWidget1(NULL),
-mitkWidget2(NULL),
-mitkWidget3(NULL),
-mitkWidget4(NULL),
-levelWindowWidget(NULL),
-QmitkStdMultiWidgetLayout(NULL),
-m_Layout(LAYOUT_DEFAULT),
-m_PlaneMode(PLANE_MODE_SLICING),
-m_RenderingManager(renderingManager),
-m_GradientBackgroundFlag(true),
-m_TimeNavigationController(NULL),
-m_MainSplit(NULL),
-m_LayoutSplit(NULL),
-m_SubSplit1(NULL),
-m_SubSplit2(NULL),
-mitkWidget1Container(NULL),
-mitkWidget2Container(NULL),
-mitkWidget3Container(NULL),
-mitkWidget4Container(NULL),
-m_PendingCrosshairPositionEvent(false),
-m_CrosshairNavigationEnabled(false)
+  : QWidget(parent, f),
+  mitkWidget1(NULL),
+  mitkWidget2(NULL),
+  mitkWidget3(NULL),
+  mitkWidget4(NULL),
+  levelWindowWidget(NULL),
+  QmitkStdMultiWidgetLayout(NULL),
+  m_Layout(LAYOUT_DEFAULT),
+  m_PlaneMode(PLANE_MODE_SLICING),
+  m_RenderingManager(renderingManager),
+  m_GradientBackgroundFlag(true),
+  m_TimeNavigationController(NULL),
+  m_MainSplit(NULL),
+  m_LayoutSplit(NULL),
+  m_SubSplit1(NULL),
+  m_SubSplit2(NULL),
+  mitkWidget1Container(NULL),
+  mitkWidget2Container(NULL),
+  mitkWidget3Container(NULL),
+  mitkWidget4Container(NULL),
+  m_PendingCrosshairPositionEvent(false),
+  m_CrosshairNavigationEnabled(false)
 {
   /******************************************************
-   * Use the global RenderingManager if none was specified
-   * ****************************************************/
+  * Use the global RenderingManager if none was specified
+  * ****************************************************/
   if (m_RenderingManager == NULL)
   {
     m_RenderingManager = mitk::RenderingManager::GetInstance();
@@ -343,6 +343,7 @@ void QmitkStdMultiWidget::InitializeWidget()
     );
 
   // setup the department logo rendering
+  /*
   m_LogoRendering = mitk::LogoOverlay::New();
   mitk::BaseRenderer::Pointer renderer4 = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
   m_LogoRendering->SetOpacity(0.5);
@@ -353,6 +354,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_LogoRendering->SetCornerPosition(1);
   m_LogoRendering->SetLogoImagePath("DefaultLogo");
   renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(),renderer4);
+  */
 }
 
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()
@@ -1248,7 +1250,8 @@ void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
   m_SubSplit1->addWidget( mitkWidget1Container );
 
   //set SplitterSize for splitter top
-   QList<int> splitterSize;
+  QList<int> splitterSize;
+
   //insert Widget Container into splitter bottom
   m_SubSplit2->addWidget( mitkWidget4Container );
   //set SplitterSize for splitter m_LayoutSplit
@@ -1421,10 +1424,10 @@ void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
 
 void QmitkStdMultiWidget::mousePressEvent(QMouseEvent * e)
 {
-   if (e->button() == Qt::LeftButton) {
-       mitk::Point3D pointValue = this->GetLastLeftClickPosition();
-       emit LeftMouseClicked(pointValue);
-   }
+  if (e->button() == Qt::LeftButton) {
+    mitk::Point3D pointValue = this->GetLastLeftClickPosition();
+    emit LeftMouseClicked(pointValue);
+  }
 }
 
 void QmitkStdMultiWidget::moveEvent( QMoveEvent* e )
@@ -1620,23 +1623,39 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetTopLayerNode(mitk::DataStorage::
     // find node with largest layer, that is the node shown on top in the render window
     for (unsigned int x = 0; x < nodes->size(); x++)
     {
-    if ( (nodes->at(x)->GetData()->GetGeometry() != NULL) &&
-         nodes->at(x)->GetData()->GetGeometry()->IsInside(crosshairPos) )
-    {
-      int layer = 0;
-      if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
-      if(layer > maxlayer)
+      if ( (nodes->at(x)->GetData()->GetGeometry() != NULL) &&
+        nodes->at(x)->GetData()->GetGeometry()->IsInside(crosshairPos) )
       {
-        if( static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible( baseRenderer ) )
+        int layer = 0;
+        if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
+        if(layer > maxlayer)
         {
-          node = nodes->at(x);
-          maxlayer = layer;
+          if( static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible( baseRenderer ) )
+          {
+            node = nodes->at(x);
+            maxlayer = layer;
+          }
         }
       }
     }
-    }
   }
   return node;
+}
+
+void QmitkStdMultiWidget::setCornerAnnotation(int corner, const char* text) 
+{
+  auto cornerText = vtkCornerAnnotation::New();
+  cornerText->SetText(corner, text);
+  cornerText->SetMaximumFontSize(14);
+  auto textProp = vtkTextProperty::New();
+  textProp->SetColor( 1.0, 1.0, 1.0 );
+  textProp->SetFontFamilyToArial();
+  cornerText->SetTextProperty( textProp );
+  auto ren = vtkRenderer::New();
+  ren->AddActor(cornerText);
+  ren->InteractiveOff();
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->InsertForegroundRenderer(ren,true);
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->UpdateLayers();
 }
 
 void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
@@ -1692,6 +1711,45 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   {
     image->GetGeometry()->WorldToIndex(crosshairPos, p);
     stream.precision(2);
+
+    std::string patient, patientId,
+      birthday, sex, institution, studyDate, studyTime;
+
+    auto properties = image->GetPropertyList();
+    properties->GetStringProperty("dicom.patient.PatientsName", patient);
+    properties->GetStringProperty("dicom.patient.PatientID", patientId);
+    properties->GetStringProperty("dicom.patient.PatientsBirthDate", birthday);
+    properties->GetStringProperty("dicom.patient.PatientsSex", sex);
+    properties->GetStringProperty("dicom.study.InstitutionName", institution);
+    properties->GetStringProperty("dicom.study.StudyDate", studyDate);
+    properties->GetStringProperty("dicom.study.StudyTime", studyTime);
+    
+    char yy[5]; yy[4] = 0;
+    char mm[3]; mm[2] = 0;
+    char dd[3]; dd[2] = 0;
+    sscanf (birthday.c_str(),"%4c%2c%2c",yy,mm,dd);
+
+    std::stringstream s;
+    s << "\n\n" << patient.c_str()
+      << "\n" << patientId.c_str()
+      << "\n" << dd << "." << mm << "." << yy << " " << sex.c_str()
+      << "\n" << institution.c_str();
+    const std::string tmp = s.str();
+
+    sscanf (studyDate.c_str(),"%4c%2c%2c",yy,mm,dd);
+    char hh[3]; hh[2] = 0;
+    char mi[3]; mi[2] = 0;
+    char ss[3]; ss[2] = 0;
+    sscanf (studyTime.c_str(),"%2c%2c%2c",hh,mi,ss);
+
+    std::stringstream d;
+    d << dd << "." << mm << "." << yy 
+      << " " << hh << ":" << mi << ":" << ss;
+    const std::string tmp2 = d.str();
+
+    setCornerAnnotation(3, tmp.c_str());
+    setCornerAnnotation(1, tmp2.c_str());
+
     stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";
     stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
     mitk::ScalarType pixelValue = image->GetPixelValueByIndex(p, timestep, component);
@@ -1720,9 +1778,9 @@ void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
 
   //// Listen for SliceNavigationController
   //TODO 18735 can this be deleted ??
-  //mitkWidget1->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
-  //mitkWidget2->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
-  //mitkWidget3->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
+  mitkWidget1->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
+  mitkWidget2->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
+  mitkWidget3->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
 
   switch ( m_PlaneMode )
   {
@@ -1905,25 +1963,25 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int userMode )
   {
     switch(userMode)
     {
-      case 0:
-        mode = PLANE_MODE_SLICING;
-        link = false;
-        break;
+    case 0:
+      mode = PLANE_MODE_SLICING;
+      link = false;
+      break;
 
-      case 1:
-        mode = PLANE_MODE_ROTATION;
-        link = false;
-        break;
+    case 1:
+      mode = PLANE_MODE_ROTATION;
+      link = false;
+      break;
 
-      case 2:
-        mode = PLANE_MODE_ROTATION;
-        link = true;
-        break;
+    case 2:
+      mode = PLANE_MODE_ROTATION;
+      link = true;
+      break;
 
-      case 3:
-        mode = PLANE_MODE_SWIVEL;
-        link = false;
-        break;
+    case 3:
+      mode = PLANE_MODE_SWIVEL;
+      link = false;
+      break;
     }
   }
 
@@ -2273,12 +2331,12 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane(int id)
 {
   switch(id)
   {
-    case 1: return this->m_PlaneNode1;
+  case 1: return this->m_PlaneNode1;
     break;
-    case 2: return this->m_PlaneNode2;
+  case 2: return this->m_PlaneNode2;
     break;
-    case 3: return this->m_PlaneNode3;
+  case 3: return this->m_PlaneNode3;
     break;
-    default: return NULL;
+  default: return NULL;
   }
 }

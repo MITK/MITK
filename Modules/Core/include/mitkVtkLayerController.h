@@ -98,18 +98,18 @@ public:
   unsigned int GetNumberOfRenderers();
 
   void SetEraseForAllRenderers(int i);
+
+  /**
+  * Internally used to sort all registered renderers and to connect the with the vtkRenderWindow.
+  * Mention that VTK Version 5 and above is rendering higher numbers in the background and VTK
+  * Verison < 5 in the foreground.
+  */
+  void UpdateLayers();
+
 protected:
   vtkSmartPointer<vtkRenderWindow>    m_RenderWindow;
 
 private:
-
-  /**
-    * Internally used to sort all registered renderers and to connect the with the vtkRenderWindow.
-    * Mention that VTK Version 5 and above is rendering higher numbers in the background and VTK
-    * Verison < 5 in the foreground.
-    */
-  void UpdateLayers();
-
   // Layer Management
   typedef std::vector< vtkSmartPointer<vtkRenderer> > RendererVectorType;
   RendererVectorType m_BackgroundRenderers;

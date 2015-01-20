@@ -52,7 +52,7 @@ std::vector<mitk::BaseData::Pointer> mitk::SimulationIO::Read()
 
   simulationService->SetActiveSimulation(simulation);
 
-  std::ifstream scnFile(this->GetLocalFileName());
+  std::ifstream scnFile(this->GetLocalFileName().c_str());
   std::string content = std::string((std::istreambuf_iterator<char>(scnFile)), std::istreambuf_iterator<char>());
   scnFile.close();
 

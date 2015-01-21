@@ -47,7 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSetDataInteractor.h>
 
 //Propertylist Test
-
+#include <mitkImageGenerator.h>
 
 
 /**
@@ -246,7 +246,39 @@ static void TestGetMTime(mitk::DataNode::Pointer dataNode)
   MITK_TEST_CONDITION( lastModified <= dataNode->GetMTime(), "Testing if the node timestamp is updated after property list was modified" )
 
 }
+static void TestSetDataUnderPropertyChange(mitk::DataNode::Pointer dataNode)
+{
+  mitk::Image::Pointer image = mitk::Image::New();
+  mitk::Image::Pointer additionalImage = mitk::Image::New();
+
+  mitk::DataNode::Pointer additionalDataNode = mitk::DataNode::New();
+
+  image = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(3u, 3u);
+
+  additionalDataNode->SetData(image);
+
+  float outlineWidth = 0;
+  MITK_TEST_CONDITION(mitk::Equal(outlineWidth,1.0), "Testing if the SetData set the default propertylist" )
+
+  additionalDataNode->SetProperty("outline width", mitk::FloatProperty::New( 42.0 ));
+  additionalDataNode->SetData(image);
+  additionalDataNode->GetPropertyValue("outline width", outlineWidth);
+
+  MITK_TEST_CONDITION(mitk::Equal(outlineWidth,42.0), "Testing if the SetData does not set anything imagedata is identical" )
+
+  additionalDataNode->SetData(additionalImage);
+  additionalDataNode->GetPropertyValue("outline width", outlineWidth);
+
+  MITK_TEST_CONDITION(mitk::Equal(outlineWidth,42.0), "Testing if the SetData does not set the default propertylist if imagedata is already set" )
+
+  mitk::Surface::Pointer additionalSurface = mitk::Surface::New();
+  additionalDataNode->SetData(additionalSurface);
+  //additionalDataNode->GetPropertyValue("outline width", &outlineWidth);
+
+  MITK_TEST_CONDITION(additionalDataNode->GetPropertyValue("outline width", outlineWidth) == false, "Testing if the SetData sets the default propertylist if some new datatype is loaded" )
+}
 }; //mitkDataNodeTestClass
+
 int mitkDataNodeTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
@@ -266,6 +298,7 @@ int mitkDataNodeTest(int /* argc */, char* /*argv*/[])
   //test setData() Method
   mitkDataNodeTestClass::TestDataSetting(myDataNode);
   mitkDataNodeTestClass::TestMapperSetting(myDataNode);
+  mitkDataNodeTestClass::TestSetDataUnderPropertyChange(myDataNode);
   //
   //note, that no data is set to the dataNode
   mitkDataNodeTestClass::TestInteractorSetting(myDataNode);
@@ -279,3 +312,4 @@ int mitkDataNodeTest(int /* argc */, char* /*argv*/[])
   // always end with this!
   MITK_TEST_END()
 }
+

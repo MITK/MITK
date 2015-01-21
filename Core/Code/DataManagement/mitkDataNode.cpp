@@ -74,6 +74,7 @@ void mitk::DataNode::SetData(mitk::BaseData* baseData)
     else
     {
        m_Data=baseData;
+       this->GetPropertyList()->Clear();
        mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(this);
     }
 

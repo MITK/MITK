@@ -31,7 +31,6 @@ using namespace mitk;
  */
 int main(int argc, char* argv[])
 {
-    std::cout << "TensorReconstruction";
     mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);

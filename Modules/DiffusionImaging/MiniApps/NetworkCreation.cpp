@@ -29,6 +29,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
+
+  parser.setTitle("Network Creation");
+  parser.setCategory("Connectomics");
+  parser.setDescription("");
+  parser.setContributor("MBI");
+
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("fiberImage", "f", mitkCommandLineParser::InputFile, "Input image", "input fiber image (.fib)", us::Any(), false);
   parser.addArgument("parcellation", "p", mitkCommandLineParser::InputFile, "Parcellation image", "parcellation image", us::Any(), false);

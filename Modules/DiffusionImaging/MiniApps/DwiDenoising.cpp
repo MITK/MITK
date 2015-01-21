@@ -48,7 +48,6 @@ mitk::BaseData::Pointer LoadFile(std::string filename)
  */
 int main(int argc, char* argv[])
 {
-    std::cout << "DwiDenoising";
   mitkCommandLineParser parser;
 
   parser.setTitle("DWI Denoising");

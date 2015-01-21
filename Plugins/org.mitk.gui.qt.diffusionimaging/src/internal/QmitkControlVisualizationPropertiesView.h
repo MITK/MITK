@@ -88,6 +88,7 @@ protected slots:
   void FiberSlicingThickness2D();
   void FiberSlicingUpdateLabel(int);
   void LineWidthChanged();
+  void TubeRadiusChanged();
 
   void SetInteractor();
 

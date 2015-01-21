@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSImageLoggingFilter.h"
 #include <mitkIOUtil.h>
-#include <mitkImageWriter.h>
 #include <mitkUIDGenerator.h>
 #include <Poco/Path.h>
 
@@ -138,17 +137,17 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
   fb.close();
 }
 
-bool mitk::USImageLoggingFilter::SetImageFilesExtension(std::string extension)
+bool mitk::USImageLoggingFilter::SetImageFilesExtension(std::string extension) //TODO IO
  {
- mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
- if(!imageWriter->IsExtensionValid(extension))
-  {
-  MITK_WARN << "Extension " << extension << " is not supported; still using " << m_ImageExtension << " as before.";
-  return false;
-  }
- else
-  {
-  m_ImageExtension = extension;
+// mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
+// if(!imageWriter->IsExtensionValid(extension))
+//  {
+//  MITK_WARN << "Extension " << extension << " is not supported; still using " << m_ImageExtension << " as before.";
+//  return false;
+//  }
+// else
+//  {
+//  m_ImageExtension = extension;
   return true;
-  }
+//  }
  }

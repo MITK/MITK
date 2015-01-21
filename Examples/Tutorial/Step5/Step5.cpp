@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRenderWindow.h"
 #include "QmitkSliceWidget.h"
 
-#include "mitkDataNodeFactory.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 #include "mitkStandaloneDataStorage.h"

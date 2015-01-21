@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVectorImage.h>
 #include <itkResampleImageFilter.h>
 
-#include <mitkBaseDataIOFactory.h>
 #include <mitkImage.h>
 #include <mitkQBallImage.h>
 #include <mitkBaseData.h>

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIDataStorageService.h>
 #include <mitkSceneIO.h>
+#include <mitkIOUtil.h>
 #include <mitkProgressBar.h>
 #include <mitkRenderingManager.h>
 
@@ -107,25 +108,7 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
          }
          else
          {
-           mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-           try
-           {
-             nodeReader->SetFileName(arguments[i].toStdString());
-             nodeReader->Update();
-             for (unsigned int j = 0 ; j < nodeReader->GetNumberOfOutputs( ); ++j)
-             {
-               mitk::DataNode::Pointer node = nodeReader->GetOutput(j);
-               if (node->GetData() != 0)
-               {
-                 dataStorage->Add(node);
-                 argumentsAdded++;
-               }
-             }
-           }
-           catch(...)
-           {
-             MITK_WARN << "Failed to load command line argument: " << arguments[i].toStdString();
-           }
+           mitk::IOUtil::Load(arguments[i].toStdString(),*(dataStorage.GetPointer()));
          }
        } // end for each command line argument
 

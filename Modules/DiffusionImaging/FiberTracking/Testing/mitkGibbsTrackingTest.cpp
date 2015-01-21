@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkImageCast.h>
 #include <mitkQBallImage.h>
-#include <mitkBaseDataIOFactory.h>
 #include <itkGibbsTrackingFilter.h>
 #include <mitkFiberBundleX.h>
 

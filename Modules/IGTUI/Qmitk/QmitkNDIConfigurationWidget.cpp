@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkNavigationToolWriter.h>
 #include <mitkNavigationToolReader.h>
-#include <mitkSTLFileReader.h>
 #include <mitkIGTException.h>
 
 #include "QmitkCustomVariants.h"

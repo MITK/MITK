@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkBaseDataIOFactory.h>
 #include <metaCommand.h>
 #include "mitkCommandLineParser.h"
 #include <usAny.h>

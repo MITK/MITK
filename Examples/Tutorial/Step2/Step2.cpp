@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 
-#include <mitkDataNodeFactory.h>
 #include <mitkStandaloneDataStorage.h>
 
 #include <itksys/SystemTools.hxx>

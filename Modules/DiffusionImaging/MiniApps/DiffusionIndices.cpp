@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <itkExceptionObject.h>
 #include <itkImageFileWriter.h>
-#include <mitkBaseDataIOFactory.h>
 #include <mitkQBallImage.h>
 #include <itkTensorDerivedMeasurementsFilter.h>
 #include <itkDiffusionQballGeneralizedFaImageFilter.h>

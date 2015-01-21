@@ -32,7 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 
 // MITK includes
-#include <mitkBaseDataIOFactory.h>
 #include <mitkConnectomicsStatisticsCalculator.h>
 #include <mitkConnectomicsNetworkThresholder.h>
 #include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>

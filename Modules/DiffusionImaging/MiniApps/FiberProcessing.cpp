@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMetaDataObject.h>
 #include <itkVectorImage.h>
 
-#include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <mitkFiberBundleX.h>
 #include "mitkCommandLineParser.h"

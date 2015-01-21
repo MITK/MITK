@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkQBallImage.h>
 #include <mitkTensorImage.h>
-#include <mitkBaseDataIOFactory.h>
 #include <mitkFiberBundleX.h>
 #include <itkGibbsTrackingFilter.h>
 #include <itkDiffusionTensor3D.h>

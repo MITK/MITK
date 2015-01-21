@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkProperties.h>
 #include <mitkImage.h>
-#include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkFiberBundleX.h>
 #include <mitkFiberfoxParameters.h>

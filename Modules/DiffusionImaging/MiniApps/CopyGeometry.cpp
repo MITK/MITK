@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImageCast.h>
 #include <mitkImage.h>
-#include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
 #include "mitkCommandLineParser.h"
 

@@ -13,27 +13,14 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-/*
- *  mitkFiberBundleMapper2D.cpp
- *  mitk-all
- *
- *  Created by HAL9000 on 1/17/11.
- *  Copyright 2011 __MyCompanyName__. All rights reserved.
- *
- */
 
 #include "mitkFiberBundleXMapper2D.h"
 #include <mitkBaseRenderer.h>
-
-
 #include <vtkActor.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPlane.h>
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
-//#include <vtkPropAssembly.h>
-
-//#include <vtkPainterPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkLookupTable.h>
 #include <vtkPoints.h>
@@ -42,14 +29,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderer.h>
 #include <vtkCellArray.h>
 #include <vtkMatrix4x4.h>
-
-//#include <mitkGeometry3D.h>
+#include <vtkTubeFilter.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkSliceNavigationController.h>
-
 #include <mitkIShaderRepository.h>
 #include <mitkShaderProperty.h>
-
 #include <mitkCoreServices.h>
 
 mitk::FiberBundleXMapper2D::FiberBundleXMapper2D()
@@ -159,13 +143,6 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     localStorage->m_PointActor->GetProperty()->SetOpacity(0.999);
     localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
 
-//        if(fiberBundle->GetCurrentColorCoding() == fiberBundle->COLORCODING_CUSTOM){
-//            float temprgb[3];
-//            this->GetDataNode()->GetColor( temprgb, NULL );
-//            double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
-//            localStorage->m_PointActor->GetProperty()->SetColor(trgb);
-//        }
-
     int lineWidth = 1;
     node->GetIntProperty("LineWidth",lineWidth);
     localStorage->m_FiberMapper->SetInputData(fiberPolyData);
@@ -204,6 +181,7 @@ void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
     node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(1.0f), renderer, overwrite );
     node->AddProperty( "Fiber2DfadeEFX", mitk::BoolProperty::New(true), renderer, overwrite );
     node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), renderer, overwrite);
+    node->AddProperty( "TubeRadius",mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
 }
 
 

@@ -290,6 +290,11 @@ void mitk::DiffusionPropertyHelper::InitializeImage()
   }
 }
 
+bool mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(const mitk::DataNode* node)
+{
+    return IsDiffusionWeightedImage(dynamic_cast<mitk::Image *>(node->GetData()));
+}
+
 
 bool mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(const mitk::Image * image)
 {

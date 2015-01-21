@@ -456,6 +456,8 @@ void QmitkSlicesInterpolator::OnTimeChanged(itk::Object* sender, const itk::Even
 
   m_TimeStep[slicer];
 
+  m_SurfaceInterpolator->SetCurrentTimeStep( slicer->GetTime()->GetPos() );
+
   if (m_LastSNC == slicer)
   {
     slicer->SendSlice();//will trigger a new interpolation
@@ -896,6 +898,9 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 
 void QmitkSlicesInterpolator::Run3DInterpolation()
 {
+  /*GetRenderWindowPart();
+  mitk::SliceNavigationController* navController = m_TimeStep.
+  mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator->GetInstance()*/
   m_SurfaceInterpolator->Interpolate();
 }
 
@@ -1102,10 +1107,13 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
         m_SurfaceInterpolator->SetDistanceImageVolume(50000);
 
         mitk::Image* segmentationImage = dynamic_cast<mitk::Image*>(workingNode->GetData());
-        if (segmentationImage->GetDimension() == 3)
+        /*if (segmentationImage->GetDimension() == 3)
+        {*/
           m_SurfaceInterpolator->SetCurrentInterpolationSession(segmentationImage);
-        else
-          MITK_INFO<<"3D Interpolation is only supported for 3D images at the moment!";
+          m_SurfaceInterpolator->SetCurrentTimeStep( time_position );
+        //}
+        /*else
+          MITK_INFO<<"3D Interpolation is only supported for 3D images at the moment!";*/
 
         if (m_3DInterpolationEnabled)
         {
@@ -1139,7 +1147,7 @@ void QmitkSlicesInterpolator::CheckSupportedImageDimension()
   if (m_ToolManager->GetWorkingData(0))
     m_Segmentation = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
 
-  if (m_3DInterpolationEnabled && m_Segmentation && m_Segmentation->GetDimension() != 3)
+  /*if (m_3DInterpolationEnabled && m_Segmentation && m_Segmentation->GetDimension() != 3)
   {
     QMessageBox info;
     info.setWindowTitle("3D Interpolation Process");
@@ -1147,7 +1155,7 @@ void QmitkSlicesInterpolator::CheckSupportedImageDimension()
     info.setText("3D Interpolation is only supported for 3D images at the moment!");
     info.exec();
     m_CmbInterpolation->setCurrentIndex(0);
-  }
+  }*/
 }
 
 void QmitkSlicesInterpolator::OnSliceNavigationControllerDeleted(const itk::Object *sender, const itk::EventObject& /*e*/)

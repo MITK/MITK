@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 
 #include "mitkImageToSurfaceFilter.h"
+#include "mitkImageTimeSelector.h"
 
 // Check whether the given contours are coplanar
 bool ContoursCoplanar(mitk::SurfaceInterpolationController::ContourPositionInformation leftHandSide, mitk::SurfaceInterpolationController::ContourPositionInformation rightHandSide)
@@ -74,7 +75,7 @@ mitk::SurfaceInterpolationController::ContourPositionInformation CreateContourPo
 }
 
 mitk::SurfaceInterpolationController::SurfaceInterpolationController()
-  :m_SelectedSegmentation(0)
+  :m_SelectedSegmentation(0), m_CurrentTimeStep(0)
 {
   m_ReduceFilter = ReduceContourSetFilter::New();
   m_NormalsFilter = ComputeContourSetNormalsFilter::New();
@@ -143,10 +144,19 @@ void mitk::SurfaceInterpolationController::AddNewContours(std::vector<mitk::Surf
   this->Modified();
 }
 
-void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPositionInformation contourInfo)
+void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPositionInformation contourInfo, unsigned int ts)
 {
   int pos (-1);
-  ContourPositionInformationList currentContourList = m_ListOfInterpolationSessions[m_SelectedSegmentation];
+  unsigned int numTimeSteps = m_SelectedSegmentation->GetTimeSteps();
+  if ( ts >= numTimeSteps )
+  {
+    MITK_ERROR << "Invalid time step requested for interpolation pipeline.";
+    return;
+  }
+
+  ContourPositionInformationVec2D currentContours = m_ListOfInterpolationSessions[m_SelectedSegmentation];
+  ContourPositionInformationList currentContourList = currentContours[m_CurrentTimeStep];
+
   mitk::Surface* newContour = contourInfo.contour;
   for (unsigned int i = 0; i < currentContourList.size(); i++)
   {
@@ -161,12 +171,12 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
   //Don't save a new empty contour
   if (pos == -1 && newContour->GetVtkPolyData()->GetNumberOfPoints() > 0)
   {
-    m_ReduceFilter->SetInput(m_ListOfInterpolationSessions[m_SelectedSegmentation].size(), newContour);
-    m_ListOfInterpolationSessions[m_SelectedSegmentation].push_back(contourInfo);
+    m_ReduceFilter->SetInput(m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].size(), newContour);
+    m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].push_back(contourInfo);
   }
   else if (pos != -1 && newContour->GetVtkPolyData()->GetNumberOfPoints() > 0)
   {
-    m_ListOfInterpolationSessions[m_SelectedSegmentation].at(pos) = contourInfo;
+    m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].at(pos) = contourInfo;
     m_ReduceFilter->SetInput(pos, newContour);
   }
   else if (newContour->GetVtkPolyData()->GetNumberOfPoints() == 0)
@@ -184,17 +194,26 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
   }
 }
 
-bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformation contourInfo)
+bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformation contourInfo, unsigned int ts)
 {
   if(!m_SelectedSegmentation)
+  {
     return false;
-  ContourPositionInformationList::iterator it = m_ListOfInterpolationSessions[m_SelectedSegmentation].begin();
-  while (it !=  m_ListOfInterpolationSessions[m_SelectedSegmentation].end())
+  }
+
+  unsigned int numTimeSteps = m_SelectedSegmentation->GetTimeSteps();
+  if ( ts >= numTimeSteps )
+  {
+    return false;
+  }
+
+  ContourPositionInformationList::iterator it = m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].begin();
+  while (it !=  m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].end())
   {
     ContourPositionInformation currentContour = (*it);
     if (ContoursCoplanar(currentContour, contourInfo))
     {
-      m_ListOfInterpolationSessions[m_SelectedSegmentation].erase(it);
+      m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].erase(it);
       this->ReinitializeInterpolation();
       return true;
     }
@@ -203,9 +222,20 @@ bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformat
   return false;
 }
 
-const mitk::Surface* mitk::SurfaceInterpolationController::GetContour(ContourPositionInformation contourInfo)
+const mitk::Surface* mitk::SurfaceInterpolationController::GetContour(ContourPositionInformation contourInfo, unsigned int ts )
 {
-  ContourPositionInformationList contourList = m_ListOfInterpolationSessions[m_SelectedSegmentation];
+  if(!m_SelectedSegmentation)
+  {
+    return 0;
+  }
+
+  unsigned int numTimeSteps = m_SelectedSegmentation->GetTimeSteps();
+  if ( ts >= numTimeSteps )
+  {
+    return 0;
+  }
+
+  ContourPositionInformationList contourList = m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep];
   for (unsigned int i = 0; i < contourList.size(); ++i)
   {
     ContourPositionInformation currentContour = contourList.at(i);
@@ -215,9 +245,20 @@ const mitk::Surface* mitk::SurfaceInterpolationController::GetContour(ContourPos
   return 0;
 }
 
-unsigned int mitk::SurfaceInterpolationController::GetNumberOfContours()
+unsigned int mitk::SurfaceInterpolationController::GetNumberOfContours( unsigned int ts )
 {
-  return m_ListOfInterpolationSessions[m_SelectedSegmentation].size();
+  if(!m_SelectedSegmentation)
+  {
+    return -1;
+  }
+
+  unsigned int numTimeSteps = m_SelectedSegmentation->GetTimeSteps();
+  if ( ts >= numTimeSteps )
+  {
+    return -1;
+  }
+
+  return m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].size();
 }
 
 void mitk::SurfaceInterpolationController::Interpolate()
@@ -244,7 +285,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
   vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
   for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
   {
-    polyDataAppender->AddInputData(m_ListOfInterpolationSessions[m_SelectedSegmentation].at(i).contour->GetVtkPolyData());
+    polyDataAppender->AddInputData(m_ListOfInterpolationSessions[m_SelectedSegmentation].at(i)[m_CurrentTimeStep].contour->GetVtkPolyData());
   }
   polyDataAppender->Update();
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
@@ -338,8 +379,8 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
   // If the session does not exist yet create a new ContourPositionPairList otherwise reinitialize the interpolation pipeline
   if (it == m_ListOfInterpolationSessions.end())
   {
-    ContourPositionInformationList newList;
-    m_ListOfInterpolationSessions.insert(std::pair<mitk::Image*, ContourPositionInformationList>(m_SelectedSegmentation, newList));
+    ContourPositionInformationVec2D newList;
+    m_ListOfInterpolationSessions.insert(std::pair<mitk::Image*, ContourPositionInformationVec2D>(m_SelectedSegmentation, newList));
     m_InterpolationResult = 0;
     m_CurrentNumberOfReducedContours = 0;
 
@@ -367,8 +408,8 @@ bool mitk::SurfaceInterpolationController::ReplaceInterpolationSession(mitk::Ima
   if (it == m_ListOfInterpolationSessions.end())
     return false;
 
-  ContourPositionInformationList oldList = (*it).second;
-  m_ListOfInterpolationSessions.insert(std::pair<mitk::Image*, ContourPositionInformationList>(newSession.GetPointer(), oldList));
+  ContourPositionInformationVec2D oldList = (*it).second;
+  m_ListOfInterpolationSessions.insert(std::pair<mitk::Image*, ContourPositionInformationVec2D>(newSession.GetPointer(), oldList));
   itk::MemberCommand<SurfaceInterpolationController>::Pointer command = itk::MemberCommand<SurfaceInterpolationController>::New();
   command->SetCallbackFunction(this, &SurfaceInterpolationController::OnSegmentationDeleted);
   m_SegmentationObserverTags.insert( std::pair<mitk::Image*, unsigned long>( newSession, newSession->AddObserver( itk::DeleteEvent(), command ) ) );
@@ -556,12 +597,26 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation()
   m_InterpolateSurfaceFilter->Reset();
 
   itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
-  AccessFixedDimensionByItk_1( m_SelectedSegmentation, GetImageBase, 3, itkImage );
+  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+  timeSelector->SetInput( m_SelectedSegmentation );
+  timeSelector->SetTimeNr( 0 );
+  timeSelector->SetChannelNr( 0 );
+  timeSelector->Update();
+
+  mitk::Image::Pointer refImage = timeSelector->GetOutput();
+  //AccessFixedDimensionByItk_1( m_SelectedSegmentation, GetImageBase, 3, itkImage );
+  AccessFixedDimensionByItk_1( refImage, GetImageBase, 3, itkImage );
   m_InterpolateSurfaceFilter->SetReferenceImage(itkImage.GetPointer());
 
+  unsigned int numTimeSteps = m_SelectedSegmentation->GetTimeSteps();
+  m_ListOfInterpolationSessions[m_SelectedSegmentation].resize( numTimeSteps );
   for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
   {
-    m_ReduceFilter->SetInput(i, m_ListOfInterpolationSessions[m_SelectedSegmentation].at(i).contour);
+    unsigned int numContours = m_ListOfInterpolationSessions[m_SelectedSegmentation][i].size();
+    for ( unsigned int c = 0; c < numContours; ++c )
+    {
+      m_ReduceFilter->SetInput(i, m_ListOfInterpolationSessions[m_SelectedSegmentation][i][c].contour);
+    }
   }
 
   m_ReduceFilter->Update();

@@ -95,8 +95,9 @@ public:
     typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
     typedef itk::Vector<double,3>           GradientType;
     typedef vector<GradientType>            GradientListType;
-    typedef itk::VectorImage< short, 3 >                                    ItkDwiType;
+    typedef itk::VectorImage< short, 3 >    ItkDwiType;
     typedef itk::Image<double, 3>           ItkDoubleImgType;
+    typedef itk::Image<float, 3>            ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
 
     template<int ndirs> vector<itk::Vector<double,3> > MakeGradientList();
@@ -190,7 +191,7 @@ protected:
 
     std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;   ///< map each planar figure uniquely to a QmitkPlanarFigureData
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
-    mitk::DataNode::Pointer                             m_SelectedImage;
+    mitk::DataNode::Pointer                             m_SelectedImageNode;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles2;
     vector< mitk::DataNode::Pointer >                   m_SelectedFiducials;

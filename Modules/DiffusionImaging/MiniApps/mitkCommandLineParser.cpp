@@ -335,7 +335,7 @@ mitkCommandLineParser::mitkCommandLineParser()
     this->Contributor = string();
     this->Description = string();
     this->ParameterGroupName = "Parameters";
-    this->ParameterGroupDescription = "Groupbox containing parameters.";
+    this->ParameterGroupDescription = "Parameters";
 }
 
 // --------------------------------------------------------------------------
@@ -640,7 +640,7 @@ const mitkCommandLineParser::StringContainerType& mitkCommandLineParser::unparse
 // --------------------------------------------------------------------------
 void mitkCommandLineParser::addArgument(const string& longarg, const string& shortarg,
                                        Type type, const string& argLabel, const string& argHelp,
-                                       const us::Any& defaultValue, bool optional, bool ignoreRest,
+                                       const us::Any &defaultValue, bool optional, bool ignoreRest,
                                        bool deprecated)
 {
     if (longarg.empty() && shortarg.empty()) { return; }
@@ -843,10 +843,17 @@ void mitkCommandLineParser::generateXmlOutput()
       lastParameterGroup = (*it)->ArgGroup;
     }
 
+    // Skip help item, as it's no use in GUI
+    if ((*it)->ShortArg == "h")
+      continue;
+
     xml << "<" << type << ">" << endl;
     xml << "<name>" << (*it)->LongArg << "</name>" << endl;
-    xml << "<label>" << (*it)->ArgLabel << "</label>" << endl;
     xml << "<description>" << (*it)->ArgHelp << "</description>" << endl;
+    xml << "<label>" << (*it)->ArgLabel << "</label>" << endl;
+    if (!(*it)->DefaultValue.Empty())
+      xml << "<default>" << (*it)->DefaultValue.ToString() << "</default>" << endl;
+
     xml << "<longflag>" << (*it)->LongArg << "</longflag>" << endl;
     xml << "<flag>" << (*it)->ShortArg << "</flag>" << endl;
 

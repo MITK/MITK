@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
     parser.setTitle("Diffusion Indices");
     parser.setCategory("Diffusion Related Measures");
-    parser.setDescription("");
+    parser.setDescription("Computes requested diffusion related measures");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");

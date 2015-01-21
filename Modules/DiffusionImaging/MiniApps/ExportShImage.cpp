@@ -38,7 +38,7 @@ int StartShConversion(int argc, char* argv[])
 
     parser.setTitle("Export SH Image");
     parser.setCategory("Preprocessing Tools");
-    parser.setDescription("");
+    parser.setDescription(" ");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
 
     parser.setCategory("Preprocessing Tools");
     parser.setTitle("Export SH Image");
-    parser.setDescription("");
+    parser.setDescription(" ");
     parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

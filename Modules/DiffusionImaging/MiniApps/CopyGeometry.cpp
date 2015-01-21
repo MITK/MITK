@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 
     parser.setTitle("Copy Geometry");
     parser.setCategory("Preprocessing Tools");
-    parser.setDescription("");
+    parser.setDescription("Copies Geometry from one image unto another");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");

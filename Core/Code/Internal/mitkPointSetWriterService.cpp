@@ -40,7 +40,7 @@ const std::string mitk::PointSetWriterService::VERSION_STRING = "0.1" ;
 
 mitk::PointSetWriterService::PointSetWriterService()
   : AbstractFileWriter(PointSet::GetStaticNameOfClass(),
-                       CustomMimeType(IOMimeTypes::POINTSET_MIMETYPE_NAME()),
+                       CustomMimeType(IOMimeTypes::POINTSET_MIMETYPE()),
                        "MITK Point Set Writer")
   , m_IndentDepth(0)
   , m_Indent(2)

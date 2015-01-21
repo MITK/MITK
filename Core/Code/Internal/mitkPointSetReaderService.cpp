@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <tinyxml.h>
 
 mitk::PointSetReaderService::PointSetReaderService()
-  : AbstractFileReader(CustomMimeType(IOMimeTypes::POINTSET_MIMETYPE_NAME()), "MITK Point Set Reader")
+  : AbstractFileReader(CustomMimeType(IOMimeTypes::POINTSET_MIMETYPE()), "MITK Point Set Reader")
 {
   RegisterService();
 }

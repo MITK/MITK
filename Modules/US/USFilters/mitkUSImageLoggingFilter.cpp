@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSImageLoggingFilter.h"
 #include <mitkIOUtil.h>
-#include <mitkImageWriter.h>
 #include <mitkUIDGenerator.h>
 #include <Poco/Path.h>
 

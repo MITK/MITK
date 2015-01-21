@@ -518,7 +518,7 @@ namespace mitk {
     //## @brief Is this an ImageGeometry?
     //##
     //## For more information, see SetImageGeometry
-    itkGetConstMacro(ImageGeometry, bool);
+    itkGetConstMacro(ImageGeometry, bool)
     //##Documentation
     //## @brief Define that this BaseGeometry is refering to an Image
     //##
@@ -532,8 +532,8 @@ namespace mitk {
     //## outside the image (by half of the voxel diameter). Thus, we have
     //## to correct for this and to be able to do that, we need to know
     //## that the BaseGeometry is referring to an Image.
-    itkSetMacro(ImageGeometry, bool);
-    itkBooleanMacro(ImageGeometry);
+    itkSetMacro(ImageGeometry, bool)
+    itkBooleanMacro(ImageGeometry)
 
     const GeometryTransformHolder* GetGeometryTransformHolder() const;
 
@@ -569,7 +569,7 @@ namespace mitk {
 
     static const std::string GetTransformAsString( TransformType* transformType );
 
-    itkGetConstMacro(NDimensions, unsigned int);
+    itkGetConstMacro(NDimensions, unsigned int)
 
     bool IsBoundingBoxNull() const;
 
@@ -585,13 +585,13 @@ namespace mitk {
     //## These virtual functions allow for a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use {}.
     //## If this class is inherited from a subclass of BaseGeometry, call {Superclass::Pre...();};, example: DisplayGeometry class
-    virtual void PreSetBounds(const BoundsArrayType& bounds){};
-    virtual void PostInitialize(){};
-    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * newGeometry) const {};
-    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM) {};
-    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* transform) {};
-    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform) {};
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing) {};
+    virtual void PreSetBounds(const BoundsArrayType& ) {}
+    virtual void PostInitialize(){}
+    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self* ) const {}
+    virtual void PostSetExtentInMM(int, ScalarType ) {}
+    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* ) {}
+    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* ) {}
+    virtual void PreSetSpacing(const mitk::Vector3D&) {}
 
   private:
 

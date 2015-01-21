@@ -36,14 +36,14 @@ namespace mitk {
   class MITK_CORE_EXPORT Geometry3D : public BaseGeometry
   {
   public:
-    mitkClassMacro(Geometry3D, mitk::BaseGeometry);
+    mitkClassMacro(Geometry3D, mitk::BaseGeometry)
 
     typedef itk::QuaternionRigidTransform< ScalarType > QuaternionTransformType;
     typedef QuaternionTransformType::VnlQuaternionType VnlQuaternionType;
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
-    mitkNewMacro1Param(Self, const Self&);
+    mitkNewMacro1Param(Self, const Self&)
 
     itkCloneMacro(Self)
       //itkGetConstReferenceMacro(TimeBounds, TimeBounds);
@@ -52,7 +52,7 @@ namespace mitk {
 
   protected:
     Geometry3D();
-    Geometry3D(const Geometry3D& other);
+    Geometry3D(const Geometry3D& );
 
     //##Documentation
     //## @brief clones the geometry
@@ -74,13 +74,13 @@ namespace mitk {
     //## These virtual functions allow for a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use {}.
     //## If this class is inherited from a subclass of BaseGeometry, call {Superclass::Pre...();};, example: DisplayGeometry class
-    virtual void PreSetBounds(const BoundsArrayType& bounds){};
-    virtual void PostInitialize(){};
-    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * newGeometry) const{};
-    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM){};
-    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* transform){};
-    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform){};
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){};
+    virtual void PreSetBounds(const BoundsArrayType& ){}
+    virtual void PostInitialize(){}
+    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self* ) const {}
+    virtual void PostSetExtentInMM(int, ScalarType ){}
+    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* ){}
+    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* ){}
+    virtual void PreSetSpacing(const mitk::Vector3D& ){}
   };
 } // namespace mitk
 

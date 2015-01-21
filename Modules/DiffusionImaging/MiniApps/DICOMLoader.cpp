@@ -192,9 +192,12 @@ int main(int argc, char* argv[])
   std::string subdir_prefix;
   if( parsedArgs.count("dwprefix"))
   {
-    MITK_INFO << "Prefix specified, will search for subdirs in the input directory!";
     subdir_prefix = us::any_cast<std::string>( parsedArgs["dwprefix"] );
-    search_for_subdirs = true;
+    if (subdir_prefix != "")
+    {
+      MITK_INFO << "Prefix specified, will search for subdirs in the input directory!";
+      search_for_subdirs = true;
+    }
   }
 
   // retrieve the output

@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::NrrdDiffusionImageWriter::NrrdDiffusionImageWriter()
-  : AbstractFileWriter(mitk::Image::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_DESCRIPTION())
+  : AbstractFileWriter(mitk::Image::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_DESCRIPTION())
 {
   RegisterService();
 }

@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <algorithm>
 
+#include <itksys/SystemTools.hxx>
+
 namespace  mitk {
 
 class FindCaseInsensitive
@@ -120,14 +122,37 @@ std::string CustomMimeType::GetComment() const
 
 bool CustomMimeType::AppliesTo(const std::string& path) const
 {
+  std::string extension,filename;
+  return ParsePathForExtension(path,extension,filename);
+}
+
+std::string CustomMimeType::GetExtension(const std::string& path) const
+{
+  std::string extension,filename;
+  ParsePathForExtension(path,extension,filename);
+  return extension;
+}
+
+std::string CustomMimeType::GetFilenameWithoutExtension(const std::string& path) const
+{
+  std::string extension,filename;
+  ParsePathForExtension(path,extension,filename);
+  return filename;
+}
+
+bool CustomMimeType::ParsePathForExtension(const std::string& path, std::string& extension, std::string& filename ) const
+{
   for (std::vector<std::string>::const_iterator iter = d->m_Extensions.begin(),
-       iterEnd = d->m_Extensions.end(); iter != iterEnd; ++iter)
+    iterEnd = d->m_Extensions.end(); iter != iterEnd; ++iter)
   {
     if (!iter->empty() && path.size() >= iter->size())
     {
       FindCaseInsensitive cmp(*iter);
       if (cmp(path.substr(path.size() - iter->size())))
       {
+        extension = "." + *iter;
+        std::string filenameWithExtension = itksys::SystemTools::GetFilenameName(path);
+        filename = filenameWithExtension.substr(0,filenameWithExtension.size() - extension.size());
         return true;
       }
     }

@@ -32,6 +32,7 @@ if(NOT DEFINED ${proj}_DIR)
     )
 
   set(${proj}_DIR ${ep_prefix})
+  mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()
 

@@ -114,6 +114,9 @@ if(MITK_USE_SimpleITK)
       endif()
     endif()
 
+    mitkFunctionInstallExternalCMakeProject(${proj})
+    # Still need to install the SimpleITK Python wrappings
+
   else()
 
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")

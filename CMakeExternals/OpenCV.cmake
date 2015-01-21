@@ -82,6 +82,7 @@ if(MITK_USE_OpenCV)
     )
 
     set(OpenCV_DIR ${ep_prefix})
+    mitkFunctionInstallExternalCMakeProject(${proj})
 
   else()
 

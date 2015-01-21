@@ -29,6 +29,7 @@ if(MITK_USE_ANN)
       )
 
     set(ANN_DIR ${ep_prefix})
+    mitkFunctionInstallExternalCMakeProject(${proj})
 
   else()
 

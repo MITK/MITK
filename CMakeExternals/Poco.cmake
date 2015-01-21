@@ -49,6 +49,7 @@ if(MITK_USE_Poco)
      )
 
     set(${proj}_DIR ${ep_prefix})
+    mitkFunctionInstallExternalCMakeProject(${proj})
 
   else()
 

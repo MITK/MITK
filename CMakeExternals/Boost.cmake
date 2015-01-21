@@ -99,6 +99,39 @@ if(MITK_USE_Boost)
       DEPENDS ${proj_DEPENDENCIES}
       )
 
+    # Manual install commands (for a MITK super-build install)
+    # until the Boost CMake system is used.
+
+    # We just copy the include directory
+    ExternalProject_Get_Property(${proj} install_dir)
+    install(DIRECTORY "${install_dir}/include/boost"
+            DESTINATION "include"
+            COMPONENT dev
+           )
+
+    if(MITK_USE_Boost_LIBRARIES)
+      # Copy the boost libraries
+      file(GLOB _boost_libs
+           "${install_dir}/lib/libboost*.so*"
+           "${install_dir}/lib/libboost*.dylib")
+      install(FILES ${_boost_libs}
+              DESTINATION "lib"
+              COMPONENT runtime)
+
+      file(GLOB _boost_libs
+           "${install_dir}/bin/libboost*.dll")
+      install(FILES ${_boost_libs}
+              DESTINATION "bin"
+              COMPONENT runtime)
+
+      file(GLOB _boost_libs
+           "${install_dir}/lib/libboost*.lib"
+           "${install_dir}/lib/libboost*.a")
+      install(FILES ${_boost_libs}
+              DESTINATION "lib"
+              COMPONENT dev)
+    endif()
+
   else()
 
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")

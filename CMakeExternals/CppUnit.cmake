@@ -28,6 +28,7 @@ if(NOT DEFINED CppUnit_DIR)
     )
 
   set(${proj}_DIR ${ep_prefix})
+  mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()
 

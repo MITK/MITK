@@ -29,6 +29,7 @@ if(MITK_USE_Eigen)
     )
 
     set(Eigen_DIR ${ep_prefix})
+    mitkFunctionInstallExternalCMakeProject(${proj})
 
   else()
 

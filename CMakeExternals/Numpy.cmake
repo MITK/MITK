@@ -93,6 +93,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     )
 
     set(Numpy_DIR ${MITK_PYTHON_SITE_DIR}/numpy)
+    install(SCRIPT ${_install_step})
 
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")

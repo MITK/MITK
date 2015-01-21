@@ -181,6 +181,13 @@ ${PYTHON_EXECUTABLE} -m compileall
       )
     endif()
 
+    mitkFunctionInstallExternalCMakeProject(${proj})
+    install(DIRECTORY ${Python_DIR}
+            DESTINATION .
+            COMPONENT runtime
+            FILES_MATCHING PATTERN "*.pyc"
+           )
+
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()

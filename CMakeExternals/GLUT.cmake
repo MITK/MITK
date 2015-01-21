@@ -35,6 +35,8 @@ if(MITK_USE_GLUT)
         )
 
       set(GLUT_DIR ${ep_prefix})
+      mitkFunctionInstallExternalCMakeProject(${proj})
+
     endif()
 
   else()

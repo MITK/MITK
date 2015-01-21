@@ -27,6 +27,7 @@ if(NOT DEFINED GLEW_DIR)
     )
 
   set(GLEW_DIR ${ep_prefix})
+  mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()
 

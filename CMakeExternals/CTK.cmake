@@ -96,6 +96,7 @@ if(MITK_USE_CTK)
     ExternalProject_Get_Property(${proj} binary_dir)
     set(CTK_DIR ${binary_dir})
     #set(CTK_DIR ${ep_prefix})
+    #mitkFunctionInstallExternalCMakeProject(${proj})
 
   else()
 

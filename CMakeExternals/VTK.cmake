@@ -100,6 +100,7 @@ if(NOT DEFINED VTK_DIR)
     )
 
   set(VTK_DIR ${ep_prefix})
+  mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()
 

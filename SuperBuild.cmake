@@ -1,3 +1,4 @@
+include(mitkFunctionInstallExternalCMakeProject)
 include(mitkFunctionCheckCompilerFlags)
 
 #-----------------------------------------------------------------------------
@@ -492,6 +493,7 @@ ExternalProject_Add(${proj}
     MITK-Utilities
   )
 
+mitkFunctionInstallExternalCMakeProject(${proj})
 
 #-----------------------------------------------------------------------------
 # MITK

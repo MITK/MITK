@@ -35,6 +35,7 @@ if(NOT DEFINED GDCM_DIR)
      DEPENDS ${proj_DEPENDENCIES}
     )
   set(GDCM_DIR ${ep_prefix})
+  mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()
 

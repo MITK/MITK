@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConnectomicsStatisticsCalculator.h>
 #include <mitkConnectomicsNetworkThresholder.h>
 #include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
+#include <mitkIOUtil.h>
 
 int main(int argc, char* argv[])
 {
@@ -130,11 +131,9 @@ int main(int argc, char* argv[])
 
   try
   {
-    const std::string s1="", s2="";
-
     // load network
     std::vector<mitk::BaseData::Pointer> networkFile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( networkName, s1, s2, false );
+      mitk::IOUtil::Load( networkName);
     if( networkFile.empty() )
     {
       std::string errorMessage = "File at " + networkName + " could not be read. Aborting.";

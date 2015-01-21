@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 
     // load fiber image
     std::vector<mitk::BaseData::Pointer> fiberInfile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( fiberFilename, s1, s2, false );
+      mitk::IOUtil::Load( fiberFilename);
     if( fiberInfile.empty() )
     {
       std::string errorMessage = "Fiber Image at " + fiberFilename + " could not be read. Aborting.";
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 
     // load parcellation
     std::vector<mitk::BaseData::Pointer> parcellationInFile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( parcellationFilename, s1, s2, false );
+      mitk::IOUtil::Load( parcellationFilename);
     if( parcellationInFile.empty() )
     {
       std::string errorMessage = "Parcellation at " + parcellationFilename + " could not be read. Aborting.";

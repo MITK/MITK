@@ -59,13 +59,13 @@ int main(int argc, char* argv[])
     try
     {
         // load input image
-        mitk::BaseData::Pointer infile = mitk::IOUtil::LoadBaseData( inFileName );
+        std::vector<mitk::BaseData::Pointer> infile = mitk::IOUtil::Load( inFileName );
 
         if( boost::algorithm::ends_with(inFileName, ".qbi") && index=="gfa" )
         {
             typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
             typedef itk::Image<OdfVectorType,3>         ItkQballImageType;
-            mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.GetPointer());
+            mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile[0].GetPointer());
             ItkQballImageType::Pointer itk_qbi = ItkQballImageType::New();
             mitk::CastToItkImage(mitkQballImage, itk_qbi);
 
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
         else if( boost::algorithm::ends_with(inFileName, ".dti") )
         {
             typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
-            mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(infile.GetPointer());
+            mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(infile[0].GetPointer());
             ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
             mitk::CastToItkImage(mitkTensorImage, itk_dti);
 

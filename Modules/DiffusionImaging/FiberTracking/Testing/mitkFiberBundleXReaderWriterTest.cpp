@@ -45,7 +45,9 @@ public:
 
     std::string filename = GetTestDataFilePath("DiffusionImaging/fiberBundleX.fib");
 
-    mitk::BaseData::Pointer baseData = mitk::IOUtil::LoadBaseData(filename);
+    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::IOUtil::Load( filename);
+    mitk::BaseData::Pointer baseData = fibInfile.at(0);
+
     fib1 = dynamic_cast<mitk::FiberBundleX*>(baseData.GetPointer());
   }
 
@@ -58,8 +60,8 @@ public:
   void Equal_SaveLoad_ReturnsTrue()
   {
     mitk::IOUtil::Save(fib1.GetPointer(), std::string(MITK_TEST_OUTPUT_DIR)+"/writerTest.fib");
-    mitk::BaseData::Pointer baseData = mitk::IOUtil::LoadBaseData(std::string(MITK_TEST_OUTPUT_DIR)+"/writerTest.fib");
-    fib2 = dynamic_cast<mitk::FiberBundleX*>(baseData.GetPointer());
+    std::vector<mitk::BaseData::Pointer> baseData = mitk::IOUtil::Load(std::string(MITK_TEST_OUTPUT_DIR)+"/writerTest.fib");
+    fib2 = dynamic_cast<mitk::FiberBundleX*>(baseData[0].GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Should be equal", fib1->Equals(fib2));
     //MITK_ASSERT_EQUAL(fib1, fib2, "A saved and re-loaded file should be equal");
   }

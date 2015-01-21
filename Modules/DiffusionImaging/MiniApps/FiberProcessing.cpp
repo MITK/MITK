@@ -34,11 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::FiberBundleX::Pointer LoadFib(std::string filename)
 {
-    const std::string s1="", s2="";
-    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::BaseDataIO::LoadBaseDataFromFile( filename, s1, s2, false );
+    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::IOUtil::Load(filename);
     if( fibInfile.empty() )
         std::cout << "File " << filename << " could not be read!";
-
     mitk::BaseData::Pointer baseData = fibInfile.at(0);
     return dynamic_cast<mitk::FiberBundleX*>(baseData.GetPointer());
 }

@@ -45,17 +45,15 @@ int main(int argc, char* argv[])
 
     try
     {
-        const std::string s1="", s2="";
-        std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inName, s1, s2, false );
-        mitk::BaseData::Pointer baseData = infile.at(0);
+        std::vector<mitk::BaseData::Pointer> baseData = mitk::IOUtil::Load(inName);
 
-        if ( dynamic_cast<Image*>(baseData.GetPointer()) )
+        if ( baseData.size()>0 && dynamic_cast<Image*>(baseData[0].GetPointer()) )
         {
-            mitk::IOUtil::Save(dynamic_cast<Image*>(baseData.GetPointer()), outName.c_str());
+            mitk::IOUtil::Save(dynamic_cast<Image*>(baseData[0].GetPointer()), outName.c_str());
         }
-        else if ( dynamic_cast<FiberBundleX*>(baseData.GetPointer()) )
+        else if ( baseData.size()>0 && dynamic_cast<FiberBundleX*>(baseData[0].GetPointer()) )
         {
-            mitk::IOUtil::Save(dynamic_cast<FiberBundleX*>(baseData.GetPointer()) ,outName.c_str());
+            mitk::IOUtil::Save(dynamic_cast<FiberBundleX*>(baseData[0].GetPointer()) ,outName.c_str());
         }
         else
             std::cout << "File type currently not supported!";

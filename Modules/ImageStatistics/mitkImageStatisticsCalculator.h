@@ -294,7 +294,7 @@ public:
   bool GetDoIgnorePixelValue();
 
   /** \brief Set bin size for histogram resolution.*/
-  void SetHistogramBinSize( unsigned int size);
+  void SetHistogramBinSize( double size);
 
   /** \brief Get bin size for histogram resolution.*/
   unsigned int GetHistogramBinSize();
@@ -559,7 +559,7 @@ protected:
   int m_PlanarFigureCoordinate0;      // First plane-axis for PlanarFigure
   int m_PlanarFigureCoordinate1;      // Second plane-axis for PlanarFigure
 
-  unsigned int m_HistogramBinSize;    ///Bin size for histogram resoluion.
+  double m_HistogramBinSize;    ///Bin size for histogram resoluion.
   bool m_UseDefaultBinSize;
   double m_HotspotRadiusInMM;
   bool m_CalculateHotspot;

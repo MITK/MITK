@@ -77,7 +77,7 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_PlanarFigureSlice (0),
   m_PlanarFigureCoordinate0 (0),
   m_PlanarFigureCoordinate1 (0),
-  m_HistogramBinSize(1),
+  m_HistogramBinSize(1.0),
   m_UseDefaultBinSize(true),
   m_HotspotRadiusInMM(6.2035049089940),   // radius of a 1cm3 sphere in mm
   m_CalculateHotspot(false),
@@ -431,7 +431,7 @@ bool ImageStatisticsCalculator::GetDoIgnorePixelValue()
   return m_DoIgnorePixelValue;
 }
 
-void ImageStatisticsCalculator::SetHistogramBinSize(unsigned int size)
+void ImageStatisticsCalculator::SetHistogramBinSize(double size)
 {
   this->m_HistogramBinSize = size;
 }

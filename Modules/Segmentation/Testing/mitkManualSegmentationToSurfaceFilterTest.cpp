@@ -17,9 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkManualSegmentationToSurfaceFilter.h"
 #include <itksys/SystemTools.hxx>
-#include "mitkDataNodeFactory.h"
-#include <mitkSurfaceVtkWriter.h>
 #include <vtkSTLWriter.h>
+#include <mitkIOUtil.h>
 
 #include <fstream>
 /**
@@ -43,85 +42,38 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
   std::string fileOut = "BallBinary30x30x30.stl";
 
 
-  std::cout<<"Eingabe Datei: "<<fileIn<<std::endl;
-  std::cout<<"Ausgabe Datei: "<<fileOut<<std::endl;
+  MITK_INFO<<"Eingabe Datei: "<<fileIn;
+  MITK_INFO<<"Ausgabe Datei: "<<fileOut;
   mitk::Image::Pointer image = NULL;
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   try
   {
-    std::cout << "Loading file: "<<std::flush;
-    factory->SetFileName( fileIn.c_str() );
-    factory->Update();
-
-    if(factory->GetNumberOfOutputs()<1)
-    {
-      std::cout<<"file could not be loaded [FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-    image = dynamic_cast<mitk::Image*>(node->GetData());
+    image = mitk::IOUtil::LoadImage( fileIn.c_str() );
     if(image.IsNull())
     {
-      std::cout<<"file not an image - test will not be applied [PASSED]"<<std::endl;
-      std::cout<<"[TEST DONE]"<<std::endl;
-      return EXIT_SUCCESS;
-    }
-  }
-  catch ( itk::ExceptionObject & ex )
-  {
-    std::cout << "Exception: " << ex << "[FAILED]" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-
-  mitk::ManualSegmentationToSurfaceFilter::Pointer filter;
-  std::cout << "Instantiat mitk::ManualSegmentationToSurfaceFilter - implicit: mitk::ImageToSurface: ";
-  filter = mitk::ManualSegmentationToSurfaceFilter::New();
-
-  if (filter.IsNull())
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else {
-  std::cout<<"[PASSED]"<<std::endl;
-  }
-
-
-  //Wirter instance
-  mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer = mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
-  if (filter.IsNull())
-  {
-    std::cout<<"Instantiat SurfaceVtkWirter: [FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else {
-    writer->GlobalWarningDisplayOn();
-    writer->SetFileName(fileOut.c_str());
-    writer->GetVtkWriter()->SetFileTypeToBinary();
-
-  }
-
-  std::cout << "Create surface with default settings: ";
-  if (image->GetDimension()==3)
-  {
-    filter->SetInput(image);
-    filter->Update();
-    writer->SetInput(filter->GetOutput());
-    writer->Write();
-
-    if( writer->GetNumberOfInputs() < 1 )
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      writer->Delete();
+      MITK_INFO << "file not an image - test will not be applied";
       return EXIT_FAILURE;
     }
-    else
-    {
-      std::cout<<"[PASSED]"<<std::endl;
-    }
+  }
+  catch ( mitk::Exception &e )
+  {
+    MITK_INFO << "Exception: " << e.what();
+    return EXIT_FAILURE;
+  }
 
-    std::cout << "Create surface all optimised settings: ";
+  mitk::ManualSegmentationToSurfaceFilter::Pointer filter;
+  MITK_INFO << "Instantiat mitk::ManualSegmentationToSurfaceFilter - implicit: mitk::ImageToSurface: ";
+  filter = mitk::ManualSegmentationToSurfaceFilter::New();
+
+  MITK_INFO << "Create surface with default settings: ";
+  if (image->GetDimension()==3)
+  {
+
+    filter->SetInput(image);
+    filter->Update();
+
+    mitk::IOUtil::SaveSurface(filter->GetOutput(), fileOut.c_str());
+
+    MITK_INFO << "Create surface all optimised settings: ";
     //configure ImageToSurfaceFilter
     filter->MedianFilter3DOn();
     filter->SetGaussianStandardDeviation(1.5);
@@ -144,33 +96,21 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
       return EXIT_FAILURE;
     }
 
-    writer->SetInput( filter->GetOutput() );
-    if( writer->GetNumberOfInputs() < 1 )
+    try
     {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
+      mitk::IOUtil::SaveSurface(filter->GetOutput(), fileOut.c_str());
     }
-    else
+    catch( mitk::Exception &e)
     {
-      std::cout<<"[PASSED]"<<std::endl;
-      try {
-        writer->Write();
-      }
-      catch( itk::ExceptionObject e)
-      {
-        std::cout<<"caught exception: "<<e<<std::endl;
-      }
+      MITK_INFO <<"Caught exception: "<<e.what();
+      return EXIT_FAILURE;
     }
   }
   else
   {
-    std::cout<<"Image not suitable for filter: Dimension!=3"<<std::endl;
+    MITK_INFO<<"Image not suitable for filter: Dimension!=3";
+    return EXIT_FAILURE;
   }
-
-  std::cout<<"[TEST DONE]"<<std::endl;
-
-  //writer->Delete();
-
   return EXIT_SUCCESS;
 }
 

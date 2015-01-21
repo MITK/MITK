@@ -264,7 +264,7 @@ static void TestSetDataUnderPropertyChange(mitk::DataNode::Pointer dataNode)
   additionalDataNode->SetData(image);
   additionalDataNode->GetPropertyValue("outline width", outlineWidth);
 
-  MITK_TEST_CONDITION(mitk::Equal(outlineWidth,42.0), "Testing if the SetData does not set anything imagedata is identical" )
+  MITK_TEST_CONDITION(mitk::Equal(outlineWidth,42.0), "Testing if the SetData does not set anything if imagedata is identical" )
 
   additionalDataNode->SetData(additionalImage);
   additionalDataNode->GetPropertyValue("outline width", outlineWidth);

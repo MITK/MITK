@@ -84,11 +84,11 @@ namespace berry
 
   void XMLPreferencesStorage::Flush(IPreferences*  /*_Preferences*/) throw(Poco::Exception, BackingStoreException)
   {
+#ifdef _MSC_VER
     std::locale localeBackup;             // See bug #18575: Do not remove these lines! In case of any issues regarding
     std::locale::global(std::locale("")); // the formatting of numbers, try to set the numeric facet. The C locale is NOT
-                                          // available here at application shutdown (possibly a bug in MSVC 2013 standard
+#endif                                    // available here at application shutdown (possibly a bug in MSVC 2013 standard
                                           // library), i.e., it is already partly deconstructed.
-
     try
     {
       this->ToDOMTree(dynamic_cast<Preferences*>(this->m_Root.GetPointer()), 0);
@@ -110,7 +110,9 @@ namespace berry
       WARNMSG << e.what();
     }
 
+#ifdef _MSC_VER
     std::locale::global(localeBackup);
+#endif
   }
 
   XMLPreferencesStorage::~XMLPreferencesStorage()

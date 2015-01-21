@@ -24,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkNavigationToolWriter.h>
 #include <mitkNavigationToolReader.h>
-#include <mitkSTLFileReader.h>
 #include <mitkIGTException.h>
+#include <mitkIOUtil.h>
 
 #include "QmitkCustomVariants.h"
 
@@ -875,12 +875,8 @@ mitk::Surface::Pointer QmitkNDIConfigurationWidget::LoadSurfaceFromSTLFile(QStri
   QFile surfaceFile(surfaceFilename);
   if(surfaceFile.exists())
   {
-    mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
-
     try{
-      stlReader->SetFileName(surfaceFilename.toStdString().c_str());
-      stlReader->Update();//load surface
-      toolSurface = stlReader->GetOutput();
+      toolSurface = mitk::IOUtil::LoadSurface(surfaceFilename.toStdString().c_str());
     }
     catch(std::exception& e )
     {

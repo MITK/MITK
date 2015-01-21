@@ -41,6 +41,12 @@ mitk::NavigationToolWriter::~NavigationToolWriter()
 
 bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTool::Pointer Tool)
   {
+  // Workaround for a problem: the geometry might be modified if the tool is tracked. If this
+  // modified geometry is saved the surface representation is moved by this offset. To avoid
+  // this bug, the geometry is set to identity for the saving progress and restored later.
+  mitk::BaseGeometry::Pointer geometryBackup = Tool->GetDataNode()->GetData()->GetGeometry()->Clone();
+  Tool->GetDataNode()->GetData()->GetGeometry()->SetIdentity();
+
   //convert whole data to a mitk::DataStorage
   mitk::StandaloneDataStorage::Pointer saveStorage = mitk::StandaloneDataStorage::New();
   mitk::DataNode::Pointer thisTool = ConvertToDataNode(Tool);
@@ -68,6 +74,9 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
 
   //delete the data storage
   std::remove(DataStorageFileName.c_str());
+
+  //restore original geometry
+  Tool->GetDataNode()->GetData()->SetGeometry(geometryBackup);
 
   return true;
   }

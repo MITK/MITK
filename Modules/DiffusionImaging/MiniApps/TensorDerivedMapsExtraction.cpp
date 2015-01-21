@@ -102,40 +102,26 @@ static void ExtractMapsAndSave(mitk::TensorImage::Pointer tensorImage, std::stri
 
 int main(int argc, char* argv[])
 {
-
-    std::cout << "TensorDerivedMapsExtraction";
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("help", "h", mitkCommandLineParser::String, "Help", "Show this help text");
   parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input file", "input dwi file", us::Any(),false);
-  parser.addArgument("out", "o", mitkCommandLineParser::String, "Output folder", "output folder and base name, e.g. /tmp/outPatient1 ", us::Any(),false);
+  parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output folder", "output folder and base name, e.g. /tmp/outPatient1 ", us::Any(),false);
 
-  parser.setCategory("Diffusion Related Measures");
   parser.setTitle("Tensor Derived Maps Extraction");
+  parser.setCategory("Diffusion Related Measures");
   parser.setDescription("");
   parser.setContributor("MBI");
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
-  if (parsedArgs.size()==0 || parsedArgs.count("help") || parsedArgs.count("h"))
-  {
-    std::cout << "\n\nMiniApp Description: \nPerforms tensor reconstruction on DWI file," << endl;
-    std::cout << "and computes tensor derived measures." << endl;
-    std::cout << "\n\n For out parameter /tmp/outPatient1 it will produce :"<< endl;
-    std::cout << " /tmp/outPatient1_dti.dti , /tmp/outPatient1_dti_FA.nrrd, ..."<< endl;
-    std::cout << "\n\n Parameters:"<< endl;
-    std::cout << parser.helpText();
-    return EXIT_SUCCESS;
-  }
-
+  if (parsedArgs.size()==0)
+    return EXIT_FAILURE;
 
 
   std::string inputFile = us::any_cast<string>(parsedArgs["input"]);
   std::string baseFileName = us::any_cast<string>(parsedArgs["out"]);
 
   std::string dtiFileName = "_dti.dti";
-
-  std::cout << "BaseFileName: " << baseFileName;
-
 
   mitk::Image::Pointer diffusionImage =  mitk::IOUtil::LoadImage(inputFile);
 

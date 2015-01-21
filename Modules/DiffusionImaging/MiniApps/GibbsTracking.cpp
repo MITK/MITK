@@ -84,12 +84,11 @@ typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Poin
 
 int main(int argc, char* argv[])
 {
-    std::cout << "GibbsTracking";
     mitkCommandLineParser parser;
 
     parser.setTitle("Gibbs Tracking");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription("");
+    parser.setDescription(" ");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");

@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreServices.h>
 
 mitk::FiberBundleXMapper2D::FiberBundleXMapper2D()
+    : m_LineWidth(1)
 {
     m_lut = vtkLookupTable::New();
     m_lut->Build();
@@ -88,6 +89,14 @@ void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
         mitk::FiberBundleX* fiberBundle = this->GetInput();
         if (fiberBundle==NULL)
             return;
+
+        int lineWidth = 0;
+        node->GetIntProperty("LineWidth", lineWidth);
+        if (m_LineWidth!=lineWidth)
+        {
+            m_LineWidth = lineWidth;
+            fiberBundle->RequestUpdate2D();
+        }
 
         if ( localStorage->m_LastUpdateTime<renderer->GetDisplayGeometry()->GetMTime() || localStorage->m_LastUpdateTime<fiberBundle->GetUpdateTime2D() )
         {
@@ -143,12 +152,10 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     localStorage->m_PointActor->GetProperty()->SetOpacity(0.999);
     localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
 
-    int lineWidth = 1;
-    node->GetIntProperty("LineWidth",lineWidth);
     localStorage->m_FiberMapper->SetInputData(fiberPolyData);
     localStorage->m_PointActor->SetMapper(localStorage->m_FiberMapper);
     localStorage->m_PointActor->GetProperty()->ShadingOn();
-    localStorage->m_PointActor->GetProperty()->SetLineWidth(lineWidth);
+    localStorage->m_PointActor->GetProperty()->SetLineWidth(m_LineWidth);
 
     // Applying shading properties
     this->ApplyShaderProperties(renderer);

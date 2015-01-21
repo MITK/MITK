@@ -413,6 +413,10 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
             node->GetIntProperty("LineWidth", width);
             m_Controls->m_LineWidth->setValue(width);
 
+            float radius;
+            node->GetFloatProperty("TubeRadius", radius);
+            m_Controls->m_TubeWidth->setValue(radius);
+
             float range;
             node->GetFloatProperty("Fiber2DSliceThickness",range);
             mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
@@ -1020,8 +1024,7 @@ void QmitkControlVisualizationPropertiesView::LineWidthChanged()
         if (currentWidth==newWidth)
             return;
         m_SelectedNode->SetIntProperty("LineWidth", newWidth);
-        dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData())->RequestUpdate2D();
-        dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData())->RequestUpdate3D();
+        dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData())->RequestUpdate();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 }

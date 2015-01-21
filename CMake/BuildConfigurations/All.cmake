@@ -31,6 +31,7 @@ set(_package_excludes
   TOF_MESASR4000
   TOF_PMDCAMBOARD
   TOF_PMDCAMCUBE
+  TOF_PMDO3
   US_TELEMED_SDK
   videoInput
   WIIMOTE

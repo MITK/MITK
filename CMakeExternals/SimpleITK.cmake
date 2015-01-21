@@ -53,9 +53,9 @@ if(MITK_USE_SimpleITK)
 
     ExternalProject_Add(${proj}
        LIST_SEPARATOR ${sep}
-       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SimpleITK-0.8.0.tar.gz
-       URL_MD5 "d98f2e5442228e324ef62111febc7446"
-       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/SimpleITK-0.8.0.patch
+       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SimpleITK-0.8.1.tar.gz
+       URL_MD5 9126ab2eda9e88f598a962c02a705c43
+       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/SimpleITK-0.8.1.patch
        CMAKE_ARGS
          ${ep_common_args}
          # -DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON
@@ -83,7 +83,7 @@ if(MITK_USE_SimpleITK)
       if(WIN32)
         STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
       else()
-      # escape spaces in the install path for linux
+        # escape spaces in the install path for linux
         STRING(REPLACE " " "\ " _install_dir ${Python_DIR})
       endif()
       # Build python distribution with easy install. If a own runtime is used
@@ -92,14 +92,14 @@ if(MITK_USE_SimpleITK)
         ExternalProject_Add_Step(${proj} sitk_python_install_step
           COMMAND ${PYTHON_EXECUTABLE} setup.py install --prefix=${_install_dir}
           DEPENDEES build
-          WORKING_DIRECTORY ${SimpleITK_DIR}/Wrapping/PythonPackage
+          WORKING_DIRECTORY <BINARY_DIR>/Wrapping/PythonPackage
         )
       # Build egg into custom user base folder and deploy it later into installer
       # https://pythonhosted.org/setuptools/easy_install.html#use-the-user-option-and-customize-pythonuserbase
       else()
-        set(_userbase_install ${SimpleITK_DIR}/Wrapping/PythonPackage/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
+        set(_userbase_install <BINARY_DIR>/Wrapping/PythonPackage/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
         if(WIN32)
-          set(_userbase_install ${SimpleITK_DIR}/Wrapping/PythonPackage/Lib/site-packages)
+          set(_userbase_install <BINARY_DIR>/Wrapping/PythonPackage/Lib/site-packages)
         endif()
         ExternalProject_Add_Step(${proj} sitk_create_userbase_step
           COMMAND ${CMAKE_COMMAND} -E make_directory ${_userbase_install}
@@ -107,9 +107,9 @@ if(MITK_USE_SimpleITK)
           WORKING_DIRECTORY ${SimpleITK_DIR}/Wrapping/PythonPackage
         )
         ExternalProject_Add_Step(${proj} sitk_python_install_step
-          COMMAND PYTHONUSERBASE=${SimpleITK_DIR}/Wrapping/PythonPackage ${PYTHON_EXECUTABLE} setup.py install --user
+          COMMAND PYTHONUSERBASE=<BINARY_DIR>/Wrapping/PythonPackage ${PYTHON_EXECUTABLE} setup.py install --user
           DEPENDEES sitk_create_userbase_step
-          WORKING_DIRECTORY ${SimpleITK_DIR}/Wrapping/PythonPackage
+          WORKING_DIRECTORY <BINARY_DIR>/Wrapping/PythonPackage
         )
       endif()
     endif()

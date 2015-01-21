@@ -405,7 +405,7 @@ ExternalProject_Add(${proj}
   CMAKE_GENERATOR ${gen}
   CMAKE_CACHE_ARGS
     # --------------- Build options ----------------
-    -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/MITK-build/install
+    -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     # --------------- Compile options ----------------
     -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -449,6 +449,7 @@ ExternalProject_Add(${proj}
     -DMITK_ACCESSBYITK_VECTOR_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_DIMENSIONS:STRING=${MITK_ACCESSBYITK_DIMENSIONS}
     # --------------- External project dirs ---------------
+    -DMITK_EXTERNAL_PROJECT_PREFIX:PATH=${ep_prefix}
     -DCppMicroServices_DIR:PATH=${CppMicroServices_DIR}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
     -DCTK_DIR:PATH=${CTK_DIR}

@@ -7,6 +7,11 @@ if(MITK_USE_SWIG)
   endif()
 
   if(NOT SWIG_DIR)
+
+    # We don't "install" SWIG in the common install prefix,
+    # since it is only used as a tool during the MITK super-build
+    # to generate the Python wrappings for some projects.
+
     set(SWIG_TARGET_VERSION 3.0.2)
     set(proj Swig)
     set(Swig_DEPENDENCIES PCRE)
@@ -17,17 +22,17 @@ if(MITK_USE_SWIG)
       set(swig_source_dir ${CMAKE_CURRENT_BINARY_DIR}/swigwin-${SWIG_TARGET_VERSION})
 
       # swig.exe available as pre-built binary on Windows:
-      ExternalProject_Add(Swig
+      ExternalProject_Add(${proj}
         URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swigwin-${SWIG_TARGET_VERSION}.zip
         URL_MD5 "3f18de4fc09ab9abb0d3be37c11fbc8f"
-        SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/swigwin-${SWIG_TARGET_VERSION}
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
         )
 
-      set(SWIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/swigwin-${SWIG_TARGET_VERSION}) # path specified as source in ep
-      set(SWIG_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/swigwin-${SWIG_TARGET_VERSION}/swig.exe)
+      ExternalProject_Get_Property(${proj} source_dir)
+      set(SWIG_DIR ${source_dir})
+      set(SWIG_EXECUTABLE ${source_dir}/swig.exe)
 
     else()
 
@@ -41,6 +46,8 @@ if(MITK_USE_SWIG)
       ExternalProject_add(${proj}
         LIST_SEPARATOR ${sep}
         URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swig-${SWIG_TARGET_VERSION}.tar.gz
+        # Custom install dir for SWIG
+        INSTALL_DIR ${ep_prefix}/src/${proj}-install
         URL_MD5 "62f9b0d010cef36a13a010dc530d0d41"
         CONFIGURE_COMMAND <SOURCE_DIR>/./configure
                           CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}
@@ -53,8 +60,9 @@ if(MITK_USE_SWIG)
         DEPENDS ${Swig_DEPENDENCIES}
         )
 
-      set(SWIG_DIR ${ep_prefix}/share/swig/${SWIG_TARGET_VERSION})
-      set(SWIG_EXECUTABLE ${ep_prefix}/bin/swig)
+      ExternalProject_Get_Property(${proj} install_dir)
+      set(SWIG_DIR ${install_dir}/share/swig/${SWIG_TARGET_VERSION})
+      set(SWIG_EXECUTABLE ${install_dir}/bin/swig)
 
     endif()
   endif(NOT SWIG_DIR)

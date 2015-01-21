@@ -8,32 +8,29 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
   endif()
 
   if(NOT DEFINED Python_DIR)
-    set(proj Python)
-    set(Python_DEPENDENCIES ZLIB Python-src)
-    set(Python_DEPENDS ${proj})
 
     set(MITK_PYTHON_MAJOR_VERSION 2)
     set(MITK_PYTHON_MINOR_VERSION 7)
     set(MITK_PYTHON_PATCH_VERSION 3)
 
     set(PYTHON_SOURCE_PACKAGE Python-${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}.${MITK_PYTHON_PATCH_VERSION})
-    set(PYTHON_SOURCE_DIR  "${CMAKE_BINARY_DIR}/${PYTHON_SOURCE_PACKAGE}")
-    # patch the VS compiler config
-
-    set(PYTHON_PATCH_COMMAND PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${CMAKE_CURRENT_LIST_DIR}/Patch${proj}.cmake)
+    set(proj ${PYTHON_SOURCE_PACKAGE})
 
     # download the source code
-    ExternalProject_Add(Python-src
+    ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/${PYTHON_SOURCE_PACKAGE}.tgz
       URL_MD5  "2cf641732ac23b18d139be077bd906cd"
-      PREFIX   ${CMAKE_BINARY_DIR}/${PYTHON_SOURCE_PACKAGE}-cmake
-      SOURCE_DIR  "${PYTHON_SOURCE_DIR}"
+      # patch the VS compiler config
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Python-2.7.3.patch
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
       INSTALL_COMMAND ""
     )
+
+    set(proj Python)
+    set(Python_DEPENDENCIES ZLIB ${PYTHON_SOURCE_PACKAGE})
+    set(Python_DEPENDS ${proj})
 
     set(additional_cmake_cache_args )
     list(APPEND additional_cmake_cache_args
@@ -149,7 +146,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       # linux custom compile step, set the environment variables and python home to the right
       # path. Other runtimes can mess up the paths of the installation and the stripped executable
       # used to compile links to the wrong library in /usr/lib
-      set(_python_compile_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_compile_step.sh)
+      set(_python_compile_step ${ep_prefix}/tmp/python_compile_step.sh)
       file(WRITE ${_python_compile_step}
 "#!/bin/bash
 export PYTHONHOME=${Python_DIR}
@@ -168,7 +165,8 @@ ${PYTHON_EXECUTABLE} -m compileall
       # ones will cause conflicts if system libraries are present during the build/configure process
       # of opencv, since they will try to lookup the sys path first if no lib is directly
       # linked with it s path into the executable
-      set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
+      ExternalProject_Get_Property(${proj} binary_dir)
+      set(PYTHON_EXECUTABLE "${binary_dir}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
     else()
       set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include")

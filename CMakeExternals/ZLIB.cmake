@@ -25,11 +25,19 @@ if(MITK_USE_ZLIB)
       )
     set(ZLIB_DIR ${ep_prefix})
     set(ZLIB_INCLUDE_DIR ${ZLIB_DIR}/include/mitk_zlib)
+
+    install(DIRECTORY ${ZLIB_INCLUDE_DIR}
+            DESTINATION include
+            COMPONENT dev)
+
     if(WIN32)
       set(ZLIB_LIBRARY ${ZLIB_DIR}/lib/zlib.lib)
     else()
       set(ZLIB_LIBRARY ${ZLIB_DIR}/lib/libzlib.a)
     endif()
+    install(FILES ${ZLIB_LIBRARY}
+            DESTINATION lib
+            COMPONENT dev)
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()

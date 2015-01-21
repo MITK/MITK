@@ -19,16 +19,7 @@ diff -urNb SimpleITK-0.8.0/CMakeLists.txt SimpleITK-src/CMakeLists.txt
  
  
  endif()
-@@ -444,7 +446,7 @@
- set(SimpleITKConfig_CODE "set(SimpleITK_INSTALL_PREFIX \"\${_SimpleITKConfig_DIR}\")")
- # Construct the proper number of get_filename_component(... PATH)
- # calls to compute the installation prefix.
--string(REGEX REPLACE "/" ";" _count "${SimpleITK_INSTALL_PACKAGE_DIR}")
-+string(REGEX REPLACE "/" "" _count "${SimpleITK_INSTALL_PACKAGE_DIR}")
- foreach(p ${_count})
-   set(SimpleITKConfig_CODE "${SimpleITKConfig_CODE}
- get_filename_component(SimpleITK_INSTALL_PREFIX \"\${SimpleITK_INSTALL_PREFIX}\" PATH)")
-@@ -513,7 +515,7 @@
+@@ -514,7 +516,7 @@
  #------------------------------------------------------------------------------
  # CPack
  

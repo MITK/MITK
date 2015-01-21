@@ -72,6 +72,7 @@ if(MITK_USE_CTK)
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
       URL_MD5 a3ac62b6fdefc90966b52bc5b52c80e5
       UPDATE_COMMAND ""
+      INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
@@ -91,7 +92,10 @@ if(MITK_USE_CTK)
         -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_5f3a03b1.tar.gz
       DEPENDS ${proj_DEPENDENCIES}
      )
-  set(CTK_DIR ${ep_prefix})
+
+    ExternalProject_Get_Property(${proj} binary_dir)
+    set(CTK_DIR ${binary_dir})
+    #set(CTK_DIR ${ep_prefix})
 
   else()
 

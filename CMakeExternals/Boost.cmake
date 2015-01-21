@@ -25,7 +25,7 @@ if(MITK_USE_Boost)
     if(MITK_USE_Boost_LIBRARIES)
       string(REPLACE ";" "," _boost_libs "${MITK_USE_Boost_LIBRARIES}")
     endif()
-    
+
     if(WIN32)
       set(_shell_extension .bat)
       if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -60,22 +60,23 @@ if(MITK_USE_Boost)
       endif()
     endif()
 
+    set(_boost_variant "$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>")
     set(_boost_link shared)
     if(NOT BUILD_SHARED_LIBS)
       set(_boost_link static)
     endif()
-    
+
     set(_build_cmd ${CMAKE_COMMAND} -E chdir "<SOURCE_DIR>"
         ./b2
         ${APPLE_SYSROOT_FLAG}
         "--build-dir=<BINARY_DIR>"
-        variant=$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>
+        variant=${_boost_variant}
         link=${_boost_link}
         threading=multi
         runtime-link=shared
         -q
     )
-    
+
     if(MITK_USE_Boost_LIBRARIES)
       set(_boost_build_cmd BUILD_COMMAND ${_build_cmd})
       set(_install_cmd ${_build_cmd} install)
@@ -84,7 +85,7 @@ if(MITK_USE_Boost)
       set(_install_cmd ${CMAKE_COMMAND} -E echo "copying Boost header..."
              COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/include/boost")
     endif()
-    
+
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_56_0.tar.bz2

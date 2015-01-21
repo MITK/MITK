@@ -200,7 +200,7 @@ set(_ctk_plugins
 set(_ctk_test_plugins )
 
 if(BLUEBERRY_BUILD_TESTING)
-  find_package(CppUnit REQUIRED)
+  find_package(CppUnit PATHS ${CppUnit_DIR} REQUIRED)
   include(berryTestingHelpers)
 
   set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}")

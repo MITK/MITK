@@ -33,16 +33,16 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
 
     set(_numpy_build_step ${MITK_SOURCE_DIR}/CMake/mitkFunctionExternalPythonBuildStep.cmake)
 
-    set(_configure_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_configure_step.cmake)
+    set(_configure_step ${ep_prefix}/tmp/${proj}_configure_step.cmake)
     file(WRITE ${_configure_step}
        "${_numpy_env}
         include(\"${_numpy_build_step}\")
-        file(WRITE \"${CMAKE_BINARY_DIR}/${proj}-src/site.cfg\" \"\")
+        file(WRITE \"${ep_prefix}/src/${proj}/site.cfg\" \"\")
         mitkFunctionExternalPythonBuildStep(${proj} configure \"${PYTHON_EXECUTABLE}\" \"${CMAKE_BINARY_DIR}\" setup.py config)
        ")
 
     # build step
-    set(_build_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_build_step.cmake)
+    set(_build_step ${ep_prefix}/tmp/${proj}_build_step.cmake)
     file(WRITE ${_build_step}
        "${_numpy_env}
         include(\"${_numpy_build_step}\")
@@ -50,18 +50,17 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
        ")
 
     # install step
-    set(_install_dir "${Python_DIR}")
-    if(WIN32)
-      STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
-    endif()
-    # escape spaces in install path
-    STRING(REPLACE " " "\\ " _install_dir ${_install_dir})
-
-    set(_install_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_install_step.cmake)
+    set(_install_step ${ep_prefix}/tmp/${proj}_install_step.cmake)
     file(WRITE ${_install_step}
        "${_numpy_env}
         include(\"${_numpy_build_step}\")
-        mitkFunctionExternalPythonBuildStep(${proj} install \"${PYTHON_EXECUTABLE}\" \"${CMAKE_BINARY_DIR}\" setup.py install --prefix=${_install_dir})
+        # escape characters in install path
+        set(_install_dir \"\${CMAKE_INSTALL_PREFIX}\")
+        if(WIN32)
+          string(REPLACE \"/\" \"\\\\\" _install_dir \${_install_dir})
+        endif()
+        string(REPLACE \" \" \"\\ \" _install_dir \${_install_dir})
+        mitkFunctionExternalPythonBuildStep(${proj} install \"${PYTHON_EXECUTABLE}\" \"${CMAKE_BINARY_DIR}\" setup.py install --prefix=\${_install_dir})
        ")
 
     set(Numpy_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/numpy-1.4.1.tar.gz)
@@ -87,7 +86,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       BUILD_IN_SOURCE 1
       CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${_configure_step}
       BUILD_COMMAND   ${CMAKE_COMMAND} -P ${_build_step}
-      INSTALL_COMMAND ${CMAKE_COMMAND} -P ${_install_step}
+      INSTALL_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -P ${_install_step}
 
       DEPENDS
         ${${proj}_DEPENDENCIES}

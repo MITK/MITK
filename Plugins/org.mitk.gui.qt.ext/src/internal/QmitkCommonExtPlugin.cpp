@@ -26,12 +26,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIDataStorageService.h>
 #include <mitkSceneIO.h>
-#include <mitkIOUtil.h>
 #include <mitkProgressBar.h>
 #include <mitkRenderingManager.h>
 
 #include <berryPlatformUI.h>
 #include <berryIPreferencesService.h>
+#include <mitkIOUtil.h>
 
 #include <Poco/Util/OptionProcessor.h>
 
@@ -108,7 +108,16 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
          }
          else
          {
-           mitk::IOUtil::Load(arguments[i].toStdString(),*(dataStorage.GetPointer()));
+           try
+           {
+             const std::string path(arguments[i].toStdString());
+             mitk::IOUtil::Load(path, *dataStorage);
+             argumentsAdded++;
+           }
+           catch(...)
+           {
+             MITK_WARN << "Failed to load command line argument: " << arguments[i].toStdString();
+           }
          }
        } // end for each command line argument
 

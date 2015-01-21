@@ -68,6 +68,8 @@ DiffusionIOMimeTypes::DwiMimeType::DwiMimeType()
   this->AddExtension("fsl");
   this->AddExtension("fslgz");
   this->AddExtension("nrrd");
+  this->AddExtension("nii");
+  this->AddExtension("nii.gz");
 }
 
 bool DiffusionIOMimeTypes::DwiMimeType::AppliesTo(const std::string &path) const
@@ -84,7 +86,7 @@ bool DiffusionIOMimeTypes::DwiMimeType::AppliesTo(const std::string &path) const
   }
   //end fix for bug 18572
 
-  std::string ext = itksys::SystemTools::GetFilenameLastExtension( path );
+  std::string ext = this->GetExtension( path );
   ext = itksys::SystemTools::LowerCase( ext );
 
   // Simple NRRD files should only be considered for this mime type if they contain
@@ -119,6 +121,30 @@ bool DiffusionIOMimeTypes::DwiMimeType::AppliesTo(const std::string &path) const
     {
       MITK_ERROR << "ITK Exception: " << e.what();
     }
+    canRead = false;
+  }
+
+  // Nifti files should only be considered for this mime type if they are
+  // accompanied by bvecs and bvals files defining the diffusion information
+  if( ext == ".nii" || ext == ".nii.gz" )
+  {
+    std::string base = itksys::SystemTools::GetFilenamePath( path ) + "/"
+      + this->GetFilenameWithoutExtension( path );
+
+    if( itksys::SystemTools::FileExists( std::string( base + ".bvec").c_str() )
+      && itksys::SystemTools::FileExists( std::string( base + ".bval").c_str() )
+      )
+    {
+      return canRead;
+    }
+
+    if( itksys::SystemTools::FileExists( std::string( base + ".bvecs").c_str() )
+      && itksys::SystemTools::FileExists( std::string( base + ".bvals").c_str() )
+      )
+    {
+      return canRead;
+    }
+
     canRead = false;
   }
 

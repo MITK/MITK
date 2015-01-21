@@ -125,8 +125,9 @@ namespace mitk
         MITK_INFO << "NrrdDiffusionImageReader: reading image information";
         VectorImageType::Pointer itkVectorImage;
 
-        std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetInputLocation());
-        ext = itksys::SystemTools::LowerCase(ext);
+        std::string ext = this->GetMimeType()->GetExtension( this->GetInputLocation() );
+        ext = itksys::SystemTools::LowerCase( ext );
+
         if (ext == ".hdwi" || ext == ".dwi" || ext == ".nrrd")
         {
           typedef itk::ImageFileReader<VectorImageType> FileReaderType;
@@ -156,6 +157,78 @@ namespace mitk
 
           // delete temporary file
           itksys::SystemTools::RemoveFile(fname3.c_str());
+
+          // convert 4D file to vector image
+          itkVectorImage = VectorImageType::New();
+
+          VectorImageType::SpacingType spacing;
+          ImageType4D::SpacingType spacing4 = img4->GetSpacing();
+          for(int i=0; i<3; i++)
+            spacing[i] = spacing4[i];
+          itkVectorImage->SetSpacing( spacing );   // Set the image spacing
+
+          VectorImageType::PointType origin;
+          ImageType4D::PointType origin4 = img4->GetOrigin();
+          for(int i=0; i<3; i++)
+            origin[i] = origin4[i];
+          itkVectorImage->SetOrigin( origin );     // Set the image origin
+
+          VectorImageType::DirectionType direction;
+          ImageType4D::DirectionType direction4 = img4->GetDirection();
+          for(int i=0; i<3; i++)
+            for(int j=0; j<3; j++)
+              direction[i][j] = direction4[i][j];
+          itkVectorImage->SetDirection( direction );  // Set the image direction
+
+          VectorImageType::RegionType region;
+          ImageType4D::RegionType region4 = img4->GetLargestPossibleRegion();
+
+          VectorImageType::RegionType::SizeType size;
+          ImageType4D::RegionType::SizeType size4 = region4.GetSize();
+
+          for(int i=0; i<3; i++)
+            size[i] = size4[i];
+
+          VectorImageType::RegionType::IndexType index;
+          ImageType4D::RegionType::IndexType index4 = region4.GetIndex();
+          for(int i=0; i<3; i++)
+            index[i] = index4[i];
+
+          region.SetSize(size);
+          region.SetIndex(index);
+          itkVectorImage->SetRegions( region );
+
+          itkVectorImage->SetVectorLength(size4[3]);
+          itkVectorImage->Allocate();
+
+          itk::ImageRegionIterator<VectorImageType>   it ( itkVectorImage,  itkVectorImage->GetLargestPossibleRegion() );
+          typedef VectorImageType::PixelType VecPixType;
+          for (it.GoToBegin(); !it.IsAtEnd(); ++it)
+          {
+            VecPixType vec = it.Get();
+            VectorImageType::IndexType currentIndex = it.GetIndex();
+            for(int i=0; i<3; i++)
+              index4[i] = currentIndex[i];
+            for(unsigned int ind=0; ind<vec.Size(); ind++)
+            {
+              index4[3] = ind;
+              vec[ind] = img4->GetPixel(index4);
+            }
+            it.Set(vec);
+          }
+        }
+        else if(ext == ".nii" || ext == ".nii.gz")
+        {
+          // create reader and read file
+          typedef itk::Image<DiffusionPixelType,4> ImageType4D;
+          itk::NiftiImageIO::Pointer io2 = itk::NiftiImageIO::New();
+          typedef itk::ImageFileReader<ImageType4D> FileReaderType;
+          FileReaderType::Pointer reader = FileReaderType::New();
+          reader->SetFileName( this->GetInputLocation() );
+          reader->SetImageIO(io2);
+          reader->Update();
+          ImageType4D::Pointer img4 = reader->GetOutput();
+
 
           // convert 4D file to vector image
           itkVectorImage = VectorImageType::New();
@@ -303,13 +376,48 @@ namespace mitk
           }
 
         }
-        else if(ext == ".fsl" || ext == ".fslgz")
+        else if(ext == ".fsl" || ext == ".fslgz" || ext == ".nii" || ext == ".nii.gz")
         {
+          // some parsing depending on the extension
+          bool useFSLstyle( true );
+          std::string bvecsExtension("");
+          std::string bvalsExtension("");
+
+          std::string base = itksys::SystemTools::GetFilenamePath( this->GetInputLocation() ) + "/"
+            + this->GetMimeType()->GetFilenameWithoutExtension( this->GetInputLocation() );
+
+          // check for possible file names
+          {
+            if( useFSLstyle && itksys::SystemTools::FileExists( std::string( base + ".bvec").c_str() )
+              && itksys::SystemTools::FileExists( std::string( base + ".bval").c_str() )
+              )
+            {
+              useFSLstyle = false;
+              bvecsExtension = ".bvec";
+              bvalsExtension = ".bval";
+            }
+
+            if( useFSLstyle && itksys::SystemTools::FileExists( std::string( base + ".bvecs").c_str() )
+              && itksys::SystemTools::FileExists( std::string( base + ".bvals").c_str() )
+              )
+            {
+              useFSLstyle = false;
+              bvecsExtension = ".bvecs";
+              bvalsExtension = ".bvals";
+            }
+          }
 
           std::string line;
           std::vector<float> bvec_entries;
           std::string fname = this->GetInputLocation();
-          fname += ".bvecs";
+          if( useFSLstyle )
+          {
+            fname += ".bvecs";
+          }
+          else
+          {
+            fname = std::string( base + bvecsExtension);
+          }
           std::ifstream myfile (fname.c_str());
           if (myfile.is_open())
           {
@@ -332,7 +440,14 @@ namespace mitk
 
           std::vector<float> bval_entries;
           std::string fname2 = this->GetInputLocation();
-          fname2 += ".bvals";
+          if( useFSLstyle )
+          {
+            fname2 += ".bvals";
+          }
+          else
+          {
+            fname2 = std::string( base + bvalsExtension);
+          }
           std::ifstream myfile2 (fname2.c_str());
           if (myfile2.is_open())
           {

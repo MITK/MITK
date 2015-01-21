@@ -242,7 +242,7 @@ int main( int argc, char* argv[] )
       std::cout << parser.helpText();
       return EXIT_SUCCESS;
     }
-   }
+  }
 
   std::string outputFile = us::any_cast<string>(parsedArgs["output"]);
   std::string inputFile = us::any_cast<string>(parsedArgs["input"]);
@@ -251,12 +251,16 @@ int main( int argc, char* argv[] )
   float spacing[3];
   if (parsedArgs.count("spacing"))
   {
+
     std::string arg =  us::any_cast<string>(parsedArgs["spacing"]);
-    spacings = split(arg ,',');
-    spacing[0] = atoi(spacings.at(0).c_str());
-    spacing[1] = atoi(spacings.at(1).c_str());
-    spacing[2] = atoi(spacings.at(2).c_str());
-    useSpacing = true;
+    if (arg != "")
+    {
+      spacings = split(arg ,',');
+      spacing[0] = atoi(spacings.at(0).c_str());
+      spacing[1] = atoi(spacings.at(1).c_str());
+      spacing[2] = atoi(spacings.at(2).c_str());
+      useSpacing = true;
+    }
   }
 
   std::string refImageFile = "";
@@ -274,7 +278,7 @@ int main( int argc, char* argv[] )
 
   mitk::Image::Pointer refImage;
   if (!useSpacing)
-      refImage = mitk::IOUtil::LoadImage(refImageFile);
+    refImage = mitk::IOUtil::LoadImage(refImageFile);
 
   mitk::Image::Pointer inputDWI = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadBaseData(inputFile).GetPointer());
   if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(inputDWI))

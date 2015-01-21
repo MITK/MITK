@@ -414,7 +414,7 @@ void MitkCoreActivator::RegisterItkReaderWriter()
   }
 
   FixedNiftiImageIO::Pointer itkNiftiIO = FixedNiftiImageIO::New();
-  mitk::ItkImageIO* niftiIO = new mitk::ItkImageIO(mitk::CustomMimeType(mitk::IOMimeTypes::NIFTI_MIMETYPE_NAME()),
+  mitk::ItkImageIO* niftiIO = new mitk::ItkImageIO(mitk::IOMimeTypes::NIFTI_MIMETYPE(),
                                                    itkNiftiIO.GetPointer(), 0);
   m_FileIOs.push_back(niftiIO);
 }

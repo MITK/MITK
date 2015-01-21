@@ -15,13 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "QmitkPointListWidget.h"
 #include <mitkGlobalInteraction.h>
-#include <mitkPointSetReader.h>
-#include <mitkPointSetWriter.h>
 
 #include <QHBoxLayout>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDir>
+#include <mitkIOUtil.h>
 
 #include <QmitkEditPointDialog.h>
 
@@ -220,11 +219,7 @@ void QmitkPointListWidget::OnBtnSavePoints()
 
   try
   {
-    // instantiate the writer and add the point-sets to write
-    mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
-    writer->SetInput( dynamic_cast<mitk::PointSet*>(m_PointSetNode->GetData()) );
-    writer->SetFileName( aFilename.toLatin1() );
-    writer->Update();
+    mitk::IOUtil::Save(m_PointSetNode->GetData(), aFilename.toStdString() );
   }
   catch(...)
   {
@@ -243,11 +238,7 @@ void QmitkPointListWidget::OnBtnLoadPoints()
   // attempt to load file
   try
   {
-    mitk::PointSetReader::Pointer reader = mitk::PointSetReader::New();
-    reader->SetFileName( filename.toLatin1() );
-    reader->Update();
-
-    mitk::PointSet::Pointer pointSet = reader->GetOutput();
+    mitk::PointSet::Pointer pointSet = mitk::IOUtil::LoadPointSet(filename.toStdString());
     if ( pointSet.IsNull() )
     {
       QMessageBox::warning( this, "Load point set", QString("File reader could not read %1").arg(filename) );

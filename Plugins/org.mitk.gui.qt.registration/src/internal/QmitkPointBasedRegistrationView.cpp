@@ -38,8 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPositionEvent.h>
 #include "mitkOperationEvent.h"
 #include "mitkUndoController.h"
-#include <mitkPointSetWriter.h>
-#include <mitkPointSetReader.h>
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateAnd.h"

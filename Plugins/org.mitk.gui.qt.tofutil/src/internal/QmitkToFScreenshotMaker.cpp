@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Mitk
 #include <mitkToFCameraDevice.h>
 #include <mitkIOUtil.h>
-#include <mitkImageWriter.h>
 
 // Qt
 #include <QString>

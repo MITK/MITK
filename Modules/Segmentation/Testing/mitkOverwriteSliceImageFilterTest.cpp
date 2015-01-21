@@ -17,8 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkExtractImageFilter.h"
 #include "mitkOverwriteSliceImageFilter.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkCompareImageSliceTestHelper.h"
+
+#include <mitkIOUtil.h>
 
 unsigned int CompareImageSliceTestHelper::m_Dimension0 = 0;
 unsigned int CompareImageSliceTestHelper::m_Dimension1 = 0;
@@ -315,25 +316,16 @@ int mitkOverwriteSliceImageFilterTest(int argc, char* argv[])
   // load the image
 
     mitk::Image::Pointer image = NULL;
-    mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
     try
     {
-      std::cout << "Testing with parameter '" << argv[1] << "'" << std::endl;
-      factory->SetFileName( argv[1] );
-      factory->Update();
+      MITK_INFO << "Testing with parameter '" << argv[1] << "'";
 
-      if(factory->GetNumberOfOutputs()<1)
-      {
-        std::cerr<<"File could not be loaded [FAILED]"<<std::endl;
-        return EXIT_FAILURE;
-      }
-      mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-      image = dynamic_cast<mitk::Image*>(node->GetData());
+      std::string pathToImage(argv[1]);
+      image = mitk::IOUtil::LoadImage( pathToImage );
       if(image.IsNull())
       {
-        std::cout<<"File not an image - test will not be applied [PASSED]"<<std::endl;
-        std::cout<<"[TEST DONE]"<<std::endl;
-        return EXIT_SUCCESS;
+        MITK_INFO<<"File not an image - test will not be applied";
+        return EXIT_FAILURE;
       }
     }
     catch ( itk::ExceptionObject & ex )

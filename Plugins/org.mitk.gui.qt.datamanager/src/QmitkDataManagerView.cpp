@@ -620,6 +620,10 @@ void QmitkDataManagerView::ColorChanged()
       return;
     m_ColorButton->setAutoFillBackground(true);
     node->SetProperty("color",mitk::ColorProperty::New(qcolor.red()/255.0,qcolor.green()/255.0,qcolor.blue()/255.0));
+    if (node->GetProperty("binaryimage.selectedcolor"))
+    {
+      node->SetProperty("binaryimage.selectedcolor",mitk::ColorProperty::New(qcolor.red()/255.0,qcolor.green()/255.0,qcolor.blue()/255.0));
+    }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
    }
  }

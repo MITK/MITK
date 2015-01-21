@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkModuleView.h"
 
-#include <mitkDataNodeFactory.h>
 #include <mitkIDataStorageService.h>
 #include <mitkSceneIO.h>
 #include <mitkProgressBar.h>

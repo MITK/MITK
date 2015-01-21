@@ -65,7 +65,7 @@ namespace mitk {
   class MITK_CORE_EXPORT SlicedGeometry3D : public mitk::BaseGeometry
   {
   public:
-    mitkClassMacro(SlicedGeometry3D, BaseGeometry);
+    mitkClassMacro(SlicedGeometry3D, BaseGeometry)
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
@@ -96,13 +96,13 @@ namespace mitk {
         /**
     * \deprecatedSince{2014_10} Please use GetPlaneGeometry
     */
-    DEPRECATED(const PlaneGeometry* GetGeometry2D(int s)){return GetPlaneGeometry(s);};
+    DEPRECATED(const PlaneGeometry* GetGeometry2D(int s)){return GetPlaneGeometry(s);}
 
 
     /**
     * \deprecatedSince{2014_10} Please use SetPlaneGeometry
     */
-    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo, int s)){SetPlaneGeometry(geo, s);};
+    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo, int s)){SetPlaneGeometry(geo, s);}
 
     //##Documentation
     //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
@@ -114,7 +114,7 @@ namespace mitk {
     /**
     * \brief Get the number of slices
     */
-    itkGetConstMacro( Slices, unsigned int );
+    itkGetConstMacro( Slices, unsigned int )
 
     /**
     * \brief Set PlaneGeometry of slice \a s.
@@ -152,7 +152,7 @@ namespace mitk {
     *
     * \sa GetPlaneGeometry
     */
-    itkGetConstMacro(EvenlySpaced, bool);
+    itkGetConstMacro(EvenlySpaced, bool)
 
     virtual void SetEvenlySpaced(bool on = true);
 
@@ -167,7 +167,7 @@ namespace mitk {
     * \sa m_DirectionVector
     */
     virtual void SetDirectionVector(const mitk::Vector3D& directionVector);
-    itkGetConstMacro(DirectionVector, const mitk::Vector3D&);
+    itkGetConstMacro(DirectionVector, const mitk::Vector3D&)
 
     virtual itk::LightObject::Pointer InternalClone() const;
 
@@ -312,17 +312,18 @@ namespace mitk {
 
 
 
-    //##Documentation
-    //## @brief Pre- and Post-functions are empty in BaseGeometry
-    //##
-    //## These virtual functions allow for a different beahiour in subclasses.
-    //## Do implement them in every subclass. If not needed, use {}.
-    virtual void PostInitialize(){};
-    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * newGeometry) const{};
-    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM){};
-    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* transform){};
-    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform){};
-    virtual void PreSetBounds(const BoundsArrayType& /*bounds*/){};
+    /** Documentation
+    * @brief Pre- and Post-functions are empty in BaseGeometry
+    *
+    * These virtual functions allow for a different beahiour in subclasses.
+    * Do implement them in every subclass. If not needed, use {}.
+    */
+    virtual void PostInitialize(){}
+    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self*) const{}
+    virtual void PostSetExtentInMM(int, ScalarType ){}
+    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D*){}
+    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D*){}
+    virtual void PreSetBounds(const BoundsArrayType&){}
 
     /**
     * \brief Set the spacing (m_Spacing), in direction of the plane normal.

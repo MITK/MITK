@@ -550,11 +550,11 @@ namespace mitk {
     //##
     //## These virtual functions allow for a different beahiour in subclasses.
     //## Do implement them in every subclass. If not needed, use {}.
-    virtual void PostInitialize(){};
-    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * newGeometry) const{};
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){};
+    virtual void PostInitialize(){}
+    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self *) const {}
+    virtual void PreSetSpacing(const mitk::Vector3D& ){}
 
-    virtual void PreSetBounds(const BoundsArrayType& bounds);
+    virtual void PreSetBounds(const BoundsArrayType& );
     virtual void PreSetIndexToWorldTransform( AffineTransform3D *transform);
     virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
     virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);

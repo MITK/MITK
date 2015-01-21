@@ -100,6 +100,7 @@ protected:
 private:
     vtkSmartPointer<vtkLookupTable> m_lut;
 
+    int     m_LineWidth;
 };
 
 

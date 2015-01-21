@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
     : m_TubeRadius(0.0)
     , m_TubeSides(15)
+    , m_LineWidth(1)
 {
     m_lut = vtkLookupTable::New();
     m_lut->Build();
@@ -99,10 +100,7 @@ void mitk::FiberBundleXMapper3D::InternalGenerateData(mitk::BaseRenderer *render
 
     // set Opacity
     localStorage->m_FiberActor->GetProperty()->SetOpacity((double) tmpopa);
-
-    int lineWidth = 1;
-    this->GetDataNode()->GetIntProperty("LineWidth",lineWidth);
-    localStorage->m_FiberActor->GetProperty()->SetLineWidth(lineWidth);
+    localStorage->m_FiberActor->GetProperty()->SetLineWidth(m_LineWidth);
 
     localStorage->m_FiberAssembly->AddPart(localStorage->m_FiberActor);
     localStorage->m_LastUpdateTime.Modified();
@@ -120,6 +118,7 @@ void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
     FBXLocalStorage3D* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
     mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
 
+    // did any rendering properties change?
     float tubeRadius = 0;
     node->GetFloatProperty("TubeRadius", tubeRadius);
     if (m_TubeRadius!=tubeRadius)
@@ -127,11 +126,20 @@ void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
         m_TubeRadius = tubeRadius;
         fiberBundle->RequestUpdate3D();
     }
+
     int tubeSides = 0;
     node->GetIntProperty("TubeSides", tubeSides);
     if (m_TubeSides!=tubeSides)
     {
         m_TubeSides = tubeSides;
+        fiberBundle->RequestUpdate3D();
+    }
+
+    int lineWidth = 0;
+    node->GetIntProperty("LineWidth", lineWidth);
+    if (m_LineWidth!=lineWidth)
+    {
+        m_LineWidth = lineWidth;
         fiberBundle->RequestUpdate3D();
     }
 

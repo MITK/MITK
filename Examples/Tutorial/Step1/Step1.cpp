@@ -55,10 +55,7 @@ int main(int argc, char* argv[])
   //*************************************************************************
 
   // Load datanode (eg. many image formats, surface formats, etc.)
-  mitk::DataNode::Pointer datanode = mitk::IOUtil::LoadDataNode(filename);
-
-  // Add the node to the DataStorage
-  ds->Add(reader->GetOutput());
+  mitk::IOUtil::Load(argv[1],*ds);
 
   //*************************************************************************
   // Part IV: Create window and pass the datastorage to it

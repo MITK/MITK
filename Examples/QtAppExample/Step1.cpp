@@ -54,9 +54,13 @@ int main(int argc, char* argv[])
 
   // Load a DataNode using the mitkIOUtil
   // (supports many image formats, surface formats, etc.)
-  mitk::DataNode::Pointer dn = mitk::IOUtil::LoadDataNode(argv[1]);
+  mitk::StandaloneDataStorage::SetOfObjects::Pointer dataNodes = mitk::IOUtil::Load(argv[1],*ds);
 
-  ds->Add(dn);
+  if(dataNodes->empty())
+  {
+    fprintf( stderr, "Could not open file %s \n\n", argv[1] );
+    exit(2);
+  }
 
   //*************************************************************************
   // Part IV: Create window and pass the datastorage to it

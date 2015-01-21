@@ -106,7 +106,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 
     std::vector< unsigned int > spikeVolume;
     for (unsigned int i=0; i<m_Parameters.m_SignalGen.m_Spikes; i++)
-        spikeVolume.push_back(m_RandGen->GetIntegerVariate()%images.at(0)->GetVectorLength());
+        spikeVolume.push_back(m_RandGen->GetIntegerVariate()%(images.at(0)->GetVectorLength()-1)+1);
     std::sort (spikeVolume.begin(), spikeVolume.end());
     std::reverse (spikeVolume.begin(), spikeVolume.end());
 

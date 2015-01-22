@@ -16,16 +16,43 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkModel.h"
 #include <mitkLogMacros.h>
+#include <mitkRenderingManager.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkOpenGLTexture.h>
 
-bool mitk::VtkModel::IsGlewInitialized = false;
+static bool InitGLEW()
+{
+  static bool isInitialized = false;
+
+  // If no render window is shown, OpenGL is potentially not initialized, e.g., the
+  // Display tab of the Workbench might be closed while loading a SOFA scene file.
+  // In this case initialization is deferred (see mitk::VtkModel::internalDraw()).
+  if (mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows().empty())
+    return false;
+
+  if (!isInitialized)
+  {
+    GLenum error = glewInit();
+
+    if (error != GLEW_OK)
+    {
+      MITK_ERROR("glewInit") << glewGetErrorString(error);
+    }
+    else
+    {
+      isInitialized = true;
+    }
+  }
+
+  return isInitialized;
+}
 
 mitk::VtkModel::VtkModel()
-  : m_BuffersCreated(false),
+  : m_GlewIsInitialized(InitGLEW()),
+    m_BuffersWereCreated(false),
     m_LastNumberOfVertices(0),
     m_LastNumberOfTriangles(0),
     m_LastNumberOfQuads(0),
@@ -33,24 +60,15 @@ mitk::VtkModel::VtkModel()
     m_IndexBuffer(0),
     m_VtkRenderer(NULL)
 {
-  if (!IsGlewInitialized)
-  {
-    GLenum error = glewInit();
-
-    if (error != GLEW_OK)
-      MITK_ERROR("glewInit") << glewGetErrorString(error);
-    else
-      IsGlewInitialized = true;
-  }
 }
 
 mitk::VtkModel::~VtkModel()
 {
-  /*if (m_BuffersCreated)
+  if (m_BuffersWereCreated)
   {
     glDeleteBuffers(1, &m_IndexBuffer);
     glDeleteBuffers(1, &m_VertexBuffer);
-  }*/
+  }
 }
 
 void mitk::VtkModel::CreateIndexBuffer()
@@ -191,12 +209,28 @@ void mitk::VtkModel::internalDraw(const sofa::core::visual::VisualParams* vparam
   using sofa::core::visual::DisplayFlags;
   using sofa::defaulttype::ResizableExtVector;
 
-  if (!IsGlewInitialized)
-    return;
+  if (!m_GlewIsInitialized)
+  {
+    // Try lazy initialization since initialization potentially failed so far
+    // due to missing render windows (see InitGLEW()).
+    m_GlewIsInitialized = InitGLEW();
+
+    if (m_GlewIsInitialized)
+    {
+      this->updateBuffers();
+    }
+    else
+    {
+      return;
+    }
+  }
 
   const DisplayFlags& displayFlags = vparams->displayFlags();
 
   if (!displayFlags.getShowVisualModels())
+    return;
+
+  if (m_BuffersWereCreated == false)
     return;
 
   glEnable(GL_LIGHTING);
@@ -204,11 +238,12 @@ void mitk::VtkModel::internalDraw(const sofa::core::visual::VisualParams* vparam
   glPolygonMode(GL_FRONT_AND_BACK, displayFlags.getShowWireFrame() ? GL_LINE : GL_FILL);
 
   const VecCoord& vertices = this->getVertices();
-  const ResizableExtVector<Deriv>& normals = this->getVnormals();
-  const VecTexCoord& texCoords = this->getVtexcoords();
 
   glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
+
+  this->ValidateBoundBuffers();
+
   glVertexPointer(3, GL_FLOAT, 0, NULL);
   glNormalPointer(GL_FLOAT, 0, reinterpret_cast<const GLvoid*>(vertices.size() * sizeof(VecCoord::value_type)));
   glEnableClientState(GL_VERTEX_ARRAY);
@@ -218,8 +253,6 @@ void mitk::VtkModel::internalDraw(const sofa::core::visual::VisualParams* vparam
 
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   if (displayFlags.getShowWireFrame())
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -317,19 +350,19 @@ void mitk::VtkModel::updateBuffers()
 {
   using sofa::defaulttype::ResizableExtVector;
 
+  if (!m_GlewIsInitialized)
+    return;
+
   const VecCoord& vertices = this->getVertices();
   const ResizableExtVector<Triangle>& triangles = this->getTriangles();
   const ResizableExtVector<Quad>& quads = this->getQuads();
 
-  if (!IsGlewInitialized)
-    return;
-
-  if (!m_BuffersCreated)
+  if (!m_BuffersWereCreated)
   {
     this->CreateVertexBuffer();
     this->CreateIndexBuffer();
 
-    m_BuffersCreated = true;
+    m_BuffersWereCreated = true;
   }
   else
   {
@@ -362,7 +395,6 @@ void mitk::VtkModel::UpdateIndexBuffer()
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
   glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeOfTriangleIndices, triangles.getData());
   glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeOfTriangleIndices, sizeOfQuadIndices, quads.getData());
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void mitk::VtkModel::UpdateVertexBuffer()
@@ -385,6 +417,19 @@ void mitk::VtkModel::UpdateVertexBuffer()
     GLsizeiptr sizeOfTexCoords = texCoords.size() * sizeof(VecTexCoord::value_type);
     glBufferSubData(GL_ARRAY_BUFFER, sizeOfVertices + sizeOfNormals, sizeOfTexCoords, texCoords.getData());
   }
+}
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+void mitk::VtkModel::ValidateBoundBuffers()
+{
+  GLint indexBufferSize;
+  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &indexBufferSize);
+
+  if (indexBufferSize == 0)
+  {
+    glDeleteBuffers(1, &m_IndexBuffer);
+    this->CreateIndexBuffer();
+
+    glDeleteBuffers(1, &m_VertexBuffer);
+    this->CreateVertexBuffer();
+  }
 }

@@ -40,8 +40,6 @@ namespace mitk
     void updateBuffers();
 
   private:
-    static bool IsGlewInitialized;
-
     VtkModel();
     ~VtkModel();
 
@@ -57,8 +55,10 @@ namespace mitk
     void InitVertexBuffer();
     void UpdateIndexBuffer();
     void UpdateVertexBuffer();
+    void ValidateBoundBuffers();
 
-    bool m_BuffersCreated;
+    bool m_GlewIsInitialized;
+    bool m_BuffersWereCreated;
     size_t m_LastNumberOfVertices;
     size_t m_LastNumberOfTriangles;
     size_t m_LastNumberOfQuads;

@@ -173,7 +173,7 @@ std::vector<mitk::UnstructuredGrid::Pointer> mitk::UnstructuredGridClusteringFil
 {
   std::vector< mitk::UnstructuredGrid::Pointer > mitkUGridVector;
 
-  for(int i=0; i<m_Clusters.size();i++)
+  for(unsigned int i=0; i<m_Clusters.size();i++)
   {
     vtkSmartPointer<vtkUnstructuredGrid> cluster = vtkSmartPointer<vtkUnstructuredGrid>::New();
 
@@ -209,6 +209,12 @@ std::vector<mitk::UnstructuredGrid::Pointer> mitk::UnstructuredGridClusteringFil
     }
 
     mitkUGridVector.push_back(mitkGrid);
-    return mitkUGridVector;
   }
+
+  return mitkUGridVector;
+}
+
+int mitk::UnstructuredGridClusteringFilter::GetNumberOfFoundClusters()
+{
+  return m_Clusters.size();
 }

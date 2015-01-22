@@ -77,6 +77,8 @@ namespace mitk {
 
       virtual std::vector< mitk::UnstructuredGrid::Pointer> GetAllClusters();
 
+      virtual int GetNumberOfFoundClusters();
+
       virtual void GenerateOutputInformation();
 
       virtual void GenerateData();

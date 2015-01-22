@@ -92,12 +92,10 @@ void mitk::UnstructuredGridClusteringFilter::GenerateData()
   for(unsigned int i=0; i<m_Clusters.size();i++)
   {
     vtkSmartPointer<vtkPoints> points = m_Clusters.at(i);
-    std::cout << "CLUSTER " << i << ": " << points->GetNumberOfPoints() << std::endl;
     for(int j=0; j<points->GetNumberOfPoints();j++)
     {
       double point[3];
       points->GetPoint(j,point);
-      std::cout << "POINT: " << point[0] << " " << point[1] << " " << point[2] << std::endl;
     }
     if(points->GetNumberOfPoints() > numberOfClusterPoints)
     {

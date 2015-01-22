@@ -131,6 +131,8 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         ${additional_cmake_cache_args}
         -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
         -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
+        # Python (and Numpy) do not like different shared library names
+        -DCMAKE_DEBUG_POSTFIX:STRING=
       DEPENDS
         ${Python_DEPENDENCIES}
     )
@@ -165,8 +167,8 @@ ${PYTHON_EXECUTABLE} -m compileall
       # ones will cause conflicts if system libraries are present during the build/configure process
       # of opencv, since they will try to lookup the sys path first if no lib is directly
       # linked with it s path into the executable
-      ExternalProject_Get_Property(${proj} binary_dir)
-      set(PYTHON_EXECUTABLE "${binary_dir}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
+      #ExternalProject_Get_Property(${proj} binary_dir)
+      #set(PYTHON_EXECUTABLE "${binary_dir}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
     else()
       set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include")

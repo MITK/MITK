@@ -19,9 +19,7 @@ if(MITK_USE_ZLIB)
         -DBUILD_SHARED_LIBS:BOOL=OFF
         -DZLIB_MANGLE_PREFIX:STRING=mitk_zlib_
         -DZLIB_INSTALL_INCLUDE_DIR:STRING=include/mitk_zlib
-        
-      DEPENDS
-      ${ZLIB_DEPENDENCIES}
+      DEPENDS ${ZLIB_DEPENDENCIES}
       )
     set(ZLIB_DIR ${ep_prefix})
     set(ZLIB_INCLUDE_DIR ${ZLIB_DIR}/include/mitk_zlib)
@@ -30,14 +28,31 @@ if(MITK_USE_ZLIB)
             DESTINATION include
             COMPONENT dev)
 
-    if(WIN32)
-      set(ZLIB_LIBRARY ${ZLIB_DIR}/lib/zlib.lib)
-    else()
-      set(ZLIB_LIBRARY ${ZLIB_DIR}/lib/libzlib.a)
+    find_library(ZLIB_LIBRARY_RELEASE NAMES zlib
+                 PATHS ${ZLIB_DIR}
+                 PATH_SUFFIXES lib lib/Release
+                 NO_DEFAULT_PATH)
+    find_library(ZLIB_LIBRARY_DEBUG NAMES zlibd
+                 PATHS ${ZLIB_DIR}
+                 PATH_SUFFIXES lib lib/Debug
+                 NO_DEFAULT_PATH)
+
+    set(ZLIB_LIBRARY )
+    if(ZLIB_LIBRARY_RELEASE)
+      list(APPEND ZLIB_LIBRARY release ${ZLIB_LIBRARY_RELEASE})
+      install(FILES ${ZLIB_LIBRARY_RELEASE}
+              DESTINATION lib
+              CONFIGURATIONS Release
+              COMPONENT dev)
     endif()
-    install(FILES ${ZLIB_LIBRARY}
-            DESTINATION lib
-            COMPONENT dev)
+    if(ZLIB_LIBRARY_DEBUG)
+      list(APPEND ZLIB_LIBRARY debug ${ZLIB_LIBRARY_DEBUG})
+      install(FILES ${ZLIB_LIBRARY_DEBUG}
+              DESTINATION lib
+              CONFIGURATIONS Debug
+              COMPONENT dev)
+    endif()
+
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()

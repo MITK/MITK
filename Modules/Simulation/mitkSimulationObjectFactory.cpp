@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulationVtkMapper3D.h"
 #include "mitkVtkModel.h"
 #include <mitkCoreObjectFactory.h>
+#include <boost/core/ignore_unused.hpp>
 #include <sofa/helper/system/glut.h>
 #include <sofa/component/init.h>
 #include <sofa/core/ObjectFactory.h>
@@ -45,6 +46,7 @@ static void RegisterSofaClasses()
 
   int IndexROIClass = RegisterObject("").add<mitk::IndexROI>();
   int VtkModelClass = RegisterObject("").add<mitk::VtkModel>();
+  boost::ignore_unused(IndexROIClass, VtkModelClass);
 
   ObjectFactory::AddAlias("VisualModel", "VtkModel", true);
   ObjectFactory::AddAlias("OglModel", "VtkModel", true);

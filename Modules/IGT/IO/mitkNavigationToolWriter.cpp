@@ -41,11 +41,28 @@ mitk::NavigationToolWriter::~NavigationToolWriter()
 
 bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTool::Pointer Tool)
   {
+  //some initial validation checks...
+  if ( Tool.IsNull())
+    {
+    m_ErrorMessage = "Cannot write a navigation tool containing invalid tool data, aborting!";
+    MITK_ERROR << m_ErrorMessage;
+    return false;
+    }
+
+
   // Workaround for a problem: the geometry might be modified if the tool is tracked. If this
   // modified geometry is saved the surface representation is moved by this offset. To avoid
   // this bug, the geometry is set to identity for the saving progress and restored later.
-  mitk::BaseGeometry::Pointer geometryBackup = Tool->GetDataNode()->GetData()->GetGeometry()->Clone();
-  Tool->GetDataNode()->GetData()->GetGeometry()->SetIdentity();
+  mitk::BaseGeometry::Pointer geometryBackup;
+  if (  Tool->GetDataNode().IsNull()
+        || (Tool->GetDataNode()->GetData()==NULL)
+        || (Tool->GetDataNode()->GetData()->GetGeometry()==NULL)
+        )
+      {
+      geometryBackup = Tool->GetDataNode()->GetData()->GetGeometry()->Clone();
+      Tool->GetDataNode()->GetData()->GetGeometry()->SetIdentity();
+      }
+  else {MITK_WARN << "Saving a tool with invalid data node, proceeding but errors might occure!";}
 
   //convert whole data to a mitk::DataStorage
   mitk::StandaloneDataStorage::Pointer saveStorage = mitk::StandaloneDataStorage::New();
@@ -62,6 +79,7 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
   if (!file.good())
     {
     m_ErrorMessage = "Could not open a zip file for writing: '" + FileName + "'";
+    MITK_ERROR << m_ErrorMessage;
     return false;
     }
   else
@@ -76,7 +94,7 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
   std::remove(DataStorageFileName.c_str());
 
   //restore original geometry
-  Tool->GetDataNode()->GetData()->SetGeometry(geometryBackup);
+  if (geometryBackup.IsNotNull()) {Tool->GetDataNode()->GetData()->SetGeometry(geometryBackup);}
 
   return true;
   }

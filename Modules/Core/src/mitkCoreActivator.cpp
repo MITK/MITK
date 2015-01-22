@@ -49,6 +49,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleResourceStream.h>
 #include <usServiceTracker.h>
 
+// ITK "injects" static initialization code for IO factories
+// via the itkImageIOFactoryRegisterManager.h header (which
+// is generated in the application library build directory).
+// To ensure that the code is called *before* the CppMicroServices
+// static initialization code (which triggers the Activator::Start
+// method), we include the ITK header here.
+#include <itkImageIOFactoryRegisterManager.h>
 
 void HandleMicroServicesMessages(us::MsgType type, const char* msg)
 {

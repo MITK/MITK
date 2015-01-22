@@ -22,7 +22,7 @@ mitkAddCustomModuleTest(mitkEventMapperTest_Test1And2 mitkEventMapperTest
 )
 
 mitkAddCustomModuleTest(mitkEventConfigTest_CreateObjectInDifferentWays mitkEventConfigTest
-                        ${MITK_SOURCE_DIR}/Core/Code/Testing/Resources/Interactions/StatemachineConfigTest.xml
+                        ${MITK_SOURCE_DIR}/Modules/Core/Testing/Resources/Interactions/StatemachineConfigTest.xml
 )
 
 mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest

@@ -2,13 +2,13 @@
 set(TOOL_CPPS "")
 
 # temporary suppress warnings in the following files until image accessors are fully integrated.
-set_source_files_properties( DataManagement/mitkImage.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
-set_source_files_properties( Controllers/mitkSliceNavigationController.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
+set_source_files_properties( src/DataManagement/mitkImage.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
+set_source_files_properties( src/Controllers/mitkSliceNavigationController.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
 
 MITK_CREATE_MODULE(
   INCLUDE_DIRS
-    PUBLIC Algorithms Common DataManagement Controllers Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}
-    PRIVATE Internal ${OPENGL_INCLUDE_DIR}
+    PUBLIC ${MITK_BINARY_DIR}
+    PRIVATE src/Algorithms src/Controllers src/DataManagement src/Interactions src/IO src/Rendering ${OPENGL_INCLUDE_DIR}
   DEPENDS PUBLIC mbilog CppMicroServices
   PACKAGE_DEPENDS
     PRIVATE tinyxml OpenGL
@@ -74,4 +74,4 @@ endif(MSVC_IDE OR MSVC_VERSION OR MINGW)
 
 add_subdirectory(TestingHelper)
 
-add_subdirectory(Testing)
+add_subdirectory(tests)

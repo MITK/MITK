@@ -820,8 +820,6 @@ endforeach()
 # Add subdirectories
 #-----------------------------------------------------------------------------
 
-add_subdirectory(Core)
-
 add_subdirectory(Modules)
 
 if(MITK_USE_BLUEBERRY)

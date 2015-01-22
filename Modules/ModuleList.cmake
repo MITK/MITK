@@ -1,4 +1,9 @@
+# The entries in the mitk_modules list must be
+# ordered according to their dependencies.
+
 set(mitk_modules
+  Core
+  DCMTesting
   RDF
   LegacyIO
   DataTypesExt

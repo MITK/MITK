@@ -5,7 +5,7 @@ set(TOOL_CPPS "")
 set_source_files_properties( DataManagement/mitkImage.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
 set_source_files_properties( Controllers/mitkSliceNavigationController.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
 
-MITK_CREATE_MODULE(Core
+MITK_CREATE_MODULE(
   INCLUDE_DIRS
     PUBLIC Algorithms Common DataManagement Controllers Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}
     PRIVATE Internal ${OPENGL_INCLUDE_DIR}
@@ -20,6 +20,7 @@ MITK_CREATE_MODULE(Core
     PRIVATE ITK
     PUBLIC  VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingVolumeOpenGL+vtkRenderingFreeTypeOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
   WARNINGS_AS_ERRORS
+  SUBPROJECTS MITK-Core
   # Do not automatically create CppMicroServices initialization code.
   # Because the VTK 6 "auto-init" functionality injects file-local static
   # initialization code in every cpp file which includes a VTK header,
@@ -31,7 +32,9 @@ MITK_CREATE_MODULE(Core
   # the mitkCoreActivator.cpp file.
   NO_INIT
 )
-
+if(NOT TARGET ${MODULE_TARGET})
+  message(SEND_ERROR "Core target ${MODULE_TARGET} does not exist")
+endif()
 function(_itk_create_factory_register_manager)
   # In MITK_ITK_Config.cmake, we do *not* include ITK_USE_FILE, which
   # prevents multiple registrations/unregistrations of ITK IO factories

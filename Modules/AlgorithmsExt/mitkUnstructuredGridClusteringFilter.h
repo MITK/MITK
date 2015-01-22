@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 
 #include <mitkUnstructuredGrid.h>
+#include <vtkSmartPointer.h>
 #include <mitkUnstructuredGridToUnstructuredGridFilter.h>
 #include <vtkIdList.h>
 #include <vtkPoints.h>
@@ -72,7 +73,13 @@ namespace mitk {
       itkSetMacro(MinPts, int)
       itkGetMacro(MinPts, int)
 
+      itkSetMacro(Meshing, bool)
+
+//      itkGetMacro(Clusters, std::vector<vtkPoints*>)
+
       virtual void GenerateOutputInformation();
+
+      virtual void GenerateData();
 
     protected:
 
@@ -86,9 +93,13 @@ namespace mitk {
 
       mitk::UnstructuredGrid::Pointer m_UnstructGrid;
 
+      std::vector< vtkSmartPointer<vtkPoints> > m_Clusters;
+
       double m_eps;
 
       int m_MinPts;
+
+      bool m_Meshing;
 
   };
 

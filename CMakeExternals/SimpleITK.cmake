@@ -62,7 +62,6 @@ if(MITK_USE_SimpleITK)
       CMAKE_CACHE_ARGS
          ${additional_cmake_args}
          -DBUILD_SHARED_LIBS:BOOL=${_build_shared}
-         -DCMAKE_INSTALL_NAME_DIR:STRING=<INSTALL_DIR>/lib
          -DSimpleITK_BUILD_DISTRIBUTE:BOOL=ON
          -DSimpleITK_PYTHON_THREADS:BOOL=ON
          -DUSE_SYSTEM_ITK:BOOL=ON

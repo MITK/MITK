@@ -23,8 +23,6 @@ if(MITK_USE_Poco)
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
-        #-DCMAKE_INSTALL_NAME_DIR:STRING=<INSTALL_DIR>/lib
-        #-DCMAKE_INSTALL_RPATH:STRING=<INSTALL_DIR>/lib
         -DENABLE_XML:BOOL=ON
         -DENABLE_JSON:BOOL=ON
         -DENABLE_MONGODB:BOOL=OFF

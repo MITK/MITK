@@ -206,10 +206,19 @@ endif()
 # CMAKE_CXX_STANDARD seems to only set the -std=c++11 flag for targets.
 mitkFunctionCheckCompilerFlags("-std=c++11" _cxx11_flag)
 
+set(_install_rpath)
+if(UNIX)
+  set(_install_rpath "\$ORIGIN/../lib")
+elseif(MACOS)
+  set(_install_rpath "@loader_path/../lib")
+endif()
+
 set(ep_common_args
   -DCMAKE_CXX_EXTENSIONS:STRING=0
   -DCMAKE_CXX_STANDARD:STRING=11
   -DCMAKE_DEBUG_POSTFIX:STRING=d
+  -DCMAKE_MACOSX_RPATH:BOOL=TRUE
+  "-DCMAKE_INSTALL_RPATH:STRING=${_install_rpath}"
   -DBUILD_TESTING:BOOL=OFF
   -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   "-DCMAKE_PREFIX_PATH:PATH=<INSTALL_DIR>^^${CMAKE_PREFIX_PATH}"

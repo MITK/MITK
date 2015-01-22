@@ -75,7 +75,7 @@ namespace mitk {
 
       itkSetMacro(Meshing, bool)
 
-//      itkGetMacro(Clusters, std::vector<vtkPoints*>)
+      virtual std::vector< mitk::UnstructuredGrid::Pointer> GetAllClusters();
 
       virtual void GenerateOutputInformation();
 

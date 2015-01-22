@@ -168,3 +168,47 @@ void mitk::UnstructuredGridClusteringFilter::ExpandCluster(int id, vtkIdList *po
     }
   }
 }
+
+std::vector<mitk::UnstructuredGrid::Pointer> mitk::UnstructuredGridClusteringFilter::GetAllClusters()
+{
+  std::vector< mitk::UnstructuredGrid::Pointer > mitkUGridVector;
+
+  for(int i=0; i<m_Clusters.size();i++)
+  {
+    vtkSmartPointer<vtkUnstructuredGrid> cluster = vtkSmartPointer<vtkUnstructuredGrid>::New();
+
+    vtkSmartPointer<vtkPoints> points = m_Clusters.at(i);
+
+    vtkSmartPointer<vtkPolyVertex> verts = vtkSmartPointer<vtkPolyVertex>::New();
+
+    verts->GetPointIds()->SetNumberOfIds(points->GetNumberOfPoints());
+    for(int i=0; i<points->GetNumberOfPoints(); i++)
+    {
+      verts->GetPointIds()->SetId(i,i);
+    }
+
+    cluster->Allocate(1);
+    cluster->InsertNextCell(verts->GetCellType(), verts->GetPointIds());
+    cluster->SetPoints(points);
+
+    mitk::UnstructuredGrid::Pointer mitkGrid = mitk::UnstructuredGrid::New();
+
+    if(m_Meshing)
+    {
+      vtkSmartPointer<vtkDelaunay3D> mesher = vtkSmartPointer<vtkDelaunay3D>::New();
+      mesher->SetInputData(cluster);
+      mesher->SetAlpha(0.9);
+      mesher->Update();
+
+      vtkSmartPointer<vtkUnstructuredGrid> output = mesher->GetOutput();
+      mitkGrid->SetVtkUnstructuredGrid(output);
+    }
+    else
+    {
+      mitkGrid->SetVtkUnstructuredGrid(cluster);
+    }
+
+    mitkUGridVector.push_back(mitkGrid);
+    return mitkUGridVector;
+  }
+}

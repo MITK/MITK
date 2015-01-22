@@ -70,16 +70,16 @@ void mitk::UnstructuredGridClusteringFilter::GenerateData()
     {
       visited[i] = true; //mark P as visited
       vtkSmartPointer<vtkIdList> idList = vtkSmartPointer<vtkIdList>::New(); //represent N
-      pLocator->FindPointsWithinRadius(m_eps, inpPoints->GetPoint(i), idList); //find neighbours
-      if(idList->GetNumberOfIds() < m_MinPts)
+      pLocator->FindPointsWithinRadius(m_eps, inpPoints->GetPoint(i), idList); //N = D.regionQuery(P, eps)
+      if(idList->GetNumberOfIds() < m_MinPts) //if sizeof(N) < MinPts
       {
-        isNoise[i] = true;//point is noise - maybe just skip it?
+        isNoise[i] = true; //mark P as NOISE
       }
       else
       {
-        vtkSmartPointer<vtkPoints> cluster = vtkSmartPointer<vtkPoints>::New();
-        clusterVector.push_back(cluster); //next Cluster
-        this->ExpandCluster(i,idList,cluster,inpPoints);
+        vtkSmartPointer<vtkPoints> cluster = vtkSmartPointer<vtkPoints>::New(); //represent a cluster
+        clusterVector.push_back(cluster); //C = next cluster
+        this->ExpandCluster(i,idList,cluster,inpPoints); //expandCluster(P, N, C, eps, MinPts) mod. the parameter list
       }
     }
   }
@@ -140,28 +140,28 @@ void mitk::UnstructuredGridClusteringFilter::GenerateData()
 
 void mitk::UnstructuredGridClusteringFilter::ExpandCluster(int id, vtkIdList *pointIDs, vtkPoints* cluster, vtkPoints* inpPoints)
 {
-  cluster->InsertNextPoint(inpPoints->GetPoint(id)); //add Point to Cluster
+  cluster->InsertNextPoint(inpPoints->GetPoint(id)); //add P to cluster C
   clusterMember[id] = true; //right?
 
-  vtkSmartPointer<vtkPoints> neighbours = vtkSmartPointer<vtkPoints>::New(); //same N as top
+  vtkSmartPointer<vtkPoints> neighbours = vtkSmartPointer<vtkPoints>::New(); //same N as in other function
   inpPoints->GetPoints(pointIDs,neighbours);
 
-  for(int i=0; i<pointIDs->GetNumberOfIds();i++)
+  for(int i=0; i<pointIDs->GetNumberOfIds();i++) //for each point P' in N
   {
     if(!visited[pointIDs->GetId(i)]) //if P' is not visited
     {
       visited[pointIDs->GetId(i)] = true; //mark P' as visited
       vtkSmartPointer<vtkIdList> idList = vtkSmartPointer<vtkIdList>::New(); //represent N'
-      pLocator->FindPointsWithinRadius(m_eps, inpPoints->GetPoint(pointIDs->GetId(i)), idList); //find neighbours
-      if(idList->GetNumberOfIds() >= m_MinPts)
+      pLocator->FindPointsWithinRadius(m_eps, inpPoints->GetPoint(pointIDs->GetId(i)), idList); //N' = D.regionQuery(P', eps)
+      if(idList->GetNumberOfIds() >= m_MinPts) //if sizeof(N') >= MinPts
       {
-        for(int j=0; j<idList->GetNumberOfIds();j++)//join every point in range to the points
+        for(int j=0; j<idList->GetNumberOfIds();j++) //N = N joined with N'
         {
           pointIDs->InsertNextId(idList->GetId(j));
         }
       }
     }
-    if(!clusterMember[pointIDs->GetId(i)]) //P' ist not yet member of any cluster
+    if(!clusterMember[pointIDs->GetId(i)]) //if P' is not yet member of any cluster
     {
       clusterMember[pointIDs->GetId(i)] = true;
       cluster->InsertNextPoint(inpPoints->GetPoint(pointIDs->GetId(i))); //add P' to cluster C

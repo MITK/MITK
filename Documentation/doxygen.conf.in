@@ -814,25 +814,20 @@ EXCLUDE                = @MITK_SOURCE_DIR@/BlueBerry/Documentation/reference/api
                          @MITK_SOURCE_DIR@/Utilities/IpFunc/ \
                          @MITK_SOURCE_DIR@/Utilities/IpSegmentation/ \
                          @MITK_SOURCE_DIR@/Utilities/KWStyle/ \
-                         @MITK_SOURCE_DIR@/Utilities/Poco/ \
                          @MITK_SOURCE_DIR@/Utilities/qtsingleapplication/ \
                          @MITK_SOURCE_DIR@/Applications/PluginGenerator/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/doc/snippets/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/doc/doxygen/standalone/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/test/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/examples/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/src/util/jsoncpp.cpp \
-                         @MITK_SOURCE_DIR@/Deprecated/ \
-                         @MITK_SOURCE_DIR@/Build/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/snippets/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/doxygen/standalone/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/test/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/examples/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/src/util/jsoncpp.cpp \
                          @MITK_SOURCE_DIR@/CMake/PackageDepends \
-                         @MITK_SOURCE_DIR@/CMake/QBundleTemplate \
                          @MITK_SOURCE_DIR@/CMakeExternals \
-                         @MITK_SOURCE_DIR@/Modules/QmitkExt/vtkQtChartHeaders/ \
                          @MITK_BINARY_DIR@/Documentation/Doxygen \
                          @MITK_BINARY_DIR@/bin/ \
                          @MITK_BINARY_DIR@/PT/ \
                          @MITK_BINARY_DIR@/GP/ \
-                         @MITK_BINARY_DIR@/Core/CppMicroServices/ \
+                         @MITK_BINARY_DIR@/Modules/CppMicroServices/ \
                          @MITK_BINARY_DIR@/_CPack_Packages/ \
                          @MITK_DOXYGEN_ADDITIONAL_EXCLUDE_DIRS@
 
@@ -888,9 +883,9 @@ EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/ \
                          @MITK_SOURCE_DIR@/Examples/Tutorial/ \
                          @MITK_SOURCE_DIR@/Examples/Plugins/ \
                          @MITK_SOURCE_DIR@/Examples/QtFreeRender/ \
-                         @MITK_SOURCE_DIR@/Core/Code/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/doc/snippets/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/examples/ \
+                         @MITK_SOURCE_DIR@/Modules/Core/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/snippets/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/examples/ \
                          @MITK_DOXYGEN_OUTPUT_DIR@/html/extension-points/html/ \
                          @MITK_SOURCE_DIR@/Modules/OpenCL/Documentation/doxygen/snippets/ \
                          @MITK_SOURCE_DIR@/Modules/IGT/Tutorial/

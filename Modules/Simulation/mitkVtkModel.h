@@ -17,10 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkVtkModel_h
 #define mitkVtkModel_h
 
+#include <mitkDataNode.h>
 #include <mitkPoint.h>
+#include <mitkSurface.h>
 #include <mitkVector.h>
 #include <sofa/component/visualmodel/VisualModelImpl.h>
 #include <sofa/helper/system/gl.h>
+#include <vtkCellArray.h>
+#include <vtkFloatArray.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <MitkSimulationExports.h>
 
@@ -32,12 +38,23 @@ namespace mitk
   class MitkSimulation_EXPORT VtkModel : public sofa::component::visualmodel::VisualModelImpl
   {
   public:
+    enum Mode
+    {
+      OpenGL,
+      Surface
+    };
+
     SOFA_CLASS(VtkModel, sofa::component::visualmodel::VisualModelImpl);
 
     void internalDraw(const sofa::core::visual::VisualParams* vparams, bool transparent);
     bool loadTextures();
     void SetVtkRenderer(vtkRenderer* renderer);
     void updateBuffers();
+
+    DataNode::Pointer GetDataNode() const;
+
+    Mode GetMode() const;
+    void SetMode(Mode mode);
 
   private:
     VtkModel();
@@ -66,6 +83,14 @@ namespace mitk
     GLuint m_IndexBuffer;
     std::map<unsigned int, vtkSmartPointer<vtkOpenGLTexture> > m_Textures;
     vtkRenderer* m_VtkRenderer;
+    Mode m_Mode;
+    vtkSmartPointer<vtkPoints> m_Points;
+    vtkSmartPointer<vtkCellArray> m_Polys;
+    vtkSmartPointer<vtkFloatArray> m_Normals;
+    vtkSmartPointer<vtkFloatArray> m_TexCoords;
+    vtkSmartPointer<vtkPolyData> m_PolyData;
+    Surface::Pointer m_Surface;
+    DataNode::Pointer m_DataNode;
   };
 }
 

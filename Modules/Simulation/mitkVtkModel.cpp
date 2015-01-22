@@ -18,9 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLogMacros.h>
 #include <mitkRenderingManager.h>
 #include <sofa/core/visual/VisualParams.h>
+#include <vtkCellArray.h>
+#include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
 #include <vtkOpenGLTexture.h>
 
 static bool InitGLEW()
@@ -58,13 +62,14 @@ mitk::VtkModel::VtkModel()
     m_LastNumberOfQuads(0),
     m_VertexBuffer(0),
     m_IndexBuffer(0),
-    m_VtkRenderer(NULL)
+    m_VtkRenderer(NULL),
+    m_Mode(OpenGL)
 {
 }
 
 mitk::VtkModel::~VtkModel()
 {
-  if (m_BuffersWereCreated)
+  if (m_Mode == OpenGL && m_BuffersWereCreated)
   {
     glDeleteBuffers(1, &m_IndexBuffer);
     glDeleteBuffers(1, &m_VertexBuffer);
@@ -73,13 +78,31 @@ mitk::VtkModel::~VtkModel()
 
 void mitk::VtkModel::CreateIndexBuffer()
 {
-  glGenBuffers(1, &m_IndexBuffer);
+  if (m_Mode == OpenGL)
+  {
+    glGenBuffers(1, &m_IndexBuffer);
+  }
+  else if (m_Mode == Surface)
+  {
+    m_Polys = vtkSmartPointer<vtkCellArray>::New();
+  }
+
   this->InitIndexBuffer();
 }
 
 void mitk::VtkModel::CreateVertexBuffer()
 {
-  glGenBuffers(1, &m_VertexBuffer);
+  if (m_Mode == OpenGL)
+  {
+    glGenBuffers(1, &m_VertexBuffer);
+  }
+  else if (m_Mode == Surface)
+  {
+    m_Points = vtkSmartPointer<vtkPoints>::New();
+    m_Normals = vtkSmartPointer<vtkFloatArray>::New();
+    m_TexCoords = vtkSmartPointer<vtkFloatArray>::New();
+  }
+
   this->InitVertexBuffer();
 }
 
@@ -89,66 +112,77 @@ void mitk::VtkModel::DrawGroup(int group, bool)
   using sofa::defaulttype::ResizableExtVector;
   using sofa::defaulttype::Vec4f;
 
-  const VecCoord& vertices = this->getVertices();
-  const ResizableExtVector<Deriv>& normals = this->getVnormals();
-  const ResizableExtVector<Triangle>& triangles = this->getTriangles();
-  const ResizableExtVector<Quad>& quads = this->getQuads();
-
-  FaceGroup faceGroup;
-
-  if (group == -1)
+  if (m_Mode == OpenGL)
   {
-    faceGroup.nbt = triangles.size();
-    faceGroup.nbq = quads.size();
+    const VecCoord& vertices = this->getVertices();
+    const ResizableExtVector<Deriv>& normals = this->getVnormals();
+    const ResizableExtVector<Triangle>& triangles = this->getTriangles();
+    const ResizableExtVector<Quad>& quads = this->getQuads();
+
+    FaceGroup faceGroup;
+
+    if (group == -1)
+    {
+      faceGroup.nbt = triangles.size();
+      faceGroup.nbq = quads.size();
+    }
+    else
+    {
+      faceGroup = groups.getValue()[group];
+    }
+
+    Material material = faceGroup.materialId != -1
+      ? materials.getValue()[faceGroup.materialId]
+      : this->material.getValue();
+
+    if (material.useTexture && material.activated)
+    {
+      m_Textures[faceGroup.materialId]->Load(m_VtkRenderer);
+
+      glEnable(GL_TEXTURE_2D);
+      glTexCoordPointer(2, GL_FLOAT, 0, reinterpret_cast<const GLvoid*>(vertices.size() * sizeof(VecCoord::value_type) + normals.size() * sizeof(Deriv)));
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
+
+    Vec4f ambient = material.useAmbient ? material.ambient : Vec4f();
+    Vec4f diffuse = material.useDiffuse ? material.diffuse : Vec4f();
+    Vec4f specular = material.useSpecular ? material.specular : Vec4f();
+    Vec4f emissive = material.useEmissive ? material.emissive : Vec4f();
+    float shininess = material.useShininess ? std::min(material.shininess, 128.0f) : 45.0f;
+
+    if (shininess == 0.0f)
+    {
+      specular.clear();
+      shininess = 1.0f;
+    }
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient.ptr());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse.ptr());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular.ptr());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emissive.ptr());
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+
+    if (faceGroup.nbt != 0)
+      glDrawElements(GL_TRIANGLES, faceGroup.nbt * 3, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(faceGroup.tri0 * sizeof(Triangle)));
+
+    if (faceGroup.nbq != 0)
+      glDrawElements(GL_QUADS, faceGroup.nbq * 4, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(triangles.size() * sizeof(Triangle) + faceGroup.quad0 * sizeof(Quad)));
+
+    if (material.useTexture && material.activated)
+    {
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      glDisable(GL_TEXTURE_2D);
+
+      m_Textures[faceGroup.materialId]->PostRender(m_VtkRenderer);
+    }
   }
-  else
+  else if (m_Mode == Surface)
   {
-    faceGroup = groups.getValue()[group];
-  }
-
-  Material material = faceGroup.materialId != -1
-    ? materials.getValue()[faceGroup.materialId]
-    : this->material.getValue();
-
-  if (material.useTexture && material.activated)
-  {
-    m_Textures[faceGroup.materialId]->Load(m_VtkRenderer);
-
-    glEnable(GL_TEXTURE_2D);
-    glTexCoordPointer(2, GL_FLOAT, 0, reinterpret_cast<const GLvoid*>(vertices.size() * sizeof(VecCoord::value_type) + normals.size() * sizeof(Deriv)));
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  }
-
-  Vec4f ambient = material.useAmbient ? material.ambient : Vec4f();
-  Vec4f diffuse = material.useDiffuse ? material.diffuse : Vec4f();
-  Vec4f specular = material.useSpecular ? material.specular : Vec4f();
-  Vec4f emissive = material.useEmissive ? material.emissive : Vec4f();
-  float shininess = material.useShininess ? std::min(material.shininess, 128.0f) : 45.0f;
-
-  if (shininess == 0.0f)
-  {
-    specular.clear();
-    shininess = 1.0f;
-  }
-
-  glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient.ptr());
-  glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse.ptr());
-  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular.ptr());
-  glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emissive.ptr());
-  glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
-
-  if (faceGroup.nbt != 0)
-    glDrawElements(GL_TRIANGLES, faceGroup.nbt * 3, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(faceGroup.tri0 * sizeof(Triangle)));
-
-  if (faceGroup.nbq != 0)
-    glDrawElements(GL_QUADS, faceGroup.nbq * 4, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(triangles.size() * sizeof(Triangle) + faceGroup.quad0 * sizeof(Quad)));
-
-  if (material.useTexture && material.activated)
-  {
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisable(GL_TEXTURE_2D);
-
-    m_Textures[faceGroup.materialId]->PostRender(m_VtkRenderer);
+    m_PolyData->SetPoints(m_Points);
+    m_PolyData->SetPolys(m_Polys);
+    m_PolyData->GetPointData()->SetNormals(m_Normals);
+    m_PolyData->GetPointData()->SetTCoords(m_TexCoords);
+    m_PolyData->Modified();
   }
 }
 
@@ -180,8 +214,15 @@ void mitk::VtkModel::InitIndexBuffer()
   const ResizableExtVector<Triangle>& triangles = this->getTriangles();
   const ResizableExtVector<Quad>& quads = this->getQuads();
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangles.size() * sizeof(Triangle) + quads.size() * sizeof(Quad), NULL, GL_DYNAMIC_DRAW);
+  if (m_Mode == OpenGL)
+  {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangles.size() * sizeof(Triangle) + quads.size() * sizeof(Quad), NULL, GL_DYNAMIC_DRAW);
+  }
+  else if (m_Mode == Surface)
+  {
+    m_Polys->Initialize();
+  }
 
   this->UpdateIndexBuffer();
 }
@@ -194,12 +235,21 @@ void mitk::VtkModel::InitVertexBuffer()
   const ResizableExtVector<Deriv> normals = this->getVnormals();
   const VecTexCoord& texCoords = this->getVtexcoords();
 
-  GLsizeiptr sizeOfVertices = vertices.size() * sizeof(VecCoord::value_type);
-  GLsizeiptr sizeOfNormals = normals.size() * sizeof(Deriv);
-  GLsizeiptr sizeOfTexCoords = texCoords.size() * sizeof(VecTexCoord::value_type);
+  if (m_Mode == OpenGL)
+  {
+    glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(VecCoord::value_type) + normals.size() * sizeof(Deriv) + texCoords.size() * sizeof(VecTexCoord::value_type), NULL, GL_DYNAMIC_DRAW);
+  }
+  else if (m_Mode == Surface)
+  {
+    m_Points->SetNumberOfPoints(vertices.size());
 
-  glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeOfVertices + sizeOfNormals + sizeOfTexCoords, NULL, GL_DYNAMIC_DRAW);
+    m_Normals->SetNumberOfComponents(3);
+    m_Normals->SetNumberOfTuples(normals.size());
+
+    m_TexCoords->SetNumberOfComponents(2);
+    m_TexCoords->SetNumberOfTuples(texCoords.size());
+  }
 
   this->UpdateVertexBuffer();
 }
@@ -209,7 +259,7 @@ void mitk::VtkModel::internalDraw(const sofa::core::visual::VisualParams* vparam
   using sofa::core::visual::DisplayFlags;
   using sofa::defaulttype::ResizableExtVector;
 
-  if (!m_GlewIsInitialized)
+  if (m_Mode == OpenGL && !m_GlewIsInitialized)
   {
     // Try lazy initialization since initialization potentially failed so far
     // due to missing render windows (see InitGLEW()).
@@ -233,31 +283,37 @@ void mitk::VtkModel::internalDraw(const sofa::core::visual::VisualParams* vparam
   if (m_BuffersWereCreated == false)
     return;
 
-  glEnable(GL_LIGHTING);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glPolygonMode(GL_FRONT_AND_BACK, displayFlags.getShowWireFrame() ? GL_LINE : GL_FILL);
+  if (m_Mode == OpenGL)
+  {
+    glEnable(GL_LIGHTING);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glPolygonMode(GL_FRONT_AND_BACK, displayFlags.getShowWireFrame() ? GL_LINE : GL_FILL);
 
-  const VecCoord& vertices = this->getVertices();
+    const VecCoord& vertices = this->getVertices();
 
-  glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
 
-  this->ValidateBoundBuffers();
+    this->ValidateBoundBuffers();
 
-  glVertexPointer(3, GL_FLOAT, 0, NULL);
-  glNormalPointer(GL_FLOAT, 0, reinterpret_cast<const GLvoid*>(vertices.size() * sizeof(VecCoord::value_type)));
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, NULL);
+    glNormalPointer(GL_FLOAT, 0, reinterpret_cast<const GLvoid*>(vertices.size() * sizeof(VecCoord::value_type)));
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+  }
 
   this->DrawGroups(transparent);
 
-  glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
+  if (m_Mode == OpenGL)
+  {
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 
-  if (displayFlags.getShowWireFrame())
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if (displayFlags.getShowWireFrame())
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-  glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHTING);
+  }
 
   if (displayFlags.getShowNormals())
     this->DrawNormals();
@@ -267,21 +323,24 @@ void mitk::VtkModel::DrawNormals()
 {
   using sofa::defaulttype::ResizableExtVector;
 
-  const VecCoord& vertices = this->getVertices();
-  const ResizableExtVector<Deriv>& normals = this->getVnormals();
-  size_t numVertices = vertices.size();
-  Coord normal;
-
-  glBegin(GL_LINES);
-
-  for (size_t i = 0; i < numVertices; ++i)
+  if (m_Mode == OpenGL)
   {
-    glVertex3fv(vertices[i].ptr());
-    normal = vertices[i] + normals[i];
-    glVertex3fv(normal.ptr());
-  }
+    const VecCoord& vertices = this->getVertices();
+    const ResizableExtVector<Deriv>& normals = this->getVnormals();
+    size_t numVertices = vertices.size();
+    Coord normal;
 
-  glEnd();
+    glBegin(GL_LINES);
+
+    for (size_t i = 0; i < numVertices; ++i)
+    {
+      glVertex3fv(vertices[i].ptr());
+      normal = vertices[i] + normals[i];
+      glVertex3fv(normal.ptr());
+    }
+
+    glEnd();
+  }
 }
 
 bool mitk::VtkModel::loadTextures()
@@ -341,6 +400,58 @@ bool mitk::VtkModel::loadTextures()
   return retValue;
 }
 
+mitk::DataNode::Pointer mitk::VtkModel::GetDataNode() const
+{
+  return m_DataNode;
+}
+
+mitk::VtkModel::Mode mitk::VtkModel::GetMode() const
+{
+  return m_Mode;
+}
+
+void mitk::VtkModel::SetMode(Mode mode)
+{
+  if (m_Mode == mode)
+    return;
+
+  if (mode == OpenGL)
+  {
+    m_DataNode = NULL;
+    m_Surface = NULL;
+    m_PolyData = NULL;
+    m_TexCoords = NULL;
+    m_Normals = NULL;
+    m_Polys = NULL;
+    m_Points = NULL;
+  }
+  else if (mode == Surface)
+  {
+    if (m_Mode == OpenGL && m_BuffersWereCreated)
+    {
+      glDeleteBuffers(1, &m_IndexBuffer);
+      m_IndexBuffer = 0;
+
+      glDeleteBuffers(1, &m_VertexBuffer);
+      m_VertexBuffer = 0;
+    }
+
+    m_PolyData = vtkSmartPointer<vtkPolyData>::New();
+
+    m_Surface = Surface::New();
+    m_Surface->SetVtkPolyData(m_PolyData);
+
+    m_DataNode = DataNode::New();
+    m_DataNode->SetName(name.getValue());
+    m_DataNode->SetData(m_Surface);
+  }
+
+  m_Mode = mode;
+
+  m_BuffersWereCreated = false;
+  this->updateBuffers();
+}
+
 void mitk::VtkModel::SetVtkRenderer(vtkRenderer* renderer)
 {
   m_VtkRenderer = renderer;
@@ -350,7 +461,7 @@ void mitk::VtkModel::updateBuffers()
 {
   using sofa::defaulttype::ResizableExtVector;
 
-  if (!m_GlewIsInitialized)
+  if (m_Mode == OpenGL && !m_GlewIsInitialized)
     return;
 
   const VecCoord& vertices = this->getVertices();
@@ -392,9 +503,47 @@ void mitk::VtkModel::UpdateIndexBuffer()
   GLsizeiptr sizeOfTriangleIndices = triangles.size() * sizeof(Triangle);
   GLsizeiptr sizeOfQuadIndices = quads.size() * sizeof(Quad);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
-  glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeOfTriangleIndices, triangles.getData());
-  glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeOfTriangleIndices, sizeOfQuadIndices, quads.getData());
+  if (m_Mode == OpenGL)
+  {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeOfTriangleIndices, triangles.getData());
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeOfTriangleIndices, sizeOfQuadIndices, quads.getData());
+  }
+  else if (m_Mode == Surface)
+  {
+    m_Polys->Initialize();
+
+    if (!triangles.empty())
+    {
+      ResizableExtVector<Triangle>::const_iterator trianglesEnd = triangles.end();
+
+      for (ResizableExtVector<Triangle>::const_iterator it = triangles.begin(); it != trianglesEnd; ++it)
+      {
+        const Triangle& triangle = *it;
+
+        m_Polys->InsertNextCell(3);
+        m_Polys->InsertCellPoint(triangle[0]);
+        m_Polys->InsertCellPoint(triangle[1]);
+        m_Polys->InsertCellPoint(triangle[2]);
+      }
+    }
+
+    if (!quads.empty())
+    {
+      ResizableExtVector<Quad>::const_iterator quadsEnd = quads.end();
+
+      for (ResizableExtVector<Quad>::const_iterator it = quads.begin(); it != quadsEnd; ++it)
+      {
+        const Quad& quad = *it;
+
+        m_Polys->InsertNextCell(4);
+        m_Polys->InsertCellPoint(quad[0]);
+        m_Polys->InsertCellPoint(quad[1]);
+        m_Polys->InsertCellPoint(quad[2]);
+        m_Polys->InsertCellPoint(quad[3]);
+      }
+    }
+  }
 }
 
 void mitk::VtkModel::UpdateVertexBuffer()
@@ -405,22 +554,51 @@ void mitk::VtkModel::UpdateVertexBuffer()
   const ResizableExtVector<Deriv> normals = this->getVnormals();
   const VecTexCoord& texCoords = this->getVtexcoords();
 
-  GLsizeiptr sizeOfVertices = vertices.size() * sizeof(VecCoord::value_type);
-  GLsizeiptr sizeOfNormals = normals.size() * sizeof(Deriv);
-
-  glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeOfVertices, vertices.getData());
-  glBufferSubData(GL_ARRAY_BUFFER, sizeOfVertices, sizeOfNormals, normals.getData());
-
-  if (!m_Textures.empty())
+  if (m_Mode == OpenGL)
   {
-    GLsizeiptr sizeOfTexCoords = texCoords.size() * sizeof(VecTexCoord::value_type);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeOfVertices + sizeOfNormals, sizeOfTexCoords, texCoords.getData());
+    GLsizeiptr sizeOfVertices = vertices.size() * sizeof(VecCoord::value_type);
+    GLsizeiptr sizeOfNormals = normals.size() * sizeof(Deriv);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeOfVertices, vertices.getData());
+    glBufferSubData(GL_ARRAY_BUFFER, sizeOfVertices, sizeOfNormals, normals.getData());
+
+    if (!m_Textures.empty())
+    {
+      GLsizeiptr sizeOfTexCoords = texCoords.size() * sizeof(VecTexCoord::value_type);
+      glBufferSubData(GL_ARRAY_BUFFER, sizeOfVertices + sizeOfNormals, sizeOfTexCoords, texCoords.getData());
+    }
+  }
+  else if (m_Mode == Surface)
+  {
+    size_t numPoints = vertices.size();
+
+    for (size_t i = 0; i < numPoints; ++i)
+      m_Points->SetPoint(i, vertices[i].elems);
+
+    if (!normals.empty())
+    {
+      size_t numNormals = normals.size();
+
+      for (size_t i = 0; i < numNormals; ++i)
+        m_Normals->SetTuple(i, normals[i].elems);
+    }
+
+    if (!texCoords.empty())
+    {
+      size_t numTexCoords = texCoords.size();
+
+      for (size_t i = 0; i < numTexCoords; ++i)
+        m_TexCoords->SetTuple(i, normals[i].elems);
+    }
   }
 }
 
 void mitk::VtkModel::ValidateBoundBuffers()
 {
+  if (m_Mode != OpenGL)
+    return;
+
   GLint indexBufferSize;
   glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &indexBufferSize);
 

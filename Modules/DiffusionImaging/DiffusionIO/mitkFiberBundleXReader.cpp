@@ -96,7 +96,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleXReader::Read()
             for (int i=0; i<weights->GetSize(); i++)
                 if (!mitk::Equal(weights->GetValue(i),weight,0.00001))
                 {
-                    MITK_INFO << "Weight: " << weights->GetValue(i);
+                    MITK_INFO << this->GetInputLocation() << ": " << weights->GetValue(i);
                     weight = weights->GetValue(i);
                 }
             fiberBundle->SetFiberWeights(weights);

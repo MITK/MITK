@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>349</width>
+    <width>379</width>
     <height>980</height>
    </rect>
   </property>
@@ -358,6 +358,9 @@
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item row="4" column="2">
@@ -406,6 +409,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="maximum">
+         <number>999999999</number>
+        </property>
        </widget>
       </item>
       <item row="4" column="1">
@@ -418,6 +424,9 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="maximum">
+         <number>999999999</number>
         </property>
        </widget>
       </item>

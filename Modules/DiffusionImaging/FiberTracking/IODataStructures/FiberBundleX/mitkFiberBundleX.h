@@ -81,6 +81,8 @@ public:
     void ResampleSpline(float pointDistance=1);
     void ResampleSpline(float pointDistance, double tension, double continuity, double bias );
 
+    void Noisify(float dist=1);
+
     bool RemoveShortFibers(float lengthInMM);
     bool RemoveLongFibers(float lengthInMM);
     bool ApplyCurvatureThreshold(float minRadius, bool deleteFibers);
@@ -167,7 +169,6 @@ private:
     float   m_MeanFiberLength;
     float   m_MedianFiberLength;
     float   m_LengthStDev;
-    int     m_FiberSampling;
     itk::TimeStamp m_UpdateTime2D;
     itk::TimeStamp m_UpdateTime3D;
     mitk::BaseGeometry::Pointer m_ReferenceGeometry;

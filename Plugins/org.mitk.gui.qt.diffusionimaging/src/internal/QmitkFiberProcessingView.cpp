@@ -163,7 +163,6 @@ void QmitkFiberProcessingView::WeightFibers()
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
         fib->SetFiberWeights(weight);
     }
-
 }
 
 void QmitkFiberProcessingView::Remove()
@@ -342,7 +341,7 @@ void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
 
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
         mitk::CastToItkImage(mitkMask, mask);
-        mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, onlyEnds, invert);
+        mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, !onlyEnds, invert);
         if (newFib->GetNumFibers()<=0)
         {
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
@@ -1116,8 +1115,8 @@ void QmitkFiberProcessingView::ExtractWithPlanarFigure()
         node = mitk::DataNode::New();
         node->SetData(extFB);
         QString name(fiberBundles.at(i)->GetName().c_str());
-        name += "_";
-        name += planarFigure->GetName().c_str();
+        name += "*";
+        //name += planarFigure->GetName().c_str();
         node->SetName(name.toStdString());
         fiberBundles.at(i)->SetVisibility(false);
         GetDataStorage()->Add(node);

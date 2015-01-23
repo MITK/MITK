@@ -613,6 +613,7 @@ void QmitkPreprocessingView::DoResampleImage()
         QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
 
         imageNode->SetName((name+"_resampled_"+outAdd).toStdString().c_str());
+        imageNode->SetVisibility(false);
         GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
     }
     else if (m_SelectedImage.IsNotNull())
@@ -1568,7 +1569,6 @@ void QmitkPreprocessingView::DoShowGradientDirections()
         {
             mitk::Point3D ip;
             vnl_vector_fixed< double, 3 > v = gradientContainer->at(it->second[j]);
-            MITK_INFO << v;
             if (v.magnitude()>mitk::eps)
             {
                 ip[0] = v[0]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[0]-0.5*geometry->GetSpacing()[0] + geometry->GetSpacing()[0]*m_SelectedImage->GetDimension(0)/2;

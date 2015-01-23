@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ClusteredPlaneSuggestionFilter::ClusteredPlaneSuggestionFilter(): m_Meshing(false), m_MinPts(4), m_Eps(1.2)
 {
-  this->m_UnstructGrid = mitk::UnstructuredGrid::New();
+  this->m_MainCluster = mitk::UnstructuredGrid::New();
   this->m_GeoData = mitk::GeometryData::New();
 }
 
@@ -45,8 +45,10 @@ void mitk::ClusteredPlaneSuggestionFilter::GenerateData()
   clusterFilter->Seteps(1.2);
   clusterFilter->Update();
 
+  m_Clusters = clusterFilter->GetAllClusters();
+
   vtkSmartPointer< vtkUnstructuredGrid > vtkGrid = clusterFilter->GetOutput()->GetVtkUnstructuredGrid();
-  m_UnstructGrid->SetVtkUnstructuredGrid(vtkGrid);
+  m_MainCluster->SetVtkUnstructuredGrid(vtkGrid);
 
   //Generate a pointset from UnstructuredGrid for the PlaneFitFilter:
   mitk::PointSet::Pointer pointset = mitk::PointSet::New();
@@ -74,7 +76,7 @@ void mitk::ClusteredPlaneSuggestionFilter::GenerateOutputInformation()
 {
   mitk::UnstructuredGrid::ConstPointer inputImage = this->GetInput();
 
-  m_UnstructGrid = this->GetOutput();
+  m_MainCluster = this->GetOutput();
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 

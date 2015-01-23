@@ -44,6 +44,7 @@ namespace mitk {
       itkCloneMacro(Self)
 
       itkGetMacro(GeoData, mitk::GeometryData::Pointer)
+      itkGetMacro(Clusters, std::vector< mitk::UnstructuredGrid::Pointer >)
       itkGetMacro(Meshing, bool)
       itkGetMacro(MinPts, int)
       itkGetMacro(Eps, double)
@@ -68,7 +69,9 @@ namespace mitk {
 
       mitk::GeometryData::Pointer m_GeoData;
 
-      mitk::UnstructuredGrid::Pointer m_UnstructGrid;
+      std::vector< mitk::UnstructuredGrid::Pointer > m_Clusters;
+
+      mitk::UnstructuredGrid::Pointer m_MainCluster;
 
       bool m_Meshing;
 

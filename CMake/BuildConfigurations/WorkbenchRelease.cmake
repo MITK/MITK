@@ -1,4 +1,4 @@
-include(${CMAKE_CURRENT_LIST_DIR}/mitkBuildConfigurationDefault.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/Default.cmake)
 
 set(MITK_VTK_DEBUG_LEAKS OFF CACHE BOOL "Enable VTK Debug Leaks" FORCE)
 

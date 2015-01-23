@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
+#include "mitkPlanarLine.h"
 #include "mitkProperties.h"
 #include "mitkGL.h"
 
@@ -150,10 +151,16 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   }
 
   // draw name near the anchor point (point located on the right)
-  const std::string name = node->GetName();
-  if ( m_DrawName && !name.empty() )
+  std::string label = node->GetName();
+
+  std::string annotation = planarFigure->EvaluateAnnotation();
+  if (!annotation.empty()) {
+    label = annotation;
+  }
+  
+  if ( m_DrawName && !label.empty() )
   {
-    RenderAnnotations(renderer, name, anchorPoint, globalOpacity, lineDisplayMode, annotationOffset);
+    RenderAnnotations(renderer, label, anchorPoint, globalOpacity, lineDisplayMode, annotationOffset);
   }
 
   // draw feature quantities (if requested) next to the anchor point,

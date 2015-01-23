@@ -428,6 +428,12 @@ void mitk::PlanarFigure::SetFeatureVisible( unsigned int index, bool visible )
 }
 
 
+std::string mitk::PlanarFigure::EvaluateAnnotation()
+{
+  return "";
+}
+
+
 void mitk::PlanarFigure::EvaluateFeatures()
 {
   if ( !m_FeaturesUpToDate || !m_PolyLineUpToDate )

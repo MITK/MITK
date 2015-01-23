@@ -52,6 +52,23 @@ static mitk::SimulationInteractor::Pointer CreateSimulationInteractor()
   return interactor;
 }
 
+class Equals
+{
+public:
+  explicit Equals(mitk::DataNode::Pointer dataNode)
+    : m_DataNode(dataNode)
+  {
+  }
+
+  bool operator()(const mitk::DataStorage::SetOfObjects::value_type& object)
+  {
+    return object == m_DataNode;
+  }
+
+private:
+  mitk::DataNode::Pointer m_DataNode;
+};
+
 QmitkSimulationView::QmitkSimulationView()
   : m_SimulationService(GetService<mitk::ISimulationService>()),
     m_Interactor(CreateSimulationInteractor()),
@@ -77,8 +94,11 @@ void QmitkSimulationView::CreateQtPartControl(QWidget* parent)
   m_Ui.simulationComboBox->SetDataStorage(this->GetDataStorage());
   m_Ui.simulationComboBox->SetPredicate(mitk::NodePredicateDataType::New("Simulation"));
 
+  QAction* vtkModelModeAction = new QAction(/*QIcon(":/Qmitk/Surface_48.png"),*/ "Render to Surface", m_VtkModelContextMenu);
+  vtkModelModeAction->setCheckable(true);
+
   m_VtkModelContextMenu = new QMenu(m_Ui.sceneTreeWidget);
-  m_VtkModelContextMenu->addAction(QIcon(":/Qmitk/Surface_48.png"), "Map to Surface");
+  m_VtkModelContextMenu->addAction(vtkModelModeAction);
 
   connect(m_Ui.simulationComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnSelectedSimulationChanged(const mitk::DataNode*)));
   connect(m_Ui.animateButton, SIGNAL(toggled(bool)), this, SLOT(OnAnimateButtonToggled(bool)));
@@ -134,6 +154,8 @@ void QmitkSimulationView::OnAnimateButtonToggled(bool toggled)
 
 void QmitkSimulationView::OnBaseContextMenuRequested(const QPoint& point)
 {
+  typedef mitk::DataStorage::SetOfObjects SetOfObjects;
+
   QTreeWidgetItem* item = m_Ui.sceneTreeWidget->itemAt(point);
 
   if (item == NULL)
@@ -154,11 +176,28 @@ void QmitkSimulationView::OnBaseContextMenuRequested(const QPoint& point)
   if (action == NULL)
     return;
 
-  if (action->text() == "Map to Surface")
+  if (action->text() == "Render to Surface")
   {
-    vtkModel->SetMode(mitk::VtkModel::Surface);
-    this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
-    this->GetDataStorage()->Add(vtkModel->GetDataNode(), m_Selection);
+    mitk::DataStorage::Pointer dataStorage = this->GetDataStorage();
+    SetOfObjects::ConstPointer objects = dataStorage->GetSubset(NULL);
+
+    if (action->isChecked())
+    {
+      vtkModel->SetMode(mitk::VtkModel::Surface);
+      mitk::DataNode::Pointer dataNode = vtkModel->GetDataNode();
+
+      if (std::find_if(objects->begin(), objects->end(), Equals(dataNode)) == objects->end())
+        dataStorage->Add(dataNode, m_Selection);
+    }
+    else
+    {
+      mitk::DataNode::Pointer dataNode = vtkModel->GetDataNode();
+
+      if (std::find_if(objects->begin(), objects->end(), Equals(dataNode)) != objects->end())
+        dataStorage->Remove(dataNode);
+
+      vtkModel->SetMode(mitk::VtkModel::OpenGL);
+    }
   }
 }
 

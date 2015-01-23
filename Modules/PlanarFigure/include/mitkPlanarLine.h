@@ -74,6 +74,9 @@ protected:
   /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
   virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
 
+  /** \evaluate annotation based on evaluating features. */
+  virtual std::string EvaluateAnnotation();
+
   /** \brief Calculates feature quantities of the planar figure. */
   virtual void EvaluateFeaturesInternal() override;
 

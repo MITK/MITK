@@ -36,7 +36,7 @@ mitk::vtkSimulationPolyDataMapper3D::~vtkSimulationPolyDataMapper3D()
 {
 }
 
-void mitk::vtkSimulationPolyDataMapper3D::Render(vtkRenderer* renderer, vtkActor* actor)
+void mitk::vtkSimulationPolyDataMapper3D::Render(vtkRenderer* renderer, vtkActor*)
 {
   vtkRenderWindow* renderWindow = renderer->GetRenderWindow();
 

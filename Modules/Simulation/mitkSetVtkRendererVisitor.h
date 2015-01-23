@@ -30,6 +30,7 @@ namespace mitk
     explicit SetVtkRendererVisitor(vtkRenderer* renderer, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
     ~SetVtkRendererVisitor();
 
+    using sofa::simulation::Visitor::processNodeTopDown;
     Result processNodeTopDown(sofa::simulation::Node* node);
 
   private:

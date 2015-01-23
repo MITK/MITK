@@ -38,6 +38,12 @@ void mitk::ClusteredPlaneSuggestionFilter::GenerateData()
 {
   mitk::UnstructuredGrid::Pointer inpGrid = const_cast<mitk::UnstructuredGrid*>(this->GetInput());
 
+  if(inpGrid.IsNull())
+  {
+    MITK_ERROR << "Input or cast to UnstructuredGrid is null";
+    return;
+  }
+
   mitk::UnstructuredGridClusteringFilter::Pointer clusterFilter = mitk::UnstructuredGridClusteringFilter::New();
   clusterFilter->SetInput(inpGrid);
   clusterFilter->SetMeshing(false);
@@ -45,10 +51,16 @@ void mitk::ClusteredPlaneSuggestionFilter::GenerateData()
   clusterFilter->Seteps(1.2);
   clusterFilter->Update();
 
-  m_Clusters = clusterFilter->GetAllClusters();
-
   vtkSmartPointer< vtkUnstructuredGrid > vtkGrid = clusterFilter->GetOutput()->GetVtkUnstructuredGrid();
+
+  if(!vtkGrid)
+  {
+    MITK_ERROR << "vtkUnstructuredGrid output from clustering is null";
+    return;
+  }
+
   m_MainCluster->SetVtkUnstructuredGrid(vtkGrid);
+  m_Clusters = clusterFilter->GetAllClusters();
 
   //Generate a pointset from UnstructuredGrid for the PlaneFitFilter:
   mitk::PointSet::Pointer pointset = mitk::PointSet::New();
@@ -68,6 +80,12 @@ void mitk::ClusteredPlaneSuggestionFilter::GenerateData()
   planeFilter->Update();
 
   m_GeoData = planeFilter->GetOutput();
+
+  if(m_GeoData.IsNull())
+  {
+    MITK_ERROR << "GeometryData output from PlaneFit filter is null";
+    return;
+  }
 
 //  mitk::PlaneGeometry* planeGeometry = dynamic_cast<mitk::PlaneGeometry*>( planeFilter->GetOutput()->GetGeometry());
 }

@@ -48,7 +48,7 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    void ApplyColorAndOpacityProperties(vtkActor*, BaseRenderer*);
+    void ApplyColorAndOpacityProperties(BaseRenderer*, vtkActor*);
     void ApplySimulationProperties(BaseRenderer* renderer);
     vtkProp* GetVtkProp(BaseRenderer* renderer);
 

@@ -44,11 +44,19 @@ void mitk::vtkSimulationPolyDataMapper2D::Render(vtkRenderer* renderer, vtkActor
   typedef PlaneIntersectionVisitor::Edge Edge;
   typedef PlaneIntersectionVisitor::Intersection Intersection;
 
-  if (renderer->GetRenderWindow()->CheckAbortStatus())
+  vtkRenderWindow* renderWindow = renderer->GetRenderWindow();
+
+  if (renderWindow->CheckAbortStatus() == 1)
+    return;
+
+  if (renderWindow->SupportsOpenGL() == 0)
     return;
 
   if (m_Simulation.IsNull())
     return;
+
+  if (!renderWindow->IsCurrent())
+    renderWindow->MakeCurrent();
 
   BaseRenderer* mitkRenderer = BaseRenderer::GetInstance(renderer->GetRenderWindow());
 

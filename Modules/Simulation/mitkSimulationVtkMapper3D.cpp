@@ -80,7 +80,7 @@ mitk::SimulationVtkMapper3D::~SimulationVtkMapper3D()
 {
 }
 
-void mitk::SimulationVtkMapper3D::ApplyColorAndOpacityProperties(vtkActor*, BaseRenderer*)
+void mitk::SimulationVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer*, vtkActor*)
 {
 }
 

@@ -38,13 +38,19 @@ mitk::vtkSimulationPolyDataMapper3D::~vtkSimulationPolyDataMapper3D()
 
 void mitk::vtkSimulationPolyDataMapper3D::Render(vtkRenderer* renderer, vtkActor* actor)
 {
-  if (renderer->GetRenderWindow()->CheckAbortStatus())
+  vtkRenderWindow* renderWindow = renderer->GetRenderWindow();
+
+  if (renderWindow->CheckAbortStatus() == 1)
+    return;
+
+  if (renderWindow->SupportsOpenGL() == 0)
     return;
 
   if (m_Simulation.IsNull())
     return;
 
-  renderer->GetRenderWindow()->MakeCurrent();
+  if (!renderWindow->IsCurrent())
+    renderWindow->MakeCurrent();
 
   m_SimulationService->SetActiveSimulation(m_Simulation);
 
@@ -54,6 +60,9 @@ void mitk::vtkSimulationPolyDataMapper3D::Render(vtkRenderer* renderer, vtkActor
 
   sofaSimulation->updateVisual(rootNode.get());
   sofaSimulation->draw(vParams, rootNode.get());
+
+  // SOFA potentially disables GL_BLEND but VTK relies on it.
+  glEnable(GL_BLEND);
 }
 
 void mitk::vtkSimulationPolyDataMapper3D::RenderPiece(vtkRenderer*, vtkActor*)

@@ -44,7 +44,7 @@ mitk::SimulationVtkMapper2D::~SimulationVtkMapper2D()
 {
 }
 
-void mitk::SimulationVtkMapper2D::ApplyColorAndOpacityProperties(vtkActor*, BaseRenderer*)
+void mitk::SimulationVtkMapper2D::ApplyColorAndOpacityProperties(BaseRenderer*, vtkActor*)
 {
 }
 

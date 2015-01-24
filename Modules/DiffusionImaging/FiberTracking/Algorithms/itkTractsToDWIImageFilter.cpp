@@ -609,8 +609,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         upsampler->SetSize(upsampledImageRegion.GetSize());
         upsampler->SetOutputSpacing(upsampledSpacing);
         upsampler->SetOutputOrigin(upsampledOrigin);
-        itk::NearestNeighborInterpolateImageFunction<ItkFloatImgType, double>::Pointer nn_interpolator
-                = itk::NearestNeighborInterpolateImageFunction<ItkFloatImgType, double>::New();
+        itk::LinearInterpolateImageFunction<ItkFloatImgType, double>::Pointer nn_interpolator
+                = itk::LinearInterpolateImageFunction<ItkFloatImgType, double>::New();
         upsampler->SetInterpolator(nn_interpolator);
         upsampler->Update();
         m_HelperTdiUpsampled = upsampler->GetOutput();
@@ -722,12 +722,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                         if (m_HelperTdiTransformed.IsNotNull())
                         {
                             double TD = TDI->GetPixel(idx);
-
                             itk::Index<3> idx2;
                             m_HelperTdiTransformed->TransformPhysicalPointToIndex(vertex, idx2);
                             double HTD = m_HelperTdiTransformed->GetPixel(idx2);
-                            if (TD>0)
-                                TdCorrectionFactor = HTD/TD;
+                            if (TD>0.00001)
+                                TdCorrectionFactor = sqrt(HTD)/TD;
                         }
 
                         // generate signal for each fiber compartment
@@ -776,22 +775,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                             m_CompartmentImages.at(i)->SetPixel(index, pix);
                         }
                     }
-
-                    //                    double w = 1;
-                    //                    double intraAxonalVolume = intraAxonalVolumeImage->GetPixel(index)*fact;
-                    //                    if (intraAxonalVolume>0.0001 && intraAxonalVolume<0.3)  // only fiber in voxel
-                    //                    {
-                    //                        w = (m_VoxelVolume*0.3)/intraAxonalVolume;
-                    //                        for (int i=0; i<numFiberCompartments; i++)
-                    //                        {
-                    //                            DoubleDwiType::PixelType pix = m_CompartmentImages.at(i)->GetPixel(index);
-                    //                            pix[g] *= w;
-                    //                            m_CompartmentImages.at(i)->SetPixel(index, pix);
-                    //                        }
-
-                    //                        m_VolumeFractions.at(0)->SetPixel(index, 1);
-                    //                    }
-
 
                     // simulate other compartments
                     SimulateNonFiberSignal(index, intraAxonalVolumeImage->GetPixel(index)*fact, g);
@@ -1219,10 +1202,10 @@ void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
                 ++maskIt2;
             }
 
-//            itk::ImageFileWriter<ItkFloatImgType>::Pointer wr = itk::ImageFileWriter<ItkFloatImgType>::New();
-//            wr->SetInput(m_HelperTdiTransformed);
-//            wr->SetFileName("/local/TDI_transformed.nrrd");
-//            wr->Update();
+            itk::ImageFileWriter<ItkFloatImgType>::Pointer wr = itk::ImageFileWriter<ItkFloatImgType>::New();
+            wr->SetInput(m_HelperTdiTransformed);
+            wr->SetFileName("/local/TDI_transformed.nrrd");
+            wr->Update();
         }
 
         // rotate fibers
@@ -1312,11 +1295,31 @@ void TractsToDWIImageFilter< PixelType >::SimulateNonFiberSignal(ItkUcharImgType
         }
         else
         {
+//            double extraAxonalVolume = m_VoxelVolume-intraAxonalVolume;    // non-fiber volume
+//            if (extraAxonalVolume<0)
+//                extraAxonalVolume = 0;
+
+//            double interAxonalVolume = 0;
+//            if (numFiberCompartments>1)
+//                interAxonalVolume = 0.5*intraAxonalVolume;   // inter-axonal fraction of non fiber compartment scales linearly with f
+
+//            double other = extraAxonalVolume - interAxonalVolume;        // rest of compartment
+//            if (other<0)
+//            {
+//                other = 0;
+//                interAxonalVolume = extraAxonalVolume;
+//            }
+//            double singleinter = interAxonalVolume/(numFiberCompartments-1);
+
             double extraAxonalVolume = m_VoxelVolume-intraAxonalVolume;    // non-fiber volume
+            if (extraAxonalVolume<0)
+                extraAxonalVolume = 0;
             double interAxonalVolume = 0;
             if (numFiberCompartments>1)
                 interAxonalVolume = extraAxonalVolume * intraAxonalVolume/m_VoxelVolume;   // inter-axonal fraction of non fiber compartment scales linearly with f
             double other = extraAxonalVolume - interAxonalVolume;        // rest of compartment
+            if (other<0)
+                other = 0;
             double singleinter = interAxonalVolume/(numFiberCompartments-1);
 
             // adjust non-fiber and intra-axonal signal

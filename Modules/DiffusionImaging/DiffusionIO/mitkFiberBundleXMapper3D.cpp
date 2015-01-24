@@ -84,7 +84,10 @@ void mitk::FiberBundleXMapper3D::InternalGenerateData(mitk::BaseRenderer *render
         vtkSmartPointer<vtkDepthSortPolyData> depthSort = vtkSmartPointer<vtkDepthSortPolyData>::New();
         depthSort->SetInputData( fiberPolyData );
         depthSort->SetCamera( renderer->GetVtkRenderer()->GetActiveCamera() );
-        depthSort->SetDirectionToFrontToBack();
+        if (m_TubeRadius>0.0)
+            depthSort->SetDirectionToBackToFront();
+        else
+            depthSort->SetDirectionToFrontToBack();
         depthSort->Update();
         fiberPolyData = depthSort->GetOutput();
     }

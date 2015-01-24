@@ -199,7 +199,6 @@ void mitk::DiffusionPropertyHelper::ApplyMeasurementFrame()
   {
     vnl_vector<double> vec = gdcit.Value();
     vec = vec.pre_multiply(measurementFrame);
-    MITK_INFO << gdcit.Value();
     directions->InsertElement(c, vec);
     c++;
   }
@@ -231,7 +230,6 @@ void mitk::DiffusionPropertyHelper::UpdateBValueMap()
     GradientDirectionsContainerType::ConstIterator gdcit;
     for( gdcit = directions->Begin(); gdcit != directions->End(); ++gdcit)
     {
-        MITK_INFO << gdcit.Value();
       b_ValueMap[GetB_Value(gdcit.Index())].push_back(gdcit.Index());
     }
   }

@@ -1835,6 +1835,9 @@
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a binary image to define the area of signal generation. Outside of the mask image only noise will be actively generated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+            </property>
            </widget>
           </item>
           <item row="0" column="0" rowspan="2" colspan="2">
@@ -1899,6 +1902,9 @@
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a fiber bundle to generate the white matter signal from. You can either use the fiber definition tab to manually define an input fiber bundle or you can also use any existing bundle, e.g. yielded by a tractography algorithm.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+            </property>
            </widget>
           </item>
           <item row="3" column="0">
@@ -1924,6 +1930,9 @@
            <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TemplateComboBox">
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The parameters for the simulation (e.g. spacing, size, diffuison-weighted gradients, b-value) are adopted from this image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
             </property>
            </widget>
           </item>

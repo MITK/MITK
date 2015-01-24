@@ -316,7 +316,6 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
         connect((QObject*) m_Controls->m_FiberThicknessSlider, SIGNAL(valueChanged(int)), (QObject*) this, SLOT( FiberSlicingUpdateLabel(int) ));
         connect((QObject*) m_Controls->m_Crosshair, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
         connect((QObject*) m_Controls->m_LineWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(LineWidthChanged()));
-        connect((QObject*) m_Controls->m_TubeWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(TubeRadiusChanged()));
     }
 }
 
@@ -412,10 +411,6 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
             int width;
             node->GetIntProperty("LineWidth", width);
             m_Controls->m_LineWidth->setValue(width);
-
-            float radius;
-            node->GetFloatProperty("TubeRadius", radius);
-            m_Controls->m_TubeWidth->setValue(radius);
 
             float range;
             node->GetFloatProperty("Fiber2DSliceThickness",range);
@@ -1000,16 +995,6 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
             }
 
         }
-    }
-}
-
-void QmitkControlVisualizationPropertiesView::TubeRadiusChanged()
-{
-    if(m_SelectedNode && dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData()))
-    {
-        float newRadius = m_Controls->m_TubeWidth->value();
-        m_SelectedNode->SetFloatProperty("TubeRadius", newRadius);
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 }
 

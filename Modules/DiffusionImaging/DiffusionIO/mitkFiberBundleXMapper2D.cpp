@@ -13,26 +13,14 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-/*
- *  mitkFiberBundleMapper2D.cpp
- *  mitk-all
- *
- *  Created by HAL9000 on 1/17/11.
- *  Copyright 2011 __MyCompanyName__. All rights reserved.
- *
- */
 
 #include "mitkFiberBundleXMapper2D.h"
 #include <mitkBaseRenderer.h>
-
-
 #include <vtkActor.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPlane.h>
 #include <vtkPolyData.h>
-//#include <vtkPropAssembly.h>
-
-//#include <vtkPainterPolyDataMapper.h>
+#include <vtkPointData.h>
 #include <vtkProperty.h>
 #include <vtkLookupTable.h>
 #include <vtkPoints.h>
@@ -41,17 +29,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderer.h>
 #include <vtkCellArray.h>
 #include <vtkMatrix4x4.h>
-
-//#include <mitkGeometry3D.h>
+#include <vtkTubeFilter.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkSliceNavigationController.h>
-
 #include <mitkIShaderRepository.h>
 #include <mitkShaderProperty.h>
-
 #include <mitkCoreServices.h>
 
 mitk::FiberBundleXMapper2D::FiberBundleXMapper2D()
+    : m_LineWidth(1)
 {
     m_lut = vtkLookupTable::New();
     m_lut->Build();
@@ -104,6 +90,14 @@ void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
         if (fiberBundle==NULL)
             return;
 
+        int lineWidth = 0;
+        node->GetIntProperty("LineWidth", lineWidth);
+        if (m_LineWidth!=lineWidth)
+        {
+            m_LineWidth = lineWidth;
+            fiberBundle->RequestUpdate2D();
+        }
+
         if ( localStorage->m_LastUpdateTime<renderer->GetDisplayGeometry()->GetMTime() || localStorage->m_LastUpdateTime<fiberBundle->GetUpdateTime2D() )
         {
             this->UpdateShaderParameter(renderer);
@@ -147,29 +141,21 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     if ( node == NULL )
         return;
 
+    vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
+    if (fiberPolyData == NULL)
+        return;
+
+    fiberPolyData->GetPointData()->AddArray(fiberBundle->GetFiberColors());
     localStorage->m_FiberMapper->ScalarVisibilityOn();
     localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
     localStorage->m_FiberMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
     localStorage->m_PointActor->GetProperty()->SetOpacity(0.999);
+    localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
 
-    // set color
-    if (fiberBundle->GetCurrentColorCoding() != NULL)
-    {
-        localStorage->m_FiberMapper->SelectColorArray(fiberBundle->GetCurrentColorCoding());
-
-        if(fiberBundle->GetCurrentColorCoding() == fiberBundle->COLORCODING_CUSTOM){
-            float temprgb[3];
-            this->GetDataNode()->GetColor( temprgb, NULL );
-            double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
-            localStorage->m_PointActor->GetProperty()->SetColor(trgb);
-        }
-    }
-    int lineWidth = 1;
-    node->GetIntProperty("LineWidth",lineWidth);
-    localStorage->m_FiberMapper->SetInputData(fiberBundle->GetFiberPolyData());
+    localStorage->m_FiberMapper->SetInputData(fiberPolyData);
     localStorage->m_PointActor->SetMapper(localStorage->m_FiberMapper);
     localStorage->m_PointActor->GetProperty()->ShadingOn();
-    localStorage->m_PointActor->GetProperty()->SetLineWidth(lineWidth);
+    localStorage->m_PointActor->GetProperty()->SetLineWidth(m_LineWidth);
 
     // Applying shading properties
     this->ApplyShaderProperties(renderer);
@@ -188,6 +174,7 @@ vtkProp* mitk::FiberBundleXMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 
 void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
+    Superclass::SetDefaultProperties(node, renderer, overwrite);
     node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));
 
     // Shaders
@@ -198,10 +185,10 @@ void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
     }
 
     //add other parameters to propertylist
-    node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(2.0f), renderer, overwrite );
+    node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(1.0f), renderer, overwrite );
     node->AddProperty( "Fiber2DfadeEFX", mitk::BoolProperty::New(true), renderer, overwrite );
-
-    Superclass::SetDefaultProperties(node, renderer, overwrite);
+    node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), renderer, overwrite);
+    node->AddProperty( "TubeRadius",mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
 }
 
 

@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGlobalInteraction.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkNodePredicateDataType.h>
-#include <mitkIOUtil.h>
 
 // include gl to read out properties
 #include <vtkOpenGL.h>

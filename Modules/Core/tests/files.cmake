@@ -109,12 +109,14 @@ set(MODULE_TESTS
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
   mitkLineTest.cpp
+  mitkSurfaceVtkMapper2DTest.cpp
 )
 
-if(MITK_ENABLE_RENDERING_TESTING) #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
+if(MITK_ENABLE_RENDERING_TESTING)
 set(MODULE_TESTS
   ${MODULE_TESTS}
-  mitkPointSetDataInteractorTest.cpp
+  mitkPointSetDataInteractorTest.cpp #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
+  mitkSurfaceVtkMapper2DTest.cpp #new rendering test in CppUnit style
 )
 endif()
 
@@ -166,8 +168,6 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DLookupTableTest.cpp
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
-    mitkSurfaceVtkMapper2DColorTest.cpp
-    mitkSurfaceVtkMapper2DOpacityTest.cpp
     mitkVolumeCalculatorTest.cpp
     mitkLevelWindowManagerTest.cpp
     mitkPointSetVtkMapper2DTest.cpp

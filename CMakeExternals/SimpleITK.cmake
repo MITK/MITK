@@ -75,7 +75,7 @@ if(MITK_USE_SimpleITK)
 
     set(SimpleITK_DIR ${ep_prefix})
 
-    if( MITK_USE_Python )
+    if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       # PythonDir needs to be fixed for the python interpreter by
       # changing dir delimiter for Windows
       set(_install_dir ${Python_DIR})

@@ -20,11 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBasePropertySerializer.h"
 #include "mitkProperties.h"
 
-#include <MitkSceneSerializationBaseExports.h>
-
 namespace mitk
 {
-class MITKSCENESERIALIZATIONBASE_EXPORT Point3iPropertySerializer : public BasePropertySerializer
+class Point3iPropertySerializer : public BasePropertySerializer
 {
   public:
     mitkClassMacro( Point3iPropertySerializer, BasePropertySerializer );

@@ -1,5 +1,8 @@
 message(STATUS "Configuring MITK Diffusion Release Build")
 
+# Enable Boost which is a necessary configuration
+set(MITK_USE_Boost ON CACHE BOOL "MITK Use Boost Library" FORCE)
+
 # Disable all apps but MITK Diffusion
 set(MITK_BUILD_ALL_APPS OFF CACHE BOOL "Build all MITK applications" FORCE)
 set(MITK_BUILD_APP_CoreApp OFF CACHE BOOL "Build the MITK CoreApp" FORCE)

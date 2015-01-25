@@ -46,12 +46,11 @@ mitk::FiberBundleX::Pointer LoadFib(std::string filename)
 
 int main(int argc, char* argv[])
 {
-    std::cout << "FiberProcessing";
     mitkCommandLineParser parser;
 
     parser.setTitle("Fiber Processing");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription("");
+    parser.setDescription(" ");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");

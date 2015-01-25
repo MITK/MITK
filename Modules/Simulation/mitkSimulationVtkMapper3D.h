@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class vtkSimulationPolyDataMapper;
+  class vtkSimulationPolyDataMapper3D;
 
   class MITKSIMULATION_EXPORT SimulationVtkMapper3D : public VtkMapper
   {
@@ -33,7 +33,7 @@ namespace mitk
       LocalStorage();
       ~LocalStorage();
 
-      vtkSmartPointer<vtkSimulationPolyDataMapper> m_Mapper;
+      vtkSmartPointer<vtkSimulationPolyDataMapper3D> m_Mapper;
       vtkSmartPointer<vtkActor> m_Actor;
 
     private:
@@ -48,7 +48,7 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    void ApplyColorAndOpacityProperties(vtkActor*, BaseRenderer*);
+    void ApplyColorAndOpacityProperties(BaseRenderer*, vtkActor*);
     void ApplySimulationProperties(BaseRenderer* renderer);
     vtkProp* GetVtkProp(BaseRenderer* renderer);
 

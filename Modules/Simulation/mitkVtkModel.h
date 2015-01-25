@@ -17,10 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkVtkModel_h
 #define mitkVtkModel_h
 
+#include <mitkDataNode.h>
 #include <mitkPoint.h>
+#include <mitkSurface.h>
 #include <mitkVector.h>
 #include <sofa/component/visualmodel/VisualModelImpl.h>
 #include <sofa/helper/system/gl.h>
+#include <vtkCellArray.h>
+#include <vtkFloatArray.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <MitkSimulationExports.h>
 
@@ -32,6 +38,12 @@ namespace mitk
   class MITKSIMULATION_EXPORT VtkModel : public sofa::component::visualmodel::VisualModelImpl
   {
   public:
+    enum Mode
+    {
+      OpenGL,
+      Surface
+    };
+
     SOFA_CLASS(VtkModel, sofa::component::visualmodel::VisualModelImpl);
 
     void internalDraw(const sofa::core::visual::VisualParams* vparams, bool transparent);
@@ -39,9 +51,12 @@ namespace mitk
     void SetVtkRenderer(vtkRenderer* renderer);
     void updateBuffers();
 
-  private:
-    static bool IsGlewInitialized;
+    DataNode::Pointer GetDataNode() const;
 
+    Mode GetMode() const;
+    void SetMode(Mode mode);
+
+  private:
     VtkModel();
     ~VtkModel();
 
@@ -57,8 +72,10 @@ namespace mitk
     void InitVertexBuffer();
     void UpdateIndexBuffer();
     void UpdateVertexBuffer();
+    void ValidateBoundBuffers();
 
-    bool m_BuffersCreated;
+    bool m_GlewIsInitialized;
+    bool m_BuffersWereCreated;
     size_t m_LastNumberOfVertices;
     size_t m_LastNumberOfTriangles;
     size_t m_LastNumberOfQuads;
@@ -66,6 +83,14 @@ namespace mitk
     GLuint m_IndexBuffer;
     std::map<unsigned int, vtkSmartPointer<vtkOpenGLTexture> > m_Textures;
     vtkRenderer* m_VtkRenderer;
+    Mode m_Mode;
+    vtkSmartPointer<vtkPoints> m_Points;
+    vtkSmartPointer<vtkCellArray> m_Polys;
+    vtkSmartPointer<vtkFloatArray> m_Normals;
+    vtkSmartPointer<vtkFloatArray> m_TexCoords;
+    vtkSmartPointer<vtkPolyData> m_PolyData;
+    Surface::Pointer m_Surface;
+    DataNode::Pointer m_DataNode;
   };
 }
 

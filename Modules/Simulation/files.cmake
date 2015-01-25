@@ -11,18 +11,16 @@ set(CPP_FILES
   mitkSchedulingAlgorithmBase.cpp
   mitkSimulation.cpp
   mitkSimulationActivator.cpp
-  mitkSimulationGLMapper2D.cpp
   mitkSimulationInteractor.cpp
-  mitkSimulationIOFactory.cpp
+  mitkSimulationIO.cpp
   mitkSimulationObjectFactory.cpp
-  mitkSimulationReader.cpp
   mitkSimulationSerializer.cpp
   mitkSimulationService.cpp
+  mitkSimulationVtkMapper2D.cpp
   mitkSimulationVtkMapper3D.cpp
-  mitkSimulationWriter.cpp
-  mitkSimulationWriterFactory.cpp
   mitkVtkModel.cpp
-  mitkVtkSimulationPolyDataMapper.cpp
+  mitkVtkSimulationPolyDataMapper2D.cpp
+  mitkVtkSimulationPolyDataMapper3D.cpp
   mitkWeightedRoundRobinSchedulingAlgorithm.cpp
 )
 

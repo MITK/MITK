@@ -18,18 +18,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFiberBundleXMapper3D.h"
 #include <mitkProperties.h>
-//#include <mitkFiberBundleInteractor.h>
-//#include <mitkGlobalInteraction.h>
 
 #include <vtkPropAssembly.h>
 #include <vtkPointData.h>
 #include <vtkProperty.h>
 #include <vtkCellArray.h>
-
-//not essential for mapper
-// #include <QTime>
+#include <vtkDepthSortPolyData.h>
+#include <vtkCamera.h>
+#include <vtkTubeFilter.h>
 
 mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
+    : m_TubeRadius(0.0)
+    , m_TubeSides(15)
+    , m_LineWidth(1)
 {
     m_lut = vtkLookupTable::New();
     m_lut->Build();
@@ -62,39 +63,44 @@ void mitk::FiberBundleXMapper3D::InternalGenerateData(mitk::BaseRenderer *render
     if (fiberPolyData == NULL)
         return;
 
+    fiberPolyData->GetPointData()->AddArray(fiberBundle->GetFiberColors());
+    float tmpopa;
+    this->GetDataNode()->GetOpacity(tmpopa, NULL);
     FBXLocalStorage3D *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
-    localStorage->m_FiberMapper->SetInputData(fiberPolyData);
 
-    if ( fiberPolyData->GetPointData()->GetNumberOfArrays() > 0 )
-        localStorage->m_FiberMapper->SelectColorArray( fiberBundle->GetCurrentColorCoding() );
+    if (m_TubeRadius>0.0)
+    {
+        vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
+        tubeFilter->SetInputData(fiberPolyData);
+        tubeFilter->SetNumberOfSides(m_TubeSides);
+        tubeFilter->SetRadius(m_TubeRadius);
+        tubeFilter->Update();
+        fiberPolyData = tubeFilter->GetOutput();
+    }
 
+    if (tmpopa<1)
+    {
+        vtkSmartPointer<vtkDepthSortPolyData> depthSort = vtkSmartPointer<vtkDepthSortPolyData>::New();
+        depthSort->SetInputData( fiberPolyData );
+        depthSort->SetCamera( renderer->GetVtkRenderer()->GetActiveCamera() );
+        depthSort->SetDirectionToFrontToBack();
+        depthSort->Update();
+        localStorage->m_FiberMapper->SetInputConnection(depthSort->GetOutputPort());
+    }
+    else
+    {
+        localStorage->m_FiberMapper->SetInputData(fiberPolyData);
+    }
+
+    localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
     localStorage->m_FiberMapper->ScalarVisibilityOn();
     localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
     localStorage->m_FiberActor->SetMapper(localStorage->m_FiberMapper);
     localStorage->m_FiberMapper->SetLookupTable(m_lut);
 
     // set Opacity
-    float tmpopa;
-    this->GetDataNode()->GetOpacity(tmpopa, NULL);
     localStorage->m_FiberActor->GetProperty()->SetOpacity((double) tmpopa);
-
-    int lineWidth = 1;
-    this->GetDataNode()->GetIntProperty("LineWidth",lineWidth);
-    localStorage->m_FiberActor->GetProperty()->SetLineWidth(lineWidth);
-
-    // set color
-    if (fiberBundle->GetCurrentColorCoding() != NULL){
-        //        localStorage->m_FiberMapper->SelectColorArray("");
-        localStorage->m_FiberMapper->SelectColorArray(fiberBundle->GetCurrentColorCoding());
-        MITK_DEBUG << "MapperFBX: " << fiberBundle->GetCurrentColorCoding();
-
-        if(fiberBundle->GetCurrentColorCoding() == fiberBundle->COLORCODING_CUSTOM) {
-            float temprgb[3];
-            this->GetDataNode()->GetColor( temprgb, NULL );
-            double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
-            localStorage->m_FiberActor->GetProperty()->SetColor(trgb);
-        }
-    }
+    localStorage->m_FiberActor->GetProperty()->SetLineWidth(m_LineWidth);
 
     localStorage->m_FiberAssembly->AddPart(localStorage->m_FiberActor);
     localStorage->m_LastUpdateTime.Modified();
@@ -111,6 +117,32 @@ void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
     const DataNode* node = this->GetDataNode();
     FBXLocalStorage3D* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
     mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+
+    // did any rendering properties change?
+    float tubeRadius = 0;
+    node->GetFloatProperty("TubeRadius", tubeRadius);
+    if (m_TubeRadius!=tubeRadius)
+    {
+        m_TubeRadius = tubeRadius;
+        fiberBundle->RequestUpdate3D();
+    }
+
+    int tubeSides = 0;
+    node->GetIntProperty("TubeSides", tubeSides);
+    if (m_TubeSides!=tubeSides)
+    {
+        m_TubeSides = tubeSides;
+        fiberBundle->RequestUpdate3D();
+    }
+
+    int lineWidth = 0;
+    node->GetIntProperty("LineWidth", lineWidth);
+    if (m_LineWidth!=lineWidth)
+    {
+        m_LineWidth = lineWidth;
+        fiberBundle->RequestUpdate3D();
+    }
+
     if (localStorage->m_LastUpdateTime>=fiberBundle->GetUpdateTime3D())
         return;
 
@@ -123,30 +155,19 @@ void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
 void mitk::FiberBundleXMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-    //   node->AddProperty( "DisplayChannel", mitk::IntProperty::New( true ), renderer, overwrite );
+    Superclass::SetDefaultProperties(node, renderer, overwrite);
     node->AddProperty( "LineWidth", mitk::IntProperty::New( true ), renderer, overwrite );
     node->AddProperty( "opacity", mitk::FloatProperty::New( 1.0 ), renderer, overwrite);
-    //  node->AddProperty( "VertexOpacity_1", mitk::BoolProperty::New( false ), renderer, overwrite);
-    //  node->AddProperty( "Set_FA_VertexAlpha", mitk::BoolProperty::New( false ), renderer, overwrite);
-    //  node->AddProperty( "pointSize", mitk::FloatProperty::New(0.5), renderer, overwrite);
-    //  node->AddProperty( "setShading", mitk::IntProperty::New(1), renderer, overwrite);
-    //  node->AddProperty( "Xmove", mitk::IntProperty::New( 0 ), renderer, overwrite);
-    //  node->AddProperty( "Ymove", mitk::IntProperty::New( 0 ), renderer, overwrite);
-    //  node->AddProperty( "Zmove", mitk::IntProperty::New( 0 ), renderer, overwrite);
-    //  node->AddProperty( "RepPoints", mitk::BoolProperty::New( false ), renderer, overwrite);
-    //  node->AddProperty( "TubeSides", mitk::IntProperty::New( 8 ), renderer, overwrite);
-    //  node->AddProperty( "TubeRadius", mitk::FloatProperty::New( 0.15 ), renderer, overwrite);
-    //  node->AddProperty( "TubeOpacity", mitk::FloatProperty::New( 1.0 ), renderer, overwrite);
+    node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), renderer, overwrite);
     node->AddProperty( "pickable", mitk::BoolProperty::New( true ), renderer, overwrite);
-    Superclass::SetDefaultProperties(node, renderer, overwrite);
+
+    node->AddProperty( "TubeRadius",mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
+    node->AddProperty( "TubeSides",mitk::IntProperty::New( 15 ), renderer, overwrite);
 }
 
 vtkProp* mitk::FiberBundleXMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
-    //MITK_INFO << "FiberBundleXxXXMapper3D()GetVTKProp";
-    //this->GenerateData();
     return m_LocalStorageHandler.GetLocalStorage(renderer)->m_FiberAssembly;
-
 }
 
 void mitk::FiberBundleXMapper3D::UpdateVtkObjects()

@@ -21,6 +21,10 @@ mitkDefineGenericProperty(BoolProperty,bool,false);
 
 mitkDefineGenericProperty(IntProperty,int,0);
 
+mitkDefineGenericProperty(UIntProperty,unsigned int,0);
+
+mitkDefineGenericProperty(UShortProperty,unsigned short,0);
+
 mitkDefineGenericProperty(FloatProperty,float,0.0f);
 
 mitkDefineGenericProperty(DoubleProperty,double,0.0);

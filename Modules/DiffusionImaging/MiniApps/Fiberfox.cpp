@@ -40,6 +40,10 @@ using namespace mitk;
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
+    parser.setTitle("FiberFox");
+    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setContributor("MBI");
+    parser.setDescription(" ");
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);
     parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameter file:", "fiberfox parameter file", us::Any(), false);

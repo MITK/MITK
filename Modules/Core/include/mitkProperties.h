@@ -28,6 +28,10 @@ namespace mitk {
 
    mitkDeclareGenericProperty(IntProperty,int,MITKCORE_EXPORT);
 
+   mitkDeclareGenericProperty(UIntProperty,unsigned int,MITKCORE_EXPORT);
+
+   mitkDeclareGenericProperty(UShortProperty,unsigned short,MITKCORE_EXPORT);
+
    mitkDeclareGenericProperty(FloatProperty,float,MITKCORE_EXPORT);
 
    mitkDeclareGenericProperty(DoubleProperty,double,MITKCORE_EXPORT);

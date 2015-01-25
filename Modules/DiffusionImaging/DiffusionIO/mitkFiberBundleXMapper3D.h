@@ -90,8 +90,9 @@ protected:
 
 private:
     vtkSmartPointer<vtkLookupTable> m_lut;
-
-
+    float   m_TubeRadius;
+    int     m_TubeSides;
+    int     m_LineWidth;
 };
 
 } // end namespace mitk

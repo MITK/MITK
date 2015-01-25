@@ -14,7 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkSimulationService.h>
+#include "mitkSimulationIO.h"
+#include "mitkSimulationService.h"
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 #include <memory>
@@ -36,10 +37,13 @@ namespace mitk
     {
       m_SimulationService.reset(new SimulationService);
       context->RegisterService<ISimulationService>(m_SimulationService.get());
+
+      m_SimulationIO.reset(new SimulationIO);
     }
 
     void Unload(us::ModuleContext*)
     {
+      m_SimulationIO.reset(NULL);
       m_SimulationService.reset(NULL);
     }
 
@@ -48,6 +52,7 @@ namespace mitk
     SimulationActivator& operator=(const SimulationActivator&);
 
     std::auto_ptr<SimulationService> m_SimulationService;
+    std::auto_ptr<AbstractFileIO> m_SimulationIO;
   };
 }
 

@@ -87,131 +87,6 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QToolButton" name="m_Reinit">
-           <property name="toolTip">
-            <string>Reinit view</string>
-           </property>
-           <property name="statusTip">
-            <string/>
-           </property>
-           <property name="whatsThis">
-            <string/>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="checkable">
-            <bool>false</bool>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="m_TextureIntON">
-           <property name="toolTip">
-            <string>Texture interpolation ON</string>
-           </property>
-           <property name="statusTip">
-            <string/>
-           </property>
-           <property name="whatsThis">
-            <string/>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="m_VisibleOdfsON_T">
-           <property name="toolTip">
-            <string>Toggle visibility of ODF glyphs (axial)</string>
-           </property>
-           <property name="statusTip">
-            <string/>
-           </property>
-           <property name="whatsThis">
-            <string/>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/glyphsoff_T.png</normaloff>
-             <normalon>:/QmitkDiffusionImaging/glyphson_T.png</normalon>:/QmitkDiffusionImaging/glyphsoff_T.png</iconset>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="m_VisibleOdfsON_S">
-           <property name="toolTip">
-            <string>Toggle visibility of ODF glyphs (sagittal)</string>
-           </property>
-           <property name="statusTip">
-            <string/>
-           </property>
-           <property name="whatsThis">
-            <string/>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/glyphsoff_S.png</normaloff>
-             <normalon>:/QmitkDiffusionImaging/glyphson_S.png</normalon>:/QmitkDiffusionImaging/glyphsoff_S.png</iconset>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="m_VisibleOdfsON_C">
-           <property name="toolTip">
-            <string>Toggle visibility of ODF glyphs (coronal)</string>
-           </property>
-           <property name="statusTip">
-            <string/>
-           </property>
-           <property name="whatsThis">
-            <string/>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/glyphsoff_C.png</normaloff>
-             <normalon>:/QmitkDiffusionImaging/glyphson_C.png</normalon>:/QmitkDiffusionImaging/glyphsoff_C.png</iconset>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QToolButton" name="m_TSMenu">
            <property name="toolTip">
             <string>Multislice Projection</string>
@@ -232,26 +107,6 @@
             <enum>Qt::NoArrow</enum>
            </property>
           </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_channel">
-           <property name="text">
-            <string>Channel</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSlider" name="m_DisplayIndex">
-           <property name="maximum">
-            <number>300</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="m_DisplayIndexSpinBox"/>
          </item>
          <item>
           <widget class="QFrame" name="m_NumberGlyphsFrame">
@@ -275,17 +130,85 @@
              <number>0</number>
             </property>
             <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+             <widget class="QToolButton" name="m_VisibleOdfsON_T">
+              <property name="toolTip">
+               <string>Toggle visibility of ODF glyphs (axial)</string>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
+              <property name="statusTip">
+               <string/>
               </property>
-             </spacer>
+              <property name="whatsThis">
+               <string/>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+                <normaloff>:/QmitkDiffusionImaging/glyphsoff_T.png</normaloff>
+                <normalon>:/QmitkDiffusionImaging/glyphson_T.png</normalon>:/QmitkDiffusionImaging/glyphsoff_T.png</iconset>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="m_VisibleOdfsON_S">
+              <property name="toolTip">
+               <string>Toggle visibility of ODF glyphs (sagittal)</string>
+              </property>
+              <property name="statusTip">
+               <string/>
+              </property>
+              <property name="whatsThis">
+               <string/>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+                <normaloff>:/QmitkDiffusionImaging/glyphsoff_S.png</normaloff>
+                <normalon>:/QmitkDiffusionImaging/glyphson_S.png</normalon>:/QmitkDiffusionImaging/glyphsoff_S.png</iconset>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="m_VisibleOdfsON_C">
+              <property name="toolTip">
+               <string>Toggle visibility of ODF glyphs (coronal)</string>
+              </property>
+              <property name="statusTip">
+               <string/>
+              </property>
+              <property name="whatsThis">
+               <string/>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+                <normaloff>:/QmitkDiffusionImaging/glyphsoff_C.png</normaloff>
+                <normalon>:/QmitkDiffusionImaging/glyphson_C.png</normalon>:/QmitkDiffusionImaging/glyphsoff_C.png</iconset>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_glyphs">
@@ -301,6 +224,19 @@
               </property>
              </widget>
             </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
           </widget>
          </item>
@@ -308,61 +244,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QFrame" name="OpacMinFrame">
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Opacity</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="ctkRangeSlider" name="m_OpacitySlider">
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="m_OpacityMinFaLabel">
-           <property name="minimumSize">
-            <size>
-             <width>80</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>0.0 : 0.0</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QFrame" name="frame">
+       <widget class="QFrame" name="m_GlyphFrame">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
@@ -467,6 +349,18 @@
                  <property name="toolTip">
                   <string>Additional scaling factor</string>
                  </property>
+                 <property name="decimals">
+                  <number>3</number>
+                 </property>
+                 <property name="maximum">
+                  <double>999999999.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.100000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>1.000000000000000</double>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -534,58 +428,6 @@
            </layout>
           </widget>
          </item>
-         <item>
-          <widget class="QFrame" name="params_frame">
-           <property name="frameShape">
-            <enum>QFrame::NoFrame</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="label_2">
-              <property name="text">
-               <string>Param1</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="m_IndexParam1">
-              <property name="maximum">
-               <double>9999.989999999999782</double>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Param2</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="m_IndexParam2">
-              <property name="maximum">
-               <double>9999.989999999999782</double>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -635,22 +477,16 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QToolButton" name="m_Color">
-           <property name="toolTip">
-            <string>Uniform Color for Bundle</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QToolButton" name="m_ResetColoring">
            <property name="toolTip">
             <string>Reset to Default Coloring</string>
            </property>
            <property name="text">
             <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+             <normaloff>:/QmitkDiffusionImaging/reset.png</normaloff>:/QmitkDiffusionImaging/reset.png</iconset>
            </property>
           </widget>
          </item>
@@ -665,24 +501,15 @@
            <property name="text">
             <string/>
            </property>
+           <property name="icon">
+            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+             <normaloff>:/QmitkDiffusionImaging/crosshair.png</normaloff>:/QmitkDiffusionImaging/crosshair.png</iconset>
+           </property>
            <property name="checkable">
             <bool>true</bool>
            </property>
            <property name="checked">
             <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="m_TDI">
-           <property name="toolTip">
-            <string comment="Generate Tract Density Image" extracomment="Generate Tract Density Image">Generate Tract Density Image</string>
-           </property>
-           <property name="whatsThis">
-            <string/>
-           </property>
-           <property name="text">
-            <string/>
            </property>
           </widget>
          </item>
@@ -789,7 +616,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <layout class="QGridLayout" name="gridLayout_2">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -802,14 +629,21 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
+         <item row="1" column="0">
           <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Tube Width</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_7">
            <property name="text">
             <string>Line Width</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item row="0" column="1">
           <widget class="QSpinBox" name="m_LineWidth">
            <property name="minimum">
             <number>1</number>
@@ -819,92 +653,20 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="m_TubeWidth">
+           <property name="toolTip">
+            <string>Fiber tube radius in mm. If &gt; 0, fibers are rendered as tubes in 3D.</string>
+           </property>
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+          </widget>
+         </item>
         </layout>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="m_PlanarFigureControlsFrame">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_7">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QToolButton" name="m_Focus">
-        <property name="toolTip">
-         <string>Focus Planar Figure</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="m_PFColor">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string comment="Select ROI color." extracomment="Select ROI color.">Select ROI color.</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSlider" name="m_PFWidth">
-        <property name="toolTip">
-         <string comment="Adjust 2D line width." extracomment="Adjust 2D line width.">Adjust 2D line width.</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>20</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_pfwidth">
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Width</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
        </widget>
       </item>
      </layout>
@@ -924,11 +686,13 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;       ODF Visualisation not possible in rotated planes. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;       Use 'Reinit' on the image node to reset. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;One or more slices are rotated.  ODF Visualisation is not possible in rotated planes. Use 'Reinit' on the image node to reset. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -948,13 +712,6 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>ctkRangeSlider</class>
-   <extends>QWidget</extends>
-   <header>ctkRangeSlider.h</header>
-  </customwidget>
- </customwidgets>
  <includes>
   <include location="local">QmitkDataStorageComboBox.h</include>
  </includes>

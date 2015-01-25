@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 
 #include <MitkTestingHelperExports.h>
+#include <mitkIOUtil.h>
 
 class vtkRenderWindow;
 class vtkRenderer;
@@ -137,6 +138,45 @@ public:
 
   /** @brief Returns true if the opengl context is compatible for advanced vtk effects **/
   bool IsAdvancedOpenGL();
+
+  /**
+   * @brief The ArgcHelperClass class is a convinience class to convert a vector
+   * of strings to the standard c++ argv and argc arguments. This is necessary for
+   * the vtkTesting::Test, since is requires the reference image (and other
+   * optional parameters) via command line.
+   */
+  class ArgcHelperClass{
+  private:
+    /**
+     * Members for conversion.
+     */
+    std::vector<char*> argv;
+    std::vector<std::vector<char> > argvec;
+
+  public:
+    ArgcHelperClass(const std::vector<std::string>& argstrings):
+      argv(argstrings.size()+1),
+      argvec(argstrings.size()+1)
+    {
+      std::vector<std::string> cmdArgs;
+      cmdArgs.push_back(mitk::IOUtil::GetProgramPath());
+      cmdArgs.insert(cmdArgs.end(), argstrings.begin(), argstrings.end());
+      for(std::size_t i = 0 ; i<cmdArgs.size() ; ++i)
+      {
+        argvec[i].assign(cmdArgs[i].begin(),cmdArgs[i].end());
+        argvec[i].push_back('\0');
+        argv[i] = &argvec[i][0];
+      }
+    }
+    char** GetArgv()
+    {
+      return &argv[0];
+    }
+    int GetArgc()
+    {
+      return argv.size();
+    }
+  };
 
 protected:
   /**

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkTrackingDeviceConfigurationWidget.h"
 #include <mitkClaronTrackingDevice.h>
+#include <mitkVirtualTrackingDevice.h>
 #include <mitkNDITrackingDevice.h>
 #include <mitkOptitrackTrackingDevice.h>
 #include <mitkIGTException.h>
@@ -383,7 +384,6 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
   {
   mitk::TrackingDevice::Pointer returnValue;
   //#### Step 1: configure tracking device:
-  MITK_INFO << "Current Index: " << m_Controls->m_trackingDeviceChooser->currentIndex();
   if (m_Controls->m_trackingDeviceChooser->currentIndex()==0)//NDI Polaris
       {
       if(m_Controls->m_radioPolaris5D->isChecked()) //5D Tracking
@@ -420,6 +420,11 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
     // Create the Tracking Device this->m_OptitrackDevice = mitk::OptitrackTrackingDevice::New();
     returnValue = ConfigureOptitrackTrackingDevice();
     returnValue->SetType(mitk::NPOptitrack);
+  }
+  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==4) //Virtual Tracker
+  {
+    // Create the Virtual Tracking Device
+    returnValue = mitk::VirtualTrackingDevice::New();
   }
   return returnValue;
   }
@@ -581,7 +586,6 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
     {selectedDeviceChecked = 0;} //0 = Polaris (default)
   else if (SelectedDevice==3 && !mitk::OptitrackTrackingDevice::New()->IsDeviceInstalled())
     {selectedDeviceChecked = 0;}
-  MITK_INFO << "SelectedDeviceChecked: " << selectedDeviceChecked;
   m_Controls->m_TrackingSystemWidget->setCurrentIndex(selectedDeviceChecked);
   m_Controls->m_trackingDeviceChooser->setCurrentIndex(selectedDeviceChecked);
 

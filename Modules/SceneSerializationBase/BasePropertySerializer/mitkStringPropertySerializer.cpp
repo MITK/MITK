@@ -21,12 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkStringProperty.h"
 
-#include <MitkSceneSerializationBaseExports.h>
-
 namespace mitk
 {
 
-class MITKSCENESERIALIZATIONBASE_EXPORT StringPropertySerializer : public BasePropertySerializer
+class StringPropertySerializer : public BasePropertySerializer
 {
   public:
 

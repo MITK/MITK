@@ -116,7 +116,7 @@ protected:
    * create a new input stream based on the input location in the
    * file system.
    */
-  class InputStream : public std::istream
+  class MITKCORE_EXPORT InputStream : public std::istream
   {
   public:
     InputStream(IFileReader* writer, std::ios_base::openmode mode = std::ios_base::in);

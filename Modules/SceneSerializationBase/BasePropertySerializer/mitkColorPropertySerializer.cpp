@@ -21,12 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkColorProperty.h"
 
-#include <MitkSceneSerializationBaseExports.h>
-
 namespace mitk
 {
 
-class MITKSCENESERIALIZATIONBASE_EXPORT ColorPropertySerializer : public BasePropertySerializer
+class ColorPropertySerializer : public BasePropertySerializer
 {
   public:
 

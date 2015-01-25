@@ -108,7 +108,7 @@ protected:
    * to the specified output stream or the original output location
    * if no output stream was set.
    */
-  class LocalFile
+  class MITKCORE_EXPORT LocalFile
   {
   public:
     LocalFile(IFileWriter* writer);

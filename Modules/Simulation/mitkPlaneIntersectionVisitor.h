@@ -35,7 +35,7 @@ namespace mitk
 
     struct Intersection
     {
-      ScalarType color[3];
+      float color[4];
       std::vector<Edge> edges;
     };
 

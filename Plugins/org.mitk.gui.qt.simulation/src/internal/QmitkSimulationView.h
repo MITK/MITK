@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkSimulationInteractor.h>
 #include <QmitkAbstractView.h>
+#include <QMenu>
 #include <QTime>
 #include <QTimer>
 #include <ui_QmitkSimulationViewControls.h>
@@ -41,6 +42,7 @@ public:
 
 private slots:
   void OnAnimateButtonToggled(bool toggled);
+  void OnBaseContextMenuRequested(const QPoint& point);
   void OnDtChanged(double dt);
   void OnResetButtonClicked();
   void OnSelectedSimulationChanged(const mitk::DataNode* node);
@@ -56,10 +58,11 @@ private:
 
   static const int MSecsPerFrame = 17;
 
-  Ui::QmitkSimulationViewControls m_Controls;
+  Ui::QmitkSimulationViewControls m_Ui;
   mitk::ISimulationService* m_SimulationService;
   mitk::DataNode::Pointer m_Selection;
   mitk::SimulationInteractor::Pointer m_Interactor;
+  QMenu* m_VtkModelContextMenu;
   QTimer m_Timer;
   QTime m_NextRenderWindowUpdate;
 };

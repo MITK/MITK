@@ -21,12 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLookupTableProperty.h"
 
-#include <MitkSceneSerializationBaseExports.h>
-
 namespace mitk
 {
 
-class MITKSCENESERIALIZATIONBASE_EXPORT LookupTablePropertySerializer : public BasePropertySerializer
+class LookupTablePropertySerializer : public BasePropertySerializer
 {
   public:
 

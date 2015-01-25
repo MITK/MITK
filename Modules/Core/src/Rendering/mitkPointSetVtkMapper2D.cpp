@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSetVtkMapper2D.h"
 
 //mitk includes
-#include "mitkDataNode.h"
-#include "mitkProperties.h"
 #include "mitkVtkPropRenderer.h"
-#include "mitkPointSet.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkDataNode.h>
+#include <mitkProperties.h>
+#include <mitkPointSet.h>
+#include <mitkPlaneGeometry.h>
 
 //vtk includes
 #include <vtkActor.h>
@@ -315,7 +315,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     float diff = geo2D->Distance(point);
     diff = diff * diff;
 
-    // draw markers on slices a certain distance away from the points true location according to the tolerance threshold (m_DistanceToPlane)
+    //draw markers on slices a certain distance away from the points
+    //location according to the tolerance threshold (m_DistanceToPlane)
     if(diff < m_DistanceToPlane)
     {
       // is point selected or not?
@@ -333,8 +334,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
       }
 
       //---- LABEL -----//
-
-      //  paint label for each point if available
+      //paint label for each point if available
       if (dynamic_cast<mitk::StringProperty *>(this->GetDataNode()->GetProperty("label")) != NULL)
       {
         const char * pointLabel = dynamic_cast<mitk::StringProperty *>(
@@ -414,8 +414,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
         if(m_ShowAngles && count > 1) // calculate and print angle between connected lines
         {
           std::stringstream buffer;
-          //(char) 176 is the degree sign
-          buffer << angle(vec.GetVnlVector(), -lastVec.GetVnlVector())*180/vnl_math::pi << (char)176;
+          buffer << angle(vec.GetVnlVector(), -lastVec.GetVnlVector())*180/vnl_math::pi << "°";
 
           //compute desired display position of text
           Vector2D vec2d = pt2d-lastPt2d;             // first arm enclosing the angle

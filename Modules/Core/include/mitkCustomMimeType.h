@@ -59,6 +59,20 @@ public:
   std::string GetComment() const;
 
   virtual bool AppliesTo(const std::string& path) const;
+  /**
+  * \brief Provides the first matching extension
+  *
+  * Checks whether any of its extensions are present at the end of the provided path.
+  * Returns the first found one.
+  */
+  std::string GetExtension(const std::string& path) const;
+  /**
+  * \brief Provides the filename minus the extension
+  *
+  * Checks whether any of its extensions are present at the end of the provided path.
+  * Returns the filename without that extension and without the directory.
+  */
+  std::string GetFilenameWithoutExtension(const std::string& path) const;
 
   void SetName(const std::string& name);
   void SetCategory(const std::string& category);
@@ -71,6 +85,9 @@ public:
   virtual CustomMimeType* Clone() const;
 
 private:
+
+  // returns true if an extension was found
+  bool ParsePathForExtension(const std::string& path, std::string& extension, std::string& filename ) const;
 
   struct Impl;
   Impl* d;

@@ -83,9 +83,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBValueMapProperty.h>
 #include <mitkGradientDirectionsProperty.h>
 #include <mitkMeasurementFrameProperty.h>
+#include <itkImageDuplicator.h>
 
 const std::string QmitkPreprocessingView::VIEW_ID =
-    "org.mitk.views.preprocessing";
+        "org.mitk.views.preprocessing";
 
 #define DI_INFO MITK_INFO("DiffusionImaging")
 
@@ -94,9 +95,9 @@ typedef float TTensorPixelType;
 
 
 QmitkPreprocessingView::QmitkPreprocessingView()
-  : QmitkFunctionality(),
-    m_Controls(NULL),
-    m_MultiWidget(NULL)
+    : QmitkFunctionality(),
+      m_Controls(NULL),
+      m_MultiWidget(NULL)
 {
 }
 
@@ -107,158 +108,200 @@ QmitkPreprocessingView::~QmitkPreprocessingView()
 
 void QmitkPreprocessingView::CreateQtPartControl(QWidget *parent)
 {
-  if (!m_Controls)
-  {
-    // create GUI widgets
-    m_Controls = new Ui::QmitkPreprocessingViewControls;
-    m_Controls->setupUi(parent);
-    this->CreateConnections();
+    if (!m_Controls)
+    {
+        // create GUI widgets
+        m_Controls = new Ui::QmitkPreprocessingViewControls;
+        m_Controls->setupUi(parent);
+        this->CreateConnections();
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    m_Controls->m_MeasurementFrameTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-    m_Controls->m_MeasurementFrameTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
-    m_Controls->m_DirectionMatrixTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-    m_Controls->m_DirectionMatrixTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
+        m_Controls->m_MeasurementFrameTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+        m_Controls->m_MeasurementFrameTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
+        m_Controls->m_DirectionMatrixTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+        m_Controls->m_DirectionMatrixTable->verticalHeader()->setResizeMode(QHeaderView::Stretch);
 #else
-    m_Controls->m_MeasurementFrameTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    m_Controls->m_MeasurementFrameTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    m_Controls->m_DirectionMatrixTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    m_Controls->m_DirectionMatrixTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        m_Controls->m_MeasurementFrameTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        m_Controls->m_MeasurementFrameTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        m_Controls->m_DirectionMatrixTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        m_Controls->m_DirectionMatrixTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 #endif
-  }
+    }
 }
 
 void QmitkPreprocessingView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
-  m_MultiWidget = &stdMultiWidget;
+    m_MultiWidget = &stdMultiWidget;
 }
 
 void QmitkPreprocessingView::StdMultiWidgetNotAvailable()
 {
-  m_MultiWidget = NULL;
+    m_MultiWidget = NULL;
 }
 
 void QmitkPreprocessingView::CreateConnections()
 {
-  if ( m_Controls )
-  {
-    m_Controls->m_NormalizationMaskBox->SetDataStorage(this->GetDataStorage());
-    mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-    mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
-    mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
-    mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
-    mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isDwi, isDti);
-    isDiffusionImage = mitk::NodePredicateOr::New(isDiffusionImage, isQbi);
-    mitk::NodePredicateNot::Pointer noDiffusionImage = mitk::NodePredicateNot::New(isDiffusionImage);
-    mitk::NodePredicateAnd::Pointer finalPredicate = mitk::NodePredicateAnd::New(isMitkImage, noDiffusionImage);
-    mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-    finalPredicate = mitk::NodePredicateAnd::New(finalPredicate, isBinaryPredicate);
-    m_Controls->m_NormalizationMaskBox->SetPredicate(finalPredicate);
+    if ( m_Controls )
+    {
+        m_Controls->m_NormalizationMaskBox->SetDataStorage(this->GetDataStorage());
+        mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+        mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
+        mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
+        mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
+        mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isDwi, isDti);
+        isDiffusionImage = mitk::NodePredicateOr::New(isDiffusionImage, isQbi);
+        mitk::NodePredicateNot::Pointer noDiffusionImage = mitk::NodePredicateNot::New(isDiffusionImage);
+        mitk::NodePredicateAnd::Pointer finalPredicate = mitk::NodePredicateAnd::New(isMitkImage, noDiffusionImage);
+        mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+        finalPredicate = mitk::NodePredicateAnd::New(finalPredicate, isBinaryPredicate);
+        m_Controls->m_NormalizationMaskBox->SetPredicate(finalPredicate);
 
-    m_Controls->m_ExtractBrainMask->setVisible(false);
-    m_Controls->m_BrainMaskIterationsBox->setVisible(false);
-    m_Controls->m_ResampleIntFrame->setVisible(false);
-    connect( (QObject*)(m_Controls->m_ButtonAverageGradients), SIGNAL(clicked()), this, SLOT(AverageGradients()) );
-    connect( (QObject*)(m_Controls->m_ButtonExtractB0), SIGNAL(clicked()), this, SLOT(ExtractB0()) );
-    connect( (QObject*)(m_Controls->m_ModifyMeasurementFrame), SIGNAL(clicked()), this, SLOT(DoApplyMesurementFrame()) );
-    connect( (QObject*)(m_Controls->m_ReduceGradientsButton), SIGNAL(clicked()), this, SLOT(DoReduceGradientDirections()) );
-    connect( (QObject*)(m_Controls->m_ShowGradientsButton), SIGNAL(clicked()), this, SLOT(DoShowGradientDirections()) );
-    connect( (QObject*)(m_Controls->m_MirrorGradientToHalfSphereButton), SIGNAL(clicked()), this, SLOT(DoHalfSphereGradientDirections()) );
-    connect( (QObject*)(m_Controls->m_MergeDwisButton), SIGNAL(clicked()), this, SLOT(MergeDwis()) );
-    connect( (QObject*)(m_Controls->m_ProjectSignalButton), SIGNAL(clicked()), this, SLOT(DoProjectSignal()) );
-    connect( (QObject*)(m_Controls->m_B_ValueMap_Rounder_SpinBox), SIGNAL(valueChanged(int)), this, SLOT(UpdateDwiBValueMapRounder(int)));
-    connect( (QObject*)(m_Controls->m_CreateLengthCorrectedDwi), SIGNAL(clicked()), this, SLOT(DoLengthCorrection()) );
-    connect( (QObject*)(m_Controls->m_CalcAdcButton), SIGNAL(clicked()), this, SLOT(DoAdcCalculation()) );
-    connect( (QObject*)(m_Controls->m_NormalizeImageValuesButton), SIGNAL(clicked()), this, SLOT(DoDwiNormalization()) );
-    connect( (QObject*)(m_Controls->m_ModifyDirection), SIGNAL(clicked()), this, SLOT(DoApplyDirectionMatrix()) );
-    connect( (QObject*)(m_Controls->m_ModifySpacingButton), SIGNAL(clicked()), this, SLOT(DoApplySpacing()) );
-    connect( (QObject*)(m_Controls->m_ModifyOriginButton), SIGNAL(clicked()), this, SLOT(DoApplyOrigin()) );
-    connect( (QObject*)(m_Controls->m_ResampleImageButton), SIGNAL(clicked()), this, SLOT(DoResampleImage()) );
-    connect( (QObject*)(m_Controls->m_ResampleTypeBox), SIGNAL(currentIndexChanged(int)), this, SLOT(DoUpdateInterpolationGui(int)) );
-    connect( (QObject*)(m_Controls->m_CropImageButton), SIGNAL(clicked()), this, SLOT(DoCropImage()) );
-    connect( (QObject*)(m_Controls->m_RemoveGradientButton), SIGNAL(clicked()), this, SLOT(DoRemoveGradient()) );
-    connect( (QObject*)(m_Controls->m_ExtractGradientButton), SIGNAL(clicked()), this, SLOT(DoExtractGradient()) );
+        m_Controls->m_ExtractBrainMask->setVisible(false);
+        m_Controls->m_BrainMaskIterationsBox->setVisible(false);
+        m_Controls->m_ResampleIntFrame->setVisible(false);
+        connect( (QObject*)(m_Controls->m_ButtonAverageGradients), SIGNAL(clicked()), this, SLOT(AverageGradients()) );
+        connect( (QObject*)(m_Controls->m_ButtonExtractB0), SIGNAL(clicked()), this, SLOT(ExtractB0()) );
+        connect( (QObject*)(m_Controls->m_ModifyMeasurementFrame), SIGNAL(clicked()), this, SLOT(DoApplyMesurementFrame()) );
+        connect( (QObject*)(m_Controls->m_ReduceGradientsButton), SIGNAL(clicked()), this, SLOT(DoReduceGradientDirections()) );
+        connect( (QObject*)(m_Controls->m_ShowGradientsButton), SIGNAL(clicked()), this, SLOT(DoShowGradientDirections()) );
+        connect( (QObject*)(m_Controls->m_MirrorGradientToHalfSphereButton), SIGNAL(clicked()), this, SLOT(DoHalfSphereGradientDirections()) );
+        connect( (QObject*)(m_Controls->m_MergeDwisButton), SIGNAL(clicked()), this, SLOT(MergeDwis()) );
+        connect( (QObject*)(m_Controls->m_ProjectSignalButton), SIGNAL(clicked()), this, SLOT(DoProjectSignal()) );
+        connect( (QObject*)(m_Controls->m_B_ValueMap_Rounder_SpinBox), SIGNAL(valueChanged(int)), this, SLOT(UpdateDwiBValueMapRounder(int)));
+        connect( (QObject*)(m_Controls->m_CreateLengthCorrectedDwi), SIGNAL(clicked()), this, SLOT(DoLengthCorrection()) );
+        connect( (QObject*)(m_Controls->m_CalcAdcButton), SIGNAL(clicked()), this, SLOT(DoAdcCalculation()) );
+        connect( (QObject*)(m_Controls->m_NormalizeImageValuesButton), SIGNAL(clicked()), this, SLOT(DoDwiNormalization()) );
+        connect( (QObject*)(m_Controls->m_ModifyDirection), SIGNAL(clicked()), this, SLOT(DoApplyDirectionMatrix()) );
+        connect( (QObject*)(m_Controls->m_ModifySpacingButton), SIGNAL(clicked()), this, SLOT(DoApplySpacing()) );
+        connect( (QObject*)(m_Controls->m_ModifyOriginButton), SIGNAL(clicked()), this, SLOT(DoApplyOrigin()) );
+        connect( (QObject*)(m_Controls->m_ResampleImageButton), SIGNAL(clicked()), this, SLOT(DoResampleImage()) );
+        connect( (QObject*)(m_Controls->m_ResampleTypeBox), SIGNAL(currentIndexChanged(int)), this, SLOT(DoUpdateInterpolationGui(int)) );
+        connect( (QObject*)(m_Controls->m_CropImageButton), SIGNAL(clicked()), this, SLOT(DoCropImage()) );
+        connect( (QObject*)(m_Controls->m_RemoveGradientButton), SIGNAL(clicked()), this, SLOT(DoRemoveGradient()) );
+        connect( (QObject*)(m_Controls->m_ExtractGradientButton), SIGNAL(clicked()), this, SLOT(DoExtractGradient()) );
 
 
-    //        connect( (QObject*)(m_Controls->m_ExtractBrainMask), SIGNAL(clicked()), this, SLOT(DoExtractBrainMask()) );
-  }
+        //        connect( (QObject*)(m_Controls->m_ExtractBrainMask), SIGNAL(clicked()), this, SLOT(DoExtractBrainMask()) );
+    }
 }
 
 void QmitkPreprocessingView::DoRemoveGradient()
 {
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( !isDiffusionImage )
-  {
-    return;
-  }
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( !isDiffusionImage )
+    {
+        return;
+    }
 
-  std::vector< unsigned int > channelsToRemove; channelsToRemove.push_back(m_Controls->m_RemoveGradientBox->value());
+    std::vector< unsigned int > channelsToRemove; channelsToRemove.push_back(m_Controls->m_RemoveGradientBox->value());
 
-  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-  mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
+    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+    mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
 
-  itk::RemoveDwiChannelFilter< short >::Pointer filter = itk::RemoveDwiChannelFilter< short >::New();
-  filter->SetInput(itkVectorImagePointer);
-  filter->SetChannelIndices(channelsToRemove);
-  filter->SetDirections( static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
-  filter->Update();
+    itk::RemoveDwiChannelFilter< short >::Pointer filter = itk::RemoveDwiChannelFilter< short >::New();
+    filter->SetInput(itkVectorImagePointer);
+    filter->SetChannelIndices(channelsToRemove);
+    filter->SetDirections( static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+    filter->Update();
 
-  mitk::Image::Pointer image = mitk::GrabItkImageMemory( filter->GetOutput() );
-  image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetNewDirections() ) );
-  image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
-  image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
-  mitk::DiffusionPropertyHelper propertyHelper( image );
-  propertyHelper.InitializeImage();
+    mitk::Image::Pointer image = mitk::GrabItkImageMemory( filter->GetOutput() );
+    image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetNewDirections() ) );
+    image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
+    image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
+    mitk::DiffusionPropertyHelper propertyHelper( image );
+    propertyHelper.InitializeImage();
 
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( image );
-  QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
 
-  imageNode->SetName((name+"_removedgradients").toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+    imageNode->SetName((name+"_removedgradients").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
 
-  mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkPreprocessingView::DoExtractGradient()
 {
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( !isDiffusionImage )
-  {
-    return;
-  }
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( !isDiffusionImage )
+    {
+        return;
+    }
 
-  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-  mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
+    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+    mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
 
-  unsigned int channel = m_Controls->m_ExtractGradientBox->value();
-  itk::ExtractDwiChannelFilter< short >::Pointer filter = itk::ExtractDwiChannelFilter< short >::New();
-  filter->SetInput( itkVectorImagePointer);
-  filter->SetChannelIndex(channel);
-  filter->Update();
+    unsigned int channel = m_Controls->m_ExtractGradientBox->value();
+    itk::ExtractDwiChannelFilter< short >::Pointer filter = itk::ExtractDwiChannelFilter< short >::New();
+    filter->SetInput( itkVectorImagePointer);
+    filter->SetChannelIndex(channel);
+    filter->Update();
 
-  mitk::Image::Pointer mitkImage = mitk::Image::New();
-  mitkImage->InitializeByItk( filter->GetOutput() );
-  mitkImage->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
+    mitk::Image::Pointer mitkImage = mitk::Image::New();
+    mitkImage->InitializeByItk( filter->GetOutput() );
+    mitkImage->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
 
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( mitkImage );
-  QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
-  imageNode->SetName((name+"_direction-"+QString::number(channel)).toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( mitkImage );
+    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+    imageNode->SetName((name+"_direction-"+QString::number(channel)).toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
 
-  mitk::RenderingManager::GetInstance()->InitializeViews(imageNode->GetData()->GetTimeGeometry(),mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+    mitk::RenderingManager::GetInstance()->InitializeViews(imageNode->GetData()->GetTimeGeometry(),mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
 }
 
 void QmitkPreprocessingView::DoCropImage()
 {
-  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-  mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( isDiffusionImage )
+    {
+        ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+        mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
 
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( isDiffusionImage )
-  {
+        ItkDwiType::SizeType lower;
+        ItkDwiType::SizeType upper;
+        lower[0] = m_Controls->m_XstartBox->value();
+        lower[1] = m_Controls->m_YstartBox->value();
+        lower[2] = m_Controls->m_ZstartBox->value();
+        upper[0] = m_Controls->m_XendBox->value();
+        upper[1] = m_Controls->m_YendBox->value();
+        upper[2] = m_Controls->m_ZendBox->value();
+
+        itk::CropImageFilter< ItkDwiType, ItkDwiType >::Pointer cropper = itk::CropImageFilter< ItkDwiType, ItkDwiType >::New();
+        cropper->SetLowerBoundaryCropSize(lower);
+        cropper->SetUpperBoundaryCropSize(upper);
+        cropper->SetInput( itkVectorImagePointer );
+        cropper->Update();
+
+        mitk::Image::Pointer image = mitk::GrabItkImageMemory( cropper->GetOutput() );
+        image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
+        image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
+        image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
+        mitk::DiffusionPropertyHelper propertyHelper( image );
+        propertyHelper.InitializeImage();
+
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+        imageNode->SetName((name+"_cropped").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+        mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+        mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    else if(m_SelectedImage.IsNotNull())
+    {
+        AccessFixedDimensionByItk(m_SelectedImage, TemplatedCropImage,3);
+    }
+}
+
+template < typename TPixel, unsigned int VImageDimension >
+void QmitkPreprocessingView::TemplatedCropImage( itk::Image<TPixel, VImageDimension>* itkImage)
+{
     ItkDwiType::SizeType lower;
     ItkDwiType::SizeType upper;
     lower[0] = m_Controls->m_XstartBox->value();
@@ -268,1041 +311,977 @@ void QmitkPreprocessingView::DoCropImage()
     upper[1] = m_Controls->m_YendBox->value();
     upper[2] = m_Controls->m_ZendBox->value();
 
-    itk::CropImageFilter< ItkDwiType, ItkDwiType >::Pointer cropper = itk::CropImageFilter< ItkDwiType, ItkDwiType >::New();
+    typedef itk::Image<TPixel, VImageDimension> ImageType;
+    typename itk::CropImageFilter< ImageType, ImageType >::Pointer cropper = itk::CropImageFilter< ImageType, ImageType >::New();
     cropper->SetLowerBoundaryCropSize(lower);
     cropper->SetUpperBoundaryCropSize(upper);
-    cropper->SetInput( itkVectorImagePointer );
+    cropper->SetInput(itkImage);
     cropper->Update();
 
-    mitk::Image::Pointer image = mitk::GrabItkImageMemory( cropper->GetOutput() );
-    image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
-    image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
-    image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
-    mitk::DiffusionPropertyHelper propertyHelper( image );
-    propertyHelper.InitializeImage();
-
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->InitializeByItk( cropper->GetOutput() );
+    image->SetVolume( cropper->GetOutput()->GetBufferPointer() );
     mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
     imageNode->SetData( image );
-    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+    QString name = m_SelectedImageNode->GetName().c_str();
+
     imageNode->SetName((name+"_cropped").toStdString().c_str());
-    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
-    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
 
     mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-  else if(m_SelectedImage.IsNotNull())
-  {
-    AccessFixedDimensionByItk(m_SelectedImage, TemplatedCropImage,3);
-  }
-}
-
-template < typename TPixel, unsigned int VImageDimension >
-void QmitkPreprocessingView::TemplatedCropImage( itk::Image<TPixel, VImageDimension>* itkImage)
-{
-  ItkDwiType::SizeType lower;
-  ItkDwiType::SizeType upper;
-  lower[0] = m_Controls->m_XstartBox->value();
-  lower[1] = m_Controls->m_YstartBox->value();
-  lower[2] = m_Controls->m_ZstartBox->value();
-  upper[0] = m_Controls->m_XendBox->value();
-  upper[1] = m_Controls->m_YendBox->value();
-  upper[2] = m_Controls->m_ZendBox->value();
-
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typename itk::CropImageFilter< ImageType, ImageType >::Pointer cropper = itk::CropImageFilter< ImageType, ImageType >::New();
-  cropper->SetLowerBoundaryCropSize(lower);
-  cropper->SetUpperBoundaryCropSize(upper);
-  cropper->SetInput(itkImage);
-  cropper->Update();
-
-  mitk::Image::Pointer image = mitk::Image::New();
-  image->InitializeByItk( cropper->GetOutput() );
-  image->SetVolume( cropper->GetOutput()->GetBufferPointer() );
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( image );
-  QString name = m_SelectedImageNode->GetName().c_str();
-
-  imageNode->SetName((name+"_cropped").toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
-
-  mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkPreprocessingView::DoApplySpacing()
 {
-  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-  mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( m_SelectedImageNode) );
+    if ( isDiffusionImage )
+    {
+        mitk::Vector3D spacing;
+        spacing[0] = m_Controls->m_HeaderSpacingX->value();
+        spacing[1] = m_Controls->m_HeaderSpacingY->value();
+        spacing[2] = m_Controls->m_HeaderSpacingZ->value();
 
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( isDiffusionImage )
-  {
-    mitk::Vector3D spacing;
-    spacing[0] = m_Controls->m_HeaderSpacingX->value();
-    spacing[1] = m_Controls->m_HeaderSpacingY->value();
-    spacing[2] = m_Controls->m_HeaderSpacingZ->value();
+        mitk::Image::Pointer image = m_SelectedImage->Clone();
+        image->GetGeometry()->SetSpacing( spacing );
+        mitk::DiffusionPropertyHelper propertyHelper( image );
+        propertyHelper.InitializeImage();
 
-    mitk::Image::Pointer image = m_SelectedImage->Clone();
-    image->GetGeometry()->SetSpacing( spacing );
-    mitk::DiffusionPropertyHelper propertyHelper( image );
-    propertyHelper.InitializeImage();
-
-    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-    imageNode->SetData( image );
-    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
-    imageNode->SetName((name+"_newspacing").toStdString().c_str());
-    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
-    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-  else if(m_SelectedImage.IsNotNull())
-  {
-    AccessFixedDimensionByItk(m_SelectedImage, TemplatedSetImageSpacing,3);
-  }
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+        imageNode->SetName((name+"_newspacing").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+        mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    else if(m_SelectedImage.IsNotNull())
+    {
+        AccessFixedDimensionByItk(m_SelectedImage, TemplatedSetImageSpacing,3);
+    }
 }
 
 template < typename TPixel, unsigned int VImageDimension >
 void QmitkPreprocessingView::TemplatedSetImageSpacing( itk::Image<TPixel, VImageDimension>* itkImage)
 {
-  mitk::Vector3D spacing;
-  spacing[0] = m_Controls->m_HeaderSpacingX->value();
-  spacing[1] = m_Controls->m_HeaderSpacingY->value();
-  spacing[2] = m_Controls->m_HeaderSpacingZ->value();
+    mitk::Vector3D spacing;
+    spacing[0] = m_Controls->m_HeaderSpacingX->value();
+    spacing[1] = m_Controls->m_HeaderSpacingY->value();
+    spacing[2] = m_Controls->m_HeaderSpacingZ->value();
 
-  typedef itk::ImageDuplicator< itk::Image<TPixel, VImageDimension> > DuplicateFilterType;
-  typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
-  duplicator->SetInputImage( itkImage );
-  duplicator->Update();
-  typename itk::Image<TPixel, VImageDimension>::Pointer newImage = duplicator->GetOutput();
-  newImage->SetSpacing(spacing);
+    typedef itk::ImageDuplicator< itk::Image<TPixel, VImageDimension> > DuplicateFilterType;
+    typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
+    duplicator->SetInputImage( itkImage );
+    duplicator->Update();
+    typename itk::Image<TPixel, VImageDimension>::Pointer newImage = duplicator->GetOutput();
+    newImage->SetSpacing(spacing);
 
-  mitk::Image::Pointer image = mitk::Image::New();
-  image->InitializeByItk( newImage.GetPointer() );
-  image->SetVolume( newImage->GetBufferPointer() );
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( image );
-  QString name = m_SelectedImageNode->GetName().c_str();
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->InitializeByItk( newImage.GetPointer() );
+    image->SetVolume( newImage->GetBufferPointer() );
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_SelectedImageNode->GetName().c_str();
 
-  imageNode->SetName((name+"_newspacing").toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
-  mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    imageNode->SetName((name+"_newspacing").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
+    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkPreprocessingView::DoApplyOrigin()
 {
-  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-  mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( isDiffusionImage )
+    {
+        mitk::Vector3D origin;
+        origin[0] = m_Controls->m_HeaderOriginX->value();
+        origin[1] = m_Controls->m_HeaderOriginY->value();
+        origin[2] = m_Controls->m_HeaderOriginZ->value();
 
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( isDiffusionImage )
-  {
-    mitk::Vector3D origin;
-    origin[0] = m_Controls->m_HeaderOriginX->value();
-    origin[1] = m_Controls->m_HeaderOriginY->value();
-    origin[2] = m_Controls->m_HeaderOriginZ->value();
+        mitk::Image::Pointer image = m_SelectedImage->Clone();
 
-    mitk::Image::Pointer image = m_SelectedImage->Clone();
+        image->GetGeometry()->SetOrigin( origin );
+        mitk::DiffusionPropertyHelper propertyHelper( image );
+        propertyHelper.InitializeImage();
 
-    image->GetGeometry()->SetOrigin( origin );
-    mitk::DiffusionPropertyHelper propertyHelper( image );
-    propertyHelper.InitializeImage();
-
-    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-    imageNode->SetData( image );
-    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
-    imageNode->SetName((name+"_neworigin").toStdString().c_str());
-    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
-    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-  else if(m_SelectedImage.IsNotNull())
-  {
-    AccessFixedDimensionByItk(m_SelectedImage, TemplatedSetImageOrigin,3);
-  }
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+        imageNode->SetName((name+"_neworigin").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+        mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    else if(m_SelectedImage.IsNotNull())
+    {
+        AccessFixedDimensionByItk(m_SelectedImage, TemplatedSetImageOrigin,3);
+    }
 }
 
 template < typename TPixel, unsigned int VImageDimension >
 void QmitkPreprocessingView::TemplatedSetImageOrigin( itk::Image<TPixel, VImageDimension>* itkImage)
 {
-  mitk::Vector3D origin;
-  origin[0] = m_Controls->m_HeaderOriginX->value();
-  origin[1] = m_Controls->m_HeaderOriginY->value();
-  origin[2] = m_Controls->m_HeaderOriginZ->value();
+    mitk::Vector3D origin;
+    origin[0] = m_Controls->m_HeaderOriginX->value();
+    origin[1] = m_Controls->m_HeaderOriginY->value();
+    origin[2] = m_Controls->m_HeaderOriginZ->value();
 
-  typedef itk::ImageDuplicator< itk::Image<TPixel, VImageDimension> > DuplicateFilterType;
-  typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
-  duplicator->SetInputImage( itkImage );
-  duplicator->Update();
-  typename itk::Image<TPixel, VImageDimension>::Pointer newImage = duplicator->GetOutput();
-  newImage->SetOrigin(origin);
+    typedef itk::ImageDuplicator< itk::Image<TPixel, VImageDimension> > DuplicateFilterType;
+    typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
+    duplicator->SetInputImage( itkImage );
+    duplicator->Update();
+    typename itk::Image<TPixel, VImageDimension>::Pointer newImage = duplicator->GetOutput();
+    newImage->SetOrigin(origin);
 
-  mitk::Image::Pointer image = mitk::Image::New();
-  image->InitializeByItk( newImage.GetPointer() );
-  image->SetVolume( newImage->GetBufferPointer() );
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( image );
-  QString name = m_SelectedImageNode->GetName().c_str();
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->InitializeByItk( newImage.GetPointer() );
+    image->SetVolume( newImage->GetBufferPointer() );
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_SelectedImageNode->GetName().c_str();
 
-  imageNode->SetName((name+"_neworigin").toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
-  mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    imageNode->SetName((name+"_neworigin").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
+    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkPreprocessingView::DoUpdateInterpolationGui(int i)
 {
-  if( m_SelectedImageNode && m_SelectedImageNode.IsNull() )
-  {
-    return;
-  }
-  switch (i)
-  {
-  case 0:
-  {
-    m_Controls->m_ResampleIntFrame->setVisible(false);
-    m_Controls->m_ResampleDoubleFrame->setVisible(true);
-    break;
-  }
-  case 1:
-  {
-    m_Controls->m_ResampleIntFrame->setVisible(false);
-    m_Controls->m_ResampleDoubleFrame->setVisible(true);
-
-    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-    mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
-
-    if (itkVectorImagePointer.IsNotNull())
+    switch (i)
     {
-      m_Controls->m_ResampleDoubleX->setValue(itkVectorImagePointer->GetSpacing()[0]);
-      m_Controls->m_ResampleDoubleY->setValue(itkVectorImagePointer->GetSpacing()[1]);
-      m_Controls->m_ResampleDoubleZ->setValue(itkVectorImagePointer->GetSpacing()[2]);
-    }
-    else if (m_SelectedImage.IsNotNull())
+    case 0:
     {
-      mitk::BaseGeometry* geom = m_SelectedImage->GetGeometry();
-      m_Controls->m_ResampleDoubleX->setValue(geom->GetSpacing()[0]);
-      m_Controls->m_ResampleDoubleY->setValue(geom->GetSpacing()[1]);
-      m_Controls->m_ResampleDoubleZ->setValue(geom->GetSpacing()[2]);
+        m_Controls->m_ResampleIntFrame->setVisible(false);
+        m_Controls->m_ResampleDoubleFrame->setVisible(true);
+        break;
     }
-    break;
-  }
-  case 2:
-  {
-    m_Controls->m_ResampleIntFrame->setVisible(true);
-    m_Controls->m_ResampleDoubleFrame->setVisible(false);
+    case 1:
+    {
+        m_Controls->m_ResampleIntFrame->setVisible(false);
+        m_Controls->m_ResampleDoubleFrame->setVisible(true);
 
-    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-    mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
+        if (m_SelectedImage.IsNotNull())
+        {
+            mitk::BaseGeometry* geom = m_SelectedImage->GetGeometry();
+            m_Controls->m_ResampleDoubleX->setValue(geom->GetSpacing()[0]);
+            m_Controls->m_ResampleDoubleY->setValue(geom->GetSpacing()[1]);
+            m_Controls->m_ResampleDoubleZ->setValue(geom->GetSpacing()[2]);
+        }
+        break;
+    }
+    case 2:
+    {
+        m_Controls->m_ResampleIntFrame->setVisible(true);
+        m_Controls->m_ResampleDoubleFrame->setVisible(false);
 
-    if (itkVectorImagePointer.IsNotNull())
-    {
-      m_Controls->m_ResampleIntX->setValue(itkVectorImagePointer->GetLargestPossibleRegion().GetSize(0));
-      m_Controls->m_ResampleIntY->setValue(itkVectorImagePointer->GetLargestPossibleRegion().GetSize(1));
-      m_Controls->m_ResampleIntZ->setValue(itkVectorImagePointer->GetLargestPossibleRegion().GetSize(2));
+        if (m_SelectedImage.IsNotNull())
+        {
+            mitk::BaseGeometry* geom = m_SelectedImage->GetGeometry();
+            m_Controls->m_ResampleIntX->setValue(geom->GetExtent(0));
+            m_Controls->m_ResampleIntY->setValue(geom->GetExtent(1));
+            m_Controls->m_ResampleIntZ->setValue(geom->GetExtent(2));
+        }
+        break;
     }
-    else if (m_SelectedImage.IsNotNull())
+    default:
     {
-      mitk::BaseGeometry* geom = m_SelectedImage->GetGeometry();
-      m_Controls->m_ResampleIntX->setValue(geom->GetExtent(0));
-      m_Controls->m_ResampleIntY->setValue(geom->GetExtent(1));
-      m_Controls->m_ResampleIntZ->setValue(geom->GetExtent(2));
+        m_Controls->m_ResampleIntFrame->setVisible(false);
+        m_Controls->m_ResampleDoubleFrame->setVisible(true);
     }
-    break;
-  }
-  default:
-  {
-    m_Controls->m_ResampleIntFrame->setVisible(false);
-    m_Controls->m_ResampleDoubleFrame->setVisible(true);
-  }
-  }
+    }
 }
 
 void QmitkPreprocessingView::DoExtractBrainMask()
 {
-  //    if (m_SelectedImage.IsNull())
-  //        return;
+    //    if (m_SelectedImage.IsNull())
+    //        return;
 
-  //    typedef itk::Image<unsigned short, 3> ShortImageType;
-  //    ShortImageType::Pointer itkImage = ShortImageType::New();
-  //    mitk::CastToItkImage(m_SelectedImage, itkImage);
+    //    typedef itk::Image<unsigned short, 3> ShortImageType;
+    //    ShortImageType::Pointer itkImage = ShortImageType::New();
+    //    mitk::CastToItkImage(m_SelectedImage, itkImage);
 
-  //    typedef itk::BrainMaskExtractionImageFilter< unsigned char > FilterType;
-  //    FilterType::Pointer filter = FilterType::New();
-  //    filter->SetInput(itkImage);
-  //    filter->SetMaxNumIterations(m_Controls->m_BrainMaskIterationsBox->value());
-  //    filter->Update();
+    //    typedef itk::BrainMaskExtractionImageFilter< unsigned char > FilterType;
+    //    FilterType::Pointer filter = FilterType::New();
+    //    filter->SetInput(itkImage);
+    //    filter->SetMaxNumIterations(m_Controls->m_BrainMaskIterationsBox->value());
+    //    filter->Update();
 
-  //    mitk::Image::Pointer image = mitk::Image::New();
-  //    image->InitializeByItk( filter->GetOutput() );
-  //    image->SetVolume( filter->GetOutput()->GetBufferPointer() );
-  //    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  //    imageNode->SetData( image );
-  //    imageNode->SetName("BRAINMASK");
-  //    GetDefaultDataStorage()->Add(imageNode);
+    //    mitk::Image::Pointer image = mitk::Image::New();
+    //    image->InitializeByItk( filter->GetOutput() );
+    //    image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+    //    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    //    imageNode->SetData( image );
+    //    imageNode->SetName("BRAINMASK");
+    //    GetDefaultDataStorage()->Add(imageNode);
 }
 
 void QmitkPreprocessingView::DoResampleImage()
 {
-  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-  mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( isDiffusionImage )
+    {
+        ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+        mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
 
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( isDiffusionImage )
-  {
-    typedef itk::ResampleDwiImageFilter< short > ResampleFilter;
-    ResampleFilter::Pointer resampler = ResampleFilter::New();
-    resampler->SetInput( itkVectorImagePointer );
+        typedef itk::ResampleDwiImageFilter< short > ResampleFilter;
+        ResampleFilter::Pointer resampler = ResampleFilter::New();
+        resampler->SetInput( itkVectorImagePointer );
 
-    switch (m_Controls->m_ResampleTypeBox->currentIndex())
-    {
-    case 0:
-    {
-      itk::Vector< double, 3 > samplingFactor;
-      samplingFactor[0] = m_Controls->m_ResampleDoubleX->value();
-      samplingFactor[1] = m_Controls->m_ResampleDoubleY->value();
-      samplingFactor[2] = m_Controls->m_ResampleDoubleZ->value();
-      resampler->SetSamplingFactor(samplingFactor);
-      break;
-    }
-    case 1:
-    {
-      itk::Vector< double, 3 > newSpacing;
-      newSpacing[0] = m_Controls->m_ResampleDoubleX->value();
-      newSpacing[1] = m_Controls->m_ResampleDoubleY->value();
-      newSpacing[2] = m_Controls->m_ResampleDoubleZ->value();
-      resampler->SetNewSpacing(newSpacing);
-      break;
-    }
-    case 2:
-    {
-      itk::ImageRegion<3> newRegion;
-      newRegion.SetSize(0, m_Controls->m_ResampleIntX->value());
-      newRegion.SetSize(1, m_Controls->m_ResampleIntY->value());
-      newRegion.SetSize(2, m_Controls->m_ResampleIntZ->value());
-      resampler->SetNewImageSize(newRegion);
-      break;
-    }
-    default:
-    {
-      MITK_WARN << "Unknown resampling parameters!";
-      return;
-    }
-    }
+        switch (m_Controls->m_ResampleTypeBox->currentIndex())
+        {
+        case 0:
+        {
+            itk::Vector< double, 3 > samplingFactor;
+            samplingFactor[0] = m_Controls->m_ResampleDoubleX->value();
+            samplingFactor[1] = m_Controls->m_ResampleDoubleY->value();
+            samplingFactor[2] = m_Controls->m_ResampleDoubleZ->value();
+            resampler->SetSamplingFactor(samplingFactor);
+            break;
+        }
+        case 1:
+        {
+            itk::Vector< double, 3 > newSpacing;
+            newSpacing[0] = m_Controls->m_ResampleDoubleX->value();
+            newSpacing[1] = m_Controls->m_ResampleDoubleY->value();
+            newSpacing[2] = m_Controls->m_ResampleDoubleZ->value();
+            resampler->SetNewSpacing(newSpacing);
+            break;
+        }
+        case 2:
+        {
+            itk::ImageRegion<3> newRegion;
+            newRegion.SetSize(0, m_Controls->m_ResampleIntX->value());
+            newRegion.SetSize(1, m_Controls->m_ResampleIntY->value());
+            newRegion.SetSize(2, m_Controls->m_ResampleIntZ->value());
+            resampler->SetNewImageSize(newRegion);
+            break;
+        }
+        default:
+        {
+            MITK_WARN << "Unknown resampling parameters!";
+            return;
+        }
+        }
 
-    QString outAdd;
-    switch (m_Controls->m_InterpolatorBox->currentIndex())
-    {
-    case 0:
-    {
-      resampler->SetInterpolation(ResampleFilter::Interpolate_NearestNeighbour);
-      outAdd = "NearestNeighbour";
-      break;
-    }
-    case 1:
-    {
-      resampler->SetInterpolation(ResampleFilter::Interpolate_Linear);
-      outAdd = "Linear";
-      break;
-    }
-    case 2:
-    {
-      resampler->SetInterpolation(ResampleFilter::Interpolate_BSpline);
-      outAdd = "BSpline";
-      break;
-    }
-    case 3:
-    {
-      resampler->SetInterpolation(ResampleFilter::Interpolate_WindowedSinc);
-      outAdd = "WindowedSinc";
-      break;
-    }
-    default:
-    {
-      resampler->SetInterpolation(ResampleFilter::Interpolate_NearestNeighbour);
-      outAdd = "NearestNeighbour";
-    }
-    }
+        QString outAdd;
+        switch (m_Controls->m_InterpolatorBox->currentIndex())
+        {
+        case 0:
+        {
+            resampler->SetInterpolation(ResampleFilter::Interpolate_NearestNeighbour);
+            outAdd = "NearestNeighbour";
+            break;
+        }
+        case 1:
+        {
+            resampler->SetInterpolation(ResampleFilter::Interpolate_Linear);
+            outAdd = "Linear";
+            break;
+        }
+        case 2:
+        {
+            resampler->SetInterpolation(ResampleFilter::Interpolate_BSpline);
+            outAdd = "BSpline";
+            break;
+        }
+        case 3:
+        {
+            resampler->SetInterpolation(ResampleFilter::Interpolate_WindowedSinc);
+            outAdd = "WindowedSinc";
+            break;
+        }
+        default:
+        {
+            resampler->SetInterpolation(ResampleFilter::Interpolate_NearestNeighbour);
+            outAdd = "NearestNeighbour";
+        }
+        }
 
-    resampler->Update();
+        resampler->Update();
 
-    mitk::Image::Pointer image = mitk::GrabItkImageMemory( resampler->GetOutput() );
-    image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
-    image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
-    image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
-    mitk::DiffusionPropertyHelper propertyHelper( image );
-    propertyHelper.InitializeImage();
+        mitk::Image::Pointer image = mitk::GrabItkImageMemory( resampler->GetOutput() );
+        image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
+        image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
+        image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
+        mitk::DiffusionPropertyHelper propertyHelper( image );
+        propertyHelper.InitializeImage();
 
-    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-    imageNode->SetData( image );
-    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
 
-    imageNode->SetName((name+"_resampled_"+outAdd).toStdString().c_str());
-    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
-  }
-  else if (m_SelectedImage.IsNotNull())
-  {
-    AccessFixedDimensionByItk(m_SelectedImage, TemplatedResampleImage,3);
-  }
+        imageNode->SetName((name+"_resampled_"+outAdd).toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+    }
+    else if (m_SelectedImage.IsNotNull())
+    {
+        AccessFixedDimensionByItk(m_SelectedImage, TemplatedResampleImage,3);
+    }
 }
 
 
 template < typename TPixel, unsigned int VImageDimension >
 void QmitkPreprocessingView::TemplatedResampleImage( itk::Image<TPixel, VImageDimension>* itkImage)
 {
-  itk::Vector< double, 3 > newSpacing;
-  itk::ImageRegion<3>   newRegion;
+    itk::Vector< double, 3 > newSpacing;
+    itk::ImageRegion<3>   newRegion;
 
-  switch (m_Controls->m_ResampleTypeBox->currentIndex())
-  {
-  case 0:
-  {
-    itk::Vector< double, 3 > sampling;
-    sampling[0] = m_Controls->m_ResampleDoubleX->value();
-    sampling[1] = m_Controls->m_ResampleDoubleY->value();
-    sampling[2] = m_Controls->m_ResampleDoubleZ->value();
+    switch (m_Controls->m_ResampleTypeBox->currentIndex())
+    {
+    case 0:
+    {
+        itk::Vector< double, 3 > sampling;
+        sampling[0] = m_Controls->m_ResampleDoubleX->value();
+        sampling[1] = m_Controls->m_ResampleDoubleY->value();
+        sampling[2] = m_Controls->m_ResampleDoubleZ->value();
 
-    newSpacing = itkImage->GetSpacing();
-    newSpacing[0] /= sampling[0];
-    newSpacing[1] /= sampling[1];
-    newSpacing[2] /= sampling[2];
-    newRegion = itkImage->GetLargestPossibleRegion();
-    newRegion.SetSize(0, newRegion.GetSize(0)*sampling[0]);
-    newRegion.SetSize(1, newRegion.GetSize(1)*sampling[1]);
-    newRegion.SetSize(2, newRegion.GetSize(2)*sampling[2]);
+        newSpacing = itkImage->GetSpacing();
+        newSpacing[0] /= sampling[0];
+        newSpacing[1] /= sampling[1];
+        newSpacing[2] /= sampling[2];
+        newRegion = itkImage->GetLargestPossibleRegion();
+        newRegion.SetSize(0, newRegion.GetSize(0)*sampling[0]);
+        newRegion.SetSize(1, newRegion.GetSize(1)*sampling[1]);
+        newRegion.SetSize(2, newRegion.GetSize(2)*sampling[2]);
 
-    break;
-  }
-  case 1:
-  {
-    newSpacing[0] = m_Controls->m_ResampleDoubleX->value();
-    newSpacing[1] = m_Controls->m_ResampleDoubleY->value();
-    newSpacing[2] = m_Controls->m_ResampleDoubleZ->value();
+        break;
+    }
+    case 1:
+    {
+        newSpacing[0] = m_Controls->m_ResampleDoubleX->value();
+        newSpacing[1] = m_Controls->m_ResampleDoubleY->value();
+        newSpacing[2] = m_Controls->m_ResampleDoubleZ->value();
 
-    itk::Vector< double, 3 > oldSpacing = itkImage->GetSpacing();
-    itk::Vector< double, 3 > sampling;
-    sampling[0] = oldSpacing[0]/newSpacing[0];
-    sampling[1] = oldSpacing[1]/newSpacing[1];
-    sampling[2] = oldSpacing[2]/newSpacing[2];
-    newRegion = itkImage->GetLargestPossibleRegion();
-    newRegion.SetSize(0, newRegion.GetSize(0)*sampling[0]);
-    newRegion.SetSize(1, newRegion.GetSize(1)*sampling[1]);
-    newRegion.SetSize(2, newRegion.GetSize(2)*sampling[2]);
-    break;
-  }
-  case 2:
-  {
-    newRegion.SetSize(0, m_Controls->m_ResampleIntX->value());
-    newRegion.SetSize(1, m_Controls->m_ResampleIntY->value());
-    newRegion.SetSize(2, m_Controls->m_ResampleIntZ->value());
+        itk::Vector< double, 3 > oldSpacing = itkImage->GetSpacing();
+        itk::Vector< double, 3 > sampling;
+        sampling[0] = oldSpacing[0]/newSpacing[0];
+        sampling[1] = oldSpacing[1]/newSpacing[1];
+        sampling[2] = oldSpacing[2]/newSpacing[2];
+        newRegion = itkImage->GetLargestPossibleRegion();
+        newRegion.SetSize(0, newRegion.GetSize(0)*sampling[0]);
+        newRegion.SetSize(1, newRegion.GetSize(1)*sampling[1]);
+        newRegion.SetSize(2, newRegion.GetSize(2)*sampling[2]);
+        break;
+    }
+    case 2:
+    {
+        newRegion.SetSize(0, m_Controls->m_ResampleIntX->value());
+        newRegion.SetSize(1, m_Controls->m_ResampleIntY->value());
+        newRegion.SetSize(2, m_Controls->m_ResampleIntZ->value());
 
-    itk::ImageRegion<3> oldRegion = itkImage->GetLargestPossibleRegion();
-    itk::Vector< double, 3 > sampling;
-    sampling[0] = (double)newRegion.GetSize(0)/oldRegion.GetSize(0);
-    sampling[1] = (double)newRegion.GetSize(1)/oldRegion.GetSize(1);
-    sampling[2] = (double)newRegion.GetSize(2)/oldRegion.GetSize(2);
+        itk::ImageRegion<3> oldRegion = itkImage->GetLargestPossibleRegion();
+        itk::Vector< double, 3 > sampling;
+        sampling[0] = (double)newRegion.GetSize(0)/oldRegion.GetSize(0);
+        sampling[1] = (double)newRegion.GetSize(1)/oldRegion.GetSize(1);
+        sampling[2] = (double)newRegion.GetSize(2)/oldRegion.GetSize(2);
 
-    newSpacing = itkImage->GetSpacing();
-    newSpacing[0] /= sampling[0];
-    newSpacing[1] /= sampling[1];
-    newSpacing[2] /= sampling[2];
-    break;
-  }
-  default:
-  {
-    MITK_WARN << "Unknown resampling parameters!";
-    return;
-  }
-  }
+        newSpacing = itkImage->GetSpacing();
+        newSpacing[0] /= sampling[0];
+        newSpacing[1] /= sampling[1];
+        newSpacing[2] /= sampling[2];
+        break;
+    }
+    default:
+    {
+        MITK_WARN << "Unknown resampling parameters!";
+        return;
+    }
+    }
 
-  itk::Point<double,3> origin = itkImage->GetOrigin();
-  origin[0] -= itkImage->GetSpacing()[0]/2;
-  origin[1] -= itkImage->GetSpacing()[1]/2;
-  origin[2] -= itkImage->GetSpacing()[2]/2;
-  origin[0] += newSpacing[0]/2;
-  origin[1] += newSpacing[1]/2;
-  origin[2] += newSpacing[2]/2;
+    itk::Point<double,3> origin = itkImage->GetOrigin();
+    origin[0] -= itkImage->GetSpacing()[0]/2;
+    origin[1] -= itkImage->GetSpacing()[1]/2;
+    origin[2] -= itkImage->GetSpacing()[2]/2;
+    origin[0] += newSpacing[0]/2;
+    origin[1] += newSpacing[1]/2;
+    origin[2] += newSpacing[2]/2;
 
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typename ImageType::Pointer outImage = ImageType::New();
-  outImage->SetSpacing( newSpacing );
-  outImage->SetOrigin( origin );
-  outImage->SetDirection( itkImage->GetDirection() );
-  outImage->SetLargestPossibleRegion( newRegion );
-  outImage->SetBufferedRegion( newRegion );
-  outImage->SetRequestedRegion( newRegion );
-  outImage->Allocate();
+    typedef itk::Image<TPixel, VImageDimension> ImageType;
+    typename ImageType::Pointer outImage = ImageType::New();
+    outImage->SetSpacing( newSpacing );
+    outImage->SetOrigin( origin );
+    outImage->SetDirection( itkImage->GetDirection() );
+    outImage->SetLargestPossibleRegion( newRegion );
+    outImage->SetBufferedRegion( newRegion );
+    outImage->SetRequestedRegion( newRegion );
+    outImage->Allocate();
 
-  typedef itk::ResampleImageFilter<ImageType, ImageType> ResampleFilter;
-  typename ResampleFilter::Pointer resampler = ResampleFilter::New();
-  resampler->SetInput(itkImage);
-  resampler->SetOutputParametersFromImage(outImage);
+    typedef itk::ResampleImageFilter<ImageType, ImageType> ResampleFilter;
+    typename ResampleFilter::Pointer resampler = ResampleFilter::New();
+    resampler->SetInput(itkImage);
+    resampler->SetOutputParametersFromImage(outImage);
 
-  QString outAdd;
-  switch (m_Controls->m_InterpolatorBox->currentIndex())
-  {
-  case 0:
-  {
-    typename itk::NearestNeighborInterpolateImageFunction<ImageType>::Pointer interp = itk::NearestNeighborInterpolateImageFunction<ImageType>::New();
-    resampler->SetInterpolator(interp);
-    outAdd = "NearestNeighbour";
-    break;
-  }
-  case 1:
-  {
-    typename itk::LinearInterpolateImageFunction<ImageType>::Pointer interp = itk::LinearInterpolateImageFunction<ImageType>::New();
-    resampler->SetInterpolator(interp);
-    outAdd = "Linear";
-    break;
-  }
-  case 2:
-  {
-    typename itk::BSplineInterpolateImageFunction<ImageType>::Pointer interp = itk::BSplineInterpolateImageFunction<ImageType>::New();
-    resampler->SetInterpolator(interp);
-    outAdd = "BSpline";
-    break;
-  }
-  case 3:
-  {
-    typename itk::WindowedSincInterpolateImageFunction<ImageType, 3>::Pointer interp = itk::WindowedSincInterpolateImageFunction<ImageType, 3>::New();
-    resampler->SetInterpolator(interp);
-    outAdd = "WindowedSinc";
-    break;
-  }
-  default:
-  {
-    typename itk::NearestNeighborInterpolateImageFunction<ImageType>::Pointer interp = itk::NearestNeighborInterpolateImageFunction<ImageType>::New();
-    resampler->SetInterpolator(interp);
-    outAdd = "NearestNeighbour";
-  }
-  }
+    QString outAdd;
+    switch (m_Controls->m_InterpolatorBox->currentIndex())
+    {
+    case 0:
+    {
+        typename itk::NearestNeighborInterpolateImageFunction<ImageType>::Pointer interp = itk::NearestNeighborInterpolateImageFunction<ImageType>::New();
+        resampler->SetInterpolator(interp);
+        outAdd = "NearestNeighbour";
+        break;
+    }
+    case 1:
+    {
+        typename itk::LinearInterpolateImageFunction<ImageType>::Pointer interp = itk::LinearInterpolateImageFunction<ImageType>::New();
+        resampler->SetInterpolator(interp);
+        outAdd = "Linear";
+        break;
+    }
+    case 2:
+    {
+        typename itk::BSplineInterpolateImageFunction<ImageType>::Pointer interp = itk::BSplineInterpolateImageFunction<ImageType>::New();
+        resampler->SetInterpolator(interp);
+        outAdd = "BSpline";
+        break;
+    }
+    case 3:
+    {
+        typename itk::WindowedSincInterpolateImageFunction<ImageType, 3>::Pointer interp = itk::WindowedSincInterpolateImageFunction<ImageType, 3>::New();
+        resampler->SetInterpolator(interp);
+        outAdd = "WindowedSinc";
+        break;
+    }
+    default:
+    {
+        typename itk::NearestNeighborInterpolateImageFunction<ImageType>::Pointer interp = itk::NearestNeighborInterpolateImageFunction<ImageType>::New();
+        resampler->SetInterpolator(interp);
+        outAdd = "NearestNeighbour";
+    }
+    }
 
-  resampler->Update();
+    resampler->Update();
 
-  mitk::Image::Pointer image = mitk::Image::New();
-  image->InitializeByItk( resampler->GetOutput() );
-  image->SetVolume( resampler->GetOutput()->GetBufferPointer() );
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( image );
-  QString name = m_SelectedImageNode->GetName().c_str();
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->InitializeByItk( resampler->GetOutput() );
+    image->SetVolume( resampler->GetOutput()->GetBufferPointer() );
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_SelectedImageNode->GetName().c_str();
 
-  imageNode->SetName((name+"_resampled_"+outAdd).toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
+    imageNode->SetName((name+"_resampled_"+outAdd).toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
 }
 
 void QmitkPreprocessingView::DoApplyDirectionMatrix()
 {
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( isDiffusionImage )
-  {
-    mitk::Image::Pointer newDwi = m_SelectedImage->Clone();
-    ItkDwiType::DirectionType newDirection;
-    for (int r=0; r<3; r++)
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( isDiffusionImage )
     {
-      for (int c=0; c<3; c++)
-      {
-        QTableWidgetItem* item = m_Controls->m_DirectionMatrixTable->item(r,c);
-        if (!item)
-          return;
-        newDirection[r][c] = item->text().toDouble();
-      }
+        ItkDwiType::DirectionType newDirection;
+        for (int r=0; r<3; r++)
+        {
+            for (int c=0; c<3; c++)
+            {
+                QTableWidgetItem* item = m_Controls->m_DirectionMatrixTable->item(r,c);
+                if (!item)
+                    return;
+                newDirection[r][c] = item->text().toDouble();
+            }
+        }
+        ItkDwiType::Pointer itkDwi = ItkDwiType::New();
+        mitk::CastToItkImage(m_SelectedImage, itkDwi);
+
+        itk::ImageDuplicator<ItkDwiType>::Pointer duplicator = itk::ImageDuplicator<ItkDwiType>::New();
+        duplicator->SetInputImage(itkDwi);
+        duplicator->Update();
+        itkDwi = duplicator->GetOutput();
+
+        vnl_matrix_fixed< double,3,3 > oldInverseDirection = itkDwi->GetDirection().GetInverse();
+        mitk::GradientDirectionsProperty::GradientDirectionsContainerType::Pointer oldGradients = static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+        mitk::GradientDirectionsProperty::GradientDirectionsContainerType::Pointer newGradients = mitk::GradientDirectionsProperty::GradientDirectionsContainerType::New();
+
+        for (unsigned int i=0; i<oldGradients->Size(); i++)
+        {
+            mitk::GradientDirectionsProperty::GradientDirectionType g = oldGradients->GetElement(i);
+            double mag = g.magnitude();
+            g.normalize();
+            mitk::GradientDirectionsProperty::GradientDirectionType newG = oldInverseDirection*g;
+            newG = newDirection.GetVnlMatrix()*newG;
+            newG.normalize();
+            newGradients->InsertElement(i, newG*mag);
+        }
+
+        itkDwi->SetDirection(newDirection);
+        mitk::Image::Pointer newDwi2 = mitk::GrabItkImageMemory( itkDwi.GetPointer() );
+        newDwi2->SetProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( newGradients ) );
+        newDwi2->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
+        newDwi2->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
+
+        mitk::DiffusionPropertyHelper propertyHelper( newDwi2 );
+        propertyHelper.InitializeImage();
+
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( newDwi2 );
+        QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+        imageNode->SetName((name+"_newdirection").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+
+        mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
-    ItkDwiType::Pointer itkDwi = ItkDwiType::New();
-    mitk::CastToItkImage(newDwi, itkDwi);
-
-    vnl_matrix_fixed< double,3,3 > oldInverseDirection = itkDwi->GetDirection().GetInverse();
-    mitk::GradientDirectionsProperty::GradientDirectionsContainerType::Pointer oldGradients = static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
-    mitk::GradientDirectionsProperty::GradientDirectionsContainerType::Pointer newGradients = mitk::GradientDirectionsProperty::GradientDirectionsContainerType::New();
-
-    for (unsigned int i=0; i<oldGradients->Size(); i++)
+    else if (m_SelectedImage.IsNotNull())
     {
-      mitk::GradientDirectionsProperty::GradientDirectionType g = oldGradients->GetElement(i);
-      double mag = g.magnitude();
-      mitk::GradientDirectionsProperty::GradientDirectionType newG = oldInverseDirection*g;
-      newG = newDirection.GetVnlMatrix()*newG;
-      newG.normalize();
-      newGradients->InsertElement(i, newG*mag);
+        AccessFixedDimensionByItk(m_SelectedImage, TemplatedApplyRotation,3);
     }
-
-    itkDwi->SetDirection(newDirection);
-    newDwi->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( newGradients ) );
-    newDwi->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
-    newDwi->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
-
-    mitk::DiffusionPropertyHelper propertyHelper( newDwi );
-    propertyHelper.InitializeImage();
-
-    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-    imageNode->SetData( newDwi );
-    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
-    imageNode->SetName((name+"_newdirection").toStdString().c_str());
-    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
-
-    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-  else if (m_SelectedImage.IsNotNull())
-  {
-    AccessFixedDimensionByItk(m_SelectedImage, TemplatedApplyRotation,3);
-  }
 }
 
 template < typename TPixel, unsigned int VImageDimension >
 void QmitkPreprocessingView::TemplatedApplyRotation( itk::Image<TPixel, VImageDimension>* itkImage)
 {
-  ItkDwiType::DirectionType newDirection;
-  for (int r=0; r<3; r++)
-    for (int c=0; c<3; c++)
+    ItkDwiType::DirectionType newDirection;
+    for (int r=0; r<3; r++)
+        for (int c=0; c<3; c++)
+        {
+            QTableWidgetItem* item = m_Controls->m_DirectionMatrixTable->item(r,c);
+            if (!item)
+                return;
+            newDirection[r][c] = item->text().toDouble();
+        }
+    typedef itk::Image<TPixel, VImageDimension> ImageType;
+
+    typename ImageType::Pointer newImage = ImageType::New();
+    newImage->SetSpacing( itkImage->GetSpacing() );
+    newImage->SetOrigin( itkImage->GetOrigin() );
+    newImage->SetDirection( newDirection );
+    newImage->SetLargestPossibleRegion( itkImage->GetLargestPossibleRegion() );
+    newImage->SetBufferedRegion( itkImage->GetLargestPossibleRegion() );
+    newImage->SetRequestedRegion( itkImage->GetLargestPossibleRegion() );
+    newImage->Allocate();
+    newImage->FillBuffer(0);
+
+    itk::ImageRegionIterator< itk::Image<TPixel, VImageDimension> > it(itkImage, itkImage->GetLargestPossibleRegion());
+    while(!it.IsAtEnd())
     {
-      QTableWidgetItem* item = m_Controls->m_DirectionMatrixTable->item(r,c);
-      if (!item)
-        return;
-      newDirection[r][c] = item->text().toDouble();
+        newImage->SetPixel(it.GetIndex(), it.Get());
+        ++it;
     }
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
 
-  typename ImageType::Pointer newImage = ImageType::New();
-  newImage->SetSpacing( itkImage->GetSpacing() );
-  newImage->SetOrigin( itkImage->GetOrigin() );
-  newImage->SetDirection( newDirection );
-  newImage->SetLargestPossibleRegion( itkImage->GetLargestPossibleRegion() );
-  newImage->SetBufferedRegion( itkImage->GetLargestPossibleRegion() );
-  newImage->SetRequestedRegion( itkImage->GetLargestPossibleRegion() );
-  newImage->Allocate();
-  newImage->FillBuffer(0);
+    mitk::Image::Pointer newMitkImage = mitk::Image::New();
+    newMitkImage->InitializeByItk(newImage.GetPointer());
+    newMitkImage->SetVolume(newImage->GetBufferPointer());
 
-  itk::ImageRegionIterator< itk::Image<TPixel, VImageDimension> > it(itkImage, itkImage->GetLargestPossibleRegion());
-  while(!it.IsAtEnd())
-  {
-    newImage->SetPixel(it.GetIndex(), it.Get());
-    ++it;
-  }
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( newMitkImage );
+    QString name = m_SelectedImageNode->GetName().c_str();
+    imageNode->SetName((name+"_newdirection").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
 
-  mitk::Image::Pointer newMitkImage = mitk::Image::New();
-  newMitkImage->InitializeByItk(newImage.GetPointer());
-  newMitkImage->SetVolume(newImage->GetBufferPointer());
-
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( newMitkImage );
-  QString name = m_SelectedImageNode->GetName().c_str();
-  imageNode->SetName((name+"_newdirection").toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
-
-  mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkPreprocessingView::DoProjectSignal()
 {
-  switch(m_Controls->m_ProjectionMethodBox->currentIndex())
-  {
-  case 0:
-    DoADCAverage();
-    break;
-  case 1:
-    DoAKCFit();
-    break;
-  case 2:
-    DoBiExpFit();
-    break;
-  default:
-    DoADCAverage();
-  }
+    switch(m_Controls->m_ProjectionMethodBox->currentIndex())
+    {
+    case 0:
+        DoADCAverage();
+        break;
+    case 1:
+        DoAKCFit();
+        break;
+    case 2:
+        DoBiExpFit();
+        break;
+    default:
+        DoADCAverage();
+    }
 }
 
 void QmitkPreprocessingView::DoDwiNormalization()
 {
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( ! isDiffusionImage )
-    return;
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( ! isDiffusionImage )
+        return;
 
-  GradientDirectionContainerType::Pointer gradientContainer = static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+    GradientDirectionContainerType::Pointer gradientContainer = static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
 
-  int b0Index = -1;
-  for (unsigned int i=0; i<gradientContainer->size(); i++)
-  {
-    GradientDirectionType g = gradientContainer->GetElement(i);
-    if (g.magnitude()<0.001)
+    int b0Index = -1;
+    for (unsigned int i=0; i<gradientContainer->size(); i++)
     {
-      b0Index = i;
-      break;
+        GradientDirectionType g = gradientContainer->GetElement(i);
+        if (g.magnitude()<0.001)
+        {
+            b0Index = i;
+            break;
+        }
     }
-  }
-  if (b0Index==-1)
-    return;
+    if (b0Index==-1)
+        return;
 
-  typedef itk::DwiNormilzationFilter<short>  FilterType;
+    typedef itk::DwiNormilzationFilter<short>  FilterType;
 
-  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-  mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
+    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+    mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
 
-  FilterType::Pointer filter = FilterType::New();
-  filter->SetInput( itkVectorImagePointer );
-  filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetInput( itkVectorImagePointer );
+    filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
 
-  UcharImageType::Pointer itkImage = NULL;
-  if (m_Controls->m_NormalizationMaskBox->GetSelectedNode().IsNotNull())
-  {
-    itkImage = UcharImageType::New();
-    mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_NormalizationMaskBox->GetSelectedNode()->GetData()), itkImage);
-    filter->SetMaskImage(itkImage);
-  }
-
-  // determin normalization reference
-  switch(m_Controls->m_NormalizationReferenceBox->currentIndex())
-  {
-  case 0: // normalize relative to mean white matter signal intensity
-  {
-    typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
-    TensorReconstructionImageFilterType::Pointer dtFilter = TensorReconstructionImageFilterType::New();
-    dtFilter->SetGradientImage( gradientContainer, itkVectorImagePointer );
-    dtFilter->SetBValue( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
-    dtFilter->Update();
-    itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = dtFilter->GetOutput();
-    itk::ImageRegionIterator< itk::Image< itk::DiffusionTensor3D< double >, 3 > > inIt(tensorImage, tensorImage->GetLargestPossibleRegion());
-    double ref = 0;
-    unsigned int count = 0;
-    while ( !inIt.IsAtEnd() )
+    UcharImageType::Pointer itkImage = NULL;
+    if (m_Controls->m_NormalizationMaskBox->GetSelectedNode().IsNotNull())
     {
-      if (itkImage.IsNotNull() && itkImage->GetPixel(inIt.GetIndex())<=0)
-      {
-        ++inIt;
-        continue;
-      }
-
-      double FA = inIt.Get().GetFractionalAnisotropy();
-      if (FA>0.4 && FA<0.99)
-      {
-        ref += itkVectorImagePointer->GetPixel(inIt.GetIndex())[b0Index];
-        count++;
-      }
-      ++inIt;
+        itkImage = UcharImageType::New();
+        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_NormalizationMaskBox->GetSelectedNode()->GetData()), itkImage);
+        filter->SetMaskImage(itkImage);
     }
-    if (count>0)
+
+    // determin normalization reference
+    switch(m_Controls->m_NormalizationReferenceBox->currentIndex())
     {
-      ref /= count;
-      filter->SetUseGlobalReference(true);
-      filter->SetReference(ref);
-    }
-    break;
-  }
-  case 1: // normalize relative to mean CSF signal intensity
-  {
-    itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
-    adcFilter->SetInput( itkVectorImagePointer );
-    adcFilter->SetGradientDirections( gradientContainer);
-    adcFilter->SetB_value( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
-    adcFilter->Update();
-    ItkDoubleImageType::Pointer adcImage = adcFilter->GetOutput();
-    itk::ImageRegionIterator<ItkDoubleImageType> inIt(adcImage, adcImage->GetLargestPossibleRegion());
-    double max = 0.0030;
-    double ref = 0;
-    unsigned int count = 0;
-    while ( !inIt.IsAtEnd() )
+    case 0: // normalize relative to mean white matter signal intensity
     {
-      if (itkImage.IsNotNull() && itkImage->GetPixel(inIt.GetIndex())<=0)
-      {
-        ++inIt;
-        continue;
-      }
-      if (inIt.Get()>max && inIt.Get()<0.004)
-      {
-        ref += itkVectorImagePointer->GetPixel(inIt.GetIndex())[b0Index];
-        count++;
-      }
-      ++inIt;
+        typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
+        TensorReconstructionImageFilterType::Pointer dtFilter = TensorReconstructionImageFilterType::New();
+        dtFilter->SetGradientImage( gradientContainer, itkVectorImagePointer );
+        dtFilter->SetBValue( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+        dtFilter->Update();
+        itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = dtFilter->GetOutput();
+        itk::ImageRegionIterator< itk::Image< itk::DiffusionTensor3D< double >, 3 > > inIt(tensorImage, tensorImage->GetLargestPossibleRegion());
+        double ref = 0;
+        unsigned int count = 0;
+        while ( !inIt.IsAtEnd() )
+        {
+            if (itkImage.IsNotNull() && itkImage->GetPixel(inIt.GetIndex())<=0)
+            {
+                ++inIt;
+                continue;
+            }
+
+            double FA = inIt.Get().GetFractionalAnisotropy();
+            if (FA>0.4 && FA<0.99)
+            {
+                ref += itkVectorImagePointer->GetPixel(inIt.GetIndex())[b0Index];
+                count++;
+            }
+            ++inIt;
+        }
+        if (count>0)
+        {
+            ref /= count;
+            filter->SetUseGlobalReference(true);
+            filter->SetReference(ref);
+        }
+        break;
     }
-    if (count>0)
+    case 1: // normalize relative to mean CSF signal intensity
     {
-      ref /= count;
-      filter->SetUseGlobalReference(true);
-      filter->SetReference(ref);
+        itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
+        adcFilter->SetInput( itkVectorImagePointer );
+        adcFilter->SetGradientDirections( gradientContainer);
+        adcFilter->SetB_value( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+        adcFilter->Update();
+        ItkDoubleImageType::Pointer adcImage = adcFilter->GetOutput();
+        itk::ImageRegionIterator<ItkDoubleImageType> inIt(adcImage, adcImage->GetLargestPossibleRegion());
+        double max = 0.0030;
+        double ref = 0;
+        unsigned int count = 0;
+        while ( !inIt.IsAtEnd() )
+        {
+            if (itkImage.IsNotNull() && itkImage->GetPixel(inIt.GetIndex())<=0)
+            {
+                ++inIt;
+                continue;
+            }
+            if (inIt.Get()>max && inIt.Get()<0.004)
+            {
+                ref += itkVectorImagePointer->GetPixel(inIt.GetIndex())[b0Index];
+                count++;
+            }
+            ++inIt;
+        }
+        if (count>0)
+        {
+            ref /= count;
+            filter->SetUseGlobalReference(true);
+            filter->SetReference(ref);
+        }
+        break;
     }
-    break;
-  }
-  case 2:
-  {
-    filter->SetUseGlobalReference(false);
-  }
-  }
-  filter->Update();
+    case 2:
+    {
+        filter->SetUseGlobalReference(false);
+    }
+    }
+    filter->Update();
 
-  mitk::Image::Pointer image = mitk::GrabItkImageMemory( filter->GetOutput() );
-  image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
-  image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
-  image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
-  mitk::DiffusionPropertyHelper propertyHelper( image );
-  propertyHelper.InitializeImage();
+    mitk::Image::Pointer image = mitk::GrabItkImageMemory( filter->GetOutput() );
+    image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
+    image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
+    image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
+    mitk::DiffusionPropertyHelper propertyHelper( image );
+    propertyHelper.InitializeImage();
 
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( image );
-  QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
 
-  imageNode->SetName((name+"_normalized").toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+    imageNode->SetName((name+"_normalized").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
 }
 
 void QmitkPreprocessingView::DoLengthCorrection()
 {
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( ! isDiffusionImage )
-    return;
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( ! isDiffusionImage )
+        return;
 
-  typedef itk::DwiGradientLengthCorrectionFilter  FilterType;
+    typedef itk::DwiGradientLengthCorrectionFilter  FilterType;
 
-  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-  mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
+    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+    mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
 
-  FilterType::Pointer filter = FilterType::New();
-  filter->SetRoundingValue( m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
-  filter->SetReferenceBValue( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
-  filter->SetReferenceGradientDirectionContainer( static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
-  filter->Update();
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetRoundingValue( m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
+    filter->SetReferenceBValue( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+    filter->SetReferenceGradientDirectionContainer( static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+    filter->Update();
 
-  mitk::Image::Pointer image = mitk::ImportItkImage( itkVectorImagePointer );
-  image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetOutputGradientDirectionContainer() ) );
-  image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( filter->GetNewBValue() ) );
-  image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
-  mitk::DiffusionPropertyHelper propertyHelper( image );
-  propertyHelper.InitializeImage();
+    mitk::Image::Pointer image = mitk::ImportItkImage( itkVectorImagePointer );
+    image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetOutputGradientDirectionContainer() ) );
+    image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( filter->GetNewBValue() ) );
+    image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
+    mitk::DiffusionPropertyHelper propertyHelper( image );
+    propertyHelper.InitializeImage();
 
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( image );
-  QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
 
-  imageNode->SetName((name+"_rounded").toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+    imageNode->SetName((name+"_rounded").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
 }
 
 void QmitkPreprocessingView::UpdateDwiBValueMapRounder(int i)
 {
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( ! isDiffusionImage )
-    return;
-  //m_DiffusionImage->UpdateBValueMap();
-  UpdateBValueTableWidget(i);
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( ! isDiffusionImage )
+        return;
+    //m_DiffusionImage->UpdateBValueMap();
+    UpdateBValueTableWidget(i);
 }
 
 void QmitkPreprocessingView::CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::Image::Pointer ImPtr, QString imageName, mitk::DataNode* parent)
 {
-  typedef itk::RadialMultishellToSingleshellImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+    typedef itk::RadialMultishellToSingleshellImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
 
-  // filter input parameter
-  const mitk::BValueMapProperty::BValueMap
-      &originalShellMap  = static_cast<mitk::BValueMapProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+    // filter input parameter
+    const mitk::BValueMapProperty::BValueMap
+            &originalShellMap  = static_cast<mitk::BValueMapProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
 
-  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-  mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
-  ItkDwiType
-      *vectorImage       = itkVectorImagePointer.GetPointer();
+    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+    mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
+    ItkDwiType
+            *vectorImage       = itkVectorImagePointer.GetPointer();
 
-  const mitk::GradientDirectionsProperty::GradientDirectionsContainerType::Pointer
-      gradientContainer = static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+    const mitk::GradientDirectionsProperty::GradientDirectionsContainerType::Pointer
+            gradientContainer = static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
 
-  const unsigned int
-      &bValue            = static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue();
+    const unsigned int
+            &bValue            = static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue();
 
-  mitk::DataNode::Pointer imageNode = 0;
+    mitk::DataNode::Pointer imageNode = 0;
 
-  // filter call
-  FilterType::Pointer filter = FilterType::New();
-  filter->SetInput(vectorImage);
-  filter->SetOriginalGradientDirections(gradientContainer);
-  filter->SetOriginalBValueMap(originalShellMap);
-  filter->SetOriginalBValue(bValue);
-  filter->SetFunctor(functor);
-  filter->Update();
+    // filter call
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetInput(vectorImage);
+    filter->SetOriginalGradientDirections(gradientContainer);
+    filter->SetOriginalBValueMap(originalShellMap);
+    filter->SetOriginalBValue(bValue);
+    filter->SetFunctor(functor);
+    filter->Update();
 
-  // create new DWI image
-  mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
-  outImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
-  outImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( m_Controls->m_targetBValueSpinBox->value() ) );
-  outImage->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
-  mitk::DiffusionPropertyHelper propertyHelper( outImage );
-  propertyHelper.InitializeImage();
+    // create new DWI image
+    mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
+    outImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
+    outImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( m_Controls->m_targetBValueSpinBox->value() ) );
+    outImage->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
+    mitk::DiffusionPropertyHelper propertyHelper( outImage );
+    propertyHelper.InitializeImage();
 
-  imageNode = mitk::DataNode::New();
-  imageNode->SetData( outImage );
-  imageNode->SetName(imageName.toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, parent);
+    imageNode = mitk::DataNode::New();
+    imageNode->SetData( outImage );
+    imageNode->SetName(imageName.toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, parent);
 
-  //  if(m_Controls->m_OutputRMSErrorImage->isChecked()){
-  //    // create new Error image
-  //    FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
-  //    mitk::Image::Pointer mitkErrImage = mitk::Image::New();
-  //    mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
-  //    mitkErrImage->SetVolume(errImage->GetBufferPointer());
+    //  if(m_Controls->m_OutputRMSErrorImage->isChecked()){
+    //    // create new Error image
+    //    FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
+    //    mitk::Image::Pointer mitkErrImage = mitk::Image::New();
+    //    mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
+    //    mitkErrImage->SetVolume(errImage->GetBufferPointer());
 
-  //    imageNode = mitk::DataNode::New();
-  //    imageNode->SetData( mitkErrImage );
-  //    imageNode->SetName((imageName+"_Error").toStdString().c_str());
-  //    GetDefaultDataStorage()->Add(imageNode);
-  //  }
+    //    imageNode = mitk::DataNode::New();
+    //    imageNode->SetData( mitkErrImage );
+    //    imageNode->SetName((imageName+"_Error").toStdString().c_str());
+    //    GetDefaultDataStorage()->Add(imageNode);
+    //  }
 }
 
 void QmitkPreprocessingView::DoBiExpFit()
 {
-  itk::BiExpFitFunctor::Pointer functor = itk::BiExpFitFunctor::New();
+    itk::BiExpFitFunctor::Pointer functor = itk::BiExpFitFunctor::New();
 
-  for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
-  {
-    mitk::Image::Pointer inImage =
-        dynamic_cast< mitk::Image* >(m_SelectedDiffusionNodes.at(i)->GetData());
+    for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+    {
+        mitk::Image::Pointer inImage =
+                dynamic_cast< mitk::Image* >(m_SelectedDiffusionNodes.at(i)->GetData());
 
-    QString name(m_SelectedDiffusionNodes.at(i)->GetName().c_str());
+        QString name(m_SelectedDiffusionNodes.at(i)->GetName().c_str());
 
-    const mitk::BValueMapProperty::BValueMap
-        &originalShellMap  = static_cast<mitk::BValueMapProperty*>(inImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+        const mitk::BValueMapProperty::BValueMap
+                &originalShellMap  = static_cast<mitk::BValueMapProperty*>(inImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
 
-    mitk::BValueMapProperty::BValueMap::const_iterator it = originalShellMap.begin();
-    ++it;/* skip b=0*/ unsigned int s = 0; /*shell index */
-    vnl_vector<double> bValueList(originalShellMap.size()-1);
-    while(it != originalShellMap.end())
-      bValueList.put(s++,(it++)->first);
+        mitk::BValueMapProperty::BValueMap::const_iterator it = originalShellMap.begin();
+        ++it;/* skip b=0*/ unsigned int s = 0; /*shell index */
+        vnl_vector<double> bValueList(originalShellMap.size()-1);
+        while(it != originalShellMap.end())
+            bValueList.put(s++,(it++)->first);
 
-    const double targetBValue = m_Controls->m_targetBValueSpinBox->value();
-    functor->setListOfBValues(bValueList);
-    functor->setTargetBValue(targetBValue);
-    CallMultishellToSingleShellFilter(functor,inImage,name + "_BiExp", m_SelectedDiffusionNodes.at(i));
-  }
+        const double targetBValue = m_Controls->m_targetBValueSpinBox->value();
+        functor->setListOfBValues(bValueList);
+        functor->setTargetBValue(targetBValue);
+        CallMultishellToSingleShellFilter(functor,inImage,name + "_BiExp", m_SelectedDiffusionNodes.at(i));
+    }
 }
 
 void QmitkPreprocessingView::DoAKCFit()
 {
-  itk::KurtosisFitFunctor::Pointer functor = itk::KurtosisFitFunctor::New();
+    itk::KurtosisFitFunctor::Pointer functor = itk::KurtosisFitFunctor::New();
 
-  for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
-  {
-    mitk::Image::Pointer inImage =
-        dynamic_cast< mitk::Image* >(m_SelectedDiffusionNodes.at(i)->GetData());
+    for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+    {
+        mitk::Image::Pointer inImage =
+                dynamic_cast< mitk::Image* >(m_SelectedDiffusionNodes.at(i)->GetData());
 
-    QString name(m_SelectedDiffusionNodes.at(i)->GetName().c_str());
+        QString name(m_SelectedDiffusionNodes.at(i)->GetName().c_str());
 
-    const mitk::BValueMapProperty::BValueMap
-        &originalShellMap  = static_cast<mitk::BValueMapProperty*>(inImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+        const mitk::BValueMapProperty::BValueMap
+                &originalShellMap  = static_cast<mitk::BValueMapProperty*>(inImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
 
-    mitk::BValueMapProperty::BValueMap::const_iterator it = originalShellMap.begin();
-    ++it;/* skip b=0*/ unsigned int s = 0; /*shell index */
-    vnl_vector<double> bValueList(originalShellMap.size()-1);
-    while(it != originalShellMap.end())
-      bValueList.put(s++,(it++)->first);
+        mitk::BValueMapProperty::BValueMap::const_iterator it = originalShellMap.begin();
+        ++it;/* skip b=0*/ unsigned int s = 0; /*shell index */
+        vnl_vector<double> bValueList(originalShellMap.size()-1);
+        while(it != originalShellMap.end())
+            bValueList.put(s++,(it++)->first);
 
-    const double targetBValue = m_Controls->m_targetBValueSpinBox->value();
-    functor->setListOfBValues(bValueList);
-    functor->setTargetBValue(targetBValue);
-    CallMultishellToSingleShellFilter(functor,inImage,name + "_AKC", m_SelectedDiffusionNodes.at(i));
-  }
+        const double targetBValue = m_Controls->m_targetBValueSpinBox->value();
+        functor->setListOfBValues(bValueList);
+        functor->setTargetBValue(targetBValue);
+        CallMultishellToSingleShellFilter(functor,inImage,name + "_AKC", m_SelectedDiffusionNodes.at(i));
+    }
 }
 
 void QmitkPreprocessingView::DoADCFit()
 {
-  // later
+    // later
 }
 
 void QmitkPreprocessingView::DoADCAverage()
 {
-  itk::ADCAverageFunctor::Pointer functor = itk::ADCAverageFunctor::New();
+    itk::ADCAverageFunctor::Pointer functor = itk::ADCAverageFunctor::New();
 
-  for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
-  {
-    mitk::Image::Pointer inImage =
-        dynamic_cast< mitk::Image* >(m_SelectedDiffusionNodes.at(i)->GetData());
+    for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+    {
+        mitk::Image::Pointer inImage =
+                dynamic_cast< mitk::Image* >(m_SelectedDiffusionNodes.at(i)->GetData());
 
-    QString name(m_SelectedDiffusionNodes.at(i)->GetName().c_str());
+        QString name(m_SelectedDiffusionNodes.at(i)->GetName().c_str());
 
-    const mitk::BValueMapProperty::BValueMap
-        &originalShellMap  = static_cast<mitk::BValueMapProperty*>(inImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+        const mitk::BValueMapProperty::BValueMap
+                &originalShellMap  = static_cast<mitk::BValueMapProperty*>(inImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
 
-    mitk::BValueMapProperty::BValueMap::const_iterator it = originalShellMap.begin();
-    ++it;/* skip b=0*/ unsigned int s = 0; /*shell index */
-    vnl_vector<double> bValueList(originalShellMap.size()-1);
-    while(it != originalShellMap.end())
-      bValueList.put(s++,(it++)->first);
+        mitk::BValueMapProperty::BValueMap::const_iterator it = originalShellMap.begin();
+        ++it;/* skip b=0*/ unsigned int s = 0; /*shell index */
+        vnl_vector<double> bValueList(originalShellMap.size()-1);
+        while(it != originalShellMap.end())
+            bValueList.put(s++,(it++)->first);
 
-    const double targetBValue = m_Controls->m_targetBValueSpinBox->value();
-    functor->setListOfBValues(bValueList);
-    functor->setTargetBValue(targetBValue);
-    CallMultishellToSingleShellFilter(functor,inImage,name + "_ADC", m_SelectedDiffusionNodes.at(i));
-  }
+        const double targetBValue = m_Controls->m_targetBValueSpinBox->value();
+        functor->setListOfBValues(bValueList);
+        functor->setTargetBValue(targetBValue);
+        CallMultishellToSingleShellFilter(functor,inImage,name + "_ADC", m_SelectedDiffusionNodes.at(i));
+    }
 }
 
 void QmitkPreprocessingView::DoAdcCalculation()
 {
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( ! isDiffusionImage )
-    return;
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( ! isDiffusionImage )
+        return;
 
-  typedef itk::AdcImageFilter< DiffusionPixelType, double >     FilterType;
+    typedef itk::AdcImageFilter< DiffusionPixelType, double >     FilterType;
 
 
-  for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
-  {
-    mitk::Image::Pointer inImage = dynamic_cast< mitk::Image* >(m_SelectedDiffusionNodes.at(i)->GetData());
-    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-    mitk::CastToItkImage(inImage, itkVectorImagePointer);
-    FilterType::Pointer filter = FilterType::New();
-    filter->SetInput( itkVectorImagePointer );
-    filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( inImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
-    filter->SetB_value( static_cast<mitk::FloatProperty*>(inImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
-    filter->Update();
+    for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+    {
+        mitk::Image::Pointer inImage = dynamic_cast< mitk::Image* >(m_SelectedDiffusionNodes.at(i)->GetData());
+        ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+        mitk::CastToItkImage(inImage, itkVectorImagePointer);
+        FilterType::Pointer filter = FilterType::New();
+        filter->SetInput( itkVectorImagePointer );
+        filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( inImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+        filter->SetB_value( static_cast<mitk::FloatProperty*>(inImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+        filter->Update();
 
-    mitk::Image::Pointer image = mitk::Image::New();
-    image->InitializeByItk( filter->GetOutput() );
-    image->SetVolume( filter->GetOutput()->GetBufferPointer() );
-    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-    imageNode->SetData( image );
-    QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
+        mitk::Image::Pointer image = mitk::Image::New();
+        image->InitializeByItk( filter->GetOutput() );
+        image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
 
-    imageNode->SetName((name+"_ADC").toStdString().c_str());
-    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.at(i));
-  }
+        imageNode->SetName((name+"_ADC").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.at(i));
+    }
 }
 
 
 void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
 {
-  bool isDiffusionImage(false);
-  if( m_SelectedImageNode && m_SelectedImageNode.IsNotNull() )
-  {
-    isDiffusionImage = mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData()));
-  }
-
-  if ( ! isDiffusionImage )
-  {
-    m_Controls->m_B_ValueMap_TableWidget->clear();
-    m_Controls->m_B_ValueMap_TableWidget->setRowCount(1);
-    QStringList headerList;
-    headerList << "b-Value" << "Number of gradients";
-    m_Controls->m_B_ValueMap_TableWidget->setHorizontalHeaderLabels(headerList);
-    m_Controls->m_B_ValueMap_TableWidget->setItem(0,0,new QTableWidgetItem("-"));
-    m_Controls->m_B_ValueMap_TableWidget->setItem(0,1,new QTableWidgetItem("-"));
-  }else{
-
-    typedef mitk::BValueMapProperty::BValueMap BValueMap;
-    typedef mitk::BValueMapProperty::BValueMap::iterator BValueMapIterator;
-
-    BValueMapIterator it;
-
-    BValueMap roundedBValueMap = static_cast<mitk::BValueMapProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
-
-    m_Controls->m_B_ValueMap_TableWidget->clear();
-    m_Controls->m_B_ValueMap_TableWidget->setRowCount(roundedBValueMap.size() );
-    QStringList headerList;
-    headerList << "b-Value" << "Number of gradients";
-    m_Controls->m_B_ValueMap_TableWidget->setHorizontalHeaderLabels(headerList);
-
-    int i = 0 ;
-    for(it = roundedBValueMap.begin() ;it != roundedBValueMap.end(); it++)
+    bool isDiffusionImage(false);
+    if( m_SelectedImageNode && m_SelectedImageNode.IsNotNull() )
     {
-      m_Controls->m_B_ValueMap_TableWidget->setItem(i,0,new QTableWidgetItem(QString::number(it->first)));
-      QTableWidgetItem* item = m_Controls->m_B_ValueMap_TableWidget->item(i,0);
-      item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-      m_Controls->m_B_ValueMap_TableWidget->setItem(i,1,new QTableWidgetItem(QString::number(it->second.size())));
-      i++;
+        isDiffusionImage = mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData()));
     }
-  }
+
+    if ( ! isDiffusionImage )
+    {
+        m_Controls->m_B_ValueMap_TableWidget->clear();
+        m_Controls->m_B_ValueMap_TableWidget->setRowCount(1);
+        QStringList headerList;
+        headerList << "b-Value" << "Number of gradients";
+        m_Controls->m_B_ValueMap_TableWidget->setHorizontalHeaderLabels(headerList);
+        m_Controls->m_B_ValueMap_TableWidget->setItem(0,0,new QTableWidgetItem("-"));
+        m_Controls->m_B_ValueMap_TableWidget->setItem(0,1,new QTableWidgetItem("-"));
+    }else{
+
+        typedef mitk::BValueMapProperty::BValueMap BValueMap;
+        typedef mitk::BValueMapProperty::BValueMap::iterator BValueMapIterator;
+
+        BValueMapIterator it;
+
+        BValueMap roundedBValueMap = static_cast<mitk::BValueMapProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+
+        m_Controls->m_B_ValueMap_TableWidget->clear();
+        m_Controls->m_B_ValueMap_TableWidget->setRowCount(roundedBValueMap.size() );
+        QStringList headerList;
+        headerList << "b-Value" << "Number of gradients";
+        m_Controls->m_B_ValueMap_TableWidget->setHorizontalHeaderLabels(headerList);
+
+        int i = 0 ;
+        for(it = roundedBValueMap.begin() ;it != roundedBValueMap.end(); it++)
+        {
+            m_Controls->m_B_ValueMap_TableWidget->setItem(i,0,new QTableWidgetItem(QString::number(it->first)));
+            QTableWidgetItem* item = m_Controls->m_B_ValueMap_TableWidget->item(i,0);
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+            m_Controls->m_B_ValueMap_TableWidget->setItem(i,1,new QTableWidgetItem(QString::number(it->second.size())));
+            i++;
+        }
+    }
 
 }
 
@@ -1310,583 +1289,584 @@ void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
 template < typename TPixel, unsigned int VImageDimension >
 void QmitkPreprocessingView::TemplatedUpdateGui( itk::Image<TPixel, VImageDimension>* itkImage)
 {
-  for (int r=0; r<3; r++)
-    for (int c=0; c<3; c++)
-    {
-      QTableWidgetItem* item = m_Controls->m_DirectionMatrixTable->item(r,c);
-      delete item;
-      item = new QTableWidgetItem();
-      item->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-      item->setText(QString::number(itkImage->GetDirection()[r][c]));
-      m_Controls->m_DirectionMatrixTable->setItem(r,c,item);
-    }
+    for (int r=0; r<3; r++)
+        for (int c=0; c<3; c++)
+        {
+            QTableWidgetItem* item = m_Controls->m_DirectionMatrixTable->item(r,c);
+            delete item;
+            item = new QTableWidgetItem();
+            item->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+            item->setText(QString::number(itkImage->GetDirection()[r][c]));
+            m_Controls->m_DirectionMatrixTable->setItem(r,c,item);
+        }
 }
 
 void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-  bool foundDwiVolume = false;
-  bool foundImageVolume = false;
-  m_SelectedImage = NULL;
-  m_SelectedImageNode = NULL;
-  m_SelectedDiffusionNodes.clear();
+    bool foundDwiVolume = false;
+    bool foundImageVolume = false;
+    m_SelectedImage = NULL;
+    m_SelectedImageNode = NULL;
+    m_SelectedDiffusionNodes.clear();
 
-  // iterate selection
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
-  {
-    mitk::DataNode::Pointer node = *it;
-
-    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+    // iterate selection
+    for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
     {
-      foundImageVolume = true;
-      m_SelectedImage = dynamic_cast<mitk::Image*>(node->GetData());
-      m_Controls->m_DiffusionImageLabel->setText(node->GetName().c_str());
-      m_SelectedImageNode = node;
+        mitk::DataNode::Pointer node = *it;
 
-      bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-      if( isDiffusionImage )
-      {
-        foundDwiVolume = true;
-        m_SelectedDiffusionNodes.push_back(node);
-      }
+        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+        {
+            foundImageVolume = true;
+            m_SelectedImage = dynamic_cast<mitk::Image*>(node->GetData());
+            m_Controls->m_DiffusionImageLabel->setText(node->GetName().c_str());
+            m_SelectedImageNode = node;
+
+            bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( m_SelectedImageNode ) );
+            if( isDiffusionImage )
+            {
+                foundDwiVolume = true;
+                m_SelectedDiffusionNodes.push_back(node);
+            }
+        }
     }
-  }
 
-  m_Controls->m_ButtonAverageGradients->setEnabled(foundDwiVolume);
-  m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);
-  m_Controls->m_CheckExtractAll->setEnabled(foundDwiVolume);
-  m_Controls->m_ModifyMeasurementFrame->setEnabled(foundDwiVolume);
-  m_Controls->m_MeasurementFrameTable->setEnabled(foundDwiVolume);
-  m_Controls->m_ReduceGradientsButton->setEnabled(foundDwiVolume);
-  m_Controls->m_ShowGradientsButton->setEnabled(foundDwiVolume);
-  m_Controls->m_MirrorGradientToHalfSphereButton->setEnabled(foundDwiVolume);
-  m_Controls->m_MergeDwisButton->setEnabled(foundDwiVolume);
-  m_Controls->m_B_ValueMap_Rounder_SpinBox->setEnabled(foundDwiVolume);
-  m_Controls->m_ProjectSignalButton->setEnabled(foundDwiVolume);
-  m_Controls->m_CreateLengthCorrectedDwi->setEnabled(foundDwiVolume);
-  m_Controls->m_CalcAdcButton->setEnabled(foundDwiVolume);
-  m_Controls->m_targetBValueSpinBox->setEnabled(foundDwiVolume);
-  m_Controls->m_NormalizeImageValuesButton->setEnabled(foundDwiVolume);
-  m_Controls->m_DirectionMatrixTable->setEnabled(foundImageVolume);
-  m_Controls->m_ModifyDirection->setEnabled(foundImageVolume);
-  m_Controls->m_ExtractBrainMask->setEnabled(foundImageVolume);
-  m_Controls->m_ResampleImageButton->setEnabled(foundImageVolume);
-  m_Controls->m_ModifySpacingButton->setEnabled(foundImageVolume);
-  m_Controls->m_ModifyOriginButton->setEnabled(foundImageVolume);
-  m_Controls->m_CropImageButton->setEnabled(foundImageVolume);
-  m_Controls->m_RemoveGradientButton->setEnabled(foundDwiVolume);
-  m_Controls->m_ExtractGradientButton->setEnabled(foundDwiVolume);
+    m_Controls->m_ButtonAverageGradients->setEnabled(foundDwiVolume);
+    m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);
+    m_Controls->m_CheckExtractAll->setEnabled(foundDwiVolume);
+    m_Controls->m_ModifyMeasurementFrame->setEnabled(foundDwiVolume);
+    m_Controls->m_MeasurementFrameTable->setEnabled(foundDwiVolume);
+    m_Controls->m_ReduceGradientsButton->setEnabled(foundDwiVolume);
+    m_Controls->m_ShowGradientsButton->setEnabled(foundDwiVolume);
+    m_Controls->m_MirrorGradientToHalfSphereButton->setEnabled(foundDwiVolume);
+    m_Controls->m_MergeDwisButton->setEnabled(foundDwiVolume);
+    m_Controls->m_B_ValueMap_Rounder_SpinBox->setEnabled(foundDwiVolume);
+    m_Controls->m_ProjectSignalButton->setEnabled(foundDwiVolume);
+    m_Controls->m_CreateLengthCorrectedDwi->setEnabled(foundDwiVolume);
+    m_Controls->m_CalcAdcButton->setEnabled(foundDwiVolume);
+    m_Controls->m_targetBValueSpinBox->setEnabled(foundDwiVolume);
+    m_Controls->m_NormalizeImageValuesButton->setEnabled(foundDwiVolume);
+    m_Controls->m_DirectionMatrixTable->setEnabled(foundImageVolume);
+    m_Controls->m_ModifyDirection->setEnabled(foundImageVolume);
+    m_Controls->m_ExtractBrainMask->setEnabled(foundImageVolume);
+    m_Controls->m_ResampleImageButton->setEnabled(foundImageVolume);
+    m_Controls->m_ModifySpacingButton->setEnabled(foundImageVolume);
+    m_Controls->m_ModifyOriginButton->setEnabled(foundImageVolume);
+    m_Controls->m_CropImageButton->setEnabled(foundImageVolume);
+    m_Controls->m_RemoveGradientButton->setEnabled(foundDwiVolume);
+    m_Controls->m_ExtractGradientButton->setEnabled(foundDwiVolume);
 
-  // reset sampling frame to 1 and update all ealted components
-  m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(1);
+    // reset sampling frame to 1 and update all ealted components
+    m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(1);
 
-  UpdateBValueTableWidget(m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
-  DoUpdateInterpolationGui(m_Controls->m_ResampleTypeBox->currentIndex());
+    UpdateBValueTableWidget(m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
+    DoUpdateInterpolationGui(m_Controls->m_ResampleTypeBox->currentIndex());
 
-  if( m_SelectedImageNode.IsNull() )
-  {
-    return;
-  }
+    if( m_SelectedImageNode.IsNull() )
+    {
+        return;
+    }
 
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( m_SelectedImageNode) );
 
-  if (foundDwiVolume && isDiffusionImage)
-  {
-    m_Controls->m_InputData->setTitle("Input Data");
-    vnl_matrix_fixed< double, 3, 3 > mf = static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame();
-    for (int r=0; r<3; r++)
-      for (int c=0; c<3; c++)
-      {
-        // Measurement frame
-        {
-          QTableWidgetItem* item = m_Controls->m_MeasurementFrameTable->item(r,c);
-          delete item;
-          item = new QTableWidgetItem();
-          item->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-          item->setText(QString::number(mf.get(r,c)));
-          m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
-        }
+    if (foundDwiVolume && isDiffusionImage)
+    {
+        m_Controls->m_InputData->setTitle("Input Data");
+        vnl_matrix_fixed< double, 3, 3 > mf = static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame();
+        for (int r=0; r<3; r++)
+            for (int c=0; c<3; c++)
+            {
+                // Measurement frame
+                {
+                    QTableWidgetItem* item = m_Controls->m_MeasurementFrameTable->item(r,c);
+                    delete item;
+                    item = new QTableWidgetItem();
+                    item->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+                    item->setText(QString::number(mf.get(r,c)));
+                    m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
+                }
 
-        // Direction matrix
-        {
-          ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-          mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
+                // Direction matrix
+                {
+                    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+                    mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
 
-          QTableWidgetItem* item = m_Controls->m_DirectionMatrixTable->item(r,c);
-          delete item;
-          item = new QTableWidgetItem();
-          item->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-          item->setText(QString::number(itkVectorImagePointer->GetDirection()[r][c]));
-          m_Controls->m_DirectionMatrixTable->setItem(r,c,item);
-        }
-      }
+                    QTableWidgetItem* item = m_Controls->m_DirectionMatrixTable->item(r,c);
+                    delete item;
+                    item = new QTableWidgetItem();
+                    item->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+                    item->setText(QString::number(itkVectorImagePointer->GetDirection()[r][c]));
+                    m_Controls->m_DirectionMatrixTable->setItem(r,c,item);
+                }
+            }
 
-    //calculate target bValue for MultishellToSingleShellfilter
-    const mitk::BValueMapProperty::BValueMap & bValMap = static_cast<mitk::BValueMapProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
-    mitk::BValueMapProperty::BValueMap::const_iterator it = bValMap.begin();
-    unsigned int targetBVal = 0;
-    while(it != bValMap.end())
-      targetBVal += (it++)->first;
-    targetBVal /= (float)bValMap.size()-1;
-    m_Controls->m_targetBValueSpinBox->setValue(targetBVal);
+        //calculate target bValue for MultishellToSingleShellfilter
+        const mitk::BValueMapProperty::BValueMap & bValMap = static_cast<mitk::BValueMapProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+        mitk::BValueMapProperty::BValueMap::const_iterator it = bValMap.begin();
+        unsigned int targetBVal = 0;
+        while(it != bValMap.end())
+            targetBVal += (it++)->first;
+        targetBVal /= (float)bValMap.size()-1;
+        m_Controls->m_targetBValueSpinBox->setValue(targetBVal);
 
-    m_Controls->m_HeaderSpacingX->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[0]);
-    m_Controls->m_HeaderSpacingY->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[1]);
-    m_Controls->m_HeaderSpacingZ->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[2]);
-    m_Controls->m_HeaderOriginX->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[0]);
-    m_Controls->m_HeaderOriginY->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[1]);
-    m_Controls->m_HeaderOriginZ->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[2]);
-    m_Controls->m_XstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(0)-1);
-    m_Controls->m_YstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(1)-1);
-    m_Controls->m_ZstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(2)-1);
-    m_Controls->m_XendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(0)-1);
-    m_Controls->m_YendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(1)-1);
-    m_Controls->m_ZendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(2)-1);
-    m_Controls->m_RemoveGradientBox->setMaximum(static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->Size()-1);
-    m_Controls->m_ExtractGradientBox->setMaximum(static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->Size()-1);
-  }
-  else if (foundImageVolume)
-  {
-    for (int r=0; r<3; r++)
-      for (int c=0; c<3; c++)
-      {
-        QTableWidgetItem* item = m_Controls->m_MeasurementFrameTable->item(r,c);
-        delete item;
-        item = new QTableWidgetItem();
-        m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
-      }
+        m_Controls->m_HeaderSpacingX->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[0]);
+        m_Controls->m_HeaderSpacingY->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[1]);
+        m_Controls->m_HeaderSpacingZ->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[2]);
+        m_Controls->m_HeaderOriginX->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[0]);
+        m_Controls->m_HeaderOriginY->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[1]);
+        m_Controls->m_HeaderOriginZ->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[2]);
+        m_Controls->m_XstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(0)-1);
+        m_Controls->m_YstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(1)-1);
+        m_Controls->m_ZstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(2)-1);
+        m_Controls->m_XendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(0)-1);
+        m_Controls->m_YendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(1)-1);
+        m_Controls->m_ZendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(2)-1);
+        m_Controls->m_RemoveGradientBox->setMaximum(static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->Size()-1);
+        m_Controls->m_ExtractGradientBox->setMaximum(static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->Size()-1);
+    }
+    else if (foundImageVolume)
+    {
+        for (int r=0; r<3; r++)
+            for (int c=0; c<3; c++)
+            {
+                QTableWidgetItem* item = m_Controls->m_MeasurementFrameTable->item(r,c);
+                delete item;
+                item = new QTableWidgetItem();
+                m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
+            }
 
-    m_Controls->m_HeaderSpacingX->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[0]);
-    m_Controls->m_HeaderSpacingY->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[1]);
-    m_Controls->m_HeaderSpacingZ->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[2]);
-    m_Controls->m_HeaderOriginX->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[0]);
-    m_Controls->m_HeaderOriginY->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[1]);
-    m_Controls->m_HeaderOriginZ->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[2]);
-    m_Controls->m_XstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(0)-1);
-    m_Controls->m_YstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(1)-1);
-    m_Controls->m_ZstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(2)-1);
-    m_Controls->m_XendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(0)-1);
-    m_Controls->m_YendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(1)-1);
-    m_Controls->m_ZendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(2)-1);
+        m_Controls->m_HeaderSpacingX->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[0]);
+        m_Controls->m_HeaderSpacingY->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[1]);
+        m_Controls->m_HeaderSpacingZ->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[2]);
+        m_Controls->m_HeaderOriginX->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[0]);
+        m_Controls->m_HeaderOriginY->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[1]);
+        m_Controls->m_HeaderOriginZ->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[2]);
+        m_Controls->m_XstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(0)-1);
+        m_Controls->m_YstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(1)-1);
+        m_Controls->m_ZstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(2)-1);
+        m_Controls->m_XendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(0)-1);
+        m_Controls->m_YendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(1)-1);
+        m_Controls->m_ZendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(2)-1);
 
-    AccessFixedDimensionByItk(m_SelectedImage, TemplatedUpdateGui,3);
-  }
-  else
-  {
-    for (int r=0; r<3; r++)
-      for (int c=0; c<3; c++)
-      {
-        {
-          QTableWidgetItem* item = m_Controls->m_MeasurementFrameTable->item(r,c);
-          delete item;
-          item = new QTableWidgetItem();
-          m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
-        }
-        {
-          QTableWidgetItem* item = m_Controls->m_DirectionMatrixTable->item(r,c);
-          delete item;
-          item = new QTableWidgetItem();
-          m_Controls->m_DirectionMatrixTable->setItem(r,c,item);
-        }
-      }
+        AccessFixedDimensionByItk(m_SelectedImage, TemplatedUpdateGui,3);
+    }
+    else
+    {
+        for (int r=0; r<3; r++)
+            for (int c=0; c<3; c++)
+            {
+                {
+                    QTableWidgetItem* item = m_Controls->m_MeasurementFrameTable->item(r,c);
+                    delete item;
+                    item = new QTableWidgetItem();
+                    m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
+                }
+                {
+                    QTableWidgetItem* item = m_Controls->m_DirectionMatrixTable->item(r,c);
+                    delete item;
+                    item = new QTableWidgetItem();
+                    m_Controls->m_DirectionMatrixTable->setItem(r,c,item);
+                }
+            }
 
-    m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
-    m_Controls->m_InputData->setTitle("Please Select Input Data");
-  }
+        m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
+        m_Controls->m_InputData->setTitle("Please Select Input Data");
+    }
 }
 
 void QmitkPreprocessingView::Activated()
 {
-  QmitkFunctionality::Activated();
+    QmitkFunctionality::Activated();
 }
 
 void QmitkPreprocessingView::Deactivated()
 {
-  QmitkFunctionality::Deactivated();
+    QmitkFunctionality::Deactivated();
 }
 
 void QmitkPreprocessingView::DoHalfSphereGradientDirections()
 {
 
-  mitk::Image::Pointer newDwi = m_SelectedImage->Clone();
-  GradientDirectionContainerType::Pointer gradientContainer =   static_cast<mitk::GradientDirectionsProperty*>( newDwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
-
-  for (unsigned int j=0; j<gradientContainer->Size(); j++)
-    if (gradientContainer->at(j)[0]<0)
-      gradientContainer->at(j) = -gradientContainer->at(j);
-
-  newDwi->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( gradientContainer ) );
-  mitk::DiffusionPropertyHelper propertyHelper( newDwi );
-  propertyHelper.InitializeImage();
-
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( newDwi );
-  QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
-  imageNode->SetName((name+"_halfsphere").toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
-}
-
-void QmitkPreprocessingView::DoApplyMesurementFrame()
-{
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( !isDiffusionImage )
-    return;
-
-  vnl_matrix_fixed< double, 3, 3 > mf;
-  for (int r=0; r<3; r++)
-    for (int c=0; c<3; c++)
-    {
-      QTableWidgetItem* item = m_Controls->m_MeasurementFrameTable->item(r,c);
-      if (!item)
-        return;
-      mf[r][c] = item->text().toDouble();
-    }
-
-  mitk::Image::Pointer newDwi = m_SelectedImage->Clone();
-  newDwi->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mf ) );
-  mitk::DiffusionPropertyHelper propertyHelper( newDwi );
-  propertyHelper.InitializeImage();
-
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( newDwi );
-  QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
-  imageNode->SetName((name+"_new-MF").toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
-}
-
-void QmitkPreprocessingView::DoShowGradientDirections()
-{
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( !isDiffusionImage )
-    return;
-
-  int maxIndex = 0;
-  unsigned int maxSize = m_SelectedImage->GetDimension(0);
-  if (maxSize<m_SelectedImage->GetDimension(1))
-  {
-    maxSize = m_SelectedImage->GetDimension(1);
-    maxIndex = 1;
-  }
-  if (maxSize<m_SelectedImage->GetDimension(2))
-  {
-    maxSize = m_SelectedImage->GetDimension(2);
-    maxIndex = 2;
-  }
-
-  mitk::Point3D origin = m_SelectedImage->GetGeometry()->GetOrigin();
-  mitk::PointSet::Pointer originSet = mitk::PointSet::New();
-
-  typedef mitk::BValueMapProperty::BValueMap BValueMap;
-  typedef mitk::BValueMapProperty::BValueMap::iterator BValueMapIterator;
-  BValueMap bValMap =  static_cast<mitk::BValueMapProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
-
-  GradientDirectionContainerType::Pointer gradientContainer = static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
-  mitk::BaseGeometry::Pointer geometry = m_SelectedImage->GetGeometry();
-  int shellCount = 1;
-  for(BValueMapIterator it = bValMap.begin(); it!=bValMap.end(); ++it)
-  {
-    mitk::PointSet::Pointer pointset = mitk::PointSet::New();
-    for (unsigned int j=0; j<it->second.size(); j++)
-    {
-      mitk::Point3D ip;
-      vnl_vector_fixed< double, 3 > v = gradientContainer->at(it->second[j]);
-      if (v.magnitude()>mitk::eps)
-      {
-        ip[0] = v[0]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[0]-0.5*geometry->GetSpacing()[0] + geometry->GetSpacing()[0]*m_SelectedImage->GetDimension(0)/2;
-        ip[1] = v[1]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[1]-0.5*geometry->GetSpacing()[1] + geometry->GetSpacing()[1]*m_SelectedImage->GetDimension(1)/2;
-        ip[2] = v[2]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[2]-0.5*geometry->GetSpacing()[2] + geometry->GetSpacing()[2]*m_SelectedImage->GetDimension(2)/2;
-
-        pointset->InsertPoint(j, ip);
-      }
-      else if (originSet->IsEmpty())
-      {
-        ip[0] = v[0]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[0]-0.5*geometry->GetSpacing()[0] + geometry->GetSpacing()[0]*m_SelectedImage->GetDimension(0)/2;
-        ip[1] = v[1]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[1]-0.5*geometry->GetSpacing()[1] + geometry->GetSpacing()[1]*m_SelectedImage->GetDimension(1)/2;
-        ip[2] = v[2]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[2]-0.5*geometry->GetSpacing()[2] + geometry->GetSpacing()[2]*m_SelectedImage->GetDimension(2)/2;
-
-        originSet->InsertPoint(j, ip);
-      }
-    }
-    if (it->first<mitk::eps)
-      continue;
-
-    // add shell to datastorage
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(pointset);
-    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
-    name += "_Shell_";
-    name += QString::number(it->first);
-    node->SetName(name.toStdString().c_str());
-    node->SetProperty("pointsize", mitk::FloatProperty::New((float)maxSize/50));
-    int b0 = shellCount%2;
-    int b1 = 0;
-    int b2 = 0;
-    if (shellCount>4)
-      b2 = 1;
-    if (shellCount%4 >= 2)
-      b1 = 1;
-
-    node->SetProperty("color", mitk::ColorProperty::New(b2, b1, b0));
-    GetDefaultDataStorage()->Add(node, m_SelectedDiffusionNodes.front());
-    shellCount++;
-  }
-
-  // add origin to datastorage
-  mitk::DataNode::Pointer node = mitk::DataNode::New();
-  node->SetData(originSet);
-  QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
-  name += "_Origin";
-  node->SetName(name.toStdString().c_str());
-  node->SetProperty("pointsize", mitk::FloatProperty::New((float)maxSize/50));
-  node->SetProperty("color", mitk::ColorProperty::New(1,1,1));
-  GetDefaultDataStorage()->Add(node, m_SelectedDiffusionNodes.front());
-}
-
-void QmitkPreprocessingView::DoReduceGradientDirections()
-{
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
-  if ( !isDiffusionImage )
-    return;
-
-  typedef itk::ElectrostaticRepulsionDiffusionGradientReductionFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
-  typedef mitk::BValueMapProperty::BValueMap BValueMap;
-
-  // GetShellSelection from GUI
-  BValueMap shellSlectionMap;
-  BValueMap originalShellMap = static_cast<mitk::BValueMapProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
-  std::vector<unsigned int> newNumGradientDirections;
-  int shellCounter = 0;
-
-  QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
-  for (int i=0; i<m_Controls->m_B_ValueMap_TableWidget->rowCount(); i++)
-  {
-    double BValue = m_Controls->m_B_ValueMap_TableWidget->item(i,0)->text().toDouble();
-    shellSlectionMap[BValue] = originalShellMap[BValue];
-    unsigned int num = m_Controls->m_B_ValueMap_TableWidget->item(i,1)->text().toUInt();
-    newNumGradientDirections.push_back(num);
-    name += "_";
-    name += QString::number(num);
-    shellCounter++;
-  }
-
-  if (newNumGradientDirections.empty())
-    return;
-
-  GradientDirectionContainerType::Pointer gradientContainer = static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
-
-  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-  mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
-
-  FilterType::Pointer filter = FilterType::New();
-  filter->SetInput( itkVectorImagePointer );
-  filter->SetOriginalGradientDirections(gradientContainer);
-  filter->SetNumGradientDirections(newNumGradientDirections);
-  filter->SetOriginalBValueMap(originalShellMap);
-  filter->SetShellSelectionBValueMap(shellSlectionMap);
-  filter->Update();
-
-  mitk::Image::Pointer image = mitk::GrabItkImageMemory( filter->GetOutput() );
-  image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetGradientDirections() ) );
-  image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
-  image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
-  mitk::DiffusionPropertyHelper propertyHelper( image );
-  propertyHelper.InitializeImage();
-
-
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( image );
-
-  imageNode->SetName(name.toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
-}
-
-void QmitkPreprocessingView::MergeDwis()
-{
-  typedef mitk::GradientDirectionsProperty::GradientDirectionsContainerType    GradientContainerType;
-
-  if (m_SelectedDiffusionNodes.size()<2)
-    return;
-
-  typedef itk::VectorImage<DiffusionPixelType,3>                  DwiImageType;
-  typedef DwiImageType::PixelType                        DwiPixelType;
-  typedef DwiImageType::RegionType                       DwiRegionType;
-  typedef std::vector< DwiImageType::Pointer >  DwiImageContainerType;
-
-  typedef std::vector< GradientContainerType::Pointer >  GradientListContainerType;
-
-  DwiImageContainerType       imageContainer;
-  GradientListContainerType   gradientListContainer;
-  std::vector< double >       bValueContainer;
-
-  QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
-  for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
-  {
-    mitk::Image::Pointer dwi = dynamic_cast< mitk::Image* >( m_SelectedDiffusionNodes.at(i)->GetData() );
-    if ( dwi.IsNotNull() )
-    {
-      ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-      mitk::CastToItkImage(dwi, itkVectorImagePointer);
-
-      imageContainer.push_back( itkVectorImagePointer );
-      gradientListContainer.push_back( static_cast<mitk::GradientDirectionsProperty*>( dwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
-      bValueContainer.push_back( static_cast<mitk::FloatProperty*>(dwi->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
-      if (i>0)
-      {
-        name += "+";
-        name += m_SelectedDiffusionNodes.at(i)->GetName().c_str();
-      }
-    }
-  }
-
-  typedef itk::MergeDiffusionImagesFilter<short> FilterType;
-  FilterType::Pointer filter = FilterType::New();
-  filter->SetImageVolumes(imageContainer);
-  filter->SetGradientLists(gradientListContainer);
-  filter->SetBValues(bValueContainer);
-  filter->Update();
-
-  vnl_matrix_fixed< double, 3, 3 > mf; mf.set_identity();
-  mitk::Image::Pointer image = mitk::GrabItkImageMemory( filter->GetOutput() );
-
-  image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetOutputGradients() ) );
-  image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mf ) );
-  image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( filter->GetB_Value() ) );
-  mitk::DiffusionPropertyHelper propertyHelper( image );
-  propertyHelper.InitializeImage();
-
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( image );
-  imageNode->SetName(name.toStdString().c_str());
-  GetDefaultDataStorage()->Add(imageNode);
-}
-
-void QmitkPreprocessingView::ExtractB0()
-{
-  typedef mitk::GradientDirectionsProperty::GradientDirectionsContainerType    GradientContainerType;
-
-  int nrFiles = m_SelectedDiffusionNodes.size();
-  if (!nrFiles) return;
-
-  // call the extraction withou averaging if the check-box is checked
-  if( this->m_Controls->m_CheckExtractAll->isChecked() )
-  {
-    DoExtractBOWithoutAveraging();
-    return;
-  }
-
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes.begin() );
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes.end() );
-
-  std::vector<mitk::DataNode::Pointer> nodes;
-  while ( itemiter != itemiterend ) // for all items
-  {
-
-    mitk::Image* vols =
-        static_cast<mitk::Image*>(
-          (*itemiter)->GetData());
-
-    std::string nodename;
-    (*itemiter)->GetStringProperty("name", nodename);
-
-    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-    mitk::CastToItkImage(vols, itkVectorImagePointer);
-
-    // Extract image using found index
-    typedef itk::B0ImageExtractionImageFilter<short, short> FilterType;
-    FilterType::Pointer filter = FilterType::New();
-    filter->SetInput( itkVectorImagePointer );
-    filter->SetDirections( static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
-    filter->Update();
-
-    mitk::Image::Pointer mitkImage = mitk::Image::New();
-    mitkImage->InitializeByItk( filter->GetOutput() );
-    mitkImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
-    mitk::DataNode::Pointer node=mitk::DataNode::New();
-    node->SetData( mitkImage );
-    node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0"));
-
-    GetDefaultDataStorage()->Add(node, (*itemiter));
-
-    ++itemiter;
-  }
-}
-
-void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
-{
-  // typedefs
-  typedef mitk::GradientDirectionsProperty::GradientDirectionsContainerType    GradientContainerType;
-  typedef itk::B0ImageExtractionToSeparateImageFilter< short, short> FilterType;
-
-  // check number of selected objects, return if empty
-  int nrFiles = m_SelectedDiffusionNodes.size();
-  if (!nrFiles)
-    return;
-
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes.begin() );
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes.end() );
-
-  while ( itemiter != itemiterend ) // for all items
-  {
-    mitk::Image* vols =
-        static_cast<mitk::Image*>(
-          (*itemiter)->GetData());
-
-    std::string nodename;
-    (*itemiter)->GetStringProperty("name", nodename);
-
-    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-    mitk::CastToItkImage(vols, itkVectorImagePointer);
-
-    // Extract image using found index
-    FilterType::Pointer filter = FilterType::New();
-    filter->SetInput( itkVectorImagePointer );
-    filter->SetDirections( static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
-    filter->Update();
-
-    mitk::Image::Pointer mitkImage = mitk::Image::New();
-    mitkImage->InitializeByItk( filter->GetOutput() );
-    mitkImage->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
-    mitk::DataNode::Pointer node=mitk::DataNode::New();
-    node->SetData( mitkImage );
-    node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0_ALL"));
-
-    GetDefaultDataStorage()->Add(node, (*itemiter));
-
-    /*A reinitialization is needed to access the time channels via the ImageNavigationController
-    The Global-Geometry can not recognize the time channel without a re-init.
-    (for a new selection in datamanger a automatically updated of the Global-Geometry should be done - if it contains the time channel)*/
-    mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeGeometry(),mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-
-    ++itemiter;
-  }
-}
-
-void QmitkPreprocessingView::AverageGradients()
-{
-  int nrFiles = m_SelectedDiffusionNodes.size();
-  if (!nrFiles) return;
-
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes.begin() );
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes.end() );
-
-  while ( itemiter != itemiterend ) // for all items
-  {
-    mitk::Image* mitkDwi =
-        static_cast<mitk::Image*>(
-          (*itemiter)->GetData());
-
-    mitk::Image::Pointer newDwi = mitkDwi->Clone();
-    newDwi->SetPropertyList(mitkDwi->GetPropertyList()->Clone());
-
-    mitk::DiffusionPropertyHelper propertyHelper(newDwi);
-    propertyHelper.AverageRedundantGradients(m_Controls->m_Blur->value());
+    mitk::Image::Pointer newDwi = m_SelectedImage->Clone();
+    GradientDirectionContainerType::Pointer gradientContainer =   static_cast<mitk::GradientDirectionsProperty*>( newDwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+
+    for (unsigned int j=0; j<gradientContainer->Size(); j++)
+        if (gradientContainer->at(j)[0]<0)
+            gradientContainer->at(j) = -gradientContainer->at(j);
+
+    newDwi->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( gradientContainer ) );
+    mitk::DiffusionPropertyHelper propertyHelper( newDwi );
     propertyHelper.InitializeImage();
 
     mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
     imageNode->SetData( newDwi );
-    QString name = (*itemiter)->GetName().c_str();
-    imageNode->SetName((name+"_averaged").toStdString().c_str());
-    GetDefaultDataStorage()->Add(imageNode, (*itemiter));
+    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+    imageNode->SetName((name+"_halfsphere").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+}
 
-    ++itemiter;
-  }
+void QmitkPreprocessingView::DoApplyMesurementFrame()
+{
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( !isDiffusionImage )
+        return;
+
+    vnl_matrix_fixed< double, 3, 3 > mf;
+    for (int r=0; r<3; r++)
+        for (int c=0; c<3; c++)
+        {
+            QTableWidgetItem* item = m_Controls->m_MeasurementFrameTable->item(r,c);
+            if (!item)
+                return;
+            mf[r][c] = item->text().toDouble();
+        }
+
+    mitk::Image::Pointer newDwi = m_SelectedImage->Clone();
+    newDwi->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mf ) );
+    mitk::DiffusionPropertyHelper propertyHelper( newDwi );
+    propertyHelper.InitializeImage();
+
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( newDwi );
+    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+    imageNode->SetName((name+"_new-MF").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+}
+
+void QmitkPreprocessingView::DoShowGradientDirections()
+{
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( !isDiffusionImage )
+        return;
+
+    int maxIndex = 0;
+    unsigned int maxSize = m_SelectedImage->GetDimension(0);
+    if (maxSize<m_SelectedImage->GetDimension(1))
+    {
+        maxSize = m_SelectedImage->GetDimension(1);
+        maxIndex = 1;
+    }
+    if (maxSize<m_SelectedImage->GetDimension(2))
+    {
+        maxSize = m_SelectedImage->GetDimension(2);
+        maxIndex = 2;
+    }
+
+    mitk::Point3D origin = m_SelectedImage->GetGeometry()->GetOrigin();
+    mitk::PointSet::Pointer originSet = mitk::PointSet::New();
+
+    typedef mitk::BValueMapProperty::BValueMap BValueMap;
+    typedef mitk::BValueMapProperty::BValueMap::iterator BValueMapIterator;
+    BValueMap bValMap =  static_cast<mitk::BValueMapProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+
+    GradientDirectionContainerType::Pointer gradientContainer = static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+    mitk::BaseGeometry::Pointer geometry = m_SelectedImage->GetGeometry();
+    int shellCount = 1;
+    for(BValueMapIterator it = bValMap.begin(); it!=bValMap.end(); ++it)
+    {
+        mitk::PointSet::Pointer pointset = mitk::PointSet::New();
+        for (unsigned int j=0; j<it->second.size(); j++)
+        {
+            mitk::Point3D ip;
+            vnl_vector_fixed< double, 3 > v = gradientContainer->at(it->second[j]);
+            MITK_INFO << v;
+            if (v.magnitude()>mitk::eps)
+            {
+                ip[0] = v[0]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[0]-0.5*geometry->GetSpacing()[0] + geometry->GetSpacing()[0]*m_SelectedImage->GetDimension(0)/2;
+                ip[1] = v[1]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[1]-0.5*geometry->GetSpacing()[1] + geometry->GetSpacing()[1]*m_SelectedImage->GetDimension(1)/2;
+                ip[2] = v[2]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[2]-0.5*geometry->GetSpacing()[2] + geometry->GetSpacing()[2]*m_SelectedImage->GetDimension(2)/2;
+
+                pointset->InsertPoint(j, ip);
+            }
+            else if (originSet->IsEmpty())
+            {
+                ip[0] = v[0]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[0]-0.5*geometry->GetSpacing()[0] + geometry->GetSpacing()[0]*m_SelectedImage->GetDimension(0)/2;
+                ip[1] = v[1]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[1]-0.5*geometry->GetSpacing()[1] + geometry->GetSpacing()[1]*m_SelectedImage->GetDimension(1)/2;
+                ip[2] = v[2]*maxSize*geometry->GetSpacing()[maxIndex]/2 + origin[2]-0.5*geometry->GetSpacing()[2] + geometry->GetSpacing()[2]*m_SelectedImage->GetDimension(2)/2;
+
+                originSet->InsertPoint(j, ip);
+            }
+        }
+        if (it->first<mitk::eps)
+            continue;
+
+        // add shell to datastorage
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData(pointset);
+        QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+        name += "_Shell_";
+        name += QString::number(it->first);
+        node->SetName(name.toStdString().c_str());
+        node->SetProperty("pointsize", mitk::FloatProperty::New((float)maxSize/50));
+        int b0 = shellCount%2;
+        int b1 = 0;
+        int b2 = 0;
+        if (shellCount>4)
+            b2 = 1;
+        if (shellCount%4 >= 2)
+            b1 = 1;
+
+        node->SetProperty("color", mitk::ColorProperty::New(b2, b1, b0));
+        GetDefaultDataStorage()->Add(node, m_SelectedDiffusionNodes.front());
+        shellCount++;
+    }
+
+    // add origin to datastorage
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(originSet);
+    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+    name += "_Origin";
+    node->SetName(name.toStdString().c_str());
+    node->SetProperty("pointsize", mitk::FloatProperty::New((float)maxSize/50));
+    node->SetProperty("color", mitk::ColorProperty::New(1,1,1));
+    GetDefaultDataStorage()->Add(node, m_SelectedDiffusionNodes.front());
+}
+
+void QmitkPreprocessingView::DoReduceGradientDirections()
+{
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_SelectedImageNode->GetData())) );
+    if ( !isDiffusionImage )
+        return;
+
+    typedef itk::ElectrostaticRepulsionDiffusionGradientReductionFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+    typedef mitk::BValueMapProperty::BValueMap BValueMap;
+
+    // GetShellSelection from GUI
+    BValueMap shellSlectionMap;
+    BValueMap originalShellMap = static_cast<mitk::BValueMapProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+    std::vector<unsigned int> newNumGradientDirections;
+    int shellCounter = 0;
+
+    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+    for (int i=0; i<m_Controls->m_B_ValueMap_TableWidget->rowCount(); i++)
+    {
+        double BValue = m_Controls->m_B_ValueMap_TableWidget->item(i,0)->text().toDouble();
+        shellSlectionMap[BValue] = originalShellMap[BValue];
+        unsigned int num = m_Controls->m_B_ValueMap_TableWidget->item(i,1)->text().toUInt();
+        newNumGradientDirections.push_back(num);
+        name += "_";
+        name += QString::number(num);
+        shellCounter++;
+    }
+
+    if (newNumGradientDirections.empty())
+        return;
+
+    GradientDirectionContainerType::Pointer gradientContainer = static_cast<mitk::GradientDirectionsProperty*>( m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+
+    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+    mitk::CastToItkImage(m_SelectedImage, itkVectorImagePointer);
+
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetInput( itkVectorImagePointer );
+    filter->SetOriginalGradientDirections(gradientContainer);
+    filter->SetNumGradientDirections(newNumGradientDirections);
+    filter->SetOriginalBValueMap(originalShellMap);
+    filter->SetShellSelectionBValueMap(shellSlectionMap);
+    filter->Update();
+
+    mitk::Image::Pointer image = mitk::GrabItkImageMemory( filter->GetOutput() );
+    image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetGradientDirections() ) );
+    image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
+    image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(m_SelectedImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
+    mitk::DiffusionPropertyHelper propertyHelper( image );
+    propertyHelper.InitializeImage();
+
+
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+
+    imageNode->SetName(name.toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+}
+
+void QmitkPreprocessingView::MergeDwis()
+{
+    typedef mitk::GradientDirectionsProperty::GradientDirectionsContainerType    GradientContainerType;
+
+    if (m_SelectedDiffusionNodes.size()<2)
+        return;
+
+    typedef itk::VectorImage<DiffusionPixelType,3>                  DwiImageType;
+    typedef DwiImageType::PixelType                        DwiPixelType;
+    typedef DwiImageType::RegionType                       DwiRegionType;
+    typedef std::vector< DwiImageType::Pointer >  DwiImageContainerType;
+
+    typedef std::vector< GradientContainerType::Pointer >  GradientListContainerType;
+
+    DwiImageContainerType       imageContainer;
+    GradientListContainerType   gradientListContainer;
+    std::vector< double >       bValueContainer;
+
+    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+    for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+    {
+        mitk::Image::Pointer dwi = dynamic_cast< mitk::Image* >( m_SelectedDiffusionNodes.at(i)->GetData() );
+        if ( dwi.IsNotNull() )
+        {
+            ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+            mitk::CastToItkImage(dwi, itkVectorImagePointer);
+
+            imageContainer.push_back( itkVectorImagePointer );
+            gradientListContainer.push_back( static_cast<mitk::GradientDirectionsProperty*>( dwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+            bValueContainer.push_back( static_cast<mitk::FloatProperty*>(dwi->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+            if (i>0)
+            {
+                name += "+";
+                name += m_SelectedDiffusionNodes.at(i)->GetName().c_str();
+            }
+        }
+    }
+
+    typedef itk::MergeDiffusionImagesFilter<short> FilterType;
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetImageVolumes(imageContainer);
+    filter->SetGradientLists(gradientListContainer);
+    filter->SetBValues(bValueContainer);
+    filter->Update();
+
+    vnl_matrix_fixed< double, 3, 3 > mf; mf.set_identity();
+    mitk::Image::Pointer image = mitk::GrabItkImageMemory( filter->GetOutput() );
+
+    image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetOutputGradients() ) );
+    image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mf ) );
+    image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( filter->GetB_Value() ) );
+    mitk::DiffusionPropertyHelper propertyHelper( image );
+    propertyHelper.InitializeImage();
+
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    imageNode->SetName(name.toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode);
+}
+
+void QmitkPreprocessingView::ExtractB0()
+{
+    typedef mitk::GradientDirectionsProperty::GradientDirectionsContainerType    GradientContainerType;
+
+    int nrFiles = m_SelectedDiffusionNodes.size();
+    if (!nrFiles) return;
+
+    // call the extraction withou averaging if the check-box is checked
+    if( this->m_Controls->m_CheckExtractAll->isChecked() )
+    {
+        DoExtractBOWithoutAveraging();
+        return;
+    }
+
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes.begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes.end() );
+
+    std::vector<mitk::DataNode::Pointer> nodes;
+    while ( itemiter != itemiterend ) // for all items
+    {
+
+        mitk::Image* vols =
+                static_cast<mitk::Image*>(
+                    (*itemiter)->GetData());
+
+        std::string nodename;
+        (*itemiter)->GetStringProperty("name", nodename);
+
+        ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+        mitk::CastToItkImage(vols, itkVectorImagePointer);
+
+        // Extract image using found index
+        typedef itk::B0ImageExtractionImageFilter<short, short> FilterType;
+        FilterType::Pointer filter = FilterType::New();
+        filter->SetInput( itkVectorImagePointer );
+        filter->SetDirections( static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+        filter->Update();
+
+        mitk::Image::Pointer mitkImage = mitk::Image::New();
+        mitkImage->InitializeByItk( filter->GetOutput() );
+        mitkImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
+        mitk::DataNode::Pointer node=mitk::DataNode::New();
+        node->SetData( mitkImage );
+        node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0"));
+
+        GetDefaultDataStorage()->Add(node, (*itemiter));
+
+        ++itemiter;
+    }
+}
+
+void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
+{
+    // typedefs
+    typedef mitk::GradientDirectionsProperty::GradientDirectionsContainerType    GradientContainerType;
+    typedef itk::B0ImageExtractionToSeparateImageFilter< short, short> FilterType;
+
+    // check number of selected objects, return if empty
+    int nrFiles = m_SelectedDiffusionNodes.size();
+    if (!nrFiles)
+        return;
+
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes.begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes.end() );
+
+    while ( itemiter != itemiterend ) // for all items
+    {
+        mitk::Image* vols =
+                static_cast<mitk::Image*>(
+                    (*itemiter)->GetData());
+
+        std::string nodename;
+        (*itemiter)->GetStringProperty("name", nodename);
+
+        ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+        mitk::CastToItkImage(vols, itkVectorImagePointer);
+
+        // Extract image using found index
+        FilterType::Pointer filter = FilterType::New();
+        filter->SetInput( itkVectorImagePointer );
+        filter->SetDirections( static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+        filter->Update();
+
+        mitk::Image::Pointer mitkImage = mitk::Image::New();
+        mitkImage->InitializeByItk( filter->GetOutput() );
+        mitkImage->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
+        mitk::DataNode::Pointer node=mitk::DataNode::New();
+        node->SetData( mitkImage );
+        node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0_ALL"));
+
+        GetDefaultDataStorage()->Add(node, (*itemiter));
+
+        /*A reinitialization is needed to access the time channels via the ImageNavigationController
+    The Global-Geometry can not recognize the time channel without a re-init.
+    (for a new selection in datamanger a automatically updated of the Global-Geometry should be done - if it contains the time channel)*/
+        mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeGeometry(),mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+
+        ++itemiter;
+    }
+}
+
+void QmitkPreprocessingView::AverageGradients()
+{
+    int nrFiles = m_SelectedDiffusionNodes.size();
+    if (!nrFiles) return;
+
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes.begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes.end() );
+
+    while ( itemiter != itemiterend ) // for all items
+    {
+        mitk::Image* mitkDwi =
+                static_cast<mitk::Image*>(
+                    (*itemiter)->GetData());
+
+        mitk::Image::Pointer newDwi = mitkDwi->Clone();
+        newDwi->SetPropertyList(mitkDwi->GetPropertyList()->Clone());
+
+        mitk::DiffusionPropertyHelper propertyHelper(newDwi);
+        propertyHelper.AverageRedundantGradients(m_Controls->m_Blur->value());
+        propertyHelper.InitializeImage();
+
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( newDwi );
+        QString name = (*itemiter)->GetName().c_str();
+        imageNode->SetName((name+"_averaged").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode, (*itemiter));
+
+        ++itemiter;
+    }
 }

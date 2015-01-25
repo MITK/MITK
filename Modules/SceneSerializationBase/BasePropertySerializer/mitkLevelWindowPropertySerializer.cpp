@@ -21,12 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLevelWindowProperty.h"
 
-#include <MitkSceneSerializationBaseExports.h>
-
 namespace mitk
 {
 
-class MITKSCENESERIALIZATIONBASE_EXPORT LevelWindowPropertySerializer : public BasePropertySerializer
+class LevelWindowPropertySerializer : public BasePropertySerializer
 {
   public:
 

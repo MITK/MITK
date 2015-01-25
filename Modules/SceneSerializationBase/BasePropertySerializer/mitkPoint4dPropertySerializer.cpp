@@ -21,12 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkProperties.h"
 
-#include <MitkSceneSerializationBaseExports.h>
-
 namespace mitk
 {
 
-class MITKSCENESERIALIZATIONBASE_EXPORT Point4dPropertySerializer : public BasePropertySerializer
+class Point4dPropertySerializer : public BasePropertySerializer
 {
   public:
 

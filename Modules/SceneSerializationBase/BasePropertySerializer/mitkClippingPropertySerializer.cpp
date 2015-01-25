@@ -22,11 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkClippingProperty.h"
 #include "mitkNumericTypes.h"
 
-#include <MitkSceneSerializationBaseExports.h>
-
 namespace mitk
 {
-class MITKSCENESERIALIZATIONBASE_EXPORT ClippingPropertySerializer : public BasePropertySerializer
+class ClippingPropertySerializer : public BasePropertySerializer
 {
   public:
     mitkClassMacro( ClippingPropertySerializer, BasePropertySerializer );

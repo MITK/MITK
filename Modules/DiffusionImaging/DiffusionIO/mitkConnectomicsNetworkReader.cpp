@@ -32,7 +32,7 @@ namespace mitk
   }
 
   ConnectomicsNetworkReader::ConnectomicsNetworkReader()
-    : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_DESCRIPTION() )
+    : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE() ), mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_DESCRIPTION() )
   {
     m_ServiceReg = this->RegisterService();
   }

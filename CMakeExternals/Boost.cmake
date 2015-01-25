@@ -50,9 +50,9 @@ if(MITK_USE_Boost)
 
     set (APPLE_SYSROOT_FLAG)
     if(APPLE)
-      #set(APPLE_CMAKE_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/${proj}-cmake/ChangeBoostLibsInstallNameForMac.cmake)
-      #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeExternals/ChangeBoostLibsInstallNameForMac.cmake.in ${APPLE_CMAKE_SCRIPT} @ONLY)
-      #set(INSTALL_COMMAND ${CMAKE_COMMAND} -P ${APPLE_CMAKE_SCRIPT})
+      set(APPLE_CMAKE_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/${proj}-cmake/ChangeBoostLibsInstallNameForMac.cmake)
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeExternals/ChangeBoostLibsInstallNameForMac.cmake.in ${APPLE_CMAKE_SCRIPT} @ONLY)
+      set(_macos_change_install_name_cmd COMMAND ${CMAKE_COMMAND} -P ${APPLE_CMAKE_SCRIPT})
 
       # Set OSX_SYSROOT
       if (NOT ${CMAKE_OSX_SYSROOT} STREQUAL "")
@@ -65,13 +65,26 @@ if(MITK_USE_Boost)
     if(NOT BUILD_SHARED_LIBS)
       set(_boost_link static)
     endif()
+    set(_boost_cxxflags )
+    if(CMAKE_CXX_FLAGS)
+      set(_boost_cxxflags "cxxflags=${CMAKE_CXX_FLAGS}")
+    endif()
+    set(_boost_linkflags )
+    if(BUILD_SHARED_LIBS AND _install_rpath_linkflag)
+      set(_boost_linkflags "linkflags=${_install_rpath_linkflag}")
+    endif()
 
     set(_build_cmd ${CMAKE_COMMAND} -E chdir "<SOURCE_DIR>"
         ./b2
         ${APPLE_SYSROOT_FLAG}
         "--build-dir=<BINARY_DIR>"
+        --layout=tagged
+        # Use the option below to view the shell commands (for debugging)
+        #-d+4
         variant=${_boost_variant}
         link=${_boost_link}
+        ${_boost_cxxflags}
+        ${_boost_linkflags}
         threading=multi
         runtime-link=shared
         -q
@@ -79,7 +92,7 @@ if(MITK_USE_Boost)
 
     if(MITK_USE_Boost_LIBRARIES)
       set(_boost_build_cmd BUILD_COMMAND ${_build_cmd})
-      set(_install_cmd ${_build_cmd} install)
+      set(_install_cmd ${_build_cmd} install ${_macos_change_install_name_cmd})
     else()
       set(_boost_build_cmd BUILD_COMMAND ${CMAKE_COMMAND} -E echo "no binary libraries")
       set(_install_cmd ${CMAKE_COMMAND} -E echo "copying Boost header..."

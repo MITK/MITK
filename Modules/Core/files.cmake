@@ -136,6 +136,7 @@ set(CPP_FILES
   DataManagement/mitkPropertyFilter.cpp
   DataManagement/mitkPropertyFilters.cpp
   DataManagement/mitkPropertyList.cpp
+  DataManagement/mitkPropertyListReplacedObserver.cpp
   DataManagement/mitkPropertyObserver.cpp
   DataManagement/mitkProportionalTimeGeometry.cpp
   DataManagement/mitkRenderingModeProperty.cpp

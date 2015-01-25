@@ -39,7 +39,7 @@ if(MITK_USE_ZLIB)
 
     set(ZLIB_LIBRARY )
     if(ZLIB_LIBRARY_RELEASE)
-      list(APPEND ZLIB_LIBRARY release ${ZLIB_LIBRARY_RELEASE})
+      list(APPEND ZLIB_LIBRARY optimized ${ZLIB_LIBRARY_RELEASE})
       install(FILES ${ZLIB_LIBRARY_RELEASE}
               DESTINATION lib
               CONFIGURATIONS Release

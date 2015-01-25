@@ -204,10 +204,19 @@ endif()
 
 # This is necessary to avoid problems with compile feature checks.
 # CMAKE_CXX_STANDARD seems to only set the -std=c++11 flag for targets.
-mitkFunctionCheckCompilerFlags("-std=c++11" _cxx11_flag)
+# The CMAKE_CXX_FLAGS variable is also used for non-CMake based
+# external projects like Boost and PCRE.
+mitkFunctionCheckCompilerFlags("-std=c++11" CMAKE_CXX_FLAGS)
+
+mitkFunctionCheckCompilerFlags("-Wl,-rpath" _has_rpath_flag)
+set(_install_rpath_linkflag )
+if(_has_rpath_flag)
+  set(_install_rpath_linkflag "-Wl,-rpath='$ORIGIN/../lib'")
+endif()
 
 set(_install_rpath)
 if(UNIX)
+  # this work for libraries as well as executables
   set(_install_rpath "\$ORIGIN/../lib")
 elseif(MACOS)
   set(_install_rpath "@loader_path/../lib")
@@ -227,7 +236,7 @@ set(ep_common_args
   -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
   -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
   -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
-  "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS} ${_cxx11_flag}"
+  "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
   #debug flags
   -DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG}
   -DCMAKE_C_FLAGS_DEBUG:STRING=${CMAKE_C_FLAGS_DEBUG}
@@ -465,6 +474,7 @@ ExternalProject_Add(${proj}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
     -DCTK_DIR:PATH=${CTK_DIR}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
+    -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
     -DEigen_DIR:PATH=${Eigen_DIR}
     -Dtinyxml_DIR:PATH=${tinyxml_DIR}
     -DGLUT_DIR:PATH=${GLUT_DIR}

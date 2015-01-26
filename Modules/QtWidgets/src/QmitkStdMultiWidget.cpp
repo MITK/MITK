@@ -1619,12 +1619,13 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     char dd[3]; dd[2] = 0;
     sscanf (birthday.c_str(),"%4c%2c%2c",yy,mm,dd);
 
-    std::stringstream s;
-    s << "\n\n" << patient.c_str()
+    std::stringstream infoStringStream;
+    infoStringStream 
+      << "\n\n" << patient.c_str()
       << "\n" << patientId.c_str()
       << "\n" << dd << "." << mm << "." << yy << " " << sex.c_str()
       << "\n" << institution.c_str();
-    const std::string tmp = s.str();
+    const std::string infoString = infoStringStream.str();
 
     sscanf (studyDate.c_str(),"%4c%2c%2c",yy,mm,dd);
     char hh[3]; hh[2] = 0;
@@ -1632,13 +1633,14 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     char ss[3]; ss[2] = 0;
     sscanf (studyTime.c_str(),"%2c%2c%2c",hh,mi,ss);
 
-    std::stringstream d;
-    d << dd << "." << mm << "." << yy 
+    std::stringstream infoStringStream2;
+    infoStringStream2 
+      << dd << "." << mm << "." << yy 
       << " " << hh << ":" << mi << ":" << ss;
-    const std::string tmp2 = d.str();
+    const std::string infoString2 = infoStringStream2.str();
 
-    setCornerAnnotation(3, tmp.c_str());
-    setCornerAnnotation(1, tmp2.c_str());
+    setCornerAnnotation(3, infoString.c_str());
+    setCornerAnnotation(1, infoString2.c_str());
 
     stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";
     stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";

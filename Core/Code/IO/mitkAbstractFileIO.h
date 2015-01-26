@@ -133,18 +133,6 @@ protected:
   explicit AbstractFileIO(const std::string& baseDataType, const CustomMimeType& mimeType,
                           const std::string& description);
 
-  /**
-   * Associate this reader instance with the registered MIME type referenced by its name.
-   *
-   * @param mimeTypeName The name of the mime type for which a registered
-   *        mime-type object is looked up and associated with this instance.
-   * @param description A human readable description of this reader.
-   *
-   * @see RegisterService
-   */
-  explicit AbstractFileIO(const std::string& baseDataType, const std::string& mimeTypeName,
-                          const std::string& description);
-
   void SetMimeType(const CustomMimeType& mimeType);
 
   /**

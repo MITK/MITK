@@ -14,15 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkClusteredPlaneSuggestionFilter.h>
-
-#include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkPointLocator.h>
-#include <vtkPolyVertex.h>
 
 #include <mitkPlaneFit.h>
-#include <mitkPointSet.h>
+#include <mitkClusteredPlaneSuggestionFilter.h>
 #include <mitkUnstructuredGridClusteringFilter.h>
 
 
@@ -46,11 +41,12 @@ void mitk::ClusteredPlaneSuggestionFilter::GenerateData()
 
   mitk::UnstructuredGridClusteringFilter::Pointer clusterFilter = mitk::UnstructuredGridClusteringFilter::New();
   clusterFilter->SetInput(inpGrid);
-  clusterFilter->SetMeshing(false);
-  clusterFilter->SetMinPts(4);
-  clusterFilter->Seteps(1.2);
+  clusterFilter->SetMeshing(m_Meshing);
+  clusterFilter->SetMinPts(m_MinPts);
+  clusterFilter->Seteps(m_Eps);
   clusterFilter->Update();
 
+  //need the get and set the vtkUnstructuredGrid instead of the mitkUnstructuredGrid, otherwise rendering error
   vtkSmartPointer< vtkUnstructuredGrid > vtkGrid = clusterFilter->GetOutput()->GetVtkUnstructuredGrid();
 
   if(!vtkGrid)
@@ -86,8 +82,6 @@ void mitk::ClusteredPlaneSuggestionFilter::GenerateData()
     MITK_ERROR << "GeometryData output from PlaneFit filter is null";
     return;
   }
-
-//  mitk::PlaneGeometry* planeGeometry = dynamic_cast<mitk::PlaneGeometry*>( planeFilter->GetOutput()->GetGeometry());
 }
 
 void mitk::ClusteredPlaneSuggestionFilter::GenerateOutputInformation()

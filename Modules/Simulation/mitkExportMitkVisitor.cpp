@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 
-static void ApplyMaterial(mitk::DataNode::Pointer dataNode, const sofa::core::loader::Material& material)
+void ApplyMaterial(mitk::DataNode::Pointer dataNode, const sofa::core::loader::Material& material)
 {
   using sofa::defaulttype::Vec4f;
 

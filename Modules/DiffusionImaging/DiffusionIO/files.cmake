@@ -21,8 +21,10 @@ set(CPP_FILES
 
   mitkDiffusionIOMimeTypes.cpp
 
-  mitkNrrdDiffusionImageReader.cpp
-  mitkNrrdDiffusionImageWriter.cpp
+  mitkDiffusionImageNrrdReaderService.cpp
+  mitkDiffusionImageNrrdWriterService.cpp
+  mitkDiffusionImageNiftiReaderService.cpp
+  mitkDiffusionImageNiftiWriterService.cpp
 
   mitkNrrdQBallImageReader.cpp
   mitkNrrdQBallImageWriter.cpp

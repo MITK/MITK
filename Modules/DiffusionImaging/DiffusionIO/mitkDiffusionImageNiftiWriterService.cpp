@@ -14,13 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkNrrdDiffusionImageWriter__cpp
-#define __mitkNrrdDiffusionImageWriter__cpp
+#ifndef __mitkDiffusionImageNiftiWriterService__cpp
+#define __mitkDiffusionImageNiftiWriterService__cpp
 
-#include "mitkNrrdDiffusionImageWriter.h"
+#include "mitkDiffusionImageNiftiWriterService.h"
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
-#include "itkNrrdImageIO.h"
 #include "itkNiftiImageIO.h"
 #include "itkImageFileWriter.h"
 #include "itksys/SystemTools.hxx"
@@ -31,21 +30,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 
 
-mitk::NrrdDiffusionImageWriter::NrrdDiffusionImageWriter()
-  : AbstractFileWriter(mitk::Image::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_DESCRIPTION())
+mitk::DiffusionImageNiftiWriterService::DiffusionImageNiftiWriterService()
+  : AbstractFileWriter(mitk::Image::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_NIFTI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION())
 {
   RegisterService();
 }
 
-mitk::NrrdDiffusionImageWriter::NrrdDiffusionImageWriter(const mitk::NrrdDiffusionImageWriter& other)
+mitk::DiffusionImageNiftiWriterService::DiffusionImageNiftiWriterService(const mitk::DiffusionImageNiftiWriterService& other)
   : AbstractFileWriter(other)
 {
 }
 
-mitk::NrrdDiffusionImageWriter::~NrrdDiffusionImageWriter()
+mitk::DiffusionImageNiftiWriterService::~DiffusionImageNiftiWriterService()
 {}
 
-void mitk::NrrdDiffusionImageWriter::Write()
+void mitk::DiffusionImageNiftiWriterService::Write()
 {
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image *>(this->GetInput());
 
@@ -54,7 +53,7 @@ void mitk::NrrdDiffusionImageWriter::Write()
 
   if (input.IsNull())
   {
-    MITK_ERROR <<"Sorry, input to NrrdDiffusionImageWriter is NULL!";
+    MITK_ERROR <<"Sorry, input to DiffusionImageNiftiWriterService is NULL!";
     return;
   }
   if ( this->GetOutputLocation().empty() )
@@ -119,42 +118,13 @@ void mitk::NrrdDiffusionImageWriter::Write()
   std::string ext = this->GetMimeType()->GetExtension(this->GetOutputLocation());
   ext = itksys::SystemTools::LowerCase(ext);
 
-  // default extension is .dwi
+  // default extension is .nii
   if( ext == "")
   {
-    ext = ".nrrd";
+    ext = ".nii";
     this->SetOutputLocation(this->GetOutputLocation() + ext);
   }
-
-  if (ext == ".hdwi" || ext == ".nrrd" || ext == ".dwi")
-  {
-
-    MITK_INFO << "Extension " << ext;
-    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-    //io->SetNrrdVectorType( nrrdKindList );
-    io->SetFileType( itk::ImageIOBase::Binary );
-    io->UseCompressionOn();
-
-    typedef itk::ImageFileWriter<ImageType> WriterType;
-    WriterType::Pointer nrrdWriter = WriterType::New();
-    nrrdWriter->UseInputMetaDataDictionaryOn();
-    nrrdWriter->SetInput( itkImg );
-    nrrdWriter->SetImageIO(io);
-    nrrdWriter->SetFileName(this->GetOutputLocation());
-    nrrdWriter->UseCompressionOn();
-    nrrdWriter->SetImageIO(io);
-    try
-    {
-      nrrdWriter->Update();
-    }
-    catch (itk::ExceptionObject e)
-    {
-      std::cout << e << std::endl;
-      throw;
-    }
-
-  }
-  else if (ext == ".fsl" || ext == ".fslgz")
+  if (ext == ".fsl" || ext == ".fslgz")
   {
     MITK_INFO << "Writing Nifti-Image for FSL";
 
@@ -452,12 +422,12 @@ void mitk::NrrdDiffusionImageWriter::Write()
   }
 }
 
-mitk::NrrdDiffusionImageWriter* mitk::NrrdDiffusionImageWriter::Clone() const
+mitk::DiffusionImageNiftiWriterService* mitk::DiffusionImageNiftiWriterService::Clone() const
 {
-  return new NrrdDiffusionImageWriter(*this);
+  return new DiffusionImageNiftiWriterService(*this);
 }
 
-mitk::IFileWriter::ConfidenceLevel mitk::NrrdDiffusionImageWriter::GetConfidenceLevel() const
+mitk::IFileWriter::ConfidenceLevel mitk::DiffusionImageNiftiWriterService::GetConfidenceLevel() const
 {
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
   if (input.IsNull() || !mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( input ) )
@@ -470,4 +440,4 @@ mitk::IFileWriter::ConfidenceLevel mitk::NrrdDiffusionImageWriter::GetConfidence
   }
 }
 
-#endif //__mitkNrrdDiffusionImageWriter__cpp
+#endif //__mitkDiffusionImageNiftiWriterService__cpp

@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkNrrdDiffusionImageReader_cpp
-#define __mitkNrrdDiffusionImageReader_cpp
+#ifndef __mitkDiffusionImageNiftiReaderService_cpp
+#define __mitkDiffusionImageNiftiReaderService_cpp
 
-#include "mitkNrrdDiffusionImageReader.h"
+#include "mitkDiffusionImageNiftiReaderService.h"
 
 #include <iostream>
 #include <fstream>
@@ -35,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itksys/SystemTools.hxx"
 #include "itkImageFileReader.h"
 #include "itkMetaDataObject.h"
-#include "itkNrrdImageIO.h"
 #include "itkNiftiImageIO.h"
 
 #include "mitkCustomMimeType.h"
@@ -51,32 +50,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  NrrdDiffusionImageReader::
-  NrrdDiffusionImageReader(const NrrdDiffusionImageReader & other)
+  DiffusionImageNiftiReaderService::
+  DiffusionImageNiftiReaderService(const DiffusionImageNiftiReaderService & other)
     : AbstractFileReader(other)
   {
   }
 
 
-  NrrdDiffusionImageReader* NrrdDiffusionImageReader::Clone() const
+  DiffusionImageNiftiReaderService* DiffusionImageNiftiReaderService::Clone() const
   {
-    return new NrrdDiffusionImageReader(*this);
+    return new DiffusionImageNiftiReaderService(*this);
   }
 
 
-  NrrdDiffusionImageReader::
-  ~NrrdDiffusionImageReader()
+  DiffusionImageNiftiReaderService::
+  ~DiffusionImageNiftiReaderService()
   {}
 
-  NrrdDiffusionImageReader::
-  NrrdDiffusionImageReader()
-    : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_DESCRIPTION() )
+  DiffusionImageNiftiReaderService::
+  DiffusionImageNiftiReaderService()
+    : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_NIFTI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION() )
   {
     m_ServiceReg = this->RegisterService();
   }
 
   std::vector<itk::SmartPointer<mitk::BaseData> >
-  NrrdDiffusionImageReader::
+  DiffusionImageNiftiReaderService::
   Read()
   {
     std::vector<itk::SmartPointer<mitk::BaseData> > result;
@@ -95,7 +94,7 @@ namespace mitk
   }
 
 
-  void NrrdDiffusionImageReader::InternalRead()
+  void DiffusionImageNiftiReaderService::InternalRead()
   {
     OutputType::Pointer outputForCache = OutputType::New();
     if ( this->GetInputLocation() == "")
@@ -122,23 +121,13 @@ namespace mitk
         }
 
 
-        MITK_INFO << "NrrdDiffusionImageReader: reading image information";
+        MITK_INFO << "DiffusionImageNiftiReaderService: reading image information";
         VectorImageType::Pointer itkVectorImage;
 
         std::string ext = this->GetMimeType()->GetExtension( this->GetInputLocation() );
         ext = itksys::SystemTools::LowerCase( ext );
 
-        if (ext == ".hdwi" || ext == ".dwi" || ext == ".nrrd")
-        {
-          typedef itk::ImageFileReader<VectorImageType> FileReaderType;
-          FileReaderType::Pointer reader = FileReaderType::New();
-          reader->SetFileName(this->GetInputLocation());
-          itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-          reader->SetImageIO(io);
-          reader->Update();
-          itkVectorImage = reader->GetOutput();
-        }
-        else if(ext == ".fsl" || ext == ".fslgz")
+        if(ext == ".fsl" || ext == ".fslgz")
         {
           // create temporary file with correct ending for nifti-io
           std::string fname3 = "temp_dwi";
@@ -297,86 +286,7 @@ namespace mitk
         float BValue = -1;
         // Diffusion Image information END
 
-        if (ext == ".hdwi" || ext == ".dwi" || ext == ".nrrd")
-        {
-
-          itk::MetaDataDictionary imgMetaDictionary =  itkVectorImage->GetMetaDataDictionary();
-          std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
-          std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-          std::string metaString;
-
-          GradientDirectionType vect3d;
-
-          int numberOfImages = 0;
-          int numberOfGradientImages = 0;
-          bool readb0 = false;
-          double xx, xy, xz, yx, yy, yz, zx, zy, zz;
-
-          for (; itKey != imgMetaKeys.end(); itKey ++)
-          {
-            double x,y,z;
-
-            itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-            if (itKey->find("DWMRI_gradient") != std::string::npos)
-            {
-              sscanf(metaString.c_str(), "%lf %lf %lf\n", &x, &y, &z);
-              vect3d[0] = x; vect3d[1] = y; vect3d[2] = z;
-              DiffusionVectors->InsertElement( numberOfImages, vect3d );
-              ++numberOfImages;
-              // If the direction is 0.0, this is a reference image
-              if (vect3d[0] == 0.0 &&
-                  vect3d[1] == 0.0 &&
-                  vect3d[2] == 0.0)
-              {
-                continue;
-              }
-              ++numberOfGradientImages;;
-            }
-            else if (itKey->find("DWMRI_b-value") != std::string::npos)
-            {
-              readb0 = true;
-              BValue = atof(metaString.c_str());
-            }
-            else if (itKey->find("measurement frame") != std::string::npos)
-            {
-              sscanf(metaString.c_str(), " ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) \n", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
-
-              if (xx>10e-10 || xy>10e-10 || xz>10e-10 ||
-                  yx>10e-10 || yy>10e-10 || yz>10e-10 ||
-                  zx>10e-10 || zy>10e-10 || zz>10e-10 )
-              {
-                MeasurementFrame(0,0) = xx;
-                MeasurementFrame(0,1) = xy;
-                MeasurementFrame(0,2) = xz;
-                MeasurementFrame(1,0) = yx;
-                MeasurementFrame(1,1) = yy;
-                MeasurementFrame(1,2) = yz;
-                MeasurementFrame(2,0) = zx;
-                MeasurementFrame(2,1) = zy;
-                MeasurementFrame(2,2) = zz;
-              }
-              else
-              {
-                MeasurementFrame(0,0) = 1;
-                MeasurementFrame(0,1) = 0;
-                MeasurementFrame(0,2) = 0;
-                MeasurementFrame(1,0) = 0;
-                MeasurementFrame(1,1) = 1;
-                MeasurementFrame(1,2) = 0;
-                MeasurementFrame(2,0) = 0;
-                MeasurementFrame(2,1) = 0;
-                MeasurementFrame(2,2) = 1;
-              }
-            }
-          }
-
-          if(!readb0)
-          {
-            MITK_INFO << "BValue not specified in header file";
-          }
-
-        }
-        else if(ext == ".fsl" || ext == ".fslgz" || ext == ".nii" || ext == ".nii.gz")
+        if(ext == ".fsl" || ext == ".fslgz" || ext == ".nii" || ext == ".nii.gz")
         {
           // some parsing depending on the extension
           bool useFSLstyle( true );

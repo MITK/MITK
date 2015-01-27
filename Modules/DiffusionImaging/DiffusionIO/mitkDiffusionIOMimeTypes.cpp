@@ -31,7 +31,8 @@ std::vector<CustomMimeType*> DiffusionIOMimeTypes::Get()
 
   // order matters here (descending rank for mime types)
 
-  mimeTypes.push_back(DWI_MIMETYPE().Clone());
+  mimeTypes.push_back(DWI_NRRD_MIMETYPE().Clone());
+  mimeTypes.push_back(DWI_NIFTI_MIMETYPE().Clone());
   mimeTypes.push_back(DTI_MIMETYPE().Clone());
   mimeTypes.push_back(QBI_MIMETYPE().Clone());
 
@@ -56,8 +57,8 @@ CustomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE()
   return mimeType;
 }
 
-DiffusionIOMimeTypes::DwiMimeType::DwiMimeType()
-  : CustomMimeType(DWI_MIMETYPE_NAME())
+DiffusionIOMimeTypes::DiffusionImageNrrdMimeType::DiffusionImageNrrdMimeType()
+  : CustomMimeType(DWI_NRRD_MIMETYPE_NAME())
 {
   std::string category = "Diffusion Weighted Image";
   this->SetCategory(category);
@@ -65,14 +66,10 @@ DiffusionIOMimeTypes::DwiMimeType::DwiMimeType()
 
   this->AddExtension("dwi");
   this->AddExtension("hdwi");
-  this->AddExtension("fsl");
-  this->AddExtension("fslgz");
   this->AddExtension("nrrd");
-  this->AddExtension("nii");
-  this->AddExtension("nii.gz");
 }
 
-bool DiffusionIOMimeTypes::DwiMimeType::AppliesTo(const std::string &path) const
+bool DiffusionIOMimeTypes::DiffusionImageNrrdMimeType::AppliesTo(const std::string &path) const
 {
   bool canRead( CustomMimeType::AppliesTo(path) );
 
@@ -124,22 +121,65 @@ bool DiffusionIOMimeTypes::DwiMimeType::AppliesTo(const std::string &path) const
     canRead = false;
   }
 
+  return canRead;
+}
+
+DiffusionIOMimeTypes::DiffusionImageNrrdMimeType* DiffusionIOMimeTypes::DiffusionImageNrrdMimeType::Clone() const
+{
+  return new DiffusionImageNrrdMimeType(*this);
+}
+
+
+DiffusionIOMimeTypes::DiffusionImageNrrdMimeType DiffusionIOMimeTypes::DWI_NRRD_MIMETYPE()
+{
+  return DiffusionImageNrrdMimeType();
+}
+
+DiffusionIOMimeTypes::DiffusionImageNiftiMimeType::DiffusionImageNiftiMimeType()
+  : CustomMimeType(DWI_NIFTI_MIMETYPE_NAME())
+{
+  std::string category = "Diffusion Weighted Image";
+  this->SetCategory(category);
+  this->SetComment("Diffusion Weighted Images");
+  this->AddExtension("fsl");
+  this->AddExtension("fslgz");
+  this->AddExtension("nii");
+  this->AddExtension("nii.gz");
+}
+
+bool DiffusionIOMimeTypes::DiffusionImageNiftiMimeType::AppliesTo(const std::string &path) const
+{
+  bool canRead(CustomMimeType::AppliesTo(path));
+
+  // fix for bug 18572
+  // Currently this function is called for writing as well as reading, in that case
+  // the image information can of course not be read
+  // This is a bug, this function should only be called for reading.
+  if (!itksys::SystemTools::FileExists(path.c_str()))
+  {
+    return canRead;
+  }
+  //end fix for bug 18572
+
+  std::string ext = this->GetExtension(path);
+  ext = itksys::SystemTools::LowerCase(ext);
+
   // Nifti files should only be considered for this mime type if they are
   // accompanied by bvecs and bvals files defining the diffusion information
-  if( ext == ".nii" || ext == ".nii.gz" )
+  if (ext == ".nii" || ext == ".nii.gz")
   {
-    std::string base = itksys::SystemTools::GetFilenamePath( path ) + "/"
-      + this->GetFilenameWithoutExtension( path );
+    std::string base = itksys::SystemTools::GetFilenamePath(path) + "/"
+      + this->GetFilenameWithoutExtension(path);
 
-    if( itksys::SystemTools::FileExists( std::string( base + ".bvec").c_str() )
-      && itksys::SystemTools::FileExists( std::string( base + ".bval").c_str() )
+    if (itksys::SystemTools::FileExists(std::string(base + ".bvec").c_str())
+      && itksys::SystemTools::FileExists(std::string(base + ".bval").c_str())
       )
     {
       return canRead;
     }
 
-    if( itksys::SystemTools::FileExists( std::string( base + ".bvecs").c_str() )
-      && itksys::SystemTools::FileExists( std::string( base + ".bvals").c_str() )
+    if (itksys::SystemTools::FileExists(std::string(base + ".bvecs").c_str())
+      && itksys::SystemTools::FileExists(std::string(base + ".bvals").c_str())
       )
     {
       return canRead;
@@ -151,15 +191,15 @@ bool DiffusionIOMimeTypes::DwiMimeType::AppliesTo(const std::string &path) const
   return canRead;
 }
 
-DiffusionIOMimeTypes::DwiMimeType* DiffusionIOMimeTypes::DwiMimeType::Clone() const
+DiffusionIOMimeTypes::DiffusionImageNiftiMimeType* DiffusionIOMimeTypes::DiffusionImageNiftiMimeType::Clone() const
 {
-  return new DwiMimeType(*this);
+  return new DiffusionImageNiftiMimeType(*this);
 }
 
 
-DiffusionIOMimeTypes::DwiMimeType DiffusionIOMimeTypes::DWI_MIMETYPE()
+DiffusionIOMimeTypes::DiffusionImageNiftiMimeType DiffusionIOMimeTypes::DWI_NIFTI_MIMETYPE()
 {
-  return DwiMimeType();
+  return DiffusionImageNiftiMimeType();
 }
 
 CustomMimeType DiffusionIOMimeTypes::DTI_MIMETYPE()
@@ -195,9 +235,15 @@ CustomMimeType DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE()
 }
 
 // Names
-std::string DiffusionIOMimeTypes::DWI_MIMETYPE_NAME()
+std::string DiffusionIOMimeTypes::DWI_NRRD_MIMETYPE_NAME()
 {
   static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".dwi";
+  return name;
+}
+
+std::string DiffusionIOMimeTypes::DWI_NIFTI_MIMETYPE_NAME()
+{
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".fsl";
   return name;
 }
 
@@ -232,7 +278,13 @@ std::string DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_DESCRIPTION()
   return description;
 }
 
-std::string DiffusionIOMimeTypes::DWI_MIMETYPE_DESCRIPTION()
+std::string DiffusionIOMimeTypes::DWI_NRRD_MIMETYPE_DESCRIPTION()
+{
+  static std::string description = "Diffusion Weighted Images";
+  return description;
+}
+
+std::string DiffusionIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION()
 {
   static std::string description = "Diffusion Weighted Images";
   return description;

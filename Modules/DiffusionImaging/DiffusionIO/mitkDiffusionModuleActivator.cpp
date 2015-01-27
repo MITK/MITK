@@ -46,9 +46,9 @@ namespace mitk
       us::ServiceProperties props;
       props[ us::ServiceConstants::SERVICE_RANKING() ] = 10;
 
-      std::vector<mitk::CustomMimeType*> mimeTypes = mitk::DiffusionIOMimeTypes::Get();
-      for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = mimeTypes.begin(),
-        iterEnd = mimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
+      m_MimeTypes = mitk::DiffusionIOMimeTypes::Get();
+      for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = m_MimeTypes.begin(),
+        iterEnd = m_MimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
       {
         context->RegisterService(*mimeTypeIter, props);
       }
@@ -70,6 +70,11 @@ namespace mitk
 
     void Unload(us::ModuleContext*)
     {
+      for (int loop(0); loop < m_MimeTypes.size(); ++loop)
+      {
+        delete m_MimeTypes.at(loop);
+      }
+
       delete m_DiffusionImageNrrdReaderService;
       delete m_DiffusionImageNiftiReaderService;
       delete m_NrrdTensorImageReader;
@@ -100,6 +105,8 @@ namespace mitk
     NrrdQBallImageWriter * m_NrrdQBallImageWriter;
     FiberBundleXWriter * m_FiberBundleXWriter;
     ConnectomicsNetworkWriter * m_ConnectomicsNetworkWriter;
+
+    std::vector<mitk::CustomMimeType*> m_MimeTypes;
 
   };
 }

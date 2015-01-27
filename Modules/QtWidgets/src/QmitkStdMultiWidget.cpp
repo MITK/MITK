@@ -294,6 +294,11 @@ void QmitkStdMultiWidget::InitializeWidget()
   SetDecorationProperties("Coronal", GetDecorationColor(2), 2);
   SetDecorationProperties("3D", GetDecorationColor(3), 3);
 
+  cornerText = vtkCornerAnnotation::New();
+  textProp = vtkTextProperty::New();
+  ren = vtkRenderer::New();
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->InsertForegroundRenderer(ren,true);
+
   // create a slice rotator
   m_SlicesRotator = mitk::SlicesRotator::New("slices-rotator");
   m_SlicesRotator->AddSliceController(
@@ -456,6 +461,12 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
   m_TimeNavigationController->Disconnect(mitkWidget2->GetSliceNavigationController());
   m_TimeNavigationController->Disconnect(mitkWidget3->GetSliceNavigationController());
   m_TimeNavigationController->Disconnect(mitkWidget4->GetSliceNavigationController());
+
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->RemoveRenderer( ren );
+
+  cornerText->Delete();
+  textProp->Delete();
+  ren->Delete();
 }
 
 void QmitkStdMultiWidget::RemovePlanesFromDataStorage()
@@ -1644,18 +1655,15 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetTopLayerNode(mitk::DataStorage::
 
 void QmitkStdMultiWidget::setCornerAnnotation(int corner, const char* text) 
 {
-  auto cornerText = vtkCornerAnnotation::New();
   cornerText->SetText(corner, text);
   cornerText->SetMaximumFontSize(14);
-  auto textProp = vtkTextProperty::New();
   textProp->SetColor( 1.0, 1.0, 1.0 );
   textProp->SetFontFamilyToArial();
   cornerText->SetTextProperty( textProp );
-  auto ren = vtkRenderer::New();
   ren->AddActor(cornerText);
   ren->InteractiveOff();
-  mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->InsertForegroundRenderer(ren,true);
   mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->UpdateLayers();
+  this->GetRenderWindow4()->GetRenderer()->ForceImmediateUpdate();
 }
 
 void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
@@ -1712,45 +1720,49 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     image->GetGeometry()->WorldToIndex(crosshairPos, p);
     stream.precision(2);
 
-    std::string patient, patientId,
-      birthday, sex, institution, studyDate, studyTime;
+    unsigned long newImageMTime = image->GetMTime();
+    if (imageMTime != newImageMTime) {
+      imageMTime = newImageMTime;
+      std::string patient, patientId,
+        birthday, sex, institution, studyDate, studyTime;
 
-    auto properties = image->GetPropertyList();
-    properties->GetStringProperty("dicom.patient.PatientsName", patient);
-    properties->GetStringProperty("dicom.patient.PatientID", patientId);
-    properties->GetStringProperty("dicom.patient.PatientsBirthDate", birthday);
-    properties->GetStringProperty("dicom.patient.PatientsSex", sex);
-    properties->GetStringProperty("dicom.study.InstitutionName", institution);
-    properties->GetStringProperty("dicom.study.StudyDate", studyDate);
-    properties->GetStringProperty("dicom.study.StudyTime", studyTime);
+      imageProperties = image->GetPropertyList();
+      imageProperties->GetStringProperty("dicom.patient.PatientsName", patient);
+      imageProperties->GetStringProperty("dicom.patient.PatientID", patientId);
+      imageProperties->GetStringProperty("dicom.patient.PatientsBirthDate", birthday);
+      imageProperties->GetStringProperty("dicom.patient.PatientsSex", sex);
+      imageProperties->GetStringProperty("dicom.study.InstitutionName", institution);
+      imageProperties->GetStringProperty("dicom.study.StudyDate", studyDate);
+      imageProperties->GetStringProperty("dicom.study.StudyTime", studyTime);
     
-    char yy[5]; yy[4] = 0;
-    char mm[3]; mm[2] = 0;
-    char dd[3]; dd[2] = 0;
-    sscanf (birthday.c_str(),"%4c%2c%2c",yy,mm,dd);
+      char yy[5]; yy[4] = 0;
+      char mm[3]; mm[2] = 0;
+      char dd[3]; dd[2] = 0;
+      sscanf (birthday.c_str(),"%4c%2c%2c",yy,mm,dd);
 
-    std::stringstream infoStringStream;
-    infoStringStream 
-      << "\n\n" << patient.c_str()
-      << "\n" << patientId.c_str()
-      << "\n" << dd << "." << mm << "." << yy << " " << sex.c_str()
-      << "\n" << institution.c_str();
-    const std::string infoString = infoStringStream.str();
+      std::stringstream infoStringStream;
+      infoStringStream 
+        << "\n\n" << patient.c_str()
+        << "\n" << patientId.c_str()
+        << "\n" << dd << "." << mm << "." << yy << " " << sex.c_str()
+        << "\n" << institution.c_str();
+      const std::string infoString = infoStringStream.str();
 
-    sscanf (studyDate.c_str(),"%4c%2c%2c",yy,mm,dd);
-    char hh[3]; hh[2] = 0;
-    char mi[3]; mi[2] = 0;
-    char ss[3]; ss[2] = 0;
-    sscanf (studyTime.c_str(),"%2c%2c%2c",hh,mi,ss);
+      sscanf (studyDate.c_str(),"%4c%2c%2c",yy,mm,dd);
+      char hh[3]; hh[2] = 0;
+      char mi[3]; mi[2] = 0;
+      char ss[3]; ss[2] = 0;
+      sscanf (studyTime.c_str(),"%2c%2c%2c",hh,mi,ss);
 
-    std::stringstream infoStringStream2;
-    infoStringStream2 
-      << dd << "." << mm << "." << yy 
-      << " " << hh << ":" << mi << ":" << ss;
-    const std::string infoString2 = infoStringStream2.str();
+      std::stringstream infoStringStream2;
+      infoStringStream2 
+        << dd << "." << mm << "." << yy 
+        << " " << hh << ":" << mi << ":" << ss;
+      const std::string infoString2 = infoStringStream2.str();
 
-    setCornerAnnotation(3, infoString.c_str());
-    setCornerAnnotation(1, infoString2.c_str());
+      setCornerAnnotation(3, infoString.c_str());
+      setCornerAnnotation(1, infoString2.c_str());
+    }
 
     stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";
     stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";

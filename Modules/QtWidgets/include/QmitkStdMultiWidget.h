@@ -140,6 +140,12 @@ protected:
 
   void HideAllWidgetToolbars();
 
+  mitk::PropertyList::Pointer imageProperties;
+  unsigned long imageMTime;
+  vtkCornerAnnotation* cornerText;
+  vtkTextProperty* textProp;
+  vtkRenderer* ren;
+
   void setCornerAnnotation(int corner, const char* text);
 
   mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);

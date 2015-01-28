@@ -695,6 +695,18 @@ void QmitkMeasurementView::ActionDrawCircleTriggered(bool checked)
   Q_UNUSED(checked)
 
   mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
+
+  mitk::DataNode* node;
+  figure->m_ImageNode = NULL;
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  if (!nodes.empty()) {
+    node = nodes.front();
+
+    if (node) {
+      figure->m_ImageNode = node;
+    }
+  }
+
   QString qString = QString("Circle%1").arg(++d->m_CircleCounter);
   this->AddFigureToDataStorage(figure, qString);
 

@@ -69,6 +69,8 @@ namespace mitk
     static bool IsDiffusionWeightedImage(const mitk::Image *);
     static bool IsDiffusionWeightedImage(const mitk::DataNode* node);
 
+    static ImageType::Pointer GetItkVectorImage(Image *image);
+
     /// Convenience method to get the BValueMap
     static const BValueMapType & GetBValueMap(const mitk::Image *);
     /// Convenience method to get the BValue

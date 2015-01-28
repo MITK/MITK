@@ -40,6 +40,14 @@ mitk::DiffusionPropertyHelper::~DiffusionPropertyHelper()
 {
 }
 
+
+mitk::DiffusionPropertyHelper::ImageType::Pointer mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk::Image* image)
+{
+    ImageType::Pointer vectorImage = ImageType::New();
+    mitk::CastToItkImage(image, vectorImage);
+    return vectorImage;
+}
+
 mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer
   mitk::DiffusionPropertyHelper::CalcAveragedDirectionSet(double precision, GradientDirectionsContainerType::Pointer directions)
 {

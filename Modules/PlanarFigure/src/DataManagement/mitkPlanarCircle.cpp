@@ -174,10 +174,12 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
         currentIndex[Z] = ñenterIndex[Z];
 
         int sum = 0;
+        double sd(0), mean(0);
         int pixCount = 0;
         double dx;
         int lIndex, rIndex;
         mitk::Point3D currentPoint; 
+        std::vector<short> values;
         for (double dy = circleRadius; dy > - circleRadius; dy--) {  
           dx = sqrt(circleRadiusSqr - dy*dy);
           currentPoint[X] = center[X] - dx;
@@ -194,6 +196,7 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
           for (int rowX = lIndex; rowX <= rIndex; rowX++) {
             currentIndex[X] = rowX;
             short val = itkImage->GetPixel(currentIndex);
+            values.push_back(val);
             if (val < minValue) {
               minValue = val;
             } else if (val > maxValue) {
@@ -204,10 +207,23 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
           } 
         }
 
+        if (pixCount > 0) {
+          mean = (double)sum/pixCount;
+          sum = 0;
+          for (std::vector<short>::const_iterator it = values.begin(); it != values.end(); ++it) {
+            sum += (*it - mean)*(*it - mean);
+          }
+          sd = sqrt((double)sum/pixCount);
+        } else {
+          maxValue = 0;
+          minValue = 0;
+        }
+
         MeasurementStatistics* stats = new MeasurementStatistics();
-        stats->Mean = (double)sum/pixCount;
+        stats->Mean = mean;
         stats->Max = maxValue;
         stats->Min = minValue;
+        stats->SD = sd;
 
         return stats;
       }
@@ -240,6 +256,9 @@ std::string mitk::PlanarCircle::EvaluateAnnotation()
     res += "\n";
     sprintf(str, "%.2f", stats->Mean);
     res += "Mean=";
+    res += str;    
+    sprintf(str, "%.2f", stats->SD);
+    res += "\nSD=";
     res += str;    
     res += "\nMax=" + std::to_string(stats->Max);
     res += " Min=" + std::to_string(stats->Min);

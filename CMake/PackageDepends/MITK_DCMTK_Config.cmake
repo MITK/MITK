@@ -8,7 +8,7 @@ if(NOT DCMTK_DIR)
   endif(NOT DCMTK_DIR)
 endif(NOT DCMTK_DIR)
 
-find_package(DCMTK)
+find_package(DCMTK QUIET REQUIRED)
 
 if(NOT DCMTK_FOUND)
   message(SEND_ERROR "DCMTK development files not found.\n Please check variables (e.g. DCMTK_DIR) for include directories and libraries.\nYou may set environment variable DCMTK_DIR before pressing 'configure'")

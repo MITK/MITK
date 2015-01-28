@@ -1,6 +1,12 @@
 project(org_mitk_gui_qt_dicom)
 
-find_program(DCMTK_STORESCP storescp PATHS "${DCMTK_DIR}/bin" PATH_SUFFIXES Release Debug DOC "Dcmtk storage provider which is used to store dicom files which are transfered over network." NO_DEFAULT_PATH)
+find_program(DCMTK_STORESCP
+  NAMES storescp storescp${DCMTK_CMAKE_DEBUG_POSTFIX} storescp${CMAKE_DEBUG_POSTFIX}
+  PATHS "${DCMTK_DIR}/bin"
+  PATH_SUFFIXES Release Debug
+  DOC "Dcmtk storage provider which is used to store dicom files which are transfered over network."
+  NO_DEFAULT_PATH
+)
 mark_as_advanced(DCMTK_STORESCP)
 
 if(NOT EXISTS ${DCMTK_STORESCP})

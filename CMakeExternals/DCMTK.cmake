@@ -13,10 +13,6 @@ if(MITK_USE_DCMTK)
   set(proj_DEPENDENCIES )
   set(DCMTK_DEPENDS ${proj})
 
-  if(CMAKE_GENERATOR MATCHES Xcode)
-    set(DCMTK_PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/DCMTK-3.6.1.patch)
-  endif()
-
   if(NOT DEFINED DCMTK_DIR)
     if(DCMTK_DICOM_ROOT_ID)
       set(DCMTK_CXX_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
@@ -27,7 +23,12 @@ if(MITK_USE_DCMTK)
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.1_20121102.tar.gz
       URL_MD5 39d97456027a4219ce47e566e3ab123b
-      PATCH_COMMAND ${DCMTK_PATCH_COMMAND}
+      # See http://bugs.mitk.org/show_bug.cgi?id=14513 except for the changes
+      # in dcmtkMacros.cmake which allow installing release and debug executables
+      # of dcmtk in the same install prefix.
+      # The other patches were originally for the Xcode generator, but we always
+      # apply them for consistency.
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/DCMTK-3.6.1.patch
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
          ${ep_common_args}

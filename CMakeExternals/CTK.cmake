@@ -70,8 +70,10 @@ if(MITK_USE_CTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 a3ac62b6fdefc90966b52bc5b52c80e5
+      GIT_URL https://github.com/saschazelzer/CTK
+      GIT_TAG origin/improve-external-dependency-handling
+      #URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
+      #URL_MD5 a3ac62b6fdefc90966b52bc5b52c80e5
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
@@ -79,6 +81,10 @@ if(MITK_USE_CTK)
         ${ep_common_args}
         ${ctk_optional_cache_args}
         ${ctk_qt_args}
+        # The CTK PluginFramework cannot cope with
+        # a non-empty CMAKE_DEBUG_POSTFIX for the plugin
+        # libraries yet.
+        -DCMAKE_DEBUG_POSTFIX:STRING=
         -DGit_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DCTK_LIB_CommandLineModules/Backend/LocalProcess:BOOL=ON

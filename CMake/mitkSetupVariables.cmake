@@ -23,6 +23,11 @@ if(MITK_BUILD_ALL_PLUGINS)
   set(MITK_BUILD_ALL_PLUGINS_OPTION "FORCE_BUILD_ALL")
 endif()
 
+if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
+  # We can't do this yet because the CTK Plugin Framework
+  # cannot cope with a postfix yet.
+  #set(CMAKE_DEBUG_POSTFIX d)
+endif()
 
 #-----------------------------------
 # Find external dependencies

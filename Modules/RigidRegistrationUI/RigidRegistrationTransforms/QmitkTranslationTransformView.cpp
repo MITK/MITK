@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkTranslationTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <itkTranslationTransform.h>
+#include <itkAffineTransform.h>
 #include <QValidator>
 
 QmitkTranslationTransformView::QmitkTranslationTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f)
@@ -47,10 +47,11 @@ itk::Object::Pointer QmitkTranslationTransformView::GetTransform2(itk::Image<TPi
 {
   typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
   typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::TranslationTransform< double, VImageDimension>::Pointer TransformPointer = itk::TranslationTransform< double, VImageDimension>::New();
-  TransformPointer->SetIdentity();
-  m_TransformObject = TransformPointer.GetPointer();
-  return TransformPointer.GetPointer();
+  typedef itk::AffineTransform<double, VImageDimension>  TransformType;
+  typename TransformType::Pointer transform = TransformType::New();
+  transform->SetIdentity();
+  m_TransformObject = transform;
+  return transform.GetPointer();
 }
 
 itk::Array<double> QmitkTranslationTransformView::GetTransformParameters()

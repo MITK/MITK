@@ -56,7 +56,7 @@ this definition</a>. For "none", there will be no validation. For "weak"  valida
 but try to carry on and load as many modules as possible. The XML validation errors are available as tool-tips on
 the tab widget when the module is launched. Many third party modules included with Slicer currently have
 incorrect XML (typically, mis-ordered XML tags), and so the "weak" or "none" mode may assist in loading them.
-By default the "strict" mode is chosen so that only valid modules are loaded.
+By default the "weak" mode is chosen so that only valid modules are loaded.
 \li max concurrent processes: Sets the maximum number of concurrent jobs that can be run via this interface. The default is 4.
 When the maximum number is reached, the green "Run" button is disabled until a job finishes.
 

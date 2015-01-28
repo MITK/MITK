@@ -208,7 +208,7 @@ bool CommandLineModulesPreferencesPage::PerformOk()
   std::string modules = this->ConvertToStdString(m_ModulesFiles->files());
   m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, modules);
 
-  int currentValidationMode = m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 0);
+  int currentValidationMode = m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 2);
   if (currentValidationMode != m_ValidationMode->currentIndex())
   {
     QMessageBox msgBox;
@@ -256,7 +256,7 @@ void CommandLineModulesPreferencesPage::Update()
   QStringList fileList = files.split(";", QString::SkipEmptyParts);
   m_ModulesFiles->setFiles(fileList);
 
-  m_ValidationMode->setCurrentIndex(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 0));
+  m_ValidationMode->setCurrentIndex(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 2));
   m_XmlTimeoutInSeconds->setValue(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_TIMEOUT_SECS, 30)); // 30 secs = QProcess default timeout
   m_MaximumNumberProcesses->setValue(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::MAX_CONCURRENT, 4));
 }

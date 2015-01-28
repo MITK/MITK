@@ -186,7 +186,7 @@ void CommandLineModulesView::RetrieveAndStoreValidationMode()
 {
   berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
 
-  int value = prefs->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 0);
+  int value = prefs->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 2);
   if (value == 0)
   {
     m_ValidationMode = ctkCmdLineModuleManager::STRICT_VALIDATION;

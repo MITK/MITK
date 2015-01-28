@@ -1,8 +1,10 @@
 function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
 
   set(_dir_candidates
-      "${MITK_BINARY_DIR}/bin"
-      "${MITK_BINARY_DIR}/bin/plugins"
+      "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+      "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
+      "${MITK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+      "${MITK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}/plugins"
      )
   if(MITK_EXTERNAL_PROJECT_PREFIX)
     list(APPEND _dir_candidates

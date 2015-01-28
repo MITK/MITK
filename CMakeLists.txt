@@ -122,27 +122,26 @@ SUPPRESS_VC_DEPRECATED_WARNINGS()
 # Output directories.
 #-----------------------------------------------------------------------------
 
+set(_default_LIBRARY_output_dir lib)
+set(_default_RUNTIME_output_dir bin)
+set(_default_ARCHIVE_output_dir lib)
+
 foreach(type LIBRARY RUNTIME ARCHIVE)
   # Make sure the directory exists
-  if(DEFINED MITK_CMAKE_${type}_OUTPUT_DIRECTORY
+  if(MITK_CMAKE_${type}_OUTPUT_DIRECTORY
      AND NOT EXISTS ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
     message("Creating directory MITK_CMAKE_${type}_OUTPUT_DIRECTORY: ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}")
     file(MAKE_DIRECTORY "${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}")
   endif()
 
-  if(MITK_USE_SUPERBUILD)
-    set(output_dir ${MITK_BINARY_DIR}/bin)
-    if(NOT DEFINED MITK_CMAKE_${type}_OUTPUT_DIRECTORY)
-      set(MITK_CMAKE_${type}_OUTPUT_DIRECTORY ${MITK_BINARY_DIR}/MITK-build/bin)
-    endif()
+  if(MITK_CMAKE_${type}_OUTPUT_DIRECTORY)
+    set(CMAKE_${type}_OUTPUT_DIRECTORY ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
   else()
-    if(NOT DEFINED MITK_CMAKE_${type}_OUTPUT_DIRECTORY)
-      set(output_dir ${MITK_BINARY_DIR}/bin)
-    else()
-      set(output_dir ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
-    endif()
+    set(CMAKE_${type}_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${_default_${type}_output_dir})
+    set(MITK_CMAKE_${type}_OUTPUT_DIRECTORY ${CMAKE_${type}_OUTPUT_DIRECTORY})
   endif()
-  set(CMAKE_${type}_OUTPUT_DIRECTORY ${output_dir} CACHE INTERNAL "Single output directory for building all libraries.")
+
+  set(CMAKE_${type}_OUTPUT_DIRECTORY ${CMAKE_${type}_OUTPUT_DIRECTORY} CACHE INTERNAL "Output directory for ${type} files.")
   mark_as_advanced(CMAKE_${type}_OUTPUT_DIRECTORY)
 endforeach()
 

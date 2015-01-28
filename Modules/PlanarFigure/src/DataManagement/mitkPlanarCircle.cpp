@@ -158,8 +158,8 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
         double circleRadius = GetWorldControlPoint(CENTRAL_POINT_NUM).EuclideanDistanceTo(GetWorldControlPoint(RADIUS_POINT_NUM));
         double circleRadiusSqr = circleRadius*circleRadius;
 
-        mitk::Point3D ñenterIndex;
-        image->GetGeometry()->WorldToIndex(this->GetWorldControlPoint(CENTRAL_POINT_NUM), ñenterIndex);
+        mitk::Point3D centerIndex;
+        image->GetGeometry()->WorldToIndex(this->GetWorldControlPoint(CENTRAL_POINT_NUM), centerIndex);
 
         mitk::Point3D center = GetWorldControlPoint(CENTRAL_POINT_NUM);
 
@@ -171,7 +171,7 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
 		mitk::CastToItkImage(image, itkImage);
 
         ImageType3D::IndexType currentIndex;
-        currentIndex[Z] = ñenterIndex[Z];
+        currentIndex[Z] = centerIndex[Z];
 
         int sum = 0;
         double sd(0), mean(0);
@@ -185,14 +185,14 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
           currentPoint[X] = center[X] - dx;
           currentPoint[Y] =  center[Y] + dy;
           currentPoint[Z] = 0;
-          image->GetGeometry()->WorldToIndex(currentPoint, ñenterIndex);
-          lIndex = ñenterIndex[X];
+          image->GetGeometry()->WorldToIndex(currentPoint, centerIndex);
+          lIndex = centerIndex[X];
 
           currentPoint[X] = center[X] + dx;
-          image->GetGeometry()->WorldToIndex(currentPoint, ñenterIndex);
-          rIndex = ñenterIndex[X];
+          image->GetGeometry()->WorldToIndex(currentPoint, centerIndex);
+          rIndex = centerIndex[X];
           
-          currentIndex[Y] = ñenterIndex[Y];
+          currentIndex[Y] = centerIndex[Y];
           for (int rowX = lIndex; rowX <= rIndex; rowX++) {
             currentIndex[X] = rowX;
             short val = itkImage->GetPixel(currentIndex);

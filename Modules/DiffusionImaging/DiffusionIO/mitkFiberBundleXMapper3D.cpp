@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkDepthSortPolyData.h>
 #include <vtkCamera.h>
 #include <vtkTubeFilter.h>
+#include <vtkGlyph3D.h>
 
 mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
     : m_TubeRadius(0.0)
@@ -83,15 +84,15 @@ void mitk::FiberBundleXMapper3D::InternalGenerateData(mitk::BaseRenderer *render
         vtkSmartPointer<vtkDepthSortPolyData> depthSort = vtkSmartPointer<vtkDepthSortPolyData>::New();
         depthSort->SetInputData( fiberPolyData );
         depthSort->SetCamera( renderer->GetVtkRenderer()->GetActiveCamera() );
-        depthSort->SetDirectionToFrontToBack();
+        if (m_TubeRadius>0.0)
+            depthSort->SetDirectionToBackToFront();
+        else
+            depthSort->SetDirectionToFrontToBack();
         depthSort->Update();
-        localStorage->m_FiberMapper->SetInputConnection(depthSort->GetOutputPort());
-    }
-    else
-    {
-        localStorage->m_FiberMapper->SetInputData(fiberPolyData);
+        fiberPolyData = depthSort->GetOutput();
     }
 
+    localStorage->m_FiberMapper->SetInputData(fiberPolyData);
     localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
     localStorage->m_FiberMapper->ScalarVisibilityOn();
     localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();

@@ -86,7 +86,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
         connect( m_Controls->m_SeedsPerVoxelSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSeedsPerVoxelChanged(int)) );
         connect( m_Controls->m_MinTractLengthSlider, SIGNAL(valueChanged(int)), this, SLOT(OnMinTractLengthChanged(int)) );
-        connect( m_Controls->m_FaThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(OnFaThresholdChanged(int)) );
+        connect( m_Controls->m_ScalarThresholdBox, SIGNAL(valueChanged(double)), this, SLOT(OnFaThresholdChanged(double)) );
         connect( m_Controls->m_AngularThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAngularThresholdChanged(int)) );
         connect( m_Controls->m_StepsizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnStepsizeChanged(int)) );
         connect( m_Controls->m_fSlider, SIGNAL(valueChanged(int)), this, SLOT(OnfChanged(int)) );
@@ -122,9 +122,9 @@ void QmitkStreamlineTrackingView::OnMinTractLengthChanged(int value)
     m_Controls->m_MinTractLengthLabel->setText(QString("Min. Tract Length: ")+QString::number(value)+QString("mm"));
 }
 
-void QmitkStreamlineTrackingView::OnFaThresholdChanged(int value)
+void QmitkStreamlineTrackingView::OnFaThresholdChanged(double value)
 {
-    m_Controls->m_FaThresholdLabel->setText(QString("FA Threshold: ")+QString::number((float)value/100));
+    m_Controls->m_FaThresholdLabel->setText(QString("FA Threshold: ")+QString::number(value));
 }
 
 void QmitkStreamlineTrackingView::OnStepsizeChanged(int value)
@@ -233,7 +233,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
     //filter->SetNumberOfThreads(1);
     filter->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelSlider->value());
-    filter->SetFaThreshold((float)m_Controls->m_FaThresholdSlider->value()/100);
+    filter->SetFaThreshold(m_Controls->m_ScalarThresholdBox->value());
     filter->SetMinCurvatureRadius((float)m_Controls->m_AngularThresholdSlider->value()/10);
     filter->SetStepSize((float)m_Controls->m_StepsizeSlider->value()/10);
     filter->SetF((float)m_Controls->m_fSlider->value()/100);

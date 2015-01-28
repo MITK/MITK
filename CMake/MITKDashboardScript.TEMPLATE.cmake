@@ -26,7 +26,8 @@ set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
 #set(CTEST_DASHBOARD_ROOT "C:/dartclients")
 
 # The directory containing the Qt binaries
-set(QT_BINARY_DIR "/home/user/Qt/5.4/gcc_64/bin")
+set(QT5_INSTALL_PREFIX "/home/user/Qt/5.4/gcc_64")
+set(QT_BINARY_DIR "${QT5_INSTALL_PREFIX}/bin")
 # For Windows, e.g.
 #set(QT_BINARY_DIR "C:/Qt/5.4/msvc2013_64_opengl/bin")
 
@@ -92,7 +93,7 @@ set(ADDITIONAL_CMAKECACHE_OPTION "
 # Use the MITK_INITIAL_CACHE the pass variables to the MITK-Build.
 # add entries like this
 #MITK_USE_OpenCV:BOOL=OFF
-CMAKE_PREFIX_PATH:PATH=/home/user/Qt/5.4/gcc_64
+CMAKE_PREFIX_PATH:PATH=${QT5_INSTALL_PREFIX}
 DESIRED_QT_VERSION:STRING=5
 ")
 

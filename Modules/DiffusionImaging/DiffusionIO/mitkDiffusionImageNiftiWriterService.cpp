@@ -14,13 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkNrrdDiffusionImageWriter__cpp
-#define __mitkNrrdDiffusionImageWriter__cpp
+#ifndef __mitkDiffusionImageNiftiWriterService__cpp
+#define __mitkDiffusionImageNiftiWriterService__cpp
 
-#include "mitkNrrdDiffusionImageWriter.h"
+#include "mitkDiffusionImageNiftiWriterService.h"
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
-#include "itkNrrdImageIO.h"
 #include "itkNiftiImageIO.h"
 #include "itkImageFileWriter.h"
 #include "itksys/SystemTools.hxx"
@@ -31,21 +30,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 
 
-mitk::NrrdDiffusionImageWriter::NrrdDiffusionImageWriter()
-  : AbstractFileWriter(mitk::Image::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::DWI_MIMETYPE_DESCRIPTION())
+mitk::DiffusionImageNiftiWriterService::DiffusionImageNiftiWriterService()
+  : AbstractFileWriter(mitk::Image::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_NIFTI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION())
 {
   RegisterService();
 }
 
-mitk::NrrdDiffusionImageWriter::NrrdDiffusionImageWriter(const mitk::NrrdDiffusionImageWriter& other)
+mitk::DiffusionImageNiftiWriterService::DiffusionImageNiftiWriterService(const mitk::DiffusionImageNiftiWriterService& other)
   : AbstractFileWriter(other)
 {
 }
 
-mitk::NrrdDiffusionImageWriter::~NrrdDiffusionImageWriter()
+mitk::DiffusionImageNiftiWriterService::~DiffusionImageNiftiWriterService()
 {}
 
-void mitk::NrrdDiffusionImageWriter::Write()
+void mitk::DiffusionImageNiftiWriterService::Write()
 {
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image *>(this->GetInput());
 
@@ -54,7 +53,7 @@ void mitk::NrrdDiffusionImageWriter::Write()
 
   if (input.IsNull())
   {
-    MITK_ERROR <<"Sorry, input to NrrdDiffusionImageWriter is NULL!";
+    MITK_ERROR <<"Sorry, input to DiffusionImageNiftiWriterService is NULL!";
     return;
   }
   if ( this->GetOutputLocation().empty() )
@@ -116,45 +115,16 @@ void mitk::NrrdDiffusionImageWriter::Write()
 
   typedef itk::VectorImage<short,3> ImageType;
 
-  std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetOutputLocation());
+  std::string ext = this->GetMimeType()->GetExtension(this->GetOutputLocation());
   ext = itksys::SystemTools::LowerCase(ext);
 
-  // default extension is .dwi
+  // default extension is .nii
   if( ext == "")
   {
-    ext = ".nrrd";
+    ext = ".nii";
     this->SetOutputLocation(this->GetOutputLocation() + ext);
   }
-
-  if (ext == ".hdwi" || ext == ".nrrd" || ext == ".dwi")
-  {
-
-    MITK_INFO << "Extension " << ext;
-    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-    //io->SetNrrdVectorType( nrrdKindList );
-    io->SetFileType( itk::ImageIOBase::Binary );
-    io->UseCompressionOn();
-
-    typedef itk::ImageFileWriter<ImageType> WriterType;
-    WriterType::Pointer nrrdWriter = WriterType::New();
-    nrrdWriter->UseInputMetaDataDictionaryOn();
-    nrrdWriter->SetInput( itkImg );
-    nrrdWriter->SetImageIO(io);
-    nrrdWriter->SetFileName(this->GetOutputLocation());
-    nrrdWriter->UseCompressionOn();
-    nrrdWriter->SetImageIO(io);
-    try
-    {
-      nrrdWriter->Update();
-    }
-    catch (itk::ExceptionObject e)
-    {
-      std::cout << e << std::endl;
-      throw;
-    }
-
-  }
-  else if (ext == ".fsl" || ext == ".fslgz")
+  if (ext == ".fsl" || ext == ".fslgz")
   {
     MITK_INFO << "Writing Nifti-Image for FSL";
 
@@ -301,6 +271,147 @@ void mitk::NrrdDiffusionImageWriter::Write()
       }
     }
   }
+  else if (ext == ".nii" || ext == ".nii.gz")
+  {
+    MITK_INFO << "Writing Nifti-Image";
+
+    typedef itk::Image<short,4> ImageType4D;
+    ImageType4D::Pointer img4 = ImageType4D::New();
+
+    ImageType::SpacingType spacing = itkImg->GetSpacing();
+    ImageType4D::SpacingType spacing4;
+    for(int i=0; i<3; i++)
+      spacing4[i] = spacing[i];
+    spacing4[3] = 1;
+    img4->SetSpacing( spacing4 );   // Set the image spacing
+
+    ImageType::PointType origin = itkImg->GetOrigin();
+    ImageType4D::PointType origin4;
+    for(int i=0; i<3; i++)
+      origin4[i] = origin[i];
+    origin4[3] = 0;
+    img4->SetOrigin( origin4 );     // Set the image origin
+
+    ImageType::DirectionType direction = itkImg->GetDirection();
+    ImageType4D::DirectionType direction4;
+    for(int i=0; i<3; i++)
+      for(int j=0; j<3; j++)
+        direction4[i][j] = direction[i][j];
+    for(int i=0; i<4; i++)
+      direction4[i][3] = 0;
+    for(int i=0; i<4; i++)
+      direction4[3][i] = 0;
+    direction4[3][3] = 1;
+    img4->SetDirection( direction4 );  // Set the image direction
+
+    ImageType::RegionType region = itkImg->GetLargestPossibleRegion();
+    ImageType4D::RegionType region4;
+
+    ImageType::RegionType::SizeType size = region.GetSize();
+    ImageType4D::RegionType::SizeType size4;
+
+    for(int i=0; i<3; i++)
+      size4[i] = size[i];
+    size4[3] = itkImg->GetVectorLength();
+
+    ImageType::RegionType::IndexType index = region.GetIndex();
+    ImageType4D::RegionType::IndexType index4;
+    for(int i=0; i<3; i++)
+      index4[i] = index[i];
+    index4[3] = 0;
+
+    region4.SetSize(size4);
+    region4.SetIndex(index4);
+    img4->SetRegions( region4 );
+
+    img4->Allocate();
+
+    itk::ImageRegionIterator<ImageType>   it (itkImg, itkImg->GetLargestPossibleRegion() );
+    typedef ImageType::PixelType VecPixType;
+
+    for (it.GoToBegin(); !it.IsAtEnd(); ++it)
+    {
+      VecPixType vec = it.Get();
+      ImageType::IndexType currentIndex = it.GetIndex();
+      for(unsigned int ind=0; ind<vec.Size(); ind++)
+      {
+
+        for(int i=0; i<3; i++)
+          index4[i] = currentIndex[i];
+        index4[3] = ind;
+        img4->SetPixel(index4, vec[ind]);
+      }
+    }
+
+    itk::NiftiImageIO::Pointer io4 = itk::NiftiImageIO::New();
+
+    typedef itk::VectorImage<short,3> ImageType;
+    typedef itk::ImageFileWriter<ImageType4D> WriterType4;
+    WriterType4::Pointer nrrdWriter4 = WriterType4::New();
+    nrrdWriter4->UseInputMetaDataDictionaryOn();
+    nrrdWriter4->SetInput( img4 );
+    nrrdWriter4->SetFileName(this->GetOutputLocation());
+    nrrdWriter4->UseCompressionOn();
+    nrrdWriter4->SetImageIO(io4);
+    try
+    {
+      nrrdWriter4->Update();
+    }
+    catch (itk::ExceptionObject e)
+    {
+      std::cout << e << std::endl;
+      throw;
+    }
+
+
+    if(mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size())
+    {
+      std::ofstream myfile;
+      std::string fname = itksys::SystemTools::GetFilenamePath( this->GetOutputLocation() ) + "/"
+        + this->GetMimeType()->GetFilenameWithoutExtension( this->GetOutputLocation() );
+      fname += ".bvals";
+      myfile.open (fname.c_str());
+      for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size(); i++)
+      {
+        double twonorm = mitk::DiffusionPropertyHelper::GetGradientContainer(input)->ElementAt(i).two_norm();
+        myfile << mitk::DiffusionPropertyHelper::GetReferenceBValue(input)*twonorm*twonorm << " ";
+      }
+      myfile.close();
+
+      std::ofstream myfile2;
+      std::string fname2 = itksys::SystemTools::GetFilenamePath( this->GetOutputLocation() ) + "/"
+        + this->GetMimeType()->GetFilenameWithoutExtension( this->GetOutputLocation() );
+      fname2 += ".bvecs";
+      myfile2.open (fname2.c_str());
+      for(int j=0; j<3; j++)
+      {
+        for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size(); i++)
+        {
+          //need to modify the length
+          GradientDirectionContainerType::Pointer grads = mitk::DiffusionPropertyHelper::GetGradientContainer(input);
+          GradientDirectionType direction = grads->ElementAt(i);
+          direction.normalize();
+          myfile2 << direction.get(j) << " ";
+          //myfile2 << input->GetDirections()->ElementAt(i).get(j) << " ";
+        }
+        myfile2 << std::endl;
+      }
+
+      std::ofstream myfile3;
+      std::string fname4 = itksys::SystemTools::GetFilenamePath( this->GetOutputLocation() ) + "/"
+        + this->GetMimeType()->GetFilenameWithoutExtension( this->GetOutputLocation() );
+      fname4 += ".ttk";
+      myfile3.open (fname4.c_str());
+      for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size(); i++)
+      {
+        for(int j=0; j<3; j++)
+        {
+          myfile3 << mitk::DiffusionPropertyHelper::GetGradientContainer(input)->ElementAt(i).get(j) << " ";
+        }
+        myfile3 << std::endl;
+      }
+    }
+  }
   try
   {
     setlocale(LC_ALL, currLocale.c_str());
@@ -311,12 +422,12 @@ void mitk::NrrdDiffusionImageWriter::Write()
   }
 }
 
-mitk::NrrdDiffusionImageWriter* mitk::NrrdDiffusionImageWriter::Clone() const
+mitk::DiffusionImageNiftiWriterService* mitk::DiffusionImageNiftiWriterService::Clone() const
 {
-  return new NrrdDiffusionImageWriter(*this);
+  return new DiffusionImageNiftiWriterService(*this);
 }
 
-mitk::IFileWriter::ConfidenceLevel mitk::NrrdDiffusionImageWriter::GetConfidenceLevel() const
+mitk::IFileWriter::ConfidenceLevel mitk::DiffusionImageNiftiWriterService::GetConfidenceLevel() const
 {
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
   if (input.IsNull() || !mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( input ) )
@@ -329,4 +440,4 @@ mitk::IFileWriter::ConfidenceLevel mitk::NrrdDiffusionImageWriter::GetConfidence
   }
 }
 
-#endif //__mitkNrrdDiffusionImageWriter__cpp
+#endif //__mitkDiffusionImageNiftiWriterService__cpp

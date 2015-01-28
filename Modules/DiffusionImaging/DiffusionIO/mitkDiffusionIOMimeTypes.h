@@ -28,14 +28,21 @@ class DiffusionIOMimeTypes
 {
 public:
 
-  class MitkDiffusionIO_EXPORT DwiMimeType : public CustomMimeType
+  class MitkDiffusionIO_EXPORT DiffusionImageNrrdMimeType : public CustomMimeType
   {
   public:
-    DwiMimeType();
+    DiffusionImageNrrdMimeType();
     virtual bool AppliesTo(const std::string &path) const;
-    virtual DwiMimeType* Clone() const;
+    virtual DiffusionImageNrrdMimeType* Clone() const;
   };
 
+  class MitkDiffusionIO_EXPORT DiffusionImageNiftiMimeType : public CustomMimeType
+  {
+  public:
+    DiffusionImageNiftiMimeType();
+    virtual bool AppliesTo(const std::string &path) const;
+    virtual DiffusionImageNiftiMimeType* Clone() const;
+  };
   // Get all Diffusion Mime Types
   static std::vector<CustomMimeType*> Get();
 
@@ -49,15 +56,18 @@ public:
 
   // ------------------------- Image formats (ITK based) --------------------------
 
-  static DwiMimeType DWI_MIMETYPE(); // dwi, hdwi
+  static DiffusionImageNrrdMimeType DWI_NRRD_MIMETYPE();
+  static DiffusionImageNiftiMimeType DWI_NIFTI_MIMETYPE();
   static CustomMimeType DTI_MIMETYPE(); // dti, hdti
   static CustomMimeType QBI_MIMETYPE(); // qbi, hqbi
 
-  static std::string DWI_MIMETYPE_NAME();
+  static std::string DWI_NRRD_MIMETYPE_NAME();
+  static std::string DWI_NIFTI_MIMETYPE_NAME();
   static std::string DTI_MIMETYPE_NAME();
   static std::string QBI_MIMETYPE_NAME();
 
-  static std::string DWI_MIMETYPE_DESCRIPTION();
+  static std::string DWI_NRRD_MIMETYPE_DESCRIPTION();
+  static std::string DWI_NIFTI_MIMETYPE_DESCRIPTION();
   static std::string DTI_MIMETYPE_DESCRIPTION();
   static std::string QBI_MIMETYPE_DESCRIPTION();
 

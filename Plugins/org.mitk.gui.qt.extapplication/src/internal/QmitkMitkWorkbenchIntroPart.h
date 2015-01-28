@@ -69,7 +69,6 @@ public:
   void StandbyStateChanged(bool);
 
   void SetFocus();
-#ifdef QT_WEBKIT
 
   virtual void CreateConnections();
 
@@ -78,7 +77,7 @@ protected slots:
 
 
   void DelegateMeTo(const QUrl& ShowMeNext);
-#endif
+
 protected:
 
   Ui::QmitkWelcomeScreenViewControls* m_Controls;

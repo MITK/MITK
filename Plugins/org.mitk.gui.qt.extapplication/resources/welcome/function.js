@@ -227,7 +227,7 @@ function changeToHover(targetId){
 }
 
 function openPage(){
-  window.open("http://www.mitk.org","_self");
+  window.open("http://www.mitk.org","_blank");
 }
 
 function changeToNormal(targetId){

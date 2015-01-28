@@ -45,7 +45,7 @@ void mitk::PlanarLine::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsig
 std::string mitk::PlanarLine::EvaluateAnnotation()
 {
     double length = GetQuantity(FEATURE_ID_LENGTH);
-    char* str = new char[20];
+    char str[20];
     sprintf(str, "%.2f", length);
     std::string res = str;
     res += " mm";

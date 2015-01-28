@@ -69,7 +69,7 @@ if(MINGW)
 endif(MINGW)
 
 if(MSVC_IDE OR MSVC_VERSION OR MINGW)
-  target_link_libraries(${MODULE_TARGET} psapi.lib)
+  target_link_libraries(${MODULE_TARGET} PRIVATE psapi.lib)
 endif(MSVC_IDE OR MSVC_VERSION OR MINGW)
 
 add_subdirectory(TestingHelper)

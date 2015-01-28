@@ -44,7 +44,7 @@ class MitkSegmentationUI_EXPORT QmitkToolGUI : public QWidget, public itk::Objec
 
     // just make sure ITK won't take care of anything (especially not destruction)
     virtual void Register() const;
-    virtual void UnRegister() const;
+    virtual void UnRegister() const ITK_NOEXCEPT ITK_OVERRIDE;
     virtual void SetReferenceCount(int);
 
     virtual ~QmitkToolGUI();

@@ -70,10 +70,10 @@ IFileIO::ConfidenceLevel AbstractFileIO::GetWriterConfidenceLevel() const
   return AbstractFileIOWriter::GetWriterConfidenceLevel();
 }
 
-std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileReader> >
+std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileWriter> >
 AbstractFileIO::RegisterService(us::ModuleContext* context)
 {
-  std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileReader> > result;
+  std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileWriter> > result;
   result.first = this->AbstractFileReader::RegisterService(context);
   const CustomMimeType* writerMimeType = this->AbstractFileWriter::GetMimeType();
   if (writerMimeType == NULL ||

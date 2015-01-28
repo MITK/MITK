@@ -101,6 +101,11 @@ std::string MimeType::GetComment() const
   return m_Data->m_CustomMimeType->GetComment();
 }
 
+std::string MimeType::GetFilenameWithoutExtension(const std::string& path) const
+{
+  return m_Data->m_CustomMimeType->GetFilenameWithoutExtension(path);
+}
+
 bool MimeType::AppliesTo(const std::string& path) const
 {
   return m_Data->m_CustomMimeType->AppliesTo(path);

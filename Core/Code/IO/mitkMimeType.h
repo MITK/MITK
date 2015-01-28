@@ -61,6 +61,8 @@ public:
   std::vector<std::string> GetExtensions() const;
   std::string GetComment() const;
 
+  std::string GetFilenameWithoutExtension(const std::string& path) const;
+
   bool AppliesTo(const std::string& path) const;
 
   bool IsValid() const;

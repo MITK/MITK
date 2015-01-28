@@ -108,7 +108,7 @@ public:
 
   virtual ConfidenceLevel GetWriterConfidenceLevel() const;
 
-  std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileReader> >
+  std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileWriter> >
   RegisterService(us::ModuleContext* context = us::GetModuleContext());
 
 protected:
@@ -120,7 +120,10 @@ protected:
   /**
    * Associate this reader instance with the given MIME type.
    *
-   * @param mimeType The mime type this reader can read.
+   * If the given MIME type has nothing but its name set, the according MIME type
+   * is looked up in the service registry.
+   *
+   * @param mimeType The MIME type this reader can read.
    * @param description A human readable description of this reader.
    *
    * @throws std::invalid_argument if \c mimeType is empty.
@@ -128,22 +131,6 @@ protected:
    * @see RegisterService
    */
   explicit AbstractFileIO(const std::string& baseDataType, const CustomMimeType& mimeType,
-                          const std::string& description);
-
-  /**
-   * Associate this reader with the given file extension.
-   *
-   * Additonal file extensions can be added by sub-classes by calling AddExtension
-   * or SetExtensions on the CustomMimeType object returned by GetMimeType() and
-   * setting the modified object again via SetMimeType().
-   *
-   * @param extension The file extension (without a leading period) for which a registered
-   *        mime-type object is looked up and associated with this instance.
-   * @param description A human readable description of this reader.
-   *
-   * @see RegisterService
-   */
-  explicit AbstractFileIO(const std::string& baseDataType, const std::string& extension,
                           const std::string& description);
 
   void SetMimeType(const CustomMimeType& mimeType);

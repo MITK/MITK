@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFileWriterRegistry.h>
 #include <mitkCoreServices.h>
 #include <mitkIMimeTypeProvider.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 //ITK
 #include <itksys/SystemTools.hxx>
@@ -800,6 +802,35 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
   mitk::ProgressBar::GetInstance()->Progress(2*filesToRead);
 
   return errMsg;
+}
+
+std::vector<BaseData::Pointer> IOUtil::Load(const us::ModuleResource &usResource, std::ios_base::openmode mode)
+{
+  us::ModuleResourceStream resStream(usResource,mode);
+
+  mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
+  std::vector<MimeType> mimetypes = mimeTypeProvider->GetMimeTypesForFile(usResource.GetResourcePath());
+
+  std::vector<mitk::BaseData::Pointer> data;
+  if(mimetypes.empty())
+  {
+    mitkThrow() << "No mimetype for resource stream: "<< usResource.GetResourcePath();
+    return data;
+  }
+
+  mitk::FileReaderRegistry fileReaderRegistry;
+  std::vector<us::ServiceReference<IFileReader> > refs = fileReaderRegistry.GetReferences(mimetypes[0]);
+  if(refs.empty())
+  {
+    mitkThrow() << "No reader available for resource stream: "<< usResource.GetResourcePath();
+    return data;
+  }
+
+  mitk::IFileReader* reader = fileReaderRegistry.GetReader(refs[0]);
+  reader->SetInput(usResource.GetResourcePath(),&resStream);
+  data = reader->Read();
+
+  return data;
 }
 
 void IOUtil::Save(const BaseData* data, const std::string& path)

@@ -70,7 +70,7 @@ if(MITK_USE_CTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      GIT_URL https://github.com/saschazelzer/CTK
+      GIT_REPOSITORY https://github.com/saschazelzer/CTK
       GIT_TAG origin/improve-external-dependency-handling
       #URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
       #URL_MD5 a3ac62b6fdefc90966b52bc5b52c80e5

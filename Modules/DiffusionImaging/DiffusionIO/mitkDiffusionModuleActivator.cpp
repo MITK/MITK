@@ -70,7 +70,7 @@ namespace mitk
 
     void Unload(us::ModuleContext*)
     {
-      for (int loop(0); loop < m_MimeTypes.size(); ++loop)
+      for (unsigned int loop(0); loop < m_MimeTypes.size(); ++loop)
       {
         delete m_MimeTypes.at(loop);
       }

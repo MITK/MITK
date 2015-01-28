@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkPlanarFigureExports.h>
 #include "mitkBaseData.h"
 #include "mitkCommon.h"
+#include "mitkDataNode.h"
 
 #include <deque>
 
@@ -67,6 +68,7 @@ public:
   typedef std::deque< Point2D > ControlPointListType;
   typedef std::vector< PolyLineElement > PolyLineType;
 
+  mitk::DataNode* m_ImageNode;
 
   /** \brief Sets the 2D geometry on which this figure will be placed.
    *

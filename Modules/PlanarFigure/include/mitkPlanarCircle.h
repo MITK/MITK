@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigure.h"
 #include <MitkPlanarFigureExports.h>
 
-
 namespace mitk
 {
 
@@ -33,6 +32,15 @@ class PlaneGeometry;
  */
 class MITKPLANARFIGURE_EXPORT PlanarCircle : public PlanarFigure
 {
+
+typedef struct MeasurementStatistics
+{
+  double Mean;
+  double SD;
+  int Max;
+  int Min;
+};
+
 public:
   mitkClassMacro( PlanarCircle, PlanarFigure );
 
@@ -133,7 +141,7 @@ protected:
   bool m_MinMaxRadiusContraintsActive;
 
 private:
-
+  MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistics(); 
 };
 
 } // namespace mitk

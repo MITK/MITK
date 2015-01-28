@@ -173,9 +173,9 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
         ImageType3D::IndexType currentIndex;
         currentIndex[Z] = centerIndex[Z];
 
-        int sum = 0;
+        long long sum = 0;
         double sd(0), mean(0);
-        int pixCount = 0;
+        long long pixCount = 0;
         double dx;
         int lIndex, rIndex;
         mitk::Point3D currentPoint; 

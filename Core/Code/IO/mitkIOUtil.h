@@ -439,6 +439,14 @@ protected:
   static std::string Save(std::vector<SaveInfo>& saveInfos,
                           WriterOptionsFunctorBase* optionsCallback);
 
+  /**
+   * @brief Internal method that checks whether a filepath is empty or null.
+   *
+   * This methods is seperated from load in order to allow a central managment of error behaviour
+   * in read and write methods.
+   */
+  static void ValidatePath(const std::string& path);
+
 private:
 
   struct Impl;

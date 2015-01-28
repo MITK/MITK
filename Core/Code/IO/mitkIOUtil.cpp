@@ -610,6 +610,7 @@ DataNode::Pointer IOUtil::LoadDataNode(const std::string& path)
 
 Image::Pointer IOUtil::LoadImage(const std::string& path)
 {
+  ValidatePath(path);
   BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path);
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(baseData.GetPointer());
   if(image.IsNull())
@@ -621,6 +622,7 @@ Image::Pointer IOUtil::LoadImage(const std::string& path)
 
 Surface::Pointer IOUtil::LoadSurface(const std::string& path)
 {
+  ValidatePath(path);
   BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path);
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(baseData.GetPointer());
   if(surface.IsNull())
@@ -632,6 +634,7 @@ Surface::Pointer IOUtil::LoadSurface(const std::string& path)
 
 PointSet::Pointer IOUtil::LoadPointSet(const std::string& path)
 {
+  ValidatePath(path);
   BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path);
   mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(baseData.GetPointer());
   if(pointset.IsNull())
@@ -821,6 +824,11 @@ void IOUtil::Save(const BaseData* data, const std::string& mimeType, const std::
 void IOUtil::Save(const BaseData* data, const std::string& mimeType, const std::string& path,
                   const IFileWriter::Options& options, bool addExtension)
 {
+  if ((data == NULL) || (data->IsEmpty()))
+    mitkThrow() << "BaseData cannotbe null or empty for save methods in IOUtil.h.";
+
+  ValidatePath(path);
+
   std::string errMsg;
   if (options.empty())
   {
@@ -1074,4 +1082,10 @@ IOUtil::LoadInfo::LoadInfo(const std::string& path)
 {
 }
 
+}
+
+
+void mitk::IOUtil::ValidatePath(const std::string& path){
+  if( (&path == NULL) || (path.empty()))
+    mitkThrow() << "File path cannotbe null or empty for save and read methods in IOUtil.h.";
 }

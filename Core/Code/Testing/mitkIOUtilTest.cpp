@@ -29,8 +29,11 @@ class mitkIOUtilTestSuite : public mitk::TestFixture
   MITK_TEST(TestTempMethods);
   MITK_TEST(TestSaveEmptyData);
   MITK_TEST(TestLoadAndSaveImage);
+  MITK_TEST(TestNullLoad);
+  MITK_TEST(TestNullSave);
   MITK_TEST(TestLoadAndSavePointSet);
   MITK_TEST(TestLoadAndSaveSurface);
+  MITK_TEST(TestTempMethodsForUniqueFilenames);
   MITK_TEST(TestTempMethodsForUniqueFilenames);
   CPPUNIT_TEST_SUITE_END();
 
@@ -160,6 +163,26 @@ public:
     mitk::IOUtil::Save(relativImage, imagePath3);
     CPPUNIT_ASSERT_NO_THROW(mitk::IOUtil::LoadImage(imagePath3));
     std::remove(imagePath3.c_str());
+  }
+
+
+  /**
+  * \brief This method calls all available load methods with a nullpointer and an empty pathand expects an exception
+  **/
+  void TestNullLoad(){
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadImage(""), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadSurface(""), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadPointSet(""), mitk::Exception);
+  }
+
+  /**
+  * \brief This method calls the save method (to which all other convenience save methods reference) with null parameters
+  **/
+  void TestNullSave(){
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveImage(NULL, mitk::IOUtil::CreateTemporaryFile()), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveImage(mitk::Image::New().GetPointer(), ""), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(NULL, mitk::IOUtil::CreateTemporaryFile()), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(mitk::Image::New().GetPointer(), ""), mitk::Exception);
   }
 
   void TestLoadAndSavePointSet()

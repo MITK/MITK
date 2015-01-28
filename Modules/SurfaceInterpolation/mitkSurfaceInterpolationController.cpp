@@ -187,6 +187,15 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
   m_ReduceFilter->Update();
   m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
 
+  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+  timeSelector->SetInput( m_SelectedSegmentation );
+  timeSelector->SetTimeNr( m_CurrentTimeStep );
+  timeSelector->SetChannelNr( 0 );
+  timeSelector->Update();
+  mitk::Image::Pointer refSegImage = timeSelector->GetOutput();
+
+  //m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);
+  m_NormalsFilter->SetSegmentationBinaryImage(refSegImage);//maybe leading to crash
   for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
   {
     m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
@@ -416,7 +425,16 @@ bool mitk::SurfaceInterpolationController::ReplaceInterpolationSession(mitk::Ima
 
   if (m_SelectedSegmentation == oldSession)
     m_SelectedSegmentation = newSession;
-  m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);
+
+  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+  timeSelector->SetInput( m_SelectedSegmentation );
+  timeSelector->SetTimeNr( m_CurrentTimeStep );
+  timeSelector->SetChannelNr( 0 );
+  timeSelector->Update();
+  mitk::Image::Pointer refSegImage = timeSelector->GetOutput();
+
+  //m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);
+  m_NormalsFilter->SetSegmentationBinaryImage(refSegImage);
 
   this->RemoveInterpolationSession(oldSession);
   return true;
@@ -589,7 +607,15 @@ void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Obje
 
 void mitk::SurfaceInterpolationController::ReinitializeInterpolation()
 {
-  m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);
+  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+  timeSelector->SetInput( m_SelectedSegmentation );
+  timeSelector->SetTimeNr( m_CurrentTimeStep );
+  timeSelector->SetChannelNr( 0 );
+  timeSelector->Update();
+  mitk::Image::Pointer refSegImage = timeSelector->GetOutput();
+
+  //m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);
+  m_NormalsFilter->SetSegmentationBinaryImage(refSegImage);
 
   // If session has changed reset the pipeline
   m_ReduceFilter->Reset();
@@ -597,15 +623,9 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation()
   m_InterpolateSurfaceFilter->Reset();
 
   itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
-  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-  timeSelector->SetInput( m_SelectedSegmentation );
-  timeSelector->SetTimeNr( 0 );
-  timeSelector->SetChannelNr( 0 );
-  timeSelector->Update();
 
-  mitk::Image::Pointer refImage = timeSelector->GetOutput();
   //AccessFixedDimensionByItk_1( m_SelectedSegmentation, GetImageBase, 3, itkImage );
-  AccessFixedDimensionByItk_1( refImage, GetImageBase, 3, itkImage );
+  AccessFixedDimensionByItk_1( refSegImage, GetImageBase, 3, itkImage );
   m_InterpolateSurfaceFilter->SetReferenceImage(itkImage.GetPointer());
 
   unsigned int numTimeSteps = m_SelectedSegmentation->GetTimeSteps();

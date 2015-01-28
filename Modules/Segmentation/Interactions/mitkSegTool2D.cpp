@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //Includes for 3DSurfaceInterpolation
 #include "mitkImageToContourFilter.h"
 #include "mitkSurfaceInterpolationController.h"
+#include "mitkImageTimeSelector.h"
 
 //includes for resling and overwriting
 #include <mitkExtractSliceFilter.h>
@@ -173,7 +174,14 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation (const Image* slice, const Imag
   contourExtractor->Update();
   contour = contourExtractor->GetOutput();
 
-  if (contour->GetVtkPolyData()->GetNumberOfPoints() != 0 && workingImage->GetDimension() == 3)
+  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+  timeSelector->SetInput( workingImage );
+  timeSelector->SetTimeNr( 0 );
+  timeSelector->SetChannelNr( 0 );
+  timeSelector->Update();
+  Image::Pointer dimRefImg = timeSelector->GetOutput();
+
+  if (contour->GetVtkPolyData()->GetNumberOfPoints() != 0 && dimRefImg->GetDimension() == 3)//dimension to be changed
   {
     mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour );
     contour->DisconnectPipeline();
@@ -302,13 +310,19 @@ void mitk::SegTool2D::WriteBackSegmentationResult(std::vector<mitk::SegTool2D::S
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
+  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+  timeSelector->SetInput( image );
+  timeSelector->SetTimeNr( 0 );
+  timeSelector->SetChannelNr( 0 );
+  timeSelector->Update();
+  Image::Pointer dimRefImg = timeSelector->GetOutput();
 
   for (unsigned int i = 0; i < sliceList.size(); ++i)
   {
     SliceInformation currentSliceInfo = sliceList.at(i);
     if(writeSliceToVolume)
       this->WriteSliceToVolume(currentSliceInfo);
-    if (m_SurfaceInterpolationEnabled && image->GetDimension() == 3)
+    if (m_SurfaceInterpolationEnabled && dimRefImg->GetDimension() == 3)
     {
       currentSliceInfo.slice->DisconnectPipeline();
       contourExtractor->SetInput(currentSliceInfo.slice);

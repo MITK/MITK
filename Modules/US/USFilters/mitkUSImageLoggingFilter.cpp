@@ -137,17 +137,8 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
   fb.close();
 }
 
-bool mitk::USImageLoggingFilter::SetImageFilesExtension(std::string extension) //TODO IO
+bool mitk::USImageLoggingFilter::SetImageFilesExtension(std::string extension)
  {
-// mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
-// if(!imageWriter->IsExtensionValid(extension))
-//  {
-//  MITK_WARN << "Extension " << extension << " is not supported; still using " << m_ImageExtension << " as before.";
-//  return false;
-//  }
-// else
-//  {
-//  m_ImageExtension = extension;
+  m_ImageExtension = extension;
   return true;
-//  }
  }

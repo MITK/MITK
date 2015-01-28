@@ -49,6 +49,8 @@ HelpContentWidget::HelpContentWidget()
   setUniformRowHeights(true);
   connect(this, SIGNAL(activated(QModelIndex)),
           this, SLOT(showLink(QModelIndex)));
+  connect(this, SIGNAL(clicked(QModelIndex)),
+          this, SLOT(showLink(QModelIndex)));
 
   m_SortModel->setDynamicSortFilter(true);
   QTreeView::setModel(m_SortModel);

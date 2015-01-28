@@ -167,7 +167,6 @@ function(mitk_use_modules)
       set(ALL_INCLUDE_DIRECTORIES)
       set(ALL_LIBRARIES)
       set(ALL_COMPILE_DEFINITIONS)
-      set(ALL_META_DEPENDENCIES)
 
       set(${_package}_REQUIRED_COMPONENTS_BY_MODULE ${${_package_visibility}_${_package}_REQUIRED_COMPONENTS})
       set(_package_found 0)

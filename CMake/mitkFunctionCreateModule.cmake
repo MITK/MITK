@@ -48,7 +48,6 @@
 #! - MODULE_TARGET
 #! - MODULE_IS_ENABLED
 #! - MODULE_SUBPROJECTS
-#! - ALL_META_DEPENDENCIES
 #!
 #! \sa mitk_create_executable
 #!
@@ -268,11 +267,11 @@ function(mitk_create_module)
           if(NOT TARGET "${MODULE_AUTOLOAD_WITH}")
             message(SEND_ERROR "The module target \"${MODULE_AUTOLOAD_WITH}\" specified as the auto-loading module for \"${MODULE_NAME}\" does not exist")
           endif()
-          set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-autoload")
-          # create a meta-target if it does not already exist
-          if(NOT TARGET ${_module_autoload_meta_target})
-            add_custom_target(${_module_autoload_meta_target})
-          endif()
+        endif()
+        set(_module_autoload_meta_target "${CMAKE_PROJECT_NAME}-autoload")
+        # create a meta-target if it does not already exist
+        if(NOT TARGET ${_module_autoload_meta_target})
+          add_custom_target(${_module_autoload_meta_target})
         endif()
 
         if(NOT MODULE_EXPORT_DEFINE)
@@ -364,9 +363,6 @@ function(mitk_create_module)
         else()
           set(_STATIC )
         endif(MODULE_FORCE_STATIC)
-
-        # create a meta-target for auto-loaded modules
-        add_custom_target(${MODULE_NAME}-autoload)
 
         if(NOT MODULE_HEADERS_ONLY)
           if(NOT MODULE_NO_INIT OR RESOURCE_FILES)
@@ -649,6 +645,5 @@ function(mitk_create_module)
   set(MODULE_TARGET ${MODULE_TARGET} PARENT_SCOPE)
   set(MODULE_IS_ENABLED ${MODULE_IS_ENABLED} PARENT_SCOPE)
   set(MODULE_SUBPROJECTS ${MODULE_SUBPROJECTS} PARENT_SCOPE)
-  set(ALL_META_DEPENDENCIES ${ALL_META_DEPENDENCIES} PARENT_SCOPE)
 
 endfunction()

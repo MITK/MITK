@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>379</width>
+    <width>448</width>
     <height>980</height>
    </rect>
   </property>
@@ -358,6 +358,12 @@
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
+        <property name="decimals">
+         <number>4</number>
+        </property>
+        <property name="minimum">
+         <double>-999999999.000000000000000</double>
+        </property>
         <property name="maximum">
          <double>999999999.000000000000000</double>
         </property>
@@ -373,6 +379,12 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="decimals">
+         <number>4</number>
+        </property>
+        <property name="minimum">
+         <double>-999999999.000000000000000</double>
         </property>
         <property name="maximum">
          <double>999999999.000000000000000</double>
@@ -391,7 +403,10 @@
          </sizepolicy>
         </property>
         <property name="decimals">
-         <number>2</number>
+         <number>4</number>
+        </property>
+        <property name="minimum">
+         <double>-999999999.000000000000000</double>
         </property>
         <property name="maximum">
          <double>999999999.000000000000000</double>
@@ -409,6 +424,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="minimum">
+         <number>-999999999</number>
+        </property>
         <property name="maximum">
          <number>999999999</number>
         </property>
@@ -424,6 +442,9 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimum">
+         <number>-999999999</number>
         </property>
         <property name="maximum">
          <number>999999999</number>

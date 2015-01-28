@@ -392,6 +392,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     {
         if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNull())
         {
+            MITK_INFO << "ERROR";
             ItkDoubleImgType::Pointer doubleImg = ItkDoubleImgType::New();
             doubleImg->SetSpacing( sumImage->GetSpacing() );
             doubleImg->SetOrigin( sumImage->GetOrigin() );

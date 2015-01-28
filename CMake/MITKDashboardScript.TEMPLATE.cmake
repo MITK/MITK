@@ -7,13 +7,13 @@
 # Note: The specific version and processor type of this machine should be reported in the
 # header above. Indeed, this file will be send to the dashboard as a NOTE file.
 
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.1)
 
 #
 # Dashboard properties
 #
 
-set(MY_COMPILER "gcc-4.4.5")
+set(MY_COMPILER "gcc-4.8.x")
 # For Windows, e.g.
 #set(MY_COMPILER "VC9.0")
 
@@ -22,13 +22,14 @@ set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
 # For Windows, e.g.
 #set(CTEST_CMAKE_COMMAND "cmake")
-#set(CTEST_CMAKE_GENERATOR "Visual Studio 9 2008 Win64")
+#set(CTEST_CMAKE_GENERATOR "Visual Studio 12 2013 Win64")
 #set(CTEST_DASHBOARD_ROOT "C:/dartclients")
 
 # The directory containing the Qt binaries
-set(QT_BINARY_DIR "/usr/bin/")
+set(QT5_INSTALL_PREFIX "/home/user/Qt/5.4/gcc_64")
+set(QT_BINARY_DIR "${QT5_INSTALL_PREFIX}/bin")
 # For Windows, e.g.
-#set(QT_BINARY_DIR "V:/windows/x64/QT-4.7.0_VC9.0_Bin/bin")
+#set(QT_BINARY_DIR "C:/Qt/5.4/msvc2013_64_opengl/bin")
 
 #
 # Dashboard options
@@ -92,6 +93,8 @@ set(ADDITIONAL_CMAKECACHE_OPTION "
 # Use the MITK_INITIAL_CACHE the pass variables to the MITK-Build.
 # add entries like this
 #MITK_USE_OpenCV:BOOL=OFF
+CMAKE_PREFIX_PATH:PATH=${QT5_INSTALL_PREFIX}
+DESIRED_QT_VERSION:STRING=5
 ")
 
 # List of test that should be explicitly disabled on this machine

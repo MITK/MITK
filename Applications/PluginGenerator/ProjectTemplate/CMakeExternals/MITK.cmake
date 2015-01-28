@@ -61,7 +61,7 @@ if(NOT MITK_DIR)
     MITK_USE_Python
    )
 
-  if(MITK_USE_QT)
+  if(MITK_USE_QT AND NOT DESIRED_QT_VERSION MATCHES "5")
     # Look for Qt at the superbuild level, to catch missing Qt libs early
     find_package(Qt4 4.7 REQUIRED)
   endif()
@@ -209,7 +209,7 @@ else()
     message(FATAL_ERROR "VTK packages do not match:\n   ${MY_PROJECT_NAME}: ${my_vtk_dir}\n  MITK: ${VTK_DIR}")
   endif()
 
-  if(my_qmake_executable AND NOT my_qmake_executable STREQUAL ${MITK_QMAKE_EXECUTABLE})
+  if(my_qmake_executable AND ${MITK_QMAKE_EXECUTABLE} AND NOT my_qmake_executable STREQUAL ${MITK_QMAKE_EXECUTABLE})
     message(FATAL_ERROR "Qt qmake does not match:\n   ${MY_PROJECT_NAME}: ${my_qmake_executable}\n  MITK: ${MITK_QMAKE_EXECUTABLE}")
   endif()
 

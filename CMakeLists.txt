@@ -296,17 +296,6 @@ if(MITK_USE_CTK AND NOT MITK_USE_DCMTK)
 endif()
 
 if(MITK_USE_SOFA)
-  # SOFA requires at least CMake 2.8.8
-  set(SOFA_CMAKE_VERSION 2.8.8)
-  if(${CMAKE_VERSION} VERSION_LESS ${SOFA_CMAKE_VERSION})
-    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
-    message(WARNING "Switched off MITK_USE_SOFA\n  Minimum required CMake version: ${SOFA_CMAKE_VERSION}\n  Installed CMake version: ${CMAKE_VERSION}")
-  endif()
-  # SOFA/ITK combination requires at least MSVC 2010
-  if(MSVC_VERSION AND MSVC_VERSION LESS 1600)
-    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
-    message(WARNING "Switched off MITK_USE_SOFA\n  MSVC versions less than 2010 are not supported.")
-  endif()
   # SOFA requires boost library
   if(MITK_USE_SOFA AND NOT MITK_USE_Boost)
     message("Forcing MITK_USE_Boost to ON because of MITK_USE_SOFA")

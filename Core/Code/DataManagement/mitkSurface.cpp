@@ -21,12 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <vtkPolyData.h>
 
-static vtkPolyData* DeepCopy(vtkPolyData* other)
+static vtkSmartPointer<vtkPolyData> DeepCopy(vtkPolyData* other)
 {
   if (other == NULL)
     return NULL;
 
-  vtkPolyData* copy = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> copy = vtkSmartPointer<vtkPolyData>::New();
   copy->DeepCopy(other);
 
   return copy;
@@ -117,13 +117,11 @@ void mitk::Surface::SetVtkPolyData(vtkPolyData* polyData, unsigned int t)
 
   if (m_PolyDatas[t] != NULL)
   {
-    if (m_PolyDatas[t] == polyData)
+    if (m_PolyDatas[t].GetPointer() == polyData)
       return;
-
-    m_PolyDatas[t]->Delete();
   }
 
-  m_PolyDatas[t] = polyData;
+  m_PolyDatas[t].TakeReference(polyData);
 
   if(polyData != NULL)
     polyData->Register(NULL);
@@ -188,7 +186,7 @@ void mitk::Surface::CalculateBoundingBox()
 
   for (unsigned int i = 0; i < m_PolyDatas.size(); ++i)
   {
-    vtkPolyData* polyData = m_PolyDatas[i];
+    vtkPolyData* polyData = m_PolyDatas[i].GetPointer();
     double bounds[6] = {0};
 
     if (polyData != NULL && polyData->GetNumberOfPoints() > 0)

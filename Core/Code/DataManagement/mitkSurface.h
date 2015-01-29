@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseData.h"
 #include "itkImageRegion.h"
+#include <vtkSmartPointer.h>
 
 class vtkPolyData;
 
@@ -72,7 +73,7 @@ namespace mitk
     virtual void InitializeEmpty();
 
   private:
-    std::vector<vtkPolyData*> m_PolyDatas;
+    std::vector< vtkSmartPointer<vtkPolyData> > m_PolyDatas;
     mutable RegionType m_LargestPossibleRegion;
     mutable RegionType m_RequestedRegion;
     bool m_CalculateBoundingBox;

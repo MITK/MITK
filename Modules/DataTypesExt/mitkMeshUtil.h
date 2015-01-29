@@ -96,7 +96,7 @@ template <typename MeshType>
 class SimplexMeshAccessor : public NullScalarAccessor<MeshType>
 {
 public:
-  static inline double GetPointScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0 )
+  static inline double GetPointScalar(typename MeshType::PointDataContainer* /*point*/, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0 )
   {
     typename MeshType::GeometryMapPointer geometryData = mesh->GetGeometryData();
 

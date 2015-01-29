@@ -142,6 +142,10 @@ std::string mitk::PlanarAngle::EvaluateAnnotation()
 {
   double angle = GetQuantity(FEATURE_ID_ANGLE);
 
+  if (!(angle >= 0 || angle < M_PI)) {
+    angle = 0;
+  }
+
   char str[20];
   sprintf(str, "%.2f", angle*180/M_PI);
   std::string res = str;

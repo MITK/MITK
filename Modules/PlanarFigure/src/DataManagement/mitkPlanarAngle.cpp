@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPlanarAngle.h"
 #include "mitkPlaneGeometry.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 
 mitk::PlanarAngle::PlanarAngle()
@@ -135,6 +137,18 @@ void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   }
 }
 
+
+std::string mitk::PlanarAngle::EvaluateAnnotation()
+{
+  double angle = GetQuantity(FEATURE_ID_ANGLE);
+
+  char str[20];
+  sprintf(str, "%.2f", angle*180/M_PI);
+  std::string res = str;
+  res += " \xC2\xB0";
+
+  return res;
+}
 
 void mitk::PlanarAngle::EvaluateFeaturesInternal()
 {

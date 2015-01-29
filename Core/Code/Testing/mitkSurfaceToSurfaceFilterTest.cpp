@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurfaceToSurfaceFilter.h"
 #include "mitkCommon.h"
 #include "mitkNumericTypes.h"
+#include "mitkTestingMacros.h"
 
 #include "vtkPolyData.h"
 #include "vtkSphereSource.h"
 
-#include <fstream>
 
 int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
 {
@@ -42,60 +42,59 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
 
 
   mitk::SurfaceToSurfaceFilter::Pointer filter = mitk::SurfaceToSurfaceFilter::New();
-  std::cout << "Testing mitk::SurfaceToSurfaceFilter::SetInput() and ::GetNumberOfInputs() : " ;
+  MITK_TEST_OUTPUT(<<"Testing mitk::SurfaceToSurfaceFilter::SetInput() and ::GetNumberOfInputs() : ");
   filter->SetInput( surface );
-  if ( filter->GetNumberOfInputs() < 1 )
-  {
-    std::cout<<"[FAILED] : zero inputs set "<<std::endl;
-    return EXIT_FAILURE;
-  }
+  MITK_TEST_CONDITION(filter->GetNumberOfInputs() == 1, "Number of inputs must be 1" );
 
+  MITK_TEST_OUTPUT(<<"Testing if GetInput returns the right Input : ");
+  mitk::Surface::Pointer input = const_cast<mitk::Surface*>(filter->GetInput());
+  MITK_ASSERT_EQUAL(input, surface, "GetInput() should return correct input. ");
 
-  std::cout << "Testing if GetInput returns the right Input : " << std::endl;
-  if ( filter->GetInput() != surface )
-  {
-    std::cout<<"[FAILED] : GetInput does not return correct input. "<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout << "[SUCCESS] : input correct" << std::endl;
+  MITK_TEST_CONDITION(filter->GetInput(5) == NULL, "GetInput(5) should return NULL. ");
 
-
-  if ( filter->GetInput(5) != NULL )
-  {
-    std::cout<<"[FAILED] : GetInput returns inputs that were not set. "<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout << "[SUCCESS] : Input nr.5 was not set -> is NULL" << std::endl;
-
-
-  std::cout << "Testing whether Output is created correctly : " << std::endl;
-  if ( filter->GetNumberOfOutputs() != filter->GetNumberOfInputs() )
-  {
-    std::cout <<"[FAILED] : number of outputs != number of inputs" << std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout << "[SUCCESS] : number of inputs == number of outputs." << std::endl;
-
+  MITK_TEST_OUTPUT(<<"Testing whether Output is created correctly : ");
+  MITK_TEST_CONDITION(filter->GetNumberOfOutputs() == filter->GetNumberOfInputs(), "Test if number of outputs == number of inputs");
 
   mitk::Surface::Pointer outputSurface = filter->GetOutput();
-  if ( outputSurface->GetVtkPolyData()->GetNumberOfPolys() != surface->GetVtkPolyData()->GetNumberOfPolys() )
-  {
-    std::cout << "[FAILED] : number of Polys in PolyData of output != number of Polys in PolyData of input" << std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout << "[SUCCESS] : number of Polys in PolyData of input and output are identical." << std::endl;
-
-
+  MITK_ASSERT_EQUAL(outputSurface, surface, "Test if output == input");
 
   filter->Update();
   outputSurface = filter->GetOutput();
-  if ( outputSurface->GetSizeOfPolyDataSeries() != surface->GetSizeOfPolyDataSeries() )
-  {
-    std::cout << "[FAILED] : number of PolyDatas in PolyDataSeries of output != number of PolyDatas of input" << std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout << "[SUCCESS] : Size of PolyDataSeries of input and output are identical." << std::endl;
+  MITK_TEST_CONDITION(outputSurface->GetSizeOfPolyDataSeries() == surface->GetSizeOfPolyDataSeries(), "Test if number of PolyDatas in PolyDataSeries of output == number of PolyDatas of input");
 
+  mitk::SurfaceToSurfaceFilter::Pointer s2sFilter = mitk::SurfaceToSurfaceFilter::New();
+  MITK_TEST_FOR_EXCEPTION(mitk::Exception, s2sFilter->CreateOutputForInput(500));
+
+  std::vector<vtkPolyData*> polydatas;
+  for (unsigned int i = 0; i < 5; ++i)
+  {
+    sphereSource = vtkSphereSource::New();
+    sphereSource->SetCenter(0,i,0);
+    sphereSource->SetRadius(5.0 + i);
+    sphereSource->SetThetaResolution(10);
+    sphereSource->SetPhiResolution(10);
+    sphereSource->Update();
+
+    vtkPolyData* poly = sphereSource->GetOutput();
+    mitk::Surface::Pointer s = mitk::Surface::New();
+    s->SetVtkPolyData( poly );
+    s2sFilter->SetInput(i, s);
+    polydatas.push_back(s2sFilter->GetOutput(i)->GetVtkPolyData());
+    sphereSource->Delete();
+  }
+
+  // Test if the outputs are not recreated each time another input is added
+  for (unsigned int i = 0; i < 5; ++i)
+  {
+    MITK_TEST_CONDITION(s2sFilter->GetOutput(i)->GetVtkPolyData() == polydatas.at(i), "Test if pointers are still equal");
+  }
+
+  // Test if the outputs are recreated after calling CreateOutputsForAllInputs()
+  s2sFilter->CreateOutputsForAllInputs();
+  for (unsigned int i = 0; i < 5; ++i)
+  {
+    MITK_TEST_CONDITION(s2sFilter->GetOutput(i)->GetVtkPolyData() != polydatas.at(i), "Test if pointers are not equal");
+  }
 
   //std::cout << "Testing RemoveInputs() : " << std::endl;
   //unsigned int numOfInputs = filter->GetNumberOfInputs();
@@ -114,8 +113,5 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   //}
   //std::cout << "[SUCCESS] : existing input was removed correctly." << std::endl;
 
-
-
-  std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

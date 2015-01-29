@@ -45,13 +45,30 @@ public:
   using itk::ProcessObject::SetInput;
   virtual void SetInput( const mitk::Surface* surface );
 
+  /**
+    * @brief Add a new input at the given index (idx)
+    * Calls mitk::Surface::CreateOutputForInput(idx)
+    * @note The inputs must be added sequentially
+    * @param idx the index of the input, which must be incremental
+    * @param surface the input which should be added
+    */
   virtual void SetInput( unsigned int idx, const mitk::Surface* surface );
 
   virtual const mitk::Surface* GetInput();
 
   virtual const mitk::Surface* GetInput( unsigned int idx );
 
-  virtual void CreateOutputsForAllInputs(unsigned int idx);
+  /**
+    * @brief Create a new output for the input at idx
+    * @param idx the index of the input for which the output should be created
+    */
+  virtual void CreateOutputForInput(unsigned int idx);
+
+  /**
+    * @brief Creates outputs for all existing inputs
+    * @note For each existing input a new output will be allocated
+    */
+  virtual void CreateOutputsForAllInputs();
 
   virtual void RemoveInputs( mitk::Surface* surface );
 

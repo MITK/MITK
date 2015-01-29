@@ -81,6 +81,7 @@ if(MITK_USE_Boost)
     set(_build_cmd "<SOURCE_DIR>/b2"
         ${APPLE_SYSROOT_FLAG}
         --layout=tagged
+        "--prefix=<INSTALL_DIR>"
         ${_with_boost_libs}
         # Use the option below to view the shell commands (for debugging)
         #-d+4

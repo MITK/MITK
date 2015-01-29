@@ -225,11 +225,11 @@ if(_has_rpath_flag)
 endif()
 
 set(_install_rpath)
-if(UNIX)
+if(APPLE)
+  set(_install_rpath "@loader_path/../lib")
+elseif(UNIX)
   # this work for libraries as well as executables
   set(_install_rpath "\$ORIGIN/../lib")
-elseif(APPLE)
-  set(_install_rpath "@loader_path/../lib")
 endif()
 
 set(ep_common_args

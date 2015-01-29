@@ -119,33 +119,6 @@ include(CTestUseLaunchers)
 SUPPRESS_VC_DEPRECATED_WARNINGS()
 
 #-----------------------------------------------------------------------------
-# Output directories.
-#-----------------------------------------------------------------------------
-
-set(_default_LIBRARY_output_dir lib)
-set(_default_RUNTIME_output_dir bin)
-set(_default_ARCHIVE_output_dir lib)
-
-foreach(type LIBRARY RUNTIME ARCHIVE)
-  # Make sure the directory exists
-  if(MITK_CMAKE_${type}_OUTPUT_DIRECTORY
-     AND NOT EXISTS ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
-    message("Creating directory MITK_CMAKE_${type}_OUTPUT_DIRECTORY: ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}")
-    file(MAKE_DIRECTORY "${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}")
-  endif()
-
-  if(MITK_CMAKE_${type}_OUTPUT_DIRECTORY)
-    set(CMAKE_${type}_OUTPUT_DIRECTORY ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
-  else()
-    set(CMAKE_${type}_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${_default_${type}_output_dir})
-    set(MITK_CMAKE_${type}_OUTPUT_DIRECTORY ${CMAKE_${type}_OUTPUT_DIRECTORY})
-  endif()
-
-  set(CMAKE_${type}_OUTPUT_DIRECTORY ${CMAKE_${type}_OUTPUT_DIRECTORY} CACHE INTERNAL "Output directory for ${type} files.")
-  mark_as_advanced(CMAKE_${type}_OUTPUT_DIRECTORY)
-endforeach()
-
-#-----------------------------------------------------------------------------
 # Additional MITK Options (also shown during superbuild)
 #-----------------------------------------------------------------------------
 
@@ -491,6 +464,52 @@ include(mitkMacroGetLinuxDistribution)
 include(mitkMacroGetPMDPlatformString)
 
 #-----------------------------------------------------------------------------
+# Global CMake variables
+#-----------------------------------------------------------------------------
+
+set(MITK_CXX_STANDARD 11)
+
+# help keeping cross-platform compatibility
+# CMake 3.1 does not yet know how to handle AppleClang...
+# See http://public.kitware.com/Bug/view.php?id=15355
+if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+  set(CMAKE_CXX_EXTENSIONS 0)
+  set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
+  set(CMAKE_CXX_STANDARD_REQUIRED 1)
+endif()
+
+# Required and enabled C++11 features for all MITK code.
+# These are added as PUBLIC compile features to all MITK modules.
+set(MITK_CXX_FEATURES cxx_auto_type cxx_nullptr cxx_override)
+
+#-----------------------------------------------------------------------------
+# Output directories.
+#-----------------------------------------------------------------------------
+
+set(_default_LIBRARY_output_dir lib)
+set(_default_RUNTIME_output_dir bin)
+set(_default_ARCHIVE_output_dir lib)
+
+foreach(type LIBRARY RUNTIME ARCHIVE)
+  # Make sure the directory exists
+  if(MITK_CMAKE_${type}_OUTPUT_DIRECTORY
+     AND NOT EXISTS ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
+    message("Creating directory MITK_CMAKE_${type}_OUTPUT_DIRECTORY: ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}")
+    file(MAKE_DIRECTORY "${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}")
+  endif()
+
+  if(MITK_CMAKE_${type}_OUTPUT_DIRECTORY)
+    set(CMAKE_${type}_OUTPUT_DIRECTORY ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
+  else()
+    set(CMAKE_${type}_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${_default_${type}_output_dir})
+    set(MITK_CMAKE_${type}_OUTPUT_DIRECTORY ${CMAKE_${type}_OUTPUT_DIRECTORY})
+  endif()
+
+  set(CMAKE_${type}_OUTPUT_DIRECTORY ${CMAKE_${type}_OUTPUT_DIRECTORY} CACHE INTERNAL "Output directory for ${type} files.")
+  mark_as_advanced(CMAKE_${type}_OUTPUT_DIRECTORY)
+endforeach()
+
+#-----------------------------------------------------------------------------
 # Set MITK specific options and variables (NOT available during superbuild)
 #-----------------------------------------------------------------------------
 
@@ -557,21 +576,6 @@ endif()
 #-----------------------------------------------------------------------------
 # MITK C/CXX Flags
 #-----------------------------------------------------------------------------
-
-set(MITK_CXX_STANDARD 11)
-
-# help keeping cross-platform compatibility
-# CMake 3.1 does not yet know how to handle AppleClang...
-# See http://public.kitware.com/Bug/view.php?id=15355
-if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-  set(CMAKE_CXX_EXTENSIONS 0)
-  set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
-  set(CMAKE_CXX_STANDARD_REQUIRED 1)
-endif()
-
-# Required and enabled C++11 features for all MITK code.
-# These are added as PUBLIC compile features to all MITK modules.
-set(MITK_CXX_FEATURES cxx_auto_type cxx_nullptr cxx_override)
 
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS}")
 set(MITK_C_FLAGS_DEBUG )

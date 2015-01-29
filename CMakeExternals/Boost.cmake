@@ -78,10 +78,8 @@ if(MITK_USE_Boost)
       set(_boost_linkflags "linkflags=${_install_rpath_linkflag}")
     endif()
 
-    set(_build_cmd ${CMAKE_COMMAND} -E chdir "<SOURCE_DIR>"
-        ./b2
+    set(_build_cmd "<SOURCE_DIR>/b2"
         ${APPLE_SYSROOT_FLAG}
-        "--build-dir=<BINARY_DIR>"
         --layout=tagged
         ${_with_boost_libs}
         # Use the option below to view the shell commands (for debugging)
@@ -108,7 +106,9 @@ if(MITK_USE_Boost)
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_56_0.tar.bz2
       URL_MD5 a744cf167b05d72335f27c88115f211d
-      CONFIGURE_COMMAND ${CMAKE_COMMAND} -E chdir "<SOURCE_DIR>" ./bootstrap${_shell_extension}
+      # We use in-source builds for Boost
+      BINARY_DIR ${ep_prefix}/src/${proj}
+      CONFIGURE_COMMAND "<SOURCE_DIR>/bootstrap${_shell_extension}"
         --with-toolset=${_boost_toolset}
         --with-libraries=${_boost_libs}
         "--prefix=<INSTALL_DIR>"

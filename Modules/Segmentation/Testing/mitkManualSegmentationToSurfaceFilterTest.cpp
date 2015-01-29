@@ -14,105 +14,80 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#include "mitkManualSegmentationToSurfaceFilter.h"
-#include <itksys/SystemTools.hxx>
-#include <vtkSTLWriter.h>
+#include <mitkTestingMacros.h>
+#include <mitkTestingConfig.h>
+#include <mitkTestFixture.h>
+#include <mitkManualSegmentationToSurfaceFilter.h>
 #include <mitkIOUtil.h>
 
-#include <fstream>
-/**
-* Test class for ManualSegmentationToSurfaceFilter and ImageToSurface
-* 1. Read an image
-* 2. Create a surface
-* 3. Create a Surface with all image processing facillities
-*/
-int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
+class mitkManualSegmentationToSurfaceFilterTestSuite : public mitk::TestFixture
 {
+  CPPUNIT_TEST_SUITE(mitkManualSegmentationToSurfaceFilterTestSuite);
+  //Add tests with reference data.
+  //For now I only add reference for BallBinary, since
+  //other images do not really make sense.
+  //Note: .stl consumes much more memory and even loses
+  //some vertices and triangles during saving. Hence,
+  //.vtp is preferred as reference format.
+  MITK_PARAMETERIZED_TEST_2(Update_BallBinary_OutputEqualsReference,
+                            "BallBinary30x30x30.nrrd",
+                            "BallBinary30x30x30Reference.vtp");
+  MITK_PARAMETERIZED_TEST_2(Update_BallBinaryAndSmooth_OutputEqualsReference,
+                            "BallBinary30x30x30.nrrd",
+                            "BallBinary30x30x30SmoothReference.vtp");
+  CPPUNIT_TEST_SUITE_END();
 
-  if(argc==0)
+private:
+
+  mitk::ManualSegmentationToSurfaceFilter::Pointer m_Filter;
+  mitk::Surface::Pointer m_ReferenceSurface;
+
+public:
+
+  void setUp()
   {
-    std::cout<<"no file specified [FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-
-  std::string path = argv[1];
-  itksys::SystemTools::ConvertToUnixSlashes(path);
-  std::string fileIn = path;
-  std::string fileOut = "BallBinary30x30x30.stl";
-
-
-  MITK_INFO<<"Eingabe Datei: "<<fileIn;
-  MITK_INFO<<"Ausgabe Datei: "<<fileOut;
-  mitk::Image::Pointer image = NULL;
-  try
-  {
-    image = mitk::IOUtil::LoadImage( fileIn.c_str() );
-    if(image.IsNull())
+    std::vector<std::string> parameter = GetTestParameter();
+    m_Filter = mitk::ManualSegmentationToSurfaceFilter::New();
+    if(parameter.size() == 2)
     {
-      MITK_INFO << "file not an image - test will not be applied";
-      return EXIT_FAILURE;
+      m_Filter->SetInput(mitk::IOUtil::LoadImage(GetTestDataFilePath(parameter.at(0))));
+      //For the tests which have reference data
+      m_ReferenceSurface = mitk::IOUtil::LoadSurface(GetTestDataFilePath(parameter.at(1)));
+    }
+    else
+    {
+      MITK_WARN << "No test run for parameter for unknown parameter.";
     }
   }
-  catch ( mitk::Exception &e )
+
+  void tearDown()
   {
-    MITK_INFO << "Exception: " << e.what();
-    return EXIT_FAILURE;
+    m_Filter = NULL;
+    m_ReferenceSurface = NULL;
   }
 
-  mitk::ManualSegmentationToSurfaceFilter::Pointer filter;
-  MITK_INFO << "Instantiat mitk::ManualSegmentationToSurfaceFilter - implicit: mitk::ImageToSurface: ";
-  filter = mitk::ManualSegmentationToSurfaceFilter::New();
-
-  MITK_INFO << "Create surface with default settings: ";
-  if (image->GetDimension()==3)
+  void Update_BallBinary_OutputEqualsReference()
   {
-
-    filter->SetInput(image);
-    filter->Update();
-
-    mitk::IOUtil::SaveSurface(filter->GetOutput(), fileOut.c_str());
-
-    MITK_INFO << "Create surface all optimised settings: ";
-    //configure ImageToSurfaceFilter
-    filter->MedianFilter3DOn();
-    filter->SetGaussianStandardDeviation(1.5);
-    filter->InterpolationOn();
-    filter->UseGaussianImageSmoothOn();
-    filter->SetThreshold( 1 ); //if( Gauss ) --> TH manipulated for vtkMarchingCube
-    filter->SetDecimate( mitk::ImageToSurfaceFilter::DecimatePro );
-    filter->SetTargetReduction(0.05f);
-    filter->SmoothOn();
-
-    try
-    {
-      filter->Update();
-    }
-    catch( itk::ExceptionObject & err )
-    {
-      MITK_INFO << " ERROR!" << std::endl;
-      MITK_ERROR << "ExceptionObject caught!" << std::endl;
-      MITK_ERROR << err << std::endl;
-      return EXIT_FAILURE;
-    }
-
-    try
-    {
-      mitk::IOUtil::SaveSurface(filter->GetOutput(), fileOut.c_str());
-    }
-    catch( mitk::Exception &e)
-    {
-      MITK_INFO <<"Caught exception: "<<e.what();
-      return EXIT_FAILURE;
-    }
+    m_Filter->Update();
+    mitk::Surface::Pointer computedOutput = m_Filter->GetOutput();
+    MITK_ASSERT_EQUAL(computedOutput, m_ReferenceSurface, "Computed equals the reference?");
   }
-  else
+
+  void Update_BallBinaryAndSmooth_OutputEqualsReference()
   {
-    MITK_INFO<<"Image not suitable for filter: Dimension!=3";
-    return EXIT_FAILURE;
+    m_Filter->MedianFilter3DOn();
+    m_Filter->SetGaussianStandardDeviation(1.5);
+    m_Filter->InterpolationOn();
+    m_Filter->UseGaussianImageSmoothOn();
+    m_Filter->SetThreshold( 1 );
+    m_Filter->SetDecimate( mitk::ImageToSurfaceFilter::DecimatePro );
+    m_Filter->SetTargetReduction(0.05f);
+    m_Filter->SmoothOn();
+    m_Filter->Update();
+    mitk::Surface::Pointer computedOutput = m_Filter->GetOutput();
+
+    MITK_ASSERT_EQUAL(computedOutput, m_ReferenceSurface, "Computed equals the reference?");
   }
-  return EXIT_SUCCESS;
-}
-
-
+};
+MITK_TEST_SUITE_REGISTRATION(mitkManualSegmentationToSurfaceFilter)
 

@@ -18,12 +18,16 @@ if(MITK_USE_Boost)
   if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
     set(_boost_libs )
+    set(_with_boost_libs )
 
     # Set the boost root to the libraries install directory
     set(BOOST_ROOT "${ep_prefix}")
 
     if(MITK_USE_Boost_LIBRARIES)
       string(REPLACE ";" "," _boost_libs "${MITK_USE_Boost_LIBRARIES}")
+      foreach(_boost_lib ${MITK_USE_Boost_LIBRARIES})
+        list(APPEND _with_boost_libs ${_with_boost_libs} --with-${_boost_lib})
+      endforeach()
     endif()
 
     if(WIN32)
@@ -79,6 +83,7 @@ if(MITK_USE_Boost)
         ${APPLE_SYSROOT_FLAG}
         "--build-dir=<BINARY_DIR>"
         --layout=tagged
+        ${_with_boost_libs}
         # Use the option below to view the shell commands (for debugging)
         #-d+4
         variant=${_boost_variant}

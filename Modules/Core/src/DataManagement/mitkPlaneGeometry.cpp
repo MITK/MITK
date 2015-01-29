@@ -72,6 +72,11 @@ namespace mitk
   void
     PlaneGeometry::PreSetBounds(const BoundingBox::BoundsArrayType &bounds)
   {
+    // error: unused parameter 'bounds'
+    // this happens in release mode, where the assert macro is defined empty
+    // hence we "use" the parameter:
+    (void)bounds;
+
     //currently the unit rectangle must be starting at the origin [0,0]
     assert(bounds[0]==0);
     assert(bounds[2]==0);

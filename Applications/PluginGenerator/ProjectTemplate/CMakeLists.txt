@@ -279,7 +279,7 @@ endif()
 # Qt support
 #-----------------------------------------------------------------------------
 
-if(MITK_USE_QT)
+if(MITK_USE_Qt4)
   set(QT_QMAKE_EXECUTABLE ${MITK_QMAKE_EXECUTABLE})
 endif()
 

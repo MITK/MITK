@@ -133,6 +133,9 @@ if(NOT MITK_DIR)
 
   if(MITK_USE_Qt4 AND QT_QMAKE_EXECUTABLE)
     list(APPEND additional_mitk_cmakevars "-DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}")
+  elseif(MITK_USE_Qt5)
+    list(APPEND additional_mitk_cmakevars "-DDESIRED_QT_VERSION:STRING=5")
+    list(APPEND additional_mitk_cmakevars "-DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}")
   endif()
 
   if(MITK_USE_CTK)

@@ -66,7 +66,7 @@ void mitk::SurfaceToSurfaceFilter::CreateOutputForInput(unsigned int idx)
 {
   if (this->GetNumberOfIndexedInputs() < idx || this->GetInput(idx) == NULL)
   {
-    mitkThrow() << "Error creating output for input ["<<idx<<"]. Input does not exists!";
+    mitkThrow() << "Error creating output for input [" <<idx<< "]. Input does not exists!";
   }
 
   if (this->GetNumberOfIndexedOutputs() <= idx)

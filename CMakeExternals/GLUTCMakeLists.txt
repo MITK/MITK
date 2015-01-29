@@ -334,8 +334,8 @@ endif()
 
 add_library(freeglut ${freeglut_HEADERS} ${freeglut_SOURCES})
 target_include_directories(freeglut
-  PUBLIC $<BUILD_INTERFACE:${_include_dirs}>
-         $<INSTALL_INTERFACE:include>
+  PUBLIC "$<BUILD_INTERFACE:${_include_dirs}>"
+         "$<INSTALL_INTERFACE:include>"
 )
 target_link_libraries(freeglut PUBLIC ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY})
 set_target_properties(freeglut PROPERTIES

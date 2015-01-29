@@ -19,8 +19,8 @@ add_library(glew src/glew.c)
 
 set(include_dirs ${OPENGL_INCLUDE_DIR} ${GLEW_SOURCE_DIR}/include)
 target_include_directories(glew
-  PUBLIC $<BUILD_INTERFACE:${include_dirs}>
-         $<INSTALL_INTERFACE:include>
+  PUBLIC "$<BUILD_INTERFACE:${include_dirs}>"
+         "$<INSTALL_INTERFACE:include>"
 )
 target_link_libraries(glew PUBLIC ${OPENGL_gl_LIBRARY})
 set_target_properties(glew PROPERTIES

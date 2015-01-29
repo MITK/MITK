@@ -178,8 +178,8 @@ set(cppunit_SRCS
 
 add_library(cppunit SHARED ${cppunit_SRCS})
 target_include_directories(cppunit
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-         $<INSTALL_INTERFACE:include>
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>"
 )
 target_compile_definitions(cppunit PRIVATE CPPUNIT_BUILD_DLL)
 

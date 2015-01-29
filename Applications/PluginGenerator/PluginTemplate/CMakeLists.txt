@@ -1,5 +1,9 @@
 project($(plugin-target))
 
+if(MITK_USE_Qt5)
+  find_package(Qt5Widgets REQUIRED)
+endif()
+
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE $(plugin-export-directive)
   EXPORTED_INCLUDE_SUFFIXES src

@@ -208,17 +208,27 @@ endif()
 # external projects like Boost and PCRE.
 mitkFunctionCheckCompilerFlags("-std=c++11" CMAKE_CXX_FLAGS)
 
-mitkFunctionCheckCompilerFlags("-Wl,-rpath" _has_rpath_flag)
+# This is a workaround for passing linker flags
+# actually down to the linker invocation
+set(_cmake_required_flags_orig ${CMAKE_REQUIRED_FLAGS})
+set(CMAKE_REQUIRED_FLAGS "-Wl,-rpath")
+mitkFunctionCheckCompilerFlags(${CMAKE_REQUIRED_FLAGS} _has_rpath_flag)
+set(CMAKE_REQUIRED_FLAGS ${_cmake_required_flags_orig})
+
 set(_install_rpath_linkflag )
 if(_has_rpath_flag)
-  set(_install_rpath_linkflag "-Wl,-rpath='$ORIGIN/../lib'")
+  if(APPLE)
+    set(_install_rpath_linkflag "-Wl,-rpath,@loader_path/../lib")
+  else()
+    set(_install_rpath_linkflag "-Wl,-rpath='$ORIGIN/../lib'")
+  endif()
 endif()
 
 set(_install_rpath)
 if(UNIX)
   # this work for libraries as well as executables
   set(_install_rpath "\$ORIGIN/../lib")
-elseif(MACOS)
+elseif(APPLE)
   set(_install_rpath "@loader_path/../lib")
 endif()
 

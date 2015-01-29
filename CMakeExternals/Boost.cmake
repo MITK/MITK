@@ -19,6 +19,7 @@ if(MITK_USE_Boost)
 
     set(_boost_libs )
     set(_with_boost_libs )
+    set(_install_lib_dir )
 
     # Set the boost root to the libraries install directory
     set(BOOST_ROOT "${ep_prefix}")
@@ -48,6 +49,7 @@ if(MITK_USE_Boost)
           set(_boost_toolset "toolset=msvc-11.0")
         endif()
       endif()
+      set(_install_lib_dir "--libdir=<INSTALL_DIR>/bin")
     else()
       set(_shell_extension .sh)
     endif()
@@ -82,6 +84,7 @@ if(MITK_USE_Boost)
         ${APPLE_SYSROOT_FLAG}
         --layout=tagged
         "--prefix=<INSTALL_DIR>"
+        ${_install_lib_dir}
         ${_with_boost_libs}
         # Use the option below to view the shell commands (for debugging)
         #-d+4

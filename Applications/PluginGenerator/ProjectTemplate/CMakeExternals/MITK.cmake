@@ -64,6 +64,8 @@ if(NOT MITK_DIR)
   if(MITK_USE_Qt4)
     # Look for Qt at the superbuild level, to catch missing Qt libs early
     find_package(Qt4 4.7 REQUIRED)
+  elseif(MITK_USE_Qt5)
+    find_package(Qt5Widgets REQUIRED)
   endif()
 
   set(additional_mitk_cmakevars )

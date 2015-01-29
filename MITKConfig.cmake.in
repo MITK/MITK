@@ -10,7 +10,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
   set(MITK_NO_CXX_STANDARD_ERROR 1)
 endif()
 
-# We use target_compile_features for GNU and Clang to enusre
+# We use target_compile_features for GNU and Clang to ensure
 # external projects are compiled with e.g. -std=c++11. For
 # msvc, C++11 support is always enabled by the compiler itself.
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND

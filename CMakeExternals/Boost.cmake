@@ -121,11 +121,16 @@ if(MITK_USE_Boost)
       DEPENDS ${proj_DEPENDENCIES}
       )
 
+    ExternalProject_Get_Property(${proj} install_dir)
+
+    if(WIN32)
+      set(BOOST_LIBRARYDIR "${install_dir}/bin")
+    endif()
+
     # Manual install commands (for a MITK super-build install)
     # until the Boost CMake system is used.
 
     # We just copy the include directory
-    ExternalProject_Get_Property(${proj} install_dir)
     install(DIRECTORY "${install_dir}/include/boost"
             DESTINATION "include"
             COMPONENT dev

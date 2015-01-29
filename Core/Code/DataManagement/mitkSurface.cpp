@@ -32,12 +32,6 @@ static vtkPolyData* DeepCopy(vtkPolyData* other)
   return copy;
 }
 
-static void Delete(vtkPolyData* polyData)
-{
-  if (polyData != NULL)
-    polyData->Delete();
-}
-
 static void Update(vtkPolyData* /*polyData*/)
 {
 //  if (polyData != NULL)
@@ -88,9 +82,6 @@ mitk::Surface::~Surface()
 
 void mitk::Surface::ClearData()
 {
-  using ::Delete;
-
-  std::for_each(m_PolyDatas.begin(), m_PolyDatas.end(), Delete);
   m_PolyDatas.clear();
 
   Superclass::ClearData();
@@ -171,7 +162,7 @@ vtkPolyData* mitk::Surface::GetVtkPolyData(unsigned int t) const
       this->GetSource()->Update();
     }
 
-    return m_PolyDatas[t];
+    return m_PolyDatas[t].GetPointer();
   }
 
   return NULL;
@@ -349,7 +340,7 @@ void mitk::Surface::Graft(const DataObject* data)
 
   for (unsigned int i = 0; i < surface->GetSizeOfPolyDataSeries(); ++i)
   {
-    m_PolyDatas.push_back(vtkPolyData::New());
+    m_PolyDatas.push_back(vtkSmartPointer<vtkPolyData>::New());
     m_PolyDatas.back()->DeepCopy(const_cast<mitk::Surface*>(surface)->GetVtkPolyData(i));
   }
 }
@@ -362,7 +353,7 @@ void mitk::Surface::PrintSelf(std::ostream& os, itk::Indent indent) const
 
   unsigned int count = 0;
 
-  for (std::vector<vtkPolyData*>::const_iterator it = m_PolyDatas.begin(); it != m_PolyDatas.end(); ++it)
+  for (std::vector<vtkSmartPointer<vtkPolyData> >::const_iterator it = m_PolyDatas.begin(); it != m_PolyDatas.end(); ++it)
   {
     os << "\n";
 

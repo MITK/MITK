@@ -110,7 +110,7 @@ void mitk::SimulationVtkMapper3D::ApplySimulationProperties(BaseRenderer* render
   node->GetBoolProperty("Simulation.Options.Wire Frame", showWireFrame, renderer);
   node->GetBoolProperty("Simulation.Visual.Visual Models", showVisualModels, renderer);
 
-  Simulation* simulation = static_cast<Simulation*>(this->GetData());
+  Simulation* simulation = static_cast<Simulation*>(node->GetData());
   sofa::component::visualmodel::VisualStyle::SPtr visualStyle;
   simulation->GetRootNode()->get(visualStyle);
 

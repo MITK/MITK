@@ -31,22 +31,21 @@ if(MITK_USE_Boost)
       endforeach()
     endif()
 
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(_boost_address_model "address-model=64")
+    else()
+      set(_boost_address_model "address-model=32")
+    endif()
+
     if(WIN32)
       set(_shell_extension .bat)
-      if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(_boost_address_model "address-model=64")
-      else()
-        set(_boost_address_model "address-model=32")
-      endif()
       if(MSVC)
-        if(MSVC_VERSION EQUAL 1400)
-          set(_boost_toolset "toolset=msvc-8.0")
-        elseif(MSVC_VERSION EQUAL 1500)
-          set(_boost_toolset "toolset=msvc-9.0")
-        elseif(MSVC_VERSION EQUAL 1600)
-          set(_boost_toolset "toolset=msvc-10.0")
+        if(MSVC_VERSION EQUAL 1600)
+          set(_boost_toolset "msvc-10.0")
         elseif(MSVC_VERSION EQUAL 1700)
-          set(_boost_toolset "toolset=msvc-11.0")
+          set(_boost_toolset "msvc-11.0")
+        elseif(MSVC_VERSION EQUAL 1800)
+          set(_boost_toolset "msvc-12.0")
         endif()
       endif()
       set(_install_lib_dir "--libdir=<INSTALL_DIR>/bin")
@@ -92,6 +91,7 @@ if(MITK_USE_Boost)
         link=${_boost_link}
         ${_boost_cxxflags}
         ${_boost_linkflags}
+        ${_boost_address_model}
         threading=multi
         runtime-link=shared
         -q

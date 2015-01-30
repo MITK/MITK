@@ -31,7 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <fstream>
 
+namespace us{class ModuleResource;}
+
 namespace mitk {
+
 
 /**
  * \ingroup IO
@@ -297,6 +300,15 @@ public:
    */
   static mitk::PointSet::Pointer LoadPointSet(const std::string& path);
 
+  /**
+   * @brief Loads the contents of a us::ModuleResource and returns the corresponding mitk::BaseData
+   * @param usResource a ModuleResource, representing a BaseData object
+   * @param mode Optional parameter to set the openmode of the stream
+   * @return The set of loaded BaseData objects. \c Should contain either one or zero elements, since a resource stream
+   * respresents one object.
+   * @throws mitk::Exception if no reader was found for the stream.
+   */
+  static std::vector<BaseData::Pointer> Load(const us::ModuleResource& usResource, std::ios_base::openmode mode = std::ios_base::in);
 
   /**
    * @brief Save a mitk::BaseData instance.

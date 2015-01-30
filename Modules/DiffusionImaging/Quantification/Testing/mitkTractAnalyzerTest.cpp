@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkTractAnalyzer.h>
 #include <itkImageFileReader.h>
-#include <mitkPointSetReader.h>
 #include <mitkNrrdTbssRoiImageReader.h>
+#include <mitkIOUtil.h>
 
 /**Documentation
  *  test for the class "mitkTractAnalyzer".
@@ -41,16 +41,8 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
 
   mitk::CastToMitkImage(itkImage, mitkImage);
 
-
   // load point set
-
-  mitk::PointSetReader::Pointer pointSetReader = mitk::PointSetReader::New();
-  pointSetReader->SetFileName(argv[2]);
-  pointSetReader->Update();
-
-  mitk::PointSet::Pointer pointSet = pointSetReader->GetOutput();
-
-
+  mitk::PointSet::Pointer pointSet = mitk::IOUtil::LoadPointSet(argv[2]);
 
   mitk::TractAnalyzer analyzer;
 
@@ -60,8 +52,6 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
   analyzer.MakeRoi();
 
   mitk::TbssRoiImage::Pointer tbssRoi = analyzer.GetRoiImage();
-
-
 
   std::vector< itk::Index<3> > roi = tbssRoi->GetRoi();
 

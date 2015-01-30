@@ -49,10 +49,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDTIAtlasAppApplicationPlugin.h"
 #include "mitkDataStorageEditorInput.h"
 
-#include "mitkBaseDataIOFactory.h"
+#include <mitkIOUtil.h>
 #include "mitkSceneIO.h"
 #include "mitkProgressBar.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 
@@ -119,6 +118,7 @@ void QmitkDTIAtlasAppIntroPart::CreateQtPartControl(QWidget* parent)
   }
 }
 
+#define QT_WEBKIT
 #ifdef QT_WEBKIT
 void QmitkDTIAtlasAppIntroPart::CreateConnections()
 {
@@ -207,26 +207,7 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
       }
       else
       {
-        mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-        try
-        {
-          nodeReader->SetFileName(fileName->toLocal8Bit().data());
-          nodeReader->Update();
-          for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
-          {
-            mitk::DataNode::Pointer node;
-            node = nodeReader->GetOutput(i);
-            if ( node->GetData() != NULL )
-            {
-              dataStorage->Add(node);
-              dsmodified = true;
-            }
-          }
-        }
-        catch(...)
-        {
-          MITK_INFO << "Could not open file!";
-        }
+        mitk::IOUtil::Load(fileName->toStdString(),*(dataStorage.GetPointer()));
       }
 
 

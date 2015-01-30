@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVectorImage.h>
 #include <itkResampleImageFilter.h>
 
-#include <mitkBaseDataIOFactory.h>
 #include <mitkImage.h>
 #include <mitkQBallImage.h>
 #include <mitkBaseData.h>
@@ -78,13 +77,11 @@ int main(int argc, char* argv[])
   try
   {
     std::cout << "Loading " << inName;
-    const std::string s1="", s2="";
-    std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inName, s1, s2, false );
-    mitk::BaseData::Pointer baseData = infile.at(0);
 
-    if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image*>(baseData.GetPointer()) ) )
+    mitk::Image::Pointer dwi = mitk::IOUtil::LoadImage(inName);
+
+    if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dwi ) )
     {
-      mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(baseData.GetPointer());
       typedef itk::RadialMultishellToSingleshellImageFilter<short, short> FilterType;
 
       typedef itk::DwiGradientLengthCorrectionFilter  CorrectionFilterType;

@@ -34,7 +34,6 @@ class mitkUSImageLoggingFilterTestSuite : public mitk::TestFixture
   MITK_TEST(TestSavingAfterMupltipleUpdateCalls);
   MITK_TEST(TestFilterWithEmptyImages);
   MITK_TEST(TestFilterWithInvalidPath);
-  MITK_TEST(TestWrongImageFileExtensions);
   MITK_TEST(TestJpgFileExtension);
   CPPUNIT_TEST_SUITE_END();
 
@@ -155,11 +154,6 @@ public:
   CPPUNIT_ASSERT_THROW_MESSAGE("Testing if correct exception if thrown if an invalid path is given.",
                                m_TestFilter->SaveImages(filename),
                                mitk::Exception);
-  }
-
-  void TestWrongImageFileExtensions()
-  {
-  CPPUNIT_ASSERT_MESSAGE("Testing invalid extension.",!m_TestFilter->SetImageFilesExtension(".INVALID"));
   }
 
   void TestJpgFileExtension()

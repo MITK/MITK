@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTrackingVolumeGenerator.h"
-#include "mitkSTLFileReader.h"
 #include "mitkStandardFileLocations.h"
 #include "mitkConfig.h"
 #include <vtkCubeSource.h>
@@ -24,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVirtualTrackingDevice.h>
 #include <vtkSmartPointer.h>
 #include <mitkSurface.h>
+#include <mitkIOMimeTypes.h>
+#include <mitkFileReaderRegistry.h>
 
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
@@ -83,35 +84,15 @@ void mitk::TrackingVolumeGenerator::GenerateData()
 
   us::ModuleResource moduleResource = module->GetResource(filename);
 
-  // Create ResourceStream from Resource
-  us::ModuleResourceStream resStream(moduleResource,std::ios_base::binary);
+  std::vector<mitk::BaseData::Pointer> data = mitk::IOUtil::Load(moduleResource);
 
-  ofstream tmpOutputStream;
-  std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpOutputStream);
-  tmpOutputStream << resStream.rdbuf();
-  tmpOutputStream.close();
+   if(data.empty())
+     MITK_ERROR << "Exception while reading file:";
 
+   mitk::Surface::Pointer fileoutput = dynamic_cast<mitk::Surface*>(data[0].GetPointer());
 
-  //filepath = mitk::StandardFileLocations::GetInstance()->FindFile(filename.c_str());
+   output->SetVtkPolyData(fileoutput->GetVtkPolyData());
 
-  if (tmpFilePath.empty())
-  {
-    MITK_ERROR << ("Volume Generator could not find the specified file " + filename);
-    return;
-  }
-
-  mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
-  stlReader->SetFileName( tmpFilePath.c_str() );
-  stlReader->Update();
-
-  std::remove(tmpFilePath.c_str());
-
-  if ( stlReader->GetOutput() == NULL)
-  {
-    MITK_ERROR << "Error while reading file";
-    return ;
-  }
-  output->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());//set the visible trackingvolume
 }
 
 void mitk::TrackingVolumeGenerator::SetTrackingDeviceType(mitk::TrackingDeviceType deviceType)

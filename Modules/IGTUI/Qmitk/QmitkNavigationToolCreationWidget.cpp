@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qfiledialog.h>
 #include <qmessagebox.h>
 #include <QDialog>
+#include <mitkIOUtil.h>
 
 //poco headers
 #include <Poco/Path.h>
@@ -203,25 +204,15 @@ emit Canceled();
 
 void QmitkNavigationToolCreationWidget::OnLoadSurface()
 {
-std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", tr("STL (*.stl)")).toLatin1().data();
-mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
-try
-{
-stlReader->SetFileName( filename.c_str() );
-stlReader->Update();
-}
-catch (...)
-{
-}
-
-if ( stlReader->GetOutput() == NULL );
-else
-{
-mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-newNode->SetName(filename);
-newNode->SetData(stlReader->GetOutput());
-m_DataStorage->Add(newNode);
-}
+  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", tr("STL (*.stl)")).toLatin1().data();
+  try
+  {
+    mitk::IOUtil::Load(filename.c_str(), *m_DataStorage);
+  }
+  catch (mitk::Exception &e)
+  {
+    MITK_ERROR << "Exception occured: " << e.what();
+  }
 }
 
 void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()

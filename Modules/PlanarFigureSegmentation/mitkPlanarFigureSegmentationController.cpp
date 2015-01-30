@@ -16,23 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPlanarFigureSegmentationController.h"
 
-#include "mitkSurfaceToImageFilter.h"
-
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
 #include <vtkPolygon.h>
 #include <vtkCellArray.h>
-
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
-#include "mitkImageWriter.h"
-#include "mitkSurfaceVtkWriter.h"
-#include "mitkImageToSurfaceFilter.h"
 
-#include "mitkImageAccessByItk.h"
-
-#include "mitkImageCast.h"
-
+#include <mitkSurfaceToImageFilter.h>
+#include <mitkImageToSurfaceFilter.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkIOUtil.h>
+#include <mitkImageCast.h>
 
 mitk::PlanarFigureSegmentationController::PlanarFigureSegmentationController()
 : itk::Object()
@@ -205,11 +200,7 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
   bool debugOutput(false);
   if ( debugOutput )
   {
-    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
-    imageWriter->SetInput( distanceImage );
-    imageWriter->SetExtension( ".nrrd" );
-    imageWriter->SetFileName( "v:/DistanceImage" );
-    imageWriter->Update();
+    mitk::IOUtil::Save(distanceImage, "v:/DistanceImage.nrrd");
   }
 
   mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
@@ -225,13 +216,8 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
 
   if ( debugOutput )
   {
-    mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer surfaceWriter = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
-    surfaceWriter->SetInput( segmentationAsSurface );
-    surfaceWriter->SetExtension( ".vtk" );
-    surfaceWriter->SetFileName( "v:/DistanceImageAsSurface.vtk" );
-    surfaceWriter->Update();
+    mitk::IOUtil::Save( segmentationAsSurface, "v:/DistanceImageAsSurface.vtk" );
   }
-
 
   mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
   surfaceToImageFilter->SetInput( segmentationAsSurface );

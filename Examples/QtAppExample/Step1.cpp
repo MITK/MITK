@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 
-#include <mitkDataNodeFactory.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkIOUtil.h>
 
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
@@ -52,24 +52,13 @@ int main(int argc, char* argv[])
   // Part II: Create some data by reading a file
   //*************************************************************************
 
-  // Create a DataNodeFactory to read a data format supported
-  // by the DataNodeFactory (many image formats, surface formats, etc.)
-  mitk::DataNodeFactory::Pointer reader=mitk::DataNodeFactory::New();
-  const char * filename = argv[1];
-  try
-  {
-    reader->SetFileName(filename);
-    reader->Update();
-    //*************************************************************************
-    // Part III: Put the data into the datastorage
-    //*************************************************************************
+  // Load a DataNode using the mitkIOUtil
+  // (supports many image formats, surface formats, etc.)
+  mitk::StandaloneDataStorage::SetOfObjects::Pointer dataNodes = mitk::IOUtil::Load(argv[1],*ds);
 
-    // Add the node to the DataStorage
-    ds->Add(reader->GetOutput());
-  }
-  catch(...)
+  if(dataNodes->empty())
   {
-    fprintf( stderr, "Could not open file %s \n\n", filename );
+    fprintf( stderr, "Could not open file %s \n\n", argv[1] );
     exit(2);
   }
 

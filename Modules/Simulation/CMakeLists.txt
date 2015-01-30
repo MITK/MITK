@@ -6,5 +6,5 @@ MITK_CREATE_MODULE(
 )
 
 if(TARGET ${MODULE_TARGET})
-  target_compile_options(${MODULE_TARGET} PRIVATE "$<$<CXX_COMPILER_ID:MSVC>:/wd4068 /wd4250 /wd4251 /wd4267 /wd4275>")
+  target_compile_options(${MODULE_TARGET} PUBLIC "$<$<CXX_COMPILER_ID:MSVC>:/wd4068;/wd4250;/wd4251;/wd4267;/wd4275>")
 endif()

@@ -19,6 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUIDGenerator.h>
 #include <Poco/Path.h>
 
+#include <algorithm>
+#include <mitkIOMimeTypes.h>
+#include <mitkCoreServices.h>
+#include <mitkIMimeTypeProvider.h>
+
+
 mitk::USImageLoggingFilter::USImageLoggingFilter() : m_SystemTimeClock(RealTimeClock::New()),
                                                      m_ImageExtension(".nrrd")
 {
@@ -139,6 +145,21 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
 
 bool mitk::USImageLoggingFilter::SetImageFilesExtension(std::string extension)
  {
-  m_ImageExtension = extension;
-  return true;
+  if(extension.compare(0,1,".") == 0)
+    extension = extension.substr(1,extension.size()-1);
+
+  CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(CoreServices::GetMimeTypeProvider());
+
+  std::vector<MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForCategory(IOMimeTypes::CATEGORY_IMAGES());
+
+  for(std::vector<MimeType>::size_type i = 0 ; i< mimeTypes.size() ; ++i)
+  {
+    std::vector<std::string> extensions = mimeTypes[i].GetExtensions();
+    if (std::find(extensions.begin(), extensions.end(), extension) != extensions.end())
+    {
+      m_ImageExtension = "."+extension;
+      return true;
+    }
+  }
+  return false;
  }

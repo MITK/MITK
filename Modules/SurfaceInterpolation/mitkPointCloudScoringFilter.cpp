@@ -19,9 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkPoints.h>
 #include <vtkKdTree.h>
-#include <vtkPolyData.h>
-#include <vtkPolyLine.h>
-#include <vtkCellArray.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkPolyVertex.h>
 
@@ -29,8 +26,6 @@ mitk::PointCloudScoringFilter::PointCloudScoringFilter():
   m_NumberOfOutpPoints(0)
 {
   m_OutpGrid = mitk::UnstructuredGrid::New();
-//  this->SetNumberOfRequiredInputs(2);
-//  this->SetNumberOfRequiredOutputs(1);
 
   this->SetNthOutput(0, m_OutpGrid);
 }

@@ -19,10 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkSurfaceInterpolationExports.h>
 #include <mitkUnstructuredGridToUnstructuredGridFilter.h>
-#include <mitkUnstructuredGrid.h>
+
 
 namespace mitk
 {
+
+class UnstructuredGrid;
 
 /**
  * @brief Scores an UnstructuredGrid as good as one matches to the other.

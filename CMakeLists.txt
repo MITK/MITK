@@ -686,7 +686,7 @@ if(BUILD_TESTING)
 
   # Test the external project template
   if(MITK_USE_BLUEBERRY)
-    include(mitkTestProjectTemplate)
+    #include(mitkTestProjectTemplate)
   endif()
 
   # Test the package target

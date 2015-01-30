@@ -73,9 +73,8 @@ namespace mitk {
     /** Sets the extension of the output images which alse defines the file type. E.g., ".nrrd" or ".jpg".
      *  ".nrrd" is default.
      *  @return Returns true if the file extension was successfully set which means it is supported. False if not.
-     *  @deprecated_since{next_release}
      */
-    DEPRECATED(bool SetImageFilesExtension(std::string extension));
+    bool SetImageFilesExtension(std::string extension);
 
 
   protected:

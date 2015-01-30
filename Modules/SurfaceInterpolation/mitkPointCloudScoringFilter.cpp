@@ -76,8 +76,8 @@ void mitk::PointCloudScoringFilter::GenerateData()
 
   std::vector< ScorePair > score;
 
-  double dist_glob;
-  double dist;
+  double dist_glob = 0.0;
+  double dist = 0.0;
 
   for(int i=0; i<points->GetNumberOfPoints(); i++)
   {

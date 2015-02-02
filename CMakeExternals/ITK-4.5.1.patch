@@ -13,16 +13,3 @@ diff -burN ITK-4.5.1/CMake/UseITK.cmake ITK/CMake/UseITK.cmake
    include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR}/ITKIOFactoryRegistration)
  
  endif()
-diff -burN ITK-4.5.1/Modules/Core/Common/include/itkMetaDataObject.h ITK/Modules/Core/Common/include/itkMetaDataObject.h
---- ITK-4.5.1/Modules/Core/Common/include/itkMetaDataObject.h	2014-02-28 19:46:45.000000000 +0100
-+++ ITK/Modules/Core/Common/include/itkMetaDataObject.h	2015-01-29 18:28:24.625091845 +0100
-@@ -70,7 +70,7 @@
-  * \ingroup ITKCommon
-  */
- template< typename MetaDataObjectType >
--class MetaDataObject:public MetaDataObjectBase
-+class ITKCommon_EXPORT MetaDataObject:public MetaDataObjectBase
- {
- public:
-   /** Smart pointer typedef support. */
-

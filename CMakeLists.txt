@@ -465,6 +465,11 @@ if(NOT MITK_ACCESSBYITK_DIMENSIONS)
       CACHE STRING "List of dimensions used in AccessByItk and InstantiateAccessFunction macros")
 endif()
 
+# Set up data downloads URL
+if(NOT MITK_DATA_DOWNLOAD_PREFIX_URL)
+  set(MITK_DATA_DOWNLOAD_PREFIX_URL http://mitk.org/download/data)
+endif()
+
 #-----------------------------------------------------------------------------
 # Project.xml
 #-----------------------------------------------------------------------------

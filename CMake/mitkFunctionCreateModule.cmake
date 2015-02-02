@@ -323,7 +323,11 @@ function(mitk_create_module)
         set(module_cxx_flags_debug )
         set(module_cxx_flags_release )
 
-        if(MODULE_GCC_DEFAULT_VISIBILITY)
+        if(MODULE_GCC_DEFAULT_VISIBILITY OR NOT CMAKE_COMPILER_IS_GNUCXX)
+          # We only support hidden visibility for gcc for now. Clang still has troubles with
+          # correctly marking template declarations and explicit template instantiations as exported.
+          # See http://comments.gmane.org/gmane.comp.compilers.clang.scm/50028
+          # and http://llvm.org/bugs/show_bug.cgi?id=10113
           set(CMAKE_CXX_VISIBILITY_PRESET default)
           set(CMAKE_VISIBILITY_INLINES_HIDDEN 0)
         else()

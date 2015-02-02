@@ -5,4 +5,4 @@ MITK_CREATE_MODULE(
     PRIVATE ITK|ITKIOGDCM
 )
 
-add_subdirectory(Testing)
+add_subdirectory(test)

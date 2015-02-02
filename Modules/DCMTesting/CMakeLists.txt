@@ -35,14 +35,14 @@ if(TARGET ${MODULE_NAME})
   include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
   # dumps out image information
-  add_executable(DumpDCMMitkImage DumpDCMMitkImage.cpp)
+  add_executable(DumpDCMMitkImage src/DumpDCMMitkImage.cpp)
   target_link_libraries(DumpDCMMitkImage ${MODULE_NAME})
 
   # compares dumped out image information against reference dump
-  add_executable(VerifyDCMMitkImageDump VerifyDCMMitkImageDump.cpp)
+  add_executable(VerifyDCMMitkImageDump src/VerifyDCMMitkImageDump.cpp)
   target_link_libraries(VerifyDCMMitkImageDump ${MODULE_NAME})
 
-  add_subdirectory(Testing)
+  add_subdirectory(test)
 endif()
 
 endif()

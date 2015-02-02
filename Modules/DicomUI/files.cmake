@@ -1,17 +1,21 @@
 
-SET(CPP_FILES ${CPP_FILES}
-  Qmitk/QmitkDicomLocalStorageWidget.cpp
-  Qmitk/QmitkDicomExternalDataWidget.cpp
+set(H_FILES
+  include/QmitkDicomExternalDataWidget.h
+  include/QmitkDicomLocalStorageWidget.h
 )
 
-SET(UI_FILES ${UI_FILES}
-  Qmitk/QmitkDicomLocalStorageWidgetControls.ui
-  Qmitk/QmitkDicomExternalDataWidgetControls.ui
+set(CPP_FILES
+  QmitkDicomLocalStorageWidget.cpp
+  QmitkDicomExternalDataWidget.cpp
 )
 
-SET(MOC_H_FILES ${MOC_H_FILES}
-  Qmitk/QmitkDicomLocalStorageWidget.h
-  Qmitk/QmitkDicomExternalDataWidget.h
+set(UI_FILES
+  src/QmitkDicomLocalStorageWidgetControls.ui
+  src/QmitkDicomExternalDataWidgetControls.ui
+)
 
+set(MOC_H_FILES
+  include/QmitkDicomLocalStorageWidget.h
+  include/QmitkDicomExternalDataWidget.h
 )
 

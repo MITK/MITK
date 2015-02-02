@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageIterator.h>
 #include <itkImageRegionIterator.h>
 
-#include <DataStructures/mitkRTConstants.h>
+#include <mitkRTConstants.h>
 
 namespace mitk
 {

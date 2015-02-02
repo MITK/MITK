@@ -32,7 +32,10 @@ if(MITK_USE_GLUT)
 
       ExternalProject_Add(${proj}
          LIST_SEPARATOR ${sep}
-         URL http://mitk.org/download/thirdparty/freeglut-2.8.1.tar.gz
+         SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
+         BINARY_DIR ${proj}-build
+         PREFIX ${proj}-cmake
+         URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/freeglut-2.8.1.tar.gz
          URL_MD5 918ffbddcffbac83c218bc52355b6d5a
          PATCH_COMMAND ${patch_cmd}
          CMAKE_GENERATOR ${gen}

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
   class Surface;
   class Image;
+  class LabelSetImage;
 }
 
 /*!
@@ -59,7 +60,7 @@ private:
   void EnableButtons(bool enable = true);
 
   /** @brief Convert a surface into an binary image. */
-  itk::SmartPointer<mitk::Image> ConvertSurfaceToImage( itk::SmartPointer<mitk::Image> image, itk::SmartPointer<mitk::Surface> surface );
+  itk::SmartPointer<mitk::LabelSetImage> ConvertSurfaceToImage( itk::SmartPointer<mitk::Image> image, itk::SmartPointer<mitk::Surface> surface );
 
   Ui::QmitkSurfaceToImageWidgetControls m_Controls;
 };

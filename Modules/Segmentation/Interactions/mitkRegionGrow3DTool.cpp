@@ -326,7 +326,7 @@ void mitk::RegionGrow3DTool::ConfirmSegmentation( std::string name, mitk::Color 
   int lowerThresholdLabeledImage = (short int) tempLevelWindow.GetLowerWindowBound() + 1;
 
   typedef itk::Image<int, 3> InputImageType;
-  typedef itk::Image<unsigned char, 3> SegmentationType;
+  typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, 3> SegmentationType;
   typedef itk::BinaryThresholdImageFilter<InputImageType, SegmentationType> ThresholdFilterType;
 
   ThresholdFilterType::Pointer filter = ThresholdFilterType::New();

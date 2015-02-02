@@ -8,6 +8,7 @@ else()
   mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-declarations" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
 endif()
 
+if(TARGET ${TESTDRIVER})
 MITK_CREATE_MODULE_TESTS(US_MODULE)
 mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|ITKThresholding+ITKTestKernel VTK|vtkTestingRendering tinyxml)
 
@@ -223,3 +224,4 @@ set_property(TEST mitkImageWriterTest_nrrdImage PROPERTY LABELS MITK-Core)
 set_property(TEST mitkImageWriterTest_2DPNGImage PROPERTY LABELS MITK-Core)
 set_property(TEST mitkImageWriterTest_rgbPNGImage PROPERTY LABELS MITK-Core)
 set_property(TEST mitkImageWriterTest_rgbaPNGImage PROPERTY LABELS MITK-Core)
+endif() # TARGET ${TESTDRIVER}

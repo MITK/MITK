@@ -1,3 +1,4 @@
+if(TARGET ${TESTDRIVER})
 MITK_CREATE_MODULE_TESTS()
 mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES VTK|vtkTestingRendering)
 
@@ -35,3 +36,4 @@ mitkAddCustomModuleTest(mitkTextOverlay3DColorRenderingTest_ball mitkTextOverlay
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkTextOverlay3DColorRenderingTest_ball.png #corresponding reference screenshot
 )
 endif()
+endif() # TARGET ${TESTDRIVER}

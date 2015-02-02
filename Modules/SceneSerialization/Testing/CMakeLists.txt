@@ -1,4 +1,4 @@
-
+if(TARGET ${TESTDRIVER})
 MITK_CREATE_MODULE_TESTS(LABELS MITK-Modules)
 
 if(BUILD_TESTING AND MODULE_IS_ENABLED)
@@ -6,3 +6,4 @@ if(BUILD_TESTING AND MODULE_IS_ENABLED)
  ${MITK_DATA_DIR}/binary.stl)
   set_property(TEST mitkSceneIOTest_Pic3D.nrrd_binary.stl PROPERTY LABELS MITK-Modules)
 endif()
+endif() # TARGET ${TESTDRIVER}

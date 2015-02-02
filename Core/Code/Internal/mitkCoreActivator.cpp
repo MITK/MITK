@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // File IO
 #include <mitkIOUtil.h>
 #include <mitkIOMimeTypes.h>
-#include <Internal/mitkItkImageIO.h>
+#include <mitkItkImageIO.h>
 #include <Internal/mitkMimeTypeProvider.h>
 #include <Internal/mitkPointSetReaderService.h>
 #include <Internal/mitkPointSetWriterService.h>

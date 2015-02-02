@@ -24,8 +24,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-// This class wraps ITK image IO objects registered via the
-// ITK object factory system
+/**
+ * This class wraps ITK image IO objects as mitk::IFileReader and
+ * mitk::IFileWriter objects.
+ *
+ * Instantiating this class with a given itk::ImageIOBase instance
+ * will register corresponding MITK reader/writer services for that
+ * ITK ImageIO object.
+ */
 class ItkImageIO : public AbstractFileIO
 {
 
@@ -46,13 +52,15 @@ public:
   virtual void Write();
   virtual ConfidenceLevel GetWriterConfidenceLevel() const;
 
+protected:
+
+  virtual std::vector<std::string> FixUpImageIOExtensions(const std::string& imageIOName);
+
 private:
 
   ItkImageIO(const ItkImageIO& other);
 
   ItkImageIO* IOClone() const;
-
-  std::vector<std::string> FixUpImageIOExtensions(const std::string& imageIOName);
 
   itk::ImageIOBase::Pointer m_ImageIO;
 };

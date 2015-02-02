@@ -74,4 +74,4 @@ endif(MSVC_IDE OR MSVC_VERSION OR MINGW)
 
 add_subdirectory(TestingHelper)
 
-add_subdirectory(tests)
+add_subdirectory(test)

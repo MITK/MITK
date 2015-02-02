@@ -39,6 +39,7 @@ if(MITK_USE_Boost)
 
     if(WIN32)
       set(_shell_extension .bat)
+      set(_boost_layout)
       if(MSVC)
         if(MSVC_VERSION EQUAL 1600)
           set(_boost_toolset "msvc-10.0")
@@ -51,6 +52,7 @@ if(MITK_USE_Boost)
       set(_install_lib_dir "--libdir=<INSTALL_DIR>/bin")
     else()
       set(_shell_extension .sh)
+      set(_boost_layout "--layout=tagged")
     endif()
 
     set (APPLE_SYSROOT_FLAG)
@@ -81,7 +83,7 @@ if(MITK_USE_Boost)
 
     set(_build_cmd "<SOURCE_DIR>/b2"
         ${APPLE_SYSROOT_FLAG}
-        --layout=tagged
+        ${_boost_layout}
         "--prefix=<INSTALL_DIR>"
         ${_install_lib_dir}
         ${_with_boost_libs}

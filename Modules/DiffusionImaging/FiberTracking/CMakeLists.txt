@@ -19,7 +19,7 @@ endif()
 
 if(NOT _missing_deps)
 
-  set(lut_url http://mitk.org/download/data/FibertrackingLUT.tar.gz)
+  set(lut_url ${MITK_DATA_DOWNLOAD_PREFIX_URL}/FibertrackingLUT.tar.gz)
   set(lut_tarball ${CMAKE_CURRENT_BINARY_DIR}/FibertrackingLUT.tar.gz)
   message("Downloading FiberTracking LUT ${lut_url}...")
   file(DOWNLOAD ${lut_url} ${lut_tarball}

@@ -24,12 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkPoints.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkDebugLeaks.h>
 
 class mitkPointCloudScoringFilterTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPointCloudScoringFilterTestSuite);
-  vtkDebugLeaks::SetExitError(0);
   MITK_TEST(testPointCloudScoringFilterInitialization);
   MITK_TEST(testInputs);
   MITK_TEST(testOutput);

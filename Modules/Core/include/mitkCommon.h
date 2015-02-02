@@ -146,4 +146,22 @@ calling object*/
   #define DEPRECATED(func) func
 #endif
 
+/**
+ * Mark templates as exported to generate public RTTI symbols which are
+ * needed for GCC and Clang to support e.g. dynamic_cast between DSOs.
+ */
+#if defined(__clang__) || defined(__GNUC__)
+  #define MITK_EXPORT __attribute__ ((visibility ("default")))
+  #define MITK_IMPORT __attribute__ ((visibility ("default")))
+  #define MITK_LOCAL  __attribute__ ((visibility ("hidden")))
+#elif defined(WIN32)
+  #define MITK_EXPORT __declspec(dllexport)
+  #define MITK_IMPORT __declspec(dllimport)
+  #define MITK_LOCAL
+#else
+  #define MITK_EXPORT
+  #define MITK_IMPORT
+  #define MITK_LOCAL
+#endif
+
 #endif // MITK_COMMON_H_DEFINED

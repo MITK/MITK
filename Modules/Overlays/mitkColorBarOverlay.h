@@ -21,7 +21,7 @@
 #include <mitkLocalStorageHandler.h>
 #include <vtkSmartPointer.h>
 #include <vtkLookupTable.h>
-#include "MitkCoreExports.h"
+#include "MitkOverlaysExports.h"
 
 class vtkScalarBarActor;
 

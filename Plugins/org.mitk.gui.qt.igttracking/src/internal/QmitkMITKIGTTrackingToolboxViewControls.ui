@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>386</width>
+    <width>388</width>
     <height>601</height>
    </rect>
   </property>
@@ -371,7 +371,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QLabel" name="m_OptionsUpdateRateLabel">
            <property name="text">
-            <string>Update Rate [Hz]</string>
+            <string>Update Rate [per second]</string>
            </property>
           </widget>
          </item>
@@ -391,7 +391,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QSpinBox" name="m_UpdateRate">
            <property name="maximum">
-            <number>999</number>
+            <number>100</number>
            </property>
            <property name="value">
             <number>10</number>
@@ -401,9 +401,9 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="m_UseRenderUpdateRate">
+        <widget class="QCheckBox" name="m_UseDifferentUpdateRates">
          <property name="text">
-          <string>Use different Update Rate for Rendering</string>
+          <string>Use different Render and Log Update Rates</string>
          </property>
         </widget>
        </item>
@@ -411,6 +411,9 @@ p, li { white-space: pre-wrap; }
         <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,0">
          <item>
           <widget class="QLabel" name="m_OptionsRenderUpdateRateLabel">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Render Update Rate [fps]</string>
            </property>
@@ -431,11 +434,63 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <widget class="QSpinBox" name="m_RenderUpdateRate">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimum">
+            <number>0</number>
+           </property>
            <property name="maximum">
-            <number>999</number>
+            <number>100</number>
            </property>
            <property name="value">
             <number>10</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <item>
+          <widget class="QLabel" name="m_OptionsLogUpdateRateLabel">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Log Update Rate [per second]</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="m_LogUpdateRate">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>120</number>
+           </property>
+           <property name="singleStep">
+            <number>10</number>
+           </property>
+           <property name="value">
+            <number>60</number>
            </property>
           </widget>
          </item>

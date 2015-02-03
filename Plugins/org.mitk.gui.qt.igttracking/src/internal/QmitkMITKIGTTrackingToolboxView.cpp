@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkMITKIGTTrackingToolboxView.h"
+#include "QmitkTrackingDeviceConfigurationWidget.h"
 #include "QmitkStdMultiWidget.h"
 
 // Qt
@@ -326,7 +327,6 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   m_Worker->SetInverseMode(m_Controls->m_InverseMode->isChecked());
   m_Worker->SetNavigationToolStorage(this->m_toolStorage);
   m_Worker->SetTrackingDeviceData(data);
-
   //start worker thread
   m_WorkerThread->start();
 
@@ -692,8 +692,8 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   }
 
   //refresh view and status widget
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  m_Controls->m_TrackingToolsStatusWidget->Refresh();
+  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  //m_Controls->m_TrackingToolsStatusWidget->Refresh();
 
   //code to better isolate bug 17713, could be removed when bug 17713 is fixed
   static int i = 0;
@@ -933,16 +933,20 @@ void QmitkMITKIGTTrackingToolboxView::DisableOptionsButtons()
 {
   m_Controls->m_ShowTrackingVolume->setEnabled(false);
   m_Controls->m_UpdateRate->setEnabled(false);
+  m_Controls->m_RenderUpdateRate->setEnabled(false);
   m_Controls->m_ShowToolQuaternions->setEnabled(false);
   m_Controls->m_OptionsUpdateRateLabel->setEnabled(false);
+  m_Controls->m_OptionsRenderUpdateRateLabel->setEnabled(false);
 }
 
 void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
 {
   m_Controls->m_ShowTrackingVolume->setEnabled(true);
   m_Controls->m_UpdateRate->setEnabled(true);
+  m_Controls->m_RenderUpdateRate->setEnabled(true);
   m_Controls->m_ShowToolQuaternions->setEnabled(true);
   m_Controls->m_OptionsUpdateRateLabel->setEnabled(true);
+  m_Controls->m_OptionsRenderUpdateRateLabel->setEnabled(true);
 }
 
 void QmitkMITKIGTTrackingToolboxView::EnableTrackingControls()

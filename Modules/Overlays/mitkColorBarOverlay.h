@@ -28,7 +28,7 @@ class vtkScalarBarActor;
 namespace mitk {
 
 /** \brief Displays configurable scales on the renderwindow. The scale is determined by the image spacing. */
-class MITK_CORE_EXPORT ColorBarOverlay : public mitk::VtkOverlay {
+class MitkOverlays_EXPORT ColorBarOverlay : public mitk::VtkOverlay {
 public:
 
   class LocalStorage : public mitk::Overlay::BaseLocalStorage

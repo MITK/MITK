@@ -79,6 +79,9 @@ class MitkQtWidgetsExt_EXPORT QmitkHistogramJSWidget : public QWebView
   Q_PROPERTY(bool intensityProfile
              READ GetIntensityProfile)
 
+  Q_PROPERTY(double size
+             READ GetSize)
+
 public:
   typedef mitk::Image::HistogramType HistogramType;
   typedef mitk::Image::HistogramType::ConstIterator HistogramConstIteratorType;
@@ -155,6 +158,8 @@ public:
   */
   bool GetIntensityProfile();
 
+  double GetSize();
+
   /**
   * \brief Setter for reference image.
   *
@@ -203,6 +208,7 @@ private:
 
   bool m_UseLineGraph;
   bool m_IntensityProfile;
+  double m_Size;
 
   /**
   * Holds the current histogram

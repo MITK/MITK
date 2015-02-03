@@ -149,9 +149,23 @@ function updateHistogram()
  */
 function calcBinSize()
 {
-  min = d3.min(histogramData.measurement);
-  max = d3.max(histogramData.measurement);
-  binSize = ((max - min) / (histogramData.measurement.length));
+  window.alert(histogramData.size);
+
+  binSize = histogramData.size / histogramData.measurement.length;
+/*
+  if (1 < histogramData.measurement.length)
+  {
+    min = d3.min(histogramData.measurement);
+    max = d3.max(histogramData.measurement);
+    binSize = ((max - min) / (histogramData.measurement.length-1));
+  }
+  else
+  {
+    binsize = 10;
+  }
+*/
+  //window.alert(min); window.alert(max); window.alert(histogramData.measurement.length);
+  //window.alert(binSize);
 }
 
 /*
@@ -367,6 +381,7 @@ function definition()
     .scale(xScale)
     .orient("bottom")
     .tickFormat(d3.format("s"));
+
 
   yAxis = d3.svg.axis()
     .scale(yScale)

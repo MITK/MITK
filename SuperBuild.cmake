@@ -96,6 +96,7 @@ set(external_projects
   raptor2
   rasqal
   redland
+  OpenIGTLink
   )
 
 # These are "hard" dependencies and always set to ON
@@ -279,6 +280,7 @@ set(mitk_cmake_boolean_args
   MITK_USE_GLEW
   MITK_USE_OpenCL
   MITK_USE_OpenCV
+  MITK_USE_OpenIGTLink
   MITK_USE_Poco
   MITK_USE_Python
   MITK_USE_Redland
@@ -327,6 +329,7 @@ ExternalProject_Add(${proj}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
     ${OpenCV_DEPENDS}
+    ${OpenIGTLink_DEPENDS}
     ${Poco_DEPENDS}
     ${PCRE_DEPENDS}
     ${Swig_DEPENDS}
@@ -468,6 +471,7 @@ ExternalProject_Add(${proj}
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR
     -DACVD_DIR:PATH=${ACVD_DIR}
     -DOpenCV_DIR:PATH=${OpenCV_DIR}
+    -DOpenIGTLink_DIR:PATH=${OpenIGTLink_DIR}
     -DPoco_DIR:PATH=${Poco_DIR}
     -DPCRE_DIR:PATH=${PCRE_DIR}
     -DSwig_DIR:PATH=${Swig_DIR}

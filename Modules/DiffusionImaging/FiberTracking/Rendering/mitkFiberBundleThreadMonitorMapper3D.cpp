@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-#include "mitkFiberBundleXThreadMonitorMapper3D.h"
+#include "mitkFiberBundleThreadMonitorMapper3D.h"
 #include <mitkProperties.h>
 #include <vtkPropAssembly.h>
 //#include <vtkTextActor.h>
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-mitk::FiberBundleXThreadMonitorMapper3D::FiberBundleXThreadMonitorMapper3D()
+mitk::FiberBundleThreadMonitorMapper3D::FiberBundleThreadMonitorMapper3D()
 : m_FiberMonitorMapper(vtkSmartPointer<vtkPolyDataMapper>::New())
 , m_TextActorClose(vtkSmartPointer<vtkTextActor>::New())
 , m_TextActorOpen(vtkSmartPointer<vtkTextActor>::New())
@@ -50,15 +50,15 @@ mitk::FiberBundleXThreadMonitorMapper3D::FiberBundleXThreadMonitorMapper3D()
 }
 
 
-mitk::FiberBundleXThreadMonitorMapper3D::~FiberBundleXThreadMonitorMapper3D()
+mitk::FiberBundleThreadMonitorMapper3D::~FiberBundleThreadMonitorMapper3D()
 {
   m_FiberAssembly->Delete();
 }
 
 
-const mitk::FiberBundleXThreadMonitor* mitk::FiberBundleXThreadMonitorMapper3D::GetInput()
+const mitk::FiberBundleThreadMonitor* mitk::FiberBundleThreadMonitorMapper3D::GetInput()
 {
-  return static_cast<const mitk::FiberBundleXThreadMonitor * > ( GetDataNode()->GetData() );
+  return static_cast<const mitk::FiberBundleThreadMonitor * > ( GetDataNode()->GetData() );
 }
 
 
@@ -66,7 +66,7 @@ const mitk::FiberBundleXThreadMonitor* mitk::FiberBundleXThreadMonitorMapper3D::
  This method is called once the mapper gets new input,
  for UI rotation or changes in colorcoding this method is NOT called
  */
-void mitk::FiberBundleXThreadMonitorMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
+void mitk::FiberBundleThreadMonitorMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
@@ -81,7 +81,7 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateDataForRenderer( mitk::Bas
   m_lastModifiedMonitorNodeTime = node->GetMTime();
 
   //  MITK_INFO << m_LastUpdateTime;
-  FiberBundleXThreadMonitor* monitor = dynamic_cast<FiberBundleXThreadMonitor * > ( GetDataNode()->GetData() );
+  FiberBundleThreadMonitor* monitor = dynamic_cast<FiberBundleThreadMonitor * > ( GetDataNode()->GetData() );
 
 //  m_TextActor->SetInput( monitor->getTextL1().toStdString().c_str() );
   m_TextActorClose->SetInput( monitor->getBracketClose().toStdString().c_str() );
@@ -163,10 +163,10 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateDataForRenderer( mitk::Bas
 }
 
 
-void mitk::FiberBundleXThreadMonitorMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::FiberBundleThreadMonitorMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
 
-//  MITK_INFO << "FiberBundleXxXXMapper3D()SetDefaultProperties";
+//  MITK_INFO << "FiberBundlexXXMapper3D()SetDefaultProperties";
 
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
@@ -175,27 +175,27 @@ void mitk::FiberBundleXThreadMonitorMapper3D::SetDefaultProperties(mitk::DataNod
 
 }
 
-vtkProp* mitk::FiberBundleXThreadMonitorMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
+vtkProp* mitk::FiberBundleThreadMonitorMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
-  //MITK_INFO << "FiberBundleXxXXMapper3D()GetVTKProp";
+  //MITK_INFO << "FiberBundlexXXMapper3D()GetVTKProp";
   //this->GenerateData();
   return m_FiberAssembly;
 
 }
 
-void mitk::FiberBundleXThreadMonitorMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
+void mitk::FiberBundleThreadMonitorMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
-//  MITK_INFO << "FiberBundleXXXXMapper3D ApplyProperties(renderer)";
+//  MITK_INFO << "FiberBundleXXXMapper3D ApplyProperties(renderer)";
 }
 
-void mitk::FiberBundleXThreadMonitorMapper3D::UpdateVtkObjects()
+void mitk::FiberBundleThreadMonitorMapper3D::UpdateVtkObjects()
 {
-//  MITK_INFO << "FiberBundleXxxXMapper3D UpdateVtkObjects()";
+//  MITK_INFO << "FiberBundlexxXMapper3D UpdateVtkObjects()";
 
 
 }
 
-void mitk::FiberBundleXThreadMonitorMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *)
+void mitk::FiberBundleThreadMonitorMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *)
 {
 
 

@@ -333,7 +333,7 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
         else
             minSpacing = outImageSpacing[2];
 
-        mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+        mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
         directions->SetGeometry(geometry);
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData(directions);

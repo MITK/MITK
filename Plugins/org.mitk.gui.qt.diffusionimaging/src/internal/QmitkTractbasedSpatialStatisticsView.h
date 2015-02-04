@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkTbssTableModel.h"
 #include "QmitkTbssMetaTableModel.h"
 
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 
 
 // Image types
@@ -127,10 +127,10 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     void Plot(mitk::TbssImage*, mitk::TbssRoiImage*);
 
 
-    void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL);
+    void PlotFiberBundle(mitk::FiberBundle* fib, mitk::Image* img, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL);
 
 
-    void PlotFiber4D(mitk::TbssImage*, mitk::FiberBundleX* fib, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL);
+    void PlotFiber4D(mitk::TbssImage*, mitk::FiberBundle* fib, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL);
 
     // Create a point set. This point set defines the points through which a region of interest should go
     void InitPointsets();
@@ -150,7 +150,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     // Used to save the region of interest in a vector of itk::index.
     std::vector< itk::Index<3> > m_Roi;
 
-    mitk::FiberBundleX* m_Fib;
+    mitk::FiberBundle* m_Fib;
 
     mitk::BaseGeometry* m_CurrentGeometry;
 

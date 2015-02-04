@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTbssImage.h"
 #include "mitkPlanarFigure.h"
-#include "mitkFiberBundleX.h"
+#include "mitkFiberBundle.h"
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
 #include "mitkFiberBundleInteractor.h"
@@ -382,7 +382,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
 
         m_SelectedNode = node;
 
-        if (dynamic_cast<mitk::FiberBundleX*>(nodeData))
+        if (dynamic_cast<mitk::FiberBundle*>(nodeData))
         {
             // handle fiber bundle property observers
             if (m_Color.IsNotNull())
@@ -419,7 +419,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
 
             float range;
             node->GetFloatProperty("Fiber2DSliceThickness",range);
-            mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+            mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
             mitk::BaseGeometry::Pointer geo = fib->GetGeometry();
             mitk::ScalarType max = geo->GetExtentInMM(0);
             max = std::max(max, geo->GetExtentInMM(1));
@@ -773,19 +773,19 @@ void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
 
 void QmitkControlVisualizationPropertiesView::Fiber2DfadingEFX()
 {
-    if (m_SelectedNode && dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData()) )
+    if (m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()) )
     {
         bool currentMode;
         m_SelectedNode->GetBoolProperty("Fiber2DfadeEFX", currentMode);
         m_SelectedNode->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(!currentMode));
-        dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData())->RequestUpdate2D();
+        dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData())->RequestUpdate2D();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 }
 
 void QmitkControlVisualizationPropertiesView::FiberSlicingThickness2D()
 {
-    if (m_SelectedNode && dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData()))
+    if (m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
     {
         float fibThickness = m_Controls->m_FiberThicknessSlider->value() * 0.1;
         float currentThickness = 0;
@@ -793,7 +793,7 @@ void QmitkControlVisualizationPropertiesView::FiberSlicingThickness2D()
         if (fabs(fibThickness-currentThickness)<0.001)
             return;
         m_SelectedNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(fibThickness));
-        dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData())->RequestUpdate2D();
+        dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData())->RequestUpdate2D();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 }
@@ -810,7 +810,7 @@ void QmitkControlVisualizationPropertiesView::SetFiberBundleOpacity(const itk::E
 {
     if(m_SelectedNode)
     {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData());
         fib->RequestUpdate();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -818,11 +818,11 @@ void QmitkControlVisualizationPropertiesView::SetFiberBundleOpacity(const itk::E
 
 void QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor(const itk::EventObject& /*e*/)
 {
-    if(m_SelectedNode && dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData()))
+    if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
     {
         float color[3];
         m_SelectedNode->GetColor(color);
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData());
         fib->SetFiberColors(color[0]*255, color[1]*255, color[2]*255);
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -830,9 +830,9 @@ void QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor(const it
 
 void QmitkControlVisualizationPropertiesView::BundleRepresentationResetColoring()
 {
-    if(m_SelectedNode && dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData()))
+    if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
     {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData());
         fib->DoColorCodingOrientationBased();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -968,7 +968,7 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
     typedef std::vector<mitk::DataNode*> Container;
     Container _NodeSet = this->GetDataManagerSelection();
     mitk::DataNode* node = 0;
-    mitk::FiberBundleX* bundle = 0;
+    mitk::FiberBundle* bundle = 0;
     mitk::FiberBundleInteractor::Pointer bundleInteractor = 0;
 
     // finally add all nodes to the model
@@ -976,7 +976,7 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
         ; it++)
     {
         node = const_cast<mitk::DataNode*>(*it);
-        bundle = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+        bundle = dynamic_cast<mitk::FiberBundle*>(node->GetData());
 
         if(bundle)
         {
@@ -1006,7 +1006,7 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
 
 void QmitkControlVisualizationPropertiesView::TubeRadiusChanged()
 {
-    if(m_SelectedNode && dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData()))
+    if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
     {
         float newRadius = m_Controls->m_TubeWidth->value();
         m_SelectedNode->SetFloatProperty("TubeRadius", newRadius);
@@ -1016,7 +1016,7 @@ void QmitkControlVisualizationPropertiesView::TubeRadiusChanged()
 
 void QmitkControlVisualizationPropertiesView::LineWidthChanged()
 {
-    if(m_SelectedNode && dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData()))
+    if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
     {
         int newWidth = m_Controls->m_LineWidth->value();
         int currentWidth = 0;
@@ -1024,7 +1024,7 @@ void QmitkControlVisualizationPropertiesView::LineWidthChanged()
         if (currentWidth==newWidth)
             return;
         m_SelectedNode->SetIntProperty("LineWidth", newWidth);
-        dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData())->RequestUpdate();
+        dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData())->RequestUpdate();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 }

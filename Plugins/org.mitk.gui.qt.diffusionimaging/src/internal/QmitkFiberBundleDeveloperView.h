@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkDataStorageSelection.h>
 #include <mitkWeakPointer.h>
-#include <mitkFiberBundleXThreadMonitor.h>
+#include <mitkFiberBundleThreadMonitor.h>
 
 // Qt
 #include <QVector>
@@ -36,9 +36,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // VTK
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 
 #include <QTimer>
 #include <QThread>
@@ -52,7 +52,7 @@ class QmitkFiberBundleDeveloperView; //this include is needed for the struct ele
  */
 struct Package4WorkingThread
 {
-  mitk::FiberBundleX* st_FBX;
+  mitk::FiberBundle* st_FBX;
   QTimer* st_FancyGUITimer1;
   Ui::QmitkFiberBundleDeveloperViewControls* st_Controls;
 
@@ -66,7 +66,7 @@ struct Package4WorkingThread
   //==DO NOT TOUCH THIS SECTION=== you might extend this section, but do NOT shorten it! hai capito!
   //host MITK I/O elements, especially needed for thread monitoring
   QmitkFiberThreadMonitorWorker *st_fiberThreadMonitorWorker;
-  mitk::FiberBundleXThreadMonitor::Pointer st_FBX_Monitor; //needed for direct access do animation/fancy methods
+  mitk::FiberBundleThreadMonitor::Pointer st_FBX_Monitor; //needed for direct access do animation/fancy methods
   mitk::DataNode::Pointer st_ThreadMonitorDataNode; //needed for renderer to recognize node modifications
   mitk::DataNode::Pointer st_PassedDataNode; //put an extra node if needed
   mitk::DataStorage::Pointer st_DataStorage; //well that is discussable if needed ;-) probably not
@@ -343,7 +343,7 @@ private:
 
   //contains the selected FiberBundle, PlanarFigure
   mitk::DataNode::Pointer m_FiberBundleNode;
-  mitk::WeakPointer<mitk::FiberBundleX> m_FiberBundleX;
+  mitk::WeakPointer<mitk::FiberBundle> m_FiberBundle;
   mitk::PlanarFigure::Pointer m_PlanarFigure;
 
   //  radiobutton groups

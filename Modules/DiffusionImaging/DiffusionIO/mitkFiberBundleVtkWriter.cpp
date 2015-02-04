@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionIOMimeTypes.h"
 
 mitk::FiberBundleVtkWriter::FiberBundleVtkWriter()
-    : mitk::AbstractFileWriter(mitk::FiberBundleX::GetStaticNameOfClass(), mitk::DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE_NAME(), "VTK Fiber Bundle Reader")
+    : mitk::AbstractFileWriter(mitk::FiberBundle::GetStaticNameOfClass(), mitk::DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE_NAME(), "VTK Fiber Bundle Reader")
 {
     Options defaultOptions;
     defaultOptions["Save as binary file"] = true;
@@ -81,7 +81,7 @@ void mitk::FiberBundleVtkWriter::Write()
 
         std::string filename = this->GetOutputLocation().c_str();
 
-        mitk::FiberBundleX::ConstPointer input = dynamic_cast<const mitk::FiberBundleX*>(this->GetInput());
+        mitk::FiberBundle::ConstPointer input = dynamic_cast<const mitk::FiberBundle*>(this->GetInput());
         std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetOutputLocation().c_str());
         Options options = this->GetOptions();
 

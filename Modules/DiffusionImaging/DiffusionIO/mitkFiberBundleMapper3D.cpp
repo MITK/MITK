@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-#include "mitkFiberBundleXMapper3D.h"
+#include "mitkFiberBundleMapper3D.h"
 #include <mitkProperties.h>
 
 #include <vtkPropAssembly.h>
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCamera.h>
 #include <vtkTubeFilter.h>
 
-mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
+mitk::FiberBundleMapper3D::FiberBundleMapper3D()
     : m_TubeRadius(0.0)
     , m_TubeSides(15)
     , m_LineWidth(1)
@@ -37,15 +37,15 @@ mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
 }
 
 
-mitk::FiberBundleXMapper3D::~FiberBundleXMapper3D()
+mitk::FiberBundleMapper3D::~FiberBundleMapper3D()
 {
 
 }
 
 
-const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
+const mitk::FiberBundle* mitk::FiberBundleMapper3D::GetInput()
 {
-    return static_cast<const mitk::FiberBundleX * > ( GetDataNode()->GetData() );
+    return static_cast<const mitk::FiberBundle * > ( GetDataNode()->GetData() );
 }
 
 
@@ -53,9 +53,9 @@ const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
  This method is called once the mapper gets new input,
  for UI rotation or changes in colorcoding this method is NOT called
  */
-void mitk::FiberBundleXMapper3D::InternalGenerateData(mitk::BaseRenderer *renderer)
+void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *renderer)
 {
-    mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*> (GetDataNode()->GetData());
+    mitk::FiberBundle* fiberBundle = dynamic_cast<mitk::FiberBundle*> (GetDataNode()->GetData());
     if (fiberBundle == NULL)
         return;
 
@@ -108,7 +108,7 @@ void mitk::FiberBundleXMapper3D::InternalGenerateData(mitk::BaseRenderer *render
 
 
 
-void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
+void mitk::FiberBundleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
     bool visible = true;
     GetDataNode()->GetVisibility(visible, renderer, "visible");
@@ -116,7 +116,7 @@ void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
     const DataNode* node = this->GetDataNode();
     FBXLocalStorage3D* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
-    mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+    mitk::FiberBundle* fiberBundle = dynamic_cast<mitk::FiberBundle*>(node->GetData());
 
     // did any rendering properties change?
     float tubeRadius = 0;
@@ -153,7 +153,7 @@ void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
 }
 
 
-void mitk::FiberBundleXMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::FiberBundleMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
     Superclass::SetDefaultProperties(node, renderer, overwrite);
     node->AddProperty( "LineWidth", mitk::IntProperty::New( true ), renderer, overwrite );
@@ -165,22 +165,22 @@ void mitk::FiberBundleXMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk
     node->AddProperty( "TubeSides",mitk::IntProperty::New( 15 ), renderer, overwrite);
 }
 
-vtkProp* mitk::FiberBundleXMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
+vtkProp* mitk::FiberBundleMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
     return m_LocalStorageHandler.GetLocalStorage(renderer)->m_FiberAssembly;
 }
 
-void mitk::FiberBundleXMapper3D::UpdateVtkObjects()
+void mitk::FiberBundleMapper3D::UpdateVtkObjects()
 {
 
 }
 
-void mitk::FiberBundleXMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *)
+void mitk::FiberBundleMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *)
 {
 
 }
 
-mitk::FiberBundleXMapper3D::FBXLocalStorage3D::FBXLocalStorage3D()
+mitk::FiberBundleMapper3D::FBXLocalStorage3D::FBXLocalStorage3D()
 {
     m_FiberActor = vtkSmartPointer<vtkActor>::New();
     m_FiberMapper = vtkSmartPointer<vtkPolyDataMapper>::New();

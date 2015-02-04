@@ -137,7 +137,7 @@ void FiberCurvatureFilter::GenerateData()
     vtkSmartPointer<vtkPolyData> outputPoly = vtkSmartPointer<vtkPolyData>::New();
     outputPoly->SetPoints(vtkNewPoints);
     outputPoly->SetLines(vtkNewCells);
-    m_OutputFiberBundle = FiberBundleX::New(outputPoly);
+    m_OutputFiberBundle = FiberBundle::New(outputPoly);
 }
 
 }

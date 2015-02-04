@@ -15,12 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef FiberBundleXMapper3D_H_HEADER_INCLUDED
-#define FiberBundleXMapper3D_H_HEADER_INCLUDED
+#ifndef FiberBundleMapper3D_H_HEADER_INCLUDED
+#define FiberBundleMapper3D_H_HEADER_INCLUDED
 
 //#include <mitkBaseData.h> //?? necessary
 #include <mitkVtkMapper.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 
 #include <vtkSmartPointer.h>
 #include <vtkOpenGLPolyDataMapper.h>
@@ -37,19 +37,19 @@ class vtkPropAssembly;
 namespace mitk {
 
 //##Documentation
-//## @brief Mapper for FiberBundleX
+//## @brief Mapper for FiberBundle
 //## @ingroup Mapper
 
-class FiberBundleXMapper3D : public VtkMapper
+class FiberBundleMapper3D : public VtkMapper
 {
 public:
 
-    mitkClassMacro(FiberBundleXMapper3D, VtkMapper)
+    mitkClassMacro(FiberBundleMapper3D, VtkMapper)
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
     //========== essential implementation for 3D mapper ========
-    const FiberBundleX* GetInput();
+    const FiberBundle* GetInput();
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer); //looks like depricated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
@@ -82,8 +82,8 @@ public:
 
 protected:
 
-    FiberBundleXMapper3D();
-    virtual ~FiberBundleXMapper3D();
+    FiberBundleMapper3D();
+    virtual ~FiberBundleMapper3D();
     void InternalGenerateData(mitk::BaseRenderer *renderer);
 
     void UpdateVtkObjects(); //??
@@ -100,5 +100,5 @@ private:
 
 
 
-#endif /* FiberBundleXMapper3D_H_HEADER_INCLUDED */
+#endif /* FiberBundleMapper3D_H_HEADER_INCLUDED */
 

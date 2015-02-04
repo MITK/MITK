@@ -284,7 +284,7 @@ int StartPeakExtraction(int argc, char* argv[])
 
         // write vector field
         {
-            mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+            mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
 
             string outfilename = outRoot.c_str();
             outfilename.append("_VECTOR_FIELD.fib");

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkQBallImage.h>
 #include <itkGibbsTrackingFilter.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkIOUtil.h>
 
 using namespace mitk;
@@ -34,7 +34,7 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
 
   QBallImage::Pointer mitkQballImage;
   Image::Pointer mitkMaskImage;
-  mitk::FiberBundleX::Pointer fib1;
+  mitk::FiberBundle::Pointer fib1;
 
   try{
 
@@ -52,7 +52,7 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     MITK_TEST_CONDITION_REQUIRED(mitkMaskImage.IsNotNull(),"check mask image")
 
     infile = mitk::IOUtil::Load( argv[4]);
-    fib1 = dynamic_cast<mitk::FiberBundleX*>(infile.at(0).GetPointer());
+    fib1 = dynamic_cast<mitk::FiberBundle*>(infile.at(0).GetPointer());
     MITK_TEST_CONDITION_REQUIRED(fib1.IsNotNull(),"check fiber bundle")
 
     typedef itk::Vector<float, QBALL_ODFSIZE> OdfVectorType;
@@ -74,12 +74,12 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     gibbsTracker->SetLoadParameterFile(argv[3]);
     gibbsTracker->Update();
 
-    mitk::FiberBundleX::Pointer fib2 = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());
+    mitk::FiberBundle::Pointer fib2 = mitk::FiberBundle::New(gibbsTracker->GetFiberBundle());
     MITK_TEST_CONDITION_REQUIRED(fib1->Equals(fib2), "check if gibbs tracking has changed");
 
     gibbsTracker->SetRandomSeed(0);
     gibbsTracker->Update();
-    fib2 = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());
+    fib2 = mitk::FiberBundle::New(gibbsTracker->GetFiberBundle());
     MITK_TEST_CONDITION_REQUIRED(!fib1->Equals(fib2), "check if gibbs tracking has changed after wrong seed");
   }
   catch(...)

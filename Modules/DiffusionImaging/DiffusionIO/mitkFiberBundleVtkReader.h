@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkCommon.h>
 #include <mitkFileReader.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <vtkSmartPointer.h>
 
 #include <mitkAbstractFileReader.h>
@@ -49,4 +49,4 @@ namespace mitk
 
 } //namespace MITK
 
-#endif // __mitkFiberBundleXReader_h
+#endif // __mitkFiberBundleReader_h

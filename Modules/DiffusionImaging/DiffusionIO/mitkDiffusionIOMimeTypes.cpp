@@ -271,13 +271,13 @@ std::string DiffusionIOMimeTypes::QBI_MIMETYPE_NAME()
 
 std::string DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".fiberbundlex.vtk";
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".FiberBundle.vtk";
   return name;
 }
 
 std::string DiffusionIOMimeTypes::FIBERBUNDLE_TRK_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".fiberbundlex.trk";
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".FiberBundle.trk";
   return name;
 }
 

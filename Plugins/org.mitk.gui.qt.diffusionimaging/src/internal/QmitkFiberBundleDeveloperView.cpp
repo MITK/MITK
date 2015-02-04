@@ -116,7 +116,7 @@ void QmitkFiberExtractorWorker::run()
     //generate new fiberbundle by fiber iDs
     vtkSmartPointer<vtkPolyData> newFBPolyData = m_itemPackage.st_FBX->GeneratePolyDataByIds(fibIds);
 
-    // call function to convert fiberstructure into fiberbundleX and pass it to datastorage
+    // call function to convert fiberstructure into FiberBundle and pass it to datastorage
     (m_itemPackage.st_host->*m_itemPackage.st_pntr_to_Method_PutFibersToDataStorage)(newFBPolyData);
 
 
@@ -164,7 +164,7 @@ void QmitkFiberColoringWorker::run()
         m_itemPackage.st_PassedDataNode->SetOpacity(0.999);
         m_itemPackage.st_FBX->DoUseFaFiberOpacity();
     } else if(m_itemPackage.st_Controls->radioButton_ColorCustom->isChecked()){
-        m_itemPackage.st_FBX->SetColorCoding(mitk::FiberBundleX::COLORCODING_CUSTOM);
+        m_itemPackage.st_FBX->SetColorCoding(mitk::FiberBundle::COLORCODING_CUSTOM);
     }
 
 
@@ -301,7 +301,7 @@ void QmitkFiberGenerateRandomWorker::run()
     clock.Stop();
     //MITK_INFO << "=====Assambling random Fibers to Polydata======\nMean: " << clock.GetMean() << " Total: " << clock.GetTotal() << std::endl;
 
-    // call function to convert fiberstructure into fiberbundleX and pass it to datastorage
+    // call function to convert fiberstructure into FiberBundle and pass it to datastorage
     (m_itemPackage.st_host->*m_itemPackage.st_pntr_to_Method_PutFibersToDataStorage)(PDRandom);
 
     /* MEASUREMENTS AND FANCY GUI EFFECTS CLEANUP */
@@ -691,7 +691,7 @@ QmitkFiberBundleDeveloperView::QmitkFiberBundleDeveloperView()
 // Destructor
 QmitkFiberBundleDeveloperView::~QmitkFiberBundleDeveloperView()
 {
-    //m_FiberBundleX->Delete(); using weakPointer, therefore no delete necessary
+    //m_FiberBundle->Delete(); using weakPointer, therefore no delete necessary
     delete m_hostThread;
 }
 
@@ -880,7 +880,7 @@ void QmitkFiberBundleDeveloperView::DoExtractFibers()
     connect( localTimer, SIGNAL(timeout()), this, SLOT( UpdateExtractFibersTimer()) );
 
     struct Package4WorkingThread ItemPackageForExtractor;
-    ItemPackageForExtractor.st_FBX = m_FiberBundleX;
+    ItemPackageForExtractor.st_FBX = m_FiberBundle;
     ItemPackageForExtractor.st_Controls = m_Controls;
     ItemPackageForExtractor.st_FancyGUITimer1 = localTimer;
     ItemPackageForExtractor.st_host = this; //needed to access method "PutFibersToDataStorage()"
@@ -948,10 +948,10 @@ void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkSmartPointer<vtkP
 
     MITK_INFO << "lines: " << threadOutput->GetNumberOfLines() << "pnts: " << threadOutput->GetNumberOfPoints();
     //qthread mutex lock
-    mitk::FiberBundleX::Pointer FB = mitk::FiberBundleX::New(threadOutput);
+    mitk::FiberBundle::Pointer FB = mitk::FiberBundle::New(threadOutput);
     mitk::DataNode::Pointer FBNode;
     FBNode = mitk::DataNode::New();
-    FBNode->SetName("FiberBundleX");
+    FBNode->SetName("FiberBundle");
     FBNode->SetData(FB);
     FBNode->SetVisibility(true);
     FBNode->SetOpacity(1.0);
@@ -1061,7 +1061,7 @@ void QmitkFiberBundleDeveloperView::GenerateVtkFibersRandom()
     connect( localTimer, SIGNAL(timeout()), this, SLOT(UpdateGenerateRandomFibersTimer()) );
 
     struct Package4WorkingThread ItemPackageForRandomGenerator;
-    ItemPackageForRandomGenerator.st_FBX = m_FiberBundleX;
+    ItemPackageForRandomGenerator.st_FBX = m_FiberBundle;
     ItemPackageForRandomGenerator.st_Controls = m_Controls;
     ItemPackageForRandomGenerator.st_FancyGUITimer1 = localTimer;
     ItemPackageForRandomGenerator.st_host = this; //needed to access method "PutFibersToDataStorage()"
@@ -1215,7 +1215,7 @@ void QmitkFiberBundleDeveloperView::DoSetFAValues()
 
     // pack items which are needed by thread processing
     struct Package4WorkingThread ItemPackageToSetFAMap;
-    ItemPackageToSetFAMap.st_FBX = m_FiberBundleX;
+    ItemPackageToSetFAMap.st_FBX = m_FiberBundle;
     ItemPackageToSetFAMap.st_FancyGUITimer1 = localTimer;
     ItemPackageToSetFAMap.st_PassedDataNode = m_FANode;
     ItemPackageToSetFAMap.st_Controls = m_Controls;
@@ -1291,14 +1291,14 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberSetFA()
 void QmitkFiberBundleDeveloperView::DoColorFibers()
 {
     //
-    MITK_INFO << "call fibercoloring in fiberBundleX";
+    MITK_INFO << "call fibercoloring in FiberBundle";
     QTimer *localTimer = new QTimer; // timer must be initialized here, otherwise timer is not fancy enough
     localTimer->setInterval( 10 );
     connect( localTimer, SIGNAL(timeout()), this, SLOT( UpdateColorFibersTimer() ) );
 
     // pack items which are needed by thread processing
     struct Package4WorkingThread ItemPackageForFiberColoring;
-    ItemPackageForFiberColoring.st_FBX = m_FiberBundleX;
+    ItemPackageForFiberColoring.st_FBX = m_FiberBundle;
     ItemPackageForFiberColoring.st_PassedDataNode = m_FiberBundleNode;
     ItemPackageForFiberColoring.st_FancyGUITimer1 = localTimer;
     ItemPackageForFiberColoring.st_Controls = m_Controls; //needed to catch up some selections and set options in GUI
@@ -1351,7 +1351,7 @@ void QmitkFiberBundleDeveloperView::AfterThread_FiberColorCoding()
 
 void QmitkFiberBundleDeveloperView::DoGatherColorCodings()
 {
-    QStringList fbxColorCodings = m_FiberBundleX->GetAvailableColorCodings();
+    QStringList fbxColorCodings = m_FiberBundle->GetAvailableColorCodings();
 
     //update dropDown Menu
     //remove all items from menu
@@ -1363,10 +1363,10 @@ void QmitkFiberBundleDeveloperView::DoGatherColorCodings()
     }
     //fill new data into menu
     m_Controls->ddAvailableColorcodings->addItems(fbxColorCodings);
-    m_Controls->ddAvailableColorcodings->addItem(m_FiberBundleX->COLORCODING_CUSTOM);
+    m_Controls->ddAvailableColorcodings->addItem(m_FiberBundle->COLORCODING_CUSTOM);
 
     //highlight current colorcoding
-    QString cc = m_FiberBundleX->GetCurrentColorCoding();
+    QString cc = m_FiberBundle->GetCurrentColorCoding();
     MITK_INFO << cc.toStdString().c_str() << " is at idx: " << m_Controls->ddAvailableColorcodings->findText(cc);
     m_Controls->ddAvailableColorcodings->setCurrentIndex( m_Controls->ddAvailableColorcodings->findText(cc) );
     m_Controls->ddAvailableColorcodings->update();
@@ -1378,7 +1378,7 @@ void QmitkFiberBundleDeveloperView::SetCurrentColorCoding(int idx)
 {
     if(!m_suppressSignal){
         QString selectedColorCoding = m_Controls->ddAvailableColorcodings->itemText(idx);
-        m_FiberBundleX->SetColorCoding(selectedColorCoding.toStdString().c_str() ); //QString to char
+        m_FiberBundle->SetColorCoding(selectedColorCoding.toStdString().c_str() ); //QString to char
         // update rendering
         m_FiberBundleNode->Modified();
         m_MultiWidget->ForceImmediateUpdate();
@@ -1463,7 +1463,7 @@ void QmitkFiberBundleDeveloperView::UpdateFiberIDTimer()
 
 }
 
-/* Initialie ID dataset in FiberBundleX */
+/* Initialie ID dataset in FiberBundle */
 void QmitkFiberBundleDeveloperView::DoGenerateFiberIDs()
 {
 
@@ -1476,7 +1476,7 @@ void QmitkFiberBundleDeveloperView::DoGenerateFiberIDs()
 
     // pack items which are needed by thread processing
     struct Package4WorkingThread FiberIdPackage;
-    FiberIdPackage.st_FBX = m_FiberBundleX;
+    FiberIdPackage.st_FBX = m_FiberBundle;
     FiberIdPackage.st_FancyGUITimer1 = localTimer;
     FiberIdPackage.st_Controls = m_Controls;
 
@@ -1541,9 +1541,9 @@ void  QmitkFiberBundleDeveloperView::FeedFiberInfoWidget()
         m_Controls->infoAnalyseNumOfFibers->setEnabled(true);
 
     QString numOfFibers;
-    numOfFibers.setNum( m_FiberBundleX->GetFiberPolyData()->GetNumberOfLines() );
+    numOfFibers.setNum( m_FiberBundle->GetFiberPolyData()->GetNumberOfLines() );
     QString numOfPoints;
-    numOfPoints.setNum( m_FiberBundleX->GetFiberPolyData()->GetNumberOfPoints() );
+    numOfPoints.setNum( m_FiberBundle->GetFiberPolyData()->GetNumberOfPoints() );
 
     m_Controls->infoAnalyseNumOfFibers->setText( numOfFibers );
     m_Controls->infoAnalyseNumOfPoints->setText( numOfPoints );
@@ -1554,7 +1554,7 @@ void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
     // show/reset items of selected toolbox page FiberInfo
     if (m_Controls->page_FiberInfo->isVisible())
     {
-        if (m_FiberBundleX != NULL) {
+        if (m_FiberBundle != NULL) {
             FeedFiberInfoWidget();
 
         } else {
@@ -1567,7 +1567,7 @@ void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
     // show/reset items of selected toolbox page FiberProcessing
     if (m_Controls->page_FiberProcessing->isVisible())
     {
-        if (m_FiberBundleX.IsNotNull() && m_PlanarFigure.IsNotNull() )
+        if (m_FiberBundle.IsNotNull() && m_PlanarFigure.IsNotNull() )
         {
             //show fiber extraction button
             m_Controls->buttonExtractFibers->setEnabled(true);
@@ -1576,7 +1576,7 @@ void QmitkFiberBundleDeveloperView::SelectionChangedToolBox(int idx)
             m_Controls->buttonExtractFibers->setEnabled(false);
         }
 
-        if (m_FiberBundleX.IsNotNull())
+        if (m_FiberBundle.IsNotNull())
         {
             //show button colorCoding
             m_Controls->buttonColorFibers->setEnabled(true);
@@ -1616,7 +1616,7 @@ void QmitkFiberBundleDeveloperView::FBXDependendGUIElementsConfigurator()
 
 void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
 {
-    //check if in datanode exists already a node of type mitkFiberBundleXThreadMonitor
+    //check if in datanode exists already a node of type mitkFiberBundleThreadMonitor
     //if not then put node to datastorage
 
     //if checkStatus is 1 then start qtimer using fading in starting text in datanode
@@ -1626,7 +1626,7 @@ void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
     {
         m_fiberMonitorIsOn = true;
         // Generate Node hosting thread information
-        mitk::FiberBundleXThreadMonitor::Pointer FBXThreadMonitor = mitk::FiberBundleXThreadMonitor::New();
+        mitk::FiberBundleThreadMonitor::Pointer FBXThreadMonitor = mitk::FiberBundleThreadMonitor::New();
         FBXThreadMonitor->SetGeometry(this->GenerateStandardGeometryForMITK());
 
         m_MonitorNode = mitk::DataNode::New();
@@ -1707,12 +1707,12 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
 
     if (nodes.empty())
         return;
-    /* ==== reset everyhing related to FiberBundleX ======
-   * - variable m_FiberBundleX
+    /* ==== reset everyhing related to FiberBundle ======
+   * - variable m_FiberBundle
    * - visualization of analysed fiberbundle
    */
     m_FiberBundleNode = NULL;
-    m_FiberBundleX = NULL; //reset pointer, so that member does not point to depricated locations
+    m_FiberBundle = NULL; //reset pointer, so that member does not point to depricated locations
     m_PlanarFigure = NULL;
     ResetFiberInfoWidget();
 
@@ -1733,19 +1733,19 @@ void QmitkFiberBundleDeveloperView::OnSelectionChanged( std::vector<mitk::DataNo
         mitk::DataNode::Pointer node = *it;
 
         /* CHECKPOINT: FIBERBUNDLE*/
-        if( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
+        if( node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()) )
         {
             m_FiberBundleNode = node;
-            m_FiberBundleX = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
-            if (m_FiberBundleX.IsNull()){
-                MITK_INFO << "========ATTENTION=========\n unable to load selected FiberBundleX to FiberBundleDeveloper-plugin \n";
+            m_FiberBundle = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+            if (m_FiberBundle.IsNull()){
+                MITK_INFO << "========ATTENTION=========\n unable to load selected FiberBundle to FiberBundleDeveloper-plugin \n";
                 m_FiberBundleNode = NULL;
             }
             // ==== FIBERBUNDLE_INFO ELEMENTS ====
             if ( m_Controls->page_FiberInfo->isVisible() )
                 FeedFiberInfoWidget();
 
-            // enable FiberBundleX related Gui Elements, such as buttons etc.
+            // enable FiberBundle related Gui Elements, such as buttons etc.
             this->FBXDependendGUIElementsConfigurator();
             this->DoGatherColorCodings();
 

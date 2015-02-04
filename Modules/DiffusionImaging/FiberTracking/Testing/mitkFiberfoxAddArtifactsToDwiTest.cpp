@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestingMacros.h>
 #include <mitkIOUtil.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <itkAddArtifactsToDwiImageFilter.h>
 #include <mitkFiberfoxParameters.h>
 #include <mitkStickModel.h>

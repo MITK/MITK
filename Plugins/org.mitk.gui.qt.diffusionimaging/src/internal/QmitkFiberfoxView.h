@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVectorImage.h>
 #include <itkVectorContainer.h>
 #include <itkOrientationDistributionFunction.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkPlanarEllipse.h>
 #include <mitkDiffusionNoiseModel.h>
 #include <mitkDiffusionSignalModel.h>

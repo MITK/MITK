@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkImage.h>
 #include <mitkIOUtil.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include "mitkCommandLineParser.h"
 
 using namespace mitk;
@@ -51,9 +51,9 @@ int main(int argc, char* argv[])
         {
             mitk::IOUtil::Save(dynamic_cast<Image*>(baseData[0].GetPointer()), outName.c_str());
         }
-        else if ( baseData.size()>0 && dynamic_cast<FiberBundleX*>(baseData[0].GetPointer()) )
+        else if ( baseData.size()>0 && dynamic_cast<FiberBundle*>(baseData[0].GetPointer()) )
         {
-            mitk::IOUtil::Save(dynamic_cast<FiberBundleX*>(baseData[0].GetPointer()) ,outName.c_str());
+            mitk::IOUtil::Save(dynamic_cast<FiberBundle*>(baseData[0].GetPointer()) ,outName.c_str());
         }
         else
             std::cout << "File type currently not supported!";

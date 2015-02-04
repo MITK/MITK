@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef FIBERBUNDLEXMAPPER2D_H_HEADER_INCLUDED
-#define FIBERBUNDLEXMAPPER2D_H_HEADER_INCLUDED
+#ifndef FiberBundleMAPPER2D_H_HEADER_INCLUDED
+#define FiberBundleMAPPER2D_H_HEADER_INCLUDED
 
 //MITK Rendering
 #include <mitkCommon.h>
@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <MitkFiberTrackingExports.h>
 
 #include <mitkVtkMapper.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <vtkSmartPointer.h>
 
 
@@ -41,14 +41,14 @@ namespace mitk {
 
 struct IShaderRepository;
 
-class FiberBundleXMapper2D : public VtkMapper
+class FiberBundleMapper2D : public VtkMapper
 {
 
 public:
-    mitkClassMacro(FiberBundleXMapper2D, VtkMapper);
+    mitkClassMacro(FiberBundleMapper2D, VtkMapper);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
-    mitk::FiberBundleX* GetInput();
+    mitk::FiberBundle* GetInput();
 
 
     /** \brief Checks whether this mapper needs to update itself and generate data. */
@@ -89,8 +89,8 @@ public:
 
 
 protected:
-    FiberBundleXMapper2D();
-    virtual ~FiberBundleXMapper2D();
+    FiberBundleMapper2D();
+    virtual ~FiberBundleMapper2D();
 
     /** Does the actual resampling, without rendering. */
     virtual void GenerateDataForRenderer(mitk::BaseRenderer*);

@@ -15,13 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef FiberBundleXThreadMonitorMapper3D_H_HEADER_INCLUDED
-#define FiberBundleXThreadMonitorMapper3D_H_HEADER_INCLUDED
+#ifndef FiberBundleThreadMonitorMapper3D_H_HEADER_INCLUDED
+#define FiberBundleThreadMonitorMapper3D_H_HEADER_INCLUDED
 
 //#include <mitkBaseData.h> //?? necessary
 #include <MitkFiberTrackingExports.h>
 #include <mitkVtkMapper.h>
-#include <mitkFiberBundleXThreadMonitor.h>
+#include <mitkFiberBundleThreadMonitor.h>
 
 #include <vtkSmartPointer.h>
 #include <vtkPolyDataMapper.h>
@@ -37,19 +37,19 @@ class vtkPropAssembly;
 namespace mitk {
 
   //##Documentation
-  //## @brief Mapper for FiberBundleX
+  //## @brief Mapper for FiberBundle
   //## @ingroup Mapper
 
-  class MitkFiberTracking_EXPORT FiberBundleXThreadMonitorMapper3D : public VtkMapper
+  class MitkFiberTracking_EXPORT FiberBundleThreadMonitorMapper3D : public VtkMapper
   {
   public:
 
-    mitkClassMacro(FiberBundleXThreadMonitorMapper3D, VtkMapper);
+    mitkClassMacro(FiberBundleThreadMonitorMapper3D, VtkMapper);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
     //========== essential implementation for 3D mapper ========
-    const FiberBundleXThreadMonitor* GetInput();
+    const FiberBundleThreadMonitor* GetInput();
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer); //looks like depricated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);
@@ -59,8 +59,8 @@ namespace mitk {
 
   protected:
 
-    FiberBundleXThreadMonitorMapper3D();
-    virtual ~FiberBundleXThreadMonitorMapper3D();
+    FiberBundleThreadMonitorMapper3D();
+    virtual ~FiberBundleThreadMonitorMapper3D();
 
     void UpdateVtkObjects(); //??
 
@@ -86,5 +86,5 @@ namespace mitk {
 
 
 
-#endif /* FiberBundleXMapper3D_H_HEADER_INCLUDED */
+#endif /* FiberBundleMapper3D_H_HEADER_INCLUDED */
 

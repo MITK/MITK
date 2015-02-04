@@ -83,7 +83,7 @@ int TractogramAngularError(int argc, char* argv[])
         typedef itk::EvaluateTractogramDirectionsFilter< float >                EvaluationFilterType;
 
         // load fiber bundle
-        mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
+        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
         if (!inputTractogram)
             return EXIT_FAILURE;
 

@@ -367,7 +367,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_TemplateComboBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_FiberBundleComboBox->SetDataStorage(this->GetDataStorage());
 
-        mitk::TNodePredicateDataType<mitk::FiberBundleX>::Pointer isFiberBundle = mitk::TNodePredicateDataType<mitk::FiberBundleX>::New();
+        mitk::TNodePredicateDataType<mitk::FiberBundle>::Pointer isFiberBundle = mitk::TNodePredicateDataType<mitk::FiberBundle>::New();
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
         mitk::NodePredicateIsDWI::Pointer isDwi = mitk::NodePredicateIsDWI::New( );
         mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
@@ -1676,7 +1676,7 @@ void QmitkFiberfoxView::AlignOnGrid()
         for( mitk::DataStorage::SetOfObjects::const_iterator it = parentFibs->begin(); it != parentFibs->end(); ++it )
         {
             mitk::DataNode::Pointer pFibNode = *it;
-            if ( pFibNode.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(pFibNode->GetData()) )
+            if ( pFibNode.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(pFibNode->GetData()) )
             {
                 mitk::DataStorage::SetOfObjects::ConstPointer parentImgs = GetDataStorage()->GetSources(pFibNode);
                 for( mitk::DataStorage::SetOfObjects::const_iterator it2 = parentImgs->begin(); it2 != parentImgs->end(); ++it2 )
@@ -1749,7 +1749,7 @@ void QmitkFiberfoxView::AlignOnGrid()
         for( mitk::DataStorage::SetOfObjects::const_iterator it = derivations->begin(); it != derivations->end(); ++it )
         {
             mitk::DataNode::Pointer fibNode = *it;
-            if ( fibNode.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(fibNode->GetData()) )
+            if ( fibNode.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(fibNode->GetData()) )
             {
                 mitk::DataStorage::SetOfObjects::ConstPointer derivations2 = GetDataStorage()->GetDerivations(fibNode);
                 for( mitk::DataStorage::SetOfObjects::const_iterator it2 = derivations2->begin(); it2 != derivations2->end(); ++it2 )
@@ -1878,7 +1878,7 @@ void QmitkFiberfoxView::OnAddBundle()
 
     mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedImage);
 
-    mitk::FiberBundleX::Pointer bundle = mitk::FiberBundleX::New();
+    mitk::FiberBundle::Pointer bundle = mitk::FiberBundle::New();
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( bundle );
     QString name = QString("Bundle_%1").arg(children->size());
@@ -1948,7 +1948,7 @@ void QmitkFiberfoxView::GenerateFibers()
 
         mitk::DataStorage::SetOfObjects::ConstPointer parents = GetDataStorage()->GetSources(m_SelectedFiducial);
         for( mitk::DataStorage::SetOfObjects::const_iterator it = parents->begin(); it != parents->end(); ++it )
-            if(dynamic_cast<mitk::FiberBundleX*>((*it)->GetData()))
+            if(dynamic_cast<mitk::FiberBundle*>((*it)->GetData()))
                 m_SelectedBundles.push_back(*it);
 
         if (m_SelectedBundles.empty())
@@ -2015,7 +2015,7 @@ void QmitkFiberfoxView::GenerateFibers()
             parameters.m_FiberGen.m_FlipList.push_back(flip);
         }
         else if (fib.size()>0)
-            m_SelectedBundles.at(i)->SetData( mitk::FiberBundleX::New() );
+            m_SelectedBundles.at(i)->SetData( mitk::FiberBundle::New() );
 
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -2023,7 +2023,7 @@ void QmitkFiberfoxView::GenerateFibers()
     itk::FibersFromPlanarFiguresFilter::Pointer filter = itk::FibersFromPlanarFiguresFilter::New();
     filter->SetParameters(parameters.m_FiberGen);
     filter->Update();
-    vector< mitk::FiberBundleX::Pointer > fiberBundles = filter->GetFiberBundles();
+    vector< mitk::FiberBundle::Pointer > fiberBundles = filter->GetFiberBundles();
 
     for (unsigned int i=0; i<fiberBundles.size(); i++)
     {
@@ -2108,7 +2108,7 @@ void QmitkFiberfoxView::SimulateForExistingDwi(mitk::DataNode* imageNode)
 
 void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
 {
-    mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(fiberNode->GetData());
+    mitk::FiberBundle::Pointer fiberBundle = dynamic_cast<mitk::FiberBundle*>(fiberNode->GetData());
     if (fiberBundle->GetNumFibers()<=0)
         return;
 
@@ -2198,7 +2198,7 @@ void QmitkFiberfoxView::ApplyTransform()
         for( mitk::DataStorage::SetOfObjects::const_iterator it = derivations->begin(); it != derivations->end(); ++it )
         {
             mitk::DataNode::Pointer fibNode = *it;
-            if ( fibNode.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(fibNode->GetData()) )
+            if ( fibNode.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(fibNode->GetData()) )
                 selectedBundles.push_back(fibNode);
         }
     }
@@ -2209,7 +2209,7 @@ void QmitkFiberfoxView::ApplyTransform()
     {
         for (std::vector<mitk::DataNode::Pointer>::const_iterator it = selectedBundles.begin(); it!=selectedBundles.end(); ++it)
         {
-            mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+            mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>((*it)->GetData());
             fib->RotateAroundAxis(m_Controls->m_XrotBox->value(), m_Controls->m_YrotBox->value(), m_Controls->m_ZrotBox->value());
             fib->TranslateFibers(m_Controls->m_XtransBox->value(), m_Controls->m_YtransBox->value(), m_Controls->m_ZtransBox->value());
             fib->ScaleFibers(m_Controls->m_XscaleBox->value(), m_Controls->m_YscaleBox->value(), m_Controls->m_ZscaleBox->value());
@@ -2354,8 +2354,8 @@ void QmitkFiberfoxView::CopyBundles()
             }
         }
 
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
-        mitk::FiberBundleX::Pointer newBundle = fib->GetDeepCopy();
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>((*it)->GetData());
+        mitk::FiberBundle::Pointer newBundle = fib->GetDeepCopy();
         QString name((*it)->GetName().c_str());
         name += "_copy";
 
@@ -2400,13 +2400,13 @@ void QmitkFiberfoxView::JoinBundles()
     }
 
     std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedBundles.begin();
-    mitk::FiberBundleX::Pointer newBundle = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+    mitk::FiberBundle::Pointer newBundle = dynamic_cast<mitk::FiberBundle*>((*it)->GetData());
     QString name("");
     name += QString((*it)->GetName().c_str());
     ++it;
     for (; it!=m_SelectedBundles.end(); ++it)
     {
-        newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundleX*>((*it)->GetData()));
+        newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundle*>((*it)->GetData()));
         name += "+"+QString((*it)->GetName().c_str());
     }
 
@@ -2510,13 +2510,13 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
             m_SelectedImages.push_back(node);
             m_SelectedImage = node;
         }
-        else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
+        else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()) )
         {
             m_SelectedBundles2.push_back(node);
             if (m_Controls->m_RealTimeFibers->isChecked())
             {
                 m_SelectedBundles.push_back(node);
-                mitk::FiberBundleX::Pointer newFib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+                mitk::FiberBundle::Pointer newFib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
                 if (newFib->GetNumFibers()!=m_Controls->m_FiberDensityBox->value())
                     GenerateFibers();
             }
@@ -2532,7 +2532,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
             for( mitk::DataStorage::SetOfObjects::const_iterator it = parents->begin(); it != parents->end(); ++it )
             {
                 mitk::DataNode::Pointer pNode = *it;
-                if ( pNode.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(pNode->GetData()) )
+                if ( pNode.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(pNode->GetData()) )
                     m_SelectedBundles.push_back(pNode);
             }
         }
@@ -2577,7 +2577,7 @@ void QmitkFiberfoxView::NodeRemoved(const mitk::DataNode* node)
     mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
     std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it = m_DataNodeToPlanarFigureData.find(nonConstNode);
 
-    if (dynamic_cast<FiberBundleX*>(node->GetData()))
+    if (dynamic_cast<FiberBundle*>(node->GetData()))
     {
         m_SelectedBundles.clear();
         m_SelectedBundles2.clear();

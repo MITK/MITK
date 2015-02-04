@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef _MITK_FiberBundleX_H
-#define _MITK_FiberBundleX_H
+#ifndef _MITK_FiberBundle_H
+#define _MITK_FiberBundle_H
 
 //includes for MITK datastructure
 #include <mitkBaseData.h>
@@ -43,7 +43,7 @@ namespace mitk {
 
 /**
    * \brief Base Class for Fiber Bundles;   */
-class MitkFiberTracking_EXPORT FiberBundleX : public BaseData
+class MitkFiberTracking_EXPORT FiberBundle : public BaseData
 {
 public:
 
@@ -58,7 +58,7 @@ public:
     virtual bool VerifyRequestedRegion();
     virtual void SetRequestedRegion(const itk::DataObject*);
 
-    mitkClassMacro( FiberBundleX, BaseData )
+    mitkClassMacro( FiberBundle, BaseData )
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     mitkNewMacro1Param(Self, vtkSmartPointer<vtkPolyData>) // custom constructor
@@ -94,14 +94,14 @@ public:
     itk::Matrix< double, 3, 3 > TransformMatrix(itk::Matrix< double, 3, 3 > m, double rx, double ry, double rz);
 
     // add/subtract fibers
-    FiberBundleX::Pointer AddBundle(FiberBundleX* fib);
-    FiberBundleX::Pointer SubtractBundle(FiberBundleX* fib);
+    FiberBundle::Pointer AddBundle(FiberBundle* fib);
+    FiberBundle::Pointer SubtractBundle(FiberBundle* fib);
 
     // fiber subset extraction
-    FiberBundleX::Pointer           ExtractFiberSubset(BaseData* roi);
+    FiberBundle::Pointer           ExtractFiberSubset(BaseData* roi);
     std::vector<long>               ExtractFiberIdSubset(BaseData* roi);
-    FiberBundleX::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false);
-    FiberBundleX::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
+    FiberBundle::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false);
+    FiberBundle::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
 
     vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> ); // TODO: make protected
     void                            GenerateFiberIds(); // TODO: make protected
@@ -131,18 +131,18 @@ public:
     unsigned long GetNumberOfPoints();
 
     // copy fiber bundle
-    mitk::FiberBundleX::Pointer GetDeepCopy();
+    mitk::FiberBundle::Pointer GetDeepCopy();
 
     // compare fiber bundles
-    bool Equals(FiberBundleX* fib, double eps=0.0001);
+    bool Equals(FiberBundle* fib, double eps=0.0001);
 
     itkSetMacro( ReferenceGeometry, mitk::BaseGeometry::Pointer )
     itkGetConstMacro( ReferenceGeometry, mitk::BaseGeometry::Pointer )
 
 protected:
 
-    FiberBundleX( vtkPolyData* fiberPolyData = NULL );
-    virtual ~FiberBundleX();
+    FiberBundle( vtkPolyData* fiberPolyData = NULL );
+    virtual ~FiberBundle();
 
     itk::Point<float, 3> GetItkPoint(double point[3]);
 
@@ -175,4 +175,4 @@ private:
 
 } // namespace mitk
 
-#endif /*  _MITK_FiberBundleX_H */
+#endif /*  _MITK_FiberBundle_H */

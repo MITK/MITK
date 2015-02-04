@@ -14,34 +14,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkFiberBundleXSerializer.h"
-#include "mitkFiberBundleX.h"
+#include "mitkFiberBundleSerializer.h"
+#include "mitkFiberBundle.h"
 #include "mitkFiberBundleVtkWriter.h"
 
 #include <itksys/SystemTools.hxx>
 #include <mitkIOUtil.h>
 
 
-MITK_REGISTER_SERIALIZER(FiberBundleXSerializer)
+MITK_REGISTER_SERIALIZER(FiberBundleSerializer)
 
 
-mitk::FiberBundleXSerializer::FiberBundleXSerializer()
+mitk::FiberBundleSerializer::FiberBundleSerializer()
 {
 }
 
 
-mitk::FiberBundleXSerializer::~FiberBundleXSerializer()
+mitk::FiberBundleSerializer::~FiberBundleSerializer()
 {
 }
 
 
-std::string mitk::FiberBundleXSerializer::Serialize()
+std::string mitk::FiberBundleSerializer::Serialize()
 {
-  const FiberBundleX* fb = dynamic_cast<const FiberBundleX*>( m_Data.GetPointer() );
+  const FiberBundle* fb = dynamic_cast<const FiberBundle*>( m_Data.GetPointer() );
   if (fb == NULL)
   {
     MITK_ERROR << " Object at " << (const void*) this->m_Data
-              << " is not an mitk::FiberBundleX. Cannot serialize as FiberBundleX.";
+              << " is not an mitk::FiberBundle. Cannot serialize as FiberBundle.";
     return "";
   }
 
@@ -56,7 +56,7 @@ std::string mitk::FiberBundleXSerializer::Serialize()
 
   try
   {
-    mitk::IOUtil::Save(const_cast<FiberBundleX*>(fb),fullname);
+    mitk::IOUtil::Save(const_cast<FiberBundle*>(fb),fullname);
   }
   catch (std::exception& e)
   {

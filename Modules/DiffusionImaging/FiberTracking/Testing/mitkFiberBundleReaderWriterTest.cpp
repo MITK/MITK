@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTestingMacros.h"
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkBaseData.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkTestingConfig.h>
@@ -23,18 +23,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestFixture.h"
 
-class mitkFiberBundleXReaderWriterTestSuite : public mitk::TestFixture
+class mitkFiberBundleReaderWriterTestSuite : public mitk::TestFixture
 {
 
-  CPPUNIT_TEST_SUITE(mitkFiberBundleXReaderWriterTestSuite);
+  CPPUNIT_TEST_SUITE(mitkFiberBundleReaderWriterTestSuite);
   MITK_TEST(Equal_SaveLoad_ReturnsTrue);
   CPPUNIT_TEST_SUITE_END();
 
 private:
 
   /** Members used inside the different (sub-)tests. All members are initialized via setUp().*/
-  mitk::FiberBundleX::Pointer fib1;
-  mitk::FiberBundleX::Pointer fib2;
+  mitk::FiberBundle::Pointer fib1;
+  mitk::FiberBundle::Pointer fib2;
 
 public:
 
@@ -48,7 +48,7 @@ public:
     std::vector<mitk::BaseData::Pointer> fibInfile = mitk::IOUtil::Load( filename);
     mitk::BaseData::Pointer baseData = fibInfile.at(0);
 
-    fib1 = dynamic_cast<mitk::FiberBundleX*>(baseData.GetPointer());
+    fib1 = dynamic_cast<mitk::FiberBundle*>(baseData.GetPointer());
   }
 
   void tearDown()
@@ -61,11 +61,11 @@ public:
   {
     mitk::IOUtil::Save(fib1.GetPointer(), std::string(MITK_TEST_OUTPUT_DIR)+"/writerTest.fib");
     std::vector<mitk::BaseData::Pointer> baseData = mitk::IOUtil::Load(std::string(MITK_TEST_OUTPUT_DIR)+"/writerTest.fib");
-    fib2 = dynamic_cast<mitk::FiberBundleX*>(baseData[0].GetPointer());
+    fib2 = dynamic_cast<mitk::FiberBundle*>(baseData[0].GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Should be equal", fib1->Equals(fib2));
     //MITK_ASSERT_EQUAL(fib1, fib2, "A saved and re-loaded file should be equal");
   }
 
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkFiberBundleXReaderWriter)
+MITK_TEST_SUITE_REGISTRATION(mitkFiberBundleReaderWriter)

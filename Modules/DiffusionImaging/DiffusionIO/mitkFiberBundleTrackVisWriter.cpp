@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionIOMimeTypes.h"
 
 mitk::FiberBundleTrackVisWriter::FiberBundleTrackVisWriter()
-    : mitk::AbstractFileWriter(mitk::FiberBundleX::GetStaticNameOfClass(), mitk::DiffusionIOMimeTypes::FIBERBUNDLE_TRK_MIMETYPE_NAME(), "TrackVis Fiber Bundle Reader")
+    : mitk::AbstractFileWriter(mitk::FiberBundle::GetStaticNameOfClass(), mitk::DiffusionIOMimeTypes::FIBERBUNDLE_TRK_MIMETYPE_NAME(), "TrackVis Fiber Bundle Reader")
 {
     //    Options defaultOptions;
     //    this->SetDefaultOptions(defaultOptions);
@@ -78,7 +78,7 @@ void mitk::FiberBundleTrackVisWriter::Write()
 
         std::string filename = this->GetOutputLocation().c_str();
 
-        mitk::FiberBundleX::ConstPointer input = dynamic_cast<const mitk::FiberBundleX*>(this->GetInput());
+        mitk::FiberBundle::ConstPointer input = dynamic_cast<const mitk::FiberBundle*>(this->GetInput());
         std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetOutputLocation().c_str());
 
         // default extension is .fib

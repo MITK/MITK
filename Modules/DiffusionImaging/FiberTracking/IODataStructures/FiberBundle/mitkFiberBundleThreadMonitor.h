@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITK_FiberBundleXThreadMonitor_H
-#define _MITK_FiberBundleXThreadMonitor_H
+#ifndef _MITK_FiberBundleThreadMonitor_H
+#define _MITK_FiberBundleThreadMonitor_H
 
 //includes for MITK datastructure
 #include "mitkBaseData.h"
@@ -30,7 +30,7 @@ namespace mitk {
 
   /**
    * \brief Base Class for Fiber Bundles;   */
-  class Mitk FiberTracking_EXPORT FiberBundleXThreadMonitor : public BaseData
+  class Mitk FiberTracking_EXPORT FiberBundleThreadMonitor : public BaseData
   {
 
   public:
@@ -43,7 +43,7 @@ namespace mitk {
     virtual void SetRequestedRegion(const itk::DataObject *data );
     //=======================================
 
-    mitkClassMacro( FiberBundleXThreadMonitor, BaseData );
+    mitkClassMacro( FiberBundleThreadMonitor, BaseData );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -103,8 +103,8 @@ namespace mitk {
 
 
   protected:
-    FiberBundleXThreadMonitor();
-    virtual ~FiberBundleXThreadMonitor();
+    FiberBundleThreadMonitor();
+    virtual ~FiberBundleThreadMonitor();
 
 
   private:
@@ -151,4 +151,4 @@ namespace mitk {
 
 } // namespace mitk
 
-#endif /*  _MITK_FiberBundleX_H */
+#endif /*  _MITK_FiberBundle_H */

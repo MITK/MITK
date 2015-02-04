@@ -23,7 +23,7 @@
 #include "vnl/algo/vnl_svd.h"
 #include "itkVectorContainer.h"
 #include "itkVectorImage.h"
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <itkOrientationDistributionFunction.h>
 
 namespace itk{
@@ -89,7 +89,7 @@ Image< Vector< PixelType, 3 >, 3 > >
     itkSetMacro( NormalizationMethod, NormalizationMethods) ///< normalization method of ODF peaks
 
     // output
-    itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)                ///< vector field (peak sizes rescaled for visualization purposes)
+    itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)                ///< vector field (peak sizes rescaled for visualization purposes)
     itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)  ///< container for output peaks
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                  ///< number of peaks per voxel
 
@@ -127,7 +127,7 @@ Image< Vector< PixelType, 3 >, 3 > >
     double                                      m_AngularThreshold;     ///< directions closer together than the specified threshold that remain after clustering are discarded (largest is kept) (in rad)
     const int                                   m_NumCoeffs;            ///< number of spherical harmonics coefficients
 
-    mitk::FiberBundleX::Pointer               m_OutputFiberBundle;      ///< vector field (peak sizes rescaled for visualization purposes)
+    mitk::FiberBundle::Pointer               m_OutputFiberBundle;      ///< vector field (peak sizes rescaled for visualization purposes)
     ItkDirectionImageContainer::Pointer       m_DirectionImageContainer;///< container for output peaks
     ItkUcharImgType::Pointer                  m_NumDirectionsImage;     ///< number of peaks per voxel
     ItkUcharImgType::Pointer                  m_MaskImage;              ///< only voxels inside the binary mask are processed

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAbstractFileWriter.h>
 
-#include "mitkFiberBundleX.h"
+#include "mitkFiberBundle.h"
 #include <vtkPolyDataWriter.h>
 
 
@@ -115,4 +115,4 @@ public:
 
 } // end of namespace mitk
 
-#endif //__mitkFiberBundleXWriter_h
+#endif //__mitkFiberBundleWriter_h

@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
         typedef itk::EvaluateDirectionImagesFilter< float >                     EvaluationFilterType;
 
         // load fiber bundle
-        mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
+        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
 
         // load reference directions
         ItkDirectionImageContainerType::Pointer referenceImageContainer = ItkDirectionImageContainerType::New();
@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
         if (verbose)
         {
             // write vector field
-            mitk::FiberBundleX::Pointer directions = fOdfFilter->GetOutputFiberBundle();
+            mitk::FiberBundle::Pointer directions = fOdfFilter->GetOutputFiberBundle();
 
             string outfilename = outRoot;
             outfilename.append("_VECTOR_FIELD.fib");

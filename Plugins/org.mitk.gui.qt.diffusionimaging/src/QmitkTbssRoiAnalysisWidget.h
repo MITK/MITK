@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_diffusionimaging_Export.h>
 
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkTbssImage.h>
 
 #include <itkVectorImage.h>
@@ -65,7 +65,7 @@ public:
 
 
   void PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
-                   mitk::FiberBundleX *fib,
+                   mitk::FiberBundle *fib,
                    mitk::PlanarFigure* startRoi,
                    mitk::PlanarFigure* endRoi,
                    int number);
@@ -135,7 +135,7 @@ public:
   }
 
 
-  void PlotFiberBetweenRois(mitk::FiberBundleX *fib, mitk::Image* img,
+  void PlotFiberBetweenRois(mitk::FiberBundle *fib, mitk::Image* img,
                             mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg=-1, int number=25);
 
 
@@ -151,7 +151,7 @@ public:
 
 protected:
 
-  mitk::FiberBundleX* m_Fib;
+  mitk::FiberBundle* m_Fib;
 
 
   std::vector< std::vector<double> > m_Vals;
@@ -163,7 +163,7 @@ protected:
 
   std::vector< std::vector<double> > CalculateGroupProfiles();
   std::vector< std::vector<double> > CalculateGroupProfilesFibers(mitk::TbssImage::Pointer tbssImage,
-                                                                  mitk::FiberBundleX *fib,
+                                                                  mitk::FiberBundle *fib,
                                                                   mitk::PlanarFigure* startRoi,
                                                                   mitk::PlanarFigure* endRoi,
                                                                   int number);
@@ -215,13 +215,13 @@ protected:
   mitk::PlanarFigure* m_CurrentEndRoi;
 
 
-  void DoPlotFiberBundles(mitk::FiberBundleX *fib, mitk::Image* img,
+  void DoPlotFiberBundles(mitk::FiberBundle *fib, mitk::Image* img,
                           mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg=false, int number=25);
 
 
 
-  /* \brief Creates tracts from a mitk::FiberBundleX and two planar figures indicating the start end end point */
-  TractContainerType CreateTracts(mitk::FiberBundleX *fib, mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi);
+  /* \brief Creates tracts from a mitk::FiberBundle and two planar figures indicating the start end end point */
+  TractContainerType CreateTracts(mitk::FiberBundle *fib, mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi);
 
 
 

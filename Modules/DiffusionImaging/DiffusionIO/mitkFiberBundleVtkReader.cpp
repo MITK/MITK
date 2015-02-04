@@ -77,7 +77,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleVtkReader::Read
       if ( reader->GetOutput() != NULL )
       {
         vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput();
-        FiberBundleX::Pointer fiberBundle = FiberBundleX::New(fiberPolyData);
+        FiberBundle::Pointer fiberBundle = FiberBundle::New(fiberPolyData);
 
         vtkSmartPointer<vtkFloatArray> weights = vtkFloatArray::SafeDownCast(fiberPolyData->GetCellData()->GetArray("FIBER_WEIGHTS"));
         if (weights!=NULL)
@@ -198,7 +198,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleVtkReader::Read
         cleaner->SetInputData(fiberPolyData);
         cleaner->Update();
         fiberPolyData = cleaner->GetOutput();
-        FiberBundleX::Pointer image = FiberBundleX::New(fiberPolyData);
+        FiberBundle::Pointer image = FiberBundle::New(fiberPolyData);
         result.push_back(image.GetPointer());
         return result;
       }

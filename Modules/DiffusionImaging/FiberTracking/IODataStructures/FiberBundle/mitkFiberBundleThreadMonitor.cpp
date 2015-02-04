@@ -15,11 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkFiberBundleXThreadMonitor.h"
+#include "mitkFiberBundleThreadMonitor.h"
 
 
 
-mitk::FiberBundleXThreadMonitor::FiberBundleXThreadMonitor()
+mitk::FiberBundleThreadMonitor::FiberBundleThreadMonitor()
 : m_monitorBracketOpen("[")
 , m_monitorBracketClose("]")
 , m_monitorHeading("Monitoring Fiberprocessing Threads")
@@ -55,19 +55,19 @@ mitk::FiberBundleXThreadMonitor::FiberBundleXThreadMonitor()
   m_monitorStatusOpacity = 0;
 }
 
-mitk::FiberBundleXThreadMonitor::~FiberBundleXThreadMonitor()
+mitk::FiberBundleThreadMonitor::~FiberBundleThreadMonitor()
 {
 
 }
 
 
-QString mitk::FiberBundleXThreadMonitor::getBracketOpen(){
+QString mitk::FiberBundleThreadMonitor::getBracketOpen(){
   return m_monitorBracketOpen;
 }
-mitk::Point2D mitk::FiberBundleXThreadMonitor::getBracketOpenPosition(){
+mitk::Point2D mitk::FiberBundleThreadMonitor::getBracketOpenPosition(){
   return m_monitorBracketOpenPosition;
 }
-void mitk::FiberBundleXThreadMonitor::setBracketOpenPosition(mitk::Point2D pnt){
+void mitk::FiberBundleThreadMonitor::setBracketOpenPosition(mitk::Point2D pnt){
   m_monitorBracketOpenPosition[0] = pnt[0];
   m_monitorBracketOpenPosition[1] = pnt[1];
 }
@@ -75,53 +75,53 @@ void mitk::FiberBundleXThreadMonitor::setBracketOpenPosition(mitk::Point2D pnt){
 
 
 
-QString mitk::FiberBundleXThreadMonitor::getBracketClose(){
+QString mitk::FiberBundleThreadMonitor::getBracketClose(){
   return m_monitorBracketClose;
 }
-mitk::Point2D mitk::FiberBundleXThreadMonitor::getBracketClosePosition(){
+mitk::Point2D mitk::FiberBundleThreadMonitor::getBracketClosePosition(){
   return m_monitorBracketClosePosition;
 }
-void mitk::FiberBundleXThreadMonitor::setBracketClosePosition(mitk::Point2D pnt){
+void mitk::FiberBundleThreadMonitor::setBracketClosePosition(mitk::Point2D pnt){
   m_monitorBracketClosePosition[0] = pnt[0];
   m_monitorBracketClosePosition[1] = pnt[1];
 }
 
 
 
-QString mitk::FiberBundleXThreadMonitor::getHeading(){
+QString mitk::FiberBundleThreadMonitor::getHeading(){
   return m_monitorHeading;
 }
-mitk::Point2D mitk::FiberBundleXThreadMonitor::getHeadingPosition(){
+mitk::Point2D mitk::FiberBundleThreadMonitor::getHeadingPosition(){
   return m_monitorHeadingPosition;
 }
-void mitk::FiberBundleXThreadMonitor::setHeadingPosition(mitk::Point2D pnt){
+void mitk::FiberBundleThreadMonitor::setHeadingPosition(mitk::Point2D pnt){
   m_monitorHeadingPosition[0] = pnt[0];
   m_monitorHeadingPosition[1] = pnt[1];
 }
-int mitk::FiberBundleXThreadMonitor::getHeadingOpacity(){
+int mitk::FiberBundleThreadMonitor::getHeadingOpacity(){
   return m_monitorHeadingOpacity;
 }
-void mitk::FiberBundleXThreadMonitor::setHeadingOpacity(int opacity){
+void mitk::FiberBundleThreadMonitor::setHeadingOpacity(int opacity){
   m_monitorHeadingOpacity = opacity;
 }
 
 
 
 
-QString mitk::FiberBundleXThreadMonitor::getMask(){
+QString mitk::FiberBundleThreadMonitor::getMask(){
   return m_monitorMask;
 }
-mitk::Point2D mitk::FiberBundleXThreadMonitor::getMaskPosition(){
+mitk::Point2D mitk::FiberBundleThreadMonitor::getMaskPosition(){
   return m_monitorMaskPosition;
 }
-void mitk::FiberBundleXThreadMonitor::setMaskPosition(mitk::Point2D pnt){
+void mitk::FiberBundleThreadMonitor::setMaskPosition(mitk::Point2D pnt){
   m_monitorMaskPosition[0] = pnt[0];
   m_monitorMaskPosition[1] = pnt[1];
 }
-int mitk::FiberBundleXThreadMonitor::getMaskOpacity(){
+int mitk::FiberBundleThreadMonitor::getMaskOpacity(){
   return m_monitorMaskOpacity;
 }
-void mitk::FiberBundleXThreadMonitor::setMaskOpacity(int opacity){
+void mitk::FiberBundleThreadMonitor::setMaskOpacity(int opacity){
   m_monitorMaskOpacity = opacity;
 }
 
@@ -129,125 +129,125 @@ void mitk::FiberBundleXThreadMonitor::setMaskOpacity(int opacity){
 
 
 
-QString mitk::FiberBundleXThreadMonitor::getStatus(){
+QString mitk::FiberBundleThreadMonitor::getStatus(){
   return m_monitorStatus;
 }
-void mitk::FiberBundleXThreadMonitor::setStatus(QString status){
+void mitk::FiberBundleThreadMonitor::setStatus(QString status){
   m_statusMutex.lock();
   m_monitorStatus = status;
   m_statusMutex.unlock();
 }
-mitk::Point2D mitk::FiberBundleXThreadMonitor::getStatusPosition(){
+mitk::Point2D mitk::FiberBundleThreadMonitor::getStatusPosition(){
   return m_monitorStatusPosition;
 }
-void mitk::FiberBundleXThreadMonitor::setStatusPosition(mitk::Point2D pnt){
+void mitk::FiberBundleThreadMonitor::setStatusPosition(mitk::Point2D pnt){
   m_monitorStatusPosition[0] = pnt[0];
   m_monitorStatusPosition[1] = pnt[1];
 }
-int mitk::FiberBundleXThreadMonitor::getStatusOpacity(){
+int mitk::FiberBundleThreadMonitor::getStatusOpacity(){
   return m_monitorStatusOpacity;
 }
-void mitk::FiberBundleXThreadMonitor::setStatusOpacity(int opacity){
+void mitk::FiberBundleThreadMonitor::setStatusOpacity(int opacity){
   m_monitorStatusOpacity = opacity;
 }
 
 
-int mitk::FiberBundleXThreadMonitor::getStarted(){
+int mitk::FiberBundleThreadMonitor::getStarted(){
   return m_monitorStarted;
 }
 /* is thread safe :) */
-void mitk::FiberBundleXThreadMonitor::setStarted(int val)
+void mitk::FiberBundleThreadMonitor::setStarted(int val)
 {
   m_startedMutex.lock();
   m_monitorStarted = val;
   m_startedMutex.unlock();
 }
-mitk::Point2D mitk::FiberBundleXThreadMonitor::getStartedPosition(){
+mitk::Point2D mitk::FiberBundleThreadMonitor::getStartedPosition(){
   return m_monitorStartedPosition;
 }
-void mitk::FiberBundleXThreadMonitor::setStartedPosition(mitk::Point2D pnt){
+void mitk::FiberBundleThreadMonitor::setStartedPosition(mitk::Point2D pnt){
   m_monitorStartedPosition[0] = pnt[0];
   m_monitorStartedPosition[1] = pnt[1];
 }
-int mitk::FiberBundleXThreadMonitor::getStartedOpacity(){
+int mitk::FiberBundleThreadMonitor::getStartedOpacity(){
   return m_monitorStartedOpacity;
 }
-void mitk::FiberBundleXThreadMonitor::setStartedOpacity(int opacity){
+void mitk::FiberBundleThreadMonitor::setStartedOpacity(int opacity){
   m_monitorStartedOpacity = opacity;
 }
 
 
 
 
-int mitk::FiberBundleXThreadMonitor::getFinished(){
+int mitk::FiberBundleThreadMonitor::getFinished(){
   return m_monitorFinished;
 }
-void mitk::FiberBundleXThreadMonitor::setFinished(int val)
+void mitk::FiberBundleThreadMonitor::setFinished(int val)
 {
   m_finishedMutex.lock();
   m_monitorFinished = val;
   m_finishedMutex.unlock();
 }
-mitk::Point2D mitk::FiberBundleXThreadMonitor::getFinishedPosition(){
+mitk::Point2D mitk::FiberBundleThreadMonitor::getFinishedPosition(){
   return m_monitorFinishedPosition;
 }
-void mitk::FiberBundleXThreadMonitor::setFinishedPosition(mitk::Point2D pnt){
+void mitk::FiberBundleThreadMonitor::setFinishedPosition(mitk::Point2D pnt){
   m_monitorFinishedPosition[0] = pnt[0];
   m_monitorFinishedPosition[1] = pnt[1];
 }
-int mitk::FiberBundleXThreadMonitor::getFinishedOpacity(){
+int mitk::FiberBundleThreadMonitor::getFinishedOpacity(){
   return m_monitorFinishedOpacity;
 }
-void mitk::FiberBundleXThreadMonitor::setFinishedOpacity(int opacity){
+void mitk::FiberBundleThreadMonitor::setFinishedOpacity(int opacity){
   m_monitorFinishedOpacity = opacity;
 }
 
 
 
 
-int mitk::FiberBundleXThreadMonitor::getTerminated(){
+int mitk::FiberBundleThreadMonitor::getTerminated(){
   return m_monitorTerminated;
 }
-void mitk::FiberBundleXThreadMonitor::setTerminated(int val)
+void mitk::FiberBundleThreadMonitor::setTerminated(int val)
 {
   m_terminatedMutex.lock();
   m_monitorTerminated = val;
   m_terminatedMutex.unlock();
 }
-mitk::Point2D mitk::FiberBundleXThreadMonitor::getTerminatedPosition(){
+mitk::Point2D mitk::FiberBundleThreadMonitor::getTerminatedPosition(){
   return m_monitorTerminatedPosition;
 }
-void mitk::FiberBundleXThreadMonitor::setTerminatedPosition(mitk::Point2D pnt){
+void mitk::FiberBundleThreadMonitor::setTerminatedPosition(mitk::Point2D pnt){
   m_monitorTerminatedPosition[0] = pnt[0];
   m_monitorTerminatedPosition[1] = pnt[1];
 }
-int mitk::FiberBundleXThreadMonitor::getTerminatedOpacity(){
+int mitk::FiberBundleThreadMonitor::getTerminatedOpacity(){
   return m_monitorTerminatedOpacity;
 }
-void mitk::FiberBundleXThreadMonitor::setTerminatedOpacity(int opacity){
+void mitk::FiberBundleThreadMonitor::setTerminatedOpacity(int opacity){
   m_monitorTerminatedOpacity = opacity;
 }
 
 
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
-void mitk::FiberBundleXThreadMonitor::UpdateOutputInformation()
+void mitk::FiberBundleThreadMonitor::UpdateOutputInformation()
 {
 
 }
-void mitk::FiberBundleXThreadMonitor::SetRequestedRegionToLargestPossibleRegion()
+void mitk::FiberBundleThreadMonitor::SetRequestedRegionToLargestPossibleRegion()
 {
 
 }
-bool mitk::FiberBundleXThreadMonitor::RequestedRegionIsOutsideOfTheBufferedRegion()
+bool mitk::FiberBundleThreadMonitor::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
   return false;
 }
-bool mitk::FiberBundleXThreadMonitor::VerifyRequestedRegion()
+bool mitk::FiberBundleThreadMonitor::VerifyRequestedRegion()
 {
   return true;
 }
-void mitk::FiberBundleXThreadMonitor::SetRequestedRegion(const itk::DataObject *data )
+void mitk::FiberBundleThreadMonitor::SetRequestedRegion(const itk::DataObject *data )
 {
 
 }

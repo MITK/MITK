@@ -227,6 +227,7 @@ env_option(MITK_USE_Redland "Use the Redland RDF library" OFF)
 env_option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
 env_option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 env_option(MITK_USE_SimpleITK "Use the SimpleITK library" OFF)
+env_option(MITK_USE_OpenIGTLink "Use the OpenIGTLink library" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 
 option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)

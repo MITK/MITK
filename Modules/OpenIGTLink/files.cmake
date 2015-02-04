@@ -3,6 +3,7 @@ set(CPP_FILES
   mitkIGTLServer.cpp
   mitkIGTLDevice.cpp
   mitkIGTLMessageSource.cpp
+  mitkIGTLMessageCommon.cpp
   mitkIGTLDeviceSource.cpp
   mitkIGTLMessage.cpp
   mitkIGTLMessageFactory.cpp

@@ -79,7 +79,7 @@ namespace itk
     MapIterator mapIt;
     typename TLabelImage::RegionType Subregion;
 
-    double baseOfSkewnessAndCurtosis;
+    double baseOfSkewnessAndCurtosis = 0.0;
     double kurtosis = 0.0;
     double skewness = 0.0;
 
@@ -107,38 +107,30 @@ namespace itk
         double mean  = GetMean( *it );
         Subregion = Superclass::GetRegion(*it);
 
-        if ( sigma != 0 )
+        int count( GetCount(*it) );
+        if ( count == 0 || sigma==0)
         {
-          ImageRegionConstIteratorWithIndex< TInputImage > it1 (this->GetInput(),
-            Subregion);
-          ImageRegionConstIterator< TLabelImage > labelIt (this->GetLabelInput(),
-            Subregion);
-
-          for (it1.GoToBegin(); !it1.IsAtEnd(); ++it1, ++labelIt)
-          {
-            if (labelIt.Get() == *it)
-            {
-              baseOfSkewnessAndCurtosis = (it1.Get() -mean) / sigma;
-              kurtosis += std::pow( baseOfSkewnessAndCurtosis, 4.0 );
-              skewness += std::pow( baseOfSkewnessAndCurtosis, 3.0 );
-            }
-          }
-
-          if ( GetCount(*it) == 0 )
-          {
-            throw std::logic_error( "Empty segmentation" );
-          }
-
-          m_LabelStatisticsCoefficients[*it].m_Skewness = double(skewness/GetCount(*it));
-          m_LabelStatisticsCoefficients[*it].m_Kurtosis = double(kurtosis/GetCount(*it));
-
-        }
-        else
-        {
-          m_LabelStatisticsCoefficients[*it].m_Kurtosis = -1;
-          m_LabelStatisticsCoefficients[*it].m_Skewness = -1;
+          throw std::logic_error( "Empty segmentation" );
         }
 
+
+        ImageRegionConstIteratorWithIndex< TInputImage > it1 (this->GetInput(),
+          Subregion);
+        ImageRegionConstIterator< TLabelImage > labelIt (this->GetLabelInput(),
+          Subregion);
+
+        for (it1.GoToBegin(); !it1.IsAtEnd(); ++it1, ++labelIt)
+        {
+          if (labelIt.Get() == *it)
+          {
+            baseOfSkewnessAndCurtosis = (it1.Get() -mean) / sigma;
+            kurtosis += std::pow( baseOfSkewnessAndCurtosis, 4.0 );
+            skewness += std::pow( baseOfSkewnessAndCurtosis, 3.0 );
+          }
+        }
+
+        m_LabelStatisticsCoefficients[*it].m_Skewness = double(skewness/count);
+        m_LabelStatisticsCoefficients[*it].m_Kurtosis = double(kurtosis/count);
       }
     }
   }
@@ -148,6 +140,7 @@ namespace itk
   void ExtendedLabelStatisticsImageFilter< TInputImage, TLabelImage >::
     AfterThreadedGenerateData()
   {
+
     Superclass::AfterThreadedGenerateData();
 
     ComputeTheSkewnessAndKurtosis();

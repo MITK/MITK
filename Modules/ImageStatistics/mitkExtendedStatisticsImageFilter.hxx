@@ -119,8 +119,12 @@ namespace itk
     RealType kurtosis = 0;
     RealType skewness = 0;
 
-    if ( sigma != 0 )
+    if (  sigma == 0 )
     {
+      throw std::logic_error( "Empty segmentation" );
+    }
+
+
       ImageRegionConstIterator< TInputImage > it (this->GetInput(), this->GetInput()->GetLargestPossibleRegion() );
 
       int counter = 0;
@@ -139,12 +143,7 @@ namespace itk
 
       kurtosis = kurtosis / counter;
       skewness = skewness / counter;
-    }
-    else
-    {
-      kurtosis = -1;
-      skewness = -1;
-    }
+
 
     this->GetKurtosisOutput()->Set( kurtosis );
     this->GetSkewnessOutput()->Set( skewness );

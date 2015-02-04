@@ -113,7 +113,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     void OnAutoDetectTools();
 
     /** @brief Slot for tracking timer. The timer updates the IGT pipline and also the logging filter if logging is activated.*/
-    void UpdateTrackingTimer();
+    void UpdateRenderTrackingTimer();
+    void UpdateLoggingTrackingTimer();
 
     /** @brief Resets the Tracking Tools: this means all tools are removed. */
     void OnResetTools();
@@ -140,6 +141,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    void DisableTrackingConfigurationButtons();
    void EnableTrackingControls();
    void DisableTrackingControls();
+
+   void OnToggleDifferentUpdateRates();
 
    //slots for worker thread
    void OnAutoDetectToolsFinished(bool success, QString errorMessage);
@@ -179,7 +182,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    mitk::NavigationDataRecorder::Pointer m_loggingFilter; ///> holds the logging filter if logging is on (third filter of the IGT pipeline)
 
    /** @brief This timer updates the IGT pipline and also the logging filter if logging is activated.*/
-   QTimer* m_TrackingTimer;
+   QTimer* m_TrackingRenderTimer;
+   QTimer* m_TrackingLoggingTimer;
    QTimer* m_TimeoutTimer;
 
    /** Replaces the current navigation tool storage which is stored in m_toolStorage.

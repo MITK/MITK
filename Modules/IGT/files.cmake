@@ -63,6 +63,8 @@ set(CPP_FILES
   TrackingDevices/mitkOptitrackErrorMessages.cpp
   TrackingDevices/mitkOptitrackTrackingDevice.cpp
   TrackingDevices/mitkOptitrackTrackingTool.cpp
+  TrackingDevices/mitkOpenIGTLinkTrackingDevice.cpp
+  TrackingDevices/mitkOpenIGTLinkTrackingTool.cpp
 )
 
 set(RESOURCE_FILES

@@ -85,15 +85,16 @@ namespace mitk
     */
     enum TrackingDeviceType
     {
-      NDIPolaris,                ///< Polaris: optical Tracker from NDI
-      NDIAurora,                 ///< Aurora: electromagnetic Tracker from NDI
-      ClaronMicron,              ///< Micron Tracker: optical Tracker from Claron
-      IntuitiveDaVinci,          ///< Intuitive Surgical: DaVinci Telemanipulator API Interface
-      AscensionMicroBird,        ///< Ascension microBird / PCIBird family
-      VirtualTracker,            ///< Virtual Tracking device class that produces random tracking coordinates
-      TrackingSystemNotSpecified,///< entry for not specified or initialized tracking system
+      NDIPolaris,                 ///< Polaris: optical Tracker from NDI
+      NDIAurora,                  ///< Aurora: electromagnetic Tracker from NDI
+      ClaronMicron,               ///< Micron Tracker: optical Tracker from Claron
+      IntuitiveDaVinci,           ///< Intuitive Surgical: DaVinci Telemanipulator API Interface
+      AscensionMicroBird,         ///< Ascension microBird / PCIBird family
+      VirtualTracker,             ///< Virtual Tracking device class that produces random tracking coordinates
+      TrackingSystemNotSpecified, ///< entry for not specified or initialized tracking system
       TrackingSystemInvalid,      ///< entry for invalid state (mainly for testing)
-    NPOptitrack               ///< NaturalPoint: Optitrack optical Tracking System
+      NPOptitrack,                          ///< NaturalPoint: Optitrack optical Tracking System
+      OpenIGTLinkTrackingDeviceConnection   ///< Device which is connected via open igt link
     };
 
 
@@ -148,7 +149,7 @@ namespace mitk
   static TrackingDeviceData DeviceDataSpectraExtendedPyramid = {NDIPolaris, "Polaris Spectra (Extended Pyramid)", "NDIPolarisSpectraExtendedPyramid.stl","5-3"};
   static TrackingDeviceData DeviceDataPolarisVicra = {NDIPolaris, "Polaris Vicra", "NDIPolarisVicra.stl","7"};
 
-  //############## NDI Polaris device data ############
+  //############## NP Optitrack device data ############
   static TrackingDeviceData DeviceDataNPOptitrack = {NPOptitrack, "Optitrack", "cube", "X"};
 
   //############## other device data ##################
@@ -157,13 +158,15 @@ namespace mitk
   static TrackingDeviceData DeviceDataVirtualTracker = {VirtualTracker, "Virtual Tracker", "cube","X"};
   static TrackingDeviceData DeviceDataMicronTrackerH40 = {ClaronMicron, "Micron Tracker H40", "ClaronMicron.stl", "X"};
   static TrackingDeviceData DeviceDataUnspecified = {TrackingSystemNotSpecified, "Unspecified System", "cube","X"};
+  static TrackingDeviceData DeviceDataOpenIGTLinkTrackingDeviceConnection = {OpenIGTLinkTrackingDeviceConnection, "OpenIGTLink Tracking Device", "cube","X"};
   // Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
   static TrackingDeviceData DeviceDataInvalid = {TrackingSystemInvalid, "Invalid Tracking System", "", "X"};
 
   //This list should hold all devices defined above!
   static TrackingDeviceData TrackingDeviceList[] = {DeviceDataAuroraPlanarCube, DeviceDataAuroraPlanarDome, DeviceDataAuroraCompact,
   DeviceDataAuroraTabletop, DeviceDataMicronTrackerH40, DeviceDataPolarisSpectra, DeviceDataPolarisVicra, DeviceDataNPOptitrack,
-  DeviceDataDaVinci, DeviceDataMicroBird, DeviceDataVirtualTracker, DeviceDataUnspecified, DeviceDataSpectraExtendedPyramid, DeviceDataInvalid, DeviceDataPolarisOldModel};
+  DeviceDataDaVinci, DeviceDataMicroBird, DeviceDataVirtualTracker, DeviceDataUnspecified, DeviceDataSpectraExtendedPyramid, DeviceDataInvalid, DeviceDataPolarisOldModel,
+  DeviceDataOpenIGTLinkTrackingDeviceConnection};
 
   /**
   * /brief Returns all devices compatibel to the given Line of Devices

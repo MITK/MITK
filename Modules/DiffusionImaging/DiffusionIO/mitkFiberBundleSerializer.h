@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkFiberBundleXSerializer_h_included
-#define mitkFiberBundleXSerializer_h_included
+#ifndef mitkFiberBundleSerializer_h_included
+#define mitkFiberBundleSerializer_h_included
 
 #include "mitkBaseDataSerializer.h"
 
@@ -24,16 +24,16 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class FiberBundleXSerializer : public BaseDataSerializer
+class FiberBundleSerializer : public BaseDataSerializer
 {
   public:
-    mitkClassMacro( FiberBundleXSerializer, BaseDataSerializer );
+    mitkClassMacro( FiberBundleSerializer, BaseDataSerializer );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     virtual std::string Serialize();
   protected:
-    FiberBundleXSerializer();
-    virtual ~FiberBundleXSerializer();
+    FiberBundleSerializer();
+    virtual ~FiberBundleSerializer();
 };
 } // namespace
 #endif

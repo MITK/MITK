@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkFiberBundleXMapper2D.h"
+#include "mitkFiberBundleMapper2D.h"
 #include <mitkBaseRenderer.h>
 #include <vtkActor.h>
 #include <vtkPolyDataMapper.h>
@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkShaderProperty.h>
 #include <mitkCoreServices.h>
 
-mitk::FiberBundleXMapper2D::FiberBundleXMapper2D()
+mitk::FiberBundleMapper2D::FiberBundleMapper2D()
     : m_LineWidth(1)
 {
     m_lut = vtkLookupTable::New();
@@ -44,19 +44,19 @@ mitk::FiberBundleXMapper2D::FiberBundleXMapper2D()
 
 }
 
-mitk::FiberBundleXMapper2D::~FiberBundleXMapper2D()
+mitk::FiberBundleMapper2D::~FiberBundleMapper2D()
 {
 }
 
 
-mitk::FiberBundleX* mitk::FiberBundleXMapper2D::GetInput()
+mitk::FiberBundle* mitk::FiberBundleMapper2D::GetInput()
 {
-    return dynamic_cast< mitk::FiberBundleX * > ( GetDataNode()->GetData() );
+    return dynamic_cast< mitk::FiberBundle * > ( GetDataNode()->GetData() );
 }
 
 
 
-void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
+void mitk::FiberBundleMapper2D::Update(mitk::BaseRenderer * renderer)
 {
         bool visible = true;
         GetDataNode()->GetVisibility(visible, renderer, "visible");
@@ -86,7 +86,7 @@ void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
         node->SetIntProperty("shader.mitkShaderFiberClipping.fiberFadingON",fiberfading);
         node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberOpacity",fiberOpacity);
 
-        mitk::FiberBundleX* fiberBundle = this->GetInput();
+        mitk::FiberBundle* fiberBundle = this->GetInput();
         if (fiberBundle==NULL)
             return;
 
@@ -105,7 +105,7 @@ void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
         }
 }
 
-void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * renderer)
+void mitk::FiberBundleMapper2D::UpdateShaderParameter(mitk::BaseRenderer * renderer)
 {
     //get information about current position of views
     mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
@@ -130,9 +130,9 @@ void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rend
 }
 
 // vtkActors and Mappers are feeded here
-void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
+void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-    mitk::FiberBundleX* fiberBundle = this->GetInput();
+    mitk::FiberBundle* fiberBundle = this->GetInput();
 
     //the handler of local storage gets feeded in this method with requested data for related renderwindow
     FBXLocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
@@ -165,14 +165,14 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 }
 
 
-vtkProp* mitk::FiberBundleXMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
+vtkProp* mitk::FiberBundleMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
     this->Update(renderer);
     return m_LocalStorageHandler.GetLocalStorage(renderer)->m_PointActor;
 }
 
 
-void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
     Superclass::SetDefaultProperties(node, renderer, overwrite);
     node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));
@@ -192,7 +192,7 @@ void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
 }
 
 
-mitk::FiberBundleXMapper2D::FBXLocalStorage::FBXLocalStorage()
+mitk::FiberBundleMapper2D::FBXLocalStorage::FBXLocalStorage()
 {
     m_PointActor = vtkSmartPointer<vtkActor>::New();
     m_FiberMapper = vtkSmartPointer<vtkPolyDataMapper>::New();

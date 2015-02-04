@@ -14,12 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkFiberBundleXWriter_h
-#define __mitkFiberBundleXWriter_h
+#ifndef __mitkFiberBundleTrackVisWriter_h
+#define __mitkFiberBundleTrackVisWriter_h
 
 #include <mitkAbstractFileWriter.h>
 
-#include "mitkFiberBundleX.h"
+#include "mitkFiberBundle.h"
 #include <vtkPolyDataWriter.h>
 
 
@@ -31,15 +31,15 @@ namespace mitk
  * Writes fiber bundles to a file
  * @ingroup Process
  */
-class FiberBundleXWriter : public mitk::AbstractFileWriter
+class FiberBundleTrackVisWriter : public mitk::AbstractFileWriter
 {
 public:
 
 
-    FiberBundleXWriter();
-    FiberBundleXWriter(const FiberBundleXWriter & other);
-    virtual FiberBundleXWriter * Clone() const;
-    virtual ~FiberBundleXWriter();
+    FiberBundleTrackVisWriter();
+    FiberBundleTrackVisWriter(const FiberBundleTrackVisWriter & other);
+    virtual FiberBundleTrackVisWriter * Clone() const;
+    virtual ~FiberBundleTrackVisWriter();
 
     using mitk::AbstractFileWriter::Write;
     virtual void Write();
@@ -115,4 +115,4 @@ public:
 
 } // end of namespace mitk
 
-#endif //__mitkFiberBundleXWriter_h
+#endif //__mitkFiberBundleWriter_h

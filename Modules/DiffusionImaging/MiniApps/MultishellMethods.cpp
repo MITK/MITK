@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkQBallImage.h>
 #include <mitkBaseData.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include "mitkCommandLineParser.h"
 #include <boost/lexical_cast.hpp>
 

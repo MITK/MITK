@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
       return EXIT_FAILURE;
     }
     mitk::BaseData* fiberBaseData = fiberInfile.at(0);
-    mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*>( fiberBaseData );
+    mitk::FiberBundle* fiberBundle = dynamic_cast<mitk::FiberBundle*>( fiberBaseData );
 
     // load parcellation
     std::vector<mitk::BaseData::Pointer> parcellationInFile =

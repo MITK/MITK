@@ -48,7 +48,7 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator()
 {
 }
 
-mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator( mitk::Image::Pointer segmentation, mitk::FiberBundleX::Pointer fiberBundle )
+mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator( mitk::Image::Pointer segmentation, mitk::FiberBundle::Pointer fiberBundle )
 : m_FiberBundle(fiberBundle)
 , m_Segmentation(segmentation)
 , m_ConNetwork( mitk::ConnectomicsNetwork::New() )
@@ -69,7 +69,7 @@ mitk::ConnectomicsNetworkCreator::~ConnectomicsNetworkCreator()
 {
 }
 
-void mitk::ConnectomicsNetworkCreator::SetFiberBundle(mitk::FiberBundleX::Pointer fiberBundle)
+void mitk::ConnectomicsNetworkCreator::SetFiberBundle(mitk::FiberBundle::Pointer fiberBundle)
 {
   m_FiberBundle = fiberBundle;
 }

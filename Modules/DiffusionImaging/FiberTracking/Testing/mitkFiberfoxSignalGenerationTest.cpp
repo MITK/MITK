@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestingMacros.h>
 #include <mitkIOUtil.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <itkTractsToDWIImageFilter.h>
 #include <mitkFiberfoxParameters.h>
 #include <mitkStickModel.h>
@@ -63,7 +63,7 @@ bool CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 >
     return true;
 }
 
-void StartSimulation(FiberfoxParameters<double> parameters, FiberBundleX::Pointer fiberBundle, mitk::Image::Pointer refImage, string message)
+void StartSimulation(FiberfoxParameters<double> parameters, FiberBundle::Pointer fiberBundle, mitk::Image::Pointer refImage, string message)
 {
     itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
     tractsToDwiFilter->SetUseConstantRandSeed(true);
@@ -106,7 +106,7 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     MITK_TEST_CONDITION_REQUIRED(argc>=19,"check for input data");
 
     // input fiber bundle
-    FiberBundleX::Pointer fiberBundle = dynamic_cast<FiberBundleX*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
+    FiberBundle::Pointer fiberBundle = dynamic_cast<FiberBundle*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
 
     // reference diffusion weighted images
     mitk::Image::Pointer stickBall = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[2])->GetData());

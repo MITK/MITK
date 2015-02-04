@@ -3,8 +3,8 @@ set(CPP_FILES
   mitkFiberTrackingModuleActivator.cpp
 
   ## IO datastructures
-  IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
-  IODataStructures/FiberBundleX/mitkTrackvis.cpp
+  IODataStructures/FiberBundle/mitkFiberBundle.cpp
+  IODataStructures/FiberBundle/mitkTrackvis.cpp
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
 
   # Interactions
@@ -20,9 +20,9 @@ set(CPP_FILES
 )
 
 set(H_FILES
-  # DataStructures -> FiberBundleX
-  IODataStructures/FiberBundleX/mitkFiberBundleX.h
-  IODataStructures/FiberBundleX/mitkTrackvis.h
+  # DataStructures -> FiberBundle
+  IODataStructures/FiberBundle/mitkFiberBundle.h
+  IODataStructures/FiberBundle/mitkTrackvis.h
   IODataStructures/mitkFiberfoxParameters.h
 
   # Algorithms

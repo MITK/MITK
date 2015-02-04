@@ -45,9 +45,6 @@ mitk::DiffusionImagingActivator::start(ctkPluginContext* context)
   mitk::NodePredicateDataType::Pointer isFiberBundle = mitk::NodePredicateDataType::New("FiberBundle");
   manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("FiberBundle"), QString(":/QmitkDiffusionImaging/FiberBundle.png"), isFiberBundle, manager));
 
-  mitk::NodePredicateDataType::Pointer isFiberBundleX = mitk::NodePredicateDataType::New("FiberBundleX");
-  manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("FiberBundleX"), QString(":/QmitkDiffusionImaging/FiberBundleX.png"), isFiberBundleX, manager));
-
   mitk::NodePredicateDataType::Pointer isConnectomicsNetwork = mitk::NodePredicateDataType::New("ConnectomicsNetwork");
   manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("ConnectomicsNetwork"), QString(":/QmitkDiffusionImaging/ConnectomicsNetwork.png"), isConnectomicsNetwork, manager));
 

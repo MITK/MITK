@@ -24,7 +24,7 @@ This file is based heavily on a corresponding ITK filter.
 
 #include <itkProcessObject.h>
 #include <itkVectorContainer.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <itkImageSource.h>
 
 namespace itk{
@@ -51,7 +51,7 @@ public:
     /** Runtime information support. */
     itkTypeMacro(EvaluateTractogramDirectionsFilter, ImageToImageFilter)
 
-    typedef mitk::FiberBundleX                                  FiberBundleType;
+    typedef mitk::FiberBundle                                  FiberBundleType;
     typedef Vector< float, 3 >                                  DirectionType;
     typedef Image< DirectionType, 3 >                           DirectionImageType;
     typedef VectorContainer< int, DirectionImageType::Pointer > DirectionImageContainerType;

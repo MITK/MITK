@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkQBallImage.h>
 #include <mitkTensorImage.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <itkGibbsTrackingFilter.h>
 #include <itkDiffusionTensor3D.h>
 #include <itkShCoefficientImageImporter.h>
@@ -213,7 +213,7 @@ int main(int argc, char* argv[])
 //        gibbsTracker->SetLutPath( "" );
         gibbsTracker->Update();
 
-        mitk::FiberBundleX::Pointer mitkFiberBundle = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());
+        mitk::FiberBundle::Pointer mitkFiberBundle = mitk::FiberBundle::New(gibbsTracker->GetFiberBundle());
         mitkFiberBundle->SetReferenceGeometry(mitkImage->GetGeometry());
 
         mitk::IOUtil::SaveBaseData(mitkFiberBundle.GetPointer(), outFileName );

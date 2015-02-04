@@ -36,7 +36,7 @@ QmitkTbssRoiAnalysisWidget::QmitkTbssRoiAnalysisWidget( QWidget * parent )
 
 
 
-void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundleX *fib, mitk::Image* img,
+void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundle *fib, mitk::Image* img,
                                                     mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg, int number)
 {
 
@@ -53,7 +53,7 @@ void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundleX *fib, mit
 }
 
 
-TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *fib,
+TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundle *fib,
                                                             mitk::PlanarFigure *startRoi,
                                                             mitk::PlanarFigure *endRoi)
 {
@@ -64,8 +64,8 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
     mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
     mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi
 
-    mitk::FiberBundleX::Pointer inStart = fib->ExtractFiberSubset(startRoi);
-    mitk::FiberBundleX::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
+    mitk::FiberBundle::Pointer inStart = fib->ExtractFiberSubset(startRoi);
+    mitk::FiberBundle::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
 
 
 
@@ -384,7 +384,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
     return tracts;
 }
 
-void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, mitk::Image* img,
+void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundle *fib, mitk::Image* img,
                                 mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg, int number)
 {
 
@@ -692,7 +692,7 @@ void QmitkTbssRoiAnalysisWidget::Plot(std::vector <std::vector<mitk::ScalarType>
 
 
 std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::CalculateGroupProfilesFibers(mitk::TbssImage::Pointer tbssImage,
-                                                                                            mitk::FiberBundleX *fib,
+                                                                                            mitk::FiberBundle *fib,
                                                                                             mitk::PlanarFigure* startRoi,
                                                                                             mitk::PlanarFigure* endRoi,
                                                                                             int number)
@@ -794,7 +794,7 @@ std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::Calcula
 
 
 void QmitkTbssRoiAnalysisWidget::PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
-                                             mitk::FiberBundleX *fib,
+                                             mitk::FiberBundle *fib,
                                              mitk::PlanarFigure* startRoi,
                                              mitk::PlanarFigure* endRoi,
                                              int number)

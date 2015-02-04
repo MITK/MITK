@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _TRACKVIS
 
 #include <mitkCommon.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
 #include <vtkCellArray.h>
@@ -66,10 +66,10 @@ private:
 public:
     TrackVis_header     m_Header;
 
-    short   create(string m_Filename, const mitk::FiberBundleX* fib);
+    short   create(string m_Filename, const mitk::FiberBundle* fib);
     short   open( string m_Filename );
-    short   read( mitk::FiberBundleX* fib );
-    short   append(const mitk::FiberBundleX* fib );
+    short   read( mitk::FiberBundle* fib );
+    short   append(const mitk::FiberBundle* fib );
     void    writeHdr();
     void    updateTotal( int totFibers );
     void    close();

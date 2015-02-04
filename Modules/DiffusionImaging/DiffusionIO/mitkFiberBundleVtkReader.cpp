@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkFiberBundleXReader.h"
+#include "mitkFiberBundleVtkReader.h"
 #include <itkMetaDataObject.h>
 #include <vtkPolyData.h>
 #include <vtkDataReader.h>
@@ -34,24 +34,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionIOMimeTypes.h"
 
 
-mitk::FiberBundleXReader::FiberBundleXReader()
-  : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE() ), mitk::DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_DESCRIPTION() )
+mitk::FiberBundleVtkReader::FiberBundleVtkReader()
+  : mitk::AbstractFileReader( mitk::DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE_NAME(), "VTK Fiber Bundle Reader" )
 {
   m_ServiceReg = this->RegisterService();
 }
 
-mitk::FiberBundleXReader::FiberBundleXReader(const FiberBundleXReader &other)
+mitk::FiberBundleVtkReader::FiberBundleVtkReader(const FiberBundleVtkReader &other)
   :mitk::AbstractFileReader(other)
 {
 }
 
-mitk::FiberBundleXReader * mitk::FiberBundleXReader::Clone() const
+mitk::FiberBundleVtkReader * mitk::FiberBundleVtkReader::Clone() const
 {
-  return new FiberBundleXReader(*this);
+  return new FiberBundleVtkReader(*this);
 }
 
 
-std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleXReader::Read()
+std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleVtkReader::Read()
 {
 
   std::vector<itk::SmartPointer<mitk::BaseData> > result;
@@ -66,16 +66,6 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleXReader::Read()
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
     ext = itksys::SystemTools::LowerCase(ext);
 
-    if (ext==".trk")
-    {
-      FiberBundleX::Pointer image = FiberBundleX::New();
-      TrackVisFiberReader reader;
-      reader.open(this->GetInputLocation().c_str());
-      reader.read(image.GetPointer());
-      result.push_back(image.GetPointer());
-      return result;
-    }
-
     vtkSmartPointer<vtkDataReader> chooser=vtkSmartPointer<vtkDataReader>::New();
     chooser->SetFileName( this->GetInputLocation().c_str() );
     if( chooser->IsFilePolyData())
@@ -87,7 +77,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleXReader::Read()
       if ( reader->GetOutput() != NULL )
       {
         vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput();
-        FiberBundleX::Pointer fiberBundle = FiberBundleX::New(fiberPolyData);
+        FiberBundle::Pointer fiberBundle = FiberBundle::New(fiberPolyData);
 
         vtkSmartPointer<vtkFloatArray> weights = vtkFloatArray::SafeDownCast(fiberPolyData->GetCellData()->GetArray("FIBER_WEIGHTS"));
         if (weights!=NULL)
@@ -208,7 +198,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleXReader::Read()
         cleaner->SetInputData(fiberPolyData);
         cleaner->Update();
         fiberPolyData = cleaner->GetOutput();
-        FiberBundleX::Pointer image = FiberBundleX::New(fiberPolyData);
+        FiberBundle::Pointer image = FiberBundle::New(fiberPolyData);
         result.push_back(image.GetPointer());
         return result;
       }

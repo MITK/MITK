@@ -344,6 +344,8 @@ set_target_properties(freeglut PROPERTIES
 
 set(${PROJECT_NAME}_LIBRARIES freeglut)
 
+target_compile_definitions(freeglut INTERFACE FREEGLUT_LIB_PRAGMAS=0)
+
 # Install support
 
 install(TARGETS ${${PROJECT_NAME}_LIBRARIES} EXPORT ${PROJECT_NAME}_TARGETS

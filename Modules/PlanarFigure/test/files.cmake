@@ -3,7 +3,6 @@ set(MODULE_TESTS
   mitkPlanarPolygonTest.cpp
   mitkPlanarSubdivisionPolygonTest.cpp
   mitkPlanarFigureIOTest.cpp
-  mitkPlanarFigureObjectFactoryTest.cpp
   mitkPlanarArrowTest.cpp
 )
 

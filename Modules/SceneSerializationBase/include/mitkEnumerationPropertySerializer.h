@@ -14,33 +14,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkImageSerializer_h_included
-#define mitkImageSerializer_h_included
+#ifndef mitkEnumerationPropertySerializer_h_included
+#define mitkEnumerationPropertySerializer_h_included
 
-#include <MitkSceneSerializationExports.h>
+#include "mitkBasePropertySerializer.h"
 
-#include "mitkBaseDataSerializer.h"
+#include "mitkEnumerationProperty.h"
 
 namespace mitk
 {
 
-/**
-  \brief Serializes mitk::Image for mitk::SceneIO
-*/
-class MITKSCENESERIALIZATION_EXPORT ImageSerializer : public BaseDataSerializer
+class MITKSCENESERIALIZATIONBASE_EXPORT EnumerationPropertySerializer : public BasePropertySerializer
 {
   public:
 
-    mitkClassMacro( ImageSerializer, BaseDataSerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro( EnumerationPropertySerializer, BasePropertySerializer );
 
-    virtual std::string Serialize();
+    virtual TiXmlElement* Serialize();
 
   protected:
 
-    ImageSerializer();
-    virtual ~ImageSerializer();
+    EnumerationPropertySerializer();
+    virtual ~EnumerationPropertySerializer();
 };
 
 } // namespace

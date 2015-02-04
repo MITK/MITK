@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkPropertyListDeserializer_h_included
 #define mitkPropertyListDeserializer_h_included
 
-#include <MitkSceneSerializationExports.h>
-
 #include "mitkPropertyList.h"
 
 namespace mitk
@@ -27,7 +25,7 @@ namespace mitk
 /**
   \brief Deserializes a mitk::PropertyList
 */
-class MITKSCENESERIALIZATION_EXPORT PropertyListDeserializer : public itk::Object
+class PropertyListDeserializer : public itk::Object
 {
   public:
 

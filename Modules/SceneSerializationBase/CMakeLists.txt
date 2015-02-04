@@ -4,5 +4,5 @@ MITK_CREATE_MODULE(
   PACKAGE_DEPENDS PUBLIC tinyxml
   WARNINGS_AS_ERRORS
 )
-add_subdirectory(Testing)
+add_subdirectory(test)
 

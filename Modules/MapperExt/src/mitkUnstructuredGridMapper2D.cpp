@@ -46,7 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkColorTransferFunction.h>
 #include <vtkProp3DCollection.h>
 
-#include "Internal/vtkPointSetSlicer.h"
+#include "vtkPointSetSlicer.h"
 
 void mitk::UnstructuredGridMapper2D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {

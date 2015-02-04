@@ -14,36 +14,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkSurfaceSerializer_h_included
-#define mitkSurfaceSerializer_h_included
-
-#include <MitkSceneSerializationExports.h>
+#ifndef mitkPointSetSerializer_h_included
+#define mitkPointSetSerializer_h_included
 
 #include "mitkBaseDataSerializer.h"
 
 namespace mitk
 {
-
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class MITKSCENESERIALIZATION_EXPORT SurfaceSerializer : public BaseDataSerializer
+class PointSetSerializer : public BaseDataSerializer
 {
   public:
-
-    mitkClassMacro( SurfaceSerializer, BaseDataSerializer );
+    mitkClassMacro( PointSetSerializer, BaseDataSerializer );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
-
     virtual std::string Serialize();
-
   protected:
-
-    SurfaceSerializer();
-    virtual ~SurfaceSerializer();
+    PointSetSerializer();
+    virtual ~PointSetSerializer();
 };
-
 } // namespace
-
 #endif
-

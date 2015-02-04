@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTransferFunctionProperty.h"
 #include "mitkBasePropertySerializer.h"
 
-#include <MitkSceneSerializationBaseExports.h>
-
 namespace mitk
 {
   class MITKSCENESERIALIZATIONBASE_EXPORT TransferFunctionPropertySerializer : public BasePropertySerializer

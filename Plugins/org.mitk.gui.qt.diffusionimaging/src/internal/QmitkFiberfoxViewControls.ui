@@ -171,6 +171,9 @@
                <property name="toolTip">
                 <string>Rotation angle (in degree) around x-axis.</string>
                </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
                <property name="minimum">
                 <double>-360.000000000000000</double>
                </property>
@@ -205,6 +208,9 @@
               <widget class="QDoubleSpinBox" name="m_YrotBox">
                <property name="toolTip">
                 <string>Rotation angle (in degree) around y-axis.</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
                </property>
                <property name="minimum">
                 <double>-360.000000000000000</double>
@@ -241,6 +247,9 @@
                <property name="toolTip">
                 <string>Translation (in mm) in direction of the z-axis.</string>
                </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
                <property name="minimum">
                 <double>-1000.000000000000000</double>
                </property>
@@ -256,6 +265,9 @@
               <widget class="QDoubleSpinBox" name="m_YtransBox">
                <property name="toolTip">
                 <string>Translation (in mm) in direction of the y-axis.</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
                </property>
                <property name="minimum">
                 <double>-1000.000000000000000</double>
@@ -330,6 +342,9 @@
                <property name="toolTip">
                 <string>Rotation angle (in degree) around z-axis.</string>
                </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
                <property name="minimum">
                 <double>-360.000000000000000</double>
                </property>
@@ -345,6 +360,9 @@
               <widget class="QDoubleSpinBox" name="m_XtransBox">
                <property name="toolTip">
                 <string>Translation (in mm) in direction of the x-axis.</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
                </property>
                <property name="minimum">
                 <double>-1000.000000000000000</double>

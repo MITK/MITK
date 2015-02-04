@@ -1460,6 +1460,8 @@ void QmitkFiberProcessingView::MirrorFibers()
     for (int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+        if (m_SelectedImage.IsNotNull())
+            fib->SetReferenceGeometry(m_SelectedImage->GetGeometry());
         fib->MirrorFibers(axis);
     }
 

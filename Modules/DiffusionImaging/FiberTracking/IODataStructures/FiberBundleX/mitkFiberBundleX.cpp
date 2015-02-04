@@ -53,6 +53,7 @@ using namespace std;
 
 mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     : m_NumFibers(0)
+    , m_ReferenceGeometry(NULL)
 {
     m_FiberWeights = vtkSmartPointer<vtkFloatArray>::New();
     m_FiberWeights->SetName("FIBER_WEIGHTS");
@@ -1328,6 +1329,18 @@ void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
     if (axis>2)
         return;
 
+    mitk::Point3D c; c.Fill(0);
+    if (m_ReferenceGeometry.IsNotNull()){
+//        c = m_ReferenceGeometry->GetCenter();
+        c = m_ReferenceGeometry->GetBoundingBox()->GetCenter();
+        c[0] -= 0.5;
+        c[1] -= 0.5;
+        c[2] -= 0.5;
+        m_ReferenceGeometry->IndexToWorld(c, c);
+    }
+    MITK_INFO << c;
+
+
     MITK_INFO << "Mirroring fibers";
     boost::progress_display disp(m_NumFibers);
 
@@ -1345,7 +1358,13 @@ void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
         for (int j=0; j<numPoints; j++)
         {
             double* p = points->GetPoint(j);
+            p[0] -= c[0];
+            p[1] -= c[1];
+            p[2] -= c[2];
             p[axis] = -p[axis];
+            p[0] += c[0];
+            p[1] += c[1];
+            p[2] += c[2];
             vtkIdType id = vtkNewPoints->InsertNextPoint(p);
             container->GetPointIds()->InsertNextId(id);
         }

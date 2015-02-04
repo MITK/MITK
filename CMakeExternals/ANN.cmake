@@ -28,7 +28,7 @@ if(MITK_USE_ANN)
        DEPENDS ${proj_DEPENDENCIES}
       )
 
-    set(ANN_DIR ${ep_prefix})
+    set(ANN_DIR ${ep_prefix}/lib/cmake/ANN)
     mitkFunctionInstallExternalCMakeProject(${proj})
 
   else()

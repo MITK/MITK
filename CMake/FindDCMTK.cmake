@@ -149,9 +149,12 @@ foreach(dir
   #message("** DCMTKs ${dir} found at ${DCMTK_${dir}_INCLUDE_DIR}")
 
   if(DCMTK_${dir}_INCLUDE_DIR)
-    list(APPEND
-      DCMTK_INCLUDE_DIRS
-      ${DCMTK_${dir}_INCLUDE_DIR})
+    # add the 'include' path so eg
+    #include "dcmtk/dcmimgle/dcmimage.h"
+    # works
+    get_filename_component(_include ${DCMTK_${dir}_INCLUDE_DIR} PATH)
+    get_filename_component(_include ${_include} PATH)
+    list(APPEND DCMTK_INCLUDE_DIRS ${DCMTK_${dir}_INCLUDE_DIR} ${_include})
   endif()
 endforeach()
 

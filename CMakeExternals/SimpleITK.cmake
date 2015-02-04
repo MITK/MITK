@@ -10,7 +10,7 @@ if(MITK_USE_SimpleITK)
  endif()
 
   set(proj SimpleITK)
-  set(proj_DEPENDENCIES ITK GDCM Swig)
+  set(proj_DEPENDENCIES ITK GDCM SWIG)
 
   if(MITK_USE_OpenCV)
     list(APPEND proj_DEPENDENCIES OpenCV)

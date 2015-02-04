@@ -2,24 +2,24 @@
 # raptor2
 #-----------------------------------------------------------------------------
 
-if(MITK_USE_raptor2)
+if(MITK_USE_Raptor2)
 
 # Sanity checks
-if(DEFINED raptor2_DIR AND NOT EXISTS ${raptor2_DIR})
-  message(FATAL_ERROR "raptor2_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED Raptor2_DIR AND NOT EXISTS ${Raptor2_DIR})
+  message(FATAL_ERROR "Raptor2_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(proj raptor2)
+set(proj Raptor2)
 set(proj_DEPENDENCIES )
 set(${proj}_DEPENDS ${proj})
 
-if(NOT DEFINED raptor2_DIR)
+if(NOT DEFINED Raptor2_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/raptor2-2.0.15.tar.gz
      URL_MD5 a39f6c07ddb20d7dd2ff1f95fa21e2cd
-     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/raptor2-2.0.15.patch
+     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Raptor2-2.0.15.patch
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
@@ -48,7 +48,7 @@ if(NOT DEFINED raptor2_DIR)
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  set(${proj}_DIR ${ep_prefix})
+  set(${proj}_DIR ${ep_prefix}/lib/raptor2/cmake)
   mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()

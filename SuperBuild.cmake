@@ -69,74 +69,11 @@ endif()
 # ExternalProjects
 #-----------------------------------------------------------------------------
 
-# These are ordered by dependencies
-set(external_projects
-  ZLIB
-  Python
-  Numpy
-  tinyxml
-  GLUT
-  ANN
-  CppUnit
-  GLEW
-  VTK
-  ACVD
-  GDCM
-  OpenCV
-  Poco
-  ITK
-  Boost
-  DCMTK
-  CTK
-  SOFA
-  MITKData
-  Qwt
-  PCRE
-  Swig
-  SimpleITK
-  Eigen
-  raptor2
-  rasqal
-  redland
-  )
-
-# These are "hard" dependencies and always set to ON
-set(MITK_USE_tinyxml 1)
-set(MITK_USE_GLEW 1)
-set(MITK_USE_GDCM 1)
-set(MITK_USE_ITK 1)
-set(MITK_USE_VTK 1)
-
-# Semi-hard dependencies, enabled by user-controlled variables
-if(MITK_USE_QT)
-  set(MITK_USE_Qwt 1)
-endif()
-
-if(MITK_USE_Redland)
-  set(MITK_USE_raptor2 1)
-  set(MITK_USE_PCRE 1)
-  set(MITK_USE_rasqal 1)
-  set(MITK_USE_redland 1)
-endif()
-
-if(MITK_USE_SOFA)
-  set(MITK_USE_GLUT 1)
-endif()
-
-if(MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON)
-  set(MITK_USE_ZLIB 1)
-endif()
-
-if(MITK_USE_SimpleITK OR MITK_USE_Python)
-  set(MITK_USE_SWIG 1)
-  if(UNIX)
-    set(MITK_USE_PCRE 1)
-  endif()
-endif()
+get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 
 # A list of "nice" external projects, playing well together with CMake
 set(nice_external_projects ${external_projects})
-list(REMOVE_ITEM nice_external_projects Boost)
+list(REMOVE_ITEM nice_external_projects Boost Python)
 foreach(proj ${nice_external_projects})
   if(MITK_USE_${proj})
     set(EXTERNAL_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
@@ -275,9 +212,23 @@ if(APPLE)
   )
 endif()
 
+set(mitk_superbuild_ep_args)
+set(mitk_depends )
+
 # Include external projects
+include(CMakeExternals/MITKData.cmake)
 foreach(p ${external_projects})
   include(CMakeExternals/${p}.cmake)
+
+  list(APPEND mitk_superbuild_ep_args
+       -DMITK_USE_${p}:BOOL=${MITK_USE_${p}}
+      )
+  get_property(_package GLOBAL PROPERTY MITK_${p}_PACKAGE)
+  if(_package)
+    list(APPEND mitk_superbuild_ep_args -D${p}_DIR:PATH=${${p}_DIR})
+  endif()
+
+  list(APPEND mitk_depends ${${p}_DEPENDS})
 endforeach()
 
 #-----------------------------------------------------------------------------
@@ -289,28 +240,15 @@ set(mitk_cmake_boolean_args
   WITH_COVERAGE
   BUILD_TESTING
 
-  MITK_USE_QT
   MITK_BUILD_ALL_PLUGINS
   MITK_BUILD_ALL_APPS
   MITK_BUILD_TUTORIAL # Deprecated. Use MITK_BUILD_EXAMPLES instead
   MITK_BUILD_EXAMPLES
 
-  MITK_USE_ACVD
-  MITK_USE_ANN
-  MITK_USE_BLUEBERRY
-  MITK_USE_Boost
-  MITK_USE_CppUnit
-  MITK_USE_CTK
-  MITK_USE_DCMTK
-  MITK_USE_Eigen
-  MITK_USE_GLEW
-  MITK_USE_OpenCL
-  MITK_USE_OpenCV
-  MITK_USE_Poco
-  MITK_USE_Python
-  MITK_USE_Redland
-  MITK_USE_SOFA
+  MITK_USE_QT
   MITK_USE_SYSTEM_Boost
+  MITK_USE_BLUEBERRY
+  MITK_USE_OpenCL
 
   MITK_ENABLE_PIC_READER
   )
@@ -339,33 +277,7 @@ ExternalProject_Add(${proj}
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
   DEPENDS
-    # Mandatory dependencies
-    ${tinyxml_DEPENDS}
-    ${ANN_DEPENDS}
-    ${VTK_DEPENDS}
-    ${ITK_DEPENDS}
-    # Optionnal dependencies
-    ${ACVD_DEPENDS}
-    ${CppUnit_DEPENDS}
-    ${Eigen_DEPENDS}
-    ${GLUT_DEPENDS}
-    ${GLEW_DEPENDS}
-    ${Boost_DEPENDS}
-    ${CTK_DEPENDS}
-    ${DCMTK_DEPENDS}
-    ${OpenCV_DEPENDS}
-    ${Poco_DEPENDS}
-    ${PCRE_DEPENDS}
-    ${Swig_DEPENDS}
-    ${raptor2_DEPENDS}
-    ${rasqal_DEPENDS}
-    ${redland_DEPENDS}
-    ${SOFA_DEPENDS}
-    ${MITK-Data_DEPENDS}
-    ${Qwt_DEPENDS}
-    ${ZLIB_DEPENDS}
-    ${SimpleITK_DEPENDS}
-    ${Numpy_DEPENDS}
+    ${mitk_depends}
 )
 #-----------------------------------------------------------------------------
 # Additional MITK CXX/C Flags
@@ -404,19 +316,13 @@ endforeach()
 # Optional python variables
 if(MITK_USE_Python)
   list(APPEND mitk_optional_cache_args
+       -DMITK_USE_Python:BOOL=${MITK_USE_Python}
        -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
        -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
        -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
        -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
        -DMITK_USE_SYSTEM_PYTHON:BOOL=${MITK_USE_SYSTEM_PYTHON}
       )
-  if( NOT MITK_USE_SYSTEM_PYTHON )
-    list(APPEND mitk_optional_cache_args
-          # Folders are needed to create an installer
-          -DPython_DIR:PATH=${Python_DIR}
-          -DNumpy_DIR:PATH=${Numpy_DIR}
-        )
-  endif()
 endif()
 
 if(MITK_USE_QT)
@@ -478,42 +384,20 @@ ExternalProject_Add(${proj}
     -DMITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_VECTOR_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_DIMENSIONS:STRING=${MITK_ACCESSBYITK_DIMENSIONS}
-    # --------------- External project dirs ---------------
+    # --------------- External project options ---------------
+    -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
     -DMITK_EXTERNAL_PROJECT_PREFIX:PATH=${ep_prefix}
     -DCppMicroServices_DIR:PATH=${CppMicroServices_DIR}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
-    -DCTK_DIR:PATH=${CTK_DIR}
-    -DDCMTK_DIR:PATH=${DCMTK_DIR}
     -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
-    -DEigen_DIR:PATH=${Eigen_DIR}
-    -Dtinyxml_DIR:PATH=${tinyxml_DIR}
-    -DGLUT_DIR:PATH=${GLUT_DIR}
-    -DGLEW_DIR:PATH=${GLEW_DIR}
-    -DANN_DIR:PATH=${ANN_DIR}
-    -DCppUnit_DIR:PATH=${CppUnit_DIR}
-    -DVTK_DIR:PATH=${VTK_DIR}     # FindVTK expects VTK_DIR
-    -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR
-    -DACVD_DIR:PATH=${ACVD_DIR}
-    -DOpenCV_DIR:PATH=${OpenCV_DIR}
-    -DPoco_DIR:PATH=${Poco_DIR}
-    -DPCRE_DIR:PATH=${PCRE_DIR}
-    -DSwig_DIR:PATH=${Swig_DIR}
-    -DRaptor2_DIR:PATH=${raptor2_DIR}
-    -DRasqal_DIR:PATH=${rasqal_DIR}
-    -DRedland_DIR:PATH=${redland_DIR}
-    -DSOFA_DIR:PATH=${SOFA_DIR}
-    -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
-    -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
-    -DQwt_DIR:PATH=${Qwt_DIR}
-    -DSimpleITK_DIR:PATH=${SimpleITK_DIR}
-    -DNumpy_DIR:PATH=${Numpy_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}
-    "-DCMAKE_PREFIX_PATH:PATH=${ep_prefix}^^${CMAKE_PREFIX_PATH}"
+    ${mitk_superbuild_ep_args}
+    "-DCMAKE_PREFIX_PATH:PATH=${ep_prefix}${sep}${CMAKE_PREFIX_PATH}"
 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/MITK-build

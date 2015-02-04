@@ -108,23 +108,25 @@ set(CMAKE_MODULE_PATH
 # CMake function(s) and macro(s)
 #-----------------------------------------------------------------------------
 
+# Standard CMake macros
+include(FeatureSummary)
+include(CTestUseLaunchers)
+include(CMakeParseArguments)
+include(FindPackageHandleStandardArgs)
+
+# MITK macros
 include(mitkMacroEmptyExternalProject)
 include(mitkFunctionGenerateProjectXml)
 include(mitkFunctionSuppressWarnings)
 include(mitkFunctionEnableBuildConfiguration)
 include(mitkFunctionWhitelists)
-include(FeatureSummary)
-include(CTestUseLaunchers)
+include(mitkFunctionAddExternalProject)
 
 SUPPRESS_VC_DEPRECATED_WARNINGS()
 
 #-----------------------------------------------------------------------------
 # Additional MITK Options (also shown during superbuild)
 #-----------------------------------------------------------------------------
-
-option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
-option(WITH_COVERAGE "Enable/Disable coverage" OFF)
-option(BUILD_TESTING "Test the project" ON)
 
 macro(env_option name doc value)
   set(_value $ENV{${name}})
@@ -133,6 +135,20 @@ macro(env_option name doc value)
   endif()
   option(${name} "${doc}" ${_value})
 endmacro()
+
+# -----------------------------------------
+# General build options
+option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
+option(WITH_COVERAGE "Enable/Disable coverage" OFF)
+option(BUILD_TESTING "Test the project" ON)
+
+env_option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
+env_option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
+option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
+
+mark_as_advanced(MITK_BUILD_ALL_APPS
+                 MITK_ENABLE_PIC_READER
+                )
 
 # -----------------------------------------
 # Qt version related variables
@@ -155,117 +171,75 @@ if(MITK_USE_QT)
     set(MITK_USE_Qt5 TRUE)
     set(QT5_INSTALL_PREFIX "" CACHE PATH "The install location of Qt5")
     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${QT5_INSTALL_PREFIX})
-    find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
-    find_package(Qt5Concurrent ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
-    find_package(Qt5OpenGL ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
-    find_package(Qt5PrintSupport ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
-    find_package(Qt5Script ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
-    find_package(Qt5Sql ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
-    find_package(Qt5Svg ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
-    find_package(Qt5WebKit ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
-    find_package(Qt5WebKitWidgets ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
-    find_package(Qt5Widgets ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
-    find_package(Qt5Xml ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
-    find_package(Qt5XmlPatterns ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
-    find_package(Qt5UiTools ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+    set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg WebKitWidgets Xml XmlPatterns UiTools)
+    find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
   endif()
 else()
   set(MITK_USE_Qt4 FALSE)
   set(MITK_USE_Qt5 FALSE)
 endif()
 
+# ------------------------------------------------------------------------
+# Register external projects which can be build with the MITK superbuild
+# system. Each mitkFunctionAddExternalProject() call registers an external
+# project for which a CMakeExternals/<project>.cmake file must exist. The
+# call also creates a MITK_USE_<project> variable (appearing in the CMake
+# UI if the NO_CACHE option is *not* given).
+
+
 # -----------------------------------------
-# MITK_USE_* build variables
+# Optional external projects with no
+# inter-dependencies
 
-env_option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
-set(MITK_BUILD_TUTORIAL OFF CACHE INTERNAL "Deprecated! Use MITK_BUILD_EXAMPLES instead!")
-env_option(MITK_BUILD_EXAMPLES "Build the MITK Examples" ${MITK_BUILD_TUTORIAL})
-env_option(MITK_USE_ACVD "Use Approximated Centroidal Voronoi Diagrams" OFF)
-env_option(MITK_USE_ANN "Use Approximate Nearest Neighbor Library" ON)
-env_option(MITK_USE_CppUnit "Use CppUnit for unit tests" ON)
-if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
-  message("> Forcing MITK_USE_CppUnit to ON because BUILD_TESTING=ON")
-  set(MITK_USE_CppUnit ON CACHE BOOL "Use CppUnit for unit tests" FORCE)
+set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
+
+mitkFunctionAddExternalProject(NAME Poco    ON  COMPONENTS Foundation Util XML)
+mitkFunctionAddExternalProject(NAME Boost   OFF DOC "Use the Boost C++ library")
+mitkFunctionAddExternalProject(NAME DCMTK   ON  DOC "EXPERIMENTAL, superbuild only: Use DCMTK in MITK")
+
+mitkFunctionAddExternalProject(NAME tinyxml ON  ADVANCED)
+mitkFunctionAddExternalProject(NAME GDCM    ON  ADVANCED)
+mitkFunctionAddExternalProject(NAME GLUT    OFF ADVANCED)
+mitkFunctionAddExternalProject(NAME Raptor2 OFF ADVANCED)
+mitkFunctionAddExternalProject(NAME Eigen   ON  ADVANCED DOC "Use the Eigen library")
+mitkFunctionAddExternalProject(NAME GLEW    ON  ADVANCED DOC "Use the GLEW library")
+mitkFunctionAddExternalProject(NAME ANN     ON  ADVANCED DOC "Use Approximate Nearest Neighbor Library")
+mitkFunctionAddExternalProject(NAME CppUnit ON  ADVANCED DOC "Use CppUnit for unit tests")
+
+mitkFunctionAddExternalProject(NAME PCRE    OFF ADVANCED NO_PACKAGE)
+mitkFunctionAddExternalProject(NAME ZLIB    OFF ADVANCED NO_PACKAGE NO_CACHE)
+
+# -----------------------------------------
+# The following external projects must be
+# ordered according to their
+# inter-dependencies
+
+if(MITK_USE_QT)
+  mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED)
 endif()
-env_option(MITK_USE_Eigen "Use the Eigen library" ON)
-env_option(MITK_USE_GLEW "Use the GLEW library" ON)
-env_option(MITK_USE_Boost "Use the Boost C++ library" OFF)
-env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-env_option(MITK_USE_CTK "Use CTK in MITK" ON)
-env_option(MITK_USE_DCMTK "EXPERIMENTAL, superbuild only: Use DCMTK in MITK" ${MITK_USE_CTK})
-env_option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
-env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
-env_option(MITK_USE_Poco "Use the Poco library" ON)
-env_option(MITK_USE_Redland "Use the Redland RDF library" OFF)
-env_option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
-env_option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
-env_option(MITK_USE_SimpleITK "Use the SimpleITK library" OFF)
-set(MITK_USE_CableSwig ${MITK_USE_Python})
 
-option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
+mitkFunctionAddExternalProject(NAME SWIG      OFF ADVANCED NO_PACKAGE DEPENDS PCRE)
+mitkFunctionAddExternalProject(NAME Python    OFF          NO_PACKAGE DEPENDS SWIG DOC "Use Python wrapping in MITK")
+mitkFunctionAddExternalProject(NAME Numpy     OFF ADVANCED NO_PACKAGE)
+mitkFunctionAddExternalProject(NAME OpenCV    OFF)
 
-set(_buildConfigs "Custom")
+# These are "hard" dependencies and always set to ON
+mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE)
+mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
 
-file(GLOB _buildConfigFiles CMake/BuildConfigurations/*.cmake)
+mitkFunctionAddExternalProject(NAME SimpleITK OFF          DEPENDS ITK GDCM SWIG)
+mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
+mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS DCMTK DOC "Use CTK in MITK")
+mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)
+mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")
+mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DOC "Use Simulation Open Framework Architecture")
 
-foreach(_buildConfigFile ${_buildConfigFiles})
-  get_filename_component(_buildConfigFile ${_buildConfigFile} NAME_WE)
-  list(APPEND _buildConfigs ${_buildConfigFile})
-endforeach()
-
-set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
-set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
-
-mitkFunctionEnableBuildConfiguration()
-
-mitkFunctionCreateWhitelistPaths(MITK)
-mitkFunctionFindWhitelists(MITK)
-
-mark_as_advanced(MITK_BUILD_ALL_APPS
-                 MITK_USE_CppUnit
-                 MITK_USE_GLEW
-                 MITK_USE_CTK
-                 MITK_USE_DCMTK
-                 MITK_ENABLE_PIC_READER
-                 MITK_BUILD_CONFIGURATION
-                )
-
-if(MITK_USE_Python)
-  if(APPLE)
-    message(WARNING "Python wrapping is unsuported on mac OSX!")
-    set(MITK_USE_Python OFF CACHE BOOL "Use Python wrapping in MITK" FORCE)
-  else()
-    option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" OFF)
-    # SimpleITK is required when python is enabled
-    set(MITK_USE_SimpleITK ON CACHE BOOL "Use the SimpleITK library" FORCE)
-    if(MITK_USE_SYSTEM_PYTHON)
-      FIND_PACKAGE(PythonLibs REQUIRED)
-      FIND_PACKAGE(PythonInterp REQUIRED)
-    else()
-      FIND_PACKAGE(PythonLibs)
-      FIND_PACKAGE(PythonInterp)
-    endif()
-  endif()
-endif()
+# -----------------------------------------
+# Custom dependency logic
 
 if(MITK_USE_Boost)
   option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
   set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
-endif()
-
-if(MITK_USE_BLUEBERRY)
-  option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
-  mark_as_advanced(MITK_BUILD_ALL_PLUGINS)
-
-  if(NOT MITK_USE_CTK)
-    message("> Forcing MITK_USE_CTK to ON because of MITK_USE_BLUEBERRY")
-    set(MITK_USE_CTK ON CACHE BOOL "Use CTK in MITK" FORCE)
-  endif()
-endif()
-
-if(MITK_USE_CTK AND NOT MITK_USE_DCMTK)
-  message("> Forcing MITK_USE_DCMTK to ON because of MITK_USE_CTK")
-  set(MITK_USE_DCMTK ON CACHE BOOL "Use DCMTK in MITK" FORCE)
 endif()
 
 if(MITK_USE_SOFA)
@@ -282,25 +256,25 @@ if(MITK_USE_SOFA)
   endif()
   # SOFA requires boost library
   if(MITK_USE_SOFA AND NOT MITK_USE_Boost)
-    message("Forcing MITK_USE_Boost to ON because of MITK_USE_SOFA")
+    message("> Forcing MITK_USE_Boost to ON because of MITK_USE_SOFA")
     set(MITK_USE_Boost ON CACHE BOOL "" FORCE)
   endif()
   # SOFA requires boost system library
   list(FIND MITK_USE_Boost_LIBRARIES system _result)
   if(_result LESS 0)
-    message("Adding 'system' to MITK_USE_Boost_LIBRARIES.")
+    message("> Adding 'system' to MITK_USE_Boost_LIBRARIES.")
     list(APPEND MITK_USE_Boost_LIBRARIES system)
   endif()
   # SOFA requires boost thread library
   list(FIND MITK_USE_Boost_LIBRARIES thread _result)
   if(_result LESS 0)
-    message("Adding 'thread' to MITK_USE_Boost_LIBRARIES.")
+    message("> Adding 'thread' to MITK_USE_Boost_LIBRARIES.")
     list(APPEND MITK_USE_Boost_LIBRARIES thread)
   endif()
   # Simulation plugin requires boost chrono library
   list(FIND MITK_USE_Boost_LIBRARIES chrono _result)
   if(_result LESS 0)
-    message("Adding 'chrono' to MITK_USE_Boost_LIBRARIES.")
+    message("> Adding 'chrono' to MITK_USE_Boost_LIBRARIES.")
     list(APPEND MITK_USE_Boost_LIBRARIES chrono)
   endif()
   set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "" FORCE)
@@ -308,6 +282,78 @@ if(MITK_USE_SOFA)
   set(MITK_USE_SOFA_PLUGINS_DIR ${MITK_USE_SOFA_PLUGINS_DIR} CACHE PATH "External SOFA plugins directory" FORCE)
   set(MITK_USE_SOFA_PLUGINS ${MITK_USE_SOFA_PLUGINS} CACHE PATH "List of semicolon-separated plugin names" FORCE)
 endif()
+
+if(MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON)
+  set(MITK_USE_ZLIB ON)
+  if(NOT MITK_USE_Numpy)
+    message("> Forcing MITK_USE_Numpy to ON because of MITK_USE_Python")
+    set(MITK_USE_Numpy ON CACHE BOOL "Use Numpy" FORCE)
+  endif()
+  if(NOT MITK_USE_SimpleITK)
+    message("> Forcing MITK_USE_SimpleITK to ON because of MITK_USE_Python")
+    set(MITK_USE_Numpy ON CACHE BOOL "Use Numpy" FORCE)
+  endif()
+
+  if(APPLE)
+    message(WARNING "Python wrapping is unsuported on mac OSX!")
+    set(MITK_USE_Python OFF CACHE BOOL "Use Python wrapping in MITK" FORCE)
+  else()
+    option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" OFF)
+    if(MITK_USE_SYSTEM_PYTHON)
+      find_package(PythonLibs REQUIRED)
+      find_package(PythonInterp REQUIRED)
+    endif()
+  endif()
+endif()
+
+if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
+  message("> Forcing MITK_USE_CppUnit to ON because BUILD_TESTING=ON")
+  set(MITK_USE_CppUnit ON CACHE BOOL "Use CppUnit for unit tests" FORCE)
+endif()
+
+# -----------------------------------------
+# Other MITK_USE_* options not related to
+# external projects build via the
+# MITK superbuild
+
+env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
+env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
+
+if(MITK_USE_BLUEBERRY)
+  option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
+  mark_as_advanced(MITK_BUILD_ALL_PLUGINS)
+
+  if(NOT MITK_USE_CTK)
+    message("> Forcing MITK_USE_CTK to ON because of MITK_USE_BLUEBERRY")
+    set(MITK_USE_CTK ON CACHE BOOL "Use CTK in MITK" FORCE)
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
+# Build configurations
+#-----------------------------------------------------------------------------
+
+set(_buildConfigs "Custom")
+
+file(GLOB _buildConfigFiles CMake/BuildConfigurations/*.cmake)
+
+foreach(_buildConfigFile ${_buildConfigFiles})
+  get_filename_component(_buildConfigFile ${_buildConfigFile} NAME_WE)
+  list(APPEND _buildConfigs ${_buildConfigFile})
+endforeach()
+
+set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
+mark_as_advanced(MITK_BUILD_CONFIGURATION)
+set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
+
+mitkFunctionEnableBuildConfiguration()
+
+mitkFunctionCreateWhitelistPaths(MITK)
+mitkFunctionFindWhitelists(MITK)
+
+#-----------------------------------------------------------------------------
+# Pixel type multiplexing
+#-----------------------------------------------------------------------------
 
 # Customize the default pixel types for multiplex macros
 
@@ -437,7 +483,6 @@ endif()
 include(WriteBasicConfigVersionFile)
 include(CheckCXXSourceCompiles)
 include(GenerateExportHeader)
-include(CMakeParseArguments)
 include(mitkFunctionCheckCompilerFlags)
 include(mitkFunctionGetGccVersion)
 include(mitkFunctionSuppressWarnings) # includes several functions
@@ -692,17 +737,40 @@ set(MITK_EXE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR ${MITK_SOURCE_DIR}/CMake/PackageDepends)
 set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR})
 
-find_package(GDCM PATHS ${GDCM_DIR} REQUIRED)
-if(MITK_USE_OpenCV)
-  find_package(OpenCV PATHS ${OpenCV_DIR} REQUIRED)
+# This property is populated at the top half of this file
+get_property(MITK_EXTERNAL_PROJECTS GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
+foreach(ep ${MITK_EXTERNAL_PROJECTS})
+  get_property(_package GLOBAL PROPERTY MITK_${ep}_PACKAGE)
+  get_property(_components GLOBAL PROPERTY MITK_${ep}_COMPONENTS)
+  if(MITK_USE_${ep} AND _package)
+    if(_components)
+      find_package(${_package} COMPONENTS ${_components} REQUIRED CONFIG)
+    else()
+      # Prefer config mode first because it finds external
+      # <proj>Config.cmake files pointed at by <proj>_DIR variables.
+      # Otherwise, existing Find<proj>.cmake files could file
+      # (e.g. in the case of GLEW and the FindGLEW.cmake file shipped
+      # with CMake).
+      find_package(${_package} QUIET CONFIG)
+      string(TOUPPER "${_package}" _package_uc)
+      if(NOT (${_package}_FOUND OR ${_package_uc}_FOUND))
+        find_package(${_package} REQUIRED)
+      endif()
+    endif()
+  endif()
+endforeach()
+
+if(MITK_USE_Python)
+  find_package(PythonLibs REQUIRED)
+  find_package(PythonInterp REQUIRED)
 endif()
+
 if(MITK_USE_SOFA)
   # The SOFAConfig.cmake file does not provide exported targets or
   # libraries with absolute paths, hence we need to make the link
   # directories globally available until the SOFAConfig.cmake file
   # supports a proper mechanism for handling targets.
   # The same code is needed in MITKConfig.cmake.
-  find_package(SOFA PATHS ${SOFA_DIR} CONFIG REQUIRED)
   link_directories(${SOFA_LIBRARY_DIRS})
 endif()
 
@@ -714,6 +782,12 @@ if(MITK_USE_QT)
     find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
   endif()
 endif()
+
+# Ensure that the MITK CMake module path comes first
+set(CMAKE_MODULE_PATH
+  ${MITK_CMAKE_DIR}
+  ${CMAKE_MODULE_PATH}
+  )
 
 #-----------------------------------------------------------------------------
 # Testing
@@ -1046,6 +1120,8 @@ include(mitkInstallRules)
 # Last configuration steps
 #-----------------------------------------------------------------------------
 
+# ---------------- Export targets -----------------
+
 set(MITK_EXPORTS_FILE "${MITK_BINARY_DIR}/MitkExports.cmake")
 file(REMOVE ${MITK_EXPORTS_FILE})
 
@@ -1084,7 +1160,46 @@ set_target_properties(${target_to_export} PROPERTIES MITK_MODULE_DEPRECATED_SINC
   endif()
 endforeach()
 
+# ---------------- External projects -----------------
+
 get_property(MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS_CONFIG GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
+
+set(MITK_CONFIG_EXTERNAL_PROJECTS )
+#string(REPLACE "^^" ";" _mitk_external_projects ${MITK_EXTERNAL_PROJECTS})
+
+foreach(ep ${MITK_EXTERNAL_PROJECTS})
+  get_property(_components GLOBAL PROPERTY MITK_${ep}_COMPONENTS)
+  set(MITK_CONFIG_EXTERNAL_PROJECTS "${MITK_CONFIG_EXTERNAL_PROJECTS}
+set(MITK_USE_${ep} ${MITK_USE_${ep}})
+set(MITK_${ep}_DIR \"${${ep}_DIR}\")
+set(MITK_${ep}_COMPONENTS ${_components})
+")
+endforeach()
+
+foreach(ep ${MITK_EXTERNAL_PROJECTS})
+  get_property(_package GLOBAL PROPERTY MITK_${ep}_PACKAGE)
+  get_property(_components GLOBAL PROPERTY MITK_${ep}_COMPONENTS)
+  if(_components)
+      set(_components_arg COMPONENTS \${_components})
+  else()
+    set(_components_arg)
+  endif()
+
+  if(_package)
+    set(MITK_CONFIG_EXTERNAL_PROJECTS "${MITK_CONFIG_EXTERNAL_PROJECTS}
+if(MITK_USE_${ep})
+  set(${ep}_DIR \${MITK_${ep}_DIR})
+  if(MITK_${ep}_COMPONENTS)
+    mitkMacroFindDependency(${_package} COMPONENTS \${MITK_${ep}_COMPONENTS})
+  else()
+    mitkMacroFindDependency(${_package})
+  endif()
+endif()")
+  endif()
+endforeach()
+
+
+# ---------------- Tools -----------------
 
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in
                ${MITK_BINARY_DIR}/ToolExtensionITKFactory.cpp.in COPYONLY)
@@ -1092,6 +1207,8 @@ configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactoryLoader.cpp.in
                ${MITK_BINARY_DIR}/ToolExtensionITKFactoryLoader.cpp.in COPYONLY)
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in
                ${MITK_BINARY_DIR}/ToolGUIExtensionITKFactory.cpp.in COPYONLY)
+
+# ---------------- Configure files -----------------
 
 configure_file(mitkVersion.h.in ${MITK_BINARY_DIR}/mitkVersion.h)
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)

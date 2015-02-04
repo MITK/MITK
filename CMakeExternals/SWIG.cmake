@@ -2,8 +2,8 @@
 # SWIG (Simple Wrapper Interface Generator)
 #-----------------------------------------------------------
 if(MITK_USE_SWIG)
-  if(DEFINED Swig_DIR AND NOT EXISTS ${Swig_DIR})
-    message(FATAL_ERROR "Swig_DIR variable is defined but corresponds to non-existing directory")
+  if(DEFINED SWIG_DIR AND NOT EXISTS ${SWIG_DIR})
+    message(FATAL_ERROR "SWIG_DIR variable is defined but corresponds to non-existing directory")
   endif()
 
   if(NOT SWIG_DIR)
@@ -13,9 +13,9 @@ if(MITK_USE_SWIG)
     # to generate the Python wrappings for some projects.
 
     set(SWIG_TARGET_VERSION 3.0.2)
-    set(proj Swig)
-    set(Swig_DEPENDENCIES PCRE)
-    set(Swig_DEPENDS ${proj})
+    set(proj SWIG)
+    set(SWIG_DEPENDENCIES PCRE)
+    set(SWIG_DEPENDS ${proj})
 
     # binary SWIG for windows
     if(WIN32)
@@ -36,7 +36,7 @@ if(MITK_USE_SWIG)
 
     else()
 
-      list(APPEND Swig_DEPENDENCIES PCRE)
+      list(APPEND SWIG_DEPENDENCIES PCRE)
 
       # swig uses bison find it by cmake and pass it down
       find_package(BISON)
@@ -57,7 +57,7 @@ if(MITK_USE_SWIG)
                             --with-pcre-prefix=${PCRE_DIR}
                             --without-octave
                             --with-python=${PYTHON_EXECUTABLE}
-        DEPENDS ${Swig_DEPENDENCIES}
+        DEPENDS ${SWIG_DEPENDENCIES}
         )
 
       ExternalProject_Get_Property(${proj} install_dir)
@@ -65,5 +65,5 @@ if(MITK_USE_SWIG)
       set(SWIG_EXECUTABLE ${install_dir}/bin/swig)
 
     endif()
-  endif(NOT SWIG_DIR)
+  endif()
 endif()

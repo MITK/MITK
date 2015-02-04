@@ -173,6 +173,7 @@ public:
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadImage(""), mitk::Exception);
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadSurface(""), mitk::Exception);
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadPointSet(""), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Load(""), mitk::Exception);
   }
 
   /**

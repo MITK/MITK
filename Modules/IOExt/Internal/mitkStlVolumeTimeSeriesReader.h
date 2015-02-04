@@ -29,7 +29,7 @@ namespace mitk
 class StlVolumeTimeSeriesReader : public SurfaceSource, public FileSeriesReader
 {
 public:
-    mitkClassMacro( StlVolumeTimeSeriesReader, FileReader );
+  mitkClassMacro(StlVolumeTimeSeriesReader, FileSeriesReader);
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)

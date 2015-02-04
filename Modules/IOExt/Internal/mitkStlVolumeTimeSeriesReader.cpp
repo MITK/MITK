@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkStlVolumeTimeSeriesReader.h"
-#include "mitkSTLFileReader.h"
 #include "mitkSurface.h"
 #include "vtkPolyData.h"
+#include <mitkIOUtil.h>
 
 void mitk::StlVolumeTimeSeriesReader::GenerateData()
 {
@@ -36,20 +36,18 @@ void mitk::StlVolumeTimeSeriesReader::GenerateData()
     std::string fileName = m_MatchedFileNames[i];
     MITK_INFO << "Loading " << fileName << " as stl..." << std::endl;
 
-    STLFileReader::Pointer stlReader = STLFileReader::New();
-    stlReader->SetFileName( fileName.c_str() );
-    stlReader->Update();
+    mitk::Surface::Pointer surface = IOUtil::LoadSurface(fileName.c_str());
 
-    if ( stlReader->GetOutput() != NULL )
-    {
-      surface->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData(), i );
-    }
-    else
+    if (surface.IsNull())
     {
       itkWarningMacro(<< "stlReader returned NULL while reading " << fileName << ". Trying to continue with empty vtkPolyData...");
-      surface->SetVtkPolyData( vtkPolyData::New(), i );
+      surface->SetVtkPolyData(vtkPolyData::New(), i);
+      return;
     }
+
+    surface->SetVtkPolyData(surface->GetVtkPolyData(), i);
   }
+
 }
 
 bool mitk::StlVolumeTimeSeriesReader::CanReadFile(const std::string /*filename*/, const std::string filePrefix, const std::string filePattern)

@@ -116,6 +116,9 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     void UpdateRenderTrackingTimer();
     void UpdateLoggingTrackingTimer();
 
+    /** @brief Slot for showing the rendering disabled warning label*/
+    void OnChangeRenderUpdateRate();
+
     /** @brief Resets the Tracking Tools: this means all tools are removed. */
     void OnResetTools();
 

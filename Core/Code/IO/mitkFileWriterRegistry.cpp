@@ -49,7 +49,7 @@ std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry:
 std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry::GetReferences(const mitk::BaseData* baseData, const std::string& mimeType, us::ModuleContext* context)
 {
   if (baseData == NULL){
-    MITK_ERROR << "Warning: FileWriterRegistry::GetReferences was called with null basedata. Returning empty list, please report this error to the developers.";
+    mitkThrow() << "FileWriterRegistry::GetReferences was called with null basedata.";
     std::vector<mitk::FileWriterRegistry::WriterReference> emptyResult;
     return emptyResult;
   }
@@ -84,7 +84,7 @@ mitk::IFileWriter* mitk::FileWriterRegistry::GetWriter(const mitk::FileWriterReg
 std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(const mitk::BaseData* baseData, const std::string& mimeType, us::ModuleContext* context)
 {
   if (baseData == NULL){
-    MITK_ERROR << "Warning: FileWriterRegistry::GetReferences was called with null basedata. Returning empty list, please report this error to the developers.";
+    mitkThrow() << "FileWriterRegistry::GetReferences was called with null basedata.";
     std::vector<mitk::IFileWriter*> emptyResult;
     return emptyResult;
   }

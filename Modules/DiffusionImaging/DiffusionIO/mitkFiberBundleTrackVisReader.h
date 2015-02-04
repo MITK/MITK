@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkFiberBundleXReader_h
-#define __mitkFiberBundleXReader_h
+#ifndef __mitkFiberBundleTrackVisReader_h
+#define __mitkFiberBundleTrackVisReader_h
 
 #include <mitkCommon.h>
 #include <mitkFileReader.h>
@@ -30,14 +30,14 @@ namespace mitk
   /** \brief
   */
 
-  class FiberBundleXReader : public AbstractFileReader
+  class FiberBundleTrackVisReader : public AbstractFileReader
   {
   public:
 
-    FiberBundleXReader();
-    virtual ~FiberBundleXReader(){}
-    FiberBundleXReader(const FiberBundleXReader& other);
-    virtual FiberBundleXReader * Clone() const;
+    FiberBundleTrackVisReader();
+    virtual ~FiberBundleTrackVisReader(){}
+    FiberBundleTrackVisReader(const FiberBundleTrackVisReader& other);
+    virtual FiberBundleTrackVisReader * Clone() const;
 
     using mitk::AbstractFileReader::Read;
     virtual std::vector<itk::SmartPointer<BaseData> > Read();

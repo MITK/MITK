@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFiberBundleXSerializer.h"
 #include "mitkFiberBundleX.h"
-#include "mitkFiberBundleXWriter.h"
+#include "mitkFiberBundleVtkWriter.h"
 
 #include <itksys/SystemTools.hxx>
 #include <mitkIOUtil.h>

@@ -20,14 +20,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImageNiftiReaderService.h>
 #include <mitkNrrdTensorImageReader.h>
 #include <mitkNrrdQBallImageReader.h>
-#include <mitkFiberBundleXReader.h>
+#include <mitkFiberBundleVtkReader.h>
+#include <mitkFiberBundleTrackVisReader.h>
 #include <mitkConnectomicsNetworkReader.h>
 
 #include <mitkDiffusionImageNrrdWriterService.h>
 #include <mitkDiffusionImageNiftiWriterService.h>
 #include <mitkNrrdTensorImageWriter.h>
 #include <mitkNrrdQBallImageWriter.h>
-#include <mitkFiberBundleXWriter.h>
+#include <mitkFiberBundleVtkWriter.h>
+#include <mitkFiberBundleTrackVisWriter.h>
 #include <mitkConnectomicsNetworkWriter.h>
 
 #include "mitkDiffusionIOMimeTypes.h"
@@ -57,14 +59,16 @@ namespace mitk
       m_DiffusionImageNiftiReaderService = new DiffusionImageNiftiReaderService();
       m_NrrdTensorImageReader = new NrrdTensorImageReader();
       m_NrrdQBallImageReader = new NrrdQBallImageReader();
-      m_FiberBundleXReader = new FiberBundleXReader();
+      m_FiberBundleVtkReader = new FiberBundleVtkReader();
+      m_FiberBundleTrackVisReader = new FiberBundleTrackVisReader();
       m_ConnectomicsNetworkReader = new ConnectomicsNetworkReader();
 
       m_DiffusionImageNrrdWriterService = new DiffusionImageNrrdWriterService();
       m_DiffusionImageNiftiWriterService = new DiffusionImageNiftiWriterService();
       m_NrrdTensorImageWriter = new NrrdTensorImageWriter();
       m_NrrdQBallImageWriter = new NrrdQBallImageWriter();
-      m_FiberBundleXWriter = new FiberBundleXWriter();
+      m_FiberBundleVtkWriter = new FiberBundleVtkWriter();
+      m_FiberBundleTrackVisWriter = new FiberBundleTrackVisWriter();
       m_ConnectomicsNetworkWriter = new ConnectomicsNetworkWriter();
     }
 
@@ -79,14 +83,16 @@ namespace mitk
       delete m_DiffusionImageNiftiReaderService;
       delete m_NrrdTensorImageReader;
       delete m_NrrdQBallImageReader;
-      delete m_FiberBundleXReader;
+      delete m_FiberBundleVtkReader;
+      delete m_FiberBundleTrackVisReader;
       delete m_ConnectomicsNetworkReader;
 
       delete m_DiffusionImageNrrdWriterService;
       delete m_DiffusionImageNiftiWriterService;
       delete m_NrrdTensorImageWriter;
       delete m_NrrdQBallImageWriter;
-      delete m_FiberBundleXWriter;
+      delete m_FiberBundleVtkWriter;
+      delete m_FiberBundleTrackVisWriter;
       delete m_ConnectomicsNetworkWriter;
     }
 
@@ -96,14 +102,16 @@ namespace mitk
     DiffusionImageNiftiReaderService * m_DiffusionImageNiftiReaderService;
     NrrdTensorImageReader * m_NrrdTensorImageReader;
     NrrdQBallImageReader * m_NrrdQBallImageReader;
-    FiberBundleXReader * m_FiberBundleXReader;
+    FiberBundleVtkReader * m_FiberBundleVtkReader;
+    FiberBundleTrackVisReader * m_FiberBundleTrackVisReader;
     ConnectomicsNetworkReader * m_ConnectomicsNetworkReader;
 
     DiffusionImageNrrdWriterService * m_DiffusionImageNrrdWriterService;
     DiffusionImageNiftiWriterService * m_DiffusionImageNiftiWriterService;
     NrrdTensorImageWriter * m_NrrdTensorImageWriter;
     NrrdQBallImageWriter * m_NrrdQBallImageWriter;
-    FiberBundleXWriter * m_FiberBundleXWriter;
+    FiberBundleVtkWriter * m_FiberBundleVtkWriter;
+    FiberBundleTrackVisWriter * m_FiberBundleTrackVisWriter;
     ConnectomicsNetworkWriter * m_ConnectomicsNetworkWriter;
 
     std::vector<mitk::CustomMimeType*> m_MimeTypes;

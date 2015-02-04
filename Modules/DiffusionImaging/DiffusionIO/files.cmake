@@ -30,8 +30,10 @@ set(CPP_FILES
   mitkNrrdQBallImageWriter.cpp
   mitkQBallImageSerializer.cpp
 
-  mitkFiberBundleXReader.cpp
-  mitkFiberBundleXWriter.cpp
+  mitkFiberBundleTrackVisReader.cpp
+  mitkFiberBundleTrackVisWriter.cpp
+  mitkFiberBundleVtkReader.cpp
+  mitkFiberBundleVtkWriter.cpp
   mitkFiberBundleXSerializer.cpp
   mitkFiberBundleXMapper2D.cpp
   mitkFiberBundleXMapper3D.cpp

@@ -193,21 +193,22 @@ endif()
 
 set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
 
-mitkFunctionAddExternalProject(NAME Poco    ON  COMPONENTS Foundation Util XML)
-mitkFunctionAddExternalProject(NAME Boost   OFF DOC "Use the Boost C++ library")
-mitkFunctionAddExternalProject(NAME DCMTK   ON  DOC "EXPERIMENTAL, superbuild only: Use DCMTK in MITK")
+mitkFunctionAddExternalProject(NAME Poco        ON  COMPONENTS Foundation Util XML)
+mitkFunctionAddExternalProject(NAME Boost       OFF DOC "Use the Boost C++ library")
+mitkFunctionAddExternalProject(NAME DCMTK       ON  DOC "EXPERIMENTAL, superbuild only: Use DCMTK in MITK")
+mitkFunctionAddExternalProject(NAME OpenIGTLink OFF)
 
-mitkFunctionAddExternalProject(NAME tinyxml ON  ADVANCED)
-mitkFunctionAddExternalProject(NAME GDCM    ON  ADVANCED)
-mitkFunctionAddExternalProject(NAME GLUT    OFF ADVANCED)
-mitkFunctionAddExternalProject(NAME Raptor2 OFF ADVANCED)
-mitkFunctionAddExternalProject(NAME Eigen   ON  ADVANCED DOC "Use the Eigen library")
-mitkFunctionAddExternalProject(NAME GLEW    ON  ADVANCED DOC "Use the GLEW library")
-mitkFunctionAddExternalProject(NAME ANN     ON  ADVANCED DOC "Use Approximate Nearest Neighbor Library")
-mitkFunctionAddExternalProject(NAME CppUnit ON  ADVANCED DOC "Use CppUnit for unit tests")
+mitkFunctionAddExternalProject(NAME tinyxml     ON  ADVANCED)
+mitkFunctionAddExternalProject(NAME GDCM        ON  ADVANCED)
+mitkFunctionAddExternalProject(NAME GLUT        OFF ADVANCED)
+mitkFunctionAddExternalProject(NAME Raptor2     OFF ADVANCED)
+mitkFunctionAddExternalProject(NAME Eigen       ON  ADVANCED DOC "Use the Eigen library")
+mitkFunctionAddExternalProject(NAME GLEW        ON  ADVANCED DOC "Use the GLEW library")
+mitkFunctionAddExternalProject(NAME ANN         ON  ADVANCED DOC "Use Approximate Nearest Neighbor Library")
+mitkFunctionAddExternalProject(NAME CppUnit     ON  ADVANCED DOC "Use CppUnit for unit tests")
 
-mitkFunctionAddExternalProject(NAME PCRE    OFF ADVANCED NO_PACKAGE)
-mitkFunctionAddExternalProject(NAME ZLIB    OFF ADVANCED NO_PACKAGE NO_CACHE)
+mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
+mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE)
 
 # -----------------------------------------
 # The following external projects must be
@@ -838,7 +839,7 @@ if(BUILD_TESTING)
 
   # Test the external project template
   if(MITK_USE_BLUEBERRY)
-    include(mitkTestProjectTemplate)
+    #include(mitkTestProjectTemplate)
   endif()
 
   # Test the package target

@@ -170,7 +170,7 @@ void QmitkConnectomicsDataView::OnSelectionChanged( std::vector<mitk::DataNode*>
       m_Controls->inputImageOneLabel->setVisible( true );
     }
 
-    if( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
+    if( node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()) )
     {
       currentFormatUnknown = false;
       // a fiber bundle has to be in conjunction with a parcellation
@@ -371,13 +371,13 @@ void QmitkConnectomicsDataView::OnNetworkifyPushButtonClicked()
   {
     // test if this data item is an image or not (could also be a surface or something totally different)
     mitk::Image* image = dynamic_cast<mitk::Image*>( firstData );
-    mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*>( secondData );
+    mitk::FiberBundle* fiberBundle = dynamic_cast<mitk::FiberBundle*>( secondData );
 
     // check whether order was switched
     if (! (image && fiberBundle) )
     {
       image = dynamic_cast<mitk::Image*>( secondData );
-      fiberBundle = dynamic_cast<mitk::FiberBundleX*>( firstData );
+      fiberBundle = dynamic_cast<mitk::FiberBundle*>( firstData );
     }
 
     if (image && fiberBundle)

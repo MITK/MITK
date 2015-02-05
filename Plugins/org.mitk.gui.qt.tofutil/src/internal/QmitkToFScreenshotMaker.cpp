@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Mitk
 #include <mitkToFCameraDevice.h>
 #include <mitkIOUtil.h>
-#include <mitkImageWriter.h>
 
 // Qt
 #include <QString>
@@ -70,8 +69,10 @@ void QmitkToFScreenshotMaker::OnSelectCamera()
   m_Controls.m_MakeScreenshot->setEnabled(device->IsCameraActive());
 
   //todo: where do i get correct file extensions?
-  mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
-  std::vector<std::string> fileExtensions = imageWriter->GetPossibleFileExtensions();
+  std::vector<std::string> fileExtensions;
+  fileExtensions.push_back(".png");
+  fileExtensions.push_back(".nrrd");
+  fileExtensions.push_back(".jpg");
   QStringList extensions;
   for( unsigned int i = 0; i < fileExtensions.size(); ++i)
   {

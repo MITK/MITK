@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkImageCast.h>
-#include <mitkBaseDataIOFactory.h>
 #include "mitkCommandLineParser.h"
 #include <boost/algorithm/string.hpp>
 #include <mitkImage.h>
@@ -29,23 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 typedef mitk::Image DiffusionImageType;
 typedef itk::Image<short, 3> ImageType;
-
-mitk::BaseData::Pointer LoadFile(std::string filename)
-{
-  if( filename.empty() )
-    return NULL;
-
-  const std::string s1="", s2="";
-  std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( filename, s1, s2, false );
-  if( infile.empty() )
-  {
-    std::cout << "File " << filename << " could not be read!";
-    return NULL;
-  }
-
-  mitk::BaseData::Pointer baseData = infile.at(0);
-  return baseData;
-}
 
 /**
  * Denoises DWI using the Nonlocal - Means algorithm
@@ -103,7 +85,7 @@ int main(int argc, char* argv[])
     if( boost::algorithm::ends_with(inFileName, ".dwi"))
     {
 
-      DiffusionImageType::Pointer dwi = dynamic_cast<DiffusionImageType*>(LoadFile(inFileName).GetPointer());
+      DiffusionImageType::Pointer dwi = mitk::IOUtil::LoadImage(inFileName);
 
       mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
       mitk::CastToItkImage(dwi, itkVectorImagePointer);
@@ -114,7 +96,7 @@ int main(int argc, char* argv[])
 
       if (!maskName.empty())
       {
-        mitk::Image::Pointer mask = dynamic_cast<mitk::Image*>(LoadFile(maskName).GetPointer());
+        mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(maskName);
         ImageType::Pointer itkMask = ImageType::New();
         mitk::CastToItkImage(mask, itkMask);
         filter->SetInputMask(itkMask);

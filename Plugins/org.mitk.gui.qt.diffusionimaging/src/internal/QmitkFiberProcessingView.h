@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkFiberProcessingViewControls.h"
 
 #include <mitkPlanarFigureComposite.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkSurface.h>
 
 #include <itkCastImageFilter.h>
@@ -174,10 +174,10 @@ protected:
   void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer pfc, mitk::DataNode::Pointer parentNode=NULL);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
   void WritePfToImage(mitk::DataNode::Pointer node, mitk::Image* image);
-  mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary, bool absolute);
-  mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundleX::Pointer fib);
-  mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundleX::Pointer fib);
-  mitk::DataNode::Pointer GenerateFiberEndingsPointSet(mitk::FiberBundleX::Pointer fib);
+  mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundle::Pointer fib, bool binary, bool absolute);
+  mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundle::Pointer fib);
+  mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundle::Pointer fib);
+  mitk::DataNode::Pointer GenerateFiberEndingsPointSet(mitk::FiberBundle::Pointer fib);
 
   void NodeAdded( const mitk::DataNode* node );
   void NodeRemoved(const mitk::DataNode* node);

@@ -44,10 +44,9 @@ void mitk::UnstructuredGridToUnstructuredGridFilter::CreateOutputsForAllInputs(u
   {
     if (this->GetOutput(idx) == NULL)
     {
-      DataObjectPointer newOutput = this->MakeOutput(idx);
-      this->SetNthOutput(idx, newOutput);
+      mitk::UnstructuredGrid::Pointer newOutputX = mitk::UnstructuredGrid::New();
+      this->SetNthOutput(idx, newOutputX);
     }
-    this->GetOutput( idx )->Graft( this->GetInput( idx) );
   }
   this->Modified();
 }

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkBaseDataIOFactory.h"
 #include <mitkCoreObjectFactory.h>
 #include "mitkImage.h"
 #include "itkAnalyticalDiffusionQballReconstructionImageFilter.h"
@@ -26,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkImageCast.h>
 #include <mitkProperties.h>
+#include <mitkIOUtil.h>
 
 using namespace mitk;
 
@@ -84,8 +84,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        const std::string s1="", s2="";
-        std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
+        std::vector<BaseData::Pointer> infile = mitk::IOUtil::Load(inFileName);
         Image::Pointer dwi = dynamic_cast<Image*>(infile.at(0).GetPointer());
         mitk::DiffusionPropertyHelper propertyHelper(dwi);
         propertyHelper.AverageRedundantGradients(0.001);

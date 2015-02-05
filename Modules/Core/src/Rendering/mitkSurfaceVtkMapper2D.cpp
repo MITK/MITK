@@ -46,7 +46,6 @@ mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_Mapper->ScalarVisibilityOff();
   m_Actor = vtkSmartPointer<vtkActor>::New();
-  m_Actor->SetMapper( m_Mapper );
   m_PropAssembly = vtkSmartPointer <vtkAssembly>::New();
   m_PropAssembly->AddPart( m_Actor );
   m_CuttingPlane = vtkSmartPointer<vtkPlane>::New();
@@ -90,8 +89,6 @@ mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
   m_InverseNormalActor->SetMapper(m_InverseNormalMapper);
 
   m_ReverseSense = vtkSmartPointer<vtkReverseSense>::New();
-
-  m_PropAssembly->AddPart( m_NormalActor );
 }
 
 // destructor LocalStorage
@@ -185,7 +182,7 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
     timestep = dataTimeGeometry->TimePointToTimeStep( time );
 
   vtkSmartPointer<vtkPolyData> inputPolyData = surface->GetVtkPolyData( timestep );
-  if((inputPolyData==NULL) || (inputPolyData->GetNumberOfPoints() < 1 ))
+  if ((inputPolyData == NULL) || (inputPolyData->GetNumberOfPoints() < 1))
     return;
 
   //apply color and opacity read from the PropertyList
@@ -196,6 +193,9 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
   {
     return;
   }
+
+  if (localStorage->m_Actor->GetMapper() == NULL)
+    localStorage->m_Actor->SetMapper(localStorage->m_Mapper);
 
   double origin[3];
   origin[0] = planeGeometry->GetOrigin()[0];

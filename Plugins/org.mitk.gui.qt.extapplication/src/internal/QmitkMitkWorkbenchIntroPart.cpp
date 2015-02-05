@@ -34,13 +34,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLabel>
 #include <QMessageBox>
 #include <QtCore/qconfig.h>
-#ifdef QT_WEBKIT
+
 #  include <QWebView>
 #  include <QWebPage>
 #  if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #    include <QUrlQuery>
 #  endif
-#endif
+
 #include <QString>
 #include <QStringList>
 #include <QRegExp>
@@ -97,8 +97,6 @@ void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
     // create GUI widgets
     m_Controls = new Ui::QmitkWelcomeScreenViewControls;
     m_Controls->setupUi(parent);
-#ifdef QT_WEBKIT
-
     // create a QWebView as well as a QWebPage and QWebFrame within the QWebview
     m_view = new QWebView(parent);
     m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
@@ -109,18 +107,14 @@ void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
     // adds the webview as a widget
     parent->layout()->addWidget(m_view);
     this->CreateConnections();
-#else
-    parent->layout()->addWidget(new QLabel("<h1><center>Please install Qt with the WebKit option to see cool pictures!</center></h1>"));
-#endif
   }
 }
 
-#ifdef QT_WEBKIT
 void QmitkMitkWorkbenchIntroPart::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_view->page()), SIGNAL(linkClicked(const QUrl& )), this, SLOT(DelegateMeTo(const QUrl& )) );
+    connect( m_view, SIGNAL(linkClicked(const QUrl& )), this, SLOT(DelegateMeTo(const QUrl& )) );
   }
 }
 
@@ -200,7 +194,6 @@ void QmitkMitkWorkbenchIntroPart::DelegateMeTo(const QUrl& showMeNext)
 
 }
 
-#endif
 
 void QmitkMitkWorkbenchIntroPart::StandbyStateChanged(bool /*standby*/)
 {

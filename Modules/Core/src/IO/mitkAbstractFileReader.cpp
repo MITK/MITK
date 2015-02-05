@@ -393,7 +393,7 @@ void AbstractFileReader::SetDefaultDataNodeProperties(DataNode* node, const std:
     if(baseDataNameProp.IsNull() || (strcmp(baseDataNameProp->GetValue(),"No Name!")==0))
     {
       // name neither defined in node, nor in BaseData -> name = filebasename;
-      nameProp = mitk::StringProperty::New( this->GetMimeType()->GetFilenameWithoutExtension(filePath) );
+      nameProp = mitk::StringProperty::New( this->GetRegisteredMimeType().GetFilenameWithoutExtension(filePath) );
       node->SetProperty("name", nameProp);
     }
     else

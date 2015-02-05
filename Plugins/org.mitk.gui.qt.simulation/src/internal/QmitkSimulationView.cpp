@@ -171,6 +171,8 @@ void QmitkSimulationView::OnBaseContextMenuRequested(const QPoint& point)
   if (vtkModel == NULL)
     return;
 
+  m_VtkModelContextMenu->actions().first()->setChecked(vtkModel->GetMode() == mitk::VtkModel::Surface);
+
   QAction* action = m_VtkModelContextMenu->exec(m_Ui.sceneTreeWidget->mapToGlobal(point));
 
   if (action == NULL)

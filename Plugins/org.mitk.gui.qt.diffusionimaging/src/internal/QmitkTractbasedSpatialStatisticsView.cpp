@@ -82,7 +82,7 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
   mitk::TbssRoiImage* roiImage;
   mitk::TbssImage* image;
   mitk::Image* img;
-  mitk::FiberBundleX* fib;
+  mitk::FiberBundle* fib;
   mitk::PlanarFigure* start;
   mitk::PlanarFigure* end;
 
@@ -122,10 +122,10 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
         }
       }
 
-      else if (QString("FiberBundleX").compare(nodeData->GetNameOfClass())==0)
+      else if (QString("FiberBundle").compare(nodeData->GetNameOfClass())==0)
       {
         foundFiberBundle = true;
-        fib = static_cast<mitk::FiberBundleX*>(nodeData);
+        fib = static_cast<mitk::FiberBundle*>(nodeData);
         this->m_CurrentFiberNode = nodes[i];
       }
 
@@ -525,7 +525,7 @@ void QmitkTractbasedSpatialStatisticsView::Clicked(const QPointF& pos)
 void QmitkTractbasedSpatialStatisticsView::Cut()
 {
   mitk::BaseData* fibData = m_CurrentFiberNode->GetData();
-  mitk::FiberBundleX* fib = static_cast<mitk::FiberBundleX*>(fibData);
+  mitk::FiberBundle* fib = static_cast<mitk::FiberBundle*>(fibData);
 
   mitk::BaseData* startData = m_CurrentStartRoi->GetData();
   mitk::PlanarFigure* startRoi = static_cast<mitk::PlanarFigure*>(startData);
@@ -538,8 +538,8 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
   mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
   mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi
 
-  mitk::FiberBundleX::Pointer inStart = fib->ExtractFiberSubset(startRoi);
-  mitk::FiberBundleX::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
+  mitk::FiberBundle::Pointer inStart = fib->ExtractFiberSubset(startRoi);
+  mitk::FiberBundle::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
 
   int num = inBoth->GetNumFibers();
 
@@ -986,7 +986,7 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
   // Add the lines to the dataset
   polyData->SetLines(cells);
 
-  mitk::FiberBundleX::Pointer cutBundle = mitk::FiberBundleX::New(polyData);
+  mitk::FiberBundle::Pointer cutBundle = mitk::FiberBundle::New(polyData);
 
 
   mitk::DataNode::Pointer cutNode = mitk::DataNode::New();
@@ -1082,7 +1082,7 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 }
 
 void QmitkTractbasedSpatialStatisticsView::PlotFiber4D(mitk::TbssImage* image,
-                                                            mitk::FiberBundleX* fib,
+                                                            mitk::FiberBundle* fib,
                                                             mitk::PlanarFigure* startRoi,
                                                             mitk::PlanarFigure* endRoi)
 {
@@ -1101,7 +1101,7 @@ void QmitkTractbasedSpatialStatisticsView::PlotFiber4D(mitk::TbssImage* image,
 
 }
 
-void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img,
+void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundle *fib, mitk::Image* img,
                                                            mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi)
 {
   bool avg = m_Controls->m_Average->isChecked();

@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkOpenGLTexture.h>
 
+// Defined in mitkExportMitkVisitor.cpp
+void ApplyMaterial(mitk::DataNode::Pointer dataNode, const sofa::core::loader::Material& material);
+
 static bool InitGLEW()
 {
   static bool isInitialized = false;
@@ -106,84 +109,103 @@ void mitk::VtkModel::CreateVertexBuffer()
   this->InitVertexBuffer();
 }
 
-void mitk::VtkModel::DrawGroup(int group, bool)
+void mitk::VtkModel::DrawGroup(int group, bool transparent)
+{
+  if (m_Mode == OpenGL)
+  {
+    this->DrawOpenGLGroup(group, transparent);
+  }
+  else if (m_Mode == Surface)
+  {
+    this->DrawSurfaceGroup(group, transparent);
+  }
+}
+
+void mitk::VtkModel::DrawOpenGLGroup(int group, bool)
 {
   using sofa::core::loader::Material;
   using sofa::defaulttype::ResizableExtVector;
   using sofa::defaulttype::Vec4f;
 
-  if (m_Mode == OpenGL)
+  const VecCoord& vertices = this->getVertices();
+  const ResizableExtVector<Deriv>& normals = this->getVnormals();
+  const ResizableExtVector<Triangle>& triangles = this->getTriangles();
+  const ResizableExtVector<Quad>& quads = this->getQuads();
+
+  FaceGroup faceGroup;
+
+  if (group == -1)
   {
-    const VecCoord& vertices = this->getVertices();
-    const ResizableExtVector<Deriv>& normals = this->getVnormals();
-    const ResizableExtVector<Triangle>& triangles = this->getTriangles();
-    const ResizableExtVector<Quad>& quads = this->getQuads();
-
-    FaceGroup faceGroup;
-
-    if (group == -1)
-    {
-      faceGroup.nbt = triangles.size();
-      faceGroup.nbq = quads.size();
-    }
-    else
-    {
-      faceGroup = groups.getValue()[group];
-    }
-
-    Material material = faceGroup.materialId != -1
-      ? materials.getValue()[faceGroup.materialId]
-      : this->material.getValue();
-
-    if (material.useTexture && material.activated)
-    {
-      m_Textures[faceGroup.materialId]->Load(m_VtkRenderer);
-
-      glEnable(GL_TEXTURE_2D);
-      glTexCoordPointer(2, GL_FLOAT, 0, reinterpret_cast<const GLvoid*>(vertices.size() * sizeof(VecCoord::value_type) + normals.size() * sizeof(Deriv)));
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    }
-
-    Vec4f ambient = material.useAmbient ? material.ambient : Vec4f();
-    Vec4f diffuse = material.useDiffuse ? material.diffuse : Vec4f();
-    Vec4f specular = material.useSpecular ? material.specular : Vec4f();
-    Vec4f emissive = material.useEmissive ? material.emissive : Vec4f();
-    float shininess = material.useShininess ? std::min(material.shininess, 128.0f) : 45.0f;
-
-    if (shininess == 0.0f)
-    {
-      specular.clear();
-      shininess = 1.0f;
-    }
-
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient.ptr());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse.ptr());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular.ptr());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emissive.ptr());
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
-
-    if (faceGroup.nbt != 0)
-      glDrawElements(GL_TRIANGLES, faceGroup.nbt * 3, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(faceGroup.tri0 * sizeof(Triangle)));
-
-    if (faceGroup.nbq != 0)
-      glDrawElements(GL_QUADS, faceGroup.nbq * 4, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(triangles.size() * sizeof(Triangle) + faceGroup.quad0 * sizeof(Quad)));
-
-    if (material.useTexture && material.activated)
-    {
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-      glDisable(GL_TEXTURE_2D);
-
-      m_Textures[faceGroup.materialId]->PostRender(m_VtkRenderer);
-    }
+    faceGroup.nbt = triangles.size();
+    faceGroup.nbq = quads.size();
   }
-  else if (m_Mode == Surface)
+  else
   {
-    m_PolyData->SetPoints(m_Points);
-    m_PolyData->SetPolys(m_Polys);
-    m_PolyData->GetPointData()->SetNormals(m_Normals);
-    m_PolyData->GetPointData()->SetTCoords(m_TexCoords);
-    m_PolyData->Modified();
+    faceGroup = groups.getValue()[group];
   }
+
+  Material material = faceGroup.materialId != -1
+    ? materials.getValue()[faceGroup.materialId]
+    : this->material.getValue();
+
+  if (material.useTexture && material.activated)
+  {
+    m_Textures[faceGroup.materialId]->Load(m_VtkRenderer);
+
+    glEnable(GL_TEXTURE_2D);
+    glTexCoordPointer(2, GL_FLOAT, 0, reinterpret_cast<const GLvoid*>(vertices.size() * sizeof(VecCoord::value_type) + normals.size() * sizeof(Deriv)));
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  }
+
+  Vec4f ambient = material.useAmbient ? material.ambient : Vec4f();
+  Vec4f diffuse = material.useDiffuse ? material.diffuse : Vec4f();
+  Vec4f specular = material.useSpecular ? material.specular : Vec4f();
+  Vec4f emissive = material.useEmissive ? material.emissive : Vec4f();
+  float shininess = material.useShininess ? std::min(material.shininess, 128.0f) : 45.0f;
+
+  if (shininess == 0.0f)
+  {
+    specular.clear();
+    shininess = 1.0f;
+  }
+
+  glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient.ptr());
+  glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse.ptr());
+  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular.ptr());
+  glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emissive.ptr());
+  glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+
+  if (faceGroup.nbt != 0)
+    glDrawElements(GL_TRIANGLES, faceGroup.nbt * 3, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(faceGroup.tri0 * sizeof(Triangle)));
+
+  if (faceGroup.nbq != 0)
+    glDrawElements(GL_QUADS, faceGroup.nbq * 4, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(triangles.size() * sizeof(Triangle) + faceGroup.quad0 * sizeof(Quad)));
+
+  if (material.useTexture && material.activated)
+  {
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisable(GL_TEXTURE_2D);
+
+    m_Textures[faceGroup.materialId]->PostRender(m_VtkRenderer);
+  }
+}
+
+void mitk::VtkModel::DrawSurfaceGroup(int group, bool)
+{
+  m_PolyData->SetPoints(m_Points);
+  m_PolyData->SetPolys(m_Polys);
+
+  vtkPointData* pointData = m_PolyData->GetPointData();
+
+  pointData->SetNormals(m_Normals->GetSize() != 0
+    ? m_Normals
+    : NULL);
+
+  pointData->SetTCoords(m_TexCoords->GetSize() != 0
+    ? m_TexCoords
+    : NULL);
+
+  m_PolyData->Modified();
 }
 
 void mitk::VtkModel::DrawGroups(bool transparent)
@@ -218,10 +240,6 @@ void mitk::VtkModel::InitIndexBuffer()
   {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangles.size() * sizeof(Triangle) + quads.size() * sizeof(Quad), NULL, GL_DYNAMIC_DRAW);
-  }
-  else if (m_Mode == Surface)
-  {
-    m_Polys->Initialize();
   }
 
   this->UpdateIndexBuffer();
@@ -444,6 +462,8 @@ void mitk::VtkModel::SetMode(Mode mode)
     m_DataNode = DataNode::New();
     m_DataNode->SetName(name.getValue());
     m_DataNode->SetData(m_Surface);
+
+    ApplyMaterial(m_DataNode, this->material.getValue());
   }
 
   m_Mode = mode;

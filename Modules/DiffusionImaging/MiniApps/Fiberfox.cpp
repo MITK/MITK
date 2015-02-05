@@ -18,9 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkProperties.h>
 #include <mitkImage.h>
-#include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkFiberfoxParameters.h>
 #include "mitkCommandLineParser.h"
 
@@ -64,7 +63,7 @@ int main(int argc, char* argv[])
         FiberfoxParameters<double> parameters;
         parameters.LoadParameters(paramName);
 
-        mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
+        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
 
         itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
         tractsToDwiFilter->SetParameters(parameters);

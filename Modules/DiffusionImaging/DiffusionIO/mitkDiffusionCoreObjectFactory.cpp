@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
 
-#include "mitkNrrdDiffusionImageWriter.h"
-
 #include "mitkCompositeMapper.h"
 #include "mitkGPUVolumeMapper3D.h"
 #include "mitkVolumeDataVtkMapper3D.h"

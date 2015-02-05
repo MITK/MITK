@@ -21,21 +21,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <vtkPolyData.h>
 
-static vtkPolyData* DeepCopy(vtkPolyData* other)
+static vtkSmartPointer<vtkPolyData> DeepCopy(vtkPolyData* other)
 {
   if (other == NULL)
     return NULL;
 
-  vtkPolyData* copy = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> copy = vtkSmartPointer<vtkPolyData>::New();
   copy->DeepCopy(other);
 
   return copy;
-}
-
-static void Delete(vtkPolyData* polyData)
-{
-  if (polyData != NULL)
-    polyData->Delete();
 }
 
 static void Update(vtkPolyData* /*polyData*/)
@@ -88,9 +82,6 @@ mitk::Surface::~Surface()
 
 void mitk::Surface::ClearData()
 {
-  using ::Delete;
-
-  std::for_each(m_PolyDatas.begin(), m_PolyDatas.end(), Delete);
   m_PolyDatas.clear();
 
   Superclass::ClearData();
@@ -126,13 +117,11 @@ void mitk::Surface::SetVtkPolyData(vtkPolyData* polyData, unsigned int t)
 
   if (m_PolyDatas[t] != NULL)
   {
-    if (m_PolyDatas[t] == polyData)
+    if (m_PolyDatas[t].GetPointer() == polyData)
       return;
-
-    m_PolyDatas[t]->Delete();
   }
 
-  m_PolyDatas[t] = polyData;
+  m_PolyDatas[t].TakeReference(polyData);
 
   if(polyData != NULL)
     polyData->Register(NULL);
@@ -171,7 +160,7 @@ vtkPolyData* mitk::Surface::GetVtkPolyData(unsigned int t) const
       this->GetSource()->Update();
     }
 
-    return m_PolyDatas[t];
+    return m_PolyDatas[t].GetPointer();
   }
 
   return NULL;
@@ -197,7 +186,7 @@ void mitk::Surface::CalculateBoundingBox()
 
   for (unsigned int i = 0; i < m_PolyDatas.size(); ++i)
   {
-    vtkPolyData* polyData = m_PolyDatas[i];
+    vtkPolyData* polyData = m_PolyDatas[i].GetPointer();
     double bounds[6] = {0};
 
     if (polyData != NULL && polyData->GetNumberOfPoints() > 0)
@@ -349,7 +338,7 @@ void mitk::Surface::Graft(const DataObject* data)
 
   for (unsigned int i = 0; i < surface->GetSizeOfPolyDataSeries(); ++i)
   {
-    m_PolyDatas.push_back(vtkPolyData::New());
+    m_PolyDatas.push_back(vtkSmartPointer<vtkPolyData>::New());
     m_PolyDatas.back()->DeepCopy(const_cast<mitk::Surface*>(surface)->GetVtkPolyData(i));
   }
 }
@@ -362,7 +351,7 @@ void mitk::Surface::PrintSelf(std::ostream& os, itk::Indent indent) const
 
   unsigned int count = 0;
 
-  for (std::vector<vtkPolyData*>::const_iterator it = m_PolyDatas.begin(); it != m_PolyDatas.end(); ++it)
+  for (std::vector<vtkSmartPointer<vtkPolyData> >::const_iterator it = m_PolyDatas.begin(); it != m_PolyDatas.end(); ++it)
   {
     os << "\n";
 

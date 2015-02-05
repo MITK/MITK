@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkImageToItk.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkImageCast.h>
 
 // VTK
@@ -280,7 +280,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     fiberPolyData->SetPoints(vPoints);
     fiberPolyData->SetLines(vCellArray);
 
-    mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberPolyData);
+    mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(fiberPolyData);
     fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_DiffusionImageNode->GetData())->GetGeometry());
     mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
     fbNode->SetData(fib);

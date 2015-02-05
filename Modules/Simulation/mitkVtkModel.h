@@ -65,7 +65,9 @@ namespace mitk
 
     void CreateIndexBuffer();
     void CreateVertexBuffer();
-    void DrawGroup(int group, bool);
+    void DrawGroup(int group, bool transparent);
+    void DrawOpenGLGroup(int group, bool transparent);
+    void DrawSurfaceGroup(int group, bool transparent);
     void DrawGroups(bool transparent);
     void DrawNormals();
     void InitIndexBuffer();

@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkModuleView.h"
 
-#include <mitkDataNodeFactory.h>
 #include <mitkIDataStorageService.h>
 #include <mitkSceneIO.h>
 #include <mitkProgressBar.h>
@@ -32,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryPlatformUI.h>
 #include <berryIPreferencesService.h>
+#include <mitkIOUtil.h>
 
 #include <Poco/Util/OptionProcessor.h>
 
@@ -108,20 +108,11 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
          }
          else
          {
-           mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
            try
            {
-             nodeReader->SetFileName(arguments[i].toStdString());
-             nodeReader->Update();
-             for (unsigned int j = 0 ; j < nodeReader->GetNumberOfOutputs( ); ++j)
-             {
-               mitk::DataNode::Pointer node = nodeReader->GetOutput(j);
-               if (node->GetData() != 0)
-               {
-                 dataStorage->Add(node);
-                 argumentsAdded++;
-               }
-             }
+             const std::string path(arguments[i].toStdString());
+             mitk::IOUtil::Load(path, *dataStorage);
+             argumentsAdded++;
            }
            catch(...)
            {

@@ -1009,7 +1009,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
       ImageType::Pointer resampledImage = resampler->GetOutput();
 
-      newImage = mitk::ImportItkImage( resampledImage );
+      newImage = mitk::ImportItkImage( resampledImage )->Clone();
       nameAddition << "_Resampled_" << selectedInterpolator;
       std::cout << "Resampling successful." << std::endl;
       break;

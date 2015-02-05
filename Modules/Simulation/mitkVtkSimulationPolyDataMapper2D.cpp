@@ -39,7 +39,7 @@ mitk::vtkSimulationPolyDataMapper2D::~vtkSimulationPolyDataMapper2D()
 {
 }
 
-void mitk::vtkSimulationPolyDataMapper2D::Render(vtkRenderer* renderer, vtkActor* actor)
+void mitk::vtkSimulationPolyDataMapper2D::Render(vtkRenderer* renderer, vtkActor*)
 {
   typedef PlaneIntersectionVisitor::Edge Edge;
   typedef PlaneIntersectionVisitor::Intersection Intersection;

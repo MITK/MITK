@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(
   INCLUDE_DIRS PRIVATE src/Algorithms src/DataManagement src/Interactions src/IO src/Rendering
-  DEPENDS MitkLegacyIO MitkSceneSerializationBase MitkLegacyGL MitkOverlays
+  DEPENDS MitkSceneSerializationBase MitkLegacyGL MitkOverlays
   WARNINGS_AS_ERRORS
 )
 

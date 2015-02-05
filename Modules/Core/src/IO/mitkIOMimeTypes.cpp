@@ -215,8 +215,8 @@ CustomMimeType IOMimeTypes::NIFTI_MIMETYPE()
   mimeType.AddExtension("nii");
   mimeType.AddExtension("nii.gz");
   mimeType.AddExtension("hdr");
+  mimeType.AddExtension("hdr.gz");
   mimeType.AddExtension("img");
-  mimeType.AddExtension("img.gz");
   mimeType.AddExtension("img.gz");
   mimeType.AddExtension("nia");
   mimeType.SetCategory("Images");

@@ -17,8 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkTensorImage.h>
 #include <mitkIOUtil.h>
-#include <mitkBaseDataIOFactory.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <itkStreamlineTrackingFilter.h>
 #include <itkDiffusionTensor3D.h>
 #include "mitkCommandLineParser.h"
@@ -152,7 +151,7 @@ int main(int argc, char* argv[])
             std::cout << "No fibers reconstructed. Check parametrization.";
             return EXIT_FAILURE;
         }
-        mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberBundle);
+        mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(fiberBundle);
         fib->SetReferenceGeometry(mitkImage->GetGeometry());
 
         mitk::IOUtil::SaveBaseData(fib.GetPointer(), outFileName );

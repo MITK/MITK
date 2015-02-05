@@ -30,6 +30,7 @@ namespace mitk
     ExportMitkVisitor(DataStorage::Pointer dataStorage, const std::string& visualModelName, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
     ~ExportMitkVisitor();
 
+    using sofa::simulation::Visitor::processNodeTopDown;
     Result processNodeTopDown(sofa::simulation::Node* node);
 
   private:

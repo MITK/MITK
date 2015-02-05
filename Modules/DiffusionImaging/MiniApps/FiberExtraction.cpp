@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkBaseDataIOFactory.h>
 #include <metaCommand.h>
 #include "mitkCommandLineParser.h"
 #include <usAny.h>
@@ -23,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureComposite.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 
@@ -69,8 +68,8 @@ int main(int argc, char* argv[])
         typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
 
         // load fiber bundle
-        mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(inFib)->GetData());
-        mitk::FiberBundleX::Pointer result;
+        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(inFib)->GetData());
+        mitk::FiberBundle::Pointer result;
 
         mitk::BaseData::Pointer input1 = mitk::IOUtil::LoadDataNode(pf1_path)->GetData();
         mitk::PlanarFigure::Pointer pf1 = dynamic_cast<mitk::PlanarFigure*>(input1.GetPointer());

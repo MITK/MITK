@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIDataStorageReference.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkColorProperty.h"
 #include "mitkCommon.h"
 #include "mitkNodePredicateData.h"

@@ -15,7 +15,7 @@
 #! boolean cache option is created with the given DOC argument as help string.
 #! The option is marked as advanced if the ADVANCED option is set. The
 #! option's initial value matches the ON or OFF option and defaults to OFF
-#! is none is given. The DEPENDS arguments are used to force the
+#! if none is given. The DEPENDS arguments are used to force the
 #! corresponding MITK_USE_<depN> cache variables to ON if MITK_USE_<name>
 #! is ON.
 #!
@@ -53,11 +53,12 @@ function(mitkFunctionAddExternalProject)
     set(_on 1)
   endif()
 
-  if(_on)
+  if(_on AND EP_DEPENDS)
     # Get all transitive dependencies
     set(_depends_all)
     set(_depends_cur ${EP_DEPENDS})
-    set(_depends_new ${EP_DEPENDS})
+    list(REMOVE_DUPLICATES _depends_cur)
+    set(_depends_new ${_depends_cur})
     while(NOT "${_depends_all}" STREQUAL "${_depends_cur}")
       list(APPEND _depends_all ${_depends_new})
       set(_depends_new_tmp )
@@ -66,7 +67,10 @@ function(mitkFunctionAddExternalProject)
         list(APPEND _depends_new_tmp ${_dep_dep})
       endforeach()
       set(_depends_new ${_depends_new_tmp})
-      list(APPEND _depends_cur ${_depends_new})
+      if(_depends_new)
+        list(REMOVE_DUPLICATES _depends_new)
+        list(APPEND _depends_cur ${_depends_new})
+      endif()
     endwhile()
     # Force dependencies to ON
     foreach(dep ${_depends_all})

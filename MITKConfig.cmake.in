@@ -183,6 +183,14 @@ if(MITK_USE_SOFA)
 endif()
 
 # -----------------------------------------
+# Special handling for OpenIGTLink
+
+if(MITK_USE_OpenIGTLink)
+  # Same as SOFA above
+  link_directories(${OpenIGTLink_LIBRARY_DIRS})
+endif()
+
+# -----------------------------------------
 # External dependencies from the superbuild
 # or injected from somewhere else via
 # <project>_DIR variables.

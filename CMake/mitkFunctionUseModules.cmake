@@ -102,6 +102,7 @@ function(_include_package_config pkg_config_file)
   set(ALL_INCLUDE_DIRECTORIES ${ALL_INCLUDE_DIRECTORIES} PARENT_SCOPE)
   set(ALL_LIBRARIES ${ALL_LIBRARIES} PARENT_SCOPE)
   set(ALL_COMPILE_DEFINITIONS ${ALL_COMPILE_DEFINITIONS} PARENT_SCOPE)
+  set(ALL_COMPILE_OPTIONS ${ALL_COMPILE_OPTIONS} PARENT_SCOPE)
 endfunction()
 
 #! This CMake function sets up the necessary include directories,
@@ -167,6 +168,7 @@ function(mitk_use_modules)
       set(ALL_INCLUDE_DIRECTORIES)
       set(ALL_LIBRARIES)
       set(ALL_COMPILE_DEFINITIONS)
+      set(ALL_COMPILE_OPTIONS)
 
       set(${_package}_REQUIRED_COMPONENTS_BY_MODULE ${${_package_visibility}_${_package}_REQUIRED_COMPONENTS})
       set(_package_found 0)
@@ -179,16 +181,24 @@ function(mitk_use_modules)
       endforeach()
       if(_package_found)
         if(ALL_INCLUDE_DIRECTORIES)
+          list(REMOVE_DUPLICATES ALL_INCLUDE_DIRECTORIES)
           target_include_directories(${USE_TARGET} SYSTEM ${_package_visibility} ${ALL_INCLUDE_DIRECTORIES})
         endif()
         if(ALL_LIBRARIES)
+          # Don't remove "duplicats" because ALL_LIBRARIES may be of the form:
+          # "general;bla;debug;blad;general;foo;debug;food"
           target_link_libraries(${USE_TARGET} ${_package_visibility} ${ALL_LIBRARIES})
         endif()
         if(ALL_COMPILE_DEFINITIONS)
-          # we consider all compile definitions from external projects as "private",
-          # meaning they are only needed for the implementation and not when using
-          # this the header files from the MITK module
+          list(REMOVE_DUPLICATES ALL_COMPILE_DEFINITIONS)
+          # Compile definitions are always added "PRIVATE" to avoid multiple definitions
+          # on the command line due to transitive and direct dependencies adding the
+          # same definitions.
           target_compile_definitions(${USE_TARGET} PRIVATE ${ALL_COMPILE_DEFINITIONS})
+        endif()
+        if(ALL_COMPILE_OPTIONS)
+          list(REMOVE_DUPLICATES ALL_COMPILE_OPTIONS)
+          target_compile_options(${USE_TARGET} ${_package_visibility} ${ALL_COMPILE_OPTIONS})
         endif()
       else()
         message(SEND_ERROR "Missing package: ${_package}")

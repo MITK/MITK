@@ -775,6 +775,11 @@ if(MITK_USE_SOFA)
   link_directories(${SOFA_LIBRARY_DIRS})
 endif()
 
+if(MITK_USE_OpenIGTLink)
+  # Same as SOFA above
+  link_directories(${OpenIGTLink_LIBRARY_DIRS})
+endif()
+
 # Qt support
 if(MITK_USE_QT)
   if(DESIRED_QT_VERSION MATCHES 4)

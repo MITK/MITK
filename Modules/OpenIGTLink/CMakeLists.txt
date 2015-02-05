@@ -1,29 +1,9 @@
-#find_package(OpenIGTLink)
-
-#include(${OpenIGTLink_USE_FILE})
-
-#include(${OpenIGTLink_SOURCE_DIR}/Source)
-
-#SET(OpenIGTLink_INCLUDE_DIRS_BUILD_TREE ${OpenIGTLink_INCLUDE_DIRS_BUILD_TREE}
-#  ${OpenIGTLink_BINARY_DIR}
-#  ${OpenIGTLink_SOURCE_DIR}/Source
-#  ${OpenIGTLink_SOURCE_DIR}/Source/igtlutil
-#)
-
-MITK_CREATE_MODULE(
-  #SUBPROJECTS MITK-IGTL
+mitk_create_module(
+  SUBPROJECTS MITK-IGT
   DEPENDS MitkCore
-  PACKAGE_DEPENDS OpenIGTLink
+  PACKAGE_DEPENDS PUBLIC OpenIGTLink
   #WARNINGS_AS_ERRORS
-  #ADDITIONAL_LIBS ${OpenIGTLink_LIBRARIES} /projects/OIGTL-build/bin/libOpenIGTLink.a
-  #INCLUDE_DIRS ${OpenIGTLink_INCLUDE_DIRS_BUILD_TREE}
-  #INCLUDE_DIRS /projects/OIGTL-build ${OpenIGTLink_BINARY_DIR} ${OpenIGTLink_SOURCE_DIR}/Source
-  EXPORT_DEFINE MITK_OPENIGTLINK_EXPORT
 )
 
-if(MODULE_IS_ENABLED)
-## create IGT config
-#configure_file(mitkIGTConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTConfig.h @ONLY)
-
 add_subdirectory(Testing)
-endif()
+

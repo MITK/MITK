@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
-#include <algorithm>
-
 mitk::PlanarEllipse::PlanarEllipse()
     : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),
       FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),
@@ -258,6 +256,20 @@ void mitk::PlanarEllipse::GeneratePolyLine()
 void mitk::PlanarEllipse::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)
 {
     // A circle does not require a helper object
+}
+
+std::string mitk::PlanarEllipse::EvaluateAnnotation()
+{
+  double major_axis = GetQuantity(FEATURE_ID_MAJOR_AXIS);
+  double minor_axis = GetQuantity(FEATURE_ID_MINOR_AXIS);
+  std::stringstream ss;
+  char stmp[20];
+  ss << "Major axis=";
+  sprintf(stmp, "%.2fmm\n", major_axis);
+  ss << stmp << "Minor axis=";
+  sprintf(stmp, "%.2fmm\n", minor_axis);
+  ss << stmp;
+  return ss.str();
 }
 
 void mitk::PlanarEllipse::EvaluateFeaturesInternal()

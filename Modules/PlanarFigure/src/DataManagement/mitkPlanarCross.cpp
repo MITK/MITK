@@ -297,6 +297,19 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
   }
 }
 
+std::string mitk::PlanarCross::EvaluateAnnotation()
+{
+  double long_axis = GetQuantity(FEATURE_ID_LONGESTDIAMETER);
+  double short_axis = GetQuantity(FEATURE_ID_SHORTAXISDIAMETER);
+  std::stringstream ss;
+  char stmp[20];
+  ss << "Longest axis=";
+  sprintf(stmp, "%.2fmm\n", long_axis);
+  ss << stmp << "Short axis=";
+  sprintf(stmp, "%.2fmm\n", short_axis);
+  ss << stmp;
+  return ss.str();
+}
 
 void mitk::PlanarCross::EvaluateFeaturesInternal()
 {

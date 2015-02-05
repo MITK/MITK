@@ -29,6 +29,16 @@ mitk::PlanarBezierCurve::PlanarBezierCurve()
 }
 
 
+std::string mitk::PlanarBezierCurve::EvaluateAnnotation()
+{
+    double length = GetQuantity(FEATURE_ID_LENGTH);
+    char str[20];
+    sprintf(str, "%.2f", length);
+    std::string res = str;
+    res += " mm";
+    return res;
+}
+
 void mitk::PlanarBezierCurve::EvaluateFeaturesInternal()
 {
   double length = 0.0;

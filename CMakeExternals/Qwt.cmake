@@ -19,13 +19,11 @@ if(NOT DEFINED ${proj}_DIR)
   set(qt54patch_cmd ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchQwt-6.1.0.cmake)
 
   ExternalProject_Add(${proj}
-     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-     BINARY_DIR ${proj}-build
-     PREFIX ${proj}-cmake
+     LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qwt-6.1.0.tar.bz2
      URL_MD5 aef0437b37f191067a6a9dc01c30ba64
-     PATCH_COMMAND ${patch_cmd}
-     INSTALL_COMMAND ""
+     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Qwt-6.1.0.patch
+       COMMAND ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=qwt -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
@@ -33,15 +31,8 @@ if(NOT DEFINED ${proj}_DIR)
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-    ExternalProject_Add_Step(${proj} qt54patch
-      COMMAND ${qt54patch_cmd}
-      WORKING_DIRECTORY ${proj}-src
-      DEPENDEES patch
-      DEPENDERS configure
-      LOG 1
-    )
-
-  set(${proj}_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  set(${proj}_DIR ${ep_prefix})
+  mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()
 

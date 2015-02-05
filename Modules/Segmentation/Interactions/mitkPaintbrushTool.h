@@ -47,7 +47,7 @@ namespace mitk
   \warning Only to be instantiated by mitk::ToolManager.
   $Author: maleike $
 */
-class MitkSegmentation_EXPORT PaintbrushTool : public FeedbackContourTool
+class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
 {
   public:
 

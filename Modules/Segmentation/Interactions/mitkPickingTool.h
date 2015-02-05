@@ -43,7 +43,7 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
 
   */
-  class MitkSegmentation_EXPORT PickingTool : public AutoSegmentationTool
+  class MITKSEGMENTATION_EXPORT PickingTool : public AutoSegmentationTool
   {
   public:
 

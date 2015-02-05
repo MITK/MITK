@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkImplicitFunction.h"
 #include "mitkCommon.h"
 
-class MitkDiffusionCore_EXPORT vtkThickPlane : public vtkImplicitFunction
+class MITKDIFFUSIONCORE_EXPORT vtkThickPlane : public vtkImplicitFunction
 {
 public:
   // Description

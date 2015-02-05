@@ -73,7 +73,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QToolBar>
 #include <QMessageBox>
 #include <QLabel>
-#include <QmitkAboutDialog/QmitkAboutDialog.h>
+#include <QmitkAboutDialog.h>
 
 QmitkExtWorkbenchWindowAdvisorHack
 * QmitkExtWorkbenchWindowAdvisorHack::undohack =

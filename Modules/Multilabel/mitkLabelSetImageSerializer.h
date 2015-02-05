@@ -18,22 +18,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkLabelSetImageSerializer_h_included
 
 #include "mitkBaseDataSerializer.h"
-#include "MitkMultilabelExports.h"
 
 namespace mitk
 {
 /**
   \brief Serializes mitk::LabelSetImage for mitk::SceneIO
 */
-class MitkMultilabel_EXPORT LabelSetImageSerializer : public BaseDataSerializer
-{
+class LabelSetImageSerializer : public BaseDataSerializer
+  {
   public:
     mitkClassMacro( LabelSetImageSerializer, BaseDataSerializer );
     itkNewMacro(Self);
     virtual std::string Serialize();
+
   protected:
     LabelSetImageSerializer();
     virtual ~LabelSetImageSerializer();
-};
+  };
 } // namespace
+
 #endif

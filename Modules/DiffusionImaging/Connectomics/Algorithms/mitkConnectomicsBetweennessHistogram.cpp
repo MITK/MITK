@@ -69,7 +69,7 @@ void mitk::ConnectomicsBetweennessHistogram::ComputeFromConnectomicsNetwork( Con
 }
 
 void mitk::ConnectomicsBetweennessHistogram::CalculateUnweightedUndirectedBetweennessCentrality(
-  NetworkType* boostGraph, IteratorType vertex_iterator_begin, IteratorType vertex_iterator_end )
+  NetworkType* boostGraph, IteratorType /*vertex_iterator_begin*/, IteratorType /*vertex_iterator_end*/ )
 {
   boost::brandes_betweenness_centrality(
     *boostGraph,
@@ -81,7 +81,7 @@ void mitk::ConnectomicsBetweennessHistogram::CalculateUnweightedUndirectedBetwee
 }
 
 void mitk::ConnectomicsBetweennessHistogram::CalculateWeightedUndirectedBetweennessCentrality(
-  NetworkType* boostGraph, IteratorType vertex_iterator_begin, IteratorType vertex_iterator_end )
+  NetworkType* /*boostGraph*/, IteratorType /*vertex_iterator_begin*/, IteratorType /*vertex_iterator_end*/ )
 {
   MBI_WARN << mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_UNIMPLEMENTED_FEATURE;
 }

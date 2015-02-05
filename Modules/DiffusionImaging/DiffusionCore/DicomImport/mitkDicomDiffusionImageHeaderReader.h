@@ -33,7 +33,7 @@ namespace mitk
     @brief Reads the header information from a DICOM series and stores it into an output object of type
     DiffusionImageHeaderInformation
     */
-  class MitkDiffusionCore_EXPORT DicomDiffusionImageHeaderReader : public itk::Object
+  class MITKDIFFUSIONCORE_EXPORT DicomDiffusionImageHeaderReader : public itk::Object
   {
   public:
 

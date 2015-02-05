@@ -33,7 +33,7 @@ namespace mitk
     };
   }
 
-  class MitkSimulation_EXPORT Scheduler
+  class MITKSIMULATION_EXPORT Scheduler
   {
   public:
     explicit Scheduler(SchedulingAlgorithm::Enum algorithm = SchedulingAlgorithm::RoundRobin);

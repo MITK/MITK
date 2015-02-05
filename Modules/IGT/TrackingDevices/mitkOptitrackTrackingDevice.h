@@ -63,7 +63,7 @@ namespace mitk
   *   \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
   *   \ingroup IGT
   */
-  class MitkIGT_EXPORT OptitrackTrackingDevice : public mitk::TrackingDevice
+  class MITKIGT_EXPORT OptitrackTrackingDevice : public mitk::TrackingDevice
   {
 
   friend class OptitrackTrackingTool;

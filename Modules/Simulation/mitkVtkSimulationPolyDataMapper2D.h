@@ -25,7 +25,7 @@ namespace mitk
 {
   class ISimulationService;
 
-  class MitkSimulation_EXPORT vtkSimulationPolyDataMapper2D : public vtkPolyDataMapper
+  class MITKSIMULATION_EXPORT vtkSimulationPolyDataMapper2D : public vtkPolyDataMapper
   {
   public:
     static vtkSimulationPolyDataMapper2D* New();
@@ -33,7 +33,6 @@ namespace mitk
 
     using vtkPolyDataMapper::GetBounds;
     double* GetBounds();
-
     void Render(vtkRenderer* renderer, vtkActor* actor);
     void RenderPiece(vtkRenderer*, vtkActor*);
     void SetSimulation(mitk::Simulation::Pointer simulation);

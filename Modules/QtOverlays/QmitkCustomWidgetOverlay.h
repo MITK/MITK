@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 
 
-  class MitkQtOverlays_EXPORT QmitkCustomWidgetOverlay : public QmitkOverlay
+  class MITKQTOVERLAYS_EXPORT QmitkCustomWidgetOverlay : public QmitkOverlay
   {
   public:
 

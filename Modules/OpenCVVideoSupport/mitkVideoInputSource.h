@@ -27,7 +27,7 @@ class videoInput;
 
 namespace mitk
 {
-  class MITK_OPENCVVIDEOSUPPORT_EXPORT VideoInputSource : public OpenCVVideoSource
+  class MITKOPENCVVIDEOSUPPORT_EXPORT VideoInputSource : public OpenCVVideoSource
   {
     public:
     mitkClassMacro( VideoInputSource, OpenCVVideoSource );

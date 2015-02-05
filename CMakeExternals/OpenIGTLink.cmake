@@ -9,8 +9,8 @@ if(MITK_USE_OpenIGTLink)
   endif()
 
   set(proj OpenIGTLink)
-
-  set(OPENIGTLINK_DEPENDS ${proj})
+  set(proj_DEPENDENCIES )
+  set(${proj}_DEPENDS ${proj})
 
   if(NOT DEFINED OpenIGTLink_DIR)
 
@@ -22,25 +22,22 @@ if(MITK_USE_OpenIGTLink)
     endif()
 
     ExternalProject_Add(${proj}
-       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-       BINARY_DIR ${proj}-build
-       PREFIX ${proj}-cmake
        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenIGTLink-54df50de.tar.gz
        URL_MD5 b9fd8351b059f4ec615f2dfd74ab2458
-       INSTALL_COMMAND ""
+       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenIGTLink-54df50de.patch
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
          ${ep_common_args}
          ${additional_cmake_args}
-         -DBUILD_TESTING:BOOL=OFF
          -DBUILD_EXAMPLES:BOOL=OFF
          -DOpenIGTLink_PROTOCOL_VERSION_2:BOOL=ON
-         -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
-         -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
+         -DOpenIGTLink_INSTALL_LIB_DIR:STRING=lib
+         -DOpenIGTLink_INSTALL_PACKAGE_DIR:STRING=lib/cmake/OpenIGTLink
+         -DOpenIGTLink_INSTALL_NO_DOCUMENTATION:BOOL=ON
        DEPENDS ${proj_DEPENDENCIES}
       )
 
-    set(OpenIGTLink_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+    set(OpenIGTLink_DIR "${ep_prefix}/lib/cmake/OpenIGTLink")
 
   else()
 

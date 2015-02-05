@@ -36,7 +36,7 @@ namespace mitk
  *     ODFSB_NONE, ODFSB_GFA, ODFSB_PC
  * Default is ODFSB_NONE
  */
-class MitkDiffusionCore_EXPORT OdfScaleByProperty : public EnumerationProperty
+class MITKDIFFUSIONCORE_EXPORT OdfScaleByProperty : public EnumerationProperty
 {
 public:
 
@@ -86,7 +86,7 @@ protected:
   virtual void AddInterpolationTypes();
 };
 
-class MitkDiffusionCore_EXPORT OdfScaleByPropertySerializer : public EnumerationPropertySerializer
+class MITKDIFFUSIONCORE_EXPORT OdfScaleByPropertySerializer : public EnumerationPropertySerializer
 {
   public:
 

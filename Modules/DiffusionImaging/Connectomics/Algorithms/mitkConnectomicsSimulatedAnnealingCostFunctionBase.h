@@ -29,7 +29,7 @@ namespace mitk
 {
   /**
   * \brief A generic base class for cost functions for use in simulated annealing */
-  class MitkConnectomics_EXPORT ConnectomicsSimulatedAnnealingCostFunctionBase : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsSimulatedAnnealingCostFunctionBase : public itk::Object
   {
   public:
 

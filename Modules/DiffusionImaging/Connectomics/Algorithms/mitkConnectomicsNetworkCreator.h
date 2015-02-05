@@ -39,7 +39,7 @@ namespace mitk
     * a connectomics network from the two, using different strategies.
     */
 
-  class MitkConnectomics_EXPORT ConnectomicsNetworkCreator : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsNetworkCreator : public itk::Object
   {
   public:
 

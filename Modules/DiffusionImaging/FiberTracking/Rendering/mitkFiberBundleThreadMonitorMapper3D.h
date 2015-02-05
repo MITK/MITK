@@ -40,7 +40,7 @@ namespace mitk {
   //## @brief Mapper for FiberBundle
   //## @ingroup Mapper
 
-  class MitkFiberTracking_EXPORT FiberBundleThreadMonitorMapper3D : public VtkMapper
+  class MITKFIBERTRACKING_EXPORT FiberBundleThreadMonitorMapper3D : public VtkMapper
   {
   public:
 

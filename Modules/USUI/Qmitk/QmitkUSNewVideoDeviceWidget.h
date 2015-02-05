@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * @ingroup USUI
 */
-class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
+class MITKUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

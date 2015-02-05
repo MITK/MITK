@@ -36,7 +36,7 @@ namespace mitk {
     * information.
     *
     */
-  class MITK_OPENIGTLINK_EXPORT IGTLMessage : public itk::DataObject
+  class MITKOPENIGTLINK_EXPORT IGTLMessage : public itk::DataObject
     {
     public:
       mitkClassMacro(IGTLMessage, itk::DataObject);
@@ -188,7 +188,7 @@ namespace mitk {
       * or not.
       * @return true, if all subsequent comparisons are true, false otherwise
       */
-      MITK_OPENIGTLINK_EXPORT bool Equal( const mitk::IGTLMessage& leftHandSide,
+      MITKOPENIGTLINK_EXPORT bool Equal( const mitk::IGTLMessage& leftHandSide,
                                           const mitk::IGTLMessage& rightHandSide,
                                           ScalarType eps = mitk::eps,
                                           bool verbose = false );

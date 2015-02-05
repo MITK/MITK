@@ -75,7 +75,7 @@ class DisplayGeometry;
  *   - \b "back normal length (px)": (FloatProperty) Length of the back side normals in pixels.
  *
  */
-class MitkLegacyGL_EXPORT SurfaceGLMapper2D : public GLMapper
+class MITKLEGACYGL_EXPORT SurfaceGLMapper2D : public GLMapper
 {
 public:
   mitkClassMacro(SurfaceGLMapper2D, GLMapper);

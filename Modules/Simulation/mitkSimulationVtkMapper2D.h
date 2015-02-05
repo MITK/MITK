@@ -25,7 +25,7 @@ namespace mitk
 {
   class vtkSimulationPolyDataMapper2D;
 
-  class MitkSimulation_EXPORT SimulationVtkMapper2D : public VtkMapper
+  class MITKSIMULATION_EXPORT SimulationVtkMapper2D : public VtkMapper
   {
     class LocalStorage : public Mapper::BaseLocalStorage
     {

@@ -72,7 +72,7 @@ namespace mitk {
 
   $Author: fetzer$
   */
-  class MitkSurfaceInterpolation_EXPORT CreateDistanceImageFromSurfaceFilter : public ImageSource
+  class MITKSURFACEINTERPOLATION_EXPORT CreateDistanceImageFromSurfaceFilter : public ImageSource
   {
 
   public:

@@ -29,7 +29,7 @@ namespace mitk
 
   /** This property will store the b value map */
 
-  class MitkDiffusionCore_EXPORT BValueMapProperty : public mitk::BaseProperty
+  class MITKDIFFUSIONCORE_EXPORT BValueMapProperty : public mitk::BaseProperty
   {
   public:
     /**

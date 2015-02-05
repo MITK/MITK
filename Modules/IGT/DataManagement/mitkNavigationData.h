@@ -37,7 +37,7 @@ namespace mitk {
     *
     * \ingroup IGT
     */
-  class MitkIGT_EXPORT NavigationData : public itk::DataObject
+  class MITKIGT_EXPORT NavigationData : public itk::DataObject
     {
     public:
       mitkClassMacro(NavigationData, itk::DataObject);
@@ -291,7 +291,7 @@ namespace mitk {
       * @param verbose Flag indicating if the user wants detailed console output or not.
       * @return true, if all subsequent comparisons are true, false otherwise
       */
-      MitkIGT_EXPORT bool Equal( const mitk::NavigationData& leftHandSide, const mitk::NavigationData& rightHandSide, ScalarType eps = mitk::eps, bool verbose = false );
+      MITKIGT_EXPORT bool Equal( const mitk::NavigationData& leftHandSide, const mitk::NavigationData& rightHandSide, ScalarType eps = mitk::eps, bool verbose = false );
 
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATA_H_HEADER_INCLUDED_ */

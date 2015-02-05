@@ -34,7 +34,7 @@ namespace mitk {
   * are already added but you can also add your custom types at runtime.
   *
   */
-  class MITK_OPENIGTLINK_EXPORT IGTLMessageFactory : public itk::Object
+  class MITKOPENIGTLINK_EXPORT IGTLMessageFactory : public itk::Object
   {
   public:
     mitkClassMacro(IGTLMessageFactory, itk::Object)

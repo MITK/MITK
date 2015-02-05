@@ -1,0 +1,40 @@
+diff -urNb dcmtk-3.6.1_20121102/CMake/dcmtkMacros.cmake DCMTK/CMake/dcmtkMacros.cmake
+--- dcmtk-3.6.1_20121102/CMake/dcmtkMacros.cmake	2012-11-02 14:35:36.000000000 +0100
++++ DCMTK/CMake/dcmtkMacros.cmake	2015-01-27 23:11:49.300207775 +0100
+@@ -26,6 +26,7 @@
+ MACRO(DCMTK_ADD_EXECUTABLE PROGRAM)
+     IF(BUILD_APPS)
+         ADD_EXECUTABLE(${PROGRAM} ${ARGN})
++        SET_TARGET_PROPERTIES(${PROGRAM} PROPERTIES DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
+ 
+         # Make wildcard arguments work
+         IF(WIN32 AND NOT MINGW)
+diff -urNb dcmtk-3.6.1_20121102/CMake/dcmtkPrepare.cmake DCMTK-src/CMake/dcmtkPrepare.cmake
+--- dcmtk-3.6.1_20121102/CMake/dcmtkPrepare.cmake	2012-11-02 14:37:54.000000000 +0100
++++ DCMTK-src/CMake/dcmtkPrepare.cmake	2015-01-12 00:46:42.933870536 +0100
+@@ -107,7 +107,8 @@
+ ENDIF(COMMAND CMAKE_POLICY)
+ 
+ # pass optional build date to compiler
+-ADD_DEFINITIONS("-DDCMTK_BUILD_DATE=\\\"2012-11-02\\\"")
++set(DCMTK_BUILD_DATE "\"2012-11-02\"")
++#ADD_DEFINITIONS("-DDCMTK_BUILD_DATE=\\\"2012-11-02\\\"")
+ 
+ # make OFString(NULL) safe by default
+ ADD_DEFINITIONS("-DUSE_NULL_SAFE_OFSTRING")
+@@ -330,3 +331,4 @@
+     ENDIF(HAVE_LIBRT)
+   ENDIF(HAVE_PTHREAD_H)
+ ENDIF(WITH_THREADS)
++
+diff -urNb dcmtk-3.6.1_20121102/CMake/osconfig.h.in DCMTK-src/CMake/osconfig.h.in
+--- dcmtk-3.6.1_20121102/CMake/osconfig.h.in	2012-11-02 14:35:36.000000000 +0100
++++ DCMTK-src/CMake/osconfig.h.in	2015-01-12 00:46:42.937870536 +0100
+@@ -738,6 +738,8 @@
+ /* Define to the date of this package. */
+ #define PACKAGE_DATE "@DCMTK_PACKAGE_DATE@"
+ 
++#define DCMTK_BUILD_DATE @DCMTK_BUILD_DATE@
++
+ /* Define to the version of this package. */
+ #define PACKAGE_VERSION "@DCMTK_PACKAGE_VERSION@"

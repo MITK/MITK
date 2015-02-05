@@ -37,7 +37,7 @@ namespace mitk
   \Note It is highly not recommend to use this class directly as no secure mechanism is used here.
   Use mitk::ContourModel instead providing some additional features.
   */
-  class MitkContourModel_EXPORT ContourElement : public itk::LightObject
+  class MITKCONTOURMODEL_EXPORT ContourElement : public itk::LightObject
   {
 
   public:

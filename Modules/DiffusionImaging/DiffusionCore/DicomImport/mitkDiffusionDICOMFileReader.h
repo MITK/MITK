@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkDiffusionCore_EXPORT DiffusionDICOMFileReader
+class MITKDIFFUSIONCORE_EXPORT DiffusionDICOMFileReader
         : public ThreeDnTDICOMSeriesReader
 {
 public:

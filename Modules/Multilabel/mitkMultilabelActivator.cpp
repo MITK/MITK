@@ -24,13 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-std::vector<AbstractFileIO*> m_FileIOs;
-
   /**
   \brief Registers services for multilabel module.
   */
   class MultilabelModuleActivator : public us::ModuleActivator
   {
+    std::vector<AbstractFileIO*> m_FileIOs;
+    
   public:
 
     void Load(us::ModuleContext* /*context*/)

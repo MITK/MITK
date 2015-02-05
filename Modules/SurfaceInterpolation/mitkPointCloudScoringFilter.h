@@ -36,7 +36,7 @@ class UnstructuredGrid;
  * The second input is the UnstructuredGrid, which you want to score. All Points
  * of the output UnstructuredGrid are from the second input.
  */
-class MitkSurfaceInterpolation_EXPORT PointCloudScoringFilter:
+class MITKSURFACEINTERPOLATION_EXPORT PointCloudScoringFilter:
     public UnstructuredGridToUnstructuredGridFilter
 {
 

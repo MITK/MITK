@@ -5,7 +5,7 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
 
-include(MacroParseArguments)
+include(CMakeParseArguments)
 include(MacroConvertSchema)
 include(MacroOrganizeSources)
 include(MacroCreateCTKPlugin)
@@ -137,7 +137,7 @@ mark_as_advanced(BLUEBERRY_STATIC)
 option(BLUEBERRY_DEBUG_SMARTPOINTER "Enable code for debugging smart pointers" OFF)
 mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
 
-find_package(Poco REQUIRED)
+find_package(Poco PATHS ${Poco_DIR} COMPONENTS Foundation Util XML REQUIRED)
 find_package(Ant)
 find_package(Eclipse)
 
@@ -199,21 +199,15 @@ set(_ctk_plugins
 
 set(_ctk_test_plugins )
 
-set(_ctk_plugins_include_dirs
-  ${Poco_INCLUDE_DIRS}
-)
-
-include_directories(SYSTEM ${_ctk_plugins_include_dirs})
-
 if(BLUEBERRY_BUILD_TESTING)
-  find_package(CppUnit REQUIRED)
+  find_package(CppUnit PATHS ${CppUnit_DIR} REQUIRED)
   include(berryTestingHelpers)
 
   set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}")
-  # get_target_property(_is_macosx_bundle ${OSGI_APP} MACOSX_BUNDLE)
-  if(APPLE AND _is_macosx_bundle)
-    set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.app/Contents/MacOS/${OSGI_APP}")
-  endif()
+  #get_target_property(_is_macosx_bundle ${OSGI_APP} MACOSX_BUNDLE)
+  #if(APPLE AND _is_macosx_bundle)
+  #  set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.app/Contents/MacOS/${OSGI_APP}")
+  #endif()
 
   set(_ctk_testinfrastructure_plugins
     Bundles/org.blueberry.test:ON
@@ -229,10 +223,10 @@ if(BLUEBERRY_BUILD_TESTING)
 #    list(APPEND _ctk_test_plugins Testing/org.blueberry.ui.tests:ON)
 
     set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}")
-    get_target_property(_is_macosx_bundle ${OSGI_UI_APP} MACOSX_BUNDLE)
-    if(APPLE AND _is_macosx_bundle)
-      set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}.app/Contents/MacOS/${OSGI_UI_APP}")
-    endif()
+    #get_target_property(_is_macosx_bundle ${OSGI_UI_APP} MACOSX_BUNDLE)
+    #if(APPLE AND _is_macosx_bundle)
+    #  set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}.app/Contents/MacOS/${OSGI_UI_APP}")
+    #endif()
   endif()
 endif()
 

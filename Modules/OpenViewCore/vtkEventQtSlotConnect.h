@@ -51,7 +51,7 @@ class vtkQtConnections;
 class vtkQtConnection;
 
 // manage connections between VTK object events and Qt slots
-class MitkOpenViewCore_EXPORT vtkEventQtSlotConnect : public vtkObject
+class MITKOPENVIEWCORE_EXPORT vtkEventQtSlotConnect : public vtkObject
 {
   public:
     static vtkEventQtSlotConnect* New();

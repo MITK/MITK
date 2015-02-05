@@ -44,7 +44,7 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUSNavigation_EXPORT NodeDisplacementFilter : public NavigationDataPassThroughFilter
+  class MITKUSNAVIGATION_EXPORT NodeDisplacementFilter : public NavigationDataPassThroughFilter
   {
   public:
     mitkClassMacro(NodeDisplacementFilter, NavigationDataPassThroughFilter);

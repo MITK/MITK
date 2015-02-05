@@ -60,7 +60,7 @@ namespace mitk {
     * \ingroup OpenIGTLink
     *
     */
-    class MITK_OPENIGTLINK_EXPORT IGTLDevice : public itk::Object
+    class MITKOPENIGTLINK_EXPORT IGTLDevice : public itk::Object
     {
     public:
       mitkClassMacro(IGTLDevice, itk::Object)

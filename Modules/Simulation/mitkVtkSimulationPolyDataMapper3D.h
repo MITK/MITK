@@ -25,7 +25,7 @@ namespace mitk
 {
   class ISimulationService;
 
-  class MitkSimulation_EXPORT vtkSimulationPolyDataMapper3D : public vtkPolyDataMapper
+  class MITKSIMULATION_EXPORT vtkSimulationPolyDataMapper3D : public vtkPolyDataMapper
   {
   public:
     static vtkSimulationPolyDataMapper3D* New();

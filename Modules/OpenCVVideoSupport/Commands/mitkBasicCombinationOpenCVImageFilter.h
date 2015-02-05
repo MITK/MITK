@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObjectFactory.h"
 
 namespace mitk {
-class MITK_OPENCVVIDEOSUPPORT_EXPORT BasicCombinationOpenCVImageFilter : public AbstractOpenCVImageFilter
+class MITKOPENCVVIDEOSUPPORT_EXPORT BasicCombinationOpenCVImageFilter : public AbstractOpenCVImageFilter
 {
 public:
   mitkClassMacro(BasicCombinationOpenCVImageFilter, AbstractOpenCVImageFilter);

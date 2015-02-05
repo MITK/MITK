@@ -24,7 +24,7 @@ namespace mitk {
 //## @brief Reader to read surface files in vtk-format
 //## @ingroup MitkLegacyIOModule
 //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class MitkLegacyIO_EXPORT VtkSurfaceReader : public SurfaceSource
+class MITKLEGACYIO_EXPORT VtkSurfaceReader : public SurfaceSource
 {
 public:
     mitkClassMacro(VtkSurfaceReader, SurfaceSource);

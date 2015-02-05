@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   Last contributor: $Author$
 */
 
-class MitkSegmentationUI_EXPORT QmitkToolGUI : public QWidget, public itk::Object
+class MITKSEGMENTATIONUI_EXPORT QmitkToolGUI : public QWidget, public itk::Object
 {
   Q_OBJECT
 

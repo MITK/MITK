@@ -28,7 +28,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataSequentialPlayer
+  class MITKIGT_EXPORT NavigationDataSequentialPlayer
     : public NavigationDataPlayerBase
   {
   public:

@@ -86,8 +86,8 @@ FunctionCreateBlueBerryApplication(
 mitk_use_modules(TARGET ${DIFFUSIONAPP_NAME} MODULES qtsingleapplication)
 
 # Add meta dependencies (e.g. on auto-load modules from depending modules)
-if(ALL_META_DEPENDENCIES)
-  add_dependencies(${DIFFUSIONAPP_NAME} ${ALL_META_DEPENDENCIES})
+if(TARGET ${CMAKE_PROJECT_NAME}-autoload)
+  add_dependencies(${DIFFUSIONAPP_NAME} ${CMAKE_PROJECT_NAME}-autoload)
 endif()
 
 # Add a build time dependency to legacy BlueBerry bundles.

@@ -52,7 +52,7 @@ class InteractionEvent;
 
   $Author$
 */
-class MitkSegmentation_EXPORT CorrectorTool2D : public FeedbackContourTool
+class MITKSEGMENTATION_EXPORT CorrectorTool2D : public FeedbackContourTool
 {
   public:
 

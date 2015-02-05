@@ -38,7 +38,7 @@ namespace mitk
   * This offers users the oppertunity to generate new KinectDevices via a global instance of this factory.
   * @ingroup ToFHardware
   */
-  class MITK_KINECTV2MODULE_EXPORT KinectV2DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+  class MITKKINECTV2_EXPORT KinectV2DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
   public:
 

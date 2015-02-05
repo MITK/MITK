@@ -1,0 +1,12 @@
+diff -urNb numpy-1.4.1/numpy/core/setup_common.py Numpy-src/numpy/core/setup_common.py
+--- numpy-1.4.1/numpy/core/setup_common.py	2010-04-22 11:35:23.000000000 +0200
++++ Numpy-src/numpy/core/setup_common.py	2015-01-13 20:50:49.137871831 +0100
+@@ -175,7 +175,7 @@
+     """
+     out = []
+ 
+-    fid = open(filename, 'r')
++    fid = open(filename, 'rb')
+     try:
+         yo = [int(oct(int(binascii.b2a_hex(o), 16))) for o in fid.read()]
+         for i in range(0, len(yo), 16):

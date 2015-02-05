@@ -29,7 +29,7 @@ namespace mitk {
   * \sa ProgressBar
   *
   */
-  class MitkSegmentation_EXPORT ToolCommand : public itk::Command
+  class MITKSEGMENTATION_EXPORT ToolCommand : public itk::Command
   {
     public:
       typedef  ToolCommand   Self;

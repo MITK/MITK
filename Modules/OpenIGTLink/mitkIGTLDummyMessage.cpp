@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIGTLDummyMessage.h"
 
-#include "igtlutil/igtl_header.h"
-#include "igtlutil/igtl_util.h"
+#include "igtl_header.h"
+#include "igtl_util.h"
 
 
 mitk::IGTLDummyMessage::IGTLDummyMessage() : StringMessage()

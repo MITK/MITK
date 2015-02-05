@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkDiffusionCore_EXPORT GradientDirectionsPropertySerializer : public BasePropertySerializer
+class MITKDIFFUSIONCORE_EXPORT GradientDirectionsPropertySerializer : public BasePropertySerializer
 {
   public:
 

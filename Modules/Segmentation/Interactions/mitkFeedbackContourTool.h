@@ -50,7 +50,7 @@ namespace mitk
 
   $Author: nolden $
 */
-class MitkSegmentation_EXPORT FeedbackContourTool : public SegTool2D
+class MITKSEGMENTATION_EXPORT FeedbackContourTool : public SegTool2D
 {
   public:
 

@@ -34,7 +34,7 @@ namespace mitk
 //## @brief A data structure describing a label.
 //## @ingroup Data
 //##
-class MitkMultilabel_EXPORT Label : public PropertyList
+class MITKMULTILABEL_EXPORT Label : public PropertyList
 {
 public:
   mitkClassMacro( Label, mitk::PropertyList );
@@ -107,7 +107,7 @@ private:
 * @param verbose Flag indicating if the user wants detailed console output or not.
 * @return true, if all subsequent comparisons are true, false otherwise
 */
-MITK_CORE_EXPORT bool Equal( const mitk::Label& leftHandSide, const mitk::Label& rightHandSide, ScalarType eps, bool verbose );
+MITKMULTILABEL_EXPORT bool Equal( const mitk::Label& leftHandSide, const mitk::Label& rightHandSide, ScalarType eps, bool verbose );
 
 
 } // namespace mitk

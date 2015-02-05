@@ -5,13 +5,18 @@ MACRO_CREATE_CTK_PLUGIN(
   EXPORTED_INCLUDE_SUFFIXES src src/application src/event src/service
   )
 
+target_link_libraries(${PLUGIN_TARGET} PUBLIC Poco::Foundation Poco::Util Poco::XML)
+
+# Set compiler flags
+target_compile_definitions(${PLUGIN_TARGET} PUBLIC "$<$<PLATFORM_ID:Windows>:POCO_NO_UNWINDOWS;WIN32_LEAN_AND_MEAN>")
+
 if(MITK_USE_Qt5)
-  qt5_use_modules(${PLUGIN_TARGET} Concurrent Gui Sql)
+  target_link_libraries(${PLUGIN_TARGET} PRIVATE Qt5::Concurrent Qt5::Gui Qt5::Sql)
 endif()
 
 add_executable(${OSGI_APP} MACOSX_BUNDLE "src/application/berryMain.cpp")
 
-target_link_libraries(${OSGI_APP} ${PROJECT_NAME} mbilog)
+target_link_libraries(${OSGI_APP} PRIVATE ${PROJECT_NAME} mbilog)
 if(_ctk_test_plugins)
   add_dependencies(${OSGI_APP} ${_ctk_test_plugins})
   add_dependencies(BlueBerry ${OSGI_APP})
@@ -25,10 +30,10 @@ configure_file(src/application/solstice.ini
 add_executable(${OSGI_UI_APP} MACOSX_BUNDLE "src/application/berryMainUI.cpp")
 
 if(MITK_USE_Qt5)
-  qt5_use_modules(${OSGI_UI_APP} Widgets)
+  target_link_libraries(${OSGI_UI_APP} PRIVATE Qt5::Widgets)
 endif()
 
-target_link_libraries(${OSGI_UI_APP} ${PROJECT_NAME} mbilog)
+target_link_libraries(${OSGI_UI_APP} PRIVATE ${PROJECT_NAME} mbilog)
 if(_ctk_test_plugins)
   add_dependencies(${OSGI_UI_APP} ${_ctk_test_plugins})
   add_dependencies(BlueBerry ${OSGI_UI_APP})

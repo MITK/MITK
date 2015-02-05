@@ -58,7 +58,7 @@ class BaseRenderer;
 
   $Author$
 */
-class MitkSegmentation_EXPORT SegTool2D : public Tool
+class MITKSEGMENTATION_EXPORT SegTool2D : public Tool
 {
   public:
 

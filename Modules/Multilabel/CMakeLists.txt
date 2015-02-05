@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(
   DEPENDS MitkCore MitkAlgorithmsExt MitkSceneSerializationBase
-  PACKAGE_DEPENDS ITK|ITKQuadEdgeMesh+ITKAntiAlias
+  PACKAGE_DEPENDS PRIVATE ITK|ITKQuadEdgeMesh+ITKAntiAlias+ITKIONRRD
   WARNINGS_AS_ERRORS
 )
 

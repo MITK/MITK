@@ -1,12 +1,9 @@
-SET(CPP_FILES
- mitkXnatSessionTracker.cpp
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
+set(CPP_FILES
+  mitkXnatSessionTracker.cpp
 )
 
-SET(H_FILES
- mitkXnatSession.h
- mitkXnatSessionTracker.h
-)
-
-SET(MOC_H_FILES
- mitkXnatSessionTracker.h
+set(MOC_H_FILES
+  include/mitkXnatSessionTracker.h
 )

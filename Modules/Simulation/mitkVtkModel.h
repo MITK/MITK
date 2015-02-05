@@ -35,7 +35,7 @@ class vtkRenderer;
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT VtkModel : public sofa::component::visualmodel::VisualModelImpl
+  class MITKSIMULATION_EXPORT VtkModel : public sofa::component::visualmodel::VisualModelImpl
   {
   public:
     enum Mode

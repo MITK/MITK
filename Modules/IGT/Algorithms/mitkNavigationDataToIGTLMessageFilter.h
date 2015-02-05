@@ -33,7 +33,7 @@ namespace mitk {
   * \ingroup IGT
   *
   */
-  class MitkIGT_EXPORT NavigationDataToIGTLMessageFilter : public IGTLMessageSource
+  class MITKIGT_EXPORT NavigationDataToIGTLMessageFilter : public IGTLMessageSource
   {
   public:
     mitkClassMacro(NavigationDataToIGTLMessageFilter, IGTLMessageSource);

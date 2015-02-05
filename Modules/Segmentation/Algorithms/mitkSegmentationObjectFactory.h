@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  class MitkSegmentation_EXPORT SegmentationObjectFactory : public CoreObjectFactoryBase
+  class MITKSEGMENTATION_EXPORT SegmentationObjectFactory : public CoreObjectFactoryBase
   {
   public:
     mitkClassMacro(SegmentationObjectFactory,CoreObjectFactoryBase);

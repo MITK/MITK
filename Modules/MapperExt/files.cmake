@@ -1,3 +1,5 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
 set(CPP_FILES
   mitkEnhancedPointSetVtkMapper3D.cpp
   mitkGPUVolumeMapper3D.cpp
@@ -15,5 +17,5 @@ set(CPP_FILES
   vtkMitkVolumeTextureMapper3D.cpp
   vtkUnstructuredGridMapper.cpp
 
-  Internal/vtkPointSetSlicer.cxx
+  vtkPointSetSlicer.cxx
 )

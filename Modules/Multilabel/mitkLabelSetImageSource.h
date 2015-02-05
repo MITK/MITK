@@ -30,7 +30,7 @@ class LabelSetImage;
 //## of class LabelSetImage) as output.
 //##
 //## @ingroup Process
-class MitkMultilabel_EXPORT LabelSetImageSource : public ImageSource
+class MITKMULTILABEL_EXPORT LabelSetImageSource : public ImageSource
 {
 public:
   mitkClassMacro(LabelSetImageSource, ImageSource);

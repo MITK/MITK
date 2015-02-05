@@ -34,7 +34,7 @@ namespace mitk {
     * This class is a helper class for copying OpenIGTLink messages.
     *
     */
-  class MITK_OPENIGTLINK_EXPORT IGTLMessageCommon  : public itk::DataObject
+  class MITKOPENIGTLINK_EXPORT IGTLMessageCommon  : public itk::DataObject
     {
     public:
       mitkClassMacro(IGTLMessageCommon, itk::DataObject);

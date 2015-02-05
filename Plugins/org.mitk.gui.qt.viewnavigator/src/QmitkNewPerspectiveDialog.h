@@ -18,10 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkNewPerspectiveDialog_h_Included
 
 #include "mitkColorProperty.h"
-#include <MitkSegmentationUIExports.h>
 
-#include <qdialog.h>
-
+#include <QDialog>
 #include <QCompleter>
 
 class QLabel;

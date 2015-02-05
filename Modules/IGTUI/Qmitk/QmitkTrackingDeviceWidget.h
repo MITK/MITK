@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include "MitkIGTUIExports.h"
 
-class MitkIGTUI_EXPORT QmitkTrackingDeviceWidget : public QWidget //MitkIGTUI_EXPORT
+class MITKIGTUI_EXPORT QmitkTrackingDeviceWidget : public QWidget //MITKIGTUI_EXPORT
 {
   Q_OBJECT
 

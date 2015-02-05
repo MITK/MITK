@@ -47,7 +47,7 @@ namespace mitk
   \ingroup RigidRegistration
 
   \author Thomas van Bruggen  */
-  class MITK_RIGIDREGISTRATION_EXPORT PyramidalRegistrationMethod : public ImageToImageFilter
+  class MITKRIGIDREGISTRATION_EXPORT PyramidalRegistrationMethod : public ImageToImageFilter
   {
 
   public:

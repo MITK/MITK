@@ -37,7 +37,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT VirtualTrackingTool : public InternalTrackingTool
+  class MITKIGT_EXPORT VirtualTrackingTool : public InternalTrackingTool
   {
   public:
     mitkClassMacro(VirtualTrackingTool, InternalTrackingTool);

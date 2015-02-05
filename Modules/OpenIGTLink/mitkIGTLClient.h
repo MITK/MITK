@@ -36,7 +36,7 @@ namespace mitk
   *
   * \ingroup OpenIGTLink
   */
-  class MITK_OPENIGTLINK_EXPORT IGTLClient : public IGTLDevice
+  class MITKOPENIGTLINK_EXPORT IGTLClient : public IGTLDevice
   {
   public:
     mitkClassMacro(IGTLClient, IGTLDevice)

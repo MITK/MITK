@@ -56,7 +56,7 @@ namespace mitk
 
   $Author$
 */
-class MitkSegmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
+class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
 {
   public:
 

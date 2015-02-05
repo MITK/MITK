@@ -36,7 +36,7 @@ namespace mitk
  * If you want to calculate a surface representation for all available labels,
  * you may call GenerateAllLabelsOn().
  */
-class MitkMultilabel_EXPORT LabelSetImageToSurfaceFilter : public SurfaceSource
+class MITKMULTILABEL_EXPORT LabelSetImageToSurfaceFilter : public SurfaceSource
 {
 public:
 

@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qapplication.h>
 
 
-MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkWatershedToolGUI, "")
+MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkWatershedToolGUI, "")
 
 QmitkWatershedToolGUI::QmitkWatershedToolGUI()
 :QmitkToolGUI(),

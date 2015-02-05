@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, AdaptiveRegionGrowingTool, "AdaptiveRegionGrowingTool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, AdaptiveRegionGrowingTool, "AdaptiveRegionGrowingTool");
 }
 
 mitk::AdaptiveRegionGrowingTool::AdaptiveRegionGrowingTool()

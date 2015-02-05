@@ -68,7 +68,7 @@ class USControlInterfaceDoppler;
   * \ingroup US
   */
 
-  class MitkUS_EXPORT USDevice : public mitk::ImageSource
+  class MITKUS_EXPORT USDevice : public mitk::ImageSource
   {
   public:
     enum DeviceStates { State_NoState, State_Initialized, State_Connected, State_Activated };

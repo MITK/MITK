@@ -37,7 +37,7 @@ namespace mitk
 //## Handles operations for adding, removing, erasing and editing labels and layers.
 //## @ingroup Data
 
-class MitkMultilabel_EXPORT LabelSetImage : public Image
+class MITKMULTILABEL_EXPORT LabelSetImage : public Image
 {
 
 public:
@@ -333,7 +333,7 @@ protected:
 * @param verbose Flag indicating if the user wants detailed console output or not.
 * @return true, if all subsequent comparisons are true, false otherwise
 */
-MITK_CORE_EXPORT bool Equal( const mitk::LabelSetImage& leftHandSide, const mitk::LabelSetImage& rightHandSide, ScalarType eps, bool verbose );
+MITKMULTILABEL_EXPORT bool Equal( const mitk::LabelSetImage& leftHandSide, const mitk::LabelSetImage& rightHandSide, ScalarType eps, bool verbose );
 
 
 } // namespace mitk

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qpushbutton.h>
 #include <qlayout.h>
 
-MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkBinaryThresholdToolGUI, "")
+MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkBinaryThresholdToolGUI, "")
 
 QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
 :QmitkToolGUI(),

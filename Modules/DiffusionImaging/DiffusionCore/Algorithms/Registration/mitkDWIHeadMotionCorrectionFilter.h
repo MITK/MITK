@@ -42,7 +42,7 @@ namespace mitk
  *
  */
 
-class MitkDiffusionCore_EXPORT DWIHeadMotionCorrectionFilter
+class MITKDIFFUSIONCORE_EXPORT DWIHeadMotionCorrectionFilter
     : public ImageToImageFilter
 {
 public:

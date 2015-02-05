@@ -20,9 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkPluginActivator.h>
 
-#include <org_mitk_core_ext_Export.h>
-#include <mitkExportMacros.h>
-
 namespace mitk
 {
   /**
@@ -33,7 +30,7 @@ namespace mitk
   * the mitkCoreExt module.
   *
   */
-  class MITK_LOCAL CoreExtActivator : public QObject, public ctkPluginActivator
+  class CoreExtActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)

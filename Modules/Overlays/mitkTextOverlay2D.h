@@ -28,7 +28,7 @@ class vtkPropAssembly;
 namespace mitk {
 
 /** \brief Displays text on the renderwindow */
-class MitkOverlays_EXPORT TextOverlay2D : public mitk::VtkOverlay2D {
+class MITKOVERLAYS_EXPORT TextOverlay2D : public mitk::VtkOverlay2D {
 public:
 
   class LocalStorage : public mitk::Overlay::BaseLocalStorage

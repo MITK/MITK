@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   *
   *   \ingroup OpenIGTLinkUI
   */
-class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLMessageSourceSelectionWidget :
+class MITKOPENIGTLINKUI_EXPORT QmitkIGTLMessageSourceSelectionWidget :
     public QWidget
 {
   Q_OBJECT

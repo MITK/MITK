@@ -41,7 +41,7 @@ namespace mitk
   *
   * @ingroup ToFProcessing
   */
-  class MitkToFProcessing_EXPORT ToFCompositeFilter : public ImageToImageFilter
+  class MITKTOFPROCESSING_EXPORT ToFCompositeFilter : public ImageToImageFilter
   {
   public:
 

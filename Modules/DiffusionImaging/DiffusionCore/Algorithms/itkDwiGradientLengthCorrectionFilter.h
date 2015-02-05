@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-class MitkDiffusionCore_EXPORT DwiGradientLengthCorrectionFilter : public ProcessObject
+class MITKDIFFUSIONCORE_EXPORT DwiGradientLengthCorrectionFilter : public ProcessObject
 {
 
 public:

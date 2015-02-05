@@ -32,7 +32,7 @@ namespace mitk
   /**
   * \brief this class encapsulates tensor images
   */
-  class MitkDiffusionCore_EXPORT TensorImage : public Image
+  class MITKDIFFUSIONCORE_EXPORT TensorImage : public Image
   {
 
   public:

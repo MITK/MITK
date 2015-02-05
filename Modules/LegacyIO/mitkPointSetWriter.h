@@ -39,7 +39,7 @@ namespace mitk
  *
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
-class MitkLegacyIO_EXPORT PointSetWriter : public mitk::FileWriter
+class MITKLEGACYIO_EXPORT PointSetWriter : public mitk::FileWriter
 {
 public:
 

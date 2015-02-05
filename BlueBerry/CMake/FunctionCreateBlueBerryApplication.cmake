@@ -31,7 +31,7 @@
 #!
 function(FunctionCreateBlueBerryApplication)
 
-macro_parse_arguments(_APP "NAME;DESCRIPTION;SOURCES;PLUGINS;EXCLUDE_PLUGINS;LINK_LIBRARIES;LIBRARY_DIRS" "SHOW_CONSOLE;NO_PROVISIONING;NO_INSTALL" ${ARGN})
+cmake_parse_arguments(_APP "SHOW_CONSOLE;NO_PROVISIONING;NO_INSTALL" "NAME;DESCRIPTION" "SOURCES;PLUGINS;EXCLUDE_PLUGINS;LINK_LIBRARIES;LIBRARY_DIRS" ${ARGN})
 
 if(NOT _APP_NAME)
   message(FATAL_ERROR "NAME argument cannot be empty.")
@@ -62,7 +62,6 @@ endif()
 #------------------------------------------------------------------------
 
 find_package(MITK REQUIRED)
-find_package(Poco REQUIRED)
 
 # -----------------------------------------------------------------------
 # Set up include and link dirs for the executable
@@ -114,9 +113,9 @@ mitk_use_modules(TARGET ${_APP_NAME} MODULES mbilog PACKAGES Poco Qt4|QtCore Qt5
 set_target_properties(${_APP_NAME} PROPERTIES
                       COMPILE_FLAGS "${_app_compile_flags}")
 
-target_link_libraries(${_APP_NAME} org_blueberry_osgi ${_APP_LINK_LIBRARIES})
+target_link_libraries(${_APP_NAME} PRIVATE org_blueberry_osgi ${_APP_LINK_LIBRARIES})
 if(WIN32)
-  target_link_libraries(${_APP_NAME} ${QT_QTMAIN_LIBRARY})
+  target_link_libraries(${_APP_NAME} PRIVATE ${QT_QTMAIN_LIBRARY})
 endif()
 
 # -----------------------------------------------------------------------

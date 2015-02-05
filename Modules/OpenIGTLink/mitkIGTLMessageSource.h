@@ -43,7 +43,7 @@ namespace mitk {
   * Update() was called.
   *
   */
-  class MITK_OPENIGTLINK_EXPORT IGTLMessageSource : public itk::ProcessObject
+  class MITKOPENIGTLINK_EXPORT IGTLMessageSource : public itk::ProcessObject
   {
   public:
     mitkClassMacro(IGTLMessageSource, itk::ProcessObject);

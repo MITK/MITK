@@ -40,7 +40,7 @@ namespace mitk
   * This offers users the oppertunity to generate new Raw Player Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
-class MITK_PMDMODULE_EXPORT ToFCameraPMDRawDataCamCubeDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+class MITKPMD_EXPORT ToFCameraPMDRawDataCamCubeDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
 public:
 

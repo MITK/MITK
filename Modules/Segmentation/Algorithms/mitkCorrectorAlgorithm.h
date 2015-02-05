@@ -38,7 +38,7 @@ namespace mitk
  *
  * \sa CorrectorTool2D
  */
-class MitkSegmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
+class MITKSEGMENTATION_EXPORT CorrectorAlgorithm : public ImageToImageFilter
 {
   public:
 

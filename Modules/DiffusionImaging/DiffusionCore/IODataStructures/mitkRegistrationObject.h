@@ -32,7 +32,7 @@ namespace mitk
  *
  */
 
-class MitkDiffusionCore_EXPORT RegistrationObject : public BaseData
+class MITKDIFFUSIONCORE_EXPORT RegistrationObject : public BaseData
 {
 public:
 

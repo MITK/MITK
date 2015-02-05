@@ -43,7 +43,7 @@ class Image;
 
   $Darth Vader$
 */
-class MitkSegmentation_EXPORT WatershedTool : public AutoSegmentationTool
+class MITKSEGMENTATION_EXPORT WatershedTool : public AutoSegmentationTool
 {
   public:
 

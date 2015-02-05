@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag 9331130f+65420ed0+e57224a2)
+    set(revision_tag d8cd14e7)
     #IF(${proj}_REVISION_TAG)
     #  SET(revision_tag ${${proj}_REVISION_TAG})
     #ENDIF()
@@ -45,6 +45,7 @@ if(MITK_USE_CTK)
     if(MITK_USE_DCMTK)
       list(APPEND ctk_optional_cache_args
            -DDCMTK_DIR:PATH=${DCMTK_DIR}
+           -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
           )
       list(APPEND proj_DEPENDENCIES DCMTK)
     else()
@@ -68,11 +69,9 @@ if(MITK_USE_CTK)
     ENDFOREACH()
 
     ExternalProject_Add(${proj}
-      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-      BINARY_DIR ${proj}-build
-      PREFIX ${proj}-cmake
+      LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 0ee6baf7333b3bb53480453311f4a3ee
+      URL_MD5 2f1255494de6ae19aae3d4dc5f2ea6de
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
@@ -80,6 +79,10 @@ if(MITK_USE_CTK)
         ${ep_common_args}
         ${ctk_optional_cache_args}
         ${ctk_qt_args}
+        # The CTK PluginFramework cannot cope with
+        # a non-empty CMAKE_DEBUG_POSTFIX for the plugin
+        # libraries yet.
+        -DCMAKE_DEBUG_POSTFIX:STRING=
         -DGit_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DCTK_LIB_CommandLineModules/Backend/LocalProcess:BOOL=ON
@@ -94,7 +97,11 @@ if(MITK_USE_CTK)
         -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_5f3a03b1.tar.gz
       DEPENDS ${proj_DEPENDENCIES}
      )
-  set(CTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+
+    ExternalProject_Get_Property(${proj} binary_dir)
+    set(CTK_DIR ${binary_dir})
+    #set(CTK_DIR ${ep_prefix})
+    #mitkFunctionInstallExternalCMakeProject(${proj})
 
   else()
 

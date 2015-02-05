@@ -32,7 +32,7 @@ Selection is possible via a combobox, listing all available segmentations.
 Item "bounding objects" activates the \ref QmitkBoundingObjectWidget.
 
 */
-class MitkSegmentationUI_EXPORT QmitkToolRoiDataSelectionBox : public QWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkToolRoiDataSelectionBox : public QWidget
 {
   Q_OBJECT
 

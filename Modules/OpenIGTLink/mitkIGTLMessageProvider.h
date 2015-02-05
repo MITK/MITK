@@ -48,7 +48,7 @@ namespace mitk {
   *
   * \ingroup OpenIGTLink
   */
-  class MITK_OPENIGTLINK_EXPORT IGTLMessageProvider : public IGTLDeviceSource
+  class MITKOPENIGTLINK_EXPORT IGTLMessageProvider : public IGTLDeviceSource
   {
   public:
     mitkClassMacro(IGTLMessageProvider, IGTLDeviceSource);

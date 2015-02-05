@@ -37,7 +37,7 @@ namespace mitk {
   /// between opencv/vnl/mitk/xml representations of transform
   /// data
   ///
-  class MitkCameraCalibration_EXPORT Transform: public itk::Object,
+  class MITKCAMERACALIBRATION_EXPORT Transform: public itk::Object,
     public XMLSerializable
   {
   public:
@@ -299,7 +299,7 @@ namespace mitk {
 
 } // namespace mitk
 
-MitkCameraCalibration_EXPORT std::ostream& operator<<
+MITKCAMERACALIBRATION_EXPORT std::ostream& operator<<
     (std::ostream& os, mitk::Transform::Pointer p);
 
 #endif // MITKTRANSFORM_H

@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT Simulation : public BaseData, public SchedulableProcess
+  class MITKSIMULATION_EXPORT Simulation : public BaseData, public SchedulableProcess
   {
   public:
     mitkClassMacro(Simulation, BaseData);

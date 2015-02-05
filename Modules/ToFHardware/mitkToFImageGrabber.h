@@ -35,7 +35,7 @@ namespace mitk
   *
   * \ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFImageGrabber : public mitk::ToFImageSource
+  class MITKTOFHARDWARE_EXPORT ToFImageGrabber : public mitk::ToFImageSource
   {
   public:
 

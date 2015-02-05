@@ -31,7 +31,7 @@ namespace mitk
  *
  *
  */
-class MitkContourModel_EXPORT ContourModelUtils : public itk::Object
+class MITKCONTOURMODEL_EXPORT ContourModelUtils : public itk::Object
 {
   public:
 

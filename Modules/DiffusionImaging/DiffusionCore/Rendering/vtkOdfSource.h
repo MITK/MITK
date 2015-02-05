@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkOrientationDistributionFunction.h>
 #include <mitkOdfNormalizationMethodProperty.h>
 
-class MitkDiffusionCore_EXPORT vtkOdfSource : public vtkPolyDataAlgorithm
+class MITKDIFFUSIONCORE_EXPORT vtkOdfSource : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkOdfSource,vtkPolyDataAlgorithm);

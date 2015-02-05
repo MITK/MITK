@@ -34,7 +34,7 @@ namespace mitk
   \author Daniel Stein
   */
 
-  class MITK_DEFORMABLEREGISTRATION_EXPORT SymmetricForcesDemonsRegistration : public RegistrationBase
+  class MITKDEFORMABLEREGISTRATION_EXPORT SymmetricForcesDemonsRegistration : public RegistrationBase
   {
 
   public:

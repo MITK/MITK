@@ -35,7 +35,7 @@ namespace mitk
 // @ingroup Data
 //
 
-class MitkMultilabel_EXPORT LabelSet : public itk::Object
+class MITKMULTILABEL_EXPORT LabelSet : public itk::Object
 {
 public:
 
@@ -229,7 +229,7 @@ protected:
 * @param verbose Flag indicating if the user wants detailed console output or not.
 * @return true, if all subsequent comparisons are true, false otherwise
 */
-MITK_CORE_EXPORT bool Equal( const mitk::LabelSet& leftHandSide, const mitk::LabelSet& rightHandSide, ScalarType eps, bool verbose );
+MITKMULTILABEL_EXPORT bool Equal( const mitk::LabelSet& leftHandSide, const mitk::LabelSet& rightHandSide, ScalarType eps, bool verbose );
 
 
 } // namespace mitk

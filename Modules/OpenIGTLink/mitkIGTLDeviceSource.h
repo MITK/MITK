@@ -31,7 +31,7 @@ namespace mitk {
   * one single output.
   *
   */
-  class MITK_OPENIGTLINK_EXPORT IGTLDeviceSource : public IGTLMessageSource
+  class MITKOPENIGTLINK_EXPORT IGTLDeviceSource : public IGTLMessageSource
   {
   public:
     mitkClassMacro(IGTLDeviceSource, IGTLMessageSource);

@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT SimulationIO : public AbstractFileIO
+  class MITKSIMULATION_EXPORT SimulationIO : public AbstractFileIO
   {
   public:
     SimulationIO();

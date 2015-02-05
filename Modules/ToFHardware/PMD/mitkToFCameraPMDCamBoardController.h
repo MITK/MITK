@@ -31,7 +31,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_PMDMODULE_EXPORT ToFCameraPMDCamBoardController : public ToFCameraPMDController
+  class MITKPMD_EXPORT ToFCameraPMDCamBoardController : public ToFCameraPMDController
   {
   public:
 

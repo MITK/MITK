@@ -25,7 +25,7 @@ namespace mitk {
     * There are no methods defined, yet! At the moment, this is just an empty
     * interface.
     */
-  class MitkUS_EXPORT USControlInterfaceDoppler : public USAbstractControlInterface
+  class MITKUS_EXPORT USControlInterfaceDoppler : public USAbstractControlInterface
   {
   public:
     mitkClassMacro(USControlInterfaceDoppler, USAbstractControlInterface);

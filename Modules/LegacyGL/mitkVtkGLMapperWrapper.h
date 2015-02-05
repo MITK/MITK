@@ -33,7 +33,7 @@ namespace mitk {
   /**
   * @brief Vtk-based 2D mapper for PointSet
   */
-  class MitkLegacyGL_EXPORT VtkGLMapperWrapper : public VtkMapper
+  class MITKLEGACYGL_EXPORT VtkGLMapperWrapper : public VtkMapper
   {
   public:
     mitkClassMacro(VtkGLMapperWrapper, VtkMapper);

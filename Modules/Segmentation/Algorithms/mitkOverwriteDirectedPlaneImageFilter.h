@@ -54,7 +54,7 @@ namespace mitk
 
   Last contributor: $Author: maleike $
 */
-class MitkSegmentation_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImageFilter
+class MITKSEGMENTATION_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImageFilter
 {
   public:
 

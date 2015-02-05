@@ -40,7 +40,7 @@ namespace mitk {
    * @ingroup Process
    */
 
-  class MitkSegmentation_EXPORT ManualSegmentationToSurfaceFilter : public ImageToSurfaceFilter
+  class MITKSEGMENTATION_EXPORT ManualSegmentationToSurfaceFilter : public ImageToSurfaceFilter
   {
     public:
       mitkClassMacro(ManualSegmentationToSurfaceFilter,ImageToSurfaceFilter);

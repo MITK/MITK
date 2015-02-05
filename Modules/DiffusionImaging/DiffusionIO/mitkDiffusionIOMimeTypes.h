@@ -28,7 +28,7 @@ class DiffusionIOMimeTypes
 {
 public:
 
-  class MitkDiffusionIO_EXPORT DiffusionImageNrrdMimeType : public CustomMimeType
+  class MITKDIFFUSIONIO_EXPORT DiffusionImageNrrdMimeType : public CustomMimeType
   {
   public:
     DiffusionImageNrrdMimeType();
@@ -36,7 +36,7 @@ public:
     virtual DiffusionImageNrrdMimeType* Clone() const;
   };
 
-  class MitkDiffusionIO_EXPORT DiffusionImageNiftiMimeType : public CustomMimeType
+  class MITKDIFFUSIONIO_EXPORT DiffusionImageNiftiMimeType : public CustomMimeType
   {
   public:
     DiffusionImageNiftiMimeType();

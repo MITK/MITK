@@ -34,7 +34,7 @@ namespace mitk {
   * \ingroup Navigation
   */
 
-  class MitkIGTBase_EXPORT WindowsRealTimeClock : public RealTimeClock
+  class MITKIGTBASE_EXPORT WindowsRealTimeClock : public RealTimeClock
   {
   public:
     mitkClassMacro(WindowsRealTimeClock, mitk::RealTimeClock);

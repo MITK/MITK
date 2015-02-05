@@ -37,7 +37,7 @@ namespace mitk {
 //##
 //## @ingroup Process
 
-class MitkQuantification_EXPORT TbssRoiImageSource : public ImageSource
+class MITKQUANTIFICATION_EXPORT TbssRoiImageSource : public ImageSource
 {
 public:
   mitkClassMacro(TbssRoiImageSource, BaseDataSource)

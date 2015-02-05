@@ -60,7 +60,7 @@ namespace mitk {
 
  * \ingroup Mapper
  */
-class MitkMultilabel_EXPORT LabelSetImageVtkMapper2D : public VtkMapper
+class MITKMULTILABEL_EXPORT LabelSetImageVtkMapper2D : public VtkMapper
 {
 
 public:
@@ -88,7 +88,7 @@ public:
      * internal helper class LocalStorage. This allows rendering n views with just
      * 1 mitkMapper using n vtkMapper.
      * */
-  class MITK_CORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
+  class MITKMULTILABEL_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
   public:
 

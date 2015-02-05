@@ -47,7 +47,7 @@ class QmitkTrackingDeviceConfigurationWidgetScanPortsWorker;
   *
   *   \ingroup IGTUI
   */
-class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
+class MITKIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 {
   Q_OBJECT
 

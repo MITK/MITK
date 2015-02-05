@@ -37,7 +37,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT
+  class MITKIGT_EXPORT
       IGTLMessageToNavigationDataFilter : public NavigationDataSource
   {
   public:

@@ -38,7 +38,7 @@ namespace mitk
    * Additional you can assign the lookup table or transferfunction by using the AssignLookupTable(DataNode* node) or AssignTransferfunction(DataNode* node) methods.
    *
    */
-  class MitkConnectomics_EXPORT FreeSurferParcellationTranslator : public itk::Object
+  class MITKCONNECTOMICS_EXPORT FreeSurferParcellationTranslator : public itk::Object
   {
       /*###########      Constructors, Typedefs and Enumerations      ###########*/
     public:

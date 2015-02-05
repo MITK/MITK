@@ -367,8 +367,7 @@ bool LabelSetImageIO::PropertyFromXmlElem(std::string& key, mitk::BaseProperty::
 
 void LabelSetImageIO::LoadLabelSetImagePreset(const std::string & presetFilename, mitk::LabelSetImage::Pointer& inputImage )
 {
-  std::auto_ptr<TiXmlDocument> presetXmlDoc;
-  presetXmlDoc.reset( new TiXmlDocument());
+  std::unique_ptr<TiXmlDocument> presetXmlDoc(new TiXmlDocument());
 
   bool ok = presetXmlDoc->LoadFile(presetFilename);
   if ( !ok )

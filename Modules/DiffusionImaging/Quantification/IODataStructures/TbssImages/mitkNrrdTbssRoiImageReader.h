@@ -30,7 +30,7 @@ namespace mitk
   */
 
 
-  class MitkQuantification_EXPORT NrrdTbssRoiImageReader : public mitk::TbssRoiImageSource, public FileReader
+  class MITKQUANTIFICATION_EXPORT NrrdTbssRoiImageReader : public mitk::TbssRoiImageSource, public FileReader
   {
   public:
 

@@ -80,7 +80,7 @@ namespace mitk
 
   $Author$
   */
-  class MitkSegmentation_EXPORT Tool : public EventStateMachine
+  class MITKSEGMENTATION_EXPORT Tool : public EventStateMachine
                                  , public InteractionEventObserver
   {
   public:

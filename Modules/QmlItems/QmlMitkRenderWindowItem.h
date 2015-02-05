@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   \warning Subject to change.
 */
-class MitkQmlItems_EXPORT QmlMitkRenderWindowItem : public QVTKQuickItem, public mitk::RenderWindowBase
+class MITKQMLITEMS_EXPORT QmlMitkRenderWindowItem : public QVTKQuickItem, public mitk::RenderWindowBase
 {
     Q_OBJECT
 

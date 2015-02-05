@@ -28,7 +28,7 @@ namespace mitk
 /**
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
-class DEPRECATED() MitkLegacyIO_EXPORT ImageWriterFactory : public itk::ObjectFactoryBase
+class DEPRECATED() MITKLEGACYIO_EXPORT ImageWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 

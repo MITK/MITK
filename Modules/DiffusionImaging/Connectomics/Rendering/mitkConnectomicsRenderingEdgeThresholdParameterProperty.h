@@ -31,7 +31,7 @@ namespace mitk
 /**
  * Encapsulates the enumeration of different rendering schemes for connectomics networks
  */
-class MitkConnectomics_EXPORT ConnectomicsRenderingEdgeThresholdParameterProperty : public EnumerationProperty
+class MITKCONNECTOMICS_EXPORT ConnectomicsRenderingEdgeThresholdParameterProperty : public EnumerationProperty
 {
 public:
 

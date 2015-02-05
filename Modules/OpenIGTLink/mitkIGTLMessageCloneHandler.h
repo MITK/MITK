@@ -37,7 +37,7 @@ namespace mitk
   * message factory.
   *
   */
-  class MITK_OPENIGTLINK_EXPORT IGTLMessageCloneHandler: public itk::Object
+  class MITKOPENIGTLINK_EXPORT IGTLMessageCloneHandler: public itk::Object
   {
   public:
     mitkClassMacro(IGTLMessageCloneHandler, itk::Object);

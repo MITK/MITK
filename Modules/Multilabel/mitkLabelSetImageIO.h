@@ -28,7 +28,9 @@ namespace mitk
  * Writes a LabelSetImage to a file
  * @ingroup Process
  */
-class MitkMultilabel_EXPORT LabelSetImageIO : public mitk::AbstractFileIO
+// The export macro should be removed. Currently, the unit
+// tests directly instantiate this class.
+class MITKMULTILABEL_EXPORT LabelSetImageIO : public mitk::AbstractFileIO
 {
 public:
 

@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkIOUtil.h>
-#include "../mitkLabelSetImage.h"
-#include "../mitkLabelSetImageIO.h"
+#include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageIO.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>

@@ -8,7 +8,7 @@ if(NOT DCMTK_DIR)
   endif(NOT DCMTK_DIR)
 endif(NOT DCMTK_DIR)
 
-find_package(DCMTK)
+find_package(DCMTK QUIET REQUIRED)
 
 if(NOT DCMTK_FOUND)
   message(SEND_ERROR "DCMTK development files not found.\n Please check variables (e.g. DCMTK_DIR) for include directories and libraries.\nYou may set environment variable DCMTK_DIR before pressing 'configure'")
@@ -41,8 +41,8 @@ file(READ ${DCMTK_config_INCLUDE_DIR}/osconfig.h _osconfig_h)
     find_library(DCMTK_oflog_LIBRARY_DEBUG oflog ${_DCMTK_lib_dir_debug} )
     list(APPEND DCMTK_LIBRARIES debug ${DCMTK_oflog_LIBRARY_DEBUG} )
   endif()
-  endif(NOT _osconfig_h MATCHES "PACKAGE_VERSION_NUMBER \"354\"")
-endif(EXISTS ${DCMTK_config_INCLUDE_DIR}/osconfig.h)
+  endif()
+endif()
 
 #
 # Usually all code should be adapted to DCMTK 3.6
@@ -50,9 +50,9 @@ endif(EXISTS ${DCMTK_config_INCLUDE_DIR}/osconfig.h)
 # to configure a header file for ifdefs:
 # configure_file( mitkDCMTKConfig.h.in mitkDCMTKConfig.h )
 
-list(APPEND ALL_INCLUDE_DIRECTORIES ${DCMTK_INCLUDE_DIR} ${DCMTK_DIR}/include)
+list(APPEND ALL_INCLUDE_DIRECTORIES ${DCMTK_INCLUDE_DIR})
 list(APPEND ALL_LIBRARIES ${DCMTK_LIBRARIES} ${MISSING_LIBS_REQUIRED_BY_DCMTK})
 #link_directories()
 
-endif(MITK_USE_DCMTK)
+endif()
 

@@ -84,7 +84,7 @@ void mitk::ConnectomicsShortestPathHistogram::CalculateUnweightedUndirectedShort
   }
 }
 
-void mitk::ConnectomicsShortestPathHistogram::CalculateWeightedUndirectedShortestPaths( NetworkType* boostGraph )
+void mitk::ConnectomicsShortestPathHistogram::CalculateWeightedUndirectedShortestPaths( NetworkType* /*boostGraph*/ )
 {
   MBI_WARN << mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_UNIMPLEMENTED_FEATURE;
 }

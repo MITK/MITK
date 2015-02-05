@@ -15,7 +15,7 @@ using namespace mitk;
 /**
 * \brief ODF lookuptable based energy computer.   */
 
-class MitkFiberTracking_EXPORT GibbsEnergyComputer : public EnergyComputer
+class MITKFIBERTRACKING_EXPORT GibbsEnergyComputer : public EnergyComputer
 {
   public:
 

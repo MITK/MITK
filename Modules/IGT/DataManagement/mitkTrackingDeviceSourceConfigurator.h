@@ -37,7 +37,7 @@ namespace mitk {
   *        GetErrorMessage().
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT TrackingDeviceSourceConfigurator : public itk::Object
+  class MITKIGT_EXPORT TrackingDeviceSourceConfigurator : public itk::Object
   {
   public:
     mitkClassMacro(TrackingDeviceSourceConfigurator,  itk::Object);

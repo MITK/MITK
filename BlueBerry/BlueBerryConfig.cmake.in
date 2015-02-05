@@ -11,7 +11,7 @@ find_package(CTK REQUIRED)
 set(mbilog_DIR "@mbilog_DIR@")
 find_package(mbilog REQUIRED)
 
-find_package(Poco REQUIRED)
+find_package(Poco COMPONENTS Foundation Util XML CONFIG REQUIRED)
 
 set(DOXYGEN_EXECUTABLE "@DOXYGEN_EXECUTABLE@")
 set(DOXYGEN_DOT_EXECUTABLE "@DOXYGEN_DOT_EXECUTABLE@")

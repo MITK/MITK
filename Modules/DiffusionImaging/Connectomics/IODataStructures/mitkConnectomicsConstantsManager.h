@@ -26,7 +26,7 @@ namespace mitk
   /** \brief The XML consts for reading and writing
   */
 
-  class MitkConnectomics_EXPORT ConnectomicsConstantsManager
+  class MITKCONNECTOMICS_EXPORT ConnectomicsConstantsManager
   {
   public:
 

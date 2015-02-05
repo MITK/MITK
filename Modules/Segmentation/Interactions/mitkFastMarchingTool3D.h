@@ -53,7 +53,7 @@ namespace mitk
 
   For detailed documentation see ITK Software Guide section 9.3.1 Fast Marching Segmentation.
 */
-class MitkSegmentation_EXPORT FastMarchingTool3D : public AutoSegmentationTool
+class MITKSEGMENTATION_EXPORT FastMarchingTool3D : public AutoSegmentationTool
 {
     mitkNewMessageMacro(Ready);
 

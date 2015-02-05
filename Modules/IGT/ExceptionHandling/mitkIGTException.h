@@ -26,7 +26,7 @@ namespace mitk {
   * \brief An object of this class represents an exception of the MITK-IGT module.
   *
   * \ingroup IGT
-  */  class MitkIGT_EXPORT IGTException : public mitk::Exception //perhaps this should later derive from mitk::Exception (if there is an exception handling for complete MITK
+  */  class MITKIGT_EXPORT IGTException : public mitk::Exception //perhaps this should later derive from mitk::Exception (if there is an exception handling for complete MITK
   {
   public:
 

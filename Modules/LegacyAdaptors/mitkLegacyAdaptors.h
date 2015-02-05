@@ -40,7 +40,7 @@ namespace mitk
 
    Meant to support legacy code, which was base on mitkIpPicDescriptor types. Please remind that such code should be migrated towards ITK/VTK solutions.
  */
-  MitkLegacyAdaptors_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitk::ImageWriteAccessor*, mitkIpPicDescriptor* picDesc);
+  MITKLEGACYADAPTORS_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitk::ImageWriteAccessor*, mitkIpPicDescriptor* picDesc);
 
   /**
     \brief Constructs a legacy mitkIpPicDescriptor from mitk::ImageDataItem
@@ -49,7 +49,7 @@ namespace mitk
     Simply calling ipPicFree( desc ) will delete the data and so will the ImageDataItem try when it get deleted. Simplest way to avoid the duplicate
     deletion attempt is to set the desc->data manually to NULL before calling the ipPicFree() on the descriptor
   */
-  MitkLegacyAdaptors_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitk::ImageWriteAccessor*, mitkIpPicDescriptor *picDesc );
+  MITKLEGACYADAPTORS_EXPORT mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitk::ImageWriteAccessor*, mitkIpPicDescriptor *picDesc );
 
  /**
    \brief Constructs a deprecated legacy mitkIpPicDescriptor from mitk::Image
@@ -57,7 +57,7 @@ namespace mitk
    Meant to support legacy code, which was base on mitkIpPicDescriptor types. Please remind that such code should be migrated towards ITK/VTK solutions.
    \deprecatedSince{2012_09} Please use image accessors instead! An image accessor (ImageWriteAccessor) can be commited to CastToIpPicDescriptor.
  */
-  MitkLegacyAdaptors_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitkIpPicDescriptor* picDesc));
+  MITKLEGACYADAPTORS_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(mitk::Image::Pointer, mitkIpPicDescriptor* picDesc));
 
   /**
     \brief Constructs a deprecated legacy mitkIpPicDescriptor from mitk::ImageDataItem
@@ -67,7 +67,7 @@ namespace mitk
     deletion attempt is to set the desc->data manually to NULL before calling the ipPicFree() on the descriptor
    \deprecatedSince{2012_09} Please use image accessors instead! An image accessor (ImageWriteAccessor) can be commited to CastToIpPicDescriptor.
   */
-  MitkLegacyAdaptors_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitkIpPicDescriptor *picDesc));
+  MITKLEGACYADAPTORS_EXPORT DEPRECATED(mitkIpPicDescriptor* CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>, mitkIpPicDescriptor *picDesc));
 
 
   /**
@@ -75,14 +75,14 @@ namespace mitk
 
     Performs the oposite cast direction to \sa CastToIpPicDescriptor
   */
-  MitkLegacyAdaptors_EXPORT DEPRECATED(mitk::ImageDescriptor::Pointer CastToImageDescriptor(mitkIpPicDescriptor* desc));
+  MITKLEGACYADAPTORS_EXPORT DEPRECATED(mitk::ImageDescriptor::Pointer CastToImageDescriptor(mitkIpPicDescriptor* desc));
 
   /**
     \brief Constructs a legacy type information from mitk::PixelType
 
     The IpPicDescriptor uses own notations for different pixel types. This casting is needed e.g. by the CastToIpPicDescriptor method.
   */
-  MitkLegacyAdaptors_EXPORT DEPRECATED(mitkIpPicType_t CastToIpPicType( int componentType ) );
+  MITKLEGACYADAPTORS_EXPORT DEPRECATED(mitkIpPicType_t CastToIpPicType( int componentType ) );
 
   /**
     \brief Returns a mitk::PixelType object corresponding to given mitkIpPicType_t
@@ -90,7 +90,7 @@ namespace mitk
     The method needs the mitkIpPicType_t and the bits per element (bpe) information to be able to create the correct corresponding PixelType
     \sa PixelType
   */
-  MitkLegacyAdaptors_EXPORT DEPRECATED(PixelType CastToPixelType( mitkIpPicType_t pictype, size_t bpe ) );
+  MITKLEGACYADAPTORS_EXPORT DEPRECATED(PixelType CastToPixelType( mitkIpPicType_t pictype, size_t bpe ) );
 
 } // end namespace mitk
 

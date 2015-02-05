@@ -1,1 +1,3 @@
-list(APPEND ALL_INCLUDE_DIRECTORIES ${Eigen_DIR})
+find_package(Eigen REQUIRED)
+list(APPEND ALL_LIBRARIES Eigen)
+

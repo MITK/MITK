@@ -31,7 +31,7 @@ namespace mitk
 * \brief This class is a dummy message to show the how to implement a new message
 * type
 */
-class MITK_OPENIGTLINK_EXPORT IGTLDummyMessage: public igtl::StringMessage
+class MITKOPENIGTLINK_EXPORT IGTLDummyMessage: public igtl::StringMessage
 {
 public:
   typedef IGTLDummyMessage                     Self;

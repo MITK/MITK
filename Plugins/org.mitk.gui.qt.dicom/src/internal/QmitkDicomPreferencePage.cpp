@@ -112,7 +112,7 @@ void QmitkDicomPreferencePage::DefaultButtonPushed()
 
 void QmitkDicomPreferencePage::PathSelectButtonPushed()
 {
-  QString path = QFileDialog::getExistingDirectory(m_MainControl,"Folder for Dicom directory","dir",false);
+  QString path = QFileDialog::getExistingDirectory(m_MainControl,"Folder for Dicom directory","dir");
   if (!path.isEmpty())
   {
     m_PathEdit->setText(path);

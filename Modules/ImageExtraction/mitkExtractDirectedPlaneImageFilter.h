@@ -66,7 +66,7 @@ namespace mitk
   Last contributor: $Author: T. Schwarz$
 */
 
-  class MitkImageExtraction_EXPORT ExtractDirectedPlaneImageFilter : public ImageToImageFilter
+  class MITKIMAGEEXTRACTION_EXPORT ExtractDirectedPlaneImageFilter : public ImageToImageFilter
   {
   public:
 

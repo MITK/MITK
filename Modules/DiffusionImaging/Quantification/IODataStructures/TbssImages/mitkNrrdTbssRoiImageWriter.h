@@ -30,7 +30,7 @@ namespace mitk
  * @ingroup Process
  */
 
-class MitkQuantification_EXPORT NrrdTbssRoiImageWriter : public mitk::FileWriterWithInformation
+class MITKQUANTIFICATION_EXPORT NrrdTbssRoiImageWriter : public mitk::FileWriterWithInformation
 {
 public:
 

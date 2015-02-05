@@ -30,7 +30,7 @@ namespace mitk {
   * Use mitk::NavigationDataPlayer to stream from these sets easily.
   *
   */
-  class MitkIGT_EXPORT NavigationDataSet : public BaseData
+  class MITKIGT_EXPORT NavigationDataSet : public BaseData
   {
   public:
 

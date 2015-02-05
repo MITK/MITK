@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * @ingroup ToFUI
 */
-class MitkToFUI_EXPORT QmitkToFConnectionWidget :public QWidget
+class MITKTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 {
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT

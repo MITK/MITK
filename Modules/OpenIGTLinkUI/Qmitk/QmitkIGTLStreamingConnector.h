@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   *
   *   \ingroup OpenIGTLinkUI
   */
-class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLStreamingConnector : public QObject
+class MITKOPENIGTLINKUI_EXPORT QmitkIGTLStreamingConnector : public QObject
 {
   Q_OBJECT
 

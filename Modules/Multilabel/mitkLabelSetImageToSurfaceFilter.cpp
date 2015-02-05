@@ -90,7 +90,7 @@ void mitk::LabelSetImageToSurfaceFilter::GenerateData()
 }
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::LabelSetImageToSurfaceFilter::InternalProcessing( const itk::Image<TPixel, VDimension>* input, mitk::Surface* surface )
+void mitk::LabelSetImageToSurfaceFilter::InternalProcessing( const itk::Image<TPixel, VDimension>* input, mitk::Surface* /*surface*/ )
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
 

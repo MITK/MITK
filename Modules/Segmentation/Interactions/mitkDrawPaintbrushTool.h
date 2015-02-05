@@ -44,7 +44,7 @@ namespace mitk
   \warning Only to be instantiated by mitk::ToolManager.
   $Author: maleike $
 */
-class MitkSegmentation_EXPORT DrawPaintbrushTool : public PaintbrushTool
+class MITKSEGMENTATION_EXPORT DrawPaintbrushTool : public PaintbrushTool
 {
   public:
 

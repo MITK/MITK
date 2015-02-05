@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ///
 /// A script highlighter for Python Scripts
-class MITK_PYTHON_EXPORT QmitkPythonScriptEditorHighlighter : public QSyntaxHighlighter
+class MITKPYTHON_EXPORT QmitkPythonScriptEditorHighlighter : public QSyntaxHighlighter
 {
   Q_OBJECT
 

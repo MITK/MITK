@@ -28,7 +28,7 @@ namespace mitk
 {
 
   /** This property will store the gradients directions and the original gradient directions */
-  class MitkDiffusionCore_EXPORT GradientDirectionsProperty : public mitk::BaseProperty
+  class MITKDIFFUSIONCORE_EXPORT GradientDirectionsProperty : public mitk::BaseProperty
   {
   public:
     typedef unsigned int                                             IndexType;

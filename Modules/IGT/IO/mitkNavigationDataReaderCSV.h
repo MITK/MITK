@@ -27,7 +27,7 @@ namespace mitk {
    *  Caution: at the moment only one navigation data is supported which means that only
    *  the data of the first navigation tool in the file is read!
    */
-  class MitkIGT_EXPORT NavigationDataReaderCSV : public NavigationDataReaderInterface
+  class MITKIGT_EXPORT NavigationDataReaderCSV : public NavigationDataReaderInterface
   {
   public:
 

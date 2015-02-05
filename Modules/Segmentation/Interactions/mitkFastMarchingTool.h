@@ -56,7 +56,7 @@ namespace mitk
 
   For detailed documentation see ITK Software Guide section 9.3.1 Fast Marching Segmentation.
 */
-class MitkSegmentation_EXPORT FastMarchingTool : public FeedbackContourTool
+class MITKSEGMENTATION_EXPORT FastMarchingTool : public FeedbackContourTool
 {
     mitkNewMessageMacro(Ready);
 

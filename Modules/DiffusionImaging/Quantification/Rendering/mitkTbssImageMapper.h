@@ -27,7 +27,7 @@ namespace mitk {
   //## @brief Mapper for raw diffusion weighted images
   //## @ingroup Mapper
 
-  class MitkQuantification_EXPORT TbssImageMapper : public ImageVtkMapper2D
+  class MITKQUANTIFICATION_EXPORT TbssImageMapper : public ImageVtkMapper2D
   {
   public:
 

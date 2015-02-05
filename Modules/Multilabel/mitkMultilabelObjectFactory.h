@@ -18,13 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MULTILABELOBJECTFACTORY_H_INCLUDED
 
 #include "mitkCoreObjectFactoryBase.h"
-#include <MitkMultilabelExports.h>
 
 #include <mitkAbstractFileIO.h>
 
 namespace mitk {
 
-  class MitkMultilabel_EXPORT MultilabelObjectFactory : public CoreObjectFactoryBase
+  class MultilabelObjectFactory : public CoreObjectFactoryBase
   {
   public:
     mitkClassMacro(MultilabelObjectFactory, CoreObjectFactoryBase);

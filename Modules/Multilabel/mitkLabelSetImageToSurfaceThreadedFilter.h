@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkMultilabel_EXPORT LabelSetImageToSurfaceThreadedFilter : public SegmentationSink
+class MITKMULTILABEL_EXPORT LabelSetImageToSurfaceThreadedFilter : public SegmentationSink
 {
   public:
 

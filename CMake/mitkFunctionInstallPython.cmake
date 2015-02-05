@@ -36,7 +36,8 @@ function(mitkFunctionInstallPython _python_libs_out _python_dirs_out _app_bundle
   endif()
 
   # install OpenCV python wrapping
-  if(MITK_USE_OpenCV)
+  if(MITK_USE_OpenCV AND EXISTS "${OpenCV_DIR}/lib/cv2${PYTHON_LIB_SUFFIX}")
+    # we currently only support installing in release mode
     list(APPEND _python_libs "cv2${PYTHON_LIB_SUFFIX}")
 
     if(UNIX)
@@ -63,8 +64,8 @@ function(mitkFunctionInstallPython _python_libs_out _python_dirs_out _app_bundle
     # exclude system libs
     if(${_lib} MATCHES "^vtk.+")
       # use only python wrapped modules ( targets end with PythonD )
-      if(TARGET ${_lib}PythonD)
-        list(APPEND _VTK_PYTHON_TARGETS ${_lib}Python)
+      if(TARGET ${_lib}Python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}D)
+        list(APPEND _VTK_PYTHON_TARGETS ${_lib}Python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}D)
       endif()
     endif()
   endforeach()
@@ -73,19 +74,20 @@ function(mitkFunctionInstallPython _python_libs_out _python_dirs_out _app_bundle
   foreach(_target ${_VTK_PYTHON_TARGETS})
     # get the properties of the python wrapped target
     if( CMAKE_BUILD_TYPE STREQUAL "Debug")
-      get_target_property(_target_lib   "${_target}D" IMPORTED_LOCATION_DEBUG)
+      get_target_property(_target_lib   "${_target}" IMPORTED_LOCATION_DEBUG)
     else()
-      get_target_property(_target_lib "${_target}D" IMPORTED_LOCATION_RELEASE)
+      get_target_property(_target_lib "${_target}" IMPORTED_LOCATION_RELEASE)
     endif()
     get_filename_component(_filepath "${_target_lib}" PATH)
+    get_filename_component(_filename "${_target_lib}" NAME)
 
-    install(FILES "${_filepath}/${_target}${PYTHON_LIB_SUFFIX}" DESTINATION ${_destination})
+    install(FILES "${_target_lib}" DESTINATION ${_destination})
 
     if(UNIX AND NOT APPLE )
       install(CODE "file(RPATH_REMOVE
-                    FILE \"\${CMAKE_INSTALL_PREFIX}/bin/${_target}${PYTHON_LIB_SUFFIX}\")")
+                    FILE \"\${CMAKE_INSTALL_PREFIX}/bin/${_filename}\")")
     endif()
-    list(APPEND _python_libs "${_target}${PYTHON_LIB_SUFFIX}")
+    list(APPEND _python_libs "${_filename}")
   endforeach()
 
   # install vtk python. This folder contains all *.py and
@@ -115,7 +117,7 @@ function(mitkFunctionInstallPython _python_libs_out _python_dirs_out _app_bundle
     endforeach()
 
     # config will by read out at runtime
-    install(FILES "${Python_DIR}/include/${_py_include_postfix}pyconfig.h" DESTINATION ${_destination}/Python/include/${_py_include_postfix})
+    install(FILES "${PYTHON_INCLUDE_DIR}/pyconfig.h" DESTINATION ${_destination}/Python/include/${_py_include_postfix})
 
     # add simple itk python wrapping file to the dependency list to resolve linked libraries
     file(GLOB_RECURSE item RELATIVE "${Python_DIR}/${_python_runtime_dir}" "${Python_DIR}/${_python_runtime_dir}/_SimpleITK${PYTHON_LIB_SUFFIX}")

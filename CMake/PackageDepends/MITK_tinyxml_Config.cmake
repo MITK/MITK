@@ -6,4 +6,6 @@ if(NOT tinyxml_FOUND)
 endif()
 
 list(APPEND ALL_LIBRARIES ${tinyxml_LIBRARIES})
-list(APPEND ALL_INCLUDE_DIRECTORIES ${tinyxml_INCLUDE_DIRS})
+if(tinyxml_INCLUDE_DIRS)
+  list(APPEND ALL_INCLUDE_DIRECTORIES ${tinyxml_INCLUDE_DIRS})
+endif()

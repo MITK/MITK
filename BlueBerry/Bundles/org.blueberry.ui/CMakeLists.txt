@@ -18,5 +18,5 @@ MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE BERRY_UI
                         EXPORTED_INCLUDE_SUFFIXES ${PLUGIN_exported_include_suffixes})
 
 if(MITK_USE_Qt5)
-  qt5_use_modules(${PLUGIN_TARGET} Widgets)
+  target_link_libraries(${PLUGIN_TARGET} PRIVATE Qt5::Widgets)
 endif()

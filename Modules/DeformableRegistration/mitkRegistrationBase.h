@@ -31,7 +31,7 @@ namespace mitk {
   \author Daniel Stein
   */
 
-  class MITK_DEFORMABLEREGISTRATION_EXPORT RegistrationBase : public ImageToImageFilter
+  class MITKDEFORMABLEREGISTRATION_EXPORT RegistrationBase : public ImageToImageFilter
   {
   public:
     mitkClassMacro(RegistrationBase, ImageToImageFilter);

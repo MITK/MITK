@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleContext.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, BinaryThresholdULTool, "ThresholdingUL tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, BinaryThresholdULTool, "ThresholdingUL tool");
 }
 
 mitk::BinaryThresholdULTool::BinaryThresholdULTool()

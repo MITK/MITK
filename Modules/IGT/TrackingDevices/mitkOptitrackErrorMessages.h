@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkIGT_EXPORT OptitrackErrorMessages
+  class MITKIGT_EXPORT OptitrackErrorMessages
   {
   public:
   /**

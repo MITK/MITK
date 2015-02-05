@@ -34,7 +34,7 @@ namespace mitk
   * missing.
   */
 
-  class MitkDiffusionCore_EXPORT DiffusionPropertyHelper
+  class MITKDIFFUSIONCORE_EXPORT DiffusionPropertyHelper
   {
   public:
 

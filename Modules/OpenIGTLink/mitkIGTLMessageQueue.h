@@ -35,7 +35,7 @@ namespace mitk {
   *
   * \ingroup OpenIGTLink
   */
-  class MITK_OPENIGTLINK_EXPORT IGTLMessageQueue : public itk::Object
+  class MITKOPENIGTLINK_EXPORT IGTLMessageQueue : public itk::Object
   {
   public:
     mitkClassMacro(mitk::IGTLMessageQueue, itk::Object)

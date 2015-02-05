@@ -36,7 +36,7 @@ namespace mitk {
 //##Documentation
 //## @brief Vtk-based mapper for mitk::Contour
 //## @ingroup Mapper
-class MitkSegmentation_EXPORT ContourSetVtkMapper3D : public VtkMapper
+class MITKSEGMENTATION_EXPORT ContourSetVtkMapper3D : public VtkMapper
 {
   public:
 

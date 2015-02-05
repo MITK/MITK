@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * Displays options for rigid registration.
 */
-class MITK_RIGIDREGISTRATION_UI_EXPORT QmitkRigidRegistrationTransformsGUIBase : public QWidget
+class MITKRIGIDREGISTRATIONUI_EXPORT QmitkRigidRegistrationTransformsGUIBase : public QWidget
 {
 
 public:

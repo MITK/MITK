@@ -33,7 +33,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MitkSegmentation_EXPORT AutoCropTool : public SegmentationsProcessingTool
+class MITKSEGMENTATION_EXPORT AutoCropTool : public SegmentationsProcessingTool
 {
   public:
 

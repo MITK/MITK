@@ -48,6 +48,7 @@ namespace mitk
     mitkCloneMacro(Self)
 
     virtual mitk::Point2D ApplyControlPointConstraints(unsigned int index, const Point2D& point) override;
+    virtual std::string EvaluateAnnotation() override;
     virtual void EvaluateFeaturesInternal() override;
     virtual void GenerateHelperPolyLine(double, unsigned int) override;
     virtual void GeneratePolyLine() override;

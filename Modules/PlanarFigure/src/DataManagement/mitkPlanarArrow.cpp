@@ -90,6 +90,15 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   this->AppendPointToHelperPolyLine(1, Point2D(p1 - temp2 * nonScalingLength));
 }
 
+std::string mitk::PlanarArrow::EvaluateAnnotation()
+{
+    double length = GetQuantity(FEATURE_ID_LENGTH);
+    char str[20];
+    sprintf(str, "%.2f", length);
+    std::string res = str;
+    res += " mm";
+    return res;
+}
 
 void mitk::PlanarArrow::EvaluateFeaturesInternal()
 {

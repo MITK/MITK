@@ -92,6 +92,20 @@ void mitk::PlanarRectangle::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, 
   // A polygon does not require helper objects
 }
 
+std::string mitk::PlanarRectangle::EvaluateAnnotation()
+{
+  double circumference = GetQuantity(FEATURE_ID_CIRCUMFERENCE);
+  double area = GetQuantity(FEATURE_ID_AREA);
+  std::stringstream ss;
+  char stmp[20];
+  ss << "Circumference=";
+  sprintf(stmp, "%.2fmm\n", circumference);
+  ss << stmp << "Area=";
+  sprintf(stmp, "%.2fmm2\n", area);
+  ss << stmp;
+  return ss.str();
+}
+
 void mitk::PlanarRectangle::EvaluateFeaturesInternal()
 {
   // Calculate circumference

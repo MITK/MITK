@@ -68,6 +68,23 @@ mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned i
   return point;
 }
 
+std::string mitk::PlanarDoubleEllipse::EvaluateAnnotation()
+{
+  double major_axis = GetQuantity(FEATURE_ID_MAJOR_AXIS);
+  double minor_axis = GetQuantity(FEATURE_ID_MINOR_AXIS);
+  double thickness = GetQuantity(FEATURE_ID_THICKNESS);
+  std::stringstream ss;
+  char stmp[20];
+  ss << "Major axis=";
+  sprintf(stmp, "%.2fmm\n", major_axis);
+  ss << stmp << "Minor axis=";
+  sprintf(stmp, "%.2fmm\n", minor_axis);
+  ss << stmp << "Thickness=";
+  sprintf(stmp, "%.2fmm\n", thickness);
+  ss << stmp;
+  return ss.str();
+}
+
 void mitk::PlanarDoubleEllipse::EvaluateFeaturesInternal()
 {
   const Point2D centerPoint = this->GetControlPoint(0);

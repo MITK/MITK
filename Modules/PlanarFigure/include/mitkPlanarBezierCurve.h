@@ -52,6 +52,7 @@ namespace mitk
 
     mitkCloneMacro(Self)
 
+    virtual std::string EvaluateAnnotation() override;
     virtual void EvaluateFeaturesInternal() override;
     virtual void GenerateHelperPolyLine(double, unsigned int) override;
     virtual void GeneratePolyLine() override;

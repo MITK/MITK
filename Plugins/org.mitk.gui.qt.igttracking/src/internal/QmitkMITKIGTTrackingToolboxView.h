@@ -75,6 +75,9 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     /** Connects the device if it is disconnected / disconnects the device if it is connected. */
     void OnConnectDisconnect();
 
+    /** Freezes the device if it is not frozen / unfreezes the device if it is frozen. */
+    void OnFreezeUnfreezeTracking();
+
     /** @brief This slot connects to the device. In status "connected" configuration of the device is disabled. */
     void OnConnect();
 

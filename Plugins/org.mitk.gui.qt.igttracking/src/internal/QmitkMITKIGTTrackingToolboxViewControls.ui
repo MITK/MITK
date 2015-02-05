@@ -340,7 +340,7 @@ p, li { white-space: pre-wrap; }
                </size>
               </property>
               <property name="text">
-               <string>Unfreeze Tracking</string>
+               <string>Freeze Tracking</string>
               </property>
              </widget>
             </item>

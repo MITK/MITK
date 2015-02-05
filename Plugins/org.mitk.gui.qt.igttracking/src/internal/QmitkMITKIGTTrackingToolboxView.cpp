@@ -127,6 +127,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_LoadTools, SIGNAL(clicked()), this, SLOT(OnLoadTools()) );
     connect( m_Controls->m_ConnectDisconnectButton, SIGNAL(clicked()), this, SLOT(OnConnectDisconnect()) );
     connect( m_Controls->m_StartStopTrackingButton, SIGNAL(clicked()), this, SLOT(OnStartStopTracking()) );
+    connect( m_Controls->m_FreezeUnfreezeTrackingButton, SIGNAL(clicked()), this, SLOT(OnFreezeUnfreezeTracking()) );
     connect( m_TrackingLoggingTimer, SIGNAL(timeout()), this, SLOT(UpdateLoggingTrackingTimer()));
     connect( m_TrackingRenderTimer, SIGNAL(timeout()), this, SLOT(UpdateRenderTrackingTimer()));
     connect( m_TimeoutTimer, SIGNAL(timeout()), this, SLOT(OnTimeOut()));
@@ -292,7 +293,7 @@ void QmitkMITKIGTTrackingToolboxView::OnResetTools()
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStartStopTracking()
-  {
+{
   if(!m_connected)
     {
     MITK_WARN << "Can't start tracking if no device is connected. Aborting";
@@ -300,13 +301,35 @@ void QmitkMITKIGTTrackingToolboxView::OnStartStopTracking()
     }
   if(m_tracking) {OnStopTracking();}
   else {OnStartTracking();}
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnFreezeUnfreezeTracking()
+{
+  if( m_Controls->m_FreezeUnfreezeTrackingButton->text() == "Freeze Tracking" )
+  {
+    for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfIndexedOutputs(); i++)
+    {
+      //mitk::NavigationData::Pointer currentTool = m_ToolVisualizationFilter->GetOutput(i);
+      m_ToolVisualizationFilter->Freeze();
+    }
+    m_Controls->m_FreezeUnfreezeTrackingButton->setText("Unfreeze Tracking");
   }
+  else if( m_Controls->m_FreezeUnfreezeTrackingButton->text() == "Unfreeze Tracking" )
+  {
+    for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfIndexedOutputs(); i++)
+    {
+      //mitk::NavigationData::Pointer currentTool = m_ToolVisualizationFilter->GetOutput(i);
+      m_ToolVisualizationFilter->UnFreeze();
+    }
+    m_Controls->m_FreezeUnfreezeTrackingButton->setText("Freeze Tracking");
+  }
+}
 
 void QmitkMITKIGTTrackingToolboxView::OnConnectDisconnect()
-  {
+{
   if(m_connected) {OnDisconnect();}
   else {OnConnect();}
-  }
+}
 
 void QmitkMITKIGTTrackingToolboxView::OnConnect()
 {
@@ -458,6 +481,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   m_tracking = true;
   m_Controls->m_ConnectDisconnectButton->setEnabled(false);
   m_Controls->m_StartStopTrackingButton->setText("Stop Tracking");
+  m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(true);
 
   this->GlobalReinit();
 }
@@ -492,6 +516,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTrackingFinished(bool success, QStri
   m_tracking = false;
   m_Controls->m_StartStopTrackingButton->setText("Start Tracking");
   m_Controls->m_ConnectDisconnectButton->setEnabled(true);
+  m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(false);
 
   this->GlobalReinit();
 }

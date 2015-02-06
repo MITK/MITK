@@ -267,6 +267,28 @@ mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE 
 mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")
 mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DOC "Use Simulation Open Framework Architecture")
 
+#-----------------------------------------------------------------------------
+# Build configurations
+#-----------------------------------------------------------------------------
+
+set(_buildConfigs "Custom")
+
+file(GLOB _buildConfigFiles CMake/BuildConfigurations/*.cmake)
+
+foreach(_buildConfigFile ${_buildConfigFiles})
+  get_filename_component(_buildConfigFile ${_buildConfigFile} NAME_WE)
+  list(APPEND _buildConfigs ${_buildConfigFile})
+endforeach()
+
+set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
+mark_as_advanced(MITK_BUILD_CONFIGURATION)
+set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
+
+mitkFunctionEnableBuildConfiguration()
+
+mitkFunctionCreateWhitelistPaths(MITK)
+mitkFunctionFindWhitelists(MITK)
+
 # -----------------------------------------
 # Custom dependency logic
 
@@ -361,28 +383,6 @@ if(MITK_USE_BLUEBERRY)
     set(MITK_USE_CTK ON CACHE BOOL "Use CTK in MITK" FORCE)
   endif()
 endif()
-
-#-----------------------------------------------------------------------------
-# Build configurations
-#-----------------------------------------------------------------------------
-
-set(_buildConfigs "Custom")
-
-file(GLOB _buildConfigFiles CMake/BuildConfigurations/*.cmake)
-
-foreach(_buildConfigFile ${_buildConfigFiles})
-  get_filename_component(_buildConfigFile ${_buildConfigFile} NAME_WE)
-  list(APPEND _buildConfigs ${_buildConfigFile})
-endforeach()
-
-set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
-mark_as_advanced(MITK_BUILD_CONFIGURATION)
-set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
-
-mitkFunctionEnableBuildConfiguration()
-
-mitkFunctionCreateWhitelistPaths(MITK)
-mitkFunctionFindWhitelists(MITK)
 
 #-----------------------------------------------------------------------------
 # Pixel type multiplexing

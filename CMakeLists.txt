@@ -804,6 +804,16 @@ if(MITK_USE_QT)
     find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
   elseif(DESIRED_QT_VERSION MATCHES 5)
     find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
+    get_target_property(_qmake_exec Qt5::qmake LOCATION)
+    execute_process(COMMAND ${_qmake_exec} -query QT_INSTALL_BINS
+      RESULT_VARIABLE _result
+      OUTPUT_VARIABLE QT_BINARY_DIR
+      ERROR_VARIABLE _error
+    )
+    string(STRIP "${QT_BINARY_DIR}" QT_BINARY_DIR)
+    if(_result OR NOT EXISTS "${QT_BINARY_DIR}")
+      message(FATAL_ERROR "Could not determine Qt binary directory: ${_result} ${QT_BINARY_DIR} ${_error}")
+    endif()
   endif()
 endif()
 

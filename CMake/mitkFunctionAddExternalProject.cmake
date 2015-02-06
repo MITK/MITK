@@ -49,8 +49,10 @@ function(mitkFunctionAddExternalProject)
 
   set(_use_var "MITK_USE_${EP_NAME}")
   set(_on 0)
-  if(EP_ON OR ${_use_var})
-    set(_on 1)
+  if(DEFINED ${_use_var})
+    set(_on ${${_use_var}})
+  else()
+    set(_on ${EP_ON})
   endif()
 
   if(_on AND EP_DEPENDS)

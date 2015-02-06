@@ -120,7 +120,7 @@ if(MITK_USE_Boost)
       CONFIGURE_COMMAND "<SOURCE_DIR>/bootstrap${_shell_extension}"
         --with-toolset=${_boost_toolset}
         --with-libraries=${_boost_libs}
-        "--prefix=<INSTALL_DIR>"
+        "--prefix=\"<INSTALL_DIR>\""
       ${_boost_build_cmd}
       INSTALL_COMMAND ${_install_cmd}
       DEPENDS ${proj_DEPENDENCIES}

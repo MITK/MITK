@@ -2,17 +2,15 @@ set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.1)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
-# Set a default build type if none was specified
+# See http://cmake.org/cmake/help/cmake-2-8-docs.html#section_Policies for details
 #-----------------------------------------------------------------------------
 
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Debug' as none was specified.")
-  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
-
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
-               STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-endif()
+set(project_policies )
+foreach(policy ${project_policies})
+  if(POLICY ${policy})
+    cmake_policy(SET ${policy} NEW)
+  endif()
+endforeach()
 
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
@@ -26,6 +24,52 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
   project(MITK VERSION 2014.10.99)
+endif()
+
+#-----------------------------------------------------------------------------
+# Update CMake module path
+#------------------------------------------------------------------------------
+
+set(MITK_CMAKE_DIR ${MITK_SOURCE_DIR}/CMake)
+
+set(CMAKE_MODULE_PATH
+  ${MITK_CMAKE_DIR}
+  ${CMAKE_MODULE_PATH}
+  )
+
+#-----------------------------------------------------------------------------
+# CMake function(s) and macro(s)
+#-----------------------------------------------------------------------------
+
+# Standard CMake macros
+include(FeatureSummary)
+include(CTestUseLaunchers)
+include(CMakeParseArguments)
+include(FindPackageHandleStandardArgs)
+
+# MITK macros
+include(mitkFunctionGetGccVersion)
+include(mitkFunctionCheckCompilerFlags)
+include(mitkFunctionSuppressWarnings) # includes several functions
+include(mitkMacroEmptyExternalProject)
+include(mitkFunctionGenerateProjectXml)
+include(mitkFunctionEnableBuildConfiguration)
+include(mitkFunctionWhitelists)
+include(mitkFunctionAddExternalProject)
+
+SUPPRESS_VC_DEPRECATED_WARNINGS()
+
+#-----------------------------------------------------------------------------
+# Set a default build type if none was specified
+#-----------------------------------------------------------------------------
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to 'Debug' as none was specified.")
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
+               STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -56,6 +100,36 @@ else()
   message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
 endif()
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+  mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
+else()
+  set(GCC_VERSION 0)
+endif()
+
+set(MITK_CXX_STANDARD 11)
+
+# help keeping cross-platform compatibility
+# CMake 3.1 does not yet know how to handle AppleClang...
+# See http://public.kitware.com/Bug/view.php?id=15355
+if(NOT MSVC AND
+   NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND
+   GCC_VERSION VERSION_GREATER 4.6)
+  set(CMAKE_CXX_EXTENSIONS 0)
+  set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
+  set(CMAKE_CXX_STANDARD_REQUIRED 1)
+endif()
+
+# This is necessary to avoid problems with compile feature checks.
+# CMAKE_CXX_STANDARD seems to only set the -std=c++11 flag for targets.
+# However, compile flag checks also need to be done with -std=c++11.
+# The MITK_CXX11_FLAG variable is also used for external projects
+# build during the MITK super-build.
+mitkFunctionCheckCompilerFlags("-std=c++11" MITK_CXX11_FLAG)
+if(NOT MITK_CXX11_FLAG)
+  # Older gcc compilers use -std=c++0x
+  mitkFunctionCheckCompilerFlags("-std=c++0x" MITK_CXX11_FLAG)
+endif()
+
 #-----------------------------------------------------------------------------
 # Warn if source or build path is too long
 #-----------------------------------------------------------------------------
@@ -81,48 +155,6 @@ if(WIN32)
                     "Please move the MITK build directory to a directory with a shorter path." )
   endif()
 endif()
-
-#-----------------------------------------------------------------------------
-# See http://cmake.org/cmake/help/cmake-2-8-docs.html#section_Policies for details
-#-----------------------------------------------------------------------------
-
-set(project_policies )
-foreach(policy ${project_policies})
-  if(POLICY ${policy})
-    cmake_policy(SET ${policy} NEW)
-  endif()
-endforeach()
-
-#-----------------------------------------------------------------------------
-# Update CMake module path
-#------------------------------------------------------------------------------
-
-set(MITK_CMAKE_DIR ${MITK_SOURCE_DIR}/CMake)
-
-set(CMAKE_MODULE_PATH
-  ${MITK_CMAKE_DIR}
-  ${CMAKE_MODULE_PATH}
-  )
-
-#-----------------------------------------------------------------------------
-# CMake function(s) and macro(s)
-#-----------------------------------------------------------------------------
-
-# Standard CMake macros
-include(FeatureSummary)
-include(CTestUseLaunchers)
-include(CMakeParseArguments)
-include(FindPackageHandleStandardArgs)
-
-# MITK macros
-include(mitkMacroEmptyExternalProject)
-include(mitkFunctionGenerateProjectXml)
-include(mitkFunctionSuppressWarnings)
-include(mitkFunctionEnableBuildConfiguration)
-include(mitkFunctionWhitelists)
-include(mitkFunctionAddExternalProject)
-
-SUPPRESS_VC_DEPRECATED_WARNINGS()
 
 #-----------------------------------------------------------------------------
 # Additional MITK Options (also shown during superbuild)
@@ -484,9 +516,6 @@ endif()
 include(WriteBasicConfigVersionFile)
 include(CheckCXXSourceCompiles)
 include(GenerateExportHeader)
-include(mitkFunctionCheckCompilerFlags)
-include(mitkFunctionGetGccVersion)
-include(mitkFunctionSuppressWarnings) # includes several functions
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionGetVersion)
 include(mitkFunctionGetVersionDescription)
@@ -513,17 +542,6 @@ include(mitkMacroConfigureItkPixelTypes)
 #-----------------------------------------------------------------------------
 # Global CMake variables
 #-----------------------------------------------------------------------------
-
-set(MITK_CXX_STANDARD 11)
-
-# help keeping cross-platform compatibility
-# CMake 3.1 does not yet know how to handle AppleClang...
-# See http://public.kitware.com/Bug/view.php?id=15355
-if(NOT MSVC AND NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-  set(CMAKE_CXX_EXTENSIONS 0)
-  set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
-  set(CMAKE_CXX_STANDARD_REQUIRED 1)
-endif()
 
 # Required and enabled C++11 features for all MITK code.
 # These are added as PUBLIC compile features to all MITK modules.
@@ -660,14 +678,12 @@ endif()
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS}")
 set(MITK_C_FLAGS_DEBUG )
 set(MITK_C_FLAGS_RELEASE )
-set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS}")
+set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${MITK_CXX11_FLAG}")
 set(MITK_CXX_FLAGS_DEBUG )
 set(MITK_CXX_FLAGS_RELEASE )
 
 set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
-
-mitkFunctionCheckCompilerFlags("-std=c++11" MITK_CXX_FLAGS)
 
 if(WIN32)
   set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
@@ -711,8 +727,6 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-
-  mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
   # With older version of gcc supporting the flag -fstack-protector-all, an extra dependency to libssp.so
   # is introduced. If gcc is smaller than 4.4.0 and the build type is Release let's not include the flag.
   # Doing so should allow to build package made for distribution using older linux distro.
@@ -725,7 +739,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 
   set(MITK_CXX_FLAGS_RELEASE "-D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
-
 endif()
 
 set(MITK_MODULE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})

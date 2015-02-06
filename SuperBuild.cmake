@@ -139,12 +139,6 @@ if(MSVC_VERSION)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
 endif()
 
-# This is necessary to avoid problems with compile feature checks.
-# CMAKE_CXX_STANDARD seems to only set the -std=c++11 flag for targets.
-# The CMAKE_CXX_FLAGS variable is also used for non-CMake based
-# external projects like Boost and PCRE.
-mitkFunctionCheckCompilerFlags("-std=c++11" CMAKE_CXX_FLAGS)
-
 # This is a workaround for passing linker flags
 # actually down to the linker invocation
 set(_cmake_required_flags_orig ${CMAKE_REQUIRED_FLAGS})
@@ -170,8 +164,9 @@ elseif(UNIX)
 endif()
 
 set(ep_common_args
-  -DCMAKE_CXX_EXTENSIONS:STRING=0
-  -DCMAKE_CXX_STANDARD:STRING=11
+  -DCMAKE_CXX_EXTENSIONS:STRING=${CMAKE_CXX_EXTENSIONS}
+  -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
+  -DCMAKE_CXX_STANDARD_REQUIRED:BOOL=${CMAKE_CXX_STANDARD_REQUIRED}
   -DCMAKE_DEBUG_POSTFIX:STRING=d
   -DCMAKE_MACOSX_RPATH:BOOL=TRUE
   "-DCMAKE_INSTALL_RPATH:STRING=${_install_rpath}"
@@ -185,7 +180,7 @@ set(ep_common_args
   -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
   -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
   -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
-  "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
+  "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS} ${MITK_CXX11_FLAG}"
   #debug flags
   -DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG}
   -DCMAKE_C_FLAGS_DEBUG:STRING=${CMAKE_C_FLAGS_DEBUG}

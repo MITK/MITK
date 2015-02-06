@@ -702,7 +702,7 @@ void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure( itk::Image
     itmask.GoToBegin();
     itimage.GoToBegin();
 
-    typename ImageType::SizeType lowersize = {{itk::NumericTraits<ImageType::SizeType>::max(),itk::NumericTraits<ImageType::SizeType>::max(),itk::NumericTraits<ImageType::SizeType>::max()}};
+    typename ImageType::SizeType lowersize = {{itk::NumericTraits<TPixel>::max(),itk::NumericTraits<TPixel>::max(),itk::NumericTraits<TPixel>::max()}};
     typename ImageType::SizeType uppersize = {{0,0,0}};
     while( !itmask.IsAtEnd() )
     {

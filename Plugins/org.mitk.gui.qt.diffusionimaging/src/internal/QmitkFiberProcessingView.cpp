@@ -1068,6 +1068,7 @@ void QmitkFiberProcessingView::AddFigureToDataStorage(mitk::PlanarFigure* figure
     newNode->SetName(name.toStdString());
     newNode->SetData(figure);
     newNode->SetBoolProperty("planarfigure.3drendering", true);
+    newNode->SetBoolProperty("planarfigure.3drendering.fill", true);
 
     mitk::PlanarFigureInteractor::Pointer figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(newNode->GetDataInteractor().GetPointer());
     if(figureInteractor.IsNull())

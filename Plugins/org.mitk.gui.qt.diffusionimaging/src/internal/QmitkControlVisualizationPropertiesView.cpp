@@ -410,11 +410,11 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
                 m_Controls->m_Crosshair->setEnabled(true);
 
             int width;
-            node->GetIntProperty("LineWidth", width);
+            node->GetIntProperty("shape.linewidth", width);
             m_Controls->m_LineWidth->setValue(width);
 
             float radius;
-            node->GetFloatProperty("TubeRadius", radius);
+            node->GetFloatProperty("shape.tuberadius", radius);
             m_Controls->m_TubeWidth->setValue(radius);
 
             float range;
@@ -1009,7 +1009,7 @@ void QmitkControlVisualizationPropertiesView::TubeRadiusChanged()
     if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
     {
         float newRadius = m_Controls->m_TubeWidth->value();
-        m_SelectedNode->SetFloatProperty("TubeRadius", newRadius);
+        m_SelectedNode->SetFloatProperty("shape.tuberadius", newRadius);
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 }
@@ -1020,10 +1020,10 @@ void QmitkControlVisualizationPropertiesView::LineWidthChanged()
     {
         int newWidth = m_Controls->m_LineWidth->value();
         int currentWidth = 0;
-        m_SelectedNode->GetIntProperty("LineWidth", currentWidth);
+        m_SelectedNode->GetIntProperty("shape.linewidth", currentWidth);
         if (currentWidth==newWidth)
             return;
-        m_SelectedNode->SetIntProperty("LineWidth", newWidth);
+        m_SelectedNode->SetIntProperty("shape.linewidth", newWidth);
         dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData())->RequestUpdate();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }

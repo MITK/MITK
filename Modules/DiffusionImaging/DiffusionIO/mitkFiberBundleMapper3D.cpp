@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkDepthSortPolyData.h>
 #include <vtkCamera.h>
 #include <vtkTubeFilter.h>
+#include <vtkRibbonFilter.h>
 
 mitk::FiberBundleMapper3D::FiberBundleMapper3D()
     : m_TubeRadius(0.0)
@@ -77,6 +78,14 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
         tubeFilter->Update();
         fiberPolyData = tubeFilter->GetOutput();
     }
+    else if (m_RibbonWidth>0.0)
+    {
+        vtkSmartPointer<vtkRibbonFilter> tubeFilter = vtkSmartPointer<vtkRibbonFilter>::New();
+        tubeFilter->SetInputData(fiberPolyData);
+        tubeFilter->SetWidth(m_RibbonWidth);
+        tubeFilter->Update();
+        fiberPolyData = tubeFilter->GetOutput();
+    }
 
     if (tmpopa<1)
     {
@@ -90,6 +99,32 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
     else
     {
         localStorage->m_FiberMapper->SetInputData(fiberPolyData);
+    }
+
+    if (m_Lighting)
+    {
+        float floatProp = 1.0;
+        GetDataNode()->GetFloatProperty("light.ambient", floatProp);
+        localStorage->m_FiberActor->GetProperty()->SetAmbient(floatProp);
+        GetDataNode()->GetFloatProperty("light.diffuse", floatProp);
+        localStorage->m_FiberActor->GetProperty()->SetDiffuse(floatProp);
+        GetDataNode()->GetFloatProperty("light.specular", floatProp);
+        localStorage->m_FiberActor->GetProperty()->SetSpecular(floatProp);
+        GetDataNode()->GetFloatProperty("light.specularpower", floatProp);
+        localStorage->m_FiberActor->GetProperty()->SetSpecularPower( floatProp );
+
+        mitk::ColorProperty* ambientC = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("light.ambientcolor"));
+        mitk::ColorProperty* diffuseC = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("light.diffusecolor"));
+        mitk::ColorProperty* specularC = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("light.specularcolor"));
+
+        localStorage->m_FiberActor->GetProperty()->SetAmbientColor( ambientC->GetColor()[0], ambientC->GetColor()[1], ambientC->GetColor()[2] );
+        localStorage->m_FiberActor->GetProperty()->SetDiffuseColor( diffuseC->GetColor()[0], diffuseC->GetColor()[1], diffuseC->GetColor()[2] );
+        localStorage->m_FiberActor->GetProperty()->SetSpecularColor( specularC->GetColor()[0], specularC->GetColor()[1], specularC->GetColor()[2] );
+        localStorage->m_FiberActor->GetProperty()->SetLighting(true);
+    }
+    else
+    {
+        localStorage->m_FiberActor->GetProperty()->SetLighting(false);
     }
 
     localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
@@ -120,7 +155,7 @@ void mitk::FiberBundleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
 
     // did any rendering properties change?
     float tubeRadius = 0;
-    node->GetFloatProperty("TubeRadius", tubeRadius);
+    node->GetFloatProperty("shape.tuberadius", tubeRadius);
     if (m_TubeRadius!=tubeRadius)
     {
         m_TubeRadius = tubeRadius;
@@ -128,7 +163,7 @@ void mitk::FiberBundleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     }
 
     int tubeSides = 0;
-    node->GetIntProperty("TubeSides", tubeSides);
+    node->GetIntProperty("shape.tubesides", tubeSides);
     if (m_TubeSides!=tubeSides)
     {
         m_TubeSides = tubeSides;
@@ -136,10 +171,26 @@ void mitk::FiberBundleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     }
 
     int lineWidth = 0;
-    node->GetIntProperty("LineWidth", lineWidth);
+    node->GetIntProperty("shape.linewidth", lineWidth);
     if (m_LineWidth!=lineWidth)
     {
         m_LineWidth = lineWidth;
+        fiberBundle->RequestUpdate3D();
+    }
+
+    float ribbonWidth = 0;
+    node->GetFloatProperty("shape.ribbonwidth", ribbonWidth);
+    if (m_RibbonWidth!=ribbonWidth)
+    {
+        m_RibbonWidth = ribbonWidth;
+        fiberBundle->RequestUpdate3D();
+    }
+
+    bool lighting = false;
+    node->GetBoolProperty("light.enable", lighting);
+    if (m_Lighting!=lighting)
+    {
+        m_Lighting = lighting;
         fiberBundle->RequestUpdate3D();
     }
 
@@ -156,13 +207,23 @@ void mitk::FiberBundleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
 void mitk::FiberBundleMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
     Superclass::SetDefaultProperties(node, renderer, overwrite);
-    node->AddProperty( "LineWidth", mitk::IntProperty::New( true ), renderer, overwrite );
     node->AddProperty( "opacity", mitk::FloatProperty::New( 1.0 ), renderer, overwrite);
     node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), renderer, overwrite);
     node->AddProperty( "pickable", mitk::BoolProperty::New( true ), renderer, overwrite);
 
-    node->AddProperty( "TubeRadius",mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
-    node->AddProperty( "TubeSides",mitk::IntProperty::New( 15 ), renderer, overwrite);
+    node->AddProperty( "shape.linewidth", mitk::IntProperty::New( true ), renderer, overwrite );
+    node->AddProperty( "shape.tuberadius",mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
+    node->AddProperty( "shape.tubesides",mitk::IntProperty::New( 15 ), renderer, overwrite);
+    node->AddProperty( "shape.ribbonwidth", mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
+
+    node->AddProperty( "light.enable", mitk::BoolProperty::New( true ), renderer, overwrite);
+    node->AddProperty( "light.ambient", mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
+    node->AddProperty( "light.diffuse", mitk::FloatProperty::New( 1.0 ), renderer, overwrite);
+    node->AddProperty( "light.specular", mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
+    node->AddProperty( "light.specularpower", mitk::FloatProperty::New( 1.0 ), renderer, overwrite);
+    node->AddProperty( "light.ambientcolor", mitk::ColorProperty::New(1,1,1), renderer, overwrite);
+    node->AddProperty( "light.diffusecolor", mitk::ColorProperty::New(1,1,1), renderer, overwrite);
+    node->AddProperty( "light.specularcolor", mitk::ColorProperty::New(1,1,1), renderer, overwrite);
 }
 
 vtkProp* mitk::FiberBundleMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)

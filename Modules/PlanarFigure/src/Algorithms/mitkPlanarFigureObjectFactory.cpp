@@ -88,9 +88,9 @@ void mitk::PlanarFigureObjectFactory::SetDefaultProperties(mitk::DataNode* node)
   if ( pf.IsNotNull() )
   {
     mitk::PlanarFigureMapper2D::SetDefaultProperties(node);
+    mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(node);
     node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), NULL, true );
     node->AddProperty( "opacity", mitk::FloatProperty::New(0.8), NULL, true );
-    node->AddProperty( "planarfigure.3drendering", mitk::BoolProperty::New(false), NULL, true );
   }
 }
 

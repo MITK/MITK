@@ -897,17 +897,17 @@
            <widget class="QComboBox" name="m_MirrorFibersBox">
             <item>
              <property name="text">
-              <string>Axial</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
               <string>Sagittal</string>
              </property>
             </item>
             <item>
              <property name="text">
               <string>Coronal</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Axial</string>
              </property>
             </item>
            </widget>
@@ -1134,7 +1134,7 @@
              <number>7</number>
             </property>
             <property name="maximum">
-             <double>1.000000000000000</double>
+             <double>999999999.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.100000000000000</double>

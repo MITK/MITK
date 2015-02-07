@@ -342,7 +342,7 @@ void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
 
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
         mitk::CastToItkImage(mitkMask, mask);
-        mitk::FiberBundle::Pointer newFib = fib->ExtractFiberSubset(mask, onlyEnds, invert);
+        mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, !onlyEnds, invert);
         if (newFib->GetNumFibers()<=0)
         {
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
@@ -1116,8 +1116,8 @@ void QmitkFiberProcessingView::ExtractWithPlanarFigure()
         node = mitk::DataNode::New();
         node->SetData(extFB);
         QString name(fiberBundles.at(i)->GetName().c_str());
-        name += "_";
-        name += planarFigure->GetName().c_str();
+        name += "*";
+        //name += planarFigure->GetName().c_str();
         node->SetName(name.toStdString());
         fiberBundles.at(i)->SetVisibility(false);
         GetDataStorage()->Add(node);
@@ -1461,6 +1461,8 @@ void QmitkFiberProcessingView::MirrorFibers()
     for (int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
+        if (m_SelectedImage.IsNotNull())
+            fib->SetReferenceGeometry(m_SelectedImage->GetGeometry());
         fib->MirrorFibers(axis);
     }
 

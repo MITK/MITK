@@ -161,7 +161,8 @@ private:
     DOWNSAMPLING,
     FLIPPING,
     RESAMPLING,
-    RESCALE
+    RESCALE,
+    RESCALE2
   } m_SelectedAction;
 
   enum OperationType{

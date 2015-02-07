@@ -104,7 +104,7 @@ const std::string QmitkFiberfoxView::VIEW_ID = "org.mitk.views.fiberfoxview";
 QmitkFiberfoxView::QmitkFiberfoxView()
     : QmitkAbstractView()
     , m_Controls( 0 )
-    , m_SelectedImage( NULL )
+    , m_SelectedImageNode( NULL )
     , m_Worker(this)
     , m_ThreadIsRunning(false)
 {
@@ -1873,10 +1873,10 @@ std::vector<itk::Vector<double,3> > QmitkFiberfoxView::MakeGradientList()
 
 void QmitkFiberfoxView::OnAddBundle()
 {
-    if (m_SelectedImage.IsNull())
+    if (m_SelectedImageNode.IsNull())
         return;
 
-    mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedImage);
+    mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedImageNode);
 
     mitk::FiberBundle::Pointer bundle = mitk::FiberBundle::New();
     mitk::DataNode::Pointer node = mitk::DataNode::New();
@@ -1886,7 +1886,7 @@ void QmitkFiberfoxView::OnAddBundle()
     m_SelectedBundles.push_back(node);
     UpdateGui();
 
-    GetDataStorage()->Add(node, m_SelectedImage);
+    GetDataStorage()->Add(node, m_SelectedImageNode);
 }
 
 void QmitkFiberfoxView::OnDrawROI()
@@ -2055,7 +2055,7 @@ void QmitkFiberfoxView::GenerateImage()
         mitk::LevelWindow lw; lw.SetLevelWindow(level, window);
         node->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( lw ) );
         GetDataStorage()->Add(node);
-        m_SelectedImage = node;
+        m_SelectedImageNode = node;
 
         mitk::BaseData::Pointer basedata = node->GetData();
         if (basedata.IsNotNull())
@@ -2183,6 +2183,13 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
         return;
     }
 
+    if (m_SelectedImageNode.IsNotNull())
+    {
+        ItkFloatImgType::Pointer itkImg = ItkFloatImgType::New();
+        mitk::Image::Pointer mitkImg = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetData());
+        mitk::CastToItkImage<ItkFloatImgType>(mitkImg, itkImg);
+        m_TractsToDwiFilter->SetHelperTdi(itkImg);
+    }
     m_TractsToDwiFilter->SetParameters(parameters);
     m_TractsToDwiFilter->SetFiberBundle(fiberBundle);
     m_Worker.m_FilterType = 0;
@@ -2443,12 +2450,12 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_AlignOnGrid->setEnabled(true);
     }
 
-    if (m_SelectedImage.IsNotNull() || !m_SelectedBundles.empty())
+    if (m_SelectedImageNode.IsNotNull() || !m_SelectedBundles.empty())
     {
         m_Controls->m_CircleButton->setEnabled(true);
         m_Controls->m_FiberGenMessage->setVisible(false);
     }
-    if (m_SelectedImage.IsNotNull() && !m_SelectedBundles.empty())
+    if (m_SelectedImageNode.IsNotNull() && !m_SelectedBundles.empty())
         m_Controls->m_AlignOnGrid->setEnabled(true);
 
     if (!m_SelectedBundles.empty())
@@ -2485,7 +2492,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     m_SelectedFiducials.clear();
     m_SelectedFiducial = NULL;
     m_SelectedBundles.clear();
-    m_SelectedImage = NULL;
+    m_SelectedImageNode = NULL;
 
     // iterate all selected objects, adjust warning visibility
     for( int i=0; i<nodes.size(); i++)
@@ -2508,7 +2515,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
             m_SelectedImages.push_back(node);
-            m_SelectedImage = node;
+            m_SelectedImageNode = node;
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()) )
         {

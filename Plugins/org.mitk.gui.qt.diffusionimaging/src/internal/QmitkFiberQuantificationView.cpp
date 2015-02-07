@@ -418,10 +418,10 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(
     typedef float OutPixType;
     typedef itk::Image<OutPixType, 3> OutImageType;
 
-    std::vector< mitk::FiberBundleX::Pointer > fibs;
+    std::vector< mitk::FiberBundle::Pointer > fibs;
     for (int i=0; i<m_SelectedFB.size(); i++)
     {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
         fibs.push_back(fib);
     }
 

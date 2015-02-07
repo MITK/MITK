@@ -60,7 +60,7 @@ public:
 
   void GenerateData();
 
-  std::vector< mitk::FiberBundleX::Pointer > fibs;
+  std::vector< mitk::FiberBundle::Pointer > fibs;
 
 protected:
 

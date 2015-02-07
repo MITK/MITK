@@ -1903,6 +1903,7 @@ void QmitkFiberfoxView::OnDrawROI()
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( figure );
     node->SetBoolProperty("planarfigure.3drendering", true);
+    node->SetBoolProperty("planarfigure.3drendering.fill", true);
 
     QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
     for( int i=0; i<nodes.size(); i++)

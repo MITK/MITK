@@ -62,6 +62,22 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     endif()
   endif()
 
+  if(OpenCV_DIR)
+    set(_opencv_link_directories
+      "${OpenCV_LIB_DIR_DBG}"
+      "${OpenCV_LIB_DIR_OPT}"
+      "${OpenCV_3RDPARTY_LIB_DIR_DBG}"
+      "${OpenCV_3RDPARTY_LIB_DIR_OPT}")
+    list(REMOVE_DUPLICATES _opencv_link_directories)
+    if(WIN32)
+      foreach(_opencv_link_directory ${_opencv_link_directories})
+        list(APPEND _dir_candidates "${_opencv_link_directory}/../bin")
+      endforeach()
+    else()
+      list(APPEND _dir_candidates ${_opencv_link_directories})
+    endif()
+  endif()
+
   if(MITK_USE_Python AND CTK_PYTHONQT_INSTALL_DIR)
     list(APPEND _dir_candidates "${CTK_PYTHONQT_INSTALL_DIR}/bin")
   endif()

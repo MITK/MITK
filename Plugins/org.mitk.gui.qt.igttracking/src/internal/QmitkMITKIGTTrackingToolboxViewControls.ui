@@ -329,6 +329,13 @@ p, li { white-space: pre-wrap; }
              </spacer>
             </item>
             <item>
+             <widget class="QLabel" name="m_TrackingFrozenLabel">
+              <property name="text">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;Tracking Frozen!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="m_FreezeUnfreezeTrackingButton">
               <property name="enabled">
                <bool>true</bool>

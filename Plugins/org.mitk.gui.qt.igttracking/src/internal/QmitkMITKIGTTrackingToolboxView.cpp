@@ -184,8 +184,9 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_StartStopTrackingButton->setEnabled(false);
     m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(false);
 
-    //initialize warning label
+    //initialize warning labels
     m_Controls->m_renderWarningLabel->setVisible(false);
+    m_Controls->m_TrackingFrozenLabel->setVisible(false);
 
     //Update List of available models for selected tool.
     std::vector<mitk::TrackingDeviceData> Compatibles;
@@ -307,21 +308,15 @@ void QmitkMITKIGTTrackingToolboxView::OnFreezeUnfreezeTracking()
 {
   if( m_Controls->m_FreezeUnfreezeTrackingButton->text() == "Freeze Tracking" )
   {
-    for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfIndexedOutputs(); i++)
-    {
-      //mitk::NavigationData::Pointer currentTool = m_ToolVisualizationFilter->GetOutput(i);
-      m_ToolVisualizationFilter->Freeze();
-    }
+    m_TrackingDeviceSource->Freeze();
     m_Controls->m_FreezeUnfreezeTrackingButton->setText("Unfreeze Tracking");
+    m_Controls->m_TrackingFrozenLabel->setVisible(true);
   }
   else if( m_Controls->m_FreezeUnfreezeTrackingButton->text() == "Unfreeze Tracking" )
   {
-    for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfIndexedOutputs(); i++)
-    {
-      //mitk::NavigationData::Pointer currentTool = m_ToolVisualizationFilter->GetOutput(i);
-      m_ToolVisualizationFilter->UnFreeze();
-    }
+    m_TrackingDeviceSource->UnFreeze();
     m_Controls->m_FreezeUnfreezeTrackingButton->setText("Freeze Tracking");
+    m_Controls->m_TrackingFrozenLabel->setVisible(false);
   }
 }
 
@@ -425,7 +420,8 @@ void QmitkMITKIGTTrackingToolboxView::OnDisconnectFinished(bool success, QString
   m_Controls->m_configurationWidget->Reset();
   m_Controls->m_TrackingControlLabel->setText("Status: disconnected");
   m_Controls->m_ConnectDisconnectButton->setText("Connect");
-
+  m_Controls->m_FreezeUnfreezeTrackingButton->setText("Freeze Tracking");
+  m_Controls->m_TrackingFrozenLabel->setVisible(false);
   m_connected = false;
   }
 

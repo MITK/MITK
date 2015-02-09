@@ -47,6 +47,20 @@ if(MITK_USE_QT)
   string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
 endif()
 
+set(OPENCV_DIR)
+if(WIN32 AND MITK_USE_OpenCV)
+  find_package(OpenCV REQUIRED CONFIG PATHS "${CTEST_BINARY_DIRECTORY}/ep")
+  set(_opencv_link_directories
+    "${OpenCV_LIB_DIR_DBG}"
+    "${OpenCV_LIB_DIR_OPT}"
+    "${OpenCV_3RDPARTY_LIB_DIR_DBG}"
+    "${OpenCV_3RDPARTY_LIB_DIR_OPT}")
+  list(REMOVE_DUPLICATES _opencv_link_directories)
+  foreach(_opencv_link_directory ${_opencv_link_directories})
+    list(APPEND OPENCV_DIR "${_opencv_link_directory}/../bin")
+  endforeach()
+endif()
+
 #
 # Project specific properties
 #
@@ -64,7 +78,7 @@ set(CTEST_PATH "$ENV{PATH}")
 if(WIN32)
   set(SOFA_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/SOFA-build/bin/${CTEST_BUILD_CONFIGURATION}")
   set(BLUEBERRY_OSGI_DIR "${CTEST_BINARY_DIRECTORY}/MITK-build/bin/BlueBerry/org.blueberry.osgi/bin/${CTEST_BUILD_CONFIGURATION}")
-  set(CTEST_PATH "${CTEST_PATH};${CTEST_BINARY_DIRECTORY}/ep/bin;${QT_BINARY_DIR};${SOFA_BINARY_DIR};${BLUEBERRY_OSGI_DIR}")
+  set(CTEST_PATH "${CTEST_PATH};${CTEST_BINARY_DIRECTORY}/ep/bin;${QT_BINARY_DIR};${SOFA_BINARY_DIR};${BLUEBERRY_OSGI_DIR};${OPENCV_DIR}")
 endif()
 set(ENV{PATH} "${CTEST_PATH}")
 

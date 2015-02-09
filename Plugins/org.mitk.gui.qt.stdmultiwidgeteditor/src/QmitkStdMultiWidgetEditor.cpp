@@ -434,6 +434,9 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
     d->m_StdMultiWidget->DisableStandardLevelWindow();
   }
 
+  bool displayMetainfo = prefs->GetBool("Display metainfo", true);
+  d->m_StdMultiWidget->setDisplayMetaInfo( displayMetainfo );
+
   // mouse modes toolbar
   bool newMode = prefs->GetBool("PACS like mouse interaction", false);
   d->m_MouseModeToolbar->setVisible( newMode );

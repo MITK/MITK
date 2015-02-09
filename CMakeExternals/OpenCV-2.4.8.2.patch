@@ -1,11 +1,3 @@
-diff -burN OpenCV-2.4.8.2/CMakeLists.txt OpenCV/CMakeLists.txt
---- OpenCV-2.4.8.2/CMakeLists.txt	2014-02-14 14:12:31.000000000 +0100
-+++ OpenCV/CMakeLists.txt	2015-02-06 16:07:00.000000000 +0100
-@@ -265,3 +265,3 @@
-   if(DEFINED OpenCV_RUNTIME AND DEFINED OpenCV_ARCH)
--    set(OpenCV_INSTALL_BINARIES_PREFIX "${OpenCV_ARCH}/${OpenCV_RUNTIME}/")
-+    set(OpenCV_INSTALL_BINARIES_PREFIX "")
-   else()
 diff -burN OpenCV-2.4.8.2/cmake/OpenCVModule.cmake OpenCV/cmake/OpenCVModule.cmake
 --- OpenCV-2.4.8.2/cmake/OpenCVModule.cmake	2014-02-14 14:12:31.000000000 +0100
 +++ OpenCV/cmake/OpenCVModule.cmake	2015-01-29 17:02:40.735387894 +0100

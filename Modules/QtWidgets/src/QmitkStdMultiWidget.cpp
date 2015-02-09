@@ -1547,8 +1547,11 @@ void QmitkStdMultiWidget::setCornerAnnotation(int corner, const char* text)
   cornerText->SetTextProperty( textProp );
   ren->AddActor(cornerText);
   ren->InteractiveOff();
-  mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->UpdateLayers();
-  this->GetRenderWindow4()->GetRenderer()->ForceImmediateUpdate();
+}
+
+void QmitkStdMultiWidget::setDisplayMetaInfo(bool metainfo)
+{
+  displayMetaInfo = metainfo;
 }
 
 void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
@@ -1620,33 +1623,38 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       imageProperties->GetStringProperty("dicom.study.StudyDate", studyDate);
       imageProperties->GetStringProperty("dicom.study.StudyTime", studyTime);
     
+      std::stringstream infoStringStream, infoStringStream2;
+
       char yy[5]; yy[4] = 0;
       char mm[3]; mm[2] = 0;
       char dd[3]; dd[2] = 0;
-      sscanf (birthday.c_str(),"%4c%2c%2c",yy,mm,dd);
-
-      std::stringstream infoStringStream;
-      infoStringStream 
-        << "\n\n" << patient.c_str()
-        << "\n" << patientId.c_str()
-        << "\n" << dd << "." << mm << "." << yy << " " << sex.c_str()
-        << "\n" << institution.c_str();
-      const std::string infoString = infoStringStream.str();
-
-      sscanf (studyDate.c_str(),"%4c%2c%2c",yy,mm,dd);
       char hh[3]; hh[2] = 0;
       char mi[3]; mi[2] = 0;
       char ss[3]; ss[2] = 0;
-      sscanf (studyTime.c_str(),"%2c%2c%2c",hh,mi,ss);
 
-      std::stringstream infoStringStream2;
-      infoStringStream2 
-        << dd << "." << mm << "." << yy 
-        << " " << hh << ":" << mi << ":" << ss;
+      if ( displayMetaInfo && ( birthday != "" ) ) {
+        sscanf (birthday.c_str(),"%4c%2c%2c",yy,mm,dd);
+        infoStringStream 
+          << "\n\n" << patient.c_str()
+          << "\n" << patientId.c_str()
+          << "\n" << dd << "." << mm << "." << yy << " " << sex.c_str()
+          << "\n" << institution.c_str();
+      }
+      const std::string infoString = infoStringStream.str();
+
+      if ( displayMetaInfo && ( studyDate != "" && studyTime != "" ) ) {
+        sscanf (studyDate.c_str(),"%4c%2c%2c",yy,mm,dd);
+        sscanf (studyTime.c_str(),"%2c%2c%2c",hh,mi,ss);
+        infoStringStream2 
+          << dd << "." << mm << "." << yy 
+          << " " << hh << ":" << mi << ":" << ss;
+      }
       const std::string infoString2 = infoStringStream2.str();
 
       setCornerAnnotation(3, infoString.c_str());
       setCornerAnnotation(1, infoString2.c_str());
+      mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->UpdateLayers();
+      this->GetRenderWindow4()->GetRenderer()->ForceImmediateUpdate();
     }
 
     stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";

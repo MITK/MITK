@@ -107,6 +107,7 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
   m_Preferences->PutBool("Use constrained zooming and panning"
                          , m_Ui->m_EnableFlexibleZooming->isChecked());
   m_Preferences->PutBool("Show level/window widget", m_Ui->m_ShowLevelWindowWidget->isChecked());
+  m_Preferences->PutBool("Display metainfo", m_Ui->m_DisplayMetaInfo->isChecked());
   m_Preferences->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
   m_Preferences->PutInt("Rendering Mode", m_Ui->m_RenderingMode->currentIndex());
 
@@ -173,6 +174,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::ColorChooserButtonClicked()
   //find out last used color and set it
   QColor initialColor;
   if( senderObj->objectName() == m_Ui->m_ColorButton1->objectName())
+
   {
     initialColor = QColor(m_WidgetBackgroundColor1[widgetIndex]);
   }else if( senderObj->objectName() == m_Ui->m_ColorButton2->objectName())

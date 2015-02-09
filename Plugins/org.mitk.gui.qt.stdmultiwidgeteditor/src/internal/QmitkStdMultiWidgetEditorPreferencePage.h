@@ -69,6 +69,7 @@ public slots:
   void AnnotationTextChanged(QString text);
 
 protected:
+
   /**
    * @brief m_CurrentRenderingMode String for the rendering mode.
    */

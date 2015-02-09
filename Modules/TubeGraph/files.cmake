@@ -11,7 +11,6 @@ set (H_FILES
   IO/mitkTubeGraphDefinitions.h
   IO/mitkTubeGraphIO.h
   IO/mitkTubeGraphObjectFactory.h
-  Rendering/mitkTubeGraphGeometry3D.h
   Rendering/mitkTubeGraphProperty.h
   Rendering/mitkTubeGraphVtkMapper3D.h
 )
@@ -26,7 +25,6 @@ set(CPP_FILES
   IO/mitkTubeGraphIO.cpp
   IO/mitkTubeGraphModuleActivator.cpp
   IO/mitkTubeGraphObjectFactory.cpp
-  Rendering/mitkTubeGraphGeometry3D.cpp
   Rendering/mitkTubeGraphProperty.cpp
   Rendering/mitkTubeGraphVtkMapper3D.cpp
 )

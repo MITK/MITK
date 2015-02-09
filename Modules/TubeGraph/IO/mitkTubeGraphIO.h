@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
 
+#include "../DataStructure/mitkTubeGraph.h"
+
 class TiXmlElement;
 
 namespace mitk
@@ -35,10 +37,7 @@ namespace mitk
   {
   public:
 
-    // TubeGraphIO(TubeGraph::Pointer tubeGraph);
-    //????
     TubeGraphIO();
-
 
     // -------------- AbstractFileReader -------------
 
@@ -56,19 +55,21 @@ namespace mitk
     {
       CustomMimeType mimeType(TUBEGRAPH_MIMETYPE_NAME());
       mimeType.AddExtension("tsf");
-      mimeType.SetCategory("Tube Graph");
+      mimeType.SetCategory("Graphs");
       mimeType.SetComment("MITK Tube Graph Structure File");
       return mimeType;
     }
     static std::string TUBEGRAPH_MIMETYPE_NAME()
     {
-      static std::string name = mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".tubegraphstructurefile";
+      static std::string name = mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".graphs.tubular-sructure";
       return name;
     }
 
   private:
     TubeGraphIO* IOClone() const;
     TubeGraphIO(const TubeGraphIO& other);
+    const BoundingBox::Pointer ComputeBoundingBox(TubeGraph::Pointer graph ) const;
+
   };
 
 }

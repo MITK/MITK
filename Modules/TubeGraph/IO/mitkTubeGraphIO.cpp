@@ -15,12 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTubeGraphIO.h"
-#include "mitkTubeGraphDefinitions.h"
 
-#include <mitkTubeGraph.h>
-#include <mitkTubeGraphGeometry3D.h>
-#include <mitkTubeGraphProperty.h>
-#include <mitkCircularProfileTubeElement.h>
+#include "mitkTubeGraphDefinitions.h"
+#include "../DataStructure/mitkCircularProfileTubeElement.h"
+#include "../Rendering/mitkTubeGraphProperty.h"
 
 #include <mitkIOMimeTypes.h>
 
@@ -44,7 +42,6 @@ namespace mitk {
 
   std::vector<BaseData::Pointer> TubeGraphIO::Read()
   {
-    //?????
     std::locale::global(std::locale("C"));
 
     std::vector< itk::SmartPointer<mitk::BaseData> > result;
@@ -69,7 +66,8 @@ namespace mitk {
       pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_GEOMETRY).Element();
 
       // read geometry
-      mitk::TubeGraphGeometry3D::Pointer geometry = mitk::TubeGraphGeometry3D::New();
+      mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+      geometry->Initialize();
 
       // read origin
       mitk::Point3D origin;
@@ -208,6 +206,11 @@ namespace mitk {
 
         }
       }
+
+      //Compute bounding box
+      BoundingBox::Pointer bb = this->ComputeBoundingBox(newTubeGraph);
+      geometry->SetBounds(bb->GetBounds());
+
       MITK_INFO << "Tube Graph read";
       MITK_INFO<<"Edge numb:"<< newTubeGraph->GetNumberOfEdges()<< " Vertices: "<< newTubeGraph->GetNumberOfVertices();
 
@@ -335,7 +338,7 @@ namespace mitk {
       }
 
       MITK_INFO << "Tube Graph Property read";
-      geometry->Initialize(newTubeGraph);
+
       newTubeGraph->SetGeometry(geometry);
       newTubeGraph->SetProperty("Tube Graph.Visualization Information", newProperty);
       result.push_back( newTubeGraph.GetPointer() );
@@ -370,13 +373,13 @@ namespace mitk {
 
     const mitk::TubeGraph* tubeGraph = dynamic_cast<const mitk::TubeGraph*>(this->GetInput());
     // Get geometry of the tube graph
-    mitk::TubeGraphGeometry3D::Pointer geometry = dynamic_cast<mitk::TubeGraphGeometry3D*>(tubeGraph->GetGeometry());
+    mitk::Geometry3D::Pointer geometry = dynamic_cast<mitk::Geometry3D*>(tubeGraph->GetGeometry());
     // Get property of the tube graph
     mitk::TubeGraphProperty::Pointer tubeGraphProperty = dynamic_cast<mitk::TubeGraphProperty*>(tubeGraph->GetProperty("Tube Graph.Visualization Information").GetPointer());
     // Create XML document
     TiXmlDocument documentXML;
     {//Begin document
-      TiXmlDeclaration* declXML = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
+      TiXmlDeclaration* declXML = new TiXmlDeclaration( "1.0", "", "" );
       documentXML.LinkEndChild(declXML);
 
       TiXmlElement* mainXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_TUBEGRAPH_FILE);
@@ -536,4 +539,48 @@ namespace mitk {
   {
     return new TubeGraphIO(*this);
   }
+}
+
+const mitk::BoundingBox::Pointer mitk::TubeGraphIO::ComputeBoundingBox(mitk::TubeGraph::Pointer graph ) const
+{
+  BoundingBox::Pointer boundingBox = BoundingBox::New();
+  BoundingBox::PointIdentifier pointid = 0;
+  BoundingBox::PointsContainer::Pointer pointscontainer = BoundingBox::PointsContainer::New();
+
+  ScalarType nullpoint[] = { 0,0,0 };
+  BoundingBox::PointType p(nullpoint);
+
+  //traverse the tree and add each point to the pointscontainer
+
+  mitk::Point3D pos;
+
+  std::vector<mitk::TubeGraphVertex> vertexVector = graph->GetVectorOfAllVertices();
+  for(std::vector<mitk::TubeGraphVertex>::iterator vertex = vertexVector.begin(); vertex != vertexVector.end(); ++vertex)
+  {
+    pos =  vertex->GetTubeElement()->GetCoordinates();
+    p[0] = pos[0];
+    p[1] = pos[1];
+    p[2] = pos[2];
+    pointscontainer->InsertElement(pointid++, p);
+  }
+
+  std::vector<mitk::TubeGraphEdge> edgeVector = graph->GetVectorOfAllEdges();
+
+  for(std::vector<mitk::TubeGraphEdge>::iterator edge = edgeVector.begin(); edge != edgeVector.end(); ++edge)
+  {
+    std::vector<mitk::TubeElement*> allElements = edge->GetElementVector();
+    for(unsigned int index =0; index < edge->GetNumberOfElements(); index++)
+    {
+      pos = allElements[index]->GetCoordinates();
+      p[0] = pos[0];
+      p[1] = pos[1];
+      p[2] = pos[2];
+      pointscontainer->InsertElement(pointid++, p);
+    }
+  }
+
+  boundingBox->SetPoints(pointscontainer);
+  boundingBox->ComputeBoundingBox();
+
+  return boundingBox;
 }

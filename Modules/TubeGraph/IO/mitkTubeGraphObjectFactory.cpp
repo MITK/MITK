@@ -19,8 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseRenderer.h>
 #include <mitkDataNode.h>
 #include <mitkProperties.h>
-#include <mitkTubeGraph.h>
-#include <mitkTubeGraphVtkMapper3D.h>
+
+#include "../DataStructure/mitkTubeGraph.h"
+#include "../Rendering/mitkTubeGraphVtkMapper3D.h"
 
 mitk::TubeGraphObjectFactory::TubeGraphObjectFactory()
 :CoreObjectFactoryBase()

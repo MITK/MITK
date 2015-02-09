@@ -1,4 +1,4 @@
-  /*===================================================================
+/*===================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
+  std::vector<AbstractFileIO*> m_FileIOs;
+
   /**
   \brief Registers services for tube graph module.
   */
@@ -27,21 +30,18 @@ namespace mitk
   {
   public:
 
-    void Load(us::ModuleContext* context)
+    void Load(us::ModuleContext* /*context*/)
     {
-      //context->RegisterService(* TUBEGRAPH_MIMETYPE);
-
-        m_TubeGraphIO = new TubeGraphIO();
+      m_FileIOs.push_back(new TubeGraphIO());
     }
 
     void Unload(us::ModuleContext*)
     {
-      delete m_TubeGraphIO;
+      for(std::vector<mitk::AbstractFileIO*>::iterator iter = m_FileIOs.begin(), endIter = m_FileIOs.end(); iter != endIter; ++iter)
+      {
+        delete *iter;
+      }
     }
-
-  private:
-    TubeGraphIO * m_TubeGraphIO;
-
   };
 }
 

@@ -14,8 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTubeGraph.h"
-
-#include "mitkTubeGraphGeometry3D.h"
+#include "mitkGeometry3D.h"
 
 const mitk::TubeGraph::TubeDescriptorType mitk::TubeGraph::ErrorId = std::pair<VertexDescriptorType, VertexDescriptorType>(boost::graph_traits<GraphType>::null_vertex(),boost::graph_traits<GraphType>::null_vertex());
 
@@ -239,8 +238,8 @@ mitk::TubeGraph::Pointer mitk::TubeGraph::CreateSubGraph(std::vector<TubeDescrip
   }
   subGraph->CopyInformation(this);
 
-  TubeGraphGeometry3D::Pointer geometry = mitk::TubeGraphGeometry3D::New();
-  geometry->Initialize(subGraph);
+  mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+  geometry->Initialize();
   subGraph->SetGeometry(geometry);
 
   this->Modified();

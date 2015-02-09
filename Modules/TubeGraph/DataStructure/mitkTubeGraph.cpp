@@ -63,23 +63,11 @@ std::vector<mitk::TubeGraph::TubeDescriptorType> mitk::TubeGraph::SearchAllPathB
 {    //http://lists.boost.org/boost-users/att-9001/maze.cpp
   //http://www.boost.org/doc/libs/1_49_0/libs/graph/example/bfs.cpp
 
-  //typedef std::map<VertexDescriptorType, VertexDescriptorType>                     VertexMap;
-  //typedef boost::associative_property_map<VertexMap>                               PredecessorMap;
-  //typedef boost::predecessor_recorder<PredecessorMap, boost::on_tree_edge>         PredecessorVisitor;
-
   typedef std::map<VertexDescriptorType, EdgeDescriptorType>                       EdgeMap;
   typedef boost::associative_property_map<EdgeMap>                                 PredecessorMap;
   typedef boost::edge_predecessor_recorder<PredecessorMap, boost::on_tree_edge>    PredecessorVisitor;
   typedef boost::dfs_visitor< std::pair<PredecessorVisitor, boost::null_visitor> > DFSVisitor;
 
-  /*std::vector<VertexDescriptorType> predecessors(this->GetNumberOfVertices());*/
-
-  //VertexMap  verticesMap;
-  //PredecessorMap predecessorMap(verticesMap);
-  //MITK_INFO<< "Number: "<< this->GetNumberOfEdges();
-  //TubeGraphEdge edge;
-  //this->AddEdge(5,0,edge);
-  //MITK_INFO<< "Number: "<< this->GetNumberOfEdges();
   EdgeMap  edgesMap;
   PredecessorMap predecessorMap(edgesMap);
 
@@ -89,7 +77,6 @@ std::vector<mitk::TubeGraph::TubeDescriptorType> mitk::TubeGraph::SearchAllPathB
 
   std::map<VertexDescriptorType, boost::default_color_type> vertexColorMap;
   std::map<EdgeDescriptorType, boost::default_color_type> edgeColorMap;
-  //boost::vector_property_map<boost::default_color_type> colorVec( num_vertices(m_Graph) );  //http://boost.2283326.n4.nabble.com/boost-graph-creating-an-external-map-for-depth-first-search-td2571915.html
 
   boost::undirected_dfs(m_Graph,
     visitor,
@@ -97,8 +84,6 @@ std::vector<mitk::TubeGraph::TubeDescriptorType> mitk::TubeGraph::SearchAllPathB
     make_assoc_property_map(edgeColorMap),
     startTube.second );
 
-  //boost::depth_first_search(m_Graph, vis , make_assoc_property_map(colorMap), startTube.first);
-  //boost::depth_first_visit(m_Graph, startTube.first, vis, vertexColorMap); //http://www.boost.org/doc/libs/1_49_0/libs/graph_parallel/doc/html/tsin_depth_first_visit.html
   std::vector<TubeDescriptorType> solutionPath;
   solutionPath.push_back(endTube);
   VertexDescriptorType pathEdgeSource = endTube.first;
@@ -201,7 +186,7 @@ mitk::TubeGraph::DirectedGraphType mitk::TubeGraph::GetDirectedGraph(VertexDescr
 }
 
 mitk::TubeGraph::Pointer mitk::TubeGraph::CreateSubGraph(std::vector<TubeDescriptorType> subGraphTubes)
-{ //THINK ABOUT: put this in interactor
+{
   TubeGraph::Pointer subGraph = new TubeGraph();
   //store the descriptor from origin graph to the correspondent new descriptors
   std::map<VertexDescriptorType, VertexDescriptorType> vertexDescriptorOldToNewMap;
@@ -248,7 +233,7 @@ mitk::TubeGraph::Pointer mitk::TubeGraph::CreateSubGraph(std::vector<TubeDescrip
 }
 
 void mitk::TubeGraph::RemoveSubGraph(std::vector<TubeDescriptorType> deletedTubes)
-{//THINK ABOUT: put this in interactor
+{
   for (std::vector<TubeDescriptorType>::iterator it = deletedTubes.begin(); it != deletedTubes.end(); it++)
   {
     VertexDescriptorType source = it->first;

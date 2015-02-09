@@ -17,14 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef TubeGraphVtkMapper3D_H_HEADER_INCLUDED
 #define TubeGraphVtkMapper3D_H_HEADER_INCLUDED
 
-#include "MitkTubeGraphExports.h"
+#include <MitkTubeGraphExports.h>
+#include <mitkLocalStorageHandler.h>
 
 #include "mitkVtkMapper3D.h"
-
-#include "mitkLocalStorageHandler.h"
-#include "mitkTubeGraph.h"
 #include "mitkTubeGraphProperty.h"
-#include <mitkCircularProfileTubeElement.h>
+#include "../DataStructure/mitkTubeGraph.h"
+#include "../DataStructure/mitkCircularProfileTubeElement.h"
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>

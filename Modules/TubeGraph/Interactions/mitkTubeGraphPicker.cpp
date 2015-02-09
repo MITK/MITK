@@ -16,9 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTubeGraphPicker.h"
 
-#include "mitkTubeGraphVtkMapper3D.h"
-
-
 mitk::TubeGraphPicker::TubeGraphPicker()
 {
   m_WorldPosition.Fill( 0.0 );

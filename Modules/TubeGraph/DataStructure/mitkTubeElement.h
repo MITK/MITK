@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_TubeElement_H
 #define _MITK_TubeElement_H
 
-#include "MitkTubeGraphExports.h"
+#include <MitkTubeGraphExports.h>
 
-#include "mitkPoint.h"
+#include <mitkPoint.h>
 
 namespace mitk {
   /**

@@ -17,12 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _mitk_TubeGraphPicker_h
 #define _mitk_TubeGraphPicker_h
 
-#include "MitkTubeGraphExports.h"
+#include <MitkTubeGraphExports.h>
 
-#include "mitkTubeGraph.h"
-#include "mitkTubeGraphProperty.h"
+#include "../DataStructure/mitkCircularProfileTubeElement.h"
+#include "../DataStructure/mitkTubeGraph.h"
+#include "Rendering/mitkTubeGraphProperty.h"
 
-#include <mitkCircularProfileTubeElement.h>
+
 
 namespace mitk
 {

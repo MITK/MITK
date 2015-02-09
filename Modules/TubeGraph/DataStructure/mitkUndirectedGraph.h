@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_UndirectedGraph_H
 #define _MITK_UndirectedGraph_H
 
-#include "mitkBaseData.h"
+#include <mitkBaseData.h>
 
 #include <boost/graph/adjacency_list.hpp>
 

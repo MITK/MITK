@@ -17,11 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkTubeGraphDataInteractor3D_h_
 #define mitkTubeGraphDataInteractor3D_h_
 
-#include "mitkBaseRenderer.h"
-#include "mitkDataInteractor.h"
-#include "mitkTubeGraph.h"
-#include "MitkTubeGraphExports.h"
-#include "mitkTubeGraphProperty.h"
+#include <MitkTubeGraphExports.h>
+
+#include <mitkBaseRenderer.h>
+#include <mitkDataInteractor.h>
+
+#include "../DataStructure/mitkTubeGraph.h"
+#include "../Rendering/mitkTubeGraphProperty.h"
 
 namespace mitk
 {

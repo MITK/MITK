@@ -16,11 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_TubeGraphEdge_H
 #define _MITK_TubeGraphEdge_H
 
-#include "MitkTubeGraphExports.h"
+#include <MitkTubeGraphExports.h>
 
-#include <mitkTubeElement.h>
-#include <mitkCircularProfileTubeElement.h>
-#include <mitkTubeGraphVertex.h>
+#include "mitkTubeElement.h"
+#include "mitkCircularProfileTubeElement.h"
+#include "mitkTubeGraphVertex.h"
 
 namespace mitk {
   /**

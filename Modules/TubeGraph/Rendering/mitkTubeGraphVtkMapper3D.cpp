@@ -16,28 +16,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTubeGraphVtkMapper3D.h"
 
-#include "mitkColorProperty.h"
+#include <mitkColorProperty.h>
 
 #include <vtkCellArray.h>
 #include <vtkClipPolyData.h>
+#include <vtkContourFilter.h>
 #include <vtkCylinder.h>
 #include <vtkFloatArray.h>
 #include <vtkGeneralTransform.h>
 #include <vtkImplicitBoolean.h>
+#include <vtkImplicitModeller.h>
 #include <vtkPlane.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkSampleFunction.h>
 #include <vtkSphereSource.h>
 #include <vtkTubeFilter.h>
 #include <vtkUnsignedIntArray.h>
-
-
-#include <vtkSampleFunction.h>
-#include <vtkContourFilter.h>
-#include <vtkImplicitModeller.h>
 
 mitk::TubeGraphVtkMapper3D::TubeGraphVtkMapper3D()
 {

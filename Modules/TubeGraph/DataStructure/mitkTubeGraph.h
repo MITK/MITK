@@ -16,11 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _mitk_TubeGraph_h
 #define _mitk_TubeGraph_h
 
-#include "MitkTubeGraphExports.h"
+#include <MitkTubeGraphExports.h>
 
 #include "mitkUndirectedGraph.h"
-#include <mitkTubeGraphEdge.h>
-#include <mitkTubeGraphVertex.h>
+#include "mitkTubeGraphEdge.h"
+#include "mitkTubeGraphVertex.h"
 
 
 #include <boost/graph/undirected_dfs.hpp>
@@ -57,8 +57,6 @@ namespace mitk{
     //--- Macros ---//
     mitkClassMacro( TubeGraph, Superclass );
     itkNewMacro( Self );
-
-    //TubeDescriptorType GetTubeId (?);
 
     /**
     * Search only the shortest path between two tubes.

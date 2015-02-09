@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTubeGraphProperty.h"
 
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 
 mitk::TubeGraphProperty::TubeGraphProperty()
 /*: m_LabelGroups(), m_ActiveTubes(), m_TubeToLabelsMap()*/
@@ -289,7 +289,7 @@ void mitk::TubeGraphProperty::RemoveLabelGroup(LabelGroup* labelGroup)
   LabelGroupSetType::iterator foundElement = std::find(m_LabelGroups.begin(), m_LabelGroups.end(), labelGroup);
   unsigned int pos = foundElement - m_LabelGroups.begin();
 
-  //find it? delete it!
+  //found it? delete it!
   if (pos < m_LabelGroups.size())
   {
     //delete every assignment to a tube

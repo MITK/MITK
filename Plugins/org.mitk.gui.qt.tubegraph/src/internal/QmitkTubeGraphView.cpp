@@ -25,10 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkTubeGraphNewLabelGroupDialog.h"
 #include "QmitkTubeGraphNewAnnotationDialog.h"
 
-
-
 const std::string QmitkTubeGraphView::VIEW_ID = "org.mitk.views.tubegraph";
-
 
 QmitkTubeGraphView::QmitkTubeGraphView()
   :QmitkAbstractView(),

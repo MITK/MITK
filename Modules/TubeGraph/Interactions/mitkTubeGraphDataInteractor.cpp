@@ -16,9 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTubeGraphDataInteractor.h"
 
-#include "mitkInteractionConst.h"
-#include "mitkInteractionPositionEvent.h"
-#include "mitkStatusBar.h"
+#include <mitkInteractionConst.h>
+#include <mitkInteractionPositionEvent.h>
+#include <mitkStatusBar.h>
+
 #include "mitkTubeGraphPicker.h"
 
 #include <vtkCamera.h>
@@ -99,7 +100,7 @@ bool mitk::TubeGraphDataInteractor::SelectTube(StateMachineAction*, InteractionE
 
   if (m_ActivationMode != None)
   {
-    // show vessel id on status bar
+    // show tube id on status bar
     std::stringstream displayText;
     displayText << "Picked tube: ID [" << m_LastPickedTube.first << "," << m_LastPickedTube.second << "]";
     StatusBar::GetInstance()->DisplayText( displayText.str().c_str() );
@@ -227,7 +228,7 @@ void mitk::TubeGraphDataInteractor::UpdateActivation()
       break;
 
     default:
-      MITK_WARN<<"the impossible happened!";
+      MITK_WARN<<"Unknown tube graph interaction mode!";
       break;
     }
   }

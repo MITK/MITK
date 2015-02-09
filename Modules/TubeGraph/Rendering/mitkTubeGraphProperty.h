@@ -17,12 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _mitk_TubeGraphProperty_h
 #define _mitk_TubeGraphProperty_h
 
-#include "MitkTubeGraphExports.h"
+#include <MitkTubeGraphExports.h>
 
-#include "mitkBaseProperty.h"
-
-#include "mitkColorProperty.h"
-#include "mitkTubeGraph.h"
+#include <mitkBaseProperty.h>
+#include <mitkColorProperty.h>
+#include "../DataStructure/mitkTubeGraph.h"
 
 #include <itkObject.h>
 #include <vector>

@@ -47,22 +47,6 @@ if(MITK_USE_QT)
   string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
 endif()
 
-set(OPENCV_DIR)
-if(WIN32)
-  find_package(OpenCV CONFIG PATHS "${CTEST_BINARY_DIRECTORY}/ep")
-  if(OpenCV_FOUND)
-    set(_opencv_link_directories
-      "${OpenCV_LIB_DIR_DBG}"
-      "${OpenCV_LIB_DIR_OPT}"
-      "${OpenCV_3RDPARTY_LIB_DIR_DBG}"
-      "${OpenCV_3RDPARTY_LIB_DIR_OPT}")
-    list(REMOVE_DUPLICATES _opencv_link_directories)
-    foreach(_opencv_link_directory ${_opencv_link_directories})
-      list(APPEND OPENCV_DIR "${_opencv_link_directory}/../bin")
-    endforeach()
-  endif()
-endif()
-
 #
 # Project specific properties
 #
@@ -78,9 +62,22 @@ set(PROJECT_BUILD_DIR "MITK-build")
 
 set(CTEST_PATH "$ENV{PATH}")
 if(WIN32)
+  set(CMAKE_PREFIX_PATH "${CTEST_BINARY_DIRECTORY}/ep;${CMAKE_PREFIX_PATH}" CACHE STRING "" FORCE)
+  if(CMAKE_CL_64)
+    set(CMAKE_LIBRARY_ARCHITECTURE x64)
+  else()
+    set(CMAKE_LIBRARY_ARCHITECTURE x86)
+  endif()
+  find_library(OPENCV_LIBRARY opencv_core248 PATH_SUFFIXES vc10 vc11 vc12 vc13 vc14 NO_DEFAULT_PATH)
+  if(OPENCV_LIBRARY)
+    get_filename_component(OPENCV_BIN_DIR "${OPENCV_LIBRARY}" DIRECTORY)
+  endif()
+  message("OpenCV runtime path: ${OPENCV_BIN_DIR}")
+
   set(SOFA_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/SOFA-build/bin/${CTEST_BUILD_CONFIGURATION}")
   set(BLUEBERRY_OSGI_DIR "${CTEST_BINARY_DIRECTORY}/MITK-build/bin/BlueBerry/org.blueberry.osgi/bin/${CTEST_BUILD_CONFIGURATION}")
-  set(CTEST_PATH "${CTEST_PATH};${CTEST_BINARY_DIRECTORY}/ep/bin;${QT_BINARY_DIR};${SOFA_BINARY_DIR};${BLUEBERRY_OSGI_DIR};${OPENCV_DIR}")
+
+  set(CTEST_PATH "${CTEST_PATH};${CTEST_BINARY_DIRECTORY}/ep/bin;${QT_BINARY_DIR};${SOFA_BINARY_DIR};${BLUEBERRY_OSGI_DIR};${OPENCV_BIN_DIR}")
 endif()
 set(ENV{PATH} "${CTEST_PATH}")
 

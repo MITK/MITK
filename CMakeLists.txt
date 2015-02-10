@@ -247,10 +247,6 @@ mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE
 # ordered according to their
 # inter-dependencies
 
-if(MITK_USE_QT)
-  mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED)
-endif()
-
 mitkFunctionAddExternalProject(NAME SWIG      OFF ADVANCED NO_PACKAGE DEPENDS PCRE)
 mitkFunctionAddExternalProject(NAME Python    OFF          NO_PACKAGE DEPENDS SWIG DOC "Use Python wrapping in MITK")
 mitkFunctionAddExternalProject(NAME Numpy     OFF ADVANCED NO_PACKAGE)
@@ -262,10 +258,14 @@ mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
 
 mitkFunctionAddExternalProject(NAME SimpleITK OFF          DEPENDS ITK GDCM SWIG)
 mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
-mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS DCMTK DOC "Use CTK in MITK")
+mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS QT DCMTK DOC "Use CTK in MITK")
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)
 mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")
 mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DOC "Use Simulation Open Framework Architecture")
+
+if(MITK_USE_QT)
+  mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS QT)
+endif()
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -751,6 +751,17 @@ set(MITK_EXE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR ${MITK_SOURCE_DIR}/CMake/PackageDepends)
 set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR})
 
+if(NOT MITK_USE_SYSTEM_Boost)
+  set(Boost_NO_SYSTEM_PATHS 1)
+endif()
+
+set(Boost_USE_MULTITHREADED 1)
+set(Boost_USE_STATIC_LIBS 0)
+set(Boost_USE_STATIC_RUNTIME 0)
+
+# We need this later for a DCMTK workaround
+set(_dcmtk_dir_orig ${DCMTK_DIR})
+
 # This property is populated at the top half of this file
 get_property(MITK_EXTERNAL_PROJECTS GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 foreach(ep ${MITK_EXTERNAL_PROJECTS})
@@ -762,7 +773,7 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
     else()
       # Prefer config mode first because it finds external
       # <proj>Config.cmake files pointed at by <proj>_DIR variables.
-      # Otherwise, existing Find<proj>.cmake files could file
+      # Otherwise, existing Find<proj>.cmake files could fail.
       # (e.g. in the case of GLEW and the FindGLEW.cmake file shipped
       # with CMake).
       find_package(${_package} QUIET CONFIG)
@@ -773,6 +784,26 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
     endif()
   endif()
 endforeach()
+
+# Ensure that the MITK CMake module path comes first
+set(CMAKE_MODULE_PATH
+  ${MITK_CMAKE_DIR}
+  ${CMAKE_MODULE_PATH}
+  )
+
+if(MITK_USE_DCMTK)
+  # Due to the preferred CONFIG mode in find_package calls above,
+  # the DCMTKConfig.cmake file is read, which does not provide useful
+  # package information. We explictly need MODULE mode to find DCMTK.
+  if(${_dcmtk_dir_orig} MATCHES "${MITK_EXTERNAL_PROJECT_PREFIX}.*")
+    # Help our FindDCMTK.cmake script find our super-build DCMTK
+    set(DCMTK_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
+  else()
+    # Use the original value
+    set(DCMTK_DIR ${_dcmtk_dir_orig})
+  endif()
+  find_package(DCMTK REQUIRED MODULE)
+endif()
 
 if(MITK_USE_Python)
   find_package(PythonLibs REQUIRED)
@@ -798,6 +829,10 @@ if(MITK_USE_OpenIGTLink)
   link_directories(${OpenIGTLink_LIBRARY_DIRS})
 endif()
 
+if(MITK_USE_SimpleITK)
+  link_directories(${SimpleITK_LIBRARY_DIRS})
+endif()
+
 # Qt support
 if(MITK_USE_QT)
   if(DESIRED_QT_VERSION MATCHES 4)
@@ -816,12 +851,6 @@ if(MITK_USE_QT)
     endif()
   endif()
 endif()
-
-# Ensure that the MITK CMake module path comes first
-set(CMAKE_MODULE_PATH
-  ${MITK_CMAKE_DIR}
-  ${CMAKE_MODULE_PATH}
-  )
 
 #-----------------------------------------------------------------------------
 # Testing

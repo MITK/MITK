@@ -1,5 +1,4 @@
 include(mitkFunctionInstallExternalCMakeProject)
-include(mitkFunctionCheckCompilerFlags)
 
 #-----------------------------------------------------------------------------
 # Convenient macro allowing to download a file

@@ -165,8 +165,7 @@ mitk::PicFileReader* mitk::PicFileReader::Clone() const
 void mitk::PicFileReader::FillImage(Image::Pointer output)
 {
   mitkIpPicDescriptor* outputPic = mitkIpPicNew();
-  mitk::ImageWriteAccessor imageAccess(output);
-  outputPic = CastToIpPicDescriptor(output, &imageAccess, outputPic);
+  outputPic = CastToIpPicDescriptor(output, nullptr, outputPic);
   mitkIpPicDescriptor* pic=mitkIpPicGet(const_cast<char *>(this->GetLocalFileName().c_str()),
                                         outputPic);
   // comes upside-down (in MITK coordinates) from PIC file
@@ -198,4 +197,11 @@ void mitk::PicFileReader::FillImage(Image::Pointer output)
     mitkIpPicFree(header);
     mitkIpPicDelTag( pic, "VELOCITY" );
   }
+
+  // Copy the memory to avoid mismatches of malloc() and delete[].
+  // mitkIpPicGet will always allocate a new memory block with malloc(),
+  // but MITK Images delete the data via delete[].
+  output->SetImportChannel(pic->data, 0, Image::CopyMemory);
+  pic->data = nullptr;
+  mitkIpPicFree(pic);
 }

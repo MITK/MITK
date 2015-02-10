@@ -53,7 +53,7 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.setupUi(parent);
 
-  m_Controls.propertyListComboBox->addItem("independent");
+  m_Controls.propertyListComboBox->addItem("Data node: common");
 
   mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
 
@@ -63,9 +63,11 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
     Q_FOREACH(QString renderWindow, renderWindows.keys())
     {
-      m_Controls.propertyListComboBox->addItem(renderWindow);
+      m_Controls.propertyListComboBox->addItem(QString("Data node: ") + renderWindow);
     }
   }
+
+  m_Controls.propertyListComboBox->addItem("Base data");
 
   m_Controls.newButton->setEnabled(false);
 
@@ -311,8 +313,23 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
       : "";
 
     m_SelectionClassName = selectionClassName.toStdString();
-    m_Model->SetPropertyList(m_SelectedNode->GetPropertyList(m_Renderer), selectionClassName);
-    m_Delegate->SetPropertyList(m_SelectedNode->GetPropertyList(m_Renderer));
+
+    mitk::PropertyList::Pointer propertyList;
+
+    if (m_Renderer == NULL && m_Controls.propertyListComboBox->currentText() == "Base data")
+    {
+      propertyList = m_SelectedNode->GetData() != NULL
+        ? m_SelectedNode->GetData()->GetPropertyList()
+        : NULL;
+    }
+    else
+    {
+      propertyList = m_SelectedNode->GetPropertyList(m_Renderer);
+    }
+
+    m_Model->SetPropertyList(propertyList, selectionClassName);
+    m_Delegate->SetPropertyList(propertyList);
+
     OnPropertyNameChanged(itk::ModifiedEvent());
 
     mitk::BaseProperty* nameProperty = m_SelectedNode->GetProperty("name");
@@ -338,23 +355,24 @@ void QmitkPropertyTreeView::SetFocus()
 
 void QmitkPropertyTreeView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  if (m_Controls.propertyListComboBox->count() == 1)
+  if (m_Controls.propertyListComboBox->count() == 2)
   {
     QHash<QString, QmitkRenderWindow*> renderWindows = this->GetRenderWindowPart()->GetQmitkRenderWindows();
 
     Q_FOREACH(QString renderWindow, renderWindows.keys())
     {
-      m_Controls.propertyListComboBox->addItem(renderWindow);
+      m_Controls.propertyListComboBox->insertItem(m_Controls.propertyListComboBox->count() - 1, QString("Data node: ") + renderWindow);
     }
   }
 }
 
 void QmitkPropertyTreeView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
-  if (m_Controls.propertyListComboBox->count() > 1)
+  if (m_Controls.propertyListComboBox->count() > 2)
   {
     m_Controls.propertyListComboBox->clear();
-    m_Controls.propertyListComboBox->addItem("independent");
+    m_Controls.propertyListComboBox->addItem("Data node: common");
+    m_Controls.propertyListComboBox->addItem("Base data");
   }
 }
 
@@ -365,7 +383,10 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
 
   QString renderer = m_Controls.propertyListComboBox->itemText(index);
 
-  m_Renderer = renderer != "independent"
+  if (renderer.startsWith("Data node: "))
+    renderer = QString::fromStdString(renderer.toStdString().substr(11));
+
+  m_Renderer = renderer != "common" && renderer != "Base data"
     ? this->GetRenderWindowPart()->GetQmitkRenderWindow(renderer)->GetRenderer()
     : NULL;
 

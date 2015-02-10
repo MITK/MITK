@@ -133,7 +133,7 @@ private:
  * @see CoreServices
  */
 template<class S>
-class CoreServicePointer
+class MITK_LOCAL CoreServicePointer
 {
 public:
 

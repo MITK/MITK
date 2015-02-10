@@ -37,7 +37,8 @@ endif()
 #-----------------------------------------------------------------------------
 
 # Update the CMake module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@MITK_SOURCE_DIR@/CMake")
+set(MITK_CMAKE_MODULE_PATH "@MITK_SOURCE_DIR@/CMake")
+list(APPEND CMAKE_MODULE_PATH ${MITK_CMAKE_MODULE_PATH})
 
 # Standard CMake macros
 include(CMakeParseArguments)
@@ -103,10 +104,13 @@ set(MITK_CMAKE_LIBRARY_OUTPUT_DIRECTORY "@MITK_CMAKE_LIBRARY_OUTPUT_DIRECTORY@")
 # of a MITK development version (non-release).
 set(MITK_VERSION_PLUGIN_SYSTEM 2) # dropped legacy BlueBerry plug-in CMake support
 
+set(MITK_DATA_DIR "@MITK_DATA_DIR@")
 set(UTILITIES_DIR "@UTILITIES_DIR@")
 set(REGISTER_QFUNCTIONALITY_CPP_IN "@REGISTER_QFUNCTIONALITY_CPP_IN@")
 set(MITK_DOXYGEN_TAGFILE_NAME "@MITK_DOXYGEN_TAGFILE_NAME@")
 set(MITK_LEGACY_EXPORT_MACRO_NAME 1)
+
+set(DCMTK_CMAKE_DEBUG_POSTFIX @DCMTK_CMAKE_DEBUG_POSTFIX@)
 
 if(CMAKE_CURRENT_LIST_DIR STREQUAL MITK_BINARY_DIR)
   set(MITK_EXTERNAL_PROJECT_PREFIX @MITK_EXTERNAL_PROJECT_PREFIX@)
@@ -163,12 +167,15 @@ endif()
 # Special Boost variables
 
 set(MITK_USE_Boost @MITK_USE_Boost@)
-set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES})
+set(MITK_USE_Boost_LIBRARIES @MITK_USE_Boost_LIBRARIES@)
 set(MITK_USE_SYSTEM_Boost @MITK_USE_SYSTEM_Boost@)
 if(MITK_USE_Boost)
   set(BOOST_ROOT "@BOOST_ROOT@" CACHE PATH "")
   set(BOOST_LIBRARYDIR "@BOOST_LIBRARYDIR@" CACHE PATH "")
 endif()
+
+# We need this later for a DCMTK workaround
+set(_dcmtk_dir_orig "@DCMTK_DIR@")
 
 # -----------------------------------------
 # External dependencies from the superbuild
@@ -176,6 +183,26 @@ endif()
 # <project>_DIR variables.
 
 @MITK_CONFIG_EXTERNAL_PROJECTS@
+
+# Ensure the MITK module path comes first
+set(CMAKE_MODULE_PATH ${MITK_CMAKE_MODULE_PATH} ${CMAKE_MODULE_PATH})
+
+# -----------------------------------------
+# Special handling for DCMTK
+
+if(MITK_USE_DCMTK)
+  # Due to the preferred CONFIG mode in find_package calls above,
+  # the DCMTKConfig.cmake file is read, which does not provide useful
+  # package information. We explictly need MODULE mode to find DCMTK.
+  if(${_dcmtk_dir_orig} MATCHES "${MITK_EXTERNAL_PROJECT_PREFIX}.*")
+    # Help our FindDCMTK.cmake script find our super-build DCMTK
+    set(DCMTK_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
+  else()
+    # Use the original value
+    set(DCMTK_DIR ${_dcmtk_dir_orig})
+  endif()
+  find_package(DCMTK REQUIRED MODULE)
+endif()
 
 # -----------------------------------------
 # Special handling for SOFA

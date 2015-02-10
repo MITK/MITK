@@ -2,17 +2,15 @@ set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.1)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
-# Set a default build type if none was specified
+# See http://cmake.org/cmake/help/cmake-2-8-docs.html#section_Policies for details
 #-----------------------------------------------------------------------------
 
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Debug' as none was specified.")
-  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
-
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
-               STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-endif()
+set(project_policies )
+foreach(policy ${project_policies})
+  if(POLICY ${policy})
+    cmake_policy(SET ${policy} NEW)
+  endif()
+endforeach()
 
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
@@ -26,6 +24,52 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
   project(MITK VERSION 2014.10.99)
+endif()
+
+#-----------------------------------------------------------------------------
+# Update CMake module path
+#------------------------------------------------------------------------------
+
+set(MITK_CMAKE_DIR ${MITK_SOURCE_DIR}/CMake)
+
+set(CMAKE_MODULE_PATH
+  ${MITK_CMAKE_DIR}
+  ${CMAKE_MODULE_PATH}
+  )
+
+#-----------------------------------------------------------------------------
+# CMake function(s) and macro(s)
+#-----------------------------------------------------------------------------
+
+# Standard CMake macros
+include(FeatureSummary)
+include(CTestUseLaunchers)
+include(CMakeParseArguments)
+include(FindPackageHandleStandardArgs)
+
+# MITK macros
+include(mitkFunctionGetGccVersion)
+include(mitkFunctionCheckCompilerFlags)
+include(mitkFunctionSuppressWarnings) # includes several functions
+include(mitkMacroEmptyExternalProject)
+include(mitkFunctionGenerateProjectXml)
+include(mitkFunctionEnableBuildConfiguration)
+include(mitkFunctionWhitelists)
+include(mitkFunctionAddExternalProject)
+
+SUPPRESS_VC_DEPRECATED_WARNINGS()
+
+#-----------------------------------------------------------------------------
+# Set a default build type if none was specified
+#-----------------------------------------------------------------------------
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to 'Debug' as none was specified.")
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
+               STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -56,6 +100,36 @@ else()
   message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
 endif()
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+  mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
+else()
+  set(GCC_VERSION 0)
+endif()
+
+set(MITK_CXX_STANDARD 11)
+
+# help keeping cross-platform compatibility
+# CMake 3.1 does not yet know how to handle AppleClang...
+# See http://public.kitware.com/Bug/view.php?id=15355
+if(NOT MSVC AND
+   NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND
+   GCC_VERSION VERSION_GREATER 4.6)
+  set(CMAKE_CXX_EXTENSIONS 0)
+  set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
+  set(CMAKE_CXX_STANDARD_REQUIRED 1)
+endif()
+
+# This is necessary to avoid problems with compile feature checks.
+# CMAKE_CXX_STANDARD seems to only set the -std=c++11 flag for targets.
+# However, compile flag checks also need to be done with -std=c++11.
+# The MITK_CXX11_FLAG variable is also used for external projects
+# build during the MITK super-build.
+mitkFunctionCheckCompilerFlags("-std=c++11" MITK_CXX11_FLAG)
+if(NOT MITK_CXX11_FLAG)
+  # Older gcc compilers use -std=c++0x
+  mitkFunctionCheckCompilerFlags("-std=c++0x" MITK_CXX11_FLAG)
+endif()
+
 #-----------------------------------------------------------------------------
 # Warn if source or build path is too long
 #-----------------------------------------------------------------------------
@@ -81,48 +155,6 @@ if(WIN32)
                     "Please move the MITK build directory to a directory with a shorter path." )
   endif()
 endif()
-
-#-----------------------------------------------------------------------------
-# See http://cmake.org/cmake/help/cmake-2-8-docs.html#section_Policies for details
-#-----------------------------------------------------------------------------
-
-set(project_policies )
-foreach(policy ${project_policies})
-  if(POLICY ${policy})
-    cmake_policy(SET ${policy} NEW)
-  endif()
-endforeach()
-
-#-----------------------------------------------------------------------------
-# Update CMake module path
-#------------------------------------------------------------------------------
-
-set(MITK_CMAKE_DIR ${MITK_SOURCE_DIR}/CMake)
-
-set(CMAKE_MODULE_PATH
-  ${MITK_CMAKE_DIR}
-  ${CMAKE_MODULE_PATH}
-  )
-
-#-----------------------------------------------------------------------------
-# CMake function(s) and macro(s)
-#-----------------------------------------------------------------------------
-
-# Standard CMake macros
-include(FeatureSummary)
-include(CTestUseLaunchers)
-include(CMakeParseArguments)
-include(FindPackageHandleStandardArgs)
-
-# MITK macros
-include(mitkMacroEmptyExternalProject)
-include(mitkFunctionGenerateProjectXml)
-include(mitkFunctionSuppressWarnings)
-include(mitkFunctionEnableBuildConfiguration)
-include(mitkFunctionWhitelists)
-include(mitkFunctionAddExternalProject)
-
-SUPPRESS_VC_DEPRECATED_WARNINGS()
 
 #-----------------------------------------------------------------------------
 # Additional MITK Options (also shown during superbuild)
@@ -215,10 +247,6 @@ mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE
 # ordered according to their
 # inter-dependencies
 
-if(MITK_USE_QT)
-  mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED)
-endif()
-
 mitkFunctionAddExternalProject(NAME SWIG      OFF ADVANCED NO_PACKAGE DEPENDS PCRE)
 mitkFunctionAddExternalProject(NAME Python    OFF          NO_PACKAGE DEPENDS SWIG DOC "Use Python wrapping in MITK")
 mitkFunctionAddExternalProject(NAME Numpy     OFF ADVANCED NO_PACKAGE)
@@ -230,10 +258,36 @@ mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
 
 mitkFunctionAddExternalProject(NAME SimpleITK OFF          DEPENDS ITK GDCM SWIG)
 mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
-mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS DCMTK DOC "Use CTK in MITK")
+mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS QT DCMTK DOC "Use CTK in MITK")
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)
 mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")
 mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DOC "Use Simulation Open Framework Architecture")
+
+if(MITK_USE_QT)
+  mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS QT)
+endif()
+
+#-----------------------------------------------------------------------------
+# Build configurations
+#-----------------------------------------------------------------------------
+
+set(_buildConfigs "Custom")
+
+file(GLOB _buildConfigFiles CMake/BuildConfigurations/*.cmake)
+
+foreach(_buildConfigFile ${_buildConfigFiles})
+  get_filename_component(_buildConfigFile ${_buildConfigFile} NAME_WE)
+  list(APPEND _buildConfigs ${_buildConfigFile})
+endforeach()
+
+set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
+mark_as_advanced(MITK_BUILD_CONFIGURATION)
+set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
+
+mitkFunctionEnableBuildConfiguration()
+
+mitkFunctionCreateWhitelistPaths(MITK)
+mitkFunctionFindWhitelists(MITK)
 
 # -----------------------------------------
 # Custom dependency logic
@@ -329,28 +383,6 @@ if(MITK_USE_BLUEBERRY)
     set(MITK_USE_CTK ON CACHE BOOL "Use CTK in MITK" FORCE)
   endif()
 endif()
-
-#-----------------------------------------------------------------------------
-# Build configurations
-#-----------------------------------------------------------------------------
-
-set(_buildConfigs "Custom")
-
-file(GLOB _buildConfigFiles CMake/BuildConfigurations/*.cmake)
-
-foreach(_buildConfigFile ${_buildConfigFiles})
-  get_filename_component(_buildConfigFile ${_buildConfigFile} NAME_WE)
-  list(APPEND _buildConfigs ${_buildConfigFile})
-endforeach()
-
-set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
-mark_as_advanced(MITK_BUILD_CONFIGURATION)
-set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
-
-mitkFunctionEnableBuildConfiguration()
-
-mitkFunctionCreateWhitelistPaths(MITK)
-mitkFunctionFindWhitelists(MITK)
 
 #-----------------------------------------------------------------------------
 # Pixel type multiplexing
@@ -484,9 +516,6 @@ endif()
 include(WriteBasicConfigVersionFile)
 include(CheckCXXSourceCompiles)
 include(GenerateExportHeader)
-include(mitkFunctionCheckCompilerFlags)
-include(mitkFunctionGetGccVersion)
-include(mitkFunctionSuppressWarnings) # includes several functions
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionGetVersion)
 include(mitkFunctionGetVersionDescription)
@@ -513,17 +542,6 @@ include(mitkMacroConfigureItkPixelTypes)
 #-----------------------------------------------------------------------------
 # Global CMake variables
 #-----------------------------------------------------------------------------
-
-set(MITK_CXX_STANDARD 11)
-
-# help keeping cross-platform compatibility
-# CMake 3.1 does not yet know how to handle AppleClang...
-# See http://public.kitware.com/Bug/view.php?id=15355
-if(NOT MSVC AND NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-  set(CMAKE_CXX_EXTENSIONS 0)
-  set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
-  set(CMAKE_CXX_STANDARD_REQUIRED 1)
-endif()
 
 # Required and enabled C++11 features for all MITK code.
 # These are added as PUBLIC compile features to all MITK modules.
@@ -660,14 +678,12 @@ endif()
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS}")
 set(MITK_C_FLAGS_DEBUG )
 set(MITK_C_FLAGS_RELEASE )
-set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS}")
+set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${MITK_CXX11_FLAG}")
 set(MITK_CXX_FLAGS_DEBUG )
 set(MITK_CXX_FLAGS_RELEASE )
 
 set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
-
-mitkFunctionCheckCompilerFlags("-std=c++11" MITK_CXX_FLAGS)
 
 if(WIN32)
   set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
@@ -711,8 +727,6 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-
-  mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
   # With older version of gcc supporting the flag -fstack-protector-all, an extra dependency to libssp.so
   # is introduced. If gcc is smaller than 4.4.0 and the build type is Release let's not include the flag.
   # Doing so should allow to build package made for distribution using older linux distro.
@@ -725,7 +739,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 
   set(MITK_CXX_FLAGS_RELEASE "-D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
-
 endif()
 
 set(MITK_MODULE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
@@ -738,6 +751,17 @@ set(MITK_EXE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR ${MITK_SOURCE_DIR}/CMake/PackageDepends)
 set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR})
 
+if(NOT MITK_USE_SYSTEM_Boost)
+  set(Boost_NO_SYSTEM_PATHS 1)
+endif()
+
+set(Boost_USE_MULTITHREADED 1)
+set(Boost_USE_STATIC_LIBS 0)
+set(Boost_USE_STATIC_RUNTIME 0)
+
+# We need this later for a DCMTK workaround
+set(_dcmtk_dir_orig ${DCMTK_DIR})
+
 # This property is populated at the top half of this file
 get_property(MITK_EXTERNAL_PROJECTS GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 foreach(ep ${MITK_EXTERNAL_PROJECTS})
@@ -749,7 +773,7 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
     else()
       # Prefer config mode first because it finds external
       # <proj>Config.cmake files pointed at by <proj>_DIR variables.
-      # Otherwise, existing Find<proj>.cmake files could file
+      # Otherwise, existing Find<proj>.cmake files could fail.
       # (e.g. in the case of GLEW and the FindGLEW.cmake file shipped
       # with CMake).
       find_package(${_package} QUIET CONFIG)
@@ -760,6 +784,26 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
     endif()
   endif()
 endforeach()
+
+# Ensure that the MITK CMake module path comes first
+set(CMAKE_MODULE_PATH
+  ${MITK_CMAKE_DIR}
+  ${CMAKE_MODULE_PATH}
+  )
+
+if(MITK_USE_DCMTK)
+  # Due to the preferred CONFIG mode in find_package calls above,
+  # the DCMTKConfig.cmake file is read, which does not provide useful
+  # package information. We explictly need MODULE mode to find DCMTK.
+  if(${_dcmtk_dir_orig} MATCHES "${MITK_EXTERNAL_PROJECT_PREFIX}.*")
+    # Help our FindDCMTK.cmake script find our super-build DCMTK
+    set(DCMTK_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
+  else()
+    # Use the original value
+    set(DCMTK_DIR ${_dcmtk_dir_orig})
+  endif()
+  find_package(DCMTK REQUIRED MODULE)
+endif()
 
 if(MITK_USE_Python)
   find_package(PythonLibs REQUIRED)
@@ -785,20 +829,28 @@ if(MITK_USE_OpenIGTLink)
   link_directories(${OpenIGTLink_LIBRARY_DIRS})
 endif()
 
+if(MITK_USE_SimpleITK)
+  link_directories(${SimpleITK_LIBRARY_DIRS})
+endif()
+
 # Qt support
 if(MITK_USE_QT)
   if(DESIRED_QT_VERSION MATCHES 4)
     find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
   elseif(DESIRED_QT_VERSION MATCHES 5)
     find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
+    get_target_property(_qmake_exec Qt5::qmake LOCATION)
+    execute_process(COMMAND ${_qmake_exec} -query QT_INSTALL_BINS
+      RESULT_VARIABLE _result
+      OUTPUT_VARIABLE QT_BINARY_DIR
+      ERROR_VARIABLE _error
+    )
+    string(STRIP "${QT_BINARY_DIR}" QT_BINARY_DIR)
+    if(_result OR NOT EXISTS "${QT_BINARY_DIR}")
+      message(FATAL_ERROR "Could not determine Qt binary directory: ${_result} ${QT_BINARY_DIR} ${_error}")
+    endif()
   endif()
 endif()
-
-# Ensure that the MITK CMake module path comes first
-set(CMAKE_MODULE_PATH
-  ${MITK_CMAKE_DIR}
-  ${CMAKE_MODULE_PATH}
-  )
 
 #-----------------------------------------------------------------------------
 # Testing

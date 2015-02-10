@@ -47,10 +47,6 @@ if( OpenCV_LIB_DIR )
 
 endif()
 
-# This is done in the top-level CMakeLists.txt file because
-# we need the imported OpenCV targets globally visible for transitive
-# dependencies.
-#find_package(OpenCV REQUIRED)
 list(APPEND ALL_LIBRARIES ${OpenCV_LIBS})
 list(APPEND ALL_INCLUDE_DIRECTORIES ${OpenCV_INCLUDE_DIRS})
 

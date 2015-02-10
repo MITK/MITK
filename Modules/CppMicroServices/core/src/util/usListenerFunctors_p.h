@@ -28,15 +28,19 @@
 #include <algorithm>
 #include <cstring>
 
-#ifdef US_HAVE_FUNCTIONAL_H
-  #include <functional>
-#elif defined(US_HAVE_TR1_FUNCTIONAL_H)
-  #include <tr1/functional>
-#endif
-
 #ifdef US_HAVE_STD_FUNCTION
+  #ifdef US_HAVE_FUNCTIONAL_H
+    #include <functional>
+  #elif defined(US_HAVE_TR1_FUNCTIONAL_H)
+    #include <tr1/functional>
+  #endif
   #define US_FUNCTION_TYPE std::function
 #elif defined(US_HAVE_TR1_FUNCTION)
+  #ifdef US_HAVE_TR1_FUNCTIONAL_H
+    #include <tr1/functional>
+  #elif defined(US_HAVE_FUNCTIONAL_H)
+    #include <functional>
+  #endif
   #define US_FUNCTION_TYPE std::tr1::function
 #endif
 

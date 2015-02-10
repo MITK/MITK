@@ -23,7 +23,7 @@ if(TARGET ${TESTDRIVER})
   )
 
   mitkAddCustomModuleTest(mitkEventConfigTest_CreateObjectInDifferentWays mitkEventConfigTest
-                          ${MITK_SOURCE_DIR}/Modules/Core/tests/resource/Interactions/StatemachineConfigTest.xml
+                          ${MITK_SOURCE_DIR}/Modules/Core/test/resource/Interactions/StatemachineConfigTest.xml
   )
 
   mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest

@@ -109,7 +109,6 @@ set(MODULE_TESTS
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
   mitkLineTest.cpp
-  mitkSurfaceVtkMapper2DTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING)

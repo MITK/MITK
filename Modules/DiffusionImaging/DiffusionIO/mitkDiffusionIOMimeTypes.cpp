@@ -53,7 +53,7 @@ CustomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE()
   mimeType.SetComment("VTK Fibers");
   mimeType.SetCategory(category);
   mimeType.AddExtension("fib");
-  mimeType.AddExtension("vtk");
+//  mimeType.AddExtension("vtk");
   return mimeType;
 }
 

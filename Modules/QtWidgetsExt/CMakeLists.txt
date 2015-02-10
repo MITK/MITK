@@ -1,5 +1,4 @@
 MITK_CREATE_MODULE(
-  INCLUDE_DIRS QmitkPropertyObservers
   DEPENDS MitkImageStatistics MitkQtWidgets
   PACKAGE_DEPENDS
     PUBLIC Qwt CTK|CTKWidgets Qt4|QtWebKit Qt5|WebKitWidgets

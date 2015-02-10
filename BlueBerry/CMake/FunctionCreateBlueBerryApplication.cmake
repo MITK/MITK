@@ -144,7 +144,7 @@ endif()
 # executable is build.
 if(_APP_PLUGINS)
   ctkMacroGetAllProjectTargetLibraries("${_APP_PLUGINS}" _project_plugins)
-  if(_APP_EXCLUDE_PLUGINS)
+  if(_APP_EXCLUDE_PLUGINS AND _project_plugins)
     set(_exclude_targets)
     foreach(_exclude_plugin ${_APP_EXCLUDE_PLUGINS})
       string(REPLACE "." "_" _exclude_target ${_exclude_plugin})

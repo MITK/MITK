@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkCoreExports.h"
 
 #include <mitkLogMacros.h>
+#include <mitkCommon.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -133,7 +134,7 @@ private:
  * @see CoreServices
  */
 template<class S>
-class CoreServicePointer
+class MITK_LOCAL CoreServicePointer
 {
 public:
 

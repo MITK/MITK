@@ -32,7 +32,7 @@ namespace mitk {
  * will register corresponding MITK reader/writer services for that
  * ITK ImageIO object.
  */
-class ItkImageIO : public AbstractFileIO
+class MITK_CORE_EXPORT ItkImageIO : public AbstractFileIO
 {
 
 public:

@@ -82,7 +82,6 @@ void QmitkToFConnectionWidget::CreateConnections()
     /*Creating an other Datanode structur for Kinect is done here: As soon as a Kinect is connected, the KinectParameterWidget is enabled,
     which can be used to trigger the KinectAcqusitionModeChanged-Method, to create a working Data-Node-structure*/
     connect( m_Controls->m_KinectParameterWidget, SIGNAL(AcquisitionModeChanged()), this, SIGNAL(KinectAcquisitionModeChanged()) );
-
   }
 }
 
@@ -114,6 +113,10 @@ void QmitkToFConnectionWidget::OnSelectCamera()
   {
     this->m_Controls->m_KinectParameterWidget->show();
   }
+  else if (selectedCamera.contains("Structure"))
+  {
+    this->m_Controls->m_StructureParameterWidget->show();
+  }
   m_Controls->m_ConnectCameraButton->setEnabled(true); //ConnectCameraButton gets enabled
   m_SelectedCameraName = selectedCamera;
   emit  (selectedCamera);
@@ -124,6 +127,7 @@ void QmitkToFConnectionWidget::HideAllParameterWidgets()
   this->m_Controls->m_PMDParameterWidget->hide();
   this->m_Controls->m_MESAParameterWidget->hide();
   this->m_Controls->m_KinectParameterWidget->hide();
+  this->m_Controls->m_StructureParameterWidget->hide();
 }
 
 //OnConnectCamera-Method; represents one of the main parts of ToFConnectionWidget2.
@@ -145,13 +149,17 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       //Feeding it with the Info from ServiceListWidget
       this->m_ToFImageGrabber->SetCameraDevice(device);
 
-      // Calling Alex FixForKinect, if the Kinect is selected
       if (selectedCamera.contains("Kinect") )
       {
-        MITK_INFO<< "Kinect is connected here";
         //If the particular property is selected, the suitable data-node will be generated
         this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_KinectParameterWidget->IsAcquisitionModeRGB());
         this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_KinectParameterWidget->IsAcquisitionModeIR());
+      }
+
+      if (selectedCamera.contains("Structure") )
+      {
+        this->m_ToFImageGrabber->SetIntProperty("RGBResolution", m_Controls->m_StructureParameterWidget->GetSelectedResolution());
+        this->m_ToFImageGrabber->SetIntProperty("DepthResolution", m_Controls->m_StructureParameterWidget->GetSelectedResolution());
       }
 
       //Activation of "PlayerMode". If the selectedCamera String contains "Player", we start the Player Mode
@@ -296,6 +304,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           this->m_Controls->m_PMDParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
           this->m_Controls->m_MESAParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
           this->m_Controls->m_KinectParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
+          this->m_Controls->m_StructureParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
 
           //Activating the respective widgets
           if (selectedCamera.contains("PMD"))
@@ -309,6 +318,10 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           else if (selectedCamera.contains("Kinect"))
           {
             this->m_Controls->m_KinectParameterWidget->ActivateAllParameters();
+          }
+          else if (selectedCamera.contains("Structure"))
+          {
+            this->m_Controls->m_StructureParameterWidget->ActivateAllParameters();
           }
           else
           {

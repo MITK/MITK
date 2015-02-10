@@ -1,5 +1,6 @@
 SET(CPP_FILES
   Qmitk/QmitkKinectParameterWidget.cpp
+  Qmitk/QmitkStructureSensorParameterWidget.cpp
   Qmitk/QmitkToFConnectionWidget.cpp
   Qmitk/QmitkToFPointSetWidget.cpp
   Qmitk/QmitkToFRecorderWidget.cpp
@@ -11,6 +12,7 @@ SET(CPP_FILES
 )
 SET(UI_FILES
   Qmitk/QmitkKinectParameterWidgetControls.ui
+  Qmitk/QmitkStructureSensorParameterWidgetControls.ui
   Qmitk/QmitkToFConnectionWidgetControls.ui
   Qmitk/QmitkToFPointSetWidgetControls.ui
   Qmitk/QmitkToFRecorderWidgetControls.ui
@@ -23,6 +25,7 @@ SET(UI_FILES
 
 SET(MOC_H_FILES
   Qmitk/QmitkKinectParameterWidget.h
+  Qmitk/QmitkStructureSensorParameterWidget.h
   Qmitk/QmitkToFConnectionWidget.h
   Qmitk/QmitkToFPointSetWidget.h
   Qmitk/QmitkToFRecorderWidget.h

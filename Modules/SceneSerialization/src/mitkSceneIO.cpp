@@ -200,6 +200,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 
   // test if index.xml exists
   // parse index.xml with TinyXML
+  m_WorkingDirectory = Poco::Path::transcode ( m_WorkingDirectory );
   TiXmlDocument document( m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml" );
   if (!document.LoadFile())
   {

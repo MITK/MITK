@@ -218,8 +218,24 @@ void QmitkPreprocessingView::DoFlipAxis()
         flipper->SetFlipAxes(flipAxes);
         flipper->Update();
 
+        mitk::GradientDirectionsProperty::GradientDirectionsContainerType::Pointer oldGradients = static_cast<mitk::GradientDirectionsProperty*>( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+        mitk::GradientDirectionsProperty::GradientDirectionsContainerType::Pointer newGradients = mitk::GradientDirectionsProperty::GradientDirectionsContainerType::New();
+
+        for (unsigned int i=0; i<oldGradients->Size(); i++)
+        {
+            mitk::GradientDirectionsProperty::GradientDirectionType g = oldGradients->GetElement(i);
+            mitk::GradientDirectionsProperty::GradientDirectionType newG = g;
+            if (flipAxes[0])
+                newG[0] *= -1;
+            if (flipAxes[1])
+                newG[1] *= -1;
+            if (flipAxes[2])
+                newG[2] *= -1;
+            newGradients->InsertElement(i, newG);
+        }
+
         mitk::Image::Pointer newImage = mitk::GrabItkImageMemory( flipper->GetOutput() );
-        newImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
+        newImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( newGradients ) );
         newImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
         newImage->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(image->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
         mitk::DiffusionPropertyHelper propertyHelper( newImage );

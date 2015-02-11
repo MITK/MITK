@@ -35,12 +35,9 @@ mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice(): mitk::TrackingDevi
   this->m_MultiThreader = itk::MultiThreader::New();
   m_ThreadID = 0;
 
-  //TODO: Implement
-}
+  m_OpenIGTLinkClient = mitk::IGTLClient::New();
+  m_OpenIGTLinkClient->SetName("OpenIGTLink Tracking Device");
 
-bool mitk::OpenIGTLinkTrackingDevice::IsDeviceInstalled()
-{
-  return true;
 }
 
 
@@ -48,6 +45,16 @@ mitk::OpenIGTLinkTrackingDevice::~OpenIGTLinkTrackingDevice()
 {
 }
 
+
+void mitk::OpenIGTLinkTrackingDevice::SetPortNumber(int portNumber)
+{
+  m_OpenIGTLinkClient->SetPortNumber(portNumber);
+}
+
+void mitk::OpenIGTLinkTrackingDevice::SetHostname(std::string hostname)
+{
+  m_OpenIGTLinkClient->SetHostname(hostname);
+}
 
 mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::AddTool( const char* toolName, const char* fileName )
 {

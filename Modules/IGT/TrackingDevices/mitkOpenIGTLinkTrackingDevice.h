@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIGTConfig.h>
 #include <mitkTrackingDevice.h>
 #include <mitkOpenIGTLinkTrackingTool.h>
+#include <mitkIGTLClient.h>
+#include <mitkIGTLDeviceSource.h>
+#include <mitkIGTLMessageToNavigationDataFilter.h>
 #include <itkMultiThreader.h>
 
 
@@ -40,10 +43,9 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    /**
-    * @returns Returns true if the MicronTracker is installed on this build (means activated in CMAKE). False if not.
-    */
-    virtual bool IsDeviceInstalled();
+    void SetPortNumber(int portNumber);
+
+    void mitk::OpenIGTLinkTrackingDevice::SetHostname(std::string hostname);
 
     /**
     * \brief Starts the tracking.
@@ -126,6 +128,13 @@ namespace mitk
     * \return Returns all tools of the tracking device.
     */
     std::vector<OpenIGTLinkTrackingTool::Pointer> GetAllTools();
+
+    //OpenIGTLink connection class
+    mitk::IGTLClient::Pointer m_OpenIGTLinkClient;
+
+    //OpenIGTLink pipeline
+    mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;
+    mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
 
 
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);

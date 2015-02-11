@@ -36,6 +36,7 @@ private:
 
   std::auto_ptr<IFileReader> m_SceneReader;
   std::auto_ptr<IFileReader> m_ObjReader;
+  std::auto_ptr<IFileReader> m_PlyReader;
 };
 
 }

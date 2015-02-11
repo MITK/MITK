@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ListenerView.h"
 #include "SelectionView.h"
 
-#include <QtPlugin>
-
 void org_mitk_example_gui_selectionserviceqt_Activator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(SelectionServiceQt, context)
@@ -36,8 +34,3 @@ void org_mitk_example_gui_selectionserviceqt_Activator::stop(ctkPluginContext* c
 {
   Q_UNUSED(context)
 }
-
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_example_gui_selectionserviceqt, org_mitk_example_gui_selectionserviceqt_Activator)
-#endif

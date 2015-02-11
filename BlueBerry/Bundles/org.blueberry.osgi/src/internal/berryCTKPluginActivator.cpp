@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkPluginFrameworkLauncher.h>
 
 #include <QCoreApplication>
-#include <QtPlugin>
-
 #include <QDebug>
 
 namespace berry {
@@ -61,7 +59,3 @@ ctkPluginContext* org_blueberry_osgi_Activator::getPluginContext()
 }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_blueberry_osgi, berry::org_blueberry_osgi_Activator)
-#endif

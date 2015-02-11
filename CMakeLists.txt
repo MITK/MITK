@@ -185,30 +185,12 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 # -----------------------------------------
 # Qt version related variables
 
-set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
-env_option(MITK_USE_QT "Use Nokia's Qt library" ON)
-set(MITK_DESIRED_QT_VERSION ${DESIRED_QT_VERSION})
+env_option(MITK_USE_QT "Use Qt library" ON)
 
 if(MITK_USE_QT)
-  # find the package at the very beginning, so that QT4_FOUND is available
-  if(DESIRED_QT_VERSION MATCHES 4)
-    set(MITK_QT4_MINIMUM_VERSION 4.7)
-    find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
-    set(MITK_USE_Qt4 TRUE)
-    set(MITK_USE_Qt5 FALSE)
-  endif()
-  if(DESIRED_QT_VERSION MATCHES 5)
-    set(MITK_QT5_MINIMUM_VERSION 5.0.0)
-    set(MITK_USE_Qt4 FALSE)
-    set(MITK_USE_Qt5 TRUE)
-    set(QT5_INSTALL_PREFIX "" CACHE PATH "The install location of Qt5")
-    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${QT5_INSTALL_PREFIX})
-    set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg WebKitWidgets Xml XmlPatterns UiTools)
-    find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
-  endif()
-else()
-  set(MITK_USE_Qt4 FALSE)
-  set(MITK_USE_Qt5 FALSE)
+  set(MITK_QT5_MINIMUM_VERSION 5.0.0)
+  set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg WebKitWidgets Xml XmlPatterns UiTools)
+  find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
 endif()
 
 # ------------------------------------------------------------------------
@@ -835,20 +817,16 @@ endif()
 
 # Qt support
 if(MITK_USE_QT)
-  if(DESIRED_QT_VERSION MATCHES 4)
-    find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
-  elseif(DESIRED_QT_VERSION MATCHES 5)
-    find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
-    get_target_property(_qmake_exec Qt5::qmake LOCATION)
-    execute_process(COMMAND ${_qmake_exec} -query QT_INSTALL_BINS
-      RESULT_VARIABLE _result
-      OUTPUT_VARIABLE QT_BINARY_DIR
-      ERROR_VARIABLE _error
-    )
-    string(STRIP "${QT_BINARY_DIR}" QT_BINARY_DIR)
-    if(_result OR NOT EXISTS "${QT_BINARY_DIR}")
-      message(FATAL_ERROR "Could not determine Qt binary directory: ${_result} ${QT_BINARY_DIR} ${_error}")
-    endif()
+  find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
+  get_target_property(_qmake_exec Qt5::qmake LOCATION)
+  execute_process(COMMAND ${_qmake_exec} -query QT_INSTALL_BINS
+    RESULT_VARIABLE _result
+     OUTPUT_VARIABLE QT_BINARY_DIR
+    ERROR_VARIABLE _error
+  )
+  string(STRIP "${QT_BINARY_DIR}" QT_BINARY_DIR)
+  if(_result OR NOT EXISTS "${QT_BINARY_DIR}")
+    message(FATAL_ERROR "Could not determine Qt binary directory: ${_result} ${QT_BINARY_DIR} ${_error}")
   endif()
 endif()
 

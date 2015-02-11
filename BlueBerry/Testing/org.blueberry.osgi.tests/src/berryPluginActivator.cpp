@@ -15,12 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <berryMacros.h>
-
 #include "berryPluginActivator.h"
-
 #include "berryOSGiCoreTestSuite.h"
-
-#include <QtPlugin>
 
 namespace berry {
 

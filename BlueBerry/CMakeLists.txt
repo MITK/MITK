@@ -24,9 +24,7 @@ endif()
 find_package(mbilog REQUIRED)
 include_directories(${mbilog_INCLUDE_DIRS})
 
-if(MITK_USE_Qt4)
-  find_package(Qt4 4.7 REQUIRED)
-else()
+if(MITK_USE_QT)
   find_package(Qt5Concurrent ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
   find_package(Qt5Help ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
   find_package(Qt5Sql ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
@@ -43,19 +41,19 @@ if(QT_QMAKE_CHANGED)
 endif()
 
 find_program(QT_HELPGENERATOR_EXECUTABLE
-  NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
+  NAMES qhelpgenerator qhelpgenerator-qt5 qhelpgenerator5
   PATHS ${QT_BINARY_DIR}
   NO_DEFAULT_PATH
 )
 
 find_program(QT_COLLECTIONGENERATOR_EXECUTABLE
-  NAMES qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator4
+  NAMES qcollectiongenerator qcollectiongenerator-qt5 qcollectiongenerator5
   PATHS ${QT_BINARY_DIR}
   NO_DEFAULT_PATH
 )
 
 find_program(QT_ASSISTANT_EXECUTABLE
-  NAMES assistant-qt4 assistant4 assistant
+  NAMES assistant-qt5 assistant5 assistant
   PATHS ${QT_BINARY_DIR}
   NO_DEFAULT_PATH
 )
@@ -104,10 +102,6 @@ endif(BLUEBERRY_USE_QT_HELP)
 
 if(BLUEBERRY_QT_HELP_REQUIRED AND NOT BLUEBERRY_USE_QT_HELP)
   message(FATAL_ERROR "BLUEBERRY_USE_QT_HELP is required to be set to ON")
-endif()
-
-if(MITK_USE_Qt4)
-  include(${QT_USE_FILE})
 endif()
 
 # =========  CTK specific CMake stuff ============

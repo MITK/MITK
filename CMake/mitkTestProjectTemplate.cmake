@@ -43,9 +43,6 @@ if(BUILD_TESTING)
     -DAwesomeProject_BUILD_ALL_APPS:BOOL=ON
     -G${CMAKE_GENERATOR}
     )
-  if(MITK_USE_Qt4)
-    list(APPEND configure_options -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE})
-  endif()
   if(CMAKE_PREFIX_PATH)
     list(APPEND configure_options -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH})
   endif()

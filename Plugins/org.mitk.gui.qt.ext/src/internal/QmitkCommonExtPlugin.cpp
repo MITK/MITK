@@ -37,7 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QProcess>
 #include <QMainWindow>
-#include <QtPlugin>
 #include <berryIPreferencesService.h>
 #include "berryPlatform.h"
 #include <QMessageBox>
@@ -244,7 +243,3 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
   }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_ext, QmitkCommonExtPlugin)
-#endif

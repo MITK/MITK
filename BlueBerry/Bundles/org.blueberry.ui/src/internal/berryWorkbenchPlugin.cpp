@@ -327,7 +327,3 @@ bool WorkbenchPlugin::GetDataPath(Poco::Path& path)
 }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_blueberry_ui, berry::WorkbenchPlugin)
-#endif

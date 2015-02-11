@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkIGTTutorialView.h"
 #include "QmitkIGTTrackingLabView.h"
 
-#include <QtPlugin>
-
 namespace mitk {
 
 void PluginActivator::start(ctkPluginContext* context)
@@ -33,7 +31,3 @@ void PluginActivator::stop(ctkPluginContext* context)
 }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_igtexamples, mitk::PluginActivator)
-#endif

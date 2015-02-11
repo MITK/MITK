@@ -14,12 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPluginActivator.h"
-
-
-#include <QtPlugin>
-
 #include "QmitkMITKIGTNavigationToolManagerView.h"
 #include "QmitkMITKIGTTrackingToolboxView.h"
 #include "QmitkNavigationDataPlayerView.h"
@@ -48,7 +43,3 @@ void PluginActivator::stop(ctkPluginContext* context)
 }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_igttracking, mitk::PluginActivator)
-#endif

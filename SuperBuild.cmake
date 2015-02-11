@@ -50,21 +50,6 @@ if(NOT PATCH_COMMAND)
 endif()
 
 #-----------------------------------------------------------------------------
-# Qt options for external projects and MITK
-#-----------------------------------------------------------------------------
-
-if(MITK_USE_QT)
-  set(qt_project_args -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION})
-else()
-  set(qt_project_args )
-endif()
-
-if(MITK_USE_Qt4)
-  list(APPEND qt_project_args
-       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE} )
-endif()
-
-#-----------------------------------------------------------------------------
 # ExternalProjects
 #-----------------------------------------------------------------------------
 
@@ -321,14 +306,6 @@ if(MITK_USE_Python)
       )
 endif()
 
-if(MITK_USE_QT)
-  if(DESIRED_QT_VERSION MATCHES "5")
-    list(APPEND mitk_optional_cache_args
-      -DQT5_INSTALL_PREFIX:PATH=${QT5_INSTALL_PREFIX}
-    )
-  endif()
-endif()
-
 set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}
@@ -376,7 +353,6 @@ ExternalProject_Add(${proj}
     -DMITK_WHITELIST:STRING=${MITK_WHITELIST}
     -DMITK_WHITELISTS_EXTERNAL_PATH:STRING=${MITK_WHITELISTS_EXTERNAL_PATH}
     -DMITK_WHITELISTS_INTERNAL_PATH:STRING=${MITK_WHITELISTS_INTERNAL_PATH}
-    ${qt_project_args}
     -DMITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_FLOATING_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}

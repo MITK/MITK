@@ -6,5 +6,5 @@ MACRO_CREATE_MITK_CTK_PLUGIN(
   MODULE_DEPENDS MitkQtWidgetsExt
   PACKAGE_DEPENDS
     PUBLIC  CTK|CTKWidgets
-    PRIVATE CTK|CTKCommandLineModulesFrontendQtGui+CTKCommandLineModulesBackendLocalProcess Qt4|QtUiTools Qt5|UiTools+XmlPatterns
+    PRIVATE CTK|CTKCommandLineModulesFrontendQtGui+CTKCommandLineModulesBackendLocalProcess Qt5|UiTools+XmlPatterns
 )

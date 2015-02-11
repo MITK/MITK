@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "EmptyView1.h"
 #include "EmptyView2.h"
 
-#include <QtPlugin>
-
 void org_mitk_example_gui_multipleperspectives_Activator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(MultiplePerspectives, context)
@@ -38,7 +36,3 @@ void org_mitk_example_gui_multipleperspectives_Activator::stop(ctkPluginContext*
 {
   Q_UNUSED(context)
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_example_gui_multipleperspectives, org_mitk_example_gui_multipleperspectives_Activator)
-#endif

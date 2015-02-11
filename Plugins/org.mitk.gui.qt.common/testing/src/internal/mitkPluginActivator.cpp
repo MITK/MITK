@@ -13,10 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+
 #include "mitkPluginActivator.h"
-
-#include <QtPlugin>
-
 #include "../QmitkQtCommonTestSuite.h"
 #include "../api/QmitkMockFunctionality.h"
 

@@ -14,15 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "berryPluginActivator.h"
-
 #include "berryUiTestSuite.h"
-
 #include "api/berryMockViewPart.h"
 #include "api/berrySaveableMockViewPart.h"
-
-#include <QtPlugin>
 
 namespace berry {
 

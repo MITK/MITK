@@ -20,7 +20,7 @@ if(NOT MITK_DIR)
   option(MITK_USE_ACVD "Use Approximated Centroidal Voronoi Diagrams" OFF)
   option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
   option(MITK_USE_DCMTK "Use DCMTK in MITK" ON)
-  option(MITK_USE_QT "Use Nokia's Qt library in MITK" ON)
+  option(MITK_USE_QT "Use Qt library in MITK" ON)
   option(MITK_USE_Boost "Use the Boost library in MITK" OFF)
   option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
   option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
@@ -33,7 +33,7 @@ if(NOT MITK_DIR)
 
   if(MITK_USE_CTK AND NOT MITK_USE_QT)
     message("Forcing MITK_USE_QT to ON because of MITK_USE_CTK")
-    set(MITK_USE_QT ON CACHE BOOL "Use Nokia's Qt library in MITK" FORCE)
+    set(MITK_USE_QT ON CACHE BOOL "Use Qt library in MITK" FORCE)
   endif()
 
   set(MITK_USE_CableSwig ${MITK_USE_Python})
@@ -61,10 +61,8 @@ if(NOT MITK_DIR)
     MITK_USE_Python
    )
 
-  if(MITK_USE_Qt4)
+  if(MITK_USE_QT)
     # Look for Qt at the superbuild level, to catch missing Qt libs early
-    find_package(Qt4 4.7 REQUIRED)
-  elseif(MITK_USE_Qt5)
     find_package(Qt5Widgets REQUIRED)
   endif()
 
@@ -133,10 +131,7 @@ if(NOT MITK_DIR)
   # Additional MITK CMake variables
   #-----------------------------------------------------------------------------
 
-  if(MITK_USE_Qt4 AND QT_QMAKE_EXECUTABLE)
-    list(APPEND additional_mitk_cmakevars "-DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}")
-  elseif(MITK_USE_Qt5)
-    list(APPEND additional_mitk_cmakevars "-DDESIRED_QT_VERSION:STRING=5")
+  if(MITK_USE_QT)
     list(APPEND additional_mitk_cmakevars "-DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}")
   endif()
 
@@ -213,15 +208,4 @@ else()
     message(FATAL_ERROR "VTK packages do not match:\n   ${MY_PROJECT_NAME}: ${my_vtk_dir}\n  MITK: ${VTK_DIR}")
   endif()
 
-  if(MITK_USE_Qt4)
-    set(my_qmake_executable ${QT_QMAKE_EXECUTABLE})
-
-    if(my_qmake_executable AND MITK_QMAKE_EXECUTABLE)
-      if(NOT my_qmake_executable STREQUAL ${MITK_QMAKE_EXECUTABLE})
-        message(FATAL_ERROR "Qt qmake does not match:\n   ${MY_PROJECT_NAME}: ${my_qmake_executable}\n  MITK: ${MITK_QMAKE_EXECUTABLE}")
-      endif()
-    endif()
-  endif()
-
 endif()
-

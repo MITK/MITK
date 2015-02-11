@@ -675,13 +675,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     mainWindow->addToolBar(mainActionsToolBar);
 
-#ifdef __APPLE__
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    mainWindow->setUnifiedTitleAndToolBarOnMac(true);
-    // default is false
-#endif
-#endif
-
     // ==== Window Menu ==========================
     QMenu* windowMenu = menuBar->addMenu("Window");
     if (showNewWindowMenuItem)

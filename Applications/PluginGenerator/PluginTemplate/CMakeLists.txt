@@ -1,6 +1,6 @@
 project($(plugin-target))
 
-if(MITK_USE_Qt5)
+if(MITK_USE_QT)
   find_package(Qt5OpenGL REQUIRED)
   find_package(Qt5Sql REQUIRED)
   find_package(Qt5Widgets REQUIRED)

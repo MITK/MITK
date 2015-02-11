@@ -26,9 +26,7 @@ class org_mitk_gui_qt_viewnavigator_Activator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
   Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_viewnavigator")
-#endif
   Q_INTERFACES(ctkPluginActivator)
 
 public:

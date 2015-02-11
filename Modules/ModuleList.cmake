@@ -13,7 +13,6 @@ set(mitk_modules
   MapperExt
   DICOMReader
   DICOMTesting
-  Qt4Qt5TestModule
   SceneSerializationBase
   PlanarFigure
   ImageDenoising

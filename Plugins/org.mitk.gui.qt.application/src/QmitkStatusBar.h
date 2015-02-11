@@ -37,7 +37,7 @@ class MITK_QT_APP QmitkStatusBar : public mitk::StatusBarImplementation
 {
 public:
 
-    mitkClassMacro(QmitkStatusBar, mitk::StatusBarImplementation);
+    mitkClassMacro(QmitkStatusBar, mitk::StatusBarImplementation)
 
     //##Documentation
     //##@brief Constructor;

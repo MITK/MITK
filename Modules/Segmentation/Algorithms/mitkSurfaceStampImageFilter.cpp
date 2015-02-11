@@ -128,14 +128,12 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
 
   vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
   BaseGeometry::Pointer geometry = surfaceTimeGeometry->GetGeometryForTimeStep( surfaceTimeStep );
-  //MLI TODO
-  //geometry->TransferItkToVtkTransform();
+
   transform->PostMultiply();
   transform->Concatenate(geometry->GetVtkTransform()->GetMatrix());
   // take image geometry into account. vtk-Image information will be changed to unit spacing and zero origin below.
   BaseGeometry::Pointer imageGeometry = imageTimeGeometry->GetGeometryForTimeStep(time);
-  //MLI TODO
-  //imageGeometry->TransferItkToVtkTransform();
+
   transform->Concatenate(imageGeometry->GetVtkTransform()->GetLinearInverse());
   transformFilter->SetTransform(transform);
   transformFilter->Update();

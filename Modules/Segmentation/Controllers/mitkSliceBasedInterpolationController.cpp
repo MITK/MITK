@@ -409,11 +409,12 @@ mitk::Image::Pointer mitk::SliceBasedInterpolationController::Interpolate(unsign
   //   inspect the original patient image at appropriate positions
 
   mitk::SegmentationInterpolationAlgorithm::Pointer algorithm = mitk::ShapeBasedInterpolationAlgorithm::New().GetPointer();
-  //MLI TODO
-  //algorithm->Interpolate( lowerMITKSlice.GetPointer(), lowerBound,
-  //                        upperMITKSlice.GetPointer(), upperBound,
-  //                        sliceIndex,
-  //                        resultImage);
+
+  algorithm->Interpolate( lowerMITKSlice.GetPointer(), lowerBound,
+                          upperMITKSlice.GetPointer(), upperBound,
+                          sliceIndex,
+                          0,
+                          resultImage);
 
   return resultImage;
 }

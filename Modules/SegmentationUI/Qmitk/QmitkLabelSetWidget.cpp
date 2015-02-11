@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include <QmitkDataStorageComboBox.h>
 #include <QmitkNewSegmentationDialog.h>
-// MLI Integration
+
 #include <QmitkSearchLabelDialog.h>
 
 // Qt
@@ -44,7 +44,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMenu>
 #include <QWidgetAction>
 #include <QColorDialog>
-// MLI TODO
 #include <QPushButton>
 
 // itk
@@ -402,14 +401,13 @@ void QmitkLabelSetWidget::OnEraseLabels(bool /*value*/)
     if ( ranges.isEmpty() )
     return;
 
-    std::vector<int> VectorOfLablePixelValues;
+    std::vector<mitk::Label::PixelType> VectorOfLablePixelValues;
     foreach (QTableWidgetSelectionRange a, ranges)
       for(int i = a.topRow(); i <= a.bottomRow(); i++)
         VectorOfLablePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i,0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
-    //MLI TODO
-    //GetWorkingImage()->EraseLabels(VectorOfLablePixelValues);
+    GetWorkingImage()->EraseLabels(VectorOfLablePixelValues);
     this->WaitCursorOff();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -427,14 +425,13 @@ void QmitkLabelSetWidget::OnRemoveLabels(bool /*value*/)
     if ( ranges.isEmpty() )
       return;
 
-    std::vector<int> VectorOfLablePixelValues;
+    std::vector<mitk::Label::PixelType> VectorOfLablePixelValues;
     foreach (QTableWidgetSelectionRange a, ranges)
       for(int i = a.topRow(); i <= a.bottomRow(); i++)
         VectorOfLablePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i,0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
-    //MLI TODO
-    //GetWorkingImage()->RemoveLabels(VectorOfLablePixelValues);
+    GetWorkingImage()->RemoveLabels(VectorOfLablePixelValues);
     this->WaitCursorOff();
   }
 
@@ -457,15 +454,15 @@ void QmitkLabelSetWidget::OnMergeLabels(bool /*value*/)
     if ( ranges.isEmpty() )
       return;
 
-    std::vector<int> VectorOfLablePixelValues;
+    std::vector<mitk::Label::PixelType> VectorOfLablePixelValues;
     foreach (QTableWidgetSelectionRange a, ranges)
       for(int i = a.topRow(); i <= a.bottomRow(); i++)
         VectorOfLablePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i,0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
     int pixelValue = m_Controls.m_LabelSetTableWidget->item(m_Controls.m_LabelSetTableWidget->currentRow(),0)->data(Qt::UserRole).toInt();
-    //MLI TODO
-    //GetWorkingImage()->MergeLabels(VectorOfLablePixelValues,pixelValue);
+
+    GetWorkingImage()->MergeLabels(VectorOfLablePixelValues,pixelValue);
     this->WaitCursorOff();
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -902,8 +899,7 @@ void QmitkLabelSetWidget::OnSearchLabel()
   this->WaitCursorOn();
   mitk::Point3D pos = GetWorkingImage()->GetLabel(pixelValue)->GetCenterOfMassCoordinates();
 
-  //MLI TODO
-  //m_ToolManager->WorkingDataModified.Send();
+  m_ToolManager->WorkingDataChanged();
 
   if (pos.GetVnlVector().max_value() > 0.0)
     emit goToLabel(pos);

@@ -798,11 +798,17 @@ namespace mitk
   void
     PlaneGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const
   {
+    //pt2d_mm is measured from the origin of the world geometry (at leats it called form BaseRendere::Mouse...Event)
     Point3D pt3d_units;
     pt3d_units[0]=pt2d_mm[0]/m_ScaleFactorMMPerUnitX;
     pt3d_units[1]=pt2d_mm[1]/m_ScaleFactorMMPerUnitY;
     pt3d_units[2]=0;
+    //pt3d_units is a continuos index. We divided it with the Scale Factor (= spacing in x and y) to convert it from mm to index units.
+    //
     pt3d_mm = GetIndexToWorldTransform()->TransformPoint(pt3d_units);
+    MITK_INFO << "ITWT der PlaneGeometry: ";
+    GetIndexToWorldTransform()->Print(std::cout);
+    //now we convert the 3d index to a 3D world point in mm. We could have used IndexToWorld as well as GetITW->Transform...
   }
 
   void

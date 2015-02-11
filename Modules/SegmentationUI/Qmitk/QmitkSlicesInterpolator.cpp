@@ -1028,6 +1028,7 @@ void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
     mitk::BaseRenderer* renderer = m_LastSNC->GetRenderer();
     if (renderer && renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)
     {
+      //TODO 18735: Hier wird immer null zurückgegeben, weil GetWorldGeometry ne BaseGeo zurück gibt?!?!?!
       const mitk::TimeGeometry* timeGeometry = dynamic_cast<const mitk::TimeGeometry*>( renderer->GetWorldGeometry() );
       if (timeGeometry)
       {

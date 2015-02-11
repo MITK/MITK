@@ -18,7 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QMessageBox"
 #include <qcoreapplication.h>
 #include "QFileDialog"
-#include "mitkLabelSetImageWriter.h"
+//MLI TODO
+//#include "mitkLabelSetImageWriter.h"
 #include "tinyxml.h"
 
 QmitkCreateMultiLabelPresetAction::QmitkCreateMultiLabelPresetAction()
@@ -35,7 +36,6 @@ void QmitkCreateMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer
   {
     if (referenceNode.IsNotNull())
     {
-
       mitk::LabelSetImage::Pointer referenceImage = dynamic_cast<mitk::LabelSetImage*>( referenceNode->GetData() );
       assert(referenceImage);
 
@@ -51,8 +51,8 @@ void QmitkCreateMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer
       QString filename = QFileDialog::getSaveFileName( NULL,"save file dialog",QString(),"LabelSet Preset(*.lsetp)");
       if ( filename.isEmpty() )
         return;
-
-      bool wasSaved = mitk::LabelSetImageWriter::SaveLabelSetImagePreset(filename.toStdString(),referenceImage);
+      //MLI TODO
+      bool wasSaved;// = mitk::LabelSetImageWriter::SaveLabelSetImagePreset(filename.toStdString(),referenceImage);
 
       if(!wasSaved)
       {

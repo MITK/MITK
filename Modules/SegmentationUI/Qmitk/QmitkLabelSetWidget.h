@@ -21,7 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ui_QmitkLabelSetWidgetControls.h>
 #include "mitkColorSequenceRainbow.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
+#include "mitkLabel.h"
 
 
 class QmitkDataStorageComboBox;
@@ -66,7 +67,7 @@ public slots:
 
   void ResetAllTableWidgetItems();
   void UpdateAllTableWidgetItems();
-  void SelectLabelByPixelValue(int pixelValue);
+  void SelectLabelByPixelValue(mitk::Label::PixelType pixelValue);
 
 private slots:
 
@@ -152,7 +153,6 @@ private:
     QStringList m_OrganColors;
 
     QStringList m_LabelStringList;
-
 };
 
 #endif

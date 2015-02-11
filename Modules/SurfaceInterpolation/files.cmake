@@ -3,4 +3,6 @@ set(CPP_FILES
   mitkCreateDistanceImageFromSurfaceFilter.cpp
   mitkReduceContourSetFilter.cpp
   mitkSurfaceInterpolationController.cpp
+#Added from ML
+  mitkSurfaceBasedInterpolationController.cpp
 )

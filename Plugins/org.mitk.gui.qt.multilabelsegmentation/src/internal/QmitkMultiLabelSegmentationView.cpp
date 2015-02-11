@@ -202,7 +202,6 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_btNextLayer->hide();
   m_Controls.m_btPreviousLayer->hide();
   m_Controls.m_cbActiveLayer->hide();
-
 }
 
 void QmitkMultiLabelSegmentationView::InitializeListeners()
@@ -244,8 +243,8 @@ bool QmitkMultiLabelSegmentationView::CheckForSameGeometry(const mitk::Image *im
 
   if (image1 && image2)
   {
-    mitk::Geometry3D* geo1 = image1->GetGeometry();
-    mitk::Geometry3D* geo2 = image2->GetGeometry();
+    mitk::BaseGeometry::Pointer geo1 = image1->GetGeometry();
+    mitk::BaseGeometry::Pointer geo2 = image2->GetGeometry();
 
     isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetOrigin(), geo2->GetOrigin());
     isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(0), geo2->GetExtent(0));
@@ -369,7 +368,8 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
 
     m_Controls.m_pbShowLabelTable->setChecked(workingImage->GetNumberOfLabels() > 1 /*1st is exterior*/);
 
-    m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithWorkingDataVisible);
+    //MLI TODO
+    //m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithWorkingDataVisible);
   }
 
   if(hasWorkingNode && hasReferenceNode)
@@ -738,7 +738,7 @@ void QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection()
   workingImage->GetActiveLabelSet()->AllLabelsModifiedEvent
       += mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::UpdateAllTableWidgetItems);
   workingImage->GetActiveLabelSet()->ActiveLabelEvent
-      += mitk::MessageDelegate1<QmitkLabelSetWidget,int>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::SelectLabelByPixelValue);
+      += mitk::MessageDelegate1<QmitkLabelSetWidget,mitk::Label::PixelType>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::SelectLabelByPixelValue);
 }
 
 
@@ -758,8 +758,7 @@ void QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection()
   workingImage->GetActiveLabelSet()->AllLabelsModifiedEvent
       -= mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::UpdateAllTableWidgetItems);
   workingImage->GetActiveLabelSet()->ActiveLabelEvent
-      -= mitk::MessageDelegate1<QmitkLabelSetWidget,int>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::SelectLabelByPixelValue);
-
+      -= mitk::MessageDelegate1<QmitkLabelSetWidget,mitk::Label::PixelType>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::SelectLabelByPixelValue);
 }
 
 void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode *node)

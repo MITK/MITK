@@ -1,6 +1,5 @@
 set(SRC_CPP_FILES
   QmitkMultiLabelSegmentationPreferencePage.cpp
-  QmitkLabelSetWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -32,12 +31,10 @@ set(UI_FILES
   src/internal/SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidgetControls.ui
   src/internal/SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidgetControls.ui
   src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidgetControls.ui
-  src/QmitkLabelSetWidgetControls.ui
 )
 
 set(MOC_H_FILES
   src/QmitkMultiLabelSegmentationPreferencePage.h
-  src/QmitkLabelSetWidget.h
   src/internal/mitkPluginActivator.h
   src/internal/QmitkMultiLabelSegmentationView.h
   src/internal/QmitkThresholdAction.h

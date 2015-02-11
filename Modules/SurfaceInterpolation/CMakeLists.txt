@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkAlgorithmsExt
+  DEPENDS MitkAlgorithmsExt MitkContourModel
   PACKAGE_DEPENDS Eigen
   WARNINGS_AS_ERRORS
 )

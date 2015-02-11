@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ui_QmitkImageMaskingWidgetControls.h>
 
 #include <mitkSurface.h>
+#include <mitkImage.h>
 
 /*!
   \brief QmitkImageMaskingWidget

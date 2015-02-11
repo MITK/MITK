@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include <QmitkDataStorageComboBox.h>
 #include <QmitkNewSegmentationDialog.h>
+// MLI Integration
 #include <QmitkSearchLabelDialog.h>
 
 // Qt
@@ -43,6 +44,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMenu>
 #include <QWidgetAction>
 #include <QColorDialog>
+// MLI TODO
+#include <QPushButton>
 
 // itk
 #include <itksys/SystemTools.hxx>
@@ -86,7 +89,6 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent)
   m_Controls.m_lblCaption->setText("");
 
   InitializeTableWidget();
-
 }
 
 QmitkLabelSetWidget::~QmitkLabelSetWidget()
@@ -354,12 +356,12 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
 
 void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
 {
-
   QmitkNewSegmentationDialog dialog(this);
   dialog.setWindowTitle("Rename Label");
   dialog.SetSuggestionList( m_OrganColors );
-  dialog.SetColor(GetWorkingImage()->GetActiveLabel()->GetColor());
-  dialog.SetSegmentationName(GetWorkingImage()->GetActiveLabel()->GetName());
+  //MLI TODO
+  //dialog.SetColor(GetWorkingImage()->GetActiveLabel()->GetColor());
+  //dialog.SetSegmentationName(GetWorkingImage()->GetActiveLabel()->GetName());
 
   if ( dialog.exec() == QDialog::Rejected ) return;
   int pixelValue = GetWorkingImage()->GetActiveLabel()->GetValue();
@@ -406,7 +408,8 @@ void QmitkLabelSetWidget::OnEraseLabels(bool /*value*/)
         VectorOfLablePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i,0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
-    GetWorkingImage()->EraseLabels(VectorOfLablePixelValues);
+    //MLI TODO
+    //GetWorkingImage()->EraseLabels(VectorOfLablePixelValues);
     this->WaitCursorOff();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -430,7 +433,8 @@ void QmitkLabelSetWidget::OnRemoveLabels(bool /*value*/)
         VectorOfLablePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i,0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
-    GetWorkingImage()->RemoveLabels(VectorOfLablePixelValues);
+    //MLI TODO
+    //GetWorkingImage()->RemoveLabels(VectorOfLablePixelValues);
     this->WaitCursorOff();
   }
 
@@ -460,7 +464,8 @@ void QmitkLabelSetWidget::OnMergeLabels(bool /*value*/)
 
     this->WaitCursorOn();
     int pixelValue = m_Controls.m_LabelSetTableWidget->item(m_Controls.m_LabelSetTableWidget->currentRow(),0)->data(Qt::UserRole).toInt();
-    GetWorkingImage()->MergeLabels(VectorOfLablePixelValues,pixelValue);
+    //MLI TODO
+    //GetWorkingImage()->MergeLabels(VectorOfLablePixelValues,pixelValue);
     this->WaitCursorOff();
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -589,7 +594,6 @@ void QmitkLabelSetWidget::OnItemClicked(QTableWidgetItem *item)
     OnActiveLabelChanged(pixelValue);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
-
 }
 
 void QmitkLabelSetWidget::OnItemDoubleClicked(QTableWidgetItem *item)
@@ -605,9 +609,8 @@ void QmitkLabelSetWidget::OnItemDoubleClicked(QTableWidgetItem *item)
   if (pos.GetVnlVector().max_value() > 0.0) emit goToLabel(pos);
 }
 
-void QmitkLabelSetWidget::SelectLabelByPixelValue(int pixelValue)
+void QmitkLabelSetWidget::SelectLabelByPixelValue(mitk::Label::PixelType pixelValue)
 {
-
   //MITK_INFO << "QmitkLabelSetWidget::SelectLabelByPixelValue " << pixelValue;
 
   if(!GetWorkingImage()->ExistLabel(pixelValue)) return;
@@ -704,7 +707,6 @@ void QmitkLabelSetWidget::InsertTableWidgetItem(mitk::Label * label)
 
   mitk::LabelSetImage * workingImage;
   if((workingImage = GetWorkingImage()) == NULL) return;
-
 }
 
 void QmitkLabelSetWidget::UpdateAllTableWidgetItems()
@@ -900,7 +902,8 @@ void QmitkLabelSetWidget::OnSearchLabel()
   this->WaitCursorOn();
   mitk::Point3D pos = GetWorkingImage()->GetLabel(pixelValue)->GetCenterOfMassCoordinates();
 
-  m_ToolManager->WorkingDataModified.Send();
+  //MLI TODO
+  //m_ToolManager->WorkingDataModified.Send();
 
   if (pos.GetVnlVector().max_value() > 0.0)
     emit goToLabel(pos);
@@ -948,7 +951,6 @@ void QmitkLabelSetWidget::UpdateControls()
 
   QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
   completeModel->setStringList(GetLabelStringList());
-
 }
 
 
@@ -1098,7 +1100,6 @@ void QmitkLabelSetWidget::OnCreateSmoothedSurface(bool /*triggered*/)
     MITK_ERROR << "Exception caught: " << e.GetDescription();
     QMessageBox::information(this, "Create Surface", "Could not create a surface mesh out of the selected label. See error log for details.\n");
   }
-
 }
 
 void QmitkLabelSetWidget::OnCreateDetailedSurface(bool /*triggered*/)
@@ -1137,7 +1138,6 @@ void QmitkLabelSetWidget::OnCreateDetailedSurface(bool /*triggered*/)
     MITK_ERROR << "Exception caught: " << e.GetDescription();
     QMessageBox::information(this, "Create Surface", "Could not create a surface mesh out of the selected label. See error log for details.\n");
   }
-
 }
 
 void QmitkLabelSetWidget::OnImportLabeledImage()
@@ -1246,4 +1246,3 @@ void QmitkLabelSetWidget::OnThreadedCalculationDone()
 {
   mitk::StatusBar::GetInstance()->Clear();
 }
-

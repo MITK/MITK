@@ -32,6 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ctkPluginContext* mitk::PluginActivator::m_Context = NULL;
 
+//MLI TODO
+US_INITIALIZE_MODULE //("MultiLabelSegmentation", "liborg_mitk_gui_qt_multilabelsegmentation")
+
 void mitk::PluginActivator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationView, context)
@@ -62,5 +65,3 @@ ctkPluginContext* mitk::PluginActivator::getContext()
 }
 
 Q_EXPORT_PLUGIN2(org_mitk_gui_qt_multilabelsegmentation, mitk::PluginActivator)
-
-US_INITIALIZE_MODULE("MultiLabelSegmentation", "liborg_mitk_gui_qt_multilabelsegmentation")

@@ -14,30 +14,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKIOEXTACTIVATOR_H
-#define MITKIOEXTACTIVATOR_H
 
-#include <usModuleActivator.h>
+#ifndef ObjFileReaderService_h
+#define ObjFileReaderService_h
 
-#include <memory>
+#include <mitkAbstractFileReader.h>
+#include <mitkIOMimeTypes.h>
 
 namespace mitk {
 
-struct IFileReader;
+  class BaseData;
 
-class IOExtActivator : public us::ModuleActivator
+class ObjFileReaderService : public AbstractFileReader
 {
 public:
 
-  void Load(us::ModuleContext*context);
-  void Unload(us::ModuleContext* context);
+  ObjFileReaderService();
+  virtual ~ObjFileReaderService();
+
+  using AbstractFileReader::Read;
+  virtual std::vector< itk::SmartPointer<BaseData> > Read();
+
+  static mitk::CustomMimeType mimeType;
 
 private:
 
-  std::auto_ptr<IFileReader> m_SceneReader;
-  std::auto_ptr<IFileReader> m_ObjReader;
+  ObjFileReaderService* Clone() const;
 };
 
-}
+} // namespace mitk
 
-#endif // MITKIOEXTACTIVATOR_H
+#endif /* ObjFileReaderService_h */

@@ -17,12 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOExtActivator.h"
 
 #include "mitkSceneFileReader.h"
+#include "mitkObjFileReaderService.h"
 
 namespace mitk {
 
 void IOExtActivator::Load(us::ModuleContext*)
 {
   m_SceneReader.reset(new SceneFileReader());
+  m_ObjReader.reset(new ObjFileReaderService());
 }
 
 void IOExtActivator::Unload(us::ModuleContext*)

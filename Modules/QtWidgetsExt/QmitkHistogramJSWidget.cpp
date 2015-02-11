@@ -99,8 +99,6 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
     m_Measurement.insert(i, measurement);
   }
 
-  m_Size = m_Histogram->GetSize(0); // we only handle one dimensional histograms
-
   m_IntensityProfile = false;
   this->SignalDataChanged();
 }
@@ -109,7 +107,6 @@ void QmitkHistogramJSWidget::ClearData()
 {
   m_Frequency.clear();
   m_Measurement.clear();
-  m_Size = 0;
 }
 
 void QmitkHistogramJSWidget::ClearHistogram()
@@ -242,8 +239,4 @@ bool QmitkHistogramJSWidget::GetIntensityProfile()
   return m_IntensityProfile;
 }
 
-double QmitkHistogramJSWidget::GetSize()
-{
-  return m_Size;
-}
 

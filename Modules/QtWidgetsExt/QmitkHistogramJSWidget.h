@@ -73,7 +73,7 @@ class MitkQtWidgetsExt_EXPORT QmitkHistogramJSWidget : public QWebView
   * @brief intensity profile property.
   *
   * This property is used in JavaScript as member of the current object.
-  * It holds a boolean, which sais wether to use an intensity profile or not.
+  * It holds a boolean, which says whether to use an intensity profile or not.
   * @see GetIntensityProfile()
   */
   Q_PROPERTY(bool intensityProfile
@@ -208,7 +208,6 @@ private:
 
   bool m_UseLineGraph;
   bool m_IntensityProfile;
-  double m_Size;
 
   /**
   * Holds the current histogram

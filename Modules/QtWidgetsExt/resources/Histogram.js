@@ -149,10 +149,6 @@ function updateHistogram()
  */
 function calcBinSize()
 {
-  window.alert(histogramData.size);
-
-  binSize = histogramData.size / histogramData.measurement.length;
-/*
   if (1 < histogramData.measurement.length)
   {
     min = d3.min(histogramData.measurement);
@@ -161,11 +157,8 @@ function calcBinSize()
   }
   else
   {
-    binsize = 10;
+    binSize = 10;
   }
-*/
-  //window.alert(min); window.alert(max); window.alert(histogramData.measurement.length);
-  //window.alert(binSize);
 }
 
 /*

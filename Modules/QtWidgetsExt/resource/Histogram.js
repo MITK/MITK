@@ -149,9 +149,16 @@ function updateHistogram()
  */
 function calcBinSize()
 {
-  min = d3.min(histogramData.measurement);
-  max = d3.max(histogramData.measurement);
-  binSize = ((max - min) / (histogramData.measurement.length));
+  if (1 < histogramData.measurement.length)
+  {
+    min = d3.min(histogramData.measurement);
+    max = d3.max(histogramData.measurement);
+    binSize = ((max - min) / (histogramData.measurement.length-1));
+  }
+  else
+  {
+    binSize = 10;
+  }
 }
 
 /*
@@ -367,6 +374,7 @@ function definition()
     .scale(xScale)
     .orient("bottom")
     .tickFormat(d3.format("s"));
+
 
   yAxis = d3.svg.axis()
     .scale(yScale)

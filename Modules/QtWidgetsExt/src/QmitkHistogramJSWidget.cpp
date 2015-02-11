@@ -98,6 +98,7 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
     m_Frequency.insert(i, frequency);
     m_Measurement.insert(i, measurement);
   }
+
   m_IntensityProfile = false;
   this->SignalDataChanged();
 }
@@ -237,4 +238,5 @@ bool QmitkHistogramJSWidget::GetIntensityProfile()
 {
   return m_IntensityProfile;
 }
+
 

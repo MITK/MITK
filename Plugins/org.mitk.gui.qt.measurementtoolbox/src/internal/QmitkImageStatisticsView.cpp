@@ -226,7 +226,7 @@ void QmitkImageStatisticsView::OnClipboardHistogramButtonClicked()
       it != histogram->End();
       ++it )
     {
-      if( m_Controls->m_HistogramBinSizeSpinbox->value() == 1)
+      if( m_Controls->m_HistogramBinSizeSpinbox->value() == 1.0)
       {
         clipboard = clipboard.append( "%L1 \t %L2\n" )
           .arg( it.GetMeasurementVector()[0], 0, 'f', 0 )

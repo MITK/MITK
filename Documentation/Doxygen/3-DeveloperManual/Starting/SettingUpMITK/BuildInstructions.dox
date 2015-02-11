@@ -136,14 +136,8 @@ CMake will present you a couple of options, these are the most important ones:
  - <tt><b>QT_QMAKE_EXECUTABLE</b></tt> The path to the qmake executable of your Qt
    installation
 
-You may also choose to build with either Qt4 or Qt5. When building with Qt5,
-the BlueBerry application framework and hence the MITK Workbench application
-will not be available. Further, many Qt-depdendent MITK modules have not been
-migrated to Qt5 yet. In case of Qt4 you may point CMake to a certain Qt4
-installation directory by setting the <tt>QT_QMAKE_EXECUTABLE</tt> variable.
-When building against Qt5, the following variables are important:
+When building against Qt5, the following variable are important:
 
- - <tt><b>DESIRED_QT_VERSION</b></tt> Set this to "5" for building with Qt5.
  - <tt><b>CMAKE_PREFIX_PATH</b></tt> If Qt5 is not found automatically, set
    this variable to the base directory of your Qt5 installation.
 

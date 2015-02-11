@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageToSurfaceFilter.h"
 #include "mitkImageTimeSelector.h"
+#include "vtkXMLPolyDataWriter.h"
 
 // Check whether the given contours are coplanar
 bool ContoursCoplanar(mitk::SurfaceInterpolationController::ContourPositionInformation leftHandSide, mitk::SurfaceInterpolationController::ContourPositionInformation rightHandSide)
@@ -194,7 +195,7 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
   timeSelector->Update();
   mitk::Image::Pointer refSegImage = timeSelector->GetOutput();
 
-  //m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);
+  //m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);//war vorher schon drin?
   m_NormalsFilter->SetSegmentationBinaryImage(refSegImage);//maybe leading to crash
   for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
   {
@@ -282,6 +283,32 @@ void mitk::SurfaceInterpolationController::Interpolate()
   //Setting up progress bar
   mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
 
+  mitk::Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
+  mitk::DataNode::Pointer distanceImageNode = mitk::DataNode::New();
+  distanceImageNode->SetData( distanceImage );
+  //m_DataStorage->Add( distanceImageNode );
+
+  int numContours = m_NormalsFilter->GetNumberOfOutputs();
+  vtkXMLPolyDataWriter* writer = vtkXMLPolyDataWriter::New();
+  //writer->SetDataModeToAscii();
+
+  for ( int i=0; i < numContours; ++i )
+  {
+    char fileDescr[1024];
+    sprintf( fileDescr, "Contour-%i.vtp", i );
+
+    std::string fileName = "C:/tmp/interpol/";
+    fileName.append( fileDescr );
+
+    mitk::Surface::Pointer contour = m_NormalsFilter->GetOutput( i );
+    writer->SetInputData( contour->GetVtkPolyData() );
+    writer->SetFileName( fileName.c_str() );
+    //writer->Write();
+    /*mitk::DataNode::Pointer contourNode = mitk::DataNode::New();
+    contourNode->SetData( contour );
+    m_DataStorage->Add( contourNode );*/
+  }
+
   // create a surface from the distance-image
   mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
   imageToSurfaceFilter->SetInput( m_InterpolateSurfaceFilter->GetOutput() );
@@ -289,12 +316,15 @@ void mitk::SurfaceInterpolationController::Interpolate()
   imageToSurfaceFilter->SetSmooth(true);
   imageToSurfaceFilter->SetSmoothIteration(20);
   imageToSurfaceFilter->Update();
-  m_InterpolationResult = imageToSurfaceFilter->GetOutput();
+
+  mitk::Surface::Pointer interpolationResult = mitk::Surface::New();
+  interpolationResult->SetVtkPolyData( imageToSurfaceFilter->GetOutput()->GetVtkPolyData(), m_CurrentTimeStep );
+  m_InterpolationResult = interpolationResult;
 
   vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
-  for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
+  for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].size(); i++)
   {
-    polyDataAppender->AddInputData(m_ListOfInterpolationSessions[m_SelectedSegmentation].at(i)[m_CurrentTimeStep].contour->GetVtkPolyData());
+    polyDataAppender->AddInputData(m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].at(i).contour->GetVtkPolyData());
   }
   polyDataAppender->Update();
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
@@ -630,14 +660,14 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation()
 
   unsigned int numTimeSteps = m_SelectedSegmentation->GetTimeSteps();
   m_ListOfInterpolationSessions[m_SelectedSegmentation].resize( numTimeSteps );
-  for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
-  {
-    unsigned int numContours = m_ListOfInterpolationSessions[m_SelectedSegmentation][i].size();
+  /*for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
+  {*/
+    unsigned int numContours = m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].size();
     for ( unsigned int c = 0; c < numContours; ++c )
     {
-      m_ReduceFilter->SetInput(i, m_ListOfInterpolationSessions[m_SelectedSegmentation][i][c].contour);
+      m_ReduceFilter->SetInput(c, m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour);
     }
-  }
+  //}
 
   m_ReduceFilter->Update();
 

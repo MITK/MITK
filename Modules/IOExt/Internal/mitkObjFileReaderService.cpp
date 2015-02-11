@@ -37,6 +37,7 @@ mitk::ObjFileReaderService::~ObjFileReaderService()
 
 std::vector< itk::SmartPointer<mitk::BaseData> > mitk::ObjFileReaderService::Read()
 {
+  MITK_INFO << "HAAAAALLLOOOOO";
   std::vector< itk::SmartPointer<BaseData> > result;
 
   vtkSmartPointer <vtkOBJReader> reader = vtkSmartPointer <vtkOBJReader>::New();

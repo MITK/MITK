@@ -1,9 +1,8 @@
 set(CPP_FILES
   Internal/mitkIOExtActivator.cpp
   Internal/mitkIOExtObjectFactory.cpp
-  Internal/mitkObjFileIOFactory.cpp
-  Internal/mitkObjFileReader.cpp
   Internal/mitkObjFileReaderService.cpp
+  Internal/mitkPlyFileReaderService.cpp
   Internal/mitkParRecFileIOFactory.cpp
   Internal/mitkParRecFileReader.cpp
   Internal/mitkSceneFileReader.cpp

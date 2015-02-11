@@ -30,12 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLabel>
 #include <QMessageBox>
 #include <QtCore/qconfig.h>
-#ifdef QT_WEBKIT
-#  include <QWebView>
-#  include <QWebPage>
-#  if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-#    include <QUrlQuery>
-#  endif
+#include <QWebView>
+#include <QWebPage>
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#  include <QUrlQuery>
 #endif
 #include <QString>
 #include <QStringList>
@@ -100,7 +98,6 @@ void QmitkDTIAtlasAppIntroPart::CreateQtPartControl(QWidget* parent)
     // create GUI widgets
     m_Controls = new Ui::QmitkWelcomeScreenViewControls;
     m_Controls->setupUi(parent);
-#ifdef QT_WEBKIT
 
     // create a QWebView as well as a QWebPage and QWebFrame within the QWebview
     m_view = new QWebView(parent);
@@ -112,14 +109,9 @@ void QmitkDTIAtlasAppIntroPart::CreateQtPartControl(QWidget* parent)
     // adds the webview as a widget
     parent->layout()->addWidget(m_view);
     this->CreateConnections();
-#else
-    parent->layout()->addWidget(new QLabel("<h1><center>Please install Qt with the WebKit option to see cool pictures!</center></h1>"));
-#endif
   }
 }
 
-#define QT_WEBKIT
-#ifdef QT_WEBKIT
 void QmitkDTIAtlasAppIntroPart::CreateConnections()
 {
   if ( m_Controls )
@@ -210,8 +202,6 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
         mitk::IOUtil::Load(fileName->toStdString(),*(dataStorage.GetPointer()));
       }
 
-
-
       if(dataStorage.IsNotNull() && dsmodified)
       {
         // get all nodes that have not set "includeInBoundingBox" to false
@@ -229,10 +219,6 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
           mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
         }
       }
-
-
-
-
 
     }
     // searching for the load
@@ -270,8 +256,6 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
   }
 
 }
-
-#endif
 
 void QmitkDTIAtlasAppIntroPart::StandbyStateChanged(bool standby)
 {

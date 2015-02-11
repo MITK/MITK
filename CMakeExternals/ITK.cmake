@@ -51,8 +51,8 @@ if(NOT DEFINED ITK_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.5.1-3e550bf8.tar.gz
-     URL_MD5 80e433ffc0e81cdc19a03dd02a3c329b
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.7.0-1d4dcc92.tar.gz
+     URL_MD5 d689ccb115d0a8278e9f2b93392c1df7
      # work with external GDCM
      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.5.1.patch
                    ${vcl_constexpr_patch}

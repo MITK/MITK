@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::PlyFileReaderService::PlyFileReaderService()
-  : AbstractFileReader(CustomMimeType(IOMimeTypes::STANFORD_PLY_MIMETYPE()), "Stanford Triangle Reader")
+  : AbstractFileReader(CustomMimeType(IOMimeTypes::STANFORD_PLY_MIMETYPE()), "Stanford Triangle PLY Reader")
 {
   this->RegisterService();
 }

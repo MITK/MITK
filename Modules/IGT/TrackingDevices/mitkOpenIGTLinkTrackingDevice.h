@@ -47,6 +47,10 @@ namespace mitk
 
     void mitk::OpenIGTLinkTrackingDevice::SetHostname(std::string hostname);
 
+    int GetPortNumber();
+
+    std::string GetHostname();
+
     /**
     * \brief Starts the tracking.
     * \return Returns true if the tracking is started. Throws an exception if an error occures.

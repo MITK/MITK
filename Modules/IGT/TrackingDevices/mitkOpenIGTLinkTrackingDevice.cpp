@@ -45,6 +45,16 @@ mitk::OpenIGTLinkTrackingDevice::~OpenIGTLinkTrackingDevice()
 {
 }
 
+int mitk::OpenIGTLinkTrackingDevice::GetPortNumber()
+{
+  return m_OpenIGTLinkClient->GetPortNumber();
+}
+
+std::string mitk::OpenIGTLinkTrackingDevice::GetHostname()
+{
+  return m_OpenIGTLinkClient->GetHostname();
+}
+
 
 void mitk::OpenIGTLinkTrackingDevice::SetPortNumber(int portNumber)
 {
@@ -115,7 +125,13 @@ mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::GetTool(unsigned int toolNu
 bool mitk::OpenIGTLinkTrackingDevice::OpenConnection()
 {
   bool returnValue = false;
-  //TODO: Implement
+  if (!m_OpenIGTLinkClient->TestConnection()) //TestConnection() not implemented yet!
+    {
+    MITK_WARN << "No connection available, aborting!";
+    return false;
+    }
+
+
   return returnValue;
 }
 

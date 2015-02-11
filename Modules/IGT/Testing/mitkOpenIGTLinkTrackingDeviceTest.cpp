@@ -26,6 +26,7 @@ class mitkOpenIGTLinkTrackingDeviceTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkOpenIGTLinkTrackingDeviceTestSuite);
   MITK_TEST(TestInstantiation);
+  MITK_TEST(TestSetConnectionParameters);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -37,6 +38,7 @@ public:
   /**@brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).*/
   void setUp()
   {
+    m_OpenIGTLinkTrackingDevice = mitk::OpenIGTLinkTrackingDevice::New();
   }
 
   void tearDown()
@@ -48,6 +50,14 @@ public:
   // let's create objects of our classes
   mitk::OpenIGTLinkTrackingDevice::Pointer testDevice = mitk::OpenIGTLinkTrackingDevice::New();
   CPPUNIT_ASSERT_MESSAGE("Testing instantiation of OpenIGTLinkTrackingDevice",testDevice.IsNotNull());
+  }
+
+  void TestSetConnectionParameters()
+  {
+    m_OpenIGTLinkTrackingDevice->SetHostname("localhost");
+    m_OpenIGTLinkTrackingDevice->SetPortNumber(10);
+    CPPUNIT_ASSERT_MESSAGE("Testing method SetHostname() ...", m_OpenIGTLinkTrackingDevice->GetHostname()=="localhost");
+    CPPUNIT_ASSERT_MESSAGE("Testing method SetPort() ...", m_OpenIGTLinkTrackingDevice->GetPortNumber()==10);
   }
 
 };

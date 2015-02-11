@@ -9,6 +9,3 @@ MACRO_CREATE_MITK_CTK_PLUGIN(
   PACKAGE_DEPENDS Qt4|QtWebKit Qt5|WebKitWidgets
 )
 
-if(QT_QTWEBKIT_FOUND)
-  add_definitions(-DQT_WEBKIT)
-endif(QT_QTWEBKIT_FOUND)

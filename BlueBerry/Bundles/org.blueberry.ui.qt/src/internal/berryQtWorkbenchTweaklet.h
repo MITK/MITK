@@ -30,7 +30,7 @@ class BERRY_UI_QT QtWorkbenchTweaklet : public QObject, public WorkbenchTweaklet
 
 public:
 
-  berryObjectMacro(QtWorkbenchTweaklet);
+  berryObjectMacro(QtWorkbenchTweaklet)
 
   QtWorkbenchTweaklet();
 

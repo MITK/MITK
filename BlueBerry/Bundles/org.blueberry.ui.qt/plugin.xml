@@ -77,7 +77,7 @@
           id="org.blueberry.ui.views.showView.secondaryId"
           name="Secondary Id"
           optional="true"/>
-    </command>
+     </command>
    </extension>
 
    <extension point="org.blueberry.ui.views">

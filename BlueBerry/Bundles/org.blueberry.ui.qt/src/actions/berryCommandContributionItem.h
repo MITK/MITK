@@ -143,8 +143,7 @@ public:
 
   bool IsVisible() const;
 
-  void UpdateCommandPropertiesInUI(const SmartPointer<
-    const CommandEvent>& commandEvent);
+  void UpdateCommandPropertiesInUI(const SmartPointer<const CommandEvent>& commandEvent);
 
 
 private:

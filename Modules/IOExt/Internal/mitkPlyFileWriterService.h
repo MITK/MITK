@@ -24,7 +24,10 @@ namespace mitk
 {
 
 /**
- * @brief
+ * @brief Used to write Surfaces to the PLY format.
+ *
+ * Currently, this writer uses the binary format as standard. Should the ASCII Format be required,
+ * it is suggested to incorporate Options.
  *
  * @ingroup IOExt
  */

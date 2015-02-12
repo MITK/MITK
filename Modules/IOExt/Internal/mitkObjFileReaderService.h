@@ -25,6 +25,12 @@ namespace mitk {
 
   class BaseData;
 
+
+  /**
+  * @brief Used to read surfaces from Wavefront OBJ files.
+  *
+  * @ingroup IOExt
+  */
 class ObjFileReaderService : public AbstractFileReader
 {
 public:

@@ -14,35 +14,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKIOEXTACTIVATOR_H
-#define MITKIOEXTACTIVATOR_H
 
-#include <usModuleActivator.h>
+#ifndef PlyFileWriterService_h
+#define PlyFileWriterService_h
 
-#include <memory>
+#include <mitkAbstractFileWriter.h>
 
-namespace mitk {
+namespace mitk
+{
 
-struct IFileReader;
-struct IFileWriter;
-
-class IOExtActivator : public us::ModuleActivator
+/**
+ * @brief
+ *
+ * @ingroup IOExt
+ */
+class PlyFileWriterService : public AbstractFileWriter
 {
 public:
 
-  void Load(us::ModuleContext*context);
-  void Unload(us::ModuleContext* context);
+  PlyFileWriterService();
+  virtual ~PlyFileWriterService();
+
+  using AbstractFileWriter::Write;
+  virtual void Write();
 
 private:
 
-  std::auto_ptr<IFileReader> m_SceneReader;
+  PlyFileWriterService(const PlyFileWriterService& other);
 
-  std::auto_ptr<IFileReader> m_ObjReader;
-  std::auto_ptr<IFileWriter> m_ObjWriter;
+  virtual mitk::PlyFileWriterService* Clone() const;
 
-  std::auto_ptr<IFileReader> m_PlyReader;
 };
 
 }
 
-#endif // MITKIOEXTACTIVATOR_H
+#endif

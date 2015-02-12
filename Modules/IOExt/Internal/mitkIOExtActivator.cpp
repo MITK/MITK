@@ -18,15 +18,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSceneFileReader.h"
 #include "mitkObjFileReaderService.h"
+#include "mitkPlyFileWriterService.h"
 #include "mitkPlyFileReaderService.h"
+
 
 namespace mitk {
 
 void IOExtActivator::Load(us::ModuleContext*)
 {
   m_SceneReader.reset(new SceneFileReader());
+
   m_ObjReader.reset(new ObjFileReaderService());
+
   m_PlyReader.reset(new PlyFileReaderService());
+  m_ObjWriter.reset(new PlyFileWriterService());
 }
 
 void IOExtActivator::Unload(us::ModuleContext*)

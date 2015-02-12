@@ -2,6 +2,7 @@ set(CPP_FILES
   Internal/mitkIOExtActivator.cpp
   Internal/mitkIOExtObjectFactory.cpp
   Internal/mitkObjFileReaderService.cpp
+  Internal/mitkPlyFileWriterService.cpp
   Internal/mitkPlyFileReaderService.cpp
   Internal/mitkParRecFileIOFactory.cpp
   Internal/mitkParRecFileReader.cpp

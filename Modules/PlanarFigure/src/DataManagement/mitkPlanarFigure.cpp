@@ -30,7 +30,8 @@ mitk::PlanarFigure::PlanarFigure()
   m_PolyLineUpToDate(false),
   m_HelperLinesUpToDate(false),
   m_FeaturesUpToDate(false),
-  m_FeaturesMTime( 0 )
+  m_FeaturesMTime( 0 ),
+  m_ImageNode(0)
 {
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
 
@@ -60,7 +61,8 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
     m_FeaturesUpToDate(other.m_FeaturesUpToDate),
     m_Features(other.m_Features),
     m_FeaturesMTime(other.m_FeaturesMTime),
-    m_DisplaySize(other.m_DisplaySize)
+    m_DisplaySize(other.m_DisplaySize),
+    m_ImageNode(other.m_ImageNode)
 {
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
   for( unsigned long i=0; i<other.m_HelperPolyLinesToBePainted->Size(); ++i )

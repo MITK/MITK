@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyLine.h>
+#include <vtkPolygon.h>
 
 mitk::PlanarFigureVtkMapper3D::LocalStorage::LocalStorage()
   : m_Actor(vtkSmartPointer<vtkActor>::New()),
@@ -36,8 +37,10 @@ mitk::PlanarFigureVtkMapper3D::LocalStorage::~LocalStorage()
 {
 }
 
-void mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(DataNode*, BaseRenderer*, bool)
+void mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(DataNode* node, BaseRenderer*, bool)
 {
+    node->AddProperty( "planarfigure.3drendering",mitk::BoolProperty::New(false));
+    node->AddProperty( "planarfigure.3drendering.fill",mitk::BoolProperty::New(false));
 }
 
 mitk::PlanarFigureVtkMapper3D::PlanarFigureVtkMapper3D()
@@ -103,6 +106,9 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
   if (node == NULL)
     return;
 
+  bool fill3d = false;
+  node->GetBoolProperty("planarfigure.3drendering.fill", fill3d);
+
   PlanarFigure* planarFigure = dynamic_cast<PlanarFigure*>(node->GetData());
 
   if (planarFigure == NULL || !planarFigure->IsPlaced())
@@ -128,12 +134,16 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
 
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+    vtkSmartPointer<vtkCellArray> polygons = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType baseIndex = 0;
 
     for (size_t i = 0; i < numPolyLines; ++i)
     {
       PolyLine polyLine = planarFigure->GetPolyLine(i);
       vtkIdType numPoints = polyLine.size();
+
+
+      vtkSmartPointer<vtkPolygon> polygon = vtkSmartPointer<vtkPolygon>::New();
 
       if (numPoints < 2)
         continue;
@@ -145,6 +155,9 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
         Point3D point;
         planeGeometry->Map(*polyLineIt, point);
         points->InsertNextPoint(point.GetDataPointer());
+
+        vtkIdType id = polygon->GetPoints()->InsertNextPoint(point[0], point[1], point[2] );
+        polygon->GetPointIds()->InsertNextId(id);
       }
 
       vtkSmartPointer<vtkPolyLine> line = vtkSmartPointer<vtkPolyLine>::New();
@@ -153,6 +166,7 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
 
       if (planarFigure->IsClosed() && numPoints > 2)
       {
+        polygons->InsertNextCell(polygon);
         pointIds->SetNumberOfIds(numPoints + 1);
         pointIds->SetId(numPoints, baseIndex);
       }
@@ -172,6 +186,8 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
     vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
     polyData->SetPoints(points);
     polyData->SetLines(cells);
+    if (fill3d)
+      polyData->SetPolys(polygons);
 
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->SetInputData(polyData);

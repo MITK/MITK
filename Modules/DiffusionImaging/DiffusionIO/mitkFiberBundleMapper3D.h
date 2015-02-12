@@ -93,6 +93,8 @@ private:
     float   m_TubeRadius;
     int     m_TubeSides;
     int     m_LineWidth;
+    float   m_RibbonWidth;
+    bool    m_Lighting;
 };
 
 } // end namespace mitk

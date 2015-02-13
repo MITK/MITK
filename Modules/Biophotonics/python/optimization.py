@@ -15,9 +15,11 @@ from matplotlib           import cm
 
 import setupData
 
+
+#%% load data
+
 dataFolder = "data/output/"
 
-# load data
 trainingParameters, trainingReflectances, testParameters, testReflectances = \
     setupData.setupTwoDimensionalData(dataFolder)
 
@@ -25,10 +27,15 @@ trainingParameters, trainingReflectances, testParameters, testReflectances = \
 BVFs = np.unique(trainingParameters[:,0])
 Vss  = np.unique(trainingParameters[:,1])
 
+
+#%% build optimization function from rectangular reflectance grid
+
 reflectanceGrid3D = np.reshape(trainingReflectances, (len(BVFs), len(Vss), trainingReflectances.shape[1]))
 
 functionToMinimize = ReflectanceError(BVFs, Vss, reflectanceGrid3D)
 
+
+#%% do optimization
 
 absErrors = np.zeros_like(testParameters)
 
@@ -44,11 +51,7 @@ for idx, (testParameter, testReflectance) in enumerate(zip(testParameters, testR
     absErrors[idx,:] = np.abs([estimatedBVF, estimatedVs] - testParameter)
 
 
-
-# plot
-
-
-
+#%% test
 
 print("error distribution BVF, Volume fraction")
 print("median: " + str(np.median(absErrors, axis=0)))
@@ -57,6 +60,7 @@ print("higher quartile: " + str(np.percentile(absErrors, 75, axis=0)))
 
 
 
+#%% test routines, put these in a unit test asap!
 if __name__ == "__main__":
 
     rbs = RectBivariateSpline(BVFs,
@@ -135,7 +139,7 @@ if __name__ == "__main__":
 
     # check if grid interpolation looks good.
     #%%
-    grid_x, grid_y = np.mgrid[0.01:0.1:100j, 0.04:0.6:100j]
+    grid_x, grid_y = np.mgrid[min(BVFs):max(BVFs):100j, min(Vss):max(Vss):100j]
     grid_z = rbs.ev(grid_x, grid_y)
 
     fig = plt.figure(0)

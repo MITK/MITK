@@ -25,6 +25,18 @@ outfolderMC = 'outputMC/'
 outfolderRS = 'outputRS/'
 
 
+# the input file without the run specific parameters for ua, us and d:
+infileString = 'data/colonTemplate.mci'
+infile       = open(infileString)
+# the output folder for the mc simulations
+# attention: this is relative to your gpumcml path!
+outfolderMC ='outputMC/'
+# the output folder for the reflectance spectra
+outfolderRS = 'data/output/'
+gpumcmlDirectory = '/home/wirkert/workspace/monteCarlo/gpumcml/fast-gpumcml/'
+gpumcmlExecutable = 'gpumcml.sm_20'
+
+
 BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = setup.setupNormalSimulation()
 
 nrSimulations = 100
@@ -39,7 +51,7 @@ start = time.time()
 
 
 for i in range(nrSimulations):
-    j = 0
+
     print('starting simulation ' + str(i) + ' of ' + str(nrSimulations))
 
     BVF = random.uniform(min(BVFs), max(BVFs))
@@ -51,12 +63,12 @@ for i in range(nrSimulations):
     parameters[i,:] = np.array([BVF, Vs])#, d, r, SaO2])
 
 
-    for wavelength in wavelengths:
+    for j, wavelength in enumerate(wavelengths):
 
 
         reflectanceValue = mch.runOneSimulation(
             wavelength, eHbO2, eHb,
-            infile, outfolderMC,
+            infile, outfolderMC, gpumcmlDirectory, gpumcmlExecutable,
             BVF, Vs, d,
             r, SaO2,
             Fwhm = FWHM, nrPhotons=photons)
@@ -66,7 +78,6 @@ for i in range(nrSimulations):
 
         # here, summarize result from wavelength in reflectance spectrum
         reflectances[i, j] = reflectanceValue
-        j +=1
 
 
 

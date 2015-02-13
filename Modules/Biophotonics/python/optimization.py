@@ -13,15 +13,6 @@ from reflectanceError import ReflectanceError
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
-import setupSimulation as setup
-
-
-
-#BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = setup.setupNormalSimulation()
-
-
-
-
 
 dataFolder = "outputRS/"
 
@@ -57,11 +48,6 @@ for idx, (testParameter, testReflectance) in enumerate(zip(testParameters, testR
     # todo: sort out this ugly mess of flipping Vss and BVFs!
     estimatedVs = np.clip(minimization.x[0], min(Vss), max(Vss))
     estimatedBVF= np.clip(minimization.x[1], min(BVFs), max(BVFs))
-
-    print (str(idx) + ": estimated: " + str([[estimatedBVF, estimatedVs]]) + " expected: " + str(testParameter))
-    print (str(testReflectance))
-    print (" match error: " + str(functionToMinimize.f(minimization.x)) + \
-           " real error:  " + str(functionToMinimize.f([testParameter[1], testParameter[0]])))
 
     absErrors[idx,:] = np.abs([estimatedBVF, estimatedVs] - testParameter)
 

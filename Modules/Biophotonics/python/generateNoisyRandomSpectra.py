@@ -14,15 +14,16 @@ import numpy as np
 import monteCarloHelper as mch
 import setupSimulation as setup
 
-
 # the input file without the run specific parameters for ua, us and d:
-infileString = 'input/darmpythontest.mci'
+infileString = 'data/colonTemplate.mci'
 infile       = open(infileString)
 # the output folder for the mc simulations
-outfolderMC = 'outputMC/'
+# attention: this is relative to your gpumcml path!
+outfolderMC ='outputMC/'
 # the output folder for the reflectance spectra
-outfolderRS = 'outputRS/'
-
+outfolderRS = 'data/output/'
+gpumcmlDirectory = '/home/wirkert/workspace/monteCarlo/gpumcml/fast-gpumcml/'
+gpumcmlExecutable = 'gpumcml.sm_20'
 
 BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = setup.setupNormalSimulation()
 
@@ -39,7 +40,7 @@ start = time.time()
 
 
 for i in range(nrSimulations):
-    j = 0
+
     print('starting simulation ' + str(i) + ' of ' + str(nrSimulations))
 
     BVF = random.uniform(min(BVFs), max(BVFs))
@@ -57,11 +58,11 @@ for i in range(nrSimulations):
     parameters[i,:] = np.array([BVF, Vs, d, r, SaO2, sm_BVF, sm_Vs, sm_SaO2])
 
 
-    for wavelength in wavelengths:
+    for j, wavelength in enumerate(wavelengths):
 
         reflectanceValue = mch.runOneSimulation(
             wavelength, eHbO2, eHb,
-            infile, outfolderMC,
+            infile, outfolderMC, gpumcmlDirectory, gpumcmlExecutable,
             BVF, Vs, d,
             r, SaO2,
             submucosa_BVF=sm_BVF, submucosa_Vs=sm_Vs, submucosa_SaO2=sm_SaO2,
@@ -72,7 +73,6 @@ for i in range(nrSimulations):
 
         # here, summarize result from wavelength in reflectance spectrum
         reflectances[i, j] = reflectanceValue
-        j +=1
 
 
 

@@ -81,7 +81,7 @@ def normalizeImageQuotient(data, iqBand=0):
 
 
 def runOneSimulation(wavelength, eHbO2, eHb,
-                     infile, simulationOutputFolderName, gpumcmlDirectory, gpymcmlExecutable,
+                     infile, simulationOutputFolderName, gpumcmlDirectory, gpumcmlExecutable,
                      BVF=0.1, Vs=0.4, d=500 * 10**-6,
                      r=0.4 * 10**-6, SaO2=0.7, cHb=120,
                      submucosa_BVF=0.1, submucosa_Vs=0.3, submucosa_SaO2=0.7,
@@ -137,7 +137,7 @@ def runOneSimulation(wavelength, eHbO2, eHb,
     createSimulationFile(infile, replacements,
                          "data/output/simulationFile.mci")
 
-    args = ("./" + gpymcmlExecutable, "-A", os.getcwd() + "/data/output/simulationFile.mci")
+    args = ("./" + gpumcmlExecutable, "-A", os.getcwd() + "/data/output/simulationFile.mci")
 
     with cd(gpumcmlDirectory):
         popen = subprocess.Popen(args, stdout=subprocess.PIPE)

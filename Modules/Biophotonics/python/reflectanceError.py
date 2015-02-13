@@ -13,7 +13,7 @@ class ReflectanceError:
     calculate the fit error of a given reflectance and examples of reflectances.
     """
 
-    def __init__(self, Vss, BVFs, reflectances):
+    def __init__(self, BVFs, Vss, reflectances):
         """
         intialize the reflectance error calculation.
 
@@ -32,8 +32,8 @@ class ReflectanceError:
         self.RBSs = np.empty(nr_wavelengths, dtype=object)
 
         for i in np.arange(nr_wavelengths):
-            self.RBSs[i] = RectBivariateSpline(Vss,
-                  BVFs,
+            self.RBSs[i] = RectBivariateSpline(BVFs,
+                  Vss,
                   reflectances[:,:,i])
 
     def setReflectanceToMatch(self, reflectance):

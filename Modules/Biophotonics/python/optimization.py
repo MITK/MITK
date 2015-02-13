@@ -27,29 +27,21 @@ testReflectances = np.load(dataFolder + "2015February1107:43PMreflectancesRandom
 BVFs = np.unique(trainingParameters[:,0])
 Vss  = np.unique(trainingParameters[:,1])
 
-reflectanceGrid3D = np.reshape(trainingReflectances, (len(Vss), len(BVFs), trainingReflectances.shape[1]), order='F')
+reflectanceGrid3D = np.reshape(trainingReflectances, (len(BVFs), len(Vss), trainingReflectances.shape[1]))
 
-functionToMinimize = ReflectanceError(Vss, BVFs, reflectanceGrid3D)
+functionToMinimize = ReflectanceError(BVFs, Vss, reflectanceGrid3D)
 
 
 absErrors = np.zeros_like(testParameters)
 
-functionToMinimize.setReflectanceToMatch(trainingReflectances[0,:])
-absError = minimize(functionToMinimize.f, [0.3, 0.05], method="Nelder-Mead")
-#absError = minimize(functionToMinimize.f, [0.04, 0.3], method="BFGS", jac=functionToMinimize.df)
-
-print(" function evaluation yields: " + str(absError.x) + " with absolute error: " + str(functionToMinimize.f(absError.x)))
-print(" expected evaluation result: " + str([0.04, 0.01]) + " real result error: " + str(functionToMinimize.f([0.04, 0.01])))
-
 
 for idx, (testParameter, testReflectance) in enumerate(zip(testParameters, testReflectances)):
     functionToMinimize.setReflectanceToMatch(testReflectance)
-    minimization = minimize(functionToMinimize.f, [0.3, 0.05], method="Nelder-Mead")
+    minimization = minimize(functionToMinimize.f, [0.05, 0.3], method="Nelder-Mead")
     # interpolation extrapolates with constant values. Since the minimization function is
     # covex, we can just crop it to the bounds
-    # todo: sort out this ugly mess of flipping Vss and BVFs!
-    estimatedVs = np.clip(minimization.x[0], min(Vss), max(Vss))
-    estimatedBVF= np.clip(minimization.x[1], min(BVFs), max(BVFs))
+    estimatedBVF= np.clip(minimization.x[0], min(BVFs), max(BVFs))
+    estimatedVs = np.clip(minimization.x[1], min(Vss), max(Vss))
 
     absErrors[idx,:] = np.abs([estimatedBVF, estimatedVs] - testParameter)
 
@@ -69,31 +61,32 @@ print("higher quartile: " + str(np.percentile(absErrors, 75, axis=0)))
 
 if __name__ == "__main__":
 
-    rbs = RectBivariateSpline(Vss,
-                              BVFs,
-                              np.reshape(trainingReflectances[:,0],(100,100)).T)
+    rbs = RectBivariateSpline(BVFs,
+                              Vss,
+                              np.reshape(trainingReflectances[:,0],(100,100)))
 
 
-    rbsFrom3DGrid = RectBivariateSpline(Vss,
-                          BVFs,
+
+    rbsFrom3DGrid = RectBivariateSpline(BVFs,
+                          Vss,
                           reflectanceGrid3D[:,:,0])
 
     print("check if reflectance grid is build correctly. Reflectance at " + \
-        "(0.29442218, 0.04258016): " + str(rbs( 0.29442218, 0.04258016 , dx=0)) + "; expected " + str(654.222))
+        "(0.04258016, 0.29442218): " + str(rbs( 0.04258016 , 0.29442218, dx=0)) + "; expected " + str(654.222))
 
     print("check if reflectance grid is build correctly. Reflectance at " + \
-        "(0.60, 0.1): " + str(rbs( 0.6, 0.1 , dx=0)) + "; expected " + str(818.945))
+        "(0.1, 0.60): " + str(rbs( 0.1 , 0.6, dx=0)) + "; expected " + str(818.945))
 
     print("check if reflectance grid is build correctly. Reflectance at " + \
-        "(0.60, 0.01): " + str(rbs( 0.6, 0.01 , dx=0)) + "; expected " + str(1120.118))
+        "(0.01, 0.60): " + str(rbs(0.01 , 0.6,  dx=0)) + "; expected " + str(1120.118))
 
 
     print("check if reflectance grid is build correctly. Reflectance at " + \
-        "(0.041, 0.0112): " + str(rbsFrom3DGrid(0.041,0.0112, dx=0)) + "; expected " + str(rbs(0.041,0.0112, dx=0)))
+        "(0.0112, 0.041): " + str(rbsFrom3DGrid(0.0112, 0.041, dx=0)) + "; expected " + str(rbs(0.0112, 0.041, dx=0)))
 
-    reflectanceError = ReflectanceError(Vss, BVFs, reflectanceGrid3D)
+    reflectanceError = ReflectanceError(BVFs, Vss, reflectanceGrid3D)
 
-    # reflectance at point (0.149, 0.062)
+    # reflectance at point (0.062, 0.149)
     exampleReflectance = [ 312.09769118,  327.67866117,  336.20970583,  343.10626114,
         344.77202411,  322.68062559,  280.01722363,  265.45441892,
         292.59760112,  294.58676191,  256.88475134,  296.10442177,
@@ -104,12 +97,12 @@ if __name__ == "__main__":
     reflectanceError.setReflectanceToMatch(exampleReflectance)
 
     print("check if reflectance error value is correctly computed. Expected: 0, actual: " +
-        str(reflectanceError.f([1.149252955326078018e-01,    6.191087469731736126e-02])))
+        str(reflectanceError.f([6.191087469731736126e-02, 1.149252955326078018e-01])))
 
     print("check if derivate of reflectance error value is correctly computed. Expected: close to [0,0], actual: " +
-        str(reflectanceError.df([1.149252955326078018e-01,    6.191087469731736126e-02])))
+        str(reflectanceError.df([6.191087469731736126e-02, 1.149252955326078018e-01])))
 
-    # reflectance at point (0.6, 0.01)
+    # reflectance at point (0.01, 0.6)
     exampleReflectance2 = [1.120118468811987896e+03,    1.131318509608477598e+03,
                            1.137543168078165081e+03,    1.141159082538952589e+03,
                            1.139712500764461311e+03,    1.120915174518419235e+03,
@@ -126,10 +119,19 @@ if __name__ == "__main__":
     reflectanceError.setReflectanceToMatch(exampleReflectance2)
 
     print("check if reflectance error value is correctly computed (second one). Expected: 0, actual: " +
-        str(reflectanceError.f([0.6, 0.01])))
+        str(reflectanceError.f([0.01, 0.6])))
 
     print("check if derivate of reflectance error value is correctly computed (second one). Expected: close to [0,0], actual: " +
-        str(reflectanceError.df([0.6, 0.01])))
+        str(reflectanceError.df([0.01, 0.6])))
+
+
+    functionToMinimize.setReflectanceToMatch(trainingReflectances[0,:])
+    absError = minimize(functionToMinimize.f, [0.05, 0.3], method="Nelder-Mead")
+    #absError = minimize(functionToMinimize.f, [0.05, 0.3], method="BFGS", jac=functionToMinimize.df)
+
+    print(" function evaluation yields: " + str(absError.x) + " (unclipped) with absolute error: " + str(functionToMinimize.f(absError.x)))
+    print(" expected evaluation result: " + str([0.01, 0.04]) + " real result error: " + str(functionToMinimize.f([0.01, 0.04])))
+
 
 
 

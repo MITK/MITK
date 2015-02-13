@@ -7,16 +7,15 @@ Created on Fri Feb  6 10:49:45 2015
 
 
 import numpy as np
-import monteCarloHelper as mch
 import matplotlib.pyplot as plt
-from sklearn import tree
+from sklearn          import tree
 from sklearn.ensemble import RandomForestRegressor
 
+import setupData
 
-# todo we:
-# 2. optimization
 
-# what to find out in this study:
+
+# additional things that could be checked in this study:
 # 1. band selection results
 # 2. effect of normalizations
 # 3. parameter study
@@ -29,19 +28,9 @@ from sklearn.ensemble import RandomForestRegressor
 dataFolder = 'data/output/'
 
 # load data
-trainingParameters   = np.load(dataFolder + "2015February0511:02PMparamters2D.npy")
-trainingReflectances = np.load(dataFolder + "2015February0511:02PMreflectances2D.npy")
+trainingParameters, trainingReflectances, testParameters, testReflectances = \
+    setupData.setupTwoDimensionalData(dataFolder)
 
-testParameters   = np.load(dataFolder + "2015February1107:43PMparamtersRandom2D.npy")
-testReflectances = np.load(dataFolder + "2015February1107:43PMreflectancesRandom2D.npy")
-
-
-
-# normalize data
-#trainingReflectances = trainingReflectances[:,[0, 1, 4, 9, 11, 13, 18, 22]]
-#trainingReflectances = trainingReflectances[:,[  0,   3,   6,   9,  12,  15,  18,  22]]
-#trainingReflectances = trainingReflectances[:,[  0,   1,   2,   3,  4,  5,  6,  7]]
-trainingReflectances = mch.normalizeImageQuotient(trainingReflectances, iqBand=4)
 
 #%% train forest
 
@@ -53,11 +42,6 @@ rf.fit(trainingReflectances, trainingParameters)
 
 #%% test
 
-
-#testReflectances = testReflectances[:,[0, 1, 4, 9, 11, 13, 18, 22]]
-#testReflectances = testReflectances[:,[  0,   3,   6,   9,  12,  15,  18,  22]]
-#testReflectances = testReflectances[:,[0, 1, 2, 3, 4, 5, 6, 7]]
-testReflectances = mch.normalizeImageQuotient(testReflectances, iqBand=4)
 
 # predict test reflectances and get absolute errors.
 absErrors = np.abs(rf.predict(testReflectances) - testParameters)

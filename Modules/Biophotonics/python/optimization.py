@@ -5,23 +5,21 @@ Created on Sat Feb 07 23:42:41 2015
 @author: Seb
 """
 
-from scipy.interpolate import RectBivariateSpline
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import minimize
-from reflectanceError import ReflectanceError
+from scipy.interpolate    import RectBivariateSpline
+from scipy.optimize       import minimize
+from reflectanceError     import ReflectanceError
 from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
+from matplotlib           import cm
 
+import setupData
 
 dataFolder = "data/output/"
 
 # load data
-trainingParameters   = np.load(dataFolder + "2015February0511:02PMparamters2D.npy")
-trainingReflectances = np.load(dataFolder + "2015February0511:02PMreflectances2D.npy")
-
-testParameters   = np.load(dataFolder + "2015February1107:43PMparamtersRandom2D.npy")
-testReflectances = np.load(dataFolder + "2015February1107:43PMreflectancesRandom2D.npy")
+trainingParameters, trainingReflectances, testParameters, testReflectances = \
+    setupData.setupTwoDimensionalData(dataFolder)
 
 
 BVFs = np.unique(trainingParameters[:,0])
@@ -137,13 +135,13 @@ if __name__ == "__main__":
 
     # check if grid interpolation looks good.
     #%%
-    grid_x, grid_y = np.mgrid[0.04:0.6:100j, 0.01:0.1:100j]
+    grid_x, grid_y = np.mgrid[0.01:0.1:100j, 0.04:0.6:100j]
     grid_z = rbs.ev(grid_x, grid_y)
 
     fig = plt.figure(0)
     ax = fig.gca(projection='3d')
     surf = ax.plot_surface(grid_x, grid_y, grid_z, cmap=cm.jet, linewidth=1, antialiased=True)
-    ax.scatter(testParameters[:,1], testParameters[:,0], testReflectances[:,0])
+    ax.scatter(testParameters[:,0], testParameters[:,1], testReflectances[:,0])
     ax.set_zlim3d(np.min(grid_z), np.max(grid_z))
     fig.colorbar(surf)
 

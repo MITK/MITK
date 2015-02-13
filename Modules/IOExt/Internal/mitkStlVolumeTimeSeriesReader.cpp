@@ -36,7 +36,7 @@ void mitk::StlVolumeTimeSeriesReader::GenerateData()
     std::string fileName = m_MatchedFileNames[i];
     MITK_INFO << "Loading " << fileName << " as stl..." << std::endl;
 
-    mitk::Surface::Pointer surface = IOUtil::LoadSurface(fileName.c_str());
+    surface = IOUtil::LoadSurface(fileName.c_str());
 
     if (surface.IsNull())
     {

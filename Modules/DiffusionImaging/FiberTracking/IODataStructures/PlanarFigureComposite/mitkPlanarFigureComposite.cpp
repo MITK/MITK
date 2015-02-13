@@ -55,17 +55,15 @@ void mitk::PlanarFigureComposite::replaceDataNodeAt(int idx, mitk::DataNode::Poi
   m_DNVector->SetElement( idx, dn );
 }
 
-void mitk::PlanarFigureComposite::setOperationType(PFCompositionOperation pfcOp)
+void mitk::PlanarFigureComposite::setOperationType(OperationType pfcOp)
 {
   this->m_compOperation = pfcOp;
 }
 
 
-mitk::PFCompositionOperation mitk::PlanarFigureComposite::getOperationType()
+mitk::PlanarFigureComposite::OperationType mitk::PlanarFigureComposite::getOperationType() const
 {
   return this->m_compOperation;
-
-
 }
 
 void mitk::PlanarFigureComposite::setDisplayName(std::string displName)

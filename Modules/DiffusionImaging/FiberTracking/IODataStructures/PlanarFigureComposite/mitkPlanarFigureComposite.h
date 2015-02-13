@@ -35,15 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-enum PFCompositionOperation {
-    PFCOMPOSITION_AND_OPERATION,
-    PFCOMPOSITION_OR_OPERATION,
-    PFCOMPOSITION_NOT_OPERATION,
-};
-
-
-
-
 class MITKFIBERTRACKING_EXPORT PlanarFigureComposite : public BaseData
 {
 
@@ -52,6 +43,13 @@ class MITKFIBERTRACKING_EXPORT PlanarFigureComposite : public BaseData
 
 
 public:
+
+    enum OperationType {
+        AND,
+        OR,
+        NOT
+    };
+
     mitkClassMacro(PlanarFigureComposite, BaseData)
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
@@ -84,8 +82,8 @@ public:
     void replaceDataNodeAt(int, mitk::DataNode::Pointer);
 
     // set if this compsition is AND, OR, NOT
-    void setOperationType(PFCompositionOperation);
-    PFCompositionOperation getOperationType();
+    void setOperationType(OperationType);
+    OperationType getOperationType() const;
 
     void setDisplayName(std::string);
     std::string getDisplayName();
@@ -112,7 +110,7 @@ protected:
 private:
     //this vector takes planarfigures and planarfigureComosite types
     CompositionContainer::Pointer m_PFVector;
-    PFCompositionOperation m_compOperation;
+    OperationType m_compOperation;
 
     DataNodeContainer::Pointer m_DNVector;
     std::string m_name;

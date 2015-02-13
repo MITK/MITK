@@ -48,12 +48,12 @@ int mitkFiberExtractionTest(int argc, char* argv[])
         MITK_INFO << "TEST1";
 
         mitk::PlanarFigureComposite::Pointer pfc1 = mitk::PlanarFigureComposite::New();
-        pfc1->setOperationType(mitk::PFCOMPOSITION_AND_OPERATION);
+        pfc1->setOperationType(mitk::PlanarFigureComposite::AND);
         pfc1->addPlanarFigure(dynamic_cast<mitk::BaseData*>(pf2.GetPointer()));
         pfc1->addPlanarFigure(dynamic_cast<mitk::BaseData*>(pf3.GetPointer()));
         MITK_INFO << "TEST2";
         mitk::PlanarFigureComposite::Pointer pfc2 = mitk::PlanarFigureComposite::New();
-        pfc2->setOperationType(mitk::PFCOMPOSITION_OR_OPERATION);
+        pfc2->setOperationType(mitk::PlanarFigureComposite::OR);
         pfc2->addPlanarFigure(dynamic_cast<mitk::BaseData*>(pf1.GetPointer()));
         pfc2->addPlanarFigure(pfc1.GetPointer());
         MITK_INFO << "TEST3";

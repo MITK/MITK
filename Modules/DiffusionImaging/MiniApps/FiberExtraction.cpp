@@ -92,20 +92,20 @@ int main(int argc, char* argv[])
             }
             else if (operation=="NOT")
             {
-                pfc->setOperationType(mitk::PFCOMPOSITION_NOT_OPERATION);
+                pfc->setOperationType(mitk::PlanarFigureComposite::NOT);
                 pfc->addPlanarFigure(input1);
                 result = inputTractogram->ExtractFiberSubset(pfc);
             }
             else if (operation=="AND" && pf2.IsNotNull())
             {
-                pfc->setOperationType(mitk::PFCOMPOSITION_AND_OPERATION);
+                pfc->setOperationType(mitk::PlanarFigureComposite::AND);
                 pfc->addPlanarFigure(input1);
                 pfc->addPlanarFigure(input2);
                 result = inputTractogram->ExtractFiberSubset(pfc);
             }
             else if (operation=="OR" && pf2.IsNotNull())
             {
-                pfc->setOperationType(mitk::PFCOMPOSITION_OR_OPERATION);
+                pfc->setOperationType(mitk::PlanarFigureComposite::OR);
                 pfc->addPlanarFigure(input1);
                 pfc->addPlanarFigure(input2);
                 result = inputTractogram->ExtractFiberSubset(pfc);

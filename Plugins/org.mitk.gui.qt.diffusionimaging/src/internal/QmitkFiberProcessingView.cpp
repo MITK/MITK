@@ -1128,7 +1128,7 @@ void QmitkFiberProcessingView::ExtractWithPlanarFigure()
 void QmitkFiberProcessingView::GenerateAndComposite()
 {
     mitk::PlanarFigureComposite::Pointer PFCAnd = mitk::PlanarFigureComposite::New();
-    PFCAnd->setOperationType(mitk::PFCOMPOSITION_AND_OPERATION);
+    PFCAnd->setOperationType(mitk::PlanarFigureComposite::AND);
     for( std::vector<mitk::DataNode::Pointer>::iterator it = m_SelectedPF.begin(); it != m_SelectedPF.end(); ++it )
     {
         mitk::DataNode::Pointer nodePF = *it;
@@ -1142,7 +1142,7 @@ void QmitkFiberProcessingView::GenerateAndComposite()
 void QmitkFiberProcessingView::GenerateOrComposite()
 {
     mitk::PlanarFigureComposite::Pointer PFCOr = mitk::PlanarFigureComposite::New();
-    PFCOr->setOperationType(mitk::PFCOMPOSITION_OR_OPERATION);
+    PFCOr->setOperationType(mitk::PlanarFigureComposite::OR);
     for( std::vector<mitk::DataNode::Pointer>::iterator it = m_SelectedPF.begin(); it != m_SelectedPF.end(); ++it )
     {
         mitk::DataNode::Pointer nodePF = *it;
@@ -1156,7 +1156,7 @@ void QmitkFiberProcessingView::GenerateOrComposite()
 void QmitkFiberProcessingView::GenerateNotComposite()
 {
     mitk::PlanarFigureComposite::Pointer PFCNot = mitk::PlanarFigureComposite::New();
-    PFCNot->setOperationType(mitk::PFCOMPOSITION_NOT_OPERATION);
+    PFCNot->setOperationType(mitk::PlanarFigureComposite::NOT);
     for( std::vector<mitk::DataNode::Pointer>::iterator it = m_SelectedPF.begin(); it != m_SelectedPF.end(); ++it )
     {
         mitk::DataNode::Pointer nodePF = *it;

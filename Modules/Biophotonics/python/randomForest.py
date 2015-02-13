@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 from sklearn import tree
 from sklearn.ensemble import RandomForestRegressor
 
-import setupSimulation as setup
 
 # todo we:
 # 2. optimization
@@ -27,15 +26,16 @@ import setupSimulation as setup
 
 
 # the folder with the reflectance spectra
-dataFolder = 'outputRS/'
-
-
-BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = setup.setupNormalSimulation()
-
+dataFolder = 'data/output/'
 
 # load data
-trainingParameters   = np.load(dataFolder + "paramterers2015February0511:02PM.npy")
-trainingReflectances = np.load(dataFolder + "reflectances2015February0511:02PM.npy")
+trainingParameters   = np.load(dataFolder + "2015February0511:02PMparamters2D.npy")
+trainingReflectances = np.load(dataFolder + "2015February0511:02PMreflectances2D.npy")
+
+testParameters   = np.load(dataFolder + "2015February1107:43PMparamtersRandom2D.npy")
+testReflectances = np.load(dataFolder + "2015February1107:43PMreflectancesRandom2D.npy")
+
+
 
 # normalize data
 #trainingReflectances = trainingReflectances[:,[0, 1, 4, 9, 11, 13, 18, 22]]
@@ -53,8 +53,6 @@ rf.fit(trainingReflectances, trainingParameters)
 
 #%% test
 
-testParameters   = np.load(dataFolder + "2015February0604:48PMparamterers.npy")
-testReflectances = np.load(dataFolder + "2015February0604:48PMreflectances.npy")
 
 #testReflectances = testReflectances[:,[0, 1, 4, 9, 11, 13, 18, 22]]
 #testReflectances = testReflectances[:,[  0,   3,   6,   9,  12,  15,  18,  22]]

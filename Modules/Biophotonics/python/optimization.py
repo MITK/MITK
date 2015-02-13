@@ -14,11 +14,15 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
 
-dataFolder = "outputRS/"
+dataFolder = "data/output/"
 
 # load data
-trainingParameters   = np.load(dataFolder + "paramterers2015February0511:02PM.npy")
-trainingReflectances = np.load(dataFolder + "reflectances2015February0511:02PM.npy")
+trainingParameters   = np.load(dataFolder + "2015February0511:02PMparamters2D.npy")
+trainingReflectances = np.load(dataFolder + "2015February0511:02PMreflectances2D.npy")
+
+testParameters   = np.load(dataFolder + "2015February1107:43PMparamtersRandom2D.npy")
+testReflectances = np.load(dataFolder + "2015February1107:43PMreflectancesRandom2D.npy")
+
 
 BVFs = np.unique(trainingParameters[:,0])
 Vss  = np.unique(trainingParameters[:,1])
@@ -27,8 +31,6 @@ reflectanceGrid3D = np.reshape(trainingReflectances, (len(Vss), len(BVFs), train
 
 functionToMinimize = ReflectanceError(Vss, BVFs, reflectanceGrid3D)
 
-testParameters   = np.load(dataFolder + "2015February1107:43PMparamterersRandom.npy")
-testReflectances = np.load(dataFolder + "2015February1107:43PMreflectancesRandom.npy")
 
 absErrors = np.zeros_like(testParameters)
 

@@ -17,6 +17,12 @@ if(MITK_USE_Boost)
 
   if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
+    set(_boost_version 1_56)
+    set(_boost_install_include_dir include/boost)
+    if(WIN32)
+      set(_boost_install_include_dir include/boost-${_boost_version})
+    endif()
+
     set(_boost_libs )
     set(_with_boost_libs )
     set(_install_lib_dir )
@@ -108,12 +114,12 @@ if(MITK_USE_Boost)
     else()
       set(_boost_build_cmd BUILD_COMMAND ${CMAKE_COMMAND} -E echo "no binary libraries")
       set(_install_cmd ${CMAKE_COMMAND} -E echo "copying Boost header..."
-             COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/include/boost")
+             COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/${_boost_install_include_dir}")
     endif()
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_56_0.tar.bz2
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.tar.bz2
       URL_MD5 a744cf167b05d72335f27c88115f211d
       # We use in-source builds for Boost
       BINARY_DIR ${ep_prefix}/src/${proj}
@@ -136,7 +142,7 @@ if(MITK_USE_Boost)
     # until the Boost CMake system is used.
 
     # We just copy the include directory
-    install(DIRECTORY "${install_dir}/include/boost"
+    install(DIRECTORY "${install_dir}/${_boost_install_include_dir}"
             DESTINATION "include"
             COMPONENT dev
            )

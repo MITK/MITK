@@ -20,16 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIContributionManagerOverrides.h"
 #include "berryIContributionItem.h"
-//#include "berryActionContributionItem.h"
 
 namespace berry {
-
-//void ContributionManager::Add(Action *action)
-//{
-//  Q_ASSERT_X(action, "nullcheck", "Action must not be null");
-//  IContributionItem::Pointer item(new ActionContributionItem(action));
-//  Add(item);
-//}
 
 void ContributionManager::Add(const SmartPointer<IContributionItem>& item)
 {
@@ -40,12 +32,6 @@ void ContributionManager::Add(const SmartPointer<IContributionItem>& item)
     ItemAdded(item);
   }
 }
-
-//void ContributionManager::AppendToGroup(const QString& groupName, Action *action)
-//{
-//  IContributionItem::Pointer item(new ActionContributionItem(action));
-//  AddToGroup(groupName, item, true);
-//}
 
 void ContributionManager::AppendToGroup(const QString& groupName, const SmartPointer<IContributionItem>& item)
 {
@@ -82,11 +68,11 @@ SmartPointer<IContributionManagerOverrides> ContributionManager::GetOverrides()
   if (overrides.IsNull())
   {
     struct _DefaultOverride : public IContributionManagerOverrides {
-      int GetEnabled(IContributionItem* /*item*/) const {
+      int GetEnabled(const IContributionItem* /*item*/) const {
         return -1;
       }
 
-      int GetVisible(IContributionItem* /*item*/) const {
+      int GetVisible(const IContributionItem* /*item*/) const {
         return -1;
       }
     };
@@ -124,12 +110,6 @@ void ContributionManager::Insert(int index, const SmartPointer<IContributionItem
   }
 }
 
-//void ContributionManager::InsertAfter(const QString& ID, Action *action)
-//{
-//  IContributionItem::Pointer item(new ActionContributionItem(action));
-//  InsertAfter(ID, item);
-//}
-
 void ContributionManager::InsertAfter(const QString& ID, const SmartPointer<IContributionItem>& item)
 {
   IContributionItem::Pointer ci = Find(ID);
@@ -148,12 +128,6 @@ void ContributionManager::InsertAfter(const QString& ID, const SmartPointer<ICon
     }
   }
 }
-
-//void ContributionManager::InsertBefore(const QString& ID, Action *action)
-//{
-//  IContributionItem::Pointer item(new ActionContributionItem(action));
-//  InsertBefore(ID, item);
-//}
 
 void ContributionManager::InsertBefore(const QString& ID, const SmartPointer<IContributionItem>& item)
 {
@@ -202,12 +176,6 @@ void ContributionManager::MarkDirty()
 {
   SetDirty(true);
 }
-
-//void ContributionManager::PrependToGroup(const QString& groupName, Action *action)
-//{
-//  IContributionItem::Pointer item(new ActionContributionItem(action));
-//  AddToGroup(groupName, item, false);
-//}
 
 void ContributionManager::PrependToGroup(const QString& groupName, const SmartPointer<IContributionItem>& item)
 {

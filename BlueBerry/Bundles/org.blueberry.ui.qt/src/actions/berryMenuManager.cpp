@@ -94,12 +94,12 @@ struct NullOverrides: public IContributionManagerOverrides
 {
 public:
 
-  int GetEnabled(IContributionItem* /*item*/) const
+  int GetEnabled(const IContributionItem* /*item*/) const
   {
     return -1;
   }
 
-  int GetVisible(IContributionItem* /*item*/) const
+  int GetVisible(const IContributionItem* /*item*/) const
   {
     return -1;
   }
@@ -636,8 +636,10 @@ void MenuManager::Update(bool force, bool recursive)
         else
         {
           int start = menu->actions().size();
-          this->DoItemFill(src, destIx < 1 ? 0 : menu->actions().at(destIx-1));
+          qDebug() << "***** Filling item destIx = " << destIx << " (size: " << start << ")";
+          this->DoItemFill(src, destIx >= start ? NULL : menu->actions().at(destIx));
           int newItems = menu->actions().size() - start;
+          qDebug() << "***** New items: " << newItems;
           for (int i = 0; i < newItems; ++i)
           {
             menu->actions().at(destIx++)->setData(QVariant::fromValue<Object::Pointer>(src));

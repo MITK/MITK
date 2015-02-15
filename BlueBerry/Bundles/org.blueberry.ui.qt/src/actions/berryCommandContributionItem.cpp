@@ -420,7 +420,10 @@ void CommandContributionItem::SetImages(IServiceLocator* locator,
   if (icon.isNull())
   {
     ICommandImageService* service = locator->GetService<ICommandImageService>();
-    icon = service->GetImage(command->GetId(), iconStyle);
+    if (service)
+    {
+      icon = service->GetImage(command->GetId(), iconStyle);
+    }
   }
 }
 

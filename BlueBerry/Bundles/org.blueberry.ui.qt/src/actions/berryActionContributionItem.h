@@ -53,7 +53,7 @@ public:
    */
   bool operator==(const Object* o) const;
 
-  std::size_t HashCode() const;
+  uint HashCode() const;
 
   /**
    * The <code>ActionContributionItem</code> implementation of this
@@ -74,6 +74,8 @@ public:
    */
   QAction* Fill(QMenu* parent, QAction *before);
 
+  QAction* Fill(QMenuBar* menu, QAction* before);
+
   /**
    * The <code>ActionContributionItem</code> implementation of this ,
    * <code>IContributionItem</code> method creates an SWT
@@ -82,7 +84,7 @@ public:
    * the value of the checked property. If the action's menu creator property
    * has been set, a drop-down tool item is created.
    */
-  QAction* Fill(QToolBar* parent, int index);
+  QAction* Fill(QToolBar* parent, QAction* before);
 
   /**
    * Returns the action associated with this contribution item.

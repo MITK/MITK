@@ -56,33 +56,12 @@ struct IContributionManager : public virtual Object
 
   berryObjectMacro(berry::IContributionManager)
 
-  /*
-     * Adds an action as a contribution item to this manager.
-     * Equivalent to <code>add(new ActionContributionItem(action))</code>.
-     *
-     * @param action the action, this cannot be <code>null</code>
-     */
-  //virtual void Add(Action* action) = 0;
-
   /**
    * Adds a contribution item to this manager.
    *
    * @param item the contribution item, this cannot be <code>null</code>
    */
   virtual void Add(const SmartPointer<IContributionItem>& item) = 0;
-
-  /*
-   * Adds a contribution item for the given action at the end of the group
-   * with the given name.
-   * Equivalent to
-   * <code>appendToGroup(groupName,new ActionContributionItem(action))</code>.
-   *
-   * @param groupName the name of the group
-   * @param action the action
-   * @exception std::invalid_argument if there is no group with
-   *   the given name
-   */
-  //virtual void AppendToGroup(const QString& groupName, Action* action) = 0;
 
   /**
    * Adds a contribution item to this manager at the end of the group
@@ -118,19 +97,6 @@ struct IContributionManager : public virtual Object
    */
   virtual SmartPointer<IContributionManagerOverrides> GetOverrides() = 0;
 
-  /*
-   * Inserts a contribution item for the given action after the item
-   * with the given id.
-   * Equivalent to
-   * <code>insertAfter(id,new ActionContributionItem(action))</code>.
-   *
-   * @param id the contribution item id
-   * @param action the action to insert
-   * @exception IllegalArgumentException if there is no item with
-   *   the given id
-   */
-  //virtual void InsertAfter(const QString& id, Action* action) = 0;
-
   /**
    * Inserts a contribution item after the item with the given id.
    *
@@ -140,19 +106,6 @@ struct IContributionManager : public virtual Object
    *   the given id
    */
   virtual void InsertAfter(const QString& id, const SmartPointer<IContributionItem>& item) = 0;
-
-  /*
-   * Inserts a contribution item for the given action before the item
-   * with the given id.
-   * Equivalent to
-   * <code>InsertBefore(id,new ActionContributionItem(action))</code>.
-   *
-   * @param id the contribution item id
-   * @param action the action to insert
-   * @exception IllegalArgumentException if there is no item with
-   *   the given id
-   */
-  //virtual void InsertBefore(const QString& id, Action* action) = 0;
 
   /**
    * Inserts a contribution item before the item with the given id.
@@ -185,19 +138,6 @@ struct IContributionManager : public virtual Object
    * Marks this contribution manager as dirty.
    */
   virtual void MarkDirty() = 0;
-
-  /*
-   * Adds a contribution item for the given action at the beginning of the
-   * group with the given name.
-   * Equivalent to
-   * <code>prependToGroup(groupName,new ActionContributionItem(action))</code>.
-   *
-   * @param groupName the name of the group
-   * @param action the action
-   * @exception IllegalArgumentException if there is no group with
-   *   the given name
-   */
-  //virtual void PrependToGroup(const QString& groupName, Action* action) = 0;
 
   /**
    * Adds a contribution item to this manager at the beginning of the

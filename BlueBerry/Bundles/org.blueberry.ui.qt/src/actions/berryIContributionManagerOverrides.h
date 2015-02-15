@@ -59,7 +59,7 @@ struct BERRY_UI_QT IContributionManagerOverrides : virtual Object
    *           <li><code>-1</code> if the item may determine its own enablement</li>
    *         </ul>
    */
-  virtual int GetEnabled(IContributionItem* item) const = 0;
+  virtual int GetEnabled(const IContributionItem* item) const = 0;
 
   /**
    * Visiblity override.
@@ -71,7 +71,7 @@ struct BERRY_UI_QT IContributionManagerOverrides : virtual Object
    *           <li><code>-1</code> if the item may determine its own visibility</li>
    *         </ul>
    */
-  virtual int GetVisible(IContributionItem* item) const = 0;
+  virtual int GetVisible(const IContributionItem* item) const = 0;
 };
 
 }

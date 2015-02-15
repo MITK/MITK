@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryActionContributionItem.h"
 
 #include <berryIContributionManager.h>
+#include <berryIContributionManagerOverrides.h>
 #include <berryAction.h>
 
 #include <QMenu>
@@ -38,7 +39,7 @@ bool ActionContributionItem::operator==(const Object* o) const
   return false;
 }
 
-std::size_t ActionContributionItem::HashCode() const
+uint ActionContributionItem::HashCode() const
 {
   return qHash(action);
 }
@@ -131,7 +132,12 @@ QAction *ActionContributionItem::Fill(QMenu* parent, QAction* before)
   return action;
 }
 
-QAction *ActionContributionItem::Fill(QToolBar* parent, int index)
+QAction*ActionContributionItem::Fill(QMenuBar* menu, QAction* before)
+{
+  return NULL;
+}
+
+QAction *ActionContributionItem::Fill(QToolBar* parent, QAction* before)
 {
 //  if (widget == null && parent != null) {
 //    int flags = SWT.PUSH;

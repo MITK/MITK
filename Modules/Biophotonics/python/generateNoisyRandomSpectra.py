@@ -28,7 +28,7 @@ gpumcmlExecutable = 'gpumcml.sm_20'
 BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = setup.setupNormalSimulation()
 
 
-nrSimulations = 100
+nrSimulations = 20000
 reflectances  = np.zeros((nrSimulations, len(wavelengths)))
 parameters    = np.zeros((nrSimulations, 8))
 
@@ -81,8 +81,8 @@ infile.close()
 
 # save the reflectance results!
 now = datetime.datetime.now().strftime("%Y%B%d%I:%M%p")
-np.save(outfolderRS + now + "reflectancesRandomWithNoise", reflectances)
-np.save(outfolderRS + now + "paramterersRandomWithNoise", parameters)
+np.save(outfolderRS + now + "reflectancesRandomWithNoiseOurBands", reflectances)
+np.save(outfolderRS + now + "paramtersRandomWithNoiseOurBands", parameters)
 
 end = time.time()
 print "total time for script: " + str((end - start))

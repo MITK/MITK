@@ -1,7 +1,6 @@
 import time
 import itertools
 import datetime
-import os
 
 import numpy as np
 
@@ -36,7 +35,7 @@ outfolderRS = 'data/output/'
 gpumcmlDirectory = '/home/wirkert/workspace/monteCarlo/gpumcml/fast-gpumcml/'
 gpumcmlExecutable = 'gpumcml.sm_20'
 
-BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = setup.setupNormalSimulation()
+BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = setup.setupPerfectArtificialSimulation()
 
 reflectances = np.zeros((nrSamples, len(wavelengths)))
 
@@ -80,8 +79,8 @@ infile.close()
 
 # save the reflectance results!
 now = datetime.datetime.now().strftime("%Y%B%d%I:%M%p")
-np.save(outfolderRS + now + "reflectances" + str(photons) + "photons", reflectances)
-np.save(outfolderRS + now + "paramters", paramsList)
+np.save(outfolderRS + now + "reflectancesPerfectArtificial" + str(photons) + "photons", reflectances)
+np.save(outfolderRS + now + "paramtersPerfectArtificial", paramsList)
 
 end = time.time()
 print "total time for script: " + str((end - start))

@@ -30,8 +30,7 @@ Vss  = np.unique(trainingParameters[:,1])
 
 #%% build optimization function from rectangular reflectance grid
 
-reflectanceGrid3D = np.reshape(trainingReflectances, (len(BVFs), len(Vss), trainingReflectances.shape[1]))
-
+reflectanceGrid3D  = np.reshape(trainingReflectances, (len(BVFs), len(Vss), trainingReflectances.shape[1]))
 functionToMinimize = ReflectanceError(BVFs, Vss, reflectanceGrid3D)
 
 
@@ -42,13 +41,12 @@ absErrors = np.zeros_like(testParameters)
 
 for idx, (testParameter, testReflectance) in enumerate(zip(testParameters, testReflectances)):
     functionToMinimize.setReflectanceToMatch(testReflectance)
-    minimization = minimize(functionToMinimize.f, [0.05, 0.3], method="Nelder-Mead")
+    minimization = minimize(functionToMinimize.f, [np.median(BVFs), np.median(Vss)], method="Nelder-Mead")
     # interpolation extrapolates with constant values. Since the minimization function is
     # covex, we can just crop it to the bounds
-    estimatedBVF= np.clip(minimization.x[0], min(BVFs), max(BVFs))
-    estimatedVs = np.clip(minimization.x[1], min(Vss), max(Vss))
+    clippedX= np.clip(minimization.x, [min(BVFs), min(Vss)], [max(BVFs), max(Vss)])
 
-    absErrors[idx,:] = np.abs([estimatedBVF, estimatedVs] - testParameter)
+    absErrors[idx,:] = np.abs(clippedX - testParameter)
 
 
 #%% test

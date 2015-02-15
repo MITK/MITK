@@ -39,14 +39,7 @@ class BERRY_UI_QT ShowViewHandler : public AbstractHandler
   Q_OBJECT
 
 public:
-  berryObjectMacro(ShowViewHandler);
-
-private:
-
-  /**
-   * The name of the parameter providing the view identifier.
-   */
-  static const QString PARAMETER_NAME_VIEW_ID;
+  berryObjectMacro(ShowViewHandler)
 
 public:
 
@@ -69,10 +62,12 @@ private:
    *
    * @param viewId
    *            The view to open; must not be <code>null</code>
+   * @param secondaryId
+   *            An optional secondary id; may be <code>null</code>
    * @throws PartInitException
    *             If the part could not be initialized.
    */
-  void OpenView(const QString& viewId, IWorkbenchWindow::ConstPointer activeWorkbenchWindow);
+  void OpenView(const QString& viewId, const QString& secondaryId, IWorkbenchWindow::ConstPointer activeWorkbenchWindow);
 };
 
 }

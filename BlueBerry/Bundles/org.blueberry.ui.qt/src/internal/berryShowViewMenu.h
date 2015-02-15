@@ -76,7 +76,7 @@ private:
 
   QSet<QPair<QString, QString> > GetShortcuts(IWorkbenchPage* page) const;
 
-//  Action showDlgAction;
+  IContributionItem::Pointer showDlgItem;
 
 //  IMenuListener menuListener = new IMenuListener() {
 //    public void menuAboutToShow(IMenuManager manager) {

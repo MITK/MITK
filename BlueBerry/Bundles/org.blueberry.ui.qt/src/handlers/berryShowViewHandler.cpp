@@ -16,15 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "tweaklets/berryWorkbenchTweaklet.h"
 
+#include "berryIWorkbenchCommandConstants.h"
 #include "berryShowViewHandler.h"
 #include "berryHandlerUtil.h"
-
-#include "dialogs/berryIShowViewDialog.h"
 
 #include "berryUIException.h"
 #include "berryIWorkbenchPage.h"
 #include "berryIViewDescriptor.h"
 #include "berryPlatformUI.h"
+
+#include "internal/berryWorkbenchPlugin.h"
+#include "internal/berryQtShowViewDialog.h"
 
 #include <berryCommandExceptions.h>
 
@@ -32,8 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-
-const QString ShowViewHandler::PARAMETER_NAME_VIEW_ID = "org.blueberry.ui.views.showView.viewId";
 
 ShowViewHandler::ShowViewHandler()
 {
@@ -44,11 +44,12 @@ Object::Pointer ShowViewHandler::Execute(const ExecutionEvent::ConstPointer& eve
   IWorkbenchWindow::ConstPointer window = HandlerUtil::GetActiveWorkbenchWindowChecked(event);
   // Get the view identifier, if any.
   const ExecutionEvent::ParameterMap& parameters = event->GetParameters();
-  ExecutionEvent::ParameterMap::const_iterator result = parameters.find(PARAMETER_NAME_VIEW_ID);
-  QString value;
-  if (result != parameters.end()) value = result.value();
+  ExecutionEvent::ParameterMap::const_iterator result = parameters.find(IWorkbenchCommandConstants::VIEWS_SHOW_VIEW_PARM_ID);
+  QString viewId = result != parameters.end() ? result.value() : QString::null;
+  result = parameters.find(IWorkbenchCommandConstants::VIEWS_SHOW_VIEW_SECONDARY_ID);
+  QString secondary = result != parameters.end() ? result.value() : QString::null;
 
-  if (value.isEmpty())
+  if (viewId.isEmpty())
   {
     this->OpenOther(window);
   }
@@ -56,7 +57,7 @@ Object::Pointer ShowViewHandler::Execute(const ExecutionEvent::ConstPointer& eve
   {
     try
     {
-      this->OpenView(value, window);
+      this->OpenView(viewId, secondary, window);
     }
     catch (const PartInitException& e)
     {
@@ -75,26 +76,25 @@ void ShowViewHandler::OpenOther(IWorkbenchWindow::ConstPointer window)
     return;
   }
 
-  IShowViewDialog::Pointer dialog = Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateStandardDialog(WorkbenchTweaklet::DIALOG_ID_SHOW_VIEW).Cast<IShowViewDialog>();
-  if (dialog.IsNull()) return;
+  QtShowViewDialog dialog(window.GetPointer(), WorkbenchPlugin::GetDefault()->GetViewRegistry());
 
-  int returnCode = dialog->Open();
+  int returnCode = dialog.exec();
 
-  if (returnCode == IDialog::CANCEL)
+  if (returnCode == QDialog::Rejected)
   {
     return;
   }
 
-  const QList<IViewDescriptor::Pointer> descriptors =
-      dialog->GetSelection();
+  const QList<IViewDescriptor::Pointer> descriptors = dialog.GetSelection();
   for (int i = 0; i < descriptors.size(); ++i)
   {
     try
     {
-      this->OpenView(descriptors[i]->GetId(), window);
+      this->OpenView(descriptors[i]->GetId(), QString(), window);
     }
-    catch (PartInitException e)
+    catch (const PartInitException& e)
     {
+      BERRY_WARN << e.what();
 //      StatusUtil.handleStatus(e.getStatus(),
 //          WorkbenchMessages.ShowView_errorTitle
 //          + ": " + e.getMessage(), //$NON-NLS-1$
@@ -103,7 +103,7 @@ void ShowViewHandler::OpenOther(IWorkbenchWindow::ConstPointer window)
   }
 }
 
-void ShowViewHandler::OpenView(const QString& viewId, IWorkbenchWindow::ConstPointer activeWorkbenchWindow)
+void ShowViewHandler::OpenView(const QString& viewId, const QString& secondaryId, IWorkbenchWindow::ConstPointer activeWorkbenchWindow)
 {
   const IWorkbenchPage::Pointer activePage = activeWorkbenchWindow->GetActivePage();
   if (activePage.IsNull())
@@ -111,7 +111,7 @@ void ShowViewHandler::OpenView(const QString& viewId, IWorkbenchWindow::ConstPoi
     return;
   }
 
-  activePage->ShowView(viewId);
+  activePage->ShowView(viewId, secondaryId, IWorkbenchPage::VIEW_ACTIVATE);
 }
 
 }

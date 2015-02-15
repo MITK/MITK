@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryQtDnDTweaklet.h"
 #include "berryQtImageTweaklet.h"
-#include "berryQtMessageDialogTweaklet.h"
 #include "berryQtWorkbenchTweaklet.h"
 #include "berryQtWorkbenchPageTweaklet.h"
 #include "berryQtWidgetsTweaklet.h"
@@ -321,7 +320,6 @@ void WorkbenchPlugin::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QtDnDTweaklet, context)
   BERRY_REGISTER_EXTENSION_CLASS(QtImageTweaklet, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QtMessageDialogTweaklet, context)
   BERRY_REGISTER_EXTENSION_CLASS(QtWidgetsTweaklet, context)
   BERRY_REGISTER_EXTENSION_CLASS(QtWorkbenchTweaklet, context)
   BERRY_REGISTER_EXTENSION_CLASS(QtWorkbenchPageTweaklet, context)

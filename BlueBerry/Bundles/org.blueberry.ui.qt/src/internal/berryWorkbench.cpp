@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchPage.h"
 #include "berryPerspective.h"
 #include "berryPreferenceConstants.h"
-#include "dialogs/berryMessageDialog.h"
 #include "berryWorkbenchWindow.h"
 #include "berryImageDescriptor.h"
 #include "berryDisplay.h"
@@ -57,6 +56,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QDir>
 #include <QApplication>
+#include <QMessageBox>
 
 //#include <Poco/Thread.h>
 //#include <Poco/Bugcheck.h>
@@ -116,7 +116,7 @@ public:
       input.close();
       QString msg =
           "Invalid workbench state version. workbench.xml will be deleted";
-      MessageDialog::OpenError(Shell::Pointer(0), "Restoring Problems", msg);
+      QMessageBox::critical(NULL, "Restoring Problems", msg);
       stateFile.remove();
       //          result[0] = new Status(IStatus.ERROR,
       //              WorkbenchPlugin.PI_WORKBENCH,
@@ -237,10 +237,11 @@ Workbench::ServiceLocatorOwner::ServiceLocatorOwner(Workbench* wb) :
 
 void Workbench::ServiceLocatorOwner::Dispose()
 {
-  MessageDialog::OpenInformation(
-      Shell::Pointer(0),
-      "Restart needed",
-      "A required plug-in is no longer available and the Workbench needs to be restarted. You will be prompted to save if there is any unsaved work.");
+  QMessageBox::information(
+        NULL,
+        "Restart needed",
+        "A required plug-in is no longer available and the Workbench needs "
+        "to be restarted. You will be prompted to save if there is any unsaved work.");
   workbench->Close(PlatformUI::RETURN_RESTART, true);
 }
 
@@ -1012,8 +1013,7 @@ bool Workbench::BusyClose(bool force)
       {
         message = QString("An error has occurred: ") + e.what() + ". See error log for more details. Do you want to exit?";
       }
-
-      if (!MessageDialog::OpenQuestion(Shell::Pointer(0), "Error", message))
+      if (QMessageBox::question(NULL, "Error", message) != QMessageBox::Yes)
       {
         isClosing = false;
       }
@@ -1077,9 +1077,9 @@ bool Workbench::SaveMementoToFile(XMLMemento::Pointer memento)
   catch (const Poco::IOException& /*e*/)
   {
     QFile::remove(stateFile);
-    MessageDialog::OpenError(Shell::Pointer(0),
-        "Saving Problems",
-        "Unable to store workbench state.");
+    QMessageBox::critical(NULL,
+                          "Saving Problems",
+                          "Unable to store workbench state.");
     return false;
   }
 

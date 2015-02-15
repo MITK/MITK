@@ -140,11 +140,6 @@ set(SRC_CPP_FILES
   commands/berryIMenuService.h
   commands/berryUIElement.cpp
 
-  #dialogs
-  dialogs/berryIDialog.cpp
-  dialogs/berryIShowViewDialog.cpp
-  dialogs/berryMessageDialog.cpp
-
   #guitk
   guitk/berryGuiTkControlEvent.cpp
   guitk/berryGuiTkEvent.cpp
@@ -172,7 +167,6 @@ set(SRC_CPP_FILES
   tweaklets/berryDnDTweaklet.cpp
   tweaklets/berryGuiWidgetsTweaklet.cpp
   tweaklets/berryImageTweaklet.cpp
-  tweaklets/berryMessageDialogTweaklet.cpp
   tweaklets/berryITracker.cpp
   tweaklets/berryWorkbenchPageTweaklet.cpp
   tweaklets/berryWorkbenchTweaklet.cpp
@@ -333,7 +327,6 @@ set(INTERNAL_CPP_FILES
   berryQtIconImageDescriptor.cpp
   berryQtImageTweaklet.cpp
   berryQtMainWindowControl.cpp
-  berryQtMessageDialogTweaklet.cpp
   berryQtMissingImageDescriptor.cpp
   berryQtOpenPerspectiveAction.cpp
   berryQtPerspectiveSwitcher.cpp
@@ -422,7 +415,6 @@ set(MOC_H_FILES
   src/internal/berryQtGlobalEventFilter.h
   src/internal/berryQtImageTweaklet.h
   src/internal/berryQtMainWindowControl.h
-  src/internal/berryQtMessageDialogTweaklet.h
   src/internal/berryQtOpenPerspectiveAction.h
   src/internal/berryQtPerspectiveSwitcher.h
   src/internal/berryQtSash.h

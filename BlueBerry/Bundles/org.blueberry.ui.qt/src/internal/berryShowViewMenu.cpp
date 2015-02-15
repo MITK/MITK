@@ -49,27 +49,12 @@ struct ActionComparator {
 ShowViewMenu::ShowViewMenu(IWorkbenchWindow *window, const QString& id)
   : ContributionItem(id), dirty(true), window(window)
 {
-//  final IHandlerService handlerService = (IHandlerService) window
-//      .getService(IHandlerService.class);
-//  final ICommandService commandService = (ICommandService) window
-//      .getService(ICommandService.class);
-//  final ParameterizedCommand cmd = getCommand(commandService, makeFast);
-
-//  showDlgAction = new Action(WorkbenchMessages.ShowView_title) {
-//    public void run() {
-//      try {
-//        handlerService.executeCommand(cmd, null);
-//      } catch (final ExecutionException e) {
-//        // Do nothing.
-//      } catch (NotDefinedException e) {
-//        // Do nothing.
-//      } catch (NotEnabledException e) {
-//        // Do nothing.
-//      } catch (NotHandledException e) {
-//        // Do nothing.
-//      }
-//    }
-//  };
+  CommandContributionItemParameter::Pointer showDlgItemParms(
+        new CommandContributionItemParameter(
+          window, QString::null, IWorkbenchCommandConstants::VIEWS_SHOW_VIEW,
+          CommandContributionItem::STYLE_PUSH));
+  showDlgItemParms->label = "&Other...";
+  showDlgItem = new CommandContributionItem(showDlgItemParms);
 
 //  window.getWorkbench().getHelpSystem().setHelp(showDlgAction,
 //      IWorkbenchHelpContextIds.SHOW_VIEW_OTHER_ACTION);
@@ -78,8 +63,6 @@ ShowViewMenu::ShowViewMenu(IWorkbenchWindow *window, const QString& id)
 //    ((WorkbenchWindow) window)
 //        .addSubmenu(WorkbenchWindow.SHOW_VIEW_SUBMENU);
 //  }
-
-//  showDlgAction.setActionDefinitionId(IWorkbenchCommandConstants.VIEWS_SHOW_VIEW);
 
 }
 
@@ -190,7 +173,7 @@ void ShowViewMenu::FillMenu(IMenuManager* innerMgr)
   }
 
   // Add Other...
-  //innerMgr->Add(showDlgAction);
+  innerMgr->Add(showDlgItem);
 }
 
 QSet<QPair<QString,QString> > ShowViewMenu::GetShortcuts(IWorkbenchPage* page) const

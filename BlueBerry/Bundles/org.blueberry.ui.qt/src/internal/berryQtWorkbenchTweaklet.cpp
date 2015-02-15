@@ -16,18 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "berryQtWorkbenchTweaklet.h"
-#include <internal/berryQtControlWidget.h>
 
 #include <QApplication>
-#include <QMainWindow>
 
-#include "berryQtShowViewDialog.h"
 #include "berryQtDisplay.h"
-
-#include <berryPlatform.h>
-#include <berryPlatformUI.h>
-
-#include <internal/berryWorkbenchWindow.h>
 
 namespace berry {
 
@@ -45,15 +37,5 @@ bool QtWorkbenchTweaklet::IsRunning()
 {
   return QApplication::instance() != 0;
 }
-
-IDialog::Pointer
-QtWorkbenchTweaklet::CreateStandardDialog(const QString& dialogid)
-{
-  if (dialogid == DIALOG_ID_SHOW_VIEW)
-    return IDialog::Pointer(new QtShowViewDialog(PlatformUI::GetWorkbench()->GetViewRegistry()));
-  else
-    return IDialog::Pointer(0);
-}
-
 
 }  // namespace berry

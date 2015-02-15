@@ -27,11 +27,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryViewSite.h"
 #include "berryEditorAreaHelper.h"
 #include "intro/berryIntroConstants.h"
-#include "dialogs/berryMessageDialog.h"
 #include "berryWorkbenchWindow.h"
 #include "berryStatusUtil.h"
 
 #include "presentations/berryIStackPresentationSite.h"
+
+#include <QMessageBox>
 
 namespace berry
 {
@@ -402,13 +403,13 @@ void Perspective::UnableToOpenPerspective(PerspectiveDescriptor::Pointer persp,
   QString msg = "Unable to read workbench state.";
   if (status == "")
   {
-    MessageDialog::OpenError(Shell::Pointer(0), title, msg);
+    QMessageBox::critical(NULL, title, msg);
   }
   else
   {
     //TODO error dialog
     //ErrorDialog.openError((Shell) 0, title, msg, status);
-    MessageDialog::OpenError(Shell::Pointer(0), title, msg + "\n" + status);
+    QMessageBox::critical(NULL, title, msg + "\n" + status);
   }
 }
 

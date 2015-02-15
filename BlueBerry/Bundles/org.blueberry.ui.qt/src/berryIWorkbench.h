@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryMacros.h>
 
 #include "services/berryIServiceLocator.h"
-#include "dialogs/berryIDialog.h"
 #include "berryIViewRegistry.h"
 #include "berryIEditorRegistry.h"
 #include "intro/berryIIntroManager.h"

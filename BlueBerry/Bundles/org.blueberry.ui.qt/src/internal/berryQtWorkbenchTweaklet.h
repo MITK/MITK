@@ -38,8 +38,6 @@ public:
 
   bool IsRunning();
 
-  IDialog::Pointer CreateStandardDialog(const QString& id);
-
 };
 
 } // namespace berry

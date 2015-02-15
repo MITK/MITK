@@ -36,8 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "intro/berryIntroConstants.h"
 #include "intro/berryViewIntroAdapterPart.h"
 
-#include "dialogs/berryMessageDialog.h"
-
 #include "berryWorkbenchWindow.h"
 #include "berryUIException.h"
 #include "berryPlatformUI.h"
@@ -45,6 +43,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryImageDescriptor.h"
 
 #include <berryPlatform.h>
+
+#include <QMessageBox>
 
 namespace berry
 {
@@ -1732,8 +1732,9 @@ Perspective::Pointer WorkbenchPage::CreatePerspective(
   {
     if (!window->GetWorkbenchImpl()->IsStarting())
     {
-      MessageDialog::OpenError(window->GetShell(), "Error",
-          "Problems opening perspective \"" + desc->GetId() + "\"");
+      QMessageBox::critical(reinterpret_cast<QWidget*>(window->GetShell()->GetControl()),
+                            "Error",
+                            "Problems opening perspective \"" + desc->GetId() + "\"");
     }
     return Perspective::Pointer(0);
   }
@@ -2635,21 +2636,11 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditorBatched(
     {
       if (editor->IsDirty())
       {
-        QList<QString> dlgLabels;
-        dlgLabels.push_back("Yes");
-        dlgLabels.push_back("No");
-        dlgLabels.push_back("Cancel");
-        IDialog::Pointer
-            dialog =
-                MessageDialog::CreateMessageDialog(
-                    this->GetWorkbenchWindow()->GetShell(),
-                    "Save",
-                    (void*) 0, // accept the default window icon
-                    "\"" + input->GetName()
-                        + "\" is opened and has unsaved changes. Do you want to save it?",
-                    IDialog::QUESTION, dlgLabels, 0);
-        int saveFile = dialog->Open();
-        if (saveFile == 0)
+        QMessageBox::StandardButton saveFile = QMessageBox::question(
+                                                 this->GetWorkbenchWindow()->GetShell()->GetControl(),
+                                                 "Save", "\"" + input->GetName() + "\" is opened and has unsaved changes. Do you want to save it?",
+                                                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Cancel);
+        if (saveFile == QMessageBox::Yes)
         {
           //          try
           //          {
@@ -2675,7 +2666,7 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditorBatched(
           //            return 0;
           //          }
         }
-        else if (saveFile == 2)
+        else if (saveFile == QMessageBox::Cancel)
         {
           return IEditorPart::Pointer(0);
         }
@@ -3485,8 +3476,8 @@ void WorkbenchPage::SetPerspective(Perspective::Pointer newPersp)
       {
         QString title = "Restoring problems";
         QString msg = "Unable to read workbench state.";
-        MessageDialog::OpenError(this->GetWorkbenchWindow()->GetShell(), title,
-            msg);
+        QMessageBox::critical(reinterpret_cast<QWidget*>(this->GetWorkbenchWindow()->GetShell()->GetControl()),
+                                                         title, msg);
       }
     }
 
@@ -4081,9 +4072,10 @@ void WorkbenchPage::SuggestReset()
 
   parentShell = window->GetShell();
 
-  if (MessageDialog::OpenQuestion(parentShell,
-          "Reset Perspective?",
-          "Changes to installed plug-ins have affected this perspective. Would you like to reset this perspective to accept these changes?"))
+  if (QMessageBox::question(parentShell.IsNull() ? NULL : reinterpret_cast<QWidget*>(parentShell->GetControl()),
+                            "Reset Perspective?",
+                            "Changes to installed plug-ins have affected this perspective. Would you like to reset this perspective to accept these changes?") ==
+      QMessageBox::Yes)
   {
     IWorkbenchPage::Pointer page = window->GetActivePage();
     if (page == 0)

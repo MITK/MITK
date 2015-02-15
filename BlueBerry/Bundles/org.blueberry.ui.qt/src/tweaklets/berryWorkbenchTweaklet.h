@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryShell.h"
 #include "berryDisplay.h"
-#include "dialogs/berryIDialog.h"
 
 namespace berry
 {
@@ -34,13 +33,9 @@ struct BERRY_UI_QT WorkbenchTweaklet
 
   static Tweaklets::TweakKey<WorkbenchTweaklet> KEY;
 
-  static const QString DIALOG_ID_SHOW_VIEW; // = "org.blueberry.ui.dialogs.showview";
-
   virtual Display* CreateDisplay() = 0;
 
   virtual bool IsRunning() = 0;
-
-  virtual IDialog::Pointer CreateStandardDialog(const QString& id) = 0;
 
 };
 

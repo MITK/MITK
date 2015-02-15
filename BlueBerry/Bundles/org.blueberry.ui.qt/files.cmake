@@ -107,8 +107,6 @@ set(SRC_CPP_FILES
   #actions
   actions/berryAbstractContributionFactory.cpp
   actions/berryAbstractGroupMarker.cpp
-  #actions/berryAction.cpp
-  #actions/berryActionContributionItem.cpp
   actions/berryCommandContributionItem.h
   actions/berryCommandContributionItem.cpp
   actions/berryContributionItem.cpp

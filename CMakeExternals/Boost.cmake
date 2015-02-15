@@ -135,7 +135,7 @@ if(MITK_USE_Boost)
     ExternalProject_Get_Property(${proj} install_dir)
 
     if(WIN32)
-      set(BOOST_LIBRARYDIR "${install_dir}/bin")
+      set(BOOST_LIBRARYDIR "${install_dir}/lib")
     endif()
 
     # Manual install commands (for a MITK super-build install)

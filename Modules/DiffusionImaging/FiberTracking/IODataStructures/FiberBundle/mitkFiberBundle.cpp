@@ -726,12 +726,12 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
     return newFib;
 }
 
-mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(BaseData* roi)
+mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(DataNode* roi, DataStorage* storage)
 {
-    if (roi==NULL || !(dynamic_cast<PlanarFigure*>(roi) || dynamic_cast<PlanarFigureComposite*>(roi)) )
+    if (roi==NULL || !(dynamic_cast<PlanarFigure*>(roi->GetData()) || dynamic_cast<PlanarFigureComposite*>(roi->GetData())) )
         return NULL;
 
-    std::vector<long> tmp = ExtractFiberIdSubset(roi);
+    std::vector<long> tmp = ExtractFiberIdSubset(roi, storage);
 
     if (tmp.size()<=0)
         return mitk::FiberBundle::New();
@@ -739,24 +739,29 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(BaseData* roi)
     return mitk::FiberBundle::New(pTmp);
 }
 
-std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(BaseData* roi)
+std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataStorage* storage)
 {
     std::vector<long> result;
-    if (roi==NULL)
+    if (roi==NULL || roi->GetData()==NULL)
         return result;
 
-    mitk::PlanarFigureComposite::Pointer pfc = dynamic_cast<mitk::PlanarFigureComposite*>(roi);
+    mitk::PlanarFigureComposite::Pointer pfc = dynamic_cast<mitk::PlanarFigureComposite*>(roi->GetData());
     if (!pfc.IsNull()) // handle composite
     {
+        DataStorage::SetOfObjects::ConstPointer children = storage->GetDerivations(roi);
+        if (children->size()==0)
+            return result;
+
         switch (pfc->getOperationType())
         {
         case 0: // AND
         {
-            result = this->ExtractFiberIdSubset(pfc->getChildAt(0));
+            MITK_INFO << "AND";
+            result = this->ExtractFiberIdSubset(children->ElementAt(0), storage);
             std::vector<long>::iterator it;
-            for (int i=1; i<pfc->getNumberOfChildren(); ++i)
+            for (int i=1; i<children->Size(); ++i)
             {
-                std::vector<long> inRoi = this->ExtractFiberIdSubset(pfc->getChildAt(i));
+                std::vector<long> inRoi = this->ExtractFiberIdSubset(children->ElementAt(i), storage);
 
                 std::vector<long> rest(std::min(result.size(),inRoi.size()));
                 it = std::set_intersection(result.begin(), result.end(), inRoi.begin(), inRoi.end(), rest.begin() );
@@ -767,12 +772,13 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(BaseData* roi)
         }
         case 1: // OR
         {
-            result = ExtractFiberIdSubset(pfc->getChildAt(0));
+            MITK_INFO << "OR";
+            result = ExtractFiberIdSubset(children->ElementAt(0), storage);
             std::vector<long>::iterator it;
-            for (int i=1; i<pfc->getNumberOfChildren(); ++i)
+            for (int i=1; i<children->Size(); ++i)
             {
                 it = result.end();
-                std::vector<long> inRoi = ExtractFiberIdSubset(pfc->getChildAt(i));
+                std::vector<long> inRoi = ExtractFiberIdSubset(children->ElementAt(i), storage);
                 result.insert(it, inRoi.begin(), inRoi.end());
             }
 
@@ -784,13 +790,14 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(BaseData* roi)
         }
         case 2: // NOT
         {
+            MITK_INFO << "NOT";
             for(long i=0; i<this->GetNumFibers(); i++)
                 result.push_back(i);
 
             std::vector<long>::iterator it;
-            for (long i=0; i<pfc->getNumberOfChildren(); ++i)
+            for (long i=0; i<children->Size(); ++i)
             {
-                std::vector<long> inRoi = ExtractFiberIdSubset(pfc->getChildAt(i));
+                std::vector<long> inRoi = ExtractFiberIdSubset(children->ElementAt(i), storage);
 
                 std::vector<long> rest(result.size()-inRoi.size());
                 it = std::set_difference(result.begin(), result.end(), inRoi.begin(), inRoi.end(), rest.begin() );
@@ -801,11 +808,11 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(BaseData* roi)
         }
         }
     }
-    else if ( dynamic_cast<mitk::PlanarFigure*>(roi) )  // actual extraction
+    else if ( dynamic_cast<mitk::PlanarFigure*>(roi->GetData()) )  // actual extraction
     {
-        if ( dynamic_cast<mitk::PlanarPolygon*>(roi) )
+        if ( dynamic_cast<mitk::PlanarPolygon*>(roi->GetData()) )
         {
-            mitk::PlanarFigure::Pointer planarPoly = dynamic_cast<mitk::PlanarFigure*>(roi);
+            mitk::PlanarFigure::Pointer planarPoly = dynamic_cast<mitk::PlanarFigure*>(roi->GetData());
 
             //create vtkPolygon using controlpoints from planarFigure polygon
             vtkSmartPointer<vtkPolygon> polygonVtk = vtkSmartPointer<vtkPolygon>::New();
@@ -849,9 +856,9 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(BaseData* roi)
                 }
             }
         }
-        else if ( dynamic_cast<mitk::PlanarCircle*>(roi) )
+        else if ( dynamic_cast<mitk::PlanarCircle*>(roi->GetData()) )
         {
-            mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(roi);
+            mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(roi->GetData());
             Vector3D planeNormal = planarFigure->GetPlaneGeometry()->GetNormal();
             planeNormal.Normalize();
 

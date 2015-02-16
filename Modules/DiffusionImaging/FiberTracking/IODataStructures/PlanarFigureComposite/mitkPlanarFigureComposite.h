@@ -13,14 +13,6 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-/*
- *  mitkPlanarFigureComposite.h
- *  mitk-all
- *
- *  Created by HAL9000 on 2/4/11.
- *  Copyright 2011 __MyCompanyName__. All rights reserved.
- *
- */
 
 #ifndef _MITK_PLANARFIGURECOMPOSITE_H
 #define _MITK_PLANARFIGURECOMPOSITE_H
@@ -38,10 +30,6 @@ namespace mitk {
 class MITKFIBERTRACKING_EXPORT PlanarFigureComposite : public BaseData
 {
 
-    typedef itk::VectorContainer<unsigned int, BaseData::Pointer> CompositionContainer;
-    typedef itk::VectorContainer<unsigned int, mitk::DataNode::Pointer> DataNodeContainer;
-
-
 public:
 
     enum OperationType {
@@ -54,39 +42,14 @@ public:
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual void UpdateOutputInformation();
     virtual void SetRequestedRegionToLargestPossibleRegion();
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
     virtual bool VerifyRequestedRegion();
     virtual void SetRequestedRegion(const itk::DataObject*);
 
-    // ///MUST HAVE IMPLEMENTATION//////
-    bool SetControlPoint(unsigned int, const Point2D &, bool);
-    unsigned int GetMinimumNumberOfControlPoints() const
-    {
-        return 0;
-    }
-    unsigned int GetMaximumNumberOfControlPoints() const
-    {
-        return 0;
-    }
-    // /////////////////////////
-
-    int getNumberOfChildren();
-    mitk::BaseData::Pointer getChildAt(int);
-    void addPlanarFigure(BaseData::Pointer);
-
-
-    mitk::DataNode::Pointer getDataNodeAt(int);
-    void addDataNode(mitk::DataNode::Pointer);
-    void replaceDataNodeAt(int, mitk::DataNode::Pointer);
-
     // set if this compsition is AND, OR, NOT
     void setOperationType(OperationType);
     OperationType getOperationType() const;
-
-    void setDisplayName(std::string);
-    std::string getDisplayName();
 
 protected:
     PlanarFigureComposite();
@@ -94,26 +57,8 @@ protected:
 
     PlanarFigureComposite(const Self& other);
 
-    // ///MUST HAVE IMPLEMENTATION//////
-    /** \brief Generates the poly-line representation of the planar figure. */
-    virtual void GeneratePolyLine();
-
-    /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-    virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight);
-
-    /** \brief Calculates feature quantities of the planar figure. */
-    virtual void EvaluateFeaturesInternal();
-
-    virtual void PrintSelf(std::ostream &, itk::Indent) const;
-    // ////////////////////
-
 private:
-    //this vector takes planarfigures and planarfigureComosite types
-    CompositionContainer::Pointer m_PFVector;
     OperationType m_compOperation;
-
-    DataNodeContainer::Pointer m_DNVector;
-    std::string m_name;
 };
 }
 

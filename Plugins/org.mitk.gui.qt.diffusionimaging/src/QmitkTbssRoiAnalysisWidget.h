@@ -66,8 +66,8 @@ public:
 
   void PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
                    mitk::FiberBundle *fib,
-                   mitk::PlanarFigure* startRoi,
-                   mitk::PlanarFigure* endRoi,
+                   mitk::DataNode *startRoi,
+                   mitk::DataNode *endRoi,
                    int number);
 
 
@@ -136,7 +136,7 @@ public:
 
 
   void PlotFiberBetweenRois(mitk::FiberBundle *fib, mitk::Image* img,
-                            mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg=-1, int number=25);
+                            mitk::DataNode *startRoi, mitk::DataNode *endRoi, bool avg=-1, int number=25);
 
 
 
@@ -164,8 +164,8 @@ protected:
   std::vector< std::vector<double> > CalculateGroupProfiles();
   std::vector< std::vector<double> > CalculateGroupProfilesFibers(mitk::TbssImage::Pointer tbssImage,
                                                                   mitk::FiberBundle *fib,
-                                                                  mitk::PlanarFigure* startRoi,
-                                                                  mitk::PlanarFigure* endRoi,
+                                                                  mitk::DataNode* startRoi,
+                                                                  mitk::DataNode* endRoi,
                                                                   int number);
 
   void Plot(std::vector <std::vector<double> > groupProfiles);
@@ -211,17 +211,17 @@ protected:
   mitk::Image* m_CurrentImage;
   mitk::TbssImage* m_CurrentTbssImage;
 
-  mitk::PlanarFigure* m_CurrentStartRoi;
-  mitk::PlanarFigure* m_CurrentEndRoi;
+  mitk::DataNode* m_CurrentStartRoi;
+  mitk::DataNode* m_CurrentEndRoi;
 
 
   void DoPlotFiberBundles(mitk::FiberBundle *fib, mitk::Image* img,
-                          mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg=false, int number=25);
+                          mitk::DataNode* startRoi, mitk::DataNode* endRoi, bool avg=false, int number=25);
 
 
 
   /* \brief Creates tracts from a mitk::FiberBundle and two planar figures indicating the start end end point */
-  TractContainerType CreateTracts(mitk::FiberBundle *fib, mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi);
+  TractContainerType CreateTracts(mitk::FiberBundle *fib, mitk::DataNode* startRoi, mitk::DataNode* endRoi);
 
 
 

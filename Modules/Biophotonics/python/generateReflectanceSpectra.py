@@ -51,11 +51,12 @@ params = itertools.product(BVFs, Vss, ds, SaO2s, rs)
 paramsList = list(itertools.product(BVFs, Vss, ds, SaO2s, rs))
 
 for BVF, Vs, d, SaO2, r in params:
-    j = 0
+
     print('starting simulation ' + str(currentSimulation) + ' of ' + str(nrSamples))
-    for wavelength in wavelengths:
+    for idx, wavelength in enumerate(wavelengths):
 
-
+        # here the magic happens: run monte carlo simulation for tissue parameters
+        # and specific wavelength
         reflectanceValue = mch.runOneSimulation(
             wavelength, eHbO2, eHb,
             infile, outfolderMC, gpumcmlDirectory, gpumcmlExecutable,
@@ -63,12 +64,10 @@ for BVF, Vs, d, SaO2, r in params:
             r, SaO2,
             Fwhm = FWHM, nrPhotons=photons)
 
-
         print((BVF, Vs, d, SaO2, r, wavelength))
 
         # here, summarize result from wavelength in reflectance spectrum
-        reflectances[currentSimulation, j] = reflectanceValue
-        j +=1
+        reflectances[currentSimulation, idx] = reflectanceValue
 
     currentSimulation += 1
 

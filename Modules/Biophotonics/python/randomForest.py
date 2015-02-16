@@ -34,7 +34,7 @@ dataFolder = 'data/output/'
 trainingParameters, trainingReflectances, testParameters, testReflectances = \
     setupData.setupTwoDimensionalData(dataFolder)
 
-# trasform data with pca (test)
+# transform data with pca (test)
 #pca = decomposition.PCA(n_components=22)
 #pca.fit(trainingReflectances)
 #trainingReflectances = pca.transform(trainingReflectances)
@@ -46,12 +46,12 @@ start = time.time()
 
 # get best forest using k-fold cross validation and grid search
 
-#kf = KFold(trainingReflectances.shape[0], 5, shuffle=True)
-#param_grid = [
-#  {'max_depth': np.arange(2,20,1), 'n_estimators': np.arange(10,1000,10)}]
+kf = KFold(trainingReflectances.shape[0], 5, shuffle=True)
+param_grid = [
+  {'max_depth': np.arange(2,20,1), 'n_estimators': np.arange(10,1000,10)}]
 
-#best_rf = GridSearchCV(RandomForestRegressor(50, max_depth=8), param_grid, cv=kf, n_jobs=11)
-#best_rf.fit(trainingReflectances, trainingParameters)
+best_rf = GridSearchCV(RandomForestRegressor(50, max_depth=8), param_grid, cv=kf, n_jobs=11)
+best_rf.fit(trainingReflectances, trainingParameters)
 
 
 end = time.time()
@@ -80,12 +80,12 @@ print("higher quartile: " + str(np.percentile(absErrors, 75, axis=0)))
 
 print("-------------------------------")
 
-#print("result of random forest with parameters: " + str(best_rf.best_params_))
+print("result of random forest with parameters: " + str(best_rf.best_params_))
 # predict test reflectances and get absolute errors.
-#absErrors = np.abs(best_rf.predict(testReflectances) - testParameters)
-#print("error distribution BVF, Volume fraction")
-#print("median: " + str(np.median(absErrors, axis=0)))
-#print("lower quartile: " + str(np.percentile(absErrors, 25, axis=0)))
-#print("higher quartile: " + str(np.percentile(absErrors, 75, axis=0)))
+absErrors = np.abs(best_rf.predict(testReflectances) - testParameters)
+print("error distribution BVF, Volume fraction")
+print("median: " + str(np.median(absErrors, axis=0)))
+print("lower quartile: " + str(np.percentile(absErrors, 25, axis=0)))
+print("higher quartile: " + str(np.percentile(absErrors, 75, axis=0)))
 
 

@@ -852,6 +852,9 @@ void IOUtil::Save(const BaseData* data, const std::string& mimeType, const std::
 void IOUtil::Save(const BaseData* data, const std::string& mimeType, const std::string& path,
                   const IFileWriter::Options& options, bool addExtension)
 {
+  if ((data == NULL) || (data->IsEmpty()))
+    mitkThrow() << "BaseData cannotbe null or empty for save methods in IOUtil.h.";
+
   std::string errMsg;
   if (options.empty())
   {

@@ -91,9 +91,10 @@ static void TestContourModelIO_OneTimeStep()
 
 static void TestContourModelIO_EmptyContourModel()
 {
-  mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+ // Commented out: Saving of empty basedatas is invalid since Reader/Writer redesign
+ // mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
-  TestContourModel(contour.GetPointer(), "/contourEmpty.cnt");
+ // TestContourModel(contour.GetPointer(), "/contourEmpty.cnt");
 }
 
 

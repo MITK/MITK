@@ -35,12 +35,12 @@ public:
 
 private:
 
-  std::auto_ptr<IFileReader> m_SceneReader;
+  std::unique_ptr<IFileReader> m_SceneReader;
 
-  std::auto_ptr<IFileReader> m_ObjReader;
-  std::auto_ptr<IFileWriter> m_ObjWriter;
+  std::unique_ptr<IFileReader> m_ObjReader;
+  std::unique_ptr<IFileWriter> m_ObjWriter;
 
-  std::auto_ptr<IFileReader> m_PlyReader;
+  std::unique_ptr<IFileReader> m_PlyReader;
 };
 
 }

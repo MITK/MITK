@@ -37,9 +37,9 @@ gpumcmlDirectory = '/home/wirkert/workspace/monteCarlo/gpumcml/fast-gpumcml/'
 gpumcmlExecutable = 'gpumcml.sm_20'
 
 
-BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = setup.setupNormalSimulation()
+BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = setup.setupPerfectArtificialSimulation()
 
-nrSimulations = 100
+nrSimulations = 10000
 reflectances  = np.zeros((nrSimulations, len(wavelengths)))
 parameters    = np.zeros((nrSimulations, 2))
 

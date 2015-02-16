@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 struct IFileReader;
+struct IFileWriter;
 
 class IOExtActivator : public us::ModuleActivator
 {
@@ -35,6 +36,11 @@ public:
 private:
 
   std::auto_ptr<IFileReader> m_SceneReader;
+
+  std::auto_ptr<IFileReader> m_ObjReader;
+  std::auto_ptr<IFileWriter> m_ObjWriter;
+
+  std::auto_ptr<IFileReader> m_PlyReader;
 };
 
 }

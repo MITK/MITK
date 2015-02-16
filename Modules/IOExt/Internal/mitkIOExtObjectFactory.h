@@ -47,7 +47,6 @@ private:
   MultimapType m_SaveFileExtensionsMap;
 
   itk::ObjectFactoryBase::Pointer m_ParRecFileIOFactory;
-  itk::ObjectFactoryBase::Pointer m_ObjFileIOFactory;
   itk::ObjectFactoryBase::Pointer m_VtkUnstructuredGridIOFactory;
   itk::ObjectFactoryBase::Pointer m_StlVolumeTimeSeriesIOFactory;
   itk::ObjectFactoryBase::Pointer m_VtkVolumeTimeSeriesIOFactory;

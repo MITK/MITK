@@ -55,6 +55,8 @@ public:
   static CustomMimeType VTK_POLYDATA_LEGACY_MIMETYPE(); // (mitk::Surface) vtk
   static CustomMimeType VTK_PARALLEL_POLYDATA_MIMETYPE(); // (mitk::Surface) pvtp
   static CustomMimeType STEREOLITHOGRAPHY_MIMETYPE(); // (mitk::Surface) stl
+  static CustomMimeType WAVEFRONT_OBJ_MIMETYPE(); // (mitk::Surface) obj
+  static CustomMimeType STANFORD_PLY_MIMETYPE(); // (mitk::Surface) ply
 
   static std::string STEREOLITHOGRAPHY_NAME(); // DEFAULT_BASE_NAME.stl
   static std::string VTK_IMAGE_NAME(); // DEFAULT_BASE_NAME.vtk.image
@@ -63,6 +65,8 @@ public:
   static std::string VTK_POLYDATA_NAME(); // DEFAULT_BASE_NAME.vtk.polydata
   static std::string VTK_POLYDATA_LEGACY_NAME(); // DEFAULT_BASE_NAME.vtk.polydata.legacy
   static std::string VTK_PARALLEL_POLYDATA_NAME(); // DEFAULT_BASE_NAME.vtk.parallel.polydata
+  static std::string WAVEFRONT_OBJ_NAME(); // DEFAULT_BASE_NAME.obj
+  static std::string STANFORD_PLY_NAME(); // DEFAULT_BASE_NAME.ply
 
   // ------------------------- Image formats (ITK based) --------------------------
 

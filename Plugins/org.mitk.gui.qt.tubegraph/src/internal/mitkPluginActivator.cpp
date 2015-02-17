@@ -42,4 +42,6 @@ namespace mitk
 
 } //namespace
 
-Q_EXPORT_PLUGIN2(org_mbi_gui_qt_tubegraph, mitk::PluginActivator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_tubegraph, mitk::PluginActivator)
+#endif

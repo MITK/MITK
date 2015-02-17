@@ -28,24 +28,24 @@ void mitk::StlVolumeTimeSeriesReader::GenerateData()
     return ;
   }
 
-  mitk::Surface::Pointer surface = this->GetOutput();
+  mitk::Surface::Pointer result = this->GetOutput();
   MITK_INFO << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
-  surface->Expand(m_MatchedFileNames.size());
+  result->Expand(m_MatchedFileNames.size());
   for ( unsigned int i = 0 ; i < m_MatchedFileNames.size(); ++i )
   {
     std::string fileName = m_MatchedFileNames[i];
     MITK_INFO << "Loading " << fileName << " as stl..." << std::endl;
 
-    surface = IOUtil::LoadSurface(fileName.c_str());
+    mitk::Surface::Pointer timestepSurface  = IOUtil::LoadSurface(fileName.c_str());
 
-    if (surface.IsNull())
+    if (timestepSurface.IsNull())
     {
       itkWarningMacro(<< "stlReader returned NULL while reading " << fileName << ". Trying to continue with empty vtkPolyData...");
-      surface->SetVtkPolyData(vtkPolyData::New(), i);
+      result->SetVtkPolyData(vtkPolyData::New(), i);
       return;
     }
 
-    surface->SetVtkPolyData(surface->GetVtkPolyData(), i);
+    result->SetVtkPolyData(timestepSurface->GetVtkPolyData(), i);
   }
 
 }

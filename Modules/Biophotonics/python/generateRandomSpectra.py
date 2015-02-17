@@ -17,7 +17,7 @@ import setupSimulation as setup
 
 
 # the input file without the run specific parameters for ua, us and d:
-infileString = 'input/darmpythontest.mci'
+infileString = 'data/colonTemplate.mci'
 infile       = open(infileString)
 # the output folder for the mc simulations
 outfolderMC = 'outputMC/'
@@ -39,9 +39,9 @@ gpumcmlExecutable = 'gpumcml.sm_20'
 
 BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = setup.setupPerfectArtificialSimulation()
 
-nrSimulations = 10000
+nrSimulations = 100
 reflectances  = np.zeros((nrSimulations, len(wavelengths)))
-parameters    = np.zeros((nrSimulations, 2))
+parameters    = np.zeros((nrSimulations, 5))
 
 print('start simulations...')
 
@@ -60,7 +60,7 @@ for i in range(nrSimulations):
     r   = random.uniform(min(rs), max(rs))
     SaO2= random.uniform(min(SaO2s), max(SaO2s))
 
-    parameters[i,:] = np.array([BVF, Vs])#, d, r, SaO2])
+    parameters[i,:] = np.array([BVF, Vs, d, r, SaO2])
 
 
     for j, wavelength in enumerate(wavelengths):
@@ -86,7 +86,7 @@ infile.close()
 
 # save the reflectance results!
 now = datetime.datetime.now().strftime("%Y%B%d%I:%M%p")
-np.save(outfolderRS + now + "reflectancesRandom", reflectances)
+np.save(outfolderRS + now + "reflectancesRandom"  + str(photons) + "photons", reflectances)
 np.save(outfolderRS + now + "paramtersRandom", parameters)
 
 end = time.time()

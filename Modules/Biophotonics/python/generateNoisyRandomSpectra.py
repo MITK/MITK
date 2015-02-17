@@ -25,10 +25,10 @@ outfolderRS = 'data/output/'
 gpumcmlDirectory = '/home/wirkert/workspace/monteCarlo/gpumcml/fast-gpumcml/'
 gpumcmlExecutable = 'gpumcml.sm_20'
 
-BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = setup.setupNormalSimulation()
+BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = setup.setupNoisySimulation()
 
 
-nrSimulations = 20000
+nrSimulations = 10000
 reflectances  = np.zeros((nrSimulations, len(wavelengths)))
 parameters    = np.zeros((nrSimulations, 8))
 
@@ -81,7 +81,7 @@ infile.close()
 
 # save the reflectance results!
 now = datetime.datetime.now().strftime("%Y%B%d%I:%M%p")
-np.save(outfolderRS + now + "reflectancesRandomWithNoiseOurBands", reflectances)
+np.save(outfolderRS + now + "reflectancesRandomWithNoiseOurBands"  + str(photons) + "photons", reflectances)
 np.save(outfolderRS + now + "paramtersRandomWithNoiseOurBands", parameters)
 
 end = time.time()

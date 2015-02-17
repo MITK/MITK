@@ -21,7 +21,7 @@ import setupData
 dataFolder = "data/output/"
 
 trainingParameters, trainingReflectances, testParameters, testReflectances = \
-    setupData.setupTwoDimensionalData(dataFolder)
+    setupData.setupPerfectArtificialData(dataFolder)
 
 
 BVFs = np.unique(trainingParameters[:,0])
@@ -42,8 +42,7 @@ absErrors = np.zeros_like(testParameters)
 for idx, (testParameter, testReflectance) in enumerate(zip(testParameters, testReflectances)):
     functionToMinimize.setReflectanceToMatch(testReflectance)
     minimization = minimize(functionToMinimize.f, [np.median(BVFs), np.median(Vss)], method="Nelder-Mead")
-    # interpolation extrapolates with constant values. Since the minimization function is
-    # covex, we can just crop it to the bounds
+    # interpolation extrapolates with constant values. We just crop it to the bounds
     clippedX= np.clip(minimization.x, [min(BVFs), min(Vss)], [max(BVFs), max(Vss)])
 
     absErrors[idx,:] = np.abs(clippedX - testParameter)

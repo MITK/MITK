@@ -4,8 +4,6 @@ import datetime
 
 import numpy as np
 
-import matplotlib.pyplot as plt
-
 import monteCarloHelper as mch
 
 import setupSimulation as setup

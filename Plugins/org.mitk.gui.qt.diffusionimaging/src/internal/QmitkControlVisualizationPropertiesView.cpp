@@ -833,7 +833,7 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationResetColoring(
     if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
     {
         mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData());
-        fib->DoColorCodingOrientationBased();
+        fib->ColorFibersByOrientation();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 }

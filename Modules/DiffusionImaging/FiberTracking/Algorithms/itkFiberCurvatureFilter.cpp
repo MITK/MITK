@@ -24,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk{
 
 FiberCurvatureFilter::FiberCurvatureFilter()
-    : m_AngularDeviation(20)
-    , m_Distance(1.0)
+    : m_AngularDeviation(30)
+    , m_Distance(5.0)
     , m_RemoveFibers(false)
 {
 
@@ -73,7 +73,8 @@ void FiberCurvatureFilter::GenerateData()
                 dist += v.magnitude();
                 v.normalize();
                 vectors.push_back(v);
-                meanV += v;
+                if (c==j)
+                    meanV += v;
                 c--;
             }
             c = j;
@@ -92,7 +93,8 @@ void FiberCurvatureFilter::GenerateData()
                 dist += v.magnitude();
                 v.normalize();
                 vectors.push_back(v);
-                meanV += v;
+                if (c==j)
+                    meanV += v;
                 c++;
             }
             meanV.normalize();
@@ -103,8 +105,8 @@ void FiberCurvatureFilter::GenerateData()
                 double angle = dot_product(meanV, vectors.at(c));
                 if (angle>1.0)
                     angle = 1.0;
-                if (angle<0.0)
-                    angle = 0.0;
+                if (angle<-1.0)
+                    angle = -1.0;
                 dev += acos(angle)*180/M_PI;
             }
             if (vectors.size()>0)

@@ -25,7 +25,7 @@
         <x>0</x>
         <y>0</y>
         <width>355</width>
-        <height>302</height>
+        <height>308</height>
        </rect>
       </property>
       <attribute name="label">
@@ -423,8 +423,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>270</width>
-        <height>380</height>
+        <width>306</width>
+        <height>410</height>
        </rect>
       </property>
       <attribute name="label">
@@ -725,7 +725,7 @@
                 <double>0.100000000000000</double>
                </property>
                <property name="value">
-                <double>15.000000000000000</double>
+                <double>30.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -751,7 +751,7 @@
                 <double>1.000000000000000</double>
                </property>
                <property name="value">
-                <double>10.000000000000000</double>
+                <double>5.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -812,7 +812,7 @@
         <x>0</x>
         <y>0</y>
         <width>355</width>
-        <height>349</height>
+        <height>382</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1003,6 +1003,11 @@
          <item>
           <property name="text">
            <string>Weight Bundle</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Color fibers by curvature</string>
           </property>
          </item>
         </widget>

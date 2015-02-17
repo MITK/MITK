@@ -69,15 +69,15 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::PlanarFigureCompositeReade
         switch(comptype)
         {
         case 0:
-            pfc->setOperationType(mitk::PlanarFigureComposite::OperationType::AND);
+            pfc->setOperationType(mitk::PlanarFigureComposite::AND);
             MITK_INFO << "loading AND composition";
             break;
         case 1:
-            pfc->setOperationType(mitk::PlanarFigureComposite::OperationType::OR);
+            pfc->setOperationType(mitk::PlanarFigureComposite::OR);
             MITK_INFO << "loading OR composition";
             break;
         case 2:
-            pfc->setOperationType(mitk::PlanarFigureComposite::OperationType::NOT);
+            pfc->setOperationType(mitk::PlanarFigureComposite::NOT);
             MITK_INFO << "loading NOT composition";
             break;
         default:

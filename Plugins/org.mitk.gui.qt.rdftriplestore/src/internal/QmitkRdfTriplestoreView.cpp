@@ -159,7 +159,8 @@ void QmitkRdfTriplestoreView::ImportRdfFile()
   Store store;
   //store.SetBaseUri(Uri("http://mitk.org/wiki/MITK"));
   store.Import("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf#");
-  store.Import("file:///D:/home/knorr/builds/tripleStore/Ontologies/dcterms.ttl");
+  store.Import("file:D:/home/knorr/builds/tripleStore/Ontologies/dcterms.ttl");
+  store.Import("file:D:/home/knorr/builds/tripleStore/Ontologies/fma_3.1.ttl");
   //store.AddPrefix("bomowl", Uri("file:C:/Users/knorr/Desktop/BaseOntologyMitk.owl#"));
 
   store.Save("C:/Users/knorr/Desktop/storeFromMitkWithDC.rdf");
@@ -198,17 +199,17 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
     std::string nodeUUID = generator.Generate();
     node->SetProperty("uuid", mitk::StringProperty::New(nodeUUID));
 
-    //const mitk::PropertyList::PropertyMap* map = node->GetData()->GetPropertyList()->GetMap();
-    //for (mitk::PropertyList::PropertyMap::const_iterator i = map->begin(); i != map->end(); i++)
-    //{
-    //  MITK_INFO << i->first << " " << i->second;
-    //}
+    const mitk::PropertyList::PropertyMap* map = node->GetData()->GetPropertyList()->GetMap();
+    for (mitk::PropertyList::PropertyMap::const_iterator i = map->begin(); i != map->end(); i++)
+    {
+      MITK_INFO << i->first << " " << i->second;//getvalueasstring()
+    }
 
     // Get the parent of a DataNode
     mitk::DataStorage::SetOfObjects::ConstPointer sourceContainer = GetDataStorage()->GetSources(node);
 
-    for( mitk::DataStorage::SetOfObjects::ConstIterator sources = nodeContainer->Begin();
-      sources != nodeContainer->End(); sources++ )
+    for( mitk::DataStorage::SetOfObjects::ConstIterator sources = sourceContainer->Begin();
+      sources != sourceContainer->End(); sources++ )
     {
       const mitk::DataNode::Pointer sourceNode = sources->Value();
 
@@ -216,17 +217,30 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
       std::string sourceUUID = generator.Generate();
       sourceNode->SetProperty("uuid", mitk::StringProperty::New(sourceUUID));
 
-      Uri first(":" + nodeUUID);
-      Uri second(":" + sourceUUID);
+      // TODO: Name(title)
+      Uri firstT(":" + nodeUUID + name);
+      Uri secondT(name);
+      Node subT(firstT);
+      Node predT(Uri("dcterms:title"));
+      Node objT(secondT);
+      Triple tName(subT, predT, objT);
 
+      // Parent(source)
+      Uri first(":" + nodeUUID + name);
+      Uri second(":" + sourceUUID + sourceName);
       Node sub(first);
       Node pred(Uri("dcterms:source"));
       Node obj(second);
-
       Triple t(sub, pred, obj);
 
+      m_Store.Add(tName);
       m_Store.Add(t);
-      std::cout << t;
+
+      std::cout << tName << std::endl;
+      std::cout << t << std::endl;
+
+      // TODO: Add all properties to store
+      // TODO: Save store
     }
   }
 }

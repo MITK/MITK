@@ -41,10 +41,22 @@ std::vector<CustomMimeType*> DiffusionIOMimeTypes::Get()
 
   mimeTypes.push_back(CONNECTOMICS_MIMETYPE().Clone());
 
+  mimeTypes.push_back(PLANARFIGURECOMPOSITE_MIMETYPE().Clone());
+
   return mimeTypes;
 }
 
 // Mime Types
+
+CustomMimeType DiffusionIOMimeTypes::PLANARFIGURECOMPOSITE_MIMETYPE()
+{
+  CustomMimeType mimeType(PLANARFIGURECOMPOSITE_MIMETYPE_NAME());
+  std::string category = "Planar Figure Composite";
+  mimeType.SetComment("Planar Figure Composite");
+  mimeType.SetCategory(category);
+  mimeType.AddExtension("pfc");
+  return mimeType;
+}
 
 CustomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE()
 {
@@ -287,6 +299,12 @@ std::string DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_NAME()
   return name;
 }
 
+std::string DiffusionIOMimeTypes::PLANARFIGURECOMPOSITE_MIMETYPE_NAME()
+{
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".pfc";
+  return name;
+}
+
 // Descriptions
 std::string DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_DESCRIPTION()
 {
@@ -321,6 +339,12 @@ std::string DiffusionIOMimeTypes::QBI_MIMETYPE_DESCRIPTION()
 std::string DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_DESCRIPTION()
 {
   static std::string description = "Connectomics Networks";
+  return description;
+}
+
+std::string DiffusionIOMimeTypes::PLANARFIGURECOMPOSITE_MIMETYPE_DESCRIPTION()
+{
+  static std::string description = "Planar Figure Composite";
   return description;
 }
 

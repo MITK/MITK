@@ -84,6 +84,12 @@ public:
 
   static std::string CONNECTOMICS_MIMETYPE_DESCRIPTION();
 
+  static CustomMimeType PLANARFIGURECOMPOSITE_MIMETYPE();
+
+  static std::string PLANARFIGURECOMPOSITE_MIMETYPE_NAME();
+
+  static std::string PLANARFIGURECOMPOSITE_MIMETYPE_DESCRIPTION();
+
 private:
 
   // purposely not implemented

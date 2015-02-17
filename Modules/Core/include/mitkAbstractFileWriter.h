@@ -138,7 +138,7 @@ protected:
    * create a new output stream based on the output location in the
    * file system.
    */
-  class OutputStream : public std::ostream
+  class MITKCORE_EXPORT OutputStream : public std::ostream
   {
   public:
     OutputStream(IFileWriter* writer, std::ios_base::openmode mode = std::ios_base::trunc | std::ios_base::out);

@@ -50,12 +50,10 @@ std::string mitk::PlanarFigureCompositeSerializer::Serialize()
   filename += "_";
   filename += m_FilenameHint;
   filename += ".pfc";
-  MITK_INFO << filename;
 
   std::string fullname(m_WorkingDirectory);
   fullname += "/";
   fullname += itksys::SystemTools::ConvertToOutputPath(filename.c_str());
-  MITK_INFO << fullname;
 
   try
   {

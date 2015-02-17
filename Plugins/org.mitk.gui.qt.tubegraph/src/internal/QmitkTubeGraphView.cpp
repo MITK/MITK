@@ -38,7 +38,7 @@ QmitkTubeGraphView::QmitkTubeGraphView()
 QmitkTubeGraphView::~QmitkTubeGraphView()
 {
   delete m_Parent;
-  m_ActivationMode.mitk::TubeGraphDataInteractor::ActivationMode::~ActivationMode();
+  //m_ActivationMode.mitk::TubeGraphDataInteractor::ActivationMode::~ActivationMode();
 
   //remove observer
   //if (m_ActiveInteractor.IsNotNull())

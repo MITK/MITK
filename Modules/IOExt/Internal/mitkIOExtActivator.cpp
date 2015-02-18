@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSceneFileReader.h"
 #include "mitkObjFileReaderService.h"
+#include "mitkVtkUnstructuredGridReader.h"
 #include "mitkPlyFileWriterService.h"
 #include "mitkPlyFileReaderService.h"
 
@@ -28,6 +29,7 @@ void IOExtActivator::Load(us::ModuleContext*)
 {
   m_SceneReader.reset(new SceneFileReader());
 
+  m_VtkUnstructuredGridReader.reset(new VtkUnstructuredGridReader());
   m_ObjReader.reset(new ObjFileReaderService());
 
   m_PlyReader.reset(new PlyFileReaderService());

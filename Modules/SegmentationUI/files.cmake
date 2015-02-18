@@ -82,3 +82,7 @@ Qmitk/QmitkSliceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitkSurfaceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitkSearchLabelDialogGUI.ui
 )
+
+set(QRC_FILES
+  resources/SegmentationUI.qrc
+)

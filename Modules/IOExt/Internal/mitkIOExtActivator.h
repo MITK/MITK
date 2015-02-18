@@ -35,6 +35,7 @@ public:
 private:
 
   std::auto_ptr<IFileReader> m_SceneReader;
+  std::auto_ptr<IFileReader> m_VtkUnstructuredGridReader;
 };
 
 }

@@ -36,7 +36,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 typedef unsigned int MapperSlotId;
 
-
+/** From ITK 4.7 version, the TypeMacro overrides (by using the explicit attribute) the GetNameOfClass
+ * hence the SuperClass must provide one.
+ *
+ * If not, use the mitkClassMacroNoParent version
+ */
 #define mitkClassMacro(className,SuperClassName) \
   typedef className        Self; \
   typedef SuperClassName      Superclass; \
@@ -45,6 +49,17 @@ typedef unsigned int MapperSlotId;
   static const char* GetStaticNameOfClass() { return #className; } \
   virtual std::vector<std::string> GetClassHierarchy() const { return mitk::GetClassHierarchy<Self>(); } \
   itkTypeMacro(className,SuperClassName)
+
+/** At version 4.7 provides two type macros, the normal one expects the Superclass to provide the
+ *  GetNameOfClass explicitely, the NoParent deos not expect anything.
+ */
+#define mitkClassMacroNoParent(className) \
+  typedef className        Self; \
+  typedef itk::SmartPointer<Self> Pointer; \
+  typedef itk::SmartPointer<const Self>  ConstPointer; \
+  static const char* GetStaticNameOfClass() { return #className; } \
+  virtual std::vector<std::string> GetClassHierarchy() const { return mitk::GetClassHierarchy<Self>(); } \
+  itkTypeMacroNoParent(className)
 
 /**
 * Macro for Constructors with one parameter for classes derived from itk::Lightobject

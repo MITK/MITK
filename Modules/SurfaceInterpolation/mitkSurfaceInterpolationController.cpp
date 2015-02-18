@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 
 #include "mitkImageToSurfaceFilter.h"
-#include "mitkImageTimeSelector.h"
-#include "vtkXMLPolyDataWriter.h"
+//#include "vtkXMLPolyDataWriter.h"
+#include "vtkPolyDataWriter.h"
 
 // Check whether the given contours are coplanar
 bool ContoursCoplanar(mitk::SurfaceInterpolationController::ContourPositionInformation leftHandSide, mitk::SurfaceInterpolationController::ContourPositionInformation rightHandSide)
@@ -81,6 +81,7 @@ mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   m_ReduceFilter = ReduceContourSetFilter::New();
   m_NormalsFilter = ComputeContourSetNormalsFilter::New();
   m_InterpolateSurfaceFilter = CreateDistanceImageFromSurfaceFilter::New();
+  m_TimeSelector = ImageTimeSelector::New();
 
   m_ReduceFilter->SetUseProgressBar(false);
 //  m_ReduceFilter->SetProgressStepSize(1);
@@ -188,12 +189,11 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
   m_ReduceFilter->Update();
   m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
 
-  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-  timeSelector->SetInput( m_SelectedSegmentation );
-  timeSelector->SetTimeNr( m_CurrentTimeStep );
-  timeSelector->SetChannelNr( 0 );
-  timeSelector->Update();
-  mitk::Image::Pointer refSegImage = timeSelector->GetOutput();
+  m_TimeSelector->SetInput( m_SelectedSegmentation );
+  m_TimeSelector->SetTimeNr( m_CurrentTimeStep );
+  m_TimeSelector->SetChannelNr( 0 );
+  m_TimeSelector->Update();
+  mitk::Image::Pointer refSegImage = m_TimeSelector->GetOutput();
 
   //m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);//war vorher schon drin?
   m_NormalsFilter->SetSegmentationBinaryImage(refSegImage);//maybe leading to crash
@@ -289,7 +289,8 @@ void mitk::SurfaceInterpolationController::Interpolate()
   //m_DataStorage->Add( distanceImageNode );
 
   int numContours = m_NormalsFilter->GetNumberOfOutputs();
-  vtkXMLPolyDataWriter* writer = vtkXMLPolyDataWriter::New();
+  //vtkXMLPolyDataWriter* writer = vtkXMLPolyDataWriter::New();
+  vtkPolyDataWriter* writer = vtkPolyDataWriter::New();
   //writer->SetDataModeToAscii();
 
   for ( int i=0; i < numContours; ++i )
@@ -301,7 +302,11 @@ void mitk::SurfaceInterpolationController::Interpolate()
     fileName.append( fileDescr );
 
     mitk::Surface::Pointer contour = m_NormalsFilter->GetOutput( i );
-    writer->SetInputData( contour->GetVtkPolyData() );
+    vtkPolyData* poly = contour->GetVtkPolyData();
+    poly->GetCellData()->AddArray( poly->GetCellData()->GetNormals() );
+
+    //writer->SetInputData( contour->GetVtkPolyData() );
+    writer->SetInputData( poly );
     writer->SetFileName( fileName.c_str() );
     //writer->Write();
     /*mitk::DataNode::Pointer contourNode = mitk::DataNode::New();
@@ -456,15 +461,15 @@ bool mitk::SurfaceInterpolationController::ReplaceInterpolationSession(mitk::Ima
   if (m_SelectedSegmentation == oldSession)
     m_SelectedSegmentation = newSession;
 
-  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+  /*mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
   timeSelector->SetInput( m_SelectedSegmentation );
   timeSelector->SetTimeNr( m_CurrentTimeStep );
   timeSelector->SetChannelNr( 0 );
   timeSelector->Update();
-  mitk::Image::Pointer refSegImage = timeSelector->GetOutput();
+  mitk::Image::Pointer refSegImage = timeSelector->GetOutput();*/
 
   //m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);
-  m_NormalsFilter->SetSegmentationBinaryImage(refSegImage);
+  //m_NormalsFilter->SetSegmentationBinaryImage(refSegImage);
 
   this->RemoveInterpolationSession(oldSession);
   return true;
@@ -637,15 +642,14 @@ void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Obje
 
 void mitk::SurfaceInterpolationController::ReinitializeInterpolation()
 {
-  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-  timeSelector->SetInput( m_SelectedSegmentation );
-  timeSelector->SetTimeNr( m_CurrentTimeStep );
-  timeSelector->SetChannelNr( 0 );
-  timeSelector->Update();
-  mitk::Image::Pointer refSegImage = timeSelector->GetOutput();
+  //m_TimeSelector->SetInput( m_SelectedSegmentation );
+  //timeSelector->SetTimeNr( m_CurrentTimeStep );
+  //timeSelector->SetChannelNr( 0 );
+  //timeSelector->Update();
+  //mitk::Image::Pointer refSegImage = m_TimeSelector->GetOutput();
 
-  //m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);
-  m_NormalsFilter->SetSegmentationBinaryImage(refSegImage);
+  ////m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);
+  //m_NormalsFilter->SetSegmentationBinaryImage(refSegImage);
 
   // If session has changed reset the pipeline
   m_ReduceFilter->Reset();
@@ -654,29 +658,35 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation()
 
   itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
 
-  //AccessFixedDimensionByItk_1( m_SelectedSegmentation, GetImageBase, 3, itkImage );
-  AccessFixedDimensionByItk_1( refSegImage, GetImageBase, 3, itkImage );
-  m_InterpolateSurfaceFilter->SetReferenceImage(itkImage.GetPointer());
-
-  unsigned int numTimeSteps = m_SelectedSegmentation->GetTimeSteps();
-  m_ListOfInterpolationSessions[m_SelectedSegmentation].resize( numTimeSteps );
-  /*for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
-  {*/
-    unsigned int numContours = m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].size();
-    for ( unsigned int c = 0; c < numContours; ++c )
-    {
-      m_ReduceFilter->SetInput(c, m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour);
-    }
-  //}
-
-  m_ReduceFilter->Update();
-
-  m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
-
-  for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
+  if ( m_SelectedSegmentation )
   {
-    m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
-    m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
+    //AccessFixedDimensionByItk_1( m_SelectedSegmentation, GetImageBase, 3, itkImage );
+    m_TimeSelector->SetInput( m_SelectedSegmentation );
+    m_TimeSelector->Update();
+    mitk::Image::Pointer refSegImage = m_TimeSelector->GetOutput();
+    AccessFixedDimensionByItk_1( refSegImage, GetImageBase, 3, itkImage );
+    m_InterpolateSurfaceFilter->SetReferenceImage(itkImage.GetPointer());
+
+    unsigned int numTimeSteps = m_SelectedSegmentation->GetTimeSteps();
+    m_ListOfInterpolationSessions[m_SelectedSegmentation].resize( numTimeSteps );
+    /*for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
+    {*/
+      unsigned int numContours = m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].size();
+      for ( unsigned int c = 0; c < numContours; ++c )
+      {
+        m_ReduceFilter->SetInput(c, m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour);
+      }
+    //}
+
+    m_ReduceFilter->Update();
+
+    m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
+
+    for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
+    {
+      m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
+      m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
+    }
+    Modified();
   }
-  Modified();
 }

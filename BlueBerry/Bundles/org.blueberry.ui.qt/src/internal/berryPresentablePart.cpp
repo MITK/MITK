@@ -167,7 +167,7 @@ QString PresentablePart::GetTitleStatus() const
   return titleStatus;
 }
 
-void* PresentablePart::GetTitleImage()
+QIcon PresentablePart::GetTitleImage()
 {
 
   if (enableOutputs)
@@ -177,7 +177,7 @@ void* PresentablePart::GetTitleImage()
 
 //  return PlatformUI.getWorkbench().getSharedImages().getImage(
 //      ISharedImages.IMG_DEF_VIEW);
-  return 0;
+  return QIcon();
 }
 
 QString PresentablePart::GetTitleToolTip() const

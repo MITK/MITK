@@ -227,8 +227,7 @@ CommandContributionItemParameter::Pointer ShowViewMenu::GetItem(const QString& v
       window, viewId, IWorkbenchCommandConstants::VIEWS_SHOW_VIEW,
       CommandContributionItem::STYLE_PUSH));
   parms->label = label;
-  QIcon icon(*(reinterpret_cast<QIcon*>(desc->GetImageDescriptor()->CreateImage())));
-  parms->icon = icon;
+  parms->icon = desc->GetImageDescriptor();
 
   Object::Pointer strViewId(new ObjectString(viewId));
   parms->parameters.insert(IWorkbenchCommandConstants::VIEWS_SHOW_VIEW_PARM_ID, strViewId);

@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIConfigurationElement.h>
 
+#include <QIcon>
+
 namespace berry
 {
 
@@ -61,7 +63,7 @@ private:
 
   QString imageFilename;
 
-  mutable SmartPointer<ImageDescriptor> imageDesc;
+  mutable QIcon imageDesc;
 
   mutable bool testImage;
 
@@ -203,7 +205,7 @@ public: QString GetId() const;
    *
    * @return the image descriptor
    */
-public: SmartPointer<ImageDescriptor> GetImageDescriptor() const;
+public: QIcon GetImageDescriptor() const;
 
   /**
    * Verifies that the image descriptor generates an image.  If not, the

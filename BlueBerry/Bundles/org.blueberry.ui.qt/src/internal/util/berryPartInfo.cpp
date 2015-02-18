@@ -19,10 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-PartInfo::PartInfo() :
-  image(0)
+PartInfo::PartInfo()
 {
-
 }
 
 PartInfo::PartInfo(IPresentablePart::Pointer part)
@@ -35,7 +33,7 @@ void PartInfo::Set(IPresentablePart::Pointer part)
   name = part->GetName();
   title = part->GetTitle();
   contentDescription = part->GetTitleStatus();
-  image = static_cast<QIcon*> (part->GetTitleImage());
+  image = part->GetTitleImage();
   toolTip = part->GetTitleToolTip();
   dirty = part->IsDirty();
 }

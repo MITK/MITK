@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryUIException.h"
 #include "tweaklets/berryWorkbenchPageTweaklet.h"
 #include "berryPlatformUI.h"
-#include "berryImageDescriptor.h"
 
 #include "berryWorkbenchPage.h"
 #include "berryWorkbenchConstants.h"
@@ -42,7 +41,7 @@ ViewReference::ViewReference(ViewFactory* fac, const QString& id,
 {
   ViewDescriptor::Pointer desc =
       this->factory->GetViewRegistry()->Find(id).Cast<ViewDescriptor> ();
-  ImageDescriptor::Pointer iDesc;
+  QIcon iDesc;
   QString title;
   if (!desc.IsNull())
   {

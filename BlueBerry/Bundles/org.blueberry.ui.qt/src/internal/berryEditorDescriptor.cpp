@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchPlugin.h"
 
 #include "berryEditorPart.h"
-#include "berryImageDescriptor.h"
 #include "berryIContributor.h"
 
 namespace berry
@@ -125,12 +124,12 @@ QString EditorDescriptor::GetId() const
   //return Util.safeString(program.getName());
 }
 
-SmartPointer<ImageDescriptor> EditorDescriptor::GetImageDescriptor() const
+QIcon EditorDescriptor::GetImageDescriptor() const
 {
   if (testImage)
   {
     testImage = false;
-    if (!imageDesc)
+    if (imageDesc.isNull())
     {
       QString imageFileName(this->GetImageFilename());
       QString command(this->GetFileName());

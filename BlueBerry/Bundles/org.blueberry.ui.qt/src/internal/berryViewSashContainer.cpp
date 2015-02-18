@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchConstants.h"
 #include "berryWorkbenchPlugin.h"
 
-#include "berryImageDescriptor.h"
-
 namespace berry
 {
 

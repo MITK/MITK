@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchPart.h"
 
 #include "berryIWorkbenchPartConstants.h"
-#include "berryImageDescriptor.h"
 #include <berryIContributor.h>
 #include <berrySafeRunner.h>
 #include <util/berrySafeRunnable.h>
@@ -54,13 +53,10 @@ private:
 
 WorkbenchPart::~WorkbenchPart()
 {
-  if (m_TitleImage && m_ImageDescriptor)
-    m_ImageDescriptor->DestroyImage(m_TitleImage);
 }
 
 WorkbenchPart::WorkbenchPart()
 :m_Title(""),
- m_TitleImage(0),
  m_ToolTip(""),
  m_PartName(""),
  m_ContentDescription("")
@@ -122,22 +118,16 @@ void WorkbenchPart::CheckSite(IWorkbenchPartSite::Pointer /*site*/)
   // do nothing
 }
 
-void WorkbenchPart::SetTitleImage(void* titleImage)
+void WorkbenchPart::SetTitleImage(const QIcon& titleImage)
 {
   //assert(titleImage == 0 || !titleImage.isDisposed());
   //Do not send changes if they are the same
-  if (this->m_TitleImage == titleImage)
+  if (this->m_TitleImage.cacheKey() == titleImage.cacheKey())
   {
     return;
   }
-  m_ImageDescriptor->DestroyImage(m_TitleImage);
   this->m_TitleImage = titleImage;
   this->FirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
-
-  if (m_ImageDescriptor) {
-    //JFaceResources.getResources().destroyImage(imageDescriptor);
-    m_ImageDescriptor = 0;
-  }
 }
 
 void WorkbenchPart::SetTitleToolTip(const QString& toolTip)
@@ -265,14 +255,9 @@ QString WorkbenchPart::GetContentDescription() const
   return this->m_ContentDescription;
 }
 
-void* WorkbenchPart::GetTitleImage() const
+QIcon WorkbenchPart::GetTitleImage() const
 {
-  if (this->m_TitleImage != 0)
-  {
-    return this->m_TitleImage;
-  }
-
-  return 0;
+  return this->m_TitleImage;
   //return GetDefaultImage();
 }
 
@@ -298,16 +283,8 @@ void WorkbenchPart::SetInitializationData(const IConfigurationElement::Pointer& 
     return;
   }
 
-  m_ImageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
+  m_TitleImage = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
         m_ConfigElement->GetContributor()->GetName(), strIcon);
-
-  if (!m_ImageDescriptor)
-  {
-    return;
-  }
-
-  //titleImage = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
-  m_TitleImage = m_ImageDescriptor->CreateImage();
 }
 
 } // namespace berry

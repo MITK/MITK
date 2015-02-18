@@ -22,9 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIIntroSite.h"
 
 #include <berryIConfigurationElement.h>
-#include <berryImageDescriptor.h>
 #include <berryIExecutableExtension.h>
 #include <berryIPropertyChangeListener.h>
+
+#include <QIcon>
 
 namespace berry
 {
@@ -56,17 +57,15 @@ class BERRY_UI_QT IntroPart: public QObject, public IIntroPart, public IExecutab
 {
 
   Q_OBJECT
-  Q_INTERFACES(berry::IIntroPart berry::IExecutableExtension);
+  Q_INTERFACES(berry::IIntroPart berry::IExecutableExtension)
 
 private:
 
   IConfigurationElement::Pointer configElement;
 
-  ImageDescriptor::Pointer imageDescriptor;
+  QIcon imageDescriptor;
 
   IIntroSite::Pointer partSite;
-
-  void* titleImage;
 
   QString titleLabel;
 
@@ -103,7 +102,7 @@ protected:
    *
    * @return the default image
    */
-  void* GetDefaultImage() const;
+  QIcon GetDefaultImage() const;
 
   /**
    * Sets the part site.
@@ -121,7 +120,7 @@ protected:
    * @param titleImage
    *            the title image, or <code>null</code> to clear
    */
-  void SetTitleImage(void* titleImage);
+  void SetTitleImage(const QIcon& titleImage);
 
   /**
    * Set the title string for this part.
@@ -168,7 +167,7 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.intro.IIntroPart#getTitleImage()
    */
-  void* GetTitleImage() const;
+  QIcon GetTitleImage() const;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.intro.IIntroPart#getTitle()

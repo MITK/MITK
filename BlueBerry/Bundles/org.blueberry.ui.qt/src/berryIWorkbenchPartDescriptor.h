@@ -22,9 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryMacros.h>
 #include <berryObject.h>
 
-#include "berryImageDescriptor.h"
-
-
 namespace berry
 {
 
@@ -54,7 +51,7 @@ struct BERRY_UI_QT IWorkbenchPartDescriptor : public virtual Object
    *
    * @return the descriptor of the image to display next to this part
    */
-  virtual SmartPointer<ImageDescriptor> GetImageDescriptor() const = 0;
+  virtual QIcon GetImageDescriptor() const = 0;
 
   /**
    * Returns the label to show for this part.

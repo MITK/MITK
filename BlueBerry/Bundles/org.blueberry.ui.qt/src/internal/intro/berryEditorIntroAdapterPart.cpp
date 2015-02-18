@@ -64,7 +64,7 @@ EditorIntroAdapterPart::~EditorIntroAdapterPart()
   }
 }
 
-void* EditorIntroAdapterPart::GetTitleImage() const
+QIcon EditorIntroAdapterPart::GetTitleImage() const
 {
   return introPart->GetTitleImage();
 }

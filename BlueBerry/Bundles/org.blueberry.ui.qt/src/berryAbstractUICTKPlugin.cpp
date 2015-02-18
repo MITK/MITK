@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "internal/berryBundleUtility.h"
 #include "internal/berryWorkbenchPlugin.h"
 
-#include "berryImageDescriptor.h"
 #include "berryPlatformUI.h"
 #include "berryIPreferencesService.h"
 #include "berryIPreferences.h"
@@ -253,7 +252,7 @@ void AbstractUICTKPlugin::stop(ctkPluginContext* context)
   Plugin::stop(context);
 }
 
-SmartPointer<ImageDescriptor> AbstractUICTKPlugin::ImageDescriptorFromPlugin(
+QIcon AbstractUICTKPlugin::ImageDescriptorFromPlugin(
     const QString& pluginId, const QString& imageFilePath)
 {
   if (pluginId.isEmpty() || imageFilePath.isEmpty())
@@ -265,17 +264,18 @@ SmartPointer<ImageDescriptor> AbstractUICTKPlugin::ImageDescriptorFromPlugin(
   QSharedPointer<ctkPlugin> plugin = BundleUtility::FindPlugin(pluginId);
   if (!BundleUtility::IsReady(plugin.data()))
   {
-    return ImageDescriptor::Pointer(0);
+    return QIcon();
   }
 
   QByteArray imgContent = plugin->getResource(imageFilePath);
   QImage image = QImage::fromData(imgContent);
   QPixmap pixmap = QPixmap::fromImage(image);
-  QIcon* icon = new QIcon(pixmap);
-  if (icon->isNull())
-    return ImageDescriptor::Pointer(0);
+  return QIcon(pixmap);
+}
 
-  return ImageDescriptor::CreateFromImage(icon);
+QIcon AbstractUICTKPlugin::GetMissingIcon()
+{
+  return QIcon(":/org.blueberry.ui.qt/icon_missing.png");
 }
 
 }

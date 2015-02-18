@@ -38,9 +38,8 @@ QtOpenPerspectiveAction::QtOpenPerspectiveAction(
 
   group->addAction(this);
 
-  QIcon* icon = static_cast<QIcon*>(descr->GetImageDescriptor()->CreateImage());
-  this->setIcon(*icon);
-  descr->GetImageDescriptor()->DestroyImage(icon);
+  QIcon icon = descr->GetImageDescriptor();
+  this->setIcon(icon);
 
   perspectiveId = descr->GetId();
 

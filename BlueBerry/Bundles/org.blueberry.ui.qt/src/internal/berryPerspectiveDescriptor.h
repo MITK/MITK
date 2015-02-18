@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIMemento.h"
 
 #include <QStringList>
+#include <QIcon>
 
 namespace berry {
 
@@ -67,7 +68,7 @@ private:
 
    bool fixed;
 
-   mutable ImageDescriptor::Pointer imageDescriptor;
+   mutable QIcon imageDescriptor;
 
    IConfigurationElement::Pointer configElement;
 
@@ -145,7 +146,7 @@ private:
    *
    * @see org.blueberry.ui.IPerspectiveDescriptor#getImageDescriptor()
    */
-  public: ImageDescriptor::Pointer GetImageDescriptor() const;
+  public: QIcon GetImageDescriptor() const;
 
   /*
    * (non-Javadoc)

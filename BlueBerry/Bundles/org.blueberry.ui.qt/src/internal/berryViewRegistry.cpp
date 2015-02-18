@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryViewRegistry.h"
 
 #include "berryPlatformUI.h"
-#include "berryImageDescriptor.h"
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchRegistryConstants.h"
 

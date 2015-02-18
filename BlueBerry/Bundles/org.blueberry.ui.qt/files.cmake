@@ -20,7 +20,6 @@ set(SRC_CPP_FILES
   berryIEditorSite.cpp
   berryIFileEditorMapping.cpp
   berryIFolderLayout.cpp
-  berryImageDescriptor.cpp
   berryIMemento.cpp
   berryINullSelectionListener.cpp
   berryIPageLayout.cpp
@@ -164,7 +163,6 @@ set(SRC_CPP_FILES
   #tweaklets
   tweaklets/berryDnDTweaklet.cpp
   tweaklets/berryGuiWidgetsTweaklet.cpp
-  tweaklets/berryImageTweaklet.cpp
   tweaklets/berryITracker.cpp
   tweaklets/berryWorkbenchPageTweaklet.cpp
   tweaklets/berryWorkbenchTweaklet.cpp
@@ -320,12 +318,8 @@ set(INTERNAL_CPP_FILES
   berryQtDnDControlWidget.cpp
   berryQtDisplay.cpp
   berryQtDnDTweaklet.cpp
-  berryQtFileImageDescriptor.cpp
   berryQtGlobalEventFilter.cpp
-  berryQtIconImageDescriptor.cpp
-  berryQtImageTweaklet.cpp
   berryQtMainWindowControl.cpp
-  berryQtMissingImageDescriptor.cpp
   berryQtOpenPerspectiveAction.cpp
   berryQtPerspectiveSwitcher.cpp
   berryQtSafeApplication.cpp
@@ -411,7 +405,6 @@ set(MOC_H_FILES
   src/internal/berryQtDisplay.h
   src/internal/berryQtDnDTweaklet.h
   src/internal/berryQtGlobalEventFilter.h
-  src/internal/berryQtImageTweaklet.h
   src/internal/berryQtMainWindowControl.h
   src/internal/berryQtOpenPerspectiveAction.h
   src/internal/berryQtPerspectiveSwitcher.h

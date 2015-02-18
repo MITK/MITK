@@ -25,9 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryRegistryReader.h"
 #include "berryWorkbenchRegistryConstants.h"
 
-#include "berryImageDescriptor.h"
 #include "berryAbstractUICTKPlugin.h"
-#include "berryImageDescriptor.h"
 #include "handlers/berryIHandlerActivation.h"
 
 namespace berry
@@ -74,9 +72,9 @@ bool ViewDescriptor::operator==(const Object* o) const
   return false;
 }
 
-ImageDescriptor::Pointer ViewDescriptor::GetImageDescriptor() const
+QIcon ViewDescriptor::GetImageDescriptor() const
 {
-  if (imageDescriptor)
+  if (!imageDescriptor.isNull())
   {
     return imageDescriptor;
   }
@@ -86,23 +84,17 @@ ImageDescriptor::Pointer ViewDescriptor::GetImageDescriptor() const
   {
     //TODO default image descriptor
     //return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEF_VIEW);
-    return ImageDescriptor::GetMissingImageDescriptor();
+    return AbstractUICTKPlugin::GetMissingIcon();
   }
   IExtension::Pointer extension(configElement->GetDeclaringExtension());
   const QString extendingPluginId(extension->GetContributor()->GetName());
   imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
       extendingPluginId, iconName);
-  if (!imageDescriptor)
-  {
-    // Try legacy BlueBerry method
-    imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
-      extendingPluginId, iconName);
-  }
 
   // If the icon attribute was invalid, use the error icon
-  if (!imageDescriptor)
+  if (imageDescriptor.isNull())
   {
-    imageDescriptor = ImageDescriptor::GetMissingImageDescriptor();
+    imageDescriptor = AbstractUICTKPlugin::GetMissingIcon();
   }
 
   return imageDescriptor;

@@ -64,7 +64,7 @@ public:
    *
    * @see org.blueberry.ui.Saveable#getImageDescriptor()
    */
-  SmartPointer<ImageDescriptor> GetImageDescriptor() const;
+  QIcon GetImageDescriptor() const;
 
   /*
    * (non-Javadoc)

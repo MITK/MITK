@@ -38,7 +38,7 @@ class PresentablePart: public IPresentablePart
 
 public:
 
-  berryObjectMacro(PresentablePart);
+  berryObjectMacro(PresentablePart)
 
 private:
 
@@ -172,7 +172,7 @@ public:
    *
    * @see org.blueberry.ui.presentations.IPresentablePart#getTitleImage()
    */
-  void* GetTitleImage();
+  QIcon GetTitleImage();
 
   /*
    * (non-Javadoc)

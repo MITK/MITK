@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchRegistryConstants.h"
 #include "berryWorkbenchPlugin.h"
 
-#include "berryImageDescriptor.h"
 #include "berryPlatformUI.h"
 
 namespace berry

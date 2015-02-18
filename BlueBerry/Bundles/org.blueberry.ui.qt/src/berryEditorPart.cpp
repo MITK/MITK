@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryEditorPart.h"
 
-#include "berryImageDescriptor.h"
 #include "berryIWorkbenchPartConstants.h"
 
 #include <cassert>

@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryViewLayout.h"
 
-#include "berryImageDescriptor.h"
-
 namespace berry
 {
 

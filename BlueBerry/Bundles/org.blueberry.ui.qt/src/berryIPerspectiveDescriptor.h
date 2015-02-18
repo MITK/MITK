@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_ui_qt_Export.h>
 
-#include "berryImageDescriptor.h"
-
 namespace berry {
 
 /**
@@ -91,7 +89,7 @@ struct BERRY_UI_QT IPerspectiveDescriptor : public Object
      *
      * @return the descriptor of the image to show for this perspective
      */
-    virtual ImageDescriptor::Pointer GetImageDescriptor() const = 0;
+    virtual QIcon GetImageDescriptor() const = 0;
 
     /**
      * Returns this perspective's label. For perspectives declared via an extension,

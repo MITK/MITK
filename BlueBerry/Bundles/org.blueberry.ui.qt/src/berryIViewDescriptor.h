@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIConfigurationElement.h>
 #include <berryIAdaptable.h>
-#include "berryImageDescriptor.h"
 
 namespace berry
 {
@@ -81,7 +80,7 @@ struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAd
   /**
    * Returns the descriptor for the icon to show for this view.
    */
-  virtual SmartPointer<ImageDescriptor> GetImageDescriptor() const = 0;
+  virtual QIcon GetImageDescriptor() const = 0;
 
 
   /**

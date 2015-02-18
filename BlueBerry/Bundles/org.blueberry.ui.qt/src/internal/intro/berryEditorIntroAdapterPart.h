@@ -123,7 +123,7 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#getTitleImage()
    */
-  void* GetTitleImage() const;
+  QIcon GetTitleImage() const;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.part.WorkbenchPart#GetPartName()

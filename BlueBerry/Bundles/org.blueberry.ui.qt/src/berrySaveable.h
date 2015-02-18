@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIAdaptable.h>
 
 #include <org_blueberry_ui_qt_Export.h>
-#include "berryImageDescriptor.h"
 
 namespace berry {
 
@@ -96,7 +95,7 @@ public:
    * @return the image descriptor for this model; may be <code>null</code>
    *         if there is no image
    */
-  virtual SmartPointer<ImageDescriptor> GetImageDescriptor() const = 0;
+  virtual QIcon GetImageDescriptor() const = 0;
 
   /**
    * Saves the contents of this saveable.

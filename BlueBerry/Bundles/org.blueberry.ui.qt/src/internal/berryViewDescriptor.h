@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIPluginContribution.h"
 
 #include <QStringList>
+#include <QIcon>
 
 namespace berry
 {
@@ -38,7 +39,7 @@ class ViewDescriptor : public IViewDescriptor, public IPluginContribution
 private:
 
   QString id;
-  mutable SmartPointer<ImageDescriptor> imageDescriptor;
+  mutable QIcon imageDescriptor;
   IConfigurationElement::Pointer configElement;
   QStringList categoryPath;
 
@@ -92,7 +93,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPartDescriptor#getImageDescriptor()
    */
-  SmartPointer<ImageDescriptor> GetImageDescriptor() const;
+  QIcon GetImageDescriptor() const;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPartDescriptor#getLabel()

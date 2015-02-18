@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPerspective.h"
 #include "berryPreferenceConstants.h"
 #include "berryWorkbenchWindow.h"
-#include "berryImageDescriptor.h"
 #include "berryDisplay.h"
 #include "services/berryIServiceFactory.h"
 #include "util/berrySafeRunnable.h"

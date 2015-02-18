@@ -61,7 +61,7 @@ ViewIntroAdapterPart::~ViewIntroAdapterPart()
       introPart);
 }
 
-void* ViewIntroAdapterPart::GetTitleImage() const
+QIcon ViewIntroAdapterPart::GetTitleImage() const
 {
   return introPart->GetTitleImage();
 }

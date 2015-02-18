@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryStatus.h"
 #include "berryIContributor.h"
 
+#include <QIcon>
+
 namespace berry
 {
 
@@ -178,9 +180,9 @@ QString PerspectiveDescriptor::GetPluginId() const
   return configElement == 0 ? pluginId : configElement->GetContributor()->GetName();
 }
 
-ImageDescriptor::Pointer PerspectiveDescriptor::GetImageDescriptor() const
+QIcon PerspectiveDescriptor::GetImageDescriptor() const
 {
-  if (imageDescriptor)
+  if (!imageDescriptor.isNull())
     return imageDescriptor;
 
   if (configElement)
@@ -194,9 +196,9 @@ ImageDescriptor::Pointer PerspectiveDescriptor::GetImageDescriptor() const
 
   }
 
-  if (!imageDescriptor)
+  if (imageDescriptor.isNull())
   {
-    imageDescriptor = ImageDescriptor::GetMissingImageDescriptor();
+    imageDescriptor = AbstractUICTKPlugin::GetMissingIcon();
   }
 
   return imageDescriptor;

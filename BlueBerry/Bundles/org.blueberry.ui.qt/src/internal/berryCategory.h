@@ -100,7 +100,7 @@ public:
   /* (non-Javadoc)
    * Method declared on IWorkbenchAdapter.
    */
-  SmartPointer<ImageDescriptor> GetImageDescriptor() const;
+  QIcon GetImageDescriptor() const;
 
   /**
    * Return the id for this category.

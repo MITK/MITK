@@ -44,78 +44,71 @@ struct BERRY_UI_QT IWorkbenchPartReference : public Object
 
   ~IWorkbenchPartReference();
 
-    /**
-     * Returns the IWorkbenchPart referenced by this object.
-     * Returns <code>null</code> if the editors was not instantiated or
-     * it failed to be restored. Tries to restore the editor
-     * if <code>restore</code> is true.
-     */
-    virtual SmartPointer<IWorkbenchPart> GetPart(bool restore) = 0;
+  /**
+   * Returns the IWorkbenchPart referenced by this object.
+   * Returns <code>null</code> if the editors was not instantiated or
+   * it failed to be restored. Tries to restore the editor
+   * if <code>restore</code> is true.
+   */
+  virtual SmartPointer<IWorkbenchPart> GetPart(bool restore) = 0;
 
+  /**
+   * @see IWorkbenchPart#getTitleImage
+   */
+  virtual QIcon GetTitleImage() const = 0;
 
-    /**
-     * @see IWorkbenchPart#getTitleImage
-     */
-    virtual void* GetTitleImage() = 0;
+  /**
+   * @see IWorkbenchPart#getTitleToolTip
+   */
+  virtual QString GetTitleToolTip() const = 0;
 
-    /**
-     * @see IWorkbenchPart#getTitleToolTip
-     */
-    virtual QString GetTitleToolTip() const = 0;
+  /**
+   * @see IWorkbenchPartSite#getId
+   */
+  virtual QString GetId() const = 0;
 
-    /**
-     * @see IWorkbenchPartSite#getId
-     */
-    virtual QString GetId() const = 0;
+  /**
+   * @see IWorkbenchPart#addPropertyListener
+   */
+  virtual void AddPropertyListener(IPropertyChangeListener* listener) = 0;
 
-    /**
-     * @see IWorkbenchPart#addPropertyListener
-     */
-    virtual void AddPropertyListener(IPropertyChangeListener* listener) = 0;
+  /**
+   * @see IWorkbenchPart#removePropertyListener
+   */
+  virtual void RemovePropertyListener(IPropertyChangeListener* listener) = 0;
 
-    /**
-     * @see IWorkbenchPart#removePropertyListener
-     */
-    virtual void RemovePropertyListener(IPropertyChangeListener* listener) = 0;
+  /**
+   * Returns the workbench page that contains this part
+   */
+  virtual SmartPointer<IWorkbenchPage> GetPage() const = 0;
 
-    /**
-     * Returns the workbench page that contains this part
-     */
-    virtual SmartPointer<IWorkbenchPage> GetPage() const = 0;
+  /**
+   * Returns the name of the part, as it should be shown in tabs.
+   *
+   * @return the part name
+    */
+  virtual QString GetPartName() const = 0;
 
-    /**
-     * Returns the name of the part, as it should be shown in tabs.
-     *
-     * @return the part name
-     *
-     * @since 3.0
-     */
-    virtual QString GetPartName() const = 0;
+  /**
+   * Returns the content description for the part (or the empty string if none)
+   *
+   * @return the content description for the part
+   */
+  virtual QString GetContentDescription() const = 0;
 
-    /**
-     * Returns the content description for the part (or the empty string if none)
-     *
-     * @return the content description for the part
-     *
-     * @since 3.0
-     */
-    virtual QString GetContentDescription() const = 0;
+  /**
+   * Returns true if the part is pinned otherwise returns false.
+   */
+  virtual bool IsPinned() const = 0;
 
-    /**
-      * Returns true if the part is pinned otherwise returns false.
-      */
-    virtual bool IsPinned() const = 0;
+  /**
+   * Returns whether the part is dirty (i.e. has unsaved changes).
+   *
+   * @return <code>true</code> if the part is dirty, <code>false</code> otherwise
+   */
+  virtual bool IsDirty() const = 0;
 
-    /**
-     * Returns whether the part is dirty (i.e. has unsaved changes).
-     *
-     * @return <code>true</code> if the part is dirty, <code>false</code> otherwise
-     *
-     * @since 3.2 (previously existed on IEditorReference)
-     */
-    virtual bool IsDirty() const = 0;
-
-    /**
+  /**
    * Return an arbitrary property from the reference. If the part has been
    * instantiated, it just delegates to the part. If not, then it looks in its
    * own cache of properties. If the property is not available or the part has
@@ -124,27 +117,24 @@ struct BERRY_UI_QT IWorkbenchPartReference : public Object
    * @param key
    *            The property to return. Must not be <code>null</code>.
    * @return The String property, or <code>null</code>.
-   * @since 3.3
    */
-   virtual QString GetPartProperty(const QString& key) const = 0;
+  virtual QString GetPartProperty(const QString& key) const = 0;
 
-    /**
+  /**
    * Add a listener for changes in the arbitrary properties set.
    *
    * @param listener
    *            Must not be <code>null</code>.
-   * @since 3.3
    */
-    //virtual void addPartPropertyListener(IPropertyChangeListener listener) = 0;
+  //virtual void addPartPropertyListener(IPropertyChangeListener listener) = 0;
 
-    /**
+  /**
    * Remove a listener for changes in the arbitrary properties set.
    *
    * @param listener
    *            Must not be <code>null</code>.
-   * @since 3.3
    */
-    //virtual void removePartPropertyListener(IPropertyChangeListener listener) = 0;
+  //virtual void removePartPropertyListener(IPropertyChangeListener listener) = 0;
 };
 
 }  // namespace berry

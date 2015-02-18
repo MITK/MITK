@@ -25,7 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchPartSite.h"
 #include "berryIEditorPart.h"
 #include "berryIWorkbenchPartConstants.h"
-#include "berryImageDescriptor.h"
+
+#include <QIcon>
 
 namespace berry
 {
@@ -57,7 +58,6 @@ void WorkbenchPartReference::PropertyChangeListener::PropertyChange(
 WorkbenchPartReference::WorkbenchPartReference()
   : state(STATE_LAZY)
   , pinned(false)
-  , image(0)
   , propertyChangeListener(new PropertyChangeListener(this))
 {
 }
@@ -128,16 +128,13 @@ void WorkbenchPartReference::SetContentDescription(
 }
 
 void WorkbenchPartReference::SetImageDescriptor(
-    ImageDescriptor::Pointer descriptor)
+    const QIcon& descriptor)
 {
-  if (imageDescriptor == descriptor)
+  if (imageDescriptor.cacheKey() == descriptor.cacheKey())
   {
     return;
   }
 
-  void* oldImage = image;
-  ImageDescriptor::Pointer oldDescriptor = imageDescriptor;
-  image = 0;
   imageDescriptor = descriptor;
 
   // Don't queue events triggered by image changes. We'll dispose the image
@@ -148,14 +145,6 @@ void WorkbenchPartReference::SetImageDescriptor(
     // If there's a PROP_TITLE event queued, remove it from the queue because
     // we've just fired it.
     queuedEvents.remove(IWorkbenchPartConstants::PROP_TITLE);
-  }
-
-  // If we had allocated the old image, deallocate it now (AFTER we fire the property change
-  // -- listeners may need to clean up references to the old image)
-  if (oldImage && oldDescriptor)
-  {
-    //JFaceResources.getResources().destroy(oldDescriptor);
-    oldDescriptor->DestroyImage(oldImage);
   }
 }
 
@@ -218,17 +207,17 @@ void WorkbenchPartReference::RefreshFromPart()
   this->DeferEvents(false);
 }
 
-ImageDescriptor::Pointer WorkbenchPartReference::ComputeImageDescriptor()
+QIcon WorkbenchPartReference::ComputeImageDescriptor()
 {
   if (part)
   {
-    return ImageDescriptor::CreateFromImage(part->GetTitleImage());
+    return part->GetTitleImage();
   }
   return defaultImageDescriptor;
 }
 
 void WorkbenchPartReference::Init(const QString& id,
-    const QString& tooltip, ImageDescriptor::Pointer desc,
+    const QString& tooltip, const QIcon& desc,
     const QString& paneName, const QString& contentDescription)
 {
 
@@ -347,30 +336,8 @@ bool WorkbenchPartReference::IsDirty() const
   return part.Cast<IEditorPart> ()->IsDirty();
 }
 
-void* WorkbenchPartReference::GetTitleImage()
+QIcon WorkbenchPartReference::GetTitleImage() const
 {
-  if (this->IsDisposed())
-  {
-    //return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
-    return 0;
-  }
-
-  if (!image && imageDescriptor)
-  {
-    //image = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
-    image = imageDescriptor->CreateImage();
-  }
-  return image;
-}
-
-ImageDescriptor::Pointer WorkbenchPartReference::GetTitleImageDescriptor() const
-{
-  if (this->IsDisposed())
-  {
-    //return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEF_VIEW);
-    return ImageDescriptor::Pointer(0);
-  }
-
   return imageDescriptor;
 }
 
@@ -568,21 +535,12 @@ void WorkbenchPartReference::Dispose()
 
   //clearListenerList(internalPropChangeListeners);
   //clearListenerList(partChangeListeners);
-  void* oldImage = image;
-  ImageDescriptor::Pointer oldDescriptor = imageDescriptor;
-  image = 0;
 
   state = STATE_DISPOSED;
-  imageDescriptor = ImageDescriptor::GetMissingImageDescriptor();
-  defaultImageDescriptor = ImageDescriptor::GetMissingImageDescriptor();
+  imageDescriptor = AbstractUICTKPlugin::GetMissingIcon();
+  defaultImageDescriptor = imageDescriptor;
   this->ImmediateFirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
   //clearListenerList(propChangeListeners);
-
-  if (oldImage)
-  {
-    //JFaceResources.getResources().destroy(oldDescriptor);
-    oldDescriptor->DestroyImage(oldImage);
-  }
 
   pane = 0;
 }

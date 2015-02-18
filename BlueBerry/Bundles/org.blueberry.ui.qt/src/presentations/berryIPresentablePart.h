@@ -183,7 +183,7 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
      *
      * @return the title image
      */
-    virtual void* GetTitleImage() = 0;
+    virtual QIcon GetTitleImage() = 0;
 
     /**
      * Returns the title tool tip text of this workbench part. If this value

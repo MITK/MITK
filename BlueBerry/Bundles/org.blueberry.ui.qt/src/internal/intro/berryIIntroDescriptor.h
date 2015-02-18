@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "intro/berryIIntroPart.h"
 
-#include <berryImageDescriptor.h>
-
 namespace berry {
 
 /**
@@ -62,7 +60,7 @@ struct BERRY_UI_QT IIntroDescriptor : public Object
    *
    * @return the descriptor of the image to display next to this part
    */
-  virtual ImageDescriptor::Pointer GetImageDescriptor() const = 0;
+  virtual QIcon GetImageDescriptor() const = 0;
 
   /**
    * Return the label override string for this part.

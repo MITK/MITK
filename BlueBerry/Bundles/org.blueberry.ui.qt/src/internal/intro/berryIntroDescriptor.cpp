@@ -80,21 +80,20 @@ QString IntroDescriptor::GetPluginId() const
   return element->GetContributor()->GetName();
 }
 
-ImageDescriptor::Pointer IntroDescriptor::GetImageDescriptor() const
+QIcon IntroDescriptor::GetImageDescriptor() const
 {
-  if (imageDescriptor)
+  if (!imageDescriptor.isNull())
   {
     return imageDescriptor;
   }
   QString iconName = element->GetAttribute(WorkbenchRegistryConstants::ATT_ICON);
   if (iconName.isEmpty())
   {
-    return ImageDescriptor::Pointer();
+    return QIcon();
   }
 
-  imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
+  return AbstractUICTKPlugin::ImageDescriptorFromPlugin(
         element->GetContributor()->GetName(), iconName);
-  return imageDescriptor;
 }
 
 IConfigurationElement::Pointer IntroDescriptor::GetConfigurationElement() const

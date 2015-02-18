@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryNullEditorInput.h"
 #include "berryPartTester.h"
 
-#include "berryImageDescriptor.h"
 #include "berryPlatformUI.h"
 #include "berryIWorkbenchPartConstants.h"
 

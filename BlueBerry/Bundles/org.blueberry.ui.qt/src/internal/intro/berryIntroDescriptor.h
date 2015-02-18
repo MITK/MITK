@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "intro/berryIIntroPart.h"
 
 #include <berryIConfigurationElement.h>
-#include <berryImageDescriptor.h>
+
+#include <QIcon>
 
 namespace berry
 {
@@ -38,11 +39,11 @@ private:
 
   IConfigurationElement::Pointer element;
 
-  mutable ImageDescriptor::Pointer imageDescriptor;
+  mutable QIcon imageDescriptor;
 
 public:
 
-  berryObjectMacro(IntroDescriptor);
+  berryObjectMacro(IntroDescriptor)
 
   /**
    * Create a new IntroDescriptor for an extension.
@@ -68,7 +69,7 @@ public:
   /*
    * @see IIntroDescriptor#GetImageDescriptor()
    */
-  ImageDescriptor::Pointer GetImageDescriptor() const;
+  QIcon GetImageDescriptor() const;
 
   /**
    * Returns the configuration element.

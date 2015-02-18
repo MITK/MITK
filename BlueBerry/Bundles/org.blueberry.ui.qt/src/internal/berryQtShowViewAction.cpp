@@ -31,9 +31,8 @@ QtShowViewAction::QtShowViewAction(IWorkbenchWindow::Pointer window,
   this->setToolTip(desc->GetLabel());
   this->setIconVisibleInMenu(true);
 
-  QIcon* icon = static_cast<QIcon*>(desc->GetImageDescriptor()->CreateImage());
-  this->setIcon(*icon);
-  desc->GetImageDescriptor()->DestroyImage(icon);
+  QIcon icon = desc->GetImageDescriptor();
+  this->setIcon(icon);
 
   m_Window = window.GetPointer();
   m_Desc = desc;

@@ -505,8 +505,8 @@ bool QmitkViewNavigatorWidget::FillTreeList()
 
         QStringList catPath = v->GetCategoryPath();
 
-        QIcon* icon = static_cast<QIcon*>(v->GetImageDescriptor()->CreateImage());
-        mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon, v->GetLabel());
+        QIcon icon = v->GetImageDescriptor();
+        mitk::QtViewItem* vItem = new mitk::QtViewItem(icon, v->GetLabel());
         vItem->m_View = v;
         vItem->setToolTip(v->GetDescription());
         vItem->m_Description = v->GetDescription();

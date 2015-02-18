@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryUIException.h"
 #include "berryIViewRegistry.h"
-#include "berryImageDescriptor.h"
 
 #include "berryViewReference.h"
 #include "berryViewDescriptor.h"

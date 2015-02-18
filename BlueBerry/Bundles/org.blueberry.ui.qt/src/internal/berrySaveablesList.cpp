@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berrySaveablesList.h"
 #include "berryWorkbenchPlugin.h"
 #include "berryDefaultSaveable.h"
-#include "berryImageDescriptor.h"
 
 #include "berryWorkbenchPart.h"
 

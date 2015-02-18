@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryWorkbenchPagePartList.h"
 #include "berryPartPane.h"
-#include "berryImageDescriptor.h"
 
 namespace berry
 {

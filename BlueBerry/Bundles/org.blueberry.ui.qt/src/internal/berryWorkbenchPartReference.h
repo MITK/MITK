@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchPartReference.h"
 #include "berryIWorkbenchPart.h"
 
-#include "berryImageDescriptor.h"
+#include <QIcon>
 
 namespace berry {
 
@@ -42,82 +42,212 @@ public:
 
     // State constants //////////////////////////////
 
-    /**
-     * State constant indicating that the part is not created yet
-     */
-public: static int STATE_LAZY; // = 0
+  /**
+   * State constant indicating that the part is not created yet
+   */
+  static int STATE_LAZY; // = 0
 
-    /**
-     * State constant indicating that the part is in the process of being created
-     */
-public: static int STATE_CREATION_IN_PROGRESS; // = 1
+  /**
+   * State constant indicating that the part is in the process of being created
+   */
+  static int STATE_CREATION_IN_PROGRESS; // = 1
 
-    /**
-     * State constant indicating that the part has been created
-     */
-public: static int STATE_CREATED; // = 2
+  /**
+   * State constant indicating that the part has been created
+   */
+  static int STATE_CREATED; // = 2
 
-    /**
-     * State constant indicating that the reference has been disposed (the reference shouldn't be
-     * used anymore)
-     */
-public: static int STATE_DISPOSED; // = 3
+  /**
+   * State constant indicating that the reference has been disposed (the reference shouldn't be
+   * used anymore)
+   */
+  static int STATE_DISPOSED; // = 3
 
-    /**
-     * Current state of the reference. Used to detect recursive creation errors, disposed
-     * references, etc.
-     */
-private: int state;
+  WorkbenchPartReference();
+  ~WorkbenchPartReference();
 
-protected: IWorkbenchPart::Pointer part;
+  virtual bool IsDisposed() const;
 
-protected: SmartPointer<PartPane> pane;
+  virtual void Init(const QString& id, const QString& tooltip,
+                    const QIcon& desc, const QString& paneName, const QString& contentDescription);
 
-private: QString id;
+  /**
+   * @see IWorkbenchPart
+   */
+  virtual void AddPropertyListener(IPropertyChangeListener* listener) override;
 
-private: bool pinned;
+  /**
+   * @see IWorkbenchPart
+   */
+  virtual void RemovePropertyListener(IPropertyChangeListener* listener) override;
 
-private: QString tooltip;
+  QString GetId() const override;
 
-/**
- * Stores the current Image for this part reference. Lazily created. Null if not allocated.
- */
-private: void* image;
+  virtual QString GetTitleToolTip() const override;
 
-private: SmartPointer<ImageDescriptor> defaultImageDescriptor;
+  /**
+   * Returns the pane name for the part
+   *
+   * @return the pane name for the part
+   */
+  virtual QString GetPartName() const override;
 
-    /**
-     * Stores the current image descriptor for the part.
-     */
-private: SmartPointer<ImageDescriptor> imageDescriptor;
+  /**
+   * Returns the content description for this part.
+   *
+   * @return the pane name for the part
+   */
+  virtual QString GetContentDescription() const override;
 
-    /**
-     * API listener list
-     */
-private: IPropertyChangeListener::Events propChangeEvents;
+  virtual bool IsDirty() const override;
 
-//private: ListenerList partChangeListeners = new ListenerList();
+  virtual QIcon GetTitleImage() const override;
 
-private: QString partName;
+  virtual void FireVisibilityChange();
 
-private: QString contentDescription;
+  virtual bool GetVisible();
 
-protected: QHash<QString, QString> propertyCache;
+  virtual void SetVisible(bool isVisible);
 
-    /**
-     * Used to remember which events have been queued.
-     */
-private: QSet<int> queuedEvents;
+  IWorkbenchPart::Pointer GetPart(bool restore) override;
 
-private: bool queueEvents;
+  /**
+   * Returns the part pane for this part reference. Does not return null.
+   *
+   * @return
+   */
+  SmartPointer<PartPane> GetPane();
 
-//private: static DisposeListener prematureDisposeListener = new DisposeListener() {
+  void Dispose();
+
+  virtual void SetPinned(bool newPinned);
+
+  virtual bool IsPinned() const override;
+
+  /*
+   * @see org.blueberry.ui.IWorkbenchPartReference#getPartProperty(java.lang.String)
+   */
+  virtual QString GetPartProperty(const QString& key) const override;
+
+  int ComputePreferredSize(bool width, int availableParallel,
+                           int availablePerpendicular, int preferredResult);
+
+  int GetSizeFlags(bool width) override;
+
+protected:
+
+  IWorkbenchPart::Pointer part;
+
+  SmartPointer<PartPane> pane;
+
+  QHash<QString, QString> propertyCache;
+
+  virtual void CheckReference();
+
+  virtual void SetPartName(const QString& newPartName);
+
+  virtual void SetContentDescription(const QString& newContentDescription);
+
+  virtual void SetImageDescriptor(const QIcon& descriptor);
+
+  virtual void SetToolTip(const QString& newToolTip);
+
+  virtual void PropertyChanged(const Object::Pointer& source, int propId);
+
+  virtual void PropertyChanged(const PropertyChangeEvent::Pointer& event);
+
+  /**
+   * Refreshes all cached values with the values from the real part
+   */
+  virtual void RefreshFromPart();
+
+  virtual QIcon ComputeImageDescriptor();
+
+  // /* package */ virtual void fireZoomChange();
+
+  QString GetRawToolTip() const;
+
+  /**
+   * Gets the part name directly from the associated workbench part,
+   * or the empty string if none.
+   *
+   * @return
+   */
+  QString GetRawPartName() const;
+
+  virtual QString ComputePartName() const;
+
+  /**
+   * Computes a new content description for the part. Subclasses may override to change the
+   * default behavior
+   *
+   * @return the new content description for the part
+   */
+  virtual QString ComputeContentDescription() const;
+
+  /**
+   * Returns the content description as set directly by the part, or the empty string if none
+   *
+   * @return the unmodified content description from the part (or the empty string if none)
+   */
+  QString GetRawContentDescription() const;
+
+  virtual void FirePropertyChange(int id);
+
+  virtual IWorkbenchPart::Pointer CreatePart() = 0;
+
+  virtual SmartPointer<PartPane> CreatePane() = 0;
+
+  void DoDisposePart();
+
+  virtual void FirePropertyChange(const PropertyChangeEvent::Pointer& event);
+
+  virtual void CreatePartProperties(IWorkbenchPart::Pointer workbenchPart);
+
+private:
+
+  /**
+   * Current state of the reference. Used to detect recursive creation errors, disposed
+   * references, etc.
+   */
+  int state;
+
+  QString id;
+
+  bool pinned;
+
+  QString tooltip;
+
+  QIcon defaultImageDescriptor;
+
+  /**
+   * Stores the current image descriptor for the part.
+   */
+  QIcon imageDescriptor;
+
+  /**
+   * API listener list
+   */
+  IPropertyChangeListener::Events propChangeEvents;
+
+  //private: ListenerList partChangeListeners = new ListenerList();
+
+  QString partName;
+
+  QString contentDescription;
+
+  /**
+   * Used to remember which events have been queued.
+   */
+  QSet<int> queuedEvents;
+
+  bool queueEvents;
+
+//static DisposeListener prematureDisposeListener = new DisposeListener() {
 //        public void widgetDisposed(DisposeEvent e) {
 //            WorkbenchPlugin.log(new RuntimeException("Widget disposed too early!")); //$NON-NLS-1$
 //        }
 //    };
-
-private:
 
   struct PropertyChangeListener : public IPropertyChangeListener
   {
@@ -125,147 +255,22 @@ private:
     using IPropertyChangeListener::PropertyChange;
     void PropertyChange(const PropertyChangeEvent::Pointer& event);
 
-  private: WorkbenchPartReference* partRef;
+  private:
+    WorkbenchPartReference* partRef;
   };
 
-private: QScopedPointer<IPropertyChangeListener> propertyChangeListener;
+  QScopedPointer<IPropertyChangeListener> propertyChangeListener;
 
-/**
- * Calling this with deferEvents(true) will queue all property change events until a subsequent
- * call to deferEvents(false). This should be used at the beginning of a batch of related changes
- * to prevent duplicate property change events from being sent.
- *
- * @param shouldQueue
- */
-private: void DeferEvents(bool shouldQueue);
+  /**
+   * Calling this with deferEvents(true) will queue all property change events until a subsequent
+   * call to deferEvents(false). This should be used at the beginning of a batch of related changes
+   * to prevent duplicate property change events from being sent.
+   *
+   * @param shouldQueue
+   */
+  void DeferEvents(bool shouldQueue);
 
-public: WorkbenchPartReference();
-
-public: ~WorkbenchPartReference();
-
-public: virtual bool IsDisposed() const;
-
-protected: virtual void CheckReference();
-
-    /**
-     * Calling this with deferEvents(true) will queue all property change events until a subsequent
-     * call to deferEvents(false). This should be used at the beginning of a batch of related changes
-     * to prevent duplicate property change events from being sent.
-     *
-     * @param shouldQueue
-     */
-//private: virtual void DeferEvents(bool shouldQueue);
-
-protected: virtual void SetPartName(const QString& newPartName);
-
-protected: virtual void SetContentDescription(const QString& newContentDescription);
-
-protected: virtual void SetImageDescriptor(SmartPointer<ImageDescriptor> descriptor);
-
-protected: virtual void SetToolTip(const QString& newToolTip);
-
-protected: virtual void PropertyChanged(const Object::Pointer& source, int propId);
-
-protected: virtual void PropertyChanged(const PropertyChangeEvent::Pointer& event);
-
-    /**
-     * Refreshes all cached values with the values from the real part
-     */
-protected: virtual void RefreshFromPart();
-
-protected: virtual SmartPointer<ImageDescriptor> ComputeImageDescriptor();
-
-public: virtual void Init(const QString& id, const QString& tooltip,
-            SmartPointer<ImageDescriptor> desc, const QString& paneName, const QString& contentDescription);
-
-
-    /**
-     * @see IWorkbenchPart
-     */
-public: virtual void AddPropertyListener(IPropertyChangeListener* listener);
-
-    /**
-     * @see IWorkbenchPart
-     */
-public: virtual void RemovePropertyListener(IPropertyChangeListener* listener);
-
-public: QString GetId() const;
-
-public: virtual QString GetTitleToolTip() const;
-
-protected: QString GetRawToolTip() const;
-
-    /**
-     * Returns the pane name for the part
-     *
-     * @return the pane name for the part
-     */
-public: virtual QString GetPartName() const;
-
-    /**
-     * Gets the part name directly from the associated workbench part,
-     * or the empty string if none.
-     *
-     * @return
-     */
-protected: QString GetRawPartName() const;
-
-protected: virtual QString ComputePartName() const;
-
-    /**
-     * Returns the content description for this part.
-     *
-     * @return the pane name for the part
-     */
-public: virtual QString GetContentDescription() const;
-
-    /**
-     * Computes a new content description for the part. Subclasses may override to change the
-     * default behavior
-     *
-     * @return the new content description for the part
-     */
-protected: virtual QString ComputeContentDescription() const;
-
-    /**
-     * Returns the content description as set directly by the part, or the empty string if none
-     *
-     * @return the unmodified content description from the part (or the empty string if none)
-     */
-protected: QString GetRawContentDescription() const;
-
-public: virtual bool IsDirty() const;
-
-public: virtual void* GetTitleImage();
-
-public: virtual SmartPointer<ImageDescriptor> GetTitleImageDescriptor() const;
-
-public: virtual void FireVisibilityChange();
-
-//    /* package */ virtual void fireZoomChange();
-
-public: virtual bool GetVisible();
-
-public: virtual void SetVisible(bool isVisible);
-
-protected: virtual void FirePropertyChange(int id);
-
-private: void ImmediateFirePropertyChange(int id);
-
-public: IWorkbenchPart::Pointer GetPart(bool restore);
-
-protected: virtual IWorkbenchPart::Pointer CreatePart() = 0;
-
-protected: virtual SmartPointer<PartPane> CreatePane() = 0;
-
-    /**
-     * Returns the part pane for this part reference. Does not return null.
-     *
-     * @return
-     */
-public: SmartPointer<PartPane> GetPane();
-
-public: void Dispose();
+  void ImmediateFirePropertyChange(int id);
 
   /**
    * Clears all of the listeners in a listener list. TODO Bug 117519 Remove
@@ -274,28 +279,7 @@ public: void Dispose();
    * @param list
    *            The list to be clear; must not be <code>null</code>.
    */
-//private: void clearListenerList(const ListenerList list);
-
-
-public: virtual void SetPinned(bool newPinned);
-
-public: virtual bool IsPinned() const;
-
-protected: void DoDisposePart();
-
-/* (non-Javadoc)
- * @see org.blueberry.ui.IWorkbenchPartReference#getPartProperty(java.lang.String)
- */
-public: virtual QString GetPartProperty(const QString& key) const;
-
-protected: virtual void FirePropertyChange(const PropertyChangeEvent::Pointer& event);
-
-protected: virtual void CreatePartProperties(IWorkbenchPart::Pointer workbenchPart);
-
-public: int ComputePreferredSize(bool width, int availableParallel,
-            int availablePerpendicular, int preferredResult);
-
-public: int GetSizeFlags(bool width);
+  //private: void clearListenerList(const ListenerList list);
 
 };
 

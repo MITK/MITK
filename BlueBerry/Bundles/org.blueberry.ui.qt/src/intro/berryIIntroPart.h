@@ -172,7 +172,7 @@ struct BERRY_UI_QT IIntroPart : public virtual Object
      *
      * @return the title image
      */
-    virtual void* GetTitleImage() const = 0;
+    virtual QIcon GetTitleImage() const = 0;
 
     /**
      * Returns the title of this intro part. If this value changes

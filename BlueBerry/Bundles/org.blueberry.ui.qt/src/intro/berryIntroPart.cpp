@@ -82,9 +82,9 @@ IConfigurationElement::Pointer IntroPart::GetConfigurationElement()
   return configElement;
 }
 
-void* IntroPart::GetDefaultImage() const
+QIcon IntroPart::GetDefaultImage() const
 {
-  return 0;
+  return QIcon();
 }
 
 void IntroPart::SetSite(IIntroSite::Pointer site)
@@ -92,14 +92,14 @@ void IntroPart::SetSite(IIntroSite::Pointer site)
   this->partSite = site;
 }
 
-void IntroPart::SetTitleImage(void* titleImage)
+void IntroPart::SetTitleImage(const QIcon& titleImage)
 {
   //Do not send changes if they are the same
-  if (this->titleImage == titleImage)
+  if (this->imageDescriptor.cacheKey() == titleImage.cacheKey())
   {
     return;
   }
-  this->titleImage = titleImage;
+  this->imageDescriptor = titleImage;
   FirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
 }
 
@@ -126,11 +126,11 @@ IIntroSite::Pointer IntroPart::GetIntroSite() const
   return partSite;
 }
 
-void* IntroPart::GetTitleImage() const
+QIcon IntroPart::GetTitleImage() const
 {
-  if (titleImage != 0)
+  if (!this->imageDescriptor.isNull())
   {
-    return titleImage;
+    return this->imageDescriptor;
   }
   return GetDefaultImage();
 }
@@ -179,12 +179,6 @@ void IntroPart::SetInitializationData(const IConfigurationElement::Pointer& cfig
   imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
         configElement->GetContributor()->GetName(), strIcon);
 
-  if (!imageDescriptor)
-  {
-    return;
-  }
-
-  titleImage = imageDescriptor->CreateImage(true);
 }
 
 }

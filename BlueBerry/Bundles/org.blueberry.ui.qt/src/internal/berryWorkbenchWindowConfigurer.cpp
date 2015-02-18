@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchWindowConfigurer.h"
 
 #include "berryWorkbenchWindow.h"
-#include "berryImageDescriptor.h"
 #include "berryWorkbench.h"
 #include "berryWorkbenchPage.h"
 #include "berryEditorSashContainer.h"

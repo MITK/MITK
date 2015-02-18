@@ -29,8 +29,6 @@ struct IPreferences;
 struct IPreferencesService;
 struct IWorkbench;
 
-struct ImageDescriptor;
-
 /**
  * \ingroup org_blueberry_ui_qt
  *
@@ -83,16 +81,6 @@ struct ImageDescriptor;
  *      information is always safe on disk. </li>
  * <li> Dialog settings are also saved automatically on plug-in shutdown.</li>
  * </ul>
- * Images
- * <ul>
- * <li> A typical UI plug-in will have some images that are used very frequently
- *      and so need to be cached and shared.  The plug-in's image registry
- *      provides a central place for a plug-in to store its common images.
- *      Images managed by the registry are created lazily as needed, and will be
- *      automatically disposed of when the plug-in shuts down. Note that the
- *      number of registry images should be kept to a minimum since many OSs
- *      have severe limits on the number of images that can be in memory at once.
- * </ul>
  * <p>
  * For easy access to your plug-in object, use the singleton pattern. Declare a
  * static variable in your plug-in class for the singleton. Store the first
@@ -128,12 +116,6 @@ private:
     mutable IPreferencesService* preferencesService;
 
     /**
-     * The registry for all graphic images; <code>null</code> if not yet
-     * initialized.
-     */
-    //ImageRegistry imageRegistry = null;
-
-    /**
      * The bundle listener used for kicking off refreshPluginActions().
      */
     //BundleListener bundleListener;
@@ -164,26 +146,6 @@ public:
      * @return the dialog settings
      */
 //    IDialogSettings getDialogSettings();
-
-    /**
-     * Returns the image registry for this UI plug-in.
-     * <p>
-     * The image registry contains the images used by this plug-in that are very
-     * frequently used and so need to be globally shared within the plug-in. Since
-     * many OSs have a severe limit on the number of images that can be in memory at
-     * any given time, a plug-in should only keep a small number of images in their
-     * registry.
-     * <p>
-     * Subclasses should reimplement <code>initializeImageRegistry</code> if they have
-     * custom graphic images to load.
-     * </p>
-     * <p>
-     * Subclasses may override this method but are not expected to.
-     * </p>
-     *
-     * @return the image registry
-     */
-//    ImageRegistry getImageRegistry();
 
     /**
      * Returns the preferences service for this UI plug-in.
@@ -320,11 +282,11 @@ public:
      * root of the plug-in; the path must be legal
      * @return an image descriptor, or <code>null</code> if no image
      * could be found
-     * @since 3.0
      */
-    static SmartPointer<ImageDescriptor> ImageDescriptorFromPlugin(
+    static QIcon ImageDescriptorFromPlugin(
         const QString& pluginId, const QString& imageFilePath);
 
+    static QIcon GetMissingIcon();
 };
 
 }  // namespace berry

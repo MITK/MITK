@@ -32,7 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryParameterizedCommand.h>
 #include <berryCommandExceptions.h>
 
-#include "../berryImageDescriptor.h"
 #include "../berryDisplay.h"
 #include "../berryAsyncRunnable.h"
 

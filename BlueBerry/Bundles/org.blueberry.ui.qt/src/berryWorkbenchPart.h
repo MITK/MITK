@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIConfigurationElement.h>
 #include <berryIExecutableExtension.h>
 
-#include "berryImageDescriptor.h"
+#include <QIcon>
 
 namespace berry {
 
@@ -55,8 +55,7 @@ public:
 
 private:
   QString m_Title;
-  SmartPointer<ImageDescriptor> m_ImageDescriptor;
-  void* m_TitleImage;
+  QIcon m_TitleImage;
   QString m_ToolTip;
 
   IConfigurationElement::Pointer m_ConfigElement;
@@ -117,7 +116,7 @@ protected:
    *
    * @param titleImage the title image, or <code>null</code> to clear
    */
-  virtual void SetTitleImage(void* titleImage);
+  virtual void SetTitleImage(const QIcon& titleImage);
 
   /**
    * Sets or clears the title tool tip text of this part. Clients should
@@ -240,7 +239,7 @@ public:
   /* (non-Javadoc)
    * Method declared on IWorkbenchPart.
    */
-  void* GetTitleImage() const;
+  QIcon GetTitleImage() const;
 
   /* (non-Javadoc)
    * Gets the title tool tip text of this part.

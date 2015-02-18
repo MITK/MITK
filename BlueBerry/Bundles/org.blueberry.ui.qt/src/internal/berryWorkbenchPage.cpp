@@ -40,7 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryUIException.h"
 #include "berryPlatformUI.h"
 #include "berryPartPane.h"
-#include "berryImageDescriptor.h"
 
 #include <berryPlatform.h>
 

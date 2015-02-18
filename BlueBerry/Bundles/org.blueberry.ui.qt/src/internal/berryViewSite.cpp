@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIViewReference.h"
 #include "berryIViewPart.h"
 #include "berryPartPane.h"
-#include "berryImageDescriptor.h"
 #include "berryViewDescriptor.h"
 #include "berryWorkbenchPage.h"
 

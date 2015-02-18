@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryViewPart.h"
 
-#include "berryImageDescriptor.h"
-
 #include <Poco/Exception.h>
 
 namespace berry

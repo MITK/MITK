@@ -198,7 +198,7 @@ struct BERRY_UI_QT IWorkbenchPart : public virtual Object { // public IAdaptable
      *
      * @return the title image
      */
-    virtual void* GetTitleImage() const = 0;
+    virtual QIcon GetTitleImage() const = 0;
 
     /**
      * Returns the title tool tip text of this workbench part.

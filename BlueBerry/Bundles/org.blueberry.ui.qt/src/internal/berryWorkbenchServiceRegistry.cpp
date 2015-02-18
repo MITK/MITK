@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryISources.h"
 #include "berryISourceProvider.h"
 #include "berryPlatformUI.h"
-#include "berryImageDescriptor.h"
 
 #include "services/berryIServiceFactory.h"
 

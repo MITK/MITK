@@ -19,7 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchPart.h"
 #include "berryIWorkbenchPage.h"
 #include "berryUIException.h"
-#include "berryImageDescriptor.h"
+
+#include <QIcon>
 
 namespace berry
 {
@@ -44,16 +45,9 @@ QString DefaultSaveable::GetName() const
   return part.Lock()->GetPartName();
 }
 
-ImageDescriptor::Pointer DefaultSaveable::GetImageDescriptor() const
+QIcon DefaultSaveable::GetImageDescriptor() const
 {
-  //TODO DefaultSaveable GetImageDescriptor
-  //  Image image = part.getTitleImage();
-  //  if (image == null)
-  //  {
-  //    return null;
-  //  }
-  //  return ImageDescriptor.createFromImage(image);
-  return ImageDescriptor::Pointer(0);
+  return part.Lock()->GetTitleImage();
 }
 
 QString DefaultSaveable::GetToolTipText() const

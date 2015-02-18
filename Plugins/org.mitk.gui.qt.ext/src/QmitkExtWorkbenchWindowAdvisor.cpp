@@ -430,9 +430,10 @@ QmitkExtWorkbenchWindowAdvisor::~QmitkExtWorkbenchWindowAdvisor()
 berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(
  berry::IActionBarConfigurer::Pointer configurer)
 {
- berry::ActionBarAdvisor::Pointer actionBarAdvisor(
-  new QmitkExtActionBarAdvisor(configurer));
- return actionBarAdvisor;
+ //berry::ActionBarAdvisor::Pointer actionBarAdvisor(
+ // new QmitkExtActionBarAdvisor(configurer));
+ //return actionBarAdvisor;
+  return berry::WorkbenchWindowAdvisor::CreateActionBarAdvisor(configurer);
 }
 
 void* QmitkExtWorkbenchWindowAdvisor::CreateEmptyWindowContents(void* parent)
@@ -547,7 +548,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     QIcon::setThemeName( iconTheme );
 
  // ==== Application menu ============================
- /*
+
  QMenuBar* menuBar = mainWindow->menuBar();
  menuBar->setContextMenuPolicy(Qt::PreventContextMenu);
 
@@ -859,7 +860,7 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
         QmitkMemoryUsageIndicatorView* memoryIndicator = new QmitkMemoryUsageIndicatorView();
  qStatusBar->addPermanentWidget(memoryIndicator, 0);
     }
- */
+
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()

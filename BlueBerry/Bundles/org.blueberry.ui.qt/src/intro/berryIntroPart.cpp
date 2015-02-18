@@ -160,8 +160,8 @@ void IntroPart::SaveState(IMemento::Pointer /*memento*/)
   //no-op
 }
 
-void IntroPart::SetInitializationData(IConfigurationElement::Pointer cfig,
-    const QString& /*propertyName*/, Object::Pointer /*data*/)
+void IntroPart::SetInitializationData(const IConfigurationElement::Pointer& cfig,
+                                      const QString& /*propertyName*/, const Object::Pointer& /*data*/)
 {
 
   // Save config element.

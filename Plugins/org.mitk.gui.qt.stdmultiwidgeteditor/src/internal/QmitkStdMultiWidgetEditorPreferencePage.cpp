@@ -14,15 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
-#include <berryServiceRegistry.h>
-#include <mitkExceptionMacro.h>
-#include <QColorDialog>
+
 #include <ui_QmitkStdMultiWidgetEditorPreferencePage.h>
 #include "QmitkStdMultiWidgetEditorPreferencePage.h"
-
 #include <QmitkStdMultiWidgetEditor.h>
+
+#include <berryIPreferencesService.h>
+#include <berryPlatform.h>
+
+#include <QColorDialog>
 
 QmitkStdMultiWidgetEditorPreferencePage::QmitkStdMultiWidgetEditorPreferencePage()
   : m_Preferences(NULL),

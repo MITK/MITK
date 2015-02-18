@@ -50,14 +50,14 @@ namespace mitk
      *      the id to search for
      * @return the descriptor or <code>null</code>
      */
-    virtual IInputDeviceDescriptor::Pointer Find(const std::string& id) const = 0;
+    virtual IInputDeviceDescriptor::Pointer Find(const QString& id) const = 0;
 
     /**
      * Return a list of input devices defined in the registry.
      *
      * @return the input devices.
      */
-    virtual std::vector<IInputDeviceDescriptor::Pointer> GetInputDevices() const = 0;
+    virtual QList<IInputDeviceDescriptor::Pointer> GetInputDevices() const = 0;
 
     virtual ~IInputDeviceRegistry() {}
 

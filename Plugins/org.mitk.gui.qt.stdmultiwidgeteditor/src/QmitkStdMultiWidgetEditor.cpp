@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 #include <berryIPreferencesService.h>
 #include <berryIPartListener.h>
+#include <berryIPreferences.h>
 
 #include <QWidget>
 
@@ -33,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkMouseModeSwitcher.h>
 #include <QmitkStdMultiWidget.h>
-#include <berryIBerryPreferences.h>
 
 #include <mbilogo.h>
 
@@ -46,7 +46,6 @@ public:
 
   QmitkStdMultiWidget* m_StdMultiWidget;
   QmitkMouseModeSwitcher* m_MouseModeToolbar;
-
   /**
   * @brief Members for the MultiWidget decorations.
   */
@@ -54,11 +53,11 @@ public:
   std::string m_WidgetBackgroundColor2[4];
   std::string m_WidgetDecorationColor[4];
   std::string m_WidgetAnnotation[4];
-
   bool m_MenuWidgetsEnabled;
   berry::IPartListener::Pointer m_PartListener;
 
   QHash<QString, QmitkRenderWindow*> m_RenderWindows;
+
 };
 
 struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
@@ -119,6 +118,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
 private:
 
   QmitkStdMultiWidgetEditorPrivate* const d;
+
 };
 
 QmitkStdMultiWidgetEditorPrivate::QmitkStdMultiWidgetEditorPrivate()
@@ -131,7 +131,7 @@ QmitkStdMultiWidgetEditorPrivate::~QmitkStdMultiWidgetEditorPrivate()
 {
 }
 
-const std::string QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
+const QString QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
 
 QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor()
   : d(new QmitkStdMultiWidgetEditorPrivate)
@@ -287,7 +287,6 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(prefs->GetInt( "Rendering Mode" , 0 ));
 
     d->m_StdMultiWidget = new QmitkStdMultiWidget(parent,0,0,renderingMode);
-
     d->m_RenderWindows.insert("axial", d->m_StdMultiWidget->GetRenderWindow1());
     d->m_RenderWindows.insert("sagittal", d->m_StdMultiWidget->GetRenderWindow2());
     d->m_RenderWindows.insert("coronal", d->m_StdMultiWidget->GetRenderWindow3());
@@ -295,7 +294,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     d->m_MouseModeToolbar->setMouseModeSwitcher( d->m_StdMultiWidget->GetMouseModeSwitcher() );
     connect( d->m_MouseModeToolbar, SIGNAL( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ),
-             d->m_StdMultiWidget, SLOT( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ) );
+      d->m_StdMultiWidget, SLOT( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ) );
 
     layout->addWidget(d->m_StdMultiWidget);
 
@@ -311,7 +310,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     // Initialize bottom-right view as 3D view
     d->m_StdMultiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(
-          mitk::BaseRenderer::Standard3D );
+      mitk::BaseRenderer::Standard3D );
 
     // Enable standard handler for levelwindow-slider
     d->m_StdMultiWidget->EnableStandardLevelWindow();
@@ -339,22 +338,22 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
 {
   // Enable change of logo. If no DepartmentLogo was set explicitly, MBILogo is used.
   // Set new department logo by prefs->Set("DepartmentLogo", "PathToImage");
+
   // If no logo was set for this plug-in specifically, walk the parent preference nodes
   // and lookup a logo value there.
+
   const berry::IPreferences* currentNode = prefs;
 
   while(currentNode)
   {
-    std::vector<std::string> keys = currentNode->Keys();
-
     bool logoFound = false;
-    for( std::size_t i = 0; i < keys.size(); ++i )
+    foreach (const QString& key, prefs->Keys())
     {
-      if( keys[i] == "DepartmentLogo")
+      if( key == "DepartmentLogo")
       {
-        std::string departmentLogoLocation = currentNode->Get("DepartmentLogo", "");
+        QString departmentLogoLocation = prefs->Get("DepartmentLogo", "");
 
-        if (departmentLogoLocation.empty())
+        if (departmentLogoLocation.isEmpty())
         {
           d->m_StdMultiWidget->DisableDepartmentLogo();
         }
@@ -363,7 +362,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
           // we need to disable the logo first, otherwise setting a new logo will have
           // no effect due to how mitkManufacturerLogo works...
           d->m_StdMultiWidget->DisableDepartmentLogo();
-          d->m_StdMultiWidget->SetDepartmentLogoPath(departmentLogoLocation.c_str());
+          d->m_StdMultiWidget->SetDepartmentLogoPath(qPrintable(departmentLogoLocation));
           d->m_StdMultiWidget->EnableDepartmentLogo();
         }
         logoFound = true;
@@ -375,7 +374,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
     currentNode = currentNode->Parent().GetPointer();
   }
 
-  //Upadte internal members
+  //Update internal members
   this->FillMembersWithCurrentDecorations();
   this->GetPreferenceDecorations(prefs);
   //Now the members can be used to modify the stdmultiwidget
@@ -408,7 +407,6 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
     d->m_StdMultiWidget->SetCornerAnnotation(d->m_WidgetAnnotation[i],
                                              HexColorToMitkColor(d->m_WidgetDecorationColor[i]), i);
   }
-
   //The crosshair gap
   int crosshairgapsize = prefs->GetInt("crosshair gap size", 32);
   d->m_StdMultiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
@@ -558,3 +556,4 @@ void QmitkStdMultiWidgetEditor::RequestActivateMenuWidget(bool on)
     }
   }
 }
+

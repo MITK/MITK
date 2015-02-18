@@ -78,7 +78,7 @@ protected:
 
   QWidget* m_MainControl;
 
-  QHash<QCheckBox*,std::string> m_InputDevices;
+  QHash<QCheckBox*,QString> m_InputDevices;
 
   // specific for Wiimote
   QGroupBox* m_WiiMoteModes;

@@ -38,12 +38,12 @@ bool DataStorageEditorInput::Exists() const
   return true;
 }
 
-std::string DataStorageEditorInput::GetName() const
+QString DataStorageEditorInput::GetName() const
 {
   return "DataStorage Scene";
 }
 
-std::string DataStorageEditorInput::GetToolTipText() const
+QString DataStorageEditorInput::GetToolTipText() const
 {
   return "";
 }

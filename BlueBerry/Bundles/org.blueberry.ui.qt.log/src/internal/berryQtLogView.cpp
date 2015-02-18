@@ -40,9 +40,7 @@ namespace berry {
 QtLogView::QtLogView(QWidget *parent)
     : QWidget(parent)
 {
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   berry::IBerryPreferences::Pointer prefs
       = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
         .Cast<berry::IBerryPreferences>();
@@ -125,9 +123,7 @@ void QtLogView::on_ShowAdvancedFields_clicked( bool checked )
   ui.tableView->resizeColumnsToContents();
   ui.tableView->setVisible(true);
 
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   berry::IBerryPreferences::Pointer prefs
       = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
         .Cast<berry::IBerryPreferences>();
@@ -143,9 +139,7 @@ void QtLogView::on_ShowCategory_clicked( bool checked )
   ui.tableView->resizeColumnsToContents();
   ui.tableView->setVisible(true);
 
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   berry::IBerryPreferences::Pointer prefs
       = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
         .Cast<berry::IBerryPreferences>();

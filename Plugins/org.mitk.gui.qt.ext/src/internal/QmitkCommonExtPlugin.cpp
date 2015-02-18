@@ -28,19 +28,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSceneIO.h>
 #include <mitkProgressBar.h>
 #include <mitkRenderingManager.h>
+#include <mitkIOUtil.h>
 
 #include <berryPlatformUI.h>
 #include <berryIPreferencesService.h>
-#include <mitkIOUtil.h>
+#include <berryPlatform.h>
 
 #include <Poco/Util/OptionProcessor.h>
 
 #include <QProcess>
 #include <QMainWindow>
 #include <QtPlugin>
-#include <berryIPreferencesService.h>
-#include "berryPlatform.h"
-#include <QMessageBox>
 
 ctkPluginContext* QmitkCommonExtPlugin::_context = 0;
 
@@ -61,14 +59,8 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
     connect(qApp, SIGNAL(messageReceived(QByteArray)), this, SLOT(handleIPCMessage(QByteArray)));
   }
 
-  std::vector<std::string> args = berry::Platform::GetApplicationArgs();
-  QStringList qargs;
-  for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
-  {
-    qargs << QString::fromStdString(*it);
-  }
   // This is a potentially long running operation.
-  loadDataFromDisk(qargs, true);
+  loadDataFromDisk(berry::Platform::GetApplicationArgs(), true);
 }
 
 void QmitkCommonExtPlugin::stop(ctkPluginContext* context)
@@ -138,9 +130,9 @@ void QmitkCommonExtPlugin::startNewInstance(const QStringList &args, const QStri
 {
   QStringList newArgs(args);
 #ifdef Q_OS_UNIX
-  newArgs << QString("--") + QString::fromStdString(berry::Platform::ARG_NEWINSTANCE);
+  newArgs << QString("--") +berry::Platform::ARG_NEWINSTANCE;
 #else
-  newArgs << QString("/") + QString::fromStdString(berry::Platform::ARG_NEWINSTANCE);
+  newArgs << QString("/") + berry::Platform::ARG_NEWINSTANCE;
 #endif
   newArgs << files;
   QProcess::startDetached(qApp->applicationFilePath(), newArgs);

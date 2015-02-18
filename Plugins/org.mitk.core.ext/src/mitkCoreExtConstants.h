@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKCOREEXTCONSTANTS_H_
 #define MITKCOREEXTCONSTANTS_H_
 
-#include <string>
+#include <QString>
 
 #include <org_mitk_core_ext_Export.h>
 
@@ -37,16 +37,16 @@ namespace mitk
   */
   struct MITKCOREEXT_EXPORT CoreExtConstants
   {
-    static const std::string INPUTDEVICE_SERVICE;
-    static const std::string INPUTDEVICE_PREFERENCES;
-    static const std::string INPUTDEVICE_EXTENSION_NAME;
-    static const std::string INPUTDEVICE_XMLATTRIBUTE_CLASS;
-    static const std::string INPUTDEVICE_XMLATTRIBUTE_DESCRIPTION;
-    static const std::string INPUTDEVICE_XMLATTRIBUTE_NAME;
-    static const std::string INPUTDEVICE_XMLATTRIBUTE_ID;
-    static const std::string WIIMOTE_SURFACEINTERACTION;
-    static const std::string WIIMOTE_HEADTRACKING;
-    static const std::string WIIMOTE_XMLATTRIBUTE_NAME;
+    static const QString INPUTDEVICE_SERVICE;
+    static const QString INPUTDEVICE_PREFERENCES;
+    static const QString INPUTDEVICE_EXTENSION_NAME;
+    static const QString INPUTDEVICE_XMLATTRIBUTE_CLASS;
+    static const QString INPUTDEVICE_XMLATTRIBUTE_DESCRIPTION;
+    static const QString INPUTDEVICE_XMLATTRIBUTE_NAME;
+    static const QString INPUTDEVICE_XMLATTRIBUTE_ID;
+    static const QString WIIMOTE_SURFACEINTERACTION;
+    static const QString WIIMOTE_HEADTRACKING;
+    static const QString WIIMOTE_XMLATTRIBUTE_NAME;
   };
 }
 

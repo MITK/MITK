@@ -77,14 +77,14 @@ public:
     bool GetShowMemoryIndicator();
 
     //TODO should be removed when product support is here
-    void SetProductName(const std::string& product);
-    void SetWindowIcon(const std::string& wndIcon);
+    void SetProductName(const QString& product);
+    void SetWindowIcon(const QString& wndIcon);
 
-    void SetPerspectiveExcludeList(std::vector<std::string> v);
-    std::vector<std::string> GetPerspectiveExcludeList();
+    void SetPerspectiveExcludeList(const QList<QString> &v);
+    QList<QString> GetPerspectiveExcludeList();
 
-    void SetViewExcludeList(std::vector<std::string> v);
-    std::vector<std::string> GetViewExcludeList();
+    void SetViewExcludeList(const QList<QString> &v);
+    QList<QString> GetViewExcludeList();
 
 protected slots:
 
@@ -135,7 +135,7 @@ private:
   berry::IEditorPart::WeakPtr lastActiveEditor;
   berry::IPerspectiveDescriptor::WeakPtr lastPerspective;
   berry::IWorkbenchPage::WeakPtr lastActivePage;
-  std::string lastEditorTitle;
+  QString lastEditorTitle;
   berry::IAdaptable* lastInput;
 
   berry::WorkbenchAdvisor* wbAdvisor;
@@ -149,19 +149,19 @@ private:
   bool viewNavigatorFound;
   bool showMemoryIndicator;
   QString productName;
-  std::string windowIcon;
+  QString windowIcon;
 
   // enables DnD on the editor area
   berry::SmartPointer<berry::IDropTargetListener> dropTargetListener;
 
   // stringlist for excluding perspectives from the perspective menu entry (e.g. Welcome Perspective)
-  std::vector<std::string> perspectiveExcludeList;
+  QList<QString> perspectiveExcludeList;
 
   // stringlist for excluding views from the menu entry
-  std::vector<std::string> viewExcludeList;
+  QList<QString> viewExcludeList;
 
   // maps perspective ids to QAction objects
-  std::map<std::string, QAction*> mapPerspIdToAction;
+  QHash<QString, QAction*> mapPerspIdToAction;
 
   // actions which will be enabled/disabled depending on the application state
   QList<QAction*> viewActions;

@@ -32,15 +32,15 @@ bool HelpEditorInput::Exists() const
   return !url.isEmpty();
 }
 
-std::string HelpEditorInput::GetName() const
+QString HelpEditorInput::GetName() const
 {
   if (url.isEmpty()) return "Untitled";
-  return url.toString().toStdString();
+  return url.toString();
 }
 
-std::string HelpEditorInput::GetToolTipText() const
+QString HelpEditorInput::GetToolTipText() const
 {
-  return url.toString().toStdString();
+  return url.toString();
 }
 
 bool HelpEditorInput::operator==(const berry::Object* o) const

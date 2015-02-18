@@ -215,8 +215,8 @@ public:
    * Should not be called by clients. It is called by the core plugin when
    * creating this executable extension.
    */
-  void SetInitializationData(IConfigurationElement::Pointer cfig,
-      const QString& propertyName, Object::Pointer data);
+  void SetInitializationData(const IConfigurationElement::Pointer& cfig,
+                             const QString& propertyName, const Object::Pointer& data);
 
 };
 

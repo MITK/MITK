@@ -112,6 +112,7 @@ struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual 
                  << " does not seem to implement the required interface \""
                  << qobject_interface_iid<C>() << "\", or you forgot the Q_INTERFACES macro.";
     }
+    return interface;
   }
 
   /**

@@ -43,7 +43,7 @@ public:
   Events::Types GetPerspectiveEventTypes() const;
 
   void PerspectiveOpened(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective);
-  void PerspectiveChanged(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective, const std::string &changeId);
+  void PerspectiveChanged(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective, const QString &changeId);
 };
 
 class HelpWindowListener : public IWindowListener
@@ -163,7 +163,7 @@ void HelpPluginActivator::linkActivated(IWorkbenchPage::Pointer page, const QUrl
     else
     {
       // get the last used HelpEditor instance
-      std::vector<IEditorReference::Pointer> editors =
+      QList<IEditorReference::Pointer> editors =
           page->FindEditors(IEditorInput::Pointer(0), HelpEditor::EDITOR_ID, IWorkbenchPage::MATCH_ID);
       if (editors.empty())
       {
@@ -347,7 +347,7 @@ void HelpPerspectiveListener::PerspectiveOpened(SmartPointer<IWorkbenchPage> pag
   }
 }
 
-void HelpPerspectiveListener::PerspectiveChanged(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective, const std::string &changeId)
+void HelpPerspectiveListener::PerspectiveChanged(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective, const QString &changeId)
 {
   if (perspective->GetId() == HelpPerspective::ID && changeId == IWorkbenchPage::CHANGE_RESET)
   {
@@ -359,7 +359,7 @@ HelpWindowListener::HelpWindowListener()
   : perspListener(new HelpPerspectiveListener())
 {
   // Register perspective listener for already opened windows
-  typedef std::vector<IWorkbenchWindow::Pointer> WndVec;
+  typedef QList<IWorkbenchWindow::Pointer> WndVec;
   WndVec windows = PlatformUI::GetWorkbench()->GetWorkbenchWindows();
   for (WndVec::iterator i = windows.begin(); i != windows.end(); ++i)
   {
@@ -369,7 +369,7 @@ HelpWindowListener::HelpWindowListener()
 
 HelpWindowListener::~HelpWindowListener()
 {
-  typedef std::vector<IWorkbenchWindow::Pointer> WndVec;
+  typedef QList<IWorkbenchWindow::Pointer> WndVec;
   WndVec windows = PlatformUI::GetWorkbench()->GetWorkbenchWindows();
   for (WndVec::iterator i = windows.begin(); i != windows.end(); ++i)
   {
@@ -424,8 +424,8 @@ void HelpContextHandler::handleEvent(const ctkEvent &event)
             berry::IWorkbenchPart::Pointer currentPart = currentPage->GetActivePart();
             if (currentPart)
             {
-              QString pluginID = QString::fromStdString(currentPart->GetSite()->GetPluginId());
-              QString viewID = QString::fromStdString(currentPart->GetSite()->GetId());
+              QString pluginID = currentPart->GetSite()->GetPluginId();
+              QString viewID = currentPart->GetSite()->GetId();
               QString loc = "qthelp://" + pluginID + "/bundle/%1.html";
 
               QHelpEngineWrapper& helpEngine = HelpPluginActivator::getInstance()->getQHelpEngine();

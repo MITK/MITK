@@ -34,6 +34,7 @@ namespace berry {
 CTKPluginListener::CTKPluginListener(ExtensionRegistry* registry, QObject* key, RegistryStrategy* strategy)
   : registry(registry), strategy(strategy), token(key)
 {
+  currentStateStamp << 0;
 }
 
 void CTKPluginListener::ProcessPlugins(const QList<QSharedPointer<ctkPlugin> >& plugins)

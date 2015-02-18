@@ -37,7 +37,7 @@ class HelpEditor : public QtEditorPart, public IReusableEditor, public IPartList
 public:
   berryObjectMacro(HelpEditor);
 
-  static const std::string EDITOR_ID;
+  static const QString EDITOR_ID;
 
   HelpEditor();
   ~HelpEditor();

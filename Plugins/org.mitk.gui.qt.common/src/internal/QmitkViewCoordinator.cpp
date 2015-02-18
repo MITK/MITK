@@ -38,8 +38,8 @@ QmitkViewCoordinator::~QmitkViewCoordinator()
 void QmitkViewCoordinator::Start()
 {
   berry::PlatformUI::GetWorkbench()->AddWindowListener(berry::IWindowListener::Pointer(this));
-  std::vector<berry::IWorkbenchWindow::Pointer> wnds(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows());
-  for (std::vector<berry::IWorkbenchWindow::Pointer>::iterator i = wnds.begin();
+  QList<berry::IWorkbenchWindow::Pointer> wnds(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows());
+  for (QList<berry::IWorkbenchWindow::Pointer>::iterator i = wnds.begin();
        i != wnds.end(); ++i)
   {
     (*i)->GetPartService()->AddPartListener(berry::IPartListener::Pointer(this));
@@ -51,8 +51,8 @@ void QmitkViewCoordinator::Stop()
   if (!berry::PlatformUI::IsWorkbenchRunning()) return;
 
   berry::PlatformUI::GetWorkbench()->RemoveWindowListener(berry::IWindowListener::Pointer(this));
-  std::vector<berry::IWorkbenchWindow::Pointer> wnds(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows());
-  for (std::vector<berry::IWorkbenchWindow::Pointer>::iterator i = wnds.begin();
+  QList<berry::IWorkbenchWindow::Pointer> wnds(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows());
+  for (QList<berry::IWorkbenchWindow::Pointer>::iterator i = wnds.begin();
        i != wnds.end(); ++i)
   {
     (*i)->GetPartService()->RemovePartListener(berry::IPartListener::Pointer(this));

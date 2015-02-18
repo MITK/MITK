@@ -38,38 +38,32 @@ mitk::IInputDevice::Pointer mitk::InputDeviceDescriptor::CreateInputDevice()
     {
       // support legacy BlueBerry extensions
       this->m_InputDevice = this->m_InputDeviceExtensionPoint
-          ->CreateExecutableExtension<IInputDevice>(
-            mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_CLASS,
-            IInputDevice::GetManifestName());
+          ->CreateExecutableExtension<IInputDevice>(mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_CLASS);
     }
   }
   return this->m_InputDevice;
 }
 
-std::string mitk::InputDeviceDescriptor::GetID() const
+QString mitk::InputDeviceDescriptor::GetID() const
 {
-  std::string idOfExtensionPoint;
-  this->m_InputDeviceExtensionPoint->GetAttribute(mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_ID,idOfExtensionPoint);
-  return idOfExtensionPoint;
+  return this->m_InputDeviceExtensionPoint->GetAttribute(mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_ID);
 }
 
-std::string mitk::InputDeviceDescriptor::GetDescription() const
+QString mitk::InputDeviceDescriptor::GetDescription() const
 {
-  std::vector<berry::IConfigurationElement::Pointer>
+  QList<berry::IConfigurationElement::Pointer>
     descriptions(this->m_InputDeviceExtensionPoint->GetChildren(mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_DESCRIPTION));
 
   if(!descriptions.empty())
   {
     return descriptions[0]->GetValue();
   }
-  return "";
+  return QString();
 }
 
-std::string mitk::InputDeviceDescriptor::GetName() const
+QString mitk::InputDeviceDescriptor::GetName() const
 {
-  std::string name;
-  this->m_InputDeviceExtensionPoint->GetAttribute(mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_NAME,name);
-  return name;
+  return this->m_InputDeviceExtensionPoint->GetAttribute(mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_NAME);
 }
 
 bool mitk::InputDeviceDescriptor::operator==(const Object* object) const

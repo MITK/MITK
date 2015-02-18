@@ -20,9 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include <string>
-#include <vector>
-
 #include "mitkIInputDevice.h"
 
 namespace mitk
@@ -44,7 +41,7 @@ namespace mitk
   struct IInputDeviceDescriptor : public berry::Object
   {
 
-    berryInterfaceMacro(IInputDeviceDescriptor, mitk);
+    berryObjectMacro(mitk::IInputDeviceDescriptor)
 
     /**
     * Creates an instance of an input device defined in the descriptor.
@@ -58,21 +55,21 @@ namespace mitk
     *
     * @return the description
     */
-    virtual std::string GetDescription() const = 0;
+    virtual QString GetDescription() const = 0;
 
     /**
     * Returns the id of this input device.
     *
     * @return the id
     */
-    virtual std::string GetID() const = 0;
+    virtual QString GetID() const = 0;
 
     /**
     * Returns the name of this input device.
     *
     * @return the name
     */
-    virtual std::string GetName() const = 0;
+    virtual QString GetName() const = 0;
 
     // /**
     // * Returns the descriptor for the icon to show for this view.
@@ -82,8 +79,7 @@ namespace mitk
     /**
     * Equals this class with the given parameter.
     *
-    * @param object
-    *      the object for the equation
+    * @param object the object for the equation
     * @return true, if the objects are equal :: false, if they differ in any way
     */
     virtual bool operator==(const Object* object) const = 0;

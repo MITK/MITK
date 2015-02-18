@@ -39,7 +39,7 @@ public:
 
   berryObjectMacro(QmitkStdMultiWidgetEditor);
 
-  static const std::string EDITOR_ID;
+  static const QString EDITOR_ID;
 
   QmitkStdMultiWidgetEditor();
   ~QmitkStdMultiWidgetEditor();

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInputDeviceRegistry.h"
 
 #include <berryPlatform.h>
+#include <berryIPreferences.h>
 #include <berryIPreferencesService.h>
 
 #include <ctkPluginContext.h>
@@ -61,8 +62,8 @@ namespace mitk
         prefService->GetSystemPreferences()->Node(CoreExtConstants::INPUTDEVICE_PREFERENCES);
 
     // Initializes the modules
-    std::vector<IInputDeviceDescriptor::Pointer> descriptors(m_InputDeviceRegistry->GetInputDevices());
-    for (std::vector<IInputDeviceDescriptor::Pointer>::const_iterator it = descriptors.begin();
+    QList<IInputDeviceDescriptor::Pointer> descriptors(m_InputDeviceRegistry->GetInputDevices());
+    for (QList<IInputDeviceDescriptor::Pointer>::const_iterator it = descriptors.begin();
          it != descriptors.end(); ++it)
     {
       if (extPreferencesNode->GetBool((*it)->GetID(), false))

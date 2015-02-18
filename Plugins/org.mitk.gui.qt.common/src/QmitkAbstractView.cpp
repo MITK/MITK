@@ -332,8 +332,8 @@ mitk::IRenderWindowPart* QmitkAbstractView::GetRenderWindowPart( IRenderWindowPa
   if (renderPart) return renderPart;
 
   // No suitable active editor found, check visible editors
-  std::list<berry::IEditorReference::Pointer> editors = page->GetEditorReferences();
-  for (std::list<berry::IEditorReference::Pointer>::iterator i = editors.begin();
+  QList<berry::IEditorReference::Pointer> editors = page->GetEditorReferences();
+  for (QList<berry::IEditorReference::Pointer>::iterator i = editors.begin();
        i != editors.end(); ++i)
   {
     berry::IWorkbenchPart::Pointer part = (*i)->GetPart(false);
@@ -345,8 +345,8 @@ mitk::IRenderWindowPart* QmitkAbstractView::GetRenderWindowPart( IRenderWindowPa
   }
 
   // No suitable visible editor found, check visible views
-  std::vector<berry::IViewReference::Pointer> views = page->GetViewReferences();
-  for(std::vector<berry::IViewReference::Pointer>::iterator i = views.begin();
+  QList<berry::IViewReference::Pointer> views = page->GetViewReferences();
+  for(QList<berry::IViewReference::Pointer>::iterator i = views.begin();
       i != views.end(); ++i)
   {
     berry::IWorkbenchPart::Pointer part = (*i)->GetPart(false);
@@ -462,7 +462,7 @@ berry::IPreferences::Pointer QmitkAbstractView::GetPreferences() const
 {
   berry::IPreferencesService* prefService = d->m_PrefServiceTracker.getService();
   // const_cast workaround for bad programming: const uncorrectness this->GetViewSite() should be const
-  std::string id = "/" + (const_cast<QmitkAbstractView*>(this))->GetViewSite()->GetId();
+  QString id = "/" + (const_cast<QmitkAbstractView*>(this))->GetViewSite()->GetId();
   return prefService ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(0);
 }
 

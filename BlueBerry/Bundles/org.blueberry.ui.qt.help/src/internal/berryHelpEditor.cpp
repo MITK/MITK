@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const std::string HelpEditor::EDITOR_ID = "org.blueberry.editors.help";
+const QString HelpEditor::EDITOR_ID = "org.blueberry.editors.help";
 
 HelpEditor::HelpEditor()
   : m_ToolBar(0)
@@ -215,7 +215,7 @@ void HelpEditor::CloseHelpPerspective()
 
 void HelpEditor::InitializeTitle()
 {
-  std::string title = m_WebView->title().toStdString();
+  QString title = m_WebView->title();
   this->SetPartName(title);
 }
 

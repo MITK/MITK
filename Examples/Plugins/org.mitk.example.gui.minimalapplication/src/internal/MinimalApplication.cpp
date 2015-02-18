@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 
-class MinimalWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
+class MinimalWorkbenchAdvisor : public berry::WorkbenchAdvisor
 {
 
 public:
@@ -37,18 +37,13 @@ public:
     // Enable or disable the perspective bar
     configurer->SetShowPerspectiveBar(false);
 
-    wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
-    return wwAdvisor.data();
+    return new berry::WorkbenchWindowAdvisor(configurer);
   }
 
   QString GetInitialWindowPerspectiveId()
   {
     return DEFAULT_PERSPECTIVE_ID;
   }
-
-private:
-
-  QScopedPointer<berry::WorkbenchWindowAdvisor> wwAdvisor;
 
 };
 

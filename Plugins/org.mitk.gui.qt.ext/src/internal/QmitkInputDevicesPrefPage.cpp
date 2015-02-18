@@ -50,11 +50,11 @@ void QmitkInputDevicesPrefPage::CreateQtControl(QWidget* parent)
   m_MainControl = new QWidget(parent);
   QVBoxLayout *layout = new QVBoxLayout;
 
-  std::vector<mitk::IInputDeviceDescriptor::Pointer> temp(GetInputDeviceRegistry()->GetInputDevices());
+  QList<mitk::IInputDeviceDescriptor::Pointer> temp(GetInputDeviceRegistry()->GetInputDevices());
 
-  for(std::vector<mitk::IInputDeviceDescriptor::Pointer>::const_iterator it = temp.begin(); it != temp.end();++it)
+  for(QList<mitk::IInputDeviceDescriptor::Pointer>::const_iterator it = temp.begin(); it != temp.end();++it)
   {
-    QString inputDeviceName(QString::fromStdString((*it)->GetName()));
+    QString inputDeviceName((*it)->GetName());
     QCheckBox* checkBox = new QCheckBox((inputDeviceName),m_MainControl);
     layout->addWidget(checkBox);
     m_InputDevices.insert(checkBox,(*it)->GetID());
@@ -63,10 +63,8 @@ void QmitkInputDevicesPrefPage::CreateQtControl(QWidget* parent)
     {
       m_WiiMoteModes = new QGroupBox("WiiMote Modus");
 
-      m_WiiMoteHeadTracking = new QRadioButton
-        (QString::fromStdString(mitk::CoreExtConstants::WIIMOTE_HEADTRACKING));
-      m_WiiMoteSurfaceInteraction = new QRadioButton
-        (QString::fromStdString(mitk::CoreExtConstants::WIIMOTE_SURFACEINTERACTION));
+      m_WiiMoteHeadTracking = new QRadioButton(mitk::CoreExtConstants::WIIMOTE_HEADTRACKING);
+      m_WiiMoteSurfaceInteraction = new QRadioButton(mitk::CoreExtConstants::WIIMOTE_SURFACEINTERACTION);
       m_WiiMoteHeadTracking->setChecked(true);
 
       QVBoxLayout* vBoxLayout = new QVBoxLayout;
@@ -97,7 +95,7 @@ bool QmitkInputDevicesPrefPage::PerformOk()
 
   mitk::IInputDeviceRegistry* inputDeviceRegistry = GetInputDeviceRegistry();
 
-  QHashIterator<QCheckBox*, std::string> it(m_InputDevices);
+  QHashIterator<QCheckBox*, QString> it(m_InputDevices);
   while (it.hasNext())
   {
     it.next();
@@ -109,9 +107,9 @@ bool QmitkInputDevicesPrefPage::PerformOk()
       QString surfaceInteraction(m_WiiMoteSurfaceInteraction->text());
 
       this->m_InputDevicesPrefNode->PutBool
-        (headTracking.toStdString(),m_WiiMoteHeadTracking->isChecked());
+        (headTracking, m_WiiMoteHeadTracking->isChecked());
       this->m_InputDevicesPrefNode->PutBool
-        (surfaceInteraction.toStdString(),m_WiiMoteSurfaceInteraction->isChecked());
+        (surfaceInteraction, m_WiiMoteSurfaceInteraction->isChecked());
 
       // forced flush of the preferences is needed
       // because otherwise the mitk::WiiMoteActivator class
@@ -166,7 +164,7 @@ void QmitkInputDevicesPrefPage::PerformCancel()
 
 void QmitkInputDevicesPrefPage::Update()
 {
-  QHashIterator<QCheckBox*, std::string> it(m_InputDevices);
+  QHashIterator<QCheckBox*, QString> it(m_InputDevices);
   while (it.hasNext())
   {
     it.next();

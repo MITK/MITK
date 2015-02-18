@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIPreferencesService.h>
 #include <berryQtPreferences.h>
+#include <berryPlatform.h>
 
 QmitkAppInstancesPreferencePage::QmitkAppInstancesPreferencePage()
 {

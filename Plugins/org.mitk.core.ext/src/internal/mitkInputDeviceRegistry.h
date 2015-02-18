@@ -17,12 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKSPACENAVIGATORREGISTRY_H_
 #define MITKSPACENAVIGATORREGISTRY_H_
 
-#include <Poco/HashMap.h>
-#include <string>
-#include <vector>
-
 #include <mitkIInputDeviceDescriptor.h>
 #include <mitkIInputDeviceRegistry.h>
+
+#include <QHash>
 
 namespace mitk
 {
@@ -48,17 +46,17 @@ namespace mitk
     /**
     * @see mitk::IInputDeviceRegistry::Find(const std::string& id)
     */
-    InputDeviceDescriptorPtr Find(const std::string& id) const;
+    InputDeviceDescriptorPtr Find(const QString& id) const;
 
     /**
-    * @see mitk::IInputDeviceRegistry´::GetInputDevices()
+    * @see mitk::IInputDeviceRegistryÂ´::GetInputDevices()
     */
-    std::vector<InputDeviceDescriptorPtr> GetInputDevices() const;
+    QList<InputDeviceDescriptorPtr> GetInputDevices() const;
 
   protected:
 
   private:
-    Poco::HashMap<std::string, InputDeviceDescriptorPtr> m_ListRegisteredDevices;
+    QHash<QString, InputDeviceDescriptorPtr> m_ListRegisteredDevices;
 
   }; // end class InputDeviceRegistry
 } // end namespace mitk

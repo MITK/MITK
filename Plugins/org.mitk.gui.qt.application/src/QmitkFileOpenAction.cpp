@@ -53,7 +53,7 @@ public:
     berry::IPreferences::Pointer prefs = GetPreferences();
     if(prefs.IsNotNull())
     {
-      return QString::fromStdString(prefs->Get("LastFileOpenPath", ""));
+      return prefs->Get("LastFileOpenPath", "");
     }
     return QString();
   }
@@ -63,7 +63,7 @@ public:
     berry::IPreferences::Pointer prefs = GetPreferences();
     if(prefs.IsNotNull())
     {
-      prefs->Put("LastFileOpenPath", path.toStdString());
+      prefs->Put("LastFileOpenPath", path);
       prefs->Flush();
     }
   }
@@ -100,15 +100,15 @@ QmitkFileOpenAction::~QmitkFileOpenAction()
 
 void QmitkFileOpenAction::Run()
 {
+
   // Ask the user for a list of files to open
-  QStringList fileNames =  QFileDialog::getOpenFileNames(NULL, "Open",
-                                                         d->getLastFileOpenPath(),
-                                                         QmitkIOUtil::GetFileOpenFilterString());
+  QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Open",
+                                                        d->getLastFileOpenPath(),
+                                                        QmitkIOUtil::GetFileOpenFilterString());
 
   if (fileNames.empty())
     return;
 
   d->setLastFileOpenPath(fileNames.front());
-
   mitk::WorkbenchUtil::LoadFiles(fileNames, d->m_Window.Lock(), d->GetOpenEditor());
 }

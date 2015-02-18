@@ -19,12 +19,12 @@ class ReflectanceError:
 
         Arguments
         _________
-        Vss:
-            array storing all the different values Vs (Volume fraction of scattering particles)
         BVFs:
             array storing all the differnet values for BVF (Blood Volume Fraction)
+        Vss:
+            array storing all the different values Vs (Volume fraction of scattering particles)
         reflectances:
-            grid of dimension Vss.shape[0] x BVFs.shape[0] x wavelenghts with reflectance values
+            grid of dimension BVFs.shape[0] x Vss.shape[0] x wavelenghts with reflectance values
         """
         nr_wavelengths = reflectances.shape[2]
 

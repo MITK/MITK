@@ -338,7 +338,7 @@ if(MITK_USE_SOFA)
   set(MITK_USE_SOFA_PLUGINS ${MITK_USE_SOFA_PLUGINS} CACHE PATH "List of semicolon-separated plugin names" FORCE)
 endif()
 
-if(MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON)
+if(MITK_USE_Python)
   set(MITK_USE_ZLIB ON)
   if(NOT MITK_USE_Numpy)
     message("> Forcing MITK_USE_Numpy to ON because of MITK_USE_Python")

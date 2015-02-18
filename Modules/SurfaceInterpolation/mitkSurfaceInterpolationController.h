@@ -44,6 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkImageData.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "vtkProperty.h"
+#include "mitkImageTimeSelector.h"
 
 #include "mitkProgressBar.h"
 
@@ -72,9 +73,20 @@ namespace mitk
 
     static SurfaceInterpolationController* GetInstance();
 
-    void SetCurrentTimeStep( unsigned int ts )
+    void SetCurrentTimeStep( int ts )
     {
-      m_CurrentTimeStep = ts;
+      if ( m_CurrentTimeStep != ts )
+      {
+        m_CurrentTimeStep = ts;
+
+        if ( m_SelectedSegmentation )
+        {
+          m_TimeSelector->SetInput( m_SelectedSegmentation );
+          m_TimeSelector->SetTimeNr( m_CurrentTimeStep );
+          m_TimeSelector->SetChannelNr( 0 );
+          m_TimeSelector->Update();
+        }
+      }
     };
 
     unsigned int GetCurrentTimeStep()
@@ -244,7 +256,9 @@ namespace mitk
 
     std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
 
-    unsigned int m_CurrentTimeStep;
+    int m_CurrentTimeStep;
+
+    mitk::ImageTimeSelector::Pointer m_TimeSelector;
  };
 }
 #endif

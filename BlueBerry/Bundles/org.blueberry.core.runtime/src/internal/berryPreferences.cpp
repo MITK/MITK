@@ -132,6 +132,11 @@ namespace berry
 
   void Preferences::Flush()
   {
+    {
+      QMutexLocker scopedMutex(&m_Mutex);
+      AssertValid_unlocked();
+    }
+
     m_Storage->Flush(this);
 
     // if something is written, make the tree undirty
@@ -355,36 +360,26 @@ namespace berry
 
   void Preferences::PutBool(const QString& key, bool value)
   {
-    QMutexLocker scopedMutex(&m_Mutex);
-    AssertValid_unlocked();
     this->Put(key, value ? "true" : "false");
   }
 
   void Preferences::PutDouble(const QString& key, double value)
   {
-    QMutexLocker scopedMutex(&m_Mutex);
-    AssertValid_unlocked();
     this->Put(key, QString::number(value));
   }
 
   void Preferences::PutFloat(const QString& key, float value)
   {
-    QMutexLocker scopedMutex(&m_Mutex);
-    AssertValid_unlocked();
     this->Put(key, QString::number(value));
   }
 
   void Preferences::PutInt(const QString& key, int value)
   {
-    QMutexLocker scopedMutex(&m_Mutex);
-    AssertValid_unlocked();
     this->Put(key, QString::number(value));
   }
 
   void Preferences::PutLong(const QString& key, long value)
   {
-    QMutexLocker scopedMutex(&m_Mutex);
-    AssertValid_unlocked();
     this->Put(key, QString::number(value));
   }
 
@@ -408,8 +403,6 @@ namespace berry
 
   void Preferences::Sync()
   {
-    QMutexLocker scopedMutex(&m_Mutex);
-    AssertValid_unlocked();
     this->Flush();
   }
 

@@ -17,7 +17,7 @@ from sklearn.grid_search      import GridSearchCV
 from sklearn.cross_validation import KFold
 from sklearn.linear_model     import LogisticRegression
 
-import setupData
+from setup import data
 
 
 #%% initialize
@@ -28,7 +28,7 @@ dataFolder = 'data/output/'
 
 # load data
 uniformReflectances, gaussReflectances = \
-    setupData.setupLogisticRegressionArtificialData(dataFolder)
+    data.logisticRegressionArtificialData(dataFolder)
 
 labelsUniform = np.zeros(uniformReflectances.shape[0])
 labelsGauss   = np.ones(gaussReflectances.shape[0])

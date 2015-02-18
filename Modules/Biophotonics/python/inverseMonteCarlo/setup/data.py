@@ -28,7 +28,7 @@ def perfect(dataFolder):
 
 
 
-def setupLogisticRegressionArtificialData(dataFolder):
+def logisticRegressionArtificialData(dataFolder):
     uniformReflectances = np.load(dataFolder + "2015February1704:00PMreflectancesRandom1000000photons.npy")
     uniformReflectances = mch.normalizeImageQuotient(uniformReflectances, iqBand=1)
 

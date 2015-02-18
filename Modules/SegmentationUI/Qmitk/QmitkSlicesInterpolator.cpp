@@ -1096,7 +1096,7 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
           {
             minSpacing = spacing[i];
           }
-          else if (spacing[i] > maxSpacing)
+          if (spacing[i] > maxSpacing)
           {
             maxSpacing = spacing[i];
           }

@@ -11,7 +11,10 @@ import numpy as np
 from scipy.interpolate import interp1d
 from scipy.stats import norm
 
-def setupNormalSimulation():
+
+nrSimulations = 10000
+
+def normal():
     #%% intialization
     print('initialize...')
 
@@ -72,11 +75,11 @@ def setupNormalSimulation():
     nrSamples    = samplesBVF * samplesD * samplesR * samplesSaO2 * samplesVs
 
 
-    return BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb
+    return BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations
 
 
 
-def setupNoisySimulation():
+def noisy():
     #%% intialization
     print('initialize...')
 
@@ -137,11 +140,11 @@ def setupNoisySimulation():
     nrSamples    = samplesBVF * samplesD * samplesR * samplesSaO2 * samplesVs
 
 
-    return BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb
+    return BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations
 
 
 
-def setupPerfectArtificialSimulation():
+def perfect():
     #%% intialization
     print('initialize...')
 
@@ -200,4 +203,4 @@ def setupPerfectArtificialSimulation():
 
     nrSamples    = samplesBVF * samplesD * samplesR * samplesSaO2 * samplesVs
 
-    return BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb
+    return BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations

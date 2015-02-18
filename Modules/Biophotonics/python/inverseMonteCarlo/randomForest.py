@@ -13,8 +13,8 @@ from sklearn.grid_search      import GridSearchCV
 from sklearn.cross_validation import KFold
 from sklearn import decomposition
 
+from setup import data
 
-import setupData
 
 
 
@@ -32,7 +32,7 @@ dataFolder = 'data/output/'
 
 # load data
 trainingParameters, trainingReflectances, testParameters, testReflectances = \
-    setupData.setupPerfectArtificialData(dataFolder)
+    data.perfect(dataFolder)
 
 # transform data with pca (test)
 #pca = decomposition.PCA(n_components=22)

@@ -13,7 +13,7 @@ from reflectanceError     import ReflectanceError
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib           import cm
 
-import setupData
+from setup import data
 
 
 #%% load data
@@ -21,7 +21,7 @@ import setupData
 dataFolder = "data/output/"
 
 trainingParameters, trainingReflectances, testParameters, testReflectances = \
-    setupData.setupPerfectArtificialData(dataFolder)
+    data.perfect(dataFolder)
 
 
 BVFs = np.unique(trainingParameters[:,0])

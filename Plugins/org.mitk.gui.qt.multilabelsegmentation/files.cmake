@@ -56,8 +56,25 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
+  resources/BooleanDifference_48x48.png
+  resources/BooleanIntersection_48x48.png
+  resources/BooleanOperations_48x48.png
+  resources/BooleanUnion_48x48.png
+  resources/Closing_48x48.png
+  resources/CTKWidgets_48x48.png
+  resources/deformablePlane.png
+  resources/Dilate_48x48.png
+  resources/Erode_48x48.png
+  resources/FillHoles_48x48.png
+  resources/Icons.svg
+  resources/ImageMasking_48x48.png
+  resources/MorphologicalOperations_48x48.png
   resources/multilabelsegmentation.png
   resources/MultiLabelSegmentationUtilities_48x48.png
+  resources/NewLabel_48x48.png
+  resources/NewSegmentationSession_48x48.png
+  resources/Opening_48x48.png
+  resources/SurfaceToImage_48x48.png
   plugin.xml
 )
 

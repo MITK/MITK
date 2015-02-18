@@ -17,11 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkMultiLabelSegmentationView_h
 #define QmitkMultiLabelSegmentationView_h
 
-#include <berryISizeProvider.h>
-#include <berryIBerryPreferences.h>
-
 #include <QmitkAbstractView.h>
-#include <mitkIRenderWindowPartListener.h>
 #include "mitkSegmentationInteractor.h"
 
 #include "ui_QmitkMultiLabelSegmentationControls.h"
@@ -33,8 +29,7 @@ class QmitkRenderWindow;
  * \ingroup ToolManagerEtAl
  * \ingroup org_mitk_gui_qt_multilabelsegmentation_internal
  */
-class QmitkMultiLabelSegmentationView : public QmitkAbstractView,
-  public mitk::IRenderWindowPartListener, public berry::ISizeProvider
+class QmitkMultiLabelSegmentationView : public QmitkAbstractView
 {
   Q_OBJECT
 

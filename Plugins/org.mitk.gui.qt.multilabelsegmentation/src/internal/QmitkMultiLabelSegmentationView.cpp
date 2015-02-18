@@ -91,7 +91,7 @@ QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView() :
 
 QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
 {
-  m_ToolManager->ActivateTool(-1);
+  //m_ToolManager->ActivateTool(-1);
   /*
   todo: check this
   m_Controls.m_SliceBasedInterpolatorWidget->EnableInterpolation(false);
@@ -101,17 +101,22 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
   service->RemoveAllPlanePositions();
   context->ungetService(ppmRef);
 */
-  m_ToolManager->SetReferenceData(NULL);
-  m_ToolManager->SetWorkingData(NULL);
+  //m_ToolManager->SetReferenceData(NULL);
+  //m_ToolManager->SetWorkingData(NULL);
 
-  m_ServiceRegistration.Unregister();
+  //m_ServiceRegistration.Unregister();
 }
 
 void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 {
   // setup the basic GUI of this view
-  m_Parent = parent;
+//  m_Parent = parent;
   m_Controls.setupUi(parent);
+
+
+  // *------------------------
+  // * DATA SLECTION WIDGETS
+  // *------------------------
 
   m_Controls.m_cbReferenceNodeSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.m_cbReferenceNodeSelector->SetPredicate(m_ReferencePredicate);
@@ -121,59 +126,84 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_cbWorkingNodeSelector->SetPredicate(m_SegmentationPredicate);
   m_Controls.m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(m_ToolManager);
-
-  m_ToolManager->SetDataStorage( *(this->GetDataStorage()) );
-  m_ToolManager->InitializeTools();
-
-  //use the same ToolManager instance for our 3D Tools
-  m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*m_ToolManager);
-
-  m_Controls.m_LabelSetWidget->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_LabelSetWidget->SetOrganColors(mitk::OrganNamesHandling::GetDefaultOrganColorString());
-  m_Controls.m_LabelSetWidget->hide();
-
-  m_Controls.m_SurfaceBasedInterpolatorWidget->SetDataStorage( *(this->GetDataStorage()) );
-  m_Controls.m_SliceBasedInterpolatorWidget->SetDataStorage( *(this->GetDataStorage()) );
-
-  // all part of open source MITK
-  m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
-  m_Controls.m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer2D );
-  //m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups();
-  m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Fill Erase Paint Wipe 'Region Growing' FastMarching2D Correction 'Live Wire'");// todo: "Correction 'Live Wire'"
-  m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
-  connect( m_Controls.m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
-
-  //setup 3D Tools
-  m_Controls.m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
-  m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer3D );
-  //specify tools to be added to 3D Tool area
-  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' 'Auto Threshold' 'Multiple Otsu'"); // todo add : FastMarching3D RegionGrowing Watershed
-
-  m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(2);
-  m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
-
   connect( m_Controls.m_cbReferenceNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
            this, SLOT( OnReferenceSelectionChanged( const mitk::DataNode* ) ) );
 
   connect( m_Controls.m_cbWorkingNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
            this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
 
-  connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT( OnNewLabel()) );
-  connect( m_Controls.m_pbNewSegmentationSession, SIGNAL(clicked()), this, SLOT( OnNewSegmentationSession()) );
-  connect( m_Controls.m_pbShowLabelTable, SIGNAL(toggled(bool)), this, SLOT( OnShowLabelTable(bool)) );
+  //  this->OnReferenceSelectionChanged( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode() );
 
-  connect(m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
-  connect(m_Controls.m_LabelSetWidget, SIGNAL(resetView()), this, SLOT(OnResetView()) );
+  // *------------------------
+  // * ToolManager
+  // *------------------------
 
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  assert(m_ToolManager);
+  m_ToolManager->SetDataStorage( *(this->GetDataStorage()) );
+  m_ToolManager->InitializeTools();
+  //use the same ToolManager instance for our 3D Tools
+  m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*m_ToolManager);
+
+  // *------------------------
+  // * LabelSetWidget
+  // *------------------------
+
+  m_Controls.m_LabelSetWidget->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_LabelSetWidget->SetOrganColors(mitk::OrganNamesHandling::GetDefaultOrganColorString());
+  m_Controls.m_LabelSetWidget->hide();
+
+  // *------------------------
+  // * Interpolation
+  // *------------------------
+
+  m_Controls.m_SurfaceBasedInterpolatorWidget->SetDataStorage( *(this->GetDataStorage()) );
+  m_Controls.m_SliceBasedInterpolatorWidget->SetDataStorage( *(this->GetDataStorage()) );
   connect( m_Controls.m_cbInterpolation, SIGNAL( activated (int) ), this, SLOT( OnInterpolationSelectionChanged(int) ) );
 
   m_Controls.m_cbInterpolation->setCurrentIndex(0);
   m_Controls.m_swInterpolation->hide();
 
-  this->OnReferenceSelectionChanged( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode() );
+  // *------------------------
+  // * ToolSelection 2D
+  // *------------------------
 
+  m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
+  m_Controls.m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer2D );
+  m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Fill Erase Paint Wipe 'Region Growing' FastMarching2D Correction 'Live Wire'");// todo: "Correction 'Live Wire'"
+  m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+  connect( m_Controls.m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
+
+
+  // *------------------------
+  // * ToolSelection 3D
+  // *------------------------
+
+  m_Controls.m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
+  m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer3D );
+  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' 'Auto Threshold' 'Multiple Otsu'"); // todo add : FastMarching3D RegionGrowing Watershed
+  m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(2);
+  m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+
+  // *------------------------*
+  // * Connect PushButtons (pb)
+  // *------------------------*
+
+  connect( m_Controls.m_pbNewLabel, SIGNAL(clicked()), this, SLOT( OnNewLabel()) );
+  connect( m_Controls.m_pbNewSegmentationSession, SIGNAL(clicked()), this, SLOT( OnNewSegmentationSession()) );
+  connect( m_Controls.m_pbShowLabelTable, SIGNAL(toggled(bool)), this, SLOT( OnShowLabelTable(bool)) );
+
+  // *------------------------*
+  // * Connect LabelSetWidget
+  // *------------------------*
+
+  connect(m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
+  connect(m_Controls.m_LabelSetWidget, SIGNAL(resetView()), this, SLOT(OnResetView()) );
+
+
+  // *------------------------*
+  // * DATA SLECTION WIDGET
+  // *------------------------*
   m_IRenderWindowPart = this->GetRenderWindowPart();
   if (m_IRenderWindowPart)
   {
@@ -185,7 +215,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
     //    m_Controls.m_LabelSetWidget->SetRenderWindowPart(this->m_IRenderWindowPart);
   }
 
-  this->InitializeListeners();
+//  this->InitializeListeners();
 
   connect( m_Controls.m_btAddLayer, SIGNAL(clicked()), this, SLOT( OnAddLayer()) );
   connect( m_Controls.m_btDeleteLayer, SIGNAL(clicked()), this, SLOT( OnDeleteLayer()) );

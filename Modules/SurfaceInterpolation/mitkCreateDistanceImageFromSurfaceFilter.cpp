@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
 #include "mitkImageCast.h"
+#include "vtkXMLPolyDataWriter.h"
 
 mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImageFromSurfaceFilter()
 {
@@ -88,6 +89,80 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
     {
       MITK_INFO << "mitk::CreateDistanceImageFromSurfaceFilter: No input-polygons available. Please be sure the input surface consists of polygons!" << std::endl;
     }
+
+    char fileDescr[1024];
+    sprintf( fileDescr, "Contour-%i.vtp", i );
+
+    std::string fileName = "C:/tmp/interpol/";
+    fileName.append( fileDescr );
+
+    int numPoints = polyData->GetNumberOfPoints();
+    //vtkPoints* points = polyData->GetPoints();
+    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+    vtkPolyData* linePoly = vtkPolyData::New();
+    for ( int i=0; i<numPoints; ++i )
+    {
+      double pointCoords[3];
+      pointCoords[0] = polyData->GetPoint( i )[0];
+      pointCoords[1] = polyData->GetPoint( i )[1];
+      pointCoords[2] = polyData->GetPoint( i )[2];
+
+      points->InsertPoint( i, pointCoords[0], pointCoords[1], pointCoords[2] );
+
+      double currentNormal[3];
+      polyData->GetCellData()->GetNormals()->GetTuple(i, currentNormal);
+      pointCoords[0] += currentNormal[0];
+      pointCoords[1] += currentNormal[1];
+      pointCoords[2] += currentNormal[2];
+
+      points->InsertPoint( numPoints + i, pointCoords[0], pointCoords[1], pointCoords[2] );
+      //points->SetPoint( numPoints + i, pointCoords[0], pointCoords[1], pointCoords[2] );
+    }
+    //linePoly->SetPoints( polyData->GetPoints() );
+    linePoly->SetPoints( points );
+
+    vtkCellArray* lines = vtkCellArray::New();
+    for ( int i=0; i<numPoints-1; ++i )
+    {
+      lines->InsertNextCell(2);
+      lines->InsertCellPoint( i );
+      lines->InsertCellPoint( i+1 );
+      /*vtkIdList* vertices = vtkIdList::New();
+      vertices->InsertNextId( i );
+      vertices->InsertNextId( i+1 );*/
+/*
+
+      linePoly->InsertNextCell( VTK_LINE, vertices );*/
+    }
+    /*vtkIdList* vertices = vtkIdList::New();
+    vertices->InsertNextId( numPoints-1 );
+    vertices->InsertNextId( 0 );
+    linePoly->InsertNextCell( VTK_LINE, vertices );*/
+    lines->InsertNextCell(2);
+    lines->InsertCellPoint( numPoints-1 );
+    lines->InsertCellPoint( 0 );
+
+    for ( int i=0; i<numPoints; ++i )
+    {
+      /*vtkIdList* vertices = vtkIdList::New();
+      vertices->InsertNextId( i );
+      vertices->InsertNextId( i+numPoints );
+      linePoly->InsertNextCell( VTK_LINE, vertices );*/
+      lines->InsertNextCell(2);
+      lines->InsertCellPoint( i );
+      lines->InsertCellPoint( i+numPoints );
+    }
+    linePoly->SetLines( lines );
+    ///
+    //polyData->GetCellData()->AddArray( polyData->GetCellData()->GetNormals() );
+
+    vtkXMLPolyDataWriter* writer = vtkXMLPolyDataWriter::New();
+    //writer->SetInputData( contour->GetVtkPolyData() );
+    writer->SetDataModeToAscii();
+    //writer->SetInputData( polyData );
+    writer->SetInputData( linePoly );
+    writer->SetFileName( fileName.c_str() );
+    writer->Write();
 
     currentCellNormals = vtkDoubleArray::SafeDownCast(polyData->GetCellData()->GetNormals());
 

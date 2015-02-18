@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkComputeContourSetNormalsFilter.h"
 
 #include "mitkImagePixelReadAccessor.h"
+#include "mitkIOUtil.h"
 
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
@@ -123,6 +124,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
       double vertexNormal[3];
 
+      mitk::IOUtil::SaveImage( m_SegmentationBinaryImage, "C:/tmp/interpol/SegmentationBinaryImage.nrrd" );
       for (vtkIdType j = 0; j < cellSize-2; j++)
       {
         existingPoints->GetPoint(cell[j+1], p1);
@@ -150,6 +152,11 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
           worldCoord[1] = p1[1]+finalNormal[1]*m_MaxSpacing;
           worldCoord[2] = p1[2]+finalNormal[2]*m_MaxSpacing;
 
+          std::cout << "World coords: " << worldCoord[0] << " , " << worldCoord[1] << " , " << worldCoord[2] << std::endl;
+          std::cout << "...for point: " << p1[0] << " , " << p1[1] << " , " << p1[2] << std::endl;
+          std::cout << "...and normal: " << finalNormal[0] << " , " << finalNormal[1] << " , " << finalNormal[2] << std::endl;
+          std::cout << "MaxSpacing: " << m_MaxSpacing << std::endl;
+
           double val = 0.0;
 
           mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_SegmentationBinaryImage);
@@ -166,10 +173,12 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
           if (val == 0.0)
           {
+              //MITK_INFO << "val equals zero.";
               ++m_PositiveNormalCounter;
           }
           else
           {
+            //MITK_INFO << "val does not equal zero.";
               ++m_NegativeNormalCounter;
           }
         }
@@ -202,6 +211,9 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
       id = cell[cellSize-1];
       normals->SetTuple(id,vertexNormal);
 
+      std::cout << "Negative normal counter: " << m_NegativeNormalCounter << std::endl;
+      std::cout << "Positive normal counter: " << m_PositiveNormalCounter << std::endl;
+      int n = 5;
       if(m_NegativeNormalCounter > m_PositiveNormalCounter)
       {
           for(vtkIdType n = 0; n < cellSize; n++)

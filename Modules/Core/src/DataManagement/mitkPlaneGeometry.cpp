@@ -26,8 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   PlaneGeometry::PlaneGeometry()
-    : Superclass(), m_ScaleFactorMMPerUnitX( 1.0 ),
-    m_ScaleFactorMMPerUnitY( 1.0 ),
+    : Superclass(),
     m_ReferenceGeometry( NULL )
   {
     Initialize();
@@ -38,8 +37,7 @@ namespace mitk
   }
 
   PlaneGeometry::PlaneGeometry(const PlaneGeometry& other)
-    : Superclass(other), m_ScaleFactorMMPerUnitX( other.m_ScaleFactorMMPerUnitX),
-    m_ScaleFactorMMPerUnitY( other.m_ScaleFactorMMPerUnitY),
+    : Superclass(other),
     m_ReferenceGeometry( other.m_ReferenceGeometry )
   {
   }
@@ -88,14 +86,14 @@ namespace mitk
   void
     PlaneGeometry::IndexToWorld( const Point2D &pt_units, Point2D &pt_mm ) const
   {
-    pt_mm[0]=m_ScaleFactorMMPerUnitX*pt_units[0];
-    pt_mm[1]=m_ScaleFactorMMPerUnitY*pt_units[1];
+    pt_mm[0] = GetExtentInMM(0) / GetExtent(0)*pt_units[0];
+    pt_mm[1] = GetExtentInMM(1) / GetExtent(1)*pt_units[1];
   }
 
   void PlaneGeometry::WorldToIndex( const Point2D &pt_mm, Point2D &pt_units ) const
   {
-    pt_units[0]=pt_mm[0]*(1.0/m_ScaleFactorMMPerUnitX);
-    pt_units[1]=pt_mm[1]*(1.0/m_ScaleFactorMMPerUnitY);
+    pt_units[0] = pt_mm[0] * (1.0 / (GetExtentInMM(0) / GetExtent(0)));
+    pt_units[1] = pt_mm[1] * (1.0 / (GetExtentInMM(1) / GetExtent(1)));
   }
 
   void PlaneGeometry::IndexToWorld( const Point2D & /*atPt2d_units*/,
@@ -107,8 +105,8 @@ namespace mitk
 
   void PlaneGeometry::IndexToWorld(const Vector2D &vec_units, Vector2D &vec_mm) const
   {
-    vec_mm[0] = m_ScaleFactorMMPerUnitX * vec_units[0];
-    vec_mm[1] = m_ScaleFactorMMPerUnitY * vec_units[1];
+    vec_mm[0] = (GetExtentInMM(0) / GetExtent(0)) * vec_units[0];
+    vec_mm[1] = (GetExtentInMM(1) / GetExtent(1)) * vec_units[1];
   }
 
   void
@@ -122,8 +120,8 @@ namespace mitk
   void
     PlaneGeometry::WorldToIndex( const Vector2D &vec_mm, Vector2D &vec_units) const
   {
-    vec_units[0] = vec_mm[0] * ( 1.0 / m_ScaleFactorMMPerUnitX );
-    vec_units[1] = vec_mm[1] * ( 1.0 / m_ScaleFactorMMPerUnitY );
+    vec_units[0] = vec_mm[0] * (1.0 / (GetExtentInMM(0) / GetExtent(0)));
+    vec_units[1] = vec_mm[1] * (1.0 / (GetExtentInMM(1) / GetExtent(1)));
   }
 
   void
@@ -758,30 +756,12 @@ namespace mitk
   {
     Superclass::PrintSelf(os,indent);
     os << indent << " ScaleFactorMMPerUnitX: "
-      << m_ScaleFactorMMPerUnitX << std::endl;
+      << GetExtentInMM(0) / GetExtent(0) << std::endl;
     os << indent << " ScaleFactorMMPerUnitY: "
-      << m_ScaleFactorMMPerUnitY << std::endl;
+      << GetExtentInMM(1) / GetExtent(1) << std::endl;
     os << indent << " Normal: " << GetNormal() << std::endl;
   }
 
-  void PlaneGeometry::PostSetIndexToWorldTransform(
-      mitk::AffineTransform3D* /*transform*/)
-  {
-    m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
-    m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);
-
-    assert(m_ScaleFactorMMPerUnitX<itk::NumericTraits<ScalarType>::infinity());
-    assert(m_ScaleFactorMMPerUnitY<itk::NumericTraits<ScalarType>::infinity());
-  }
-
-  void PlaneGeometry::PostSetExtentInMM(int /*direction*/, ScalarType /*extentInMM*/)
-  {
-    m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
-    m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);
-
-    assert(m_ScaleFactorMMPerUnitX<itk::NumericTraits<ScalarType>::infinity());
-    assert(m_ScaleFactorMMPerUnitY<itk::NumericTraits<ScalarType>::infinity());
-  }
 
   bool PlaneGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
   {
@@ -789,8 +769,8 @@ namespace mitk
 
     Point3D pt3d_units;
     BackTransform(pt3d_mm, pt3d_units);
-    pt2d_mm[0]=pt3d_units[0]*m_ScaleFactorMMPerUnitX;
-    pt2d_mm[1]=pt3d_units[1]*m_ScaleFactorMMPerUnitY;
+    pt2d_mm[0] = pt3d_units[0] * GetExtentInMM(0) / GetExtent(0);
+    pt2d_mm[1] = pt3d_units[1] * GetExtentInMM(1) / GetExtent(1);
     pt3d_units[2]=0;
     return const_cast<BoundingBox*>(this->GetBoundingBox())->IsInside(pt3d_units);
   }
@@ -800,14 +780,12 @@ namespace mitk
   {
     //pt2d_mm is measured from the origin of the world geometry (at leats it called form BaseRendere::Mouse...Event)
     Point3D pt3d_units;
-    pt3d_units[0]=pt2d_mm[0]/m_ScaleFactorMMPerUnitX;
-    pt3d_units[1]=pt2d_mm[1]/m_ScaleFactorMMPerUnitY;
+    pt3d_units[0] = pt2d_mm[0] / (GetExtentInMM(0) / GetExtent(0));
+    pt3d_units[1] = pt2d_mm[1] / (GetExtentInMM(1) / GetExtent(1));
     pt3d_units[2]=0;
     //pt3d_units is a continuos index. We divided it with the Scale Factor (= spacing in x and y) to convert it from mm to index units.
     //
     pt3d_mm = GetIndexToWorldTransform()->TransformPoint(pt3d_units);
-    MITK_INFO << "ITWT der PlaneGeometry: ";
-    GetIndexToWorldTransform()->Print(std::cout);
     //now we convert the 3d index to a 3D world point in mm. We could have used IndexToWorld as well as GetITW->Transform...
   }
 

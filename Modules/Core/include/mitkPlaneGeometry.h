@@ -527,18 +527,6 @@ namespace mitk {
 
     virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
-    /**
-    * \brief factor to convert x-coordinates from mm to units and vice versa
-    *
-    */
-    mutable mitk::ScalarType m_ScaleFactorMMPerUnitX;
-
-    /**
-    * \brief factor to convert y-coordinates from mm to units and vice versa
-    *
-    */
-    mutable mitk::ScalarType m_ScaleFactorMMPerUnitY;
-
     mitk::BaseGeometry *m_ReferenceGeometry;
 
 
@@ -554,10 +542,12 @@ namespace mitk {
     virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * /*newGeometry*/) const {}
     virtual void PreSetSpacing(const mitk::Vector3D& /*aSpacing*/) {}
 
+    virtual void PostSetExtentInMM(int /*direction*/, ScalarType /*extentInMM*/) {}
+    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* /*transform*/) {}
+
     virtual void PreSetBounds(const BoundsArrayType& bounds);
     virtual void PreSetIndexToWorldTransform( AffineTransform3D * transform);
-    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
-    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+
 
   private:
     /**

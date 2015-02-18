@@ -228,12 +228,12 @@ namespace berry
     ///
     /// \see IPreferences::RemoveNode()
     ///
-    virtual void RemoveNode() throw(Poco::Exception, BackingStoreException);
+    virtual void RemoveNode();
 
     ///
     /// \see IPreferences::Sync()
     ///
-    virtual void Sync() throw(Poco::Exception, BackingStoreException);
+    virtual void Sync();
 
     //# End of IPreferences methods
 

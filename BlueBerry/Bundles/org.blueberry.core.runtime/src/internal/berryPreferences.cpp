@@ -397,7 +397,7 @@ namespace berry
       m_Properties.erase(it);
   }
 
-  void Preferences::RemoveNode() throw(Poco::Exception, BackingStoreException)
+  void Preferences::RemoveNode()
   {
     QMutexLocker scopedMutex(&m_Mutex);
     AssertValid_unlocked();
@@ -406,7 +406,7 @@ namespace berry
       Preferences::Pointer(this)));
   }
 
-  void Preferences::Sync() throw(Poco::Exception, BackingStoreException)
+  void Preferences::Sync()
   {
     QMutexLocker scopedMutex(&m_Mutex);
     AssertValid_unlocked();

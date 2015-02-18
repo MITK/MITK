@@ -630,7 +630,7 @@ namespace berry
      *         with it.
      * @see #flush()
      */
-    virtual void RemoveNode() throw(Poco::Exception, BackingStoreException) = 0;
+    virtual void RemoveNode() = 0;
 
     /**
      * Returns this node's name, relative to its parent.

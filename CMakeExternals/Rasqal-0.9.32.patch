@@ -604,7 +604,7 @@ diff -urNb rasqal-0.9.32-orig/src/gettimeofday.c rasqal-0.9.32-patched/src/getti
 diff -urNb rasqal-0.9.32-orig/src/rasqal_config_cmake.h.in rasqal-0.9.32-patched/src/rasqal_config_cmake.h.in
 --- rasqal-0.9.32-orig/src/rasqal_config_cmake.h.in	1970-01-01 01:00:00.000000000 +0100
 +++ rasqal-0.9.32-patched/src/rasqal_config_cmake.h.in	2014-11-19 04:56:07.408581656 +0100
-@@ -0,0 +1,337 @@
+@@ -0,0 +1,340 @@
 +/* rasqal_config.h */
 +
 +#ifndef RASQAL_CONFIG_H
@@ -874,8 +874,11 @@ diff -urNb rasqal-0.9.32-orig/src/rasqal_config_cmake.h.in rasqal-0.9.32-patched
 +
 +# include <float.h>
 +# define isnan(n) _isnan(n)
-+  /* no round function available */
-+# define round(x) floor(x+0.5)
++# ifdef _MSC_VER
++#  if (_MSC_VER < 1800)
++#   define round(x) floor(x+0.5)
++#  endif
++# endif
 +
 +  /* These are SPARQL token definitions */
 +# ifdef OPTIONAL

@@ -67,12 +67,12 @@ public:
 
   void TestImageWriterPng2()
   {
-    TestImageWriter("rgbImage.png");
+    TestImageWriter("RenderingTestData/rgbImage.png");
   }
 
   void TestImageWriterPng3()
   {
-    TestImageWriter("rgbaImage.png");
+    TestImageWriter("RenderingTestData/rgbaImage.png");
   }
 
   void TestImageWriterSimple()

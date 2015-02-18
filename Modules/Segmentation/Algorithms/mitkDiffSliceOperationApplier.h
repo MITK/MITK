@@ -35,7 +35,7 @@ namespace mitk
 
   public:
 
-    mitkClassMacro(DiffSliceOperationApplier, OperationActor);
+    mitkClassMacro(DiffSliceOperationApplier, OperationActor)
 
     //itkFactorylessNewMacro(Self)
     //itkCloneMacro(Self)

@@ -15,19 +15,14 @@ print __name__
 
 from helper import monteCarloHelper as mch
 from setup import simulation
+from setup import systemPaths
 
 
 def noisyRandom(generatedFilename):
-    # the input file without the run specific parameters for ua, us and d:
-    infileString = 'data/colonTemplate.mci'
-    infile       = open(infileString)
-    # the output folder for the mc simulations
-    # attention: this is relative to your gpumcml path!
-    outfolderMC ='outputMC/'
-    # the output folder for the reflectance spectra
-    outfolderRS = '../data/output/'
-    gpumcmlDirectory = '/home/wirkert/workspace/monteCarlo/gpumcml/fast-gpumcml/'
-    gpumcmlExecutable = 'gpumcml.sm_20'
+
+
+    infileString, outfolderMC, outfolderRS, gpumcmlDirectory, gpumcmlExecutable = systemPaths.initPaths()
+    infile = open(infileString)
 
     BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations = simulation.noisy()
 
@@ -56,8 +51,6 @@ def noisyRandom(generatedFilename):
         sm_Vs  = random.uniform(min(Vss), max(Vss))
         sm_SaO2= random.uniform(min(SaO2s), max(SaO2s))
 
-
-
         parameters[i,:] = np.array([BVF, Vs, d, r, SaO2, sm_BVF, sm_Vs, sm_SaO2])
 
 
@@ -85,7 +78,7 @@ def noisyRandom(generatedFilename):
     # save the reflectance results!
     now = datetime.datetime.now().strftime("%Y%B%d%I:%M%p")
     np.save(outfolderRS + now + generatedFilename + "reflectances" + str(photons) + "photons", reflectances)
-    np.save(outfolderRS + now + generatedFilename + "parameters", parameters)
+    np.save(outfolderRS + now + generatedFilename  + str(nrSimulations) + "parameters", parameters)
 
     end = time.time()
     print "total time to generate noisy random data: " + str((end - start))

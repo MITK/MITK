@@ -35,5 +35,9 @@ def logisticRegressionArtificialData(dataFolder):
     gaussReflectances = np.load(dataFolder + "2015February1703:56PMreflectancesRandomNonUniform1000000photons.npy")
     gaussReflectances = mch.normalizeImageQuotient(gaussReflectances, iqBand=1)
 
-    return uniformReflectances, gaussReflectances
+
+    labelsUniform = np.zeros(uniformReflectances.shape[0])
+    labelsGauss   = np.ones(gaussReflectances.shape[0])
+
+    return uniformReflectances, labelsUniform, gaussReflectances, labelsGauss
 

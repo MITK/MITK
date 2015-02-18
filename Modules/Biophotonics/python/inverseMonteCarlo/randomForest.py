@@ -11,7 +11,7 @@ import time
 from sklearn.ensemble         import RandomForestRegressor
 from sklearn.grid_search      import GridSearchCV
 from sklearn.cross_validation import KFold
-from sklearn import decomposition
+
 
 from setup import data
 
@@ -34,17 +34,12 @@ dataFolder = 'data/output/'
 trainingParameters, trainingReflectances, testParameters, testReflectances = \
     data.perfect(dataFolder)
 
-# transform data with pca (test)
-#pca = decomposition.PCA(n_components=22)
-#pca.fit(trainingReflectances)
-#trainingReflectances = pca.transform(trainingReflectances)
-#testReflectances     = pca.transform(testReflectances)
-
 #%% train forest
 
 start = time.time()
 
 # get best forest using k-fold cross validation and grid search
+# outcommented for now because it takes to long for quick tests
 
 #kf = KFold(trainingReflectances.shape[0], 5, shuffle=True)
 #param_grid = [

@@ -165,7 +165,7 @@ void mitk::SurfaceBasedInterpolationController::Interpolate()
     normalsFilter->SetMaxSpacing(m_MaxSpacing);
     //MLI TODO
     //normalsFilter->SetSegmentationBinaryImage(m_WorkingImage, m_ActiveLabel);
-    normalsFilter->Update();
+    //normalsFilter->Update();
 
     m_InterpolateSurfaceFilter->SetInput(i, normalsFilter->GetOutput());
 

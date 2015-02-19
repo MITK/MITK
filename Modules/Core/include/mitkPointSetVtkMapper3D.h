@@ -122,9 +122,12 @@ namespace mitk {
 
     virtual ~PointSetVtkMapper3D();
 
+    void CreateEdgeObjectsBetweenPoints(itk::Point<float> point1, itk::Point<float> point2);
+
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
     virtual void ResetMapper( BaseRenderer* renderer ) override;
-    virtual void ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor);
+
+    virtual void ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor) ;
     virtual void CreateContour();
     virtual void CreateVTKRenderObjects();
 

@@ -38,8 +38,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkPolyDataAlgorithm.h>
-
+#include <math.h> 
 #include <stdlib.h>
+#include <vtkMatrix4x4.h>
 
 
 
@@ -89,6 +90,46 @@ void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(mitk::BaseRenderer* ren
   m_UnselectedActor->ReleaseGraphicsResources(renderer->GetRenderWindow());
   m_ContourActor->ReleaseGraphicsResources(renderer->GetRenderWindow());
 
+}
+
+void mitk::PointSetVtkMapper3D::CreateEdgeObjectsBetweenPoints(itk::Point<float> point1, itk::Point<float> point2) {
+
+  float h = point1.EuclideanDistanceTo(point2);
+  double px = point2[0] - point1[0];
+  double py = point2[1] - point1[1];
+  double pz = point2[2] - point1[2];
+
+  double hXY = sqrt(px*px + py*py);
+  double thetta = asin(px/hXY)*180/3.14;
+  if (py > 0) {
+    thetta = -thetta;
+  }
+
+  double phi = 90 - (acos(pz/h))*180/3.14;
+  if (py < 0) {
+    phi = -phi;
+  }
+
+  vtkSmartPointer<vtkTransform> aTransform = vtkSmartPointer<vtkTransform>::New();
+  aTransform->Identity();
+
+  aTransform->Translate(point1[0] + (point2[0] - point1[0])/2, point1[1] + (point2[1] - point1[1])/2, point1[2] + (point2[2] - point1[2])/2);
+  aTransform->RotateZ(thetta);
+  aTransform->RotateX(phi);
+
+  vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+  transformFilter->SetTransform(aTransform);
+
+  vtkSmartPointer<vtkCylinderSource> cylinder = vtkSmartPointer<vtkCylinderSource>::New();
+  cylinder->SetRadius(m_PointSize);
+  cylinder->SetCenter(0, 0, 0);
+          
+  cylinder->SetHeight(h);
+  cylinder->SetResolution(20);
+  transformFilter->SetInputConnection(cylinder->GetOutputPort());
+
+  m_vtkUnselectedPointList->AddInputConnection(transformFilter->GetOutputPort());
+  ++m_NumberOfSelectedAdded;
 }
 
 void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
@@ -171,6 +212,9 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   //check if the list for the PointDataContainer is the same size as the PointsContainer. Is not, then the points were inserted manually and can not be visualized according to the PointData (selected/unselected)
   bool pointDataBroken = (itkPointSet->GetPointData()->Size() != itkPointSet->GetPoints()->Size());
   //now add an object for each point in data
+
+  itk::Point<float> lastPoint;
+
   pointDataIter = itkPointSet->GetPointData()->Begin();
   for (j=0, pointsIter=itkPointSet->GetPoints()->Begin();
     pointsIter!=itkPointSet->GetPoints()->End();
@@ -186,13 +230,25 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 
     vtkSmartPointer<vtkPolyDataAlgorithm> source;
 
+    bool showEdge = false;
+    this->GetDataNode()->GetBoolProperty("show edge", showEdge);
+
     switch (pointType)
     {
     case mitk::PTUNDEFINED:
       {
+        
+        if (j > 0) {
+          itk::Point<float> currentPoint = pointsIter->Value();
+          if (showEdge) {
+            CreateEdgeObjectsBetweenPoints(currentPoint, lastPoint);
+          }
+        }
+
         vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
         sphere->SetRadius(m_PointSize);
         itk::Point<float> point1 = pointsIter->Value();
+        lastPoint = point1;
         sphere->SetCenter(point1[0],point1[1],point1[2]);
         //sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
 

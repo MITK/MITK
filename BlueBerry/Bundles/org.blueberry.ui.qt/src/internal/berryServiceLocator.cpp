@@ -155,7 +155,10 @@ Object* ServiceLocator::GetService(const QString& key)
           WorkbenchServiceRegistry::GetRegistry()->GetService(key,
                                                               factoryParent.GetPointer(),
                                                               this);
-      managedFactoryServices.push_back(factoryService);
+      if (factoryService)
+      {
+        managedFactoryServices.push_back(factoryService);
+      }
       service = factoryService.GetPointer();
     }
     if (!service)

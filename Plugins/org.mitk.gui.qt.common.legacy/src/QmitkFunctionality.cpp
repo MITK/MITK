@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkFunctionality.h"
 #include "internal/QmitkFunctionalityUtil.h"
+#include "internal/QmitkCommonLegacyActivator.h"
 
 // other includes
 #include <mitkLogMacros.h>
@@ -44,9 +45,11 @@ QmitkFunctionality::QmitkFunctionality()
  , m_Active(false)
  , m_Visible(false)
  , m_SelectionProvider(0)
+ , m_DataStorageServiceTracker(QmitkCommonLegacyActivator::GetContext())
  , m_HandlesMultipleDataStorages(false)
  , m_InDataStorageChanged(false)
 {
+  m_DataStorageServiceTracker.open();
 }
 
 void QmitkFunctionality::SetHandleMultipleDataStorages(bool multiple)
@@ -62,11 +65,11 @@ bool QmitkFunctionality::HandlesMultipleDataStorages() const
 mitk::DataStorage::Pointer
 QmitkFunctionality::GetDataStorage() const
 {
-  mitk::IDataStorageService* service = this->GetSite()->GetService<mitk::IDataStorageService>();
+  mitk::IDataStorageService* service = m_DataStorageServiceTracker.getService();
 
-  if (service != nullptr)
+  if (service != 0)
   {
-    if (m_HandlesMultipleDataStorages)
+    if(m_HandlesMultipleDataStorages)
       return service->GetActiveDataStorage()->GetDataStorage();
     else
       return service->GetDefaultDataStorage()->GetDataStorage();
@@ -77,12 +80,26 @@ QmitkFunctionality::GetDataStorage() const
 
 mitk::DataStorage::Pointer QmitkFunctionality::GetDefaultDataStorage() const
 {
-  mitk::IDataStorageService* service = this->GetSite()->GetService<mitk::IDataStorageService>();
-  if (service != nullptr)
+  mitk::IDataStorageService* service = m_DataStorageServiceTracker.getService();
+
+  if (service != 0)
   {
     return service->GetDefaultDataStorage()->GetDataStorage();
   }
+
   return 0;
+}
+
+mitk::IDataStorageReference::Pointer QmitkFunctionality::GetDataStorageReference() const
+{
+  mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
+
+  if (dsService != 0)
+  {
+    return dsService->GetDataStorage();
+  }
+
+  return mitk::IDataStorageReference::Pointer(0);
 }
 
 void QmitkFunctionality::CreatePartControl(void* parent)
@@ -204,6 +221,8 @@ QmitkFunctionality::~QmitkFunctionality()
   this->ClosePartProxy();
 
   this->UnRegister(false);
+
+  m_DataStorageServiceTracker.close();
 }
 
 void QmitkFunctionality::OnPreferencesChanged( const berry::IBerryPreferences* )
@@ -261,10 +280,8 @@ QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget( bool reCreateW
       || editor.Cast<QmitkStdMultiWidgetEditor>().IsNull()
      )
   {
-    mitk::IDataStorageService* service = this->GetSite()->GetService<mitk::IDataStorageService>();
-
     mitk::DataStorageEditorInput::Pointer editorInput(
-          new mitk::DataStorageEditorInput( service->GetActiveDataStorage() ));
+          new mitk::DataStorageEditorInput( this->GetDataStorageReference() ));
     // open a new multi-widget editor, but do not give it the focus
     berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false, berry::IWorkbenchPage::MATCH_ID);
     activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();

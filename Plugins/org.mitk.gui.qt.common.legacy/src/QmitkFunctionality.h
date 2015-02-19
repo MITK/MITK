@@ -35,12 +35,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_common_legacy_Export.h>
 #include "mitkDataNodeSelection.h"
 #include <mitkDataStorage.h>
+#include <mitkIDataStorageReference.h>
 #include <QmitkStdMultiWidget.h>
+
+// CTK Includes
+#include <ctkServiceTracker.h>
+
 
 //# forward declarations
 
 namespace mitk {
   class DataNode;
+  struct IDataStorageService;
 }
 
 namespace berry {
@@ -240,6 +246,9 @@ protected:
   /// \return always returns the default DataStorage
   ///
   mitk::DataStorage::Pointer GetDefaultDataStorage() const;
+
+  mitk::IDataStorageReference::Pointer GetDataStorageReference() const;
+
   ///
   /// Returns the default and active StdMultiWidget.
   /// \param reCreateWidget a boolean flag to en-/disable the attept to re-create the StdWidget
@@ -365,7 +374,8 @@ protected:
   ///
   bool m_Visible;
 
-//# private fields:
+  //# private fields:
+
 private:
   ///
   /// Holds the current selection (selection made by this Functionality !!!)
@@ -375,6 +385,10 @@ private:
   /// object to observe BlueBerry selections
   ///
   QScopedPointer<berry::ISelectionListener> m_BlueBerrySelectionListener;
+
+  ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
+
+
   ///
   /// Saves if this view handles multiple datastorages
   ///

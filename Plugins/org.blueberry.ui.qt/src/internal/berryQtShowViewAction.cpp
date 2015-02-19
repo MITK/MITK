@@ -27,6 +27,7 @@ namespace berry
 
 const QString QtShowViewAction::plugingTranslateNames[] = { 
   QAction::tr("BasicImageProcessing"),   
+  QAction::tr("Clipping Plane"),
   QAction::tr("Display"),
   QAction::tr("Data Manager"),
   QAction::tr("Image Navigator"),
@@ -46,7 +47,7 @@ QtShowViewAction::QtShowViewAction(IWorkbenchWindow::Pointer window,
     IViewDescriptor::Pointer desc) :
   QAction(nullptr)
 {
-  plugingSrcNames << "BasicImageProcessing" << "Display" << "Data Manager" << "Image Navigator" << "LiverSegmentation" <<
+  plugingSrcNames << "BasicImageProcessing" << "Clipping Plane" << "Display" << "Data Manager" << "Image Navigator" << "LiverSegmentation" <<
     "Measurement" << "PointSet Interaction" << "RegionGrowing Segmentation" << "Segmentation" << "Segmentation Utilities" <<
     "Statistics" << "Vascular Structure Segmentation" << "Volume Visualization";
 

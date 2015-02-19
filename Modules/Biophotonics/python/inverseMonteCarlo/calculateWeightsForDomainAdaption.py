@@ -26,7 +26,8 @@ from setup import data
 dataFolder = 'data/output/'
 
 # load data
-uniformReflectances, labelsUniform, gaussReflectances, labelsGauss = \
+uniformReflectances, labelsUniform, gaussReflectances, labelsGauss, \
+    testReflectancesUniform, labelsTestUniform, testReflectancesGauss, labelsTestGauss = \
     data.logisticRegressionArtificialData(dataFolder)
 
 
@@ -56,4 +57,7 @@ print "time necessary to train the logistic regression [s]: " + str((end - start
 
 #%% test
 
+
+print "score for uniform test:", best_lr.score(testReflectancesUniform, labelsTestUniform)
+print "score for gauss test  :", best_lr.score(testReflectancesGauss, labelsTestGauss)
 

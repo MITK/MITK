@@ -16,10 +16,10 @@ from generate.perfectGrid      import perfectGrid
 
 
 # training non-uniform spectra
-randomNonUniform("nonUniformRandomTrainingData")
+#randomNonUniform("nonUniformRandomTrainingData")
 
 # testing non-uniform spectra
-randomNonUniform("nonUniformRandomTestingData")
+#randomNonUniform("nonUniformRandomTestingData")
 
 # training noisy spectra
 #noisyRandom("noisyRandomTrainingData")
@@ -35,6 +35,3 @@ noisyRandom("noisyRandomTestingData")
 
 # training perfect data on grid
 #perfectGrid("perfectGridTrainingData")
-
-# testing perfect data on grid
-#perfectGrid("perfectGridTestingData")

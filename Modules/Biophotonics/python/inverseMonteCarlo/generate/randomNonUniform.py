@@ -28,7 +28,7 @@ def drawFromNormal(parameterVector):
     the boarders of the parameter range
     """
     # draw sample from some normal distribution
-    sample = random.gauss(np.mean(parameterVector), (max(parameterVector) - min (parameterVector)) /20.0)
+    sample = random.gauss(np.mean(parameterVector), (max(parameterVector) - min (parameterVector)) / 10.0)
     # clip it to be in the allowed range
     sample = np.clip(sample, min(parameterVector), max(parameterVector))
     return sample

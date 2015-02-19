@@ -58,6 +58,8 @@ print("higher quartile: " + str(np.percentile(absErrors, 75, axis=0)))
 
 
 #%% test routines, put these in a unit test asap!
+# furthermore, the tests fail since they require precomputed results which have changed (due to normalization)
+# find a way to make these tests more general
 if __name__ == "__main__":
 
     rbs = RectBivariateSpline(BVFs,

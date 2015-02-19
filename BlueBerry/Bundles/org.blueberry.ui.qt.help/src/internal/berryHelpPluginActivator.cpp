@@ -373,6 +373,8 @@ HelpWindowListener::HelpWindowListener()
 
 HelpWindowListener::~HelpWindowListener()
 {
+  if (!PlatformUI::IsWorkbenchRunning()) return;
+
   typedef QList<IWorkbenchWindow::Pointer> WndVec;
   WndVec windows = PlatformUI::GetWorkbench()->GetWorkbenchWindows();
   for (WndVec::iterator i = windows.begin(); i != windows.end(); ++i)

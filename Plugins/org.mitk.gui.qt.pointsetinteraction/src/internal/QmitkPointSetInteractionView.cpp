@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkPointListWidget.h>
 #include <mitkDataNodeObject.h>
 #include <mitkDataNodeSelection.h>
-
+#include <mitkPointSetVtkMapper3D.h>
 
 QString QmitkPointSetInteractionView::TR_ADD_POINTSET = QLabel::tr("Add point set...");
 QString QmitkPointSetInteractionView::TR_ENTER_NAME = QLabel::tr("Enter name for the new point set");
@@ -70,7 +70,7 @@ void QmitkPointSetInteractionView::OnAddPointSetClicked()
   //Ask for the name of the point set
   bool ok = false;
   QString name = QInputDialog::getText( QApplication::activeWindow()
-    , TR_ADD_POINTSET, TR_ENTER_NAME, QLineEdit::Normal, TR_POINTSET, &ok );
+    , TR_ADD_POINTSET, TR_ENTER_NAME, QLineEdit::Normal, "PointSet", &ok );
   if ( ! ok || name.isEmpty() )
     return;
 
@@ -99,6 +99,7 @@ void QmitkPointSetInteractionView::OnAddPointSetClicked()
   selection.push_back( pointSetNode );
   this->FireNodesSelected( selection );
   this->OnSelectionChanged( selection );
+
 }
 
 void QmitkPointSetInteractionView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)

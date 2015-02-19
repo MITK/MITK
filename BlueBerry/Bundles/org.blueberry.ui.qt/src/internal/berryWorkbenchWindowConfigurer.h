@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryWeakPointer.h>
 
 #include <QSet>
+#include <QPoint>
 
 class QToolBar;
 class QMenuBar;
@@ -197,12 +198,12 @@ public:
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  Point GetInitialSize() const;
+  QPoint GetInitialSize() const;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  void SetInitialSize(Point size);
+  void SetInitialSize(QPoint size);
 
   /**
    * Creates the default window contents.
@@ -390,7 +391,7 @@ private:
   /**
    * The initial size to use for the shell.
    */
-  Point initialSize;
+  QPoint initialSize;
 
   /**
    * Object for configuring this workbench window's action bars.

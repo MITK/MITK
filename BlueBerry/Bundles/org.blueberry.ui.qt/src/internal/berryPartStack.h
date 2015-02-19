@@ -117,9 +117,9 @@ public:
          void Close(const QList<IPresentablePart::Pointer>& parts);
 
          void DragStart(IPresentablePart::Pointer beingDragged,
-                Point& initialLocation, bool keyboard);
+                QPoint& initialLocation, bool keyboard);
 
-         void DragStart(Point& initialLocation, bool keyboard);
+         void DragStart(QPoint& initialLocation, bool keyboard);
 
          bool IsPartMoveable(IPresentablePart::Pointer part);
 
@@ -177,9 +177,9 @@ public:
 
         void Drop();
 
-        DnDTweaklet::CursorType GetCursor();
+        CursorType GetCursor();
 
-        Rectangle GetSnapRectangle();
+        QRect GetSnapRectangle();
     };
 
     private: static PartStackDropResult::Pointer dropResult;
@@ -298,9 +298,9 @@ public:
     public: void CreateControl(void* parent);
 
     /* (non-Javadoc)
-     * @see org.blueberry.ui.internal.LayoutPart#getDropTarget(java.lang.Object, org.blueberry.swt.graphics.Point)
+     * @see org.blueberry.ui.internal.LayoutPart#getDropTarget(java.lang.Object, org.blueberry.swt.graphics.QPoint)
      */
-    public: IDropTarget::Pointer GetDropTarget(Object::Pointer draggedObject, const Point& position);
+    public: IDropTarget::Pointer GetDropTarget(Object::Pointer draggedObject, const QPoint& position);
 
     public: void SetActive(bool isActive);
 
@@ -324,7 +324,7 @@ public:
     /**
      * Gets the presentation bounds.
      */
-    public: Rectangle GetBounds();
+    public: QRect GetBounds();
 
     /**
      * See IVisualContainer#getChildren
@@ -428,7 +428,7 @@ public:
     /**
      * Sets the presentation bounds.
      */
-    public: void SetBounds(const Rectangle& r);
+    public: void SetBounds(const QRect& r);
 
     public: void SetSelection(LayoutPart::Pointer part);
 
@@ -713,10 +713,10 @@ public:
      * @param initialLocation
      * @param keyboard
      */
-    private: void DragStart(IPresentablePart::Pointer beingDragged, Point& initialLocation,
+    private: void DragStart(IPresentablePart::Pointer beingDragged, QPoint& initialLocation,
             bool keyboard);
 
-    public: void PaneDragStart(PartPane::Pointer pane, Point& initialLocation,
+    public: void PaneDragStart(PartPane::Pointer pane, QPoint& initialLocation,
             bool keyboard);
 
     /**

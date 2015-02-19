@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryMacros.h>
 
 #include "berryISizeProvider.h"
-#include "berryRectangle.h"
 #include "berryIPropertyChangeListener.h"
 
 namespace berry {
@@ -101,7 +100,7 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
      *
      * @param bounds bounding rectangle (not null)
      */
-    virtual void SetBounds(const Rectangle& bounds) = 0;
+    virtual void SetBounds(const QRect& bounds) = 0;
 
     /**
      * Notifies the part whether or not it is visible in the current

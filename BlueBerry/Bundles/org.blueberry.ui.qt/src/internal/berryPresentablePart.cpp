@@ -109,7 +109,7 @@ void PresentablePart::RemovePropertyListener(IPropertyChangeListener* listener)
   partPropertyChangeEvents.RemoveListener(listener);
 }
 
-void PresentablePart::SetBounds(const Rectangle& bounds)
+void PresentablePart::SetBounds(const QRect& bounds)
 {
   savedBounds = bounds;
   if (enableInputs && part != 0)

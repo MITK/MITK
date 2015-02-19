@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIShellListener.h"
 #include "guitk/berryGuiTkIControlListener.h"
 
-#include "berryRectangle.h"
 #include "berryShell.h"
 
 namespace berry
@@ -45,7 +44,7 @@ private:
 
   WorkbenchPage* page;
 
-  Rectangle bounds;
+  QRect bounds;
 
   Shell::Pointer windowShell;
 
@@ -118,11 +117,11 @@ public:
   bool Close();
 
   /*
-   * @see org.blueberry.ui.internal.IDragOverListener#Drag(void*, Object::Pointer, const Point&, const Rectangle& )
+   * @see org.blueberry.ui.internal.IDragOverListener#Drag(void*, Object::Pointer, const QPoint&, const QRect& )
    */
   IDropTarget::Pointer Drag(void* currentControl,
-      const Object::Pointer& draggedObject, const Point& position,
-      const Rectangle& dragRectangle);
+      const Object::Pointer& draggedObject, const QPoint& position,
+      const QRect& dragRectangle);
 
   ILayoutContainer::ChildrenType GetChildren() const;
 

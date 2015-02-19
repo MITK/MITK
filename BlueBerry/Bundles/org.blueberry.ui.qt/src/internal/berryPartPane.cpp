@@ -113,7 +113,7 @@ void PartPane::DoHide()
   }
 }
 
-Rectangle PartPane::GetParentBounds()
+QRect PartPane::GetParentBounds()
 {
   void* ctrl = this->GetControl();
 

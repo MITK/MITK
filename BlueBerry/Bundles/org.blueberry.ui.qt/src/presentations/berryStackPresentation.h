@@ -57,7 +57,7 @@ class BERRY_UI_QT StackPresentation : public Object, public ISizeProvider {
 
 public:
 
-  berryObjectMacro(StackPresentation);
+  berryObjectMacro(StackPresentation)
 
 private:
 
@@ -106,7 +106,7 @@ public:
      *
      * @param bounds new bounding rectangle (not null)
      */
-    virtual void SetBounds(const Rectangle& bounds) = 0;
+    virtual void SetBounds(const QRect& bounds) = 0;
 
     /**
      * Returns the minimum size for this stack. The stack is prevented
@@ -119,7 +119,7 @@ public:
      *
      * @deprecated replaced by computePreferredSize
      */
-    virtual Point ComputeMinimumSize();
+    virtual QSize ComputeMinimumSize();
 
     /*
      * @see ISizeProvider#getSizeFlags(boolean)
@@ -224,7 +224,7 @@ public:
      * @return a StackDropResult or null if the presentation does not have
      * a drop target in this location.
      */
-    virtual StackDropResult::Pointer DragOver(void* currentControl, const Point& location) = 0;
+    virtual StackDropResult::Pointer DragOver(void* currentControl, const QPoint& location) = 0;
 
     /**
      * Instructs the presentation to display the system menu

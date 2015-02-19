@@ -87,7 +87,7 @@ DefaultStackPresentationSite::DefaultStackPresentationSite()
    /* (non-Javadoc)
     * @see org.blueberry.ui.internal.skins.IPresentationSite#dragStart(org.blueberry.ui.internal.skins.IPresentablePart, boolean)
     */
-   void DefaultStackPresentationSite::DragStart(IPresentablePart::Pointer /*beingDragged*/, Point& /*initialPosition*/,
+   void DefaultStackPresentationSite::DragStart(IPresentablePart::Pointer /*beingDragged*/, QPoint& /*initialPosition*/,
            bool  /*keyboard*/) {
    }
 
@@ -100,7 +100,7 @@ DefaultStackPresentationSite::DefaultStackPresentationSite()
    /* (non-Javadoc)
     * @see org.blueberry.ui.internal.skins.IPresentationSite#dragStart(boolean)
     */
-   void DefaultStackPresentationSite::DragStart(Point&  /*initialPosition*/, bool  /*keyboard*/) {
+   void DefaultStackPresentationSite::DragStart(QPoint&  /*initialPosition*/, bool  /*keyboard*/) {
    }
 
    /* (non-Javadoc)

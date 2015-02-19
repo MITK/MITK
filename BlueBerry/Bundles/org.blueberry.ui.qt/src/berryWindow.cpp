@@ -209,8 +209,8 @@ void Window::ConfigureShell(Shell::Pointer newShell)
 //voidWindow::ConstrainShellSize()
 //{
 //  // limit the shell size to the display size
-//  Rectangle bounds = shell.getBounds();
-//  Rectangle constrained = getConstrainedShellBounds(bounds);
+//  QRect bounds = shell.getBounds();
+//  QRect constrained = getConstrainedShellBounds(bounds);
 //  if (!bounds.equals(constrained))
 //  {
 //    shell.setBounds(constrained);
@@ -267,33 +267,33 @@ void* Window::GetContents()
   return contents;
 }
 
-Point Window::GetInitialLocation(const Point& initialSize)
+QPoint Window::GetInitialLocation(const QPoint& initialSize)
 {
   void* parent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(shell->GetControl());
 
-  Point centerPoint(0,0);
-  Rectangle parentBounds(0,0,0,0);
+  QPoint centerPoint(0,0);
+  QRect parentBounds(0,0,0,0);
   if (parent != 0)
   {
     parentBounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(parent);
-    centerPoint.x = parentBounds.x + parentBounds.width/2;
-    centerPoint.y = parentBounds.y - parentBounds.height/2;
+    centerPoint.setX(parentBounds.x() + parentBounds.width()/2);
+    centerPoint.setY(parentBounds.y() - parentBounds.height()/2);
   }
   else
   {
     parentBounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)
       ->GetScreenSize(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetPrimaryScreenNumber());
-    centerPoint.x = parentBounds.width/2;
-    centerPoint.y = parentBounds.height/2;
+    centerPoint.setX(parentBounds.width()/2);
+    centerPoint.setY(parentBounds.height()/2);
   }
 
-  return Point(centerPoint.x - (initialSize.x / 2),
-              std::max<int>(parentBounds.y,
-                            std::min<int>(centerPoint.y - (initialSize.y * 2 / 3),
-                                          parentBounds.y + parentBounds.height - initialSize.y)));
+  return QPoint(centerPoint.x() - (initialSize.x() / 2),
+              std::max<int>(parentBounds.y(),
+                            std::min<int>(centerPoint.y() - (initialSize.y() * 2 / 3),
+                                          parentBounds.y() + parentBounds.height() - initialSize.y())));
 }
 
-Point Window::GetInitialSize()
+QPoint Window::GetInitialSize()
 {
   return shell->ComputeSize(Constants::DEFAULT, Constants::DEFAULT, true);
 }
@@ -346,31 +346,31 @@ void Window::InitializeBounds()
 //    return;
 //  }
 
-  Point size = this->GetInitialSize();
-  Point location = this->GetInitialLocation(size);
-  shell->SetBounds(this->GetConstrainedShellBounds(Rectangle(location.x, location.y, size.x, size.y)));
+  QPoint size = this->GetInitialSize();
+  QPoint location = this->GetInitialLocation(size);
+  shell->SetBounds(this->GetConstrainedShellBounds(QRect(location.x(), location.y(), size.x(), size.y())));
 }
 
-Rectangle Window::GetConstrainedShellBounds(const Rectangle& preferredSize)
+QRect Window::GetConstrainedShellBounds(const QRect& preferredSize)
 {
-  Rectangle result(preferredSize);
+  QRect result(preferredSize);
 
   GuiWidgetsTweaklet* guiTweaklet(Tweaklets::Get(GuiWidgetsTweaklet::KEY));
   int screenNum = guiTweaklet->GetClosestScreenNumber(result);
-  Rectangle bounds(guiTweaklet->GetAvailableScreenSize(screenNum));
+  QRect bounds(guiTweaklet->GetAvailableScreenSize(screenNum));
 
-  if (result.height > bounds.height) {
-    result.height = bounds.height;
+  if (result.height() > bounds.height()) {
+    result.setHeight(bounds.height());
   }
 
-  if (result.width > bounds.width) {
-    result.width = bounds.width;
+  if (result.width() > bounds.width()) {
+    result.setWidth(bounds.width());
   }
 
-  result.x = std::max<int>(bounds.x, std::min<int>(result.x, bounds.x
-    + bounds.width - result.width));
-  result.y = std::max<int>(bounds.y, std::min<int>(result.y, bounds.y
-    + bounds.height - result.height));
+  result.setX( std::max<int>(bounds.x(), std::min<int>(result.x(), bounds.x()
+    + bounds.width() - result.width())));
+  result.setY(std::max<int>(bounds.y(), std::min<int>(result.y(), bounds.y()
+    + bounds.height() - result.height())));
 
   return result;
 }

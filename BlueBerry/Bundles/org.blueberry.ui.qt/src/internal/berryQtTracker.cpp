@@ -16,12 +16,51 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryQtTracker.h"
 
+#include "berryConstants.h"
+
 #include <QEvent>
 #include <QKeyEvent>
 #include <QApplication>
+#include <QRubberBand>
+#include <QPixmap>
 
 namespace berry
 {
+
+CursorType QtDragManager::PositionToCursorType(int positionConstant)
+{
+  if (positionConstant == Constants::LEFT)
+    return CURSOR_LEFT;
+  if (positionConstant == Constants::RIGHT)
+    return CURSOR_RIGHT;
+  if (positionConstant == Constants::TOP)
+    return CURSOR_TOP;
+  if (positionConstant == Constants::BOTTOM)
+    return CURSOR_BOTTOM;
+  if (positionConstant == Constants::CENTER)
+    return CURSOR_CENTER;
+
+  return CURSOR_INVALID;
+}
+
+int QtDragManager::CursorTypeToPosition(CursorType dragCursorId)
+{
+  switch (dragCursorId)
+  {
+  case CURSOR_LEFT:
+    return Constants::LEFT;
+  case CURSOR_RIGHT:
+    return Constants::RIGHT;
+  case CURSOR_TOP:
+    return Constants::TOP;
+  case CURSOR_BOTTOM:
+    return Constants::BOTTOM;
+  case CURSOR_CENTER:
+    return Constants::CENTER;
+  default:
+    return Constants::DEFAULT;
+  }
+}
 
 bool QtDragManager::eventFilter(QObject* o, QEvent* e)
 {
@@ -144,55 +183,54 @@ QtTracker::QtTracker() :
 
   QPixmap pixCursorTop(":/org.blueberry.ui.qt/cursor_top.xpm");
   QCursor* cursorTop = new QCursor(pixCursorTop, 15, 8);
-  cursorMap.insert(DnDTweaklet::CURSOR_TOP, cursorTop);
+  cursorMap.insert(CURSOR_TOP, cursorTop);
 
   QPixmap pixCursorRight(":/org.blueberry.ui.qt/cursor_right.xpm");
   QCursor* cursorRight = new QCursor(pixCursorRight, 23, 15);
-  cursorMap.insert(DnDTweaklet::CURSOR_RIGHT, cursorRight);
+  cursorMap.insert(CURSOR_RIGHT, cursorRight);
 
   QPixmap pixCursorBottom(":/org.blueberry.ui.qt/cursor_bottom.xpm");
   QCursor* cursorBottom = new QCursor(pixCursorBottom, 16, 23);
-  cursorMap.insert(DnDTweaklet::CURSOR_BOTTOM, cursorBottom);
+  cursorMap.insert(CURSOR_BOTTOM, cursorBottom);
 
   QPixmap pixCursorLeft(":/org.blueberry.ui.qt/cursor_left.xpm");
   QCursor* cursorLeft = new QCursor(pixCursorLeft, 8, 15);
-  cursorMap.insert(DnDTweaklet::CURSOR_LEFT, cursorLeft);
+  cursorMap.insert(CURSOR_LEFT, cursorLeft);
 
   QPixmap pixCursorCenter(":/org.blueberry.ui.qt/cursor_center.xpm");
   QCursor* cursorCenter = new QCursor(pixCursorCenter, 15, 15);
-  cursorMap.insert(DnDTweaklet::CURSOR_CENTER, cursorCenter);
+  cursorMap.insert(CURSOR_CENTER, cursorCenter);
 
   QPixmap pixCursorOffscreen(":/org.blueberry.ui.qt/cursor_offscreen.xpm");
   QCursor* cursorOffscreen = new QCursor(pixCursorOffscreen, 15, 15);
-  cursorMap.insert(DnDTweaklet::CURSOR_OFFSCREEN, cursorOffscreen);
+  cursorMap.insert(CURSOR_OFFSCREEN, cursorOffscreen);
 
   QCursor* cursorInvalid = new QCursor(Qt::ForbiddenCursor);
-  cursorMap.insert(DnDTweaklet::CURSOR_INVALID, cursorInvalid);
+  cursorMap.insert(CURSOR_INVALID, cursorInvalid);
 }
 
 QtTracker::~QtTracker()
 {
   delete rubberBand;
 
-  for (QHash<DnDTweaklet::CursorType, QCursor*>::iterator iter = cursorMap.begin();
+  for (QHash<CursorType, QCursor*>::iterator iter = cursorMap.begin();
        iter != cursorMap.end(); ++iter)
   {
     delete iter.value();
   }
 }
 
-Rectangle QtTracker::GetRectangle()
+QRect QtTracker::GetRectangle() const
 {
-  const QRect& rect = rubberBand->geometry();
-  return Rectangle(rect.x(), rect.y(), rect.width(), rect.height());
+  return rubberBand->geometry();
 }
 
-void QtTracker::SetRectangle(const Rectangle& rectangle)
+void QtTracker::SetRectangle(const QRect& rectangle)
 {
-  rubberBand->setGeometry(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+  rubberBand->setGeometry(rectangle);
 }
 
-void QtTracker::SetCursor(DnDTweaklet::CursorType cursorType)
+void QtTracker::SetCursor(CursorType cursorType)
 {
   QCursor* cursor = cursorMap[cursorType];
   if (!cursor) return;

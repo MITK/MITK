@@ -78,7 +78,6 @@ set(SRC_CPP_FILES
   berryIWorkbenchWindow.cpp
   berryMenuUtil.cpp
   berryPlatformUI.cpp
-  berryPoint.cpp
   berryPropertyChangeEvent.cpp
   berryQModelIndexObject.cpp
   berryQtEditorPart.cpp
@@ -87,7 +86,6 @@ set(SRC_CPP_FILES
   berryQtPreferences.cpp
   berryQtSelectionProvider.cpp
   berryQtViewPart.cpp
-  berryRectangle.cpp
   berrySameShellProvider.cpp
   berrySaveable.cpp
   berrySaveablesLifecycleEvent.cpp
@@ -161,9 +159,7 @@ set(SRC_CPP_FILES
   intro/berryIntroPart.cpp
 
   #tweaklets
-  tweaklets/berryDnDTweaklet.cpp
   tweaklets/berryGuiWidgetsTweaklet.cpp
-  tweaklets/berryITracker.cpp
   tweaklets/berryWorkbenchPageTweaklet.cpp
   tweaklets/berryWorkbenchTweaklet.cpp
 
@@ -317,7 +313,6 @@ set(INTERNAL_CPP_FILES
   berryQtControlWidget.cpp
   berryQtDnDControlWidget.cpp
   berryQtDisplay.cpp
-  berryQtDnDTweaklet.cpp
   berryQtGlobalEventFilter.cpp
   berryQtMainWindowControl.cpp
   berryQtOpenPerspectiveAction.cpp
@@ -403,7 +398,6 @@ set(MOC_H_FILES
   src/internal/berryMenuServiceFactory.h
   src/internal/berryMMMenuListener.h
   src/internal/berryQtDisplay.h
-  src/internal/berryQtDnDTweaklet.h
   src/internal/berryQtGlobalEventFilter.h
   src/internal/berryQtMainWindowControl.h
   src/internal/berryQtOpenPerspectiveAction.h

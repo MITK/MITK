@@ -192,7 +192,7 @@ PartStack::Pointer EditorSashContainer::GetUpperRightEditorStack(
 
   // Find the upper Right editor stack
   PartStack::Pointer winner;
-  Rectangle winnerRect;
+  QRect winnerRect;
 
   for (ILayoutContainer::ChildrenType::const_iterator iter = stacks.begin();
        iter != stacks.end(); ++iter)
@@ -202,9 +202,9 @@ PartStack::Pointer EditorSashContainer::GetUpperRightEditorStack(
       continue;
 
     PartStack::Pointer stack = part.Cast<PartStack>();
-    Rectangle bb = stack->GetBounds();
-    if (iter == stacks.begin() || bb.y < winnerRect.y || (bb.y == winnerRect.y && bb.x
-        > winnerRect.x))
+    QRect bb = stack->GetBounds();
+    if (iter == stacks.begin() || bb.y() < winnerRect.y() || (bb.y() == winnerRect.y() && bb.x()
+        > winnerRect.x()))
     {
       winner = stack;
       winnerRect = bb;

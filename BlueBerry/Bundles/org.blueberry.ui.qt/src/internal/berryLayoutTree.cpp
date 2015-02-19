@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryLayoutPartSash.h"
 
 #include "berryConstants.h"
+#include "berryLog.h"
 
 namespace berry
 {
@@ -54,7 +55,7 @@ LayoutPart::Pointer LayoutTree::ComputeRelation(
   return part;
 }
 
-LayoutPart::Pointer LayoutTree::FindPart(const Point&  /*toFind*/)
+LayoutPart::Pointer LayoutTree::FindPart(const QPoint&  /*toFind*/)
 {
   return part;
 }
@@ -91,7 +92,7 @@ LayoutTreeNode::Pointer LayoutTree::FindSash(LayoutPartSash::Pointer  /*sash*/)
   return LayoutTreeNode::Pointer(0);
 }
 
-Rectangle LayoutTree::GetBounds()
+QRect LayoutTree::GetBounds()
 {
   return currentBounds;
 }
@@ -431,7 +432,7 @@ LayoutTree::Pointer LayoutTree::Remove(LayoutPart::Pointer child)
   return LayoutTree::Pointer(this);
 }
 
-void LayoutTree::SetBounds(const Rectangle& bounds)
+void LayoutTree::SetBounds(const QRect& bounds)
 {
   if (!(bounds == currentBounds) || forceLayout)
   {
@@ -442,7 +443,7 @@ void LayoutTree::SetBounds(const Rectangle& bounds)
   }
 }
 
-void LayoutTree::DoSetBounds(const Rectangle& bounds)
+void LayoutTree::DoSetBounds(const QRect& bounds)
 {
   part->SetBounds(bounds);
 }

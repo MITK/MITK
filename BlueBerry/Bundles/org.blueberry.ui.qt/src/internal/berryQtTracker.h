@@ -18,16 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYQTTRACKER_H_
 #define BERRYQTTRACKER_H_
 
-#include <berryITracker.h>
-#include <berryDnDTweaklet.h>
+#include <berryConstants.h>
 #include <berryGuiTkIControlListener.h>
 
-#include <QDrag>
-#include <QRubberBand>
-#include <QEventLoop>
-#include <QCursor>
-
-#include <map>
+class QCursor;
+class QEventLoop;
+class QRubberBand;
 
 namespace berry {
 
@@ -55,12 +51,30 @@ protected:
 
 public:
 
+  static CursorType PositionToCursorType(int positionConstant);
+
+  /**
+   * Converts a DnDTweaklet::CursorType (CURSOR_LEFT, CURSOR_RIGHT, CURSOR_TOP, CURSOR_BOTTOM, CURSOR_CENTER) into a BlueBerry constant
+   * (Constants::LEFT, Constants::RIGHT, Constants::TOP, Constants::BOTTOM, Constants::CENTER)
+   *
+   * @param dragCursorId
+   * @return a BlueBerry Constants::* constant
+   */
+  static int CursorTypeToPosition(CursorType dragCursorId);
+
   bool Drag(QtTracker* tracker);
 
 };
 
-
-class QtTracker : public ITracker {
+/**
+ *  Instances of this class implement a rubber banding rectangle that is
+ *  drawn onto a parent control or display.
+ *  These rectangles can be specified to respond to mouse and key events
+ *  by either moving or resizing themselves accordingly.  Trackers are
+ *  typically used to represent window geometries in a lightweight manner.
+ *
+ */
+class QtTracker {
 
 private:
 
@@ -71,17 +85,17 @@ private:
 
   GuiTk::IControlListener::Events controlEvents;
 
-  QHash<DnDTweaklet::CursorType, QCursor*> cursorMap;
+  QHash<CursorType, QCursor*> cursorMap;
 
 public:
 
   QtTracker();
   ~QtTracker();
 
-  Rectangle GetRectangle();
-  void SetRectangle(const Rectangle& rectangle);
+  QRect GetRectangle() const;
+  void SetRectangle(const QRect& rectangle);
 
-  void SetCursor(DnDTweaklet::CursorType cursor);
+  void SetCursor(CursorType cursor);
 
   bool Open();
 

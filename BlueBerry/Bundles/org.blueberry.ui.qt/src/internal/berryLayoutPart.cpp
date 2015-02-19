@@ -55,10 +55,10 @@ void LayoutPart::Dispose()
 
 }
 
-Rectangle LayoutPart::GetBounds()
+QRect LayoutPart::GetBounds()
 {
   if (this->GetControl() == 0)
-    return Rectangle();
+    return QRect();
 
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetControl());
 }
@@ -83,11 +83,9 @@ bool LayoutPart::IsCompressible()
   return false;
 }
 
-Point LayoutPart::GetSize()
+QSize LayoutPart::GetSize()
 {
-  Rectangle r = this->GetBounds();
-  Point ptSize(r.width, r.height);
-  return ptSize;
+  return this->GetBounds().size();
 }
 
 int LayoutPart::GetSizeFlags(bool  /*horizontal*/)
@@ -101,7 +99,7 @@ int LayoutPart::ComputePreferredSize(bool /*width*/, int /*availableParallel*/,
   return preferredParallel;
 }
 
-IDropTarget::Pointer LayoutPart::GetDropTarget(Object::Pointer  /*draggedObject*/, const Point&  /*displayCoordinates*/)
+IDropTarget::Pointer LayoutPart::GetDropTarget(Object::Pointer  /*draggedObject*/, const QPoint&  /*displayCoordinates*/)
 {
   return IDropTarget::Pointer(0);
 }
@@ -233,7 +231,7 @@ bool LayoutPart::IsFocusAncestor(void*  /*ctrl*/)
   return false;
 }
 
-void LayoutPart::SetBounds(const Rectangle& r)
+void LayoutPart::SetBounds(const QRect& r)
 {
   void* ctrl = this->GetControl();
   if (ctrl)

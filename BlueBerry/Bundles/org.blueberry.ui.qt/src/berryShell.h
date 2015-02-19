@@ -23,10 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_blueberry_ui_qt_Export.h>
 #include "berryIShellListener.h"
 #include "guitk/berryGuiTkIControlListener.h"
-#include "berryRectangle.h"
-#include "berryPoint.h"
-
-#include <map>
 
 namespace berry {
 
@@ -146,12 +142,12 @@ public:
 
   void SetBounds(int x, int y, int width, int height);
 
-  virtual void SetBounds(const Rectangle& bounds) = 0;
-  virtual Rectangle GetBounds() const = 0;
+  virtual void SetBounds(const QRect& bounds) = 0;
+  virtual QRect GetBounds() const = 0;
 
   virtual void SetLocation(int x, int y) = 0;
 
-  virtual Point ComputeSize(int wHint, int hHint, bool changed) = 0;
+  virtual QPoint ComputeSize(int wHint, int hHint, bool changed) = 0;
 
   /**
    * Returns the receiver's text, which is the string that the

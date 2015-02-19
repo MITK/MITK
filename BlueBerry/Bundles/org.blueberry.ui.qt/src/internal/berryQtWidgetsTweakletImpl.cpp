@@ -114,15 +114,11 @@ void QtWidgetsTweakletImpl::RemoveSelectionListener(QWidget* widget,
   }
 }
 
-Rectangle QtWidgetsTweakletImpl::GetScreenSize(int i)
+QRect QtWidgetsTweakletImpl::GetScreenSize(int i)
 {
   QDesktopWidget *desktop = QApplication::desktop();
-  QRect screenGeometry;
-  if (i < 0) screenGeometry = desktop->screen()->geometry();
-  else screenGeometry = desktop->screenGeometry(i);
-
-  return (Rectangle(screenGeometry.x(), screenGeometry.y()
-    , screenGeometry.width(), screenGeometry.height()));
+  if (i < 0) return desktop->screen()->geometry();
+  return desktop->screenGeometry(i);
 }
 
 unsigned int QtWidgetsTweakletImpl::GetScreenNumber()
@@ -141,21 +137,17 @@ int QtWidgetsTweakletImpl::GetPrimaryScreenNumber()
   return primaryScreenNr;
 }
 
-Rectangle QtWidgetsTweakletImpl::GetAvailableScreenSize(int i)
+QRect QtWidgetsTweakletImpl::GetAvailableScreenSize(int i)
 {
   QDesktopWidget *desktop = QApplication::desktop();
-  QRect screenGeometry;
-  if (i < 0) screenGeometry = desktop->screen()->geometry();
-  else screenGeometry = desktop->availableGeometry(i);
-
-  return (Rectangle(screenGeometry.x(), screenGeometry.y()
-    , screenGeometry.width(), screenGeometry.height()));
+  if (i < 0) return desktop->screen()->geometry();
+  return desktop->availableGeometry(i);
 }
 
-int QtWidgetsTweakletImpl::GetClosestScreenNumber(const Rectangle& r)
+int QtWidgetsTweakletImpl::GetClosestScreenNumber(const QRect& r)
 {
   QDesktopWidget *desktop = QApplication::desktop();
-  return desktop->screenNumber(QPoint(r.x + r.width/2, r.y + r.height/2));
+  return desktop->screenNumber(QPoint(r.x() + r.width()/2, r.y() + r.height()/2));
 }
 
 void QtWidgetsTweakletImpl::AddControlListener(QtWidgetController* controller,
@@ -180,15 +172,15 @@ void QtWidgetsTweakletImpl::SetEnabled(QWidget* widget, bool enabled)
   widget->setEnabled(enabled);
 }
 
-void QtWidgetsTweakletImpl::SetBounds(QWidget* widget, const Rectangle& bounds)
+void QtWidgetsTweakletImpl::SetBounds(QWidget* widget, const QRect& bounds)
 {
-  widget->setGeometry(bounds.x, bounds.y, bounds.width, bounds.height);
+  widget->setGeometry(bounds);
 }
 
-Rectangle QtWidgetsTweakletImpl::GetBounds(QWidget* widget)
+QRect QtWidgetsTweakletImpl::GetBounds(QWidget* widget)
 {
   const QRect& geometry = widget->geometry();
-  Rectangle rect(geometry.x(), geometry.y(), geometry.width(), geometry.height());
+  QRect rect(geometry.x(), geometry.y(), geometry.width(), geometry.height());
   return rect;
 }
 
@@ -207,11 +199,9 @@ bool QtWidgetsTweakletImpl::IsVisible(QWidget* widget)
   return widget->isVisible();
 }
 
-Rectangle QtWidgetsTweakletImpl::GetClientArea(QWidget* widget)
+QRect QtWidgetsTweakletImpl::GetClientArea(QWidget* widget)
 {
-  const QRect& contentsRect = widget->contentsRect();
-  Rectangle rect(contentsRect.x(), contentsRect.y(), contentsRect.width(), contentsRect.height());
-  return rect;
+  return widget->contentsRect();
 }
 
 void* QtWidgetsTweakletImpl::GetParent(QWidget* widget)
@@ -252,10 +242,10 @@ Object::Pointer QtWidgetsTweakletImpl::GetData(QWidget* object, const QString& i
   return Object::Pointer(0);
 }
 
-Point QtWidgetsTweakletImpl::GetCursorLocation()
+QPoint QtWidgetsTweakletImpl::GetCursorLocation()
 {
   QPoint qpoint = QCursor::pos();
-  return Point(qpoint.x(), qpoint.y());
+  return QPoint(qpoint.x(), qpoint.y());
 }
 
 QWidget* QtWidgetsTweakletImpl::GetCursorControl()
@@ -263,13 +253,13 @@ QWidget* QtWidgetsTweakletImpl::GetCursorControl()
   return QApplication::widgetAt(QCursor::pos());
 }
 
-QWidget* QtWidgetsTweakletImpl::FindControl(const QList<Shell::Pointer>& shells, const Point& location)
+QWidget* QtWidgetsTweakletImpl::FindControl(const QList<Shell::Pointer>& shells, const QPoint& location)
 {
   for (QList<Shell::Pointer>::const_iterator iter = shells.begin();
       iter != shells.end(); ++iter)
   {
     QWidget* shellWidget = static_cast<QWidget*>((*iter)->GetControl());
-    QWidget* control = shellWidget->childAt(location.x, location.y);
+    QWidget* control = shellWidget->childAt(location.x(), location.y());
     if (control) return control;
   }
 
@@ -402,48 +392,42 @@ Shell::Pointer QtWidgetsTweakletImpl::GetActiveShell()
   return Shell::Pointer(0);
 }
 
-Rectangle QtWidgetsTweakletImpl::ToControl(QWidget* coordinateSystem,
-          const Rectangle& toConvert)
+QRect QtWidgetsTweakletImpl::ToControl(QWidget* coordinateSystem,
+          const QRect& toConvert)
 {
-  QPoint globalUpperLeft(toConvert.x, toConvert.y);
-  QPoint globalLowerRight(toConvert.x + toConvert.width, toConvert.y + toConvert.height);
+  QPoint globalUpperLeft = toConvert.topLeft();
+  QPoint globalLowerRight = toConvert.bottomRight();
 
   QPoint upperLeft = coordinateSystem->mapFromGlobal(globalUpperLeft);
   QPoint lowerRight = coordinateSystem->mapFromGlobal(globalLowerRight);
 
-  return Rectangle(upperLeft.x(), upperLeft.y(), lowerRight.x() - upperLeft.x(),
+  return QRect(upperLeft.x(), upperLeft.y(), lowerRight.x() - upperLeft.x(),
             lowerRight.y() - upperLeft.y());
 }
 
-Point QtWidgetsTweakletImpl::ToControl(QWidget* coordinateSystem,
-          const Point& toConvert)
+QPoint QtWidgetsTweakletImpl::ToControl(QWidget* coordinateSystem,
+          const QPoint& toConvert)
 {
-  QPoint displayPoint(toConvert.x, toConvert.y);
-
-  QPoint localPoint = coordinateSystem->mapFromGlobal(displayPoint);
-  return Point(localPoint.x(), localPoint.y());
+  return coordinateSystem->mapFromGlobal(toConvert);
 }
 
-Rectangle QtWidgetsTweakletImpl::ToDisplay(QWidget* coordinateSystem,
-        const Rectangle& toConvert)
+QRect QtWidgetsTweakletImpl::ToDisplay(QWidget* coordinateSystem,
+        const QRect& toConvert)
 {
-  QPoint upperLeft(toConvert.x, toConvert.y);
-  QPoint lowerRight(toConvert.x + toConvert.width, toConvert.y + toConvert.height);
+  QPoint upperLeft = toConvert.topLeft();
+  QPoint lowerRight = toConvert.bottomRight();
 
   QPoint globalUpperLeft = coordinateSystem->mapToGlobal(upperLeft);
   QPoint globalLowerRight = coordinateSystem->mapToGlobal(lowerRight);
 
-  return Rectangle(globalUpperLeft.x(), globalUpperLeft.y(), globalLowerRight.x() - globalUpperLeft.x(),
+  return QRect(globalUpperLeft.x(), globalUpperLeft.y(), globalLowerRight.x() - globalUpperLeft.x(),
             globalLowerRight.y() - globalUpperLeft.y());
 }
 
-Point QtWidgetsTweakletImpl::ToDisplay(QWidget* coordinateSystem,
-        const Point& toConvert)
+QPoint QtWidgetsTweakletImpl::ToDisplay(QWidget* coordinateSystem,
+        const QPoint& toConvert)
 {
-  QPoint localPoint(toConvert.x, toConvert.y);
-  QPoint displayPoint = coordinateSystem->mapToGlobal(localPoint);
-
-  return Point(displayPoint.x(), displayPoint.y());
+  return coordinateSystem->mapToGlobal(toConvert);
 }
 
 }

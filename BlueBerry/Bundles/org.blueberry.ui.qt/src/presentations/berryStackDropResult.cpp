@@ -19,14 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-StackDropResult::StackDropResult(const Rectangle& snapRectangle,
+StackDropResult::StackDropResult(const QRect& snapRectangle,
     Object::Pointer cookie) :
   snapRectangle(snapRectangle), cookie(cookie)
 {
 
 }
 
-Rectangle StackDropResult::GetSnapRectangle()
+QRect StackDropResult::GetSnapRectangle()
 {
   return snapRectangle;
 }

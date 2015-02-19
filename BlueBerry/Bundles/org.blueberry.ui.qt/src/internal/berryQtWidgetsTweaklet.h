@@ -43,14 +43,14 @@ public:
   bool GetEnabled(void* widget);
   void SetEnabled(void* widget, bool enabled);
 
-  void SetBounds(void* widget, const Rectangle& bounds);
-  Rectangle GetBounds(void* widget);
+  void SetBounds(void* widget, const QRect& bounds);
+  QRect GetBounds(void* widget);
 
   void SetVisible(void* widget, bool visible);
   bool GetVisible(void* widget);
   bool IsVisible(void* widget);
 
-  Rectangle GetClientArea(void* widget);
+  QRect GetClientArea(void* widget);
 
   void* GetParent(void* widget);
   bool SetParent(void* widget, void* parent);
@@ -62,15 +62,15 @@ public:
   //IMenu::Pointer CreateMenu(IMenu::Pointer parent);
   //IMenuItem::Pointer CreateMenuItem(IMenu::Pointer, IMenuItem::Style, int index = -1);
 
-  Rectangle GetScreenSize(int i = -1);
+  QRect GetScreenSize(int i = -1);
   unsigned int GetScreenNumber();
   int GetPrimaryScreenNumber();
-  Rectangle GetAvailableScreenSize(int i = -1);
-  int GetClosestScreenNumber(const Rectangle&);
+  QRect GetAvailableScreenSize(int i = -1);
+  int GetClosestScreenNumber(const QRect&);
 
-  Point GetCursorLocation();
+  QPoint GetCursorLocation();
   void* GetCursorControl();
-  void* FindControl(const QList<Shell::Pointer>& shells, const Point& location);
+  void* FindControl(const QList<Shell::Pointer>& shells, const QPoint& location);
 
   /**
    * Determines if one control is a child of another. Returns true iff the second
@@ -108,17 +108,17 @@ public:
   Shell::Pointer GetShell(void* widget);
   Shell::Pointer GetActiveShell();
 
-  Rectangle ToControl(void* coordinateSystem,
-          const Rectangle& toConvert);
+  QRect ToControl(void* coordinateSystem,
+          const QRect& toConvert);
 
-  Point ToControl(void* coordinateSystem,
-          const Point& toConvert);
+  QPoint ToControl(void* coordinateSystem,
+          const QPoint& toConvert);
 
-  Rectangle ToDisplay(void* coordinateSystem,
-          const Rectangle& toConvert);
+  QRect ToDisplay(void* coordinateSystem,
+          const QRect& toConvert);
 
-  Point ToDisplay(void* coordinateSystem,
-          const Point& toConvert);
+  QPoint ToDisplay(void* coordinateSystem,
+          const QPoint& toConvert);
 
 private:
 

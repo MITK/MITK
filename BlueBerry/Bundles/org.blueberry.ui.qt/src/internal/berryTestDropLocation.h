@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYTESTDROPLOCATION_H_
 
 #include <berryObject.h>
-#include "berryPoint.h"
 #include "berryShell.h"
 
 #include <vector>
@@ -35,14 +34,14 @@ namespace berry {
  */
 struct TestDropLocation : public Object {
 
-  berryObjectMacro(TestDropLocation);
+  berryObjectMacro(TestDropLocation)
 
     /**
      * Location where the object should be dropped, in display coordinates
      *
      * @return a location in display coordinates
      */
-    virtual Point GetLocation() = 0;
+    virtual QPoint GetLocation() = 0;
 
     /**
      * The drop code will pretend that only the given shells are open,

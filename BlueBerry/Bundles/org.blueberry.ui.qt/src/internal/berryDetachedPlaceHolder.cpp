@@ -24,7 +24,7 @@ namespace berry
 {
 
 DetachedPlaceHolder::DetachedPlaceHolder(const QString& id,
-    const Rectangle& b) :
+    const QRect& b) :
   PartPlaceholder(id), bounds(b)
 {
 
@@ -54,7 +54,7 @@ bool DetachedPlaceHolder::AllowsAutoFocus()
   return PartPlaceholder::AllowsAutoFocus();
 }
 
-Rectangle DetachedPlaceHolder::GetBounds()
+QRect DetachedPlaceHolder::GetBounds()
 {
   return bounds;
 }
@@ -88,7 +88,7 @@ void DetachedPlaceHolder::RestoreState(IMemento::Pointer memento)
   int height = 0;
   memento->GetInteger(WorkbenchConstants::TAG_HEIGHT, height);
 
-  bounds = Rectangle(x, y, width, height);
+  bounds = QRect(x, y, width, height);
 
   // Restore the placeholders.
   QList<IMemento::Pointer> childrenMem(memento
@@ -106,10 +106,10 @@ void DetachedPlaceHolder::RestoreState(IMemento::Pointer memento)
 void DetachedPlaceHolder::SaveState(IMemento::Pointer memento)
 {
   // Save the bounds.
-  memento->PutInteger(WorkbenchConstants::TAG_X, bounds.x);
-  memento->PutInteger(WorkbenchConstants::TAG_Y, bounds.y);
-  memento->PutInteger(WorkbenchConstants::TAG_WIDTH, bounds.width);
-  memento->PutInteger(WorkbenchConstants::TAG_HEIGHT, bounds.height);
+  memento->PutInteger(WorkbenchConstants::TAG_X, bounds.x());
+  memento->PutInteger(WorkbenchConstants::TAG_Y, bounds.y());
+  memento->PutInteger(WorkbenchConstants::TAG_WIDTH, bounds.width());
+  memento->PutInteger(WorkbenchConstants::TAG_HEIGHT, bounds.height());
 
   // Save the views.
   for (QList<LayoutPart::Pointer>::iterator i = children.begin();

@@ -3858,43 +3858,43 @@ void WorkbenchPage::ResizeView(IViewPart::Pointer part, int width, int height)
   this->FindSashParts(tree, pane->FindSashes(), sashInfo);
 
   // first set the width
-  int deltaWidth = width - pane->GetBounds().width;
+  int deltaWidth = width - pane->GetBounds().width();
   if (sashInfo.right != 0)
   {
-    Rectangle rightBounds = sashInfo.rightNode->GetBounds();
+    QRect rightBounds = sashInfo.rightNode->GetBounds();
     // set the new ratio
-    sashInfo.right->SetRatio(static_cast<float>((deltaWidth + sashInfo.right->GetBounds().x)
-            - rightBounds.x) / rightBounds.width);
+    sashInfo.right->SetRatio(static_cast<float>((deltaWidth + sashInfo.right->GetBounds().x())
+            - rightBounds.x()) / rightBounds.width());
     // complete the resize
     sashInfo.rightNode->SetBounds(rightBounds);
   }
   else if (sashInfo.left != 0)
   {
-    Rectangle leftBounds = sashInfo.leftNode->GetBounds();
+    QRect leftBounds = sashInfo.leftNode->GetBounds();
     // set the ratio
-    sashInfo.left->SetRatio(static_cast<float>((sashInfo.left->GetBounds().x - deltaWidth)
-            - leftBounds.x) / leftBounds.width);
+    sashInfo.left->SetRatio(static_cast<float>((sashInfo.left->GetBounds().x() - deltaWidth)
+            - leftBounds.x()) / leftBounds.width());
     // complete the resize
     sashInfo.leftNode->SetBounds(sashInfo.leftNode->GetBounds());
   }
 
   // next set the height
-  int deltaHeight = height - pane->GetBounds().height;
+  int deltaHeight = height - pane->GetBounds().height();
   if (sashInfo.bottom != 0)
   {
-    Rectangle bottomBounds = sashInfo.bottomNode->GetBounds();
+    QRect bottomBounds = sashInfo.bottomNode->GetBounds();
     // set the new ratio
-    sashInfo.bottom->SetRatio(static_cast<float>((deltaHeight + sashInfo.bottom->GetBounds().y)
-            - bottomBounds.y) / bottomBounds.height);
+    sashInfo.bottom->SetRatio(static_cast<float>((deltaHeight + sashInfo.bottom->GetBounds().y())
+            - bottomBounds.y()) / bottomBounds.height());
     // complete the resize
     sashInfo.bottomNode->SetBounds(bottomBounds);
   }
   else if (sashInfo.top != 0)
   {
-    Rectangle topBounds = sashInfo.topNode->GetBounds();
+    QRect topBounds = sashInfo.topNode->GetBounds();
     // set the ratio
-    sashInfo.top->SetRatio(static_cast<float>((sashInfo.top->GetBounds().y - deltaHeight)
-            - topBounds.y) / topBounds.height);
+    sashInfo.top->SetRatio(static_cast<float>((sashInfo.top->GetBounds().y() - deltaHeight)
+            - topBounds.y()) / topBounds.height());
     // complete the resize
     sashInfo.topNode->SetBounds(topBounds);
   }

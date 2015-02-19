@@ -51,7 +51,7 @@ void LayoutTreeNode::FlushChildren()
   children[1]->FlushChildren();
 }
 
-LayoutPart::Pointer LayoutTreeNode::FindPart(const Point& toFind)
+LayoutPart::Pointer LayoutTreeNode::FindPart(const QPoint& toFind)
 {
   if (!children[0]->IsVisible())
   {
@@ -72,11 +72,11 @@ LayoutPart::Pointer LayoutTreeNode::FindPart(const Point& toFind)
 
   LayoutPartSash::Pointer sash = this->GetSash();
 
-  Rectangle bounds = sash->GetBounds();
+  QRect bounds = sash->GetBounds();
 
   if (sash->IsVertical())
   {
-    if (toFind.x < bounds.x + (bounds.width / 2))
+    if (toFind.x() < bounds.x() + (bounds.width() / 2))
     {
       return children[0]->FindPart(toFind);
     }
@@ -84,7 +84,7 @@ LayoutPart::Pointer LayoutTreeNode::FindPart(const Point& toFind)
   }
   else
   {
-    if (toFind.y < bounds.y + (bounds.height / 2))
+    if (toFind.y() < bounds.y() + (bounds.height() / 2))
     {
       return children[0]->FindPart(toFind);
     }
@@ -540,7 +540,7 @@ int LayoutTreeNode::DoGetSizeFlags(bool width)
       & Constants::MAX);
 }
 
-void LayoutTreeNode::DoSetBounds(const Rectangle& b)
+void LayoutTreeNode::DoSetBounds(const QRect& b)
 {
   if (!children[0]->IsVisible())
   {
@@ -555,7 +555,7 @@ void LayoutTreeNode::DoSetBounds(const Rectangle& b)
     return;
   }
 
-  Rectangle bounds = b;
+  QRect bounds = b;
 
   bool vertical = this->GetSash()->IsVertical();
 
@@ -563,26 +563,25 @@ void LayoutTreeNode::DoSetBounds(const Rectangle& b)
   // that we can eliminate special cases
   if (!vertical)
   {
-    bounds.FlipXY();
+    bounds = FlipRect(bounds);
   }
 
-  ChildSizes childSizes = this->ComputeChildSizes(bounds.width, bounds.height,
-      this->GetSash()->GetLeft(), this->GetSash()->GetRight(), bounds.width);
+  ChildSizes childSizes = this->ComputeChildSizes(bounds.width(), bounds.height(),
+      this->GetSash()->GetLeft(), this->GetSash()->GetRight(), bounds.width());
 
   this->GetSash()->SetVisible(true);
   this->GetSash()->SetEnabled(childSizes.resizable);
 
-  Rectangle leftBounds = Rectangle(bounds.x, bounds.y, childSizes.left, bounds.height);
-  Rectangle sashBounds = Rectangle(leftBounds.x + leftBounds.width, bounds.y, this->GetSashSize(), bounds.height);
-  Rectangle
-      rightBounds =
-          Rectangle(sashBounds.x + sashBounds.width, bounds.y, childSizes.right, bounds.height);
+  QRect leftBounds = QRect(bounds.x(), bounds.y(), childSizes.left, bounds.height());
+  QRect sashBounds = QRect(leftBounds.x() + leftBounds.width(), bounds.y(), this->GetSashSize(), bounds.height());
+  QRect rightBounds = QRect(sashBounds.x() + sashBounds.width(), bounds.y(),
+                            childSizes.right, bounds.height());
 
   if (!vertical)
   {
-    leftBounds.FlipXY();
-    sashBounds.FlipXY();
-    rightBounds.FlipXY();
+    leftBounds = FlipRect(leftBounds);
+    sashBounds = FlipRect(sashBounds);
+    rightBounds = FlipRect(rightBounds);
   }
 
   this->GetSash()->SetBounds(sashBounds);
@@ -714,6 +713,11 @@ void LayoutTreeNode::DescribeLayout(QString& buf) const
 
   children[1]->DescribeLayout(buf);
   buf.append(")");
+}
+
+QRect LayoutTreeNode::FlipRect(const QRect& rect)
+{
+  return QRect(rect.y(), rect.x(), rect.height(), rect.width());
 }
 
 }

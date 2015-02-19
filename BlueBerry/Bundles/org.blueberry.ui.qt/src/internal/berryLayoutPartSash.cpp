@@ -60,8 +60,8 @@ void LayoutPartSash::CheckDragLimit(GuiTk::SelectionEvent::Pointer event)
 {
   LayoutTree::Pointer root = rootContainer->GetLayoutTree();
   LayoutTreeNode::Pointer node = root->FindSash(LayoutPartSash::Pointer(this));
-  Rectangle nodeBounds = node->GetBounds();
-  Rectangle eventRect(event->x, event->y, event->width, event->height);
+  QRect nodeBounds = node->GetBounds();
+  QRect eventRect(event->x, event->y, event->width, event->height);
 
   bool vertical = (style == Constants::VERTICAL);
 
@@ -69,27 +69,27 @@ void LayoutPartSash::CheckDragLimit(GuiTk::SelectionEvent::Pointer event)
   // can handle horizontal and vertical sashes without special cases
   if (!vertical)
   {
-    nodeBounds.FlipXY();
-    eventRect.FlipXY();
+    nodeBounds = QRect(nodeBounds.y(), nodeBounds.x(), nodeBounds.height(), nodeBounds.width());
+    eventRect = QRect(eventRect.y(), eventRect.x(), eventRect.height(), eventRect.width());
   }
 
-  int eventX = eventRect.x;
-  int left = std::max<int>(0, eventX - nodeBounds.x);
-  left = std::min<int>(left, nodeBounds.width - this->GetSashSize());
-  int right = nodeBounds.width - left - this->GetSashSize();
+  int eventX = eventRect.x();
+  int left = std::max<int>(0, eventX - nodeBounds.x());
+  left = std::min<int>(left, nodeBounds.width() - this->GetSashSize());
+  int right = nodeBounds.width() - left - this->GetSashSize();
 
-  LayoutTreeNode::ChildSizes sizes = node->ComputeChildSizes(nodeBounds.width, nodeBounds.height, left, right, nodeBounds.width);
+  LayoutTreeNode::ChildSizes sizes = node->ComputeChildSizes(nodeBounds.width(), nodeBounds.height(), left, right, nodeBounds.width());
 
-  eventRect.x = nodeBounds.x + sizes.left;
+  eventRect.setX(nodeBounds.x() + sizes.left);
 
   // If it's a horizontal sash, restore eventRect to its original coordinate system
   if (!vertical)
   {
-    eventRect.FlipXY();
+    eventRect = QRect(eventRect.y(), eventRect.x(), eventRect.height(), eventRect.width());
   }
 
-  event->x = eventRect.x;
-  event->y = eventRect.y;
+  event->x = eventRect.x();
+  event->y = eventRect.y();
 }
 
 void LayoutPartSash::CreateControl(void* /*parent*/)
@@ -118,7 +118,7 @@ void LayoutPartSash::DoCreateControl()
   }
 }
 
-void LayoutPartSash::SetBounds(const Rectangle& r)
+void LayoutPartSash::SetBounds(const QRect& r)
 {
   LayoutPart::SetBounds(r);
 
@@ -162,7 +162,7 @@ void LayoutPartSash::Dispose()
   sash = 0;
 }
 
-Rectangle LayoutPartSash::GetBounds()
+QRect LayoutPartSash::GetBounds()
 {
   if (sash == 0)
   {
@@ -270,17 +270,17 @@ void LayoutPartSash::WidgetSelected(int x, int y, int  /*width*/, int  /*height*
 
   LayoutTree::Pointer root = rootContainer->GetLayoutTree();
   LayoutTreeNode::Pointer node = root->FindSash(LayoutPartSash::Pointer(this));
-  Rectangle nodeBounds = node->GetBounds();
+  QRect nodeBounds = node->GetBounds();
   //Recompute ratio
-  x -= nodeBounds.x;
-  y -= nodeBounds.y;
+  x -= nodeBounds.x();
+  y -= nodeBounds.y();
   if (style == Constants::VERTICAL)
   {
-    this->SetSizes(x, nodeBounds.width - x - this->GetSashSize());
+    this->SetSizes(x, nodeBounds.width() - x - this->GetSashSize());
   }
   else
   {
-    this->SetSizes(y, nodeBounds.height - y - this->GetSashSize());
+    this->SetSizes(y, nodeBounds.height() - y - this->GetSashSize());
   }
 
   node->SetBounds(nodeBounds);

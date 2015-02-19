@@ -38,7 +38,7 @@ class BERRY_UI_QT ControlEvent: public Event
 
 public:
 
-  berryObjectMacro(ControlEvent);
+  berryObjectMacro(ControlEvent)
 
 
 

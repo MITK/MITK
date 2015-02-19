@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryShell.h"
 
+#include <QRect>
+
 namespace berry {
 
 Shell::Shell()
@@ -47,7 +49,7 @@ void Shell::SetExtraShellListener(IShellListener* l)
 
 void Shell::SetBounds(int x, int y, int width, int height)
 {
-  Rectangle rect(x, y, width, height);
+  QRect rect(x, y, width, height);
   this->SetBounds(rect);
 }
 

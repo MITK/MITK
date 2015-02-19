@@ -23,9 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIDragOverListener.h"
 #include "berryAbstractDropTarget.h"
 
-#include "tweaklets/berryDnDTweaklet.h"
-#include "berryRectangle.h"
-
 #include "guitk/berryGuiTkIControlListener.h"
 
 namespace berry
@@ -145,9 +142,9 @@ private:
 
      void Drop();
 
-    DnDTweaklet::CursorType GetCursor();
+    CursorType GetCursor();
 
-    Rectangle GetSnapRectangle();
+    QRect GetSnapRectangle();
 };
 
 
@@ -240,7 +237,7 @@ protected:
       float ratioForNewPart, LayoutPart::Pointer relative);
 
 protected:
-  static int MeasureTree(const Rectangle& outerBounds,
+  static int MeasureTree(const QRect& outerBounds,
       SmartPointer<const LayoutTree> toMeasure, bool horizontal);
 
 protected:
@@ -342,7 +339,7 @@ public:
    * @see LayoutPart#getBounds
    */
 public:
-  Rectangle GetBounds();
+  QRect GetBounds();
 
   /**
    * @see ILayoutContainer#getChildren
@@ -430,7 +427,7 @@ public:
    * @see LayoutPart#setBounds
    */
 public:
-  void SetBounds(const Rectangle& r);
+  void SetBounds(const QRect& r);
 
   /**
    * Zoom in on a particular layout part.
@@ -574,11 +571,11 @@ public:
   //    }
 
   /* (non-Javadoc)
-   * @see org.blueberry.ui.internal.dnd.IDragOverListener#drag(org.blueberry.swt.widgets.Control, java.lang.Object, org.blueberry.swt.graphics.Point, org.blueberry.swt.graphics.Rectangle)
+   * @see org.blueberry.ui.internal.dnd.IDragOverListener#drag(org.blueberry.swt.widgets.Control, java.lang.Object, org.blueberry.swt.graphics.QPoint, org.blueberry.swt.graphics.QRect)
    */
 public:
   IDropTarget::Pointer Drag(void* currentControl, const Object::Pointer& draggedObject,
-                            const Point& position, const Rectangle& dragRectangle);
+                            const QPoint& position, const QRect& dragRectangle);
 
   /**
    * @param sourcePart

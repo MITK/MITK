@@ -389,7 +389,7 @@ void WorkbenchWindow::FillActionBars(ActionBarAdvisor::FillFlags flags)
 //    }
 }
 
-Point WorkbenchWindow::GetInitialSize()
+QPoint WorkbenchWindow::GetInitialSize()
 {
   return this->GetWindowConfigurer()->GetInitialSize();
 }
@@ -838,7 +838,7 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
   }
 
   // Read window's bounds and state.
-  Rectangle displayBounds;
+  QRect displayBounds;
   //  StartupThreading.runWithoutExceptions(new StartupRunnable() {
   //
   //    public void runWithException() {
@@ -846,7 +846,6 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
   //displayBounds = GetShell()->GetDisplay()->GetBounds();
 
   //    }});
-  Rectangle shellBounds;
 
   //  final IMemento fastViewMem = memento
   //      .getChild(IWorkbenchConstants.TAG_FAST_VIEW_DATA);
@@ -861,20 +860,23 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
   //    }
   //  }
 
-  memento->GetInteger(WorkbenchConstants::TAG_X, shellBounds.x);
-  memento->GetInteger(WorkbenchConstants::TAG_Y, shellBounds.y);
-  memento->GetInteger(WorkbenchConstants::TAG_WIDTH, shellBounds.width);
-  memento->GetInteger(WorkbenchConstants::TAG_HEIGHT, shellBounds.height);
-  if (!shellBounds.IsEmpty())
+  int x, y, w, h;
+  memento->GetInteger(WorkbenchConstants::TAG_X, x);
+  memento->GetInteger(WorkbenchConstants::TAG_Y, y);
+  memento->GetInteger(WorkbenchConstants::TAG_WIDTH, w);
+  memento->GetInteger(WorkbenchConstants::TAG_HEIGHT, h);
+  QRect shellBounds(x, y, w, h);
+
+  if (!shellBounds.isEmpty())
   {
     //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
     //
     //      public void runWithException() {
-    if (!shellBounds.Intersects(displayBounds))
+    if (!shellBounds.intersects(displayBounds))
     {
-      Rectangle clientArea(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetAvailableScreenSize());
-      shellBounds.x = clientArea.x;
-      shellBounds.y = clientArea.y;
+      QRect clientArea(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetAvailableScreenSize());
+      shellBounds.setX(clientArea.x());
+      shellBounds.setY(clientArea.y());
     }
     GetShell()->SetBounds(shellBounds);
     //      }});
@@ -1429,7 +1431,7 @@ bool WorkbenchWindow::SaveState(IMemento::Pointer memento)
   {
     memento->PutString(WorkbenchConstants::TAG_MINIMIZED, "true");
   }
-  if (normalBounds.IsEmpty())
+  if (normalBounds.isEmpty())
   {
     normalBounds = GetShell()->GetBounds();
   }
@@ -1440,10 +1442,10 @@ bool WorkbenchWindow::SaveState(IMemento::Pointer memento)
   //    fastViewBar.saveState(fastViewBarMem);
   //  }
 
-  memento->PutInteger(WorkbenchConstants::TAG_X, normalBounds.x);
-  memento->PutInteger(WorkbenchConstants::TAG_Y, normalBounds.y);
-  memento->PutInteger(WorkbenchConstants::TAG_WIDTH, normalBounds.width);
-  memento->PutInteger(WorkbenchConstants::TAG_HEIGHT, normalBounds.height);
+  memento->PutInteger(WorkbenchConstants::TAG_X, normalBounds.x());
+  memento->PutInteger(WorkbenchConstants::TAG_Y, normalBounds.y());
+  memento->PutInteger(WorkbenchConstants::TAG_WIDTH, normalBounds.width());
+  memento->PutInteger(WorkbenchConstants::TAG_HEIGHT, normalBounds.height());
 
   IWorkbenchPage::Pointer activePage = GetActivePage();
   if (activePage

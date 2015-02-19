@@ -68,7 +68,7 @@ private:
   // True iff the "get" methods are returning up-to-date info from the real part (disabled
   // for efficiency if the presentation is invisible)
   bool enableOutputs;
-  Rectangle savedBounds;
+  QRect savedBounds;
   bool isVisible;
 
   // Saved state (only used when the part is inactive)
@@ -138,9 +138,9 @@ public:
   //    }
 
   /* (non-Javadoc)
-   * @see org.blueberry.ui.presentations.IPresentablePart#setBounds(org.blueberry.swt.graphics.Rectangle)
+   * @see org.blueberry.ui.presentations.IPresentablePart#setBounds(org.blueberry.swt.graphics.QRect)
    */
-  void SetBounds(const Rectangle& bounds);
+  void SetBounds(const QRect& bounds);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#setVisible(boolean)

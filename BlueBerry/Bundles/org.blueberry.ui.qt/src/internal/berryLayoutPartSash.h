@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "guitk/berryGuiTkISelectionListener.h"
 #include "presentations/berryIPresentationFactory.h"
 
+#include <QRect>
+
 namespace berry
 {
 
@@ -58,7 +60,7 @@ private:
   int left;
   int right;
 
-  Rectangle bounds;
+  QRect bounds;
 
   IPresentationFactory* presFactory;
 
@@ -99,7 +101,7 @@ private:
   void DoCreateControl();
 
 public:
-  void SetBounds(const Rectangle& r);
+  void SetBounds(const QRect& r);
 
   /**
    * Makes the sash visible or invisible. Note: as an optimization, the actual widget is destroyed when the
@@ -121,7 +123,7 @@ public:
    * Gets the presentation bounds.
    */
 public:
-  Rectangle GetBounds();
+  QRect GetBounds();
 
   /**
    * Returns the part control.

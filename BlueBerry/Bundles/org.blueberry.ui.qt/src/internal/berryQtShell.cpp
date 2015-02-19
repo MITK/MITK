@@ -57,18 +57,14 @@ QtShell::~QtShell()
   widget->deleteLater();
 }
 
-void QtShell::SetBounds(const Rectangle& bounds)
+void QtShell::SetBounds(const QRect& bounds)
 {
-  widget->move(bounds.x, bounds.y);
-  widget->resize(bounds.width, bounds.height);
+  widget->setGeometry(bounds);
 }
 
-Rectangle QtShell::GetBounds() const
+QRect QtShell::GetBounds() const
 {
-  const QRect& qRect = widget->frameGeometry();
-  const QSize& size = widget->size();
-  Rectangle rect(qRect.x(), qRect.y(), size.width(), size.height());
-  return rect;
+  return widget->frameGeometry();
 }
 
 void QtShell::SetLocation(int x, int y)
@@ -76,11 +72,11 @@ void QtShell::SetLocation(int x, int y)
   widget->move(x, y);
 }
 
-Point QtShell::ComputeSize(int  /*wHint*/, int  /*hHint*/, bool changed)
+QPoint QtShell::ComputeSize(int  /*wHint*/, int  /*hHint*/, bool changed)
 {
   if (changed) widget->updateGeometry();
   QSize size(widget->size());
-  Point point(size.width(), size.height());
+  QPoint point(size.width(), size.height());
   return point;
 }
 

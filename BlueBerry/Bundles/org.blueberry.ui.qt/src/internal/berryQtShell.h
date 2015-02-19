@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYQTMAINWINDOWSHELL_H_
 
 #include <berryShell.h>
-#include <berryPoint.h>
 
 #include <QWidget>
 
@@ -37,12 +36,12 @@ public:
   ~QtShell();
 
   // berry::Shell
-  void SetBounds(const Rectangle& bounds);
-  Rectangle GetBounds() const;
+  void SetBounds(const QRect& bounds);
+  QRect GetBounds() const;
 
   void SetLocation(int x, int y);
 
-  Point ComputeSize(int wHint, int hHint, bool changed);
+  QPoint ComputeSize(int wHint, int hHint, bool changed);
 
   QString GetText() const;
   void SetText(const QString& text);

@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIShellProvider.h"
 #include "berryIShellListener.h"
-#include "berryPoint.h"
 
 #include "internal/berryWindowManager.h"
 #include "tweaklets/berryGuiWidgetsTweaklet.h"
@@ -323,7 +322,7 @@ protected:
    *         extend outside the monitor
    *
    */
-  Rectangle GetConstrainedShellBounds(const Rectangle& preferredSize);
+  QRect GetConstrainedShellBounds(const QRect& preferredSize);
 
   /**
    * Initializes this windows variables
@@ -422,7 +421,7 @@ protected:
    *            <code>getInitialSize</code>.
    * @return the initial location of the shell
    */
-  virtual Point GetInitialLocation(const Point& initialSize);
+  virtual QPoint GetInitialLocation(const QPoint& initialSize);
 
   /**
    * Returns the initial size to use for the shell. The default implementation
@@ -431,7 +430,7 @@ protected:
    *
    * @return the initial size of the shell
    */
-  virtual Point GetInitialSize();
+  virtual QPoint GetInitialSize();
 
   /**
    * Returns parent shell, under which this window's shell is created.

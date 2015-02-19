@@ -19,8 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryDragUtil.h"
 
 #include "berryGeometry.h"
-#include "tweaklets/berryDnDTweaklet.h"
-#include "tweaklets/berryITracker.h"
+#include "berryQtTracker.h"
 
 namespace berry
 {
@@ -33,7 +32,7 @@ TestDropLocation::Pointer DragUtil::forcedDropTarget(0);
 QList<IDragOverListener*> DragUtil::defaultTargets = QList<IDragOverListener*>();
 
 DragUtil::TrackerMoveListener::TrackerMoveListener(Object::Pointer draggedItem,
-    const Rectangle& sourceBounds, const Point& initialLocation,
+    const QRect& sourceBounds, const QPoint& initialLocation,
     bool allowSnapping) :
   allowSnapping(allowSnapping), draggedItem(draggedItem), sourceBounds(
       sourceBounds), initialLocation(initialLocation)
@@ -51,7 +50,7 @@ void DragUtil::TrackerMoveListener::ControlMoved(
 {
 
   // Get the curslor location as a point
-  Point location(event->x, event->y);
+  QPoint location(event->x, event->y);
 
   // Select a drop target; use the global one by default
   IDropTarget::Pointer target;
@@ -59,15 +58,15 @@ void DragUtil::TrackerMoveListener::ControlMoved(
   void* targetControl =
       Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorControl();
 
-  // Get the ITracker which fired the event
-  ITracker* tracker = static_cast<ITracker*> (event->item);
+  // Get the QtTracker which fired the event
+  QtTracker* tracker = static_cast<QtTracker*> (event->item);
 
   // Get the drop target for this location
   target = DragUtil::GetDropTarget(targetControl, draggedItem, location,
       tracker->GetRectangle());
 
   // Set up the tracker feedback based on the target
-  Rectangle snapTarget;
+  QRect snapTarget;
   if (target != 0)
   {
     snapTarget = target->GetSnapRectangle();
@@ -76,22 +75,22 @@ void DragUtil::TrackerMoveListener::ControlMoved(
   }
   else
   {
-    tracker->SetCursor(DnDTweaklet::CURSOR_INVALID);
+    tracker->SetCursor(CURSOR_INVALID);
   }
 
   // If snapping then reset the tracker's rectangle based on the current drop target
   if (allowSnapping)
   {
-    if (snapTarget.width == 0 || snapTarget.height == 0)
+    if (snapTarget.width() < 0 || snapTarget.height() < 0)
     {
-      snapTarget = Rectangle(sourceBounds.x + location.x - initialLocation.x,
-          sourceBounds.y + location.y - initialLocation.y, sourceBounds.width,
-          sourceBounds.height);
+      snapTarget = QRect(sourceBounds.x() + location.x() - initialLocation.x(),
+          sourceBounds.y() + location.y() - initialLocation.y(), sourceBounds.width(),
+          sourceBounds.height());
     }
 
     // Try to prevent flicker: don't change the rectangles if they're already in
     // the right location
-    Rectangle currentRectangle = tracker->GetRectangle();
+    QRect currentRectangle = tracker->GetRectangle();
 
     if (!(currentRectangle == snapTarget))
     {
@@ -112,8 +111,8 @@ DragUtil::TargetListType::Pointer DragUtil::GetTargetList(void* control)
 IDropTarget::Pointer DragUtil::GetDropTarget(const QList<IDragOverListener*>& toSearch,
                                              void* mostSpecificControl,
                                              Object::Pointer draggedObject,
-                                             const Point& position,
-                                             const Rectangle& dragRectangle)
+                                             const QPoint& position,
+                                             const QRect& dragRectangle)
 {
 
   for (QList<IDragOverListener*>::const_iterator iter =
@@ -174,7 +173,7 @@ void DragUtil::RemoveDragTarget(void* control, IDragOverListener* target)
   }
 }
 
-Rectangle DragUtil::GetDisplayBounds(void* boundsControl)
+QRect DragUtil::GetDisplayBounds(void* boundsControl)
 {
   void* parent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(
       boundsControl);
@@ -183,13 +182,13 @@ Rectangle DragUtil::GetDisplayBounds(void* boundsControl)
     return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(boundsControl);
   }
 
-  Rectangle rect = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(
+  QRect rect = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(
       boundsControl);
   return Geometry::ToDisplay(parent, rect);
 }
 
 bool DragUtil::PerformDrag(Object::Pointer draggedItem,
-    const Rectangle& sourceBounds, const Point& initialLocation,
+    const QRect& sourceBounds, const QPoint& initialLocation,
     bool allowSnapping)
 {
 
@@ -213,7 +212,7 @@ void DragUtil::ForceDropLocation(TestDropLocation::Pointer forcedLocation)
 }
 
 IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
-    const Rectangle& sourceBounds, const Point& initialLocation,
+    const QRect& sourceBounds, const QPoint& initialLocation,
     bool allowSnapping)
 {
   //final Display display = Display.getCurrent();
@@ -221,7 +220,7 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
   // Testing...immediately 'drop' onto the test target
   if (forcedDropTarget != 0)
   {
-    Point location = forcedDropTarget->GetLocation();
+    QPoint location = forcedDropTarget->GetLocation();
 
     void* currentControl =
         Tweaklets::Get(GuiWidgetsTweaklet::KEY)->FindControl(
@@ -231,13 +230,13 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
 
   // Create a tracker.  This is just an XOR rect on the screen.
   // As it moves we notify the drag listeners.
-  ITracker* tracker = Tweaklets::Get(DnDTweaklet::KEY)->CreateTracker();
+  QtTracker tracker;
   //tracker.setStippled(true);
 
   GuiTk::IControlListener::Pointer trackerListener(new TrackerMoveListener(
       draggedItem, sourceBounds, initialLocation, allowSnapping));
 
-  tracker->AddControlListener(trackerListener);
+  tracker.AddControlListener(trackerListener);
 
   // Setup...when the drag starts we might already be over a valid target, check this...
   // If there is a 'global' target then skip the check
@@ -252,22 +251,22 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
   }
 
   // Set up an initial tracker rectangle
-  Rectangle startRect = sourceBounds;
+  QRect startRect = sourceBounds;
   if (target != 0)
   {
-    Rectangle rect = target->GetSnapRectangle();
+    QRect rect = target->GetSnapRectangle();
 
-    if (rect.width != 0 && rect.height != 0)
+    if (rect.width() != 0 && rect.height() != 0)
     {
       startRect = rect;
     }
 
-    tracker->SetCursor(target->GetCursor());
+    tracker.SetCursor(target->GetCursor());
   }
 
-  if (startRect.width != 0 && startRect.height != 0)
+  if (startRect.width() != 0 && startRect.height() != 0)
   {
-    tracker->SetRectangle(startRect);
+    tracker.SetRectangle(startRect);
   }
 
   // Tracking Loop...tracking is preformed on the 'SWT.Move' listener registered
@@ -283,7 +282,7 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
   //  }
 
   // Run tracker until mouse up occurs or escape key pressed.
-  bool trackingOk = tracker->Open();
+  bool trackingOk = tracker.Open();
 
   //  // HACK:
   //  // Release the mouse now
@@ -296,15 +295,15 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
 
   // Get the current drop target
   IDropTarget::Pointer dropTarget;
-  Point finalLocation =
+  QPoint finalLocation =
       Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorLocation();
   void* targetControl =
       Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorControl();
   dropTarget = GetDropTarget(targetControl, draggedItem, finalLocation,
-      tracker->GetRectangle());
+      tracker.GetRectangle());
 
   // Cleanup...
-  delete tracker;
+  //delete tracker;
 
   // if we're going to perform a 'drop' then delay the issuing of the 'finished'
   // callback until after it's done...
@@ -322,8 +321,8 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
 }
 
 IDropTarget::Pointer DragUtil::GetDropTarget(void* toSearch,
-    Object::Pointer draggedObject, const Point& position,
-    const Rectangle& dragRectangle)
+    Object::Pointer draggedObject, const QPoint& position,
+    const QRect& dragRectangle)
 {
   // Search for a listener by walking the control's parent hierarchy
   for (void* current = toSearch; current != 0; current = Tweaklets::Get(
@@ -353,10 +352,10 @@ IDropTarget::Pointer DragUtil::GetDropTarget(void* toSearch,
       dragRectangle);
 }
 
-//Point DragUtil::GetEventLoc(GuiTk::ControlEvent::Pointer event)
+//QPoint DragUtil::GetEventLoc(GuiTk::ControlEvent::Pointer event)
 //{
 //  Control ctrl = (Control) event.widget;
-//  return ctrl.toDisplay(new Point(event.x, event.y));
+//  return ctrl.toDisplay(new QPoint(event.x, event.y));
 //}
 
 }

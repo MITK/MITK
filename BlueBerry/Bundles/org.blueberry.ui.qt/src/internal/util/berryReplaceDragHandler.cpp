@@ -35,14 +35,13 @@ ReplaceDragHandler::ReplaceDragHandler(AbstractTabFolder* folder) :
 }
 
 StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget*,
-    const Point& location, int dragStart)
+    const QPoint& location, int dragStart)
 {
 
   // Determine which tab we're currently dragging over
   //Point localPos = tabFolder.getControl().toControl(location);
 
-  QPoint point(location.x, location.y);
-  AbstractTabItem* tabUnderPointer = tabFolder->GetItem(point);
+  AbstractTabItem* tabUnderPointer = tabFolder->GetItem(location);
 
   // This drop target only deals with tabs... if we're not dragging over
   // a tab, exit.
@@ -52,7 +51,7 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget*,
 
     // If we're dragging over the title area, treat this as a drop in the last
     // tab position.
-    if (titleArea.contains(point) && tabFolder->GetItemCount() > 0)
+    if (titleArea.contains(location) && tabFolder->GetItemCount() > 0)
     {
       int dragOverIndex = static_cast<int>(tabFolder->GetItemCount());
       AbstractTabItem* lastTab = tabFolder->GetItem(dragOverIndex - 1);
@@ -64,9 +63,8 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget*,
       }
 
       // If we are unable to compute the bounds for this tab, then ignore the drop
-      QRect qlastTabBounds = lastTab->GetBounds();
-      Rectangle lastTabBounds(qlastTabBounds.x(), qlastTabBounds.y(), qlastTabBounds.width(), qlastTabBounds.height());
-      if (qlastTabBounds.isEmpty())
+      QRect lastTabBounds = lastTab->GetBounds();
+      if (lastTabBounds.isEmpty())
       {
         return StackDropResult::Pointer(0);
       }
@@ -82,10 +80,10 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget*,
       // Make the drag-over rectangle look like a tab at the end of the tab region.
       // We don't actually know how wide the tab will be when it's dropped, so just
       // make it 3 times wider than it is tall.
-      Rectangle dropRectangle(titleArea.x(), titleArea.y(), titleArea.width(), titleArea.height());
+      QRect dropRectangle = titleArea;
 
-      dropRectangle.x = lastTabBounds.x + lastTabBounds.width;
-      dropRectangle.width = 3 * dropRectangle.height;
+      dropRectangle.setX(lastTabBounds.x() + lastTabBounds.width());
+      dropRectangle.setWidth(3 * dropRectangle.height());
       Object::Pointer cookie(new DragCookie(dragOverIndex));
       StackDropResult::Pointer result(new StackDropResult(dropRectangle, cookie));
       return result;
@@ -94,7 +92,7 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget*,
     {
       // If the closest side is the side with the tabs, consider this a stack operation.
       // Otherwise, let the drop fall through to whatever the default behavior is
-      Rectangle displayBounds = DragUtil::GetDisplayBounds(
+      QRect displayBounds = DragUtil::GetDisplayBounds(
           tabFolder->GetControl());
       int closestSide = Geometry::GetClosestSide(displayBounds, location);
       if (closestSide == tabFolder->GetTabPosition())
@@ -113,7 +111,7 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget*,
   }
 
   QRect qtabBounds = tabUnderPointer->GetBounds();
-  Rectangle tabBounds(qtabBounds.x(), qtabBounds.y(), qtabBounds.width(), qtabBounds.height());
+  QRect tabBounds(qtabBounds.x(), qtabBounds.y(), qtabBounds.width(), qtabBounds.height());
 
   if (qtabBounds.isEmpty())
   {

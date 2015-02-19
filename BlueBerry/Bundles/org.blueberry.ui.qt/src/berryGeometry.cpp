@@ -19,18 +19,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryGeometry.h"
 #include "berryConstants.h"
 
+#include <QPoint>
+#include <QRect>
+
 #include <limits>
 
 namespace berry
 {
 
-int Geometry::GetDimension(const Rectangle& toMeasure, bool width)
+int Geometry::GetDimension(const QRect& toMeasure, bool width)
 {
   if (width)
   {
-    return toMeasure.width;
+    return toMeasure.width();
   }
-  return toMeasure.height;
+  return toMeasure.height();
 }
 
 bool Geometry::IsHorizontal(int berrySideConstant)
@@ -39,27 +42,27 @@ bool Geometry::IsHorizontal(int berrySideConstant)
       == Constants::RIGHT);
 }
 
-Rectangle Geometry::GetExtrudedEdge(const Rectangle& toExtrude, int size,
+QRect Geometry::GetExtrudedEdge(const QRect& toExtrude, int size,
     int orientation)
 {
-  Rectangle bounds(toExtrude);
+  QRect bounds(toExtrude);
 
   if (!IsHorizontal(orientation))
   {
-    bounds.width = size;
+    bounds.setWidth(size);
   }
   else
   {
-    bounds.height = size;
+    bounds.setHeight(size);
   }
 
   if (orientation == Constants::RIGHT)
   {
-    bounds.x = toExtrude.x + toExtrude.width - bounds.width;
+    bounds.moveLeft(toExtrude.x() + toExtrude.width() - bounds.width());
   }
   else if (orientation == Constants::BOTTOM)
   {
-    bounds.y = toExtrude.y + toExtrude.height - bounds.height;
+    bounds.moveTop(toExtrude.y() + toExtrude.height() - bounds.height());
 
   }
 
@@ -68,22 +71,22 @@ Rectangle Geometry::GetExtrudedEdge(const Rectangle& toExtrude, int size,
   return bounds;
 }
 
-void Geometry::Normalize(Rectangle& rect)
+void Geometry::Normalize(QRect& rect)
 {
-  if (rect.width < 0)
+  if (rect.width() < 0)
   {
-    rect.width = -rect.width;
-    rect.x -= rect.width;
+    rect.setWidth(-rect.width());
+    rect.setX(-rect.width());
   }
 
-  if (rect.height < 0)
+  if (rect.height() < 0)
   {
-    rect.height = -rect.height;
-    rect.y -= rect.height;
+    rect.setHeight(-rect.height());
+    rect.setY(-rect.height());
   }
 }
 
-int Geometry::GetClosestSide(const Rectangle& boundary, const Point& toTest)
+int Geometry::GetClosestSide(const QRect& boundary, const QPoint& toTest)
 {
   int sides[] =
   { Constants::LEFT, Constants::RIGHT, Constants::TOP, Constants::BOTTOM };
@@ -107,17 +110,17 @@ int Geometry::GetClosestSide(const Rectangle& boundary, const Point& toTest)
   return closestSide;
 }
 
-int Geometry::GetDistanceFromEdge(const Rectangle& rectangle,
-    const Point& testPoint, int edgeOfInterest)
+int Geometry::GetDistanceFromEdge(const QRect& rectangle,
+    const QPoint& testPoint, int edgeOfInterest)
 {
   if (edgeOfInterest == Constants::TOP)
-    return testPoint.y - rectangle.y;
+    return testPoint.y() - rectangle.y();
   else if (edgeOfInterest == Constants::BOTTOM)
-    return rectangle.y + rectangle.height - testPoint.y;
+    return rectangle.y() + rectangle.height() - testPoint.y();
   else if (edgeOfInterest == Constants::LEFT)
-    return testPoint.x - rectangle.x;
+    return testPoint.x() - rectangle.x();
   else if (edgeOfInterest == Constants::RIGHT)
-    return rectangle.x + rectangle.width - testPoint.x;
+    return rectangle.x() + rectangle.width() - testPoint.x();
 
   return 0;
 }
@@ -136,27 +139,27 @@ int Geometry::GetOppositeSide(int directionConstant)
   return directionConstant;
 }
 
-Rectangle Geometry::ToControl(void* coordinateSystem,
-    const Rectangle& toConvert)
+QRect Geometry::ToControl(void* coordinateSystem,
+    const QRect& toConvert)
 {
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->ToControl(coordinateSystem,
       toConvert);
 }
 
-Point Geometry::ToControl(void* coordinateSystem, const Point& toConvert)
+QPoint Geometry::ToControl(void* coordinateSystem, const QPoint& toConvert)
 {
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->ToControl(coordinateSystem,
       toConvert);
 }
 
-Rectangle Geometry::ToDisplay(void* coordinateSystem,
-    const Rectangle& toConvert)
+QRect Geometry::ToDisplay(void* coordinateSystem,
+    const QRect& toConvert)
 {
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->ToDisplay(coordinateSystem,
       toConvert);
 }
 
-Point Geometry::ToDisplay(void* coordinateSystem, const Point& toConvert)
+QPoint Geometry::ToDisplay(void* coordinateSystem, const QPoint& toConvert)
 {
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->ToDisplay(coordinateSystem,
       toConvert);

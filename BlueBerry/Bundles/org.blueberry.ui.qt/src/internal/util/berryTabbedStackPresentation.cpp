@@ -96,7 +96,7 @@ void TabbedStackPresentation::HandleTabFolderEvent(TabFolderEvent::Pointer e)
   else if (type == TabFolderEvent::EVENT_DRAG_START)
   {
     AbstractTabItem* beingDragged = e->tab;
-    Point initialLocation(e->x, e->y);
+    QPoint initialLocation(e->x, e->y);
 
     if (beingDragged == 0)
     {
@@ -235,16 +235,14 @@ void TabbedStackPresentation::SaveState(IPresentationSerializer* context,
   tabs->SaveState(context, memento);
 }
 
-void TabbedStackPresentation::SetBounds(const Rectangle& bounds)
+void TabbedStackPresentation::SetBounds(const QRect& bounds)
 {
-  QRect rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
-  folder->SetBounds(rectangle);
+  folder->SetBounds(bounds);
 }
 
-Point TabbedStackPresentation::ComputeMinimumSize()
+QSize TabbedStackPresentation::ComputeMinimumSize()
 {
-  QSize point = folder->GetTabFolder()->ComputeSize(Constants::DEFAULT, Constants::DEFAULT);
-  return Point(point.width(), point.height());
+  return folder->GetTabFolder()->ComputeSize(Constants::DEFAULT, Constants::DEFAULT);
 }
 
 int TabbedStackPresentation::ComputePreferredSize(bool width,
@@ -451,7 +449,7 @@ void TabbedStackPresentation::SelectPart(IPresentablePart::Pointer toSelect)
   tabs->Select(toSelect);
 }
 
-StackDropResult::Pointer TabbedStackPresentation::DragOver(void* currentControl, const Point& location)
+StackDropResult::Pointer TabbedStackPresentation::DragOver(void* currentControl, const QPoint& location)
 {
   QWidget* currentWidget = static_cast<QWidget*>(currentControl);
   return dragBehavior->DragOver(currentWidget, location, dragStart);

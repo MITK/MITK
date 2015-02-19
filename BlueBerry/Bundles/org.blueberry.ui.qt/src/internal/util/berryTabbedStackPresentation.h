@@ -100,14 +100,14 @@ public:
     void SaveState(IPresentationSerializer* context, IMemento::Pointer memento);
 
     /* (non-Javadoc)
-     * @see org.blueberry.ui.presentations.StackPresentation#setBounds(org.blueberry.swt.graphics.Rectangle)
+     * @see org.blueberry.ui.presentations.StackPresentation#setBounds(org.blueberry.swt.graphics.QRect)
      */
-    void SetBounds(const Rectangle& bounds);
+    void SetBounds(const QRect& bounds);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#computeMinimumSize()
      */
-    Point ComputeMinimumSize();
+    QSize ComputeMinimumSize();
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.ISizeProvider#computePreferredSize(boolean, int, int, int)
@@ -179,7 +179,7 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#DragOver(void*, const Point&)
      */
-    StackDropResult::Pointer DragOver(void* currentControl, const Point& location);
+    StackDropResult::Pointer DragOver(void* currentControl, const QPoint& location);
 
 //    void showSystemMenu() {
 //        showSystemMenu(folder.getTabFolder().getSystemMenuLocation(), getSite().getSelectedPart());

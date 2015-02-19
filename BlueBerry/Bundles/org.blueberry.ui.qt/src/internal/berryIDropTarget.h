@@ -19,9 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYIDROPTARGET_H_
 
 #include <berryMacros.h>
+#include <berryConstants.h>
+#include <berryObject.h>
 
-#include "berryRectangle.h"
-#include "tweaklets/berryDnDTweaklet.h"
+#include <org_blueberry_ui_qt_Export.h>
 
 namespace berry {
 
@@ -33,9 +34,10 @@ namespace berry {
  *
  * @see IDragOverListener
  */
-struct BERRY_UI_QT IDropTarget : public Object {
+struct BERRY_UI_QT IDropTarget : public Object
+{
 
-  berryObjectMacro(IDropTarget);
+  berryObjectMacro(IDropTarget)
 
   ~IDropTarget();
 
@@ -49,7 +51,7 @@ struct BERRY_UI_QT IDropTarget : public Object {
    *
    * @return a cursor id describing this drop operation
    */
-  virtual DnDTweaklet::CursorType GetCursor() = 0;
+  virtual CursorType GetCursor() = 0;
 
   /**
    * Returns a rectangle (screen coordinates) describing the target location
@@ -58,7 +60,7 @@ struct BERRY_UI_QT IDropTarget : public Object {
    * @return a snap rectangle or null if this drop target does not have a specific snap
    * location.
    */
-  virtual Rectangle GetSnapRectangle() = 0;
+  virtual QRect GetSnapRectangle() = 0;
 
   /**
    * This is called whenever a drag operation is cancelled

@@ -104,25 +104,25 @@ void DetachedWindow::Create()
 
   DragUtil::AddDragTarget(windowShell->GetControl(), this);
   hideViewsOnClose = true;
-  if (bounds.IsEmpty())
+  if (bounds.isEmpty())
   {
-    Rectangle windowRect = page->GetWorkbenchWindow()->GetShell()->GetBounds();
-    Point center(windowRect.x + windowRect.width / 2, windowRect.y
-        - windowRect.height / 2);
-    bounds = Rectangle(center.x - 150, center.y + 100, 300, 200);
+    QRect windowRect = page->GetWorkbenchWindow()->GetShell()->GetBounds();
+    QPoint center(windowRect.x() + windowRect.width() / 2, windowRect.y()
+        - windowRect.height() / 2);
+    bounds = QRect(center.x() - 150, center.y() + 100, 300, 200);
   }
 
   // Force the rect into the current display
-  Rectangle dispBounds =
+  QRect dispBounds =
       Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetAvailableScreenSize();
-  if (bounds.width > dispBounds.width)
-    bounds.width = dispBounds.width;
-  if (bounds.height > dispBounds.height)
-    bounds.height = dispBounds.height;
-  if (bounds.x + bounds.width > dispBounds.width)
-    bounds.x = dispBounds.width - bounds.width;
-  if (bounds.y + bounds.height > dispBounds.height)
-    bounds.y = dispBounds.height - bounds.height;
+  if (bounds.width() > dispBounds.width())
+    bounds.setWidth(dispBounds.width());
+  if (bounds.height() > dispBounds.height())
+    bounds.setHeight(dispBounds.height());
+  if (bounds.x() + bounds.width() > dispBounds.width())
+    bounds.setX(dispBounds.width() - bounds.width());
+  if (bounds.y() + bounds.height() > dispBounds.height())
+    bounds.setY(dispBounds.height() - bounds.height());
 
   this->GetShell()->SetBounds(bounds);
 
@@ -163,7 +163,7 @@ bool DetachedWindow::Close()
 }
 
 IDropTarget::Pointer DetachedWindow::Drag(void* /*currentControl*/,
-    const Object::Pointer& draggedObject, const Point& position, const Rectangle& /*dragRectangle*/)
+    const Object::Pointer& draggedObject, const QPoint& position, const QRect& /*dragRectangle*/)
 {
 
   if (draggedObject.Cast<PartPane> () == 0)
@@ -186,9 +186,9 @@ IDropTarget::Pointer DetachedWindow::Drag(void* /*currentControl*/,
 
     if (target == 0)
     {
-      Rectangle displayBounds =
+      QRect displayBounds =
           DragUtil::GetDisplayBounds(folder->GetControl());
-      if (displayBounds.Contains(position))
+      if (displayBounds.contains(position))
       {
         StackDropResult::Pointer stackDropResult(new StackDropResult(
             displayBounds, Object::Pointer(0)));
@@ -229,7 +229,7 @@ void DetachedWindow::RestoreState(IMemento::Pointer memento)
   // memento->GetInteger(WorkbenchConstants::TAG_FLOAT);
 
   // Set the bounds.
-  bounds = Rectangle(x, y, width, height);
+  bounds = QRect(x, y, width, height);
   if (GetShell())
   {
     GetShell()->SetBounds(bounds);
@@ -252,10 +252,10 @@ void DetachedWindow::SaveState(IMemento::Pointer memento)
   }
 
   // Save the bounds.
-  memento->PutInteger(WorkbenchConstants::TAG_X, bounds.x);
-  memento->PutInteger(WorkbenchConstants::TAG_Y, bounds.y);
-  memento->PutInteger(WorkbenchConstants::TAG_WIDTH, bounds.width);
-  memento->PutInteger(WorkbenchConstants::TAG_HEIGHT, bounds.height);
+  memento->PutInteger(WorkbenchConstants::TAG_X, bounds.x());
+  memento->PutInteger(WorkbenchConstants::TAG_Y, bounds.y());
+  memento->PutInteger(WorkbenchConstants::TAG_WIDTH, bounds.width());
+  memento->PutInteger(WorkbenchConstants::TAG_HEIGHT, bounds.height());
 
   // Save the views.
   IMemento::Pointer childMem = memento->CreateChild(
@@ -276,7 +276,7 @@ int DetachedWindow::Open()
     this->Create();
   }
 
-  Rectangle bounds = this->GetShell()->GetBounds();
+  QRect bounds = this->GetShell()->GetBounds();
 
   if (!(bounds == this->GetShell()->GetBounds()))
   {

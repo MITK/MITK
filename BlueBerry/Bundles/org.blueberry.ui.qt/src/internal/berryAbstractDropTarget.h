@@ -28,9 +28,9 @@ struct AbstractDropTarget : public IDropTarget
     /*
      * @see IDropTarget#GetSnapRectangle()
      */
-    Rectangle GetSnapRectangle()
+    QRect GetSnapRectangle()
     {
-        return Rectangle();
+        return QRect();
     }
 
     void DragFinished(bool  /*dropPerformed*/)

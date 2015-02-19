@@ -252,12 +252,12 @@ void WorkbenchWindowConfigurer::SetWindowFlags(Qt::WindowFlags shellStyle)
   this->shellStyle = shellStyle;
 }
 
-Point WorkbenchWindowConfigurer::GetInitialSize() const
+QPoint WorkbenchWindowConfigurer::GetInitialSize() const
 {
   return initialSize;
 }
 
-void WorkbenchWindowConfigurer::SetInitialSize(Point size)
+void WorkbenchWindowConfigurer::SetInitialSize(QPoint size)
 {
   initialSize = size;
 }

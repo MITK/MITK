@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIDropTarget.h"
 
 #include "berryISizeProvider.h"
-#include "berryRectangle.h"
-#include "berryPoint.h"
 #include "berryShell.h"
 
 namespace berry {
@@ -96,7 +94,7 @@ protected: ILayoutContainer* container;
     /**
      * Gets the presentation bounds.
      */
-    public: Rectangle GetBounds();
+    public: QRect GetBounds();
 
 
     /**
@@ -133,7 +131,7 @@ protected: ILayoutContainer* container;
     /**
      * Gets the presentation size.
      */
-    public: virtual Point GetSize();
+    public: virtual QSize GetSize();
 
     /**
      * @see org.blueberry.ui.presentations.StackPresentation#getSizeFlags(boolean)
@@ -149,7 +147,7 @@ protected: ILayoutContainer* container;
      */
     public: virtual int ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredParallel);
 
-    public: virtual IDropTarget::Pointer GetDropTarget(Object::Pointer draggedObject, const Point& displayCoordinates);
+    public: virtual IDropTarget::Pointer GetDropTarget(Object::Pointer draggedObject, const QPoint& displayCoordinates);
 
     public: bool IsDocked();
 
@@ -199,7 +197,7 @@ protected: ILayoutContainer* container;
     /**
      * Sets the presentation bounds.
      */
-    public: virtual void SetBounds(const Rectangle& r);
+    public: virtual void SetBounds(const QRect& r);
 
     /**
      * Sets the parent for this part.

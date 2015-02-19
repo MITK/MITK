@@ -18,10 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYLAYOUTTREE_H_
 
 #include "berryISizeProvider.h"
-#include "berryRectangle.h"
-#include "berryPoint.h"
-
 #include "berryPartSashContainer.h"
+
+#include <QRect>
 
 namespace berry
 {
@@ -63,7 +62,7 @@ private:
   int cachedMaximumHeight;
 
   bool forceLayout;
-  Rectangle currentBounds;
+  QRect currentBounds;
 
   // Cached size flags
   bool sizeFlagsDirty;
@@ -96,7 +95,7 @@ public:
    * @param toFind
    * @return
    */
-  virtual LayoutPart::Pointer FindPart(const Point& toFind);
+  virtual LayoutPart::Pointer FindPart(const QPoint& toFind);
 
   /**
    * Dispose all Sashs in this tree
@@ -131,7 +130,7 @@ public:
    * Return the bounds of this tree which is the rectangle that
    * contains all Controls in this tree.
    */
-  Rectangle GetBounds();
+  QRect GetBounds();
 
   /**
    * Subtracts two integers. If a is INF, this is treated as
@@ -301,14 +300,14 @@ public:
    *
    * @param bounds new bounds of the tree
    */
-  void SetBounds(const Rectangle& bounds);
+  void SetBounds(const QRect& bounds);
 
 protected:
 
   /**
    * Resize the parts on this tree to fit in <code>bounds</code>.
    */
-  virtual void DoSetBounds(const Rectangle& bounds);
+  virtual void DoSetBounds(const QRect& bounds);
 
 public:
 

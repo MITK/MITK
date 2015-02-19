@@ -23,6 +23,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
+enum CursorType
+{
+  CURSOR_INVALID,
+  CURSOR_LEFT,
+  CURSOR_RIGHT,
+  CURSOR_TOP,
+  CURSOR_BOTTOM,
+  CURSOR_CENTER,
+  CURSOR_OFFSCREEN,
+  CURSOR_FASTVIEW
+};
+
 struct BERRY_UI_QT Constants
 {
 

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <internal/berryQtWidgetController.h>
 
-#include <berryRectangle.h>
 #include <berryShell.h>
 #include <berryGuiTkISelectionListener.h>
 
@@ -68,14 +67,14 @@ class QtWidgetsTweakletImpl
   bool GetEnabled(QWidget* widget);
   void SetEnabled(QWidget* widget, bool enabled);
 
-  void SetBounds(QWidget* widget, const Rectangle& bounds);
-  Rectangle GetBounds(QWidget* widget);
+  void SetBounds(QWidget* widget, const QRect& bounds);
+  QRect GetBounds(QWidget* widget);
 
   void SetVisible(QWidget* widget, bool visible);
   bool GetVisible(QWidget* widget);
   bool IsVisible(QWidget* widget);
 
-  Rectangle GetClientArea(QWidget* widget);
+  QRect GetClientArea(QWidget* widget);
 
   void* GetParent(QWidget* widget);
   bool SetParent(QWidget* widget, QWidget* parent);
@@ -83,15 +82,15 @@ class QtWidgetsTweakletImpl
   void SetData(QWidget* widget, const QString& id, Object::Pointer data);
   Object::Pointer GetData(QWidget* widget, const QString& id);
 
-  Rectangle GetScreenSize(int i = -1);
+  QRect GetScreenSize(int i = -1);
   unsigned int GetScreenNumber();
   int GetPrimaryScreenNumber();
-  Rectangle GetAvailableScreenSize(int i = -1);
-  int GetClosestScreenNumber(const Rectangle&);
+  QRect GetAvailableScreenSize(int i = -1);
+  int GetClosestScreenNumber(const QRect&);
 
-  Point GetCursorLocation();
+  QPoint GetCursorLocation();
   QWidget* GetCursorControl();
-  QWidget* FindControl(const QList<Shell::Pointer>& shells, const Point& location);
+  QWidget* FindControl(const QList<Shell::Pointer>& shells, const QPoint& location);
 
   /**
    * Determines if one control is a child of another. Returns true iff the second
@@ -129,17 +128,17 @@ class QtWidgetsTweakletImpl
   Shell::Pointer GetShell(QWidget* widget);
   Shell::Pointer GetActiveShell();
 
-  Rectangle ToControl(QWidget* coordinateSystem,
-          const Rectangle& toConvert);
+  QRect ToControl(QWidget* coordinateSystem,
+          const QRect& toConvert);
 
-  Point ToControl(QWidget* coordinateSystem,
-          const Point& toConvert);
+  QPoint ToControl(QWidget* coordinateSystem,
+          const QPoint& toConvert);
 
-  Rectangle ToDisplay(QWidget* coordinateSystem,
-          const Rectangle& toConvert);
+  QRect ToDisplay(QWidget* coordinateSystem,
+          const QRect& toConvert);
 
-  Point ToDisplay(QWidget* coordinateSystem,
-          const Point& toConvert);
+  QPoint ToDisplay(QWidget* coordinateSystem,
+          const QPoint& toConvert);
 
 private:
 

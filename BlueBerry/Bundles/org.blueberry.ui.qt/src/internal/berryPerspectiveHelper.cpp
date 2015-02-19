@@ -39,8 +39,8 @@ PerspectiveHelper::DragOverListener::DragOverListener(PerspectiveHelper* perspHe
 }
 
 IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
-    void* /*currentControl*/, const Object::Pointer& draggedObject, const Point& /*position*/,
-    const Rectangle& dragRectangle)
+    void* /*currentControl*/, const Object::Pointer& draggedObject, const QPoint& /*position*/,
+    const QRect& dragRectangle)
 {
 
   if (draggedObject.Cast<PartPane>() != 0)
@@ -80,7 +80,7 @@ IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
 }
 
 void PerspectiveHelper::ActualDropTarget::SetTarget(PartPane::Pointer part,
-    const Rectangle& dragRectangle)
+    const QRect& dragRectangle)
 {
   this->stack = 0;
   this->part = part;
@@ -88,7 +88,7 @@ void PerspectiveHelper::ActualDropTarget::SetTarget(PartPane::Pointer part,
 }
 
 void PerspectiveHelper::ActualDropTarget::SetTarget(PartStack::Pointer stack,
-    const Rectangle& dragRectangle)
+    const QRect& dragRectangle)
 {
   this->stack = stack;
   this->part = 0;
@@ -96,14 +96,14 @@ void PerspectiveHelper::ActualDropTarget::SetTarget(PartStack::Pointer stack,
 }
 
 PerspectiveHelper::ActualDropTarget::ActualDropTarget(PerspectiveHelper* perspHelper, PartPane::Pointer part,
-    const Rectangle& dragRectangle)
+    const QRect& dragRectangle)
 : AbstractDropTarget(), perspHelper(perspHelper)
 {
   this->SetTarget(part, dragRectangle);
 }
 
 PerspectiveHelper::ActualDropTarget::ActualDropTarget(PerspectiveHelper* perspHelper, PartStack::Pointer stack,
-    const Rectangle& dragRectangle)
+    const QRect& dragRectangle)
 : AbstractDropTarget(), perspHelper(perspHelper)
 {
   this->SetTarget(stack, dragRectangle);
@@ -123,7 +123,7 @@ void PerspectiveHelper::ActualDropTarget::Drop()
     {
       if (container.Cast<PartStack>()->GetItemCount() == 1)
       {
-        shell->SetLocation(dragRectangle.x, dragRectangle.y);
+        shell->SetLocation(dragRectangle.x(), dragRectangle.y());
         return;
       }
     }
@@ -135,7 +135,7 @@ void PerspectiveHelper::ActualDropTarget::Drop()
 //    zoomOut();
 //  }
   // do a normal part detach
-  perspHelper->DetachPart(part, dragRectangle.x, dragRectangle.y);
+  perspHelper->DetachPart(part, dragRectangle.x(), dragRectangle.y());
   }
   else if (stack != 0)
   {
@@ -144,7 +144,7 @@ void PerspectiveHelper::ActualDropTarget::Drop()
   {
     // only one tab folder in a detach window, so do window
     // move
-     shell->SetLocation(dragRectangle.x, dragRectangle.y);
+     shell->SetLocation(dragRectangle.x(), dragRectangle.y());
       return;
   }
 
@@ -154,13 +154,13 @@ void PerspectiveHelper::ActualDropTarget::Drop()
 //    zoomOut();
 //  }
   // do a normal part detach
-  perspHelper->Detach(stack, dragRectangle.x, dragRectangle.y);
+  perspHelper->Detach(stack, dragRectangle.x(), dragRectangle.y());
   }
 }
 
-DnDTweaklet::CursorType PerspectiveHelper::ActualDropTarget::GetCursor()
+CursorType PerspectiveHelper::ActualDropTarget::GetCursor()
 {
-  return DnDTweaklet::CURSOR_OFFSCREEN;
+  return CURSOR_OFFSCREEN;
 }
 
 PerspectiveHelper::MatchingPart::MatchingPart(const QString& pid,
@@ -886,8 +886,8 @@ void PerspectiveHelper::Detach(LayoutPart::Pointer part, int x, int y)
   }
 
   // Calculate detached window size.
-  Point size = part->GetSize();
-  if (size.x == 0 || size.y == 0)
+  QSize size = part->GetSize();
+  if (size.width() == 0 || size.height() == 0)
   {
     ILayoutContainer::Pointer container = part->GetContainer();
     if (container.Cast<LayoutPart> () != 0)
@@ -895,8 +895,8 @@ void PerspectiveHelper::Detach(LayoutPart::Pointer part, int x, int y)
       size = container.Cast<LayoutPart>()->GetSize();
     }
   }
-  int width = std::max<int>(size.x, MIN_DETACH_WIDTH);
-  int height = std::max<int>(size.y, MIN_DETACH_HEIGHT);
+  int width = std::max<int>(size.width(), MIN_DETACH_WIDTH);
+  int height = std::max<int>(size.height(), MIN_DETACH_HEIGHT);
 
   // Create detached window.
   DetachedWindow::Pointer window(new DetachedWindow(page));
@@ -948,8 +948,8 @@ void PerspectiveHelper::DetachPart(LayoutPart::Pointer part, int x, int y)
   }
 
   // Calculate detached window size.
-  Point size = part->GetSize();
-  if (size.x == 0 || size.y == 0)
+  QSize size = part->GetSize();
+  if (size.width() == 0 || size.height() == 0)
   {
     ILayoutContainer::Pointer container = part->GetContainer();
     if (container.Cast<LayoutPart> () != 0)
@@ -957,8 +957,8 @@ void PerspectiveHelper::DetachPart(LayoutPart::Pointer part, int x, int y)
       size = container.Cast<LayoutPart>()->GetSize();
     }
   }
-  int width = std::max<int>(size.x, MIN_DETACH_WIDTH);
-  int height = std::max<int>(size.y, MIN_DETACH_HEIGHT);
+  int width = std::max<int>(size.width(), MIN_DETACH_WIDTH);
+  int height = std::max<int>(size.height(), MIN_DETACH_HEIGHT);
 
   // Create detached window.
   DetachedWindow::Pointer window(new DetachedWindow(page));
@@ -985,23 +985,23 @@ void PerspectiveHelper::DetachPart(IViewReference::Pointer ref)
     //    if (getMaximizedStack() != 0)
     //      getMaximizedStack().setState(IStackPresentationSite.STATE_RESTORED);
 
-    Rectangle bounds = pane->GetParentBounds();
-    this->DetachPart(pane, bounds.x, bounds.y);
+    QRect bounds = pane->GetParentBounds();
+    this->DetachPart(pane, bounds.x(), bounds.y());
   }
 }
 
 void PerspectiveHelper::AddDetachedPart(LayoutPart::Pointer part)
 {
   // Calculate detached window size.
-  Rectangle bounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(parentWidget)->GetBounds();
-  bounds.x = bounds.x + (bounds.width - 300) / 2;
-  bounds.y = bounds.y + (bounds.height - 300) / 2;
+  QRect bounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(parentWidget)->GetBounds();
+  bounds.setX(bounds.x() + (bounds.width() - 300) / 2);
+  bounds.setY(bounds.y() + (bounds.height() - 300) / 2);
 
   this->AddDetachedPart(part, bounds);
 }
 
 void PerspectiveHelper::AddDetachedPart(LayoutPart::Pointer part,
-    const Rectangle& bounds)
+    const QRect& bounds)
 {
   // Detaching is disabled on some platforms ..
   if (!detachable)
@@ -1020,7 +1020,7 @@ void PerspectiveHelper::AddDetachedPart(LayoutPart::Pointer part,
   window->Add(part);
 
   // Open window.
-  window->GetShell()->SetBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+  window->GetShell()->SetBounds(bounds.x(), bounds.y(), bounds.width(), bounds.height());
   window->Open();
 
   part->SetFocus();
@@ -1403,7 +1403,7 @@ bool PerspectiveHelper::RestoreState(IMemento::Pointer memento)
         iter != childrenMem.end(); ++iter)
     {
       DetachedPlaceHolder::Pointer holder(
-          new DetachedPlaceHolder("", Rectangle(0, 0, 0, 0)));
+          new DetachedPlaceHolder("", QRect(0, 0, 0, 0)));
       holder->RestoreState(*iter);
       detachedPlaceHolderList.push_back(holder);
     }
@@ -1484,7 +1484,7 @@ void PerspectiveHelper::ResetBoundsMap()
   boundsMap.clear();
 }
 
-Rectangle PerspectiveHelper::GetCachedBoundsFor(const QString& id)
+QRect PerspectiveHelper::GetCachedBoundsFor(const QString& id)
 {
   return boundsMap[id];
 }

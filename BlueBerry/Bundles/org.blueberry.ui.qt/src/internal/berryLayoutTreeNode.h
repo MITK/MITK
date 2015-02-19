@@ -64,7 +64,7 @@ public:
      * @param toFind
      * @return the part that intersects the given point
      */
-    public: LayoutPart::Pointer FindPart(const Point& toFind);
+    public: LayoutPart::Pointer FindPart(const QPoint& toFind);
 
     /**
      * Add the relation ship between the children in the list
@@ -163,7 +163,7 @@ public:
     /**
      * Resize the parts on this tree to fit in <code>bounds</code>.
      */
-    public: void DoSetBounds(const Rectangle& bounds);
+    public: void DoSetBounds(const QRect& bounds);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.LayoutTree#createControl(org.blueberry.swt.widgets.Composite)
@@ -219,6 +219,9 @@ public:
      */
     public: void DescribeLayout(QString& buf) const;
 
+private:
+
+    static QRect FlipRect(const QRect& rect);
 };
 
 }

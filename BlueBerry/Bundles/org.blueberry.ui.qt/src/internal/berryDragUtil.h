@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYDRAGUTIL_H_
 
 #include <org_blueberry_ui_qt_Export.h>
-#include "berryRectangle.h"
 #include "guitk/berryGuiTkIControlListener.h"
 
 #include "berryTestDropLocation.h"
@@ -27,7 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIDropTarget.h"
 
 #include <berryObjectList.h>
-#include <list>
+
+#include <QPoint>
+#include <QRect>
 
 namespace berry {
 
@@ -79,14 +80,14 @@ private:
      * @return
      */
     static IDropTarget::Pointer GetDropTarget(const QList<IDragOverListener*>& toSearch,
-            void* mostSpecificControl, Object::Pointer draggedObject, const Point &position,
-            const Rectangle& dragRectangle);
+            void* mostSpecificControl, Object::Pointer draggedObject, const QPoint &position,
+            const QRect& dragRectangle);
 
 
     struct TrackerMoveListener : public GuiTk::IControlListener {
 
-      TrackerMoveListener(Object::Pointer draggedItem, const Rectangle& sourceBounds,
-          const Point& initialLocation, bool allowSnapping);
+      TrackerMoveListener(Object::Pointer draggedItem, const QRect& sourceBounds,
+          const QPoint& initialLocation, bool allowSnapping);
 
       Events::Types GetEventTypes() const;
 
@@ -96,8 +97,8 @@ private:
 
       bool allowSnapping;
       Object::Pointer draggedItem;
-      Rectangle sourceBounds;
-      Point initialLocation;
+      QRect sourceBounds;
+      QPoint initialLocation;
     };
 
 
@@ -131,10 +132,10 @@ public:
      * @param boundsControl
      * @return
      */
-    static Rectangle GetDisplayBounds(void* boundsControl);
+    static QRect GetDisplayBounds(void* boundsControl);
 
   static bool PerformDrag(Object::Pointer draggedItem,
-          const Rectangle& sourceBounds, const Point& initialLocation, bool allowSnapping);
+          const QRect& sourceBounds, const QPoint& initialLocation, bool allowSnapping);
 
 //  /**
 //   * Drags the given item to the given location (in display coordinates). This
@@ -145,7 +146,7 @@ public:
 //   * @return true iff the drop was accepted
 //   */
 //  static bool DragTo(Display display, Object draggedItem,
-//          Point finalLocation, Rectangle dragRectangle) {
+//          QPoint finalLocation, QRect dragRectangle) {
 //      Control currentControl = SwtUtil.findControl(display, finalLocation);
 //
 //      IDropTarget target = getDropTarget(currentControl, draggedItem,
@@ -188,7 +189,7 @@ public:
    * @return
    */
   static IDropTarget::Pointer DragToTarget(Object::Pointer draggedItem,
-          const Rectangle& sourceBounds, const Point& initialLocation,
+          const QRect& sourceBounds, const QPoint& initialLocation,
           bool allowSnapping);
 
   /**
@@ -199,13 +200,13 @@ public:
    * @return
    */
   static IDropTarget::Pointer GetDropTarget(void* toSearch,
-          Object::Pointer draggedObject, const Point& position, const Rectangle& dragRectangle);
+          Object::Pointer draggedObject, const QPoint& position, const QRect& dragRectangle);
 
   /**
    * Returns the location of the given event, in display coordinates
    * @return
    */
-  //static Point GetEventLoc(GuiTk::ControlEvent::Pointer event);
+  //static QPoint GetEventLoc(GuiTk::ControlEvent::Pointer event);
 
 };
 

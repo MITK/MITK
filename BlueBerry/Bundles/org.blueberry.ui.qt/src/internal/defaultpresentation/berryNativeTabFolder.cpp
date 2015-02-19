@@ -49,7 +49,6 @@ void NativeTabFolder::TabSelectionChanged(int index)
 
 void NativeTabFolder::DragStarted(const QPoint& location)
 {
-  Point point(location.x(), location.y());
   this->HandleDragStarted(location);
 }
 

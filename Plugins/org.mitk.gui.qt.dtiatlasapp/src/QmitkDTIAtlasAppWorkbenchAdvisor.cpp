@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkExtWorkbenchWindowAdvisor.h>
 
 #include <QApplication>
+#include <QPoint>
 
 const QString QmitkDTIAtlasAppWorkbenchAdvisor::WELCOME_PERSPECTIVE_ID = "org.mitk.dtiatlasapp.perspectives.welcome";
 
@@ -81,7 +82,7 @@ QmitkDTIAtlasAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   viewExcludeList.push_back( "org.mitk.views.simplemeasurement");
 
   configurer->SetShowPerspectiveBar(false);
-  configurer->SetInitialSize(berry::Point(1000,770));
+  configurer->SetInitialSize(QPoint(1000,770));
 
   QmitkExtWorkbenchWindowAdvisor* advisor = new QmitkExtWorkbenchWindowAdvisor(this, configurer);
   advisor->SetPerspectiveExcludeList(perspExcludeList);

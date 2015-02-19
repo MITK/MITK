@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_ui_qt_Export.h>
 
-#include "berryPoint.h"
-
 class QMenuBar;
 
 namespace berry
@@ -220,7 +218,7 @@ struct BERRY_UI_QT IWorkbenchWindowConfigurer : public Object
    *
    * @return the initial size to use for the shell
    */
-  virtual Point GetInitialSize() const = 0;
+  virtual QPoint GetInitialSize() const = 0;
 
   /**
    * Sets the size to use for the window's shell when it is created.
@@ -230,7 +228,7 @@ struct BERRY_UI_QT IWorkbenchWindowConfigurer : public Object
    *
    * @param initialSize the initial size to use for the shell
    */
-  virtual void SetInitialSize(Point initialSize) = 0;
+  virtual void SetInitialSize(QPoint initialSize) = 0;
 
   /*
    * Returns the data associated with this workbench window at the given key.

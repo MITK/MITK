@@ -18,8 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYGEOMETRY_H_
 #define BERRYGEOMETRY_H_
 
-#include "berryRectangle.h"
-#include "berryPoint.h"
+#include <org_blueberry_ui_qt_Export.h>
+
+class QRect;
+class QPoint;
 
 namespace berry {
 
@@ -34,7 +36,7 @@ struct BERRY_UI_QT Geometry
    * @return the width or height of the given rectangle
    * @since 3.0
    */
-  static int GetDimension(const Rectangle& toMeasure, bool width);
+  static int GetDimension(const QRect& toMeasure, bool width);
 
   /**
    * Returns true iff the given side constant corresponds to a horizontal side
@@ -60,7 +62,7 @@ struct BERRY_UI_QT Geometry
    * resulting rectangle will always share this side with the original rectangle.
    * @return a rectangle formed by extruding the given side of the rectangle by the given distance.
    */
-  static Rectangle GetExtrudedEdge(const Rectangle& toExtrude, int size,
+  static QRect GetExtrudedEdge(const QRect& toExtrude, int size,
           int orientation);
 
   /**
@@ -71,7 +73,7 @@ struct BERRY_UI_QT Geometry
    *
    * @param rect rectangle to modify
    */
-  static void Normalize(Rectangle& rect);
+  static void Normalize(QRect& rect);
 
   /**
    * Returns the edge of the given rectangle is closest to the given
@@ -83,7 +85,7 @@ struct BERRY_UI_QT Geometry
    *
    * @since 3.0
    */
-  static int GetClosestSide(const Rectangle& boundary, const Point& toTest);
+  static int GetClosestSide(const QRect& boundary, const QPoint& toTest);
 
   /**
    * Returns the distance of the given point from a particular side of the given rectangle.
@@ -95,7 +97,7 @@ struct BERRY_UI_QT Geometry
    * @return the distance of the given point from the given edge of the rectangle
    * @since 3.0
    */
-  static int GetDistanceFromEdge(const Rectangle& rectangle, const Point& testPoint,
+  static int GetDistanceFromEdge(const QRect& rectangle, const QPoint& testPoint,
           int edgeOfInterest);
 
   /**
@@ -117,8 +119,8 @@ struct BERRY_UI_QT Geometry
    * @return a rectangle in control coordinates
    * @since 3.0
    */
-  static Rectangle ToControl(void* coordinateSystem,
-          const Rectangle& toConvert);
+  static QRect ToControl(void* coordinateSystem,
+          const QRect& toConvert);
 
   /**
    * Converts the given point from display coordinates to the local coordinate system
@@ -129,8 +131,8 @@ struct BERRY_UI_QT Geometry
    * @return a point in control coordinates
    * @since 3.0
    */
-  static Point ToControl(void* coordinateSystem,
-          const Point& toConvert);
+  static QPoint ToControl(void* coordinateSystem,
+          const QPoint& toConvert);
 
   /**
    * Converts the given rectangle from the local coordinate system of the given object
@@ -141,8 +143,8 @@ struct BERRY_UI_QT Geometry
    * @return a rectangle in display coordinates
    * @since 3.0
    */
-  static Rectangle ToDisplay(void* coordinateSystem,
-          const Rectangle& toConvert);
+  static QRect ToDisplay(void* coordinateSystem,
+          const QRect& toConvert);
 
   /**
    * Converts the given point from the local coordinate system of the given object
@@ -153,8 +155,8 @@ struct BERRY_UI_QT Geometry
    * @return a point in display coordinates
    * @since 3.0
    */
-  static Point ToDisplay(void* coordinateSystem,
-          const Point& toConvert);
+  static QPoint ToDisplay(void* coordinateSystem,
+          const QPoint& toConvert);
 
 };
 

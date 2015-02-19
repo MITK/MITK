@@ -21,7 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryMacros.h>
 #include <berryObject.h>
 
-#include "berryRectangle.h"
+#include <org_blueberry_ui_qt_Export.h>
+
+#include <QRect>
 
 namespace berry {
 
@@ -34,11 +36,11 @@ class BERRY_UI_QT StackDropResult : public Object {
 
 public:
 
-  berryObjectMacro(StackDropResult);
+  berryObjectMacro(StackDropResult)
 
 private:
 
-  Rectangle snapRectangle;
+  QRect snapRectangle;
   Object::Pointer cookie;
 
 public:
@@ -52,7 +54,7 @@ public:
    * in order to identify the drop location. This object will be passed back into the
    * presentation's add method.
    */
-  StackDropResult(const Rectangle& snapRectangle, Object::Pointer cookie);
+  StackDropResult(const QRect& snapRectangle, Object::Pointer cookie);
 
   /**
    * Returns a rectangle (screen coordinates) describing the target location
@@ -61,7 +63,7 @@ public:
    *
    * @return a snap rectangle (not null)
    */
-  Rectangle GetSnapRectangle();
+  QRect GetSnapRectangle();
 
   /**
    * Returns the cookie for this drop result. This object provided by the presentation,

@@ -46,9 +46,9 @@ IStackPresentationSite::Pointer StackPresentation::GetSite()
   return site.Lock();
 }
 
-Point StackPresentation::ComputeMinimumSize()
+QSize StackPresentation::ComputeMinimumSize()
 {
-  return Point(0, 0);
+  return QSize(0, 0);
 }
 
 int StackPresentation::GetSizeFlags(bool  /*width*/)
@@ -62,8 +62,8 @@ int StackPresentation::GetSizeFlags(bool  /*width*/)
 int StackPresentation::ComputePreferredSize(bool width, int /*availableParallel*/,
     int  /*availablePerpendicular*/, int preferredResult)
 {
-  Point p = this->ComputeMinimumSize();
-  int minSize = width ? p.x : p.y;
+  QSize s = this->ComputeMinimumSize();
+  int minSize = width ? s.width() : s.width();
 
   if (this->GetSite()->GetState() == IStackPresentationSite::STATE_MINIMIZED
       || preferredResult < minSize)

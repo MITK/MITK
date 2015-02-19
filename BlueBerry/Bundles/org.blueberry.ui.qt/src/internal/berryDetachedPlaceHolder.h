@@ -22,9 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryILayoutContainer.h"
 
 #include "berryIMemento.h"
-#include "berryRectangle.h"
-
-#include <list>
 
 namespace berry {
 
@@ -39,7 +36,7 @@ private:
 
     QList<LayoutPart::Pointer> children;
 
-    Rectangle bounds;
+    QRect bounds;
 
 public:
 
@@ -50,7 +47,7 @@ public:
      * @param id java.lang.String
      * @param bounds the size of the placeholder
      */
-    DetachedPlaceHolder(const QString& id, const Rectangle& b);
+    DetachedPlaceHolder(const QString& id, const QRect& b);
 
     /**
      * Add a child to the container.
@@ -70,7 +67,7 @@ public:
 
     bool AllowsAutoFocus();
 
-    Rectangle GetBounds();
+    QRect GetBounds();
 
     /**
      * Returns a list of layout children.

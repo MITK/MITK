@@ -107,12 +107,12 @@ void PartStack::PartStackDropResult::Drop()
   }
 }
 
-DnDTweaklet::CursorType PartStack::PartStackDropResult::GetCursor()
+CursorType PartStack::PartStackDropResult::GetCursor()
 {
-  return DnDTweaklet::CURSOR_CENTER;
+  return CURSOR_CENTER;
 }
 
-Rectangle PartStack::PartStackDropResult::GetSnapRectangle()
+QRect PartStack::PartStackDropResult::GetSnapRectangle()
 {
   if (dropResult == 0)
   {
@@ -139,13 +139,13 @@ void PartStack::MyStackPresentationSite::Close(const QList<
 }
 
 void PartStack::MyStackPresentationSite::DragStart(
-    IPresentablePart::Pointer beingDragged, Point& initialLocation,
+    IPresentablePart::Pointer beingDragged, QPoint& initialLocation,
     bool keyboard)
 {
   partStack->DragStart(beingDragged, initialLocation, keyboard);
 }
 
-void PartStack::MyStackPresentationSite::DragStart(Point& initialLocation,
+void PartStack::MyStackPresentationSite::DragStart(QPoint& initialLocation,
     bool keyboard)
 {
   partStack->DragStart(IPresentablePart::Pointer(0), initialLocation, keyboard);
@@ -547,7 +547,7 @@ void PartStack::CreateControl(void* parent)
   Tweaklets::Get(GuiWidgetsTweaklet::KEY)->MoveBelow(this->GetControl(), 0);
 }
 
-IDropTarget::Pointer PartStack::GetDropTarget(Object::Pointer draggedObject, const Point& position)
+IDropTarget::Pointer PartStack::GetDropTarget(Object::Pointer draggedObject, const QPoint& position)
 {
 
   if (draggedObject.Cast<PartPane>() == 0)
@@ -583,7 +583,7 @@ IDropTarget::Pointer PartStack::GetDropTarget(Object::Pointer draggedObject, con
   return this->CreateDropTarget(pane, dropResult);
 }
 
-void PartStack::SetBounds(const Rectangle& r)
+void PartStack::SetBounds(const QRect& r)
 {
   if (this->GetPresentation() != 0)
   {
@@ -719,11 +719,11 @@ void PartStack::FindSashes(LayoutPart::Pointer /*toFind*/, PartPane::Sashes& sas
   }
 }
 
-Rectangle PartStack::GetBounds()
+QRect PartStack::GetBounds()
 {
   if (this->GetPresentation() == 0)
   {
-    return Rectangle(0, 0, 0, 0);
+    return QRect(0, 0, 0, 0);
   }
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl());
 }
@@ -1477,7 +1477,7 @@ QList<void*> PartStack::GetTabList(LayoutPart::Pointer part)
   return QList<void*>();
 }
 
-void PartStack::DragStart(IPresentablePart::Pointer beingDragged, Point& initialLocation,
+void PartStack::DragStart(IPresentablePart::Pointer beingDragged, QPoint& initialLocation,
     bool keyboard)
 {
   if (beingDragged == 0)
@@ -1498,7 +1498,7 @@ void PartStack::DragStart(IPresentablePart::Pointer beingDragged, Point& initial
   }
 }
 
-void PartStack::PaneDragStart(PartPane::Pointer pane, Point& initialLocation,
+void PartStack::PaneDragStart(PartPane::Pointer pane, QPoint& initialLocation,
     bool keyboard)
 {
   if (pane == 0)
@@ -1508,10 +1508,10 @@ void PartStack::PaneDragStart(PartPane::Pointer pane, Point& initialLocation,
       if (presentationSite->GetState() == IStackPresentationSite::STATE_MAXIMIZED)
       {
         // Calculate where the initial location was BEFORE the 'restore'...as a percentage
-        Rectangle bounds = Geometry::ToDisplay(this->GetParent(),
+        QRect bounds = Geometry::ToDisplay(this->GetParent(),
             Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl()));
-        float xpct = (initialLocation.x - bounds.x) / (float)(bounds.width);
-        float ypct = (initialLocation.y - bounds.y) / (float)(bounds.height);
+        float xpct = (initialLocation.x() - bounds.x()) / (float)(bounds.width());
+        float ypct = (initialLocation.y() - bounds.y()) / (float)(bounds.height());
 
         // Only restore if we're dragging views/view stacks
         if (this->GetAppearance() != PresentationFactoryUtil::ROLE_EDITOR)
@@ -1520,8 +1520,8 @@ void PartStack::PaneDragStart(PartPane::Pointer pane, Point& initialLocation,
         // Now, adjust the initial location to be within the bounds of the restored rect
         bounds = Geometry::ToDisplay(this->GetParent(),
             Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl()));
-        initialLocation.x = (int) (bounds.x + (xpct * bounds.width));
-        initialLocation.y = (int) (bounds.y + (ypct * bounds.height));
+        initialLocation.setX((int) (bounds.x() + (xpct * bounds.width())));
+        initialLocation.setY((int) (bounds.y() + (ypct * bounds.height())));
       }
 
       DragUtil::PerformDrag(Object::Pointer(this), Geometry::ToDisplay(this->GetParent(),
@@ -1534,10 +1534,10 @@ void PartStack::PaneDragStart(PartPane::Pointer pane, Point& initialLocation,
     if (presentationSite->GetState() == IStackPresentationSite::STATE_MAXIMIZED)
     {
       // Calculate where the initial location was BEFORE the 'restore'...as a percentage
-      Rectangle bounds = Geometry::ToDisplay(this->GetParent(),
+      QRect bounds = Geometry::ToDisplay(this->GetParent(),
           Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl()));
-      float xpct = (initialLocation.x - bounds.x) / (float)(bounds.width);
-      float ypct = (initialLocation.y - bounds.y) / (float)(bounds.height);
+      float xpct = (initialLocation.x() - bounds.x()) / (float)(bounds.width());
+      float ypct = (initialLocation.y() - bounds.y()) / (float)(bounds.height());
 
       // Only restore if we're dragging views/view stacks
       if (this->GetAppearance() != PresentationFactoryUtil::ROLE_EDITOR)
@@ -1547,8 +1547,8 @@ void PartStack::PaneDragStart(PartPane::Pointer pane, Point& initialLocation,
       // See bug 100908
       bounds = Geometry::ToDisplay(this->GetParent(),
           Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl()));
-      initialLocation.x = (int) (bounds.x + (xpct * bounds.width));
-      initialLocation.y = (int) (bounds.y + (ypct * bounds.height));
+      initialLocation.setX((int) (bounds.x() + (xpct * bounds.width())));
+      initialLocation.setY((int) (bounds.y() + (ypct * bounds.height())));
     }
 
     DragUtil::PerformDrag(pane, Geometry::ToDisplay(this->GetParent(),

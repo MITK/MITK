@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "internal/berryTweaklets.h"
 #include "guitk/berryGuiTkISelectionListener.h"
 #include "guitk/berryGuiTkIControlListener.h"
-#include "berryRectangle.h"
 #include "berryShell.h"
 
 //#include "commands/berryIMenu.h"
@@ -65,14 +64,14 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
   virtual bool GetEnabled(void* widget) = 0;
   virtual void SetEnabled(void* widget, bool enabled) = 0;
 
-  virtual void SetBounds(void* widget, const Rectangle& bounds) = 0;
-  virtual Rectangle GetBounds(void* widget) = 0;
+  virtual void SetBounds(void* widget, const QRect& bounds) = 0;
+  virtual QRect GetBounds(void* widget) = 0;
 
   virtual void SetVisible(void* widget, bool visible) = 0;
   virtual bool GetVisible(void* widget) = 0;
   virtual bool IsVisible(void* widget) = 0;
 
-  virtual Rectangle GetClientArea(void* widget) = 0;
+  virtual QRect GetClientArea(void* widget) = 0;
 
   virtual void* GetParent(void* widget) = 0;
   virtual bool SetParent(void* widget, void* parent) = 0;
@@ -80,9 +79,9 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
   virtual void SetData(void* widget, const QString& id, Object::Pointer data) = 0;
   virtual Object::Pointer GetData(void* widget, const QString& id) = 0;
 
-  virtual Point GetCursorLocation() = 0;
+  virtual QPoint GetCursorLocation() = 0;
   virtual void* GetCursorControl() = 0;
-  virtual void* FindControl(const QList<Shell::Pointer>& shells, const Point& location) = 0;
+  virtual void* FindControl(const QList<Shell::Pointer>& shells, const QPoint& location) = 0;
 
   /**
    * Determines if one control is a child of another. Returns true iff the second
@@ -135,11 +134,11 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @see GetScreenNumber()
    * @see GetPrimaryScreenNumber()
    */
-  virtual Rectangle GetScreenSize(int i = -1) = 0;
+  virtual QRect GetScreenSize(int i = -1) = 0;
 
-  virtual Rectangle GetAvailableScreenSize(int i = -1) = 0;
+  virtual QRect GetAvailableScreenSize(int i = -1) = 0;
 
-  virtual int GetClosestScreenNumber(const Rectangle&) = 0;
+  virtual int GetClosestScreenNumber(const QRect&) = 0;
 
   /**
    * @brief Gets the number of available screens in a multi-screen environment.
@@ -164,8 +163,8 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @return a rectangle in control coordinates
    * @since 3.0
    */
-  virtual Rectangle ToControl(void* coordinateSystem,
-          const Rectangle& toConvert) = 0;
+  virtual QRect ToControl(void* coordinateSystem,
+          const QRect& toConvert) = 0;
 
   /**
    * Converts the given point from display coordinates to the local coordinate system
@@ -176,8 +175,8 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @return a point in control coordinates
    * @since 3.0
    */
-  virtual Point ToControl(void* coordinateSystem,
-          const Point& toConvert) = 0;
+  virtual QPoint ToControl(void* coordinateSystem,
+          const QPoint& toConvert) = 0;
 
   /**
    * Converts the given rectangle from the local coordinate system of the given object
@@ -188,8 +187,8 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @return a rectangle in display coordinates
    * @since 3.0
    */
-  virtual Rectangle ToDisplay(void* coordinateSystem,
-          const Rectangle& toConvert) = 0;
+  virtual QRect ToDisplay(void* coordinateSystem,
+          const QRect& toConvert) = 0;
 
   /**
    * Converts the given point from the local coordinate system of the given object
@@ -200,8 +199,8 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @return a point in display coordinates
    * @since 3.0
    */
-  virtual Point ToDisplay(void* coordinateSystem,
-          const Point& toConvert) = 0;
+  virtual QPoint ToDisplay(void* coordinateSystem,
+          const QPoint& toConvert) = 0;
 };
 
 }

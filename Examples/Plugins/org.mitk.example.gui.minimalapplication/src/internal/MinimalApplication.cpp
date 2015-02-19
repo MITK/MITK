@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 
+#include <QPoint>
+
 class MinimalWorkbenchAdvisor : public berry::WorkbenchAdvisor
 {
 
@@ -31,7 +33,7 @@ public:
       berry::IWorkbenchWindowConfigurer::Pointer configurer)
   {
     // Set an individual initial size
-    configurer->SetInitialSize(berry::Point(600,400));
+    configurer->SetInitialSize(QPoint(600,400));
     // Set an individual title
     configurer->SetTitle("Minimal Application");
     // Enable or disable the perspective bar

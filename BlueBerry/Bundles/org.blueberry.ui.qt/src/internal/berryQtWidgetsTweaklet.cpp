@@ -40,7 +40,7 @@ void QtWidgetsTweaklet::RemoveSelectionListener(void* widget,
   impl.RemoveSelectionListener(static_cast<QWidget*>(widget), listener);
 }
 
-Rectangle QtWidgetsTweaklet::GetScreenSize(int i)
+QRect QtWidgetsTweaklet::GetScreenSize(int i)
 {
   return impl.GetScreenSize(i);
 }
@@ -55,12 +55,12 @@ int QtWidgetsTweaklet::GetPrimaryScreenNumber()
   return impl.GetPrimaryScreenNumber();
 }
 
-Rectangle QtWidgetsTweaklet::GetAvailableScreenSize(int i)
+QRect QtWidgetsTweaklet::GetAvailableScreenSize(int i)
 {
   return impl.GetAvailableScreenSize(i);
 }
 
-int QtWidgetsTweaklet::GetClosestScreenNumber(const Rectangle& rect)
+int QtWidgetsTweaklet::GetClosestScreenNumber(const QRect& rect)
 {
   return impl.GetClosestScreenNumber(rect);
 }
@@ -119,12 +119,12 @@ void QtWidgetsTweaklet::SetEnabled(void* widget, bool enabled)
   impl.SetEnabled(static_cast<QWidget*>(widget), enabled);
 }
 
-void QtWidgetsTweaklet::SetBounds(void* widget, const Rectangle& bounds)
+void QtWidgetsTweaklet::SetBounds(void* widget, const QRect& bounds)
 {
   impl.SetBounds(static_cast<QWidget*>(widget), bounds);
 }
 
-Rectangle QtWidgetsTweaklet::GetBounds(void* widget)
+QRect QtWidgetsTweaklet::GetBounds(void* widget)
 {
   return impl.GetBounds(static_cast<QWidget*>(widget));
 }
@@ -144,7 +144,7 @@ bool QtWidgetsTweaklet::IsVisible(void* widget)
   return impl.IsVisible(static_cast<QWidget*>(widget));
 }
 
-Rectangle QtWidgetsTweaklet::GetClientArea(void* widget)
+QRect QtWidgetsTweaklet::GetClientArea(void* widget)
 {
   return impl.GetClientArea(static_cast<QWidget*>(widget));
 }
@@ -170,7 +170,7 @@ Object::Pointer QtWidgetsTweaklet::GetData(void* widget, const QString& id)
   return impl.GetData(static_cast<QWidget*>(widget), id);
 }
 
-Point QtWidgetsTweaklet::GetCursorLocation()
+QPoint QtWidgetsTweaklet::GetCursorLocation()
 {
   return impl.GetCursorLocation();
 }
@@ -180,7 +180,7 @@ void* QtWidgetsTweaklet::GetCursorControl()
   return impl.GetCursorControl();
 }
 
-void* QtWidgetsTweaklet::FindControl(const QList<Shell::Pointer>& shells, const Point& location)
+void* QtWidgetsTweaklet::FindControl(const QList<Shell::Pointer>& shells, const QPoint& location)
 {
   return impl.FindControl(shells, location);
 }
@@ -248,26 +248,26 @@ Shell::Pointer QtWidgetsTweaklet::GetActiveShell()
   return impl.GetActiveShell();
 }
 
-Rectangle QtWidgetsTweaklet::ToControl(void* coordinateSystem,
-          const Rectangle& toConvert)
+QRect QtWidgetsTweaklet::ToControl(void* coordinateSystem,
+          const QRect& toConvert)
 {
   return impl.ToControl(static_cast<QWidget*>(coordinateSystem), toConvert);
 }
 
-Point QtWidgetsTweaklet::ToControl(void* coordinateSystem,
-          const Point& toConvert)
+QPoint QtWidgetsTweaklet::ToControl(void* coordinateSystem,
+          const QPoint& toConvert)
 {
   return impl.ToControl(static_cast<QWidget*>(coordinateSystem), toConvert);
 }
 
-Rectangle QtWidgetsTweaklet::ToDisplay(void* coordinateSystem,
-        const Rectangle& toConvert)
+QRect QtWidgetsTweaklet::ToDisplay(void* coordinateSystem,
+        const QRect& toConvert)
 {
   return impl.ToDisplay(static_cast<QWidget*>(coordinateSystem), toConvert);
 }
 
-Point QtWidgetsTweaklet::ToDisplay(void* coordinateSystem,
-        const Point& toConvert)
+QPoint QtWidgetsTweaklet::ToDisplay(void* coordinateSystem,
+        const QPoint& toConvert)
 {
   return impl.ToDisplay(static_cast<QWidget*>(coordinateSystem), toConvert);
 }

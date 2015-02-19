@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIPresentablePart.h"
 
 #include <org_blueberry_ui_qt_Export.h>
-#include "berryPoint.h"
 
 namespace berry
 {
@@ -83,7 +82,7 @@ struct BERRY_UI_QT IStackPresentationSite : public Object
    * and false if the drag may be using the keyboard
    */
   virtual void DragStart(IPresentablePart::Pointer beingDragged,
-      Point& initialPosition, bool keyboard) = 0;
+      QPoint& initialPosition, bool keyboard) = 0;
 
   /**
    * Closes the given set of parts.
@@ -100,7 +99,7 @@ struct BERRY_UI_QT IStackPresentationSite : public Object
    * @param keyboard true iff the drag was initiated via mouse dragging,
    * and false if the drag may be using the keyboard
    */
-  virtual void DragStart(Point& initialPosition, bool keyboard) = 0;
+  virtual void DragStart(QPoint& initialPosition, bool keyboard) = 0;
 
   /**
    * Returns true iff this site will allow the given part to be closed

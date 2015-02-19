@@ -20,9 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryMessage.h>
 
-#include "berryPoint.h"
-#include "berryRectangle.h"
-
+#include "berryObject.h"
 #include "berryIDropTarget.h"
 
 namespace berry {
@@ -36,8 +34,8 @@ struct IDragOverListener
 
   struct Events {
 
-    typedef Message4<void*, const Object::Pointer&, const Point&, const Rectangle&, IDropTarget::Pointer> DragEventType;
-    typedef MessageDelegate4<IDragOverListener, void*, const Object::Pointer&, const Point&, const Rectangle&, IDropTarget::Pointer> DragDelegate;
+    typedef Message4<void*, const Object::Pointer&, const QPoint&, const QRect&, IDropTarget::Pointer> DragEventType;
+    typedef MessageDelegate4<IDragOverListener, void*, const Object::Pointer&, const QPoint&, const QRect&, IDropTarget::Pointer> DragDelegate;
 
     DragEventType drag;
 
@@ -59,7 +57,7 @@ struct IDragOverListener
    * @return a valid drop target or null if none
    */
   virtual IDropTarget::Pointer Drag(void* currentControl, const Object::Pointer& draggedObject,
-          const Point& position, const Rectangle& dragRectangle) = 0;
+          const QPoint& position, const QRect& dragRectangle) = 0;
 };
 
 }

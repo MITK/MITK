@@ -89,9 +89,9 @@ void PresentablePartFolder::LayoutContent()
 {
   if (current != 0)
   {
-    Rectangle clientArea = DragUtil::GetDisplayBounds(contentProxy);
+    QRect clientArea = DragUtil::GetDisplayBounds(contentProxy);
 
-    Rectangle bounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->ToControl(
+    QRect bounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->ToControl(
         folder->GetControl()->parentWidget(), clientArea);
     current->SetBounds(bounds);
   }

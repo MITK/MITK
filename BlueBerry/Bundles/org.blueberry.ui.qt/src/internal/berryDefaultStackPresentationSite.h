@@ -71,7 +71,7 @@ public:
    * @see org.blueberry.ui.internal.skins.IPresentationSite#dragStart(org.blueberry.ui.internal.skins.IPresentablePart, boolean)
    */
   void DragStart(IPresentablePart::Pointer beingDragged,
-      Point& initialPosition, bool keyboard);
+      QPoint& initialPosition, bool keyboard);
 
   using IStackPresentationSite::Close;
 
@@ -83,7 +83,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.skins.IPresentationSite#dragStart(boolean)
    */
-  void DragStart(Point& initialPosition, bool keyboard);
+  void DragStart(QPoint& initialPosition, bool keyboard);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IStackPresentationSite#supportsState(int)

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchPartReference.h"
 #include "berryLayoutPart.h"
 
-#include "berryRectangle.h"
 #include "berryIPropertyChangeListener.h"
 
 #include "guitk/berryGuiTkIControlListener.h"
@@ -154,7 +153,7 @@ public:
      */
     public: void DoHide();
 
-    protected: Rectangle GetParentBounds();
+    protected: QRect GetParentBounds();
 
     /**
      * Get the control.

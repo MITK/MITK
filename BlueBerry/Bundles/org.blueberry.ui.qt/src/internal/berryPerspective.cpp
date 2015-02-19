@@ -883,11 +883,12 @@ bool Perspective::RestoreState()
   const IMemento::Pointer boundsMem(memento->GetChild(WorkbenchConstants::TAG_WINDOW));
   if (boundsMem)
   {
-    Rectangle r(0, 0, 0, 0);
-    boundsMem->GetInteger(WorkbenchConstants::TAG_X, r.x);
-    boundsMem->GetInteger(WorkbenchConstants::TAG_Y, r.y);
-    boundsMem->GetInteger(WorkbenchConstants::TAG_HEIGHT, r.height);
-    boundsMem->GetInteger(WorkbenchConstants::TAG_WIDTH, r.width);
+    int x, y, w, h;
+    boundsMem->GetInteger(WorkbenchConstants::TAG_X, x);
+    boundsMem->GetInteger(WorkbenchConstants::TAG_Y, y);
+    boundsMem->GetInteger(WorkbenchConstants::TAG_HEIGHT, h);
+    boundsMem->GetInteger(WorkbenchConstants::TAG_WIDTH, w);
+    QRect r(x, y, w, h);
     //StartupThreading.runWithoutExceptions(new StartupRunnable()
     //    {
 
@@ -1294,13 +1295,13 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
   result &= p->SaveState(memento);
   if (!saveInnerViewState)
   {
-    Rectangle bounds(page->GetWorkbenchWindow()->GetShell()->GetBounds());
+    QRect bounds(page->GetWorkbenchWindow()->GetShell()->GetBounds());
     IMemento::Pointer boundsMem = memento
     ->CreateChild(WorkbenchConstants::TAG_WINDOW);
-    boundsMem->PutInteger(WorkbenchConstants::TAG_X, bounds.x);
-    boundsMem->PutInteger(WorkbenchConstants::TAG_Y, bounds.y);
-    boundsMem->PutInteger(WorkbenchConstants::TAG_HEIGHT, bounds.height);
-    boundsMem->PutInteger(WorkbenchConstants::TAG_WIDTH, bounds.width);
+    boundsMem->PutInteger(WorkbenchConstants::TAG_X, bounds.x());
+    boundsMem->PutInteger(WorkbenchConstants::TAG_Y, bounds.y());
+    boundsMem->PutInteger(WorkbenchConstants::TAG_HEIGHT, bounds.height());
+    boundsMem->PutInteger(WorkbenchConstants::TAG_WIDTH, bounds.width());
   }
 
 //  // Save the "always on" action sets.

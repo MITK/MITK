@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "application/berryActionBarAdvisor.h"
 
 #include <QStringList>
+#include <QRect>
 
 namespace berry
 {
@@ -316,7 +317,7 @@ protected:
    *
    * @since 3.0
    */
-  Point GetInitialSize();
+  QPoint GetInitialSize();
 
   /**
    * Returns the default page input for workbench pages opened in this window.
@@ -408,7 +409,7 @@ private:
   bool emptyWindowContentsCreated;
   void* emptyWindowContents;
 
-  Rectangle normalBounds;
+  QRect normalBounds;
 
   bool asMaximizedState;
 

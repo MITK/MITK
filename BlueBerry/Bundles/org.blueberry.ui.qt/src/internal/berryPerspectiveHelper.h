@@ -89,7 +89,7 @@ private:
    * bounds to change.
    */
 private:
-  QHash<QString, Rectangle> boundsMap;
+  QHash<QString, QRect> boundsMap;
 
 private:
   bool detachable;
@@ -112,8 +112,8 @@ private:
     DragOverListener(PerspectiveHelper* perspHelper);
 
     IDropTarget::Pointer Drag(void* currentControl,
-        const Object::Pointer& draggedObject, const Point& position,
-        const Rectangle& dragRectangle);
+        const Object::Pointer& draggedObject, const QPoint& position,
+        const QRect& dragRectangle);
 
   private:
     PerspectiveHelper* perspHelper;
@@ -132,29 +132,29 @@ private:
      * @param dragRectangle
      * @since 3.1
      */
-    void SetTarget(PartPane::Pointer part, const Rectangle& dragRectangle);
+    void SetTarget(PartPane::Pointer part, const QRect& dragRectangle);
 
     /**
      * @param part
      * @param dragRectangle
      * @since 3.1
      */
-    void SetTarget(PartStack::Pointer part, const Rectangle& dragRectangle);
+    void SetTarget(PartStack::Pointer part, const QRect& dragRectangle);
 
-    ActualDropTarget(PerspectiveHelper* perspHelper, PartPane::Pointer part, const Rectangle& dragRectangle);
+    ActualDropTarget(PerspectiveHelper* perspHelper, PartPane::Pointer part, const QRect& dragRectangle);
 
-    ActualDropTarget(PerspectiveHelper* perspHelper, PartStack::Pointer part, const Rectangle& dragRectangle);
+    ActualDropTarget(PerspectiveHelper* perspHelper, PartStack::Pointer part, const QRect& dragRectangle);
 
     void Drop();
 
-    DnDTweaklet::CursorType GetCursor();
+    CursorType GetCursor();
 
   private:
 
     PartPane::Pointer part;
     PartStack::Pointer stack;
 
-    Rectangle dragRectangle;
+    QRect dragRectangle;
 
     PerspectiveHelper* perspHelper;
   };
@@ -332,7 +332,7 @@ public:
   void AddDetachedPart(LayoutPart::Pointer part);
 
 public:
-  void AddDetachedPart(LayoutPart::Pointer part, const Rectangle& bounds);
+  void AddDetachedPart(LayoutPart::Pointer part, const QRect& bounds);
 
   /**
    * disableDragging.
@@ -549,7 +549,7 @@ public:
 
   /**
    * Captures the current bounds of all ViewStacks and the editor
-   * area and puts them into an ID -> Rectangle map. This info is
+   * area and puts them into an ID -> QRect map. This info is
    * used to cache the bounds so that we can correctly place minimized
    * stacks during a 'maximized' operation (where the iterative min's
    * affect the current layout while being performed.
@@ -565,7 +565,7 @@ public:
   void ResetBoundsMap();
 
 public:
-  Rectangle GetCachedBoundsFor(const QString& id);
+  QRect GetCachedBoundsFor(const QString& id);
 };
 
 }

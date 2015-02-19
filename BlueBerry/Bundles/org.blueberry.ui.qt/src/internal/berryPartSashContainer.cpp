@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryGeometry.h"
 #include "berryPartPane.h"
 
+#include "berryQtTracker.h"
+
 #include "berryConstants.h"
 
 
@@ -170,14 +172,14 @@ void PartSashContainer::DropObject(const QList<PartPane::Pointer>& toDrop,
   }
 }
 
-DnDTweaklet::CursorType PartSashContainer::SashContainerDropTarget::GetCursor()
+CursorType PartSashContainer::SashContainerDropTarget::GetCursor()
 {
-  return DnDTweaklet::PositionToCursorType(cursor);
+  return QtDragManager::PositionToCursorType(cursor);
 }
 
-Rectangle PartSashContainer::SashContainerDropTarget::GetSnapRectangle()
+QRect PartSashContainer::SashContainerDropTarget::GetSnapRectangle()
 {
-  Rectangle targetBounds;
+  QRect targetBounds;
 
   if (targetPart.Cast<LayoutPart> () != 0)
   {
@@ -328,7 +330,7 @@ void PartSashContainer::Add(LayoutPart::Pointer child, int relationship,
     node = root->Find(relative);
   }
 
-  Rectangle bounds;
+  QRect bounds;
   if (this->GetParent() == 0)
   {
     void* control = this->GetPage()->GetClientComposite();
@@ -338,10 +340,10 @@ void PartSashContainer::Add(LayoutPart::Pointer child, int relationship,
     }
     else
     {
-      bounds = Rectangle(0, 0, 800, 600);
+      bounds = QRect(0, 0, 800, 600);
     }
-    bounds.x = 0;
-    bounds.y = 0;
+    bounds.setX(0);
+    bounds.setY(0);
   }
   else
   {
@@ -356,18 +358,18 @@ void PartSashContainer::Add(LayoutPart::Pointer child, int relationship,
   this->Add(child, relationship, left, right, relative);
 }
 
-int PartSashContainer::MeasureTree(const Rectangle& outerBounds,
+int PartSashContainer::MeasureTree(const QRect& outerBounds,
     LayoutTree::ConstPointer toMeasure, bool horizontal)
 {
   if (toMeasure == 0)
   {
-    return outerBounds.GetDimension(horizontal);
+    return Geometry::GetDimension(outerBounds, horizontal);
   }
 
   LayoutTreeNode* parent = toMeasure->GetParent();
   if (parent == 0)
   {
-    return outerBounds.GetDimension(horizontal);
+    return Geometry::GetDimension(outerBounds, horizontal);
   }
 
   if (parent->GetSash()->IsHorizontal() == horizontal)
@@ -690,7 +692,7 @@ LayoutPart::Pointer PartSashContainer::FindBottomRight()
   return root->FindBottomRight();
 }
 
-Rectangle PartSashContainer::GetBounds()
+QRect PartSashContainer::GetBounds()
 {
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->parent);
 }
@@ -884,14 +886,14 @@ int PartSashContainer::GetSizeFlags(bool width)
   return 0;
 }
 
-void PartSashContainer::SetBounds(const Rectangle& r)
+void PartSashContainer::SetBounds(const QRect& r)
 {
   Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetBounds(this->parent, r);
 }
 
 IDropTarget::Pointer PartSashContainer::Drag(void* /*currentControl*/,
-    const Object::Pointer& draggedObject, const Point& position,
-    const Rectangle&  /*dragRectangle*/)
+    const Object::Pointer& draggedObject, const QPoint& position,
+    const QRect&  /*dragRectangle*/)
 {
   if (!(draggedObject.Cast<PartStack> () != 0
       || draggedObject.Cast<PartPane> () != 0))
@@ -923,7 +925,7 @@ IDropTarget::Pointer PartSashContainer::Drag(void* /*currentControl*/,
     return IDropTarget::Pointer(0);
   }
 
-  Rectangle containerBounds = DragUtil::GetDisplayBounds(parent);
+  QRect containerBounds = DragUtil::GetDisplayBounds(parent);
   LayoutPart::Pointer targetPart;
 
   // If this container has no visible children
@@ -933,7 +935,7 @@ IDropTarget::Pointer PartSashContainer::Drag(void* /*currentControl*/,
         Constants::CENTER, Object::Pointer(0));
   }
 
-  if (containerBounds.Contains(position))
+  if (containerBounds.contains(position))
   {
 
     if (root != 0)
@@ -946,7 +948,7 @@ IDropTarget::Pointer PartSashContainer::Drag(void* /*currentControl*/,
     {
       void* targetControl = targetPart->GetControl();
 
-      Rectangle targetBounds = DragUtil::GetDisplayBounds(targetControl);
+      QRect targetBounds = DragUtil::GetDisplayBounds(targetControl);
 
       int side = Geometry::GetClosestSide(targetBounds, position);
       int distance =

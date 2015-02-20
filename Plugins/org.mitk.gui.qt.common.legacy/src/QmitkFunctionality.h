@@ -295,7 +295,7 @@ public:
   ///
   /// Creates a scroll area for this view and calls CreateQtPartControl then
   ///
-  void CreatePartControl(void* parent);
+  void CreatePartControl(QWidget* parent);
   ///
   /// Called when this view receives the focus. Same as Activated()
   /// \see Activated()
@@ -361,8 +361,8 @@ protected:
   ///
   friend struct berry::SelectionChangedAdapter<QmitkFunctionality>;
   ///
-  /// Saves the parent of this view (this is the scrollarea created in CreatePartControl(void*)
-  /// \see CreatePartControl(void*)
+  /// Saves the parent of this view (this is the scrollarea created in CreatePartControl(QWidget*)
+  /// \see CreatePartControl(QWidget*)
   ///
   QWidget* m_Parent;
   ///

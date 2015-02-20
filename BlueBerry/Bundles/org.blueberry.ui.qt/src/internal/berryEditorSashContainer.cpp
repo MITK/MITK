@@ -97,7 +97,7 @@ PartStack::Pointer EditorSashContainer::NewEditorWorkbook()
   return newWorkbook;
 }
 
-void* EditorSashContainer::CreateParent(void* parentWidget)
+QWidget* EditorSashContainer::CreateParent(QWidget* parentWidget)
 {
   //return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->CreateComposite(parentWidget);
   return new QtDnDControlWidget(static_cast<QWidget*>(parentWidget));
@@ -138,7 +138,7 @@ LayoutPart::Pointer EditorSashContainer::GetVisiblePart(
 }
 
 EditorSashContainer::EditorSashContainer(const QString& editorId,
-    WorkbenchPage* page, void* parent)
+    WorkbenchPage* page, QWidget* parent)
  : PartSashContainer(editorId, page, parent)
 {
   this->CreateDefaultWorkbook();
@@ -530,7 +530,7 @@ PartStack::Pointer EditorSashContainer::GetWorkbookFromID(const QString& id)
 
 void EditorSashContainer::UpdateTabList()
 {
-  void* parent = this->GetParent();
+  QWidget* parent = this->GetParent();
   if (parent != 0)
   { // parent may be 0 on startup
     PartStack::Pointer wb(this->GetActiveWorkbook());
@@ -546,7 +546,7 @@ void EditorSashContainer::UpdateTabList()
   }
 }
 
-void EditorSashContainer::CreateControl(void* parent)
+void EditorSashContainer::CreateControl(QWidget* parent)
 {
   PartSashContainer::CreateControl(parent);
 

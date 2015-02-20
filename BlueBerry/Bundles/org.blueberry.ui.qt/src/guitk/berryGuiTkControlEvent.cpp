@@ -27,7 +27,7 @@ ControlEvent::ControlEvent() :
 {
 }
 
-ControlEvent::ControlEvent(void* item, int x, int y, int width, int height) :
+ControlEvent::ControlEvent(QWidget* item, int x, int y, int width, int height) :
   Event()
 {
   this->item = item;

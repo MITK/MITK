@@ -436,7 +436,7 @@ berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBar
   return berry::WorkbenchWindowAdvisor::CreateActionBarAdvisor(configurer);
 }
 
-void* QmitkExtWorkbenchWindowAdvisor::CreateEmptyWindowContents(void* parent)
+QWidget* QmitkExtWorkbenchWindowAdvisor::CreateEmptyWindowContents(QWidget* parent)
 {
  QWidget* parentWidget = static_cast<QWidget*>(parent);
  QLabel* label = new QLabel(parentWidget);

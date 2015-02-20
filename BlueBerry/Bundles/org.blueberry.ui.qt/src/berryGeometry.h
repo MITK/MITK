@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QRect;
 class QPoint;
+class QWidget;
 
 namespace berry {
 
@@ -119,7 +120,7 @@ struct BERRY_UI_QT Geometry
    * @return a rectangle in control coordinates
    * @since 3.0
    */
-  static QRect ToControl(void* coordinateSystem,
+  static QRect ToControl(QWidget* coordinateSystem,
           const QRect& toConvert);
 
   /**
@@ -131,7 +132,7 @@ struct BERRY_UI_QT Geometry
    * @return a point in control coordinates
    * @since 3.0
    */
-  static QPoint ToControl(void* coordinateSystem,
+  static QPoint ToControl(QWidget* coordinateSystem,
           const QPoint& toConvert);
 
   /**
@@ -143,7 +144,7 @@ struct BERRY_UI_QT Geometry
    * @return a rectangle in display coordinates
    * @since 3.0
    */
-  static QRect ToDisplay(void* coordinateSystem,
+  static QRect ToDisplay(QWidget* coordinateSystem,
           const QRect& toConvert);
 
   /**
@@ -155,7 +156,7 @@ struct BERRY_UI_QT Geometry
    * @return a point in display coordinates
    * @since 3.0
    */
-  static QPoint ToDisplay(void* coordinateSystem,
+  static QPoint ToDisplay(QWidget* coordinateSystem,
           const QPoint& toConvert);
 
 };

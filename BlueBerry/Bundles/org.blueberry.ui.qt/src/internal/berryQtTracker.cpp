@@ -14,9 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "berryTweaklets.h"
+
 #include "berryQtTracker.h"
 
 #include "berryConstants.h"
+
+#include "berryIDropTarget.h"
+#include "berryDragUtil.h"
+#include "berryGuiWidgetsTweaklet.h"
 
 #include <QEvent>
 #include <QKeyEvent>
@@ -142,7 +148,7 @@ void QtDragManager::Cancel()
 
 void QtDragManager::Move(const QPoint& globalPos)
 {
-  tracker->HandleMove(globalPos);
+  emit tracker->Moved(tracker, globalPos);
 }
 
 bool QtDragManager::Drag(QtTracker* tracker)
@@ -265,22 +271,61 @@ bool QtTracker::Open()
   return result;
 }
 
-void QtTracker::AddControlListener(GuiTk::IControlListener::Pointer listener)
+QtTrackerMoveListener::QtTrackerMoveListener(Object::Pointer draggedItem,
+                                             const QRect& sourceBounds,
+                                             const QPoint& initialLocation,
+                                             bool allowSnapping)
+  : allowSnapping(allowSnapping)
+  , draggedItem(draggedItem)
+  , sourceBounds(sourceBounds)
+  , initialLocation(initialLocation)
 {
-  controlEvents.AddListener(listener);
 }
 
-void QtTracker::RemoveControlListener(GuiTk::IControlListener::Pointer listener)
+void QtTrackerMoveListener::Moved(QtTracker* tracker, const QPoint& location)
 {
-  controlEvents.RemoveListener(listener);
-}
+  // Select a drop target; use the global one by default
+  IDropTarget::Pointer target;
 
-void QtTracker::HandleMove(const QPoint& globalPoint)
-{
-  GuiTk::ControlEvent::Pointer event(
-          new GuiTk::ControlEvent(this, globalPoint.x(), globalPoint.y(), 0, 0));
+  QWidget* targetControl = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorControl();
 
-  controlEvents.movedEvent(event);
+  // Get the drop target for this location
+  target = DragUtil::GetDropTarget(targetControl, draggedItem, location,
+      tracker->GetRectangle());
+
+  // Set up the tracker feedback based on the target
+  QRect snapTarget;
+  if (target != 0)
+  {
+    snapTarget = target->GetSnapRectangle();
+
+    tracker->SetCursor(target->GetCursor());
+  }
+  else
+  {
+    tracker->SetCursor(CURSOR_INVALID);
+  }
+
+  // If snapping then reset the tracker's rectangle based on the current drop target
+  if (allowSnapping)
+  {
+    if (snapTarget.width() < 0 || snapTarget.height() < 0)
+    {
+      snapTarget = QRect(sourceBounds.x() + location.x() - initialLocation.x(),
+          sourceBounds.y() + location.y() - initialLocation.y(), sourceBounds.width(),
+          sourceBounds.height());
+    }
+
+    // Try to prevent flicker: don't change the rectangles if they're already in
+    // the right location
+    QRect currentRectangle = tracker->GetRectangle();
+
+    if (!(currentRectangle == snapTarget))
+    {
+      tracker->SetRectangle(snapTarget);
+    }
+  }
+
 }
 
 }

@@ -46,7 +46,7 @@ public:
 
 private:
 
-  void* sash;
+  QWidget* sash;
   bool enabled;
 
   PartSashContainer* rootContainer;
@@ -90,7 +90,7 @@ private:
    * the control is invisible.
    */
 public:
-  void CreateControl(void* parent);
+  void CreateControl(QWidget* parent);
 
   /**
    * Creates the underlying SWT control.
@@ -129,7 +129,7 @@ public:
    * Returns the part control.
    */
 public:
-  void* GetControl();
+  QWidget* GetControl();
 
   /**
    *

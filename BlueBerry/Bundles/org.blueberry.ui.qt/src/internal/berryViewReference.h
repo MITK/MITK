@@ -34,7 +34,7 @@ struct IWorkbenchPage;
  */
 class ViewReference : public WorkbenchPartReference, public IViewReference {
 
-public: berryObjectMacro(ViewReference);
+public: berryObjectMacro(ViewReference)
 
 private: const ViewFactory* factory;
 

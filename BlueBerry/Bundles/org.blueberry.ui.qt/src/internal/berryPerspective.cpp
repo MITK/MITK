@@ -179,7 +179,7 @@ IViewReference::Pointer Perspective::FindView(const QString& id, const QString& 
   return IViewReference::Pointer(0);
 }
 
-void* Perspective::GetClientComposite()
+QWidget* Perspective::GetClientComposite()
 {
   return page->GetClientComposite();
 }

@@ -39,7 +39,7 @@ PerspectiveHelper::DragOverListener::DragOverListener(PerspectiveHelper* perspHe
 }
 
 IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
-    void* /*currentControl*/, const Object::Pointer& draggedObject, const QPoint& /*position*/,
+    QWidget* /*currentControl*/, const Object::Pointer& draggedObject, const QPoint& /*position*/,
     const QRect& dragRectangle)
 {
 
@@ -213,7 +213,7 @@ detachable(false), active(false)
     // Check if some arbitrary Composite supports reparenting. If it
     // doesn't, views cannot be detached.
 
-    void* client = workbenchPage->GetClientComposite();
+    QWidget* client = workbenchPage->GetClientComposite();
     if (client == 0)
     {
       // The workbench page is not initialized. I don't think this can happen,
@@ -227,7 +227,7 @@ detachable(false), active(false)
   }
 }
 
-void PerspectiveHelper::Activate(void* parent)
+void PerspectiveHelper::Activate(QWidget* parent)
 {
 
   if (active)
@@ -624,7 +624,7 @@ void PerspectiveHelper::Deactivate()
   this->DisableAllDrag();
 
   // Reparent all views to the main window
-  void* parent = mainLayout->GetParent();
+  QWidget* parent = mainLayout->GetParent();
   QList<PartPane::Pointer> children;
   this->CollectViewPanes(children, mainLayout->GetChildren());
 
@@ -1265,7 +1265,7 @@ void PerspectiveHelper::RemovePart(LayoutPart::Pointer part)
 {
 
   // Reparent the part back to the main window
-  void* parent = mainLayout->GetParent();
+  QWidget* parent = mainLayout->GetParent();
   part->Reparent(parent);
 
   // Replace part with a placeholder

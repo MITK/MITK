@@ -44,12 +44,12 @@ public:
     /**
      * Creates the SWT control
      */
-    void CreateControl(void* parent);
+    void CreateControl(QWidget* parent);
 
     /**
      * Get the part control.  This method may return null.
      */
-    void* GetControl();
+    QWidget* GetControl();
 
     /**
      * Returns whether this placeholder has a wildcard.

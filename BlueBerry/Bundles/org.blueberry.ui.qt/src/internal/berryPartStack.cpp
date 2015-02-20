@@ -337,7 +337,7 @@ IStackPresentationSite::Pointer PartStack::GetPresentationSite()
 
 void PartStack::TestInvariants()
 {
-  void* focusControl =
+  QWidget* focusControl =
       Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetFocusControl();
 
   bool currentFound = false;
@@ -527,7 +527,7 @@ IPresentationFactory* PartStack::GetFactory()
   return WorkbenchPlugin::GetDefault()->GetPresentationFactory();
 }
 
-void PartStack::CreateControl(void* parent)
+void PartStack::CreateControl(QWidget* parent)
 {
   if (this->GetPresentation() != 0)
   {
@@ -617,7 +617,7 @@ void PartStack::SetActive(bool isActive)
   }
 }
 
-void PartStack::CreateControl(void*  /*parent*/, StackPresentation::Pointer presentation)
+void PartStack::CreateControl(QWidget*  /*parent*/, StackPresentation::Pointer presentation)
 {
 
   poco_assert(this->GetPresentation() == 0);
@@ -645,7 +645,7 @@ void PartStack::CreateControl(void*  /*parent*/, StackPresentation::Pointer pres
     presentation->RestoreState(&serializer, savedPresentationState);
   }
 
-  //void* ctrl = this->GetPresentation()->GetControl();
+  //QWidget* ctrl = this->GetPresentation()->GetControl();
 
   //TODO control setData ?
   //ctrl.setData(this);
@@ -733,7 +733,7 @@ QList<LayoutPart::Pointer> PartStack::GetChildren() const
   return children;
 }
 
-void* PartStack::GetControl()
+QWidget* PartStack::GetControl()
 {
   StackPresentation::Pointer presentation = this->GetPresentation();
 
@@ -767,7 +767,7 @@ PartPane::Pointer PartStack::GetPaneFor(IPresentablePart::Pointer part)
   return part.Cast<PresentablePart>()->GetPane();
 }
 
-void* PartStack::GetParent()
+QWidget* PartStack::GetParent()
 {
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(this->GetControl());
 }
@@ -863,10 +863,10 @@ void PartStack::Remove(LayoutPart::Pointer child)
   }
 }
 
-void PartStack::Reparent(void* newParent)
+void PartStack::Reparent(QWidget* newParent)
 {
 
-  void* control = this->GetControl();
+  QWidget* control = this->GetControl();
   GuiWidgetsTweaklet* tweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
   if ((control == 0) || (tweaklet->GetParent(control) == newParent)
       || !tweaklet->IsReparentable(control))
@@ -1018,7 +1018,7 @@ bool PartStack::RestoreState(IMemento::Pointer memento)
 
 void PartStack::SetVisible(bool makeVisible)
 {
-  void* ctrl = this->GetControl();
+  QWidget* ctrl = this->GetControl();
 
   bool useShortcut = makeVisible || !isActive;
 
@@ -1461,7 +1461,7 @@ void PartStack::ShowPartList()
   this->GetPresentation()->ShowPartList();
 }
 
-QList<void*> PartStack::GetTabList(LayoutPart::Pointer part)
+QList<QWidget*> PartStack::GetTabList(LayoutPart::Pointer part)
 {
   if (part != 0)
   {
@@ -1474,7 +1474,7 @@ QList<void*> PartStack::GetTabList(LayoutPart::Pointer part)
     }
   }
 
-  return QList<void*>();
+  return QList<QWidget*>();
 }
 
 void PartStack::DragStart(IPresentablePart::Pointer beingDragged, QPoint& initialLocation,

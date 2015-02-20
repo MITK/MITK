@@ -47,7 +47,7 @@ void ViewIntroAdapterPart::SetStandby(bool standby)
   //        });
 }
 
-void ViewIntroAdapterPart::CreatePartControl(void* parent)
+void ViewIntroAdapterPart::CreatePartControl(QWidget* parent)
 {
   //addPaneListener();
   introPart->CreatePartControl(parent);

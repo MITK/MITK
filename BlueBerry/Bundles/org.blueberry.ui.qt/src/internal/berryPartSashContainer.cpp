@@ -215,7 +215,7 @@ QRect PartSashContainer::SashContainerDropTarget::GetSnapRectangle()
 }
 
 PartSashContainer::PartSashContainer(const QString& id,
-    WorkbenchPage* _page, void* _parentWidget) :
+    WorkbenchPage* _page, QWidget* _parentWidget) :
   LayoutPart(id), parentWidget(_parentWidget), parent(0), page(_page), active(
       false), layoutDirty(false)
 {
@@ -333,7 +333,7 @@ void PartSashContainer::Add(LayoutPart::Pointer child, int relationship,
   QRect bounds;
   if (this->GetParent() == 0)
   {
-    void* control = this->GetPage()->GetClientComposite();
+    QWidget* control = this->GetPage()->GetClientComposite();
     if (control != 0)
     {
       bounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(control);
@@ -613,7 +613,7 @@ void PartSashContainer::SetActive(bool isActive)
   }
 }
 
-void PartSashContainer::CreateControl(void* parentWidget)
+void PartSashContainer::CreateControl(QWidget* parentWidget)
 {
   if (this->parent != 0)
   {
@@ -702,7 +702,7 @@ ILayoutContainer::ChildrenType PartSashContainer::GetChildren() const
   return children;
 }
 
-void* PartSashContainer::GetControl()
+QWidget* PartSashContainer::GetControl()
 {
   return this->parent;
 }
@@ -717,7 +717,7 @@ WorkbenchPage::Pointer PartSashContainer::GetPage()
   return WorkbenchPage::Pointer(page);
 }
 
-void* PartSashContainer::GetParent()
+QWidget* PartSashContainer::GetParent()
 {
   return parent;
 }
@@ -891,7 +891,7 @@ void PartSashContainer::SetBounds(const QRect& r)
   Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetBounds(this->parent, r);
 }
 
-IDropTarget::Pointer PartSashContainer::Drag(void* /*currentControl*/,
+IDropTarget::Pointer PartSashContainer::Drag(QWidget* /*currentControl*/,
     const Object::Pointer& draggedObject, const QPoint& position,
     const QRect&  /*dragRectangle*/)
 {
@@ -946,7 +946,7 @@ IDropTarget::Pointer PartSashContainer::Drag(void* /*currentControl*/,
 
     if (targetPart != 0)
     {
-      void* targetControl = targetPart->GetControl();
+      QWidget* targetControl = targetPart->GetControl();
 
       QRect targetBounds = DragUtil::GetDisplayBounds(targetControl);
 

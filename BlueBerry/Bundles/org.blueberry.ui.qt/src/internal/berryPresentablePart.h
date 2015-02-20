@@ -109,7 +109,7 @@ public:
    *
    * @param part
    */
-  PresentablePart(SmartPointer<PartPane> part, void* parent);
+  PresentablePart(SmartPointer<PartPane> part, QWidget* parent);
 
   SmartPointer<PartPane> GetPane() const;
 
@@ -198,7 +198,7 @@ public:
    *
    * @see org.blueberry.ui.presentations.IPresentablePart#getToolBar()
    */
-  void* GetToolBar();
+  QToolBar* GetToolBar();
 
   /*
    * (non-Javadoc)
@@ -237,7 +237,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#getControl()
    */
-  void* GetControl();
+  QWidget* GetControl();
 
   void EnableOutputs(bool isActive);
 

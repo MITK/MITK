@@ -464,7 +464,7 @@ QString LayoutTree::ToString() const
   return "(" + part->ToString() + ")";
 }
 
-void LayoutTree::CreateControl(void*  /*parent*/)
+void LayoutTree::CreateControl(QWidget*  /*parent*/)
 {
 }
 

@@ -1689,7 +1689,7 @@ void WorkbenchPage::CloseAllPerspectives(bool saveEditors, bool closePage)
 
 void WorkbenchPage::CreateClientComposite()
 {
-  void* parent = window->GetPageComposite();
+  QWidget* parent = window->GetPageComposite();
   //  StartupThreading.runWithoutExceptions(new StartupRunnable()
   //      {
   //
@@ -1972,7 +1972,7 @@ Perspective::Pointer WorkbenchPage::GetActivePerspective()
   return perspList.GetActive();
 }
 
-void* WorkbenchPage::GetClientComposite()
+QWidget* WorkbenchPage::GetClientComposite()
 {
   return composite;
 }
@@ -3915,7 +3915,7 @@ void WorkbenchPage::FindSashParts(LayoutTree::Pointer tree,
     // get the layout part sash from this tree node
     LayoutPartSash::Pointer sash = parent->part.Cast<LayoutPartSash> ();
     // make sure it has a sash control
-    void* control = sash->GetControl();
+    QWidget* control = sash->GetControl();
     if (control != 0)
     {
       // check for a vertical sash

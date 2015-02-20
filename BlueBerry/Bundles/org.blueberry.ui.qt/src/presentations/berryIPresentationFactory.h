@@ -74,7 +74,7 @@ public:
      * @return a newly created part presentation
      */
     virtual StackPresentation::Pointer CreateEditorPresentation(
-            void* parent, IStackPresentationSite::Pointer site) = 0;
+            QWidget* parent, IStackPresentationSite::Pointer site) = 0;
 
     /**
      * Creates a stack presentation for presenting regular docked views.
@@ -89,7 +89,7 @@ public:
      *            the workbench
      * @return a newly created part presentation
      */
-    virtual StackPresentation::Pointer CreateViewPresentation(void* parent,
+    virtual StackPresentation::Pointer CreateViewPresentation(QWidget* parent,
             IStackPresentationSite::Pointer site) = 0;
 
     /**
@@ -111,7 +111,7 @@ public:
      * @return a newly created part presentation
      */
     virtual StackPresentation::Pointer CreateStandaloneViewPresentation(
-            void* parent, IStackPresentationSite::Pointer site, bool showTitle) = 0;
+            QWidget* parent, IStackPresentationSite::Pointer site, bool showTitle) = 0;
 
     /**
      * Creates the status line manager for the window.
@@ -154,7 +154,7 @@ public:
      * @return the sash control
      * @since 3.4
      */
-    virtual void* CreateSash(void* parent, int style) = 0;
+    virtual QWidget* CreateSash(QWidget* parent, int style) = 0;
 //    {
 //      int orientation = style & (SASHORIENTATION_HORIZONTAL
 //          | SASHORIENTATION_VERTICAL);

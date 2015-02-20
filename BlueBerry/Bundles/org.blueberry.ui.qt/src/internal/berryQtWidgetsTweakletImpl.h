@@ -76,7 +76,7 @@ class QtWidgetsTweakletImpl
 
   QRect GetClientArea(QWidget* widget);
 
-  void* GetParent(QWidget* widget);
+  QWidget* GetParent(QWidget* widget);
   bool SetParent(QWidget* widget, QWidget* parent);
 
   void SetData(QWidget* widget, const QString& id, Object::Pointer data);
@@ -142,7 +142,7 @@ class QtWidgetsTweakletImpl
 
 private:
 
-  typedef QHash<void*, QtSelectionListenerWrapper* > SelectionListenerMap;
+  typedef QHash<QWidget*, QtSelectionListenerWrapper* > SelectionListenerMap;
   SelectionListenerMap selectionListenerMap;
 
   QList<Shell::Pointer> shellList;

@@ -30,7 +30,7 @@ namespace berry
 const int Window::OK = 0;
 const int Window::CANCEL = 1;
 
-QList<void*> Window::defaultImages = QList<void*>();
+QList<QIcon> Window::defaultImages = QList<QIcon>();
 
 Window::IExceptionHandler::Pointer Window::exceptionHandler(new DefaultExceptionHandler());
 IShellProvider::Pointer Window::defaultModalParent(new DefaultModalParent());
@@ -217,7 +217,7 @@ void Window::ConfigureShell(Shell::Pointer newShell)
 //  }
 //}
 
-void* Window::CreateContents(Shell::Pointer parent)
+QWidget* Window::CreateContents(Shell::Pointer parent)
 {
   // by default, just create a composite
   //return new Composite(parent, SWT.NONE);
@@ -262,14 +262,14 @@ Shell::Pointer Window::CreateShell()
   return newShell;
 }
 
-void* Window::GetContents()
+QWidget* Window::GetContents()
 {
   return contents;
 }
 
 QPoint Window::GetInitialLocation(const QPoint& initialSize)
 {
-  void* parent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(shell->GetControl());
+  QWidget* parent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(shell->GetControl());
 
   QPoint centerPoint(0,0);
   QRect parentBounds(0,0,0,0);
@@ -473,13 +473,12 @@ void Window::Create()
   this->InitializeBounds();
 }
 
-void* Window::GetDefaultImage()
+QIcon Window::GetDefaultImage()
 {
-  return (defaultImages.size() < 1) ? 0
-      : defaultImages[0];
+  return (defaultImages.size() < 1) ? QIcon() : defaultImages[0];
 }
 
-QList<void*> Window::GetDefaultImages()
+QList<QIcon> Window::GetDefaultImages()
 {
   return defaultImages;
 }
@@ -533,13 +532,13 @@ void Window::SetBlockOnOpen(bool shouldBlock)
   block = shouldBlock;
 }
 
-void Window::SetDefaultImage(void* image)
+void Window::SetDefaultImage(const QIcon& image)
 {
-  if (image != 0)
+  if (!image.isNull())
     defaultImages.push_back(image);
 }
 
-void Window::SetDefaultImages(const QList<void*>& images)
+void Window::SetDefaultImages(const QList<QIcon>& images)
 {
   defaultImages = images;
 }

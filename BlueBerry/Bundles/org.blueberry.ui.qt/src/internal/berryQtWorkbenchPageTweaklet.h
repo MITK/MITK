@@ -36,10 +36,10 @@ public:
 
   QtWorkbenchPageTweaklet();
 
-  void* CreateClientComposite(void* pageControl);
-  void* CreatePaneControl(void* parent);
+  QWidget* CreateClientComposite(QWidget* pageControl);
+  QWidget* CreatePaneControl(QWidget* parent);
 
-  Object::Pointer CreateStatusPart(void* parent, const QString& title, const QString& msg);
+  Object::Pointer CreateStatusPart(QWidget* parent, const QString& title, const QString& msg);
   IEditorPart::Pointer CreateErrorEditorPart(const QString& partName, const QString& msg);
 
 };

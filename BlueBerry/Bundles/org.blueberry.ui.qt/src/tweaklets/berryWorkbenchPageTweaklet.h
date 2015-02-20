@@ -29,10 +29,10 @@ struct BERRY_UI_QT WorkbenchPageTweaklet
 
   static Tweaklets::TweakKey<WorkbenchPageTweaklet> KEY;
 
-  virtual void* CreateClientComposite(void* pageControl) = 0;
-  virtual void* CreatePaneControl(void* parent) = 0;
+  virtual QWidget* CreateClientComposite(QWidget* pageControl) = 0;
+  virtual QWidget* CreatePaneControl(QWidget* parent) = 0;
 
-  virtual Object::Pointer CreateStatusPart(void* parent, const QString& title, const QString& msg) = 0;
+  virtual Object::Pointer CreateStatusPart(QWidget* parent, const QString& title, const QString& msg) = 0;
   virtual IEditorPart::Pointer CreateErrorEditorPart(const QString& partName, const QString& msg) = 0;
 
 };

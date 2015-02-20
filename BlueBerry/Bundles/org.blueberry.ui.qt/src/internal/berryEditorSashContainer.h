@@ -80,7 +80,7 @@ protected:
    * the composite to use to parent all children
    * layout parts it contains.
    */
-  void* CreateParent(void* parentWidget);
+  QWidget* CreateParent(QWidget* parentWidget);
 
   /**
    * Subclasses override this method to dispose
@@ -120,7 +120,7 @@ public:
   static const QString DEFAULT_WORKBOOK_ID;
 
   EditorSashContainer(const QString& editorId, WorkbenchPage* page,
-      void* parent);
+      QWidget* parent);
 
   bool AllowsAdd(LayoutPart::Pointer layoutPart);
 
@@ -214,7 +214,7 @@ public:
   /**
    * @see org.blueberry.ui.internal.LayoutPart#createControl(org.blueberry.swt.widgets.Composite)
    */
-  void CreateControl(void* parent);
+  void CreateControl(QWidget* parent);
 
   /**
    * @see org.blueberry.ui.internal.LayoutPart#getImportance()

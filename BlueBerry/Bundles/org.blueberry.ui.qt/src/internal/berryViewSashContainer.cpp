@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-ViewSashContainer::ViewSashContainer(WorkbenchPage* page, void* parent) :
+ViewSashContainer::ViewSashContainer(WorkbenchPage* page, QWidget* parent) :
   PartSashContainer("root layout container", page, parent)
 {
 }
@@ -36,7 +36,7 @@ ViewSashContainer::Pointer ViewSashContainer::GetRootContainer()
   return ViewSashContainer::Pointer(this);
 }
 
-void* ViewSashContainer::GetControl()
+QWidget* ViewSashContainer::GetControl()
 {
   return this->parent;
 }
@@ -221,7 +221,7 @@ void ViewSashContainer::Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointe
   PartSashContainer::Replace(oldChild, newChild);
 }
 
-void* ViewSashContainer::CreateParent(void* parentWidget)
+QWidget* ViewSashContainer::CreateParent(QWidget* parentWidget)
 {
   return parentWidget;
 }

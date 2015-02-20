@@ -29,12 +29,12 @@ PartPlaceholder::PartPlaceholder(const QString& id) :
 
 }
 
-void PartPlaceholder::CreateControl(void*  /*parent*/)
+void PartPlaceholder::CreateControl(QWidget*  /*parent*/)
 {
   // do nothing
 }
 
-void* PartPlaceholder::GetControl()
+QWidget* PartPlaceholder::GetControl()
 {
   return 0;
 }

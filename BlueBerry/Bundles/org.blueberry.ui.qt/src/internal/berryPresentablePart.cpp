@@ -75,7 +75,7 @@ void PresentablePart::FirePropertyChange(int propId)
   this->FirePropertyChange(event);
 }
 
-PresentablePart::PresentablePart(PartPane::Pointer part, void*  /*parent*/)
+PresentablePart::PresentablePart(PartPane::Pointer part, QWidget*  /*parent*/)
 {
   enableInputs = true;
   enableOutputs = true;
@@ -203,7 +203,7 @@ bool PresentablePart::IsBusy() const
   return isBusy;
 }
 
-void* PresentablePart::GetToolBar()
+QToolBar* PresentablePart::GetToolBar()
 {
   if (enableOutputs)
   {
@@ -217,7 +217,7 @@ bool PresentablePart::IsCloseable() const
   return part->IsCloseable();
 }
 
-void* PresentablePart::GetControl()
+QWidget* PresentablePart::GetControl()
 {
   return part->GetControl();
 }

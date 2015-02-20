@@ -24,7 +24,7 @@ namespace berry
 namespace GuiTk
 {
 
-SelectionEvent::SelectionEvent(void* item) :
+SelectionEvent::SelectionEvent(QWidget* item) :
   Event()
 {
   this->item = item;

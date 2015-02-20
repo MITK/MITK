@@ -118,12 +118,6 @@ namespace berry {
  * </p><p>
  * IMPORTANT: This class is not intended to be subclassed.
  * </p>
- *
- * @see Decorations
- * @see SWT
- * @see <a href="http://www.blueberry.org/swt/snippets/#shell">Shell snippets</a>
- * @see <a href="http://www.blueberry.org/swt/examples.php">SWT Example: ControlExample</a>
- * @see <a href="http://www.blueberry.org/swt/">Sample code and further information</a>
  */
 class BERRY_UI_QT Shell : public virtual Object
 {
@@ -169,7 +163,7 @@ public:
 
   virtual QWidget* GetControl() = 0;
 
-  virtual void SetImages(const QList<void*>& images) = 0;
+  virtual void SetImages(const QList<QIcon>& images) = 0;
 
   /**
    * Returns <code>true</code> if the receiver is currently

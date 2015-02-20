@@ -295,7 +295,7 @@ public:
 
     protected: IPresentationFactory* GetFactory();
 
-    public: void CreateControl(void* parent);
+    public: void CreateControl(QWidget* parent);
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.LayoutPart#getDropTarget(java.lang.Object, org.blueberry.swt.graphics.QPoint)
@@ -331,7 +331,7 @@ public:
      */
     public: ChildVector GetChildren() const;
 
-    public: void* GetControl();
+    public: QWidget* GetControl();
 
     /**
      * Answer the number of children.
@@ -350,7 +350,7 @@ public:
     /**
      * Get the parent control.
      */
-    public: void* GetParent();
+    public: QWidget* GetParent();
 
     /**
      * Returns a list of IPresentablePart
@@ -379,7 +379,7 @@ public:
     /**
      * Reparent a part. Also reparent visible children...
      */
-    public: void Reparent(void* newParent);
+    public: void Reparent(QWidget* newParent);
 
     /**
      * See IVisualContainer#replace
@@ -423,7 +423,7 @@ public:
 
     public: int GetActive() const;
 
-    public: void CreateControl(void* parent, StackPresentation::Pointer presentation);
+    public: void CreateControl(QWidget* parent, StackPresentation::Pointer presentation);
 
     /**
      * Sets the presentation bounds.
@@ -705,7 +705,7 @@ public:
 
     public: void ShowPartList();
 
-    public: QList<void*> GetTabList(LayoutPart::Pointer part);
+    public: QList<QWidget*> GetTabList(LayoutPart::Pointer part);
 
     /**
      *

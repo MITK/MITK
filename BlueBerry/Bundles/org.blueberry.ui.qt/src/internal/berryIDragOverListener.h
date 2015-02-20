@@ -34,8 +34,8 @@ struct IDragOverListener
 
   struct Events {
 
-    typedef Message4<void*, const Object::Pointer&, const QPoint&, const QRect&, IDropTarget::Pointer> DragEventType;
-    typedef MessageDelegate4<IDragOverListener, void*, const Object::Pointer&, const QPoint&, const QRect&, IDropTarget::Pointer> DragDelegate;
+    typedef Message4<QWidget*, const Object::Pointer&, const QPoint&, const QRect&, IDropTarget::Pointer> DragEventType;
+    typedef MessageDelegate4<IDragOverListener, QWidget*, const Object::Pointer&, const QPoint&, const QRect&, IDropTarget::Pointer> DragDelegate;
 
     DragEventType drag;
 
@@ -56,7 +56,7 @@ struct IDragOverListener
    * @param dragRectangle current drag rectangle (may be an empty rectangle if none)
    * @return a valid drop target or null if none
    */
-  virtual IDropTarget::Pointer Drag(void* currentControl, const Object::Pointer& draggedObject,
+  virtual IDropTarget::Pointer Drag(QWidget* currentControl, const Object::Pointer& draggedObject,
           const QPoint& position, const QRect& dragRectangle) = 0;
 };
 

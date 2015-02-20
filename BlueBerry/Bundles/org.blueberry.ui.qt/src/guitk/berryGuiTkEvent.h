@@ -43,14 +43,14 @@ class BERRY_UI_QT Event: public Object
 
 public:
 
-  berryObjectMacro(Event);
+  berryObjectMacro(Event)
 
   Event();
 
   /**
    * the widget that issued the event
    */
-  void* item;
+  QWidget* item;
 
   /**
    * the event specific detail field, as defined by the detail constants

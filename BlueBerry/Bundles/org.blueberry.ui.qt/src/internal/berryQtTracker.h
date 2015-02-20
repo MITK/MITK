@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryConstants.h>
 #include <berryGuiTkIControlListener.h>
 
+#include <QRect>
+#include <QPoint>
+
 class QCursor;
 class QEventLoop;
 class QRubberBand;
@@ -74,7 +77,9 @@ public:
  *  typically used to represent window geometries in a lightweight manner.
  *
  */
-class QtTracker {
+class QtTracker : public QObject
+{
+  Q_OBJECT
 
 private:
 
@@ -82,8 +87,6 @@ private:
   QtDragManager* dragManager;
 
   int cursorOverride;
-
-  GuiTk::IControlListener::Events controlEvents;
 
   QHash<CursorType, QCursor*> cursorMap;
 
@@ -99,11 +102,26 @@ public:
 
   bool Open();
 
-  void AddControlListener(GuiTk::IControlListener::Pointer listener);
-  void RemoveControlListener(GuiTk::IControlListener::Pointer listener);
+  Q_SIGNAL void Moved(QtTracker* tracker, const QPoint& globalPoint);
 
-  void HandleMove(const QPoint& globalPoint);
+};
 
+class QtTrackerMoveListener : public QObject
+{
+  Q_OBJECT
+
+public:
+  QtTrackerMoveListener(Object::Pointer draggedItem, const QRect& sourceBounds,
+                        const QPoint& initialLocation, bool allowSnapping);
+
+  Q_SLOT void Moved(QtTracker* tracker, const QPoint& globalPoint);
+
+private:
+
+  bool allowSnapping;
+  Object::Pointer draggedItem;
+  QRect sourceBounds;
+  QPoint initialLocation;
 };
 
 }

@@ -102,7 +102,7 @@ mitk::IDataStorageReference::Pointer QmitkFunctionality::GetDataStorageReference
   return mitk::IDataStorageReference::Pointer(0);
 }
 
-void QmitkFunctionality::CreatePartControl(void* parent)
+void QmitkFunctionality::CreatePartControl(QWidget* parent)
 {
 
   // scrollArea

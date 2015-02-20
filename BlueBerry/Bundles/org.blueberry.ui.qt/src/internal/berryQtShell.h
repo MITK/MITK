@@ -53,7 +53,7 @@ public:
 
   QWidget* GetControl();
 
-  void SetImages(const QList<void*>& images);
+  void SetImages(const QList<QIcon>& images);
 
   bool GetMaximized();
   bool GetMinimized();

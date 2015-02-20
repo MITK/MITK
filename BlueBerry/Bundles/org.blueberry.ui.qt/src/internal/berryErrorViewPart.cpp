@@ -29,7 +29,7 @@ ErrorViewPart::ErrorViewPart(const QString& title, const QString& error) :
 
 }
 
-void ErrorViewPart::CreatePartControl(void* parent)
+void ErrorViewPart::CreatePartControl(QWidget* parent)
 {
   if (!error.isEmpty())
   {

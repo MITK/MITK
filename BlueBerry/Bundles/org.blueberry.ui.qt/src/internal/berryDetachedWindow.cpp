@@ -162,7 +162,7 @@ bool DetachedWindow::Close()
   return true;
 }
 
-IDropTarget::Pointer DetachedWindow::Drag(void* /*currentControl*/,
+IDropTarget::Pointer DetachedWindow::Drag(QWidget* /*currentControl*/,
     const Object::Pointer& draggedObject, const QPoint& position, const QRect& /*dragRectangle*/)
 {
 
@@ -263,7 +263,7 @@ void DetachedWindow::SaveState(IMemento::Pointer memento)
   folder->SaveState(childMem);
 }
 
-void* DetachedWindow::GetControl()
+QWidget* DetachedWindow::GetControl()
 {
   return folder->GetControl();
 }
@@ -329,7 +329,7 @@ void DetachedWindow::ConfigureShell(Shell::Pointer shell)
   //      IWorkbenchHelpContextIds.DETACHED_WINDOW);
 }
 
-void* DetachedWindow::CreateContents(void* parent)
+QWidget* DetachedWindow::CreateContents(QWidget* parent)
 {
   // Create the tab folder.
   folder->CreateControl(parent);

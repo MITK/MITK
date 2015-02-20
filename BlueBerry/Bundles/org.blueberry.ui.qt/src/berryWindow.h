@@ -88,7 +88,7 @@ class BERRY_UI_QT Window: public IShellProvider
 
 public:
 
-  berryObjectMacro(Window);
+  berryObjectMacro(Window)
 
   /**
    * Standard return code constant (value 0) indicating that the window was
@@ -110,7 +110,7 @@ public:
    * An array of images to be used for the window. It is expected that the
    * array will contain the same icon rendered at different resolutions.
    */
-  static QList<void*> defaultImages;
+  static QList<QIcon> defaultImages;
 
   /**
    * This interface defines a Exception Handler which can be set as a global
@@ -222,7 +222,7 @@ private:
   /**
    * Top level SWT control, or <code>null</code> if none
    */
-  void* contents;
+  QWidget* contents;
 
   /**
    * Window return code; initially <code>OK</code>.
@@ -385,7 +385,7 @@ protected:
    * @return the control that will be returned by subsequent calls to
    *         getContents()
    */
-  virtual void* CreateContents(Shell::Pointer parent);
+  virtual QWidget* CreateContents(Shell::Pointer parent);
 
   /**
    * Creates and returns this window's shell.
@@ -407,7 +407,7 @@ protected:
    * @return the top level control, or <code>null</code> if this window's
    *         control has not been created yet
    */
-  virtual void* GetContents();
+  virtual QWidget* GetContents();
 
   /**
    * Returns the initial location to use for the shell. The default
@@ -590,7 +590,7 @@ public:
    * @return the default image, or <code>null</code> if none
    * @see #setDefaultImage
    */
-  static void* GetDefaultImage();
+  static QIcon GetDefaultImage();
 
   /**
    * Returns the array of default images to use for newly opened windows. It
@@ -603,7 +603,7 @@ public:
    * @see #setDefaultImages
    * @since 3.0
    */
-  static QList<void*> GetDefaultImages();
+  static QList<QIcon> GetDefaultImages();
 
   /**
    * Returns this window's return code. A window's return codes are
@@ -674,7 +674,7 @@ public:
    * @param image
    *            the default image, or <code>null</code> if none
    */
-  static void SetDefaultImage(void* image);
+  static void SetDefaultImage(const QIcon& image);
 
   /**
    * Sets the array of default images to use for newly opened windows. It is
@@ -687,7 +687,7 @@ public:
    *            the array of images to be used when this window is opened
    * @since 3.0
    */
-  static void SetDefaultImages(const QList<void*>& images);
+  static void SetDefaultImages(const QList<QIcon>& images);
 
   /**
    * Sets the window manager of this window.

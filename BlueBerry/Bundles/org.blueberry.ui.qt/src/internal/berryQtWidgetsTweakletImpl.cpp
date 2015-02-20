@@ -109,7 +109,7 @@ void QtWidgetsTweakletImpl::RemoveSelectionListener(QWidget* widget,
 
   if (wrapper->RemoveListener(listener) == 0)
   {
-    selectionListenerMap.remove(wrapper);
+    selectionListenerMap.remove(widget);
     delete wrapper;
   }
 }
@@ -204,7 +204,7 @@ QRect QtWidgetsTweakletImpl::GetClientArea(QWidget* widget)
   return widget->contentsRect();
 }
 
-void* QtWidgetsTweakletImpl::GetParent(QWidget* widget)
+QWidget* QtWidgetsTweakletImpl::GetParent(QWidget* widget)
 {
   return widget->parentWidget();
 }

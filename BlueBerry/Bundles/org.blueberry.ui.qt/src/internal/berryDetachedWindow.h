@@ -117,9 +117,9 @@ public:
   bool Close();
 
   /*
-   * @see org.blueberry.ui.internal.IDragOverListener#Drag(void*, Object::Pointer, const QPoint&, const QRect& )
+   * @see org.blueberry.ui.internal.IDragOverListener#Drag(QWidget*, Object::Pointer, const QPoint&, const QRect& )
    */
-  IDropTarget::Pointer Drag(void* currentControl,
+  IDropTarget::Pointer Drag(QWidget* currentControl,
       const Object::Pointer& draggedObject, const QPoint& position,
       const QRect& dragRectangle);
 
@@ -137,7 +137,7 @@ public:
    */
   void SaveState(IMemento::Pointer memento);
 
-  void* GetControl();
+  QWidget* GetControl();
 
   /**
    * Opens the detached window.
@@ -156,7 +156,7 @@ protected:
   /**
    * Override this method to create the widget tree that is used as the window's contents.
    */
-  void* CreateContents(void* parent);
+  QWidget* CreateContents(QWidget* parent);
 
 private:
 

@@ -180,7 +180,7 @@ public:
   SmartPointer<IWorkbenchPage> OpenPage(IAdaptable* input);
 
   //TODO menu manager
-  //virtual void* GetMenuManager() = 0;
+  //virtual QWidget* GetMenuManager() = 0;
 
   virtual bool SaveState(IMemento::Pointer memento);
 
@@ -255,7 +255,7 @@ protected:
    * Returns the GUI dependent page composite, under which the window's
    * pages create their controls.
    */
-  void* GetPageComposite();
+  QWidget* GetPageComposite();
 
   /**
    * Creates and remembers the client composite, under which workbench pages
@@ -270,7 +270,7 @@ protected:
    *
    * @since 3.0
    */
-  void* CreateContents(Shell::Pointer parent);
+  QWidget* CreateContents(Shell::Pointer parent);
 
   /**
    * Creates the default contents and layout of the shell.
@@ -407,7 +407,7 @@ private:
   QScopedPointer<IWorkbenchLocationService, QScopedPointerObjectDeleter> workbenchLocationService;
 
   bool emptyWindowContentsCreated;
-  void* emptyWindowContents;
+  QWidget* emptyWindowContents;
 
   QRect normalBounds;
 

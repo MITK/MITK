@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryISizeProvider.h"
 #include "berryIPropertyChangeListener.h"
 
+class QToolBar;
+
 namespace berry {
 
 /**
@@ -227,7 +229,7 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
      *
      * @return the local toolbar for the part, or null if none
      */
-    virtual void* GetToolBar() = 0;
+    virtual QToolBar* GetToolBar() = 0;
 
     /**
      * Returns the menu for this part or null if none
@@ -245,7 +247,7 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
      *
      * @return the part's control (not null)
      */
-    virtual void* GetControl() = 0;
+    virtual QWidget* GetControl() = 0;
 
     /**
    * Get a property from the part's arbitrary property set.

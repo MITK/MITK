@@ -45,7 +45,7 @@ PartPane::PartPane(IWorkbenchPartReference::Pointer partReference,
   this->page = workbenchPage;
 }
 
-void PartPane::CreateControl(void* parent) {
+void PartPane::CreateControl(QWidget* parent) {
   if (this->GetControl() != 0)
   {
     return;
@@ -115,7 +115,7 @@ void PartPane::DoHide()
 
 QRect PartPane::GetParentBounds()
 {
-  void* ctrl = this->GetControl();
+  QWidget* ctrl = this->GetControl();
 
   if (this->GetContainer() != 0 && this->GetContainer().Cast<LayoutPart>() != 0)
   {
@@ -130,7 +130,7 @@ QRect PartPane::GetParentBounds()
   return DragUtil::GetDisplayBounds(ctrl);
 }
 
-void* PartPane::GetControl()
+QWidget* PartPane::GetControl()
 {
   return control;
 }
@@ -153,7 +153,7 @@ GuiTk::IControlListener::Events::Types PartPane::GetEventTypes() const
   return GuiTk::IControlListener::Events::ACTIVATED;
 }
 
-void PartPane::MoveAbove(void* refControl)
+void PartPane::MoveAbove(QWidget* refControl)
 {
   if (this->GetControl() != 0)
   {
@@ -208,12 +208,12 @@ void PartPane::SetContainer(ILayoutContainer::Pointer container)
     }
   }
 
-  void* containerControl = container == 0 ? 0 : container.Cast<LayoutPart>()->GetControl();
+  QWidget* containerControl = container == 0 ? 0 : container.Cast<LayoutPart>()->GetControl();
 
   if (containerControl != 0)
   {
-    void* control = this->GetControl();
-    void* newParent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(containerControl);
+    QWidget* control = this->GetControl();
+    QWidget* newParent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(containerControl);
     if (control != 0 && newParent != Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(control))
     {
       this->Reparent(newParent);
@@ -223,9 +223,9 @@ void PartPane::SetContainer(ILayoutContainer::Pointer container)
   LayoutPart::SetContainer(container);
 }
 
-void PartPane::Reparent(void* newParent)
+void PartPane::Reparent(QWidget* newParent)
 {
-  void* control = this->GetControl();
+  QWidget* control = this->GetControl();
 
   GuiWidgetsTweaklet* guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
   if ((control == 0) || (guiTweaklet->GetParent(control) == newParent))
@@ -349,7 +349,7 @@ void PartPane::ShowHighlight()
   //No nothing by default
 }
 
-void* PartPane::GetToolBar()
+QToolBar* PartPane::GetToolBar()
 {
   return 0;
 }

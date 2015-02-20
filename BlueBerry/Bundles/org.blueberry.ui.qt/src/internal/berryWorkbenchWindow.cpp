@@ -738,7 +738,7 @@ int WorkbenchWindow::Open()
   return result;
 }
 
-void* WorkbenchWindow::GetPageComposite()
+QWidget* WorkbenchWindow::GetPageComposite()
 {
   return pageComposite;
 }
@@ -761,7 +761,7 @@ QWidget *WorkbenchWindow::CreatePageComposite(QWidget *parent)
   return pageArea;
 }
 
-void* WorkbenchWindow::CreateContents(Shell::Pointer parent)
+QWidget* WorkbenchWindow::CreateContents(Shell::Pointer parent)
 {
   // we know from Window.create that the parent is a Shell.
   this->GetWindowAdvisor()->CreateWindowContents(parent);
@@ -1681,7 +1681,7 @@ void WorkbenchWindow::ShowEmptyWindowContents()
 {
   if (!emptyWindowContentsCreated)
   {
-    void* parent = this->GetPageComposite();
+    QWidget* parent = this->GetPageComposite();
     emptyWindowContents = this->GetWindowAdvisor()->CreateEmptyWindowContents(
         parent);
     emptyWindowContentsCreated = true;

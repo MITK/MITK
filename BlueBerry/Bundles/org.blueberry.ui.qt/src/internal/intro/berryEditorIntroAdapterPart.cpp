@@ -47,7 +47,7 @@ void EditorIntroAdapterPart::SetStandby(bool standby)
   //        });
 }
 
-void EditorIntroAdapterPart::CreatePartControl(void* parent)
+void EditorIntroAdapterPart::CreatePartControl(QWidget* parent)
 {
   //addPaneListener();
   introPart->CreatePartControl(parent);

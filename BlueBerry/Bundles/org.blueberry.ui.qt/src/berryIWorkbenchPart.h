@@ -150,7 +150,7 @@ struct BERRY_UI_QT IWorkbenchPart : public virtual Object { // public IAdaptable
      *
      * @param parent the parent control
      */
-    virtual void CreatePartControl(void* parent) = 0;
+    virtual void CreatePartControl(QWidget* parent) = 0;
 
     /**
      * Returns the site for this workbench part. The site can be

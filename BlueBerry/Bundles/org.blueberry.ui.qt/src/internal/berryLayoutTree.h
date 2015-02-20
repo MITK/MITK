@@ -333,7 +333,7 @@ public:
    * @param parent
    * @since 3.1
    */
-  virtual void CreateControl(void* parent);
+  virtual void CreateControl(QWidget* parent);
 
   /**
    * Writes a description of the layout to the given string buffer.

@@ -28,7 +28,7 @@ const int PresentationFactoryUtil::ROLE_STANDALONE = 0x03;
 const int PresentationFactoryUtil::ROLE_STANDALONE_NOTITLE = 0x04;
 
 StackPresentation::Pointer PresentationFactoryUtil::CreatePresentation(
-    IPresentationFactory* factory, int role, void* parent,
+    IPresentationFactory* factory, int role, QWidget* parent,
     IStackPresentationSite::Pointer site, IPresentationSerializer* serializer,
     IMemento::Pointer memento)
 {

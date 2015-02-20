@@ -43,9 +43,9 @@ QtWorkbenchPresentationFactory::QtWorkbenchPresentationFactory(
 }
 
 StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateEditorPresentation(
-    void* parent, IStackPresentationSite::Pointer site)
+    QWidget* parent, IStackPresentationSite::Pointer site)
 {
-  NativeTabFolder* folder = new NativeTabFolder(static_cast<QWidget*> (parent));
+  NativeTabFolder* folder = new NativeTabFolder(parent);
 
   //    /*
   //     * Set the minimum characters to display, if the preference is something
@@ -81,7 +81,7 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateEditorPresentat
 }
 
 StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateViewPresentation(
-    void* parent, IStackPresentationSite::Pointer site)
+    QWidget* parent, IStackPresentationSite::Pointer site)
 {
 
   NativeTabFolder* folder = new NativeTabFolder(static_cast<QWidget*> (parent));
@@ -111,7 +111,7 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateViewPresentatio
 }
 
 StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateStandaloneViewPresentation(
-    void* parent, IStackPresentationSite::Pointer site, bool showTitle)
+    QWidget* parent, IStackPresentationSite::Pointer site, bool showTitle)
 {
 
   if (showTitle)
@@ -131,7 +131,7 @@ QString QtWorkbenchPresentationFactory::GetId()
   return "berryQtWorkbenchPresentationFactory";
 }
 
-void* QtWorkbenchPresentationFactory::CreateSash(void* parent, int style)
+QWidget* QtWorkbenchPresentationFactory::CreateSash(QWidget* parent, int style)
 {
   Qt::Orientation orientation =
       style & SASHORIENTATION_HORIZONTAL ? Qt::Horizontal : Qt::Vertical;

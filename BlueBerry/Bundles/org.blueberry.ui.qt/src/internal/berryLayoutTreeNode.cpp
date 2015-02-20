@@ -178,7 +178,7 @@ LayoutTreeNode::Pointer LayoutTreeNode::FindSash(LayoutPartSash::Pointer sash)
 
 void LayoutTreeNode::FindSashes(LayoutTree::Pointer child, PartPane::Sashes sashes)
 {
-  void* sash = this->GetSash()->GetControl();
+  QWidget* sash = this->GetSash()->GetControl();
   bool leftOrTop = children[0] == child;
   if (sash != 0)
   {
@@ -589,7 +589,7 @@ void LayoutTreeNode::DoSetBounds(const QRect& b)
   children[1]->SetBounds(rightBounds);
 }
 
-void LayoutTreeNode::CreateControl(void* parent)
+void LayoutTreeNode::CreateControl(QWidget* parent)
 {
   children[0]->CreateControl(parent);
   children[1]->CreateControl(parent);
@@ -676,7 +676,7 @@ QString LayoutTreeNode::ToString() const
   return str2;
 }
 
-//void LayoutTreeNode::UpdateSashes(void* parent) {
+//void LayoutTreeNode::UpdateSashes(QWidget* parent) {
 //        if (parent == 0)
 //            return;
 //        children[0]->UpdateSashes(parent);

@@ -116,7 +116,7 @@ bool LayoutPart::IsDocked()
 
 Shell::Pointer LayoutPart::GetShell()
 {
-  void* ctrl = this->GetControl();
+  QWidget* ctrl = this->GetControl();
   if (ctrl)
   {
     return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(ctrl);
@@ -145,13 +145,13 @@ IWorkbenchWindow::Pointer LayoutPart::GetWorkbenchWindow()
 
 }
 
-void LayoutPart::MoveAbove(void*  /*refControl*/)
+void LayoutPart::MoveAbove(QWidget*  /*refControl*/)
 {
 }
 
-void LayoutPart::Reparent(void* newParent)
+void LayoutPart::Reparent(QWidget* newParent)
 {
-  void* control = this->GetControl();
+  QWidget* control = this->GetControl();
 
   GuiWidgetsTweaklet* guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
   if ((control == 0) || (guiTweaklet->GetParent(control) == newParent))
@@ -176,7 +176,7 @@ void LayoutPart::Reparent(void* newParent)
 
 bool LayoutPart::GetVisible()
 {
-  void* ctrl = this->GetControl();
+  QWidget* ctrl = this->GetControl();
   if (ctrl)
   {
     return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetVisible(ctrl);
@@ -187,7 +187,7 @@ bool LayoutPart::GetVisible()
 
 bool LayoutPart::IsVisible()
 {
-  void* ctrl = this->GetControl();
+  QWidget* ctrl = this->GetControl();
   if (ctrl)
   {
     return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->IsVisible(ctrl);
@@ -198,7 +198,7 @@ bool LayoutPart::IsVisible()
 
 void LayoutPart::SetVisible(bool makeVisible)
 {
-  void* ctrl = this->GetControl();
+  QWidget* ctrl = this->GetControl();
   if (ctrl != 0)
   {
     if (makeVisible == Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetVisible(ctrl))
@@ -220,7 +220,7 @@ void LayoutPart::SetVisible(bool makeVisible)
 }
 }
 
-bool LayoutPart::IsFocusAncestor(void*  /*ctrl*/)
+bool LayoutPart::IsFocusAncestor(QWidget*  /*ctrl*/)
 {
 //  Control f = ctrl.getDisplay().getFocusControl();
 //  while (f != null && f != ctrl)
@@ -233,7 +233,7 @@ bool LayoutPart::IsFocusAncestor(void*  /*ctrl*/)
 
 void LayoutPart::SetBounds(const QRect& r)
 {
-  void* ctrl = this->GetControl();
+  QWidget* ctrl = this->GetControl();
   if (ctrl)
   {
     return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetBounds(ctrl, r);

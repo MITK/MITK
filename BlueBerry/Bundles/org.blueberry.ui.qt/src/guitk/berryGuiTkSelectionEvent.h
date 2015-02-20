@@ -45,7 +45,7 @@ public:
    *
    * @param item the GUI dependent widget which has been selected
    */
-  SelectionEvent(void* item);
+  SelectionEvent(QWidget* item);
 
 };
 

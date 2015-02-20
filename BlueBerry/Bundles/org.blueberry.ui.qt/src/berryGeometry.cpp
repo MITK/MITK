@@ -14,13 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
-
 #include "berryGeometry.h"
 #include "berryConstants.h"
 
 #include <QPoint>
 #include <QRect>
+#include <QWidget>
 
 #include <limits>
 
@@ -139,30 +138,28 @@ int Geometry::GetOppositeSide(int directionConstant)
   return directionConstant;
 }
 
-QRect Geometry::ToControl(void* coordinateSystem,
+QRect Geometry::ToControl(QWidget* coordinateSystem,
     const QRect& toConvert)
 {
-  return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->ToControl(coordinateSystem,
-      toConvert);
+  return QRect(coordinateSystem->mapFromGlobal(toConvert.topLeft()),
+               coordinateSystem->mapFromGlobal(toConvert.bottomRight()));
 }
 
-QPoint Geometry::ToControl(void* coordinateSystem, const QPoint& toConvert)
+QPoint Geometry::ToControl(QWidget* coordinateSystem, const QPoint& toConvert)
 {
-  return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->ToControl(coordinateSystem,
-      toConvert);
+  return coordinateSystem->mapFromGlobal(toConvert);
 }
 
-QRect Geometry::ToDisplay(void* coordinateSystem,
+QRect Geometry::ToDisplay(QWidget* coordinateSystem,
     const QRect& toConvert)
 {
-  return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->ToDisplay(coordinateSystem,
-      toConvert);
+  return QRect(coordinateSystem->mapToGlobal(toConvert.topLeft()),
+               coordinateSystem->mapToGlobal(toConvert.bottomRight()));
 }
 
-QPoint Geometry::ToDisplay(void* coordinateSystem, const QPoint& toConvert)
+QPoint Geometry::ToDisplay(QWidget* coordinateSystem, const QPoint& toConvert)
 {
-  return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->ToDisplay(coordinateSystem,
-      toConvert);
+  return coordinateSystem->mapToGlobal(toConvert);
 }
 
 }

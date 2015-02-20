@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "guitk/berryGuiTkIControlListener.h"
 
+class QToolBar;
+
 namespace berry {
 
 class WorkbenchPage;
@@ -63,7 +65,7 @@ public:
 
     protected: WorkbenchPage* page;
 
-    protected: void* control;
+    protected: QWidget* control;
 
     private: bool inLayout;
 
@@ -106,10 +108,10 @@ public:
         public:
           Sashes();
 
-          /*Sash*/ void* left;
-          /*Sash*/ void* right;
-          /*Sash*/ void* top;
-          /*Sash*/ void* bottom;
+          /*Sash*/ QWidget* left;
+          /*Sash*/ QWidget* right;
+          /*Sash*/ QWidget* top;
+          /*Sash*/ QWidget* bottom;
     };
 
     /**
@@ -131,9 +133,9 @@ public:
      *
      * Creates the GUI-dependent container control
      * for the part widgets. This is passed to
-     * IWorkbenchPart::CreatePartControl(void*)
+     * IWorkbenchPart::CreatePartControl(QWidget*)
      */
-    public: virtual void CreateControl(void* parent);
+    public: virtual void CreateControl(QWidget* parent);
 
     //public: virtual void SetControlEnabled(bool enabled) = 0;
 
@@ -158,7 +160,7 @@ public:
     /**
      * Get the control.
      */
-    public: void* GetControl();
+    public: QWidget* GetControl();
 
     /**
      * Answer the part child.
@@ -178,7 +180,7 @@ public:
     /**
      * Move the control over another one.
      */
-    public: void MoveAbove(void* refControl);
+    public: void MoveAbove(QWidget* refControl);
 
     /**
      * Notify the workbook page that the part pane has
@@ -202,7 +204,7 @@ public:
      */
     public: void SetWorkbenchPage(SmartPointer<WorkbenchPage> workbenchPage);
 
-    public: void Reparent(void* newParent);
+    public: void Reparent(QWidget* newParent);
 
     /**
      * Indicate focus in part.
@@ -342,7 +344,7 @@ public:
     /**
      * @return
      */
-    public: virtual void* GetToolBar();
+    public: virtual QToolBar* GetToolBar();
 
     /**
      * @return

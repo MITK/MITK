@@ -26,14 +26,12 @@ namespace berry {
 
 /**
  * This part is shown instead the views with errors.
- *
- * @since 3.3
  */
 class ErrorViewPart : public ViewPart {
 
 public:
 
-  berryObjectMacro(ErrorViewPart);
+  berryObjectMacro(ErrorViewPart)
 
   /**
    * Creates instance of the class
@@ -52,7 +50,7 @@ public:
    *
    * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
    */
-  void CreatePartControl(void* parent);
+  void CreatePartControl(QWidget* parent);
 
   /*
    * (non-Javadoc)

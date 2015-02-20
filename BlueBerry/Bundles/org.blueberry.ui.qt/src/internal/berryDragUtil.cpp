@@ -31,76 +31,8 @@ TestDropLocation::Pointer DragUtil::forcedDropTarget(0);
 
 QList<IDragOverListener*> DragUtil::defaultTargets = QList<IDragOverListener*>();
 
-DragUtil::TrackerMoveListener::TrackerMoveListener(Object::Pointer draggedItem,
-    const QRect& sourceBounds, const QPoint& initialLocation,
-    bool allowSnapping) :
-  allowSnapping(allowSnapping), draggedItem(draggedItem), sourceBounds(
-      sourceBounds), initialLocation(initialLocation)
-{
 
-}
-
-GuiTk::IControlListener::Events::Types DragUtil::TrackerMoveListener::GetEventTypes() const
-{
-  return Events::MOVED;
-}
-
-void DragUtil::TrackerMoveListener::ControlMoved(
-    GuiTk::ControlEvent::Pointer event)
-{
-
-  // Get the curslor location as a point
-  QPoint location(event->x, event->y);
-
-  // Select a drop target; use the global one by default
-  IDropTarget::Pointer target;
-
-  void* targetControl =
-      Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorControl();
-
-  // Get the QtTracker which fired the event
-  QtTracker* tracker = static_cast<QtTracker*> (event->item);
-
-  // Get the drop target for this location
-  target = DragUtil::GetDropTarget(targetControl, draggedItem, location,
-      tracker->GetRectangle());
-
-  // Set up the tracker feedback based on the target
-  QRect snapTarget;
-  if (target != 0)
-  {
-    snapTarget = target->GetSnapRectangle();
-
-    tracker->SetCursor(target->GetCursor());
-  }
-  else
-  {
-    tracker->SetCursor(CURSOR_INVALID);
-  }
-
-  // If snapping then reset the tracker's rectangle based on the current drop target
-  if (allowSnapping)
-  {
-    if (snapTarget.width() < 0 || snapTarget.height() < 0)
-    {
-      snapTarget = QRect(sourceBounds.x() + location.x() - initialLocation.x(),
-          sourceBounds.y() + location.y() - initialLocation.y(), sourceBounds.width(),
-          sourceBounds.height());
-    }
-
-    // Try to prevent flicker: don't change the rectangles if they're already in
-    // the right location
-    QRect currentRectangle = tracker->GetRectangle();
-
-    if (!(currentRectangle == snapTarget))
-    {
-      tracker->SetRectangle(snapTarget);
-    }
-  }
-
-}
-
-DragUtil::TargetListType::Pointer DragUtil::GetTargetList(void* control)
+DragUtil::TargetListType::Pointer DragUtil::GetTargetList(QWidget* control)
 {
   Object::Pointer data = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetData(
       control, DROP_TARGET_ID);
@@ -109,7 +41,7 @@ DragUtil::TargetListType::Pointer DragUtil::GetTargetList(void* control)
 }
 
 IDropTarget::Pointer DragUtil::GetDropTarget(const QList<IDragOverListener*>& toSearch,
-                                             void* mostSpecificControl,
+                                             QWidget* mostSpecificControl,
                                              Object::Pointer draggedObject,
                                              const QPoint& position,
                                              const QRect& dragRectangle)
@@ -132,7 +64,7 @@ IDropTarget::Pointer DragUtil::GetDropTarget(const QList<IDragOverListener*>& to
   return IDropTarget::Pointer(0);
 }
 
-void DragUtil::AddDragTarget(void* control, IDragOverListener* target)
+void DragUtil::AddDragTarget(QWidget* control, IDragOverListener* target)
 {
   if (control == 0)
   {
@@ -152,7 +84,7 @@ void DragUtil::AddDragTarget(void* control, IDragOverListener* target)
   }
 }
 
-void DragUtil::RemoveDragTarget(void* control, IDragOverListener* target)
+void DragUtil::RemoveDragTarget(QWidget* control, IDragOverListener* target)
 {
   if (control == 0)
   {
@@ -173,9 +105,9 @@ void DragUtil::RemoveDragTarget(void* control, IDragOverListener* target)
   }
 }
 
-QRect DragUtil::GetDisplayBounds(void* boundsControl)
+QRect DragUtil::GetDisplayBounds(QWidget* boundsControl)
 {
-  void* parent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(
+  QWidget* parent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(
       boundsControl);
   if (parent == 0)
   {
@@ -222,7 +154,7 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
   {
     QPoint location = forcedDropTarget->GetLocation();
 
-    void* currentControl =
+    QWidget* currentControl =
         Tweaklets::Get(GuiWidgetsTweaklet::KEY)->FindControl(
             forcedDropTarget->GetShells(), location);
     return GetDropTarget(currentControl, draggedItem, location, sourceBounds);
@@ -233,15 +165,15 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
   QtTracker tracker;
   //tracker.setStippled(true);
 
-  GuiTk::IControlListener::Pointer trackerListener(new TrackerMoveListener(
-      draggedItem, sourceBounds, initialLocation, allowSnapping));
+  QtTrackerMoveListener trackerListener(draggedItem, sourceBounds,
+                                        initialLocation, allowSnapping);
 
-  tracker.AddControlListener(trackerListener);
+  trackerListener.connect(&tracker, SIGNAL(Moved(QtTracker*,QPoint)), SLOT(Moved(QtTracker*,QPoint)));
 
   // Setup...when the drag starts we might already be over a valid target, check this...
   // If there is a 'global' target then skip the check
   IDropTarget::Pointer target;
-  void* startControl =
+  QWidget* startControl =
       Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorControl();
 
   if (startControl != 0 && allowSnapping)
@@ -297,7 +229,7 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
   IDropTarget::Pointer dropTarget;
   QPoint finalLocation =
       Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorLocation();
-  void* targetControl =
+  QWidget* targetControl =
       Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorControl();
   dropTarget = GetDropTarget(targetControl, draggedItem, finalLocation,
       tracker.GetRectangle());
@@ -320,12 +252,12 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
   return IDropTarget::Pointer(0);
 }
 
-IDropTarget::Pointer DragUtil::GetDropTarget(void* toSearch,
+IDropTarget::Pointer DragUtil::GetDropTarget(QWidget* toSearch,
     Object::Pointer draggedObject, const QPoint& position,
     const QRect& dragRectangle)
 {
   // Search for a listener by walking the control's parent hierarchy
-  for (void* current = toSearch; current != 0; current = Tweaklets::Get(
+  for (QWidget* current = toSearch; current != 0; current = Tweaklets::Get(
       GuiWidgetsTweaklet::KEY)->GetParent(current))
   {
     TargetListType::Pointer targetList = GetTargetList(current);

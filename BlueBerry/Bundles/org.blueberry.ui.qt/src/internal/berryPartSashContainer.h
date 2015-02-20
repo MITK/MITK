@@ -58,7 +58,7 @@ public:
   friend class PageLayout;
 
 private:
-  void* parentWidget;
+  QWidget* parentWidget;
   //LayoutPart::Pointer zoomedPart;
 
   /* Indicates if the children of a sash container should be aligned from left to right
@@ -81,7 +81,7 @@ protected:
   private: PartSashContainer* partSashContainer;
   };
 
-  void* parent;
+  QWidget* parent;
   GuiTk::IControlListener::Pointer resizeListener;
   SmartPointer<LayoutTree> root;
   WorkbenchPage*  page;
@@ -159,7 +159,7 @@ public:
    * GUI specializations must hook
    */
   PartSashContainer(const QString& id, WorkbenchPage*  page,
-      void* parentWidget);
+      QWidget* parentWidget);
 
   ~PartSashContainer();
 
@@ -294,7 +294,7 @@ public:
    * @see LayoutPart#getControl
    */
 public:
-  void CreateControl(void* parentWidget);
+  void CreateControl(QWidget* parentWidget);
 
   /**
    * Subclasses override this method to specify
@@ -302,7 +302,7 @@ public:
    * layout parts it contains.
    */
 protected:
-  virtual void* CreateParent(void* parentWidget) = 0;
+  virtual QWidget* CreateParent(QWidget* parentWidget) = 0;
 
   /**
    * @see LayoutPart#dispose
@@ -351,7 +351,7 @@ public:
    * @see LayoutPart#getControl
    */
 public:
-  void* GetControl();
+  QWidget* GetControl();
 
 public:
   virtual SmartPointer<LayoutTree> GetLayoutTree();
@@ -369,7 +369,7 @@ public:
    * layout parts contained within.
    */
 public:
-  virtual void* GetParent();
+  virtual QWidget* GetParent();
 
 protected:
   virtual bool IsChild(LayoutPart::Pointer part);
@@ -574,7 +574,7 @@ public:
    * @see org.blueberry.ui.internal.dnd.IDragOverListener#drag(org.blueberry.swt.widgets.Control, java.lang.Object, org.blueberry.swt.graphics.QPoint, org.blueberry.swt.graphics.QRect)
    */
 public:
-  IDropTarget::Pointer Drag(void* currentControl, const Object::Pointer& draggedObject,
+  IDropTarget::Pointer Drag(QWidget* currentControl, const Object::Pointer& draggedObject,
                             const QPoint& position, const QRect& dragRectangle);
 
   /**

@@ -79,7 +79,7 @@ protected: ILayoutContainer* container;
     /**
      * Creates the GUI control
      */
-    public: virtual void CreateControl(void* parent) = 0;
+    public: virtual void CreateControl(QWidget* parent) = 0;
 
     /**
      * Disposes the GUI control
@@ -117,7 +117,7 @@ protected: ILayoutContainer* container;
     /**
      * Get the part control.  This method may return null.
      */
-    public: virtual void* GetControl() = 0;
+    public: virtual QWidget* GetControl() = 0;
 
     public: virtual bool IsPlaceHolder() const;
 
@@ -164,12 +164,12 @@ protected: ILayoutContainer* container;
     /**
      * Move the control over another one.
      */
-    public: virtual void MoveAbove(void* refControl);
+    public: virtual void MoveAbove(QWidget* refControl);
 
     /**
      * Reparent a part.
      */
-    public: virtual void Reparent(void* newParent);
+    public: virtual void Reparent(QWidget* newParent);
 
     /**
      * Returns true if this part was set visible. This returns whatever was last passed into
@@ -192,7 +192,7 @@ protected: ILayoutContainer* container;
     /**
      * Returns <code>true</code> if the given control or any of its descendents has focus.
      */
-    private: virtual bool IsFocusAncestor(void* ctrl);
+    private: virtual bool IsFocusAncestor(QWidget* ctrl);
 
     /**
      * Sets the presentation bounds.

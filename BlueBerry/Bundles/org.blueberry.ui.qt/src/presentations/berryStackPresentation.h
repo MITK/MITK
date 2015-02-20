@@ -173,7 +173,7 @@ public:
      *
      * @return the control for this presentation (not null)
      */
-    virtual void* GetControl() = 0;
+    virtual QWidget* GetControl() = 0;
 
     /**
      * Adds the given part to the stack. The presentation is free to determine
@@ -224,7 +224,7 @@ public:
      * @return a StackDropResult or null if the presentation does not have
      * a drop target in this location.
      */
-    virtual StackDropResult::Pointer DragOver(void* currentControl, const QPoint& location) = 0;
+    virtual StackDropResult::Pointer DragOver(QWidget* currentControl, const QPoint& location) = 0;
 
     /**
      * Instructs the presentation to display the system menu
@@ -267,7 +267,7 @@ public:
      * @param part the part
      * @return the tab-key traversal order
      */
-    virtual QList<void*> GetTabList(IPresentablePart::Pointer part) = 0;
+    virtual QList<QWidget*> GetTabList(IPresentablePart::Pointer part) = 0;
 };
 
 }

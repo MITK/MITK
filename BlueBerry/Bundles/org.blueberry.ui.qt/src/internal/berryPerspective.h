@@ -175,7 +175,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      * Returns the window's client composite widget
      * which views and editor area will be parented.
      */
-    public: void* GetClientComposite();
+    public: QWidget* GetClientComposite();
 
     /**
      * Returns the perspective.

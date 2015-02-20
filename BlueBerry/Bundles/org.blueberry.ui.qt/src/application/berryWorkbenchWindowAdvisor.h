@@ -242,7 +242,7 @@ public:
    * @param parent the parent composite
    * @return the control or <code>null</code>
    */
-  virtual void* CreateEmptyWindowContents(void* parent);
+  virtual QWidget* CreateEmptyWindowContents(QWidget* parent);
 
   /**
    * Saves arbitrary application specific state information.

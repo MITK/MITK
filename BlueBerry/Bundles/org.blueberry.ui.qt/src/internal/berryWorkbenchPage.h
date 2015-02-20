@@ -357,7 +357,7 @@ private:
 
   IAdaptable* input;
 
-  void* composite;
+  QWidget* composite;
 
   //Could be delete. This information is in the active part list;
   ActivationList* activationList;
@@ -848,7 +848,7 @@ public:
    * Returns the client composite.
    */
 public:
-  void* GetClientComposite();
+  QWidget* GetClientComposite();
 
   //  for dynamic UI - change access from private to protected
   // for testing purposes only, changed from protected to public

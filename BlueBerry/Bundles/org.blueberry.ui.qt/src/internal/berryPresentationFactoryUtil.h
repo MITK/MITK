@@ -38,7 +38,7 @@ public:
   static const int ROLE_STANDALONE_NOTITLE; // = 0x04;
 
   static StackPresentation::Pointer CreatePresentation(
-      IPresentationFactory* factory, int role, void* parent,
+      IPresentationFactory* factory, int role, QWidget* parent,
       IStackPresentationSite::Pointer site,
       IPresentationSerializer* serializer, IMemento::Pointer memento);
 

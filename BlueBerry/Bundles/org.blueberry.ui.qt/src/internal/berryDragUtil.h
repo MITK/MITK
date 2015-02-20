@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 /**
- * Provides the methods for attaching drag-and-drop listeners to SWT controls.
+ * Provides the methods for attaching drag-and-drop listeners to controls.
  */
 class BERRY_UI_QT DragUtil
 {
@@ -46,96 +46,81 @@ private:
 
   static const QString DROP_TARGET_ID;
 
-    /**
-     * The location where all drags will end. If this is non-null, then
-     * all user input is ignored in drag/drop. If null, we use user input
-     * to determine where objects should be dropped.
-     */
-    static TestDropLocation::Pointer forcedDropTarget;
+  /**
+   * The location where all drags will end. If this is non-null, then
+   * all user input is ignored in drag/drop. If null, we use user input
+   * to determine where objects should be dropped.
+   */
+  static TestDropLocation::Pointer forcedDropTarget;
 
-    /**
-     * List of IDragOverListener
-     */
-    static QList<IDragOverListener*> defaultTargets;
+  /**
+   * List of IDragOverListener
+   */
+  static QList<IDragOverListener*> defaultTargets;
 
-    /**
-     * Return the list of 'IDragOverListener' elements associated with
-     * the given control. If there's a 'global' listener then always
-     * return it.
-     *
-     * @param control
-     * @return
-     */
-    static TargetListType::Pointer GetTargetList(void* control);
+  /**
+   * Return the list of 'IDragOverListener' elements associated with
+   * the given control. If there's a 'global' listener then always
+   * return it.
+   *
+   * @param control
+   * @return
+   */
+  static TargetListType::Pointer GetTargetList(QWidget* control);
 
-    /**
-     * Given a list of IDragOverListeners and a description of what is being dragged, it returns
-     * a IDropTarget for the current drop.
-     *
-     * @param toSearch
-     * @param mostSpecificControl
-     * @param draggedObject
-     * @param position
-     * @param dragRectangle
-     * @return
-     */
-    static IDropTarget::Pointer GetDropTarget(const QList<IDragOverListener*>& toSearch,
-            void* mostSpecificControl, Object::Pointer draggedObject, const QPoint &position,
-            const QRect& dragRectangle);
-
-
-    struct TrackerMoveListener : public GuiTk::IControlListener {
-
-      TrackerMoveListener(Object::Pointer draggedItem, const QRect& sourceBounds,
-          const QPoint& initialLocation, bool allowSnapping);
-
-      Events::Types GetEventTypes() const;
-
-      void ControlMoved(GuiTk::ControlEvent::Pointer event);
-
-    private:
-
-      bool allowSnapping;
-      Object::Pointer draggedItem;
-      QRect sourceBounds;
-      QPoint initialLocation;
-    };
-
+  /**
+   * Given a list of IDragOverListeners and a description of what is being dragged, it returns
+   * a IDropTarget for the current drop.
+   *
+   * @param toSearch
+   * @param mostSpecificControl
+   * @param draggedObject
+   * @param position
+   * @param dragRectangle
+   * @return
+   */
+  static IDropTarget::Pointer GetDropTarget(const QList<IDragOverListener*>& toSearch,
+                                            QWidget* mostSpecificControl,
+                                            Object::Pointer draggedObject,
+                                            const QPoint &position,
+                                            const QRect& dragRectangle);
 
 public:
 
-    /**
-     * Sets the drop target for the given control. It is possible to add one or more
-     * targets for a "null" control. This becomes a default target that is used if no
-     * other targets are found (for example, when dragging objects off the application
-     * window).
-     *
-     * @param control the control that should be treated as a drag target, or null
-     * to indicate the default target
-     * @param target the drag target to handle the given control
-     */
-    static void AddDragTarget(void* control, IDragOverListener* target);
+  /**
+   * Sets the drop target for the given control. It is possible to add one or more
+   * targets for a "null" control. This becomes a default target that is used if no
+   * other targets are found (for example, when dragging objects off the application
+   * window).
+   *
+   * @param control the control that should be treated as a drag target, or null
+   * to indicate the default target
+   * @param target the drag target to handle the given control
+   */
+  static void AddDragTarget(QWidget* control, IDragOverListener* target);
 
-    /**
-     * Removes a drop target from the given control.
-     *
-     * @param control
-     * @param target
-     */
-    static void RemoveDragTarget(void* control, IDragOverListener* target);
+  /**
+   * Removes a drop target from the given control.
+   *
+   * @param control
+   * @param target
+   */
+  static void RemoveDragTarget(QWidget* control, IDragOverListener* target);
 
-    /**
-     * Shorthand method. Returns the bounding rectangle for the given control, in
-     * display coordinates.
-     *
-     * @param draggedItem
-     * @param boundsControl
-     * @return
-     */
-    static QRect GetDisplayBounds(void* boundsControl);
+  /**
+   * Shorthand method. Returns the bounding rectangle for the given control, in
+   * display coordinates.
+   *
+   * @param draggedItem
+   * @param boundsControl
+   * @return
+   */
+  static QRect GetDisplayBounds(QWidget* boundsControl);
 
   static bool PerformDrag(Object::Pointer draggedItem,
-          const QRect& sourceBounds, const QPoint& initialLocation, bool allowSnapping);
+                          const QRect& sourceBounds,
+                          const QPoint& initialLocation,
+                          bool allowSnapping);
 
 //  /**
 //   * Drags the given item to the given location (in display coordinates). This
@@ -189,8 +174,9 @@ public:
    * @return
    */
   static IDropTarget::Pointer DragToTarget(Object::Pointer draggedItem,
-          const QRect& sourceBounds, const QPoint& initialLocation,
-          bool allowSnapping);
+                                           const QRect& sourceBounds,
+                                           const QPoint& initialLocation,
+                                           bool allowSnapping);
 
   /**
    * Returns the drag target for the given control or null if none.
@@ -199,8 +185,10 @@ public:
    * @param e
    * @return
    */
-  static IDropTarget::Pointer GetDropTarget(void* toSearch,
-          Object::Pointer draggedObject, const QPoint& position, const QRect& dragRectangle);
+  static IDropTarget::Pointer GetDropTarget(QWidget* toSearch,
+                                            Object::Pointer draggedObject,
+                                            const QPoint& position,
+                                            const QRect& dragRectangle);
 
   /**
    * Returns the location of the given event, in display coordinates

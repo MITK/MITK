@@ -367,7 +367,7 @@ private:
   /**
    * Creates a scroll area for this view and calls CreateQtPartControl then
    */
-  void CreatePartControl(void* parent);
+  void CreatePartControl(QWidget* parent);
 
   /**
    * Called immediately after CreateQtPartControl().

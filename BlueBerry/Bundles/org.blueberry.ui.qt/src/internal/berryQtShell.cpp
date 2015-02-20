@@ -112,7 +112,7 @@ QWidget *QtShell::GetControl()
   return widget;
 }
 
-void QtShell::SetImages(const QList<void*>&  /*images*/)
+void QtShell::SetImages(const QList<QIcon>&  /*images*/)
 {
 }
 

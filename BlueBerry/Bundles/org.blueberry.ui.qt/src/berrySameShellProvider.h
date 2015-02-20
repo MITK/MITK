@@ -38,12 +38,12 @@ class BERRY_UI_QT SameShellProvider : public IShellProvider {
 
 private:
 
-  void* targetControl;
+  QWidget* targetControl;
   Shell::Pointer shell;
 
 public:
 
-  berryObjectMacro(SameShellProvider);
+  berryObjectMacro(SameShellProvider)
 
   /**
    * Returns a shell provider that always returns the current
@@ -52,7 +52,7 @@ public:
    * @param targetControl control whose shell will be tracked, or null if getShell() should always
    * return null
    */
-  SameShellProvider(void* targetControl);
+  SameShellProvider(QWidget* targetControl);
 
   /**
    * Returns a shell provider that always returns the given shell.

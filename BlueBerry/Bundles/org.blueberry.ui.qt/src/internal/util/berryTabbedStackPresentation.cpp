@@ -354,7 +354,7 @@ void TabbedStackPresentation::SetState(int state)
   folder->GetTabFolder()->SetState(state);
 }
 
-void* TabbedStackPresentation::GetControl()
+QWidget* TabbedStackPresentation::GetControl()
 {
   return folder->GetTabFolder()->GetControl();
 }
@@ -449,16 +449,16 @@ void TabbedStackPresentation::SelectPart(IPresentablePart::Pointer toSelect)
   tabs->Select(toSelect);
 }
 
-StackDropResult::Pointer TabbedStackPresentation::DragOver(void* currentControl, const QPoint& location)
+StackDropResult::Pointer TabbedStackPresentation::DragOver(QWidget* currentControl, const QPoint& location)
 {
   QWidget* currentWidget = static_cast<QWidget*>(currentControl);
   return dragBehavior->DragOver(currentWidget, location, dragStart);
 }
 
-QList<void*> TabbedStackPresentation::GetTabList(
+QList<QWidget*> TabbedStackPresentation::GetTabList(
     IPresentablePart::Pointer part)
 {
-  QList<void*> list;
+  QList<QWidget*> list;
   if (folder->GetTabFolder()->GetTabPosition() == Constants::BOTTOM)
   {
     if (part->GetControl() != 0)

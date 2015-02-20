@@ -31,7 +31,7 @@ QtWorkbenchPageTweaklet::QtWorkbenchPageTweaklet()
 
 }
 
-void* QtWorkbenchPageTweaklet::CreateClientComposite(void* pageControl)
+QWidget* QtWorkbenchPageTweaklet::CreateClientComposite(QWidget* pageControl)
 {
   QWidget* parent = static_cast<QWidget*>(pageControl);
   QtControlWidget* client = new QtControlWidget(parent, 0);
@@ -44,7 +44,7 @@ void* QtWorkbenchPageTweaklet::CreateClientComposite(void* pageControl)
   return client;
 }
 
-void* QtWorkbenchPageTweaklet::CreatePaneControl(void* parent)
+QWidget* QtWorkbenchPageTweaklet::CreatePaneControl(QWidget* parent)
 {
   QWidget* qParent = static_cast<QWidget*>(parent);
   QtControlWidget* control = new QtControlWidget(qParent, 0);
@@ -56,7 +56,7 @@ void* QtWorkbenchPageTweaklet::CreatePaneControl(void* parent)
   return control;
 }
 
-Object::Pointer QtWorkbenchPageTweaklet::CreateStatusPart(void* parent, const QString& title, const QString& msg)
+Object::Pointer QtWorkbenchPageTweaklet::CreateStatusPart(QWidget* parent, const QString& title, const QString& msg)
 {
   Ui::QtStatusPart statusPart;
   statusPart.setupUi(static_cast<QWidget*>(parent));

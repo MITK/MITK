@@ -46,7 +46,7 @@ public:
     berry::SmartPointer<berry::ActionBarAdvisor> CreateActionBarAdvisor(
         berry::SmartPointer<berry::IActionBarConfigurer> configurer);
 
-    void* CreateEmptyWindowContents(void* parent);
+    QWidget* CreateEmptyWindowContents(QWidget* parent);
 
     void PostWindowCreate();
 

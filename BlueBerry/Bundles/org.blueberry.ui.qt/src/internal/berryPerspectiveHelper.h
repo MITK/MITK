@@ -56,7 +56,7 @@ protected:
   Perspective* perspective;
 
 protected:
-  void* parentWidget;
+  QWidget* parentWidget;
 
 private:
   ViewSashContainer::Pointer mainLayout;
@@ -111,7 +111,7 @@ private:
 
     DragOverListener(PerspectiveHelper* perspHelper);
 
-    IDropTarget::Pointer Drag(void* currentControl,
+    IDropTarget::Pointer Drag(QWidget* currentControl,
         const Object::Pointer& draggedObject, const QPoint& position,
         const QRect& dragRectangle);
 
@@ -192,7 +192,7 @@ public:
    * Show the presentation.
    */
 public:
-  void Activate(void* parent);
+  void Activate(QWidget* parent);
 
   /**
    * Adds a part to the presentation. If a placeholder exists for the part

@@ -215,7 +215,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
     }
     part->SetPartName(label);
 
-    void* parent = pane->GetControl();
+    QWidget* parent = pane->GetControl();
 
     try
     {
@@ -311,7 +311,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
     // Create the top-level composite
 
     {
-      void* parent = pane->GetControl();
+      QWidget* parent = pane->GetControl();
 
       view->CreatePartControl(parent);
     }

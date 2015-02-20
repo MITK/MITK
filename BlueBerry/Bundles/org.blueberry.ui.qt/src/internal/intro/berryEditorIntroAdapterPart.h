@@ -113,7 +113,7 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
    */
-  void CreatePartControl(void* parent);
+  void CreatePartControl(QWidget* parent);
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#dispose()

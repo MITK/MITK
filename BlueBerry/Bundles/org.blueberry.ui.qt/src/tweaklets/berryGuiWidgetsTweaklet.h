@@ -34,8 +34,8 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
 
   static Tweaklets::TweakKey<GuiWidgetsTweaklet> KEY;
 
-  virtual void AddSelectionListener(void* widget, GuiTk::ISelectionListener::Pointer listener) = 0;
-  virtual void RemoveSelectionListener(void* widget, GuiTk::ISelectionListener::Pointer listener) = 0;
+  virtual void AddSelectionListener(QWidget* widget, GuiTk::ISelectionListener::Pointer listener) = 0;
+  virtual void RemoveSelectionListener(QWidget* widget, GuiTk::ISelectionListener::Pointer listener) = 0;
 
   /**
    * Adds the listener to the collection of listeners who will
@@ -48,7 +48,7 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @see IControlListener
    * @see #RemoveControlListener
    */
-  virtual void AddControlListener(void* widget, GuiTk::IControlListener::Pointer listener) = 0;
+  virtual void AddControlListener(QWidget* widget, GuiTk::IControlListener::Pointer listener) = 0;
 
   /**
    * Removes the listener from the collection of listeners who will
@@ -59,29 +59,29 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @see IControlListener
    * @see #AddControlListener
    */
-  virtual void RemoveControlListener(void* widget, GuiTk::IControlListener::Pointer listener) = 0;
+  virtual void RemoveControlListener(QWidget* widget, GuiTk::IControlListener::Pointer listener) = 0;
 
-  virtual bool GetEnabled(void* widget) = 0;
-  virtual void SetEnabled(void* widget, bool enabled) = 0;
+  virtual bool GetEnabled(QWidget* widget) = 0;
+  virtual void SetEnabled(QWidget* widget, bool enabled) = 0;
 
-  virtual void SetBounds(void* widget, const QRect& bounds) = 0;
-  virtual QRect GetBounds(void* widget) = 0;
+  virtual void SetBounds(QWidget* widget, const QRect& bounds) = 0;
+  virtual QRect GetBounds(QWidget* widget) = 0;
 
-  virtual void SetVisible(void* widget, bool visible) = 0;
-  virtual bool GetVisible(void* widget) = 0;
-  virtual bool IsVisible(void* widget) = 0;
+  virtual void SetVisible(QWidget* widget, bool visible) = 0;
+  virtual bool GetVisible(QWidget* widget) = 0;
+  virtual bool IsVisible(QWidget* widget) = 0;
 
-  virtual QRect GetClientArea(void* widget) = 0;
+  virtual QRect GetClientArea(QWidget* widget) = 0;
 
-  virtual void* GetParent(void* widget) = 0;
-  virtual bool SetParent(void* widget, void* parent) = 0;
+  virtual QWidget* GetParent(QWidget* widget) = 0;
+  virtual bool SetParent(QWidget* widget, QWidget* parent) = 0;
 
-  virtual void SetData(void* widget, const QString& id, Object::Pointer data) = 0;
-  virtual Object::Pointer GetData(void* widget, const QString& id) = 0;
+  virtual void SetData(QWidget* widget, const QString& id, Object::Pointer data) = 0;
+  virtual Object::Pointer GetData(QWidget* widget, const QString& id) = 0;
 
   virtual QPoint GetCursorLocation() = 0;
-  virtual void* GetCursorControl() = 0;
-  virtual void* FindControl(const QList<Shell::Pointer>& shells, const QPoint& location) = 0;
+  virtual QWidget* GetCursorControl() = 0;
+  virtual QWidget* FindControl(const QList<Shell::Pointer>& shells, const QPoint& location) = 0;
 
   /**
    * Determines if one control is a child of another. Returns true iff the second
@@ -91,7 +91,7 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @param childToTest
    * @return
    */
-  virtual bool IsChild(void* potentialParent, void* childToTest) = 0;
+  virtual bool IsChild(QWidget* potentialParent, QWidget* childToTest) = 0;
 
   /**
    * Returns the control which currently has keyboard focus,
@@ -101,26 +101,26 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    *
    * @return the control under the cursor
    */
-  virtual void* GetFocusControl() = 0;
+  virtual QWidget* GetFocusControl() = 0;
 
-  virtual bool IsReparentable(void* widget) = 0;
+  virtual bool IsReparentable(QWidget* widget) = 0;
 
-  virtual void MoveAbove(void* widgetToMove, void* widget) = 0;
-  virtual void MoveBelow(void* widgetToMove, void* widget) = 0;
+  virtual void MoveAbove(QWidget* widgetToMove, QWidget* widget) = 0;
+  virtual void MoveBelow(QWidget* widgetToMove, QWidget* widget) = 0;
 
-  virtual void Dispose(void* widget) = 0;
+  virtual void Dispose(QWidget* widget) = 0;
 
   virtual Shell::Pointer CreateShell(Shell::Pointer parent, int style) = 0;
   virtual void DisposeShell(Shell::Pointer shell) = 0;
 
-  virtual void* CreateComposite(void* parent) = 0;
+  virtual QWidget* CreateComposite(QWidget* parent) = 0;
 
   virtual QList<Shell::Pointer> GetShells() = 0;
-  virtual Shell::Pointer GetShell(void* widget) = 0;
+  virtual Shell::Pointer GetShell(QWidget* widget) = 0;
   virtual Shell::Pointer GetActiveShell() = 0;
 
   // command framework interface classes
-  //virtual IMenu::Pointer CreateMenu(void*, IMenu::Style = IMenu::POP_UP) = 0;
+  //virtual IMenu::Pointer CreateMenu(QWidget*, IMenu::Style = IMenu::POP_UP) = 0;
   //virtual IMenu::Pointer CreateMenu(IMenu::Pointer parent) = 0;
   //virtual IMenuItem::Pointer CreateMenuItem(IMenu::Pointer, IMenuItem::Style, int index = -1) = 0;
 
@@ -163,7 +163,7 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @return a rectangle in control coordinates
    * @since 3.0
    */
-  virtual QRect ToControl(void* coordinateSystem,
+  virtual QRect ToControl(QWidget* coordinateSystem,
           const QRect& toConvert) = 0;
 
   /**
@@ -175,7 +175,7 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @return a point in control coordinates
    * @since 3.0
    */
-  virtual QPoint ToControl(void* coordinateSystem,
+  virtual QPoint ToControl(QWidget* coordinateSystem,
           const QPoint& toConvert) = 0;
 
   /**
@@ -187,7 +187,7 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @return a rectangle in display coordinates
    * @since 3.0
    */
-  virtual QRect ToDisplay(void* coordinateSystem,
+  virtual QRect ToDisplay(QWidget* coordinateSystem,
           const QRect& toConvert) = 0;
 
   /**
@@ -199,7 +199,7 @@ struct BERRY_UI_QT GuiWidgetsTweaklet
    * @return a point in display coordinates
    * @since 3.0
    */
-  virtual QPoint ToDisplay(void* coordinateSystem,
+  virtual QPoint ToDisplay(QWidget* coordinateSystem,
           const QPoint& toConvert) = 0;
 };
 

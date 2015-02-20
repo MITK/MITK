@@ -92,7 +92,7 @@ void LayoutPartSash::CheckDragLimit(GuiTk::SelectionEvent::Pointer event)
   event->y = eventRect.y();
 }
 
-void LayoutPartSash::CreateControl(void* /*parent*/)
+void LayoutPartSash::CreateControl(QWidget* /*parent*/)
 {
   // Defer creation of the control until it becomes visible
   if (isVisible)
@@ -172,7 +172,7 @@ QRect LayoutPartSash::GetBounds()
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(sash);
 }
 
-void* LayoutPartSash::GetControl()
+QWidget* LayoutPartSash::GetControl()
 {
   return sash;
 }

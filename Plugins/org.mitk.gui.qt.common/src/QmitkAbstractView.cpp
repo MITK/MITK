@@ -153,8 +153,8 @@ public:
   ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
 
   /**
-   * Saves the parent of this view (this is the scrollarea created in CreatePartControl(void*)
-   * \see CreatePartControl(void*)
+   * Saves the parent of this view (this is the scrollarea created in CreatePartControl(QWidget*)
+   * \see CreatePartControl(QWidget*)
    */
   QWidget* m_Parent;
 
@@ -191,7 +191,7 @@ QmitkAbstractView::QmitkAbstractView()
 {
 }
 
-void QmitkAbstractView::CreatePartControl(void* parent)
+void QmitkAbstractView::CreatePartControl(QWidget* parent)
 {
 
   // scrollArea

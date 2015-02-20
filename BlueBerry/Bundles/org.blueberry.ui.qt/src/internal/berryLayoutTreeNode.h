@@ -168,7 +168,7 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.LayoutTree#createControl(org.blueberry.swt.widgets.Composite)
      */
-    public: void CreateControl(void* parent);
+    public: void CreateControl(QWidget* parent);
 
     //Added by hudsonr@us.ibm.com - bug 19524
 
@@ -205,7 +205,7 @@ public:
      * Create the sashes if the children are visible
      * and dispose it if they are not.
      */
-    //public: void UpdateSashes(void* parent);
+    //public: void UpdateSashes(QWidget* parent);
 
     /**
      * Writes a description of the layout to the given string buffer.

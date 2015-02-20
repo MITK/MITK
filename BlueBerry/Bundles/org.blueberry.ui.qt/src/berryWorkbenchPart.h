@@ -199,7 +199,7 @@ public:
    * @param parent the parent control
    * @see IWorkbenchPart
    */
-  virtual void CreatePartControl(void* parent) = 0;
+  virtual void CreatePartControl(QWidget* parent) = 0;
 
   /* (non-Javadoc)
      * Asks this part to take focus within the workbench.

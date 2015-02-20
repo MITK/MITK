@@ -149,7 +149,7 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#getControl()
      */
-    void* GetControl();
+    QWidget* GetControl();
 
     /**
      * @return AbstractTabFolder the presentation's tab folder
@@ -177,9 +177,9 @@ public:
     void SelectPart(IPresentablePart::Pointer toSelect);
 
     /* (non-Javadoc)
-     * @see org.blueberry.ui.presentations.StackPresentation#DragOver(void*, const Point&)
+     * @see org.blueberry.ui.presentations.StackPresentation#DragOver(QWidget*, const Point&)
      */
-    StackDropResult::Pointer DragOver(void* currentControl, const QPoint& location);
+    StackDropResult::Pointer DragOver(QWidget* currentControl, const QPoint& location);
 
 //    void showSystemMenu() {
 //        showSystemMenu(folder.getTabFolder().getSystemMenuLocation(), getSite().getSelectedPart());
@@ -216,7 +216,7 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#getTabList(org.blueberry.ui.presentations.IPresentablePart)
      */
-    QList<void*> GetTabList(IPresentablePart::Pointer part);
+    QList<QWidget*> GetTabList(IPresentablePart::Pointer part);
 
 //    void SetPartList(ISystemMenu menu) {
 //        this.partList = menu;

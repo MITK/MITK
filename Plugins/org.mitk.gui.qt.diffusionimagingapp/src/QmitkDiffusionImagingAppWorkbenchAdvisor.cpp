@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkExtWorkbenchWindowAdvisor.h>
 
 #include <QApplication>
+#include <QPoint>
 
 const QString QmitkDiffusionImagingAppWorkbenchAdvisor::WELCOME_PERSPECTIVE_ID = "org.mitk.diffusionimagingapp.perspectives.welcome";
 
@@ -60,7 +61,7 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   viewExcludeList.push_back( "org.mitk.views.modules" );
   viewExcludeList.push_back( "org.blueberry.ui.internal.introview" );
 
-  configurer->SetInitialSize(berry::Point(1000,770));
+  configurer->SetInitialSize(QPoint(1000,770));
 
   QmitkExtWorkbenchWindowAdvisor* advisor = new QmitkExtWorkbenchWindowAdvisor(this, configurer);
   advisor->ShowViewMenuItem(true);

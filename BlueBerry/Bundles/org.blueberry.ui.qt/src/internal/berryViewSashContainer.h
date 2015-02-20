@@ -32,7 +32,7 @@ public:
 
   berryObjectMacro(ViewSashContainer);
 
-  ViewSashContainer(WorkbenchPage* page, void* parent);
+  ViewSashContainer(WorkbenchPage* page, QWidget* parent);
 
     /**
      * Gets root container for this part.
@@ -42,7 +42,7 @@ public:
     /**
      * Get the part control.  This method may return null.
      */
-    void* GetControl();
+    QWidget* GetControl();
 
     /**
      * @see IPersistablePart
@@ -81,7 +81,7 @@ protected:
      * the composite to use to parent all children
      * layout parts it contains.
      */
-    void* CreateParent(void* parentWidget);
+    QWidget* CreateParent(QWidget* parentWidget);
 
     /**
      * Subclasses override this method to dispose

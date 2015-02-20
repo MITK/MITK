@@ -32,8 +32,8 @@ public:
   HelpEditorInput(const QUrl& url = QUrl());
 
   bool Exists() const;
-  std::string GetName() const;
-  std::string GetToolTipText() const;
+  QString GetName() const;
+  QString GetToolTipText() const;
 
   bool operator==(const berry::Object*) const;
 

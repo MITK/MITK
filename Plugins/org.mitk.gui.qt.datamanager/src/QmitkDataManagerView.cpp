@@ -87,10 +87,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDataNodeObject.h"
 #include "mitkIContextMenuAction.h"
-#include "berryIExtensionPointService.h"
+#include "berryIExtensionRegistry.h"
 #include "mitkRenderingModeProperty.h"
 
-const std::string QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
+const QString QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
 QmitkDataManagerView::QmitkDataManagerView()
     : m_GlobalReinitOnNodeDelete(true),
@@ -113,9 +113,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_CurrentRowCount = 0;
   m_Parent = parent;
   //# Preferences
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
   berry::IBerryPreferences::Pointer prefs
       = (prefService->GetSystemPreferences()->Node(VIEW_ID))
@@ -175,16 +173,16 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   // # Actions
   berry::IEditorRegistry* editorRegistry = berry::PlatformUI::GetWorkbench()->GetEditorRegistry();
-  std::list<berry::IEditorDescriptor::Pointer> editors = editorRegistry->GetEditors("*.mitk");
+  QList<berry::IEditorDescriptor::Pointer> editors = editorRegistry->GetEditors("*.mitk");
   if (editors.size() > 1)
   {
     m_ShowInMapper = new QSignalMapper(this);
     foreach(berry::IEditorDescriptor::Pointer descriptor, editors)
     {
-      QAction* action = new QAction(QString::fromStdString(descriptor->GetLabel()), this);
+      QAction* action = new QAction(descriptor->GetLabel(), this);
       m_ShowInActions << action;
       m_ShowInMapper->connect(action, SIGNAL(triggered()), m_ShowInMapper, SLOT(map()));
-      m_ShowInMapper->setMapping(action, QString::fromStdString(descriptor->GetId()));
+      m_ShowInMapper->setMapping(action, descriptor->GetId());
     }
     connect(m_ShowInMapper, SIGNAL(mapped(QString)), this, SLOT(ShowIn(QString)));
   }
@@ -225,15 +223,10 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,reinitAction));
 
   // find contextMenuAction extension points and add them to the node descriptor
-  berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
-  berry::IConfigurationElement::vector cmActions(
+  berry::IExtensionRegistry* extensionPointService = berry::Platform::GetExtensionRegistry();
+  QList<berry::IConfigurationElement::Pointer> cmActions(
     extensionPointService->GetConfigurationElementsFor("org.mitk.gui.qt.datamanager.contextMenuActions") );
-  berry::IConfigurationElement::vector::iterator cmActionsIt;
-
-  std::string cmNodeDescriptorName;
-  std::string cmLabel;
-  std::string cmIcon;
-  std::string cmClass;
+  QList<berry::IConfigurationElement::Pointer>::iterator cmActionsIt;
 
   QmitkNodeDescriptor* tmpDescriptor;
   QAction* contextMenuAction;
@@ -245,27 +238,29 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     ; cmActionsIt != cmActions.end()
     ; ++cmActionsIt)
   {
-    cmIcon.erase();
-    if((*cmActionsIt)->GetAttribute("nodeDescriptorName", cmNodeDescriptorName)
-      && (*cmActionsIt)->GetAttribute("label", cmLabel)
-      && (*cmActionsIt)->GetAttribute("class", cmClass))
+    QString cmNodeDescriptorName = (*cmActionsIt)->GetAttribute("nodeDescriptorName");
+    QString cmLabel = (*cmActionsIt)->GetAttribute("label");
+    QString cmClass = (*cmActionsIt)->GetAttribute("class");
+    if(!cmNodeDescriptorName.isEmpty() &&
+       !cmLabel.isEmpty() &&
+       !cmClass.isEmpty())
     {
+      QString cmIcon = (*cmActionsIt)->GetAttribute("icon");
       // create context menu entry here
-      tmpDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(QString::fromStdString(cmNodeDescriptorName));
+      tmpDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(cmNodeDescriptorName);
       if(!tmpDescriptor)
       {
         MITK_WARN << "cannot add action \"" << cmLabel << "\" because descriptor " << cmNodeDescriptorName << " does not exist";
         continue;
       }
       // check if the user specified an icon attribute
-      if ( (*cmActionsIt)->GetAttribute("icon", cmIcon) )
+      if ( !cmIcon.isEmpty() )
       {
-        contextMenuAction = new QAction( QIcon( QString::fromStdString(cmIcon)),
-                                         QString::fromStdString(cmLabel), parent);
+        contextMenuAction = new QAction( QIcon(cmIcon), cmLabel, parent);
       }
       else
       {
-        contextMenuAction = new QAction( QString::fromStdString(cmLabel), parent);
+        contextMenuAction = new QAction( cmLabel, parent);
       }
       tmpDescriptor->AddAction(contextMenuAction);
       m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(tmpDescriptor,contextMenuAction));
@@ -377,7 +372,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   }
 
   m_SurfaceRepresentation = new QAction("Surface Representation", this);
-  m_SurfaceRepresentation->setMenu(new QMenu);
+  m_SurfaceRepresentation->setMenu(new QMenu(m_NodeTreeView));
   QObject::connect( m_SurfaceRepresentation->menu(), SIGNAL( aboutToShow() )
     , this, SLOT( SurfaceRepresentationMenuAboutToShow() ) );
   surfaceDataNodeDescriptor->AddAction(m_SurfaceRepresentation, false);
@@ -447,10 +442,8 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   berry::IConfigurationElement::Pointer confElem = it->second;
   mitk::IContextMenuAction* contextMenuAction = confElem->CreateExecutableExtension<mitk::IContextMenuAction>("class");
 
-  std::string className;
-  std::string smoothed;
-  confElem->GetAttribute("class", className);
-  confElem->GetAttribute("smoothed", smoothed);
+  QString className = confElem->GetAttribute("class");
+  QString smoothed = confElem->GetAttribute("smoothed");
 
   if(className == "QmitkCreatePolygonModelAction")
   {
@@ -564,7 +557,7 @@ void QmitkDataManagerView::OpacityChanged(int value)
 
 void QmitkDataManagerView::OpacityActionChanged()
 {
-    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
   if(node)
   {
     float opacity = 0.0;
@@ -837,7 +830,6 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
   {
     indexesOfSelectedRows.push_back(m_FilterModel->mapToSource(indexesOfSelectedRowsFiltered[i]));
   }
-
   if(indexesOfSelectedRows.size() < 1)
   {
     return;
@@ -998,7 +990,7 @@ void QmitkDataManagerView::OtsuFilter( bool )
     }
     catch( std::exception& err )
     {
-      MITK_ERROR(this->GetClassName()) << err.what();
+      MITK_ERROR(qPrintable(this->GetClassName())) << err.what();
     }
 
   }
@@ -1046,7 +1038,7 @@ void QmitkDataManagerView::ShowIn(const QString &editorId)
 {
   berry::IWorkbenchPage::Pointer page = this->GetSite()->GetPage();
   berry::IEditorInput::Pointer input(new mitk::DataStorageEditorInput(this->GetDataStorageReference()));
-  page->OpenEditor(input, editorId.toStdString(), false, berry::IWorkbenchPage::MATCH_ID);
+  page->OpenEditor(input, editorId, false, berry::IWorkbenchPage::MATCH_ID);
 }
 
 mitk::IRenderWindowPart* QmitkDataManagerView::OpenRenderWindowPart(bool activatedEditor)

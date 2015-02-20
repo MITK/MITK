@@ -29,9 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
   * @noextend This interface is not intended to be extended by clients.
   */
 
-   struct IJobStatus : public IStatus {
+struct IJobStatus : public virtual IStatus
+{
 
-   berryObjectMacro(IJobStatus);
+   berryObjectMacro(IJobStatus)
 
   /**
    * Returns the job associated with this status.

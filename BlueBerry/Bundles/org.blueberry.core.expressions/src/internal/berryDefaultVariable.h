@@ -19,14 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIEvaluationContext.h"
 
-#include <vector>
-
 namespace berry {
 
-class DefaultVariable : public IEvaluationContext {
+class DefaultVariable : public IEvaluationContext
+{
 
 private:
-  Object::Pointer fDefaultVariable;
+  Object::ConstPointer fDefaultVariable;
   IEvaluationContext* fParent;
   IEvaluationContext* fManagedPool;
 
@@ -40,7 +39,7 @@ public:
      *  be <code>null</code>.
      * @param defaultVariable the default variable
      */
-  DefaultVariable(IEvaluationContext* parent, Object::Pointer defaultVariable);
+  DefaultVariable(IEvaluationContext* parent, const Object::ConstPointer& defaultVariable);
 
   /**
    * {@inheritDoc}
@@ -50,12 +49,12 @@ public:
   /**
    * {@inheritDoc}
    */
-  IEvaluationContext* GetRoot();
+  IEvaluationContext* GetRoot() const;
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer GetDefaultVariable() const;
+  Object::ConstPointer GetDefaultVariable() const;
 
   /**
    * {@inheritDoc}
@@ -70,22 +69,22 @@ public:
   /**
    * {@inheritDoc}
    */
-  void AddVariable(const std::string& name, Object::Pointer value);
+  void AddVariable(const QString& name, const Object::ConstPointer& value);
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer RemoveVariable(const std::string& name);
+  Object::ConstPointer RemoveVariable(const QString& name);
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer GetVariable(const std::string& name) const;
+  Object::ConstPointer GetVariable(const QString& name) const;
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer ResolveVariable(const std::string& name, std::vector<Object::Pointer>& args);
+  Object::ConstPointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args) const;
 };
 
 }  // namespace berry

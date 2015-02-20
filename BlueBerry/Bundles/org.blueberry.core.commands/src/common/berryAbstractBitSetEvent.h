@@ -30,8 +30,6 @@ namespace berry {
  * An event that carries with it two or more boolean values.  This provides a
  * single integer value which can then be used as a bit set.
  * </p>
- *
- * @since 3.1
  */
 class BERRY_COMMANDS AbstractBitSetEvent : public virtual Object {
 

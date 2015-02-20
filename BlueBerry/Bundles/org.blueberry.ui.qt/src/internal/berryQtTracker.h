@@ -18,16 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYQTTRACKER_H_
 #define BERRYQTTRACKER_H_
 
-#include <berryITracker.h>
-#include <berryDnDTweaklet.h>
+#include <berryConstants.h>
 #include <berryGuiTkIControlListener.h>
 
-#include <QDrag>
-#include <QRubberBand>
-#include <QEventLoop>
-#include <QCursor>
+#include <QRect>
+#include <QPoint>
 
-#include <map>
+class QCursor;
+class QEventLoop;
+class QRubberBand;
 
 namespace berry {
 
@@ -55,12 +54,32 @@ protected:
 
 public:
 
+  static CursorType PositionToCursorType(int positionConstant);
+
+  /**
+   * Converts a DnDTweaklet::CursorType (CURSOR_LEFT, CURSOR_RIGHT, CURSOR_TOP, CURSOR_BOTTOM, CURSOR_CENTER) into a BlueBerry constant
+   * (Constants::LEFT, Constants::RIGHT, Constants::TOP, Constants::BOTTOM, Constants::CENTER)
+   *
+   * @param dragCursorId
+   * @return a BlueBerry Constants::* constant
+   */
+  static int CursorTypeToPosition(CursorType dragCursorId);
+
   bool Drag(QtTracker* tracker);
 
 };
 
-
-class QtTracker : public ITracker {
+/**
+ *  Instances of this class implement a rubber banding rectangle that is
+ *  drawn onto a parent control or display.
+ *  These rectangles can be specified to respond to mouse and key events
+ *  by either moving or resizing themselves accordingly.  Trackers are
+ *  typically used to represent window geometries in a lightweight manner.
+ *
+ */
+class QtTracker : public QObject
+{
+  Q_OBJECT
 
 private:
 
@@ -69,27 +88,40 @@ private:
 
   int cursorOverride;
 
-  GuiTk::IControlListener::Events controlEvents;
-
-  std::map<DnDTweaklet::CursorType, QCursor*> cursorMap;
+  QHash<CursorType, QCursor*> cursorMap;
 
 public:
 
   QtTracker();
   ~QtTracker();
 
-  Rectangle GetRectangle();
-  void SetRectangle(const Rectangle& rectangle);
+  QRect GetRectangle() const;
+  void SetRectangle(const QRect& rectangle);
 
-  void SetCursor(DnDTweaklet::CursorType cursor);
+  void SetCursor(CursorType cursor);
 
   bool Open();
 
-  void AddControlListener(GuiTk::IControlListener::Pointer listener);
-  void RemoveControlListener(GuiTk::IControlListener::Pointer listener);
+  Q_SIGNAL void Moved(QtTracker* tracker, const QPoint& globalPoint);
 
-  void HandleMove(const QPoint& globalPoint);
+};
 
+class QtTrackerMoveListener : public QObject
+{
+  Q_OBJECT
+
+public:
+  QtTrackerMoveListener(Object::Pointer draggedItem, const QRect& sourceBounds,
+                        const QPoint& initialLocation, bool allowSnapping);
+
+  Q_SLOT void Moved(QtTracker* tracker, const QPoint& globalPoint);
+
+private:
+
+  bool allowSnapping;
+  Object::Pointer draggedItem;
+  QRect sourceBounds;
+  QPoint initialLocation;
 };
 
 }

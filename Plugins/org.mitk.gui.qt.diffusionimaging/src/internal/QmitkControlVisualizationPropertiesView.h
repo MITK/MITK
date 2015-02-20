@@ -51,7 +51,6 @@ class QmitkControlVisualizationPropertiesView : public QmitkFunctionality//, pub
   static const std::string VIEW_ID;
 
   QmitkControlVisualizationPropertiesView();
-  QmitkControlVisualizationPropertiesView(const QmitkControlVisualizationPropertiesView& other);
   virtual ~QmitkControlVisualizationPropertiesView();
 
   virtual void CreateQtPartControl(QWidget *parent);
@@ -112,7 +111,7 @@ protected:
 
   QmitkStdMultiWidget* m_MultiWidget;
 
-  berry::ISelectionListener::Pointer m_SelListener;
+  QScopedPointer<berry::ISelectionListener> m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
   mitk::DataNode::Pointer m_NodeUsedForOdfVisualization;

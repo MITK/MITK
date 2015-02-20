@@ -27,7 +27,7 @@ namespace berry
 struct IProgressMonitor: public Object
 {
 
-berryInterfaceMacro(IProgressMonitor, berry);
+  berryObjectMacro(berry::IProgressMonitor)
 
   /** Constant indicating an unknown amount of work. */
 

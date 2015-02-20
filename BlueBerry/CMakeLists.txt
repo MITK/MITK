@@ -13,6 +13,10 @@ include(MacroCreateQtHelp)
 include(MacroInstallCTKPlugin)
 include(FunctionCreateProvisioningFile)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BLUEBERRY_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${BLUEBERRY_CXX_FLAGS_RELEASE}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${BLUEBERRY_C_FLAGS}")
+
 if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX /wd4250 /wd4275 /wd4251 /wd4503")
 endif()
@@ -183,14 +187,10 @@ endif()
 # Add CTK plugins
 
 set(_ctk_plugins
-  Bundles/org.blueberry.osgi:ON
-  Bundles/org.blueberry.compat:OFF
-  Bundles/org.blueberry.core.runtime:OFF
+  Bundles/org.blueberry.core.runtime:ON
   Bundles/org.blueberry.core.expressions:OFF
-  Bundles/org.blueberry.solstice.common:OFF
   Bundles/org.blueberry.core.commands:OFF
   Bundles/org.blueberry.core.jobs:OFF
-  Bundles/org.blueberry.ui:OFF
   Bundles/org.blueberry.ui.qt:OFF
   Bundles/org.blueberry.ui.qt.help:OFF
   Bundles/org.blueberry.ui.qt.log:ON

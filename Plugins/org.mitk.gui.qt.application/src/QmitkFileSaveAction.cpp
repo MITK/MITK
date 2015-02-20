@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionService.h>
 #include <berryINullSelectionListener.h>
+#include <berryIPreferences.h>
 
 #include <QmitkIOUtil.h>
 
@@ -33,12 +34,13 @@ class QmitkFileSaveActionPrivate
 {
 private:
 
-  void HandleSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, berry::ISelection::ConstPointer selection)
+  void HandleSelectionChanged(const berry::IWorkbenchPart::Pointer& /*part*/,
+                              const berry::ISelection::ConstPointer& selection)
   {
     this->setEnabled(selection);
   }
 
-  berry::ISelectionListener::Pointer m_SelectionListener;
+  QScopedPointer<berry::ISelectionListener> m_SelectionListener;
 
 public:
 
@@ -52,7 +54,7 @@ public:
   {
     if (!m_Window.Expired())
     {
-      m_Window.Lock()->GetSelectionService()->RemoveSelectionListener(m_SelectionListener);
+      m_Window.Lock()->GetSelectionService()->RemoveSelectionListener(m_SelectionListener.data());
     }
   }
 
@@ -68,15 +70,15 @@ public:
     berry::ISelectionService* selectionService = m_Window.Lock()->GetSelectionService();
     setEnabled(selectionService->GetSelection());
 
-    selectionService->AddSelectionListener(m_SelectionListener);
+    selectionService->AddSelectionListener(m_SelectionListener.data());
 
     QObject::connect(action, SIGNAL(triggered(bool)), action, SLOT(Run()));
   }
 
   berry::IPreferences::Pointer GetPreferences() const
   {
-    berry::IPreferencesService::Pointer prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
-    if (prefService.IsNotNull())
+    berry::IPreferencesService* prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
+    if (prefService != nullptr)
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }
@@ -88,7 +90,7 @@ public:
     berry::IPreferences::Pointer prefs = GetPreferences();
     if(prefs.IsNotNull())
     {
-      return QString::fromStdString(prefs->Get("LastFileSavePath", ""));
+      return prefs->Get("LastFileSavePath", "");
     }
     return QString();
   }
@@ -98,7 +100,7 @@ public:
     berry::IPreferences::Pointer prefs = GetPreferences();
     if(prefs.IsNotNull())
     {
-      prefs->Put("LastFileSavePath", path.toStdString());
+      prefs->Put("LastFileSavePath", path);
       prefs->Flush();
     }
   }

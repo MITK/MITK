@@ -17,12 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYIPREFERENCES_H_
 
 #include <org_blueberry_core_runtime_Export.h>
+
 #include "berryObject.h"
 #include "berryBackingStoreException.h"
 
-#include <vector>
-#include <string>
-#include <exception>
 
 namespace berry
 {
@@ -52,7 +50,7 @@ namespace berry
    * and a path name <i>relative </i> to each ancestor including itself.
    *
    * <p>
-   * The root node has a node name of the empty <code>std::string</code> object ("").
+   * The root node has a node name of the empty <code>QString</code> object ("").
    * Every other node has an arbitrary node name, specified at the time it is
    * created. The only restrictions on this name are that it cannot be the empty
    * string, and it cannot contain the slash character ('/').
@@ -91,9 +89,9 @@ namespace berry
    * Each <code>Preference</code> node has zero or more properties associated with
    * it, where a property consists of a name and a value. The bundle writer is
    * free to choose any appropriate names for properties. Their values can be of
-   * type <code>std::string</code>,<code>long</code>,<code>int</code>,<code>bool</code>,
+   * type <code>QString</code>,<code>long</code>,<code>int</code>,<code>bool</code>,
    * <code>std::vector<char></code>,<code>float</code>, or <code>double</code> but they can
-   * always be accessed as if they were <code>std::string</code> objects.
+   * always be accessed as if they were <code>QString</code> objects.
    *
    * <p>
    * All node name and property name comparisons are case-sensitive.
@@ -122,9 +120,9 @@ namespace berry
    *
    * @version $Revision$
    */
-  struct BERRY_RUNTIME IPreferences : virtual public Object
+  struct org_blueberry_core_runtime_EXPORT IPreferences : virtual public Object
   {
-    berryInterfaceMacro(IPreferences, berry);
+    berryObjectMacro(berry::IPreferences)
 
     virtual ~IPreferences();
 
@@ -138,7 +136,7 @@ namespace berry
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
      */
-    virtual void Put(std::string key, std::string value) = 0;
+    virtual void Put(const QString& key, const QString& value) = 0;
 
     /**
      * Returns the value associated with the specified <code>key</code> in this
@@ -156,18 +154,18 @@ namespace berry
      * @throws NullPointerException if <code>key</code> is <code>null</code>. (A
      *         <code>null</code> default <i>is </i> permitted.)
      */
-    virtual std::string Get(std::string key, std::string def) const = 0;
+    virtual QString Get(const QString& key, const QString& def) const = 0;
 
     /**
      * Removes the value associated with the specified <code>key</code> in this
      * node, if any.
      *
      * @param key key whose mapping is to be removed from this node.
-     * @see #get(std::string,std::string)
+     * @see #get(const QString&,const QString&)
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
      */
-    virtual void Remove(std::string key) = 0;
+    virtual void Remove(const QString& key) = 0;
 
     /**
      * Removes all of the properties (key-value associations) in this node. This
@@ -178,12 +176,12 @@ namespace berry
      *         with it.
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
-     * @see #remove(std::string)
+     * @see #remove(const QString&)
      */
-    virtual void Clear() throw(Poco::Exception, BackingStoreException) = 0;
+    virtual void Clear() = 0;
 
     /**
-     * Associates a <code>std::string</code> object representing the specified
+     * Associates a <code>QString</code> object representing the specified
      * <code>int</code> value with the specified <code>key</code> in this node. The
      * associated string is the one that would be returned if the <code>int</code>
      * value were passed to <code>Integer.toString(int)</code>. This method is
@@ -191,11 +189,11 @@ namespace berry
      *
      * <p>
      * Implementor's note: it is <i>not </i> necessary that the property value
-     * be represented by a <code>std::string</code> object in the backing store. If the
+     * be represented by a <code>QString</code> object in the backing store. If the
      * backing store supports integer values, it is not unreasonable to use
      * them. This implementation detail is not visible through the
      * <code>IPreferences</code> API, which allows the value to be read as an
-     * <code>int</code> (with <code>getInt</code> or a <code>std::string</code> (with
+     * <code>int</code> (with <code>getInt</code> or a <code>QString</code> (with
      * <code>get</code>) type.
      *
      * @param key key with which the string form of value is to be associated.
@@ -204,17 +202,17 @@ namespace berry
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
-     * @see #getInt(std::string,int)
+     * @see #getInt(const QString&,int)
      */
-    virtual void PutInt(std::string key, int value) = 0;
+    virtual void PutInt(const QString& key, int value) = 0;
 
     /**
-     * Returns the <code>int</code> value represented by the <code>std::string</code>
+     * Returns the <code>int</code> value represented by the <code>QString</code>
      * object associated with the specified <code>key</code> in this node. The
-     * <code>std::string</code> object is converted to an <code>int</code> as by
-     * <code>Integer.parseInt(std::string)</code>. Returns the specified default if
+     * <code>QString</code> object is converted to an <code>int</code> as by
+     * <code>Integer.parseInt(QString)</code>. Returns the specified default if
      * there is no value associated with the <code>key</code>, the backing store
-     * is inaccessible, or if <code>Integer.parseInt(std::string)</code> would throw a
+     * is inaccessible, or if <code>Integer.parseInt(QString)</code> would throw a
      * <code>NumberFormatException</code> if the associated <code>value</code> were
      * passed. This method is intended for use in conjunction with the
      * {@link #putInt}method.
@@ -225,33 +223,33 @@ namespace berry
      *        value associated with <code>key</code> or the associated value
      *        cannot be interpreted as an <code>int</code> or the backing store is
      *        inaccessible.
-     * @return the <code>int</code> value represented by the <code>std::string</code>
+     * @return the <code>int</code> value represented by the <code>QString</code>
      *         object associated with <code>key</code> in this node, or
      *         <code>def</code> if the associated value does not exist or cannot
      *         be interpreted as an <code>int</code> type.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
-     * @see #putInt(std::string,int)
-     * @see #get(std::string,std::string)
+     * @see #putInt(const QString&,int)
+     * @see #get(const QString&,const QString&)
      */
-    virtual int GetInt(std::string key, int def) const = 0;
+    virtual int GetInt(const QString& key, int def) const = 0;
 
     /**
-     * Associates a <code>std::string</code> object representing the specified
+     * Associates a <code>QString</code> object representing the specified
      * <code>long</code> value with the specified <code>key</code> in this node. The
-     * associated <code>std::string</code> object is the one that would be returned if
+     * associated <code>QString</code> object is the one that would be returned if
      * the <code>long</code> value were passed to <code>Long.toString(long)</code>.
      * This method is intended for use in conjunction with the {@link #getLong}
      * method.
      *
      * <p>
      * Implementor's note: it is <i>not </i> necessary that the <code>value</code>
-     * be represented by a <code>std::string</code> type in the backing store. If the
+     * be represented by a <code>QString</code> type in the backing store. If the
      * backing store supports <code>long</code> values, it is not unreasonable to
      * use them. This implementation detail is not visible through the <code>
      * IPreferences</code> API, which allows the value to be read as a
-     * <code>long</code> (with <code>getLong</code> or a <code>std::string</code> (with
+     * <code>long</code> (with <code>getLong</code> or a <code>QString</code> (with
      * <code>get</code>) type.
      *
      * @param key <code>key</code> with which the string form of <code>value</code>
@@ -261,17 +259,17 @@ namespace berry
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
-     * @see #getLong(std::string,long)
+     * @see #getLong(const QString&,long)
      */
-    virtual void PutLong(std::string key, long value) = 0;
+    virtual void PutLong(const QString& key, long value) = 0;
 
     /**
-     * Returns the <code>long</code> value represented by the <code>std::string</code>
+     * Returns the <code>long</code> value represented by the <code>QString</code>
      * object associated with the specified <code>key</code> in this node. The
-     * <code>std::string</code> object is converted to a <code>long</code> as by
-     * <code>Long.parseLong(std::string)</code>. Returns the specified default if
+     * <code>QString</code> object is converted to a <code>long</code> as by
+     * <code>Long.parseLong(QString)</code>. Returns the specified default if
      * there is no value associated with the <code>key</code>, the backing store
-     * is inaccessible, or if <code>Long.parseLong(std::string)</code> would throw a
+     * is inaccessible, or if <code>Long.parseLong(QString)</code> would throw a
      * <code>NumberFormatException</code> if the associated <code>value</code> were
      * passed. This method is intended for use in conjunction with the
      * {@link #putLong}method.
@@ -282,20 +280,20 @@ namespace berry
      *        value associated with <code>key</code> or the associated value
      *        cannot be interpreted as a <code>long</code> type or the backing
      *        store is inaccessible.
-     * @return the <code>long</code> value represented by the <code>std::string</code>
+     * @return the <code>long</code> value represented by the <code>QString</code>
      *         object associated with <code>key</code> in this node, or
      *         <code>def</code> if the associated value does not exist or cannot
      *         be interpreted as a <code>long</code> type.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
-     * @see #putLong(std::string,long)
-     * @see #get(std::string,std::string)
+     * @see #putLong(const QString&,long)
+     * @see #get(const QString&,const QString&)
      */
-    virtual long GetLong(std::string key, long def) const = 0;
+    virtual long GetLong(const QString& key, long def) const = 0;
 
     /**
-     * Associates a <code>std::string</code> object representing the specified
+     * Associates a <code>QString</code> object representing the specified
      * <code>bool</code> value with the specified key in this node. The
      * associated string is "true" if the value is <code>true</code>, and "false"
      * if it is <code>false</code>. This method is intended for use in
@@ -307,7 +305,7 @@ namespace berry
      * supports <code>bool</code> values, it is not unreasonable to use them.
      * This implementation detail is not visible through the <code>IPreferences
      * </code> API, which allows the value to be read as a <code>bool</code>
-     * (with <code>getBool</code>) or a <code>std::string</code> (with <code>get</code>)
+     * (with <code>getBool</code>) or a <code>QString</code> (with <code>get</code>)
      * type.
      *
      * @param key <code>key</code> with which the string form of value is to be
@@ -317,13 +315,13 @@ namespace berry
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
-     * @see #getBool(std::string,bool)
-     * @see #get(std::string,std::string)
+     * @see #getBool(const QString&,bool)
+     * @see #get(const QString&,const QString&)
      */
-    virtual void PutBool(std::string key, bool value) = 0;
+    virtual void PutBool(const QString& key, bool value) = 0;
 
     /**
-     * Returns the <code>bool</code> value represented by the <code>std::string</code>
+     * Returns the <code>bool</code> value represented by the <code>QString</code>
      * object associated with the specified <code>key</code> in this node. Valid
      * strings are "true", which represents <code>true</code>, and "false", which
      * represents <code>false</code>. Case is ignored, so, for example, "TRUE"
@@ -348,15 +346,15 @@ namespace berry
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
-     * @see #get(std::string,std::string)
-     * @see #putBool(std::string,bool)
+     * @see #get(const QString&,const QString&)
+     * @see #putBool(const QString&,bool)
      */
-    virtual bool GetBool(std::string key, bool def) const = 0;
+    virtual bool GetBool(const QString& key, bool def) const = 0;
 
     /**
-     * Associates a <code>std::string</code> object representing the specified
+     * Associates a <code>QString</code> object representing the specified
      * <code>float</code> value with the specified <code>key</code> in this node.
-     * The associated <code>std::string</code> object is the one that would be returned
+     * The associated <code>QString</code> object is the one that would be returned
      * if the <code>float</code> value were passed to
      * <code>Float.toString(float)</code>. This method is intended for use in
      * conjunction with the {@link #getFloat}method.
@@ -367,7 +365,7 @@ namespace berry
      * supports <code>float</code> values, it is not unreasonable to use them.
      * This implementation detail is not visible through the <code>IPreferences
      * </code> API, which allows the value to be read as a <code>float</code> (with
-     * <code>getFloat</code>) or a <code>std::string</code> (with <code>get</code>) type.
+     * <code>getFloat</code>) or a <code>QString</code> (with <code>get</code>) type.
      *
      * @param key <code>key</code> with which the string form of value is to be
      *        associated.
@@ -376,17 +374,17 @@ namespace berry
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
-     * @see #getFloat(std::string,float)
+     * @see #getFloat(const QString&,float)
      */
-    virtual void PutFloat(std::string key, float value) = 0;
+    virtual void PutFloat(const QString& key, float value) = 0;
 
     /**
-     * Returns the float <code>value</code> represented by the <code>std::string</code>
+     * Returns the float <code>value</code> represented by the <code>QString</code>
      * object associated with the specified <code>key</code> in this node. The
-     * <code>std::string</code> object is converted to a <code>float</code> value as by
-     * <code>Float.parseFloat(std::string)</code>. Returns the specified default if
+     * <code>QString</code> object is converted to a <code>float</code> value as by
+     * <code>Float.parseFloat(QString)</code>. Returns the specified default if
      * there is no value associated with the <code>key</code>, the backing store
-     * is inaccessible, or if <code>Float.parseFloat(std::string)</code> would throw a
+     * is inaccessible, or if <code>Float.parseFloat(QString)</code> would throw a
      * <code>NumberFormatException</code> if the associated value were passed.
      * This method is intended for use in conjunction with the {@link #putFloat}
      * method.
@@ -404,15 +402,15 @@ namespace berry
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
-     * @see #putFloat(std::string,float)
-     * @see #get(std::string,std::string)
+     * @see #putFloat(const QString&,float)
+     * @see #get(const QString&,const QString&)
      */
-    virtual float GetFloat(std::string key, float def) const = 0;
+    virtual float GetFloat(const QString& key, float def) const = 0;
 
     /**
-     * Associates a <code>std::string</code> object representing the specified
+     * Associates a <code>QString</code> object representing the specified
      * <code>double</code> value with the specified <code>key</code> in this node.
-     * The associated <code>std::string</code> object is the one that would be returned
+     * The associated <code>QString</code> object is the one that would be returned
      * if the <code>double</code> value were passed to
      * <code>Double.toString(double)</code>. This method is intended for use in
      * conjunction with the {@link #getDouble}method
@@ -423,7 +421,7 @@ namespace berry
      * supports <code>double</code> values, it is not unreasonable to use them.
      * This implementation detail is not visible through the <code>IPreferences
      * </code> API, which allows the value to be read as a <code>double</code> (with
-     * <code>getDouble</code>) or a <code>std::string</code> (with <code>get</code>)
+     * <code>getDouble</code>) or a <code>QString</code> (with <code>get</code>)
      * type.
      *
      * @param key <code>key</code> with which the string form of value is to be
@@ -433,17 +431,17 @@ namespace berry
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
-     * @see #getDouble(std::string,double)
+     * @see #getDouble(const QString&,double)
      */
-    virtual void PutDouble(std::string key, double value) = 0;
+    virtual void PutDouble(const QString& key, double value) = 0;
 
     /**
-     * Returns the <code>double</code> value represented by the <code>std::string</code>
+     * Returns the <code>double</code> value represented by the <code>QString</code>
      * object associated with the specified <code>key</code> in this node. The
-     * <code>std::string</code> object is converted to a <code>double</code> value as by
-     * <code>Double.parseDouble(std::string)</code>. Returns the specified default if
+     * <code>QString</code> object is converted to a <code>double</code> value as by
+     * <code>Double.parseDouble(QString)</code>. Returns the specified default if
      * there is no value associated with the <code>key</code>, the backing store
-     * is inaccessible, or if <code>Double.parseDouble(std::string)</code> would throw
+     * is inaccessible, or if <code>Double.parseDouble(QString)</code> would throw
      * a <code>NumberFormatException</code> if the associated value were passed.
      * This method is intended for use in conjunction with the
      * {@link #putDouble}method.
@@ -454,37 +452,24 @@ namespace berry
      *        value associated with <code>key</code> or the associated value
      *        cannot be interpreted as a <code>double</code> type or the backing
      *        store is inaccessible.
-     * @return the <code>double</code> value represented by the <code>std::string</code>
+     * @return the <code>double</code> value represented by the <code>QString</code>
      *         object associated with <code>key</code> in this node, or
      *         <code>def</code> if the associated value does not exist or cannot
      *         be interpreted as a <code>double</code> type.
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the the {@link #removeNode()}method.
      * @throws NullPointerException if <code>key</code> is <code>null</code>.
-     * @see #putDouble(std::string,double)
-     * @see #get(std::string,std::string)
+     * @see #putDouble(const QString&,double)
+     * @see #get(const QString&,const QString&)
      */
-    virtual double GetDouble(std::string key, double def) const = 0;
+    virtual double GetDouble(const QString& key, double def) const = 0;
 
     /**
-     * Associates a <code>std::string</code> object representing the specified
-     * <code>std::vector<char></code> with the specified <code>key</code> in this node. The
-     * associated <code>std::string</code> object the <i>Base64 </i> encoding of the
-     * <code>std::vector<char></code>, as defined in <a
-     * href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045 </a>, Section 6.8,
-     * with one minor change: the string will consist solely of characters from
-     * the <i>Base64 Alphabet </i>; it will not contain any newline characters.
+     * Associates a <code>QByteArray</code> object representing the specified
+     * <code>QByteArray</code> with the specified <code>key</code> in this node. The
+     * associated <code>QByteArray</code> object is stored in <i>Base64</i> encoding.
      * This method is intended for use in conjunction with the
      * {@link #getByteArray}method.
-     *
-     * <p>
-     * Implementor's note: it is <i>not </i> necessary that the value be
-     * represented by a <code>std::string</code> type in the backing store. If the
-     * backing store supports <code>std::vector<char></code> values, it is not unreasonable
-     * to use them. This implementation detail is not visible through the <code>
-     * IPreferences</code> API, which allows the value to be read as an a
-     * <code>std::vector<char></code> object (with <code>getByteArray</code>) or a
-     * <code>std::string</code> object (with <code>get</code>).
      *
      * @param key <code>key</code> with which the string form of <code>value</code>
      *        is to be associated.
@@ -494,15 +479,15 @@ namespace berry
      *         <code>null</code>.
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
-     * @see #getByteArray(std::string,std::vector<char>)
-     * @see #get(std::string,std::string)
+     * @see #GetByteArray(const QString&,const QByteArray&)
+     * @see #Get(const QString&,const QString&)
      */
-    virtual void PutByteArray(std::string key, std::string value) = 0;
+    virtual void PutByteArray(const QString& key, const QByteArray& value) = 0;
 
     /**
-     * Returns the <code>std::vector<char></code> value represented by the <code>std::string</code>
+     * Returns the <code>QByteArray</code> value represented by the <code>QString</code>
      * object associated with the specified <code>key</code> in this node. Valid
-     * <code>std::string</code> objects are <i>Base64 </i> encoded binary data, as
+     * <code>QString</code> objects are <i>Base64 </i> encoded binary data, as
      * defined in <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045 </a>,
      * Section 6.8, with one minor change: the string must consist solely of
      * characters from the <i>Base64 Alphabet </i>; no newline characters or
@@ -520,7 +505,7 @@ namespace berry
      *        value associated with <code>key</code> or the associated value
      *        cannot be interpreted as a <code>std::vector<char></code> type, or the backing
      *        store is inaccessible.
-     * @return the <code>std::vector<char></code> value represented by the <code>std::string</code>
+     * @return the <code>std::vector<char></code> value represented by the <code>QString</code>
      *         object associated with <code>key</code> in this node, or
      *         <code>def</code> if the associated value does not exist or cannot
      *         be interpreted as a <code>std::vector<char></code>.
@@ -528,10 +513,10 @@ namespace berry
      *         <code>null</code> value for <code>def</code> <i>is </i> permitted.)
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
-     * @see #get(std::string,std::string)
-     * @see #putByteArray(std::string,std::vector<char>)
+     * @see #get(const QString&,const QString&)
+     * @see #putByteArray(const QString&,std::vector<char>)
      */
-    virtual std::string GetByteArray(std::string key, std::string def) const = 0;
+    virtual QByteArray GetByteArray(const QString& key, const QByteArray& def) const = 0;
 
     /**
      * Returns all of the keys that have an associated value in this node. (The
@@ -545,7 +530,7 @@ namespace berry
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
      */
-    virtual std::vector<std::string> Keys() const throw(Poco::Exception, BackingStoreException) = 0;
+    virtual QStringList Keys() const = 0;
 
     /**
      * Returns the names of the children of this node. (The returned array will
@@ -558,7 +543,7 @@ namespace berry
      * @throws IllegalStateException if this node (or an ancestor) has been
      *         removed with the {@link #removeNode()}method.
      */
-    virtual std::vector<std::string> ChildrenNames() const throw(Poco::Exception, BackingStoreException) = 0;
+    virtual QStringList ChildrenNames() const = 0;
 
     /**
      * Returns the parent of this node, or <code>null</code> if this is the root.
@@ -593,7 +578,7 @@ namespace berry
      * @throws NullPointerException if path name is <code>null</code>.
      * @see #flush()
      */
-    virtual IPreferences::Pointer Node(std::string pathName) = 0;
+    virtual IPreferences::Pointer Node(const QString& pathName) = 0;
 
     /**
      * Returns true if the named node exists. Accepts a relative or absolute
@@ -623,8 +608,7 @@ namespace berry
      *         contains multiple consecutive slash characters, or ends with a
      *         slash character and is more than one character long).
      */
-    virtual bool NodeExists(std::string pathName) const
-        throw(Poco::Exception, BackingStoreException) = 0;
+    virtual bool NodeExists(const QString& pathName) const = 0;
 
     /**
      * Removes this node and all of its descendants, invalidating any properties
@@ -646,14 +630,14 @@ namespace berry
      *         with it.
      * @see #flush()
      */
-    virtual void RemoveNode() throw(Poco::Exception, BackingStoreException) = 0;
+    virtual void RemoveNode() = 0;
 
     /**
      * Returns this node's name, relative to its parent.
      *
      * @return this node's name, relative to its parent.
      */
-    virtual std::string Name() const = 0;
+    virtual QString Name() const = 0;
 
     /**
      * Returns this node's absolute path name. Note that:
@@ -669,7 +653,7 @@ namespace berry
      *
      * @return this node's absolute path name.
      */
-    virtual std::string AbsolutePath() const = 0;
+    virtual QString AbsolutePath() const = 0;
 
     /**
      * Forces any changes in the contents of this node and its descendants to
@@ -697,7 +681,7 @@ namespace berry
      *         removed with the {@link #removeNode()}method.
      * @see #sync()
      */
-    virtual void Flush() throw(Poco::Exception, BackingStoreException) = 0;
+    virtual void Flush() = 0;
 
     /**
      * Ensures that future reads from this node and its descendants reflect any
@@ -713,7 +697,7 @@ namespace berry
      *         removed with the {@link #removeNode()}method.
      * @see #flush()
      */
-    virtual void Sync() throw(Poco::Exception, BackingStoreException) = 0;
+    virtual void Sync() = 0;
   };
 
 }  // namespace berry

@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 struct org_mitk_example_gui_extensionpointdefinition_EXPORT IChangeText
     : public virtual berry::Object
 {
-  berryInterfaceMacro(IChangeText, ::)
+  berryObjectMacro(IChangeText)
 
   virtual ~IChangeText();
 

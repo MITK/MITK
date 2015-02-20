@@ -74,7 +74,7 @@ struct BERRY_UI_QT TabOrder {
      */
     virtual void Select(IPresentablePart::Pointer selected) = 0;
 
-    virtual std::vector<IPresentablePart::Pointer> GetPartList() = 0;
+    virtual QList<IPresentablePart::Pointer> GetPartList() = 0;
 };
 
 }

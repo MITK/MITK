@@ -49,7 +49,7 @@ public:
    */
   static IAdaptable* GetPageInput();
 
-  UITestCase(const std::string& testName);
+  UITestCase(const QString& testName);
 
   /**
    * Sets up the fixture, for example, open a network connection.
@@ -71,9 +71,9 @@ public:
   /**
    * Fails the test due to the given throwable.
    */
-  void failexc(const std::string& message, const std::exception& e,
+  void failexc(const QString& message, const std::exception& e,
                long lineNumber = -1,
-               const std::string& fileName = "unknown");
+               const QString& fileName = "unknown");
 
   /**
    * Open a test window with the empty perspective.
@@ -83,7 +83,7 @@ public:
   /**
    * Open a test window with the provided perspective.
    */
-  IWorkbenchWindow::Pointer OpenTestWindow(const std::string& perspectiveId);
+  IWorkbenchWindow::Pointer OpenTestWindow(const QString& perspectiveId);
 
   /**
    * Close all test windows.
@@ -93,18 +93,18 @@ public:
   /**
    * Open a test page with the empty perspective in a window.
    */
-  IWorkbenchPage::Pointer OpenTestPage(IWorkbenchWindow::Pointer win);
+  IWorkbenchPage::Pointer OpenTestPage(const IWorkbenchWindow::Pointer& win);
 
   /**
    * Open "n" test pages with the empty perspective in a window.
    */
-  std::vector<IWorkbenchPage::Pointer> OpenTestPage(
-      IWorkbenchWindow::Pointer win, int pageTotal);
+  QList<IWorkbenchPage::Pointer> OpenTestPage(
+      const IWorkbenchWindow::Pointer& win, int pageTotal);
 
   /**
    * Close all pages within a window.
    */
-  void CloseAllPages(IWorkbenchWindow::Pointer window);
+  void CloseAllPages(const IWorkbenchWindow::Pointer& window);
 
 protected:
 
@@ -114,7 +114,7 @@ protected:
    *
    * @param msg the trace message
    */
-  void Trace(const std::string& msg);
+  void Trace(const QString& msg);
 
   /**
    * Simple implementation of setUp. Subclasses are prevented
@@ -150,32 +150,32 @@ protected:
 
   private:
     bool enabled;
-    std::list<IWorkbenchWindow::Pointer>& testWindows;
+    QList<IWorkbenchWindow::Pointer>& testWindows;
 
   public:
 
-    berryObjectMacro(TestWindowListener);
+    berryObjectMacro(TestWindowListener)
 
-    TestWindowListener(std::list<IWorkbenchWindow::Pointer>& testWindows);
+    TestWindowListener(QList<IWorkbenchWindow::Pointer>& testWindows);
 
     void SetEnabled(bool enabled);
 
-    void WindowActivated(IWorkbenchWindow::Pointer window);
+    void WindowActivated(const IWorkbenchWindow::Pointer& window);
 
-    void WindowDeactivated(IWorkbenchWindow::Pointer window);
+    void WindowDeactivated(const IWorkbenchWindow::Pointer& window);
 
-    void WindowClosed(IWorkbenchWindow::Pointer window);
+    void WindowClosed(const IWorkbenchWindow::Pointer& window);
 
-    void WindowOpened(IWorkbenchWindow::Pointer window);
+    void WindowOpened(const IWorkbenchWindow::Pointer& window);
   };
 
   IWorkbench* fWorkbench;
 
 private:
 
-  std::list<IWorkbenchWindow::Pointer> testWindows;
+  QList<IWorkbenchWindow::Pointer> testWindows;
 
-  TestWindowListener::Pointer windowListener;
+  QScopedPointer<TestWindowListener> windowListener;
 
   static void Indent(std::ostream& output, unsigned int indent);
 

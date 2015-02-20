@@ -53,7 +53,7 @@ void CustomViewerWorkbenchWindowAdvisor::PreWindowOpen()
   berry::IWorkbenchWindowConfigurer::Pointer configurer = this->GetWindowConfigurer();
   configurer->SetTitle("Spartan Viewer");
   configurer->SetShowMenuBar(false);
-  configurer->SetShowCoolBar(false);
+  configurer->SetShowToolBar(false);
   configurer->SetShowPerspectiveBar(false);
   configurer->SetShowStatusLine(false);
 }
@@ -125,7 +125,7 @@ void CustomViewerWorkbenchWindowAdvisor::CreateWindowContents(berry::Shell::Poin
   CentralWidgetLayout->activate();
   CentralWidgetLayout->update();
 
-  this->GetWindowConfigurer()->CreatePageComposite(static_cast<void*>(PageComposite));
+  this->GetWindowConfigurer()->CreatePageComposite(PageComposite);
 // //! [WorkbenchWindowAdvisorCreateWindowContents]
 }
 // //! [WorkbenchWindowAdvisorUpdateStyle]
@@ -159,7 +159,7 @@ void CustomViewerWorkbenchWindowAdvisor::OpenFile()
 // //! [WorkbenchWindowAdvisorOpenFile]
 // //! [WorkbenchWindowAdvisorOpenFilePerspActive]
   berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
-  std::string perspectiveId = "org.mitk.example.viewerperspective";
+  QString perspectiveId = "org.mitk.example.viewerperspective";
   window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
 // //! [WorkbenchWindowAdvisorOpenFilePerspActive]
 }

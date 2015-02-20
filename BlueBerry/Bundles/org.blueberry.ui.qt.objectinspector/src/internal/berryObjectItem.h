@@ -35,9 +35,10 @@ struct ObjectItem
   union
   {
     const Object* obj;
-    const char* className;
     unsigned int spId;
   };
+
+  QString className;
 
   Type type;
 
@@ -46,7 +47,7 @@ struct ObjectItem
 
   ObjectItem();
 
-  ObjectItem(const char* className);
+  ObjectItem(const QString& className);
 
   ObjectItem(const Object* obj, ObjectItem* parent);
 

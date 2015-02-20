@@ -27,9 +27,10 @@ QmitkExtApplication::QmitkExtApplication()
 
 int QmitkExtApplication::Start()
 {
-  berry::Display* display = berry::PlatformUI::CreateDisplay();
+  QScopedPointer<berry::Display> display(berry::PlatformUI::CreateDisplay());
 
-  int code = berry::PlatformUI::CreateAndRunWorkbench(display, new QmitkExtAppWorkbenchAdvisor());
+  QScopedPointer<QmitkExtAppWorkbenchAdvisor> wbAdvisor(new QmitkExtAppWorkbenchAdvisor());
+  int code = berry::PlatformUI::CreateAndRunWorkbench(display.data(), wbAdvisor.data());
 
   // exit the application with an appropriate return code
   return code == berry::PlatformUI::RETURN_RESTART

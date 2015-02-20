@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryPlatform.h>
 #include <berryPlatformUI.h>
+#include <berryIActionBarConfigurer.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIPreferencesService.h>
@@ -77,7 +78,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkExtWorkbenchWindowAdvisorHack
 * QmitkExtWorkbenchWindowAdvisorHack::undohack =
-        new QmitkExtWorkbenchWindowAdvisorHack();
+new QmitkExtWorkbenchWindowAdvisorHack();
 
 QString QmitkExtWorkbenchWindowAdvisor::QT_SETTINGS_FILENAME = "QtSettings.ini";
 
@@ -85,59 +86,58 @@ class PartListenerForTitle: public berry::IPartListener
 {
 public:
 
-    PartListenerForTitle(QmitkExtWorkbenchWindowAdvisor* wa) :
-        windowAdvisor(wa)
-    {
-    }
+ PartListenerForTitle(QmitkExtWorkbenchWindowAdvisor* wa) :
+   windowAdvisor(wa)
+   {
+   }
 
-    Events::Types GetPartEventTypes() const
-    {
-        return Events::ACTIVATED | Events::BROUGHT_TO_TOP | Events::CLOSED
-                | Events::HIDDEN | Events::VISIBLE;
-    }
+   Events::Types GetPartEventTypes() const
+   {
+    return Events::ACTIVATED | Events::BROUGHT_TO_TOP | Events::CLOSED
+     | Events::HIDDEN | Events::VISIBLE;
+   }
 
-    void PartActivated(berry::IWorkbenchPartReference::Pointer ref)
+   void PartActivated(const berry::IWorkbenchPartReference::Pointer& ref)
+   {
+    if (ref.Cast<berry::IEditorReference> ())
     {
-        if (ref.Cast<berry::IEditorReference> ())
-        {
-            windowAdvisor->UpdateTitle(false);
-        }
+     windowAdvisor->UpdateTitle(false);
     }
+   }
 
-    void PartBroughtToTop(berry::IWorkbenchPartReference::Pointer ref)
+   void PartBroughtToTop(const berry::IWorkbenchPartReference::Pointer& ref)
+   {
+    if (ref.Cast<berry::IEditorReference> ())
     {
-        if (ref.Cast<berry::IEditorReference> ())
-        {
-            windowAdvisor->UpdateTitle(false);
-        }
+     windowAdvisor->UpdateTitle(false);
     }
+   }
 
-    void PartClosed(berry::IWorkbenchPartReference::Pointer /*ref*/)
-    {
-        windowAdvisor->UpdateTitle(false);
-    }
+   void PartClosed(const berry::IWorkbenchPartReference::Pointer& /*ref*/)
+   {
+    windowAdvisor->UpdateTitle(false);
+   }
 
-    void PartHidden(berry::IWorkbenchPartReference::Pointer ref)
+   void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref)
+   {
+    if (!windowAdvisor->lastActiveEditor.Expired() &&
+     ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
     {
-        if (!windowAdvisor->lastActiveEditor.Expired() &&
-                ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
-        {
-            windowAdvisor->UpdateTitle(true);
-        }
+     windowAdvisor->UpdateTitle(true);
     }
+   }
 
-    void PartVisible(berry::IWorkbenchPartReference::Pointer ref)
+   void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref)
+   {
+    if (!windowAdvisor->lastActiveEditor.Expired() &&
+     ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
     {
-        if (!windowAdvisor->lastActiveEditor.Expired() &&
-                ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
-        {
-            windowAdvisor->UpdateTitle(false);
-        }
+     windowAdvisor->UpdateTitle(false);
     }
+   }
 
 private:
-    QmitkExtWorkbenchWindowAdvisor* windowAdvisor;
-
+ QmitkExtWorkbenchWindowAdvisor* windowAdvisor;
 };
 
 class PartListenerForViewNavigator: public berry::IPartListener
@@ -155,7 +155,7 @@ public:
                 Events::VISIBLE;
     }
 
-    void PartOpened(berry::IWorkbenchPartReference::Pointer ref)
+    void PartOpened(const berry::IWorkbenchPartReference::Pointer& ref)
     {
         if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
@@ -163,7 +163,7 @@ public:
         }
     }
 
-    void PartClosed(berry::IWorkbenchPartReference::Pointer ref)
+    void PartClosed(const berry::IWorkbenchPartReference::Pointer& ref)
     {
         if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
@@ -171,7 +171,7 @@ public:
         }
     }
 
-    void PartVisible(berry::IWorkbenchPartReference::Pointer ref)
+    void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref)
     {
         if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
@@ -179,7 +179,7 @@ public:
         }
     }
 
-    void PartHidden(berry::IWorkbenchPartReference::Pointer ref)
+    void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref)
     {
         if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
@@ -196,51 +196,51 @@ class PartListenerForImageNavigator: public berry::IPartListener
 {
 public:
 
-    PartListenerForImageNavigator(QAction* act) :
-        imageNavigatorAction(act)
-    {
-    }
+ PartListenerForImageNavigator(QAction* act) :
+   imageNavigatorAction(act)
+   {
+   }
 
-    Events::Types GetPartEventTypes() const
-    {
-        return Events::OPENED | Events::CLOSED | Events::HIDDEN |
-                Events::VISIBLE;
-    }
+   Events::Types GetPartEventTypes() const
+   {
+    return Events::OPENED | Events::CLOSED | Events::HIDDEN |
+     Events::VISIBLE;
+   }
 
-    void PartOpened(berry::IWorkbenchPartReference::Pointer ref)
+   void PartOpened(const berry::IWorkbenchPartReference::Pointer& ref)
+   {
+    if (ref->GetId()=="org.mitk.views.imagenavigator")
     {
-        if (ref->GetId()=="org.mitk.views.imagenavigator")
-        {
-            imageNavigatorAction->setChecked(true);
-        }
+     imageNavigatorAction->setChecked(true);
     }
+   }
 
-    void PartClosed(berry::IWorkbenchPartReference::Pointer ref)
+   void PartClosed(const berry::IWorkbenchPartReference::Pointer& ref)
+   {
+    if (ref->GetId()=="org.mitk.views.imagenavigator")
     {
-        if (ref->GetId()=="org.mitk.views.imagenavigator")
-        {
-            imageNavigatorAction->setChecked(false);
-        }
+     imageNavigatorAction->setChecked(false);
     }
+   }
 
-    void PartVisible(berry::IWorkbenchPartReference::Pointer ref)
+   void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref)
+   {
+    if (ref->GetId()=="org.mitk.views.imagenavigator")
     {
-        if (ref->GetId()=="org.mitk.views.imagenavigator")
-        {
-            imageNavigatorAction->setChecked(true);
-        }
+     imageNavigatorAction->setChecked(true);
     }
+   }
 
-    void PartHidden(berry::IWorkbenchPartReference::Pointer ref)
+   void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref)
+   {
+    if (ref->GetId()=="org.mitk.views.imagenavigator")
     {
-        if (ref->GetId()=="org.mitk.views.imagenavigator")
-        {
-            imageNavigatorAction->setChecked(false);
-        }
+     imageNavigatorAction->setChecked(false);
     }
+   }
 
 private:
-    QAction* imageNavigatorAction;
+ QAction* imageNavigatorAction;
 
 };
 
@@ -248,209 +248,214 @@ class PerspectiveListenerForTitle: public berry::IPerspectiveListener
 {
 public:
 
-    PerspectiveListenerForTitle(QmitkExtWorkbenchWindowAdvisor* wa) :
-        windowAdvisor(wa), perspectivesClosed(false)
+ PerspectiveListenerForTitle(QmitkExtWorkbenchWindowAdvisor* wa) :
+   windowAdvisor(wa), perspectivesClosed(false)
+   {
+   }
+
+   Events::Types GetPerspectiveEventTypes() const
+   {
+    return Events::ACTIVATED | Events::SAVED_AS | Events::DEACTIVATED
+     // remove the following line when command framework is finished
+     | Events::CLOSED | Events::OPENED;
+   }
+
+   void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
+                             const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+   {
+    windowAdvisor->UpdateTitle(false);
+   }
+
+   void PerspectiveSavedAs(const berry::IWorkbenchPage::Pointer& /*page*/,
+                           const berry::IPerspectiveDescriptor::Pointer& /*oldPerspective*/,
+                           const berry::IPerspectiveDescriptor::Pointer& /*newPerspective*/)
+   {
+    windowAdvisor->UpdateTitle(false);
+   }
+
+   void PerspectiveDeactivated(const berry::IWorkbenchPage::Pointer& /*page*/,
+                               const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+   {
+    windowAdvisor->UpdateTitle(false);
+   }
+
+   void PerspectiveOpened(const berry::IWorkbenchPage::Pointer& /*page*/,
+                          const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+   {
+    if (perspectivesClosed)
     {
+     QListIterator<QAction*> i(windowAdvisor->viewActions);
+     while (i.hasNext())
+     {
+      i.next()->setEnabled(true);
+     }
+
+     //GetViewRegistry()->Find("org.mitk.views.imagenavigator");
+     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+     {
+        windowAdvisor->openDicomEditorAction->setEnabled(true);
+     }
+     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnat.browser"))
+     {
+        windowAdvisor->openXnatEditorAction->setEnabled(true);
+     }
+     windowAdvisor->fileSaveProjectAction->setEnabled(true);
+     windowAdvisor->closeProjectAction->setEnabled(true);
+     windowAdvisor->undoAction->setEnabled(true);
+     windowAdvisor->redoAction->setEnabled(true);
+     windowAdvisor->imageNavigatorAction->setEnabled(true);
+     windowAdvisor->viewNavigatorAction->setEnabled(true);
+     windowAdvisor->resetPerspAction->setEnabled(true);
+     if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
+     {
+       windowAdvisor->closePerspAction->setEnabled(true);
+     }
     }
 
-    Events::Types GetPerspectiveEventTypes() const
+    perspectivesClosed = false;
+   }
+
+   void PerspectiveClosed(const berry::IWorkbenchPage::Pointer& /*page*/,
+                          const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+   {
+    berry::IWorkbenchWindow::Pointer wnd = windowAdvisor->GetWindowConfigurer()->GetWindow();
+    bool allClosed = true;
+    if (wnd->GetActivePage())
     {
-        return Events::ACTIVATED | Events::SAVED_AS | Events::DEACTIVATED
-                // remove the following line when command framework is finished
-                | Events::CLOSED | Events::OPENED;
+     QList<berry::IPerspectiveDescriptor::Pointer> perspectives(wnd->GetActivePage()->GetOpenPerspectives());
+     allClosed = perspectives.empty();
     }
 
-    void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
-                              berry::IPerspectiveDescriptor::Pointer /*perspective*/)
+    if (allClosed)
     {
-        windowAdvisor->UpdateTitle(false);
+     perspectivesClosed = true;
+
+     QListIterator<QAction*> i(windowAdvisor->viewActions);
+     while (i.hasNext())
+     {
+      i.next()->setEnabled(false);
+     }
+
+     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+     {
+        windowAdvisor->openDicomEditorAction->setEnabled(false);
+     }
+     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnat.browser"))
+     {
+       windowAdvisor->openXnatEditorAction->setEnabled(false);
+     }
+     windowAdvisor->fileSaveProjectAction->setEnabled(false);
+     windowAdvisor->closeProjectAction->setEnabled(false);
+     windowAdvisor->undoAction->setEnabled(false);
+     windowAdvisor->redoAction->setEnabled(false);
+     windowAdvisor->imageNavigatorAction->setEnabled(false);
+     windowAdvisor->viewNavigatorAction->setEnabled(false);
+     windowAdvisor->resetPerspAction->setEnabled(false);
+     if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
+     {
+       windowAdvisor->closePerspAction->setEnabled(false);
+     }
     }
-
-    void PerspectiveSavedAs(berry::IWorkbenchPage::Pointer /*page*/,
-                            berry::IPerspectiveDescriptor::Pointer /*oldPerspective*/,
-                            berry::IPerspectiveDescriptor::Pointer /*newPerspective*/)
-    {
-        windowAdvisor->UpdateTitle(false);
-    }
-
-    void PerspectiveDeactivated(berry::IWorkbenchPage::Pointer /*page*/,
-                                berry::IPerspectiveDescriptor::Pointer /*perspective*/)
-    {
-        windowAdvisor->UpdateTitle(false);
-    }
-
-    void PerspectiveOpened(berry::IWorkbenchPage::Pointer /*page*/,
-                           berry::IPerspectiveDescriptor::Pointer /*perspective*/)
-    {
-        if (perspectivesClosed)
-        {
-            QListIterator<QAction*> i(windowAdvisor->viewActions);
-            while (i.hasNext())
-            {
-                i.next()->setEnabled(true);
-            }
-
-            //GetViewRegistry()->Find("org.mitk.views.imagenavigator");
-            if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
-            {
-                windowAdvisor->openDicomEditorAction->setEnabled(true);
-            }
-            if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnat.browser"))
-            {
-                windowAdvisor->openXnatEditorAction->setEnabled(true);
-            }
-            windowAdvisor->fileSaveProjectAction->setEnabled(true);
-            windowAdvisor->closeProjectAction->setEnabled(true);
-            windowAdvisor->undoAction->setEnabled(true);
-            windowAdvisor->redoAction->setEnabled(true);
-            windowAdvisor->imageNavigatorAction->setEnabled(true);
-            windowAdvisor->viewNavigatorAction->setEnabled(true);
-            windowAdvisor->resetPerspAction->setEnabled(true);
-            if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
-            {
-                windowAdvisor->closePerspAction->setEnabled(true);
-            }
-        }
-
-        perspectivesClosed = false;
-    }
-
-    void PerspectiveClosed(berry::IWorkbenchPage::Pointer /*page*/,
-                           berry::IPerspectiveDescriptor::Pointer /*perspective*/)
-    {
-        berry::IWorkbenchWindow::Pointer wnd = windowAdvisor->GetWindowConfigurer()->GetWindow();
-        bool allClosed = true;
-        if (wnd->GetActivePage())
-        {
-            std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(wnd->GetActivePage()->GetOpenPerspectives());
-            allClosed = perspectives.empty();
-        }
-
-        if (allClosed)
-        {
-            perspectivesClosed = true;
-
-            QListIterator<QAction*> i(windowAdvisor->viewActions);
-            while (i.hasNext())
-            {
-                i.next()->setEnabled(false);
-            }
-
-            if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
-            {
-                windowAdvisor->openDicomEditorAction->setEnabled(false);
-            }
-            if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnat.browser"))
-            {
-                windowAdvisor->openXnatEditorAction->setEnabled(false);
-            }
-            windowAdvisor->fileSaveProjectAction->setEnabled(false);
-            windowAdvisor->closeProjectAction->setEnabled(false);
-            windowAdvisor->undoAction->setEnabled(false);
-            windowAdvisor->redoAction->setEnabled(false);
-            windowAdvisor->imageNavigatorAction->setEnabled(false);
-            windowAdvisor->viewNavigatorAction->setEnabled(false);
-            windowAdvisor->resetPerspAction->setEnabled(false);
-            if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
-            {
-                windowAdvisor->closePerspAction->setEnabled(false);
-            }
-        }
-    }
+   }
 
 private:
-    QmitkExtWorkbenchWindowAdvisor* windowAdvisor;
-    bool perspectivesClosed;
+ QmitkExtWorkbenchWindowAdvisor* windowAdvisor;
+ bool perspectivesClosed;
 };
 
 class PerspectiveListenerForMenu: public berry::IPerspectiveListener
 {
 public:
 
-    PerspectiveListenerForMenu(QmitkExtWorkbenchWindowAdvisor* wa) :
-        windowAdvisor(wa)
-    {
-    }
+ PerspectiveListenerForMenu(QmitkExtWorkbenchWindowAdvisor* wa) :
+   windowAdvisor(wa)
+   {
+   }
 
-    Events::Types GetPerspectiveEventTypes() const
-    {
-        return Events::ACTIVATED | Events::DEACTIVATED;
-    }
+   Events::Types GetPerspectiveEventTypes() const
+   {
+    return Events::ACTIVATED | Events::DEACTIVATED;
+   }
 
-    void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
-                              berry::IPerspectiveDescriptor::Pointer perspective)
-    {
-        QAction* action = windowAdvisor->mapPerspIdToAction[perspective->GetId()];
-        if (action)
-        {
-            action->setChecked(true);
-        }
-    }
+   void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
+                             const berry::IPerspectiveDescriptor::Pointer& perspective)
+   {
+     QAction* action = windowAdvisor->mapPerspIdToAction[perspective->GetId()];
+     if (action)
+     {
+       action->setChecked(true);
+     }
+   }
 
-    void PerspectiveDeactivated(berry::IWorkbenchPage::Pointer /*page*/,
-                                berry::IPerspectiveDescriptor::Pointer perspective)
-    {
-        QAction* action = windowAdvisor->mapPerspIdToAction[perspective->GetId()];
-        if (action)
-        {
-            action->setChecked(false);
-        }
-    }
+   void PerspectiveDeactivated(const berry::IWorkbenchPage::Pointer& /*page*/,
+                               const berry::IPerspectiveDescriptor::Pointer& perspective)
+   {
+     QAction* action = windowAdvisor->mapPerspIdToAction[perspective->GetId()];
+     if (action)
+     {
+       action->setChecked(false);
+     }
+   }
 
 private:
-    QmitkExtWorkbenchWindowAdvisor* windowAdvisor;
+ QmitkExtWorkbenchWindowAdvisor* windowAdvisor;
 };
 
 
 
 QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor,
-                                                               berry::IWorkbenchWindowConfigurer::Pointer configurer) :
-    berry::WorkbenchWindowAdvisor(configurer),
-    lastInput(0),
-    wbAdvisor(wbAdvisor),
-    showViewToolbar(true),
-    showPerspectiveToolbar(false),
-    showVersionInfo(true),
-    showMitkVersionInfo(true),
-    showViewMenuItem(true),
-    showNewWindowMenuItem(false),
-    showClosePerspectiveMenuItem(true),
-    viewNavigatorFound(false),
-    showMemoryIndicator(true),
-    dropTargetListener(new QmitkDefaultDropTargetListener)
+                  berry::IWorkbenchWindowConfigurer::Pointer configurer) :
+berry::WorkbenchWindowAdvisor(configurer),
+lastInput(0),
+wbAdvisor(wbAdvisor),
+showViewToolbar(true),
+showPerspectiveToolbar(false),
+showVersionInfo(true),
+showMitkVersionInfo(true),
+showViewMenuItem(true),
+showNewWindowMenuItem(false),
+showClosePerspectiveMenuItem(true),
+viewNavigatorFound(false),
+showMemoryIndicator(true),
+dropTargetListener(new QmitkDefaultDropTargetListener)
 {
-    productName = QCoreApplication::applicationName().toStdString();
-    viewExcludeList.push_back("org.mitk.views.viewnavigatorview");
+ productName = QCoreApplication::applicationName();
+  viewExcludeList.push_back("org.mitk.views.viewnavigatorview");
+}
+
+QmitkExtWorkbenchWindowAdvisor::~QmitkExtWorkbenchWindowAdvisor()
+{
 }
 
 berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(
-        berry::IActionBarConfigurer::Pointer configurer)
+ berry::IActionBarConfigurer::Pointer configurer)
 {
-    berry::ActionBarAdvisor::Pointer actionBarAdvisor(
-                new QmitkExtActionBarAdvisor(configurer));
-    return actionBarAdvisor;
+ //berry::ActionBarAdvisor::Pointer actionBarAdvisor(
+ // new QmitkExtActionBarAdvisor(configurer));
+ //return actionBarAdvisor;
+  return berry::WorkbenchWindowAdvisor::CreateActionBarAdvisor(configurer);
 }
 
-void* QmitkExtWorkbenchWindowAdvisor::CreateEmptyWindowContents(void* parent)
+QWidget* QmitkExtWorkbenchWindowAdvisor::CreateEmptyWindowContents(QWidget* parent)
 {
-    QWidget* parentWidget = static_cast<QWidget*>(parent);
-    QLabel* label = new QLabel(parentWidget);
-    label->setText("<b>No perspectives are open. Open a perspective in the <i>Window->Open Perspective</i> menu.</b>");
-    label->setContentsMargins(10,10,10,10);
-    label->setAlignment(Qt::AlignTop);
-    label->setEnabled(false);
-    parentWidget->layout()->addWidget(label);
-    return label;
+ QWidget* parentWidget = static_cast<QWidget*>(parent);
+ QLabel* label = new QLabel(parentWidget);
+ label->setText("<b>No perspectives are open. Open a perspective in the <i>Window->Open Perspective</i> menu.</b>");
+ label->setContentsMargins(10,10,10,10);
+ label->setAlignment(Qt::AlignTop);
+ label->setEnabled(false);
+ parentWidget->layout()->addWidget(label);
+ return label;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowClosePerspectiveMenuItem(bool show)
 {
-    showClosePerspectiveMenuItem = show;
+ showClosePerspectiveMenuItem = show;
 }
 
 bool QmitkExtWorkbenchWindowAdvisor::GetShowClosePerspectiveMenuItem()
 {
-    return showClosePerspectiveMenuItem;
+  return showClosePerspectiveMenuItem;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowMemoryIndicator(bool show)
@@ -465,62 +470,62 @@ bool QmitkExtWorkbenchWindowAdvisor::GetShowMemoryIndicator()
 
 void QmitkExtWorkbenchWindowAdvisor::ShowNewWindowMenuItem(bool show)
 {
-    showNewWindowMenuItem = show;
+ showNewWindowMenuItem = show;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowViewToolbar(bool show)
 {
-    showViewToolbar = show;
+ showViewToolbar = show;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowViewMenuItem(bool show)
 {
-    showViewMenuItem = show;
+ showViewMenuItem = show;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowPerspectiveToolbar(bool show)
 {
-    showPerspectiveToolbar = show;
+ showPerspectiveToolbar = show;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowVersionInfo(bool show)
 {
-    showVersionInfo = show;
+ showVersionInfo = show;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowMitkVersionInfo(bool show)
 {
-    showMitkVersionInfo = show;
+ showMitkVersionInfo = show;
 }
 
-void QmitkExtWorkbenchWindowAdvisor::SetProductName(const std::string& product)
+void QmitkExtWorkbenchWindowAdvisor::SetProductName(const QString& product)
 {
-    productName = product;
+ productName = product;
 }
 
-void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const std::string& wndIcon)
+void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const QString& wndIcon)
 {
-    windowIcon = wndIcon;
+ windowIcon = wndIcon;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 {
-    // very bad hack...
-    berry::IWorkbenchWindow::Pointer window =
-            this->GetWindowConfigurer()->GetWindow();
-    QMainWindow* mainWindow =
-            static_cast<QMainWindow*> (window->GetShell()->GetControl());
+ // very bad hack...
+ berry::IWorkbenchWindow::Pointer window =
+  this->GetWindowConfigurer()->GetWindow();
+ QMainWindow* mainWindow =
+  qobject_cast<QMainWindow*> (window->GetShell()->GetControl());
 
-    window->SetPerspectiveExcludeList(perspectiveExcludeList);
+ window->SetPerspectiveExcludeList(perspectiveExcludeList);
     window->SetViewExcludeList(viewExcludeList);
 
-    if (!windowIcon.empty())
-    {
-        mainWindow->setWindowIcon(QIcon(QString::fromStdString(windowIcon)));
-    }
-    mainWindow->setContextMenuPolicy(Qt::PreventContextMenu);
+ if (!windowIcon.isEmpty())
+ {
+  mainWindow->setWindowIcon(QIcon(windowIcon));
+ }
+ mainWindow->setContextMenuPolicy(Qt::PreventContextMenu);
 
-    /*mainWindow->setStyleSheet("color: white;"
+ /*mainWindow->setStyleSheet("color: white;"
  "background-color: #808080;"
  "selection-color: #659EC7;"
  "selection-background-color: #808080;"
@@ -533,90 +538,87 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     searchPaths.push_front( QString(":/org_mitk_icons/icons/") );
     QIcon::setThemeSearchPaths( searchPaths );
 
-    berry::IPreferencesService::Pointer prefService
-      = berry::Platform::GetServiceRegistry()
-      .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-
+    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
     berry::IPreferences::Pointer stylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
-    QString iconTheme = QString::fromStdString(stylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>"));
+    QString iconTheme = stylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>");
     if( iconTheme == QString( "<<default>>" ) )
     {
       iconTheme = QString( "tango" );
     }
     QIcon::setThemeName( iconTheme );
 
-    // ==== Application menu ============================
-    QMenuBar* menuBar = mainWindow->menuBar();
-    menuBar->setContextMenuPolicy(Qt::PreventContextMenu);
+ // ==== Application menu ============================
 
-    QMenu* fileMenu = menuBar->addMenu("&File");
-    fileMenu->setObjectName("FileMenu");
+ QMenuBar* menuBar = mainWindow->menuBar();
+ menuBar->setContextMenuPolicy(Qt::PreventContextMenu);
+
+ QMenu* fileMenu = menuBar->addMenu("&File");
+ fileMenu->setObjectName("FileMenu");
 
     QAction* fileOpenAction = new QmitkFileOpenAction(QIcon::fromTheme("document-open",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-open.svg")), window);
     fileOpenAction->setShortcut(QKeySequence::Open);
-    fileMenu->addAction(fileOpenAction);
+ fileMenu->addAction(fileOpenAction);
     QAction* fileSaveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"), window);
     fileSaveAction->setShortcut(QKeySequence::Save);
     fileMenu->addAction(fileSaveAction);
-    fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
+ fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
     fileSaveProjectAction->setIcon(QIcon::fromTheme("document-save",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-save.svg")));
-    fileMenu->addAction(fileSaveProjectAction);
-    closeProjectAction = new QmitkCloseProjectAction(window);
+ fileMenu->addAction(fileSaveProjectAction);
+ closeProjectAction = new QmitkCloseProjectAction(window);
     closeProjectAction->setIcon(QIcon::fromTheme("edit-delete",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-delete.svg")));
-    fileMenu->addAction(closeProjectAction);
-    fileMenu->addSeparator();
-    QAction* fileExitAction = new QmitkFileExitAction(window);
+ fileMenu->addAction(closeProjectAction);
+ fileMenu->addSeparator();
+ QAction* fileExitAction = new QmitkFileExitAction(window);
     fileExitAction->setIcon(QIcon::fromTheme("system-log-out",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/system-log-out.svg")));
     fileExitAction->setShortcut(QKeySequence::Quit);
-    fileExitAction->setObjectName("QmitkFileExitAction");
-    fileMenu->addAction(fileExitAction);
+ fileExitAction->setObjectName("QmitkFileExitAction");
+ fileMenu->addAction(fileExitAction);
 
-    if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
-    {
-        openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"),window);
-    }
+if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+{
+ openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"),window);
+}
     if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnat.browser"))
     {
         openXnatEditorAction = new QmitkOpenXnatEditorAction(QIcon(":/org.mitk.gui.qt.ext/xnat-icon.png"),window);
     }
 
-    berry::IViewRegistry* viewRegistry =
-            berry::PlatformUI::GetWorkbench()->GetViewRegistry();
-    const std::vector<berry::IViewDescriptor::Pointer>& viewDescriptors =
-            viewRegistry->GetViews();
+ berry::IViewRegistry* viewRegistry =
+  berry::PlatformUI::GetWorkbench()->GetViewRegistry();
+ const QList<berry::IViewDescriptor::Pointer> viewDescriptors = viewRegistry->GetViews();
 
-    // another bad hack to get an edit/undo menu...
-    QMenu* editMenu = menuBar->addMenu("&Edit");
+ // another bad hack to get an edit/undo menu...
+ QMenu* editMenu = menuBar->addMenu("&Edit");
     undoAction = editMenu->addAction(QIcon::fromTheme("edit-undo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-undo.svg")),
-                                     "&Undo",
-                                     QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
-                                     QKeySequence("CTRL+Z"));
-    undoAction->setToolTip("Undo the last action (not supported by all modules)");
+  "&Undo",
+  QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
+  QKeySequence("CTRL+Z"));
+ undoAction->setToolTip("Undo the last action (not supported by all modules)");
     redoAction = editMenu->addAction(QIcon::fromTheme("edit-redo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-redo.svg"))
-                                     , "&Redo",
-                                     QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
-                                     QKeySequence("CTRL+Y"));
-    redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
+  , "&Redo",
+  QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
+  QKeySequence("CTRL+Y"));
+ redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
 
-    imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", NULL);
-    bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
-    if (imageNavigatorViewFound)
-    {
-        QObject::connect(imageNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()));
-        imageNavigatorAction->setCheckable(true);
+ imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", NULL);
+ bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
+ if (imageNavigatorViewFound)
+ {
+   QObject::connect(imageNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()));
+   imageNavigatorAction->setCheckable(true);
 
-        // add part listener for image navigator
-        imageNavigatorPartListener = new PartListenerForImageNavigator(imageNavigatorAction);
-        window->GetPartService()->AddPartListener(imageNavigatorPartListener);
-        berry::IViewPart::Pointer imageNavigatorView =
-                window->GetActivePage()->FindView("org.mitk.views.imagenavigator");
-        imageNavigatorAction->setChecked(false);
-        if (imageNavigatorView)
-        {
-            bool isImageNavigatorVisible = window->GetActivePage()->IsPartVisible(imageNavigatorView);
-            if (isImageNavigatorVisible)
-                imageNavigatorAction->setChecked(true);
-        }
+   // add part listener for image navigator
+   imageNavigatorPartListener.reset(new PartListenerForImageNavigator(imageNavigatorAction));
+   window->GetPartService()->AddPartListener(imageNavigatorPartListener.data());
+   berry::IViewPart::Pointer imageNavigatorView =
+       window->GetActivePage()->FindView("org.mitk.views.imagenavigator");
+   imageNavigatorAction->setChecked(false);
+   if (imageNavigatorView)
+   {
+     bool isImageNavigatorVisible = window->GetActivePage()->IsPartVisible(imageNavigatorView);
+     if (isImageNavigatorVisible)
+       imageNavigatorAction->setChecked(true);
+   }
         imageNavigatorAction->setToolTip("Toggle image navigator for navigating through image");
     }
 
@@ -628,8 +630,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
         viewNavigatorAction->setCheckable(true);
 
         // add part listener for view navigator
-        viewNavigatorPartListener = new PartListenerForViewNavigator(viewNavigatorAction);
-        window->GetPartService()->AddPartListener(viewNavigatorPartListener);
+        viewNavigatorPartListener.reset(new PartListenerForViewNavigator(viewNavigatorAction));
+        window->GetPartService()->AddPartListener(viewNavigatorPartListener.data());
         berry::IViewPart::Pointer viewnavigatorview =
                 window->GetActivePage()->FindView("org.mitk.views.viewnavigatorview");
         viewNavigatorAction->setChecked(false);
@@ -640,290 +642,293 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
                 viewNavigatorAction->setChecked(true);
         }
         viewNavigatorAction->setToolTip("Toggle View Navigator");
-    }
+ }
 
-    // toolbar for showing file open, undo, redo and other main actions
-    QToolBar* mainActionsToolBar = new QToolBar;
+ // toolbar for showing file open, undo, redo and other main actions
+ QToolBar* mainActionsToolBar = new QToolBar;
     mainActionsToolBar->setObjectName("mainActionsToolBar");
-    mainActionsToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-
+ mainActionsToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 #ifdef __APPLE__
-    mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextUnderIcon );
+ mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextUnderIcon );
 #else
-    mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
+ mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
 #endif
 
-    mainActionsToolBar->addAction(fileOpenAction);
-    mainActionsToolBar->addAction(fileSaveProjectAction);
-    mainActionsToolBar->addAction(closeProjectAction);
-    mainActionsToolBar->addAction(undoAction);
-    mainActionsToolBar->addAction(redoAction);
-    if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
-    {
-        mainActionsToolBar->addAction(openDicomEditorAction);
-    }
+ mainActionsToolBar->addAction(fileOpenAction);
+ mainActionsToolBar->addAction(fileSaveProjectAction);
+ mainActionsToolBar->addAction(closeProjectAction);
+ mainActionsToolBar->addAction(undoAction);
+ mainActionsToolBar->addAction(redoAction);
+if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+{
+ mainActionsToolBar->addAction(openDicomEditorAction);
+}
     if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnat.browser"))
     {
         mainActionsToolBar->addAction(openXnatEditorAction);
     }
-    if (imageNavigatorViewFound)
-    {
-        mainActionsToolBar->addAction(imageNavigatorAction);
-    }
+ if (imageNavigatorViewFound)
+ {
+   mainActionsToolBar->addAction(imageNavigatorAction);
+ }
     if (viewNavigatorFound)
         mainActionsToolBar->addAction(viewNavigatorAction);
-
-    mainWindow->addToolBar(mainActionsToolBar);
+ mainWindow->addToolBar(mainActionsToolBar);
 
 #ifdef __APPLE__
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    mainWindow->setUnifiedTitleAndToolBarOnMac(true);
+ mainWindow->setUnifiedTitleAndToolBarOnMac(true);
     // default is false
 #endif
 #endif
 
-    // ==== Window Menu ==========================
-    QMenu* windowMenu = menuBar->addMenu("Window");
-    if (showNewWindowMenuItem)
-    {
-        windowMenu->addAction("&New Window", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
-        windowMenu->addSeparator();
-    }
+ // ==== Window Menu ==========================
+ QMenu* windowMenu = menuBar->addMenu("Window");
+ if (showNewWindowMenuItem)
+ {
+   windowMenu->addAction("&New Window", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
+   windowMenu->addSeparator();
+ }
 
-    QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
+ QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
 
-    QMenu* viewMenu;
-    if (showViewMenuItem)
-    {
-        viewMenu = windowMenu->addMenu("Show &View");
-        viewMenu->setObjectName("Show View");
-    }
-    windowMenu->addSeparator();
-    resetPerspAction = windowMenu->addAction("&Reset Perspective",
-                                             QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
+ QMenu* viewMenu;
+ if (showViewMenuItem)
+ {
+   viewMenu = windowMenu->addMenu("Show &View");
+   viewMenu->setObjectName("Show View");
+ }
+ windowMenu->addSeparator();
+ resetPerspAction = windowMenu->addAction("&Reset Perspective",
+  QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
 
-    if(showClosePerspectiveMenuItem)
-        closePerspAction = windowMenu->addAction("&Close Perspective", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
+ if(showClosePerspectiveMenuItem)
+  closePerspAction = windowMenu->addAction("&Close Perspective", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
 
-    windowMenu->addSeparator();
-    windowMenu->addAction("&Preferences...",
-                          QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()),
-                          QKeySequence("CTRL+P"));
+ windowMenu->addSeparator();
+ windowMenu->addAction("&Preferences...",
+  QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()),
+  QKeySequence("CTRL+P"));
 
-    // fill perspective menu
-    berry::IPerspectiveRegistry* perspRegistry =
-            window->GetWorkbench()->GetPerspectiveRegistry();
-    QActionGroup* perspGroup = new QActionGroup(menuBar);
+ // fill perspective menu
+ berry::IPerspectiveRegistry* perspRegistry =
+  window->GetWorkbench()->GetPerspectiveRegistry();
+ QActionGroup* perspGroup = new QActionGroup(menuBar);
 
-    std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(
-                perspRegistry->GetPerspectives());
+ QList<berry::IPerspectiveDescriptor::Pointer> perspectives(
+  perspRegistry->GetPerspectives());
 
     bool skip = false;
-    for (std::vector<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
-         perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
+    for (QList<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
+      perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
     {
 
-        // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
-        // should not appear as an menu-entry in the perspective menu
-        if (perspectiveExcludeList.size() > 0)
+      // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
+      // should not appear as an menu-entry in the perspective menu
+      if (perspectiveExcludeList.size() > 0)
+      {
+        for (int i=0; i<perspectiveExcludeList.size(); i++)
         {
-            for (unsigned int i=0; i<perspectiveExcludeList.size(); i++)
-            {
-                if (perspectiveExcludeList.at(i) == (*perspIt)->GetId())
-                {
-                    skip = true;
-                    break;
-                }
-            }
-            if (skip)
-            {
-                skip = false;
-                continue;
-            }
+          if (perspectiveExcludeList.at(i) == (*perspIt)->GetId())
+          {
+            skip = true;
+            break;
+          }
         }
+        if (skip)
+        {
+          skip = false;
+          continue;
+        }
+      }
 
-        QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
-                                                                  *perspIt, perspGroup);
-        mapPerspIdToAction.insert(std::make_pair((*perspIt)->GetId(), perspAction));
+      QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
+        *perspIt, perspGroup);
+      mapPerspIdToAction.insert((*perspIt)->GetId(), perspAction);
     }
-    perspMenu->addActions(perspGroup->actions());
+ perspMenu->addActions(perspGroup->actions());
 
-    // sort elements (converting vector to map...)
-    std::vector<berry::IViewDescriptor::Pointer>::const_iterator iter;
-    std::map<std::string, berry::IViewDescriptor::Pointer> VDMap;
+ // sort elements (converting vector to map...)
+ QList<berry::IViewDescriptor::Pointer>::const_iterator iter;
+ std::map<QString, berry::IViewDescriptor::Pointer> VDMap;
 
-    skip = false;
-    for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
-    {
+ skip = false;
+ for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
+ {
 
-        // if viewExcludeList is set, it contains the id-strings of view, which
-        // should not appear as an menu-entry in the menu
-        if (viewExcludeList.size() > 0)
-        {
-            for (unsigned int i=0; i<viewExcludeList.size(); i++)
-            {
-                if (viewExcludeList.at(i) == (*iter)->GetId())
-                {
-                    skip = true;
-                    break;
-                }
-            }
-            if (skip)
-            {
-                skip = false;
-                continue;
-            }
-        }
+   // if viewExcludeList is set, it contains the id-strings of view, which
+   // should not appear as an menu-entry in the menu
+   if (viewExcludeList.size() > 0)
+   {
+     for (int i=0; i<viewExcludeList.size(); i++)
+     {
+       if (viewExcludeList.at(i) == (*iter)->GetId())
+       {
+         skip = true;
+         break;
+       }
+     }
+     if (skip)
+     {
+       skip = false;
+       continue;
+     }
+   }
 
-        if ((*iter)->GetId() == "org.blueberry.ui.internal.introview")
-            continue;
-        if ((*iter)->GetId() == "org.mitk.views.imagenavigator")
-            continue;
+  if ((*iter)->GetId() == "org.blueberry.ui.internal.introview")
+   continue;
+  if ((*iter)->GetId() == "org.mitk.views.imagenavigator")
+   continue;
         if ((*iter)->GetId() == "org.mitk.views.viewnavigatorview")
-            continue;
+   continue;
 
-        std::pair<std::string, berry::IViewDescriptor::Pointer> p(
-                    (*iter)->GetLabel(), (*iter));
-        VDMap.insert(p);
-    }
+  std::pair<QString, berry::IViewDescriptor::Pointer> p(
+   (*iter)->GetLabel(), (*iter));
+  VDMap.insert(p);
+ }
 
-    // ==== Perspective Toolbar ==================================
-    QToolBar* qPerspectiveToolbar = new QToolBar;
+  // ==== Perspective Toolbar ==================================
+ QToolBar* qPerspectiveToolbar = new QToolBar;
     qPerspectiveToolbar->setObjectName("perspectiveToolBar");
 
-    if (showPerspectiveToolbar)
-    {
-        qPerspectiveToolbar->addActions(perspGroup->actions());
-        mainWindow->addToolBar(qPerspectiveToolbar);
-    }
-    else
-        delete qPerspectiveToolbar;
+ if (showPerspectiveToolbar)
+ {
+  qPerspectiveToolbar->addActions(perspGroup->actions());
+  mainWindow->addToolBar(qPerspectiveToolbar);
+ }
+ else
+  delete qPerspectiveToolbar;
 
-    // ==== View Toolbar ==================================
-    QToolBar* qToolbar = new QToolBar;
+ // ==== View Toolbar ==================================
+ QToolBar* qToolbar = new QToolBar;
     qToolbar->setObjectName("viewToolBar");
 
-    std::map<std::string, berry::IViewDescriptor::Pointer>::const_iterator
-            MapIter;
-    for (MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
-    {
-        berry::QtShowViewAction* viewAction = new berry::QtShowViewAction(window,
-                                                                          (*MapIter).second);
-        viewActions.push_back(viewAction);
-        if(showViewMenuItem)
-            viewMenu->addAction(viewAction);
-        if (showViewToolbar)
-        {
-            qToolbar->addAction(viewAction);
-        }
-    }
+ std::map<QString, berry::IViewDescriptor::Pointer>::const_iterator
+  MapIter;
+ for (MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
+ {
+  berry::QtShowViewAction* viewAction = new berry::QtShowViewAction(window,
+   (*MapIter).second);
+  viewActions.push_back(viewAction);
+  if(showViewMenuItem)
+    viewMenu->addAction(viewAction);
+  if (showViewToolbar)
+  {
+   qToolbar->addAction(viewAction);
+  }
+ }
 
-    if (showViewToolbar)
-    {
-        mainWindow->addToolBar(qToolbar);
-    }
-    else
-        delete qToolbar;
+ if (showViewToolbar)
+ {
+  mainWindow->addToolBar(qToolbar);
+ }
+ else
+  delete qToolbar;
 
-    QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
-    mainWindow->restoreState(settings.value("ToolbarPosition").toByteArray());
+ QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
+ mainWindow->restoreState(settings.value("ToolbarPosition").toByteArray());
 
-    // ===== Help menu ====================================
-    QMenu* helpMenu = menuBar->addMenu("&Help");
-    helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
-    helpMenu->addAction("&Open Help Perspective", this, SLOT(onHelpOpenHelpPerspective()));
-    helpMenu->addAction("&Context Help",this, SLOT(onHelp()),  QKeySequence("F1"));
-    helpMenu->addAction("&About",this, SLOT(onAbout()));
-    // =====================================================
+ // ===== Help menu ====================================
+ QMenu* helpMenu = menuBar->addMenu("&Help");
+ helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
+ helpMenu->addAction("&Open Help Perspective", this, SLOT(onHelpOpenHelpPerspective()));
+  helpMenu->addAction("&Context Help",this, SLOT(onHelp()),  QKeySequence("F1"));
+ helpMenu->addAction("&About",this, SLOT(onAbout()));
+ // =====================================================
 
-    QStatusBar* qStatusBar = new QStatusBar();
 
-    //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
-    QmitkStatusBar *statusBar = new QmitkStatusBar(qStatusBar);
-    //disabling the SizeGrip in the lower right corner
-    statusBar->SetSizeGripEnabled(false);
+ QStatusBar* qStatusBar = new QStatusBar();
 
-    QmitkProgressBar *progBar = new QmitkProgressBar();
+ //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
+ QmitkStatusBar *statusBar = new QmitkStatusBar(qStatusBar);
+ //disabling the SizeGrip in the lower right corner
+ statusBar->SetSizeGripEnabled(false);
 
-    qStatusBar->addPermanentWidget(progBar, 0);
-    progBar->hide();
-    // progBar->AddStepsToDo(2);
-    // progBar->Progress(1);
 
-    mainWindow->setStatusBar(qStatusBar);
+
+ QmitkProgressBar *progBar = new QmitkProgressBar();
+
+ qStatusBar->addPermanentWidget(progBar, 0);
+ progBar->hide();
+// progBar->AddStepsToDo(2);
+// progBar->Progress(1);
+
+ mainWindow->setStatusBar(qStatusBar);
 
     if (showMemoryIndicator)
     {
         QmitkMemoryUsageIndicatorView* memoryIndicator = new QmitkMemoryUsageIndicatorView();
-        qStatusBar->addPermanentWidget(memoryIndicator, 0);
+ qStatusBar->addPermanentWidget(memoryIndicator, 0);
     }
+
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 {
-    berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
+ berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
 
-    // show the shortcut bar and progress indicator, which are hidden by
-    // default
-    //configurer->SetShowPerspectiveBar(true);
-    //configurer->SetShowFastViewBars(true);
-    //configurer->SetShowProgressIndicator(true);
+ // show the shortcut bar and progress indicator, which are hidden by
+ // default
+ //configurer->SetShowPerspectiveBar(true);
+ //configurer->SetShowFastViewBars(true);
+ //configurer->SetShowProgressIndicator(true);
 
-    //  // add the drag and drop support for the editor area
-    //  configurer.addEditorAreaTransfer(EditorInputTransfer.getInstance());
-    //  configurer.addEditorAreaTransfer(ResourceTransfer.getInstance());
-    //  configurer.addEditorAreaTransfer(FileTransfer.getInstance());
-    //  configurer.addEditorAreaTransfer(MarkerTransfer.getInstance());
-    //  configurer.configureEditorAreaDropListener(new EditorAreaDropAdapter(
-    //      configurer.getWindow()));
+ //  // add the drag and drop support for the editor area
+ //  configurer.addEditorAreaTransfer(EditorInputTransfer.getInstance());
+ //  configurer.addEditorAreaTransfer(ResourceTransfer.getInstance());
+ //  configurer.addEditorAreaTransfer(FileTransfer.getInstance());
+ //  configurer.addEditorAreaTransfer(MarkerTransfer.getInstance());
+ //  configurer.configureEditorAreaDropListener(new EditorAreaDropAdapter(
+ //      configurer.getWindow()));
 
-    this->HookTitleUpdateListeners(configurer);
+ this->HookTitleUpdateListeners(configurer);
 
-    menuPerspectiveListener = new PerspectiveListenerForMenu(this);
-    configurer->GetWindow()->AddPerspectiveListener(menuPerspectiveListener);
+ menuPerspectiveListener.reset(new PerspectiveListenerForMenu(this));
+ configurer->GetWindow()->AddPerspectiveListener(menuPerspectiveListener.data());
 
-    configurer->AddEditorAreaTransfer(QStringList("text/uri-list"));
-    configurer->ConfigureEditorAreaDropListener(dropTargetListener);
+ configurer->AddEditorAreaTransfer(QStringList("text/uri-list"));
+ configurer->ConfigureEditorAreaDropListener(dropTargetListener.data());
 
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
 {
-    // Force Rendering Window Creation on startup.
-    berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
+  berry::WorkbenchWindowAdvisor::PostWindowOpen();
+  // Force Rendering Window Creation on startup.
+  berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
 
-    ctkPluginContext* context = QmitkCommonExtPlugin::getContext();
-    ctkServiceReference serviceRef = context->getServiceReference<mitk::IDataStorageService>();
-    if (serviceRef)
+  ctkPluginContext* context = QmitkCommonExtPlugin::getContext();
+  ctkServiceReference serviceRef = context->getServiceReference<mitk::IDataStorageService>();
+  if (serviceRef)
+  {
+    mitk::IDataStorageService *dsService = context->getService<mitk::IDataStorageService>(serviceRef);
+    if (dsService)
     {
-        mitk::IDataStorageService *dsService = context->getService<mitk::IDataStorageService>(serviceRef);
-        if (dsService)
-        {
-            mitk::IDataStorageReference::Pointer dsRef = dsService->GetDataStorage();
-            mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dsRef));
-            mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(),dsInput);
-        }
+      mitk::IDataStorageReference::Pointer dsRef = dsService->GetDataStorage();
+      mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dsRef));
+      mitk::WorkbenchUtil::OpenEditor(configurer->GetWindow()->GetActivePage(),dsInput);
     }
+  }
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onIntro()
 {
-    QmitkExtWorkbenchWindowAdvisorHack::undohack->onIntro();
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onIntro();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onHelp()
 {
-    QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelp();
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelp();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onHelpOpenHelpPerspective()
 {
-    QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelpOpenHelpPerspective();
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onHelpOpenHelpPerspective();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onAbout()
 {
-    QmitkExtWorkbenchWindowAdvisorHack::undohack->onAbout();
+  QmitkExtWorkbenchWindowAdvisorHack::undohack->onAbout();
 }
 
 //--------------------------------------------------------------------------------
@@ -943,63 +948,63 @@ QmitkExtWorkbenchWindowAdvisorHack::~QmitkExtWorkbenchWindowAdvisorHack()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onUndo()
 {
-    mitk::UndoModel* model = mitk::UndoController::GetCurrentUndoModel();
-    if (model)
-    {
-        if (mitk::VerboseLimitedLinearUndo* verboseundo = dynamic_cast<mitk::VerboseLimitedLinearUndo*>( model ))
-        {
-            mitk::VerboseLimitedLinearUndo::StackDescription descriptions =
-                    verboseundo->GetUndoDescriptions();
-            if (descriptions.size() >= 1)
-            {
-                MITK_INFO << "Undo " << descriptions.front().second;
-            }
-        }
-        model->Undo();
-    }
-    else
-    {
-        MITK_ERROR << "No undo model instantiated";
-    }
+ mitk::UndoModel* model = mitk::UndoController::GetCurrentUndoModel();
+ if (model)
+ {
+  if (mitk::VerboseLimitedLinearUndo* verboseundo = dynamic_cast<mitk::VerboseLimitedLinearUndo*>( model ))
+  {
+   mitk::VerboseLimitedLinearUndo::StackDescription descriptions =
+    verboseundo->GetUndoDescriptions();
+   if (descriptions.size() >= 1)
+   {
+    MITK_INFO << "Undo " << descriptions.front().second;
+   }
+  }
+  model->Undo();
+ }
+ else
+ {
+  MITK_ERROR << "No undo model instantiated";
+ }
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onRedo()
 {
-    mitk::UndoModel* model = mitk::UndoController::GetCurrentUndoModel();
-    if (model)
-    {
-        if (mitk::VerboseLimitedLinearUndo* verboseundo = dynamic_cast<mitk::VerboseLimitedLinearUndo*>( model ))
-        {
-            mitk::VerboseLimitedLinearUndo::StackDescription descriptions =
-                    verboseundo->GetRedoDescriptions();
-            if (descriptions.size() >= 1)
-            {
-                MITK_INFO << "Redo " << descriptions.front().second;
-            }
-        }
-        model->Redo();
-    }
-    else
-    {
-        MITK_ERROR << "No undo model instantiated";
-    }
+ mitk::UndoModel* model = mitk::UndoController::GetCurrentUndoModel();
+ if (model)
+ {
+  if (mitk::VerboseLimitedLinearUndo* verboseundo = dynamic_cast<mitk::VerboseLimitedLinearUndo*>( model ))
+  {
+   mitk::VerboseLimitedLinearUndo::StackDescription descriptions =
+    verboseundo->GetRedoDescriptions();
+   if (descriptions.size() >= 1)
+   {
+    MITK_INFO << "Redo " << descriptions.front().second;
+   }
+  }
+  model->Redo();
+ }
+ else
+ {
+  MITK_ERROR << "No undo model instantiated";
+ }
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
 {
-    // get ImageNavigatorView
-    berry::IViewPart::Pointer imageNavigatorView =
-            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
-    if (imageNavigatorView)
-    {
-        bool isImageNavigatorVisible = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
-        if (isImageNavigatorVisible)
-        {
-            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(imageNavigatorView);
-            return;
-        }
-    }
-    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
+ // get ImageNavigatorView
+ berry::IViewPart::Pointer imageNavigatorView =
+  berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
+ if (imageNavigatorView)
+ {
+  bool isImageNavigatorVisible = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
+  if (isImageNavigatorVisible)
+  {
+   berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(imageNavigatorView);
+   return;
+  }
+ }
+ berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
     //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
 
@@ -1018,334 +1023,334 @@ void QmitkExtWorkbenchWindowAdvisorHack::onViewNavigator()
         }
     }
     berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.viewnavigatorview");
-    //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
+ //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()
 {
-    QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
-    _PreferencesDialog.exec();
+ QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
+ _PreferencesDialog.exec();
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onQuit()
 {
-    berry::PlatformUI::GetWorkbench()->Close();
+ berry::PlatformUI::GetWorkbench()->Close();
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onResetPerspective()
 {
-    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
+ berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onClosePerspective()
 {
-    berry::IWorkbenchPage::Pointer
-            page =
-            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
-    page->ClosePerspective(page->GetPerspective(), true, true);
+ berry::IWorkbenchPage::Pointer
+  page =
+  berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+ page->ClosePerspective(page->GetPerspective(), true, true);
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onNewWindow()
 {
-    berry::PlatformUI::GetWorkbench()->OpenWorkbenchWindow(0);
+ berry::PlatformUI::GetWorkbench()->OpenWorkbenchWindow(0);
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 {
-    bool hasIntro =
-            berry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro();
-    if (!hasIntro)
-    {
+ bool hasIntro =
+  berry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro();
+ if (!hasIntro)
+ {
 
-        QRegExp reg("(.*)<title>(\\n)*");
-        QRegExp reg2("(\\n)*</title>(.*)");
-        QFile file(":/org.mitk.gui.qt.ext/index.html");
-        file.open(QIODevice::ReadOnly | QIODevice::Text); //text file only for reading
+  QRegExp reg("(.*)<title>(\\n)*");
+  QRegExp reg2("(\\n)*</title>(.*)");
+  QFile file(":/org.mitk.gui.qt.ext/index.html");
+  file.open(QIODevice::ReadOnly | QIODevice::Text); //text file only for reading
 
-        QString text = QString(file.readAll());
+  QString text = QString(file.readAll());
 
-        file.close();
+  file.close();
 
-        QString title = text;
-        title.replace(reg, "");
-        title.replace(reg2, "");
+  QString title = text;
+  title.replace(reg, "");
+  title.replace(reg2, "");
 
-        std::cout << title.toStdString() << std::endl;
+  std::cout << title.toStdString() << std::endl;
 
-        QMessageBox::information(NULL, title,
-                                 text, "Close");
+  QMessageBox::information(NULL, title,
+   text, "Close");
 
-    }
-    else
-    {
-        berry::PlatformUI::GetWorkbench()->GetIntroManager()->ShowIntro(
-                    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow(), false);
-    }
+ }
+ else
+ {
+  berry::PlatformUI::GetWorkbench()->GetIntroManager()->ShowIntro(
+   berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow(), false);
+ }
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
 {
-    ctkPluginContext* context = QmitkCommonExtPlugin::getContext();
-    if (context == 0)
-    {
-        MITK_WARN << "Plugin context not set, unable to open context help";
-        return;
-    }
+  ctkPluginContext* context = QmitkCommonExtPlugin::getContext();
+  if (context == 0)
+  {
+    MITK_WARN << "Plugin context not set, unable to open context help";
+    return;
+  }
 
-    // Check if the org.blueberry.ui.qt.help plug-in is installed and started
-    QList<QSharedPointer<ctkPlugin> > plugins = context->getPlugins();
-    foreach(QSharedPointer<ctkPlugin> p, plugins)
+  // Check if the org.blueberry.ui.qt.help plug-in is installed and started
+  QList<QSharedPointer<ctkPlugin> > plugins = context->getPlugins();
+  foreach(QSharedPointer<ctkPlugin> p, plugins)
+  {
+    if (p->getSymbolicName() == "org.blueberry.ui.qt.help")
     {
-        if (p->getSymbolicName() == "org.blueberry.ui.qt.help")
+      if (p->getState() != ctkPlugin::ACTIVE)
+      {
+        // try to activate the plug-in explicitly
+        try
         {
-            if (p->getState() != ctkPlugin::ACTIVE)
-            {
-                // try to activate the plug-in explicitly
-                try
-                {
-                    p->start(ctkPlugin::START_TRANSIENT);
-                }
-                catch (const ctkPluginException& pe)
-                {
-                    MITK_ERROR << "Activating org.blueberry.ui.qt.help failed: " << pe.what();
-                    return;
-                }
-            }
+          p->start(ctkPlugin::START_TRANSIENT);
         }
+        catch (const ctkPluginException& pe)
+        {
+          MITK_ERROR << "Activating org.blueberry.ui.qt.help failed: " << pe.what();
+          return;
+        }
+      }
     }
+  }
 
-    ctkServiceReference eventAdminRef = context->getServiceReference<ctkEventAdmin>();
-    ctkEventAdmin* eventAdmin = 0;
-    if (eventAdminRef)
-    {
-        eventAdmin = context->getService<ctkEventAdmin>(eventAdminRef);
-    }
-    if (eventAdmin == 0)
-    {
-        MITK_WARN << "ctkEventAdmin service not found. Unable to open context help";
-    }
-    else
-    {
-        ctkEvent ev("org/blueberry/ui/help/CONTEXTHELP_REQUESTED");
-        eventAdmin->postEvent(ev);
-    }
+  ctkServiceReference eventAdminRef = context->getServiceReference<ctkEventAdmin>();
+  ctkEventAdmin* eventAdmin = 0;
+  if (eventAdminRef)
+  {
+    eventAdmin = context->getService<ctkEventAdmin>(eventAdminRef);
+  }
+  if (eventAdmin == 0)
+  {
+    MITK_WARN << "ctkEventAdmin service not found. Unable to open context help";
+  }
+  else
+  {
+    ctkEvent ev("org/blueberry/ui/help/CONTEXTHELP_REQUESTED");
+    eventAdmin->postEvent(ev);
+  }
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onHelpOpenHelpPerspective()
 {
-    berry::PlatformUI::GetWorkbench()->ShowPerspective("org.blueberry.perspectives.help",
-                                                       berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow());
+  berry::PlatformUI::GetWorkbench()->ShowPerspective("org.blueberry.perspectives.help",
+                                                     berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow());
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onAbout()
 {
-    QmitkAboutDialog* aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(),NULL);
-    aboutDialog->open();
+ QmitkAboutDialog* aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(),NULL);
+ aboutDialog->open();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(
-        berry::IWorkbenchWindowConfigurer::Pointer configurer)
+ berry::IWorkbenchWindowConfigurer::Pointer configurer)
 {
-    // hook up the listeners to update the window title
-    titlePartListener = new PartListenerForTitle(this);
-    titlePerspectiveListener = new PerspectiveListenerForTitle(this);
-    editorPropertyListener = new berry::PropertyChangeIntAdapter<
-            QmitkExtWorkbenchWindowAdvisor>(this,
-                                            &QmitkExtWorkbenchWindowAdvisor::PropertyChange);
+ // hook up the listeners to update the window title
+ titlePartListener.reset(new PartListenerForTitle(this));
+ //titlePerspectiveListener = new PerspectiveListenerForTitle(this);
+ editorPropertyListener.reset(new berry::PropertyChangeIntAdapter<
+  QmitkExtWorkbenchWindowAdvisor>(this,
+  &QmitkExtWorkbenchWindowAdvisor::PropertyChange));
 
-    //    configurer.getWindow().addPageListener(new IPageListener() {
-    //      public void pageActivated(IWorkbenchPage page) {
-    //        updateTitle(false);
-    //      }
-    //
-    //      public void pageClosed(IWorkbenchPage page) {
-    //        updateTitle(false);
-    //      }
-    //
-    //      public void pageOpened(IWorkbenchPage page) {
-    //        // do nothing
-    //      }
-    //    });
+ //    configurer.getWindow().addPageListener(new IPageListener() {
+ //      public void pageActivated(IWorkbenchPage page) {
+ //        updateTitle(false);
+ //      }
+ //
+ //      public void pageClosed(IWorkbenchPage page) {
+ //        updateTitle(false);
+ //      }
+ //
+ //      public void pageOpened(IWorkbenchPage page) {
+ //        // do nothing
+ //      }
+ //    });
 
-    configurer->GetWindow()->AddPerspectiveListener(titlePerspectiveListener);
-    configurer->GetWindow()->GetPartService()->AddPartListener(titlePartListener);
+ //configurer->GetWindow()->AddPerspectiveListener(titlePerspectiveListener);
+ configurer->GetWindow()->GetPartService()->AddPartListener(titlePartListener.data());
 }
 
-std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
+QString QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
 {
-    berry::IWorkbenchWindowConfigurer::Pointer configurer =
-            GetWindowConfigurer();
-    berry::IWorkbenchPage::Pointer currentPage =
-            configurer->GetWindow()->GetActivePage();
-    berry::IEditorPart::Pointer activeEditor;
-    if (currentPage)
-    {
-        activeEditor = lastActiveEditor.Lock();
-    }
+ berry::IWorkbenchWindowConfigurer::Pointer configurer =
+  GetWindowConfigurer();
+ berry::IWorkbenchPage::Pointer currentPage =
+  configurer->GetWindow()->GetActivePage();
+ berry::IEditorPart::Pointer activeEditor;
+ if (currentPage)
+ {
+  activeEditor = lastActiveEditor.Lock();
+ }
 
-    std::string title;
-    //TODO Product
-    //    IProduct product = Platform.getProduct();
-    //    if (product != null) {
-    //      title = product.getName();
-    //    }
-    // instead of the product name, we use a custom variable for now
-    title = productName;
+ QString title;
+ //TODO Product
+ //    IProduct product = Platform.getProduct();
+ //    if (product != null) {
+ //      title = product.getName();
+ //    }
+ // instead of the product name, we use a custom variable for now
+ title = productName;
 
-    if(showMitkVersionInfo)
-    {
-        title += std::string(" ") + MITK_VERSION_STRING;
-    }
+ if(showMitkVersionInfo)
+ {
+   title += QString(" ") + MITK_VERSION_STRING;
+ }
 
-    if (showVersionInfo)
-    {
-        // add version informatioin
-        QString versions = QString(" (ITK %1.%2.%3  VTK %4.%5.%6 Qt %7 MITK %8)")
-                .arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH)
-                .arg(VTK_MAJOR_VERSION).arg(VTK_MINOR_VERSION).arg(VTK_BUILD_VERSION)
-                .arg(QT_VERSION_STR)
-                .arg(MITK_VERSION_STRING);
+ if (showVersionInfo)
+ {
+  // add version informatioin
+  QString versions = QString(" (ITK %1.%2.%3  VTK %4.%5.%6 Qt %7 MITK %8)")
+   .arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH)
+   .arg(VTK_MAJOR_VERSION).arg(VTK_MINOR_VERSION).arg(VTK_BUILD_VERSION)
+   .arg(QT_VERSION_STR)
+   .arg(MITK_VERSION_STRING);
 
-        title += versions.toStdString();
-    }
+  title += versions;
+ }
 
-    if (currentPage)
-    {
-        if (activeEditor)
-        {
-            lastEditorTitle = activeEditor->GetTitleToolTip();
-            if (!lastEditorTitle.empty())
-                title = lastEditorTitle + " - " + title;
-        }
-        berry::IPerspectiveDescriptor::Pointer persp =
-                currentPage->GetPerspective();
-        std::string label = "";
-        if (persp)
-        {
-            label = persp->GetLabel();
-        }
-        berry::IAdaptable* input = currentPage->GetInput();
-        if (input && input != wbAdvisor->GetDefaultPageInput())
-        {
-            label = currentPage->GetLabel();
-        }
-        if (!label.empty())
-        {
-            title = label + " - " + title;
-        }
-    }
+ if (currentPage)
+ {
+  if (activeEditor)
+  {
+   lastEditorTitle = activeEditor->GetTitleToolTip();
+   if (!lastEditorTitle.isEmpty())
+    title = lastEditorTitle + " - " + title;
+  }
+  berry::IPerspectiveDescriptor::Pointer persp =
+   currentPage->GetPerspective();
+  QString label = "";
+  if (persp)
+  {
+   label = persp->GetLabel();
+  }
+  berry::IAdaptable* input = currentPage->GetInput();
+  if (input && input != wbAdvisor->GetDefaultPageInput())
+  {
+   label = currentPage->GetLabel();
+  }
+  if (!label.isEmpty())
+  {
+   title = label + " - " + title;
+  }
+ }
 
-    title += " (Not for use in diagnosis or treatment of patients)";
+ title += " (Not for use in diagnosis or treatment of patients)";
 
-    return title;
+ return title;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::RecomputeTitle()
 {
-    berry::IWorkbenchWindowConfigurer::Pointer configurer =
-            GetWindowConfigurer();
-    std::string oldTitle = configurer->GetTitle();
-    std::string newTitle = ComputeTitle();
-    if (newTitle != oldTitle)
-    {
-        configurer->SetTitle(newTitle);
-    }
+ berry::IWorkbenchWindowConfigurer::Pointer configurer =
+  GetWindowConfigurer();
+ QString oldTitle = configurer->GetTitle();
+ QString newTitle = ComputeTitle();
+ if (newTitle != oldTitle)
+ {
+  configurer->SetTitle(newTitle);
+ }
 }
 
 void QmitkExtWorkbenchWindowAdvisor::UpdateTitle(bool editorHidden)
 {
-    berry::IWorkbenchWindowConfigurer::Pointer configurer =
-            GetWindowConfigurer();
-    berry::IWorkbenchWindow::Pointer window = configurer->GetWindow();
-    berry::IEditorPart::Pointer activeEditor;
-    berry::IWorkbenchPage::Pointer currentPage = window->GetActivePage();
-    berry::IPerspectiveDescriptor::Pointer persp;
-    berry::IAdaptable* input = 0;
+ berry::IWorkbenchWindowConfigurer::Pointer configurer =
+  GetWindowConfigurer();
+ berry::IWorkbenchWindow::Pointer window = configurer->GetWindow();
+ berry::IEditorPart::Pointer activeEditor;
+ berry::IWorkbenchPage::Pointer currentPage = window->GetActivePage();
+ berry::IPerspectiveDescriptor::Pointer persp;
+ berry::IAdaptable* input = 0;
 
-    if (currentPage)
-    {
-        activeEditor = currentPage->GetActiveEditor();
-        persp = currentPage->GetPerspective();
-        input = currentPage->GetInput();
-    }
+ if (currentPage)
+ {
+  activeEditor = currentPage->GetActiveEditor();
+  persp = currentPage->GetPerspective();
+  input = currentPage->GetInput();
+ }
 
-    if (editorHidden)
-    {
-        activeEditor = 0;
-    }
+ if (editorHidden)
+ {
+  activeEditor = 0;
+ }
 
-    // Nothing to do if the editor hasn't changed
-    if (activeEditor == lastActiveEditor.Lock() && currentPage == lastActivePage.Lock()
-            && persp == lastPerspective.Lock() && input == lastInput)
-    {
-        return;
-    }
+ // Nothing to do if the editor hasn't changed
+ if (activeEditor == lastActiveEditor.Lock() && currentPage == lastActivePage.Lock()
+  && persp == lastPerspective.Lock() && input == lastInput)
+ {
+  return;
+ }
 
-    if (!lastActiveEditor.Expired())
-    {
-        lastActiveEditor.Lock()->RemovePropertyListener(editorPropertyListener);
-    }
+ if (!lastActiveEditor.Expired())
+ {
+  lastActiveEditor.Lock()->RemovePropertyListener(editorPropertyListener.data());
+ }
 
-    lastActiveEditor = activeEditor;
-    lastActivePage = currentPage;
-    lastPerspective = persp;
-    lastInput = input;
+ lastActiveEditor = activeEditor;
+ lastActivePage = currentPage;
+ lastPerspective = persp;
+ lastInput = input;
 
-    if (activeEditor)
-    {
-        activeEditor->AddPropertyListener(editorPropertyListener);
-    }
+ if (activeEditor)
+ {
+  activeEditor->AddPropertyListener(editorPropertyListener.data());
+ }
 
+ RecomputeTitle();
+}
+
+void QmitkExtWorkbenchWindowAdvisor::PropertyChange(const berry::Object::Pointer& /*source*/, int propId)
+{
+ if (propId == berry::IWorkbenchPartConstants::PROP_TITLE)
+ {
+  if (!lastActiveEditor.Expired())
+  {
+   QString newTitle = lastActiveEditor.Lock()->GetPartName();
+   if (lastEditorTitle != newTitle)
+   {
     RecomputeTitle();
-}
-
-void QmitkExtWorkbenchWindowAdvisor::PropertyChange(berry::Object::Pointer /*source*/, int propId)
-{
-    if (propId == berry::IWorkbenchPartConstants::PROP_TITLE)
-    {
-        if (!lastActiveEditor.Expired())
-        {
-            std::string newTitle = lastActiveEditor.Lock()->GetPartName();
-            if (lastEditorTitle != newTitle)
-            {
-                RecomputeTitle();
-            }
-        }
-    }
+   }
+  }
+ }
 }
 
 
-void QmitkExtWorkbenchWindowAdvisor::SetPerspectiveExcludeList(std::vector<std::string> v)
+void QmitkExtWorkbenchWindowAdvisor::SetPerspectiveExcludeList(const QList<QString>& v)
 {
-    this->perspectiveExcludeList = v;
+  this->perspectiveExcludeList = v;
 }
 
-std::vector<std::string> QmitkExtWorkbenchWindowAdvisor::GetPerspectiveExcludeList()
+QList<QString> QmitkExtWorkbenchWindowAdvisor::GetPerspectiveExcludeList()
 {
-    return this->perspectiveExcludeList;
+  return this->perspectiveExcludeList;
 }
 
-void QmitkExtWorkbenchWindowAdvisor::SetViewExcludeList(std::vector<std::string> v)
+void QmitkExtWorkbenchWindowAdvisor::SetViewExcludeList(const QList<QString>& v)
 {
-    this->viewExcludeList = v;
+  this->viewExcludeList = v;
 }
 
-std::vector<std::string> QmitkExtWorkbenchWindowAdvisor::GetViewExcludeList()
+QList<QString> QmitkExtWorkbenchWindowAdvisor::GetViewExcludeList()
 {
-    return this->viewExcludeList;
+  return this->viewExcludeList;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowClose()
 {
-    berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
-    QMainWindow* mainWindow = static_cast<QMainWindow*> (window->GetShell()->GetControl());
+  berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
+  QMainWindow* mainWindow = static_cast<QMainWindow*> (window->GetShell()->GetControl());
 
-    QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
-    settings.setValue("ToolbarPosition", mainWindow->saveState());
+  QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
+  settings.setValue("ToolbarPosition", mainWindow->saveState());
 }
 
 QString QmitkExtWorkbenchWindowAdvisor::GetQSettingsFile() const
 {
-    QFileInfo settingsInfo = QmitkCommonExtPlugin::getContext()->getDataFile(QT_SETTINGS_FILENAME);
-    return settingsInfo.canonicalFilePath();
+  QFileInfo settingsInfo = QmitkCommonExtPlugin::getContext()->getDataFile(QT_SETTINGS_FILENAME);
+  return settingsInfo.canonicalFilePath();
 }

@@ -19,10 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_blueberry_core_runtime_Export.h>
 #include "berryAbstractPreferencesStorage.h"
 
-#include "Poco/Path.h"
-#include "Poco/DOM/Node.h"
-#include "Poco/DOM/Document.h"
 #include "Poco/AutoPtr.h"
+
+namespace Poco {
+namespace XML {
+class Node;
+class Document;
+}
+}
 
 namespace berry
 {
@@ -31,7 +35,7 @@ namespace berry
   /// Implementation of the OSGI Preferences Interface.
   /// Wraps a DOMNode.
   ///
-  class BERRY_RUNTIME XMLPreferencesStorage: public AbstractPreferencesStorage
+  class org_blueberry_core_runtime_EXPORT XMLPreferencesStorage: public AbstractPreferencesStorage
   {
   public:
     ///
@@ -41,12 +45,12 @@ namespace berry
     ///
     /// Construct a new XML-based PreferencesStorage
     ///
-    XMLPreferencesStorage(const Poco::File& _File);
+    XMLPreferencesStorage(const QString& _File);
 
     ///
     /// To be implemented in the subclasses.
     ///
-    virtual void Flush(IPreferences* _Preferences) throw(Poco::Exception, BackingStoreException);
+    virtual void Flush(IPreferences* _Preferences);
 
     ///
     /// Nothing to do here
@@ -64,9 +68,12 @@ namespace berry
     /// Construct a DOMNode from the prefNode by using parentDOMNode
     ///
     void ToDOMTree(Preferences* prefNode, Poco::XML::Node* parentDOMNode);
+
   protected:
+
     Poco::AutoPtr<Poco::XML::Document> m_Document;
 
   };
 }
+
 #endif /* BERRYXMLPREFERENCES_H_ */

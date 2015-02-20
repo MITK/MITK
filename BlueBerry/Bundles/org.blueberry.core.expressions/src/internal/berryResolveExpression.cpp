@@ -18,49 +18,54 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpressions.h"
 #include "berryEvaluationContext.h"
+#include "berryExpressionStatus.h"
 
-#include "Poco/Hash.h"
+#include <berryIConfigurationElement.h>
+#include <berryCoreException.h>
 
 namespace berry {
 
-const std::string ResolveExpression::ATT_VARIABLE= "variable";
-const std::string ResolveExpression::ATT_ARGS= "args";
-const std::size_t ResolveExpression::HASH_INITIAL = Poco::Hash<std::string>()("berry::ResolveExpression");
+const QString ResolveExpression::ATT_VARIABLE= "variable";
+const QString ResolveExpression::ATT_ARGS= "args";
+const uint ResolveExpression::HASH_INITIAL = qHash("berry::ResolveExpression");
 
-ResolveExpression::ResolveExpression(IConfigurationElement::Pointer configElement)
+ResolveExpression::ResolveExpression(const IConfigurationElement::Pointer& configElement)
 {
-  bool result = configElement->GetAttribute(ATT_VARIABLE, fVariable);
-  Expressions::CheckAttribute(ATT_VARIABLE, result);
-  Expressions::GetArguments(fArgs, configElement, ATT_ARGS);
+  fVariable = configElement->GetAttribute(ATT_VARIABLE);
+  Expressions::CheckAttribute(ATT_VARIABLE, fVariable);
+  fArgs = Expressions::GetArguments(configElement, ATT_ARGS);
 }
 
 ResolveExpression::ResolveExpression(Poco::XML::Element* element)
 {
-  fVariable = element->getAttribute(ATT_VARIABLE);
-  Expressions::CheckAttribute(ATT_VARIABLE, fVariable.size()> 0);
-  Expressions::GetArguments(fArgs, element, ATT_ARGS);
+  fVariable = QString::fromStdString(element->getAttribute(ATT_VARIABLE.toStdString()));
+  Expressions::CheckAttribute(ATT_VARIABLE, fVariable.size() > 0 ? fVariable : QString());
+  fArgs = Expressions::GetArguments(element, ATT_ARGS);
 }
 
-ResolveExpression::ResolveExpression(const std::string& variable, std::vector<Object::Pointer>& args)
+ResolveExpression::ResolveExpression(const QString& variable, const QList<Object::Pointer>& args)
  : fVariable(variable), fArgs(args)
 {
 
 }
 
-EvaluationResult
-ResolveExpression::Evaluate(IEvaluationContext* context)
+EvaluationResult::ConstPointer
+ResolveExpression::Evaluate(IEvaluationContext* context) const
 {
-  Object::Pointer variable= context->ResolveVariable(fVariable, fArgs);
+  Object::ConstPointer variable= context->ResolveVariable(fVariable, fArgs);
   if (variable.IsNull())
   {
-    throw CoreException("Variable not defined", fVariable);
+    IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::VARIABLE_NOT_DEFINED,
+                                                 QString("The variable %1 is not defined.").arg(fVariable),
+                                                 BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
   EvaluationContext evalContext(context, variable);
   return this->EvaluateAnd(&evalContext);
 }
 
 void
-ResolveExpression::CollectExpressionInfo(ExpressionInfo* info)
+ResolveExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   ExpressionInfo other;
   this->CompositeExpression::CollectExpressionInfo(&other);
@@ -72,27 +77,23 @@ ResolveExpression::CollectExpressionInfo(ExpressionInfo* info)
 }
 
 bool
-ResolveExpression::operator==(Expression& object)
+ResolveExpression::operator==(const Object* object) const
 {
-  try
+  if (const ResolveExpression* that = dynamic_cast<const ResolveExpression*>(object))
   {
-    ResolveExpression& that = dynamic_cast<ResolveExpression&>(object);
-    return this->fVariable == that.fVariable
-    && this->Equals(this->fArgs, that.fArgs)
-    && this->Equals(this->fExpressions, that.fExpressions);
+    return this->fVariable == that->fVariable
+        && this->Equals(this->fArgs, that->fArgs)
+        && this->Equals(this->fExpressions, that->fExpressions);
   }
-  catch (std::bad_cast)
-  {
-    return false;
-  }
+  return false;
 }
 
-std::size_t
-ResolveExpression::ComputeHashCode()
+uint
+ResolveExpression::ComputeHashCode() const
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fExpressions)
-  * HASH_FACTOR + this->HashCode(fArgs)
-  * HASH_FACTOR + Poco::Hash<std::string>()(fVariable);
+      * HASH_FACTOR + this->HashCode(fArgs)
+      * HASH_FACTOR + qHash(fVariable);
 }
 
 } // namespace berry

@@ -15,7 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkDataSelectionWidget.h"
-#include <berryPlatform.h>
+#include "../mitkPluginActivator.h"
+
+#include <berryIWorkbench.h>
+
 #include <mitkContourModel.h>
 #include <mitkContourModelSet.h>
 #include <mitkIDataStorageService.h>
@@ -116,10 +119,10 @@ unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(const QString &lab
 
 mitk::DataStorage::Pointer QmitkDataSelectionWidget::GetDataStorage() const
 {
-  mitk::IDataStorageService::Pointer service =
-    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+  mitk::IDataStorageService* service =
+      mitk::PluginActivator::getDefault()->GetWorkbench()->GetService<mitk::IDataStorageService>();
 
-  assert(service.IsNotNull());
+  assert(service);
 
   return service->GetDefaultDataStorage()->GetDataStorage();
 }

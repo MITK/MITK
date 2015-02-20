@@ -24,8 +24,8 @@ namespace mitk {
   class MITKIGT_EXPORT NavigationDataSetWriterCSV
   {
   public:
-     NavigationDataSetWriterCSV();
-    ~NavigationDataSetWriterCSV();
+    NavigationDataSetWriterCSV();
+    virtual~NavigationDataSetWriterCSV();
 
     virtual void Write (std::string path, mitk::NavigationDataSet::Pointer );
     virtual void Write (std::ostream* stream, mitk::NavigationDataSet::Pointer);

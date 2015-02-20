@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include "common/berryCommandExceptions.h"
 #include <org_blueberry_core_commands_Export.h>
 
 namespace berry {
@@ -44,7 +43,7 @@ namespace berry {
  * This class will typically be extended so the subclass can be referenced from
  * the <code>converter</code> attribute of the
  * <code>commandParameterType</code> elemement of the
- * <code>org.eclipse.ui.commands</code> extension-point. Objects implementing
+ * <code>org.blueberry.ui.commands</code> extension-point. Objects implementing
  * this interface may also be passed directly to
  * {@link ParameterType#Define(IParameterValueConverter::Pointer)} by
  * clients.
@@ -53,9 +52,9 @@ namespace berry {
  * @see ParameterType#Define(IParameterValueConverter::Pointer)
  * @see ParameterizedCommand#Serialize()
  */
-struct BERRY_COMMANDS IParameterValueConverter : public virtual Object {
+struct BERRY_COMMANDS IParameterValueConverter {
 
-  berryInterfaceMacro(IParameterValueConverter, berry);
+  virtual ~IParameterValueConverter();
 
   /**
    * Returns whether the provided value is compatible with this parameter
@@ -69,7 +68,7 @@ struct BERRY_COMMANDS IParameterValueConverter : public virtual Object {
    * @return <code>true</code> if the value is compatible with this converter,
    *         <code>false</code> otherwise
    */
-  virtual bool IsCompatible(const Object::ConstPointer value) const = 0;
+  //virtual bool IsCompatible(const Object::ConstPointer value) const = 0;
 
   /**
    * Converts a string encoded command parameter value into the parameter
@@ -84,8 +83,7 @@ struct BERRY_COMMANDS IParameterValueConverter : public virtual Object {
    *             if an object cannot be produced from the
    *             <code>parameterValue</code> string
    */
-  virtual Object::Pointer ConvertToObject(const std::string& parameterValue)
-      throw(ParameterValueConversionException) = 0;
+  virtual Object::Pointer ConvertToObject(const QString& parameterValue) = 0;
 
   /**
    * Converts a command parameter value object into a string that encodes a
@@ -99,11 +97,12 @@ struct BERRY_COMMANDS IParameterValueConverter : public virtual Object {
    *             if a string reference or serialization cannot be provided for
    *             the <code>parameterValue</code>
    */
-  virtual std::string ConvertToString(const Object::Pointer parameterValue)
-      throw(ParameterValueConversionException) = 0;
+  virtual QString ConvertToString(const Object::Pointer& parameterValue) = 0;
 
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IParameterValueConverter, "org.blueberry.core.commands.IParameterValueConverter")
 
 #endif /* BERRYABSTRACTPARAMETERVALUECONVERTER_H_ */

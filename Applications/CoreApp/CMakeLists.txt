@@ -11,7 +11,6 @@ endif()
 set(MITK_COREAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MitkCoreApp.provisioning" CACHE INTERNAL "CoreApp provisioning file" FORCE)
 
 set(_plugins
-  org.blueberry.compat
   org.mitk.gui.qt.coreapplication
   org.mitk.gui.qt.stdmultiwidgeteditor
 )

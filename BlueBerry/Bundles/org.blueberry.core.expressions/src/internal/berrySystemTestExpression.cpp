@@ -19,80 +19,75 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryExpressions.h"
 
 #include <berryPlatform.h>
-
-#include <Poco/Hash.h>
+#include <berryIConfigurationElement.h>
 
 namespace berry {
 
-const std::string SystemTestExpression::ATT_PROPERTY= "property";
+const QString SystemTestExpression::ATT_PROPERTY= "property";
 
-const std::size_t SystemTestExpression::HASH_INITIAL = Poco::Hash<std::string>()("berry::SystemTestExpression");
+const uint SystemTestExpression::HASH_INITIAL = qHash("berry::SystemTestExpression");
 
-SystemTestExpression::SystemTestExpression(IConfigurationElement::Pointer element)
+SystemTestExpression::SystemTestExpression(const IConfigurationElement::Pointer& element)
 {
-  bool result = element->GetAttribute(ATT_PROPERTY, fProperty);
-  Expressions::CheckAttribute(ATT_PROPERTY, result);
-  result = element->GetAttribute(ATT_VALUE, fExpectedValue);
-  Expressions::CheckAttribute(ATT_VALUE, result);
+  fProperty = element->GetAttribute(ATT_PROPERTY);
+  Expressions::CheckAttribute(ATT_PROPERTY, fProperty);
+  fExpectedValue = element->GetAttribute(ATT_VALUE);
+  Expressions::CheckAttribute(ATT_VALUE, fExpectedValue);
 }
 
 SystemTestExpression::SystemTestExpression(Poco::XML::Element* element)
 {
-  fProperty= element->getAttribute(ATT_PROPERTY);
-  Expressions::CheckAttribute(ATT_PROPERTY, fProperty.length()> 0);
-  fExpectedValue = element->getAttribute(ATT_VALUE);
-  Expressions::CheckAttribute(ATT_VALUE, fExpectedValue.length()> 0);
+  fProperty= QString::fromStdString(element->getAttribute(ATT_PROPERTY.toStdString()));
+  Expressions::CheckAttribute(ATT_PROPERTY, fProperty.size() > 0 ? fProperty : QString());
+  fExpectedValue = QString::fromStdString(element->getAttribute(ATT_VALUE.toStdString()));
+  Expressions::CheckAttribute(ATT_VALUE, fExpectedValue.size() > 0 ? fExpectedValue : QString());
 }
 
-SystemTestExpression::SystemTestExpression(const std::string& property, const std::string& expectedValue)
+SystemTestExpression::SystemTestExpression(const QString &property, const QString &expectedValue)
  : fProperty(property), fExpectedValue(expectedValue)
 {
 
 }
 
-EvaluationResult
-SystemTestExpression::Evaluate(IEvaluationContext*  /*context*/)
+EvaluationResult::ConstPointer
+SystemTestExpression::Evaluate(IEvaluationContext*  /*context*/) const
 {
-  std::string str = Platform::GetProperty(fProperty);
-  if (str.size() == 0)
+  QString str = Platform::GetProperty(fProperty);
+  if (str.isEmpty())
     return EvaluationResult::FALSE_EVAL;
 
   return EvaluationResult::ValueOf(str == fExpectedValue);
 }
 
 void
-SystemTestExpression::CollectExpressionInfo(ExpressionInfo* info)
+SystemTestExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   info->MarkSystemPropertyAccessed();
 }
 
 bool
-SystemTestExpression::operator==(Expression& object)
+SystemTestExpression::operator==(const Object* object) const
 {
-  try {
-    SystemTestExpression& that = dynamic_cast<SystemTestExpression&>(object);
-    return this->fProperty == that.fProperty
-      && this->fExpectedValue == that.fExpectedValue;
-  }
-  catch (std::bad_cast)
+  if (const SystemTestExpression* that = dynamic_cast<const SystemTestExpression*>(object))
   {
-    return false;
+    return this->fProperty == that->fProperty
+        && this->fExpectedValue == that->fExpectedValue;
   }
-
+  return false;
 }
 
-std::size_t
-SystemTestExpression::ComputeHashCode()
+uint
+SystemTestExpression::ComputeHashCode() const
 {
-  return HASH_INITIAL * HASH_FACTOR + Poco::Hash<std::string>()(fExpectedValue)
-  * HASH_FACTOR + Poco::Hash<std::string>()(fProperty);
+  return HASH_INITIAL * HASH_FACTOR + qHash(fExpectedValue)
+      * HASH_FACTOR + qHash(fProperty);
 }
 
-std::string
-SystemTestExpression::ToString()
+QString
+SystemTestExpression::ToString() const
 {
-  return "<systemTest property=\"" + fProperty + //$NON-NLS-1$
-    "\" value=\"" + fExpectedValue + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+  return QString("<systemTest property=\"") + fProperty +
+      "\" value=\"" + fExpectedValue + "\"";
   }
 
 }

@@ -30,20 +30,13 @@ class BERRY_UI_QT QtWorkbenchTweaklet : public QObject, public WorkbenchTweaklet
 
 public:
 
-  berryObjectMacro(QtWorkbenchTweaklet);
+  berryObjectMacro(QtWorkbenchTweaklet)
 
   QtWorkbenchTweaklet();
-  QtWorkbenchTweaklet(const QtWorkbenchTweaklet& other);
 
   Display* CreateDisplay();
 
   bool IsRunning();
-
-  SmartPointer<WorkbenchWindow> CreateWorkbenchWindow(int number);
-
-  void* CreatePageComposite(void* parent);
-
-  IDialog::Pointer CreateStandardDialog(const std::string& id);
 
 };
 

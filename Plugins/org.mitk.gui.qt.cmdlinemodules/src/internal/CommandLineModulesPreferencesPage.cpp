@@ -74,11 +74,9 @@ void CommandLineModulesPreferencesPage::Init(berry::IWorkbench::Pointer )
 //-----------------------------------------------------------------------------
 void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
-  std::string id = "/" + CommandLineModulesViewConstants::VIEW_ID;
+  QString id = "/" + CommandLineModulesViewConstants::VIEW_ID;
   m_CLIPreferencesNode = prefService->GetSystemPreferences()->Node(id);
 
   m_MainControl = new QWidget(parent);
@@ -190,8 +188,8 @@ std::string CommandLineModulesPreferencesPage::ConvertToStdString(const QStringL
 //-----------------------------------------------------------------------------
 bool CommandLineModulesPreferencesPage::PerformOk()
 {
-  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->directory().toStdString());
-  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, m_OutputDirectory->directory().toStdString());
+  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->directory());
+  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, m_OutputDirectory->directory());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, m_DebugOutput->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::SHOW_ADVANCED_WIDGETS_NAME, m_ShowAdvancedWidgets->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR, m_LoadFromApplicationDir->isChecked());
@@ -202,10 +200,10 @@ bool CommandLineModulesPreferencesPage::PerformOk()
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR_CLI_MODULES, m_LoadFromCurrentDirCliModules->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, m_LoadFromAutoLoadPathDir->isChecked());
 
-  std::string paths = this->ConvertToStdString(m_ModulesDirectories->directories());
+  QString paths = m_ModulesDirectories->directories().join(";");
   m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, paths);
 
-  std::string modules = this->ConvertToStdString(m_ModulesFiles->files());
+  QString modules = m_ModulesFiles->files().join(";");
   m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, modules);
 
   int currentValidationMode = m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 2);
@@ -233,10 +231,10 @@ void CommandLineModulesPreferencesPage::PerformCancel()
 void CommandLineModulesPreferencesPage::Update()
 {
   QString fallbackTmpDir = QDir::tempPath();
-  m_TemporaryDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir.toStdString())));
+  m_TemporaryDirectory->setDirectory(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir));
 
   QString fallbackOutputDir = QDir::homePath();
-  m_OutputDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackOutputDir.toStdString())));
+  m_OutputDirectory->setDirectory(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackOutputDir));
 
   m_ShowAdvancedWidgets->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::SHOW_ADVANCED_WIDGETS_NAME, false));
   m_DebugOutput->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, false));
@@ -248,11 +246,11 @@ void CommandLineModulesPreferencesPage::Update()
   m_LoadFromCurrentDirCliModules->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR_CLI_MODULES, false));
   m_LoadFromAutoLoadPathDir->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, false));
 
-  QString paths = QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, ""));
+  QString paths = m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, "");
   QStringList directoryList = paths.split(";", QString::SkipEmptyParts);
   m_ModulesDirectories->setDirectories(directoryList);
 
-  QString files = QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, ""));
+  QString files = m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, "");
   QStringList fileList = files.split(";", QString::SkipEmptyParts);
   m_ModulesFiles->setFiles(fileList);
 

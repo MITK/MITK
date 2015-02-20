@@ -15,10 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "berryBackingStoreException.h"
 
-#include <typeinfo>
-
 namespace berry {
 
-  POCO_IMPLEMENT_EXCEPTION(BackingStoreException, Poco::RuntimeException, "BackingStore Exception")
+CTK_IMPLEMENT_EXCEPTION(BackingStoreException, ctkException, "BackingStore Exception")
 
 }

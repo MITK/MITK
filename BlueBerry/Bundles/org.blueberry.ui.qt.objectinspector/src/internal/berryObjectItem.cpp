@@ -22,11 +22,10 @@ namespace berry
 ObjectItem::ObjectItem()
 {
   type = CLASS;
-  className = 0;
   parent = 0;
 }
 
-ObjectItem::ObjectItem(const char* className) :
+ObjectItem::ObjectItem(const QString& className) :
   className(className), type(CLASS), parent(0)
 {
 }
@@ -60,11 +59,7 @@ ObjectItem::ObjectItem(const ObjectItem& item) :
 
 ObjectItem::~ObjectItem()
 {
-  QListIterator<ObjectItem*> iter(children);
-  while (iter.hasNext())
-  {
-    delete iter.next();
-  }
+  qDeleteAll(children);
 }
 
 ObjectItem& ObjectItem::operator=(const ObjectItem& item)
@@ -97,8 +92,7 @@ bool ObjectItem::operator==(const ObjectItem& item) const
   {
   case CLASS:
   {
-    std::string str(className);
-    return str == item.className;
+    return className == item.className;
   }
   case INSTANCE:
     return obj == item.obj;

@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPlatformObject.h"
 #include "berryIAdapterFactory.h"
 
-#include <Poco/Any.h>
 #include <QtPlugin>
 
 #include <typeinfo>
@@ -82,10 +81,10 @@ namespace berry
  * @see IAdaptable
  * @see IAdapterFactory
  */
-struct BERRY_RUNTIME IAdapterManager: public Object
+struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
 {
 
-  berryInterfaceMacro(IAdapterManager, berry);
+  berryObjectMacro(berry::IAdapterManager)
 
   /**
    * This value can be returned to indicate that no applicable adapter factory
@@ -108,46 +107,6 @@ struct BERRY_RUNTIME IAdapterManager: public Object
   static const int LOADED;
 
   /**
-   * Returns the types that can be obtained by converting <code>adaptableClass</code>
-   * via this manager. Converting means that subsequent calls to <code>getAdapter()</code>
-   * or <code>loadAdapter()</code> could result in an adapted object.
-   * <p>
-   * Note that the returned types do not guarantee that
-   * a subsequent call to <code>getAdapter</code> with the same type as an argument
-   * will return a non-null result. If the factory's plug-in has not yet been
-   * loaded, or if the factory itself returns <code>null</code>, then
-   * <code>getAdapter</code> will still return <code>null</code>.
-   * </p>
-   * @param adaptableClass the adaptable class being queried
-   * @return an array of type names that can be obtained by converting
-   * <code>adaptableClass</code> via this manager. An empty array
-   * is returned if there are none.
-   * @since 3.1
-   */
-  virtual std::vector<std::string> ComputeAdapterTypes(
-      const std::type_info& adaptableClass) = 0;
-
-  /**
-   * Returns the class search order for a given class. The search order from a
-   * class with the definition <br>
-   * <code>class X extends Y implements A, B</code><br>
-   * is as follows:
-   * <ul>
-   * <li>the target's class: X
-   * <li>X's superclasses in order to <code>Object</code>
-   * <li>a breadth-first traversal of the target class's interfaces in the
-   * order returned by <code>getInterfaces</code> (in the example, A and its
-   * superinterfaces then B and its superinterfaces) </li>
-   * </ul>
-   *
-   * @param clazz the class for which to return the class order.
-   * @return the class search order for the given class. The returned
-   * search order will minimally  contain the target class.
-   * @since 3.1
-   */
-  //public Class[] computeClassOrder(Class clazz);
-
-  /**
    * Returns a Poco::Any object which contains an instance of the given name associated
    * with the given adaptable. Returns an empty Poco::Any if no such object can
    * be found.
@@ -165,9 +124,37 @@ struct BERRY_RUNTIME IAdapterManager: public Object
    * given type
    */
   template<typename A>
-  Poco::Any GetAdapter(A adaptable, const std::string& adapterTypeName) {
-    return this->GetAdapter(Poco::Any(adaptable), adapterTypeName, false);
+  A* GetAdapter(const Object* adaptable)
+  {
+    const char* typeName = qobject_interface_iid<A*>();
+    if (typeName == NULL)
+    {
+      BERRY_WARN << "Error getting adapter for '" << Object::DemangleName(typeid(*adaptable).name()) << "': "
+                 << "Cannot get the interface id for type '" << Object::DemangleName(typeid(A).name())
+                 << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
+      return NULL;
+    }
+    return dynamic_cast<A*>(this->GetAdapter(adaptable, typeName, false));
   }
+
+  /**
+   * Returns an object which is an instance of the given class name associated
+   * with the given object. Returns <code>null</code> if no such object can
+   * be found.
+   * <p>
+   * Note that this method will never cause plug-ins to be loaded. If the
+   * only suitable factory is not yet loaded, this method will return <code>null</code>.
+   * If activation of the plug-in providing the factory is required, use the
+   * <code>loadAdapter</code> method instead.
+   *
+   * @param adaptable the adaptable object being queried (usually an instance
+   * of <code>IAdaptable</code>)
+   * @param adapterTypeName the fully qualified name of the type of adapter to look up
+   * @return an object castable to the given adapter type, or <code>null</code>
+   * if the given adaptable object does not have an available adapter of the
+   * given type
+   */
+  virtual Object* GetAdapter(const Object* adaptable, const QString& adapterTypeName) = 0;
 
   /**
    * Returns whether there is an adapter factory registered that may be able
@@ -187,7 +174,21 @@ struct BERRY_RUNTIME IAdapterManager: public Object
    * it can convert <code>adaptable</code> to an object of type <code>adapterType</code>,
    * and <code>false</code> otherwise.
    */
-  virtual bool HasAdapter(const std::string& adaptableType, const std::string& adapterType) = 0;
+  virtual bool HasAdapter(const Object* adaptableType, const QString& adapterType) = 0;
+
+  template<typename A>
+  int QueryAdapter(const Object* adaptable)
+  {
+    const char* typeName = qobject_interface_iid<A*>();
+    if (typeName == NULL)
+    {
+      BERRY_WARN << "Error querying adapter manager for '" << Object::DemangleName(typeid(*adaptable).name()) << "': "
+                 << "Cannot get the interface id for type '" << Object::DemangleName(typeid(A).name())
+                 << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
+      return NONE;
+    }
+    return this->QueryAdapter(adaptable, typeName);
+  }
 
   /**
    * Returns a status of an adapter factory registered that may be able
@@ -204,8 +205,7 @@ struct BERRY_RUNTIME IAdapterManager: public Object
    * look up
    * @return a status of the adapter
    */
-  virtual int
-      QueryAdapter(const std::string& adaptableType, const std::string& adapterType) = 0;
+  virtual int QueryAdapter(const Object* adaptableType, const QString& adapterType) = 0;
 
   /**
    * Returns an object that is an instance of the given class name associated
@@ -226,8 +226,17 @@ struct BERRY_RUNTIME IAdapterManager: public Object
    * given type
    */
   template<typename A>
-  Poco::Any LoadAdapter(A adaptable, const std::string& adapterTypeName) {
-    return this->GetAdapter(Poco::Any(adaptable), adapterTypeName, true);
+  A* LoadAdapter(const Object* adaptable)
+  {
+    const char* typeName = qobject_interface_iid<A*>();
+    if (typeName == NULL)
+    {
+      BERRY_WARN << "Error getting adapter for '" << Object::DemangleName(typeid(*adaptable).name()) << "': "
+                 << "Cannot get the interface id for type '" << Object::DemangleName(typeid(A).name())
+                 << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
+      return NULL;
+    }
+    return dynamic_cast<A*>(this->GetAdapter(adaptable, typeName, true));
   }
 
   /**
@@ -240,7 +249,7 @@ struct BERRY_RUNTIME IAdapterManager: public Object
    * @see #UnregisterAdapters(IAdapterFactory*, const std::adaptableTypeName&)
    */
   virtual void RegisterAdapters(IAdapterFactory* factory,
-      const std::string& adaptableTypeName) = 0;
+                                const QString& adaptableTypeName) = 0;
 
   /**
    * Removes the given adapter factory completely from the list of registered
@@ -264,11 +273,11 @@ struct BERRY_RUNTIME IAdapterManager: public Object
    * @see #RegisterAdapters(IAdapterFactory*, const std::string&)
    */
   virtual void UnregisterAdapters(IAdapterFactory* factory,
-      const std::string& adaptableTypeName) = 0;
+                                  const QString& adaptableTypeName) = 0;
 
-protected:
+private:
 
-  virtual Poco::Any GetAdapter(Poco::Any adaptable, const std::string& adapterType, bool force) = 0;
+  virtual Object* GetAdapter(const Object* adaptable, const QString& adapterType, bool force) = 0;
 };
 
 } // namespace berry

@@ -60,9 +60,7 @@ void QmitkOpenDicomEditorAction::init(berry::IWorkbenchWindow::Pointer window)
   this->setText("&DICOM");
   this->setToolTip("Open dicom tool");
 
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
   m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
 
@@ -73,13 +71,13 @@ void QmitkOpenDicomEditorAction::Run()
 {
 
  // check if there is an open perspective, if not open the default perspective
-    if (m_Window->GetActivePage().IsNull())
-    {
-        std::string defaultPerspId = m_Window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
-        m_Window->GetWorkbench()->ShowPerspective(defaultPerspId, m_Window);
-    }
+  if (m_Window->GetActivePage().IsNull())
+  {
+    QString defaultPerspId = m_Window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
+    m_Window->GetWorkbench()->ShowPerspective(defaultPerspId, m_Window);
+  }
 
-    mitk::DataStorageEditorInput::Pointer editorInput;
+    //mitk::DataStorageEditorInput::Pointer editorInput;
     //mitk::DataStorage::Pointer dataStorage;
     //QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
     //berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
@@ -107,7 +105,7 @@ void QmitkOpenDicomEditorAction::Run()
     //    multiWidgetEditor->GetStdMultiWidget()->RequestUpdate();
     //}
 
-    berry::IEditorInput::Pointer editorInput2(new berry::FileEditorInput(Poco::Path()));
+    berry::IEditorInput::Pointer editorInput2(new berry::FileEditorInput(QString()));
     m_Window->GetActivePage()->OpenEditor(editorInput2, "org.mitk.editors.dicomeditor");
 }
 

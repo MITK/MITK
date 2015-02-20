@@ -182,8 +182,8 @@ void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
         {
             int oldDisplayVal;
             correctNode->GetIntProperty("DisplayChannel", oldDisplayVal);
-            std::string oldVal = QString::number(oldDisplayVal).toStdString();
-            std::string newVal = QString::number(volume).toStdString();
+            QString oldVal = QString::number(oldDisplayVal);
+            QString newVal = QString::number(volume);
             correctNode->SetIntProperty("DisplayChannel",volume);
             correctNode->SetSelected(true);
             this->FirePropertyChanged("DisplayChannel", oldVal, newVal);

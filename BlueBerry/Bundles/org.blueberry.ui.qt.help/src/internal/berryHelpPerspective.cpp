@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace  berry {
 
-const std::string HelpPerspective::ID = "org.blueberry.perspectives.help";
+const QString HelpPerspective::ID = "org.blueberry.perspectives.help";
 
 HelpPerspective::HelpPerspective()
 {
@@ -27,7 +27,7 @@ HelpPerspective::HelpPerspective()
 
 void HelpPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
-  std::string editorArea = layout->GetEditorArea();
+  QString editorArea = layout->GetEditorArea();
 
   layout->AddView("org.blueberry.views.helpsearch",
                   berry::IPageLayout::LEFT, 0.3f, editorArea);

@@ -16,22 +16,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryParameterization.h"
 #include "berryIParameter.h"
-
-#include <Poco/Hash.h>
+#include "berryIParameterValues.h"
 
 namespace berry
 {
 
-const std::size_t Parameterization::HASH_CODE_NOT_COMPUTED = 0;
-const std::size_t Parameterization::HASH_FACTOR = 89;
-const std::size_t Parameterization::HASH_INITIAL = Poco::hash("berry::Parameterization");
+const uint Parameterization::HASH_CODE_NOT_COMPUTED = 0;
+const uint Parameterization::HASH_FACTOR = 89;
+const uint Parameterization::HASH_INITIAL = qHash("berry::Parameterization");
 
-Parameterization::Parameterization(const SmartPointer<const IParameter> parameter, const std::string& value)
+Parameterization::Parameterization(const SmartPointer<const IParameter> parameter, const QString& value)
 : hashCode(HASH_CODE_NOT_COMPUTED), parameter(parameter), value(value)
 {
   if (!parameter)
   {
-    throw Poco::NullPointerException(
+    throw ctkInvalidArgumentException(
         "You cannot parameterize a null parameter");
   }
 }
@@ -80,27 +79,23 @@ SmartPointer<const IParameter> Parameterization::GetParameter() const
   return parameter;
 }
 
-std::string Parameterization::GetValue() const
+QString Parameterization::GetValue() const
 {
   return value;
 }
 
-#ifdef _MSC_VER
-std::string Parameterization::GetValueName() const throw()
-#else
-std::string Parameterization::GetValueName() const throw(ParameterValuesException)
-#endif
+QString Parameterization::GetValueName() const
 {
-  const IParameter::ParameterValues parameterValues = parameter->GetValues();
+  const QHash<QString,QString> parameterValues = parameter->GetValues()->GetParameterValues();
 
-  std::string returnValue;
+  QString returnValue;
   for (IParameter::ParameterValues::const_iterator parameterValueItr = parameterValues.begin();
       parameterValueItr != parameterValues.end(); ++ parameterValueItr)
   {
-    const std::string currentValue(parameterValueItr->second);
+    const QString currentValue(parameterValueItr.value());
     if (value == currentValue)
     {
-      returnValue = parameterValueItr->first;
+      returnValue = parameterValueItr.key();
       break;
     }
   }
@@ -108,12 +103,12 @@ std::string Parameterization::GetValueName() const throw(ParameterValuesExceptio
   return returnValue;
 }
 
-std::size_t Parameterization::HashCode() const
+uint Parameterization::HashCode() const
 {
   if (hashCode == HASH_CODE_NOT_COMPUTED)
   {
     hashCode = HASH_INITIAL * HASH_FACTOR + parameter->HashCode();
-    hashCode = hashCode * HASH_FACTOR + Poco::hash(value);
+    hashCode = hashCode * HASH_FACTOR + qHash(value);
     if (hashCode == HASH_CODE_NOT_COMPUTED)
     {
       hashCode++;

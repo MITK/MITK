@@ -21,61 +21,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-JobStatus::JobStatus(const Status::Severity& serverity, Job::Pointer sptr_job,
-    const std::string& message) :
-  m_myJob(sptr_job), m_internalStatus(new Status(serverity,
-      JobManager::PI_JOBS(), 1, message))
+JobStatus::JobStatus(const Severity& severity, Job::Pointer sptr_job,
+                     const QString& message, const Status::SourceLocation& sl)
+  : Status(severity, JobManager::PI_JOBS(), 1, message, sl)
+  , m_myJob(sptr_job)
 {
 }
 
 Job::Pointer JobStatus::GetJob()
 {
   return m_myJob;
-}
-
-std::vector<IStatus::Pointer> JobStatus::GetChildren() const
-{
-  return m_internalStatus->GetChildren();
-}
-
-int JobStatus::GetCode() const
-{
-  return m_internalStatus->GetCode();
-}
-
-std::exception JobStatus::GetException() const
-{
-  return m_internalStatus->GetException();
-}
-
-std::string JobStatus::GetMessage() const
-{
-  return m_internalStatus->GetMessage();
-}
-
-std::string JobStatus::GetPlugin() const
-{
-  return m_internalStatus->GetPlugin();
-}
-
-IStatus::Severity JobStatus::GetSeverity() const
-{
-  return m_internalStatus->GetSeverity();
-}
-
-bool JobStatus::IsMultiStatus() const
-{
-  return m_internalStatus->IsMultiStatus();
-}
-
-bool JobStatus::IsOK() const
-{
-  return m_internalStatus->IsOK();
-}
-
-bool JobStatus::Matches(const Severities& severityMask) const
-{
-  return m_internalStatus->Matches(severityMask);
 }
 
 }

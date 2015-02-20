@@ -188,7 +188,7 @@ class REGISTRATION_EXPORT QmitkDeformableRegistrationView : public QmitkFunction
 
   protected:
 
-    berry::ISelectionListener::Pointer m_SelListener;
+    QScopedPointer<berry::ISelectionListener> m_SelListener;
     berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
     /*!

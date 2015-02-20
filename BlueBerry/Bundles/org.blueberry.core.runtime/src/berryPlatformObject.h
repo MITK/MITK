@@ -48,7 +48,7 @@ namespace berry {
  *
  * @see Platform#getAdapterManager
  */
-class BERRY_RUNTIME PlatformObject : public Object, public IAdaptable {
+class org_blueberry_core_runtime_EXPORT PlatformObject : public virtual Object, public IAdaptable {
 
 public:
 
@@ -75,7 +75,7 @@ public:
    * @see IAdaptable#getAdapter
    * @see Platform#getAdapterManager
    */
-  Poco::Any GetAdapter(const std::string& adapter);
+  Object* GetAdapter(const QString& adapter);
 
 };
 

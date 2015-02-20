@@ -18,13 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYIHANDLERLISTENER_H_
 #define BERRYIHANDLERLISTENER_H_
 
-#include <berryObject.h>
-#include <berryMacros.h>
 #include <berryMessage.h>
 
 #include <org_blueberry_core_commands_Export.h>
 
 namespace berry {
+
+template<class T> class SmartPointer;
 
 class HandlerEvent;
 
@@ -35,26 +35,26 @@ class HandlerEvent;
  * This interface may be implemented by clients.
  * </p>
  *
- * @since 3.1
  * @see IHandler#addHandlerListener(IHandlerListener)
  * @see IHandler#removeHandlerListener(IHandlerListener)
  */
-struct BERRY_COMMANDS IHandlerListener : public virtual Object {
-
-  berryInterfaceMacro(IHandlerListener, berry);
+struct BERRY_COMMANDS IHandlerListener
+{
 
   struct Events {
 
-    typedef Message1<SmartPointer<HandlerEvent> > Event;
+    typedef Message1<const SmartPointer<HandlerEvent>&> Event;
 
     Event handlerChanged;
 
-    void AddListener(IHandlerListener::Pointer listener);
-    void RemoveListener(IHandlerListener::Pointer listener);
+    void AddListener(IHandlerListener* listener);
+    void RemoveListener(IHandlerListener* listener);
 
   private:
-    typedef MessageDelegate1<IHandlerListener, SmartPointer<HandlerEvent> > Delegate;
+    typedef MessageDelegate1<IHandlerListener, const SmartPointer<HandlerEvent>&> Delegate;
   };
+
+  virtual ~IHandlerListener();
 
   /**
    * Notifies that one or more properties of an instance of
@@ -64,7 +64,7 @@ struct BERRY_COMMANDS IHandlerListener : public virtual Object {
    * @param handlerEvent
    *            the handler event. Guaranteed not to be <code>null</code>.
    */
-  virtual void HandlerChanged(SmartPointer<HandlerEvent> handlerEvent) = 0;
+  virtual void HandlerChanged(const SmartPointer<HandlerEvent>& handlerEvent) = 0;
 };
 
 }

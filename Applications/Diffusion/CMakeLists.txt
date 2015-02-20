@@ -17,13 +17,9 @@ set(DIFFUSIONIMAGINGAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${D
 set(_plugins
   org.commontk.configadmin
   org.commontk.eventadmin
-  org.blueberry.osgi
-  org.blueberry.compat
   org.blueberry.core.runtime
   org.blueberry.core.expressions
-  org.blueberry.solstice.common
   org.blueberry.core.commands
-  org.blueberry.ui
   org.blueberry.ui.qt
   org.blueberry.ui.qt.log
   org.blueberry.ui.qt.help

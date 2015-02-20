@@ -273,9 +273,9 @@ void QmitkPropertyTreeView::OnPropertyNameChanged(const itk::EventObject&)
 
     if (nameProperty != NULL)
     {
-      std::ostringstream partName;
-      partName << "Properties (" << nameProperty->GetValueAsString() << ')';
-      this->SetPartName(partName.str());
+      QString partName = "Properties (";
+      partName.append(QString::fromStdString(nameProperty->GetValueAsString())).append(')');
+      this->SetPartName(partName);
     }
   }
 }

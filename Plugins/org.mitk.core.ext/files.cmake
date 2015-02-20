@@ -1,17 +1,15 @@
-set(SRC_H_FILES
+
+set(SRC_CPP_FILES
+  mitkCoreExtConstants.cpp
   mitkIInputDeviceDescriptor.h
   mitkIInputDeviceRegistry.h
   mitkIInputDevice.h
 )
 
-set(SRC_CPP_FILES
-  mitkCoreExtConstants.cpp
-  mitkInputDeviceRegistry.cpp
-  mitkInputDeviceDescriptor.cpp
-)
-
 set(INTERNAL_CPP_FILES
   mitkCoreExtActivator.cpp
+  mitkInputDeviceRegistry.cpp
+  mitkInputDeviceDescriptor.cpp
 )
 
 set(CACHED_RESOURCE_FILES
@@ -20,6 +18,7 @@ set(CACHED_RESOURCE_FILES
 
 set(MOC_H_FILES
   src/internal/mitkCoreExtActivator.h
+  src/internal/mitkInputDeviceRegistry.h
 )
 
 set(CPP_FILES )

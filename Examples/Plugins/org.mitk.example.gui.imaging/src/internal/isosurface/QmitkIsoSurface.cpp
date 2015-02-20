@@ -51,7 +51,7 @@ void QmitkIsoSurface::CreateQtPartControl(QWidget *parent)
 
     berry::IPreferences::Pointer prefs = this->GetPreferences();
     if(prefs.IsNotNull())
-      m_Controls->thresholdLineEdit->setText(QString::fromStdString(prefs->Get("defaultThreshold", "0")));
+      m_Controls->thresholdLineEdit->setText(prefs->Get("defaultThreshold", "0"));
   }
 }
 
@@ -158,5 +158,5 @@ QmitkIsoSurface::~QmitkIsoSurface()
 {
   berry::IPreferences::Pointer prefs = this->GetPreferences();
   if(prefs.IsNotNull())
-    prefs->Put("defaultThreshold", m_Controls->thresholdLineEdit->text().toStdString());
+    prefs->Put("defaultThreshold", m_Controls->thresholdLineEdit->text());
 }

@@ -21,18 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 DefaultVariable::DefaultVariable(IEvaluationContext* parent,
-    Object::Pointer defaultVariable)
+                                 const Object::ConstPointer& defaultVariable)
+  : fDefaultVariable(defaultVariable)
+  , fParent(parent)
 {
-  poco_check_ptr(parent);
+  Q_ASSERT(parent);
 
-  fParent= parent;
-
-  while (dynamic_cast<DefaultVariable*>(parent))
+  while (dynamic_cast<const DefaultVariable*>(parent))
   {
     parent = parent->GetParent();
   }
-  fManagedPool= parent;
-  fDefaultVariable= defaultVariable;
+  fManagedPool = parent;
+  fDefaultVariable = defaultVariable;
 }
 
 IEvaluationContext* DefaultVariable::GetParent() const
@@ -40,12 +40,12 @@ IEvaluationContext* DefaultVariable::GetParent() const
   return fParent;
 }
 
-IEvaluationContext* DefaultVariable::GetRoot()
+IEvaluationContext* DefaultVariable::GetRoot() const
 {
   return fParent->GetRoot();
 }
 
-Object::Pointer DefaultVariable::GetDefaultVariable() const
+Object::ConstPointer DefaultVariable::GetDefaultVariable() const
 {
   return fDefaultVariable;
 }
@@ -60,23 +60,23 @@ bool DefaultVariable::GetAllowPluginActivation() const
   return fParent->GetAllowPluginActivation();
 }
 
-void DefaultVariable::AddVariable(const std::string& name, Object::Pointer value)
+void DefaultVariable::AddVariable(const QString& name, const Object::ConstPointer& value)
 {
   fManagedPool->AddVariable(name, value);
 }
 
-Object::Pointer DefaultVariable::RemoveVariable(const std::string& name)
+Object::ConstPointer DefaultVariable::RemoveVariable(const QString &name)
 {
   return fManagedPool->RemoveVariable(name);
 }
 
-Object::Pointer DefaultVariable::GetVariable(const std::string& name) const
+Object::ConstPointer DefaultVariable::GetVariable(const QString &name) const
 {
   return fManagedPool->GetVariable(name);
 }
 
-Object::Pointer DefaultVariable::ResolveVariable(const std::string& name,
-    std::vector<Object::Pointer>& args)
+Object::ConstPointer DefaultVariable::ResolveVariable(const QString &name,
+                                                 const QList<Object::Pointer>& args) const
 {
   return fManagedPool->ResolveVariable(name, args);
 }

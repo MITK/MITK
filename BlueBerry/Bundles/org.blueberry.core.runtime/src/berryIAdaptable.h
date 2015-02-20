@@ -19,10 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_core_runtime_Export.h>
 
-#include <berryMacros.h>
 #include <berryObject.h>
 
-#include <Poco/Any.h>
+#include <berryLog.h>
+
+#include <typeinfo>
 
 namespace berry {
 
@@ -50,11 +51,10 @@ namespace berry {
  * @see IAdapterManager
  * @see PlatformObject
  */
-struct BERRY_RUNTIME IAdaptable {
+struct org_blueberry_core_runtime_EXPORT IAdaptable
+{
 
 public:
-
-  berryNameMacro(berry::IAdaptable);
 
   /**
    * Returns an object which is an instance of the given class
@@ -66,7 +66,21 @@ public:
    *    or <code>null</code> if this object does not
    *    have an adapter for the given class
    */
-  virtual Poco::Any GetAdapter(const std::string& adapterType) = 0;
+  virtual Object* GetAdapter(const QString& adapterType) = 0;
+
+  template<class A>
+  A* GetAdapter()
+  {
+    const char* typeName = qobject_interface_iid<A*>();
+    if (typeName == NULL)
+    {
+      BERRY_WARN << "Error getting adapter for '" << Object::DemangleName(typeid(*this).name()) << "': "
+                 << "Cannot get the interface id for type '" << Object::DemangleName(typeid(A).name())
+                 << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
+      return NULL;
+    }
+    return dynamic_cast<A*>(this->GetAdapter(typeName));
+  }
 
   virtual ~IAdaptable();
 

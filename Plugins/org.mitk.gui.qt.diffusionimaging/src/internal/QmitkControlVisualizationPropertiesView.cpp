@@ -90,12 +90,6 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
     itk::MultiThreader::SetGlobalDefaultNumberOfThreads(numThread);
 }
 
-QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView(const QmitkControlVisualizationPropertiesView& other)
-{
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-}
-
 QmitkControlVisualizationPropertiesView::~QmitkControlVisualizationPropertiesView()
 {
     if(m_SlicesRotationObserverTag1 )
@@ -111,7 +105,7 @@ QmitkControlVisualizationPropertiesView::~QmitkControlVisualizationPropertiesVie
             coordinator->RemoveObserver(m_SlicesRotationObserverTag1);
     }
 
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
 }
 
 void QmitkControlVisualizationPropertiesView::OnThickSlicesModeSelected( QAction* action )
@@ -293,7 +287,7 @@ void QmitkControlVisualizationPropertiesView::StdMultiWidgetNotAvailable()
     m_MultiWidget = NULL;
 }
 
-void QmitkControlVisualizationPropertiesView::NodeRemoved(const mitk::DataNode* node)
+void QmitkControlVisualizationPropertiesView::NodeRemoved(const mitk::DataNode* /*node*/)
 {
 }
 

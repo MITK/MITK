@@ -20,18 +20,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Poco/Any.h"
 #include "Poco/DOM/Element.h"
 
-#include "service/berryIConfigurationElement.h"
-
 #include "berryExpression.h"
 #include "berryIIterable.h"
 #include "berryICountable.h"
 
-#include <string>
 #include <vector>
 #include <typeinfo>
 
 namespace berry
 {
+
+struct IConfigurationElement;
 
 class Expressions {
 
@@ -39,18 +38,18 @@ private:
 
   Expressions();
 
-  static int FindNextComma(const std::string& str, int start);
+  static int FindNextComma(const QString& str, int start);
 
 public:
 
   /* debugging flag to enable tracing */
   static const bool TRACING;
 
-  static bool IsInstanceOf(Object::ConstPointer element, const std::string& type);
+  static bool IsInstanceOf(const Object *element, const QString& type);
 
-  static void CheckAttribute(const std::string& name, bool value);
+  static void CheckAttribute(const QString& name, const QString& value);
 
-  static void CheckAttribute(const std::string& name, bool result, const std::string& value, std::vector<std::string>& validValues);
+  static void CheckAttribute(const QString& name, const QString& value, QStringList& validValues);
 
   static void CheckCollection(Object::ConstPointer var, Expression::Pointer expression);
 
@@ -65,7 +64,7 @@ public:
    *
    * @throws CoreException if the var can't be adapted to an <code>IIterable</code>
    */
-  static IIterable::Pointer GetAsIIterable(Object::Pointer var, Expression::Pointer expression);
+  static IIterable::ConstPointer GetAsIIterable(Object::ConstPointer var, Expression::ConstPointer expression);
 
   /**
    * Converts the given variable into an <code>ICountable</code>. If a corresponding adapter can't be found an
@@ -78,23 +77,25 @@ public:
    *
    * @throws CoreException if the var can't be adapted to an <code>ICountable</code>
    */
-  static ICountable::Pointer GetAsICountable(Object::Pointer var, Expression::Pointer expression);
+  static ICountable::ConstPointer GetAsICountable(Object::ConstPointer var, Expression::ConstPointer expression);
 
-  static bool GetOptionalBooleanAttribute(SmartPointer<IConfigurationElement> element, const std::string& attributeName);
+  static bool GetOptionalBooleanAttribute(SmartPointer<IConfigurationElement> element, const QString& attributeName);
 
-  static bool GetOptionalBooleanAttribute(Poco::XML::Element* element, const std::string& attributeName);
+  static bool GetOptionalBooleanAttribute(Poco::XML::Element* element, const QString& attributeName);
 
   //---- Argument parsing --------------------------------------------
 
-  static void GetArguments(std::vector<Object::Pointer>& args, SmartPointer<IConfigurationElement> element, const std::string& attributeName);
+  static QList<Object::Pointer> GetArguments(const SmartPointer<IConfigurationElement>& element,
+                                             const QString& attributeName);
 
-  static void GetArguments(std::vector<Object::Pointer>& args, Poco::XML::Element* element, const std::string& attributeName);
+  static QList<Object::Pointer> GetArguments(Poco::XML::Element* element,
+                                             const QString& attributeName);
 
-  static void ParseArguments(std::vector<Object::Pointer>&, const std::string& args);
+  static QList<Object::Pointer> ParseArguments(const QString& args);
 
-  static Object::Pointer ConvertArgument(const std::string& arg, bool result = true);
+  static Object::Pointer ConvertArgument(const QString& arg);
 
-  static std::string UnEscapeString(const std::string& str);
+  static QString UnEscapeString(const QString& str);
 
 };
 

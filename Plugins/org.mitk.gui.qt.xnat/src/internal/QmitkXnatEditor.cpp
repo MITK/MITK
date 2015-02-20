@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Blueberry
 #include <berryQModelIndexObject.h>
 #include <berryIWorkbenchPage.h>
+#include <berryPlatform.h>
 
 // Qt
 #include <QListView>
@@ -44,16 +45,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkIOUtil.h>
 
-const std::string QmitkXnatEditor::EDITOR_ID = "org.mitk.editors.xnat.browser";
+const QString QmitkXnatEditor::EDITOR_ID = "org.mitk.editors.xnat.browser";
 
 QmitkXnatEditor::QmitkXnatEditor() :
-  m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
-  m_Session(0),
+  m_DownloadPath(berry::Platform::GetPreferencesService()->
+                 GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", "")),
   m_ListModel(new ctkXnatListModel()),
-  m_SelectionListener(new berry::SelectionChangedAdapter<QmitkXnatEditor>(this, &QmitkXnatEditor::SelectionChanged)),
-  m_DownloadPath(berry::Platform::GetServiceRegistry().
-    GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID)->
-    GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", "").c_str())
+  m_Session(0),
+  m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
+  m_SelectionListener(new berry::SelectionChangedAdapter<QmitkXnatEditor>(this, &QmitkXnatEditor::SelectionChanged))
 {
   m_DataStorageServiceTracker.open();
   if(m_DownloadPath.isEmpty())
@@ -70,7 +70,7 @@ QmitkXnatEditor::~QmitkXnatEditor()
 {
   delete m_ListModel;
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  s->RemoveSelectionListener(m_SelectionListener);
+  s->RemoveSelectionListener(m_SelectionListener.data());
   m_DataStorageServiceTracker.close();
 }
 
@@ -118,7 +118,7 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
 
-  GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
+  GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener.data());
 
   connect( m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnObjectActivated(const QModelIndex&)) );
 
@@ -225,8 +225,8 @@ void QmitkXnatEditor::UpdateList()
   m_Controls.buttonDataModel->setText("root");
 }
 
-void QmitkXnatEditor::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
-                                       berry::ISelection::ConstPointer selection)
+void QmitkXnatEditor::SelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
+                                       const berry::ISelection::ConstPointer& selection)
 {
   // check for null selection
   if (selection.IsNull())
@@ -250,7 +250,7 @@ void QmitkXnatEditor::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart
         // if a file is selected, don't change the input and list view
         if ( dynamic_cast<ctkXnatFile*>(object) == NULL )
         {
-          QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( object );
+          QmitkXnatObjectEditorInput::Pointer oPtr(new QmitkXnatObjectEditorInput( object ));
           berry::IEditorInput::Pointer editorInput( oPtr );
           if ( !(editorInput == this->GetEditorInput()) )
             this->SetInput(editorInput);
@@ -312,7 +312,7 @@ void QmitkXnatEditor::ToHigherLevel()
   {
     return;
   }
-  QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( parent );
+  QmitkXnatObjectEditorInput::Pointer oPtr(new QmitkXnatObjectEditorInput(parent));
   berry::IEditorInput::Pointer editorInput( oPtr );
   this->SetInput(editorInput);
   UpdateList();
@@ -333,20 +333,15 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
       mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
       if(dsService != NULL)
       {
-        mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode((m_DownloadPath + file->id()).toStdString());
-        if ( ( node.IsNotNull() ) && ( node->GetData() != NULL ) )
-        {
-          dsService->GetDataStorage()->GetDataStorage()->Add(node);
-          mitk::BaseData::Pointer basedata = node->GetData();
-          mitk::RenderingManager::GetInstance()->InitializeViews(
-            basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-        }
+        mitk::IOUtil::Load((m_DownloadPath + file->id()).toStdString(),
+                           *dsService->GetDataStorage()->GetDataStorage());
+        mitk::RenderingManager::GetInstance()->InitializeViews();
       }
     }
     else
     {
       // Updates the root item
-      QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( child );
+      QmitkXnatObjectEditorInput::Pointer oPtr(new QmitkXnatObjectEditorInput(child));
       berry::IEditorInput::Pointer editorInput( oPtr );
       this->SetInput(editorInput);
 
@@ -460,7 +455,7 @@ void QmitkXnatEditor::OnResourceButtonClicked()
 
 void QmitkXnatEditor::UpdateSession(ctkXnatSession* session)
 {
-  GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemoveSelectionListener(m_SelectionListener);
+  GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemoveSelectionListener(m_SelectionListener.data());
 
   if(session != 0 && session->isOpen())
   {
@@ -470,7 +465,7 @@ void QmitkXnatEditor::UpdateSession(ctkXnatSession* session)
     m_Controls.buttonDownloadResource->setEnabled(true);
 
     // Fill model and show in the GUI
-    QmitkXnatObjectEditorInput::Pointer xoPtr = QmitkXnatObjectEditorInput::New( session->dataModel() );
+    QmitkXnatObjectEditorInput::Pointer xoPtr(new QmitkXnatObjectEditorInput(session->dataModel()));
     berry::IEditorInput::Pointer editorInput( xoPtr );
     this->SetInput(editorInput);
     this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
@@ -484,7 +479,7 @@ void QmitkXnatEditor::UpdateSession(ctkXnatSession* session)
     m_Controls.buttonDownloadResource->setEnabled(false);
   }
 
-  GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
+  GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener.data());
 }
 
 void QmitkXnatEditor::CleanListModel(ctkXnatSession* session)

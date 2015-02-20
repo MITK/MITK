@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryITestDescriptor.h"
 
-#include <service/berryIConfigurationElement.h>
+#include <berryIConfigurationElement.h>
 
 namespace berry {
 
@@ -28,14 +28,14 @@ class TestDescriptor : public ITestDescriptor
 {
 public:
 
-  berryObjectMacro(TestDescriptor);
+  berryObjectMacro(TestDescriptor)
 
   TestDescriptor(IConfigurationElement::Pointer elem);
 
   CppUnit::Test* CreateTest();
-  std::string GetId() const;
-  std::string GetContributor() const;
-  std::string GetDescription() const;
+  QString GetId() const;
+  QString GetContributor() const;
+  QString GetDescription() const;
 
   bool IsUITest() const;
 

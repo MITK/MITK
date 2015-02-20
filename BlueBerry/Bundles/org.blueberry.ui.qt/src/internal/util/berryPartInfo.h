@@ -28,7 +28,7 @@ struct PartInfo {
      QString title;
      QString contentDescription;
      QString toolTip;
-     QIcon* image;
+     QIcon image;
      bool dirty;
 
      PartInfo();

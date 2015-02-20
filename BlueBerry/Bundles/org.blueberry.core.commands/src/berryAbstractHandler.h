@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYABSTRACTHANDLER_H_
 
 #include "berryIHandler.h"
+#include "berryIHandlerListener.h"
+
 #include <org_blueberry_core_commands_Export.h>
 
 namespace berry {
@@ -32,23 +34,23 @@ namespace berry {
  * changes. Subclasses can also override {@link AbstractHandler#isEnabled()} and
  * {@link AbstractHandler#isHandled()}.
  * </p>
- *
- * @since 3.1
  */
-class BERRY_COMMANDS AbstractHandler : public IHandler { // ,public EventManager {
+class BERRY_COMMANDS AbstractHandler : public QObject, public IHandler { // ,public EventManager {
+
+  Q_OBJECT
+  Q_INTERFACES(berry::IHandler)
 
 public:
-  berryObjectMacro(AbstractHandler);
+  berryObjectMacro(AbstractHandler)
 
 private:
 
   /**
    * Track this base class enabled state.
-   *
-   * @since 3.4
    */
   bool baseEnabled;
 
+  IHandlerListener::Events handlerListeners;
 
 public:
 
@@ -57,19 +59,15 @@ public:
   /**
    * @see IHandler#addHandlerListener(IHandlerListener)
    */
-//  void AddHandlerListener(final IHandlerListener handlerListener) {
-//    addListenerObject(handlerListener);
-//  }
+  void AddHandlerListener(IHandlerListener* handlerListener);
 
   /**
    * The default implementation does nothing. Subclasses who attach listeners
    * to other objects are encouraged to detach them in this method.
    *
-   * @see org.blueberry.core.commands.IHandler#dispose()
+   * @see IHandler#Dispose()
    */
-  ~AbstractHandler() {
-    // Do nothing.
-  }
+  void Dispose();
 
   /**
    * Whether this handler is capable of executing at this time. Subclasses may
@@ -81,7 +79,19 @@ public:
    * @see #setEnabled(Object)
    * @see #setBaseEnabled(boolean)
    */
-  bool IsEnabled();
+  bool IsEnabled() const;
+
+  /**
+   * Called by the framework to allow the handler to update its enabled state
+   * by extracting the same information available at execution time. Clients
+   * may override if they need to extract information from the application
+   * context.
+   *
+   * @param evaluationContext
+   *            the application context. May be <code>null</code>
+   * @see #SetBaseEnabled(bool)
+   */
+  void SetEnabled(const Object::Pointer& evaluationContext);
 
   /**
    * Whether this handler is capable of handling delegated responsibilities at
@@ -89,15 +99,12 @@ public:
    *
    * @return <code>true</code>
    */
-  bool IsHandled();
+  bool IsHandled() const;
 
   /**
    * @see IHandler#removeHandlerListener(IHandlerListener)
    */
-//  void RemoveHandlerListener(final IHandlerListener handlerListener) {
-//    removeListenerObject(handlerListener);
-//  }
-
+  void RemoveHandlerListener(IHandlerListener* handlerListener);
 
 protected:
 
@@ -117,19 +124,7 @@ protected:
    *            the event describing changes to this instance. Must not be
    *            <code>null</code>.
    */
-//  void FireHandlerChanged(final HandlerEvent handlerEvent) {
-//    if (handlerEvent == null) {
-//      throw new NullPointerException();
-//    }
-//
-//    final Object[] listeners = getListeners();
-//    for (int i = 0; i < listeners.length; i++) {
-//      final IHandlerListener listener = (IHandlerListener) listeners[i];
-//      listener.handlerChanged(handlerEvent);
-//    }
-//  }
-
-
+  void FireHandlerChanged(const SmartPointer<HandlerEvent>& handlerEvent);
 
   /**
    * Allow the default {@link #isEnabled()} to answer our enabled state. It
@@ -139,7 +134,6 @@ protected:
    *
    * @param state
    *            the enabled state
-   * @since 3.4
    */
   void SetBaseEnabled(bool state);
 
@@ -152,7 +146,7 @@ protected:
    * Subclasses may extend the definition of this method (i.e., if a different
    * type of listener can be attached to a subclass). This is used primarily
    * for support of <code>AbstractHandler</code> in
-   * <code>org.blueberry.ui.workbench</code>, and clients should be wary of
+   * <code>org.blueberry.ui.qt</code>, and clients should be wary of
    * overriding this behaviour. If this method is overridden, then the return
    * value should include "<code>super.hasListeners() ||</code>".
    * </p>
@@ -160,10 +154,7 @@ protected:
    * @return true iff there is one or more IHandlerListeners attached to this
    *         AbstractHandler
    */
-//  bool HasListeners() {
-//    return isListenerAttached();
-//  }
-
+  virtual bool HasListeners() const;
 
 };
 

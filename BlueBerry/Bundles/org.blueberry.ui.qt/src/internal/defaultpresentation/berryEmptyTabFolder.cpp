@@ -82,9 +82,9 @@ void EmptyTabFolder::SetContent(QWidget* newContent)
   control->layout()->addWidget(childControl);
 }
 
-std::vector<AbstractTabItem*> EmptyTabFolder::GetItems()
+QList<AbstractTabItem*> EmptyTabFolder::GetItems()
 {
-  return std::vector<AbstractTabItem*>();
+  return QList<AbstractTabItem*>();
 }
 
 AbstractTabItem* EmptyTabFolder::GetSelection()

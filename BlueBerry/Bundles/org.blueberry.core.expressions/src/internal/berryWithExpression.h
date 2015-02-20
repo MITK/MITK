@@ -19,41 +19,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryCompositeExpression.h"
 
-#include "service/berryIConfigurationElement.h"
-
 #include "Poco/DOM/Element.h"
 
 namespace berry {
 
+struct IConfigurationElement;
+
 class WithExpression : public CompositeExpression {
 
 private:
-  std::string fVariable;
-  static const std::string ATT_VARIABLE;
+  QString fVariable;
+  static const QString ATT_VARIABLE;
 
   /**
    * The seed for the hash code for all with expressions.
    */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
 public:
 
-  WithExpression(SmartPointer<IConfigurationElement> configElement);
+  WithExpression(const SmartPointer<IConfigurationElement>& configElement);
 
   WithExpression(Poco::XML::Element* element);
 
-  WithExpression(const std::string& variable);
+  WithExpression(const QString &variable);
 
-  bool operator==(Expression& object);
+  bool operator==(const Object* object) const;
 
-  EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 
-  void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info) const;
 
 
 protected:
 
-  std::size_t ComputeHashCode();
+  uint ComputeHashCode() const;
 
 };
 

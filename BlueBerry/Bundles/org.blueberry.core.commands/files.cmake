@@ -1,9 +1,12 @@
 set(MOC_H_FILES
+  src/berryAbstractHandler.h
+
   src/internal/berryPluginActivator.h
 )
 
 set(SRC_CPP_FILES
   berryAbstractHandler.cpp
+  berryAbstractHandlerWithState.cpp
   berryCommand.cpp
   berryCommandCategory.cpp
   berryCommandCategoryEvent.cpp
@@ -17,9 +20,14 @@ set(SRC_CPP_FILES
   berryICommandManagerListener.cpp
   berryIExecutionListener.cpp
   berryIExecutionListenerWithChecks.cpp
+  berryIHandler.h
   berryIHandlerListener.cpp
   berryINamedHandleStateIds.cpp
+  berryIObjectWithState.h
+  berryIParameter.h
   berryIParameterTypeListener.cpp
+  berryIParameterValueConverter.cpp
+  berryIParameterValues.cpp
   berryIStateListener.cpp
   berryNamedHandleObjectWithState.cpp
   berryParameterization.cpp

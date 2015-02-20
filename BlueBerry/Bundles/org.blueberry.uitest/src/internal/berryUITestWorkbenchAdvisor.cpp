@@ -31,9 +31,9 @@ WorkbenchWindowAdvisor* UITestWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   return new UITestWorkbenchWindowAdvisor(configurer);
 }
 
-std::string UITestWorkbenchAdvisor::GetInitialWindowPerspectiveId()
+QString UITestWorkbenchAdvisor::GetInitialWindowPerspectiveId()
 {
-  return "";
+  return QString::null;
 }
 
 }

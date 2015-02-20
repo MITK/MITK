@@ -75,17 +75,9 @@ void NativeTabItem::SetInfo(const PartInfo& info)
     widget->setTabToolTip(index, info.toolTip);
   }
 
-  if (info.image == 0)
+  if (widget->tabIcon(index).cacheKey() != info.image.cacheKey())
   {
-    widget->setTabIcon(index, QIcon());
-  }
-  else
-  {
-    QIcon icon(*(info.image));
-    if (widget->tabIcon(index).cacheKey() != icon.cacheKey())
-    {
-      widget->setTabIcon(index, icon);
-    }
+    widget->setTabIcon(index, info.image);
   }
 }
 

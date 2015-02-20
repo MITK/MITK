@@ -51,7 +51,7 @@ public:
    * @see org.blueberry.ui.presentations.AbstractPresentationFactory#createEditorPresentation(org.blueberry.swt.widgets.Composite,
    *      org.blueberry.ui.presentations.IStackPresentationSite)
    */
-  StackPresentation::Pointer CreateEditorPresentation(void* parent,
+  StackPresentation::Pointer CreateEditorPresentation(QWidget* parent,
       IStackPresentationSite::Pointer site);
 
   /*
@@ -60,7 +60,7 @@ public:
    * @see org.blueberry.ui.presentations.AbstractPresentationFactory#createViewPresentation(org.blueberry.swt.widgets.Composite,
    *      org.blueberry.ui.presentations.IStackPresentationSite)
    */
-  StackPresentation::Pointer CreateViewPresentation(void* parent,
+  StackPresentation::Pointer CreateViewPresentation(QWidget* parent,
       IStackPresentationSite::Pointer site);
 
   /*
@@ -69,12 +69,12 @@ public:
    * @see org.blueberry.ui.presentations.AbstractPresentationFactory#createStandaloneViewPresentation(org.blueberry.swt.widgets.Composite,
    *      org.blueberry.ui.presentations.IStackPresentationSite, boolean)
    */
-  StackPresentation::Pointer CreateStandaloneViewPresentation(void* parent,
+  StackPresentation::Pointer CreateStandaloneViewPresentation(QWidget* parent,
       IStackPresentationSite::Pointer site, bool showTitle);
 
-  std::string GetId();
+  QString GetId();
 
-  void* CreateSash(void* parent, int style);
+  QWidget* CreateSash(QWidget* parent, int style);
 
   int GetSashSize(int style);
 

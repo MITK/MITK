@@ -21,13 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-NamedHandleObject::NamedHandleObject(const std::string& id) :
+NamedHandleObject::NamedHandleObject(const QString& id) :
   HandleObject(id)
 {
 
 }
 
-std::string NamedHandleObject::GetDescription() const
+QString NamedHandleObject::GetDescription() const
 {
   if (!this->IsDefined())
   {
@@ -39,13 +39,12 @@ std::string NamedHandleObject::GetDescription() const
   return description;
 }
 
-std::string NamedHandleObject::GetName() const
+QString NamedHandleObject::GetName() const
 {
   if (!this->IsDefined())
   {
     throw NotDefinedException(
-        "Cannot get the name from an undefined object. " //$NON-NLS-1$
-        + id);
+        "Cannot get the name from an undefined object. " + id);
   }
 
   return name;

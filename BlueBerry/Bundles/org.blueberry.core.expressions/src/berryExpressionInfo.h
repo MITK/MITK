@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYEXPRESSIONINFO_H_
 #define BERRYEXPRESSIONINFO_H_
 
-#include <string>
+#include <QSet>
+
 #include <typeinfo>
-#include <set>
 
 #include <org_blueberry_core_expressions_Export.h>
 
@@ -44,9 +44,9 @@ private:
 
   // Although we are using this as sets we use lists since
   // they are faster for smaller numbers of elements
-  std::set<std::string> fAccessedVariableNames;
-  std::set<std::string> fMisbehavingExpressionTypes;
-  std::set<std::string> fAccessedPropertyNames;
+  QSet<QString> fAccessedVariableNames;
+  QSet<QString> fMisbehavingExpressionTypes;
+  QSet<QString> fAccessedPropertyNames;
 
 
 public:
@@ -82,22 +82,21 @@ public:
    *
    * @return the set off accessed variables
    */
-  std::set<std::string> GetAccessedVariableNames() const;
+  QSet<QString> GetAccessedVariableNames() const;
 
   /**
    * Marks the given variable as accessed.
    *
    * @param name the accessed variable
    */
-  void AddVariableNameAccess(const std::string& name);
+  void AddVariableNameAccess(const QString& name);
 
   /**
    * Returns the set of accessed properties.
    *
    * @return the set of accessed properties, or an empty array
-   * @since 3.4
    */
-  std::set<std::string> GetAccessedPropertyNames() const;
+  QSet<QString> GetAccessedPropertyNames() const;
 
   /**
    * Marks that this expression access this property. It should be the fully
@@ -105,9 +104,8 @@ public:
    *
    * @param name
    *            the fully qualified property name
-   * @since 3.4
    */
-  void AddAccessedPropertyName(const std::string& name);
+  void AddAccessedPropertyName(const QString& name);
 
   /**
    * Returns the set of expression types which don't implement the
@@ -119,7 +117,7 @@ public:
    * @return the set of expression types which don't implement the
    *  <code>computeReevaluationInfo</code> method.
    */
-  std::set<std::string> GetMisbehavingExpressionTypes() const;
+  QSet<QString> GetMisbehavingExpressionTypes() const;
 
   /**
    * Adds the given class to the list of misbehaving classes.

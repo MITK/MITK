@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkIOUtil.h>
 
+#include <berryIPreferences.h>
+
 #include <QFileDialog>
 
 class QmitkFileOpenActionPrivate
@@ -40,8 +42,8 @@ public:
 
   berry::IPreferences::Pointer GetPreferences() const
   {
-    berry::IPreferencesService::Pointer prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
-    if (prefService.IsNotNull())
+    berry::IPreferencesService* prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
+    if (prefService)
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }
@@ -53,7 +55,7 @@ public:
     berry::IPreferences::Pointer prefs = GetPreferences();
     if(prefs.IsNotNull())
     {
-      return QString::fromStdString(prefs->Get("LastFileOpenPath", ""));
+      return prefs->Get("LastFileOpenPath", "");
     }
     return QString();
   }
@@ -63,7 +65,7 @@ public:
     berry::IPreferences::Pointer prefs = GetPreferences();
     if(prefs.IsNotNull())
     {
-      prefs->Put("LastFileOpenPath", path.toStdString());
+      prefs->Put("LastFileOpenPath", path);
       prefs->Flush();
     }
   }
@@ -100,15 +102,15 @@ QmitkFileOpenAction::~QmitkFileOpenAction()
 
 void QmitkFileOpenAction::Run()
 {
+
   // Ask the user for a list of files to open
-  QStringList fileNames =  QFileDialog::getOpenFileNames(NULL, "Open",
-                                                         d->getLastFileOpenPath(),
-                                                         QmitkIOUtil::GetFileOpenFilterString());
+  QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Open",
+                                                        d->getLastFileOpenPath(),
+                                                        QmitkIOUtil::GetFileOpenFilterString());
 
   if (fileNames.empty())
     return;
 
   d->setLastFileOpenPath(fileNames.front());
-
   mitk::WorkbenchUtil::LoadFiles(fileNames, d->m_Window.Lock(), d->GetOpenEditor());
 }

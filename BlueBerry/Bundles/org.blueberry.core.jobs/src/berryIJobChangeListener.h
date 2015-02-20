@@ -44,15 +44,15 @@ namespace berry
  * @see Job#RemoveJobChangeListener(IJobChangeListener::Pointer)
  */
 
-struct BERRY_JOBS IJobChangeListener: public Object
+struct BERRY_JOBS IJobChangeListener
 {
 
-berryInterfaceMacro(IJobChangeListener, berry);
+  berryObjectMacro(berry::IJobChangeListener)
 
   struct BERRY_JOBS Events
   {
 
-    typedef Message1<const IJobChangeEvent::ConstPointer> JobChangeEventType;
+    typedef Message1<const IJobChangeEvent::ConstPointer&> JobChangeEventType;
 
     enum Type
     {
@@ -67,7 +67,7 @@ berryInterfaceMacro(IJobChangeListener, berry);
       ALL = 0xffffffff
     };
 
-    BERRY_DECLARE_FLAGS(Types, Type)
+    Q_DECLARE_FLAGS(Types, Type)
 
     JobChangeEventType jobAboutToRun;
     JobChangeEventType jobAwake;
@@ -76,12 +76,12 @@ berryInterfaceMacro(IJobChangeListener, berry);
     JobChangeEventType jobScheduled;
     JobChangeEventType jobSleeping;
 
-    void AddListener(IJobChangeListener::Pointer listener);
-    void RemoveListener(IJobChangeListener::Pointer listener);
+    void AddListener(IJobChangeListener* listener);
+    void RemoveListener(IJobChangeListener* listener);
 
     void SetExceptionHandler(const AbstractExceptionHandler& handler);
 
-    typedef MessageDelegate1<IJobChangeListener, const IJobChangeEvent::ConstPointer>
+    typedef MessageDelegate1<IJobChangeListener, const IJobChangeEvent::ConstPointer&>
         Delegate;
   };
 
@@ -94,10 +94,9 @@ berryInterfaceMacro(IJobChangeListener, berry);
    *
    * @param event the event details
    */
-  virtual void AboutToRun(const IJobChangeEvent::ConstPointer /*event*/)
+  virtual void AboutToRun(const IJobChangeEvent::ConstPointer& /*event*/)
   {
   }
-  ;
 
   /**
    * Notification that a job was previously sleeping and has now been rescheduled
@@ -105,10 +104,9 @@ berryInterfaceMacro(IJobChangeListener, berry);
    *
    * @param event the event details
    */
-  virtual void Awake(const IJobChangeEvent::ConstPointer /*event*/)
+  virtual void Awake(const IJobChangeEvent::ConstPointer& /*event*/)
   {
   }
-  ;
 
   /**
    * Notification that a job has completed execution, either due to cancelation, successful
@@ -117,20 +115,18 @@ berryInterfaceMacro(IJobChangeListener, berry);
    *
    * @param event the event details
    */
-  virtual void Done(const IJobChangeEvent::ConstPointer /*event*/)
+  virtual void Done(const IJobChangeEvent::ConstPointer& /*event*/)
   {
   }
-  ;
 
   /**
    * Notification that a job has started running.
    *
    * @param event the event details
    */
-  virtual void Running(const IJobChangeEvent::ConstPointer /*event*/)
+  virtual void Running(const IJobChangeEvent::ConstPointer& /*event*/)
   {
   }
-  ;
 
   /**
    * Notification that a job is being added to the queue of scheduled jobs.
@@ -140,10 +136,9 @@ berryInterfaceMacro(IJobChangeListener, berry);
    * @param event the event details, including the job instance and the scheduling
    * delay
    */
-  virtual void Scheduled(const IJobChangeEvent::ConstPointer /*event*/)
+  virtual void Scheduled(const IJobChangeEvent::ConstPointer& /*event*/)
   {
   }
-  ;
 
   /**
    * Notification that a job was waiting to run and has now been put in the
@@ -151,15 +146,14 @@ berryInterfaceMacro(IJobChangeListener, berry);
    *
    * @param event the event details
    */
-  virtual void Sleeping(const IJobChangeEvent::ConstPointer /*event*/)
+  virtual void Sleeping(const IJobChangeEvent::ConstPointer& /*event*/)
   {
   }
-  ;
 
 };
 
 }
 
-BERRY_DECLARE_OPERATORS_FOR_FLAGS(berry::IJobChangeListener::Events::Types)
+Q_DECLARE_OPERATORS_FOR_FLAGS(berry::IJobChangeListener::Events::Types)
 
 #endif /* BERRYIJOBCHANGELISTENER_H_ */

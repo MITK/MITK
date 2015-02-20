@@ -238,7 +238,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
             // ask about the name and organ type of the new segmentation
             QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
 
-            QString storedList = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
+            QString storedList = this->GetPreferences()->Get("Organ-Color-List","");
             QStringList organColors;
             if (storedList.isEmpty())
             {
@@ -263,7 +263,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
                */
 
                // recover string list from BlueBerry view's preferences
-               QString storedString = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
+               QString storedString = this->GetPreferences()->Get("Organ-Color-List","");
                MITK_DEBUG << "storedString: " << storedString.toStdString();
                // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
                QRegExp onePart("(?:[^;]|\\\\;)*");
@@ -319,9 +319,9 @@ void QmitkSegmentationView::CreateNewSegmentation()
                   /*
                   escape ';' here (replace by '\;'), see longer comment above
                   */
-                  std::string stringForStorage = organColors.replaceInStrings(";","\\;").join(";").toStdString();
+                  QString stringForStorage = organColors.replaceInStrings(";","\\;").join(";");
                   MITK_DEBUG << "Will store: " << stringForStorage;
-                  this->GetPreferences()->PutByteArray("Organ-Color-List", stringForStorage );
+                  this->GetPreferences()->Put("Organ-Color-List", stringForStorage);
                   this->GetPreferences()->Flush();
 
                   if(mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0))
@@ -1066,7 +1066,7 @@ void QmitkSegmentationView::RenderingManagerReinitialized()
       const mitk::BaseGeometry* workingNodeGeo = workingNode->GetData()->GetGeometry();
       const mitk::BaseGeometry* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
 
-      if (mitk::Equal(workingNodeGeo->GetBoundingBox(), worldGeo->GetBoundingBox(), mitk::eps, true))
+      if (mitk::Equal(*workingNodeGeo->GetBoundingBox(), *worldGeo->GetBoundingBox(), mitk::eps, true))
       {
          this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
          this->SetToolSelectionBoxesEnabled(true);

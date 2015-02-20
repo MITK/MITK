@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryObject.h>
 #include <org_blueberry_core_commands_Export.h>
 
-#include <Poco/Hash.h>
+#include <QHash>
 
 namespace berry {
 
@@ -61,23 +61,23 @@ private:
    * The constant integer hash code value meaning the hash code has not yet
    * been computed.
    */
-  static const std::size_t HASH_CODE_NOT_COMPUTED; // = 0;
+  static const uint HASH_CODE_NOT_COMPUTED; // = 0;
 
   /**
    * A factor for computing the hash code for all schemes.
    */
-  static const std::size_t HASH_FACTOR; // = 89;
+  static const uint HASH_FACTOR; // = 89;
 
   /**
    * The seed for the hash code for all schemes.
    */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
   /**
    * The hash code for this object. This value is computed lazily, and marked
    * as invalid when one of the values on which it is based changes.
    */
-  mutable std::size_t hashCode; // = HASH_CODE_NOT_COMPUTED;
+  mutable uint hashCode; // = HASH_CODE_NOT_COMPUTED;
 
 
 protected:
@@ -93,7 +93,7 @@ protected:
    * all objects of the same type and should never change. This value will
    * never be <code>null</code>.
    */
-  const  std::string id;
+  const  QString id;
 
   /**
    * The string representation of this object. This string is for debugging
@@ -101,7 +101,7 @@ protected:
    * is computed lazily, and is cleared if one of its dependent values
    * changes.
    */
-  mutable std::string str;
+  mutable QString str;
 
   /**
    * Constructs a new instance of <code>HandleObject</code>.
@@ -109,7 +109,7 @@ protected:
    * @param id
    *            The id of this handle; must not be <code>null</code>.
    */
-  HandleObject(const std::string& id);
+  HandleObject(const QString& id);
 
 
 public:
@@ -125,22 +125,25 @@ public:
      */
    bool operator==(const Object* object) const;
 
-   virtual std::string GetId() const;
+   QString GetId() const;
 
     /**
      * Computes the hash code for this object based on the id.
      *
      * @return The hash code for this object.
      */
-    virtual std::size_t HashCode() const {
-        if (hashCode == HASH_CODE_NOT_COMPUTED) {
-      hashCode = HASH_INITIAL * HASH_FACTOR + Poco::hash(id);
-      if (hashCode == HASH_CODE_NOT_COMPUTED) {
-        hashCode++;
-      }
-    }
-    return hashCode;
-    }
+   virtual uint HashCode() const
+   {
+     if (hashCode == HASH_CODE_NOT_COMPUTED)
+     {
+       hashCode = HASH_INITIAL * HASH_FACTOR + qHash(id);
+       if (hashCode == HASH_CODE_NOT_COMPUTED)
+       {
+         hashCode++;
+       }
+     }
+     return hashCode;
+   }
 
     /**
      * Whether this instance is defined. A defined instance is one that has been
@@ -150,7 +153,7 @@ public:
      * @return <code>true</code> if this object is defined; <code>false</code>
      *         otherwise.
      */
-    virtual bool IsDefined() const;
+    bool IsDefined() const;
 
     /**
      * Makes this object becomes undefined. This method should make any defined

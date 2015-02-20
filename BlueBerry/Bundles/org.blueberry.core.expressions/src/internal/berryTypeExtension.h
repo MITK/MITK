@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIPropertyTester.h"
 
-#include <vector>
 
 namespace berry {
 
@@ -37,13 +36,13 @@ public:
 private:
 
   /* the type this extension is extending */
-  std::string fTypeInfo;
+  QString fTypeInfo;
   /* the list of associated extenders */
-  std::vector<IPropertyTester::Pointer> fExtenders;
+  QList<IPropertyTester::Pointer> fExtenders;
   bool fExtendersLoaded;
 
   /* the extensions associated with <code>fType</code>'s super classes */
-  std::vector<TypeExtension::Pointer> fExtends;
+  QList<TypeExtension::Pointer> fExtends;
   bool fExtendsLoaded;
 
   TypeExtension() : fExtendersLoaded(false), fExtendsLoaded(false) {
@@ -62,7 +61,7 @@ protected:
 
      berryObjectMacro(CONTINUE_);
 
-     bool Handles(const std::string&  /*namespaze*/, const std::string&  /*method*/) {
+     bool Handles(const QString&  /*namespaze*/, const QString&  /*method*/) {
        return false;
      }
      bool IsInstantiated() {
@@ -74,8 +73,8 @@ protected:
      IPropertyTester* Instantiate() {
        return this;
      }
-     bool Test(Object::Pointer /*receiver*/, const std::string& /*method*/,
-         std::vector<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/) {
+     bool Test(Object::ConstPointer /*receiver*/, const QString& /*method*/,
+               const QList<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/) {
        return false;
      }
    };
@@ -84,11 +83,11 @@ protected:
    static const END_POINT_ END_POINT;
 
   /* package */
-   TypeExtension(const std::string& typeInfo);
+   TypeExtension(const QString &typeInfo);
 
   /* package */
    IPropertyTester::Pointer FindTypeExtender(TypeExtensionManager& manager,
-       const std::string& namespaze, const std::string& method,
+       const QString &namespaze, const QString &method,
        bool staticMethod, bool forcePluginActivation);
 };
 
@@ -98,7 +97,7 @@ class END_POINT_ : public TypeExtension
 {
 protected:
   IPropertyTester::Pointer FindTypeExtender(TypeExtensionManager& /*manager*/,
-      const std::string& /*namespaze*/, const std::string& /*name*/,
+      const QString& /*namespaze*/, const QString& /*name*/,
       bool  /*staticMethod*/, bool  /*forcePluginActivation*/)
   {
     return CONTINUE_::Pointer(new CONTINUE_());

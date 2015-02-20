@@ -16,10 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryLog.h"
 
+#include "berryIMemento.h"
+
 #include "berryTabbedStackPresentation.h"
 #include "berryAbstractTabItem.h"
 #include "berryLeftToRightTabOrder.h"
 #include "berryReplaceDragHandler.h"
+#include "berryShell.h"
 
 #include <berryConstants.h>
 
@@ -64,7 +67,7 @@ void TabbedStackPresentation::HandleTabFolderEvent(TabFolderEvent::Pointer e)
     IPresentablePart::Pointer part = folder->GetPartForTab(e->tab);
     if (part != 0)
     {
-      std::vector<IPresentablePart::Pointer> parts;
+      QList<IPresentablePart::Pointer> parts;
       parts.push_back(part);
       this->GetSite()->Close(parts);
     }
@@ -93,7 +96,7 @@ void TabbedStackPresentation::HandleTabFolderEvent(TabFolderEvent::Pointer e)
   else if (type == TabFolderEvent::EVENT_DRAG_START)
   {
     AbstractTabItem* beingDragged = e->tab;
-    Point initialLocation(e->x, e->y);
+    QPoint initialLocation(e->x, e->y);
 
     if (beingDragged == 0)
     {
@@ -103,18 +106,21 @@ void TabbedStackPresentation::HandleTabFolderEvent(TabFolderEvent::Pointer e)
     {
       IPresentablePart::Pointer part = folder->GetPartForTab(beingDragged);
 
-      try {
-          dragStart = folder->IndexOf(part);
-          // hold on to this TabbedStackPresentation instance, because
-          // in this->GetSite()->DragStart() all reference may be deleted
-          // and this instance is destroyed, leading to a seg fault when
-          // trying to write to dragStart
-          StackPresentation::Pointer tabbedStackPresentation(this);
-          this->GetSite()->DragStart(part, initialLocation, false);
-          dragStart = -1;
-      } catch(std::exception& exc) {
-          dragStart = -1;
-          throw exc;
+      try
+      {
+        dragStart = folder->IndexOf(part);
+        // hold on to this TabbedStackPresentation instance, because
+        // in this->GetSite()->DragStart() all reference may be deleted
+        // and this instance is destroyed, leading to a seg fault when
+        // trying to write to dragStart
+        StackPresentation::Pointer tabbedStackPresentation(this);
+        this->GetSite()->DragStart(part, initialLocation, false);
+        dragStart = -1;
+      }
+      catch(const std::exception& exc)
+      {
+        dragStart = -1;
+        throw exc;
       }
     }
   }
@@ -152,7 +158,7 @@ void TabbedStackPresentation::HandleTabFolderEvent(TabFolderEvent::Pointer e)
     if (part == 0)
     {
       // Standalone views with no title have no tab, so just get the part.
-      std::list<IPresentablePart::Pointer> parts = this->GetSite()->GetPartList();
+      QList<IPresentablePart::Pointer> parts = this->GetSite()->GetPartList();
       if (parts.size() > 0)
         part = parts.front();
     }
@@ -229,16 +235,14 @@ void TabbedStackPresentation::SaveState(IPresentationSerializer* context,
   tabs->SaveState(context, memento);
 }
 
-void TabbedStackPresentation::SetBounds(const Rectangle& bounds)
+void TabbedStackPresentation::SetBounds(const QRect& bounds)
 {
-  QRect rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
-  folder->SetBounds(rectangle);
+  folder->SetBounds(bounds);
 }
 
-Point TabbedStackPresentation::ComputeMinimumSize()
+QSize TabbedStackPresentation::ComputeMinimumSize()
 {
-  QSize point = folder->GetTabFolder()->ComputeSize(Constants::DEFAULT, Constants::DEFAULT);
-  return Point(point.width(), point.height());
+  return folder->GetTabFolder()->ComputeSize(Constants::DEFAULT, Constants::DEFAULT);
 }
 
 int TabbedStackPresentation::ComputePreferredSize(bool width,
@@ -247,7 +251,7 @@ int TabbedStackPresentation::ComputePreferredSize(bool width,
 
   // If there is exactly one part in the stack, this just returns the
   // preferred size of the part as the preferred size of the stack.
-  std::list<IPresentablePart::Pointer> parts = this->GetSite()->GetPartList();
+  QList<IPresentablePart::Pointer> parts = this->GetSite()->GetPartList();
   if (parts.size() == 1 && parts.front() != 0 && !(this->GetSite()->GetState()
       == IStackPresentationSite::STATE_MINIMIZED))
   {
@@ -295,7 +299,7 @@ int TabbedStackPresentation::GetSizeFlags(bool width)
   int flags = 0;
   // If there is exactly one part in the stack,
   // then take into account the size flags of the part.
-  std::list<IPresentablePart::Pointer> parts = this->GetSite()->GetPartList();
+  QList<IPresentablePart::Pointer> parts = this->GetSite()->GetPartList();
   if (parts.size() == 1 && parts.front() != 0)
   {
     flags |= parts.front()->GetSizeFlags(width);
@@ -350,7 +354,7 @@ void TabbedStackPresentation::SetState(int state)
   folder->GetTabFolder()->SetState(state);
 }
 
-void* TabbedStackPresentation::GetControl()
+QWidget* TabbedStackPresentation::GetControl()
 {
   return folder->GetTabFolder()->GetControl();
 }
@@ -445,16 +449,16 @@ void TabbedStackPresentation::SelectPart(IPresentablePart::Pointer toSelect)
   tabs->Select(toSelect);
 }
 
-StackDropResult::Pointer TabbedStackPresentation::DragOver(void* currentControl, const Point& location)
+StackDropResult::Pointer TabbedStackPresentation::DragOver(QWidget* currentControl, const QPoint& location)
 {
   QWidget* currentWidget = static_cast<QWidget*>(currentControl);
   return dragBehavior->DragOver(currentWidget, location, dragStart);
 }
 
-std::vector<void*> TabbedStackPresentation::GetTabList(
+QList<QWidget*> TabbedStackPresentation::GetTabList(
     IPresentablePart::Pointer part)
 {
-  std::vector<void*> list;
+  QList<QWidget*> list;
   if (folder->GetTabFolder()->GetTabPosition() == Constants::BOTTOM)
   {
     if (part->GetControl() != 0)
@@ -487,7 +491,7 @@ void TabbedStackPresentation::MoveTab(IPresentablePart::Pointer part, int index)
   folder->Layout(true);
 }
 
-std::vector<IPresentablePart::Pointer> TabbedStackPresentation::GetPartList()
+QList<IPresentablePart::Pointer> TabbedStackPresentation::GetPartList()
 {
   return tabs->GetPartList();
 }

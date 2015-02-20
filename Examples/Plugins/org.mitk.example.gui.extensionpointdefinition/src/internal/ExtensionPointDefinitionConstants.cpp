@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ChangeTextRegistry.h"
 
-const std::string ExtensionPointDefinitionConstants::CHANGETEXT_XP_NAME = "org.mitk.example.extensionpointdefinition.changetext";
-const std::string ExtensionPointDefinitionConstants::CHANGETEXT_CHILD_DESCRIPTION = "description";
-const std::string ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_CLASS = "class";
-const std::string ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_NAME = "name";
-const std::string ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID = "id";
+const QString ExtensionPointDefinitionConstants::CHANGETEXT_XP_NAME = "org.mitk.example.extensionpointdefinition.changetext";
+const QString ExtensionPointDefinitionConstants::CHANGETEXT_CHILD_DESCRIPTION = "description";
+const QString ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_CLASS = "class";
+const QString ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_NAME = "name";
+const QString ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID = "id";

@@ -18,13 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYIPARAMETERTYPELISTENER_H_
 #define BERRYIPARAMETERTYPELISTENER_H_
 
-#include <berryObject.h>
-#include <berryMacros.h>
 #include <berryMessage.h>
 
 #include <org_blueberry_core_commands_Export.h>
 
 namespace berry {
+
+template<class T> class SmartPointer;
 
 class ParameterTypeEvent;
 
@@ -38,21 +38,22 @@ class ParameterTypeEvent;
  * @see ParameterType#AddListener(IParameterTypeListener::Pointer)
  * @see ParameterType#RemoveListener(IParameterTypeListener::Pointer)
  */
-struct BERRY_COMMANDS IParameterTypeListener : public virtual Object {
-
-  berryInterfaceMacro(IParameterTypeListener, berry);
+struct BERRY_COMMANDS IParameterTypeListener
+{
 
   struct Events {
 
-    typedef Message1<const SmartPointer<const ParameterTypeEvent> > Event;
+    typedef Message1<const SmartPointer<const ParameterTypeEvent>& > Event;
 
     Event parameterTypeChanged;
 
-    void AddListener(IParameterTypeListener::Pointer listener);
-    void RemoveListener(IParameterTypeListener::Pointer listener);
+    void AddListener(IParameterTypeListener* listener);
+    void RemoveListener(IParameterTypeListener* listener);
 
-    typedef MessageDelegate1<IParameterTypeListener, const SmartPointer<const ParameterTypeEvent> > Delegate;
+    typedef MessageDelegate1<IParameterTypeListener, const SmartPointer<const ParameterTypeEvent>& > Delegate;
   };
+
+  virtual ~IParameterTypeListener();
 
   /**
    * Notifies that one or more properties of an instance of
@@ -62,7 +63,7 @@ struct BERRY_COMMANDS IParameterTypeListener : public virtual Object {
    * @param parameterTypeEvent
    *            the event. Guaranteed not to be <code>null</code>.
    */
-  virtual void ParameterTypeChanged(const SmartPointer<const ParameterTypeEvent> parameterTypeEvent) = 0;
+  virtual void ParameterTypeChanged(const SmartPointer<const ParameterTypeEvent>& parameterTypeEvent) = 0;
 
 };
 

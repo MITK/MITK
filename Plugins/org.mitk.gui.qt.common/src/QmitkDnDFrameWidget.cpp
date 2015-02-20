@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkDnDFrameWidget.h>
 
 #include <berryIPreferencesService.h>
+#include <berryIPreferences.h>
 #include <berryPlatformUI.h>
 
 #include "internal/QmitkCommonActivator.h"
@@ -32,8 +33,8 @@ public:
 
   berry::IPreferences::Pointer GetPreferences() const
   {
-    berry::IPreferencesService::Pointer prefService = QmitkCommonActivator::GetInstance()->GetPreferencesService();
-    if (prefService.IsNotNull())
+    berry::IPreferencesService* prefService = QmitkCommonActivator::GetInstance()->GetPreferencesService();
+    if (prefService)
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }

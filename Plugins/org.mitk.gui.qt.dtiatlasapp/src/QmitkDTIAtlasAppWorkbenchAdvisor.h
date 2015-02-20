@@ -25,14 +25,14 @@ class QmitkDTIAtlasAppWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 
 public:
 
-  static const std::string WELCOME_PERSPECTIVE_ID; // = "org.mitk.qt.dtiatlasapp.defaultperspective"
+  static const QString WELCOME_PERSPECTIVE_ID; // = "org.mitk.qt.dtiatlasapp.defaultperspective"
 
   void Initialize(berry::IWorkbenchConfigurer::Pointer configurer);
 
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
         berry::IWorkbenchWindowConfigurer::Pointer configurer);
 
-  std::string GetInitialWindowPerspectiveId();
+  QString GetInitialWindowPerspectiveId();
 
 };
 

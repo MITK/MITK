@@ -23,7 +23,7 @@ QmitkExtDefaultPerspective::QmitkExtDefaultPerspective()
 
 void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
-  std::string editorArea = layout->GetEditorArea();
+  QString editorArea = layout->GetEditorArea();
 
   layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::LEFT, 0.3f, editorArea);
 

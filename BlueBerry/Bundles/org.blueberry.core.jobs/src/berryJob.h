@@ -169,7 +169,7 @@ public:
    *
    * @param name the name of the job.
    */
-  Job(std::string name);
+  Job(const QString& name);
 
   /**
    * Registers a job listener with this job
@@ -177,7 +177,7 @@ public:
    *
    * @param listener the listener to be added.
    */
-  void AddJobChangeListener(IJobChangeListener::Pointer listener);
+  void AddJobChangeListener(IJobChangeListener* listener);
 
   /**
    * Returns whether this job belongs to the given family.  Job families are
@@ -231,7 +231,7 @@ public:
    *
    * @return the name of this job
    */
-  std::string GetName() const;
+  QString GetName() const;
 
   /**
    * Returns the priority of this job.  The priority is used as a hint when the job
@@ -370,7 +370,7 @@ public:
    *
    * @param listener the listener to be removed
    */
-  void RemoveJobChangeListener(IJobChangeListener::Pointer listener);
+  void RemoveJobChangeListener(IJobChangeListener* listener);
 
 
   /**
@@ -418,7 +418,7 @@ public:
    *
    * @param name the name of the job.
    */
-  void SetName(std::string name);
+  void SetName(const QString& name);
 
   /**
    * Sets the priority of the job.  This will not affect the execution of

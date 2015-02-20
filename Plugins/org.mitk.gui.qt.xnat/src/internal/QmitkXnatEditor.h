@@ -56,7 +56,7 @@ public:
   QmitkXnatEditor();
   ~QmitkXnatEditor();
 
-  static const std::string EDITOR_ID;
+  static const QString EDITOR_ID;
 
   void CreateQtPartControl(QWidget *parent);
 
@@ -123,8 +123,9 @@ private:
   ctkXnatSession* m_Session;
   mitk::XnatSessionTracker* m_Tracker;
 
-  berry::ISelectionListener::Pointer m_SelectionListener;
-  void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
+  QScopedPointer<berry::ISelectionListener> m_SelectionListener;
+  void SelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
+                        const berry::ISelection::ConstPointer& selection);
 };
 
 #endif // QMITKXNATEDITOR_h

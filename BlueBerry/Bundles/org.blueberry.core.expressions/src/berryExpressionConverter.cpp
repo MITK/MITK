@@ -17,8 +17,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryExpressionConverter.h"
 
 #include "berryPlatformException.h"
+#include "berryIConfigurationElement.h"
+#include "berryIExtension.h"
+#include "berryIContributor.h"
+
+#include "berryCoreException.h"
+#include "berryElementHandler.h"
+#include "berryExpression.h"
+#include "berryStatus.h"
+
+#include "internal/berryExpressionPlugin.h"
+#include "internal/berryCompositeExpression.h"
 
 #include "Poco/DOM/Node.h"
+#include "Poco/DOM/Element.h"
+
 
 namespace berry {
 
@@ -29,22 +42,22 @@ ExpressionConverter::GetDefault()
 {
   if (INSTANCE) return INSTANCE;
 
-  std::vector<ElementHandler::Pointer> handlers;
+  QList<ElementHandler::Pointer> handlers;
   handlers.push_back(ElementHandler::GetDefault());
   INSTANCE = new ExpressionConverter(handlers);
 
   return INSTANCE;
 }
 
-ExpressionConverter::ExpressionConverter(std::vector<ElementHandler::Pointer>& handlers)
+ExpressionConverter::ExpressionConverter(const QList<ElementHandler::Pointer>& handlers)
 {
   fHandlers = handlers;
 }
 
 Expression::Pointer
-ExpressionConverter::Perform(IConfigurationElement::Pointer root)
+ExpressionConverter::Perform(const IConfigurationElement::Pointer& root)
 {
-  for (unsigned int i = 0; i < fHandlers.size(); i++) {
+  for (int i = 0; i < fHandlers.size(); i++) {
     ElementHandler::Pointer handler = fHandlers[i];
     Expression::Pointer result = handler->Create(this, root);
     if (!result.IsNull())
@@ -56,7 +69,7 @@ ExpressionConverter::Perform(IConfigurationElement::Pointer root)
 Expression::Pointer
 ExpressionConverter::Perform(Poco::XML::Element* root)
 {
-  for (unsigned int i = 0; i < fHandlers.size(); i++) {
+  for (int i = 0; i < fHandlers.size(); i++) {
     ElementHandler::Pointer handler = fHandlers[i];
     Expression::Pointer result = handler->Create(this, root);
     if (!result.IsNull())
@@ -66,51 +79,65 @@ ExpressionConverter::Perform(Poco::XML::Element* root)
 }
 
 void
-ExpressionConverter::ProcessChildren(IConfigurationElement::Pointer element, CompositeExpression::Pointer result)
+ExpressionConverter::ProcessChildren(const IConfigurationElement::Pointer& element,
+                                     const CompositeExpression::Pointer& result)
 {
-  IConfigurationElement::vector children(element->GetChildren());
+  QList<IConfigurationElement::Pointer> children(element->GetChildren());
 
-  IConfigurationElement::vector::iterator iter;
-    for (iter = children.begin(); iter != children.end(); ++iter)
+  QList<IConfigurationElement::Pointer>::iterator iter;
+  for (iter = children.begin(); iter != children.end(); ++iter)
+  {
+    Expression::Pointer child = this->Perform(*iter);
+    if (child.IsNull())
     {
-      Expression::Pointer child = this->Perform(*iter);
-      if (child.IsNull())
-        throw new CoreException("Unknown element", GetDebugPath(*iter));
-
-      result->Add(child);
+      IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, ExpressionPlugin::GetPluginId(),
+                                         IStatus::ERROR_TYPE, QString("Unknown expression element ") + GetDebugPath(*iter),
+                                         BERRY_STATUS_LOC));
+      throw CoreException(status);
     }
 
+    result->Add(child);
+  }
 }
 
-std::string
-ExpressionConverter::GetDebugPath(IConfigurationElement::Pointer configurationElement)
+QString
+ExpressionConverter::GetDebugPath(const IConfigurationElement::Pointer& configurationElement)
 {
-  std::string buf = "";
+  QString buf;
   buf.append(configurationElement->GetName());
-  const IConfigurationElement* parent= configurationElement->GetParent();
-  while (parent) {
-    if (parent->GetParent())
+  Object::Pointer parent= configurationElement->GetParent();
+  while (parent)
+  {
+    if (IConfigurationElement::Pointer parent2 = parent.Cast<IConfigurationElement>())
     {
       buf.append(" > ");
-      buf.append(parent->GetName());
-      parent = parent->GetParent();
+      buf.append(parent2->GetName());
+      QString id= parent2->GetAttribute("id");
+      if (!id.isEmpty())
+      {
+        buf.append(" (id=").append(id).append(')');
+      }
+      parent= parent2->GetParent();
+    }
+    else if (IExtension::Pointer parent2 = parent.Cast<IExtension>())
+    {
+      buf.append(" : ");
+      buf.append(parent2->GetExtensionPointUniqueIdentifier());
+      buf.append(" @ ");
+      buf.append(parent2->GetContributor()->GetName());
+      parent = 0;
     }
     else
     {
-      buf.append(" : "); //$NON-NLS-1$
-      std::string point;
-      parent->GetAttribute("point", point);
-      buf.append(point);
-      buf.append(" @ "); //$NON-NLS-1$
-      buf.append(parent->GetContributor());
-      parent= 0;
+      parent = 0;
     }
   }
   return buf;
 }
 
 void
-ExpressionConverter::ProcessChildren(Poco::XML::Element* element, CompositeExpression::Pointer result)
+ExpressionConverter::ProcessChildren(Poco::XML::Element* element,
+                                     const CompositeExpression::Pointer& result)
 {
   Poco::XML::Node* child = element->firstChild();
   while (child != 0) {
@@ -118,8 +145,13 @@ ExpressionConverter::ProcessChildren(Poco::XML::Element* element, CompositeExpre
       Poco::XML::Element* elem = static_cast<Poco::XML::Element*>(child);
       Expression::Pointer exp = this->Perform(elem);
       if (exp.IsNull())
-        throw CoreException("org.blueberry.core.expressions unknown element", elem->nodeName());
+      {
+        IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, ExpressionPlugin::GetPluginId(),
+                                           IStatus::ERROR_TYPE, QString("Unknown expression element ")
+                                           + QString::fromStdString(elem->nodeName()), BERRY_STATUS_LOC));
 
+        throw CoreException(status);
+      }
       result->Add(exp);
     }
     child = child->nextSibling();

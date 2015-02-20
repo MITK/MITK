@@ -16,9 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryUITestWorkbenchWindowAdvisor.h"
 
+#include <berryIWorkbenchWindowConfigurer.h>
+
 namespace berry {
 
-UITestWorkbenchWindowAdvisor::UITestWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer::Pointer configurer)
+UITestWorkbenchWindowAdvisor::UITestWorkbenchWindowAdvisor(const IWorkbenchWindowConfigurer::Pointer& configurer)
 : WorkbenchWindowAdvisor(configurer)
 {
 

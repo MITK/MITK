@@ -91,7 +91,7 @@ void QtShell::SetText(const QString& title)
   widget->setObjectName(title);
 }
 
-bool QtShell::IsVisible()
+bool QtShell::IsVisible() const
 {
   return widget->isVisible();
 }
@@ -116,12 +116,12 @@ void QtShell::SetImages(const QList<QIcon>&  /*images*/)
 {
 }
 
-bool QtShell::GetMaximized()
+bool QtShell::GetMaximized() const
 {
   return widget->isMaximized();
 }
 
-bool QtShell::GetMinimized()
+bool QtShell::GetMinimized() const
 {
   return widget->isMinimized();
 }

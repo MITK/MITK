@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIWorkbenchPage.h"
 #include "berryIPerspectiveDescriptor.h"
+#include "berryIContextService.h"
 #include "berryUIException.h"
 #include "berryConstants.h"
 #include "berryIMenuService.h"
@@ -50,6 +51,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMainWindow>
 #include <QHBoxLayout>
 #include <QMenuBar>
+#include <QMoveEvent>
+#include <QResizeEvent>
 
 namespace berry
 {
@@ -80,6 +83,7 @@ WorkbenchWindow::WorkbenchWindow(int number)
   , asMaximizedState(false)
   , partService(this)
   , serviceLocatorOwner(new ServiceLocatorOwner(this))
+  , resizeEventFilter(this)
 {
   this->Register(); // increase the reference count to avoid deleting
   // this object when temporary smart pointers
@@ -397,24 +401,12 @@ QPoint WorkbenchWindow::GetInitialSize()
 bool WorkbenchWindow::Close()
 {
   //BERRY_INFO << "WorkbenchWindow::Close()";
-
-  if (controlResizeListener)
-  {
-    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(GetShell()->GetControl(), controlResizeListener);
-  }
-
   bool ret = false;
   //BusyIndicator.showWhile(null, new Runnable() {
   //      public void run() {
   ret = this->BusyClose();
   //      }
   //    });
-
-  if (!ret && controlResizeListener)
-  {
-    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(GetShell()->GetControl(), controlResizeListener);
-  }
-
   return ret;
 }
 
@@ -530,10 +522,8 @@ bool WorkbenchWindow::HardClose()
      */
 
     // Remove the enabled submissions. Bug 64024.
-    /*
-     final IContextService contextService = (IContextService) workbench.getService(IContextService.class);
-     contextService.unregisterShell(getShell());
-     */
+    //IContextService* contextService = this->GetWorkbench()->GetService<IContextService>();
+    //contextService->UnregisterShell(this->GetShell());
 
     this->CloseAllPages();
 
@@ -1631,15 +1621,14 @@ void WorkbenchWindow::ConfigureShell(Shell::Pointer shell)
     shell->SetText(title);
   }
 
-  //  final IWorkbench workbench = getWorkbench();
+  //IWorkbench* workbench = this->GetWorkbench();
   //  workbench.getHelpSystem().setHelp(shell,
   //      IWorkbenchHelpContextIds.WORKBENCH_WINDOW);
 
-  //    final IContextService contextService = (IContextService) getWorkbench().getService(IContextService.class);
-  //    contextService.registerShell(shell, IContextService.TYPE_WINDOW);
+  //IContextService* contextService = workbench->GetService<IContextService>();
+  //contextService->RegisterShell(shell, IContextService::TYPE_WINDOW);
 
-  this->TrackShellActivation(shell);
-  this->TrackShellResize(shell);
+  shell->GetControl()->installEventFilter(&resizeEventFilter);
 }
 
 ShellPool::Pointer WorkbenchWindow::GetDetachedWindowPool()
@@ -1814,124 +1803,6 @@ WorkbenchPage::Pointer WorkbenchWindow::PageList::GetNextActive()
   return pagesInActivationOrder.at(pagesInActivationOrder.size()-2).Cast<WorkbenchPage>();
 }
 
-WorkbenchWindow::ShellActivationListener::ShellActivationListener(WorkbenchWindow::Pointer w) :
-window(w)
-{
-}
-
-void WorkbenchWindow::ShellActivationListener::ShellActivated(const ShellEvent::Pointer& /*event*/)
-{
-  WorkbenchWindow::Pointer wnd(window);
-
-  wnd->shellActivated = true;
-  wnd->serviceLocator->Activate();
-  wnd->GetWorkbenchImpl()->SetActivatedWindow(wnd);
-  WorkbenchPage::Pointer currentPage = wnd->GetActivePage().Cast<WorkbenchPage>();
-  if (currentPage != 0)
-  {
-    IWorkbenchPart::Pointer part = currentPage->GetActivePart();
-    if (part != 0)
-    {
-      PartSite::Pointer site = part->GetSite().Cast<PartSite>();
-      site->GetPane()->ShellActivated();
-    }
-    IEditorPart::Pointer editor = currentPage->GetActiveEditor();
-    if (editor != 0)
-    {
-      PartSite::Pointer site = editor->GetSite().Cast<PartSite>();
-      site->GetPane()->ShellActivated();
-    }
-    wnd->GetWorkbenchImpl()->FireWindowActivated(wnd);
-  }
-  //liftRestrictions();
-}
-
-void WorkbenchWindow::ShellActivationListener::ShellDeactivated(const ShellEvent::Pointer& /*event*/)
-{
-  WorkbenchWindow::Pointer wnd(window);
-
-  wnd->shellActivated = false;
-  //imposeRestrictions();
-  wnd->serviceLocator->Deactivate();
-  WorkbenchPage::Pointer currentPage = wnd->GetActivePage().Cast<WorkbenchPage>();
-  if (currentPage != 0)
-  {
-    IWorkbenchPart::Pointer part = currentPage->GetActivePart();
-    if (part != 0)
-    {
-      PartSite::Pointer site = part->GetSite().Cast<PartSite>();
-      site->GetPane()->ShellDeactivated();
-    }
-    IEditorPart::Pointer editor = currentPage->GetActiveEditor();
-    if (editor != 0)
-    {
-      PartSite::Pointer site = editor->GetSite().Cast<PartSite>();
-      site->GetPane()->ShellDeactivated();
-    }
-    wnd->GetWorkbenchImpl()->FireWindowDeactivated(wnd);
-  }
-}
-
-void WorkbenchWindow::TrackShellActivation(Shell::Pointer shell)
-{
-  shellActivationListener.reset(new ShellActivationListener(WorkbenchWindow::Pointer(this)));
-  shell->AddShellListener(shellActivationListener.data());
-}
-
-WorkbenchWindow::ControlResizeListener::ControlResizeListener(WorkbenchWindow* w)
-: window(w)
-{
-}
-
-GuiTk::IControlListener::Events::Types WorkbenchWindow::ControlResizeListener::GetEventTypes() const
-{
-  return Events::MOVED | Events::RESIZED;
-}
-
-void WorkbenchWindow::
-ControlResizeListener::ControlMoved(GuiTk::ControlEvent::Pointer /*e*/)
-{
-  this->SaveBounds();
-}
-
-void WorkbenchWindow::
-ControlResizeListener::ControlResized(GuiTk::ControlEvent::Pointer /*e*/)
-{
-  this->SaveBounds();
-}
-
-void WorkbenchWindow::ControlResizeListener::SaveBounds()
-{
-  WorkbenchWindow::Pointer wnd(window);
-
-  Shell::Pointer shell = wnd->GetShell();
-  if (shell == 0)
-  {
-    return;
-  }
-  //  if (shell->IsDisposed())
-  //  {
-  //    return;
-  //  }
-  if (shell->GetMinimized())
-  {
-    return;
-  }
-  if (shell->GetMaximized())
-  {
-    wnd->asMaximizedState = true;
-    return;
-  }
-  wnd->asMaximizedState = false;
-  wnd->normalBounds = shell->GetBounds();
-}
-
-void WorkbenchWindow::TrackShellResize(Shell::Pointer newShell)
-{
-  controlResizeListener = new ControlResizeListener(this);
-  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(newShell->GetControl(), controlResizeListener);
-}
-
 bool WorkbenchWindow::UpdatesDeferred() const
 {
   return largeUpdates > 0;
@@ -1958,6 +1829,117 @@ void WorkbenchWindow::FirePropertyChanged(const  QString& property, const Object
 {
   PropertyChangeEvent::Pointer event(new PropertyChangeEvent(Object::Pointer(this), property, oldValue, newValue));
   genericPropertyListeners.propertyChange(event);
+}
+
+WorkbenchWindow::ShellEventFilter::ShellEventFilter(WorkbenchWindow* window)
+  : window(window)
+{
+}
+
+bool WorkbenchWindow::ShellEventFilter::eventFilter(QObject* watched, QEvent* event)
+{
+  QEvent::Type eventType = event->type();
+  if (eventType == QEvent::Move || eventType == QEvent::Resize)
+  {
+    QWidget* widget = static_cast<QWidget*>(watched);
+    QRect newBounds = widget->geometry();
+    if (eventType == QEvent::Move)
+    {
+      newBounds.setTopLeft(static_cast<QMoveEvent*>(event)->pos());
+    }
+    else if(eventType == QEvent::Resize)
+    {
+      newBounds.setSize(static_cast<QResizeEvent*>(event)->size());
+    }
+    this->SaveBounds(newBounds);
+  }
+  else if (eventType == QEvent::WindowActivate)
+  {
+    this->ShellActivated();
+  }
+  else if (eventType == QEvent::WindowDeactivate)
+  {
+    this->ShellDeactivated();
+  }
+
+  return false;
+}
+
+void WorkbenchWindow::ShellEventFilter::SaveBounds(const QRect& newBounds)
+{
+  Shell::Pointer shell = window->GetShell();
+  if (shell == 0)
+  {
+    return;
+  }
+  //  if (shell->IsDisposed())
+  //  {
+  //    return;
+  //  }
+  if (shell->GetMinimized())
+  {
+    return;
+  }
+  if (shell->GetMaximized())
+  {
+    window->asMaximizedState = true;
+    return;
+  }
+  window->asMaximizedState = false;
+  window->normalBounds = newBounds;
+}
+
+void WorkbenchWindow::ShellEventFilter::ShellActivated()
+{
+  WorkbenchWindow::Pointer wnd(window);
+
+  wnd->shellActivated = true;
+  wnd->serviceLocator->Activate();
+  wnd->GetWorkbenchImpl()->SetActivatedWindow(wnd);
+  WorkbenchPage::Pointer currentPage = wnd->GetActivePage().Cast<WorkbenchPage>();
+  if (currentPage != 0)
+  {
+    IWorkbenchPart::Pointer part = currentPage->GetActivePart();
+    if (part != 0)
+    {
+      PartSite::Pointer site = part->GetSite().Cast<PartSite>();
+      site->GetPane()->ShellActivated();
+    }
+    IEditorPart::Pointer editor = currentPage->GetActiveEditor();
+    if (editor != 0)
+    {
+      PartSite::Pointer site = editor->GetSite().Cast<PartSite>();
+      site->GetPane()->ShellActivated();
+    }
+    wnd->GetWorkbenchImpl()->FireWindowActivated(wnd);
+  }
+  //liftRestrictions();
+}
+
+void WorkbenchWindow::ShellEventFilter::ShellDeactivated()
+{
+  WorkbenchWindow::Pointer wnd(window);
+
+  wnd->shellActivated = false;
+  //imposeRestrictions();
+  wnd->serviceLocator->Deactivate();
+  WorkbenchPage::Pointer currentPage = wnd->GetActivePage().Cast<WorkbenchPage>();
+  if (currentPage != 0)
+  {
+    IWorkbenchPart::Pointer part = currentPage->GetActivePart();
+    if (part != 0)
+    {
+      PartSite::Pointer site = part->GetSite().Cast<PartSite>();
+      site->GetPane()->ShellDeactivated();
+    }
+    IEditorPart::Pointer editor = currentPage->GetActiveEditor();
+    if (editor != 0)
+    {
+      PartSite::Pointer site = editor->GetSite().Cast<PartSite>();
+      site->GetPane()->ShellDeactivated();
+    }
+    wnd->GetWorkbenchImpl()->FireWindowDeactivated(wnd);
+  }
 }
 
 }

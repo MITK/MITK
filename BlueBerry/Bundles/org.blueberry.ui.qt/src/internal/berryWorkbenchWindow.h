@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchWindow.h"
 
 #include "berryIPerspectiveListener.h"
-#include "guitk/berryGuiTkIControlListener.h"
 #include "berryWindow.h"
 
 #include "berryWorkbenchWindowConfigurer.h"
@@ -668,45 +667,20 @@ private:
 
   void HideEmptyWindowContents();
 
-  struct ShellActivationListener: public IShellListener
+  struct ShellEventFilter : public QObject
   {
-    ShellActivationListener(WorkbenchWindow::Pointer window);
-
-    void ShellActivated(const ShellEvent::Pointer& event);
-
-    void ShellDeactivated(const ShellEvent::Pointer& event);
+    ShellEventFilter(WorkbenchWindow* window);
+    bool eventFilter(QObject* watched, QEvent* event);
 
   private:
-
-    WorkbenchWindow::WeakPtr window;
-  };
-
-  QScopedPointer<IShellListener> shellActivationListener;
-
-  /**
-   * Hooks a listener to track the activation and deactivation of the window's
-   * shell. Notifies the active part and editor of the change
-   */
-  void TrackShellActivation(Shell::Pointer shell);
-
-  struct ControlResizeListener: public GuiTk::IControlListener
-  {
-    ControlResizeListener(WorkbenchWindow* window);
-
-    GuiTk::IControlListener::Events::Types GetEventTypes() const;
-
-    void ControlMoved(GuiTk::ControlEvent::Pointer e);
-
-    void ControlResized(GuiTk::ControlEvent::Pointer e);
-
-  private:
-
-    void SaveBounds();
+    void SaveBounds(const QRect& newBounds);
+    void ShellActivated();
+    void ShellDeactivated();
 
     WorkbenchWindow* window;
   };
 
-  GuiTk::IControlListener::Pointer controlResizeListener;
+  ShellEventFilter resizeEventFilter;
 
   /**
    * Hooks a listener to track the resize of the window's shell. Stores the

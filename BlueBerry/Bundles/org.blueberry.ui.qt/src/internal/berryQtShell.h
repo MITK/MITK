@@ -46,7 +46,7 @@ public:
   QString GetText() const;
   void SetText(const QString& text);
 
-  bool IsVisible();
+  bool IsVisible() const;
   void SetVisible(bool visible);
 
   void SetActive();
@@ -55,8 +55,8 @@ public:
 
   void SetImages(const QList<QIcon>& images);
 
-  bool GetMaximized();
-  bool GetMinimized();
+  bool GetMaximized() const;
+  bool GetMinimized() const;
   void SetMaximized(bool maximized);
   void SetMinimized(bool minimized);
 

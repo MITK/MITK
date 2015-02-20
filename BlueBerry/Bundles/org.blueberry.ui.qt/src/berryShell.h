@@ -158,7 +158,7 @@ public:
    */
   virtual void SetText(const QString& text) = 0;
 
-  virtual bool IsVisible() = 0;
+  virtual bool IsVisible() const = 0;
   virtual void SetVisible(bool visible) = 0;
 
   virtual QWidget* GetControl() = 0;
@@ -174,7 +174,7 @@ public:
    *
    * @see #SetMaximized
    */
-  virtual bool GetMaximized() = 0;
+  virtual bool GetMaximized() const = 0;
 
   /**
    * Returns <code>true</code> if the receiver is currently
@@ -185,7 +185,7 @@ public:
    *
    * @see #SetMinimized
    */
-  virtual bool GetMinimized() = 0;
+  virtual bool GetMinimized() const = 0;
 
   /**
    * Sets the minimized stated of the receiver.

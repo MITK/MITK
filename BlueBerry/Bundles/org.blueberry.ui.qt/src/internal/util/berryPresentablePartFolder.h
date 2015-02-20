@@ -42,28 +42,6 @@ private:
   QList<IPresentablePart::Pointer> partList;
   bool isVisible;
 
-  /**
-   * Movement listener. Updates the bounds of the target to match the
-   * bounds of the dummy control.
-   */
-  struct ContentProxyListener : public GuiTk::IControlListener
-  {
-    ContentProxyListener(PresentablePartFolder*);
-
-    Events::Types GetEventTypes() const;
-
-    void ControlMoved(GuiTk::ControlEvent::Pointer e);
-
-    void ControlResized(GuiTk::ControlEvent::Pointer e);
-
-  private:
-
-    PresentablePartFolder* folder;
-
-  };
-
-  GuiTk::IControlListener::Pointer contentListener;
-
   struct ShellListener: public IShellListener
   {
 

@@ -27,28 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-PresentablePartFolder::ContentProxyListener::ContentProxyListener(
-    PresentablePartFolder* folder) :
-  folder(folder)
-{
-}
-
-GuiTk::IControlListener::Events::Types PresentablePartFolder::ContentProxyListener::GetEventTypes() const
-{
-  return static_cast<GuiTk::IControlListener::Events::Types>(Events::MOVED & Events::RESIZED);
-}
-
-void PresentablePartFolder::ContentProxyListener::ControlMoved(
-    GuiTk::ControlEvent::Pointer  /*e*/)
-{
-  folder->LayoutContent();
-}
-
-void PresentablePartFolder::ContentProxyListener::ControlResized(
-    GuiTk::ControlEvent::Pointer  /*e*/)
-{
-}
-
 PresentablePartFolder::ShellListener::ShellListener(AbstractTabFolder* _folder) :
   folder(_folder)
 {
@@ -176,12 +154,6 @@ PresentablePartFolder::~PresentablePartFolder()
     (*iter)->RemovePropertyListener(childPropertyChangeListener.data());
   }
 
-  for (QWidget* currentWidget = contentProxy; currentWidget != 0 && currentWidget
-      != folder->GetControl()->parentWidget(); currentWidget = currentWidget->parentWidget())
-  {
-    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(currentWidget, contentListener);
-  }
-
   BERRY_DEBUG << "DELETING PresentablePartFolder and contentProxy\n";
 
   delete folder;
@@ -218,16 +190,8 @@ PresentablePartFolder::PresentablePartFolder(AbstractTabFolder* _folder) :
 
   //toolbarProxy = new ProxyControl(folder.getToolbarParent());
 
-  // NOTE: if the shape of contentProxy changes, the fix for bug 85899 in EmptyTabFolder.computeSize may need adjustment.
-  contentListener = new ContentProxyListener(this);
-  contentProxy = new QtControlWidget(folder->GetContentParent(), 0);
+  contentProxy = new QWidget(folder->GetContentParent());
   contentProxy->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  //contentProxy->setVisible(false);
-  for (QWidget* currentWidget = contentProxy; currentWidget != 0 && currentWidget
-      != folder->GetControl()->parentWidget(); currentWidget = currentWidget->parentWidget())
-  {
-    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(currentWidget, contentListener);
-  }
   folder->SetContent(contentProxy);
 
 }

@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryStatusUtil.h"
 
 #include "presentations/berryIStackPresentationSite.h"
+#include "berryIContextService.h"
 
 #include <QMessageBox>
 
@@ -514,17 +515,16 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
   //List temp = new ArrayList();
   //this->CreateInitialActionSets(temp, layout.getActionSets());
 
-//  IContextService service = 0;
+//  IContextService* service = 0;
 //  if (page != 0)
 //  {
-//    service = (IContextService) page.getWorkbenchWindow().getService(
-//        IContextService.class);
+//    service = page->GetWorkbenchWindow()->GetService<IContextService>();
 //  }
 //  try
 //  {
-//    if (service!=0)
+//    if (service != 0)
 //    {
-//      service.activateContext(ContextAuthority.DEFER_EVENTS);
+//      service->DeferUpdates(true);
 //    }
 //    for (Iterator iter = temp.iterator(); iter.hasNext();)
 //    {

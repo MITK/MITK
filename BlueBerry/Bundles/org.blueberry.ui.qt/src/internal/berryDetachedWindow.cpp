@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIWorkbenchPartConstants.h"
 #include "berryISaveablePart.h"
+#include "berryIContextService.h"
 
 #include "berryWorkbenchWindow.h"
 
@@ -320,11 +321,11 @@ void DetachedWindow::ConfigureShell(Shell::Pointer shell)
   //shell.addListener(SWT.Deactivate, activationListener);
 
   //TODO DetachedWindow key bindings
-  //  // Register this detached view as a window (for key bindings).
-  //  IContextService contextService = (IContextService) getWorkbenchPage()
-  //  .getWorkbenchWindow().getWorkbench().getService(IContextService.class);
-  //  contextService.registerShell(shell, IContextService.TYPE_WINDOW);
-  //
+  // Register this detached view as a window (for key bindings).
+  //IContextService* contextService = this->GetWorkbenchPage()->GetWorkbenchWindow()->
+  //                                  GetWorkbench()->GetService<IContextService>();
+  //contextService->RegisterShell(shell, IContextService::TYPE_WINDOW);
+
   //  page.getWorkbenchWindow().getWorkbench().getHelpSystem().setHelp(shell,
   //      IWorkbenchHelpContextIds.DETACHED_WINDOW);
 }
@@ -473,10 +474,10 @@ bool DetachedWindow::HandleClose()
     DragUtil::RemoveDragTarget(windowShell->GetControl(), this);
     bounds = windowShell->GetBounds();
 
-    //TODO DetachedWindow unregister key bindings
-    //    // Unregister this detached view as a window (for key bindings).
-    //    final IContextService contextService = (IContextService) getWorkbenchPage().getWorkbenchWindow().getWorkbench().getService(IContextService.class);
-    //    contextService.unregisterShell(windowShell);
+    // Unregister this detached view as a window (for key bindings).
+    //IContextService* contextService = this->GetWorkbenchPage()->GetWorkbenchWindow()->
+    //                                  GetWorkbench()->GetService<IContextService>();
+    //contextService->UnregisterShell(windowShell);
 
     windowShell->SetData(Object::Pointer(0));
     windowShell = 0;

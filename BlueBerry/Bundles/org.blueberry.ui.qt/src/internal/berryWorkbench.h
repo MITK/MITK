@@ -294,7 +294,7 @@ protected:
   friend class WorkbenchConfigurer;
   friend class WorkbenchWindowConfigurer;
   friend class WorkbenchWindow;
-  friend struct WorkbenchWindow::ShellActivationListener;
+  friend struct WorkbenchWindow::ShellEventFilter;
 
   int RunUI();
 

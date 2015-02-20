@@ -242,7 +242,7 @@ struct QbrSelListener : ISelectionListener
   }
 
   void SelectionChanged(const IWorkbenchPart::Pointer& part,
-                        const ISelection::ConstPointer& selection) override
+                        const ISelection::ConstPointer& selection)
   {
     // check, if selection comes from datamanager
     if (part)

@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #if defined(_WIN32) && defined(NDEBUG)
 // exported from VC CRT
 extern "C"
-char * _unDName(char * outputString, const char * name, int maxStringLength,
+char * __unDName(char * outputString, const char * name, int maxStringLength,
                 void * (* pAlloc )(size_t), void (* pFree )(void *),
                 unsigned short disableFlags);
 #endif
@@ -67,7 +67,7 @@ QString Object::DemangleName(const char* mangledName)
     free(unmangled);
   }
 #elif defined(_WIN32) && defined(NDEBUG)
-  char * const unmangled = _unDName(0, mangledName, 0, malloc, free, 0x2800);
+  char * const unmangled = __unDName(0, mangledName, 0, malloc, free, 0x2800);
   if (unmangled)
   {
     name = QString(unmangled);

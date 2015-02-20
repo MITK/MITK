@@ -74,34 +74,34 @@ public:
   /**
    * @see IWorkbenchPart
    */
-  virtual void AddPropertyListener(IPropertyChangeListener* listener) override;
+  virtual void AddPropertyListener(IPropertyChangeListener* listener);
 
   /**
    * @see IWorkbenchPart
    */
-  virtual void RemovePropertyListener(IPropertyChangeListener* listener) override;
+  virtual void RemovePropertyListener(IPropertyChangeListener* listener);
 
-  QString GetId() const override;
+  QString GetId() const;
 
-  virtual QString GetTitleToolTip() const override;
+  virtual QString GetTitleToolTip() const;
 
   /**
    * Returns the pane name for the part
    *
    * @return the pane name for the part
    */
-  virtual QString GetPartName() const override;
+  virtual QString GetPartName() const;
 
   /**
    * Returns the content description for this part.
    *
    * @return the pane name for the part
    */
-  virtual QString GetContentDescription() const override;
+  virtual QString GetContentDescription() const;
 
-  virtual bool IsDirty() const override;
+  virtual bool IsDirty() const;
 
-  virtual QIcon GetTitleImage() const override;
+  virtual QIcon GetTitleImage() const;
 
   virtual void FireVisibilityChange();
 
@@ -109,7 +109,7 @@ public:
 
   virtual void SetVisible(bool isVisible);
 
-  IWorkbenchPart::Pointer GetPart(bool restore) override;
+  IWorkbenchPart::Pointer GetPart(bool restore);
 
   /**
    * Returns the part pane for this part reference. Does not return null.
@@ -122,17 +122,17 @@ public:
 
   virtual void SetPinned(bool newPinned);
 
-  virtual bool IsPinned() const override;
+  virtual bool IsPinned() const;
 
   /*
    * @see org.blueberry.ui.IWorkbenchPartReference#getPartProperty(java.lang.String)
    */
-  virtual QString GetPartProperty(const QString& key) const override;
+  virtual QString GetPartProperty(const QString& key) const;
 
   int ComputePreferredSize(bool width, int availableParallel,
                            int availablePerpendicular, int preferredResult);
 
-  int GetSizeFlags(bool width) override;
+  int GetSizeFlags(bool width);
 
 protected:
 

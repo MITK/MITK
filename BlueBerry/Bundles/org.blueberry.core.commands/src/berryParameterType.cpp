@@ -55,7 +55,7 @@ void ParameterType::Define(const QString&  type,
       new ParameterTypeEvent(ParameterType::Pointer(this), definedChanged));
   this->FireParameterTypeChanged(event);
 }
-#include <qplugin.h>
+
 IParameterValueConverter* ParameterType::GetValueConverter() const
 {
   if (!this->IsDefined())

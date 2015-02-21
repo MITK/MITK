@@ -37,6 +37,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchWindow.h"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
+#include <QUrlQuery>
+#endif
+
 namespace berry {
 
 const QString WorkbenchMenuService::INDEX_AFTER_ADDITIONS_QK = "after";
@@ -942,13 +946,20 @@ void WorkbenchMenuService::ReleaseCache(ContributionRoot* items)
 int WorkbenchMenuService::GetInsertionIndex(ContributionManager* mgr, const QString& location)
 {
   QUrl uri(location);
+#if (QT_VERSION < QT_VERSION_CHECK(5,0,0))
   QList<QPair<QString,QString> > queryParts = uri.queryItems();
+  bool indexAfterAdditions = uri.queryItemValue(INDEX_AFTER_ADDITIONS_QK) == INDEX_AFTER_ADDITIONS_QV;
+#else
+  QUrlQuery query(uri);
+  QList<QPair<QString,QString> > queryParts = query.queryItems();
+  bool indexAfterAdditions = query.queryItemValue(INDEX_AFTER_ADDITIONS_QK) == INDEX_AFTER_ADDITIONS_QV;
+#endif
 
   int additionsIndex = -1;
 
   // No Query means 'after=additions' (if there) or
   // the end of the menu
-  if (queryParts.isEmpty() || uri.queryItemValue(INDEX_AFTER_ADDITIONS_QK) == INDEX_AFTER_ADDITIONS_QV)
+  if (queryParts.isEmpty() || indexAfterAdditions)
   {
     additionsIndex = mgr->IndexOf(WorkbenchActionConstants::MB_ADDITIONS);
     if (additionsIndex == -1)

@@ -158,7 +158,11 @@ void Object::UnRegister(bool del) const
 void Object::SetReferenceCount(int ref)
 {
   QMutexLocker lock(&m_ReferenceCountLock);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+  m_ReferenceCount.store(ref);
+#else
   m_ReferenceCount = ref;
+#endif
   if (ref == 0)
   {
     delete this;
@@ -199,7 +203,11 @@ Object::~Object()
    * warn user if reference counting is on and the object is being referenced
    * by another object.
    */
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+  if (m_ReferenceCount.load() > 0)
+#else
   if (m_ReferenceCount > 0)
+#endif
   {
     // A general exception safety rule is that destructors should
     // never throw.  Something is wrong with a program that reaches
@@ -225,7 +233,13 @@ QDebug Object::PrintSelf(QDebug os, Indent Indent) const
 {
   QString demangledName = DemangleName(typeid(*this).name());
   os << Indent << "RTTI typeinfo:   " << demangledName << '\n';
-  os << Indent << "Reference Count: " << m_ReferenceCount << '\n';
+  os << Indent << "Reference Count: " <<
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    m_ReferenceCount.load()
+#else
+    m_ReferenceCount
+#endif
+    << '\n';
   return os;
 }
 

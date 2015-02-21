@@ -29,14 +29,14 @@ bool ObjectString::operator==(const Object* other) const
 {
   if (const ObjectString* otherStr = dynamic_cast<const ObjectString*>(other))
   {
-    return QString::operator ==(*otherStr);
+    return static_cast<const QString&>(*this) == static_cast<const QString&>(*otherStr);
   }
   return false;
 }
 
 bool ObjectString::operator==(const QString& other) const
 {
-  return QString::operator==(other);
+  return static_cast<const QString&>(*this) == other;
 }
 
 QString ObjectString::ToString() const

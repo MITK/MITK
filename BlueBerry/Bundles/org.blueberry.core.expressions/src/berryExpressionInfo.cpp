@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpressionInfo.h"
 
-#include <algorithm>
+#include <QString>
 
 namespace berry {
 
@@ -75,7 +75,7 @@ QSet<QString> ExpressionInfo::GetMisbehavingExpressionTypes() const
 void
 ExpressionInfo::AddMisBehavingExpressionType(const std::type_info& clazz)
 {
-  fMisbehavingExpressionTypes.insert(clazz.name());
+  fMisbehavingExpressionTypes.insert(QString(clazz.name()));
 }
 
 void

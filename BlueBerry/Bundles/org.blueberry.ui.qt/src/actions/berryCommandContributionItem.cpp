@@ -46,6 +46,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QToolBar>
 #include <QApplication>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
+#include <QMetaMethod>
+#endif
+
 namespace berry
 {
 
@@ -642,15 +646,25 @@ void CommandContributionItem::HandleWidgetSelection()
   }
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5,0,0))
 void CommandContributionItem::connectNotify(const char *signal)
 {
   qDebug() << "Connected to:" << signal;
 }
-
 void CommandContributionItem::disconnectNotify(const char *signal)
 {
   qDebug() << "Disconnected from:" << signal;
 }
+#else
+void CommandContributionItem::connectNotify(const QMetaMethod& signal)
+{
+  qDebug() << "Connected to:" << signal.name();
+}
+void CommandContributionItem::disconnectNotify(const QMetaMethod& signal)
+{
+  qDebug() << "Disconnected from:" << signal.name();
+}
+#endif
 
 //TODO Tool item drop down menu contributions
 //bool CommandContributionItem::OpenDropDownMenu(SmartPointer<GuiTk::Event> event)

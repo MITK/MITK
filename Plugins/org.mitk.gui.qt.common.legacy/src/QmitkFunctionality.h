@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_common_legacy_Export.h>
 #include "mitkDataNodeSelection.h"
 #include <mitkDataStorage.h>
+#include <mitkIDataStorageService.h>
 #include <mitkIDataStorageReference.h>
 #include <QmitkStdMultiWidget.h>
 

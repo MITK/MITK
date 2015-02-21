@@ -27,7 +27,12 @@ namespace berry
 
 
 
-const IStatus::Pointer Job::ASYNC_FINISH(new Status ( IStatus::OK_TYPE, JobManager::PI_JOBS(), 1, "", BERRY_STATUS_LOC) ) ;
+const IStatus::Pointer Job::ASYNC_FINISH(
+    new Status (IStatus::OK_TYPE, JobManager::PI_JOBS(),
+                1,
+                "",
+                berry::Status::SourceLocation(__FILE__, "berry::Job::ASYNC_FINISH", __LINE__)
+                ));
 
 Job::Job(const QString& name)
   : InternalJob(name)

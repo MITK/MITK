@@ -177,9 +177,13 @@ private:
 
   //SmartPointer<IUIElementListener> GetItemListener();
 
+#if (QT_VERSION < QT_VERSION_CHECK(5,0,0))
   void connectNotify(const char *signal);
   void disconnectNotify(const char *signal);
-
+#else
+  void connectNotify(const QMetaMethod& signal);
+  void disconnectNotify(const QMetaMethod& signal);
+#endif
   /**
    * Determines if the selection was on the dropdown affordance and, if so,
    * opens the drop down menu (populated using the same id as this item...

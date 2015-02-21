@@ -133,7 +133,7 @@ QObject* RegistryStrategy::CreateExecutableExtension(const SmartPointer<Registry
   }
 
   QString typeName = contributor->GetActualName() + "_" + className;
-  int extensionTypeId = ExtensionType::type(typeName.toAscii().data());
+  int extensionTypeId = ExtensionType::type(typeName.toLatin1().data());
   if (extensionTypeId == 0)
   {
     QString message = QString("Unable to find class \"%1\" from contributor \"%2\"."

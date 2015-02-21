@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkPluginActivator.h>
 
+#include "mitkInputDeviceRegistry.h"
+
 namespace mitk
 {
-
-class InputDeviceRegistry;
 
   /**
   * @brief The activator class for the org.mitk.core.ext plug-in.

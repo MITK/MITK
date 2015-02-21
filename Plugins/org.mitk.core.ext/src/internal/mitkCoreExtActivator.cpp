@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCoreExtConstants.h"
 #include "mitkLogMacros.h"
-#include "mitkInputDeviceRegistry.h"
 
 #include <berryPlatform.h>
 #include <berryIPreferences.h>

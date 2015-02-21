@@ -6,6 +6,9 @@ MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE org_blueberry_core_runtime_EXPORT
                         EXPORTED_INCLUDE_SUFFIXES src src/application src/service src/registry)
 
 target_link_libraries(${PLUGIN_TARGET} PUBLIC Poco::Foundation Poco::Util Poco::XML)
+if(MITK_USE_Qt5)
+  target_link_libraries(${PLUGIN_TARGET} PRIVATE Qt5::Gui Qt5::Xml)
+endif()
 
 # Set compiler flags
 target_compile_definitions(${PLUGIN_TARGET} PUBLIC "$<$<PLATFORM_ID:Windows>:POCO_NO_UNWINDOWS;WIN32_LEAN_AND_MEAN>")
@@ -26,6 +29,10 @@ configure_file(src/application/solstice.ini
 add_executable(${OSGI_UI_APP} MACOSX_BUNDLE "src/application/berryMainUI.cpp")
 
 target_link_libraries(${OSGI_UI_APP} PRIVATE ${PROJECT_NAME} mbilog)
+if(MITK_USE_Qt5)
+  target_link_libraries(${OSGI_UI_APP} PRIVATE Qt5::Widgets)
+endif()
+
 if(_ctk_test_plugins)
   add_dependencies(${OSGI_UI_APP} ${_ctk_test_plugins})
   add_dependencies(BlueBerry ${OSGI_UI_APP})

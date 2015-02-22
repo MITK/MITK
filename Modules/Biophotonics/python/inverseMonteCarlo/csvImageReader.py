@@ -2,11 +2,24 @@
 """
 Created on Tue Feb 17 17:48:05 2015
 
+Reads the csv images provided by our MITK miniapp.
+The image is supposed to be structured as follows:
+
+1. line: arbitrary data
+2. line: image shape;1024;768
+3. line - 1024x768 + 2 line: multispectral spectra.
+
+e.g.: 4000;8144;3776;4880;9408;6048;3808;4704
+for an image with 8 spectral bands. This is one pixel.
+
+image shape;1024;768 is of course only an example for an image resolution of 1024x768
+
 @author: wirkert
 """
 
 import csv
 import numpy as np
+import Image
 
 
 def csvImageReader(csvFilename):
@@ -26,7 +39,8 @@ def csvImageReader(csvFilename):
                 shapeLine = row
                 break
 
-    resultShape = (int(shapeLine[1]), int(shapeLine[2]))
+    # for some reason, shapes are flipped from itk to csv
+    resultShape = (int(shapeLine[2]), int(shapeLine[1]))
 
     print 'determined shape to be: ', resultShape
 
@@ -35,25 +49,48 @@ def csvImageReader(csvFilename):
     return (resultShape, reflectances)
 
 
-def csvImageReadAndCorrect(csvFilename):
+def csvMultiSpectralImageReader(csvFilename):
     """
     read an image and correct it by its dark and flatfield image.
     dark and flatfield image are expected to have the same name
     as the original image with suffixes
     _dark
     _flatfield
+    Also returns the segmentation of the multispectral image, expecting
+    the suffix:
+    _segmentation
+    Segmentation will have value > 0 if pixel is segmented, 0 otherwise.
     """
 
     shape, reflectances = csvImageReader(csvFilename)
     dummy, dark         = csvImageReader(csvFilename + "_dark")
     dummy, flatfield    = csvImageReader(csvFilename + "_flatfield")
+    dummy, segmentation = csvImageReader(csvFilename + "_segmentation")
 
-    correctedReflectances = (reflectances - dark) / flatfield
+    correctedReflectances = (reflectances - dark) / (flatfield - dark)
 
-    return (shape, correctedReflectances)
+    return (shape, correctedReflectances, segmentation)
 
 
 if __name__ == "__main__":
 
+    #%% load images
     shape, reflectances = csvImageReader("data/output/sample_0")
-    shape, correctedReflectances = csvImageReadAndCorrect("data/output/sample_0")
+    shape, correctedReflectances, segmentation = csvMultiSpectralImageReader("data/output/sample_0")
+
+    #%% save again
+
+    # save one wavelength of the uncorrected image to see if reading worked
+    uncorrectedImage_0 = np.reshape(reflectances[:,0], shape)
+
+    #Rescale to 0-255 and convert to uint8
+    rescaled = (255.0 / uncorrectedImage_0.max() * (uncorrectedImage_0 - uncorrectedImage_0.min())).astype(np.uint8)
+
+    im = Image.fromarray(rescaled)
+    im.save("data/output/" + "testUncorrectedImage_0.tiff")
+
+    # save the corrected images to see if reading and correction worked.
+    for i in np.arange(0,correctedReflectances.shape[1]):
+        correctedImage_i = np.reshape(correctedReflectances[:,i], shape)
+        im = Image.fromarray(correctedImage_i)
+        im.save("data/output/" + "testCorrectedImage_" + str(i) + ".tiff")

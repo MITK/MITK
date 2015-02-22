@@ -72,7 +72,7 @@ def normalizeIntegral(data, wavelengths):
     norms = np.trapz(data, wavelengths, axis=1)
     return data / norms[:,None]
 
-def normalizeImageQuotient(data, iqBand=0):
+def normalizeImageQuotient(data, iqBand=1):
     # use line 0 as image quotient
     normData = data / data[:,iqBand][:,None]
     # discard it

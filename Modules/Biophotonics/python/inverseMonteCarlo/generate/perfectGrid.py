@@ -27,7 +27,7 @@ def perfectGrid(generatedFilename):
     infileString, outfolderMC, outfolderRS, gpumcmlDirectory, gpumcmlExecutable = systemPaths.initPaths()
     infile = open(infileString)
 
-    BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = simulation.perfect()
+    BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations = simulation.perfect()
 
     reflectances = np.zeros((nrSamples, len(wavelengths)))
 
@@ -71,7 +71,7 @@ def perfectGrid(generatedFilename):
     # save the reflectance results!
     now = datetime.datetime.now().strftime("%Y%B%d%I:%M%p")
     np.save(outfolderRS + now + generatedFilename + "reflectances" + str(photons) + "photons", reflectances)
-    np.save(outfolderRS + now + generatedFilename  + str(nrSimulations) + "parameters", paramsList)
+    np.save(outfolderRS + now + generatedFilename  + str(nrSamples) + "parameters", paramsList)
 
     end = time.time()
     print "total time for generating perfect data on grid: " + str((end - start))

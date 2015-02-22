@@ -24,7 +24,7 @@ def randomUniform(generatedFilename):
     BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations = simulation.perfect()
 
     reflectances  = np.zeros((nrSimulations, len(wavelengths)))
-    parameters    = np.zeros((nrSimulations, 5))
+    parameters    = np.zeros((nrSimulations, 4))
 
     print('start simulations...')
 
@@ -43,7 +43,7 @@ def randomUniform(generatedFilename):
         r   = random.uniform(min(rs), max(rs))
         SaO2= random.uniform(min(SaO2s), max(SaO2s))
 
-        parameters[i,:] = np.array([BVF, Vs, d, r, SaO2])
+        parameters[i,:] = np.array([BVF, Vs, d, SaO2])
 
 
         for j, wavelength in enumerate(wavelengths):

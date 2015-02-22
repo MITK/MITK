@@ -42,10 +42,10 @@ def randomNonUniform(generatedFilename):
     infile = open(infileString)
 
 
-    BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations = simulation.perfect()
+    BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations = simulation.noisy()
 
     reflectances  = np.zeros((nrSimulations, len(wavelengths)))
-    parameters    = np.zeros((nrSimulations, 5))
+    parameters    = np.zeros((nrSimulations, 8))
 
     print('start simulations...')
 
@@ -60,10 +60,15 @@ def randomNonUniform(generatedFilename):
         BVF = drawFromNormal(BVFs)
         Vs  = drawFromNormal(Vss)
         d   = drawFromNormal(ds)
-        r   = drawFromNormal(rs)
         SaO2= drawFromNormal(SaO2s)
+        r   = drawFromNormal(rs)
 
-        parameters[i,:] = np.array([BVF, Vs, d, r, SaO2])
+        min_sm_BVF = max(min(BVFs), 0.03)
+        sm_BVF = drawFromNormal([min_sm_BVF, max(BVFs)])
+        sm_Vs  = drawFromNormal(Vss)
+        sm_SaO2= drawFromNormal(SaO2s)
+
+        parameters[i,:] = np.array([BVF, Vs, d, SaO2, r, sm_BVF, sm_Vs, sm_SaO2])
 
 
         for j, wavelength in enumerate(wavelengths):

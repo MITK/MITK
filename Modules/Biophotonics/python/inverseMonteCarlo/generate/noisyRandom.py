@@ -44,14 +44,15 @@ def noisyRandom(generatedFilename):
         BVF = random.uniform(min(BVFs), max(BVFs))
         Vs  = random.uniform(min(Vss), max(Vss))
         d   = random.uniform(min(ds), max(ds))
-        r   = random.uniform(min(rs), max(rs))
         SaO2= random.uniform(min(SaO2s), max(SaO2s))
+        r   = random.uniform(min(rs), max(rs))
 
-        sm_BVF = random.uniform(min(BVFs), max(BVFs))
+        min_sm_BVF = max(min(BVFs), 0.03)
+        sm_BVF = random.uniform(min_sm_BVF, max(BVFs))
         sm_Vs  = random.uniform(min(Vss), max(Vss))
         sm_SaO2= random.uniform(min(SaO2s), max(SaO2s))
 
-        parameters[i,:] = np.array([BVF, Vs, d, r, SaO2, sm_BVF, sm_Vs, sm_SaO2])
+        parameters[i,:] = np.array([BVF, Vs, d, SaO2, r, sm_BVF, sm_Vs, sm_SaO2])
 
 
         for j, wavelength in enumerate(wavelengths):

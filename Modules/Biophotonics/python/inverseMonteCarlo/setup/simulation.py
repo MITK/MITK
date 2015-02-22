@@ -41,7 +41,7 @@ def noisy():
     photons = 1 * 10**6
     # the wavelengths [m] for which the reflectance spectrum shall be evaluated
     #wavelengths = np.linspace(470,700,23) * 10**-9
-    wavelengths = np.array([580, 470, 660, 560, 480, 611, 600, 700]) * 10**-9
+    wavelengths = np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10**-9
 
     # The full width at half maximum [m] of the used imaging systems filters
     FWHM = 20 * 10**-9
@@ -55,9 +55,7 @@ def noisy():
     haemoLUT = np.loadtxt("data/haemoglobin.txt", skiprows=2)
     # we calculate everything in [m] instead of [nm] and [1/cm]
     haemoLUT[:,0]   = haemoLUT[:,0] * 10**-9
-    haemoLUT[:,1:2] = haemoLUT[:,1:2] * 10**2
-    eHbO2 = interp1d(haemoLUT[:,0], haemoLUT[:,1])
-    eHb   = interp1d(haemoLUT[:,0], haemoLUT[:,2])
+    haemoLUT[:,1:] = haemoLUT[:,1:] * 10**2
     # to account for the FWHM of the used filters, compute convolution
     # see http://en.wikipedia.org/wiki/Full_width_at_half_maximum
     filterResponse = norm(loc = 0, scale = FWHM / 2.355)
@@ -66,11 +64,12 @@ def noisy():
                    filterResponse.ppf(0.99), 20)
     filterResponse_table = filterResponse.pdf(x)
     # TODO verify if this normalization is correct!
-    # filterResponse_table = filterResponse_table / sum(filterResponse_table)
+    filterResponse_table = filterResponse_table / sum(filterResponse_table)
     haemoLUT[:, 1] = np.convolve(haemoLUT[:, 1], filterResponse_table, 'same')
     haemoLUT[:, 2] = np.convolve(haemoLUT[:, 2], filterResponse_table, 'same')
-    #plt.plot(haemoLUT[:, 0], haemoLUT[:, 1], '--', linewidth=2)
-    #plt.show()
+
+    eHbO2 = interp1d(haemoLUT[:,0], haemoLUT[:,1])
+    eHb   = interp1d(haemoLUT[:,0], haemoLUT[:,2])
 
 
     nrSamples    = samplesBVF * samplesD * samplesR * samplesSaO2 * samplesVs
@@ -106,7 +105,7 @@ def perfect():
     photons = 1 * 10**6
     # the wavelengths [m] for which the reflectance spectrum shall be evaluated
     #wavelengths = np.linspace(470,700,23) * 10**-9
-    wavelengths = np.array([580, 470, 660, 560, 480, 611, 600, 700]) * 10**-9
+    wavelengths = np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10**-9
 
     # The full width at half maximum [m] of the used imaging systems filters
     FWHM = 20 * 10**-9
@@ -117,12 +116,10 @@ def perfect():
     # table with wavelength at 1st row,
     # HbO2 molar extinction coefficient [cm**-1/(moles/l)] at 2nd row,
     # Hb molar extinction coefficient [cm**-1/(moles/l)] at 3rd row
-    haemoLUT = np.loadtxt("data/haemoglobin.txt", skiprows=2)
+    haemoLUT = np.loadtxt("../data/haemoglobin.txt", skiprows=2)
     # we calculate everything in [m] instead of [nm] and [1/cm]
     haemoLUT[:,0]   = haemoLUT[:,0] * 10**-9
-    haemoLUT[:,1:2] = haemoLUT[:,1:2] * 10**2
-    eHbO2 = interp1d(haemoLUT[:,0], haemoLUT[:,1])
-    eHb   = interp1d(haemoLUT[:,0], haemoLUT[:,2])
+    haemoLUT[:,1:]  = haemoLUT[:,1:] * 10**2
     # to account for the FWHM of the used filters, compute convolution
     # see http://en.wikipedia.org/wiki/Full_width_at_half_maximum
     filterResponse = norm(loc = 0, scale = FWHM / 2.355)
@@ -131,12 +128,32 @@ def perfect():
                    filterResponse.ppf(0.99), 20)
     filterResponse_table = filterResponse.pdf(x)
     # TODO verify if this normalization is correct!
-    # filterResponse_table = filterResponse_table / sum(filterResponse_table)
+    filterResponse_table = filterResponse_table / sum(filterResponse_table)
+
     haemoLUT[:, 1] = np.convolve(haemoLUT[:, 1], filterResponse_table, 'same')
     haemoLUT[:, 2] = np.convolve(haemoLUT[:, 2], filterResponse_table, 'same')
-    #plt.plot(haemoLUT[:, 0], haemoLUT[:, 1], '--', linewidth=2)
-    #plt.show()
+
+    eHbO2 = interp1d(haemoLUT[:,0], haemoLUT[:,1])
+    eHb   = interp1d(haemoLUT[:,0], haemoLUT[:,2])
 
     nrSamples    = samplesBVF * samplesD * samplesR * samplesSaO2 * samplesVs
 
     return BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations
+
+
+if __name__ == "__main__":
+
+    import matplotlib.pyplot as plt
+
+    # currently will not work due to path of haemoblobin.txt
+    # change this when moving to unit tests.
+
+    #%% do plotting
+
+    BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations = perfect()
+
+    sortedWavelengths = np.sort(wavelengths)
+    sortedReflectance = eHbO2(sortedWavelengths)
+
+    #plt.figure()
+    plt.plot(sortedWavelengths, sortedReflectance, 'bo-')

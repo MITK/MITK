@@ -58,7 +58,7 @@ void FiberCurvatureFilter::GenerateData()
             double dist = 0;
             int c = j;
             std::vector< vnl_vector_fixed< float, 3 > > vectors;
-            vnl_vector_fixed< float, 3 > meanV;
+            vnl_vector_fixed< float, 3 > meanV; meanV.fill(0.0);
             while(dist<m_Distance/2 && c>1)
             {
                 double p1[3];

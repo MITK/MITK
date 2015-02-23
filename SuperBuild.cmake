@@ -395,7 +395,7 @@ ExternalProject_Add(${proj}
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}
     ${mitk_superbuild_ep_args}
-    "-DCMAKE_PREFIX_PATH:PATH=${ep_prefix}${sep}${CMAKE_PREFIX_PATH}"
+    "-DCMAKE_PREFIX_PATH:PATH=${ep_prefix}${sep}${CMAKE_CURRENT_BINARY_DIR}/HDF5-install${sep}${CMAKE_CURRENT_BINARY_DIR}/Vigra-install${sep}${CMAKE_PREFIX_PATH}"
 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/MITK-build

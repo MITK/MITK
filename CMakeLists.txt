@@ -262,6 +262,8 @@ mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS QT DCMTK DOC 
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)
 mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")
 mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DOC "Use Simulation Open Framework Architecture")
+mitkFunctionAddExternalProject(NAME HDF5      OFF)
+mitkFunctionAddExternalProject(NAME Vigra     OFF          DEPENDS HDF5)
 
 if(MITK_USE_QT)
   mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS QT)
@@ -364,6 +366,14 @@ endif()
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
   message("> Forcing MITK_USE_CppUnit to ON because BUILD_TESTING=ON")
   set(MITK_USE_CppUnit ON CACHE BOOL "Use CppUnit for unit tests" FORCE)
+endif()
+
+if(MITK_USE_Vigra)
+  link_directories(${Vigra_DIR}/../../lib ${Vigra_DIR}/lib)
+  list(APPEND MITK_RUNTIME_PATH
+       ${Vigra_DIR}/../../
+       ${Vigra_DIR}
+      )
 endif()
 
 # -----------------------------------------
@@ -1295,6 +1305,10 @@ if(WIN32)
   include(mitkFunctionCreateWindowsBatchScript)
 
   set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
+  if(MITK_USE_HDF5)
+    list(APPEND MITK_LIBRARY_DIRS ${HDF5_DIR}/install/bin)
+    message(STATUS "MITK-Runtime " ${MITK_RUNTIME_PATH})
+  endif(MITK_USE_HDF5)
   foreach(VS_BUILD_TYPE debug release)
     mitkFunctionCreateWindowsBatchScript("${MITK_SOURCE_DIR}/CMake/StartVS.bat.in"
       ${PROJECT_BINARY_DIR}/StartVS_${VS_BUILD_TYPE}.bat

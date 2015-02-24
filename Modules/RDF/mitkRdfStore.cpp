@@ -189,9 +189,18 @@ namespace mitk {
 
         std::string key = name;
 
+        std::list<RdfNode> list;
+
+        if(!resultMap[key].empty())
+        {
+          list = resultMap[key];
+        }
+
         librdf_node *node = librdf_query_results_get_binding_value(results, i);
 
-        resultMap[key] = LibRdfNodeToRdfNode(node);
+        list.push_front(LibRdfNodeToRdfNode(node));
+
+        resultMap[key] = list;
       }
 
       librdf_query_results_next(results);

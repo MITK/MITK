@@ -19,62 +19,61 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkRDFExports.h>
 #include <map>
+#include <list>
 
 #include <redland.h>
 
 #include "mitkRdfTriple.h"
 
 namespace mitk {
+  class MitkRDF_EXPORT RdfStore
+  {
+  public:
 
-class MitkRDF_EXPORT RdfStore
-{
-public:
+    typedef std::map<std::string, std::list<RdfNode> > ResultMap;
+    typedef std::map<std::string, RdfUri> PrefixMap;
 
-  typedef std::map<std::string, RdfNode> ResultMap;
-  typedef std::map<std::string, RdfUri> PrefixMap;
+    RdfStore();
+    ~RdfStore();
 
-  RdfStore();
-  ~RdfStore();
+    void SetBaseUri(RdfUri uri);
+    RdfUri GetBaseUri();
 
-  void SetBaseUri(RdfUri uri);
-  RdfUri GetBaseUri();
+    void AddPrefix(std::string prefix, RdfUri uri);
+    void CleanUp();
 
-  void AddPrefix(std::string prefix, RdfUri uri);
-  void CleanUp();
+    bool Add(RdfTriple triple);
+    bool Remove(RdfTriple triple);
 
-  bool Add(RdfTriple triple);
-  bool Remove(RdfTriple triple);
+    bool Contains(RdfTriple triple);
+    ResultMap Query(std::string query);
 
-  bool Contains(RdfTriple triple);
-  ResultMap Query(std::string query);
+    // Supported formats are: "ntriples", "turtle"(default), "nquads"
+    void Save(std::string filename, std::string format = "");
 
-  // Supported formats are: "ntriples", "turtle"(default), "nquads"
-  void Save(std::string filename, std::string format = "");
+    // Supported formats are: "ntriples", "turtle"(default), "nquads"
+    void Import(std::string url, std::string format = "");
 
-  // Supported formats are: "ntriples", "turtle"(default), "nquads"
-  void Import(std::string url, std::string format = "");
+  private:
 
-private:
+    RdfUri m_BaseUri;
 
-  RdfUri m_BaseUri;
+    PrefixMap m_Prefixes;
 
-  PrefixMap m_Prefixes;
+    librdf_model* m_Model;
+    librdf_storage* m_Storage;
+    librdf_world* m_World;
 
-  librdf_model* m_Model;
-  librdf_storage* m_Storage;
-  librdf_world* m_World;
+    librdf_statement* RdfTripleToStatement(RdfTriple triple);
+    librdf_node* RdfNodeToLibRdfNode(RdfNode node);
+    librdf_uri* RdfUriToLibRdfUri(RdfUri uri);
 
-  librdf_statement* RdfTripleToStatement(RdfTriple triple);
-  librdf_node* RdfNodeToLibRdfNode(RdfNode node);
-  librdf_uri* RdfUriToLibRdfUri(RdfUri uri);
+    RdfTriple StatementToRdfTriple(librdf_statement* statement);
+    RdfNode LibRdfNodeToRdfNode(librdf_node* node);
+    RdfUri LibRdfUriToRdfUri(librdf_uri* uri);
 
-  RdfTriple StatementToRdfTriple(librdf_statement* statement);
-  RdfNode LibRdfNodeToRdfNode(librdf_node* node);
-  RdfUri LibRdfUriToRdfUri(librdf_uri* uri);
-
-  bool CheckComplete(librdf_statement* statement);
-};
-
+    bool CheckComplete(librdf_statement* statement);
+  };
 }
 
 #endif // MITKRDFSTORE_H

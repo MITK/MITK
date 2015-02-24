@@ -30,9 +30,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStringProperty.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateNot.h>
+#include <mitkImage.h>
+#include <mitkSurface.h>
+#include <mitkPointSet.h>
 
 // GDCM
 #include <gdcmUUIDGenerator.h>
+
+// STD
+#include <list>
 
 const std::string QmitkRdfTriplestoreView::VIEW_ID = "org.mitk.views.rdftriplestore";
 
@@ -65,8 +71,11 @@ void QmitkRdfTriplestoreView::CreateQtPartControl( QWidget *parent )
   m_Controls.comboBoxProperty->addItem("format");
 
   // Set up the Triplestore
-  m_Store.SetBaseUri(Uri("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf"));
+  m_Store.SetBaseUri(Uri("http://www.mitk.org/BaseOntology"));
   m_Store.Import("file:D:/home/knorr/builds/tripleStore/Ontologies/dcterms.ttl");
+
+  Uri bomrdf("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf");
+  m_Store.AddPrefix("bomrdf", bomrdf);
 
   connect( m_Controls.buttonPerformGenerate, SIGNAL(clicked()), this, SLOT(GenerateRdfFile()) );
   connect( m_Controls.buttonPerformImport, SIGNAL(clicked()), this, SLOT(ImportRdfFile()) );
@@ -111,8 +120,8 @@ void QmitkRdfTriplestoreView::GenerateRdfFile()
 
   store.SetBaseUri(baseUri);
   store.Import("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf");
-  store.AddPrefix("bomrdf", Uri("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf"));
-  store.AddPrefix("sfm", Uri("file:C:/Users/knorr/Desktop/storeFromMitk.rdf"));
+  store.AddPrefix("bomrdf", Uri("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf#"));
+  store.AddPrefix("sfm", Uri("file:C:/Users/knorr/Desktop/storeFromMitk.rdf#"));
 
   // Create some nodes
   mitk::RdfNode project1(mitk::RdfUri("sfm:Project1"));
@@ -143,14 +152,37 @@ void QmitkRdfTriplestoreView::GenerateRdfFile()
   // Save the store in a local path
   store.Save("C:/Users/knorr/Desktop/storeFromMitk.rdf");
 
-  //std::string query = "SELECT ?x WHERE {?x bomrdf:name [] .}";
+  // Selects all triples in the storage
+  std::string query = "SELECT ?x ?y ?z WHERE {?x ?y ?z .}";
 
-  //Store::ResultMap map = store.Query(query);
-  //for (Store::ResultMap::const_iterator i = map.begin(); i != map.end(); i++)
-  //{
-  //  MITK_INFO << i->first << " " << i->second.value << " " << i->second.type << " " << i->second.datatype;
-  //}
+  Store::ResultMap map = store.Query(query);
 
+  //MITK_INFO << i->first << " " << i->second.value << " " << i->second.type << " " << i->second.datatype;
+
+  std::list<Node> listX(map["x"]);
+  std::list<Node> listY(map["y"]);
+  std::list<Node> listZ(map["z"]);
+
+  MITK_INFO << "x" << " " << "y" << " " << "z";
+  std::list<Node>::const_iterator x = listX.begin();
+  std::list<Node>::const_iterator y = listY.begin();
+  std::list<Node>::const_iterator z = listZ.begin();
+
+  for (; x != listX.end(); x++,y++,z++)
+  {
+    MITK_INFO << "( <" << x->value << "> <" << y->value << "> <" << z->value << "> )";
+  }
+
+  /*
+  for (int i = 1; i <= counter; i++)
+  {
+  MITK_INFO << "x" << " " << "y" << " " << "z";
+  MITK_INFO << listX.back().value << " " << listY.back().value << " " << listZ.back().value;
+  listX.pop_back();
+  listY.pop_back();
+  listZ.pop_back();
+  }
+  */
   store.CleanUp();
 }
 
@@ -195,14 +227,76 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
 
     if (!node->GetData()) continue;
 
-    std::string name = node->GetProperty("name")->GetValueAsString();
     std::string nodeUUID = generator.Generate();
     node->SetProperty("uuid", mitk::StringProperty::New(nodeUUID));
+  }
 
-    const mitk::PropertyList::PropertyMap* map = node->GetData()->GetPropertyList()->GetMap();
-    for (mitk::PropertyList::PropertyMap::const_iterator i = map->begin(); i != map->end(); i++)
+  for( mitk::DataStorage::SetOfObjects::ConstIterator iter = nodeContainer->Begin();
+    iter != nodeContainer->End(); iter++ )
+  {
+    const mitk::DataNode::Pointer node = iter->Value();
+
+    if (!node->GetData()) continue;
+
+    std::string name = node->GetProperty("name")->GetValueAsString();
+    std::string nodeUUID = node->GetProperty("uuid")->GetValueAsString();
+
+    //const mitk::PropertyList::PropertyMap* map = node->GetData()->GetPropertyList()->GetMap();
+    //for (mitk::PropertyList::PropertyMap::const_iterator i = map->begin(); i != map->end(); i++)
+    //{
+    //  MITK_INFO << i->first << " " << i->second->GetValueAsString();//getvalueasstring()
+    //}
+
+    Uri firstT(":" + nodeUUID/* + name*/);
+    Uri secondT(name);
+    Node subT(firstT);
+    Node predT(Uri("dcterms:title"));
+    Node objT(secondT);
+    Triple tparent(subT, predT, objT);
+
+    m_Store.Add(tparent);
+
+    std::cout << tparent << std::endl;
+
+    Node rdfType(Uri("rdf:type"));
+
+    // Check if mitk::Image
+    mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+    if(image)
     {
-      MITK_INFO << i->first << " " << i->second;//getvalueasstring()
+      bool isSeg = false;
+      node->GetBoolProperty("binary", isSeg);
+
+      if(isSeg)
+      {
+        Node seg(Uri("bomrdf:Segmentation"));
+        Triple tType(subT, rdfType, seg);
+        std::cout << tType << std::endl;
+      }
+      else
+      {
+        Node img(Uri("bomrdf:Image"));
+        Triple tType(subT, rdfType, img);
+        std::cout << tType << std::endl;
+      }
+    }
+
+    // Check if Surface
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(node->GetData());
+    if(surface)
+    {
+      Node surf(Uri("bomrdf:Surface"));
+      Triple tType(subT, rdfType, surf);
+      std::cout << tType << std::endl;
+    }
+
+    // Check if PointSet
+    mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(node->GetData());
+    if(surface)
+    {
+      Node pSet(Uri("bomrdf:PointSet"));
+      Triple tType(subT, rdfType, pSet);
+      std::cout << tType << std::endl;
     }
 
     // Get the parent of a DataNode
@@ -214,29 +308,31 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
       const mitk::DataNode::Pointer sourceNode = sources->Value();
 
       std::string sourceName = sourceNode->GetProperty("name")->GetValueAsString();
-      std::string sourceUUID = generator.Generate();
-      sourceNode->SetProperty("uuid", mitk::StringProperty::New(sourceUUID));
+      std::string sourceUUID = sourceNode->GetProperty("uuid")->GetValueAsString();
+      //sourceNode->SetProperty("uuid", mitk::StringProperty::New(sourceUUID));
+
+      // ENUM mit dublincore properties oder string array
 
       // TODO: Name(title)
-      Uri firstT(":" + nodeUUID + name);
-      Uri secondT(name);
-      Node subT(firstT);
-      Node predT(Uri("dcterms:title"));
-      Node objT(secondT);
-      Triple tName(subT, predT, objT);
+      //Uri firstT(":" + nodeUUID + name);
+      //Uri secondT(name);
+      //Node subT(firstT);
+      //Node predT(Uri("dcterms:title"));
+      //Node objT(secondT);
+      //Triple tName(subT, predT, objT);
 
       // Parent(source)
-      Uri first(":" + nodeUUID + name);
-      Uri second(":" + sourceUUID + sourceName);
+      Uri first(":" + nodeUUID/* + name*/);
+      Uri second(":" + sourceUUID/* + sourceName*/);
       Node sub(first);
       Node pred(Uri("dcterms:source"));
       Node obj(second);
       Triple t(sub, pred, obj);
 
-      m_Store.Add(tName);
+      //m_Store.Add(tName);
       m_Store.Add(t);
 
-      std::cout << tName << std::endl;
+      //std::cout << tName << std::endl;
       std::cout << t << std::endl;
 
       // TODO: Add all properties to store

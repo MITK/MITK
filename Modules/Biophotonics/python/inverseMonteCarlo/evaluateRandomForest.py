@@ -20,7 +20,7 @@ trainingParameters, trainingReflectances, testParameters, testReflectances = \
 
 trainingWeights = np.ones((trainingParameters.shape[0], 1))
 
-testingErrors = randomForest(trainingParameters, trainingReflectances, trainingWeights, testParameters, testReflectances)
+rf, testingErrors, r2Score = randomForest(trainingParameters, trainingReflectances, trainingWeights, testParameters, testReflectances)
 
 #%% test
 

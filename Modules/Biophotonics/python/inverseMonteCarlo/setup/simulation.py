@@ -116,7 +116,7 @@ def perfect():
     # table with wavelength at 1st row,
     # HbO2 molar extinction coefficient [cm**-1/(moles/l)] at 2nd row,
     # Hb molar extinction coefficient [cm**-1/(moles/l)] at 3rd row
-    haemoLUT = np.loadtxt("../data/haemoglobin.txt", skiprows=2)
+    haemoLUT = np.loadtxt("data/haemoglobin.txt", skiprows=2)
     # we calculate everything in [m] instead of [nm] and [1/cm]
     haemoLUT[:,0]   = haemoLUT[:,0] * 10**-9
     haemoLUT[:,1:]  = haemoLUT[:,1:] * 10**2

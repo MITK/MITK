@@ -121,9 +121,10 @@ for i, (BVF, Vs, d, SaO2) in enumerate(estimatedParametersOnlySegmented):
 reflectancesFromEstimatedParameters = mch.normalizeImageQuotient(reflectancesFromEstimatedParameters, iqBand=1)
 
 #%% plot data for nicer inspection
+plot_i = 99
 nearestTraining = find_nearest(trainingReflectances, inputReflectancesOnlySegmented[0,:])
-plot(nearestTraining);
-#plot(reflectancesFromEstimatedParameters[0,:])
-plot(inputReflectancesOnlySegmented[0,:])
+#plot(nearestTraining);
+plot(reflectancesFromEstimatedParameters[plot_i,:])
+plot(inputReflectancesOnlySegmented[plot_i,:])
 
 

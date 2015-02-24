@@ -44,17 +44,11 @@ def noisy(dataFolder):
 
 
 def realImageEstimationRFTrainingData(dataFolder):
-    #trainingParameters   = np.load(dataFolder + "2015February1805:25PMnoisyRandomTrainingData10000parameters.npy")
+    trainingParameters   = np.load(dataFolder + "2015February2208:16PMNoisyRandomTraining10000parameters.npy")
     # estimate: BVF, Vs, d, SaO2:
-    #trainingParameters   = trainingParameters[:, 0:4]
-    #trainingReflectances = np.load(dataFolder + "2015February1805:25PMnoisyRandomTrainingDatareflectances1000000photons.npy")
-    #trainingReflectances = mch.normalizeImageQuotient(trainingReflectances, iqBand=1)
-
-    trainingParameters   = np.load(dataFolder + "2015February1612:04AMperfectGridTrainingData10000parameters.npy")
-    trainingParameters   = trainingParameters[:,0:24] # only BVF and Vs for perfect data simulations
-    trainingReflectances = np.load(dataFolder + "2015February1612:04AMreflectancesperfectGridTrainingData1000000photons.npy")
+    trainingParameters   = trainingParameters[:, 0:4]
+    trainingReflectances = np.load(dataFolder + "2015February2208:16PMNoisyRandomTrainingreflectances1000000photons.npy")
     trainingReflectances = mch.normalizeImageQuotient(trainingReflectances, iqBand=1)
-
 
     return trainingParameters, trainingReflectances
 

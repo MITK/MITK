@@ -49,7 +49,7 @@ def csvImageReader(csvFilename):
     return (resultShape, reflectances)
 
 
-def csvMultiSpectralImageReader(csvFilename):
+def csvMultiSpectralImageReader(csvFilename, maskname = "trainmask"):
     """
     read an image and correct it by its dark and flatfield image.
     dark and flatfield image are expected to have the same name
@@ -65,7 +65,7 @@ def csvMultiSpectralImageReader(csvFilename):
     shape, reflectances = csvImageReader(csvFilename)
     dummy, dark         = csvImageReader(csvFilename + "_dark")
     dummy, flatfield    = csvImageReader(csvFilename + "_flatfield")
-    dummy, segmentation = csvImageReader(csvFilename + "_segmentation")
+    dummy, segmentation = csvImageReader(csvFilename + maskname)
 
     correctedReflectances = (reflectances - dark) / (flatfield - dark)
 

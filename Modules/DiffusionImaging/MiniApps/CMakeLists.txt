@@ -36,6 +36,8 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     TensorReconstruction^^
     TensorDerivedMapsExtraction^^
     DICOMLoader^^
+    DFTraining^^MitkFiberTracking
+    DFTracking^^MitkFiberTracking
     )
 
     foreach(diffusionminiapp ${diffusionminiapps})

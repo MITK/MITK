@@ -367,6 +367,14 @@
     </view>
     </extension>
 
+    <view id="org.mitk.views.mlbtview"
+    name="Machine Learning Based Streamline Tractography"
+    category="Fiber tractography"
+    class="QmitkMLBTView"
+    icon="resources/fiberTracking1.png">
+    </view>
+    </extension>
+
 
   <extension point="org.blueberry.ui.perspectives">
 

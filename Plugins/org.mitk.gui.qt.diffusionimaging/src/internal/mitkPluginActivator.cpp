@@ -53,6 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/QmitkFieldmapGeneratorView.h"
 #include "src/internal/QmitkDiffusionRegistrationView.h"
 #include "src/internal/QmitkDenoisingView.h"
+#include "src/internal/QmitkMLBTView.h"
 
 namespace mitk {
 
@@ -92,6 +93,7 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionRegistrationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDenoisingView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkRandomParcellationView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkMLBTView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

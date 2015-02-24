@@ -13,8 +13,8 @@ from sklearn.grid_search      import GridSearchCV
 from sklearn.cross_validation import KFold
 
 
-from setup import data
 
+from setup import data
 
 
 
@@ -24,63 +24,37 @@ from setup import data
 # 3. parameter study
 # 4. optimal image quotient
 
-#%% initialize
+def randomForest(trainingParameters, trainingReflectances, trainingWeights, testParameters, testReflectances):
+    #%% train forest
+
+    start = time.time()
+
+    # get best forest using k-fold cross validation and grid search
+    # outcommented for now because it takes to long for quick tests
+
+    #kf = KFold(trainingReflectances.shape[0], 5, shuffle=True)
+    #param_grid = [
+    #  {'max_depth': np.arange(2,20,1), 'n_estimators': np.arange(10,1000,10)}]
+
+    #best_rf = GridSearchCV(RandomForestRegressor(50, max_depth=8), param_grid, cv=kf, n_jobs=11)
+    #best_rf.fit(trainingReflectances, trainingParameters)
 
 
-# the folder with the reflectance spectra
-dataFolder = 'data/output/'
+    end = time.time()
+    print "time necessary to train the forest [s]: " + str((end - start))
 
-# load data
-trainingParameters, trainingReflectances, testParameters, testReflectances = \
-    data.perfect(dataFolder)
+    # train a baseline forest
 
-#%% train forest
+    rf = RandomForestRegressor(100, max_depth=10, n_jobs=5)
+    rf.fit(trainingReflectances, trainingParameters)
 
-start = time.time()
+    #with open("iris.dot", 'w') as f:
+    #    f = tree.export_graphviz(rf, out_file=f)
 
-# get best forest using k-fold cross validation and grid search
-# outcommented for now because it takes to long for quick tests
+    # predict test reflectances and get absolute errors.
+    absErrors = np.abs(rf.predict(testReflectances) - testParameters)
 
-#kf = KFold(trainingReflectances.shape[0], 5, shuffle=True)
-#param_grid = [
-#  {'max_depth': np.arange(2,20,1), 'n_estimators': np.arange(10,1000,10)}]
+    return absErrors
 
-#best_rf = GridSearchCV(RandomForestRegressor(50, max_depth=8), param_grid, cv=kf, n_jobs=11)
-#best_rf.fit(trainingReflectances, trainingParameters)
-
-
-end = time.time()
-print "time necessary to train the forest [s]: " + str((end - start))
-
-# train a baseline forest
-
-rf = RandomForestRegressor(50, max_depth=8, n_jobs=5)
-rf.fit(trainingReflectances, trainingParameters)
-
-
-#with open("iris.dot", 'w') as f:
-#    f = tree.export_graphviz(rf, out_file=f)
-
-#%% test
-
-
-# predict test reflectances and get absolute errors.
-absErrors = np.abs(rf.predict(testReflectances) - testParameters)
-print("Baseline random forest with 50 trees and depth of 8")
-print("error distribution BVF, Volume fraction")
-print("median: " + str(np.median(absErrors, axis=0)))
-print("lower quartile: " + str(np.percentile(absErrors, 25, axis=0)))
-print("higher quartile: " + str(np.percentile(absErrors, 75, axis=0)))
-
-
-print("-------------------------------")
-
-#print("result of random forest with parameters: " + str(best_rf.best_params_))
-# predict test reflectances and get absolute errors.
-#absErrors = np.abs(best_rf.predict(testReflectances) - testParameters)
-#print("error distribution BVF, Volume fraction")
-#print("median: " + str(np.median(absErrors, axis=0)))
-#print("lower quartile: " + str(np.percentile(absErrors, 25, axis=0)))
-#print("higher quartile: " + str(np.percentile(absErrors, 75, axis=0)))
 
 

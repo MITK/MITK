@@ -23,37 +23,34 @@ dataFolder = "data/output/"
 trainingParameters, trainingReflectances, testParameters, testReflectances = \
     data.perfect(dataFolder)
 
+def optimization(trainingParameters, trainingReflectances, testParameters, testReflectances):
 
-BVFs = np.unique(trainingParameters[:,0])
-Vss  = np.unique(trainingParameters[:,1])
-
-
-#%% build optimization function from rectangular reflectance grid
-
-reflectanceGrid3D  = np.reshape(trainingReflectances, (len(BVFs), len(Vss), trainingReflectances.shape[1]))
-functionToMinimize = ReflectanceError(BVFs, Vss, reflectanceGrid3D)
+    BVFs = np.unique(trainingParameters[:,0])
+    Vss  = np.unique(trainingParameters[:,1])
 
 
-#%% do optimization
+    #%% build optimization function from rectangular reflectance grid
 
-absErrors = np.zeros_like(testParameters)
-
-
-for idx, (testParameter, testReflectance) in enumerate(zip(testParameters, testReflectances)):
-    functionToMinimize.setReflectanceToMatch(testReflectance)
-    minimization = minimize(functionToMinimize.f, [np.median(BVFs), np.median(Vss)], method="Nelder-Mead")
-    # interpolation extrapolates with constant values. We just crop it to the bounds
-    clippedX= np.clip(minimization.x, [min(BVFs), min(Vss)], [max(BVFs), max(Vss)])
-
-    absErrors[idx,:] = np.abs(clippedX - testParameter)
+    reflectanceGrid3D  = np.reshape(trainingReflectances, (len(BVFs), len(Vss), trainingReflectances.shape[1]))
+    functionToMinimize = ReflectanceError(BVFs, Vss, reflectanceGrid3D)
 
 
-#%% test
+    #%% do optimization
 
-print("error distribution BVF, Volume fraction")
-print("median: " + str(np.median(absErrors, axis=0)))
-print("lower quartile: " + str(np.percentile(absErrors, 25, axis=0)))
-print("higher quartile: " + str(np.percentile(absErrors, 75, axis=0)))
+    absErrors = np.zeros_like(testParameters)
+
+
+    for idx, (testParameter, testReflectance) in enumerate(zip(testParameters, testReflectances)):
+        functionToMinimize.setReflectanceToMatch(testReflectance)
+        minimization = minimize(functionToMinimize.f, [np.median(BVFs), np.median(Vss)], method="Nelder-Mead")
+        # interpolation extrapolates with constant values. We just crop it to the bounds
+        clippedX= np.clip(minimization.x, [min(BVFs), min(Vss)], [max(BVFs), max(Vss)])
+
+        absErrors[idx,:] = np.abs(clippedX - testParameter)
+
+    return absErrors
+
+
 
 
 

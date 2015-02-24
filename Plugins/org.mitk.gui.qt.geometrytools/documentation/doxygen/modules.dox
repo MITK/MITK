@@ -2,7 +2,14 @@
   \defgroup org_mitk_gui_qt_geometrytools org.mitk.gui.qt.geometrytools
   \ingroup MITKPlugins
 
-  \brief Describe your plugin here.
+  \brief A plugin to modify geometry of mitkBaseData via interaction. Currently, the following
+operations can be performed:
+
+<ul>
+<li>Translation
+<li>Rotation
+<li>Scaling (not supported for images, yet, and will not happen in coordinate origin)
+</ul>
 
 */
 

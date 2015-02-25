@@ -585,14 +585,14 @@ namespace mitk {
     //## If you implement this function in a subclass, make sure, that all classes were your class inherits from
     //## have an implementation of CheckBounds
     //## (e.g. inheritance BaseGeometry <- A <- B. Implementation of CheckBounds in class B needs implementation in A as well!)
-    virtual void CheckBounds(const BoundsArrayType& bounds){};
+    virtual void CheckBounds(const BoundsArrayType& /*bounds*/){};
 
     //##Documentation
     //## @brief CheckIndexToWorldTransform
     //##
     //## This function is called in SetIndexToWorldTransform. Assertions can be implemented in this function (see PlaneGeometry.cpp).
     //## In Subclasses of BaseGeometry, implement own conditions or call Superclass::CheckBounds(bounds);.
-    virtual void CheckIndexToWorldTransform(mitk::AffineTransform3D* transform){};
+    virtual void CheckIndexToWorldTransform(mitk::AffineTransform3D* /*transform*/){};
 
   private:
 

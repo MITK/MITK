@@ -74,48 +74,38 @@ if(MITK_USE_SimpleITK)
       )
 
     set(SimpleITK_DIR ${ep_prefix})
+    MESSAGE("EP: " ${ep_prefix})
 
-    if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
-      # PythonDir needs to be fixed for the python interpreter by
-      # changing dir delimiter for Windows
-      set(_install_dir ${Python_DIR})
-      if(WIN32)
-        STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
-      else()
-        # escape spaces in the install path for linux
-        STRING(REPLACE " " "\ " _install_dir ${Python_DIR})
-      endif()
+    if( MITK_USE_Python )
+      set(_sitk_build_dir ${ep_prefix}/src/SimpleITK-build)
       # Build python distribution with easy install. If a own runtime is used
       # embedd the egg into the site-package folder of the runtime
-      if(NOT MITK_USE_SYSTEM_PYTHON)
-        ExternalProject_Add_Step(${proj} sitk_python_install_step
-          COMMAND ${PYTHON_EXECUTABLE} setup.py install --prefix=${_install_dir}
-          DEPENDEES build
-          WORKING_DIRECTORY <BINARY_DIR>/Wrapping/PythonPackage
-        )
+
+      # Note: Userbase install could also be relevant in some cases Probably windows want's to
+      # install to Lib/python2.7/
       # Build egg into custom user base folder and deploy it later into installer
       # https://pythonhosted.org/setuptools/easy_install.html#use-the-user-option-and-customize-pythonuserbase
+      # PYTHONUSERBASE=${_install_dir} ${PYTHON_EXECUTABLE} setup.py --user
+
+      # PythonDir needs to be fixed for the python interpreter by
+      # changing dir delimiter for Windows
+      set(_install_dir ${ep_prefix})
+      if(WIN32)
+        STRING(REPLACE "/" "\\\\" _install_dir ${ep_prefix})
       else()
-        set(_userbase_install <BINARY_DIR>/Wrapping/PythonPackage/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
-        if(WIN32)
-          set(_userbase_install <BINARY_DIR>/Wrapping/PythonPackage/Lib/site-packages)
-        endif()
-        ExternalProject_Add_Step(${proj} sitk_create_userbase_step
-          COMMAND ${CMAKE_COMMAND} -E make_directory ${_userbase_install}
-          DEPENDEES build
-          WORKING_DIRECTORY ${SimpleITK_DIR}/Wrapping/PythonPackage
-        )
-        ExternalProject_Add_Step(${proj} sitk_python_install_step
-          COMMAND PYTHONUSERBASE=<BINARY_DIR>/Wrapping/PythonPackage ${PYTHON_EXECUTABLE} setup.py install --user
-          DEPENDEES sitk_create_userbase_step
-          WORKING_DIRECTORY <BINARY_DIR>/Wrapping/PythonPackage
-        )
+        # escape spaces in the install path for linux
+        STRING(REPLACE " " "\ " _install_dir ${ep_prefix})
       endif()
+
+      ExternalProject_Add_Step(${proj} sitk_python_install_step
+        COMMAND ${PYTHON_EXECUTABLE} setup.py install --prefix=${_install_dir}
+        DEPENDEES build
+        WORKING_DIRECTORY ${_sitk_build_dir}/Wrapping/PythonPackage
+      )
     endif()
 
     mitkFunctionInstallExternalCMakeProject(${proj})
     # Still need to install the SimpleITK Python wrappings
-
   else()
 
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")

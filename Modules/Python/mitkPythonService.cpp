@@ -71,6 +71,8 @@ mitk::PythonService::PythonService()
       std::string programPath = mitk::IOUtil::GetProgramPath();
       QDir programmDir( QString( programPath.c_str() ).append("/Python") );
       QString pythonCommand;
+
+      // TODO: Check this in the modernization branch
       // Set the pythonpath variable depending if
       // we have an installer or development environment
       if ( programmDir.exists() ) {
@@ -82,8 +84,11 @@ mitk::PythonService::PythonService()
 #ifndef USE_MITK_BUILTIN_PYTHON
         pythonCommand.append( QString("\nsite.addsitedir('%1/Python/SimpleITK')").arg(programPath.c_str()) );
 #endif
+      // development
       } else {
-        pythonCommand.append(PYTHONPATH_COMMAND);
+        pythonCommand.append( QString("import site, sys\n") );
+        pythonCommand.append( QString("sys.path.append('')\n") );
+        pythonCommand.append( QString("\nsite.addsitedir('%1')").arg(EXTERNAL_SITE_PACKAGES) );
       }
 
       if( pythonInitialized )
@@ -108,6 +113,7 @@ mitk::PythonService::PythonService()
 #endif
 
       MITK_DEBUG("PythonService") << "initalizing python";
+
       m_PythonManager.initialize();
 
 #ifdef USE_MITK_BUILTIN_PYTHON
@@ -130,7 +136,7 @@ mitk::PythonService::PythonService()
       MITK_DEBUG("PythonService")<< "Python Search paths: " << Py_GetPath();
       MITK_DEBUG("PythonService") << "python initalized";
 
-      MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
+      //MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
       m_PythonManager.executeString( pythonCommand, ctkAbstractPythonManager::FileInput );
     }
     catch (...)

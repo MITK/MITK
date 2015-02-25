@@ -29,7 +29,19 @@ namespace mitk {
   /**
     * \brief Class to calculate covariance and correlation
     *
-    * Does not need to be instantiated, just use the static functions.
+    * In addition to static functions to calculate covariance and correlation,
+    * this class offers capability to set a time series image and optionally a
+    * parcellation image and calculate a correlation matrix.
+    *
+    * Whole correlation only needs a time series image and will return a
+    * #voxel x #voxel matrix where each voxel's time series is correlated
+    * against the time series of each other voxel.
+    *
+    * Parcel correlation will compute an average time series for each parcel
+    * of a parcellation image and create a #parcel x #parcel correlation matrix.
+    *
+    * Please note that time series images are assumed to be 4D and parcellation
+    * images integer valued and 3D.
     */
 
   template< class T >

@@ -77,11 +77,16 @@ std::string mitk::PlanarPolygon::EvaluateAnnotation()
   double area = GetQuantity(FEATURE_ID_AREA);
   std::stringstream ss;
   char stmp[20];
-  ss << "Circumference=";
-  sprintf(stmp, "%.2fmm\n", circumference);
-  ss << stmp << "Area=";
-  sprintf(stmp, "%.2fmm2\n", area);
-  ss << stmp;
+  if (this->IsClosed()) {
+    ss << "Circumference=";
+    sprintf(stmp, "%.2fmm\n", circumference);
+    ss << stmp << "Area=";
+    sprintf(stmp, "%.2fmm2\n", area);
+    ss << stmp;
+  } else {
+    sprintf(stmp, "%.2fmm\n", circumference);
+    ss << stmp;
+  }
   return ss.str();
 }
 

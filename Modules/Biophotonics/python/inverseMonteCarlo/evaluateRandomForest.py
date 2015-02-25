@@ -11,33 +11,37 @@ from setup import data
 from randomForest import randomForest
 
 
+#%% load data
 # the folder with the reflectance spectra
 dataFolder = 'data/output/'
 
-# load data
 trainingParameters, trainingReflectances, testParameters, testReflectances = \
     data.perfect(dataFolder)
 
 trainingWeights = np.ones((trainingParameters.shape[0], 1))
 
-rf, testingErrors, r2Score = randomForest(trainingParameters, trainingReflectances, trainingWeights, testParameters, testReflectances)
+#%% train forest
+
+rf, pca = randomForest(trainingParameters, trainingReflectances, trainingWeights)
 
 #%% test
 
+#with open("iris.dot", 'w') as f:
+#    f = tree.export_graphviz(rf, out_file=f)
+
+# predict test reflectances and get absolute errors.
+
+testReflectances = pca.transform(testReflectances)
+
+absErrors = np.abs(rf.predict(testReflectances) - testParameters)
+
+r2Score = rf.score(testReflectances, testParameters)
 
 #import matplotlib.pyplot as plt
 
-print("Baseline random forest with 100 trees and depth of 8")
-print("error distribution BVF, Volume fraction")
-print("median: " + str(np.median(testingErrors, axis=0)))
-print("lower quartile: " + str(np.percentile(testingErrors, 25, axis=0)))
-print("higher quartile: " + str(np.percentile(testingErrors, 75, axis=0)))
+print("result for random forest with parameters: " + str(rf.best_estimator_))
+print("absolute error distribution BVF, Volume fraction")
+print("median: " + str(np.median(absErrors, axis=0)))
+print("lower quartile: " + str(np.percentile(absErrors, 25, axis=0)))
+print("higher quartile: " + str(np.percentile(absErrors, 75, axis=0)))
 print("r2Score", str(r2Score))
-
-#print("result of random forest with parameters: " + str(best_rf.best_params_))
-# predict test reflectances and get absolute errors.
-#absErrors = np.abs(best_rf.predict(testReflectances) - testParameters)
-#print("error distribution BVF, Volume fraction")
-#print("median: " + str(np.median(absErrors, axis=0)))
-#print("lower quartile: " + str(np.percentile(absErrors, 25, axis=0)))
-#print("higher quartile: " + str(np.percentile(absErrors, 75, axis=0)))

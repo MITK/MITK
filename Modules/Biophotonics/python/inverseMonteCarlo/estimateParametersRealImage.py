@@ -5,16 +5,17 @@ Created on Thu Feb 19 10:14:34 2015
 @author: wirkert
 """
 
+
+from randomForest import randomForest
 from setup import data
+from calculateWeightsForDomainAdaption import calculateWeights
 
-import csvImageReader
-
-import helper.monteCarloHelper as mch
 import numpy as np
 import time
 import Image
 from sklearn.ensemble  import RandomForestRegressor
 from matplotlib.pyplot import plot
+
 
 
 #%% 0. setup helper functions.
@@ -28,42 +29,40 @@ def find_nearest(array,value):
     return array[idx]
 
 
-#%% 1. first train a random forest classifier using noisy data
-# in future versions of this script this step shall be replaced by loading a pretrained classifier
+
+#%% 1. load data
 
 # the folder with the reflectance spectra
-dataFolder = 'data/output/'
+dataFolder  = 'data/output/'
 
-# load data
-trainingParameters, trainingReflectances = \
-    data.realImageEstimationRFTrainingData(dataFolder)
+# the image which shall be tested
+imageToLoad = "ColonUC1"
 
-# train forest
-rf = RandomForestRegressor(1024, max_depth=19, n_jobs=5)
-rf.fit(trainingReflectances, trainingParameters)
+trainingParameters, trainingReflectances, shape, image, trainsegmentation, testsegmentation = \
+    data.realImageColonUC1(dataFolder)
 
-##% 2. load the image
+sourceReflectancesDA = image[np.nonzero(trainsegmentation)[0], :]
 
-imageToLoad = "sample_1"
-shape, image, trainsegmentation, testsegmentation = csvImageReader.csvMultiSpectralImageReader("data/output/" + imageToLoad)
-image        = mch.normalizeImageQuotient(image, 1)
+#%% 2. determine domain adaptation weights
 
+trainingWeights = calculateWeights(trainingReflectances, sourceReflectancesDA)
 
-#%% 3. estimate the parameters for the image
+#%% 3. train forest
+rf, pca = randomForest(trainingParameters, trainingReflectances, trainingWeights)
+
+#%% 4. estimate the parameters for the image
 
 start = time.time()
 
 estimatedParameters = rf.predict(image)
 
 # set to zero if not in segmentation mask
-estimatedParameters[np.where(0 == segmentation), :] = 0
-
+estimatedParameters[np.where(0 == testsegmentation), :] = 0
 
 end = time.time()
 print "time necessary to estimate parameters for image [s]: " + str((end - start))
 
-
-#%% 4. save parametric map
+#%% 5. save parametric map
 
 for i in np.arange(0,estimatedParameters.shape[1]):
     parameterImage_i = np.reshape(estimatedParameters[:,i], shape)
@@ -71,7 +70,7 @@ for i in np.arange(0,estimatedParameters.shape[1]):
     im.save(dataFolder + imageToLoad + "_parameterImage_" + str(i) + ".tiff")
 
 
-#%% 5. evaluate data
+#%% 6. evaluate data
 
 # for this, create monte carlo simulation for each
 # parameter estimate. The resulted reflectance estimate can then be compared to

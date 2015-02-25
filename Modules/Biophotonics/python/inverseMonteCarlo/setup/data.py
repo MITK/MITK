@@ -11,6 +11,8 @@ of datasets (same combinations / normalizations / ...)
 import numpy as np
 import helper.monteCarloHelper as mch
 
+import csvImageReader
+
 
 
 def perfect(dataFolder):
@@ -41,14 +43,17 @@ def noisy(dataFolder):
     return trainingParameters, trainingReflectances, testParameters, testReflectances
 
 
-def realImageEstimationRFTrainingData(dataFolder):
+def realImage(dataFolder, imageToLoad):
     trainingParameters   = np.load(dataFolder + "2015February2208:16PMNoisyRandomTraining10000parameters.npy")
     # estimate: BVF, Vs, d, SaO2:
     trainingParameters   = trainingParameters[:, 0:4]
     trainingReflectances = np.load(dataFolder + "2015February2208:16PMNoisyRandomTrainingreflectances1000000photons.npy")
     trainingReflectances = mch.normalizeImageQuotient(trainingReflectances)
 
-    return trainingParameters, trainingReflectances
+    shape, image, trainsegmentation, testsegmentation = csvImageReader.csvMultiSpectralImageReader(dataFolder + imageToLoad)
+    image        = mch.normalizeImageQuotient(image, 1)
+
+    return trainingParameters, trainingReflectances, shape, image, trainsegmentation, testsegmentation
 
 
 def logisticRegressionArtificialData(dataFolder):

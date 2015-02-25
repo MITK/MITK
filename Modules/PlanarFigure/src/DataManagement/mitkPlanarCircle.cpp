@@ -238,9 +238,24 @@ std::string mitk::PlanarCircle::EvaluateAnnotation()
 {
   double diameter = GetQuantity(FEATURE_ID_DIAMETER);
   double area = GetQuantity(FEATURE_ID_AREA);
+
+  MeasurementStatistics* stats = EvaluateStatistics();
   char str[20];
+  std::string res;
+  if (stats) {
+    res = "Mean=";
+    sprintf(str, "%.2f", stats->Mean);
+    res += str;    
+    sprintf(str, "%.2f", stats->SD);
+    res += " SD=";
+    res += str;    
+    res += "\nMax=" + std::to_string(stats->Max);
+    res += " Min=" + std::to_string(stats->Min);
+  }
+  delete stats;
+  
   sprintf(str, "%.2f", diameter);
-  std::string res = "D=";
+  res += "\nD=";
   res += str;
   res += " mm";
   res += "\n";
@@ -249,20 +264,6 @@ std::string mitk::PlanarCircle::EvaluateAnnotation()
   res += "Area=";
   res += str;
   res += " mm\xC2\xB2";
-
-  MeasurementStatistics* stats = EvaluateStatistics();
-  if (stats) {
-    res += "\n";
-    sprintf(str, "%.2f", stats->Mean);
-    res += "Mean=";
-    res += str;    
-    sprintf(str, "%.2f", stats->SD);
-    res += "\nSD=";
-    res += str;    
-    res += "\nMax=" + std::to_string(stats->Max);
-    res += " Min=" + std::to_string(stats->Min);
-  }
-  delete stats;
 
   return res;
 }

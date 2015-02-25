@@ -74,7 +74,6 @@ if(MITK_USE_SimpleITK)
       )
 
     set(SimpleITK_DIR ${ep_prefix})
-    MESSAGE("EP: " ${ep_prefix})
 
     if( MITK_USE_Python )
       set(_sitk_build_dir ${ep_prefix}/src/SimpleITK-build)

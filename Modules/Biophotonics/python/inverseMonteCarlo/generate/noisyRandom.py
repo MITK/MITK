@@ -50,9 +50,8 @@ def noisyRandom(generatedFilename):
         min_sm_BVF = max(min(BVFs), 0.03)
         sm_BVF = random.uniform(min_sm_BVF, max(BVFs))
         sm_Vs  = random.uniform(min(Vss), max(Vss))
-        sm_SaO2= random.uniform(min(SaO2s), max(SaO2s))
 
-        parameters[i,:] = np.array([BVF, Vs, d, SaO2, r, sm_BVF, sm_Vs, sm_SaO2])
+        parameters[i,:] = np.array([BVF, Vs, d, SaO2, r, sm_BVF, sm_Vs])
 
 
         for j, wavelength in enumerate(wavelengths):
@@ -62,11 +61,11 @@ def noisyRandom(generatedFilename):
                 infile, outfolderMC, gpumcmlDirectory, gpumcmlExecutable,
                 BVF, Vs, d,
                 r, SaO2,
-                submucosa_BVF=sm_BVF, submucosa_Vs=sm_Vs, submucosa_SaO2=sm_SaO2,
+                submucosa_BVF=sm_BVF, submucosa_Vs=sm_Vs, submucosa_SaO2=SaO2,
                 Fwhm = FWHM, nrPhotons=photons)
 
 
-            print((BVF, Vs, d, SaO2, r, wavelength, sm_BVF, sm_Vs, sm_SaO2))
+            print((BVF, Vs, d, SaO2, r, wavelength, sm_BVF, sm_Vs))
 
             # here, summarize result from wavelength in reflectance spectrum
             reflectances[i, j] = reflectanceValue

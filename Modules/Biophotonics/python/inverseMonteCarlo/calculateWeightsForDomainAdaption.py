@@ -16,19 +16,6 @@ from sklearn.grid_search      import GridSearchCV
 from sklearn.cross_validation import KFold
 from sklearn.linear_model     import LogisticRegression
 
-from setup import data
-
-
-#%% initialize
-
-
-# the folder with the reflectance spectra
-dataFolder = 'data/output/'
-
-# load data
-sourceReflectances, labelsUniform, targetReflectances, labelsGauss, \
-    testReflectancesGauss = \
-    data.logisticRegressionArtificialData(dataFolder)
 
 def calculateWeights(sourceReflectances, targetReflectances):
 
@@ -39,9 +26,13 @@ def calculateWeights(sourceReflectances, targetReflectances):
     allLabels       = np.concatenate((labelsSource, labelsTarget))
 
 
+
+
     # train logistic regression
 
     start = time.time()
+
+    print "now starting domain adaptation"
 
     kf = KFold(allReflectances.shape[0], 5, shuffle=True)
     # todo include intercept scaling paramter
@@ -55,11 +46,9 @@ def calculateWeights(sourceReflectances, targetReflectances):
     end = time.time()
     print "time necessary to train the logistic regression [s]: " + str((end - start))
 
-    sourceWeights = best_lr.predict(sourceReflectances)
+    sourceProbabilities = best_lr.predict_proba(sourceReflectances)
 
-    sourceWeights = sourceWeights
-
-    return sourceWeights[:,1] / sourceWeights[:,0]
+    return sourceProbabilities[:,1] / sourceProbabilities[:,0]
 
     #%% test
 

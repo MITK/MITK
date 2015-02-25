@@ -22,7 +22,7 @@ trainingWeights = np.ones((trainingParameters.shape[0], 1))
 
 #%% train forest
 
-rf, pca = randomForest(trainingParameters, trainingReflectances, trainingWeights)
+rf = randomForest(trainingParameters, trainingReflectances, trainingWeights)
 
 #%% test
 
@@ -30,8 +30,6 @@ rf, pca = randomForest(trainingParameters, trainingReflectances, trainingWeights
 #    f = tree.export_graphviz(rf, out_file=f)
 
 # predict test reflectances and get absolute errors.
-
-testReflectances = pca.transform(testReflectances)
 
 absErrors = np.abs(rf.predict(testReflectances) - testParameters)
 

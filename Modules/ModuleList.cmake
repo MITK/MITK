@@ -51,7 +51,7 @@ set(mitk_modules
   ToFUI
   US
   USUI
-  DicomUI
+  #DicomUI
   Simulation
   Remeshing
   Python
@@ -59,7 +59,7 @@ set(mitk_modules
   OpenIGTLinkUI
   IGTUI
   VtkShaders
-  DicomRT
+  #DicomRT
   IOExt
   XNAT
   TubeGraph

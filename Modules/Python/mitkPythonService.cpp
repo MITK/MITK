@@ -72,7 +72,7 @@ mitk::PythonService::PythonService()
       QDir programmDir( QString( programPath.c_str() ).append("/Python") );
       QString pythonCommand;
 
-      // TODO: Check this in the modernization branch
+      // TODO: Check this in the modernization branch with an installer
       // Set the pythonpath variable depending if
       // we have an installer or development environment
       if ( programmDir.exists() ) {
@@ -88,6 +88,7 @@ mitk::PythonService::PythonService()
       } else {
         pythonCommand.append( QString("import site, sys\n") );
         pythonCommand.append( QString("sys.path.append('')\n") );
+        pythonCommand.append( QString("sys.path.append('%1')\n").arg(EXTERNAL_DIST_PACKAGES) );
         pythonCommand.append( QString("\nsite.addsitedir('%1')").arg(EXTERNAL_SITE_PACKAGES) );
       }
 

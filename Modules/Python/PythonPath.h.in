@@ -6,6 +6,8 @@
 
 // TODO: windows might be Lib
 #define EXTERNAL_SITE_PACKAGES "@MITK_EXTERNAL_PROJECT_PREFIX@/lib/python2.7/site-packages"
+#define EXTERNAL_DIST_PACKAGES "@MITK_EXTERNAL_PROJECT_PREFIX@/lib/python2.7/dist-packages"
+
 
 //#define PYTHONPATH_COMMAND "import sys\n"\
 //"sys.path.append('@SimpleITK_DIR@/bin')\n"\

@@ -68,7 +68,7 @@ namespace mitk {
 
   class PlaneGeometry;
   /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometry instead. */
-  DEPRECATED( typedef PlaneGeometry Geometry2D);
+  DEPRECATED(typedef PlaneGeometry Geometry2D);
 
   /**
   * \brief Describes a two-dimensional, rectangular plane
@@ -78,13 +78,13 @@ namespace mitk {
   class MITKCORE_EXPORT PlaneGeometry : public BaseGeometry
   {
   public:
-    mitkClassMacro(PlaneGeometry,BaseGeometry);
+    mitkClassMacro(PlaneGeometry, BaseGeometry);
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
-      enum PlaneOrientation
+    enum PlaneOrientation
     {
       Axial,
       Sagittal,
@@ -138,9 +138,9 @@ namespace mitk {
     *   thisgeometry->SetExtentInMM(2, 1.0);
     * \endcode
     */
-    virtual void InitializeStandardPlane( const BaseGeometry* geometry3D,
+    virtual void InitializeStandardPlane(const BaseGeometry* geometry3D,
       PlaneOrientation planeorientation = Axial, ScalarType zPosition = 0,
-      bool frontside=true, bool rotated=false );
+      bool frontside = true, bool rotated = false);
 
     /**
     * \brief Initialize a plane with orientation \a planeorientation
@@ -150,9 +150,9 @@ namespace mitk {
     * \param top if \a true, create plane at top, otherwise at bottom
     * (for PlaneOrientation Axial, for other plane locations respectively)
     */
-    virtual void InitializeStandardPlane( const BaseGeometry* geometry3D, bool top,
+    virtual void InitializeStandardPlane(const BaseGeometry* geometry3D, bool top,
       PlaneOrientation planeorientation = Axial,
-      bool frontside=true, bool rotated=false );
+      bool frontside = true, bool rotated = false);
 
     /**
     * \brief Initialize a plane with orientation \a planeorientation
@@ -160,19 +160,19 @@ namespace mitk {
     * given width and height in units.
     *
     */
-    virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
+    virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
       const AffineTransform3D* transform = NULL,
       PlaneOrientation planeorientation = Axial,
-      ScalarType zPosition = 0, bool frontside=true, bool rotated=false );
+      ScalarType zPosition = 0, bool frontside = true, bool rotated = false);
 
     /**
     * \brief Initialize plane with orientation \a planeorientation
     * (default: axial) given width, height and spacing.
     *
     */
-    virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
+    virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
       const Vector3D & spacing, PlaneOrientation planeorientation = Axial,
-      ScalarType zPosition = 0, bool frontside = true, bool rotated = false );
+      ScalarType zPosition = 0, bool frontside = true, bool rotated = false);
 
     /**
     * \brief Initialize plane by width and height in pixels, right-/down-vector
@@ -182,9 +182,9 @@ namespace mitk {
     * The vectors are normalized and multiplied by the respective spacing before
     * they are set in the matrix.
     */
-    virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
+    virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
       const Vector3D& rightVector, const Vector3D& downVector,
-      const Vector3D *spacing = NULL );
+      const Vector3D *spacing = NULL);
 
     /**
     * \brief Initialize plane by width and height in pixels,
@@ -194,9 +194,9 @@ namespace mitk {
     * The vectors are normalized and multiplied by the respective spacing
     * before they are set in the matrix.
     */
-    virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
+    virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
       const VnlVector& rightVector, const VnlVector& downVector,
-      const Vector3D * spacing = NULL );
+      const Vector3D * spacing = NULL);
 
     /**
     * \brief Initialize plane by right-/down-vector (itk) and spacing
@@ -206,8 +206,8 @@ namespace mitk {
     * respectively. Then, the vectors are normalized and multiplied by the
     * respective spacing before they are set in the matrix.
     */
-    virtual void InitializeStandardPlane( const Vector3D& rightVector,
-      const Vector3D& downVector, const Vector3D * spacing = NULL );
+    virtual void InitializeStandardPlane(const Vector3D& rightVector,
+      const Vector3D& downVector, const Vector3D * spacing = NULL);
 
     /**
     * \brief Initialize plane by right-/down-vector (vnl) and spacing
@@ -217,8 +217,8 @@ namespace mitk {
     * respectively. Then, the vectors are normalized and multiplied by the
     * respective spacing before they are set in the matrix.
     */
-    virtual void InitializeStandardPlane( const VnlVector& rightVector,
-      const VnlVector& downVector, const Vector3D * spacing = NULL );
+    virtual void InitializeStandardPlane(const VnlVector& rightVector,
+      const VnlVector& downVector, const Vector3D * spacing = NULL);
 
     /**
     * \brief Initialize plane by origin and normal (size is 1.0 mm in
@@ -226,7 +226,7 @@ namespace mitk {
     * undefined).
     *
     */
-    virtual void InitializePlane( const Point3D& origin, const Vector3D& normal);
+    virtual void InitializePlane(const Point3D& origin, const Vector3D& normal);
 
     /**
     * \brief Initialize plane by right-/down-vector.
@@ -234,15 +234,15 @@ namespace mitk {
     * \warning The vectors are set into the matrix as they are,
     * \em without normalization!
     */
-    void SetMatrixByVectors( const VnlVector& rightVector,
-      const VnlVector& downVector, ScalarType thickness=1.0 );
+    void SetMatrixByVectors(const VnlVector& rightVector,
+      const VnlVector& downVector, ScalarType thickness = 1.0);
 
     /**
     * \brief Change \a transform so that the third column of the
     * transform-martix is perpendicular to the first two columns
     *
     */
-    static void EnsurePerpendicularNormal( AffineTransform3D* transform );
+    static void EnsurePerpendicularNormal(AffineTransform3D* transform);
 
     /**
     * \brief Normal of the plane
@@ -256,20 +256,20 @@ namespace mitk {
     */
     VnlVector GetNormalVnl() const;
 
-    virtual ScalarType SignedDistance( const Point3D& pt3d_mm ) const;
+    virtual ScalarType SignedDistance(const Point3D& pt3d_mm) const;
 
     /**
     * \brief Calculates, whether a point is below or above the plane. There are two different
     *calculation methods, with or without consideration of the bounding box.
     */
-    virtual bool IsAbove( const Point3D& pt3d_mm , bool considerBoundingBox=false) const;
+    virtual bool IsAbove(const Point3D& pt3d_mm, bool considerBoundingBox = false) const;
 
     /**
     * \brief Distance of the point from the plane
     * (bounding-box \em not considered)
     *
     */
-    ScalarType DistanceFromPlane( const Point3D& pt3d_mm ) const ;
+    ScalarType DistanceFromPlane(const Point3D& pt3d_mm) const;
 
     /**
     * \brief Signed distance of the point from the plane
@@ -277,14 +277,14 @@ namespace mitk {
     *
     * > 0 : point is in the direction of the direction vector.
     */
-    inline ScalarType SignedDistanceFromPlane( const Point3D& pt3d_mm ) const
+    inline ScalarType SignedDistanceFromPlane(const Point3D& pt3d_mm) const
     {
       ScalarType len = GetNormalVnl().two_norm();
 
-      if( len == 0 )
+      if (len == 0)
         return 0;
 
-      return (pt3d_mm-GetOrigin())*GetNormal() / len;
+      return (pt3d_mm - GetOrigin())*GetNormal() / len;
     }
 
     /**
@@ -304,9 +304,9 @@ namespace mitk {
     *
     * Result is 0 if planes are not parallel.
     */
-    inline ScalarType SignedDistanceFromPlane( const PlaneGeometry *plane ) const
+    inline ScalarType SignedDistanceFromPlane(const PlaneGeometry *plane) const
     {
-      if(IsParallel(plane))
+      if (IsParallel(plane))
       {
         return SignedDistance(plane->GetOrigin());
       }
@@ -319,7 +319,7 @@ namespace mitk {
     * \return \a true planes are intersecting
     * \return \a false planes do not intersect
     */
-    bool IntersectionLine( const PlaneGeometry *plane, Line3D &crossline ) const;
+    bool IntersectionLine(const PlaneGeometry *plane, Line3D &crossline) const;
 
     /**
     * \brief Calculate two points where another plane intersects the border of this plane
@@ -328,21 +328,21 @@ namespace mitk {
     * is returned in \a lineFrom, second in \a lineTo.
     */
     unsigned int IntersectWithPlane2D(const PlaneGeometry *plane,
-      Point2D &lineFrom, Point2D &lineTo ) const ;
+      Point2D &lineFrom, Point2D &lineTo) const;
 
     /**
     * \brief Calculate the angle between two planes
     *
     * \return angle in radiants
     */
-    double Angle( const PlaneGeometry *plane ) const;
+    double Angle(const PlaneGeometry *plane) const;
 
     /**
     * \brief Calculate the angle between the plane and a line
     *
     * \return angle in radiants
     */
-    double Angle( const Line3D &line ) const;
+    double Angle(const Line3D &line) const;
 
     /**
     * \brief Calculate intersection point between the plane and a line
@@ -351,8 +351,8 @@ namespace mitk {
     * \return \a true if \em unique intersection exists, i.e., if line
     * is \em not on or parallel to the plane
     */
-    bool IntersectionPoint( const Line3D &line,
-      Point3D &intersectionPoint ) const;
+    bool IntersectionPoint(const Line3D &line,
+      Point3D &intersectionPoint) const;
 
     /**
     * \brief Calculate line parameter of intersection point between the
@@ -363,26 +363,26 @@ namespace mitk {
     * \return \a true if \em unique intersection exists, i.e., if line
     * is \em not on or parallel to the plane
     */
-    bool IntersectionPointParam( const Line3D &line, double &t ) const;
+    bool IntersectionPointParam(const Line3D &line, double &t) const;
 
     /**
     * \brief Returns whether the plane is parallel to another plane
     *
     * @return true iff the normal vectors both point to the same or exactly oposit direction
     */
-    bool IsParallel( const PlaneGeometry *plane ) const;
+    bool IsParallel(const PlaneGeometry *plane) const;
 
     /**
     * \brief Returns whether the point is on the plane
     * (bounding-box \em not considered)
     */
-    bool IsOnPlane( const Point3D &point ) const;
+    bool IsOnPlane(const Point3D &point) const;
 
     /**
     * \brief Returns whether the line is on the plane
     * (bounding-box \em not considered)
     */
-    bool IsOnPlane( const Line3D &line ) const;
+    bool IsOnPlane(const Line3D &line) const;
 
     /**
     * \brief Returns whether the plane is on the plane
@@ -392,17 +392,17 @@ namespace mitk {
     *  the distance of the planes is < eps
     *
     */
-    bool IsOnPlane( const PlaneGeometry *plane ) const;
+    bool IsOnPlane(const PlaneGeometry *plane) const;
 
     /**
     * \brief Returns the lot from the point to the plane
     */
-    Point3D ProjectPointOntoPlane( const Point3D &pt ) const;
+    Point3D ProjectPointOntoPlane(const Point3D &pt) const;
 
     virtual itk::LightObject::Pointer InternalClone() const;
 
     /** Implements operation to re-orient the plane */
-    virtual void ExecuteOperation( Operation *operation );
+    virtual void ExecuteOperation(Operation *operation);
 
     /**
     * \brief Project a 3D point given in mm (\a pt3d_mm) onto the 2D
@@ -491,7 +491,7 @@ namespace mitk {
     *
     * \return true projection was possible
     */
-    virtual bool Project( const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
+    virtual bool Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
 
     /**
     * \brief Distance of the point from the geometry
@@ -510,7 +510,7 @@ namespace mitk {
     * This would usually be the BaseGeometry of the underlying dataset, but
     * setting it is optional.
     */
-    void SetReferenceGeometry( mitk::BaseGeometry *geometry );
+    void SetReferenceGeometry(mitk::BaseGeometry *geometry);
 
     /**
     * \brief Get the geometrical frame of reference for this PlaneGeometry.
@@ -525,52 +525,46 @@ namespace mitk {
 
     virtual ~PlaneGeometry();
 
-    virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
-
-    /**
-    * \brief factor to convert x-coordinates from mm to units and vice versa
-    *
-    */
-    mutable mitk::ScalarType m_ScaleFactorMMPerUnitX;
-
-    /**
-    * \brief factor to convert y-coordinates from mm to units and vice versa
-    *
-    */
-    mutable mitk::ScalarType m_ScaleFactorMMPerUnitY;
+    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const;
 
     mitk::BaseGeometry *m_ReferenceGeometry;
 
-
-
-
+    //##Documentation
+    //## @brief PreSetSpacing
+    //##
+    //## These virtual function allows a different beahiour in subclasses.
+    //## Do implement them in every subclass of BaseGeometry. If not needed, use
+    //## {Superclass::PreSetSpacing();};
+    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){ Superclass::PreSetSpacing(aSpacing); };
 
     //##Documentation
-    //## @brief Pre- and Post-functions are empty in BaseGeometry
+    //## @brief CheckBounds
     //##
-    //## These virtual functions allow for a different beahiour in subclasses.
-    //## Do implement them in every subclass. If not needed, use {}.
-    virtual void PostInitialize() {}
-    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * /*newGeometry*/) const {}
-    virtual void PreSetSpacing(const mitk::Vector3D& /*aSpacing*/) {}
+    //## This function is called in SetBounds. Assertions can be implemented in this function (see PlaneGeometry.cpp).
+    //## If you implement this function in a subclass, make sure, that all classes were your class inherits from
+    //## have an implementation of CheckBounds
+    //## (e.g. inheritance BaseGeometry <- A <- B. Implementation of CheckBounds in class B needs implementation in A as well!)
+    virtual void CheckBounds(const BoundsArrayType& bounds);
 
-    virtual void PreSetBounds(const BoundsArrayType& bounds);
-    virtual void PreSetIndexToWorldTransform( AffineTransform3D * transform);
-    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
-    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+    //##Documentation
+    //## @brief CheckIndexToWorldTransform
+    //##
+    //## This function is called in SetIndexToWorldTransform. Assertions can be implemented in this function (see PlaneGeometry.cpp).
+    //## In Subclasses of BaseGeometry, implement own conditions or call Superclass::CheckBounds(bounds);.
+    virtual void CheckIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
   private:
     /**
     * \brief Compares plane with another plane: \a true if IsOnPlane
     * (bounding-box \em not considered)
     */
-    virtual bool operator==( const PlaneGeometry * ) const { return false; };
+    virtual bool operator==(const PlaneGeometry *) const { return false; };
 
     /**
     * \brief Compares plane with another plane: \a false if IsOnPlane
     * (bounding-box \em not considered)
     */
-    virtual bool operator!=( const PlaneGeometry * ) const { return false; };
+    virtual bool operator!=(const PlaneGeometry *) const { return false; };
   };
 } // namespace mitk
 

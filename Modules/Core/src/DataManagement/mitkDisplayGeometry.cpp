@@ -259,8 +259,10 @@ void mitk::DisplayGeometry::Fit()
 
 void mitk::DisplayGeometry::DisplayToWorld(const Point2D &pt_display, Point2D &pt_mm) const
 {
+  //pt_display is in pixel units. It is scaled by the zooming factor and moved by the origin of the image (world geometry).
   pt_mm[0]=m_ScaleFactorMMPerDisplayUnit*pt_display[0]+m_OriginInMM[0];
   pt_mm[1]=m_ScaleFactorMMPerDisplayUnit*pt_display[1]+m_OriginInMM[1];
+  //the result is a 2D vector from the origin of the world geometry to the projection of the requested point onto the first slice.
 }
 
 void mitk::DisplayGeometry::WorldToDisplay(const Point2D &pt_mm, Point2D &pt_display) const
@@ -303,12 +305,14 @@ void mitk::DisplayGeometry::MMToULDisplay(const Vector2D &vec_mm, Vector2D &vec_
   DisplayToULDisplay(vec_ULdisplay, vec_ULdisplay);
 }
 
+//TODO 18735 remove this functions... not needed... can be done directly. Or delete this class...
 void mitk::DisplayGeometry::ULDisplayToDisplay(const Point2D &pt_ULdisplay, Point2D &pt_display) const
 {
   pt_display[0]=pt_ULdisplay[0];
   pt_display[1]=GetDisplayHeight()-pt_ULdisplay[1];
 }
 
+//TODO 18735 remove this functions... not needed... can be done directly. Or delete this class...
 void mitk::DisplayGeometry::DisplayToULDisplay(const Point2D &pt_display, Point2D &pt_ULdisplay) const
 {
   ULDisplayToDisplay(pt_display, pt_ULdisplay);

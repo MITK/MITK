@@ -119,11 +119,11 @@ namespace mitk {
     //## For further information about coordinates types, please see the Geometry documentation
     virtual void WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
-    virtual bool IsAbove(const Point3D& pt3d_mm, bool considerBoundingBox=false) const;
+    virtual bool IsAbove(const Point3D& pt3d_mm, bool considerBoundingBox = false) const;
 
     virtual mitk::ScalarType GetParametricExtentInMM(int direction) const;
 
-  virtual const itk::Transform<mitk::ScalarType, 3, 3>* GetParametricTransform() const;
+    virtual const itk::Transform<mitk::ScalarType, 3, 3>* GetParametricTransform() const;
 
     //##Documentation
     //## @brief Change the parametric bounds to @a oversampling times
@@ -213,19 +213,12 @@ namespace mitk {
     mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
 
     //##Documentation
-    //## @brief Pre- and Post-functions are empty in BaseGeometry
+    //## @brief PreSetSpacing
     //##
-    //## These virtual functions allow for a different beahiour in subclasses.
-    //## Do implement them in every subclass of BaseGeometry. If not needed, use {}.
-    //## If this class is inherited from a subclass of BaseGeometry, call {Superclass::Pre...();};, example: DisplayGeometry class
-    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * newGeometry) const{Superclass::PostInitializeGeometry(newGeometry);};
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){Superclass::PreSetSpacing(aSpacing);};
-    virtual void PreSetBounds( const BoundingBox::BoundsArrayType &bounds ){Superclass::PreSetBounds(bounds);};
-    virtual void PreSetIndexToWorldTransform( AffineTransform3D *transform){Superclass::PreSetIndexToWorldTransform(transform);};
-    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM){Superclass::PostSetExtentInMM(direction,extentInMM);};
-    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform){Superclass::PostSetIndexToWorldTransform(transform);};
-
-    virtual void PostInitialize();
+    //## These virtual function allows a different beahiour in subclasses.
+    //## Do implement them in every subclass of BaseGeometry. If not needed, use
+    //## {Superclass::PreSetSpacing();};
+    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){ Superclass::PreSetSpacing(aSpacing); };
   };
 } // namespace mitk
 #endif /* MITKVTKABSTRACTTRANSFORMPLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */

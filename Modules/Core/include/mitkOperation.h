@@ -31,6 +31,8 @@ typedef int OperationType ;
 class MITKCORE_EXPORT Operation
 {
 public:
+  itkTypeMacroNoParent(Operation)
+
   //##Documentation
   //## Constructor
   Operation(OperationType operationType);

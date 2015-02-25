@@ -34,7 +34,7 @@ class MITKCORE_EXPORT ModeOperation : public Operation
 public:
   typedef Interactor::ModeType ModeType;
 
-  mitkClassMacro(ModeOperation, Operation);
+  mitkClassMacro(ModeOperation, Operation)
   //##Documentation
   //## Constructor
   ModeOperation(OperationType operationType, ModeType mode);

@@ -746,9 +746,14 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
   }
 
   m_AnnotationOverlay->SetText( name );
-  m_AnnotationOverlay->SetColor( m_AnnotationColor[lineDisplayMode][0],
-                                 m_AnnotationColor[lineDisplayMode][1],
-                                 m_AnnotationColor[lineDisplayMode][2] );
+
+  /*
+  m_AnnotationOverlay->SetColor( m_LineColor[lineDisplayMode][0],
+                                 m_LineColor[lineDisplayMode][1],
+                                 m_LineColor[lineDisplayMode][2] );
+                                 */
+  m_AnnotationOverlay->SetColor(1, 1, 0);
+
   m_AnnotationOverlay->SetOpacity( globalOpacity );
   m_AnnotationOverlay->SetFontSize( m_AnnotationSize*m_DevicePixelRatio );
   m_AnnotationOverlay->SetBoolProperty( "drawShadow", m_AnnotationsShadow );
@@ -774,7 +779,6 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
   m_AnnotationOverlay->Paint( renderer );
   annotationOffset -= 15.0;
 //  annotationOffset -= m_AnnotationOverlay->GetBoundsOnDisplay( renderer ).Size[1];
-
 }
 
 void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * planarFigure,

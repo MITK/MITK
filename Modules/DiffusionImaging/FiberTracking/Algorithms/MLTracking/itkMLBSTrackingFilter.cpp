@@ -460,7 +460,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
         {
             direction += tempDir*prob;
         }
-        else if (candidates==0) // out of white matter
+        else if (candidates==0 && olddir.magnitude()>0) // out of white matter
         {
             vnl_vector_fixed<double,3> normProbe = -probe; normProbe.normalize();
             double dot = dot_product(normProbe, olddir);
@@ -537,10 +537,9 @@ double MLBSTrackingFilter< NumImageFeatures >::FollowStreamline(ThreadIdType thr
             else
                 fib->push_back(pos);
 
-            int curv = CheckCurvature(fib, front);  // TODO: Move into classification
+            int curv = CheckCurvature(fib, front);  // TODO: Move into classification ???
             if (curv>0)
             {
-                MITK_INFO << "CURVTHRES!!!";
                 tractLength -= m_StepSize*curv;
                 while (curv>0)
                 {
@@ -694,10 +693,31 @@ void MLBSTrackingFilter< NumImageFeatures >::ThreadedGenerateData(const InputIma
             // forward tracking
             tractLength = FollowStreamline(threadId, worldPos, dir, &fib, 0, false);
             fib.push_front(worldPos);
+            {
+                itk::Point<double> check = fib.back();
+                dirOld.fill(0.0);
+                vnl_vector_fixed<double,3> check2 = GetNewDirection(check, dirOld);
+                if (check2.magnitude()>0.001)
+                {
+                    MITK_INFO << "Detected WM ending. Discarding fiber.";
+                    continue;
+                }
+            }
 
             // backward tracking
             tractLength = FollowStreamline(threadId, worldPos, -dir, &fib, tractLength, true);
             counter = fib.size();
+
+            {
+                itk::Point<double> check = fib.front();
+                dirOld.fill(0.0);
+                vnl_vector_fixed<double,3> check2 = GetNewDirection(check, dirOld);
+                if (check2.magnitude()>0.001)
+                {
+                    MITK_INFO << "Detected WM ending. Discarding fiber.";
+                    continue;
+                }
+            }
 
             if (tractLength<m_MinTractLength || counter<2)
                 continue;

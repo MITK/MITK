@@ -99,7 +99,7 @@ if(MITK_USE_SimpleITK)
 
       ExternalProject_Add_Step(${proj} sitk_python_install_step
         COMMAND ${PYTHON_EXECUTABLE} setup.py install --prefix=${_install_dir}
-        DEPENDEES build
+        DEPENDEES install
         WORKING_DIRECTORY ${_sitk_build_dir}/Wrapping/PythonPackage
       )
     endif()

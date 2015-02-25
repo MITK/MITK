@@ -14,6 +14,41 @@ from scipy.stats import norm
 
 nrSimulations = 10000
 
+# number of photons for one MC simulation run
+photons = 1 * 10**6
+
+# the wavelengths [m] for which the reflectance spectrum shall be evaluated
+#wavelengths = np.linspace(470,700,23) * 10**-9
+wavelengths = np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10**-9
+
+# The full width at half maximum [m] of the used imaging systems filters
+FWHM = 20 * 10**-9
+
+print('create reference data...')
+#reference data
+
+# table with wavelength at 1st row,
+# HbO2 molar extinction coefficient [cm**-1/(moles/l)] at 2nd row,
+# Hb molar extinction coefficient [cm**-1/(moles/l)] at 3rd row
+haemoLUT = np.loadtxt("data/haemoglobin.txt", skiprows=2)
+# we calculate everything in [m] instead of [nm] and [1/cm]
+haemoLUT[:,0]   = haemoLUT[:,0] * 10**-9
+haemoLUT[:,1:] = haemoLUT[:,1:] * 10**2
+# to account for the FWHM of the used filters, compute convolution
+# see http://en.wikipedia.org/wiki/Full_width_at_half_maximum
+filterResponse = norm(loc = 0, scale = FWHM / 2.355)
+# parse at 20 locations
+x = np.linspace(filterResponse.ppf(0.01),
+               filterResponse.ppf(0.99), 20)
+filterResponse_table = filterResponse.pdf(x)
+# TODO verify if this normalization is correct!
+filterResponse_table = filterResponse_table / sum(filterResponse_table)
+haemoLUT[:, 1] = np.convolve(haemoLUT[:, 1], filterResponse_table, 'same')
+haemoLUT[:, 2] = np.convolve(haemoLUT[:, 2], filterResponse_table, 'same')
+
+eHbO2 = interp1d(haemoLUT[:,0], haemoLUT[:,1])
+eHb   = interp1d(haemoLUT[:,0], haemoLUT[:,2])
+
 
 def noisy():
     #%% intialization
@@ -37,39 +72,10 @@ def noisy():
     # radius of scattering particles [m]
     samplesR = 1
     rs   = np.linspace(0.4 * 10**-6, 0.4 * 10**-6, samplesR)
-    # number of photons for one MC simulation run
-    photons = 1 * 10**6
-    # the wavelengths [m] for which the reflectance spectrum shall be evaluated
-    #wavelengths = np.linspace(470,700,23) * 10**-9
-    wavelengths = np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10**-9
 
-    # The full width at half maximum [m] of the used imaging systems filters
-    FWHM = 20 * 10**-9
 
-    print('create reference data...')
-    #reference data
 
-    # table with wavelength at 1st row,
-    # HbO2 molar extinction coefficient [cm**-1/(moles/l)] at 2nd row,
-    # Hb molar extinction coefficient [cm**-1/(moles/l)] at 3rd row
-    haemoLUT = np.loadtxt("data/haemoglobin.txt", skiprows=2)
-    # we calculate everything in [m] instead of [nm] and [1/cm]
-    haemoLUT[:,0]   = haemoLUT[:,0] * 10**-9
-    haemoLUT[:,1:] = haemoLUT[:,1:] * 10**2
-    # to account for the FWHM of the used filters, compute convolution
-    # see http://en.wikipedia.org/wiki/Full_width_at_half_maximum
-    filterResponse = norm(loc = 0, scale = FWHM / 2.355)
-    # parse at 20 locations
-    x = np.linspace(filterResponse.ppf(0.01),
-                   filterResponse.ppf(0.99), 20)
-    filterResponse_table = filterResponse.pdf(x)
-    # TODO verify if this normalization is correct!
-    filterResponse_table = filterResponse_table / sum(filterResponse_table)
-    haemoLUT[:, 1] = np.convolve(haemoLUT[:, 1], filterResponse_table, 'same')
-    haemoLUT[:, 2] = np.convolve(haemoLUT[:, 2], filterResponse_table, 'same')
 
-    eHbO2 = interp1d(haemoLUT[:,0], haemoLUT[:,1])
-    eHb   = interp1d(haemoLUT[:,0], haemoLUT[:,2])
 
 
     nrSamples    = samplesBVF * samplesD * samplesR * samplesSaO2 * samplesVs
@@ -101,11 +107,6 @@ def perfect():
     # radius of scattering particles [m]
     samplesR = 1
     rs   = np.linspace(0.4 * 10**-6, 0.4 * 10**-6, samplesR)
-    # number of photons for one MC simulation run
-    photons = 1 * 10**6
-    # the wavelengths [m] for which the reflectance spectrum shall be evaluated
-    #wavelengths = np.linspace(470,700,23) * 10**-9
-    wavelengths = np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10**-9
 
     # The full width at half maximum [m] of the used imaging systems filters
     FWHM = 20 * 10**-9

@@ -32,7 +32,7 @@ print("error distribution BVF, Volume fraction")
 print("median: " + str(np.median(testingErrors, axis=0)))
 print("lower quartile: " + str(np.percentile(testingErrors, 25, axis=0)))
 print("higher quartile: " + str(np.percentile(testingErrors, 75, axis=0)))
-
+print("r2Score", str(r2Score))
 
 #print("result of random forest with parameters: " + str(best_rf.best_params_))
 # predict test reflectances and get absolute errors.

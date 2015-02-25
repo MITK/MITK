@@ -12,6 +12,7 @@ from sklearn.ensemble         import RandomForestRegressor
 from sklearn.grid_search      import GridSearchCV
 from sklearn.cross_validation import KFold
 
+from sklearn import decomposition
 
 
 
@@ -26,24 +27,30 @@ def randomForest(trainingParameters, trainingReflectances, trainingWeights, test
 
     start = time.time()
 
+    # transform data with pca (test)
+    pca = decomposition.PCA(n_components=trainingReflectances.shape[1])
+    pca.fit(trainingReflectances)
+    trainingReflectances = pca.transform(trainingReflectances)
+    testReflectances     = pca.transform(testReflectances)
+
     # get best forest using k-fold cross validation and grid search
     # outcommented for now because it takes to long for quick tests
 
-    #kf = KFold(trainingReflectances.shape[0], 5, shuffle=True)
-    #param_grid = [
-    #  {'max_depth': np.arange(2,20,1), 'n_estimators': np.arange(10,1000,10)}]
+    kf = KFold(trainingReflectances.shape[0], 5, shuffle=True)
+    param_grid = [
+      {'max_depth': np.arange(2,40,1), 'n_estimators': np.logspace(1,11,11,base=2).astype(int)}]
 
-    #rf = GridSearchCV(RandomForestRegressor(50, max_depth=8), param_grid, cv=kf, n_jobs=11)
-    #rf.fit(trainingReflectances, trainingParameters)
+    rf = GridSearchCV(RandomForestRegressor(50, max_depth=8), param_grid, cv=kf, n_jobs=11)
+    rf.fit(trainingReflectances, trainingParameters)
 
 
-    #end = time.time()
-    #print "time necessary to train the forest [s]: " + str((end - start))
+    end = time.time()
+    print "time necessary to train the forest [s]: " + str((end - start))
 
     # train a baseline forest
 
-    rf = RandomForestRegressor(100, max_depth=10, n_jobs=5)
-    rf.fit(testReflectances, testParameters)
+    #rf = RandomForestRegressor(100, max_depth=10, n_jobs=5)
+    #rf.fit(testReflectances, testParameters)
 
     #with open("iris.dot", 'w') as f:
     #    f = tree.export_graphviz(rf, out_file=f)

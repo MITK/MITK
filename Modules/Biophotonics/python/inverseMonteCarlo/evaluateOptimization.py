@@ -18,7 +18,7 @@ dataFolder = "data/output/"
 trainingParameters, trainingReflectances, testParameters, testReflectances = \
     data.perfect(dataFolder)
 
-testingErrors = optimization(trainingParameters, trainingReflectances, testParameters, testReflectances)
+testingErrors, r2Score = optimization(trainingParameters, trainingReflectances, testParameters, testReflectances)
 
 #%% test
 
@@ -26,3 +26,4 @@ print("error distribution BVF, Volume fraction")
 print("median: " + str(np.median(testingErrors, axis=0)))
 print("lower quartile: " + str(np.percentile(testingErrors, 25, axis=0)))
 print("higher quartile: " + str(np.percentile(testingErrors, 75, axis=0)))
+print("r2Score", str(r2Score))

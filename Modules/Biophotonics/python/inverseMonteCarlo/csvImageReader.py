@@ -49,7 +49,7 @@ def csvImageReader(csvFilename):
     return (resultShape, reflectances)
 
 
-def csvMultiSpectralImageReader(csvFilename, maskname = "trainmask"):
+def csvMultiSpectralImageReader(csvFilename):
     """
     read an image and correct it by its dark and flatfield image.
     dark and flatfield image are expected to have the same name
@@ -57,26 +57,28 @@ def csvMultiSpectralImageReader(csvFilename, maskname = "trainmask"):
     _dark
     _flatfield
     Also returns the segmentation of the multispectral image, expecting
-    the suffix:
-    _segmentation
+    the suffixes:
+    _trainsegmentation
+    _testsegmentation
     Segmentation will have value > 0 if pixel is segmented, 0 otherwise.
     """
 
     shape, reflectances = csvImageReader(csvFilename)
     dummy, dark         = csvImageReader(csvFilename + "_dark")
     dummy, flatfield    = csvImageReader(csvFilename + "_flatfield")
-    dummy, segmentation = csvImageReader(csvFilename + maskname)
+    dummy, trainsegmentation = csvImageReader(csvFilename + "_trainsegmentation")
+    dummy, testsegmentation =csvImageReader(csvFilename + "_testsegmentation")
 
     correctedReflectances = (reflectances - dark) / (flatfield - dark)
 
-    return (shape, correctedReflectances, segmentation)
+    return (shape, correctedReflectances, trainsegmentation, testsegmentation)
 
 
 if __name__ == "__main__":
 
     #%% load images
     shape, reflectances = csvImageReader("data/output/sample_0")
-    shape, correctedReflectances, segmentation = csvMultiSpectralImageReader("data/output/sample_0")
+    shape, correctedReflectances, trainseg, testseg = csvMultiSpectralImageReader("data/output/sample_0")
 
     #%% save again
 

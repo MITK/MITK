@@ -28,15 +28,13 @@ def perfect(dataFolder):
 
 
 def noisy(dataFolder):
-    # these are still perfect, switch out as soon as noisy training data is available.
     trainingParameters   = np.load(dataFolder + "2015February2208:16PMNoisyRandomTraining10000parameters.npy")
-    trainingParameters   = trainingParameters[:,0:2] # only BVF and Vs for perfect data simulations
+    trainingParameters   = trainingParameters[:,0:4]
     trainingReflectances = np.load(dataFolder + "2015February2208:16PMNoisyRandomTrainingreflectances1000000photons.npy")
     trainingReflectances = mch.normalizeImageQuotient(trainingReflectances)
 
-    # currently testing and training data is switched TODO switch this.
     testParameters   = np.load(dataFolder + "2015February2301:23AMNoisyRandomTesting10000parameters.npy")
-    testParameters   = testParameters[:,0:2] # only BVF and Vs for perfect data simulations
+    testParameters   = testParameters[:,0:4]
     testReflectances = np.load(dataFolder + "2015February2301:23AMNoisyRandomTestingreflectances1000000photons.npy")
     testReflectances = mch.normalizeImageQuotient(testReflectances)
 
@@ -56,21 +54,13 @@ def realImageEstimationRFTrainingData(dataFolder):
 def logisticRegressionArtificialData(dataFolder):
     uniformReflectances = np.load(dataFolder + "2015February1704:00PMreflectancesRandom1000000photons.npy")
     uniformReflectances = mch.normalizeImageQuotient(uniformReflectances)
-    labelsUniform = np.zeros(uniformReflectances.shape[0])
 
     gaussReflectances = np.load(dataFolder + "2015February1908:54AMnonUniformRandomTrainingDatareflectances1000000photons.npy")
     gaussReflectances = mch.normalizeImageQuotient(gaussReflectances)
-    labelsGauss   = np.ones(gaussReflectances.shape[0])
-
-    testReflectancesUniform = np.load(dataFolder + "2015February1702:02AMuniformRandomTestingData1000000photons.npy")
-    testReflectancesUniform = mch.normalizeImageQuotient(testReflectancesUniform)
-    labelsTestUniform = np.zeros(testReflectancesUniform.shape[0])
-
 
     testReflectancesGauss = np.load(dataFolder + "2015February1908:57AMnonUniformRandomTestingDatareflectances1000000photons.npy")
     testReflectancesGauss = mch.normalizeImageQuotient(testReflectancesGauss)
-    labelsTestGauss = np.ones(testReflectancesGauss.shape[0])
 
 
-    return uniformReflectances, labelsUniform, gaussReflectances, labelsGauss, testReflectancesUniform, labelsTestUniform, testReflectancesGauss, labelsTestGauss
+    return uniformReflectances, gaussReflectances, testReflectancesGauss
 

@@ -12,6 +12,7 @@ from scipy.optimize       import minimize
 from reflectanceError     import ReflectanceError
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib           import cm
+from sklearn.metrics      import r2_score
 
 from setup import data
 
@@ -37,7 +38,8 @@ def optimization(trainingParameters, trainingReflectances, testParameters, testR
 
     #%% do optimization
 
-    absErrors = np.zeros_like(testParameters)
+    estimatedParameters = np.zeros_like(testParameters)
+    absErrors           = np.zeros_like(testParameters)
 
 
     for idx, (testParameter, testReflectance) in enumerate(zip(testParameters, testReflectances)):
@@ -46,9 +48,13 @@ def optimization(trainingParameters, trainingReflectances, testParameters, testR
         # interpolation extrapolates with constant values. We just crop it to the bounds
         clippedX= np.clip(minimization.x, [min(BVFs), min(Vss)], [max(BVFs), max(Vss)])
 
-        absErrors[idx,:] = np.abs(clippedX - testParameter)
+        estimatedParameters[idx, :] = clippedX
+        absErrors[idx,:]            = np.abs(clippedX - testParameter)
 
-    return absErrors
+
+    r2Score = r2_score(testParameters, estimatedParameters)
+
+    return absErrors, r2Score
 
 
 

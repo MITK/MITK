@@ -26,38 +26,44 @@ from setup import data
 dataFolder = 'data/output/'
 
 # load data
-uniformReflectances, labelsUniform, gaussReflectances, labelsGauss, \
-    testReflectancesUniform, labelsTestUniform, testReflectancesGauss, labelsTestGauss = \
+sourceReflectances, labelsUniform, targetReflectances, labelsGauss, \
+    testReflectancesGauss = \
     data.logisticRegressionArtificialData(dataFolder)
 
+def calculateWeights(sourceReflectances, targetReflectances):
 
-allReflectances = np.concatenate((uniformReflectances, gaussReflectances))
-allLabels       = np.concatenate((labelsUniform, labelsGauss))
+    labelsSource = np.zeros(sourceReflectances.shape[0])
+    labelsTarget = np.ones(targetReflectances.shape[0])
 
-
-# train logistic regression
-
-start = time.time()
-
-#lr = LogisticRegression()
+    allReflectances = np.concatenate((sourceReflectances, targetReflectances))
+    allLabels       = np.concatenate((labelsSource, labelsTarget))
 
 
-kf = KFold(allReflectances.shape[0], 2, shuffle=True)
-# todo include intercept scaling paramter
-param_grid = [
-  {'C': np.logspace(-3,6,1000), 'fit_intercept':['True', 'False']} ]
+    # train logistic regression
 
-best_lr = GridSearchCV(LogisticRegression(), param_grid, cv=kf, n_jobs=11)
+    start = time.time()
 
-best_lr.fit(allReflectances, allLabels)
+    kf = KFold(allReflectances.shape[0], 5, shuffle=True)
+    # todo include intercept scaling paramter
+    param_grid = [
+      {'C': np.logspace(-3,6,1000), 'fit_intercept':['True', 'False']} ]
 
-end = time.time()
-print "time necessary to train the logistic regression [s]: " + str((end - start))
+    best_lr = GridSearchCV(LogisticRegression(), param_grid, cv=kf, n_jobs=11)
+
+    best_lr.fit(allReflectances, allLabels)
+
+    end = time.time()
+    print "time necessary to train the logistic regression [s]: " + str((end - start))
+
+    sourceWeights = best_lr.predict(sourceReflectances)
+
+    sourceWeights = sourceWeights
+
+    return sourceWeights[:,1] / sourceWeights[:,0]
+
+    #%% test
 
 
-#%% test
-
-
-print "score for uniform test:", best_lr.score(testReflectancesUniform, labelsTestUniform)
-print "score for gauss test  :", best_lr.score(testReflectancesGauss, labelsTestGauss)
+    #print "score for uniform test:", best_lr.score(testReflectancesUniform, labelsTestUniform)
+    #print "score for gauss test  :", best_lr.score(testReflectancesGauss, labelsTestGauss)
 

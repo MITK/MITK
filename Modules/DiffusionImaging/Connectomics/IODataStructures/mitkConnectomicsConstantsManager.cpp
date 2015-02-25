@@ -49,6 +49,7 @@ const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH = "-";
 const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS = "Connectomics";
 const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS_CREATION = "Connectomics Creation";
 const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_SELECTION_WARNING = "Please load and select exactly one parcellation image and one fiber image before starting network creation.";
+const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING = "Please load and select either only one time series image or one parcellation image and one time series image before starting correlation analysis.";
 const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING = "Please load and select one parcellation image.";
 const char* mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_PERFORMING_IMAGE_PROCESSING_FOR_IMAGE = "Performing image processing for image ";
 

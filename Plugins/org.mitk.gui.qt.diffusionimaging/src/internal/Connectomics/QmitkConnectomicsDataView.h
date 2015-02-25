@@ -66,6 +66,9 @@ public:
     /// \brief Adjust parameters depending on synthetic network type
     void OnSyntheticNetworkComboBoxCurrentIndexChanged(int currentIndex);
 
+    /// \brief Create #voxel x #voxel correlation matrix of a timeseries image
+    void OnCreateCorrelationMatrixPushButtonClicked();
+
 protected:
 
   // ####### Functions #######
@@ -79,6 +82,11 @@ protected:
   /// \brief Wipe display and empty statistics
   void WipeDisplay();
 
+  template< typename TPixel, unsigned int VImageDimension >
+  void DoWholeCorrelation( itk::Image<TPixel, VImageDimension>* itkTimeSeriesImage );
+
+  template< typename TPixel, unsigned int VImageDimension >
+  void DoParcelCorrelation( itk::Image<TPixel, VImageDimension>* itkTimeSeriesImage, mitk::Image::Pointer parcelImage );
 
   // ####### Variables #######
 

@@ -67,8 +67,8 @@ namespace mitk {
   public:
     mitkClassMacro(SlicedGeometry3D, BaseGeometry)
 
-    /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self)
+      /** Method for creation through the object factory. */
+      itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
       /**
@@ -92,42 +92,40 @@ namespace mitk {
       * \sa itk::DataObject::CopyInformation() and
       * \sa itk::DataObject::UpdateOutputInformation().
       */
-      virtual mitk::PlaneGeometry* GetPlaneGeometry( int s ) const;
-        /**
-    * \deprecatedSince{2014_10} Please use GetPlaneGeometry
-    */
-    DEPRECATED(const PlaneGeometry* GetGeometry2D(int s)){return GetPlaneGeometry(s);}
-
+      virtual mitk::PlaneGeometry* GetPlaneGeometry(int s) const;
+    /**
+* \deprecatedSince{2014_10} Please use GetPlaneGeometry
+*/
+    DEPRECATED(const PlaneGeometry* GetGeometry2D(int s)){ return GetPlaneGeometry(s); }
 
     /**
     * \deprecatedSince{2014_10} Please use SetPlaneGeometry
     */
-    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo, int s)){SetPlaneGeometry(geo, s);}
+    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo, int s)){ SetPlaneGeometry(geo, s); }
 
     //##Documentation
     //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
-    virtual void ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry );
+    virtual void ChangeImageGeometryConsideringOriginOffset(const bool isAnImageGeometry);
 
-  //virtual void SetTimeBounds( const mitk::TimeBounds& timebounds );
+    //virtual void SetTimeBounds( const mitk::TimeBounds& timebounds );
     virtual const mitk::BoundingBox* GetBoundingBox() const;
 
     /**
     * \brief Get the number of slices
     */
-    itkGetConstMacro( Slices, unsigned int )
+    itkGetConstMacro(Slices, unsigned int)
 
-    /**
-    * \brief Set PlaneGeometry of slice \a s.
-    */
-    virtual bool SetPlaneGeometry( mitk::PlaneGeometry *geometry2D, int s );
-
+      /**
+      * \brief Set PlaneGeometry of slice \a s.
+      */
+      virtual bool SetPlaneGeometry(mitk::PlaneGeometry *geometry2D, int s);
 
     /**
     * \brief Check whether a slice exists
     */
-    virtual bool IsValidSlice( int s = 0 ) const;
+    virtual bool IsValidSlice(int s = 0) const;
 
-    virtual void SetReferenceGeometry( BaseGeometry *referenceGeometry );
+    virtual void SetReferenceGeometry(BaseGeometry *referenceGeometry);
 
     /**
     * \brief Set the SliceNavigationController corresponding to this sliced
@@ -137,7 +135,7 @@ namespace mitk {
     * changes, which can occur whenthe slices are re-oriented by rotation.
     */
     virtual void SetSliceNavigationController(
-      mitk::SliceNavigationController *snc );
+      mitk::SliceNavigationController *snc);
     mitk::SliceNavigationController *GetSliceNavigationController();
 
     /**
@@ -154,7 +152,7 @@ namespace mitk {
     */
     itkGetConstMacro(EvenlySpaced, bool)
 
-    virtual void SetEvenlySpaced(bool on = true);
+      virtual void SetEvenlySpaced(bool on = true);
 
     /**
     * \brief Set/Get the vector between slices for the evenly-spaced case
@@ -169,7 +167,7 @@ namespace mitk {
     virtual void SetDirectionVector(const mitk::Vector3D& directionVector);
     itkGetConstMacro(DirectionVector, const mitk::Vector3D&)
 
-    virtual itk::LightObject::Pointer InternalClone() const;
+      virtual itk::LightObject::Pointer InternalClone() const;
 
     static const std::string SLICES;
     const static std::string DIRECTION_VECTOR;
@@ -183,7 +181,7 @@ namespace mitk {
     * \warning Bounding box and the 2D-geometries must be set additionally: use
     * SetBounds(), SetGeometry().
     */
-    virtual void InitializeSlicedGeometry( unsigned int slices );
+    virtual void InitializeSlicedGeometry(unsigned int slices);
 
     /**
     * \brief Completely initialize this instance as evenly-spaced with slices
@@ -193,8 +191,8 @@ namespace mitk {
     * Initializes the bounding box according to the width/height of the
     * PlaneGeometry and \a slices. The spacing is calculated from the PlaneGeometry.
     */
-    virtual void InitializeEvenlySpaced( mitk::PlaneGeometry *geometry2D,
-      unsigned int slices, bool flipped=false );
+    virtual void InitializeEvenlySpaced(mitk::PlaneGeometry *geometry2D,
+      unsigned int slices, bool flipped = false);
 
     /**
     * \brief Completely initialize this instance as evenly-spaced with slices
@@ -205,8 +203,8 @@ namespace mitk {
     * PlaneGeometry and \a slices. The x-/y-spacing is calculated from the
     * PlaneGeometry.
     */
-    virtual void InitializeEvenlySpaced( mitk::PlaneGeometry *geometry2D,
-      mitk::ScalarType zSpacing, unsigned int slices, bool flipped=false );
+    virtual void InitializeEvenlySpaced(mitk::PlaneGeometry *geometry2D,
+      mitk::ScalarType zSpacing, unsigned int slices, bool flipped = false);
 
     /**
     * \brief Completely initialize this instance as evenly-spaced plane slices
@@ -226,15 +224,15 @@ namespace mitk {
     * \param rotate rotates the plane by 180 degree around its normal (the
     * definition of rotated vs not rotated is somewhat arbitrary)
     */
-    virtual void InitializePlanes( const mitk::BaseGeometry *geometry3D,
-      mitk::PlaneGeometry::PlaneOrientation planeorientation, bool top=true,
-      bool frontside=true, bool rotated=false );
+    virtual void InitializePlanes(const mitk::BaseGeometry *geometry3D,
+      mitk::PlaneGeometry::PlaneOrientation planeorientation, bool top = true,
+      bool frontside = true, bool rotated = false);
 
     virtual void SetImageGeometry(const bool isAnImageGeometry);
 
     virtual void ExecuteOperation(Operation* operation);
 
-    static double CalculateSpacing( const mitk::Vector3D spacing, const mitk::Vector3D &d );
+    static double CalculateSpacing(const mitk::Vector3D spacing, const mitk::Vector3D &d);
 
   protected:
     SlicedGeometry3D();
@@ -256,10 +254,10 @@ namespace mitk {
     *    ensure this touching. Usually, the reference point would be the
     *    point around which the geometry is rotated.
     */
-    virtual void ReinitializePlanes( const Point3D &center,
-      const Point3D &referencePoint );
+    virtual void ReinitializePlanes(const Point3D &center,
+      const Point3D &referencePoint);
 
-    ScalarType GetLargestExtent( const BaseGeometry *geometry );
+    ScalarType GetLargestExtent(const BaseGeometry *geometry);
 
     void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
@@ -267,13 +265,13 @@ namespace mitk {
     * non-orthogonal to the coordinate axes. This is done via the
     * ellipsoid equation.
     */
-    double CalculateSpacing( const mitk::Vector3D &direction ) const;
+    double CalculateSpacing(const mitk::Vector3D &direction) const;
 
     /** The extent of the slice stack, i.e. the number of slices, depends on the
     * plane normal. For rotated geometries, the geometry's transform needs to
     * be accounted in this calculation.
     */
-    mitk::Vector3D AdjustNormal( const mitk::Vector3D &normal ) const;
+    mitk::Vector3D AdjustNormal(const mitk::Vector3D &normal) const;
 
     /**
     * Container for the 2D-geometries contained within this SliceGeometry3D.
@@ -310,25 +308,13 @@ namespace mitk {
     //mitk::NavigationController *m_NavigationController;
     mitk::SliceNavigationController *m_SliceNavigationController;
 
-
-
-    /**
-     * @brief Pre- and Post-functions are empty in BaseGeometry
-     *
-     * These virtual functions allow for a different beahiour in subclasses.
-     * Do implement them in every subclass. If not needed, use {}.
-     */
-    virtual void PostInitialize() {}
-    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * /*newGeometry*/) const {}
-    virtual void PostSetExtentInMM(int /*direction*/, ScalarType /*extentInMM*/) {}
-    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* /*transform*/) {}
-    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* /*transform*/) {}
-    virtual void PreSetBounds(const BoundsArrayType& /*bounds*/) {}
-
-    /**
-    * \brief Set the spacing (m_Spacing), in direction of the plane normal.
-    */
-    virtual void PreSetSpacing( const mitk::Vector3D &aSpacing );
+    //##Documentation
+    //## @brief PreSetSpacing
+    //##
+    //## These virtual function allows a different beahiour in subclasses.
+    //## Do implement them in every subclass of BaseGeometry. If not needed, use
+    //## {Superclass::PreSetSpacing();};
+    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing);
   };
 } // namespace mitk
 

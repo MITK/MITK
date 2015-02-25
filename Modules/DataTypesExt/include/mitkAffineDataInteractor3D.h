@@ -88,7 +88,7 @@ protected:
 
 private:
 
-  double m_InitialPickedWorldPoint[4];
+  Point3D m_InitialPickedWorldPoint;
   Point2D m_InitialPickedDisplayPoint;
 
   Geometry3D::Pointer m_OriginalGeometry;

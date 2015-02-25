@@ -75,6 +75,7 @@ set(H_FILES
   Algorithms/BrainParcellation/mitkRandomParcellationGenerator.h
   Algorithms/BrainParcellation/mitkRegionVoxelCounter.h
   Algorithms/mitkFreeSurferParcellationTranslator.h
+  Algorithms/mitkCorrelationCalculator.h
 )
 
 

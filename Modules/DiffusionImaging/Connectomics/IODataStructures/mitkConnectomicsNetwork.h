@@ -223,7 +223,7 @@ namespace mitk {
   /**
   * \brief Returns true if the networks are considered equal.
   *
-  * For now two networks are considered equal if they have the following properties are equal:
+  * For now two networks are considered equal if they are equal in the following properties:
   * - Number of nodes
   * - Number of edges
   * - Smallworldness

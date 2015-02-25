@@ -18,7 +18,6 @@ SET(UI_FILES
 
 SET(MOC_H_FILES
   src/internal/mitkPluginActivator.h
-  src/internal/mitkTubeGraphDefaultLabelGroups.h
   src/internal/QmitkTubeGraphView.h
   src/internal/QmitkTubeGraphLabelWidget.h
   src/internal/QmitkTubeGraphLabelGroupWidget.h

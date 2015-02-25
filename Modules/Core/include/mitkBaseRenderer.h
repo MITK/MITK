@@ -543,7 +543,7 @@ namespace mitk
     void UpdateOverlays();
 
   private:
-    //TODO 18735: Warum gibt es drei weltgeometrien + welt plane? Warum sollte sie laut Kommentar const sein?!
+    //TODO 18735: Why are there three world geometries and a world plane? Why should they be const and are not (see comment below)?
     //##Documentation
     //## Pointer to the worldgeometry, describing the maximal area to be rendered
     //## (3D as well as 2D).
@@ -551,7 +551,7 @@ namespace mitk
     //## directly from the geometry of an image-slice and thus it would be
     //## very strange when suddenly the image-slice changes its geometry).
     //## \sa SetWorldGeometry
-    //TODO 18735: Kann gelöscht werden, weil er nie verwendet wird (außer QmtikSlicesInterpolator (falsch verwendet, code kann nie erreicht werden, bug?))
+    //TODO 18735: can be deleted, because it is not used (except QmtikSlicesInterpolator, but this usage is wrong and the code cannot be reached. bug?).
     BaseGeometry::Pointer m_WorldGeometry;
 
     itk::SmartPointer<OverlayManager> m_OverlayManager;

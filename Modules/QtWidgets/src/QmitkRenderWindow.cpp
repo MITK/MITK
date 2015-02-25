@@ -104,7 +104,7 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
   //Get mouse position in vtk display coordinate system. me contains qt display infos...
   mitk::Point2D displayPos = GetMousePosition(me);
   //Transform 2D coordinates in 3D world position. Used transform comes from TODO 18735
-  //TODO 10735: ersetze Methode mit disp...
+  //TODO 18735: replace this method call by displayPos (see above)
   mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
   //worldPos is the 3D vector from the origin of the world to the requested point.
 

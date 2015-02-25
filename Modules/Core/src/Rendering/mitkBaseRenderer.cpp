@@ -550,7 +550,7 @@ void mitk::BaseRenderer::SetWorldGeometry3D(mitk::BaseGeometry* geometry)
     itkWarningMacro("m_CurrentWorldPlaneGeometry is NULL");
 }
 
-//TODO 18735: Diese Funktion wird nie verwendet. Löschen!!!! Und dumm ist sie auch. Display Geometry sollte nie geändert werden...
+//TODO 18735: This function is not used. Delete it. And it is stupid. The display geometry should not be changed....
 void mitk::BaseRenderer::SetDisplayGeometry(mitk::DisplayGeometry* geometry2d)
 {
   itkDebugMacro("setting DisplayGeometry to " << geometry2d);

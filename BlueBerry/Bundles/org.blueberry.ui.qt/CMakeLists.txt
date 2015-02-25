@@ -5,7 +5,6 @@ set(PLUGIN_exported_include_suffixes
   src/actions
   src/application
   src/commands
-  src/dialogs
   src/guitk
   src/handlers
   src/intro

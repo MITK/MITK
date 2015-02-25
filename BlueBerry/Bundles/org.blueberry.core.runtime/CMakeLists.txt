@@ -3,7 +3,7 @@ project(org_blueberry_core_runtime)
 set(QT_USE_QTXML 1)
 
 MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE org_blueberry_core_runtime_EXPORT
-                        EXPORTED_INCLUDE_SUFFIXES src src/application src/service src/registry)
+                        EXPORTED_INCLUDE_SUFFIXES src src/application src/registry)
 
 target_link_libraries(${PLUGIN_TARGET} PUBLIC Poco::Foundation Poco::Util Poco::XML)
 if(MITK_USE_Qt5)

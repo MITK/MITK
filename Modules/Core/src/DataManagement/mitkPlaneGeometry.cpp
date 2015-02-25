@@ -61,14 +61,13 @@ namespace mitk
     transform->SetMatrix(matrix);
   }
 
-  void
-    PlaneGeometry::PreSetIndexToWorldTransform(mitk::AffineTransform3D *transform)
+    void PlaneGeometry::CheckIndexToWorldTransform(mitk::AffineTransform3D* transform)
   {
     EnsurePerpendicularNormal(transform);
   }
 
   void
-    PlaneGeometry::PreSetBounds(const BoundingBox::BoundsArrayType &bounds)
+    PlaneGeometry::CheckBounds(const BoundingBox::BoundsArrayType &bounds)
   {
     // error: unused parameter 'bounds'
     // this happens in release mode, where the assert macro is defined empty
@@ -762,13 +761,12 @@ namespace mitk
     os << indent << " Normal: " << GetNormal() << std::endl;
   }
 
-
   bool PlaneGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
   {
     assert(this->IsBoundingBoxNull()==false);
 
     Point3D pt3d_units;
-    BackTransform(pt3d_mm, pt3d_units);
+    Superclass::WorldToIndex(pt3d_mm, pt3d_units);
     pt2d_mm[0] = pt3d_units[0] * GetExtentInMM(0) / GetExtent(0);
     pt2d_mm[1] = pt3d_units[1] * GetExtentInMM(1) / GetExtent(1);
     pt3d_units[2]=0;
@@ -822,7 +820,7 @@ namespace mitk
     assert(this->IsBoundingBoxNull()==false);
 
     Point3D pt3d_units;
-    BackTransform(pt3d_mm, pt3d_units);
+    Superclass::WorldToIndex(pt3d_mm, pt3d_units);
     pt3d_units[2] = 0;
     projectedPt3d_mm = GetIndexToWorldTransform()->TransformPoint(pt3d_units);
     return const_cast<BoundingBox*>(this->GetBoundingBox())->IsInside(pt3d_units);
@@ -834,7 +832,7 @@ namespace mitk
     assert(this->IsBoundingBoxNull()==false);
 
     Vector3D vec3d_units;
-    BackTransform(vec3d_mm, vec3d_units);
+    Superclass::WorldToIndex(vec3d_mm, vec3d_units);
     vec3d_units[2] = 0;
     projectedVec3d_mm = GetIndexToWorldTransform()->TransformVector(vec3d_units);
     return true;
@@ -848,12 +846,12 @@ namespace mitk
     assert(this->IsBoundingBoxNull()==false);
 
     Vector3D vec3d_units;
-    BackTransform(atPt3d_mm, vec3d_mm, vec3d_units);
+    Superclass::WorldToIndex(atPt3d_mm, vec3d_mm, vec3d_units);
     vec3d_units[2] = 0;
     projectedVec3d_mm = GetIndexToWorldTransform()->TransformVector(vec3d_units);
 
     Point3D pt3d_units;
-    BackTransform(atPt3d_mm, pt3d_units);
+    Superclass::WorldToIndex(atPt3d_mm, pt3d_units);
     return const_cast<BoundingBox*>(this->GetBoundingBox())->IsInside(pt3d_units);
   }
 
@@ -877,8 +875,6 @@ namespace mitk
     //@todo implement parallel to the other Map method!
     assert(false);
   }
-
-
 
   void
     PlaneGeometry::SetReferenceGeometry( mitk::BaseGeometry *geometry )

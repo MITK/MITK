@@ -20,11 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::AbstractTransformGeometry::AbstractTransformGeometry() : Superclass(), m_Plane(NULL), m_FrameGeometry(NULL)
 {
   Initialize();
+  m_ItkVtkAbstractTransform = itk::VtkAbstractTransform<ScalarType>::New();
 }
 
 mitk::AbstractTransformGeometry::AbstractTransformGeometry(const AbstractTransformGeometry& other) : Superclass(other), m_ParametricBoundingBox(other.m_ParametricBoundingBox)
 {
-  if(other.m_ParametricBoundingBox.IsNotNull())
+  if (other.m_ParametricBoundingBox.IsNotNull())
   {
     m_ParametricBoundingBox = other.m_ParametricBoundingBox->DeepCopy();
     this->SetParametricBounds(m_ParametricBoundingBox->GetBounds());
@@ -33,16 +34,11 @@ mitk::AbstractTransformGeometry::AbstractTransformGeometry(const AbstractTransfo
   this->SetPlane(other.m_Plane);
 
   this->SetFrameGeometry(other.m_FrameGeometry);
+  m_ItkVtkAbstractTransform = itk::VtkAbstractTransform<ScalarType>::New();
 }
 
 mitk::AbstractTransformGeometry::~AbstractTransformGeometry()
 {
-}
-
-void mitk::AbstractTransformGeometry::PostInitialize()
-{
-  m_ItkVtkAbstractTransform = itk::VtkAbstractTransform<ScalarType>::New();
-  Superclass::PostInitialize();
 }
 
 vtkAbstractTransform* mitk::AbstractTransformGeometry::GetVtkAbstractTransform() const
@@ -52,9 +48,9 @@ vtkAbstractTransform* mitk::AbstractTransformGeometry::GetVtkAbstractTransform()
 
 mitk::ScalarType mitk::AbstractTransformGeometry::GetParametricExtentInMM(int direction) const
 {
-  if(m_Plane.IsNull())
+  if (m_Plane.IsNull())
   {
-    itkExceptionMacro(<<"m_Plane is NULL.");
+    itkExceptionMacro(<< "m_Plane is NULL.");
   }
   return m_Plane->GetExtentInMM(direction);
 }
@@ -66,7 +62,7 @@ const itk::Transform<mitk::ScalarType, 3, 3>* mitk::AbstractTransformGeometry::G
 
 bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const
 {
-  assert(this->IsBoundingBoxNull()==false);
+  assert(this->IsBoundingBoxNull() == false);
 
   mitk::Point2D pt2d_mm;
   bool isInside;
@@ -101,7 +97,7 @@ void mitk::AbstractTransformGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Po
 bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
 {
   itkExceptionMacro("not implemented yet - replace GetIndexToWorldTransform by m_ItkVtkAbstractTransform->GetInverseVtkAbstractTransform()");
-  assert(this->IsBoundingBoxNull()==false);
+  assert(this->IsBoundingBoxNull() == false);
 
   Vector3D vec3d_units;
   vec3d_units = GetIndexToWorldTransform()->GetInverseMatrix() * vec3d_mm;
@@ -170,7 +166,7 @@ void mitk::AbstractTransformGeometry::WorldToIndex(const mitk::Point2D &pt_mm, m
 
 void mitk::AbstractTransformGeometry::IndexToWorld(const mitk::Point2D & /*atPt2d_units*/, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
-  MITK_WARN<<"Warning! Call of the deprecated function AbstractTransformGeometry::IndexToWorld(point, vec, vec). Use AbstractTransformGeometry::IndexToWorld(vec, vec) instead!";
+  MITK_WARN << "Warning! Call of the deprecated function AbstractTransformGeometry::IndexToWorld(point, vec, vec). Use AbstractTransformGeometry::IndexToWorld(vec, vec) instead!";
   this->IndexToWorld(vec_units, vec_mm);
 }
 
@@ -181,7 +177,7 @@ void mitk::AbstractTransformGeometry::IndexToWorld(const mitk::Vector2D &vec_uni
 
 void mitk::AbstractTransformGeometry::WorldToIndex(const mitk::Point2D & /*atPt2d_mm*/, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
 {
-  MITK_WARN<<"Warning! Call of the deprecated function AbstractTransformGeometry::WorldToIndex(point, vec, vec). Use AbstractTransformGeometry::WorldToIndex(vec, vec) instead!";
+  MITK_WARN << "Warning! Call of the deprecated function AbstractTransformGeometry::WorldToIndex(point, vec, vec). Use AbstractTransformGeometry::WorldToIndex(vec, vec) instead!";
   this->WorldToIndex(vec_mm, vec_units);
 }
 
@@ -210,11 +206,11 @@ void mitk::AbstractTransformGeometry::SetVtkAbstractTransform(vtkAbstractTransfo
 
 void mitk::AbstractTransformGeometry::SetPlane(const mitk::PlaneGeometry* aPlane)
 {
-  if(aPlane!=NULL)
+  if (aPlane != NULL)
   {
     m_Plane = static_cast<mitk::PlaneGeometry*>(aPlane->Clone().GetPointer());
 
-    BoundingBox::BoundsArrayType b=m_Plane->GetBoundingBox()->GetBounds();
+    BoundingBox::BoundsArrayType b = m_Plane->GetBoundingBox()->GetBounds();
 
     SetParametricBounds(b);
 
@@ -222,16 +218,16 @@ void mitk::AbstractTransformGeometry::SetPlane(const mitk::PlaneGeometry* aPlane
   }
   else
   {
-    if(m_Plane.IsNull())
+    if (m_Plane.IsNull())
       return;
-    m_Plane=NULL;
+    m_Plane = NULL;
   }
   Modified();
 }
 
 void mitk::AbstractTransformGeometry::CalculateFrameGeometry()
 {
-  if((m_Plane.IsNull()) || (m_FrameGeometry.IsNotNull()))
+  if ((m_Plane.IsNull()) || (m_FrameGeometry.IsNotNull()))
     return;
   //@warning affine-transforms and bounding-box should be set by specific sub-classes!
   SetBounds(m_Plane->GetBoundingBox()->GetBounds());
@@ -239,7 +235,7 @@ void mitk::AbstractTransformGeometry::CalculateFrameGeometry()
 
 void mitk::AbstractTransformGeometry::SetFrameGeometry(const mitk::BaseGeometry* frameGeometry)
 {
-  if((frameGeometry != NULL) && (frameGeometry->IsValid()))
+  if ((frameGeometry != NULL) && (frameGeometry->IsValid()))
   {
     m_FrameGeometry = static_cast<mitk::BaseGeometry*>(frameGeometry->Clone().GetPointer());
     SetIndexToWorldTransform(m_FrameGeometry->GetIndexToWorldTransform());
@@ -253,7 +249,7 @@ void mitk::AbstractTransformGeometry::SetFrameGeometry(const mitk::BaseGeometry*
 
 unsigned long mitk::AbstractTransformGeometry::GetMTime() const
 {
-  if(Superclass::GetMTime()<m_ItkVtkAbstractTransform->GetMTime())
+  if (Superclass::GetMTime() < m_ItkVtkAbstractTransform->GetMTime())
     return m_ItkVtkAbstractTransform->GetMTime();
 
   return Superclass::GetMTime();
@@ -261,13 +257,13 @@ unsigned long mitk::AbstractTransformGeometry::GetMTime() const
 
 void mitk::AbstractTransformGeometry::SetOversampling(mitk::ScalarType oversampling)
 {
-  if(m_Plane.IsNull())
+  if (m_Plane.IsNull())
   {
     itkExceptionMacro(<< "m_Plane is not set.");
   }
 
   mitk::BoundingBox::BoundsArrayType bounds = m_Plane->GetBounds();
-  bounds[1]*=oversampling; bounds[3]*=oversampling; bounds[5]*=oversampling;
+  bounds[1] *= oversampling; bounds[3] *= oversampling; bounds[5] *= oversampling;
   SetParametricBounds(bounds);
 }
 
@@ -287,12 +283,12 @@ void mitk::AbstractTransformGeometry::SetParametricBounds(const BoundingBox::Bou
   BoundingBoxType::PointType p;
   BoundingBoxType::PointIdentifier pointid;
 
-  for(pointid=0; pointid<2;++pointid)
+  for (pointid = 0; pointid < 2; ++pointid)
   {
     unsigned int i;
-    for(i=0; i<GetNDimensions(); ++i)
+    for (i = 0; i < GetNDimensions(); ++i)
     {
-      p[i] = bounds[2*i+pointid];
+      p[i] = bounds[2 * i + pointid];
     }
     pointscontainer->InsertElement(pointid, p);
   }
@@ -310,10 +306,10 @@ const mitk::BoundingBox::BoundsArrayType& mitk::AbstractTransformGeometry::GetPa
 
 mitk::ScalarType mitk::AbstractTransformGeometry::GetParametricExtent(int direction) const
 {
-  if (direction < 0 || direction>=3)
+  if (direction < 0 || direction >= 3)
     mitkThrow() << "Invalid direction. Must be between either 0, 1 or 2. ";
   assert(m_ParametricBoundingBox.IsNotNull());
 
   BoundingBoxType::BoundsArrayType bounds = m_ParametricBoundingBox->GetBounds();
-  return bounds[direction*2+1]-bounds[direction*2];
+  return bounds[direction * 2 + 1] - bounds[direction * 2];
 }

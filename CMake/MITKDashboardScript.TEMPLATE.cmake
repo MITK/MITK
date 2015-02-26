@@ -15,7 +15,7 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 
 set(MY_COMPILER "gcc-4.8.x")
 # For Windows, e.g.
-#set(MY_COMPILER "VC9.0")
+#set(MY_COMPILER "VC12.0")
 
 set(CTEST_CMAKE_COMMAND "/usr/bin/cmake")
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
@@ -27,9 +27,10 @@ set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
 
 # The directory containing the Qt binaries
 set(QT5_INSTALL_PREFIX "/home/user/Qt/5.4/gcc_64")
-set(QT_BINARY_DIR "${QT5_INSTALL_PREFIX}/bin")
 # For Windows, e.g.
-#set(QT_BINARY_DIR "C:/Qt/5.4/msvc2013_64_opengl/bin")
+#set(QT5_INSTALL_PREFIX "C:/Qt/5.4/msvc2013_64_opengl")
+
+set(QT_BINARY_DIR "${QT5_INSTALL_PREFIX}/bin")
 
 #
 # Dashboard options

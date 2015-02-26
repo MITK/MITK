@@ -27,7 +27,7 @@ namespace itk
   {
     /*
     * add the Skewness and Kurtosis to the other statistical calculated Values
-    * of the mitkStatisticsImageFilter
+    * of the mitkStatisticsImageFilter as the 7th and 8th Output
     */
     for ( int i = 7; i < 9; ++i )
     {
@@ -125,24 +125,24 @@ namespace itk
     }
 
 
-      ImageRegionConstIterator< TInputImage > it (this->GetInput(), this->GetInput()->GetLargestPossibleRegion() );
+    ImageRegionConstIterator< TInputImage > it (this->GetInput(), this->GetInput()->GetLargestPossibleRegion() );
 
-      int counter = 0;
-      for (it.GoToBegin(); !it.IsAtEnd(); ++it)
-      {
-        baseOfSkewnessAndKurtosis = (it.Get() - mean) / sigma ;
-        kurtosis += std::pow( baseOfSkewnessAndKurtosis, 4.0 );
-        skewness += std::pow( baseOfSkewnessAndKurtosis, 3.0 );
-        counter++;
-      }
+    int counter = 0;
+    for (it.GoToBegin(); !it.IsAtEnd(); ++it)
+    {
+      baseOfSkewnessAndKurtosis = (it.Get() - mean) / sigma ;
+      kurtosis += std::pow( baseOfSkewnessAndKurtosis, 4.0 );
+      skewness += std::pow( baseOfSkewnessAndKurtosis, 3.0 );
+      counter++;
+    }
 
-      if ( counter == 0 )
-      {
-        throw std::logic_error( "Empty segmentation" );
-      }
+    if ( counter == 0 )
+    {
+      throw std::logic_error( "Empty segmentation" );
+    }
 
-      kurtosis = kurtosis / counter;
-      skewness = skewness / counter;
+    kurtosis = kurtosis / counter;
+    skewness = skewness / counter;
 
 
     this->GetKurtosisOutput()->Set( kurtosis );

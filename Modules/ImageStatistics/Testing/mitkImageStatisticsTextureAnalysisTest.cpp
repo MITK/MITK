@@ -13,30 +13,37 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
 #include "mitkStandardFileLocations.h"
 #include "mitkTestingMacros.h"
-#include "mitkPointSetStatisticsCalculator.h"
 #include "itkImage.h"
 #include "mitkExtendedLabelStatisticsImageFilter.h"
 #include "mitkExtendedStatisticsImageFilter.h"
-#include "itkDiscreteGaussianImageFilter.h"
-
-#include <itkImageRegionConstIterator.h>
-#include <itkImageRegionIterator.h>
-#include <itkImageRegionConstIteratorWithIndex.h>
-#include <itkImageRegionIteratorWithIndex.h>
-//#include <QtCore>
 
 /**
- * \brief Test class for mitkPointSetStatisticsCalculator
- */
+ \section Testing of Skewness and Kurtosis
+
+  * This test class is for testing the added coefficients Skewness and Kurtosis
+  * for the mitkExtendedLabelStatisticsImageFilter (Masked Images) and for the
+  * mitkExtendedStatisticsImageFilter (Unmasked Images). Both filter will be tested
+  * against two pictures.
+*/
+
 class mitkImageStatisticsTextureAnalysisTestClass
 {
+   /**
+  * \brief Explanation of the mitkImageStatisticsTextureAnalysisTestClass test class
+  *
+  * this test class produce test images and masking images with the method CreatingTestImageForDifferentLabelSize.
+  * TestInstanceFortheMaskedStatisticsFilter and TestInstanceFortheUnmaskedStatisticsFilter are the two Instances
+  * for the filters of masking and unmasking images.
+  * TestofSkewnessAndKurtosisForMaskedImagesand TestofSkewnessAndKurtosisForUnmaskedImages are the correlated test
+  * for the checking the values.
+  */
+
 public:
 
   typedef itk::Image<unsigned short,3 >ImageType;
-  typedef ImageType::Pointer pointerOfImage;
+  typedef ImageType::Pointer PointerOfImage;
 
   typedef itk::ExtendedLabelStatisticsImageFilter< ImageType, ImageType > LabelStatisticsFilterType;
   typedef LabelStatisticsFilterType::Pointer labelStatisticsFilterPointer;
@@ -44,7 +51,8 @@ public:
   typedef itk::ExtendedStatisticsImageFilter< ImageType > StatisticsFilterType;
   typedef StatisticsFilterType::Pointer StatisticsFilterPointer;
 
-  static ImageType::Pointer CreatingTestLabelImage()
+
+  ImageType::Pointer CreatingTestImageForDifferentLabelSize( int factorOfDividingThePicture, int bufferValue, int labelValue)
   {
     ImageType::Pointer image = ImageType :: New();
     ImageType::IndexType start;
@@ -64,38 +72,11 @@ public:
 
     image->SetRegions(region);
     image->Allocate();
-    image->FillBuffer(1.0);
-
-    return image;
-  }
-
-
-
-  static ImageType::Pointer CreatingTestImage()
-  {
-    ImageType::Pointer image = ImageType :: New();
-    ImageType::IndexType start;
-    ImageType::SizeType size;
-
-    start[0] = 0;
-    start[1] = 0;
-    start[2] = 0;
-
-    size[0] = 100;
-    size[1] = 100;
-    size[2] = 100;
-
-    ImageType:: RegionType region;
-    region.SetSize( size );
-    region.SetIndex( start );
-
-    image->SetRegions(region);
-    image->Allocate();
-    image->FillBuffer(3.0);
+    image->FillBuffer(bufferValue);
 
     for(unsigned int r = 0; r < 50; r++)
     {
-      for(unsigned int c = 0; c < 100; c++)
+      for(unsigned int c = 0; c < factorOfDividingThePicture; c++)
       {
         for(unsigned int l = 0; l < 100; l++)
         {
@@ -104,48 +85,7 @@ public:
           pixelIndex[1] = c;
           pixelIndex[2] = l;
 
-          image->SetPixel(pixelIndex, 2.0);
-        }
-      }
-    }
-
-    return image;
-  }
-
-  static ImageType::Pointer CreatingTestImage2()
-  {
-    ImageType::Pointer image = ImageType :: New();
-    ImageType::IndexType start;
-    ImageType::SizeType size;
-
-    start[0] = 0;
-    start[1] = 0;
-    start[2] = 0;
-
-    size[0] = 100;
-    size[1] = 100;
-    size[2] = 100;
-
-    ImageType:: RegionType region;
-    region.SetSize( size );
-    region.SetIndex( start );
-
-    image->SetRegions(region);
-    image->Allocate();
-    image->FillBuffer(3.0);
-
-    for(unsigned int r = 0; r < 50; r++)
-    {
-      for(unsigned int c = 0; c < 50; c++)
-      {
-        for(unsigned int l = 0; l < 100; l++)
-        {
-          ImageType::IndexType pixelIndex;
-          pixelIndex[0] = r;
-          pixelIndex[1] = c;
-          pixelIndex[2] = l;
-
-          image->SetPixel(pixelIndex, 2.0);
+          image->SetPixel(pixelIndex, labelValue);
         }
       }
     }
@@ -154,7 +94,7 @@ public:
   }
 
 
-  static LabelStatisticsFilterType::Pointer  TestInstantiation(ImageType::Pointer image, ImageType::Pointer maskImage)
+  LabelStatisticsFilterType::Pointer  TestInstanceFortheMaskedStatisticsFilter(ImageType::Pointer image, ImageType::Pointer maskImage)
   {
     LabelStatisticsFilterType::Pointer labelStatisticsFilter;
     labelStatisticsFilter = LabelStatisticsFilterType::New();
@@ -166,7 +106,7 @@ public:
     return labelStatisticsFilter;
   }
 
-  static StatisticsFilterType::Pointer  TestInstantiation2(ImageType::Pointer image )
+  StatisticsFilterType::Pointer  TestInstanceFortheUnmaskedStatisticsFilter(ImageType::Pointer image )
   {
     StatisticsFilterType::Pointer StatisticsFilter;
     StatisticsFilter = StatisticsFilterType::New();
@@ -178,7 +118,7 @@ public:
   }
 
 
-  static void TestTrueFalse(LabelStatisticsFilterType::Pointer labelStatisticsFilter, double expectedSkewness, double expectedKurtosis)
+  void TestofSkewnessAndKurtosisForMaskedImages(LabelStatisticsFilterType::Pointer labelStatisticsFilter, double expectedSkewness, double expectedKurtosis)
   {
     // let's create an object of our class
     bool isSkewsnessLowerlimitCorrect = labelStatisticsFilter->GetSkewness( 1 )- expectedKurtosis+ std::pow(10,-3) <= expectedSkewness;
@@ -195,7 +135,7 @@ public:
 
 
 
-  static void TestTrueFalse2(StatisticsFilterType::Pointer StatisticsFilter, double expectedSkewness, double expectedKurtosis)
+  void TestofSkewnessAndKurtosisForUnmaskedImages(StatisticsFilterType::Pointer StatisticsFilter, double expectedSkewness, double expectedKurtosis)
   {
     // let's create an object of our class
     bool isSkewsnessLowerlimitCorrect = StatisticsFilter->GetSkewness()- expectedKurtosis+ std::pow(10,-3) <= expectedSkewness;
@@ -219,23 +159,24 @@ int mitkImageStatisticsTextureAnalysisTest(int, char* [])
   // always start with this!
   MITK_TEST_BEGIN("mitkImageStatisticsTextureAnalysisTest")
 
-  mitkImageStatisticsTextureAnalysisTestClass::pointerOfImage label = mitkImageStatisticsTextureAnalysisTestClass:: CreatingTestLabelImage();
+    mitkImageStatisticsTextureAnalysisTestClass testclassInstance;
 
-  mitkImageStatisticsTextureAnalysisTestClass::pointerOfImage image = mitkImageStatisticsTextureAnalysisTestClass:: CreatingTestImage();
-  mitkImageStatisticsTextureAnalysisTestClass::pointerOfImage image2 = mitkImageStatisticsTextureAnalysisTestClass:: CreatingTestImage2();
+  mitkImageStatisticsTextureAnalysisTestClass::PointerOfImage labelImage = testclassInstance.CreatingTestImageForDifferentLabelSize(100, 1, 1);
+  mitkImageStatisticsTextureAnalysisTestClass::PointerOfImage image  = testclassInstance.CreatingTestImageForDifferentLabelSize(100, 3, 2);
+  mitkImageStatisticsTextureAnalysisTestClass::PointerOfImage image2 = testclassInstance.CreatingTestImageForDifferentLabelSize(50, 3, 2);
 
 
-  mitkImageStatisticsTextureAnalysisTestClass::labelStatisticsFilterPointer mitkLabelFilter= mitkImageStatisticsTextureAnalysisTestClass::TestInstantiation( image,label);
-  mitkImageStatisticsTextureAnalysisTestClass::TestTrueFalse(mitkLabelFilter, 0, 0.999998);
+  mitkImageStatisticsTextureAnalysisTestClass::labelStatisticsFilterPointer mitkLabelFilter= testclassInstance.TestInstanceFortheMaskedStatisticsFilter( image,labelImage);
+  testclassInstance.TestofSkewnessAndKurtosisForMaskedImages(mitkLabelFilter, 0, 0.999998);
 
-  mitkImageStatisticsTextureAnalysisTestClass::labelStatisticsFilterPointer mitkLabelFilter2= mitkImageStatisticsTextureAnalysisTestClass::TestInstantiation( image2,label);
-  mitkImageStatisticsTextureAnalysisTestClass::TestTrueFalse(mitkLabelFilter2, -1.1547, 2.33333);
+  mitkImageStatisticsTextureAnalysisTestClass::labelStatisticsFilterPointer mitkLabelFilter2= testclassInstance.TestInstanceFortheMaskedStatisticsFilter( image2,labelImage);
+  testclassInstance.TestofSkewnessAndKurtosisForMaskedImages(mitkLabelFilter2, -1.1547, 2.33333);
 
-  mitkImageStatisticsTextureAnalysisTestClass::StatisticsFilterPointer mitkFilter= mitkImageStatisticsTextureAnalysisTestClass::TestInstantiation2( image);
-  mitkImageStatisticsTextureAnalysisTestClass::TestTrueFalse(mitkLabelFilter, 0, 0.999998);
+  mitkImageStatisticsTextureAnalysisTestClass::StatisticsFilterPointer mitkFilter= testclassInstance.TestInstanceFortheUnmaskedStatisticsFilter( image);
+  testclassInstance.TestofSkewnessAndKurtosisForUnmaskedImages(mitkFilter, 0, 0.999998);
 
-  mitkImageStatisticsTextureAnalysisTestClass::StatisticsFilterPointer mitkFilter2= mitkImageStatisticsTextureAnalysisTestClass::TestInstantiation2( image2);
-  mitkImageStatisticsTextureAnalysisTestClass::TestTrueFalse(mitkLabelFilter2, -1.1547, 2.33333);
+  mitkImageStatisticsTextureAnalysisTestClass::StatisticsFilterPointer mitkFilter2= testclassInstance.TestInstanceFortheUnmaskedStatisticsFilter( image2);
+  testclassInstance.TestofSkewnessAndKurtosisForUnmaskedImages(mitkFilter2, -1.1547, 2.33333);
 
   MITK_TEST_END()
 }

@@ -51,7 +51,8 @@ namespace itk
     typedef typename Superclass::PixelType                          PixelType;
     typedef typename Superclass::MapIterator                        MapIterator;
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro( Self );
+    itkCloneMacro( Self );
 
     itkTypeMacro(ExtendedLabelStatisticsImageFilter, LabelStatisticsImageFilter);
 
@@ -76,14 +77,15 @@ namespace itk
 
     };
 
-    typedef std::map< LabelPixelType, CoefficientsClass >        CoefficientsMap;
-    typedef typename std::map< LabelPixelType, CoefficientsClass >::const_iterator CoefficientsMapConstIterator;
 
     /*getter method for the new coefficients*/
     RealType GetSkewness(LabelPixelType label) const;
     RealType GetKurtosis(LabelPixelType label) const;
 
   protected:
+
+    typedef std::map< LabelPixelType, CoefficientsClass >        CoefficientsMap;
+    typedef typename std::map< LabelPixelType, CoefficientsClass >::const_iterator CoefficientsMapConstIterator;
 
     ExtendedLabelStatisticsImageFilter();
 

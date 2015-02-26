@@ -32,7 +32,8 @@ namespace itk
   *
   * This class inherits from the itkStatisticsImageFilter and
   * uses its Results for the calculation of the two new coefficients:
-  * the Skewness and Kurtosis. Both will be added in this class.
+  * the Skewness and Kurtosis. Both will be added in this class. So they will be
+  * placed as the 7th and 8th Output after the other statistical coefficients
   */
   template< class TInputImage >
   class ExtendedStatisticsImageFilter : public StatisticsImageFilter< TInputImage >
@@ -43,11 +44,12 @@ namespace itk
     typedef StatisticsImageFilter< TInputImage >             Superclass;
     typedef SmartPointer< Self >                             Pointer;
     typedef SmartPointer< const Self >                       ConstPointer;
-    typedef typename Superclass::RealType                             RealType;
-    typedef typename Superclass::RealObjectType                       RealObjectType;
+    typedef typename Superclass::RealType                     RealType;
+    typedef typename Superclass::RealObjectType               RealObjectType;
 
     /** Method for creation through the object factory. */
-    itkNewMacro( Self );
+    itkFactorylessNewMacro( Self );
+    itkCloneMacro( Self );
 
     /** Runtime information support. */
     itkTypeMacro(ExtendedStatisticsImageFilter, StatisticsImageFilter);

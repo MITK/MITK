@@ -26,9 +26,7 @@ namespace itk
   ExtendedLabelStatisticsImageFilter< TInputImage, TLabelImage >
     ::ExtendedLabelStatisticsImageFilter()
     : LabelStatisticsImageFilter< TInputImage,  TLabelImage >()
-  {
-    m_LabelStatisticsCoefficients;
-  }
+  { }
 
 
   template< class TInputImage, class TLabelImage >
@@ -76,7 +74,6 @@ namespace itk
     ExtendedLabelStatisticsImageFilter< TInputImage, TLabelImage >::
     ComputeTheSkewnessAndKurtosis()
   {
-    MapIterator mapIt;
     typename TLabelImage::RegionType Subregion;
 
     double baseOfSkewnessAndCurtosis = 0.0;
@@ -98,10 +95,10 @@ namespace itk
 
     if ( maskNonEmpty )
     {
-      typename std::list< LabelPixelType >::iterator it;
-      for ( it = relevantLabels.begin(), i = 0;
+      typename std::list< LabelPixelType >::const_iterator it;
+      for ( it = relevantLabels.begin();
         it != relevantLabels.end();
-        ++it, ++i )
+        ++it )
       {
         double sigma = GetSigma( *it );
         double mean  = GetMean( *it );

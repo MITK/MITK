@@ -39,7 +39,7 @@ diff -urNb vigra-Version-1-10-0/config/VigraConfig.cmake.in Vigra-src/config/Vig
 +
 diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_decisionTree.hxx Vigra-src/include/vigra/random_forest/rf_decisionTree.hxx
 --- vigra-Version-1-10-0/include/vigra/random_forest/rf_decisionTree.hxx	2013-11-18 17:48:16.000000000 +0100
-+++ Vigra-src/include/vigra/random_forest/rf_decisionTree.hxx	2014-01-16 16:26:12.000000000 +0100
++++ Vigra-src/include/vigra/random_forest/rf_decisionTree.hxx	2015-01-16 19:16:34.000000000 +0100
 @@ -90,6 +90,8 @@
      ProblemSpec<> ext_param_;
      unsigned int classCount_;
@@ -49,7 +49,7 @@ diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_decisionTree.hxx 
  
    public:
      /* \brief Create tree with parameters */
-@@ -350,6 +352,25 @@
+@@ -350,6 +352,22 @@
      continueLearn(features,labels,stack_entry,split,stop,visitor,randint);
  }
  
@@ -69,28 +69,44 @@ diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_decisionTree.hxx 
 +  return depth;
 +}
 +
-+
-+
-+
  template <  class U, class C,
              class U2, class C2,
              class StackEntry_t,
-@@ -391,8 +412,13 @@
-         //produce a Terminal Node or the Split itself decides what 
+@@ -374,6 +392,11 @@
+     size_t last_node_pos = 0;
+     StackEntry_t top=stack.back();
+ 
++    Split_t* splitPointer = &split;
++    bool isDepthSplitter = true;
++
++    int maximumTreeDepth = splitPointer->GetMaximumTreeDepth();
++
+     while(!stack.empty())
+     {
+ 
+@@ -392,7 +415,20 @@
          //kind of node to make
          TreeInt NodeID;
-+        int currentDepthLevel;
-+        if (top.leftParent != StackEntry_t::DecisionTreeNoParent)
-+          currentDepthLevel = GetTreeDepthForNode(top.leftParent, this);
-+        else
-+          currentDepthLevel = GetTreeDepthForNode(top.rightParent, this);
          
 -        if(stop(top))
-+        if(stop(top) || (currentDepthLevel >= split.GetMaximumTreeDepth()))
++        bool depthStop = false;
++        if (isDepthSplitter)
++        {
++          int currentDepthLevel;
++          if (top.leftParent != StackEntry_t::DecisionTreeNoParent)
++            currentDepthLevel = GetTreeDepthForNode(top.leftParent, this);
++          else
++            currentDepthLevel = GetTreeDepthForNode(top.rightParent, this);
++
++          depthStop = (currentDepthLevel >= maximumTreeDepth);
++        }
++        if(stop(top) || (depthStop))
++
++        //if (stop(top) || currentDepthLevel >= MaximumSplitDepth(split))
              NodeID = split.makeTerminalNode(features, 
                                              labels, 
                                              top, 
-@@ -421,17 +447,20 @@
+@@ -421,17 +457,20 @@
          // Using InteriorNodeBase because exact parameter form not needed.
          // look at the Node base before getting scared.
          last_node_pos = topology_.size();
@@ -111,9 +127,40 @@ diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_decisionTree.hxx 
          }
  
  
+diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_nodeproxy.hxx Vigra-src/include/vigra/random_forest/rf_nodeproxy.hxx
+--- vigra-Version-1-10-0/include/vigra/random_forest/rf_nodeproxy.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra-src/include/vigra/random_forest/rf_nodeproxy.hxx	2015-01-13 16:56:56.000000000 +0100
+@@ -50,7 +50,11 @@
+ namespace vigra
+ {
+ 
+-
++class DepthSplitterBase
++{
++public:
++  virtual int GetMaximumTreeDepth() const = 0;
++};
+ 
+ enum NodeTags
+ {
+diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_split.hxx Vigra-src/include/vigra/random_forest/rf_split.hxx
+--- vigra-Version-1-10-0/include/vigra/random_forest/rf_split.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra-src/include/vigra/random_forest/rf_split.hxx	2015-01-16 19:11:02.000000000 +0100
+@@ -108,6 +108,11 @@
+         \ref SplitBase::findBestSplit() or \ref SplitBase::makeTerminalNode().
+     **/
+ 
++      virtual int GetMaximumTreeDepth() 
++      {
++        return 1000000000;
++      }
++
+     template<class T>
+     void set_external_parameters(ProblemSpec<T> const & in)
+     {
 diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_split-old.hxx Vigra-src/include/vigra/random_forest/rf_split-old.hxx
 --- vigra-Version-1-10-0/include/vigra/random_forest/rf_split-old.hxx	1970-01-01 01:00:00.000000000 +0100
-+++ Vigra-src/include/vigra/random_forest/rf_split-old.hxx	2014-03-31 09:46:18.000000000 +0200
++++ Vigra-src/include/vigra/random_forest/rf_split-old.hxx	2014-03-31 08:46:18.000000000 +0200
 @@ -0,0 +1,1383 @@
 +/************************************************************************/
 +/*                                                                      */

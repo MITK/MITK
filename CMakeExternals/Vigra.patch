@@ -3,19 +3,19 @@ diff -urNb vigra-Version-1-10-0/CMakeLists.txt Vigra-src/CMakeLists.txt
 +++ Vigra-src/CMakeLists.txt	2015-02-24 14:31:03.716528000 +0100
 @@ -70,8 +70,11 @@
  ENDIF()
- 
+
  IF(WITH_HDF5)
-+    FIND_PACKAGE(HDF5 PATHS "/local/mitk/release-binary/MITK-superbuild/HDF5-install" PATH_SUFFIXES hdf5 NO_DEFAULT_PATH NO_MODULE)
++    FIND_PACKAGE(HDF5 PATHS ${HDF5_DIR} PATH_SUFFIXES hdf5 NO_DEFAULT_PATH NO_MODULE)
 +IF(NOT HDF5_FOUND)
      VIGRA_FIND_PACKAGE(HDF5)
  ENDIF()
 +ENDIF()
- 
+
  IF(WITH_BOOST_GRAPH)
      IF(WITH_VIGRANUMPY)
 @@ -395,3 +398,4 @@
  ENDIF()
- 
+
  MESSAGE( STATUS "---------------------------------------------------------" )
 +
 diff -urNb vigra-Version-1-10-0/config/VigraConfig.cmake.in Vigra-src/config/VigraConfig.cmake.in
@@ -24,7 +24,7 @@ diff -urNb vigra-Version-1-10-0/config/VigraConfig.cmake.in Vigra-src/config/Vig
 @@ -1,7 +1,9 @@
  get_filename_component(SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
  get_filename_component(Vigra_TOP_DIR  "${SELF_DIR}/../../" ABSOLUTE)
- 
+
 -include(${SELF_DIR}/vigra-targets.cmake)
 +if(NOT TARGET vigraimpex)
 +  include(${SELF_DIR}/vigra-targets.cmake)

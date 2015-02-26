@@ -139,6 +139,10 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
 
     set(Python_DIR "${ep_prefix}")
 
+    # set versions, override
+    set(PYTHON_VERSION_MAJOR ${MITK_PYTHON_MAJOR_VERSION})
+    set(PYTHON_VERSION_MINOR ${MITK_PYTHON_MINOR_VERSION})
+
     if(UNIX)
       set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include/python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}")

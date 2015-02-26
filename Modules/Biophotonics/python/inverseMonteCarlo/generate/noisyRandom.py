@@ -28,7 +28,7 @@ def noisyRandom(generatedFilename):
 
 
     reflectances  = np.zeros((nrSimulations, len(wavelengths)))
-    parameters    = np.zeros((nrSimulations, 8))
+    parameters    = np.zeros((nrSimulations, 7))
 
     print('start simulations...')
 

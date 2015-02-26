@@ -18,7 +18,8 @@ dataFolder = 'data/output/'
 trainingParameters, trainingReflectances, testParameters, testReflectances = \
     data.perfect(dataFolder)
 
-trainingWeights = np.ones((trainingParameters.shape[0], 1))
+
+trainingWeights = np.ones((trainingParameters.shape[0],))
 
 #%% train forest
 
@@ -37,7 +38,6 @@ r2Score = rf.score(testReflectances, testParameters)
 
 #import matplotlib.pyplot as plt
 
-print("result for random forest with parameters: " + str(rf.best_estimator_))
 print("absolute error distribution BVF, Volume fraction")
 print("median: " + str(np.median(absErrors, axis=0)))
 print("lower quartile: " + str(np.percentile(absErrors, 25, axis=0)))

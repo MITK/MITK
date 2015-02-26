@@ -67,18 +67,28 @@ def getReflectanceFromFile(fileName):
     return sum(reflectances)
 
 
-def normalizeIntegral(data, wavelengths):
+from setup import simulation
+
+def normalizeIntegral(data):
     # normalize data
-    norms = np.trapz(data, wavelengths, axis=1)
+    # first sort by wavelength:
+    sortedIndices = sorted(range(len(simulation.getWavelengths())), key=lambda k: simulation.getWavelengths()[k])
+
+    norms = np.trapz(data[:,sortedIndices], simulation.getWavelengths()[sortedIndices], axis=1)
     return data / norms[:,None]
 
-def normalizeImageQuotient(data, iqBand=1):
-    # use line 0 as image quotient
-    normData = data / data[:,iqBand][:,None]
-    # discard it
-    normData = np.concatenate((normData[:,0:iqBand], normData[:,iqBand+1:]), axis=1)
-    return normData
+iqBand = 3
 
+def normalizeImageQuotient(data):
+    # use line iqBand as image quotient
+#    normData = data / data[:,iqBand][:,None]
+#    # discard it
+#    normData = np.delete(normData, iqBand, axis=1)
+#    return normData
+    return normalizeIntegral(data)
+
+def removeIqWavelength(wavelenghts):
+    return np.delete(wavelenghts, iqBand)
 
 def runOneSimulation(wavelength, eHbO2, eHb,
                      infile, simulationOutputFolderName, gpumcmlDirectory, gpumcmlExecutable,

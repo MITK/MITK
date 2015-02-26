@@ -51,7 +51,7 @@ def realImage(dataFolder, imageToLoad):
     trainingReflectances = mch.normalizeImageQuotient(trainingReflectances)
 
     shape, image, trainsegmentation, testsegmentation = csvImageReader.csvMultiSpectralImageReader(dataFolder + imageToLoad)
-    image        = mch.normalizeImageQuotient(image, 1)
+    image        = mch.normalizeImageQuotient(image)
 
     return trainingParameters, trainingReflectances, shape, image, trainsegmentation, testsegmentation
 

@@ -49,6 +49,8 @@ haemoLUT[:, 2] = np.convolve(haemoLUT[:, 2], filterResponse_table, 'same')
 eHbO2 = interp1d(haemoLUT[:,0], haemoLUT[:,1])
 eHb   = interp1d(haemoLUT[:,0], haemoLUT[:,2])
 
+def getWavelengths():
+    return wavelengths
 
 def noisy():
     #%% intialization
@@ -72,9 +74,6 @@ def noisy():
     # radius of scattering particles [m]
     samplesR = 1
     rs   = np.linspace(0.4 * 10**-6, 0.4 * 10**-6, samplesR)
-
-
-
 
 
 
@@ -108,34 +107,6 @@ def perfect():
     samplesR = 1
     rs   = np.linspace(0.4 * 10**-6, 0.4 * 10**-6, samplesR)
 
-    # The full width at half maximum [m] of the used imaging systems filters
-    FWHM = 20 * 10**-9
-
-    print('create reference data...')
-    #reference data
-
-    # table with wavelength at 1st row,
-    # HbO2 molar extinction coefficient [cm**-1/(moles/l)] at 2nd row,
-    # Hb molar extinction coefficient [cm**-1/(moles/l)] at 3rd row
-    haemoLUT = np.loadtxt("data/haemoglobin.txt", skiprows=2)
-    # we calculate everything in [m] instead of [nm] and [1/cm]
-    haemoLUT[:,0]   = haemoLUT[:,0] * 10**-9
-    haemoLUT[:,1:]  = haemoLUT[:,1:] * 10**2
-    # to account for the FWHM of the used filters, compute convolution
-    # see http://en.wikipedia.org/wiki/Full_width_at_half_maximum
-    filterResponse = norm(loc = 0, scale = FWHM / 2.355)
-    # parse at 20 locations
-    x = np.linspace(filterResponse.ppf(0.01),
-                   filterResponse.ppf(0.99), 20)
-    filterResponse_table = filterResponse.pdf(x)
-    # TODO verify if this normalization is correct!
-    filterResponse_table = filterResponse_table / sum(filterResponse_table)
-
-    haemoLUT[:, 1] = np.convolve(haemoLUT[:, 1], filterResponse_table, 'same')
-    haemoLUT[:, 2] = np.convolve(haemoLUT[:, 2], filterResponse_table, 'same')
-
-    eHbO2 = interp1d(haemoLUT[:,0], haemoLUT[:,1])
-    eHb   = interp1d(haemoLUT[:,0], haemoLUT[:,2])
 
     nrSamples    = samplesBVF * samplesD * samplesR * samplesSaO2 * samplesVs
 
@@ -154,7 +125,7 @@ if __name__ == "__main__":
     BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations = perfect()
 
     sortedWavelengths = np.sort(wavelengths)
-    sortedReflectance = eHbO2(sortedWavelengths)
 
-    #plt.figure()
-    plt.plot(sortedWavelengths, sortedReflectance, 'bo-')
+    plt.figure()
+    plt.plot(sortedWavelengths, eHbO2(sortedWavelengths), 'bo-')
+    plt.plot(sortedWavelengths, eHb(sortedWavelengths), 'go-')

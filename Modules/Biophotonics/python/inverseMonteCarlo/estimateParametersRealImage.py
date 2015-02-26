@@ -14,7 +14,8 @@ import random
 import numpy as np
 import time
 import Image
-from matplotlib.pyplot import plot
+
+import matplotlib.pyplot as plt
 
 
 
@@ -41,6 +42,10 @@ imageToLoad = "ColonUC1"
 trainingParameters, trainingReflectances, shape, image, trainsegmentation, testsegmentation = \
     data.realImage(dataFolder, imageToLoad)
 
+#discard last wavelength
+#trainingReflectances = trainingReflectances[:,:-1]
+#image = image[:,:-1]
+
 sourceReflectancesDA = image[np.nonzero(trainsegmentation)[0], :]
 # choose m reflectances for training DA
 m = trainingReflectances.shape[0]
@@ -50,7 +55,7 @@ sourceReflectancesDA = np.matrix(random.sample(sourceReflectancesDA, m))
 
 trainingWeights = np.ones(trainingReflectances.shape[0])
 #in case you dont want to use domain adaptation, just comment out following line
-#trainingWeights = calculateWeights(trainingReflectances, sourceReflectancesDA)
+trainingWeights = calculateWeights(trainingReflectances, sourceReflectancesDA)
 
 #%% 3. train forest
 
@@ -58,6 +63,7 @@ rf = randomForest(trainingParameters, trainingReflectances, trainingWeights)
 
 #%% 4. estimate the parameters for the image
 
+print "starting to estimate the tissue parameters"
 start = time.time()
 
 estimatedParameters = rf.predict(image)
@@ -108,8 +114,7 @@ estimatedParametersOnlySegmented = estimatedParametersOnlySegmented[nSamples]
 inputReflectancesOnlySegmented   = inputReflectancesOnlySegmented[nSamples]
 
 # placeholder for the reflectance computed from MC with the estimated parameters
-irShape = inputReflectancesOnlySegmented.shape
-reflectancesFromEstimatedParameters = np.zeros((irShape[0], irShape[1]+1))
+reflectancesFromEstimatedParameters = np.zeros_like(inputReflectancesOnlySegmented)
 # +1 due to the non discarded image quotient
 
 for i, (BVF, Vs, d, SaO2) in enumerate(estimatedParametersOnlySegmented):
@@ -122,8 +127,8 @@ for i, (BVF, Vs, d, SaO2) in enumerate(estimatedParametersOnlySegmented):
         reflectanceValue = mch.runOneSimulation(
             wavelength, eHbO2, eHb,
             infile, outfolderMC, gpumcmlDirectory, gpumcmlExecutable,
-            BVF, Vs, d,
-            np.median(rs), SaO2,
+            BVF, Vs, d, np.mean(rs), SaO2,
+            #submucosa_BVF=sm_BVF, submucosa_Vs=sm_Vs, submucosa_SaO2=SaO2,
             Fwhm = FWHM, nrPhotons=photons)
 
 
@@ -138,18 +143,18 @@ reflectancesFromEstimatedParameters = mch.normalizeImageQuotient(reflectancesFro
 
 from sklearn.metrics      import r2_score
 
-r2Score = r2_score(reflectancesFromEstimatedParameters, inputReflectancesOnlySegmented)
+r2Score = r2_score(reflectancesFromEstimatedParameters.T, inputReflectancesOnlySegmented.T)
 
-print("best determined random forest:", rf.best_params_)
+
 print("r2Score for random forest estimatation of", imageToLoad, ":", str(r2Score))
 
 # sort by wavelength:
 
-plot_i = 10
-# attention hack: this resorting is done to account for image quotient. if the image
-# quotient changes, the sorting will change!!
-sortedWavelengths = wavelengths[[4, 5, 3, 0, 6, 2, 7]]
-plot(sortedWavelengths, reflectancesFromEstimatedParameters[plot_i,[3, 4, 2, 0, 5, 1, 6]], 'g-o')
-plot(sortedWavelengths, inputReflectancesOnlySegmented[plot_i,[3, 4, 2, 0, 5, 1, 6]], 'b-o')
+for plot_i in range(n):
 
+    sortedIndices = sorted(range(len(wavelengths)), key=lambda k: wavelengths[k])
 
+    plt.figure()
+    plt.plot(wavelengths[sortedIndices], reflectancesFromEstimatedParameters[plot_i,sortedIndices], 'g-o')
+    plt.plot(wavelengths[sortedIndices], inputReflectancesOnlySegmented[plot_i,sortedIndices], 'b-o')
+    print(str(r2_score(reflectancesFromEstimatedParameters[plot_i, :], inputReflectancesOnlySegmented[plot_i, :])))

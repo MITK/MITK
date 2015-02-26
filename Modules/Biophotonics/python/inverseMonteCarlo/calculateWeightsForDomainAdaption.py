@@ -25,9 +25,6 @@ def calculateWeights(sourceReflectances, targetReflectances):
     allReflectances = np.concatenate((sourceReflectances, targetReflectances))
     allLabels       = np.concatenate((labelsSource, labelsTarget))
 
-
-
-
     # train logistic regression
 
     start = time.time()

@@ -22,10 +22,6 @@ if(MITK_USE_Vigra)
     set(patch_cmd ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${CMAKE_CURRENT_LIST_DIR}/EmptyFileForPatching.dummy -DHDF5_DIR:PATH=${HDF5_DIR} -P ${CMAKE_CURRENT_LIST_DIR}/PatchVigra-1.10.0.cmake)
 
     ExternalProject_Add(${proj}
-       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-       BINARY_DIR ${proj}-build
-       INSTALL_DIR ${proj}-install
-       PREFIX ${proj}-cmake
        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vigra-1.10.0-src.tar.gz
        URL_MD5 4f963f0be4fcb8b06271c2aa40baa9be
        PATCH_COMMAND ${patch_cmd}
@@ -40,7 +36,7 @@ if(MITK_USE_Vigra)
        DEPENDS ${proj_DEPENDENCIES}
       )
 
-    set(Vigra_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
+    set(Vigra_DIR ${ep_prefix})
 
   else()
 

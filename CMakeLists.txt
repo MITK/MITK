@@ -253,6 +253,7 @@ mitkFunctionAddExternalProject(NAME Numpy     OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME OpenCV    OFF)
 
 # These are "hard" dependencies and always set to ON
+mitkFunctionAddExternalProject(NAME HDF5      OFF)
 mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE)
 mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
 
@@ -262,7 +263,6 @@ mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS QT DCMTK DOC 
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)
 mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")
 mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DOC "Use Simulation Open Framework Architecture")
-mitkFunctionAddExternalProject(NAME HDF5      OFF)
 mitkFunctionAddExternalProject(NAME Vigra     OFF          DEPENDS HDF5)
 
 if(MITK_USE_QT)

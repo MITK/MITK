@@ -33,6 +33,15 @@ class PlaneGeometry;
  */
 class MITKPLANARFIGURE_EXPORT PlanarEllipse : public PlanarFigure
 {
+
+typedef struct MeasurementStatistics
+{
+  double Mean;
+  double SD;
+  int Max;
+  int Min;
+};
+
 public:
   mitkClassMacro( PlanarEllipse, PlanarFigure )
 
@@ -137,7 +146,7 @@ protected:
   bool m_TreatAsCircle;
 
 private:
-
+  MeasurementStatistics* EvaluateStatistics(); 
 };
 
 } // namespace mitk

@@ -683,9 +683,25 @@ void QmitkMeasurementView::OnDrawCircleTriggered(bool)
 
 void QmitkMeasurementView::OnDrawEllipseTriggered(bool)
 {
-  this->AddFigureToDataStorage(
-    mitk::PlanarEllipse::New(),
-    QString("Ellipse%1").arg(++d->m_EllipseCounter));
+  Q_UNUSED(checked)
+
+  mitk::PlanarEllipse::Pointer figure = mitk::PlanarEllipse::New();
+
+  mitk::DataNode* node;
+  figure->m_ImageNode = NULL;
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  if (!nodes.empty()) {
+    node = nodes.front();
+
+    if (node) {
+      figure->m_ImageNode = node;
+    }
+  }
+
+  QString qString = QString("Ellipse%1").arg(++d->m_EllipseCounter);
+  this->AddFigureToDataStorage(figure, qString);
+
+  MEASUREMENT_DEBUG << "PlanarEllipse initialized...";
 }
 
 void QmitkMeasurementView::OnDrawDoubleEllipseTriggered(bool)

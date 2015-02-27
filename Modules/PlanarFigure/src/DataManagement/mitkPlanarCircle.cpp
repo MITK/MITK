@@ -168,7 +168,7 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
 
         typedef itk::Image<short, 3> ImageType3D;
         ImageType3D::Pointer itkImage;
-		mitk::CastToItkImage(image, itkImage);
+		    mitk::CastToItkImage(image, itkImage);
 
         ImageType3D::IndexType currentIndex;
         currentIndex[Z] = centerIndex[Z];
@@ -180,7 +180,7 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
         int lIndex, rIndex;
         mitk::Point3D currentPoint; 
         std::vector<short> values;
-        for (double dy = circleRadius; dy > - circleRadius; dy--) {  
+        for (double dy = circleRadius; dy > - circleRadius; dy--) {
           dx = sqrt(circleRadiusSqr - dy*dy);
           currentPoint[X] = center[X] - dx;
           currentPoint[Y] =  center[Y] + dy;

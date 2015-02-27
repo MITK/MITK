@@ -141,7 +141,7 @@ protected:
   bool m_MinMaxRadiusContraintsActive;
 
 private:
-  MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistics(); 
+  MeasurementStatistics* EvaluateStatistics(); 
 };
 
 } // namespace mitk

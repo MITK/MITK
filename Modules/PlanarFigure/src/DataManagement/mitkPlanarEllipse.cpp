@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarEllipse.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
+#include "mitkImage.h"
+#include "itkImage.h"
+#include <mitkImageCast.h>
 
 #include <algorithm>
 
@@ -270,12 +273,128 @@ std::string mitk::PlanarEllipse::EvaluateAnnotation()
   double minor_axis = GetQuantity(FEATURE_ID_MINOR_AXIS);
   std::stringstream ss;
   char stmp[20];
-  ss << "Major axis=";
+
+  MeasurementStatistics* stats = EvaluateStatistics();
+  if (stats) {
+    ss << "Mean=";
+    sprintf(stmp, "%.2f", stats->Mean);
+    ss << stmp;    
+    sprintf(stmp, "%.2f", stats->SD);
+    ss << " SD=" << stmp;    
+    ss << "\nMax=" << std::to_string(stats->Max);
+    ss << " Min=" << std::to_string(stats->Min);
+  }
+  delete stats;
+
+  ss << "\nMajor axis=";
   sprintf(stmp, "%.2fmm\n", major_axis);
   ss << stmp << "Minor axis=";
   sprintf(stmp, "%.2fmm\n", minor_axis);
   ss << stmp;
   return ss.str();
+}
+
+mitk::PlanarEllipse::MeasurementStatistics* mitk::PlanarEllipse::EvaluateStatistics() 
+{
+  if (m_ImageNode) {
+   mitk::BaseData* data = m_ImageNode->GetData();
+    if (data) {
+      mitk::Image* image = dynamic_cast<mitk::Image*>(data);
+      if (image) {
+
+        const int CENTRAL_POINT_NUM = 0;
+        const int RADIUS_POINT_NUM1 = 1;
+        const int RADIUS_POINT_NUM2 = 2;
+        const int X = 0;
+        const int Y = 1;
+        const int Z = 2;        
+
+        double circleRadius1 = GetWorldControlPoint(CENTRAL_POINT_NUM).EuclideanDistanceTo(GetWorldControlPoint(RADIUS_POINT_NUM1));
+        double circleRadius2 = GetWorldControlPoint(CENTRAL_POINT_NUM).EuclideanDistanceTo(GetWorldControlPoint(RADIUS_POINT_NUM2));
+
+        double ymax = sqrt( ( 1 - (pow(0,2) / pow(circleRadius2,2) )) * pow(circleRadius1,2) );
+        /* rotation matrix:
+        x' = x \cos \theta - y \sin \theta\,,
+        y' = x \sin \theta + y \cos \theta\,.
+        */
+
+        mitk::Point3D centerIndex;
+        image->GetGeometry()->WorldToIndex(this->GetWorldControlPoint(CENTRAL_POINT_NUM), centerIndex);
+
+        mitk::Point3D center = GetWorldControlPoint(CENTRAL_POINT_NUM);
+
+        int minValue = INT32_MAX;
+        int maxValue = INT32_MIN;
+
+        typedef itk::Image<short, 3> ImageType3D;
+        ImageType3D::Pointer itkImage;
+		    mitk::CastToItkImage(image, itkImage);
+
+        ImageType3D::IndexType currentIndex;
+        currentIndex[Z] = centerIndex[Z];
+
+        double theta = acos ( GetWorldControlPoint(RADIUS_POINT_NUM1)[X] / circleRadius1 );
+
+        long long sum = 0;
+        double sd(0), mean(0);
+        long long pixCount = 0;
+        double dx;
+        int lIndex, rIndex;
+        mitk::Point3D currentPoint; 
+        std::vector<short> values;
+        double tx, ty;
+        for (double dy = ymax; dy > -ymax; dy--) {
+          dx = sqrt( ( 1 - (pow(dy,2) / pow(circleRadius1,2) )) * pow(circleRadius2,2) );
+          tx = center[X] - dx;
+          ty = center[Y] + dy;
+          currentPoint[X] = tx * cos( theta ) - ty * sin ( theta );
+          currentPoint[Y] = tx * sin( theta ) + ty * cos ( theta );
+          currentPoint[Z] = 0;
+          image->GetGeometry()->WorldToIndex(currentPoint, centerIndex);
+          lIndex = centerIndex[X];
+
+          currentPoint[X] = center[X] + dx;
+          image->GetGeometry()->WorldToIndex(currentPoint, centerIndex);
+          rIndex = centerIndex[X];
+          
+          currentIndex[Y] = centerIndex[Y];
+          for (int rowX = lIndex; rowX <= rIndex; rowX++) {
+            currentIndex[X] = rowX;
+            short val = itkImage->GetPixel(currentIndex);
+            values.push_back(val);
+            if (val < minValue) {
+              minValue = val;
+            } else if (val > maxValue) {
+              maxValue = val;
+            }
+            sum += val;
+            pixCount++;
+          } 
+        }
+
+        if (pixCount > 0) {
+          mean = (double)sum/pixCount;
+          sum = 0;
+          for (std::vector<short>::const_iterator it = values.begin(); it != values.end(); ++it) {
+            sum += (*it - mean)*(*it - mean);
+          }
+          sd = sqrt((double)sum/pixCount);
+        } else {
+          maxValue = 0;
+          minValue = 0;
+        }
+
+        MeasurementStatistics* stats = new MeasurementStatistics();
+        stats->Mean = mean;
+        stats->Max = maxValue;
+        stats->Min = minValue;
+        stats->SD = sd;
+
+        return stats;
+      }
+    }
+  }
+  return NULL;
 }
 
 void mitk::PlanarEllipse::EvaluateFeaturesInternal()

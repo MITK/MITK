@@ -307,21 +307,25 @@ mitk::PlanarEllipse::MeasurementStatistics* mitk::PlanarEllipse::EvaluateStatist
         const int RADIUS_POINT_NUM2 = 2;
         const int X = 0;
         const int Y = 1;
-        const int Z = 2;        
+        const int Z = 2;
+        mitk::Point3D center = GetWorldControlPoint(CENTRAL_POINT_NUM);
+        double circleRadius1 = center.EuclideanDistanceTo(GetWorldControlPoint(RADIUS_POINT_NUM1));
+        double circleRadius2 = center.EuclideanDistanceTo(GetWorldControlPoint(RADIUS_POINT_NUM2));
 
-        double circleRadius1 = GetWorldControlPoint(CENTRAL_POINT_NUM).EuclideanDistanceTo(GetWorldControlPoint(RADIUS_POINT_NUM1));
-        double circleRadius2 = GetWorldControlPoint(CENTRAL_POINT_NUM).EuclideanDistanceTo(GetWorldControlPoint(RADIUS_POINT_NUM2));
+        if (circleRadius1 == 0 || circleRadius2 == 0) return NULL;
 
         double ymax = sqrt( ( 1 - (pow(0,2) / pow(circleRadius2,2) )) * pow(circleRadius1,2) );
         /* rotation matrix:
         x' = x \cos \theta - y \sin \theta\,,
         y' = x \sin \theta + y \cos \theta\,.
         */
+        
+        if (ymax < 0) return NULL;
 
         mitk::Point3D centerIndex;
         image->GetGeometry()->WorldToIndex(this->GetWorldControlPoint(CENTRAL_POINT_NUM), centerIndex);
 
-        mitk::Point3D center = GetWorldControlPoint(CENTRAL_POINT_NUM);
+        
 
         int minValue = INT32_MAX;
         int maxValue = INT32_MIN;
@@ -333,7 +337,15 @@ mitk::PlanarEllipse::MeasurementStatistics* mitk::PlanarEllipse::EvaluateStatist
         ImageType3D::IndexType currentIndex;
         currentIndex[Z] = centerIndex[Z];
 
-        double theta = acos ( GetWorldControlPoint(RADIUS_POINT_NUM1)[X] / circleRadius1 );
+        mitk::Point3D cosPoint;
+        cosPoint[X] = GetWorldControlPoint(RADIUS_POINT_NUM1)[X];
+        cosPoint[Y] = center[Y];
+        cosPoint[Z] = center[Z];
+        double cosline = center.EuclideanDistanceTo(cosPoint);
+
+        if (cosline == 0) return NULL;
+
+        double theta = acos ( cosline / circleRadius1 );
 
         long long sum = 0;
         double sd(0), mean(0);
@@ -343,6 +355,7 @@ mitk::PlanarEllipse::MeasurementStatistics* mitk::PlanarEllipse::EvaluateStatist
         mitk::Point3D currentPoint; 
         std::vector<short> values;
         double tx, ty;
+
         for (double dy = ymax; dy > -ymax; dy--) {
           dx = sqrt( ( 1 - (pow(dy,2) / pow(circleRadius1,2) )) * pow(circleRadius2,2) );
           tx = center[X] - dx;

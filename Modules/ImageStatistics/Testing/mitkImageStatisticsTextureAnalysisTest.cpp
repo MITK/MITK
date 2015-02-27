@@ -13,7 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include "mitkStandardFileLocations.h"
+
 #include "mitkTestingMacros.h"
 #include "itkImage.h"
 #include "mitkExtendedLabelStatisticsImageFilter.h"

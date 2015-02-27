@@ -17,14 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkExtendedLabelStatisticsImageFilter_h
 
 #include "itkLabelStatisticsImageFilter.h"
-#include "itkSimpleDataObjectDecorator.h"
-#include "itksys/hash_map.hxx"
-#include "itkHistogram.h"
-#include "itkFastMutexLock.h"
-#include <vector>
-#include "itkDataObject.h"
-
-#include "mitkCommon.h"
 
 namespace itk
 {

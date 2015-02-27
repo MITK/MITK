@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkExtractImageFilter.h"
 #include "mitkImageTimeSelector.h"
-#include "mitkITKImageImport.h"
 
 #include <mitkExtendedStatisticsImageFilter.h>
 #include <mitkExtendedLabelStatisticsImageFilter.h>
@@ -32,12 +31,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMinimumMaximumImageCalculator.h>
 
 #include <itkMaskImageFilter.h>
-#include <itkImageFileWriter.h>
-#include <itkRescaleIntensityImageFilter.h>
-
 
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>
+#include <itkImageRegionConstIteratorWithIndex.h>
+#include <itkImageRegionIteratorWithIndex.h>
 
 #include <itkCastImageFilter.h>
 #include <itkVTKImageImport.h>
@@ -45,16 +43,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageDuplicator.h>
 
 #include <vtkPoints.h>
-#include <vtkCellArray.h>
-#include <vtkPolyData.h>
-#include <vtkLinearExtrusionFilter.h>
-#include <vtkPolyDataToImageStencil.h>
 #include <vtkImageStencil.h>
 #include <vtkImageImport.h>
 #include <vtkImageExport.h>
-#include <vtkImageData.h>
 #include <vtkLassoStencilSource.h>
-#include <vtkMetaImageWriter.h>
 
 #include <itkFFTConvolutionImageFilter.h>
 #include <itkConstantBoundaryCondition.h>
@@ -66,14 +58,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <exception>
 
-
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
 #include "itkImage.h"
-#include <itkNrrdImageIO.h>
-#include <itkGDCMImageIO.h>
-#include <itkImageRegionConstIteratorWithIndex.h>
-#include <itkImageRegionIteratorWithIndex.h>
+
 
 //#define DEBUG_HOTSPOTSEARCH
 

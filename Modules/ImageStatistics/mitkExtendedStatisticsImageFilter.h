@@ -18,12 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkStatisticsImageFilter.h"
 
-#include "itkDataObject.h"
-
-#include "MitkImageStatisticsExports.h"
-
-#include "mitkCommon.h"
-
 namespace itk
 {
   /**

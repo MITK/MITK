@@ -55,6 +55,7 @@ set(mitk_modules
   DicomRT
   IOExt
   XNAT
+  BiophotonicsHardware
 )
 
 if(MITK_ENABLE_PIC_READER)

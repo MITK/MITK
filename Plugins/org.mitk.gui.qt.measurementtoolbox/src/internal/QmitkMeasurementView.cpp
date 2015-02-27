@@ -718,6 +718,18 @@ void QmitkMeasurementView::ActionDrawEllipseTriggered(bool checked)
   Q_UNUSED(checked)
 
   mitk::PlanarEllipse::Pointer figure = mitk::PlanarEllipse::New();
+
+  mitk::DataNode* node;
+  figure->m_ImageNode = NULL;
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  if (!nodes.empty()) {
+    node = nodes.front();
+
+    if (node) {
+      figure->m_ImageNode = node;
+    }
+  }
+
   QString qString = QString("Ellipse%1").arg(++d->m_EllipseCounter);
   this->AddFigureToDataStorage(figure, qString);
 

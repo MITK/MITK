@@ -72,13 +72,13 @@ namespace itk
   template< class TInputImage, class TLabelImage >
   void
     ExtendedLabelStatisticsImageFilter< TInputImage, TLabelImage >::
-    ComputeTheSkewnessAndKurtosis()
+    ComputeSkewnessAndKurtosis()
   {
     typename TLabelImage::RegionType Subregion;
 
-    double baseOfSkewnessAndCurtosis = 0.0;
-    double kurtosis = 0.0;
-    double skewness = 0.0;
+    double baseOfSkewnessAndCurtosis( 0.0 );
+    double kurtosis( 0.0 );
+    double skewness( 0.0 );
 
     std::list< LabelPixelType> relevantLabels;
     bool maskNonEmpty = false;
@@ -140,7 +140,7 @@ namespace itk
 
     Superclass::AfterThreadedGenerateData();
 
-    ComputeTheSkewnessAndKurtosis();
+    ComputeSkewnessAndKurtosis();
   }
 
 } // end namespace itk

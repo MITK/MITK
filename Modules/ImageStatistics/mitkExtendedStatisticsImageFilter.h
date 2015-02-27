@@ -25,9 +25,17 @@ namespace itk
   * \brief Extension of the itkStatisticsImageFilter that also calculates the Skewness and Kurtosis.
   *
   * This class inherits from the itkStatisticsImageFilter and
-  * uses its Results for the calculation of the two new coefficients:
-  * the Skewness and Kurtosis. Both will be added in this class. So they will be
-  * placed as the 7th and 8th Output after the other statistical coefficients
+  * uses its results for the calculation of the two additional coefficients:
+  * the Skewness and Kurtosis.
+  *
+  * As these coefficient are based on the mean and the sigma which are both calculated
+  * by the StatisticsImageFilter, the method AfterThreadedGenerateData() is overwritten
+  * and calls ComputeSkewnessAndKurtosis() after the AfterThreadedGenerateData()
+  * implementation of the superclass is called.
+  *
+  * As the StatisticsImageFilter stores the statistics in the outputs 1 to 6 by the
+  * StatisticsImageFilter, the skewness and kurtosis are stored in the outputs
+  * 7 and 8 by this filter.
   */
   template< class TInputImage >
   class ExtendedStatisticsImageFilter : public StatisticsImageFilter< TInputImage >
@@ -38,20 +46,17 @@ namespace itk
     typedef StatisticsImageFilter< TInputImage >             Superclass;
     typedef SmartPointer< Self >                             Pointer;
     typedef SmartPointer< const Self >                       ConstPointer;
-    typedef typename Superclass::RealType                     RealType;
-    typedef typename Superclass::RealObjectType               RealObjectType;
+    typedef typename Superclass::RealType                    RealType;
+    typedef typename Superclass::RealObjectType              RealObjectType;
 
-    /** Method for creation through the object factory. */
     itkFactorylessNewMacro( Self );
     itkCloneMacro( Self );
-
-    /** Runtime information support. */
-    itkTypeMacro(ExtendedStatisticsImageFilter, StatisticsImageFilter);
+    itkTypeMacro( ExtendedStatisticsImageFilter, StatisticsImageFilter );
 
     /**
     * \brief Return the computed Skewness.
     */
-    RealType GetSkewness() const
+    double GetSkewness() const
     {
       return this->GetSkewnessOutput()->Get();
     }
@@ -59,7 +64,7 @@ namespace itk
     /**
     * \brief Return the computed Kurtosis.
     */
-    RealType GetKurtosis() const
+    double GetKurtosis() const
     {
       return this->GetKurtosisOutput()->Get();
     }
@@ -70,6 +75,9 @@ namespace itk
 
     virtual ~ExtendedStatisticsImageFilter(){};
 
+    /**
+    * brief Calls AfterThreadedGenerateData() of the superclass and ComputeSkewnessAndKurtosis().
+    */
     void AfterThreadedGenerateData();
 
     /**
@@ -78,7 +86,7 @@ namespace itk
     * The Skewness and Kurtosis will be calculated with the Sigma and Mean Value of the
     * itkStatisticsImageFilter which comes out of the threadedGenerateData().
     */
-    void ComputeTheSkewnessAndKurtosis();
+    void ComputeSkewnessAndKurtosis();
 
 
     RealObjectType* GetSkewnessOutput();

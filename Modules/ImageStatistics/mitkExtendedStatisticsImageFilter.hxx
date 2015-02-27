@@ -105,19 +105,19 @@ namespace itk
   {
     Superclass::AfterThreadedGenerateData();
 
-    ComputeTheSkewnessAndKurtosis();
+    ComputeSkewnessAndKurtosis();
   }
 
   template< class TInputImage >
   void
     ExtendedStatisticsImageFilter< TInputImage >
-    ::ComputeTheSkewnessAndKurtosis()
+    ::ComputeSkewnessAndKurtosis()
   {
     RealType mean = this->GetMean();
     RealType sigma = this->GetSigma();
     RealType baseOfSkewnessAndKurtosis;
-    RealType kurtosis = 0;
-    RealType skewness = 0;
+    RealType kurtosis(0.0);
+    RealType skewness(0.0);
 
     if (  sigma == 0 )
     {

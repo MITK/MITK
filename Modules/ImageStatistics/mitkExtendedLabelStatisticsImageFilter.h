@@ -25,9 +25,14 @@ namespace itk
   * \brief Extension of the itkLabelStatisticsImageFilter that also calculates the Skewness and Kurtosis.
   *
   * This class inherits from the itkLabelStatisticsImageFilter and
-  * uses its results for the calculation of two new coefficients of the statistics:
-  * the Skewness and Kurtosis. Both will be added in this new class. This class can be
-  * used for calculating the statistics for a multilabelImage
+  * uses its results for the calculation of two additional coefficients:
+  * the Skewness and Kurtosis.
+  *
+  * As these coefficient are based on the mean and the sigma which are both calculated
+  * by the LabelStatisticsImageFilter, the method AfterThreadedGenerateData() is overwritten
+  * and calls ComputeSkewnessAndKurtosis() after the AfterThreadedGenerateData()
+  * implementation of the superclass is called.
+  *
   */
   template< class TInputImage, class TLabelImage >
   class ExtendedLabelStatisticsImageFilter : public LabelStatisticsImageFilter< TInputImage,  TLabelImage >
@@ -45,7 +50,6 @@ namespace itk
 
     itkFactorylessNewMacro( Self );
     itkCloneMacro( Self );
-
     itkTypeMacro(ExtendedLabelStatisticsImageFilter, LabelStatisticsImageFilter);
 
     /**
@@ -71,18 +75,21 @@ namespace itk
 
 
     /*getter method for the new coefficients*/
-    RealType GetSkewness(LabelPixelType label) const;
-    RealType GetKurtosis(LabelPixelType label) const;
+    double GetSkewness(LabelPixelType label) const;
+    double GetKurtosis(LabelPixelType label) const;
 
   protected:
 
     typedef std::map< LabelPixelType, CoefficientsClass >        CoefficientsMap;
-    typedef typename std::map< LabelPixelType, CoefficientsClass >::const_iterator CoefficientsMapConstIterator;
+    typedef typename CoefficientsMap::const_iterator             CoefficientsMapConstIterator;
 
     ExtendedLabelStatisticsImageFilter();
 
     virtual ~ExtendedLabelStatisticsImageFilter(){};
 
+    /**
+    * brief Calls AfterThreadedGenerateData() of the superclass and ComputeSkewnessAndKurtosis().
+    */
     void AfterThreadedGenerateData();
 
     /**
@@ -90,7 +97,7 @@ namespace itk
     *
     * This method will calculate the new coefficients with sigma and mean value of the threaded generate data of the base class.
     */
-    void ComputeTheSkewnessAndKurtosis();
+    void ComputeSkewnessAndKurtosis();
 
 
   private:

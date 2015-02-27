@@ -76,9 +76,9 @@ namespace itk
   {
     typename TLabelImage::RegionType Subregion;
 
-    double baseOfSkewnessAndCurtosis( 0.0 );
-    double kurtosis( 0.0 );
-    double skewness( 0.0 );
+    RealType baseOfSkewnessAndCurtosis( 0.0 );
+    RealType kurtosis( 0.0 );
+    RealType skewness( 0.0 );
 
     std::list< LabelPixelType> relevantLabels;
     bool maskNonEmpty = false;
@@ -100,8 +100,8 @@ namespace itk
         it != relevantLabels.end();
         ++it )
       {
-        double sigma = GetSigma( *it );
-        double mean  = GetMean( *it );
+        RealType sigma = GetSigma( *it );
+        RealType mean  = GetMean( *it );
         Subregion = Superclass::GetRegion(*it);
 
         int count( GetCount(*it) );
@@ -126,8 +126,8 @@ namespace itk
           }
         }
 
-        m_LabelStatisticsCoefficients[*it].m_Skewness = double(skewness/count);
-        m_LabelStatisticsCoefficients[*it].m_Kurtosis = double(kurtosis/count);
+        m_LabelStatisticsCoefficients[*it].m_Skewness = RealType(skewness/count);
+        m_LabelStatisticsCoefficients[*it].m_Kurtosis = RealType(kurtosis/count);
       }
     }
   }

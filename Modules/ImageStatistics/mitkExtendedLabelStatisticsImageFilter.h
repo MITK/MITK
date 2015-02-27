@@ -61,22 +61,22 @@ namespace itk
 
       CoefficientsClass()
       {
-        m_Kurtosis = 0;
-        m_Skewness = 0;
+        m_Kurtosis = 0.0;
+        m_Skewness = 0.0;
       };
 
       ~CoefficientsClass(){};
 
       /* the new member coefficients*/
-      double m_Kurtosis;
-      double m_Skewness;
+      RealType m_Kurtosis;
+      RealType m_Skewness;
 
     };
 
 
     /*getter method for the new coefficients*/
-    double GetSkewness(LabelPixelType label) const;
-    double GetKurtosis(LabelPixelType label) const;
+    RealType GetSkewness(LabelPixelType label) const;
+    RealType GetKurtosis(LabelPixelType label) const;
 
   protected:
 

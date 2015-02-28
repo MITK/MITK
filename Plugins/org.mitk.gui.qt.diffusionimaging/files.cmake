@@ -13,6 +13,9 @@ set(SRC_CPP_FILES
   QmitkBallModelParametersWidget.cpp
   QmitkAstrosticksModelParametersWidget.cpp
   QmitkPrototypeSignalParametersWidget.cpp
+
+  QmitkFreeSurferParcellationHandler.cpp
+  QmitkFreeSurferParcellationWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -93,6 +96,8 @@ set(UI_FILES
   src/internal/QmitkFieldmapGeneratorViewControls.ui
   src/internal/QmitkDiffusionRegistrationViewControls.ui
   src/internal/QmitkDenoisingViewControls.ui
+
+  src/QmitkFreeSurferParcellationWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -147,6 +152,9 @@ set(MOC_H_FILES
   src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h
   src/internal/Perspectives/QmitkDIAppIVIMPerspective.h
   src/internal/Perspectives/QmitkDiffusionDefaultPerspective.h
+
+  src/QmitkFreeSurferParcellationHandler.h
+  src/QmitkFreeSurferParcellationWidget.h
 )
 
 set(CACHED_RESOURCE_FILES

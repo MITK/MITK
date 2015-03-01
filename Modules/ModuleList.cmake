@@ -62,6 +62,7 @@ set(mitk_modules
   DicomRT
   IOExt
   XNAT
+  TubeGraph
 )
 
 if(MITK_ENABLE_PIC_READER)

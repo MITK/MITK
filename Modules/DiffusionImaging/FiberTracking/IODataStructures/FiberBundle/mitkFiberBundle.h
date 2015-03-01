@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <MitkFiberTrackingExports.h>
 #include <mitkImage.h>
+#include <mitkDataStorage.h>
+#include <mitkPlanarFigure.h>
+#include <mitkPixelTypeTraits.h>
+#include <mitkPlanarFigureComposite.h>
 
 
 //includes storing fiberdata
@@ -31,12 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkDataSet.h>
 #include <vtkTransform.h>
 #include <vtkFloatArray.h>
-
-//#include <QStringList>
-
-#include <mitkPlanarFigure.h>
-#include <mitkPixelTypeTraits.h>
-#include <mitkPlanarFigureComposite.h>
 
 
 namespace mitk {
@@ -64,10 +62,11 @@ public:
     mitkNewMacro1Param(Self, vtkSmartPointer<vtkPolyData>) // custom constructor
 
     // colorcoding related methods
+    void ColorFibersByCurvature();
     void ColorFibersByScalarMap(mitk::Image::Pointer, bool opacity);
     template <typename TPixel>
     void ColorFibersByScalarMap(const mitk::PixelType pixelType, mitk::Image::Pointer, bool opacity);
-    void DoColorCodingOrientationBased();
+    void ColorFibersByOrientation();
     void SetFiberOpacity(vtkDoubleArray *FAValArray);
     void ResetFiberOpacity();
     void SetFiberColors(vtkSmartPointer<vtkUnsignedCharArray> fiberColors);
@@ -98,8 +97,8 @@ public:
     FiberBundle::Pointer SubtractBundle(FiberBundle* fib);
 
     // fiber subset extraction
-    FiberBundle::Pointer           ExtractFiberSubset(BaseData* roi);
-    std::vector<long>               ExtractFiberIdSubset(BaseData* roi);
+    FiberBundle::Pointer           ExtractFiberSubset(DataNode *roi, DataStorage* storage);
+    std::vector<long>              ExtractFiberIdSubset(DataNode* roi, DataStorage* storage);
     FiberBundle::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false);
     FiberBundle::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
 

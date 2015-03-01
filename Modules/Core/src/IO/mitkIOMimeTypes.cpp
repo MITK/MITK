@@ -70,6 +70,8 @@ std::vector<CustomMimeType*> IOMimeTypes::Get()
   mimeTypes.push_back(VTK_POLYDATA_LEGACY_MIMETYPE().Clone());
 
   mimeTypes.push_back(STEREOLITHOGRAPHY_MIMETYPE().Clone());
+  mimeTypes.push_back(WAVEFRONT_OBJ_MIMETYPE().Clone());
+  mimeTypes.push_back(STANFORD_PLY_MIMETYPE().Clone());
 
   mimeTypes.push_back(RAW_MIMETYPE().Clone());
   mimeTypes.push_back(POINTSET_MIMETYPE().Clone());
@@ -139,9 +141,39 @@ CustomMimeType IOMimeTypes::STEREOLITHOGRAPHY_MIMETYPE()
   return mimeType;
 }
 
+CustomMimeType IOMimeTypes::WAVEFRONT_OBJ_MIMETYPE()
+{
+  CustomMimeType mimeType(WAVEFRONT_OBJ_NAME());
+  mimeType.AddExtension("obj");
+  mimeType.SetCategory(CATEGORY_SURFACES());
+  mimeType.SetComment("Wavefront OBJ");
+  return mimeType;
+}
+
+CustomMimeType IOMimeTypes::STANFORD_PLY_MIMETYPE()
+{
+  CustomMimeType mimeType(STANFORD_PLY_NAME());
+  mimeType.AddExtension("ply");
+  mimeType.SetCategory(CATEGORY_SURFACES());
+  mimeType.SetComment("Stanford PLY");
+  return mimeType;
+}
+
 std::string IOMimeTypes::STEREOLITHOGRAPHY_NAME()
 {
   static std::string name = DEFAULT_BASE_NAME() + ".stl";
+  return name;
+}
+
+std::string IOMimeTypes::WAVEFRONT_OBJ_NAME()
+{
+  static std::string name = DEFAULT_BASE_NAME() + ".obj";
+  return name;
+}
+
+std::string IOMimeTypes::STANFORD_PLY_NAME()
+{
+  static std::string name = DEFAULT_BASE_NAME() + ".ply";
   return name;
 }
 

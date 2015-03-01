@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureComposite.h>
 #include <mitkImageCast.h>
-
+#include <mitkStandaloneDataStorage.h>
 #include <vtkDebugLeaks.h>
 
 /**Documentation
@@ -41,27 +41,38 @@ int mitkFiberExtractionTest(int argc, char* argv[])
         mitk::FiberBundle::Pointer testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(argv[2])->GetData());
 
         // test planar figure based extraction
-        mitk::PlanarFigure::Pointer pf1 = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::LoadDataNode(argv[3])->GetData());
-        mitk::PlanarFigure::Pointer pf2 = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::LoadDataNode(argv[4])->GetData());
-        mitk::PlanarFigure::Pointer pf3 = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::LoadDataNode(argv[5])->GetData());
+        mitk::DataNode::Pointer pf1 = mitk::IOUtil::LoadDataNode(argv[3]);
+        mitk::DataNode::Pointer pf2 = mitk::IOUtil::LoadDataNode(argv[4]);
+        mitk::DataNode::Pointer pf3 = mitk::IOUtil::LoadDataNode(argv[5]);
 
-        MITK_INFO << "TEST1";
+        mitk::StandaloneDataStorage::Pointer storage = mitk::StandaloneDataStorage::New();
+
+        mitk::PlanarFigureComposite::Pointer pfc2 = mitk::PlanarFigureComposite::New();
+        pfc2->setOperationType(mitk::PlanarFigureComposite::OR);
+        mitk::DataNode::Pointer pfcNode2 = mitk::DataNode::New();
+        pfcNode2->SetData(pfc2);
+        mitk::DataStorage::SetOfObjects::Pointer set2 = mitk::DataStorage::SetOfObjects::New();
+        set2->push_back(pfcNode2);
 
         mitk::PlanarFigureComposite::Pointer pfc1 = mitk::PlanarFigureComposite::New();
-        pfc1->setOperationType(mitk::PFCOMPOSITION_AND_OPERATION);
-        pfc1->addPlanarFigure(dynamic_cast<mitk::BaseData*>(pf2.GetPointer()));
-        pfc1->addPlanarFigure(dynamic_cast<mitk::BaseData*>(pf3.GetPointer()));
+        pfc1->setOperationType(mitk::PlanarFigureComposite::AND);
+        mitk::DataNode::Pointer pfcNode1 = mitk::DataNode::New();
+        pfcNode1->SetData(pfc1);
+        mitk::DataStorage::SetOfObjects::Pointer set1 = mitk::DataStorage::SetOfObjects::New();
+        set1->push_back(pfcNode1);
+
+        storage->Add(pfcNode2);
+        storage->Add(pf1, set2);
+        storage->Add(pfcNode1, set2);
+        storage->Add(pf2, set1);
+        storage->Add(pf3, set1);
+
+        MITK_INFO << "TEST1";
+        mitk::FiberBundle::Pointer extractedFibs = groundTruthFibs->ExtractFiberSubset(pfcNode2, storage);
         MITK_INFO << "TEST2";
-        mitk::PlanarFigureComposite::Pointer pfc2 = mitk::PlanarFigureComposite::New();
-        pfc2->setOperationType(mitk::PFCOMPOSITION_OR_OPERATION);
-        pfc2->addPlanarFigure(dynamic_cast<mitk::BaseData*>(pf1.GetPointer()));
-        pfc2->addPlanarFigure(pfc1.GetPointer());
-        MITK_INFO << "TEST3";
-        mitk::FiberBundle::Pointer extractedFibs = groundTruthFibs->ExtractFiberSubset(pfc2);
-        MITK_INFO << "TEST4";
         MITK_TEST_CONDITION_REQUIRED(extractedFibs->Equals(testFibs),"check planar figure extraction")
 
-                MITK_INFO << "TEST5";
+                MITK_INFO << "TEST3";
         // test subtraction and addition
         mitk::FiberBundle::Pointer notExtractedFibs = groundTruthFibs->SubtractBundle(extractedFibs);
 

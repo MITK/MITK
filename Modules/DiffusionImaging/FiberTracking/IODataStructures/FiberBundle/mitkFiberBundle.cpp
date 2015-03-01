@@ -61,7 +61,7 @@ mitk::FiberBundle::FiberBundle( vtkPolyData* fiberPolyData )
     if (fiberPolyData != NULL)
     {
         m_FiberPolyData = fiberPolyData;
-        this->DoColorCodingOrientationBased();
+        this->ColorFibersByOrientation();
     }
 
     this->UpdateFiberGeometry();
@@ -276,7 +276,7 @@ void mitk::FiberBundle::SetFiberPolyData(vtkSmartPointer<vtkPolyData> fiberPD, b
     else
     {
         m_FiberPolyData->DeepCopy(fiberPD);
-        DoColorCodingOrientationBased();
+        ColorFibersByOrientation();
     }
 
     m_NumFibers = m_FiberPolyData->GetNumberOfLines();
@@ -294,7 +294,7 @@ vtkSmartPointer<vtkPolyData> mitk::FiberBundle::GetFiberPolyData() const
     return m_FiberPolyData;
 }
 
-void mitk::FiberBundle::DoColorCodingOrientationBased()
+void mitk::FiberBundle::ColorFibersByOrientation()
 {
     //===== FOR WRITING A TEST ========================
     //  colorT size == tupelComponents * tupelElements
@@ -409,6 +409,129 @@ void mitk::FiberBundle::DoColorCodingOrientationBased()
     m_UpdateTime2D.Modified();
 }
 
+void mitk::FiberBundle::ColorFibersByCurvature()
+{
+    double window = 5;
+
+    //colors and alpha value for each single point, RGBA = 4 components
+    unsigned char rgba[4] = {0,0,0,0};
+    int componentSize = 4;
+    m_FiberColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+    m_FiberColors->Allocate(m_FiberPolyData->GetNumberOfPoints() * componentSize);
+    m_FiberColors->SetNumberOfComponents(componentSize);
+    m_FiberColors->SetName("FIBER_COLORS");
+
+    mitk::LookupTable::Pointer mitkLookup = mitk::LookupTable::New();
+    vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
+    lookupTable->SetTableRange(0.0, 0.8);
+    lookupTable->Build();
+    mitkLookup->SetVtkLookupTable(lookupTable);
+    mitkLookup->SetType(mitk::LookupTable::JET);
+
+    vector< double > values;
+    double min = 1;
+    double max = 0;
+    MITK_INFO << "Coloring fibers by curvature";
+    boost::progress_display disp(m_FiberPolyData->GetNumberOfCells());
+    for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
+    {
+        ++disp;
+        vtkCell* cell = m_FiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
+
+        // calculate curvatures
+        for (int j=0; j<numPoints; j++)
+        {
+            double dist = 0;
+            int c = j;
+            std::vector< vnl_vector_fixed< float, 3 > > vectors;
+            vnl_vector_fixed< float, 3 > meanV; meanV.fill(0.0);
+            while(dist<window/2 && c>1)
+            {
+                double p1[3];
+                points->GetPoint(c-1, p1);
+                double p2[3];
+                points->GetPoint(c, p2);
+
+                vnl_vector_fixed< float, 3 > v;
+                v[0] = p2[0]-p1[0];
+                v[1] = p2[1]-p1[1];
+                v[2] = p2[2]-p1[2];
+                dist += v.magnitude();
+                v.normalize();
+                vectors.push_back(v);
+                if (c==j)
+                    meanV += v;
+                c--;
+            }
+            c = j;
+            dist = 0;
+            while(dist<window/2 && c<numPoints-1)
+            {
+                double p1[3];
+                points->GetPoint(c, p1);
+                double p2[3];
+                points->GetPoint(c+1, p2);
+
+                vnl_vector_fixed< float, 3 > v;
+                v[0] = p2[0]-p1[0];
+                v[1] = p2[1]-p1[1];
+                v[2] = p2[2]-p1[2];
+                dist += v.magnitude();
+                v.normalize();
+                vectors.push_back(v);
+                if (c==j)
+                    meanV += v;
+                c++;
+            }
+            meanV.normalize();
+
+            double dev = 0;
+            for (int c=0; c<vectors.size(); c++)
+            {
+                double angle = dot_product(meanV, vectors.at(c));
+                if (angle>1.0)
+                    angle = 1.0;
+                if (angle<-1.0)
+                    angle = -1.0;
+                dev += acos(angle)*180/M_PI;
+            }
+            if (vectors.size()>0)
+                dev /= vectors.size();
+
+            dev = 1.0-dev/180.0;
+            values.push_back(dev);
+            if (dev<min)
+                min = dev;
+            if (dev>max)
+                max = dev;
+        }
+    }
+    MITK_INFO << min << " - " << max;
+    unsigned int count = 0;
+    for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
+    {
+        vtkCell* cell = m_FiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        for (int j=0; j<numPoints; j++)
+        {
+            double color[3];
+            double dev = (values.at(count)-min)/(max-min);
+            lookupTable->GetColor(dev, color);
+
+            rgba[0] = (unsigned char) (255.0 * color[0]);
+            rgba[1] = (unsigned char) (255.0 * color[1]);
+            rgba[2] = (unsigned char) (255.0 * color[2]);
+            rgba[3] = (unsigned char) (255.0);
+            m_FiberColors->InsertTupleValue(cell->GetPointId(j), rgba);
+            count++;
+        }
+    }
+    m_UpdateTime3D.Modified();
+    m_UpdateTime2D.Modified();
+}
+
 void mitk::FiberBundle::SetFiberOpacity(vtkDoubleArray* FAValArray)
 {
     for(long i=0; i<m_FiberColors->GetNumberOfTuples(); i++)
@@ -465,7 +588,7 @@ void mitk::FiberBundle::ColorFibersByScalarMap(const mitk::PixelType, mitk::Imag
         double pixelValue = readimage.GetPixelByWorldCoordinates(px);
 
         double color[3];
-        lookupTable->GetColor(pixelValue, color);
+        lookupTable->GetColor(1-pixelValue, color);
 
         rgba[0] = (unsigned char) (255.0 * color[0]);
         rgba[1] = (unsigned char) (255.0 * color[1]);
@@ -726,12 +849,12 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
     return newFib;
 }
 
-mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(BaseData* roi)
+mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(DataNode* roi, DataStorage* storage)
 {
-    if (roi==NULL || !(dynamic_cast<PlanarFigure*>(roi) || dynamic_cast<PlanarFigureComposite*>(roi)) )
+    if (roi==NULL || !(dynamic_cast<PlanarFigure*>(roi->GetData()) || dynamic_cast<PlanarFigureComposite*>(roi->GetData())) )
         return NULL;
 
-    std::vector<long> tmp = ExtractFiberIdSubset(roi);
+    std::vector<long> tmp = ExtractFiberIdSubset(roi, storage);
 
     if (tmp.size()<=0)
         return mitk::FiberBundle::New();
@@ -739,24 +862,29 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(BaseData* roi)
     return mitk::FiberBundle::New(pTmp);
 }
 
-std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(BaseData* roi)
+std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataStorage* storage)
 {
     std::vector<long> result;
-    if (roi==NULL)
+    if (roi==NULL || roi->GetData()==NULL)
         return result;
 
-    mitk::PlanarFigureComposite::Pointer pfc = dynamic_cast<mitk::PlanarFigureComposite*>(roi);
+    mitk::PlanarFigureComposite::Pointer pfc = dynamic_cast<mitk::PlanarFigureComposite*>(roi->GetData());
     if (!pfc.IsNull()) // handle composite
     {
+        DataStorage::SetOfObjects::ConstPointer children = storage->GetDerivations(roi);
+        if (children->size()==0)
+            return result;
+
         switch (pfc->getOperationType())
         {
         case 0: // AND
         {
-            result = this->ExtractFiberIdSubset(pfc->getChildAt(0));
+            MITK_INFO << "AND";
+            result = this->ExtractFiberIdSubset(children->ElementAt(0), storage);
             std::vector<long>::iterator it;
-            for (int i=1; i<pfc->getNumberOfChildren(); ++i)
+            for (int i=1; i<children->Size(); ++i)
             {
-                std::vector<long> inRoi = this->ExtractFiberIdSubset(pfc->getChildAt(i));
+                std::vector<long> inRoi = this->ExtractFiberIdSubset(children->ElementAt(i), storage);
 
                 std::vector<long> rest(std::min(result.size(),inRoi.size()));
                 it = std::set_intersection(result.begin(), result.end(), inRoi.begin(), inRoi.end(), rest.begin() );
@@ -767,12 +895,13 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(BaseData* roi)
         }
         case 1: // OR
         {
-            result = ExtractFiberIdSubset(pfc->getChildAt(0));
+            MITK_INFO << "OR";
+            result = ExtractFiberIdSubset(children->ElementAt(0), storage);
             std::vector<long>::iterator it;
-            for (int i=1; i<pfc->getNumberOfChildren(); ++i)
+            for (int i=1; i<children->Size(); ++i)
             {
                 it = result.end();
-                std::vector<long> inRoi = ExtractFiberIdSubset(pfc->getChildAt(i));
+                std::vector<long> inRoi = ExtractFiberIdSubset(children->ElementAt(i), storage);
                 result.insert(it, inRoi.begin(), inRoi.end());
             }
 
@@ -784,13 +913,14 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(BaseData* roi)
         }
         case 2: // NOT
         {
+            MITK_INFO << "NOT";
             for(long i=0; i<this->GetNumFibers(); i++)
                 result.push_back(i);
 
             std::vector<long>::iterator it;
-            for (long i=0; i<pfc->getNumberOfChildren(); ++i)
+            for (long i=0; i<children->Size(); ++i)
             {
-                std::vector<long> inRoi = ExtractFiberIdSubset(pfc->getChildAt(i));
+                std::vector<long> inRoi = ExtractFiberIdSubset(children->ElementAt(i), storage);
 
                 std::vector<long> rest(result.size()-inRoi.size());
                 it = std::set_difference(result.begin(), result.end(), inRoi.begin(), inRoi.end(), rest.begin() );
@@ -801,11 +931,11 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(BaseData* roi)
         }
         }
     }
-    else if ( dynamic_cast<mitk::PlanarFigure*>(roi) )  // actual extraction
+    else if ( dynamic_cast<mitk::PlanarFigure*>(roi->GetData()) )  // actual extraction
     {
-        if ( dynamic_cast<mitk::PlanarPolygon*>(roi) )
+        if ( dynamic_cast<mitk::PlanarPolygon*>(roi->GetData()) )
         {
-            mitk::PlanarFigure::Pointer planarPoly = dynamic_cast<mitk::PlanarFigure*>(roi);
+            mitk::PlanarFigure::Pointer planarPoly = dynamic_cast<mitk::PlanarFigure*>(roi->GetData());
 
             //create vtkPolygon using controlpoints from planarFigure polygon
             vtkSmartPointer<vtkPolygon> polygonVtk = vtkSmartPointer<vtkPolygon>::New();
@@ -849,9 +979,9 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(BaseData* roi)
                 }
             }
         }
-        else if ( dynamic_cast<mitk::PlanarCircle*>(roi) )
+        else if ( dynamic_cast<mitk::PlanarCircle*>(roi->GetData()) )
         {
-            mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(roi);
+            mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(roi->GetData());
             Vector3D planeNormal = planarFigure->GetPlaneGeometry()->GetNormal();
             planeNormal.Normalize();
 
@@ -918,7 +1048,7 @@ void mitk::FiberBundle::UpdateFiberGeometry()
     m_NumFibers = m_FiberPolyData->GetNumberOfCells();
 
     if (m_FiberColors==NULL || m_FiberColors->GetNumberOfTuples()!=m_FiberPolyData->GetNumberOfPoints())
-        this->DoColorCodingOrientationBased();
+        this->ColorFibersByOrientation();
 
     if (m_FiberWeights->GetSize()!=m_NumFibers)
     {

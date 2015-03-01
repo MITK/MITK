@@ -124,6 +124,7 @@ void mitk::VtkLayerController::InsertForegroundRenderer(vtkSmartPointer<vtkRende
   else
     m_ForegroundRenderers.push_back(renderer);
 
+  renderer->PreserveDepthBufferOn();
   UpdateLayers();
 }
 /**

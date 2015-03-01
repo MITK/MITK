@@ -42,6 +42,10 @@ mitk::FileReaderRegistry::~FileReaderRegistry()
 
 mitk::MimeType mitk::FileReaderRegistry::GetMimeTypeForFile(const std::string& path, us::ModuleContext* context)
 {
+  if (path.empty()){
+    mitkThrow() << "FileReaderRegistry::GetMimeTypeForFile was called with empty path. Returning empty MimeType, please report this error to the developers.";
+  }
+
   mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider(context));
   std::vector<MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForFile(path);
   if (mimeTypes.empty())

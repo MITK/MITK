@@ -38,6 +38,8 @@ set(CPP_FILES
   mitkFiberBundleMapper2D.cpp
   mitkFiberBundleMapper3D.cpp
   mitkCompositeMapper.cpp
-
+  mitkPlanarFigureCompositeWriter.cpp
+  mitkPlanarFigureCompositeReader.cpp
+  mitkPlanarFigureCompositeSerializer.cpp
 )
 

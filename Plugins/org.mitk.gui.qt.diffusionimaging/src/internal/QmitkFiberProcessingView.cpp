@@ -152,6 +152,11 @@ void QmitkFiberProcessingView::Modify()
         WeightFibers();
         break;
     }
+    case 5:
+    {
+        DoCurvatureColorCoding();
+        break;
+    }
     }
 }
 
@@ -456,10 +461,10 @@ void QmitkFiberProcessingView::WritePfToImage(mitk::DataNode::Pointer node, mitk
     }
     else if (dynamic_cast<mitk::PlanarFigureComposite*>(node->GetData()))
     {
-        mitk::PlanarFigureComposite* pfc = dynamic_cast<mitk::PlanarFigureComposite*>(node->GetData());
-        for (int j=0; j<pfc->getNumberOfChildren(); j++)
+        DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(node);
+        for (int j=0; j<children->size(); j++)
         {
-            WritePfToImage(pfc->getDataNodeAt(j), image);
+            WritePfToImage(children->ElementAt(j), image);
         }
     }
 }
@@ -1104,9 +1109,8 @@ void QmitkFiberProcessingView::ExtractWithPlanarFigure()
     for (unsigned int i=0; i<fiberBundles.size(); i++)
     {
         mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(fiberBundles.at(i)->GetData());
-        mitk::BaseData::Pointer roi = planarFigure->GetData();
 
-        mitk::FiberBundle::Pointer extFB = fib->ExtractFiberSubset(roi);
+        mitk::FiberBundle::Pointer extFB = fib->ExtractFiberSubset(planarFigure, GetDataStorage());
         if (extFB->GetNumFibers()<=0)
         {
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
@@ -1128,232 +1132,87 @@ void QmitkFiberProcessingView::ExtractWithPlanarFigure()
 void QmitkFiberProcessingView::GenerateAndComposite()
 {
     mitk::PlanarFigureComposite::Pointer PFCAnd = mitk::PlanarFigureComposite::New();
-    PFCAnd->setOperationType(mitk::PFCOMPOSITION_AND_OPERATION);
-    for( std::vector<mitk::DataNode::Pointer>::iterator it = m_SelectedPF.begin(); it != m_SelectedPF.end(); ++it )
-    {
-        mitk::DataNode::Pointer nodePF = *it;
-        PFCAnd->addPlanarFigure( nodePF->GetData() );
-        PFCAnd->addDataNode( nodePF );
-        PFCAnd->setDisplayName("AND");
-    }
-    AddCompositeToDatastorage(PFCAnd);
+    PFCAnd->setOperationType(mitk::PlanarFigureComposite::AND);
+
+    mitk::DataNode::Pointer newPFCNode;
+    newPFCNode = mitk::DataNode::New();
+    newPFCNode->SetName("AND");
+    newPFCNode->SetData(PFCAnd);
+
+    AddCompositeToDatastorage(newPFCNode, m_SelectedPF);
+    m_SelectedPF.clear();
+    m_SelectedPF.push_back(newPFCNode);
+    UpdateGui();
 }
 
 void QmitkFiberProcessingView::GenerateOrComposite()
 {
     mitk::PlanarFigureComposite::Pointer PFCOr = mitk::PlanarFigureComposite::New();
-    PFCOr->setOperationType(mitk::PFCOMPOSITION_OR_OPERATION);
-    for( std::vector<mitk::DataNode::Pointer>::iterator it = m_SelectedPF.begin(); it != m_SelectedPF.end(); ++it )
-    {
-        mitk::DataNode::Pointer nodePF = *it;
-        PFCOr->addPlanarFigure( nodePF->GetData() );
-        PFCOr->addDataNode( nodePF );
-        PFCOr->setDisplayName("OR");
-    }
-    AddCompositeToDatastorage(PFCOr);
+    PFCOr->setOperationType(mitk::PlanarFigureComposite::OR);
+
+    mitk::DataNode::Pointer newPFCNode;
+    newPFCNode = mitk::DataNode::New();
+    newPFCNode->SetName("OR");
+    newPFCNode->SetData(PFCOr);
+
+    AddCompositeToDatastorage(newPFCNode, m_SelectedPF);
+    m_SelectedPF.clear();
+    m_SelectedPF.push_back(newPFCNode);
+    UpdateGui();
 }
 
 void QmitkFiberProcessingView::GenerateNotComposite()
 {
     mitk::PlanarFigureComposite::Pointer PFCNot = mitk::PlanarFigureComposite::New();
-    PFCNot->setOperationType(mitk::PFCOMPOSITION_NOT_OPERATION);
-    for( std::vector<mitk::DataNode::Pointer>::iterator it = m_SelectedPF.begin(); it != m_SelectedPF.end(); ++it )
-    {
-        mitk::DataNode::Pointer nodePF = *it;
-        PFCNot->addPlanarFigure( nodePF->GetData() );
-        PFCNot->addDataNode( nodePF );
-        PFCNot->setDisplayName("NOT");
-    }
-    AddCompositeToDatastorage(PFCNot);
-}
+    PFCNot->setOperationType(mitk::PlanarFigureComposite::NOT);
 
-/* CLEANUP NEEDED */
-void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer pfc, mitk::DataNode::Pointer parentNode )
-{
     mitk::DataNode::Pointer newPFCNode;
     newPFCNode = mitk::DataNode::New();
-    newPFCNode->SetName( pfc->getDisplayName() );
-    newPFCNode->SetData(pfc);
+    newPFCNode->SetName("NOT");
+    newPFCNode->SetData(PFCNot);
 
-    switch (pfc->getOperationType()) {
-    case 0:
-    {
-        if (parentNode.IsNotNull())
-            GetDataStorage()->Add(newPFCNode, parentNode);
-        else
-            GetDataStorage()->Add(newPFCNode);
-
-        //iterate through its childs
-        for(int i=0; i<pfc->getNumberOfChildren(); ++i)
-        {
-            mitk::BaseData::Pointer tmpPFchild = pfc->getChildAt(i);
-            mitk::DataNode::Pointer savedPFchildNode = pfc->getDataNodeAt(i);
-
-            mitk::PlanarFigureComposite::Pointer pfcompcast= dynamic_cast<mitk::PlanarFigureComposite*>(tmpPFchild.GetPointer());
-            if ( pfcompcast.IsNotNull() )
-            {
-                // child is of type planar Figure composite
-                // make new node of the child, cuz later the child has to be removed of its old position in datamanager
-                // feed new dataNode with information of the savedDataNode, which is gonna be removed soon
-                mitk::DataNode::Pointer newChildPFCNode;
-                newChildPFCNode = mitk::DataNode::New();
-                newChildPFCNode->SetData(tmpPFchild);
-                newChildPFCNode->SetName( savedPFchildNode->GetName() );
-                pfcompcast->setDisplayName(  savedPFchildNode->GetName()  ); //name might be changed in DataManager by user
-
-                //update inside vector the dataNodePointer
-                pfc->replaceDataNodeAt(i, newChildPFCNode);
-
-                AddCompositeToDatastorage(pfcompcast, newPFCNode); //the current PFCNode becomes the childs parent
-
-                // remove savedNode here, cuz otherwise its children will change their position in the dataNodeManager
-                // without having its parent anymore
-                GetDataStorage()->Remove(savedPFchildNode);
-            }
-            else
-            {
-                // child is not of type PlanarFigureComposite, so its one of the planarFigures
-                // create new dataNode containing the data of the old dataNode, but position in dataManager will be
-                // modified cuz we re setting a (new) parent.
-                mitk::DataNode::Pointer newPFchildNode = mitk::DataNode::New();
-                newPFchildNode->SetName(savedPFchildNode->GetName() );
-                newPFchildNode->SetData(tmpPFchild);
-                newPFchildNode->SetVisibility(true);
-                newPFchildNode->SetBoolProperty("planarfigure.3drendering", true);
-
-                // replace the dataNode in PFComp DataNodeVector
-                pfc->replaceDataNodeAt(i, newPFchildNode);
-
-                // remove old child position in dataStorage
-                GetDataStorage()->Remove(savedPFchildNode);
-
-                //add new child to datamanager with its new position as child of newPFCNode parent
-                GetDataStorage()->Add(newPFchildNode, newPFCNode);
-            }
-        }
-        break;
-    }
-    case 1:
-    {
-        if (!parentNode.IsNull())
-            GetDataStorage()->Add(newPFCNode, parentNode);
-        else
-            GetDataStorage()->Add(newPFCNode);
-
-        for(int i=0; i<pfc->getNumberOfChildren(); ++i)
-        {
-            mitk::BaseData::Pointer tmpPFchild = pfc->getChildAt(i);
-            mitk::DataNode::Pointer savedPFchildNode = pfc->getDataNodeAt(i);
-            mitk::PlanarFigureComposite::Pointer pfcompcast= dynamic_cast<mitk::PlanarFigureComposite*>(tmpPFchild.GetPointer());
-            if ( !pfcompcast.IsNull() )
-            {
-                // child is of type planar Figure composite
-                // make new node of the child, cuz later the child has to be removed of its old position in datamanager
-                // feed new dataNode with information of the savedDataNode, which is gonna be removed soon
-                mitk::DataNode::Pointer newChildPFCNode;
-                newChildPFCNode = mitk::DataNode::New();
-                newChildPFCNode->SetData(tmpPFchild);
-                newChildPFCNode->SetName( savedPFchildNode->GetName() );
-                pfcompcast->setDisplayName(  savedPFchildNode->GetName()  ); //name might be changed in DataManager by user
-
-                //update inside vector the dataNodePointer
-                pfc->replaceDataNodeAt(i, newChildPFCNode);
-
-                AddCompositeToDatastorage(pfcompcast, newPFCNode); //the current PFCNode becomes the childs parent
-
-                // remove old child position in dataStorage
-                GetDataStorage()->Remove(savedPFchildNode);
-            }
-            else
-            {
-                // child is not of type PlanarFigureComposite, so its one of the planarFigures
-                // create new dataNode containing the data of the old dataNode, but position in dataManager will be
-                // modified cuz we re setting a (new) parent.
-                mitk::DataNode::Pointer newPFchildNode = mitk::DataNode::New();
-                newPFchildNode->SetName(savedPFchildNode->GetName() );
-                newPFchildNode->SetData(tmpPFchild);
-                newPFchildNode->SetVisibility(true);
-                newPFchildNode->SetBoolProperty("planarfigure.3drendering", true);
-
-                // replace the dataNode in PFComp DataNodeVector
-                pfc->replaceDataNodeAt(i, newPFchildNode);
-
-                // remove old child position in dataStorage
-                GetDataStorage()->Remove(savedPFchildNode);
-
-                //add new child to datamanager with its new position as child of newPFCNode parent
-                GetDataStorage()->Add(newPFchildNode, newPFCNode);
-            }
-        }
-        break;
-    }
-    case 2:
-    {
-        if (!parentNode.IsNull())
-            GetDataStorage()->Add(newPFCNode, parentNode);
-        else
-            GetDataStorage()->Add(newPFCNode);
-
-        //iterate through its childs
-        for(int i=0; i<pfc->getNumberOfChildren(); ++i)
-        {
-            mitk::BaseData::Pointer tmpPFchild = pfc->getChildAt(i);
-            mitk::DataNode::Pointer savedPFchildNode = pfc->getDataNodeAt(i);
-
-            mitk::PlanarFigureComposite::Pointer pfcompcast= dynamic_cast<mitk::PlanarFigureComposite*>(tmpPFchild.GetPointer());
-            if ( !pfcompcast.IsNull() )
-            { // child is of type planar Figure composite
-                // makeRemoveBundle new node of the child, cuz later the child has to be removed of its old position in datamanager
-                // feed new dataNode with information of the savedDataNode, which is gonna be removed soon
-                mitk::DataNode::Pointer newChildPFCNode;
-                newChildPFCNode = mitk::DataNode::New();
-                newChildPFCNode->SetData(tmpPFchild);
-                newChildPFCNode->SetName( savedPFchildNode->GetName() );
-                pfcompcast->setDisplayName( savedPFchildNode->GetName() ); //name might be changed in DataManager by user
-
-                //update inside vector the dataNodePointer
-                pfc->replaceDataNodeAt(i, newChildPFCNode);
-
-                AddCompositeToDatastorage(pfcompcast, newPFCNode); //the current PFCNode becomes the childs parent
-
-                // remove old child position in dataStorage
-                GetDataStorage()->Remove(savedPFchildNode);
-            }
-            else
-            {
-                // child is not of type PlanarFigureComposite, so its one of the planarFigures
-                // create new dataNode containing the data of the old dataNode, but position in dataManager will be
-                // modified cuz we re setting a (new) parent.
-                mitk::DataNode::Pointer newPFchildNode = mitk::DataNode::New();
-                newPFchildNode->SetName(savedPFchildNode->GetName() );
-                newPFchildNode->SetData(tmpPFchild);
-                newPFchildNode->SetVisibility(true);
-                newPFchildNode->SetBoolProperty("planarfigure.3drendering", true);
-
-                // replace the dataNode in PFComp DataNodeVector
-                pfc->replaceDataNodeAt(i, newPFchildNode);
-
-                // remove old child position in dataStorage
-                GetDataStorage()->Remove(savedPFchildNode);
-
-                //add new child to datamanager with its new position as child of newPFCNode parent
-                GetDataStorage()->Add(newPFchildNode, newPFCNode);
-            }
-        }
-        break;
-    }
-    default:
-        MITK_DEBUG << "we have an UNDEFINED composition... ERROR" ;
-        break;
-    }
-
-    for(unsigned int i = 0; i < m_SelectedPF.size(); i++)
-        m_SelectedPF[i]->SetSelected(false);
-
-    newPFCNode->SetSelected(true);
+    AddCompositeToDatastorage(newPFCNode, m_SelectedPF);
     m_SelectedPF.clear();
     m_SelectedPF.push_back(newPFCNode);
     UpdateGui();
+}
+
+void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::DataNode::Pointer pfc, std::vector<mitk::DataNode::Pointer> children, mitk::DataNode::Pointer parentNode )
+{
+    pfc->SetSelected(true);
+    if (parentNode.IsNotNull())
+        GetDataStorage()->Add(pfc, parentNode);
+    else
+        GetDataStorage()->Add(pfc);
+
+    for (int i=0; i<children.size(); i++)
+    {
+        if (dynamic_cast<PlanarFigure*>(children.at(i)->GetData()))
+        {
+            mitk::DataNode::Pointer newChild;
+            newChild = mitk::DataNode::New();
+            newChild->SetData(dynamic_cast<PlanarFigure*>(children.at(i)->GetData()));
+            newChild->SetName( children.at(i)->GetName() );
+
+            GetDataStorage()->Add(newChild, pfc);
+            GetDataStorage()->Remove(children.at(i));
+        }
+        else if (dynamic_cast<PlanarFigureComposite*>(children.at(i)->GetData()))
+        {
+            mitk::DataNode::Pointer newChild;
+            newChild = mitk::DataNode::New();
+            newChild->SetData(dynamic_cast<PlanarFigureComposite*>(children.at(i)->GetData()));
+            newChild->SetName( children.at(i)->GetName() );
+
+            std::vector< mitk::DataNode::Pointer > grandChildVector;
+            mitk::DataStorage::SetOfObjects::ConstPointer grandchildren = GetDataStorage()->GetDerivations(children.at(i));
+            for( mitk::DataStorage::SetOfObjects::const_iterator it = grandchildren->begin(); it != grandchildren->end(); ++it )
+                grandChildVector.push_back(*it);
+
+            AddCompositeToDatastorage(newChild, grandChildVector, pfc);
+            GetDataStorage()->Remove(children.at(i));
+        }
+    }
 }
 
 void QmitkFiberProcessingView::JoinBundles()
@@ -1455,6 +1314,18 @@ void QmitkFiberProcessingView::DoImageColorCoding()
         m_MultiWidget->RequestUpdate();
 }
 
+
+void QmitkFiberProcessingView::DoCurvatureColorCoding()
+{
+    for(unsigned int i=0; i<m_SelectedFB.size(); i++ )
+    {
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
+        fib->ColorFibersByCurvature();
+    }
+
+    if(m_MultiWidget)
+        m_MultiWidget->RequestUpdate();
+}
 
 void QmitkFiberProcessingView::MirrorFibers()
 {

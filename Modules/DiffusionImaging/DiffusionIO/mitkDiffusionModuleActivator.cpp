@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleVtkReader.h>
 #include <mitkFiberBundleTrackVisReader.h>
 #include <mitkConnectomicsNetworkReader.h>
+#include <mitkPlanarFigureCompositeReader.h>
 
 #include <mitkDiffusionImageNrrdWriterService.h>
 #include <mitkDiffusionImageNiftiWriterService.h>
@@ -31,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleVtkWriter.h>
 #include <mitkFiberBundleTrackVisWriter.h>
 #include <mitkConnectomicsNetworkWriter.h>
+#include <mitkPlanarFigureCompositeWriter.h>
 
 #include "mitkDiffusionIOMimeTypes.h"
 
@@ -62,6 +64,7 @@ namespace mitk
       m_FiberBundleVtkReader = new FiberBundleVtkReader();
       m_FiberBundleTrackVisReader = new FiberBundleTrackVisReader();
       m_ConnectomicsNetworkReader = new ConnectomicsNetworkReader();
+      m_PlanarFigureCompositeReader = new PlanarFigureCompositeReader();
 
       m_DiffusionImageNrrdWriterService = new DiffusionImageNrrdWriterService();
       m_DiffusionImageNiftiWriterService = new DiffusionImageNiftiWriterService();
@@ -70,6 +73,7 @@ namespace mitk
       m_FiberBundleVtkWriter = new FiberBundleVtkWriter();
       m_FiberBundleTrackVisWriter = new FiberBundleTrackVisWriter();
       m_ConnectomicsNetworkWriter = new ConnectomicsNetworkWriter();
+      m_PlanarFigureCompositeWriter = new PlanarFigureCompositeWriter();
     }
 
     void Unload(us::ModuleContext*)
@@ -86,6 +90,7 @@ namespace mitk
       delete m_FiberBundleVtkReader;
       delete m_FiberBundleTrackVisReader;
       delete m_ConnectomicsNetworkReader;
+      delete m_PlanarFigureCompositeReader;
 
       delete m_DiffusionImageNrrdWriterService;
       delete m_DiffusionImageNiftiWriterService;
@@ -94,6 +99,7 @@ namespace mitk
       delete m_FiberBundleVtkWriter;
       delete m_FiberBundleTrackVisWriter;
       delete m_ConnectomicsNetworkWriter;
+      delete m_PlanarFigureCompositeWriter;
     }
 
   private:
@@ -105,6 +111,7 @@ namespace mitk
     FiberBundleVtkReader * m_FiberBundleVtkReader;
     FiberBundleTrackVisReader * m_FiberBundleTrackVisReader;
     ConnectomicsNetworkReader * m_ConnectomicsNetworkReader;
+    PlanarFigureCompositeReader* m_PlanarFigureCompositeReader;
 
     DiffusionImageNrrdWriterService * m_DiffusionImageNrrdWriterService;
     DiffusionImageNiftiWriterService * m_DiffusionImageNiftiWriterService;
@@ -113,6 +120,7 @@ namespace mitk
     FiberBundleVtkWriter * m_FiberBundleVtkWriter;
     FiberBundleTrackVisWriter * m_FiberBundleTrackVisWriter;
     ConnectomicsNetworkWriter * m_ConnectomicsNetworkWriter;
+    PlanarFigureCompositeWriter* m_PlanarFigureCompositeWriter;
 
     std::vector<mitk::CustomMimeType*> m_MimeTypes;
 

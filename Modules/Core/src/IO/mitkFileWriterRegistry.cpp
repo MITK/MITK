@@ -48,10 +48,16 @@ std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry:
 
 std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry::GetReferences(const mitk::BaseData* baseData, const std::string& mimeType, us::ModuleContext* context)
 {
+  if (baseData == NULL){
+    mitkThrow() << "FileWriterRegistry::GetReferences was called with null basedata.";
+    std::vector<mitk::FileWriterRegistry::WriterReference> emptyResult;
+    return emptyResult;
+  }
+
   std::vector<WriterReference> result;
 
   // loop over the class hierarchy of baseData and get all writers
-  // claiming the support the actual baseData class or any of its super classes
+  // claiming to support the actual baseData class or any of its super classes
   std::vector<std::string> classHierarchy = baseData->GetClassHierarchy();
   for (std::vector<std::string>::const_iterator clIter = classHierarchy.begin(),
        clIterEnd = classHierarchy.end(); clIter != clIterEnd; ++clIter)
@@ -77,6 +83,12 @@ mitk::IFileWriter* mitk::FileWriterRegistry::GetWriter(const mitk::FileWriterReg
 
 std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(const mitk::BaseData* baseData, const std::string& mimeType, us::ModuleContext* context)
 {
+  if (baseData == NULL){
+    mitkThrow() << "FileWriterRegistry::GetReferences was called with null basedata.";
+    std::vector<mitk::IFileWriter*> emptyResult;
+    return emptyResult;
+  }
+
   std::vector <mitk::IFileWriter*> result;
 
   std::vector <us::ServiceReference<IFileWriter> > refs;

@@ -100,7 +100,7 @@ namespace mitk {
     void AddEdge( VertexDescriptorType vertexA, VertexDescriptorType vertexB);
 
     /** add an edge between two given vertices ( with a specific weight ) */
-    void AddEdge( VertexDescriptorType vertexA, VertexDescriptorType vertexB, int sourceID, int targetID, int weight = 1 );
+    void AddEdge( VertexDescriptorType vertexA, VertexDescriptorType vertexB, int sourceID, int targetID, int weight = 1, double edge_weight = 1.0 );
 
     /** add a vertex with a specified id */
     VertexDescriptorType AddVertex( int id);

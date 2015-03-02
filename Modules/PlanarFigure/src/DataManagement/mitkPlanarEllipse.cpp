@@ -325,8 +325,6 @@ mitk::PlanarEllipse::MeasurementStatistics* mitk::PlanarEllipse::EvaluateStatist
         mitk::Point3D centerIndex;
         image->GetGeometry()->WorldToIndex(this->GetWorldControlPoint(CENTRAL_POINT_NUM), centerIndex);
 
-        
-
         int minValue = INT32_MAX;
         int maxValue = INT32_MIN;
 
@@ -358,10 +356,11 @@ mitk::PlanarEllipse::MeasurementStatistics* mitk::PlanarEllipse::EvaluateStatist
 
         for (double dy = ymax; dy > -ymax; dy--) {
           dx = sqrt( ( 1 - (pow(dy,2) / pow(circleRadius1,2) )) * pow(circleRadius2,2) );
-          tx = center[X] - dx;
-          ty = center[Y] + dy;
-          currentPoint[X] = tx * cos( theta ) - ty * sin ( theta );
-          currentPoint[Y] = tx * sin( theta ) + ty * cos ( theta );
+          /// Matrix rotation when center is (0, 0)
+          tx = dx * cos( theta ) - dy * sin ( theta );
+          ty = dx * sin( theta ) + dy * cos ( theta );
+          currentPoint[X] = center[X] - tx;
+          currentPoint[Y] = center[Y] + ty;
           currentPoint[Z] = 0;
           image->GetGeometry()->WorldToIndex(currentPoint, centerIndex);
           lIndex = centerIndex[X];

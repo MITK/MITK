@@ -183,7 +183,7 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
         for (double dy = circleRadius; dy > - circleRadius; dy--) {
           dx = sqrt(circleRadiusSqr - dy*dy);
           currentPoint[X] = center[X] - dx;
-          currentPoint[Y] =  center[Y] + dy;
+          currentPoint[Y] = center[Y] + dy;
           currentPoint[Z] = 0;
           image->GetGeometry()->WorldToIndex(currentPoint, centerIndex);
           lIndex = centerIndex[X];

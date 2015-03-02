@@ -21,24 +21,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-void ICommandManagerListener::Events::AddListener(
-    ICommandManagerListener::Pointer l)
+void ICommandManagerListener::Events::AddListener(ICommandManagerListener* l)
 {
-  if (l.IsNull())
-    return;
+  if (l == 0) return;
 
-  commandManagerChanged += Delegate(l.GetPointer(),
-      &ICommandManagerListener::CommandManagerChanged);
+  commandManagerChanged += Delegate(l, &ICommandManagerListener::CommandManagerChanged);
 }
 
-void ICommandManagerListener::Events::RemoveListener(
-    ICommandManagerListener::Pointer l)
+void ICommandManagerListener::Events::RemoveListener(ICommandManagerListener* l)
 {
-  if (l.IsNull())
-    return;
+  if (l == 0) return;
 
-  commandManagerChanged -= Delegate(l.GetPointer(),
-      &ICommandManagerListener::CommandManagerChanged);
+  commandManagerChanged -= Delegate(l, &ICommandManagerListener::CommandManagerChanged);
+}
+
+ICommandManagerListener::~ICommandManagerListener()
+{
 }
 
 }

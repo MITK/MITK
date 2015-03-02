@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkExtWorkbenchWindowAdvisor.h>
 
-const std::string QmitkExtAppWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID =
+const QString QmitkExtAppWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID =
     "org.mitk.extapp.defaultperspective";
 
 void
@@ -40,12 +40,12 @@ QmitkExtAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   // Exclude the help perspective from org.blueberry.ui.qt.help from
   // the normal perspective list.
   // The perspective gets a dedicated menu entry in the help menu
-  std::vector<std::string> excludePerspectives;
+  QList<QString> excludePerspectives;
   excludePerspectives.push_back("org.blueberry.perspectives.help");
   advisor->SetPerspectiveExcludeList(excludePerspectives);
 
   // Exclude some views from the normal view list
-  std::vector<std::string> excludeViews;
+  QList<QString> excludeViews;
   excludeViews.push_back("org.mitk.views.modules");
   excludeViews.push_back( "org.blueberry.ui.internal.introview" );
   advisor->SetViewExcludeList(excludeViews);
@@ -55,7 +55,7 @@ QmitkExtAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   //return new QmitkExtWorkbenchWindowAdvisor(this, configurer);
 }
 
-std::string QmitkExtAppWorkbenchAdvisor::GetInitialWindowPerspectiveId()
+QString QmitkExtAppWorkbenchAdvisor::GetInitialWindowPerspectiveId()
 {
   return DEFAULT_PERSPECTIVE_ID;
 }

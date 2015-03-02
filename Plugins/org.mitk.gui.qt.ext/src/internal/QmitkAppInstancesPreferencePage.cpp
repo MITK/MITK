@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIPreferencesService.h>
 #include <berryQtPreferences.h>
+#include <berryPlatform.h>
 
 QmitkAppInstancesPreferencePage::QmitkAppInstancesPreferencePage()
 {
@@ -34,10 +35,7 @@ void QmitkAppInstancesPreferencePage::CreateQtControl(QWidget* parent)
   mainWidget = new QWidget(parent);
   controls.setupUi(mainWidget);
 
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   prefs = prefService->GetSystemPreferences()->Node("/General");
 
   Update();

@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QStandardItemModel>
 #include <QTimer>
+#include <berryPlatform.h>
 #include <mitkBaseRenderer.h>
 #include <mitkGL.h>
 
@@ -46,14 +47,13 @@ static QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
   return NULL;
 }
 
-static QString GetFFmpegPath()
+QString QmitkMovieMakerView::GetFFmpegPath() const
 {
-  berry::IPreferencesService::Pointer preferencesService =
-    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferences::Pointer preferences = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
 
-  berry::IPreferences::Pointer preferences = preferencesService->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
-
-  return QString::fromStdString(preferences->Get("ffmpeg", ""));
+  return preferences.IsNotNull()
+    ? preferences->Get("ffmpeg", "")
+    : "";
 }
 
 static unsigned char* ReadPixels(vtkRenderWindow* renderWindow, int x, int y, int width, int height)

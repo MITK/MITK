@@ -23,7 +23,7 @@ void QmitkVisualizationPerspective::CreateInitialLayout(berry::IPageLayout::Poin
   // all di-app perspectives should have the following:
   /////////////////////////////////////////////////////
 
-  std::string editorArea = layout->GetEditorArea();
+  QString editorArea = layout->GetEditorArea();
 
   layout->AddStandaloneView("org.mitk.views.datamanager",
     false, berry::IPageLayout::LEFT, 0.3f, editorArea);

@@ -17,45 +17,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYPREFERENCESSERVICE_H_
 
 #include <org_blueberry_core_runtime_Export.h>
-#include "berryIBerryPreferencesService.h"
-#include "berryAbstractPreferencesStorage.h"
 
-#include <vector>
-#include <map>
+#include "berryIBerryPreferencesService.h"
 
 #include <QObject>
+#include <QHash>
+#include <QMutex>
 
 namespace berry
 {
+
+class AbstractPreferencesStorage;
+
   /**
   * Implementation of the IPreferencesService Interface
   */
-  class BERRY_RUNTIME PreferencesService : public QObject, public IBerryPreferencesService
+  class org_blueberry_core_runtime_EXPORT PreferencesService : public QObject, public IBerryPreferencesService
   {
     Q_OBJECT
-    Q_INTERFACES(berry::IPreferencesService)
+    Q_INTERFACES(berry::IBerryPreferencesService berry::IPreferencesService)
 
   public:
-    berryObjectMacro(PreferencesService);
-
-    //# From berry::Service
-    virtual bool IsA(const std::type_info& type) const;
-    virtual const std::type_info& GetType() const;
 
     ///
     /// Returns the default name for the preferences data file
     ///
-    static std::string GetDefaultPreferencesFileName();
+    static QString GetDefaultPreferencesFileName();
 
     ///
     /// Returns the path to the directory where all preference data is stored.
     ///
-    static std::string GetDefaultPreferencesDirPath();
+    static QString GetDefaultPreferencesDirPath();
 
     ///
     /// Reads in all users for which preferences exist.
     ///
-    PreferencesService(std::string _PreferencesDir="");
+    PreferencesService(const QString& _PreferencesDir="");
 
     ///
     /// Nothing to do here so far.
@@ -66,51 +63,55 @@ namespace berry
     * If no system preference file exists create a new AbstractPreferencesStorage.
     * \see IPreferencesService::GetSystemPreferences()
     */
-    virtual IPreferences::Pointer GetSystemPreferences();
+    virtual SmartPointer<IPreferences> GetSystemPreferences();
 
     /**
     * If no user preference file exists create a new AbstractPreferencesStorage.
     * \see IPreferencesService::GetUserPreferences()
     */
-    virtual IPreferences::Pointer GetUserPreferences(std::string name);
+    virtual SmartPointer<IPreferences> GetUserPreferences(const QString& name);
 
     /**
     * \see IPreferencesService::GetUsers()
     */
-    virtual std::vector<std::string> GetUsers() const;
+    virtual QStringList GetUsers() const;
 
 
     ///
     /// \see IPreferencesService::ImportPreferences()
     ///
-    virtual void ImportPreferences(Poco::File f, std::string name="");
+    virtual void ImportPreferences(const QString &f, const QString& name="");
 
     ///
     /// \see IPreferencesService::ExportPreferences()
     ///
-    virtual void ExportPreferences(Poco::File f, std::string name="");
+    virtual void ExportPreferences(const QString &f, const QString& name="");
 
     ///
     /// flushes all preferences
     ///
     virtual void ShutDown();
+
   protected:
+
+    SmartPointer<IPreferences> GetUserPreferences_unlocked(const QString& name);
+
     ///
     /// Helper func for ImportPreferences(). Imports all nodes of an IPreferences tree recursively
     ///
-    void ImportNode( IPreferences::Pointer nodeToImport , IPreferences::Pointer rootOfOldPrefs );
+    void ImportNode(const SmartPointer<IPreferences>& nodeToImport, const SmartPointer<IPreferences>& rootOfOldPrefs);
     ///
     /// Holds the directory where the preferences files will be stored
     ///
-    std::string m_PreferencesDir;
+    QString m_PreferencesDir;
     ///
     /// Maps all user names to their preference storage.
     ///
-    std::map<std::string, AbstractPreferencesStorage::Pointer> m_PreferencesStorages;
+    QHash<QString, SmartPointer<AbstractPreferencesStorage> > m_PreferencesStorages;
     ///
     /// A mutex to avoid concurrency crashes. Mutable because we need to use Mutex::lock() in const functions
     ///
-    mutable Poco::Mutex m_Mutex;
+    mutable QMutex m_Mutex;
 
   };
 }  // namespace berry

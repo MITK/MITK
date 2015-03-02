@@ -43,7 +43,7 @@ public:
   static ctkPluginContext* GetContext();
   static org_mitk_gui_qt_application_Activator* GetInstance();
 
-  berry::IPreferencesService::Pointer GetPreferencesService();
+  berry::IPreferencesService* GetPreferencesService();
 
 private:
 

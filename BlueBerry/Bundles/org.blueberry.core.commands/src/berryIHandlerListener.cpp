@@ -23,20 +23,24 @@ namespace berry {
 
 void
 IHandlerListener::Events
-::AddListener(IHandlerListener::Pointer l)
+::AddListener(IHandlerListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == NULL) return;
 
-  handlerChanged += Delegate(l.GetPointer(), &IHandlerListener::HandlerChanged);
+  handlerChanged += Delegate(l, &IHandlerListener::HandlerChanged);
 }
 
 void
 IHandlerListener::Events
-::RemoveListener(IHandlerListener::Pointer l)
+::RemoveListener(IHandlerListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == NULL) return;
 
-  handlerChanged -= Delegate(l.GetPointer(), &IHandlerListener::HandlerChanged);
+  handlerChanged -= Delegate(l, &IHandlerListener::HandlerChanged);
+}
+
+IHandlerListener::~IHandlerListener()
+{
 }
 
 }

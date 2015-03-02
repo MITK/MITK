@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDir>
 #include <QDesktopServices>
 #include <QStringList>
+#include <QString>
+#include <QMap>
+#include <QHash>
 
 #include <usModuleSettings.h>
 
@@ -137,25 +140,17 @@ int main(int argc, char** argv)
   // These paths replace the .ini file and are tailored for installation
   // packages created with CPack. If a .ini file is presented, it will
   // overwrite the settings in MapConfiguration
-  Poco::Path basePath(argv[0]);
-  basePath.setFileName("");
+  QDir basePath(argv[0]);
 
-  Poco::Path provFile(basePath);
-  provFile.setFileName("MitkWorkbench.provisioning");
-
-  Poco::Path extPath(basePath);
-  extPath.pushDirectory("ExtBundles");
-
-  std::string pluginDirs = extPath.toString();
+  QString provFile = basePath.absoluteFilePath("MitkWorkbench.provisioning");
 
   Poco::Util::MapConfiguration* extConfig(new Poco::Util::MapConfiguration());
   if (!storageDir.isEmpty())
   {
-    extConfig->setString(berry::Platform::ARG_STORAGE_DIR, storageDir.toStdString());
+    extConfig->setString(berry::Platform::ARG_STORAGE_DIR.toStdString(), storageDir.toStdString());
   }
-  extConfig->setString(berry::Platform::ARG_PLUGIN_DIRS, pluginDirs);
-  extConfig->setString(berry::Platform::ARG_PROVISIONING, provFile.toString());
-  extConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.extapplication");
+  extConfig->setString(berry::Platform::ARG_PROVISIONING.toStdString(), provFile.toStdString());
+  extConfig->setString(berry::Platform::ARG_APPLICATION.toStdString(), "org.mitk.qt.extapplication");
 
   QStringList preloadLibs;
 
@@ -208,7 +203,7 @@ int main(int argc, char** argv)
   }
   preloadConfig.chop(1);
 
-  extConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, preloadConfig.toStdString());
+  extConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY.toStdString(), preloadConfig.toStdString());
 
   // Seed the random number generator, once at startup.
   QTime time = QTime::currentTime();

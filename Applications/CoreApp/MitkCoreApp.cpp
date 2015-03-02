@@ -72,22 +72,20 @@ int main(int argc, char** argv)
   // These paths replace the .ini file and are tailored for installation
   // packages created with CPack. If a .ini file is presented, it will
   // overwrite the settings in MapConfiguration
-  Poco::Path basePath(argv[0]);
-  basePath.setFileName("");
+  QDir basePath(argv[0]);
 
-  Poco::Path provFile(basePath);
-  provFile.setFileName("MitkCoreApp.provisioning");
+  QString provFile = basePath.absoluteFilePath("MitkCoreApp.provisioning");
 
   Poco::Util::MapConfiguration* coreConfig(new Poco::Util::MapConfiguration());
-  coreConfig->setString(berry::Platform::ARG_PROVISIONING, provFile.toString());
-  coreConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.coreapplication");
+  coreConfig->setString(berry::Platform::ARG_PROVISIONING.toStdString(), provFile.toStdString());
+  coreConfig->setString(berry::Platform::ARG_APPLICATION.toStdString(), "org.mitk.qt.coreapplication");
 
   // Preload the org.mitk.gui.qt.common plug-in (and hence also Qmitk) to speed
   // up a clean-cache start. This also works around bugs in older gcc and glibc implementations,
   // which have difficulties with multiple dynamic opening and closing of shared libraries with
   // many global static initializers. It also helps if dependent libraries have weird static
   // initialization methods and/or missing de-initialization code.
-  coreConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, "liborg_mitk_gui_qt_common");
+  coreConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY.toStdString(), "liborg_mitk_gui_qt_common");
 
   return berry::Starter::Run(argc, argv, coreConfig);
 }

@@ -79,7 +79,7 @@ private:
   QScopedPointer<HelpContextHandler> helpContextHandler;
 
   QCHPluginListener* pluginListener;
-  IWindowListener::Pointer wndListener;
+  QScopedPointer<IWindowListener> wndListener;
 };
 
 /**

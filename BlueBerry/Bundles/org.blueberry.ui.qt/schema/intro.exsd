@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.blueberry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.blueberry.ui" id="intro" name="Intro Part"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;This extension point is used to register implementations of special workbench parts, called intro parts, that are responsible for introducing a product to new users. An intro part is typically shown the first time a product is started up. Rules for associating an intro part implementation with particular products are also contributed via this extension point.
+&lt;/p&gt;
+The life cycle is as follows:
+&lt;ul&gt;
+&lt;li&gt;The intro area is created on workbench start up. As with editor and view areas, this area is managed by an intro site (implementing &lt;code&gt;IIntroSite&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;The id of the current product (Platform::GetProduct()) is used to choose the relevant intro part implementation.
+&lt;/li&gt;
+&lt;li&gt;The intro part class (implementing &lt;code&gt;IIntroPart&lt;/code&gt;) is created and initialized with the intro site.
+&lt;/li&gt;
+&lt;li&gt;While the intro part is showing to the user, it can transition back and forth between full and standby mode (either programmatically or explicitly by the user).
+&lt;/li&gt;
+&lt;li&gt;Eventually the intro part is closed (either programmatically or explicitly by the user). The current perspective takes over the entire workbench window area.
+&lt;/li&gt;
+&lt;/ul&gt;
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="intro" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="introProductBinding" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified identifier of the target extension point
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  an optional identifier of the extension instance
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  an optional name of the extension instance
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="intro">
+      <annotation>
+         <appinfo>
+            <meta.element labelAttribute="id" icon="icon"/>
+         </appinfo>
+         <documentation>
+            Specifies an introduction. An introduction is a product-specific presentation shown to first-time users on product start up.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a unique identifier for this introduction
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  a plug-in-relative file name of the icon that will be associated with this introduction
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified name of the class implementing the &lt;code&gt;berry::IIntroPart&lt;/code&gt; interface.  A common practice
+is to subclass &lt;samp&gt;berry::IntroPart&lt;/samp&gt;
+in order to inherit the default functionality.  This class implements the introduction.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":berryIIntroPart"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="contentDetector" type="string">
+            <annotation>
+               <documentation>
+                  a fully qualified name of a class extending &lt;code&gt;berry::IntroContentDetector&lt;/code&gt;.  This optional class is used to detect newly added introduction content.  If new content is available, the view showing the introduction will be opened again.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":berryIntroContentDetector"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="label" type="string">
+            <annotation>
+               <documentation>
+                  an string label for this introduction that will be used in the construction of the open action as well as the part label.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="introProductBinding">
+      <annotation>
+         <documentation>
+            Specifies a binding between a product and an introduction. These bindings determine which introduction is appropriate for the current product (as defined by &lt;code&gt;Platform::GetProduct()&lt;/code&gt;).
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="productId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  unique id of a product
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="introId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  unique id of an introduction
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         3.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         The following is an example of an intro part extension that contributes an particular introduction and associates it with a particular product:
+&lt;p&gt;
+&lt;pre&gt;
+  &lt;extension point=&quot;org.eclipse.ui.intro&quot;&gt;
+     &lt;intro
+        id=&quot;com.example.xyz.intro.custom&quot;
+        class=&quot;com.example.xyz.intro.IntroPart&quot;/&gt;
+     &lt;introProductBinding
+        productId=&quot;com.example.xyz.Product&quot;
+        introId=&quot;com.example.xyz.intro.custom&quot;/&gt;
+  &lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiInfo"/>
+      </appinfo>
+      <documentation>
+         The value of the &lt;code&gt;class&lt;/code&gt; attribute must be the fully qualified name of a class that implements the&lt;code&gt;org.eclipse.ui.intro.IIntroPart&lt;/code&gt; interface by subclassing &lt;code&gt;org.eclipse.ui.part.intro.IntroPart&lt;/code&gt;.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         There are no default implementations of the initial user experience. Each Eclipse-based product is responsible for providing one that is closely matched to its branding and function.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2004, 2007 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made
+available under the terms of the Eclipse Public License v1.0 which accompanies
+this distribution, and is available at &lt;a
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

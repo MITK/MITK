@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryEqualsExpression.h"
 
 #include "berryExpressions.h"
+#include <berryIConfigurationElement.h>
 
 #include <Poco/Hash.h>
 #include <Poco/Exception.h>
@@ -33,45 +34,45 @@ EqualsExpression::EqualsExpression(Object::Pointer expectedValue) {
   fExpectedValue = expectedValue;
 }
 
-EqualsExpression::EqualsExpression(IConfigurationElement::Pointer element) {
-  std::string value;
-  bool result = element->GetAttribute(ATT_VALUE, value);
-  Expressions::CheckAttribute(ATT_VALUE, result);
-  fExpectedValue = Expressions::ConvertArgument(value, result);
-}
-
-EqualsExpression::EqualsExpression(Poco::XML::Element* element) {
-  std::string value = element->getAttribute(ATT_VALUE);
-  Expressions::CheckAttribute(ATT_VALUE, value.size() > 0);
+EqualsExpression::EqualsExpression(const IConfigurationElement::Pointer& element) {
+  QString value = element->GetAttribute(ATT_VALUE);
+  Expressions::CheckAttribute(ATT_VALUE, value);
   fExpectedValue = Expressions::ConvertArgument(value);
 }
 
-EvaluationResult
-EqualsExpression::Evaluate(IEvaluationContext* context) {
-  Object::Pointer element= context->GetDefaultVariable();
+EqualsExpression::EqualsExpression(Poco::XML::Element* element) {
+  std::string strValue = element->getAttribute(ATT_VALUE.toStdString());
+  QString value(strValue.size() > 0 ? QString::fromStdString(strValue) : QString());
+  Expressions::CheckAttribute(ATT_VALUE, value);
+  fExpectedValue = Expressions::ConvertArgument(value);
+}
+
+EvaluationResult::ConstPointer
+EqualsExpression::Evaluate(IEvaluationContext* context) const
+{
+  Object::ConstPointer element= context->GetDefaultVariable();
   return EvaluationResult::ValueOf(element == fExpectedValue);
 }
 
 void
-EqualsExpression::CollectExpressionInfo(ExpressionInfo* info) {
+EqualsExpression::CollectExpressionInfo(ExpressionInfo* info) const
+{
   info->MarkDefaultVariableAccessed();
 }
 
 bool
-EqualsExpression::operator==(Expression& object) {
-
-  try {
-    EqualsExpression& that = dynamic_cast<EqualsExpression&>(object);
-    return this->fExpectedValue == that.fExpectedValue;
-  }
-  catch (std::bad_cast)
+EqualsExpression::operator==(const Object* object) const
+{
+  if(const EqualsExpression* that = dynamic_cast<const EqualsExpression*>(object))
   {
-    return false;
+    return this->fExpectedValue == that->fExpectedValue;
   }
+  return false;
 }
 
-std::size_t
-EqualsExpression::ComputeHashCode() {
+uint
+EqualsExpression::ComputeHashCode() const
+{
   return HASH_INITIAL * HASH_FACTOR + fExpectedValue->HashCode();
 }
 

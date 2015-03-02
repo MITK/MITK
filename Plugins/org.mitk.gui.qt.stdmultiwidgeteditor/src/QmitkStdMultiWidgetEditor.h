@@ -39,7 +39,7 @@ public:
 
   berryObjectMacro(QmitkStdMultiWidgetEditor);
 
-  static const std::string EDITOR_ID;
+  static const QString EDITOR_ID;
 
   QmitkStdMultiWidgetEditor();
   ~QmitkStdMultiWidgetEditor();
@@ -131,13 +131,13 @@ protected:
    * @param widgetColorInHex color in hex format (#12356) where each diget is in the form (0-F).
    * @return the color in mitk format.
    */
-  mitk::Color HexColorToMitkColor(std::string widgetColorInHex);
+  mitk::Color HexColorToMitkColor(const QString& widgetColorInHex);
   /**
    * @brief MitkColorToHex Convert an mitk::Color to hex string.
    * @param color mitk format.
    * @return String in hex (#RRGGBB).
    */
-  std::string MitkColorToHex(mitk::Color color);
+  QString MitkColorToHex(const mitk::Color& color);
 
   /**
    * @brief InitializePreferences Internal helper method to set default preferences.

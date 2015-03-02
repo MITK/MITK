@@ -39,46 +39,24 @@ private:
   QWidget* contentProxy;
   static PartInfo tempPartInfo;
 
-  std::list<IPresentablePart::Pointer> partList;
+  QList<IPresentablePart::Pointer> partList;
   bool isVisible;
-
-  /**
-   * Movement listener. Updates the bounds of the target to match the
-   * bounds of the dummy control.
-   */
-  struct ContentProxyListener : public GuiTk::IControlListener
-  {
-    ContentProxyListener(PresentablePartFolder*);
-
-    Events::Types GetEventTypes() const;
-
-    void ControlMoved(GuiTk::ControlEvent::Pointer e);
-
-    void ControlResized(GuiTk::ControlEvent::Pointer e);
-
-  private:
-
-    PresentablePartFolder* folder;
-
-  };
-
-  GuiTk::IControlListener::Pointer contentListener;
 
   struct ShellListener: public IShellListener
   {
 
     ShellListener(AbstractTabFolder* folder);
 
-    void ShellActivated(ShellEvent::Pointer e);
+    void ShellActivated(const ShellEvent::Pointer& e);
 
-    void ShellDeactivated(ShellEvent::Pointer e);
+    void ShellDeactivated(const ShellEvent::Pointer& e);
 
   private:
 
     AbstractTabFolder* folder;
   };
 
-  IShellListener::Pointer shellListener;
+  QScopedPointer<IShellListener> shellListener;
 
   /**
    * Listener attached to all child parts. It responds to changes in part properties
@@ -87,14 +65,15 @@ private:
   {
     ChildPropertyChangeListener(PresentablePartFolder* folder);
 
-    void PropertyChange(Object::Pointer source, int property);
+    using IPropertyChangeListener::PropertyChange;
+    void PropertyChange(const Object::Pointer& source, int property);
 
   private:
 
     PresentablePartFolder* presentablePartFolder;
   };
 
-  IPropertyChangeListener::Pointer childPropertyChangeListener;
+  QScopedPointer<IPropertyChangeListener> childPropertyChangeListener;
 
   //    /**
   //     * Dispose listener that is attached to the main control. It triggers cleanup of
@@ -138,7 +117,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.IPresentablePartList#getPartList()
    */
-  std::vector<IPresentablePart::Pointer> GetPartList();
+  QList<IPresentablePart::Pointer> GetPartList();
 
   /**
    * Adds the given presentable part directly into this presentation at the
@@ -164,7 +143,7 @@ public:
   /**
    * Returns the number of parts in this folder
    */
-  std::size_t Size();
+  int Size();
 
   void SetBounds(const QRect& bounds);
 

@@ -19,35 +19,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryTypeExtensionManager.h"
 
 #include "berryExpressions.h"
+#include "berryExpressionStatus.h"
 
 #include "berryPropertyTesterDescriptor.h"
 
 #include "berryPlatform.h"
-#include "service/berryIExtensionPointService.h"
+#include "berryCoreException.h"
+#include <berryIExtensionRegistry.h>
 
 #include <ctime>
 
 namespace berry {
 
-  const std::string TypeExtensionManager::TYPE= "type"; //$NON-NLS-1$
+  const QString TypeExtensionManager::TYPE= "type";
 
-  TypeExtensionManager::TypeExtensionManager(const std::string& extensionPoint)
+  TypeExtensionManager::TypeExtensionManager(const QString& extensionPoint)
   : fExtensionPoint(extensionPoint)
   {
     //Platform.getExtensionRegistry().addRegistryChangeListener(this);
     this->InitializeCaches();
   }
 
-  Property::Pointer TypeExtensionManager::GetProperty(Object::Pointer receiver,
-      const std::string& namespaze, const std::string& method)
+  Property::Pointer TypeExtensionManager::GetProperty(Object::ConstPointer receiver,
+      const QString& namespaze, const QString& method)
   {
     return GetProperty(receiver, namespaze, method, false);
   }
 
   /*synchronized*/Property::Pointer
   TypeExtensionManager::GetProperty(
-      Object::Pointer receiver, const std::string& namespaze,
-      const std::string& method, bool forcePluginActivation)
+      Object::ConstPointer receiver, const QString& namespaze,
+      const QString& method, bool forcePluginActivation)
   {
     std::clock_t start= 0;
     if (Expressions::TRACING)
@@ -64,10 +66,10 @@ namespace berry {
       {
         if (Expressions::TRACING)
         {
-          BERRY_INFO << "[Type Extension] - method " <<
-          receiver->ToString() << "#" << method <<
-          " found in cache: " <<
-          (double(std::clock() - start))/(CLOCKS_PER_SEC/1000) << " ms.";
+          BERRY_INFO << "[Type Extension] - method "
+                     << receiver->ToString() << "#" << method.toStdString()
+                     << " found in cache: "
+                     << (double(std::clock() - start))/(CLOCKS_PER_SEC/1000) << " ms.";
         }
         return cached;
       }
@@ -80,24 +82,28 @@ namespace berry {
     IPropertyTester::Pointer extender(extension->FindTypeExtender(*this, namespaze, method, false /*receiver instanceof Class*/, forcePluginActivation));
     if (!extender.Cast<TypeExtension::CONTINUE_>().IsNull() || extender.IsNull())
     {
-      std::string msg("Unknown method for ");
+      QString msg("Unknown method for ");
       msg.append(receiver->GetClassName());
-      throw CoreException(msg, method);
+      IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::TYPE_EXTENDER_UNKOWN_METHOD,
+                                                   QString("No property tester contributes a property %1 to type %2")
+                                                   .arg(namespaze + "::" + method).arg(receiver->GetClassName()),
+                                                   BERRY_STATUS_LOC));
+      throw CoreException(status);
     }
     result->SetPropertyTester(extender);
     fPropertyCache->Put(result);
     if (Expressions::TRACING)
     {
-      BERRY_INFO << "[Type Extension] - method " <<
-      typeid(receiver).name() << "#" << method <<
-      " not found in cache: " <<
-      (double(std::clock() - start))/(CLOCKS_PER_SEC/1000) << " ms.";
+      BERRY_INFO << "[Type Extension] - method "
+                 << typeid(receiver).name() << "#" << method
+                 << " not found in cache: "
+                 << (double(std::clock() - start))/(CLOCKS_PER_SEC/1000) << " ms.";
     }
     return result;
   }
 
   /* package */TypeExtension::Pointer
-  TypeExtensionManager::Get(const std::string& type)
+  TypeExtensionManager::Get(const QString& type)
   {
     TypeExtension::Pointer result(fTypeExtensionMap[type]);
     if (result.IsNull())
@@ -108,28 +114,25 @@ namespace berry {
     return result;
   }
 
-  /* package */void TypeExtensionManager::LoadTesters(
-      std::vector<IPropertyTester::Pointer>& result, const std::string& typeName)
+  QList<IPropertyTester::Pointer> TypeExtensionManager::LoadTesters(const QString& typeName)
   {
-    if (fConfigurationElementMap == 0)
+    if (fConfigurationElementMap.isEmpty())
     {
-      fConfigurationElementMap = new std::map<std::string, std::vector<IConfigurationElement::Pointer> >();
-      IExtensionPointService::Pointer registry(Platform::GetExtensionPointService());
-      IConfigurationElement::vector ces(
-        registry->GetConfigurationElementsFor("org.blueberry.core.expressions." + fExtensionPoint));
-      for (unsigned int i= 0; i < ces.size(); i++)
+      IExtensionRegistry* registry = Platform::GetExtensionRegistry();
+      QList<IConfigurationElement::Pointer> ces(
+            registry->GetConfigurationElementsFor(QString("org.blueberry.core.expressions.") + fExtensionPoint));
+      for (int i= 0; i < ces.size(); i++)
       {
         IConfigurationElement::Pointer config(ces[i]);
-        std::string typeAttr;
-        config->GetAttribute(TYPE, typeAttr);
-        std::vector<IConfigurationElement::Pointer> typeConfigs = (*fConfigurationElementMap)[typeAttr];
-        typeConfigs.push_back(config);
+        QString typeAttr = config->GetAttribute(TYPE);
+        fConfigurationElementMap[typeAttr].push_back(config);
       }
     }
     //std::string typeName= type.getName();
-    std::vector<IConfigurationElement::Pointer> typeConfigs = (*fConfigurationElementMap)[typeName];
+    QList<IConfigurationElement::Pointer> typeConfigs = fConfigurationElementMap.take(typeName);
 
-    for (unsigned int i= 0; i < typeConfigs.size(); i++)
+    QList<IPropertyTester::Pointer> result;
+    for (int i= 0; i < typeConfigs.size(); i++)
     {
       IConfigurationElement::Pointer config(typeConfigs[i]);
       try
@@ -137,7 +140,7 @@ namespace berry {
         IPropertyTester::Pointer descr(new PropertyTesterDescriptor(config));
         result.push_back(descr);
       }
-      catch (CoreException e)
+      catch (const CoreException& /*e*/)
       {
         //TODO
         //ExpressionPlugin.getDefault().getLog().log(e.getStatus());
@@ -145,20 +148,20 @@ namespace berry {
         result.push_back(nullTester);
       }
     }
-    fConfigurationElementMap->erase(typeName);
 
+    return result;
   }
 
   /*synchronized*/void TypeExtensionManager::InitializeCaches()
   {
     fPropertyCache = new PropertyCache(1000);
-    fConfigurationElementMap = 0;
+    fConfigurationElementMap.clear();
+    fTypeExtensionMap.clear();
   }
 
   TypeExtensionManager::~TypeExtensionManager()
   {
     if (fPropertyCache) delete fPropertyCache;
-    if (fConfigurationElementMap) delete fConfigurationElementMap;
   }
 
 }

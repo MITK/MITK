@@ -19,17 +19,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_core_commands_Export.h>
 
-#include <Poco/Exception.h>
+#include <ctkException.h>
 
 namespace berry {
 
-POCO_DECLARE_EXCEPTION(BERRY_COMMANDS, CommandException, Poco::RuntimeException);
+CTK_DECLARE_EXCEPTION(BERRY_COMMANDS, CommandException, ctkRuntimeException)
 
-POCO_DECLARE_EXCEPTION(BERRY_COMMANDS, ExecutionException, CommandException);
-POCO_DECLARE_EXCEPTION(BERRY_COMMANDS, NotHandledException, CommandException);
-POCO_DECLARE_EXCEPTION(BERRY_COMMANDS, NotDefinedException, CommandException);
-POCO_DECLARE_EXCEPTION(BERRY_COMMANDS, NotEnabledException, CommandException);
-POCO_DECLARE_EXCEPTION(BERRY_COMMANDS, ParameterValueConversionException, CommandException);
+CTK_DECLARE_EXCEPTION(BERRY_COMMANDS, ExecutionException, CommandException)
+CTK_DECLARE_EXCEPTION(BERRY_COMMANDS, NotHandledException, CommandException)
+CTK_DECLARE_EXCEPTION(BERRY_COMMANDS, NotDefinedException, CommandException)
+CTK_DECLARE_EXCEPTION(BERRY_COMMANDS, NotEnabledException, CommandException)
+CTK_DECLARE_EXCEPTION(BERRY_COMMANDS, ParameterValueConversionException, CommandException)
 
 /**
  * Signals that a problem has occurred while trying to create an instance of
@@ -39,7 +39,7 @@ POCO_DECLARE_EXCEPTION(BERRY_COMMANDS, ParameterValueConversionException, Comman
  * could be used to signify any general problem during initialization.
  *
  */
-POCO_DECLARE_EXCEPTION(BERRY_COMMANDS, ParameterValuesException, CommandException);
+CTK_DECLARE_EXCEPTION(BERRY_COMMANDS, ParameterValuesException, CommandException)
 
 /**
  * Signals that an exception occured while serializing a
@@ -49,7 +49,7 @@ POCO_DECLARE_EXCEPTION(BERRY_COMMANDS, ParameterValuesException, CommandExceptio
  * This class is not intended to be extended by clients.
  *
  */
-POCO_DECLARE_EXCEPTION(BERRY_COMMANDS, SerializationException, CommandException);
+CTK_DECLARE_EXCEPTION(BERRY_COMMANDS, SerializationException, CommandException)
 
 
 }

@@ -6,12 +6,13 @@
 \tableofcontents
 
 \section org_mitk_gui_qt_geometrytoolsOverview Overview
-Describe the features of your awesome plugin here
-<ul>
-<li>Increases productivity
-<li>Creates beautiful images
-<li>Generates PhD thesis
-<li>Brings world peace
-</ul>
 
+A plugin to modify geometry of mitkBaseData via interaction. Currently, the following
+operations can be performed:
+
+<ul>
+<li>Translation
+<li>Rotation
+<li>Scaling (not supported for images, yet, and will not happen in coordinate origin)
+</ul>
 */

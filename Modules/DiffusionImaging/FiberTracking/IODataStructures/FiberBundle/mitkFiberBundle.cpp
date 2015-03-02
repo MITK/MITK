@@ -517,7 +517,8 @@ void mitk::FiberBundle::ColorFibersByCurvature()
         for (int j=0; j<numPoints; j++)
         {
             double color[3];
-            double dev = (values.at(count)-min)/(max-min);
+            //double dev = (values.at(count)-min)/(max-min);
+            double dev = values.at(count)*values.at(count);
             lookupTable->GetColor(dev, color);
 
             rgba[0] = (unsigned char) (255.0 * color[0]);

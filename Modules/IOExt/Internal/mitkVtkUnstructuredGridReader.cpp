@@ -21,102 +21,71 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 
+#include <mitkCustomMimeType.h>
+#include <mitkIOMimeTypes.h>
 
 mitk::VtkUnstructuredGridReader::VtkUnstructuredGridReader()
-: m_FileName("")
+  : AbstractFileReader()
 {
+  CustomMimeType mimeType(IOMimeTypes::DEFAULT_BASE_NAME() + ".vtu");
+  mimeType.SetComment("Vtk Unstructured Grid Files");
+  mimeType.SetCategory("Vtk Unstructured Grid");
+  mimeType.AddExtension("vtu");
+  mimeType.AddExtension("vtk");
+
+  this->SetDescription("Vtk Unstructured Grid Files");
+  this->SetMimeType(mimeType);
+
+  this->RegisterService();
 }
 
 mitk::VtkUnstructuredGridReader::~VtkUnstructuredGridReader()
+{}
+
+std::vector< itk::SmartPointer<mitk::BaseData> > mitk::VtkUnstructuredGridReader::Read()
 {
-}
-
-void mitk::VtkUnstructuredGridReader::GenerateData()
-{
-  if( m_FileName != "")
-  {
-    bool success = false;
-    MITK_INFO << "Loading " << m_FileName << " as vtk unstructured grid" << std::endl;
-
-    std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
-    ext = itksys::SystemTools::LowerCase(ext);
-    if (ext == ".vtk")
-    {
-      ///We create a Generic Reader to test de .vtk/
-      vtkDataReader *chooser=vtkDataReader::New();
-      chooser->SetFileName(m_FileName.c_str() );
-      if( chooser->IsFileUnstructuredGrid())
-      {
-        ///UnstructuredGrid/
-        itkDebugMacro( << "UnstructuredGrid" );
-        vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-        reader->SetFileName( m_FileName.c_str() );
-        reader->Update();
-
-        if ( reader->GetOutput() != NULL )
-        {
-          mitk::UnstructuredGrid::Pointer output = this->GetOutput();
-          output->SetVtkUnstructuredGrid( reader->GetOutput() );
-          success = true;
-        }
-        reader->Delete();
-      }
-    }
-    else if (ext == ".vtu")
-    {
-      vtkXMLUnstructuredGridReader *reader=vtkXMLUnstructuredGridReader::New();
-      if( reader->CanReadFile(m_FileName.c_str()) )
-      {
-        ///UnstructuredGrid/
-        itkDebugMacro( << "XMLUnstructuredGrid" );
-        reader->SetFileName( m_FileName.c_str() );
-        reader->Update();
-
-        if ( reader->GetOutput() != NULL )
-        {
-          mitk::UnstructuredGrid::Pointer output = this->GetOutput();
-          output->SetVtkUnstructuredGrid( reader->GetOutput() );
-          success = true;
-        }
-        reader->Delete();
-      }
-    }
-    if(!success)
-    {
-      itkExceptionMacro( << " ... sorry, this .vtk format is not supported yet." );
-    }
-  }
-}
-
-bool mitk::VtkUnstructuredGridReader::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/)
-{
-  // First check the extension
-  if(  filename == "" )
-    return false;
-
-  std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
+  MITK_INFO << "Loading " << " as vtk unstructured grid";
+  std::vector< itk::SmartPointer<mitk::BaseData> > result;
+  MITK_INFO << this->GetLocalFileName();
+  std::string ext = itksys::SystemTools::GetFilenameLastExtension(GetLocalFileName().c_str());
   ext = itksys::SystemTools::LowerCase(ext);
   if (ext == ".vtk")
   {
-    vtkDataReader *chooser=vtkDataReader::New();
-    chooser->SetFileName(filename.c_str() );
-    if(!chooser->IsFileUnstructuredGrid())
+    vtkDataReader *chooser = vtkDataReader::New();
+    chooser->SetFileName(GetLocalFileName().c_str() );
+    if( chooser->IsFileUnstructuredGrid())
     {
-      chooser->Delete();
-      return false;
+      vtkUnstructuredGridReader* reader = vtkUnstructuredGridReader::New();
+      reader->SetFileName( GetLocalFileName().c_str() );
+      reader->Update();
+
+      if ( reader->GetOutput() != NULL )
+      {
+        mitk::UnstructuredGrid::Pointer grid = mitk::UnstructuredGrid::New();
+        grid->SetVtkUnstructuredGrid( reader->GetOutput() );
+        result.push_back( grid.GetPointer() );
+      }
+      reader->Delete();
     }
   }
   else if (ext == ".vtu")
-    {
-      vtkXMLUnstructuredGridReader *chooser=vtkXMLUnstructuredGridReader::New();
-      if(!chooser->CanReadFile(filename.c_str()))
-      {
-        chooser->Delete();
-        return false;
-      }
-    }
-    else
-      return false;
+  {
+    vtkXMLUnstructuredGridReader* reader = vtkXMLUnstructuredGridReader::New();
+    reader->SetFileName(GetLocalFileName().c_str() );
+    reader->Update();
 
-  return true;
+    if ( reader->GetOutput() != NULL )
+    {
+      mitk::UnstructuredGrid::Pointer grid = mitk::UnstructuredGrid::New();
+      grid->SetVtkUnstructuredGrid( reader->GetOutput() );
+      result.push_back( grid.GetPointer() );
+    }
+    reader->Delete();
+  }
+  return result;
+}
+
+mitk::VtkUnstructuredGridReader* mitk::VtkUnstructuredGridReader::Clone() const
+{
+  return new mitk::VtkUnstructuredGridReader(*this);
 }

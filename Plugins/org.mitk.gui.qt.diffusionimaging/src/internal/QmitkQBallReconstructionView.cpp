@@ -184,8 +184,6 @@ using namespace berry;
 struct QbrSelListener : ISelectionListener
 {
 
-  berryObjectMacro(QbrSelListener);
-
   QbrSelListener(QmitkQBallReconstructionView* view)
   {
     m_View = view;
@@ -243,13 +241,14 @@ struct QbrSelListener : ISelectionListener
     }
   }
 
-  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
+  void SelectionChanged(const IWorkbenchPart::Pointer& part,
+                        const ISelection::ConstPointer& selection)
   {
     // check, if selection comes from datamanager
     if (part)
     {
-      QString partname(part->GetPartName().c_str());
-      if(partname.compare("Data Manager")==0)
+      QString partname = part->GetPartName();
+      if(partname == "Data Manager")
       {
 
         // apply selection
@@ -275,7 +274,7 @@ QmitkQBallReconstructionView::QmitkQBallReconstructionView()
 
 QmitkQBallReconstructionView::~QmitkQBallReconstructionView()
 {
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
 }
 
 void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
@@ -303,12 +302,12 @@ void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
     AdvancedCheckboxClicked();
   }
 
-  m_SelListener = berry::ISelectionListener::Pointer(new QbrSelListener(this));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+  m_SelListener.reset(new QbrSelListener(this));
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
   berry::ISelection::ConstPointer sel(
         this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  m_SelListener.Cast<QbrSelListener>()->DoSelectionChanged(sel);
+  static_cast<QbrSelListener*>(m_SelListener.data())->DoSelectionChanged(sel);
 }
 
 void QmitkQBallReconstructionView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -344,7 +343,7 @@ void QmitkQBallReconstructionView::Activated()
   berry::ISelection::ConstPointer sel(
         this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  m_SelListener.Cast<QbrSelListener>()->DoSelectionChanged(sel);
+  static_cast<QbrSelListener*>(m_SelListener.data())->DoSelectionChanged(sel);
 }
 
 void QmitkQBallReconstructionView::Deactivated()

@@ -18,13 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYISTATELISTENER_H_
 #define BERRYISTATELISTENER_H_
 
-#include "berryObject.h"
-#include "berryMacros.h"
-
 #include <org_blueberry_core_commands_Export.h>
+
+#include "berryMessage.h"
 
 namespace berry {
 
+template<class T> class SmartPointer;
+
+class Object;
 class State;
 
 /**
@@ -34,25 +36,24 @@ class State;
  * <p>
  * Clients may implement, but must not extend this interface.
  * </p>
- *
- * @since 3.2
  */
-struct BERRY_COMMANDS IStateListener : public virtual Object {
-
-  berryInterfaceMacro(IStateListener, berry);
+struct BERRY_COMMANDS IStateListener
+{
 
   struct Events {
 
-    typedef Message2<SmartPointer<State>, Object::Pointer> StateEvent;
+    typedef Message2<const SmartPointer<State>&, const SmartPointer<Object>&> StateEvent;
 
     StateEvent stateChanged;
 
-    void AddListener(IStateListener::Pointer listener);
-    void RemoveListener(IStateListener::Pointer listener);
+    void AddListener(IStateListener* listener);
+    void RemoveListener(IStateListener* listener);
 
-  private:
-    typedef MessageDelegate2<IStateListener, SmartPointer<State>, Object::Pointer> Delegate;
+    private:
+    typedef MessageDelegate2<IStateListener, const SmartPointer<State>&, const SmartPointer<Object>&> Delegate;
   };
+
+  virtual ~IStateListener();
 
   /**
    * Handles a change to the value in some state.
@@ -63,7 +64,8 @@ struct BERRY_COMMANDS IStateListener : public virtual Object {
    * @param oldValue
    *            The old value; may be anything.
    */
-  virtual void HandleStateChange(SmartPointer<State> state, Object::Pointer oldValue) = 0;
+  virtual void HandleStateChange(const SmartPointer<State>& state,
+                                 const SmartPointer<Object>& oldValue) = 0;
 };
 
 

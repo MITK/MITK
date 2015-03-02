@@ -68,7 +68,7 @@ find_package(MITK REQUIRED)
 # -----------------------------------------------------------------------
 
 include_directories(
-  ${org_blueberry_osgi_INCLUDE_DIRS}
+  ${org_blueberry_core_runtime_INCLUDE_DIRS}
 )
 
 # -----------------------------------------------------------------------
@@ -90,19 +90,6 @@ if(WIN32)
   set(_app_compile_flags "${_app_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
 endif()
 
-# Work-around for linking GDCM libraries, until GDCM provides proper
-# target exports.
-foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
-  if(EXISTS "${dir}/MITK_GDCM_Config.cmake")
-    include("${dir}/MITK_GDCM_Config.cmake")
-    break()
-  endif()
-endforeach()
-if(ALL_LIBRARY_DIRS)
-  list(REMOVE_DUPLICATES ALL_LIBRARY_DIRS)
-  link_directories(${ALL_LIBRARY_DIRS})
-endif()
-
 if(_APP_SHOW_CONSOLE)
   add_executable(${_APP_NAME} MACOSX_BUNDLE ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 else()
@@ -113,7 +100,7 @@ mitk_use_modules(TARGET ${_APP_NAME} MODULES mbilog PACKAGES Poco Qt4|QtCore Qt5
 set_target_properties(${_APP_NAME} PROPERTIES
                       COMPILE_FLAGS "${_app_compile_flags}")
 
-target_link_libraries(${_APP_NAME} PRIVATE org_blueberry_osgi ${_APP_LINK_LIBRARIES})
+target_link_libraries(${_APP_NAME} PRIVATE org_blueberry_core_runtime ${_APP_LINK_LIBRARIES})
 if(WIN32)
   target_link_libraries(${_APP_NAME} PRIVATE ${QT_QTMAIN_LIBRARY})
 endif()

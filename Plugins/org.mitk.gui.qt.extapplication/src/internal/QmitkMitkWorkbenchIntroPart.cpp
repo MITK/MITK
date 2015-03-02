@@ -22,9 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPerspectiveRegistry.h>
 #include <berryWorkbenchPreferenceConstants.h>
 #include <berryIPreferences.h>
+#include <berryIPreferencesService.h>
+#include <berryPlatform.h>
 
 #include <berryIEditorReference.h>
 #include <berryIEditorInput.h>
+
+#include <ctkPluginContext.h>
 
 #include <mitkIDataStorageService.h>
 #include <mitkDataStorageEditorInput.h>
@@ -150,34 +154,30 @@ void QmitkMitkWorkbenchIntroPart::DelegateMeTo(const QUrl& showMeNext)
       urlPath = urlPath.simplified();
       QString tmpPerspectiveId(urlPath.data());
       tmpPerspectiveId.replace(QString("/"), QString("") );
-      std::string perspectiveId  = tmpPerspectiveId.toStdString();
+      QString perspectiveId  = tmpPerspectiveId;
 
       // is working fine as long as the perspective id is valid, if not the application crashes
       GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->ShowPerspective(perspectiveId, GetIntroSite()->GetWorkbenchWindow() );
 
       // search the Workbench for opened StdMultiWidgets to ensure the focus does not stay on the welcome screen and is switched to
-      // an StdMultiWidget if one available
-      mitk::IDataStorageService::Pointer service =
-          berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
-      berry::IEditorInput::Pointer editorInput;
-      editorInput = new mitk::DataStorageEditorInput( service->GetActiveDataStorage() );
-
-      // the solution is not clean, but the dependency to the StdMultiWidget was removed in order to fix a crash problem
-      // as described in Bug #11715
-      // This is the correct way : use the static string ID variable
-      // berry::IEditorPart::Pointer editor = GetIntroSite()->GetPage()->FindEditors( editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID );
-      // QuickFix: we use the same string for an local variable
-      const std::string stdEditorID = "org.mitk.editors.stdmultiwidget";
-
-      // search for opened StdMultiWidgetEditors
-      std::vector<berry::IEditorReference::Pointer> editorList = GetIntroSite()->GetPage()->FindEditors( editorInput, stdEditorID, 1 );
-
-      // if an StdMultiWidgetEditor open was found, give focus to it
-      if(editorList.size())
+      // a render window editor if one available
+      ctkPluginContext* context = QmitkExtApplicationPlugin::GetDefault()->GetPluginContext();
+      mitk::IDataStorageService* service = NULL;
+      ctkServiceReference serviceRef = context->getServiceReference<mitk::IDataStorageService>();
+      if (serviceRef) service = context->getService<mitk::IDataStorageService>(serviceRef);
+      if (service)
       {
-        GetIntroSite()->GetPage()->Activate( editorList[0]->GetPart(true) );
-      }
+        berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput( service->GetActiveDataStorage() ));
 
+        // search for opened StdMultiWidgetEditors
+        berry::IEditorPart::Pointer editorPart = GetIntroSite()->GetPage()->FindEditor( editorInput );
+
+        // if an StdMultiWidgetEditor open was found, give focus to it
+        if(editorPart)
+        {
+          GetIntroSite()->GetPage()->Activate( editorPart );
+        }
+      }
     }
   }
   // if the scheme is set to http, by default no action is performed, if an external webpage needs to be

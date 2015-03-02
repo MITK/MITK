@@ -194,13 +194,14 @@ struct SelListenerPointBasedRegistration : ISelectionListener
     }
   }
 
-  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
+  void SelectionChanged(const IWorkbenchPart::Pointer& part,
+                        const ISelection::ConstPointer& selection)
   {
     // check, if selection comes from datamanager
     if (part)
     {
-      QString partname(part->GetPartName().c_str());
-      if(partname.compare("Data Manager")==0)
+      QString partname = part->GetPartName();
+      if(partname == "Data Manager")
       {
         // apply selection
         DoSelectionChanged(selection);
@@ -213,7 +214,7 @@ struct SelListenerPointBasedRegistration : ISelectionListener
 
 
 QmitkPointBasedRegistrationView::QmitkPointBasedRegistrationView(QObject * /*parent*/, const char * /*name*/)
-: QmitkFunctionality(), m_SelListener(0), m_MultiWidget(NULL), m_FixedLandmarks(NULL), m_MovingLandmarks(NULL), m_MovingNode(NULL),
+: QmitkFunctionality(), m_MultiWidget(NULL), m_FixedLandmarks(NULL), m_MovingLandmarks(NULL), m_MovingNode(NULL),
 m_FixedNode(NULL), m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Transformation(0), m_HideFixedImage(false), m_HideMovingImage(false),
 m_OldFixedLabel(""), m_OldMovingLabel(""), m_Deactivated (false), m_CurrentFixedLandmarksObserverID(0), m_CurrentMovingLandmarksObserverID(0)
 {
@@ -229,12 +230,10 @@ m_OldFixedLabel(""), m_OldMovingLabel(""), m_Deactivated (false), m_CurrentFixed
 
 QmitkPointBasedRegistrationView::~QmitkPointBasedRegistrationView()
 {
-  if(m_SelListener.IsNotNull())
+  if(m_SelListener)
   {
     berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-    if(s)
-      s->RemovePostSelectionListener(m_SelListener);
-    m_SelListener = NULL;
+    if(s) s->RemovePostSelectionListener(m_SelListener.data());
   }
   if (m_FixedPointSetNode.IsNotNull())
   {
@@ -321,14 +320,14 @@ void QmitkPointBasedRegistrationView::Activated()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   QmitkFunctionality::Activated();
   this->clearTransformationLists();
-  if (m_SelListener.IsNull())
+  if (m_SelListener.isNull())
   {
-    m_SelListener = berry::ISelectionListener::Pointer(new SelListenerPointBasedRegistration(this));
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+    m_SelListener.reset(new SelListenerPointBasedRegistration(this));
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
     berry::ISelection::ConstPointer sel(
       this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
     m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-    m_SelListener.Cast<SelListenerPointBasedRegistration>()->DoSelectionChanged(sel);
+    static_cast<SelListenerPointBasedRegistration*>(m_SelListener.data())->DoSelectionChanged(sel);
   }
   this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
   this->showRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
@@ -395,9 +394,8 @@ void QmitkPointBasedRegistrationView::Deactivated()
   m_Controls.label_2->hide();
   m_Controls.m_SwitchImages->hide();
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  if(s)
-    s->RemovePostSelectionListener(m_SelListener);
-  m_SelListener = NULL;
+  if(s) s->RemovePostSelectionListener(m_SelListener.data());
+  m_SelListener.reset();
 
 }
 

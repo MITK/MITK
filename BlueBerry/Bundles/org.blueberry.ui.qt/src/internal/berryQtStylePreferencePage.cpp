@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferencesService.h>
 #include <berryQtPreferences.h>
 
+#include "berryWorkbenchPlugin.h"
+
 #include <QFileDialog>
 #include <QDirIterator>
 
@@ -28,11 +30,6 @@ namespace berry
 QtStylePreferencePage::QtStylePreferencePage()
 {
 
-}
-
-QtStylePreferencePage::QtStylePreferencePage(const QtStylePreferencePage& other)
-{
-  Q_UNUSED(other)
 }
 
 void QtStylePreferencePage::Init(IWorkbench::Pointer )
@@ -45,12 +42,14 @@ void QtStylePreferencePage::CreateQtControl(QWidget* parent)
   mainWidget = new QWidget(parent);
   controls.setupUi(mainWidget);
 
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
 
-  styleManager = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IQtStyleManager>(berry::IQtStyleManager::ID);
+  ctkPluginContext* context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
+  ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
+  if (styleManagerRef)
+  {
+    styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
+  }
 
   m_StylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
 
@@ -198,21 +197,22 @@ QWidget* QtStylePreferencePage::GetQtControl() const
 bool QtStylePreferencePage::PerformOk()
 {
   m_StylePref->Put(berry::QtPreferences::QT_STYLE_NAME,
-      controls.m_StylesCombo->itemData(controls.m_StylesCombo->currentIndex()).toString().toStdString());
+      controls.m_StylesCombo->itemData(controls.m_StylesCombo->currentIndex()).toString());
 
-  std::string paths;
+  QString paths;
   for (int i = 0; i < controls.m_PathList->count(); ++i)
   {
     QString path = controls.m_PathList->item(i)->text() + ";";
-    paths += path.toStdString();
+    paths += path;
   }
+
   QString currentTheme = QIcon::themeName();
-  if(currentTheme == QString(""))
+  if(currentTheme.isEmpty())
   {
     currentTheme = QString("<<default>>");
   }
   m_StylePref->Put(berry::QtPreferences::QT_STYLE_SEARCHPATHS, paths);
-  m_StylePref->Put(berry::QtPreferences::QT_ICON_THEME, currentTheme.toStdString());
+  m_StylePref->Put(berry::QtPreferences::QT_ICON_THEME, currentTheme);
   return true;
 }
 
@@ -225,7 +225,7 @@ void QtStylePreferencePage::Update()
 {
   styleManager->RemoveStyles();
 
-  QString paths = QString::fromStdString(m_StylePref->Get(berry::QtPreferences::QT_STYLE_SEARCHPATHS, ""));
+  QString paths = m_StylePref->Get(berry::QtPreferences::QT_STYLE_SEARCHPATHS, "");
   QStringList pathList = paths.split(";", QString::SkipEmptyParts);
   QStringListIterator it(pathList);
   while (it.hasNext())
@@ -233,11 +233,11 @@ void QtStylePreferencePage::Update()
     AddPath(it.next(), false);
   }
 
-  QString iconTheme = QString::fromStdString(m_StylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>"));
+  QString iconTheme = m_StylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>");
   styleManager->SetIconTheme( iconTheme );
 
-  std::string name = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
-  styleManager->SetStyle(QString::fromStdString(name));
+  QString name = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
+  styleManager->SetStyle(name);
   oldStyle = styleManager->GetStyle();
 
   FillStyleCombo(oldStyle);

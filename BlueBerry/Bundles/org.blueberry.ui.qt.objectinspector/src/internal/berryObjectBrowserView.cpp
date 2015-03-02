@@ -30,8 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryDebugUtil.h"
 #include "berryDebugBreakpointManager.h"
 
-#include <sstream>
-
 namespace berry
 {
 
@@ -39,21 +37,13 @@ const std::string ObjectBrowserView::VIEW_ID = "objectbrowser";
 
 ObjectBrowserView::ObjectBrowserView() :
   m_ActionToggleBreakpoint(this), m_ActionEnableBreakpoint(this),
-      m_ActionDisableBreakpoint(this)
+  m_ActionDisableBreakpoint(this)
 {
 #ifdef BLUEBERRY_DEBUG_SMARTPOINTER
   m_Useful = true;
 #else
   m_Useful = false;
 #endif
-}
-
-ObjectBrowserView::ObjectBrowserView(const ObjectBrowserView& other)
-  : m_ActionToggleBreakpoint(this), m_ActionEnableBreakpoint(this),
-    m_ActionDisableBreakpoint(this)
-{
-  Q_UNUSED(other)
-  throw std::runtime_error("Copy constructor not implemented");
 }
 
 void ObjectBrowserView::Init(IViewSite::Pointer site, IMemento::Pointer memento)
@@ -185,9 +175,10 @@ void ObjectBrowserView::SelectionChanged(const QItemSelection& selected,
 
       if (obj)
       {
-        std::stringstream ss;
-        ss << *(obj) << std::endl << obj->ToString();
-        m_Controls.m_DetailsView->setPlainText(QString::fromStdString(ss.str()));
+        QString str;
+        QDebug ss(&str);
+        obj->Print(ss);
+        m_Controls.m_DetailsView->setPlainText(str);
       }
       else
       {

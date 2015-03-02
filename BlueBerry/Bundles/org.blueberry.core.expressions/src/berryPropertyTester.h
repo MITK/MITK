@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_core_expressions_Export.h>
 
-#include <string>
 
 namespace berry {
 
@@ -76,8 +75,8 @@ class BERRY_EXPRESSIONS PropertyTester : public IPropertyTester
 
 private:
   IConfigurationElement::Pointer fConfigElement;
-  std::string fNamespace;
-  std::string fProperties;
+  QString fNamespace;
+  QString fProperties;
 
 public:
   /**
@@ -101,7 +100,7 @@ public:
   /**
    * {@inheritDoc}
    */
-  bool Handles(const std::string& namespaze, const std::string& property);
+  bool Handles(const QString& namespaze, const QString& property);
 
   /**
    * {@inheritDoc}

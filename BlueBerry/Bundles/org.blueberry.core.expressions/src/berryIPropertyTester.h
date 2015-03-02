@@ -38,14 +38,13 @@ namespace berry {
  * This interface is not intended to be implemented by clients. Clients
  * should subclass type <code>PropertyTester</code>.
  * </p>
- *
- * @since 3.0
  */
-struct BERRY_EXPRESSIONS IPropertyTester : public Object {
+struct BERRY_EXPRESSIONS IPropertyTester : public Object
+{
 
-  berryInterfaceMacro(IPropertyTester, berry);
+  berryObjectMacro(berry::IPropertyTester)
 
-  virtual ~IPropertyTester() {}
+  virtual ~IPropertyTester();
 
   /**
    * Returns whether the property tester can handle the given
@@ -56,7 +55,7 @@ struct BERRY_EXPRESSIONS IPropertyTester : public Object {
    * @return <code>true</code> if the tester provides an implementation
    *  for the given property; otherwise <code>false</code> is returned
    */
-  virtual bool Handles(const std::string& namespaze, const std::string& property) = 0;
+  virtual bool Handles(const QString& namespaze, const QString& property) = 0;
 
   /**
    * Returns whether the implementation class for this property tester is
@@ -101,7 +100,8 @@ struct BERRY_EXPRESSIONS IPropertyTester : public Object {
    * @return returns <code>true<code> if the property is equal to the expected value;
    *  otherwise <code>false</code> is returned
    */
-  virtual bool Test(Object::Pointer receiver, const std::string& property, std::vector<Object::Pointer>& args, Object::Pointer expectedValue) = 0;
+  virtual bool Test(Object::ConstPointer receiver, const QString& property,
+                    const QList<Object::Pointer>& args, Object::Pointer expectedValue) = 0;
 
 };
 

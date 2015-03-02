@@ -1721,10 +1721,11 @@ void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
   // Let NavigationControllers listen to GlobalInteraction
   mitk::GlobalInteraction *gi = mitk::GlobalInteraction::GetInstance();
 
-  // Listen for SliceNavigationController
-  mitkWidget1->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
-  mitkWidget2->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
-  mitkWidget3->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
+  //// Listen for SliceNavigationController
+  //TODO 18735 can this be deleted ??
+  //mitkWidget1->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
+  //mitkWidget2->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
+  //mitkWidget3->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
 
   switch ( m_PlaneMode )
   {

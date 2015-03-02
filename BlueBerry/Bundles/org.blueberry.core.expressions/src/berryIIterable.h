@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_core_expressions_Export.h>
 
-#include <vector>
-
 namespace berry {
 
 /**
@@ -32,16 +30,16 @@ namespace berry {
  *
  * @see IAdaptable
  * @see IAdapterManager
- *
- * @since 3.3
  */
-struct BERRY_EXPRESSIONS IIterable : public Object {
+struct BERRY_EXPRESSIONS IIterable : public Object
+{
 
-  berryObjectMacro(IIterable);
+  berryObjectMacro(berry::IIterable)
 
-  typedef std::vector<Object::Pointer>::iterator iterator;
+  typedef QList<Object::Pointer>::iterator iterator;
+  typedef QList<Object::Pointer>::const_iterator const_iterator;
 
-  virtual ~IIterable() {}
+  virtual ~IIterable();
 
   /**
    * Returns an iterator to iterate over the elements.
@@ -51,8 +49,13 @@ struct BERRY_EXPRESSIONS IIterable : public Object {
   virtual iterator begin() = 0;
   virtual iterator end() = 0;
 
+  virtual const_iterator begin() const = 0;
+  virtual const_iterator end() const = 0;
+
 };
 
 }  // namespace berry
+
+Q_DECLARE_INTERFACE(berry::IIterable, "org.blueberry.core.IIterable")
 
 #endif /*BERRYIITERABLE_H_*/

@@ -146,13 +146,14 @@ struct SelListenerRigidRegistration : ISelectionListener
     }
   }
 
-  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
+  void SelectionChanged(const IWorkbenchPart::Pointer& part,
+                        const ISelection::ConstPointer& selection)
   {
     // check, if selection comes from datamanager
     if (part)
     {
-      QString partname(part->GetPartName().c_str());
-      if(partname.compare("Data Manager")==0)
+      QString partname = part->GetPartName();
+      if(partname == "Data Manager")
       {
         // apply selection
         DoSelectionChanged(selection);
@@ -191,12 +192,10 @@ m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(fal
 
 QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
 {
-  if(m_SelListener.IsNotNull())
+  if(m_SelListener)
   {
     berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-    if(s)
-      s->RemovePostSelectionListener(m_SelListener);
-    m_SelListener = NULL;
+    if(s) s->RemovePostSelectionListener(m_SelListener.data());
   }
 
   this->GetDataStorage()->RemoveNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkRigidRegistrationView,
@@ -306,14 +305,14 @@ void QmitkRigidRegistrationView::Activated()
   m_Deactivated = false;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   QmitkFunctionality::Activated();
-  if (m_SelListener.IsNull())
+  if (m_SelListener.isNull())
   {
-    m_SelListener = berry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+    m_SelListener.reset(new SelListenerRigidRegistration(this));
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
     berry::ISelection::ConstPointer sel(
       this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
     m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-    m_SelListener.Cast<SelListenerRigidRegistration>()->DoSelectionChanged(sel);
+    static_cast<SelListenerRigidRegistration*>(m_SelListener.data())->DoSelectionChanged(sel);
   }
   this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
   this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
@@ -369,9 +368,8 @@ void QmitkRigidRegistrationView::Deactivated()
   m_MovingNode = NULL;
   this->ClearTransformationLists();
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  if(s)
-    s->RemovePostSelectionListener(m_SelListener);
-  m_SelListener = NULL;
+  if(s) s->RemovePostSelectionListener(m_SelListener.data());
+  m_SelListener.reset();
   /*
   m_Deactivated = true;
   this->SetImageColor(false);

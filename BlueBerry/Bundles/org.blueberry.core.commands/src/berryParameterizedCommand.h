@@ -40,15 +40,13 @@ class Parameterization;
  * with parameters. It handles the behaviour of generating a parameter map and a
  * human-readable name.
  * </p>
- *
- * @since 3.1
  */
 class BERRY_COMMANDS ParameterizedCommand: public Object
 { //implements Comparable {
 
 public:
 
-  berryObjectMacro(ParameterizedCommand);
+  berryObjectMacro(ParameterizedCommand)
 
   /**
    * The index of the parameter id in the parameter values.
@@ -91,16 +89,11 @@ public:
    *            An array of parameterizations binding parameters to values for
    *            the command. This value may be <code>null</code>.
    */
-  ParameterizedCommand(const SmartPointer<Command> command,
-      const std::vector<Parameterization>& parameterizations);
+  ParameterizedCommand(const SmartPointer<Command>& command,
+                       const QList<Parameterization>& parameterizations);
 
   bool operator<(const Object* object) const;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   bool operator==(const Object* object) const;
 
   /**
@@ -124,11 +117,9 @@ public:
    *             If the command you are trying to execute is not enabled.
    * @throws NotHandledException
    *             If there is no handler.
-   * @since 3.2
    */
-  Object::Pointer ExecuteWithChecks(const Object::ConstPointer trigger,
-      const Object::ConstPointer applicationContext) throw(ExecutionException,
-      NotDefinedException, NotEnabledException, NotHandledException);
+  Object::Pointer ExecuteWithChecks(const Object::ConstPointer& trigger,
+                                    const Object::Pointer& applicationContext);
 
   /**
    * Returns the base command. It is possible for more than one parameterized
@@ -144,7 +135,7 @@ public:
    *
    * @return The command id; never <code>null</code>.
    */
-  std::string GetId() const;
+  QString GetId() const;
 
   /**
    * Returns a human-readable representation of this command with all of its
@@ -155,7 +146,7 @@ public:
    * @throws NotDefinedException
    *             If the underlying command is not defined.
    */
-  std::string GetName() const throw(NotDefinedException);
+  QString GetName() const;
 
   /**
    * Returns the parameter map, as can be used to construct an
@@ -165,14 +156,9 @@ public:
    *         values (<code>String</code>). This map is never
    *         <code>null</code>, but may be empty.
    */
-  std::map<std::string, std::string> GetParameterMap() const;
+  QHash<QString, QString> GetParameterMap() const;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.lang.Object#hashCode()
-   */
-  std::size_t HashCode() const;
+  uint HashCode() const;
 
   /**
    * Returns a {@link String} containing the command id, parameter ids and
@@ -229,11 +215,10 @@ public:
    * @return A string containing the escaped command id, parameter ids and
    *         parameter values; never <code>null</code>.
    * @see CommandManager#deserialize(String)
-   * @since 3.2
    */
-  std::string Serialize();
+  QString Serialize();
 
-  std::string ToString() const;
+  QString ToString() const;
 
   /**
    * <p>
@@ -256,9 +241,8 @@ public:
    * @throws NotDefinedException
    *             If the command is not defined.
    */
-  static std::vector<ParameterizedCommand::Pointer>
-  GenerateCombinations(const SmartPointer<Command> command)
-  throw(NotDefinedException);
+  static QList<ParameterizedCommand::Pointer>
+  GenerateCombinations(const SmartPointer<Command> command);
 
   /**
    * Take a command and a map of parameter IDs to values, and generate the
@@ -271,10 +255,9 @@ public:
    *            <code>null</code>.
    * @return the parameterized command, or <code>null</code> if it could not
    *         be generated
-   * @since 3.4
    */
   static ParameterizedCommand::Pointer GenerateCommand(const SmartPointer<Command> command,
-      const std::map<std::string, Object::Pointer>& parameters);
+                                                       const QHash<QString, Object::Pointer>& parameters);
 
 private:
 
@@ -282,17 +265,17 @@ private:
    * The constant integer hash code value meaning the hash code has not yet
    * been computed.
    */
-  static const std::size_t HASH_CODE_NOT_COMPUTED; // = 0;
+  static const uint HASH_CODE_NOT_COMPUTED; // = 0;
 
   /**
    * A factor for computing the hash code for all parameterized commands.
    */
-  static const std::size_t HASH_FACTOR; // = 89;
+  static const uint HASH_FACTOR; // = 89;
 
   /**
    * The seed for the hash code for all parameterized commands.
    */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
   /**
    * Escapes special characters in the command id, parameter ids and parameter
@@ -309,9 +292,8 @@ private:
    *            serialization.
    * @return a <code>String</code> representing <code>rawText</code> with
    *         special serialization characters escaped
-   * @since 3.2
    */
-  static std::string Escape(const std::string& rawText);
+  static QString Escape(const QString& rawText);
 
   /**
    * Generates every possible combination of parameter values for the given
@@ -326,8 +308,8 @@ private:
    * @return A collection (<code>Collection</code>) of combinations (<code>List</code>
    *         of <code>Parameterization</code>).
    */
-  static std::vector<std::list<Parameterization> > ExpandParameters(unsigned int startIndex,
-      const std::vector<SmartPointer<IParameter> >& parameters);
+  static QList<QList<Parameterization> > ExpandParameters(unsigned int startIndex,
+                                                          const QList<SmartPointer<IParameter> >& parameters);
 
   /**
    * The base command which is being parameterized. This value is never
@@ -339,15 +321,15 @@ private:
    * The hash code for this object. This value is computed lazily, and marked
    * as invalid when one of the values on which it is based changes.
    */
-  mutable std::size_t hashCode;
+  mutable uint hashCode;
 
   /**
    * This is an array of parameterization defined for this command. This value
    * may be <code>null</code> if the command has no parameters.
    */
-  std::vector<Parameterization> parameterizations;
+  QList<Parameterization> parameterizations;
 
-  mutable std::string name;
+  mutable QString name;
 
 };
 

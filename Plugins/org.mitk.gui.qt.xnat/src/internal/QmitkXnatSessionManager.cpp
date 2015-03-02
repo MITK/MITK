@@ -29,10 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkXnatException.h"
 
 QmitkXnatSessionManager::QmitkXnatSessionManager()
-  :m_Session(0)
+  : m_Session(0)
 {
-  m_PreferencesService = berry::Platform::GetServiceRegistry().
-    GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 }
 
 QmitkXnatSessionManager::~QmitkXnatSessionManager()
@@ -60,17 +58,17 @@ void QmitkXnatSessionManager::OpenXnatSession()
 
 void QmitkXnatSessionManager::CreateXnatSession()
 {
-  berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   berry::IPreferences::Pointer nodeConnectionPref = prefService->GetSystemPreferences()->Node("/XnatConnection");
 
-  QUrl url(QString::fromStdString(nodeConnectionPref->Get("Server Address", "")));
-  url.setPort(QString::fromStdString(nodeConnectionPref->Get("Port", "")).toInt());
+  QUrl url(nodeConnectionPref->Get("Server Address", ""));
+  url.setPort(nodeConnectionPref->Get("Port", "").toInt());
 
   ctkXnatLoginProfile profile;
   profile.setName("Default");
   profile.setServerUrl(url);
-  profile.setUserName(QString::fromStdString(nodeConnectionPref->Get("Username", "")));
-  profile.setPassword(QString::fromStdString(nodeConnectionPref->Get("Password", "")));
+  profile.setUserName(nodeConnectionPref->Get("Username", ""));
+  profile.setPassword(nodeConnectionPref->Get("Password", ""));
   profile.setDefault(true);
 
   m_Session = new ctkXnatSession(profile);

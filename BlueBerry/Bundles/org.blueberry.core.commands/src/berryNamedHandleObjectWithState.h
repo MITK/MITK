@@ -20,8 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "common/berryNamedHandleObject.h"
 #include "berryIObjectWithState.h"
 
-#include <vector>
-#include <map>
+#include <QHash>
 
 namespace berry {
 
@@ -33,44 +32,42 @@ namespace berry {
  * <p>
  * Clients may neither instantiate nor extend this class.
  * </p>
- *
- * @since 3.2
  */
 class BERRY_COMMANDS NamedHandleObjectWithState : public NamedHandleObject, public IObjectWithState {
 
 public:
 
-  berryObjectMacro(NamedHandleObjectWithState);
+  berryObjectMacro(berry::NamedHandleObjectWithState)
 
-  void AddState(const std::string& stateId, const State::Pointer state);
+  void AddState(const QString& stateId, const SmartPointer<State>& state);
 
-  std::string GetDescription() const;
+  QString GetDescription() const;
 
-  std::string GetName() const;
+  QString GetName() const;
 
-  State::Pointer GetState(const std::string& stateId) const;
+  SmartPointer<State> GetState(const QString& stateId) const;
 
-  std::vector<std::string> GetStateIds() const;
+  QList<QString> GetStateIds() const;
 
-  void RemoveState(const std::string& id);
+  void RemoveState(const QString& id);
 
-  private:
+private:
 
-    /**
-     * The map of states currently held by this command. If this command has no
-     * state, then this will be empty.
-     */
-    std::map<std::string, State::Pointer> states;
+  /**
+   * The map of states currently held by this command. If this command has no
+   * state, then this will be empty.
+   */
+  QHash<QString, SmartPointer<State> > states;
 
-  protected:
+protected:
 
-    /**
-     * Constructs a new instance of <code>NamedHandleObject<WithState/code>.
-     *
-     * @param id
-     *            The identifier for this handle; must not be empty.
-     */
-    NamedHandleObjectWithState(const std::string& id);
+  /**
+   * Constructs a new instance of <code>NamedHandleObject<WithState/code>.
+   *
+   * @param id
+   *            The identifier for this handle; must not be empty.
+   */
+  NamedHandleObjectWithState(const QString& id);
 
 };
 

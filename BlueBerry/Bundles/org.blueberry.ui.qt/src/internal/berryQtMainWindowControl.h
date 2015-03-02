@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QMainWindow>
 
+#include <berryShell.h>
 #include <internal/berryQtWidgetController.h>
 
 namespace berry {

@@ -20,18 +20,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 
+#include <QPoint>
+
 class MinimalWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 {
 
 public:
 
-  static const std::string DEFAULT_PERSPECTIVE_ID;
+  static const QString DEFAULT_PERSPECTIVE_ID;
 
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
       berry::IWorkbenchWindowConfigurer::Pointer configurer)
   {
     // Set an individual initial size
-    configurer->SetInitialSize(berry::Point(600,400));
+    configurer->SetInitialSize(QPoint(600,400));
     // Set an individual title
     configurer->SetTitle("Extension Points");
     // Enable or disable the perspective bar
@@ -41,7 +43,7 @@ public:
     return wwAdvisor.data();
   }
 
-  std::string GetInitialWindowPerspectiveId()
+  QString GetInitialWindowPerspectiveId()
   {
     return DEFAULT_PERSPECTIVE_ID;
   }
@@ -52,7 +54,7 @@ private:
 
 };
 
-const std::string MinimalWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.minimalperspective";
+const QString MinimalWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.minimalperspective";
 
 ExtensionPointDefinition::ExtensionPointDefinition()
 {

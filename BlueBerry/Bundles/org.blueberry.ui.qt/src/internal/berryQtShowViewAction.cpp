@@ -27,13 +27,12 @@ QtShowViewAction::QtShowViewAction(IWorkbenchWindow::Pointer window,
   QAction(0)
 {
   this->setParent(static_cast<QWidget*>(window->GetShell()->GetControl()));
-  this->setText(QString(desc->GetLabel().c_str()));
-  this->setToolTip(QString(desc->GetLabel().c_str()));
+  this->setText(desc->GetLabel());
+  this->setToolTip(desc->GetLabel());
   this->setIconVisibleInMenu(true);
 
-  QIcon* icon = static_cast<QIcon*>(desc->GetImageDescriptor()->CreateImage());
-  this->setIcon(*icon);
-  desc->GetImageDescriptor()->DestroyImage(icon);
+  QIcon icon = desc->GetImageDescriptor();
+  this->setIcon(icon);
 
   m_Window = window.GetPointer();
   m_Desc = desc;
@@ -50,9 +49,9 @@ void QtShowViewAction::Run()
     {
       page->ShowView(m_Desc->GetId());
     }
-    catch (PartInitException e)
+    catch (const PartInitException& e)
     {
-      BERRY_ERROR << "Error: " << e.displayText() << std::endl;
+      BERRY_ERROR << "Error: " << e.what();
     }
   }
 }

@@ -185,8 +185,13 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 # -----------------------------------------
 # Qt version related variables
 
-set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
-env_option(MITK_USE_QT "Use Nokia's Qt library" ON)
+if(APPLE)
+  set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
+else()
+  set(DESIRED_QT_VERSION 5 CACHE STRING "Pick a version of Qt to use: 4 or 5")
+endif()
+
+env_option(MITK_USE_QT "Use the Qt Company's Qt library" ON)
 set(MITK_DESIRED_QT_VERSION ${DESIRED_QT_VERSION})
 
 if(MITK_USE_QT)
@@ -977,6 +982,10 @@ if(MITK_USE_BLUEBERRY)
   if(MITK_BUILD_ALL_PLUGINS)
     set(BLUEBERRY_BUILD_ALL_PLUGINS ON)
   endif()
+
+  set(BLUEBERRY_CXX_FLAGS "${MITK_CXX_FLAGS}")
+  set(BLUEBERRY_CXX_FLAGS_RELEASE "${MITK_CXX_FLAGS_RELEASE}")
+  set(BLUEBERRY_C_FLAGS "${MITK_C_FLAGS}")
 
   set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
 

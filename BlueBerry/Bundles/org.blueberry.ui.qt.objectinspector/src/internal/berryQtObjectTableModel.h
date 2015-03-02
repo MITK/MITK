@@ -71,7 +71,7 @@ private:
   QList<ObjectItem*> indexData;
   QList<ObjectItem*> pendingData;
 
-  IDebugObjectListener::Pointer objectListener;
+  QScopedPointer<IDebugObjectListener> objectListener;
   friend class DebugObjectListener;
 
 };

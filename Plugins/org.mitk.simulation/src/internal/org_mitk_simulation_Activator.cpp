@@ -40,7 +40,7 @@ static void LoadSofaPlugins()
   if (preferences.IsNull())
     return;
 
-  QString plugins = preferences->GetByteArray("plugins", "").c_str();
+  QString plugins = preferences->Get("plugins", "");
 
   if (plugins.isEmpty())
     return;

@@ -18,9 +18,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "internal/berryStandardElementHandler.h"
 
+#include "berryExpression.h"
+#include "internal/berryCompositeExpression.h"
+#include "berryExpressionConverter.h"
+
+#include <berryIConfigurationElement.h>
+
 #include "Poco/Exception.h"
 
 namespace berry {
+
+ElementHandler::~ElementHandler()
+{
+}
 
 ElementHandler::Pointer
 ElementHandler::GetDefault()

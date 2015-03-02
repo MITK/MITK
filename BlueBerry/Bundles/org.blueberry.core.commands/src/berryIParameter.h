@@ -21,9 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryMacros.h>
 #include <org_blueberry_core_commands_Export.h>
 
-#include <map>
 
 namespace berry {
+
+struct IParameterValues;
 
 /**
  * <p>
@@ -32,28 +33,27 @@ namespace berry {
  * id of a view for display. This parameter also identifies possible values, for
  * display in the user interface.
  * </p>
- *
- * @since 3.1
  */
-struct BERRY_COMMANDS IParameter : public virtual Object {
+struct BERRY_COMMANDS IParameter : public virtual Object
+{
 
-  berryInterfaceMacro(IParameter, berry);
+  berryObjectMacro(berry::IParameter)
 
-  typedef std::map<std::string, std::string> ParameterValues;
+  typedef QHash<QString, QString> ParameterValues;
 
   /**
    * Returns the identifier for this parameter.
    *
    * @return The identifier; never <code>null</code>.
    */
-  virtual std::string GetId() const = 0;
+  virtual QString GetId() const = 0;
 
   /**
    * Returns the human-readable name for this parameter.
    *
    * @return The parameter name; never <code>null</code>.
    */
-  virtual std::string GetName() const = 0;
+  virtual QString GetName() const = 0;
 
   /**
    * Returns the values associated with this parameter.
@@ -63,7 +63,7 @@ struct BERRY_COMMANDS IParameter : public virtual Object {
    * @throws ParameterValuesException
    *             If the values can't be retrieved for some reason.
    */
-  virtual ParameterValues GetValues() const = 0;
+  virtual IParameterValues* GetValues() const = 0;
 
   /**
    * Returns whether parameter is optional. Otherwise, it is required.

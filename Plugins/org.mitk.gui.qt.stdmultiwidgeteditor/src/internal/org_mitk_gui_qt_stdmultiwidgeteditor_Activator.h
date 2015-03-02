@@ -36,7 +36,15 @@ public:
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
+  static ctkPluginContext* GetContext();
+
+private:
+
+  static ctkPluginContext* m_Context;
+
 };
+
+typedef org_mitk_gui_qt_stdmultiwidgeteditor_Activator PluginActivator;
 
 #endif /* org_mitk_gui_qt_stdmultiwidgeteditor_Activator_H_ */
 

@@ -25,7 +25,7 @@ namespace mitk {
   public:
 
     NavigationDataSetWriterXML();
-    ~NavigationDataSetWriterXML();
+    virtual ~NavigationDataSetWriterXML();
 
     virtual void Write (std::string path, mitk::NavigationDataSet::Pointer );
     virtual void Write (std::ostream* stream, mitk::NavigationDataSet::Pointer);

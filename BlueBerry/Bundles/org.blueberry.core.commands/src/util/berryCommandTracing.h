@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYCOMMANDTRACING_H_
 #define BERRYCOMMANDTRACING_H_
 
-#include <string>
+#include <QString>
+
+#include <org_blueberry_core_commands_Export.h>
 
 namespace berry {
 
@@ -29,17 +31,16 @@ namespace berry {
  * <p>
  * Clients must not extend or instantiate this class.
  * </p>
- *
- * @since 3.2
  */
-class CommandTracing {
+class BERRY_COMMANDS CommandTracing
+{
 
 public:
 
   /**
    * The separator to place between the component and the message.
    */
-  static const std::string SEPARATOR; // = " >>> ";
+  static const QString SEPARATOR; // = " >>> ";
 
   /**
    * <p>
@@ -57,8 +58,8 @@ public:
    * @param message
    *            The message to print to standard out; may be empty
    */
-  static void PrintTrace(const std::string& component,
-      const std::string& message);
+  static void PrintTrace(const QString& component,
+                         const QString& message);
 
 private:
 

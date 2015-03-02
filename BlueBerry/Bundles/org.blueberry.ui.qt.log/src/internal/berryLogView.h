@@ -30,7 +30,6 @@ class LogView : public QtViewPart
 public:
 
   LogView();
-  LogView(const LogView& other);
 
   void SetFocus();
 

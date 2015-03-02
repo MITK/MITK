@@ -41,9 +41,13 @@ public:
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
+  static ctkPluginContext* GetContext();
+
 private:
 
-  QmitkFunctionalityCoordinator::Pointer m_FunctionalityCoordinator;
+  QmitkFunctionalityCoordinator m_FunctionalityCoordinator;
+
+  static ctkPluginContext* m_Context;
 
 };
 

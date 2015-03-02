@@ -29,9 +29,9 @@ class BERRY_UI_QT QtEditorPart : public EditorPart
 {
 public:
 
-  berryObjectMacro(QtEditorPart);
+  berryObjectMacro(QtEditorPart)
 
-  void CreatePartControl(void* parent);
+  void CreatePartControl(QWidget* parent);
 
 protected:
 

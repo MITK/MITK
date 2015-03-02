@@ -25,29 +25,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 bool
-EnablementExpression::operator==(Expression& object)
+EnablementExpression::operator==(const Object* object) const
 {
-  try
+  if (const EnablementExpression* that = dynamic_cast<const EnablementExpression*>(object))
   {
-    EnablementExpression& that = dynamic_cast<EnablementExpression&>(object);
-    return this->Equals(this->fExpressions, that.fExpressions);
+    return this->Equals(this->fExpressions, that->fExpressions);
   }
-  catch (std::bad_cast)
-  {
-    return false;
-  }
-
   return false;
 }
 
-EvaluationResult
-EnablementExpression::Evaluate(IEvaluationContext* context)
+EvaluationResult::ConstPointer
+EnablementExpression::Evaluate(IEvaluationContext* context) const
 {
   std::clock_t start = 0;
   if (Expressions::TRACING)
     start = std::clock();
 
-  EvaluationResult result = this->EvaluateAnd(context);
+  EvaluationResult::ConstPointer result = this->EvaluateAnd(context);
 
   if (Expressions::TRACING)
   {

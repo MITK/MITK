@@ -19,46 +19,46 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryCompositeExpression.h"
 
-#include "service/berryIConfigurationElement.h"
-
 #include "Poco/DOM/Element.h"
 
 #include <vector>
 
 namespace berry {
 
+struct IConfigurationElement;
+
 class ResolveExpression : public CompositeExpression {
 
 private:
-  std::string fVariable;
-  std::vector<Object::Pointer> fArgs;
+  QString fVariable;
+  QList<Object::Pointer> fArgs;
 
-  static const std::string ATT_VARIABLE;
-  static const std::string ATT_ARGS;
+  static const QString ATT_VARIABLE;
+  static const QString ATT_ARGS;
 
   /**
    * The seed for the hash code for all resolve expressions.
    */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
 public:
 
-  ResolveExpression(SmartPointer<IConfigurationElement> configElement);
+  ResolveExpression(const SmartPointer<IConfigurationElement>& configElement);
 
   ResolveExpression(Poco::XML::Element* element);
 
-  ResolveExpression(const std::string& variable, std::vector<Object::Pointer>& args);
+  ResolveExpression(const QString& variable, const QList<Object::Pointer>& args);
 
-  EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 
-  void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info) const;
 
-  bool operator==(Expression& object);
+  bool operator==(const Object* object) const;
 
 
 protected:
 
-  std::size_t ComputeHashCode();
+  uint ComputeHashCode() const;
 };
 
 } // namespace berry

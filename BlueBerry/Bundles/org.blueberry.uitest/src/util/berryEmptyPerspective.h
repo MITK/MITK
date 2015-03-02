@@ -35,7 +35,7 @@ class BERRY_UITEST_EXPORT EmptyPerspective: public QObject, public IPerspectiveF
 
 private:
 
-  static std::string LastPerspective;
+  static QString LastPerspective;
 
 public:
 
@@ -44,12 +44,12 @@ public:
   /**
    * The perspective id for the empty perspective.
    */
-  static const std::string PERSP_ID; // = "org.blueberry.uitest.util.EmptyPerspective";
+  static const QString PERSP_ID; // = "org.blueberry.uitest.util.EmptyPerspective";
 
   /**
    * The perspective id for the second empty perspective.
    */
-  static const std::string PERSP_ID2; // = "org.blueberry.uitest.util.EmptyPerspective2";
+  static const QString PERSP_ID2; // = "org.blueberry.uitest.util.EmptyPerspective2";
 
 
   /**
@@ -57,14 +57,14 @@ public:
    *
    * @return the descriptor for the perspective last opened using this factory, or <code>null</code>
    */
-  static std::string GetLastPerspective();
+  static QString GetLastPerspective();
 
   /**
    * Sets the descriptor for the perspective last opened using this factory.
    *
    * @param persp the descriptor for the perspective last opened using this factory, or <code>null</code>
    */
-  static void SetLastPerspective(const std::string& perspId);
+  static void SetLastPerspective(const QString& perspId);
 
   /**
    * Constructs a new Default layout engine.

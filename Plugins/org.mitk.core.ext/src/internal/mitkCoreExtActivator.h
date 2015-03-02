@@ -20,8 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkPluginActivator.h>
 
+#include "mitkInputDeviceRegistry.h"
+
 namespace mitk
 {
+
   /**
   * @brief The activator class for the org.mitk.core.ext plug-in.
   * @ingroup org_mitk_core_ext_internal
@@ -40,6 +43,8 @@ namespace mitk
 
   public:
 
+    ~CoreExtActivator();
+
     /**
     * Starts this plug-in and registers object factories.
     *
@@ -55,7 +60,9 @@ namespace mitk
     /**
     * Activates the input device modules.
     */
-    void StartInputDeviceModules();
+    void StartInputDeviceModules(ctkPluginContext *context);
+
+    QScopedPointer<InputDeviceRegistry> m_InputDeviceRegistry;
 
   }; // end class CoreExtActivator
 } //end namespace mitk

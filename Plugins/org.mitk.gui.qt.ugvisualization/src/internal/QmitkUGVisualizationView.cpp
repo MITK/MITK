@@ -77,12 +77,6 @@ QmitkUGVisualizationView::QmitkUGVisualizationView()
 {
 }
 
-QmitkUGVisualizationView::QmitkUGVisualizationView(const QmitkUGVisualizationView& other)
-{
-  Q_UNUSED(other)
-  throw std::runtime_error("Copy constructor not implemented");
-}
-
 QmitkUGVisualizationView::~QmitkUGVisualizationView()
 {
   delete m_VolumeModeObserver;

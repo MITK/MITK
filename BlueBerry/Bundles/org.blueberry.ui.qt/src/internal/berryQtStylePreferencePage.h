@@ -19,9 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYQTSTYLEPREFERENCEPAGE_H_
 
 #include <berryIQtPreferencePage.h>
-
-#include <berryIPreferences.h>
 #include <berryIQtStyleManager.h>
+#include <berryIPreferences.h>
 
 #include <ui_berryQtStylePreferencePage.h>
 
@@ -38,7 +37,6 @@ class QtStylePreferencePage : public QObject, public IQtPreferencePage
 public:
 
   QtStylePreferencePage();
-  QtStylePreferencePage(const QtStylePreferencePage& other);
 
   void Init(IWorkbench::Pointer workbench);
 
@@ -67,7 +65,7 @@ protected slots:
 
 private:
 
-  berry::IQtStyleManager::Pointer styleManager;
+  berry::IQtStyleManager* styleManager;
 
   Ui::QtStylePreferencePageUI controls;
   berry::IPreferences::Pointer m_StylePref;

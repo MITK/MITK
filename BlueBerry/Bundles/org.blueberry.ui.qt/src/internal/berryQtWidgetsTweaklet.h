@@ -33,45 +33,44 @@ class QtWidgetsTweaklet : public QObject, public GuiWidgetsTweaklet
 public:
 
   QtWidgetsTweaklet();
-  QtWidgetsTweaklet(const QtWidgetsTweaklet& other);
 
-  void AddSelectionListener(void* widget, GuiTk::ISelectionListener::Pointer listener);
-  void RemoveSelectionListener(void* widget, GuiTk::ISelectionListener::Pointer listener);
+  void AddSelectionListener(QWidget* widget, GuiTk::ISelectionListener::Pointer listener);
+  void RemoveSelectionListener(QWidget* widget, GuiTk::ISelectionListener::Pointer listener);
 
-  void AddControlListener(void* widget, GuiTk::IControlListener::Pointer listener);
-  void RemoveControlListener(void* widget, GuiTk::IControlListener::Pointer listener);
+  void AddControlListener(QWidget* widget, GuiTk::IControlListener::Pointer listener);
+  void RemoveControlListener(QWidget* widget, GuiTk::IControlListener::Pointer listener);
 
-  bool GetEnabled(void* widget);
-  void SetEnabled(void* widget, bool enabled);
+  bool GetEnabled(QWidget* widget);
+  void SetEnabled(QWidget* widget, bool enabled);
 
-  void SetBounds(void* widget, const Rectangle& bounds);
-  Rectangle GetBounds(void* widget);
+  void SetBounds(QWidget* widget, const QRect& bounds);
+  QRect GetBounds(QWidget* widget);
 
-  void SetVisible(void* widget, bool visible);
-  bool GetVisible(void* widget);
-  bool IsVisible(void* widget);
+  void SetVisible(QWidget* widget, bool visible);
+  bool GetVisible(QWidget* widget);
+  bool IsVisible(QWidget* widget);
 
-  Rectangle GetClientArea(void* widget);
+  QRect GetClientArea(QWidget* widget);
 
-  void* GetParent(void* widget);
-  bool SetParent(void* widget, void* parent);
+  QWidget* GetParent(QWidget* widget);
+  bool SetParent(QWidget* widget, QWidget* parent);
 
-  void SetData(void* widget, const std::string& id, Object::Pointer data);
-  Object::Pointer GetData(void* widget, const std::string& id);
+  void SetData(QWidget* widget, const QString& id, Object::Pointer data);
+  Object::Pointer GetData(QWidget* widget, const QString& id);
 
-  //IMenu::Pointer CreateMenu(void*, IMenu::Style = IMenu::POP_UP);
+  //IMenu::Pointer CreateMenu(QWidget*, IMenu::Style = IMenu::POP_UP);
   //IMenu::Pointer CreateMenu(IMenu::Pointer parent);
   //IMenuItem::Pointer CreateMenuItem(IMenu::Pointer, IMenuItem::Style, int index = -1);
 
-  Rectangle GetScreenSize(int i = -1);
+  QRect GetScreenSize(int i = -1);
   unsigned int GetScreenNumber();
   int GetPrimaryScreenNumber();
-  Rectangle GetAvailableScreenSize(int i = -1);
-  int GetClosestScreenNumber(const Rectangle&);
+  QRect GetAvailableScreenSize(int i = -1);
+  int GetClosestScreenNumber(const QRect&);
 
-  Point GetCursorLocation();
-  void* GetCursorControl();
-  void* FindControl(const std::vector<Shell::Pointer>& shells, const Point& location);
+  QPoint GetCursorLocation();
+  QWidget* GetCursorControl();
+  QWidget* FindControl(const QList<Shell::Pointer>& shells, const QPoint& location);
 
   /**
    * Determines if one control is a child of another. Returns true iff the second
@@ -81,7 +80,7 @@ public:
    * @param childToTest
    * @return
    */
-  bool IsChild(void* potentialParent, void* childToTest);
+  bool IsChild(QWidget* potentialParent, QWidget* childToTest);
 
   /**
    * Returns the control which currently has keyboard focus,
@@ -91,35 +90,35 @@ public:
    *
    * @return the control under the cursor
    */
-  void* GetFocusControl();
+  QWidget* GetFocusControl();
 
-  bool IsReparentable(void* widget);
+  bool IsReparentable(QWidget* widget);
 
-  void MoveAbove(void* widgetToMove, void* widget);
-  void MoveBelow(void* widgetToMove, void* widget);
+  void MoveAbove(QWidget* widgetToMove, QWidget* widget);
+  void MoveBelow(QWidget* widgetToMove, QWidget* widget);
 
-  void Dispose(void* widget);
+  void Dispose(QWidget* widget);
 
   Shell::Pointer CreateShell(Shell::Pointer parent, int style);
   void DisposeShell(Shell::Pointer shell);
 
-  void* CreateComposite(void* parent);
+  QWidget* CreateComposite(QWidget* parent);
 
-  std::vector<Shell::Pointer> GetShells();
-  Shell::Pointer GetShell(void* widget);
+  QList<Shell::Pointer> GetShells();
+  Shell::Pointer GetShell(QWidget* widget);
   Shell::Pointer GetActiveShell();
 
-  Rectangle ToControl(void* coordinateSystem,
-          const Rectangle& toConvert);
+  QRect ToControl(QWidget* coordinateSystem,
+          const QRect& toConvert);
 
-  Point ToControl(void* coordinateSystem,
-          const Point& toConvert);
+  QPoint ToControl(QWidget* coordinateSystem,
+          const QPoint& toConvert);
 
-  Rectangle ToDisplay(void* coordinateSystem,
-          const Rectangle& toConvert);
+  QRect ToDisplay(QWidget* coordinateSystem,
+          const QRect& toConvert);
 
-  Point ToDisplay(void* coordinateSystem,
-          const Point& toConvert);
+  QPoint ToDisplay(QWidget* coordinateSystem,
+          const QPoint& toConvert);
 
 private:
 

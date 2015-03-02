@@ -303,12 +303,14 @@ mitk::Point3D mitk::BaseRenderer::Map2DRendererPositionTo3DWorldPosition(const P
   Point3D position;
   if (m_MapperID == 1)
   {
+    ////the p_mm is a 2D vector from the origin of the plane geometry to the projection of the requested point onto the first slice.
     GetDisplayGeometry()->DisplayToWorld(mousePosition, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
+    //position is the 3D vector from the origin of the world to the requested point.
   }
   else if (m_MapperID == 2)
   {
-    PickWorldPoint(mousePosition, position);
+    PickWorldPoint(mousePosition, position); //Seems to be the same code as above, but subclasses may contain different implementations.
   }
   return position;
 }
@@ -387,10 +389,13 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
     m_Slice = slice;
     if (m_WorldTimeGeometry.IsNotNull())
     {
+      // get world geometry which may be rotated, for the current time step
       SlicedGeometry3D* slicedWorldGeometry = dynamic_cast<SlicedGeometry3D*>(m_WorldTimeGeometry->GetGeometryForTimeStep(m_TimeStep).GetPointer());
       if (slicedWorldGeometry != NULL)
       {
+        // if slice position is part of the world geometry...
         if (m_Slice >= slicedWorldGeometry->GetSlices())
+          // set the current worldplanegeomety as the selected 2D slice of the world geometry
           m_Slice = slicedWorldGeometry->GetSlices() - 1;
         SetCurrentWorldPlaneGeometry(slicedWorldGeometry->GetPlaneGeometry(m_Slice));
         SetCurrentWorldGeometry(slicedWorldGeometry);
@@ -545,6 +550,7 @@ void mitk::BaseRenderer::SetWorldGeometry3D(mitk::BaseGeometry* geometry)
     itkWarningMacro("m_CurrentWorldPlaneGeometry is NULL");
 }
 
+//TODO 18735: This function is not used. Delete it. And it is stupid. The display geometry should not be changed....
 void mitk::BaseRenderer::SetDisplayGeometry(mitk::DisplayGeometry* geometry2d)
 {
   itkDebugMacro("setting DisplayGeometry to " << geometry2d);

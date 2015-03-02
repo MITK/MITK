@@ -19,10 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-std::string EmptyPerspective::LastPerspective;
-const std::string EmptyPerspective::PERSP_ID =
+QString EmptyPerspective::LastPerspective;
+const QString EmptyPerspective::PERSP_ID =
     "org.blueberry.uitest.util.EmptyPerspective";
-const std::string EmptyPerspective::PERSP_ID2 =
+const QString EmptyPerspective::PERSP_ID2 =
     "org.blueberry.uitest.util.EmptyPerspective2";
 
 EmptyPerspective::EmptyPerspective()
@@ -31,16 +31,17 @@ EmptyPerspective::EmptyPerspective()
 }
 
 EmptyPerspective::EmptyPerspective(const EmptyPerspective& other)
+  : QObject()
 {
   Q_UNUSED(other)
 }
 
-std::string EmptyPerspective::GetLastPerspective()
+QString EmptyPerspective::GetLastPerspective()
 {
   return LastPerspective;
 }
 
-void EmptyPerspective::SetLastPerspective(const std::string& perspId)
+void EmptyPerspective::SetLastPerspective(const QString& perspId)
 {
   LastPerspective = perspId;
 }

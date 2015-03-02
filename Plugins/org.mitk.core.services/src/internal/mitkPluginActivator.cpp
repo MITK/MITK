@@ -89,9 +89,8 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
   mitk::ItkLoggingAdapter::Initialize();
 
   //initialize data storage service
-  DataStorageService* service = new DataStorageService();
-  dataStorageService = IDataStorageService::Pointer(service);
-  context->registerService<mitk::IDataStorageService>(service);
+  dataStorageService.reset(new DataStorageService());
+  context->registerService<mitk::IDataStorageService>(dataStorageService.data());
 
   // Get the MitkCore Module Context
   mitkContext = us::ModuleRegistry::GetModule(1)->GetModuleContext();
@@ -123,7 +122,7 @@ void org_mitk_core_services_Activator::stop(ctkPluginContext* /*context*/)
   //clean up logging
   mitk::LoggingBackend::Unregister();
 
-  dataStorageService = 0;
+  dataStorageService.reset();
   mitkContext = 0;
   pluginContext = 0;
 }
@@ -276,6 +275,10 @@ ctkDictionary org_mitk_core_services_Activator::CreateServiceProperties(const us
 
 org_mitk_core_services_Activator::org_mitk_core_services_Activator()
   : mitkContext(0), pluginContext(0)
+{
+}
+
+org_mitk_core_services_Activator::~org_mitk_core_services_Activator()
 {
 }
 

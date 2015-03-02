@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 
-#include <berryISelectionListener.h>
 #include <mitkDataNodeSelection.h>
 
 #include <mitkWeakPointer.h>
@@ -69,11 +68,6 @@ protected slots:
 
 
 protected:
-
-  ///
-  /// A selection listener for datatreenode events
-  ///
-  berry::ISelectionListener::Pointer m_SelectionListener;
 
   Ui::QmitkVolumeVisualizationViewControls* m_Controls;
 

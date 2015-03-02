@@ -29,7 +29,7 @@ class BERRY_TEST_EXPORT TestCase : public CppUnit::TestCase
 
 public:
 
-  TestCase(const std::string& testName);
+  TestCase(const QString& testName);
 
   /**
    * Sets up the fixture, for example, open a network connection.

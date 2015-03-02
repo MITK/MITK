@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkParRecFileIOFactory.h"
 //#include "mitkObjFileIOFactory.h"
-#include "mitkVtkUnstructuredGridIOFactory.h"
 #include "mitkStlVolumeTimeSeriesIOFactory.h"
 #include "mitkVtkVolumeTimeSeriesIOFactory.h"
 
@@ -44,7 +43,6 @@ mitk::IOExtObjectFactory::IOExtObjectFactory()
   : CoreObjectFactoryBase()
   , m_ParRecFileIOFactory(ParRecFileIOFactory::New().GetPointer())
   //, m_ObjFileIOFactory(ObjFileIOFactory::New().GetPointer())
-  , m_VtkUnstructuredGridIOFactory(VtkUnstructuredGridIOFactory::New().GetPointer())
   , m_StlVolumeTimeSeriesIOFactory(StlVolumeTimeSeriesIOFactory::New().GetPointer())
   , m_VtkVolumeTimeSeriesIOFactory(VtkVolumeTimeSeriesIOFactory::New().GetPointer())
   , m_UnstructuredGridVtkWriterFactory(UnstructuredGridVtkWriterFactory::New().GetPointer())
@@ -55,7 +53,6 @@ mitk::IOExtObjectFactory::IOExtObjectFactory()
     MITK_DEBUG << "IOExtObjectFactory c'tor" << std::endl;
 
     itk::ObjectFactoryBase::RegisterFactory( m_ParRecFileIOFactory );
-    itk::ObjectFactoryBase::RegisterFactory( m_VtkUnstructuredGridIOFactory );
     itk::ObjectFactoryBase::RegisterFactory( m_StlVolumeTimeSeriesIOFactory );
     itk::ObjectFactoryBase::RegisterFactory( m_VtkVolumeTimeSeriesIOFactory );
 
@@ -74,7 +71,6 @@ mitk::IOExtObjectFactory::IOExtObjectFactory()
 mitk::IOExtObjectFactory::~IOExtObjectFactory()
 {
   itk::ObjectFactoryBase::UnRegisterFactory( m_ParRecFileIOFactory );
-  itk::ObjectFactoryBase::UnRegisterFactory( m_VtkUnstructuredGridIOFactory );
   itk::ObjectFactoryBase::UnRegisterFactory( m_StlVolumeTimeSeriesIOFactory );
   itk::ObjectFactoryBase::UnRegisterFactory( m_VtkVolumeTimeSeriesIOFactory );
 

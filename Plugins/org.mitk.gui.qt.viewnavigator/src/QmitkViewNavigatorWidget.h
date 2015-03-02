@@ -55,8 +55,8 @@ public:
     bool FillTreeList();
     void UpdateTreeList(QStandardItem* item = NULL, berry::IWorkbenchPartReference* partRef=NULL, const std::string& changeId="");
 
-    berry::IPerspectiveListener::Pointer    m_PerspectiveListener;
-    berry::IWindowListener::Pointer         m_WindowListener;
+    QScopedPointer<berry::IPerspectiveListener>    m_PerspectiveListener;
+    QScopedPointer<berry::IWindowListener>         m_WindowListener;
 
 public slots:
 
@@ -75,7 +75,7 @@ public slots:
 protected:
 
     // member variables
-    Ui::QmitkViewNavigatorWidgetControls          m_Controls;
+    Ui::QmitkViewNavigatorWidgetControls        m_Controls;
     QWidget*                                    m_Parent;
     QStandardItemModel*                         m_TreeModel;
     ClassFilterProxyModel*                      m_FilterProxyModel;

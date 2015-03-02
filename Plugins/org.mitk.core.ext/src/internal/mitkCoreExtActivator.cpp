@@ -17,11 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCoreExtActivator.h"
 
 #include "mitkCoreExtConstants.h"
-
-#include "mitkInputDeviceRegistry.h"
+#include "mitkLogMacros.h"
 
 #include <berryPlatform.h>
+#include <berryIPreferences.h>
 #include <berryIPreferencesService.h>
+
+#include <ctkPluginContext.h>
 
 #include <QtPlugin>
 
@@ -31,7 +33,7 @@ namespace mitk
   {
     Q_UNUSED(context)
 
-    this->StartInputDeviceModules();
+    this->StartInputDeviceModules(context);
   }
 
   void CoreExtActivator::stop(ctkPluginContext* context)
@@ -39,23 +41,26 @@ namespace mitk
     Q_UNUSED(context)
   }
 
-  void mitk::CoreExtActivator::StartInputDeviceModules()
+  void CoreExtActivator::StartInputDeviceModules(ctkPluginContext* context)
   {
-    IInputDeviceRegistry::Pointer inputDeviceRegistry(new mitk::InputDeviceRegistry());
-    berry::Platform::GetServiceRegistry().RegisterService(
-          mitk::CoreExtConstants::INPUTDEVICE_SERVICE,
-          inputDeviceRegistry);
+    m_InputDeviceRegistry.reset(new InputDeviceRegistry());
+    context->registerService<mitk::IInputDeviceRegistry>(m_InputDeviceRegistry.data());
 
     // Gets the last setting of the preferences; if a device was selected,
     // it will still be activated after a restart
-    berry::IPreferencesService::Pointer prefService = berry::Platform::GetServiceRegistry()
-        .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+    ctkServiceReference prefServiceRef = context->getServiceReference<berry::IPreferencesService>();
+    if (!prefServiceRef)
+    {
+      MITK_WARN << "Preferences service not available";
+      return;
+    }
+    berry::IPreferencesService* prefService = context->getService<berry::IPreferencesService>(prefServiceRef);
     berry::IPreferences::Pointer extPreferencesNode =
         prefService->GetSystemPreferences()->Node(CoreExtConstants::INPUTDEVICE_PREFERENCES);
 
     // Initializes the modules
-    std::vector<IInputDeviceDescriptor::Pointer> descriptors(inputDeviceRegistry->GetInputDevices());
-    for (std::vector<IInputDeviceDescriptor::Pointer>::const_iterator it = descriptors.begin();
+    QList<IInputDeviceDescriptor::Pointer> descriptors(m_InputDeviceRegistry->GetInputDevices());
+    for (QList<IInputDeviceDescriptor::Pointer>::const_iterator it = descriptors.begin();
          it != descriptors.end(); ++it)
     {
       if (extPreferencesNode->GetBool((*it)->GetID(), false))
@@ -64,7 +69,12 @@ namespace mitk
         temp->RegisterInputDevice();
       }
     }
-  } // end method StartInputDeviceModules
+  }
+
+  CoreExtActivator::~CoreExtActivator()
+  {
+  }
+
 } // end namespace mitk
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

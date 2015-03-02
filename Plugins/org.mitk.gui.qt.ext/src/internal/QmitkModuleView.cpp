@@ -75,12 +75,12 @@ void QmitkModuleView::CreateQtPartControl(QWidget *parent)
     berry::IMemento::Pointer tableHeaderState = viewState->GetChild("tableHeader");
     if (tableHeaderState)
     {
-      std::string key;
+      QString key;
       tableHeaderState->GetString("qsettings-key", key);
-      if (!key.empty())
+      if (!key.isEmpty())
       {
         QSettings settings;
-        QByteArray ba = settings.value(QString::fromStdString(key)).toByteArray();
+        QByteArray ba = settings.value(key).toByteArray();
         tableView->horizontalHeader()->restoreState(ba);
       }
     }
@@ -101,5 +101,5 @@ void QmitkModuleView::SaveState(berry::IMemento::Pointer memento)
   settings.setValue(key, ba);
 
   berry::IMemento::Pointer tableHeaderState = memento->CreateChild("tableHeader");
-  tableHeaderState->PutString("qsettings-key", key.toStdString());
+  tableHeaderState->PutString("qsettings-key", key);
 }

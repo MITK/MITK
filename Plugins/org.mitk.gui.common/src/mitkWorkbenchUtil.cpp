@@ -17,11 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkWorkbenchUtil.h"
 
+#include <berryPlatform.h>
 #include <berryPlatformUI.h>
 #include <berryIEditorRegistry.h>
-#include <berryUIException.h>
+#include <berryCoreException.h>
 #include <berryIPreferencesService.h>
-#include <berryIBerryPreferences.h>
+#include <berryIPreferences.h>
 
 #include "mitkIDataStorageService.h"
 #include "mitkDataStorageEditorInput.h"
@@ -74,13 +75,13 @@ struct WorkbenchUtilPrivate {
     berry::IEditorDescriptor::Pointer editorDesc = defaultDescriptor;
 
     // next check the OS for in-place editor (OLE on Win32)
-    if (editorReg->IsSystemInPlaceEditorAvailable(name.toStdString()))
+    if (editorReg->IsSystemInPlaceEditorAvailable(name))
     {
       editorDesc = editorReg->FindEditor(berry::IEditorRegistry::SYSTEM_INPLACE_EDITOR_ID);
     }
 
     // next check with the OS for an external editor
-    if (editorDesc.IsNull() && editorReg->IsSystemExternalEditorAvailable(name.toStdString()))
+    if (editorDesc.IsNull() && editorReg->IsSystemExternalEditorAvailable(name))
     {
       editorDesc = editorReg->FindEditor(berry::IEditorRegistry::SYSTEM_EXTERNAL_EDITOR_ID);
     }
@@ -155,19 +156,20 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
   // Check if there is an open perspective. If not, open the default perspective.
   if (window->GetActivePage().IsNull())
   {
-    std::string defaultPerspId = window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
+    QString defaultPerspId = window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
     window->GetWorkbench()->ShowPerspective(defaultPerspId, window);
   }
 
   bool globalReinitOnNodeAdded = true;
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-  if (prefService.IsNotNull())
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+  if (prefService != nullptr)
   {
-      berry::IBerryPreferences::Pointer prefs
-              = (prefService->GetSystemPreferences()->Node("org.mitk.views.datamanager")).Cast<berry::IBerryPreferences>();
+      berry::IPreferences::Pointer prefs
+              = prefService->GetSystemPreferences()->Node("org.mitk.views.datamanager");
       if(prefs.IsNotNull())
+      {
         globalReinitOnNodeAdded = prefs->GetBool("Call global reinit if node is added", true);
+      }
   }
 
   if (openEditor && globalReinitOnNodeAdded)
@@ -189,7 +191,7 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
     {
       QString msg = "An error occurred when displaying the file(s): %1";
       QMessageBox::warning(QApplication::activeWindow(), "Error displaying file",
-                           msg.arg(QString::fromStdString(e.message())));
+                           msg.arg(e.message()));
     }
   }
 }
@@ -205,7 +207,7 @@ berry::IEditorPart::Pointer WorkbenchUtil::OpenEditor(berry::IWorkbenchPage::Poi
   }
 
   // open the editor on the input
-  return page->OpenEditor(input, editorId.toStdString(), activate);
+  return page->OpenEditor(input, editorId, activate);
 }
 
 berry::IEditorPart::Pointer WorkbenchUtil::OpenEditor(berry::IWorkbenchPage::Pointer page,
@@ -220,7 +222,7 @@ berry::IEditorPart::Pointer WorkbenchUtil::OpenEditor(berry::IWorkbenchPage::Poi
   }
 
   // open the editor on the data storage
-  QString name = QString::fromStdString(input->GetName()) + ".mitk";
+  QString name = input->GetName() + ".mitk";
   berry::IEditorDescriptor::Pointer editorDesc =
       WorkbenchUtilPrivate::GetEditorDescriptor(name,
                                                 berry::PlatformUI::GetWorkbench()->GetEditorRegistry(),
@@ -243,7 +245,7 @@ berry::IEditorDescriptor::Pointer WorkbenchUtil::GetEditorDescriptor(
   berry::IEditorRegistry* editorReg = berry::PlatformUI::GetWorkbench()->GetEditorRegistry();
 
   return WorkbenchUtilPrivate::GetEditorDescriptor(name, editorReg,
-                                                   editorReg->GetDefaultEditor(name.toStdString() /*, contentType*/));
+                                                   editorReg->GetDefaultEditor(name /*, contentType*/));
 }
 
 berry::IEditorDescriptor::Pointer WorkbenchUtil::GetDefaultEditor(const QString& name,
@@ -256,7 +258,7 @@ berry::IEditorDescriptor::Pointer WorkbenchUtil::GetDefaultEditor(const QString&
     QString editorID; // = file.getPersistentProperty(EDITOR_KEY);
     if (!editorID.isEmpty())
     {
-      berry::IEditorDescriptor::Pointer desc = editorReg->FindEditor(editorID.toStdString());
+      berry::IEditorDescriptor::Pointer desc = editorReg->FindEditor(editorID);
       if (desc.IsNotNull())
       {
         return desc;
@@ -275,7 +277,7 @@ berry::IEditorDescriptor::Pointer WorkbenchUtil::GetDefaultEditor(const QString&
 //  }
 
   // Try lookup with filename
-  return editorReg->GetDefaultEditor(name.toStdString()); //, contentType);
+  return editorReg->GetDefaultEditor(name); //, contentType);
 }
 
 bool WorkbenchUtil::SetDepartmentLogoPreference(const QString &logoResource, ctkPluginContext *context)

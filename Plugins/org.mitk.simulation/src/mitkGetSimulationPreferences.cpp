@@ -17,9 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGetSimulationPreferences.h"
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
-#include <berryServiceRegistry.h>
 
 berry::IPreferences::Pointer mitk::GetSimulationPreferences()
 {
-  return berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID)->GetSystemPreferences()->Node("/org.mitk.views.simulation");
+  return berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.simulation");
 }

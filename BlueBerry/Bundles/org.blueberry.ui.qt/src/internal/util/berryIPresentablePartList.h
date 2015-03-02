@@ -36,11 +36,11 @@ struct BERRY_UI_QT IPresentablePartList
 
   virtual void Move(IPresentablePart::Pointer part, int newIndex) = 0;
 
-  virtual std::size_t Size() = 0;
+  virtual int Size() = 0;
 
   virtual void Select(IPresentablePart::Pointer part) = 0;
 
-  virtual std::vector<IPresentablePart::Pointer> GetPartList() = 0;
+  virtual QList<IPresentablePart::Pointer> GetPartList() = 0;
 };
 
 }

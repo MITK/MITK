@@ -45,7 +45,7 @@ protected slots:
 private:
 
   IWorkbenchWindow* window;
-  std::string perspectiveId;
+  QString perspectiveId;
 
 };
 

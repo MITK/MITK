@@ -16,9 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryWorker.h"
 #include "berryWorkerPool.h"
-#include <sstream>
-#include <exception>
 #include "berryJobManager.h"
+#include "berryLog.h"
 
 namespace berry
 {
@@ -45,7 +44,7 @@ void Worker::JobRunnable::run()
     while ((ptr_currentWorker->ptr_currentJob
         = ptr_currentWorker->m_wpPool.Lock()->StartJob(ptr_currentWorker)) != 0)
     {
-      IStatus::Pointer result = Status::OK_STATUS ;
+      IStatus::Pointer result = Status::OK_STATUS(BERRY_STATUS_LOC);
 
       try
      {
@@ -89,36 +88,33 @@ void Worker::JobRunnable::run()
 void Worker::JobRunnable::RunMethodFinallyExecution(IStatus::Pointer sptr_result)
 {
 
-    //clear interrupted state for this thread
-    //Thread.interrupted();
+  //clear interrupted state for this thread
+  //Thread.interrupted();
 
-    //result must not be null
-if (sptr_result.IsNull())
+  //result must not be null
+  if (sptr_result.IsNull())
   {
-  std::runtime_error tempError("NullPointerException") ;
+    std::runtime_error tempError("NullPointerException");
     sptr_result = HandleException( ptr_currentWorker->ptr_currentJob, tempError );
   }
-   ptr_currentWorker->m_wpPool.Lock()->EndJob( ptr_currentWorker->ptr_currentJob, sptr_result );
+  ptr_currentWorker->m_wpPool.Lock()->EndJob( ptr_currentWorker->ptr_currentJob, sptr_result );
 
-    if ((sptr_result->GetSeverity() & (IStatus::ERROR_TYPE | IStatus::WARNING_TYPE)) != 0)
-          // TODO Logging  RuntimeLog.log(result);
-          std::cout << " Status after executing the job : " << sptr_result->ToString() ;
-    ptr_currentWorker->ptr_currentJob = 0;
-          //reset thread priority in case job changed it
-    ptr_currentWorker->setPriority(PRIO_NORMAL);
-
- }
+  if ((sptr_result->GetSeverity() & (IStatus::ERROR_TYPE | IStatus::WARNING_TYPE)) != 0)
+    // TODO Logging  RuntimeLog.log(result);
+    BERRY_ERROR << " Status after executing the job : " << sptr_result->ToString();
+  ptr_currentWorker->ptr_currentJob = 0;
+  //reset thread priority in case job changed it
+  ptr_currentWorker->setPriority(PRIO_NORMAL);
+}
 
 
 IStatus::Pointer Worker::JobRunnable::HandleException(InternalJob::Pointer sptr_job, const std::exception& exception)
-  {
-   std::stringstream ss;
-   ss << "An internal error occurred while executing the job: " <<  sptr_job->GetName()   ;
-    IStatus::Pointer sptr_errorStatus(new Status(IStatus::ERROR_TYPE, JobManager::PI_JOBS(), JobManager::PLUGIN_ERROR, ss.str(), exception) ) ;
-    return sptr_errorStatus ;
-  }
-
-
+{
+  QString msg = "An internal error occurred while executing the job: " + sptr_job->GetName();
+  IStatus::Pointer sptr_errorStatus(new Status(IStatus::ERROR_TYPE, JobManager::PI_JOBS(),
+                                               JobManager::PLUGIN_ERROR, msg, ctkException(exception.what()), BERRY_STATUS_LOC));
+  return sptr_errorStatus ;
+}
 
 
 /************************* end of nested JobRunnable class definition ****************************/

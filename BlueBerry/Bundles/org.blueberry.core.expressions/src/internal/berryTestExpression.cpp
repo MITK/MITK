@@ -17,86 +17,94 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryTestExpression.h"
 
 #include "berryExpressions.h"
+#include "berryExpressionStatus.h"
 
 #include "berryPlatform.h"
+#include "berryCoreException.h"
 
 #include <berryObjectString.h>
-
-#include <Poco/Hash.h>
+#include <berryIConfigurationElement.h>
 
 namespace berry {
 
-const char TestExpression::PROP_SEP = '.';
-const std::string TestExpression::ATT_PROPERTY = "property";
-const std::string TestExpression::ATT_ARGS = "args";
-const std::string TestExpression::ATT_FORCE_PLUGIN_ACTIVATION = "forcePluginActivation";
+const QChar TestExpression::PROP_SEP = '.';
+const QString TestExpression::ATT_PROPERTY = "property";
+const QString TestExpression::ATT_ARGS = "args";
+const QString TestExpression::ATT_FORCE_PLUGIN_ACTIVATION = "forcePluginActivation";
 
 TypeExtensionManager TestExpression::fgTypeExtensionManager("propertyTesters");
 
-const std::size_t TestExpression::HASH_INITIAL= Poco::hash("berry::TextExpression");
+const uint TestExpression::HASH_INITIAL= qHash("berry::TextExpression");
 
 
-TestExpression::TestExpression(IConfigurationElement::Pointer element)
+TestExpression::TestExpression(const IConfigurationElement::Pointer& element)
 {
-  std::string property;
-  element->GetAttribute(ATT_PROPERTY, property);
-  std::size_t pos = property.find_last_of(PROP_SEP);
-  if (pos == std::string::npos)
+  QString property = element->GetAttribute(ATT_PROPERTY);
+  int pos = property.lastIndexOf(PROP_SEP);
+  if (pos == -1)
   {
-    throw CoreException("No namespace provided");
+    IStatus::Pointer status(new ExpressionStatus(
+                              ExpressionStatus::NO_NAMESPACE_PROVIDED,
+                              "The property attribute of the test expression must be qualified by a name space.",
+                              BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
-  fNamespace = property.substr(0, pos);
-  fProperty = property.substr(pos + 1);
-  Expressions::GetArguments(fArgs, element, ATT_ARGS);
-  std::string arg = "";
-  bool result = element->GetAttribute(ATT_VALUE, arg);
-  fExpectedValue = Expressions::ConvertArgument(arg, result);
+  fNamespace = property.left(pos);
+  fProperty = property.mid(pos + 1);
+  fArgs = Expressions::GetArguments(element, ATT_ARGS);
+  fExpectedValue = Expressions::ConvertArgument(element->GetAttribute(ATT_VALUE));
   fForcePluginActivation = Expressions::GetOptionalBooleanAttribute(element, ATT_FORCE_PLUGIN_ACTIVATION);
 }
 
 TestExpression::TestExpression(Poco::XML::Element* element)
 {
-  std::string property= element->getAttribute(ATT_PROPERTY);
-  std::size_t pos = property.find_last_of(PROP_SEP);
-  if (pos == std::string::npos)
+  QString property= QString::fromStdString(element->getAttribute(ATT_PROPERTY.toStdString()));
+  int pos = property.lastIndexOf(PROP_SEP);
+  if (pos == -1)
   {
-    throw CoreException("No namespace provided");
+    IStatus::Pointer status(new ExpressionStatus(
+                              ExpressionStatus::NO_NAMESPACE_PROVIDED,
+                              "The property attribute of the test expression must be qualified by a name space.",
+                              BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
-  fNamespace = property.substr(0, pos);
-  fProperty = property.substr(pos + 1);
-  Expressions::GetArguments(fArgs, element, ATT_ARGS);
-  std::string value = element->getAttribute(ATT_VALUE);
-  fExpectedValue = Expressions::ConvertArgument(value, value.size() > 0);
-  fForcePluginActivation= Expressions::GetOptionalBooleanAttribute(element, ATT_FORCE_PLUGIN_ACTIVATION);
+  fNamespace = property.left(pos);
+  fProperty = property.mid(pos + 1);
+  fArgs = Expressions::GetArguments(element, ATT_ARGS);
+  std::string value = element->getAttribute(ATT_VALUE.toStdString());
+  fExpectedValue = Expressions::ConvertArgument(value.size() > 0 ? QString::fromStdString(value) : QString());
+  fForcePluginActivation = Expressions::GetOptionalBooleanAttribute(element, ATT_FORCE_PLUGIN_ACTIVATION);
 }
 
-TestExpression::TestExpression(const std::string& namespaze, const std::string& property, std::vector<Object::Pointer>& args, Object::Pointer expectedValue)
+TestExpression::TestExpression(const QString& namespaze, const QString& property,
+                               const QList<Object::Pointer>& args, Object::Pointer expectedValue)
+  : fNamespace(namespaze), fProperty(property), fArgs(args),
+    fExpectedValue(expectedValue), fForcePluginActivation(false)
 {
-  TestExpression(namespaze, property, args, expectedValue, false);
 }
 
-TestExpression::TestExpression(const std::string& namespaze, const std::string& property, std::vector<Object::Pointer>& args, Object::Pointer expectedValue, bool forcePluginActivation)
+TestExpression::TestExpression(const QString &namespaze, const QString &property, const QList<Object::Pointer>& args,
+                               Object::Pointer expectedValue, bool forcePluginActivation)
  : fNamespace(namespaze), fProperty(property), fArgs(args),
    fExpectedValue(expectedValue), fForcePluginActivation(forcePluginActivation)
 {
-
 }
 
-EvaluationResult
-TestExpression::Evaluate(IEvaluationContext* context)
+EvaluationResult::ConstPointer
+TestExpression::Evaluate(IEvaluationContext* context) const
 {
-  Object::Pointer element = context->GetDefaultVariable();
+  Object::ConstPointer element(context->GetDefaultVariable());
   if (typeid(Platform) == typeid(element.GetPointer()))
   {
-    std::string str = Platform::GetProperty(fProperty);
-    if (str.size() == 0)
+    QString str = Platform::GetProperty(fProperty);
+    if (str.isEmpty())
     {
       return EvaluationResult::FALSE_EVAL;
     }
 
     ObjectString::Pointer var = fArgs[0].Cast<ObjectString>();
     if (var)
-      return EvaluationResult::ValueOf(*var == str);
+      return EvaluationResult::ValueOf(static_cast<QString&>(*var) == str);
 
     return EvaluationResult::FALSE_EVAL;
   }
@@ -108,67 +116,61 @@ TestExpression::Evaluate(IEvaluationContext* context)
 }
 
 void
-TestExpression::CollectExpressionInfo(ExpressionInfo* info)
+TestExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   info->MarkDefaultVariableAccessed();
   info->AddAccessedPropertyName(fNamespace + PROP_SEP + fProperty);
 }
 
 bool
-TestExpression::operator==(Expression& object)
+TestExpression::operator==(const Object* object) const
 {
-  try {
-    TestExpression& that = dynamic_cast<TestExpression&>(object);
-    return this->fNamespace == that.fNamespace &&
-            this->fProperty == that.fProperty &&
-            this->fForcePluginActivation == that.fForcePluginActivation &&
-            this->Equals(this->fArgs, that.fArgs) &&
-            this->fExpectedValue == that.fExpectedValue;
-  }
-  catch (std::bad_cast)
+  if (const TestExpression* that = dynamic_cast<const TestExpression*>(object))
   {
-    return false;
+    return this->fNamespace == that->fNamespace &&
+            this->fProperty == that->fProperty &&
+            this->fForcePluginActivation == that->fForcePluginActivation &&
+            this->Equals(this->fArgs, that->fArgs) &&
+            this->fExpectedValue == that->fExpectedValue;
   }
-
+  return false;
 }
 
-std::size_t
-TestExpression::ComputeHashCode()
+uint TestExpression::ComputeHashCode() const
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fArgs)
   * HASH_FACTOR + fExpectedValue->HashCode()
-  * HASH_FACTOR + Poco::hash(fNamespace)
-  * HASH_FACTOR + Poco::hash(fProperty)
+  * HASH_FACTOR + qHash(fNamespace)
+  * HASH_FACTOR + qHash(fProperty)
   * HASH_FACTOR + (fForcePluginActivation ? 1 : 0);
 }
 
-std::string
-TestExpression::ToString()
+QString
+TestExpression::ToString() const
 {
-  std::string args("");
-  for (unsigned int i= 0; i < fArgs.size(); i++)
+  QString args("");
+  for (int i= 0; i < fArgs.size(); i++)
   {
     Object::Pointer arg= fArgs[i];
     ObjectString::Pointer strarg = arg.Cast<ObjectString>();
     if (strarg)
     {
-      args.append(1,'\'');
-      args.append(*strarg);
-      args.append(1,'\'');
+      args.append('\'');
+      args.append(static_cast<QString&>(*strarg));
+      args.append('\'');
     }
     else
     {
       args.append(arg->ToString());
     }
     if (i < fArgs.size() - 1)
-    args.append(", "); //$NON-NLS-1$
+    args.append(", ");
   }
 
   return "<test property=\"" + fProperty +
-  (fArgs.size() != 0 ? "\" args=\"" + args + "\"" : "\"") +
-  (!fExpectedValue.IsNull() ? "\" value=\"" + fExpectedValue->ToString() + "\"" : "\"") +
-  " plug-in activation: " + (fForcePluginActivation ? "eager" : "lazy") +
-  "/>"; //$NON-NLS-1$
+      (!fArgs.isEmpty() ? "\" args=\"" + args + "\"" : "\"") +
+      (!fExpectedValue.IsNull() ? "\" value=\"" + fExpectedValue->ToString() + "\"" : "\"") +
+      " plug-in activation: " + (fForcePluginActivation ? "eager" : "lazy") + "/>";
 }
 
 //---- testing ---------------------------------------------------

@@ -16,43 +16,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryEvaluationResult.h"
 
-#include "Poco/Exception.h"
-
 namespace berry {
 
-const int EvaluationResult::FALSE_VALUE= 0;
-const int EvaluationResult::TRUE_VALUE= 1;
-const int EvaluationResult::NOT_LOADED_VALUE= 2;
+const int EvaluationResult::FALSE_VALUE = 0;
+const int EvaluationResult::TRUE_VALUE = 1;
+const int EvaluationResult::NOT_LOADED_VALUE = 2;
 
-const EvaluationResult EvaluationResult::FALSE_EVAL(EvaluationResult::FALSE_VALUE);
-const EvaluationResult EvaluationResult::TRUE_EVAL(EvaluationResult::TRUE_VALUE);
-const EvaluationResult EvaluationResult::NOT_LOADED(NOT_LOADED_VALUE);
+const SmartPointer<const EvaluationResult> EvaluationResult::FALSE_EVAL(new EvaluationResult(EvaluationResult::FALSE_VALUE));
+const SmartPointer<const EvaluationResult> EvaluationResult::TRUE_EVAL(new EvaluationResult(EvaluationResult::TRUE_VALUE));
+const SmartPointer<const EvaluationResult> EvaluationResult::NOT_LOADED(new EvaluationResult(NOT_LOADED_VALUE));
 
-bool EvaluationResult::operator==(const EvaluationResult& result)
+bool EvaluationResult::operator==(const Object* result) const
 {
-  return this->fValue == result.fValue;
+  if(const EvaluationResult* o = dynamic_cast<const EvaluationResult*>(result))
+  {
+    return this->fValue == o->fValue;
+  }
+  return false;
 }
 
-bool EvaluationResult::operator!=(const EvaluationResult& result)
+bool EvaluationResult::operator!=(const Object* result) const
 {
-  return this->fValue != result.fValue;
+  return !(this == result);
 }
 
-const EvaluationResult EvaluationResult::AND[3][3] = {
+const SmartPointer<const EvaluationResult> EvaluationResult::AND[3][3] = {
     //                    FALSE                      TRUE                  NOT_LOADED
     /* FALSE   */ { EvaluationResult::FALSE_EVAL, EvaluationResult::FALSE_EVAL, EvaluationResult::FALSE_EVAL   },
     /* TRUE    */ { EvaluationResult::FALSE_EVAL, EvaluationResult::TRUE_EVAL,  EvaluationResult::NOT_LOADED  },
     /* PNL     */ { EvaluationResult::FALSE_EVAL, EvaluationResult::NOT_LOADED, EvaluationResult::NOT_LOADED  }
 };
 
-const EvaluationResult EvaluationResult::OR[3][3] = {
+const SmartPointer<const EvaluationResult> EvaluationResult::OR[3][3] = {
     //                      FALSE                   TRUE                  NOT_LOADED
     /* FALSE   */ { EvaluationResult::FALSE_EVAL, EvaluationResult::TRUE_EVAL, EvaluationResult::NOT_LOADED  },
     /* TRUE    */ { EvaluationResult::TRUE_EVAL,  EvaluationResult::TRUE_EVAL, EvaluationResult::TRUE_EVAL    },
     /* PNL     */ { EvaluationResult::NOT_LOADED, EvaluationResult::TRUE_EVAL,   EvaluationResult::NOT_LOADED  }
 };
 
-const EvaluationResult EvaluationResult::NOT[3] = {
+const SmartPointer<const EvaluationResult> EvaluationResult::NOT[3] = {
     //    FALSE                        TRUE                  NOT_LOADED
     EvaluationResult::TRUE_EVAL, EvaluationResult::FALSE_EVAL, EvaluationResult::NOT_LOADED
 };
@@ -63,34 +65,39 @@ EvaluationResult::EvaluationResult(int value)
   fValue= value;
 }
 
-EvaluationResult
-EvaluationResult::And(EvaluationResult other)
+EvaluationResult::EvaluationResult(const EvaluationResult &o)
+  : Object()
+  , fValue(o.fValue)
 {
-  return AND[fValue][other.fValue];
 }
 
-EvaluationResult
-EvaluationResult::Or(EvaluationResult other)
+EvaluationResult::ConstPointer
+EvaluationResult::And(const EvaluationResult::ConstPointer& other) const
 {
-  return OR[fValue][other.fValue];
+  return AND[fValue][other->fValue];
+}
+
+EvaluationResult::ConstPointer
+EvaluationResult::Or(const EvaluationResult::ConstPointer& other) const
+{
+  return OR[fValue][other->fValue];
 }
 
 
-EvaluationResult
-EvaluationResult::Not()
+EvaluationResult::ConstPointer
+EvaluationResult::Not() const
 {
   return NOT[fValue];
 }
 
-EvaluationResult
+EvaluationResult::ConstPointer
 EvaluationResult::ValueOf(bool b)
 {
-  return b ? TRUE_EVAL : FALSE_EVAL;
+  return (b ? TRUE_EVAL : FALSE_EVAL);
 }
 
 
-std::string
-EvaluationResult::ToString()
+QString EvaluationResult::ToString() const
 {
   switch (fValue) {
   case 0:
@@ -100,7 +107,7 @@ EvaluationResult::ToString()
   case 2:
     return "not_loaded";
   default:
-    poco_bugcheck();
+    Q_ASSERT(false);
     return "";
   }
 }

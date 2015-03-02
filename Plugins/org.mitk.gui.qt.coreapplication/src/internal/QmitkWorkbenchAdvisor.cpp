@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkWorkbenchWindowAdvisor.h"
 
-const std::string QmitkWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.coreapp.defaultperspective";
+const QString QmitkWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.coreapp.defaultperspective";
 
 void
 QmitkWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer::Pointer configurer)
@@ -38,7 +38,7 @@ QmitkWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   return new QmitkWorkbenchWindowAdvisor(configurer);
 }
 
-std::string QmitkWorkbenchAdvisor::GetInitialWindowPerspectiveId()
+QString QmitkWorkbenchAdvisor::GetInitialWindowPerspectiveId()
 {
   return DEFAULT_PERSPECTIVE_ID;
 }

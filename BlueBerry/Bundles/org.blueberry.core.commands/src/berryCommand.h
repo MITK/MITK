@@ -18,14 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYCOMMAND_H_
 
 #include "berryNamedHandleObjectWithState.h"
-#include "berryIParameter.h"
-#include "berryParameterType.h"
 
-#include "berryIExecutionListenerWithChecks.h"
-#include "berryICommandListener.h"
-#include "berryIHandlerListener.h"
+#include <berryICommandListener.h>
+#include <berryIHandlerListener.h>
+#include <berryIExecutionListenerWithChecks.h>
+#include <berryIParameter.h>
 
-#include <vector>
+#include <berryParameterType.h>
 
 namespace berry
 {
@@ -62,7 +61,7 @@ struct IHandler;
  * </p>
  *
  */
-class BERRY_COMMANDS Command: public NamedHandleObjectWithState
+class BERRY_COMMANDS Command : public NamedHandleObjectWithState, private IHandlerListener
 { // implements Comparable {
 
 public:
@@ -73,7 +72,7 @@ public:
    * This flag can be set to <code>true</code> if commands should print
    * information to <code>System.out</code> when executing.
    */
-  static  bool DEBUG_COMMAND_EXECUTION;
+  static bool DEBUG_COMMAND_EXECUTION;
 
   /**
    * This flag can be set to <code>true</code> if commands should print
@@ -86,7 +85,7 @@ public:
    * command should print information to <code>System.out</code> when
    * changing handlers.
    */
-  static std::string DEBUG_HANDLERS_COMMAND_ID;
+  static QString DEBUG_HANDLERS_COMMAND_ID;
 
 private:
 
@@ -117,33 +116,21 @@ private:
    * The help context identifier for this command. This can be
    * <code>null</code> if there is no help currently associated with the
    * command.
-   *
-   * @since 3.2
    */
-  std::string helpContextId;
+  QString helpContextId;
 
   /**
    * The ordered array of parameters understood by this command. This value
    * may be <code>null</code> if there are no parameters, or if the command
    * is undefined. It may also be empty.
    */
-  std::vector<SmartPointer<IParameter> > parameters;
+  QList<SmartPointer<IParameter> > parameters;
 
   /**
    * The type of the return value of this command. This value may be
    * <code>null</code> if the command does not declare a return type.
-   *
-   * @since 3.2
    */
   SmartPointer<ParameterType> returnType;
-
-  /**
-   * Our command will listen to the active handler for enablement changes so
-   * that they can be fired from the command itself.
-   *
-   * @since 3.3
-   */
-  SmartPointer<IHandlerListener> handlerListener;
 
 protected:
 
@@ -157,7 +144,7 @@ protected:
    *            The identifier for the command. This value must not be
    *            <code>null</code>, and must be unique amongst all commands.
    */
-  Command(const std::string& id);
+  Command(const QString& id);
 
   friend class CommandManager;
 
@@ -170,7 +157,7 @@ public:
    * @param commandListener
    *            The listener to be added; must not be <code>null</code>.
    */
-  void AddCommandListener(const ICommandListener::Pointer commandListener);
+  void AddCommandListener(ICommandListener* commandListener);
 
   /**
    * Adds a listener to this command that will be notified when this command
@@ -179,8 +166,7 @@ public:
    * @param executionListener
    *            The listener to be added; must not be <code>null</code>.
    */
-  void AddExecutionListener(
-      const IExecutionListener::Pointer executionListener);
+  void AddExecutionListener(IExecutionListener* executionListener);
 
   /**
    * <p>
@@ -197,9 +183,8 @@ public:
    *            <code>null</code>.
    * @param state
    *            The state to add; must not be <code>null</code>.
-   * @since 3.2
    */
-  void AddState(const std::string& id, const State::Pointer state);
+  void AddState(const QString& id, const SmartPointer<State>& state);
 
   /**
    * Compares this command with another command by comparing each of its
@@ -240,12 +225,12 @@ public:
    *            The identifier of the help context to associate with this
    *            command; may be <code>null</code> if this command does not
    *            have any help associated with it.
-   * @since 3.2
    */
-  void Define(const std::string& name, const std::string& description,
-      const SmartPointer<CommandCategory> category,
-      const std::vector<SmartPointer<IParameter> >& parameters = std::vector<SmartPointer<IParameter> >(),
-      SmartPointer<ParameterType> returnType = SmartPointer<ParameterType>(0), const std::string& helpContextId = "");
+  void Define(const QString& name, const QString& description,
+              const SmartPointer<CommandCategory> category,
+              const QList<SmartPointer<IParameter> >& parameters = QList<SmartPointer<IParameter> >(),
+              const SmartPointer<ParameterType>& returnType = SmartPointer<ParameterType>(0),
+              const QString& helpContextId = "");
 
   /**
    * Executes this command by delegating to the current handler, if any. If
@@ -269,7 +254,6 @@ public:
    *             If the command you are trying to execute is not enabled.
    * @throws NotHandledException
    *             If there is no handler.
-   * @since 3.2
    */
   Object::Pointer ExecuteWithChecks(const SmartPointer<const ExecutionEvent> event);
 
@@ -302,7 +286,6 @@ private:
    * @param e
    *            The exception that is about to be thrown; never
    *            <code>null</code>.
-   * @since 3.2
    */
   void FireNotEnabled(const NotEnabledException* e);
 
@@ -356,7 +339,6 @@ public:
    * </p>
    *
    * @return The current handler for this command; may be <code>null</code>.
-   * @since 3.3
    */
   SmartPointer<IHandler> GetHandler() const;
 
@@ -367,9 +349,8 @@ public:
    *
    * @return The help context identifier for this command; may be
    *         <code>null</code> if there is none.
-   * @since 3.2
    */
-  std::string GetHelpContextId() const;
+  QString GetHelpContextId() const;
 
   /**
    * Returns the parameter with the provided id or <code>null</code> if this
@@ -381,9 +362,8 @@ public:
    *         command does not have a parameter with the id.
    * @throws NotDefinedException
    *             If the handle is not currently defined.
-   * @since 3.2
    */
-  SmartPointer<IParameter> GetParameter(const std::string& parameterId) const;
+  SmartPointer<IParameter> GetParameter(const QString& parameterId) const;
 
   /**
    * Returns the parameters for this command. This call triggers provides a
@@ -394,7 +374,7 @@ public:
    * @throws NotDefinedException
    *             If the handle is not currently defined.
    */
-  std::vector<SmartPointer<IParameter> > GetParameters() const;
+  QList<SmartPointer<IParameter> > GetParameters() const;
 
   /**
    * Returns the {@link ParameterType} for the parameter with the provided id
@@ -409,9 +389,8 @@ public:
    *         type with the provided id.
    * @throws NotDefinedException
    *             If the handle is not currently defined.
-   * @since 3.2
    */
-  SmartPointer<ParameterType> GetParameterType(const std::string& parameterId) const;
+  SmartPointer<ParameterType> GetParameterType(const QString& parameterId) const;
 
   /**
    * Returns the {@link ParameterType} for the return value of this command or
@@ -423,7 +402,6 @@ public:
    *         value parameter type.
    * @throws NotDefinedException
    *             If the handle is not currently defined.
-   * @since 3.2
    */
   SmartPointer<ParameterType> GetReturnType() const;
 
@@ -443,9 +421,8 @@ public:
    *            the state to evaluate against. May be <code>null</code>
    *            which indicates that the handler can query whatever model that
    *            is necessary.  This context must not be cached.
-   * @since 3.4
    */
-  void SetEnabled(Object::ConstPointer evaluationContext);
+  void SetEnabled(const Object::Pointer& evaluationContext);
 
   /**
    * Returns whether this command has a handler, and whether this handler is
@@ -463,8 +440,7 @@ public:
    *            The listener to be removed; must not be <code>null</code>.
    *
    */
-  void RemoveCommandListener(
-      const ICommandListener::Pointer commandListener);
+  void RemoveCommandListener(ICommandListener* commandListener);
 
   /**
    * Removes a listener from this command.
@@ -473,8 +449,7 @@ public:
    *            The listener to be removed; must not be <code>null</code>.
    *
    */
-  void RemoveExecutionListener(
-      const IExecutionListener::Pointer executionListener);
+  void RemoveExecutionListener(IExecutionListener* executionListener);
 
   /**
    * <p>
@@ -486,9 +461,8 @@ public:
    * @param stateId
    *            The identifier of the state to remove; must not be
    *            <code>null</code>.
-   * @since 3.2
    */
-  void RemoveState(const std::string& stateId);
+  void RemoveState(const QString& stateId);
 
   /**
    * Changes the handler for this command. This will remove all the state from
@@ -505,21 +479,16 @@ public:
 
 private:
 
-  struct HandlerListener : public IHandlerListener
-  {
-
-    HandlerListener(Command* command);
-
-    void HandlerChanged(SmartPointer<HandlerEvent> handlerEvent);
-
-  private:
-    Command* command;
-  };
-
   /**
    * @return the handler listener
    */
-  SmartPointer<IHandlerListener> GetHandlerListener();
+  IHandlerListener* GetHandlerListener();
+
+  /**
+   * Our command will listen to the active handler for enablement changes so
+   * that they can be fired from the command itself.
+   */
+  void HandlerChanged(const SmartPointer<HandlerEvent>& handlerEvent);
 
 
 public:
@@ -530,7 +499,7 @@ public:
    *
    * @return The string representation; never <code>null</code>.
    */
-  std::string ToString() const;
+  QString ToString() const;
 
   /**
    * Makes this command become undefined. This has the side effect of changing

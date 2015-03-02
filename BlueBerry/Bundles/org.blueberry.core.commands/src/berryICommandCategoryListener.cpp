@@ -23,20 +23,24 @@ namespace berry {
 
 void
 ICommandCategoryListener::Events
-::AddListener(ICommandCategoryListener::Pointer l)
+::AddListener(ICommandCategoryListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == 0) return;
 
-  categoryChanged += Delegate(l.GetPointer(), &ICommandCategoryListener::CategoryChanged);
+  categoryChanged += Delegate(l, &ICommandCategoryListener::CategoryChanged);
 }
 
 void
 ICommandCategoryListener::Events
-::RemoveListener(ICommandCategoryListener::Pointer l)
+::RemoveListener(ICommandCategoryListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == 0) return;
 
-  categoryChanged -= Delegate(l.GetPointer(), &ICommandCategoryListener::CategoryChanged);
+  categoryChanged -= Delegate(l, &ICommandCategoryListener::CategoryChanged);
+}
+
+ICommandCategoryListener::~ICommandCategoryListener()
+{
 }
 
 }

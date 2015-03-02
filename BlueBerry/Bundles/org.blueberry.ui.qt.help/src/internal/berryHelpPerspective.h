@@ -31,7 +31,7 @@ class HelpPerspective : public QObject, public berry::IPerspectiveFactory
 
 public:
 
-  static const std::string ID;
+  static const QString ID;
 
   HelpPerspective();
 

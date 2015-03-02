@@ -93,7 +93,7 @@ public:
   virtual QWidget* GetContentParent() = 0;
   virtual void SetContent(QWidget* newContent) = 0;
 
-  virtual std::vector<AbstractTabItem*> GetItems() = 0;
+  virtual QList<AbstractTabItem*> GetItems() = 0;
 
   virtual AbstractTabItem* GetSelection() = 0;
   virtual void SetSelection(AbstractTabItem* toSelect) = 0;
@@ -165,7 +165,7 @@ public:
    */
   virtual int IndexOf(AbstractTabItem* item);
 
-  virtual std::size_t GetItemCount();
+  virtual int GetItemCount();
 
   /**
    * Sets the current state for the folder

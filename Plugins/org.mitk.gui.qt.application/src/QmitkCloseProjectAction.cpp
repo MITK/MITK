@@ -110,13 +110,12 @@ void QmitkCloseProjectAction::Run()
 
     // Close all editors with this data storage as input
     mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dataStorageRef));
-    std::vector<berry::IEditorReference::Pointer> dsEditors =
-        m_Window->GetActivePage()->FindEditors(dsInput, std::string(), berry::IWorkbenchPage::MATCH_INPUT);
+    QList<berry::IEditorReference::Pointer> dsEditors =
+        m_Window->GetActivePage()->FindEditors(dsInput, QString(), berry::IWorkbenchPage::MATCH_INPUT);
 
     if (!dsEditors.empty())
     {
-      std::list<berry::IEditorReference::Pointer> editorsToClose;
-      editorsToClose.assign(dsEditors.begin(), dsEditors.end());
+      QList<berry::IEditorReference::Pointer> editorsToClose = dsEditors;
       m_Window->GetActivePage()->CloseEditors(editorsToClose, false);
     }
   }

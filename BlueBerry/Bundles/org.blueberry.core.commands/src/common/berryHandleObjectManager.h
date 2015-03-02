@@ -18,12 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYHANDLEOBJECTMANAGER_H_
 #define BERRYHANDLEOBJECTMANAGER_H_
 
-#include <Poco/HashSet.h>
-#include <Poco/HashMap.h>
+#include <org_blueberry_core_commands_Export.h>
 
-#include "berryHandleObject.h"
+#include <berrySmartPointer.h>
+
+#include <QHash>
+#include <QSet>
 
 namespace berry {
+
+class HandleObject;
 
 /**
  * <p>
@@ -33,15 +37,14 @@ namespace berry {
  * <p>
  * Clients may extend.
  * </p>
- *
- * @since 3.2
- */
-class BERRY_COMMANDS HandleObjectManager {
+*/
+class BERRY_COMMANDS HandleObjectManager
+{
 
 protected:
 
-  typedef Poco::HashSet<HandleObject::Pointer, HandleObject::Hash> HandleObjectsSet;
-  typedef Poco::HashMap<std::string, HandleObject::Pointer> HandleObjectsByIdMap;
+  typedef QSet<SmartPointer<HandleObject> > HandleObjectsSet;
+  typedef QHash<QString, SmartPointer<HandleObject> > HandleObjectsByIdMap;
 
   /**
    * The set of handle objects that are defined. This value may be empty, but
@@ -63,7 +66,7 @@ protected:
    * @param id
    *            The identifier to validate; may be anything.
    */
-  void CheckId(const std::string& id) const;
+  void CheckId(const QString& id) const;
 
   /**
    * Returns the set of identifiers for those handle objects that are defined.
@@ -71,7 +74,7 @@ protected:
    * @return The set of defined handle object identifiers; this value may be
    *         empty, but it is never <code>null</code>.
    */
-  Poco::HashSet<std::string> GetDefinedHandleObjectIds() const;
+  QSet<QString> GetDefinedHandleObjectIds() const;
 };
 
 }

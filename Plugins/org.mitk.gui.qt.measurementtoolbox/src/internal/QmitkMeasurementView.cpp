@@ -289,10 +289,13 @@ void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
     interactor->SetDataNode(nonConstNode);
 
     QmitkPlanarFigureData data;
+
     data.m_Figure = planarFigure;
 
     typedef itk::SimpleMemberCommand<QmitkMeasurementView> SimpleCommandType;
     typedef itk::MemberCommand<QmitkMeasurementView> MemberCommandType;
+
+    planarFigure->m_ImageNode = this->DetectTopMostVisibleImage();
 
     // add observer for event when figure has been placed
     auto initializationCommand = SimpleCommandType::New();
@@ -664,17 +667,6 @@ void QmitkMeasurementView::OnDrawCircleTriggered(bool)
 
   mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
 
-  mitk::DataNode* node;
-  figure->m_ImageNode = NULL;
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (!nodes.empty()) {
-    node = nodes.front();
-
-    if (node) {
-      figure->m_ImageNode = node;
-    }
-  }
-
   QString qString = QString("Circle%1").arg(++d->m_CircleCounter);
   this->AddFigureToDataStorage(figure, qString);
 
@@ -686,18 +678,6 @@ void QmitkMeasurementView::OnDrawEllipseTriggered(bool)
   Q_UNUSED(checked)
 
   mitk::PlanarEllipse::Pointer figure = mitk::PlanarEllipse::New();
-
-  mitk::DataNode* node;
-  figure->m_ImageNode = NULL;
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (!nodes.empty()) {
-    node = nodes.front();
-
-    if (node) {
-      figure->m_ImageNode = node;
-    }
-  }
-
   QString qString = QString("Ellipse%1").arg(++d->m_EllipseCounter);
   this->AddFigureToDataStorage(figure, qString);
 

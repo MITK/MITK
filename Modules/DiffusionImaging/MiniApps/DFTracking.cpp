@@ -168,6 +168,9 @@ int main(int argc, char* argv[])
     tracker->SetDecisionForest(&rf);
     tracker->SetSamplingDistance(samplingdist);
     tracker->SetNumberOfSamples(samples);
+    //tracker->SetAvoidStop(false);
+    tracker->SetAposterioriCurvCheck(true);
+    tracker->SetRemoveWmEndFibers(true);
     tracker->Update();
     vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
     mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);

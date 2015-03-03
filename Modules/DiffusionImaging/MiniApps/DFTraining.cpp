@@ -51,30 +51,19 @@ void TrainForest( vigra::RandomForest<int> &rf, vigra::MultiArray<2, double> &la
     MITK_INFO << "Number of trees: " << numTrees;
     vigra::rf::visitors::OOB_Error oob_v;
 
-    rf.set_options().use_stratification(vigra::RF_NONE); // How the data should be made equal
-    rf.set_options().sample_with_replacement(true); // if sampled with replacement or not
-    rf.set_options().samples_per_tree(sample_fraction); // Fraction of samples that are used to train a tree
-    rf.set_options().tree_count(1); // Number of trees that are calculated;
-    rf.set_options().min_split_node_size(5); // Minimum number of datapoints that must be in a node
-    //    rf.set_options().features_per_node(10);
+//    rf.set_options().use_stratification(vigra::RF_NONE); // How the data should be made equal
+//    rf.set_options().sample_with_replacement(true); // if sampled with replacement or not
+//    rf.set_options().samples_per_tree(sample_fraction); // Fraction of samples that are used to train a tree
+//    rf.set_options().tree_count(1); // Number of trees that are calculated;
+//    rf.set_options().min_split_node_size(5); // Minimum number of datapoints that must be in a node
+//    rf.ext_param_.max_tree_depth = max_tree_depth;
+//    //    rf.set_options().features_per_node(10);
+//    rf.learn(featureData, labelData, vigra::rf::visitors::create_visitor(oob_v));
 
-    rf.learn(featureData, labelData, vigra::rf::visitors::create_visitor(oob_v));
-
-    // Prepare parallel VariableImportance Calculation
-    int numMod =  featureData.shape(1);
-    const int numClass = 2 + 2;
-
-    float** varImp = new float*[numMod];
-
-    for(int i = 0; i < numMod; i++)
-        varImp[i] = new float[numClass];
-
-    for (int i = 0; i < numMod; ++i)
-        for (int j = 0; j < numClass; ++j)
-            varImp[i][j] = 0.0;
-
+    std::vector< vigra::RandomForest<int> > trees;
+    int count = 0;
 #pragma omp parallel for
-    for (int i = 0; i < numTrees - 1; ++i)
+    for (int i = 0; i < numTrees; ++i)
     {
         vigra::RandomForest<int> lrf;
         vigra::rf::visitors::OOB_Error loob_v;
@@ -84,18 +73,26 @@ void TrainForest( vigra::RandomForest<int> &rf, vigra::MultiArray<2, double> &la
         lrf.set_options().samples_per_tree(sample_fraction); // Fraction of samples that are used to train a tree
         lrf.set_options().tree_count(1); // Number of trees that are calculated;
         lrf.set_options().min_split_node_size(5); // Minimum number of datapoints that must be in a node
+        lrf.ext_param_.max_tree_depth = max_tree_depth;
         //        lrf.set_options().features_per_node(10);
 
-        lrf.learn(featureData, labelData, vigra::rf::visitors::create_visitor(loob_v));
+        lrf.learn(featureData, labelData);//, vigra::rf::visitors::create_visitor(loob_v));
 #pragma omp critical
         {
-            rf.trees_.push_back(lrf.trees_[0]);
+            count++;
+            MITK_INFO << "Tree " << count << " finished training.";
+            trees.push_back(lrf);
+            //rf.trees_.push_back(lrf.trees_[0]);
         }
     }
 
+    for (int i = 1; i < numTrees; ++i)
+        trees.at(0).trees_.push_back(trees.at(i).trees_[0]);
+
+    rf = trees.at(0);
     rf.options_.tree_count_ = numTrees;
     MITK_INFO << "Training finsihed";
-    MITK_INFO << "The out-of-bag error is: " << oob_v.oob_breiman << std::endl;
+    //MITK_INFO << "The out-of-bag error is: " << oob_v.oob_breiman << std::endl;
 }
 
 SampledShImageType::PixelType GetImageValues(itk::Point<float, 3> itkP, SampledShImageType::Pointer image)
@@ -297,7 +294,7 @@ int main(int argc, char* argv[])
         MITK_INFO << "Samples outside of WM: " << numSamples << " (" << gmsamples << " per non-WM voxel)";
 
         // load and resample training tractograms
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(tractogramFiles.at(t))->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(tractogramFiles.at(t)).at(0).GetPointer());
         if (stepsize<0)
         {
             SampledShImageType::Pointer image = sampledShImages.at(t);

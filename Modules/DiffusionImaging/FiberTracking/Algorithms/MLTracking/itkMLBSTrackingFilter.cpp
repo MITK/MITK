@@ -55,6 +55,9 @@ MLBSTrackingFilter< NumImageFeatures >
     , m_DemoMode(false)
     , m_PauseTracking(false)
     , m_AbortTracking(false)
+    , m_RemoveWmEndFibers(false)
+    , m_AposterioriCurvCheck(false)
+    , m_AvoidStop(true)
 {
     this->SetNumberOfRequiredInputs(1);
 }
@@ -442,12 +445,17 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
     direction = Classify(pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
     direction *= prob;
 
+
+    itk::OrientationDistributionFunction< double, 50 >  probeVecs;
+
     for (int i=0; i<m_NumberOfSamples; i++)
     {
         vnl_vector_fixed<double,3> probe;
-        probe[0] = GetRandDouble()*m_SamplingDistance;
-        probe[1] = GetRandDouble()*m_SamplingDistance;
-        probe[2] = GetRandDouble()*m_SamplingDistance;
+//        probe[0] = GetRandDouble()*m_SamplingDistance;
+//        probe[1] = GetRandDouble()*m_SamplingDistance;
+//        probe[2] = GetRandDouble()*m_SamplingDistance;
+
+        probe = probeVecs.GetDirection(i)*m_SamplingDistance;
 
         itk::Point<double, 3> temp;
         temp[0] = pos[0] + probe[0];
@@ -460,7 +468,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
         {
             direction += tempDir*prob;
         }
-        else if (candidates==0 && olddir.magnitude()>0) // out of white matter
+        else if (m_AvoidStop && candidates==0 && olddir.magnitude()>0) // out of white matter
         {
             vnl_vector_fixed<double,3> normProbe = -probe; normProbe.normalize();
             double dot = dot_product(normProbe, olddir);
@@ -537,19 +545,22 @@ double MLBSTrackingFilter< NumImageFeatures >::FollowStreamline(ThreadIdType thr
             else
                 fib->push_back(pos);
 
-            int curv = CheckCurvature(fib, front);  // TODO: Move into classification ???
-            if (curv>0)
+            if (m_AposterioriCurvCheck)
             {
-                tractLength -= m_StepSize*curv;
-                while (curv>0)
+                int curv = CheckCurvature(fib, front);  // TODO: Move into classification ???
+                if (curv>0)
                 {
-                    if (front)
-                        fib->pop_front();
-                    else
-                        fib->pop_back();
-                    curv--;
+                    tractLength -= m_StepSize*curv;
+                    while (curv>0)
+                    {
+                        if (front)
+                            fib->pop_front();
+                        else
+                            fib->pop_back();
+                        curv--;
+                    }
+                    return tractLength;
                 }
-                return tractLength;
             }
 
             if (tractLength>m_MaxTractLength)
@@ -693,6 +704,8 @@ void MLBSTrackingFilter< NumImageFeatures >::ThreadedGenerateData(const InputIma
             // forward tracking
             tractLength = FollowStreamline(threadId, worldPos, dir, &fib, 0, false);
             fib.push_front(worldPos);
+
+            if (m_RemoveWmEndFibers)
             {
                 itk::Point<double> check = fib.back();
                 dirOld.fill(0.0);
@@ -708,6 +721,7 @@ void MLBSTrackingFilter< NumImageFeatures >::ThreadedGenerateData(const InputIma
             tractLength = FollowStreamline(threadId, worldPos, -dir, &fib, tractLength, true);
             counter = fib.size();
 
+            if (m_RemoveWmEndFibers)
             {
                 itk::Point<double> check = fib.front();
                 dirOld.fill(0.0);

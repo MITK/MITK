@@ -100,6 +100,9 @@ public:
     itkSetMacro( B_Value, float )
     itkSetMacro( GradientDirections, mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer )
     itkSetMacro( DemoMode, bool )
+    itkSetMacro( RemoveWmEndFibers, bool )
+    itkSetMacro( AposterioriCurvCheck, bool )
+    itkSetMacro( AvoidStop, bool )
 
     void SetDecisionForest( DecisionForestType* forest )
     {
@@ -158,6 +161,10 @@ public:
     mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer m_GradientDirections;
     float                               m_B_Value;
 
+    bool                                m_AposterioriCurvCheck;
+    bool                                m_RemoveWmEndFibers;
+    bool                                m_AvoidStop;
+
     int                                 m_Threads;
     bool                                m_DemoMode;
     void BuildFibers(bool check);
@@ -165,7 +172,7 @@ public:
 
     // decision forest
     DecisionForestType*                                                 m_DecisionForest;
-    itk::OrientationDistributionFunction< double, NumImageFeatures*2 >     m_ODF;
+    itk::OrientationDistributionFunction< double, NumImageFeatures*2 >  m_ODF;
     std::vector< int >                                                  m_DirectionIndices;
 
     std::vector< PolyDataType >         m_PolyDataContainer;

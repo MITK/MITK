@@ -68,7 +68,7 @@ public:
   typedef std::deque< Point2D > ControlPointListType;
   typedef std::vector< PolyLineElement > PolyLineType;
 
-  mitk::DataNode* m_ImageNode;
+  mitk::DataNode::Pointer m_ImageNode;
 
   /** \brief Sets the 2D geometry on which this figure will be placed.
    *

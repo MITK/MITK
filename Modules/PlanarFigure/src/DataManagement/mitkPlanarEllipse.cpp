@@ -354,11 +354,14 @@ mitk::PlanarEllipse::MeasurementStatistics* mitk::PlanarEllipse::EvaluateStatist
         std::vector<short> values;
         double tx, ty;
 
+        double theta_cos = cos( theta );
+        double theta_sin = sin( theta );
+
         for (double dy = ymax; dy > -ymax; dy--) {
           dx = sqrt( ( 1 - (pow(dy,2) / pow(circleRadius1,2) )) * pow(circleRadius2,2) );
           /// Matrix rotation when center is (0, 0)
-          tx = dx * cos( theta ) - dy * sin ( theta );
-          ty = dx * sin( theta ) + dy * cos ( theta );
+          tx = dx * theta_cos - dy * theta_sin;
+          ty = dx * theta_sin + dy * theta_cos;
           currentPoint[X] = center[X] - tx;
           currentPoint[Y] = center[Y] + ty;
           currentPoint[Z] = 0;

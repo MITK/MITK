@@ -168,7 +168,7 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
 
         typedef itk::Image<short, 3> ImageType3D;
         ImageType3D::Pointer itkImage;
-		    mitk::CastToItkImage(image, itkImage);
+        mitk::CastToItkImage(image, itkImage);
 
         ImageType3D::IndexType currentIndex;
         currentIndex[Z] = centerIndex[Z];

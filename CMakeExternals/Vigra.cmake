@@ -21,7 +21,7 @@ if(MITK_USE_Vigra)
     ExternalProject_Add(${proj}
        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vigra-1.10.0-src.tar.gz
        URL_MD5 4f963f0be4fcb8b06271c2aa40baa9be
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Vigra.patch
+       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Vigra.patch
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
          ${ep_common_args}

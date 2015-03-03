@@ -26,6 +26,7 @@ set(CPP_FILES
   mitkAnisotropicRegistrationCommon.cpp
   mitkUnstructuredGridClusteringFilter.cpp
   mitkUnstructuredGridToUnstructuredGridFilter.cpp
+  mitkSurfaceToPointSetFilter.cpp
 )
 
 if(WIN32 AND NOT MINGW)

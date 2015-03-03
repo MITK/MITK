@@ -52,8 +52,9 @@ set(H_FILES
 
 
   # Datastructures Connectomics
-  IODataStructures/mitkConnectomicsNetwork.h
   IODataStructures/mitkConnectomicsConstantsManager.h
+  IODataStructures/mitkConnectomicsNetwork.h
+  IODataStructures/mitkConnectomicsNetworkProperties.h
 
   # Algorithms Connectomics
   Algorithms/mitkConnectomicsNetworkCreator.h

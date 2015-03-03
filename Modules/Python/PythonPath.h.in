@@ -21,4 +21,4 @@
 //"sys.path.append('@OpenCV_DIR@/bin')\n"\
 //"sys.path.append('@OpenCV_DIR@/bin" PYTHON_PATH_BUILD_TYPE "')"
 
-#define PYTHONHOME "@Python_DIR@"
+#define PYTHONHOME "@MITK_EXTERNAL_PROJECT_PREFIX@"

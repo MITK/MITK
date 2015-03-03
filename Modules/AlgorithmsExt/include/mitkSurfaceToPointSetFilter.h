@@ -39,7 +39,7 @@ namespace mitk {
 
     mitkClassMacro(SurfaceToPointSetFilter,mitk::PointSetSource);
     itkNewMacro(Self);
-
+    using itk::ProcessObject::SetInput;
     void SetInput(mitk::Surface::Pointer m_InputSurface);
 
 

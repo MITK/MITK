@@ -40,6 +40,8 @@ if(NOT DEFINED ITK_DIR)
   # see MITK bug #17338
   list(APPEND additional_cmake_args
     -DModule_ITKReview:BOOL=ON
+  # for 4.7, the OpenJPEG is needed by review but the variable must be set
+    -DModule_ITKOpenJPEG:BOOL=ON
   )
 
   set(vcl_constexpr_patch)
@@ -51,8 +53,8 @@ if(NOT DEFINED ITK_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.5.1-3e550bf8.tar.gz
-     URL_MD5 80e433ffc0e81cdc19a03dd02a3c329b
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.7.1-20c0592.tar.gz
+     URL_MD5 f778a5f0e297c06dc629c33ec45733dc
      # work with external GDCM
      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.5.1.patch
                    ${vcl_constexpr_patch}

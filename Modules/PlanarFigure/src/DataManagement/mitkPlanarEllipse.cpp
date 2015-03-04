@@ -335,12 +335,21 @@ mitk::PlanarEllipse::MeasurementStatistics* mitk::PlanarEllipse::EvaluateStatist
         ImageType3D::IndexType currentIndex;
         currentIndex[Z] = centerIndex[Z];
 
+        BoundingBox::BoundsArrayType bounds = this->GetPlaneGeometry()->GetBounds();
+
+        unsigned short layout = 0;
         mitk::Point3D cosPoint;
         cosPoint[X] = GetWorldControlPoint(RADIUS_POINT_NUM1)[X];
         cosPoint[Y] = center[Y];
         cosPoint[Z] = center[Z];
         double cosline = center.EuclideanDistanceTo(cosPoint);
-
+        if (cosline == 0) {
+          layout = 1;
+          cosPoint[X] = center[X];
+          cosPoint[Y] = GetWorldControlPoint(RADIUS_POINT_NUM1)[Y];
+          cosPoint[Z] = center[Z];
+          cosline = center.EuclideanDistanceTo(GetWorldControlPoint(RADIUS_POINT_NUM1));
+        }
         if (cosline == 0) return NULL;
 
         double theta = acos ( cosline / circleRadius1 );
@@ -364,7 +373,7 @@ mitk::PlanarEllipse::MeasurementStatistics* mitk::PlanarEllipse::EvaluateStatist
           ty = dx * theta_sin + dy * theta_cos;
           currentPoint[X] = center[X] - tx;
           currentPoint[Y] = center[Y] + ty;
-          currentPoint[Z] = 0;
+          currentPoint[Z] = center[Z];
           image->GetGeometry()->WorldToIndex(currentPoint, centerIndex);
           lIndex = centerIndex[X];
 
@@ -375,6 +384,15 @@ mitk::PlanarEllipse::MeasurementStatistics* mitk::PlanarEllipse::EvaluateStatist
           currentIndex[Y] = centerIndex[Y];
           for (int rowX = lIndex; rowX <= rIndex; rowX++) {
             currentIndex[X] = rowX;
+            
+            ///Constraints re-check, TODO: fix Constraints
+            
+            
+            if ( currentIndex[X] <= bounds[0]
+                || currentIndex[X] >= bounds[1]
+                || currentIndex[Z] <= bounds[2]
+                || currentIndex[Z] >= bounds[3]) return NULL;
+
             short val = itkImage->GetPixel(currentIndex);
             values.push_back(val);
             if (val < minValue) {

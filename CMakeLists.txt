@@ -272,6 +272,14 @@ if(MITK_USE_QT)
   mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS QT)
 endif()
 
+# -----------------------------------------
+# Other MITK_USE_* options not related to
+# external projects build via the
+# MITK superbuild
+
+env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
+env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
+
 #-----------------------------------------------------------------------------
 # Build configurations
 #-----------------------------------------------------------------------------
@@ -370,14 +378,6 @@ if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
   message("> Forcing MITK_USE_CppUnit to ON because BUILD_TESTING=ON")
   set(MITK_USE_CppUnit ON CACHE BOOL "Use CppUnit for unit tests" FORCE)
 endif()
-
-# -----------------------------------------
-# Other MITK_USE_* options not related to
-# external projects build via the
-# MITK superbuild
-
-env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 
 if(MITK_USE_BLUEBERRY)
   option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)

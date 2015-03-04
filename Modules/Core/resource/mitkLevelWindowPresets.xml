@@ -3,7 +3,7 @@
    <preset NAME="Bones" LEVEL="500" WINDOW="1000" />
    <preset NAME="Liver" LEVEL="30" WINDOW="400" />
    <preset NAME="Lung" LEVEL="-200" WINDOW="500" />
-   <preset NAME="Brain" LEVEL="35" WINDOW="85" />
+   <preset NAME="Brain" LEVEL="40" WINDOW="80" />
    <preset NAME="Blood" LEVEL="100" WINDOW="600" />
    <preset NAME="Intestine" LEVEL="30" WINDOW="400" />
    <preset NAME="Fat" LEVEL="-130" WINDOW="200" />

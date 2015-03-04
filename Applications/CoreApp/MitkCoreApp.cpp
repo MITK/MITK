@@ -72,7 +72,7 @@ int main(int argc, char** argv)
   // These paths replace the .ini file and are tailored for installation
   // packages created with CPack. If a .ini file is presented, it will
   // overwrite the settings in MapConfiguration
-  QDir basePath(argv[0]);
+  QDir basePath(QCoreApplication::applicationDirPath());
 
   QString provFile = basePath.absoluteFilePath("MitkCoreApp.provisioning");
 

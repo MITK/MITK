@@ -112,7 +112,7 @@ int main(int argc, char** argv)
   // These paths replace the .ini file and are tailored for installation
   // packages created with CPack. If a .ini file is presented, it will
   // overwrite the settings in MapConfiguration
-  QDir basePath(argv[0]);
+  QDir basePath(QCoreApplication::applicationDirPath());
 
   QString provFile = basePath.absoluteFilePath("MitkDiffusion.provisioning");
 
@@ -151,14 +151,14 @@ int main(int argc, char** argv)
   {
     QString& preloadLib = *preloadLibIter;
     // In case the application is started from an install directory
-    QString tempLibraryPath = QCoreApplication::applicationDirPath() + "/plugins/" + preloadLib + libSuffix;
+    QString tempLibraryPath = basePath.absoluteFilePath("plugins/" + preloadLib + libSuffix);
     QFile preloadLibrary (tempLibraryPath);
 #ifdef Q_OS_MAC
     if (!preloadLibrary.exists())
     {
       // In case the application is started from a build tree
-      QString relPath = "/../../../plugins/" + preloadLib + libSuffix;
-      tempLibraryPath = QCoreApplication::applicationDirPath() + relPath;
+      QString relPath = "../../../plugins/" + preloadLib + libSuffix;
+      tempLibraryPath = QDir::cleanPath(basePath.absoluteFilePath(relPath));
       preloadLibrary.setFileName(tempLibraryPath);
     }
 #endif

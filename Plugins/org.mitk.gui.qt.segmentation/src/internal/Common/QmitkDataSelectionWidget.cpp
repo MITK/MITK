@@ -119,8 +119,10 @@ unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(const QString &lab
 
 mitk::DataStorage::Pointer QmitkDataSelectionWidget::GetDataStorage() const
 {
-  mitk::IDataStorageService* service =
-      mitk::PluginActivator::getDefault()->GetWorkbench()->GetService<mitk::IDataStorageService>();
+  ctkServiceReference ref = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
+  assert(ref == true);
+
+  mitk::IDataStorageService* service = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(ref);
 
   assert(service);
 

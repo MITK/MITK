@@ -551,6 +551,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
  QMenuBar* menuBar = mainWindow->menuBar();
  menuBar->setContextMenuPolicy(Qt::PreventContextMenu);
+ menuBar->setNativeMenuBar(false);
 
  QMenu* fileMenu = menuBar->addMenu("&File");
  fileMenu->setObjectName("FileMenu");

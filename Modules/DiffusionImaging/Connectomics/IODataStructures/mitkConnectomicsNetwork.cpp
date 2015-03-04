@@ -503,7 +503,14 @@ mitk::ConnectomicsNetwork::NetworkNode mitk::ConnectomicsNetwork::GetNode( Verte
 
 mitk::ConnectomicsNetwork::NetworkEdge mitk::ConnectomicsNetwork::GetEdge( VertexDescriptorType vertexA, VertexDescriptorType vertexB ) const
 {
-  return m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ];
+  if( EdgeExists(vertexA, vertexB) )
+  {
+    return m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ];
+  }
+  else
+  {
+    mitkThrow() << "Edge does not exist";
+  }
 }
 
 void mitk::ConnectomicsNetwork::UpdateBounds( )

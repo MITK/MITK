@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleVtkWriter.h>
 #include <mitkFiberBundleTrackVisWriter.h>
 #include <mitkConnectomicsNetworkWriter.h>
+#include <mitkConnectomicsNetworkCSVWriter.h>
+#include <mitkConnectomicsNetworkMatrixWriter.h>
 #include <mitkPlanarFigureCompositeWriter.h>
 
 #include "mitkDiffusionIOMimeTypes.h"
@@ -73,6 +75,8 @@ namespace mitk
       m_FiberBundleVtkWriter = new FiberBundleVtkWriter();
       m_FiberBundleTrackVisWriter = new FiberBundleTrackVisWriter();
       m_ConnectomicsNetworkWriter = new ConnectomicsNetworkWriter();
+      m_ConnectomicsNetworkCSVWriter = new ConnectomicsNetworkCSVWriter();
+      m_ConnectomicsNetworkMatrixWriter = new ConnectomicsNetworkMatrixWriter();
       m_PlanarFigureCompositeWriter = new PlanarFigureCompositeWriter();
     }
 
@@ -99,6 +103,8 @@ namespace mitk
       delete m_FiberBundleVtkWriter;
       delete m_FiberBundleTrackVisWriter;
       delete m_ConnectomicsNetworkWriter;
+      delete m_ConnectomicsNetworkCSVWriter;
+      delete m_ConnectomicsNetworkMatrixWriter;
       delete m_PlanarFigureCompositeWriter;
     }
 
@@ -120,6 +126,8 @@ namespace mitk
     FiberBundleVtkWriter * m_FiberBundleVtkWriter;
     FiberBundleTrackVisWriter * m_FiberBundleTrackVisWriter;
     ConnectomicsNetworkWriter * m_ConnectomicsNetworkWriter;
+    ConnectomicsNetworkCSVWriter * m_ConnectomicsNetworkCSVWriter;
+    ConnectomicsNetworkMatrixWriter * m_ConnectomicsNetworkMatrixWriter;
     PlanarFigureCompositeWriter* m_PlanarFigureCompositeWriter;
 
     std::vector<mitk::CustomMimeType*> m_MimeTypes;

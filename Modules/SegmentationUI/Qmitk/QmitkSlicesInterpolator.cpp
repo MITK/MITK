@@ -453,7 +453,7 @@ void QmitkSlicesInterpolator::OnTimeChanged(itk::Object* sender, const itk::Even
   mitk::SliceNavigationController* slicer = dynamic_cast<mitk::SliceNavigationController*>(sender);
   Q_ASSERT(slicer);
 
-  m_TimeStep[slicer];
+  m_TimeStep[slicer] = slicer->GetTime()->GetPos();
 
   if (m_LastSNC == slicer)
   {
@@ -689,10 +689,10 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
         mitk::ExtractSliceFilter::Pointer diffslicewriter =  mitk::ExtractSliceFilter::New(reslice);
         diffslicewriter->SetInput( diffImage );
-        diffslicewriter->SetTimeStep( timeStep );
+        diffslicewriter->SetTimeStep( 0 );
         diffslicewriter->SetWorldGeometry(reslicePlane);
         diffslicewriter->SetVtkOutputRequest(true);
-        diffslicewriter->SetResliceTransformByGeometry( diffImage->GetTimeGeometry()->GetGeometryForTimeStep( timeStep ) );
+        diffslicewriter->SetResliceTransformByGeometry( diffImage->GetTimeGeometry()->GetGeometryForTimeStep( 0 ) );
 
         diffslicewriter->Modified();
         diffslicewriter->Update();

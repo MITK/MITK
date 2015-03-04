@@ -450,47 +450,42 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
 
     for (int i=0; i<m_NumberOfSamples; i++)
     {
-        vnl_vector_fixed<double,3> probe;
+        vnl_vector_fixed<double,3> d;
 //        probe[0] = GetRandDouble()*m_SamplingDistance;
 //        probe[1] = GetRandDouble()*m_SamplingDistance;
 //        probe[2] = GetRandDouble()*m_SamplingDistance;
 
-        probe = probeVecs.GetDirection(i)*m_SamplingDistance;
+        d = probeVecs.GetDirection(i)*m_SamplingDistance;
 
-        itk::Point<double, 3> temp;
-        temp[0] = pos[0] + probe[0];
-        temp[1] = pos[1] + probe[1];
-        temp[2] = pos[2] + probe[2];
+        itk::Point<double, 3> sample_pos;
+        sample_pos[0] = pos[0] + d[0];
+        sample_pos[1] = pos[1] + d[1];
+        sample_pos[2] = pos[2] + d[2];
 
         candidates = 0;
-        vnl_vector_fixed<double,3> tempDir = Classify(temp, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
+        vnl_vector_fixed<double,3> tempDir = Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
         if (candidates>0 && tempDir.magnitude()>0.001)
         {
             direction += tempDir*prob;
         }
         else if (m_AvoidStop && candidates==0 && olddir.magnitude()>0) // out of white matter
         {
-            vnl_vector_fixed<double,3> normProbe = -probe; normProbe.normalize();
-            double dot = dot_product(normProbe, olddir);
-            if (dot < 0.0)
-            {
-                probe = (normProbe - 2 * dot*olddir)*probe.magnitude(); // reflect
-            }
+            double dot = dot_product(d, olddir);
+            if (dot >= 0.0) // in front of plane defined by pos and olddir
+                d = -d + 2*dot*olddir; // reflect
             else
-            {
-                probe = -probe; // invert
-            }
+                d = -d; // invert
 
             // look a bit further into the other direction
-            temp[0] = pos[0] + probe[0]*2;
-            temp[1] = pos[1] + probe[1]*2;
-            temp[2] = pos[2] + probe[2]*2;
+            sample_pos[0] = pos[0] + d[0]*2;
+            sample_pos[1] = pos[1] + d[1]*2;
+            sample_pos[2] = pos[2] + d[2]*2;
             candidates = 0;
-            vnl_vector_fixed<double,3> tempDir = Classify(temp, candidates, olddir, m_AngularThreshold, prob, true); // sample neighborhood
+            vnl_vector_fixed<double,3> tempDir = Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob, true); // sample neighborhood
 
             if (candidates>0 && tempDir.magnitude()>0.001)  // are we back in the white matter?
             {
-                direction += probe;         // go into the direction of the white matter
+                direction += d;         // go into the direction of the white matter
                 direction += tempDir*prob;  // go into the direction of the white matter direction at this location
             }
         }

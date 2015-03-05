@@ -15,11 +15,6 @@ if(MITK_USE_HDF5)
 
   if(NOT DEFINED HDF5_DIR)
 
-    if(APPLE)
-      set(APPLE_HDF5_CMAKE_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/${proj}-cmake/ChangeHDF5LibsInstallNameForMac.cmake)
-      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeExternals/ChangeHDF5LibsInstallNameForMac.cmake.in ${APPLE_HDF5_CMAKE_SCRIPT} @ONLY)
-    endif()
-
     # We might build static libs with  -DBUILD_SHARED_LIBS=0 but this conflicts with
     # the in ITK integrated version! So we need to go the way with dynamic libs. Too
     # bad :( This would be fixed by using an external HDF-Installation with ITK/VTK
@@ -36,14 +31,11 @@ if(MITK_USE_HDF5)
        DEPENDS ${proj_DEPENDENCIES}
       )
 
-    set(HDF5_DIR ${ep_prefix})
-
-    if(APPLE)
-          ExternalProject_Add_Step(${proj} sitk_create_userbase_step
-            COMMAND ${CMAKE_COMMAND} -P ${APPLE_HDF5_CMAKE_SCRIPT}
-        DEPENDEES install
-        WORKING_DIRECTORY ${HDF5_DIR}
-      )
+    ExternalProject_Get_Property(${proj} install_dir)
+    if(WIN32)
+      set(HDF5_DIR ${install_dir}/cmake/hdf5)
+    else()
+      set(HDF5_DIR ${install_dir}/share/cmake/hdf5)
     endif()
 
   else()

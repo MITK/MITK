@@ -246,6 +246,8 @@ mitkFunctionAddExternalProject(NAME CppUnit     ON  ADVANCED DOC "Use CppUnit fo
 mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE)
 
+mitkFunctionAddExternalProject(NAME HDF5        OFF ADVANCED)
+
 # -----------------------------------------
 # The following external projects must be
 # ordered according to their
@@ -255,6 +257,7 @@ mitkFunctionAddExternalProject(NAME SWIG      OFF ADVANCED NO_PACKAGE DEPENDS PC
 mitkFunctionAddExternalProject(NAME Python    OFF          NO_PACKAGE DEPENDS SWIG DOC "Use Python wrapping in MITK")
 mitkFunctionAddExternalProject(NAME Numpy     OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME OpenCV    OFF)
+mitkFunctionAddExternalProject(NAME Vigra     OFF          DEPENDS HDF5)
 
 # These are "hard" dependencies and always set to ON
 mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE)
@@ -377,6 +380,22 @@ if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
   message("> Forcing MITK_USE_CppUnit to ON because BUILD_TESTING=ON")
   set(MITK_USE_CppUnit ON CACHE BOOL "Use CppUnit for unit tests" FORCE)
 endif()
+
+if(MITK_USE_Vigra)
+  link_directories(${Vigra_DIR}/../../lib ${Vigra_DIR}/lib)
+  list(APPEND MITK_RUNTIME_PATH
+       ${Vigra_DIR}/../../
+       ${Vigra_DIR}
+      )
+endif()
+
+# -----------------------------------------
+# Other MITK_USE_* options not related to
+# external projects build via the
+# MITK superbuild
+
+env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
+env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 
 if(MITK_USE_BLUEBERRY)
   option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
@@ -1299,6 +1318,10 @@ if(WIN32)
   include(mitkFunctionCreateWindowsBatchScript)
 
   set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
+  if(MITK_USE_HDF5)
+    list(APPEND MITK_LIBRARY_DIRS ${HDF5_DIR}/install/bin)
+    message(STATUS "MITK-Runtime " ${MITK_RUNTIME_PATH})
+  endif(MITK_USE_HDF5)
   foreach(VS_BUILD_TYPE debug release)
     mitkFunctionCreateWindowsBatchScript("${MITK_SOURCE_DIR}/CMake/StartVS.bat.in"
       ${PROJECT_BINARY_DIR}/StartVS_${VS_BUILD_TYPE}.bat

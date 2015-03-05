@@ -1,0 +1,17 @@
+# Get all the shared libraries which are located in the HDF5-install/lib directory
+file(GLOB dylibFiles @HDF5_DIR@/lib/*.dylib)
+
+# For each shared library call the install_name_tool in order to change the install name of the according library
+foreach(_dylib ${dylibFiles})
+   message("Fixing HDF5 install name for lib: ${_dylib}")
+   execute_process(COMMAND install_name_tool -id ${_dylib} ${_dylib})
+   foreach(_dep_dylib ${dylibFiles})
+      get_filename_component(_dep_dylib_name ${_dep_dylib} NAME)
+      execute_process(COMMAND install_name_tool -change ${_dep_dylib_name} \@loader_path/${_dep_dylib_name} ${_dylib})
+   endforeach()
+endforeach()
+
+
+
+
+

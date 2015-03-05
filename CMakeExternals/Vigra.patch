@@ -1,0 +1,291 @@
+diff -urNb vigra-Version-1-10-0/CMakeLists.txt Vigra/CMakeLists.txt
+--- vigra-Version-1-10-0/CMakeLists.txt	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/CMakeLists.txt	2015-03-03 10:13:57.693725000 +0100
+@@ -70,8 +70,11 @@
+ ENDIF()
+ 
+ IF(WITH_HDF5)
++    FIND_PACKAGE(HDF5 PATHS ${HDF5_DIR} PATH_SUFFIXES hdf5 NO_DEFAULT_PATH NO_MODULE)
++IF(NOT HDF5_FOUND)
+     VIGRA_FIND_PACKAGE(HDF5)
+ ENDIF()
++ENDIF()
+ 
+ IF(WITH_BOOST_GRAPH)
+     IF(WITH_VIGRANUMPY)
+@@ -395,3 +398,4 @@
+ ENDIF()
+ 
+ MESSAGE( STATUS "---------------------------------------------------------" )
++
+diff -urNb vigra-Version-1-10-0/config/VigraConfig.cmake.in Vigra/config/VigraConfig.cmake.in
+--- vigra-Version-1-10-0/config/VigraConfig.cmake.in	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/config/VigraConfig.cmake.in	2015-03-03 10:13:57.693725000 +0100
+@@ -1,7 +1,9 @@
+ get_filename_component(SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+ get_filename_component(Vigra_TOP_DIR  "${SELF_DIR}/../../" ABSOLUTE)
+ 
+-include(${SELF_DIR}/vigra-targets.cmake)
++if(NOT TARGET vigraimpex)
++  include(${SELF_DIR}/vigra-targets.cmake)
++endif()
+ get_target_property(VIGRA_TYPE vigraimpex TYPE)
+ if(${VIGRA_TYPE} STREQUAL "STATIC_LIBRARY")
+     SET(VIGRA_STATIC_LIB True)
+@@ -12,3 +14,4 @@
+ IF(EXISTS ${SELF_DIR}/../vigranumpy/VigranumpyConfig.cmake)
+     INCLUDE(${SELF_DIR}/../vigranumpy/VigranumpyConfig.cmake)
+ ENDIF()
++
+diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_common.hxx Vigra/include/vigra/random_forest/rf_common.hxx
+--- vigra-Version-1-10-0/include/vigra/random_forest/rf_common.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/random_forest/rf_common.hxx	2015-03-03 10:45:19.423056174 +0100
+@@ -558,6 +558,7 @@
+     int                     is_weighted_;     // class_weights_ are used
+     double                  precision_;       // termination criterion for regression loss
+     int                     response_size_; 
++    int                     max_tree_depth;
+         
+     template<class T> 
+     void to_classlabel(int index, T & out) const
+@@ -583,7 +584,8 @@
+         EQUALS(class_weights_),
+         EQUALS(is_weighted_),
+         EQUALS(precision_),
+-        EQUALS(response_size_)
++        EQUALS(response_size_),
++        EQUALS(max_tree_depth)
+     {
+         std::back_insert_iterator<ArrayVector<Label_t> >
+                         iter(classes);
+@@ -604,7 +606,8 @@
+         EQUALS(class_weights_),
+         EQUALS(is_weighted_),
+         EQUALS(precision_),
+-        EQUALS(response_size_)
++        EQUALS(response_size_),
++        EQUALS(max_tree_depth)
+     {
+         std::back_insert_iterator<ArrayVector<Label_t> >
+                         iter(classes);
+@@ -624,7 +627,8 @@
+         EQUALS(used_);
+         EQUALS(is_weighted_);
+         EQUALS(precision_);
+-        EQUALS(response_size_)
++        EQUALS(response_size_);
++        EQUALS(max_tree_depth)
+         class_weights_.clear();
+         std::back_insert_iterator<ArrayVector<double> >
+                         iter2(class_weights_);
+@@ -648,7 +652,8 @@
+         EQUALS(used_);
+         EQUALS(is_weighted_);
+         EQUALS(precision_);
+-        EQUALS(response_size_)
++        EQUALS(response_size_);
++        EQUALS(max_tree_depth)
+         class_weights_.clear();
+         std::back_insert_iterator<ArrayVector<double> >
+                         iter2(class_weights_);
+@@ -677,7 +682,8 @@
+         COMPARE(used_);
+         COMPARE(class_weights_);
+         COMPARE(classes);
+-        COMPARE(response_size_)
++        COMPARE(response_size_);
++        COMPARE(max_tree_depth)
+         #undef COMPARE
+         return result;
+     }
+@@ -715,6 +721,7 @@
+         PULL(used_, int);
+         PULL(precision_, double);
+         PULL(response_size_, int);
++        PULL(max_tree_depth, int);
+         if(is_weighted_)
+         {
+             vigra_precondition(end - begin == 10 + 2*class_count_, 
+@@ -747,6 +754,7 @@
+         PUSH(used_);
+         PUSH(precision_);
+         PUSH(response_size_);
++        PUSH(max_tree_depth);
+         if(is_weighted_)
+         {
+             std::copy(class_weights_.begin(),
+@@ -773,6 +781,7 @@
+         PULL(used_, int);
+         PULL(precision_, double);
+         PULL(response_size_, int);
++        PULL(max_tree_depth, int);
+         class_weights_ = in["class_weights_"];
+         #undef PUSH
+     }
+@@ -789,6 +798,7 @@
+         PUSH(used_);
+         PUSH(precision_);
+         PUSH(response_size_);
++        PUSH(max_tree_depth);
+         in["class_weights_"] = class_weights_;
+         #undef PUSH
+     }
+@@ -805,7 +815,8 @@
+         used_(false),
+         is_weighted_(false),
+         precision_(0.0),
+-        response_size_(1)
++        response_size_(1),
++        max_tree_depth(50)
+     {}
+ 
+ 
+@@ -857,7 +868,7 @@
+         is_weighted_ = false;
+         precision_   = 0.0;
+         response_size_ = 0;
+-
++        max_tree_depth = 50;
+     }
+ 
+     bool used() const
+diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_decisionTree.hxx Vigra/include/vigra/random_forest/rf_decisionTree.hxx
+--- vigra-Version-1-10-0/include/vigra/random_forest/rf_decisionTree.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/random_forest/rf_decisionTree.hxx	2015-03-03 10:49:22.264260358 +0100
+@@ -90,6 +90,8 @@
+     ProblemSpec<> ext_param_;
+     unsigned int classCount_;
+ 
++    std::map<int, int> m_Parents;
++
+ 
+   public:
+     /* \brief Create tree with parameters */
+@@ -350,6 +352,22 @@
+     continueLearn(features,labels,stack_entry,split,stop,visitor,randint);
+ }
+ 
++template < class TRandomForest>
++int GetTreeDepthForNode(int nodeIndex, TRandomForest* rf)
++{
++  int depth = 0;
++  while (true)
++  {
++    if (nodeIndex < 1)
++    {
++      break;
++    }
++    ++depth;
++    nodeIndex = rf->m_Parents[nodeIndex];
++  }
++  return depth;
++}
++
+ template <  class U, class C,
+             class U2, class C2,
+             class StackEntry_t,
+@@ -374,6 +392,11 @@
+     size_t last_node_pos = 0;
+     StackEntry_t top=stack.back();
+ 
++    Split_t* splitPointer = &split;
++    bool isDepthSplitter = true;
++
++    int maximumTreeDepth = splitPointer->GetMaximumTreeDepth();
++
+     while(!stack.empty())
+     {
+ 
+@@ -392,7 +415,20 @@
+         //kind of node to make
+         TreeInt NodeID;
+         
+-        if(stop(top))
++        bool depthStop = false;
++        if (isDepthSplitter)
++        {
++          int currentDepthLevel;
++          if (top.leftParent != StackEntry_t::DecisionTreeNoParent)
++            currentDepthLevel = GetTreeDepthForNode(top.leftParent, this);
++          else
++            currentDepthLevel = GetTreeDepthForNode(top.rightParent, this);
++
++          depthStop = (currentDepthLevel >= maximumTreeDepth);
++        }
++        if(stop(top) || (depthStop))
++
++        //if (stop(top) || currentDepthLevel >= MaximumSplitDepth(split))
+             NodeID = split.makeTerminalNode(features, 
+                                             labels, 
+                                             top, 
+@@ -421,17 +457,20 @@
+         // Using InteriorNodeBase because exact parameter form not needed.
+         // look at the Node base before getting scared.
+         last_node_pos = topology_.size();
++        m_Parents[last_node_pos] = StackEntry_t::DecisionTreeNoParent;
+         if(top.leftParent != StackEntry_t::DecisionTreeNoParent)
+         {
+             NodeBase(topology_, 
+                      parameters_, 
+                      top.leftParent).child(0) = last_node_pos;
++            m_Parents[last_node_pos] = top.leftParent;
+         }
+         else if(top.rightParent != StackEntry_t::DecisionTreeNoParent)
+         {
+             NodeBase(topology_, 
+                      parameters_, 
+                      top.rightParent).child(1) = last_node_pos;
++            m_Parents[last_node_pos] = top.rightParent;
+         }
+ 
+ 
+diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_nodeproxy.hxx Vigra/include/vigra/random_forest/rf_nodeproxy.hxx
+--- vigra-Version-1-10-0/include/vigra/random_forest/rf_nodeproxy.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/random_forest/rf_nodeproxy.hxx	2015-03-03 10:13:57.693725000 +0100
+@@ -50,7 +50,11 @@
+ namespace vigra
+ {
+ 
+-
++class DepthSplitterBase
++{
++public:
++  virtual int GetMaximumTreeDepth() const = 0;
++};
+ 
+ enum NodeTags
+ {
+diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_split.hxx Vigra/include/vigra/random_forest/rf_split.hxx
+--- vigra-Version-1-10-0/include/vigra/random_forest/rf_split.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/random_forest/rf_split.hxx	2015-03-03 10:49:01.164155728 +0100
+@@ -108,6 +108,11 @@
+         \ref SplitBase::findBestSplit() or \ref SplitBase::makeTerminalNode().
+     **/
+ 
++      virtual int GetMaximumTreeDepth() 
++      {
++        return ext_param_.max_tree_depth;
++      }
++
+     template<class T>
+     void set_external_parameters(ProblemSpec<T> const & in)
+     {
+diff -urNb vigra-Version-1-10-0/include/vigra/random_forest.hxx Vigra/include/vigra/random_forest.hxx
+--- vigra-Version-1-10-0/include/vigra/random_forest.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/random_forest.hxx	2015-03-03 10:13:57.693725000 +0100
+@@ -584,6 +584,7 @@
+     {
+         vigra_precondition(features.shape(0) == labels.shape(0),
+             "RandomForest::predictLabels(): Label array has wrong size.");
++#pragma omp parallel for
+         for(int k=0; k<features.shape(0); ++k)
+         {
+             vigra_precondition(!detail::contains_nan(rowVector(features, k)),
+@@ -1261,6 +1262,7 @@
+     }
+     */
+     //Classify for each row.
++#pragma omp parallel for
+     for(int row=0; row < rowCount(features); ++row)
+     {
+         MultiArrayView<2, U, StridedArrayTag> currentRow(rowVector(features, row));

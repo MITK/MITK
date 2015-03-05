@@ -337,14 +337,14 @@ mitk::PlanarEllipse::MeasurementStatistics* mitk::PlanarEllipse::EvaluateStatist
 
         BoundingBox::BoundsArrayType bounds = this->GetPlaneGeometry()->GetBounds();
 
-        unsigned short layout = 0;
+        //unsigned short layout = 0;
         mitk::Point3D cosPoint;
         cosPoint[X] = GetWorldControlPoint(RADIUS_POINT_NUM1)[X];
         cosPoint[Y] = center[Y];
         cosPoint[Z] = center[Z];
         double cosline = center.EuclideanDistanceTo(cosPoint);
         if (cosline == 0) {
-          layout = 1;
+          //layout = 1;
           cosPoint[X] = center[X];
           cosPoint[Y] = GetWorldControlPoint(RADIUS_POINT_NUM1)[Y];
           cosPoint[Z] = center[Z];
@@ -385,11 +385,10 @@ mitk::PlanarEllipse::MeasurementStatistics* mitk::PlanarEllipse::EvaluateStatist
           for (int rowX = lIndex; rowX <= rIndex; rowX++) {
             currentIndex[X] = rowX;
             
-            ///Constraints re-check, TODO: fix Constraints
-            
-            
             if ( currentIndex[X] <= bounds[0]
                 || currentIndex[X] >= bounds[1]
+                || currentIndex[Y] <= bounds[0]
+                || currentIndex[Y] >= bounds[1]
                 || currentIndex[Z] <= bounds[2]
                 || currentIndex[Z] >= bounds[3]) return NULL;
 

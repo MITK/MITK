@@ -552,6 +552,8 @@ public:
                               UpdateCallBackMethod callback = nullptr,
                               itk::SmartPointer<Image> preLoadedImageBlock = nullptr);
 
+  static void LoadSeries(const DicomSeriesReader::StringContainer& filenames, itk::SmartPointer<Image> image); 
+
 protected:
 
   /**

@@ -101,7 +101,7 @@ public:
   //## MamageMemory: Data to be set will be referenced, and Data memory block will be freed on deletion of mitk::Image.
   //## Reference Memory: Data to be set will be referenced, but Data memory block will not be freed on deletion of mitk::Image.
   //## DontManageMemory = ReferenceMemory.
-  enum ImportMemoryManagementType { CopyMemory, ManageMemory, ReferenceMemory, DontManageMemory = ReferenceMemory };
+  enum ImportMemoryManagementType { CopyMemory, ManageMemory, ReferenceMemory, AsyncCopyMemory, DontManageMemory = ReferenceMemory };
 
   //##Documentation
   //## @brief Vector container of SmartPointers to ImageDataItems;

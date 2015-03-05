@@ -30,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <limits>
 
 #include <mitkImage.h>
+#include <mitkImageCast.h>
+
+#include <thread>
 
 namespace mitk
 {
@@ -137,7 +140,11 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
 
   if (preLoadedImageBlock.IsNull())
   {
-    reader->SetFileNames(filenames);
+    StringContainer s;
+    s.push_back(filenames.at(0));
+
+    reader->SetFileNames(s);
+
     reader->Update();
     typename ImageType::Pointer readVolume = reader->GetOutput();
 
@@ -147,8 +154,12 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
       readVolume = InPlaceFixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
     }
 
-    image->InitializeByItk(readVolume.GetPointer());
-    image->SetImportVolume(readVolume->GetBufferPointer());
+    image->InitializeByItk(readVolume.GetPointer(), 1, -1, filenames.size());
+    //image->SetImportVolume(readVolume->GetBufferPointer());
+    image->SetImportVolume(readVolume->GetBufferPointer(), 0, 0, mitk::Image::ImportMemoryManagementType::AsyncCopyMemory);
+
+    std::thread thr(LoadSeries, std::ref(filenames), image);
+    thr.detach();
   }
   else
   {

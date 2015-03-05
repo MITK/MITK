@@ -37,6 +37,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
+void DicomSeriesReader::LoadSeries(const DicomSeriesReader::StringContainer& filenames, mitk::Image::Pointer image) 
+{
+  std::vector<std::string> copyFilenames(filenames);
+  typedef itk::Image<signed short, 2> InputImageType;
+  typedef itk::ImageFileReader<InputImageType> ReaderType;
+  ReaderType::Pointer reader = ReaderType::New();
+  itk::GDCMImageIO::Pointer gdcmImageIO = itk::GDCMImageIO::New();
+  reader->SetImageIO(gdcmImageIO);
+
+  for (int i=1; i<copyFilenames.size(); i++) {
+
+    reader->SetFileName(copyFilenames.at(i));
+    try {
+      reader->Update();
+    } catch (itk::ExceptionObject & e) {
+      MITK_INFO << "exception in file reader " << std::endl;
+      MITK_INFO << e << std::endl;
+    }
+    image->SetImportSlice(reader->GetOutput()->GetBufferPointer(), i);
+    MITK_INFO << "import slice" << i;
+  }
+}
+
 std::string DicomSeriesReader::ReaderImplementationLevelToString( const ReaderImplementationLevel& enumValue )
 {
   switch (enumValue)

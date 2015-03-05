@@ -25,13 +25,17 @@ namespace berry {
 QtLogPlugin* QtLogPlugin::instance = 0;
 
 QtLogPlugin::QtLogPlugin()
+  : m_LogModel(0)
+  , m_Context(0)
 {
-  instance = this;
+  this->instance = this;
 }
 
 void
 QtLogPlugin::start(ctkPluginContext* context)
 {
+  m_Context = context;
+
   BERRY_REGISTER_EXTENSION_CLASS(berry::LogView, context)
 
   m_LogModel = new QtPlatformLogModel();
@@ -41,6 +45,8 @@ void
 QtLogPlugin::stop(ctkPluginContext* /*context*/)
 {
   delete m_LogModel;
+  m_LogModel = 0;
+  m_Context = 0;
 }
 
 QtLogPlugin*
@@ -50,9 +56,14 @@ QtLogPlugin::GetInstance()
 }
 
 QtPlatformLogModel*
-QtLogPlugin::GetLogModel()
+QtLogPlugin::GetLogModel() const
 {
   return m_LogModel;
+}
+
+ctkPluginContext *QtLogPlugin::GetContext() const
+{
+  return this->m_Context;
 }
 
 }

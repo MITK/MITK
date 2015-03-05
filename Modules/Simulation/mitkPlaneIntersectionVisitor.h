@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT PlaneIntersectionVisitor : public sofa::simulation::Visitor
+  class MITKSIMULATION_EXPORT PlaneIntersectionVisitor : public sofa::simulation::Visitor
   {
   public:
     struct Edge
@@ -35,7 +35,7 @@ namespace mitk
 
     struct Intersection
     {
-      ScalarType color[3];
+      float color[4];
       std::vector<Edge> edges;
     };
 
@@ -44,6 +44,7 @@ namespace mitk
 
     const std::vector<Intersection>& GetIntersections() const;
 
+    using sofa::simulation::Visitor::processNodeTopDown;
     Result processNodeTopDown(sofa::simulation::Node* node);
 
   private:

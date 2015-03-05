@@ -6,12 +6,14 @@
     <category
       id="org.mitk.views.general"
       name="MITK General"/>
-    <view
-      id="org.mitk.views.measurement"
-      name="Measurement"
-      category="Quantification"
-      icon="resources/measurement.png"
-      class="QmitkMeasurementView" />
+    <view id="org.mitk.views.measurement"
+          name="Measurement"
+          category="Quantification"
+          icon="resources/measurement.png"
+          class="QmitkMeasurementView" >
+      <description>Measure distance and areas in the image</description>
+      <keywordReference id="org.mitk.views.measurement.Keyword"/>
+    </view>
   </extension>
 
   <extension point="org.blueberry.ui.views">
@@ -19,7 +21,25 @@
           name="Statistics"
           category="Quantification"
           class="QmitkImageStatisticsView"
-          icon="resources/ImageStatistic_24.png" />
+          icon="resources/ImageStatistic_24.png" >
+      <description>Calculate the statistic of image regions</description>
+      <keywordReference id="org.mitk.views.imagestatistics.Keyword"/>
+    </view>
   </extension>
 
+  <extension point="org.blueberry.ui.keywords">
+    <keyword label="Planar Figure" id="org.mitk.views.measurement.Keyword"/>
+    <keyword label="Measurement" id="org.mitk.views.measurement.Keyword"/>
+    <keyword label="Circle" id="org.mitk.views.measurement.Keyword"/>
+    <keyword label="Line" id="org.mitk.views.measurement.Keyword"/>
+    <keyword label="Length" id="org.mitk.views.measurement.Keyword"/>
+    <keyword label="Area" id="org.mitk.views.measurement.Keyword"/>
+    
+    <keyword label="Mean" id="org.mitk.views.imagestatistics.Keyword"/>
+    <keyword label="Statistic" id="org.mitk.views.imagestatistics.Keyword"/>
+    <keyword label="Grey Value" id="org.mitk.views.imagestatistics.Keyword"/>
+    <keyword label="Variance" id="org.mitk.views.imagestatistics.Keyword"/>
+    <keyword label="Std Dev" id="org.mitk.views.imagestatistics.Keyword"/>
+  </extension>  
+  
 </plugin>

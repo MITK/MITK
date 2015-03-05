@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const std::string HelpEditor::EDITOR_ID = "org.blueberry.editors.help";
+const QString HelpEditor::EDITOR_ID = "org.blueberry.editors.help";
 
 HelpEditor::HelpEditor()
   : m_ToolBar(0)
@@ -47,13 +47,8 @@ HelpEditor::HelpEditor()
 
 HelpEditor::~HelpEditor()
 {
-  // we need to wrap the RemovePartListener call inside a
-  // register/unregister block to prevent infinite recursion
-  // due to the destruction of temporary smartpointer to this
-  this->Register();
-  this->GetSite()->GetPage()->RemovePartListener(IPartListener::Pointer(this));
-  this->GetSite()->GetPage()->GetWorkbenchWindow()->RemovePerspectiveListener(IPerspectiveListener::Pointer(this));
-  this->UnRegister(false);
+  this->GetSite()->GetPage()->RemovePartListener(this);
+  this->GetSite()->GetPage()->GetWorkbenchWindow()->RemovePerspectiveListener(this);
 }
 
 void HelpEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
@@ -62,8 +57,8 @@ void HelpEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Poi
      throw PartInitException("Invalid Input: Must be berry::HelpEditorInput");
 
   this->SetSite(site);
-  site->GetPage()->AddPartListener(IPartListener::Pointer(this));
-  site->GetPage()->GetWorkbenchWindow()->AddPerspectiveListener(IPerspectiveListener::Pointer(this));
+  site->GetPage()->AddPartListener(this);
+  site->GetPage()->GetWorkbenchWindow()->AddPerspectiveListener(this);
 
   m_WebView = new HelpWebView(site, 0);
 
@@ -215,7 +210,7 @@ void HelpEditor::CloseHelpPerspective()
 
 void HelpEditor::InitializeTitle()
 {
-  std::string title = m_WebView->title().toStdString();
+  QString title = m_WebView->title();
   this->SetPartName(title);
 }
 
@@ -241,7 +236,7 @@ IPartListener::Events::Types HelpEditor::GetPartEventTypes() const
   return IPartListener::Events::DEACTIVATED;
 }
 
-void HelpEditor::PartDeactivated(IWorkbenchPartReference::Pointer partRef)
+void HelpEditor::PartDeactivated(const IWorkbenchPartReference::Pointer& partRef)
 {
   if (partRef == GetSite()->GetPage()->GetReference(IWorkbenchPart::Pointer(this)))
     disableShortcuts();
@@ -252,7 +247,8 @@ IPerspectiveListener::Events::Types HelpEditor::GetPerspectiveEventTypes() const
   return IPerspectiveListener::Events::ACTIVATED | IPerspectiveListener::Events::DEACTIVATED;
 }
 
-void HelpEditor::PerspectiveActivated(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective)
+void HelpEditor::PerspectiveActivated(const SmartPointer<IWorkbenchPage>& /*page*/,
+                                      const IPerspectiveDescriptor::Pointer& perspective)
 {
   if (perspective->GetId() == HelpPerspective::ID)
   {
@@ -261,7 +257,8 @@ void HelpEditor::PerspectiveActivated(SmartPointer<IWorkbenchPage> page, IPerspe
   }
 }
 
-void HelpEditor::PerspectiveDeactivated(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective)
+void HelpEditor::PerspectiveDeactivated(const SmartPointer<IWorkbenchPage>& /*page*/,
+                                        const IPerspectiveDescriptor::Pointer& perspective)
 {
   if (perspective->GetId() == HelpPerspective::ID)
   {

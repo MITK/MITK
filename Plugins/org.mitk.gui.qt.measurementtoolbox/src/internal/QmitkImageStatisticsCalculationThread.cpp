@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread():QThread(),
   m_StatisticsImage(NULL), m_BinaryMask(NULL), m_PlanarFigureMask(NULL), m_TimeStep(0),
-  m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false), m_HistogramBinSize(1), m_UseDefaultBinSize(true)
+  m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false), m_HistogramBinSize(1.0), m_UseDefaultBinSize(true)
 {
 }
 
@@ -86,7 +86,7 @@ bool QmitkImageStatisticsCalculationThread::GetIgnoreZeroValueVoxel()
   return this->m_IgnoreZeros;
 }
 
-void QmitkImageStatisticsCalculationThread::SetHistogramBinSize(unsigned int size)
+void QmitkImageStatisticsCalculationThread::SetHistogramBinSize(double size)
 {
   this->m_HistogramBinSize = size;
 }

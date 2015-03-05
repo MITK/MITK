@@ -64,7 +64,7 @@ namespace mitk {
     * \ingroup Mapper
     */
 
-  class MitkConnectomics_EXPORT ConnectomicsNetworkMapper3D : public VtkMapper
+  class MITKCONNECTOMICS_EXPORT ConnectomicsNetworkMapper3D : public VtkMapper
   {
   public:
 

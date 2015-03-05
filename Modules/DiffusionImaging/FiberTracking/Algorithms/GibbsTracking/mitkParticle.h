@@ -27,7 +27,7 @@ namespace mitk
 /**
 * \brief A particle is the basic element of the Gibbs fiber tractography method.   */
 
-class MitkFiberTracking_EXPORT Particle
+class MITKFIBERTRACKING_EXPORT Particle
 {
 public:
 
@@ -73,7 +73,7 @@ private:
 
 };
 
-class MitkFiberTracking_EXPORT EndPoint
+class MITKFIBERTRACKING_EXPORT EndPoint
 {
 public:
     EndPoint()

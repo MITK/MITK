@@ -36,7 +36,7 @@ namespace mitk {
 
   $Author: somebody$
 */
-class MitkSegmentation_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
+class MITKSEGMENTATION_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
 {
 
  public:

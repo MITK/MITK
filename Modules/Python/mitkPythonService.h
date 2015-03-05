@@ -27,7 +27,7 @@ namespace mitk
   ///
   /// implementation of the IPythonService using ctkabstractpythonmanager
   /// \see IPythonService
-  class MITK_PYTHON_EXPORT PythonService: public itk::LightObject, public mitk::IPythonService
+  class MITKPYTHON_EXPORT PythonService: public itk::LightObject, public mitk::IPythonService
   {
   public:
       ///

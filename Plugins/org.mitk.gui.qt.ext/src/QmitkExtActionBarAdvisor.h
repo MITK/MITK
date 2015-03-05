@@ -21,15 +21,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_ext_Export.h>
 
+namespace berry {
+
+struct IWorkbenchWindow;
+
+class MenuManager;
+
+}
+
 class MITK_QT_COMMON_EXT_EXPORT QmitkExtActionBarAdvisor : public berry::ActionBarAdvisor
 {
 public:
 
-  QmitkExtActionBarAdvisor(berry::IActionBarConfigurer::Pointer configurer);
+  QmitkExtActionBarAdvisor(berry::SmartPointer<berry::IActionBarConfigurer> configurer);
 
 protected:
 
-  void FillMenuBar(void* menuBar);
+  void FillMenuBar(berry::IMenuManager* menuBar);
+
+private:
+
+  /**
+   * Creates and returns the Window menu.
+   */
+  berry::SmartPointer<berry::MenuManager> CreateWindowMenu();
+
+  /**
+   * Adds the perspective actions to the specified menu.
+   */
+  void AddPerspectiveActions(berry::MenuManager* menu);
+
+  berry::IWorkbenchWindow* window;
 };
 
 #endif /*QMITKEXTACTIONBARADVISOR_H_*/

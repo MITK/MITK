@@ -10,7 +10,15 @@
       name="Python Console"
       category="General"
       icon="resources/Python.png"
-      class="QmitkPythonView" />
+      class="QmitkPythonView" >
+      <description>Allow the acces of python from MITK</description>
+      <keywordReference id="org.mitk.views.python.Keyword"/>
+    </view>
   </extension>
-
+  <extension point="org.blueberry.ui.keywords">
+    <keyword label="Python" id="org.mitk.views.python.Keyword"/>
+    <keyword label="Scripting" id="org.mitk.views.python.Keyword"/>
+    <keyword label="Programming" id="org.mitk.views.python.Keyword"/>
+    <keyword label="Automatic" id="org.mitk.views.python.Keyword"/>
+  </extension>
 </plugin>

@@ -41,7 +41,7 @@ struct BERRY_UI_QT TabDragHandler {
      * @return the StackDropResult for this drag location
      */
     virtual StackDropResult::Pointer DragOver(QWidget* currentControl,
-            const Point& location, int initialTab) = 0;
+            const QPoint& location, int initialTab) = 0;
 
     virtual int GetInsertionPosition(Object::Pointer cookie) = 0;
 };

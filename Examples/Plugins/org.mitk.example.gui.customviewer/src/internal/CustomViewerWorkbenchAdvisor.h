@@ -33,7 +33,7 @@ public:
   /**
    * Holds the ID-String of the initial window perspective.
    */
-  static const std::string DEFAULT_PERSPECTIVE_ID;
+  static const QString DEFAULT_PERSPECTIVE_ID;
 
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer);
   ~CustomViewerWorkbenchAdvisor();
@@ -46,7 +46,7 @@ public:
   /**
    * Returns the ID-String of the initial window perspective.
    */
-  std::string GetInitialWindowPerspectiveId();
+  QString GetInitialWindowPerspectiveId();
 
 private:
 

@@ -25,7 +25,7 @@ struct QmitkPythonTextEditorData;
 
 ///
 /// this is a python text editor with syntax highlightning
-class MITK_PYTHON_EXPORT QmitkPythonTextEditor : public QWidget
+class MITKPYTHON_EXPORT QmitkPythonTextEditor : public QWidget
 {
   Q_OBJECT
 

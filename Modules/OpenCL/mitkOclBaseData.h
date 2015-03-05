@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  class MitkOpenCL_EXPORT OclBaseData : public itk::Object
+  class MITKOPENCL_EXPORT OclBaseData : public itk::Object
   {
   public:
     mitkClassMacro(OclBaseData, itk::Object);

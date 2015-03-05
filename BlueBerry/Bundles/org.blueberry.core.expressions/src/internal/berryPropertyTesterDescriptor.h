@@ -17,16 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYPROPERTYTESTERDESCRIPTOR_H_
 #define BERRYPROPERTYTESTERDESCRIPTOR_H_
 
-#include "service/berryIConfigurationElement.h"
 #include "berryIPropertyTester.h"
 
 #include "Poco/Any.h"
 
-#include <vector>
-#include <string>
-
 namespace berry
 {
+
+struct IConfigurationElement;
 
 class PropertyTesterDescriptor : public IPropertyTester {
 
@@ -35,27 +33,28 @@ public:
 
 private:
 
-  IConfigurationElement::Pointer fConfigElement;
-  std::string fNamespace;
-  std::string fProperties;
+  const SmartPointer<IConfigurationElement> fConfigElement;
+  QString fNamespace;
+  QString fProperties;
 
-  static const std::string PROPERTIES;
-  static const std::string NAMESPACE;
-  static const std::string CLASS;
+  static const QString PROPERTIES;
+  static const QString NAMESPACE;
+  static const QString CLASS;
 
 public:
 
-  PropertyTesterDescriptor(IConfigurationElement::Pointer element);
+  PropertyTesterDescriptor(const SmartPointer<IConfigurationElement>& element);
 
-  PropertyTesterDescriptor(IConfigurationElement::Pointer element, const std::string& namespaze, const std::string& properties);
+  PropertyTesterDescriptor(const SmartPointer<IConfigurationElement>& element,
+                           const QString& namespaze, const QString& properties);
 
-  const std::string& GetProperties();
+  QString GetProperties();
 
-  const std::string& GetNamespace();
+  QString GetNamespace();
 
-  IConfigurationElement::Pointer GetExtensionElement();
+  SmartPointer<IConfigurationElement> GetExtensionElement();
 
-  bool Handles(const std::string& namespaze, const std::string& property);
+  bool Handles(const QString& namespaze, const QString& property);
 
   bool IsInstantiated();
 
@@ -63,7 +62,8 @@ public:
 
   IPropertyTester* Instantiate();
 
-  bool Test(Object::Pointer receiver, const std::string& method, std::vector<Object::Pointer>& args, Object::Pointer expectedValue);
+  bool Test(Object::ConstPointer receiver, const QString& method,
+            const QList<Object::Pointer>& args, Object::Pointer expectedValue);
 };
 
 }  // namespace berry

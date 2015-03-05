@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToolManager.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, CalculateVolumetryTool, "Volumetry tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, CalculateVolumetryTool, "Volumetry tool");
 }
 
 mitk::CalculateVolumetryTool::CalculateVolumetryTool()

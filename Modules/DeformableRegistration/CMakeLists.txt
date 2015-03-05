@@ -1,8 +1,7 @@
 MITK_CREATE_MODULE(
   SUBPROJECTS MITK-Registration
   DEPENDS MitkRigidRegistration
-  PACKAGE_DEPENDS ITK|ITKPDEDeformableRegistration
-  EXPORT_DEFINE MITK_DEFORMABLEREGISTRATION_EXPORT
+  PACKAGE_DEPENDS PUBLIC ITK|ITKPDEDeformableRegistration
 )
 
 add_subdirectory(Testing)

@@ -17,9 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYIEVALUATIONCONTEXT_H_
 #define BERRYIEVALUATIONCONTEXT_H_
 
-#include <string>
-#include <vector>
-
 #include <berryMacros.h>
 #include <berryObject.h>
 
@@ -40,11 +37,19 @@ namespace berry {
  *
  * @since 3.0
  */
-struct BERRY_EXPRESSIONS IEvaluationContext : public Object {
+struct BERRY_EXPRESSIONS IEvaluationContext : public Object
+{
 
-  berryInterfaceMacro(IEvaluationContext, berry);
+  berryObjectMacro(berry::IEvaluationContext)
 
-  virtual ~IEvaluationContext() {}
+  /**
+   * Represents the value used by variables that exist but are not defined
+   * in a evaluation context. When tested by the 'with' expression, <code>false</code>
+   * will be returned.
+   */
+  static Object::ConstPointer UNDEFINED_VARIABLE;
+
+  virtual ~IEvaluationContext();
 
   /**
    * Returns the parent context or <code>null</code> if
@@ -59,7 +64,7 @@ struct BERRY_EXPRESSIONS IEvaluationContext : public Object {
    *
    * @return the root evaluation context
    */
-  virtual IEvaluationContext* GetRoot() = 0;
+  virtual IEvaluationContext* GetRoot() const = 0;
 
   /**
    * Specifies whether this evaluation context allows activation
@@ -91,7 +96,7 @@ struct BERRY_EXPRESSIONS IEvaluationContext : public Object {
    * @return the default variable or <code>null</code> if
    *  no default variable is managed.
    */
-  virtual Object::Pointer GetDefaultVariable() const = 0;
+  virtual Object::ConstPointer GetDefaultVariable() const = 0;
 
   /**
    * Adds a new named variable to this context. If a variable
@@ -101,7 +106,7 @@ struct BERRY_EXPRESSIONS IEvaluationContext : public Object {
    * @param name the variable's name
    * @param value the variable's value
    */
-  virtual void AddVariable(const std::string& name, Object::Pointer value) = 0;
+  virtual void AddVariable(const QString& name, const Object::ConstPointer& value) = 0;
 
   /**
    * Removes the variable managed under the given name
@@ -111,7 +116,7 @@ struct BERRY_EXPRESSIONS IEvaluationContext : public Object {
    * @return the currently stored value or <code>null</code> if
    *  the variable doesn't exist
    */
-  virtual Object::Pointer RemoveVariable(const std::string& name) = 0;
+  virtual Object::ConstPointer RemoveVariable(const QString& name) = 0;
 
   /**
    * Returns the variable managed under the given name.
@@ -120,7 +125,7 @@ struct BERRY_EXPRESSIONS IEvaluationContext : public Object {
    * @return the variable's value or <code>null</code> if the content
    *  doesn't manage a variable with the given name
    */
-  virtual Object::Pointer GetVariable(const std::string& name) const = 0;
+  virtual Object::ConstPointer GetVariable(const QString& name) const = 0;
 
   /**
    * Resolves a variable for the given name and arguments. This
@@ -136,7 +141,7 @@ struct BERRY_EXPRESSIONS IEvaluationContext : public Object {
    * @exception CoreException if an errors occurs while resolving
    *  the variable
    */
-  virtual Object::Pointer ResolveVariable(const std::string& name, std::vector<Object::Pointer>& args) = 0;
+  virtual Object::ConstPointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args) const = 0;
 };
 
 }  // namespace berry

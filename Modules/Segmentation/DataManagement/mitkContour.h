@@ -34,7 +34,7 @@ namespace mitk
 
   \sa ContourModel
 */
-class MitkSegmentation_EXPORT Contour : public BaseData
+class MITKSEGMENTATION_EXPORT Contour : public BaseData
 {
 public:
   mitkClassMacro(Contour, BaseData);

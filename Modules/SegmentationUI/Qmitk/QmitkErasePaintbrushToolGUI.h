@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   Last contributor: $Author$
 */
 
-class MitkSegmentationUI_EXPORT QmitkErasePaintbrushToolGUI : public QmitkPaintbrushToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkErasePaintbrushToolGUI : public QmitkPaintbrushToolGUI
 {
   Q_OBJECT
 

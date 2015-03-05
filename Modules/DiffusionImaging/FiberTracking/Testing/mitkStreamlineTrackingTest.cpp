@@ -17,8 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkTensorImage.h>
 #include <mitkIOUtil.h>
-#include <mitkBaseDataIOFactory.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <itkStreamlineTrackingFilter.h>
 #include <itkDiffusionTensor3D.h>
 #include <mitkTestingMacros.h>
@@ -94,9 +93,9 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         filter->Update();
 
         vtkSmartPointer<vtkPolyData> fiberBundle = filter->GetFiberPolyData();
-        mitk::FiberBundleX::Pointer fib1 = mitk::FiberBundleX::New(fiberBundle);
+        mitk::FiberBundle::Pointer fib1 = mitk::FiberBundle::New(fiberBundle);
 
-        mitk::FiberBundleX::Pointer fib2 = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(referenceFileName)->GetData());
+        mitk::FiberBundle::Pointer fib2 = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(referenceFileName)->GetData());
         MITK_TEST_CONDITION_REQUIRED(fib2.IsNotNull(), "Check if reference tractogram is not null.");
         bool ok = fib1->Equals(fib2);
         if (!ok)

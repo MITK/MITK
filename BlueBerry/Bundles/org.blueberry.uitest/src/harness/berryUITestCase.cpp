@@ -33,15 +33,15 @@ IAdaptable* UITestCase::GetPageInput()
   return 0;
 }
 
-UITestCase::UITestCase(const std::string& testName) :
+UITestCase::UITestCase(const QString& testName) :
   TestCase(testName)
 {
   //    ErrorDialog.NO_UI = true;
   fWorkbench = PlatformUI::GetWorkbench();
 }
 
-void UITestCase::failexc(const std::string& message, const std::exception& e,
-    long lineNumber, const std::string& fileName)
+void UITestCase::failexc(const QString& message, const std::exception& e,
+    long /*lineNumber*/, const QString& /*fileName*/)
 {
   //TODO IStatus
   // If the exception is a CoreException with a multistatus
@@ -51,7 +51,7 @@ void UITestCase::failexc(const std::string& message, const std::exception& e,
   //      write(status, 0);
   //    } else
   //      e.printStackTrace();
-  CPPUNIT_FAIL(message + ": " + e.what());
+  CPPUNIT_FAIL(message.toStdString() + ": " + e.what());
 }
 
 IWorkbenchWindow::Pointer UITestCase::OpenTestWindow()
@@ -60,7 +60,7 @@ IWorkbenchWindow::Pointer UITestCase::OpenTestWindow()
 }
 
 IWorkbenchWindow::Pointer UITestCase::OpenTestWindow(
-    const std::string& perspectiveId)
+    const QString& perspectiveId)
 {
   try
   {
@@ -68,16 +68,15 @@ IWorkbenchWindow::Pointer UITestCase::OpenTestWindow(
         perspectiveId, GetPageInput());
     WaitOnShell(window->GetShell());
     return window;
-  } catch (WorkbenchException& e)
+  } catch (const WorkbenchException& e)
   {
-    CPPUNIT_FAIL(e.displayText());
+    CPPUNIT_FAIL(e.what());
     return IWorkbenchWindow::Pointer(0);
   }
 }
 
 void UITestCase::CloseAllTestWindows()
 {
-  std::list<IWorkbenchWindow::Pointer>::iterator i = testWindows.begin();
   while (!testWindows.empty())
   {
     testWindows.back()->Close();
@@ -85,7 +84,7 @@ void UITestCase::CloseAllTestWindows()
   }
 }
 
-IWorkbenchPage::Pointer UITestCase::OpenTestPage(IWorkbenchWindow::Pointer  /*win*/)
+IWorkbenchPage::Pointer UITestCase::OpenTestPage(const IWorkbenchWindow::Pointer& /*win*/)
 {
   //        IWorkbenchPage[] pages = openTestPage(win, 1);
   //        if (pages != null)
@@ -94,8 +93,8 @@ IWorkbenchPage::Pointer UITestCase::OpenTestPage(IWorkbenchWindow::Pointer  /*wi
   return IWorkbenchPage::Pointer(0);
 }
 
-std::vector<IWorkbenchPage::Pointer> UITestCase::OpenTestPage(
-    IWorkbenchWindow::Pointer  /*win*/, int  /*pageTotal*/)
+QList<IWorkbenchPage::Pointer> UITestCase::OpenTestPage(
+    const IWorkbenchWindow::Pointer&  /*win*/, int  /*pageTotal*/)
 {
   //        try {
   //            IWorkbenchPage[] pages = new IWorkbenchPage[pageTotal];
@@ -109,25 +108,26 @@ std::vector<IWorkbenchPage::Pointer> UITestCase::OpenTestPage(
   //            fail();
   //            return null;
   //        }
-  return std::vector<IWorkbenchPage::Pointer>();
+  return QList<IWorkbenchPage::Pointer>();
 }
 
-void UITestCase::CloseAllPages(IWorkbenchWindow::Pointer  /*window*/)
+void UITestCase::CloseAllPages(const IWorkbenchWindow::Pointer& /*window*/)
 {
   //        IWorkbenchPage[] pages = window.getPages();
   //        for (int i = 0; i < pages.length; i++)
   //            pages[i].close();
 }
 
-void UITestCase::Trace(const std::string& msg)
+void UITestCase::Trace(const QString& msg)
 {
-  std::cerr << msg << std::endl;
+  qDebug() << msg;
 }
 
 void UITestCase::setUp()
 {
-  Trace("----- " + this->getName());
-  Trace(this->getName() + ": setUp...");
+  QString name = QString::fromStdString(this->getName());
+  Trace("----- " + name);
+  Trace(name + ": setUp...");
   AddWindowListener();
   berry::TestCase::setUp();
 }
@@ -139,7 +139,7 @@ void UITestCase::DoSetUp()
 
 void UITestCase::tearDown()
 {
-  Trace(this->getName() + ": tearDown...\n");
+  Trace(QString::fromStdString(this->getName()) + ": tearDown...\n");
   RemoveWindowListener();
   berry::TestCase::tearDown();
 }
@@ -169,9 +169,9 @@ IWorkbench* UITestCase::GetWorkbench()
   return fWorkbench;
 }
 
-UITestCase::TestWindowListener::TestWindowListener(std::list<
-    IWorkbenchWindow::Pointer>& testWindows) :
-  enabled(true), testWindows(testWindows)
+UITestCase::TestWindowListener::TestWindowListener(
+    QList<IWorkbenchWindow::Pointer>& testWindows)
+  : enabled(true), testWindows(testWindows)
 {
 }
 
@@ -181,26 +181,26 @@ void UITestCase::TestWindowListener::SetEnabled(bool enabled)
 }
 
 void UITestCase::TestWindowListener::WindowActivated(
-    IWorkbenchWindow::Pointer  /*window*/)
+    const IWorkbenchWindow::Pointer&  /*window*/)
 {
   // do nothing
 }
 
 void UITestCase::TestWindowListener::WindowDeactivated(
-    IWorkbenchWindow::Pointer  /*window*/)
+    const IWorkbenchWindow::Pointer&  /*window*/)
 {
   // do nothing
 }
 
 void UITestCase::TestWindowListener::WindowClosed(
-    IWorkbenchWindow::Pointer window)
+    const IWorkbenchWindow::Pointer& window)
 {
   if (enabled)
-    testWindows.remove(window);
+    testWindows.removeAll(window);
 }
 
 void UITestCase::TestWindowListener::WindowOpened(
-    IWorkbenchWindow::Pointer window)
+    const IWorkbenchWindow::Pointer& window)
 {
   if (enabled)
     testWindows.push_back(window);
@@ -241,15 +241,15 @@ void UITestCase::Indent(std::ostream& output, unsigned int indent)
 
 void UITestCase::AddWindowListener()
 {
-  windowListener = new TestWindowListener(testWindows);
-  fWorkbench->AddWindowListener(windowListener);
+  windowListener.reset(new TestWindowListener(testWindows));
+  fWorkbench->AddWindowListener(windowListener.data());
 }
 
 void UITestCase::RemoveWindowListener()
 {
   if (windowListener)
   {
-    fWorkbench->RemoveWindowListener(windowListener);
+    fWorkbench->RemoveWindowListener(windowListener.data());
   }
 }
 

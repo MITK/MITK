@@ -31,7 +31,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFDeviceFactoryManager: public itk::Object
+  class MITKTOFHARDWARE_EXPORT ToFDeviceFactoryManager: public itk::Object
   {
   public:
 

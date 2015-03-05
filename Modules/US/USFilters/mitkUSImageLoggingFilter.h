@@ -33,7 +33,7 @@ namespace mitk {
    *
    *  \ingroup US
    */
-  class MitkUS_EXPORT USImageLoggingFilter : public mitk::ImageToImageFilter
+  class MITKUS_EXPORT USImageLoggingFilter : public mitk::ImageToImageFilter
   {
   public:
 

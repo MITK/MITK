@@ -28,7 +28,7 @@ namespace mitk {
   * \brief Custom controls for mitk::USVideoDevice.
   * Controls image cropping of the corresponding mitk::USImageVideoSource.
   */
-class MitkUS_EXPORT USVideoDeviceCustomControls : public USAbstractControlInterface
+class MITKUS_EXPORT USVideoDeviceCustomControls : public USAbstractControlInterface
 {
 public:
   mitkClassMacro(USVideoDeviceCustomControls, USAbstractControlInterface);

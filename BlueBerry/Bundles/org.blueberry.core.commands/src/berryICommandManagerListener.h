@@ -19,11 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_core_commands_Export.h>
 
-#include <berryObject.h>
-#include <berryMacros.h>
+#include <berryMessage.h>
 
 namespace berry
 {
+
+template<class T> class SmartPointer;
 
 class CommandManagerEvent;
 
@@ -34,27 +35,26 @@ class CommandManagerEvent;
  * This interface may be implemented by clients.
  * </p>
  *
- * @since 3.1
  * @see CommandManager#addCommandManagerListener(ICommandManagerListener)
  * @see CommandManager#removeCommandManagerListener(ICommandManagerListener)
  */
-struct BERRY_COMMANDS ICommandManagerListener: public virtual Object
+struct BERRY_COMMANDS ICommandManagerListener
 {
 
-berryInterfaceMacro(ICommandManagerListener, berry);
+  struct Events {
 
-struct Events {
-
-    typedef Message1<const SmartPointer<const CommandManagerEvent> > Event;
+    typedef Message1<const SmartPointer<const CommandManagerEvent>& > Event;
 
     Event commandManagerChanged;
 
-    void AddListener(ICommandManagerListener::Pointer listener);
-    void RemoveListener(ICommandManagerListener::Pointer listener);
+    void AddListener(ICommandManagerListener* listener);
+    void RemoveListener(ICommandManagerListener* listener);
 
   private:
-    typedef MessageDelegate1<ICommandManagerListener, const SmartPointer<const CommandManagerEvent> > Delegate;
-  }  ;
+    typedef MessageDelegate1<ICommandManagerListener, const SmartPointer<const CommandManagerEvent>& > Delegate;
+  };
+
+  virtual ~ICommandManagerListener();
 
   /**
    * Notifies that one or more properties of an instance of
@@ -65,7 +65,7 @@ struct Events {
    *            the commandManager event. Guaranteed not to be
    *            <code>null</code>.
    */
-virtual  void CommandManagerChanged(const SmartPointer<const CommandManagerEvent> commandManagerEvent) = 0;
+  virtual  void CommandManagerChanged(const SmartPointer<const CommandManagerEvent>& commandManagerEvent) = 0;
 };
 
 }

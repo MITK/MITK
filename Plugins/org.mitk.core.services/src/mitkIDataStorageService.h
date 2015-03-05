@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIDATASTORAGESERVICE_H_
 #define MITKIDATASTORAGESERVICE_H_
 
-#include <berryService.h>
-
 #include <org_mitk_core_services_Export.h>
 #include "mitkIDataStorageReference.h"
 
@@ -32,11 +30,9 @@ namespace mitk
 /**
  * \ingroup org_mitk_core_services
  */
-struct MITK_CORE_SERVICES_PLUGIN IDataStorageService : public berry::Service
+struct MITK_CORE_SERVICES_PLUGIN IDataStorageService
 {
-  berryInterfaceMacro(IDataStorageService, berry);
-
-  static const std::string ID;
+  virtual ~IDataStorageService();
 
   virtual IDataStorageReference::Pointer CreateDataStorage(const QString& label) = 0;
   virtual std::vector<IDataStorageReference::Pointer> GetDataStorageReferences() const = 0;

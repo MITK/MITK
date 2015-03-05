@@ -30,7 +30,7 @@ Widget for tool selection in an IGT Plugin. Provides a combobx which can be fill
 whose text can be set with AddCheckBoxText(). Toggeling of the checkbox should be used to activate or inactivate a specific action for the selected tool in the IGT Plugin.
 
 */
-class MitkIGTUI_EXPORT QmitkToolSelectionWidget : public QWidget
+class MITKIGTUI_EXPORT QmitkToolSelectionWidget : public QWidget
 {
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
 public:

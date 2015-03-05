@@ -40,6 +40,14 @@ mitk::DiffusionPropertyHelper::~DiffusionPropertyHelper()
 {
 }
 
+
+mitk::DiffusionPropertyHelper::ImageType::Pointer mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk::Image* image)
+{
+    ImageType::Pointer vectorImage = ImageType::New();
+    mitk::CastToItkImage(image, vectorImage);
+    return vectorImage;
+}
+
 mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer
   mitk::DiffusionPropertyHelper::CalcAveragedDirectionSet(double precision, GradientDirectionsContainerType::Pointer directions)
 {
@@ -193,13 +201,13 @@ void mitk::DiffusionPropertyHelper::ApplyMeasurementFrame()
     return;
   }
 
-  GradientDirectionsContainerType::Pointer direction = GradientDirectionsContainerType::New();
   int c = 0;
   for(GradientDirectionsContainerType::ConstIterator gdcit = originalDirections->Begin();
       gdcit != originalDirections->End(); ++gdcit)
   {
     vnl_vector<double> vec = gdcit.Value();
     vec = vec.pre_multiply(measurementFrame);
+    MITK_INFO << gdcit.Value();
     directions->InsertElement(c, vec);
     c++;
   }
@@ -231,6 +239,7 @@ void mitk::DiffusionPropertyHelper::UpdateBValueMap()
     GradientDirectionsContainerType::ConstIterator gdcit;
     for( gdcit = directions->Begin(); gdcit != directions->End(); ++gdcit)
     {
+        MITK_INFO << gdcit.Value();
       b_ValueMap[GetB_Value(gdcit.Index())].push_back(gdcit.Index());
     }
   }
@@ -288,6 +297,11 @@ void mitk::DiffusionPropertyHelper::InitializeImage()
     identity.set_identity();
     m_Image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( identity ));
   }
+}
+
+bool mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(const mitk::DataNode* node)
+{
+    return IsDiffusionWeightedImage(dynamic_cast<mitk::Image *>(node->GetData()));
 }
 
 

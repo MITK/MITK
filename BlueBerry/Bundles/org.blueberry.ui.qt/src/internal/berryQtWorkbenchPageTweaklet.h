@@ -32,16 +32,15 @@ class BERRY_UI_QT QtWorkbenchPageTweaklet : public QObject, public WorkbenchPage
 
 public:
 
-  berryObjectMacro(QtWorkbenchPageTweaklet);
+  berryObjectMacro(QtWorkbenchPageTweaklet)
 
   QtWorkbenchPageTweaklet();
-  QtWorkbenchPageTweaklet(const QtWorkbenchPageTweaklet& other);
 
-  void* CreateClientComposite(void* pageControl);
-  void* CreatePaneControl(void* parent);
+  QWidget* CreateClientComposite(QWidget* pageControl);
+  QWidget* CreatePaneControl(QWidget* parent);
 
-  Object::Pointer CreateStatusPart(void* parent, const std::string& title, const std::string& msg);
-  IEditorPart::Pointer CreateErrorEditorPart(const std::string& partName, const std::string& msg);
+  Object::Pointer CreateStatusPart(QWidget* parent, const QString& title, const QString& msg);
+  IEditorPart::Pointer CreateErrorEditorPart(const QString& partName, const QString& msg);
 
 };
 

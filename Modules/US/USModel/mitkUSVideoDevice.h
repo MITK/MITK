@@ -40,7 +40,7 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUS_EXPORT USVideoDevice : public mitk::USDevice
+  class MITKUS_EXPORT USVideoDevice : public mitk::USDevice
   {
   public:
     mitkClassMacro(USVideoDevice, mitk::USDevice);

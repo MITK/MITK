@@ -32,7 +32,7 @@ namespace mitk
 
     /**
   * \brief Base class of a permutation to be used in simulated annealing */
-  class MitkConnectomics_EXPORT ConnectomicsSimulatedAnnealingPermutationBase : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsSimulatedAnnealingPermutationBase : public itk::Object
   {
   public:
 

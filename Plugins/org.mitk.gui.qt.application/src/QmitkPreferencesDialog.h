@@ -38,7 +38,7 @@ public:
     QmitkPreferencesDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
     ~QmitkPreferencesDialog();
 
-    void SetSelectedPage(const std::string& id);
+    void SetSelectedPage(const QString& id);
 
 protected slots:
 

@@ -17,8 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkQBallImage.h>
 #include <mitkTensorImage.h>
-#include <mitkBaseDataIOFactory.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <itkGibbsTrackingFilter.h>
 #include <itkDiffusionTensor3D.h>
 #include <itkShCoefficientImageImporter.h>
@@ -84,12 +83,11 @@ typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Poin
 
 int main(int argc, char* argv[])
 {
-    std::cout << "GibbsTracking";
     mitkCommandLineParser parser;
 
     parser.setTitle("Gibbs Tracking");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription("");
+    parser.setDescription(" ");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
@@ -121,16 +119,13 @@ int main(int argc, char* argv[])
         GibbsTrackingFilterType::Pointer gibbsTracker = GibbsTrackingFilterType::New();
 
         // load input image
-        const std::string s1="", s2="";
-        std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
-
-        mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(infile.at(0).GetPointer());
+        mitk::Image::Pointer mitkImage = mitk::IOUtil::LoadImage(inFileName);
 
         // try to cast to qball image
         if( boost::algorithm::ends_with(inFileName, ".qbi") )
         {
             std::cout << "Loading qball image ...";
-            mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());
+            mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(mitkImage.GetPointer());
             ItkQballImageType::Pointer itk_qbi = ItkQballImageType::New();
             mitk::CastToItkImage(mitkQballImage, itk_qbi);
             gibbsTracker->SetQBallImage(itk_qbi.GetPointer());
@@ -139,7 +134,7 @@ int main(int argc, char* argv[])
         {
             std::cout << "Loading tensor image ...";
             typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
-            mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(infile.at(0).GetPointer());
+            mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(mitkImage.GetPointer());
             ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
             mitk::CastToItkImage(mitkTensorImage, itk_dti);
             gibbsTracker->SetTensorImage(itk_dti);
@@ -218,7 +213,7 @@ int main(int argc, char* argv[])
 //        gibbsTracker->SetLutPath( "" );
         gibbsTracker->Update();
 
-        mitk::FiberBundleX::Pointer mitkFiberBundle = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());
+        mitk::FiberBundle::Pointer mitkFiberBundle = mitk::FiberBundle::New(gibbsTracker->GetFiberBundle());
         mitkFiberBundle->SetReferenceGeometry(mitkImage->GetGeometry());
 
         mitk::IOUtil::SaveBaseData(mitkFiberBundle.GetPointer(), outFileName );

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBValueMapProperty.h>
 #include <mitkGradientDirectionsProperty.h>
 #include <mitkMeasurementFrameProperty.h>
+#include <mitkDataNode.h>
 
 namespace mitk
 {
@@ -33,7 +34,7 @@ namespace mitk
   * missing.
   */
 
-  class MitkDiffusionCore_EXPORT DiffusionPropertyHelper
+  class MITKDIFFUSIONCORE_EXPORT DiffusionPropertyHelper
   {
   public:
 
@@ -66,6 +67,9 @@ namespace mitk
      * meets the formal requirements to possibly be a valid diffusion weighted image.
      */
     static bool IsDiffusionWeightedImage(const mitk::Image *);
+    static bool IsDiffusionWeightedImage(const mitk::DataNode* node);
+
+    static ImageType::Pointer GetItkVectorImage(Image *image);
 
     /// Convenience method to get the BValueMap
     static const BValueMapType & GetBValueMap(const mitk::Image *);

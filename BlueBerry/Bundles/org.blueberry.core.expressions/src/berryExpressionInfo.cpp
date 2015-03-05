@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpressionInfo.h"
 
-#include <algorithm>
+#include <QString>
 
 namespace berry {
 
@@ -44,32 +44,30 @@ ExpressionInfo::MarkSystemPropertyAccessed()
     fHasSystemPropertyAccess= true;
   }
 
-std::set<std::string>
-ExpressionInfo::GetAccessedVariableNames() const
+QSet<QString> ExpressionInfo::GetAccessedVariableNames() const
 {
   return fAccessedVariableNames;
 }
 
 void
-ExpressionInfo::AddVariableNameAccess(const std::string& name)
+ExpressionInfo::AddVariableNameAccess(const QString &name)
 {
     fAccessedVariableNames.insert(name);
 }
 
-std::set<std::string>
+QSet<QString>
 ExpressionInfo::GetAccessedPropertyNames() const
 {
   return fAccessedPropertyNames;
 }
 
 void
-ExpressionInfo::AddAccessedPropertyName(const std::string& name)
+ExpressionInfo::AddAccessedPropertyName(const QString &name)
 {
   fAccessedPropertyNames.insert(name);
 }
 
-std::set<std::string>
-ExpressionInfo::GetMisbehavingExpressionTypes() const
+QSet<QString> ExpressionInfo::GetMisbehavingExpressionTypes() const
 {
   return fMisbehavingExpressionTypes;
 }
@@ -77,7 +75,7 @@ ExpressionInfo::GetMisbehavingExpressionTypes() const
 void
 ExpressionInfo::AddMisBehavingExpressionType(const std::type_info& clazz)
 {
-  fMisbehavingExpressionTypes.insert(clazz.name());
+  fMisbehavingExpressionTypes.insert(QString(clazz.name()));
 }
 
 void
@@ -121,10 +119,7 @@ ExpressionInfo::MergeAccessedVariableNames(ExpressionInfo* other)
   }
   else
   {
-    for (std::set<std::string>::iterator iter = other->fAccessedVariableNames.begin(); iter != other->fAccessedVariableNames.end(); ++iter)
-    {
-      fAccessedVariableNames.insert(*iter);
-    }
+    fAccessedVariableNames.unite(other->fAccessedVariableNames);
   }
 }
 
@@ -137,10 +132,7 @@ ExpressionInfo::MergeAccessedPropertyNames(ExpressionInfo* other)
   }
   else
   {
-    for (std::set<std::string>::iterator iter = other->fAccessedPropertyNames.begin(); iter != other->fAccessedPropertyNames.end(); ++iter)
-    {
-      fAccessedPropertyNames.insert(*iter);
-    }
+    fAccessedPropertyNames.unite(other->fAccessedPropertyNames);
   }
 }
 
@@ -153,10 +145,7 @@ ExpressionInfo::MergeMisbehavingExpressionTypes(ExpressionInfo* other)
   }
   else
   {
-    for (std::set<std::string>::iterator iter= other->fMisbehavingExpressionTypes.begin(); iter != other->fMisbehavingExpressionTypes.end(); ++iter)
-    {
-      fMisbehavingExpressionTypes.insert(*iter);
-    }
+    fMisbehavingExpressionTypes.unite(other->fMisbehavingExpressionTypes);
   }
 }
 

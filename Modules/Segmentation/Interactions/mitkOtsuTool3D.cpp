@@ -44,7 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageStatisticsHolder.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, OtsuTool3D, "Otsu Segmentation");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, OtsuTool3D, "Otsu Segmentation");
 }
 
 mitk::OtsuTool3D::OtsuTool3D()

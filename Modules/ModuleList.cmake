@@ -1,4 +1,9 @@
+# The entries in the mitk_modules list must be
+# ordered according to their dependencies.
+
 set(mitk_modules
+  Core
+  DCMTesting
   RDF
   LegacyIO
   DataTypesExt
@@ -17,6 +22,7 @@ set(mitk_modules
   LegacyAdaptors
   SceneSerialization
   GraphAlgorithms
+  Multilabel
   ContourModel
   SurfaceInterpolation
   Segmentation
@@ -28,6 +34,7 @@ set(mitk_modules
   SegmentationUI
   DiffusionImaging
   GPGPU
+  OpenIGTLink
   IGTBase
   IGT
   CameraCalibration
@@ -49,11 +56,13 @@ set(mitk_modules
   Remeshing
   Python
   Persistence
+  OpenIGTLinkUI
   IGTUI
   VtkShaders
   DicomRT
   IOExt
   XNAT
+  TubeGraph
 )
 
 if(MITK_ENABLE_PIC_READER)

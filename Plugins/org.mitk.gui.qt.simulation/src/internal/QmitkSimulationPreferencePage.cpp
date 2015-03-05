@@ -173,17 +173,17 @@ bool QmitkSimulationPreferencePage::PerformOk()
 {
   PluginManager& pluginManager = PluginManager::getInstance();
   PluginMap& pluginMap = pluginManager.getPluginMap();
-  std::string plugins;
+  QString plugins;
 
   for (PluginIterator it = pluginMap.begin(); it != pluginMap.end(); ++it)
   {
-    if (!plugins.empty())
+    if (!plugins.isEmpty())
       plugins += ";";
 
-    plugins += it->first;
+    plugins += QString::fromStdString(it->first);
   }
 
-  m_Preferences->PutByteArray("plugins", plugins);
+  m_Preferences->Put("plugins", plugins);
   return true;
 }
 

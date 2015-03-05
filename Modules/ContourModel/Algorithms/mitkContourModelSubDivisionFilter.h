@@ -37,7 +37,7 @@ namespace mitk {
   *
   * @ingroup MitkContourModelModule
   */
-  class MitkContourModel_EXPORT ContourModelSubDivisionFilter : public ContourModelSource
+  class MITKCONTOURMODEL_EXPORT ContourModelSubDivisionFilter : public ContourModelSource
   {
 
   public:

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-void QtViewPart::CreatePartControl(void* parent)
+void QtViewPart::CreatePartControl(QWidget* parent)
 {
   this->CreateQtPartControl(static_cast<QWidget*>(parent));
 }

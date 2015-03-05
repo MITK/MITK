@@ -16,20 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpressions.h"
 
+#include "berryExpressionStatus.h"
+
 #include <berryPlatform.h>
-#include <berryPlatformException.h>
-#include <service/berryServiceRegistry.h>
+#include <berryCoreException.h>
 
 #include <berryIAdapterManager.h>
+#include <berryIConfigurationElement.h>
 
 #include <berryObjects.h>
 #include <berryObjectString.h>
-#include <berryObjectVector.h>
+#include <berryObjectList.h>
 
-#include <Poco/String.h>
-#include <Poco/NumberParser.h>
-
-#include <deque>
 
 namespace berry
 {
@@ -42,10 +40,10 @@ namespace berry
   }
 
   bool
-  Expressions::IsInstanceOf(Object::ConstPointer element, const std::string& type)
+  Expressions::IsInstanceOf(const Object* element, const QString& type)
   {
     // null isn't an instanceof of anything.
-    if (element.IsNull())
+    if (element == 0)
       return false;
 
     // TODO Reflection
@@ -56,155 +54,160 @@ namespace berry
 
 
   void
-  Expressions::CheckAttribute(const std::string& name, bool value)
+  Expressions::CheckAttribute(const QString& name, const QString& value)
   {
-    if (!value)
+    if (value.isNull())
     {
-      throw CoreException("Missing attribute", name);
+      IStatus::Pointer status(new ExpressionStatus(
+                                ExpressionStatus::MISSING_ATTRIBUTE,
+                                QString("Mandatory attribute %1 is missing").arg(name),
+                                BERRY_STATUS_LOC));
+      throw CoreException(status);
     }
   }
 
   void
-  Expressions::CheckAttribute(const std::string& name, bool result, const std::string& value, std::vector<std::string>& validValues)
+  Expressions::CheckAttribute(const QString& name, const QString& value, QStringList &validValues)
   {
-    CheckAttribute(name, result);
-    for (unsigned int i= 0; i < validValues.size(); i++)
-    {
-      if (value == validValues[i])
-        return;
-    }
-    throw CoreException("Wrong attribute value", value);
+    CheckAttribute(name, value);
+    if (validValues.contains(value)) return;
+    IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::WRONG_ATTRIBUTE_VALUE,
+                                                 QString("Attribute value %1 is not valid").arg(value),
+                                                 BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
 
   void
   Expressions::CheckCollection(Object::ConstPointer var, Expression::Pointer expression)
   {
-    if (var.Cast<const ObjectVector<Object::Pointer> >())
+    if (var.Cast<const ObjectList<Object::Pointer> >())
       return;
-    throw CoreException("Expression variable is not of type ObjectVector", expression->ToString());
+    IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::VARIABLE_IS_NOT_A_COLLECTION,
+                                                 QString("The default variable is not of type ObjectList<Object::Pointer>. "
+                                                         "Failed expression: %1").arg(expression->ToString()),
+                                                 BERRY_STATUS_LOC));
+    throw CoreException(status);
   }
 
-  IIterable::Pointer
-  Expressions::GetAsIIterable(Object::Pointer var, Expression::Pointer expression)
+  IIterable::ConstPointer
+  Expressions::GetAsIIterable(Object::ConstPointer var, Expression::ConstPointer expression)
   {
-    IIterable::Pointer iterable(var.Cast<IIterable>());
+    IIterable::ConstPointer iterable(var.Cast<const IIterable>());
     if (!iterable.IsNull())
     {
       return iterable;
     }
     else
     {
-      IAdapterManager::Pointer manager= Platform::GetServiceRegistry().GetServiceById<IAdapterManager>("org.blueberry.service.adaptermanager");
-      Object::Pointer result;
-      Poco::Any any(manager->GetAdapter(var, IIterable::GetStaticClassName()));
-      if (!any.empty() && any.type() == typeid(Object::Pointer))
-      {
-        result = Poco::AnyCast<Object::Pointer>(any);
-      }
+      IAdapterManager* manager= Platform::GetAdapterManager();
+      iterable = manager->GetAdapter<IIterable>(var.GetPointer());
 
-      if (result)
+      if (iterable)
       {
-        iterable = result.Cast<IIterable>();
         return iterable;
       }
 
-      if (manager->QueryAdapter(var->GetClassName(), IIterable::GetStaticClassName()) == IAdapterManager::NOT_LOADED)
+      if (manager->QueryAdapter<IIterable>(var.GetPointer()) == IAdapterManager::NOT_LOADED)
         return IIterable::Pointer();
 
-      throw CoreException("The variable is not iterable", expression->ToString());
+      IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::VARIABLE_IS_NOT_A_COLLECTION,
+                                                   QString("The default variable is not iterable. Failed expression: %1").arg(expression->ToString()),
+                                                   BERRY_STATUS_LOC));
+      throw CoreException(status);
     }
   }
 
-  ICountable::Pointer
-  Expressions::GetAsICountable(Object::Pointer var, Expression::Pointer expression)
+  ICountable::ConstPointer
+  Expressions::GetAsICountable(Object::ConstPointer var, Expression::ConstPointer expression)
   {
-    ICountable::Pointer countable(var.Cast<ICountable>());
+    ICountable::ConstPointer countable(var.Cast<const ICountable>());
     if (!countable.IsNull())
     {
       return countable;
     }
     else
     {
-      IAdapterManager::Pointer manager = Platform::GetServiceRegistry().GetServiceById<IAdapterManager>("org.blueberry.service.adaptermanager");
-      Object::Pointer result;
-      Poco::Any any(manager->GetAdapter(var, ICountable::GetStaticClassName()));
-      if (!any.empty() && any.type() == typeid(Object::Pointer))
-      {
-        result = Poco::AnyCast<Object::Pointer>(any);
-      }
-
+      IAdapterManager* manager = Platform::GetAdapterManager();
+      ICountable::ConstPointer result(manager->GetAdapter<ICountable>(var.GetPointer()));
       if (result)
       {
-        countable = result.Cast<ICountable>();
+        return result;
       }
 
-      if (manager->QueryAdapter(var->GetClassName(), ICountable::GetStaticClassName()) == IAdapterManager::NOT_LOADED)
-        return ICountable::Pointer();
+      if (manager->QueryAdapter<ICountable>(var.GetPointer()) == IAdapterManager::NOT_LOADED)
+        return ICountable::ConstPointer();
 
-      throw CoreException("The variable is not countable", expression->ToString());
+      IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::VARIABLE_IS_NOT_A_COLLECTION,
+                                                   QString("The default variable is not countable. Failed expression: %1").arg(expression->ToString()),
+                                                   BERRY_STATUS_LOC));
+      throw CoreException(status);
     }
   }
 
   bool
-  Expressions::GetOptionalBooleanAttribute(IConfigurationElement::Pointer element, const std::string& attributeName)
+  Expressions::GetOptionalBooleanAttribute(IConfigurationElement::Pointer element, const QString& attributeName)
   {
-    std::string value;
-    if (element->GetAttribute(attributeName, value))
-      return Poco::toLower<std::string>(value) == "true";
+    QString value = element->GetAttribute(attributeName);
+    if (value.isNull())
+      return false;
 
-    return false;
+    return value.compare("true", Qt::CaseInsensitive) == 0;
   }
 
   bool
-  Expressions::GetOptionalBooleanAttribute(Poco::XML::Element* element, const std::string& attributeName)
+  Expressions::GetOptionalBooleanAttribute(Poco::XML::Element* element, const QString& attributeName)
   {
-    std::string value = element->getAttribute(attributeName);
+    QString value = QString::fromStdString(element->getAttribute(attributeName.toStdString()));
     if (value.size() == 0)
       return false;
 
-    return Poco::toLower<std::string>(value) == "true";
+    return value.compare("true", Qt::CaseInsensitive) == 0;
   }
 
-  void
-  Expressions::GetArguments(std::vector<Object::Pointer>& args, IConfigurationElement::Pointer element, const std::string& attributeName)
+  QList<Object::Pointer>
+  Expressions::GetArguments(const IConfigurationElement::Pointer& element, const QString& attributeName)
   {
-    std::string value;
-    if (element->GetAttribute(attributeName, value))
+    QString value = element->GetAttribute(attributeName);
+    if (!value.isNull())
     {
-      ParseArguments(args, value);
+      return ParseArguments(value);
     }
+    return QList<Object::Pointer>();
   }
 
-  void
-  Expressions::GetArguments(std::vector<Object::Pointer>& args, Poco::XML::Element* element, const std::string& attributeName)
+  QList<Object::Pointer>
+  Expressions::GetArguments(Poco::XML::Element* element, const QString& attributeName)
   {
-    std::string value = element->getAttribute(attributeName);
-    if (value.size()> 0)
+    std::string value = element->getAttribute(attributeName.toStdString());
+    if (value.size() > 0)
     {
-      ParseArguments(args, value);
+      return ParseArguments(QString::fromStdString(value));
     }
+    return QList<Object::Pointer>();
   }
 
-  void
-  Expressions::ParseArguments(std::vector<Object::Pointer>& result, const std::string& args)
+  QList<Object::Pointer>
+  Expressions::ParseArguments(const QString& args)
   {
+    QList<Object::Pointer> result;
     int start= 0;
     int comma;
     while ((comma = FindNextComma(args, start)) != -1)
     {
-      result.push_back(ConvertArgument(Poco::trim<std::string>(args.substr(start, comma-start))));
+      result.push_back(ConvertArgument(args.mid(start, comma-start).trimmed()));
       start= comma + 1;
     }
-    result.push_back(ConvertArgument(Poco::trim<std::string>(args.substr(start))));
+    result.push_back(ConvertArgument(args.mid(start).trimmed()));
+    return result;
   }
 
   int
-  Expressions::FindNextComma(const std::string& str, int start)
+  Expressions::FindNextComma(const QString& str, int start)
   {
     bool inString = false;
-    for (unsigned int i = start; i < str.size(); i++)
+    for (int i = start; i < str.size(); i++)
     {
-      char ch = str.at(i);
+      const QChar ch = str.at(i);
       if (ch == ',' && ! inString)
       return i;
       if (ch == '\'')
@@ -231,15 +234,20 @@ namespace berry
       }
     }
     if (inString)
-    throw CoreException("String not terminated", str);
+    {
+      IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::STRING_NOT_TERMINATED,
+                                                   QString("The String \"%1\" is not correctly terminated with an apostrophe character.").arg(str),
+                                                   BERRY_STATUS_LOC));
+      throw CoreException(status);
+    }
 
     return -1;
   }
 
   Object::Pointer
-  Expressions::ConvertArgument(const std::string& arg, bool result)
+  Expressions::ConvertArgument(const QString& arg)
   {
-    if (!result)
+    if (arg.isNull())
     {
       return Object::Pointer();
     }
@@ -250,7 +258,7 @@ namespace berry
     }
     else if (arg.at(0) == '\'' && arg.at(arg.size() - 1) == '\'')
     {
-      ObjectString::Pointer var(new ObjectString(UnEscapeString(arg.substr(1, arg.size() - 2))));
+      ObjectString::Pointer var(new ObjectString(UnEscapeString(arg.mid(1, arg.size() - 2))));
       return var;
     }
     else if ("true" == arg)
@@ -263,15 +271,16 @@ namespace berry
       ObjectBool::Pointer var(new ObjectBool(false));
       return var;
     }
-    else if (arg.find('.') != std::string::npos)
+    else if (arg.indexOf('.') != -1)
     {
-      try
+      bool ok = false;
+      float num = arg.toFloat(&ok);
+      if (ok)
       {
-        double num = Poco::NumberParser::parseFloat(arg);
-        ObjectFloat::Pointer var(new ObjectFloat((float) num));
+        ObjectFloat::Pointer var(new ObjectFloat(num));
         return var;
       }
-      catch (Poco::SyntaxException)
+      else
       {
         ObjectString::Pointer var(new ObjectString(arg));
         return var;
@@ -279,13 +288,14 @@ namespace berry
     }
     else
     {
-      try
+      bool ok = false;
+      int num = arg.toInt(&ok);
+      if (ok)
       {
-        int num = Poco::NumberParser::parse(arg);
         ObjectInt::Pointer var(new ObjectInt(num));
         return var;
       }
-      catch (Poco::SyntaxException e)
+      else
       {
         ObjectString::Pointer var(new ObjectString(arg));
         return var;
@@ -293,23 +303,29 @@ namespace berry
     }
   }
 
-  std::string
-  Expressions::UnEscapeString(const std::string& str)
+  QString
+  Expressions::UnEscapeString(const QString& str)
   {
-    std::string result = "";
-    for (unsigned int i= 0; i < str.size(); i++)
+    QString result = "";
+    for (int i= 0; i < str.size(); i++)
     {
-      char ch= str.at(i);
+      const QChar ch= str.at(i);
       if (ch == '\'')
       {
         if (i == str.size() - 1 || str.at(i + 1) != '\'')
-        throw CoreException("String not correctly escaped", str);
-        result.append(1, '\'');
+        {
+          IStatus::Pointer status(new ExpressionStatus(ExpressionStatus::STRING_NOT_CORRECT_ESCAPED,
+                                                       QString("The String \"%1\" is not correctly escaped. "
+                                                               "Wrong number of apostrophe characters.").arg(str),
+                                                       BERRY_STATUS_LOC));
+          throw CoreException(status);
+        }
+        result.append('\'');
         i++;
       }
       else
       {
-        result.append(1, ch);
+        result.append(ch);
       }
     }
     return result;

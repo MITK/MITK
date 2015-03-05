@@ -29,7 +29,7 @@ class ContourModelSet;
   * @brief Fills a given mitk::ContourModelSet into a given mitk::Image
   * @ingroup Process
   */
-class MitkSegmentation_EXPORT ContourModelSetToImageFilter : public ImageSource
+class MITKSEGMENTATION_EXPORT ContourModelSetToImageFilter : public ImageSource
 {
 public:
 

@@ -31,7 +31,7 @@ class QmitkUSControlsBModeWidget;
   * This class handles the mitk::USControlInterfaceBMode of mitk::USDevice
   * objects.
   */
-class MitkUSUI_EXPORT QmitkUSControlsBModeWidget : public QWidget
+class MITKUSUI_EXPORT QmitkUSControlsBModeWidget : public QWidget
 {
     Q_OBJECT
 

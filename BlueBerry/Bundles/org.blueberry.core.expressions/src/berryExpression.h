@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryMacros.h>
 #include <berryObject.h>
 
-#include <string>
 
 namespace berry {
 
@@ -38,8 +37,6 @@ namespace berry {
  * <p>
  * This class may be subclassed to provide specific expressions.
  * </p>
- *
- * @since 3.0
  */
 class BERRY_EXPRESSIONS Expression : public Object {
 
@@ -51,17 +48,17 @@ public:
    * The constant integer hash code value meaning the hash code has not yet
    * been computed.
    */
-  static const std::size_t HASH_CODE_NOT_COMPUTED;
+  static const uint HASH_CODE_NOT_COMPUTED;
 
   /**
    * A factor for computing the hash code for all expressions.
    */
-  static const std::size_t HASH_FACTOR;
+  static const uint HASH_FACTOR;
 
   /**
    * Name of the value attribute of an expression (value is <code>value</code>).
    */
-  static const std::string ATT_VALUE;
+  static const QString ATT_VALUE;
 
 private:
 
@@ -69,7 +66,7 @@ private:
    * The hash code for this object. This value is computed lazily.  If it is
    * not yet computed, it is equal to {@link #HASH_CODE_NOT_COMPUTED}.
    */
-  mutable std::size_t fHashCode;
+  mutable uint fHashCode;
 
 protected:
 
@@ -83,8 +80,6 @@ protected:
    * @param right the second object to compare; may be <code>null</code>.
    * @return <code>TRUE_EVAL</code> if the two objects are equivalent;
    *         <code>FALSE_EVAL</code> otherwise.
-   *
-   * @since 3.2
    */
    // static bool Equals(final Object left, final Object right);
 
@@ -100,14 +95,14 @@ protected:
    *
    * @return <code>TRUE_EVAL</code> if the arrays are equal length and the elements
    *  at the same position are equal; <code>FALSE_EVAL</code> otherwise.
-   *
-   * @since 3.2
    */
-  static bool Equals(std::vector<Expression::Pointer>& leftArray, std::vector<Expression::Pointer>& rightArray);
+  static bool Equals(const QList<Expression::Pointer>& leftArray,
+                     const QList<Expression::Pointer>& rightArray);
 
-  static bool Equals(std::vector<Object::Pointer>& leftArray, std::vector<Object::Pointer>& rightArray);
+  static bool Equals(const QList<Object::Pointer>& leftArray,
+                     const QList<Object::Pointer>& rightArray);
 
-    /**
+  /**
    * Returns the hash code for the given <code>object</code>. This method
    * handles <code>null</code>.
    *
@@ -116,12 +111,10 @@ protected:
    *
    * @return The hash code of the object; zero if the object is
    *  <code>null</code>.
-   *
-   * @since 3.2
    */
-   static std::size_t HashCode(Expression::Pointer object);
+   static uint HashCode(Expression::Pointer object);
 
-    /**
+  /**
    * Returns the hash code for the given array. This method handles
    * <code>null</code>.
    *
@@ -129,26 +122,22 @@ protected:
    *  <code>null</code>.
    * @return the hash code of the array; zero if the object is
    *  <code>null</code>.
-   *
-   * @since 3.2
    */
-  static std::size_t HashCode(std::vector<Expression::Pointer>& array);
+  static uint HashCode(const QList<Expression::Pointer>& array);
 
-  static std::size_t HashCode(std::vector<Object::Pointer>& array);
+  static uint HashCode(const QList<Object::Pointer>& array);
 
   /**
-     * Method to compute the hash code for this object. The result
-     * returned from this method is cached in the <code>fHashCode</code>
-     * field. If the value returned from the method equals {@link #HASH_CODE_NOT_COMPUTED}
-     * (e.g. <code>-1</code>) then the value is incremented by one.
-     * <p>
-     * This default implementation calls <code>super.hashCode()</code>
-     * </p>
-     * @return a hash code for this object.
-     *
-     * @since 3.2
-     */
-    virtual std::size_t ComputeHashCode() const;
+   * Method to compute the hash code for this object. The result
+   * returned from this method is cached in the <code>fHashCode</code>
+   * field. If the value returned from the method equals {@link #HASH_CODE_NOT_COMPUTED}
+   * (e.g. <code>-1</code>) then the value is incremented by one.
+   * <p>
+   * This default implementation calls <code>super.hashCode()</code>
+   * </p>
+   * @return a hash code for this object.
+   */
+  virtual uint ComputeHashCode() const;
 
 
 public:
@@ -166,8 +155,7 @@ public:
   Expression();
   virtual ~Expression();
 
-
-  virtual std::size_t HashCode() const;
+  virtual uint HashCode() const;
 
   /**
    * Evaluates this expression.
@@ -180,7 +168,7 @@ public:
    * @throws CoreException if the evaluation failed. The concrete reason is
    *  defined by the subclass implementing this method
    */
-  virtual EvaluationResult Evaluate(IEvaluationContext* context) = 0;
+  virtual SmartPointer<const EvaluationResult> Evaluate(IEvaluationContext* context) const = 0;
 
   /**
    * Computes the expression information for the given expression tree.
@@ -190,8 +178,6 @@ public:
    * </p>
    *
    * @return the expression information
-   *
-   * @since 3.2
    */
   virtual const ExpressionInfo* ComputeExpressionInfo() const;
 
@@ -202,12 +188,10 @@ public:
    *
    * @param info the expression information object used
    *  to collect the information
-   *
-   * @since 3.2
    */
   virtual void CollectExpressionInfo(ExpressionInfo* info) const;
 
-  virtual std::string ToString();
+  virtual QString ToString() const;
 
   virtual bool operator==(const Object* object) const;
 
@@ -216,23 +200,23 @@ public:
 class TRUE_EVALExpression : public Expression
 {
 public:
-  EvaluationResult Evaluate(IEvaluationContext* /*context*/)
+  SmartPointer<const EvaluationResult> Evaluate(IEvaluationContext* /*context*/) const
   {
       return EvaluationResult::TRUE_EVAL;
   }
 
-  void CollectExpressionInfo(ExpressionInfo* /*info*/) {}
+  void CollectExpressionInfo(ExpressionInfo* /*info*/) const {}
 };
 
 class FALSE_EVALExpression : public Expression
 {
 public:
-  EvaluationResult Evaluate(IEvaluationContext* /*context*/)
+  SmartPointer<const EvaluationResult> Evaluate(IEvaluationContext* /*context*/) const
   {
       return EvaluationResult::FALSE_EVAL;
   }
 
-  void CollectExpressionInfo(ExpressionInfo* /*info*/) {}
+  void CollectExpressionInfo(ExpressionInfo* /*info*/) const {}
 };
 
 } // namespace berry

@@ -21,7 +21,7 @@ namespace mitk
  *  For DWI images a registerable B0 Image will automatically be extracted.
  *
  */
-class MitkDiffusionCore_EXPORT RegistrationWrapper
+class MITKDIFFUSIONCORE_EXPORT RegistrationWrapper
 {
 public:
 

@@ -44,7 +44,7 @@ namespace mitk
     *  \ingroup IGT
     */
 
-class MitkIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
+class MITKIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
   {
   public:
 

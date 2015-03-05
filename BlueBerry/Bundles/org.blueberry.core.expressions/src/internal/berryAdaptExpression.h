@@ -19,31 +19,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryCompositeExpression.h"
 
-#include "berryEvaluationContext.h"
-#include "berryEvaluationResult.h"
-#include "berryExpressionInfo.h"
-
-#include "service/berryIConfigurationElement.h"
-
-#include "Poco/DOM/Node.h"
-
-#include <string>
+namespace Poco {
+namespace XML {
+class Node;
+}
+}
 
 namespace berry {
+
+struct IConfigurationElement;
 
 class AdaptExpression : public CompositeExpression
 {
 
 private:
 
-  static const std::string ATT_TYPE;
+  static const QString ATT_TYPE;
 
   /**
    * The seed for the hash code for all adapt expressions.
    */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
-  std::string fTypeName;
+  QString fTypeName;
 
 
 public:
@@ -52,7 +50,7 @@ public:
 
   AdaptExpression(Poco::XML::Node* element);
 
-  AdaptExpression(const std::string& typeName);
+  AdaptExpression(const QString& typeName);
 
 //  bool equals(final Object object) {
 //    if (!(object instanceof AdaptExpression))
@@ -67,13 +65,14 @@ public:
   /* (non-Javadoc)
    * @see Expression#evaluate(IVariablePool)
    */
-  EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 
-  void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info) const;
 
 
-  protected:
-    std::size_t ComputeHashCode();
+protected:
+
+  uint ComputeHashCode() const;
 };
 
 }  // namespace berry

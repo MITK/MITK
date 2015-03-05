@@ -621,7 +621,7 @@ void OdfMaximaExtractionFilter< TOdfPixelType >
     vtkSmartPointer<vtkPolyData> directionsPolyData = vtkSmartPointer<vtkPolyData>::New();
     directionsPolyData->SetPoints(m_VtkPoints);
     directionsPolyData->SetLines(m_VtkCellArray);
-    m_OutputFiberBundle = mitk::FiberBundleX::New(directionsPolyData);
+    m_OutputFiberBundle = mitk::FiberBundle::New(directionsPolyData);
     std::cout << "Maxima extraction finished\n";
 }
 }

@@ -41,11 +41,14 @@ public:
 
   static QtLogPlugin* GetInstance();
 
-  QtPlatformLogModel* GetLogModel();
+  QtPlatformLogModel* GetLogModel() const;
+
+  ctkPluginContext* GetContext() const;
 
 private:
   static QtLogPlugin* instance;
   QtPlatformLogModel* m_LogModel;
+  ctkPluginContext* m_Context;
 
 };
 

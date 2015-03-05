@@ -32,7 +32,7 @@ namespace mitk {
     *
     * \deprecated Deprecated since 2014-06 -> use mitk::Image instead
     */
-  class MitkUS_EXPORT USImage : public mitk::Image
+  class MITKUS_EXPORT USImage : public mitk::Image
     {
     public:
       mitkClassMacro(USImage, mitk::Image);

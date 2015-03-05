@@ -30,7 +30,7 @@ namespace mitk
   It is an interface of the factory pattern. You can create a
   specialized ToF device factory in the inherited class.
   */
-  struct MITK_TOFHARDWARE_EXPORT IToFDeviceFactory {
+  struct MITKTOFHARDWARE_EXPORT IToFDeviceFactory {
     virtual ~IToFDeviceFactory();
 
     /**

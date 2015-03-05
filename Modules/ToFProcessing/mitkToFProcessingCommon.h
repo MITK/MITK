@@ -39,7 +39,7 @@ namespace mitk
   * \image html ../Modules/ToFProcessing/Documentation/ImagePlane.png
   * @ingroup ToFProcessing
   */
-  class MitkToFProcessing_EXPORT ToFProcessingCommon
+  class MITKTOFPROCESSING_EXPORT ToFProcessingCommon
   {
   public:
     typedef double ToFScalarType;

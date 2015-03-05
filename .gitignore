@@ -21,6 +21,7 @@ CMakeLists.txt.user*
 Session.vim
 *.swp
 *.swo
+.vimrc
 
 ## Emacs
 \#*\#

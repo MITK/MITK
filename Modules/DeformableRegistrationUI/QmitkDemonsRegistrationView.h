@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * Displays options for demons registration.
 */
-class MITK_DEFORMABLEREGISTRATION_UI_EXPORT QmitkDemonsRegistrationView : public QWidget
+class MITKDEFORMABLEREGISTRATIONUI_EXPORT QmitkDemonsRegistrationView : public QWidget
 {
   Q_OBJECT
 

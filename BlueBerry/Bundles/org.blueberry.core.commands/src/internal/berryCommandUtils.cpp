@@ -24,7 +24,7 @@ int CommandUtils::Compare(const bool left, const bool right)
   return left == false ? (right == true ? -1 : 0) : (right == true ? 0 : 1);
 }
 
-int CommandUtils::Compare(const std::string& left, const std::string& right)
+int CommandUtils::Compare(const QString& left, const QString& right)
 {
   return left.compare(right);
 }

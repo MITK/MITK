@@ -37,7 +37,7 @@ namespace berry {
  * @see IAdapterManager
  * @see IAdaptable
  */
-struct BERRY_RUNTIME IAdapterFactory {
+struct org_blueberry_core_runtime_EXPORT IAdapterFactory {
 
   virtual ~IAdapterFactory() {};
 

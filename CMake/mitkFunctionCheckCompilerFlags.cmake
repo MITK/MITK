@@ -27,9 +27,8 @@
 #    2-myflags: -fprofile-arcs
 #    3-myflags: -fprofile-arcs -Wall
 
-include(TestCXXAcceptsFlag)
-include(mitkCheckCXXCompilerFlag)
-include(mitkCheckCCompilerFlag)
+include(CheckCCompilerFlag)
+include(CheckCXXCompilerFlag)
 
 function(mitkFunctionCheckCompilerFlags CXX_FLAG_TO_TEST RESULT_VAR)
 
@@ -44,7 +43,7 @@ function(mitkFunctionCheckCompilerFlags CXX_FLAG_TO_TEST RESULT_VAR)
   # For that same reason, the mitkFunctionCheckCompilerFlags function appends a unique suffix to
   # the HAS_FLAG variable. This suffix is created using a 'clean version' of the flag to test.
   string(REGEX REPLACE "[, \\$\\+\\*\\{\\}\\(\\)\\#]" "" suffix ${CXX_FLAG_TO_TEST})
-  CHECK_CXX_ACCEPTS_FLAG(${CXX_FLAG_TO_TEST} HAS_FLAG_${suffix})
+  CHECK_CXX_COMPILER_FLAG(${CXX_FLAG_TO_TEST} HAS_FLAG_${suffix})
 
   if(HAS_FLAG_${suffix})
     set(${RESULT_VAR} "${${RESULT_VAR}} ${CXX_FLAG_TO_TEST}" PARENT_SCOPE)

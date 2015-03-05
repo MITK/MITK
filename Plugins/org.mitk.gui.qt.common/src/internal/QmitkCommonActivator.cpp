@@ -32,9 +32,9 @@ QmitkCommonActivator* QmitkCommonActivator::GetInstance()
   return m_Instance;
 }
 
-berry::IPreferencesService::Pointer QmitkCommonActivator::GetPreferencesService()
+berry::IPreferencesService* QmitkCommonActivator::GetPreferencesService()
 {
-  return berry::IPreferencesService::Pointer(m_PrefServiceTracker->getService());
+  return m_PrefServiceTracker->getService();
 }
 
 void
@@ -46,7 +46,7 @@ QmitkCommonActivator::start(ctkPluginContext* context)
 
   if(berry::PlatformUI::IsWorkbenchRunning())
   {
-    m_ViewCoordinator = QmitkViewCoordinator::Pointer(new QmitkViewCoordinator);
+    m_ViewCoordinator.reset(new QmitkViewCoordinator);
     m_ViewCoordinator->Start();
   }
   else
@@ -61,7 +61,7 @@ QmitkCommonActivator::stop(ctkPluginContext* context)
   Q_UNUSED(context)
 
   m_ViewCoordinator->Stop();
-  m_ViewCoordinator = 0;
+  m_ViewCoordinator.reset();
 
   this->m_PrefServiceTracker.reset();
 

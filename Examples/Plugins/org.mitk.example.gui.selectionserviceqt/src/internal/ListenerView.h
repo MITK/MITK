@@ -72,11 +72,11 @@ private:
    *
    * @see ISelectionListener
    */
-  void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
-                        berry::ISelection::ConstPointer selection);
+  void SelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
+                        const berry::ISelection::ConstPointer& selection);
 
   /** @brief this pointer holds the selection listener */
-  berry::ISelectionListener::Pointer m_SelectionListener;
+  QScopedPointer<berry::ISelectionListener> m_SelectionListener;
   //! [Qt Selection Listener method and pointer]
 
   friend struct berry::SelectionChangedAdapter<ListenerView>;

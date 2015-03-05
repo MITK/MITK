@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 
-#include <mitkDataNodeFactory.h>
 #include <mitkStandaloneDataStorage.h>
 
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
+#include <mitkIOUtil.h>
 
 //##Documentation
 //## @brief Load one or more data sets (many image, surface
@@ -56,27 +56,11 @@ int main(int argc, char* argv[])
     // For testing
     if(strcmp(argv[i], "-testing")==0) continue;
 
-    // Create a DataNodeFactory to read a data format supported
-    // by the DataNodeFactory (many image formats, surface formats, etc.)
-    mitk::DataNodeFactory::Pointer nodeReader=mitk::DataNodeFactory::New();
-    const char * filename = argv[i];
-    try
-    {
-      nodeReader->SetFileName(filename);
-      nodeReader->Update();
-      //*********************************************************************
-      // Part III: Put the data into the datastorage
-      //*********************************************************************
-
-      // Since the DataNodeFactory directly creates a node,
-      // use the datastorage to add the read node
-      storage->Add(nodeReader->GetOutput());
-    }
-    catch(...)
-    {
-      fprintf( stderr, "Could not open file %s \n\n", filename );
-      exit(2);
-    }
+    //*********************************************************************
+    // Part III: Put the data into the datastorage
+    //*********************************************************************
+    // Add the node to the DataStorage
+    mitk::IOUtil::Load(argv[i],*storage);
   }
 
   //*************************************************************************

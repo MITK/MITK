@@ -160,13 +160,21 @@ static void TestReadInvalidData()
   MITK_TEST_CONDITION_REQUIRED(myReader->GetErrorMessage() == "Cannot open 'invalidTool' for reading", "Testing error message in this case");
 }
 
-static void TestWriteInvalidData()
+static void TestWriteInvalidFilename()
 {
+  //create a test navigation tool
   mitk::NavigationTool::Pointer myNavigationTool = mitk::NavigationTool::New();
-  myNavigationTool->SetIdentifier("ClaronTool#1");
-  myNavigationTool->SetSerialNumber("0815");
-  myNavigationTool->SetTrackingDeviceType(mitk::ClaronMicron);
-  myNavigationTool->SetType(mitk::NavigationTool::Fiducial);
+  mitk::DataNode::Pointer myNode = mitk::DataNode::New();
+  myNode->SetName("AuroraTool");
+  std::string surfaceFileName(MITK_IGT_DATA_DIR);
+  surfaceFileName.append("/EMTool.stl");
+  m_testSurface = mitk::IOUtil::LoadSurface( surfaceFileName );
+  myNode->SetData(m_testSurface);
+  myNavigationTool->SetDataNode(myNode);
+  myNavigationTool->SetIdentifier("AuroraTool#1");
+  myNavigationTool->SetSerialNumber("0816");
+  myNavigationTool->SetTrackingDeviceType(mitk::NDIAurora);
+  myNavigationTool->SetType(mitk::NavigationTool::Instrument);
 
   //now create a writer and write it to the harddisc
   mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
@@ -177,6 +185,23 @@ static void TestWriteInvalidData()
   MITK_TEST_CONDITION_REQUIRED(!test,"testing write");
   MITK_TEST_CONDITION_REQUIRED(myWriter->GetErrorMessage() == "Could not open a zip file for writing: 'NH:/sfdsfsdsf.&%%%'","testing error message");
 }
+
+static void TestWriteInvalidData()
+{
+  mitk::NavigationTool::Pointer myNavigationTool;
+  //tool is invalid because no data note is created
+
+  //now create a writer and write it to the harddisc
+  mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
+  std::string filename = "NH:/sfdsfsdsf.&%%%";
+
+  MITK_TEST_OUTPUT(<<"---- Testing write invalid tool ----");
+  bool test = myWriter->DoWrite(filename,myNavigationTool);
+  MITK_TEST_CONDITION_REQUIRED(!test,"testing write");
+  MITK_TEST_CONDITION_REQUIRED(myWriter->GetErrorMessage() == "Cannot write a navigation tool containing invalid tool data, aborting!","testing error message");
+}
+
+
 
 /** This function is testing the TrackingVolume class. */
 int mitkNavigationToolReaderAndWriterTest(int /* argc */, char* /*argv*/[])
@@ -190,6 +215,7 @@ int mitkNavigationToolReaderAndWriterTest(int /* argc */, char* /*argv*/[])
   TestRead2();
   TestReadInvalidData();
   TestWriteInvalidData();
+  TestWriteInvalidFilename();
   CleanUp();
 
   MITK_TEST_END()

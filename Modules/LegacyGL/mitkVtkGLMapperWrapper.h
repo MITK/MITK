@@ -33,7 +33,7 @@ namespace mitk {
   /**
   * @brief Vtk-based 2D mapper for PointSet
   */
-  class MitkLegacyGL_EXPORT VtkGLMapperWrapper : public VtkMapper
+  class MITKLEGACYGL_EXPORT VtkGLMapperWrapper : public VtkMapper
   {
   public:
     mitkClassMacro(VtkGLMapperWrapper, VtkMapper);
@@ -62,6 +62,12 @@ namespace mitk {
     virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor * actor);
 
     void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type);
+
+    virtual void Update(BaseRenderer *renderer);
+
+    virtual void SetDataNode(DataNode* node);
+
+    virtual DataNode* GetDataNode() const;
 
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
     mitk::LocalStorageHandler<LocalStorage> m_LSH;

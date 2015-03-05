@@ -40,13 +40,13 @@ protected:
    * The description for this handle. This value may be <code>null</code> if
    * the handle is undefined or has no description.
    */
-  std::string description;
+  QString description;
 
   /**
    * The name of this handle. This valud should not be <code>null</code>
    * unless the handle is undefined.
    */
-  std::string name;
+  QString name;
 
   /**
    * Constructs a new instance of <code>NamedHandleObject</code>.
@@ -54,7 +54,7 @@ protected:
    * @param id
    *            The identifier for this handle; must not be <code>null</code>.
    */
-  NamedHandleObject(const std::string& id);
+  NamedHandleObject(const QString& id);
 
 
 public:
@@ -67,7 +67,7 @@ public:
    * @throws NotDefinedException
    *             If the handle is not currently defined.
    */
-  virtual std::string GetDescription() const;
+  virtual QString GetDescription() const;
 
   /**
    * Returns the name for this handle.
@@ -76,7 +76,7 @@ public:
    * @throws NotDefinedException
    *             If the handle is not currently defined.
    */
-  virtual std::string GetName() const;
+  virtual QString GetName() const;
 };
 
 }

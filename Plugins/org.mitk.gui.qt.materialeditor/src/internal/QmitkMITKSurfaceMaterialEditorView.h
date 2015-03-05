@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _QMITKMITKSURFACEMATERIALEDITORVIEW_H_INCLUDED
 
 #include <QmitkFunctionality.h>
-#include <berryISelectionListener.h>
 #include <berryIStructuredSelection.h>
 #include <string>
 
@@ -114,7 +113,6 @@ private:
   void shaderEnumChange(const itk::Object *caller, const itk::EventObject &event);
 
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
-  berry::ISelectionListener::Pointer m_SelectionListener;
 };
 
 

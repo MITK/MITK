@@ -1,7 +1,7 @@
 MITK_CREATE_MODULE_TESTS()
 
 if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
-mitkAddCustomModuleTest(mitkFiberBundleXReaderWriterTest mitkFiberBundleXReaderWriterTest)
+mitkAddCustomModuleTest(mitkFiberBundleReaderWriterTest mitkFiberBundleReaderWriterTest)
 mitkAddCustomModuleTest(mitkGibbsTrackingTest mitkGibbsTrackingTest ${MITK_DATA_DIR}/DiffusionImaging/qBallImage.qbi ${MITK_DATA_DIR}/DiffusionImaging/diffusionImageMask.nrrd ${MITK_DATA_DIR}/DiffusionImaging/gibbsTrackingParameters.gtp ${MITK_DATA_DIR}/DiffusionImaging/gibbsTractogram.fib)
 mitkAddCustomModuleTest(mitkStreamlineTrackingTest mitkStreamlineTrackingTest ${MITK_DATA_DIR}/DiffusionImaging/tensorImage.dti ${MITK_DATA_DIR}/DiffusionImaging/diffusionImageMask.nrrd ${MITK_DATA_DIR}/DiffusionImaging/streamlineTractogramInterpolated.fib)
 #mitkAddCustomModuleTest(mitkPeakExtractionTest mitkPeakExtractionTest ${MITK_DATA_DIR}/DiffusionImaging/qBallImage_SHCoeffs.nrrd ${MITK_DATA_DIR}/DiffusionImaging/diffusionImageMask.nrrd ${MITK_DATA_DIR}/DiffusionImaging/qBallImage_VectorField.fib)

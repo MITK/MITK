@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkStepperAdapter.h"
 
-#include <berryISelectionListener.h>
-
 #include <mitkDataStorageSelection.h>
 
 /*!
@@ -137,8 +135,6 @@ private:
   //mitk::DataNode*       m_SelectedImageNode;
   mitk::DataStorageSelection::Pointer m_SelectedImageNode;
   QmitkStepperAdapter*      m_TimeStepperAdapter;
-
-  berry::ISelectionListener::Pointer m_SelectionListener;
 
   enum ActionType {
     NOACTIONSELECTED,

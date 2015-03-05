@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include <mitkNavigationToolStorage.h>
 namespace mitk {
-  class MitkIGT_EXPORT NavigationToolStorageTestHelper
+  class MITKIGT_EXPORT NavigationToolStorageTestHelper
   {
   public:
   //help methods for test tool storages

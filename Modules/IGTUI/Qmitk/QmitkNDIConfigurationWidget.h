@@ -40,7 +40,7 @@ namespace mitk
   *
   *\ingroup IGTUI
   */
-class MitkIGTUI_EXPORT QmitkNDIConfigurationWidget : public QWidget
+class MITKIGTUI_EXPORT QmitkNDIConfigurationWidget : public QWidget
 {
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
 public:

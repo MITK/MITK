@@ -17,11 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 
-#include <mitkDataNodeFactory.h>
 #include <mitkStandaloneDataStorage.h>
 
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
+
+#include <mitkIOUtil.h>
 
 //##Documentation
 //## @brief Load image (nrrd format) and display it in a 2D view
@@ -53,26 +54,8 @@ int main(int argc, char* argv[])
   // Part II: Create some data by reading a file
   //*************************************************************************
 
-  // Create a DataNodeFactory to read a data format supported
-  // by the DataNodeFactory (many image formats, surface formats, etc.)
-  mitk::DataNodeFactory::Pointer reader=mitk::DataNodeFactory::New();
-  const char * filename = argv[1];
-  try
-  {
-    reader->SetFileName(filename);
-    reader->Update();
-    //*************************************************************************
-    // Part III: Put the data into the datastorage
-    //*************************************************************************
-
-    // Add the node to the DataStorage
-    ds->Add(reader->GetOutput());
-  }
-  catch(...)
-  {
-    fprintf( stderr, "Could not open file %s \n\n", filename );
-    exit(2);
-  }
+  // Load datanode (eg. many image formats, surface formats, etc.)
+  mitk::IOUtil::Load(argv[1],*ds);
 
   //*************************************************************************
   // Part IV: Create window and pass the datastorage to it

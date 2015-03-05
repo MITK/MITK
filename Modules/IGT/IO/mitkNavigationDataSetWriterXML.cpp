@@ -79,7 +79,7 @@ void mitk::NavigationDataSetWriterXML::StreamData (std::ostream* stream, mitk::N
   // For each time step in the Dataset
   for (mitk::NavigationDataSet::NavigationDataSetIterator it = data->Begin(); it != data->End(); it++)
   {
-    for (int toolIndex = 0; toolIndex < it->size(); toolIndex++)
+    for (std::size_t toolIndex = 0; toolIndex < it->size(); toolIndex++)
     {
       mitk::NavigationData::Pointer nd = it->at(toolIndex);
       TiXmlElement* elem = new TiXmlElement("ND");

@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 
-static void ApplyMaterial(mitk::DataNode::Pointer dataNode, const sofa::core::loader::Material& material)
+void ApplyMaterial(mitk::DataNode::Pointer dataNode, const sofa::core::loader::Material& material)
 {
   using sofa::defaulttype::Vec4f;
 
@@ -47,10 +47,10 @@ static void ApplyMaterial(mitk::DataNode::Pointer dataNode, const sofa::core::lo
   }
 
   dataNode->SetFloatProperty("material.ambientCoefficient", 1.0f);
-  dataNode->SetProperty("material.ambientColor", mitk::ColorProperty::New(material.ambient.elems));
+  dataNode->SetProperty("material.ambientColor", mitk::ColorProperty::New(ambient.elems));
 
   dataNode->SetFloatProperty("material.diffuseCoefficient", 1.0f);
-  dataNode->SetProperty("color", mitk::ColorProperty::New(material.diffuse.elems));
+  dataNode->SetProperty("color", mitk::ColorProperty::New(diffuse.elems));
 
   dataNode->SetFloatProperty("material.specularCoefficient", 1.0f);
   dataNode->SetProperty("material.specularColor", mitk::ColorProperty::New(specular.elems));

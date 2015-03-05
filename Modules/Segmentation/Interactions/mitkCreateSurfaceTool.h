@@ -32,7 +32,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MitkSegmentation_EXPORT CreateSurfaceTool : public SegmentationsProcessingTool
+class MITKSEGMENTATION_EXPORT CreateSurfaceTool : public SegmentationsProcessingTool
 {
   public:
 

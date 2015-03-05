@@ -19,7 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryQCTabBar.h"
 
 #include <internal/berryQtControlWidget.h>
+#include <internal/berryWorkbenchPlugin.h>
 
+#include <berryIQtStyleManager.h>
 #include <berryShell.h>
 #include <berryConstants.h>
 #include <berryPlatform.h>
@@ -47,7 +49,6 @@ void NativeTabFolder::TabSelectionChanged(int index)
 
 void NativeTabFolder::DragStarted(const QPoint& location)
 {
-  Point point(location.x(), location.y());
   this->HandleDragStarted(location);
 }
 
@@ -135,7 +136,11 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
   //        attachListeners(title, false);
   //        viewForm.setTopLeft(title);
 
-  skinManager = Platform::GetServiceRegistry().GetServiceById<IQtStyleManager>(IQtStyleManager::ID);
+  ctkServiceReference serviceRef = WorkbenchPlugin::GetDefault()->GetPluginContext()->getServiceReference<IQtStyleManager>();
+  if (serviceRef)
+  {
+    skinManager = WorkbenchPlugin::GetDefault()->GetPluginContext()->getService<IQtStyleManager>(serviceRef);
+  }
 }
 
 NativeTabFolder::~NativeTabFolder()
@@ -244,7 +249,7 @@ QRect NativeTabFolder::GetClientArea()
   return content->geometry();
 }
 
-std::vector<AbstractTabItem*> NativeTabFolder::GetItems()
+QList<AbstractTabItem*> NativeTabFolder::GetItems()
 {
   return tabControl->getTabs();
 }

@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpression.h"
 
-#include "service/berryIConfigurationElement.h"
-
-#include <map>
+#include <QHash>
 
 namespace berry {
+
+struct IConfigurationElement;
 
 /**
  * This manages the extension point that allows core expression reuse.
@@ -32,9 +32,9 @@ class DefinitionRegistry { //implements IRegistryChangeListener {
 
 private:
 
-  std::map<std::string, Expression::Pointer> cache;
+  QHash<QString, Expression::Pointer> cache;
 
-  std::map<std::string, Expression::Pointer>& GetCache();
+  QHash<QString, Expression::Pointer>& GetCache();
 
 public:
   DefinitionRegistry();
@@ -48,11 +48,11 @@ public:
    * @return the expression
    * @throws CoreException If the expression cannot be found.
    */
-  Expression::Pointer GetExpression(const std::string& id);
+  Expression::Pointer GetExpression(const QString &id);
 
 private:
 
-  Expression::Pointer GetExpression(const std::string& id, SmartPointer<IConfigurationElement> element);
+  Expression::Pointer GetExpression(const QString& id, const SmartPointer<IConfigurationElement>& element);
 
 };
 

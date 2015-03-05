@@ -52,7 +52,6 @@ set(CPP_FILES
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
   Algorithms/itkDwiGradientLengthCorrectionFilter.cpp
-  Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
 
   # Registration Algorithms & Co.
   Algorithms/Registration/mitkRegistrationWrapper.cpp
@@ -104,6 +103,7 @@ set(H_FILES
   # Algorithms
   Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h
   Algorithms/itkDiffusionQballPrepareVisualizationImageFilter.h
+  Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
   Algorithms/itkTensorDerivedMeasurementsFilter.h
   Algorithms/itkBrainMaskExtractionImageFilter.h
   Algorithms/itkB0ImageExtractionImageFilter.h

@@ -1,0 +1,27 @@
+diff -urNb gdcm-2.4.1/CMake/ExportConfiguration/GDCMConfig.cmake.in GDCM-src/CMake/ExportConfiguration/GDCMConfig.cmake.in
+--- gdcm-2.4.1/CMake/ExportConfiguration/GDCMConfig.cmake.in	2013-12-09 18:22:40.000000000 +0100
++++ GDCM-src/CMake/ExportConfiguration/GDCMConfig.cmake.in	2015-01-11 15:05:32.489871724 +0100
+@@ -39,8 +39,8 @@
+ else()
+   if(EXISTS ${SELF_DIR}/GDCMExports.cmake)
+     # This is a build tree
+-    set( GDCM_INCLUDE_DIRS @GDCM_INCLUDE_PATH@)
+-    set(GDCM_LIBRARY_DIRS @GDCM_LIBRARY_DIR@)
++    set( GDCM_INCLUDE_DIRS "@GDCM_INCLUDE_PATH@")
++    set(GDCM_LIBRARY_DIRS "@GDCM_LIBRARY_DIR@")
+
+     include(${SELF_DIR}/GDCMExports.cmake)
+
+diff -urNb gdcm-2.4.1/Source/MediaStorageAndFileFormat/gdcmSorter.cxx GDCM-src/Source/MediaStorageAndFileFormat/gdcmSorter.cxx
+--- gdcm-2.4.1/Source/MediaStorageAndFileFormat/gdcmSorter.cxx	2013-12-09 18:22:40.000000000 +0100
++++ GDCM-src/Source/MediaStorageAndFileFormat/gdcmSorter.cxx	2015-01-11 15:05:32.485871724 +0100
+@@ -132,7 +132,8 @@
+       }
+     else
+       {
+-      f = NULL;
++      std::cerr << "Err: File could not be read: " << it->c_str() << std::endl; 
++      return false;
+       }
+     }
+   //std::sort( filelist.begin(), filelist.end(), Sorter::SortFunc);

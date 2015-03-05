@@ -27,19 +27,6 @@ DataStorageService::DataStorageService()
   m_ActiveDataStorageRef = m_DefaultDataStorageRef;
 }
 
-bool
-DataStorageService::IsA(const std::type_info& type) const
-{
-  std::string name(GetType().name());
-  return name == type.name() || Service::IsA(type);
-}
-
-const std::type_info&
-DataStorageService::GetType() const
-{
-  return typeid(IDataStorageService);
-}
-
 IDataStorageReference::Pointer DataStorageService::CreateDataStorage(const QString& label)
 {
 

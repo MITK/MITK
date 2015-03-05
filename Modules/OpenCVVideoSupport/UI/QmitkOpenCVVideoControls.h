@@ -37,7 +37,7 @@ class QmitkOpenCVVideoControlsPrivate;
 /// the use of an !initialized! QmitkVideoBackground. The QmitkVideoBackground should
 /// contain an OpenCVVideoSource is then owned by this widget (and deleted)
 ///
-class MITK_OPENCVVIDEOSUPPORTUI_EXPORT QmitkOpenCVVideoControls : public QWidget,  public mitk::PropertyListReplacedObserver
+class MITKOPENCVVIDEOSUPPORTUI_EXPORT QmitkOpenCVVideoControls : public QWidget,  public mitk::PropertyListReplacedObserver
 {
   Q_OBJECT
 

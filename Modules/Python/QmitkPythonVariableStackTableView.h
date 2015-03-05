@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// purpose of this class: 1. Setup the view correctly, 2. Implement the double click to write back results
 /// to the datastorage
 ///
-class MITK_PYTHON_EXPORT QmitkPythonVariableStackTableView : public QTableView
+class MITKPYTHON_EXPORT QmitkPythonVariableStackTableView : public QTableView
 {
   Q_OBJECT
 

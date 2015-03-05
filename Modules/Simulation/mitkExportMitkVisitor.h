@@ -23,13 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT ExportMitkVisitor : public sofa::simulation::Visitor
+  class MITKSIMULATION_EXPORT ExportMitkVisitor : public sofa::simulation::Visitor
   {
   public:
     explicit ExportMitkVisitor(DataStorage::Pointer dataStorage, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
     ExportMitkVisitor(DataStorage::Pointer dataStorage, const std::string& visualModelName, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
     ~ExportMitkVisitor();
 
+    using sofa::simulation::Visitor::processNodeTopDown;
     Result processNodeTopDown(sofa::simulation::Node* node);
 
   private:

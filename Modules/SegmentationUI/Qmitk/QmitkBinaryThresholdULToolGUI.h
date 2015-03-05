@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   Last contributor: $Author$
 */
-class MitkSegmentationUI_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

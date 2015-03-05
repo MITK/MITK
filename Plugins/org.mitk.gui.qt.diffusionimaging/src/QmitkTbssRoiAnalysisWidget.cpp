@@ -36,8 +36,8 @@ QmitkTbssRoiAnalysisWidget::QmitkTbssRoiAnalysisWidget( QWidget * parent )
 
 
 
-void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundleX *fib, mitk::Image* img,
-                                                    mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg, int number)
+void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundle *fib, mitk::Image* img,
+                                                    mitk::DataNode* startRoi, mitk::DataNode* endRoi, bool avg, int number)
 {
 
   TractContainerType tracts = CreateTracts(fib, startRoi, endRoi);
@@ -53,19 +53,19 @@ void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundleX *fib, mit
 }
 
 
-TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *fib,
-                                                            mitk::PlanarFigure *startRoi,
-                                                            mitk::PlanarFigure *endRoi)
+TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundle *fib,
+                                                            mitk::DataNode *startRoi,
+                                                            mitk::DataNode *endRoi)
 {
-    mitk::PlaneGeometry* startGeometry2D = const_cast<mitk::PlaneGeometry*>(startRoi->GetPlaneGeometry());
-    mitk::PlaneGeometry* endGeometry2D = const_cast<mitk::PlaneGeometry*>(endRoi->GetPlaneGeometry());
+    mitk::PlaneGeometry* startGeometry2D = const_cast<mitk::PlaneGeometry*>(dynamic_cast<mitk::PlanarFigure*>(startRoi->GetData())->GetPlaneGeometry());
+    mitk::PlaneGeometry* endGeometry2D = const_cast<mitk::PlaneGeometry*>(dynamic_cast<mitk::PlanarFigure*>(endRoi->GetData())->GetPlaneGeometry());
 
 
-    mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
-    mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi
+    mitk::Point3D startCenter = dynamic_cast<mitk::PlanarFigure*>(startRoi->GetData())->GetWorldControlPoint(0); //center Point of start roi
+    mitk::Point3D endCenter = dynamic_cast<mitk::PlanarFigure*>(startRoi->GetData())->GetWorldControlPoint(0); //center Point of end roi
 
-    mitk::FiberBundleX::Pointer inStart = fib->ExtractFiberSubset(startRoi);
-    mitk::FiberBundleX::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
+    mitk::FiberBundle::Pointer inStart = fib->ExtractFiberSubset(startRoi, NULL);
+    mitk::FiberBundle::Pointer inBoth = inStart->ExtractFiberSubset(endRoi, NULL);
 
 
 
@@ -384,8 +384,8 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
     return tracts;
 }
 
-void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, mitk::Image* img,
-                                mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg, int number)
+void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundle *fib, mitk::Image* img,
+                                mitk::DataNode* startRoi, mitk::DataNode* endRoi, bool avg, int number)
 {
 
   if(fib == NULL || img == NULL || startRoi == NULL || endRoi == NULL)
@@ -692,9 +692,9 @@ void QmitkTbssRoiAnalysisWidget::Plot(std::vector <std::vector<mitk::ScalarType>
 
 
 std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::CalculateGroupProfilesFibers(mitk::TbssImage::Pointer tbssImage,
-                                                                                            mitk::FiberBundleX *fib,
-                                                                                            mitk::PlanarFigure* startRoi,
-                                                                                            mitk::PlanarFigure* endRoi,
+                                                                                            mitk::FiberBundle *fib,
+                                                                                            mitk::DataNode* startRoi,
+                                                                                            mitk::DataNode* endRoi,
                                                                                             int number)
 {
     TractContainerType tracts = CreateTracts(fib, startRoi, endRoi);
@@ -794,9 +794,9 @@ std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::Calcula
 
 
 void QmitkTbssRoiAnalysisWidget::PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
-                                             mitk::FiberBundleX *fib,
-                                             mitk::PlanarFigure* startRoi,
-                                             mitk::PlanarFigure* endRoi,
+                                             mitk::FiberBundle *fib,
+                                             mitk::DataNode* startRoi,
+                                             mitk::DataNode* endRoi,
                                              int number)
 {
   m_PlottingFiberBundle = false;

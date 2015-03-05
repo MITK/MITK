@@ -17,22 +17,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYSTANDARDELEMENTHANDLER_H_
 #define BERRYSTANDARDELEMENTHANDLER_H_
 
-#include "service/berryIConfigurationElement.h"
-
-#include "berryExpression.h"
 #include "berryElementHandler.h"
-#include "berryExpressionConverter.h"
 
 namespace berry
 {
+
+struct IConfigurationElement;
+
+class Expression;
+class ExpressionConverter;
 
 class StandardElementHandler : public ElementHandler
 {
 
 public:
-  Expression::Pointer Create(ExpressionConverter* converter, SmartPointer<IConfigurationElement> element);
+  SmartPointer<Expression> Create(ExpressionConverter* converter, SmartPointer<IConfigurationElement> element);
 
-  Expression::Pointer Create(ExpressionConverter* converter, Poco::XML::Element* element);
+  SmartPointer<Expression> Create(ExpressionConverter* converter, Poco::XML::Element* element);
 };
 
 }  // namespace berry

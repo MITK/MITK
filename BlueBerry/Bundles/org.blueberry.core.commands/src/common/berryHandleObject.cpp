@@ -20,11 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const std::size_t HandleObject::HASH_CODE_NOT_COMPUTED = 0;
-const std::size_t HandleObject::HASH_FACTOR = 89;
-const std::size_t HandleObject::HASH_INITIAL = Poco::hash("berry::HandleObject");
+const uint HandleObject::HASH_CODE_NOT_COMPUTED = 0;
+const uint HandleObject::HASH_FACTOR = 89;
+const uint HandleObject::HASH_INITIAL = qHash(HandleObject::GetStaticClassName());
 
-HandleObject::HandleObject(const std::string& ID) :
+HandleObject::HandleObject(const QString& ID) :
   hashCode(HASH_CODE_NOT_COMPUTED), defined(false), id(ID)
 {
 }
@@ -47,7 +47,7 @@ bool HandleObject::operator==(const Object* object) const
   return false;
 }
 
-std::string HandleObject::GetId() const
+QString HandleObject::GetId() const
 {
   return id;
 }

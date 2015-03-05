@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSimulation.h"
 #include "mitkSimulationSerializer.h"
-#include "mitkSimulationWriter.h"
+#include <mitkIOUtil.h>
 
 MITK_REGISTER_SERIALIZER(SimulationSerializer)
 
@@ -46,10 +46,7 @@ std::string mitk::SimulationSerializer::Serialize()
 
   try
   {
-    SimulationWriter::Pointer writer = SimulationWriter::New();
-    writer->SetFileName(fullPath.c_str());
-    writer->SetInput(const_cast<Simulation*>(simulation));
-    writer->Write();
+    IOUtil::Save(const_cast<Simulation*>(simulation), fullPath);
   }
   catch (const std::exception& e)
   {

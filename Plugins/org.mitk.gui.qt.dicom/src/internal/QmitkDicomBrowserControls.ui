@@ -287,13 +287,13 @@
   <customwidget>
    <class>QmitkDicomLocalStorageWidget</class>
    <extends>QWidget</extends>
-   <header>Qmitk/QmitkDicomLocalStorageWidget.h</header>
+   <header>QmitkDicomLocalStorageWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QmitkDicomExternalDataWidget</class>
    <extends>QWidget</extends>
-   <header>Qmitk/QmitkDicomExternalDataWidget.h</header>
+   <header>QmitkDicomExternalDataWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

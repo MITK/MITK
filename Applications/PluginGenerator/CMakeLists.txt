@@ -1,5 +1,5 @@
 if (${CMAKE_SOURCE_DIR} EQUAL ${PROJECT_SOURCE_DIR})
-  cmake_minimum_required(VERSION 2.8.9)
+  cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 endif()
 
 project(MitkPluginGenerator)
@@ -80,7 +80,7 @@ endif()
 
 if(NOT standalone_build)
   # Test the plugin generator
-  include(mitkTestPluginGenerator)
+  # include(mitkTestPluginGenerator)
 endif()
 
 #-----------------------------------------------------------------------------

@@ -74,7 +74,7 @@ struct DiffusionImageMosaicDICOMHeaderInformation
  *
  * To provide a diffusion header reader for a new vendor, reimplement the \sa ReadDiffusionHeader method.
  */
-class MitkDiffusionCore_EXPORT DiffusionHeaderDICOMFileReader
+class MITKDIFFUSIONCORE_EXPORT DiffusionHeaderDICOMFileReader
     : public itk::LightObject
 {
 public:

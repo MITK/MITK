@@ -3,10 +3,8 @@ mitkMacroGetPMDPlatformString(_PLATFORM_STRING)
 
 MITK_CREATE_MODULE(
   SUBPROJECTS MITK-ToF
-  INCLUDE_DIRS ${MITK_BIN_DIR}
-  INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   DEPENDS MitkOpenCVVideoSupport MitkIGTBase MitkLegacyAdaptors MitkCameraCalibration
-  EXPORT_DEFINE MITK_TOFHARDWARE_EXPORT
+  PACKAGE_DEPENDS ITK|ITKIONRRD
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
 )
 
@@ -27,7 +25,7 @@ add_subdirectory(MesaSR4000)
 include(${CMAKE_CURRENT_SOURCE_DIR}/mitkToFHardwareInstallRules.cmake)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/mitkToFHardwareInstallRules.cmake
-               ${PROJECT_BINARY_DIR}/mitkToFHardwareInstallRules.cmake @COPYONLY)
+               ${PROJECT_BINARY_DIR}/mitkToFHardwareInstallRules.cmake COPYONLY)
 CONFIGURE_FILE(mitkToFConfig.h.in ${PROJECT_BINARY_DIR}/mitkToFConfig.h @ONLY)
 
 #foreach(tofhardwaresubfolder_dir ${tofhardwaresubfolder_dirs})

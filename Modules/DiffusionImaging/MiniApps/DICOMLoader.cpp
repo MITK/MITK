@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkBaseDataIOFactory.h"
 #include "mitkImage.h"
 #include "mitkBaseData.h"
 #include <mitkDiffusionPropertyHelper.h>
@@ -167,8 +166,14 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("inputdir", "i", mitkCommandLineParser::String, "Input Directory" ,"input directory containing dicom files", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::String, "Output File Name", "output file", us::Any(), false);
+
+  parser.setTitle("Diffusion Dicom Loader");
+  parser.setCategory("Preprocessing Tools");
+  parser.setDescription("Loads Diffusion Dicom files.");
+  parser.setContributor("MBI");
+
+  parser.addArgument("inputdir", "i", mitkCommandLineParser::InputDirectory, "Input Directory" ,"input directory containing dicom files", us::Any(), false);
+  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output File Name", "output file", us::Any(), false);
   parser.addArgument("dwprefix", "p", mitkCommandLineParser::String, "Recursive Scan Prefix", "prefix for subfolders search rootdir is specified by the 'inputdir' argument value", us::Any(), true);
   parser.addArgument("dryrun", "-s", mitkCommandLineParser::Bool, "Dry run","do not read, only look for input files ", us::Any(), true );
 
@@ -186,9 +191,12 @@ int main(int argc, char* argv[])
   std::string subdir_prefix;
   if( parsedArgs.count("dwprefix"))
   {
-    MITK_INFO << "Prefix specified, will search for subdirs in the input directory!";
     subdir_prefix = us::any_cast<std::string>( parsedArgs["dwprefix"] );
-    search_for_subdirs = true;
+    if (subdir_prefix != "")
+    {
+      MITK_INFO << "Prefix specified, will search for subdirs in the input directory!";
+      search_for_subdirs = true;
+    }
   }
 
   // retrieve the output

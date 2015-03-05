@@ -17,7 +17,7 @@ namespace mitk
   ///
   /// prints the EndoDebug to xml
   ///
-  class MitkCameraCalibration_EXPORT EndoDebugToXmlFile:
+  class MITKCAMERACALIBRATION_EXPORT EndoDebugToXmlFile:
     virtual public mitk::Algorithm
   {
   public:

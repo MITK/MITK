@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "berryQtGlobalEventFilter.h"
+#include "berryShell.h"
 #include "internal/berryQtControlWidget.h"
 
 #include <QEvent>

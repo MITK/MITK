@@ -38,9 +38,9 @@ class BERRY_UI_QT QtViewPart : public ViewPart
 
 public:
 
-  berryObjectMacro(QtViewPart);
+  berryObjectMacro(QtViewPart)
 
-  void CreatePartControl(void* parent);
+  void CreatePartControl(QWidget* parent);
 
 protected:
 

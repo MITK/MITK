@@ -35,7 +35,6 @@ class BERRY_UITEST_EXPORT UITestApplication: public QObject, public IApplication
 public:
 
   UITestApplication();
-  UITestApplication(const UITestApplication& other);
 
   int Start();
 
@@ -50,20 +49,20 @@ private:
 
   TestableObject::Pointer testableObject;
   int testDriverResult;
-  std::string testPlugin;
+  QString testPlugin;
 
   /*
    * return the application to run, or null if not even the default application
    * is found.
    */
-  IApplication* GetApplication() throw (CoreException);
+  IApplication* GetApplication();
 
   /**
    * The -BlueBerry.testApplication argument specifies the application to be run.
    * If the argument is not set, an empty string is returned and the UITestApplication
    * itself will be started.
    */
-  std::string GetApplicationToRun();
+  QString GetApplicationToRun();
 
   int RunApplication(IApplication* application);
 
@@ -71,13 +70,13 @@ private:
 
   struct TestRunnable: public Poco::Runnable
   {
-    TestRunnable(UITestApplication* app, const std::string& testPlugin);
+    TestRunnable(UITestApplication* app, const QString& testPlugin);
 
     void run();
 
   private:
     UITestApplication* app;
-    std::string testPlugin;
+    QString testPlugin;
   };
 };
 

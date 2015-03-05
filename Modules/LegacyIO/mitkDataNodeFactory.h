@@ -41,7 +41,7 @@ namespace mitk
 * @ingroup MitkLegacyIOModule
 * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 */
-class MitkLegacyIO_EXPORT DataNodeFactory : public DataNodeSource, public FileSeriesReader
+class MITKLEGACYIO_EXPORT DataNodeFactory : public DataNodeSource, public FileSeriesReader
 {
 public:
 

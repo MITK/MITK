@@ -24,7 +24,7 @@ namespace mitk {
 
 /** @brief A simple implementation of a layouter for 2D Overlays
  */
-class MitkOverlays_EXPORT Overlay2DLayouter : public mitk::AbstractOverlayLayouter {
+class MITKOVERLAYS_EXPORT Overlay2DLayouter : public mitk::AbstractOverlayLayouter {
 public:
   enum Alignment{TopLeft, Top, TopRight, BottomLeft, Bottom, BottomRight};
   mitkClassMacro(Overlay2DLayouter, mitk::AbstractOverlayLayouter);

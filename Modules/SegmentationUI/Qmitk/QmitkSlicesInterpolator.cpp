@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSelectableGLWidget.h"
 
 #include "mitkToolManager.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
@@ -454,7 +453,7 @@ void QmitkSlicesInterpolator::OnTimeChanged(itk::Object* sender, const itk::Even
   mitk::SliceNavigationController* slicer = dynamic_cast<mitk::SliceNavigationController*>(sender);
   Q_ASSERT(slicer);
 
-  m_TimeStep[slicer];
+  m_TimeStep[slicer] = slicer->GetTime()->GetPos();
 
   if (m_LastSNC == slicer)
   {
@@ -690,10 +689,10 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
         mitk::ExtractSliceFilter::Pointer diffslicewriter =  mitk::ExtractSliceFilter::New(reslice);
         diffslicewriter->SetInput( diffImage );
-        diffslicewriter->SetTimeStep( timeStep );
+        diffslicewriter->SetTimeStep( 0 );
         diffslicewriter->SetWorldGeometry(reslicePlane);
         diffslicewriter->SetVtkOutputRequest(true);
-        diffslicewriter->SetResliceTransformByGeometry( diffImage->GetTimeGeometry()->GetGeometryForTimeStep( timeStep ) );
+        diffslicewriter->SetResliceTransformByGeometry( diffImage->GetTimeGeometry()->GetGeometryForTimeStep( 0 ) );
 
         diffslicewriter->Modified();
         diffslicewriter->Update();
@@ -1029,6 +1028,7 @@ void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
     mitk::BaseRenderer* renderer = m_LastSNC->GetRenderer();
     if (renderer && renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)
     {
+      //TODO 18735: This cast always returns NULL, cuase GetWorldGeometry returns a Base Geometry?!?!?!
       const mitk::TimeGeometry* timeGeometry = dynamic_cast<const mitk::TimeGeometry*>( renderer->GetWorldGeometry() );
       if (timeGeometry)
       {

@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class MITK_OPENCVVIDEOSUPPORT_EXPORT CropOpenCVImageFilter : public AbstractOpenCVImageFilter
+class MITKOPENCVVIDEOSUPPORT_EXPORT CropOpenCVImageFilter : public AbstractOpenCVImageFilter
 {
 
 public:

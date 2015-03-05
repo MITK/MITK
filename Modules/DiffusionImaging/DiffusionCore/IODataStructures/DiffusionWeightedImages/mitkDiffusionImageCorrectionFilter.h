@@ -25,7 +25,7 @@ namespace mitk
 /**
  * @class DiffusionImageCorrectionFilter
  */
-class MitkDiffusionCore_EXPORT DiffusionImageCorrectionFilter
+class MITKDIFFUSIONCORE_EXPORT DiffusionImageCorrectionFilter
         : public ImageSource
 {
 public:

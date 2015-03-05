@@ -34,8 +34,8 @@ int main(int argc, char* argv[])
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("input", "i", mitkCommandLineParser::InputDirectory, "Input folder:", "Input folder",us::Any(),false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputDirectory, "Output folder:", "Output folder (ending with /)",us::Any(),false);
-  parser.addArgument("filename", "f", mitkCommandLineParser::String, "Output name:", "Output filename (incl. .nrrd)",us::Any(),false);
+  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file",us::Any(),false);
+
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
@@ -50,8 +50,7 @@ int main(int argc, char* argv[])
   }
 
   std::string inputFolder = us::any_cast<string>(parsedArgs["input"]);
-  std::string outputFolder = us::any_cast<string>(parsedArgs["output"]);
-  std::string outFileName = us::any_cast<string>(parsedArgs["filename"]);
+  std::string outFileName = us::any_cast<string>(parsedArgs["output"]);
 
   //check if DICOMTags have been set as property for mitk::Image
   mitk::DicomSeriesReader::FileNamesGrouping seriesInFiles = mitk::DicomSeriesReader::GetSeries( inputFolder, true );
@@ -82,7 +81,7 @@ int main(int argc, char* argv[])
         ++imageIter )
   {
     const mitk::Image::Pointer image = *imageIter;
-    mitk::IOUtil::SaveImage(image,outputFolder + outFileName);
+    mitk::IOUtil::SaveImage(image,outFileName);
   }
   return EXIT_SUCCESS;
 }

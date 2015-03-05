@@ -44,7 +44,7 @@ class QmitkAdaptiveRegionGrowingToolGUIControls;
 *
 */
 
-class MitkSegmentationUI_EXPORT QmitkAdaptiveRegionGrowingToolGUI : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkAdaptiveRegionGrowingToolGUI : public QmitkToolGUI
 {
 
   Q_OBJECT

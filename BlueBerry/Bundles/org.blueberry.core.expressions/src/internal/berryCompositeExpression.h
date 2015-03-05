@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryEvaluationResult.h"
 #include "berryIEvaluationContext.h"
 
-#include <vector>
 
 namespace berry
 {
@@ -38,23 +37,23 @@ private:
   /**
    * The seed for the hash code for all composite expressions.
    */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
 protected:
-  std::vector<Expression::Pointer> fExpressions;
+  QList<Expression::Pointer> fExpressions;
 
-  virtual EvaluationResult EvaluateAnd(IEvaluationContext* scope);
-  virtual EvaluationResult EvaluateOr(IEvaluationContext* scope);
+  virtual EvaluationResult::ConstPointer EvaluateAnd(IEvaluationContext* scope) const;
+  virtual EvaluationResult::ConstPointer EvaluateOr(IEvaluationContext* scope) const;
 
-  virtual std::size_t ComputeHashCode();
+  virtual uint ComputeHashCode() const;
 
 public:
 
   virtual void Add(Expression::Pointer expression);
 
-  virtual void GetChildren(std::vector<Expression::Pointer>& children);
+  virtual QList<Expression::Pointer> GetChildren();
 
-  virtual void CollectExpressionInfo(ExpressionInfo* info);
+  virtual void CollectExpressionInfo(ExpressionInfo* info) const;
 
 };
 

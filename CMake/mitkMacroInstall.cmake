@@ -112,7 +112,7 @@ macro(_fixup_target)
 
     if(NOT APPLE)
       macro(gp_resolve_item_override context item exepath dirs resolved_item_var resolved_var)
-        if(\${item} MATCHES \"blueberry_osgi\")
+        if(\${item} MATCHES \"blueberry_core_runtime\")
           get_filename_component(_item_name \${item} NAME)
           set(\${resolved_item_var} \"\${exepath}/plugins/\${_item_name}\")
           set(\${resolved_var} 1)
@@ -122,9 +122,9 @@ macro(_fixup_target)
 
     if(\"${_install_GLOB_PLUGINS}\" STREQUAL \"TRUE\")
       set(GLOBBED_PLUGINS )
-      set(_bb_osgi_lib \"\${_bin_path}/liborg_blueberry_osgi${CMAKE_SHARED_LIBRARY_SUFFIX}\")
-      if(EXISTS \"\${_bb_osgi_lib}\")
-        list(APPEND GLOBBED_PLUGINS \"\${_bb_osgi_lib}\")
+      set(_bb_runtime_lib \"\${_bin_path}/liborg_blueberry_core_runtime${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+      if(EXISTS \"\${_bb_runtime_lib}\")
+        list(APPEND GLOBBED_PLUGINS \"\${_bb_runtime_lib}\")
       endif()
 
       # Iterate over all sub-directories which contain plug-ins

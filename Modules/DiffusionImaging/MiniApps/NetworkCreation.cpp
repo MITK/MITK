@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 
 // MITK includes
-#include <mitkBaseDataIOFactory.h>
 #include "mitkConnectomicsNetworkCreator.h"
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
@@ -29,6 +28,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
+
+  parser.setTitle("Network Creation");
+  parser.setCategory("Connectomics");
+  parser.setDescription("");
+  parser.setContributor("MBI");
+
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("fiberImage", "f", mitkCommandLineParser::InputFile, "Input image", "input fiber image (.fib)", us::Any(), false);
   parser.addArgument("parcellation", "p", mitkCommandLineParser::InputFile, "Parcellation image", "parcellation image", us::Any(), false);
@@ -69,7 +74,7 @@ int main(int argc, char* argv[])
 
     // load fiber image
     std::vector<mitk::BaseData::Pointer> fiberInfile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( fiberFilename, s1, s2, false );
+      mitk::IOUtil::Load( fiberFilename);
     if( fiberInfile.empty() )
     {
       std::string errorMessage = "Fiber Image at " + fiberFilename + " could not be read. Aborting.";
@@ -77,11 +82,11 @@ int main(int argc, char* argv[])
       return EXIT_FAILURE;
     }
     mitk::BaseData* fiberBaseData = fiberInfile.at(0);
-    mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*>( fiberBaseData );
+    mitk::FiberBundle* fiberBundle = dynamic_cast<mitk::FiberBundle*>( fiberBaseData );
 
     // load parcellation
     std::vector<mitk::BaseData::Pointer> parcellationInFile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( parcellationFilename, s1, s2, false );
+      mitk::IOUtil::Load( parcellationFilename);
     if( parcellationInFile.empty() )
     {
       std::string errorMessage = "Parcellation at " + parcellationFilename + " could not be read. Aborting.";

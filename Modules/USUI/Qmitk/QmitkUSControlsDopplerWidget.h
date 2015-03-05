@@ -31,7 +31,7 @@ class QmitkUSControlsDopplerWidget;
   * This class handles the mitk::USControlInterfaceDoppler of mitk::USDevice
   * objects.
   */
-class MitkUSUI_EXPORT QmitkUSControlsDopplerWidget : public QWidget
+class MITKUSUI_EXPORT QmitkUSControlsDopplerWidget : public QWidget
 {
     Q_OBJECT
 

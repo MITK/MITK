@@ -31,7 +31,7 @@ class Image;
 
   This class is undocumented. Ask the creator ($Author$) to supply useful comments.
 */
-class MitkSegmentation_EXPORT AutoSegmentationTool : public Tool
+class MITKSEGMENTATION_EXPORT AutoSegmentationTool : public Tool
 {
   public:
 

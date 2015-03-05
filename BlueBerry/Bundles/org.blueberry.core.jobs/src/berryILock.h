@@ -66,7 +66,7 @@ namespace berry
 struct BERRY_JOBS ILock: public Object
 {
 
-  berryInterfaceMacro(ILock, berry);
+  berryObjectMacro(berry::ILock)
 
   /**
    * Attempts to acquire this lock.  If the lock is in use and the specified delay is

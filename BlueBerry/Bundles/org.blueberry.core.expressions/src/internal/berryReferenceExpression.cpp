@@ -18,11 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpressions.h"
 
+#include <berryIConfigurationElement.h>
+#include <berryCoreException.h>
+
 #include "Poco/Hash.h"
 
 namespace berry {
 
-const std::string ReferenceExpression::ATT_DEFINITION_ID= "definitionId";
+const QString ReferenceExpression::ATT_DEFINITION_ID= "definitionId";
 const std::size_t ReferenceExpression::HASH_INITIAL= Poco::Hash<std::string>()("berry::ReferenceExpression");
 
 DefinitionRegistry ReferenceExpression::fgDefinitionRegistry = DefinitionRegistry();
@@ -33,39 +36,39 @@ ReferenceExpression::GetDefinitionRegistry()
   return fgDefinitionRegistry;
 }
 
-ReferenceExpression::ReferenceExpression(const std::string& definitionId)
+ReferenceExpression::ReferenceExpression(const QString &definitionId)
 {
   fDefinitionId= definitionId;
 }
 
 ReferenceExpression::ReferenceExpression(IConfigurationElement::Pointer element)
 {
-  bool result = element->GetAttribute(ATT_DEFINITION_ID, fDefinitionId);
-  Expressions::CheckAttribute(ATT_DEFINITION_ID, result);
+  fDefinitionId = element->GetAttribute(ATT_DEFINITION_ID);
+  Expressions::CheckAttribute(ATT_DEFINITION_ID, fDefinitionId);
 }
 
 ReferenceExpression::ReferenceExpression(Poco::XML::Element* element)
 {
-  fDefinitionId = element->getAttribute(ATT_DEFINITION_ID);
-  Expressions::CheckAttribute(ATT_DEFINITION_ID, fDefinitionId.size() > 0);
+  fDefinitionId = QString::fromStdString(element->getAttribute(ATT_DEFINITION_ID.toStdString()));
+  Expressions::CheckAttribute(ATT_DEFINITION_ID, fDefinitionId.size() > 0 ? fDefinitionId : QString());
 }
 
-EvaluationResult
-ReferenceExpression::Evaluate(IEvaluationContext* context)
+EvaluationResult::ConstPointer
+ReferenceExpression::Evaluate(IEvaluationContext* context) const
 {
   Expression::Pointer expr= GetDefinitionRegistry().GetExpression(fDefinitionId);
   return expr->Evaluate(context);
 }
 
 void
-ReferenceExpression::CollectExpressionInfo(ExpressionInfo* info)
+ReferenceExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   Expression::Pointer expr;
   try
   {
     expr= GetDefinitionRegistry().GetExpression(fDefinitionId);
   }
-  catch (CoreException e)
+  catch (const CoreException& /*e*/)
   {
     // We didn't find the expression definition. So no
     // expression info can be collected.
@@ -75,22 +78,19 @@ ReferenceExpression::CollectExpressionInfo(ExpressionInfo* info)
 }
 
 bool
-ReferenceExpression::operator==(Expression& object)
+ReferenceExpression::operator==(const Object* object) const
 {
-  try {
-    ReferenceExpression& that = dynamic_cast<ReferenceExpression&>(object);
-    return this->fDefinitionId == that.fDefinitionId;
-  }
-  catch (std::bad_cast)
+  if (const ReferenceExpression* that = dynamic_cast<const ReferenceExpression*>(object))
   {
-    return false;
+    return this->fDefinitionId == that->fDefinitionId;
   }
+  return false;
 }
 
-std::size_t
-ReferenceExpression::ComputeHashCode()
+uint
+ReferenceExpression::ComputeHashCode() const
 {
-  return HASH_INITIAL * HASH_FACTOR + Poco::Hash<std::string>()(fDefinitionId);
+  return HASH_INITIAL * HASH_FACTOR + Poco::Hash<std::string>()(fDefinitionId.toStdString());
 }
 
 }

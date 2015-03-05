@@ -1,7 +1,17 @@
 function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
 
-  set(_dir_candidates ${MITK_VTK_LIBRARY_DIRS} ${MITK_ITK_LIBRARY_DIRS}
-                      "${MITK_BINARY_DIR}/bin" "${MITK_BINARY_DIR}/bin/plugins")
+  set(_dir_candidates
+      "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+      "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
+      "${MITK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+      "${MITK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}/plugins"
+     )
+  if(MITK_EXTERNAL_PROJECT_PREFIX)
+    list(APPEND _dir_candidates
+         "${MITK_EXTERNAL_PROJECT_PREFIX}/bin"
+         "${MITK_EXTERNAL_PROJECT_PREFIX}/lib"
+        )
+  endif()
 
   # Determine the Qt4/5 library installation prefix
   set(_qmake_location )
@@ -37,94 +47,41 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     list(APPEND _dir_candidates ${_additional_paths})
   endif()
 
-  if(VTK_DIR)
-    find_package(VTK QUIET)
-    if(VTK_RUNTIME_LIBRARY_DIRS)
-      list(APPEND _dir_candidates ${VTK_RUNTIME_LIBRARY_DIRS})
-    endif()
-  endif()
-
-
   # The code below is sub-optimal. It makes assumptions about
   # the structure of the build directories, pointed to by
   # the *_DIR variables. Instead, we should rely on package
   # specific "LIBRARY_DIRS" variables, if they exist.
 
   if(WIN32)
-    if(DCMTK_DIR)
-      list(APPEND _dir_candidates "${DCMTK_DIR}/bin")
-    endif()
-    if(OpenCV_DIR)
-      list(APPEND _dir_candidates "${OpenCV_DIR}/bin")
-    endif()
     if(SOFA_DIR)
       list(APPEND _dir_candidates "${SOFA_DIR}/bin")
     endif()
-    if(Python_DIR)
-      list(APPEND _dir_candidates "${Python_DIR}/bin")
-    endif()
-    if(SimpleITK_DIR)
-      list(APPEND _dir_candidates "${SimpleITK_DIR}/bin")
-    endif()
-    if(REDLAND_INSTALL_DIR)
-      list(APPEND _dir_candidates "${REDLAND_INSTALL_DIR}/bin")
-    endif()
-    list(APPEND _dir_candidates "${ITK_DIR}/bin")
   else()
-    if(DCMTK_DIR)
-      list(APPEND _dir_candidates "${DCMTK_DIR}/lib")
-    endif()
-    if(OpenCV_DIR)
-      list(APPEND _dir_candidates "${OpenCV_DIR}/lib")
-    endif()
     if(SOFA_DIR)
       list(APPEND _dir_candidates "${SOFA_DIR}/lib")
     endif()
-    if(Python_DIR)
-      list(APPEND _dir_candidates "${Python_DIR}/lib")
+  endif()
+
+  if(OpenCV_DIR)
+    set(_opencv_link_directories
+      "${OpenCV_LIB_DIR_DBG}"
+      "${OpenCV_LIB_DIR_OPT}"
+      "${OpenCV_3RDPARTY_LIB_DIR_DBG}"
+      "${OpenCV_3RDPARTY_LIB_DIR_OPT}")
+    list(REMOVE_DUPLICATES _opencv_link_directories)
+    if(WIN32)
+      foreach(_opencv_link_directory ${_opencv_link_directories})
+        list(APPEND _dir_candidates "${_opencv_link_directory}/../bin")
+      endforeach()
+    else()
+      list(APPEND _dir_candidates ${_opencv_link_directories})
     endif()
-    if(SimpleITK_DIR)
-      list(APPEND _dir_candidates "${SimpleITK_DIR}/lib")
-    endif()
-    if(REDLAND_INSTALL_DIR)
-      list(APPEND _dir_candidates "${REDLAND_INSTALL_DIR}/lib")
-    endif()
-    list(APPEND _dir_candidates "${ITK_DIR}/lib")
   endif()
 
   if(MITK_USE_Python AND CTK_PYTHONQT_INSTALL_DIR)
     list(APPEND _dir_candidates "${CTK_PYTHONQT_INSTALL_DIR}/bin")
   endif()
-  if(MITK_USE_Boost AND MITK_USE_Boost_LIBRARIES AND NOT MITK_USE_SYSTEM_Boost)
-    list(APPEND _dir_candidates "${Boost_LIBRARY_DIR}")
-  endif()
-  if(ACVD_DIR)
-    list(APPEND _dir_candidates "${ACVD_DIR}/bin")
-  endif()
-  if(ANN_DIR)
-    list(APPEND _dir_candidates "${ANN_DIR}")
-  endif()
-  if(CppUnit_DIR)
-    list(APPEND _dir_candidates "${CppUnit_DIR}")
-  endif()
-  if(GLUT_DIR)
-    list(APPEND _dir_candidates "${GLUT_DIR}")
-  endif()
-  if(GDCM_DIR)
-    list(APPEND _dir_candidates "${GDCM_DIR}/bin")
-  endif()
-  if(GLEW_DIR)
-    list(APPEND _dir_candidates "${GLEW_DIR}")
-  endif()
-  if(tinyxml_DIR)
-    list(APPEND _dir_candidates "${tinyxml_DIR}")
-  endif()
-  if(Poco_DIR)
-    list(APPEND _dir_candidates "${Poco_DIR}/lib")
-  endif()
-  if(Qwt_DIR)
-    list(APPEND _dir_candidates "${Qwt_DIR}")
-  endif()
+
   if(MITK_USE_TOF_PMDO3 OR MITK_USE_TOF_PMDCAMCUBE OR MITK_USE_TOF_PMDCAMBOARD)
     list(APPEND _dir_candidates "${MITK_PMD_SDK_DIR}/plugins" "${MITK_PMD_SDK_DIR}/bin")
   endif()

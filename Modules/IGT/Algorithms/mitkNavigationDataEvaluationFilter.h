@@ -32,7 +32,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataEvaluationFilter : public NavigationDataToNavigationDataFilter
+  class MITKIGT_EXPORT NavigationDataEvaluationFilter : public NavigationDataToNavigationDataFilter
   {
 
   public:

@@ -33,7 +33,7 @@ namespace mitk
 
     /**
   * \brief A class to generate synthetic networks */
-  class MitkConnectomics_EXPORT ConnectomicsSyntheticNetworkGenerator : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsSyntheticNetworkGenerator : public itk::Object
   {
   public:
 

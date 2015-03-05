@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
@@ -37,7 +36,7 @@ int main(int argc, char* argv[])
 
     parser.setTitle("Fiber Direction Extraction");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription("");
+    parser.setDescription(" ");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
@@ -89,7 +88,7 @@ int main(int argc, char* argv[])
         typedef itk::VectorContainer< unsigned int, ItkDirectionImage3DType::Pointer >   ItkDirectionImageContainerType;
 
         // load fiber bundle
-        mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
+        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
 
         // load/create mask image
         ItkUcharImgType::Pointer itkMaskImage = NULL;
@@ -133,7 +132,7 @@ int main(int argc, char* argv[])
         if (verbose)
         {
             // write vector field
-            mitk::FiberBundleX::Pointer directions = fOdfFilter->GetOutputFiberBundle();
+            mitk::FiberBundle::Pointer directions = fOdfFilter->GetOutputFiberBundle();
 
             string outfilename = outRoot;
             outfilename.append("_VECTOR_FIELD.fib");

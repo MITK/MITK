@@ -16,9 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSImageLoggingFilter.h"
 #include <mitkIOUtil.h>
-#include <mitkImageWriter.h>
 #include <mitkUIDGenerator.h>
 #include <Poco/Path.h>
+
+#include <algorithm>
+#include <mitkIOMimeTypes.h>
+#include <mitkCoreServices.h>
+#include <mitkIMimeTypeProvider.h>
+
 
 mitk::USImageLoggingFilter::USImageLoggingFilter() : m_SystemTimeClock(RealTimeClock::New()),
                                                      m_ImageExtension(".nrrd")
@@ -140,15 +145,21 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
 
 bool mitk::USImageLoggingFilter::SetImageFilesExtension(std::string extension)
  {
- mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
- if(!imageWriter->IsExtensionValid(extension))
+  if(extension.compare(0,1,".") == 0)
+    extension = extension.substr(1,extension.size()-1);
+
+  CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(CoreServices::GetMimeTypeProvider());
+
+  std::vector<MimeType> mimeTypes = mimeTypeProvider->GetMimeTypesForCategory(IOMimeTypes::CATEGORY_IMAGES());
+
+  for(std::vector<MimeType>::size_type i = 0 ; i< mimeTypes.size() ; ++i)
   {
-  MITK_WARN << "Extension " << extension << " is not supported; still using " << m_ImageExtension << " as before.";
+    std::vector<std::string> extensions = mimeTypes[i].GetExtensions();
+    if (std::find(extensions.begin(), extensions.end(), extension) != extensions.end())
+    {
+      m_ImageExtension = "."+extension;
+      return true;
+    }
+  }
   return false;
-  }
- else
-  {
-  m_ImageExtension = extension;
-  return true;
-  }
  }

@@ -41,7 +41,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT MicroBirdTrackingDevice : public TrackingDevice
+  class MITKIGT_EXPORT MicroBirdTrackingDevice : public TrackingDevice
   {
   public:
     mitkClassMacro(MicroBirdTrackingDevice, TrackingDevice);

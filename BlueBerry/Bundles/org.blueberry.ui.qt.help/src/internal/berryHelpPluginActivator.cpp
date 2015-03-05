@@ -42,8 +42,10 @@ public:
 
   Events::Types GetPerspectiveEventTypes() const;
 
-  void PerspectiveOpened(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective);
-  void PerspectiveChanged(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective, const std::string &changeId);
+  using IPerspectiveListener::PerspectiveChanged;
+
+  void PerspectiveOpened(const SmartPointer<IWorkbenchPage>& page, const IPerspectiveDescriptor::Pointer& perspective);
+  void PerspectiveChanged(const SmartPointer<IWorkbenchPage>& page, const IPerspectiveDescriptor::Pointer& perspective, const QString &changeId);
 };
 
 class HelpWindowListener : public IWindowListener
@@ -53,13 +55,13 @@ public:
   HelpWindowListener();
   ~HelpWindowListener();
 
-  void WindowClosed(IWorkbenchWindow::Pointer window);
-  void WindowOpened(IWorkbenchWindow::Pointer window);
+  void WindowClosed(const IWorkbenchWindow::Pointer& window);
+  void WindowOpened(const IWorkbenchWindow::Pointer& window);
 
 private:
 
   // We use the same perspective listener for every window
-  IPerspectiveListener::Pointer perspListener;
+  QScopedPointer<IPerspectiveListener> perspListener;
 };
 
 
@@ -107,8 +109,8 @@ HelpPluginActivator::start(ctkPluginContext* context)
   // Register a wnd listener which registers a perspective listener for each
   // new window. The perspective listener opens the help home page in the window
   // if no other help page is opened yet.
-  wndListener = IWindowListener::Pointer(new HelpWindowListener());
-  PlatformUI::GetWorkbench()->AddWindowListener(wndListener);
+  wndListener.reset(new HelpWindowListener());
+  PlatformUI::GetWorkbench()->AddWindowListener(wndListener.data());
 
   // Register an event handler for CONTEXTHELP_REQUESTED events
   helpContextHandler.reset(new HelpContextHandler);
@@ -125,9 +127,9 @@ HelpPluginActivator::stop(ctkPluginContext* /*context*/)
 
   if (PlatformUI::IsWorkbenchRunning())
   {
-    PlatformUI::GetWorkbench()->RemoveWindowListener(wndListener);
+    PlatformUI::GetWorkbench()->RemoveWindowListener(wndListener.data());
   }
-  wndListener = 0;
+  wndListener.reset();
 }
 
 HelpPluginActivator *HelpPluginActivator::getInstance()
@@ -163,7 +165,7 @@ void HelpPluginActivator::linkActivated(IWorkbenchPage::Pointer page, const QUrl
     else
     {
       // get the last used HelpEditor instance
-      std::vector<IEditorReference::Pointer> editors =
+      QList<IEditorReference::Pointer> editors =
           page->FindEditors(IEditorInput::Pointer(0), HelpEditor::EDITOR_ID, IWorkbenchPage::MATCH_ID);
       if (editors.empty())
       {
@@ -213,12 +215,14 @@ void QCHPluginListener::pluginChanged(const ctkPluginEvent& event)
   QSharedPointer<ctkPlugin> plugin = event.getPlugin();
   switch (event.getType())
   {
-    case ctkPluginEvent::RESOLVED :
-      addPlugin(plugin);
-      break;
-    case ctkPluginEvent::UNRESOLVED :
-      removePlugin(plugin);
-      break;
+  case ctkPluginEvent::RESOLVED :
+    addPlugin(plugin);
+    break;
+  case ctkPluginEvent::UNRESOLVED :
+    removePlugin(plugin);
+    break;
+  default:
+    break;
   }
 }
 
@@ -336,7 +340,7 @@ IPerspectiveListener::Events::Types HelpPerspectiveListener::GetPerspectiveEvent
   return Events::OPENED | Events::CHANGED;
 }
 
-void HelpPerspectiveListener::PerspectiveOpened(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective)
+void HelpPerspectiveListener::PerspectiveOpened(const SmartPointer<IWorkbenchPage>& page, const IPerspectiveDescriptor::Pointer& perspective)
 {
   // if no help editor is opened, open one showing the home page
   if (perspective->GetId() == HelpPerspective::ID &&
@@ -347,7 +351,7 @@ void HelpPerspectiveListener::PerspectiveOpened(SmartPointer<IWorkbenchPage> pag
   }
 }
 
-void HelpPerspectiveListener::PerspectiveChanged(SmartPointer<IWorkbenchPage> page, IPerspectiveDescriptor::Pointer perspective, const std::string &changeId)
+void HelpPerspectiveListener::PerspectiveChanged(const SmartPointer<IWorkbenchPage>& page, const IPerspectiveDescriptor::Pointer& perspective, const QString &changeId)
 {
   if (perspective->GetId() == HelpPerspective::ID && changeId == IWorkbenchPage::CHANGE_RESET)
   {
@@ -359,32 +363,34 @@ HelpWindowListener::HelpWindowListener()
   : perspListener(new HelpPerspectiveListener())
 {
   // Register perspective listener for already opened windows
-  typedef std::vector<IWorkbenchWindow::Pointer> WndVec;
+  typedef QList<IWorkbenchWindow::Pointer> WndVec;
   WndVec windows = PlatformUI::GetWorkbench()->GetWorkbenchWindows();
   for (WndVec::iterator i = windows.begin(); i != windows.end(); ++i)
   {
-    (*i)->AddPerspectiveListener(perspListener);
+    (*i)->AddPerspectiveListener(perspListener.data());
   }
 }
 
 HelpWindowListener::~HelpWindowListener()
 {
-  typedef std::vector<IWorkbenchWindow::Pointer> WndVec;
+  if (!PlatformUI::IsWorkbenchRunning()) return;
+
+  typedef QList<IWorkbenchWindow::Pointer> WndVec;
   WndVec windows = PlatformUI::GetWorkbench()->GetWorkbenchWindows();
   for (WndVec::iterator i = windows.begin(); i != windows.end(); ++i)
   {
-    (*i)->RemovePerspectiveListener(perspListener);
+    (*i)->RemovePerspectiveListener(perspListener.data());
   }
 }
 
-void HelpWindowListener::WindowClosed(IWorkbenchWindow::Pointer window)
+void HelpWindowListener::WindowClosed(const IWorkbenchWindow::Pointer& window)
 {
-  window->RemovePerspectiveListener(perspListener);
+  window->RemovePerspectiveListener(perspListener.data());
 }
 
-void HelpWindowListener::WindowOpened(IWorkbenchWindow::Pointer window)
+void HelpWindowListener::WindowOpened(const IWorkbenchWindow::Pointer& window)
 {
-  window->AddPerspectiveListener(perspListener);
+  window->AddPerspectiveListener(perspListener.data());
 }
 
 void HelpContextHandler::handleEvent(const ctkEvent &event)
@@ -424,8 +430,8 @@ void HelpContextHandler::handleEvent(const ctkEvent &event)
             berry::IWorkbenchPart::Pointer currentPart = currentPage->GetActivePart();
             if (currentPart)
             {
-              QString pluginID = QString::fromStdString(currentPart->GetSite()->GetPluginId());
-              QString viewID = QString::fromStdString(currentPart->GetSite()->GetId());
+              QString pluginID = currentPart->GetSite()->GetPluginId();
+              QString viewID = currentPart->GetSite()->GetId();
               QString loc = "qthelp://" + pluginID + "/bundle/%1.html";
 
               QHelpEngineWrapper& helpEngine = HelpPluginActivator::getInstance()->getQHelpEngine();

@@ -24,20 +24,19 @@ class QmitkXnatObjectEditorInput : public berry::IEditorInput {
 
 public:
   berryObjectMacro(QmitkXnatObjectEditorInput);
-  berryNewMacro1Param(QmitkXnatObjectEditorInput, ctkXnatObject*);
 
+  QmitkXnatObjectEditorInput(ctkXnatObject* object);
   ~QmitkXnatObjectEditorInput();
 
   /// \brief Returns the kept ctkXnatObject.
   ctkXnatObject* GetXnatObject() const;
 
   virtual bool Exists() const;
-  virtual std::string GetName() const;
-  virtual std::string GetToolTipText() const;
+  virtual QString GetName() const;
+  virtual QString GetToolTipText() const;
   virtual bool operator==(const berry::Object* o) const;
 
 private:
-  QmitkXnatObjectEditorInput(ctkXnatObject* object);
 
   ctkXnatObject* m_Object;
 };

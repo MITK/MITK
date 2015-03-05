@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkStlVolumeTimeSeriesReader.h"
-#include "mitkSTLFileReader.h"
 #include "mitkSurface.h"
 #include "vtkPolyData.h"
+#include <mitkIOUtil.h>
 
 void mitk::StlVolumeTimeSeriesReader::GenerateData()
 {
@@ -28,28 +28,26 @@ void mitk::StlVolumeTimeSeriesReader::GenerateData()
     return ;
   }
 
-  mitk::Surface::Pointer surface = this->GetOutput();
+  mitk::Surface::Pointer result = this->GetOutput();
   MITK_INFO << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
-  surface->Expand(m_MatchedFileNames.size());
+  result->Expand(m_MatchedFileNames.size());
   for ( unsigned int i = 0 ; i < m_MatchedFileNames.size(); ++i )
   {
     std::string fileName = m_MatchedFileNames[i];
     MITK_INFO << "Loading " << fileName << " as stl..." << std::endl;
 
-    STLFileReader::Pointer stlReader = STLFileReader::New();
-    stlReader->SetFileName( fileName.c_str() );
-    stlReader->Update();
+    mitk::Surface::Pointer timestepSurface  = IOUtil::LoadSurface(fileName.c_str());
 
-    if ( stlReader->GetOutput() != NULL )
-    {
-      surface->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData(), i );
-    }
-    else
+    if (timestepSurface.IsNull())
     {
       itkWarningMacro(<< "stlReader returned NULL while reading " << fileName << ". Trying to continue with empty vtkPolyData...");
-      surface->SetVtkPolyData( vtkPolyData::New(), i );
+      result->SetVtkPolyData(vtkPolyData::New(), i);
+      return;
     }
+
+    result->SetVtkPolyData(timestepSurface->GetVtkPolyData(), i);
   }
+
 }
 
 bool mitk::StlVolumeTimeSeriesReader::CanReadFile(const std::string /*filename*/, const std::string filePrefix, const std::string filePattern)

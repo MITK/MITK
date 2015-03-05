@@ -31,7 +31,7 @@ namespace mitk
 {
   /**
   * \brief A class for thresholding connectomics networks */
-  class MitkConnectomics_EXPORT ConnectomicsNetworkThresholder : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsNetworkThresholder : public itk::Object
   {
   public:
 

@@ -37,6 +37,7 @@ TractDensityImageFilter< OutputImageType >::TractDensityImageFilter()
     , m_UseImageGeometry(false)
     , m_OutputAbsoluteValues(false)
     , m_UseTrilinearInterpolation(false)
+    , m_DoFiberResampling(true)
 {
 
 }
@@ -127,8 +128,11 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
         minSpacing = newSpacing[2];
 
     MITK_INFO << "TractDensityImageFilter: resampling fibers to ensure sufficient voxel coverage";
-    m_FiberBundle = m_FiberBundle->GetDeepCopy();
-    m_FiberBundle->ResampleSpline(minSpacing/10);
+    if (m_DoFiberResampling)
+    {
+        m_FiberBundle = m_FiberBundle->GetDeepCopy();
+        m_FiberBundle->ResampleSpline(minSpacing/10);
+    }
 
     MITK_INFO << "TractDensityImageFilter: starting image generation";
 
@@ -143,6 +147,7 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
         vtkIdType   numPoints(0);
         vtkIdType*  points(NULL);
         vLines->GetNextCell ( numPoints, points );
+        float weight = m_FiberBundle->GetFiberWeight(i);
 
         // fill output image
         for( int j=0; j<numPoints; j++)
@@ -158,7 +163,7 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
                 if (m_BinaryOutput)
                     outImage->SetPixel(index, 1);
                 else
-                    outImage->SetPixel(index, outImage->GetPixel(index)+0.01);
+                    outImage->SetPixel(index, outImage->GetPixel(index)+0.01*weight);
                 continue;
             }
 
@@ -228,7 +233,9 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
                 max = outImageBufferPointer[i];
         if (max>0)
             for (int i=0; i<w*h*d; i++)
+            {
                 outImageBufferPointer[i] /= max;
+            }
     }
     if (m_InvertImage)
     {

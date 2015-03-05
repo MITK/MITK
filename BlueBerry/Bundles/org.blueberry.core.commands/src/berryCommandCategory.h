@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "common/berryNamedHandleObject.h"
 #include "berryICommandCategoryListener.h"
 
+#include <org_blueberry_core_commands_Export.h>
+
 namespace berry
 {
 
@@ -29,10 +31,8 @@ namespace berry
  * category. The category has no functional effect, but may be used in graphical
  * tools that want to group the set of commands somehow.
  * </p>
- *
- * @since 3.1
  */
-class CommandCategory: public NamedHandleObject
+class BERRY_COMMANDS CommandCategory: public NamedHandleObject
 {
 
 public:
@@ -46,8 +46,7 @@ public:
    * @param categoryListener
    *            The listener to be added; must not be <code>null</code>.
    */
-void  AddCategoryListener(
-      ICommandCategoryListener::Pointer categoryListener);
+  void AddCategoryListener(ICommandCategoryListener* categoryListener);
 
   /**
    * <p>
@@ -63,7 +62,7 @@ void  AddCategoryListener(
    * @param description
    *            The description for this command; may be <code>null</code>.
    */
-  void Define(const std::string& name, const std::string& description);
+  void Define(const QString& name, const QString& description);
 
   /**
    * Removes a listener from this category.
@@ -72,15 +71,14 @@ void  AddCategoryListener(
    *            The listener to be removed; must not be <code>null</code>.
    *
    */
-  void RemoveCategoryListener(
-      ICommandCategoryListener::Pointer categoryListener);
+  void RemoveCategoryListener(ICommandCategoryListener* categoryListener);
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.core.commands.common.HandleObject#toString()
    */
-  std::string ToString();
+  QString ToString() const;
 
   /*
    * (non-Javadoc)
@@ -104,7 +102,7 @@ protected:
    *            <code>null</code>, and must be unique amongst all
    *            categories.
    */
-  CommandCategory(const std::string& id);
+  CommandCategory(const QString& id);
 
 private:
 

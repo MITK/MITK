@@ -19,13 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryLog.h"
 
+#include "ctkPluginFrameworkEvent.h"
+
 #include <QtCore/QAbstractTableModel>
 #include <QtCore/QDateTime>
 
-#include "event/berryPlatformEvent.h"
-#include "berryMessage.h"
-
-#include <vector>
 #include <ctime>
 #include <sstream>
 
@@ -64,7 +62,8 @@ public:
   QVariant headerData(int section, Qt::Orientation orientation, int) const;
 
   void addLogEntry(const mbilog::LogMessage &msg);
-  void addLogEntry(const PlatformEvent& event);
+
+  Q_SLOT void addLogEntry(const ctkPluginFrameworkEvent& event);
 
 private:
   bool m_ShowAdvancedFiels;
@@ -155,12 +154,6 @@ private:
 
   };
 
-
-
-  typedef MessageDelegate1<QtPlatformLogModel, const PlatformEvent&> PlatformEventDelegate;
-
-
-
   class QtLogBackend : public mbilog::BackendBase
   {
     public:
@@ -201,8 +194,8 @@ private:
 
   } *myBackend;
 
-  std::vector<ExtendedLogMessage> m_Entries;
-  std::list<ExtendedLogMessage> *m_Active,*m_Pending;
+  QList<ExtendedLogMessage> m_Entries;
+  QList<ExtendedLogMessage> *m_Active,*m_Pending;
 
   static const QString Error;
   static const QString Warn;

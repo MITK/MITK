@@ -25,7 +25,7 @@ namespace mitk {
   * \brief An object of this class represents an exception of the MITK-IGT module which are releated to the hardware (e.g. connection problems, etc.).
   *
   * \ingroup IGT
-  */  class MitkIGT_EXPORT IGTHardwareException : public mitk::IGTException
+  */  class MITKIGT_EXPORT IGTHardwareException : public mitk::IGTException
   {
   public:
     mitkExceptionClassMacro(IGTHardwareException,mitk::IGTException);

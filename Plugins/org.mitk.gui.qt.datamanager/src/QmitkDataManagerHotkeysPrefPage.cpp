@@ -44,8 +44,8 @@ void QmitkDataManagerHotkeysPrefPage::Init(berry::IWorkbench::Pointer )
 
 void QmitkDataManagerHotkeysPrefPage::CreateQtControl(QWidget* parent)
 {
-  IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
-  berry::IPreferences::Pointer _DataManagerHotkeysPreferencesNode = prefService->GetSystemPreferences()->Node("/Data Manager/Hotkeys");
+  IPreferencesService* prefService = Platform::GetPreferencesService();
+  berry::IPreferences::Pointer _DataManagerHotkeysPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
   m_DataManagerHotkeysPreferencesNode = _DataManagerHotkeysPreferencesNode;
 
   m_HotkeyEditors["Make all nodes invisible"] = new QmitkHotkeyLineEdit("Ctrl+, V");
@@ -125,8 +125,8 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
   //# no errors -> save all values and flush to file
     for (std::map<QString, QmitkHotkeyLineEdit*>::iterator it = m_HotkeyEditors.begin()
       ; it != m_HotkeyEditors.end(); ++it)
-      _DataManagerHotkeysPreferencesNode->Put(it->first.toStdString()
-        , it->second->GetKeySequenceAsString().toStdString());
+      _DataManagerHotkeysPreferencesNode->Put(it->first
+        , it->second->GetKeySequenceAsString());
 
     _DataManagerHotkeysPreferencesNode->Flush();
 
@@ -148,8 +148,7 @@ void QmitkDataManagerHotkeysPrefPage::Update()
     for (std::map<QString, QmitkHotkeyLineEdit*>::iterator it = m_HotkeyEditors.begin()
       ; it != m_HotkeyEditors.end(); ++it)
     {
-      it->second->setText(QString::fromStdString(_DataManagerHotkeysPreferencesNode->Get(it->first.toStdString()
-        , it->second->text().toStdString())));
+      it->second->setText(_DataManagerHotkeysPreferencesNode->Get(it->first, it->second->text()));
     }
   }
 }

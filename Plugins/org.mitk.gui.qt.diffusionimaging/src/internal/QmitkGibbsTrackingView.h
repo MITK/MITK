@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkQBallImage.h>
 #include <QThread>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <QTime>
 #include <itkImage.h>
 #include <vtkSmartPointer.h>
@@ -136,7 +136,7 @@ private:
 
   /** data objects */
   mitk::DataNode::Pointer       m_TrackingNode;     ///< actual node that is tracked
-  mitk::FiberBundleX::Pointer   m_FiberBundle;      ///< tracking output
+  mitk::FiberBundle::Pointer   m_FiberBundle;      ///< tracking output
   ItkFloatImageType::Pointer    m_MaskImage;        ///< used to reduce the algorithms search space. tracking only inside of the mask.
   mitk::TensorImage::Pointer    m_TensorImage;      ///< actual image that is tracked
   mitk::QBallImage::Pointer     m_QBallImage;       ///< actual image that is tracked

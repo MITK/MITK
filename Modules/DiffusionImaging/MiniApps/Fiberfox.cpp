@@ -18,9 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkProperties.h>
 #include <mitkImage.h>
-#include <mitkBaseDataIOFactory.h>
 #include <mitkIOUtil.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkFiberfoxParameters.h>
 #include "mitkCommandLineParser.h"
 
@@ -40,6 +39,10 @@ using namespace mitk;
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
+    parser.setTitle("FiberFox");
+    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setContributor("MBI");
+    parser.setDescription(" ");
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);
     parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameter file:", "fiberfox parameter file", us::Any(), false);
@@ -60,7 +63,7 @@ int main(int argc, char* argv[])
         FiberfoxParameters<double> parameters;
         parameters.LoadParameters(paramName);
 
-        mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
+        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
 
         itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
         tractsToDwiFilter->SetParameters(parameters);

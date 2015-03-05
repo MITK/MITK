@@ -53,7 +53,7 @@ class QmitkToolGUI;
 
   Last contributor: $Author: maleike $
 */
-class MitkSegmentationUI_EXPORT QmitkToolSelectionBox : public QWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkToolSelectionBox : public QWidget
 //!
 {
   Q_OBJECT

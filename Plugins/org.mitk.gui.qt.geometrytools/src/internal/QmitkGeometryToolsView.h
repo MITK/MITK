@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
   keyboard.
 
   \warning Scaling is not supported for images, yet, and will not happen in coordinate origin.
-  \warning Surfaces
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal

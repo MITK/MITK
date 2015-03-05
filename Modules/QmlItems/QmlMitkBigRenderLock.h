@@ -17,7 +17,7 @@
   in rendering thread safe. This solution is much more
   work though, so it will come later.
 */
-class MitkQmlItems_EXPORT QmlMitkBigRenderLock : public QObject
+class MITKQMLITEMS_EXPORT QmlMitkBigRenderLock : public QObject
 {
   Q_OBJECT
   public:

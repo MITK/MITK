@@ -6,7 +6,7 @@
 #
 function(mitkFunctionCheckMitkCompatibility)
 
-  macro_parse_arguments(_COMPAT "VERSIONS" "REQUIRED" ${ARGN})
+  cmake_parse_arguments(_COMPAT "REQUIRED" "" "VERSIONS" ${ARGN})
 
   set(_is_version_name 1)
   foreach(_item ${_COMPAT_VERSIONS})

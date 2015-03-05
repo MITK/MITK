@@ -17,12 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYIOBJECTWITHSTATE_H_
 #define BERRYIOBJECTWITHSTATE_H_
 
-#include <org_blueberry_core_commands_Export.h>
-#include "berryState.h"
+#include "berryObject.h"
 
-#include <vector>
+#include <org_blueberry_core_commands_Export.h>
 
 namespace berry {
+
+class State;
 
 /**
  * <p>
@@ -34,11 +35,11 @@ namespace berry {
  * </p>
  *
  * @see AbstractHandlerWithState
- * @since 3.2
  */
-struct BERRY_COMMANDS IObjectWithState : public virtual Object {
+struct BERRY_COMMANDS IObjectWithState : public virtual Object
+{
 
-  berryInterfaceMacro(IObjectWithState, berry);
+  berryObjectMacro(berry::IObjectWithState)
 
   /**
    * Adds state to this object.
@@ -50,7 +51,7 @@ struct BERRY_COMMANDS IObjectWithState : public virtual Object {
    *            The new state to add to this object; must not be
    *            <code>null</code>.
    */
-  virtual void AddState(const std::string& id, const State::Pointer state) = 0;
+  virtual void AddState(const QString& id, const SmartPointer<State>& state) = 0;
 
   /**
    * Gets the state with the given id.
@@ -61,7 +62,7 @@ struct BERRY_COMMANDS IObjectWithState : public virtual Object {
    * @return The state; may be <code>null</code> if there is no state with
    *         the given id.
    */
-  virtual State::Pointer GetState(const std::string& stateId) const = 0;
+  virtual SmartPointer<State> GetState(const QString& stateId) const = 0;
 
   /**
    * Gets the identifiers for all of the state associated with this object.
@@ -69,7 +70,7 @@ struct BERRY_COMMANDS IObjectWithState : public virtual Object {
    * @return All of the state identifiers; may be empty, but never
    *         <code>null</code>.
    */
-  virtual std::vector<std::string> GetStateIds() const = 0;
+  virtual QList<QString> GetStateIds() const = 0;
 
   /**
    * Removes state from this object.
@@ -78,7 +79,7 @@ struct BERRY_COMMANDS IObjectWithState : public virtual Object {
    *            The id of the state to remove from this object; must not be
    *            <code>null</code>.
    */
-  virtual void RemoveState(const std::string& stateId) = 0;
+  virtual void RemoveState(const QString& stateId) = 0;
 };
 
 }

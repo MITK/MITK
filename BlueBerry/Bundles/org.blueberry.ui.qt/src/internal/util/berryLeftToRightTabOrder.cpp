@@ -57,7 +57,7 @@ void LeftToRightTabOrder::Move(IPresentablePart::Pointer toMove, int newIndex)
   list->Move(toMove, newIndex);
 }
 
-std::vector<IPresentablePart::Pointer> LeftToRightTabOrder::GetPartList()
+QList<IPresentablePart::Pointer> LeftToRightTabOrder::GetPartList()
 {
   return list->GetPartList();
 }
@@ -65,15 +65,15 @@ std::vector<IPresentablePart::Pointer> LeftToRightTabOrder::GetPartList()
 void LeftToRightTabOrder::RestoreState(IPresentationSerializer* serializer,
     IMemento::Pointer savedState)
 {
-  std::vector<IMemento::Pointer> parts = savedState->GetChildren(
+  QList<IMemento::Pointer> parts = savedState->GetChildren(
       WorkbenchConstants::TAG_PART);
 
-  for (std::size_t idx = 0; idx < parts.size(); idx++)
+  for (int idx = 0; idx < parts.size(); idx++)
   {
-    std::string id;
+    QString id;
     parts[idx]->GetString(WorkbenchConstants::TAG_ID, id);
 
-    if (!id.empty())
+    if (!id.isEmpty())
     {
       IPresentablePart::Pointer part = serializer->GetPart(id);
 
@@ -88,9 +88,9 @@ void LeftToRightTabOrder::RestoreState(IPresentationSerializer* serializer,
 void LeftToRightTabOrder::SaveState(IPresentationSerializer* context,
     IMemento::Pointer memento)
 {
-  std::vector<IPresentablePart::Pointer> parts(list->GetPartList());
+  QList<IPresentablePart::Pointer> parts(list->GetPartList());
 
-  for (std::vector<IPresentablePart::Pointer>::iterator iter = parts.begin();
+  for (QList<IPresentablePart::Pointer>::iterator iter = parts.begin();
        iter != parts.end(); ++iter)
   {
     IMemento::Pointer childMem = memento->CreateChild(WorkbenchConstants::TAG_PART);

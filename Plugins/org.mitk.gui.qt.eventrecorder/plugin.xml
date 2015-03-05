@@ -5,7 +5,16 @@
     <view id="org.mitk.views.interactioneventrecorder"
           name="Interaction Event Recorder"
           class="InteractionEventRecorder"
-          icon="resources/icon.png" />
+          icon="resources/icon.png" >
+          <description>Records and plays interaction to test the GUI</description>
+          <keywordReference id="org.mitk.views.interactioneventrecorder.Keyword"/>
+    </view>
   </extension>
-
+  <extension point="org.blueberry.ui.keywords">
+    <keyword label="Testing" id="org.mitk.views.interactioneventrecorder.Keyword"/>
+    <keyword label="Recording" id="org.mitk.views.interactioneventrecorder.Keyword"/>
+    <keyword label="GUI" id="org.mitk.views.interactioneventrecorder.Keyword"/>
+    <keyword label="Interaction" id="org.mitk.views.interactioneventrecorder.Keyword"/>
+ </extension>
+ 
 </plugin>

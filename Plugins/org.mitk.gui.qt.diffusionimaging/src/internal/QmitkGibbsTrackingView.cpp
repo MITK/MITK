@@ -565,7 +565,7 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
     vtkSmartPointer<vtkPolyData> fiberBundle = m_GlobalTracker->GetFiberBundle();
     if ( m_GlobalTracker->GetNumAcceptedFibers()==0 )
         return;
-    m_FiberBundle = mitk::FiberBundleX::New(fiberBundle);
+    m_FiberBundle = mitk::FiberBundle::New(fiberBundle);
     m_FiberBundle->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_ImageNode->GetData())->GetGeometry());
 
     if (m_FiberBundleNode.IsNotNull()){

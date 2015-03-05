@@ -52,7 +52,7 @@ namespace mitk {
   $Author: fetzer$
 */
 
-    class MitkSurfaceInterpolation_EXPORT ReduceContourSetFilter : public SurfaceToSurfaceFilter
+    class MITKSURFACEINTERPOLATION_EXPORT ReduceContourSetFilter : public SurfaceToSurfaceFilter
     {
 
     public:

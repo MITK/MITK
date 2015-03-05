@@ -45,7 +45,7 @@ namespace mitk
  *
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 */
-class MitkLegacyIO_EXPORT PointSetReader: public PointSetSource, public FileReader
+class MITKLEGACYIO_EXPORT PointSetReader: public PointSetSource, public FileReader
 {
 public:
 

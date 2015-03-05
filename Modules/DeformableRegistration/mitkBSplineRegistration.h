@@ -38,7 +38,7 @@ namespace mitk
   */
 
 
-  class MITK_DEFORMABLEREGISTRATION_EXPORT BSplineRegistration : public RegistrationBase
+  class MITKDEFORMABLEREGISTRATION_EXPORT BSplineRegistration : public RegistrationBase
   {
 
   public:

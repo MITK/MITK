@@ -49,12 +49,17 @@
        </item>
        <item>
         <property name="text">
-         <string>Claron Technology Micron Tracker</string>
+         <string>CT MicronTracker</string>
         </property>
        </item>
        <item>
         <property name="text">
          <string>NP Optitrack</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Virtual Tracker</string>
         </property>
        </item>
       </widget>
@@ -72,7 +77,7 @@
         <x>0</x>
         <y>0</y>
         <width>236</width>
-        <height>90</height>
+        <height>115</height>
        </rect>
       </property>
       <attribute name="label">
@@ -160,8 +165,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>310</width>
-        <height>113</height>
+        <width>303</width>
+        <height>98</height>
        </rect>
       </property>
       <attribute name="label">
@@ -270,8 +275,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>232</width>
-        <height>85</height>
+        <width>236</width>
+        <height>115</height>
        </rect>
       </property>
       <attribute name="label">
@@ -312,8 +317,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>281</width>
-        <height>152</height>
+        <width>276</width>
+        <height>133</height>
        </rect>
       </property>
       <attribute name="label">

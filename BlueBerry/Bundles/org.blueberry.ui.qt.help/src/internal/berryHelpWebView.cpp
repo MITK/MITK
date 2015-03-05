@@ -216,7 +216,7 @@ HelpPage::HelpPage(IEditorSite::Pointer editorSite, QObject *parent)
 
 }
 
-QWebPage *HelpPage::createWindow(QWebPage::WebWindowType type)
+QWebPage *HelpPage::createWindow(QWebPage::WebWindowType /*type*/)
 {
   IEditorInput::Pointer input(new HelpEditorInput(QUrl()));
   IEditorPart::Pointer editorPart = m_EditorSite->GetPage()->OpenEditor(input, HelpEditor::EDITOR_ID);
@@ -242,9 +242,9 @@ void HelpPage::triggerAction(WebAction action, bool checked)
 
 bool HelpPage::acceptNavigationRequest(QWebFrame *,
                                        const QNetworkRequest &request,
-                                       QWebPage::NavigationType type)
+                                       QWebPage::NavigationType /*type*/)
 {
-  const bool closeNewTab = m_CloseNewTabIfNeeded;
+  //const bool closeNewTab = m_CloseNewTabIfNeeded;
   m_CloseNewTabIfNeeded = false;
 
   // open in an external browser if a http link

@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  class MitkContourModel_EXPORT ContourModelToSurfaceFilter : public SurfaceSource
+  class MITKCONTOURMODEL_EXPORT ContourModelToSurfaceFilter : public SurfaceSource
   {
 
   public:

@@ -36,7 +36,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkCameraCalibration_EXPORT NavigationDataHandEyeCalibrationFilter : public NavigationDataToNavigationDataFilter
+  class MITKCAMERACALIBRATION_EXPORT NavigationDataHandEyeCalibrationFilter : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataHandEyeCalibrationFilter, NavigationDataToNavigationDataFilter);

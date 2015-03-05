@@ -28,7 +28,7 @@ using namespace mitk;
 /**
 * \brief Calculates internal and external energy of the new particle configuration proposal.   */
 
-class MitkFiberTracking_EXPORT EnergyComputer
+class MITKFIBERTRACKING_EXPORT EnergyComputer
 {
 
 public:

@@ -37,7 +37,7 @@ class Contour;
  @brief Vtk-based mapper for mitk::Contour
  @ingroup Mapper
  */
-class MitkSegmentation_EXPORT ContourVtkMapper3D : public VtkMapper
+class MITKSEGMENTATION_EXPORT ContourVtkMapper3D : public VtkMapper
 {
 public:
   mitkClassMacro(ContourVtkMapper3D, VtkMapper);

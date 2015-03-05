@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkLogMacros.h>
 
+ctkPluginContext* QmitkCommonLegacyActivator::m_Context = nullptr;
+
 void
 QmitkCommonLegacyActivator::start(ctkPluginContext* context)
 {
@@ -29,8 +31,8 @@ QmitkCommonLegacyActivator::start(ctkPluginContext* context)
 
   if(berry::PlatformUI::IsWorkbenchRunning())
   {
-    m_FunctionalityCoordinator = QmitkFunctionalityCoordinator::Pointer(new QmitkFunctionalityCoordinator);
-    m_FunctionalityCoordinator->Start();
+    m_FunctionalityCoordinator.Start();
+    m_Context = context;
   }
   else
   {
@@ -43,8 +45,13 @@ QmitkCommonLegacyActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 
-  m_FunctionalityCoordinator->Stop();
-  m_FunctionalityCoordinator = 0;
+  m_FunctionalityCoordinator.Stop();
+  m_Context = nullptr;
+}
+
+ctkPluginContext*QmitkCommonLegacyActivator::GetContext()
+{
+  return m_Context;
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

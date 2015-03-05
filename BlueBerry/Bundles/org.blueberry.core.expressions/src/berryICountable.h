@@ -30,10 +30,9 @@ namespace berry {
  *
  * @see IAdaptable
  * @see IAdapterManager
- *
- * @since 3.3
  */
-struct BERRY_EXPRESSIONS ICountable : public Object {
+struct BERRY_EXPRESSIONS ICountable : public Object
+{
 
   berryObjectMacro(ICountable);
 
@@ -42,12 +41,12 @@ struct BERRY_EXPRESSIONS ICountable : public Object {
    *
    * @return the number of elements
    */
-  virtual int Count() = 0;
-
-  virtual ~ICountable() {}
+  virtual int Count() const = 0;
 
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::ICountable, "org.blueberry.core.ICountable")
 
 #endif /*BERRYICOUNTABLE_H_*/

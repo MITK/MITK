@@ -20,9 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const std::size_t Expression::HASH_CODE_NOT_COMPUTED = 0;
-const std::size_t Expression::HASH_FACTOR = 89;
-const std::string Expression::ATT_VALUE= "value"; //$NON-NLS-1$
+const uint Expression::HASH_CODE_NOT_COMPUTED = 0;
+const uint Expression::HASH_FACTOR = 89;
+const QString Expression::ATT_VALUE= "value";
 
 const Expression::Pointer Expression::TRUE_EVAL(new TRUE_EVALExpression());
 const Expression::Pointer Expression::FALSE_EVAL(new FALSE_EVALExpression());
@@ -37,87 +37,49 @@ Expression::~Expression()
 
 }
 
-bool Expression::Equals(std::vector<Expression::Pointer>& leftArray,
-    std::vector<Expression::Pointer>& rightArray)
+bool Expression::Equals(const QList<Expression::Pointer>& leftArray,
+                        const QList<Expression::Pointer>& rightArray)
 {
-  if (leftArray == rightArray)
-  {
-    return true;
-  }
-
-  if (leftArray.size() != rightArray.size())
-  {
-    return false;
-  }
-
-  for (unsigned int i= 0; i < leftArray.size(); ++i)
-  {
-    Expression::Pointer left= leftArray[i];
-    Expression::Pointer right= rightArray[i];
-    const bool equal = (left.IsNull()) ? (right.IsNull()) : (left == right);
-    if (!equal)
-    {
-      return false;
-    }
-  }
-
-  return true;
+  return (leftArray == rightArray);
 }
 
-bool Expression::Equals(std::vector<Object::Pointer>& leftArray,
-    std::vector<Object::Pointer>& rightArray)
+bool Expression::Equals(const QList<Object::Pointer>& leftArray,
+                        const QList<Object::Pointer>& rightArray)
 {
-  if (leftArray == rightArray)
-  {
-    return true;
-  }
-
-  if (leftArray.size() != rightArray.size())
-  {
-    return false;
-  }
-
-  for (unsigned int i= 0; i < leftArray.size(); ++i)
-  {
-    Object::Pointer left= leftArray[i];
-    Object::Pointer right= rightArray[i];
-    const bool equal = (left.IsNull()) ? (right.IsNull()) : (left == right);
-    if (!equal)
-    {
-      return false;
-    }
-  }
-
-  return true;
+  return (leftArray == rightArray);
 }
 
-std::size_t
+uint
 Expression::HashCode(Expression::Pointer object)
 {
   return object != 0 ? object->HashCode() : 0;
 }
 
-std::size_t
-Expression::HashCode(std::vector<Expression::Pointer>& array)
+uint
+Expression::HashCode(const QList<Expression::Pointer>& array)
 {
-  if (array.size() == 0) {
+  if (array.size() == 0)
+  {
     return 0;
   }
-  std::size_t hashCode = Poco::hash("std::vector<Expression::Pointer>");
-  for (unsigned int i= 0; i < array.size(); i++) {
+  uint hashCode = qHash("QList<Expression::Pointer>");
+  for (int i= 0; i < array.size(); i++)
+  {
     hashCode = hashCode * HASH_FACTOR + HashCode(array[i]);
   }
   return hashCode;
 }
 
-std::size_t
-Expression::HashCode(std::vector<Object::Pointer>& array)
+uint
+Expression::HashCode(const QList<Object::Pointer>& array)
 {
-  if (array.size() == 0) {
+  if (array.isEmpty())
+  {
     return 0;
   }
   int hashCode = (int) Poco::hash("std::vector<Object::Pointer>");
-  for (unsigned int i= 0; i < array.size(); i++) {
+  for (int i= 0; i < array.size(); i++)
+  {
     hashCode = hashCode + (int) array[i]->HashCode();
   }
   return hashCode;
@@ -137,14 +99,13 @@ Expression::CollectExpressionInfo(ExpressionInfo* info) const
   info->AddMisBehavingExpressionType(typeid(this));
 }
 
-std::size_t
+uint
 Expression::ComputeHashCode() const
 {
-  return reinterpret_cast<std::size_t>(this);
+  return qHash(this);
 }
 
-std::size_t
-Expression::HashCode() const
+uint Expression::HashCode() const
 {
   if (fHashCode != HASH_CODE_NOT_COMPUTED)
     return fHashCode;
@@ -163,7 +124,7 @@ Expression::operator==(const Object* object) const
   return false;
 }
 
-std::string Expression::ToString()
+QString Expression::ToString() const
 {
   return typeid(this).name();
 }

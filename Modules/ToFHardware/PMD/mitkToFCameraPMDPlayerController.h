@@ -30,7 +30,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_PMDMODULE_EXPORT ToFCameraPMDPlayerController : public ToFCameraPMDController
+  class MITKPMD_EXPORT ToFCameraPMDPlayerController : public ToFCameraPMDController
   {
   public:
 

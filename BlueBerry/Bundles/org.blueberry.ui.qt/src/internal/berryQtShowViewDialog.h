@@ -27,24 +27,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDialog>
 
 #include <berryIViewRegistry.h>
-#include <berryIShowViewDialog.h>
 
 #include "ui_berryQtShowViewDialog.h"
 
 namespace berry {
 
-class QtShowViewDialog : public QDialog, public IShowViewDialog
+class QtShowViewDialog : public QDialog
 {
+
 public:
-  berryObjectMacro(QtShowViewDialog);
 
-  QtShowViewDialog(IViewRegistry* registry, QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QtShowViewDialog(const IWorkbenchWindow* window, IViewRegistry* registry,
+                   QWidget* parent = 0, Qt::WindowFlags f = 0);
 
-  std::vector<IViewDescriptor::Pointer> GetSelection();
-  int Open();
+  QList<IViewDescriptor::Pointer> GetSelection() const;
 
-protected:
+private:
 
+  const IWorkbenchWindow* m_Window;
+  IViewRegistry* m_ViewReg;
   Ui::QtShowViewDialog_ m_UserInterface;
 };
 

@@ -27,7 +27,7 @@ namespace mitk
   * @brief Superclass of all classes generating ContourModels.
   * @ingroup MitkContourModelModule
   */
-  class MitkContourModel_EXPORT ContourModelSetSource : public BaseDataSource
+  class MITKCONTOURMODEL_EXPORT ContourModelSetSource : public BaseDataSource
   {
   public:
 

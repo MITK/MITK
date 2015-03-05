@@ -59,7 +59,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 
 
-  class MitkQtOverlays_EXPORT QmitkTextOverlay : public QmitkOverlay
+  class MITKQTOVERLAYS_EXPORT QmitkTextOverlay : public QmitkOverlay
   {
   public:
 

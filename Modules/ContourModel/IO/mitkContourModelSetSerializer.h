@@ -7,7 +7,7 @@
 namespace mitk
 {
 
-class MitkContourModel_EXPORT ContourModelSetSerializer : public BaseDataSerializer
+class MITKCONTOURMODEL_EXPORT ContourModelSetSerializer : public BaseDataSerializer
 {
 public:
   mitkClassMacro(ContourModelSetSerializer, BaseDataSerializer);

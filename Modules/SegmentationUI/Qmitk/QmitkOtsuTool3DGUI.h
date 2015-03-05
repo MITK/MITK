@@ -36,7 +36,7 @@ class QLabel;
 
   Last contributor: $Author$
 */
-class MitkSegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

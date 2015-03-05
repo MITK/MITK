@@ -216,9 +216,9 @@ int main( int argc, char* argv[] )
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Show this help text");
   parser.addArgument("input", "i", mitkCommandLineParser::InputImage, "Input:", "Input file",us::Any(),false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputDirectory, "Output:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output:", "Output file",us::Any(),false);
   parser.addArgument("spacing", "s", mitkCommandLineParser::String, "Spacing:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
-  parser.addArgument("reference", "r", mitkCommandLineParser::String, "Reference:", "Resample using supplied reference image. Also cuts image to same dimensions",us::Any());
+  parser.addArgument("reference", "r", mitkCommandLineParser::InputImage, "Reference:", "Resample using supplied reference image. Also cuts image to same dimensions",us::Any());
   parser.addArgument("win-sinc", "w", mitkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
 
 
@@ -242,21 +242,25 @@ int main( int argc, char* argv[] )
       std::cout << parser.helpText();
       return EXIT_SUCCESS;
     }
-   }
+  }
 
-  std::string outputPath = us::any_cast<string>(parsedArgs["output"]);
+  std::string outputFile = us::any_cast<string>(parsedArgs["output"]);
   std::string inputFile = us::any_cast<string>(parsedArgs["input"]);
 
   std::vector<std::string> spacings;
   float spacing[3];
   if (parsedArgs.count("spacing"))
   {
+
     std::string arg =  us::any_cast<string>(parsedArgs["spacing"]);
-    spacings = split(arg ,',');
-    spacing[0] = atoi(spacings.at(0).c_str());
-    spacing[1] = atoi(spacings.at(1).c_str());
-    spacing[2] = atoi(spacings.at(2).c_str());
-    useSpacing = true;
+    if (arg != "")
+    {
+      spacings = split(arg ,',');
+      spacing[0] = atoi(spacings.at(0).c_str());
+      spacing[1] = atoi(spacings.at(1).c_str());
+      spacing[2] = atoi(spacings.at(2).c_str());
+      useSpacing = true;
+    }
   }
 
   std::string refImageFile = "";
@@ -274,10 +278,10 @@ int main( int argc, char* argv[] )
 
   mitk::Image::Pointer refImage;
   if (!useSpacing)
-      refImage = mitk::IOUtil::LoadImage(refImageFile);
+    refImage = mitk::IOUtil::LoadImage(refImageFile);
 
-  mitk::Image::Pointer inputDWI = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadBaseData(inputFile).GetPointer());
-  if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(inputDWI))
+  mitk::Image::Pointer inputDWI = mitk::IOUtil::LoadImage(inputFile);
+  if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(inputDWI.GetPointer()))
   {
     mitk::Image::Pointer outputImage;
 
@@ -289,10 +293,7 @@ int main( int argc, char* argv[] )
       return EXIT_FAILURE;
     }
 
-    std::string fileStem = itksys::SystemTools::GetFilenameWithoutExtension(inputFile);
-
-    std::string outName(outputPath + fileStem + "_res.dwi");
-    mitk::IOUtil::Save(outputImage, outName.c_str());
+    mitk::IOUtil::Save(outputImage, outputFile.c_str());
 
     return EXIT_SUCCESS;
   }
@@ -306,9 +307,8 @@ int main( int argc, char* argv[] )
   else
     resultImage = TransformToReference(refImage,inputImage);
 
-  std::string fileStem = itksys::SystemTools::GetFilenameWithoutExtension(inputFile);
 
-  mitk::IOUtil::SaveImage(resultImage, outputPath + fileStem + "_res.nrrd");
+  mitk::IOUtil::SaveImage(resultImage, outputFile);
 
   return EXIT_SUCCESS;
 }

@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  class MitkContourModel_EXPORT ContourObjectFactory : public CoreObjectFactoryBase
+  class MITKCONTOURMODEL_EXPORT ContourObjectFactory : public CoreObjectFactoryBase
   {
   public:
     mitkClassMacro(ContourObjectFactory,CoreObjectFactoryBase);

@@ -31,7 +31,7 @@ namespace mitk
 {
   /**
   * \brief A class giving functions for calculating a variety of network indices */
-  class MitkConnectomics_EXPORT ConnectomicsStatisticsCalculator : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsStatisticsCalculator : public itk::Object
   {
   public:
 

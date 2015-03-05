@@ -41,7 +41,7 @@ namespace mitk
   * \ingroup IGT
   */
 
-  class MitkIGT_EXPORT NavigationDataRecorderDeprecated : public itk::ProcessObject
+  class MITKIGT_EXPORT NavigationDataRecorderDeprecated : public itk::ProcessObject
   {
   public:
     mitkClassMacro( NavigationDataRecorderDeprecated, itk::ProcessObject );

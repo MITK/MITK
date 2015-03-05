@@ -30,7 +30,7 @@ TractsToVectorImageFilter< PixelType >::TractsToVectorImageFilter():
     m_NormalizeVectors(false),
     m_UseWorkingCopy(true),
     m_MaxNumDirections(3),
-    m_SizeThreshold(0.2),
+    m_SizeThreshold(0.3),
     m_NumDirectionsImage(NULL),
     m_CreateDirectionImages(true)
 {
@@ -252,10 +252,9 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
 
             if (dir.magnitude()<m_SizeThreshold)
                 continue;
+            if (m_NormalizeVectors)
+                dir.normalize();
             count++;
-
-//            if (m_NormalizeVectors)
-//                dir.normalize();
 
             if (m_CreateDirectionImages && i<10)
             {
@@ -303,7 +302,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
     vtkSmartPointer<vtkPolyData> directionsPolyData = vtkSmartPointer<vtkPolyData>::New();
     directionsPolyData->SetPoints(m_VtkPoints);
     directionsPolyData->SetLines(m_VtkCellArray);
-    m_OutputFiberBundle = mitk::FiberBundleX::New(directionsPolyData);
+    m_OutputFiberBundle = mitk::FiberBundle::New(directionsPolyData);
 }
 
 
@@ -387,7 +386,7 @@ TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer TractsTo
 
     if (inDirs->size()==outDirs->size())
     {
-        if (!m_NormalizeVectors && max>0)
+        if (max>0)
             for (unsigned int i=0; i<outDirs->size(); i++)
                 outDirs->SetElement(i, outDirs->at(i)*newLengths.at(i)/max);
         return outDirs;

@@ -27,7 +27,7 @@ class vtkLegendScaleActor;
 namespace mitk {
 
 /** \brief Displays configurable scales on the renderwindow. The scale is determined by the image spacing. */
-class MitkOverlays_EXPORT ScaleLegendOverlay : public mitk::VtkOverlay {
+class MITKOVERLAYS_EXPORT ScaleLegendOverlay : public mitk::VtkOverlay {
 public:
 
   class LocalStorage : public mitk::Overlay::BaseLocalStorage

@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureComposite.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -57,12 +57,12 @@ int FiberJoin(int argc, char* argv[])
 
     try
     {
-        mitk::FiberBundleX::Pointer result = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(inFibs.at(0))->GetData());
+        mitk::FiberBundle::Pointer result = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(inFibs.at(0))->GetData());
         for (int i=1; i<inFibs.size(); i++)
         {
             try
             {
-                mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(inFibs.at(i))->GetData());
+                mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(inFibs.at(i))->GetData());
                 result = result->AddBundle(inputTractogram);
             }
             catch(...){ std::cout << "could not load: " << inFibs.at(i); }

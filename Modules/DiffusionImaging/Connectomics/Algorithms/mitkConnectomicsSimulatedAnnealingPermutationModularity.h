@@ -25,7 +25,7 @@ namespace mitk
 {
   /**
   * \brief A class providing permutations for the calculation of modularity using simulated annealing */
-  class MitkConnectomics_EXPORT ConnectomicsSimulatedAnnealingPermutationModularity : public mitk::ConnectomicsSimulatedAnnealingPermutationBase
+  class MITKCONNECTOMICS_EXPORT ConnectomicsSimulatedAnnealingPermutationModularity : public mitk::ConnectomicsSimulatedAnnealingPermutationBase
   {
   public:
 

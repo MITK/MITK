@@ -33,7 +33,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFactory {
+struct MITKTOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFactory {
    public:
 
   /**

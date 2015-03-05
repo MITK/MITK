@@ -31,7 +31,7 @@ class QmitkUSControlsProbesWidget;
   * This class handles the mitk::USControlInterfaceProbes of mitk::USDevice
   * objects.
   */
-class MitkUSUI_EXPORT QmitkUSControlsProbesWidget : public QWidget
+class MITKUSUI_EXPORT QmitkUSControlsProbesWidget : public QWidget
 {
     Q_OBJECT
 

@@ -32,7 +32,7 @@ public:
   WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
       IWorkbenchWindowConfigurer::Pointer configurer);
 
-  std::string GetInitialWindowPerspectiveId();
+  QString GetInitialWindowPerspectiveId();
 
 };
 

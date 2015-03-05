@@ -17,13 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPropertyTester.h"
 
 #include "berryPlatform.h"
+#include "berryIContributor.h"
+
+#include <ctkPlugin.h>
 
 namespace berry
 {
 
 void PropertyTester::InternalInitialize(PropertyTesterDescriptor::Pointer descriptor)
 {
-  fProperties= descriptor->GetProperties();
+  fProperties = descriptor->GetProperties();
   fNamespace= descriptor->GetNamespace();
   fConfigElement= descriptor->GetExtensionElement();
 }
@@ -34,11 +37,10 @@ PropertyTesterDescriptor::Pointer PropertyTester::InternalCreateDescriptor()
   return tester;
 }
 
-bool PropertyTester::Handles(const std::string& namespaze,
-    const std::string& property)
+bool PropertyTester::Handles(const QString &namespaze,
+    const QString &property)
 {
-  return fNamespace == namespaze && fProperties.find("," + property
-      + ",") != std::string::npos;
+  return fNamespace == namespaze && fProperties.contains("," + property + ",");
 }
 
 bool PropertyTester::IsInstantiated()
@@ -48,8 +50,8 @@ bool PropertyTester::IsInstantiated()
 
 bool PropertyTester::IsDeclaringPluginActive()
 {
-  IBundle::Pointer bundle= Platform::GetBundle(fConfigElement->GetContributor());
-  return bundle->IsActive();
+  QSharedPointer<ctkPlugin> plugin = Platform::GetCTKPlugin(fConfigElement->GetContributor()->GetName());
+  return plugin->getState() == ctkPlugin::ACTIVE;
 }
 
 IPropertyTester* PropertyTester::Instantiate()

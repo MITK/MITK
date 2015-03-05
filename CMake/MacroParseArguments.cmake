@@ -33,6 +33,8 @@ if(NOT COMMAND MACRO_PARSE_ARGUMENTS)
 
 macro(MACRO_PARSE_ARGUMENTS prefix arg_names option_names)
 
+   message(WARNING "The MACRO_PARSE_ARGUMENTS macro is deprecated. Use cmake_parse_arguments instead.")
+
    set(DEFAULT_ARGS)
 
    foreach(arg_name ${arg_names})

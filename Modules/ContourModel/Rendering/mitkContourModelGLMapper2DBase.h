@@ -35,7 +35,7 @@ namespace mitk {
   *
   * @ingroup MitkContourModelModule
   */
-  class MitkContourModel_EXPORT ContourModelGLMapper2DBase : public GLMapper
+  class MITKCONTOURMODEL_EXPORT ContourModelGLMapper2DBase : public GLMapper
   {
   public:
 

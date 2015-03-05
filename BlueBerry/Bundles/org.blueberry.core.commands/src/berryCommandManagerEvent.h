@@ -67,8 +67,8 @@ public:
    *            Whether the list of defined category identifiers has changed.
    */
 CommandManagerEvent  (CommandManager& commandManager,
-      const std::string& commandId, const bool commandIdAdded,
-      const bool commandIdChanged, const std::string& categoryId,
+      const QString& commandId, const bool commandIdAdded,
+      const bool commandIdChanged, const QString& categoryId,
       const bool categoryIdAdded, const bool categoryIdChanged);
 
   /**
@@ -92,7 +92,7 @@ CommandManagerEvent  (CommandManager& commandManager,
    * @since 3.2
    */
   CommandManagerEvent(CommandManager& commandManager,
-      const std::string& parameterTypeId, const bool parameterTypeIdAdded,
+      const QString& parameterTypeId, const bool parameterTypeIdAdded,
       const bool parameterTypeIdChanged);
 
   /**
@@ -101,7 +101,7 @@ CommandManagerEvent  (CommandManager& commandManager,
    * @return The category identifier that was added or removed; may be
    *         <code>null</code>.
    */
-  std::string GetCategoryId() const;
+  QString GetCategoryId() const;
 
   /**
    * Returns the command identifier that was added or removed.
@@ -109,7 +109,7 @@ CommandManagerEvent  (CommandManager& commandManager,
    * @return The command identifier that was added or removed; may be
    *         <code>null</code>.
    */
-  std::string GetCommandId() const;
+  QString GetCommandId() const;
 
   /**
    * Returns the instance of the interface that changed.
@@ -127,7 +127,7 @@ CommandManagerEvent  (CommandManager& commandManager,
    *
    * @since 3.2
    */
-  std::string GetParameterTypeId() const;
+  QString GetParameterTypeId() const;
 
   /**
    * Returns whether the list of defined category identifiers has changed.
@@ -220,7 +220,7 @@ private:
    * defined category identifiers. This value is <code>null</code> if the
    * list of defined category identifiers did not change.
    */
-  const std::string categoryId;
+  const QString categoryId;
 
   /**
    * A collection of bits representing whether certain values have changed. A
@@ -234,7 +234,7 @@ private:
    * command identifiers. This value is <code>null</code> if the list of
    * defined command identifiers did not change.
    */
-  const std::string commandId;
+  const QString commandId;
 
   /**
    * The command parameter type identifier that was added or removed from the
@@ -242,7 +242,7 @@ private:
    * <code>null</code> if the list of defined parameter type identifiers did
    * not change.
    */
-  const std::string parameterTypeId;
+  const QString parameterTypeId;
 
   /**
    * The command manager that has changed.

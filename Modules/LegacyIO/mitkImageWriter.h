@@ -33,7 +33,7 @@ class Image;
  * @ingroup MitkLegacyIOModule
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileWriterRegistry instead.
  */
-class MitkLegacyIO_EXPORT ImageWriter :  public mitk::FileWriterWithInformation
+class MITKLEGACYIO_EXPORT ImageWriter :  public mitk::FileWriterWithInformation
 {
 public:
 

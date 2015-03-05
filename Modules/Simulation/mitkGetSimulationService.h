@@ -29,7 +29,7 @@ namespace mitk
 {
   class ISimulationService;
 
-  MitkSimulation_EXPORT ISimulationService* GetSimulationService(us::ModuleContext* moduleContext = us::GetModuleContext());
+  MITKSIMULATION_EXPORT ISimulationService* GetSimulationService(us::ModuleContext* moduleContext = us::GetModuleContext());
 }
 
 #endif

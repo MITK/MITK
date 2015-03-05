@@ -23,7 +23,7 @@ void QmitkDiffusionDefaultPerspective::CreateInitialLayout(berry::IPageLayout::P
     // all di-app perspectives should have the following:
     /////////////////////////////////////////////////////
 
-    std::string editorArea = layout->GetEditorArea();
+    QString editorArea = layout->GetEditorArea();
 
     layout->AddStandaloneView("org.mitk.views.viewnavigatorview", false, berry::IPageLayout::LEFT, 0.25f, editorArea);
 

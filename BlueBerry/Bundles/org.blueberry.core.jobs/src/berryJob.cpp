@@ -27,10 +27,15 @@ namespace berry
 
 
 
-const IStatus::Pointer Job::ASYNC_FINISH(new Status ( IStatus::OK_TYPE, JobManager::PI_JOBS(), 1, "") ) ;
+const IStatus::Pointer Job::ASYNC_FINISH(
+    new Status (IStatus::OK_TYPE, JobManager::PI_JOBS(),
+                1,
+                "",
+                berry::Status::SourceLocation(__FILE__, "berry::Job::ASYNC_FINISH", __LINE__)
+                ));
 
-Job::Job(std::string name) :
-  InternalJob(name)
+Job::Job(const QString& name)
+  : InternalJob(name)
 {
 }
 
@@ -55,7 +60,7 @@ void Job::Done(IStatus::Pointer result)
   InternalJob::Done(result);
 }
 
-std::string Job::GetName() const
+QString Job::GetName() const
 {
   return InternalJob::GetName();
 }
@@ -115,7 +120,7 @@ bool Job::IsUser() const
 //    InternalJob::Join();
 //  }
 
-void Job::RemoveJobChangeListener(IJobChangeListener::Pointer listener)
+void Job::RemoveJobChangeListener(IJobChangeListener* listener)
 {
   InternalJob::RemoveJobChangeListener(listener);
 }
@@ -131,7 +136,7 @@ void Job::Schedule(Poco::Timestamp::TimeDiff delay)
   InternalJob::Schedule(delay);
 }
 
-void Job::SetName(std::string name)
+void Job::SetName(const QString& name)
 {
   InternalJob::SetName(name);
 }

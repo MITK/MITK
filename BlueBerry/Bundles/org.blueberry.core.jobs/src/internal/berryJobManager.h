@@ -70,7 +70,7 @@ public:
   /**
    * The unique identifier constant of this plug-in.
    */
-  static const std::string& PI_JOBS();
+  static const QString& PI_JOBS();
 
   static bool DEBUG;
   static bool DEBUG_BEGIN_END;
@@ -130,9 +130,9 @@ public:
   //   ILock NewLock() ;
 
   /**
-   *  @see IJobManager#RemoveChangeListener(IJobChangeListener::Pointer)
+   *  @see IJobManager#RemoveChangeListener(IJobChangeListener*)
    */
-  void RemoveJobChangeListener(IJobChangeListener::Pointer listener);
+  void RemoveJobChangeListener(IJobChangeListener* listener);
 
   // /**
   //* report to the progress monitor that this thread is blocked, supplying
@@ -197,7 +197,7 @@ public:
   //  void WakeUp(Object family) ;
 
 
-  void AddJobChangeListener(IJobChangeListener::Pointer listener);
+  void AddJobChangeListener(IJobChangeListener* listener);
 
   //  void beginRule(ISchedulingRule rule, IProgressMonitor monitor) ;
 
@@ -325,10 +325,11 @@ private:
   WorkerPool::Pointer m_Pool;
 
   ProgressProvider::Pointer m_sptr_progressProvider;
+
   /**
    * Jobs that are currently running. Should only be modified from changeState
    */
-  Poco::HashSet<InternalJob::Pointer, Object::Hash> m_running;
+  QSet<InternalJob::Pointer> m_running;
 
   /**
    * Jobs that are sleeping.  Some sleeping jobs are scheduled to wake

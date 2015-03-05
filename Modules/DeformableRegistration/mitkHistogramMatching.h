@@ -34,7 +34,7 @@ namespace mitk
   \author Daniel Stein
   */
 
-  class MITK_DEFORMABLEREGISTRATION_EXPORT HistogramMatching : public RegistrationBase
+  class MITKDEFORMABLEREGISTRATION_EXPORT HistogramMatching : public RegistrationBase
   {
 
   public:

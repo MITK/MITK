@@ -21,7 +21,7 @@
 #! \param NO_INSTALL (option) Don't install this plug-in.
 macro(MACRO_CREATE_CTK_PLUGIN)
 
-  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;DOXYGEN_TAGFILES;MOC_OPTIONS" "TEST_PLUGIN;NO_INSTALL;NO_QHP_TRANSFORM" ${ARGN})
+  cmake_parse_arguments(_PLUGIN "TEST_PLUGIN;NO_INSTALL;NO_QHP_TRANSFORM" "EXPORT_DIRECTIVE" "EXPORTED_INCLUDE_SUFFIXES;DOXYGEN_TAGFILES;MOC_OPTIONS" ${ARGN})
 
   message(STATUS "Creating CTK plugin ${PROJECT_NAME}")
 
@@ -110,17 +110,6 @@ macro(MACRO_CREATE_CTK_PLUGIN)
   #------------------------------------------------------------#
   #------------------ Create Plug-in --------------------------#
 
-  set(_additional_target_libraries )
-  if(_PLUGIN_TEST_PLUGIN)
-    find_package(CppUnit REQUIRED)
-    include_directories(SYSTEM ${CppUnit_INCLUDE_DIRS})
-    list(APPEND _additional_target_libraries ${CppUnit_LIBRARIES})
-  endif()
-
-  if(mbilog_FOUND)
-    include_directories(${mbilog_INCLUDE_DIRS})
-  endif()
-
   MACRO_ORGANIZE_SOURCES(
     SOURCE ${_PLUGIN_CPP_FILES}
     HEADER ${_PLUGIN_H_FILES}
@@ -143,7 +132,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     UI_FORMS ${_PLUGIN_UI_FILES}
     EXPORTED_INCLUDE_SUFFIXES ${_PLUGIN_EXPORTED_INCLUDE_SUFFIXES}
     RESOURCES ${_PLUGIN_QRC_FILES}
-    TARGET_LIBRARIES ${_PLUGIN_target_libraries} ${_additional_target_libraries}
+    TARGET_LIBRARIES ${_PLUGIN_target_libraries}
     CACHED_RESOURCEFILES ${_PLUGIN_CACHED_RESOURCE_FILES}
     TRANSLATIONS ${_PLUGIN_TRANSLATION_FILES}
     OUTPUT_DIR ${_output_dir}
@@ -151,28 +140,17 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     ${is_test_plugin}
   )
 
+  if(_PLUGIN_TEST_PLUGIN)
+    find_package(CppUnit REQUIRED)
+    target_include_directories(${PLUGIN_TARGET} PRIVATE ${CppUnit_INCLUDE_DIRS})
+    target_link_libraries(${PLUGIN_TARGET} PRIVATE ${CppUnit_LIBRARIES})
+  endif()
+
   if(mbilog_FOUND)
-    target_link_libraries(${PLUGIN_TARGET} mbilog)
+    target_link_libraries(${PLUGIN_TARGET} PRIVATE mbilog)
   endif()
 
-  include_directories(SYSTEM ${Poco_INCLUDE_DIRS})
-  include_directories(${BlueBerry_BINARY_DIR})
-
-  # Only add the following Poco libraries due to possible name clashes
-  # in PocoPDF with libpng when also linking QtGui.
-  foreach(lib Foundation Util XML)
-    target_link_libraries(${PLUGIN_TARGET} ${Poco_${lib}_LIBRARY})
-  endforeach()
-
-  # Set compiler flags
-  get_target_property(_plugin_compile_flags ${PLUGIN_TARGET} COMPILE_FLAGS)
-  if(NOT _plugin_compile_flags)
-    set(_plugin_compile_flags "")
-  endif()
-  if(WIN32)
-    set(_plugin_compile_flags "${_plugin_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
-  endif()
-  set_target_properties(${PLUGIN_TARGET} PROPERTIES COMPILE_FLAGS "${_plugin_compile_flags}")
+  target_include_directories(${PLUGIN_TARGET} PRIVATE ${BlueBerry_BINARY_DIR})
 
   set(_PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")

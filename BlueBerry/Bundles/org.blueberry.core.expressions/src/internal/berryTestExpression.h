@@ -20,55 +20,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryExpression.h"
 #include "berryTypeExtensionManager.h"
 
-#include "service/berryIConfigurationElement.h"
 #include "berryObject.h"
 
 #include "Poco/DOM/Element.h"
 
 namespace berry {
 
+struct IConfigurationElement;
+
 class TestExpression : public Expression {
 
 private:
-  std::string fNamespace;
-  std::string fProperty;
-  std::vector<Object::Pointer> fArgs;
+  QString fNamespace;
+  QString fProperty;
+  QList<Object::Pointer> fArgs;
   Object::Pointer fExpectedValue;
   bool fForcePluginActivation;
 
-  static const char PROP_SEP;
-  static const std::string ATT_PROPERTY;
-  static const std::string ATT_ARGS;
-  static const std::string ATT_FORCE_PLUGIN_ACTIVATION;
+  static const QChar PROP_SEP;
+  static const QString ATT_PROPERTY;
+  static const QString ATT_ARGS;
+  static const QString ATT_FORCE_PLUGIN_ACTIVATION;
   /**
    * The seed for the hash code for all test expressions.
    */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
   static TypeExtensionManager fgTypeExtensionManager;
 
 
 public:
 
-  TestExpression(SmartPointer<IConfigurationElement> element);
+  TestExpression(const SmartPointer<IConfigurationElement>& element);
 
   TestExpression(Poco::XML::Element* element);
 
-  TestExpression(const std::string& namespaze, const std::string& property,
-      std::vector<Object::Pointer>& args, Object::Pointer expectedValue);
+  TestExpression(const QString& namespaze, const QString& property,
+                 const QList<Object::Pointer>& args, Object::Pointer expectedValue);
 
-  TestExpression(const std::string& namespaze, const std::string& property,
-      std::vector<Object::Pointer>& args, Object::Pointer expectedValue, bool forcePluginActivation);
+  TestExpression(const QString& namespaze, const QString& property,
+                 const QList<Object::Pointer>& args, Object::Pointer expectedValue,
+                 bool forcePluginActivation);
 
-  EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 
-  void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info) const;
 
-  bool operator==(Expression& object);
+  bool operator==(const Object* object) const;
 
 protected:
 
-  std::size_t ComputeHashCode();
+  uint ComputeHashCode() const;
 
   //---- Debugging ---------------------------------------------------
 
@@ -77,7 +79,7 @@ protected:
    */
 public:
 
-  std::string ToString();
+  QString ToString() const;
 
   //---- testing ---------------------------------------------------
 

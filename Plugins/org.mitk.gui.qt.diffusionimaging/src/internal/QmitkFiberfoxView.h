@@ -24,7 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVectorImage.h>
 #include <itkVectorContainer.h>
 #include <itkOrientationDistributionFunction.h>
-#include <mitkFiberBundleX.h>
+
+#ifndef Q_MOC_RUN
+#include <mitkFiberBundle.h>
 #include <mitkPlanarEllipse.h>
 #include <mitkDiffusionNoiseModel.h>
 #include <mitkDiffusionSignalModel.h>
@@ -36,13 +38,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStickModel.h>
 #include <mitkAstroStickModel.h>
 #include <mitkDotModel.h>
+#include <mitkFiberfoxParameters.h>
+#include <itkStatisticsImageFilter.h>
+#include <mitkDiffusionPropertyHelper.h>
+#endif
+
 #include <QThread>
 #include <QObject>
 #include <QTimer>
 #include <QTime>
-#include <mitkFiberfoxParameters.h>
-#include <itkStatisticsImageFilter.h>
-#include <mitkDiffusionPropertyHelper.h>
 
 /*!
 \brief View for fiber based diffusion software phantoms (Fiberfox). See "Fiberfox: Facilitating the creation of realistic white matter software phantoms" (DOI: 10.1002/mrm.25045) for details.

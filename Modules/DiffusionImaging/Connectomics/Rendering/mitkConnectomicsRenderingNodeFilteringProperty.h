@@ -31,7 +31,7 @@ namespace mitk
 /**
  * Encapsulates the enumeration of different node filtering options for rendering connectomics networks
  */
-class MitkConnectomics_EXPORT ConnectomicsRenderingNodeFilteringProperty : public EnumerationProperty
+class MITKCONNECTOMICS_EXPORT ConnectomicsRenderingNodeFilteringProperty : public EnumerationProperty
 {
 public:
 

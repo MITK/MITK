@@ -1,3 +1,0 @@
-project(org_blueberry_compat)
-
-MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE org_blueberry_compat_EXPORT)

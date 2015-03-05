@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkDiffusionCore_EXPORT DiffusionHeaderSiemensMosaicDICOMFileReader
+class MITKDIFFUSIONCORE_EXPORT DiffusionHeaderSiemensMosaicDICOMFileReader
     : public DiffusionHeaderSiemensDICOMFileReader
 {
 public:

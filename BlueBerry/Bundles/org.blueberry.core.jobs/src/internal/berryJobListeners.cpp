@@ -18,8 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryJobManager.h"
 
 #include "berryJob.h"
+#include "berryOperationCanceledException.h"
+#include "berryLog.h"
 
-#include <berrySolsticeExceptions.h>
 #include <typeinfo>
 
 namespace berry
@@ -28,7 +29,7 @@ namespace berry
 struct AboutToRunDoit: public JobListeners::IListenerDoit
 {
   void Notify(const IJobChangeListener::Events& events,
-      const IJobChangeEvent::ConstPointer event) const
+      const IJobChangeEvent::ConstPointer& event) const
   {
     events.jobAboutToRun(event);
   }
@@ -37,7 +38,7 @@ struct AboutToRunDoit: public JobListeners::IListenerDoit
 struct AwakeDoit: public JobListeners::IListenerDoit
 {
   void Notify(const IJobChangeListener::Events& events,
-      const IJobChangeEvent::ConstPointer event) const
+      const IJobChangeEvent::ConstPointer& event) const
   {
     events.jobAwake(event);
   }
@@ -46,7 +47,7 @@ struct AwakeDoit: public JobListeners::IListenerDoit
 struct DoneDoit: public JobListeners::IListenerDoit
 {
   void Notify(const IJobChangeListener::Events& events,
-      const IJobChangeEvent::ConstPointer event) const
+      const IJobChangeEvent::ConstPointer& event) const
   {
     events.jobDone(event);
   }
@@ -55,7 +56,7 @@ struct DoneDoit: public JobListeners::IListenerDoit
 struct RunningDoit: public JobListeners::IListenerDoit
 {
   void Notify(const IJobChangeListener::Events& events,
-      const IJobChangeEvent::ConstPointer event) const
+      const IJobChangeEvent::ConstPointer& event) const
   {
     events.jobRunning(event);
   }
@@ -64,7 +65,7 @@ struct RunningDoit: public JobListeners::IListenerDoit
 struct ScheduledDoit: public JobListeners::IListenerDoit
 {
   void Notify(const IJobChangeListener::Events& events,
-      const IJobChangeEvent::ConstPointer event) const
+      const IJobChangeEvent::ConstPointer& event) const
   {
     events.jobScheduled(event);
   }
@@ -73,16 +74,19 @@ struct ScheduledDoit: public JobListeners::IListenerDoit
 struct SleepingDoit: public JobListeners::IListenerDoit
 {
   void Notify(const IJobChangeListener::Events& events,
-      const IJobChangeEvent::ConstPointer event) const
+      const IJobChangeEvent::ConstPointer& event) const
   {
     events.jobSleeping(event);
   }
 };
 
-JobListeners::JobListeners() :
-  aboutToRun(new AboutToRunDoit()), awake(new AwakeDoit()),
-      done(new DoneDoit()), running(new RunningDoit()), scheduled(
-          new ScheduledDoit()), sleeping(new SleepingDoit())
+JobListeners::JobListeners()
+  : aboutToRun(new AboutToRunDoit())
+  , awake(new AwakeDoit())
+  , done(new DoneDoit())
+  , running(new RunningDoit())
+  , scheduled(new ScheduledDoit())
+  , sleeping(new SleepingDoit())
 {
 
 }
@@ -121,7 +125,7 @@ JobChangeEvent::Pointer JobListeners::NewEvent(Job::Pointer job, Poco::Timestamp
 }
 
 void JobListeners::DoNotify(const IListenerDoit* doit,
-    const IJobChangeEvent::ConstPointer event)
+    const IJobChangeEvent::ConstPointer& event)
 {
   //notify all global listeners
   doit->Notify(global, event);
@@ -140,16 +144,17 @@ void JobListeners::HandleException(const std::exception& e)
   {
     dynamic_cast<const OperationCanceledException&> (e);
     return;
-  } catch (const std::bad_cast&)
+  }
+  catch (const std::bad_cast&)
   {
     // TODO get bundle id (find a C++ way)
     //std::string pluginId = JobOSGiUtils.getDefault().getBundleId(listener);
-    std::string pluginId;
-    if (pluginId.empty())
+    QString pluginId;
+    if (pluginId.isEmpty())
       pluginId = JobManager::PI_JOBS();
-    std::string message = "Problems occurred when invoking code from plug-in: "
+    QString message = "Problems occurred when invoking code from plug-in: "
         + pluginId;
-    std::cerr << message << std::endl;
+    BERRY_ERROR << message;
     // TODO Logging
     //  RuntimeLog.log(new Status(IStatus.ERROR, pluginId, JobManager.PLUGIN_ERROR,
     //      message, e));

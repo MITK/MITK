@@ -32,14 +32,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 
 // MITK includes
-#include <mitkBaseDataIOFactory.h>
 #include <mitkConnectomicsStatisticsCalculator.h>
 #include <mitkConnectomicsNetworkThresholder.h>
 #include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
+#include <mitkIOUtil.h>
 
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
+
+  parser.setTitle("Network Creation");
+  parser.setCategory("Connectomics");
+  parser.setDescription("");
+  parser.setContributor("MBI");
+
   parser.setArgumentPrefix("--", "-");
 
   parser.addArgument("inputNetwork", "i", mitkCommandLineParser::InputFile, "Input network", "input connectomics network (.cnf)", us::Any(), false);
@@ -51,9 +57,9 @@ int main(int argc, char* argv[])
   parser.addArgument("rescaleConnectivity", "r", mitkCommandLineParser::Bool, "Rescale connectivity", "Whether to rescale the connectivity matrix");
   parser.addArgument("localStatistics", "L", mitkCommandLineParser::StringList, "Local statistics", "Provide a list of node labels for local statistics", us::Any());
   parser.addArgument("regionList", "R", mitkCommandLineParser::StringList, "Region list", "A space separated list of regions. Each region has the format\n regionname;label1;label2;...;labelN", us::Any());
-  parser.addArgument("granularity", "gr", mitkCommandLineParser::Int, "Granularity", "How finely to test the density range and how many thresholds to consider");
-  parser.addArgument("startDensity", "d", mitkCommandLineParser::Float, "Start Density", "Largest density for the range");
-  parser.addArgument("thresholdStepSize", "t", mitkCommandLineParser::Int, "Step size threshold", "Distance of two adjacent thresholds");
+  parser.addArgument("granularity", "gr", mitkCommandLineParser::Int, "Granularity", "How finely to test the density range and how many thresholds to consider",1);
+  parser.addArgument("startDensity", "d", mitkCommandLineParser::Float, "Start Density", "Largest density for the range",1.0);
+  parser.addArgument("thresholdStepSize", "t", mitkCommandLineParser::Int, "Step size threshold", "Distance of two adjacent thresholds",3);
 
   parser.setCategory("Connectomics");
   parser.setTitle("Network Statistics");
@@ -131,11 +137,9 @@ int main(int argc, char* argv[])
 
   try
   {
-    const std::string s1="", s2="";
-
     // load network
     std::vector<mitk::BaseData::Pointer> networkFile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( networkName, s1, s2, false );
+      mitk::IOUtil::Load( networkName);
     if( networkFile.empty() )
     {
       std::string errorMessage = "File at " + networkName + " could not be read. Aborting.";

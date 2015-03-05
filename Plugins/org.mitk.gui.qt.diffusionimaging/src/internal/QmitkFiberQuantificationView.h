@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkFiberQuantificationViewControls.h"
 
 #include <mitkPlanarFigureComposite.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkSurface.h>
 
 #include <itkCastImageFilter.h>
@@ -138,10 +138,10 @@ protected:
   float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
   std::vector<mitk::Surface::Pointer>   m_SelectedSurfaces;
 
-  mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary, bool absolute);
-  mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundleX::Pointer fib);
-  mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundleX::Pointer fib);
-  mitk::DataNode::Pointer GenerateFiberEndingsPointSet(mitk::FiberBundleX::Pointer fib);
+  mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundle::Pointer fib, bool binary, bool absolute);
+  mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundle::Pointer fib);
+  mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundle::Pointer fib);
+  mitk::DataNode::Pointer GenerateFiberEndingsPointSet(mitk::FiberBundle::Pointer fib);
 };
 
 

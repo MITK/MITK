@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 
 
-MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkPickingToolGUI, "")
+MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkPickingToolGUI, "")
 
 QmitkPickingToolGUI::QmitkPickingToolGUI()
 :QmitkToolGUI()

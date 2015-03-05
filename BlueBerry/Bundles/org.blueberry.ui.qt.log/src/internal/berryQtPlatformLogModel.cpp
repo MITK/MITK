@@ -22,20 +22,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 
 #include "berryQtPlatformLogModel.h"
+#include "berryQtLogPlugin.h"
 
 #include "berryPlatform.h"
-#include "event/berryPlatformEvents.h"
+
+#include "mbilogLoggingTypes.h"
 
 #include <sstream>
 #include <string>
 #include <iostream>
 #include <iomanip>
 
-#include <Poco/Message.h>
-#include "berryLog.h"
 #include <QTimer>
 #include <QIcon>
 #include <QModelIndex>
+#include <QDebug>
 
 namespace berry {
 
@@ -48,7 +49,7 @@ const QString QtPlatformLogModel::Debug = QString("Debug");
 void QtPlatformLogModel::slotFlushLogEntries()
 {
   m_Mutex.lock();
-  std::list<ExtendedLogMessage> *tmp=m_Active;
+  QList<ExtendedLogMessage> *tmp=m_Active;
   m_Active=m_Pending; m_Pending=tmp;
   m_Mutex.unlock();
 
@@ -102,13 +103,27 @@ void QtPlatformLogModel::SetShowCategory( bool showCategory )
 }
 
 void
-QtPlatformLogModel::addLogEntry(const PlatformEvent& event)
+QtPlatformLogModel::addLogEntry(const ctkPluginFrameworkEvent& event)
 {
-  const Poco::Message& entry = Poco::RefAnyCast<const Poco::Message>(*event.GetData());
-  mbilog::LogMessage msg(mbilog::Info,"n/a",-1,"n/a");
-  msg.message += entry.getText();
-  msg.category = "BlueBerry."+entry.getSource();
-  msg.moduleName = "n/a";
+  int level = mbilog::Info;
+  if (event.getType() == ctkPluginFrameworkEvent::PLUGIN_ERROR)
+  {
+    level = mbilog::Error;
+  }
+  else if (event.getType() == ctkPluginFrameworkEvent::FRAMEWORK_WAIT_TIMEDOUT ||
+           event.getType() == ctkPluginFrameworkEvent::PLUGIN_WARNING)
+  {
+    level = mbilog::Warn;
+  }
+
+  mbilog::LogMessage msg(level,"n/a",-1,"n/a");
+
+  QString str;
+  QDebug dbg(&str);
+  dbg << event;
+  msg.message = str.toStdString();
+  //msg.moduleName = event.getPlugin()->getSymbolicName().toStdString();
+
   addLogEntry(msg);
 }
 
@@ -116,16 +131,17 @@ QtPlatformLogModel::QtPlatformLogModel(QObject* parent) : QAbstractTableModel(pa
 m_ShowAdvancedFiels(false),
 m_ShowCategory(true)
 {
-  m_Active=new std::list<ExtendedLogMessage>;
-  m_Pending=new std::list<ExtendedLogMessage>;
+  m_Active=new QList<ExtendedLogMessage>;
+  m_Pending=new QList<ExtendedLogMessage>;
   connect(this, SIGNAL(signalFlushLogEntries()), this, SLOT( slotFlushLogEntries() ), Qt::QueuedConnection );
-  Platform::GetEvents().logged += PlatformEventDelegate(this, &QtPlatformLogModel::addLogEntry);
+  QtLogPlugin::GetInstance()->GetContext()->connectFrameworkListener(this, SLOT(addLogEntry(ctkPluginFrameworkEvent)));
   myBackend = new QtLogBackend(this);
 }
 
 QtPlatformLogModel::~QtPlatformLogModel()
 {
   disconnect(this, SIGNAL(signalFlushLogEntries()), this, SLOT( slotFlushLogEntries() ));
+  QtLogPlugin::GetInstance()->GetContext()->disconnectFrameworkListener(this);
 
   // dont delete and unregister backend, only deactivate it to avoid thread syncronization issues cause mbilog::UnregisterBackend is not threadsafe
   // will be fixed.

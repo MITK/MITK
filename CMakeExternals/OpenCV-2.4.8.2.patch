@@ -1,0 +1,48 @@
+diff -burN OpenCV-2.4.8.2/cmake/OpenCVModule.cmake OpenCV/cmake/OpenCVModule.cmake
+--- OpenCV-2.4.8.2/cmake/OpenCVModule.cmake	2014-02-14 14:12:31.000000000 +0100
++++ OpenCV/cmake/OpenCVModule.cmake	2015-01-29 17:02:40.735387894 +0100
+@@ -503,7 +503,7 @@
+     ocv_include_directories(${OPENCL_INCLUDE_DIRS})
+     add_custom_command(
+       OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.cpp" "${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.hpp"
+-      COMMAND ${CMAKE_COMMAND} -DCL_DIR="${CMAKE_CURRENT_SOURCE_DIR}/src/opencl" -DOUTPUT="${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.cpp" -P "${OpenCV_SOURCE_DIR}/cmake/cl2cpp.cmake"
++      COMMAND ${CMAKE_COMMAND} -DCL_DIR=${CMAKE_CURRENT_SOURCE_DIR}/src/opencl -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.cpp -P ${OpenCV_SOURCE_DIR}/cmake/cl2cpp.cmake
+       DEPENDS ${cl_kernels} "${OpenCV_SOURCE_DIR}/cmake/cl2cpp.cmake")
+     source_group("OpenCL" FILES ${cl_kernels} "${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.cpp" "${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.hpp")
+     list(APPEND lib_srcs ${cl_kernels} "${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.cpp" "${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.hpp")
+@@ -551,7 +551,7 @@
+     ARCHIVE_OUTPUT_DIRECTORY ${LIBRARY_OUTPUT_PATH}
+     LIBRARY_OUTPUT_DIRECTORY ${LIBRARY_OUTPUT_PATH}
+     RUNTIME_OUTPUT_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
+-    INSTALL_NAME_DIR lib
++    # INSTALL_NAME_DIR lib
+   )
+ 
+   # For dynamic link numbering convenions
+@@ -894,3 +894,4 @@
+     __ocv_track_module_link_dependencies("${m}" DBG)
+   endforeach()
+ endmacro()
++
+diff -burN OpenCV-2.4.8.2/cmake/templates/OpenCVConfig.cmake.in OpenCV/cmake/templates/OpenCVConfig.cmake.in
+--- OpenCV-2.4.8.2/cmake/templates/OpenCVConfig.cmake.in	2014-02-14 14:12:31.000000000 +0100
++++ OpenCV/cmake/templates/OpenCVConfig.cmake.in	2015-01-29 14:20:42.003947242 +0100
+@@ -90,7 +90,7 @@
+ 
+ # Provide the include directories to the caller
+ set(OpenCV_INCLUDE_DIRS @OpenCV_INCLUDE_DIRS_CONFIGCMAKE@)
+-include_directories(${OpenCV_INCLUDE_DIRS})
++# include_directories(${OpenCV_INCLUDE_DIRS})
+ 
+ # ======================================================
+ # Link directories to add to the user project:
+@@ -123,7 +123,7 @@
+ # ==============================================================
+ SET(OpenCV2_INCLUDE_DIRS @OpenCV2_INCLUDE_DIRS_CONFIGCMAKE@)
+ if(OpenCV2_INCLUDE_DIRS)
+-  include_directories(${OpenCV2_INCLUDE_DIRS})
++  # include_directories(${OpenCV2_INCLUDE_DIRS})
+   list(APPEND OpenCV_INCLUDE_DIRS ${OpenCV2_INCLUDE_DIRS})
+ 
+   set(OpenCV_ADD_DEBUG_RELEASE @OpenCV_ADD_DEBUG_RELEASE_CONFIGCMAKE@)
+

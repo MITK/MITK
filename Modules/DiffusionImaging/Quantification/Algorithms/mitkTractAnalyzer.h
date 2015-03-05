@@ -39,7 +39,7 @@ namespace mitk{
   */
 
 
-class MitkQuantification_EXPORT TractAnalyzer
+class MITKQUANTIFICATION_EXPORT TractAnalyzer
 {
 
 public:

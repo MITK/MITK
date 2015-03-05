@@ -30,7 +30,7 @@ namespace itk
  * \brief The DWIVoxelFunctor class
  * Abstract basisclass for voxelprocessing of Diffusion Weighted Images
  */
-class MitkDiffusionCore_EXPORT DWIVoxelFunctor: public Object
+class MITKDIFFUSIONCORE_EXPORT DWIVoxelFunctor: public Object
 {
 protected:
   DWIVoxelFunctor(){}

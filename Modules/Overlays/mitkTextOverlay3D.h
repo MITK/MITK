@@ -28,7 +28,7 @@ class vtkTextActor3D;
 namespace mitk {
 
 /** \brief Displays at 3D position, always facing the camera */
-class MitkOverlays_EXPORT TextOverlay3D : public mitk::VtkOverlay3D {
+class MITKOVERLAYS_EXPORT TextOverlay3D : public mitk::VtkOverlay3D {
 public:
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the render windows */

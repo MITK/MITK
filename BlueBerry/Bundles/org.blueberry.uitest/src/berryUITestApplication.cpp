@@ -18,7 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryBlueBerryTestDriver.h>
 #include <berryPlatformUI.h>
-#include <berryIExtensionPointService.h>
+#include <berryIExtensionRegistry.h>
+#include <berryIExtension.h>
 #include <berryStarter.h>
 
 #include "internal/berryUITestWorkbenchAdvisor.h"
@@ -44,7 +45,7 @@ private:
 };
 
 UITestApplication::TestRunnable::TestRunnable(UITestApplication* app,
-    const std::string& testPlugin) :
+    const QString& testPlugin) :
   app(app), testPlugin(testPlugin)
 {
 }
@@ -54,11 +55,14 @@ void UITestApplication::TestRunnable::run()
   try
   {
     app->testDriverResult = BlueBerryTestDriver::Run(testPlugin, true);
-  } catch (Poco::IOException& e)
+  }
+  catch (const ctkException& e)
   {
-    std::cerr << e.displayText() << std::endl;
-    //TODO print stack trace
-    //Debug::PrintStackTrace();
+    qWarning() << e.printStackTrace();
+  }
+  catch (const std::exception& e)
+  {
+    qWarning() << e.what();
   }
 }
 
@@ -67,19 +71,13 @@ UITestApplication::UITestApplication()
 
 }
 
-UITestApplication::UITestApplication(const UITestApplication& other)
-{
-  Q_UNUSED(other)
-  throw std::logic_error("Copy constructor not implemented");
-}
-
 int UITestApplication::Start()
 {
   // Get the plug-in to test
   try
   {
-    testPlugin = Platform::GetConfiguration().getString(
-        Platform::ARG_TESTPLUGIN);
+    testPlugin = QString::fromStdString(Platform::GetConfiguration().getString(
+                                          Platform::ARG_TESTPLUGIN.toStdString()));
   } catch (const Poco::NotFoundException& /*e*/)
   {
     BERRY_ERROR << "You must specify a test plug-in id via "
@@ -117,49 +115,41 @@ void UITestApplication::RunTests()
   testableObject->TestingFinished();
 }
 
-IApplication* UITestApplication::GetApplication() throw (CoreException)
+IApplication* UITestApplication::GetApplication()
 {
 
-  const IExtension* extension = 0;
+  IExtension::Pointer extension;
   /*Platform::GetExtensionPointService()->GetExtension(
       Starter::XP_APPLICATIONS, GetApplicationToRun());*/
 
-    IConfigurationElement::vector extensions(
-        Platform::GetExtensionPointService()->GetConfigurationElementsFor(Starter::XP_APPLICATIONS));
-    IConfigurationElement::vector::iterator iter;
+  QList<IConfigurationElement::Pointer> extensions(
+        Platform::GetExtensionRegistry()->GetConfigurationElementsFor(Starter::XP_APPLICATIONS));
 
-    std::string appToRun = GetApplicationToRun();
-    std::string id;
-    for (iter = extensions.begin(); iter != extensions.end(); ++iter)
+  QString appToRun = GetApplicationToRun();
+  QString id;
+  foreach (const IConfigurationElement::Pointer& configElem, extensions)
+  {
+    id = configElem->GetAttribute("id");
+    if(id == appToRun)
     {
-      if((*iter)->GetAttribute("id", id))
-      {
-        if(id == appToRun)
-        {
-          extension = (*iter)->GetDeclaringExtension();
-          break;
-        }
-      }
+      extension = configElem->GetDeclaringExtension();
+      break;
     }
+  }
 
   IApplication* app = 0;
 
   if (extension)
   {
-    std::vector<IConfigurationElement::Pointer> elements(
-        extension->GetConfigurationElements());
-    if (elements.size() > 0)
+    QList<IConfigurationElement::Pointer> elements(
+          extension->GetConfigurationElements());
+    if (!elements.isEmpty())
     {
-      std::vector<IConfigurationElement::Pointer> runs(
-          elements[0]->GetChildren("run"));
-      if (runs.size() > 0)
+      QList<IConfigurationElement::Pointer> runs(
+            elements[0]->GetChildren("run"));
+      if (!runs.isEmpty())
       {
-        app = runs[0]->CreateExecutableExtension<IApplication> ("class"); //$NON-NLS-1$
-        if (app == 0)
-        {
-          // support legacy BlueBerry extensions
-          app = runs[0]->CreateExecutableExtension<IApplication> ("class", IApplication::GetManifestName());
-        }
+        app = runs[0]->CreateExecutableExtension<IApplication> ("class");
       }
     }
     return app;
@@ -168,16 +158,16 @@ IApplication* UITestApplication::GetApplication() throw (CoreException)
   return this;
 }
 
-std::string UITestApplication::GetApplicationToRun()
+QString UITestApplication::GetApplicationToRun()
 {
 
-  std::string testApp;
+  QString testApp;
   try
   {
-    testApp = Platform::GetConfiguration().getString(
-        Platform::ARG_TESTAPPLICATION);
+    testApp = QString::fromStdString(Platform::GetConfiguration().getString(
+                                       Platform::ARG_TESTAPPLICATION.toStdString()));
   }
-  catch (Poco::NotFoundException)
+  catch (const Poco::NotFoundException&)
   {
   }
 

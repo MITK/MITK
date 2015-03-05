@@ -43,7 +43,7 @@ namespace mitk
   /**
   * \brief this class encapsulates qball images
   */
-  class MitkDiffusionCore_EXPORT QBallImage : public Image
+  class MITKDIFFUSIONCORE_EXPORT QBallImage : public Image
   {
 
   public:

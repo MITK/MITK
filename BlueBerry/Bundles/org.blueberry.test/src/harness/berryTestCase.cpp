@@ -23,8 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryDebugUtil.h>
 #endif
 
-berry::TestCase::TestCase(const std::string& testName) :
-  CppUnit::TestCase(testName), m_LeakDetails(false),
+#include <QString>
+
+berry::TestCase::TestCase(const QString& testName) :
+  CppUnit::TestCase(testName.toStdString()), m_LeakDetails(false),
   m_IgnoreLeakage(false)
 {
 

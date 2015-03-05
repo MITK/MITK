@@ -103,7 +103,7 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
     typedef itk::VectorContainer< unsigned int, ItkDirectionImage3DType::Pointer >  ItkDirectionImageContainerType;
 
     // load fiber bundle
-    mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.back()->GetData());
+    mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.back()->GetData());
 
     itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
     if (m_SelectedImage.IsNotNull())
@@ -140,7 +140,7 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
                 minSpacing = outImageSpacing[2];
         }
 
-        mitk::FiberBundleX::Pointer directions = fOdfFilter->GetOutputFiberBundle();
+        mitk::FiberBundle::Pointer directions = fOdfFilter->GetOutputFiberBundle();
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData(directions);
         node->SetName((name+"_vectorfield").toStdString().c_str());
@@ -202,7 +202,7 @@ void QmitkFiberQuantificationView::OnSelectionChanged( std::vector<mitk::DataNod
     for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
     {
         mitk::DataNode::Pointer node = *it;
-        if ( dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
+        if ( dynamic_cast<mitk::FiberBundle*>(node->GetData()) )
         {
             m_SelectedFB.push_back(node);
         }
@@ -232,12 +232,12 @@ void QmitkFiberQuantificationView::GenerateStats()
     for( int i=0; i<m_SelectedFB.size(); i++ )
     {
         mitk::DataNode::Pointer node = m_SelectedFB[i];
-        if (node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()))
+        if (node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()))
         {
             if (i>0)
                 stats += "\n-----------------------------\n";
             stats += QString(node->GetName().c_str()) + "\n";
-            mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+            mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
             stats += "Number of fibers: "+ QString::number(fib->GetNumFibers()) + "\n";
             stats += "Number of points: "+ QString::number(fib->GetNumberOfPoints()) + "\n";
             stats += "Min. length:         "+ QString::number(fib->GetMinFiberLength(),'f',1) + " mm\n";
@@ -263,9 +263,9 @@ void QmitkFiberQuantificationView::ProcessSelectedBundles()
     for( int i=0; i<m_SelectedFB.size(); i++ )
     {
         mitk::DataNode::Pointer node = m_SelectedFB[i];
-        if (node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()))
+        if (node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()))
         {
-            mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+            mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
             QString name(node->GetName().c_str());
             DataNode::Pointer newNode = NULL;
             switch(generationMethod){
@@ -303,7 +303,7 @@ void QmitkFiberQuantificationView::ProcessSelectedBundles()
 }
 
 // generate pointset displaying the fiber endings
-mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateFiberEndingsPointSet(mitk::FiberBundleX::Pointer fib)
+mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateFiberEndingsPointSet(mitk::FiberBundle::Pointer fib)
 {
     mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
     vtkSmartPointer<vtkPolyData> fiberPolyData = fib->GetFiberPolyData();
@@ -346,7 +346,7 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateFiberEndingsPointS
 }
 
 // generate image displaying the fiber endings
-mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateFiberEndingsImage(mitk::FiberBundleX::Pointer fib)
+mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateFiberEndingsImage(mitk::FiberBundle::Pointer fib)
 {
     typedef unsigned char OutPixType;
     typedef itk::Image<OutPixType,3> OutImageType;
@@ -377,7 +377,7 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateFiberEndingsImage(
 }
 
 // generate rgba heatmap from fiber bundle
-mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateColorHeatmap(mitk::FiberBundleX::Pointer fib)
+mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateColorHeatmap(mitk::FiberBundle::Pointer fib)
 {
     typedef itk::RGBAPixel<unsigned char> OutPixType;
     typedef itk::Image<OutPixType, 3> OutImageType;
@@ -408,7 +408,7 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateColorHeatmap(mitk:
 }
 
 // generate tract density image from fiber bundle
-mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary, bool absolute)
+mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(mitk::FiberBundle::Pointer fib, bool binary, bool absolute)
 {
     typedef float OutPixType;
     typedef itk::Image<OutPixType, 3> OutImageType;

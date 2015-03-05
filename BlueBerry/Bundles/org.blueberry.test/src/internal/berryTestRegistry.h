@@ -18,12 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYTESTREGISTRY_H_
 #define BERRYTESTREGISTRY_H_
 
-#include <service/berryIConfigurationElement.h>
+#include <berryIConfigurationElement.h>
 
 #include "berryITestDescriptor.h"
-
-#include <Poco/HashMap.h>
-#include <vector>
 
 namespace berry {
 
@@ -31,25 +28,23 @@ class TestRegistry
 {
 public:
 
-  static const std::string TAG_TEST; // = "test"
-  static const std::string ATT_ID; // = "id"
-  static const std::string ATT_CLASS; // = "class"
-  static const std::string ATT_DESCRIPTION; // = "description"
-  static const std::string ATT_UITEST; // = "uitest"
-
-  static const std::string TEST_MANIFEST; // = "CppUnitTest"
+  static const QString TAG_TEST; // = "test"
+  static const QString ATT_ID; // = "id"
+  static const QString ATT_CLASS; // = "class"
+  static const QString ATT_DESCRIPTION; // = "description"
+  static const QString ATT_UITEST; // = "uitest"
 
   TestRegistry();
 
-  const std::vector<ITestDescriptor::Pointer>& GetTestsForId(const std::string& pluginid);
+  const QList<ITestDescriptor::Pointer>& GetTestsForId(const QString& pluginid);
 
 protected:
 
-  void ReadTest(IConfigurationElement::Pointer testElem);
+  void ReadTest(const IConfigurationElement::Pointer& testElem);
 
 private:
 
-  Poco::HashMap<std::string, std::vector<ITestDescriptor::Pointer> > mapIdToTests;
+  QHash<QString, QList<ITestDescriptor::Pointer> > mapIdToTests;
 };
 
 }

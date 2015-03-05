@@ -27,7 +27,7 @@ namespace mitk {
 
     /**
   * \brief A class to calculate and store the shortest path between each pair of nodes */
-  class MitkConnectomics_EXPORT ConnectomicsShortestPathHistogram : public mitk::ConnectomicsHistogramBase
+  class MITKCONNECTOMICS_EXPORT ConnectomicsShortestPathHistogram : public mitk::ConnectomicsHistogramBase
   {
 
   public:

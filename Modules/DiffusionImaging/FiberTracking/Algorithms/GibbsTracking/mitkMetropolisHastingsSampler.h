@@ -37,7 +37,7 @@ namespace mitk
 /**
 * \brief Generates ne proposals of particle configurations.   */
 
-class MitkFiberTracking_EXPORT MetropolisHastingsSampler
+class MITKFIBERTRACKING_EXPORT MetropolisHastingsSampler
 {
 public:
 

@@ -194,9 +194,10 @@ void mitk::PlaneIntersectionVisitor::processVisualModel(sofa::simulation::Node*,
 
   if (!intersection.edges.empty())
   {
-    intersection.color[0] = static_cast<ScalarType>(material.diffuse[0]);
-    intersection.color[1] = static_cast<ScalarType>(material.diffuse[1]);
-    intersection.color[2] = static_cast<ScalarType>(material.diffuse[2]);
+    intersection.color[0] = material.diffuse[0];
+    intersection.color[1] = material.diffuse[1];
+    intersection.color[2] = material.diffuse[2];
+    intersection.color[3] = material.diffuse[3];
 
     m_Intersections.push_back(intersection);
   }

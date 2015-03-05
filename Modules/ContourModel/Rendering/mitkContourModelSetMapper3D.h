@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  class MitkContourModel_EXPORT ContourModelSetMapper3D : public VtkMapper
+  class MITKCONTOURMODEL_EXPORT ContourModelSetMapper3D : public VtkMapper
   {
       public:
     /** Standard class typedefs. */
@@ -62,7 +62,7 @@ namespace mitk {
     /*+++ END methods of MITK-VTK rendering pipeline +++*/
 
 
-    class MitkContourModel_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
+    class MITKCONTOURMODEL_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
 

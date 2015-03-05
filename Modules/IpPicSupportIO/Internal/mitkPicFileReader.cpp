@@ -22,11 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageWriteAccessor.h"
 #include "mitkCustomMimeType.h"
 
-extern "C"
-{
-  mitkIpPicDescriptor * MITKipPicGet( char *infile_name, mitkIpPicDescriptor *pic );
-  mitkIpPicDescriptor * MITKipPicGetTags( char *infile_name, mitkIpPicDescriptor *pic );
-}
+#include <mitkIpPic.h>
 
 mitk::PicFileReader::PicFileReader()
   : AbstractFileReader()
@@ -67,7 +63,7 @@ mitk::Image::Pointer mitk::PicFileReader::CreateImage()
     mitkThrow() << "File could not be read.";
   }
 
-  header=MITKipPicGetTags(const_cast<char *>(fileName.c_str()), header);
+  header=mitkIpPicGetTags(const_cast<char *>(fileName.c_str()), header);
 
   int channels = 1;
 
@@ -169,9 +165,8 @@ mitk::PicFileReader* mitk::PicFileReader::Clone() const
 void mitk::PicFileReader::FillImage(Image::Pointer output)
 {
   mitkIpPicDescriptor* outputPic = mitkIpPicNew();
-  mitk::ImageWriteAccessor imageAccess(output);
-  outputPic = CastToIpPicDescriptor(output, &imageAccess, outputPic);
-  mitkIpPicDescriptor* pic=MITKipPicGet(const_cast<char *>(this->GetLocalFileName().c_str()),
+  outputPic = CastToIpPicDescriptor(output, nullptr, outputPic);
+  mitkIpPicDescriptor* pic=mitkIpPicGet(const_cast<char *>(this->GetLocalFileName().c_str()),
                                         outputPic);
   // comes upside-down (in MITK coordinates) from PIC file
   ConvertHandedness(pic);
@@ -202,4 +197,11 @@ void mitk::PicFileReader::FillImage(Image::Pointer output)
     mitkIpPicFree(header);
     mitkIpPicDelTag( pic, "VELOCITY" );
   }
+
+  // Copy the memory to avoid mismatches of malloc() and delete[].
+  // mitkIpPicGet will always allocate a new memory block with malloc(),
+  // but MITK Images delete the data via delete[].
+  output->SetImportChannel(pic->data, 0, Image::CopyMemory);
+  pic->data = nullptr;
+  mitkIpPicFree(pic);
 }

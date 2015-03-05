@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkVtkGLMapperWrapper.h>
 
-
 mitk::SegmentationObjectFactory::SegmentationObjectFactory()
 :CoreObjectFactoryBase()
 {
@@ -85,7 +84,6 @@ void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
     return;
 
   mitk::DataNode::Pointer nodePointer = node;
-
 
 //  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 //  if(image.IsNotNull() && image->IsInitialized())

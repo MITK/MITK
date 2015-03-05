@@ -26,7 +26,7 @@ class UITestWorkbenchWindowAdvisor : public WorkbenchWindowAdvisor
 {
 public:
 
-  UITestWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer::Pointer configurer);
+  UITestWorkbenchWindowAdvisor(const SmartPointer<IWorkbenchWindowConfigurer>& configurer);
 };
 
 }

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSetVtkRendererVisitor.h"
 #include "mitkSimulation.h"
 #include "mitkSimulationVtkMapper3D.h"
-#include "mitkVtkSimulationPolyDataMapper.h"
+#include "mitkVtkSimulationPolyDataMapper3D.h"
 #include <sofa/component/visualmodel/VisualStyle.h>
 #include <sofa/core/visual/VisualParams.h>
 
@@ -80,7 +80,7 @@ mitk::SimulationVtkMapper3D::~SimulationVtkMapper3D()
 {
 }
 
-void mitk::SimulationVtkMapper3D::ApplyColorAndOpacityProperties(vtkActor*, BaseRenderer*)
+void mitk::SimulationVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer*, vtkActor*)
 {
 }
 
@@ -110,7 +110,7 @@ void mitk::SimulationVtkMapper3D::ApplySimulationProperties(BaseRenderer* render
   node->GetBoolProperty("Simulation.Options.Wire Frame", showWireFrame, renderer);
   node->GetBoolProperty("Simulation.Visual.Visual Models", showVisualModels, renderer);
 
-  Simulation* simulation = static_cast<Simulation*>(this->GetData());
+  Simulation* simulation = static_cast<Simulation*>(node->GetData());
   sofa::component::visualmodel::VisualStyle::SPtr visualStyle;
   simulation->GetRootNode()->get(visualStyle);
 
@@ -146,7 +146,7 @@ void mitk::SimulationVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer
 
   if (localStorage->m_Mapper == NULL)
   {
-    localStorage->m_Mapper = vtkSmartPointer<vtkSimulationPolyDataMapper>::New();
+    localStorage->m_Mapper = vtkSmartPointer<vtkSimulationPolyDataMapper3D>::New();
     localStorage->m_Mapper->SetSimulation(simulation);
 
     localStorage->m_Actor->SetMapper(localStorage->m_Mapper);

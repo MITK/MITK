@@ -44,7 +44,7 @@ class QFileDialogPrivate;
 *
 * @ingroup ToFUI
 */
-class MitkToFUI_EXPORT QmitkToFRecorderWidget :public QWidget
+class MITKTOFUI_EXPORT QmitkToFRecorderWidget :public QWidget
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

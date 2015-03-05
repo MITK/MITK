@@ -46,7 +46,7 @@ namespace mitk {
   *  @throw This class may throw an ImageTypeIsNotSupportedByGPU, if the image
   *  format is supported by the GPU.
   */
-class MitkOpenCL_EXPORT OclImage : public OclBaseData
+class MITKOPENCL_EXPORT OclImage : public OclBaseData
 {
 public:
   mitkClassMacro(OclImage, OclBaseData);

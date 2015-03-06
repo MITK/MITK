@@ -50,10 +50,27 @@ namespace mitk {
 
   public:
 
+    // Standard macros
     mitkClassMacro(CorrelationCalculator, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
+    /**
+     * @brief The ParcelMode enum defines how to define the correlation between two parcels
+     *
+     * Available choices are:
+     * <ol>
+     *  <li> UseAverageTimeSeries - Average time series across the parcel, correlate average time series between parcels
+     *  <li> UseMaximumCorrelation - Correlate all voxels of the parcels with each other, use maximum correlation
+     *  <li> UseAverageCorrelation - Correlate all voxels of the parcels with each other, use average correlation
+     * </ol>
+     */
+    enum ParcelMode
+    {
+      UseAverageTimeSeries,
+      UseMaximumCorrelation,
+      UseAverageCorrelation
+    };
 
     /**
      * @brief Calculate and return the pearson correlation coefficient for two vectors of data
@@ -102,9 +119,12 @@ namespace mitk {
     /**
      * @brief Create a #parcel x #parcel correlation matrix
      */
-    void DoParcelCorrelation();
+    void DoParcelCorrelation( ParcelMode mode = UseAverageTimeSeries );
 
-    void Modified();
+    /**
+     * @brief Marks average time series as invalid and calls superclass modified
+     */
+    virtual void Modified();
 
     const vnl_matrix< double >* GetCorrelationMatrix() const;
     const std::map< unsigned int, int >* GetLabelOrderMap() const;
@@ -116,6 +136,9 @@ namespace mitk {
 
   protected:
 
+    // intentionally not accessible, use our non-const Modified function instead
+    virtual void Modified() const override;
+
     CorrelationCalculator();
     virtual ~CorrelationCalculator();
 
@@ -123,6 +146,10 @@ namespace mitk {
     void ExtractAllAverageTimeSeries( itk::Image< TPixel, VImageDimension>* itkTimeSeriesImage );
 
     void ExtractCenterOfMassForParcels();
+
+
+    double GetParcelCorrelation(const int& parcelA,const int& parcelB, ParcelMode& mode) const;
+
     // Member variables
     bool m_InvalidTimeSeries;
 
@@ -130,6 +157,7 @@ namespace mitk {
     mitk::Image::Pointer m_TimeSeriesImage;
 
     std::map< int, std::vector<double> > m_AverageTimeSeries;
+    std::map< int, std::vector<std::vector< T > > > m_ParcelTimeSeries;
 
     std::map< int, mitk::Point3D > m_ParcelCenterOfMass;
 

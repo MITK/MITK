@@ -150,26 +150,111 @@ void mitk::CorrelationCalculator<T>::DoWholeCorrelation(  )
 }
 
 template< class T >
-void mitk::CorrelationCalculator<T>::DoParcelCorrelation(  )
+void mitk::CorrelationCalculator<T>::DoParcelCorrelation( mitk::CorrelationCalculator<T>::ParcelMode mode  )
 {
-  AccessFixedDimensionByItk(this->m_TimeSeriesImage, ExtractAllAverageTimeSeries, 4);
   this->ExtractCenterOfMassForParcels();
 
-  // fill matrix
-  m_CorrelationMatrix = vnl_matrix<double>(m_AverageTimeSeries.size(), m_AverageTimeSeries.size());
+  m_CorrelationMatrix = vnl_matrix<double>(m_ParcelCenterOfMass.size(), m_ParcelCenterOfMass.size());
 
+
+  AccessFixedDimensionByItk(this->m_TimeSeriesImage, ExtractAllAverageTimeSeries, 4);
+
+  // fill matrix
   unsigned int i(0);
   for( std::map< int, std::vector<double> >::const_iterator it(m_AverageTimeSeries.begin()); it != m_AverageTimeSeries.end(); ++it, ++i)
   {
     unsigned int j(0);
     for(std::map< int, std::vector<double> >::const_iterator inner_it(m_AverageTimeSeries.begin()); inner_it != it; ++inner_it, ++j)
     {
-      m_CorrelationMatrix[i][j] = mitk::CorrelationCalculator<double>::CalculatePearsonCorrelationCoefficient( it->second, inner_it->second );
+      switch( mode )
+      {
+      case UseAverageTimeSeries :
+        m_CorrelationMatrix[i][j] = mitk::CorrelationCalculator<double>::CalculatePearsonCorrelationCoefficient( it->second, inner_it->second );
+        break;
+      case UseMaximumCorrelation :
+        m_CorrelationMatrix[i][j] = mitk::CorrelationCalculator<T>::GetParcelCorrelation(it->first, inner_it->first, mode);
+        break;
+      case UseAverageCorrelation :
+        m_CorrelationMatrix[i][j] = mitk::CorrelationCalculator<T>::GetParcelCorrelation(it->first, inner_it->first, mode);
+        break;
+      default:
+        mitkThrow() << "No valid parcel correlation mode selected";
+      }
       m_CorrelationMatrix[j][i] = m_CorrelationMatrix[i][j];
     }
+
     m_CorrelationMatrix[i][i] = 1;
     m_LabelOrderMap.insert(std::pair< unsigned int, int >(i, it->first));
   }
+}
+
+template< class T >
+double mitk::CorrelationCalculator<T>::GetParcelCorrelation(const int& parcelA, const int& parcelB, mitk::CorrelationCalculator<T>::ParcelMode& mode) const
+{
+  double result(0.0);
+
+  if(m_ParcelTimeSeries.count(parcelA) < 1 || m_ParcelTimeSeries.count(parcelB) < 1)
+  {
+    MITK_ERROR << "Tried to calculate correlation between at least one non-existent parcel " << parcelA << " and " << parcelB;
+    return result;
+  }
+  std::vector< std::vector< T > > parcelATimeSeriesVector = m_ParcelTimeSeries.find( parcelA )->second;
+  std::vector< std::vector< T > > parcelBTimeSeriesVector = m_ParcelTimeSeries.find( parcelB )->second;
+
+  switch( mode )
+  {
+  case UseAverageTimeSeries :
+  {
+    mitkThrow() << "Wrong function called for this mode.";
+    break;
+  }
+  case UseMaximumCorrelation :
+  {
+    for(unsigned int i(0); i < parcelATimeSeriesVector.size(); ++i)
+    {
+      for(unsigned int j(0); j < parcelBTimeSeriesVector.size(); ++j)
+      {
+        double corr =
+            mitk::CorrelationCalculator<T>::CalculatePearsonCorrelationCoefficient(
+              parcelATimeSeriesVector[i], parcelBTimeSeriesVector[j]
+              );
+        if( corr > result )
+        {
+          result = corr;
+        }
+      }
+    }
+    break;
+  }
+  case UseAverageCorrelation :
+  {
+    double corr(0.0);
+    for(unsigned int i(0); i < parcelATimeSeriesVector.size(); ++i)
+    {
+      for(unsigned int j(0); j < parcelBTimeSeriesVector.size(); ++j)
+      {
+        corr +=
+            mitk::CorrelationCalculator<T>::CalculatePearsonCorrelationCoefficient(
+              parcelATimeSeriesVector[i], parcelBTimeSeriesVector[j]
+              );
+      }
+    }
+    result = corr / double( parcelATimeSeriesVector.size() * parcelBTimeSeriesVector.size() );
+    break;
+  }
+  default:
+  {
+    mitkThrow() << "No valid parcel correlation mode selected";
+  }
+  }
+
+  return result;
+}
+
+template< class T >
+void mitk::CorrelationCalculator<T>::Modified(  ) const
+{
+  Superclass::Modified();
 }
 
 template< class T >
@@ -183,6 +268,8 @@ template< class T>
 template< typename TPixel, unsigned int VImageDimension >
 void mitk::CorrelationCalculator<T>::ExtractAllAverageTimeSeries( itk::Image<TPixel, VImageDimension>* itkTimeSeriesImage )
 {
+  // storage contains for each parcel value a vector of length time steps,
+  // which manages the pixel value vectors for each time step
   std::map< int, std::vector< std::vector< T > > > storage;
 
   itk::ImageRegionConstIteratorWithIndex< itk::Image<TPixel, VImageDimension> > it_itkTimeSeriesImage(
@@ -202,7 +289,8 @@ void mitk::CorrelationCalculator<T>::ExtractAllAverageTimeSeries( itk::Image<TPi
     mitk::Point3D tempPoint;
 
     m_TimeSeriesImage->GetGeometry()->IndexToWorld( itkIndex3D, tempPoint );
-    int value( std::floor( m_ParcellationImage->GetPixelValueByWorldCoordinate( tempPoint ) + 0.5 ) );
+    mitk::ImagePixelReadAccessor<int, 3> readAccess(m_ParcellationImage);
+    int value( std::floor( readAccess.GetPixelByWorldCoordinates( tempPoint ) + 0.5 ) );
 
     if(storage.count(value) == 0)
     {
@@ -224,6 +312,24 @@ void mitk::CorrelationCalculator<T>::ExtractAllAverageTimeSeries( itk::Image<TPi
       means[loop] = std::accumulate( it->second[loop].begin(), it->second[loop].end(), 0.0 ) / double(it->second[loop].size());
     }
     m_AverageTimeSeries.insert( std::pair< int, std::vector< double > >(it->first, means) );
+
+    // reorder the information in storage for m_ParcelTimeSeries
+    // time series of each voxel by their parcellation value
+    std::vector< std::vector< T > > vectorOfTimeSeriesVectors;
+    vectorOfTimeSeriesVectors.resize(it->second[0].size());
+    for(unsigned int loop(0); loop < vectorOfTimeSeriesVectors.size(); ++loop)
+    {
+      vectorOfTimeSeriesVectors[loop].resize(timesteps);
+    }
+
+    for(unsigned int step(0); step < timesteps; ++step)
+    {
+      for(unsigned int number(0); number < vectorOfTimeSeriesVectors.size(); ++number)
+      {
+        vectorOfTimeSeriesVectors[number][step] = it->second[step][number];
+      }
+    }
+    m_ParcelTimeSeries.insert(std::pair< int, std::vector< std::vector< T > > >(it->first, vectorOfTimeSeriesVectors));
   }
 }
 
@@ -308,7 +414,7 @@ mitk::ConnectomicsNetwork::Pointer mitk::CorrelationCalculator<T>::GetConnectomi
   if( m_ParcelCenterOfMass.size() > 0)
   {
     std::map< int, mitk::Point3D >::const_iterator it = m_ParcelCenterOfMass.begin();
-    for(unsigned int loop(0); loop < numberOfNodes, it != m_ParcelCenterOfMass.end(); ++loop, ++it )
+    for(unsigned int loop(0); (loop < numberOfNodes) && (it != m_ParcelCenterOfMass.end()); ++loop, ++it )
     {
       (*boostGraph)[ idToVertexMap[loop] ].id = idToVertexMap[loop];
       (*boostGraph)[ idToVertexMap[loop] ].label = std::to_string( it->first );

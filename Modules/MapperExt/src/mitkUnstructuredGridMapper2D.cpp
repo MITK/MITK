@@ -94,7 +94,7 @@ void mitk::UnstructuredGridMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   input->Update();
 
   if (m_VtkPointSet) m_VtkPointSet->UnRegister(0);
-  m_VtkPointSet = this->GetVtkPointSet(renderer);
+  m_VtkPointSet = this->GetVtkPointSet(renderer, this->GetTimestep());
   assert(m_VtkPointSet);
   m_VtkPointSet->Register(0);
 
@@ -457,7 +457,7 @@ mitk::UnstructuredGridMapper2D
 
 vtkPointSet*
 mitk::UnstructuredGridMapper2D
-::GetVtkPointSet(mitk::BaseRenderer* renderer)
+::GetVtkPointSet(mitk::BaseRenderer* renderer, int time)
 {
   //MITK_INFO << "GETVTKPOINTSET\n";
   vtkAbstractMapper3D * abstractMapper = GetVtkAbstractMapper3D(renderer);
@@ -470,7 +470,7 @@ mitk::UnstructuredGridMapper2D
     mitk::BaseData::Pointer data = node->GetData();
     mitk::UnstructuredGrid::Pointer grid = dynamic_cast<mitk::UnstructuredGrid*>(data.GetPointer());
     if (!grid.IsNull())
-      return static_cast<vtkPointSet*>(grid->GetVtkUnstructuredGrid());
+      return static_cast<vtkPointSet*>(grid->GetVtkUnstructuredGrid(time));
 
     return 0;
   }
@@ -540,7 +540,7 @@ vtkScalarsToColors* mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer
 
 bool mitk::UnstructuredGridMapper2D::IsConvertibleToVtkPointSet(mitk::BaseRenderer * renderer)
 {
-  return ( GetVtkPointSet(renderer) != 0 );
+  return ( GetVtkPointSet(renderer,this->GetTimestep()) != 0);
 }
 
 mitk::UnstructuredGridMapper2D::UnstructuredGridMapper2D()

@@ -258,6 +258,36 @@ public:
     refNetwork->AddEdge(y,z);
     CPPUNIT_ASSERT_MESSAGE( "Comparing created and reference network.", mitk::Equal( network.GetPointer(), refNetwork, mitk::eps, true) );
 
+    // check sample parcels for other methods
+    correlationCalculator->DoParcelCorrelation( mitk::CorrelationCalculator<int>::UseAverageCorrelation );
+    cM = correlationCalculator->GetCorrelationMatrix();
+    // parcel 0 and parcel 1 should correlate with -0.0643023
+    equal = true;
+    if( std::abs((*cM)[1][0] - -0.0643023) > 0.00001 )
+    {
+      equal = false;
+    }
+    // parcel 0 and parcel 2 should correlate with 0.99998
+    if( std::abs((*cM)[2][0] - 0.99998) > 0.00001 )
+    {
+      equal = false;
+    }
+    CPPUNIT_ASSERT_MESSAGE( "Comparing sample parcel correlation for average correlation.", equal );
+
+    correlationCalculator->DoParcelCorrelation( mitk::CorrelationCalculator<int>::UseMaximumCorrelation );
+    cM = correlationCalculator->GetCorrelationMatrix();
+    // parcel 0 and parcel 1 should correlate with 0.636613
+    equal = true;
+    if( std::abs((*cM)[1][0] - 0.636613) > 0.00001 )
+    {
+      equal = false;
+    }
+    // parcel 0 and parcel 2 should correlate with 0.99998
+    if( std::abs((*cM)[2][0] - 0.99998) > 0.00001 )
+    {
+      equal = false;
+    }
+    CPPUNIT_ASSERT_MESSAGE( "Comparing sample parcel correlation for maximum correlation.", equal );
   }
 };
 

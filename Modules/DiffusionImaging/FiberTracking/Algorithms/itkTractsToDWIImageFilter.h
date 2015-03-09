@@ -64,7 +64,6 @@ public:
     itkSetMacro( UseConstantRandSeed, bool )                ///< Seed for random generator.
     void SetParameters( FiberfoxParameters<double> param )  ///< Simulation parameters.
     { m_Parameters = param; }
-    itkSetMacro( HelperTdi, ItkFloatImgType::Pointer )
 
     /** Output */
     FiberfoxParameters<double> GetParameters(){ return m_Parameters; }
@@ -118,17 +117,11 @@ protected:
     ImageRegion<3>                              m_UpsampledImageRegion;
     double                                      m_VoxelVolume;
     std::vector< DoubleDwiType::Pointer >       m_CompartmentImages;
-    ItkUcharImgType::Pointer                    m_MaskImage;                ///< copy of mask image (changes for each motion step)
+    ItkUcharImgType::Pointer                    m_TransformedMaskImage;                ///< copy of mask image (changes for each motion step)
     ItkUcharImgType::Pointer                    m_UpsampledMaskImage;       ///< helper image for motion simulation
     DoubleVectorType                            m_Rotation;
     DoubleVectorType                            m_Translation;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
-
-    // TEMP
-    ItkFloatImgType::Pointer                    m_HelperTdi;
-    ItkFloatImgType::Pointer                    m_HelperTdiUpsampled;
-    ItkFloatImgType::Pointer                    m_HelperTdiTransformed;
-    ItkUcharImgType::Pointer                    m_HelperTdiCounter;
 };
 }
 

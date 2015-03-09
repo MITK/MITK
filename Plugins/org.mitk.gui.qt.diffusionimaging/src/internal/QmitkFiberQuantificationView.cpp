@@ -214,10 +214,6 @@ void QmitkFiberQuantificationView::OnSelectionChanged( std::vector<mitk::DataNod
         }
     }
     UpdateGui();
-
-
-    if (!this->IsVisible())
-        return;
     GenerateStats();
 }
 
@@ -303,7 +299,6 @@ void QmitkFiberQuantificationView::ProcessSelectedBundles()
                 GetDataStorage()->Add(newNode);
             }
         }
-        break;
     }
 }
 
@@ -418,16 +413,8 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(
     typedef float OutPixType;
     typedef itk::Image<OutPixType, 3> OutImageType;
 
-    std::vector< mitk::FiberBundle::Pointer > fibs;
-    for (int i=0; i<m_SelectedFB.size(); i++)
-    {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
-        fibs.push_back(fib);
-    }
-
     itk::TractDensityImageFilter< OutImageType >::Pointer generator = itk::TractDensityImageFilter< OutImageType >::New();
-    generator->fibs = fibs;
-//    generator->SetFiberBundle(fib);
+    generator->SetFiberBundle(fib);
     generator->SetBinaryOutput(binary);
     generator->SetOutputAbsoluteValues(absolute);
     generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());

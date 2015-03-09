@@ -923,8 +923,8 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
                         ++it;
                         continue;
                     }
-                    if (it.Get()>900)
-                        it.Set(900);
+//                    if (it.Get()>900)
+//                        it.Set(900);
 
                     if (it.Get()>max)
                         max = it.Get();
@@ -1956,7 +1956,7 @@ void QmitkFiberfoxView::GenerateFibers()
             return;
     }
 
-    FiberfoxParameters<double> parameters = UpdateImageParameters<double>();
+    FiberfoxParameters<double> parameters; // = UpdateImageParameters<double>();
 
     for (unsigned int i=0; i<m_SelectedBundles.size(); i++)
     {
@@ -2184,13 +2184,6 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
         return;
     }
 
-    if (m_SelectedImageNode.IsNotNull())
-    {
-        ItkFloatImgType::Pointer itkImg = ItkFloatImgType::New();
-        mitk::Image::Pointer mitkImg = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetData());
-        mitk::CastToItkImage<ItkFloatImgType>(mitkImg, itkImg);
-        m_TractsToDwiFilter->SetHelperTdi(itkImg);
-    }
     m_TractsToDwiFilter->SetParameters(parameters);
     m_TractsToDwiFilter->SetFiberBundle(fiberBundle);
     m_Worker.m_FilterType = 0;

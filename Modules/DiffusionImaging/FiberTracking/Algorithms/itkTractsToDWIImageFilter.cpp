@@ -106,7 +106,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 
     std::vector< unsigned int > spikeVolume;
     for (unsigned int i=0; i<m_Parameters.m_SignalGen.m_Spikes; i++)
-        spikeVolume.push_back(m_RandGen->GetIntegerVariate()%(images.at(0)->GetVectorLength()-1)+1);
+        spikeVolume.push_back(m_RandGen->GetIntegerVariate()%(images.at(0)->GetVectorLength()));
     std::sort (spikeVolume.begin(), spikeVolume.end());
     std::reverse (spikeVolume.begin(), spikeVolume.end());
 
@@ -570,11 +570,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     m_Translation = m_Parameters.m_SignalGen.m_Translation/m_Parameters.m_SignalGen.GetNumVolumes();
 
     // creat image to hold transformed mask (motion artifact)
-    m_MaskImage = ItkUcharImgType::New();
+    m_TransformedMaskImage = ItkUcharImgType::New();
     itk::ImageDuplicator<ItkUcharImgType>::Pointer duplicator = itk::ImageDuplicator<ItkUcharImgType>::New();
     duplicator->SetInputImage(m_Parameters.m_SignalGen.m_MaskImage);
     duplicator->Update();
-    m_MaskImage = duplicator->GetOutput();
+    m_TransformedMaskImage = duplicator->GetOutput();
 
     // second upsampling needed for motion artifacts
     ImageRegion<3>      upsampledImageRegion = m_UpsampledImageRegion;
@@ -601,33 +601,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     upsampler->SetInterpolator(nn_interpolator);
     upsampler->Update();
     m_UpsampledMaskImage = upsampler->GetOutput();
-
-    if (m_HelperTdi.IsNotNull())
-    {
-        itk::ResampleImageFilter<ItkFloatImgType, ItkFloatImgType>::Pointer upsampler = itk::ResampleImageFilter<ItkFloatImgType, ItkFloatImgType>::New();
-        upsampler->SetInput(m_HelperTdi);
-        upsampler->SetOutputParametersFromImage(m_HelperTdi);
-        upsampler->SetSize(upsampledImageRegion.GetSize());
-        upsampler->SetOutputSpacing(upsampledSpacing);
-        upsampler->SetOutputOrigin(upsampledOrigin);
-        itk::LinearInterpolateImageFunction<ItkFloatImgType, double>::Pointer nn_interpolator
-                = itk::LinearInterpolateImageFunction<ItkFloatImgType, double>::New();
-        upsampler->SetInterpolator(nn_interpolator);
-        upsampler->Update();
-        m_HelperTdiUpsampled = upsampler->GetOutput();
-
-        m_HelperTdiTransformed = ItkFloatImgType::New();
-        itk::ImageDuplicator<ItkFloatImgType>::Pointer duplicator = itk::ImageDuplicator<ItkFloatImgType>::New();
-        duplicator->SetInputImage(m_HelperTdi);
-        duplicator->Update();
-        m_HelperTdiTransformed = duplicator->GetOutput();
-
-        m_HelperTdiCounter = ItkUcharImgType::New();
-        itk::ImageDuplicator<ItkUcharImgType>::Pointer duplicator2 = itk::ImageDuplicator<ItkUcharImgType>::New();
-        duplicator2->SetInputImage(m_MaskImage);
-        duplicator2->Update();
-        m_HelperTdiCounter = duplicator2->GetOutput();
-    }
 
     unsigned long lastTick = 0;
     int signalModelSeed = m_RandGen->GetIntegerVariate();
@@ -657,27 +630,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             intraAxonalVolumeImage->FillBuffer(0);
 
             vtkPolyData* fiberPolyData = m_FiberBundleTransformed->GetFiberPolyData();
-
-            // GET TDI
-            ItkDoubleImgType::Pointer TDI = ItkDoubleImgType::New();
-            TDI->SetSpacing( m_UpsampledSpacing );
-            TDI->SetOrigin( m_UpsampledOrigin );
-            TDI->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
-            TDI->SetLargestPossibleRegion( m_UpsampledImageRegion );
-            TDI->SetBufferedRegion( m_UpsampledImageRegion );
-            TDI->SetRequestedRegion( m_UpsampledImageRegion );
-            TDI->Allocate();
-            TDI->FillBuffer(0);
-            itk::TractDensityImageFilter< ItkDoubleImgType >::Pointer tdiFilter = itk::TractDensityImageFilter< ItkDoubleImgType >::New();
-            tdiFilter->SetFiberBundle(m_FiberBundleTransformed);
-            tdiFilter->SetBinaryOutput(false);
-            tdiFilter->SetOutputAbsoluteValues(false);
-            tdiFilter->SetInputImage(TDI);
-            tdiFilter->SetUseImageGeometry(true);
-            tdiFilter->SetDoFiberResampling(false);
-            tdiFilter->Update();
-            TDI = tdiFilter->GetOutput();
-
             // generate fiber signal (if there are any fiber models present)
             if (!m_Parameters.m_FiberModelList.empty())
                 for( int i=0; i<numFibers; i++ )
@@ -713,37 +665,26 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
                         itk::Index<3> idx;
                         itk::ContinuousIndex<float, 3> contIndex;
-                        m_MaskImage->TransformPhysicalPointToIndex(vertex, idx);
-                        m_MaskImage->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
+                        m_TransformedMaskImage->TransformPhysicalPointToIndex(vertex, idx);
+                        m_TransformedMaskImage->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
 
-                        if (!m_MaskImage->GetLargestPossibleRegion().IsInside(idx) || m_MaskImage->GetPixel(idx)<=0)
+                        if (!m_TransformedMaskImage->GetLargestPossibleRegion().IsInside(idx) || m_TransformedMaskImage->GetPixel(idx)<=0)
                             continue;
-
-                        double TdCorrectionFactor = 1;
-                        if (m_HelperTdiTransformed.IsNotNull())
-                        {
-                            double TD = TDI->GetPixel(idx);
-                            itk::Index<3> idx2;
-                            m_HelperTdiTransformed->TransformPhysicalPointToIndex(vertex, idx2);
-                            double HTD = m_HelperTdiTransformed->GetPixel(idx2);
-                            if (TD>0.00001)
-                                TdCorrectionFactor = sqrt(HTD)/TD;
-                        }
 
                         // generate signal for each fiber compartment
                         for (int k=0; k<numFiberCompartments; k++)
                         {
                             m_Parameters.m_FiberModelList[k]->SetFiberDirection(dir);
                             DoubleDwiType::PixelType pix = m_CompartmentImages.at(k)->GetPixel(idx);
-                            pix[g] += TdCorrectionFactor*fiberWeight*segmentVolume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g);
+                            pix[g] += fiberWeight*segmentVolume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g);
 
                             m_CompartmentImages.at(k)->SetPixel(idx, pix);
                         }
 
                         // update fiber volume image
-                        double vol = intraAxonalVolumeImage->GetPixel(idx) + segmentVolume*fiberWeight*TdCorrectionFactor;
+                        double vol = intraAxonalVolumeImage->GetPixel(idx) + segmentVolume*fiberWeight;
                         intraAxonalVolumeImage->SetPixel(idx, vol);
-                        if (g==0 && vol>maxVolume)
+                        if (g==0 && vol>maxVolume)  // we assume that the first volume is always unweighted!
                             maxVolume = vol;
                     }
 
@@ -756,9 +697,9 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                 }
 
             // generate non-fiber signal
-            ImageRegionIterator<ItkUcharImgType> it3(m_MaskImage, m_MaskImage->GetLargestPossibleRegion());
-            double fact = 1;
-            if (m_Parameters.m_SignalGen.m_AxonRadius<0.0001 || maxVolume>m_VoxelVolume)
+            ImageRegionIterator<ItkUcharImgType> it3(m_TransformedMaskImage, m_TransformedMaskImage->GetLargestPossibleRegion());
+            double fact = 1;    // density correction factor in mm³
+            if (m_Parameters.m_SignalGen.m_AxonRadius<0.0001 || maxVolume>m_VoxelVolume)    // the fullest voxel is always completely full
                 fact = m_VoxelVolume/maxVolume;
             while(!it3.IsAtEnd())
             {
@@ -796,7 +737,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         // calculate main fiber directions
         itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
         fOdfFilter->SetFiberBundle(m_FiberBundleTransformed);
-        fOdfFilter->SetMaskImage(m_MaskImage);
+        fOdfFilter->SetMaskImage(m_TransformedMaskImage);
         fOdfFilter->SetAngularThreshold(cos(m_Parameters.m_SignalGen.m_FiberSeparationThreshold*M_PI/180.0));
         fOdfFilter->SetNormalizeVectors(false);
         fOdfFilter->SetUseWorkingCopy(true);
@@ -828,7 +769,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
         m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
         m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
-        boost::progress_display disp(m_MaskImage->GetLargestPossibleRegion().GetNumberOfPixels()*m_Parameters.m_SignalGen.GetNumVolumes());
+        boost::progress_display disp(m_TransformedMaskImage->GetLargestPossibleRegion().GetNumberOfPixels()*m_Parameters.m_SignalGen.GetNumVolumes());
 
         for (unsigned int g=0; g<m_Parameters.m_SignalGen.GetNumVolumes(); g++)
         {
@@ -841,7 +782,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             if (m_Parameters.m_SignalGen.m_DoAddMotion && g>0)  // if fibers have moved we need a new TDI and new directions
             {
                 fOdfFilter->SetFiberBundle(m_FiberBundleTransformed);
-                fOdfFilter->SetMaskImage(m_MaskImage);
+                fOdfFilter->SetMaskImage(m_TransformedMaskImage);
                 fOdfFilter->Update();
                 directionImageContainer = fOdfFilter->GetDirectionImageContainer();
 
@@ -850,7 +791,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                 intraAxonalVolumeImage = tdiFilter->GetOutput();
             }
 
-            ImageRegionIterator< ItkUcharImgType > it(m_MaskImage, m_MaskImage->GetLargestPossibleRegion());
+            ImageRegionIterator< ItkUcharImgType > it(m_TransformedMaskImage, m_TransformedMaskImage->GetLargestPossibleRegion());
             while(!it.IsAtEnd())
             {
                 ++disp;
@@ -920,8 +861,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
         m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
         m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
-        boost::progress_display disp(m_MaskImage->GetLargestPossibleRegion().GetNumberOfPixels());
-        ImageRegionIterator<ItkUcharImgType> it(m_MaskImage, m_MaskImage->GetLargestPossibleRegion());
+        boost::progress_display disp(m_TransformedMaskImage->GetLargestPossibleRegion().GetNumberOfPixels());
+        ImageRegionIterator<ItkUcharImgType> it(m_TransformedMaskImage, m_TransformedMaskImage->GetLargestPossibleRegion());
         while(!it.IsAtEnd())
         {
             ++disp;
@@ -1137,7 +1078,7 @@ void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
         if (m_MaskImageSet)
         {
             ImageRegionIterator<ItkUcharImgType> maskIt(m_UpsampledMaskImage, m_UpsampledMaskImage->GetLargestPossibleRegion());
-            m_MaskImage->FillBuffer(0);
+            m_TransformedMaskImage->FillBuffer(0);
 
             while(!maskIt.IsAtEnd())
             {
@@ -1155,58 +1096,11 @@ void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
                 else
                     point = m_FiberBundleWorkingCopy->TransformPoint(point.GetVnlVector(), m_Rotation[0]*(g+1),m_Rotation[1]*(g+1),m_Rotation[2]*(g+1),m_Translation[0]*(g+1),m_Translation[1]*(g+1),m_Translation[2]*(g+1));
 
-                m_MaskImage->TransformPhysicalPointToIndex(point, index);
-                if (m_MaskImage->GetLargestPossibleRegion().IsInside(index))
-                    m_MaskImage->SetPixel(index,100);
+                m_TransformedMaskImage->TransformPhysicalPointToIndex(point, index);
+                if (m_TransformedMaskImage->GetLargestPossibleRegion().IsInside(index))
+                    m_TransformedMaskImage->SetPixel(index,100);
                 ++maskIt;
             }
-//            itk::ImageFileWriter<ItkUcharImgType>::Pointer wr = itk::ImageFileWriter<ItkUcharImgType>::New();
-//            wr->SetInput(m_MaskImage);
-//            wr->SetFileName("/local/MASK_transformed.nrrd");
-//            wr->Update();
-        }
-
-        if (m_HelperTdiUpsampled.IsNotNull())
-        {
-            ImageRegionIterator<ItkFloatImgType> maskIt(m_HelperTdiUpsampled, m_HelperTdiUpsampled->GetLargestPossibleRegion());
-            m_HelperTdiTransformed->FillBuffer(0);
-            m_HelperTdiCounter->FillBuffer(0);
-
-            while(!maskIt.IsAtEnd())
-            {
-                DoubleDwiType::IndexType index = maskIt.GetIndex();
-
-                itk::Point<double, 3> point;
-                m_HelperTdiUpsampled->TransformIndexToPhysicalPoint(index, point);
-                if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
-                    point = m_FiberBundleWorkingCopy->TransformPoint(point.GetVnlVector(), m_Rotation[0],m_Rotation[1],m_Rotation[2],m_Translation[0],m_Translation[1],m_Translation[2]);
-                else
-                    point = m_FiberBundleWorkingCopy->TransformPoint(point.GetVnlVector(), m_Rotation[0]*(g+1),m_Rotation[1]*(g+1),m_Rotation[2]*(g+1),m_Translation[0]*(g+1),m_Translation[1]*(g+1),m_Translation[2]*(g+1));
-
-                m_HelperTdiTransformed->TransformPhysicalPointToIndex(point, index);
-                if (m_HelperTdiTransformed->GetLargestPossibleRegion().IsInside(index) && m_MaskImage->GetPixel(index)>0)
-                {
-                    m_HelperTdiTransformed->SetPixel(index, m_HelperTdiTransformed->GetPixel(index)+maskIt.Get());
-                    m_HelperTdiCounter->SetPixel(index, m_HelperTdiCounter->GetPixel(index)+1);
-                }
-                ++maskIt;
-            }
-
-            ImageRegionIterator<ItkFloatImgType> maskIt2(m_HelperTdiTransformed, m_HelperTdiTransformed->GetLargestPossibleRegion());
-            while(!maskIt2.IsAtEnd())
-            {
-                DoubleDwiType::IndexType index = maskIt2.GetIndex();
-                if (m_HelperTdiCounter->GetPixel(index)>0)
-                {
-                    m_HelperTdiTransformed->SetPixel(index, maskIt2.Get()/m_HelperTdiCounter->GetPixel(index));
-                }
-                ++maskIt2;
-            }
-
-            itk::ImageFileWriter<ItkFloatImgType>::Pointer wr = itk::ImageFileWriter<ItkFloatImgType>::New();
-            wr->SetInput(m_HelperTdiTransformed);
-            wr->SetFileName("/local/TDI_transformed.nrrd");
-            wr->Update();
         }
 
         // rotate fibers
@@ -1249,7 +1143,7 @@ void TractsToDWIImageFilter< PixelType >::SimulateNonFiberSignal(ItkUcharImgType
         m_VolumeFractions.at(0)->SetPixel(index, intraAxonalVolume/m_VoxelVolume);
 
         itk::Point<double, 3> point;
-        m_MaskImage->TransformIndexToPhysicalPoint(index, point);
+        m_TransformedMaskImage->TransformIndexToPhysicalPoint(index, point);
         if (m_Parameters.m_SignalGen.m_DoAddMotion)
         {
             if (m_Parameters.m_SignalGen.m_DoRandomizeMotion && g>0)
@@ -1317,7 +1211,7 @@ void TractsToDWIImageFilter< PixelType >::SimulateNonFiberSignal(ItkUcharImgType
                 extraAxonalVolume = 0;
             double interAxonalVolume = 0;
             if (numFiberCompartments>1)
-                interAxonalVolume = extraAxonalVolume * intraAxonalVolume/m_VoxelVolume;   // inter-axonal fraction of non fiber compartment scales linearly with f
+                interAxonalVolume = extraAxonalVolume * intraAxonalVolume/m_VoxelVolume;   // inter-axonal fraction of non fiber compartment
             double other = extraAxonalVolume - interAxonalVolume;        // rest of compartment
             if (other<0)
                 other = 0;

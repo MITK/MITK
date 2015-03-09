@@ -60,6 +60,8 @@ public:
 
   void GenerateData();
 
+  std::vector< mitk::FiberBundle::Pointer > fibs;
+
 protected:
 
   itk::Point<float, 3> GetItkPoint(double point[3]);

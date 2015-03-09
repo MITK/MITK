@@ -421,7 +421,6 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
 
             m_Controls->m_FiberThicknessSlider->setMaximum(max * 10);
             m_Controls->m_FiberThicknessSlider->setValue(range * 10);
-            m_Controls->m_FiberThicknessSlider->setFocus();
         }
         else if(dynamic_cast<mitk::QBallImage*>(nodeData) || dynamic_cast<mitk::TensorImage*>(nodeData))
         {

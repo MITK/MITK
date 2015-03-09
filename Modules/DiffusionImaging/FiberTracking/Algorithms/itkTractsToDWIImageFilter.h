@@ -46,6 +46,7 @@ public:
 
     typedef typename Superclass::OutputImageType                        OutputImageType;
     typedef itk::Image<double, 3>                                       ItkDoubleImgType;
+    typedef itk::Image<float, 3>                                        ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                                ItkUcharImgType;
     typedef mitk::FiberBundle::Pointer                                 FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
@@ -63,6 +64,7 @@ public:
     itkSetMacro( UseConstantRandSeed, bool )                ///< Seed for random generator.
     void SetParameters( FiberfoxParameters<double> param )  ///< Simulation parameters.
     { m_Parameters = param; }
+    itkSetMacro( HelperTdi, ItkFloatImgType::Pointer )
 
     /** Output */
     FiberfoxParameters<double> GetParameters(){ return m_Parameters; }
@@ -121,6 +123,12 @@ protected:
     DoubleVectorType                            m_Rotation;
     DoubleVectorType                            m_Translation;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
+
+    // TEMP
+    ItkFloatImgType::Pointer                    m_HelperTdi;
+    ItkFloatImgType::Pointer                    m_HelperTdiUpsampled;
+    ItkFloatImgType::Pointer                    m_HelperTdiTransformed;
+    ItkUcharImgType::Pointer                    m_HelperTdiCounter;
 };
 }
 

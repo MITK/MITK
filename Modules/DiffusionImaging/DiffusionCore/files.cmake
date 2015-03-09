@@ -101,6 +101,8 @@ set(H_FILES
   IODataStructures/Properties/mitkMeasurementFrameProperty.h
   IODataStructures/Properties/mitkDiffusionPropertyHelper.h
 
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageTransformedCreationFilter.h
+
   # Algorithms
   Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h
   Algorithms/itkDiffusionQballPrepareVisualizationImageFilter.h

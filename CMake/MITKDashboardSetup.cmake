@@ -67,7 +67,7 @@ if(WIN32)
   else()
     set(CMAKE_LIBRARY_ARCHITECTURE x86)
   endif()
-  find_path(OPENCV_BIN_DIR opencv_core248.dll
+  find_path(OPENCV_BIN_DIR opencv_core2411.dll
     PATHS "${CTEST_BINARY_DIRECTORY}/ep/${CMAKE_LIBRARY_ARCHITECTURE}"
     PATH_SUFFIXES vc10/bin vc11/bin vc12/bin vc13/bin vc14/bin
     NO_DEFAULT_PATH

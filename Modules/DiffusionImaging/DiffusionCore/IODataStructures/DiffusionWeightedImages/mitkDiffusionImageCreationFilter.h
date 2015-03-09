@@ -90,9 +90,11 @@ protected:
   DiffusionImageCreationFilter();
   ~DiffusionImageCreationFilter();
 
-  virtual GradientDirectionContainerType::Pointer InternalGetGradientDirections( );
-  virtual MeasurementFrameType InternalGetMeasurementFrame();
-  virtual float InternalGetBValue();
+  GradientDirectionContainerType::Pointer InternalGetGradientDirections( );
+  MeasurementFrameType InternalGetMeasurementFrame();
+  float InternalGetBValue();
+
+  VectorImageType::Pointer RemapIntoVectorImage( mitk::Image::Pointer input);
 
   mitk::Image::Pointer m_ReferenceImage;
 

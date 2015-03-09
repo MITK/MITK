@@ -32,7 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
  * @brief RemapIntoVectorImage Take a 3d+t image and reinterpret it as vector image
  * @return vectoriamge
  */
-static mitk::DiffusionImageCreationFilter::VectorImageType::Pointer RemapIntoVectorImage( mitk::Image::Pointer input)
+mitk::DiffusionImageCreationFilter::VectorImageType::Pointer
+mitk::DiffusionImageCreationFilter::RemapIntoVectorImage( mitk::Image::Pointer input)
 {
   typedef itk::Image<mitk::DiffusionPropertyHelper::DiffusionPixelType, 3> ImageVolumeType;
   typedef itk::ComposeImageFilter< ImageVolumeType > ComposeFilterType;

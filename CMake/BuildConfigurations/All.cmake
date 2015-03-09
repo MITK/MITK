@@ -35,8 +35,6 @@ set(_package_excludes
   US_TELEMED_SDK
   videoInput
   WIIMOTE
-  HDF5
-  Vigra
 )
 
 get_cmake_property(_cache_vars CACHE_VARIABLES)

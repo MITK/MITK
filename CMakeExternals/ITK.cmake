@@ -55,6 +55,12 @@ if(NOT DEFINED ITK_DIR)
     )
   endif()
 
+  if(MITK_USE_HDF5 AND WIN32)
+    list(APPEND additional_cmake_args
+      -DHDF5_C_LIBRARY:FILEPATH=${ep_prefix}/lib/hdf5.lib
+      -DHDF5_CXX_LIBRARY:FILEPATH=${ep_prefix}/lib/hdf5_cpp.lib)
+  endif()
+
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.7.1-20c0592.tar.gz
@@ -69,8 +75,8 @@ if(NOT DEFINED ITK_DIR)
        -DBUILD_EXAMPLES:BOOL=OFF
        -DITK_USE_SYSTEM_GDCM:BOOL=ON
        -DGDCM_DIR:PATH=${GDCM_DIR}
-       -DITK_USE_SYSTEM_HDF5:BOOL=${MITK_USE_HDF5}
        -DHDF5_DIR:PATH=${HDF5_DIR}
+       -DITK_USE_SYSTEM_HDF5:BOOL=${MITK_USE_HDF5}
      DEPENDS ${proj_DEPENDENCIES}
     )
 

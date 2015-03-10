@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define DIFFUSIONIMAGETRANSFORMEDCREATIONFILTER_CXX
 
 #include "mitkDiffusionImageTransformedCreationFilter.h"
+#include "mitkDiffusionImageCorrectionFilter.h"
 
 #include <itkResampleImageFilter.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
@@ -70,7 +71,20 @@ static void ResampleImage( typename ItkImageType::Pointer itk_reference,
                                   position, 0, mitk::Image::CopyMemory );
 
 }
+/*
+template< typename TTransformType >
+static mitk::DiffusionPropertyHelper::GradientDirectionType
+TransformGradientDirection( mitk::DiffusionPropertyHelper::GradientDirectionType vec_in,
+                            typename TTransformType::Pointer transform )
+{
+  mitk::DiffusionPropertyHelper::GradientDirectionType vec_out;
+  vec_out.fill(1.0);
 
+  typedef typename TTransformType::MatrixType TMatrixType;
+
+  return vec_out;
+}
+*/
 template< typename TTransformType>
 mitk::DiffusionImageTransformedCreationFilter<TTransformType>
 ::DiffusionImageTransformedCreationFilter()
@@ -145,6 +159,8 @@ void mitk::DiffusionImageTransformedCreationFilter<TTransformType>
   mitk::DiffusionImageCreationFilter::Pointer creator =
       mitk::DiffusionImageCreationFilter::New();
 
+  mitk::IOUtil::Save( resampled_output, "/tmp/resampled_3dnt_post.nrrd");
+
   creator->SetInput( resampled_output );
   creator->SetHeaderDescriptor( this->GetTransformedHeaderInformation() );
   creator->Update();
@@ -155,12 +171,17 @@ void mitk::DiffusionImageTransformedCreationFilter<TTransformType>
   typedef mitk::DiffusionPropertyHelper DPH;
   float BValue = mitk::DiffusionPropertyHelper::GetReferenceBValue( creator->GetOutput() );
 
-
   mitk::BValueMapProperty::BValueMap BValueMap = mitk::BValueMapProperty::CreateBValueMap( mitk::DiffusionPropertyHelper::GetGradientContainer( creator->GetOutput() ), BValue );
   output->SetProperty( DPH::GRADIENTCONTAINERPROPERTYNAME.c_str(),  mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer( creator->GetOutput() ))  );
   output->SetProperty( DPH::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mitk::DiffusionPropertyHelper::GetMeasurementFrame( creator->GetOutput() ) ) );
   output->SetProperty( DPH::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( BValueMap ) );
   output->SetProperty( DPH::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( BValue ) );
+
+  // correct gradients
+  mitk::DiffusionImageCorrectionFilter::Pointer corrector = mitk::DiffusionImageCorrectionFilter::New();
+  corrector->SetImage( output) ;
+  corrector->CorrectDirections( this->m_RotationMatrices );
+
 
   output->Modified();
 
@@ -207,6 +228,15 @@ void mitk::DiffusionImageTransformedCreationFilter<TTransformType>
   this->m_InternalTransforms.reserve( transforms.size() );
   std::copy( transforms.begin(), transforms.end(),
              std::back_inserter(this->m_InternalTransforms ) );
+
+  MatrixType E;
+  E.set_identity();
+
+  for( auto iter = std::begin(this->m_InternalTransforms); iter != std::end( this->m_InternalTransforms); ++iter)
+  {
+    MatrixType A = E * (*iter)->GetMatrix().GetVnlMatrix();
+    this->m_RotationMatrices.push_back( A );
+  }
 }
 
 

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDiffusionPropertyHelper.h"
 #include "mitkDiffusionImageCreationFilter.h"
+#include "mitkDiffusionImageCorrectionFilter.h"
 
 #include <MitkDiffusionCoreExports.h>
 
@@ -89,6 +90,9 @@ protected:
   mitk::Image::Pointer m_DiffusionReferenceImage;
 
   InterpolatorLevel m_InterpolationLevel;
+
+  typedef DiffusionImageCorrectionFilter::TransformMatrixType MatrixType;
+  std::vector< MatrixType > m_RotationMatrices;
 };
 
 #include "mitkDiffusionImageTransformedCreationFilter.cxx"

@@ -83,6 +83,12 @@ if(NOT DEFINED VTK_DIR)
   set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.1.0+74f4888.tar.gz)
   set(VTK_URL_MD5 1f19dae22c42c032109bd3cf91c4e8c9)
 
+  if(MITK_USE_HDF5 AND WIN32)
+    list(APPEND additional_cmake_args
+      -DHDF5_C_LIBRARY:FILEPATH=${ep_prefix}/lib/hdf5.lib
+      -DHDF5_CXX_LIBRARY:FILEPATH=${ep_prefix}/lib/hdf5_cpp.lib)
+  endif()
+
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
     URL ${VTK_URL}

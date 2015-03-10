@@ -155,7 +155,7 @@
       <condition name="figure_is_on_current_slice" />
       <action name="request_context_menu" ID="48000" />
     </transition>
-
+    
   </state>
 
   <state name="ContextMenuHelperState">

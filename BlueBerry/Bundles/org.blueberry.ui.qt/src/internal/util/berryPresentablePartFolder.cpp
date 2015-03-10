@@ -27,40 +27,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-PresentablePartFolder::ContentProxyListener::ContentProxyListener(
-    PresentablePartFolder* folder) :
-  folder(folder)
-{
-}
-
-GuiTk::IControlListener::Events::Types PresentablePartFolder::ContentProxyListener::GetEventTypes() const
-{
-  return static_cast<GuiTk::IControlListener::Events::Types>(Events::MOVED & Events::RESIZED);
-}
-
-void PresentablePartFolder::ContentProxyListener::ControlMoved(
-    GuiTk::ControlEvent::Pointer  /*e*/)
-{
-  folder->LayoutContent();
-}
-
-void PresentablePartFolder::ContentProxyListener::ControlResized(
-    GuiTk::ControlEvent::Pointer  /*e*/)
-{
-}
-
 PresentablePartFolder::ShellListener::ShellListener(AbstractTabFolder* _folder) :
   folder(_folder)
 {
 }
 
-void PresentablePartFolder::ShellListener::ShellActivated(ShellEvent::Pointer  /*e*/)
+void PresentablePartFolder::ShellListener::ShellActivated(const ShellEvent::Pointer& /*e*/)
 {
   folder->ShellActive(true);
 }
 
 void PresentablePartFolder::ShellListener::ShellDeactivated(
-    ShellEvent::Pointer  /*e*/)
+    const ShellEvent::Pointer& /*e*/)
 {
   folder->ShellActive(false);
 }
@@ -72,7 +50,7 @@ PresentablePartFolder::ChildPropertyChangeListener::ChildPropertyChangeListener(
 }
 
 void PresentablePartFolder::ChildPropertyChangeListener::PropertyChange(
-    Object::Pointer source, int property)
+    const Object::Pointer& source, int property)
 {
 
   if (source.Cast<IPresentablePart> () != 0)
@@ -89,9 +67,9 @@ void PresentablePartFolder::LayoutContent()
 {
   if (current != 0)
   {
-    Rectangle clientArea = DragUtil::GetDisplayBounds(contentProxy);
+    QRect clientArea = DragUtil::GetDisplayBounds(contentProxy);
 
-    Rectangle bounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->ToControl(
+    QRect bounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->ToControl(
         folder->GetControl()->parentWidget(), clientArea);
     current->SetBounds(bounds);
   }
@@ -107,8 +85,8 @@ void PresentablePartFolder::InternalRemove(IPresentablePart::Pointer toRemove)
 
   if (std::find(partList.begin(), partList.end(), toRemove) != partList.end())
   {
-    toRemove->RemovePropertyListener(childPropertyChangeListener);
-    partList.remove(toRemove);
+    toRemove->RemovePropertyListener(childPropertyChangeListener.data());
+    partList.removeAll(toRemove);
   }
 }
 
@@ -169,17 +147,11 @@ void PresentablePartFolder::ChildPropertyChanged(
 PresentablePartFolder::~PresentablePartFolder()
 {
   Tweaklets::Get(QtWidgetsTweaklet::KEY)->GetShell(folder->GetControl())->RemoveShellListener(
-      shellListener);
-  for (std::list<IPresentablePart::Pointer>::iterator iter = partList.begin(); iter
+      shellListener.data());
+  for (QList<IPresentablePart::Pointer>::iterator iter = partList.begin(); iter
       != partList.end(); ++iter)
   {
-    (*iter)->RemovePropertyListener(childPropertyChangeListener);
-  }
-
-  for (QWidget* currentWidget = contentProxy; currentWidget != 0 && currentWidget
-      != folder->GetControl()->parentWidget(); currentWidget = currentWidget->parentWidget())
-  {
-    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(currentWidget, contentListener);
+    (*iter)->RemovePropertyListener(childPropertyChangeListener.data());
   }
 
   BERRY_DEBUG << "DELETING PresentablePartFolder and contentProxy\n";
@@ -210,7 +182,7 @@ PresentablePartFolder::PresentablePartFolder(AbstractTabFolder* _folder) :
 {
   Shell::Pointer controlShell =
       Tweaklets::Get(QtWidgetsTweaklet::KEY)->GetShell(folder->GetControl());
-  controlShell->AddShellListener(shellListener);
+  controlShell->AddShellListener(shellListener.data());
   folder->ShellActive(Tweaklets::Get(QtWidgetsTweaklet::KEY)->GetActiveShell()
       == controlShell);
 
@@ -218,26 +190,18 @@ PresentablePartFolder::PresentablePartFolder(AbstractTabFolder* _folder) :
 
   //toolbarProxy = new ProxyControl(folder.getToolbarParent());
 
-  // NOTE: if the shape of contentProxy changes, the fix for bug 85899 in EmptyTabFolder.computeSize may need adjustment.
-  contentListener = new ContentProxyListener(this);
-  contentProxy = new QtControlWidget(folder->GetContentParent(), 0);
+  contentProxy = new QWidget(folder->GetContentParent());
   contentProxy->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  //contentProxy->setVisible(false);
-  for (QWidget* currentWidget = contentProxy; currentWidget != 0 && currentWidget
-      != folder->GetControl()->parentWidget(); currentWidget = currentWidget->parentWidget())
-  {
-    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(currentWidget, contentListener);
-  }
   folder->SetContent(contentProxy);
 
 }
 
-std::vector<IPresentablePart::Pointer> PresentablePartFolder::GetPartList()
+QList<IPresentablePart::Pointer> PresentablePartFolder::GetPartList()
 {
-  std::vector<AbstractTabItem*> items = folder->GetItems();
-  std::vector<IPresentablePart::Pointer> result;
+  QList<AbstractTabItem*> items = folder->GetItems();
+  QList<IPresentablePart::Pointer> result;
 
-  for (unsigned int i = 0; i < items.size(); i++)
+  for (int i = 0; i < items.size(); i++)
   {
     result.push_back(this->GetPartForTab(items[i]));
   }
@@ -273,7 +237,7 @@ void PresentablePartFolder::Insert(IPresentablePart::Pointer part, int idx)
 
   this->InitTab(item, part);
 
-  part->AddPropertyListener(childPropertyChangeListener);
+  part->AddPropertyListener(childPropertyChangeListener.data());
   partList.push_back(part);
 }
 
@@ -307,7 +271,7 @@ void PresentablePartFolder::Move(IPresentablePart::Pointer part, int newIndex)
   //}
 }
 
-std::size_t PresentablePartFolder::Size()
+int PresentablePartFolder::Size()
 {
   return folder->GetItemCount();
 }

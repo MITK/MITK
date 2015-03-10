@@ -28,7 +28,7 @@ namespace mitk
 
   /** \brief
   */
-  class MitkContourModel_EXPORT ContourModelSet : public mitk::BaseData
+  class MITKCONTOURMODEL_EXPORT ContourModelSet : public mitk::BaseData
   {
 
   public:

@@ -16,11 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryQtPreferences.h"
 
+#include <QString>
+
 namespace berry {
 
-const std::string QtPreferences::QT_STYLES_NODE = "qtstyles";
-const std::string QtPreferences::QT_STYLE_NAME = "stylename";
-const std::string QtPreferences::QT_STYLE_SEARCHPATHS = "searchpaths";
-const std::string QtPreferences::QT_ICON_THEME = "icontheme";
+const QString QtPreferences::QT_STYLES_NODE = "qtstyles";
+const QString QtPreferences::QT_STYLE_NAME = "stylename";
+const QString QtPreferences::QT_STYLE_SEARCHPATHS = "searchpaths";
+const QString QtPreferences::QT_ICON_THEME = "icontheme";
 
 }

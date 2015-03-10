@@ -54,7 +54,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MitkSegmentation_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
+class MITKSEGMENTATION_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
 {
   public:
 

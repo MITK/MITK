@@ -26,23 +26,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIConfigurationElement.h>
 
-#include <string>
+#include <QHash>
 #include <typeinfo>
-#include <map>
 
 namespace berry {
 
 class TypeExtensionManager { // implements IRegistryChangeListener {
 
 private:
-  std::string fExtensionPoint;
+  QString fExtensionPoint;
 
-  static const std::string TYPE;
+  static const QString TYPE;
 
   class NULL_PROPERTY_TESTER_ : public IPropertyTester
   {
   public:
-    bool Handles(const std::string&  /*namespaze*/, const std::string&  /*property*/)
+    bool Handles(const QString&  /*namespaze*/, const QString&  /*property*/)
     {
       return false;
     }
@@ -58,8 +57,8 @@ private:
     {
       return this;
     }
-    bool Test(Object::Pointer, const std::string& /*property*/,
-        std::vector<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/)
+    bool Test(Object::ConstPointer, const QString& /*property*/,
+              const QList<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/)
     {
       return false;
     }
@@ -70,12 +69,12 @@ private:
   /*
    * Map containing all already created type extension object.
    */
-  std::map<std::string, TypeExtension::Pointer> fTypeExtensionMap;
+  QHash<QString, TypeExtension::Pointer> fTypeExtensionMap;
 
   /*
    * Table containing mapping of class name to configuration element
    */
-  std::map<std::string, std::vector<IConfigurationElement::Pointer> >* fConfigurationElementMap;
+  QHash<QString, QList<IConfigurationElement::Pointer> > fConfigurationElementMap;
 
   /*
    * A cache to give fast access to the last 1000 method invocations.
@@ -84,14 +83,14 @@ private:
 
 public:
 
-  TypeExtensionManager(const std::string& extensionPoint);
+  TypeExtensionManager(const QString& extensionPoint);
   ~TypeExtensionManager();
 
-  Property::Pointer GetProperty(Object::Pointer receiver,
-      const std::string& namespaze, const std::string& method);
+  Property::Pointer GetProperty(Object::ConstPointer receiver,
+                                const QString& namespaze, const QString& method);
 
-  /*synchronized*/Property::Pointer GetProperty(Object::Pointer receiver,
-      const std::string& namespaze, const std::string& method, bool forcePluginActivation);
+  /*synchronized*/Property::Pointer GetProperty(Object::ConstPointer receiver,
+      const QString& namespaze, const QString& method, bool forcePluginActivation);
 
 protected:
 
@@ -101,13 +100,13 @@ protected:
    * This method doesn't need to be synchronized since it is called
    * from withing the getProperty method which is synchronized
    */
-  /* package */TypeExtension::Pointer Get(const std::string& type);
+  /* package */TypeExtension::Pointer Get(const QString& type);
 
   /*
    * This method doesn't need to be synchronized since it is called
    * from withing the getProperty method which is synchronized
    */
-  /* package */void LoadTesters(std::vector<IPropertyTester::Pointer>& result, const std::string& typeName);
+  /* package */QList<IPropertyTester::Pointer> LoadTesters(const QString& typeName);
 
   //  public void registryChanged(IRegistryChangeEvent event) {
   //    IExtensionDelta[] deltas= event.getExtensionDeltas(ExpressionPlugin.getPluginId(), fExtensionPoint);

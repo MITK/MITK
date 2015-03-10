@@ -31,7 +31,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_KINECTMODULE_EXPORT KinectController : public itk::Object
+  class MITKKINECT_EXPORT KinectController : public itk::Object
   {
   public:
 

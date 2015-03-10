@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::NrrdQBallImageWriter::NrrdQBallImageWriter()
-  : AbstractFileWriter(mitk::QBallImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_DESCRIPTION())
+  : AbstractFileWriter(mitk::QBallImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::QBI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_DESCRIPTION())
 {
   RegisterService();
 }

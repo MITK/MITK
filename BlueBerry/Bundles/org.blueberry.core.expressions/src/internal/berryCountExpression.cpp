@@ -18,10 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpressions.h"
 
-#include <berryObjectVector.h>
-
-#include <Poco/Hash.h>
-#include <Poco/NumberParser.h>
+#include <berryObjectList.h>
+#include <berryIConfigurationElement.h>
 
 namespace berry {
 
@@ -32,67 +30,66 @@ const int CountExpression::NONE_OR_ONE= 2;
 const int CountExpression::NONE= 1;
 const int CountExpression::UNKNOWN= 0;
 
-const std::size_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("berry::CountExpression");
+const uint CountExpression::HASH_INITIAL = qHash("berry::CountExpression");
 
   void
-  CountExpression::InitializeSize(std::string size)
+  CountExpression::InitializeSize(QString size)
   {
-
-    if (size == "*") //$NON-NLS-1$
-    fMode= ANY_NUMBER;
-    else if (size == "?") //$NON-NLS-1$
-    fMode= NONE_OR_ONE;
-    else if (size == "!") //$NON-NLS-1$
-    fMode= NONE;
-    else if (size == "+") //$NON-NLS-1$
-    fMode= ONE_OR_MORE;
+    if (size.isNull())
+      size = "*";
+    if (size == "*")
+      fMode = ANY_NUMBER;
+    else if (size == "?")
+      fMode = NONE_OR_ONE;
+    else if (size == "!")
+      fMode = NONE;
+    else if (size == "+")
+      fMode = ONE_OR_MORE;
     else
     {
-      try
+      bool ok = false;
+      fSize = size.toInt(&ok);
+      if (ok)
       {
-        fSize= Poco::NumberParser::parse(size);
-        fMode= EXACT;
+        fMode = EXACT;
       }
-      catch (Poco::SyntaxException e)
+      else
       {
-        fMode= UNKNOWN;
+        fMode = UNKNOWN;
       }
     }
   }
 
-  CountExpression::CountExpression(IConfigurationElement::Pointer configElement)
+  CountExpression::CountExpression(const IConfigurationElement::Pointer& configElement)
   {
-    std::string size;
-    if (!configElement->GetAttribute(ATT_VALUE, size))
-    size = "*";
-
+    QString size = configElement->GetAttribute(ATT_VALUE);
     this->InitializeSize(size);
   }
 
   CountExpression::CountExpression(Poco::XML::Element* element)
   {
-    std::string size = element->getAttribute(ATT_VALUE);
-    this->InitializeSize(size);
+    std::string size = element->getAttribute(ATT_VALUE.toStdString());
+    this->InitializeSize(size.size() > 0 ? QString::fromStdString(size) : QString());
   }
 
-  CountExpression::CountExpression(const std::string& size)
+  CountExpression::CountExpression(const QString& size)
   {
     this->InitializeSize(size);
   }
 
-  EvaluationResult
-  CountExpression::Evaluate(IEvaluationContext* context)
+  EvaluationResult::ConstPointer
+  CountExpression::Evaluate(IEvaluationContext* context) const
   {
-    Object::Pointer var(context->GetDefaultVariable());
-    ObjectVector<Object::Pointer>::size_type size;
+    Object::ConstPointer var(context->GetDefaultVariable());
+    ObjectList<Object::Pointer>::size_type size;
 
-    if(ObjectVector<Object::Pointer>::Pointer coll = var.Cast<ObjectVector<Object::Pointer> >())
+    if(ObjectList<Object::Pointer>::ConstPointer coll = var.Cast<const ObjectList<Object::Pointer> >())
     {
       size = coll->size();
     }
     else
     {
-      ICountable::Pointer countable = Expressions::GetAsICountable(var, Expression::Pointer(this));
+      ICountable::ConstPointer countable = Expressions::GetAsICountable(var, Expression::ConstPointer(this));
       if (!countable)
         return EvaluationResult::NOT_LOADED;
       size = countable->Count();
@@ -109,7 +106,7 @@ const std::size_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("ber
       case ONE_OR_MORE:
       return EvaluationResult::ValueOf(size >= 1);
       case EXACT:
-      return EvaluationResult::ValueOf( (ObjectVector<Object::Pointer>::size_type) fSize == size);
+      return EvaluationResult::ValueOf( (ObjectList<Object::Pointer>::size_type) fSize == size);
       case ANY_NUMBER:
       return EvaluationResult::TRUE_EVAL;
     }
@@ -118,28 +115,23 @@ const std::size_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("ber
   }
 
   void
-  CountExpression::CollectExpressionInfo(ExpressionInfo* info)
+  CountExpression::CollectExpressionInfo(ExpressionInfo* info) const
   {
     info->MarkDefaultVariableAccessed();
   }
 
   bool
-  CountExpression::operator==(Expression& object)
+  CountExpression::operator==(const Object* object) const
   {
-    try
+    if (const CountExpression* that = dynamic_cast<const CountExpression*>(object))
     {
-      CountExpression& that = dynamic_cast<CountExpression&>(object);
-      return (this->fMode == that.fMode) && (this->fSize == that.fSize);
+      return (this->fMode == that->fMode) && (this->fSize == that->fSize);
     }
-    catch (std::bad_cast e)
-    {
-      return false;
-    }
-
+    return false;
   }
 
-  std::size_t
-  CountExpression::ComputeHashCode()
+  uint
+  CountExpression::ComputeHashCode() const
   {
     return HASH_INITIAL * HASH_FACTOR + fMode * HASH_FACTOR + fSize;
   }

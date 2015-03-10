@@ -14,6 +14,7 @@ set(_package_excludes
   OpenCL
   SYSTEM_Boost
   Boost_LIBRARIES
+  SYSTEM_PYTHON
   SOFA_PLUGINS
   SOFA_PLUGINS_DIR
   SUPERBUILD
@@ -30,6 +31,7 @@ set(_package_excludes
   TOF_MESASR4000
   TOF_PMDCAMBOARD
   TOF_PMDCAMCUBE
+  TOF_PMDO3
   US_TELEMED_SDK
   videoInput
   WIIMOTE

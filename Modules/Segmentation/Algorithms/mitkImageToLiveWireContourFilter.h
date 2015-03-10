@@ -38,7 +38,7 @@ namespace mitk {
   * \ingroup ContourModelFilters
   * \ingroup Process
   */
-  class MitkSegmentation_EXPORT ImageToLiveWireContourFilter : public ContourModelSource
+  class MITKSEGMENTATION_EXPORT ImageToLiveWireContourFilter : public ContourModelSource
   {
 
   public:

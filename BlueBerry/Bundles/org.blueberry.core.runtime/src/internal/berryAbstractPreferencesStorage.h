@@ -17,27 +17,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYABSTRACTPREFERENCESSTORAGE_H_
 
 #include <org_blueberry_core_runtime_Export.h>
-#include "berryIPreferences.h"
 
-#include "Poco/File.h"
+#include <berryObject.h>
+
 
 namespace berry
 {
 
+struct IPreferences;
+
   ///
   /// Interface to flush Preferences.
   ///
-  class BERRY_RUNTIME AbstractPreferencesStorage : public Object
+  class org_blueberry_core_runtime_EXPORT AbstractPreferencesStorage : public Object
   {
 
   public:
-    berryObjectMacro(berry::AbstractPreferencesStorage);
+
+    berryObjectMacro(berry::AbstractPreferencesStorage)
 
     ///
     /// Saves the path, sets the root initially to 0.
     /// In subclasses try to read data from file here.
     ///
-    AbstractPreferencesStorage(const Poco::File& _File);
+    AbstractPreferencesStorage(const QString& _File);
 
     ///
     /// Pure virtual (abstract class)
@@ -47,33 +50,33 @@ namespace berry
     ///
     /// Flushes the given (or all) prefs persistently
     ///
-    virtual void Flush(IPreferences* prefs) throw(Poco::Exception, BackingStoreException) = 0;
+    virtual void Flush(IPreferences* prefs) = 0;
 
     ///
     /// Returns the root prefs
     ///
-    virtual IPreferences::Pointer GetRoot() const;
+    virtual SmartPointer<IPreferences> GetRoot() const;
 
     ///
     /// Returns the path of the file
     ///
-    virtual const Poco::File& GetFile() const;
+    virtual QString GetFile() const;
 
     ///
     /// Sets the file
     ///
-    virtual void SetFile(const Poco::File& f);
+    virtual void SetFile(const QString& f);
 
   protected:
 
     ///
     /// Path to the file where the data is stored
     ///
-    Poco::File m_File;
+    QString m_File;
     ///
     /// Pointer to the root Preferences
     ///
-    IPreferences::Pointer m_Root;
+    SmartPointer<IPreferences> m_Root;
   };
 }
 #endif /* BERRYABSTRACTPREFERENCESSTORAGE_H_ */

@@ -45,8 +45,8 @@ mitk::TrackingDeviceSource::~TrackingDeviceSource()
 
 void mitk::TrackingDeviceSource::GenerateData()
 {
-  if (m_TrackingDevice.IsNull())
-    return;
+  if (m_IsFrozen) {return;} //no update at all if device is frozen
+  else if (m_TrackingDevice.IsNull()) {return;}
 
   if (m_TrackingDevice->GetToolCount() < 1)
     return;

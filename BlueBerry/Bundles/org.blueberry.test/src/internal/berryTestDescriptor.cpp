@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryTestDescriptor.h"
 #include "berryTestRegistry.h"
+#include "berryIContributor.h"
 
 #include <Poco/String.h>
 
@@ -38,39 +39,30 @@ CppUnit::Test* TestDescriptor::CreateTest()
   {
     // Try legacy BlueBerry manifests instead
     test = configElem->CreateExecutableExtension<CppUnit::Test> (
-        TestRegistry::ATT_CLASS, TestRegistry::TEST_MANIFEST);
+        TestRegistry::ATT_CLASS);
   }
   return test;
 }
 
-std::string TestDescriptor::GetId() const
+QString TestDescriptor::GetId() const
 {
-  std::string id;
-  configElem->GetAttribute(TestRegistry::ATT_ID, id);
-  return id;
+  return configElem->GetAttribute(TestRegistry::ATT_ID);
 }
 
-std::string TestDescriptor::GetContributor() const
+QString TestDescriptor::GetContributor() const
 {
-  return configElem->GetContributor();
+  return configElem->GetContributor()->GetName();
 }
 
-std::string TestDescriptor::GetDescription() const
+QString TestDescriptor::GetDescription() const
 {
-  std::string descr;
-  configElem->GetAttribute(TestRegistry::ATT_DESCRIPTION, descr);
-  return descr;
+  return configElem->GetAttribute(TestRegistry::ATT_DESCRIPTION);
 }
 
 bool TestDescriptor::IsUITest() const
 {
-  std::string isUi;
-  if (configElem->GetAttribute(TestRegistry::ATT_UITEST, isUi))
-  {
-    return !Poco::icompare(isUi, "true");
-  }
-
-  return false;
+  QString isUi = configElem->GetAttribute(TestRegistry::ATT_UITEST);
+  return isUi.compare("true", Qt::CaseInsensitive);
 }
 
 }

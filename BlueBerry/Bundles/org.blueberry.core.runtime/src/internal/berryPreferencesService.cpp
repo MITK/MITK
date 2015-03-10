@@ -15,69 +15,43 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "berryPreferencesService.h"
 #include "berryXMLPreferencesStorage.h"
+#include "berryIPreferences.h"
 
-#include "Poco/ScopedLock.h"
-#include "Poco/DirectoryIterator.h"
 #include "berryPlatform.h"
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormatter.h"
 
-using namespace std;
+#include <QDir>
+#include <QDateTime>
 
-bool berry::PreferencesService::IsA( const std::type_info& type ) const
+
+QString berry::PreferencesService::GetDefaultPreferencesDirPath()
 {
-  std::string name(GetType().name());
-  return name == type.name() || Service::IsA(type);
+  return Platform::GetUserPath().absolutePath() + "/.BlueBerryPrefs";
 }
 
-const std::type_info& berry::PreferencesService::GetType() const
-{
-  return typeid(berry::IPreferencesService);
-}
-
-std::string berry::PreferencesService::GetDefaultPreferencesDirPath()
-{
-  string _PreferencesDirPath;
-  _PreferencesDirPath = Platform::GetUserPath().toString() + ".BlueBerryPrefs";
-  return _PreferencesDirPath;
-}
-
-
-std::string berry::PreferencesService::GetDefaultPreferencesFileName()
+QString berry::PreferencesService::GetDefaultPreferencesFileName()
 {
   return "prefs.xml";
 }
 
-berry::PreferencesService::PreferencesService(string _PreferencesDir)
+berry::PreferencesService::PreferencesService(const QString& _PreferencesDir)
 : m_PreferencesDir(_PreferencesDir)
 {
-  if(m_PreferencesDir.empty())
+  if(m_PreferencesDir.isEmpty())
     m_PreferencesDir = GetDefaultPreferencesDirPath();
 
-  Poco::File prefDir(m_PreferencesDir);
+  QDir prefDir(m_PreferencesDir);
   if(!prefDir.exists())
-    prefDir.createDirectory();
+    QDir().mkpath(m_PreferencesDir);
 
-  Poco::DirectoryIterator dirIt(prefDir);
-
-  Poco::File f;
-
-  while(dirIt.path().getFileName() != "")
+  QString defaultName = GetDefaultPreferencesFileName();
+  QStringList prefFiles = prefDir.entryList(QStringList(QString("*") + defaultName),
+                                            QDir::Files | QDir::Readable | QDir::Writable);
+  foreach(QString prefFile, prefFiles)
   {
-    f = dirIt.path();
-
-    if(f.isFile())
-    {
-      // check if this file is a preferences file
-      string::size_type pos = dirIt.name().rfind(GetDefaultPreferencesFileName());
-      if(pos != string::npos)
-      {
-        string userName = dirIt.name().substr(0, pos);
-        // set the storage to 0 (will be loaded later)
-        m_PreferencesStorages[userName] = AbstractPreferencesStorage::Pointer(0);
-      }
-    }
-    ++dirIt;
+    int pos = prefFile.lastIndexOf(defaultName);
+    QString userName = prefFile.left(pos);
+    // set the storage to 0 (will be loaded later)
+    m_PreferencesStorages[userName] = AbstractPreferencesStorage::Pointer(0);
   }
 }
 
@@ -88,29 +62,33 @@ berry::PreferencesService::~PreferencesService()
 
 berry::IPreferences::Pointer berry::PreferencesService::GetSystemPreferences()
 {
-  Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
-  // sys prefs are indicated by an empty user string
-  return this->GetUserPreferences("");
+  QMutexLocker scopedMutex(&m_Mutex);
+  // sys prefs are indicated by an empty user QString
+  return this->GetUserPreferences_unlocked("");
 }
 
-berry::IPreferences::Pointer berry::PreferencesService::GetUserPreferences( std::string name )
+berry::IPreferences::Pointer berry::PreferencesService::GetUserPreferences(const QString& name)
 {
-  Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
+  QMutexLocker scopedMutex(&m_Mutex);
+  return this->GetUserPreferences_unlocked(name);
+}
+
+berry::IPreferences::Pointer berry::PreferencesService::GetUserPreferences_unlocked(const QString& name)
+{
   IPreferences::Pointer userPrefs(0);
 
-  map<string, AbstractPreferencesStorage::Pointer>::iterator it
-    = m_PreferencesStorages.find(name);
+  QHash<QString, AbstractPreferencesStorage::Pointer>::const_iterator it
+      = m_PreferencesStorages.find(name);
 
   // does not exist or is not loaded yet
-  if(it == m_PreferencesStorages.end() || it->second.IsNull())
+  if(it == m_PreferencesStorages.end() || it.value().IsNull())
   {
-    std::string path = m_PreferencesDir;
+    QString path = m_PreferencesDir;
 
-    if(name.empty())
-      path = path +  Poco::Path::separator() + GetDefaultPreferencesFileName();
-    //
+    if(name.isEmpty())
+      path = path +  '/' + GetDefaultPreferencesFileName();
     else
-      path = path +  Poco::Path::separator() + name + GetDefaultPreferencesFileName();
+      path = path + '/' + name + GetDefaultPreferencesFileName();
 
     XMLPreferencesStorage::Pointer storage(new XMLPreferencesStorage(path));
     m_PreferencesStorages[name] = storage;
@@ -121,26 +99,26 @@ berry::IPreferences::Pointer berry::PreferencesService::GetUserPreferences( std:
   return userPrefs;
 }
 
-std::vector<std::string> berry::PreferencesService::GetUsers() const
+QStringList berry::PreferencesService::GetUsers() const
 {
-  Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
-  vector<string> users;
+  QMutexLocker scopedMutex(&m_Mutex);
+  QStringList users;
 
-  for (map<string, AbstractPreferencesStorage::Pointer>::const_iterator it = m_PreferencesStorages.begin()
-    ; it != m_PreferencesStorages.end(); ++it)
+  for (QHash<QString, AbstractPreferencesStorage::Pointer>::const_iterator it = m_PreferencesStorages.begin();
+       it != m_PreferencesStorages.end(); ++it)
   {
-    users.push_back(it->first);
+    users.push_back(it.key());
   }
 
   return users;
 }
 
-void berry::PreferencesService::ImportPreferences( Poco::File f, std::string name )
+void berry::PreferencesService::ImportPreferences(const QString& f, const QString& name)
 {
-  map<string, AbstractPreferencesStorage::Pointer>::iterator it
-    = m_PreferencesStorages.find(name);
+  QHash<QString, AbstractPreferencesStorage::Pointer>::const_iterator it
+      = m_PreferencesStorages.find(name);
 
-  if(it == m_PreferencesStorages.end() || it->second == 0)
+  if(it == m_PreferencesStorages.end() || it.value() == 0)
   {
     this->GetUserPreferences(name);
   }
@@ -152,10 +130,9 @@ void berry::PreferencesService::ImportPreferences( Poco::File f, std::string nam
   IPreferences::Pointer rootOfOldPrefs = m_PreferencesStorages[name]->GetRoot();
 
   // make backup of old
-  std::string exportFilePath = Poco::DateTimeFormatter::format(Poco::DateTime(), "%Y.%m.%d-%H%M%S");
-  exportFilePath = GetDefaultPreferencesDirPath() + Poco::Path::separator() + exportFilePath + "prefs.xml";
-  Poco::File exportFile(exportFilePath);
-  this->ExportPreferences(exportFile, name);
+  QString exportFilePath = QDateTime::currentDateTime().toString();
+  exportFilePath = GetDefaultPreferencesDirPath() + '/' + exportFilePath + "prefs.xml";
+  this->ExportPreferences(exportFilePath, name);
 
   if(rootOfImportedPrefs.IsNotNull())
   {
@@ -167,53 +144,50 @@ void berry::PreferencesService::ImportPreferences( Poco::File f, std::string nam
 void berry::PreferencesService::ShutDown()
 {
   // flush all preferences
-  for (map<string, AbstractPreferencesStorage::Pointer>::const_iterator it = m_PreferencesStorages.begin()
-    ; it != m_PreferencesStorages.end(); ++it)
+  for (QHash<QString, AbstractPreferencesStorage::Pointer>::const_iterator it = m_PreferencesStorages.begin();
+       it != m_PreferencesStorages.end(); ++it)
   {
     // the preferences storage may be 0 if the corresponding file was never loaded
-    if(it->second != 0)
-      it->second->GetRoot()->Flush();
+    if(it.value() != 0)
+      it.value()->GetRoot()->Flush();
   }
 }
 
-void berry::PreferencesService::ImportNode( IPreferences::Pointer nodeToImport
-                                            , IPreferences::Pointer rootOfOldPrefs )
+void berry::PreferencesService::ImportNode(const IPreferences::Pointer& nodeToImport,
+                                           const IPreferences::Pointer& rootOfOldPrefs)
 {
   //# overwrite properties
   IPreferences::Pointer oldNode
     = rootOfOldPrefs->Node(nodeToImport->AbsolutePath()); // get corresponding node in "old" tree
 
-  std::vector<std::string> keys = nodeToImport->Keys(); // get all keys for properties
-  for (vector<string>::const_iterator it = keys.begin()
-    ; it != keys.end(); ++it)
+  QStringList keys = nodeToImport->Keys(); // get all keys for properties
+  foreach(QString key, keys)
   {
-    oldNode->Put((*it), nodeToImport->Get((*it), ""));// set property in old node to the value of the imported.
-                                                // properties not existing in imported are left untouched
-
+    oldNode->Put(key, nodeToImport->Get(key, "")); // set property in old node to the value of the imported.
+                                                   // properties not existing in imported are left untouched
   }
 
   // do it for all children
-  vector<string> childrenNames = nodeToImport->ChildrenNames();
-  for (vector<string>::const_iterator it = childrenNames.begin()
-    ; it != childrenNames.end(); ++it)
+  QStringList childrenNames = nodeToImport->ChildrenNames();
+  foreach (QString childName, childrenNames)
   {
     // with node->Node(<childName>) you get the child node with the name <childName>
-    this->ImportNode(nodeToImport->Node((*it)), rootOfOldPrefs);
+    this->ImportNode(nodeToImport->Node(childName), rootOfOldPrefs);
   }
 }
 
-void berry::PreferencesService::ExportPreferences( Poco::File f, std::string name )
+void berry::PreferencesService::ExportPreferences(const QString& f, const QString& name )
 {
-  map<string, AbstractPreferencesStorage::Pointer>::iterator it
-    = m_PreferencesStorages.find(name);
+  QHash<QString, AbstractPreferencesStorage::Pointer>::const_iterator it
+      = m_PreferencesStorages.find(name);
 
-  if(it->second == 0)
+  if(it.value() == 0)
   {
     this->GetUserPreferences(name);
   }
-  Poco::File temp = it->second->GetFile();
-  it->second->SetFile(f);
-  it->second->GetRoot()->Flush();
-  it->second->SetFile(temp);
-
+  AbstractPreferencesStorage::Pointer storage = it.value();
+  QString temp = storage->GetFile();
+  storage->SetFile(f);
+  storage->GetRoot()->Flush();
+  storage->SetFile(temp);
 }

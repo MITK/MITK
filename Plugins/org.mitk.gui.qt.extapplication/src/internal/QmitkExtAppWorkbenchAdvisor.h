@@ -30,14 +30,14 @@ class QmitkExtAppWorkbenchAdvisor: public berry::QtWorkbenchAdvisor
 {
 public:
 
-  static const std::string DEFAULT_PERSPECTIVE_ID; // = "org.mitk.extapp.defaultperspective"
+  static const QString DEFAULT_PERSPECTIVE_ID; // = "org.mitk.extapp.defaultperspective"
 
   void Initialize(berry::IWorkbenchConfigurer::Pointer configurer);
 
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
       berry::IWorkbenchWindowConfigurer::Pointer configurer);
 
-  std::string GetInitialWindowPerspectiveId();
+  QString GetInitialWindowPerspectiveId();
 
 };
 

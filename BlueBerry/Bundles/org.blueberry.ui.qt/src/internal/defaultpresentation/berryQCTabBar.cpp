@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 #include <QMouseEvent>
 
-#include <algorithm>
-
 namespace berry
 {
 
@@ -32,22 +30,14 @@ QCTabBar::QCTabBar(QWidget* parent) :
 
 QCTabBar::~QCTabBar()
 {
-  for (std::deque<AbstractTabItem*>::iterator iter = tabItemList.begin();
-       iter != tabItemList.end(); ++iter)
-  {
-    delete *iter;
-  }
+  qDeleteAll(tabItemList);
 }
 
 void QCTabBar::tabRemoved(int index)
 {
-  std::deque<AbstractTabItem*>::iterator iter = tabItemList.begin();
-  std::advance(iter, index);
-  if (iter != tabItemList.end())
+  if (index >= 0 && index < tabItemList.size())
   {
-    AbstractTabItem* item = *iter;
-    tabItemList.erase(iter);
-    delete item;
+    delete tabItemList.takeAt(index);
   }
 }
 
@@ -83,16 +73,14 @@ AbstractTabItem* QCTabBar::getTab(int index) const
   return tabItemList[index];
 }
 
-std::vector<AbstractTabItem*> QCTabBar::getTabs() const
+QList<AbstractTabItem*> QCTabBar::getTabs() const
 {
-  return std::vector<AbstractTabItem*>(tabItemList.begin(), tabItemList.end());
+  return tabItemList;
 }
 
 void QCTabBar::insertTab(int index, AbstractTabItem* item)
 {
-  std::deque<AbstractTabItem*>::iterator iter = tabItemList.begin();
-  std::advance(iter, index);
-  tabItemList.insert(iter, item);
+  tabItemList.insert(index, item);
   QTabBar::insertTab(index, QString());
 }
 
@@ -102,22 +90,15 @@ void QCTabBar::moveAbstractTab(int from, int to)
 
   if ((unsigned int)to >= tabItemList.size()) --to;
 
-  std::deque<AbstractTabItem*>::iterator fromIter = tabItemList.begin();
-  std::advance(fromIter, from);
-  tabItemList.erase(fromIter);
-
-  std::deque<AbstractTabItem*>::iterator toIter = tabItemList.begin();
-  std::advance(toIter, to);
-  tabItemList.insert(toIter, item);
+  tabItemList.removeAt(from);
+  tabItemList.insert(to, item);
 
   this->moveTab(from, to);
 }
 
 void QCTabBar::setCurrentTab(AbstractTabItem* item)
 {
-  std::deque<AbstractTabItem*>::iterator iter = std::find(tabItemList.begin(), tabItemList.end(), item);
-  int index = iter - tabItemList.begin();
-  this->setCurrentIndex(index);
+  this->setCurrentIndex(tabItemList.indexOf(item));
 }
 
 AbstractTabItem* QCTabBar::getCurrentTab()

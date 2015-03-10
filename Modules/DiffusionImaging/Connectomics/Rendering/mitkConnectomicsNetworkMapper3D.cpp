@@ -49,7 +49,7 @@ mitk::ConnectomicsNetworkMapper3D:: ~ConnectomicsNetworkMapper3D()
 
 }
 
-void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
+void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* /*renderer*/)
 {
   if( this->GetInput() == NULL )
   {
@@ -392,7 +392,7 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
-void mitk::ConnectomicsNetworkMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *mapper)
+void mitk::ConnectomicsNetworkMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper* /*mapper*/)
 {
   //TODO: implement
 
@@ -403,7 +403,7 @@ void mitk::ConnectomicsNetworkMapper3D::UpdateVtkObjects()
   //TODO: implement
 }
 
-vtkProp* mitk::ConnectomicsNetworkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
+vtkProp* mitk::ConnectomicsNetworkMapper3D::GetVtkProp(mitk::BaseRenderer* /*renderer*/)
 {
 
   return m_NetworkAssembly;

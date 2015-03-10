@@ -40,7 +40,7 @@ namespace mitk
  * used here.
  * Initialize via SetVideoFileInput() or SetVideoCameraInput(), start processing with StartCapturing();
  */
-  class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVVideoSource :
+  class MITKOPENCVVIDEOSUPPORT_EXPORT OpenCVVideoSource :
       virtual public VideoSource, virtual public OpenCVImageSource
   {
   public:

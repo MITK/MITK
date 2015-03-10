@@ -33,7 +33,7 @@ class ContourSet;
  *
  * @ingroup Mapper
  */
-class MitkSegmentation_EXPORT ContourSetMapper2D : public GLMapper
+class MITKSEGMENTATION_EXPORT ContourSetMapper2D : public GLMapper
 {
 public:
 

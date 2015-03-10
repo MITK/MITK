@@ -68,7 +68,7 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.presentations.util.TabOrder#getPartList()
      */
-    std::vector<IPresentablePart::Pointer> GetPartList();
+    QList<IPresentablePart::Pointer> GetPartList();
 
     /**
      * Restores a presentation from a previously stored state

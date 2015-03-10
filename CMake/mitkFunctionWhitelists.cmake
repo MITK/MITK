@@ -16,7 +16,7 @@
 #!
 #! Default values:
 #!  <prefix>_WHITELISTS_INTERNAL_PATH = <prefix>_SOURCE_DIR/CMake/Whitelists
-#!  <prefix>_WHITELISTS_EXTERNAL_PATH = %HOME%/.MITK/Whitelists
+#!  <prefix>_WHITELISTS_EXTERNAL_PATH = %HOME%/.mitk/Whitelists
 #!
 #! List of variables available after the function is called:
 #! - <prefix>_WHITELISTS_INTERNAL_PATH
@@ -29,7 +29,7 @@
 
 function(mitkFunctionCreateWhitelistPaths)
   set(${ARGV0}_WHITELISTS_INTERNAL_PATH "${${ARGV0}_SOURCE_DIR}/CMake/Whitelists" CACHE PATH "")
-  set(${ARGV0}_WHITELISTS_EXTERNAL_PATH ".MITK/Whitelists")
+  set(${ARGV0}_WHITELISTS_EXTERNAL_PATH ".mitk/Whitelists")
 
   if(WIN32)
     set(${ARGV0}_WHITELISTS_EXTERNAL_PATH "$ENV{HOMEDRIVE}$ENV{HOMEPATH}/${${ARGV0}_WHITELISTS_EXTERNAL_PATH}")
@@ -81,16 +81,16 @@ endfunction()
 function(mitkFunctionFindWhitelists)
   set(whitelists "None")
 
-  file(GLOB internalWhitelistFiles "${MITK_WHITELISTS_INTERNAL_PATH}/*.cmake")
+  file(GLOB internalWhitelistFiles "${${ARGV0}_WHITELISTS_INTERNAL_PATH}/*.cmake")
 
-  foreach(whitelistFile "${internalWhitelistFiles}")
+  foreach(whitelistFile ${internalWhitelistFiles})
     get_filename_component(whitelistFile "${whitelistFile}" NAME_WE)
     list(APPEND whitelists "${whitelistFile}")
   endforeach()
 
-  file(GLOB externalWhitelistFiles "${MITK_WHITELISTS_EXTERNAL_PATH}/*.cmake")
+  file(GLOB externalWhitelistFiles "${${ARGV0}_WHITELISTS_EXTERNAL_PATH}/*.cmake")
 
-  foreach(whitelistFile "${externalWhitelistFiles}")
+  foreach(whitelistFile ${externalWhitelistFiles})
     get_filename_component(whitelistFile "${whitelistFile}" NAME_WE)
     list(APPEND whitelists "${whitelistFile} (external)")
   endforeach()

@@ -10,8 +10,9 @@ MACRO_CREATE_CTK_PLUGIN(
 )
 
 if(MITK_USE_Qt5)
-  qt5_use_modules(${PLUGIN_TARGET} Help OpenGL PrintSupport WebKitWidgets Xml)
+  target_link_libraries(${PLUGIN_TARGET} PRIVATE
+    Qt5::Help Qt5::OpenGL Qt5::PrintSupport Qt5::WebKitWidgets Qt5::Xml)
+else()
+  target_link_libraries(${PLUGIN_TARGET} PRIVATE
+    ${QT_QTHELP_LIBRARY} ${QT_QTWEBKIT_LIBRARY} ${QT_QTNETWORK_LIBRARY})
 endif()
-
-target_link_libraries(${PROJECT_NAME}
-  ${QT_QTHELP_LIBRARY} ${QT_QTWEBKIT_LIBRARY} ${QT_QTNETWORK_LIBRARY})

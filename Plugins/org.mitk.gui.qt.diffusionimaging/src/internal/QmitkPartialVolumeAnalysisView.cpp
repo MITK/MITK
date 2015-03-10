@@ -55,7 +55,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarRectangle.h"
 #include "mitkPlanarPolygon.h"
 #include "mitkPartialVolumeAnalysisClusteringCalculator.h"
-#include "mitkDiffusionImage.h"
 #include "usModuleRegistry.h"
 
 #include <itkVectorImage.h>

@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-const std::string IDataStorageService::ID = "org.mitk.core.services.datastorage";
+IDataStorageService::~IDataStorageService()
+{
+}
 
 }

@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 
 
-  class MitkQtOverlays_EXPORT QmitkScalarBarOverlay : public QmitkOverlay
+  class MITKQTOVERLAYS_EXPORT QmitkScalarBarOverlay : public QmitkOverlay
   {
     Q_OBJECT
 

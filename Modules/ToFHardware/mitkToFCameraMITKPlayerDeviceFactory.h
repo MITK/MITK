@@ -32,7 +32,7 @@ namespace mitk
   * @ingroup ToFHardware
   */
 
-class MITK_TOFHARDWARE_EXPORT ToFCameraMITKPlayerDeviceFactory : public AbstractToFDeviceFactory {
+class MITKTOFHARDWARE_EXPORT ToFCameraMITKPlayerDeviceFactory : public AbstractToFDeviceFactory {
 
 public:
 

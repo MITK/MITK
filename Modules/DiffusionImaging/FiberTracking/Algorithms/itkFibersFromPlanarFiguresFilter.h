@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkPlanarEllipse.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkFiberfoxParameters.h>
 
 // ITK
@@ -46,8 +46,8 @@ public:
     typedef ProcessObject                                       Superclass;
     typedef SmartPointer< Self >                                Pointer;
     typedef SmartPointer< const Self >                          ConstPointer;
-    typedef mitk::FiberBundleX::Pointer                         FiberType;
-    typedef vector< mitk::FiberBundleX::Pointer >               FiberContainerType;
+    typedef mitk::FiberBundle::Pointer                         FiberType;
+    typedef vector< mitk::FiberBundle::Pointer >               FiberContainerType;
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

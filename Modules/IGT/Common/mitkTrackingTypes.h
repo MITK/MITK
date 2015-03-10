@@ -168,18 +168,18 @@ namespace mitk
   /**
   * /brief Returns all devices compatibel to the given Line of Devices
   */
-  MitkIGT_EXPORT std::vector<TrackingDeviceData> GetDeviceDataForLine(TrackingDeviceType Type);
+  MITKIGT_EXPORT std::vector<TrackingDeviceData> GetDeviceDataForLine(TrackingDeviceType Type);
 
   /**
   * /brief Returns the first TracingDeviceData mathing a given line. Useful for backward compatibility
   * with the old way to manage Devices
   */
-  MitkIGT_EXPORT TrackingDeviceData GetFirstCompatibleDeviceDataForLine(TrackingDeviceType Type);
+  MITKIGT_EXPORT TrackingDeviceData GetFirstCompatibleDeviceDataForLine(TrackingDeviceType Type);
 
   /**
   * /brief Returns the device Data set matching the model name or the invalid device, if none was found
   */
-  MitkIGT_EXPORT TrackingDeviceData GetDeviceDataByName(const std::string& modelName);
+  MITKIGT_EXPORT TrackingDeviceData GetDeviceDataByName(const std::string& modelName);
 
     /**Documentation
     * \brief activation rate of IR illuminator for NDI Polaris tracking device

@@ -24,7 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Poco/Any.h"
 
 #include <vector>
-#include <map>
+
+#include <QHash>
 
 namespace berry {
 
@@ -41,11 +42,11 @@ class BERRY_EXPRESSIONS EvaluationContext : public IEvaluationContext
 {
 
 private:
-  IEvaluationContext* fParent;
-  Object::Pointer fDefaultVariable;
-  std::map<std::string, Object::Pointer> fVariables;
+  IEvaluationContext* const fParent;
+  Object::ConstPointer fDefaultVariable;
+  QHash<QString, Object::ConstPointer> fVariables;
   std::vector<IVariableResolver*> fVariableResolvers;
-  bool fAllowPluginActivation;
+  int fAllowPluginActivation;
 
 public:
 
@@ -56,7 +57,7 @@ public:
    * @param parent the parent context. Can be <code>null</code>.
    * @param defaultVariable the default variable
    */
-  EvaluationContext(IEvaluationContext* parent, Object::Pointer defaultVariable);
+  EvaluationContext(IEvaluationContext* parent, const Object::ConstPointer& defaultVariable);
 
   /**
    * Create a new evaluation context with the given parent and default
@@ -69,7 +70,8 @@ public:
    *
    * @see #resolveVariable(String, Object[])
    */
-  EvaluationContext(IEvaluationContext* parent, Object::Pointer defaultVariable, std::vector<IVariableResolver*> resolvers);
+  EvaluationContext(IEvaluationContext* parent, const Object::ConstPointer& defaultVariable,
+                    const std::vector<IVariableResolver*>& resolvers);
 
 
   /**
@@ -80,12 +82,12 @@ public:
   /**
    * {@inheritDoc}
    */
-  IEvaluationContext* GetRoot();
+  IEvaluationContext* GetRoot() const;
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer GetDefaultVariable() const;
+  Object::ConstPointer GetDefaultVariable() const;
 
   /**
    * {@inheritDoc}
@@ -100,22 +102,22 @@ public:
   /**
    * {@inheritDoc}
    */
-  void AddVariable(const std::string& name, Object::Pointer value);
+  void AddVariable(const QString& name, const Object::ConstPointer& value);
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer RemoveVariable(const std::string& name);
+  Object::ConstPointer RemoveVariable(const QString& name);
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer GetVariable(const std::string& name) const;
+  Object::ConstPointer GetVariable(const QString &name) const;
 
   /**
    * {@inheritDoc}
    */
-  Object::Pointer ResolveVariable(const std::string& name, std::vector<Object::Pointer>& args);
+  Object::ConstPointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args) const;
 };
 
 }  // namespace berry

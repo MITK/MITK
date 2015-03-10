@@ -17,12 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYIBERRYPREFERENCES_H_
 
 #include <org_blueberry_core_runtime_Export.h>
+
 #include "berryIPreferences.h"
 #include "berryMessage.h"
 
-#include <vector>
-#include <string>
-#include <exception>
 
 namespace berry
 {
@@ -31,9 +29,9 @@ namespace berry
   /// Like IEclipsePreferences an extension to the osgi-IPreferences
   /// to send out events when nodes or values changed in a node.
   ///
-  struct BERRY_RUNTIME IBerryPreferences : virtual public IPreferences
+  struct org_blueberry_core_runtime_EXPORT IBerryPreferences : virtual public IPreferences
   {
-    berryInterfaceMacro(IBerryPreferences, berry);
+    berryObjectMacro(berry::IBerryPreferences)
 
     virtual ~IBerryPreferences();
 

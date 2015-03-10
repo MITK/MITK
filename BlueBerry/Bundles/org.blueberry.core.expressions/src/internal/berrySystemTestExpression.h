@@ -19,50 +19,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpression.h"
 
-#include "service/berryIConfigurationElement.h"
-
 #include "Poco/DOM/Element.h"
 
 namespace berry {
 
+struct IConfigurationElement;
+
 class SystemTestExpression : public Expression {
 
 private:
-  std::string fProperty;
-  std::string fExpectedValue;
+  QString fProperty;
+  QString fExpectedValue;
 
-  static const std::string ATT_PROPERTY;
+  static const QString ATT_PROPERTY;
 
   /**
    * The seed for the hash code for all system test expressions.
    */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
 public:
 
-  SystemTestExpression(SmartPointer<IConfigurationElement> element);
+  SystemTestExpression(const SmartPointer<IConfigurationElement>& element);
 
   SystemTestExpression(Poco::XML::Element* element);
 
-  SystemTestExpression(const std::string& property, const std::string& expectedValue);
+  SystemTestExpression(const QString& property, const QString& expectedValue);
 
-  EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 
-  void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info) const;
 
-  bool operator==(Expression& object);
+  bool operator==(const Object* object) const;
+
+  QString ToString() const;
 
 protected:
 
-  std::size_t ComputeHashCode();
+  uint ComputeHashCode() const ;
 
-  // ---- Debugging ---------------------------------------------------
-
-  /* (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
-public:
-  std::string ToString();
 };
 
 } // namespace berry

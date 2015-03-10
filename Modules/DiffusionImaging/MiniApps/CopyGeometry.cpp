@@ -15,8 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkImageCast.h>
-#include <mitkDiffusionImage.h>
-#include <mitkBaseDataIOFactory.h>
+#include <mitkImage.h>
 #include <mitkIOUtil.h>
 #include "mitkCommandLineParser.h"
 
@@ -29,7 +28,7 @@ int main(int argc, char* argv[])
 
     parser.setTitle("Copy Geometry");
     parser.setCategory("Preprocessing Tools");
-    parser.setDescription("");
+    parser.setDescription("Copies Geometry from one image unto another");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
@@ -48,11 +47,8 @@ int main(int argc, char* argv[])
 
     try
     {
-        const std::string s1="", s2="";
-        std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( refImage, s1, s2, false );
-        Image::Pointer source = dynamic_cast<Image*>(infile.at(0).GetPointer());
-        infile = BaseDataIO::LoadBaseDataFromFile( imageName, s1, s2, false );
-        Image::Pointer target = dynamic_cast<Image*>(infile.at(0).GetPointer());
+        Image::Pointer source = mitk::IOUtil::LoadImage(refImage);
+        Image::Pointer target = mitk::IOUtil::LoadImage(imageName);
 
         mitk::BaseGeometry* s_geom = source->GetGeometry();
         mitk::BaseGeometry* t_geom = target->GetGeometry();
@@ -60,12 +56,7 @@ int main(int argc, char* argv[])
         t_geom->SetIndexToWorldTransform(s_geom->GetIndexToWorldTransform());
         target->SetGeometry(t_geom);
 
-        if ( dynamic_cast<DiffusionImage<short>*>(target.GetPointer()) )
-        {
-            mitk::IOUtil::Save(dynamic_cast<DiffusionImage<short>*>(target.GetPointer()), outImage.c_str());
-        }
-        else
-            mitk::IOUtil::SaveImage(target, outImage);
+        mitk::IOUtil::SaveImage(target, outImage);
     }
     catch (itk::ExceptionObject e)
     {

@@ -170,10 +170,10 @@ void _mitkItkPictureWriteComposite(itk::Image< TPixel, VImageDimension >* itkIma
 }
 
 #define InstantiateAccessFunction__mitkItkPictureWrite(pixelType, dim) \
-  template MitkLegacyIO_EXPORT void _mitkItkPictureWrite(itk::Image<pixelType,dim>*, const std::string&);
+  template MITKLEGACYIO_EXPORT void _mitkItkPictureWrite(itk::Image<pixelType,dim>*, const std::string&);
 
 #define InstantiateAccessFunction__mitkItkPictureWriteComposite(pixelType, dim) \
-  template MitkLegacyIO_EXPORT void _mitkItkPictureWriteComposite(itk::Image<pixelType,dim>*, const std::string&);
+  template MITKLEGACYIO_EXPORT void _mitkItkPictureWriteComposite(itk::Image<pixelType,dim>*, const std::string&);
 
 InstantiateAccessFunction(_mitkItkPictureWrite)
 

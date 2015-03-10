@@ -1,0 +1,9 @@
+diff -urNb cppunit-1.12.1/src/cppunit/TypeInfoHelper.cpp CppUnit-src/src/cppunit/TypeInfoHelper.cpp
+--- cppunit-1.12.1/src/cppunit/TypeInfoHelper.cpp	2004-02-18 21:45:44.000000000 +0100
++++ CppUnit-src/src/cppunit/TypeInfoHelper.cpp	2015-01-11 15:05:15.433871726 +0100
+@@ -7,6 +7,7 @@
+ 
+ #if CPPUNIT_HAVE_GCC_ABI_DEMANGLE
+ #include <cxxabi.h>
++#include <stdlib.h>
+ #endif

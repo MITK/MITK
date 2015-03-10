@@ -17,13 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYPREFERENCES_H_
 
 #include <org_blueberry_core_runtime_Export.h>
+
 #include "berryIBerryPreferences.h"
 
-#include <map>
-#include <vector>
-#include <sstream>
-#include <iostream>
-#include "Poco/Mutex.h"
+#include <QHash>
+#include <QList>
 
 namespace berry
 {
@@ -32,7 +30,7 @@ namespace berry
   /// Implementation of the OSGI Preferences Interface.
   /// Wraps a DOMNode.
   ///
-  class BERRY_RUNTIME Preferences: public IBerryPreferences
+  class org_blueberry_core_runtime_EXPORT Preferences: public IBerryPreferences
   {
 
   public:
@@ -43,11 +41,11 @@ namespace berry
     ///
     /// Maps a string key to a string value
     ///
-    typedef std::map<std::string, std::string> PropertyMap;
+    typedef QHash<QString, QString> PropertyMap;
     ///
     /// The list of Child nodes
     ///
-    typedef std::vector<Preferences::Pointer> ChildrenList;
+    typedef QList<Preferences::Pointer> ChildrenList;
 
     ///
     /// Constructs a new preference node.
@@ -59,7 +57,7 @@ namespace berry
     /// \param _Root the root of this preference tree
     ///
     Preferences(const PropertyMap& _Properties
-      , const std::string& _Name
+      , const QString& _Name
       , Preferences* _Parent
       , AbstractPreferencesStorage* _Storage);
 
@@ -71,7 +69,7 @@ namespace berry
     ///
     /// Prints out the absolute path of the preference node.
     ///
-    std::string ToString() const;
+    QString ToString() const;
     ///
     /// Returns if this node and his silblings have to be rewritten persistently
     ///
@@ -83,7 +81,7 @@ namespace berry
     ///
     /// Returns if this node has property with a specific key
     ///
-    bool Has(std::string key) const;
+    bool Has(const QString& key) const;
     ///
     /// Returns true if the absolute paths are the same
     ///
@@ -105,12 +103,12 @@ namespace berry
     ///
     /// \see IPreferences::AbsolutePath()
     ///
-    virtual std::string AbsolutePath() const;
+    virtual QString AbsolutePath() const;
 
     ///
     /// \see IPreferences::ChildrenNames()
     ///
-    virtual std::vector<std::string> ChildrenNames() const throw(Poco::Exception, BackingStoreException);
+    virtual QStringList ChildrenNames() const;
 
     ///
     /// \see IPreferences::ChildrenNames()
@@ -120,67 +118,67 @@ namespace berry
     ///
     /// \see IPreferences::Clear()
     ///
-    virtual void Clear() throw(Poco::Exception, BackingStoreException);
+    virtual void Clear();
 
     ///
     /// \see IPreferences::Flush()
     ///
-    virtual void Flush() throw(Poco::Exception, BackingStoreException);
+    virtual void Flush();
 
     ///
     /// \see IPreferences::Get()
     ///
-    virtual std::string Get(std::string key, std::string def) const;
+    virtual QString Get(const QString& key, const QString& def) const;
 
     ///
     /// \see IPreferences::GetBool()
     ///
-    virtual bool GetBool(std::string key, bool def) const;
+    virtual bool GetBool(const QString& key, bool def) const;
 
     ///
     /// \see IPreferences::GetByteArray()
     ///
-    virtual std::string GetByteArray(std::string key, std::string def) const;
+    virtual QByteArray GetByteArray(const QString& key, const QByteArray& def) const;
 
     ///
     /// \see IPreferences::GetDouble()
     ///
-    virtual double GetDouble(std::string key, double def) const;
+    virtual double GetDouble(const QString& key, double def) const;
 
     ///
     /// \see IPreferences::GetFloat()
     ///
-    virtual float GetFloat(std::string key, float def) const;
+    virtual float GetFloat(const QString& key, float def) const;
 
     ///
     /// \see IPreferences::GetInt()
     ///
-    virtual int GetInt(std::string key, int def) const;
+    virtual int GetInt(const QString& key, int def) const;
 
     ///
     /// \see IPreferences::GetLong()
     ///
-    virtual long GetLong(std::string key, long def) const;
+    virtual long GetLong(const QString& key, long def) const;
 
     ///
     /// \see IPreferences::Keys()
     ///
-    std::vector<std::string> Keys() const throw(Poco::Exception, BackingStoreException);
+    QStringList Keys() const;
 
     ///
     /// \see IPreferences::Name()
     ///
-    virtual std::string Name() const;
+    virtual QString Name() const;
 
     ///
     /// \see IPreferences::Node()
     ///
-    virtual IPreferences::Pointer Node(std::string pathName);
+    virtual IPreferences::Pointer Node(const QString& pathName);
 
     ///
     /// \see IPreferences::NodeExists()
     ///
-    virtual bool NodeExists(std::string pathName) const throw(Poco::Exception, BackingStoreException);
+    virtual bool NodeExists(const QString& pathName) const;
 
     ///
     /// \see IPreferences::Parent()
@@ -190,52 +188,52 @@ namespace berry
     ///
     /// \see IPreferences::Put()
     ///
-    virtual void Put(std::string key, std::string value);
+    virtual void Put(const QString& key, const QString& value);
 
     ///
     /// \see IPreferences::PutByteArray()
     ///
-    virtual void PutByteArray(std::string key, std::string value);
+    virtual void PutByteArray(const QString& key, const QByteArray& value);
 
     ///
     /// \see IPreferences::PutBool()
     ///
-    virtual void PutBool(std::string key, bool value);
+    virtual void PutBool(const QString& key, bool value);
 
     ///
     /// \see IPreferences::PutDouble()
     ///
-    virtual void PutDouble(std::string key, double value);
+    virtual void PutDouble(const QString& key, double value);
 
     ///
     /// \see IPreferences::Sync()
     ///
-    virtual void PutFloat(std::string key, float value);
+    virtual void PutFloat(const QString& key, float value);
 
     ///
     /// \see IPreferences::PutInt()
     ///
-    virtual void PutInt(std::string key, int value);
+    virtual void PutInt(const QString& key, int value);
 
     ///
     /// \see IPreferences::PutLong()
     ///
-    virtual void PutLong(std::string key, long value);
+    virtual void PutLong(const QString& key, long value);
 
     ///
     /// \see IPreferences::Remove()
     ///
-    virtual void Remove(std::string key);
+    virtual void Remove(const QString& key);
 
     ///
     /// \see IPreferences::RemoveNode()
     ///
-    virtual void RemoveNode() throw(Poco::Exception, BackingStoreException);
+    virtual void RemoveNode();
 
     ///
     /// \see IPreferences::Sync()
     ///
-    virtual void Sync() throw(Poco::Exception, BackingStoreException);
+    virtual void Sync();
 
     //# End of IPreferences methods
 
@@ -245,57 +243,64 @@ namespace berry
     /// Checks if this node is about to be removed.
     /// \throws IllegalStateException
     ///
-    void AssertValid() const;
+    void AssertValid_unlocked() const;
     ///
     /// Checks a path value for validity.
     /// \throws invalid_argument
     ///
-    static void AssertPath(std::string pathName);
-    ///
-    /// Converts any value to a string (using stream operator "<<")
-    ///
-    template <class T>
-    static std::string ToString(const T& obj, int precision = 12 )
-    {
-      std::ostringstream s;
-      std::locale C("C");
-      s.imbue(C);
-      s.precision(precision); s << obj; return s.str();
-    }
+    static void AssertPath_unlocked(const QString& pathName);
+//    ///
+//    /// Converts any value to a string (using stream operator "<<")
+//    ///
+//    template <class T>
+//    static QString ToString(const T& obj, int precision = 12 )
+//    {
+//      std::ostringstream s;
+//      std::locale C("C");
+//      s.imbue(C);
+//      s.precision(precision); s << obj; return s.str();
+//    }
+
+    bool Has_unlocked(const QString& key) const;
+
+    Preferences::Pointer Node_unlocked(const QString& pathName);
+
     ///
     /// Sets the dirty flag recursively on all child nodes.
     ///
     void SetDirty(bool _Dirty);
+    void SetDirty_unlocked(bool _Dirty);
     ///
     /// Sets the removed flag recursively on all child nodes.
     ///
     void SetRemoved(bool _Removed);
+    void SetRemoved_unlocked(bool _Removed);
 
   protected:
     ///
     /// Holds all Key/Value Pairs.
     ///
-    std::map<std::string, std::string> m_Properties;
+    QHash<QString, QString> m_Properties;
     ///
     /// Holds all child nodes (explicit ownership).
     ///
-    std::vector<Preferences::Pointer> m_Children;
+    QList<Preferences::Pointer> m_Children;
     ///
     /// Saves the absolute path of this node (calculated in the constructor)
     ///
-    std::string m_Path;
+    const QString m_Path;
     ///
     /// Saves the name of this node (set when read from backend)
     ///
-    std::string m_Name;
+    const QString m_Name;
     ///
     /// Saves the parent of this node
     ///
-    Preferences* m_Parent;
+    Preferences* const m_Parent;
     ///
     /// Saves the root of this tree
     ///
-    Preferences* m_Root;
+    Preferences* const m_Root;
     ///
     /// Saves if something changed on this branch.
     /// Meaning that you would have to rewrite it.
@@ -308,35 +313,13 @@ namespace berry
     ///
     /// A storage to call the flush method.
     ///
-    AbstractPreferencesStorage* m_Storage;
+    AbstractPreferencesStorage* const m_Storage;
     ///
     /// A mutex to avoid concurrency crashes. Mutable because we need to use Mutex::lock() in const functions
     ///
-    mutable Poco::Mutex m_Mutex;
+    mutable QMutex m_Mutex;
   };
 
 }
-
-namespace Base64
-{
-  ///
-  /// Encode string to base64 (needed for writing byte arrays)
-  ///
-  std::string encode(const std::string &sString);
-  ///
-  /// Decode base64 to string (needed for reading byte arrays)
-  ///
-  std::string decode(const std::string &sString);
-};
-
-///
-/// Uses Preferences::ToString to print node information
-///
-std::ostream& operator<<(std::ostream& os,const berry::Preferences& m);
-
-///
-/// Uses Preferences::ToString to print node information
-///
-std::ostream& operator<<(std::ostream& os,const berry::Preferences* m);
 
 #endif /* BERRYPREFERENCES_H_ */

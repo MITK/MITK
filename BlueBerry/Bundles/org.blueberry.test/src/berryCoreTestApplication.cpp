@@ -29,6 +29,7 @@ CoreTestApplication::CoreTestApplication()
 }
 
 CoreTestApplication::CoreTestApplication(const CoreTestApplication& other)
+  : QObject()
 {
   Q_UNUSED(other)
 }
@@ -36,7 +37,7 @@ CoreTestApplication::CoreTestApplication(const CoreTestApplication& other)
 int CoreTestApplication::Start() {
   std::string testPlugin;
   try {
-    testPlugin = Platform::GetConfiguration().getString(Platform::ARG_TESTPLUGIN);
+    testPlugin = Platform::GetConfiguration().getString(Platform::ARG_TESTPLUGIN.toStdString());
   }
   catch (const Poco::NotFoundException& /*e*/)
   {
@@ -44,7 +45,7 @@ int CoreTestApplication::Start() {
     return 1;
   }
 
-  return BlueBerryTestDriver::Run(testPlugin);
+  return BlueBerryTestDriver::Run(QString::fromStdString(testPlugin));
 }
 
 void CoreTestApplication::Stop() {

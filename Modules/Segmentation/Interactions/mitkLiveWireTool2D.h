@@ -47,7 +47,7 @@ namespace mitk
 
   \warning Only to be instantiated by mitk::ToolManager.
 */
-class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
+class MITKSEGMENTATION_EXPORT LiveWireTool2D : public SegTool2D
 {
   public:
 

@@ -6,5 +6,5 @@ MACRO_CREATE_CTK_PLUGIN(
 )
 
 if(MITK_USE_Qt5)
-  qt5_use_modules(${PLUGIN_TARGET} Widgets)
+  target_link_libraries(${PLUGIN_TARGET} PUBLIC Qt5::Widgets)
 endif()

@@ -40,7 +40,7 @@ namespace mitk {
 //##Documentation
 //## @brief GPGPU
 
-class GPGPU_DLL_API GPGPU
+class MITKGPGPU_EXPORT GPGPU
 {
   public:
 
@@ -52,7 +52,7 @@ class GPGPU_DLL_API GPGPU
       UINT8_RGBA,
     };
 
-    class GPGPU_DLL_API Texture {
+    class MITKGPGPU_EXPORT Texture {
 
       public:
 
@@ -77,7 +77,7 @@ class GPGPU_DLL_API GPGPU
         int glFBOHandle;
     };
 
-    class GPGPU_DLL_API Shader {
+    class MITKGPGPU_EXPORT Shader {
 
       public:
 

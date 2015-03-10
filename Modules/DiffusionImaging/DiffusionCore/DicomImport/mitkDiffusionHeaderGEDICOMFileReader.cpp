@@ -1,4 +1,5 @@
 #include "mitkDiffusionHeaderGEDICOMFileReader.h"
+#include <vnl/vnl_math.h>
 
 mitk::DiffusionHeaderGEDICOMFileReader
 ::DiffusionHeaderGEDICOMFileReader()

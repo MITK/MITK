@@ -19,22 +19,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-void State::AddListener(IStateListener::Pointer listener)
+void State::AddListener(IStateListener* listener)
 {
   stateEvents.AddListener(listener);
 }
 
-void State::RemoveListener(IStateListener::Pointer listener)
+void State::AddListener(const IStateListener::Events::StateEvent::AbstractDelegate& delegate)
+{
+  stateEvents.stateChanged.AddListener(delegate);
+}
+
+void State::RemoveListener(IStateListener* listener)
 {
   stateEvents.RemoveListener(listener);
 }
 
-void State::FireStateChanged(Object::Pointer oldValue)
+void State::RemoveListener(const IStateListener::Events::StateEvent::AbstractDelegate& delegate)
+{
+  stateEvents.stateChanged.RemoveListener(delegate);
+}
+
+void State::FireStateChanged(const Object::Pointer& oldValue)
 {
   stateEvents.stateChanged(State::Pointer(this), oldValue);
 }
 
-std::string State::GetId() const
+QString State::GetId() const
 {
   return id;
 }
@@ -44,18 +54,18 @@ Object::Pointer State::GetValue() const
   return value;
 }
 
-void State::SetId(const std::string& id)
+void State::SetId(const QString& id)
 {
   this->id = id;
 }
 
-void State::SetValue(const Object::Pointer value)
+void State::SetValue(const Object::Pointer& value)
 {
   if (this->value != value)
   {
     const Object::Pointer oldValue(this->value);
     this->value = value;
-    //fireStateChanged(oldValue);
+    this->FireStateChanged(oldValue);
   }
 }
 

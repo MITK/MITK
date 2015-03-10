@@ -1,0 +1,26 @@
+/**
+\page LegacyGLModule The legacy OpenGL Module
+
+\tableofcontents
+
+\section LegacyGLModuleOverview Reasons for this module
+
+The new legacy GL module provides support of pure OpenGL rendering for Mitk. It contains all mitkGL.h related classes from the MitkCore. Modules, which used this classes in the past, now have a dependency to LegacyGL. This module is deprecated and should only be used for a short period until all mappers and props are migrated to the VTK-based rendering pipeline.
+
+Before the integration of this module, there was a lot of code in the Mitk rendering pipeline to enable mitkGLMapper and mitkVtkMapper in parallel. In fact, both mappers render with OpenGL but vtkMapper are compatible to each other. It was not clear for developers how to implement mappers, as there were many negative examples in the form of mitkGLMapper.
+
+Removing direct rendering of OpenGL makes a lot of code obsolete (e.g. Enable/DisableOpenGL() in VtkPropRenderer) and prevents side effects such as that the level window was sometimes applied to the crosshair etc. Furthermore, the software architecture and design becomes clear. There is now just one way to implement a Mapper in Mitk - the mitkVtkMapper. If you are a developper and want to write GL code, you can simply write a vtkMapper in VTK code and use it inside the mitkVtkMapper.
+
+\section PortExamples Examples how to port classes from GL to VTK-based mappers
+
+The following core classes were ported from GL to VTK and may give orientation how to port an existing mapper or prop to the VTK-based rendering pipeline:
+
+\li mitkSurfaceGLMapper2D -> mitkSurfaceVtkMapper2D
+\li mitkPointSetGLMapper2D -> mitkPointSetVtkMapper2D
+\li mitkPlaneGeometryGLMapper -> mitkPlaneGeometryMapper
+\li vtkMitkRectangleProp -> vtkMitkRectangleProp
+
+\section mitkVtkGLMapperWrapperDocu The mitkVtkGLMapperWrappper
+
+LegacyGL also provides a new base class, the mitkVtkGLMapperWrapper, which can be used to wrap existing GLMappers and pretend they are common vtkProps. Examples can be found in the Modules ContourModel and PlanarFigure.
+*/

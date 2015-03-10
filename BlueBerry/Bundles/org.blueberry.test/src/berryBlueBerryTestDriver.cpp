@@ -25,12 +25,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-BlueBerryTestDriver::BlueBerryTestDriver(const std::vector<
-    ITestDescriptor::Pointer>& descriptors,
+BlueBerryTestDriver::BlueBerryTestDriver(
+    const QList<ITestDescriptor::Pointer>& descriptors,
     bool uitests,
-    const std::string& testName,
-    bool wait) :
-  descriptors(descriptors), uitests(uitests), testName(testName), wait(wait)
+    const QString& testName,
+    bool wait)
+  : descriptors(descriptors)
+  , uitests(uitests)
+  , testName(testName)
+  , wait(wait)
 {
 
 }
@@ -40,10 +43,8 @@ int BlueBerryTestDriver::Run()
   CppUnit::TestRunner runner;
 
   unsigned int testCounter = 0;
-  for (std::vector<ITestDescriptor::Pointer>::iterator i = descriptors.begin(); i
-      != descriptors.end(); ++i)
+  foreach (const ITestDescriptor::Pointer& descr, descriptors)
   {
-    ITestDescriptor::Pointer descr(*i);
     if (descr->IsUITest() == uitests)
     {
       CppUnit::Test* test = descr->CreateTest();
@@ -81,10 +82,10 @@ int BlueBerryTestDriver::Run()
   return result.wasSuccessful() ? 0 : 1;
 }
 
-int BlueBerryTestDriver::Run(const std::string& pluginId, bool uitests)
+int BlueBerryTestDriver::Run(const QString& pluginId, bool uitests)
 {
   TestRegistry testRegistry;
-  const std::vector<ITestDescriptor::Pointer>& tests = testRegistry.GetTestsForId(
+  const QList<ITestDescriptor::Pointer>& tests = testRegistry.GetTestsForId(
       pluginId);
 
   BlueBerryTestDriver driver(tests, uitests);

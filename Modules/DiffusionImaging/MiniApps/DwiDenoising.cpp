@@ -15,40 +15,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkImageCast.h>
-#include <mitkBaseDataIOFactory.h>
 #include "mitkCommandLineParser.h"
 #include <boost/algorithm/string.hpp>
-#include <DiffusionWeightedImages/mitkDiffusionImage.h>
+#include <mitkImage.h>
 #include <itkNonLocalMeansDenoisingFilter.h>
 #include <itkImage.h>
 #include <mitkIOUtil.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
+#include <mitkProperties.h>
 
-typedef mitk::DiffusionImage<short> DiffusionImageType;
+typedef mitk::Image DiffusionImageType;
 typedef itk::Image<short, 3> ImageType;
-
-mitk::BaseData::Pointer LoadFile(std::string filename)
-{
-  if( filename.empty() )
-    return NULL;
-
-  const std::string s1="", s2="";
-  std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( filename, s1, s2, false );
-  if( infile.empty() )
-  {
-    std::cout << "File " << filename << " could not be read!";
-    return NULL;
-  }
-
-  mitk::BaseData::Pointer baseData = infile.at(0);
-  return baseData;
-}
 
 /**
  * Denoises DWI using the Nonlocal - Means algorithm
  */
 int main(int argc, char* argv[])
 {
-    std::cout << "DwiDenoising";
   mitkCommandLineParser parser;
 
   parser.setTitle("DWI Denoising");
@@ -100,15 +85,18 @@ int main(int argc, char* argv[])
     if( boost::algorithm::ends_with(inFileName, ".dwi"))
     {
 
-      DiffusionImageType::Pointer dwi = dynamic_cast<DiffusionImageType*>(LoadFile(inFileName).GetPointer());
+      DiffusionImageType::Pointer dwi = mitk::IOUtil::LoadImage(inFileName);
+
+      mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+      mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
       itk::NonLocalMeansDenoisingFilter<short>::Pointer filter = itk::NonLocalMeansDenoisingFilter<short>::New();
       filter->SetNumberOfThreads(12);
-      filter->SetInputImage(dwi->GetVectorImage());
+      filter->SetInputImage( itkVectorImagePointer );
 
       if (!maskName.empty())
       {
-        mitk::Image::Pointer mask = dynamic_cast<mitk::Image*>(LoadFile(maskName).GetPointer());
+        mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(maskName);
         ImageType::Pointer itkMask = ImageType::New();
         mitk::CastToItkImage(mask, itkMask);
         filter->SetInputMask(itkMask);
@@ -121,11 +109,11 @@ int main(int argc, char* argv[])
       filter->SetVariance(variance);
       filter->Update();
 
-      DiffusionImageType::Pointer output = DiffusionImageType::New();
-      output->SetVectorImage(filter->GetOutput());
-      output->SetReferenceBValue(dwi->GetReferenceBValue());
-      output->SetDirections(dwi->GetDirections());
-      output->InitializeFromVectorImage();
+      DiffusionImageType::Pointer output = mitk::GrabItkImageMemory( filter->GetOutput() );
+      output->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi) ) );
+      output->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi) ) );
+      mitk::DiffusionPropertyHelper propertyHelper( output );
+      propertyHelper.InitializeImage();
 
 //      std::stringstream name;
 //      name << outFileName << "_NLM_" << search << "-" << compare << "-" << variance << ".dwi";

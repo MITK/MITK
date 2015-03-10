@@ -26,14 +26,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-/*!
- @brief BaseDataIO creates instances of BaseData objects using an object factory.
-
- @todo Add file writing method, move writers into a similar factory scheme
- @ingroup IO
- @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-*/
-class DEPRECATED() MitkLegacyIO_EXPORT BaseDataIO : public itk::Object
+/**
+ * @brief BaseDataIO creates instances of BaseData objects using an object factory.
+ *
+ * @ingroup MitkLegacyIOModule
+ * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+ */
+class DEPRECATED() MITKLEGACYIO_EXPORT BaseDataIO : public itk::Object
 {
 public:
 

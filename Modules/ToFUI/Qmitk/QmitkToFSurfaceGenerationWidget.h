@@ -43,7 +43,7 @@ class QmitkStdMultiWidget;
   * be reused in any other GUI.
   * \ingroup ToFUI
   */
-class MitkToFUI_EXPORT QmitkToFSurfaceGenerationWidget :public QWidget
+class MITKTOFUI_EXPORT QmitkToFSurfaceGenerationWidget :public QWidget
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

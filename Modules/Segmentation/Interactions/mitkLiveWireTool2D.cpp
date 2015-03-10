@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, LiveWireTool2D, "LiveWire tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, LiveWireTool2D, "LiveWire tool");
 }
 
 static void AddInteractorToGlobalInteraction(mitk::Interactor* interactor)

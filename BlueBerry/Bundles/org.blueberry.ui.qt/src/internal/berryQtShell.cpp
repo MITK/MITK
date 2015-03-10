@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <internal/berryTweaklets.h>
+#include <tweaklets/berryGuiWidgetsTweaklet.h>
 
 #include "berryQtShell.h"
 
@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <internal/berryQtControlWidget.h>
 
 #include <berryConstants.h>
-#include <tweaklets/berryGuiWidgetsTweaklet.h>
+#include <internal/berryTweaklets.h>
 
 #include <QApplication>
 #include <QVariant>
@@ -41,12 +41,15 @@ QtShell::QtShell(QWidget* parent, Qt::WindowFlags flags)
     updatesDisabled = true;
 
     widget->setAttribute(Qt::WA_DeleteOnClose);
+
   }
   else
   {
     widget = new QtControlWidget(parent, this, flags | Qt::Dialog);
     widget->setObjectName("shell widget");
   }
+
+  widget->setProperty("shell", QVariant::fromValue(static_cast<Shell*>(this)));
 }
 
 QtShell::~QtShell()
@@ -54,18 +57,14 @@ QtShell::~QtShell()
   widget->deleteLater();
 }
 
-void QtShell::SetBounds(const Rectangle& bounds)
+void QtShell::SetBounds(const QRect& bounds)
 {
-  widget->move(bounds.x, bounds.y);
-  widget->resize(bounds.width, bounds.height);
+  widget->setGeometry(bounds);
 }
 
-Rectangle QtShell::GetBounds() const
+QRect QtShell::GetBounds() const
 {
-  const QRect& qRect = widget->frameGeometry();
-  const QSize& size = widget->size();
-  Rectangle rect(qRect.x(), qRect.y(), size.width(), size.height());
-  return rect;
+  return widget->frameGeometry();
 }
 
 void QtShell::SetLocation(int x, int y)
@@ -73,27 +72,26 @@ void QtShell::SetLocation(int x, int y)
   widget->move(x, y);
 }
 
-Point QtShell::ComputeSize(int  /*wHint*/, int  /*hHint*/, bool changed)
+QPoint QtShell::ComputeSize(int  /*wHint*/, int  /*hHint*/, bool changed)
 {
   if (changed) widget->updateGeometry();
   QSize size(widget->size());
-  Point point(size.width(), size.height());
+  QPoint point(size.width(), size.height());
   return point;
 }
 
-std::string QtShell::GetText() const
+QString QtShell::GetText() const
 {
-  return widget->windowTitle().toStdString();
+  return widget->windowTitle();
 }
 
-void QtShell::SetText(const std::string& text)
+void QtShell::SetText(const QString& title)
 {
-  QString title(QString::fromStdString(text));
   widget->setWindowTitle(title);
   widget->setObjectName(title);
 }
 
-bool QtShell::IsVisible()
+bool QtShell::IsVisible() const
 {
   return widget->isVisible();
 }
@@ -109,21 +107,21 @@ void QtShell::SetActive()
   widget->raise();
 }
 
-void* QtShell::GetControl()
+QWidget *QtShell::GetControl()
 {
   return widget;
 }
 
-void QtShell::SetImages(const std::vector<void*>&  /*images*/)
+void QtShell::SetImages(const QList<QIcon>&  /*images*/)
 {
 }
 
-bool QtShell::GetMaximized()
+bool QtShell::GetMaximized() const
 {
   return widget->isMaximized();
 }
 
-bool QtShell::GetMinimized()
+bool QtShell::GetMinimized() const
 {
   return widget->isMinimized();
 }
@@ -138,7 +136,7 @@ void QtShell::SetMinimized(bool minimized)
   minimized ? widget->showMinimized() : widget->showNormal();
 }
 
-void QtShell::AddShellListener(IShellListener::Pointer listener)
+void QtShell::AddShellListener(IShellListener* listener)
 {
   QVariant variant = widget->property(QtWidgetController::PROPERTY_ID);
   poco_assert(variant.isValid());
@@ -147,7 +145,7 @@ void QtShell::AddShellListener(IShellListener::Pointer listener)
   controller->AddShellListener(listener);
 }
 
-void QtShell::RemoveShellListener(IShellListener::Pointer listener)
+void QtShell::RemoveShellListener(IShellListener* listener)
 {
   QVariant variant = widget->property(QtWidgetController::PROPERTY_ID);
   if (variant.isValid())
@@ -174,13 +172,13 @@ void QtShell::Close()
   widget->close();
 }
 
-std::vector<Shell::Pointer> QtShell::GetShells()
+QList<Shell::Pointer> QtShell::GetShells()
 {
   GuiWidgetsTweaklet* widgetTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
-  std::vector<Shell::Pointer> allShells(widgetTweaklet->GetShells());
-  std::vector<Shell::Pointer> descendants;
+  QList<Shell::Pointer> allShells(widgetTweaklet->GetShells());
+  QList<Shell::Pointer> descendants;
 
-  for (std::size_t i = 0; i < allShells.size(); ++i)
+  for (int i = 0; i < allShells.size(); ++i)
   {
     Shell::Pointer shell = allShells[i];
     if (widgetTweaklet->GetShell(shell->GetControl()) == this)
@@ -192,28 +190,9 @@ std::vector<Shell::Pointer> QtShell::GetShells()
   return descendants;
 }
 
-int QtShell::GetStyle()
+Qt::WindowFlags QtShell::GetStyle() const
 {
-  Qt::WindowFlags qtFlags = widget->windowFlags();
-
-  int berryFlags = 0;
-  if (!(qtFlags & Qt::FramelessWindowHint))
-    berryFlags |= Constants::BORDER;
-  if (qtFlags & Qt::WindowTitleHint)
-    berryFlags |= Constants::TITLE;
-  if (qtFlags & Qt::WindowSystemMenuHint)
-    berryFlags |= Constants::CLOSE;
-  if (qtFlags & Qt::WindowMinimizeButtonHint)
-    berryFlags |= Constants::MIN;
-  if (qtFlags & Qt::WindowMaximizeButtonHint)
-    berryFlags |= Constants::MAX;
-
-  if (widget->windowModality() == Qt::WindowModal)
-    berryFlags |= Constants::PRIMARY_MODAL;
-  else if(widget->windowModality() == Qt::ApplicationModal)
-    berryFlags |= Constants::APPLICATION_MODAL;
-
-  return berryFlags;
+  return widget->windowFlags();
 }
 
 QWidget* QtShell::GetWidget()

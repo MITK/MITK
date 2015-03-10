@@ -18,21 +18,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-EvaluationResult OrExpression::Evaluate(IEvaluationContext* context)
+EvaluationResult::ConstPointer OrExpression::Evaluate(IEvaluationContext* context) const
 {
   return this->EvaluateOr(context);
 }
 
-bool OrExpression::operator==(Expression& object)
+bool OrExpression::operator==(const Object* object) const
 {
-  try {
-    OrExpression& that = dynamic_cast<OrExpression&>(object);
-    return this->fExpressions == that.fExpressions;
-  }
-  catch (std::bad_cast)
+  if(const OrExpression* that = dynamic_cast<const OrExpression*>(object))
   {
-    return false;
+    return this->fExpressions == that->fExpressions;
   }
+  return false;
 }
 
 }

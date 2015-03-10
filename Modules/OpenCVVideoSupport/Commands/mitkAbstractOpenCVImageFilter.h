@@ -37,7 +37,7 @@ namespace mitk {
   * mitk::AbstractOpenCVImageFilter::filterImage() method.
   *
   */
-class MITK_OPENCVVIDEOSUPPORT_EXPORT AbstractOpenCVImageFilter : public itk::Object
+class MITKOPENCVVIDEOSUPPORT_EXPORT AbstractOpenCVImageFilter : public itk::Object
 {
 
 public:

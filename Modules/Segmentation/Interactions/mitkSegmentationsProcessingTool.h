@@ -30,7 +30,7 @@ namespace mitk
 
   This class is undocumented. Ask the creator ($Author$) to supply useful comments.
 */
-class MitkSegmentation_EXPORT SegmentationsProcessingTool : public Tool
+class MITKSEGMENTATION_EXPORT SegmentationsProcessingTool : public Tool
 {
   public:
 

@@ -17,13 +17,9 @@ set(DIFFUSIONIMAGINGAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${D
 set(_plugins
   org.commontk.configadmin
   org.commontk.eventadmin
-  org.blueberry.osgi
-  org.blueberry.compat
   org.blueberry.core.runtime
   org.blueberry.core.expressions
-  org.blueberry.solstice.common
   org.blueberry.core.commands
-  org.blueberry.ui
   org.blueberry.ui.qt
   org.blueberry.ui.qt.log
   org.blueberry.ui.qt.help
@@ -86,8 +82,8 @@ FunctionCreateBlueBerryApplication(
 mitk_use_modules(TARGET ${DIFFUSIONAPP_NAME} MODULES qtsingleapplication)
 
 # Add meta dependencies (e.g. on auto-load modules from depending modules)
-if(ALL_META_DEPENDENCIES)
-  add_dependencies(${DIFFUSIONAPP_NAME} ${ALL_META_DEPENDENCIES})
+if(TARGET ${CMAKE_PROJECT_NAME}-autoload)
+  add_dependencies(${DIFFUSIONAPP_NAME} ${CMAKE_PROJECT_NAME}-autoload)
 endif()
 
 # Add a build time dependency to legacy BlueBerry bundles.

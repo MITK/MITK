@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPixelManipulationTool.xpm"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, PixelManipulationTool, "Pixel manipulation tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, PixelManipulationTool, "Pixel manipulation tool");
 }
 
 mitk::PixelManipulationTool::PixelManipulationTool() : Tool("dummy"),

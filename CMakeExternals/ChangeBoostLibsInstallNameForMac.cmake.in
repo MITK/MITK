@@ -1,18 +1,19 @@
-# Scan the MITK-Superbuild/Boost-install/lib directory for *.dylib files and change their install names for mac
+# Scan the MITK-Superbuild/ep/lib directory for *.dylib files and change their install names for mac
 # On Mac OS X system each shared library usually has a install name which is the absolute path of the library.
 # For some reasons boost libs do not contain the absolute path but just their name
 # (e.g. "libboost_thread.dylib" should be named "<PATH_TO_LIB/libboost_thread.dylib>")
 
 # Get all the shared libraries which are located in the Boost-install/lib directory
-file(GLOB dylibFiles @BOOST_ROOT@/lib/*.dylib)
+file(GLOB dylibFiles @BOOST_ROOT@/lib/libboost*.dylib)
 
 # For each shared library call the install_name_tool in order to change the install name of the according library
 foreach(_dylib ${dylibFiles})
    message("Fixing boost install name for lib: ${_dylib}")
-   execute_process(COMMAND install_name_tool -id ${_dylib} ${_dylib})
+   get_filename_component(_dylib_name ${_dylib} NAME)
+   execute_process(COMMAND install_name_tool -id \@rpath/${_dylib_name} ${_dylib})
    foreach(_dep_dylib ${dylibFiles})
       get_filename_component(_dep_dylib_name ${_dep_dylib} NAME)
-      execute_process(COMMAND install_name_tool -change ${_dep_dylib_name} \@loader_path/${_dep_dylib_name} ${_dylib})
+      execute_process(COMMAND install_name_tool -change ${_dep_dylib_name} \@rpath/${_dep_dylib_name} ${_dylib})
    endforeach()
 endforeach()
 

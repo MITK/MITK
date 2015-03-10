@@ -1,8 +1,7 @@
 MITK_CREATE_MODULE(
-  INCLUDE_DIRS BaseDataSerializer
   DEPENDS MitkSceneSerializationBase
-  PACKAGE_DEPENDS Poco
+  PACKAGE_DEPENDS PUBLIC Poco|Zip
   WARNINGS_AS_ERRORS
 )
 
-add_subdirectory(Testing)
+add_subdirectory(test)

@@ -27,7 +27,7 @@ namespace Ui {
   class QmitkNavigationDataPlayerControlWidget;
 }
 
-class MitkIGTUI_EXPORT QmitkNavigationDataPlayerControlWidget : public QWidget
+class MITKIGTUI_EXPORT QmitkNavigationDataPlayerControlWidget : public QWidget
 {
   Q_OBJECT
 

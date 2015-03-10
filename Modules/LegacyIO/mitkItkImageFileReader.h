@@ -25,9 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 //##Documentation
 //## @brief Reader to read file formats supported by itk
-//## @ingroup IO
+//## @ingroup MitkLegacyIOModule
 //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class MitkLegacyIO_EXPORT ItkImageFileReader : public ImageSource, public FileReader
+class MITKLEGACYIO_EXPORT ItkImageFileReader : public ImageSource, public FileReader
 {
 public:
     mitkClassMacro(ItkImageFileReader, FileReader);

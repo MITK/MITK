@@ -1,5 +1,6 @@
 set(SRC_CPP_FILES
   QmitkExtActionBarAdvisor.cpp
+  QmitkExtActionConstants.cpp
   QmitkExtWorkbenchWindowAdvisor.cpp
   QmitkExtFileSaveProjectAction.cpp
   QmitkOpenDicomEditorAction.cpp

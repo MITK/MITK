@@ -230,6 +230,15 @@ void TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
   }
 }
 
+template <class TInputScalarType, class TOutputScalarType>
+void
+TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
+::UpdateOutputInformation()
+{
+  // Calls to superclass updateoutputinformation
+  Superclass::UpdateOutputInformation();
 
+  this->GetOutput()->SetVectorLength( m_GradientList->size() );
+}
 
 } // end of namespace

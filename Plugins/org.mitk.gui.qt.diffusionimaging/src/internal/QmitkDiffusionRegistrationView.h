@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include "ui_QmitkDiffusionRegistrationViewControls.h"
 
-#include "mitkDiffusionImage.h"
+#include <mitkImage.h>
 #include <mitkDWIHeadMotionCorrectionFilter.h>
 
 #include <QThread>
@@ -78,7 +78,7 @@ public:
   virtual void CreateQtPartControl(QWidget *parent);
   void SetFocus();
 
-  typedef mitk::DWIHeadMotionCorrectionFilter< DiffusionPixelType >       DWIHeadMotionCorrectionFilterType;
+  typedef mitk::DWIHeadMotionCorrectionFilter       DWIHeadMotionCorrectionFilterType;
 
 protected slots:
 
@@ -103,7 +103,7 @@ protected:
 
   Ui::QmitkDiffusionRegistrationViewControls* m_Controls;
 
-  mitk::DiffusionImage<DiffusionPixelType>::Pointer m_DiffusionImage;
+  mitk::Image::Pointer m_DiffusionImage;
   std::vector< mitk::DataNode::Pointer >            m_SelectedDiffusionNodes;
 
 private:

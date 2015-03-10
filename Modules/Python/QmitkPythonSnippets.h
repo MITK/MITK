@@ -24,7 +24,7 @@ struct QmitkPythonSnippetsData;
 
 ///
 /// a widget that holds snippets and serializes the snippets to a certain places
-class MITK_PYTHON_EXPORT QmitkPythonSnippets: public QWidget
+class MITKPYTHON_EXPORT QmitkPythonSnippets: public QWidget
 {
   Q_OBJECT
 

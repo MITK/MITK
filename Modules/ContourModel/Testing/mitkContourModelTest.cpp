@@ -440,7 +440,7 @@ int mitkContourModelTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("mitkContourModelTest")
 
-    TestAddVertex();
+  TestAddVertex();
   TestSelectVertexAtIndex();
   TestSelectVertexAtWorldposition();
   TestMoveSelectedVertex();

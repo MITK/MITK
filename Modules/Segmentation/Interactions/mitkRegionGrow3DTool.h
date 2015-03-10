@@ -28,7 +28,7 @@ namespace mitk{
   class StateMachineAction;
   class InteractionEvent;
 
-  class MitkSegmentation_EXPORT RegionGrow3DTool : public Tool
+  class MITKSEGMENTATION_EXPORT RegionGrow3DTool : public Tool
   {
   public:
     mitkClassMacro(RegionGrow3DTool, Tool);

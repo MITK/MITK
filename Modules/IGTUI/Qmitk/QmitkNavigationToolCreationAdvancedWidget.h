@@ -46,7 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   *
   *   \ingroup IGTUI
   */
-class MitkIGTUI_EXPORT QmitkNavigationToolCreationAdvancedWidget : public QDialog
+class MITKIGTUI_EXPORT QmitkNavigationToolCreationAdvancedWidget : public QDialog
 {
   Q_OBJECT
 

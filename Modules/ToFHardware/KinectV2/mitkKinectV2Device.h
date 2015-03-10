@@ -42,7 +42,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_KINECTV2MODULE_EXPORT KinectV2Device : public ToFCameraDevice
+  class MITKKINECTV2_EXPORT KinectV2Device : public ToFCameraDevice
   {
   public:
 

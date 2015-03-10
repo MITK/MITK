@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYQCTABBAR_H_
 
 #include <QTabBar>
-#include <deque>
 
 #include "internal/util/berryAbstractTabItem.h"
 
@@ -32,7 +31,7 @@ class QCTabBar : public QTabBar
 private:
 
   // maps the index in the tabbar to the AbstractTabItem
-  std::deque<AbstractTabItem*> tabItemList;
+  QList<AbstractTabItem*> tabItemList;
 
   QPoint dragStartPosition;
 
@@ -49,7 +48,7 @@ public:
 
   AbstractTabItem* getTab(int index) const;
 
-  std::vector<AbstractTabItem*> getTabs() const;
+  QList<AbstractTabItem*> getTabs() const;
 
   /**
    * Inserts a new tab at the specified index. The TabBar takes

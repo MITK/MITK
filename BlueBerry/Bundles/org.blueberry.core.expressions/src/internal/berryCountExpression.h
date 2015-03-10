@@ -21,13 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIEvaluationContext.h"
 #include "berryExpressionInfo.h"
 
-#include "service/berryIConfigurationElement.h"
-
 #include "Poco/DOM/Element.h"
 
 #include <string>
 
 namespace berry {
+
+struct IConfigurationElement;
 
 class CountExpression : public Expression {
 
@@ -42,30 +42,30 @@ private:
   /**
    * The seed for the hash code for all count expressions.
    */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
-   int fMode;
-   int fSize;
+  int fMode;
+  int fSize;
 
- void InitializeSize(std::string size);
+  void InitializeSize(QString size);
 
 public:
-  CountExpression(SmartPointer<IConfigurationElement> configElement);
 
-   CountExpression(Poco::XML::Element* element);
+  CountExpression(const SmartPointer<IConfigurationElement>& configElement);
 
-   CountExpression(const std::string& size);
+  CountExpression(Poco::XML::Element* element);
 
-   EvaluationResult Evaluate(IEvaluationContext* context);
+  CountExpression(const QString& size);
 
-   void CollectExpressionInfo(ExpressionInfo* info);
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 
-   bool operator==(Expression& object);
+  void CollectExpressionInfo(ExpressionInfo* info) const;
 
+  bool operator==(const Object* object) const;
 
 protected:
 
-  std::size_t ComputeHashCode();
+  uint ComputeHashCode() const;
 
 };
 

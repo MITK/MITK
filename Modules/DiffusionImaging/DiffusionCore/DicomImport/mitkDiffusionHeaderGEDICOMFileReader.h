@@ -7,7 +7,7 @@
 namespace mitk
 {
 
-class MitkDiffusionCore_EXPORT DiffusionHeaderGEDICOMFileReader
+class MITKDIFFUSIONCORE_EXPORT DiffusionHeaderGEDICOMFileReader
     : public DiffusionHeaderDICOMFileReader
 {
 public:

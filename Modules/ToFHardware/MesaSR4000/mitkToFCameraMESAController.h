@@ -31,7 +31,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_MESASR4000MODULE_EXPORT ToFCameraMESAController : public itk::Object
+  class MITKMESASR4000_EXPORT ToFCameraMESAController : public itk::Object
   {
   public:
 

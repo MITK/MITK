@@ -50,7 +50,6 @@ class QmitkUGVisualizationView : public QmitkFunctionality
     static const std::string VIEW_ID;
 
     QmitkUGVisualizationView();
-    QmitkUGVisualizationView(const QmitkUGVisualizationView& other);
     virtual ~QmitkUGVisualizationView();
 
     virtual void CreateQtPartControl(QWidget *parent);

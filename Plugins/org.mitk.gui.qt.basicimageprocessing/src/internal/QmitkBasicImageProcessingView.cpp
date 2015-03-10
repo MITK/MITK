@@ -143,8 +143,7 @@ QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 : QmitkFunctionality(),
   m_Controls(NULL),
   m_SelectedImageNode(NULL),
-  m_TimeStepperAdapter(NULL),
-  m_SelectionListener(NULL)
+  m_TimeStepperAdapter(NULL)
 {
 }
 
@@ -1009,7 +1008,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
       ImageType::Pointer resampledImage = resampler->GetOutput();
 
-      newImage = mitk::ImportItkImage( resampledImage );
+      newImage = mitk::ImportItkImage( resampledImage )->Clone();
       nameAddition << "_Resampled_" << selectedInterpolator;
       std::cout << "Resampling successful." << std::endl;
       break;

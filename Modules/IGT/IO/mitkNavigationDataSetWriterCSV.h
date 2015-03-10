@@ -21,11 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataSet.h>
 
 namespace mitk {
-  class MitkIGT_EXPORT NavigationDataSetWriterCSV
+  class MITKIGT_EXPORT NavigationDataSetWriterCSV
   {
   public:
-     NavigationDataSetWriterCSV();
-    ~NavigationDataSetWriterCSV();
+    NavigationDataSetWriterCSV();
+    virtual~NavigationDataSetWriterCSV();
 
     virtual void Write (std::string path, mitk::NavigationDataSet::Pointer );
     virtual void Write (std::ostream* stream, mitk::NavigationDataSet::Pointer);

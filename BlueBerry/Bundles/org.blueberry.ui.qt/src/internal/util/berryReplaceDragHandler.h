@@ -43,7 +43,7 @@ private:
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.presentations.util.TabDragHandler#dragOver(org.eclipse.swt.widgets.Control, org.eclipse.swt.graphics.Point)
      */
-    StackDropResult::Pointer DragOver(QWidget*, const Point& location,
+    StackDropResult::Pointer DragOver(QWidget*, const QPoint& location,
             int dragStart);
 
     /* (non-Javadoc)

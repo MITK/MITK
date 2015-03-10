@@ -19,9 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYPARAMETERIZATION_H_
 
 #include <org_blueberry_core_commands_Export.h>
-#include "common/berryCommandExceptions.h"
 
-#include <string>
+#include <QString>
 
 #include <berrySmartPointer.h>
 
@@ -46,23 +45,23 @@ private:
    * The constant integer hash code value meaning the hash code has not yet
    * been computed.
    */
-  static const std::size_t HASH_CODE_NOT_COMPUTED; // = 0;
+  static const uint HASH_CODE_NOT_COMPUTED; // = 0;
 
   /**
    * A factor for computing the hash code for all parameterized commands.
    */
-  static const std::size_t HASH_FACTOR; // = 89;
+  static const uint HASH_FACTOR; // = 89;
 
   /**
    * The seed for the hash code for all parameterized commands.
    */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
   /**
    * The hash code for this object. This value is computed lazily, and marked
    * as invalid when one of the values on which it is based changes.
    */
-  mutable std::size_t hashCode;
+  mutable uint hashCode;
 
   /**
    * The parameter that is being parameterized. This value is never
@@ -74,7 +73,7 @@ private:
    * The value that defines the parameterization. This value may be
    * <code>null</code>.
    */
-  std::string value;
+  QString value;
 
 
 public:
@@ -88,7 +87,7 @@ public:
    * @param value
    *            The value for the parameter; may be <code>null</code>.
    */
-  Parameterization(const SmartPointer<const IParameter> parameter, const std::string& value);
+  Parameterization(const SmartPointer<const IParameter> parameter, const QString& value);
 
   /**
    * Copy constructor
@@ -116,7 +115,7 @@ public:
    *
    * @return The value; may be <code>null</code>.
    */
-  std::string GetValue() const;
+  QString GetValue() const;
 
   /**
    * Returns the human-readable name for the current value, if any. If the
@@ -127,16 +126,12 @@ public:
    * @throws ParameterValuesException
    *             If the parameter needed to be initialized, but couldn't be.
    */
-#ifdef _MSC_VER
-  std::string GetValueName() const throw();
-#else
-  std::string GetValueName() const throw(ParameterValuesException);
-#endif
+  QString GetValueName() const;
 
-  /* (non-Javadoc)
+  /*
    * @see java.lang.Object#hashCode()
    */
-  std::size_t HashCode() const;
+  uint HashCode() const;
 };
 
 }

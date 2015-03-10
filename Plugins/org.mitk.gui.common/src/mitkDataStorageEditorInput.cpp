@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 #include <mitkIDataStorageService.h>
 
+#include "internal/org_mitk_gui_common_Activator.h"
+
 namespace mitk
 {
 
@@ -36,12 +38,12 @@ bool DataStorageEditorInput::Exists() const
   return true;
 }
 
-std::string DataStorageEditorInput::GetName() const
+QString DataStorageEditorInput::GetName() const
 {
   return "DataStorage Scene";
 }
 
-std::string DataStorageEditorInput::GetToolTipText() const
+QString DataStorageEditorInput::GetToolTipText() const
 {
   return "";
 }
@@ -59,8 +61,10 @@ DataStorageEditorInput::GetDataStorageReference()
 {
   if (m_DataStorageRef.IsNull())
   {
-    berry::ServiceRegistry& serviceRegistry = berry::Platform::GetServiceRegistry();
-    IDataStorageService::Pointer dataService = serviceRegistry.GetServiceById<IDataStorageService>(IDataStorageService::ID);
+    ctkPluginContext* context = PluginActivator::GetContext();
+    ctkServiceReference serviceRef = context->getServiceReference<IDataStorageService>();
+    if (!serviceRef) return IDataStorageReference::Pointer(0);
+    IDataStorageService* dataService = context->getService<IDataStorageService>(serviceRef);
     if (!dataService) return IDataStorageReference::Pointer(0);
     m_DataStorageRef = dataService->GetDefaultDataStorage();
   }

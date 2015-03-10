@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
- class MitkSurfaceInterpolation_EXPORT SurfaceInterpolationController : public itk::Object
+ class MITKSURFACEINTERPOLATION_EXPORT SurfaceInterpolationController : public itk::Object
  {
 
   public:

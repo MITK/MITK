@@ -14,9 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkBaseDataIOFactory.h"
-#include "mitkDiffusionImage.h"
+#include "mitkImage.h"
+#include <mitkImageCast.h>
 #include "mitkBaseData.h"
+#include <mitkDiffusionPropertyHelper.h>
 
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>
 #include <itkDiffusionTensor3D.h>
@@ -24,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkNrrdImageIO.h>
 #include "mitkCommandLineParser.h"
 #include <itksys/SystemTools.hxx>
+#include <mitkIOUtil.h>
 
 using namespace mitk;
 /**
@@ -31,7 +33,6 @@ using namespace mitk;
  */
 int main(int argc, char* argv[])
 {
-    std::cout << "TensorReconstruction";
     mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
@@ -58,14 +59,15 @@ int main(int argc, char* argv[])
 
     try
     {
-        const std::string s1="", s2="";
-        std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
-        DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer());
+        Image::Pointer dwi = IOUtil::LoadImage(inFileName);
+
+        mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+        mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
         typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, float > TensorReconstructionImageFilterType;
         TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
-        filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-        filter->SetBValue(dwi->GetReferenceBValue());
+        filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
+        filter->SetBValue( mitk::DiffusionPropertyHelper::GetReferenceBValue( dwi ));
         filter->SetThreshold(threshold);
         filter->Update();
 

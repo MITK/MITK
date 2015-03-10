@@ -17,17 +17,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYEXPRESSIONCONVERTER_H_
 #define BERRYEXPRESSIONCONVERTER_H_
 
-#include "berryElementHandler.h"
-#include "berryExpression.h"
+#include <org_blueberry_core_expressions_Export.h>
 
-#include "internal/berryCompositeExpression.h"
+#include <berrySmartPointer.h>
 
-#include "Poco/DOM/Element.h"
+#include <QList>
 
-#include <string>
-#include <vector>
+namespace Poco {
+namespace XML {
+class Element;
+}
+}
 
 namespace berry {
+
+struct IConfigurationElement;
+
+class CompositeExpression;
+class ElementHandler;
+class Expression;
 
 /**
  * An expression converter converts an XML expression represented by an
@@ -45,7 +53,8 @@ namespace berry {
 class BERRY_EXPRESSIONS ExpressionConverter {
 
 private:
-  std::vector<ElementHandler::Pointer> fHandlers;
+
+  QList<SmartPointer<ElementHandler> > fHandlers;
 
   static ExpressionConverter* INSTANCE;
 
@@ -70,7 +79,7 @@ public:
    *
    * @param handlers the array  of element handlers
    */
-  ExpressionConverter(std::vector<ElementHandler::Pointer>& handlers);
+  ExpressionConverter(const QList<SmartPointer<ElementHandler> >& handlers);
 
   /**
    * Converts the tree of configuration elements represented by the given
@@ -86,7 +95,7 @@ public:
    *  cope with a certain configuration element or (b) the XML
    *  expression tree is malformed.
    */
-  Expression::Pointer Perform(SmartPointer<IConfigurationElement> root);
+  SmartPointer<Expression> Perform(const SmartPointer<IConfigurationElement>& root);
 
   /**
    * Converts the tree of DOM elements represented by the given
@@ -100,17 +109,17 @@ public:
    * @throws CoreException if the element can't be converted.
    *  Reasons include: (a) no handler is available to cope with
    *  a certain element or (b) the XML expression tree is malformed.
-   *
-   * @since 3.3
    */
-  Expression::Pointer Perform(Poco::XML::Element* root);
+  SmartPointer<Expression> Perform(Poco::XML::Element* root);
 
 
-  void ProcessChildren(SmartPointer<IConfigurationElement> element, SmartPointer<CompositeExpression> result);
+  void ProcessChildren(const SmartPointer<IConfigurationElement>& element,
+                       const SmartPointer<CompositeExpression>& result);
 
-  std::string GetDebugPath(SmartPointer<IConfigurationElement> configurationElement);
+  QString GetDebugPath(const SmartPointer<IConfigurationElement>& configurationElement);
 
-  void ProcessChildren(Poco::XML::Element* element, SmartPointer<CompositeExpression> result);
+  void ProcessChildren(Poco::XML::Element* element,
+                       const SmartPointer<CompositeExpression>& result);
 };
 
 }  // namespace berry

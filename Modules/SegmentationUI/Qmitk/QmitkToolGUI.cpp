@@ -30,7 +30,7 @@ void QmitkToolGUI::Register() const
   // empty on purpose, just don't let ITK handle calls to Register()
 }
 
-void QmitkToolGUI::UnRegister() const
+void QmitkToolGUI::UnRegister() const ITK_NOEXCEPT
 {
   // empty on purpose, just don't let ITK handle calls to UnRegister()
 }

@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  class MitkDiffusionCore_EXPORT PartialVolumeAnalysisClusteringCalculator : public itk::Object
+  class MITKDIFFUSIONCORE_EXPORT PartialVolumeAnalysisClusteringCalculator : public itk::Object
   {
   public:
 

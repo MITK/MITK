@@ -1,0 +1,38 @@
+<statemachine NAME="TubeGraph">
+ <state name="start" startstate="true" >
+        <transition event_class="InteractionPositionEvent" event_variant="PickByDouble" target="select">
+            <condition name="isOverTube"/>
+            <action name="selectTube"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="PickByDouble" target="start">
+            <condition name="isOverTube" inverted="true"/>
+            <action name="deselectTube"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="PickByShift" target="select">
+            <condition name="isOverTube"/>
+            <action name="selectTube"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="PickByShift" target="start">
+            <condition name="isOverTube" inverted="true"/>
+            <action name="deselectTube"/>
+        </transition>
+ </state>
+ <state name="select" >
+        <transition event_class="InteractionPositionEvent" event_variant="PickByDouble" target="select">
+            <condition name="isOverTube"/>
+            <action name="selectTube"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="PickByDouble" target="start">
+            <condition name="isOverTube" inverted="true" />
+            <action name="deselectTube"/>
+        </transition>
+          <transition event_class="InteractionPositionEvent" event_variant="PickByShift" target="select">
+            <condition name="isOverTube"/>
+            <action name="selectTube"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="PickByShift" target="start">
+            <condition name="isOverTube" inverted="true" />
+            <action name="deselectTube"/>
+        </transition>
+  </state>
+ </statemachine>

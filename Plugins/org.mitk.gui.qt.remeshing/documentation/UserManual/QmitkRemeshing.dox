@@ -44,7 +44,7 @@ This setting represents a number by which the average edge length of the input s
 Long edges are split recursively until all edges satisfy the threshold.
 Edge splitting is useful for surfaces that contain thin and long polygons.
 
-\imageMacro{QmitkRemeshing_Cylinder.png,"A surface that contains extremely long polygons.",16.00}
+\imageMacro{QmitkRemeshing_cylinder.png,"A surface that contains extremely long polygons.",16.00}
 
 <br>
 
@@ -57,7 +57,7 @@ Edge splitting is useful for surfaces that contain thin and long polygons.
 The <b>Subsampling</b> setting has direct impact on the quality of the remeshed surface.
 The input surface is recursively subdivided until the total number of vertices exceeds its initial vertex count times this setting.
 
-\imageMacro{QmitkRemeshing_Subsampling20Percent.png,"Vertex count reduced to 20 percent\, subsampling 10 vs. 500.",16.00}
+\imageMacro{QmitkRemeshing_Subsampling20percent.png,"Vertex count reduced to 20 percent\, subsampling 10 vs. 500.",16.00}
 
 You usually leave the <b>Optimization level</b> set to its default value 1.
 When disabled, the remeshed surface has usually a slightly smaller volume than the original surface.

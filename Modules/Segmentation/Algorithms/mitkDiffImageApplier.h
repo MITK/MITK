@@ -36,7 +36,7 @@ namespace mitk
 
   $Author: maleike $
 */
-class MitkSegmentation_EXPORT DiffImageApplier : public itk::Object, public OperationActor
+class MITKSEGMENTATION_EXPORT DiffImageApplier : public itk::Object, public OperationActor
 {
   public:
 

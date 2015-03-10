@@ -16,10 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryQtWorkbenchAdvisor.h"
 #include "internal/berryQtGlobalEventFilter.h"
+#include "internal/berryWorkbenchPlugin.h"
 #include "berryQtPreferences.h"
 
 #include <berryPlatform.h>
 #include <berryIPreferencesService.h>
+#include <berryIPreferences.h>
 #include <berryIQtStyleManager.h>
 
 #include <QApplication>
@@ -38,13 +40,16 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
 {
   WorkbenchAdvisor::Initialize(configurer);
 
-  IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(
-      IPreferencesService::ID);
+  IPreferencesService* prefService = WorkbenchPlugin::GetDefault()->GetPreferencesService();
   IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node(QtPreferences::QT_STYLES_NODE);
-  QString styleName = QString::fromStdString(prefs->Get(QtPreferences::QT_STYLE_NAME, ""));
+  QString styleName = prefs->Get(QtPreferences::QT_STYLE_NAME, "");
 
-  IQtStyleManager::Pointer styleManager = Platform::GetServiceRegistry().GetServiceById<IQtStyleManager>(IQtStyleManager::ID);
-  styleManager->SetStyle(styleName);
+  ctkServiceReference serviceRef = WorkbenchPlugin::GetDefault()->GetPluginContext()->getServiceReference<IQtStyleManager>();
+  if (serviceRef)
+  {
+    IQtStyleManager* styleManager = WorkbenchPlugin::GetDefault()->GetPluginContext()->getService<IQtStyleManager>(serviceRef);
+    styleManager->SetStyle(styleName);
+  }
 
   QObject* eventFilter = new QtGlobalEventFilter(qApp);
   qApp->installEventFilter(eventFilter);

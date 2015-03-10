@@ -22,17 +22,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const std::string CommandTracing::SEPARATOR = " >>> ";
+const QString CommandTracing::SEPARATOR = " >>> ";
 
-void CommandTracing::PrintTrace(const std::string& component,
-    const std::string& message)
+void CommandTracing::PrintTrace(const QString& component,
+    const QString& message)
 {
-  std::string buffer(component);
-  if ((!component.empty()) && (!message.empty()))
+  QString buffer(component);
+  if ((!component.isEmpty()) && (!message.isEmpty()))
   {
     buffer += SEPARATOR;
   }
-  if (!message.empty())
+  if (!message.isEmpty())
   {
     buffer += message;
   }

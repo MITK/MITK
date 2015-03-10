@@ -10,6 +10,7 @@ CMakeLists.txt.user*
 *.orig
 
 !Utilities/qtsingleapplication/*.patch
+!CMakeExternals/*.patch
 
 ########## IDE specific
 
@@ -20,6 +21,7 @@ CMakeLists.txt.user*
 Session.vim
 *.swp
 *.swo
+.vimrc
 
 ## Emacs
 \#*\#

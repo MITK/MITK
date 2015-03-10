@@ -35,7 +35,7 @@ namespace mitk
 ///
 /// \brief Filter for creating MITK RGB Images from an OpenCV image
 ///
-class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
+class MITKOPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
 {
   public:
     typedef itk::RGBPixel< unsigned char > UCRGBPixelType;

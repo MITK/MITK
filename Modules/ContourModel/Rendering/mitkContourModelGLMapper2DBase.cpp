@@ -23,19 +23,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourModelSet.h"
 #include <vtkLinearTransform.h>
 
+#include "mitkContourModel.h"
+#include "mitkBaseRenderer.h"
+#include "mitkOverlayManager.h"
+#include "mitkTextOverlay2D.h"
+
 #include "mitkGL.h"
 
 mitk::ContourModelGLMapper2DBase::ContourModelGLMapper2DBase()
 {
+  m_PointNumbersOverlay = mitk::TextOverlay2D::New();
+  m_ControlPointNumbersOverlay = mitk::TextOverlay2D::New();
+
 }
 
 mitk::ContourModelGLMapper2DBase::~ContourModelGLMapper2DBase()
 {
+//   RendererListType::const_iterator iter;
+//   for ( iter=m_RendererList.begin(); iter != m_RendererList.end(); ++iter)
+//   {
+//     (*iter)->GetOverlayManager()->RemoveOverlay( m_PointNumbersOverlay.GetPointer() );
+//     (*iter)->GetOverlayManager()->RemoveOverlay( m_ControlPointNumbersOverlay.GetPointer() );
+//   }
+//   m_RendererList.clear();
 }
-
 
 void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* renderingContour, mitk::BaseRenderer* renderer)
 {
+  if ( std::find( m_RendererList.begin(), m_RendererList.end(), renderer ) == m_RendererList.end() )
+  {
+    m_RendererList.push_back( renderer );
+  }
+
+  renderer->GetOverlayManager()->AddOverlay( m_PointNumbersOverlay.GetPointer(), renderer );
+  m_PointNumbersOverlay->SetVisibility( false, renderer );
+
+  renderer->GetOverlayManager()->AddOverlay( m_ControlPointNumbersOverlay.GetPointer(), renderer );
+  m_ControlPointNumbersOverlay->SetVisibility( false, renderer );
+
+  InternalDrawContour( renderingContour, renderer );
+}
+
+void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* renderingContour, mitk::BaseRenderer* renderer)
+{
+
   if(!renderingContour) return;
 
   mitk::DataNode* dataNode = this->GetDataNode();
@@ -241,10 +272,10 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
             ss << index;
             l.append(ss.str());
 
-            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
             float rgb[3];
             rgb[0] = 0.0; rgb[1] = 0.0; rgb[2] = 0.0;
-            OpenGLrenderer->WriteSimpleText(l, pt2d[0] + 2, pt2d[1] + 2,rgb[0], rgb[1],rgb[2]);
+
+            WriteTextWithOverlay( m_PointNumbersOverlay, l.c_str(), rgb, pt2d, renderer );
         }
 
 
@@ -255,10 +286,10 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
             ss << index;
             l.append(ss.str());
 
-            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
             float rgb[3];
             rgb[0] = 1.0; rgb[1] = 1.0; rgb[2] = 0.0;
-            OpenGLrenderer->WriteSimpleText(l, pt2d[0] + 2, pt2d[1] + 2,rgb[0], rgb[1],rgb[2]);
+
+            WriteTextWithOverlay( m_ControlPointNumbersOverlay, l.c_str(), rgb, pt2d, renderer );
         }
 
         index++;
@@ -326,4 +357,20 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
       //------------------------------------
     }
   }
+}
+
+void mitk::ContourModelGLMapper2DBase::WriteTextWithOverlay( TextOverlayPointerType textOverlay,
+                                                             const char* text,
+                                                             float rgb[3],
+                                                             Point2D /*pt2d*/,
+                                                             mitk::BaseRenderer* renderer )
+{
+
+  textOverlay->SetText( text );
+  textOverlay->SetColor( rgb );
+  textOverlay->SetOpacity( 1 );
+  textOverlay->SetFontSize( 16 );
+  textOverlay->SetBoolProperty( "drawShadow", false );
+  textOverlay->SetVisibility( true, renderer );
+
 }

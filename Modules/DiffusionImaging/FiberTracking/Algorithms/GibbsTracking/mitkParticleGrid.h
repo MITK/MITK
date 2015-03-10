@@ -30,7 +30,7 @@ namespace mitk
 /**
 * \brief Contains and manages particles.   */
 
-class MitkFiberTracking_EXPORT ParticleGrid
+class MITKFIBERTRACKING_EXPORT ParticleGrid
 {
 
 public:
@@ -86,7 +86,7 @@ protected:
 
 };
 
-class MitkFiberTracking_EXPORT Track
+class MITKFIBERTRACKING_EXPORT Track
 {
 public:
     std::vector< EndPoint > track;

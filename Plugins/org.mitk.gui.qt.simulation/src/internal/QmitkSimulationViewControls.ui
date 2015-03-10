@@ -114,6 +114,9 @@
       <enum>Qt::Vertical</enum>
      </property>
      <widget class="QmitkSceneTreeWidget" name="sceneTreeWidget">
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
+      </property>
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
       </property>
@@ -153,13 +156,6 @@
        </property>
       </column>
      </widget>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButton">
-     <property name="text">
-      <string/>
-     </property>
     </widget>
    </item>
   </layout>

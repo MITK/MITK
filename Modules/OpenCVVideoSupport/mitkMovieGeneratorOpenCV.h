@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 
-class MITK_OPENCVVIDEOSUPPORT_EXPORT MovieGeneratorOpenCV : public MovieGenerator
+class MITKOPENCVVIDEOSUPPORT_EXPORT MovieGeneratorOpenCV : public MovieGenerator
 {
 
 public:

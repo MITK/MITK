@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKSTDMULTIWIDGETEDITOR_H_
-#define QMITKSTDMULTIWIDGETEDITOR_H_
+#ifndef QmitkStdMultiWidgetEditor_h
+#define QmitkStdMultiWidgetEditor_h
 
 #include <QmitkAbstractRenderEditor.h>
 
@@ -39,7 +39,7 @@ public:
 
   berryObjectMacro(QmitkStdMultiWidgetEditor);
 
-  static const std::string EDITOR_ID;
+  static const QString EDITOR_ID;
 
   QmitkStdMultiWidgetEditor();
   ~QmitkStdMultiWidgetEditor();
@@ -105,16 +105,50 @@ public:
 
 protected:
 
+  /**
+   * @brief FillMembersWithCurrentDecorations Helper method to fill internal members with
+   * current values of the std multi widget.
+   */
+  void FillMembersWithCurrentDecorations();
+
+  /**
+   * @brief GetPreferenceDecorations Getter to fill internal members with values of preferences.
+   * @param preferences The berry preferences.
+   *
+   * If a preference is set, the value will overwrite the current value. If it does not exist,
+   * the value will not change.
+   */
+  void GetPreferenceDecorations(const berry::IBerryPreferences *preferences);
+
   void SetFocus();
 
   void OnPreferencesChanged(const berry::IBerryPreferences*);
 
   void CreateQtPartControl(QWidget* parent);
 
+  /**
+   * @brief GetColorForWidget helper method to convert a saved color string to mitk::Color.
+   * @param widgetColorInHex color in hex format (#12356) where each diget is in the form (0-F).
+   * @return the color in mitk format.
+   */
+  mitk::Color HexColorToMitkColor(const QString& widgetColorInHex);
+  /**
+   * @brief MitkColorToHex Convert an mitk::Color to hex string.
+   * @param color mitk format.
+   * @return String in hex (#RRGGBB).
+   */
+  QString MitkColorToHex(const mitk::Color& color);
+
+  /**
+   * @brief InitializePreferences Internal helper method to set default preferences.
+   * This method is used to show the current preferences in the first call of
+   * the preference page (the GUI).
+   *
+   * @param preferences berry preferences.
+   */
+  void InitializePreferences(berry::IBerryPreferences *preferences);
+
 private:
-
   const QScopedPointer<QmitkStdMultiWidgetEditorPrivate> d;
-
 };
-
-#endif /*QMITKSTDMULTIWIDGETEDITOR_H_*/
+#endif /*QmitkStdMultiWidgetEditor_h*/

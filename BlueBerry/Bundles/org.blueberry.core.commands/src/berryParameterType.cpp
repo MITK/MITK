@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-void ParameterType::AddListener(const IParameterTypeListener::Pointer listener)
+void ParameterType::AddListener(IParameterTypeListener* listener)
 {
   parameterTypeEvents.AddListener(listener);
 }
@@ -42,13 +42,13 @@ bool ParameterType::operator<(const Object* object) const
   return compareTo < 0;
 }
 
-void ParameterType::Define(
-    const SmartPointer<IParameterValueConverter> parameterTypeConverter)
+void ParameterType::Define(const QString&  type,
+                           const QSharedPointer<IParameterValueConverter>& parameterTypeConverter)
 {
-
   const bool definedChanged = !this->defined;
   this->defined = true;
 
+  this->type = type.isNull() ? QObject::staticMetaObject.className() : type;
   this->parameterTypeConverter = parameterTypeConverter;
 
   ParameterTypeEvent::Pointer event(
@@ -56,7 +56,7 @@ void ParameterType::Define(
   this->FireParameterTypeChanged(event);
 }
 
-SmartPointer<IParameterValueConverter> ParameterType::GetValueConverter() const
+IParameterValueConverter* ParameterType::GetValueConverter() const
 {
   if (!this->IsDefined())
   {
@@ -64,32 +64,30 @@ SmartPointer<IParameterValueConverter> ParameterType::GetValueConverter() const
         "Cannot use GetValueConverter() with an undefined ParameterType"); //$NON-NLS-1$
   }
 
-  return parameterTypeConverter;
+  return parameterTypeConverter.data();
 }
 
-bool ParameterType::IsCompatible(const Object::ConstPointer value) const
+bool ParameterType::IsCompatible(const QObject* const value) const
 {
   if (!this->IsDefined())
   {
     throw NotDefinedException(
-        "Cannot use IsCompatible() with an undefined ParameterType"); //$NON-NLS-1$
+        "Cannot use IsCompatible() with an undefined ParameterType");
   }
-  return parameterTypeConverter->IsCompatible(value);
+  return value->inherits(qPrintable(type));
 }
 
-void ParameterType::RemoveListener(
-    const IParameterTypeListener::Pointer listener)
+void ParameterType::RemoveListener(IParameterTypeListener* listener)
 {
   parameterTypeEvents.RemoveListener(listener);
 }
 
-std::string ParameterType::ToString() const
+QString ParameterType::ToString() const
 {
-  if (str.empty())
+  if (str.isEmpty())
   {
-    std::stringstream stringBuffer;
+    QTextStream stringBuffer(&str);
     stringBuffer << "ParameterType(" << id << "," << defined << ")";
-    str = stringBuffer.str();
   }
   return str;
 }
@@ -101,14 +99,14 @@ void ParameterType::Undefine()
   const bool definedChanged = defined;
   defined = false;
 
-  parameterTypeConverter = 0;
+  parameterTypeConverter.clear();
 
   ParameterTypeEvent::Pointer event(
       new ParameterTypeEvent(ParameterType::Pointer(this), definedChanged));
   this->FireParameterTypeChanged(event);
 }
 
-ParameterType::ParameterType(const std::string& id) :
+ParameterType::ParameterType(const QString& id) :
   HandleObject(id)
 {
 
@@ -119,7 +117,7 @@ void ParameterType::FireParameterTypeChanged(const SmartPointer<
 {
   if (!event)
   {
-    throw Poco::NullPointerException("Cannot send a null event to listeners."); //$NON-NLS-1$
+    throw ctkInvalidArgumentException("Cannot send a null event to listeners.");
   }
 
   parameterTypeEvents.parameterTypeChanged(event);

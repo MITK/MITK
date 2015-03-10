@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT IndexROI : public sofa::core::DataEngine
+  class MITKSIMULATION_EXPORT IndexROI : public sofa::core::DataEngine
   {
   public:
     SOFA_CLASS(IndexROI, sofa::core::DataEngine);

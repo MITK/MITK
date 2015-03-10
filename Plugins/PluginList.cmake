@@ -25,8 +25,10 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.dicom:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
   org.mitk.gui.qt.dtiatlasapp:OFF
+  org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.igtexamples:OFF
   org.mitk.gui.qt.igttracking:OFF
+  org.mitk.gui.qt.igtlplugin:OFF
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.viewnavigator:OFF
@@ -42,6 +44,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.aicpregistration:OFF
   org.mitk.gui.qt.toftutorial:OFF
   org.mitk.gui.qt.tofutil:OFF
+  org.mitk.gui.qt.tubegraph:OFF
   org.mitk.gui.qt.ugvisualization:OFF
   org.mitk.gui.qt.ultrasound:OFF
   org.mitk.gui.qt.volumevisualization:OFF

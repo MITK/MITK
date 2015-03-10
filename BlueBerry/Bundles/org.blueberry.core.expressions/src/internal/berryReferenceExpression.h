@@ -27,8 +27,6 @@ namespace berry {
  * This class makes use of the <b>org.blueberry.core.expressions.definitions</b>
  * extension point to evaluate the current context against pre-defined
  * expressions. It provides core expression re-use.
- *
- * @since 3.3
  */
 class ReferenceExpression : public Expression {
 
@@ -40,33 +38,33 @@ private:
 
   static DefinitionRegistry& GetDefinitionRegistry();
 
-  static const std::string ATT_DEFINITION_ID;
+  static const QString ATT_DEFINITION_ID;
 
   /**
    * The seed for the hash code for all equals expressions.
    */
   static const std::size_t HASH_INITIAL;
 
-  std::string fDefinitionId;
+  QString fDefinitionId;
 
 
 public:
 
-  ReferenceExpression(const std::string& definitionId);
+  ReferenceExpression(const QString& definitionId);
 
   ReferenceExpression(SmartPointer<IConfigurationElement> element);
 
   ReferenceExpression(Poco::XML::Element* element);
 
-  EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 
-  void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info) const;
 
-  bool operator==(Expression& object);
+  bool operator==(const Object* object) const;
 
 
 protected:
-  std::size_t ComputeHashCode();
+  uint ComputeHashCode() const;
 };
 
 } // namespace berry

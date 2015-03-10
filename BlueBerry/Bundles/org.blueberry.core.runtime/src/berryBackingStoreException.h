@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYBACKINGSTOREEXCEPTION_H_
 
 #include <org_blueberry_core_runtime_Export.h>
-#include <Poco/Exception.h>
+#include <ctkException.h>
 
 namespace berry
 {
@@ -27,7 +27,7 @@ namespace berry
    *
    * @version $Revision$
    */
-  POCO_DECLARE_EXCEPTION(BERRY_RUNTIME, BackingStoreException, Poco::RuntimeException);
+  CTK_DECLARE_EXCEPTION(org_blueberry_core_runtime_EXPORT, BackingStoreException, ctkException)
 }
 
 #endif /* BERRYBACKINGSTOREEXCEPTION_H_ */

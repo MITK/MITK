@@ -1,9 +1,12 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
 set(CPP_FILES
   mitkAffineDataInteractor3D.cpp
   mitkApplyDiffImageOperation.cpp
   mitkBoundingObject.cpp
   mitkBoundingObjectGroup.cpp
   mitkCellOperation.cpp
+  mitkClippingPlaneInteractor3D.cpp
   mitkColorSequence.cpp
   mitkColorSequenceCycleH.cpp
   mitkColorSequenceRainbow.cpp
@@ -28,12 +31,15 @@ set(CPP_FILES
   mitkUnstructuredGridSource.cpp
   mitkVideoSource.cpp
 
-  Internal/mitkColorConversions.cpp
+  mitkColorConversions.cpp
 )
 
 set(RESOURCE_FILES
   Interactions/AffineInteraction3D.xml
-  Interactions/AffineTranslationConfig.xml
-  Interactions/AffineRotationConfig.xml
-  Interactions/AffineDeformationConfig.xml
+  Interactions/AffineConfig.xml
+
+  Interactions/ClippingPlaneInteraction3D.xml
+  Interactions/ClippingPlaneTranslationConfig.xml
+  Interactions/ClippingPlaneRotationConfig.xml
+  Interactions/ClippingPlaneDeformationConfig.xml
 )

@@ -47,11 +47,8 @@ if( OpenCV_LIB_DIR )
 
 endif()
 
-find_package(OpenCV REQUIRED)
 list(APPEND ALL_LIBRARIES ${OpenCV_LIBS})
-
-# adding release directory for fixing error with RelWitgDebInfo (debug dlls have the suffix "d". thus release dlls wont be loaded accidentally)
-link_directories(${OpenCV_LIB_DIR} "${OpenCV_LIB_DIR}/Release")
+list(APPEND ALL_INCLUDE_DIRECTORIES ${OpenCV_INCLUDE_DIRS})
 
 # adding option for videoinput library on windows (for directshow based frame grabbing)
 if(WIN32)

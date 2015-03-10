@@ -64,7 +64,7 @@ namespace mitk {
     ConnectomicsShortestPathHistogram m_ShortestPathHistogram;
   };
 
-  class MitkConnectomics_EXPORT ConnectomicsHistogramCache : public SimpleHistogramCache
+  class MITKCONNECTOMICS_EXPORT ConnectomicsHistogramCache : public SimpleHistogramCache
   {
   public:
 

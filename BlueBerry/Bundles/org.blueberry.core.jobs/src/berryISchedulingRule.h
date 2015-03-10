@@ -49,7 +49,7 @@ namespace berry
 struct BERRY_JOBS ISchedulingRule: public Object
 {
 
-  berryInterfaceMacro(ISchedulingRule, berry);
+  berryObjectMacro(berry::ISchedulingRule)
 
   /**
    * Returns whether this scheduling rule completely contains another scheduling

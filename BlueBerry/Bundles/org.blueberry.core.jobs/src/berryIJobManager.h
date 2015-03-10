@@ -58,7 +58,7 @@ namespace berry
 struct BERRY_JOBS IJobManager: public Object
 {
 
-  berryInterfaceMacro(IJobManager, berry);
+  berryObjectMacro(berry::IJobManager)
 
   /**
    * A system property key indicating whether the job manager should create
@@ -78,7 +78,7 @@ struct BERRY_JOBS IJobManager: public Object
    * @see #removeJobChangeListener(IJobChangeListener)
    * @see IJobChangeListener
    */
-  virtual void AddJobChangeListener(IJobChangeListener::Pointer listener) = 0;
+  virtual void AddJobChangeListener(IJobChangeListener* listener) = 0;
 
   ///**
   // * Begins applying this rule in the calling thread.  If the rule conflicts with another
@@ -269,7 +269,7 @@ struct BERRY_JOBS IJobManager: public Object
    * @see #addJobChangeListener(IJobChangeListener)
    * @see IJobChangeListener
    */
-  virtual void RemoveJobChangeListener(IJobChangeListener::Pointer listener) = 0;
+  virtual void RemoveJobChangeListener(IJobChangeListener* listener) = 0;
 
   ///**
   // * Resumes execution of jobs after a previous <code>suspend</code>.  All

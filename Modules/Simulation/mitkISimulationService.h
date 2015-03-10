@@ -25,7 +25,7 @@ namespace mitk
 {
   class Scheduler;
 
-  class MitkSimulation_EXPORT ISimulationService
+  class MITKSIMULATION_EXPORT ISimulationService
   {
   public:
     virtual Simulation::Pointer GetActiveSimulation() const = 0;

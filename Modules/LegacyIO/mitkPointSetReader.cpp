@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSetReader.h"
 #include <iostream>
 #include <fstream>
-#include <locale>
+#include <mitkLocaleSwitch.h>
 
 mitk::PointSetReader::PointSetReader()
 {
@@ -32,7 +32,8 @@ mitk::PointSetReader::~PointSetReader()
 
 void mitk::PointSetReader::GenerateData()
 {
-    std::locale::global(std::locale("C"));
+    // Switch the current locale to "C"
+    LocaleSwitch localeSwitch("C");
 
     m_Success = false;
     if ( m_FileName == "" )

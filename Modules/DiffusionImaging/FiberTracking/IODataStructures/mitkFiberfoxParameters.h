@@ -24,9 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include <mitkRicianNoiseModel.h>
 #include <mitkChiSquareNoiseModel.h>
-#include <mitkDiffusionImage.h>
+#include <mitkImage.h>
+#include <mitkDiffusionPropertyHelper.h>
 #include <mitkPlanarEllipse.h>
-
 #include <mitkStickModel.h>
 #include <mitkTensorModel.h>
 #include <mitkAstroStickModel.h>
@@ -134,7 +134,7 @@ public:
 
     inline void SetNumWeightedVolumes(int numGradients);            ///< Automaticall calls GenerateGradientHalfShell() afterwards.
     inline void SetGradienDirections(GradientListType gradientList);
-    inline void SetGradienDirections(mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer gradientList);
+    inline void SetGradienDirections(mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientList);
 
 protected:
 

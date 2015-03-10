@@ -52,9 +52,10 @@ namespace berry
 {
 
 
-  XMLPreferencesStorage::XMLPreferencesStorage( const Poco::File& _File )
-    : AbstractPreferencesStorage(_File)
+  XMLPreferencesStorage::XMLPreferencesStorage( const QString& file )
+    : AbstractPreferencesStorage(file)
   {
+    Poco::File _File(file.toStdString());
     // file already exists
     try{
       if(_File.exists())
@@ -86,8 +87,13 @@ namespace berry
 
 
 
-  void XMLPreferencesStorage::Flush(IPreferences*  /*_Preferences*/) throw(Poco::Exception, BackingStoreException)
+  void XMLPreferencesStorage::Flush(IPreferences*  /*_Preferences*/)
   {
+#ifdef _MSC_VER
+    std::locale localeBackup;             // See bug #18575: Do not remove these lines! In case of any issues regarding
+    std::locale::global(std::locale("")); // the formatting of numbers, try to set the numeric facet. The C locale is NOT
+#endif                                    // available here at application shutdown (possibly a bug in MSVC 2013 standard
+                                          // library), i.e., it is already partly deconstructed.
     try
     {
       this->ToDOMTree(dynamic_cast<Preferences*>(this->m_Root.GetPointer()), 0);
@@ -96,7 +102,7 @@ namespace berry
       //writer.setNewLine("\n");
       writer.setOptions(Poco::XML::XMLWriter::PRETTY_PRINT);
       std::ofstream f;
-      f.open (this->m_File.path().c_str());
+      f.open (qPrintable(this->m_File));
 
       // PRECISION setting
       // f.precision(10);
@@ -108,11 +114,14 @@ namespace berry
     {
       WARNMSG << e.what();
     }
+
+#ifdef _MSC_VER
+    std::locale::global(localeBackup);
+#endif
   }
 
   XMLPreferencesStorage::~XMLPreferencesStorage()
   {
-
   }
 
   void XMLPreferencesStorage::ToPreferencesTree( Poco::XML::Node* DOMNode, Preferences* prefParentNode )
@@ -123,7 +132,7 @@ namespace berry
     std::string name = elem->getAttribute("name");
 
     // create a new Preferences node
-    Preferences::Pointer newNode(new Preferences(properties, name, prefParentNode, this));
+    Preferences::Pointer newNode(new Preferences(properties, QString::fromStdString(name), prefParentNode, this));
     // save the new Preferences node as root node if needed
     if(prefParentNode == 0)
       m_Root = newNode;
@@ -146,9 +155,11 @@ namespace berry
         prop = dynamic_cast<Poco::XML::Element*>(currentNode);
         key = prop->getAttribute("name");
         value = prop->getAttribute("value");
-        newNode->Put(key, value);
+        newNode->Put(QString::fromStdString(key), QString::fromStdString(value));
       }
     }
+
+    childNodes->release();
   }
 
   void XMLPreferencesStorage::ToDOMTree( Preferences* prefNode, Poco::XML::Node* parentDOMNode )
@@ -161,7 +172,7 @@ namespace berry
 
     //# create DOMNode from Preferences
     Element* newNode = m_Document->createElement("preferences");
-    newNode->setAttribute("name", prefNode->Name());
+    newNode->setAttribute("name", prefNode->Name().toStdString());
 
     // make attributes
     Preferences::PropertyMap properties = prefNode->GetProperties();
@@ -169,8 +180,8 @@ namespace berry
       ; it != properties.end(); it++)
     {
       Element* newProp = m_Document->createElement("property");
-      newProp->setAttribute("name", it->first);
-      newProp->setAttribute("value", it->second);
+      newProp->setAttribute("name", it.key().toStdString());
+      newProp->setAttribute("value", it.value().toStdString());
       newNode->appendChild(newProp);
     }
     // save in parentDOMNode
@@ -184,5 +195,6 @@ namespace berry
       this->ToDOMTree((*it).GetPointer(), newNode);
     }
 
+    newNode->release();
   }
 }

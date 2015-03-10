@@ -1,25 +1,4 @@
-set(H_FILES
-  mitkDICOMFileReader.h
-  mitkDICOMGDCMTagScanner.h
-  mitkDICOMImageFrameInfo.h
-  mitkDICOMImageBlockDescriptor.h
-  mitkDICOMGDCMImageFrameInfo.h
-  mitkDICOMITKSeriesGDCMReader.h
-  mitkDICOMDatasetSorter.h
-  mitkDICOMEnums.h
-  mitkDICOMTagBasedSorter.h
-  mitkDICOMSortCriterion.h
-  mitkDICOMSortByTag.h
-  mitkEquiDistantBlocksSorter.h
-  mitkNormalDirectionConsistencySorter.h
-  mitkSortByImagePositionPatient.h
-  mitkClassicDICOMSeriesReader.h
-  mitkThreeDnTDICOMSeriesReader.h
-  mitkDICOMTag.h
-  mitkDICOMTagCache.h
-  mitkDICOMReaderConfigurator.h
-  mitkDICOMFileReaderSelector.h
-)
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
 
 set(CPP_FILES
   mitkDICOMFileReader.cpp

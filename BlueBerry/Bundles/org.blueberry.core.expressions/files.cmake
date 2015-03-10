@@ -1,5 +1,5 @@
 set(MOC_H_FILES
-  src/internal/berryPluginActivator.h
+  src/internal/berryExpressionPlugin.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -14,6 +14,11 @@ set(SRC_CPP_FILES
   berryExpressionConverter.cpp
   berryExpressionInfo.cpp
   berryExpressionTagNames.cpp
+  berryICountable.h
+  berryIEvaluationContext.cpp
+  berryIIterable.cpp
+  berryIPropertyTester.cpp
+  berryIVariableResolver.cpp
   berryPropertyTester.cpp
 )
 
@@ -26,12 +31,13 @@ set(INTERNAL_CPP_FILES
   berryDefinitionRegistry.cpp
   berryEnablementExpression.cpp
   berryEqualsExpression.cpp
+  berryExpressionPlugin.cpp
   berryExpressions.cpp
+  berryExpressionStatus.cpp
   berryInstanceofExpression.cpp
   berryIterateExpression.cpp
   berryNotExpression.cpp
   berryOrExpression.cpp
-  berryPluginActivator.cpp
   berryProperty.cpp
   berryPropertyTesterDescriptor.cpp
   berryReferenceExpression.cpp

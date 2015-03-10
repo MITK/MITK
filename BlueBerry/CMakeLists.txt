@@ -5,13 +5,17 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
 
-include(MacroParseArguments)
+include(CMakeParseArguments)
 include(MacroConvertSchema)
 include(MacroOrganizeSources)
 include(MacroCreateCTKPlugin)
 include(MacroCreateQtHelp)
 include(MacroInstallCTKPlugin)
 include(FunctionCreateProvisioningFile)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BLUEBERRY_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${BLUEBERRY_CXX_FLAGS_RELEASE}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${BLUEBERRY_C_FLAGS}")
 
 if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX /wd4250 /wd4275 /wd4251 /wd4503")
@@ -102,6 +106,10 @@ if(BLUEBERRY_USE_QT_HELP)
   endif()
 endif(BLUEBERRY_USE_QT_HELP)
 
+if(BLUEBERRY_QT_HELP_REQUIRED AND NOT BLUEBERRY_USE_QT_HELP)
+  message(FATAL_ERROR "BLUEBERRY_USE_QT_HELP is required to be set to ON")
+endif()
+
 if(MITK_USE_Qt4)
   include(${QT_USE_FILE})
 endif()
@@ -133,7 +141,7 @@ mark_as_advanced(BLUEBERRY_STATIC)
 option(BLUEBERRY_DEBUG_SMARTPOINTER "Enable code for debugging smart pointers" OFF)
 mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
 
-find_package(Poco REQUIRED)
+find_package(Poco PATHS ${Poco_DIR} COMPONENTS Foundation Util XML REQUIRED)
 find_package(Ant)
 find_package(Eclipse)
 
@@ -179,14 +187,10 @@ endif()
 # Add CTK plugins
 
 set(_ctk_plugins
-  Bundles/org.blueberry.osgi:ON
-  Bundles/org.blueberry.compat:OFF
-  Bundles/org.blueberry.core.runtime:OFF
+  Bundles/org.blueberry.core.runtime:ON
   Bundles/org.blueberry.core.expressions:OFF
-  Bundles/org.blueberry.solstice.common:OFF
   Bundles/org.blueberry.core.commands:OFF
   Bundles/org.blueberry.core.jobs:OFF
-  Bundles/org.blueberry.ui:OFF
   Bundles/org.blueberry.ui.qt:OFF
   Bundles/org.blueberry.ui.qt.help:OFF
   Bundles/org.blueberry.ui.qt.log:ON
@@ -195,21 +199,15 @@ set(_ctk_plugins
 
 set(_ctk_test_plugins )
 
-set(_ctk_plugins_include_dirs
-  ${Poco_INCLUDE_DIRS}
-)
-
-include_directories(SYSTEM ${_ctk_plugins_include_dirs})
-
 if(BLUEBERRY_BUILD_TESTING)
-  find_package(CppUnit REQUIRED)
+  find_package(CppUnit PATHS ${CppUnit_DIR} REQUIRED)
   include(berryTestingHelpers)
 
   set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}")
-  # get_target_property(_is_macosx_bundle ${OSGI_APP} MACOSX_BUNDLE)
-  if(APPLE AND _is_macosx_bundle)
-    set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.app/Contents/MacOS/${OSGI_APP}")
-  endif()
+  #get_target_property(_is_macosx_bundle ${OSGI_APP} MACOSX_BUNDLE)
+  #if(APPLE AND _is_macosx_bundle)
+  #  set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.app/Contents/MacOS/${OSGI_APP}")
+  #endif()
 
   set(_ctk_testinfrastructure_plugins
     Bundles/org.blueberry.test:ON
@@ -225,10 +223,10 @@ if(BLUEBERRY_BUILD_TESTING)
 #    list(APPEND _ctk_test_plugins Testing/org.blueberry.ui.tests:ON)
 
     set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}")
-    get_target_property(_is_macosx_bundle ${OSGI_UI_APP} MACOSX_BUNDLE)
-    if(APPLE AND _is_macosx_bundle)
-      set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}.app/Contents/MacOS/${OSGI_UI_APP}")
-    endif()
+    #get_target_property(_is_macosx_bundle ${OSGI_UI_APP} MACOSX_BUNDLE)
+    #if(APPLE AND _is_macosx_bundle)
+    #  set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}.app/Contents/MacOS/${OSGI_UI_APP}")
+    #endif()
   endif()
 endif()
 

@@ -37,37 +37,37 @@ namespace mbilog {
    *         are relayed to this backend through the method ProcessMessage. If no backend is registered the default
    *         backend is used.
    */
-  void MBILOG_DLL_API RegisterBackend(BackendBase* backend);
+  void MBILOG_EXPORT RegisterBackend(BackendBase* backend);
 
   /** \brief Unregisters a backend.
    */
-  void MBILOG_DLL_API UnregisterBackend(BackendBase* backend);
+  void MBILOG_EXPORT UnregisterBackend(BackendBase* backend);
 
   /** \brief Distributes the given message to all registered backends. Should only be called by objects
     *        of the class pseudo stream.
     */
-  void MBILOG_DLL_API DistributeToBackends(LogMessage &l);
+  void MBILOG_EXPORT DistributeToBackends(LogMessage &l);
 
 
   /**
    * Enable the output of a backend.
    **/
-  void MBILOG_DLL_API EnableBackends(OutputType type);
+  void MBILOG_EXPORT EnableBackends(OutputType type);
   /**
    * Disable the output of a backend.
    **/
-  void MBILOG_DLL_API DisableBackends(OutputType type);
+  void MBILOG_EXPORT DisableBackends(OutputType type);
   /**
    * Checks wether the output of this backend is enabled.
    **/
-  bool MBILOG_DLL_API IsBackendEnabled(OutputType type);
+  bool MBILOG_EXPORT IsBackendEnabled(OutputType type);
 
   /**
    * \brief An object of this class simulates a std::cout stream. This means messages can be added by
    *        using the bit shift operator (<<). Should only be used by the macros defined in the file mbilog.h
    *  \ingroup mbilog
    */
-  class MBILOG_DLL_API PseudoStream {
+  class MBILOG_EXPORT PseudoStream {
 
     protected:
 
@@ -171,7 +171,7 @@ namespace mbilog {
    *        operators are availiable but doing nothing. Should only be used by the macros defined in the file mbilog.h
    * \ingroup mbilog
    */
-  class MBILOG_DLL_API NullStream {
+  class MBILOG_EXPORT NullStream {
 
     public:
 

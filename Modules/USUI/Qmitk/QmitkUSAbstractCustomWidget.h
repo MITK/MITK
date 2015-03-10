@@ -75,7 +75,7 @@ namespace us {
   * }
   * \endcode
   */
-class MitkUSUI_EXPORT QmitkUSAbstractCustomWidget : public QWidget
+class MITKUSUI_EXPORT QmitkUSAbstractCustomWidget : public QWidget
 {
   Q_OBJECT
 

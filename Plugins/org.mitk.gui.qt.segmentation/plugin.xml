@@ -10,18 +10,27 @@
       name="Segmentation"
       category="Segmentation"
       icon="resources/segmentation.png"
-      class="QmitkSegmentationView" />
+      class="QmitkSegmentationView" >
+      <description>Allows the segmentation of images using different tools.</description>
+      <keywordReference id="org.mitk.views.segmentation.ViewKeyword"/>
+    </view>
      <view id="org.mitk.views.deformableclippingplane"
        name="Clipping Plane"
        category="Segmentation"
        class="QmitkDeformableClippingPlaneView"
-       icon="resources/deformablePlane.png" />
+       icon="resources/deformablePlane.png" >
+      <description>Allow the clipping of a volume using a deformable plane.</description>
+      <keywordReference id="org.mitk.views.deformableclippingplane.ViewKeyword"/>
+    </view>
     <view
       id="org.mitk.views.segmentationutilities"
       name="Segmentation Utilities"
       category="Segmentation"
       class="QmitkSegmentationUtilitiesView"
-      icon="resources/SegmentationUtilities_48x48.png" />
+      icon="resources/SegmentationUtilities_48x48.png" >
+      <description>Edit segmentations using standard operations. </description>
+      <keywordReference id="org.mitk.views.segmentationutilities.ViewKeyword"/>
+    </view>
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">
@@ -40,4 +49,46 @@
     <contextMenuAction nodeDescriptorName="ImageMask" label="Autocrop" icon="" class="QmitkAutocropAction" />
   </extension>
 
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Segmentation" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Otsu" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Correction" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Paint" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Wipe" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Region Growing" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Fill" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Erase" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Live Wire" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Fast Marching" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Threshold" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Watershed" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Picking" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Watershed" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Annotation annote" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Labeling" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Tools" />
+
+    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword"  label="Plane" />
+    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword"  label="Volumne calculation" />
+    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword"  label="Splitting" />
+    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword"  label="Deformation" />
+    <keyword id="org.mitk.views.deformableclippingplane.ViewKeyword"  label="Volume analysis" />
+
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Segmentation" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Difference" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Intersection" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Union" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Image Masking" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Surface Masking" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Dilatation" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Erosion" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Closing" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Opening" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Fill Holes" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Morphological Operations" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Boolean Operations" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Surface to Image" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Surface creation" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Surface operations" />
+  </extension>
 </plugin>

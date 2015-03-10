@@ -31,18 +31,6 @@
      <property name="accessibleName">
       <string/>
      </property>
-     <property name="styleSheet">
-      <string notr="true">::tab
-{
-  background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 palette(light), stop:1 palette(midlight));
-}
-
-::tab:selected
-{
-  background: palette(highlight);
-  color: palette(highlighted-text);
-}</string>
-     </property>
      <property name="currentIndex">
       <number>-1</number>
      </property>

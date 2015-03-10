@@ -15,12 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "berryAbstractPreferencesStorage.h"
 
-using namespace std;
+#include <berryIPreferences.h>
 
 namespace berry
 {
 
-  AbstractPreferencesStorage::AbstractPreferencesStorage( const Poco::File& _File )
+  AbstractPreferencesStorage::AbstractPreferencesStorage( const QString& _File )
     : m_File(_File)
     , m_Root(0)
   {
@@ -37,12 +37,12 @@ namespace berry
     return m_Root;
   }
 
-  const Poco::File& AbstractPreferencesStorage::GetFile() const
+  QString AbstractPreferencesStorage::GetFile() const
   {
     return m_File;
   }
 
-  void AbstractPreferencesStorage::SetFile( const Poco::File& f )
+  void AbstractPreferencesStorage::SetFile( const QString& f )
   {
     m_File = f;
   }

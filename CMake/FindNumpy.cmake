@@ -9,6 +9,12 @@ if(DEFINED Numpy_DIR AND EXISTS ${Numpy_DIR})
   MESSAGE("NUMPY_INCLUDE_DIR: " ${NUMPY_INCLUDE_DIR})
   MESSAGE("PYTHON_EXECUTABLE: " ${PYTHON_EXECUTABLE})
 else()
+  # search for the runtime if it's not already set
+  if( NOT DEFINED PYTHON_EXECUTABLE )
+    FIND_PACKAGE(PythonLibs REQUIRED)
+    FIND_PACKAGE(PythonInterp REQUIRED)
+  endif()
+
   set(_python ${PYTHON_EXECUTABLE})
   if(UNIX)
     STRING(REPLACE " " "\ " _python ${PYTHON_EXECUTABLE})

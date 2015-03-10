@@ -34,7 +34,7 @@ namespace mitk
 
    This class takes care of loading and compiling the external GPU program code.
   */
-class MitkOpenCL_EXPORT OclFilter
+class MITKOPENCL_EXPORT OclFilter
 {
 public:
   /**

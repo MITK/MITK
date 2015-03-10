@@ -76,7 +76,7 @@ int main(int argc, char** argv)
   if (selectedConfiguration.isEmpty()) return EXIT_SUCCESS;
 
   Poco::Util::MapConfiguration* coreConfig(new Poco::Util::MapConfiguration());
-  coreConfig->setString(berry::Platform::ARG_PROVISIONING, selectedConfiguration.toStdString());
+  coreConfig->setString(berry::Platform::ARG_PROVISIONING.toStdString(), selectedConfiguration.toStdString());
 //  coreConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.coreapplication");
 
   return berry::Starter::Run(argc, argv, coreConfig);

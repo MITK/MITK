@@ -19,10 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "common/berryCommandExceptions.h"
 #include "berryIParameterValueConverter.h"
 #include "berryCommandCategory.h"
+#include "berryState.h"
 #include "berryIHandler.h"
 
 #include <berryObjectString.h>
-#include <sstream>
+
+#include <QTextStream>
 
 namespace berry
 {
@@ -32,15 +34,15 @@ ExecutionEvent::ExecutionEvent()
 
 }
 
-ExecutionEvent::ExecutionEvent(const Command::ConstPointer cmd,
-    const ParameterMap& params, const Object::ConstPointer trg,
-    const Object::ConstPointer appContext)
+ExecutionEvent::ExecutionEvent(const Command::ConstPointer& cmd,
+                               const ParameterMap& params, const Object::ConstPointer& trg,
+                               const Object::Pointer& appContext)
 : applicationContext(appContext), command(cmd), parameters(params), trigger(trg)
 {
 
 }
 
-const Object::ConstPointer ExecutionEvent::GetApplicationContext() const
+const Object::Pointer ExecutionEvent::GetApplicationContext() const
 {
   return applicationContext;
 }
@@ -51,7 +53,7 @@ const Command::ConstPointer ExecutionEvent::GetCommand() const
 }
 
 const Object::ConstPointer ExecutionEvent::GetObjectParameterForExecution(
-    const std::string& parameterId) const
+    const QString& parameterId) const
 {
   if (command.IsNull())
   {
@@ -75,7 +77,7 @@ const Object::ConstPointer ExecutionEvent::GetObjectParameterForExecution(
 //      throw new ExecutionException(
 //          "Command does not have a value converter"); //$NON-NLS-1$
 //    }
-    const std::string stringValue = this->GetParameter(parameterId);
+    const QString stringValue = this->GetParameter(parameterId);
     ObjectString::Pointer objectValue(new ObjectString(stringValue));
 //    const Object objectValue = valueConverter
 //    .convertToObject(stringValue);
@@ -92,11 +94,11 @@ const Object::ConstPointer ExecutionEvent::GetObjectParameterForExecution(
 //  }
 }
 
-std::string ExecutionEvent::GetParameter(const std::string parameterId) const
+QString ExecutionEvent::GetParameter(const QString& parameterId) const
 {
   ParameterMap::const_iterator res = parameters.find(parameterId);
   if (res != parameters.end())
-    return res->second;
+    return res.value();
   else return "";
 }
 
@@ -110,13 +112,14 @@ const Object::ConstPointer ExecutionEvent::GetTrigger() const
   return trigger;
 }
 
-std::string ExecutionEvent::ToString() const
+QString ExecutionEvent::ToString() const
 {
-  std::stringstream str;
-  str << "ExecutionEvent(" << command->ToString() << ',' << parameters.size() << ','
-      << trigger->ToString() << ',' << applicationContext->ToString() << ')';
+  QString str;
+  QTextStream ss(&str);
+  ss << "ExecutionEvent(" << command->ToString() << ',' << parameters.size() << ','
+     << (trigger ? trigger->ToString() : QString()) << ',' << applicationContext->ToString() << ')';
 
-  return str.str();
+  return str;
 }
 
 }

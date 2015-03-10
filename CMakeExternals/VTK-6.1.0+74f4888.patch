@@ -1,0 +1,34 @@
+diff -urNb VTK-6.1.0+74f4888/GUISupport/Qt/CMakeLists.txt VTK/GUISupport/Qt/CMakeLists.txt
+--- VTK-6.1.0+74f4888/GUISupport/Qt/CMakeLists.txt	2014-09-24 14:50:44.000000000 +0200
++++ VTK/GUISupport/Qt/CMakeLists.txt	2015-01-23 01:59:32.308391229 +0100
+@@ -150,6 +150,7 @@
+   endif()
+ 
+   if(NOT VTK_INSTALL_NO_QT_PLUGIN)
++    install(TARGETS QVTKWidgetPlugin DESTINATION ${VTK_INSTALL_QT_DIR})
+     # Set default plugin install directory.
+     set(DOLLAR "$")
+     if(DEFINED VTK_INSTALL_QT_PLUGIN_DIR)
+@@ -166,8 +167,8 @@
+     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/PluginInstall.cmake.in
+       ${CMAKE_CURRENT_BINARY_DIR}/PluginInstall.cmake
+       @ONLY)
+-    set_target_properties(${vtk-module} PROPERTIES POST_INSTALL_SCRIPT
+-      ${CMAKE_CURRENT_BINARY_DIR}/PluginInstall.cmake)
++    #set_target_properties(${vtk-module} PROPERTIES POST_INSTALL_SCRIPT
++    #  ${CMAKE_CURRENT_BINARY_DIR}/PluginInstall.cmake)
+   endif()
+ endif()
+ 
+diff -urNb VTK-6.1.0+74f4888/Rendering/OpenGL/vtkOpenGL.h VTK/Rendering/OpenGL/vtkOpenGL.h
+--- VTK-6.1.0+74f4888/Rendering/OpenGL/vtkOpenGL.h	2014-09-24 14:50:44.000000000 +0200
++++ VTK/Rendering/OpenGL/vtkOpenGL.h	2015-01-23 01:13:23.568339250 +0100
+@@ -19,7 +19,7 @@
+ #include "vtkConfigure.h"
+ 
+ // To prevent gl.h to include glext.h provided by the system
+-#define GL_GLEXT_LEGACY
++//#define GL_GLEXT_LEGACY
+ #if defined(__APPLE__) && (defined(VTK_USE_CARBON) || defined(VTK_USE_COCOA))
+ # include <OpenGL/gl.h> // Include OpenGL API.
+ #else

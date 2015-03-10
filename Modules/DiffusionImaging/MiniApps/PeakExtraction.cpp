@@ -18,8 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkResampleImageFilter.h>
 #include <itkFiniteDiffOdfMaximaExtractionFilter.h>
 
-#include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionImage.h>
+#include <mitkImage.h>
 #include <mitkQBallImage.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
@@ -33,24 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/algorithm/string.hpp>
 
 #include <mitkIOUtil.h>
-
-mitk::Image::Pointer LoadData(std::string filename)
-{
-    if( filename.empty() )
-        return NULL;
-
-    const std::string s1="", s2="";
-    std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( filename, s1, s2, false );
-    if( infile.empty() )
-    {
-        std::cout << "File " << filename << " could not be read!";
-        return NULL;
-    }
-
-    mitk::BaseData::Pointer baseData = infile.at(0);
-    return dynamic_cast<mitk::Image*>(baseData.GetPointer());
-}
-
 
 template<int shOrder>
 int StartPeakExtraction(int argc, char* argv[])
@@ -118,8 +99,8 @@ int StartPeakExtraction(int argc, char* argv[])
 
     try
     {
-        mitk::Image::Pointer image = LoadData(imageName);
-        mitk::Image::Pointer mask = LoadData(maskImageName);
+        mitk::Image::Pointer image = mitk::IOUtil::LoadImage(imageName);
+        mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(maskImageName);
 
         typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
         typedef itk::FiniteDiffOdfMaximaExtractionFilter< float, shOrder, 20242 > MaximaExtractionFilterType;
@@ -303,7 +284,7 @@ int StartPeakExtraction(int argc, char* argv[])
 
         // write vector field
         {
-            mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+            mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
 
             string outfilename = outRoot.c_str();
             outfilename.append("_VECTOR_FIELD.fib");

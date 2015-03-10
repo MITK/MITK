@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT SchedulableProcess
+  class MITKSIMULATION_EXPORT SchedulableProcess
   {
   public:
     explicit SchedulableProcess(int priority = 0);

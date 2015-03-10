@@ -2,6 +2,7 @@ include_directories(${CTK_INCLUDE_DIRS})
 
 MITK_CREATE_MODULE(
   DEPENDS MitkCore
-  PACKAGE_DEPENDS CTK|CTKDICOMWidgets Qt4|QtGui+QtSql Qt5|OpenGL+Sql+Widgets+Xml
-  EXPORT_DEFINE MITK_DICOMUI_EXPORT
+  PACKAGE_DEPENDS
+    PUBLIC CTK|CTKDICOMWidgets Qt4|QtSql Qt5|Sql
+    PRIVATE Qt4|QtGui Qt5|OpenGL+Widgets+Xml
   )

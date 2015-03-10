@@ -30,7 +30,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataPlayer : public NavigationDataPlayerBase
+  class MITKIGT_EXPORT NavigationDataPlayer : public NavigationDataPlayerBase
   {
   public:
     mitkClassMacro(NavigationDataPlayer, NavigationDataPlayerBase);

@@ -38,7 +38,7 @@ namespace mitk {
    *
    * \author Daniel Stein
    */
-  class MITK_RIGIDREGISTRATION_EXPORT RigidRegistrationPreset : public vtkXMLParser
+  class MITKRIGIDREGISTRATION_EXPORT RigidRegistrationPreset : public vtkXMLParser
   {
   public:
     RigidRegistrationPreset();

@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryITestDescriptor.h"
 
-#include <vector>
-
 namespace berry
 {
 
@@ -36,17 +34,17 @@ class BERRY_TEST_EXPORT BlueBerryTestDriver
 {
 public:
 
-  BlueBerryTestDriver(const std::vector<ITestDescriptor::Pointer>& descriptors, bool uitests = false, const std::string& testName="", bool wait=false);
+  BlueBerryTestDriver(const QList<ITestDescriptor::Pointer>& descriptors, bool uitests = false, const QString& testName="", bool wait=false);
 
   int Run();
 
-  static int Run(const std::string& pluginId, bool uitests = false);
+  static int Run(const QString& pluginId, bool uitests = false);
 
 protected:
 
-  std::vector<ITestDescriptor::Pointer> descriptors;
+  QList<ITestDescriptor::Pointer> descriptors;
   bool uitests;
-  std::string testName;
+  QString testName;
   bool wait;
 };
 

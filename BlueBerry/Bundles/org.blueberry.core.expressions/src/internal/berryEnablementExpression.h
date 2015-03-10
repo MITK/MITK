@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryCompositeExpression.h"
 
-#include "service/berryIConfigurationElement.h"
-
 #include "Poco/DOM/Node.h"
 
 namespace berry {
+
+struct IConfigurationElement;
 
 class EnablementExpression : public CompositeExpression
 {
@@ -35,7 +35,7 @@ public:
    *
    * @param configElement the configuration element
    */
-  EnablementExpression(SmartPointer<IConfigurationElement> /*configElement*/)
+  EnablementExpression(const SmartPointer<IConfigurationElement>& /*configElement*/)
   {
     // config element not used yet.
   }
@@ -50,9 +50,9 @@ public:
     // element not used yet.
   }
 
-  bool operator==(Expression& object);
+  bool operator==(const Object* object) const;
 
-  EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 };
 
 } // namespace berry

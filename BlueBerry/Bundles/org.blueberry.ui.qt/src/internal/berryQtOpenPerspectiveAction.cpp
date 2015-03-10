@@ -31,16 +31,15 @@ QtOpenPerspectiveAction::QtOpenPerspectiveAction(
   window(window.GetPointer())
 {
   this->setParent(group);
-  this->setText(QString(descr->GetLabel().c_str()));
-  this->setToolTip(QString(descr->GetLabel().c_str()));
+  this->setText(descr->GetLabel());
+  this->setToolTip(descr->GetLabel());
   this->setCheckable(true);
   this->setIconVisibleInMenu(true);
 
   group->addAction(this);
 
-  QIcon* icon = static_cast<QIcon*>(descr->GetImageDescriptor()->CreateImage());
-  this->setIcon(*icon);
-  descr->GetImageDescriptor()->DestroyImage(icon);
+  QIcon icon = descr->GetImageDescriptor();
+  this->setIcon(icon);
 
   perspectiveId = descr->GetId();
 

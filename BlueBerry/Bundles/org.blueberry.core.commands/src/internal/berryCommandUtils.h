@@ -17,11 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __BERRY_COMMAND_UTILS_H__
 #define __BERRY_COMMAND_UTILS_H__
 
-#include <string>
-#include <vector>
-#include <sstream>
-
 #include <berryObject.h>
+
+#include <QList>
+#include <QTextStream>
 
 namespace berry
 {
@@ -49,7 +48,7 @@ public:
    */
   static int Compare(const bool left, const bool right);
 
-  static int Compare(const std::string& left, const std::string& right);
+  static int Compare(const QString& left, const QString& right);
 
   /**
    * Compares two objects that are not otherwise comparable. If neither object
@@ -89,19 +88,22 @@ public:
    *         otherwise.
    */
   template<class T>
-  static int Compare(const std::vector<T>& leftArray,
-      const std::vector<T>& rightArray) {
+  static int Compare(const QList<T>& leftArray,
+                     const QList<T>& rightArray)
+  {
     int result = (int) (leftArray.size() - rightArray.size());
     if (result == 0)
     {
-      for (unsigned int i = 0; i < leftArray.size(); ++i) {
-        long int diff = (long) (&(leftArray[i]) - &(rightArray[i]));
-        int result = diff ? (diff < 0 ? -1 : 1) : 0;
-        if (result != 0) break;
+      for (int i = 0; i < leftArray.size(); ++i)
+      {
+        if (!(leftArray[i] == rightArray[i]))
+        {
+          return leftArray[i]->ToString().compare(rightArray[i]->ToString());
+        }
       }
     }
 
-    return result;
+    return result < 0 ? -1 : (result > 0 ? 1 : 0);
   }
 
   /**
@@ -120,37 +122,24 @@ public:
    *         otherwise.
    */
   template<class T>
-  static bool Equals(const std::vector<T>& leftArray,
-      const std::vector<T>& rightArray) {
-    if (leftArray.size() != rightArray.size()) {
-      return false;
-    }
-
-    for (unsigned int i = 0; i < leftArray.size(); i++) {
-      T left = leftArray[i];
-      T right = rightArray[i];
-      const bool equal = left ? !right : (left == right);
-      if (!equal) {
-        return false;
-      }
-    }
-
-    return true;
+  static bool Equals(const QList<T>& leftArray,
+                     const QList<T>& rightArray)
+  {
+    return leftArray == rightArray;
   }
 
   template<class T>
-  static std::string ToString(const std::vector<T>& vec)
+  static QString ToString(const QList<T>& vec)
   {
-    std::stringstream str;
-    std::locale C("C");
-    str.imbue(C);
-    str << "[";
-    for (unsigned int i = 0; i < vec.size(); ++i)
+    QString str;
+    QTextStream ss(&str);
+    ss << "[";
+    for (int i = 0; i < vec.size(); ++i)
     {
-      if (i > 0) str << ",";
-      str << &(vec[i]);
+      if (i > 0) ss << ",";
+      ss << vec[i];
     }
-    return str.str();
+    return str;
   }
 };
 

@@ -4,7 +4,7 @@
 # Usage: MITK_INSTALL_TARGETS(target1 [target2] ....)
 #
 macro(MITK_INSTALL_TARGETS)
-  MACRO_PARSE_ARGUMENTS(_install "TARGETS;EXECUTABLES;PLUGINS;LIBRARY_DIRS" "GLOB_PLUGINS" ${ARGN})
+  cmake_parse_arguments(_install "GLOB_PLUGINS" "" "TARGETS;EXECUTABLES;PLUGINS;LIBRARY_DIRS" ${ARGN})
   list(APPEND _install_TARGETS ${_install_DEFAULT_ARGS})
 
   # TODO: how to supply the correct intermediate directory??

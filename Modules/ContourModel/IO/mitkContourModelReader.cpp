@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCustomMimeType.h>
 #include <iostream>
 #include <fstream>
-#include <locale>
+#include <mitkLocaleSwitch.h>
 
 mitk::ContourModelReader::ContourModelReader(const mitk::ContourModelReader& other)
   : mitk::AbstractFileReader(other)
@@ -48,7 +48,8 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::ContourModelReader::Read()
   std::vector<itk::SmartPointer<mitk::BaseData> > result;
   std::string location = GetInputLocation();
 
-  std::locale::global(std::locale("C"));
+  // Switch the current locale to "C"
+  LocaleSwitch localeSwitch("C");
 
 
   try{

@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryEnablementExpression.h"
 #include "berryEqualsExpression.h"
 #include "berryReferenceExpression.h"
+#include "berryExpressionConverter.h"
 
 namespace berry
 {
@@ -39,7 +40,7 @@ namespace berry
 Expression::Pointer
 StandardElementHandler::Create(ExpressionConverter* converter, IConfigurationElement::Pointer element)
 {
-  std::string name = element->GetName();
+  QString name = element->GetName();
   if (ExpressionTagNames::INSTANCEOF == name) {
     Expression::Pointer result(new InstanceofExpression(element));
     return result;
@@ -55,7 +56,7 @@ StandardElementHandler::Create(ExpressionConverter* converter, IConfigurationEle
     this->ProcessChildren(converter, element, result);
     return result;
   } else if (ExpressionTagNames::NOT == name) {
-    IConfigurationElement::vector children(element->GetChildren());
+    QList<IConfigurationElement::Pointer> children(element->GetChildren());
     Expression::Pointer result(new NotExpression(converter->Perform(children[0])));
     return result;
   } else if (ExpressionTagNames::WITH == name) {
@@ -97,7 +98,7 @@ StandardElementHandler::Create(ExpressionConverter* converter, IConfigurationEle
 Expression::Pointer
 StandardElementHandler::Create(ExpressionConverter* converter, Poco::XML::Element* element)
 {
-  std::string name= element->nodeName();
+  QString name= QString::fromStdString(element->nodeName());
   if (ExpressionTagNames::INSTANCEOF == name) {
     Expression::Pointer result(new InstanceofExpression(element));
     return result;

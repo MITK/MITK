@@ -38,10 +38,6 @@ public:
 
   int Start();
   void Stop();
-
-private:
-
-  QScopedPointer<MinimalWorkbenchAdvisor> wbAdvisor;
 };
 
 #endif /*MINIMALAPPLICATION_H_*/

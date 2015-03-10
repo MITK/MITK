@@ -40,7 +40,7 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUS_EXPORT USImageSource : public itk::Object
+  class MITKUS_EXPORT USImageSource : public itk::Object
   {
   public:
     static const char* IMAGE_PROPERTY_IDENTIFIER;

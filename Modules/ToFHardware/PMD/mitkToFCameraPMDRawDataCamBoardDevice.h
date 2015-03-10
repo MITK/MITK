@@ -29,7 +29,7 @@ namespace mitk
   *
   * @ingroup ToFHardwareMBI
   */
-  class MITK_PMDMODULE_EXPORT ToFCameraPMDRawDataCamBoardDevice : public ToFCameraPMDRawDataDevice
+  class MITKPMD_EXPORT ToFCameraPMDRawDataCamBoardDevice : public ToFCameraPMDRawDataDevice
   {
   public:
 

@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <internal/util/berryAbstractTabFolder.h>
 
-#include <berryIQtStyleManager.h>
-
 #include <QObject>
 
 class QFrame;
@@ -28,6 +26,8 @@ class QWidget;
 
 namespace berry
 {
+
+struct IQtStyleManager;
 
 class QCTabBar;
 
@@ -64,7 +64,7 @@ private:
   //
   //    };
 
-  IQtStyleManager::Pointer skinManager;
+  IQtStyleManager* skinManager;
 
   /**
    * @param item
@@ -130,7 +130,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getItems()
    */
-  std::vector<AbstractTabItem*> GetItems();
+  QList<AbstractTabItem*> GetItems();
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#setSelection(org.blueberry.ui.internal.presentations.util.Widget)
@@ -209,6 +209,8 @@ public:
    * @since 3.1
    */
   /* protected */void SetSelectedImage(const QPixmap* image);
+
+  using AbstractTabFolder::GetItem;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getItem(org.blueberry.swt.graphics.Point)

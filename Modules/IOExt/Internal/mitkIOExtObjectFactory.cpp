@@ -19,8 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCoreObjectFactory.h"
 
 #include "mitkParRecFileIOFactory.h"
-#include "mitkObjFileIOFactory.h"
-#include "mitkVtkUnstructuredGridIOFactory.h"
+//#include "mitkObjFileIOFactory.h"
 #include "mitkStlVolumeTimeSeriesIOFactory.h"
 #include "mitkVtkVolumeTimeSeriesIOFactory.h"
 
@@ -33,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGPUVolumeMapper3D.h"
 #include "mitkUnstructuredGridMapper2D.h"
 #include "mitkUnstructuredGridVtkMapper3D.h"
+#include "mitkVtkGLMapperWrapper.h"
 
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
@@ -42,8 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::IOExtObjectFactory::IOExtObjectFactory()
   : CoreObjectFactoryBase()
   , m_ParRecFileIOFactory(ParRecFileIOFactory::New().GetPointer())
-  , m_ObjFileIOFactory(ObjFileIOFactory::New().GetPointer())
-  , m_VtkUnstructuredGridIOFactory(VtkUnstructuredGridIOFactory::New().GetPointer())
+  //, m_ObjFileIOFactory(ObjFileIOFactory::New().GetPointer())
   , m_StlVolumeTimeSeriesIOFactory(StlVolumeTimeSeriesIOFactory::New().GetPointer())
   , m_VtkVolumeTimeSeriesIOFactory(VtkVolumeTimeSeriesIOFactory::New().GetPointer())
   , m_UnstructuredGridVtkWriterFactory(UnstructuredGridVtkWriterFactory::New().GetPointer())
@@ -54,8 +53,6 @@ mitk::IOExtObjectFactory::IOExtObjectFactory()
     MITK_DEBUG << "IOExtObjectFactory c'tor" << std::endl;
 
     itk::ObjectFactoryBase::RegisterFactory( m_ParRecFileIOFactory );
-    itk::ObjectFactoryBase::RegisterFactory( m_ObjFileIOFactory );
-    itk::ObjectFactoryBase::RegisterFactory( m_VtkUnstructuredGridIOFactory );
     itk::ObjectFactoryBase::RegisterFactory( m_StlVolumeTimeSeriesIOFactory );
     itk::ObjectFactoryBase::RegisterFactory( m_VtkVolumeTimeSeriesIOFactory );
 
@@ -74,8 +71,6 @@ mitk::IOExtObjectFactory::IOExtObjectFactory()
 mitk::IOExtObjectFactory::~IOExtObjectFactory()
 {
   itk::ObjectFactoryBase::UnRegisterFactory( m_ParRecFileIOFactory );
-  itk::ObjectFactoryBase::UnRegisterFactory( m_ObjFileIOFactory );
-  itk::ObjectFactoryBase::UnRegisterFactory( m_VtkUnstructuredGridIOFactory );
   itk::ObjectFactoryBase::UnRegisterFactory( m_StlVolumeTimeSeriesIOFactory );
   itk::ObjectFactoryBase::UnRegisterFactory( m_VtkVolumeTimeSeriesIOFactory );
 
@@ -96,7 +91,7 @@ mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode* nod
     }
     else if((dynamic_cast<UnstructuredGrid*>(data)!=NULL))
     {
-      newMapper = mitk::UnstructuredGridMapper2D::New();
+      newMapper = mitk::VtkGLMapperWrapper::New(mitk::UnstructuredGridMapper2D::New().GetPointer());
       newMapper->SetDataNode(node);
     }
   }
@@ -163,7 +158,6 @@ void mitk::IOExtObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtu", "VTK Unstructured Grid"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "VTK Unstructured Grid"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pvtu", "VTK Unstructured Grid"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.obj", "Surfaces"));
 
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pvtu", "VTK Parallel XML Unstructured Grid"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtu", "VTK XML Unstructured Grid"));

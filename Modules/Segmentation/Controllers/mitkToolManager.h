@@ -86,7 +86,7 @@ class PlaneGeometry;
 
   $Author$
 */
-class MitkSegmentation_EXPORT ToolManager : public itk::Object
+class MITKSEGMENTATION_EXPORT ToolManager : public itk::Object
 {
   public:
 

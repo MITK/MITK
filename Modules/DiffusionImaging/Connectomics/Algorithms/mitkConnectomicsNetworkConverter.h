@@ -31,7 +31,7 @@ namespace mitk
 {
   /**
   * \brief A class giving functions for conversion of connectomics networks into different formats */
-  class MitkConnectomics_EXPORT ConnectomicsNetworkConverter : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsNetworkConverter : public itk::Object
   {
   public:
 

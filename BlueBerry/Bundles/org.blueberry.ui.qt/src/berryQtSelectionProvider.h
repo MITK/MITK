@@ -39,15 +39,15 @@ public:
 
   QtSelectionProvider();
 
-  void AddSelectionChangedListener(ISelectionChangedListener::Pointer listener);
+  void AddSelectionChangedListener(ISelectionChangedListener* listener);
 
-  void RemoveSelectionChangedListener(
-      ISelectionChangedListener::Pointer listener);
+  void RemoveSelectionChangedListener(ISelectionChangedListener* listener);
 
   ISelection::ConstPointer GetSelection() const;
-  void SetSelection(ISelection::ConstPointer selection);
+  void SetSelection(const ISelection::ConstPointer& selection);
 
-  virtual void SetSelection(ISelection::ConstPointer selection, QItemSelectionModel::SelectionFlags);
+  virtual void SetSelection(const ISelection::ConstPointer& selection,
+                            QItemSelectionModel::SelectionFlags);
 
   QItemSelection GetQItemSelection() const;
   void SetQItemSelection(const QItemSelection& selection);

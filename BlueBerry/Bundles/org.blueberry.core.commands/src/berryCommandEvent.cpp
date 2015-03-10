@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryCommandEvent.h"
 #include "berryCommand.h"
 #include "berryCommandCategory.h"
+#include "berryState.h"
 #include "berryIParameterValueConverter.h"
 #include "berryIHandler.h"
 

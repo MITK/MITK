@@ -5,10 +5,12 @@ endif()
 
 MITK_CREATE_MODULE(
   SUBPROJECTS MITK-DTI
-  INCLUDE_DIRS Algorithms Algorithms/Reconstruction Algorithms/Registration Algorithms/Reconstruction/MultishellProcessing DicomImport IODataStructures/DiffusionWeightedImages IODataStructures/QBallImages IODataStructures/TensorImages IODataStructures Rendering ${CMAKE_CURRENT_BINARY_DIR}
+  INCLUDE_DIRS Algorithms Algorithms/Reconstruction Algorithms/Registration Algorithms/Reconstruction/MultishellProcessing DicomImport IODataStructures/DiffusionWeightedImages IODataStructures/Properties IODataStructures/QBallImages IODataStructures/TensorImages IODataStructures Rendering ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS MitkMapperExt MitkPlanarFigure MitkImageExtraction MitkSceneSerializationBase MitkDICOMReader
-  PACKAGE_DEPENDS VTK|vtkFiltersProgrammable ITK|ITKDistanceMap+ITKRegistrationCommon+ITKLabelVoting+ITKVTK Boost
-                  ITK|ITKMetricsv4+ITKRegistrationMethodsv4
+  PACKAGE_DEPENDS
+    PUBLIC Boost
+    PUBLIC ITK|ITKTestKernel+ITKRegistrationCommon+ITKMetricsv4+ITKRegistrationMethodsv4+ITKDistanceMap+ITKLabelVoting+ITKVTK
+    PUBLIC VTK|vtkFiltersProgrammable
   WARNINGS_AS_ERRORS
 )
 

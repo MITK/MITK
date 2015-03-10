@@ -49,7 +49,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MitkImageExtraction_EXPORT ExtractImageFilter : public ImageToImageFilter
+class MITKIMAGEEXTRACTION_EXPORT ExtractImageFilter : public ImageToImageFilter
 {
   public:
 

@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDwiSoftwarePhantomView.h"
 
 // MITK
-#include <mitkDiffusionImage.h>
+#include <mitkImage.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkITKImageImport.h>
 #include <mitkImageToItk.h>
 #include <mitkImageCast.h>
 #include <itkDwiPhantomGenerationFilter.h>
@@ -249,11 +251,12 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
         filter->SetSimulateBaseline(true);
     filter->Update();
 
-    mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
-    image->SetVectorImage( filter->GetOutput() );
-    image->SetReferenceBValue(bVal);
-    image->SetDirections(gradientList);
-    image->InitializeFromVectorImage();
+    mitk::Image::Pointer image = mitk::GrabItkImageMemory(filter->GetOutput());
+    image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( gradientList ) );
+    image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( bVal ) );
+    mitk::DiffusionPropertyHelper propertyHelper( image );
+    propertyHelper.InitializeImage();
+
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( image );
     node->SetName(m_Controls->m_ImageName->text().toStdString());
@@ -330,7 +333,7 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
         else
             minSpacing = outImageSpacing[2];
 
-        mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+        mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
         directions->SetGeometry(geometry);
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData(directions);

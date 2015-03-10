@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpression.h"
 
-#include "service/berryIConfigurationElement.h"
-
 #include "Poco/DOM/Element.h"
 
 namespace berry {
+
+struct IConfigurationElement;
 
 struct InstanceofExpression : public Expression {
 
@@ -32,38 +32,38 @@ private:
   /**
     * The seed for the hash code for all instance of expressions.
     */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
-  std::string fTypeName;
+  QString fTypeName;
 
 
 public:
 
-  InstanceofExpression(SmartPointer<IConfigurationElement> element);
+  InstanceofExpression(const SmartPointer<IConfigurationElement>& element);
 
   InstanceofExpression(Poco::XML::Element* element);
 
-  InstanceofExpression(const std::string& typeName);
+  InstanceofExpression(const QString &typeName);
 
-  /* (non-Javadoc)
+  /*
    * @see org.blueberry.jdt.internal.corext.refactoring.participants.Expression#evaluate(java.lang.Object)
    */
-  EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
 
-  void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info) const;
 
-  bool operator==(Expression& object);
+  bool operator==(const Object* object) const;
 
   //---- Debugging ---------------------------------------------------
 
-    /* (non-Javadoc)
+    /*
      * @see java.lang.Object#toString()
      */
-  std::string ToString();
+  QString ToString() const;
 
 protected:
 
-  std::size_t ComputeHashCode();
+  uint ComputeHashCode() const;
 
 
 };

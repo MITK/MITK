@@ -58,7 +58,7 @@ class PointSet;
  * mitk::GrabCutOpenCVImageFilter::GetResultContours() or
  * mitk::GrabCutOpenCVImageFilter::GetResultContourWithPixel().
  */
-class MITK_OPENCVVIDEOSUPPORT_EXPORT GrabCutOpenCVImageFilter : public AbstractOpenCVImageFilter
+class MITKOPENCVVIDEOSUPPORT_EXPORT GrabCutOpenCVImageFilter : public AbstractOpenCVImageFilter
 {
 public:
   /** \brief List holding image indices of the model points. */

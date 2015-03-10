@@ -17,24 +17,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKDIFFUSIONIMAGECORRECTIONFILTER_H
 #define MITKDIFFUSIONIMAGECORRECTIONFILTER_H
 
-#include "mitkDiffusionImageSource.h"
+#include "mitkImageSource.h"
+#include <MitkDiffusionCoreExports.h>
 
 namespace mitk
 {
 /**
  * @class DiffusionImageCorrectionFilter
  */
-template< typename TPixelType >
-class DiffusionImageCorrectionFilter
-        : public DiffusionImageSource< TPixelType >
+class MITKDIFFUSIONCORE_EXPORT DiffusionImageCorrectionFilter
+        : public ImageSource
 {
 public:
   /** class macros */
   mitkClassMacro( DiffusionImageCorrectionFilter,
-                  DiffusionImageSource<TPixelType> )
+                  ImageSource )
 
   itkSimpleNewMacro(Self)
 
+  typedef short DiffusionPixelType;
   typedef vnl_vector_fixed< double, 3 >      GradientDirectionType;
   typedef vnl_matrix_fixed< double, 3, 3 >   TransformMatrixType;
   typedef itk::VectorContainer< unsigned int, GradientDirectionType >
@@ -43,9 +44,9 @@ public:
 
   typedef std::vector< TransformMatrixType >  TransformsVectorType;
 
-  typedef typename Superclass::OutputType DiffusionImageType;
-  typedef typename DiffusionImageType::Pointer    DiffusionImageTypePointer;
-  typedef itk::VectorImage<TPixelType,3>     ImageType;
+  typedef Superclass::OutputType DiffusionImageType;
+  typedef DiffusionImageType::Pointer    DiffusionImageTypePointer;
+  typedef itk::VectorImage<DiffusionPixelType,3>     ImageType;
 
   /**
    * @brief Set the mitk image ( a 3d+t image ) which is to be reinterpreted as dw image
@@ -91,7 +92,5 @@ protected:
 };
 
 }
-
-#include "mitkDiffusionImageCorrectionFilter.cpp"
 
 #endif // MITKDIFFUSIONIMAGECORRECTIONFILTER_H

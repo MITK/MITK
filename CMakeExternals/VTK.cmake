@@ -17,7 +17,9 @@ set(proj VTK)
 set(proj_DEPENDENCIES )
 set(VTK_DEPENDS ${proj})
 
-  set(VTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchVTK.cmake)
+if(MITK_USE_HDF5)
+  list(APPEND proj_DEPENDENCIES HDF5)
+endif()
 
 if(NOT DEFINED VTK_DIR)
 
@@ -81,31 +83,35 @@ if(NOT DEFINED VTK_DIR)
   set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.1.0+74f4888.tar.gz)
   set(VTK_URL_MD5 1f19dae22c42c032109bd3cf91c4e8c9)
 
+  if(MITK_USE_HDF5 AND WIN32)
+    list(APPEND additional_cmake_args
+      -DHDF5_C_LIBRARY:FILEPATH=${ep_prefix}/lib/hdf5.lib
+      -DHDF5_CXX_LIBRARY:FILEPATH=${ep_prefix}/lib/hdf5_cpp.lib)
+  endif()
 
   ExternalProject_Add(${proj}
-    SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-    BINARY_DIR ${proj}-build
-    PREFIX ${proj}-cmake
+    LIST_SEPARATOR ${sep}
     URL ${VTK_URL}
     URL_MD5 ${VTK_URL_MD5}
-    PATCH_COMMAND ${VTK_PATCH_COMMAND}
-    INSTALL_COMMAND ""
+    PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-6.1.0+74f4888.patch
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}
         -DVTK_WRAP_TCL:BOOL=OFF
         -DVTK_WRAP_PYTHON:BOOL=OFF
         -DVTK_WRAP_JAVA:BOOL=OFF
-        -DBUILD_SHARED_LIBS:BOOL=ON
         -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
         -DVTK_LEGACY_REMOVE:BOOL=ON
         -DModule_vtkTestingRendering:BOOL=ON
         -DVTK_MAKE_INSTANTIATORS:BOOL=ON
+        -DVTK_USE_SYSTEM_HDF5:BOOL=${MITK_USE_HDF5}
+        -DHDF5_DIR:PATH=${HDF5_DIR}
         ${additional_cmake_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  set(VTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  set(VTK_DIR ${ep_prefix})
+  mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()
 

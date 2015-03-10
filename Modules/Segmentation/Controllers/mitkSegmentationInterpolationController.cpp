@@ -467,12 +467,18 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
 
     //Transforming the current origin so that it matches the lower slice
     mitk::Point3D origin = currentPlane->GetOrigin();
-    m_Segmentation->GetSlicedGeometry()->WorldToIndex(origin, origin);
+    m_Segmentation->GetSlicedGeometry(timeStep)->WorldToIndex(origin, origin);
     origin[sliceDimension] = lowerBound;
-    m_Segmentation->GetSlicedGeometry()->IndexToWorld(origin, origin);
+    m_Segmentation->GetSlicedGeometry(timeStep)->IndexToWorld(origin, origin);
     reslicePlane->SetOrigin(origin);
 
     //Extract the lower slice
+    extractor = ExtractSliceFilter::New();
+    extractor->SetInput(m_Segmentation);
+    extractor->SetTimeStep(timeStep);
+    extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
+    extractor->SetVtkOutputRequest(false);
+
     extractor->SetWorldGeometry(reslicePlane);
     extractor->Modified();
     extractor->Update();
@@ -480,12 +486,18 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
     lowerMITKSlice->DisconnectPipeline();
 
     //Transforming the current origin so that it matches the upper slice
-    m_Segmentation->GetSlicedGeometry()->WorldToIndex(origin, origin);
+    m_Segmentation->GetSlicedGeometry(timeStep)->WorldToIndex(origin, origin);
     origin[sliceDimension] = upperBound;
-    m_Segmentation->GetSlicedGeometry()->IndexToWorld(origin, origin);
+    m_Segmentation->GetSlicedGeometry(timeStep)->IndexToWorld(origin, origin);
     reslicePlane->SetOrigin(origin);
 
     //Extract the upper slice
+    extractor = ExtractSliceFilter::New();
+    extractor->SetInput(m_Segmentation);
+    extractor->SetTimeStep(timeStep);
+    extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
+    extractor->SetVtkOutputRequest(false);
+
     extractor->SetWorldGeometry(reslicePlane);
     extractor->Modified();
     extractor->Update();

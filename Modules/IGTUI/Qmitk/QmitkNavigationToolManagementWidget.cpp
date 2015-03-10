@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk headers
 #include "mitkTrackingTypes.h"
-#include <mitkSTLFileReader.h>
 #include <mitkSurface.h>
 #include <mitkNavigationToolReader.h>
 #include <mitkNavigationToolWriter.h>
@@ -301,8 +300,10 @@ void QmitkNavigationToolManagementWidget::UpdateToolTable()
               currentTool += "(NDI Aurora/"; break;
         case mitk::NDIPolaris:
               currentTool += "(NDI Polaris/"; break;
-      case mitk::NPOptitrack:
+        case mitk::NPOptitrack:
               currentTool += "(NP Optitrack/"; break;
+        case mitk::VirtualTracker:
+              currentTool += "(Virtual Tracker/"; break;
         default:
               currentTool += "(unknown tracking system/"; break;
         }

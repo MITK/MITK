@@ -8,6 +8,7 @@ MITK_CREATE_MODULE(
   SUBPROJECTS MITK-DTI
   INCLUDE_DIRS Algorithms IODataStructures IODataStructures/TbssImages Rendering ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS MitkDiffusionCore MitkFiberTracking MitkGraphAlgorithms
+  PACKAGE_DEPENDS ITK|ITKThresholding
   WARNINGS_AS_ERRORS
 )
 

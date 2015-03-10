@@ -35,7 +35,7 @@ class OclImageFilter;
     * This makes it possible to create a filter pipeline of GPU-based filters
     * and to bind this part into the CPU (ITK) filter pipeline.
     */
-class MitkOpenCL_EXPORT OclImageFilter: public OclFilter
+class MITKOPENCL_EXPORT OclImageFilter: public OclFilter
 {
 public:
   /**

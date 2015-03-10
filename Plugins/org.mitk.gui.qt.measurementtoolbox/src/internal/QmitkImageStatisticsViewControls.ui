@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>281</width>
+    <width>548</width>
     <height>800</height>
    </rect>
   </property>
@@ -420,22 +420,6 @@
             <property name="spacing">
              <number>0</number>
             </property>
-            <item row="0" column="1">
-             <widget class="QSpinBox" name="m_HistogramBinSizeSpinbox">
-              <property name="toolTip">
-               <string>Press enter to recalculate statistics with new bin size.</string>
-              </property>
-              <property name="frame">
-               <bool>true</bool>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="value">
-               <number>10</number>
-              </property>
-             </widget>
-            </item>
             <item row="0" column="0">
              <widget class="QLabel" name="m_HistogramBinSizeCaptionLabel">
               <property name="minimumSize">
@@ -446,7 +430,7 @@
               </property>
               <property name="maximumSize">
                <size>
-                <width>40</width>
+                <width>100</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -455,17 +439,32 @@
               </property>
              </widget>
             </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="m_HistogramBinSizeSpinbox">
+              <property name="toolTip">
+               <string>Press enter to recalculate statistics with new bin size.</string>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+              <property name="decimals">
+               <number>5</number>
+              </property>
+              <property name="minimum">
+               <double>0.000010000000000</double>
+              </property>
+              <property name="maximum">
+               <double>1000000.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>10.000000000000000</double>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>
         </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="m_InfoLabel">
-        <property name="text">
-         <string/>
-        </property>
        </widget>
       </item>
       <item>
@@ -481,6 +480,13 @@
           </sizepolicy>
          </property>
         </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="m_InfoLabel">
+        <property name="text">
+         <string/>
+        </property>
        </widget>
       </item>
       <item>

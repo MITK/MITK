@@ -18,22 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYIQTSTYLEMANAGER_H_
 #define BERRYIQTSTYLEMANAGER_H_
 
-#include <berryService.h>
-
 #include <QString>
 #include <QList>
 #include <QtPlugin>
-
-#include <Poco/Exception.h>
 
 #include <org_blueberry_ui_qt_Export.h>
 
 namespace berry {
 
-struct BERRY_UI_QT IQtStyleManager : public Service
+struct BERRY_UI_QT IQtStyleManager
 {
-
-  berryInterfaceMacro(IQtStyleManager, berry);
 
   struct Style {
     QString name;
@@ -58,7 +52,7 @@ struct BERRY_UI_QT IQtStyleManager : public Service
     { return name == s.name; }
   };
 
-    struct IconTheme {
+  struct IconTheme {
     QString name;
 
     IconTheme() {}
@@ -79,10 +73,10 @@ struct BERRY_UI_QT IQtStyleManager : public Service
     { return name == s.name; }
   };
 
-  static const std::string ID; // = "org.blueberry.service.qtstylemanager";
-
   typedef QList<Style> StyleList;
   typedef QList<IconTheme> IconThemeList;
+
+  virtual ~IQtStyleManager();
 
   virtual Style GetStyle() const = 0;
   virtual QString GetStylesheet() const = 0;

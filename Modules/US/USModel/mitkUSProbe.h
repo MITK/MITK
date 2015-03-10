@@ -32,7 +32,7 @@ namespace mitk {
     * \ingroup US
     */
     //Be sure to check the isEqualTo() method if you expand this class to see if it needs work!
-  class MitkUS_EXPORT USProbe : public itk::Object
+  class MITKUS_EXPORT USProbe : public itk::Object
     {
     public:
       mitkClassMacro(USProbe,itk::Object);

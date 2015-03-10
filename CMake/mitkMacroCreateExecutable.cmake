@@ -21,17 +21,20 @@
 macro(mitk_create_executable)
 
   set(_macro_params
-      SUBPROJECTS            # list of CDash labels
       VERSION                # version number, e.g. "1.2.0"
+      FILES_CMAKE            # file name of a CMake file setting source list variables
+                             # (defaults to files.cmake)
+      DESCRIPTION            # a description for the executable
+     )
+
+  set(_macro_multiparams
+      SUBPROJECTS            # list of CDash labels
       INCLUDE_DIRS           # additional include dirs
       DEPENDS                # list of modules this module depends on
       PACKAGE_DEPENDS        # list of "packages" this module depends on (e.g. Qt, VTK, etc.)
       TARGET_DEPENDS         # list of CMake targets this executable should depend on
       ADDITIONAL_LIBS        # list of additional libraries linked to this executable
-      FILES_CMAKE            # file name of a CMake file setting source list variables
-                             # (defaults to files.cmake)
       CPP_FILES              # (optional) list of cpp files
-      DESCRIPTION            # a description for the executable
      )
 
   set(_macro_options
@@ -41,7 +44,7 @@ macro(mitk_create_executable)
       WARNINGS_AS_ERRORS     # treat all compiler warnings as errors
      )
 
-  MACRO_PARSE_ARGUMENTS(EXEC "${_macro_params}" "${_macro_options}" ${ARGN})
+  cmake_parse_arguments(EXEC "${_macro_options}" "${_macro_params}" "${_macro_multiparams}" ${ARGN})
 
   set(_EXEC_OPTIONS EXECUTABLE)
   if(EXEC_NO_INIT)
@@ -54,7 +57,7 @@ macro(mitk_create_executable)
     list(APPEND _EXEC_OPTIONS NO_FEATURE_INFO)
   endif()
 
-  mitk_create_module(${EXEC_DEFAULT_ARGS}
+  mitk_create_module(${EXEC_UNPARSED_ARGUMENTS}
                      SUBPROJECTS ${EXEC_SUBPROJECTS}
                      VERSION ${EXEC_VERSION}
                      INCLUDE_DIRS ${EXEC_INCLUDE_DIRS}
@@ -72,8 +75,8 @@ macro(mitk_create_executable)
   set(EXECUTABLE_TARGET ${MODULE_TARGET})
   if(MODULE_IS_ENABLED)
     # Add meta dependencies (e.g. on auto-load modules from depending modules)
-    if(ALL_META_DEPENDENCIES)
-      add_dependencies(${MODULE_TARGET} ${ALL_META_DEPENDENCIES})
+    if(TARGET ${CMAKE_PROJECT_NAME}-autoload)
+      add_dependencies(${MODULE_TARGET} ${CMAKE_PROJECT_NAME}-autoload)
     endif()
 
     # Create batch files for Windows platforms

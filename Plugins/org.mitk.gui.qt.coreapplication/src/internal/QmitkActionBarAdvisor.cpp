@@ -16,14 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkActionBarAdvisor.h"
 
+#include <berryIActionBarConfigurer.h>
 
-QmitkActionBarAdvisor::QmitkActionBarAdvisor(berry::IActionBarConfigurer::Pointer configurer)
+QmitkActionBarAdvisor::QmitkActionBarAdvisor(const berry::IActionBarConfigurer::Pointer& configurer)
  : berry::ActionBarAdvisor(configurer)
 {
 
 }
 
-void QmitkActionBarAdvisor::FillMenuBar(void* )
+void QmitkActionBarAdvisor::FillMenuBar(berry::IMenuManager* )
 {
 
 }

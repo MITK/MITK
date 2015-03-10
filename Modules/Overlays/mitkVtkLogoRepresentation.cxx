@@ -37,7 +37,7 @@
 vtkStandardNewMacro(mitkVtkLogoRepresentation);
 
 //----------------------------------------------------------------------
-inline void mitkVtkLogoRepresentation::AdjustImageSize(double o[2],
+inline void mitkVtkLogoRepresentation::AdjustImageSize(double /*o*/[2],
                                                    double borderSize[2],
                                                    double imageSize[2])
 {

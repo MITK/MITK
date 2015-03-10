@@ -35,6 +35,24 @@ if(MITK_USE_CTK)
 endif()
 
 if(WIN32)
+  if(MITK_USE_Qt5)
+    get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
+                 PROPERTY IMPORT_LOCATION)
+    get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)
+    install(FILES "${_qmake_path}/../plugins/platforms/qwindows.dll"
+            DESTINATION "bin/plugins/platforms"
+            CONFIGURATIONS Release)
+    install(FILES "${_qmake_path}/../plugins/sqldrivers/qsqlite.dll"
+            DESTINATION "bin/plugins/sqldrivers"
+            CONFIGURATIONS Release)
+    install(FILES "${_qmake_path}/../plugins/platforms/qwindowsd.dll"
+            DESTINATION "bin/plugins/platforms"
+            CONFIGURATIONS Debug)
+    install(FILES "${_qmake_path}/../plugins/sqldrivers/qsqlited.dll"
+            DESTINATION "bin/plugins/sqldrivers"
+            CONFIGURATIONS Debug)
+  endif()
+
   #DCMTK Dlls install target (shared libs on gcc only)
   if(MINGW AND DCMTK_ofstd_LIBRARY)
     set(_dcmtk_libs
@@ -54,11 +72,11 @@ if(WIN32)
   # can only use variables which are made available through MITKConfig.cmake
   if(MITK_USE_BLUEBERRY)
     if(MINGW)
-      MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/liborg_blueberry_osgi.dll")
+      MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/liborg_blueberry_core_runtime.dll")
     else()
       if(NOT APPLE)
-        MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/debug/liborg_blueberry_osgi.dll" CONFIGURATIONS Debug)
-        MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/release/liborg_blueberry_osgi.dll" CONFIGURATIONS Release)
+        MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/debug/liborg_blueberry_core_runtime.dll" CONFIGURATIONS Debug)
+        MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/release/liborg_blueberry_core_runtime.dll" CONFIGURATIONS Release)
       endif(NOT APPLE)
     endif()
   endif()

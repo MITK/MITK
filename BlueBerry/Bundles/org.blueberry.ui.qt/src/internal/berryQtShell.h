@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYQTMAINWINDOWSHELL_H_
 
 #include <berryShell.h>
-#include <berryPoint.h>
 
 #include <QWidget>
 
@@ -37,40 +36,40 @@ public:
   ~QtShell();
 
   // berry::Shell
-  void SetBounds(const Rectangle& bounds);
-  Rectangle GetBounds() const;
+  void SetBounds(const QRect& bounds);
+  QRect GetBounds() const;
 
   void SetLocation(int x, int y);
 
-  Point ComputeSize(int wHint, int hHint, bool changed);
+  QPoint ComputeSize(int wHint, int hHint, bool changed);
 
-  std::string GetText() const;
-  void SetText(const std::string& text);
+  QString GetText() const;
+  void SetText(const QString& text);
 
-  bool IsVisible();
+  bool IsVisible() const;
   void SetVisible(bool visible);
 
   void SetActive();
 
-  void* GetControl();
+  QWidget* GetControl();
 
-  void SetImages(const std::vector<void*>& images);
+  void SetImages(const QList<QIcon>& images);
 
-  bool GetMaximized();
-  bool GetMinimized();
+  bool GetMaximized() const;
+  bool GetMinimized() const;
   void SetMaximized(bool maximized);
   void SetMinimized(bool minimized);
 
-  void AddShellListener(IShellListener::Pointer listener);
-  void RemoveShellListener(IShellListener::Pointer listener);
+  void AddShellListener(IShellListener* listener);
+  void RemoveShellListener(IShellListener* listener);
 
   void Open(bool block = false);
 
   void Close();
 
-  std::vector<Shell::Pointer> GetShells();
+  QList<Shell::Pointer> GetShells();
 
-  int GetStyle ();
+  Qt::WindowFlags GetStyle () const;
 
   QWidget* GetWidget();
 

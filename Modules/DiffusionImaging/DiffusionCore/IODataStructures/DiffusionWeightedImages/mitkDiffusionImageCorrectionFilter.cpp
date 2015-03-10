@@ -19,19 +19,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDIFFUSIONIMAGECORRECTIONFILTER_CPP
 
 #include "mitkDiffusionImageCorrectionFilter.h"
+#include <mitkDiffusionPropertyHelper.h>
 
 #include <vnl/algo/vnl_symmetric_eigensystem.h>
 #include <vnl/vnl_inverse.h>
 
-template< typename TPixelType >
-mitk::DiffusionImageCorrectionFilter<TPixelType>::DiffusionImageCorrectionFilter()
+
+mitk::DiffusionImageCorrectionFilter::DiffusionImageCorrectionFilter()
 {
 
 }
 
-template< typename TPixelType >
-typename mitk::DiffusionImageCorrectionFilter<TPixelType>::TransformMatrixType
-mitk::DiffusionImageCorrectionFilter<TPixelType>
+
+mitk::DiffusionImageCorrectionFilter::TransformMatrixType
+mitk::DiffusionImageCorrectionFilter
 ::GetRotationComponent(const TransformMatrixType &A)
 {
   TransformMatrixType B;
@@ -61,8 +62,8 @@ mitk::DiffusionImageCorrectionFilter<TPixelType>
   return S;
 }
 
-template< typename TPixelType >
-void mitk::DiffusionImageCorrectionFilter<TPixelType>
+
+void mitk::DiffusionImageCorrectionFilter
 ::CorrectDirections( const TransformsVectorType& transformations)
 {
   if( m_SourceImage.IsNull() )
@@ -70,7 +71,7 @@ void mitk::DiffusionImageCorrectionFilter<TPixelType>
     mitkThrow() << " No diffusion image given! ";
   }
 
-  GradientDirectionContainerPointerType directions = m_SourceImage->GetDirections();
+  GradientDirectionContainerPointerType directions = static_cast<mitk::GradientDirectionsProperty*>( m_SourceImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
   GradientDirectionContainerPointerType corrected_directions =
       GradientDirectionContainerType::New();
 
@@ -94,12 +95,12 @@ void mitk::DiffusionImageCorrectionFilter<TPixelType>
   }
 
   // replace the old directions with the corrected ones
-  m_SourceImage->SetDirections( corrected_directions );
+  m_SourceImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( corrected_directions ) );
 
 }
 
-template< typename TPixelType >
-void mitk::DiffusionImageCorrectionFilter<TPixelType>
+
+void mitk::DiffusionImageCorrectionFilter
 ::CorrectDirections( const TransformMatrixType& transformation)
 {
   if( m_SourceImage.IsNull() )
@@ -107,7 +108,7 @@ void mitk::DiffusionImageCorrectionFilter<TPixelType>
     mitkThrow() << " No diffusion image given! ";
   }
   TransformsVectorType transfVec;
-  for (unsigned int i=0; i< m_SourceImage->GetDirections()->Size();i++)
+  for (unsigned int i=0; i< static_cast<mitk::GradientDirectionsProperty*>( m_SourceImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->Size();i++)
   {
     transfVec.push_back(transformation);
   }

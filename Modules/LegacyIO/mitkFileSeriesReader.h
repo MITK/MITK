@@ -34,10 +34,10 @@ namespace mitk
  *
  * @deprecatedSince{2014_10}
  */
-class MitkLegacyIO_EXPORT FileSeriesReader : public FileReader
+class MITKLEGACYIO_EXPORT FileSeriesReader : public FileReader
 {
 public:
-    mitkClassMacro( FileSeriesReader, FileReader );
+    mitkClassMacro( FileSeriesReader, FileReader )
 
     typedef std::vector< std::string > MatchedFileNames;
 

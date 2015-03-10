@@ -21,8 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include <MitkContourModelExports.h>
 #include "mitkGLMapper.h"
-#include "mitkContourModel.h"
-#include "mitkBaseRenderer.h"
+#include "mitkTextOverlay2D.h"
 
 
 namespace mitk {
@@ -34,9 +33,9 @@ namespace mitk {
   * @brief Base class for OpenGL based 2D mappers.
   * Provides functionality to draw a contour.
   *
-  * @ingroup Mapper
+  * @ingroup MitkContourModelModule
   */
-  class MitkContourModel_EXPORT ContourModelGLMapper2DBase : public GLMapper
+  class MITKCONTOURMODEL_EXPORT ContourModelGLMapper2DBase : public GLMapper
   {
   public:
 
@@ -44,11 +43,30 @@ namespace mitk {
 
 
   protected:
+
+    typedef TextOverlay2D::Pointer TextOverlayPointerType;
+
     ContourModelGLMapper2DBase();
 
     virtual ~ContourModelGLMapper2DBase();
 
     void DrawContour(mitk::ContourModel* contour, mitk::BaseRenderer* renderer);
+
+    void WriteTextWithOverlay( TextOverlayPointerType textOverlay,
+                               const char* text,
+                               float rgb[3],
+                               Point2D pt2d,
+                               mitk::BaseRenderer* renderer );
+
+    virtual void InternalDrawContour( mitk::ContourModel* renderingContour, mitk::BaseRenderer* renderer );
+
+    TextOverlayPointerType m_PointNumbersOverlay;
+    TextOverlayPointerType m_ControlPointNumbersOverlay;
+
+    typedef std::vector<BaseRenderer*> RendererListType;
+    RendererListType m_RendererList;
+
+
   };
 
 } // namespace mitk

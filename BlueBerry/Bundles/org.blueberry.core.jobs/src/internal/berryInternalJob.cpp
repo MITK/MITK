@@ -23,18 +23,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryJobManager.h"
 #include "berryJobExceptions.h"
 
-#include <string>
-#include <sstream>
 #include <assert.h>
 #include <map>
 
 namespace berry
 {
 
-InternalJob::InternalJob(std::string name) :
-  jobNumber(nextJobNumber++), flags(Job::NONE), name(name), next(0),
-      previous(0), priority(Job::LONG), sptr_schedulingRule(0),
-      sptr_monitor(0), m_startTime(), waitQueueStamp(T_NONE), ptr_thread(0)
+InternalJob::InternalJob(const QString& name)
+  : jobNumber(nextJobNumber++)
+  , flags(Job::NONE)
+  , name(name)
+  , next(0)
+  , previous(0)
+  , priority(Job::LONG)
+  , sptr_schedulingRule(0)
+  , sptr_monitor(0)
+  , m_startTime()
+  , waitQueueStamp(T_NONE)
+  , ptr_thread(0)
 {
   jobEvents.SetExceptionHandler(MessageExceptionHandler<JobListeners>(&ptr_manager->m_JobListeners, &JobListeners::HandleException));
 }
@@ -211,11 +217,9 @@ void InternalJob::SetStartTime(const Poco::Timestamp& newtime)
   m_startTime = newtime;
 }
 
-std::string InternalJob::ToString()
+QString InternalJob::ToString() const
 {
-  std::stringstream ss;
-  ss << GetName() << "(" << jobNumber << ")";
-  return ss.str();
+  return GetName() + "(" + QString::number(jobNumber) + ")";
 }
 
 void InternalJob::SetWaitQueueStamp(Poco::Timestamp waitQueueStamp)
@@ -230,7 +234,7 @@ Poco::Timestamp InternalJob::GetWaitQueueStamp()
 
 int InternalJob::nextJobNumber = 0;
 
-void InternalJob::AddJobChangeListener(IJobChangeListener::Pointer listener)
+void InternalJob::AddJobChangeListener(IJobChangeListener* listener)
 {
   jobEvents.AddListener(listener);
 }
@@ -255,7 +259,7 @@ void InternalJob::Done(IStatus::Pointer endResult)
  ptr_manager->EndJob(InternalJob::Pointer(this),endResult, true);
 }
 
-std::string InternalJob::GetName() const
+QString InternalJob::GetName() const
 {
   return name;
 }
@@ -332,7 +336,7 @@ bool InternalJob::IsUser() const
 //    manager.join(this);
 //  }
 
-void InternalJob::RemoveJobChangeListener(IJobChangeListener::Pointer listener)
+void InternalJob::RemoveJobChangeListener(IJobChangeListener* listener)
 {
   jobEvents.RemoveListener(listener);
 }
@@ -343,9 +347,9 @@ void InternalJob::Schedule(Poco::Timestamp::TimeDiff delay)
     ptr_manager->Schedule(InternalJob::Pointer(this), delay, false);
 }
 
-void InternalJob::SetName(const std::string& name)
+void InternalJob::SetName(const QString& name)
 {
-  assert(!name.empty());
+  Q_ASSERT(!name.isEmpty());
   this->name = name;
 }
 

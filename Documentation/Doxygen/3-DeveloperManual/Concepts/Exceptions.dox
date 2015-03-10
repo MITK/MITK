@@ -1,0 +1,90 @@
+/**
+\page ExceptionPage Error Handling and Exception Concept
+
+\tableofcontents
+
+\section ExceptionHandling General Exception Handling
+
+In MITK, errors during program execution are handled by the well known exception handling concept which is part of the C++ language. In case of unexpected exceptional behaviour or errors during program execution MITK classes throw exceptions. MITK exceptions are always objects of the class mitk::Exception or of one of its subclasses. 
+
+\subsection Throw Throwing of exceptions
+
+Exceptions should always be thrown by using the predefined exception macros. If you want to throw a mitk::Exception in your code, simply use the following macro.
+
+\verbatim
+//This command will throw a mitk::Exception and add a message.
+//The macro will also add filename and line number to the exception
+//object.
+mitkThrow() << "Here comes your exception message";
+\endverbatim
+
+You can also stream more complex messages, e.g. adding integers or other variables to your exception messages, like shown in the following example.
+
+\verbatim
+mitkThrow() << "This time we show the values of some variables:" << m_MyObject->GetSize() << m_MyInteger;
+\endverbatim
+
+\subsection Doc Documentation of exceptions
+
+If you throw exceptions in your code, please also document this in your doxygen comments by using the "@throws " tag. This will help users of your class to catch and handle the exceptions in a proper way. An example how to document exception throwing is given below.
+
+\verbatim
+class myExampleClass
+  {
+ 
+  /**  Documentation
+   *  @brief This method does [...]
+   *  @throws mitk::Exception This exception is thrown, when the following error occures: [...]
+   */
+
+  void MyExampleMethod()
+    {
+    //here comes your code
+    
+    //here happens an exception
+    mitkThrow() << "An exception occured because [...], method can't continue.";
+    }
+  }
+\endverbatim
+
+In general, exceptions emit no logging messages by default because they are intended to be catched by overlying classes. This classes should then decide what to do, e.g. to log an error message or handle the exception in another way. See the logging documentation for more details on error logging.
+
+\subsection Catch Catching exceptions
+
+Exceptions should be caught by overlying classes, if they can handle them in a proper way. Catching exceptions is very simple, use the standard try-catch block to do so. An example is given below.
+
+\verbatim
+try
+  {
+  //call of a method which may throw an exception
+  myObject->MyExampleMethod();
+  }
+catch (const mitk::Exception& e)
+  {
+  //This code is executed if an exception of the given type was thrown above.
+  //For example log an error message here or do some other proper handling of the exception.
+  }
+\endverbatim
+
+Please do not use "catch (...)" because normally your class can't garantee to handle all exceptions in a proper way without differentiating them.
+
+\section SpecializedExceptionHandling Defining and Using more Specialized Exceptions
+
+The basic MITK exception concept was kept very simple and should suffice in many cases. But you can also use more specialized exceptions, if needed. Nevertheless all MITK exceptions should be subclasses of mitk::exception. You can define your own exception classes by simply implementing new classes which derive from mitk::exception. Thus, you can catch your exception seperately when needed. The mitkExceptionClassMacro helps to keep implementing new exception classes as simple as possible, like shown in the following code example.
+
+\verbatim
+#include <mitkCommon.h>
+
+class mitk::MySpecializedException : public mitk::Exception
+  {
+  public:
+    mitkExceptionClassMacro(mitk::MySpecializedException,mitk::Exception);
+  };
+\endverbatim
+
+To throw your specialized exception you should use the corresponing macro, which is shown in the next code snippet.
+
+\verbatim
+mitkThrowException(mitk::MySpecializedException) << "this is error info"; 
+\endverbatim
+*/

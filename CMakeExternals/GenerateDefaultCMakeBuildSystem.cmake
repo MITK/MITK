@@ -1,9 +1,8 @@
 set(ProjConfig.cmake.in "
-set(${proj}_INCLUDE_DIRS \"@${proj}_INCLUDE_DIRS@\")
 set(${proj}_LIBRARIES @${proj}_LIBRARIES@)
 
 if(NOT TARGET ${proj_target})
-  include(\"@${proj}_BINARY_DIR@/${proj}Exports.cmake\")
+  include(\"\${CMAKE_CURRENT_LIST_DIR}/${proj}Targets.cmake\")
 endif()
 ")
 
@@ -43,9 +42,6 @@ if(NOT \"\${CMAKE_SIZEOF_VOID_P}\" STREQUAL \"@CMAKE_SIZEOF_VOID_P@\")
   set(PACKAGE_VERSION_UNSUITABLE TRUE)
 endif()
 ")
-
-message("${CMAKE_CURRENT_LIST_DIR}/${proj}CMakeLists.txt ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt")
-
 
 configure_file(${CMAKE_CURRENT_LIST_DIR}/${proj}CMakeLists.txt "${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt" COPYONLY)
 

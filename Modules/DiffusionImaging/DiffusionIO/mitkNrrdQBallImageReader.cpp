@@ -33,7 +33,7 @@ namespace mitk
   }
 
   NrrdQBallImageReader::NrrdQBallImageReader()
-    : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_DESCRIPTION() )
+    : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::QBI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_DESCRIPTION() )
   {
     m_ServiceReg = this->RegisterService();
   }

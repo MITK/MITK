@@ -18,20 +18,18 @@ if(MITK_USE_ANN)
     set(patch_cmd ${CMAKE_COMMAND} -Dproj:STRING=${proj} -Dproj_target:STRING=ann -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake)
 
     ExternalProject_Add(${proj}
-       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-       BINARY_DIR ${proj}-build
-       PREFIX ${proj}-cmake
+       LIST_SEPARATOR ${sep}
        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ann_1.1.2.tar.gz
        URL_MD5 7ffaacc7ea79ca39d4958a6378071365
        PATCH_COMMAND ${patch_cmd}
-       INSTALL_COMMAND ""
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
          ${ep_common_args}
        DEPENDS ${proj_DEPENDENCIES}
       )
 
-    set(ANN_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+    set(ANN_DIR ${ep_prefix}/lib/cmake/ANN)
+    mitkFunctionInstallExternalCMakeProject(${proj})
 
   else()
 

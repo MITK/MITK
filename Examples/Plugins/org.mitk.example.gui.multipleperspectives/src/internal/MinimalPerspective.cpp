@@ -26,7 +26,7 @@ MinimalPerspective::MinimalPerspective()
 void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   // Editors are placed for free.
-  std::string editorAreaId = layout->GetEditorArea();
+  QString editorAreaId = layout->GetEditorArea();
 
   //! [Visibility of editor area]
   // set editor area to visible

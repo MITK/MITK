@@ -1,0 +1,10 @@
+/**
+  \defgroup MitkMapperExtModule MapperExt
+  \ingroup MITKModules
+
+  \brief MITK mapper classes for data type extensions.
+
+  This module provides MITK mapper classes for the data types
+  defined in the \ref MitkDataTypesExt module. It is usually
+  not used directly.
+*/

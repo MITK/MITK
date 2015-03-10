@@ -34,25 +34,23 @@ namespace berry {
  * <p>
  * Clients may implement.
  * </p>
- *
- * @since 3.2
  */
-struct IExecutionListenerWithChecks : public IExecutionListener {
-
-  berryInterfaceMacro(IExecutionListenerWithChecks, berry);
+struct BERRY_COMMANDS IExecutionListenerWithChecks : public IExecutionListener {
 
   struct Events : public IExecutionListener::Events {
 
-    Message2<const std::string&, const NotDefinedException*> notDefined;
-    Message2<const std::string&, const NotEnabledException*> notEnabled;
+    Message2<const QString&, const NotDefinedException*> notDefined;
+    Message2<const QString&, const NotEnabledException*> notEnabled;
 
-    void AddListener(IExecutionListener::Pointer listener);
-    void RemoveListener(IExecutionListener::Pointer listener);
+    void AddListener(IExecutionListener* listener);
+    void RemoveListener(IExecutionListener* listener);
     bool HasListeners() const;
     bool IsEmpty() const;
 
-    typedef MessageDelegate2<IExecutionListenerWithChecks, const std::string&, const NotDefinedException* > NotDefinedDelegate;
-    typedef MessageDelegate2<IExecutionListenerWithChecks, const std::string&, const NotEnabledException*> NotEnabledDelegate;
+    private:
+
+    typedef MessageDelegate2<IExecutionListenerWithChecks, const QString&, const NotDefinedException* > NotDefinedDelegate;
+    typedef MessageDelegate2<IExecutionListenerWithChecks, const QString&, const NotEnabledException*> NotEnabledDelegate;
   };
 
   /**
@@ -65,7 +63,7 @@ struct IExecutionListenerWithChecks : public IExecutionListener {
    * @param exception
    *            The exception that occurred; never <code>null</code>.
    */
-  virtual void NotDefined(const std::string& commandId, const NotDefinedException* exception) = 0;
+  virtual void NotDefined(const QString& commandId, const NotDefinedException* exception) = 0;
 
   /**
    * Notifies the listener that an attempt was made to execute a command that
@@ -77,7 +75,7 @@ struct IExecutionListenerWithChecks : public IExecutionListener {
    * @param exception
    *            The exception that occurred; never <code>null</code>.
    */
-  virtual void NotEnabled(const std::string& commandId, const NotEnabledException* exception) = 0;
+  virtual void NotEnabled(const QString& commandId, const NotEnabledException* exception) = 0;
 };
 
 }

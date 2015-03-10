@@ -13,6 +13,7 @@ set(MODULE_TESTS
    ################## DISABLED TESTS #####################################################
    # mitkNavigationToolStorageDeserializerTest.cpp # This test was disabled because of bug 17303.
    # mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp # This test was disabled because of bug 17181.
+   # mitkNavigationToolStorageSerializerTest.cpp # This test was disabled because of bug 18671
 
    ################# RUNNING TESTS #######################################################
    mitkCameraVisualizationTest.cpp
@@ -34,6 +35,7 @@ set(MODULE_TESTS
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp
    mitkNavigationDataToPointSetFilterTest.cpp
+   mitkNavigationDataToIGTLMessageFilterTest.cpp
    mitkNavigationDataTransformFilterTest.cpp
    mitkNDIPassiveToolTest.cpp
    mitkNDIProtocolTest.cpp
@@ -53,7 +55,6 @@ set(MODULE_TESTS
    mitkNavigationToolStorageTest.cpp
    mitkNavigationToolTest.cpp
    mitkNavigationToolReaderAndWriterTest.cpp
-   mitkNavigationToolStorageSerializerTest.cpp
    # -----------------------------------------------------------------------
 )
 

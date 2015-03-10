@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const std::string INamedHandleStateIds::DESCRIPTION = "DESCRIPTION";
-const std::string INamedHandleStateIds::NAME = "NAME";
+const QString INamedHandleStateIds::DESCRIPTION = "DESCRIPTION";
+const QString INamedHandleStateIds::NAME = "NAME";
 
 }
 

@@ -92,7 +92,7 @@ void DicomView::AddDataNodeFromDICOM( QHash<QString,QVariant> eventProperties)
 
       // //! [DicomViewCreateAddDataNodeActivatePersp]
             berry::IWorkbenchWindow::Pointer window = this->GetSite()->GetWorkbenchWindow();
-            std::string perspectiveId = "org.mitk.example.viewerperspective";
+            QString perspectiveId = "org.mitk.example.viewerperspective";
             window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       // //! [DicomViewCreateAddDataNodeActivatePersp]

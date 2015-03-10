@@ -1,13 +1,13 @@
 set(CPP_FILES
   mitkDiffusionModuleActivator.cpp
   mitkNrrdTbssImageWriterFactory.cpp
-  #mitkFiberBundleXIOFactory.cpp
+  #mitkFiberBundleIOFactory.cpp
   mitkConnectomicsNetworkReader.cpp
   mitkConnectomicsNetworkWriter.cpp
   mitkConnectomicsNetworkSerializer.cpp
   mitkConnectomicsNetworkDefinitions.cpp
   mitkNrrdTbssRoiImageIOFactory.cpp
-  #mitkFiberBundleXWriterFactory.cpp
+  #mitkFiberBundleWriterFactory.cpp
   mitkNrrdTbssRoiImageWriterFactory.cpp
   mitkNrrdTensorImageReader.cpp
   mitkNrrdTensorImageWriter.cpp
@@ -21,19 +21,25 @@ set(CPP_FILES
 
   mitkDiffusionIOMimeTypes.cpp
 
-  mitkNrrdDiffusionImageReader.cpp
-  mitkNrrdDiffusionImageWriter.cpp
-  mitkDiffusionImageSerializer.cpp
+  mitkDiffusionImageNrrdReaderService.cpp
+  mitkDiffusionImageNrrdWriterService.cpp
+  mitkDiffusionImageNiftiReaderService.cpp
+  mitkDiffusionImageNiftiWriterService.cpp
 
   mitkNrrdQBallImageReader.cpp
   mitkNrrdQBallImageWriter.cpp
   mitkQBallImageSerializer.cpp
 
-  mitkFiberBundleXReader.cpp
-  mitkFiberBundleXWriter.cpp
-  mitkFiberBundleXSerializer.cpp
-  mitkFiberBundleXMapper2D.cpp
-  mitkFiberBundleXMapper3D.cpp
+  mitkFiberBundleTrackVisReader.cpp
+  mitkFiberBundleTrackVisWriter.cpp
+  mitkFiberBundleVtkReader.cpp
+  mitkFiberBundleVtkWriter.cpp
+  mitkFiberBundleSerializer.cpp
+  mitkFiberBundleMapper2D.cpp
+  mitkFiberBundleMapper3D.cpp
   mitkCompositeMapper.cpp
+  mitkPlanarFigureCompositeWriter.cpp
+  mitkPlanarFigureCompositeReader.cpp
+  mitkPlanarFigureCompositeSerializer.cpp
 )
 

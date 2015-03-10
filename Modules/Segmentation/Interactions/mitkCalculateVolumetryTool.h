@@ -33,7 +33,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MitkSegmentation_EXPORT CalculateVolumetryTool : public SegmentationsProcessingTool
+class MITKSEGMENTATION_EXPORT CalculateVolumetryTool : public SegmentationsProcessingTool
 {
   public:
 

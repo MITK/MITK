@@ -19,8 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-void IJobChangeListener::Events::AddListener(
-    IJobChangeListener::Pointer listener)
+void IJobChangeListener::Events::AddListener(IJobChangeListener* listener)
 {
   if (!listener)
     return;
@@ -28,36 +27,30 @@ void IJobChangeListener::Events::AddListener(
   Types types = listener->GetEventTypes();
 
   if (types & ABOUT_TO_RUN)
-    jobAboutToRun += Delegate(listener.GetPointer(),
-        &IJobChangeListener::AboutToRun);
+    jobAboutToRun += Delegate(listener, &IJobChangeListener::AboutToRun);
   if (types & AWAKE)
-    jobAwake += Delegate(listener.GetPointer(), &IJobChangeListener::Awake);
+    jobAwake += Delegate(listener, &IJobChangeListener::Awake);
   if (types & DONE)
-    jobDone += Delegate(listener.GetPointer(), &IJobChangeListener::Done);
+    jobDone += Delegate(listener, &IJobChangeListener::Done);
   if (types & RUNNING)
-    jobRunning += Delegate(listener.GetPointer(), &IJobChangeListener::Running);
+    jobRunning += Delegate(listener, &IJobChangeListener::Running);
   if (types & SCHEDULED)
-    jobScheduled += Delegate(listener.GetPointer(),
-        &IJobChangeListener::Scheduled);
+    jobScheduled += Delegate(listener, &IJobChangeListener::Scheduled);
   if (types & SLEEPING)
-    jobSleeping += Delegate(listener.GetPointer(),
-        &IJobChangeListener::Sleeping);
+    jobSleeping += Delegate(listener, &IJobChangeListener::Sleeping);
 }
 
-void IJobChangeListener::Events::RemoveListener(
-    IJobChangeListener::Pointer listener)
+void IJobChangeListener::Events::RemoveListener(IJobChangeListener* listener)
 {
   if (!listener)
     return;
 
-  jobAboutToRun -= Delegate(listener.GetPointer(),
-      &IJobChangeListener::AboutToRun);
-  jobAwake -= Delegate(listener.GetPointer(), &IJobChangeListener::Awake);
-  jobDone -= Delegate(listener.GetPointer(), &IJobChangeListener::Done);
-  jobRunning -= Delegate(listener.GetPointer(), &IJobChangeListener::Running);
-  jobScheduled -= Delegate(listener.GetPointer(),
-      &IJobChangeListener::Scheduled);
-  jobSleeping -= Delegate(listener.GetPointer(), &IJobChangeListener::Sleeping);
+  jobAboutToRun -= Delegate(listener, &IJobChangeListener::AboutToRun);
+  jobAwake -= Delegate(listener, &IJobChangeListener::Awake);
+  jobDone -= Delegate(listener, &IJobChangeListener::Done);
+  jobRunning -= Delegate(listener, &IJobChangeListener::Running);
+  jobScheduled -= Delegate(listener, &IJobChangeListener::Scheduled);
+  jobSleeping -= Delegate(listener, &IJobChangeListener::Sleeping);
 }
 
 void IJobChangeListener::Events::SetExceptionHandler(const AbstractExceptionHandler& handler)

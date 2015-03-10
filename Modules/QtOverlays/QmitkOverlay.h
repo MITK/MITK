@@ -52,7 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
  \ingroup Qmitk
 */
-class MitkQtOverlays_EXPORT QmitkOverlay : public QObject
+class MITKQTOVERLAYS_EXPORT QmitkOverlay : public QObject
 {
   Q_OBJECT
 

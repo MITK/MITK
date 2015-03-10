@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  class MitkImageDenoising_EXPORT BilateralFilter : public ImageToImageFilter
+  class MITKIMAGEDENOISING_EXPORT BilateralFilter : public ImageToImageFilter
   {
   public:
 

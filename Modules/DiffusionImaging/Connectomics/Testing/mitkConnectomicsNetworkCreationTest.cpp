@@ -73,7 +73,7 @@ public:
       CPPUNIT_ASSERT_MESSAGE( errorMessage, false );
     }
     mitk::BaseData* fiberBaseData = fiberInfile.at(0);
-    mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*>( fiberBaseData );
+    mitk::FiberBundle* fiberBundle = dynamic_cast<mitk::FiberBundle*>( fiberBaseData );
 
     // load parcellation
     std::vector<mitk::BaseData::Pointer> parcellationInFile = mitk::IOUtil::Load( m_ParcellationPath );

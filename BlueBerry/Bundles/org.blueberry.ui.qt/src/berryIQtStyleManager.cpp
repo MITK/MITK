@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const std::string IQtStyleManager::ID = "org.blueberry.service.qtstylemanager";
+IQtStyleManager::~IQtStyleManager()
+{
+}
 
 }

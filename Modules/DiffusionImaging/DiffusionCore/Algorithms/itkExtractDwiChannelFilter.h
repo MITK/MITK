@@ -24,13 +24,12 @@ This file is based heavily on a corresponding ITK filter.
 
 #include "itkImageToImageFilter.h"
 #include "itkVectorImage.h"
-#include <mitkDiffusionImage.h>
 #include <itkImageRegionIteratorWithIndex.h>
-#include <mitkDiffusionImage.h>
+#include <mitkImage.h>
 
 namespace itk{
 /** \class ExtractDwiChannelFilter
- *  \brief Remove spcified channels from diffusion-weighted image.
+ *  \brief Remove specified channels from diffusion-weighted image.
  */
 
 template< class TInPixelType >

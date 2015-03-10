@@ -23,20 +23,24 @@ namespace berry {
 
 void
 IParameterTypeListener::Events
-::AddListener(IParameterTypeListener::Pointer l)
+::AddListener(IParameterTypeListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == 0) return;
 
-  parameterTypeChanged += Delegate(l.GetPointer(), &IParameterTypeListener::ParameterTypeChanged);
+  parameterTypeChanged += Delegate(l, &IParameterTypeListener::ParameterTypeChanged);
 }
 
 void
 IParameterTypeListener::Events
-::RemoveListener(IParameterTypeListener::Pointer l)
+::RemoveListener(IParameterTypeListener* l)
 {
-  if (l.IsNull()) return;
+  if (l == 0) return;
 
-  parameterTypeChanged -= Delegate(l.GetPointer(), &IParameterTypeListener::ParameterTypeChanged);
+  parameterTypeChanged -= Delegate(l, &IParameterTypeListener::ParameterTypeChanged);
+}
+
+IParameterTypeListener::~IParameterTypeListener()
+{
 }
 
 }

@@ -147,8 +147,6 @@ protected:
   /** \brief Is called from the image navigator once the time step has changed */
   void OnTimeChanged( const itk::EventObject& );
   /** \brief Required for berry::IPartListener */
-  virtual const char* GetClassName() const { return "QmitkImageStatisticsView"; }
-  /** \brief Required for berry::IPartListener */
   virtual Events::Types GetPartEventTypes() const { return Events::CLOSED; }
 
   // member variables

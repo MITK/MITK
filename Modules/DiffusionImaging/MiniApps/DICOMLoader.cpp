@@ -14,9 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkBaseDataIOFactory.h"
-#include "mitkDiffusionImage.h"
+#include "mitkImage.h"
 #include "mitkBaseData.h"
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
 
 #include <itkImageFileWriter.h>
 #include <itkNrrdImageIO.h>
@@ -67,7 +69,7 @@ void SetInputFileNames( std::string input_directory )
 }
 
 
-mitk::DiffusionImage<short>::Pointer ReadInDICOMFiles( mitk::StringList& input_files, std::string output_file )
+mitk::Image::Pointer ReadInDICOMFiles( mitk::StringList& input_files, std::string output_file )
 {
   // repeat test with some more realistic sorting
   mitk::DiffusionDICOMFileReader::Pointer gdcmReader = mitk::DiffusionDICOMFileReader::New(); // this also tests destruction
@@ -101,9 +103,7 @@ mitk::DiffusionImage<short>::Pointer ReadInDICOMFiles( mitk::StringList& input_f
 
   mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(0).GetMitkImage();
 
-  mitk::DiffusionImage<short>::Pointer d_img = static_cast<mitk::DiffusionImage<short>*>( loaded_image.GetPointer() );
-
-  return d_img;
+  return loaded_image;
 }
 
 typedef short DiffusionPixelType;
@@ -112,8 +112,8 @@ typedef DwiImageType::PixelType                        DwiPixelType;
 typedef DwiImageType::RegionType                       DwiRegionType;
 typedef std::vector< DwiImageType::Pointer >  DwiImageContainerType;
 
-typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
-typedef DiffusionImageType::GradientDirectionContainerType    GradientContainerType;
+typedef mitk::Image          DiffusionImageType;
+typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType    GradientContainerType;
 typedef std::vector< GradientContainerType::Pointer >  GradientListContainerType;
 
 void SearchForInputInSubdirs( std::string root_directory, std::string subdir_prefix , std::vector<DiffusionImageType::Pointer>& output_container)
@@ -166,8 +166,14 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("inputdir", "i", mitkCommandLineParser::String, "Input Directory" ,"input directory containing dicom files", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::String, "Output File Name", "output file", us::Any(), false);
+
+  parser.setTitle("Diffusion Dicom Loader");
+  parser.setCategory("Preprocessing Tools");
+  parser.setDescription("Loads Diffusion Dicom files.");
+  parser.setContributor("MBI");
+
+  parser.addArgument("inputdir", "i", mitkCommandLineParser::InputDirectory, "Input Directory" ,"input directory containing dicom files", us::Any(), false);
+  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output File Name", "output file", us::Any(), false);
   parser.addArgument("dwprefix", "p", mitkCommandLineParser::String, "Recursive Scan Prefix", "prefix for subfolders search rootdir is specified by the 'inputdir' argument value", us::Any(), true);
   parser.addArgument("dryrun", "-s", mitkCommandLineParser::Bool, "Dry run","do not read, only look for input files ", us::Any(), true );
 
@@ -185,9 +191,12 @@ int main(int argc, char* argv[])
   std::string subdir_prefix;
   if( parsedArgs.count("dwprefix"))
   {
-    MITK_INFO << "Prefix specified, will search for subdirs in the input directory!";
     subdir_prefix = us::any_cast<std::string>( parsedArgs["dwprefix"] );
-    search_for_subdirs = true;
+    if (subdir_prefix != "")
+    {
+      MITK_INFO << "Prefix specified, will search for subdirs in the input directory!";
+      search_for_subdirs = true;
+    }
   }
 
   // retrieve the output
@@ -199,7 +208,7 @@ int main(int argc, char* argv[])
     SetInputFileNames( inputDirectory );
 
     MITK_INFO << "Got " << GetInputFilenames().size() << " input files.";
-    mitk::DiffusionImage<short>::Pointer d_img = ReadInDICOMFiles( GetInputFilenames(), outputFile );
+    mitk::Image::Pointer d_img = ReadInDICOMFiles( GetInputFilenames(), outputFile );
 
     try
     {
@@ -214,24 +223,27 @@ int main(int argc, char* argv[])
   // if the --dwprefix flag is set, then we have to look for the directories, load each of them separately and afterwards merge the images
   else
   {
-    std::vector<mitk::DiffusionImage<DiffusionPixelType>::Pointer> output_container;
+    std::vector<mitk::Image::Pointer> output_container;
 
     SearchForInputInSubdirs( inputDirectory, subdir_prefix, output_container );
 
     // final output image
-    mitk::DiffusionImage<DiffusionPixelType>::Pointer image = mitk::DiffusionImage<DiffusionPixelType>::New();
+    mitk::Image::Pointer image = mitk::Image::New();
     if( output_container.size() > 1 )
     {
       DwiImageContainerType       imageContainer;
       GradientListContainerType   gradientListContainer;
       std::vector< double >       bValueContainer;
 
-      for ( std::vector< mitk::DiffusionImage<DiffusionPixelType>::Pointer >::iterator dwi = output_container.begin();
-            dwi != output_container.end(); ++dwi )
+      for ( std::vector< mitk::Image::Pointer >::iterator dwi = output_container.begin();
+        dwi != output_container.end(); ++dwi )
       {
-        imageContainer.push_back((*dwi)->GetVectorImage());
-        gradientListContainer.push_back((*dwi)->GetDirections());
-        bValueContainer.push_back((*dwi)->GetReferenceBValue());
+        mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+        mitk::CastToItkImage(*dwi, itkVectorImagePointer);
+
+        imageContainer.push_back(itkVectorImagePointer);
+        gradientListContainer.push_back( mitk::DiffusionPropertyHelper::GetGradientContainer(*dwi));
+        bValueContainer.push_back( mitk::DiffusionPropertyHelper::GetReferenceBValue(*dwi));
       }
 
       typedef itk::MergeDiffusionImagesFilter<short> FilterType;
@@ -243,11 +255,12 @@ int main(int argc, char* argv[])
 
       vnl_matrix_fixed< double, 3, 3 > mf; mf.set_identity();
 
-      image->SetVectorImage( filter->GetOutput() );
-      image->SetReferenceBValue(filter->GetB_Value());
-      image->SetDirections(filter->GetOutputGradients());
-      image->SetMeasurementFrame(mf);
-      image->InitializeFromVectorImage();
+      image = mitk::GrabItkImageMemory( filter->GetOutput() );
+      image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetOutputGradients() ) );
+      image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( filter->GetB_Value() ) );
+      image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mf ) );
+      mitk::DiffusionPropertyHelper propertyHelper( image );
+      propertyHelper.InitializeImage();
     }
     // just output the image if there was only one folder found
     else

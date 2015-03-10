@@ -35,7 +35,7 @@ class ParameterType;
  */
 struct BERRY_COMMANDS ITypedParameter : public virtual Object {
 
-  berryInterfaceMacro(ITypedParameter, berry);
+  berryObjectMacro(berry::ITypedParameter)
 
   /**
    * Returns the {@link ParameterType} associated with a command parameter or
@@ -47,7 +47,7 @@ struct BERRY_COMMANDS ITypedParameter : public virtual Object {
    * @return the parameter type associated with a command parameter or
    *         <code>null</code> if the parameter does not declare a type
    */
-  virtual SmartPointer<ParameterType> GetParameterType() = 0;
+  virtual SmartPointer<ParameterType> GetParameterType() const = 0;
 };
 
 }

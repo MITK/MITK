@@ -40,7 +40,7 @@ namespace mitk
 
  Last contributor: $Author$
 */
-class MitkSegmentation_EXPORT CalculateGrayValueStatisticsTool : public SegmentationsProcessingTool
+class MITKSEGMENTATION_EXPORT CalculateGrayValueStatisticsTool : public SegmentationsProcessingTool
 {
   public:
 

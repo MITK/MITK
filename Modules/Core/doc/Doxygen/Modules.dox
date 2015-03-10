@@ -1,0 +1,105 @@
+/**
+  \defgroup Core Core
+  \ingroup MITKModules
+
+  \brief This category includes classes of the MITK Core module.
+
+  The MITK Core module contains abstractions for common data types and their
+  geometries, I/O facilities for loading and saving data in various formats,
+  infrastructures for handling user interaction and undo/redo operations,
+  GUI toolkit independent visualization classes, and a generic service registry.
+
+  In almost all cases, additional MITK modules will make use of classes contained
+  in the Core module.
+*/
+
+/**
+  \defgroup Data Data Classes
+  \ingroup Core
+
+  \brief This subcategory includes the data classes, e.g., for images (mitk::Image),
+  surfaces (mitk::Surface), vessel-trees (mitk::VesselTreeData), etc.
+
+  Data access classes are only included, if there is no equivalent in itk (see
+  \ref ProcessAndAdaptorClasses "Process and Adaptor Classes" below).
+*/
+
+/**
+  \defgroup IO IO Classes
+  \ingroup Core
+
+  \brief This subcategory includes the IO classes to read or write data objects.
+*/
+
+/**
+  \defgroup DeprecatedIO Deprecated IO Classes
+  \ingroup Core
+
+  \brief This subcategory includes the Deprecated IO classes to read or write data objects.
+*/
+
+/**
+  \defgroup DataStorage Data Storage Classes
+  \ingroup Core
+
+  \brief This subcategory includes the classes to store and retrieve objects from the mitk::DataStorage
+*/
+
+/**
+  \defgroup ProcessAdaptor Process and Adaptor Classes
+  \ingroup Core
+
+  \brief This category includes process (algorithm) classes developed specifically for mitk and
+  (mainly) adaptor classes for the integration of algorithms from other toolkits
+  (currently vtk, itk).
+
+  The itk adaptor classes are also useful for data access to mitk data objects.
+*/
+
+/**
+  \defgroup Process Process Classes
+  \ingroup ProcessAdaptor
+
+  \brief This subcategory includes process (algorithm) classes developed specifically for mitk.
+*/
+
+/**
+  \defgroup InteractionUndo Interaction and Undo Classes
+  \ingroup Core
+
+  \brief This category includes classes that support the developer to create
+  software that allows the user to interact with the data.
+
+  This includes complex interactions that have multiple states (e.g., moving a handle of an
+  active contour vs changing its local elasicity) and a concept to realize an undo/redo-mechanism.
+
+  A detailed description of the rationale for these classes can be found in
+  \ref InteractionPage.
+*/
+
+/**
+  \defgroup Interaction Interaction Classes
+  \ingroup InteractionUndo
+
+  \brief This subcategory includes interaction classes (subclasses of mitk::StateMachine) that change
+  the data according to the input of the user.
+
+  For undo-support, the change is done by sending an OperationEvent to the respective
+  data object, which changes itself accordingly.
+
+  A detailed description of the rationale for these classes can be found in
+  \ref InteractionPage.
+*/
+
+/**
+  \defgroup Undo Undo Classes
+  \ingroup InteractionUndo
+
+  \brief This subcategory includes the undo/redo-specific classes.
+
+  For undo-support, the change is done by sending an OperationEvent to the respective data object,
+  which changes itself accordingly.
+
+  A detailed description of the rationale for these classes can be found in
+  \ref InteractionPage.
+*/

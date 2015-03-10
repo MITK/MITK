@@ -1,0 +1,11 @@
+/**
+  \defgroup MitkDataTypesExtModule DataTypesExt
+  \ingroup MITKModules
+
+  \brief MITK data types and related classes.
+
+  This module provides general purpose MITK data types based
+  on the mitk::BaseData class which do not belong to a specific
+  domain. Additionally, it contains data type related classes
+  and interactors.
+*/

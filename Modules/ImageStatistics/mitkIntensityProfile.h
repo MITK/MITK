@@ -33,7 +33,7 @@ namespace mitk
     *
     * \return The computed intensity profile.
     */
-  MitkImageStatistics_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, PlanarFigure::Pointer planarFigure);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, PlanarFigure::Pointer planarFigure);
 
   namespace InterpolateImageFunction
   {
@@ -68,7 +68,7 @@ namespace mitk
     *
     * \return The computed intensity profile.
     */
-  MitkImageStatistics_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, PlanarLine::Pointer planarLine, unsigned int numSamples, InterpolateImageFunction::Enum interpolator = InterpolateImageFunction::NearestNeighbor);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, PlanarLine::Pointer planarLine, unsigned int numSamples, InterpolateImageFunction::Enum interpolator = InterpolateImageFunction::NearestNeighbor);
 
   /** \brief Compute intensity profile of an image for each sample between two points.
     *
@@ -80,7 +80,7 @@ namespace mitk
     *
     * \return The computed intensity profile.
     */
-  MitkImageStatistics_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, const Point3D& startPoint, const Point3D& endPoint, unsigned int numSamples, InterpolateImageFunction::Enum interpolator = InterpolateImageFunction::NearestNeighbor);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, const Point3D& startPoint, const Point3D& endPoint, unsigned int numSamples, InterpolateImageFunction::Enum interpolator = InterpolateImageFunction::NearestNeighbor);
 
   /** \brief Compute global maximum of an intensity profile.
     *
@@ -88,7 +88,7 @@ namespace mitk
     *
     * \return Index of the global maximum.
     */
-  MitkImageStatistics_EXPORT IntensityProfile::InstanceIdentifier ComputeGlobalMaximum(IntensityProfile::Pointer intensityProfile);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeGlobalMaximum(IntensityProfile::Pointer intensityProfile);
 
   /** \brief Compute global minimum of an intensity profile.
     *
@@ -96,7 +96,7 @@ namespace mitk
     *
     * \return Index of the global minimum.
     */
-  MitkImageStatistics_EXPORT IntensityProfile::InstanceIdentifier ComputeGlobalMinimum(IntensityProfile::Pointer intensityProfile);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeGlobalMinimum(IntensityProfile::Pointer intensityProfile);
 
   /** \brief Compute center of maximum area under the curve of an intensity profile.
     *
@@ -105,7 +105,7 @@ namespace mitk
     *
     * \return Index of the maximum area center.
     */
-  MitkImageStatistics_EXPORT IntensityProfile::InstanceIdentifier ComputeCenterOfMaximumArea(IntensityProfile::Pointer intensityProfile, IntensityProfile::InstanceIdentifier radius);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeCenterOfMaximumArea(IntensityProfile::Pointer intensityProfile, IntensityProfile::InstanceIdentifier radius);
 
   /** \brief Convert an intensity profile to a standard library vector.
     *
@@ -113,7 +113,7 @@ namespace mitk
     *
     * \return Standard library vector which contains the input intensity profile measurements.
     */
-  MitkImageStatistics_EXPORT std::vector<IntensityProfile::MeasurementType> CreateVectorFromIntensityProfile(IntensityProfile::Pointer intensityProfile);
+  MITKIMAGESTATISTICS_EXPORT std::vector<IntensityProfile::MeasurementType> CreateVectorFromIntensityProfile(IntensityProfile::Pointer intensityProfile);
 
   /** \brief Convert a standard library vector to an intensity profile.
     *
@@ -121,7 +121,7 @@ namespace mitk
     *
     * \return An intensity profile.
     */
-  MitkImageStatistics_EXPORT IntensityProfile::Pointer CreateIntensityProfileFromVector(const std::vector<IntensityProfile::MeasurementType>& vector);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::Pointer CreateIntensityProfileFromVector(const std::vector<IntensityProfile::MeasurementType>& vector);
 }
 
 #endif

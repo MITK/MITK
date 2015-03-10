@@ -2,8 +2,8 @@
   \defgroup org_blueberry_ui_qt org.blueberry.ui.qt
   \ingroup BlueBerryPlugins
 
-  \brief The Qt dependent user interface plug-in providing support for
-  creating Qt based workbench applications.
+  \brief This is the user interface plugin. It provides a Qt based framework
+  to build a BlueBerry workbench.
 
 */
 

@@ -77,11 +77,11 @@ public:
     { return ( static_cast< typename Superclass::InputImageType *>(this->ProcessObject::GetInput(0)) ); }
 
     /** Replaces the Input method.
-      * Var vols = mitk::DiffusionImage<type>
+      * Var vols = mitk::Image
       * -----------------------------------------------------
-      * GradientDirectionContainerType-Input gradientDirectionContainer (e.g. vols->GetDirections)
-      * GradientImagesType-Input gradientImage (e.g. vols->GetVectorImage)
-      * float-Input bvalue (e.g. vols->GetB_Value) */
+      * GradientDirectionContainerType-Input gradientDirectionContainer (e.g. GradientDirectionsContainerProperty)
+      * GradientImagesType-Input gradientImage (e.g. itkVectorImage)
+      * float-Input bvalue (e.g. ReferenceBValueProperty) */
     void SetGradientImage( const GradientDirectionContainerType * gradientDirectionContainer, const GradientImagesType *gradientImage , float bvalue);//, std::vector<bool> listOfUserSelctedBValues );
 
    /** Set a BValue Map (key = bvalue, value = indicies splittet for each shell)

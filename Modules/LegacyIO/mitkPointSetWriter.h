@@ -34,12 +34,12 @@ namespace mitk
  * a single XML file by simply setting multiple inputs to the filter.
  * Writing of multiple XML files according to a given filename pattern is not
  * yet supported.
- * @ingroup PSIO
- * @ingroup Process
+ *
+ * @ingroup MitkLegacyIOModule
  *
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
-class MitkLegacyIO_EXPORT PointSetWriter : public mitk::FileWriter
+class MITKLEGACYIO_EXPORT PointSetWriter : public mitk::FileWriter
 {
 public:
 

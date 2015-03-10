@@ -63,9 +63,9 @@ namespace mitk
     return m_Instance;
   }
 
-  berry::IPreferencesService::Pointer org_mitk_gui_qt_application_Activator::GetPreferencesService()
+  berry::IPreferencesService* org_mitk_gui_qt_application_Activator::GetPreferencesService()
   {
-    return berry::IPreferencesService::Pointer(m_PrefServiceTracker->getService());
+    return m_PrefServiceTracker->getService();
   }
 
 }

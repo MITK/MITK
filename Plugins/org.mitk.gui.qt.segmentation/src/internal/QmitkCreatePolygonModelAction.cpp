@@ -27,7 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Blueberry
 #include <berryIPreferencesService.h>
-#include <berryPlatformUI.h>
+#include <berryIPreferences.h>
+#include <berryPlatform.h>
 #include <berryIWorkbenchPage.h>
 
 using namespace berry;
@@ -55,7 +56,7 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
   try
   {
     // Get preference properties for smoothing and decimation
-    IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
+    IPreferencesService* prefService = Platform::GetPreferencesService();
     IPreferences::Pointer segPref = prefService->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
 
     bool smoothingHint = segPref->GetBool("smoothing hint", true);

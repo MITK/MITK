@@ -1,8 +1,4 @@
-if(DESIRED_QT_VERSION MATCHES 5)
-  cmake_minimum_required(VERSION 2.8.9)
-else()
-  cmake_minimum_required(VERSION 2.8.4)
-endif()
+cmake_minimum_required(VERSION 3.1)
 
 project(Qwt)
 
@@ -175,13 +171,8 @@ if(DESIRED_QT_VERSION MATCHES 4)
   qt4_wrap_cpp(_qwt_sources ${_qwt_moc_headers})
 
   add_library(qwt SHARED ${_qwt_sources})
-  target_link_libraries(qwt ${QT_LIBRARIES})
+  target_link_libraries(qwt PUBLIC ${QT_LIBRARIES})
 elseif(DESIRED_QT_VERSION MATCHES 5)
-
-  if (WIN32)
-    cmake_policy(SET CMP0020 NEW) # Automatically link Qt executables to qtmain target on Windows
-  endif()
-
   find_package(Qt5Svg REQUIRED)
   find_package(Qt5OpenGL REQUIRED)
   find_package(Qt5PrintSupport REQUIRED)
@@ -190,12 +181,13 @@ elseif(DESIRED_QT_VERSION MATCHES 5)
   qt5_wrap_cpp(_qwt_sources ${_qwt_moc_headers})
 
   add_library(qwt SHARED ${_qwt_sources})
-  qt5_use_modules(qwt Svg OpenGL PrintSupport Concurrent)
+  target_link_libraries(qwt PUBLIC Qt5::Svg Qt5::OpenGL Qt5::PrintSupport Qt5::Concurrent)
 endif()
 
+target_compile_definitions(qwt PUBLIC QWT_DLL PRIVATE QWT_MAKEDLL)
 set_target_properties(qwt PROPERTIES
                       SOVERSION ${${PROJECT_NAME}_VERSION}
-                      COMPILE_DEFINITIONS "QWT_DLL;QWT_MAKEDLL")
+)
 
 
 # Build the designer plug-in
@@ -237,19 +229,50 @@ set_target_properties(qwt_designer_plugin PROPERTIES
                       SOVERSION ${${PROJECT_NAME}_VERSION}
                       COMPILE_DEFINITIONS QWT_DLL)
 
+set(${PROJECT_NAME}_LIBRARIES qwt)
+
+# Install support
+
+install(TARGETS qwt_designer_plugin
+  RUNTIME DESTINATION plugins/designer
+  LIBRARY DESTINATION plugins/designer
+)
+
+install(TARGETS ${${PROJECT_NAME}_LIBRARIES} EXPORT ${PROJECT_NAME}_TARGETS
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include/${PROJECT_NAME}
+)
+install(DIRECTORY src/
+  DESTINATION include/${PROJECT_NAME}
+  FILES_MATCHING PATTERN "*.h"
+)
 
 # Config files
-set(${PROJECT_NAME}_LIBRARIES qwt)
-set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-configure_file(${PROJECT_NAME}Config.cmake.in
-               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY)
-export(TARGETS ${${PROJECT_NAME}_LIBRARIES} FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Exports.cmake)
-
-# Version information
+configure_file(
+  ${PROJECT_NAME}Config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+  @ONLY
+)
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   @ONLY
-  )
+)
 
+export(EXPORT ${PROJECT_NAME}_TARGETS
+  FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake
+)
+
+set(config_package_location lib/cmake/${PROJECT_NAME})
+install(EXPORT ${PROJECT_NAME}_TARGETS
+  FILE ${PROJECT_NAME}Targets.cmake
+  DESTINATION ${config_package_location}
+)
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+  DESTINATION ${config_package_location}
+)

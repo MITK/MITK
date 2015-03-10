@@ -59,6 +59,9 @@ public:
     /// \brief Called when the user clicks the GUI button
     void OnConvertToRGBAImagePushButtonClicked();
 
+    /// \brief Called when the user clicks the GUI button
+    void OnAssignFreeSurferColorsPushButtonClicked();
+
     /// \brief Create modularization of network
     void OnModularizePushButtonClicked();
 
@@ -77,6 +80,9 @@ protected:
   /// \brief Converts an image into a RGBA image
   template < typename TPixel, unsigned int VImageDimension >
   void TurnIntoRGBA( itk::Image<TPixel, VImageDimension>* inputImage);
+
+  /// \brief Assigns an image the Freesurfer LUT
+  void AssignFreeSurferColors( mitk::DataNode::Pointer node );
 
   /// \brief Wipe display and empty statistics
   void WipeDisplay();

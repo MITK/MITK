@@ -1,0 +1,22 @@
+/**
+  \defgroup QmitkModule QtWidgets
+  \ingroup MITKModules
+
+  \brief Basic Qt widgets and classes for MITK.
+
+  This module provides a set of Qt widgets and classes generally useful for
+  any MITK application. The main widgets are:
+
+  - QmitkLevelWindowWidget
+  - QmitkProgressBar
+  - QmitkRenderWindow
+  - QmitkStdMultiWidget
+
+  A couple of Qt models for use in the model/view architecture of Qt are also
+  provided. Among them are:
+
+  - QmitkDataStorageListModel
+  - QmitkDataStorageTableModel
+  - QmitkDataStorageTreeModel
+  - QmitkPropertiesTableModel
+*/

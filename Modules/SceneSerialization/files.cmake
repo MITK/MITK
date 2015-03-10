@@ -1,8 +1,13 @@
-# Do not glob files in the Testing directory
-file(GLOB SRCS
-  *.cpp
-  BaseDataSerializer/*.cpp
-  )
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
 
-set(CPP_FILES ${SRCS})
+set(CPP_FILES
+  mitkImageSerializer.cpp
+  mitkPointSetSerializer.cpp
+  mitkPropertyListDeserializer.cpp
+  mitkPropertyListDeserializerV1.cpp
+  mitkSceneIO.cpp
+  mitkSceneReader.cpp
+  mitkSceneReaderV1.cpp
+  mitkSurfaceSerializer.cpp
+)
 

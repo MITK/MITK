@@ -38,7 +38,7 @@ class QmitkPickingToolGUIControls;
 \brief GUI for mitk::LiveWireTool.
 \sa mitk::PickingTool
 */
-class MitkSegmentationUI_EXPORT QmitkPickingToolGUI : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkPickingToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

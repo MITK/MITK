@@ -20,19 +20,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 
+#include <QPoint>
+
 class MultiplePerspectivesWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 {
 
 public:
 
-  static const std::string DEFAULT_PERSPECTIVE_ID;
+  static const QString DEFAULT_PERSPECTIVE_ID;
 
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
       berry::IWorkbenchWindowConfigurer::Pointer configurer)
   {
     //! [initial window size]
     // Set an individual initial size
-    configurer->SetInitialSize(berry::Point(600,400));
+    configurer->SetInitialSize(QPoint(600,400));
     //! [initial window size]
 
     // Set an individual title
@@ -47,7 +49,7 @@ public:
     return wwAdvisor.data();
   }
 
-  std::string GetInitialWindowPerspectiveId()
+  QString GetInitialWindowPerspectiveId()
   {
     return DEFAULT_PERSPECTIVE_ID;
   }
@@ -58,7 +60,7 @@ private:
 
 };
 
-const std::string MultiplePerspectivesWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.minimalperspective";
+const QString MultiplePerspectivesWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.minimalperspective";
 
 MultiplePerspectives::MultiplePerspectives()
 {

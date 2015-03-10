@@ -37,7 +37,7 @@ class PointSet;
 
 
 /** \brief Can display a high amount of 3D labels to a PointSet */
-class MitkOverlays_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
+class MITKOVERLAYS_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
 public:
 
   /** \brief Internal class holding the vtkActor, etc. for each of the render windows */

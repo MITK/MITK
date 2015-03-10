@@ -34,7 +34,7 @@ namespace mitk
   * @ingroup ToFProcessing
   */
 
-  class MitkToFProcessing_EXPORT ToFImageDownsamplingFilter : public ImageToImageFilter
+  class MITKTOFPROCESSING_EXPORT ToFImageDownsamplingFilter : public ImageToImageFilter
   {
   public:
     mitkClassMacro(ToFImageDownsamplingFilter, ImageToImageFilter);

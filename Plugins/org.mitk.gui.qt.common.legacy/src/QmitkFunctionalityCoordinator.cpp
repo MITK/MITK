@@ -29,12 +29,11 @@ QmitkFunctionalityCoordinator::QmitkFunctionalityCoordinator()
 
 void QmitkFunctionalityCoordinator::Start()
 {
-  berry::PlatformUI::GetWorkbench()->AddWindowListener(berry::IWindowListener::Pointer(this));
-  std::vector<berry::IWorkbenchWindow::Pointer> wnds(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows());
-  for (std::vector<berry::IWorkbenchWindow::Pointer>::iterator i = wnds.begin();
-       i != wnds.end(); ++i)
+  berry::PlatformUI::GetWorkbench()->AddWindowListener(this);
+  QList<berry::IWorkbenchWindow::Pointer> wnds(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows());
+  for (auto i = wnds.begin(); i != wnds.end(); ++i)
   {
-    (*i)->GetPartService()->AddPartListener(berry::IPartListener::Pointer(this));
+    (*i)->GetPartService()->AddPartListener(this);
   }
 }
 
@@ -42,12 +41,11 @@ void QmitkFunctionalityCoordinator::Stop()
 {
   if (!berry::PlatformUI::IsWorkbenchRunning()) return;
 
-  berry::PlatformUI::GetWorkbench()->RemoveWindowListener(berry::IWindowListener::Pointer(this));
-  std::vector<berry::IWorkbenchWindow::Pointer> wnds(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows());
-  for (std::vector<berry::IWorkbenchWindow::Pointer>::iterator i = wnds.begin();
-       i != wnds.end(); ++i)
+  berry::PlatformUI::GetWorkbench()->RemoveWindowListener(this);
+  QList<berry::IWorkbenchWindow::Pointer> wnds(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows());
+  for (auto i = wnds.begin(); i != wnds.end(); ++i)
   {
-    (*i)->GetPartService()->RemovePartListener(berry::IPartListener::Pointer(this));
+    (*i)->GetPartService()->RemovePartListener(this);
   }
 }
 
@@ -62,18 +60,18 @@ berry::IPartListener::Events::Types QmitkFunctionalityCoordinator::GetPartEventT
     | berry::IPartListener::Events::VISIBLE | berry::IPartListener::Events::OPENED;
 }
 
-void QmitkFunctionalityCoordinator::PartActivated( berry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionalityCoordinator::PartActivated( const berry::IWorkbenchPartReference::Pointer& partRef )
 {
   // change the active standalone functionality
   this->ActivateStandaloneFunctionality(partRef.GetPointer());
 }
 
-void QmitkFunctionalityCoordinator::PartDeactivated( berry::IWorkbenchPartReference::Pointer /*partRef*/ )
+void QmitkFunctionalityCoordinator::PartDeactivated( const berry::IWorkbenchPartReference::Pointer& /*partRef*/ )
 {
   // nothing to do here: see PartActivated()
 }
 
-void QmitkFunctionalityCoordinator::PartOpened( berry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionalityCoordinator::PartOpened( const berry::IWorkbenchPartReference::Pointer& partRef )
 {
    // check for multiwidget and inform views that it is available now
   if ( partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID )
@@ -96,7 +94,7 @@ void QmitkFunctionalityCoordinator::PartOpened( berry::IWorkbenchPartReference::
   }
 }
 
-void QmitkFunctionalityCoordinator::PartClosed( berry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionalityCoordinator::PartClosed( const berry::IWorkbenchPartReference::Pointer& partRef )
 {
   // check for multiwidget and inform views that it not available any more
   if ( partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID )
@@ -132,7 +130,7 @@ void QmitkFunctionalityCoordinator::PartClosed( berry::IWorkbenchPartReference::
   }
 }
 
-void QmitkFunctionalityCoordinator::PartHidden( berry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionalityCoordinator::PartHidden( const berry::IWorkbenchPartReference::Pointer& partRef )
 {
   // Check for QmitkFunctionality
   QmitkFunctionality::Pointer _QmitkFunctionality = partRef->GetPart(false).Cast<QmitkFunctionality>();
@@ -150,7 +148,7 @@ void QmitkFunctionalityCoordinator::PartHidden( berry::IWorkbenchPartReference::
   }
 }
 
-void QmitkFunctionalityCoordinator::PartVisible( berry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionalityCoordinator::PartVisible( const berry::IWorkbenchPartReference::Pointer& partRef )
 {
   // Check for QmitkFunctionality
   QmitkFunctionality::Pointer _QmitkFunctionality = partRef->GetPart(false).Cast<QmitkFunctionality>();
@@ -211,12 +209,12 @@ void QmitkFunctionalityCoordinator::DeactivateStandaloneFunctionality(berry::IWo
   }
 }
 
-void QmitkFunctionalityCoordinator::WindowClosed( berry::IWorkbenchWindow::Pointer /*window*/ )
+void QmitkFunctionalityCoordinator::WindowClosed(const berry::IWorkbenchWindow::Pointer& /*window*/ )
 {
 
 }
 
-void QmitkFunctionalityCoordinator::WindowOpened( berry::IWorkbenchWindow::Pointer window )
+void QmitkFunctionalityCoordinator::WindowOpened(const berry::IWorkbenchWindow::Pointer& window )
 {
-  window->GetPartService()->AddPartListener(berry::IPartListener::Pointer(this));
+  window->GetPartService()->AddPartListener(this);
 }

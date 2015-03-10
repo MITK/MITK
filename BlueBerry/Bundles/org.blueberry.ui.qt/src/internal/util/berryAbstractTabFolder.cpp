@@ -67,9 +67,9 @@ AbstractTabItem* AbstractTabFolder::GetItem(int idx)
 
 AbstractTabItem* AbstractTabFolder::GetItem(const QPoint& toFind)
 {
-  std::vector<AbstractTabItem*> items = this->GetItems();
+  QList<AbstractTabItem*> items = this->GetItems();
 
-  for (unsigned int i = 0; i < items.size(); i++)
+  for (int i = 0; i < items.size(); i++)
   {
     AbstractTabItem* item = items[i];
 
@@ -84,9 +84,9 @@ AbstractTabItem* AbstractTabFolder::GetItem(const QPoint& toFind)
 
 AbstractTabItem* AbstractTabFolder::FindItem(Object::Pointer dataToFind)
 {
-  std::vector<AbstractTabItem*> items = this->GetItems();
+  QList<AbstractTabItem*> items = this->GetItems();
 
-  for (unsigned int i = 0; i < items.size(); i++)
+  for (int i = 0; i < items.size(); i++)
   {
     AbstractTabItem* item = items[i];
 
@@ -101,9 +101,9 @@ AbstractTabItem* AbstractTabFolder::FindItem(Object::Pointer dataToFind)
 
 int AbstractTabFolder::IndexOf(AbstractTabItem* item)
 {
-  std::vector<AbstractTabItem*> items = this->GetItems();
+  QList<AbstractTabItem*> items = this->GetItems();
 
-  for (unsigned int idx = 0; idx < items.size(); ++idx)
+  for (int idx = 0; idx < items.size(); ++idx)
   {
     AbstractTabItem* next = items[idx];
 
@@ -116,7 +116,7 @@ int AbstractTabFolder::IndexOf(AbstractTabItem* item)
   return -1;
 }
 
-std::size_t AbstractTabFolder::GetItemCount()
+int AbstractTabFolder::GetItemCount()
 {
   return this->GetItems().size();
 }

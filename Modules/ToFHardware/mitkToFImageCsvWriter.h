@@ -30,7 +30,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFImageCsvWriter : public ToFImageWriter
+  class MITKTOFHARDWARE_EXPORT ToFImageCsvWriter : public ToFImageWriter
   {
   public:
     /*!

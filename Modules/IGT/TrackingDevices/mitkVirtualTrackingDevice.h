@@ -36,7 +36,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT VirtualTrackingDevice : public TrackingDevice
+  class MITKIGT_EXPORT VirtualTrackingDevice : public TrackingDevice
   {
   public:
 

@@ -29,7 +29,7 @@ namespace mitk
   * @brief Groups Headers containing Diffusion Information
   * @ingroup Process
   */
-  class MitkDiffusionCore_EXPORT GroupDiffusionHeadersFilter : public BaseProcess
+  class MITKDIFFUSIONCORE_EXPORT GroupDiffusionHeadersFilter : public BaseProcess
   {
   public:
     mitkClassMacro( GroupDiffusionHeadersFilter, BaseProcess );

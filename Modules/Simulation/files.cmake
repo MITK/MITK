@@ -3,6 +3,7 @@ set(CPP_FILES
   mitkExportMitkVisitor.cpp
   mitkIndexROI.cpp
   mitkISimulationService.cpp
+  mitkPlaneIntersectionVisitor.cpp
   mitkRoundRobinSchedulingAlgorithm.cpp
   mitkSetVtkRendererVisitor.cpp
   mitkSchedulableProcess.cpp
@@ -11,16 +12,15 @@ set(CPP_FILES
   mitkSimulation.cpp
   mitkSimulationActivator.cpp
   mitkSimulationInteractor.cpp
-  mitkSimulationIOFactory.cpp
+  mitkSimulationIO.cpp
   mitkSimulationObjectFactory.cpp
-  mitkSimulationReader.cpp
   mitkSimulationSerializer.cpp
   mitkSimulationService.cpp
+  mitkSimulationVtkMapper2D.cpp
   mitkSimulationVtkMapper3D.cpp
-  mitkSimulationWriter.cpp
-  mitkSimulationWriterFactory.cpp
   mitkVtkModel.cpp
-  mitkVtkSimulationPolyDataMapper.cpp
+  mitkVtkSimulationPolyDataMapper2D.cpp
+  mitkVtkSimulationPolyDataMapper3D.cpp
   mitkWeightedRoundRobinSchedulingAlgorithm.cpp
 )
 

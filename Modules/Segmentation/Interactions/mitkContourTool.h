@@ -49,7 +49,7 @@ class InteractionEvent;
 
   $Author$
 */
-class MitkSegmentation_EXPORT ContourTool : public FeedbackContourTool
+class MITKSEGMENTATION_EXPORT ContourTool : public FeedbackContourTool
 {
   public:
 

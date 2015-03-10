@@ -362,6 +362,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_SimulationStatusText->setVisible(false);
 
         m_Controls->m_FrequencyMapBox->SetDataStorage(this->GetDataStorage());
+        m_Controls->m_Comp1VolumeFraction->SetDataStorage(this->GetDataStorage());
         m_Controls->m_Comp4VolumeFraction->SetDataStorage(this->GetDataStorage());
         m_Controls->m_MaskComboBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_TemplateComboBox->SetDataStorage(this->GetDataStorage());
@@ -380,6 +381,8 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         mitk::NodePredicateAnd::Pointer isBinaryMitkImage = mitk::NodePredicateAnd::New( isNonDiffMitkImage, isBinaryPredicate );
 
         m_Controls->m_FrequencyMapBox->SetPredicate(isNonDiffMitkImage);
+        m_Controls->m_Comp1VolumeFraction->SetPredicate(isNonDiffMitkImage);
+        m_Controls->m_Comp1VolumeFraction->SetZeroEntryText("--");
         m_Controls->m_Comp4VolumeFraction->SetPredicate(isNonDiffMitkImage);
         m_Controls->m_MaskComboBox->SetPredicate(isBinaryMitkImage);
         m_Controls->m_MaskComboBox->SetZeroEntryText("--");
@@ -762,6 +765,14 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment1.Model", StringProperty::New("Prototype") );
             break;
         }
+        }
+        if (m_Controls->m_Comp1VolumeFraction->GetSelectedNode().IsNotNull())
+        {
+            mitk::DataNode::Pointer volumeNode = m_Controls->m_Comp1VolumeFraction->GetSelectedNode();
+            ItkDoubleImgType::Pointer comp1VolumeImage = ItkDoubleImgType::New();
+            mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
+            CastToItkImage< ItkDoubleImgType >(img, comp1VolumeImage);
+            parameters.m_FiberModelList.back()->SetVolumeFractionImage(comp1VolumeImage);
         }
 
         // compartment 2

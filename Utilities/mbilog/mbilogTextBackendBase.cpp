@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mbilogTextBackendBase.h"
 #include "mbilogLoggingTypes.h"
-#include "mbilogTextDictionary.h"
 #include <ctime>
 #include <iostream>
 #include <iomanip>

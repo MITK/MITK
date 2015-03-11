@@ -382,7 +382,6 @@ if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
 endif()
 
 if(MITK_USE_Vigra)
-  link_directories(${Vigra_DIR}/../../lib ${Vigra_DIR}/lib)
   list(APPEND MITK_RUNTIME_PATH
        ${Vigra_DIR}/../../
        ${Vigra_DIR}

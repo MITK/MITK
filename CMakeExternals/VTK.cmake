@@ -17,6 +17,10 @@ set(proj VTK)
 set(proj_DEPENDENCIES )
 set(VTK_DEPENDS ${proj})
 
+if(MITK_USE_HDF5)
+  list(APPEND proj_DEPENDENCIES HDF5)
+endif()
+
 if(NOT DEFINED VTK_DIR)
 
   set(additional_cmake_args )
@@ -78,7 +82,6 @@ if(NOT DEFINED VTK_DIR)
 
   set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.1.0+74f4888.tar.gz)
   set(VTK_URL_MD5 1f19dae22c42c032109bd3cf91c4e8c9)
-
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}

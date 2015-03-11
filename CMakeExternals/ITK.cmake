@@ -14,6 +14,10 @@ if(MITK_USE_OpenCV)
   list(APPEND proj_DEPENDENCIES OpenCV)
 endif()
 
+if(MITK_USE_HDF5)
+  list(APPEND proj_DEPENDENCIES HDF5)
+endif()
+
 set(ITK_DEPENDS ${proj})
 
 if(NOT DEFINED ITK_DIR)

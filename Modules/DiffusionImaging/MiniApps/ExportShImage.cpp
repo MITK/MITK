@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 #include <itkShCoefficientImageExporter.h>
 #include <itkFlipImageFilter.h>
+#include <mitkIOUtil.h>
+#include <mitkITKImageImport.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -72,11 +74,14 @@ int StartShConversion(int argc, char* argv[])
         filter->GenerateData();
         OutImageType::Pointer outImage = filter->GetOutputImage();
 
-        typedef itk::ImageFileWriter< OutImageType > WriterType;
-        WriterType::Pointer writer = WriterType::New();
-        writer->SetFileName(outFile.c_str());
-        writer->SetInput(outImage);
-        writer->Update();
+        mitk::Image::Pointer image = mitk::GrabItkImageMemory(outImage.GetPointer());
+        mitk::IOUtil::Save(image, outFile );
+
+//        typedef itk::ImageFileWriter< OutImageType > WriterType;
+//        WriterType::Pointer writer = WriterType::New();
+//        writer->SetFileName(outFile.c_str());
+//        writer->SetInput(outImage);
+//        writer->Update();
     }
     catch (itk::ExceptionObject e)
     {

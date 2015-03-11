@@ -54,7 +54,7 @@ set(MODULE_TESTS
    # ------------------ Navigation Tool Management Tests -------------------
    mitkNavigationToolStorageTest.cpp
    mitkNavigationToolTest.cpp
-   mitkNavigationToolReaderAndWriterTest.cpp
+   #mitkNavigationToolReaderAndWriterTest.cpp #deactivated because of bug 18835
    # -----------------------------------------------------------------------
 )
 

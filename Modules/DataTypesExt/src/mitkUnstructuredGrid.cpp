@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::UnstructuredGrid::SetVtkUnstructuredGrid( vtkUnstructuredGrid* grid, unsigned int t )
 {
-  this->Expand(t);
+  this->Expand(t+1);
 
   if(m_GridSeries[ t ] != NULL)
   {

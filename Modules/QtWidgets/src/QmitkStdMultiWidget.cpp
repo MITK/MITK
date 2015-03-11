@@ -1626,7 +1626,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     std::stringstream _infoStringStream[3];
     std::string cornerimgtext[3];
     for(int i = 0; i < 3; i++) {
-      _infoStringStream[i] << "Im: " << p[i] << "/" << bounds[(i*2 + 1)];
+      _infoStringStream[i] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
       cornerimgtext[i] = _infoStringStream[i].str();
       setCornerAnnotation(2, i, cornerimgtext[i].c_str());
     }

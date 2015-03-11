@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageFileWriter.h>
-#include <boost/thread/thread.hpp>
+//#include <boost/thread/thread.hpp>
 
 #define _USE_MATH_DEFINES
 #include <math.h>

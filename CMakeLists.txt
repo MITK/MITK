@@ -73,6 +73,20 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 #-----------------------------------------------------------------------------
+# Check miminum Mac OS X version
+#-----------------------------------------------------------------------------
+# The minimum supported Mac OS X version is 10.9. If you use a version less than 10.9, there is no guarantee that the build still works.
+if(APPLE)
+  exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE osx_version)
+  if (osx_version VERSION_LESS "10.9")
+    message(WARNING "Detected OS X version \"${osx_version}\" is not supported anymore. Minimum required OS X version is 10.9 or greater.")
+  endif()
+  if (CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.9)
+    message(WARNING "Detected OS X deployment target \"${CMAKE_OSX_DEPLOYMENT_TARGET}\" is not supported anymore. Minimum required OS X version is 10.9 or greater.")
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # Check miminum compiler versions
 #-----------------------------------------------------------------------------
 

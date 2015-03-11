@@ -15,6 +15,13 @@ if(MITK_USE_ANN)
 
   if(NOT DEFINED ANN_DIR)
 
+    set(additional_args )
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     set(patch_cmd ${CMAKE_COMMAND} -Dproj:STRING=${proj} -Dproj_target:STRING=ann -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake)
 
     ExternalProject_Add(${proj}
@@ -25,6 +32,7 @@ if(MITK_USE_ANN)
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
          ${ep_common_args}
+         ${additional_args}
        DEPENDS ${proj_DEPENDENCIES}
       )
 

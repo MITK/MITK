@@ -15,6 +15,13 @@ set(${proj}_DEPENDS ${proj})
 
 if(NOT DEFINED Redland_DIR)
 
+  set(additional_cmake_args )
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_cmake_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
+
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/redland-1.0.17.tar.gz
@@ -23,6 +30,7 @@ if(NOT DEFINED Redland_DIR)
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
+       ${additional_cmake_args}
        -DWITH_THREADS:BOOL=OFF
      DEPENDS ${proj_DEPENDENCIES}
     )

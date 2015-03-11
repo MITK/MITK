@@ -80,6 +80,12 @@ if(NOT DEFINED VTK_DIR)
      )
   endif()
 
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_cmake_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
+
   set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.1.0+74f4888.tar.gz)
   set(VTK_URL_MD5 1f19dae22c42c032109bd3cf91c4e8c9)
 

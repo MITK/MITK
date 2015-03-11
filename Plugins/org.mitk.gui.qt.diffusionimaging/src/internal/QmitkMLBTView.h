@@ -14,20 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-
-#include <berryISelectionListener.h>
-#include <berryIStructuredSelection.h>
-
 #include <QmitkFunctionality.h>
 #include "ui_QmitkMLBTViewControls.h"
 
+#ifndef Q_MOC_RUN
 #include "mitkDataStorage.h"
 #include "mitkDataStorageSelection.h"
 #include <mitkTrackingForestHandler.h>
+#include <itkMLBSTrackingFilter.h>
+#endif
+
 #include <QtConcurrentRun>
 #include <QFutureWatcher>
-#include <itkMLBSTrackingFilter.h>
 #include <QTimer>
 
 /*!

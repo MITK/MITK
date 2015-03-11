@@ -23,10 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkWeakPointer.h>
 #include <vtkSmartPointer.h>
 
-class vtkActor;
+class vtkActor2D;
 class vtkPropAssembly;
 class vtkFloatArray;
 class vtkCellArray;
+class vtkPolyDataMapper2D;
 
 namespace mitk {
 
@@ -79,9 +80,11 @@ public:
     ~LocalStorage();
 
     // actor
-    vtkSmartPointer<vtkActor> m_CrosshairActor;
-    vtkSmartPointer<vtkActor> m_CrosshairHelperLineActor;
+    vtkSmartPointer<vtkActor2D> m_CrosshairActor;
+    vtkSmartPointer<vtkActor2D> m_CrosshairHelperLineActor;
     vtkSmartPointer<vtkPropAssembly> m_CrosshairAssembly;
+    vtkSmartPointer<vtkPolyDataMapper2D> m_HelperLinesmapper;
+    vtkSmartPointer<vtkPolyDataMapper2D> m_Mapper;
   };
 
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
@@ -128,6 +131,7 @@ protected:
   bool m_ArrowOrientationPositive;
   mitk::ScalarType m_DepthValue;
 
+  void ApplyColorAndOpacityProperties2D(BaseRenderer *renderer, vtkActor2D *actor);
 };
 } // namespace mitk
 #endif /* mitkPlaneGeometryDataMapper2D_h */

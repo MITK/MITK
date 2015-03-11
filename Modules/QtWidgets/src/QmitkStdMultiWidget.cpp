@@ -1646,7 +1646,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       imageProperties->GetStringProperty("dicom.study.StudyDate", studyDate);
       imageProperties->GetStringProperty("dicom.study.StudyTime", studyTime);
       
-      std::stringstream infoStringStream[3];
+      std::stringstream infoStringStream[2];
 
       char yy[5]; yy[4] = 0;
       char mm[3]; mm[2] = 0;

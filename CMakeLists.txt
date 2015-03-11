@@ -381,13 +381,6 @@ if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
   set(MITK_USE_CppUnit ON CACHE BOOL "Use CppUnit for unit tests" FORCE)
 endif()
 
-if(MITK_USE_Vigra)
-  list(APPEND MITK_RUNTIME_PATH
-       ${Vigra_DIR}/../../
-       ${Vigra_DIR}
-      )
-endif()
-
 # -----------------------------------------
 # Other MITK_USE_* options not related to
 # external projects build via the

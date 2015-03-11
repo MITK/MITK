@@ -85,6 +85,8 @@ namespace mitk
           m_TimeSelector->SetTimeNr( m_CurrentTimeStep );
           m_TimeSelector->SetChannelNr( 0 );
           m_TimeSelector->Update();
+
+          this->ReinitializeInterpolation();
         }
       }
     };

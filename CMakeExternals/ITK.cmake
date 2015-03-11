@@ -51,7 +51,7 @@ if(NOT DEFINED ITK_DIR)
   set(vcl_constexpr_patch)
   if(GCC_VERSION VERSION_LESS 4.7 AND GCC_VERSION VERSION_GREATER 4)
     set(vcl_constexpr_patch
-      COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.5.1-gcc-4.6.patch
+      COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.7777777.1-gcc-4.6.patch
     )
   endif()
 
@@ -60,7 +60,7 @@ if(NOT DEFINED ITK_DIR)
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.7.1-20c0592.tar.gz
      URL_MD5 f778a5f0e297c06dc629c33ec45733dc
      # work with external GDCM
-     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.5.1.patch
+     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.7.1.patch
                    ${vcl_constexpr_patch}
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS

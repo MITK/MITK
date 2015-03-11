@@ -60,6 +60,12 @@ if(MITK_USE_OpenCV)
           )
     endif()
 
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_cmake_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenCV-2.4.11.tar.gz)
     set(opencv_url_md5 54fe3dba49ea276ec0228f8819e653bc)
 

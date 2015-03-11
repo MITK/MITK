@@ -48,6 +48,12 @@ if(NOT DEFINED ITK_DIR)
     -DModule_ITKOpenJPEG:BOOL=ON
   )
 
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_cmake_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
+
   set(vcl_constexpr_patch)
   if(GCC_VERSION VERSION_LESS 4.7 AND GCC_VERSION VERSION_GREATER 4)
     set(vcl_constexpr_patch

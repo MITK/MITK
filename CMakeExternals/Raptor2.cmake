@@ -15,6 +15,13 @@ set(${proj}_DEPENDS ${proj})
 
 if(NOT DEFINED Raptor2_DIR)
 
+  set(additional_cmake_args )
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_cmake_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
+
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/raptor2-2.0.15.tar.gz
@@ -23,6 +30,7 @@ if(NOT DEFINED Raptor2_DIR)
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
+       ${additional_cmake_args}
        -DRAPTOR_ENABLE_TESTING:BOOL=OFF
        -DRAPTOR_PARSER_GRDDL:BOOL=OFF
        -DRAPTOR_PARSER_GUESS:BOOL=OFF

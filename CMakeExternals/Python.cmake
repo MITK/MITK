@@ -110,6 +110,12 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         -DUSE_SYSTEM_ZLIB:BOOL=ON
         )
 
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_cmake_cache_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     # CMake build environment for python from:
     # https://github.com/davidsansome/python-cmake-buildsystem
     ExternalProject_Add(${proj}

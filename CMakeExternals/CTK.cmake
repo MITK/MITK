@@ -54,6 +54,12 @@ if(MITK_USE_CTK)
           )
     endif()
 
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND ctk_optional_cache_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     set (ctk_qt_args -DCTK_QT_VERSION:STRING=${DESIRED_QT_VERSION})
 
     if (DESIRED_QT_VERSION MATCHES "4")

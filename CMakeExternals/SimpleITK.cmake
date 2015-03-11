@@ -45,6 +45,12 @@ if(MITK_USE_SimpleITK)
       endif()
     endif()
 
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_cmake_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     #TODO: Installer and testing works only with static libs on MAC
     set(_build_shared ON)
     if(APPLE)

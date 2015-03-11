@@ -26,9 +26,18 @@ if(MITK_USE_PCRE)
         --enable-jit
       )
     else()
+
+      set(additional_cmake_args )
+      if(CTEST_USE_LAUNCHERS)
+        list(APPEND additional_cmake_args
+          "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+        )
+      endif()
+
       set(configure_cmd
         CMAKE_ARGS
           ${ep_common_args}
+          ${additional_cmake_args}
          "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS} -fPIC"
          -DBUILD_SHARED_LIBS:BOOL=OFF
          -DPCRE_BUILD_PCREGREP:BOOL=OFF

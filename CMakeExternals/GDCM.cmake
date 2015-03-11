@@ -23,6 +23,13 @@ set(GDCM_DEPENDS ${proj})
 
 if(NOT DEFINED GDCM_DIR)
 
+  set(additional_args )
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
+
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/gdcm-2.4.1.tar.bz2
@@ -31,6 +38,7 @@ if(NOT DEFINED GDCM_DIR)
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
+       ${additional_args}
        -DGDCM_BUILD_SHARED_LIBS:BOOL=ON
      DEPENDS ${proj_DEPENDENCIES}
     )

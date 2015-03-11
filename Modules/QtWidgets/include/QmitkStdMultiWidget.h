@@ -145,11 +145,12 @@ protected:
 
   mitk::PropertyList::Pointer imageProperties;
   unsigned long imageMTime;
-  vtkCornerAnnotation* cornerText;
-  vtkTextProperty* textProp;
-  vtkRenderer* ren;
 
-  void setCornerAnnotation(int corner, const char* text);
+  vtkCornerAnnotation* cornerText[4];
+  vtkTextProperty* textProp[4];
+  vtkRenderer* ren[4];
+
+  void setCornerAnnotation(int corner, int i, const char* text);
   bool getDisplayMetaInfo();
 
   mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);

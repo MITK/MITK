@@ -28,7 +28,6 @@ set(INTERNAL_CPP_FILES
   QmitkStochasticFiberTrackingView.cpp
   QmitkStreamlineTrackingView.cpp
   QmitkFiberQuantificationView.cpp
-#  QmitkFiberBundleDeveloperView.cpp
   QmitkPartialVolumeAnalysisView.cpp
   QmitkIVIMView.cpp
   QmitkTractbasedSpatialStatisticsView.cpp
@@ -47,6 +46,7 @@ set(INTERNAL_CPP_FILES
   QmitkFieldmapGeneratorView.cpp
   QmitkDiffusionRegistrationView.cpp
   QmitkDenoisingView.cpp
+  QmitkMLBTView.cpp
 
   Perspectives/QmitkFiberProcessingPerspective.cpp
   Perspectives/QmitkDiffusionImagingAppPerspective.cpp
@@ -93,6 +93,7 @@ set(UI_FILES
   src/internal/QmitkFieldmapGeneratorViewControls.ui
   src/internal/QmitkDiffusionRegistrationViewControls.ui
   src/internal/QmitkDenoisingViewControls.ui
+  src/internal/QmitkMLBTViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -138,6 +139,7 @@ set(MOC_H_FILES
   src/internal/QmitkFieldmapGeneratorView.h
   src/internal/QmitkDiffusionRegistrationView.h
   src/internal/QmitkDenoisingView.h
+  src/internal/QmitkMLBTView.h
 
   src/internal/Perspectives/QmitkFiberProcessingPerspective.h
   src/internal/Perspectives/QmitkDiffusionImagingAppPerspective.h
@@ -188,6 +190,7 @@ set(CACHED_RESOURCE_FILES
   resources/syntheticdata.png
   resources/ivim.png
   resources/tractography.png
+  resources/fiberTracking1.png
  )
 
 set(QRC_FILES

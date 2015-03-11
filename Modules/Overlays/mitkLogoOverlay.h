@@ -66,7 +66,8 @@ public:
  0 = Bottom left
  1 = Bottom right
  2 = Top right
- 3 = Top left*/
+ 3 = Top left
+ 4 = Center*/
   void SetCornerPosition(const int& corner, BaseRenderer* renderer = NULL);
   int GetCornerPosition(mitk::BaseRenderer* renderer = NULL) const;
 

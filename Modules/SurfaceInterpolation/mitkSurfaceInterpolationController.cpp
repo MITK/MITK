@@ -668,14 +668,21 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation()
     m_InterpolateSurfaceFilter->SetReferenceImage(itkImage.GetPointer());
 
     unsigned int numTimeSteps = m_SelectedSegmentation->GetTimeSteps();
-    m_ListOfInterpolationSessions[m_SelectedSegmentation].resize( numTimeSteps );
+    unsigned int size = m_ListOfInterpolationSessions[m_SelectedSegmentation].size();
+    if ( size != numTimeSteps )
+    {
+      m_ListOfInterpolationSessions[m_SelectedSegmentation].resize( numTimeSteps );
+    }
+
     /*for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
     {*/
-      unsigned int numContours = m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].size();
-      for ( unsigned int c = 0; c < numContours; ++c )
-      {
-        m_ReduceFilter->SetInput(c, m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour);
-      }
+
+    unsigned int numContours = m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].size();
+    for ( unsigned int c = 0; c < numContours; ++c )
+    {
+      m_ReduceFilter->SetInput(c, m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour);
+    }
+
     //}
 
     m_ReduceFilter->Update();

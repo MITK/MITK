@@ -119,6 +119,8 @@ protected:
 
   bool EndHovering( StateMachineAction*, InteractionEvent* interactionEvent );
 
+  bool DeleteFigure( StateMachineAction*, InteractionEvent* interactionEvent );
+
   bool SetPreviewPointPosition( StateMachineAction*, InteractionEvent* interactionEvent );
 
   bool HidePreviewPoint( StateMachineAction*, InteractionEvent* interactionEvent );

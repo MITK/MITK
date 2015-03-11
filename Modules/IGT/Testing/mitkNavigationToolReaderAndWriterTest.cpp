@@ -69,7 +69,7 @@ static void TestWrite()
 
   //now create a writer and write it to the harddisc
   mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
-  std::string filename = "TestTool.tool";
+  std::string filename = mitk::IOUtil::GetTempPath() + "TestTool.tool";
 
   MITK_TEST_OUTPUT(<<"---- Testing navigation tool writer with first test tool (claron tool) ----");
   bool test = myWriter->DoWrite(filename,myNavigationTool);
@@ -79,7 +79,8 @@ static void TestWrite()
 static void TestRead()
 {
   mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
-  mitk::NavigationTool::Pointer readTool = myReader->DoRead("TestTool.tool");
+  std::string filename = mitk::IOUtil::GetTempPath() + "TestTool.tool";
+  mitk::NavigationTool::Pointer readTool = myReader->DoRead(filename);
   MITK_TEST_OUTPUT(<<"---- Testing navigation tool reader with first test tool (claron tool) ----");
 
   //Test if the surfaces do have the same number of vertexes (it would be better to test for real equality of the surfaces!)
@@ -118,7 +119,7 @@ static void TestWrite2()
 
   //now create a writer and write it to the harddisc
   mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
-  std::string filename = "TestTool2.tool";
+  std::string filename = mitk::IOUtil::GetTempPath() + "TestTool2.tool";
 
   MITK_TEST_OUTPUT(<<"---- Testing navigation tool writer with second tool (aurora tool) ----");
   bool test = myWriter->DoWrite(filename,myNavigationTool);
@@ -128,7 +129,8 @@ static void TestWrite2()
 static void TestRead2()
 {
   mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
-  mitk::NavigationTool::Pointer readTool = myReader->DoRead("TestTool2.tool");
+  std::string filename = mitk::IOUtil::GetTempPath() + "TestTool2.tool";
+  mitk::NavigationTool::Pointer readTool = myReader->DoRead(filename);
   MITK_TEST_OUTPUT(<<"---- Testing navigation tool reader  with second tool (aurora tool) ----");
 
   //Test if the surfaces do have the same number of vertexes (it would be better to test for real equality of the surfaces!)
@@ -147,8 +149,10 @@ static void TestRead2()
 
 static void CleanUp()
 {
-  std::remove("TestTool.tool");
-  std::remove("TestTool2.tool");
+  std::string tempFile1 = mitk::IOUtil::GetTempPath() + "TestTool.tool";
+  std::remove(tempFile1.c_str());
+  std::string tempFile2 = mitk::IOUtil::GetTempPath() + "TestTool2.tool";
+  std::remove(tempFile2.c_str());
 }
 
 static void TestReadInvalidData()

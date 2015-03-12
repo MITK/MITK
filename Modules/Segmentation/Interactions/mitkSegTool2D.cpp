@@ -181,7 +181,7 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation (const Image* slice, const Imag
   timeSelector->Update();
   Image::Pointer dimRefImg = timeSelector->GetOutput();
 
-  if (contour->GetVtkPolyData()->GetNumberOfPoints() != 0 && dimRefImg->GetDimension() == 3)//dimension to be changed
+  if (contour->GetVtkPolyData()->GetNumberOfPoints() != 0 && dimRefImg->GetDimension() == 3)
   {
     mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour );
     contour->DisconnectPipeline();

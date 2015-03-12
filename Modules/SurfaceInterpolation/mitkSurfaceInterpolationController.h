@@ -108,7 +108,7 @@ namespace mitk
      * @param contourInfo the contour which should be removed
      * @return true if a contour was found and removed, false if no contour was found
      */
-    bool RemoveContour (ContourPositionInformation contourInfo, unsigned int ts = 0);
+    bool RemoveContour (ContourPositionInformation contourInfo );
 
     /**
      * @brief Adds new extracted contours to the list. If one or more contours at a given position
@@ -122,13 +122,13 @@ namespace mitk
     * @param ontourInfo the contour which should be returned
     * @return the contour as an mitk::Surface. If no contour is available at the give position NULL is returned
     */
-    const mitk::Surface* GetContour (ContourPositionInformation contourInfo, unsigned int ts = 0);
+    const mitk::Surface* GetContour (ContourPositionInformation contourInfo );
 
     /**
     * @brief Returns the number of available contours for the current selected segmentation
     * @return the number of contours
     */
-    unsigned int GetNumberOfContours( unsigned int ts = 0 );
+    unsigned int GetNumberOfContours();
 
     /**
      * Interpolates the 3D surface from the given extracted contours
@@ -236,7 +236,7 @@ namespace mitk
 
    void ReinitializeInterpolation();
 
-   void AddToInterpolationPipeline(ContourPositionInformation contourInfo, unsigned int ts = 0);
+   void AddToInterpolationPipeline(ContourPositionInformation contourInfo );
 
     ReduceContourSetFilter::Pointer m_ReduceFilter;
     ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;

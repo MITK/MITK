@@ -150,7 +150,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
   m_InterpolatedSurfaceNode->SetProperty( "line width", mitk::IntProperty::New(4) );
   m_InterpolatedSurfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
-  //m_InterpolatedSurfaceNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
+  m_InterpolatedSurfaceNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
   m_InterpolatedSurfaceNode->SetVisibility(false);
 
   m_3DContourNode = mitk::DataNode::New();
@@ -898,9 +898,6 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 
 void QmitkSlicesInterpolator::Run3DInterpolation()
 {
-  /*GetRenderWindowPart();
-  mitk::SliceNavigationController* navController = m_TimeStep.
-  mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator->GetInstance()*/
   m_SurfaceInterpolator->Interpolate();
 }
 

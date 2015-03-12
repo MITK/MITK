@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkSegmentation_EXPORT FeatureBasedEdgeDetectionFilter:
+class MITKSEGMENTATION_EXPORT FeatureBasedEdgeDetectionFilter:
     public ImageToUnstructuredGridFilter
 {
 
@@ -37,6 +37,13 @@ public:
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
+
+  itkGetMacro(EdgeImage,mitk::Image::Pointer)
+  itkGetMacro(EdgePoints,mitk::Image::Pointer)
+  itkGetMacro(SegmentationMask, mitk::Image::Pointer)
+  itkGetMacro(thresholdImage, mitk::Image::Pointer)
+  itkGetMacro(morphThreshold, mitk::Image::Pointer)
+  itkGetMacro(MaskedImage, mitk::Image::Pointer)
 
   void SetSegmentationMask(mitk::Image::Pointer);
 
@@ -58,6 +65,11 @@ private:
   mitk::UnstructuredGrid::Pointer m_PointGrid;
   mitk::Image::Pointer m_SegmentationMask;
   mitk::Image::Pointer m_thresholdImage;
+  mitk::Image::Pointer m_morphThreshold;
+  mitk::Image::Pointer m_MaskedImage;
+
+  mitk::Image::Pointer m_EdgeImage;
+  mitk::Image::Pointer m_EdgePoints;
 
 };
 

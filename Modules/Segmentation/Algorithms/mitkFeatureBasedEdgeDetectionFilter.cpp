@@ -32,6 +32,10 @@ mitk::FeatureBasedEdgeDetectionFilter::FeatureBasedEdgeDetectionFilter()
   m_PointGrid = mitk::UnstructuredGrid::New();
   m_SegmentationMask = mitk::Image::New();
   m_thresholdImage = mitk::Image::New();
+  m_morphThreshold = mitk::Image::New();
+  m_EdgeImage = mitk::Image::New();
+  m_EdgePoints = mitk::Image::New();
+  m_MaskedImage = mitk::Image::New();
 
   this->SetNumberOfRequiredInputs(1);
   this->SetNumberOfRequiredOutputs(1);
@@ -68,13 +72,18 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   //thresholding
   AccessByItk_2(ncImage.GetPointer(), ITKThresholding, lowerThreshold, upperThreshold)
 
+  m_morphThreshold = m_thresholdImage->Clone();
+
   //fill holes
-  mitk::MorphologicalOperations::FillHoles(m_thresholdImage);
+  mitk::MorphologicalOperations::FillHoles(m_morphThreshold);
+
+//  mitk::MorphologicalOperations::Closing(m_morphThreshold,1,mitk::MorphologicalOperations::Ball);
+//  mitk::MorphologicalOperations::Opening(m_morphThreshold,1,mitk::MorphologicalOperations::Ball);
 
   //masking
   mitk::MaskImageFilter::Pointer maskFilter = mitk::MaskImageFilter::New();
   maskFilter->SetInput(image);
-  maskFilter->SetMask(m_thresholdImage);
+  maskFilter->SetMask(m_morphThreshold);
   maskFilter->OverrideOutsideValueOn();
   maskFilter->SetOutsideValue(0);
   try
@@ -87,6 +96,7 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
     return;
   }
 
+  m_MaskedImage = maskFilter->GetOutput()->Clone();
   mitk::Image::Pointer resultImage = maskFilter->GetOutput();
 
   //imagetopointcloudfilter
@@ -94,7 +104,10 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   pclFilter->SetInput(resultImage);
   pclFilter->Update();
 
-  m_PointGrid = pclFilter->GetOutput();
+  m_EdgeImage = pclFilter->GetEdgeImage();
+  m_EdgePoints = pclFilter->GetEdgePoints();
+
+  m_PointGrid->SetVtkUnstructuredGrid( pclFilter->GetOutput()->GetVtkUnstructuredGrid() );
 }
 
 template <typename TPixel, unsigned int VImageDimension>

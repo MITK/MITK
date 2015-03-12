@@ -33,7 +33,7 @@ mitk::ImageToPointCloudFilter::ImageToPointCloudFilter():
   m_NumberOfExtractedPoints(0)
 {
   m_PointGrid = mitk::UnstructuredGrid::New();
-  m_Method = DetectConstant(0);
+  m_Method = DetectConstant(1);
   m_EdgeImage = mitk::Image::New();
   m_EdgePoints = mitk::Image::New();
 
@@ -67,8 +67,12 @@ void mitk::ImageToPointCloudFilter::GenerateData()
     this->LaplacianStdDev(image, 3);
     break;
 
+  case 2:
+    this->LaplacianStdDev(image, 4);
+    break;
+
   default:
-    this->LaplacianStdDev(image, 2);
+    this->LaplacianStdDev(image, 3);
     break;
   }
 }

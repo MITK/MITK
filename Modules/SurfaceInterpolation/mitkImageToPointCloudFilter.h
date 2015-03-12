@@ -27,15 +27,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-enum MitkSurfaceInterpolation_EXPORT DetectConstant
+enum MITKSURFACEINTERPOLATION_EXPORT DetectConstant
 {
-  LAPLACIAN_STD_DEV2,
-  LAPLACIAN_STD_DEV3,
-  CANNY_EDGE,
-  THRESHOLD
+  LAPLACIAN_STD_DEV2 = 0,
+  LAPLACIAN_STD_DEV3 = 1,
+  LAPLACIAN_STD_DEV4 = 2
 };
 
-class MitkSurfaceInterpolation_EXPORT ImageToPointCloudFilter:
+class MITKSURFACEINTERPOLATION_EXPORT ImageToPointCloudFilter:
     public ImageToUnstructuredGridFilter
 {
 

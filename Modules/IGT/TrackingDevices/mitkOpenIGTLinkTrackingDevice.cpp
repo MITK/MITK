@@ -68,6 +68,11 @@ void mitk::OpenIGTLinkTrackingDevice::SetHostname(std::string hostname)
   m_OpenIGTLinkClient->SetHostname(hostname);
 }
 
+bool mitk::OpenIGTLinkTrackingDevice::IsDeviceInstalled()
+{
+  return true;
+}
+
 mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::AddTool( const char* toolName, const char* fileName )
 {
   mitk::OpenIGTLinkTrackingTool::Pointer t;// = mitk::OpenIGTLinkTrackingTool::New();
@@ -189,7 +194,7 @@ void mitk::OpenIGTLinkTrackingDevice::UpdateTools()
     mitk::Point3D pos;
     m_AllTools.at(i)->GetPosition(pos);
 
-    MITK_INFO << "Updated Tool " << i << " Pos: " << pos;
+    //MITK_INFO << "Updated Tool " << i << " Pos: " << pos;
   }
 
 }

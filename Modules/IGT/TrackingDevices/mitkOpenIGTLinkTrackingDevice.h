@@ -108,6 +108,8 @@ namespace mitk
     */
     mitk::TrackingTool* AddTool(const char* toolName, const char* fileName);
 
+    bool IsDeviceInstalled();
+
   protected:
     OpenIGTLinkTrackingDevice();
     ~OpenIGTLinkTrackingDevice();

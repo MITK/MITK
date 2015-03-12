@@ -508,7 +508,7 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_5">
+        <widget class="QGroupBox" name="m_OtherOptionsGroupBox">
          <property name="title">
           <string>Other Options</string>
          </property>

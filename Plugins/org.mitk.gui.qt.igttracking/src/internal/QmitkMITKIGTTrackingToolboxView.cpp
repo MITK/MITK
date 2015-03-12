@@ -1007,7 +1007,6 @@ void QmitkMITKIGTTrackingToolboxView::EnableLoggingButtons()
 void QmitkMITKIGTTrackingToolboxView::DisableOptionsButtons()
 {
   m_Controls->m_ShowTrackingVolume->setEnabled(false);
-  m_Controls->m_ShowToolQuaternions->setEnabled(false);
   m_Controls->m_UseDifferentUpdateRates->setEnabled(false);
   m_Controls->m_UpdateRate->setEnabled(false);
   m_Controls->m_OptionsUpdateRateLabel->setEnabled(false);
@@ -1015,13 +1014,14 @@ void QmitkMITKIGTTrackingToolboxView::DisableOptionsButtons()
   m_Controls->m_OptionsRenderUpdateRateLabel->setEnabled(false);
   m_Controls->m_LogUpdateRate->setEnabled(false);
   m_Controls->m_OptionsLogUpdateRateLabel->setEnabled(false);
+  m_Controls->m_OtherOptionsGroupBox->setEnabled(false);
 }
 
 void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
 {
   m_Controls->m_ShowTrackingVolume->setEnabled(true);
-  m_Controls->m_ShowToolQuaternions->setEnabled(true);
   m_Controls->m_UseDifferentUpdateRates->setEnabled(true);
+  m_Controls->m_OtherOptionsGroupBox->setEnabled(true);
   OnToggleDifferentUpdateRates();
 }
 

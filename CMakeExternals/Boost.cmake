@@ -20,7 +20,7 @@ if(MITK_USE_Boost)
     set(_boost_version 1_56)
     set(_boost_install_include_dir include/boost)
     if(WIN32)
-      set(_boost_install_include_dir include/boost-${_boost_version})
+      set(_boost_install_include_dir include/boost-${_boost_version}/boost)
     endif()
 
     set(_boost_libs )

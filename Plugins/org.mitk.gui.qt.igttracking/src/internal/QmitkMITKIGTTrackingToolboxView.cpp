@@ -443,6 +443,24 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   if (m_Controls->m_ShowToolQuaternions->isChecked()) {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(true);}
   else {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(false);}
 
+  //if activated enable open IGT link microservice
+  if (m_Controls->m_EnableOpenIGTLinkMicroService->isChecked())
+    {
+    //create convertion filter
+    m_IGTLConversionFilter =  mitk::NavigationDataToIGTLMessageFilter::New();
+    m_IGTLConversionFilter->SetName("IGT Tracking Toolbox");
+    m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);
+    m_IGTLConversionFilter->ConnectTo(m_ToolVisualizationFilter);
+    m_IGTLConversionFilter->RegisterAsMicroservice();
+
+    //create server and message provider
+    m_IGTLServer = mitk::IGTLServer::New();
+    m_IGTLServer->SetName("Tracking Toolbox IGTL Server");
+    m_IGTLMessageProvider = mitk::IGTLMessageProvider::New();
+    m_IGTLMessageProvider->SetIGTLDevice(m_IGTLServer);
+    m_IGTLMessageProvider->RegisterAsMicroservice();
+    }
+
   //show tracking volume
   this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
 
@@ -483,6 +501,13 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTrackingFinished(bool success, QStri
   m_tracking = false;
   m_Controls->m_StartStopTrackingButton->setText("Start Tracking");
   m_Controls->m_ConnectDisconnectButton->setEnabled(true);
+
+  //unregister open IGT link micro service
+  if (m_Controls->m_EnableOpenIGTLinkMicroService->isChecked())
+    {
+    m_IGTLConversionFilter->UnRegisterMicroservice();
+    m_IGTLMessageProvider->UnRegisterMicroservice();
+    }
 
   this->GlobalReinit();
 }

@@ -208,9 +208,9 @@ macro(finalize_submission)
 
 endmacro()
 
-macro(check_for_errors target)
+macro(check_for_errors)
 
-  set(_curr_target ${target})
+  set(_curr_target ${ARGV0})
   if(build_errors AND _curr_target)
     # try to remove the stamp file for external projects
     set(_stamp_file "${CTEST_BINARY_DIRECTORY}/ep/src/${_curr_target}-stamp/${_curr_target}-configure")

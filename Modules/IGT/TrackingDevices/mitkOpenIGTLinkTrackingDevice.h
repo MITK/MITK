@@ -91,10 +91,11 @@ namespace mitk
     /**
     * \brief Discover the tools available from the connected OpenIGTLink device and adds these tools to this tracking device. Therefore, a connection
     *        is opened, the tools are discovered and added.
+    * \param WaitingTime Defines how long the method waits for an answer from the server (in milliseconds). Default value is 2000 (2 seconds).
     * \return Returns true if the connection was established and the tools were discovered successfully and - if at least one tool was found - were added to this device.
     *         Retruns false if no valid connection is available.
     */
-    bool DiscoverTools();
+    bool DiscoverTools(int WaitingTime = 2000);
 
 
     /**

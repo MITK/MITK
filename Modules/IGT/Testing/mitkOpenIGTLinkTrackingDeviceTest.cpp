@@ -67,6 +67,10 @@ public:
   m_OpenIGTLinkTrackingDevice->SetPortNumber(10);
   CPPUNIT_ASSERT_MESSAGE("Testing DiscoverTools() with initialization, but without existing server. (Warnings are expected)", m_OpenIGTLinkTrackingDevice->DiscoverTools()==false);
 
+  m_OpenIGTLinkTrackingDevice->SetHostname("193.174.50.103");
+  m_OpenIGTLinkTrackingDevice->SetPortNumber(18944);
+  m_OpenIGTLinkTrackingDevice->DiscoverTools();
+
   }
 
 };

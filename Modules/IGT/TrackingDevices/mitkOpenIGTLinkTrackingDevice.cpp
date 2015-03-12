@@ -87,7 +87,7 @@ bool mitk::OpenIGTLinkTrackingDevice::InternalAddTool(OpenIGTLinkTrackingTool::P
 }
 
 
-bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools()
+bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int WaitingTime)
 {
   if (m_OpenIGTLinkClient->GetPortNumber() == -1)
     {
@@ -98,6 +98,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools()
   try
     {
     m_IGTLDeviceSource->Connect();
+    m_IGTLDeviceSource->StartCommunication();
     }
   catch(std::runtime_error &e)
     {
@@ -110,7 +111,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools()
   std::string message = "STT_TDATA";
   m_OpenIGTLinkClient->SendMessage(msgFactory->CreateInstance(message));
 
-  Sleep(500); //wait for data to arrive
+  Sleep(WaitingTime); //wait for data to arrive
   m_IGTLDeviceSource->Update();
 
   //check the tracking stream for the number and type of tools
@@ -121,7 +122,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools()
     MITK_WARN << "No message was received. Is there really a server?";
     return false;
     }
-  else if (receivedMessage->IsDataValid())
+  else if (!receivedMessage->IsDataValid())
     {
     MITK_WARN << "Received invalid message.";
     return false;
@@ -131,7 +132,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools()
 
   if( !(strcmp(msgType,"TDATA") == 0) )
     {
-    MITK_INFO << "Server does not send tracking data (received data is not of the type TDATA)";
+    MITK_INFO << "Server does not send tracking data. Received data is not of the type TDATA. Received type: " << msgType;
     return true;
     }
 

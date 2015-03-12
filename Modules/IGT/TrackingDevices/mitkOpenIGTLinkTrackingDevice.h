@@ -38,7 +38,6 @@ namespace mitk
   class MitkIGT_EXPORT OpenIGTLinkTrackingDevice : public TrackingDevice
   {
   public:
-    friend class OpenIGTLinkTrackingTrackingTool;
     mitkClassMacro(OpenIGTLinkTrackingDevice, TrackingDevice);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

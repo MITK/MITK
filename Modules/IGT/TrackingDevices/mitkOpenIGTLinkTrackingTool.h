@@ -35,9 +35,9 @@ namespace mitk
     friend class OpenIGTLinkTrackingTrackingDevice;
     mitkClassMacro(OpenIGTLinkTrackingTool, InternalTrackingTool);
 
-
-  protected:
     itkFactorylessNewMacro(Self)
+  protected:
+
     itkCloneMacro(Self)
     OpenIGTLinkTrackingTool();
     virtual ~OpenIGTLinkTrackingTool();

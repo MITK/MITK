@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <iostream>
 #include <itkMutexLockHolder.h>
+#include <igtlTrackingDataMessage.h>
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
@@ -104,10 +105,63 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools()
     return false;
     }
 
+  //send a message to the server: start tracking stream
+  mitk::IGTLMessageFactory::Pointer msgFactory = m_OpenIGTLinkClient->GetMessageFactory();
+  std::string message = "STT_TDATA";
+  m_OpenIGTLinkClient->SendMessage(msgFactory->CreateInstance(message));
+
+  Sleep(500); //wait for data to arrive
+  m_IGTLDeviceSource->Update();
+
+  //check the tracking stream for the number and type of tools
+  //igtl::MessageBase::Pointer receivedMessage = m_OpenIGTLinkClient->GetNextMessage();
+  mitk::IGTLMessage::Pointer receivedMessage = m_IGTLDeviceSource->GetOutput();
+  if (receivedMessage.IsNull())
+    {
+    MITK_WARN << "No message was received. Is there really a server?";
+    return false;
+    }
+  else if (receivedMessage->IsDataValid())
+    {
+    MITK_WARN << "Received invalid message.";
+    return false;
+    }
+
+  const char* msgType = receivedMessage->GetIGTLMessageType();
+
+  if( !(strcmp(msgType,"TDATA") == 0) )
+    {
+    MITK_INFO << "Server does not send tracking data (received data is not of the type TDATA)";
+    return true;
+    }
 
 
+  igtl::TrackingDataMessage* tdMsg = (igtl::TrackingDataMessage*)(receivedMessage->GetMessage().GetPointer());
 
-  //TODO: Implement
+  if(!tdMsg)
+    {
+     MITK_WARN << "Cannot cast message object as expected, aborting!";
+     return false;
+    }
+
+  int numberOfTools = tdMsg->GetNumberOfTrackingDataElements();
+  MITK_INFO << "Found " << numberOfTools << " tools";
+  for(int i=0; i<numberOfTools; i++)
+    {
+    mitk::OpenIGTLinkTrackingTool::Pointer newTool = mitk::OpenIGTLinkTrackingTool::New();
+    igtl::TrackingDataElement::Pointer currentTrackingData;
+    tdMsg->GetTrackingDataElement(i,currentTrackingData);
+    std::string name = currentTrackingData->GetName();
+    if (name == "") //if no name was given create a default name
+      {
+      std::stringstream defaultName;
+      defaultName << "OpenIGTLinkTool#" << i;
+      name = defaultName.str();
+      }
+    MITK_INFO << "Added tool " << name << " to tracking device.";
+    newTool->SetToolName(name);
+    this->InternalAddTool(newTool);
+    }
 
   return true;
 }

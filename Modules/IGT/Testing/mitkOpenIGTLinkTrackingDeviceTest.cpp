@@ -27,6 +27,7 @@ class mitkOpenIGTLinkTrackingDeviceTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkOpenIGTLinkTrackingDeviceTestSuite);
   MITK_TEST(TestInstantiation);
   MITK_TEST(TestSetConnectionParameters);
+  MITK_TEST(TestDiscoverToolMethod);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -58,6 +59,14 @@ public:
     m_OpenIGTLinkTrackingDevice->SetPortNumber(10);
     CPPUNIT_ASSERT_MESSAGE("Testing method SetHostname() ...", m_OpenIGTLinkTrackingDevice->GetHostname()=="localhost");
     CPPUNIT_ASSERT_MESSAGE("Testing method SetPort() ...", m_OpenIGTLinkTrackingDevice->GetPortNumber()==10);
+  }
+
+  void TestDiscoverToolMethod()
+  {
+  CPPUNIT_ASSERT_MESSAGE("Testing DiscoverTools() without initialization. (Warnings are expected)", m_OpenIGTLinkTrackingDevice->DiscoverTools()==false);
+  m_OpenIGTLinkTrackingDevice->SetPortNumber(10);
+  CPPUNIT_ASSERT_MESSAGE("Testing DiscoverTools() with initialization, but without existing server. (Warnings are expected)", m_OpenIGTLinkTrackingDevice->DiscoverTools()==false);
+
   }
 
 };

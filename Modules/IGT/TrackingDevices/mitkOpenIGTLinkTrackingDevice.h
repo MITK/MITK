@@ -43,8 +43,10 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
+    /** Sets the port number for the Open IGT Link connection. Default value is -1 (invalid). */
     void SetPortNumber(int portNumber);
 
+    /** Sets the hostname for the Open IGT Link connection. Default value is 127.0.0.1 (localhost). */
     void mitk::OpenIGTLinkTrackingDevice::SetHostname(std::string hostname);
 
     int GetPortNumber();
@@ -87,17 +89,22 @@ namespace mitk
     */
     TrackingTool* GetTool(unsigned int toolNumber)  const;
 
+    /**
+    * \brief Discover the tools available from the connected OpenIGTLink device and adds these tools to this tracking device. Therefore, a connection
+    *        is opened, the tools are discovered and added.
+    * \return Returns true if the connection was established and the tools were discovered successfully and - if at least one tool was found - were added to this device.
+    *         Retruns false if no valid connection is available.
+    */
+    bool DiscoverTools();
+
 
     /**
     * \brief Create a new OpenIGTLink tool with toolName and fileName and add it to the list of tools
     *
-    * This method will create a new OpenIGTLinkTool object, load the tool definition file fileName,
-    * set the tool name toolName and then add it to the list of tools.
-    * It returns a pointer of type mitk::TrackingTool to the tool
-    * that can be used to read tracking data from it.
-    * This is the only way to add tools to OpenIGTLinkTrackingDevice.
-    *
-    * \warning adding tools is not possible in tracking mode, only in setup and ready.
+    * Note that tools are usually provided by the OpenIGTLink connection. In most cases, the method DiscoverTools() should be used
+    * instead which automatically finds the provided tools. If you use this method to manually add tools be sure that you add the
+    * same number and type of tools that are provided by the connected device. Otherwise problems might occur when you try to start
+    * tracking.
     */
     mitk::TrackingTool* AddTool(const char* toolName, const char* fileName);
 
@@ -120,13 +127,7 @@ namespace mitk
     */
     void TrackTools();
 
-    /**
-    * \brief Automatically detects tools in field of measurement of the tracking device.
-    * Tools can only be detected if their calibration file is availiable in the directory
-    * for calibration files.
-    * \return Returns all detected Tools.
-    */
-    std::vector<OpenIGTLinkTrackingTool::Pointer> DetectTools();
+
 
     /**
     * \return Returns all tools of the tracking device.

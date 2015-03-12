@@ -38,6 +38,9 @@ mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice(): mitk::TrackingDevi
   m_OpenIGTLinkClient = mitk::IGTLClient::New();
   m_OpenIGTLinkClient->SetName("OpenIGTLink Tracking Device");
 
+  m_IGTLDeviceSource =  mitk::IGTLDeviceSource::New();
+  m_IGTLDeviceSource->SetIGTLDevice(m_OpenIGTLinkClient);
+
 }
 
 
@@ -83,13 +86,30 @@ bool mitk::OpenIGTLinkTrackingDevice::InternalAddTool(OpenIGTLinkTrackingTool::P
 }
 
 
-std::vector<mitk::OpenIGTLinkTrackingTool::Pointer> mitk::OpenIGTLinkTrackingDevice::DetectTools()
+bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools()
 {
-  std::vector<mitk::OpenIGTLinkTrackingTool::Pointer> returnValue;
+  if (m_OpenIGTLinkClient->GetPortNumber() == -1)
+    {
+    MITK_WARN << "Connection not initialized, aborting (invalid port number).";
+    return false;
+    }
+
+  try
+    {
+    m_IGTLDeviceSource->Connect();
+    }
+  catch(std::runtime_error &e)
+    {
+    MITK_WARN << "Open IGT Link device retruned an error while trying to connect: " << e.what();
+    return false;
+    }
+
+
+
 
   //TODO: Implement
 
-  return returnValue;
+  return true;
 }
 
 

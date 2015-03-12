@@ -120,6 +120,11 @@ namespace mitk
     */
     bool InternalAddTool(OpenIGTLinkTrackingTool::Pointer tool);
 
+
+    /** Updates the tools from the open IGT link connection. Is called every time a message received event is invoked.*/
+    void UpdateTools();
+    unsigned long m_MessageReceivedObserverTag;
+
     /**
     * \brief This method tracks tools as long as the variable m_Mode is set to "Tracking".
     * Tracking tools means grabbing frames from the camera an updating the tools.

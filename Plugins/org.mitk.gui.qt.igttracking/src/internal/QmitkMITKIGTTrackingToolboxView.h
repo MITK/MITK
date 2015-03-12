@@ -28,6 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTrackingDeviceSource.h>
 #include <mitkNavigationDataObjectVisualizationFilter.h>
 #include <mitkNavigationDataRecorder.h>
+#include <mitkNavigationDataToIGTLMessageFilter.h>
+#include <mitkIGTLServer.h>
+#include <mitkIGTLMessageProvider.h>
 
 //QT headers
 #include <QTimer>
@@ -113,7 +116,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     void OnAutoDetectTools();
 
     /** @brief Slot for tracking timer. The timer updates the IGT pipline and also the logging filter if logging is activated.*/
-    void UpdateTrackingTimer();
+    void UpdateRenderTrackingTimer();
+    void UpdateLoggingTrackingTimer();
 
     /** @brief Resets the Tracking Tools: this means all tools are removed. */
     void OnResetTools();
@@ -140,6 +144,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    void DisableTrackingConfigurationButtons();
    void EnableTrackingControls();
    void DisableTrackingControls();
+
+   void OnToggleDifferentUpdateRates();
 
    //slots for worker thread
    void OnAutoDetectToolsFinished(bool success, QString errorMessage);
@@ -178,8 +184,14 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter; ///> holds the tool visualization filter (second filter of the IGT pipeline)
    mitk::NavigationDataRecorder::Pointer m_loggingFilter; ///> holds the logging filter if logging is on (third filter of the IGT pipeline)
 
+   //members for open IGT link server
+   mitk::NavigationDataToIGTLMessageFilter::Pointer m_IGTLConversionFilter; ///> Converts the navigation data as open IGT link message and makes this filter available as microservice
+   mitk::IGTLServer::Pointer m_IGTLServer;
+   mitk::IGTLMessageProvider::Pointer m_IGTLMessageProvider;
+
    /** @brief This timer updates the IGT pipline and also the logging filter if logging is activated.*/
-   QTimer* m_TrackingTimer;
+   QTimer* m_TrackingRenderTimer;
+   QTimer* m_TrackingLoggingTimer;
    QTimer* m_TimeoutTimer;
 
    /** Replaces the current navigation tool storage which is stored in m_toolStorage.

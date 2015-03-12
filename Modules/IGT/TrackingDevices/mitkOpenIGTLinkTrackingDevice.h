@@ -126,15 +126,6 @@ namespace mitk
     unsigned long m_MessageReceivedObserverTag;
 
     /**
-    * \brief This method tracks tools as long as the variable m_Mode is set to "Tracking".
-    * Tracking tools means grabbing frames from the camera an updating the tools.
-    * @throw mitk::IGTHardwareException Throws an exception if there is an error during tracking of tools.
-    */
-    void TrackTools();
-
-
-
-    /**
     * \return Returns all tools of the tracking device.
     */
     std::vector<OpenIGTLinkTrackingTool::Pointer> GetAllTools();
@@ -146,13 +137,7 @@ namespace mitk
     mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;
     mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
 
-
-    static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
-
     std::vector<OpenIGTLinkTrackingTool::Pointer> m_AllTools; ///< vector holding all tools
-    itk::MultiThreader::Pointer m_MultiThreader;
-    int m_ThreadID;
-
   };
 }//mitk
 #endif /* MITKOpenIGTLinkTRACKINGDEVICE_H_HEADER_INCLUDED_ */

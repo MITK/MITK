@@ -34,16 +34,12 @@ mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice(): mitk::TrackingDevi
   //set the type of this tracking device
   this->m_Data = mitk::DeviceDataOpenIGTLinkTrackingDeviceConnection;
 
-  this->m_MultiThreader = itk::MultiThreader::New();
-  m_ThreadID = 0;
-
   m_OpenIGTLinkClient = mitk::IGTLClient::New();
   m_OpenIGTLinkClient->EnableInfiniteBufferingMode(m_OpenIGTLinkClient->GetReceiveQueue(),false);
   m_OpenIGTLinkClient->SetName("OpenIGTLink Tracking Device");
 
   m_IGTLDeviceSource =  mitk::IGTLDeviceSource::New();
   m_IGTLDeviceSource->SetIGTLDevice(m_OpenIGTLinkClient);
-
 }
 
 
@@ -330,32 +326,4 @@ bool mitk::OpenIGTLinkTrackingDevice::CloseConnection()
 std::vector<mitk::OpenIGTLinkTrackingTool::Pointer> mitk::OpenIGTLinkTrackingDevice::GetAllTools()
 {
   return this->m_AllTools;
-}
-
-
-void mitk::OpenIGTLinkTrackingDevice::TrackTools()
-{
-  //TODO: Implement
-}
-
-
-
-ITK_THREAD_RETURN_TYPE mitk::OpenIGTLinkTrackingDevice::ThreadStartTracking(void* pInfoStruct)
-{
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == NULL)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  if (pInfo->UserData == NULL)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  OpenIGTLinkTrackingDevice *trackingDevice = (OpenIGTLinkTrackingDevice*)pInfo->UserData;
-
-  if (trackingDevice != NULL)
-    trackingDevice->TrackTools();
-
-  return ITK_THREAD_RETURN_VALUE;
 }

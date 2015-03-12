@@ -32,22 +32,77 @@ namespace mitk {
   {
   public:
 
-    enum Type { NOTHING, URI, LITERAL, BLANK};
+    /**
+    * Enumeration for node types.
+    */
+    enum Type { NOTHING, URI, LITERAL, BLANK };
 
-    // Construct a empty invalid Node
+    /**
+    * Construct a empty invalid node.
+    */
     RdfNode();
 
+    /**
+    * Construct a node from type URI which represents a object of the real world.
+    * @param uri An RdfUri which represents a URI.
+    */
     RdfNode(RdfUri uri);
 
+    /**
+    * Construct a node from type LITERAL.
+    * @param text A std::string which represents a literal.
+    */
     RdfNode(std::string text);
 
+    /**
+    * Construct a node from type LITERAL with a specific data type.
+    * @param text A std::string which represents a literal.
+    * @param dataType An RdfUri which represents a specific data type.
+    */
     RdfNode(std::string text, RdfUri dataType);
 
     virtual ~RdfNode();
 
-    Type type;
-    RdfUri datatype;
-    std::string value;
+    /**
+    * Set the type of a Node.
+    * @param type An RdfNode::Type which represents a type of a node.
+    */
+    void SetType(Type type);
+
+    /**
+    * Set the data type of a LITERAL Node.
+    * @param dataType An RdfUri which represents an URI of a specific data type.
+    */
+    void SetDatatype(RdfUri dataType);
+
+    /**
+    * Set the internal represantation of an URI or a text.
+    * @param value A std::string which represents an URI or a text.
+    */
+    void SetValue(std::string value);
+
+    /**
+    * Get the type of a node.
+    * @return The type of a node.
+    */
+    Type GetType() const;
+
+    /**
+    * Get the data type of the internal value of a node.
+    * @return The data type of the internal value of a node.
+    */
+    RdfUri GetDatatype() const;
+
+    /**
+    * Get the internal value of a node.
+    * @return The internal value of a node.
+    */
+    std::string GetValue() const;
+
+  private:
+    Type m_Type;
+    RdfUri m_Datatype;
+    std::string m_Value;
 
     // dummy method for dummy test
     bool dummy();

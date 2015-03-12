@@ -75,7 +75,9 @@ void QmitkRdfTriplestoreView::CreateQtPartControl( QWidget *parent )
   m_Store.Import("file:D:/home/knorr/builds/tripleStore/Ontologies/dcterms.ttl");
 
   Uri bomrdf("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf");
-  m_Store.AddPrefix("bomrdf", bomrdf);
+  m_Store.AddPrefix("mitk", bomrdf);
+  Uri dc("http://purl.org/dc/terms/");
+  m_Store.AddPrefix("dcterms", dc);
 
   connect( m_Controls.buttonPerformGenerate, SIGNAL(clicked()), this, SLOT(GenerateRdfFile()) );
   connect( m_Controls.buttonPerformImport, SIGNAL(clicked()), this, SLOT(ImportRdfFile()) );
@@ -120,18 +122,19 @@ void QmitkRdfTriplestoreView::GenerateRdfFile()
 
   store.SetBaseUri(baseUri);
   store.Import("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf");
-  store.AddPrefix("bomrdf", Uri("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf#"));
+  store.AddPrefix("mitk", Uri("file:C:/Users/knorr/Desktop/BaseOntologyMitk.rdf#"));
   store.AddPrefix("sfm", Uri("file:C:/Users/knorr/Desktop/storeFromMitk.rdf#"));
+  store.AddPrefix("dcterms", Uri("http://purl.org/dc/terms/"));
 
   // Create some nodes
   mitk::RdfNode project1(mitk::RdfUri("sfm:Project1"));
   mitk::RdfNode subject1(mitk::RdfUri("sfm:Subject1"));
-  mitk::RdfNode proj(mitk::RdfUri("bomrdf:Project"));
-  mitk::RdfNode subj(mitk::RdfUri("bomrdf:Subject"));
+  mitk::RdfNode proj(mitk::RdfUri("mitk:Project"));
+  mitk::RdfNode subj(mitk::RdfUri("mitk:Subject"));
 
   // Create some predicate(/property) nodes
-  mitk::RdfNode hasA(mitk::RdfUri("bomrdf:has"));
-  mitk::RdfNode name(mitk::RdfUri("bomrdf:name"));
+  mitk::RdfNode hasA(mitk::RdfUri("mitk:has"));
+  mitk::RdfNode name(mitk::RdfUri("mitk:name"));
   mitk::RdfNode a(mitk::RdfUri("rdf:type"));
 
   // Create some triples
@@ -153,24 +156,26 @@ void QmitkRdfTriplestoreView::GenerateRdfFile()
   store.Save("C:/Users/knorr/Desktop/storeFromMitk.rdf");
 
   // Selects all triples in the storage
-  std::string query = "SELECT ?x ?y ?z WHERE {?x ?y ?z .}";
+  std::string query = "PREFIX dcterms: <http://purl.org/dc/terms/> SELECT ?x ?y ?z ?a WHERE {?x dcterms:source ?z ; dcterms:title ?y . ?z dcterms:title ?a . }";
 
-  Store::ResultMap map = store.Query(query);
+  Store::ResultMap map = m_Store.Query(query);
 
   //MITK_INFO << i->first << " " << i->second.value << " " << i->second.type << " " << i->second.datatype;
 
   std::list<Node> listX(map["x"]);
   std::list<Node> listY(map["y"]);
   std::list<Node> listZ(map["z"]);
+  std::list<Node> listA(map["a"]);
 
-  MITK_INFO << "x" << " " << "y" << " " << "z";
+  MITK_INFO << "|                  node1                 " << "|     name1     " << "|                  node2                 " << "|     name2     " << "|";
   std::list<Node>::const_iterator x = listX.begin();
   std::list<Node>::const_iterator y = listY.begin();
   std::list<Node>::const_iterator z = listZ.begin();
+  std::list<Node>::const_iterator aa = listA.begin();
 
-  for (; x != listX.end(); x++,y++,z++)
+  for (; x != listX.end(); x++,y++,z++,aa++)
   {
-    MITK_INFO << "( <" << x->value << "> <" << y->value << "> <" << z->value << "> )";
+    MITK_INFO << "| "  << x->GetValue() << " | " << y->GetValue() << " | " << z->GetValue() << " | " << aa->GetValue() << " |";
   }
 
   /*
@@ -195,7 +200,7 @@ void QmitkRdfTriplestoreView::ImportRdfFile()
   store.Import("file:D:/home/knorr/builds/tripleStore/Ontologies/fma_3.1.ttl");
   //store.AddPrefix("bomowl", Uri("file:C:/Users/knorr/Desktop/BaseOntologyMitk.owl#"));
 
-  store.Save("C:/Users/knorr/Desktop/storeFromMitkWithDC.rdf");
+  //store.Save("C:/Users/knorr/Desktop/storeFromMitkWithDC.rdf");
 
   //std::string query = "SELECT ?x FROM <file:C:/Users/knorr/Desktop/storeFromMitkWithDC.rdf> WHERE {?x dc:title ?title .}";
 
@@ -228,7 +233,9 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
     if (!node->GetData()) continue;
 
     std::string nodeUUID = generator.Generate();
-    node->SetProperty("uuid", mitk::StringProperty::New(nodeUUID));
+    if(!node->GetProperty("uuid")){
+      node->SetProperty("uuid", mitk::StringProperty::New(nodeUUID));
+    }
   }
 
   for( mitk::DataStorage::SetOfObjects::ConstIterator iter = nodeContainer->Begin();
@@ -240,7 +247,10 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
 
     std::string name = node->GetProperty("name")->GetValueAsString();
     std::string nodeUUID = node->GetProperty("uuid")->GetValueAsString();
-
+    std::string path;
+    if(node->GetProperty("path")){
+      path = node->GetProperty("path")->GetValueAsString();
+    }
     //const mitk::PropertyList::PropertyMap* map = node->GetData()->GetPropertyList()->GetMap();
     //for (mitk::PropertyList::PropertyMap::const_iterator i = map->begin(); i != map->end(); i++)
     //{
@@ -248,15 +258,26 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
     //}
 
     Uri firstT(":" + nodeUUID/* + name*/);
-    Uri secondT(name);
+    //Uri secondT(name);
     Node subT(firstT);
-    Node predT(Uri("dcterms:title"));
-    Node objT(secondT);
+    Node predT(Uri("http://purl.org/dc/terms/title"));
+    Node objT(name);
     Triple tparent(subT, predT, objT);
 
     m_Store.Add(tparent);
-
     std::cout << tparent << std::endl;
+
+    if(!path.empty()){
+      Uri firstP(":" + nodeUUID/* + name*/);
+      //Uri secondP(path);
+      Node subP(firstP);
+      Node predP(Uri("mitk:filepath"));
+      Node objP(path);
+      Triple pathTriple(subP, predP, objP);
+
+      m_Store.Add(pathTriple);
+      std::cout << pathTriple << std::endl;
+    }
 
     Node rdfType(Uri("rdf:type"));
 
@@ -269,13 +290,13 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
 
       if(isSeg)
       {
-        Node seg(Uri("bomrdf:Segmentation"));
+        Node seg(Uri("mitk:Segmentation"));
         Triple tType(subT, rdfType, seg);
         std::cout << tType << std::endl;
       }
       else
       {
-        Node img(Uri("bomrdf:Image"));
+        Node img(Uri("mitk:Image"));
         Triple tType(subT, rdfType, img);
         std::cout << tType << std::endl;
       }
@@ -285,16 +306,16 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
     mitk::Surface* surface = dynamic_cast<mitk::Surface*>(node->GetData());
     if(surface)
     {
-      Node surf(Uri("bomrdf:Surface"));
+      Node surf(Uri("mitk:Surface"));
       Triple tType(subT, rdfType, surf);
       std::cout << tType << std::endl;
     }
 
     // Check if PointSet
     mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(node->GetData());
-    if(surface)
+    if(pointSet)
     {
-      Node pSet(Uri("bomrdf:PointSet"));
+      Node pSet(Uri("mitk:PointSet"));
       Triple tType(subT, rdfType, pSet);
       std::cout << tType << std::endl;
     }
@@ -325,7 +346,7 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
       Uri first(":" + nodeUUID/* + name*/);
       Uri second(":" + sourceUUID/* + sourceName*/);
       Node sub(first);
-      Node pred(Uri("dcterms:source"));
+      Node pred(Uri("http://purl.org/dc/terms/source"));
       Node obj(second);
       Triple t(sub, pred, obj);
 

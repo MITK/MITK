@@ -22,33 +22,79 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRdfNode.h"
 
 namespace mitk {
+  /**
+  * \ingroup MitkRDFModule
+  */
+  class MitkRDF_EXPORT RdfTriple
+  {
+  public:
 
-class MitkRDF_EXPORT RdfTriple
-{
-public:
-  // Construct a empty Triple
-  RdfTriple();
+    /**
+    * Construct a empty invalid triple.
+    */
+    RdfTriple();
 
-  // Construct a triple with three nodes
-  RdfTriple(RdfNode subject, RdfNode predicate, RdfNode object);
+    /**
+    * Construct a normal triple with two nodes and an object property node between.
+    * @param subject A node.
+    * @param predicate A node which represents an object property.
+    * @param object A node.
+    */
+    RdfTriple(RdfNode subject, RdfNode predicate, RdfNode object);
 
-  RdfTriple(RdfNode subject, RdfNode property, std::string value);
+    /**
+    * Construct a normal triple with a node, a data property and a value.
+    * @param subject A node.
+    * @param predicate A node which represents a data property.
+    * @param value A text value.
+    */
+    RdfTriple(RdfNode subject, RdfNode property, std::string value);
 
-  virtual ~RdfTriple();
+    virtual ~RdfTriple();
 
-  RdfNode GetSubject() const;
-  RdfNode GetPredicate() const;
-  RdfNode GetObject() const;
+    /**
+    * Set the subject of a triple.
+    * @param subject A node from type URI or BLANK.
+    */
+    void SetTripleSubject(RdfNode subject);
 
-private:
-  RdfNode subject;
-  RdfNode predicate;
-  RdfNode object;
+    /**
+    * Set the predicate of a triple.
+    * @param predicate A node from type URI which can represent an object property or a data property.
+    */
+    void SetTriplePredicate(RdfNode predicate);
 
-};
+    /**
+    * Set the object of a triple.
+    * @param object A node from type URI, BLANK or LITERAL.
+    */
+    void SetTripleObject(RdfNode object);
 
-MitkRDF_EXPORT std::ostream & operator<<(std::ostream &out, const RdfTriple &t);
+    /**
+    * Get the subject of a triple.
+    * @return The subject of a triple.
+    */
+    RdfNode GetTripleSubject() const;
 
+    /**
+    * Get the predicate of a triple.
+    * @return The predicate of a triple.
+    */
+    RdfNode GetTriplePredicate() const;
+
+    /**
+    * Get the object of a triple.
+    * @return The object of a triple.
+    */
+    RdfNode GetTripleObject() const;
+
+  private:
+    RdfNode m_Subject;
+    RdfNode m_Predicate;
+    RdfNode m_Object;
+  };
+
+  MitkRDF_EXPORT std::ostream & operator<<(std::ostream &out, const RdfTriple &t);
 }
 
 #endif // MITKRDFTRIPLE_H

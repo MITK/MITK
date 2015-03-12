@@ -18,28 +18,47 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKRDFURI_H
 
 #include <MitkRDFExports.h>
-
 #include <string>
 
 namespace mitk {
+  /**
+  * \ingroup MitkRDFModule
+  */
+  class MitkRDF_EXPORT RdfUri
+  {
+  public:
 
-class MitkRDF_EXPORT RdfUri
-{
-public:
-  RdfUri();
-  explicit RdfUri(std::string uri);
+    /**
+    * Construct a empty RdfUri.
+    */
+    RdfUri();
 
-  virtual ~RdfUri();
+    /**
+    * Construct a RdfUri from a std:string.
+    * @param uri A std:string represents the transfer parameter from a URI.
+    */
+    explicit RdfUri(std::string uri);
 
-  std::string ToString() const;
+    virtual ~RdfUri();
 
-  bool operator==(const RdfUri &u) const;
-  bool operator!=(const RdfUri &u) const;
+    /**
+    * Returns the string value of an RdfUri.
+    * @return Value of RdfUri as std:string.
+    */
+    std::string ToString() const;
 
-private:
-  std::string m_Uri;
-};
+    /**
+    * Set the value of an RdfUri.
+    * @param uri New value of an RdfUri.
+    */
+    void SetUri(std::string uri);
 
+    bool operator==(const RdfUri &u) const;
+    bool operator!=(const RdfUri &u) const;
+
+  private:
+    std::string m_Uri;
+  };
 }
 
 #endif // MITKRDFURI_H

@@ -37,6 +37,11 @@ namespace mitk {
     return m_Uri;
   }
 
+  void RdfUri::SetUri(std::string uri)
+  {
+    m_Uri = uri;
+  }
+
   bool RdfUri::operator==(const RdfUri &u) const
   {
     if (this->m_Uri.compare(u.m_Uri) != 0) return false;

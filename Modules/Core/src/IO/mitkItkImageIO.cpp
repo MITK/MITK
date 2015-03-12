@@ -78,6 +78,10 @@ std::vector<std::string> ItkImageIO::FixUpImageIOExtensions(const std::string& i
     extensions.push_back("he5");
     extensions.push_back("hd5");
   }
+  else if (imageIOName == "GE4ImageIO" || imageIOName == "GE5ImageIO")
+  {
+    extensions.push_back("");
+  }
 
   if (!extensions.empty())
   {

@@ -51,7 +51,11 @@ bool CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 >
         while(!it1.IsAtEnd())
         {
             if (it1.Get()!=it2.Get())
+            {
+                MITK_INFO << it1.GetIndex() << ":" << it1.Get();
+                MITK_INFO << it2.GetIndex() << ":" << it2.Get();
                 return false;
+            }
             ++it1;
             ++it2;
         }

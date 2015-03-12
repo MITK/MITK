@@ -46,6 +46,7 @@ public:
 
     typedef typename Superclass::OutputImageType                        OutputImageType;
     typedef itk::Image<double, 3>                                       ItkDoubleImgType;
+    typedef itk::Image<float, 3>                                        ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                                ItkUcharImgType;
     typedef mitk::FiberBundle::Pointer                                 FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
@@ -116,7 +117,7 @@ protected:
     ImageRegion<3>                              m_UpsampledImageRegion;
     double                                      m_VoxelVolume;
     std::vector< DoubleDwiType::Pointer >       m_CompartmentImages;
-    ItkUcharImgType::Pointer                    m_MaskImage;                ///< copy of mask image (changes for each motion step)
+    ItkUcharImgType::Pointer                    m_TransformedMaskImage;                ///< copy of mask image (changes for each motion step)
     ItkUcharImgType::Pointer                    m_UpsampledMaskImage;       ///< helper image for motion simulation
     DoubleVectorType                            m_Rotation;
     DoubleVectorType                            m_Translation;

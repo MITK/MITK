@@ -69,11 +69,14 @@ public:
 
   m_OpenIGTLinkTrackingDevice->SetHostname("193.174.50.103");
   m_OpenIGTLinkTrackingDevice->SetPortNumber(18944);
-  m_OpenIGTLinkTrackingDevice->DiscoverTools();
+  m_OpenIGTLinkTrackingDevice->DiscoverTools(20000);
   m_OpenIGTLinkTrackingDevice->OpenConnection();
   m_OpenIGTLinkTrackingDevice->StartTracking();
 
   Sleep(20000);
+
+  m_OpenIGTLinkTrackingDevice->StopTracking();
+  m_OpenIGTLinkTrackingDevice->CloseConnection();
 
   }
 

@@ -113,9 +113,8 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int WaitingTime)
   std::string message = "STT_TDATA";
   //m_OpenIGTLinkClient->SendMessage(msgFactory->CreateInstance(message));
 
-  //Sleep(WaitingTime); //wait for data to arrive
+  Sleep(WaitingTime); //wait for data to arrive
 
-  Sleep(20000);
   m_IGTLDeviceSource->Update();
 
   //check the tracking stream for the number and type of tools
@@ -168,11 +167,19 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int WaitingTime)
     this->InternalAddTool(newTool);
     }
 
+  m_IGTLDeviceSource->StopCommunication();
+  this->SetState(Ready);
   return true;
 }
 
 void mitk::OpenIGTLinkTrackingDevice::UpdateTools()
 {
+  if (this->GetState() != Tracking)
+    {
+    MITK_ERROR << "Method was called in the wrong state, something went wrong!";
+    return;
+    }
+
   m_IGTLMsgToNavDataFilter->Update();
   for (int i=0; i<this->GetToolCount(); i++)
   {
@@ -194,10 +201,21 @@ void mitk::OpenIGTLinkTrackingDevice::UpdateTools()
 
 bool mitk::OpenIGTLinkTrackingDevice::StartTracking()
 {
-  // todo: check tracking state
+   //check tracking state
+   if (this->GetState() != Ready)
+    {
+    MITK_WARN << "Cannot start tracking, device is not ready!";
+    return false;
+    }
+
    try
     {
     m_IGTLDeviceSource->StartCommunication();
+
+    //send a message to the server: start tracking stream
+    mitk::IGTLMessageFactory::Pointer msgFactory = m_OpenIGTLinkClient->GetMessageFactory();
+    std::string message = "STT_TDATA";
+    //m_OpenIGTLinkClient->SendMessage(msgFactory->CreateInstance(message));
     }
   catch(std::runtime_error &e)
     {
@@ -217,15 +235,32 @@ bool mitk::OpenIGTLinkTrackingDevice::StartTracking()
   messageReceivedCommand->SetCallbackFunction(this, &mitk::OpenIGTLinkTrackingDevice::UpdateTools);
   m_MessageReceivedObserverTag = m_OpenIGTLinkClient->AddObserver(mitk::MessageReceivedEvent(),messageReceivedCommand);
 
-  return false;
+  this->SetState(Tracking);
+  return true;
 }
 
 
 bool mitk::OpenIGTLinkTrackingDevice::StopTracking()
 {
+  //check tracking state
+  if (this->GetState() != Tracking)
+    {
+    MITK_WARN << "Cannot open connection, device is already connected!";
+    return false;
+    }
+
   m_OpenIGTLinkClient->RemoveObserver(m_MessageReceivedObserverTag); //disconnect itk events
 
-  Superclass::StopTracking();
+  try
+    {
+    m_IGTLDeviceSource->StopCommunication();
+    }
+  catch(std::runtime_error &e)
+    {
+    MITK_WARN << "Open IGT Link device retruned an error while stopping communication: " << e.what();
+    return false;
+    }
+  this->SetState(Ready);
   return true;
 }
 
@@ -247,6 +282,13 @@ mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::GetTool(unsigned int toolNu
 
 bool mitk::OpenIGTLinkTrackingDevice::OpenConnection()
 {
+  //check tracking state
+  if (this->GetState() != Setup)
+    {
+    MITK_WARN << "Cannot open connection, device is already connected!";
+    return false;
+    }
+
   try
     {
     m_IGTLDeviceSource->Connect();
@@ -256,16 +298,33 @@ bool mitk::OpenIGTLinkTrackingDevice::OpenConnection()
     MITK_WARN << "Open IGT Link device retruned an error while trying to connect: " << e.what();
     return false;
     }
-
+  this->SetState(Ready);
   return true;
 }
 
 
 bool mitk::OpenIGTLinkTrackingDevice::CloseConnection()
 {
-  bool returnValue = false;
-  //TODO: Implement
-  return returnValue;
+  //check tracking state
+  if (this->GetState() != Ready)
+    {
+    MITK_WARN << "Cannot close connection, device is in the wrong state!";
+    return false;
+    }
+
+  try
+    {
+    m_IGTLDeviceSource->Disconnect();
+    }
+  catch(std::runtime_error &e)
+    {
+    MITK_WARN << "Open IGT Link device retruned an error while trying to disconnect: " << e.what();
+    return false;
+    }
+
+  this->SetState(Setup);
+
+  return true;
 }
 
 std::vector<mitk::OpenIGTLinkTrackingTool::Pointer> mitk::OpenIGTLinkTrackingDevice::GetAllTools()

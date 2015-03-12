@@ -204,12 +204,11 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(vtkIdTyp
       }
       else
       {
-          m_Tolerance = 0.05;
+          m_Tolerance = 1.5;
           std::cout << "Tolerance: " << m_Tolerance << std::endl;
       }
   }
 
-  //m_Tolerance = 0.05;
   std::cout << "Tolerance: " << m_Tolerance << std::endl;
 
   std::stack<LineSegment> lineSegments;

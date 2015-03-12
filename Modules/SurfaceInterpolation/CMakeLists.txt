@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkAlgorithmsExt
+  DEPENDS MitkImageExtraction MitkImageStatistics
   PACKAGE_DEPENDS PUBLIC Eigen
   WARNINGS_AS_ERRORS
 )

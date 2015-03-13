@@ -53,7 +53,7 @@ set(CPP_FILES
   Controllers/mitkVerboseLimitedLinearUndo.cpp
   Controllers/mitkVtkInteractorCameraController.cpp
   Controllers/mitkVtkLayerController.cpp
-
+  DataManagement/mitkArbitraryTimeGeometry.cpp
   DataManagement/mitkAbstractTransformGeometry.cpp
   DataManagement/mitkAnnotationProperty.cpp
   DataManagement/mitkApplicationCursor.cpp

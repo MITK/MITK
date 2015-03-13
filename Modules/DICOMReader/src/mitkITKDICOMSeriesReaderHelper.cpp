@@ -16,15 +16,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#define MBILOG_ENABLE_DEBUG
 
+#include <dcvrdt.h>
+
+#define BOOST_DATE_TIME_NO_LIB
+
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+
 #include "mitkITKDICOMSeriesReaderHelper.h"
 #include "mitkITKDICOMSeriesReaderHelper.txx"
+
+#include "mitkDICOMGDCMTagScanner.h"
+#include "mitkArbitraryTimeGeometry.h"
 
 #define switch3DCase(IOType, T) \
   case IOType: return LoadDICOMByITK< T >(filenames, correctTilt, tiltInfo, io);
 
 bool
-mitk::ITKDICOMSeriesReaderHelper
-::CanHandleFile(const std::string& filename)
+  mitk::ITKDICOMSeriesReaderHelper
+  ::CanHandleFile(const std::string& filename)
 {
   MITK_DEBUG << "ITKDICOMSeriesReaderHelper::CanHandleFile " << filename;
   itk::GDCMImageIO::Pointer tester = itk::GDCMImageIO::New();
@@ -32,8 +41,8 @@ mitk::ITKDICOMSeriesReaderHelper
 }
 
 mitk::Image::Pointer
-mitk::ITKDICOMSeriesReaderHelper
-::Load( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo )
+  mitk::ITKDICOMSeriesReaderHelper
+  ::Load( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo )
 {
   if( filenames.empty() )
   {
@@ -56,17 +65,17 @@ mitk::ITKDICOMSeriesReaderHelper
         switch (io->GetComponentType())
         {
           switch3DCase(DcmIoType::UCHAR, unsigned char)
-          switch3DCase(DcmIoType::CHAR, char)
-          switch3DCase(DcmIoType::USHORT, unsigned short)
-          switch3DCase(DcmIoType::SHORT, short)
-          switch3DCase(DcmIoType::UINT, unsigned int)
-          switch3DCase(DcmIoType::INT, int)
-          switch3DCase(DcmIoType::ULONG, long unsigned int)
-          switch3DCase(DcmIoType::LONG, long int)
-          switch3DCase(DcmIoType::FLOAT, float)
-          switch3DCase(DcmIoType::DOUBLE, double)
-          default:
-            MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
+            switch3DCase(DcmIoType::CHAR, char)
+            switch3DCase(DcmIoType::USHORT, unsigned short)
+            switch3DCase(DcmIoType::SHORT, short)
+            switch3DCase(DcmIoType::UINT, unsigned int)
+            switch3DCase(DcmIoType::INT, int)
+            switch3DCase(DcmIoType::ULONG, long unsigned int)
+            switch3DCase(DcmIoType::LONG, long int)
+            switch3DCase(DcmIoType::FLOAT, float)
+            switch3DCase(DcmIoType::DOUBLE, double)
+        default:
+          MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
         }
       }
       else if (io->GetPixelType() == itk::ImageIOBase::RGB)
@@ -74,17 +83,17 @@ mitk::ITKDICOMSeriesReaderHelper
         switch (io->GetComponentType())
         {
           switch3DCase(DcmIoType::UCHAR, itk::RGBPixel<unsigned char>)
-          switch3DCase(DcmIoType::CHAR, itk::RGBPixel<char>)
-          switch3DCase(DcmIoType::USHORT, itk::RGBPixel<unsigned short>)
-          switch3DCase(DcmIoType::SHORT, itk::RGBPixel<short>)
-          switch3DCase(DcmIoType::UINT, itk::RGBPixel<unsigned int>)
-          switch3DCase(DcmIoType::INT, itk::RGBPixel<int>)
-          switch3DCase(DcmIoType::ULONG, itk::RGBPixel<long unsigned int>)
-          switch3DCase(DcmIoType::LONG, itk::RGBPixel<long int>)
-          switch3DCase(DcmIoType::FLOAT, itk::RGBPixel<float>)
-          switch3DCase(DcmIoType::DOUBLE, itk::RGBPixel<double>)
-          default:
-            MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
+            switch3DCase(DcmIoType::CHAR, itk::RGBPixel<char>)
+            switch3DCase(DcmIoType::USHORT, itk::RGBPixel<unsigned short>)
+            switch3DCase(DcmIoType::SHORT, itk::RGBPixel<short>)
+            switch3DCase(DcmIoType::UINT, itk::RGBPixel<unsigned int>)
+            switch3DCase(DcmIoType::INT, itk::RGBPixel<int>)
+            switch3DCase(DcmIoType::ULONG, itk::RGBPixel<long unsigned int>)
+            switch3DCase(DcmIoType::LONG, itk::RGBPixel<long int>)
+            switch3DCase(DcmIoType::FLOAT, itk::RGBPixel<float>)
+            switch3DCase(DcmIoType::DOUBLE, itk::RGBPixel<double>)
+        default:
+          MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
         }
       }
 
@@ -112,8 +121,8 @@ mitk::ITKDICOMSeriesReaderHelper
   case IOType: return LoadDICOMByITK3DnT< T >(filenamesLists, correctTilt, tiltInfo, io);
 
 mitk::Image::Pointer
-mitk::ITKDICOMSeriesReaderHelper
-::Load3DnT( const StringContainerList& filenamesLists, bool correctTilt, const GantryTiltInformation& tiltInfo )
+  mitk::ITKDICOMSeriesReaderHelper
+  ::Load3DnT( const StringContainerList& filenamesLists, bool correctTilt, const GantryTiltInformation& tiltInfo )
 {
   if( filenamesLists.empty() || filenamesLists.front().empty() )
   {
@@ -136,17 +145,17 @@ mitk::ITKDICOMSeriesReaderHelper
         switch (io->GetComponentType())
         {
           switch3DnTCase(DcmIoType::UCHAR, unsigned char)
-          switch3DnTCase(DcmIoType::CHAR, char)
-          switch3DnTCase(DcmIoType::USHORT, unsigned short)
-          switch3DnTCase(DcmIoType::SHORT, short)
-          switch3DnTCase(DcmIoType::UINT, unsigned int)
-          switch3DnTCase(DcmIoType::INT, int)
-          switch3DnTCase(DcmIoType::ULONG, long unsigned int)
-          switch3DnTCase(DcmIoType::LONG, long int)
-          switch3DnTCase(DcmIoType::FLOAT, float)
-          switch3DnTCase(DcmIoType::DOUBLE, double)
-          default:
-            MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
+            switch3DnTCase(DcmIoType::CHAR, char)
+            switch3DnTCase(DcmIoType::USHORT, unsigned short)
+            switch3DnTCase(DcmIoType::SHORT, short)
+            switch3DnTCase(DcmIoType::UINT, unsigned int)
+            switch3DnTCase(DcmIoType::INT, int)
+            switch3DnTCase(DcmIoType::ULONG, long unsigned int)
+            switch3DnTCase(DcmIoType::LONG, long int)
+            switch3DnTCase(DcmIoType::FLOAT, float)
+            switch3DnTCase(DcmIoType::DOUBLE, double)
+        default:
+          MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
         }
       }
       else if (io->GetPixelType() == itk::ImageIOBase::RGB)
@@ -154,17 +163,17 @@ mitk::ITKDICOMSeriesReaderHelper
         switch (io->GetComponentType())
         {
           switch3DnTCase(DcmIoType::UCHAR, itk::RGBPixel<unsigned char>)
-          switch3DnTCase(DcmIoType::CHAR, itk::RGBPixel<char>)
-          switch3DnTCase(DcmIoType::USHORT, itk::RGBPixel<unsigned short>)
-          switch3DnTCase(DcmIoType::SHORT, itk::RGBPixel<short>)
-          switch3DnTCase(DcmIoType::UINT, itk::RGBPixel<unsigned int>)
-          switch3DnTCase(DcmIoType::INT, itk::RGBPixel<int>)
-          switch3DnTCase(DcmIoType::ULONG, itk::RGBPixel<long unsigned int>)
-          switch3DnTCase(DcmIoType::LONG, itk::RGBPixel<long int>)
-          switch3DnTCase(DcmIoType::FLOAT, itk::RGBPixel<float>)
-          switch3DnTCase(DcmIoType::DOUBLE, itk::RGBPixel<double>)
-          default:
-            MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
+            switch3DnTCase(DcmIoType::CHAR, itk::RGBPixel<char>)
+            switch3DnTCase(DcmIoType::USHORT, itk::RGBPixel<unsigned short>)
+            switch3DnTCase(DcmIoType::SHORT, itk::RGBPixel<short>)
+            switch3DnTCase(DcmIoType::UINT, itk::RGBPixel<unsigned int>)
+            switch3DnTCase(DcmIoType::INT, itk::RGBPixel<int>)
+            switch3DnTCase(DcmIoType::ULONG, itk::RGBPixel<long unsigned int>)
+            switch3DnTCase(DcmIoType::LONG, itk::RGBPixel<long int>)
+            switch3DnTCase(DcmIoType::FLOAT, itk::RGBPixel<float>)
+            switch3DnTCase(DcmIoType::DOUBLE, itk::RGBPixel<double>)
+        default:
+          MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
         }
       }
 
@@ -187,3 +196,168 @@ mitk::ITKDICOMSeriesReaderHelper
 
   return NULL;
 }
+
+bool ConvertDICOMDateTimeString(const std::string& dateString, const std::string& timeString, OFDateTime& time)
+{
+  OFString content(timeString.c_str());
+
+  if (!dateString.empty())
+  {
+    content = OFString(dateString.c_str()).append(content);
+  }
+
+  OFCondition result = DcmDateTime::getOFDateTimeFromString(content,time);
+
+  return result.good();
+}
+
+boost::posix_time::ptime ConvertOFDateTimeToPTime(const OFDateTime& time)
+{
+  boost::gregorian::date boostDate(time.getDate().getYear(),time.getDate().getMonth(),time.getDate().getDay());
+  boost::posix_time::time_duration boostTime = boost::posix_time::hours(time.getTime().getHour())
+                                              +boost::posix_time::minutes(time.getTime().getMinute())
+                                              +boost::posix_time::seconds(time.getTime().getSecond())
+                                              +boost::posix_time::milliseconds(time.getTime().getMilliSecond());
+
+  boost::posix_time::ptime result(boostDate,boostTime);
+
+  return result;
+}
+
+OFDateTime GetLowerDateTime(const OFDateTime& time1, const OFDateTime& time2)
+{
+  OFDateTime result = time1;
+
+  if ((time2.getDate()<time1.getDate()) ||
+      ((time2.getDate() == time1.getDate()) && (time2.getTime()<time1.getTime())))
+  {
+    result = time2;
+  }
+
+  return result;
+}
+
+OFDateTime GetUpperDateTime(const OFDateTime& time1, const OFDateTime& time2)
+{
+  OFDateTime result = time1;
+
+  if ((time2.getDate()>time1.getDate()) ||
+      ((time2.getDate() == time1.getDate()) && (time2.getTime()>time1.getTime())))
+  {
+    result = time2;
+  }
+
+  return result;
+}
+
+double ComputeMiliSecDuration(const OFDateTime& start, const OFDateTime& stop)
+{
+  boost::posix_time::ptime startTime = ConvertOFDateTimeToPTime(start);
+  boost::posix_time::ptime stopTime = ConvertOFDateTimeToPTime(stop);
+
+  ::boost::posix_time::time_duration duration = stopTime - startTime;
+
+  double result = duration.total_milliseconds();
+
+  return result;
+}
+
+bool
+  mitk::ITKDICOMSeriesReaderHelper::ExtractTimeBoundsOfTimeStep (const StringContainer& filenamesOfTimeStep, DateTimeBounds& bounds)
+{
+  DICOMTag acquisitionDateTag(0x0008, 0x0022);
+  DICOMTag acquisitionTimeTag(0x0008, 0x0032);
+  DICOMGDCMTagScanner::Pointer filescanner = DICOMGDCMTagScanner::New();
+  filescanner->SetInputFiles(filenamesOfTimeStep);
+  filescanner->AddTag( acquisitionDateTag );
+  filescanner->AddTag( acquisitionTimeTag );
+  filescanner->Scan();
+
+  DICOMGDCMImageFrameList frameList = filescanner->GetFrameInfoList();
+
+  bool result = false;
+  bool first = true;
+
+  for (DICOMGDCMImageFrameList::const_iterator pos = frameList.begin(); pos != frameList.end(); ++pos)
+  {
+    std::string dateStr = (*pos)->GetTagValueAsString(acquisitionDateTag);
+    std::string timeStr = (*pos)->GetTagValueAsString(acquisitionTimeTag);
+
+    OFDateTime time;
+    bool convertResult = ConvertDICOMDateTimeString(dateStr, timeStr, time);
+
+    if (convertResult)
+    {
+      if (first)
+      {
+        bounds[0] = time;
+        bounds[1] = time;
+        first = false;
+      }
+      else
+      {
+        bounds[0] = GetLowerDateTime(bounds[0], time);
+        bounds[1] = GetUpperDateTime(bounds[1], time);
+      }
+      result = true;
+    }
+  }
+
+  return result;
+};
+
+mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
+  mitk::ITKDICOMSeriesReaderHelper::ExtractTimeBoundsOfTimeSteps (const StringContainerList& filenamesOfTimeSteps)
+{
+  TimeBoundsList result;
+
+  OFDateTime baseLine;
+  bool baseLineSet = false;
+
+  for(StringContainerList::const_iterator pos = filenamesOfTimeSteps.begin(); pos!=filenamesOfTimeSteps.end(); ++pos)
+  {
+    TimeBounds bounds(0.0);
+    DateTimeBounds dateTimeBounds;
+
+    if(ExtractTimeBoundsOfTimeStep(*pos,dateTimeBounds))
+    {
+      if(!baseLineSet)
+      {
+        baseLineSet = true;
+        baseLine = dateTimeBounds[0];
+      }
+
+      bounds[0] = ComputeMiliSecDuration(baseLine, dateTimeBounds[0]);
+      bounds[1] = ComputeMiliSecDuration(baseLine, dateTimeBounds[1]);
+    }
+
+    result.push_back(bounds);
+  }
+
+  return result;
+};
+
+mitk::TimeGeometry::Pointer
+  mitk::ITKDICOMSeriesReaderHelper::
+  GenerateTimeGeometry(const Geometry3D* templateGeometry, const TimeBoundsList& boundsList)
+{
+  Geometry3D::Pointer clone = templateGeometry->Clone();
+
+  ArbitraryTimeGeometry::Pointer timeGeometry = ArbitraryTimeGeometry::New();
+  timeGeometry->ClearAllGeometries();
+
+  for (TimeBoundsList::size_type pos = 0; pos < boundsList.size(); ++pos)
+  {
+    TimeBounds bounds = boundsList[pos];
+    if (pos+1 < boundsList.size())
+    {
+      bounds[1] = boundsList[pos+1][0];
+    }
+
+    clone->SetTimeBounds(bounds);
+
+    timeGeometry->AppendTimeStepClone(clone);
+  }
+
+  return timeGeometry;
+};

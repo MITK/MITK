@@ -190,6 +190,7 @@ namespace mitk {
     * a null-pointer will be returned.
     */
     virtual BaseGeometry::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const = 0;
+
     /**
     * \brief Sets the geometry for a given time step
     *
@@ -206,6 +207,18 @@ namespace mitk {
     * Shrinking is not supported!
     */
     virtual void Expand(TimeStepType size) = 0;
+
+    /**
+    * \brief Replaces the geometry instances with clones ot the passed geometry.
+    *
+    * Replaces the geometries of all time steps with clones of the passed
+    * geometry. Replacment strategy depends on the implementation of TimeGeometry
+    * sub class.
+    * @remark The time points itself stays untouched. Use this method if you want
+    * to change the spatial properties of a TimeGeometry and preserve the time
+    * "grid".
+    */
+    virtual void ReplaceTimeStepGeometries(const Geometry3D* geometry) = 0;
 
     /**
     * \brief Tests if all necessary informations are set and the object is valid

@@ -109,6 +109,7 @@ set(MODULE_TESTS
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
   mitkLineTest.cpp
+  mitkArbitraryTimeGeometryTest
 )
 
 if(MITK_ENABLE_RENDERING_TESTING)

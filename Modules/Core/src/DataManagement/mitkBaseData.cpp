@@ -87,14 +87,7 @@ void mitk::BaseData::Expand( unsigned int timeSteps )
 {
   if (m_TimeGeometry.IsNotNull() )
   {
-    ProportionalTimeGeometry * propTimeGeometry = dynamic_cast<ProportionalTimeGeometry*> (m_TimeGeometry.GetPointer());
-    if (propTimeGeometry)
-    {
-      propTimeGeometry->Expand(timeSteps);
-      return;
-    }
-
-    mitkThrow() << "TimeGeometry is of an unkown Type. Could not expand it. ";
+    m_TimeGeometry->Expand(timeSteps);
   }
   else
   {

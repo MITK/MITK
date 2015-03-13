@@ -48,7 +48,7 @@ public:
     typedef itk::Image<double, 3>                                       ItkDoubleImgType;
     typedef itk::Image<float, 3>                                        ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                                ItkUcharImgType;
-    typedef mitk::FiberBundle::Pointer                                 FiberBundleType;
+    typedef mitk::FiberBundle::Pointer                                  FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
     typedef itk::Matrix<double, 3, 3>                                   MatrixType;
     typedef itk::Image< double, 2 >                                     SliceType;
@@ -89,16 +89,21 @@ protected:
     DoubleDwiType::Pointer DoKspaceStuff(std::vector< DoubleDwiType::Pointer >& images);
 
     /** Generate signal of non-fiber compartments. */
-    void SimulateNonFiberSignal(ItkUcharImgType::IndexType index, double intraAxonalVolume, int g=-1);
+    void SimulateExtraAxonalSignal(ItkUcharImgType::IndexType index, double intraAxonalVolume, int g=-1);
 
     /** Move fibers to simulate headmotion */
     void SimulateMotion(int g=-1);
+
+    void CheckVolumeFractionImages();
+    void InitializeData();
+    void InitializeFiberData();
 
     // input
     mitk::FiberfoxParameters<double>            m_Parameters;
     FiberBundleType                             m_FiberBundle;
 
     // output
+    typename OutputImageType::Pointer           m_OutputImage;
     mitk::LevelWindow                           m_LevelWindow;
     std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;
     std::string                                 m_StatusText;
@@ -112,15 +117,18 @@ protected:
     // signal generation
     FiberBundleType                             m_FiberBundleWorkingCopy;   ///< we work on an upsampled version of the input bundle
     FiberBundleType                             m_FiberBundleTransformed;   ///< transformed bundle simulating headmotion
-    itk::Vector<double,3>                       m_UpsampledSpacing;
-    itk::Point<double,3>                        m_UpsampledOrigin;
-    ImageRegion<3>                              m_UpsampledImageRegion;
+    itk::Vector<double,3>                       m_WorkingSpacing;
+    itk::Point<double,3>                        m_WorkingOrigin;
+    ImageRegion<3>                              m_WorkingImageRegion;
     double                                      m_VoxelVolume;
     std::vector< DoubleDwiType::Pointer >       m_CompartmentImages;
     ItkUcharImgType::Pointer                    m_TransformedMaskImage;                ///< copy of mask image (changes for each motion step)
     ItkUcharImgType::Pointer                    m_UpsampledMaskImage;       ///< helper image for motion simulation
     DoubleVectorType                            m_Rotation;
     DoubleVectorType                            m_Translation;
+    ImageRegion<3>                              m_CroppedRegion;
+    double                                      mmRadius;
+    double                                      segmentVolume;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 };
 }

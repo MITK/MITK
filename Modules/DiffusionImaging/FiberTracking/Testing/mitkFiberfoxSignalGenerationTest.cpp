@@ -223,8 +223,8 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
         StartSimulation(parameters, fiberBundle, stickTensorBall, argv[6]);
 
         // Stick-Tensor-Ball-Astrosticks
-        parameters.m_NonFiberModelList.push_back(&astrosticksModel);
-        StartSimulation(parameters, fiberBundle, stickTensorBallAstrosticks, argv[7]);
+//        parameters.m_NonFiberModelList.push_back(&astrosticksModel);
+//        StartSimulation(parameters, fiberBundle, stickTensorBallAstrosticks, argv[7]);
 
         // Gibbs ringing
         parameters.m_FiberModelList.clear();

@@ -56,6 +56,7 @@ public:
     SignalGenerationParameters()
         : m_SignalScale(100)
         , m_tEcho(100)
+        , m_tRep(500)
         , m_tLine(1)
         , m_tInhom(50)
         , m_Bvalue(1000)
@@ -97,6 +98,7 @@ public:
     /** Other acquisitions parameters */
     double                              m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
     double                              m_tEcho;                    ///< Echo time TE.
+    double                              m_tRep;                     ///< Echo time TR.
     double                              m_tLine;                    ///< k-space line readout time.
     double                              m_tInhom;                   ///< T2'
     double                              m_Bvalue;                   ///< Acquisition b-value

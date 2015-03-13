@@ -38,6 +38,7 @@ public:
 
     DiffusionSignalModel()
         : m_T2(100)
+        , m_T1(800)
     {}
     ~DiffusionSignalModel(){}
 
@@ -61,6 +62,9 @@ public:
     void SetT2(double T2) { m_T2 = T2; }
     double GetT2() { return m_T2; }
 
+    void SetT1(double T1) { m_T1 = T1; }
+    double GetT1() { return m_T1; }
+
     void SetVolumeFractionImage(ItkDoubleImgType::Pointer img){ m_VolumeFractionImage = img; }
     ItkDoubleImgType::Pointer GetVolumeFractionImage(){ return m_VolumeFractionImage; }
 
@@ -80,7 +84,8 @@ protected:
 
     GradientType                m_FiberDirection;       ///< Needed to generate anisotropc signal to determin direction of anisotropy
     GradientListType            m_GradientList;         ///< Diffusion gradient direction container
-    double                      m_T2;                   ///< Tissue specific relaxation time
+    double                      m_T2;                   ///< Tissue specific transversal relaxation time
+    double                      m_T1;                   ///< Tissue specific longitudinal relaxation time
     ItkDoubleImgType::Pointer   m_VolumeFractionImage;  ///< Tissue specific volume fraction for each voxel (only relevant for non fiber compartments)
     ItkRandGenType::Pointer     m_RandGen;              ///< Random number generator
 };

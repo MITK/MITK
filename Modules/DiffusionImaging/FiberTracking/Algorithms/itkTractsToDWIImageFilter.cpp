@@ -130,6 +130,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
         {
             std::vector< SliceType::Pointer > compartmentSlices;
             std::vector< double > t2Vector;
+            std::vector< double > t1Vector;
 
             for (unsigned int i=0; i<images.size(); i++)
             {
@@ -162,6 +163,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 
                 compartmentSlices.push_back(slice);
                 t2Vector.push_back(signalModel->GetT2());
+                t1Vector.push_back(signalModel->GetT1());
             }
 
             if (this->GetAbortGenerateData())
@@ -172,6 +174,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
             itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
             idft->SetCompartmentImages(compartmentSlices);
             idft->SetT2(t2Vector);
+            idft->SetT1(t1Vector);
             idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
             idft->SetParameters(m_Parameters);
             idft->SetZ((double)z-(double)images.at(0)->GetLargestPossibleRegion().GetSize(2)/2.0);

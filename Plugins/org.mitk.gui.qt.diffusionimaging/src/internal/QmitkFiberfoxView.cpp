@@ -655,6 +655,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     parameters.m_SignalGen.m_tLine = m_Controls->m_LineReadoutTimeBox->value();
     parameters.m_SignalGen.m_tInhom = m_Controls->m_T2starBox->value();
     parameters.m_SignalGen.m_tEcho = m_Controls->m_TEbox->value();
+    parameters.m_SignalGen.m_tRep = m_Controls->m_TRbox->value();
     parameters.m_SignalGen.m_DoDisablePartialVolume = m_Controls->m_EnforcePureFiberVoxelsBox->isChecked();
     parameters.m_SignalGen.m_AxonRadius = m_Controls->m_FiberRadius->value();
     parameters.m_SignalGen.m_SignalScale = m_Controls->m_SignalScaleBox->value();
@@ -720,6 +721,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
             model->SetDiffusivity(m_Controls->m_StickWidget1->GetD());
             model->SetT2(m_Controls->m_StickWidget1->GetT2());
+            model->SetT1(m_Controls->m_StickWidget1->GetT1());
             model->m_CompartmentId = 1;
             parameters.m_FiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Stick";
@@ -738,6 +740,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetDiffusivity2(m_Controls->m_ZeppelinWidget1->GetD2());
             model->SetDiffusivity3(m_Controls->m_ZeppelinWidget1->GetD2());
             model->SetT2(m_Controls->m_ZeppelinWidget1->GetT2());
+            model->SetT1(m_Controls->m_ZeppelinWidget1->GetT1());
             model->m_CompartmentId = 1;
             parameters.m_FiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Zeppelin";
@@ -757,6 +760,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetDiffusivity2(m_Controls->m_TensorWidget1->GetD2());
             model->SetDiffusivity3(m_Controls->m_TensorWidget1->GetD3());
             model->SetT2(m_Controls->m_TensorWidget1->GetT2());
+            model->SetT1(m_Controls->m_TensorWidget1->GetT1());
             model->m_CompartmentId = 1;
             parameters.m_FiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Tensor";
@@ -805,6 +809,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
             model->SetDiffusivity(m_Controls->m_StickWidget2->GetD());
             model->SetT2(m_Controls->m_StickWidget2->GetT2());
+            model->SetT1(m_Controls->m_StickWidget2->GetT1());
             model->m_CompartmentId = 2;
             parameters.m_FiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Stick";
@@ -823,6 +828,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetDiffusivity2(m_Controls->m_ZeppelinWidget2->GetD2());
             model->SetDiffusivity3(m_Controls->m_ZeppelinWidget2->GetD2());
             model->SetT2(m_Controls->m_ZeppelinWidget2->GetT2());
+            model->SetT1(m_Controls->m_ZeppelinWidget2->GetT1());
             model->m_CompartmentId = 2;
             parameters.m_FiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Zeppelin";
@@ -842,6 +848,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetDiffusivity2(m_Controls->m_TensorWidget2->GetD2());
             model->SetDiffusivity3(m_Controls->m_TensorWidget2->GetD3());
             model->SetT2(m_Controls->m_TensorWidget2->GetT2());
+            model->SetT1(m_Controls->m_TensorWidget2->GetT1());
             model->m_CompartmentId = 2;
             parameters.m_FiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Tensor";
@@ -873,6 +880,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
             model->SetDiffusivity(m_Controls->m_BallWidget1->GetD());
             model->SetT2(m_Controls->m_BallWidget1->GetT2());
+            model->SetT1(m_Controls->m_BallWidget1->GetT1());
             model->m_CompartmentId = 3;
             parameters.m_NonFiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Ball";
@@ -889,6 +897,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
             model->SetDiffusivity(m_Controls->m_AstrosticksWidget1->GetD());
             model->SetT2(m_Controls->m_AstrosticksWidget1->GetT2());
+            model->SetT1(m_Controls->m_AstrosticksWidget1->GetT1());
             model->SetRandomizeSticks(m_Controls->m_AstrosticksWidget1->GetRandomizeSticks());
             model->m_CompartmentId = 3;
             parameters.m_NonFiberModelList.push_back(model);
@@ -905,6 +914,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             mitk::DotModel<ScalarType>* model = new mitk::DotModel<ScalarType>();
             model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
             model->SetT2(m_Controls->m_DotWidget1->GetT2());
+            model->SetT1(m_Controls->m_DotWidget1->GetT1());
             model->m_CompartmentId = 3;
             parameters.m_NonFiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Dot";
@@ -949,6 +959,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
             model->SetDiffusivity(m_Controls->m_BallWidget2->GetD());
             model->SetT2(m_Controls->m_BallWidget2->GetT2());
+            model->SetT1(m_Controls->m_BallWidget2->GetT1());
             model->m_CompartmentId = 4;
             parameters.m_NonFiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Ball";
@@ -965,6 +976,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
             model->SetDiffusivity(m_Controls->m_AstrosticksWidget2->GetD());
             model->SetT2(m_Controls->m_AstrosticksWidget2->GetT2());
+            model->SetT1(m_Controls->m_AstrosticksWidget2->GetT1());
             model->SetRandomizeSticks(m_Controls->m_AstrosticksWidget2->GetRandomizeSticks());
             model->m_CompartmentId = 4;
             parameters.m_NonFiberModelList.push_back(model);
@@ -981,6 +993,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             mitk::DotModel<ScalarType>* model = new mitk::DotModel<ScalarType>();
             model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
             model->SetT2(m_Controls->m_DotWidget2->GetT2());
+            model->SetT1(m_Controls->m_DotWidget2->GetT1());
             model->m_CompartmentId = 4;
             parameters.m_NonFiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Dot";

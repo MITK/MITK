@@ -19,6 +19,13 @@ if(MITK_USE_DCMTK)
       set(DCMTK_C_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
     endif()
 
+    set(additional_args )
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.1_20121102.tar.gz
@@ -32,6 +39,7 @@ if(MITK_USE_DCMTK)
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
          ${ep_common_args}
+         ${additional_args}
          #-DDCMTK_OVERWRITE_WIN32_COMPILER_FLAGS:BOOL=OFF
          "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS} ${DCMTK_CXX_FLAGS}"
          "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS} ${DCMTK_C_FLAGS}"

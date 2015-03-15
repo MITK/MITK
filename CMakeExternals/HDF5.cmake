@@ -15,6 +15,13 @@ if(MITK_USE_HDF5)
 
   if(NOT DEFINED HDF5_DIR)
 
+    set(additional_args )
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     # We might build static libs with  -DBUILD_SHARED_LIBS=0 but this conflicts with
     # the in ITK integrated version! So we need to go the way with dynamic libs. Too
     # bad :( This would be fixed by using an external HDF-Installation with ITK/VTK
@@ -25,6 +32,7 @@ if(MITK_USE_HDF5)
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
          ${ep_common_args}
+         ${additional_args}
          -DHDF5_BUILD_HL_LIB:BOOL=ON
          -DHDF5_BUILD_CPP_LIB:BOOL=ON
          -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>

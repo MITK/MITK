@@ -15,6 +15,13 @@ set(${proj}_DEPENDS ${proj})
 
 if(NOT DEFINED Rasqal_DIR)
 
+  set(additional_cmake_args )
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_cmake_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
+
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/rasqal-0.9.32.tar.gz
@@ -24,6 +31,7 @@ if(NOT DEFINED Rasqal_DIR)
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
+       ${additional_cmake_args}
        "-DCMAKE_C_FLAGS:STRING=-DPCRE_STATIC ${CMAKE_C_FLAGS}"
        -DRASQAL_REGEX:STRING=pcre
        -DCMAKE_PREFIX_PATH:STRING=${PCRE_DIR}^^${REDLAND_INSTALL_DIR}

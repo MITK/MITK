@@ -7,6 +7,13 @@ if(MITK_USE_ZLIB)
     set(${proj}_DEPENDENCIES )
     set(ZLIB_DEPENDS ${proj})
 
+    set(additional_cmake_args )
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_cmake_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     # Using the ZLIB from CTK:
     # https://github.com/commontk/zlib
     ExternalProject_Add(${proj}
@@ -15,6 +22,7 @@ if(MITK_USE_ZLIB)
       URL_MD5 "4c3f572b487ae7947fd88ec363533bc5"
       CMAKE_ARGS
         ${ep_common_args}
+        ${additional_cmake_args}
       CMAKE_CACHE_ARGS
         -DBUILD_SHARED_LIBS:BOOL=OFF
         -DZLIB_MANGLE_PREFIX:STRING=mitk_zlib_

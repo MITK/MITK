@@ -82,7 +82,7 @@ protected:
      * Determines the pointset object to be cut.
      * returns the pointset if possible, otherwise NULL.
      */
-    virtual vtkPointSet* GetVtkPointSet(BaseRenderer* renderer );
+    virtual vtkPointSet* GetVtkPointSet(BaseRenderer* renderer, int time = 0 );
 
     /**
      * Determines the LookupTable used by the associated vtkMapper.

@@ -70,6 +70,18 @@ endif()
 
 get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 
+if(MITK_CTEST_SCRIPT_MODE)
+  # Write a file containing the list of enabled external project targets.
+  # This file can be read by a ctest script to separately build projects.
+  set(SUPERBUILD_TARGETS )
+  foreach(proj ${external_projects})
+    if(MITK_USE_${proj})
+      list(APPEND SUPERBUILD_TARGETS ${proj})
+    endif()
+  endforeach()
+  file(WRITE "${CMAKE_BINARY_DIR}/SuperBuildTargets.cmake" "set(SUPERBUILD_TARGETS ${SUPERBUILD_TARGETS})")
+endif()
+
 # A list of "nice" external projects, playing well together with CMake
 set(nice_external_projects ${external_projects})
 list(REMOVE_ITEM nice_external_projects Boost Python)

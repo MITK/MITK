@@ -663,6 +663,15 @@ void QmitkStdMultiWidget::SetCornerAnnotation( std::string text,
   layercontroller->InsertForegroundRenderer(m_CornerAnnotations[widgetNumber].ren,true);
 }
 
+void QmitkStdMultiWidget::SetCornerAnnotationVisibility(bool visibility)
+{
+  for(int i = 0 ; i<4 ; ++i)
+  {
+    CornerAnnotation ca = m_CornerAnnotations[i];
+    if(ca.ren) ca.ren->SetDraw(visibility);
+  }
+}
+
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(unsigned int number)
 {
   switch (number) {

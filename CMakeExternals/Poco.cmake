@@ -15,6 +15,13 @@ if(MITK_USE_Poco)
 
   if(NOT DEFINED ${proj}_DIR)
 
+    set(additional_cmake_args )
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_cmake_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.6.0-all.tar.gz
@@ -23,6 +30,7 @@ if(MITK_USE_Poco)
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
+        ${additional_cmake_args}
         -DENABLE_XML:BOOL=ON
         -DENABLE_JSON:BOOL=ON
         -DENABLE_MONGODB:BOOL=OFF

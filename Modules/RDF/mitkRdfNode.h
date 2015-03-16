@@ -103,9 +103,6 @@ namespace mitk {
     Type m_Type;
     RdfUri m_Datatype;
     std::string m_Value;
-
-    // dummy method for dummy test
-    bool dummy();
   };
 
   MitkRDF_EXPORT std::ostream & operator<<(std::ostream &out, const mitk::RdfNode &n);

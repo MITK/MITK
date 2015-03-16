@@ -18,12 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingConfig.h>
 #include <mitkTestFixture.h>
 
-#include "mitkRdfNode.h"
+#include "mitkRdfStore.h"
 
-class mitkRdfNodeTestSuite : public mitk::TestFixture
+class mitkRdfStoreTestSuite : public mitk::TestFixture
 {
   // List of Tests
-  CPPUNIT_TEST_SUITE(mitkRdfNodeTestSuite);
+  CPPUNIT_TEST_SUITE(mitkRdfStoreTestSuite);
 
   MITK_TEST(TestDummy);
 
@@ -43,9 +43,9 @@ public:
 
   void TestDummy()
   {
-    mitk::RdfNode node;
     CPPUNIT_ASSERT(true == true);
   }
+
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkRdfNode)
+MITK_TEST_SUITE_REGISTRATION(mitkRdfStore)

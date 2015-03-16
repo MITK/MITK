@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <algorithm>
 
-mitk::ArbitraryTimeGeometry::ArbitraryTimeGeometry(): m_MinimumTimePoint(0), m_MaximumTimePoint(0)
+#include <mitkGeometry3D.h>
+
+mitk::ArbitraryTimeGeometry::ArbitraryTimeGeometry(): m_MinimumTimePoint(0)
 {
 }
 
@@ -30,11 +32,7 @@ void mitk::ArbitraryTimeGeometry::Initialize()
 {
   this->ClearAllGeometries();
   Geometry3D::Pointer geo = Geometry3D::New();
-  TimeBounds bounds;
-  bounds[0] = 0;
-  bounds[1] = 1;
-  geo->SetTimeBounds(bounds);
-  this->AppendTimeStep(geo);
+  this->AppendTimeStep(geo,1,0);
 }
 
 mitk::TimeStepType mitk::ArbitraryTimeGeometry::CountTimeSteps () const
@@ -49,14 +47,47 @@ mitk::TimePointType mitk::ArbitraryTimeGeometry::GetMinimumTimePoint () const
 
 mitk::TimePointType mitk::ArbitraryTimeGeometry::GetMaximumTimePoint () const
 {
-  return m_MaximumTimePoint;
+  TimePointType result = 0;
+  if (!m_MaximumTimePoints.empty())
+  {
+    result = m_MaximumTimePoints.back();
+  }
+  return result;
 }
+
+mitk::TimePointType mitk::ArbitraryTimeGeometry::GetMinimumTimePoint(TimeStepType step) const
+{
+  TimePointType result = m_MinimumTimePoint;
+  if (step > 0 && step<=m_MaximumTimePoints.size())
+  {
+    result = m_MaximumTimePoints[step-1];
+  }
+  return result;
+};
+
+mitk::TimePointType mitk::ArbitraryTimeGeometry::GetMaximumTimePoint(TimeStepType step) const
+{
+  TimePointType result = 0;
+  if (step<m_MaximumTimePoints.size())
+  {
+    result = m_MaximumTimePoints[step];
+  }
+  return result;
+};
 
 mitk::TimeBounds mitk::ArbitraryTimeGeometry::GetTimeBounds () const
 {
   TimeBounds bounds;
   bounds[0] = this->GetMinimumTimePoint();
   bounds[1] = this->GetMaximumTimePoint();
+  return bounds;
+}
+
+mitk::TimeBounds mitk::ArbitraryTimeGeometry::GetTimeBounds (TimeStepType step) const
+{
+  TimeBounds bounds;
+  bounds[0] = this->GetMinimumTimePoint(step);
+  bounds[1] = this->GetMaximumTimePoint(step);
   return bounds;
 }
 
@@ -72,47 +103,44 @@ bool mitk::ArbitraryTimeGeometry::IsValidTimeStep (TimeStepType timeStep) const
 
 mitk::TimePointType mitk::ArbitraryTimeGeometry::TimeStepToTimePoint( TimeStepType timeStep) const
 {
-  TimePointType result = 0;
+  TimePointType result = 0.0;
 
-  if (timeStep < m_GeometryVector.size())
+  if(timeStep == 0)
   {
-    result = m_GeometryVector[timeStep]->GetTimeBounds()[0];
+    result = m_MinimumTimePoint;
+  }
+  else if(timeStep > 0 && timeStep < m_MaximumTimePoints.size())
+  {
+    result = m_MaximumTimePoints[timeStep-1];
   }
 
   return result;
 }
 
-class HasLargerTimeBoundPredicate
-{
-public:
-  HasLargerTimeBoundPredicate(const mitk::TimePointType& timePoint): m_TimePoint(timePoint)
-  {};
-
-  mitk::TimePointType m_TimePoint;
-  bool operator() (const mitk::Geometry3D::Pointer& geometry)
-  {
-    return geometry->GetTimeBounds()[0]>m_TimePoint;
-  }
-};
-
 mitk::TimeStepType mitk::ArbitraryTimeGeometry::TimePointToTimeStep( TimePointType timePoint) const
 {
-  if (m_MinimumTimePoint <= timePoint && m_MaximumTimePoint > timePoint)
-  {
-    std::vector<Geometry3D::Pointer>::const_iterator finding = ::std::find_if(m_GeometryVector.begin(), m_GeometryVector.end(), HasLargerTimeBoundPredicate(timePoint));
+  mitk::TimeStepType result = 0;
 
-    mitk::TimeStepType result = finding - m_GeometryVector.begin() - 1; //index of the correct time step -1;
-    return result;
+  if (timePoint>=m_MinimumTimePoint)
+  {
+    for (std::vector<TimePointType>::const_iterator pos = m_MaximumTimePoints.begin(); pos != m_MaximumTimePoints.end(); ++pos)
+    {
+      if (timePoint<*pos)
+      {
+        result = pos - m_MaximumTimePoints.begin();
+        break;
+      }
+    }
   }
-  else
-    return 0;
+
+  return result;
 }
 
-mitk::Geometry3D::Pointer mitk::ArbitraryTimeGeometry::GetGeometryForTimeStep( TimeStepType timeStep) const
+mitk::BaseGeometry::Pointer mitk::ArbitraryTimeGeometry::GetGeometryForTimeStep( TimeStepType timeStep) const
 {
   if (IsValidTimeStep(timeStep))
   {
-    return dynamic_cast<Geometry3D*>(m_GeometryVector[timeStep].GetPointer());
+    return dynamic_cast<BaseGeometry*>(m_GeometryVector[timeStep].GetPointer());
   }
   else
   {
@@ -120,7 +148,7 @@ mitk::Geometry3D::Pointer mitk::ArbitraryTimeGeometry::GetGeometryForTimeStep( T
   }
 }
 
-mitk::Geometry3D::Pointer mitk::ArbitraryTimeGeometry::GetGeometryForTimePoint(TimePointType timePoint) const
+mitk::BaseGeometry::Pointer mitk::ArbitraryTimeGeometry::GetGeometryForTimePoint(TimePointType timePoint) const
 {
   if (this->IsValidTimePoint(timePoint))
   {
@@ -134,7 +162,7 @@ mitk::Geometry3D::Pointer mitk::ArbitraryTimeGeometry::GetGeometryForTimePoint(T
 }
 
 
-mitk::Geometry3D::Pointer mitk::ArbitraryTimeGeometry::GetGeometryCloneForTimeStep( TimeStepType timeStep) const
+mitk::BaseGeometry::Pointer mitk::ArbitraryTimeGeometry::GetGeometryCloneForTimeStep( TimeStepType timeStep) const
 {
   if (timeStep >= m_GeometryVector.size())
     return 0;
@@ -152,55 +180,50 @@ void mitk::ArbitraryTimeGeometry::ClearAllGeometries()
 {
   m_GeometryVector.clear();
   m_MinimumTimePoint = 0;
-  m_MaximumTimePoint = 0;
+  m_MaximumTimePoints.clear();
 }
 
 void mitk::ArbitraryTimeGeometry::ReserveSpaceForGeometries(TimeStepType numberOfGeometries)
 {
   m_GeometryVector.reserve(numberOfGeometries);
+  m_MaximumTimePoints.reserve(numberOfGeometries);
 }
 
 void mitk::ArbitraryTimeGeometry::Expand(mitk::TimeStepType size)
 {
   m_GeometryVector.reserve(size);
+
+  TimeBounds bounds;
+  TimePointType minTP = this->GetMinimumTimePoint(this->CountTimeSteps()-1);
+  TimePointType maxTP = this->GetMaximumTimePoint(this->CountTimeSteps()-1);
+  TimePointType duration = maxTP-minTP;
+
   while  (m_GeometryVector.size() < size)
   {
-    m_GeometryVector.push_back(Geometry3D::New());
+    m_GeometryVector.push_back(Geometry3D::New().GetPointer());
+    maxTP += duration;
+    m_MaximumTimePoints.push_back(maxTP);
   }
 }
 
-void mitk::ArbitraryTimeGeometry::ReplaceTimeStepGeometries(const Geometry3D* geometry)
+void mitk::ArbitraryTimeGeometry::ReplaceTimeStepGeometries(const BaseGeometry* geometry)
 {
-    for (std::vector<Geometry3D::Pointer>::iterator pos = m_GeometryVector.begin(); pos != m_GeometryVector.end(); ++pos)
+    for (std::vector<BaseGeometry::Pointer>::iterator pos = m_GeometryVector.begin(); pos != m_GeometryVector.end(); ++pos)
     {
       *pos = geometry->Clone();
     }
 }
 
-void mitk::ArbitraryTimeGeometry::SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep)
+void mitk::ArbitraryTimeGeometry::SetTimeStepGeometry(BaseGeometry* geometry, TimeStepType timeStep)
 {
   assert(timeStep<m_GeometryVector.size());
+
   if (timeStep>=m_GeometryVector.size())
   {
     return;
   }
 
   m_GeometryVector[timeStep] = geometry;
-
-  //Now clean up the vector and remove conflicted steps.
-  for (TimeStepType pos = m_GeometryVector.size()-1; pos != 0; --pos)
-  {
-    bool isConflicted = ((pos>timeStep) &&  (m_GeometryVector[pos]->GetTimeBounds()[0]< geometry->GetTimeBounds()[0])) ||
-      ((pos<timeStep) && (m_GeometryVector[pos]->GetTimeBounds()[0]> geometry->GetTimeBounds()[0]));
-
-    if (isConflicted)
-      {
-        m_GeometryVector.erase(m_GeometryVector.begin()+pos);
-      }
-  }
-
-  m_MinimumTimePoint = m_GeometryVector.front()->GetTimeBounds()[0];
-  m_MaximumTimePoint = m_GeometryVector.back()->GetTimeBounds()[1];
 }
 
 itk::LightObject::Pointer mitk::ArbitraryTimeGeometry::InternalClone() const
@@ -209,18 +232,16 @@ itk::LightObject::Pointer mitk::ArbitraryTimeGeometry::InternalClone() const
   ArbitraryTimeGeometry::Pointer newTimeGeometry =
     dynamic_cast<ArbitraryTimeGeometry * > (parent.GetPointer());
   newTimeGeometry->m_MinimumTimePoint = this->m_MinimumTimePoint;
-  newTimeGeometry->m_MaximumTimePoint = this->m_MaximumTimePoint;
+  newTimeGeometry->m_MaximumTimePoints = this->m_MaximumTimePoints;
   newTimeGeometry->m_GeometryVector.clear();
-  newTimeGeometry->ReserveSpaceForGeometries(this->CountTimeSteps());
   for (TimeStepType i =0; i < CountTimeSteps(); ++i)
   {
-    Geometry3D::Pointer tempGeometry = GetGeometryForTimeStep(i)->Clone();
-    newTimeGeometry->AppendTimeStepClone(m_GeometryVector[i]);
+    newTimeGeometry->m_GeometryVector.push_back(this->m_GeometryVector[i]->Clone());
   }
   return parent;
 }
 
-void mitk::ArbitraryTimeGeometry::AppendTimeStep(Geometry3D* geometry)
+void mitk::ArbitraryTimeGeometry::AppendTimeStep(BaseGeometry* geometry, TimePointType maximumTimePoint, TimePointType minimumTimePoint)
 {
   if (!geometry)
   {
@@ -229,22 +250,25 @@ void mitk::ArbitraryTimeGeometry::AppendTimeStep(Geometry3D* geometry)
 
   if (!m_GeometryVector.empty())
   {
-    if (m_GeometryVector.back()->GetTimeBounds()[0]>geometry->GetTimeBounds()[0])
+    if (m_MaximumTimePoints.back()>maximumTimePoint)
     {
       mitkThrow() << "Cannot append geometry to time geometry. Time bound conflict.";
     }
   }
+  else
+  {
+    m_MinimumTimePoint = minimumTimePoint;
+  }
 
   m_GeometryVector.push_back(geometry);
-  m_MinimumTimePoint = m_GeometryVector.front()->GetTimeBounds()[0];
-  m_MaximumTimePoint = m_GeometryVector.back()->GetTimeBounds()[1];
+  m_MaximumTimePoints.push_back(maximumTimePoint);
 }
 
-void mitk::ArbitraryTimeGeometry::AppendTimeStepClone(Geometry3D* geometry)
+void mitk::ArbitraryTimeGeometry::AppendTimeStepClone(BaseGeometry* geometry, TimePointType maximumTimePoint, TimePointType minimumTimePoint)
 {
-  Geometry3D::Pointer clone = geometry->Clone();
+  BaseGeometry::Pointer clone = geometry->Clone();
 
-  this->AppendTimeStep(clone);
+  this->AppendTimeStep(clone, maximumTimePoint, minimumTimePoint);
 };
 
 
@@ -256,10 +280,10 @@ void mitk::ArbitraryTimeGeometry::PrintSelf(std::ostream& os, itk::Indent indent
   os << indent << " MaximumTimePoint: " << this->GetMaximumTimePoint() << " ms" << std::endl;
 
   os << std::endl;
-  os << indent << " TimeBounds: " << std::endl;
-  for (TimeStepType i=0; i<m_GeometryVector.size(); ++i)
+  os << indent << " max TimeBounds: " << std::endl;
+  for (TimeStepType i=0; i<m_MaximumTimePoints.size(); ++i)
   {
-    os << indent.GetNextIndent() << "Step "<< i <<": lower: "<<m_GeometryVector[i]->GetTimeBounds()[0] << " ms; upper: "<<m_GeometryVector[i]->GetTimeBounds()[1] << " ms" << std::endl;
+    os << indent.GetNextIndent() << "Step "<< i <<": "<<m_MaximumTimePoints[i] << " ms" << std::endl;
   }
 
 }

@@ -221,11 +221,11 @@ itk::LightObject::Pointer mitk::ProportionalTimeGeometry::InternalClone() const
   return parent;
 }
 
-void mitk::ProportionalTimeGeometry::ReplaceTimeStepGeometries(const Geometry3D* geometry)
+void mitk::ProportionalTimeGeometry::ReplaceTimeStepGeometries(const BaseGeometry* geometry)
 {
   for (TimeStepType currentStep = 0; currentStep < this->CountTimeSteps(); ++currentStep)
   {
-    Geometry3D::Pointer clonedGeometry = geometry->Clone();
+    BaseGeometry::Pointer clonedGeometry = geometry->Clone();
     this->SetTimeStepGeometry(clonedGeometry.GetPointer(), currentStep);
   }
 }

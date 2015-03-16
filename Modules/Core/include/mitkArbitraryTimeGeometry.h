@@ -36,7 +36,7 @@ namespace mitk {
   * copies should be used.
   * @remark The lower time bound of a succeeding time step may not be smaller or equal
   * to the lower time bound of its predecessor. Thus the list of time points is
-  * allways sorted by its lower time bounds.
+  * always sorted by its lower time bounds.
   * @remark For the conversion between time step and time point the following assumption
   * is used.:\n
   * time step -> time point: time point is the lower time bound of the geometry indicated by step.\n
@@ -44,7 +44,7 @@ namespace mitk {
   *
   * \addtogroup geometry
   */
-  class MITK_CORE_EXPORT ArbitraryTimeGeometry : public TimeGeometry
+  class MITKCORE_EXPORT ArbitraryTimeGeometry : public TimeGeometry
   {
   public:
     mitkClassMacro(ArbitraryTimeGeometry, TimeGeometry);
@@ -80,10 +80,29 @@ namespace mitk {
     virtual TimePointType    GetMaximumTimePoint () const;
 
     /**
+    * \brief Returns the first time point for which the object is valid.
+    *
+    * Returns the first valid time point for the given TimeStep. The time point
+    * is given in ms.
+    */
+    virtual TimePointType    GetMinimumTimePoint(TimeStepType step) const;
+    /**
+    * \brief Returns the last time point for which the object is valid
+    *
+    * Gives the last time point for the Geometry specified by the given TimeStep. The time point is given in ms.
+    */
+    virtual TimePointType    GetMaximumTimePoint(TimeStepType step) const;
+
+    /**
     * \brief Get the time bounds (in ms)
     * it returns GetMinimumTimePoint() and GetMaximumTimePoint() results as bounds.
     */
     virtual TimeBounds GetTimeBounds( ) const;
+
+    /**
+    * \brief Get the time bounds for the given TimeStep (in ms)
+    */
+    virtual TimeBounds GetTimeBounds(TimeStepType step) const;
 
     /**
     * \brief Tests if a given time point is covered by this object
@@ -129,7 +148,7 @@ namespace mitk {
     * Returns a clone of the geometry which defines the given time step. If
     * the given time step is invalid an null-pointer is returned.
     */
-    virtual Geometry3D::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const;
+    virtual BaseGeometry::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const;
 
     /**
     * \brief Returns the geometry which corresponds to the given time point
@@ -140,7 +159,7 @@ namespace mitk {
     * If the returned geometry is changed this will affect the saved
     * geometry.
     */
-    virtual Geometry3D::Pointer GetGeometryForTimePoint ( TimePointType timePoint) const;
+    virtual BaseGeometry::Pointer GetGeometryForTimePoint ( TimePointType timePoint) const;
     /**
     * \brief Returns the geometry which corresponds to the given time step
     *
@@ -150,7 +169,7 @@ namespace mitk {
     * If the returned geometry is changed this will affect the saved
     * geometry.
     */
-    virtual Geometry3D::Pointer GetGeometryForTimeStep  ( TimeStepType timeStep) const;
+    virtual BaseGeometry::Pointer GetGeometryForTimeStep  ( TimeStepType timeStep) const;
 
     /**
     * \brief Tests if all necessary informations are set and the object is valid
@@ -158,7 +177,7 @@ namespace mitk {
     virtual bool IsValid () const;
 
     /**
-    * \brief Initilizes a new object with one time steps which contains an empty geometry.
+    * \brief Initializes a new object with one time steps which contains an empty geometry.
     */
     virtual void Initialize();
 
@@ -166,33 +185,29 @@ namespace mitk {
     * \brief Expands the time geometry to the given number of time steps.
     *
     * Initializes the new time steps with empty geometries. This default geometries will behave like ProportionalTimeGeometry.
-    * Shrinking is not supported.
+    * Shrinking is not supported. The new steps will have the same duration like the last step before extension.
     */
     virtual void Expand(TimeStepType size);
 
     /**
-    * \brief Replaces the geometry instances with clones ot the passed geometry.
+    * \brief Replaces the geometry instances with clones of the passed geometry.
     *
     * Replaces the geometries of all time steps with clones of the passed
-    * geometry. Replacment strategy depends on the implementation of TimeGeometry
+    * geometry. Replacement strategy depends on the implementation of TimeGeometry
     * sub class.
     * @remark The time points itself stays untouched. Use this method if you want
     * to change the spatial properties of a TimeGeometry and preserve the time
     * "grid".
     */
-    virtual void ReplaceTimeStepGeometries(const Geometry3D* geometry);
+    virtual void ReplaceTimeStepGeometries(const BaseGeometry* geometry);
 
     /**
     * \brief Sets the geometry for the given time step
     *
     * If passed time step is not valid. Nothing will be changed.
-    * Setting of time steps may change the time step geometry (count of time steps).
-    * Alle other time steps will be removed that match one of the
-    * conflict conditions:\n
-    * 1. They are befor the set time step, but have larger lower bounds.\n
-    * 2. They are after the set time step, but have lower lower bounds.
+    * @pre geometry must point to a valid instance.
     */
-    virtual void SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep);
+    virtual void SetTimeStepGeometry(BaseGeometry* geometry, TimeStepType timeStep);
 
     /**
     * \brief Makes a deep copy of the current object
@@ -200,13 +215,16 @@ namespace mitk {
     virtual itk::LightObject::Pointer InternalClone () const;
 
     void ClearAllGeometries ();
+
     /** Append the passed geometry to the time geometry.
+     * @remark if it is not the first time step the passed minimum time point is ignored, so the existing time "grid" stays untouched.
      * @pre The passed geometry pointer must be valid.
-     * @pre The lower bound of the passed geometry must be larger then
-     * the lower time bound of the currently last time step.*/
-    void AppendTimeStep(Geometry3D* geometry);
-    /** Same than AppendTimeStep. But clones geometry befor adding it.*/
-    void AppendTimeStepClone(Geometry3D* geometry);
+     * @pre The maximumTimePoint must be larger then the maximum time point of the currently last time step.*/
+    void AppendTimeStep(BaseGeometry* geometry, TimePointType maximumTimePoint, TimePointType minimumTimePoint = 0);
+
+    /** Same than AppendTimeStep. But clones geometry before adding it.*/
+    void AppendTimeStepClone(BaseGeometry* geometry, TimePointType maximumTimePoint, TimePointType minimumTimePoint = 0);
+
     void ReserveSpaceForGeometries (TimeStepType numberOfGeometries);
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
@@ -214,12 +232,11 @@ namespace mitk {
   protected:
     virtual ~ArbitraryTimeGeometry();
 
-    std::vector<Geometry3D::Pointer> m_GeometryVector;
+    std::vector<BaseGeometry::Pointer> m_GeometryVector;
+    std::vector<TimePointType> m_MaximumTimePoints;
     TimePointType m_MinimumTimePoint;
-    TimePointType m_MaximumTimePoint;
 
-
-  }; // end class ProportialTimeGeometry
+  }; // end class ArbitraryTimeGeometry
 
 } // end namespace MITK
 #endif // ArbitraryTimeGeometry_h

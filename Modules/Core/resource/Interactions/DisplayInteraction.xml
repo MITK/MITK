@@ -25,6 +25,12 @@ TODO Std move to abort interaction of scroll/pan/zoom
           <condition name="check_position_event"/>
           <action name="init"/>
         </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="StdArrowRight" target="start" > <!-- rotation -->
+          <action name="rotate" />
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="StdArrowLeft" target="start" > <!-- rotation -->
+          <action name="rotateBack" />
+        </transition>
         <!-- mitkDispplayInteractor.cpp implements this for all events -->
         <transition event_class="InteractionEvent" event_variant="PlaneUP" target="start">
             <action name="ScrollOneUp"/>

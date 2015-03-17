@@ -67,11 +67,11 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("levelWindow", AdjustLevelWindow);
   CONNECT_FUNCTION("setCrosshair", SetCrosshair);
 
-
   CONNECT_FUNCTION ("updateStatusbar", UpdateStatusbar)
   CONNECT_FUNCTION("startRotation", StartRotation);
   CONNECT_FUNCTION("endRotation", EndRotation);
   CONNECT_FUNCTION("rotate", Rotate);
+  CONNECT_FUNCTION("rotateBack", RotateBack);
 
   CONNECT_FUNCTION("swivel", Swivel);
 }
@@ -789,6 +789,28 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
 
   statusText = stream.str();
   mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
+}
+
+bool mitk::DisplayInteractor::Rotate(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  mitk::Stepper* slice = sender->GetCameraRotationController()->GetSlice();
+
+  slice->Next(); //SetPos(slice->GetPos() + 1);
+
+  sender->GetRenderingManager()->RequestUpdateAll();
+  return true;
+}
+
+bool mitk::DisplayInteractor::RotateBack(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  mitk::Stepper* slice = sender->GetCameraRotationController()->GetSlice();
+
+  slice->Previous(); //SetPos(slice->GetPos() - 1);
+
+  sender->GetRenderingManager()->RequestUpdateAll();
+  return true;
 }
 
 void mitk::DisplayInteractor::ConfigurationChanged()

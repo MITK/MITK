@@ -117,6 +117,7 @@ namespace mitk
     /**
      * \brief Adjusts the level windows relative to mouse/pointer movement.
      */
+
     virtual void AdjustLevelWindow(StateMachineAction*, InteractionEvent*);
 
     /**
@@ -134,6 +135,8 @@ namespace mitk
      * \brief
      */
     virtual void Rotate(StateMachineAction*, InteractionEvent* event);
+    
+    virtual bool RotateBack(StateMachineAction*, InteractionEvent*);
 
     virtual void Swivel(StateMachineAction*, InteractionEvent* event);
 

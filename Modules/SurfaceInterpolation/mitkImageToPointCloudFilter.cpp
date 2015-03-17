@@ -33,7 +33,7 @@ mitk::ImageToPointCloudFilter::ImageToPointCloudFilter():
   m_NumberOfExtractedPoints(0)
 {
   m_PointGrid = mitk::UnstructuredGrid::New();
-  m_Method = DetectConstant(1);
+  m_Method = DetectConstant(0);
   m_EdgeImage = mitk::Image::New();
   m_EdgePoints = mitk::Image::New();
 
@@ -57,31 +57,26 @@ void mitk::ImageToPointCloudFilter::GenerateData()
     return;
   }
 
+  mitk::Image::Pointer notConstImage = image->Clone();
+
   switch(m_Method)
   {
   case 0:
-    this->LaplacianStdDev(image, 2);
+    AccessByItk_1(notConstImage.GetPointer(), StdDeviations, 2)
     break;
 
   case 1:
-    this->LaplacianStdDev(image, 3);
+    AccessByItk_1(notConstImage.GetPointer(), StdDeviations, 3)
     break;
 
   case 2:
-    this->LaplacianStdDev(image, 4);
+    AccessByItk_1(notConstImage.GetPointer(), StdDeviations, 4)
     break;
 
   default:
-    this->LaplacianStdDev(image, 3);
+    AccessByItk_1(notConstImage.GetPointer(), StdDeviations, 2)
     break;
   }
-}
-
-void mitk::ImageToPointCloudFilter::
-                    LaplacianStdDev(mitk::Image::ConstPointer image, int amount)
-{
-  mitk::Image::Pointer notConstImage = image->Clone();
-  AccessByItk_1(notConstImage.GetPointer(), StdDeviations, amount)
 }
 
 template<typename TPixel, unsigned int VImageDimension>
@@ -156,6 +151,8 @@ void mitk::ImageToPointCloudFilter::
 
   m_EdgePoints = mitk::ImportItkImage(lapFilter->GetOutput())->Clone();
 
+  /*need to build the UnstructuredGrid with at least one vertex otherwise its
+  not visible*/
   vtkSmartPointer<vtkPolyVertex> verts = vtkSmartPointer<vtkPolyVertex>::New();
 
   verts->GetPointIds()->SetNumberOfIds(m_NumberOfExtractedPoints);

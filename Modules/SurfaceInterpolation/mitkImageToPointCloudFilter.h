@@ -27,26 +27,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-enum MITKSURFACEINTERPOLATION_EXPORT DetectConstant
-{
-  LAPLACIAN_STD_DEV2 = 0,
-  LAPLACIAN_STD_DEV3 = 1,
-  LAPLACIAN_STD_DEV4 = 2
-};
-
+/**
+* @brief The filter extracts the edge pixels of an image as points and stores
+* them in an UnstructuredGrid. Every pixel which grey value is between the
+* mean +- standard deviation * (2 or 3), will be extracted as point. The
+* DetectionMethod can be set to choose if the doubled or tripled standard
+* deviation is used.
+*/
 class MITKSURFACEINTERPOLATION_EXPORT ImageToPointCloudFilter:
     public ImageToUnstructuredGridFilter
 {
 
 public:
 
+  enum DetectConstant
+  {
+    LAPLACIAN_STD_DEV2 = 0,
+    LAPLACIAN_STD_DEV3 = 1,
+    LAPLACIAN_STD_DEV4 = 2
+  };
+
   mitkClassMacro( ImageToPointCloudFilter, ImageToUnstructuredGridFilter)
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  typedef itk::Image<short, 3> ImageType;
-  typedef itk::Image<double, 3>  DoubleImageType;
   typedef itk::Image<double, 3> FloatImageType;
   typedef itk::LaplacianImageFilter< FloatImageType, FloatImageType >
           LaplacianFilterType;
@@ -61,30 +66,38 @@ public:
 
 protected:
 
+  /** This method is called by Update(). */
   virtual void GenerateData();
 
+  /** Initializes the output information */
   virtual void GenerateOutputInformation();
 
+  /** Constructor */
   ImageToPointCloudFilter();
 
+  /** Destructor */
   virtual ~ImageToPointCloudFilter();
 
 private:
 
+  /** Uses the laplace filter to create an image and extracts a pixel as point
+   *  if the grey value is between the mean +- standard deviation * (2 or 3) */
   template<typename TPixel, unsigned int VImageDimension>
   void StdDeviations(itk::Image<TPixel, VImageDimension>* image, int amount);
 
-  void LaplacianStdDev(Image::ConstPointer image, int amount);
-
   mitk::UnstructuredGrid::Pointer m_PointGrid;
-
   mitk::BaseGeometry* m_Geometry;
 
+  /** The generated image from the laplace filter */
   mitk::Image::Pointer m_EdgeImage;
+
+  /** The extracted pixels/points */
   mitk::Image::Pointer m_EdgePoints;
 
+  /** The number of extracted points */
   int m_NumberOfExtractedPoints;
 
+  /** The selected detection method */
   DetectionMethod m_Method;
 
 };

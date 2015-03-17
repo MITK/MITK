@@ -46,6 +46,8 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("ScrollOneDown", ScrollOneDown);
   CONNECT_FUNCTION("ScrollOneUp", ScrollOneUp);
   CONNECT_FUNCTION("levelWindow", AdjustLevelWindow);
+  CONNECT_FUNCTION("rotate", Rotate);
+  CONNECT_FUNCTION("rotateBack", RotateBack);
 }
 
 mitk::DisplayInteractor::DisplayInteractor()
@@ -310,6 +312,28 @@ bool mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction*, Interaction
 
   lv.SetLevelWindow(level, window);
   dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"))->SetLevelWindow(lv);
+
+  sender->GetRenderingManager()->RequestUpdateAll();
+  return true;
+}
+
+bool mitk::DisplayInteractor::Rotate(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  mitk::Stepper* slice = sender->GetCameraRotationController()->GetSlice();
+
+  slice->Next(); //SetPos(slice->GetPos() + 1);
+
+  sender->GetRenderingManager()->RequestUpdateAll();
+  return true;
+}
+
+bool mitk::DisplayInteractor::RotateBack(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  mitk::Stepper* slice = sender->GetCameraRotationController()->GetSlice();
+
+  slice->Previous(); //SetPos(slice->GetPos() - 1);
 
   sender->GetRenderingManager()->RequestUpdateAll();
   return true;

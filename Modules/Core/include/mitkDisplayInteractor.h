@@ -108,6 +108,11 @@ namespace mitk
      * \brief Adjusts the level windows relative to mouse/pointer movement.
      */
     virtual bool AdjustLevelWindow(StateMachineAction*, InteractionEvent*);
+    /**
+     * \brief 3D rotation.
+     */
+    virtual bool Rotate(StateMachineAction*, InteractionEvent*);
+    virtual bool RotateBack(StateMachineAction*, InteractionEvent*);
 
     /**
     * \brief Method to retrieve bool-value for given property from string-property

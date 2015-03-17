@@ -38,6 +38,12 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <transition event_class="MousePressEvent"  event_variant="StartAdjustLevelWindow" target="adjustlevelwindow">
             <action name="init"/>
         </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="StdArrowRight" target="start" > <!-- rotation -->
+          <action name="rotate" />
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="StdArrowLeft" target="start" > <!-- rotation -->
+          <action name="rotateBack" />
+        </transition>
     </state>
     <state name="move">
       <transition event_class="InteractionPositionEvent" event_variant="Moving" target="move">

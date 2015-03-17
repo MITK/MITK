@@ -35,7 +35,7 @@ namespace mitk {
 
     /**
     * Construct a RdfUri with a value.
-    * @param uri A std:string represents the transfer parameter from a URI.
+    * @param uri A std:string which represents the transfer parameter from a URI.
     */
     explicit RdfUri(std::string uri);
 

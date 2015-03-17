@@ -77,6 +77,19 @@ namespace mitk {
     return m_Value;
   }
 
+  bool RdfNode::operator==(const RdfNode &u) const
+  {
+    if (this->m_Type != u.m_Type) return false;
+    if (this->m_Value.compare(u.m_Value) != 0) return false;
+    if (this->m_Datatype != u.m_Datatype) return false;
+    return true;
+  }
+
+  bool RdfNode::operator!=(const RdfNode &u) const
+  {
+    return !operator==(u);
+  }
+
   // Define outstream of a Node
   std::ostream & operator<<(std::ostream &out, const RdfNode &n)
   {

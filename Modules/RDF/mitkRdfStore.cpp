@@ -52,7 +52,7 @@ namespace mitk {
   void RdfStore::SetBaseUri(RdfUri uri)
   {
     m_BaseUri = uri;
-    m_Prefixes[""] = RdfUri(m_BaseUri.ToString()+"#");
+    m_Prefixes[""] = RdfUri(m_BaseUri.ToString());
   }
 
   RdfUri RdfStore::GetBaseUri()
@@ -63,6 +63,11 @@ namespace mitk {
   void RdfStore::AddPrefix(std::string prefix, RdfUri uri)
   {
     m_Prefixes[prefix] = uri;
+  }
+
+  RdfStore::PrefixMap RdfStore::GetPrefixes()
+  {
+    return m_Prefixes;
   }
 
   void RdfStore::CleanUp()

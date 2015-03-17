@@ -22,17 +22,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class mitkRdfTripleTestSuite : public mitk::TestFixture
 {
-  // List of Tests
   CPPUNIT_TEST_SUITE(mitkRdfTripleTestSuite);
 
-  MITK_TEST(TestDummy);
+  // List of Tests
+  MITK_TEST(TestEmptyTriple);
+  MITK_TEST(TestObjectTriple);
+  MITK_TEST(TestDataTriple);
+  MITK_TEST(TestSubjectOfTriple);
+  MITK_TEST(TestPredicateOfTriple);
+  MITK_TEST(TestObjectOfTripleAsObject);
+  MITK_TEST(TestObjectOfTripleAsData);
 
   CPPUNIT_TEST_SUITE_END();
+
+private:
+
+  mitk::RdfTriple emptyTriple;
+  mitk::RdfUri seg;
+  mitk::RdfUri title;
 
 public:
 
   void setUp()
   {
+    emptyTriple = mitk::RdfTriple();
+    title = mitk::RdfUri("dcterms:title");
+    seg = mitk::RdfUri("http://mitk.org/wiki/MITK/data/instance.rdf#s0001");
   }
 
   void tearDown()
@@ -41,11 +56,65 @@ public:
 
   // Test functions
 
-  void TestDummy()
+  void TestEmptyTriple()
   {
-    CPPUNIT_ASSERT(true == true);
+    mitk::RdfTriple anotherTriple = mitk::RdfTriple(
+      mitk::RdfNode(), mitk::RdfNode(), mitk::RdfNode());
+    CPPUNIT_ASSERT(emptyTriple == anotherTriple);
   }
 
+  void TestObjectTriple()
+  {
+    mitk::RdfUri src = mitk::RdfUri("dcterms:source");
+    mitk::RdfUri image = mitk::RdfUri("http://mitk.org/wiki/MITK/data/instance.rdf#i0012");
+    mitk::RdfTriple objectTriple = mitk::RdfTriple(
+      mitk::RdfNode(seg), mitk::RdfNode(src), mitk::RdfNode(image));
+    emptyTriple.SetTripleSubject(seg);
+    emptyTriple.SetTriplePredicate(src);
+    emptyTriple.SetTripleObject(mitk::RdfNode(image));
+    CPPUNIT_ASSERT(emptyTriple == objectTriple);
+  }
+
+  void TestDataTriple()
+  {
+    mitk::RdfTriple dataTriple = mitk::RdfTriple(
+      mitk::RdfNode(seg), mitk::RdfNode(title), "TestLiver");
+    emptyTriple.SetTripleSubject(seg);
+    emptyTriple.SetTriplePredicate(title);
+    emptyTriple.SetTripleObject("TestLiver");
+    CPPUNIT_ASSERT(emptyTriple == dataTriple);
+  }
+
+  void TestSubjectOfTriple()
+  {
+    mitk::RdfTriple triple = mitk::RdfTriple(
+      mitk::RdfNode(seg), mitk::RdfNode(title), "KidneyLeft");
+
+    CPPUNIT_ASSERT(triple.GetTripleSubject() == mitk::RdfNode(seg));
+  }
+
+  void TestPredicateOfTriple()
+  {
+    mitk::RdfTriple triple = mitk::RdfTriple(
+      mitk::RdfNode(seg), mitk::RdfNode(title), "KidneyRight");
+    CPPUNIT_ASSERT(triple.GetTriplePredicate() == mitk::RdfNode(title));
+  }
+
+  void TestObjectOfTripleAsObject()
+  {
+    mitk::RdfNode image = mitk::RdfNode(
+      mitk::RdfUri("http://mitk.org/wiki/MITK/data/instance.rdf#i0012"));
+    mitk::RdfTriple triple = mitk::RdfTriple(
+      mitk::RdfNode(seg), mitk::RdfNode(mitk::RdfUri("dcterms:source")), image);
+    CPPUNIT_ASSERT(triple.GetTripleObject() == image);
+  }
+
+  void TestObjectOfTripleAsData()
+  {
+    mitk::RdfTriple triple = mitk::RdfTriple(
+      mitk::RdfNode(seg), mitk::RdfNode(mitk::RdfUri("mitk:volumeInMl")), "450");
+    CPPUNIT_ASSERT(triple.GetTripleObject() == mitk::RdfNode("450"));
+  }
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkRdfTriple)

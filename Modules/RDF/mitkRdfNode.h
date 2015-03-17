@@ -99,6 +99,9 @@ namespace mitk {
     */
     std::string GetValue() const;
 
+    bool operator==(const RdfNode &u) const;
+    bool operator!=(const RdfNode &u) const;
+
   private:
     Type m_Type;
     RdfUri m_Datatype;

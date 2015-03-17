@@ -22,17 +22,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class mitkRdfUriTestSuite : public mitk::TestFixture
 {
-  // List of Tests
   CPPUNIT_TEST_SUITE(mitkRdfUriTestSuite);
 
-  MITK_TEST(TestDummy);
+  // List of Tests
+  MITK_TEST(TestEmptyUri);
+  MITK_TEST(TestValueOfUri);
+  MITK_TEST(TestSetUri);
 
   CPPUNIT_TEST_SUITE_END();
+
+private:
+
+  mitk::RdfUri m_EmptyUri;
+  std::string m_UriText;
+  mitk::RdfUri m_Uri;
 
 public:
 
   void setUp()
   {
+    // normal URI
+    m_UriText = "http://mitk.org/wiki/MITK/data/BaseOntology.rdf#";
+    m_Uri = mitk::RdfUri(m_UriText);
   }
 
   void tearDown()
@@ -41,11 +52,23 @@ public:
 
   // Test functions
 
-  void TestDummy()
+  void TestEmptyUri()
   {
-    CPPUNIT_ASSERT(true == true);
+    mitk::RdfUri anotherEmptyUri("");
+    CPPUNIT_ASSERT(m_EmptyUri == anotherEmptyUri);
   }
 
+  void TestValueOfUri()
+  {
+    CPPUNIT_ASSERT(m_Uri.ToString().compare(m_UriText) == 0);
+  }
+
+  void TestSetUri()
+  {
+    mitk::RdfUri newUri;
+    newUri.SetUri(m_UriText);
+    CPPUNIT_ASSERT(newUri == m_Uri);
+  }
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkRdfUri)

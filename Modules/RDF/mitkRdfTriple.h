@@ -65,10 +65,16 @@ namespace mitk {
     void SetTriplePredicate(RdfNode predicate);
 
     /**
-    * Set the object of a triple.
+    * Set the object of a triple with an object property.
     * @param object A node from type URI, BLANK or LITERAL.
     */
     void SetTripleObject(RdfNode object);
+
+    /**
+    * Set the object of a triple with a data property as text.
+    * @param text A literal value..
+    */
+    void SetTripleObject(std::string text);
 
     /**
     * Get the subject of a triple.
@@ -87,6 +93,9 @@ namespace mitk {
     * @return The object of a triple.
     */
     RdfNode GetTripleObject() const;
+
+    bool operator==(const RdfTriple &u) const;
+    bool operator!=(const RdfTriple &u) const;
 
   private:
     RdfNode m_Subject;

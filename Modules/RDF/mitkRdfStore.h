@@ -62,6 +62,12 @@ namespace mitk {
     void AddPrefix(std::string prefix, RdfUri uri);
 
     /**
+    * Get a Map with all prefixes of the triplestore.
+    * @return A Map with all Prefixes of the RdfStore.
+    */
+    PrefixMap GetPrefixes();
+
+    /**
     * Clean up the triplestore to the state of a new store.
     */
     void CleanUp();

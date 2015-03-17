@@ -50,6 +50,12 @@ namespace mitk {
     m_Object = object;
   }
 
+  void RdfTriple::SetTripleObject(std::string text)
+  {
+    mitk::RdfNode object = mitk::RdfNode(text);
+    m_Object = object;
+  }
+
   RdfNode RdfTriple::GetTripleSubject() const
   {
     return m_Subject;
@@ -63,6 +69,19 @@ namespace mitk {
   RdfNode RdfTriple::GetTripleObject() const
   {
     return m_Object;
+  }
+
+  bool RdfTriple::operator==(const RdfTriple &u) const
+  {
+    if (this->m_Subject != u.m_Subject) return false;
+    if (this->m_Predicate != m_Predicate) return false;
+    if (this->m_Object != u.m_Object) return false;
+    return true;
+  }
+
+  bool RdfTriple::operator!=(const RdfTriple &u) const
+  {
+    return !operator==(u);
   }
 
   // Define outstream of a Triple

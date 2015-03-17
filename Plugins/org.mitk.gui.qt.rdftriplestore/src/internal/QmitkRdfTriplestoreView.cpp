@@ -334,14 +334,6 @@ void QmitkRdfTriplestoreView::DataStorageToTriples()
 
       // ENUM mit dublincore properties oder string array
 
-      // TODO: Name(title)
-      //Uri firstT(":" + nodeUUID + name);
-      //Uri secondT(name);
-      //Node subT(firstT);
-      //Node predT(Uri("dcterms:title"));
-      //Node objT(secondT);
-      //Triple tName(subT, predT, objT);
-
       // Parent(source)
       Uri first(":" + nodeUUID/* + name*/);
       Uri second(":" + sourceUUID/* + sourceName*/);

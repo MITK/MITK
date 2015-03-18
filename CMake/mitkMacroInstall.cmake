@@ -43,11 +43,9 @@ macro(_fixup_target)
     endif()
   endif()
 
-  set(_python_libs )
-  set(_python_dirs )
   if(MITK_USE_Python)
     include(mitkFunctionInstallPython)
-    mitkFunctionInstallPython(_python_libs _python_dirs "${_bundle_dest_dir}")
+    mitkFunctionInstallPython(_python_libs "${_bundle_dest_dir}")
   endif()
 
   mitkFunctionGetLibrarySearchPaths(_search_paths ${intermediate_dir})
@@ -177,10 +175,6 @@ macro(_fixup_target)
       get_filename_component(_pluginpath \${_plugin} PATH)
       list(APPEND DIRS \"\${_pluginpath}\")
     endforeach(_plugin)
-
-    foreach(_dir ${_python_dirs})
-      list(APPEND DIRS \"\${_dir}\")
-    endforeach()
 
     list(REMOVE_DUPLICATES DIRS)
 

@@ -21,8 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkExtractSliceFilter.h>
 #include "mitkIOUtil.h"
+#include "mitkITKImageImport.h"
 
 #include "itksys/SystemTools.hxx"
+#include <itkImageRegionIterator.h>
 
 #include <iostream>
 #include <fstream>
@@ -41,6 +43,8 @@ class mitkItkImageIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestImageWriterPng2);
   MITK_TEST(TestImageWriterPng3);
   MITK_TEST(TestImageWriterSimple);
+  MITK_TEST(TestWrite3DImageWithOnePlane);
+  MITK_TEST(TestWrite3DImageWithTwoPlanes);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -285,6 +289,103 @@ public:
     TestPictureWriting(image, tmpFilePath, ".tiff");
     TestPictureWriting(image, tmpFilePath, ".bmp");
     // always end with this!
+
+  }
+
+  /**
+  * Try to write a 3D image with only one plane (a 2D images in disguise for all intents and purposes)
+  */
+  void TestWrite3DImageWithOnePlane(){
+    typedef itk::Image<unsigned char, 3>  ImageType;
+
+    ImageType::Pointer itkImage = ImageType::New();
+
+    ImageType::IndexType start;
+    start.Fill(0);
+
+    ImageType::SizeType size;
+    size[0] = 100;
+    size[1] = 100;
+    size[2] = 1;
+
+    ImageType::RegionType region;
+    region.SetSize(size);
+    region.SetIndex(start);
+    itkImage->SetRegions(region);
+    itkImage->Allocate();
+    itkImage->FillBuffer(0);
+
+    itk::ImageRegionIterator<ImageType> imageIterator(itkImage, itkImage->GetLargestPossibleRegion());
+
+    // Make two squares
+    while (!imageIterator.IsAtEnd())
+    {
+      if ((imageIterator.GetIndex()[0] > 5 && imageIterator.GetIndex()[0] < 20) &&
+        (imageIterator.GetIndex()[1] > 5 && imageIterator.GetIndex()[1] < 20))
+      {
+        imageIterator.Set(255);
+      }
+
+      if ((imageIterator.GetIndex()[0] > 50 && imageIterator.GetIndex()[0] < 70) &&
+        (imageIterator.GetIndex()[1] > 50 && imageIterator.GetIndex()[1] < 70))
+      {
+        imageIterator.Set(60);
+      }
+      ++imageIterator;
+    }
+
+    mitk::Image::Pointer image = mitk::ImportItkImage(itkImage);
+
+    mitk::IOUtil::SaveImage(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.nrrd"));
+    mitk::IOUtil::SaveImage(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.png"));
+
+  }
+
+  /**
+  * Try to write a 3D image with only one plane (a 2D images in disguise for all intents and purposes)
+  */
+  void TestWrite3DImageWithTwoPlanes(){
+    typedef itk::Image<unsigned char, 3>  ImageType;
+
+    ImageType::Pointer itkImage = ImageType::New();
+
+    ImageType::IndexType start;
+    start.Fill(0);
+
+    ImageType::SizeType size;
+    size[0] = 100;
+    size[1] = 100;
+    size[2] = 2;
+
+    ImageType::RegionType region;
+    region.SetSize(size);
+    region.SetIndex(start);
+    itkImage->SetRegions(region);
+    itkImage->Allocate();
+    itkImage->FillBuffer(0);
+
+    itk::ImageRegionIterator<ImageType> imageIterator(itkImage, itkImage->GetLargestPossibleRegion());
+
+    // Make two squares
+    while (!imageIterator.IsAtEnd())
+    {
+      if ((imageIterator.GetIndex()[0] > 5 && imageIterator.GetIndex()[0] < 20) &&
+        (imageIterator.GetIndex()[1] > 5 && imageIterator.GetIndex()[1] < 20))
+      {
+        imageIterator.Set(255);
+      }
+      if ((imageIterator.GetIndex()[0] > 50 && imageIterator.GetIndex()[0] < 70) &&
+        (imageIterator.GetIndex()[1] > 50 && imageIterator.GetIndex()[1] < 70))
+      {
+        imageIterator.Set(60);
+      }
+      ++imageIterator;
+    }
+    mitk::Image::Pointer image = mitk::ImportItkImage(itkImage);
+
+    mitk::IOUtil::SaveImage(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.nrrd"));
+
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveImage(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.png")), mitk::Exception);
 
   }
 

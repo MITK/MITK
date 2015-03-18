@@ -1,5 +1,5 @@
-diff -urNb ITK-4.5.1/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_config_compiler.h.in ITK/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_config_compiler.h.in
---- ITK-4.5.1/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_config_compiler.h.in	2014-02-28 19:46:45.000000000 +0100
+diff -urNb ITK-4.7.1/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_config_compiler.h.in ITK/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_config_compiler.h.in
+--- ITK-4.7.1/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_config_compiler.h.in	2014-02-28 19:46:45.000000000 +0100
 +++ ITK/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_config_compiler.h.in	2015-02-06 01:37:50.344008518 +0100
 @@ -120,7 +120,7 @@
  // define VCL_CAN_STATIC_CONST_INIT_INT to either 0 or 1.

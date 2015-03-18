@@ -223,7 +223,7 @@ namespace mitk {
     void AppendTimeStep(BaseGeometry* geometry, TimePointType maximumTimePoint, TimePointType minimumTimePoint = 0);
 
     /** Same than AppendTimeStep. But clones geometry before adding it.*/
-    void AppendTimeStepClone(BaseGeometry* geometry, TimePointType maximumTimePoint, TimePointType minimumTimePoint = 0);
+    void AppendTimeStepClone(const BaseGeometry* geometry, TimePointType maximumTimePoint, TimePointType minimumTimePoint = 0);
 
     void ReserveSpaceForGeometries (TimeStepType numberOfGeometries);
 

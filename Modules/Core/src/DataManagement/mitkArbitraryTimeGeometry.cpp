@@ -264,7 +264,7 @@ void mitk::ArbitraryTimeGeometry::AppendTimeStep(BaseGeometry* geometry, TimePoi
   m_MaximumTimePoints.push_back(maximumTimePoint);
 }
 
-void mitk::ArbitraryTimeGeometry::AppendTimeStepClone(BaseGeometry* geometry, TimePointType maximumTimePoint, TimePointType minimumTimePoint)
+void mitk::ArbitraryTimeGeometry::AppendTimeStepClone(const BaseGeometry* geometry, TimePointType maximumTimePoint, TimePointType minimumTimePoint)
 {
   BaseGeometry::Pointer clone = geometry->Clone();
 

@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLocalStorageHandler.h"
 
 #include <vtkActor.h>
-#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkPainterPolyDataMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
@@ -116,7 +115,7 @@ public:
     public:
 
       vtkSmartPointer<vtkActor> m_Actor;
-      vtkSmartPointer<vtkPolyDataMapper> m_VtkPolyDataMapper;
+      vtkSmartPointer<vtkPainterPolyDataMapper> m_VtkPolyDataMapper;
       vtkSmartPointer<vtkPolyDataNormals> m_VtkPolyDataNormals;
       vtkSmartPointer<vtkPlaneCollection> m_ClippingPlaneCollection;
       vtkSmartPointer<vtkDepthSortPolyData> m_DepthSort;
@@ -124,7 +123,7 @@ public:
 
       LocalStorage()
       {
-        m_VtkPolyDataMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
+        m_VtkPolyDataMapper = vtkSmartPointer<vtkPainterPolyDataMapper>::New();
         m_VtkPolyDataNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
         m_Actor = vtkSmartPointer<vtkActor>::New();
         m_ClippingPlaneCollection = vtkSmartPointer<vtkPlaneCollection>::New();

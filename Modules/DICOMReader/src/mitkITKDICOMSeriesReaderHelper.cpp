@@ -339,10 +339,8 @@ mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
 
 mitk::TimeGeometry::Pointer
   mitk::ITKDICOMSeriesReaderHelper::
-  GenerateTimeGeometry(const Geometry3D* templateGeometry, const TimeBoundsList& boundsList)
+  GenerateTimeGeometry(const BaseGeometry* templateGeometry, const TimeBoundsList& boundsList)
 {
-  Geometry3D::Pointer clone = templateGeometry->Clone();
-
   ArbitraryTimeGeometry::Pointer timeGeometry = ArbitraryTimeGeometry::New();
   timeGeometry->ClearAllGeometries();
 
@@ -354,9 +352,7 @@ mitk::TimeGeometry::Pointer
       bounds[1] = boundsList[pos+1][0];
     }
 
-    clone->SetTimeBounds(bounds);
-
-    timeGeometry->AppendTimeStepClone(clone);
+    timeGeometry->AppendTimeStepClone(templateGeometry,bounds[1],bounds[0]);
   }
 
   return timeGeometry;

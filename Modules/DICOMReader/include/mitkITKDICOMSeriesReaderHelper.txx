@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <itkLinearInterpolateImageFunction.h>
 //#include <itkTimeProbesCollectorBase.h>
 
+#include <ofdatime.h>
+
 template <typename PixelType>
 mitk::Image::Pointer
 mitk::ITKDICOMSeriesReaderHelper

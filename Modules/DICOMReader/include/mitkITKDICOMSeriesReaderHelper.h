@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkGDCMImageIO.h>
 
-#include <ofdatime.h>
+/* Forward deceleration of an DCMTK class. Used in the txx but part of the interface.*/
+class OFDateTime;
 
 namespace mitk
 {
@@ -59,7 +60,7 @@ class ITKDICOMSeriesReaderHelper
     /** Helper function that generates  a time geometry using the template and the passed boundslist
         (which indicates the number of time steps).
     */
-    static TimeGeometry::Pointer GenerateTimeGeometry(const Geometry3D* templateGeometry, const TimeBoundsList& boundsList);
+    static TimeGeometry::Pointer GenerateTimeGeometry(const BaseGeometry* templateGeometry, const TimeBoundsList& boundsList);
 
     template <typename ImageType>
     typename ImageType::Pointer

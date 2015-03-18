@@ -29,7 +29,7 @@ namespace mitk
   *           continuously update the tool coordinates.
   *   \ingroup IGT
   */
-  class MitkIGT_EXPORT OpenIGTLinkTrackingTool : public InternalTrackingTool
+  class MITKIGT_EXPORT OpenIGTLinkTrackingTool : public InternalTrackingTool
   {
   public:
     friend class OpenIGTLinkTrackingTrackingDevice;

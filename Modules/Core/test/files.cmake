@@ -178,7 +178,11 @@ set(MODULE_CUSTOM_TESTS
     mitkImageToItkTest.cpp
     mitkImageSliceSelectorTest.cpp
     mitkSurfaceDepthPeelingTest.cpp
+    if(NOT WIN32)
+    # Currently not working on windows because of a rendering timing issue
+    # see bug 18083 for details
     mitkSurfaceDepthSortingTest.cpp
+    endif()
 )
 
 set(RESOURCE_FILES

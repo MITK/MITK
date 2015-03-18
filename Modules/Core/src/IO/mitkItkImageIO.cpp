@@ -465,7 +465,7 @@ AbstractFileIO::ConfidenceLevel ItkImageIO::GetWriterConfidenceLevel() const
   {
     // okay, dimension is not supported. We have to look at a special case:
     // 3D-Image with one slice. We can treat that as a 2D image.
-    if ( (image->GetDimension() == 3) && (image->GetSliceData()->GetSize() == 1) )
+    if ((image->GetDimension() == 3) && (image->GetSlicedGeometry()->GetSlices() == 1))
       return IFileWriter::Supported;
     else
       return IFileWriter::Unsupported;

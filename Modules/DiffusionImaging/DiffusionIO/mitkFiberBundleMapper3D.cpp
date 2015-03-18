@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCamera.h>
 #include <vtkTubeFilter.h>
 #include <vtkRibbonFilter.h>
+#include <vtkLookupTable.h>
 
 mitk::FiberBundleMapper3D::FiberBundleMapper3D()
     : m_TubeRadius(0.0)

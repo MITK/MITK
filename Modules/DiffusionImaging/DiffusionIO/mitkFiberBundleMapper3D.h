@@ -23,16 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundle.h>
 
 #include <vtkSmartPointer.h>
-#include <vtkOpenGLPolyDataMapper.h>
-#include <vtkOpenGLActor.h>
-#include <vtkLookupTable.h>
-
-
 
 class vtkPropAssembly;
-
-
-
+class vtkPolyDataMapper;
+class vtkLookupTable;
+class vtkOpenGLActor;
 
 namespace mitk {
 

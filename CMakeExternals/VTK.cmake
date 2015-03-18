@@ -86,14 +86,14 @@ if(NOT DEFINED VTK_DIR)
     )
   endif()
 
-  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.1.0+74f4888.tar.gz)
-  set(VTK_URL_MD5 1f19dae22c42c032109bd3cf91c4e8c9)
+  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.2.0.tar.gz)
+  set(VTK_URL_MD5 4790f8b3acdbc376997fbdc9d203f0b7)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
     URL ${VTK_URL}
     URL_MD5 ${VTK_URL_MD5}
-    PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-6.1.0+74f4888.patch
+    PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-6.2.0.patch
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}

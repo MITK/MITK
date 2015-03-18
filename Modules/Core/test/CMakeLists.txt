@@ -128,10 +128,14 @@ if(TARGET ${TESTDRIVER})
                              ${MITK_DATA_DIR}/RenderingTestData/openMeAlone.mps #input point set to load in data storage
                             -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/openMeAloneTransformedPoints640x480REF.png #corresponding reference screenshot
     )
+    # Currently not working on windows because of a rendering timing issue
+    # see bug 18083 for details
+    if(NOT WIN32)
     mitkAddCustomModuleTest(mitkSurfaceDepthSortingTransparency_StanfordBunnySTL640x480 mitkSurfaceDepthSortingTest
                             ${MITK_DATA_DIR}/RenderingTestData/Stanford_bunny.stl
                             -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Stanford_bunnySTLDepthSorting640x480REF.png
     )
+    endif()
     if(NOT APPLE)
       mitkAddCustomModuleTest(mitkSurfaceDepthPeelingTransparency_StanfordBunnySTL640x480 mitkSurfaceDepthPeelingTest
                               ${MITK_DATA_DIR}/RenderingTestData/Stanford_bunny.stl

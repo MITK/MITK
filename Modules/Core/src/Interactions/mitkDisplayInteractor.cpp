@@ -74,6 +74,9 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("rotateBack", RotateBack);
 
   CONNECT_FUNCTION("swivel", Swivel);
+
+  CONNECT_FUNCTION("rotateUp", RotateUp);
+  CONNECT_FUNCTION("rotateDown", RotateDown);
 }
 
 mitk::DisplayInteractor::DisplayInteractor()
@@ -796,7 +799,7 @@ bool mitk::DisplayInteractor::Rotate(StateMachineAction*, InteractionEvent* inte
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
   mitk::Stepper* slice = sender->GetCameraRotationController()->GetSlice();
 
-  slice->Next(); //SetPos(slice->GetPos() + 1);
+  slice->Next();
 
   sender->GetRenderingManager()->RequestUpdateAll();
   return true;
@@ -807,7 +810,29 @@ bool mitk::DisplayInteractor::RotateBack(StateMachineAction*, InteractionEvent* 
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
   mitk::Stepper* slice = sender->GetCameraRotationController()->GetSlice();
 
-  slice->Previous(); //SetPos(slice->GetPos() - 1);
+  slice->Previous();
+
+  sender->GetRenderingManager()->RequestUpdateAll();
+  return true;
+}
+
+bool mitk::DisplayInteractor::RotateUp(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  mitk::Stepper* slice = sender->GetCameraRotationController()->GetElevationSlice();
+
+  slice->Next();
+
+  sender->GetRenderingManager()->RequestUpdateAll();
+  return true;
+}
+
+bool mitk::DisplayInteractor::RotateDown(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  mitk::Stepper* slice = sender->GetCameraRotationController()->GetElevationSlice();
+
+  slice->Previous();
 
   sender->GetRenderingManager()->RequestUpdateAll();
   return true;

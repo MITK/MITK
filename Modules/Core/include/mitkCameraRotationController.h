@@ -35,6 +35,9 @@ public:
   //mitkNewMacro1Param(Self, const char *);
 
   void RotateCamera();
+  void Elevate();
+
+  void RotateToAngle(double angle);
   void AcquireCamera();
 
   void SetRenderWindow(vtkRenderWindow * renWin)
@@ -42,14 +45,24 @@ public:
     m_RenderWindow = renWin;
   }
 
+  Stepper::Pointer GetElevationSlice() {
+    return m_ElevationSlice;
+  }
+
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) override;
+
 protected:
   CameraRotationController();
   virtual ~CameraRotationController();
 
 private:
   int m_LastStepperValue;
+  int m_ElevateLastStepperValue;
+
   vtkCamera* m_Camera;
   vtkRenderWindow* m_RenderWindow;
+
+  Stepper::Pointer m_ElevationSlice;
 };
 
 }

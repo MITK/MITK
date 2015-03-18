@@ -25,12 +25,6 @@ TODO Std move to abort interaction of scroll/pan/zoom
           <condition name="check_position_event"/>
           <action name="init"/>
         </transition>
-        <transition event_class="InteractionKeyEvent" event_variant="StdArrowRight" target="start" > <!-- rotation -->
-          <action name="rotate" />
-        </transition>
-        <transition event_class="InteractionKeyEvent" event_variant="StdArrowLeft" target="start" > <!-- rotation -->
-          <action name="rotateBack" />
-        </transition>
         <!-- mitkDispplayInteractor.cpp implements this for all events -->
         <transition event_class="InteractionEvent" event_variant="PlaneUP" target="start">
             <action name="ScrollOneUp"/>
@@ -43,6 +37,18 @@ TODO Std move to abort interaction of scroll/pan/zoom
         </transition>
         <transition event_class="MousePressEvent"  event_variant="StartAdjustLevelWindow" target="adjustlevelwindow">
             <action name="init"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="StdArrowRight" target="start" >
+          <action name="rotate" />
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="StdArrowLeft" target="start" >
+          <action name="rotateBack" />
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="StdArrowUp" target="start" >
+          <action name="rotateUp" />
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="StdArrowDown" target="start" >
+          <action name="rotateDown" />
         </transition>
         <transition event_class="InteractionPositionEvent"  event_variant="SetCrosshair" target="crosshair">
             <action name="setCrosshair"/>

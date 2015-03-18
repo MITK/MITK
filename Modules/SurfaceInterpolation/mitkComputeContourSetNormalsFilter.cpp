@@ -124,7 +124,6 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
       double vertexNormal[3];
 
-      mitk::IOUtil::SaveImage( m_SegmentationBinaryImage, "C:/tmp/interpol/SegmentationBinaryImage.nrrd" );
       for (vtkIdType j = 0; j < cellSize-2; j++)
       {
         existingPoints->GetPoint(cell[j+1], p1);
@@ -213,7 +212,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
       std::cout << "Negative normal counter: " << m_NegativeNormalCounter << std::endl;
       std::cout << "Positive normal counter: " << m_PositiveNormalCounter << std::endl;
-      int n = 5;
+
       if(m_NegativeNormalCounter > m_PositiveNormalCounter)
       {
           for(vtkIdType n = 0; n < cellSize; n++)

@@ -73,7 +73,7 @@ namespace mitk
 
     static SurfaceInterpolationController* GetInstance();
 
-    void SetCurrentTimeStep( unsigned int ts )
+    void SetCurrentTimeStep( int ts )
     {
       if ( m_CurrentTimeStep != ts )
       {
@@ -81,10 +81,10 @@ namespace mitk
 
         if ( m_SelectedSegmentation )
         {
-          m_TimeSelector->SetInput( m_SelectedSegmentation );
+          /*m_TimeSelector->SetInput( m_SelectedSegmentation );
           m_TimeSelector->SetTimeNr( m_CurrentTimeStep );
           m_TimeSelector->SetChannelNr( 0 );
-          m_TimeSelector->Update();
+          m_TimeSelector->Update();*/
 
           this->ReinitializeInterpolation();
         }
@@ -258,9 +258,9 @@ namespace mitk
 
     std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
 
-    unsigned int m_CurrentTimeStep;
+    int m_CurrentTimeStep;
 
-    mitk::ImageTimeSelector::Pointer m_TimeSelector;
+    //mitk::ImageTimeSelector::Pointer m_TimeSelector;
  };
 }
 #endif

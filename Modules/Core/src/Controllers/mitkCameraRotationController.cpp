@@ -76,10 +76,10 @@ void mitk::CameraRotationController::Elevate()
   {
     this->AcquireCamera();
   }
-
   if (m_Camera)
   {
     int newStepperValue = m_ElevationSlice->GetPos();
+    if (newStepperValue == 0) return;
     m_Camera->Elevation( m_ElevateLastStepperValue - newStepperValue );
     m_ElevateLastStepperValue = newStepperValue;
     //const_cast< RenderWindow* >(m_RenderWindow)->RequestUpdate(); // TODO does not work with movie generator!

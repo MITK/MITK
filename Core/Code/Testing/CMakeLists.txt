@@ -8,7 +8,7 @@ else()
   mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-declarations" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
 endif()
 
-MITK_CREATE_MODULE_TESTS(US_MODULE)
+MITK_CREATE_MODULE_TESTS()
 mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|ITKThresholding)
 
 mitkAddCustomModuleTest(mitkVolumeCalculatorTest_Png2D-bw mitkVolumeCalculatorTest

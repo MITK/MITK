@@ -91,6 +91,7 @@ mitk::DisplayInteractor::DisplayInteractor()
   , m_AlwaysReact(false)
   , m_ZoomFactor(2)
   , m_LinkPlanes(true)
+  , m_Clock_Rotation_Speed(5)
 {
   m_StartCoordinateInMM.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
@@ -839,7 +840,7 @@ bool mitk::DisplayInteractor::RotateDown(StateMachineAction*, InteractionEvent* 
 bool mitk::DisplayInteractor::RotateClock(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  sender->GetCameraRotationController()->RotateToAngle(5);
+  sender->GetCameraRotationController()->RotateToAngle(m_Clock_Rotation_Speed);
   sender->GetRenderingManager()->RequestUpdateAll();
   return true;
 }
@@ -847,9 +848,19 @@ bool mitk::DisplayInteractor::RotateClock(StateMachineAction*, InteractionEvent*
 bool mitk::DisplayInteractor::RotateBackClock(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  sender->GetCameraRotationController()->RotateToAngle(-5);
+  sender->GetCameraRotationController()->RotateToAngle(-m_Clock_Rotation_Speed);
   sender->GetRenderingManager()->RequestUpdateAll();
   return true;
+}
+
+double mitk::DisplayInteractor::GetClockRotationSpeed()
+{
+  return m_Clock_Rotation_Speed;
+}
+
+void mitk::DisplayInteractor::SetClockRotationSpeed(double newRotationSpeed)
+{
+  m_Clock_Rotation_Speed = newRotationSpeed;
 }
 
 void mitk::DisplayInteractor::ConfigurationChanged()

@@ -151,6 +151,12 @@ namespace mitk
     virtual void UpdateStatusbar(StateMachineAction*, InteractionEvent* event);
 
     /**
+    /* Change Clock rotation spead for ctrl+arrow rotation
+    */
+    double GetClockRotationSpeed();
+    void SetClockRotationSpeed(double newRotationSpeed);
+
+    /**
     * \brief Method to retrieve bool-value for given property from string-property
     * in given propertylist.
     */
@@ -268,7 +274,10 @@ namespace mitk
     Vector3D m_PreviousRotationAxis;
     ScalarType m_PreviousRotationAngle;
 
-
+     /**
+     * Clock rotation spead for ctrl+arrow rotation
+     */
+    double m_Clock_Rotation_Speed;
   };
 }
 #endif

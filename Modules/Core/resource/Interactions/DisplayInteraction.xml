@@ -50,6 +50,12 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <transition event_class="InteractionKeyEvent" event_variant="StdArrowDown" target="start" >
           <action name="rotateDown" />
         </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="RotateClock" target="start" >
+          <action name="rotateClock" />
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="RotateBackClock" target="start" >
+          <action name="rotateBackClock" />
+        </transition>
         <transition event_class="InteractionPositionEvent"  event_variant="SetCrosshair" target="crosshair">
             <action name="setCrosshair"/>
             <action name="updateStatusbar"/>

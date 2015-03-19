@@ -76,4 +76,13 @@
   <event_variant class="MouseWheelEvent" name="PlaneDown">
     <attribute name="ScrollDirection" value="down"/>
   </event_variant>
+  <!-- Rotation -->
+  <event_variant class="InteractionKeyEvent" name="RotateClock">
+    <attribute name="Modifiers" value="ctrl"/>
+    <attribute name="Key" value="ArrowRight"/>
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="RotateBackClock">
+    <attribute name="Modifiers" value="ctrl"/>
+    <attribute name="Key" value="ArrowLeft"/>
+  </event_variant>
 </config>

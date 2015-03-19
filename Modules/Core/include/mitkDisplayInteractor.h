@@ -139,6 +139,8 @@ namespace mitk
     virtual bool RotateBack(StateMachineAction*, InteractionEvent*);
     virtual bool RotateUp(StateMachineAction*, InteractionEvent*);
     virtual bool RotateDown(StateMachineAction*, InteractionEvent*);
+    virtual bool RotateClock(StateMachineAction*, InteractionEvent*);
+    virtual bool RotateBackClock(StateMachineAction*, InteractionEvent*);
 
     virtual void Swivel(StateMachineAction*, InteractionEvent* event);
 

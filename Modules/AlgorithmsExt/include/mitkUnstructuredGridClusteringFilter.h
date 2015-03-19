@@ -96,12 +96,15 @@ namespace mitk {
       mitk::UnstructuredGrid::Pointer m_UnstructGrid;
 
       std::vector< vtkSmartPointer<vtkPoints> > m_Clusters;
+      std::vector< vtkSmartPointer<vtkDoubleArray> > m_DistanceArrays;
 
       double m_eps;
 
       int m_MinPts;
 
       bool m_Meshing;
+
+      bool m_DistCalc;
 
   };
 

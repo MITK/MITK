@@ -36,7 +36,7 @@ namespace mitk {
    * The parameters m_Meshing (Set/GetMeshing()), m_MinPts (Set/GetMinPts()) and
    * m_Eps (Set/GetEps()) are used for the UnstructuredGridClusteringFilter.
    */
-  class MitkSurfaceInterpolation_EXPORT ClusteredPlaneSuggestionFilter
+  class MITKSURFACEINTERPOLATION_EXPORT ClusteredPlaneSuggestionFilter
       : public UnstructuredGridToUnstructuredGridFilter
   {
     public:

@@ -8,7 +8,7 @@ else()
   mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-declarations" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
 endif()
 
-MITK_CREATE_MODULE_TESTS(US_MODULE)
+MITK_CREATE_MODULE_TESTS()
 if(TARGET ${TESTDRIVER})
   mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|ITKThresholding+ITKTestKernel VTK|vtkTestingRendering tinyxml)
 

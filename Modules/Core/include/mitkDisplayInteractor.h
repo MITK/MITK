@@ -119,6 +119,12 @@ namespace mitk
     virtual bool RotateBackClock(StateMachineAction*, InteractionEvent*);
 
     /**
+    /* Change Clock rotation spead for ctrl+arrow rotation
+    */
+    double GetClockRotationSpeed();
+    void SetClockRotationSpeed(double newRotationSpeed);
+
+    /**
     * \brief Method to retrieve bool-value for given property from string-property
     * in given propertylist.
     */
@@ -207,6 +213,10 @@ namespace mitk
      * Factor to adjust zooming speed.
      */
     float m_ZoomFactor;
+     /**
+     * Clock rotation spead for ctrl+arrow rotation
+     */
+    double m_Clock_Rotation_Speed;
   };
 }
 #endif

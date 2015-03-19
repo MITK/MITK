@@ -277,7 +277,7 @@ namespace mitk
      /**
      * Clock rotation spead for ctrl+arrow rotation
      */
-    double m_Clock_Rotation_Speed;
+    double m_ClockRotationSpeed;
   };
 }
 #endif

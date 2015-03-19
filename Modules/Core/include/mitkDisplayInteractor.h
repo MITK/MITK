@@ -115,6 +115,8 @@ namespace mitk
     virtual bool RotateBack(StateMachineAction*, InteractionEvent*);
     virtual bool RotateUp(StateMachineAction*, InteractionEvent*);
     virtual bool RotateDown(StateMachineAction*, InteractionEvent*);
+    virtual bool RotateClock(StateMachineAction*, InteractionEvent*);
+    virtual bool RotateBackClock(StateMachineAction*, InteractionEvent*);
 
     /**
     * \brief Method to retrieve bool-value for given property from string-property

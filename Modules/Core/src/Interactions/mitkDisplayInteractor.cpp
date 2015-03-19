@@ -50,6 +50,8 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("rotateBack", RotateBack);
   CONNECT_FUNCTION("rotateUp", RotateUp);
   CONNECT_FUNCTION("rotateDown", RotateDown);
+  CONNECT_FUNCTION("rotateClock", RotateClock);
+  CONNECT_FUNCTION("rotateBackClock", RotateBackClock);
 }
 
 mitk::DisplayInteractor::DisplayInteractor()
@@ -323,7 +325,6 @@ bool mitk::DisplayInteractor::Rotate(StateMachineAction*, InteractionEvent* inte
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
   mitk::Stepper* slice = sender->GetCameraRotationController()->GetSlice();
-
   slice->Next();
 
   sender->GetRenderingManager()->RequestUpdateAll();
@@ -334,7 +335,6 @@ bool mitk::DisplayInteractor::RotateBack(StateMachineAction*, InteractionEvent* 
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
   mitk::Stepper* slice = sender->GetCameraRotationController()->GetSlice();
-
   slice->Previous();
 
   sender->GetRenderingManager()->RequestUpdateAll();
@@ -345,7 +345,6 @@ bool mitk::DisplayInteractor::RotateUp(StateMachineAction*, InteractionEvent* in
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
   mitk::Stepper* slice = sender->GetCameraRotationController()->GetElevationSlice();
-
   slice->Next();
 
   sender->GetRenderingManager()->RequestUpdateAll();
@@ -356,9 +355,24 @@ bool mitk::DisplayInteractor::RotateDown(StateMachineAction*, InteractionEvent* 
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
   mitk::Stepper* slice = sender->GetCameraRotationController()->GetElevationSlice();
-
   slice->Previous();
 
+  sender->GetRenderingManager()->RequestUpdateAll();
+  return true;
+}
+
+bool mitk::DisplayInteractor::RotateClock(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  sender->GetCameraRotationController()->RotateToAngle(5);
+  sender->GetRenderingManager()->RequestUpdateAll();
+  return true;
+}
+
+bool mitk::DisplayInteractor::RotateBackClock(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  sender->GetCameraRotationController()->RotateToAngle(-5);
   sender->GetRenderingManager()->RequestUpdateAll();
   return true;
 }

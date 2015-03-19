@@ -7,8 +7,9 @@ MITK_CREATE_MODULE(
 #  SUBPROJECTS MITK-DTI
 #  INCLUDE_DIRS Algorithms Algorithms/Reconstruction Algorithms/Registration Algorithms/Reconstruction/MultishellProcessing DicomImport IODataStructures/DiffusionWeightedImages IODataStructures/Properties IODataStructures/QBallImages IODataStructures/TensorImages IODataStructures Rendering ${CMAKE_CURRENT_BINARY_DIR}
 #  DEPENDS MitkMapperExt MitkPlanarFigure MitkImageExtraction MitkSceneSerializationBase MitkDICOMReader
+  DEPENDS MitkClassificationCore
   PACKAGE_DEPENDS
-    PUBLIC Boost
+#    PUBLIC Boost
     PUBLIC Eigen
     #    PUBLIC ITK|ITKTestKernel+ITKRegistrationCommon+ITKMetricsv4+ITKRegistrationMethodsv4+ITKDistanceMap+ITKLabelVoting+ITKVTK
 #    PUBLIC VTK|vtkFiltersProgrammable

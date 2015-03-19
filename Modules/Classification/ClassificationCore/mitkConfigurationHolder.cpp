@@ -19,6 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExceptionMacro.h>
 #include <sstream>
 
+mitk::ConfigurationHolder::ConfigurationHolder() :
+   m_ValueType(DT_UNINIZIALIZED)
+{
+  m_GroupValue.clear();
+}
+
 void mitk::ConfigurationHolder::SetBool(bool value)
 {
   m_BoolValue = value;
@@ -248,4 +254,59 @@ std::vector<std::string> mitk::ConfigurationHolder::AsStringVector()
 mitk::ConfigurationHolder& mitk::ConfigurationHolder::At(std::string id)
 {
   return m_GroupValue[id];
+}
+
+bool mitk::ConfigurationHolder::AsBool(bool value)
+{
+  try {
+    return this->AsBool();
+  }
+  catch (mitk::Exception)
+  {
+    return value;
+  }
+}
+
+unsigned int mitk::ConfigurationHolder::AsUnsignedInt(unsigned int value)
+{
+  try {
+    return this->AsUnsignedInt();
+  }
+  catch (mitk::Exception)
+  {
+    return value;
+  }
+}
+
+int mitk::ConfigurationHolder::AsInt(int value)
+{
+  try {
+    return this->AsInt();
+  }
+  catch (mitk::Exception)
+  {
+    return value;
+  }
+}
+
+double mitk::ConfigurationHolder::AsDouble(double value)
+{
+  try {
+    return this->AsDouble();
+  }
+  catch (mitk::Exception)
+  {
+    return value;
+  }
+}
+
+std::string mitk::ConfigurationHolder::AsString(std::string value)
+{
+  try {
+    return this->AsString();
+  }
+  catch (mitk::Exception)
+  {
+    return value;
+  }
 }

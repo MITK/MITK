@@ -42,6 +42,8 @@ namespace mitk
       DT_STRING,
       DT_GROUP
     };
+    ConfigurationHolder();
+
 
     void SetBool(bool value);
     void SetUnsignedInt(unsigned int value);
@@ -58,6 +60,12 @@ namespace mitk
     double AsDouble();
     std::string AsString();
 
+    bool AsBool(bool value);
+    unsigned int AsUnsignedInt(unsigned int value);
+    int AsInt(int value);
+    double AsDouble(double value);
+    std::string AsString(std::string value);
+
     std::vector<std::string> AsStringVector();
 
     ConfigurationHolder& At(std::string id);
@@ -69,6 +77,7 @@ namespace mitk
   #pragma warning(push)
   #pragma warning(disable: 4251)
 #endif
+
     bool m_BoolValue;
     unsigned int m_UIntValue;
     int m_IntValue;
@@ -78,6 +87,7 @@ namespace mitk
     std::map<std::string, ConfigurationHolder> m_GroupValue;
 
     ValueType m_ValueType;
+
 #ifdef _MSC_VER
  #pragma warning(pop)
 #endif

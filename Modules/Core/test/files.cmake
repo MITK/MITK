@@ -109,6 +109,7 @@ set(MODULE_TESTS
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
   mitkLineTest.cpp
+  mitkItkImageIOTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING)
@@ -155,7 +156,6 @@ set(MODULE_CUSTOM_TESTS
     mitkStateMachineFactoryTest.cpp
     mitkPointSetLocaleTest.cpp
     mitkImageTest.cpp
-    mitkImageWriterTest.cpp
     mitkImageVtkMapper2DTest.cpp
     mitkImageVtkMapper2DLevelWindowTest.cpp
     mitkImageVtkMapper2DOpacityTest.cpp

@@ -459,9 +459,20 @@ AbstractFileIO::ConfidenceLevel ItkImageIO::GetWriterConfidenceLevel() const
 {
   // Check if the image dimension is supported
   const Image* image = dynamic_cast<const Image*>(this->GetInput());
-  if (image == NULL || !m_ImageIO->SupportsDimension(image->GetDimension()))
+  if (image == NULL)
   {
+    // We cannot write a null object, DUH!
     return IFileWriter::Unsupported;
+  }
+
+  if ( ! m_ImageIO->SupportsDimension(image->GetDimension()))
+  {
+    // okay, dimension is not supported. We have to look at a special case:
+    // 3D-Image with one slice. We can treat that as a 2D image.
+    if ((image->GetDimension() == 3) && (image->GetSlicedGeometry()->GetSlices() == 1))
+      return IFileWriter::Supported;
+    else
+      return IFileWriter::Unsupported;
   }
 
   // Check if geometry information will be lost

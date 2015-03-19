@@ -47,7 +47,7 @@ if(BUILD_TESTING)
     list(APPEND configure_options -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE})
   endif()
   if(CMAKE_PREFIX_PATH)
-    list(APPEND configure_options -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH})
+    list(APPEND configure_options "-DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}")
   endif()
 
   if(CMAKE_CONFIGURATION_TYPES)

@@ -346,7 +346,15 @@ namespace mitk {
     };
 
     /**
-    * \brief connect to this Event to get noticed when a message was received
+    * \brief connect to this Event to get notified when a message was successfully sent
+    *
+    * \note This event is invoked in the communication thread, therefore do not use it to make
+    * changes in the GUI!!! Use the QT signal slot system to decouple this call from the com thread
+    * */
+    itkEventMacro( MessageSentEvent , itk::AnyEvent );
+
+    /**
+    * \brief connect to this Event to get notified when a message was received
     *
     * \note Check if you can invoke this events like this or if you have to make
     * it thread-safe. They are not invoked in the main thread!!!
@@ -354,7 +362,7 @@ namespace mitk {
     itkEventMacro( MessageReceivedEvent , itk::AnyEvent );
 
     /**
-    * \brief connect to this Event to get noticed when a command was received
+    * \brief connect to this Event to get notified when a command was received
     *
     * \note Check if you can invoke this events like this or if you have to make
     * it thread-safe. They are not invoked in the main thread!!!
@@ -362,7 +370,7 @@ namespace mitk {
     itkEventMacro( CommandReceivedEvent , itk::AnyEvent );
 
     /**
-    * \brief connect to this Event to get noticed when another igtl device
+    * \brief connect to this Event to get notified when another igtl device
     * connects with this device.
     *
     * \note Check if you can invoke this events like this or if you have to make
@@ -371,7 +379,7 @@ namespace mitk {
     itkEventMacro( NewClientConnectionEvent , itk::AnyEvent );
 
     /**
-    * \brief connect to this Event to get noticed when this device looses the
+    * \brief connect to this Event to get notified when this device looses the
     * connection to a socket.
     *
     * \note Check if you can invoke this events like this or if you have to make

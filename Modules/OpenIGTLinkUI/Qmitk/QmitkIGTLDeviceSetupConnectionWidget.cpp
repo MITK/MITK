@@ -52,6 +52,11 @@ QmitkIGTLDeviceSetupConnectionWidget::QmitkIGTLDeviceSetupConnectionWidget(
 
 QmitkIGTLDeviceSetupConnectionWidget::~QmitkIGTLDeviceSetupConnectionWidget()
 {
+   this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
+   this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
+   this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
+   this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
+   this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::CreateQtPartControl(QWidget *parent)
@@ -91,11 +96,14 @@ void QmitkIGTLDeviceSetupConnectionWidget::CreateConnections()
     connect( m_Controls->bufferMsgCheckBox, SIGNAL(stateChanged(int)),
              this, SLOT(OnBufferIncomingMessages(int)));
   }
+  //this is used for thread seperation, otherwise the worker thread would change the ui elements
+  //which would cause an exception
+  connect(this, SIGNAL(AdaptGUIToStateSignal()), this, SLOT(AdaptGUIToState()));
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnDeviceStateChanged()
 {
-  this->AdaptGUIToState();
+  emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
@@ -181,11 +189,17 @@ void QmitkIGTLDeviceSetupConnectionWidget::Initialize(
     this->AdaptGUIToState();
 
     typedef itk::SimpleMemberCommand< QmitkIGTLDeviceSetupConnectionWidget > CurCommandType;
+    CurCommandType::Pointer messageSentCommand = CurCommandType::New();
+    messageSentCommand->SetCallbackFunction(
+       this, &QmitkIGTLDeviceSetupConnectionWidget::OnMessageSent);
+    this->m_MessageSentObserverTag = this->m_IGTLDevice->AddObserver(
+       mitk::MessageSentEvent(), messageSentCommand);
+
     CurCommandType::Pointer messageReceivedCommand = CurCommandType::New();
     messageReceivedCommand->SetCallbackFunction(
-      this, &QmitkIGTLDeviceSetupConnectionWidget::OnMessageReceived );
+       this, &QmitkIGTLDeviceSetupConnectionWidget::OnMessageReceived);
     this->m_MessageReceivedObserverTag = this->m_IGTLDevice->AddObserver(
-          mitk::MessageReceivedEvent(), messageReceivedCommand);
+       mitk::MessageReceivedEvent(), messageReceivedCommand);
 
     CurCommandType::Pointer commandReceivedCommand = CurCommandType::New();
     commandReceivedCommand->SetCallbackFunction(
@@ -286,64 +300,33 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnHostnameChanged()
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnLostConnection()
 {
-  //get the IGTL device that invoked this event
-//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
-
-  this->AdaptGUIToState();
-
-//  unsigned int numConnections = dev->GetNumberOfConnections();
-
-//  if ( numConnections == 0 )
-//  {
-//    if ( this->m_IsClient )
-//    {
-//      //Setup connection groupbox
-//      m_Controls->editIP->setEnabled(true);
-//      m_Controls->editPort->setEnabled(true);
-//      m_Controls->butConnect->setText("Connect");
-//      m_Controls->logSendReceiveMsg->setEnabled(false);
-//      m_Controls->bufferMsgCheckBox->setEnabled(false);
-//    }
-//  }
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnNewConnection()
 {
-  this->AdaptGUIToState();
-
-  //get the IGTL device that invoked this event
-//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
-
-//  unsigned int numConnections = dev->GetNumberOfConnections();
-
-//  if ( numConnections != 0 )
-//  {
-//    //Setup connection groupbox
-//    m_Controls->editIP->setEnabled(false);
-//    m_Controls->editPort->setEnabled(false);
-//    m_Controls->butConnect->setText("Disconnect");
-//    m_Controls->logSendReceiveMsg->setEnabled(true);
-//    m_Controls->bufferMsgCheckBox->setEnabled(true);
-//  }
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnMessageReceived()
 {
-//  //get the IGTL device that invoked this event
-//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
+   if (this->m_Controls->logSendReceiveMsg->isChecked())
+   {
+      MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a message: "
+         << this->m_IGTLDevice->GetReceiveQueue()->GetLatestMsgInformationString();
+   }
+}
 
-  if ( this->m_Controls->logSendReceiveMsg->isChecked() )
-  {
-    MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a message: "
-        << this->m_IGTLDevice->GetReceiveQueue()->GetLatestMsgInformationString();
-  }
+void QmitkIGTLDeviceSetupConnectionWidget::OnMessageSent()
+{
+   if (this->m_Controls->logSendReceiveMsg->isChecked())
+   {
+      MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Sent a message.";
+   }
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnCommandReceived()
 {
-//  //get the IGTL device that invoked this event
-//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
-
   if ( this->m_Controls->logSendReceiveMsg->isChecked() )
   {
     MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a command: "

@@ -43,13 +43,13 @@ mitk::IGTLMessageSource::IGTLMessageSource()
 
 mitk::IGTLMessageSource::~IGTLMessageSource()
 {
-  this->UnRegisterMicroservice();
+  //this->UnRegisterMicroservice();
 }
 
 mitk::IGTLMessage* mitk::IGTLMessageSource::GetOutput()
 {
   if (this->GetNumberOfIndexedOutputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast<IGTLMessage*>(this->ProcessObject::GetPrimaryOutput());
 }
@@ -59,7 +59,7 @@ mitk::IGTLMessage* mitk::IGTLMessageSource::GetOutput(
 {
   IGTLMessage* out =
       dynamic_cast<IGTLMessage*>( this->ProcessObject::GetOutput(idx) );
-  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+  if ( out == nullptr && this->ProcessObject::GetOutput(idx) != NULL )
   {
     itkWarningMacro (<< "Unable to convert output number " << idx << " to type "
                      <<  typeid( IGTLMessage ).name () );
@@ -81,7 +81,7 @@ mitk::IGTLMessage* mitk::IGTLMessageSource::GetOutput(
       return static_cast<IGTLMessage*>(it->GetPointer());
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 itk::ProcessObject::DataObjectPointerArraySizeType
@@ -116,7 +116,8 @@ void mitk::IGTLMessageSource::RegisterAsMicroservice()
 
 void mitk::IGTLMessageSource::UnRegisterMicroservice()
 {
-  if (m_ServiceRegistration != NULL) m_ServiceRegistration.Unregister();
+  if (m_ServiceRegistration != nullptr)
+     m_ServiceRegistration.Unregister();
   m_ServiceRegistration = 0;
 }
 

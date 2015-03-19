@@ -89,6 +89,11 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QW
     void OnMessageReceived();
 
     /**
+    * \brief Is called when the current device received a message
+    */
+    void OnMessageSent();
+
+    /**
      * \brief Is called when the current device received a command
     */
     void OnCommandReceived();
@@ -104,13 +109,19 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QW
      */
     void OnBufferIncomingMessages(int state);
 
-  protected:
-
     /**
-     * \brief Adapts the GUI to the state of the device
-     */
+    * \brief Adapts the GUI to the state of the device
+    */
     void AdaptGUIToState();
 
+ signals:
+    /**
+    * \brief used for thread seperation, the worker thread must not call AdaptGUIToState directly.
+    * QT signals are thread safe and seperate the threads
+    */
+    void AdaptGUIToStateSignal();
+
+  protected:
     /**
      * \brief Calls AdaptGUIToState()
      */
@@ -129,6 +140,7 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QW
     /** @brief flag to indicate if the IGTL device is a client or a server */
     bool m_IsClient;
 
+    unsigned long m_MessageSentObserverTag;
     unsigned long m_MessageReceivedObserverTag;
     unsigned long m_CommandReceivedObserverTag;
     unsigned long m_LostConnectionObserverTag;

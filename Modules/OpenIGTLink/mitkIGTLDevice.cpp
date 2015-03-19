@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkIGTLDevice.h"
+//#include "mitkIGTException.h"
 //#include "mitkIGTTimeStamp.h"
 #include <itkMutexLockHolder.h>
 #include <itksys/SystemTools.hxx>
@@ -273,9 +274,14 @@ unsigned int mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg
   int sendSuccess = socket->Send(msg->GetPackPointer(), msg->GetPackSize());
 
   if (sendSuccess)
-    return IGTL_STATUS_OK;
+  {
+     this->InvokeEvent(MessageSentEvent());
+     return IGTL_STATUS_OK;
+  }
   else
-    return IGTL_STATUS_UNKNOWN_ERROR;
+  {
+     return IGTL_STATUS_UNKNOWN_ERROR;
+  }
 }
 
 
@@ -284,41 +290,51 @@ void mitk::IGTLDevice::RunCommunication()
   if (this->GetState() != Running)
     return;
 
-  // keep lock until end of scope
-  MutexLockHolder communicationFinishedLockHolder(*m_CommunicationFinishedMutex);
-
-  // Because m_StopCommunication is used by two threads, access has to be guarded
-  // by a mutex. To minimize thread locking, a local copy is used here
-  bool localStopCommunication;
-
-  // update the local copy of m_StopCommunication
-  this->m_StopCommunicationMutex->Lock();
-  localStopCommunication = this->m_StopCommunication;
-  this->m_StopCommunicationMutex->Unlock();
-  while ((this->GetState() == Running) && (localStopCommunication == false))
+  try
   {
-    // Check if other igtl devices want to connect with this one. This method
-    // is overwritten for igtl servers but is doing nothing in case of a igtl
-    // client
-    this->Connect();
+     // keep lock until end of scope
+     MutexLockHolder communicationFinishedLockHolder(*m_CommunicationFinishedMutex);
 
-    // Check if there is something to receive and store it in the message queue
-    this->Receive();
+     // Because m_StopCommunication is used by two threads, access has to be guarded
+     // by a mutex. To minimize thread locking, a local copy is used here
+     bool localStopCommunication;
 
-    // Check if there is something to send
-    this->Send();
+     // update the local copy of m_StopCommunication
+     this->m_StopCommunicationMutex->Lock();
+     localStopCommunication = this->m_StopCommunication;
+     this->m_StopCommunicationMutex->Unlock();
+     while ((this->GetState() == Running) && (localStopCommunication == false))
+     {
+        // Check if other igtl devices want to connect with this one. This method
+        // is overwritten for igtl servers but is doing nothing in case of a igtl
+        // client
+        this->Connect();
 
-    /* Update the local copy of m_StopCommunication */
-    this->m_StopCommunicationMutex->Lock();
-    localStopCommunication = m_StopCommunication;
-    this->m_StopCommunicationMutex->Unlock();
+        // Check if there is something to receive and store it in the message queue
+        this->Receive();
 
-    // time to relax
-//    itksys::SystemTools::Delay(1);
+        // Check if there is something to send
+        this->Send();
+
+        /* Update the local copy of m_StopCommunication */
+        this->m_StopCommunicationMutex->Lock();
+        localStopCommunication = m_StopCommunication;
+        this->m_StopCommunicationMutex->Unlock();
+
+        // time to relax
+        //    itksys::SystemTools::Delay(1);
+     }
+  }
+  catch (...)
+  {
+     m_CommunicationFinishedMutex->Unlock();
+     this->StopCommunication();
+     MITK_ERROR("IGTLDevice::RunCommunication") << "Error while communicating. Thread stopped.";
+     //mitkThrowException(mitk::IGTException) << "Error while communicating. Thread stopped.";
   }
   // StopCommunication was called, thus the mode should be changed back to Ready now
   // that the tracking loop has ended.
-  this->SetState(Ready);
+  //this->SetState(Ready);
   MITK_DEBUG("IGTLDevice::RunCommunication") << "Reached end of communication.";
   // returning from this function (and ThreadStartCommunication())
   // this will end the thread

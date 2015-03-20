@@ -83,6 +83,7 @@ namespace itk{
 
     void SetCompartmentImages( std::vector< InputImagePointerType > cImgs ) { m_CompartmentImages=cImgs; }  ///< One signal image per compartment.
     void SetT2( std::vector< double > t2Vector ) { m_T2=t2Vector; } ///< One T2 relaxation constant per compartment image.
+    void SetT1( std::vector< double > t1Vector ) { m_T1=t1Vector; } ///< One T1 relaxation constant per compartment image.
     void SetDiffusionGradientDirection(itk::Vector<double,3> g) { m_DiffusionGradientDirection=g; } ///< Gradient direction is needed for eddy current simulation.
 
   protected:
@@ -96,6 +97,7 @@ namespace itk{
     FiberfoxParameters<double>              m_Parameters;
     typename InputImageType::Pointer        m_FrequencyMapSlice;
     vector< double >                        m_T2;
+    vector< double >                        m_T1;
     vector< InputImagePointerType >         m_CompartmentImages;
     itk::Vector<double,3>                   m_DiffusionGradientDirection;
     double                                  m_Z;

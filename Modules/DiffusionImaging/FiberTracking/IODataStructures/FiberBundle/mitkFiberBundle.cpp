@@ -488,7 +488,7 @@ void mitk::FiberBundle::ColorFibersByCurvature()
             meanV.normalize();
 
             double dev = 0;
-            for (int c=0; c<vectors.size(); c++)
+            for (unsigned int c=0; c<vectors.size(); c++)
             {
                 double angle = dot_product(meanV, vectors.at(c));
                 if (angle>1.0)
@@ -508,7 +508,6 @@ void mitk::FiberBundle::ColorFibersByCurvature()
                 max = dev;
         }
     }
-    MITK_INFO << min << " - " << max;
     unsigned int count = 0;
     for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
     {
@@ -517,8 +516,8 @@ void mitk::FiberBundle::ColorFibersByCurvature()
         for (int j=0; j<numPoints; j++)
         {
             double color[3];
-            //double dev = (values.at(count)-min)/(max-min);
-            double dev = values.at(count)*values.at(count);
+            double dev = (values.at(count)-min)/(max-min);
+//            double dev = values.at(count)*values.at(count);
             lookupTable->GetColor(dev, color);
 
             rgba[0] = (unsigned char) (255.0 * color[0]);
@@ -883,7 +882,7 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataSto
             MITK_INFO << "AND";
             result = this->ExtractFiberIdSubset(children->ElementAt(0), storage);
             std::vector<long>::iterator it;
-            for (int i=1; i<children->Size(); ++i)
+            for (unsigned int i=1; i<children->Size(); ++i)
             {
                 std::vector<long> inRoi = this->ExtractFiberIdSubset(children->ElementAt(i), storage);
 
@@ -899,7 +898,7 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataSto
             MITK_INFO << "OR";
             result = ExtractFiberIdSubset(children->ElementAt(0), storage);
             std::vector<long>::iterator it;
-            for (int i=1; i<children->Size(); ++i)
+            for (unsigned int i=1; i<children->Size(); ++i)
             {
                 it = result.end();
                 std::vector<long> inRoi = ExtractFiberIdSubset(children->ElementAt(i), storage);

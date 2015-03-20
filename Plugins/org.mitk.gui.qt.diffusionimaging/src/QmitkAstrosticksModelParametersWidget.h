@@ -40,12 +40,14 @@ public:
 
     virtual void CreateQtPartControl(QWidget *parent);
 
+    void SetT1(double t1){ m_Controls->m_T1box->setValue(t1); }
     void SetT2(double t2){ m_Controls->m_T2box->setValue(t2); }
     void SetD(double d){ m_Controls->m_D1box->setValue(d); }
     void SetRandomizeSticks(bool r){ m_Controls->m_RandomCheck->setChecked(r); }
 
     double GetD(){ return m_Controls->m_D1box->value(); }
     unsigned int GetT2(){ return m_Controls->m_T2box->value(); }
+    unsigned int GetT1(){ return m_Controls->m_T1box->value(); }
     bool GetRandomizeSticks(){ return m_Controls->m_RandomCheck->isChecked(); }
 
 public slots:

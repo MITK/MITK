@@ -597,7 +597,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 
             vtkSmartPointer<vtkMaskedProgrammableGlyphFilter> glyphGenerator = vtkSmartPointer<vtkMaskedProgrammableGlyphFilter>::New();
             glyphGenerator->SetMaximumNumberOfPoints(std::min(m_ShowMaxNumber,(int)cuttedPlane->GetNumberOfPoints()));
-            glyphGenerator->SetRandomMode(0);
+            glyphGenerator->SetRandomMode(1);
             glyphGenerator->SetUseMaskPoints(1);
             glyphGenerator->SetSourceConnection(trans->GetOutputPort() );
             glyphGenerator->SetInput(cuttedPlane);

@@ -32,17 +32,29 @@
   <event_variant class="MouseMoveEvent" name="Moving">
     <attribute name="ButtonState" value="MiddleMouseButton"/>
   </event_variant>
+  <event_variant class="MousePressEvent" name="StartMove">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndMoving">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="Moving">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
   <!-- Level Window -->
   <event_variant class="MousePressEvent" name="StartAdjustLevelWindow">
-    <attribute name="Modifiers" value="shift"/>
+    <attribute name="Modifiers" value="alt"/>
     <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
   <event_variant class="MouseReleaseEvent" name="EndLevelWindow">
-    <attribute name="Modifiers" value="shift"/>
+    <attribute name="Modifiers" value="alt"/>
     <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
   <event_variant class="MouseMoveEvent" name="adjustlevelwindow">
-    <attribute name="Modifiers" value="shift"/>
+    <attribute name="Modifiers" value="alt"/>
     <attribute name="ButtonState" value="LeftMouseButton"/>
   </event_variant>
   <!-- Scrolling -->

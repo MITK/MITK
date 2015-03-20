@@ -26,6 +26,10 @@ if(MITK_USE_Eigen)
         # BUILD_TESTING to OFF
         -DBUILD_TESTING:BOOL=ON
         -DEIGEN_BUILD_PKGCONFIG:BOOL=OFF
+      CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
     )
 
     set(Eigen_DIR ${ep_prefix})

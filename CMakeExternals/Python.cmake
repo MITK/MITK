@@ -128,6 +128,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       CMAKE_ARGS
         ${ep_common_args}
       CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
         #-DBUILD_TESTING:BOOL=OFF
@@ -139,6 +140,8 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
         # Python (and Numpy) do not like different shared library names
         -DCMAKE_DEBUG_POSTFIX:STRING=
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
       DEPENDS
         ${Python_DEPENDENCIES}
     )

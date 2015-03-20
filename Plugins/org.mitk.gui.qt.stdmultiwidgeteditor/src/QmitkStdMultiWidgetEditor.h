@@ -92,6 +92,9 @@ public:
    */
   QStringList GetDecorations() const override;
 
+  virtual void SetWindowPresetBeforeLoading();
+  virtual void SetWindowPresetAfterLoading();
+
   // -------------------  mitk::ILinkedRenderWindowPart  ----------------------
 
   void EnableSlicingPlanes(bool enable) override;

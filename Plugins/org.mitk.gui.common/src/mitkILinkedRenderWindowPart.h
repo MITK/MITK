@@ -51,6 +51,25 @@ struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWi
    */
   virtual bool IsSlicingPlanesEnabled() const = 0;
 
+  /**
+   * Enable or disalbe linked navigation.
+   *
+   * \param enable If <code>true</code>, setting the selected position in one QmitkRenderWindow
+   *        affects the positions in the linked windows. If <code>false</code>, linked navigation
+   *        is disabled.
+   */
+  virtual void EnableLinkedNavigation(bool enable) = 0;
+
+  /**
+   * Get the enabled status of linked navigation.
+   *
+   * \return <code>true</code> if linked navigation is enabled; <code>false</code>
+   *         otherwise.
+   */
+  virtual bool IsLinkedNavigationEnabled() const = 0;
+
+  virtual void SetWindowPresetBeforeLoading() = 0;
+  virtual void SetWindowPresetAfterLoading() = 0;
 };
 
 }

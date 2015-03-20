@@ -552,7 +552,7 @@ public:
                               UpdateCallBackMethod callback = nullptr,
                               itk::SmartPointer<Image> preLoadedImageBlock = nullptr);
 
-  static void LoadSeries(const DicomSeriesReader::StringContainer& filenames, itk::SmartPointer<Image> image); 
+  static void LoadSeries(const DicomSeriesReader::StringContainer& filenames, itk::SmartPointer<Image> image,  void* command); 
 
 protected:
 
@@ -861,8 +861,7 @@ protected:
       (*this->m_Callback)(static_cast<itk::ProcessObject*>(caller)->GetProgress());
     }
 
-  protected:
-
+    // TODO ism need another mechanism for callback
     UpdateCallBackMethod m_Callback;
   };
 

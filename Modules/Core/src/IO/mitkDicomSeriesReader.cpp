@@ -38,8 +38,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-void DicomSeriesReader::LoadSeries(const DicomSeriesReader::StringContainer& filenames, mitk::Image::Pointer image) 
+void DicomSeriesReader::LoadSeries(const DicomSeriesReader::StringContainer& filenames, mitk::Image::Pointer image, void* command) 
 {
+  const int STATUS_LOAD_SLICE = 0;
+  const int STATUS_LOAD_COMPLETE = 100;
+
   std::vector<std::string> copyFilenames(filenames);
   typedef itk::Image<signed short, 2> InputImageType;
   typedef itk::ImageFileReader<InputImageType> ReaderType;
@@ -47,7 +50,9 @@ void DicomSeriesReader::LoadSeries(const DicomSeriesReader::StringContainer& fil
   itk::GDCMImageIO::Pointer gdcmImageIO = itk::GDCMImageIO::New();
   reader->SetImageIO(gdcmImageIO);
 
-  for (int i=1; i<copyFilenames.size(); i++) {
+  int filesCount = filenames.size();
+
+  for (int i = 1; i < filesCount; i++) {
 
     reader->SetFileName(copyFilenames.at(i));
     try {
@@ -58,6 +63,14 @@ void DicomSeriesReader::LoadSeries(const DicomSeriesReader::StringContainer& fil
     }
     image->SetImportSlice(reader->GetOutput()->GetBufferPointer(), i);
     MITK_INFO << "import slice" << i;
+
+    if (command) {
+      if (i < filesCount - 1) {
+        ((CallbackCommand*)command)->m_Callback(STATUS_LOAD_SLICE);
+      } else {
+        ((CallbackCommand*)command)->m_Callback(STATUS_LOAD_COMPLETE);
+      }
+    }
   }
 }
 

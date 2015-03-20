@@ -59,6 +59,7 @@ public:
         , m_tRep(500)
         , m_tLine(1)
         , m_tInhom(50)
+        , m_ReversePhase(false)
         , m_Bvalue(1000)
         , m_SimulateKspaceAcquisition(false)
         , m_AxonRadius(0)
@@ -99,8 +100,9 @@ public:
     double                              m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
     double                              m_tEcho;                    ///< Echo time TE.
     double                              m_tRep;                     ///< Echo time TR.
-    double                              m_tLine;                    ///< k-space line readout time.
+    double                              m_tLine;                    ///< k-space line readout time (dwell time).
     double                              m_tInhom;                   ///< T2'
+    bool                                m_ReversePhase;             ///< If true, the phase readout direction will be inverted (-y instead of y)
     double                              m_Bvalue;                   ///< Acquisition b-value
     bool                                m_SimulateKspaceAcquisition;///< Flag to enable/disable k-space acquisition simulation
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)

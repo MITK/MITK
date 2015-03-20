@@ -105,18 +105,18 @@ void KspaceImageFilter< TPixelType >
     int xRingingOffset = xMax-kxMax;
     int yRingingOffset = yMaxFov-kyMax;
 
-
-//    for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
-//        MITK_INFO << (1.0-exp(-m_Parameters.m_SignalGen.m_tRep/m_T1.at(i)));
-
     while( !oit.IsAtEnd() )
     {
         itk::Index< 2 > kIdx;
         kIdx[0] = oit.GetIndex()[0];
         kIdx[1] = oit.GetIndex()[1];
 
-        double t = fromMaxEcho + ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;    // dephasing time
-//        double t1 = t+m_Parameters.m_SignalGen.m_tEcho;
+        // dephasing time
+        double t = 0;
+        if (!m_Parameters.m_SignalGen.m_ReversePhase)
+            t = fromMaxEcho + ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
+        else
+            t = fromMaxEcho + ((double)(kyMax-1-kIdx[1])*kxMax+(double)kIdx[0])*dt;
 
         // rearrange slice
         if( kIdx[0] <  kxMax/2 )

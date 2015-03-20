@@ -652,6 +652,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
 
     // other imaging parameters
+    parameters.m_SignalGen.m_ReversePhase = m_Controls->m_ReversePhaseBox->isChecked();
     parameters.m_SignalGen.m_tLine = m_Controls->m_LineReadoutTimeBox->value();
     parameters.m_SignalGen.m_tInhom = m_Controls->m_T2starBox->value();
     parameters.m_SignalGen.m_tEcho = m_Controls->m_TEbox->value();
@@ -1036,27 +1037,28 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         QMessageBox::information(NULL, "Compartment 4 disabled", "More than one non-fiber compartment selected but no volume fraction maps set!");
     }
 
-    parameters.m_SignalGen.m_FiberSeparationThreshold = m_Controls->m_SeparationAngleBox->value();
-    switch (m_Controls->m_DiffusionDirectionBox->currentIndex())
-    {
-    case 0:
-        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
-        break;
-    case 1:
-        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::MAIN_FIBER_DIRECTIONS;
-        break;
-    case 2:
-        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::RANDOM_DIRECTIONS;
-        parameters.m_SignalGen.m_DoAddMotion = false;
-        parameters.m_SignalGen.m_DoAddGibbsRinging = false;
-        parameters.m_SignalGen.m_KspaceLineOffset = 0.0;
-        parameters.m_SignalGen.m_FrequencyMap = NULL;
-        parameters.m_SignalGen.m_CroppingFactor = 1.0;
-        parameters.m_SignalGen.m_EddyStrength = 0;
-        break;
-    default:
-        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
-    }
+//    RELICT
+//    parameters.m_SignalGen.m_FiberSeparationThreshold = m_Controls->m_SeparationAngleBox->value();
+//    switch (m_Controls->m_DiffusionDirectionBox->currentIndex())
+//    {
+//    case 0:
+//        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
+//        break;
+//    case 1:
+//        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::MAIN_FIBER_DIRECTIONS;
+//        break;
+//    case 2:
+//        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::RANDOM_DIRECTIONS;
+//        parameters.m_SignalGen.m_DoAddMotion = false;
+//        parameters.m_SignalGen.m_DoAddGibbsRinging = false;
+//        parameters.m_SignalGen.m_KspaceLineOffset = 0.0;
+//        parameters.m_SignalGen.m_FrequencyMap = NULL;
+//        parameters.m_SignalGen.m_CroppingFactor = 1.0;
+//        parameters.m_SignalGen.m_EddyStrength = 0;
+//        break;
+//    default:
+//        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
+//    }
 
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.SignalScale", IntProperty::New(parameters.m_SignalGen.m_SignalScale));
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.FiberRadius", IntProperty::New(parameters.m_SignalGen.m_AxonRadius));

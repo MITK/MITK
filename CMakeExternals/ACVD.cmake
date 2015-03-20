@@ -33,6 +33,10 @@ if(MITK_USE_ACVD)
         -DUSE_MULTITHREADING:BOOL=ON
         -DBUILD_EXAMPLES:BOOL=OFF
         -DVTK_DIR:PATH=${VTK_DIR}
+      CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
       DEPENDS ${proj_DEPENDENCIES}
     )
 

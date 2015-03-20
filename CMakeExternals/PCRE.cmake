@@ -43,6 +43,10 @@ if(MITK_USE_PCRE)
          -DPCRE_BUILD_PCREGREP:BOOL=OFF
          -DPCRE_BUILD_TESTS:BOOL=OFF
          -DPCRE_SUPPORT_JIT:BOOL=ON
+       CMAKE_CACHE_ARGS
+         ${ep_common_cache_args}
+       CMAKE_CACHE_DEFAULT_ARGS
+         ${ep_common_cache_default_args}
       )
     endif()
 

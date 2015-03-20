@@ -75,6 +75,10 @@ if(NOT DEFINED ITK_DIR)
        -DBUILD_EXAMPLES:BOOL=OFF
        -DITK_USE_SYSTEM_GDCM:BOOL=ON
        -DGDCM_DIR:PATH=${GDCM_DIR}
+     CMAKE_CACHE_ARGS
+       ${ep_common_cache_args}
+     CMAKE_CACHE_DEFAULT_ARGS
+       ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 

@@ -52,6 +52,10 @@ if(NOT DEFINED Raptor2_DIR)
        -DRAPTOR_SERIALIZER_RDFXML_ABBREV:BOOL=OFF
        -DRAPTOR_SERIALIZER_RSS_1_0:BOOL=OFF
        -DRAPTOR_SERIALIZER_TURTLE:BOOL=ON
+     CMAKE_CACHE_ARGS
+       ${ep_common_cache_args}
+     CMAKE_CACHE_DEFAULT_ARGS
+       ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 

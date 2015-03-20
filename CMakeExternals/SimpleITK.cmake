@@ -66,6 +66,7 @@ if(MITK_USE_SimpleITK)
          ${ep_common_args}
          # -DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON
       CMAKE_CACHE_ARGS
+         ${ep_common_cache_args}
          ${additional_cmake_args}
          -DBUILD_SHARED_LIBS:BOOL=${_build_shared}
          -DSimpleITK_BUILD_DISTRIBUTE:BOOL=ON
@@ -76,6 +77,8 @@ if(MITK_USE_SimpleITK)
          -DITK_DIR:PATH=${ITK_DIR}
          -DSWIG_DIR:PATH=${SWIG_DIR}
          -DSWIG_EXECUTABLE:FILEPATH=${SWIG_EXECUTABLE}
+       CMAKE_CACHE_DEFAULT_ARGS
+         ${ep_common_cache_default_args}
        DEPENDS ${proj_DEPENDENCIES}
       )
 

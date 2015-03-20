@@ -54,6 +54,8 @@ std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry:
     return emptyResult;
   }
 
+  if (context == NULL) context = us::GetModuleContext();
+
   std::vector<WriterReference> result;
 
   // loop over the class hierarchy of baseData and get all writers
@@ -75,6 +77,8 @@ mitk::IFileWriter* mitk::FileWriterRegistry::GetWriter(const mitk::FileWriterReg
 {
   if (!ref) return NULL;
 
+  if (context == NULL) context = us::GetModuleContext();
+
   us::ServiceObjects<mitk::IFileWriter> serviceObjects = context->GetServiceObjects(ref);
   mitk::IFileWriter* writer = serviceObjects.GetService();
   m_ServiceObjects.insert(std::make_pair(writer, serviceObjects));
@@ -88,6 +92,8 @@ std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(const mitk:
     std::vector<mitk::IFileWriter*> emptyResult;
     return emptyResult;
   }
+
+  if (context == NULL) context = us::GetModuleContext();
 
   std::vector <mitk::IFileWriter*> result;
 

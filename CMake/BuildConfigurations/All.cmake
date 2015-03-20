@@ -11,6 +11,7 @@ endif()
 set(_package_excludes
   ${_apple_package_excludes}
   Python
+  Numpy
   OpenCL
   SYSTEM_Boost
   Boost_LIBRARIES

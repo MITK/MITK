@@ -13,6 +13,14 @@ if(MITK_USE_ACVD)
   set(ACVD_DEPENDS ${proj})
 
   if(NOT DEFINED ACVD_DIR)
+
+    set(additional_args )
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ACVD-vtk6_3d5ae388.tar.gz
@@ -21,9 +29,14 @@ if(MITK_USE_ACVD)
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
+        ${additional_args}
         -DUSE_MULTITHREADING:BOOL=ON
         -DBUILD_EXAMPLES:BOOL=OFF
         -DVTK_DIR:PATH=${VTK_DIR}
+      CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
       DEPENDS ${proj_DEPENDENCIES}
     )
 

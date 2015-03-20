@@ -30,12 +30,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //vtk includes
 #include <mitkIPropertyAliases.h>
-#include <vtkActor.h>
+#include <vtkActor2D.h>
+#include <vtkProperty2D.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkLine.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataMapper2D.h>
 
 mitk::PlaneGeometryDataMapper2D::AllInstancesContainer mitk::PlaneGeometryDataMapper2D::s_AllInstances;
 
@@ -121,7 +123,10 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  if(!visible) return;
+  if(!visible)
+  {
+    return;
+  }
 
   PlaneGeometryData::Pointer input = const_cast< PlaneGeometryData * >(this->GetInput());
   mitk::DataNode* geometryDataNode = renderer->GetCurrentWorldPlaneGeometryNode();
@@ -245,11 +250,15 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       linesPolyData->SetLines(lines);
 
       // Visualize
-      vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-      mapper->SetInputData(linesPolyData);
 
       LocalStorage* ls = m_LSH.GetLocalStorage(renderer);
-      ls->m_CrosshairActor->SetMapper(mapper);
+      ls->m_Mapper->SetInputData(linesPolyData);
+      ls->m_CrosshairActor->SetMapper(ls->m_Mapper);
+
+      vtkCoordinate *tcoord = vtkCoordinate::New();
+      tcoord->SetCoordinateSystemToWorld();
+      ls->m_Mapper->SetTransformCoordinate(tcoord);
+      tcoord->Delete();
 
       // Determine if we should draw the area covered by the thick slicing, default is false.
       // This will also show the area of slices that do not have thick slice mode enabled
@@ -271,10 +280,16 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       // so we store it in this fancy property
       GetDataNode()->SetFloatProperty( "reslice.thickslices.sizeinmm", thickSliceDistance*2 );
 
+      ls->m_CrosshairAssembly = vtkSmartPointer <vtkPropAssembly>::New();
+      ls->m_CrosshairAssembly->AddPart(ls->m_CrosshairActor);
+
+      // Visualize
+      vtkSmartPointer<vtkPolyData> helperlinesPolyData = vtkSmartPointer<vtkPolyData>::New();
+      ls->m_HelperLinesmapper->SetInputData(helperlinesPolyData);
+      ls->m_CrosshairHelperLineActor->SetVisibility(showAreaOfThickSlicing);
       if ( showAreaOfThickSlicing )
       {
         vtkSmartPointer<vtkCellArray> helperlines = vtkSmartPointer<vtkCellArray>::New();
-        vtkSmartPointer<vtkPolyData> helperlinesPolyData = vtkSmartPointer<vtkPolyData>::New();
         // vectorToHelperLine defines how to reach the helperLine from the mainLine
         Vector3D vectorToHelperLine;
         vectorToHelperLine = normal;
@@ -291,20 +306,9 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
         // Add the lines to the dataset
         helperlinesPolyData->SetLines(helperlines);
 
-        // Visualize
-        vtkSmartPointer<vtkPolyDataMapper> helperLinesmapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        helperLinesmapper->SetInputData(helperlinesPolyData);
-
         ls->m_CrosshairActor->GetProperty()->SetLineStipplePattern(0xf0f0);
         ls->m_CrosshairActor->GetProperty()->SetLineStippleRepeatFactor(1);
-
-        ls->m_CrosshairHelperLineActor->SetMapper(helperLinesmapper);
         ls->m_CrosshairAssembly->AddPart(ls->m_CrosshairHelperLineActor);
-      }
-      else
-      {
-        ls->m_CrosshairAssembly->RemovePart(ls->m_CrosshairHelperLineActor);
-        ls->m_CrosshairActor->GetProperty()->SetLineStipplePattern(0xffff);
       }
     }
   }
@@ -351,8 +355,8 @@ int mitk::PlaneGeometryDataMapper2D::DetermineThickSliceMode( DataNode * dn, int
 void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer )
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
-  Superclass::ApplyColorAndOpacityProperties(renderer, ls->m_CrosshairActor);
-  Superclass::ApplyColorAndOpacityProperties(renderer, ls->m_CrosshairHelperLineActor);
+  ApplyColorAndOpacityProperties2D(renderer, ls->m_CrosshairActor);
+  ApplyColorAndOpacityProperties2D(renderer, ls->m_CrosshairHelperLineActor);
 
   float thickness;
   this->GetDataNode()->GetFloatProperty("Line width",thickness,renderer);
@@ -382,6 +386,21 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer
   }
 }
 
+void mitk::PlaneGeometryDataMapper2D::ApplyColorAndOpacityProperties2D(BaseRenderer* renderer, vtkActor2D* actor)
+{
+  float rgba[4]={1.0f,1.0f,1.0f,1.0f};
+  DataNode * node = GetDataNode();
+
+  // check for color prop and use it for rendering if it exists
+  node->GetColor(rgba, renderer, "color");
+  // check for opacity prop and use it for rendering if it exists
+  node->GetOpacity(rgba[3], renderer, "opacity");
+
+  double drgba[4]={rgba[0],rgba[1],rgba[2],rgba[3]};
+  actor->GetProperty()->SetColor(drgba);
+  actor->GetProperty()->SetOpacity(drgba[3]);
+}
+
 void mitk::PlaneGeometryDataMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   mitk::IPropertyAliases* aliases = mitk::CoreServices::GetPropertyAliases();
@@ -402,10 +421,18 @@ void mitk::PlaneGeometryDataMapper2D::UpdateVtkTransform(mitk::BaseRenderer* /*r
 mitk::PlaneGeometryDataMapper2D::LocalStorage::LocalStorage()
 {
   m_CrosshairAssembly = vtkSmartPointer <vtkPropAssembly>::New();
-  m_CrosshairActor = vtkSmartPointer <vtkActor>::New();
-  m_CrosshairHelperLineActor = vtkSmartPointer <vtkActor>::New();
-  m_CrosshairAssembly->AddPart(m_CrosshairActor);
-  m_CrosshairAssembly->AddPart(m_CrosshairHelperLineActor);
+  m_CrosshairActor = vtkSmartPointer <vtkActor2D>::New();
+  m_CrosshairHelperLineActor = vtkSmartPointer <vtkActor2D>::New();
+  m_HelperLinesmapper = vtkSmartPointer<vtkPolyDataMapper2D>::New();
+  m_Mapper = vtkSmartPointer<vtkPolyDataMapper2D>::New();
+  m_CrosshairActor->SetMapper(m_Mapper);
+  m_CrosshairHelperLineActor->SetMapper(m_HelperLinesmapper);
+
+  vtkCoordinate *tcoord = vtkCoordinate::New();
+  tcoord->SetCoordinateSystemToWorld();
+  m_HelperLinesmapper->SetTransformCoordinate(tcoord);
+  m_Mapper->SetTransformCoordinate(tcoord);
+  tcoord->Delete();
 }
 
 mitk::PlaneGeometryDataMapper2D::LocalStorage::~LocalStorage()

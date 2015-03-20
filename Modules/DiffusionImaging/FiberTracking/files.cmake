@@ -42,7 +42,7 @@ set(H_FILES
   Algorithms/itkEvaluateTractogramDirectionsFilter.h
   Algorithms/itkFiberCurvatureFilter.h
 
-  # (old) Tractography
+  # Tractography
   Algorithms/itkGibbsTrackingFilter.h
   Algorithms/itkStochasticTractographyFilter.h
   Algorithms/itkStreamlineTrackingFilter.h
@@ -54,6 +54,8 @@ set(H_FILES
   Algorithms/GibbsTracking/mitkGibbsEnergyComputer.h
   Algorithms/GibbsTracking/mitkSphereInterpolator.h
   Algorithms/GibbsTracking/mitkFiberBuilder.h
+  Algorithms/MLTracking/mitkTrackingForestHandler.h
+  Algorithms/MLTracking/itkMLBSTrackingFilter.h
 
   # Signal Models
   SignalModels/mitkDiffusionSignalModel.h

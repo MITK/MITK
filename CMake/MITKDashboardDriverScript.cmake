@@ -27,7 +27,6 @@ set(expected_variables
   CTEST_MEMORYCHECK_COMMAND
   CTEST_GIT_COMMAND
   PROJECT_BUILD_DIR
-  SUPERBUILD_TARGETS
   )
 
 foreach(var ${expected_variables})
@@ -186,10 +185,52 @@ function(func_test label build_dir)
 
 endfunction()
 
+macro(finalize_submission)
+
+  # Note should be at the end
+  ctest_submit(PARTS Notes RETRY_DELAY 3 RETRY_COUNT 3)
+
+  # Send status to the "CDash Web Admin"
+  if(CDASH_ADMIN_URL_PREFIX)
+    set(cdash_admin_url "${CDASH_ADMIN_URL_PREFIX}/cdashadmin-web/index.php?pw=4da12ca9c06d46d3171d7f73974c900f")
+    string(REGEX REPLACE ".*\\?project=(.*)&?" "\\1" _ctest_project "${CTEST_DROP_LOCATION}")
+    file(DOWNLOAD
+         "${cdash_admin_url}&action=submit&name=${_build_name_escaped}&hasTestErrors=${test_errors}&hasBuildErrors=${build_errors}&hasBuildWarnings=${build_warnings}&ctestDropSite=${CTEST_DROP_SITE}&ctestProject=${_ctest_project}"
+         "${CTEST_BINARY_DIRECTORY}/cdashadmin.txt"
+         STATUS status
+         )
+    list(GET status 0 error_code)
+    list(GET status 1 error_msg)
+    if(error_code)
+      message(FATAL_ERROR "error: Failed to communicate with cdashadmin-web - ${error_msg}")
+    endif()
+  endif()
+
+endmacro()
+
+macro(check_for_errors)
+
+  set(_curr_target ${ARGV0})
+  if(build_errors AND _curr_target)
+    # try to remove the stamp file for external projects
+    set(_stamp_file "${CTEST_BINARY_DIRECTORY}/ep/src/${_curr_target}-stamp/${_curr_target}-configure")
+    if(EXISTS "${_stamp_file}")
+      file(REMOVE "${_stamp_file}")
+    endif()
+  endif()
+
+  if(build_errors OR test_errors)
+    finalize_submission()
+    # this should return from run_ctest()
+    return()
+  endif()
+
+endmacro()
+
 #---------------------------------------------------------------------
 # run_ctest macro
 #---------------------------------------------------------------------
-macro(run_ctest)
+function(run_ctest)
 
   set(build_warnings 0)
   set(build_errors 0)
@@ -286,19 +327,33 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     # to the superbuild project
     ctest_submit(PARTS Update RETRY_DELAY 3 RETRY_COUNT 3)
 
+    check_for_errors()
+
     # To get CTEST_PROJECT_SUBPROJECTS and CTEST_PROJECT_EXTERNALS definition
     include("${CTEST_BINARY_DIRECTORY}/CTestConfigSubProject.cmake")
 
+    # Read in a list of super-build targets (SUPERBUILD_TARGETS). If an error
+    # occurs in one of the listed projects, the ctest superbuild make step stops
+    # and the error is reported in the dashboard. If this variable would be empty
+    # the errors are still reported but make would keep building external
+    # projects which leads to potentially more errors because of dependencies.
+    set(MITK_SUPERBUILD_TARGETS_FILE "${CTEST_BINARY_DIRECTORY}/SuperBuildTargets.cmake")
+    if(EXISTS "${MITK_SUPERBUILD_TARGETS_FILE}")
+      include("${MITK_SUPERBUILD_TARGETS_FILE}")
+    endif()
+
     # Build top level (either all or the supplied targets at
     # superbuild level
-    if(SUPERBUILD_TARGETS AND NOT build_errors)
+    if(SUPERBUILD_TARGETS)
       foreach(superbuild_target ${SUPERBUILD_TARGETS})
 
         message("----------- [ Build ${superbuild_target} - SuperBuild ] -----------")
         func_build_target(${superbuild_target} "${CTEST_BINARY_DIRECTORY}")
+        check_for_errors(${superbuild_target})
 
         # runs only tests that have a LABELS property matching "SuperBuild"
         func_test("SuperBuild" "${CTEST_BINARY_DIRECTORY}")
+        check_for_errors()
       endforeach()
 
       # HACK Unfortunately ctest_coverage ignores the build argument, back-up the original dirs
@@ -317,20 +372,19 @@ ${INITIAL_CMAKECACHE_OPTIONS}
         message("----------- [ Build ${external_project_name} ] -----------")
 
         func_build_target("${external_project_name}" "${CTEST_BINARY_DIRECTORY}")
+        check_for_errors()
 
-        if(NOT build_errors)
-          # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
-          file(READ "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}/CMakeFiles/TargetDirectories.txt" mitk_build_coverage_dirs)
-          file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
+        # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
+        file(READ "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}/CMakeFiles/TargetDirectories.txt" mitk_build_coverage_dirs)
+        file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
 
-          message("----------- [ Test ${external_project_name} ] -----------")
+        message("----------- [ Test ${external_project_name} ] -----------")
 
-          # runs only tests that have a LABELS property matching "${external_project_name}"
-          func_test(${external_project_name} "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}")
+        # runs only tests that have a LABELS property matching "${external_project_name}"
+        func_test(${external_project_name} "${CTEST_BINARY_DIRECTORY}/${external_project_builddir}")
 
-          # restore old coverage dirs
-          file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${old_coverage_dirs}")
-        endif()
+        # restore old coverage dirs
+        file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${old_coverage_dirs}")
 
       endforeach()
 
@@ -343,10 +397,9 @@ ${INITIAL_CMAKECACHE_OPTIONS}
        message("----------- [ Build SuperBuild ] -----------")
     endif()
 
-    if(NOT build_errors)
-      # build everything at superbuild level which has not yet been built
-      func_build_target("" "${CTEST_BINARY_DIRECTORY}")
-    endif()
+    # build everything at superbuild level which has not yet been built
+    func_build_target("" "${CTEST_BINARY_DIRECTORY}")
+    check_for_errors()
 
     # runs only tests that have a LABELS property matching "SuperBuild"
     #func_test("SuperBuild" "${CTEST_BINARY_DIRECTORY}")
@@ -368,49 +421,47 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     if(res)
       math(EXPR build_errors "${build_errors} + 1")
     endif()
-
+    check_for_errors()
 
     foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
-      if(NOT build_errors)
-        set_property(GLOBAL PROPERTY SubProject ${subproject})
-        set_property(GLOBAL PROPERTY Label ${subproject})
+      set_property(GLOBAL PROPERTY SubProject ${subproject})
+      set_property(GLOBAL PROPERTY Label ${subproject})
 
-        if(subproject MATCHES "Unlabeled")
-          message("----------- [ Build All (Unlabeled) ] -----------")
-          # Build target
-          func_build_target("" "${build_dir}")
-        else()
-          message("----------- [ Build ${subproject} ] -----------")
-          # Build target
-          func_build_target(${subproject} "${build_dir}")
-        endif()
+      if(subproject MATCHES "Unlabeled")
+        message("----------- [ Build All (Unlabeled) ] -----------")
+        # Build target
+        func_build_target("" "${build_dir}")
+      else()
+        message("----------- [ Build ${subproject} ] -----------")
+        # Build target
+        func_build_target(${subproject} "${build_dir}")
       endif()
+      check_for_errors()
     endforeach()
 
-    if(NOT build_errors)
-      # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
-      file(READ ${build_dir}/CMakeFiles/TargetDirectories.txt mitk_build_coverage_dirs)
-      file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
+    # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
+    file(READ ${build_dir}/CMakeFiles/TargetDirectories.txt mitk_build_coverage_dirs)
+    file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
 
-      foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
-        set_property(GLOBAL PROPERTY SubProject ${subproject})
-        set_property(GLOBAL PROPERTY Label ${subproject})
-        message("----------- [ Test ${subproject} ] -----------")
+    foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
+      set_property(GLOBAL PROPERTY SubProject ${subproject})
+      set_property(GLOBAL PROPERTY Label ${subproject})
+      message("----------- [ Test ${subproject} ] -----------")
 
-        # runs only tests that have a LABELS property matching "${subproject}"
-        func_test(${subproject} "${build_dir}")
-      endforeach()
-    endif()
+      # runs only tests that have a LABELS property matching "${subproject}"
+      func_test(${subproject} "${build_dir}")
+    endforeach()
 
     # Build any additional target which is not build by "all"
     # i.e. the "package" target
-    if(CTEST_PROJECT_ADDITIONAL_TARGETS AND NOT build_errors)
+    if(CTEST_PROJECT_ADDITIONAL_TARGETS)
       foreach(additional_target ${CTEST_PROJECT_ADDITIONAL_TARGETS})
         set_property(GLOBAL PROPERTY SubProject ${additional_target})
         set_property(GLOBAL PROPERTY Label ${additional_target})
 
         message("----------- [ Build ${additional_target} ] -----------")
         func_build_target(${additional_target} "${build_dir}")
+        check_for_errors()
 
         message("----------- [ Test ${additional_target} ] -----------")
         # runs only tests that have a LABELS property matching "${subproject}"
@@ -446,24 +497,8 @@ ${INITIAL_CMAKECACHE_OPTIONS}
       ctest_submit(PARTS MemCheck RETRY_DELAY 3 RETRY_COUNT 3)
     endif()
 
-    # Note should be at the end
-    ctest_submit(PARTS Notes RETRY_DELAY 3 RETRY_COUNT 3)
-
-    # Send status to the "CDash Web Admin"
-    if(CDASH_ADMIN_URL_PREFIX)
-      set(cdash_admin_url "${CDASH_ADMIN_URL_PREFIX}/cdashadmin-web/index.php?pw=4da12ca9c06d46d3171d7f73974c900f")
-      string(REGEX REPLACE ".*\\?project=(.*)&?" "\\1" _ctest_project "${CTEST_DROP_LOCATION}")
-      file(DOWNLOAD
-           "${cdash_admin_url}&action=submit&name=${_build_name_escaped}&hasTestErrors=${test_errors}&hasBuildErrors=${build_errors}&hasBuildWarnings=${build_warnings}&ctestDropSite=${CTEST_DROP_SITE}&ctestProject=${_ctest_project}"
-           "${CTEST_BINARY_DIRECTORY}/cdashadmin.txt"
-           STATUS status
-           )
-      list(GET status 0 error_code)
-      list(GET status 1 error_msg)
-      if(error_code)
-        message(FATAL_ERROR "error: Failed to communicate with cdashadmin-web - ${error_msg}")
-      endif()
-    endif()
+    check_for_errors()
+    finalize_submission()
 
   endif()
 
@@ -471,7 +506,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
   # to try to checkout again
   set(CTEST_CHECKOUT_COMMAND "")
 
-endmacro()
+endfunction()
 
 if(SCRIPT_MODE STREQUAL "continuous")
   while(1)

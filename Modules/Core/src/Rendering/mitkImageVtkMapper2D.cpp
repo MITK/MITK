@@ -712,7 +712,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   }
 
   bool isBinaryImage(false);
-  if ( ! node->GetBoolProperty("binary", isBinaryImage) )
+  if ( ! node->GetBoolProperty("binary", isBinaryImage) && image->GetPixelType().GetNumberOfComponents()==1 )
   {
 
     // ok, property is not set, use heuristic to determine if this
@@ -748,6 +748,19 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     isBinaryImage = ( maxValue == min2ndValue && minValue == max2ndValue );
   }
 
+  std::string className = image->GetNameOfClass();
+  if (className != "TensorImage" && className != "QBallImage")
+  {
+    PixelType pixelType = image->GetPixelType();
+    size_t numComponents = pixelType.GetNumberOfComponents();
+
+    if ((pixelType.GetPixelType() == itk::ImageIOBase::VECTOR && numComponents > 1) ||
+        numComponents == 2 || numComponents > 4)
+    {
+      node->AddProperty("Image.Displayed Component", mitk::IntProperty::New(0), renderer, overwrite);
+    }
+  }
+
   // some more properties specific for a binary...
   if (isBinaryImage)
   {
@@ -766,20 +779,6 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
     node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
     node->AddProperty("layer", mitk::IntProperty::New(0), renderer, overwrite);
-
-    std::string className = image->GetNameOfClass();
-
-    if (className != "TensorImage" && className != "QBallImage")
-    {
-      PixelType pixelType = image->GetPixelType();
-      size_t numComponents = pixelType.GetNumberOfComponents();
-
-      if ((pixelType.GetPixelType() == itk::ImageIOBase::VECTOR && numComponents > 1) ||
-          numComponents == 2 || numComponents > 4)
-      {
-        node->AddProperty("Image.Displayed Component", mitk::IntProperty::New(0), renderer, overwrite);
-      }
-    }
   }
 
   if(image.IsNotNull() && image->IsInitialized())

@@ -60,6 +60,12 @@ if(MITK_USE_OpenCV)
           )
     endif()
 
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_cmake_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenCV-2.4.11.tar.gz)
     set(opencv_url_md5 54fe3dba49ea276ec0228f8819e653bc)
 
@@ -78,6 +84,10 @@ if(MITK_USE_OpenCV)
         -DBUILD_DOXYGEN_DOCS:BOOL=OFF
         -DWITH_CUDA:BOOL=OFF
         ${additional_cmake_args}
+      CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
       DEPENDS ${proj_DEPENDENCIES}
     )
 

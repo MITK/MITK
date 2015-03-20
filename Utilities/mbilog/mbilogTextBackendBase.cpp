@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mbilogTextBackendBase.h"
 #include "mbilogLoggingTypes.h"
-#include "mbilogTextDictionary.h"
 #include <ctime>
 #include <iostream>
 #include <iomanip>
@@ -25,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifdef _WIN32
  #define USE_WIN32COLOREDCONSOLE
  #include <windows.h>
+ #include "mbilogTextDictionary.h"
 #endif
 
 static bool g_init=false;

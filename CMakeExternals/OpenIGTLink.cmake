@@ -21,6 +21,12 @@ if(MITK_USE_OpenIGTLink)
           -DCMAKE_USE_PTHREADS:BOOL=OFF)
     endif()
 
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_cmake_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     ExternalProject_Add(${proj}
        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenIGTLink-54df50de.tar.gz
        URL_MD5 b9fd8351b059f4ec615f2dfd74ab2458
@@ -34,6 +40,10 @@ if(MITK_USE_OpenIGTLink)
          -DOpenIGTLink_INSTALL_LIB_DIR:STRING=lib
          -DOpenIGTLink_INSTALL_PACKAGE_DIR:STRING=lib/cmake/OpenIGTLink
          -DOpenIGTLink_INSTALL_NO_DOCUMENTATION:BOOL=ON
+       CMAKE_CACHE_ARGS
+         ${ep_common_cache_args}
+       CMAKE_CACHE_DEFAULT_ARGS
+         ${ep_common_cache_default_args}
        DEPENDS ${proj_DEPENDENCIES}
       )
 

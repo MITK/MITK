@@ -1,4 +1,4 @@
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.1)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
@@ -73,6 +73,20 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 #-----------------------------------------------------------------------------
+# Check miminum Mac OS X version
+#-----------------------------------------------------------------------------
+# The minimum supported Mac OS X version is 10.9. If you use a version less than 10.9, there is no guarantee that the build still works.
+if(APPLE)
+  exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE osx_version)
+  if (osx_version VERSION_LESS "10.9")
+    message(WARNING "Detected OS X version \"${osx_version}\" is not supported anymore. Minimum required OS X version is 10.9 or greater.")
+  endif()
+  if (CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.9)
+    message(WARNING "Detected OS X deployment target \"${CMAKE_OSX_DEPLOYMENT_TARGET}\" is not supported anymore. Minimum required OS X version is 10.9 or greater.")
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # Check miminum compiler versions
 #-----------------------------------------------------------------------------
 
@@ -108,16 +122,9 @@ endif()
 
 set(MITK_CXX_STANDARD 11)
 
-# help keeping cross-platform compatibility
-# CMake 3.1 does not yet know how to handle AppleClang...
-# See http://public.kitware.com/Bug/view.php?id=15355
-if(NOT MSVC AND
-   NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND
-   GCC_VERSION VERSION_GREATER 4.6)
-  set(CMAKE_CXX_EXTENSIONS 0)
-  set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
-  set(CMAKE_CXX_STANDARD_REQUIRED 1)
-endif()
+set(CMAKE_CXX_EXTENSIONS 0)
+set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
+set(CMAKE_CXX_STANDARD_REQUIRED 1)
 
 # This is necessary to avoid problems with compile feature checks.
 # CMAKE_CXX_STANDARD seems to only set the -std=c++11 flag for targets.
@@ -379,14 +386,6 @@ endif()
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
   message("> Forcing MITK_USE_CppUnit to ON because BUILD_TESTING=ON")
   set(MITK_USE_CppUnit ON CACHE BOOL "Use CppUnit for unit tests" FORCE)
-endif()
-
-if(MITK_USE_Vigra)
-  link_directories(${Vigra_DIR}/../../lib ${Vigra_DIR}/lib)
-  list(APPEND MITK_RUNTIME_PATH
-       ${Vigra_DIR}/../../
-       ${Vigra_DIR}
-      )
 endif()
 
 # -----------------------------------------
@@ -899,6 +898,13 @@ if(BUILD_TESTING)
     @ONLY
     )
 
+  # Initial cache for ProjectTemplate and PluginGenerator tests
+  configure_file(
+     CMake/mitkTestInitialCache.txt.in
+     ${MITK_BINARY_DIR}/mitkTestInitialCache.txt
+     @ONLY
+  )
+
   # Configuration for the CMake-generated test driver
   set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "#include <stdexcept>")
   set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
@@ -924,7 +930,7 @@ if(BUILD_TESTING)
 
   # Test the external project template
   if(MITK_USE_BLUEBERRY)
-    #include(mitkTestProjectTemplate)
+    include(mitkTestProjectTemplate)
   endif()
 
   # Test the package target

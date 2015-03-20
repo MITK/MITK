@@ -48,17 +48,17 @@ if(NOT DEFINED ITK_DIR)
     -DModule_ITKOpenJPEG:BOOL=ON
   )
 
-  set(vcl_constexpr_patch)
-  if(GCC_VERSION VERSION_LESS 4.7 AND GCC_VERSION VERSION_GREATER 4)
-    set(vcl_constexpr_patch
-      COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.5.1-gcc-4.6.patch
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_cmake_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
     )
   endif()
 
-  if(MITK_USE_HDF5 AND WIN32)
-    list(APPEND additional_cmake_args
-      -DHDF5_C_LIBRARY:FILEPATH=${ep_prefix}/lib/hdf5.lib
-      -DHDF5_CXX_LIBRARY:FILEPATH=${ep_prefix}/lib/hdf5_cpp.lib)
+  set(vcl_constexpr_patch)
+  if(GCC_VERSION VERSION_LESS 4.7 AND GCC_VERSION VERSION_GREATER 4)
+    set(vcl_constexpr_patch
+      COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.7.1-gcc-4.6.patch
+    )
   endif()
 
   ExternalProject_Add(${proj}
@@ -66,7 +66,7 @@ if(NOT DEFINED ITK_DIR)
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.7.1-20c0592.tar.gz
      URL_MD5 f778a5f0e297c06dc629c33ec45733dc
      # work with external GDCM
-     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.5.1.patch
+     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.7.1.patch
                    ${vcl_constexpr_patch}
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
@@ -75,8 +75,10 @@ if(NOT DEFINED ITK_DIR)
        -DBUILD_EXAMPLES:BOOL=OFF
        -DITK_USE_SYSTEM_GDCM:BOOL=ON
        -DGDCM_DIR:PATH=${GDCM_DIR}
-       -DHDF5_DIR:PATH=${HDF5_DIR}
-       -DITK_USE_SYSTEM_HDF5:BOOL=${MITK_USE_HDF5}
+     CMAKE_CACHE_ARGS
+       ${ep_common_cache_args}
+     CMAKE_CACHE_DEFAULT_ARGS
+       ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 

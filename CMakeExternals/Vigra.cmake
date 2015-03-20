@@ -18,6 +18,14 @@ if(MITK_USE_Vigra)
   set(Vigra_DEPENDS ${proj})
 
   if(NOT DEFINED Vigra_DIR)
+
+    set(additional_cmake_args )
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_cmake_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     ExternalProject_Add(${proj}
        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vigra-1.10.0-src.tar.gz
        URL_MD5 4f963f0be4fcb8b06271c2aa40baa9be
@@ -25,11 +33,16 @@ if(MITK_USE_Vigra)
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
          ${ep_common_args}
+         ${additional_cmake_args}
          -DAUTOEXEC_TESTS:BOOL=OFF
          -DWITH_VIGRANUMPY:BOOL=OFF
          -DHDF5_DIR:PATH=${HDF5_DIR}
          -DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=TRUE
          -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+       CMAKE_CACHE_ARGS
+         ${ep_common_cache_args}
+       CMAKE_CACHE_DEFAULT_ARGS
+         ${ep_common_cache_default_args}
        DEPENDS ${proj_DEPENDENCIES}
       )
 

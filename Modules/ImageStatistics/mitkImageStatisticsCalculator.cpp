@@ -1264,7 +1264,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   unsigned int numberOfBins = 200; // default number of bins
   if (m_UseDefaultBinSize)
   {
-    m_HistogramBinSize = std::ceil( (statisticsFilter->GetMaximum() - statisticsFilter->GetMinimum() + 1)/numberOfBins );
+    m_HistogramBinSize = std::ceil( static_cast<double>((statisticsFilter->GetMaximum() - statisticsFilter->GetMinimum() + 1)/numberOfBins) );
   }
   else
   {

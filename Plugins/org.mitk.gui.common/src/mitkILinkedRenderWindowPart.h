@@ -85,6 +85,9 @@ struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWi
    *         otherwise.
    */
   virtual bool IsLinkedNavigationEnabled() const = 0;
+
+  virtual void SetWindowPresetBeforeLoading() = 0;
+  virtual void SetWindowPresetAfterLoading() = 0;
 };
 
 }

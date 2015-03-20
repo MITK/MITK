@@ -140,10 +140,12 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
 
   if (preLoadedImageBlock.IsNull())
   {
-    StringContainer s;
-    s.push_back(filenames.at(0));
+    StringContainer fileToImmediateLoading;
+    // ism: we load two slice for gathering spacing information
+    fileToImmediateLoading.push_back(filenames.at(0));
+    fileToImmediateLoading.push_back(filenames.at(1));
 
-    reader->SetFileNames(s);
+    reader->SetFileNames(fileToImmediateLoading);
 
     reader->Update();
     typename ImageType::Pointer readVolume = reader->GetOutput();
@@ -155,10 +157,9 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
     }
 
     image->InitializeByItk(readVolume.GetPointer(), 1, -1, filenames.size());
-    //image->SetImportVolume(readVolume->GetBufferPointer());
     image->SetImportVolume(readVolume->GetBufferPointer(), 0, 0, mitk::Image::ImportMemoryManagementType::AsyncCopyMemory);
 
-    std::thread thr(LoadSeries, std::ref(filenames), image);
+    std::thread thr(LoadSeries, std::ref(filenames), image, command);
     thr.detach();
   }
   else

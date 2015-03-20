@@ -1494,7 +1494,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   ImageBlockDescriptor imageBlockDescriptor;
 
   const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
-  const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
+  const gdcm::Tag tagImageOrientation(0x0020, 0x0037); // Image Orientation
   const gdcm::Tag tagSeriesInstanceUID(0x0020, 0x000e); // Series Instance UID
   const gdcm::Tag tagSOPClassUID(0x0008, 0x0016); // SOP class UID
   const gdcm::Tag tagModality(0x0008, 0x0060); // modality
@@ -1521,12 +1521,22 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       /* default case: assume "normal" image blocks, possibly 3D+t */
       bool canLoadAs4D(true);
       gdcm::Scanner scanner;
-      ScanForSliceInformation(filenames, scanner);
+
+      StringContainer slicesFileNameForScan;
+      // we checked series id for all slice, so we expect infos for another file be the same 
+      slicesFileNameForScan.push_back(filenames.at(0));
+
+      ScanForSliceInformation(slicesFileNameForScan, scanner);
 
       // need non-const access for map
       gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(scanner.GetMappings());
 
-      std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, sort, canLoadAs4D );
+      //switch off sorting
+      //std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, sort, canLoadAs4D );
+
+      std::list<StringContainer> imageBlocks;
+      imageBlocks.push_back(slicesFileNameForScan);
+
       unsigned int volume_count = imageBlocks.size();
 
       imageBlockDescriptor.SetSeriesInstanceUID( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagSeriesInstanceUID ) ) );
@@ -1573,6 +1583,8 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
         DcmIoType::Pointer io;
+        imageBlocks.clear();
+        imageBlocks.push_back(filenames);
         image = MultiplexLoadDICOMByITK( imageBlocks.front(), correctTilt, tiltInfo, io, command, preLoadedImageBlock ); // load first 3D block
 
         imageBlockDescriptor.AddFiles(imageBlocks.front()); // only the first part is loaded

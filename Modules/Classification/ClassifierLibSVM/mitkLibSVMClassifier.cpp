@@ -24,7 +24,7 @@ namespace LibSVM
 #include <mitkExceptionMacro.h>
 
 mitk::LibSVMClassifier::LibSVMClassifier() :
-  m_Model(NULL)
+  m_Model(nullptr)
 {
 }
 
@@ -41,7 +41,7 @@ bool mitk::LibSVMClassifier::SupportsPointWiseWeight()
   return true;
 }
 
-void mitk::LibSVMClassifier::Train(const MatrixType &X, const VectorType &Y)
+void mitk::LibSVMClassifier::Fit(const MatrixType &X, const VectorType &Y)
 {
   LibSVM::svm_parameter parameter;
   LibSVM::svm_problem problem;
@@ -53,7 +53,7 @@ void mitk::LibSVMClassifier::Train(const MatrixType &X, const VectorType &Y)
   ReadYValues(&problem, Y);
   ReadWValues(&problem);
 
-  const char * error_msg = NULL;
+  const char * error_msg = nullptr;
   error_msg = LibSVM::svm_check_parameter(&problem, &parameter);
   if (error_msg)
   {
@@ -100,21 +100,23 @@ mitk::LibSVMClassifier::VectorType mitk::LibSVMClassifier::Predict(const MatrixT
 
 void  mitk::LibSVMClassifier::ConvertParameter(LibSVM::svm_parameter* parameter)
 {
-  parameter->svm_type = Configuration().At("SVM Type").AsInt(LibSVM::C_SVC);
-  parameter->kernel_type = Configuration().At("Kernel Type").AsInt(LibSVM::RBF);
-  parameter->degree = Configuration().At("Degree").AsInt(3);
-  parameter->gamma = Configuration().At("Gamma").AsDouble(0);
-  parameter->coef0 = Configuration().At("Coef 0").AsDouble(0);
-  parameter->nu = Configuration().At("Nu").AsDouble(0.5);
-  parameter->cache_size = Configuration().At("Cache Size").AsDouble(100);
-  parameter->C = Configuration().At("C").AsDouble(1);
-  parameter->eps = Configuration().At("Eps").AsDouble(1e-3);
-  parameter->p = Configuration().At("P").AsDouble(0.1);
-  parameter->shrinking = Configuration().At("Shrinking").AsInt(1);
-  parameter->probability = Configuration().At("Probability").AsInt(1);
-  parameter->nr_weight = Configuration().At("Nr Weight").AsInt(0);
-  parameter->weight_label = NULL;
-  parameter->weight = NULL;
+  // Get the proerty                                                                      // Some defaults
+  if(!this->GetPropertyList()->Get("classifier.svm.svm-type",parameter->svm_type))        parameter->svm_type = 0; // value?
+  if(!this->GetPropertyList()->Get("classifier.svm.kernel-type",parameter->kernel_type))  parameter->kernel_type = 0; // value?
+  if(!this->GetPropertyList()->Get("classifier.svm.degree",parameter->degree))            parameter->degree = 3;
+  if(!this->GetPropertyList()->Get("classifier.svm.gamma",parameter->gamma))              parameter->gamma = 0;
+  if(!this->GetPropertyList()->Get("classifier.svm.coef0",parameter->coef0))              parameter->coef0 = 0;
+  if(!this->GetPropertyList()->Get("classifier.svm.nu",parameter->nu))                    parameter->nu = 0.5;
+  if(!this->GetPropertyList()->Get("classifier.svm.cache-size",parameter->cache_size))    parameter->cache_size = 100.0;
+  if(!this->GetPropertyList()->Get("classifier.svm.c",parameter->C))                      parameter->C = 1.0;
+  if(!this->GetPropertyList()->Get("classifier.svm.eps",parameter->eps))                  parameter->eps = 1e-3;
+  if(!this->GetPropertyList()->Get("classifier.svm.p",parameter->p))                      parameter->p = 0.1;
+  if(!this->GetPropertyList()->Get("classifier.svm.shrinking",parameter->shrinking))      parameter->shrinking = 1;
+  if(!this->GetPropertyList()->Get("classifier.svm.probability",parameter->probability))  parameter->probability = 1;
+  if(!this->GetPropertyList()->Get("classifier.svm.nr-weight",parameter->nr_weight))      parameter->nr_weight = 0;
+
+  parameter->weight_label = nullptr;
+  parameter->weight = nullptr;
 }
 
 void mitk::LibSVMClassifier::ReadXValues(LibSVM::svm_problem * problem, LibSVM::svm_node** xSpace, const MatrixType &X)

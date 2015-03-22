@@ -37,10 +37,10 @@ namespace mitk
     LibSVMClassifier();
     ~LibSVMClassifier();
 
-    virtual void Train(const MatrixType &X, const VectorType &Y);
-    virtual VectorType Predict(const MatrixType &X);
+    void Fit(const MatrixType &X, const VectorType &Y) override;
+    VectorType Predict(const MatrixType &X) override;
 
-    virtual bool SupportsPointWiseWeight();
+    bool SupportsPointWiseWeight() override;
 
   private:
 

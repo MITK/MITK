@@ -40,6 +40,10 @@ if(NOT DEFINED GDCM_DIR)
        ${ep_common_args}
        ${additional_args}
        -DGDCM_BUILD_SHARED_LIBS:BOOL=ON
+     CMAKE_CACHE_ARGS
+       ${ep_common_cache_args}
+     CMAKE_CACHE_DEFAULT_ARGS
+       ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
   set(GDCM_DIR ${ep_prefix})

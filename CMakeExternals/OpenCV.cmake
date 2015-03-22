@@ -84,6 +84,10 @@ if(MITK_USE_OpenCV)
         -DBUILD_DOXYGEN_DOCS:BOOL=OFF
         -DWITH_CUDA:BOOL=OFF
         ${additional_cmake_args}
+      CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
       DEPENDS ${proj_DEPENDENCIES}
     )
 

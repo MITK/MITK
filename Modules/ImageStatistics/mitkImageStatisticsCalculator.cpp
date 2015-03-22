@@ -1080,11 +1080,16 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   statisticsContainer->push_back( statistics );
 
   // Calculate histogram
-  unsigned int numberOfBins = 200;
+  // calculate bin size or number of bins
+  unsigned int numberOfBins = 200; // default number of bins
   if (m_UseDefaultBinSize)
+  {
     m_HistogramBinSize = std::ceil( (statistics.GetMax() - statistics.GetMin() + 1)/numberOfBins );
+  }
   else
-    numberOfBins = calcNumberOfBins(statistics.GetMin(), statistics.GetMax());
+  {
+     numberOfBins = calcNumberOfBins(statistics.GetMin(), statistics.GetMax());
+  }
 
   typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
   histogramGenerator->SetInput( image );
@@ -1255,7 +1260,16 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
   statisticsFilter->Update();
 
-  int numberOfBins = calcNumberOfBins(statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum());
+  // Calculate bin size or number of bins
+  unsigned int numberOfBins = 200; // default number of bins
+  if (m_UseDefaultBinSize)
+  {
+    m_HistogramBinSize = std::ceil( static_cast<double>((statisticsFilter->GetMaximum() - statisticsFilter->GetMinimum() + 1)/numberOfBins) );
+  }
+  else
+  {
+    numberOfBins = calcNumberOfBins(statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum());
+  }
 
   typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
   labelStatisticsFilter = LabelStatisticsFilterType::New();

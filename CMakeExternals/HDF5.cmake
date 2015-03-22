@@ -36,6 +36,10 @@ if(MITK_USE_HDF5)
          -DHDF5_BUILD_HL_LIB:BOOL=ON
          -DHDF5_BUILD_CPP_LIB:BOOL=ON
          -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+       CMAKE_CACHE_ARGS
+         ${ep_common_cache_args}
+       CMAKE_CACHE_DEFAULT_ARGS
+         ${ep_common_cache_default_args}
        DEPENDS ${proj_DEPENDENCIES}
       )
 

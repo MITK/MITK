@@ -99,6 +99,10 @@ if(MITK_USE_CTK)
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
         -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
         -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_5f3a03b1.tar.gz
+      CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
       DEPENDS ${proj_DEPENDENCIES}
      )
 

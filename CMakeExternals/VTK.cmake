@@ -105,8 +105,12 @@ if(NOT DEFINED VTK_DIR)
         -DModule_vtkTestingRendering:BOOL=ON
         -DVTK_MAKE_INSTANTIATORS:BOOL=ON
         ${additional_cmake_args}
-     DEPENDS ${proj_DEPENDENCIES}
-    )
+    CMAKE_CACHE_ARGS
+      ${ep_common_cache_args}
+    CMAKE_CACHE_DEFAULT_ARGS
+      ${ep_common_cache_default_args}
+    DEPENDS ${proj_DEPENDENCIES}
+  )
 
   set(VTK_DIR ${ep_prefix})
   mitkFunctionInstallExternalCMakeProject(${proj})

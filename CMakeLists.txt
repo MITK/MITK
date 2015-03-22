@@ -898,6 +898,13 @@ if(BUILD_TESTING)
     @ONLY
     )
 
+  # Initial cache for ProjectTemplate and PluginGenerator tests
+  configure_file(
+     CMake/mitkTestInitialCache.txt.in
+     ${MITK_BINARY_DIR}/mitkTestInitialCache.txt
+     @ONLY
+  )
+
   # Configuration for the CMake-generated test driver
   set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "#include <stdexcept>")
   set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
@@ -923,7 +930,7 @@ if(BUILD_TESTING)
 
   # Test the external project template
   if(MITK_USE_BLUEBERRY)
-    #include(mitkTestProjectTemplate)
+    include(mitkTestProjectTemplate)
   endif()
 
   # Test the package target

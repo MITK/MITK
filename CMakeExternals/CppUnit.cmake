@@ -32,6 +32,10 @@ if(NOT DEFINED CppUnit_DIR)
      CMAKE_ARGS
        ${ep_common_args}
        ${additional_args}
+     CMAKE_CACHE_ARGS
+       ${ep_common_cache_args}
+     CMAKE_CACHE_DEFAULT_ARGS
+       ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 

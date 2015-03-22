@@ -27,9 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // STD Includes
 
-// MITK
-#include <mitkConfigurationHolder.h>
-
 namespace mitk
 {
   class MITKCLASSIFICATIONCORE_EXPORT AbstractClassifier : public BaseData
@@ -59,23 +56,23 @@ namespace mitk
     ///
     virtual VectorType Predict(const MatrixType &X) = 0;
 
-    ///
-    /// @brief SetConfiguration, handing over classifier custom configurations
-    /// @param conf
-    ///
-    void SetConfiguration(const ConfigurationHolder& conf);
+//    ///
+//    /// @brief SetConfiguration, handing over classifier custom configurations
+//    /// @param conf
+//    ///
+//    void SetConfiguration(const ConfigurationHolder& conf);
 
-    ///
-    /// @brief Configuration
-    /// @return none-const refernce to the custom configuration
-    ///
-    ConfigurationHolder& Configuration();
+//    ///
+//    /// @brief Configuration
+//    /// @return none-const refernce to the custom configuration
+//    ///
+//    ConfigurationHolder& Configuration();
 
-    ///
-    /// @brief GetConfigurationCopy
-    /// @return Create and return a deep copy of the configuration
-    ///
-    ConfigurationHolder GetConfigurationCopy();
+//    ///
+//    /// @brief GetConfigurationCopy
+//    /// @return Create and return a deep copy of the configuration
+//    ///
+//    ConfigurationHolder GetConfigurationCopy();
 
     ///
     /// @brief SetPointWiseWeight
@@ -118,7 +115,7 @@ namespace mitk
   #pragma warning(disable: 4251)
 #endif
 
-    ConfigurationHolder m_Config;
+//    ConfigurationHolder m_Config;
     VectorType m_PointWiseWeight;
     bool m_UsePointWiseWeight;
 

@@ -16,20 +16,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAbstractClassifier.h>
 
-void mitk::AbstractClassifier::SetConfiguration(const ConfigurationHolder& value)
-{
-  m_Config = value;
-}
+//void mitk::AbstractClassifier::SetConfiguration(const ConfigurationHolder& value)
+//{
+//  m_Config = value;
+//}
 
-mitk::ConfigurationHolder& mitk::AbstractClassifier::Configuration()
-{
-  return m_Config;
-}
+//mitk::ConfigurationHolder& mitk::AbstractClassifier::Configuration()
+//{
+//  return m_Config;
+//}
 
-mitk::ConfigurationHolder mitk::AbstractClassifier::GetConfiguration()
-{
-  return m_Config;
-}
+//mitk::ConfigurationHolder mitk::AbstractClassifier::GetConfigurationCopy()
+//{
+//  return m_Config;
+//}
 
 
 void mitk::AbstractClassifier::SetPointWiseWeight(const VectorType& w)
@@ -38,7 +38,7 @@ void mitk::AbstractClassifier::SetPointWiseWeight(const VectorType& w)
   m_UsePointWiseWeight = true;
 }
 
-mitk::AbstractClassifier::VectorType mitk::AbstractClassifier::GetPointWiseWeight()
+mitk::AbstractClassifier::VectorType mitk::AbstractClassifier::GetPointWiseWeightCopy()
 {
   return m_PointWiseWeight;
 }

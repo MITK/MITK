@@ -1,4 +1,4 @@
 add_subdirectory(ClassificationCore)
 add_subdirectory(ClassifierLibSVM)
 
-add_subdirectory(MiniApps)
+#add_subdirectory(MiniApps)

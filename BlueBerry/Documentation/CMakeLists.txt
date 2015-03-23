@@ -68,6 +68,10 @@ configure_file(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
 
 find_package(Doxygen)
+# doxygen does not necessarily create the output dir if it does not exist
+if(NOT EXISTS ${BLUEBERRY_DOXYGEN_OUTPUT_DIR})
+  file(MAKE_DIRECTORY ${BLUEBERRY_DOXYGEN_OUTPUT_DIR})
+endif()
 
 add_custom_target(BlueBerryDoc
                   ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf

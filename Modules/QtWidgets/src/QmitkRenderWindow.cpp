@@ -468,7 +468,7 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const
       key = mitk::InteractionEvent::KeyEnter;
       break;
     case Qt::Key_Escape:
-      key = mitk::InteractionEvent::KeyEnter;
+      key = mitk::InteractionEvent::KeyEsc;
       break;
     case Qt::Key_Delete:
       key = mitk::InteractionEvent::KeyDelete;

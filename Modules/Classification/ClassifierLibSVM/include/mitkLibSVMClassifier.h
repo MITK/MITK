@@ -37,16 +37,16 @@ namespace mitk
     LibSVMClassifier();
     ~LibSVMClassifier();
 
-    void Fit(const MatrixType &X, const VectorType &Y) override;
-    VectorType Predict(const MatrixType &X) override;
+    void Fit(const EigenMatrixXdType &X, const EigenVectorXdType &Y) override;
+    EigenVectorXdType Predict(const EigenMatrixXdType &X) override;
 
     bool SupportsPointWiseWeight() override;
 
   private:
 
     void ConvertParameter(LibSVM::svm_parameter* parameter);
-    void ReadXValues(LibSVM::svm_problem * problem, LibSVM::svm_node** xSpace, const MatrixType &X);
-    void ReadYValues(LibSVM::svm_problem * problem, const VectorType &Y);
+    void ReadXValues(LibSVM::svm_problem * problem, LibSVM::svm_node** xSpace, const EigenMatrixXdType &X);
+    void ReadYValues(LibSVM::svm_problem * problem, const EigenVectorXdType &Y);
     void ReadWValues(LibSVM::svm_problem * problem);
 
     LibSVM::svm_model* m_Model;

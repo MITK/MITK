@@ -342,6 +342,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_LogoRendering->SetOffsetVector(offset);
   m_LogoRendering->SetRelativeSize(0.15);
   m_LogoRendering->SetCornerPosition(1);
+  m_LogoRendering->SetLogoImagePath("DefaultLogo");
   renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(),renderer4);
 
   // setup gradient background and renderwindow rectangle frame

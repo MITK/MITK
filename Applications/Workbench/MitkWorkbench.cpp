@@ -147,9 +147,9 @@ int main(int argc, char** argv)
   Poco::Util::MapConfiguration* extConfig(new Poco::Util::MapConfiguration());
   if (!storageDir.isEmpty())
   {
-    extConfig->setString(berry::Platform::ARG_STORAGE_DIR.toStdString(), storageDir.toStdString());
+    extConfig->setString(berry::Platform::ARG_STORAGE_DIR.toStdString(), storageDir.toUtf8().constData());
   }
-  extConfig->setString(berry::Platform::ARG_PROVISIONING.toStdString(), provFile.toStdString());
+  extConfig->setString(berry::Platform::ARG_PROVISIONING.toStdString(), provFile.toUtf8().constData());
   extConfig->setString(berry::Platform::ARG_APPLICATION.toStdString(), "org.mitk.qt.extapplication");
 
   QStringList preloadLibs;

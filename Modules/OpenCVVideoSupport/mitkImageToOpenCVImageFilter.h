@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkOpenCVImageBridge.h>
 #include <MitkOpenCVVideoSupportExports.h>
 
+#include "mitkImageSliceSelector.h"
+
 namespace mitk
 {
 

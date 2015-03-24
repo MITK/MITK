@@ -122,7 +122,7 @@ int main(int argc, char** argv)
     diffConfig->setString(berry::Platform::ARG_STORAGE_DIR.toStdString(), storageDir.toUtf8().constData());
   }
 
-  diffConfig->setString(berry::Platform::ARG_PROVISIONING.toStdString(), provFile.toUtf8().constData());
+  diffConfig->setString(berry::Platform::ARG_PROVISIONING.toStdString(), provFile.toStdString());
   diffConfig->setString(berry::Platform::ARG_APPLICATION.toStdString(), "org.mitk.qt.diffusionimagingapp");
 
   QStringList preloadLibs;

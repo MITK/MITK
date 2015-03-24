@@ -17,29 +17,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
 #include "mitkIOUtil.h"
-//#include "mitkDecisionForest.h"
-
-
-//#include "mitkDataCollection.h"
-//#include "mitkCollectionReader.h"
-//#include "mitkCollectionWriter.h"
-//#include <itkLabelSampler.h>
-//#include <mitkImageCast.h>
-//#include <mitkMBIConfig.h>
 
 #include <vigra/random_forest_hdf5_impex.hxx>
+#include <mitkImageToEigenTransform.h>
+#include <mitkEigenToImageTransform.h>
+#include <mitkVigraRandomForestClassifier.h>
+#include <itkLabelSampler.h>
+#include <mitkImageCast.h>
 
 class mitkVigraRandomForestTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkVigraRandomForestTestSuite  );
 
-//  MITK_TEST(TrainThreadedDecisionForest);
+  MITK_TEST(TrainThreadedDecisionForest);
 //  MITK_TEST(TestThreadedDecisionForest);
 
   CPPUNIT_TEST_SUITE_END();
 
 private:
+  typedef mitk::ImageToEigenTransform::MatrixType EigenMatrixType;
+  typedef mitk::ImageToEigenTransform::VectorType EigenVectorType;
 //  static std::string GetTestDataFilePath(const std::string& testData)
 //  {
 //    if (itksys::SystemTools::FileIsFullPath(testData.c_str())) return testData;
@@ -50,60 +48,79 @@ private:
 //  mitk::DataCollection::Pointer m_TrainDatacollection;
 //  mitk::DataCollection::Pointer m_TestDatacollection;
 //  std::vector<std::string> m_Selected_items;
+  mitk::Image::Pointer inputImage;
+  mitk::Image::Pointer classMask;
+  mitk::Image::Pointer F1;
+  mitk::Image::Pointer F2;
+  mitk::Image::Pointer F3;
+  EigenMatrixType X;
+  EigenVectorType y;
+  EigenMatrixType X_predict;
+
+  mitk::VigraRandomForestClassifier::Pointer classifier;
+
 public:
 
   void setUp(void)
   {
-//    std::string path = GetTestDataFilePath("Classification/DataCollection/dc.xml");
-//    std::vector<std::string> selected_subjects = mitk::CollectionReader::GetSubjectsList(path);
 
-//    m_Selected_items = mitk::CollectionReader::GetItemList(path);
-//    m_Selected_items.erase(std::find(m_Selected_items.begin(),m_Selected_items.end(), "ClassMask"));
 
-    // output
-//    MITK_INFO << " Load Subjects:";
-//    std::for_each(selected_subjects.begin(),selected_subjects.end(), [](std::string & n){ MITK_INFO << "\t" <<n; });
-//    MITK_INFO << " Load Items:";
-//    std::for_each(m_Selected_items.begin(),m_Selected_items.end(), [](std::string & n){ MITK_INFO << "\t" << n; });
 
-//    mitk::CollectionReader colReader;
-//    // split to train_dc
-//    m_TrainDatacollection = colReader.LoadCollection(path);
-//    path = GetTestDataFilePath("Classification/DataCollection/Study/Subject/Study_Subject_ClassMask.nrrd");
-//    mitk::Image::Pointer classMask = mitk::IOUtil::LoadImage(path);
+    // Load Image Data
+    inputImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Classification/Classifier/InputImage.nrrd"));
+    classMask = mitk::IOUtil::LoadImage(GetTestDataFilePath("Classification/Classifier/ClassMask.nrrd"));
+    F1 = mitk::IOUtil::LoadImage(GetTestDataFilePath("Classification/Classifier/F1.nrrd"));
+    F2 = mitk::IOUtil::LoadImage(GetTestDataFilePath("Classification/Classifier/F2.nrrd"));
+    F3 = mitk::IOUtil::LoadImage(GetTestDataFilePath("Classification/Classifier/F3.nrrd"));
 
-//    typedef itk::Image<unsigned char, 3> UCharImageType;
-//    UCharImageType::Pointer itkImage;
-//    mitk::CastToItkImage(classMask,itkImage);
+    itk::Image<unsigned char,3>::Pointer itkClass;
+    mitk::CastToItkImage(classMask,itkClass);
 
-//    itk::LabelSampler<UCharImageType>::Pointer sampleFilter = itk::LabelSampler<UCharImageType>::New();
-//    sampleFilter->SetInput(itkImage);
-//    sampleFilter->SetAcceptRate(0.001);
-//    sampleFilter->Update();
-//    dynamic_cast<mitk::DataCollection *>(
-//          dynamic_cast<mitk::DataCollection *>(
-//            m_TrainDatacollection->GetData("Test-Study").GetPointer())
-//          ->GetData("Test-Subject").GetPointer())
-//        ->AddData(sampleFilter->GetOutput(),"SampledCalssMask");
+    itk::LabelSampler<itk::Image<unsigned char,3> >::Pointer filter = itk::LabelSampler<itk::Image<unsigned char,3> >::New();
+    filter->SetInput(itkClass);
+    filter->SetAcceptRate(0.01);
+    filter->Update();
 
-//    m_EmptyDecisionForest = mitk::DecisionForest::New();
-//    m_LoadedDecisionForest = mitk::DecisionForest::New();
+    mitk::Image::Pointer sampledClassMask;
+    mitk::CastToMitkImage(filter->GetOutput(), sampledClassMask);
 
-//    // ToDo: use mitk::IOUtil to laod hdf decision forest
-//    // ModuleActivator fail to register decision forest IO
-//    path = GetTestDataFilePath("Classification/forest.hdf5");
-//    vigra::RandomForest<int> rf;
-//    vigra::rf_import_HDF5(rf, path);
-//    m_LoadedDecisionForest->SetRandomForest(rf);
+    // Initialize X
+    EigenVectorType vec = mitk::ImageToEigenTransform::transform(inputImage,sampledClassMask);
+    unsigned int n_features = 4; // F1,F2,F3 and inputImage
+    unsigned int n_samples = vec.rows();
+
+    X = EigenMatrixType(n_samples,n_features);
+    X.col(0) = vec;
+    X.col(1) = mitk::ImageToEigenTransform::transform(F1,sampledClassMask);
+    X.col(2) = mitk::ImageToEigenTransform::transform(F2,sampledClassMask);
+    X.col(3) = mitk::ImageToEigenTransform::transform(F3,sampledClassMask);
+
+    y = mitk::ImageToEigenTransform::transform(classMask,sampledClassMask);
+
+    vec = mitk::ImageToEigenTransform::transform(inputImage,classMask);
+    n_samples = vec.rows();
+
+    X_predict = EigenMatrixType(n_samples,n_features);
+    X_predict.col(0) = vec;
+    X_predict.col(1) = mitk::ImageToEigenTransform::transform(F1,classMask);
+    X_predict.col(2) = mitk::ImageToEigenTransform::transform(F2,classMask);
+    X_predict.col(3) = mitk::ImageToEigenTransform::transform(F3,classMask);
+
+    MITK_INFO << "Shape of X [" << X.rows() << " " << X.cols() << "]";
+    MITK_INFO << "Shape of X_predict [" << X_predict.rows() << " " << X_predict.cols() << "]";
+    MITK_INFO << "Shape of Y [" << y.rows() << "]";
+
+    classifier = mitk::VigraRandomForestClassifier::New();
+
   }
 
   void TrainThreadedDecisionForest()
   {
-//    m_EmptyDecisionForest->SetCollection(m_TrainDatacollection);
-//    m_EmptyDecisionForest->SetModalities(m_Selected_items);
-//    m_EmptyDecisionForest->SetMaskName("SampledCalssMask");
-//    m_EmptyDecisionForest->SetTreeCount(16);
-//    m_EmptyDecisionForest->TrainThreaded();
+    classifier->Fit(X,y);
+
+    EigenVectorType classes = classifier->Predict(X_predict);
+    mitk::Image::Pointer img = mitk::EigenToImageTransform::transform(classes, classMask);
+    mitk::IOUtil::Save(img,"/Users/jc/prediction.nrrd");
   }
 
   void TestThreadedDecisionForest()

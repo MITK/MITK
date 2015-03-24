@@ -201,8 +201,30 @@ void QmitkFiberfoxView::AfterThread()
 
                 mitk::DataNode::Pointer node = mitk::DataNode::New();
                 node->SetData( image );
-                node->SetName(parameters.m_Misc.m_ParentNode->GetName()+"_CompartmentVolume-"+QString::number(k).toStdString());
-                GetDataStorage()->Add(node, parameters.m_Misc.m_ParentNode);
+                node->SetName("CompartmentVolume-"+QString::number(k).toStdString());
+                GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
+            }
+
+            if (m_TractsToDwiFilter->GetPhaseImage().IsNotNull())
+            {
+                mitk::Image::Pointer phaseImage = mitk::Image::New();
+                itk::TractsToDWIImageFilter< short >::DoubleDwiType::Pointer itkPhase = m_TractsToDwiFilter->GetPhaseImage();
+                phaseImage = mitk::GrabItkImageMemory( itkPhase.GetPointer() );
+                mitk::DataNode::Pointer phaseNode = mitk::DataNode::New();
+                phaseNode->SetData( phaseImage );
+                phaseNode->SetName("Phase Image");
+                GetDataStorage()->Add(phaseNode, parameters.m_Misc.m_ResultNode);
+            }
+
+            if (m_TractsToDwiFilter->GetKspaceImage().IsNotNull())
+            {
+                mitk::Image::Pointer image = mitk::Image::New();
+                itk::TractsToDWIImageFilter< short >::DoubleDwiType::Pointer itkImage = m_TractsToDwiFilter->GetKspaceImage();
+                image = mitk::GrabItkImageMemory( itkImage.GetPointer() );
+                mitk::DataNode::Pointer node = mitk::DataNode::New();
+                node->SetData( image );
+                node->SetName("k-Space");
+                GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
             }
         }
         m_TractsToDwiFilter = NULL;
@@ -307,13 +329,6 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         // create GUI widgets from the Qt Designer's .ui file
         m_Controls = new Ui::QmitkFiberfoxViewControls;
         m_Controls->setupUi( parent );
-
-        // commented out
-        m_Controls->m_DiffusionDirectionBox->setVisible(false);
-        m_Controls->label_3->setVisible(false);
-        m_Controls->m_SeparationAngleBox->setVisible(false);
-        m_Controls->label_4->setVisible(false);
-        //
 
         m_Controls->m_StickWidget1->setVisible(true);
         m_Controls->m_StickWidget2->setVisible(false);
@@ -652,6 +667,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
 
     // other imaging parameters
+    parameters.m_SignalGen.m_PartialFourier = m_Controls->m_PartialFourier->value();
     parameters.m_SignalGen.m_ReversePhase = m_Controls->m_ReversePhaseBox->isChecked();
     parameters.m_SignalGen.m_tLine = m_Controls->m_LineReadoutTimeBox->value();
     parameters.m_SignalGen.m_tInhom = m_Controls->m_T2starBox->value();
@@ -671,37 +687,44 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
 
     // Noise
     parameters.m_Misc.m_CheckAddNoiseBox = m_Controls->m_AddNoise->isChecked();
+    parameters.m_SignalGen.m_NoiseVariance = 0;
     if (m_Controls->m_AddNoise->isChecked())
     {
         double noiseVariance = m_Controls->m_NoiseLevel->value();
+
+        //        {
+        //            switch (m_Controls->m_NoiseDistributionBox->currentIndex())
+        //            {
+        //            case 0:
+        //            {
+        //                parameters.m_NoiseModel = new mitk::RicianNoiseModel<ScalarType>();
+        //                parameters.m_Misc.m_ArtifactModelString += "_RICIAN-";
+        //                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Rician"));
+        //                break;
+        //            }
+        //            case 1:
+        //            {
+        //                parameters.m_NoiseModel = new mitk::ChiSquareNoiseModel<ScalarType>();
+        //                parameters.m_Misc.m_ArtifactModelString += "_CHISQUARED-";
+        //                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Chi-squared"));
+        //                break;
+        //            }
+        //            default:
+        //            {
+        //                parameters.m_NoiseModel = new mitk::RicianNoiseModel<ScalarType>();
+        //                parameters.m_Misc.m_ArtifactModelString += "_RICIAN-";
+        //                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Rician"));
+        //            }
+        //            }
+        //        }
+        //        parameters.m_NoiseModel->SetNoiseVariance(noiseVariance);
+        parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
+        if (noiseVariance>0)
         {
-            switch (m_Controls->m_NoiseDistributionBox->currentIndex())
-            {
-            case 0:
-            {
-                parameters.m_NoiseModel = new mitk::RicianNoiseModel<ScalarType>();
-                parameters.m_Misc.m_ArtifactModelString += "_RICIAN-";
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Rician"));
-                break;
-            }
-            case 1:
-            {
-                parameters.m_NoiseModel = new mitk::ChiSquareNoiseModel<ScalarType>();
-                parameters.m_Misc.m_ArtifactModelString += "_CHISQUARED-";
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Chi-squared"));
-                break;
-            }
-            default:
-            {
-                parameters.m_NoiseModel = new mitk::RicianNoiseModel<ScalarType>();
-                parameters.m_Misc.m_ArtifactModelString += "_RICIAN-";
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Rician"));
-            }
-            }
+            parameters.m_SignalGen.m_NoiseVariance = m_Controls->m_NoiseLevel->value();
+            parameters.m_Misc.m_ArtifactModelString += QString::number(noiseVariance).toStdString();
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
         }
-        parameters.m_NoiseModel->SetNoiseVariance(noiseVariance);
-        parameters.m_Misc.m_ArtifactModelString += QString::number(noiseVariance).toStdString();
-        parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
     }
 
     // adjusting line readout time to the adapted image size needed for the DFT
@@ -1037,28 +1060,28 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         QMessageBox::information(NULL, "Compartment 4 disabled", "More than one non-fiber compartment selected but no volume fraction maps set!");
     }
 
-//    RELICT
-//    parameters.m_SignalGen.m_FiberSeparationThreshold = m_Controls->m_SeparationAngleBox->value();
-//    switch (m_Controls->m_DiffusionDirectionBox->currentIndex())
-//    {
-//    case 0:
-//        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
-//        break;
-//    case 1:
-//        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::MAIN_FIBER_DIRECTIONS;
-//        break;
-//    case 2:
-//        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::RANDOM_DIRECTIONS;
-//        parameters.m_SignalGen.m_DoAddMotion = false;
-//        parameters.m_SignalGen.m_DoAddGibbsRinging = false;
-//        parameters.m_SignalGen.m_KspaceLineOffset = 0.0;
-//        parameters.m_SignalGen.m_FrequencyMap = NULL;
-//        parameters.m_SignalGen.m_CroppingFactor = 1.0;
-//        parameters.m_SignalGen.m_EddyStrength = 0;
-//        break;
-//    default:
-//        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
-//    }
+    //    RELICT
+    //    parameters.m_SignalGen.m_FiberSeparationThreshold = m_Controls->m_SeparationAngleBox->value();
+    //    switch (m_Controls->m_DiffusionDirectionBox->currentIndex())
+    //    {
+    //    case 0:
+    //        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
+    //        break;
+    //    case 1:
+    //        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::MAIN_FIBER_DIRECTIONS;
+    //        break;
+    //    case 2:
+    //        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::RANDOM_DIRECTIONS;
+    //        parameters.m_SignalGen.m_DoAddMotion = false;
+    //        parameters.m_SignalGen.m_DoAddGibbsRinging = false;
+    //        parameters.m_SignalGen.m_KspaceLineOffset = 0.0;
+    //        parameters.m_SignalGen.m_FrequencyMap = NULL;
+    //        parameters.m_SignalGen.m_CroppingFactor = 1.0;
+    //        parameters.m_SignalGen.m_EddyStrength = 0;
+    //        break;
+    //    default:
+    //        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
+    //    }
 
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.SignalScale", IntProperty::New(parameters.m_SignalGen.m_SignalScale));
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.FiberRadius", IntProperty::New(parameters.m_SignalGen.m_AxonRadius));
@@ -1278,8 +1301,6 @@ void QmitkFiberfoxView::LoadParameters()
     m_Controls->m_MaxRotationBoxX->setValue(parameters.m_SignalGen.m_Rotation[0]);
     m_Controls->m_MaxRotationBoxY->setValue(parameters.m_SignalGen.m_Rotation[1]);
     m_Controls->m_MaxRotationBoxZ->setValue(parameters.m_SignalGen.m_Rotation[2]);
-    m_Controls->m_DiffusionDirectionBox->setCurrentIndex(parameters.m_SignalGen.m_DiffusionDirectionMode);
-    m_Controls->m_SeparationAngleBox->setValue(parameters.m_SignalGen.m_FiberSeparationThreshold);
 
     m_Controls->m_Compartment1Box->setCurrentIndex(0);
     m_Controls->m_Compartment2Box->setCurrentIndex(0);

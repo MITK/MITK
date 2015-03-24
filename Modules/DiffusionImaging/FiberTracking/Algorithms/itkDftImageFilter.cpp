@@ -40,6 +40,23 @@ DftImageFilter< TPixelType >
 
 template< class TPixelType >
 void DftImageFilter< TPixelType >
+::BeforeThreadedGenerateData()
+{
+    typename InputImageType::Pointer inputImage  = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
+
+    m_PhaseImage = OutputImageType::New();
+    m_PhaseImage->SetSpacing( inputImage->GetSpacing() );
+    m_PhaseImage->SetOrigin( inputImage->GetOrigin() );
+    m_PhaseImage->SetDirection( inputImage->GetDirection() );
+    m_PhaseImage->SetLargestPossibleRegion( inputImage->GetLargestPossibleRegion() );
+    m_PhaseImage->SetBufferedRegion( inputImage->GetLargestPossibleRegion() );
+    m_PhaseImage->SetRequestedRegion( inputImage->GetLargestPossibleRegion() );
+    m_PhaseImage->Allocate();
+    m_PhaseImage->FillBuffer(0.0);
+}
+
+template< class TPixelType >
+void DftImageFilter< TPixelType >
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType)
 {
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
@@ -75,13 +92,17 @@ void DftImageFilter< TPixelType >
             int y = it.GetIndex()[1];
 
             vcl_complex<double> f(it.Get().real(), it.Get().imag());
+
             s += f * exp( std::complex<double>(0, -2 * M_PI * (kx*(double)x/szx + ky*(double)y/szy) ) );
 
             ++it;
         }
         double magn = sqrt(s.real()*s.real()+s.imag()*s.imag());
-        oit.Set(magn);
 
+        if (s.real() != 0 )
+            m_PhaseImage->SetPixel(oit.GetIndex(), atan(s.imag()/s.real()));
+
+        oit.Set(magn);
         ++oit;
     }
 }

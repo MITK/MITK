@@ -26,6 +26,7 @@ This file is based heavily on a corresponding ITK filter.
 #include <itkImageToImageFilter.h>
 #include <itkDiffusionTensor3D.h>
 #include <vcl_complex.h>
+#include <mitkFiberfoxParameters.h>
 
 namespace itk{
 
@@ -55,14 +56,21 @@ namespace itk{
     typedef typename Superclass::OutputImageType        OutputImageType;
     typedef typename Superclass::OutputImageRegionType  OutputImageRegionType;
 
+    itkGetMacro( PhaseImage, typename OutputImageType::Pointer )
+
+    void SetParameters( FiberfoxParameters<double> param ){ m_Parameters = param; }
+
   protected:
     DftImageFilter();
     ~DftImageFilter() {}
 
+    void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
 
   private:
 
+    typename OutputImageType::Pointer   m_PhaseImage;
+    FiberfoxParameters<double>          m_Parameters;
   };
 
 }

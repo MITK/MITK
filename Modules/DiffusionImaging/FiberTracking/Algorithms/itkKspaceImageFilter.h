@@ -77,6 +77,7 @@ namespace itk{
     itkSetMacro( Z, double )                        ///< Slice position, necessary for eddy current simulation.
     itkSetMacro( OutSize, itk::Size<2> )            ///< Output slice size. Can be different from input size, e.g. if Gibbs ringing is enabled.
     itkSetMacro( UseConstantRandSeed, bool )        ///< Use constant seed for random generator for reproducible results.
+    itkGetMacro( KSpaceImage, typename InputImageType::Pointer )    ///< k-space magnitude image
 
     void SetParameters( FiberfoxParameters<double> param ){ m_Parameters = param; }
     FiberfoxParameters<double> GetParameters(){ return m_Parameters; }
@@ -109,6 +110,8 @@ namespace itk{
     vcl_complex<double>                     m_Spike;
     MatrixType                              m_Transform;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
+
+    typename InputImageType::Pointer        m_KSpaceImage;
 
   private:
 

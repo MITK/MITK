@@ -104,6 +104,26 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     newImage->SetVectorLength( images.at(0)->GetVectorLength() );
     newImage->Allocate();
 
+    m_PhaseImage = DoubleDwiType::New();
+    m_PhaseImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
+    m_PhaseImage->SetOrigin( m_Parameters.m_SignalGen.m_ImageOrigin );
+    m_PhaseImage->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
+    m_PhaseImage->SetLargestPossibleRegion( m_CroppedRegion );
+    m_PhaseImage->SetBufferedRegion( m_CroppedRegion );
+    m_PhaseImage->SetRequestedRegion( m_CroppedRegion );
+    m_PhaseImage->SetVectorLength( images.at(0)->GetVectorLength() );
+    m_PhaseImage->Allocate();
+
+    m_KspaceImage = DoubleDwiType::New();
+    m_KspaceImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
+    m_KspaceImage->SetOrigin( m_Parameters.m_SignalGen.m_ImageOrigin );
+    m_KspaceImage->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
+    m_KspaceImage->SetLargestPossibleRegion( m_CroppedRegion );
+    m_KspaceImage->SetBufferedRegion( m_CroppedRegion );
+    m_KspaceImage->SetRequestedRegion( m_CroppedRegion );
+    m_KspaceImage->SetVectorLength( images.at(0)->GetVectorLength() );
+    m_KspaceImage->Allocate();
+
     std::vector< unsigned int > spikeVolume;
     for (unsigned int i=0; i<m_Parameters.m_SignalGen.m_Spikes; i++)
         spikeVolume.push_back(m_RandGen->GetIntegerVariate()%(images.at(0)->GetVectorLength()));
@@ -216,6 +236,20 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                     DoubleDwiType::PixelType pix3D = newImage->GetPixel(index3D);
                     pix3D[g] = newSlice->GetPixel(index2D);
                     newImage->SetPixel(index3D, pix3D);
+
+                    // phase image
+                    {
+                        DoubleDwiType::PixelType pix3D = m_PhaseImage->GetPixel(index3D);
+                        pix3D[g] = dft->GetPhaseImage()->GetPixel(index2D);
+                        m_PhaseImage->SetPixel(index3D, pix3D);
+                    }
+
+                    // phase image
+                    {
+                        DoubleDwiType::PixelType pix3D = m_KspaceImage->GetPixel(index3D);
+                        pix3D[g] = idft->GetKSpaceImage()->GetPixel(index2D);
+                        m_KspaceImage->SetPixel(index3D, pix3D);
+                    }
                 }
             ++disp;
             newTick = 50*disp.count()/disp.expected_count();

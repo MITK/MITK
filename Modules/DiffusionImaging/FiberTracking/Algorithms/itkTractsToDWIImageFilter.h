@@ -71,6 +71,8 @@ public:
     { return m_VolumeFractions; }
     mitk::LevelWindow GetLevelWindow(){ return m_LevelWindow; }
     itkGetMacro( StatusText, std::string )
+    itkGetMacro( PhaseImage, DoubleDwiType::Pointer )
+    itkGetMacro( KspaceImage, DoubleDwiType::Pointer )
 
     void GenerateData();
 
@@ -104,6 +106,8 @@ protected:
 
     // output
     typename OutputImageType::Pointer           m_OutputImage;
+    typename DoubleDwiType::Pointer             m_PhaseImage;
+    typename DoubleDwiType::Pointer             m_KspaceImage;
     mitk::LevelWindow                           m_LevelWindow;
     std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;
     std::string                                 m_StatusText;

@@ -32,13 +32,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 //}
 
 
-void mitk::AbstractClassifier::SetPointWiseWeight(const VectorType& w)
+void mitk::AbstractClassifier::SetPointWiseWeight(const EigenVectorXdType& w)
 {
   m_PointWiseWeight = w;
   m_UsePointWiseWeight = true;
 }
 
-mitk::AbstractClassifier::VectorType mitk::AbstractClassifier::GetPointWiseWeightCopy()
+mitk::AbstractClassifier::EigenVectorXdType mitk::AbstractClassifier::GetPointWiseWeightCopy()
 {
   return m_PointWiseWeight;
 }
@@ -59,7 +59,7 @@ bool mitk::AbstractClassifier::SupportsPointWiseWeight()
 }
 
 
-mitk::AbstractClassifier::VectorType& mitk::AbstractClassifier::PointWeight()
+mitk::AbstractClassifier::EigenVectorXdType& mitk::AbstractClassifier::PointWeight()
 {
   return m_PointWiseWeight;
 }

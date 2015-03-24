@@ -38,26 +38,26 @@ namespace mitk
     ///
     /// @brief MatrixType
     ///
-    typedef Eigen::MatrixXd MatrixType;
+    typedef Eigen::MatrixXd EigenMatrixXdType;
 
     ///
     /// @brief VectorType
     ///
-    typedef Eigen::VectorXd VectorType;
+    typedef Eigen::VectorXd EigenVectorXdType;
 
     ///
     /// @brief Build a forest of trees from the training set (X, y).
     /// @param X, The training input samples. Matrix of shape = [n_samples, n_features]
     /// @param Y, The target values (class labels in classification, real numbers in regression). Array of shape = [n_samples]
     ///
-    virtual void Fit(const MatrixType &X, const VectorType &Y) = 0;
+    virtual void Fit(const EigenMatrixXdType &X, const EigenVectorXdType &Y) = 0;
 
     ///
     /// @brief Predict class for X.
     /// @param X, The input samples.
     /// @return The predicted classes. Y array of shape = [n_samples]
     ///
-    virtual VectorType Predict(const MatrixType &X) = 0;
+    virtual EigenVectorXdType Predict(const EigenMatrixXdType &X) = 0;
 
     ///
     /// @brief SetConfiguration, handing over classifier custom configurations
@@ -84,13 +84,13 @@ namespace mitk
     /// @brief SetPointWiseWeight
     /// @param W, The pointwise weights. W array of shape = [n_samples]
     ///
-    void SetPointWiseWeight(const VectorType& W);
+    void SetPointWiseWeight(const EigenVectorXdType& W);
 
     ///
     /// @brief GetPointWiseWeightCopy
     /// @return Create and return a copy of W
     ///
-    VectorType GetPointWiseWeightCopy();
+    EigenVectorXdType GetPointWiseWeightCopy();
 
     ///
     /// @brief UsePointWiseWeight
@@ -111,7 +111,7 @@ namespace mitk
     virtual bool SupportsPointWiseWeight();
 
   protected:
-    VectorType& PointWeight();
+    EigenVectorXdType& PointWeight();
 
   private:
     ///
@@ -120,7 +120,7 @@ namespace mitk
     ///
     DEPRECATED(ConfigurationHolder m_Config);
 
-    VectorType m_PointWiseWeight;
+    EigenVectorXdType m_PointWiseWeight;
     bool m_UsePointWiseWeight;
 
   };

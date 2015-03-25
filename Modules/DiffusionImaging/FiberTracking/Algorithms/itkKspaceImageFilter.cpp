@@ -114,6 +114,8 @@ void KspaceImageFilter< TPixelType >
     int xRingingOffset = xMax-kxMax;
     int yRingingOffset = yMaxFov-kyMax;
 
+    double noiseVar = m_Parameters.m_SignalGen.m_PartialFourier*m_Parameters.m_SignalGen.m_NoiseVariance/(yMaxFov*kxMax); // adjust noise variance since it is the intended variance in physical space and not in k-space
+
     while( !oit.IsAtEnd() )
     {
         itk::Index< 2 > kIdx;
@@ -213,7 +215,8 @@ void KspaceImageFilter< TPixelType >
             if (m_SpikesPerSlice>0 && sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(m_Spike.imag()*m_Spike.imag()+m_Spike.real()*m_Spike.real()) )
                 m_Spike = s;
 
-            s = vcl_complex<double>(s.real()+m_RandGen->GetNormalVariate(0,m_Parameters.m_SignalGen.m_NoiseVariance), s.imag()+m_RandGen->GetNormalVariate(0,m_Parameters.m_SignalGen.m_NoiseVariance));
+            if (m_Parameters.m_SignalGen.m_NoiseVariance>0)
+                s = vcl_complex<double>(s.real()+m_RandGen->GetNormalVariate(0,noiseVar), s.imag()+m_RandGen->GetNormalVariate(0,noiseVar));
 
             outputImage->SetPixel(kIdx, s);
             m_KSpaceImage->SetPixel(oit.GetIndex(), sqrt(s.imag()*s.imag()+s.real()*s.real()) );

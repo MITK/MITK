@@ -1451,7 +1451,7 @@
              <item row="3" column="1">
               <widget class="QDoubleSpinBox" name="m_LineReadoutTimeBox">
                <property name="toolTip">
-                <string>T2* relaxation time (in milliseconds).</string>
+                <string>Dwell time (time to read one line in k-space) in ms.</string>
                </property>
                <property name="maximum">
                 <double>100.000000000000000</double>
@@ -1517,7 +1517,7 @@
                 <number>1</number>
                </property>
                <property name="value">
-                <number>2000</number>
+                <number>4000</number>
                </property>
               </widget>
              </item>
@@ -1604,7 +1604,7 @@
              <item row="4" column="1">
               <widget class="QDoubleSpinBox" name="m_PartialFourier">
                <property name="toolTip">
-                <string>T2* relaxation time (in milliseconds).</string>
+                <string>Partial fourier factor (0.5-1)</string>
                </property>
                <property name="decimals">
                 <number>3</number>
@@ -1772,7 +1772,7 @@
                 <number>1</number>
                </property>
                <property name="value">
-                <number>11</number>
+                <number>20</number>
                </property>
               </widget>
              </item>
@@ -1791,7 +1791,7 @@
                 <number>1</number>
                </property>
                <property name="value">
-                <number>11</number>
+                <number>20</number>
                </property>
               </widget>
              </item>
@@ -2351,6 +2351,11 @@
                <property name="toolTip">
                 <string>Noise distribution</string>
                </property>
+               <item>
+                <property name="text">
+                 <string>Complex Gaussian</string>
+                </property>
+               </item>
                <item>
                 <property name="text">
                  <string>Rician</string>
@@ -3240,7 +3245,14 @@
   <tabstop>m_CopyBundlesButton</tabstop>
   <tabstop>m_JoinBundlesButton</tabstop>
   <tabstop>m_IncludeFiducials</tabstop>
+  <tabstop>m_FiberBundleComboBox</tabstop>
+  <tabstop>m_MaskComboBox</tabstop>
+  <tabstop>m_TemplateComboBox</tabstop>
+  <tabstop>m_SavePathEdit</tabstop>
+  <tabstop>m_OutputPathButton</tabstop>
   <tabstop>m_GenerateImageButton</tabstop>
+  <tabstop>m_AbortSimulationButton</tabstop>
+  <tabstop>m_SimulationStatusText</tabstop>
   <tabstop>m_SizeX</tabstop>
   <tabstop>m_SizeY</tabstop>
   <tabstop>m_SizeZ</tabstop>
@@ -3252,17 +3264,25 @@
   <tabstop>m_AdvancedOptionsBox_2</tabstop>
   <tabstop>m_SignalScaleBox</tabstop>
   <tabstop>m_TEbox</tabstop>
+  <tabstop>m_TRbox</tabstop>
   <tabstop>m_LineReadoutTimeBox</tabstop>
+  <tabstop>m_PartialFourier</tabstop>
   <tabstop>m_T2starBox</tabstop>
   <tabstop>m_FiberRadius</tabstop>
+  <tabstop>m_ReversePhaseBox</tabstop>
   <tabstop>m_RelaxationBox</tabstop>
   <tabstop>m_EnforcePureFiberVoxelsBox</tabstop>
   <tabstop>m_VolumeFractionsBox</tabstop>
   <tabstop>m_Compartment1Box</tabstop>
+  <tabstop>m_Comp1VolumeFraction</tabstop>
   <tabstop>m_Compartment2Box</tabstop>
+  <tabstop>m_Comp2VolumeFraction</tabstop>
   <tabstop>m_Compartment3Box</tabstop>
+  <tabstop>m_Comp3VolumeFraction</tabstop>
   <tabstop>m_Compartment4Box</tabstop>
+  <tabstop>m_Comp4VolumeFraction</tabstop>
   <tabstop>m_AddNoise</tabstop>
+  <tabstop>m_NoiseDistributionBox</tabstop>
   <tabstop>m_NoiseLevel</tabstop>
   <tabstop>m_AddSpikes</tabstop>
   <tabstop>m_SpikeNumBox</tabstop>

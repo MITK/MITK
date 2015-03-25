@@ -239,6 +239,10 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
         parameters.put("fiberfox.image.gradients."+boost::lexical_cast<string>(i)+".z", m_SignalGen.GetGradientDirection(i)[2]);
     }
 
+    parameters.put("fiberfox.image.reversephase", m_SignalGen.m_ReversePhase);
+    parameters.put("fiberfox.image.partialfourier", m_SignalGen.m_PartialFourier);
+    parameters.put("fiberfox.image.noisevariance", m_SignalGen.m_NoiseVariance);
+    parameters.put("fiberfox.image.trep", m_SignalGen.m_tRep);
     parameters.put("fiberfox.image.signalScale", m_SignalGen.m_SignalScale);
     parameters.put("fiberfox.image.tEcho", m_SignalGen.m_tEcho);
     parameters.put("fiberfox.image.tLine", m_SignalGen.m_tLine);
@@ -311,6 +315,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".model", "stick");
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".d", model->GetDiffusivity());
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t2", model->GetT2());
+            parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t1", model->GetT1());
         }
         else  if (dynamic_cast<mitk::TensorModel<ScalarType>*>(signalModel))
         {
@@ -320,6 +325,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".d2", model->GetDiffusivity2());
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".d3", model->GetDiffusivity3());
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t2", model->GetT2());
+            parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t1", model->GetT1());
         }
         else  if (dynamic_cast<mitk::RawShModel<ScalarType>*>(signalModel))
         {
@@ -348,6 +354,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".model", "ball");
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".d", model->GetDiffusivity());
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t2", model->GetT2());
+            parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t1", model->GetT1());
         }
         else  if (dynamic_cast<mitk::AstroStickModel<ScalarType>*>(signalModel))
         {
@@ -355,6 +362,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".model", "astrosticks");
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".d", model->GetDiffusivity());
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t2", model->GetT2());
+            parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t1", model->GetT1());
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".randomize", model->GetRandomizeSticks());
         }
         else  if (dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel))
@@ -362,6 +370,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
             mitk::DotModel<ScalarType>* model = dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel);
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".model", "dot");
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t2", model->GetT2());
+            parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t1", model->GetT1());
         }
 
         if (signalModel!=NULL)
@@ -509,6 +518,10 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             m_SignalGen.m_ImageDirection[2][1] = v1.second.get<double>("basic.direction.8",m_SignalGen.m_ImageDirection[2][1]);
             m_SignalGen.m_ImageDirection[2][2] = v1.second.get<double>("basic.direction.9",m_SignalGen.m_ImageDirection[2][2]);
 
+            m_SignalGen.m_ReversePhase = v1.second.get<bool>("reversephase", m_SignalGen.m_ReversePhase);
+            m_SignalGen.m_PartialFourier = v1.second.get<double>("partialfourier", m_SignalGen.m_PartialFourier);
+            m_SignalGen.m_NoiseVariance = v1.second.get<double>("noisevariance", m_SignalGen.m_NoiseVariance);
+            m_SignalGen.m_tRep = v1.second.get<double>("trep", m_SignalGen.m_tRep);
             m_SignalGen.m_SignalScale = v1.second.get<double>("signalScale", m_SignalGen.m_SignalScale);
             m_SignalGen.m_tEcho = v1.second.get<double>("tEcho", m_SignalGen.m_tEcho);
             m_SignalGen.m_tLine = v1.second.get<double>("tLine", m_SignalGen.m_tLine);
@@ -590,6 +603,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                     mitk::StickModel<ScalarType>* model = new mitk::StickModel<ScalarType>();
                     model->SetDiffusivity(v2.second.get<double>("d"));
                     model->SetT2(v2.second.get<double>("t2"));
+                    model->SetT1(v2.second.get<double>("t1"));
                     model->m_CompartmentId = v2.second.get<unsigned int>("ID");
                     if (v2.second.get<string>("type")=="fiber")
                         m_FiberModelList.push_back(model);
@@ -604,6 +618,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                     model->SetDiffusivity2(v2.second.get<double>("d2"));
                     model->SetDiffusivity3(v2.second.get<double>("d3"));
                     model->SetT2(v2.second.get<double>("t2"));
+                    model->SetT1(v2.second.get<double>("t1"));
                     model->m_CompartmentId = v2.second.get<unsigned int>("ID");
                     if (v2.second.get<string>("type")=="fiber")
                         m_FiberModelList.push_back(model);
@@ -616,6 +631,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                     mitk::BallModel<ScalarType>* model = new mitk::BallModel<ScalarType>();
                     model->SetDiffusivity(v2.second.get<double>("d"));
                     model->SetT2(v2.second.get<double>("t2"));
+                    model->SetT1(v2.second.get<double>("t1"));
                     model->m_CompartmentId = v2.second.get<unsigned int>("ID");
                     if (v2.second.get<string>("type")=="fiber")
                         m_FiberModelList.push_back(model);
@@ -628,6 +644,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                     mitk::AstroStickModel<ScalarType>* model = new AstroStickModel<ScalarType>();
                     model->SetDiffusivity(v2.second.get<double>("d"));
                     model->SetT2(v2.second.get<double>("t2"));
+                    model->SetT1(v2.second.get<double>("t1"));
                     model->SetRandomizeSticks(v2.second.get<bool>("randomize"));
                     model->m_CompartmentId = v2.second.get<unsigned int>("ID");
                     if (v2.second.get<string>("type")=="fiber")
@@ -640,6 +657,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 {
                     mitk::DotModel<ScalarType>* model = new mitk::DotModel<ScalarType>();
                     model->SetT2(v2.second.get<double>("t2"));
+                    model->SetT1(v2.second.get<double>("t1"));
                     model->m_CompartmentId = v2.second.get<unsigned int>("ID");
                     if (v2.second.get<string>("type")=="fiber")
                         m_FiberModelList.push_back(model);

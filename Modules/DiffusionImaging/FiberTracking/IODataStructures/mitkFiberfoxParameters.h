@@ -56,13 +56,12 @@ public:
     SignalGenerationParameters()
         : m_SignalScale(100)
         , m_tEcho(100)
-        , m_tRep(500)
+        , m_tRep(4000)
         , m_tLine(1)
         , m_tInhom(50)
         , m_ReversePhase(false)
         , m_PartialFourier(1.0)
         , m_NoiseVariance(0.001)
-        , m_NumerOfCoils(1)
         , m_Bvalue(1000)
         , m_SimulateKspaceAcquisition(false)
         , m_AxonRadius(0)
@@ -107,8 +106,7 @@ public:
     double                              m_tInhom;                   ///< T2'
     bool                                m_ReversePhase;             ///< If true, the phase readout direction will be inverted (-y instead of y)
     double                              m_PartialFourier;           ///< Partial fourier factor (0.5-1)
-    double                              m_NoiseVariance;
-    unsigned int                        m_NumerOfCoils;
+    double                              m_NoiseVariance;            ///< Variance of complex gaussian noise
     double                              m_Bvalue;                   ///< Acquisition b-value
     bool                                m_SimulateKspaceAcquisition;///< Flag to enable/disable k-space acquisition simulation
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)

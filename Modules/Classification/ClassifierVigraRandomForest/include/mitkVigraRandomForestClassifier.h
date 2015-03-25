@@ -31,7 +31,7 @@ class MITKCLASSIFIERVIGRARANDOMFOREST_EXPORT VigraRandomForestClassifier : publi
 {
 public:
 
-  mitkClassMacro(VigraRandomForestClassifier,BaseData)
+  mitkClassMacro(VigraRandomForestClassifier,AbstractClassifier)
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 

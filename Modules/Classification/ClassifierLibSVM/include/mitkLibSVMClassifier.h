@@ -34,6 +34,11 @@ namespace mitk
   class MITKCLASSIFIERLIBSVM_EXPORT LibSVMClassifier : public AbstractClassifier
   {
   public:
+
+    mitkClassMacro(LibSVMClassifier,AbstractClassifier)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
+
     LibSVMClassifier();
     ~LibSVMClassifier();
 

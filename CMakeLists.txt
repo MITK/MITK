@@ -395,14 +395,6 @@ if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
   set(MITK_USE_CppUnit ON CACHE BOOL "Use CppUnit for unit tests" FORCE)
 endif()
 
-# -----------------------------------------
-# Other MITK_USE_* options not related to
-# external projects build via the
-# MITK superbuild
-
-env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
-
 if(MITK_USE_BLUEBERRY)
   option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
   mark_as_advanced(MITK_BUILD_ALL_PLUGINS)
@@ -860,6 +852,10 @@ endif()
 
 if(MITK_USE_SimpleITK)
   link_directories(${SimpleITK_LIBRARY_DIRS})
+endif()
+
+if(MITK_USE_OpenCL)
+  find_package(OpenCL REQUIRED)
 endif()
 
 # Qt support

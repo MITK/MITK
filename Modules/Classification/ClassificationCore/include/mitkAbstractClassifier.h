@@ -38,26 +38,33 @@ namespace mitk
     ///
     /// @brief MatrixType
     ///
-    typedef Eigen::MatrixXd EigenMatrixXdType;
+    typedef Eigen::MatrixXd MatrixType;
 
     ///
     /// @brief VectorType
     ///
-    typedef Eigen::VectorXd EigenVectorXdType;
+    typedef Eigen::VectorXd VectorType;
 
     ///
     /// @brief Build a forest of trees from the training set (X, y).
     /// @param X, The training input samples. Matrix of shape = [n_samples, n_features]
     /// @param Y, The target values (class labels in classification, real numbers in regression). Array of shape = [n_samples]
     ///
-    virtual void Fit(const EigenMatrixXdType &X, const EigenVectorXdType &Y) = 0;
+    virtual void Fit(const MatrixType &X, const VectorType &Y) = 0;
 
     ///
     /// @brief Predict class for X.
     /// @param X, The input samples.
     /// @return The predicted classes. Y array of shape = [n_samples]
     ///
-    virtual EigenVectorXdType Predict(const EigenMatrixXdType &X) = 0;
+    virtual VectorType Predict(const MatrixType &X) = 0;
+
+    ///
+    /// @brief Predict probabilities for X.
+    /// @param X, The input samples.
+    /// @return The predicted probabilities for a class. X matrix of shape = [n_samples, n_classes]
+    ///
+    virtual MatrixType PredictProba(const MatrixType &/*X*/) {return MatrixType(0,0);};
 
     ///
     /// @brief SetConfiguration, handing over classifier custom configurations
@@ -84,13 +91,13 @@ namespace mitk
     /// @brief SetPointWiseWeight
     /// @param W, The pointwise weights. W array of shape = [n_samples]
     ///
-    void SetPointWiseWeight(const EigenVectorXdType& W);
+    void SetPointWiseWeight(const VectorType& W);
 
     ///
     /// @brief GetPointWiseWeightCopy
     /// @return Create and return a copy of W
     ///
-    EigenVectorXdType GetPointWiseWeightCopy();
+    VectorType GetPointWiseWeightCopy();
 
     ///
     /// @brief UsePointWiseWeight
@@ -110,13 +117,19 @@ namespace mitk
     ///
     virtual bool SupportsPointWiseWeight();
 
+    ///
+    /// @brief SupportsPointWiseProbability
+    /// @return True if the classifier supports pointwise class probability calculation else false
+    ///
+    virtual bool SupportsPointWiseProbability();
+
     virtual void SetRequestedRegionToLargestPossibleRegion(){}
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion(){return true;}
     virtual bool VerifyRequestedRegion(){return false;}
     virtual void SetRequestedRegion(const itk::DataObject */*data*/){}
 
   protected:
-    EigenVectorXdType& PointWeight();
+    VectorType& PointWeight();
 
   private:
     ///
@@ -125,7 +138,7 @@ namespace mitk
     ///
     DEPRECATED(ConfigurationHolder m_Config);
 
-    EigenVectorXdType m_PointWiseWeight;
+    VectorType m_PointWiseWeight;
     bool m_UsePointWiseWeight;
 
   };

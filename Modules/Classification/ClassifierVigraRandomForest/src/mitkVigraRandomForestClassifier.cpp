@@ -90,7 +90,7 @@ bool mitk::VigraRandomForestClassifier::SupportsPointWiseWeight()
   return true;
 }
 
-void mitk::VigraRandomForestClassifier::Fit(const EigenMatrixXdType & X, const EigenVectorXdType & Y)
+void mitk::VigraRandomForestClassifier::Fit(const MatrixType & X, const VectorType & Y)
 {
 //   MBI --------
 //  UpdateDataArrays(true);
@@ -117,7 +117,7 @@ void mitk::VigraRandomForestClassifier::Fit(const EigenMatrixXdType & X, const E
 //   MBI --------
 }
 
-mitk::VigraRandomForestClassifier::EigenVectorXdType mitk::VigraRandomForestClassifier::Predict(const EigenMatrixXdType &X)
+mitk::VigraRandomForestClassifier::VectorType mitk::VigraRandomForestClassifier::Predict(const MatrixType &X)
 {
   VigraMatrix2dType P = VigraMatrix2dType(vigra::Shape2(X.rows(),m_RandomForest.class_count()));
   VigraLabel2dType Y = VigraLabel2dType(vigra::Shape2(X.rows(),1));
@@ -129,7 +129,7 @@ mitk::VigraRandomForestClassifier::EigenVectorXdType mitk::VigraRandomForestClas
   threader->SetSingleMethod(this->PredictCallback,data);
   threader->SingleMethodExecute();
 
-  EigenVectorXdType e_Y = transform(Y);
+  VectorType e_Y = transform(Y);
 
   return e_Y;
 }

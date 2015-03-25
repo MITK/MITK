@@ -20,12 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIterator.h>
 #include <mitkImageStatisticsHolder.h>
 
-mitk::ImageToEigenTransform::VectorType mitk::ImageToEigenTransform::operator()(const mitk::Image::Pointer & image,
-                                                                                const mitk::Image::Pointer & mask)
-{
-  return mitk::ImageToEigenTransform::transform(image,mask);
-}
-
 mitk::ImageToEigenTransform::VectorType mitk::ImageToEigenTransform::transform(const mitk::Image::Pointer & image,
                                                                                const mitk::Image::Pointer & mask)
 {

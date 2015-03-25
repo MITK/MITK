@@ -40,8 +40,6 @@ namespace mitk
     ///
     typedef Eigen::VectorXd VectorType;
 
-    VectorType operator()(const mitk::Image::Pointer & image, const mitk::Image::Pointer & mask);
-
     static VectorType transform(const mitk::Image::Pointer & image, const mitk::Image::Pointer & mask);
 
   private:

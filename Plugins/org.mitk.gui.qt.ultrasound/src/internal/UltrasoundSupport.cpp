@@ -50,7 +50,9 @@ void UltrasoundSupport::SetFocus()
 
 void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 {
-m_Timer = new QTimer(this);
+m_UpdateTimer = new QTimer(this);
+m_RenderingTimer2d = new QTimer(this);
+m_RenderingTimer3d = new QTimer(this);
 
 // create GUI widgets from the Qt Designer's .ui file
 m_Controls.setupUi( parent );
@@ -63,7 +65,9 @@ connect( m_Controls.m_ShowImageStream, SIGNAL(clicked()), this, SLOT(OnChangedAc
 connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
 connect( m_Controls.m_FrameRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit(int)) );
 connect( m_Controls.m_FreezeButton, SIGNAL(clicked()), this, SLOT(OnClickedFreezeButton()) );
-connect( m_Timer, SIGNAL(timeout()), this, SLOT(DisplayImage()));
+connect( m_UpdateTimer, SIGNAL(timeout()), this, SLOT(UpdateImage()));
+connect( m_RenderingTimer2d, SIGNAL(timeout()), this, SLOT(RenderImage2d()));
+connect( m_RenderingTimer3d, SIGNAL(timeout()), this, SLOT(RenderImage3d()));
 
 // Initializations
 m_Controls.m_NewVideoDeviceWidget->setVisible(false);
@@ -99,7 +103,7 @@ m_Controls.m_Headline->setText("Add New Video Device:");
 m_Controls.m_WidgetActiveDevices->setVisible(false);
 }
 
-void UltrasoundSupport::DisplayImage()
+void UltrasoundSupport::UpdateImage()
 {
 //Update device
 m_Device->Modified();
@@ -129,11 +133,7 @@ if(m_Controls.m_ShowImageStream->isChecked())
     m_CurrentImageHeight = curOutput->GetDimension(1);
     m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(curOutput->GetGeometry());
   }
-  //if not: only update the view
-  else
-  {
-    this->RequestRenderWindowUpdate();
-  }
+
 }
 
 //Update frame counter
@@ -147,11 +147,21 @@ if (m_FrameCounter >= 10)
   }
 }
 
+void UltrasoundSupport::RenderImage2d()
+{
+this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+}
+
+void UltrasoundSupport::RenderImage3d()
+{
+this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+}
+
 void UltrasoundSupport::OnChangedFramerateLimit(int value)
 {
-m_Timer->stop();
-m_Timer->setInterval(1000 / value);
-m_Timer->start();
+StopTimers();
+SetTimerIntervals(1000 / value);
+StartTimers();
 }
 
 void UltrasoundSupport::OnClickedFreezeButton()
@@ -176,7 +186,7 @@ m_Controls.m_FreezeButton->setText("Start Viewing Again");
 void UltrasoundSupport::OnChangedActiveDevice()
 {
 //clean up and stop timer
-m_Timer->stop();
+StopTimers();
 this->RemoveControlWidgets();
 this->GetDataStorage()->Remove(m_Node);
 m_Node->ReleaseData();
@@ -201,8 +211,8 @@ if(m_Controls.m_ShowImageStream->isChecked())
 if(m_Controls.m_RunImageTimer->isChecked())
   {
   int interval = (1000 / m_Controls.m_FrameRate->value());
-  m_Timer->setInterval(interval);
-  m_Timer->start();
+  SetTimerIntervals(interval);
+  StartTimers();
   m_Controls.m_TimerWidget->setEnabled(true);
   }
 else
@@ -317,9 +327,9 @@ if ( m_Device->GetManufacturer() != service.getProperty(QString::fromStdString(m
 return;
 }
 
-if ( ! m_Device->GetIsActive() && m_Timer->isActive() )
+if ( ! m_Device->GetIsActive() && m_UpdateTimer->isActive() )
 {
-m_Timer->stop();
+StopTimers();
 }
 
 if ( m_CurrentDynamicRange != service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DYNAMIC_RANGE)).toDouble() )
@@ -354,7 +364,7 @@ UltrasoundSupport::~UltrasoundSupport()
 {
   try
   {
-    m_Timer->stop();
+    StopTimers();
 
     // Get all active devicesand deactivate them to prevent freeze
     std::vector<mitk::USDevice*> devices = this->m_Controls.m_ActiveVideoDevices->GetAllServices<mitk::USDevice>();
@@ -393,4 +403,25 @@ void UltrasoundSupport::LoadUISettings()
   m_Controls.m_ShowImageStream->setChecked(settings.value("DisplayImage", true).toBool());
   m_Controls.m_RunImageTimer->setChecked(settings.value("RunImageTimer", true).toBool());
   settings.endGroup();
+}
+
+void UltrasoundSupport::StartTimers()
+{
+m_UpdateTimer->start();
+m_RenderingTimer2d->start();
+m_RenderingTimer3d->start();
+}
+
+void UltrasoundSupport::StopTimers()
+{
+m_UpdateTimer->stop();
+m_RenderingTimer2d->stop();
+m_RenderingTimer3d->stop();
+}
+
+void UltrasoundSupport::SetTimerIntervals(int interval)
+{
+m_UpdateTimer->setInterval(interval);
+m_RenderingTimer2d->setInterval(interval);
+m_RenderingTimer3d->setInterval(interval * 4);
 }

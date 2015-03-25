@@ -77,9 +77,13 @@ public:
       void OnDeciveServiceEvent(const ctkServiceEvent event);
 
       /*
-      * \brief This is the main imaging loop that is called regularily during the imaging process
+      * \brief This is the main imaging loop that updates the image and is called regularily during the imaging process
       */
-      void DisplayImage();
+      void UpdateImage();
+
+      void RenderImage2d();
+
+      void RenderImage3d();
 
 protected:
 
@@ -89,8 +93,13 @@ protected:
   /** The device that is currently used to aquire images */
   mitk::USDevice::Pointer m_Device;
 
+  void StartTimers();
+  void StopTimers();
+  void SetTimerIntervals(int interval);
   /** This timer triggers periodic updates to the pipeline */
-  QTimer* m_Timer;
+  QTimer* m_UpdateTimer;
+  QTimer* m_RenderingTimer2d;
+  QTimer* m_RenderingTimer3d;
 
   /** This clock is used to compute the framerate in the method DisplayImage(). */
   QTime  m_Clock;

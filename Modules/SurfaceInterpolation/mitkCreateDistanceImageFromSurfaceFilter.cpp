@@ -26,7 +26,6 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateEmptyDistanceImage()
   DetermineBounds( minPointInWorldCoordinates, maxPointInWorldCoordinates,
                    minPointInIndexCoordinates, maxPointInIndexCoordinates );
 
-
   // Calculate the extent of the region that contains all given points in MM.
   // To do this, we take the difference between the maximal and minimal
   // index-coordinates (must not be less than 1) and multiply it with the
@@ -34,27 +33,21 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateEmptyDistanceImage()
   Vector3D extentMM;
   for (unsigned int dim = 0; dim < 3; ++dim)
   {
-    extentMM[dim] = (int)
-      (
-                    (std::max( std::abs(maxPointInIndexCoordinates[dim] - minPointInIndexCoordinates[dim]),
-                              (DistanceImageType::IndexType::IndexValueType) 1
-                            ) + 1.0) // (max-index - min-index)+1 because the pixels between index 3 and 5 cover 2+1=3 pixels (pixel 3,4, and 5)
-                    * m_ReferenceImage->GetSpacing()[dim]
-      ) + 1; // (int) ((...) + 1) -> we round up to the next BIGGER int value
+    extentMM[dim] = (std::abs(maxPointInIndexCoordinates[dim] - minPointInIndexCoordinates[dim])) * m_ReferenceImage->GetSpacing()[dim];
   }
 
   /*
-  * Now create an empty distance image. The create image will always have the same sizeOfRegion, independent from
+  * Now create an empty distance image. The created image will always have the same number of pixels, independent from
   * the original image (e.g. always consists of 500000 pixels) and will have an isotropic spacing.
   * The spacing is calculated like the following:
   * The image's volume = 500000 Pixels = extentX*spacing*extentY*spacing*extentZ*spacing
-  * So the spacing is: spacing = ( 500000 / extentX*extentY*extentZ )^(1/3)
+  * So the spacing is: spacing = ( extentX*extentY*extentZ / 500000 )^(1/3)
   */
   double basis = (extentMM[0]*extentMM[1]*extentMM[2]) / m_DistanceImageVolume;
   double exponent = 1.0/3.0;
   double distImgSpacing = pow(basis, exponent);
-  int tempSpacing = (distImgSpacing+0.05)*10;
-  m_DistanceImageSpacing = (double)tempSpacing/10.0;
+  m_DistanceImageSpacing = distImgSpacing;
+
 
   // calculate the number of pixels of the distance image for each direction
   unsigned int numberOfXPixel = extentMM[0] / m_DistanceImageSpacing;
@@ -78,7 +71,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateEmptyDistanceImage()
   DistanceImageType::RegionType lpRegion;
   lpRegion.SetSize(sizeOfRegion);
   lpRegion.SetIndex(initialOriginAsIndex);
-MITK_INFO << "ASDF";
+
   // We initialize the itk::Image with
   //  * origin and direction to have it correctly placed and rotated in the world
   //  * the largest possible region to set the extent to be calculated
@@ -300,7 +293,6 @@ void mitk::CreateDistanceImageFromSurfaceFilter::FillDistanceImage()
   std::queue<DistanceImageType::IndexType> narrowbandPoints;
   PointType currentPoint = m_Centers.at(0);
   double distance = this->CalculateDistanceValue(currentPoint);
-  MITK_INFO<<"Distance: "<<distance;
 
   // create itk::Point from vnl_vector
   DistanceImageType::PointType currentPointAsPoint;
@@ -348,9 +340,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::FillDistanceImage()
 
         // and check the distance
         distance = this->CalculateDistanceValue(currentPoint);
-//        MITK_INFO<<"Point: ["<<currentPoint[0]<<","<<currentPoint[1]<<","<<currentPoint[2]<<"]";
-//        MITK_INFO<<"distance: "<<distance<<" spacing: "<<m_DistanceImageSpacing;
-        if ( std::fabs(distance) <= m_DistanceImageSpacing )
+        if ( std::fabs(distance) <= m_DistanceImageSpacing*2 )
         {
           nIt.SetPixel(*relativeNb, distance);
           narrowbandPoints.push(currentIndex);
@@ -449,12 +439,9 @@ double mitk::CreateDistanceImageFromSurfaceFilter::CalculateDistanceValue(PointT
     p1 = *centerIter;
     p2 = p-p1;
     norm = p2.two_norm();
-//    MITK_INFO<<"Old distance: "<<distanceValue<<" ADD: "<<(norm * m_Weights[count]);
     distanceValue = distanceValue + (norm * m_Weights[count]);
-//    MITK_INFO<<"New distance: "<<distanceValue;
     ++count;
   }
-//  MITK_INFO<<"Final distance: "<<distanceValue;
   return distanceValue;
 }
 

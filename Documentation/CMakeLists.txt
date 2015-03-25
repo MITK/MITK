@@ -187,22 +187,19 @@ if(MITK_USE_BLUEBERRY)
                          TARGET_NAME mitkXPDoc
                          )
 
-    add_dependencies(doc mitkXPDoc BlueBerryXPDoc)
-    #if(${PROJECT_NAME} STREQUAL "MITK")
-    #  add_dependencies(doc BlueBerryDoc)
-    #endif()
+    add_dependencies(doc mitkXPDoc BlueBerryDoc BlueBerryXPDoc)
   endif(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
 endif(MITK_USE_BLUEBERRY)
 
 #if(MITK_DOXYGEN_GENERATE_ITK_QCH_FILE)
-#  # add the command to generate the ITK documantation
+#  # add the command to generate the ITK documentation
 #  add_custom_target(doc-itk
 #                    COMMAND ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.itk.conf)
 #  add_dependencies(doc doc-itk)
 #endif()
 
 #if(MITK_DOXYGEN_GENERATE_VTK_QCH_FILE)
-#  # add the command to generate the VTK documantation
+#  # add the command to generate the VTK documentation
 #  add_custom_target(doc-vtk
 #                    COMMAND ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.vtk.conf)
 #  add_dependencies(doc doc-vtk)

@@ -1159,32 +1159,6 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     itkExceptionMacro( << "Mask image needs to be set!" );
   }
 
-
-  // Make sure that spacing of mask and image are the same
-  SpacingType imageSpacing = image->GetSpacing();
-  SpacingType maskSpacing = maskImage->GetSpacing();
-  PointType zeroPoint; zeroPoint.Fill( 0.0 );
-  if ( (zeroPoint + imageSpacing).SquaredEuclideanDistanceTo( (zeroPoint + maskSpacing) ) > mitk::eps )
-  {
-    itkExceptionMacro( << "Mask needs to have same spacing as image! (Image spacing: " << imageSpacing << "; Mask spacing: " << maskSpacing << ")" );
-  }
-
-  // Make sure that orientation of mask and image are the same
-  typedef typename ImageType::DirectionType DirectionType;
-  DirectionType imageDirection = image->GetDirection();
-  DirectionType maskDirection = maskImage->GetDirection();
-  for( int i = 0; i < imageDirection.ColumnDimensions; ++i )
-  {
-    for( int j = 0; j < imageDirection.ColumnDimensions; ++j )
-    {
-      double differenceDirection = imageDirection[i][j] - maskDirection[i][j];
-      if ( fabs( differenceDirection ) > mitk::eps )
-      {
-        itkExceptionMacro( << "Mask needs to have same direction as image! (Image direction: " << imageDirection << "; Mask direction: " << maskDirection << ")" );
-      }
-    }
-  }
-
   // Make sure that the voxels of mask and image are correctly "aligned", i.e., voxel boundaries are the same in both images
   PointType imageOrigin = image->GetOrigin();
   PointType maskOrigin = maskImage->GetOrigin();
@@ -1201,7 +1175,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     double misalignment = maskOriginContinousIndex[i] - floor( maskOriginContinousIndex[i] + 0.5 );
     if ( fabs( misalignment ) > mitk::eps )
     {
-      itkExceptionMacro( << "Pixels/voxels of mask and image are not sufficiently aligned! (Misalignment: " << misalignment << ")" );
+      itkWarningMacro( << "Pixels/voxels of mask and image are not sufficiently aligned! (Misalignment: " << misalignment << ")" );
     }
 
     double indexCoordDistance = maskOriginContinousIndex[i] - imageOriginContinousIndex[i];
@@ -1216,13 +1190,23 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   adaptMaskFilter->SetInput( maskImage );
   adaptMaskFilter->SetOutputOrigin( image->GetOrigin() );
   adaptMaskFilter->SetOutputOffset( offset );
-  adaptMaskFilter->Update();
-  typename MaskImageType::Pointer adaptedMaskImage = adaptMaskFilter->GetOutput();
+
+  typename MaskImageType::Pointer adaptedMaskImage;
+  try
+  {
+    adaptMaskFilter->Update();
+    adaptedMaskImage = adaptMaskFilter->GetOutput();
+  }
+  catch( const itk::ExceptionObject &e)
+  {
+    mitkThrow() << "Attempt to adapt shifted origin of the mask image failed due to ITK Exception: \n" << e.what();
+  }
 
   // Make sure that mask region is contained within image region
-  if ( !image->GetLargestPossibleRegion().IsInside( adaptedMaskImage->GetLargestPossibleRegion() ) )
+  if ( adaptedMaskImage.IsNotNull() &&
+       !image->GetLargestPossibleRegion().IsInside( adaptedMaskImage->GetLargestPossibleRegion() ) )
   {
-    itkExceptionMacro( << "Mask region needs to be inside of image region! (Image region: "
+    itkWarningMacro( << "Mask region needs to be inside of image region! (Image region: "
       << image->GetLargestPossibleRegion() << "; Mask region: " << adaptedMaskImage->GetLargestPossibleRegion() << ")" );
   }
 
@@ -1258,7 +1242,14 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
   statisticsFilter->SetInput( adaptedImage );
 
-  statisticsFilter->Update();
+  try
+  {
+   statisticsFilter->Update();
+  }
+  catch( const itk::ExceptionObject& e)
+  {
+    mitkThrow() << "Image statistics initialization computation failed with ITK Exception: \n " << e.what();
+  }
 
   // Calculate bin size or number of bins
   unsigned int numberOfBins = 200; // default number of bins
@@ -1297,9 +1288,19 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
 
   // Execute the filter
-  labelStatisticsFilter->Update();
+  try
+  {
+    labelStatisticsFilter->Update();
+  }
+  catch( const itk::ExceptionObject& e)
+  {
+    mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.what();
+  }
+
   this->InvokeEvent( itk::EndEvent() );
-  labelStatisticsFilter->RemoveObserver( observerTag );
+
+  if( observerTag )
+    labelStatisticsFilter->RemoveObserver( observerTag );
 
   // Find all relevant labels of mask (other than 0)
   std::list< int > relevantLabels;

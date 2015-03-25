@@ -346,7 +346,7 @@ if(MITK_USE_Python)
   endif()
   if(NOT MITK_USE_SimpleITK)
     message("> Forcing MITK_USE_SimpleITK to ON because of MITK_USE_Python")
-    set(MITK_USE_Numpy ON CACHE BOOL "Use Numpy" FORCE)
+    set(MITK_USE_SimpleITK ON CACHE BOOL "Use Numpy" FORCE)
   endif()
 
   option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" OFF)

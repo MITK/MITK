@@ -112,7 +112,9 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int WaitingTime)
   //send a message to the server: start tracking stream
   mitk::IGTLMessageFactory::Pointer msgFactory = m_OpenIGTLinkClient->GetMessageFactory();
   std::string message = "STT_TDATA";
-  //m_OpenIGTLinkClient->SendMessage(msgFactory->CreateInstance(message));
+  igtl::MessageBase::Pointer sttMsg = msgFactory->CreateInstance(message);
+  ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(1);
+  m_OpenIGTLinkClient->SendMessage(sttMsg);
 
   Sleep(WaitingTime); //wait for data to arrive
 

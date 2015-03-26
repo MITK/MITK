@@ -169,10 +169,13 @@ void OpenIGTLinkProviderExample::CreatePipeline()
 
 void OpenIGTLinkProviderExample::DestroyPipeline()
 {
-  m_NavDataPlayer->StopPlaying();
-  this->GetDataStorage()->Remove(m_DemoNodeT1);
-  this->GetDataStorage()->Remove(m_DemoNodeT2);
-  this->GetDataStorage()->Remove(m_DemoNodeT3);
+   if (m_NavDataPlayer.IsNotNull())
+   {
+      m_NavDataPlayer->StopPlaying();
+   }
+   this->GetDataStorage()->Remove(m_DemoNodeT1);
+   this->GetDataStorage()->Remove(m_DemoNodeT2);
+   this->GetDataStorage()->Remove(m_DemoNodeT3);
 }
 
 void OpenIGTLinkProviderExample::Start()

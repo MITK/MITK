@@ -313,7 +313,7 @@ mitk::NavigationDataObjectVisualizationFilter::Pointer mitk::TrackingDeviceSourc
     mitk::NavigationTool::Pointer currentTool = navigationTools->GetToolByName(trackingDeviceSource->GetOutput(i)->GetName());
     if (currentTool.IsNull())
       {
-      this->m_ErrorMessage = "Error: did not find correspondig tool in tracking device after initialization.";
+      this->m_ErrorMessage = "Error: did not find corresponding tool in tracking device after initialization.";
       return NULL;
       }
     returnValue->SetInput(i,trackingDeviceSource->GetOutput(i));

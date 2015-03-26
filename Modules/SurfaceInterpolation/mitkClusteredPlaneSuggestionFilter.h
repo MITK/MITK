@@ -69,6 +69,15 @@ namespace mitk {
       itkGetMacro(Eps, double)
       itkSetMacro(Eps, double)
 
+      /** Setting to true, uses the distances of the clusters otherwise the
+      * the size of the clusters is used */
+      itkSetMacro(UseDistances, bool)
+
+      /** Sets the number of clusters which are used for the plane suggestion
+      * if the number of found clusters is lower than the "NumberOfUsedClusters"
+      * all found clusters are used */
+      itkSetMacro(NumberOfUsedClusters, int)
+
 
     protected:
 
@@ -104,6 +113,12 @@ namespace mitk {
 
       /** The distance/neighbourhood for clustering */
       double m_Eps;
+
+      /** Decides to use the distances or the size */
+      bool m_UseDistances;
+
+      /** The number of clusters which are used for the plane suggestion */
+      unsigned int m_NumberOfUsedClusters;
 
   };
 

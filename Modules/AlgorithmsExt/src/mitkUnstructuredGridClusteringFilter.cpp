@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkVariant.h>
 
 
-mitk::UnstructuredGridClusteringFilter::UnstructuredGridClusteringFilter() : m_eps(0.0), m_MinPts(0), m_Meshing(true), m_DistCalc(false)
+mitk::UnstructuredGridClusteringFilter::UnstructuredGridClusteringFilter() : m_eps(5.0), m_MinPts(4), m_Meshing(false), m_DistCalc(false)
 {
   this->m_UnstructGrid = mitk::UnstructuredGrid::New();
 }
@@ -104,12 +104,12 @@ void mitk::UnstructuredGridClusteringFilter::GenerateData()
   int numberOfClusterPoints = 0;
   int IdOfBiggestCluster = 0;
 
-  if(m_DistCalc)
+  for(unsigned int i=0; i<m_Clusters.size();i++)
   {
-    for(unsigned int i=0; i<m_Clusters.size();i++)
+    vtkSmartPointer<vtkDoubleArray> array = vtkSmartPointer<vtkDoubleArray>::New();
+    vtkSmartPointer<vtkPoints> points = m_Clusters.at(i);
+    if(m_DistCalc)
     {
-      vtkSmartPointer<vtkDoubleArray> array = vtkSmartPointer<vtkDoubleArray>::New();
-      vtkSmartPointer<vtkPoints> points = m_Clusters.at(i);
       array->SetNumberOfComponents(1);
       array->SetNumberOfTuples(points->GetNumberOfPoints());
       for(int j=0; j<points->GetNumberOfPoints();j++)
@@ -131,11 +131,11 @@ void mitk::UnstructuredGridClusteringFilter::GenerateData()
         }
       }
       m_DistanceArrays.push_back(array);
-      if(points->GetNumberOfPoints() > numberOfClusterPoints)
-      {
-        numberOfClusterPoints = points->GetNumberOfPoints();
-        IdOfBiggestCluster = i;
-      }
+    }
+    if(points->GetNumberOfPoints() > numberOfClusterPoints)
+    {
+      numberOfClusterPoints = points->GetNumberOfPoints();
+      IdOfBiggestCluster = i;
     }
   }
 
@@ -179,7 +179,7 @@ void mitk::UnstructuredGridClusteringFilter::ExpandCluster(int id, vtkIdList *po
   std::vector<int> x;
   x.push_back(id);
   cluster->InsertNextPoint(inpPoints->GetPoint(id)); //add P to cluster C
-  clusterMember[id] = true; //right?
+  clusterMember[id] = true;
 
   vtkSmartPointer<vtkPoints> neighbours = vtkSmartPointer<vtkPoints>::New(); //same N as in other function
   inpPoints->GetPoints(pointIDs,neighbours);

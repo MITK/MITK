@@ -49,9 +49,7 @@ const std::string OpenIGTLinkProviderExample::VIEW_ID =
 
 OpenIGTLinkProviderExample::~OpenIGTLinkProviderExample()
 {
-  this->GetDataStorage()->Remove(m_DemoNodeT1);
-  this->GetDataStorage()->Remove(m_DemoNodeT2);
-  this->GetDataStorage()->Remove(m_DemoNodeT3);
+   this->DestroyPipeline();
 }
 
 void OpenIGTLinkProviderExample::SetFocus()
@@ -173,6 +171,8 @@ void OpenIGTLinkProviderExample::DestroyPipeline()
 {
   m_NavDataPlayer->StopPlaying();
   this->GetDataStorage()->Remove(m_DemoNodeT1);
+  this->GetDataStorage()->Remove(m_DemoNodeT2);
+  this->GetDataStorage()->Remove(m_DemoNodeT3);
 }
 
 void OpenIGTLinkProviderExample::Start()
@@ -184,7 +184,7 @@ void OpenIGTLinkProviderExample::Start()
     this->m_Controls.butStart->setText("Stop Playing Recorded Navigation Data ");
 
     //start the visualization
-    this->m_VisualizerTimer.start(100);
+    this->m_VisualizerTimer.start(10);
   }
   else
   {

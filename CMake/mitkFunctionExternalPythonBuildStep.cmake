@@ -40,6 +40,8 @@ function(mitkFunctionExternalPythonBuildStep proj step _python_executable _bin_d
      COMMAND ${_python} ${_command}
      WORKING_DIRECTORY ${_workdir}
      RESULT_VARIABLE result
+     ERROR_QUIET
+     OUTPUT_QUIET
   )
 
   if(NOT ${result} EQUAL 0)

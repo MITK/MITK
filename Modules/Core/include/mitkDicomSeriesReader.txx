@@ -142,8 +142,11 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   {
     StringContainer fileToImmediateLoading;
     // ism: we load two slice for gathering spacing information
+    
     fileToImmediateLoading.push_back(filenames.at(0));
-    fileToImmediateLoading.push_back(filenames.at(1));
+    if (filenames.size() > 1) {
+      fileToImmediateLoading.push_back(filenames.at(1));
+    }
 
     reader->SetFileNames(fileToImmediateLoading);
 

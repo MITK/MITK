@@ -187,8 +187,9 @@ if(MITK_USE_BLUEBERRY)
                          TARGET_NAME mitkXPDoc
                          )
 
-    add_dependencies(doc mitkXPDoc BlueBerryDoc BlueBerryXPDoc)
+    add_dependencies(doc mitkXPDoc BlueBerryXPDoc)
   endif(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
+  add_dependencies(doc BlueBerryDoc)
 endif(MITK_USE_BLUEBERRY)
 
 #if(MITK_DOXYGEN_GENERATE_ITK_QCH_FILE)

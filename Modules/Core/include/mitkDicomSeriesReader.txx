@@ -133,7 +133,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
 
   reader->SetImageIO(io);
   reader->ReverseOrderOff();
-
+ 
   if (command)
   {
     reader->AddObserver(itk::ProgressEvent(), command);
@@ -160,7 +160,8 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
     image->InitializeByItk(readVolume.GetPointer(), 1, -1, filenames.size());
     image->SetImportVolume(readVolume->GetBufferPointer(), 0, 0, mitk::Image::ImportMemoryManagementType::AsyncCopyMemory);
 
-    std::thread thr(LoadSeries, std::ref(filenames), image, command);
+    itk::ImageIOBase::IOComponentType comptype = io->GetComponentType();
+    std::thread thr(LoadSeries, std::ref(filenames), image, comptype, command);
     thr.detach();
   }
   else

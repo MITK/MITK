@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef PIXELTYPE_H_HEADER_INCLUDED_C1EBF565
-#define PIXELTYPE_H_HEADER_INCLUDED_C1EBF565
+#ifndef mitkPixelType_h
+#define mitkPixelType_h
 
 #include <MitkCoreExports.h>
 #include "mitkCommon.h"
@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImageIOBase.h>
 #include <itkImage.h>
+#include <vtkImageData.h>
 
 namespace mitk {
 
@@ -128,8 +129,8 @@ private:
 
   friend PixelType MakePixelType(const itk::ImageIOBase* imageIO);
 
-  template< typename ComponentT, typename PixelT, std::size_t numberOfComponents >
-  friend PixelType MakePixelType();
+  template< typename ComponentT, typename PixelT >
+  friend PixelType MakePixelType(std::size_t numberOfComponents);
 
   template< typename ItkImageType >
   friend PixelType MakePixelType();
@@ -165,11 +166,20 @@ private:
 
 };
 
+
+/**
+ * @brief deduct the PixelType for a given vtk image
+ *
+ * @param vtkimagedata the image the PixelType shall be deducted from
+ * @return the mitk::PixelType
+ */
+MITKCORE_EXPORT mitk::PixelType MakePixelType(vtkImageData* vtkimagedata);
+
 /**
  * \brief A template method for creating a pixel type.
  */
-template< typename ComponentT, typename PixelT, std::size_t numOfComponents >
-PixelType MakePixelType()
+template< typename ComponentT, typename PixelT>
+PixelType MakePixelType(std::size_t numOfComponents)
 {
   return PixelType( MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOComponentType,
                     MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOPixelType,
@@ -177,6 +187,18 @@ PixelType MakePixelType()
                     PixelComponentTypeToString<ComponentT>(),
                     PixelTypeToString<PixelT>()
                    );
+}
+
+
+/**
+ * \brief A template method for creating a pixel type.
+ *
+ * @deprecated, use version with one numOfComponents as function argument instead.
+ */
+template< typename ComponentT, typename PixelT, std::size_t numOfComponents >
+PixelType MakePixelType()
+{
+  return MakePixelType<ComponentT, PixelT>(numOfComponents);
 }
 
 /**
@@ -195,6 +217,9 @@ struct AssertImageTypeIsValid
 // Use a itk::VectorImage instead.
 template< typename TPixelType, unsigned int VImageDimension >
 struct AssertImageTypeIsValid<itk::Image<itk::VariableLengthVector<TPixelType>, VImageDimension> >;
+
+
+
 
 /** \brief A template method for creating a MITK pixel type na ITK image type
  *
@@ -286,4 +311,4 @@ PixelType MakeScalarPixelType()
 
 
 
-#endif /* PIXELTYPE_H_HEADER_INCLUDED_C1EBF565 */
+#endif /* mitkPixelType_h */

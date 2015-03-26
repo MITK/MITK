@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBallModel.h>
 #include <mitkDotModel.h>
 #include <mitkRawShModel.h>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 using namespace std;
 
@@ -320,6 +322,9 @@ public:
     void PrintSelf();                           ///< Print parameters to stdout.
     void SaveParameters(string filename);       ///< Save image generation parameters to .ffp file.
     void LoadParameters(string filename);       ///< Load image generation parameters from .ffp file.
+    template< class ParameterType >
+    ParameterType ReadVal(boost::property_tree::ptree::value_type const& v, std::string tag, ParameterType defaultValue, bool essential=false);
+    std::string                         m_MissingTags;
 };
 }
 

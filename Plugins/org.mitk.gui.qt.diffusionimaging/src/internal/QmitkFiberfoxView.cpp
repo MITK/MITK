@@ -49,6 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateIsDWI.h>
 #include <boost/property_tree/ptree.hpp>
+#define RAPIDXML_NO_EXCEPTIONS
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/foreach.hpp>
 #include <QFileDialog>
@@ -1250,8 +1251,16 @@ void QmitkFiberfoxView::LoadParameters()
 
     m_ParameterFile = filename;
 
-    FiberfoxParameters<> parameters;
+    FiberfoxParameters<> parameters = UpdateImageParameters<double>();
     parameters.LoadParameters(filename.toStdString());
+
+    if (parameters.m_MissingTags.size()>0)
+    {
+        QString missing("Parameter file might be corrupted. The following parameters could not be read: ");
+        missing += QString(parameters.m_MissingTags.c_str());
+        missing += "\nDefault values have been assigned to the missing parameters.";
+        QMessageBox::information( NULL, "Warning!", missing);
+    }
 
     m_Controls->m_RealTimeFibers->setChecked(parameters.m_Misc.m_CheckRealTimeFibersBox);
     m_Controls->m_AdvancedOptionsBox->setChecked(parameters.m_Misc.m_CheckAdvancedFiberOptionsBox);

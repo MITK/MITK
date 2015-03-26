@@ -38,13 +38,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-void DicomSeriesReader::LoadSeries(const DicomSeriesReader::StringContainer& filenames, mitk::Image::Pointer image, void* command) 
+template <typename PixelType>
+void DicomSeriesReader::LoadSeriesTemplate(const DicomSeriesReader::StringContainer& filenames, Image::Pointer  image, void* command) 
 {
   const int STATUS_LOAD_SLICE = 0;
   const int STATUS_LOAD_COMPLETE = 100;
 
   std::vector<std::string> copyFilenames(filenames);
-  typedef itk::Image<signed short, 2> InputImageType;
+
+  typedef itk::Image<PixelType, 2> InputImageType;
+
   typedef itk::ImageFileReader<InputImageType> ReaderType;
   ReaderType::Pointer reader = ReaderType::New();
   itk::GDCMImageIO::Pointer gdcmImageIO = itk::GDCMImageIO::New();
@@ -72,6 +75,48 @@ void DicomSeriesReader::LoadSeries(const DicomSeriesReader::StringContainer& fil
       }
     }
   }
+}
+
+// TODO ism find aproach to avoid this
+void DicomSeriesReader::LoadSeries(const DicomSeriesReader::StringContainer& filenames, mitk::Image::Pointer image, itk::ImageIOBase::IOComponentType comptype,  void* command) 
+{
+  switch (comptype) 
+  {
+    case DcmIoType::UCHAR:
+      LoadSeriesTemplate<unsigned char>(filenames, image, command);
+      break;
+    case DcmIoType::CHAR:
+      LoadSeriesTemplate<char>(filenames, image, command);
+      break;
+    case DcmIoType::USHORT:
+      LoadSeriesTemplate<unsigned short>(filenames, image, command);
+      break;
+    case DcmIoType::SHORT:
+      LoadSeriesTemplate<short>(filenames, image, command);
+      break;
+    case DcmIoType::UINT:
+      LoadSeriesTemplate<unsigned int>(filenames, image, command);
+      break;
+    case DcmIoType::INT:
+      LoadSeriesTemplate<int>(filenames, image, command);
+      break;
+    case DcmIoType::ULONG:
+      LoadSeriesTemplate<long unsigned int>(filenames, image, command);
+      break;
+    case DcmIoType::LONG:
+      LoadSeriesTemplate<long int>(filenames, image, command);
+      break;
+    case DcmIoType::FLOAT:
+      LoadSeriesTemplate<float>(filenames, image, command);
+      break;
+    case DcmIoType::DOUBLE:
+      LoadSeriesTemplate<double>(filenames, image, command);
+      break;
+    default:
+      MITK_ERROR << "Unknown image pixel format";
+      break;
+  }
+  MITK_INFO << "Load series in thread complete";
 }
 
 std::string DicomSeriesReader::ReaderImplementationLevelToString( const ReaderImplementationLevel& enumValue )
@@ -1532,6 +1577,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(scanner.GetMappings());
 
       //switch off sorting
+      // TODO this is need for correct Time working
       //std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, sort, canLoadAs4D );
 
       std::list<StringContainer> imageBlocks;

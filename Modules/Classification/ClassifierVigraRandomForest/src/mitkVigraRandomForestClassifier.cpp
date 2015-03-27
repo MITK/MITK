@@ -134,6 +134,11 @@ mitk::VigraRandomForestClassifier::VectorType mitk::VigraRandomForestClassifier:
   return e_Y;
 }
 
+bool mitk::VigraRandomForestClassifier::SupportsPointWiseProba()
+{
+  return true;
+}
+
 void  mitk::VigraRandomForestClassifier::ConvertParameter()
 {
   // Get the proerty                                                                      // Some defaults

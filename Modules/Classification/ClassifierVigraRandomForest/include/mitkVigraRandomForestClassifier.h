@@ -44,6 +44,7 @@ public:
 //  EigenMatrixXdType PredictPro(const EigenMatrixXdType &X);
 
   bool SupportsPointWiseWeight() override;
+  bool SupportsPointWiseProba() override;
   void ConvertParameter();
 
   typedef AbstractClassifier::MatrixType MatrixType;

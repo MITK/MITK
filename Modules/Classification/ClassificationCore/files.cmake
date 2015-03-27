@@ -4,12 +4,8 @@ set(CPP_FILES
   mitkConfigurationHolder.cpp
   mitkAbstractClassifier.cpp
 
-  Algorithms/itkLabelSampler.cpp
-
   Transformer/mitkEigenToImageTransform.cpp
   Transformer/mitkImageToEigenTransform.cpp
-
-  Features/itkNeighborhoodFunctorImageFilter.cpp
 )
 
 set( TOOL_FILES

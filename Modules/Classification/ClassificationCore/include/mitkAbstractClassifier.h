@@ -110,6 +110,11 @@ namespace mitk
     ///
     virtual bool SupportsPointWiseWeight();
 
+    virtual void SetRequestedRegionToLargestPossibleRegion(){}
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion(){return true;}
+    virtual bool VerifyRequestedRegion(){return false;}
+    virtual void SetRequestedRegion(const itk::DataObject */*data*/){}
+
   protected:
     EigenVectorXdType& PointWeight();
 

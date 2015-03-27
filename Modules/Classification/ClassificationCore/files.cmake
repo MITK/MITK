@@ -3,7 +3,11 @@ file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURREN
 set(CPP_FILES
   mitkConfigurationHolder.cpp
   mitkAbstractClassifier.cpp
+
   Algorithms/itkLabelSampler.cpp
+
+  Transformer/mitkEigenToImageTransform.cpp
+  Transformer/mitkImageToEigenTransform.cpp
 )
 
 set( TOOL_FILES

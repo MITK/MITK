@@ -50,6 +50,6 @@ namespace mitk
 
 }
 
-#include <mitkImpurityLoss.cpp>
+#include <../src/Splitter/mitkImpurityLoss.cpp>
 
 #endif //mitkImpurityLoss_h

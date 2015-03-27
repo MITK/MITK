@@ -151,8 +151,8 @@ template<class TLossAccumulator>
 template <class TDataSourceLabel, class TDataIterator, class TArray>
 double
 mitk::LinearSplitting<TLossAccumulator>::LossOfRegion(TDataSourceLabel const & labels,
-                    TDataIterator &begin,
-                    TDataIterator &end,
+                    TDataIterator &/*begin*/,
+                    TDataIterator &/*end*/,
                     TArray const & regionResponse)
 {
     typedef TLossAccumulator LineSearchLoss;

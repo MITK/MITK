@@ -75,5 +75,5 @@ namespace mitk
 }
 
 
-#include <mitkThresholdSplit.cpp>
+#include <../src/Splitter/mitkThresholdSplit.cpp>
 #endif //mitkThresholdSplit_h

@@ -82,5 +82,5 @@ namespace mitk
   };
 }
 
-#include <mitkLinearSplitting.cpp>
+#include <../src/Splitter/mitkLinearSplitting.cpp>
 #endif //mitkLinearSplitting_h

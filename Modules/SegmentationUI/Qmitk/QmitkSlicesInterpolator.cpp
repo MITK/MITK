@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkImageWriteAccessor.h>
+#include <mitkImageReadAccessor.h>
 
 #include <itkCommand.h>
 
@@ -768,14 +769,22 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     s2iFilter->Update();
 
     mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
-    mitk::Image* oldSeg = dynamic_cast<mitk::Image*>(segmentationNode->GetData());
     mitk::Image::Pointer newSeg = s2iFilter->GetOutput();
-    if (oldSeg)
-      m_SurfaceInterpolator->ReplaceInterpolationSession(oldSeg, newSeg);
-    else
-      return;
+    mitk::Image* currSeg = dynamic_cast<mitk::Image*>(segmentationNode->GetData());
 
-    segmentationNode->SetData(newSeg);
+    unsigned int timestep = m_LastSNC->GetTime()->GetPos();
+    mitk::ImageReadAccessor readAccess(newSeg, newSeg->GetVolumeData(timestep));
+    const void* cPointer = readAccess.GetData();
+
+    if (currSeg && cPointer)
+    {
+      currSeg->SetVolume( cPointer, timestep, 0 );
+    }
+    else
+    {
+      return;
+    }
+
     m_CmbInterpolation->setCurrentIndex(0);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     mitk::DataNode::Pointer segSurface = mitk::DataNode::New();

@@ -15,7 +15,6 @@ import helper.monteCarloHelper as mch
 import csvImageReader
 
 
-
 def perfect(dataFolder):
     trainingParameters   = np.load(dataFolder + "2015February2401:43AMPerfectGridTraining10000parameters.npy")
     trainingParameters   = trainingParameters[:,0:2] # only BVF and Vs for perfect data simulations
@@ -32,12 +31,12 @@ def perfect(dataFolder):
 
 def noisy(dataFolder):
     trainingParameters   = np.load(dataFolder + "2015February2208:16PMNoisyRandomTraining10000parameters.npy")
-    trainingParameters   = trainingParameters[:,0:4]
+    trainingParameters   = trainingParameters[:,0:2]
     trainingReflectances = np.load(dataFolder + "2015February2208:16PMNoisyRandomTrainingreflectances1000000photons.npy")
     trainingReflectances = mch.normalizeImageQuotient(trainingReflectances)
 
     testParameters   = np.load(dataFolder + "2015February2301:23AMNoisyRandomTesting10000parameters.npy")
-    testParameters   = testParameters[:,0:4]
+    testParameters   = testParameters[:,0:2]
     testReflectances = np.load(dataFolder + "2015February2301:23AMNoisyRandomTestingreflectances1000000photons.npy")
     testReflectances = mch.normalizeImageQuotient(testReflectances)
 
@@ -45,31 +44,17 @@ def noisy(dataFolder):
 
 
 def realImage(dataFolder, imageToLoad):
-    trainingParameters   = np.load(dataFolder + "2015February2208:16PMNoisyRandomTraining10000parameters.npy")
+    trainingParameters   = np.load(dataFolder + "2015February2807:13PMNoisyRandomTraining10000parameters.npy")
     # estimate: BVF, Vs, d, SaO2:
-    trainingParameters   = trainingParameters[:, 0:4]
-    trainingReflectances = np.load(dataFolder + "2015February2208:16PMNoisyRandomTrainingreflectances1000000photons.npy")
-    trainingReflectances = np.delete(trainingReflectances, -1, axis=1)
+    trainingParameters   = trainingParameters[:, 0:3]
+    trainingReflectances = np.load(dataFolder + "2015February2807:13PMNoisyRandomTrainingreflectances1000000photons.npy")
+
+    #trainingReflectances = np.delete(trainingReflectances, [2, 7], axis=1)
     trainingReflectances = mch.normalizeImageQuotient(trainingReflectances)
 
-    shape, image, trainsegmentation, testsegmentation = csvImageReader.csvMultiSpectralImageReader(dataFolder + imageToLoad)
-    #discard last wavelength
-    image = np.delete(image, -1, axis=1)
+    shape, image, trainsegmentation, testsegmentation = csvImageReader.csvMultiSpectralImageReader2(dataFolder + imageToLoad)
+
+    #image = np.delete(image, [2, 7], axis=1)
     image = mch.normalizeImageQuotient(image)
 
     return trainingParameters, trainingReflectances, shape, image, trainsegmentation, testsegmentation
-
-
-def logisticRegressionArtificialData(dataFolder):
-    uniformReflectances = np.load(dataFolder + "2015February1704:00PMreflectancesRandom1000000photons.npy")
-    uniformReflectances = mch.normalizeImageQuotient(uniformReflectances)
-
-    gaussReflectances = np.load(dataFolder + "2015February1908:54AMnonUniformRandomTrainingDatareflectances1000000photons.npy")
-    gaussReflectances = mch.normalizeImageQuotient(gaussReflectances)
-
-    testReflectancesGauss = np.load(dataFolder + "2015February1908:57AMnonUniformRandomTestingDatareflectances1000000photons.npy")
-    testReflectancesGauss = mch.normalizeImageQuotient(testReflectancesGauss)
-
-
-    return uniformReflectances, gaussReflectances, testReflectancesGauss
-

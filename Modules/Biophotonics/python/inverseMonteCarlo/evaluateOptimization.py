@@ -10,13 +10,15 @@ import matplotlib.pyplot as plt
 from setup import data
 from optimization import optimization
 
-
 #%% load data
 
 dataFolder = "data/output/"
 
 trainingParameters, trainingReflectances, testParameters, testReflectances = \
     data.perfect(dataFolder)
+
+dummy1, dummy2, testParameters, testReflectances = \
+    data.noisy(dataFolder)
 
 testingErrors, r2Score = optimization(trainingParameters, trainingReflectances, testParameters, testReflectances)
 

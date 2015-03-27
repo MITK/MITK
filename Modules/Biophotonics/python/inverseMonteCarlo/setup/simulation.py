@@ -60,10 +60,10 @@ def noisy():
 
     # blood volume fraction range
     samplesBVF = 100
-    BVFs = np.linspace(0.01, 0.30, samplesBVF)
+    BVFs = np.linspace(0.001, 0.15, samplesBVF)
     # scattering particles volume fraction range
     samplesVs = 100
-    Vss  = np.linspace(0.04, 0.60, samplesVs)
+    Vss  = np.linspace(0.01, 0.60, samplesVs)
     # thickness of mucosa [m] range
     samplesD = 5
     ds   = np.linspace(250 * 10**-6, 735 * 10**-6, samplesD)
@@ -92,10 +92,10 @@ def perfect():
 
     # blood volume fraction range
     samplesBVF = 100
-    BVFs = np.linspace(0.01, 0.30, samplesBVF)
+    BVFs = np.linspace(0.001, 0.15, samplesBVF)
     # scattering particles volume fraction range
     samplesVs = 100
-    Vss  = np.linspace(0.04, 0.60, samplesVs)
+    Vss  = np.linspace(0.01, 0.60, samplesVs)
     # thickness of mucosa [m] range
     samplesD = 1
     #ds   = np.linspace(250 * 10**-6, 735 * 10**-6, samplesD)

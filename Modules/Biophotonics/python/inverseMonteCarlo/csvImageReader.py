@@ -49,6 +49,20 @@ def csvImageReader(csvFilename):
     return (resultShape, reflectances)
 
 
+def csvMultiSpectralImageReader2(csvFilename):
+    shape, reflectances = csvImageReader(csvFilename)
+    dummy, flatfieldsegmentation    = csvImageReader(csvFilename + "_flatfieldsegmentation")
+    dummy, trainsegmentation = csvImageReader(csvFilename + "_trainsegmentation")
+    dummy, testsegmentation =csvImageReader(csvFilename + "_testsegmentation")
+
+    flatfield = reflectances[np.nonzero(flatfieldsegmentation)[0], :]
+    flatfield = np.mean(flatfield, axis = 0)
+
+    correctedReflectances = reflectances / flatfield
+
+    return (shape, correctedReflectances, trainsegmentation, testsegmentation)
+
+
 def csvMultiSpectralImageReader(csvFilename):
     """
     read an image and correct it by its dark and flatfield image.

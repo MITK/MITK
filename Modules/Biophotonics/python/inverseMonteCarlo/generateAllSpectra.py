@@ -10,7 +10,6 @@ for our experiments
 
 
 from generate.noisyRandom      import noisyRandom
-from generate.randomNonUniform import randomNonUniform
 from generate.randomUniform    import randomUniform
 from generate.perfectGrid      import perfectGrid
 
@@ -26,8 +25,3 @@ randomUniform("UniformRandom")
 # training perfect data on grid
 perfectGrid("PerfectGridTraining")
 
-# training noisy non-uniform spectra
-randomNonUniform("NoisyNonUniformRandomTraining")
-
-# testing noisy non-uniform spectra
-randomNonUniform("NoisyNonUniformRandomTesting")

@@ -16,7 +16,7 @@ from randomForest import randomForest
 dataFolder = 'data/output/'
 
 trainingParameters, trainingReflectances, testParameters, testReflectances = \
-    data.perfect(dataFolder)
+    data.noisy(dataFolder)
 
 
 trainingWeights = np.ones((trainingParameters.shape[0],))

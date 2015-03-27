@@ -33,12 +33,14 @@ def randomForest(trainingParameters, trainingReflectances, trainingWeights):
 
     print "starting forest training now."
 
-    kf = KFold(trainingReflectances.shape[0], 5, shuffle=True)
-    param_grid = [
-      {'max_depth': np.arange(2,40,1), 'max_features': np.arange(7,8,1)}]
-
-    rf = GridSearchCV(RandomForestRegressor(500, max_depth=8), param_grid, cv=kf, n_jobs=11)
-    rf.fit(trainingReflectances, trainingParameters)
+#    kf = KFold(trainingReflectances.shape[0], 5, shuffle=True)
+#    param_grid = [
+#      {'max_depth': np.arange(2,40,1), 'max_features': np.arange(1,trainingReflectances.shape[1],1)}]
+#
+#    rf = GridSearchCV(RandomForestRegressor(500, max_depth=8), param_grid, cv=kf, n_jobs=11)
+    #print("best random forest parameters: " + str(rf.best_estimator_))
+    rf = RandomForestRegressor(500, max_depth=24)
+    rf.fit(trainingReflectances, trainingParameters, trainingWeights)
 
 
     end = time.time()

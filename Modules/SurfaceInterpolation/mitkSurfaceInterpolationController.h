@@ -232,9 +232,9 @@ namespace mitk
 
  private:
 
-   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
-
    void ReinitializeInterpolation();
+
+   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
 
    void AddToInterpolationPipeline(ContourPositionInformation contourInfo );
 
@@ -259,8 +259,6 @@ namespace mitk
     std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
 
     int m_CurrentTimeStep;
-
-    //mitk::ImageTimeSelector::Pointer m_TimeSelector;
  };
 }
 #endif

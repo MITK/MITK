@@ -36,12 +36,7 @@ mitk::LibSVMClassifier::~LibSVMClassifier()
   }
 }
 
-bool mitk::LibSVMClassifier::SupportsPointWiseWeight()
-{
-  return true;
-}
-
-void mitk::LibSVMClassifier::Fit(const MatrixType &X, const VectorType &Y)
+void mitk::LibSVMClassifier::Train(const MatrixType &X, const VectorType &Y)
 {
   LibSVM::svm_parameter parameter;
   LibSVM::svm_problem problem;
@@ -153,7 +148,7 @@ void mitk::LibSVMClassifier::ReadYValues(LibSVM::svm_problem * problem, const Ve
 
 void mitk::LibSVMClassifier::ReadWValues(LibSVM::svm_problem * problem)
 {
-  VectorType W = PointWeight();
+  VectorType & W = this->GetPointWiseWeight();
   int noOfPoints = problem->l;
   problem->W = static_cast<double *>(malloc(sizeof(double)  * noOfPoints));
 

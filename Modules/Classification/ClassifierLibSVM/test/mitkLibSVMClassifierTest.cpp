@@ -139,7 +139,7 @@ public:
 
   void TrainSVMClassifier()
   {
-    classifier->Fit(X,y);
+    classifier->Train(X,y);
 
     EigenVectorType classes = classifier->Predict(X_predict);
     mitk::Image::Pointer img = mitk::EigenToImageTransform::transform(classes, classMask);

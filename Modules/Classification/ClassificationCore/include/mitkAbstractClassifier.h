@@ -32,116 +32,138 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MITKCLASSIFICATIONCORE_EXPORT AbstractClassifier : public BaseData
+class MITKCLASSIFICATIONCORE_EXPORT AbstractClassifier : public BaseData
+{
+public:
+  ///
+  /// @brief MatrixType
+  ///
+  typedef Eigen::MatrixXd MatrixType;
+
+  ///
+  /// @brief VectorType
+  ///
+  typedef Eigen::VectorXd VectorType;
+
+  ///
+  /// @brief Build a forest of trees from the training set (X, y).
+  /// @param X, The training input samples. Matrix of shape = [n_samples, n_features]
+  /// @param Y, The target values (class labels in classification, real numbers in regression). Array of shape = [n_samples]
+  ///
+  virtual void Train(const MatrixType &X, const VectorType &Y) = 0;
+
+  ///
+  /// @brief Predict class for X.
+  /// @param X, The input samples.
+  /// @return The predicted classes. Y array of shape = [n_samples]
+  ///
+  virtual VectorType Predict(const MatrixType &X) = 0;
+
+
+  // * --------------- *
+  // PointWiseWeight
+  // * --------------- *
+
+  ///
+  /// @brief SupportsPointWiseWeight
+  /// @return True if the classifier supports pointwise weighting else false
+  ///
+  virtual bool SupportsPointWiseWeight() = 0;
+
+  ///
+  /// @brief GetPointWiseWeightCopy
+  /// @return Create and return a copy of W
+  ///
+  VectorType & GetPointWiseWeight()
   {
-  public:
-    ///
-    /// @brief MatrixType
-    ///
-    typedef Eigen::MatrixXd MatrixType;
+    return m_PointWiseWeight;
+  }
 
-    ///
-    /// @brief VectorType
-    ///
-    typedef Eigen::VectorXd VectorType;
+  ///
+  /// @brief SetPointWiseWeight
+  /// @param W, The pointwise weights. W array of shape = [n_samples]
+  ///
+  void SetPointWiseWeight(const VectorType& W)
+  {
+    this->m_PointWiseWeight = W;
+  }
 
-    ///
-    /// @brief Build a forest of trees from the training set (X, y).
-    /// @param X, The training input samples. Matrix of shape = [n_samples, n_features]
-    /// @param Y, The target values (class labels in classification, real numbers in regression). Array of shape = [n_samples]
-    ///
-    virtual void Fit(const MatrixType &X, const VectorType &Y) = 0;
+  ///
+  /// @brief UsePointWiseWeight
+  /// @param toggle weighting on/off
+  ///
+  void UsePointWiseWeight(bool value)
+  {
+    this->m_IsUsingPointWiseWeight = value;
+  }
 
-    ///
-    /// @brief Predict class for X.
-    /// @param X, The input samples.
-    /// @return The predicted classes. Y array of shape = [n_samples]
-    ///
-    virtual VectorType Predict(const MatrixType &X) = 0;
+  ///
+  /// @brief IsUsingPointWiseWeight
+  /// @return true if pointewise weighting is enabled.
+  ///
+  bool IsUsingPointWiseWeight()
+  {
+    return this->m_IsUsingPointWiseWeight;
+  }
 
-    ///
-    /// @brief Predict probabilities for X.
-    /// @param X, The input samples.
-    /// @return The predicted probabilities for a class. X matrix of shape = [n_samples, n_classes]
-    ///
-    virtual MatrixType PredictProba(const MatrixType &/*X*/) {return MatrixType(0,0);}
+protected:
+  VectorType m_PointWiseWeight;
+  bool m_IsUsingPointWiseWeight;
 
-    ///
-    /// @brief SetConfiguration, handing over classifier custom configurations
-    /// @param conf
-    /// @deprecated Use base data propertylist
-    ///
-    DEPRECATED(void SetConfiguration(const ConfigurationHolder& conf));
+  // * --------------- *
+  // PointWiseProbabilities
+  // * --------------- *
 
-    ///
-    /// @brief Configuration
-    /// @return none-const refernce to the custom configuration
-    /// @deprecated Use base data propertylist
-    ///
-    DEPRECATED(ConfigurationHolder& Configuration());
+public:
+  ///
+  /// @brief SupportsPointWiseProbability
+  /// @return True if the classifier supports pointwise class probability calculation else false
+  ///
+  virtual bool SupportsPointWiseProbability() = 0;
 
-    ///
-    /// @brief GetConfigurationCopy
-    /// @return Create and return a deep copy of the configuration
-    /// @deprecated Use base data propertylist
-    ///
-    DEPRECATED(ConfigurationHolder GetConfigurationCopy());
+  ///
+  /// @brief GetPointWiseWeightCopy
+  /// @return Create and return probability matrix
+  ///
+  MatrixType & GetPointWiseProbabilities()
+  {
+    return m_PointWiseProbability;
+  }
 
-    ///
-    /// @brief SetPointWiseWeight
-    /// @param W, The pointwise weights. W array of shape = [n_samples]
-    ///
-    void SetPointWiseWeight(const VectorType& W);
+  ///
+  /// \brief UsePointWiseProbabilities
+  /// \param value
+  ///
+  void UsePointWiseProbability(bool value)
+  {
+    m_IsUsingPointWiseProbability = value;
+  }
 
-    ///
-    /// @brief GetPointWiseWeightCopy
-    /// @return Create and return a copy of W
-    ///
-    VectorType GetPointWiseWeightCopy();
+  ///
+  /// \brief IsUsingPointWiseProbabilities
+  /// \return
+  ///
+  bool IsUsingPointWiseProbability()
+  {
+    return m_IsUsingPointWiseProbability;
+  }
 
-    ///
-    /// @brief UsePointWiseWeight
-    /// @param toggle weighting on/off
-    ///
-    void UsePointWiseWeight(bool value);
+protected:
+  MatrixType m_PointWiseProbability;
+  bool m_IsUsingPointWiseProbability;
 
-    ///
-    /// @brief IsUsingPointWiseWeight
-    /// @return true if pointewise weighting is enabled.
-    ///
-    bool IsUsingPointWiseWeight();
+public:
 
-    ///
-    /// @brief SupportsPointWiseWeight
-    /// @return True if the classifier supports pointwise weighting else false
-    ///
-    virtual bool SupportsPointWiseWeight();
+#ifndef DOXYGEN_SKIP
 
-    ///
-    /// @brief SupportsPointWiseProbability
-    /// @return True if the classifier supports pointwise class probability calculation else false
-    ///
-    virtual bool SupportsPointWiseProba();
+  virtual void SetRequestedRegionToLargestPossibleRegion(){}
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion(){return true;}
+  virtual bool VerifyRequestedRegion(){return false;}
+  virtual void SetRequestedRegion(const itk::DataObject */*data*/){}
 
-    virtual void SetRequestedRegionToLargestPossibleRegion(){}
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion(){return true;}
-    virtual bool VerifyRequestedRegion(){return false;}
-    virtual void SetRequestedRegion(const itk::DataObject */*data*/){}
+#endif // Skip Doxygen
 
-  protected:
-    VectorType& PointWeight();
-
-  private:
-    ///
-    /// @brief m_Config
-    /// @deprecated Use base data propertylist
-    ///
-    DEPRECATED(ConfigurationHolder m_Config);
-
-    VectorType m_PointWiseWeight;
-    bool m_UsePointWiseWeight;
-
-  };
+};
 }
 
 #endif //mitkAbstractClassifier_h

@@ -42,10 +42,11 @@ namespace mitk
     LibSVMClassifier();
     ~LibSVMClassifier();
 
-    void Fit(const MatrixType &X, const VectorType &Y) override;
+    void Train(const MatrixType &X, const VectorType &Y) override;
     VectorType Predict(const MatrixType &X) override;
 
-    bool SupportsPointWiseWeight() override;
+    bool SupportsPointWiseWeight(){return true;}
+    bool SupportsPointWiseProbability(){return false;}
 
   private:
 
@@ -55,6 +56,7 @@ namespace mitk
     void ReadWValues(LibSVM::svm_problem * problem);
 
     LibSVM::svm_model* m_Model;
+
   };
 }
 

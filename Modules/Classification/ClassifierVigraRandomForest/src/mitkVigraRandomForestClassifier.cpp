@@ -16,9 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK includes
 #include <mitkVigraRandomForestClassifier.h>
+#include <mitkThresholdSplit.h>
+#include <mitkImpurityLoss.h>
+#include <mitkLinearSplitting.h>
 
 // Vigra includes
-
 #include <vigra/random_forest.hxx>
 #include <vigra/random_forest/rf_split.hxx>
 
@@ -26,12 +28,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFastMutexLock.h>
 #include <itkMultiThreader.h>
 
+typedef mitk::ThresholdSplit<mitk::LinearSplitting< mitk::ImpurityLoss<> >,int,vigra::ClassificationTag> DefaultSplitType;
+
+struct mitk::VigraRandomForestClassifier::Parameter
+{
+  vigra::RF_OptionTag Stratification;
+  bool SampleWithReplacement;
+  bool UseRandomSplit;
+  bool UsePointBasedWeights;
+  int TreeCount;
+  int MinimumSplitNodeSize;
+  int MaximumTreeDepth;
+  double Precision;
+  double WeightLambda;
+  double SamplesPerTree;
+
+};
 
 struct mitk::VigraRandomForestClassifier::TrainMultiThreaderData
 {
   TrainMultiThreaderData(unsigned int numberOfThreads,unsigned int numberOfTrees,
                          const vigra::RandomForest<int> & refRF,
-                         const vigra::GiniSplit & refSplitter,
+                         const DefaultSplitType & refSplitter,
                          const vigra::MultiArray<2, int> & refLabel,
                          const vigra::MultiArray<2, double> & refFeature)
     :m_NumberOfThreads(numberOfThreads),
@@ -47,7 +65,7 @@ struct mitk::VigraRandomForestClassifier::TrainMultiThreaderData
 
   unsigned int m_NumberOfThreads, m_NumberOfTrees;
   const vigra::RandomForest<int> & m_RandomForest;
-  const vigra::GiniSplit & m_Splitter;
+  const DefaultSplitType & m_Splitter;
   const vigra::MultiArray<2, int> & m_Label;
   const vigra::MultiArray<2, double> & m_Feature;
   itk::FastMutexLock::Pointer m_mutex;
@@ -90,15 +108,31 @@ bool mitk::VigraRandomForestClassifier::SupportsPointWiseWeight()
   return true;
 }
 
-void mitk::VigraRandomForestClassifier::Fit(const MatrixType & X, const VectorType & Y)
+bool mitk::VigraRandomForestClassifier::SupportsPointWiseProbability()
 {
-//   MBI --------
-//  UpdateDataArrays(true);
+  return true;
+}
+
+vigra::MultiArrayView<2, double> mitk::VigraRandomForestClassifier::GetPointWiseWeight()
+{
+  vigra::MultiArrayView<2, double> eigenview;
+  return eigenview;
+}
+
+void mitk::VigraRandomForestClassifier::Train(const MatrixType & X, const VectorType & Y)
+{
+  DefaultSplitType splitter;
+  splitter.UsePointBasedWeights(m_Parameter->UsePointBasedWeights);
+  splitter.UseRandomSplit(m_Parameter->UseRandomSplit);
+  splitter.SetPrecision(m_Parameter->Precision);
+  splitter.SetMaximumTreeDepth(m_Parameter->MaximumTreeDepth);
+
+  if (m_Parameter->UsePointBasedWeights)
+    splitter.SetWeights(this->GetPointWiseWeight());
 
   VigraMatrix2dType features = transform(X);
   VigraLabel2dType label = transform(Y);
 
-  vigra::GiniSplit splitter;
   m_RandomForest.set_options().tree_count(1); // Number of trees that are calculated;
   m_RandomForest.learn(features, label,vigra::rf::visitors::VisitorBase(),splitter);
 
@@ -114,7 +148,6 @@ void mitk::VigraRandomForestClassifier::Fit(const MatrixType & X, const VectorTy
   m_RandomForest.trees_ = data->trees_;
 
   delete data;
-//   MBI --------
 }
 
 mitk::VigraRandomForestClassifier::VectorType mitk::VigraRandomForestClassifier::Predict(const MatrixType &X)
@@ -134,36 +167,23 @@ mitk::VigraRandomForestClassifier::VectorType mitk::VigraRandomForestClassifier:
   return e_Y;
 }
 
-bool mitk::VigraRandomForestClassifier::SupportsPointWiseProba()
-{
-  return true;
-}
-
 void  mitk::VigraRandomForestClassifier::ConvertParameter()
 {
+  if(this->m_Parameter == nullptr)
+    this->m_Parameter = new Parameter();
   // Get the proerty                                                                      // Some defaults
-//  if(!this->GetPropertyList()->Get("classifier.svm.svm-type",parameter->svm_type))        parameter->svm_type = 0; // value?
-//  if(!this->GetPropertyList()->Get("classifier.svm.kernel-type",parameter->kernel_type))  parameter->kernel_type = 0; // value?
-//  if(!this->GetPropertyList()->Get("classifier.svm.degree",parameter->degree))            parameter->degree = 3;
-//  if(!this->GetPropertyList()->Get("classifier.svm.gamma",parameter->gamma))              parameter->gamma = 0;
-//  if(!this->GetPropertyList()->Get("classifier.svm.coef0",parameter->coef0))              parameter->coef0 = 0;
-//  if(!this->GetPropertyList()->Get("classifier.svm.nu",parameter->nu))                    parameter->nu = 0.5;
-//  if(!this->GetPropertyList()->Get("classifier.svm.cache-size",parameter->cache_size))    parameter->cache_size = 100.0;
-//  if(!this->GetPropertyList()->Get("classifier.svm.c",parameter->C))                      parameter->C = 1.0;
-//  if(!this->GetPropertyList()->Get("classifier.svm.eps",parameter->eps))                  parameter->eps = 1e-3;
-//  if(!this->GetPropertyList()->Get("classifier.svm.p",parameter->p))                      parameter->p = 0.1;
-//  if(!this->GetPropertyList()->Get("classifier.svm.shrinking",parameter->shrinking))      parameter->shrinking = 1;
-//  if(!this->GetPropertyList()->Get("classifier.svm.probability",parameter->probability))  parameter->probability = 1;
-//  if(!this->GetPropertyList()->Get("classifier.svm.nr-weight",parameter->nr_weight))      parameter->nr_weight = 0;
+  if(!this->GetPropertyList()->Get("classifier.vigra-rf.usepointbasedweight",this->m_Parameter->UsePointBasedWeights))      this->m_Parameter->UsePointBasedWeights = false;
+  if(!this->GetPropertyList()->Get("classifier.vigra-rf.maximumtreedepth",this->m_Parameter->MaximumTreeDepth))             this->m_Parameter->MaximumTreeDepth = 20;
+  if(!this->GetPropertyList()->Get("classifier.vigra-rf.minimalsplitnodesize",this->m_Parameter->MinimumSplitNodeSize))     this->m_Parameter->MinimumSplitNodeSize = 5;
+  if(!this->GetPropertyList()->Get("classifier.vigra-rf.precision",this->m_Parameter->Precision))                           this->m_Parameter->Precision = 0.5;
+  if(!this->GetPropertyList()->Get("classifier.vigra-rf.samplespertree",this->m_Parameter->SamplesPerTree))                 this->m_Parameter->SamplesPerTree = 0.6;
+  if(!this->GetPropertyList()->Get("classifier.vigra-rf.samplewithreplacement",this->m_Parameter->SampleWithReplacement))   this->m_Parameter->SampleWithReplacement = true;
+  if(!this->GetPropertyList()->Get("classifier.vigra-rf.treecount",this->m_Parameter->TreeCount))                           this->m_Parameter->TreeCount = 100;
+  if(!this->GetPropertyList()->Get("classifier.vigra-rf.lambda",this->m_Parameter->WeightLambda))                           this->m_Parameter->WeightLambda = 1.0; // Not used yet
+//  if(!this->GetPropertyList()->Get("classifier.vigra-rf.samplewithreplacement",this->m_Parameter->Stratification))
+  this->m_Parameter->Stratification = vigra::RF_NONE; // no Property given
 
-//  parameter->weight_label = nullptr;
-//  parameter->weight = nullptr;
 }
-
-
-
-
-
 
 /**
  * @brief mitk::DecisionForest::TrainTreesCallback

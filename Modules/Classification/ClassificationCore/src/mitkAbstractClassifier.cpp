@@ -32,38 +32,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 //}
 
 
-void mitk::AbstractClassifier::SetPointWiseWeight(const VectorType& w)
-{
-  m_PointWiseWeight = w;
-  m_UsePointWiseWeight = true;
-}
+//void mitk::AbstractClassifier::SetPointWiseWeight(const VectorType& w)
+//{
+//  m_PointWiseWeight = w;
+//  m_UsePointWiseWeight = true;
+//}
 
-mitk::AbstractClassifier::VectorType mitk::AbstractClassifier::GetPointWiseWeightCopy()
-{
-  return m_PointWiseWeight;
-}
+//mitk::AbstractClassifier::VectorType mitk::AbstractClassifier::GetPointWiseWeightCopy()
+//{
+//  return m_PointWiseWeight;
+//}
 
-void mitk::AbstractClassifier::UsePointWiseWeight(bool value)
-{
-  m_UsePointWiseWeight = value;
-}
+//void mitk::AbstractClassifier::UsePointWiseWeight(bool value)
+//{
+//  m_UsePointWiseWeight = value;
+//}
 
-bool mitk::AbstractClassifier::IsUsingPointWiseWeight()
-{
-  return m_UsePointWiseWeight;
-}
+//bool mitk::AbstractClassifier::IsUsingPointWiseWeight()
+//{
+//  return m_UsePointWiseWeight;
+//}
 
-bool mitk::AbstractClassifier::SupportsPointWiseWeight()
-{
-  return false;
-}
+//bool mitk::AbstractClassifier::SupportsPointWiseWeight()
+//{
+//  return false;
+//}
 
-bool mitk::AbstractClassifier::SupportsPointWiseProba()
-{
-  return false;
-}
+//bool mitk::AbstractClassifier::SupportsPointWiseProba()
+//{
+//  return false;
+//}
 
-mitk::AbstractClassifier::VectorType& mitk::AbstractClassifier::PointWeight()
-{
-  return m_PointWiseWeight;
-}
+//mitk::AbstractClassifier::VectorType& mitk::AbstractClassifier::PointWeight()
+//{
+//  return m_PointWiseWeight;
+//}

@@ -116,7 +116,8 @@ public:
 
   void TrainThreadedDecisionForest()
   {
-    classifier->Fit(X,y);
+    classifier->ConvertParameter();
+    classifier->Train(X,y);
 
     EigenVectorType classes = classifier->Predict(X_predict);
     mitk::Image::Pointer img = mitk::EigenToImageTransform::transform(classes, classMask);

@@ -38,14 +38,14 @@ public:
   VigraRandomForestClassifier();
   ~VigraRandomForestClassifier();
 
-  void Fit(const MatrixType &X, const VectorType &Y) override;
-  VectorType Predict(const MatrixType &X) override;
-  MatrixType PredictProba(const MatrixType &/*X*/) override {return MatrixType(0,0);}
-//  EigenMatrixXdType PredictPro(const EigenMatrixXdType &X);
+  void Train(const MatrixType &X, const VectorType &Y);
+  VectorType Predict(const MatrixType &X);
 
-  bool SupportsPointWiseWeight() override;
-  bool SupportsPointWiseProba() override;
+  bool SupportsPointWiseWeight();
+  bool SupportsPointWiseProbability();
   void ConvertParameter();
+
+  vigra::MultiArrayView<2, double> GetPointWiseWeight();
 
   typedef AbstractClassifier::MatrixType MatrixType;
   typedef AbstractClassifier::VectorType VectorType;
@@ -64,7 +64,9 @@ private:
   struct TrainMultiThreaderData;
   struct TestMultiThreaderData;
   struct EigenToVigraTransform;
+  struct Parameter;
 
+  Parameter * m_Parameter;
   vigra::RandomForest<int> m_RandomForest;
 
   static VigraMatrix2dType transform(const MatrixType & matrix)

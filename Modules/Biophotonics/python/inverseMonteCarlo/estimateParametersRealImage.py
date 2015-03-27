@@ -19,18 +19,6 @@ import matplotlib.pyplot as plt
 
 
 
-#%% 0. setup helper functions.
-
-def find_nearest(array,value):
-    errors = array - value
-    quadratic_errors = errors * errors
-    quadratic_error  = np.mat(quadratic_errors) * np.mat(np.ones((value.shape[0], 1)))
-
-    idx = quadratic_error.argmin()
-    return array[idx]
-
-
-
 #%% 1. load data
 
 # the folder with the reflectance spectra
@@ -42,9 +30,6 @@ imageToLoad = "ColonUC1"
 trainingParameters, trainingReflectances, shape, image, trainsegmentation, testsegmentation = \
     data.realImage(dataFolder, imageToLoad)
 
-#discard last wavelength
-#trainingReflectances = trainingReflectances[:,:-1]
-#image = image[:,:-1]
 
 sourceReflectancesDA = image[np.nonzero(trainsegmentation)[0], :]
 # choose m reflectances for training DA
@@ -117,6 +102,8 @@ inputReflectancesOnlySegmented   = inputReflectancesOnlySegmented[nSamples]
 reflectancesFromEstimatedParameters = np.zeros_like(inputReflectancesOnlySegmented)
 # +1 due to the non discarded image quotient
 
+wavelengths = np.delete(wavelengths, -1)
+
 for i, (BVF, Vs, d, SaO2) in enumerate(estimatedParametersOnlySegmented):
 
 
@@ -150,11 +137,11 @@ print("r2Score for random forest estimatation of", imageToLoad, ":", str(r2Score
 
 # sort by wavelength:
 
-for plot_i in range(n):
-
-    sortedIndices = sorted(range(len(wavelengths)), key=lambda k: wavelengths[k])
-
-    plt.figure()
-    plt.plot(wavelengths[sortedIndices], reflectancesFromEstimatedParameters[plot_i,sortedIndices], 'g-o')
-    plt.plot(wavelengths[sortedIndices], inputReflectancesOnlySegmented[plot_i,sortedIndices], 'b-o')
-    print(str(r2_score(reflectancesFromEstimatedParameters[plot_i, :], inputReflectancesOnlySegmented[plot_i, :])))
+#for plot_i in range(n):
+#
+#    sortedIndices = sorted(range(len(wavelengths)), key=lambda k: wavelengths[k])
+#
+#    plt.figure()
+#    plt.plot(wavelengths[sortedIndices], reflectancesFromEstimatedParameters[plot_i,sortedIndices], 'g-o')
+#    plt.plot(wavelengths[sortedIndices], inputReflectancesOnlySegmented[plot_i,sortedIndices], 'b-o')
+#    print(str(r2_score(reflectancesFromEstimatedParameters[plot_i, :], inputReflectancesOnlySegmented[plot_i, :])))

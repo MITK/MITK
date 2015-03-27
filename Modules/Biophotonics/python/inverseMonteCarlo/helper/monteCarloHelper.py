@@ -72,9 +72,11 @@ from setup import simulation
 def normalizeIntegral(data):
     # normalize data
     # first sort by wavelength:
-    sortedIndices = sorted(range(len(simulation.getWavelengths())), key=lambda k: simulation.getWavelengths()[k])
+    ourWavelengths = np.delete(simulation.getWavelengths(), -1)
 
-    norms = np.trapz(data[:,sortedIndices], simulation.getWavelengths()[sortedIndices], axis=1)
+    sortedIndices = sorted(range(len(ourWavelengths)), key=lambda k: ourWavelengths[k])
+
+    norms = np.trapz(data[:,sortedIndices], ourWavelengths[sortedIndices], axis=1)
     return data / norms[:,None]
 
 iqBand = 3

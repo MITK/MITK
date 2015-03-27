@@ -11,6 +11,7 @@ of datasets (same combinations / normalizations / ...)
 import numpy as np
 import helper.monteCarloHelper as mch
 
+
 import csvImageReader
 
 
@@ -48,10 +49,13 @@ def realImage(dataFolder, imageToLoad):
     # estimate: BVF, Vs, d, SaO2:
     trainingParameters   = trainingParameters[:, 0:4]
     trainingReflectances = np.load(dataFolder + "2015February2208:16PMNoisyRandomTrainingreflectances1000000photons.npy")
+    trainingReflectances = np.delete(trainingReflectances, -1, axis=1)
     trainingReflectances = mch.normalizeImageQuotient(trainingReflectances)
 
     shape, image, trainsegmentation, testsegmentation = csvImageReader.csvMultiSpectralImageReader(dataFolder + imageToLoad)
-    image        = mch.normalizeImageQuotient(image)
+    #discard last wavelength
+    image = np.delete(image, -1, axis=1)
+    image = mch.normalizeImageQuotient(image)
 
     return trainingParameters, trainingReflectances, shape, image, trainsegmentation, testsegmentation
 

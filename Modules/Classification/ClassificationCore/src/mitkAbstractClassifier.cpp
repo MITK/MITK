@@ -58,7 +58,7 @@ bool mitk::AbstractClassifier::SupportsPointWiseWeight()
   return false;
 }
 
-bool mitk::AbstractClassifier::SupportsPointWiseProbability()
+bool mitk::AbstractClassifier::SupportsPointWiseProba()
 {
   return false;
 }

@@ -64,7 +64,7 @@ namespace mitk
     /// @param X, The input samples.
     /// @return The predicted probabilities for a class. X matrix of shape = [n_samples, n_classes]
     ///
-    virtual MatrixType PredictProba(const MatrixType &/*X*/) {return MatrixType(0,0);};
+    virtual MatrixType PredictProba(const MatrixType &/*X*/) {return MatrixType(0,0);}
 
     ///
     /// @brief SetConfiguration, handing over classifier custom configurations
@@ -121,7 +121,7 @@ namespace mitk
     /// @brief SupportsPointWiseProbability
     /// @return True if the classifier supports pointwise class probability calculation else false
     ///
-    virtual bool SupportsPointWiseProbability();
+    virtual bool SupportsPointWiseProba();
 
     virtual void SetRequestedRegionToLargestPossibleRegion(){}
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion(){return true;}

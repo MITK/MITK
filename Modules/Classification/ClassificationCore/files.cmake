@@ -8,6 +8,8 @@ set(CPP_FILES
 
   Transformer/mitkEigenToImageTransform.cpp
   Transformer/mitkImageToEigenTransform.cpp
+
+  Features/itkNeighborhoodFunctorImageFilter.cpp
 )
 
 set( TOOL_FILES

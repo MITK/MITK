@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // STD Includes
 
+// MITK includes
+#include <mitkConfigurationHolder.h>
+
 namespace mitk
 {
   class MITKCLASSIFICATIONCORE_EXPORT AbstractClassifier : public BaseData
@@ -56,23 +59,26 @@ namespace mitk
     ///
     virtual VectorType Predict(const MatrixType &X) = 0;
 
-//    ///
-//    /// @brief SetConfiguration, handing over classifier custom configurations
-//    /// @param conf
-//    ///
-//    void SetConfiguration(const ConfigurationHolder& conf);
+    ///
+    /// @brief SetConfiguration, handing over classifier custom configurations
+    /// @param conf
+    /// @deprecated Use base data propertylist
+    ///
+    DEPRECATED(void SetConfiguration(const ConfigurationHolder& conf));
 
-//    ///
-//    /// @brief Configuration
-//    /// @return none-const refernce to the custom configuration
-//    ///
-//    ConfigurationHolder& Configuration();
+    ///
+    /// @brief Configuration
+    /// @return none-const refernce to the custom configuration
+    /// @deprecated Use base data propertylist
+    ///
+    DEPRECATED(ConfigurationHolder& Configuration());
 
-//    ///
-//    /// @brief GetConfigurationCopy
-//    /// @return Create and return a deep copy of the configuration
-//    ///
-//    ConfigurationHolder GetConfigurationCopy();
+    ///
+    /// @brief GetConfigurationCopy
+    /// @return Create and return a deep copy of the configuration
+    /// @deprecated Use base data propertylist
+    ///
+    DEPRECATED(ConfigurationHolder GetConfigurationCopy());
 
     ///
     /// @brief SetPointWiseWeight
@@ -108,20 +114,15 @@ namespace mitk
     VectorType& PointWeight();
 
   private:
-// this pragma ignores the following warning:
-// warning C4251: 'mitk::Particle::pos' : class   'ATL::CStringT'   needs to have dll-interface to be used   by clients of class 'Particle'
-#ifdef _MSC_VER
-  #pragma warning(push)
-  #pragma warning(disable: 4251)
-#endif
+    ///
+    /// @brief m_Config
+    /// @deprecated Use base data propertylist
+    ///
+    DEPRECATED(ConfigurationHolder m_Config);
 
-//    ConfigurationHolder m_Config;
     VectorType m_PointWiseWeight;
     bool m_UsePointWiseWeight;
 
-#ifdef _MSC_VER
- #pragma warning(pop)
-#endif
   };
 }
 

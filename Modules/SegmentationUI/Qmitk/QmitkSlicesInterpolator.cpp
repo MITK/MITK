@@ -147,7 +147,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(SURFACE_COLOR_RGB) );
   m_InterpolatedSurfaceNode->SetProperty( "name", mitk::StringProperty::New("Surface Interpolation feedback") );
   m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
-  m_InterpolatedSurfaceNode->SetProperty( "line width", mitk::IntProperty::New(4) );
+  m_InterpolatedSurfaceNode->SetProperty( "line width", mitk::FloatProperty::New(4.0f) );
   m_InterpolatedSurfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
   m_InterpolatedSurfaceNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
   m_InterpolatedSurfaceNode->SetVisibility(false);

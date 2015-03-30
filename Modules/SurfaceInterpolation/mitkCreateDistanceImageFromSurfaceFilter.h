@@ -23,22 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 #include "mitkProgressBar.h"
 
-#include "vtkSmartPointer.h"
-#include "vtkDoubleArray.h"
-#include "vtkCellArray.h"
-#include "vtkCellData.h"
-#include "vtkPolyData.h"
-
-#include "vnl/vnl_matrix.h"
-#include "vnl/vnl_vector.h"
 #include "vnl/vnl_vector_fixed.h"
-#include "vnl/algo/vnl_qr.h"
 
 #include "itkImageBase.h"
-#include "itkImageRegionIteratorWithIndex.h"
-#include "itkNeighborhoodIterator.h"
-
-#include <queue>
 
 #include <Eigen/Dense>
 
@@ -81,8 +68,6 @@ namespace mitk {
 
     typedef itk::Image<double, 3> DistanceImageType;
     typedef DistanceImageType::IndexType IndexType;
-    typedef itk::ImageRegionIteratorWithIndex<DistanceImageType> ImageIterator;
-    typedef itk::NeighborhoodIterator<DistanceImageType> NeighborhoodImageIterator;
 
     typedef std::vector< PointType > NormalList;
     typedef std::vector< PointType > CenterList;
@@ -170,8 +155,6 @@ namespace mitk {
                           DistanceImageType::IndexType &minPointInIndexCoordinates,
                           DistanceImageType::IndexType &maxPointInIndexCoordinates );
 
-
-    void FillImageRegion(DistanceImageType::RegionType reqRegion, DistanceImageType::PixelType pixelValue, DistanceImageType::Pointer image);
 
     void PreprocessContourPoints();
     void CreateEmptyDistanceImage();

@@ -17,6 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
 #include "mitkImageCast.h"
 
+#include "vtkSmartPointer.h"
+#include "vtkDoubleArray.h"
+#include "vtkCellArray.h"
+#include "vtkCellData.h"
+#include "vtkPolyData.h"
+
+#include "itkImageRegionIteratorWithIndex.h"
+#include "itkNeighborhoodIterator.h"
+
+#include <queue>
+
 void mitk::CreateDistanceImageFromSurfaceFilter::CreateEmptyDistanceImage()
 {
   // Determine the bounds of the input points in index- and world-coordinates
@@ -45,9 +56,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateEmptyDistanceImage()
   */
   double basis = (extentMM[0]*extentMM[1]*extentMM[2]) / m_DistanceImageVolume;
   double exponent = 1.0/3.0;
-  double distImgSpacing = pow(basis, exponent);
-  m_DistanceImageSpacing = distImgSpacing;
-
+  m_DistanceImageSpacing = pow(basis, exponent);
 
   // calculate the number of pixels of the distance image for each direction
   unsigned int numberOfXPixel = extentMM[0] / m_DistanceImageSpacing;
@@ -290,6 +299,10 @@ void mitk::CreateDistanceImageFromSurfaceFilter::FillDistanceImage()
   *
   * This is done until the narrowband_point_list is empty.
   */
+
+  typedef itk::ImageRegionIteratorWithIndex<DistanceImageType> ImageIterator;
+  typedef itk::NeighborhoodIterator<DistanceImageType> NeighborhoodImageIterator;
+
   std::queue<DistanceImageType::IndexType> narrowbandPoints;
   PointType currentPoint = m_Centers.at(0);
   double distance = this->CalculateDistanceValue(currentPoint);
@@ -407,20 +420,6 @@ void mitk::CreateDistanceImageFromSurfaceFilter::FillDistanceImage()
   // that is our output.
   CastToMitkImage(m_DistanceImageITK, resultImage);
 }
-
-void mitk::CreateDistanceImageFromSurfaceFilter::FillImageRegion(DistanceImageType::RegionType reqRegion,
-                                                                 DistanceImageType::PixelType pixelValue, DistanceImageType::Pointer image)
-{
-  image->SetRequestedRegion(reqRegion);
-  ImageIterator it (image, image->GetRequestedRegion());
-  while (!it.IsAtEnd())
-  {
-    it.Set(pixelValue);
-    ++it;
-  }
-
-}
-
 
 double mitk::CreateDistanceImageFromSurfaceFilter::CalculateDistanceValue(PointType p)
 {

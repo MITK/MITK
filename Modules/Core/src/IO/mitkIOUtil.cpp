@@ -666,7 +666,9 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
       }
       else
       {
-        errMsg += "No reader available for '" + loadInfo.m_Path + "'\n";
+        // TODO ism temporary switch off. may be need warn when non image loading
+        //errMsg += "No reader available for '" + loadInfo.m_Path + "'\n";
+        MITK_ERROR << "No reader available for '" + loadInfo.m_Path + "'\n";
       }
       continue;
     }

@@ -17,6 +17,93 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
 #include "mitkImageCast.h"
 
+void mitk::CreateDistanceImageFromSurfaceFilter::CreateEmptyDistanceImage()
+{
+  // Determine the bounds of the input points in index- and world-coordinates
+  DistanceImageType::PointType minPointInWorldCoordinates, maxPointInWorldCoordinates;
+  DistanceImageType::IndexType minPointInIndexCoordinates, maxPointInIndexCoordinates;
+
+  DetermineBounds( minPointInWorldCoordinates, maxPointInWorldCoordinates,
+                   minPointInIndexCoordinates, maxPointInIndexCoordinates );
+
+
+  // Calculate the extent of the region that contains all given points in MM.
+  // To do this, we take the difference between the maximal and minimal
+  // index-coordinates (must not be less than 1) and multiply it with the
+  // spacing of the reference-image.
+  Vector3D extentMM;
+  for (unsigned int dim = 0; dim < 3; ++dim)
+  {
+    extentMM[dim] = (int)
+      (
+                    (std::max( std::abs(maxPointInIndexCoordinates[dim] - minPointInIndexCoordinates[dim]),
+                              (DistanceImageType::IndexType::IndexValueType) 1
+                            ) + 1.0) // (max-index - min-index)+1 because the pixels between index 3 and 5 cover 2+1=3 pixels (pixel 3,4, and 5)
+                    * m_ReferenceImage->GetSpacing()[dim]
+      ) + 1; // (int) ((...) + 1) -> we round up to the next BIGGER int value
+  }
+
+  /*
+  * Now create an empty distance image. The create image will always have the same sizeOfRegion, independent from
+  * the original image (e.g. always consists of 500000 pixels) and will have an isotropic spacing.
+  * The spacing is calculated like the following:
+  * The image's volume = 500000 Pixels = extentX*spacing*extentY*spacing*extentZ*spacing
+  * So the spacing is: spacing = ( 500000 / extentX*extentY*extentZ )^(1/3)
+  */
+  double basis = (extentMM[0]*extentMM[1]*extentMM[2]) / m_DistanceImageVolume;
+  double exponent = 1.0/3.0;
+  double distImgSpacing = pow(basis, exponent);
+  int tempSpacing = (distImgSpacing+0.05)*10;
+  m_DistanceImageSpacing = (double)tempSpacing/10.0;
+
+  // calculate the number of pixels of the distance image for each direction
+  unsigned int numberOfXPixel = extentMM[0] / m_DistanceImageSpacing;
+  unsigned int numberOfYPixel = extentMM[1] / m_DistanceImageSpacing;
+  unsigned int numberOfZPixel = extentMM[2] / m_DistanceImageSpacing;
+
+  // We increase the sizeOfRegion by 4 as we decrease the origin by 2 later.
+  // This expansion of the region is necessary to achieve a complete
+  // interpolation.
+  DistanceImageType::SizeType sizeOfRegion;
+  sizeOfRegion[0] = numberOfXPixel + 4;
+  sizeOfRegion[1] = numberOfYPixel + 4;
+  sizeOfRegion[2] = numberOfZPixel + 4;
+
+  // The region starts at index 0,0,0
+  DistanceImageType::IndexType initialOriginAsIndex;
+  initialOriginAsIndex.Fill(0);
+
+  DistanceImageType::PointType originAsWorld = minPointInWorldCoordinates;
+
+  DistanceImageType::RegionType lpRegion;
+  lpRegion.SetSize(sizeOfRegion);
+  lpRegion.SetIndex(initialOriginAsIndex);
+MITK_INFO << "ASDF";
+  // We initialize the itk::Image with
+  //  * origin and direction to have it correctly placed and rotated in the world
+  //  * the largest possible region to set the extent to be calculated
+  //  * the isotropic spacing that we have calculated above
+  m_DistanceImageITK = DistanceImageType::New();
+  m_DistanceImageITK->SetOrigin( originAsWorld );
+  m_DistanceImageITK->SetDirection( m_ReferenceImage->GetDirection() );
+  m_DistanceImageITK->SetRegions( lpRegion );
+  m_DistanceImageITK->SetSpacing( m_DistanceImageSpacing );
+  m_DistanceImageITK->Allocate();
+
+  //First of all the image is initialized with the value 10 for each pixel
+  m_DistanceImageITK->FillBuffer(10*m_DistanceImageSpacing);
+
+  // Now we move the origin of the distanceImage 2 index-Coordinates
+  // in all directions
+  DistanceImageType::IndexType originAsIndex;
+  m_DistanceImageITK->TransformPhysicalPointToIndex( originAsWorld, originAsIndex );
+  originAsIndex[0] -= 2;
+  originAsIndex[1] -= 2;
+  originAsIndex[2] -= 2;
+  m_DistanceImageITK->TransformIndexToPhysicalPoint( originAsIndex, originAsWorld );
+  m_DistanceImageITK->SetOrigin( originAsWorld );
+}
+
 mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImageFromSurfaceFilter()
 {
   m_DistanceImageVolume = 50000;
@@ -34,6 +121,9 @@ mitk::CreateDistanceImageFromSurfaceFilter::~CreateDistanceImageFromSurfaceFilte
 
 void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
 {
+  this->PreprocessContourPoints();
+  this->CreateEmptyDistanceImage();
+
   //First of all we have to build the equation-system from the existing contour-edge-points
   this->CreateSolutionMatrixAndFunctionValues();
 
@@ -46,7 +136,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
     mitk::ProgressBar::GetInstance()->Progress(2);
 
   //The last step is to create the distance map with the interpolated distance function
-  this->CreateDistanceImage();
+  this->FillDistanceImage();
 
   if (this->m_UseProgressBar)
     mitk::ProgressBar::GetInstance()->Progress(2);
@@ -55,7 +145,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
   m_Normals.clear();
 }
 
-void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunctionValues()
+void mitk::CreateDistanceImageFromSurfaceFilter::PreprocessContourPoints()
 {
   unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
 
@@ -125,7 +215,10 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
       }//end for all points
     }//end for all cells
   }//end for all outputs
+}
 
+void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunctionValues()
+{
   //For we can now calculate the exact size of the centers we initialize the data structures
   unsigned int numberOfCenters = m_Centers.size();
   m_Centers.reserve(numberOfCenters*3);
@@ -134,19 +227,22 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
 
   m_FunctionValues.fill(0);
 
+  PointType currentPoint;
+  PointType normal;
+
   //Create inner points
   for (unsigned int i = 0; i < numberOfCenters; i++)
   {
     currentPoint = m_Centers.at(i);
     normal = m_Normals.at(i);
 
-    currentPoint[0] = currentPoint[0] - normal[0];
-    currentPoint[1] = currentPoint[1] - normal[1];
-    currentPoint[2] = currentPoint[2] - normal[2];
+    currentPoint[0] = currentPoint[0] - normal[0]*m_DistanceImageSpacing;
+    currentPoint[1] = currentPoint[1] - normal[1]*m_DistanceImageSpacing;
+    currentPoint[2] = currentPoint[2] - normal[2]*m_DistanceImageSpacing;
 
     m_Centers.push_back(currentPoint);
 
-    m_FunctionValues[numberOfCenters+i] = -1;
+    m_FunctionValues[numberOfCenters+i] = -m_DistanceImageSpacing;
   }
 
   //Create outer points
@@ -155,13 +251,13 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
     currentPoint = m_Centers.at(i);
     normal = m_Normals.at(i);
 
-    currentPoint[0] = currentPoint[0] + normal[0];
-    currentPoint[1] = currentPoint[1] + normal[1];
-    currentPoint[2] = currentPoint[2] + normal[2];
+    currentPoint[0] = currentPoint[0] + normal[0]*m_DistanceImageSpacing;
+    currentPoint[1] = currentPoint[1] + normal[1]*m_DistanceImageSpacing;
+    currentPoint[2] = currentPoint[2] + normal[2]*m_DistanceImageSpacing;
 
     m_Centers.push_back(currentPoint);
 
-    m_FunctionValues[numberOfCenters*2+i] = 1;
+    m_FunctionValues[numberOfCenters*2+i] = m_DistanceImageSpacing;
   }
 
   //Now we have created all centers and all function values. Next step is to create the solution matrix
@@ -189,93 +285,8 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
   }
 }
 
-void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
+void mitk::CreateDistanceImageFromSurfaceFilter::FillDistanceImage()
 {
-  DistanceImageType::Pointer distanceImg = DistanceImageType::New();
-
-  // Determine the bounds of the input points in index- and world-coordinates
-  DistanceImageType::PointType minPointInWorldCoordinates, maxPointInWorldCoordinates;
-  DistanceImageType::IndexType minPointInIndexCoordinates, maxPointInIndexCoordinates;
-
-  DetermineBounds( minPointInWorldCoordinates, maxPointInWorldCoordinates,
-                   minPointInIndexCoordinates, maxPointInIndexCoordinates );
-
-
-  // Calculate the extent of the region that contains all given points in MM.
-  // To do this, we take the difference between the maximal and minimal
-  // index-coordinates (must not be less than 1) and multiply it with the
-  // spacing of the reference-image.
-  Vector3D extentMM;
-  for (unsigned int dim = 0; dim < 3; ++dim)
-  {
-    extentMM[dim] = (int)
-      (
-                    (std::max( std::abs(maxPointInIndexCoordinates[dim] - minPointInIndexCoordinates[dim]),
-                              (DistanceImageType::IndexType::IndexValueType) 1
-                            ) + 1.0) // (max-index - min-index)+1 because the pixels between index 3 and 5 cover 2+1=3 pixels (pixel 3,4, and 5)
-                    * m_ReferenceImage->GetSpacing()[dim]
-      ) + 1; // (int) ((...) + 1) -> we round up to the next BIGGER int value
-  }
-
-  /*
-  * Now create an empty distance image. The create image will always have the same sizeOfRegion, independent from
-  * the original image (e.g. always consists of 500000 pixels) and will have an isotropic spacing.
-  * The spacing is calculated like the following:
-  * The image's volume = 500000 Pixels = extentX*spacing*extentY*spacing*extentZ*spacing
-  * So the spacing is: spacing = ( 500000 / extentX*extentY*extentZ )^(1/3)
-  */
-  double basis = (extentMM[0]*extentMM[1]*extentMM[2]) / m_DistanceImageVolume;
-  double exponent = 1.0/3.0;
-  double distImgSpacing = pow(basis, exponent);
-  int tempSpacing = (distImgSpacing+0.05)*10;
-  m_DistanceImageSpacing = (double)tempSpacing/10.0;
-
-  // calculate the number of pixels of the distance image for each direction
-  unsigned int numberOfXPixel = extentMM[0] / m_DistanceImageSpacing;
-  unsigned int numberOfYPixel = extentMM[1] / m_DistanceImageSpacing;
-  unsigned int numberOfZPixel = extentMM[2] / m_DistanceImageSpacing;
-
-  // We increase the sizeOfRegion by 4 as we decrease the origin by 2 later.
-  // This expansion of the region is necessary to achieve a complete
-  // interpolation.
-  DistanceImageType::SizeType sizeOfRegion;
-  sizeOfRegion[0] = numberOfXPixel + 4;
-  sizeOfRegion[1] = numberOfYPixel + 4;
-  sizeOfRegion[2] = numberOfZPixel + 4;
-
-  // The region starts at index 0,0,0
-  DistanceImageType::IndexType initialOriginAsIndex;
-  initialOriginAsIndex.Fill(0);
-
-  DistanceImageType::PointType originAsWorld = minPointInWorldCoordinates;
-
-  DistanceImageType::RegionType lpRegion;
-  lpRegion.SetSize(sizeOfRegion);
-  lpRegion.SetIndex(initialOriginAsIndex);
-
-  // We initialize the itk::Image with
-  //  * origin and direction to have it correctly placed and rotated in the world
-  //  * the largest possible region to set the extent to be calculated
-  //  * the isotropic spacing that we have calculated above
-  distanceImg->SetOrigin( originAsWorld );
-  distanceImg->SetDirection( m_ReferenceImage->GetDirection() );
-  distanceImg->SetRegions( lpRegion );
-  distanceImg->SetSpacing( m_DistanceImageSpacing );
-  distanceImg->Allocate();
-
-  //First of all the image is initialized with the value 10 for each pixel
-  distanceImg->FillBuffer(10);
-
-  // Now we move the origin of the distanceImage 2 index-Coordinates
-  // in all directions
-  DistanceImageType::IndexType originAsIndex;
-  distanceImg->TransformPhysicalPointToIndex( originAsWorld, originAsIndex );
-  originAsIndex[0] -= 2;
-  originAsIndex[1] -= 2;
-  originAsIndex[2] -= 2;
-  distanceImg->TransformIndexToPhysicalPoint( originAsIndex, originAsWorld );
-  distanceImg->SetOrigin( originAsWorld );
-
   /*
   * Now we must calculate the distance for each pixel. But instead of calculating the distance value
   * for all of the image's pixels we proceed similar to the region growing algorithm:
@@ -289,6 +300,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   std::queue<DistanceImageType::IndexType> narrowbandPoints;
   PointType currentPoint = m_Centers.at(0);
   double distance = this->CalculateDistanceValue(currentPoint);
+  MITK_INFO<<"Distance: "<<distance;
 
   // create itk::Point from vnl_vector
   DistanceImageType::PointType currentPointAsPoint;
@@ -298,16 +310,16 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 
   // Transform the input point in world-coordinates to index-coordinates
   DistanceImageType::IndexType currentIndex;
-  distanceImg->TransformPhysicalPointToIndex( currentPointAsPoint, currentIndex );
+  m_DistanceImageITK->TransformPhysicalPointToIndex( currentPointAsPoint, currentIndex );
 
-  assert( lpRegion.IsInside(currentIndex) ); // we are quite certain this should hold
+  assert( m_DistanceImageITK->GetLargestPossibleRegion().IsInside(currentIndex) ); // we are quite certain this should hold
 
   narrowbandPoints.push(currentIndex);
-  distanceImg->SetPixel(currentIndex, distance);
+  m_DistanceImageITK->SetPixel(currentIndex, distance);
 
   NeighborhoodImageIterator::RadiusType radius;
   radius.Fill(1);
-  NeighborhoodImageIterator nIt(radius, distanceImg, distanceImg->GetLargestPossibleRegion());
+  NeighborhoodImageIterator nIt(radius, m_DistanceImageITK, m_DistanceImageITK->GetLargestPossibleRegion());
   unsigned int relativeNbIdx[] = {4, 10, 12, 14, 16, 22};
 
   bool isInBounds = false;
@@ -321,13 +333,13 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
     for (int i = 0; i < 6; i++)
     {
       nIt.GetPixel(*relativeNb, isInBounds);
-      if( isInBounds && nIt.GetPixel(*relativeNb) == 10)
+      if( isInBounds && nIt.GetPixel(*relativeNb) == 10*m_DistanceImageSpacing)
       {
         currentIndex = nIt.GetIndex(*relativeNb);
 
         // Transform the currently checked point from index-coordinates to
         // world-coordinates
-        distanceImg->TransformIndexToPhysicalPoint( currentIndex, currentPointAsPoint );
+        m_DistanceImageITK->TransformIndexToPhysicalPoint( currentIndex, currentPointAsPoint );
 
         // create a vnl_vector
         currentPoint[0] = currentPointAsPoint[0];
@@ -336,8 +348,9 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 
         // and check the distance
         distance = this->CalculateDistanceValue(currentPoint);
-        if ( (std::fabs(distance)) <= m_DistanceImageSpacing )
-        if ( std::fabs(distance) <= m_DistanceImageSpacing*2 )
+//        MITK_INFO<<"Point: ["<<currentPoint[0]<<","<<currentPoint[1]<<","<<currentPoint[2]<<"]";
+//        MITK_INFO<<"distance: "<<distance<<" spacing: "<<m_DistanceImageSpacing;
+        if ( std::fabs(distance) <= m_DistanceImageSpacing )
         {
           nIt.SetPixel(*relativeNb, distance);
           narrowbandPoints.push(currentIndex);
@@ -348,36 +361,36 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   }
 
 
-  ImageIterator imgRegionIterator (distanceImg, distanceImg->GetLargestPossibleRegion());
+  ImageIterator imgRegionIterator (m_DistanceImageITK, m_DistanceImageITK->GetLargestPossibleRegion());
   imgRegionIterator.GoToBegin();
 
   double prevPixelVal = 1;
 
   DistanceImageType::IndexType _size;
   _size.Fill(-1);
-  _size += sizeOfRegion;
+  _size += m_DistanceImageITK->GetLargestPossibleRegion().GetSize();
 
   //Set every pixel inside the surface to -10 except the edge point (so that the received surface is closed)
   while (!imgRegionIterator.IsAtEnd()) {
 
-    if ( imgRegionIterator.Get() == 10 && prevPixelVal < 0 )
+    if ( imgRegionIterator.Get() == 10*m_DistanceImageSpacing && prevPixelVal < 0 )
     {
 
-      while (imgRegionIterator.Get() == 10)
+      while (imgRegionIterator.Get() == 10*m_DistanceImageSpacing)
       {
         if (imgRegionIterator.GetIndex()[0] == _size[0] || imgRegionIterator.GetIndex()[1] == _size[1] || imgRegionIterator.GetIndex()[2] == _size[2]
             || imgRegionIterator.GetIndex()[0] == 0U || imgRegionIterator.GetIndex()[1] == 0U || imgRegionIterator.GetIndex()[2] == 0U )
         {
-          imgRegionIterator.Set(10);
-          prevPixelVal = 10;
+          imgRegionIterator.Set(10*m_DistanceImageSpacing);
+          prevPixelVal = 10*m_DistanceImageSpacing;
           ++imgRegionIterator;
           break;
         }
         else
         {
-          imgRegionIterator.Set(-10);
+          imgRegionIterator.Set(-10*m_DistanceImageSpacing);
           ++imgRegionIterator;
-          prevPixelVal = -10;
+          prevPixelVal = -10*m_DistanceImageSpacing;
         }
 
       }
@@ -387,8 +400,8 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
              || imgRegionIterator.GetIndex()[0] == 0U || imgRegionIterator.GetIndex()[1] == 0U || imgRegionIterator.GetIndex()[2] == 0U)
 
     {
-      imgRegionIterator.Set(10);
-      prevPixelVal = 10;
+      imgRegionIterator.Set(10*m_DistanceImageSpacing);
+      prevPixelVal = 10*m_DistanceImageSpacing;
       ++imgRegionIterator;
     }
     else
@@ -402,7 +415,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 
   // Cast the created distance-Image from itk::Image to the mitk::Image
   // that is our output.
-  CastToMitkImage(distanceImg, resultImage);
+  CastToMitkImage(m_DistanceImageITK, resultImage);
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::FillImageRegion(DistanceImageType::RegionType reqRegion,
@@ -436,9 +449,12 @@ double mitk::CreateDistanceImageFromSurfaceFilter::CalculateDistanceValue(PointT
     p1 = *centerIter;
     p2 = p-p1;
     norm = p2.two_norm();
+//    MITK_INFO<<"Old distance: "<<distanceValue<<" ADD: "<<(norm * m_Weights[count]);
     distanceValue = distanceValue + (norm * m_Weights[count]);
+//    MITK_INFO<<"New distance: "<<distanceValue;
     ++count;
   }
+//  MITK_INFO<<"Final distance: "<<distanceValue;
   return distanceValue;
 }
 

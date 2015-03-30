@@ -149,7 +149,7 @@ namespace mitk {
     void CreateSolutionMatrixAndFunctionValues();
     double CalculateDistanceValue(PointType p);
 
-    void CreateDistanceImage ();
+    void FillDistanceImage ();
 
     /**
     * \brief This method fills the given variables with the minimum and
@@ -173,6 +173,9 @@ namespace mitk {
 
     void FillImageRegion(DistanceImageType::RegionType reqRegion, DistanceImageType::PixelType pixelValue, DistanceImageType::Pointer image);
 
+    void PreprocessContourPoints();
+    void CreateEmptyDistanceImage();
+
     //Datastructures for the interpolation
     CenterList m_Centers;
     NormalList m_Normals;
@@ -182,6 +185,7 @@ namespace mitk {
     Eigen::VectorXd m_Weights;
 
     double m_DistanceImageSpacing;
+    DistanceImageType::Pointer m_DistanceImageITK;
 
     itk::ImageBase<3>::Pointer m_ReferenceImage;
 
@@ -189,7 +193,7 @@ namespace mitk {
 
     bool m_UseProgressBar;
     unsigned int m_ProgressStepSize;
-};
+  };
 
 }//namespace
 

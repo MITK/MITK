@@ -2,7 +2,7 @@ set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
-# See http://cmake.org/cmake/help/cmake-2-8-docs.html#section_Policies for details
+# See http://www.cmake.org/cmake/help/v3.2/manual/cmake-policies.7.html for details
 #-----------------------------------------------------------------------------
 
 set(project_policies )
@@ -91,14 +91,14 @@ endif()
 #-----------------------------------------------------------------------------
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  # require at least gcc 4.6 as provided by Ubuntu 12.04
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.6)
-    message(FATAL_ERROR "GCC version must be at least 4.6")
+  # require at least gcc 4.7.3 as provided by ppa:ubuntu-toolchain-r/test for Ubuntu 12.04
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7.3)
+    message(FATAL_ERROR "GCC version must be at least 4.7.3")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  # require at least clang 3.2 for correct RTTI handling and C++11 support
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.2)
-    message(FATAL_ERROR "Clang version must be at least 3.2")
+  # require at least clang 3.4 as provided by Ubuntu 12.04
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.4)
+    message(FATAL_ERROR "Clang version must be at least 3.4")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
   # require at least clang 5.0
@@ -106,9 +106,14 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     message(FATAL_ERROR "Apple Clang version must be at least 5.0")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  # TODO: require at least Visual Studio 2012
+  # TODO: if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)
+  # TODO:   message(FATAL_ERROR "Microsoft Visual Studio 2012 Update 4 or newer required (MSVC 17.0.61030.0)")
+  # TODO: endif()
+
   # require at least Visual Studio 2010 (msvc ...)
   if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16)
-    message(FATAL_ERROR "Micorsoft Visual Studio 2010 or newer required (MSVC 16.0)")
+    message(FATAL_ERROR "Microsoft Visual Studio 2010 or newer required (MSVC 16.0)")
   endif()
 else()
   message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
@@ -327,17 +332,6 @@ if(MITK_USE_Boost)
 endif()
 
 if(MITK_USE_SOFA)
-  # SOFA requires at least CMake 2.8.8
-  set(SOFA_CMAKE_VERSION 2.8.8)
-  if(${CMAKE_VERSION} VERSION_LESS ${SOFA_CMAKE_VERSION})
-    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
-    message(WARNING "Switched off MITK_USE_SOFA\n  Minimum required CMake version: ${SOFA_CMAKE_VERSION}\n  Installed CMake version: ${CMAKE_VERSION}")
-  endif()
-  # SOFA/ITK combination requires at least MSVC 2010
-  if(MSVC_VERSION AND MSVC_VERSION LESS 1600)
-    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
-    message(WARNING "Switched off MITK_USE_SOFA\n  MSVC versions less than 2010 are not supported.")
-  endif()
   # SOFA requires boost library
   if(MITK_USE_SOFA AND NOT MITK_USE_Boost)
     message("> Forcing MITK_USE_Boost to ON because of MITK_USE_SOFA")
@@ -566,7 +560,27 @@ include(mitkMacroConfigureItkPixelTypes)
 
 # Required and enabled C++11 features for all MITK code.
 # These are added as PUBLIC compile features to all MITK modules.
-set(MITK_CXX_FEATURES cxx_auto_type cxx_nullptr cxx_override)
+set(MITK_CXX_FEATURES
+  cxx_auto_type
+  cxx_decltype
+  cxx_enum_forward_declarations
+  cxx_extended_friend_declarations
+  cxx_extern_templates
+  cxx_final
+  cxx_lambdas
+  cxx_local_type_template_args
+  cxx_long_long_type
+  cxx_nullptr
+  cxx_override
+  cxx_range_for
+  cxx_right_angle_brackets
+  cxx_rvalue_references
+  cxx_static_assert
+  cxx_strong_enums
+  cxx_template_template_parameters
+  cxx_trailing_return_types
+  cxx_variadic_macros
+)
 
 if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
   # We can't do this yet because the CTK Plugin Framework
@@ -748,12 +762,8 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-  # With older version of gcc supporting the flag -fstack-protector-all, an extra dependency to libssp.so
-  # is introduced. If gcc is smaller than 4.4.0 and the build type is Release let's not include the flag.
-  # Doing so should allow to build package made for distribution using older linux distro.
-  if(${GCC_VERSION} VERSION_GREATER "4.4.0" OR (CMAKE_BUILD_TYPE STREQUAL "Debug" AND ${GCC_VERSION} VERSION_LESS "4.4.0"))
-    mitkFunctionCheckCAndCXXCompilerFlags("-fstack-protector-all" MITK_C_FLAGS MITK_CXX_FLAGS)
-  endif()
+  mitkFunctionCheckCAndCXXCompilerFlags("-fstack-protector-all" MITK_C_FLAGS MITK_CXX_FLAGS)
+
   if(MINGW)
     # suppress warnings about auto imported symbols
     set(MITK_SHARED_LINKER_FLAGS "-Wl,--enable-auto-import ${MITK_SHARED_LINKER_FLAGS}")

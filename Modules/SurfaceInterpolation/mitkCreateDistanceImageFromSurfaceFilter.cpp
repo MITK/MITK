@@ -67,9 +67,9 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateEmptyDistanceImage()
   // This expansion of the region is necessary to achieve a complete
   // interpolation.
   DistanceImageType::SizeType sizeOfRegion;
-  sizeOfRegion[0] = numberOfXPixel + 4;
-  sizeOfRegion[1] = numberOfYPixel + 4;
-  sizeOfRegion[2] = numberOfZPixel + 4;
+  sizeOfRegion[0] = numberOfXPixel + 8;
+  sizeOfRegion[1] = numberOfYPixel + 8;
+  sizeOfRegion[2] = numberOfZPixel + 8;
 
   // The region starts at index 0,0,0
   DistanceImageType::IndexType initialOriginAsIndex;
@@ -560,16 +560,16 @@ void mitk::CreateDistanceImageFromSurfaceFilter::DetermineBounds( DistanceImageT
   tmpPoint[2] = firstCenter[2];
 
   // transform the first point from world-coordinates to index-coordinates
-  DistanceImageType::IndexType tmpIndex;
-  m_ReferenceImage->TransformPhysicalPointToIndex( tmpPoint, tmpIndex );
+  itk::ContinuousIndex<double, 3> tmpIndex;
+  m_ReferenceImage->TransformPhysicalPointToContinuousIndex( tmpPoint, tmpIndex );
 
   // initialize the variables with this first point
-  int xmin = tmpIndex[0];
-  int ymin = tmpIndex[1];
-  int zmin = tmpIndex[2];
-  int xmax = tmpIndex[0];
-  int ymax = tmpIndex[1];
-  int zmax = tmpIndex[2];
+  DistanceImageType::IndexValueType xmin = tmpIndex[0];
+  DistanceImageType::IndexValueType ymin = tmpIndex[1];
+  DistanceImageType::IndexValueType zmin = tmpIndex[2];
+  DistanceImageType::IndexValueType xmax = tmpIndex[0];
+  DistanceImageType::IndexValueType ymax = tmpIndex[1];
+  DistanceImageType::IndexValueType zmax = tmpIndex[2];
 
   // iterate over the rest of the points
   CenterList::iterator centerIter = m_Centers.begin();
@@ -579,8 +579,9 @@ void mitk::CreateDistanceImageFromSurfaceFilter::DetermineBounds( DistanceImageT
     tmpPoint[1] = (*centerIter)[1];
     tmpPoint[2] = (*centerIter)[2];
 
+
     // transform each point from world-coordinates to index-coordinates
-    m_ReferenceImage->TransformPhysicalPointToIndex( tmpPoint, tmpIndex );
+    m_ReferenceImage->TransformPhysicalPointToContinuousIndex( tmpPoint, tmpIndex );
 
     // and set the variables accordingly to find the minimum
     // and maximum in all directions in index-coordinates

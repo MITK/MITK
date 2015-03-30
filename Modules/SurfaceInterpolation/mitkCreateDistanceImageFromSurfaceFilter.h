@@ -167,11 +167,11 @@ namespace mitk {
     Eigen::VectorXd m_FunctionValues;
     Eigen::VectorXd m_Weights;
 
-    double m_DistanceImageSpacing;
     DistanceImageType::Pointer m_DistanceImageITK;
-
     itk::ImageBase<3>::Pointer m_ReferenceImage;
 
+    double m_DistanceImageSpacing;
+    double m_DistanceImageDefaultBufferValue;
     unsigned int m_DistanceImageVolume;
 
     bool m_UseProgressBar;

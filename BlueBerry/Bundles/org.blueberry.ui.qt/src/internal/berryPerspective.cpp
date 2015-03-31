@@ -44,11 +44,13 @@ Perspective::Perspective(PerspectiveDescriptor::Pointer desc,
     WorkbenchPage::Pointer page)
  : descriptor(desc)
  {
+  this->Register();
   this->Init(page);
   if (desc.IsNotNull())
   {
     this->CreatePresentation(desc);
   }
+  this->UnRegister(false);
 }
 
 Perspective::Perspective(WorkbenchPage::Pointer page)

@@ -12,6 +12,8 @@
   <param name="zoomDirection" value="updown"/>
   <!-- react to an event, even tough is was already processed by a DataInteractor-->
   <param name="alwaysReact" value="false"/>
+  <!-- reverse levelWindow reaction -->
+  <param name="levelWindowDirection" value="updown"/>
   <!-- Crosshair -->
   <event_variant class="MousePressEvent" name="SetCrosshair">
     <attribute name="EventButton" value="LeftMouseButton"/>

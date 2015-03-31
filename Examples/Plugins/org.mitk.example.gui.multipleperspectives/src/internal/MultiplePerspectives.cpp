@@ -45,18 +45,13 @@ public:
     configurer->SetShowPerspectiveBar(true);
     //! [Visibility of perspective bar]
 
-    wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
-    return wwAdvisor.data();
+    return new berry::WorkbenchWindowAdvisor(configurer);
   }
 
   QString GetInitialWindowPerspectiveId()
   {
     return DEFAULT_PERSPECTIVE_ID;
   }
-
-private:
-
-  QScopedPointer<berry::WorkbenchWindowAdvisor> wwAdvisor;
 
 };
 

@@ -37,18 +37,13 @@ public:
     // Set the window title
     configurer->SetTitle("Qt Selection Service");
 
-    wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
-    return wwAdvisor.data();
+    return new berry::WorkbenchWindowAdvisor(configurer);
   }
 
   QString GetInitialWindowPerspectiveId()
   {
     return DEFAULT_PERSPECTIVE_ID;
   }
-
-private:
-
-  QScopedPointer<berry::WorkbenchWindowAdvisor> wwAdvisor;
 
 };
 

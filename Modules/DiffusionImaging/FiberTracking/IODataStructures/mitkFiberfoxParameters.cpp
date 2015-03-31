@@ -749,9 +749,11 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                         reader->SetFileName(filename+"_VOLUME"+ReadVal<string>(v2,"ID","")+".nrrd");
                         reader->Update();
                         signalModel->SetVolumeFractionImage(reader->GetOutput());
+                        MITK_INFO << "Volume fraction image loaded for compartment " << signalModel->m_CompartmentId;
                     }
                     catch(...)
                     {
+                        MITK_INFO << "No volume fraction image found for compartment " << signalModel->m_CompartmentId;
                     }
                 }
             }
@@ -763,10 +765,11 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
         reader->SetFileName(filename+"_FMAP.nrrd");
         reader->Update();
         m_SignalGen.m_FrequencyMap = reader->GetOutput();
+        MITK_INFO << "Frequency map loaded.";
     }
     catch(...)
     {
-        MITK_INFO << "No frequency map saved.";
+        MITK_INFO << "No frequency map found.";
     }
 
     try{
@@ -774,10 +777,11 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
         reader->SetFileName(filename+"_MASK.nrrd");
         reader->Update();
         m_SignalGen.m_MaskImage = reader->GetOutput();
+        MITK_INFO << "Mask image loaded.";
     }
     catch(...)
     {
-        MITK_INFO << "No mask image saved.";
+        MITK_INFO << "No mask image found.";
     }
 
     setlocale(LC_ALL, currLocale.c_str());

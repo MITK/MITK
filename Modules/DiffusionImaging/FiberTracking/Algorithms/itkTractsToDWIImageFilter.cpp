@@ -198,6 +198,13 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
             idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
             idft->SetParameters(m_Parameters);
             idft->SetZ((double)z-(double)images.at(0)->GetLargestPossibleRegion().GetSize(2)/2.0);
+            idft->SetZidx(z);
+            idft->SetFiberBundle(m_FiberBundleWorkingCopy);
+            if (m_Parameters.m_SignalGen.m_DoAddMotion)
+            {
+                idft->SetTranslation(m_Translations.at(g));
+                idft->SetRotation(m_Rotations.at(g));
+            }
             idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
             idft->SetFrequencyMapSlice(fMapSlice);
             idft->SetOutSize(outSize);
@@ -208,6 +215,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 spikeSlice.pop_back();
             }
             idft->SetSpikesPerSlice(numSpikes);
+            //idft->SetNumberOfThreads(1);
             idft->Update();
 
             ComplexSliceType::Pointer fSlice;
@@ -499,6 +507,10 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
     }
 
     // get transform for motion artifacts
+    m_Rotation.Fill(0.0);
+    m_Translation.Fill(0.0);
+    m_Rotations.push_back(m_Rotation);
+    m_Translations.push_back(m_Translation);
     m_Rotation = m_Parameters.m_SignalGen.m_Rotation/m_Parameters.m_SignalGen.GetNumVolumes();
     m_Translation = m_Parameters.m_SignalGen.m_Translation/m_Parameters.m_SignalGen.GetNumVolumes();
 
@@ -1119,6 +1131,17 @@ void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
                     m_TransformedMaskImage->SetPixel(index,100);
                 ++maskIt;
             }
+        }
+
+        if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
+        {
+            m_Rotations.push_back(m_Rotation);
+            m_Translations.push_back(m_Translation);
+        }
+        else
+        {
+            m_Rotations.push_back(m_Rotation*(g+1));
+            m_Translations.push_back(m_Translation*(g+1));
         }
 
         // rotate fibers

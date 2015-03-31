@@ -28,6 +28,7 @@ This file is based heavily on a corresponding ITK filter.
 #include <vector>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <mitkFiberfoxParameters.h>
+#include <mitkFiberBundle.h>
 
 using namespace std;
 
@@ -71,12 +72,18 @@ namespace itk{
     typedef typename Superclass::OutputImageRegionType      OutputImageRegionType;
     typedef itk::Matrix<double, 3, 3>                       MatrixType;
     typedef itk::Point<double,2>                            Point2D;
+    typedef itk::Vector< double,3>                          DoubleVectorType;
+    typedef itk::Image<double, 3>                           ItkDoubleImgType;
 
     itkSetMacro( SpikesPerSlice, unsigned int )     ///< Number of spikes per slice. Corresponding parameter in fiberfox parameter object specifies the number of spikes for the whole image and can thus not be used here.
     itkSetMacro( FrequencyMapSlice, typename InputImageType::Pointer )   ///< Used to simulate distortions. Specifies additional frequency component per voxel.
     itkSetMacro( Z, double )                        ///< Slice position, necessary for eddy current simulation.
     itkSetMacro( OutSize, itk::Size<2> )            ///< Output slice size. Can be different from input size, e.g. if Gibbs ringing is enabled.
     itkSetMacro( UseConstantRandSeed, bool )        ///< Use constant seed for random generator for reproducible results.
+    itkSetMacro( Rotation, DoubleVectorType )
+    itkSetMacro( Translation, DoubleVectorType )
+    itkSetMacro( Zidx, int )
+    itkSetMacro( FiberBundle, FiberBundle::Pointer )
     itkGetMacro( KSpaceImage, typename InputImageType::Pointer )    ///< k-space magnitude image
 
     void SetParameters( FiberfoxParameters<double> param ){ m_Parameters = param; }
@@ -102,9 +109,15 @@ namespace itk{
     vector< InputImagePointerType >         m_CompartmentImages;
     itk::Vector<double,3>                   m_DiffusionGradientDirection;
     double                                  m_Z;
+    int                                     m_Zidx;
     bool                                    m_UseConstantRandSeed;
     unsigned int                            m_SpikesPerSlice;
     itk::Size<2>                            m_OutSize;
+    FiberBundle::Pointer                    m_FiberBundle;
+    double                                  m_Gamma;
+
+    DoubleVectorType                        m_Rotation;     ///< used to find correct point in frequency map (head motion)
+    DoubleVectorType                        m_Translation;  ///< used to find correct point in frequency map (head motion)
 
     bool                                    m_IsBaseline;
     vcl_complex<double>                     m_Spike;

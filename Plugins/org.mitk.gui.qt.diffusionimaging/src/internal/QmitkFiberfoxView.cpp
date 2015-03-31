@@ -1355,10 +1355,25 @@ void QmitkFiberfoxView::LoadParameters()
         else
             signalModel = parameters.m_NonFiberModelList.at(i-parameters.m_FiberModelList.size());
 
+        mitk::DataNode::Pointer compVolNode;
+        if ( signalModel->GetVolumeFractionImage().IsNotNull() )
+        {
+            compVolNode = mitk::DataNode::New();
+            mitk::Image::Pointer image = mitk::Image::New();
+            image->InitializeByItk(signalModel->GetVolumeFractionImage().GetPointer());
+            image->SetVolume(signalModel->GetVolumeFractionImage()->GetBufferPointer());
+
+            compVolNode->SetData( image );
+            compVolNode->SetName("Compartment volume "+QString::number(signalModel->m_CompartmentId).toStdString());
+            GetDataStorage()->Add(compVolNode);
+        }
+
         switch (signalModel->m_CompartmentId)
         {
         case 1:
         {
+            if (compVolNode.IsNotNull())
+                m_Controls->m_Comp1VolumeFraction->SetSelectedNode(compVolNode);
             if (dynamic_cast<mitk::StickModel<>*>(signalModel))
             {
                 mitk::StickModel<>* model = dynamic_cast<mitk::StickModel<>*>(signalModel);
@@ -1394,6 +1409,8 @@ void QmitkFiberfoxView::LoadParameters()
         }
         case 2:
         {
+            if (compVolNode.IsNotNull())
+                m_Controls->m_Comp2VolumeFraction->SetSelectedNode(compVolNode);
             if (dynamic_cast<mitk::StickModel<>*>(signalModel))
             {
                 mitk::StickModel<>* model = dynamic_cast<mitk::StickModel<>*>(signalModel);
@@ -1418,6 +1435,8 @@ void QmitkFiberfoxView::LoadParameters()
         }
         case 3:
         {
+            if (compVolNode.IsNotNull())
+                m_Controls->m_Comp3VolumeFraction->SetSelectedNode(compVolNode);
             if (dynamic_cast<mitk::BallModel<>*>(signalModel))
             {
                 mitk::BallModel<>* model = dynamic_cast<mitk::BallModel<>*>(signalModel);
@@ -1460,6 +1479,8 @@ void QmitkFiberfoxView::LoadParameters()
         }
         case 4:
         {
+            if (compVolNode.IsNotNull())
+                m_Controls->m_Comp4VolumeFraction->SetSelectedNode(compVolNode);
             if (dynamic_cast<mitk::BallModel<>*>(signalModel))
             {
                 mitk::BallModel<>* model = dynamic_cast<mitk::BallModel<>*>(signalModel);
@@ -1501,6 +1522,32 @@ void QmitkFiberfoxView::LoadParameters()
             break;
         }
         }
+    }
+
+    if ( parameters.m_SignalGen.m_MaskImage )
+    {
+        mitk::Image::Pointer image = mitk::Image::New();
+        image->InitializeByItk(parameters.m_SignalGen.m_MaskImage.GetPointer());
+        image->SetVolume(parameters.m_SignalGen.m_MaskImage->GetBufferPointer());
+
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData( image );
+        node->SetName("Tissue mask");
+        GetDataStorage()->Add(node);
+        m_Controls->m_MaskComboBox->SetSelectedNode(node);
+    }
+
+    if ( parameters.m_SignalGen.m_FrequencyMap )
+    {
+        mitk::Image::Pointer image = mitk::Image::New();
+        image->InitializeByItk(parameters.m_SignalGen.m_FrequencyMap.GetPointer());
+        image->SetVolume(parameters.m_SignalGen.m_FrequencyMap->GetBufferPointer());
+
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData( image );
+        node->SetName("Frequency map");
+        GetDataStorage()->Add(node);
+        m_Controls->m_FrequencyMapBox->SetSelectedNode(node);
     }
 }
 

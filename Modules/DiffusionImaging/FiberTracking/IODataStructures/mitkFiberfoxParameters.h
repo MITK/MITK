@@ -73,7 +73,7 @@ public:
         , m_Spikes(0)
         , m_SpikeAmplitude(1)
         , m_KspaceLineOffset(0)
-        , m_EddyStrength(0)
+        , m_EddyStrength(300)
         , m_Tau(70)
         , m_CroppingFactor(1)
         , m_DoAddGibbsRinging(false)

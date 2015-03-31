@@ -73,11 +73,11 @@ void KspaceImageFilter< TPixelType >
     m_KSpaceImage->Allocate();
     m_KSpaceImage->FillBuffer(0.0);
 
-    double gamma = 42576000;    // Gyromagnetic ratio in Hz/T
+    m_Gamma = 42576000;    // Gyromagnetic ratio in Hz/T
     if ( m_Parameters.m_SignalGen.m_EddyStrength>0 && m_DiffusionGradientDirection.GetNorm()>0.001)
     {
         m_DiffusionGradientDirection.Normalize();
-        m_DiffusionGradientDirection = m_DiffusionGradientDirection *  m_Parameters.m_SignalGen.m_EddyStrength/1000 *  gamma;
+        m_DiffusionGradientDirection = m_DiffusionGradientDirection *  m_Parameters.m_SignalGen.m_EddyStrength/1000 *  m_Gamma;
         m_IsBaseline = false;
     }
 
@@ -122,6 +122,7 @@ void KspaceImageFilter< TPixelType >
         kIdx[0] = oit.GetIndex()[0];
         kIdx[1] = oit.GetIndex()[1];
 
+        // partial fourier
         bool pf = false;
         if (kIdx[1]>kyMax*m_Parameters.m_SignalGen.m_PartialFourier)
             pf = true;
@@ -132,6 +133,13 @@ void KspaceImageFilter< TPixelType >
             t = fromMaxEcho + ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
         else
             t = fromMaxEcho + ((double)(kyMax-1-kIdx[1])*kxMax+(double)kIdx[0])*dt;
+
+        // readout time
+        double tall = 0;
+        if (!m_Parameters.m_SignalGen.m_ReversePhase)
+            tall = ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
+        else
+            tall = ((double)(kyMax-1-kIdx[1])*kxMax+(double)kIdx[0])*dt;
 
         // rearrange slice
         if( kIdx[0] <  kxMax/2 )
@@ -144,10 +152,10 @@ void KspaceImageFilter< TPixelType >
         else
             kIdx[1] = kIdx[1] - kyMax/2;
 
-        // calculate eddy current decay factors
+        // calculate eddy current decay factor
         double eddyDecay = 0;
         if ( m_Parameters.m_SignalGen.m_EddyStrength>0)
-            eddyDecay = exp(-( m_Parameters.m_SignalGen.m_tEcho/2 + t)/ m_Parameters.m_SignalGen.m_Tau) * t/1000;
+            eddyDecay = exp(-tall/m_Parameters.m_SignalGen.m_Tau );
 
         // calcualte signal relaxation factors
         std::vector< double > relaxFactor;
@@ -190,15 +198,30 @@ void KspaceImageFilter< TPixelType >
                         f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) *  m_Parameters.m_SignalGen.m_SignalScale );
 
                 // simulate eddy currents and other distortions
-                double omega_t = 0;
+                double omega = 0;   // frequency offset
                 if (  m_Parameters.m_SignalGen.m_EddyStrength>0 && !m_IsBaseline)
                 {
                     itk::Vector< double, 3 > pos; pos[0] = x; pos[1] = y; pos[2] = m_Z;
                     pos = m_Transform*pos/1000;   // vector from image center to current position (in meter)
-                    omega_t += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2])*eddyDecay;
+                    omega += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2]) * eddyDecay;
                 }
-                if (m_FrequencyMapSlice.IsNotNull()) // simulate distortions
-                    omega_t += m_FrequencyMapSlice->GetPixel(it.GetIndex())*t/1000;
+                if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull()) // simulate distortions
+                {
+                    itk::Point<double, 3> point3D;
+                    ItkDoubleImgType::IndexType index; index[0] = it.GetIndex()[0]; index[1] = it.GetIndex()[1]; index[2] = m_Zidx;
+                    if (m_Parameters.m_SignalGen.m_DoAddMotion)
+                    {
+                        m_Parameters.m_SignalGen.m_FrequencyMap->TransformIndexToPhysicalPoint(index, point3D);
+                        point3D = m_FiberBundle->TransformPoint(point3D.GetVnlVector(), -m_Rotation[0],-m_Rotation[1],-m_Rotation[2],-m_Translation[0],-m_Translation[1],-m_Translation[2]);
+                        m_Parameters.m_SignalGen.m_FrequencyMap->TransformPhysicalPointToIndex(point3D, index);
+                        if (m_Parameters.m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().IsInside(index))
+                            omega += m_Parameters.m_SignalGen.m_FrequencyMap->GetPixel(index);
+                    }
+                    else
+                    {
+                        omega += m_Parameters.m_SignalGen.m_FrequencyMap->GetPixel(index);
+                    }
+                }
 
                 if (y<-yMaxFov/2)
                     y += yMaxFov;
@@ -206,7 +229,7 @@ void KspaceImageFilter< TPixelType >
                     y -= yMaxFov;
 
                 // actual DFT term
-                s += f * exp( std::complex<double>(0, 2 * M_PI * (kx*x/xMax + ky*y/yMaxFov + omega_t )) );
+                s += f * exp( std::complex<double>(0, 2 * M_PI * (kx*x/xMax + ky*y/yMaxFov + omega*t/1000 )) );
 
                 ++it;
             }
@@ -220,6 +243,7 @@ void KspaceImageFilter< TPixelType >
 
             outputImage->SetPixel(kIdx, s);
             m_KSpaceImage->SetPixel(oit.GetIndex(), sqrt(s.imag()*s.imag()+s.real()*s.real()) );
+//            m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
         }
 
         ++oit;
@@ -253,8 +277,8 @@ void KspaceImageFilter< TPixelType >
             else
                 kIdx[1] = kIdx[1] - kyMax/2;
 
-            if (oit.GetIndex()[1]%2 == 1)               // reverse readout direction and add ghosting
-                kIdx[0] = kxMax-kIdx[0]-1;                // reverse readout direction
+            if (oit.GetIndex()[1]%2 == 1)               // reverse readout direction
+                kIdx[0] = kxMax-kIdx[0]-1;
 
             itk::Index< 2 > kIdx2;
             kIdx2[0] = (int)(kxMax-kIdx[0])%(int)kxMax;
@@ -263,7 +287,15 @@ void KspaceImageFilter< TPixelType >
             vcl_complex<double> s = outputImage->GetPixel(kIdx2);
             s = vcl_complex<double>(s.real(), -s.imag());
             outputImage->SetPixel(kIdx, s);
+            if (oit.GetIndex()[0]==0)
+            {
+                MITK_INFO << "-----------------";
+                MITK_INFO << oit.GetIndex();
+                MITK_INFO << kIdx;
+                MITK_INFO << kIdx2;
+            }
             m_KSpaceImage->SetPixel(oit.GetIndex(), sqrt(s.imag()*s.imag()+s.real()*s.real()) );
+//            m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
         }
         ++oit;
     }

@@ -234,6 +234,9 @@ void QmitkIGTLDeviceSetupConnectionWidget::Initialize(
       this, &QmitkIGTLDeviceSetupConnectionWidget::OnDeviceStateChanged );
     this->m_StateModifiedObserverTag = this->m_IGTLDevice->AddObserver(
           itk::ModifiedEvent(), stateModifiedCommand);
+
+    OnBufferIncomingMessages(m_Controls->bufferInMsgCheckBox->isChecked());
+    OnBufferOutgoingMessages(m_Controls->bufferOutMsgCheckBox->isChecked());
   }
   else
   {

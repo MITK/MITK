@@ -147,9 +147,10 @@ void OpenIGTLinkExample::Start()
 {
   if ( this->m_Controls.butStart->text().contains("Start Pipeline") )
   {
-    m_Timer.setInterval(90);
+    m_Timer.setInterval(this->m_Controls.visualizationUpdateRateSpinBox->value());
     m_Timer.start();
     this->m_Controls.butStart->setText("Stop Pipeline");
+    this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(true);
   }
   else
   {
@@ -158,6 +159,7 @@ void OpenIGTLinkExample::Start()
         igtl::StopTrackingDataMessage::New();
     this->m_IGTLClient->SendMessage(stopStreaming.GetPointer());
     this->m_Controls.butStart->setText("Start Pipeline");
+    this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(false);
   }
 }
 
@@ -171,4 +173,13 @@ void OpenIGTLinkExample::UpdatePipeline()
 
   //Update rendering
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  //check if the timer interval changed
+  static int previousValue = 0;
+  int currentValue = this->m_Controls.visualizationUpdateRateSpinBox->value();
+  if (previousValue != currentValue)
+  {
+     m_Timer.setInterval(currentValue);
+     previousValue = currentValue;
+  }
 }

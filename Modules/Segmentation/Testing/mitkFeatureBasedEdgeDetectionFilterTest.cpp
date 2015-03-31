@@ -66,22 +66,10 @@ public:
     testFilter->Update();
 
     mitk::Image::Pointer thresholdImage = testFilter->GetthresholdImage();
-    mitk::Image::Pointer morphedThreshImage = testFilter->GetmorphThreshold();
-    mitk::Image::Pointer maskedImage = testFilter->GetMaskedImage();
-    mitk::Image::Pointer edge_image = testFilter->GetEdgeImage();
-    mitk::Image::Pointer edge_points = testFilter->GetEdgePoints();
 
     mitk::Image::Pointer ref_thresholdImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("PlaneSuggestion/Threshold_Image.nrrd"));
-    mitk::Image::Pointer ref_morphedThreshImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("PlaneSuggestion/MorphThreshold_Image.nrrd"));
-    mitk::Image::Pointer ref_maskedImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("PlaneSuggestion/Masked_Image.nrrd"));
-    mitk::Image::Pointer ref_edge_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("PlaneSuggestion/Edge_Image.nrrd"));
-    mitk::Image::Pointer ref_edge_points = mitk::IOUtil::LoadImage(GetTestDataFilePath("PlaneSuggestion/Edge_Points.nrrd"));
 
     MITK_ASSERT_EQUAL(thresholdImage, ref_thresholdImage, "Testing thresholded image!");
-    MITK_ASSERT_EQUAL(morphedThreshImage, ref_morphedThreshImage, "Testing morphological thresholded image!");
-    MITK_ASSERT_EQUAL(maskedImage, ref_maskedImage, "Testing masked image!");
-    MITK_ASSERT_EQUAL(edge_image, ref_edge_image, "Testing edge image!");
-    MITK_ASSERT_EQUAL(edge_points, ref_edge_points, "Testing extracted edge points!");
 
     CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testFilter->GetOutput() != NULL);
   }

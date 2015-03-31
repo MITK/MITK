@@ -19,10 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkSurfaceInterpolationExports.h>
 #include <mitkImageToUnstructuredGridFilter.h>
-#include <mitkUnstructuredGrid.h>
 
 #include <itkCastImageFilter.h>
-#include <itkLaplacianImageFilter.h>
 
 namespace mitk
 {
@@ -50,16 +48,11 @@ public:
   mitkClassMacro( ImageToPointCloudFilter, ImageToUnstructuredGridFilter)
 
   itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
 
   typedef itk::Image<double, 3> FloatImageType;
-  typedef itk::LaplacianImageFilter< FloatImageType, FloatImageType >
-          LaplacianFilterType;
   typedef DetectConstant DetectionMethod;
 
   itkGetMacro(Method,DetectionMethod)
-  itkGetMacro(EdgeImage,mitk::Image::Pointer)
-  itkGetMacro(EdgePoints,mitk::Image::Pointer)
   itkGetMacro(NumberOfExtractedPoints,int)
 
   itkSetMacro(Method,DetectionMethod)
@@ -87,12 +80,6 @@ private:
 
   mitk::UnstructuredGrid::Pointer m_PointGrid;
   mitk::BaseGeometry* m_Geometry;
-
-  /** The generated image from the laplace filter */
-  mitk::Image::Pointer m_EdgeImage;
-
-  /** The extracted pixels/points */
-  mitk::Image::Pointer m_EdgePoints;
 
   /** The number of extracted points */
   int m_NumberOfExtractedPoints;

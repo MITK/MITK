@@ -16,26 +16,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageToPointCloudFilter.h"
 
-#include <itkImageIterator.h>
+#include <itkLaplacianImageFilter.h>
 #include <itkImageRegionIterator.h>
-#include <vtkPolyLine.h>
+
 #include <vtkPolyVertex.h>
 #include <vtkUnstructuredGrid.h>
 
-#include <mitkDataNode.h>
-#include <mitkImageAccessByItk.h>
-#include <mitkImageCast.h>
+#include <mitkUnstructuredGrid.h>
 #include <mitkITKImageImport.h>
+#include <mitkImageAccessByItk.h>
 #include <mitkImageStatisticsCalculator.h>
-#include <vtkCellArray.h>
 
 mitk::ImageToPointCloudFilter::ImageToPointCloudFilter():
   m_NumberOfExtractedPoints(0)
 {
   m_PointGrid = mitk::UnstructuredGrid::New();
   m_Method = DetectConstant(0);
-  m_EdgeImage = mitk::Image::New();
-  m_EdgePoints = mitk::Image::New();
 
   this->SetNumberOfRequiredInputs(1);
   this->SetNumberOfRequiredOutputs(1);
@@ -57,7 +53,7 @@ void mitk::ImageToPointCloudFilter::GenerateData()
     return;
   }
 
-  mitk::Image::Pointer notConstImage = image->Clone();
+  mitk::Image::Pointer notConstImage = const_cast<mitk::Image*>(image.GetPointer());
 
   switch(m_Method)
   {
@@ -86,6 +82,8 @@ void mitk::ImageToPointCloudFilter::
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
   typedef itk::CastImageFilter< InputImageType, FloatImageType >
           ImagePTypeToFloatPTypeCasterType;
+  typedef itk::LaplacianImageFilter< FloatImageType, FloatImageType >
+          LaplacianFilterType;
   typename LaplacianFilterType::Pointer lapFilter = LaplacianFilterType::New();
 
   typename ImagePTypeToFloatPTypeCasterType::Pointer caster =
@@ -96,11 +94,11 @@ void mitk::ImageToPointCloudFilter::
 
   lapFilter->SetInput(fImage);
   lapFilter->UpdateLargestPossibleRegion();
-  m_EdgeImage = mitk::ImportItkImage(lapFilter->GetOutput())->Clone();
+  mitk::Image::Pointer edgeImage = mitk::ImportItkImage(lapFilter->GetOutput());
 
   mitk::ImageStatisticsCalculator::Pointer statCalc =
                                          mitk::ImageStatisticsCalculator::New();
-  statCalc->SetImage(m_EdgeImage);
+  statCalc->SetImage(edgeImage);
   statCalc->ComputeStatistics();
   mitk::ImageStatisticsCalculator::Statistics stats = statCalc->GetStatistics();
   double mean = stats.GetMean();
@@ -148,8 +146,6 @@ void mitk::ImageToPointCloudFilter::
     }
     ++it;
   }
-
-  m_EdgePoints = mitk::ImportItkImage(lapFilter->GetOutput())->Clone();
 
   /*need to build the UnstructuredGrid with at least one vertex otherwise its
   not visible*/

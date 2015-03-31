@@ -19,10 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkSegmentationExports.h>
 #include <mitkImageToUnstructuredGridFilter.h>
-#include <mitkUnstructuredGrid.h>
-
-#include <itkImage.h>
-#include <itkImageIterator.h>
 
 namespace mitk
 {
@@ -46,14 +42,9 @@ public:
   mitkClassMacro( FeatureBasedEdgeDetectionFilter, ImageToUnstructuredGridFilter)
 
   itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
 
-  itkGetMacro(EdgeImage,mitk::Image::Pointer)
-  itkGetMacro(EdgePoints,mitk::Image::Pointer)
   itkGetMacro(SegmentationMask, mitk::Image::Pointer)
   itkGetMacro(thresholdImage, mitk::Image::Pointer)
-  itkGetMacro(morphThreshold, mitk::Image::Pointer)
-  itkGetMacro(MaskedImage, mitk::Image::Pointer)
 
   /** Sets the segmentation for calculating the statistics within that */
   void SetSegmentationMask(mitk::Image::Pointer);
@@ -85,18 +76,6 @@ private:
 
   /** The thesholded image */
   mitk::Image::Pointer m_thresholdImage;
-
-  /** The thesholded image after the morphological filters*/
-  mitk::Image::Pointer m_morphThreshold;
-
-  /** The masked image */
-  mitk::Image::Pointer m_MaskedImage;
-
-  /** The generated image from the laplace filter */
-  mitk::Image::Pointer m_EdgeImage;
-
-  /** The extracted pixels/points */
-  mitk::Image::Pointer m_EdgePoints;
 
 };
 

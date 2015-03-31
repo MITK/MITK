@@ -17,8 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFeatureBasedEdgeDetectionFilter.h"
 
 #include <itkBinaryThresholdImageFilter.h>
+#include <itkImage.h>
 
 #include <SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.h>
+#include <mitkUnstructuredGrid.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageStatisticsCalculator.h>
 #include <mitkImage.h>
@@ -32,10 +34,6 @@ mitk::FeatureBasedEdgeDetectionFilter::FeatureBasedEdgeDetectionFilter()
   m_PointGrid = mitk::UnstructuredGrid::New();
   m_SegmentationMask = mitk::Image::New();
   m_thresholdImage = mitk::Image::New();
-  m_morphThreshold = mitk::Image::New();
-  m_EdgeImage = mitk::Image::New();
-  m_EdgePoints = mitk::Image::New();
-  m_MaskedImage = mitk::Image::New();
 
   this->SetNumberOfRequiredInputs(1);
   this->SetNumberOfRequiredOutputs(1);
@@ -48,7 +46,7 @@ mitk::FeatureBasedEdgeDetectionFilter::~FeatureBasedEdgeDetectionFilter(){}
 void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
 {
   mitk::Image::ConstPointer image = ImageToUnstructuredGridFilter::GetInput();
-  mitk::Image::Pointer ncImage = image->Clone();
+  mitk::Image::Pointer ncImage = const_cast<mitk::Image*>(image.GetPointer());
 
   //statistics
   mitk::ImageStatisticsCalculator::Pointer statCalc = mitk::ImageStatisticsCalculator::New();
@@ -72,10 +70,8 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   //thresholding
   AccessByItk_2(ncImage.GetPointer(), ITKThresholding, lowerThreshold, upperThreshold)
 
-  m_morphThreshold = m_thresholdImage->Clone();
-
   //fill holes
-  mitk::MorphologicalOperations::FillHoles(m_morphThreshold);
+  mitk::MorphologicalOperations::FillHoles(m_thresholdImage);
 
 //  mitk::MorphologicalOperations::Closing(m_morphThreshold,1,mitk::MorphologicalOperations::Ball);
 //  mitk::MorphologicalOperations::Opening(m_morphThreshold,1,mitk::MorphologicalOperations::Ball);
@@ -83,7 +79,7 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   //masking
   mitk::MaskImageFilter::Pointer maskFilter = mitk::MaskImageFilter::New();
   maskFilter->SetInput(image);
-  maskFilter->SetMask(m_morphThreshold);
+  maskFilter->SetMask(m_thresholdImage);
   maskFilter->OverrideOutsideValueOn();
   maskFilter->SetOutsideValue(0);
   try
@@ -96,16 +92,12 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
     return;
   }
 
-  m_MaskedImage = maskFilter->GetOutput()->Clone();
   mitk::Image::Pointer resultImage = maskFilter->GetOutput();
 
   //imagetopointcloudfilter
   mitk::ImageToPointCloudFilter::Pointer pclFilter = mitk::ImageToPointCloudFilter::New();
   pclFilter->SetInput(resultImage);
   pclFilter->Update();
-
-  m_EdgeImage = pclFilter->GetEdgeImage();
-  m_EdgePoints = pclFilter->GetEdgePoints();
 
   m_PointGrid->SetVtkUnstructuredGrid( pclFilter->GetOutput()->GetVtkUnstructuredGrid() );
 }
@@ -125,7 +117,7 @@ void mitk::FeatureBasedEdgeDetectionFilter::ITKThresholding( itk::Image<TPixel, 
   filter->SetOutsideValue(0);
   filter->Update();
 
-  m_thresholdImage = mitk::ImportItkImage(filter->GetOutput())->Clone();
+  m_thresholdImage = mitk::ImportItkImage(filter->GetOutput());
 }
 
 void mitk::FeatureBasedEdgeDetectionFilter::SetSegmentationMask(mitk::Image::Pointer segmentation)

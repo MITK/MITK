@@ -150,5 +150,6 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLStreamingManagementWidget : public QWid
 
     //############## private help methods #######################
     void DisableSourceControls();
+    void RemoveObserver();
 };
 #endif

@@ -52,11 +52,17 @@ QmitkIGTLStreamingManagementWidget::QmitkIGTLStreamingManagementWidget(
 
 QmitkIGTLStreamingManagementWidget::~QmitkIGTLStreamingManagementWidget()
 {
-   //    this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
-   //    this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
-   this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
-   this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
-   this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
+   this->RemoveObserver();
+}
+
+void QmitkIGTLStreamingManagementWidget::RemoveObserver()
+{
+   if (this->m_IGTLDevice.IsNotNull())
+   {
+      this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
+      this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
+      this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
+   }
 }
 
 void QmitkIGTLStreamingManagementWidget::CreateQtPartControl(QWidget *parent)
@@ -190,14 +196,7 @@ void QmitkIGTLStreamingManagementWidget::LoadSource(
     return;
 
   //reset the observers
-  if ( this->m_IGTLDevice.IsNotNull() )
-  {
-//    this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
-//    this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
-    this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
-    this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
-    this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
-  }
+  this->RemoveObserver();
 
 
     this->m_IGTLMsgProvider = provider;

@@ -187,7 +187,7 @@ void OpenIGTLinkProviderExample::Start()
     this->m_Controls.butStart->setText("Stop Playing Recorded Navigation Data ");
 
     //start the visualization
-    this->m_VisualizerTimer.start(10);
+    this->m_VisualizerTimer.start(100);
   }
   else
   {

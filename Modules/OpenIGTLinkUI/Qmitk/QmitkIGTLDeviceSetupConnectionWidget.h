@@ -105,9 +105,16 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QW
     void OnHostnameChanged();
 
     /**
-     * \brief Enables/Disables the buffering of incoming messages
-     */
+    * \brief Enables/Disables the buffering of incoming messages
+    */
     void OnBufferIncomingMessages(int state);
+
+    /**
+     * \brief Enables/Disables the buffering of outgoing messages
+     *
+     * This can be necessary when the data is faster produced then sent
+     */
+    void OnBufferOutgoingMessages(int state);
 
     /**
     * \brief Adapts the GUI to the state of the device
@@ -150,5 +157,6 @@ class MITK_OPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QW
     //############## private help methods #######################
     void DisableSourceControls();
 //    void EnableSourceControls();
+    void RemoveObserver();
 };
 #endif

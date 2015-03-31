@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <mitkLevelWindowPresets FILE_VERSION="0.1" >
-   <preset NAME="Bones" LEVEL="500" WINDOW="1000" />
+   <preset NAME="Bones" LEVEL="300" WINDOW="1500" />
    <preset NAME="Liver" LEVEL="30" WINDOW="400" />
-   <preset NAME="Lung" LEVEL="-200" WINDOW="500" />
+   <preset NAME="Lung" LEVEL="-400" WINDOW="1500" />
    <preset NAME="Brain" LEVEL="40" WINDOW="80" />
    <preset NAME="Blood" LEVEL="100" WINDOW="600" />
    <preset NAME="Intestine" LEVEL="30" WINDOW="400" />
@@ -17,4 +17,7 @@
    <preset NAME="Pancreas" LEVEL="40" WINDOW="400" />
    <preset NAME="Tumor" LEVEL="35" WINDOW="60" />
    <preset NAME="Water" LEVEL="0" WINDOW="10" />
+   <preset NAME="Abdomen" LEVEL="60" WINDOW="400" />
+   <preset NAME="Angio" LEVEL="300" WINDOW="600" />
+   <preset NAME="Chest" LEVEL="40" WINDOW="400" />
 </mitkLevelWindowPresets>

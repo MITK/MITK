@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyDescriptions.h>
 #include <QmitkRenderWindow.h>
 #include <QPainter>
+#include <memory>
 
 const std::string QmitkPropertyTreeView::VIEW_ID = "org.mitk.views.properties";
 
@@ -402,8 +403,10 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
 
 void QmitkPropertyTreeView::OnAddNewProperty()
 {
-  QmitkAddNewPropertyDialog dialog(m_SelectedNode, m_Renderer, m_Parent);
+  std::unique_ptr<QmitkAddNewPropertyDialog> dialog(m_Controls.propertyListComboBox->currentText() != "Base data"
+      ? new QmitkAddNewPropertyDialog(m_SelectedNode, m_Renderer, m_Parent)
+      : new QmitkAddNewPropertyDialog(m_SelectedNode->GetData()));
 
-  if (dialog.exec() == QDialog::Accepted)
+  if (dialog->exec() == QDialog::Accepted)
     this->m_Model->Update();
 }

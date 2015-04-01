@@ -328,7 +328,7 @@ void mitk::IGTLDevice::RunCommunication(void (IGTLDevice::*ComFunction)(void), i
         this->m_StopCommunicationMutex->Unlock();
 
         // time to relax
-        //    itksys::SystemTools::Delay(1);
+        itksys::SystemTools::Delay(1);
      }
   }
   catch (...)

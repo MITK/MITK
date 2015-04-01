@@ -1,7 +1,8 @@
-diff -burN ITK-4.7.1/CMake/UseITK.cmake ITK/CMake/UseITK.cmake
---- ITK-4.7.1/CMake/UseITK.cmake	2014-02-28 19:46:45.000000000 +0100
-+++ ITK/CMake/UseITK.cmake		2015-01-29 14:31:00.137911666 +0100
-@@ -108,7 +108,11 @@
+diff --git a/CMake/UseITK.cmake b/CMake/UseITK.cmake
+index 596c69c..085da7a 100644
+--- a/CMake/UseITK.cmake
++++ b/CMake/UseITK.cmake
+@@ -108,7 +108,11 @@ if(NOT ITK_NO_IO_FACTORY_REGISTER_MANAGER)
    unset(LIST_OF_FACTORY_NAMES)
  
    #-------------------
@@ -13,3 +14,23 @@ diff -burN ITK-4.7.1/CMake/UseITK.cmake ITK/CMake/UseITK.cmake
    include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR}/ITKIOFactoryRegistration)
  
  endif()
+diff --git a/Modules/IO/GDCM/src/itkGDCMImageIO.cxx b/Modules/IO/GDCM/src/itkGDCMImageIO.cxx
+index 68b09ea..4cdb36b 100644
+--- a/Modules/IO/GDCM/src/itkGDCMImageIO.cxx
++++ b/Modules/IO/GDCM/src/itkGDCMImageIO.cxx
+@@ -477,10 +477,15 @@ void GDCMImageIO::InternalReadImageInformation()
+             break;
+           }
+         }
++      // ITK-3357, mitk : Bug 18887
++      // can assign values only if there are some sp.empty occurs if the tag is not found
++      if( sp.size() == 2)
++      {
+         spacing[0] = sp[0];
+         spacing[1] = sp[1];
+         spacing[2] = 1.0; // punt?
+       }
++      }
+       break;
+     default:
+       {

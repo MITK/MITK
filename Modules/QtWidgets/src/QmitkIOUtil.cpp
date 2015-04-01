@@ -274,12 +274,14 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
       continue;
     }
 
+    // Theoretically, the user could have entered an extension that does not match the selected filter
+    // The extension then has prioritry over the filter
     // Check if one of the available mime-types match the filename
     std::vector<mitk::MimeType> filterMimeTypes = filters.GetMimeTypes();
     for (std::vector<mitk::MimeType>::const_iterator mimeTypeIter = filterMimeTypes.begin(),
          mimeTypeIterEnd = filterMimeTypes.end(); mimeTypeIter != mimeTypeIterEnd; ++mimeTypeIter)
     {
-      if (mimeTypeIter->GetComment() == selectedMimeType.GetComment());
+      if (mimeTypeIter->MatchesExtension(stdFileName))
       {
         selectedMimeType = *mimeTypeIter;
         break;

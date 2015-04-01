@@ -174,7 +174,14 @@ void BoundingObjectCutter::GenerateOutputInformation()
 
 void BoundingObjectCutter::ComputeData(mitk::Image* input3D, int boTimeStep)
 {
-  AccessFixedDimensionByItk_2(input3D, CutImage, 3, this, boTimeStep);
+  if ( input3D!=nullptr && input3D->GetPixelType().GetNumberOfComponents()==1 )
+  {
+    AccessFixedDimensionByItk_2(input3D, CutImage, 3, this, boTimeStep);
+  }
+  else
+  {
+    AccessVectorFixedDimensionByItk_n(input3D, CutImage, 3, (this, boTimeStep) );
+  }
 }
 
 void BoundingObjectCutter::GenerateData()

@@ -113,6 +113,7 @@ void QmitkNumberPropertySlider::SetProperty(mitk::IntProperty* property)
 {
   if (property == NULL)
   {
+    d->m_PropEditor->PropertyRemoved();
     d->m_PropEditor.reset();
     this->setEnabled(false);
   }
@@ -128,6 +129,7 @@ void QmitkNumberPropertySlider::SetProperty(mitk::FloatProperty* property)
 {
   if (property == NULL)
   {
+    d->m_PropEditor->PropertyRemoved();
     d->m_PropEditor.reset();
     this->setEnabled(false);
   }
@@ -143,6 +145,7 @@ void QmitkNumberPropertySlider::SetProperty(mitk::DoubleProperty* property)
 {
   if (property == NULL)
   {
+    d->m_PropEditor->PropertyRemoved();
     d->m_PropEditor.reset();
     this->setEnabled(false);
   }

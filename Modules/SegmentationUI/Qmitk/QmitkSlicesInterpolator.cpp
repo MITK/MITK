@@ -800,6 +800,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     segSurface->SetProperty( "opacity", mitk::FloatProperty::New(0.7) );
     segSurface->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(true));
     segSurface->SetProperty( "3DInterpolationResult", mitk::BoolProperty::New(true));
+    segSurface->SetVisibility(false);
     m_DataStorage->Add(segSurface, segmentationNode);
     this->Show3DInterpolationResult(false);
   }

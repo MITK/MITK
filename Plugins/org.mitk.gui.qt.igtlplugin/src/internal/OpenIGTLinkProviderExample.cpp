@@ -72,6 +72,13 @@ void OpenIGTLinkProviderExample::CreateQtPartControl( QWidget *parent )
 
 void OpenIGTLinkProviderExample::CreatePipeline()
 {
+   //create a navigation data player object that will play nav data from a
+   //recorded file
+   m_NavDataPlayer = mitk::NavigationDataPlayer::New();
+
+   //set the currently read navigation data set
+   m_NavDataPlayer->SetNavigationDataSet(m_NavDataSet);
+
   //create a new OpenIGTLink Client
   m_IGTLServer = mitk::IGTLServer::New();
   m_IGTLServer->SetName("OIGTL Provider Example Device");
@@ -89,6 +96,14 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //create a filter that converts navigation data into IGTL messages
   m_NavDataToIGTLMsgFilter = mitk::NavigationDataToIGTLMessageFilter::New();
 
+  //connect the filters with each other
+  //the navigation data player reads a file with recorded navigation data,
+  //passes this data to a filter that converts it into a IGTLMessage.
+  //The provider is not connected because it will search for fitting services.
+  //Once it found the filter it will automatically connect to it (this is not
+  // implemented so far, check m_StreamingConnector for more information).
+  m_NavDataToIGTLMsgFilter->ConnectTo(m_NavDataPlayer);
+
   //define the operation mode for this filter, we want to send tracking data
   //messages
   m_NavDataToIGTLMsgFilter->SetOperationMode(
@@ -104,21 +119,6 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //automatically (this is not implemented so far, check m_StreamingConnector
   //for more information)
   m_NavDataToIGTLMsgFilter->RegisterAsMicroservice();
-
-  //create a navigation data player object that will play nav data from a
-  //recorded file
-  m_NavDataPlayer = mitk::NavigationDataPlayer::New();
-
-  //set the currently read navigation data set
-  m_NavDataPlayer->SetNavigationDataSet(m_NavDataSet);
-
-  //connect the filters with each other
-  //the navigation data player reads a file with recorded navigation data,
-  //passes this data to a filter that converts it into a IGTLMessage.
-  //The provider is not connected because it will search for fitting services.
-  //Once it found the filter it will automatically connect to it (this is not
-  // implemented so far, check m_StreamingConnector for more information).
-  m_NavDataToIGTLMsgFilter->ConnectTo(m_NavDataPlayer);
 
   //create an object that will be moved respectively to the navigation data
   m_DemoNodeT1 = mitk::DataNode::New();

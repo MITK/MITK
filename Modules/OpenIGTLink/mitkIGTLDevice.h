@@ -104,13 +104,15 @@ namespace mitk {
       bool StartCommunication();
 
       /**
-       * \brief Continuously checks for new connections, receives messages and
-       * sends messages.
+       * \brief Continuously calls the given function
        *
        * This may only be called if the device is in Running state and only from
        * a seperate thread.
+       *
+       * \param ComFunction function pointer that specifies the method to be executed
+       * \param mutex the mutex that corresponds to the function pointer
        */
-      void RunCommunication();
+      void RunCommunication(void (IGTLDevice::*ComFunction)(void), itk::FastMutexLock* mutex);
 
       /**
        * \brief Adds the given message to the sending queue
@@ -198,10 +200,22 @@ namespace mitk {
       itkGetMacro(MessageFactory, mitk::IGTLMessageFactory::Pointer);
 
       /**
-       * \brief static start method for the tracking thread.
-       * \param data a void pointer to the IGTLDevice object.
-       */
-      static ITK_THREAD_RETURN_TYPE ThreadStartCommunication(void* data);
+      * \brief static start method for the sending thread.
+      * \param data a void pointer to the IGTLDevice object.
+      */
+      static ITK_THREAD_RETURN_TYPE ThreadStartSending(void* data);
+
+      /**
+      * \brief static start method for the receiving thread.
+      * \param data a void pointer to the IGTLDevice object.
+      */
+      static ITK_THREAD_RETURN_TYPE ThreadStartReceiving(void* data);
+
+      /**
+      * \brief static start method for the connection thread.
+      * \param data a void pointer to the IGTLDevice object.
+      */
+      static ITK_THREAD_RETURN_TYPE ThreadStartConnecting(void* data);
 
      /**
       * \brief TestConnection() tries to connect to a IGTL device on the current
@@ -316,8 +330,12 @@ namespace mitk {
       bool m_StopCommunication;
       /** mutex to control access to m_StopCommunication */
       itk::FastMutexLock::Pointer m_StopCommunicationMutex;
-      /** mutex used to make sure that the thread is just started once */
-      itk::FastMutexLock::Pointer m_CommunicationFinishedMutex;
+      /** mutex used to make sure that the send thread is just started once */
+      itk::FastMutexLock::Pointer m_SendingFinishedMutex;
+      /** mutex used to make sure that the receive thread is just started once */
+      itk::FastMutexLock::Pointer m_ReceivingFinishedMutex;
+      /** mutex used to make sure that the connect thread is just started once */
+      itk::FastMutexLock::Pointer m_ConnectingFinishedMutex;
       /** mutex to control access to m_State */
       itk::FastMutexLock::Pointer m_StateMutex;
       /** the hostname or ip of the device */
@@ -341,8 +359,12 @@ namespace mitk {
       /** creates worker thread that continuously polls interface for new
       messages */
       itk::MultiThreader::Pointer m_MultiThreader;
-      /** ID of polling thread */
-      int m_ThreadID;
+      /** ID of sending thread */
+      int m_SendThreadID;
+      /** ID of receiving thread */
+      int m_ReceiveThreadID;
+      /** ID of connecting thread */
+      int m_ConnectThreadID;
     };
 
     /**

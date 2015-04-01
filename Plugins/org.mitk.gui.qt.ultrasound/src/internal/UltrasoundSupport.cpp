@@ -70,6 +70,8 @@ connect( m_Controls.m_FreezeButton, SIGNAL(clicked()), this, SLOT(OnClickedFreez
 connect( m_UpdateTimer, SIGNAL(timeout()), this, SLOT(UpdateImage()));
 connect( m_RenderingTimer2d, SIGNAL(timeout()), this, SLOT(RenderImage2d()));
 connect( m_RenderingTimer3d, SIGNAL(timeout()), this, SLOT(RenderImage3d()));
+connect( m_Controls.m_Update2DView, SIGNAL(clicked()), this, SLOT(StartTimers()) );
+connect( m_Controls.m_Update3DView, SIGNAL(clicked()), this, SLOT(StartTimers()) );
 
 // Initializations
 m_Controls.m_NewVideoDeviceWidget->setVisible(false);
@@ -79,7 +81,9 @@ std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "="
 m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(
 mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL ,filter);
 m_Controls.m_ActiveVideoDevices->SetAutomaticallySelectFirstEntry(true);
-m_FrameCounter = 0;
+m_FrameCounterPipeline = 0;
+m_FrameCounter2d = 0;
+m_FrameCounter3d = 0;
 
 // Create Node for US Stream
 if (m_Node.IsNull())
@@ -139,31 +143,58 @@ if(m_Controls.m_ShowImageStream->isChecked())
 }
 
 //Update frame counter
-m_FrameCounter ++;
-if (m_FrameCounter >= 10)
+m_FrameCounterPipeline ++;
+if (m_FrameCounterPipeline >= 10)
   {
+  //compute framerate of pipeline update
   int nMilliseconds = m_Clock.restart();
   int fps = 10000.0f / (nMilliseconds );
-  m_Controls.m_FramerateLabel->setText("Current Framerate: "+ QString::number(fps) +" FPS");
-  m_FrameCounter = 0;
+  m_FPSPipeline = fps;
+  m_FrameCounterPipeline = 0;
+
+  //display lowest framerate in UI
+  int lowestFPS=m_FPSPipeline;
+  if (m_Controls.m_Update2DView->isChecked() && (m_FPS2d<lowestFPS)) {lowestFPS = m_FPS2d;}
+  if (m_Controls.m_Update3DView->isChecked() && (m_FPS3d<lowestFPS)) {lowestFPS = m_FPS3d;}
+  m_Controls.m_FramerateLabel->setText("Current Framerate: "+ QString::number(lowestFPS) +" FPS");
   }
 }
 
 void UltrasoundSupport::RenderImage2d()
 {
 this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+m_FrameCounter2d ++;
+if (m_FrameCounter2d >= 10)
+  {
+  //compute framerate of 2d render window update
+  int nMilliseconds = m_Clock2d.restart();
+  int fps = 10000.0f / (nMilliseconds );
+  m_FPS2d = fps;
+  m_FrameCounter2d = 0;
+  }
 }
 
 void UltrasoundSupport::RenderImage3d()
 {
 this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+m_FrameCounter3d ++;
+if (m_FrameCounter3d >= 10)
+  {
+  //compute framerate of 2d render window update
+  int nMilliseconds = m_Clock3d.restart();
+  int fps = 10000.0f / (nMilliseconds );
+  m_FPS3d = fps;
+  m_FrameCounter3d = 0;
+  }
 }
 
 void UltrasoundSupport::OnChangedFramerateLimit()
 {
-MITK_INFO << "Framerate changed";
 StopTimers();
-SetTimerIntervals(1000 / 20);
+int intervalPipeline = (1000 / m_Controls.m_FrameRatePipeline->value());
+int interval2D = (1000 / m_Controls.m_FrameRate2d->value());
+int interval3D = (1000 / m_Controls.m_FrameRate3d->value());
+SetTimerIntervals(intervalPipeline,interval2D,interval3D);
 StartTimers();
 }
 
@@ -213,8 +244,10 @@ if(m_Controls.m_ShowImageStream->isChecked())
 //start timer
 if(m_Controls.m_RunImageTimer->isChecked())
   {
-  int interval = (1000 / m_Controls.m_FrameRatePipeline->value());
-  SetTimerIntervals(interval);
+  int intervalPipeline = (1000 / m_Controls.m_FrameRatePipeline->value());
+  int interval2D = (1000 / m_Controls.m_FrameRate2d->value());
+  int interval3D = (1000 / m_Controls.m_FrameRate3d->value());
+  SetTimerIntervals(intervalPipeline,interval2D,interval3D);
   StartTimers();
   m_Controls.m_TimerWidget->setEnabled(true);
   }
@@ -411,8 +444,8 @@ void UltrasoundSupport::LoadUISettings()
 void UltrasoundSupport::StartTimers()
 {
 m_UpdateTimer->start();
-m_RenderingTimer2d->start();
-m_RenderingTimer3d->start();
+if (m_Controls.m_Update2DView->isChecked()) {m_RenderingTimer2d->start();}
+if (m_Controls.m_Update3DView->isChecked()) {m_RenderingTimer3d->start();}
 }
 
 void UltrasoundSupport::StopTimers()
@@ -422,9 +455,9 @@ m_RenderingTimer2d->stop();
 m_RenderingTimer3d->stop();
 }
 
-void UltrasoundSupport::SetTimerIntervals(int interval)
+void UltrasoundSupport::SetTimerIntervals(int intervalPipeline, int interval2D, int interval3D)
 {
-m_UpdateTimer->setInterval(interval);
-m_RenderingTimer2d->setInterval(interval);
-m_RenderingTimer3d->setInterval(interval * 4);
+m_UpdateTimer->setInterval(intervalPipeline);
+m_RenderingTimer2d->setInterval(interval2D);
+m_RenderingTimer3d->setInterval(interval3D);
 }

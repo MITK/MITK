@@ -310,7 +310,7 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QCheckBox" name="_Update3DView">
+             <widget class="QCheckBox" name="m_Update3DView">
               <property name="text">
                <string>Update 3D View</string>
               </property>

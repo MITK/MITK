@@ -85,6 +85,10 @@ public:
 
       void RenderImage3d();
 
+      void StartTimers();
+
+      void StopTimers();
+
 protected:
 
   void CreateControlWidgets();
@@ -93,19 +97,23 @@ protected:
   /** The device that is currently used to aquire images */
   mitk::USDevice::Pointer m_Device;
 
-  void StartTimers();
-  void StopTimers();
-  void SetTimerIntervals(int interval);
+
+  void SetTimerIntervals(int intervalPipeline, int interval2D, int interval3D);
   /** This timer triggers periodic updates to the pipeline */
   QTimer* m_UpdateTimer;
   QTimer* m_RenderingTimer2d;
   QTimer* m_RenderingTimer3d;
 
-  /** This clock is used to compute the framerate in the method DisplayImage(). */
+  /** These clocks are used to compute the framerate in the methods DisplayImage(),RenderImage2d() and RenderImage3d(). */
   QTime  m_Clock;
+  QTime  m_Clock2d;
+  QTime  m_Clock3d;
 
   /** A counter to comute the framerate. */
-  int m_FrameCounter;
+  int m_FrameCounterPipeline;
+  int m_FrameCounter2d;
+  int m_FrameCounter3d;
+  int m_FPSPipeline, m_FPS2d, m_FPS3d;
 
   /** Stores the properties of some QWidgets (and the tool storage file name) to QSettings.*/
   void StoreUISettings();

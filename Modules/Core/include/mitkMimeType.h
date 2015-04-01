@@ -56,14 +56,26 @@ public:
 
   bool operator<(const MimeType& other) const;
 
+  /*@See mitk::CustomMimeType::GetName()*/
   std::string GetName() const;
+
+  /*@See mitk::CustomMimeType::GetCategory()*/
   std::string GetCategory() const;
+
+  /*@See mitk::CustomMimeType::GetExtensions()*/
   std::vector<std::string> GetExtensions() const;
+
+  /*@See mitk::CustomMimeType::GetComment()*/
   std::string GetComment() const;
+
 
   std::string GetFilenameWithoutExtension(const std::string& path) const;
 
+  /*@See mitk::CustomMimeType::AppliesTo()*/
   bool AppliesTo(const std::string& path) const;
+
+  /*@See mitk::CustomMimeType::MatchesExtension()*/
+  bool MatchesExtension(const std::string& path) const;
 
   bool IsValid() const;
 

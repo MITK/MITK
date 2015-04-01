@@ -111,6 +111,11 @@ bool MimeType::AppliesTo(const std::string& path) const
   return m_Data->m_CustomMimeType->AppliesTo(path);
 }
 
+bool MimeType::MatchesExtension(const std::string& path) const
+{
+  return m_Data->m_CustomMimeType->MatchesExtension(path);
+}
+
 bool MimeType::IsValid() const
 {
   return m_Data.Data() != NULL && m_Data->m_CustomMimeType.get() != NULL && !m_Data->m_CustomMimeType->GetName().empty();

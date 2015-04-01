@@ -708,6 +708,13 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     parameters.m_SignalGen.m_DoDisablePartialVolume = m_Controls->m_EnforcePureFiberVoxelsBox->isChecked();
     parameters.m_SignalGen.m_AxonRadius = m_Controls->m_FiberRadius->value();
     parameters.m_SignalGen.m_SignalScale = m_Controls->m_SignalScaleBox->value();
+    double voxelVolume = parameters.m_SignalGen.m_ImageSpacing[0]*parameters.m_SignalGen.m_ImageSpacing[1]*parameters.m_SignalGen.m_ImageSpacing[2];
+    if ( parameters.m_SignalGen.m_SignalScale*voxelVolume > itk::NumericTraits<short>::max()*0.75 )
+    {
+        parameters.m_SignalGen.m_SignalScale = itk::NumericTraits<short>::max()*0.75/voxelVolume;
+        m_Controls->m_SignalScaleBox->setValue(parameters.m_SignalGen.m_SignalScale);
+        QMessageBox::information( NULL, "Warning", "Maximum signal exceeding data type limits. Automatically adjusted to "+QString::number(parameters.m_SignalGen.m_SignalScale)+" to obtain a maximum  signal of 75% of the data type maximum. Relaxation and other effects that affect the signal intensities are not accounted for.");
+    }
 
     // adjust echo time if needed
     int numLines = parameters.m_SignalGen.m_ImageRegion.GetSize(1)+parameters.m_SignalGen.m_ImageRegion.GetSize(1)%2;
@@ -715,7 +722,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     {
         this->m_Controls->m_TEbox->setValue( numLines*parameters.m_SignalGen.m_tLine );
         parameters.m_SignalGen.m_tEcho = m_Controls->m_TEbox->value();
-        QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automaticall adjusted to "+QString::number(parameters.m_SignalGen.m_tEcho)+" ms");
+        QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automatically adjusted to "+QString::number(parameters.m_SignalGen.m_tEcho)+" ms");
     }
 
     // Noise
@@ -1105,13 +1112,13 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
         }
     }
 
-    // check if comp 3 or 4 volume fraction image is set
-    if (parameters.m_NonFiberModelList.size()==2 && (parameters.m_NonFiberModelList[0]->GetVolumeFractionImage()==nullptr || parameters.m_NonFiberModelList[1]->GetVolumeFractionImage()==nullptr))
-    {
-        m_Controls->m_Compartment4Box->setCurrentIndex(0);
-        parameters.m_NonFiberModelList.pop_back();
-        QMessageBox::information(NULL, "Compartment 4 disabled", "More than one non-fiber compartment selected but no volume fraction maps set!");
-    }
+//    // check if comp 3 or 4 volume fraction image is set
+//    if (parameters.m_NonFiberModelList.size()==2 && (parameters.m_NonFiberModelList[0]->GetVolumeFractionImage()==nullptr || parameters.m_NonFiberModelList[1]->GetVolumeFractionImage()==nullptr))
+//    {
+//        m_Controls->m_Compartment4Box->setCurrentIndex(0);
+//        parameters.m_NonFiberModelList.pop_back();
+//        QMessageBox::information(NULL, "Compartment 4 disabled", "More than one non-fiber compartment selected but no volume fraction maps set!");
+//    }
 
     //    RELIKT
     //    parameters.m_SignalGen.m_FiberSeparationThreshold = m_Controls->m_SeparationAngleBox->value();

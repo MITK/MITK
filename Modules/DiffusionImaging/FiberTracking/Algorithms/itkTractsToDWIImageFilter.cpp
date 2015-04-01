@@ -47,6 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractDensityImageFilter.h>
 #include <boost/lexical_cast.hpp>
 #include <itkTractsToVectorImageFilter.h>
+#include <itkInvertIntensityImageFilter.h>
 
 namespace itk
 {
@@ -273,27 +274,71 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
 {
+    m_UseRelativeNonFiberVolumeFractions = false;
+
     // check for fiber volume fraction maps
+    int fibVolImages = 0;
     for (int i=0; i<m_Parameters.m_FiberModelList.size(); i++)
         if (m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage().IsNotNull())
+        {
             m_StatusText += "Using volume fraction map for fiber compartment " + boost::lexical_cast<std::string>(i+1) + "\n";
+            MITK_INFO << "Using volume fraction map for fiber compartment " + boost::lexical_cast<std::string>(i+1);
+            fibVolImages++;
+        }
 
     // check for non-fiber volume fraction maps
+    int nonfibVolImages = 0;
     for (int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
         if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNotNull())
+        {
             m_StatusText += "Using volume fraction map for non-fiber compartment " + boost::lexical_cast<std::string>(i+1) + "\n";
+            MITK_INFO << "Using volume fraction map for non-fiber compartment " + boost::lexical_cast<std::string>(i+1);
+            nonfibVolImages++;
+        }
 
-    // check volume fraction images
-    if (m_Parameters.m_FiberModelList.size()>2)
-        for (int i=0; i<m_Parameters.m_FiberModelList.size(); i++)
-            if (m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage().IsNull())
-                itkExceptionMacro("More than two fiber compartment selected but no volume fraction maps set!");
+    // not all fiber compartments are using volume fraction maps --> non-fiber volume fractions are assumed to be relative to the non-fiber volume and not absolute voxel-volume fractions.
+    // this means if two non-fiber compartments are used but only one of them has an associated volume fraction map, the repesctive other volume fraction map can be determined as inverse (1-val) of the present volume fraction map-
+    if ( fibVolImages<m_Parameters.m_FiberModelList.size() && nonfibVolImages==1 && m_Parameters.m_NonFiberModelList.size()==2)
+    {
+        m_StatusText += "Calculating missing non-fiber volume fraction image by inverting the other.\n";
+        MITK_INFO << "Calculating missing non-fiber volume fraction image by inverting the other.";
 
-    if (m_Parameters.m_NonFiberModelList.size()>1)
-        for (int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
-            if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNull())
-                itkExceptionMacro("More than one non-fiber compartment selected but no volume fraction maps set!");
+        itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
+        inverter->SetMaximum(1.0);
+        if ( m_Parameters.m_NonFiberModelList[0]->GetVolumeFractionImage().IsNull() && m_Parameters.m_NonFiberModelList[1]->GetVolumeFractionImage().IsNotNull() )
+        {
+            inverter->SetInput( m_Parameters.m_NonFiberModelList[1]->GetVolumeFractionImage() );
+            inverter->Update();
+            m_Parameters.m_NonFiberModelList[0]->SetVolumeFractionImage(inverter->GetOutput());
+        }
+        else if ( m_Parameters.m_NonFiberModelList[1]->GetVolumeFractionImage().IsNull() && m_Parameters.m_NonFiberModelList[0]->GetVolumeFractionImage().IsNotNull() )
+        {
+            inverter->SetInput( m_Parameters.m_NonFiberModelList[0]->GetVolumeFractionImage() );
+            inverter->Update();
+            m_Parameters.m_NonFiberModelList[1]->SetVolumeFractionImage(inverter->GetOutput());
+        }
+        else
+        {
+            itkExceptionMacro("Something went wrong in automatically calculating the missing non-fiber volume fraction image! Did you use two non fiber compartments but only one volume fraction image? Then it should work and this error is really strange.");
+        }
 
+        nonfibVolImages++;
+    }
+
+    // Up to two fiber compartments are allowed without volume fraction maps since the volume fractions can then be determined automatically
+    if (m_Parameters.m_FiberModelList.size()>2 && fibVolImages!=m_Parameters.m_FiberModelList.size())
+        itkExceptionMacro("More than two fiber compartment selected but no corresponding volume fraction maps set!");
+
+    // One non-fiber compartment is allowed without volume fraction map since the volume fraction can then be determined automatically
+    if (m_Parameters.m_NonFiberModelList.size()>1 && nonfibVolImages!=m_Parameters.m_NonFiberModelList.size())
+        itkExceptionMacro("More than one non-fiber compartment selected but no volume fraction maps set!");
+
+    if (fibVolImages<m_Parameters.m_FiberModelList.size() && nonfibVolImages>0)
+    {
+        m_StatusText += "Not all fiber compartments are using an associated volume fraction image.\nAssuming non-fiber volume fraction images to contain values relative to the remaining non-fiber volume, not absolute values.\n";
+        MITK_INFO << "Not all fiber compartments are using an associated volume fraction image.\nAssuming non-fiber volume fraction images to contain values relative to the remaining non-fiber volume, not absolute values.";
+        m_UseRelativeNonFiberVolumeFractions = true;
+    }
 
     // initialize the images that store the output volume fraction of each compartment
     m_VolumeFractions.clear();
@@ -553,7 +598,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
 {
     // resample fiber bundle for sufficient voxel coverage
     m_StatusText += "\n"+this->GetTime()+" > Resampling fibers ...\n";
-    segmentVolume = 0.0001;
+    m_SegmentVolume = 0.0001;
     float minSpacing = 1;
     if(m_WorkingSpacing[0]<m_WorkingSpacing[1] && m_WorkingSpacing[0]<m_WorkingSpacing[2])
         minSpacing = m_WorkingSpacing[0];
@@ -564,9 +609,9 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
     m_FiberBundleWorkingCopy = m_FiberBundle->GetDeepCopy();    // working copy is needed because we need to resample the fibers but do not want to change the original bundle
     double volumeAccuracy = 10;
     m_FiberBundleWorkingCopy->ResampleSpline(minSpacing/volumeAccuracy);
-    mmRadius = m_Parameters.m_SignalGen.m_AxonRadius/1000;
-    if (mmRadius>0)
-        segmentVolume = M_PI*mmRadius*mmRadius*minSpacing/volumeAccuracy;
+    m_mmRadius = m_Parameters.m_SignalGen.m_AxonRadius/1000;
+    if (m_mmRadius>0)
+        m_SegmentVolume = M_PI*m_mmRadius*m_mmRadius*minSpacing/volumeAccuracy;
     m_FiberBundleTransformed = m_FiberBundleWorkingCopy;    // a secon fiber bundle is needed to store the transformed version of the m_FiberBundleWorkingCopy
 }
 
@@ -688,13 +733,13 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                         {
                             m_Parameters.m_FiberModelList[k]->SetFiberDirection(dir);
                             DoubleDwiType::PixelType pix = m_CompartmentImages.at(k)->GetPixel(idx);
-                            pix[g] += fiberWeight*segmentVolume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g);
+                            pix[g] += fiberWeight*m_SegmentVolume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g);
 
                             m_CompartmentImages.at(k)->SetPixel(idx, pix);
                         }
 
                         // update fiber volume image
-                        double vol = intraAxonalVolumeImage->GetPixel(idx) + segmentVolume*fiberWeight;
+                        double vol = intraAxonalVolumeImage->GetPixel(idx) + m_SegmentVolume*fiberWeight;
                         intraAxonalVolumeImage->SetPixel(idx, vol);
                         if (vol>maxVolume)  // we assume that the first volume is always unweighted!
                             maxVolume = vol;
@@ -982,6 +1027,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     }
 
     DoubleDwiType::Pointer doubleOutImage;
+    double signalScale = m_Parameters.m_SignalGen.m_SignalScale;
     if ( m_Parameters.m_SignalGen.m_SimulateKspaceAcquisition ) // do k-space stuff
     {
         m_StatusText += this->GetTime()+" > Adjusting complex signal\n";
@@ -1003,7 +1049,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             m_StatusText += "Simulating ghosts\n";
 
         doubleOutImage = DoKspaceStuff(m_CompartmentImages);
-        m_Parameters.m_SignalGen.m_SignalScale = 1; // already scaled in DoKspaceStuff
+        signalScale = 1; // already scaled in DoKspaceStuff
     }
     else    // don't do k-space stuff, just sum compartments
     {
@@ -1028,7 +1074,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     m_StatusText += this->GetTime()+" > Finalizing image\n";
     MITK_INFO << "Finalizing image";
-    if (m_Parameters.m_SignalGen.m_SignalScale>1)
+    if (signalScale>1)
         m_StatusText += " Scaling signal\n";
     if (m_Parameters.m_NoiseModel!=NULL)
         m_StatusText += " Adding noise\n";
@@ -1057,7 +1103,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         lastTick = newTick;
 
         typename OutputImageType::IndexType index = it4.GetIndex();
-        signal = doubleOutImage->GetPixel(index)*m_Parameters.m_SignalGen.m_SignalScale;
+        signal = doubleOutImage->GetPixel(index)*signalScale;
 
         if (m_Parameters.m_NoiseModel!=NULL)
             m_Parameters.m_NoiseModel->AddNoise(signal);
@@ -1302,6 +1348,8 @@ void TractsToDWIImageFilter< PixelType >::SimulateExtraAxonalSignal(ItkUcharImgT
                     if (!m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion().IsInside(newIndex))
                         continue;
                     weight = m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetPixel(newIndex)*m_VoxelVolume;
+                    if (m_UseRelativeNonFiberVolumeFractions)
+                        weight *= other/m_VoxelVolume;
                 }
 
                 if (g>=0)

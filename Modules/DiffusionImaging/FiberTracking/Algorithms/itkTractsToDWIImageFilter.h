@@ -133,8 +133,10 @@ protected:
     std::vector< DoubleVectorType >             m_Rotations;                ///<stores the individual rotation of each volume (needed for k-space simulation to obtain correct frequency map position)
     std::vector< DoubleVectorType >             m_Translations;             ///<stores the individual translation of each volume (needed for k-space simulation to obtain correct frequency map position)
     ImageRegion<3>                              m_CroppedRegion;
-    double                                      mmRadius;
-    double                                      segmentVolume;
+    double                                      m_mmRadius;
+    double                                      m_SegmentVolume;
+    bool                                        m_UseRelativeNonFiberVolumeFractions;
+
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 };
 }

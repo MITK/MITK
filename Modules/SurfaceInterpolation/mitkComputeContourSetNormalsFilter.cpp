@@ -151,11 +151,6 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
           worldCoord[1] = p1[1]+finalNormal[1]*m_MaxSpacing;
           worldCoord[2] = p1[2]+finalNormal[2]*m_MaxSpacing;
 
-          std::cout << "World coords: " << worldCoord[0] << " , " << worldCoord[1] << " , " << worldCoord[2] << std::endl;
-          std::cout << "...for point: " << p1[0] << " , " << p1[1] << " , " << p1[2] << std::endl;
-          std::cout << "...and normal: " << finalNormal[0] << " , " << finalNormal[1] << " , " << finalNormal[2] << std::endl;
-          std::cout << "MaxSpacing: " << m_MaxSpacing << std::endl;
-
           double val = 0.0;
 
           mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_SegmentationBinaryImage);
@@ -209,9 +204,6 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
       normals->SetTuple(id,vertexNormal);
       id = cell[cellSize-1];
       normals->SetTuple(id,vertexNormal);
-
-      std::cout << "Negative normal counter: " << m_NegativeNormalCounter << std::endl;
-      std::cout << "Positive normal counter: " << m_PositiveNormalCounter << std::endl;
 
       if(m_NegativeNormalCounter > m_PositiveNormalCounter)
       {

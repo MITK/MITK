@@ -588,6 +588,7 @@ void QmitkDataManagerView::ComponentActionChanged()
     m_ComponentSlider->SetProperty(componentProperty);
     m_ComponentSlider->setMinValue(0);
     m_ComponentSlider->setMaxValue(numComponents-1);
+    m_ComponentSlider->setValue(componentProperty->GetValue());
   }
   else
   {
@@ -1029,6 +1030,12 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
   {
     if ( node.IsNotNull() )
       node->SetBoolProperty("selected", true);
+  }
+
+  if(nodes.size() == 1)
+  {
+    // Update compnent slider to the correct position
+    this->ComponentActionChanged();
   }
   //changing the selection does NOT require any rendering processes!
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();

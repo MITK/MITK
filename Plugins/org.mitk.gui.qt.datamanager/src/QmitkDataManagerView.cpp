@@ -588,7 +588,6 @@ void QmitkDataManagerView::ComponentActionChanged()
     m_ComponentSlider->SetProperty(componentProperty);
     m_ComponentSlider->setMinValue(0);
     m_ComponentSlider->setMaxValue(numComponents-1);
-    m_ComponentSlider->setValue(componentProperty->GetValue());
   }
   else
   {

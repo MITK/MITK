@@ -65,7 +65,7 @@ public:
 
       void OnClickedAddNewDevice();
 
-      void OnChangedFramerateLimit(int);
+      void OnChangedFramerateLimit();
 
       /*
        *\brief Called, when the selection in the list of the active devices changes.

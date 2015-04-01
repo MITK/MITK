@@ -63,7 +63,9 @@ connect( m_Controls.m_ActiveVideoDevices, SIGNAL(ServiceSelectionChanged(us::Ser
 connect( m_Controls.m_RunImageTimer, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()) );
 connect( m_Controls.m_ShowImageStream, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()) );
 connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
-connect( m_Controls.m_FrameRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit(int)) );
+connect( m_Controls.m_FrameRatePipeline, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit()) );
+connect( m_Controls.m_FrameRate2d, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit()) );
+connect( m_Controls.m_FrameRate3d, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit()) );
 connect( m_Controls.m_FreezeButton, SIGNAL(clicked()), this, SLOT(OnClickedFreezeButton()) );
 connect( m_UpdateTimer, SIGNAL(timeout()), this, SLOT(UpdateImage()));
 connect( m_RenderingTimer2d, SIGNAL(timeout()), this, SLOT(RenderImage2d()));
@@ -157,10 +159,11 @@ void UltrasoundSupport::RenderImage3d()
 this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
 }
 
-void UltrasoundSupport::OnChangedFramerateLimit(int value)
+void UltrasoundSupport::OnChangedFramerateLimit()
 {
+MITK_INFO << "Framerate changed";
 StopTimers();
-SetTimerIntervals(1000 / value);
+SetTimerIntervals(1000 / 20);
 StartTimers();
 }
 
@@ -210,7 +213,7 @@ if(m_Controls.m_ShowImageStream->isChecked())
 //start timer
 if(m_Controls.m_RunImageTimer->isChecked())
   {
-  int interval = (1000 / m_Controls.m_FrameRate->value());
+  int interval = (1000 / m_Controls.m_FrameRatePipeline->value());
   SetTimerIntervals(interval);
   StartTimers();
   m_Controls.m_TimerWidget->setEnabled(true);

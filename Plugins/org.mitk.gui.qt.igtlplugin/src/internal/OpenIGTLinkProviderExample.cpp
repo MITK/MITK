@@ -120,33 +120,33 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //for more information)
   m_NavDataToIGTLMsgFilter->RegisterAsMicroservice();
 
+  //also create a visualize filter to visualize the data
+  m_NavDataVisualizer = mitk::NavigationDataObjectVisualizationFilter::New();
+
   //create an object that will be moved respectively to the navigation data
-  m_DemoNodeT1 = mitk::DataNode::New();
-  m_DemoNodeT1->SetName("DemoNode IGTLProviderExmpl T1");
-  m_DemoNodeT2 = mitk::DataNode::New();
-  m_DemoNodeT2->SetName("DemoNode IGTLProviderExmpl T2");
-  m_DemoNodeT3 = mitk::DataNode::New();
-  m_DemoNodeT3->SetName("DemoNode IGTLProviderExmpl T3");
+  for (size_t i = 0; i < m_NavDataPlayer->GetNumberOfIndexedOutputs(); i++)
+  {
+     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+     QString name("DemoNode IGTLProviderExmpl T");
+     name.append(QString::number(i));
+     newNode->SetName(name.toStdString());
 
-  //create small sphere and use it as surface
-  mitk::Surface::Pointer mySphere = mitk::Surface::New();
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius(2.0f);
-  vtkData->SetCenter(0.0, 0.0, 0.0);
-  vtkData->Update();
-  mySphere->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
-  m_DemoNodeT1->SetData(mySphere);
+     //create small sphere and use it as surface
+     mitk::Surface::Pointer mySphere = mitk::Surface::New();
+     vtkSphereSource *vtkData = vtkSphereSource::New();
+     vtkData->SetRadius(2.0f);
+     vtkData->SetCenter(0.0, 0.0, 0.0);
+     vtkData->Update();
+     mySphere->SetVtkPolyData(vtkData->GetOutput());
+     vtkData->Delete();
+     newNode->SetData(mySphere);
 
-  mitk::Surface::Pointer mySphere2 = mySphere->Clone();
-  m_DemoNodeT2->SetData(mySphere2);
-  mitk::Surface::Pointer mySphere3 = mySphere->Clone();
-  m_DemoNodeT3->SetData(mySphere3);
+     this->GetDataStorage()->Add(newNode);
 
-  // add node to DataStorage
-  this->GetDataStorage()->Add(m_DemoNodeT1);
-  this->GetDataStorage()->Add(m_DemoNodeT2);
-  this->GetDataStorage()->Add(m_DemoNodeT3);
+     m_NavDataVisualizer->SetRepresentationObject(i, mySphere);
+
+     m_DemoNodes.append(newNode);
+  }
 
   //initialize the streaming connector
   //the streaming connector is checking if the data from the filter has to be
@@ -154,11 +154,8 @@ void OpenIGTLinkProviderExample::CreatePipeline()
 //  m_StreamingConnector.Initialize(m_NavDataToIGTLMsgFilter.GetPointer(),
 //                                  m_IGTLMessageProvider);
 
-  //also create a visualize filter to visualize the data
-  m_NavDataVisualizer = mitk::NavigationDataObjectVisualizationFilter::New();
-  m_NavDataVisualizer->SetRepresentationObject(0, mySphere);
-  m_NavDataVisualizer->SetRepresentationObject(1, mySphere2);
-  m_NavDataVisualizer->SetRepresentationObject(2, mySphere3);
+
+  //connect the visualization with the navigation data player
   m_NavDataVisualizer->ConnectTo(m_NavDataPlayer);
 
   //start the player
@@ -173,9 +170,11 @@ void OpenIGTLinkProviderExample::DestroyPipeline()
    {
       m_NavDataPlayer->StopPlaying();
    }
-   this->GetDataStorage()->Remove(m_DemoNodeT1);
-   this->GetDataStorage()->Remove(m_DemoNodeT2);
-   this->GetDataStorage()->Remove(m_DemoNodeT3);
+   foreach(mitk::DataNode::Pointer node, m_DemoNodes)
+   {
+      this->GetDataStorage()->Remove(node);
+   }
+   this->m_DemoNodes.clear();
 }
 
 void OpenIGTLinkProviderExample::Start()

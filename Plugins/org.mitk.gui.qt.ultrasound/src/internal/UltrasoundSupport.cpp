@@ -50,6 +50,7 @@ void UltrasoundSupport::SetFocus()
 
 void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 {
+//initialize timers
 m_UpdateTimer = new QTimer(this);
 m_RenderingTimer2d = new QTimer(this);
 m_RenderingTimer3d = new QTimer(this);
@@ -57,6 +58,10 @@ m_RenderingTimer3d = new QTimer(this);
 // create GUI widgets from the Qt Designer's .ui file
 m_Controls.setupUi( parent );
 
+//load persistence data before connecting slots (so no slots are called in this phase...)
+LoadUISettings();
+
+//connect signals and slots...
 connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this, SLOT(OnClickedAddNewDevice()) ); // Change Widget Visibilities
 connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
 connect( m_Controls.m_ActiveVideoDevices, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnChangedActiveDevice()) );
@@ -88,17 +93,16 @@ m_FrameCounter3d = 0;
 // Create Node for US Stream
 if (m_Node.IsNull())
 {
-m_Node = mitk::DataNode::New();
-m_Node->SetName("US Support Viewing Stream");
-//create a dummy image (gray values 0..255) for correct initialization of level window, etc.
-mitk::Image::Pointer dummyImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 1, 1, 1, 255,0);
-m_Node->SetData(dummyImage);
-m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(dummyImage->GetGeometry());
+  m_Node = mitk::DataNode::New();
+  m_Node->SetName("US Support Viewing Stream");
+  //create a dummy image (gray values 0..255) for correct initialization of level window, etc.
+  mitk::Image::Pointer dummyImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 1, 1, 1, 255,0);
+  m_Node->SetData(dummyImage);
+  m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(dummyImage->GetGeometry());
 }
 
 m_Controls.tabWidget->setTabEnabled(1, false);
 
-LoadUISettings();
 }
 
 void UltrasoundSupport::OnClickedAddNewDevice()
@@ -429,6 +433,11 @@ void UltrasoundSupport::StoreUISettings()
   settings.beginGroup(QString::fromStdString(VIEW_ID));
   settings.setValue("DisplayImage", QVariant(m_Controls.m_ShowImageStream->isChecked()));
   settings.setValue("RunImageTimer", QVariant(m_Controls.m_RunImageTimer->isChecked()));
+  settings.setValue("Update2DView", QVariant(m_Controls.m_Update2DView->isChecked()));
+  settings.setValue("Update3DView", QVariant(m_Controls.m_Update3DView->isChecked()));
+  settings.setValue("UpdateRatePipeline", QVariant(m_Controls.m_FrameRatePipeline->value()));
+  settings.setValue("UpdateRate2d", QVariant(m_Controls.m_FrameRate2d->value()));
+  settings.setValue("UpdateRate3d", QVariant(m_Controls.m_FrameRate3d->value()));
   settings.endGroup();
 }
 
@@ -438,7 +447,13 @@ void UltrasoundSupport::LoadUISettings()
   settings.beginGroup(QString::fromStdString(VIEW_ID));
   m_Controls.m_ShowImageStream->setChecked(settings.value("DisplayImage", true).toBool());
   m_Controls.m_RunImageTimer->setChecked(settings.value("RunImageTimer", true).toBool());
+  m_Controls.m_Update2DView->setChecked(settings.value("Update2DView", true).toBool());
+  m_Controls.m_Update3DView->setChecked(settings.value("Update3DView", true).toBool());
+  m_Controls.m_FrameRatePipeline->setValue(settings.value("UpdateRatePipeline", 50).toInt());
+  m_Controls.m_FrameRate2d->setValue(settings.value("UpdateRate2d", 20).toInt());
+  m_Controls.m_FrameRate3d->setValue(settings.value("UpdateRate3d", 5).toInt());
   settings.endGroup();
+
 }
 
 void UltrasoundSupport::StartTimers()

@@ -53,12 +53,41 @@ public:
   CustomMimeType& operator=(const CustomMimeType& other);
   CustomMimeType& operator=(const MimeType& other);
 
+  /**
+  * \brief Returns the unique name for the MimeType.
+  */
   std::string GetName() const;
+
+  /**
+  * \brief Returns the Human readable Category of the MimeType. Allows grouping of similar Mimetypes (like Suirfaces)
+  */
   std::string GetCategory() const;
+
+  /**
+  * \brief Returns all extensions that this MimeType can handle.
+  */
   std::vector<std::string> GetExtensions() const;
+
+  /**
+  * \brief Returns the Human readable comment of the MimeType, a string that describes its unique role.
+  */
   std::string GetComment() const;
 
+  /**
+  * \brief Checks if the MimeType can handle file at the given location.
+  *
+  * In its base implementation, this function exclusively looks a the given string.
+  * However, child classes can override this behaviour and peek into the file.
+  */
   virtual bool AppliesTo(const std::string& path) const;
+
+  /**
+  * \brief Checks if the MimeType can handle the etension of the given path
+  *
+  * This function exclusively looks a the given string
+  */
+  bool MatchesExtension(const std::string& path) const;
+
   /**
   * \brief Provides the first matching extension
   *
@@ -66,6 +95,7 @@ public:
   * Returns the first found one.
   */
   std::string GetExtension(const std::string& path) const;
+
   /**
   * \brief Provides the filename minus the extension
   *

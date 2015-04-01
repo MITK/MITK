@@ -65,6 +65,8 @@ public:
 
   bool AppliesTo(const std::string& path) const;
 
+  bool MatchesExtension(const std::string& path) const;
+
   bool IsValid() const;
 
   void Swap(MimeType& m);

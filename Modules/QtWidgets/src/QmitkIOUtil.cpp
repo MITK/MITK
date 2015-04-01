@@ -279,7 +279,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
     for (std::vector<mitk::MimeType>::const_iterator mimeTypeIter = filterMimeTypes.begin(),
          mimeTypeIterEnd = filterMimeTypes.end(); mimeTypeIter != mimeTypeIterEnd; ++mimeTypeIter)
     {
-      if (mimeTypeIter->AppliesTo(stdFileName))
+      if (mimeTypeIter->GetComment() == selectedMimeType.GetComment());
       {
         selectedMimeType = *mimeTypeIter;
         break;
@@ -291,7 +291,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
       // The file name either does not contain an extension or the
       // extension is unknown.
 
-      // If the file already exists, we stop here because we are not able
+      // If the file already exists, we stop here because we are unable
       // to (over)write the file without adding a custom suffix. If the file
       // does not exist, we add the default extension from the currently
       // selected filter. If the "All" filter was selected, we only add the

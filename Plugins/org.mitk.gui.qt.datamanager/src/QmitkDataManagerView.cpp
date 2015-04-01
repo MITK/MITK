@@ -1031,12 +1031,6 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
     if ( node.IsNotNull() )
       node->SetBoolProperty("selected", true);
   }
-
-  if(nodes.size() == 1)
-  {
-    // Update compnent slider to the correct position
-    this->ComponentActionChanged();
-  }
   //changing the selection does NOT require any rendering processes!
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

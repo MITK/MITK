@@ -72,7 +72,8 @@ int main(int argc, char* argv[])
       // Part III: Put the data into the datastorage
       //*********************************************************************
     // Load datanode (eg. many image formats, surface formats, etc.)
-    mitk::StandaloneDataStorage::SetOfObjects* dataNodes = mitk::IOUtil::Load(argv[i],*ds);
+    mitk::StandaloneDataStorage::SetOfObjects::Pointer dataNodes = mitk::IOUtil::Load(argv[i],*ds);
+
 
     if(dataNodes->empty())
     {

@@ -34,29 +34,6 @@ mitk::FiberfoxParameters< ScalarType >::~FiberfoxParameters()
     //        delete m_NoiseModel;
 }
 
-//using namespace rapidxml;
-//#if defined(RAPIDXML_NO_EXCEPTIONS)
-//void rapidxml::parse_error_handler(const char* what, void* where) {
-//printf("Parse error(@%p): %s\n", where, what);
-//std::abort();
-//}
-//#endif
-
-//namespace boost {
-//namespace property_tree {
-//namespace detail {
-//namespace rapidxml
-//{
-
-//void parse_error(const char *wa, void *we)
-//{
-//}
-
-//}
-//}
-//}
-//}
-
 void mitk::SignalGenerationParameters::GenerateGradientHalfShell()
 {
     int NPoints = 2*m_NumGradients;

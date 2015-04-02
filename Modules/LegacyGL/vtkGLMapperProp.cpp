@@ -37,6 +37,7 @@ int vtkGLMapperProp::RenderOpaqueGeometry(vtkViewport *)
     return 0;
 
   this->m_WrappedGLMapper->MitkRender(m_BaseRenderer, mitk::VtkPropRenderer::Opaque);
+  return 1;
 }
 
 int vtkGLMapperProp::RenderTranslucentPolygonalGeometry(vtkViewport *)

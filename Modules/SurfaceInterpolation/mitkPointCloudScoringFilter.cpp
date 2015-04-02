@@ -21,9 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkPoints.h>
 #include <vtkKdTree.h>
-#include <vtkPolyData.h>
-#include <vtkPolyLine.h>
-#include <vtkCellArray.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkPolyVertex.h>
 #include <vtkDoubleArray.h>
@@ -32,8 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::PointCloudScoringFilter::PointCloudScoringFilter():
   m_NumberOfOutpPoints(0)
 {
-  m_OutpGrid = mitk::UnstructuredGrid::New();
-  this->SetNthOutput(0, m_OutpGrid);
+  this->SetNumberOfIndexedOutputs(1);
 }
 
 mitk::PointCloudScoringFilter::~PointCloudScoringFilter(){}
@@ -53,10 +49,13 @@ void mitk::PointCloudScoringFilter::GenerateData()
   if(edgeGrid->IsEmpty() || segmGrid->IsEmpty())
   {
     if(edgeGrid->IsEmpty())
-      MITK_ERROR << "Cannot convert edgeGrid into Surfaces" << std::endl;
+      MITK_ERROR << "edgeGrid is empty" << std::endl;
     if(segmGrid->IsEmpty())
-      MITK_ERROR << "Cannot convert segmGrid into Surfaces" << std::endl;
+      MITK_ERROR << "segmGrid is empty" << std::endl;
   }
+
+  if(m_FilteredScores.size()>0)
+    m_FilteredScores.clear();
 
   vtkSmartPointer<vtkUnstructuredGrid> edgevtkGrid = edgeGrid->GetVtkUnstructuredGrid();
   vtkSmartPointer<vtkUnstructuredGrid> segmvtkGrid = segmGrid->GetVtkUnstructuredGrid();
@@ -114,13 +113,13 @@ void mitk::PointCloudScoringFilter::GenerateData()
   {
     cubicAll = cubicAll + score.at(i).second * score.at(i).second * score.at(i).second;
   }
-  double root2 = cubicAll / score.size();
+  double root2 = cubicAll / static_cast<double>(score.size());
   double cubic = pow(root2,1.0/3.0);
   //CUBIC END
 
   double metricValue = cubic;
 
-  for(unsigned int i=0; i<score.size();++i)
+  for(unsigned int i=0; i<score.size();i++)
   {
     if(score.at(i).second > metricValue)
     {
@@ -173,7 +172,9 @@ void mitk::PointCloudScoringFilter::GenerateData()
   uGrid->SetPoints(filteredPoints);
   uGrid->GetPointData()->AddArray(pointDataDistances);
 
-  m_OutpGrid->SetVtkUnstructuredGrid(uGrid);
+  mitk::UnstructuredGrid::Pointer outputGrid = mitk::UnstructuredGrid::New();
+  outputGrid->SetVtkUnstructuredGrid(uGrid);
+  this->SetNthOutput(0, outputGrid);
 
   score.clear();
   distances.clear();

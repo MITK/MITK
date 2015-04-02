@@ -15,15 +15,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTestingMacros.h"
-#include <mitkImageToUnstructuredGridFilter.h>
+#include <mitkImageToPointCloudFilter.h>
 #include <mitkTestFixture.h>
 
 #include <mitkIOUtil.h>
 
-class mitkImageToUnstructuredGridFilterTestSuite : public mitk::TestFixture
+class mitkImageToPointCloudFilterTestSuite : public mitk::TestFixture
 {
-  CPPUNIT_TEST_SUITE(mitkImageToUnstructuredGridFilterTestSuite);
-  MITK_TEST(testImageToUnstructuredGridFilterInitialization);
+  CPPUNIT_TEST_SUITE(mitkImageToPointCloudFilterTestSuite);
+  MITK_TEST(testImageToPointCloudFilterInitialization);
   MITK_TEST(testInput);
   MITK_TEST(testUnstructuredGridGeneration);
   MITK_TEST(testThreshold);
@@ -44,23 +44,22 @@ public:
     m_BallImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("BallBinary30x30x30.nrrd"));
   }
 
-  void testImageToUnstructuredGridFilterInitialization()
+  void testImageToPointCloudFilterInitialization()
   {
     mitk::ImageToUnstructuredGridFilter::Pointer testFilter = mitk::ImageToUnstructuredGridFilter::New();
     CPPUNIT_ASSERT_MESSAGE("Testing instantiation of test object", testFilter.IsNotNull());
-    CPPUNIT_ASSERT_MESSAGE("Testing initialization of threshold member variable",testFilter->GetThreshold() == -0.1);
   }
 
   void testInput()
   {
-    mitk::ImageToUnstructuredGridFilter::Pointer testFilter = mitk::ImageToUnstructuredGridFilter::New();
+    mitk::ImageToPointCloudFilter::Pointer testFilter = mitk::ImageToPointCloudFilter::New();
     testFilter->SetInput(m_BallImage);
     CPPUNIT_ASSERT_MESSAGE("Testing set / get input!", testFilter->GetInput() == m_BallImage);
   }
 
   void testUnstructuredGridGeneration()
   {
-    mitk::ImageToUnstructuredGridFilter::Pointer testFilter = mitk::ImageToUnstructuredGridFilter::New();
+    mitk::ImageToPointCloudFilter::Pointer testFilter = mitk::ImageToPointCloudFilter::New();
     testFilter->SetInput(m_BallImage);
     testFilter->Update();
     CPPUNIT_ASSERT_MESSAGE("Testing UnstructuredGrid generation!", testFilter->GetOutput() != NULL);
@@ -68,15 +67,15 @@ public:
 
   void testThreshold()
   {
-    mitk::ImageToUnstructuredGridFilter::Pointer testFilter1 = mitk::ImageToUnstructuredGridFilter::New();
+    mitk::ImageToPointCloudFilter::Pointer testFilter1 = mitk::ImageToPointCloudFilter::New();
     testFilter1->SetInput(m_BallImage);
     testFilter1->Update();
 
     int numberOfPoints1 = testFilter1->GetNumberOfExtractedPoints();
 
-    mitk::ImageToUnstructuredGridFilter::Pointer testFilter2 = mitk::ImageToUnstructuredGridFilter::New();
+    mitk::ImageToPointCloudFilter::Pointer testFilter2 = mitk::ImageToPointCloudFilter::New();
     testFilter2->SetInput(m_BallImage);
-    testFilter2->SetThreshold(1.0);
+    testFilter2->SetMethod(mitk::ImageToPointCloudFilter::LAPLACIAN_STD_DEV3);
     testFilter2->Update();
 
     int numberOfPoints2 = testFilter2->GetNumberOfExtractedPoints();
@@ -86,4 +85,4 @@ public:
 
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkImageToUnstructuredGridFilter)
+MITK_TEST_SUITE_REGISTRATION(mitkImageToPointCloudFilter)

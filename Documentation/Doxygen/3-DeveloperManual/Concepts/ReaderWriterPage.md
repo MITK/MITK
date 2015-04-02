@@ -1,7 +1,15 @@
 Reader and Writer {#ReaderWriterPage}
 =================
 
-This page is work in progress.
+This page is work in progress and will introduce you to the IO-System of MITK.
+
+## Introductory Slides
+
+Several Talks have been given on the IO-System. The following list should provide you with a good starting point.
+
+- Introduction to MimeTypes: http://www.mitk.org/images/e/e8/MimeTypes.pdf (by Caspar J. Goch)
+- Introduction to the IO-System: http://www.mitk.org/images/0/0b/Newio.pdf (by Keno März)
+- IO-Streams and the new IO System: http://www.mitk.org/images/9/95/Streams.pdf (by Keno März)
 
 ## Mime Types
 

@@ -35,8 +35,7 @@ namespace itk {
 template< class TPixelType >
 KspaceImageFilter< TPixelType >
 ::KspaceImageFilter()
-    : m_FrequencyMapSlice(NULL)
-    , m_Z(0)
+    : m_Z(0)
     , m_UseConstantRandSeed(false)
     , m_SpikesPerSlice(0)
     , m_IsBaseline(true)
@@ -45,6 +44,8 @@ KspaceImageFilter< TPixelType >
 
     m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
     m_RandGen->SetSeed();
+
+    m_CoilPosition.Fill(0.0);
 }
 
 template< class TPixelType >
@@ -87,6 +88,60 @@ void KspaceImageFilter< TPixelType >
     for (int i=0; i<3; i++)
         for (int j=0; j<3; j++)
             m_Transform[i][j] *=  m_Parameters.m_SignalGen.m_ImageSpacing[j];
+
+    double a = m_Parameters.m_SignalGen.m_ImageRegion.GetSize(0)*m_Parameters.m_SignalGen.m_ImageSpacing[0];
+    double b = m_Parameters.m_SignalGen.m_ImageRegion.GetSize(1)*m_Parameters.m_SignalGen.m_ImageSpacing[1];
+    double diagonal = sqrt(a*a+b*b)/1000;   // image diagonal in m
+
+    switch (m_Parameters.m_SignalGen.m_CoilSensitivityProfile)
+    {
+    case SignalGenerationParameters::COIL_CONSTANT:
+    {
+        m_CoilSensitivityFactor = 1;
+        break;
+    }
+    case SignalGenerationParameters::COIL_LINEAR:
+    {
+        m_CoilSensitivityFactor = -1/diagonal;
+        break;
+    }
+    case SignalGenerationParameters::COIL_EXPONENTIAL:
+    {
+        m_CoilSensitivityFactor = -log(0.1)/diagonal;
+        break;
+    }
+    }
+}
+
+template< class TPixelType >
+double KspaceImageFilter< TPixelType >::CoilSensitivity(DoubleVectorType& pos)
+{
+    // *************************************************************************
+    // Coil ring is moving with excited slice (FIX THIS SOMETIME)
+    m_CoilPosition[2] = pos[2];
+    // *************************************************************************
+
+    switch (m_Parameters.m_SignalGen.m_CoilSensitivityProfile)
+    {
+    case SignalGenerationParameters::COIL_CONSTANT:
+        return 1;
+    case SignalGenerationParameters::COIL_LINEAR:
+    {
+        DoubleVectorType diff = pos-m_CoilPosition;
+        double sens = diff.GetNorm()*m_CoilSensitivityFactor + 1;
+        if (sens<0)
+            sens = 0;
+        return sens;
+    }
+    case SignalGenerationParameters::COIL_EXPONENTIAL:
+    {
+        DoubleVectorType diff = pos-m_CoilPosition;
+        double dist = diff.GetNorm();
+        return exp(-dist*m_CoilSensitivityFactor);
+    }
+    default:
+        return 1;
+    }
 }
 
 template< class TPixelType >
@@ -188,6 +243,10 @@ void KspaceImageFilter< TPixelType >
             {
                 double x = it.GetIndex()[0]-xMax/2;
                 double y = it.GetIndex()[1]-yMax/2;
+
+                DoubleVectorType pos; pos[0] = x; pos[1] = y; pos[2] = m_Z;
+                pos = m_Transform*pos/1000;   // vector from image center to current position (in meter)
+
                 vcl_complex<double> f(0, 0);
 
                 // sum compartment signals and simulate relaxation
@@ -197,12 +256,13 @@ void KspaceImageFilter< TPixelType >
                     else
                         f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) *  m_Parameters.m_SignalGen.m_SignalScale );
 
+                if (m_Parameters.m_SignalGen.m_CoilSensitivityProfile!=SignalGenerationParameters::COIL_CONSTANT)
+                    f *= CoilSensitivity(pos);
+
                 // simulate eddy currents and other distortions
                 double omega = 0;   // frequency offset
                 if (  m_Parameters.m_SignalGen.m_EddyStrength>0 && !m_IsBaseline)
                 {
-                    itk::Vector< double, 3 > pos; pos[0] = x; pos[1] = y; pos[2] = m_Z;
-                    pos = m_Transform*pos/1000;   // vector from image center to current position (in meter)
                     omega += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2]) * eddyDecay;
                 }
                 if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull()) // simulate distortions

@@ -76,7 +76,6 @@ namespace itk{
     typedef itk::Image<double, 3>                           ItkDoubleImgType;
 
     itkSetMacro( SpikesPerSlice, unsigned int )     ///< Number of spikes per slice. Corresponding parameter in fiberfox parameter object specifies the number of spikes for the whole image and can thus not be used here.
-    itkSetMacro( FrequencyMapSlice, typename InputImageType::Pointer )   ///< Used to simulate distortions. Specifies additional frequency component per voxel.
     itkSetMacro( Z, double )                        ///< Slice position, necessary for eddy current simulation.
     itkSetMacro( OutSize, itk::Size<2> )            ///< Output slice size. Can be different from input size, e.g. if Gibbs ringing is enabled.
     itkSetMacro( UseConstantRandSeed, bool )        ///< Use constant seed for random generator for reproducible results.
@@ -84,6 +83,7 @@ namespace itk{
     itkSetMacro( Translation, DoubleVectorType )
     itkSetMacro( Zidx, int )
     itkSetMacro( FiberBundle, FiberBundle::Pointer )
+    itkSetMacro( CoilPosition, DoubleVectorType )
     itkGetMacro( KSpaceImage, typename InputImageType::Pointer )    ///< k-space magnitude image
 
     void SetParameters( FiberfoxParameters<double> param ){ m_Parameters = param; }
@@ -98,12 +98,14 @@ namespace itk{
     KspaceImageFilter();
     ~KspaceImageFilter() {}
 
+    double CoilSensitivity(DoubleVectorType& pos);
+
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);
     void AfterThreadedGenerateData();
 
+    DoubleVectorType                        m_CoilPosition;
     FiberfoxParameters<double>              m_Parameters;
-    typename InputImageType::Pointer        m_FrequencyMapSlice;
     vector< double >                        m_T2;
     vector< double >                        m_T1;
     vector< InputImagePointerType >         m_CompartmentImages;
@@ -115,7 +117,6 @@ namespace itk{
     itk::Size<2>                            m_OutSize;
     FiberBundle::Pointer                    m_FiberBundle;
     double                                  m_Gamma;
-
     DoubleVectorType                        m_Rotation;     ///< used to find correct point in frequency map (head motion)
     DoubleVectorType                        m_Translation;  ///< used to find correct point in frequency map (head motion)
 
@@ -124,6 +125,7 @@ namespace itk{
     MatrixType                              m_Transform;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 
+    double                                  m_CoilSensitivityFactor;
     typename InputImageType::Pointer        m_KSpaceImage;
 
   private:

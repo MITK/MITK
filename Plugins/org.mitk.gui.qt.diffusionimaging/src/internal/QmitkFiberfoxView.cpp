@@ -227,6 +227,15 @@ void QmitkFiberfoxView::AfterThread()
                 node->SetName("k-Space");
                 GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
             }
+
+            {
+                mitk::DataNode::Pointer node = mitk::DataNode::New();
+                node->SetData(m_TractsToDwiFilter->GetCoilPointset());
+                node->SetName("Coil Positions");
+                node->SetProperty("pointsize", mitk::FloatProperty::New(parameters.m_SignalGen.m_ImageSpacing[0]/4));
+                node->SetProperty("color", mitk::ColorProperty::New(0, 1, 0));
+                GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
+            }
         }
         m_TractsToDwiFilter = NULL;
         break;
@@ -699,6 +708,22 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     }
 
     // other imaging parameters
+    switch (m_Controls->m_CoilSensBox->currentIndex())
+    {
+    case 0:
+        parameters.m_SignalGen.m_CoilSensitivityProfile = SignalGenerationParameters::COIL_CONSTANT;
+        break;
+    case 1:
+        parameters.m_SignalGen.m_CoilSensitivityProfile = SignalGenerationParameters::COIL_LINEAR;
+        break;
+    case 2:
+        parameters.m_SignalGen.m_CoilSensitivityProfile = SignalGenerationParameters::COIL_EXPONENTIAL;
+        break;
+    default:
+        parameters.m_SignalGen.m_CoilSensitivityProfile = SignalGenerationParameters::COIL_CONSTANT;
+        break;
+    }
+    parameters.m_SignalGen.m_NumberOfCoils = m_Controls->m_NumCoilsBox->value();
     parameters.m_SignalGen.m_PartialFourier = m_Controls->m_PartialFourier->value();
     parameters.m_SignalGen.m_ReversePhase = m_Controls->m_ReversePhaseBox->isChecked();
     parameters.m_SignalGen.m_tLine = m_Controls->m_LineReadoutTimeBox->value();
@@ -788,10 +813,10 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     }
 
     // adjusting line readout time to the adapted image size needed for the DFT
-//    unsigned int y = parameters.m_SignalGen.m_ImageRegion.GetSize(1);
-//    y += y%2;
-//    if ( y>parameters.m_SignalGen.m_ImageRegion.GetSize(1) )
-//        parameters.m_SignalGen.m_tLine *= (double)parameters.m_SignalGen.m_ImageRegion.GetSize(1)/y;
+    //    unsigned int y = parameters.m_SignalGen.m_ImageRegion.GetSize(1);
+    //    y += y%2;
+    //    if ( y>parameters.m_SignalGen.m_ImageRegion.GetSize(1) )
+    //        parameters.m_SignalGen.m_tLine *= (double)parameters.m_SignalGen.m_ImageRegion.GetSize(1)/y;
 
     // signal models
     {
@@ -1112,13 +1137,13 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
         }
     }
 
-//    // check if comp 3 or 4 volume fraction image is set
-//    if (parameters.m_NonFiberModelList.size()==2 && (parameters.m_NonFiberModelList[0]->GetVolumeFractionImage()==nullptr || parameters.m_NonFiberModelList[1]->GetVolumeFractionImage()==nullptr))
-//    {
-//        m_Controls->m_Compartment4Box->setCurrentIndex(0);
-//        parameters.m_NonFiberModelList.pop_back();
-//        QMessageBox::information(NULL, "Compartment 4 disabled", "More than one non-fiber compartment selected but no volume fraction maps set!");
-//    }
+    //    // check if comp 3 or 4 volume fraction image is set
+    //    if (parameters.m_NonFiberModelList.size()==2 && (parameters.m_NonFiberModelList[0]->GetVolumeFractionImage()==nullptr || parameters.m_NonFiberModelList[1]->GetVolumeFractionImage()==nullptr))
+    //    {
+    //        m_Controls->m_Compartment4Box->setCurrentIndex(0);
+    //        parameters.m_NonFiberModelList.pop_back();
+    //        QMessageBox::information(NULL, "Compartment 4 disabled", "More than one non-fiber compartment selected but no volume fraction maps set!");
+    //    }
 
     //    RELIKT
     //    parameters.m_SignalGen.m_FiberSeparationThreshold = m_Controls->m_SeparationAngleBox->value();

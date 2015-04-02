@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTimeProbe.h>
 #include <mitkRawShModel.h>
 #include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
+#include <mitkPointSet.h>
 
 namespace itk
 {
@@ -73,6 +74,7 @@ public:
     itkGetMacro( StatusText, std::string )
     itkGetMacro( PhaseImage, DoubleDwiType::Pointer )
     itkGetMacro( KspaceImage, DoubleDwiType::Pointer )
+    itkGetMacro( CoilPointset, mitk::PointSet::Pointer )
 
     void GenerateData();
 
@@ -88,7 +90,7 @@ protected:
     std::string GetTime();
 
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using DFT and add k-space artifacts. */
-    DoubleDwiType::Pointer DoKspaceStuff(std::vector< DoubleDwiType::Pointer >& images);
+    DoubleDwiType::Pointer SimulateKspaceAcquisition(std::vector< DoubleDwiType::Pointer >& images);
 
     /** Generate signal of non-fiber compartments. */
     void SimulateExtraAxonalSignal(ItkUcharImgType::IndexType index, double intraAxonalVolume, int g=-1);
@@ -97,6 +99,7 @@ protected:
     void SimulateMotion(int g=-1);
 
     void CheckVolumeFractionImages();
+    ItkDoubleImgType::Pointer NormalizeInsideMask(ItkDoubleImgType::Pointer image);
     void InitializeData();
     void InitializeFiberData();
 
@@ -136,6 +139,7 @@ protected:
     double                                      m_mmRadius;
     double                                      m_SegmentVolume;
     bool                                        m_UseRelativeNonFiberVolumeFractions;
+    mitk::PointSet::Pointer                     m_CoilPointset;
 
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 };

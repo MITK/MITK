@@ -55,6 +55,12 @@ public:
         RANDOM_DIRECTIONS
     };
 
+    enum CoilSensitivityProfile {
+        COIL_CONSTANT,
+        COIL_LINEAR,
+        COIL_EXPONENTIAL
+    };
+
     SignalGenerationParameters()
         : m_SignalScale(100)
         , m_tEcho(100)
@@ -64,6 +70,8 @@ public:
         , m_ReversePhase(false)
         , m_PartialFourier(1.0)
         , m_NoiseVariance(0.001)
+        , m_NumberOfCoils(1)
+        , m_CoilSensitivityProfile(SignalGenerationParameters::COIL_CONSTANT)
         , m_Bvalue(1000)
         , m_SimulateKspaceAcquisition(false)
         , m_AxonRadius(0)
@@ -109,6 +117,8 @@ public:
     bool                                m_ReversePhase;             ///< If true, the phase readout direction will be inverted (-y instead of y)
     double                              m_PartialFourier;           ///< Partial fourier factor (0.5-1)
     double                              m_NoiseVariance;            ///< Variance of complex gaussian noise
+    int                                 m_NumberOfCoils;            ///< Number of coils in multi-coil acquisition
+    CoilSensitivityProfile              m_CoilSensitivityProfile;   ///< Choose between constant, linear or exponential sensitivity profile of the used coils
     double                              m_Bvalue;                   ///< Acquisition b-value
     bool                                m_SimulateKspaceAcquisition;///< Flag to enable/disable k-space acquisition simulation
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)

@@ -42,17 +42,7 @@ template< class TPixelType >
 void DftImageFilter< TPixelType >
 ::BeforeThreadedGenerateData()
 {
-    typename InputImageType::Pointer inputImage  = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
-    m_PhaseImage = OutputImageType::New();
-    m_PhaseImage->SetSpacing( inputImage->GetSpacing() );
-    m_PhaseImage->SetOrigin( inputImage->GetOrigin() );
-    m_PhaseImage->SetDirection( inputImage->GetDirection() );
-    m_PhaseImage->SetLargestPossibleRegion( inputImage->GetLargestPossibleRegion() );
-    m_PhaseImage->SetBufferedRegion( inputImage->GetLargestPossibleRegion() );
-    m_PhaseImage->SetRequestedRegion( inputImage->GetLargestPossibleRegion() );
-    m_PhaseImage->Allocate();
-    m_PhaseImage->FillBuffer(0.0);
 }
 
 template< class TPixelType >
@@ -97,12 +87,8 @@ void DftImageFilter< TPixelType >
 
             ++it;
         }
-        double magn = sqrt(s.real()*s.real()+s.imag()*s.imag());
 
-        if (s.real() != 0 )
-            m_PhaseImage->SetPixel(oit.GetIndex(), atan(s.imag()/s.real()));
-
-        oit.Set(magn);
+        oit.Set(s);
         ++oit;
     }
 }

@@ -91,18 +91,6 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         upsampledSliceRegion.SetSize(1, yMax*2);
     }
 
-    // frequency map slice
-    typename SliceType::Pointer fMapSlice = NULL;
-    if ( m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull())
-    {
-        fMapSlice = SliceType::New();
-        fMapSlice->SetLargestPossibleRegion( sliceRegion );
-        fMapSlice->SetBufferedRegion( sliceRegion );
-        fMapSlice->SetRequestedRegion( sliceRegion );
-        fMapSlice->Allocate();
-        fMapSlice->FillBuffer(0.0);
-    }
-
     m_Parameters.m_SignalGen.m_SignalScale = 1;
     m_Parameters.m_SignalGen.m_DoSimulateRelaxation = false;
 
@@ -185,8 +173,6 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
                         SliceType::PixelType pix2D = (SliceType::PixelType)inputImage->GetPixel(index3D)[g];
                         slice->SetPixel(index2D, pix2D);
-                        if (fMapSlice.IsNotNull())
-                            fMapSlice->SetPixel(index2D,  m_Parameters.m_SignalGen.m_FrequencyMap->GetPixel(index3D));
                     }
 
                 if ( m_Parameters.m_SignalGen.m_DoAddGibbsRinging)
@@ -202,20 +188,6 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                     resampler->Update();
                     typename SliceType::Pointer upslice = resampler->GetOutput();
                     compartmentSlices.push_back(upslice);
-
-                    if (fMapSlice.IsNotNull())
-                    {
-                        itk::ResampleImageFilter<SliceType, SliceType>::Pointer resampler = itk::ResampleImageFilter<SliceType, SliceType>::New();
-                        resampler->SetInput(fMapSlice);
-                        resampler->SetOutputParametersFromImage(fMapSlice);
-                        resampler->SetSize(upsampledSliceRegion.GetSize());
-                        resampler->SetOutputSpacing(fMapSlice->GetSpacing()/2);
-                        itk::NearestNeighborInterpolateImageFunction<SliceType, double>::Pointer nn_interpolator
-                                = itk::NearestNeighborInterpolateImageFunction<SliceType, double>::New();
-                        resampler->SetInterpolator(nn_interpolator);
-                        resampler->Update();
-                        fMapSlice = resampler->GetOutput();
-                    }
                 }
                 else
                     compartmentSlices.push_back(slice);
@@ -228,7 +200,6 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
                 idft->SetParameters(doubleParam);
                 idft->SetCompartmentImages(compartmentSlices);
-                idft->SetFrequencyMapSlice(fMapSlice);
                 idft->SetDiffusionGradientDirection( m_Parameters.m_SignalGen.GetGradientDirection(g));
                 idft->SetZ((double)z-(double)inputRegion.GetSize(2)/2.0);
                 idft->SetOutSize(outSize);
@@ -243,7 +214,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 fSlice = idft->GetOutput();
 
                 // inverse fourier transform slice
-                typename SliceType::Pointer newSlice;
+                typename ComplexSliceType::Pointer newSlice;
                 typename itk::DftImageFilter< SliceType::PixelType >::Pointer dft = itk::DftImageFilter< SliceType::PixelType >::New();
                 dft->SetInput(fSlice);
                 dft->Update();
@@ -256,10 +227,11 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                         typename InputImageType::IndexType index3D;
                         index3D[0]=x; index3D[1]=y; index3D[2]=z;
                         typename InputImageType::PixelType pix3D = outputImage->GetPixel(index3D);
-                        typename SliceType::IndexType index2D;
+                        typename ComplexSliceType::IndexType index2D;
                         index2D[0]=x; index2D[1]=y;
 
-                        double signal = newSlice->GetPixel(index2D);
+                        ComplexSliceType::PixelType cPix = newSlice->GetPixel(index2D);
+                        double signal = sqrt(cPix.real()*cPix.real()+cPix.imag()*cPix.imag());
                         if (signal>0)
                             signal = floor(signal+0.5);
                         else

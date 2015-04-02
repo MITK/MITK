@@ -33,17 +33,18 @@ namespace itk{
 /**
 * \brief 2D Discrete Fourier Transform Filter (complex to real). Special issue for Fiberfox -> rearranges slice. */
 
-  template< class TPixelType >
-  class DftImageFilter :
-      public ImageToImageFilter< Image< vcl_complex< TPixelType > >, Image< TPixelType > >
-  {
+template< class TPixelType >
+class DftImageFilter :
+        public ImageToImageFilter< Image< vcl_complex< TPixelType > >, Image< vcl_complex< TPixelType > > >
+{
 
-  public:
+public:
 
     typedef DftImageFilter Self;
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
-    typedef ImageToImageFilter< Image< vcl_complex< TPixelType > >, Image< TPixelType > > Superclass;
+    typedef ImageToImageFilter< Image< vcl_complex< TPixelType > >, Image< vcl_complex< TPixelType > > > Superclass;
+    typedef itk::Statistics::MersenneTwisterRandomVariateGenerator RandGenType;
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
@@ -56,22 +57,19 @@ namespace itk{
     typedef typename Superclass::OutputImageType        OutputImageType;
     typedef typename Superclass::OutputImageRegionType  OutputImageRegionType;
 
-    itkGetMacro( PhaseImage, typename OutputImageType::Pointer )
-
     void SetParameters( FiberfoxParameters<double> param ){ m_Parameters = param; }
 
-  protected:
+protected:
     DftImageFilter();
     ~DftImageFilter() {}
 
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
 
-  private:
+private:
 
-    typename OutputImageType::Pointer   m_PhaseImage;
     FiberfoxParameters<double>          m_Parameters;
-  };
+};
 
 }
 

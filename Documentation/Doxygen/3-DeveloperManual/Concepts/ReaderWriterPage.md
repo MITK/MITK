@@ -12,6 +12,15 @@ with exactly one mime-type via a service property.
 Mime-type are used for categorizing data formats and creating filter
 strings in file open and save dialogs. Hence they effectively control
 the accessible set of data formats from a graphical user interface.
+Minimally, mime-types should provide a name and a list of handled extensions in lower case.
+Additionally, it is highly enouraged to set a category and a comment which will provide user-readable
+strings for user interaction.
+
+It is important to understand the difference between mitk::MimeType and mitk::CustomMimeType.
+The former is an immutable stack object and can be pulled from mitk::MimeTypeProvider.
+it should be used for all interaction with MimeTypes. mitk::CustomMimeType is the heap-object pendant
+which is wrapped by mitk::MimeType and should exclusively be used for registration purposes, i.e. when you
+register a new MimeType.
 
 ## The IFileReader interface
 

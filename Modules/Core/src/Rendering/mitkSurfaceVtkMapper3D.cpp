@@ -234,6 +234,13 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
       property->SetLineWidth( lineWidth );
     }
 
+    // Point size
+    {
+      float pointSize = 1.0f;
+      node->GetFloatProperty("material.pointSize", pointSize, renderer);
+      property->SetPointSize(pointSize);
+    }
+
     // Representation
     {
       mitk::VtkRepresentationProperty::Pointer p;
@@ -452,6 +459,7 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
   // Shading
   {
     node->AddProperty( "material.wireframeLineWidth", mitk::FloatProperty::New(1.0f)          , renderer, overwrite );
+    node->AddProperty( "material.pointSize"         , mitk::FloatProperty::New(1.0f)          , renderer, overwrite );
 
     node->AddProperty( "material.ambientCoefficient" , mitk::FloatProperty::New(0.05f)          , renderer, overwrite );
     node->AddProperty( "material.diffuseCoefficient" , mitk::FloatProperty::New(0.9f)          , renderer, overwrite );

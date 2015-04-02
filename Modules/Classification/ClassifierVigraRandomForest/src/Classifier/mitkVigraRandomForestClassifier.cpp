@@ -162,9 +162,10 @@ mitk::VigraRandomForestClassifier::VectorType mitk::VigraRandomForestClassifier:
   threader->SetSingleMethod(this->PredictCallback,data);
   threader->SingleMethodExecute();
 
-  VectorType e_Y = transform(Y);
 
-  return e_Y;
+  m_PointWiseProbability = transform(P);
+
+  return transform(Y);
 }
 
 void  mitk::VigraRandomForestClassifier::ConvertParameter()

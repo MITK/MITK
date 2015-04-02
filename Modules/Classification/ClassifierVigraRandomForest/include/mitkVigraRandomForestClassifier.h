@@ -36,6 +36,11 @@ public:
   itkCloneMacro(Self)
 
   VigraRandomForestClassifier();
+  VigraRandomForestClassifier(const VigraRandomForestClassifier & other)
+  {
+    this->m_RandomForest = other.m_RandomForest;
+  }
+
   ~VigraRandomForestClassifier();
 
   void Train(const MatrixType &X, const VectorType &Y);
@@ -52,6 +57,16 @@ public:
 
   typedef vigra::MultiArray<2,double> VigraMatrix2dType;
   typedef vigra::MultiArray<2,int>    VigraLabel2dType;
+
+  void SetRandomForest(const vigra::RandomForest<int> & rf)
+  {
+    m_RandomForest = rf;
+  }
+
+  const vigra::RandomForest<int> GetRandomForest() const
+  {
+    return m_RandomForest;
+  }
 
 private:
   // *-------------------

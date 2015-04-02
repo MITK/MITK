@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkClassificationCore
+  DEPENDS MitkClassificationCore MitkClassificationUtilities
   PACKAGE_DEPENDS
   WARNINGS_AS_ERRORS
 )

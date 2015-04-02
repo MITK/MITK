@@ -1,7 +1,7 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkClassificationCore
+  DEPENDS MitkClassificationCore MitkClassificationUtilities
   PACKAGE_DEPENDS
-    PRIVATE Vigra
+  PRIVATE Vigra
   WARNINGS_AS_ERRORS
 )
 

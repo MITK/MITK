@@ -76,6 +76,7 @@ mitk::SurfaceInterpolationController::ContourPositionInformation CreateContourPo
 mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   :m_SelectedSegmentation(0)
 {
+  m_DistanceImageSpacing = 0.0;
   m_ReduceFilter = ReduceContourSetFilter::New();
   m_NormalsFilter = ComputeContourSetNormalsFilter::New();
   m_InterpolateSurfaceFilter = CreateDistanceImageFromSurfaceFilter::New();
@@ -240,6 +241,8 @@ void mitk::SurfaceInterpolationController::Interpolate()
   imageToSurfaceFilter->SetSmoothIteration(20);
   imageToSurfaceFilter->Update();
   m_InterpolationResult = imageToSurfaceFilter->GetOutput();
+
+  m_DistanceImageSpacing = m_InterpolateSurfaceFilter->GetDistanceImageSpacing();
 
   vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
   for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)

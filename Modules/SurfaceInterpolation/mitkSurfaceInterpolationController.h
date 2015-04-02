@@ -59,6 +59,8 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
+    itkGetMacro(DistanceImageSpacing, double)
+
     struct ContourPositionInformation {
       Surface::Pointer contour;
       Vector3D contourNormal;
@@ -217,6 +219,8 @@ namespace mitk
     CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter;
 
     Surface::Pointer m_Contours;
+
+    double m_DistanceImageSpacing;
 
     vtkSmartPointer<vtkPolyData> m_PolyData;
 

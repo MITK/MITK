@@ -79,6 +79,8 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
+    itkGetMacro(DistanceImageSpacing, double)
+
     using Superclass::SetInput;
 
     //Methods copied from mitkSurfaceToSurfaceFilter

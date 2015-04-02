@@ -55,7 +55,7 @@ public:
         RANDOM_DIRECTIONS
     };
 
-    enum CoilSensitivityProfile {
+    enum CoilSensitivityProfile : int {
         COIL_CONSTANT,
         COIL_LINEAR,
         COIL_EXPONENTIAL

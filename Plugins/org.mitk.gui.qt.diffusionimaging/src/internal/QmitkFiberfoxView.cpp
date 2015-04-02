@@ -708,21 +708,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     }
 
     // other imaging parameters
-    switch (m_Controls->m_CoilSensBox->currentIndex())
-    {
-    case 0:
-        parameters.m_SignalGen.m_CoilSensitivityProfile = SignalGenerationParameters::COIL_CONSTANT;
-        break;
-    case 1:
-        parameters.m_SignalGen.m_CoilSensitivityProfile = SignalGenerationParameters::COIL_LINEAR;
-        break;
-    case 2:
-        parameters.m_SignalGen.m_CoilSensitivityProfile = SignalGenerationParameters::COIL_EXPONENTIAL;
-        break;
-    default:
-        parameters.m_SignalGen.m_CoilSensitivityProfile = SignalGenerationParameters::COIL_CONSTANT;
-        break;
-    }
+    parameters.m_SignalGen.m_CoilSensitivityProfile = (SignalGenerationParameters::CoilSensitivityProfile)m_Controls->m_CoilSensBox->currentIndex();
     parameters.m_SignalGen.m_NumberOfCoils = m_Controls->m_NumCoilsBox->value();
     parameters.m_SignalGen.m_PartialFourier = m_Controls->m_PartialFourier->value();
     parameters.m_SignalGen.m_ReversePhase = m_Controls->m_ReversePhaseBox->isChecked();
@@ -1335,6 +1321,8 @@ void QmitkFiberfoxView::LoadParameters()
     m_Controls->m_ReversePhaseBox->setChecked(parameters.m_SignalGen.m_ReversePhase);
     m_Controls->m_PartialFourier->setValue(parameters.m_SignalGen.m_PartialFourier);
     m_Controls->m_TRbox->setValue(parameters.m_SignalGen.m_tRep);
+    m_Controls->m_NumCoilsBox->setValue(parameters.m_SignalGen.m_NumberOfCoils);
+    m_Controls->m_CoilSensBox->setCurrentIndex(parameters.m_SignalGen.m_CoilSensitivityProfile);
 
     if (parameters.m_NoiseModel!=NULL)
     {

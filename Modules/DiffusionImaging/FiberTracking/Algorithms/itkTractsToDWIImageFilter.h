@@ -46,14 +46,17 @@ public:
     typedef SmartPointer< const Self >                      ConstPointer;
 
     typedef typename Superclass::OutputImageType                        OutputImageType;
+    typedef itk::Image<double, 4>                                       ItkDoubleImgType4D;
     typedef itk::Image<double, 3>                                       ItkDoubleImgType;
     typedef itk::Image<float, 3>                                        ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                                ItkUcharImgType;
     typedef mitk::FiberBundle::Pointer                                  FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
+    typedef itk::VectorImage< double, 4 >                               DoubleDwiType4D;
     typedef itk::Matrix<double, 3, 3>                                   MatrixType;
     typedef itk::Image< double, 2 >                                     SliceType;
     typedef itk::VnlForwardFFTImageFilter<SliceType>::OutputImageType   ComplexSliceType;
+    typedef itk::VectorImage< vcl_complex< double >, 3 >                ComplexDwiType;
     typedef itk::Vector< double,3>                                      DoubleVectorType;
 
     itkFactorylessNewMacro(Self)

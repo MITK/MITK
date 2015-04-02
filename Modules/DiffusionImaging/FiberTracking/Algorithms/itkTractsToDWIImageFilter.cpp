@@ -82,16 +82,16 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     sliceSpacing[1] = m_WorkingSpacing[1];
 
     DoubleDwiType::PixelType nullPix; nullPix.SetSize(images.at(0)->GetVectorLength()); nullPix.Fill(0.0);
-    DoubleDwiType::Pointer newImage = DoubleDwiType::New();
-    newImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
-    newImage->SetOrigin( m_Parameters.m_SignalGen.m_ImageOrigin );
-    newImage->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
-    newImage->SetLargestPossibleRegion( m_CroppedRegion );
-    newImage->SetBufferedRegion( m_CroppedRegion );
-    newImage->SetRequestedRegion( m_CroppedRegion );
-    newImage->SetVectorLength( images.at(0)->GetVectorLength() );
-    newImage->Allocate();
-    newImage->FillBuffer(nullPix);
+    DoubleDwiType::Pointer magnitudeDwiImage = DoubleDwiType::New();
+    magnitudeDwiImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
+    magnitudeDwiImage->SetOrigin( m_Parameters.m_SignalGen.m_ImageOrigin );
+    magnitudeDwiImage->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
+    magnitudeDwiImage->SetLargestPossibleRegion( m_CroppedRegion );
+    magnitudeDwiImage->SetBufferedRegion( m_CroppedRegion );
+    magnitudeDwiImage->SetRequestedRegion( m_CroppedRegion );
+    magnitudeDwiImage->SetVectorLength( images.at(0)->GetVectorLength() );
+    magnitudeDwiImage->Allocate();
+    magnitudeDwiImage->FillBuffer(nullPix);
 
     m_PhaseImage = DoubleDwiType::New();
     m_PhaseImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
@@ -104,6 +104,37 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     m_PhaseImage->Allocate();
     m_PhaseImage->FillBuffer(nullPix);
 
+
+//    itk::ImageRegion<4>                 imageRegion4D;
+//    itk::Vector<double,4>               imageSpacing4D; imageSpacing4D.Fill(1);
+//    itk::Point<double,4>                imageOrigin4D; imageOrigin4D.Fill(0);
+//    itk::Matrix<double, 4, 4>           imageDirection4D; imageDirection4D.SetIdentity();
+//    imageRegion4D.SetSize(0, m_CroppedRegion.GetSize(0));
+//    imageRegion4D.SetSize(1, m_CroppedRegion.GetSize(1));
+//    imageRegion4D.SetSize(2, m_CroppedRegion.GetSize(2));
+//    imageRegion4D.SetSize(3, m_Parameters.m_SignalGen.m_NumberOfCoils);
+//    for (int i=0; i<3; i++)
+//    {
+//        imageSpacing4D[i] = m_Parameters.m_SignalGen.m_ImageSpacing[i];
+//        imageOrigin4D[i] = m_Parameters.m_SignalGen.m_ImageOrigin[i];
+//        for (int j=0; j<3; j++)
+//            imageDirection4D[i][j]=m_Parameters.m_SignalGen.m_ImageDirection[i][j];
+//    }
+
+////    ItkDoubleImgType4D::PixelType nullPix4D;
+////    nullPix4D.SetSize(images.at(0)->GetVectorLength());
+////    nullPix4D.Fill(0.0);
+//    m_KspaceImage = ItkDoubleImgType4D::New();
+//    m_KspaceImage->SetSpacing( imageSpacing4D );
+//    m_KspaceImage->SetOrigin( imageOrigin4D );
+//    m_KspaceImage->SetDirection( imageDirection4D );
+//    m_KspaceImage->SetLargestPossibleRegion( imageRegion4D );
+//    m_KspaceImage->SetBufferedRegion( imageRegion4D );
+//    m_KspaceImage->SetRequestedRegion( imageRegion4D );
+////    m_KspaceImage->SetVectorLength( images.at(0)->GetVectorLength() );
+//    m_KspaceImage->Allocate();
+//    m_KspaceImage->FillBuffer(0);
+
     m_KspaceImage = DoubleDwiType::New();
     m_KspaceImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
     m_KspaceImage->SetOrigin( m_Parameters.m_SignalGen.m_ImageOrigin );
@@ -111,7 +142,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     m_KspaceImage->SetLargestPossibleRegion( m_CroppedRegion );
     m_KspaceImage->SetBufferedRegion( m_CroppedRegion );
     m_KspaceImage->SetRequestedRegion( m_CroppedRegion );
-    m_KspaceImage->SetVectorLength( images.at(0)->GetVectorLength() );
+    m_KspaceImage->SetVectorLength( m_Parameters.m_SignalGen.m_NumberOfCoils );
     m_KspaceImage->Allocate();
     m_KspaceImage->FillBuffer(nullPix);
 
@@ -259,46 +290,69 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 
                         ComplexSliceType::PixelType cPix = newSlice->GetPixel(index2D);
                         double magn = sqrt(cPix.real()*cPix.real()+cPix.imag()*cPix.imag());
+                        double phase = 0;
+                        if (cPix.real()!=0)
+                            phase = atan( cPix.imag()/cPix.real() );
 
-                        DoubleDwiType::PixelType pix3D = newImage->GetPixel(index3D);
+
+                        DoubleDwiType::PixelType dwiPix = magnitudeDwiImage->GetPixel(index3D);
+                        DoubleDwiType::PixelType phasePix = m_PhaseImage->GetPixel(index3D);
 
                         if (m_Parameters.m_SignalGen.m_NumberOfCoils>1)
-                            pix3D[g] += magn*magn;
-                        else
-                            pix3D[g] += magn;
-#pragma omp critical
                         {
-                            newImage->SetPixel(index3D, pix3D);
+                            dwiPix[g] += magn*magn;
+                            phasePix[g] += phase*phase;
+                        }
+                        else
+                        {
+                            dwiPix[g] = magn;
+                            phasePix[g] = phase;
                         }
 
-                        //                        // phase image
-                        //                        {
-                        //                            DoubleDwiType::PixelType pix3D = m_PhaseImage->GetPixel(index3D);
-                        //                            pix3D[g] = dft->GetPhaseImage()->GetPixel(index2D);
-                        //                            m_PhaseImage->SetPixel(index3D, pix3D);
-                        //                        }
+#pragma omp critical
+                        {
+                            magnitudeDwiImage->SetPixel(index3D, dwiPix);
+                            m_PhaseImage->SetPixel(index3D, phasePix);
 
-                        //                        // k-space image
-                        //                        {
-                        //                            DoubleDwiType::PixelType pix3D = m_KspaceImage->GetPixel(index3D);
-                        //                            pix3D[g] = idft->GetKSpaceImage()->GetPixel(index2D);
-                        //                            m_KspaceImage->SetPixel(index3D, pix3D);
-                        //                        }
+                            // k-space image
+//                            {
+//                                DoubleDwiType4D::IndexType idx4d;
+//                                idx4d[0]=index3D[0];
+//                                idx4d[1]=index3D[1];
+//                                idx4d[2]=index3D[2];
+//                                idx4d[3]=c;
+//                                ItkDoubleImgType4D::PixelType pix4D = m_KspaceImage->GetPixel(idx4d);
+//                                pix4D = idft->GetKSpaceImage()->GetPixel(index2D);
+//                                m_KspaceImage->SetPixel(idx4d, pix4D);
+//                            }
+
+                            if (g==0)
+                            {
+                                DoubleDwiType::PixelType kspacePix = m_KspaceImage->GetPixel(index3D);
+                                kspacePix[c] = idft->GetKSpaceImage()->GetPixel(index2D);
+                                m_KspaceImage->SetPixel(index3D, kspacePix);
+                            }
+                        }
                     }
             }
 
             if (m_Parameters.m_SignalGen.m_NumberOfCoils>1)
             {
 #pragma omp parallel for
-                for (unsigned int y=0; y<newImage->GetLargestPossibleRegion().GetSize(1); y++)
-                    for (unsigned int x=0; x<newImage->GetLargestPossibleRegion().GetSize(0); x++)
+                for (unsigned int y=0; y<magnitudeDwiImage->GetLargestPossibleRegion().GetSize(1); y++)
+                    for (unsigned int x=0; x<magnitudeDwiImage->GetLargestPossibleRegion().GetSize(0); x++)
                     {
                         DoubleDwiType::IndexType index3D; index3D[0]=x; index3D[1]=y; index3D[2]=z;
-                        DoubleDwiType::PixelType pix3D = newImage->GetPixel(index3D);
-                        pix3D[g] = sqrt(pix3D[g]/m_Parameters.m_SignalGen.m_NumberOfCoils);
+                        DoubleDwiType::PixelType magPix = magnitudeDwiImage->GetPixel(index3D);
+                        magPix[g] = sqrt(magPix[g]/m_Parameters.m_SignalGen.m_NumberOfCoils);
+
+                        DoubleDwiType::PixelType phasePix = m_PhaseImage->GetPixel(index3D);
+                        phasePix[g] = sqrt(phasePix[g]/m_Parameters.m_SignalGen.m_NumberOfCoils);
+
 #pragma omp critical
                         {
-                            newImage->SetPixel(index3D, pix3D);
+                            magnitudeDwiImage->SetPixel(index3D, magPix);
+                            m_PhaseImage->SetPixel(index3D, phasePix);
                         }
                     }
             }
@@ -311,7 +365,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
         }
     }
     m_StatusText += "\n\n";
-    return newImage;
+    return magnitudeDwiImage;
 }
 
 template< class PixelType >

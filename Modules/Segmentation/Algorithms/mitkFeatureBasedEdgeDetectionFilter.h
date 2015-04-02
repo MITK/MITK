@@ -43,9 +43,6 @@ public:
 
   itkFactorylessNewMacro(Self)
 
-  itkGetMacro(SegmentationMask, mitk::Image::Pointer)
-  itkGetMacro(thresholdImage, mitk::Image::Pointer)
-
   /** Sets the segmentation for calculating the statistics within that */
   void SetSegmentationMask(mitk::Image::Pointer);
 

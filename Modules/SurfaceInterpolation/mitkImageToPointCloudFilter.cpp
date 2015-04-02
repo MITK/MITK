@@ -30,13 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ImageToPointCloudFilter::ImageToPointCloudFilter():
   m_NumberOfExtractedPoints(0)
 {
-  m_PointGrid = mitk::UnstructuredGrid::New();
-  m_Method = DetectConstant(0);
+  m_Method = DetectionMethod(0);
 
   this->SetNumberOfRequiredInputs(1);
-  this->SetNumberOfRequiredOutputs(1);
 
-  this->SetNthOutput(0, m_PointGrid);
+  this->SetNumberOfIndexedOutputs(1);
 }
 
 mitk::ImageToPointCloudFilter::~ImageToPointCloudFilter(){}
@@ -163,7 +161,9 @@ void mitk::ImageToPointCloudFilter::
   uGrid->InsertNextCell(verts->GetCellType(), verts->GetPointIds());
   uGrid->SetPoints(points);
 
-  m_PointGrid->SetVtkUnstructuredGrid(uGrid);
+  mitk::UnstructuredGrid::Pointer outputGrid = mitk::UnstructuredGrid::New();
+  outputGrid->SetVtkUnstructuredGrid(uGrid);
+  this->SetNthOutput(0, outputGrid);
 }
 
 

@@ -36,9 +36,8 @@ mitk::FeatureBasedEdgeDetectionFilter::FeatureBasedEdgeDetectionFilter()
   m_thresholdImage = mitk::Image::New();
 
   this->SetNumberOfRequiredInputs(1);
-  this->SetNumberOfRequiredOutputs(1);
 
-  this->SetNthOutput(0, m_PointGrid);
+  this->SetNumberOfIndexedOutputs(1);
 }
 
 mitk::FeatureBasedEdgeDetectionFilter::~FeatureBasedEdgeDetectionFilter(){}
@@ -99,7 +98,12 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   pclFilter->SetInput(resultImage);
   pclFilter->Update();
 
-  m_PointGrid->SetVtkUnstructuredGrid( pclFilter->GetOutput()->GetVtkUnstructuredGrid() );
+  mitk::UnstructuredGrid::Pointer outp = mitk::UnstructuredGrid::New();
+  outp->SetVtkUnstructuredGrid( pclFilter->GetOutput()->GetVtkUnstructuredGrid() );
+  this->SetNthOutput(0, outp);
+
+//  m_PointGrid->SetVtkUnstructuredGrid( pclFilter->GetOutput()->GetVtkUnstructuredGrid() );
+//  m_PointGrid = this->GetOutput();
 }
 
 template <typename TPixel, unsigned int VImageDimension>

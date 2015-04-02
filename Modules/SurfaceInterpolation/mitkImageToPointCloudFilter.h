@@ -38,7 +38,13 @@ class MITKSURFACEINTERPOLATION_EXPORT ImageToPointCloudFilter:
 
 public:
 
-  enum DetectConstant
+  /**
+   * @brief The method which calculates and extracts the edge pixels/points.
+   * For the edge detection the laplacian filter is used and for extraction
+   * the standard deviation multiplied with 2, 3 or 4 (depending on selected
+   * method) is used.
+   */
+  enum DetectionMethod
   {
     LAPLACIAN_STD_DEV2 = 0,
     LAPLACIAN_STD_DEV3 = 1,
@@ -46,15 +52,17 @@ public:
   };
 
   mitkClassMacro( ImageToPointCloudFilter, ImageToUnstructuredGridFilter)
-
   itkFactorylessNewMacro(Self)
 
   typedef itk::Image<double, 3> FloatImageType;
-  typedef DetectConstant DetectionMethod;
 
+  /** Returns the selected DetectionMethod */
   itkGetMacro(Method,DetectionMethod)
+
+  /** Returns the number of extracted points after edge detection */
   itkGetMacro(NumberOfExtractedPoints,int)
 
+  /** Sets the DetectionMethod for edge detection and extraction */
   itkSetMacro(Method,DetectionMethod)
 
 protected:
@@ -78,7 +86,8 @@ private:
   template<typename TPixel, unsigned int VImageDimension>
   void StdDeviations(itk::Image<TPixel, VImageDimension>* image, int amount);
 
-  mitk::UnstructuredGrid::Pointer m_PointGrid;
+  /** The geometry of the input image for transforming the pixel coordinates to
+   *  world coordinates */
   mitk::BaseGeometry* m_Geometry;
 
   /** The number of extracted points */

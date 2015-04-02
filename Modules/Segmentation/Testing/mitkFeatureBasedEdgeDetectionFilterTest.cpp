@@ -65,13 +65,7 @@ public:
     testFilter->SetSegmentationMask(m_Segmentation);
     testFilter->Update();
 
-    mitk::Image::Pointer thresholdImage = testFilter->GetthresholdImage();
-
-    mitk::Image::Pointer ref_thresholdImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("PlaneSuggestion/Threshold_Image.nrrd"));
-
-    MITK_ASSERT_EQUAL(thresholdImage, ref_thresholdImage, "Testing thresholded image!");
-
-    CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testFilter->GetOutput() != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testFilter->GetOutput()->GetVtkUnstructuredGrid() != NULL);
   }
 
 };

@@ -177,35 +177,15 @@ void KspaceImageFilter< TPixelType >
         kIdx[0] = oit.GetIndex()[0];
         kIdx[1] = oit.GetIndex()[1];
 
-        // partial fourier
-        bool pf = false;
-        if (kIdx[1]>kyMax*m_Parameters.m_SignalGen.m_PartialFourier)
-            pf = true;
-
         // dephasing time
-        double t = 0;
-        if (!m_Parameters.m_SignalGen.m_ReversePhase)
-            t = fromMaxEcho + ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
-        else
-            t = fromMaxEcho + ((double)(kyMax-1-kIdx[1])*kxMax+(double)kIdx[0])*dt;
+        double t= fromMaxEcho + ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
 
         // readout time
         double tall = 0;
-        if (!m_Parameters.m_SignalGen.m_ReversePhase)
+//        if (!m_Parameters.m_SignalGen.m_ReversePhase)
             tall = ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
-        else
-            tall = ((double)(kyMax-1-kIdx[1])*kxMax+(double)kIdx[0])*dt;
-
-        // rearrange slice
-        if( kIdx[0] <  kxMax/2 )
-            kIdx[0] = kIdx[0] + kxMax/2;
-        else
-            kIdx[0] = kIdx[0] - kxMax/2;
-
-        if( kIdx[1] <  kyMax/2 )
-            kIdx[1] = kIdx[1] + kyMax/2;
-        else
-            kIdx[1] = kIdx[1] - kyMax/2;
+//        else
+//            tall = ((double)(kyMax-1-kIdx[1])*kxMax+(double)kIdx[0])*dt;
 
         // calculate eddy current decay factor
         double eddyDecay = 0;
@@ -218,15 +198,40 @@ void KspaceImageFilter< TPixelType >
             for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
                 relaxFactor.push_back( exp(-( m_Parameters.m_SignalGen.m_tEcho+t)/m_T2.at(i) -fabs(t)/ m_Parameters.m_SignalGen.m_tInhom)*(1.0-exp(-m_Parameters.m_SignalGen.m_tRep/m_T1.at(i))) );
 
+        // reverse phase
+        if (!m_Parameters.m_SignalGen.m_ReversePhase)
+            kIdx[1] = kyMax-1-kIdx[1];
+
+        // partial fourier
+        bool pf = false;
+        if (kIdx[1]>kyMax*m_Parameters.m_SignalGen.m_PartialFourier)
+            pf = true;
+
+        // reverse readout direction
+        if (oit.GetIndex()[1]%2 == 1)
+            kIdx[0] = kxMax-kIdx[0]-1;
+
+//        if (!pf)
+//            m_KSpaceImage->SetPixel(kIdx, t );
+
+        // rearrange slice
+        if( kIdx[0] <  kxMax/2 )
+            kIdx[0] = kIdx[0] + kxMax/2;
+        else
+            kIdx[0] = kIdx[0] - kxMax/2;
+
+        if( kIdx[1] <  kyMax/2 )
+            kIdx[1] = kIdx[1] + kyMax/2;
+        else
+            kIdx[1] = kIdx[1] - kyMax/2;
+
+        // add ghosting
         double kx = kIdx[0];
         double ky = kIdx[1];
-        if (oit.GetIndex()[1]%2 == 1)               // reverse readout direction and add ghosting
-        {
-            kIdx[0] = kxMax-kIdx[0]-1;                // reverse readout direction
-            kx = (double)kIdx[0]- m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
-        }
+        if (oit.GetIndex()[1]%2 == 1)
+            kx -= m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
         else
-            kx +=  m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
+            kx += m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
 
         if (!pf)
         {
@@ -235,7 +240,6 @@ void KspaceImageFilter< TPixelType >
                 kx += xRingingOffset;
             if (ky>=kyMax/2)
                 ky += yRingingOffset;
-
 
             vcl_complex<double> s(0,0);
             InputIteratorType it(m_CompartmentImages.at(0), m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
@@ -325,8 +329,17 @@ void KspaceImageFilter< TPixelType >
         kIdx[0] = oit.GetIndex()[0];
         kIdx[1] = oit.GetIndex()[1];
 
+        // reverse phase
+        if (!m_Parameters.m_SignalGen.m_ReversePhase)
+            kIdx[1] = kyMax-1-kIdx[1];
+
         if (kIdx[1]>kyMax*m_Parameters.m_SignalGen.m_PartialFourier)
         {
+            // reverse readout direction
+            if (oit.GetIndex()[1]%2 == 1)
+                kIdx[0] = kxMax-kIdx[0]-1;
+
+            // flip k-space
             if( kIdx[0] <  kxMax/2 )
                 kIdx[0] = kIdx[0] + kxMax/2;
             else
@@ -337,9 +350,6 @@ void KspaceImageFilter< TPixelType >
             else
                 kIdx[1] = kIdx[1] - kyMax/2;
 
-            if (oit.GetIndex()[1]%2 == 1)               // reverse readout direction
-                kIdx[0] = kxMax-kIdx[0]-1;
-
             itk::Index< 2 > kIdx2;
             kIdx2[0] = (int)(kxMax-kIdx[0])%(int)kxMax;
             kIdx2[1] = (int)(kyMax-kIdx[1])%(int)kyMax;
@@ -347,13 +357,7 @@ void KspaceImageFilter< TPixelType >
             vcl_complex<double> s = outputImage->GetPixel(kIdx2);
             s = vcl_complex<double>(s.real(), -s.imag());
             outputImage->SetPixel(kIdx, s);
-            if (oit.GetIndex()[0]==0)
-            {
-                MITK_INFO << "-----------------";
-                MITK_INFO << oit.GetIndex();
-                MITK_INFO << kIdx;
-                MITK_INFO << kIdx2;
-            }
+
             m_KSpaceImage->SetPixel(oit.GetIndex(), sqrt(s.imag()*s.imag()+s.real()*s.real()) );
 //            m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
         }

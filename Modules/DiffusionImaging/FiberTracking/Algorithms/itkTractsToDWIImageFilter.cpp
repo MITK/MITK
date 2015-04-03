@@ -268,6 +268,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 idft->SetOutSize(outSize);
                 if (c==spikeCoil)
                     idft->SetSpikesPerSlice(numSpikes);
+                idft->SetNumberOfThreads(1);
                 idft->Update();
 
                 ComplexSliceType::Pointer fSlice;

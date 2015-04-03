@@ -63,6 +63,10 @@ int main(int argc, char* argv[])
 
     FiberfoxParameters<double> parameters;
     parameters.LoadParameters(paramName);
+    parameters.m_Misc.m_OutputPath = itksys::SystemTools::GetFilenamePath(outName)+"/";
+
+    if (verbose)
+        parameters.SaveParameters(outName+".ffp");
 
     mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
 

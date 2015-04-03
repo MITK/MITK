@@ -685,6 +685,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
         MITK_INFO << "Adding motion artifacts";
         MITK_INFO << "Maximum rotation: " << m_Parameters.m_SignalGen.m_Rotation;
         MITK_INFO << "Maxmimum translation: " << m_Parameters.m_SignalGen.m_Translation;
+        MITK_INFO << "Motion logfile: " << filePath << fileName;
     }
 
     // get transform for motion artifacts

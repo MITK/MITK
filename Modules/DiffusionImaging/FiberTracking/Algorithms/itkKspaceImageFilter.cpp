@@ -89,17 +89,17 @@ void KspaceImageFilter< TPixelType >
     {
     case SignalGenerationParameters::COIL_CONSTANT:
     {
-        m_CoilSensitivityFactor = 1;
+        m_CoilSensitivityFactor = 1;                    // same signal everywhere
         break;
     }
     case SignalGenerationParameters::COIL_LINEAR:
     {
-        m_CoilSensitivityFactor = -1/diagonal;
+        m_CoilSensitivityFactor = -1/diagonal;          // about 50% of the signal in the image center remaining
         break;
     }
     case SignalGenerationParameters::COIL_EXPONENTIAL:
     {
-        m_CoilSensitivityFactor = -log(0.1)/diagonal;
+        m_CoilSensitivityFactor = -log(0.1)/diagonal;   // about 32% of the signal in the image center remaining
         break;
     }
     }

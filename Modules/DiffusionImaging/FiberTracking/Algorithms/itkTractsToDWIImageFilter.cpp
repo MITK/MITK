@@ -268,7 +268,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 idft->SetOutSize(outSize);
                 if (c==spikeCoil)
                     idft->SetSpikesPerSlice(numSpikes);
-                idft->SetNumberOfThreads(1);
+//                idft->SetNumberOfThreads(1);
                 idft->Update();
 
                 ComplexSliceType::Pointer fSlice;
@@ -643,7 +643,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
     }
     else
     {
-        if (m_Parameters.m_SignalGen.m_MaskImage->GetLargestPossibleRegion()!=m_Parameters.m_SignalGen.m_ImageRegion)
+        if (m_Parameters.m_SignalGen.m_MaskImage->GetLargestPossibleRegion()!=m_WorkingImageRegion)
             itkExceptionMacro("Mask image and specified DWI geometry are not matching!");
 
         m_StatusText += "Using tissue mask\n";

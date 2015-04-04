@@ -42,9 +42,6 @@ KspaceImageFilter< TPixelType >
 {
     m_DiffusionGradientDirection.Fill(0.0);
 
-    m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
-    m_RandGen->SetSeed();
-
     m_CoilPosition.Fill(0.0);
 }
 
@@ -52,11 +49,6 @@ template< class TPixelType >
 void KspaceImageFilter< TPixelType >
 ::BeforeThreadedGenerateData()
 {
-    if (m_UseConstantRandSeed)  // always generate the same random numbers?
-        m_RandGen->SetSeed(0);
-    else
-        m_RandGen->SetSeed();
-
     m_Spike = vcl_complex<double>(0,0);
 
     typename OutputImageType::Pointer outputImage = OutputImageType::New();
@@ -146,8 +138,15 @@ double KspaceImageFilter< TPixelType >::CoilSensitivity(DoubleVectorType& pos)
 
 template< class TPixelType >
 void KspaceImageFilter< TPixelType >
-::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType)
+::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType threadID)
 {
+    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+    randGen->SetSeed();
+    if (m_UseConstantRandSeed)  // always generate the same random numbers?
+        randGen->SetSeed(threadID*100);
+    else
+        randGen->SetSeed();
+
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
@@ -303,7 +302,7 @@ void KspaceImageFilter< TPixelType >
                 m_Spike = s;
 
             if (m_Parameters.m_SignalGen.m_NoiseVariance>0)
-                s = vcl_complex<double>(s.real()+m_RandGen->GetNormalVariate(0,noiseVar), s.imag()+m_RandGen->GetNormalVariate(0,noiseVar));
+                s = vcl_complex<double>(s.real()+randGen->GetNormalVariate(0,noiseVar), s.imag()+randGen->GetNormalVariate(0,noiseVar));
 
             outputImage->SetPixel(kIdx, s);
             m_KSpaceImage->SetPixel(oit.GetIndex(), sqrt(s.imag()*s.imag()+s.real()*s.real()) );
@@ -364,12 +363,19 @@ void KspaceImageFilter< TPixelType >
         ++oit;
     }
 
+    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+    randGen->SetSeed();
+    if (m_UseConstantRandSeed)  // always generate the same random numbers?
+        randGen->SetSeed(0);
+    else
+        randGen->SetSeed();
+
     m_Spike *=  m_Parameters.m_SignalGen.m_SpikeAmplitude;
     itk::Index< 2 > spikeIdx;
     for (unsigned int i=0; i<m_SpikesPerSlice; i++)
     {
-        spikeIdx[0] = m_RandGen->GetIntegerVariate()%(int)kxMax;
-        spikeIdx[1] = m_RandGen->GetIntegerVariate()%(int)kyMax;
+        spikeIdx[0] = randGen->GetIntegerVariate()%(int)kxMax;
+        spikeIdx[1] = randGen->GetIntegerVariate()%(int)kyMax;
         outputImage->SetPixel(spikeIdx, m_Spike);
     }
 }

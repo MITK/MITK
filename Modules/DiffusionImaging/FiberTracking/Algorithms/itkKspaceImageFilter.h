@@ -101,7 +101,7 @@ namespace itk{
     double CoilSensitivity(DoubleVectorType& pos);
 
     void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadID);
     void AfterThreadedGenerateData();
 
     DoubleVectorType                        m_CoilPosition;
@@ -123,7 +123,6 @@ namespace itk{
     bool                                    m_IsBaseline;
     vcl_complex<double>                     m_Spike;
     MatrixType                              m_Transform;
-    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 
     double                                  m_CoilSensitivityFactor;
     typename InputImageType::Pointer        m_KSpaceImage;

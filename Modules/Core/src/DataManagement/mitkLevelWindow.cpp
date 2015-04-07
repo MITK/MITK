@@ -392,6 +392,21 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   SetDefaultLevelWindow((maxValue - minValue) / 2 + minValue, maxValue - minValue);
 }
 
+void mitk::LevelWindow::SetToImageRange(const mitk::Image *image)
+{
+  if ( IsFixed() )
+    return;
+
+  if ( image == NULL || !image->IsInitialized() ) return;
+
+  ScalarType minValue = image->GetStatistics()->GetScalarValueMin(0);
+  ScalarType maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
+  SetRangeMinMax(minValue, maxValue);
+  SetDefaultBoundaries(minValue, maxValue);
+  SetWindowBounds(minValue, maxValue);
+  SetDefaultLevelWindow((maxValue - minValue) / 2 + minValue, maxValue - minValue);
+}
+
 void mitk::LevelWindow::SetFixed( bool fixed )
 {
   m_Fixed = fixed;

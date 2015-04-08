@@ -231,6 +231,8 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualFrame->setEnabled(false);
   m_Parent->setEnabled(false);
 
+  this->m_Controls.m_RigidTransform->removeTab(1);
+
   mitk::NodePredicateAnd::Pointer andPred =                       // we want binary images in the selectors
     mitk::NodePredicateAnd::New(mitk::NodePredicateDataType::New("Image"),
     mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)));
@@ -247,6 +249,25 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
 
   this->CreateConnections();
   this->CheckCalculateEnabled();
+
+  mitk::RigidRegistrationPreset* preset = new mitk::RigidRegistrationPreset();
+  preset->LoadPreset();
+
+  this->FillPresetComboBox( preset->getAvailablePresets() );
+}
+
+void QmitkRigidRegistrationView::FillPresetComboBox( const std::list< std::string>& presets)
+{
+  for( const std::string &preset : presets )
+  {
+    this->m_Controls.m_RigidRegistrationPresetBox->addItem( QString(preset.c_str()) );
+  }
+}
+
+void QmitkRigidRegistrationView::LoadSelectedPreset()
+{
+  QString current_item = this->m_Controls.m_RigidRegistrationPresetBox->currentText();
+  emit PresetSelected(current_item);
 }
 
 void QmitkRigidRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -288,10 +309,14 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect(m_Controls.m_XScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(xScale_valueChanged(int)));
   connect(m_Controls.m_YScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(yScale_valueChanged(int)));
   connect(m_Controls.m_ZScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(zScale_valueChanged(int)));
-  connect(m_Controls.m_LoadRigidRegistrationParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationParameter()));
+
+  /*connect(m_Controls.m_LoadRigidRegistrationParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationParameter()));
   connect(m_Controls.m_SaveRigidRegistrationParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(SaveRigidRegistrationParameter()));
   connect(m_Controls.m_LoadRigidRegistrationTestParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationTestParameter()));
-  connect(m_Controls.m_SaveRigidRegistrationTestParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(SaveRigidRegistrationTestParameter()));
+  connect(m_Controls.m_SaveRigidRegistrationTestParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(SaveRigidRegistrationTestParameter()));*/
+  connect(this, SIGNAL(PresetSelected(QString)), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationPresetParameter(QString) ) );
+  connect(m_Controls.m_LoadRigidRegistrationParameter, SIGNAL(clicked()), this, SLOT(LoadSelectedPreset()) );
+
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(OptimizerChanged(double)),this,SLOT(SetOptimizerValue( double )));
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(TransformChanged()),this,SLOT(CheckCalculateEnabled()));
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(AddNewTransformationToUndoList()),this,SLOT(AddNewTransformationToUndoList()));

@@ -91,7 +91,7 @@ D) Provide a Clone Method: Readers are clones when the registry requires a new r
 
 E) Instantiate it in the module activator. Open the module activator and make sure that the new Reader/Writer is instantiated and held somewhere in the code.  Also, unregister the reader/writer in the unload function if necessary.
 
-### Reader/Writer Options
+## Reader/Writer Options
 
 Options are a powerful concept to modify Reader/Writer behaviour and to automate user interaction with minimal development overhead. In principal, options are represented by a simple map and a few getter and setter functions:
 
@@ -132,10 +132,8 @@ register a new MimeType.
 ## Additional Capabilities
 
 You can extend your reader writer with useful capabilities. All of these are optional
-+ Options: Reader and Writer support Options, a system to give additional information to them. When a user drags a file into MITK and it is opened by a reader which supports options, the user is shown a field with default options which he can change. Open a raw file from MITK-Data as an example. mitkRawImageFileReader is also a good reference implementation
 + Priority: Reader use a ranking with Get- and SetRanking in order to signify how well they are suited to read a file. If several readers are able to read a file, the one with the highest Ranking level will be chosen.
 + ProgressCallbacks : Readers are executed in a thread automatically. If the reader implements callbacks, the progress bar will be more accurate during loading of files. Note: Progress callbacks are work in progress.
-
 
 ## Ranking strategies
 

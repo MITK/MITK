@@ -258,7 +258,7 @@ namespace mitk
 
     std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
 
-    int m_CurrentTimeStep;
+    unsigned int m_CurrentTimeStep;
  };
 }
 #endif

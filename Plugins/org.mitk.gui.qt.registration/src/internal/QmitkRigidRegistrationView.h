@@ -275,7 +275,8 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     */
     void OnMovingMaskImageChanged(const mitk::DataNode* node);
 
-  protected:
+    void PresetSelectionChanged();
+protected:
 
     void FillPresetComboBox(const std::list<std::string> &preset);
 
@@ -324,6 +325,8 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     int m_TranslateSliderPos[3];
     int m_RotateSliderPos[3];
     int m_ScaleSliderPos[3];
+
+    bool m_PresetSelected;
 
     QmitkStepperAdapter*      m_TimeStepperAdapter;
 };

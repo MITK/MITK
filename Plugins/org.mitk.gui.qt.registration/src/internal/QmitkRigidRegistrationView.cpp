@@ -184,6 +184,8 @@ m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(fal
   rotationParams = new int[3];
   scalingParams = new int[3];
 
+  m_PresetSelected = false;
+
   m_TimeStepperAdapter = NULL;
 
   this->GetDataStorage()->RemoveNodeEvent.AddListener(mitk::MessageDelegate1<QmitkRigidRegistrationView,
@@ -254,20 +256,34 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   preset->LoadPreset();
 
   this->FillPresetComboBox( preset->getAvailablePresets() );
+  this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(false);
 }
 
 void QmitkRigidRegistrationView::FillPresetComboBox( const std::list< std::string>& presets)
 {
+  this->m_Controls.m_RigidRegistrationPresetBox->addItem( QString("== select a registration configuration ==") );
   for( const std::string &preset : presets )
   {
     this->m_Controls.m_RigidRegistrationPresetBox->addItem( QString(preset.c_str()) );
   }
 }
 
+void QmitkRigidRegistrationView::PresetSelectionChanged()
+{
+  this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(true);
+}
+
 void QmitkRigidRegistrationView::LoadSelectedPreset()
 {
+  this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(false);
+
   QString current_item = this->m_Controls.m_RigidRegistrationPresetBox->currentText();
   emit PresetSelected(current_item);
+
+  // first item is blank == no preset selected
+  m_PresetSelected = ( this->m_Controls.m_RigidRegistrationPresetBox->currentIndex() > 0 );
+
+  this->CheckCalculateEnabled();
 }
 
 void QmitkRigidRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -316,6 +332,8 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect(m_Controls.m_SaveRigidRegistrationTestParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(SaveRigidRegistrationTestParameter()));*/
   connect(this, SIGNAL(PresetSelected(QString)), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationPresetParameter(QString) ) );
   connect(m_Controls.m_LoadRigidRegistrationParameter, SIGNAL(clicked()), this, SLOT(LoadSelectedPreset()) );
+  connect(m_Controls.m_RigidRegistrationPresetBox, SIGNAL(activated(int)), this, SLOT(PresetSelectionChanged()) );
+
 
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(OptimizerChanged(double)),this,SLOT(SetOptimizerValue( double )));
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(TransformChanged()),this,SLOT(CheckCalculateEnabled()));
@@ -1128,7 +1146,7 @@ void QmitkRigidRegistrationView::SetRedoEnabled( bool enable )
 
 void QmitkRigidRegistrationView::CheckCalculateEnabled()
 {
-  if (m_FixedNode.IsNotNull() && m_MovingNode.IsNotNull())
+  if (m_FixedNode.IsNotNull() && m_MovingNode.IsNotNull() && m_PresetSelected )
   {
     m_Controls.m_ManualFrame->setEnabled(true);
     m_Controls.m_CalculateTransformation->setEnabled(true);

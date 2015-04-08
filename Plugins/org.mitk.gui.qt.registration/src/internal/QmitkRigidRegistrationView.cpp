@@ -1084,6 +1084,7 @@ void QmitkRigidRegistrationView::AlignCenters()
     mitk::Point3D movingPoint = m_MovingNode->GetData()->GetGeometry()->GetCenter();
     mitk::Vector3D translateVec;
     translateVec =  fixedPoint - movingPoint;
+    translateVec *= 10; // account for slider sensitivity
     m_Controls.m_XTransSlider->setValue((int)m_Controls.m_XTransSlider->value() + (int)translateVec[0]);
     m_Controls.m_YTransSlider->setValue((int)m_Controls.m_YTransSlider->value() + (int)translateVec[1]);
     m_Controls.m_ZTransSlider->setValue((int)m_Controls.m_ZTransSlider->value() + (int)translateVec[2]);

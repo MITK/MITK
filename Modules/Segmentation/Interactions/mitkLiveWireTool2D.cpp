@@ -246,7 +246,6 @@ bool mitk::LiveWireTool2D::IsPositionEventInsideImageRegion(mitk::InteractionPos
       data->GetGeometry()->IsInside(positionEvent->GetPositionInWorld());
   if(!IsPositionEventInsideImageRegion)
   {
-    this->ResetToStartState();
     MITK_WARN("LiveWireTool2D") << "PositionEvent is outside ImageRegion!";
     return false;
   }
@@ -261,7 +260,10 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
 
   mitk::DataNode* workingDataNode = m_ToolManager->GetWorkingData(0);
   if(!IsPositionEventInsideImageRegion(positionEvent, workingDataNode->GetData()))
+  {
+    this->ResetToStartState();
     return false;
+  }
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();

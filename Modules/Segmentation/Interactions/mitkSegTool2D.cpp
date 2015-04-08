@@ -226,11 +226,6 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
 
   Image::Pointer slice = extractor->GetOutput();
 
-  /*============= BEGIN undo feature block ========================*/
-  //specify the undo operation with the non edited slice
-  m_undoOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), extractor->GetVtkOutput(), dynamic_cast<SlicedGeometry3D*>(slice->GetGeometry()), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
-  /*============= END undo feature block ========================*/
-
   return slice;
 }
 
@@ -328,6 +323,12 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
+  /*============= BEGIN undo/redo feature block ========================*/
+  // Create undo operation by caching the not yet modified slices
+  mitk::Image::Pointer originalSlice = GetAffectedImageSliceAs2DImage(sliceInfo.plane, image, sliceInfo.timestep);
+  DiffSliceOperation* undoOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), originalSlice->GetVtkImageData(), dynamic_cast<SlicedGeometry3D*>(originalSlice->GetGeometry()), sliceInfo.timestep, sliceInfo.plane);
+  /*============= END undo/redo feature block ========================*/
+
   //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
@@ -352,20 +353,20 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
   image->Modified();
   image->GetVtkImageData()->Modified();
 
-  /*============= BEGIN undo feature block ========================*/
+  /*============= BEGIN undo/redo feature block ========================*/
   //specify the undo operation with the edited slice
-  m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),dynamic_cast<SlicedGeometry3D*>(sliceInfo.slice->GetGeometry()), sliceInfo.timestep, sliceInfo.plane);
+  DiffSliceOperation* doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),dynamic_cast<SlicedGeometry3D*>(sliceInfo.slice->GetGeometry()), sliceInfo.timestep, sliceInfo.plane);
 
   //create an operation event for the undo stack
-  OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), m_doOperation, m_undoOperation, "Segmentation" );
+  OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), doOperation, undoOperation, "Segmentation" );
 
   //add it to the undo controller
   UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
 
   //clear the pointers as the operation are stored in the undocontroller and also deleted from there
-  m_undoOperation = NULL;
-  m_doOperation = NULL;
-  /*============= END undo feature block ========================*/
+  undoOperation = NULL;
+  doOperation = NULL;
+  /*============= END undo/redo feature block ========================*/
 }
 
 void mitk::SegTool2D::SetShowMarkerNodes(bool status)

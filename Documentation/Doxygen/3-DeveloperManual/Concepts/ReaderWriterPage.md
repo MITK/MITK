@@ -3,13 +3,91 @@ Reader and Writer {#ReaderWriterPage}
 
 This page is work in progress and will introduce you to the IO-System of MITK.
 
-## Introductory Slides
+## Introductory slides
 
 Several Talks have been given on the IO-System. The following list should provide you with a good starting point.
 
 - Introduction to MimeTypes: http://www.mitk.org/images/e/e8/MimeTypes.pdf (by Caspar J. Goch)
 - Introduction to the IO-System: http://www.mitk.org/images/0/0b/Newio.pdf (by Keno März)
 - IO-Streams and the new IO System: http://www.mitk.org/images/9/95/Streams.pdf (by Keno März)
+
+## Quickstart: Reading and writing files using IOUtil
+
+mitk::IOUtil class provides convenience methods for loading data into a data
+storage or just returning BaseData objects without user interaction. The mitk::IOUtil::Save()
+and mitk::IOUtil::Load() methods cover the typical use cases and
+automatically select the best matching mitk::IFileReader and mitk::IFileWriter
+instance. In most cases, this is the easiest way to read or write a file.
+
+     // load files directly into datastorage
+    mitk::IOUtil::Load("/path/to/my/file.nrrd",*ds);
+
+     // load basedata into local vector
+    std::vector< mitk::Basedata::Pointer > basedatas;
+     basedatas = mitk::IOUtil::Load("/path/to/my/file.nrrd");
+
+     // write basedata to file (here: surface as PLY
+     mitk::IOUtil::Save(mySurface, "/Save/surface/here.ply");
+
+     // write basedata to file (here: surface as STL
+     mitk::IOUtil::Save(mySurface, "/Save/surface/here.stl");
+
+When reading a file using IOUtil, the IO-Framework  first determines the Mime-type of the given file.
+Afterwards, the best reader is selected internally, instantiated, and executed. The resulting BaseData Objects are returned to the developer as the method result.
+
+## Quickstart: Creating your own reader or writer
+
+If you implement a new BaseData, usually matching readers and writers are required. The following guide will help you to quickly set up these up and get them working in MITK.
+### Create new classes:
+Create new classes for reader and writers. Optimally, place them in an extra IO-Module that is configured as autoload. This way, they are available to the application from the start. If you are working  with common data, the appropriate module is MitkIOExt. You can either extend mitk::AbstractFileIO, which will allow you to implement a class with reader and writer abilities, or you can extend mitk::AbstractFileReader or mitk::AbstractFileWriter specifically.
+
+\imageMacro{reader_writer_classes.png,"",16}
+
+
+Implement the given Methods. A good example on how to write a simple reader and writer is the mitkPointSetReader.cpp and mitkPointSetWriter.cpp class, from which you can take implementation cues. The following is a simplified version of the header file:
+
+     namespace mitk
+     {
+
+     class PointSetReaderService: public AbstractFileReader // 2) Extend the Abstract File Reader
+     {
+     public:
+
+       PointSetReaderService();  // 3) Provide Constructor and Destructor
+       virtual ~PointSetReaderService();
+
+       // 4) Overwrite the Read Method as seen here
+       using AbstractFileReader::Read;
+       virtual std::vector< itk::SmartPointer<BaseData> > Read();
+
+     private:
+
+       // 5) Provide a clone method
+       PointSetReaderService(const PointSetReaderService& other);
+       virtual PointSetReaderService* Clone() const;
+     };
+
+     }
+
+Follow these steps to implement a new Reader:
+
+A)     Create a new cpp and h file in an appropriate submodule. Usually, a reader or writer should be located in the same module as the BaseData derivate it reads/writes.
+
+B)     Extend AbstractFileReader . This is highly recommended because it enables integration of your Reader into the Registery. It will then automatically be used by the application to load this type of files.
+
+C)     Provide a constructor . It should contain a minimal amount of information and might look like this:
+
+    mitk::PointSetReaderService::PointSetReaderService()
+      : AbstractFileReader(CustomMimeType(IOMimeTypes::POINTSET_MIMETYPE_NAME()), "MITK Point Set Reader")
+    {
+        RegisterService();
+    }
+
+Note the call to the superclass constructor containing the MIME-type. You can either reuse an existent MIME type here or create your own MIME-type locally . Finally, register the service to make it available to MITK.
+
+D)     Provide a Clone Method: Readers are clones when the registry requires a new reader. Provide a clone method to accommodate for this. Use the mitkPointSetReader.cpp as a reference if necessary.
+
+E)     Instantiate it in the module activator. Open the module activator and make sure that the new Reader/Writer is instantiated and held somewhere in the code.  Also, unregister the reader/writer in the unload function if necessary.
 
 ## Mime Types
 
@@ -53,13 +131,6 @@ Todo.
 Developers usually do not interact with the service registry directly
 to retrieve and select a matching mitk::IFileReader or mitk::IFileWriter instance.
 
-### IOUtil
-
-This class provides convenience methods for loading data into a data
-storage or just returning BaseData objects. The mitk::IOUtil::Save()
-and mitk::IOUtil::Load() methods cover thy typical use cases and
-automatically select the best matching mitk::IFileReader and mitk::IFileWriter
-instance.
 
 ### %QmitkIOUtil
 

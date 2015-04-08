@@ -44,6 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkImageData.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "vtkProperty.h"
+#include "mitkImageTimeSelector.h"
 
 #include "mitkProgressBar.h"
 
@@ -55,9 +56,9 @@ namespace mitk
 
   public:
 
-    mitkClassMacro(SurfaceInterpolationController, itk::Object)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(SurfaceInterpolationController, itk::Object);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     struct ContourPositionInformation {
       Surface::Pointer contour;
@@ -66,9 +67,34 @@ namespace mitk
     };
 
     typedef std::vector<ContourPositionInformation> ContourPositionInformationList;
-    typedef std::map<mitk::Image*, ContourPositionInformationList> ContourListMap;
+    typedef std::vector<ContourPositionInformationList> ContourPositionInformationVec2D;
+    //typedef std::map<mitk::Image*, ContourPositionInformationList> ContourListMap;
+    typedef std::map<mitk::Image*, ContourPositionInformationVec2D> ContourListMap;
 
     static SurfaceInterpolationController* GetInstance();
+
+    void SetCurrentTimeStep( int ts )
+    {
+      if ( m_CurrentTimeStep != ts )
+      {
+        m_CurrentTimeStep = ts;
+
+        if ( m_SelectedSegmentation )
+        {
+          /*m_TimeSelector->SetInput( m_SelectedSegmentation );
+          m_TimeSelector->SetTimeNr( m_CurrentTimeStep );
+          m_TimeSelector->SetChannelNr( 0 );
+          m_TimeSelector->Update();*/
+
+          this->ReinitializeInterpolation();
+        }
+      }
+    };
+
+    unsigned int GetCurrentTimeStep()
+    {
+      return m_CurrentTimeStep;
+    };
 
     /**
      * @brief Adds a new extracted contour to the list
@@ -82,7 +108,7 @@ namespace mitk
      * @param contourInfo the contour which should be removed
      * @return true if a contour was found and removed, false if no contour was found
      */
-    bool RemoveContour (ContourPositionInformation contourInfo);
+    bool RemoveContour (ContourPositionInformation contourInfo );
 
     /**
      * @brief Adds new extracted contours to the list. If one or more contours at a given position
@@ -96,7 +122,7 @@ namespace mitk
     * @param ontourInfo the contour which should be returned
     * @return the contour as an mitk::Surface. If no contour is available at the give position NULL is returned
     */
-    const mitk::Surface* GetContour (ContourPositionInformation contourInfo);
+    const mitk::Surface* GetContour (ContourPositionInformation contourInfo );
 
     /**
     * @brief Returns the number of available contours for the current selected segmentation
@@ -206,11 +232,11 @@ namespace mitk
 
  private:
 
-   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
-
    void ReinitializeInterpolation();
 
-   void AddToInterpolationPipeline(ContourPositionInformation contourInfo);
+   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
+
+   void AddToInterpolationPipeline(ContourPositionInformation contourInfo );
 
     ReduceContourSetFilter::Pointer m_ReduceFilter;
     ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;
@@ -231,6 +257,8 @@ namespace mitk
     mitk::Image* m_SelectedSegmentation;
 
     std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
+
+    int m_CurrentTimeStep;
  };
 }
 #endif

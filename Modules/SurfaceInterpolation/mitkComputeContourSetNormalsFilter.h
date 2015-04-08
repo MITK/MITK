@@ -98,7 +98,7 @@ protected:
 private:
 
   //The segmentation out of which the contours were extracted. Can be used to determine the direction of the normals
-  mitk::Image* m_SegmentationBinaryImage;
+  mitk::Image::Pointer m_SegmentationBinaryImage;
   double m_MaxSpacing;
 
   unsigned int m_NegativeNormalCounter;

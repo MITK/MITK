@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkComputeContourSetNormalsFilter.h"
 
 #include "mitkImagePixelReadAccessor.h"
+#include "mitkIOUtil.h"
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
   : m_SegmentationBinaryImage(NULL)
@@ -165,10 +166,12 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
           if (val == 0.0)
           {
+              //MITK_INFO << "val equals zero.";
               ++m_PositiveNormalCounter;
           }
           else
           {
+            //MITK_INFO << "val does not equal zero.";
               ++m_NegativeNormalCounter;
           }
         }

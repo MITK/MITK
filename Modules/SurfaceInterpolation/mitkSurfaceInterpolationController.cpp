@@ -148,6 +148,11 @@ void mitk::SurfaceInterpolationController::AddNewContours(std::vector<mitk::Surf
 
 void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPositionInformation contourInfo )
 {
+  if(!m_SelectedSegmentation)
+  {
+    return;
+  }
+
   int pos (-1);
   unsigned int numTimeSteps = m_SelectedSegmentation->GetTimeSteps();
   if ( m_CurrentTimeStep >= numTimeSteps )

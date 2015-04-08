@@ -17,6 +17,8 @@ The MimeType class provides meta-data about a specific data format.
 Every mitk::IFileReader and mitk::IFileWriter instance must be associated
 with exactly one mime-type via a service property.
 
+\imageMacro{mimetypes.png,"",14}
+
 Mime-type are used for categorizing data formats and creating filter
 strings in file open and save dialogs. Hence they effectively control
 the accessible set of data formats from a graphical user interface.

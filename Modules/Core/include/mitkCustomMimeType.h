@@ -43,8 +43,6 @@ class MimeType;
  * mirk::CustomMimetype should only be used to register mime-types. All other interaction should happen trough
  * mitk::MimeTypeProvider, from which registered mimetypes can be pulled. mitk::MimeType provides a safe and memory-managed
  * way of interacting with Mimetypes.
- *
- *
  */
 class MITKCORE_EXPORT CustomMimeType
 {

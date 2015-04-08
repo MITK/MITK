@@ -2437,11 +2437,6 @@
                  <string>Rician</string>
                 </property>
                </item>
-               <item>
-                <property name="text">
-                 <string>Chi-squared</string>
-                </property>
-               </item>
               </widget>
              </item>
             </layout>

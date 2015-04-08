@@ -47,6 +47,10 @@ int StartPeakExtraction(int argc, char* argv[])
     parser.addArgument("abspeakthres", "a", mitkCommandLineParser::Float, "Absolute peak threshold", "absolute peak threshold weighted with local GFA value", 0.06, true);
     parser.addArgument("shConvention", "s", mitkCommandLineParser::String, "Use specified SH-basis", "use specified SH-basis (MITK, FSL, MRtrix)", string("MITK"), true);
     parser.addArgument("noFlip", "f", mitkCommandLineParser::Bool, "No flip", "do not flip input image to match MITK coordinate convention");
+    parser.addArgument("flipX", "fx", mitkCommandLineParser::Bool, "Flip X", "Flip peaks in x direction");
+    parser.addArgument("flipY", "fy", mitkCommandLineParser::Bool, "Flip Y", "Flip peaks in y direction");
+    parser.addArgument("flipZ", "fz", mitkCommandLineParser::Bool, "Flip Z", "Flip peaks in z direction");
+
 
     parser.setCategory("Preprocessing Tools");
     parser.setTitle("Peak Extraction");
@@ -85,6 +89,18 @@ int StartPeakExtraction(int argc, char* argv[])
     bool noFlip = false;
     if (parsedArgs.count("noFlip"))
         noFlip = us::any_cast<bool>(parsedArgs["noFlip"]);
+
+    bool flipX = false;
+    if (parsedArgs.count("flipX"))
+        flipX = us::any_cast<bool>(parsedArgs["flipX"]);
+
+    bool flipY = false;
+    if (parsedArgs.count("flipY"))
+        flipY = us::any_cast<bool>(parsedArgs["flipY"]);
+
+    bool flipZ = false;
+    if (parsedArgs.count("flipZ"))
+        flipZ = us::any_cast<bool>(parsedArgs["flipZ"]);
 
     std::cout << "image: " << imageName;
     std::cout << "outroot: " << outRoot;
@@ -219,6 +235,9 @@ int StartPeakExtraction(int argc, char* argv[])
         filter->SetPeakThreshold(peakThres);
         filter->SetAbsolutePeakThreshold(absPeakThres);
         filter->SetAngularThreshold(1);
+        filter->SetFlipX(flipX);
+        filter->SetFlipY(flipY);
+        filter->SetFlipZ(flipZ);
 
         switch (normalization)
         {

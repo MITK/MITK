@@ -33,11 +33,16 @@ class MimeType;
  * @ingroup MicroServices_Interfaces
  *
  * @brief The CustomMimeType class represents a custom mime-type which
- *        may be registered as a service object.
+ *        may be registered as a service object. It should only be used for mime-type registration,
+ *        see also mitk::MimeType.
  *
  * Instances of this class are usually created and registered as a service.
- * They wire files to specific IFileReader instances and provide data format
+ * They act as meta data information to allow the linking of files to reader and writer.
+ * They write files to specific IFileReader instances and provide data format
  * meta-data for selecting compatible IFileWriter instances.
+ * mirk::CustomMimetype should only be used to register mime-types. All other interaction should happen trough
+ * mitk::MimeTypeProvider, from which registered mimetypes can be pulled. mitk::MimeType provides a safe and memory-managed
+ * way of interacting with Mimetypes.
  */
 class MITKCORE_EXPORT CustomMimeType
 {
@@ -59,7 +64,7 @@ public:
   std::string GetName() const;
 
   /**
-  * \brief Returns the Human readable Category of the MimeType. Allows grouping of similar Mimetypes (like Suirfaces)
+  * \brief Returns the human-readable Category of the mime-type. Allows grouping of similar mime-types (like Surfaces)
   */
   std::string GetCategory() const;
 

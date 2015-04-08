@@ -196,10 +196,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Inter
   assert( positionEvent->GetSender() ); // sure, right?
   unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image ); // get the timestep of the visible part (time-wise) of the image
 
-  // first, we determine, which slice is affected
-  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
-
-  return this->GetAffectedImageSliceAs2DImage(planeGeometry, image, timeStep);
+  return this->GetAffectedImageSliceAs2DImage(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), image, timeStep);
 }
 
 

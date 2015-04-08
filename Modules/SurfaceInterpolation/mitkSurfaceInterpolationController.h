@@ -73,7 +73,7 @@ namespace mitk
 
     static SurfaceInterpolationController* GetInstance();
 
-    void SetCurrentTimeStep( int ts )
+    void SetCurrentTimeStep( unsigned int ts )
     {
       if ( m_CurrentTimeStep != ts )
       {
@@ -81,11 +81,6 @@ namespace mitk
 
         if ( m_SelectedSegmentation )
         {
-          /*m_TimeSelector->SetInput( m_SelectedSegmentation );
-          m_TimeSelector->SetTimeNr( m_CurrentTimeStep );
-          m_TimeSelector->SetChannelNr( 0 );
-          m_TimeSelector->Update();*/
-
           this->ReinitializeInterpolation();
         }
       }

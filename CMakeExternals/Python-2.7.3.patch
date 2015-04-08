@@ -1,13 +1,15 @@
 diff -urNb Python-2.7.3/Lib/distutils/cygwinccompiler.py Python-src/Lib/distutils/cygwinccompiler.py
 --- Python-2.7.3/Lib/distutils/cygwinccompiler.py	2012-04-10 01:07:29.000000000 +0200
 +++ Python-src/Lib/distutils/cygwinccompiler.py	2015-01-13 21:03:33.025871739 +0100
-@@ -75,6 +75,10 @@
+@@ -75,6 +75,12 @@
          elif msc_ver == '1500':
              # VS2008 / MSVC 9.0
              return ['msvcr90']
 +        elif msc_ver == '1600':
 +            return ['msvcr100']
 +        elif msc_ver == '1700':
++            return ['msvcr110']
++        elif msc_ver == '1800':
 +            return ['msvcr120']
          else:
              raise ValueError("Unknown MS Compiler version %s " % msc_ver)

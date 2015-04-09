@@ -44,6 +44,8 @@ macro(_fixup_target)
   endif()
 
   if(MITK_USE_Python)
+    set(_python_libs)
+    set(_python_search_paths)
     include(mitkFunctionInstallPython)
     mitkFunctionInstallPython(_python_libs _python_search_paths "${_bundle_dest_dir}")
   endif()
@@ -155,7 +157,6 @@ macro(_fixup_target)
     endforeach()
 
     foreach(_py_lib ${_python_libs})
-      MESSAGE("pylib: " ${_py_lib})
       list(APPEND PLUGINS \"\${_bin_path}/\${_py_lib}\")
     endforeach()
 

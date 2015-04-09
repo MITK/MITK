@@ -49,8 +49,8 @@ function(mitkFunctionInstallPython _python_libs_out _search_path_out _app_bundle
       #MESSAGE("in: " "${_python_dirs}/${_python_runtime_dir}${f}")
       #MESSAGE("out: " "${_destination}/Python/lib/${_python_runtime_dir}${_filepath}")
       if(${f} MATCHES "(${PYTHON_LIB_SUFFIX})$")
-        MESSAGE("F: " ${f})
-        list(APPEND _python_libs "Python/lib/${_python_runtime_dir}${_filepath}")
+        #MESSAGE("F: " "Python/lib/${_python_runtime_dir}${f}")
+        list(APPEND _python_libs "Python/lib/${_python_runtime_dir}${f}")
         if(UNIX AND NOT APPLE)
           install(CODE "file(RPATH_REMOVE
           FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/lib/${_python_runtime_dir}${f}\")")

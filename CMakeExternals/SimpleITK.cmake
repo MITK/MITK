@@ -88,12 +88,16 @@ if(MITK_USE_SimpleITK)
 
       # PythonDir needs to be fixed for the python interpreter by
       # changing dir delimiter for Windows
-      set(_install_dir ${ep_prefix})
+      if(MITK_USE_SYSTEM_PYTHON)
+        set(_install_dir ${ep_prefix})
+      else()
+        set(_install_dir ${Python_DIR})
+      endif()
       if(WIN32)
-        STRING(REPLACE "/" "\\\\" _install_dir ${ep_prefix})
+        STRING(REPLACE "/" "\\\\" _install_dir ${_install_dir})
       else()
         # escape spaces in the install path for linux
-        STRING(REPLACE " " "\ " _install_dir ${ep_prefix})
+        STRING(REPLACE " " "\ " _install_dir ${_install_dir})
       endif()
 
       if( MITK_USE_SYSTEM_PYTHON )

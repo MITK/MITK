@@ -80,6 +80,7 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
 
   if(MITK_USE_Python)
     list(APPEND _dir_candidates "${CTK_DIR}/CMakeExternals/Install/bin")
+    list(APPEND _dir_candidates "${Python_DIR}/lib/python2.7/bin")
   endif()
 
   if(MITK_USE_TOF_PMDO3 OR MITK_USE_TOF_PMDCAMCUBE OR MITK_USE_TOF_PMDCAMBOARD)

@@ -60,7 +60,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
        "${_numpy_env}
         include(\"${_numpy_build_step}\")
         # escape characters in install path
-        set(_install_dir \"\${CMAKE_INSTALL_PREFIX}\")
+        set(_install_dir \"${Python_DIR}\")
         if(WIN32)
           string(REPLACE \"/\" \"\\\\\" _install_dir \${_install_dir})
         endif()
@@ -80,16 +80,10 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       STRING(REPLACE " " "\ " _install_step ${_install_step})
     endif()
 
-    set(NUMPY_PATCH_COMMAND )
-    if(WIN32)
-      set(NUMPY_PATCH_COMMAND PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Numpy-1.4.1-win32.patch)
-    endif()
-
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${Numpy_URL}
       URL_MD5 ${Numpy_MD5}
-    #  ${NUMPY_PATCH_COMMAND}
       BUILD_IN_SOURCE 1
       CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${_configure_step}
       BUILD_COMMAND   ${CMAKE_COMMAND} -P ${_build_step}

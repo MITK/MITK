@@ -67,7 +67,7 @@ if(MITK_USE_Boost)
       set(_boost_layout "--layout=tagged")
     endif()
 
-    if(UNIX)
+    if(UNIX AND NOT APPLE)
       if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         set(_boost_with_toolset "gcc")
       elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

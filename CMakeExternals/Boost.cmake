@@ -76,7 +76,7 @@ if(MITK_USE_Boost)
         message(FATAL_ERROR "Compiler '${CMAKE_CXX_COMPILER_ID}' not supported. Use GNU or Clang instead.")
       endif()
       string(REGEX MATCH "^[0-9]+\\.[0-9]+" _compiler_version "${CMAKE_CXX_COMPILER_VERSION}")
-      set(_boost_toolset "${_boost_toolset}-${_compiler_version}")
+      set(_boost_toolset "${_boost_with_toolset}-${_compiler_version}")
     endif()
 
     if(_boost_toolset)

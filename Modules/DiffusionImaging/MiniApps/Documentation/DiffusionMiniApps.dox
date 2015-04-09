@@ -66,6 +66,12 @@ and therefore registration fails. In this case you can try the -c option which u
 \subsection CopyGeometry Copy Geometry
 
 Copies the geometry (origin) of the source image to the target image.
+This is useful in cases where rounding errors in geometries cause the following itk error:
+itk::ERROR: ImageToImageFilter(): Inputs do not occupy the same physical space!
+
+For images with differing extent the --alignCentroid option will adapt the origin of the input image such that the centroids of both images align,
+this can be as a preprocessing steo for registratering images that do not overlap at all
+(e.g. error : Joint PDF summed to zero )
 
 
 \subsection ImageResampler Resampling of Images

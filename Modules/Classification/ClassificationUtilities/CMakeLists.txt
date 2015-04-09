@@ -4,4 +4,4 @@ MITK_CREATE_MODULE(
   WARNINGS_AS_ERRORS
 )
 
-#add_subdirectory(test)
+add_subdirectory(test)

@@ -132,7 +132,7 @@ bool PerspectiveExtensionReader::ProcessView(
   QString relative = element->GetAttribute(WorkbenchRegistryConstants::ATT_RELATIVE);
 
   QString relationship = element->GetAttribute(WorkbenchRegistryConstants::ATT_RELATIONSHIP);
-  if (!relationship.isEmpty())
+  if (relationship.isEmpty())
   {
     this->LogMissingAttribute(element, WorkbenchRegistryConstants::ATT_RELATIONSHIP);
     return false;

@@ -114,6 +114,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       list(APPEND additional_cmake_cache_args
         "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
       )
+    endif()
 
     set(_python_install_dir )
     if(WIN32)

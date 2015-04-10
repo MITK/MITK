@@ -49,7 +49,7 @@ QString NullEditorInput::GetName() const
   return "";
 }
 
-IPersistableElement*NullEditorInput::GetPersistable() const
+const IPersistableElement* NullEditorInput::GetPersistable() const
 {
   return nullptr;
 }

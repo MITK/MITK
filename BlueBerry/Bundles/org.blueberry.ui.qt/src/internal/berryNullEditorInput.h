@@ -50,7 +50,7 @@ public:
 
    QString GetName() const;
 
-   IPersistableElement* GetPersistable() const;
+   const IPersistableElement* GetPersistable() const;
 
    QString GetToolTipText() const;
 

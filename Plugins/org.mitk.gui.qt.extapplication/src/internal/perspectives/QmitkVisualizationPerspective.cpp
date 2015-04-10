@@ -39,6 +39,8 @@ void QmitkVisualizationPerspective::CreateInitialLayout(berry::IPageLayout::Poin
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
+  // Adding the entry for the image navigator to the Windows->"Show View" menu
+  layout->AddShowViewShortcut("org.mitk.views.imagenavigator");
 
   layout->AddPerspectiveShortcut("org.mitk.extapp.defaultperspective");
   layout->AddPerspectiveShortcut("org.mitk.mitkworkbench.perspectives.editor");

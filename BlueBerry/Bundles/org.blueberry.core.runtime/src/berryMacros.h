@@ -36,24 +36,24 @@ class QStringList;
 
 #define berryObjectMacro(...) berryCallOverload(berryObjectMacro, __VA_ARGS__)
 
-#define berryObjectTypeInfo(...)                                        \
-  static ::berry::Reflection::TypeInfo GetStaticTypeInfo()              \
-  { return ::berry::Reflection::TypeInfo::New<Self>(); }                \
-  ::berry::Reflection::TypeInfo GetTypeInfo() const override            \
-  { return Self::GetStaticTypeInfo(); }                                 \
-  typedef ::berry::Reflection::TypeList<__VA_ARGS__> SuperclassTypes;   \
-  static QList<::berry::Reflection::TypeInfo> GetStaticSuperclasses()   \
-  { return ::berry::Reflection::GetSuperclasses<Self>(); }              \
-  QList<::berry::Reflection::TypeInfo> GetSuperclasses() const override \
+#define berryObjectTypeInfo(...)                                         \
+  static ::berry::Reflection::TypeInfo GetStaticTypeInfo()               \
+  { return ::berry::Reflection::TypeInfo::New<Self>(); }                 \
+  ::berry::Reflection::TypeInfo GetTypeInfo() const override             \
+  { return Self::GetStaticTypeInfo(); }                                  \
+  typedef ::berry::Reflection::TypeList<__VA_ARGS__> SuperclassTypes;    \
+  static QList< ::berry::Reflection::TypeInfo> GetStaticSuperclasses()   \
+  { return ::berry::Reflection::GetSuperclasses<Self>(); }               \
+  QList< ::berry::Reflection::TypeInfo> GetSuperclasses() const override \
   { return Self::GetStaticSuperclasses(); }
 
-#define berryObjectMacro1(className)                                    \
-  typedef className       Self;                                         \
-  typedef berry::SmartPointer<Self> Pointer;                            \
-  typedef berry::SmartPointer<const Self>  ConstPointer;                \
-  typedef berry::WeakPointer<Self> WeakPtr;                             \
-  typedef berry::WeakPointer<const Self> ConstWeakPtr;                  \
-  static const char* GetStaticClassName()                               \
+#define berryObjectMacro1(className)                                     \
+  typedef className       Self;                                          \
+  typedef berry::SmartPointer<Self> Pointer;                             \
+  typedef berry::SmartPointer<const Self>  ConstPointer;                 \
+  typedef berry::WeakPointer<Self> WeakPtr;                              \
+  typedef berry::WeakPointer<const Self> ConstWeakPtr;                   \
+  static const char* GetStaticClassName()                                \
   { return #className; }
 
 #define berryObjectMacro2(className, super1) \

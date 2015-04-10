@@ -238,7 +238,6 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "minimumCMakeVersion=@CMAKE_MINIMUM_REQUIRED_VERSION@" \
                          "minimumQt4Version=@MITK_QT4_MINIMUM_VERSION@" \
                          "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
-                         \ \
                          "developersguidemainpage{1}=\page \1 " \
                          "usersguidemainpage{1}=\mainpage " \
                          "nondependentPluginLink{3}= \ref \1 \"\3\" "

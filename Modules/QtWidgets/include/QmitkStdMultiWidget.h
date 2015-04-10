@@ -145,6 +145,8 @@ public:
 
   bool IsMenuWidgetEnabled() const;
 
+  void SetCornerAnnotationVisibility(bool visibility);
+
 protected:
 
   void UpdateAllWidgets();

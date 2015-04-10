@@ -13,10 +13,10 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef MITKLookupTable_H_HEADER_INCLUDED_C1EBD53D
-#define MITKLookupTable_H_HEADER_INCLUDED_C1EBD53D
+#ifndef mitkLookupTable_h
+#define mitkLookupTable_h
 
-#include <mitkCommon.h>
+#include "mitkCommon.h"
 #include <MitkCoreExports.h>
 
 #include <itkDataObject.h>
@@ -47,9 +47,10 @@ namespace mitk
 class MITKCORE_EXPORT LookupTable : public itk::DataObject
 {
 public:
+
   /**
-     *@brief Some convenient typedefs.
-     */
+   * @brief RawLookupTableType raw lookuptable typedef for convenience.
+   */
   typedef unsigned char RawLookupTableType;
 
   mitkClassMacro( LookupTable, itk::DataObject );
@@ -58,23 +59,56 @@ public:
   itkCloneMacro(Self)
 
   /**
-     * @returns the associated vtkLookupTable
-     */
+   * @brief GetVtkLookupTable Getter for the internally wrapped vtkLookupTable.
+   */
   virtual vtkSmartPointer<vtkLookupTable> GetVtkLookupTable() const;
 
-  virtual RawLookupTableType * GetRawLookupTable() const;
+  /**
+   * @brief GetRawLookupTable Getter for the raw lookuptable array.
+   */
+  virtual RawLookupTableType* GetRawLookupTable() const;
 
+  /**
+   * @brief SetVtkLookupTable Setter for the internal lookuptable.
+   * @param lut The lookuptable.
+   */
   virtual void SetVtkLookupTable( vtkSmartPointer<vtkLookupTable> lut );
 
+  /**
+   * @brief ChangeOpacityForAll Set the opacity for all table values.
+   * @param opacity Opacity between 0.0 and 1.0.
+   */
   virtual void ChangeOpacityForAll( float opacity );
 
+  /**
+   * @brief ChangeOpacity Set the opacity for a specific table index.
+   * @param index The lookuptable index.
+   * @param opacity Opacity between 0.0 and 1.0.
+   */
   virtual void ChangeOpacity(int index, float opacity );
 
-  virtual void GetColor(int, double rgb[3]);
+  /**
+   * @brief GetColor convenience method wrapping the vtkLookupTable::GetColor() method.
+   *
+   * Map one value through the lookup table and return the color as an RGB array of doubles between 0 and 1.
+   * @param value The value you want to map.
+   * @param rgb RGB values between 0 and 1.
+   */
+  virtual void GetColor(double value, double rgb[3]);
 
-  virtual void GetTableValue(int, double rgba[4]);
+  /**
+   * @brief GetTableValue convenience method wrapping the vtkLookupTable::GetTableValue() method.
+   * @param index The index you want to get.
+   * @param rgba RGB values between 0 and 1.
+   */
+  virtual void GetTableValue(int index, double rgba[4]);
 
-  virtual void SetTableValue(int, double rgba[4]);
+  /**
+   * @brief SetTableValue convenience method wrapping the vtkLookupTable::SetTableValue() method.
+   * @param index The index you want to set.
+   * @param rgba RGB values between 0 and 1.
+   */
+  virtual void SetTableValue(int index, double rgba[4]);
 
 
   itkSetMacro(Window, float);
@@ -232,4 +266,4 @@ private:
 };
 } // namespace mitk
 
-#endif /* LookupTable_H_HEADER_INCLUDED_C1EBD53D */
+#endif /* mitkLookupTable_h */

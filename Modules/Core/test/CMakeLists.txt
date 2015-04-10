@@ -8,7 +8,7 @@ else()
   mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-declarations" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
 endif()
 
-MITK_CREATE_MODULE_TESTS(US_MODULE)
+MITK_CREATE_MODULE_TESTS()
 if(TARGET ${TESTDRIVER})
   mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|ITKThresholding+ITKTestKernel VTK|vtkTestingRendering tinyxml)
 
@@ -128,10 +128,14 @@ if(TARGET ${TESTDRIVER})
                              ${MITK_DATA_DIR}/RenderingTestData/openMeAlone.mps #input point set to load in data storage
                             -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/openMeAloneTransformedPoints640x480REF.png #corresponding reference screenshot
     )
+    # Currently not working on windows because of a rendering timing issue
+    # see bug 18083 for details
+    if(NOT WIN32)
     mitkAddCustomModuleTest(mitkSurfaceDepthSortingTransparency_StanfordBunnySTL640x480 mitkSurfaceDepthSortingTest
                             ${MITK_DATA_DIR}/RenderingTestData/Stanford_bunny.stl
                             -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Stanford_bunnySTLDepthSorting640x480REF.png
     )
+    endif()
     if(NOT APPLE)
       mitkAddCustomModuleTest(mitkSurfaceDepthPeelingTransparency_StanfordBunnySTL640x480 mitkSurfaceDepthPeelingTest
                               ${MITK_DATA_DIR}/RenderingTestData/Stanford_bunny.stl
@@ -215,12 +219,4 @@ if(TARGET ${TESTDRIVER})
   add_test(mitkPointSetLocaleTest  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPointSetLocaleTest ${MITK_DATA_DIR}/pointSet.mps)
   set_property(TEST mitkPointSetLocaleTest PROPERTY LABELS MITK-Core)
 
-  add_test(mitkImageWriterTest_nrrdImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg)
-  add_test(mitkImageWriterTest_2DPNGImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/Png2D-bw.png)
-  add_test(mitkImageWriterTest_rgbPNGImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/RenderingTestData/rgbImage.png)
-  add_test(mitkImageWriterTest_rgbaPNGImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageWriterTest ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png)
-  set_property(TEST mitkImageWriterTest_nrrdImage PROPERTY LABELS MITK-Core)
-  set_property(TEST mitkImageWriterTest_2DPNGImage PROPERTY LABELS MITK-Core)
-  set_property(TEST mitkImageWriterTest_rgbPNGImage PROPERTY LABELS MITK-Core)
-  set_property(TEST mitkImageWriterTest_rgbaPNGImage PROPERTY LABELS MITK-Core)
 endif() # TARGET ${TESTDRIVER}

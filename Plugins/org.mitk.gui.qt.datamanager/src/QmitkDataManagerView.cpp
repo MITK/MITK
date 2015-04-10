@@ -834,9 +834,9 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
   {
     return;
   }
-  std::vector<mitk::DataNode*> selectedNodes;
+  std::vector<mitk::DataNode::Pointer> selectedNodes;
 
-  mitk::DataNode* node = 0;
+  mitk::DataNode::Pointer node = 0;
   QString question = tr("Do you really want to remove ");
 
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
@@ -844,7 +844,7 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
   {
     node = m_NodeTreeModel->GetNode(*it);
     // if node is not defined or if the node contains geometry data do not remove it
-    if ( node != 0 /*& strcmp(node->GetData()->GetNameOfClass(), "PlaneGeometryData") != 0*/ )
+    if ( node.IsNotNull() /*& strcmp(node->GetData()->GetNameOfClass(), "PlaneGeometryData") != 0*/ )
     {
       selectedNodes.push_back(node);
       question.append(QString::fromStdString(node->GetName()));
@@ -862,7 +862,7 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
 
   if(answerButton == QMessageBox::Yes)
   {
-    for (std::vector<mitk::DataNode*>::iterator it = selectedNodes.begin()
+    for (std::vector<mitk::DataNode::Pointer>::iterator it = selectedNodes.begin()
       ; it != selectedNodes.end(); it++)
     {
       node = *it;

@@ -23,7 +23,6 @@
 #include "MitkOverlaysExports.h"
 
 class mitkVtkLogoRepresentation;
-class vtkLogoWidget;
 class vtkImageData;
 class vtkImageReader2Factory;
 class vtkImageImport;
@@ -40,7 +39,6 @@ public:
     /** \brief Actor of a 2D render window. */
     vtkSmartPointer<vtkImageData> m_LogoImage;
     vtkSmartPointer<mitkVtkLogoRepresentation> m_LogoRep;
-    vtkSmartPointer<vtkLogoWidget> m_LogoWidget;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;
@@ -68,7 +66,8 @@ public:
  0 = Bottom left
  1 = Bottom right
  2 = Top right
- 3 = Top left*/
+ 3 = Top left
+ 4 = Center*/
   void SetCornerPosition(const int& corner, BaseRenderer* renderer = NULL);
   int GetCornerPosition(mitk::BaseRenderer* renderer = NULL) const;
 

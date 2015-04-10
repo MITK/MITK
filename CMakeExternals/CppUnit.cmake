@@ -13,6 +13,13 @@ set(${proj}_DEPENDS ${proj})
 
 if(NOT DEFINED CppUnit_DIR)
 
+  set(additional_args )
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
+
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/cppunit-1.12.1.tar.gz
@@ -24,6 +31,11 @@ if(NOT DEFINED CppUnit_DIR)
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
+       ${additional_args}
+     CMAKE_CACHE_ARGS
+       ${ep_common_cache_args}
+     CMAKE_CACHE_DEFAULT_ARGS
+       ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 

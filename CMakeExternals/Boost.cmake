@@ -20,7 +20,7 @@ if(MITK_USE_Boost)
     set(_boost_version 1_56)
     set(_boost_install_include_dir include/boost)
     if(WIN32)
-      set(_boost_install_include_dir include/boost-${_boost_version})
+      set(_boost_install_include_dir include/boost-${_boost_version}/boost)
     endif()
 
     set(_boost_libs )
@@ -48,10 +48,13 @@ if(MITK_USE_Boost)
       set(_boost_layout)
       if(MSVC)
         if(MSVC_VERSION EQUAL 1600)
+          set(_boost_with_toolset "vc10")
           set(_boost_toolset "msvc-10.0")
         elseif(MSVC_VERSION EQUAL 1700)
+          set(_boost_with_toolset "vc11")
           set(_boost_toolset "msvc-11.0")
         elseif(MSVC_VERSION EQUAL 1800)
+          set(_boost_with_toolset "vc12")
           set(_boost_toolset "msvc-12.0")
         endif()
       endif()
@@ -62,6 +65,22 @@ if(MITK_USE_Boost)
     else()
       set(_shell_extension .sh)
       set(_boost_layout "--layout=tagged")
+    endif()
+
+    if(UNIX AND NOT APPLE)
+      if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        set(_boost_with_toolset "gcc")
+      elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        set(_boost_with_toolset "clang")
+      else()
+        message(FATAL_ERROR "Compiler '${CMAKE_CXX_COMPILER_ID}' not supported. Use GNU or Clang instead.")
+      endif()
+      string(REGEX MATCH "^[0-9]+\\.[0-9]+" _compiler_version "${CMAKE_CXX_COMPILER_VERSION}")
+      set(_boost_toolset "${_boost_with_toolset}-${_compiler_version}")
+    endif()
+
+    if(_boost_toolset)
+      set(_boost_toolset "--toolset=${_boost_toolset}")
     endif()
 
     set (APPLE_SYSROOT_FLAG)
@@ -92,6 +111,7 @@ if(MITK_USE_Boost)
 
     set(_build_cmd "<SOURCE_DIR>/b2"
         ${APPLE_SYSROOT_FLAG}
+        ${_boost_toolset}
         ${_boost_layout}
         "--prefix=<INSTALL_DIR>"
         ${_install_lib_dir}
@@ -124,7 +144,7 @@ if(MITK_USE_Boost)
       # We use in-source builds for Boost
       BINARY_DIR ${ep_prefix}/src/${proj}
       CONFIGURE_COMMAND "<SOURCE_DIR>/bootstrap${_shell_extension}"
-        --with-toolset=${_boost_toolset}
+        --with-toolset=${_boost_with_toolset}
         --with-libraries=${_boost_libs}
         "--prefix=<INSTALL_DIR>"
       ${_boost_build_cmd}

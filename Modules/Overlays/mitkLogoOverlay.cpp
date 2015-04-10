@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageReader2.h>
 
 #include <mitkVtkLogoRepresentation.h>
-#include <vtkLogoWidget.h>
 #include <vtkProperty2D.h>
 #include <vtkImageImport.h>
 #include <mbilogo.h>
@@ -40,7 +39,7 @@ mitk::LogoOverlay::LogoOverlay()
   offset.Fill(0.03);
   SetOffsetVector(offset);
   SetRelativeSize(0.2);
-  SetCornerPosition(4);
+  SetCornerPosition(3);
   m_VtkImageImport = vtkSmartPointer<vtkImageImport>::New();
 }
 
@@ -56,8 +55,6 @@ mitk::LogoOverlay::LocalStorage::~LocalStorage()
 mitk::LogoOverlay::LocalStorage::LocalStorage()
 {
   m_LogoRep = vtkSmartPointer<mitkVtkLogoRepresentation>::New();
-  m_LogoWidget = vtkSmartPointer<vtkLogoWidget>::New();
-  m_LogoWidget->SetRepresentation(m_LogoRep);
 }
 
 void mitk::LogoOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
@@ -66,6 +63,11 @@ void mitk::LogoOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
   if(ls->IsGenerateDataRequired(renderer,this))
   {
 
+    if (GetLogoImagePath().empty())
+    {
+      ls->m_LogoRep->SetVisibility(0);
+      return;
+    }
     vtkImageReader2* imageReader = m_readerFactory->CreateImageReader2(GetLogoImagePath().c_str());
     if(imageReader)
     {

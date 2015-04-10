@@ -18,6 +18,12 @@ if(NOT DEFINED tinyxml_DIR)
     set(additional_cmake_args -DBUILD_SHARED_LIBS:BOOL=OFF)
   endif()
 
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_cmake_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
+
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/tinyxml_2_6_2.tar.gz
@@ -28,6 +34,10 @@ if(NOT DEFINED tinyxml_DIR)
      CMAKE_ARGS
        ${ep_common_args}
        ${additional_cmake_args}
+     CMAKE_CACHE_ARGS
+       ${ep_common_cache_args}
+     CMAKE_CACHE_DEFAULT_ARGS
+       ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 

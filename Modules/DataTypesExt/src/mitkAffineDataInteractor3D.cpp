@@ -336,13 +336,8 @@ bool mitk::AffineDataInteractor3D::InitTranslate(StateMachineAction*, Interactio
     return false;
 
   m_InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+  m_InitialPickedWorldPoint = positionEvent->GetPositionInWorld();
 
-  vtkInteractorObserver::ComputeDisplayToWorld(
-    interactionEvent->GetSender()->GetVtkRenderer(),
-    m_InitialPickedDisplayPoint[0],
-    m_InitialPickedDisplayPoint[1],
-    0.0, //m_InitialInteractionPickedPoint[2],
-    m_InitialPickedWorldPoint );
 
   // Get the timestep to also support 3D+t
   int timeStep = 0;
@@ -361,13 +356,7 @@ bool mitk::AffineDataInteractor3D::InitRotate(StateMachineAction*, InteractionEv
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
 
   m_InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
-
-  vtkInteractorObserver::ComputeDisplayToWorld(
-    interactionEvent->GetSender()->GetVtkRenderer(),
-    m_InitialPickedDisplayPoint[0],
-    m_InitialPickedDisplayPoint[1],
-    0.0, //m_InitialInteractionPickedPoint[2],
-    m_InitialPickedWorldPoint );
+  m_InitialPickedWorldPoint = positionEvent->GetPositionInWorld();
 
   // Get the timestep to also support 3D+t
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());

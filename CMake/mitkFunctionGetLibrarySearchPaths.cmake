@@ -1,3 +1,10 @@
+macro(_find_package package_name)
+  find_package(${package_name} REQUIRED PATHS ${${package_name}_DIR} PATH_SUFFIXES ${package_name} NO_DEFAULT_PATH NO_MODULE QUIET)
+  if(NOT ${package_name}_FOUND)
+    find_package(${package_name} REQUIRED)
+  endif()
+endmacro()
+
 function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
 
   set(_dir_candidates
@@ -43,6 +50,30 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
   endif()
 
   get_property(_additional_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
+
+  if(MITK_USE_HDF5)
+    _find_package(HDF5)
+    get_target_property(_location hdf5 LOCATION)
+    get_filename_component(_location ${_location} PATH)
+    list(APPEND _additional_paths ${_location})
+
+    # This is a work-around. The hdf5-config.cmake file is not robust enough
+    # to be included several times via find_pakcage calls.
+    set(HDF5_LIBRARIES ${HDF5_LIBRARIES} PARENT_SCOPE)
+  endif()
+  if(MITK_USE_Vigra)
+    # we cannot use _find_package(Vigra) here because the vigra-config.cmake file
+    # always includes the target-exports files without using an include guard. This
+    # would lead to errors when another find_package(Vigra) call is processed. The
+    # (bad) assumption here is that for the time being, only the Classification module
+    # is using Vigra.
+    if(UNIX)
+      list(APPEND _additional_paths ${Vigra_DIR}/lib)
+    else()
+      list(APPEND _additional_paths ${Vigra_DIR}/bin)
+    endif()
+  endif()
+
   if(_additional_paths)
     list(APPEND _dir_candidates ${_additional_paths})
   endif()

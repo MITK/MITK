@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkScalarsToColors.h"
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkUnstructuredGridMapper);

@@ -89,6 +89,10 @@ class MITKIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      */
     bool GetTrackingDeviceConfigured();
 
+    /** @return Returns the frame rate set in the m_frameRatePolaris ComboBox
+     */
+    mitk::IlluminationActivationRate GetPolarisFrameRate();
+
     /** @brief Sets the style of this widget. Default is ADVANCED. Caution: The style can only be set once at startup! */
     void SetGUIStyle(Style style);
 

@@ -35,10 +35,11 @@ class CustomMimeType;
 /**
  * @ingroup IO
  *
- * @brief The MimeType class represens a registered mime-type.
+ * @brief The MimeType class represens a registered mime-type. It is an immutable wrapper for mitk::CustomMimeType
+ * that makes memory handling easier by providing a stack-object for the user.
  *
- * MimeType instances support the MITK I/O system and represent mime-types
- * for data formats.
+ * If you want to register a new MimeType, use the CustomMimeType class instead. Wrapping will be performed for you automatically.
+ * In all other cases you should use mitk::MimeType when working with mime-types.
  */
 class MITKCORE_EXPORT MimeType
 {
@@ -56,17 +57,31 @@ public:
 
   bool operator<(const MimeType& other) const;
 
+  /** @See mitk::CustomMimeType::GetName()*/
   std::string GetName() const;
+
+  /** @See mitk::CustomMimeType::GetCategory()*/
   std::string GetCategory() const;
+
+  /** @See mitk::CustomMimeType::GetExtensions()*/
   std::vector<std::string> GetExtensions() const;
+
+  /** @See mitk::CustomMimeType::GetComment()*/
   std::string GetComment() const;
 
+  /** @See mitk::CustomMimeType::GetFileNameWithoutExtension()*/
   std::string GetFilenameWithoutExtension(const std::string& path) const;
 
+  /** @See mitk::CustomMimeType::AppliesTo()*/
   bool AppliesTo(const std::string& path) const;
 
+  /** @See mitk::CustomMimeType::MatchesExtension()*/
+  bool MatchesExtension(const std::string& path) const;
+
+  /** @See mitk::CustomMimeType::IsValid()*/
   bool IsValid() const;
 
+  /** @See mitk::CustomMimeType::Swap()*/
   void Swap(MimeType& m);
 
 private:

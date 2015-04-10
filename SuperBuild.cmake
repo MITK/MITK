@@ -70,6 +70,18 @@ endif()
 
 get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 
+if(MITK_CTEST_SCRIPT_MODE)
+  # Write a file containing the list of enabled external project targets.
+  # This file can be read by a ctest script to separately build projects.
+  set(SUPERBUILD_TARGETS )
+  foreach(proj ${external_projects})
+    if(MITK_USE_${proj})
+      list(APPEND SUPERBUILD_TARGETS ${proj})
+    endif()
+  endforeach()
+  file(WRITE "${CMAKE_BINARY_DIR}/SuperBuildTargets.cmake" "set(SUPERBUILD_TARGETS ${SUPERBUILD_TARGETS})")
+endif()
+
 # A list of "nice" external projects, playing well together with CMake
 set(nice_external_projects ${external_projects})
 list(REMOVE_ITEM nice_external_projects Boost Python)
@@ -104,12 +116,6 @@ if(BUILD_TESTING)
   if(EXTERNAL_MITK_DATA_DIR)
     set(MITK_DATA_DIR ${EXTERNAL_MITK_DATA_DIR})
   endif()
-endif()
-
-# Look for git early on, if needed
-if((BUILD_TESTING AND NOT EXTERNAL_MITK_DATA_DIR) OR
-   (MITK_USE_CTK AND NOT EXTERNAL_CTK_DIR))
-  find_package(Git REQUIRED)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -171,9 +177,6 @@ set(ep_common_args
   "-DCMAKE_INSTALL_RPATH:STRING=${_install_rpath}"
   -DBUILD_TESTING:BOOL=OFF
   -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-  "-DCMAKE_PREFIX_PATH:PATH=<INSTALL_DIR>^^${CMAKE_PREFIX_PATH}"
-  -DCMAKE_INCLUDE_PATH:PATH=${CMAKE_INCLUDE_PATH}
-  -DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}
   -DBUILD_SHARED_LIBS:BOOL=ON
   -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
   -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -193,6 +196,15 @@ set(ep_common_args
   -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
   -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
   -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
+)
+
+set(ep_common_cache_args
+)
+
+set(ep_common_cache_default_args
+  "-DCMAKE_PREFIX_PATH:PATH=<INSTALL_DIR>;${CMAKE_PREFIX_PATH}"
+  "-DCMAKE_INCLUDE_PATH:PATH=${CMAKE_INCLUDE_PATH}"
+  "-DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}"
 )
 
 # Pass the CMAKE_OSX variables to external projects
@@ -238,7 +250,6 @@ set(mitk_cmake_boolean_args
 
   MITK_BUILD_ALL_PLUGINS
   MITK_BUILD_ALL_APPS
-  MITK_BUILD_TUTORIAL # Deprecated. Use MITK_BUILD_EXAMPLES instead
   MITK_BUILD_EXAMPLES
 
   MITK_USE_QT
@@ -321,14 +332,6 @@ if(MITK_USE_Python)
       )
 endif()
 
-if(MITK_USE_QT)
-  if(DESIRED_QT_VERSION MATCHES "5")
-    list(APPEND mitk_optional_cache_args
-      -DQT5_INSTALL_PREFIX:PATH=${QT5_INSTALL_PREFIX}
-    )
-  endif()
-endif()
-
 set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}
@@ -339,6 +342,9 @@ ExternalProject_Add(${proj}
     # --------------- Build options ----------------
     -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+    "-DCMAKE_PREFIX_PATH:PATH=${ep_prefix};${CMAKE_PREFIX_PATH}"
+    "-DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}"
+    "-DCMAKE_INCLUDE_PATH:PATH=${CMAKE_INCLUDE_PATH}"
     # --------------- Compile options ----------------
     -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
     -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
@@ -395,8 +401,6 @@ ExternalProject_Add(${proj}
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}
     ${mitk_superbuild_ep_args}
-    "-DCMAKE_PREFIX_PATH:PATH=${ep_prefix}${sep}${CMAKE_PREFIX_PATH}"
-
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/MITK-build
   BUILD_COMMAND ""

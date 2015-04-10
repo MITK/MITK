@@ -326,6 +326,8 @@ protected:
   /// a timer for the auto rotate action
   ///
   QTimer m_AutoRotationTimer;
+
+  QWidget* m_Parent;
 };
 
 #endif // QmitkRenderWindowMenu_H

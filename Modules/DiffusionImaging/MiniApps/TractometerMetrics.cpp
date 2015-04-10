@@ -48,7 +48,6 @@ int main(int argc, char* argv[])
     parser.addArgument("labels", "l", mitkCommandLineParser::StringList, "Label pairs:", "label pairs", false);
     parser.addArgument("labelimage", "li", mitkCommandLineParser::String, "Label image:", "label image", false);
     parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output valid, invalid and no connections as fiber bundles");
-
     parser.addArgument("fileID", "id", mitkCommandLineParser::String, "ID:", "optional ID field");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

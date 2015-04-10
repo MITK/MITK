@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
     if(strcmp(argv[i], "-testing")==0) continue;
 
     // Load datanode (eg. many image formats, surface formats, etc.)
-    mitk::StandaloneDataStorage::SetOfObjects* dataNodes = mitk::IOUtil::Load(argv[i],*ds);
+    mitk::StandaloneDataStorage::SetOfObjects::Pointer dataNodes = mitk::IOUtil::Load(argv[i],*ds);
 
     //*********************************************************************
     // Part III: Put the data into the datastorage

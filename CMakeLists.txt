@@ -1,4 +1,4 @@
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.1)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
@@ -73,6 +73,20 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 #-----------------------------------------------------------------------------
+# Check miminum Mac OS X version
+#-----------------------------------------------------------------------------
+# The minimum supported Mac OS X version is 10.9. If you use a version less than 10.9, there is no guarantee that the build still works.
+if(APPLE)
+  exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE osx_version)
+  if (osx_version VERSION_LESS "10.9")
+    message(WARNING "Detected OS X version \"${osx_version}\" is not supported anymore. Minimum required OS X version is 10.9 or greater.")
+  endif()
+  if (CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.9)
+    message(WARNING "Detected OS X deployment target \"${CMAKE_OSX_DEPLOYMENT_TARGET}\" is not supported anymore. Minimum required OS X version is 10.9 or greater.")
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # Check miminum compiler versions
 #-----------------------------------------------------------------------------
 
@@ -108,16 +122,9 @@ endif()
 
 set(MITK_CXX_STANDARD 11)
 
-# help keeping cross-platform compatibility
-# CMake 3.1 does not yet know how to handle AppleClang...
-# See http://public.kitware.com/Bug/view.php?id=15355
-if(NOT MSVC AND
-   NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND
-   GCC_VERSION VERSION_GREATER 4.6)
-  set(CMAKE_CXX_EXTENSIONS 0)
-  set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
-  set(CMAKE_CXX_STANDARD_REQUIRED 1)
-endif()
+set(CMAKE_CXX_EXTENSIONS 0)
+set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
+set(CMAKE_CXX_STANDARD_REQUIRED 1)
 
 # This is necessary to avoid problems with compile feature checks.
 # CMAKE_CXX_STANDARD seems to only set the -std=c++11 flag for targets.
@@ -185,8 +192,13 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 # -----------------------------------------
 # Qt version related variables
 
-set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
-env_option(MITK_USE_QT "Use Nokia's Qt library" ON)
+if(APPLE)
+  set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
+else()
+  set(DESIRED_QT_VERSION 5 CACHE STRING "Pick a version of Qt to use: 4 or 5")
+endif()
+
+env_option(MITK_USE_QT "Use the Qt Company's Qt library" ON)
 set(MITK_DESIRED_QT_VERSION ${DESIRED_QT_VERSION})
 
 if(MITK_USE_QT)
@@ -201,10 +213,16 @@ if(MITK_USE_QT)
     set(MITK_QT5_MINIMUM_VERSION 5.0.0)
     set(MITK_USE_Qt4 FALSE)
     set(MITK_USE_Qt5 TRUE)
-    set(QT5_INSTALL_PREFIX "" CACHE PATH "The install location of Qt5")
-    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${QT5_INSTALL_PREFIX})
+    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE PATH "")
     set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg WebKitWidgets Xml XmlPatterns UiTools)
     find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
+    if(Qt5_DIR)
+      get_filename_component(_Qt5_DIR "${Qt5_DIR}/../../../" ABSOLUTE)
+      list(FIND CMAKE_PREFIX_PATH "${_Qt5_DIR}" _result)
+      if(_result LESS 0)
+        set(CMAKE_PREFIX_PATH "${_Qt5_DIR};${CMAKE_PREFIX_PATH}" CACHE PATH "" FORCE)
+      endif()
+    endif()
   endif()
 else()
   set(MITK_USE_Qt4 FALSE)
@@ -242,6 +260,8 @@ mitkFunctionAddExternalProject(NAME CppUnit     ON  ADVANCED DOC "Use CppUnit fo
 mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE)
 
+mitkFunctionAddExternalProject(NAME HDF5        OFF ADVANCED)
+
 # -----------------------------------------
 # The following external projects must be
 # ordered according to their
@@ -251,6 +271,7 @@ mitkFunctionAddExternalProject(NAME SWIG      OFF ADVANCED NO_PACKAGE DEPENDS PC
 mitkFunctionAddExternalProject(NAME Python    OFF          NO_PACKAGE DEPENDS SWIG DOC "Use Python wrapping in MITK")
 mitkFunctionAddExternalProject(NAME Numpy     OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME OpenCV    OFF)
+mitkFunctionAddExternalProject(NAME Vigra     OFF          DEPENDS HDF5)
 
 # These are "hard" dependencies and always set to ON
 mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE)
@@ -266,6 +287,14 @@ mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DO
 if(MITK_USE_QT)
   mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS QT)
 endif()
+
+# -----------------------------------------
+# Other MITK_USE_* options not related to
+# external projects build via the
+# MITK superbuild
+
+env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
+env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -365,14 +394,6 @@ if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
   message("> Forcing MITK_USE_CppUnit to ON because BUILD_TESTING=ON")
   set(MITK_USE_CppUnit ON CACHE BOOL "Use CppUnit for unit tests" FORCE)
 endif()
-
-# -----------------------------------------
-# Other MITK_USE_* options not related to
-# external projects build via the
-# MITK superbuild
-
-env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 
 if(MITK_USE_BLUEBERRY)
   option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
@@ -833,6 +854,10 @@ if(MITK_USE_SimpleITK)
   link_directories(${SimpleITK_LIBRARY_DIRS})
 endif()
 
+if(MITK_USE_OpenCL)
+  find_package(OpenCL REQUIRED)
+endif()
+
 # Qt support
 if(MITK_USE_QT)
   if(DESIRED_QT_VERSION MATCHES 4)
@@ -876,6 +901,13 @@ if(BUILD_TESTING)
     @ONLY
     )
 
+  # Initial cache for ProjectTemplate and PluginGenerator tests
+  configure_file(
+     CMake/mitkTestInitialCache.txt.in
+     ${MITK_BINARY_DIR}/mitkTestInitialCache.txt
+     @ONLY
+  )
+
   # Configuration for the CMake-generated test driver
   set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "#include <stdexcept>")
   set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
@@ -901,7 +933,7 @@ if(BUILD_TESTING)
 
   # Test the external project template
   if(MITK_USE_BLUEBERRY)
-    #include(mitkTestProjectTemplate)
+    include(mitkTestProjectTemplate)
   endif()
 
   # Test the package target
@@ -1295,6 +1327,10 @@ if(WIN32)
   include(mitkFunctionCreateWindowsBatchScript)
 
   set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
+  if(MITK_USE_HDF5)
+    list(APPEND MITK_LIBRARY_DIRS ${HDF5_DIR}/install/bin)
+    message(STATUS "MITK-Runtime " ${MITK_RUNTIME_PATH})
+  endif(MITK_USE_HDF5)
   foreach(VS_BUILD_TYPE debug release)
     mitkFunctionCreateWindowsBatchScript("${MITK_SOURCE_DIR}/CMake/StartVS.bat.in"
       ${PROJECT_BINARY_DIR}/StartVS_${VS_BUILD_TYPE}.bat

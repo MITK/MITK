@@ -148,26 +148,22 @@ m_CrosshairNavigationEnabled(false)
 
   //Create RenderWindows 1
   mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, name + ".widget1", NULL, m_RenderingManager,renderingMode);
-  mitkWidget1->setMaximumSize(2000,2000);
   mitkWidget1->SetLayoutIndex( AXIAL );
   mitkWidgetLayout1->addWidget(mitkWidget1);
 
   //Create RenderWindows 2
   mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, name + ".widget2", NULL, m_RenderingManager,renderingMode);
-  mitkWidget2->setMaximumSize(2000,2000);
   mitkWidget2->setEnabled( true );
   mitkWidget2->SetLayoutIndex( SAGITTAL );
   mitkWidgetLayout2->addWidget(mitkWidget2);
 
   //Create RenderWindows 3
   mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, name + ".widget3", NULL, m_RenderingManager,renderingMode);
-  mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget3->SetLayoutIndex( CORONAL );
   mitkWidgetLayout3->addWidget(mitkWidget3);
 
   //Create RenderWindows 4
   mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, name + ".widget4", NULL, m_RenderingManager,renderingMode);
-  mitkWidget4->setMaximumSize(2000,2000);
   mitkWidget4->SetLayoutIndex( THREE_D );
   mitkWidgetLayout4->addWidget(mitkWidget4);
 
@@ -200,7 +196,7 @@ m_CrosshairNavigationEnabled(false)
   sizePolicy.setVerticalStretch(0);
   sizePolicy.setHeightForWidth(levelWindowWidget->sizePolicy().hasHeightForWidth());
   levelWindowWidget->setSizePolicy(sizePolicy);
-  levelWindowWidget->setMaximumSize(QSize(50, 2000));
+  levelWindowWidget->setMaximumWidth(50);
 
   //add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget( levelWindowWidget );
@@ -342,6 +338,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_LogoRendering->SetOffsetVector(offset);
   m_LogoRendering->SetRelativeSize(0.15);
   m_LogoRendering->SetCornerPosition(1);
+  m_LogoRendering->SetLogoImagePath("DefaultLogo");
   renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(),renderer4);
 
   // setup gradient background and renderwindow rectangle frame
@@ -661,6 +658,15 @@ void QmitkStdMultiWidget::SetCornerAnnotation( std::string text,
   m_CornerAnnotations[widgetNumber] = this->CreateCornerAnnotation(text, color);
   //add it to the list
   layercontroller->InsertForegroundRenderer(m_CornerAnnotations[widgetNumber].ren,true);
+}
+
+void QmitkStdMultiWidget::SetCornerAnnotationVisibility(bool visibility)
+{
+  for(int i = 0 ; i<4 ; ++i)
+  {
+    CornerAnnotation ca = m_CornerAnnotations[i];
+    if(ca.ren) ca.ren->SetDraw(visibility);
+  }
 }
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(unsigned int number)
@@ -1721,10 +1727,11 @@ void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
   // Let NavigationControllers listen to GlobalInteraction
   mitk::GlobalInteraction *gi = mitk::GlobalInteraction::GetInstance();
 
-  // Listen for SliceNavigationController
-  mitkWidget1->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
-  mitkWidget2->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
-  mitkWidget3->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
+  //// Listen for SliceNavigationController
+  //TODO 18735 can this be deleted ??
+  //mitkWidget1->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
+  //mitkWidget2->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
+  //mitkWidget3->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
 
   switch ( m_PlaneMode )
   {
@@ -1812,11 +1819,13 @@ void QmitkStdMultiWidget::DisableGradientBackground()
 void QmitkStdMultiWidget::EnableDepartmentLogo()
 {
   m_LogoRendering->SetVisibility(true);
+  RequestUpdate();
 }
 
 void QmitkStdMultiWidget::DisableDepartmentLogo()
 {
   m_LogoRendering->SetVisibility(false);
+  RequestUpdate();
 }
 
 bool QmitkStdMultiWidget::IsDepartmentLogoEnabled() const

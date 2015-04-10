@@ -310,10 +310,10 @@ void mitk::ManufacturerLogo::SetupPosition()
     case mitk::ManufacturerLogo::Middle:
     default:
     {
-      newPos[0] = 0.5 - 0.2 * normX * m_ZoomFactor;
-      newPos[1] = 0.5 + 0.2 * normY * m_ZoomFactor;
-      newPos[2] = 0.5 - 0.2 * normX * m_ZoomFactor;
-      newPos[3] = 0.5 + 0.2 * normY * m_ZoomFactor;
+      newPos[0] = 0.5 - 0.1 * normX * m_ZoomFactor;
+      newPos[1] = 0.5 - 0.1 * normY * m_ZoomFactor;
+      newPos[2] = 0.5 + 0.1 * normX * m_ZoomFactor;
+      newPos[3] = 0.5 + 0.1 * normY * m_ZoomFactor;
       break;
     }
   }

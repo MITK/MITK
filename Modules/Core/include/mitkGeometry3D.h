@@ -38,21 +38,21 @@ namespace mitk {
   public:
     mitkClassMacro(Geometry3D, mitk::BaseGeometry)
 
-    typedef itk::QuaternionRigidTransform< ScalarType > QuaternionTransformType;
+      typedef itk::QuaternionRigidTransform< ScalarType > QuaternionTransformType;
     typedef QuaternionTransformType::VnlQuaternionType VnlQuaternionType;
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
-    mitkNewMacro1Param(Self, const Self&)
+      mitkNewMacro1Param(Self, const Self&)
 
-    itkCloneMacro(Self)
+      itkCloneMacro(Self)
       //itkGetConstReferenceMacro(TimeBounds, TimeBounds);
 
       //virtual void SetTimeBounds(const TimeBounds& timebounds);
 
   protected:
     Geometry3D();
-    Geometry3D(const Geometry3D& );
+    Geometry3D(const Geometry3D&);
 
     //##Documentation
     //## @brief clones the geometry
@@ -69,18 +69,12 @@ namespace mitk {
     virtual ~Geometry3D();
 
     //##Documentation
-    //## @brief Pre- and Post-functions are empty in BaseGeometry
+    //## @brief PreSetSpacing
     //##
-    //## These virtual functions allow for a different beahiour in subclasses.
-    //## Do implement them in every subclass of BaseGeometry. If not needed, use {}.
-    //## If this class is inherited from a subclass of BaseGeometry, call {Superclass::Pre...();};, example: DisplayGeometry class
-    virtual void PreSetBounds(const BoundsArrayType& /*bounds*/) {}
-    virtual void PostInitialize() {}
-    virtual void PostInitializeGeometry(mitk::BaseGeometry::Self * /*newGeometry*/) const {}
-    virtual void PostSetExtentInMM(int /*direction*/, ScalarType /*extentInMM*/) {}
-    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* /*transform*/) {}
-    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* /*transform*/) {}
-    virtual void PreSetSpacing(const mitk::Vector3D& /*aSpacing*/) {}
+    //## These virtual function allows a different beahiour in subclasses.
+    //## Do implement them in every subclass of BaseGeometry. If not needed, use
+    //## {Superclass::PreSetSpacing();};
+    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){ Superclass::PreSetSpacing(aSpacing); };
   };
 } // namespace mitk
 

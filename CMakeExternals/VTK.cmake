@@ -17,6 +17,10 @@ set(proj VTK)
 set(proj_DEPENDENCIES )
 set(VTK_DEPENDS ${proj})
 
+if(MITK_USE_HDF5)
+  list(APPEND proj_DEPENDENCIES HDF5)
+endif()
+
 if(NOT DEFINED VTK_DIR)
 
   set(additional_cmake_args )
@@ -76,15 +80,20 @@ if(NOT DEFINED VTK_DIR)
      )
   endif()
 
-  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.1.0+74f4888.tar.gz)
-  set(VTK_URL_MD5 1f19dae22c42c032109bd3cf91c4e8c9)
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_cmake_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
 
+  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.2.0.tar.gz)
+  set(VTK_URL_MD5 4790f8b3acdbc376997fbdc9d203f0b7)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
     URL ${VTK_URL}
     URL_MD5 ${VTK_URL_MD5}
-    PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-6.1.0+74f4888.patch
+    PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-6.2.0.patch
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}
@@ -96,8 +105,12 @@ if(NOT DEFINED VTK_DIR)
         -DModule_vtkTestingRendering:BOOL=ON
         -DVTK_MAKE_INSTANTIATORS:BOOL=ON
         ${additional_cmake_args}
-     DEPENDS ${proj_DEPENDENCIES}
-    )
+    CMAKE_CACHE_ARGS
+      ${ep_common_cache_args}
+    CMAKE_CACHE_DEFAULT_ARGS
+      ${ep_common_cache_default_args}
+    DEPENDS ${proj_DEPENDENCIES}
+  )
 
   set(VTK_DIR ${ep_prefix})
   mitkFunctionInstallExternalCMakeProject(${proj})

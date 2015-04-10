@@ -36,7 +36,7 @@ namespace mitk {
  *
  * Implementations of this interface must be registered as a service
  * to make themselve available via the service registry. If the
- * implementation is state-full, the service should be registered using
+ * implementation is stateful, the service should be registered using
  * a PrototypeServiceFactory.
  *
  * The file writer implementation is associated with a mime-type, specified
@@ -48,6 +48,8 @@ namespace mitk {
  * It is recommended to derive new implementations from AbstractFileWriter or
  * AbstractFileIO (if both reader and writer is implemented),
  * which provide correct service registration semantics.
+ *
+ * A more in-depth explanation is available on the concepts pages in the developer manual.
  *
  * \sa AbstractFileWriter
  * \sa AbstractFileIO

@@ -62,17 +62,14 @@ set(PROJECT_BUILD_DIR "MITK-build")
 
 set(CTEST_PATH "$ENV{PATH}")
 if(WIN32)
-  if(CMAKE_CL_64)
+  if("${CTEST_CMAKE_GENERATOR}" MATCHES ".*Win64")
     set(CMAKE_LIBRARY_ARCHITECTURE x64)
   else()
     set(CMAKE_LIBRARY_ARCHITECTURE x86)
   endif()
-  find_path(OPENCV_BIN_DIR opencv_core248.dll
-    PATHS "${CTEST_BINARY_DIRECTORY}/ep/${CMAKE_LIBRARY_ARCHITECTURE}"
-    PATH_SUFFIXES vc10/bin vc11/bin vc12/bin vc13/bin vc14/bin
-    NO_DEFAULT_PATH
-  )
-  message("OpenCV runtime path: ${OPENCV_BIN_DIR}")
+  string(SUBSTRING "${MY_COMPILER}" 2 2 vc_version)
+
+  set(OPENCV_BIN_DIR "${CTEST_BINARY_DIRECTORY}/ep/${CMAKE_LIBRARY_ARCHITECTURE}/vc${vc_version}/bin")
 
   set(SOFA_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/ep/src/SOFA-build/bin/${CTEST_BUILD_CONFIGURATION}")
   set(BLUEBERRY_RUNTIME_DIR "${CTEST_BINARY_DIRECTORY}/MITK-build/bin/plugins/${CTEST_BUILD_CONFIGURATION}")
@@ -80,8 +77,6 @@ if(WIN32)
   set(CTEST_PATH "${CTEST_PATH};${CTEST_BINARY_DIRECTORY}/ep/bin;${QT_BINARY_DIR};${SOFA_BINARY_DIR};${BLUEBERRY_RUNTIME_DIR};${OPENCV_BIN_DIR}")
 endif()
 set(ENV{PATH} "${CTEST_PATH}")
-
-set(SUPERBUILD_TARGETS "")
 
 # If the dashscript doesn't define a GIT_REPOSITORY variable, let's define it here.
 if(NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")

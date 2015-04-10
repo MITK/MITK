@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkDataStorage.h>
 #include <mitkExceptionMacro.h>
+#include <mitkFileReaderSelector.h>
 #include <QmitkCustomVariants.h>
 #include "QmitkCmdLineModuleGui.h"
 
@@ -393,22 +394,32 @@ void QmitkCmdLineModuleRunner::LoadOutputData()
 {
   assert(m_DataStorage);
 
-  std::vector<std::string> fileNames;
-
   QString fileName;
   foreach (fileName, m_OutputDataToLoad)
   {
-    QString message = QObject::tr("loading %1").arg(fileName);
-    this->PublishMessage(message);
+    QString message;
 
-    fileNames.push_back(fileName.toStdString());
-  }
+    try
+    {
 
-  if (fileNames.size() > 0)
-  {
-    int numberLoaded = mitk::IOUtil::LoadFiles(fileNames, *(m_DataStorage));
+      mitk::IOUtil::LoadInfo info(fileName.toStdString());
+      std::vector<mitk::FileReaderSelector::Item> readers = info.m_ReaderSelector.Get();
+      if (readers.size() > 0)
+      {
+        mitk::IOUtil::Load(fileName.toStdString(), *(m_DataStorage));
+        message = QObject::tr("Loaded %1").arg(fileName);
+      }
+      else
+      {
+        message = QObject::tr("Not loading %1, as no IFileReader is available.").arg(fileName);
+      }
+    }
+    catch (const mitk::Exception& e)
+    {
+      message = QObject::tr("Failed to load %1, due to %2\n").arg(fileName).arg(e.what());
+      MITK_ERROR << message.toStdString();
+    }
 
-    QString message = QObject::tr("loaded %1 files").arg(numberLoaded);
     this->PublishMessage(message);
   }
 }

@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(
   SUBPROJECTS
-  INCLUDE_DIRS USControlInterfaces USFilters USModel USService
+  INCLUDE_DIRS USControlInterfaces USFilters USModel
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   PACKAGE_DEPENDS Poco
   DEPENDS MitkOpenCVVideoSupport MitkQtWidgetsExt MitkIGTBase

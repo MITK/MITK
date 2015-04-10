@@ -55,8 +55,8 @@ public:
 
 private:
 
-  template < class TPixelType, unsigned int VImageDimension >
-  itk::Object::Pointer GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1);
+  template < class TPixelType, class MovingPixelType, unsigned int VImageDimension >
+  itk::Object::Pointer GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1, itk::Image<MovingPixelType, VImageDimension>* itkImage2);
 
 protected:
 

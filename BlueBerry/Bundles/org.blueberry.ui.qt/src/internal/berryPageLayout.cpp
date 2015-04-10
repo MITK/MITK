@@ -631,7 +631,7 @@ QHash<QString, ViewLayoutRec::Pointer> PageLayout::GetIDtoViewLayoutRecMap()
 void PageLayout::RemovePlaceholder(const QString& id)
 {
   LayoutPart::Pointer part = this->GetRefPart(id);
-  if (part->IsPlaceHolder())
+  if (part != nullptr && part->IsPlaceHolder())
   {
     ILayoutContainer::Pointer stack = this->GetFolderPart(id);
     if (stack != 0)

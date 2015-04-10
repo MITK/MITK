@@ -21,8 +21,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 #include <berryIMemento.h>
 
+#include <QAction>
+
 namespace berry
 {
+
+ActionBarAdvisor::~ActionBarAdvisor()
+{
+  qDeleteAll(actions);
+}
 
 ActionBarAdvisor::ActionBarAdvisor(const SmartPointer<IActionBarConfigurer>& configurer)
   : actionBarConfigurer(configurer)
@@ -37,7 +44,7 @@ IActionBarConfigurer::Pointer ActionBarAdvisor::GetActionBarConfigurer() const
 
 void ActionBarAdvisor::FillActionBars(FillFlags flags)
 {
-  if (flags.testFlag(FILL_PROXY))
+  if (!flags.testFlag(FILL_PROXY))
   {
     this->MakeActions(actionBarConfigurer->GetWindowConfigurer()->GetWindow().GetPointer());
   }
@@ -58,6 +65,18 @@ void ActionBarAdvisor::FillActionBars(FillFlags flags)
 void ActionBarAdvisor::MakeActions(IWorkbenchWindow*  /*window*/)
 {
   // do nothing
+}
+
+void ActionBarAdvisor::Register(QAction* action, const QString& id)
+{
+  Q_ASSERT_X(action, "nullcheck", "QAction must not be null");
+  actions.insert(id, action);
+}
+
+QAction* ActionBarAdvisor::GetAction(const QString& id) const
+{
+  auto iter = actions.find(id);
+  return iter == actions.end() ? NULL : iter.value();
 }
 
 void ActionBarAdvisor::FillMenuBar(IMenuManager*  /*menuBar*/)

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryHelpSearchView.h"
 #include "berryHelpEditor.h"
 #include "berryHelpEditorInput.h"
+#include "berryHelpEditorInputFactory.h"
 #include "berryHelpPerspective.h"
 
 #include "berryQHelpEngineConfiguration.h"
@@ -85,6 +86,7 @@ HelpPluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(berry::HelpIndexView, context)
   BERRY_REGISTER_EXTENSION_CLASS(berry::HelpSearchView, context)
   BERRY_REGISTER_EXTENSION_CLASS(berry::HelpEditor, context)
+  BERRY_REGISTER_EXTENSION_CLASS(berry::HelpEditorInputFactory, context)
   BERRY_REGISTER_EXTENSION_CLASS(berry::HelpPerspective, context)
 
   QFileInfo qhcInfo = context->getDataFile("qthelpcollection.qhc");

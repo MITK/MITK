@@ -131,9 +131,9 @@ public:
 
   using ContributionItem::Fill;
 
-  QAction* Fill(QMenu* parent, QAction* before);
+  void Fill(QMenu* parent, QAction* before);
 
-  QAction* Fill(QToolBar* parent, QAction* before);
+  void Fill(QToolBar* parent, QAction* before);
 
   void Update();
 
@@ -177,13 +177,6 @@ private:
 
   //SmartPointer<IUIElementListener> GetItemListener();
 
-#if (QT_VERSION < QT_VERSION_CHECK(5,0,0))
-  void connectNotify(const char *signal);
-  void disconnectNotify(const char *signal);
-#else
-  void connectNotify(const QMetaMethod& signal);
-  void disconnectNotify(const QMetaMethod& signal);
-#endif
   /**
    * Determines if the selection was on the dropdown affordance and, if so,
    * opens the drop down menu (populated using the same id as this item...
@@ -208,6 +201,7 @@ private:
 
 private slots:
 
+  void HandleActionDestroyed();
   void HandleWidgetSelection();
 
 };

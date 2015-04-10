@@ -43,8 +43,6 @@ class QmitkViewCoordinator : private berry::IPartListener, private berry::IWindo
 {
 public:
 
-  berryObjectMacro(QmitkViewCoordinator);
-
   /**
    * Add listener
    */

@@ -20,10 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryMacros.h>
 #include <berryObject.h>
 
+#include <berryIAdaptable.h>
+
 #include <org_blueberry_ui_qt_Export.h>
 
 namespace berry
 {
+
+struct IPersistableElement;
 
 /**
  * \ingroup org_blueberry_ui_qt
@@ -63,7 +67,7 @@ namespace berry
  * @see org.blueberry.ui.IWorkbenchPage#openEditor(IEditorInput, String)
  * @see org.blueberry.ui.IWorkbenchPage#openEditor(IEditorInput, String, boolean)
  */
-struct BERRY_UI_QT IEditorInput : public Object // public IAdaptable
+struct BERRY_UI_QT IEditorInput : public virtual Object, public virtual IAdaptable
 {
   berryObjectMacro(berry::IEditorInput)
 
@@ -83,23 +87,12 @@ struct BERRY_UI_QT IEditorInput : public Object // public IAdaptable
   virtual bool Exists() const = 0;
 
   /**
-   * Returns the image descriptor for this input.
+   * Returns the icon for this input.
    *
-   * <p>
-   * Note: although a null return value has never been permitted from this
-   * method, there are many known buggy implementations that return null.
-   * Clients that need the image for an editor are advised to use
-   * IWorkbenchPart.getImage() instead of IEditorInput.getImageDescriptor(),
-   * or to recover from a null return value in a manner that records the ID of
-   * the problematic editor input. Implementors that have been returning null
-   * from this method should pick some other default return value (such as
-   * ImageDescriptor.getMissingImageDescriptor()).
-   * </p>
-   *
-   * @return the image descriptor for this input; may be <code>null</code> if
+   * @return the icon for this input; may be null icon if
    * there is no image.
    */
-  //virtual ImageDescriptor GetImageDescriptor() = 0;
+  virtual QIcon GetIcon() const = 0;
 
   /**
    * Returns the name of this editor input for display purposes.
@@ -118,7 +111,7 @@ struct BERRY_UI_QT IEditorInput : public Object // public IAdaptable
    * @return the persistable element, or <code>null</code> if this editor
    *         input cannot be persisted
    */
-  //virtual IPersistableElement GetPersistable() = 0;
+  virtual const IPersistableElement* GetPersistable() const = 0;
 
   /**
    * Returns the tool tip text for this editor input. This text is used to

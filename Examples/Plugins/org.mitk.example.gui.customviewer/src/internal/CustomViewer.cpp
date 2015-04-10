@@ -32,8 +32,8 @@ int CustomViewer::Start()
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
 
-  wbAdvisor.reset(new CustomViewerWorkbenchAdvisor);
-  int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor.data());
+  CustomViewerWorkbenchAdvisor* wbAdvisor = new CustomViewerWorkbenchAdvisor;
+  int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor);
 
   // exit the application with an appropriate return code
   return code == berry::PlatformUI::RETURN_RESTART

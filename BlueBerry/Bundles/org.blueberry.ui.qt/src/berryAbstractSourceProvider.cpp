@@ -42,7 +42,7 @@ void AbstractSourceProvider::LogDebuggingInfo(const QString& message)
 {
   if (DEBUG && (message != ""))
   {
-    BERRY_INFO << "SOURCES" << " >>> " << message;
+    BERRY_INFO << "SOURCES >>> " << message;
   }
 }
 

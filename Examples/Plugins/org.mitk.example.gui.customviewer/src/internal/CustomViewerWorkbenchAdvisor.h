@@ -48,8 +48,4 @@ public:
    */
   QString GetInitialWindowPerspectiveId();
 
-private:
-
-  QScopedPointer<berry::WorkbenchWindowAdvisor> wwAdvisor;
-
 };

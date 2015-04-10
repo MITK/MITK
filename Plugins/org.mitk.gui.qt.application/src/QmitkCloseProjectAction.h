@@ -24,11 +24,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <windows.h>
 #endif
 
+#include <berrySmartPointer.h>
+
 #include <QAction>
 
 #include <org_mitk_gui_qt_application_Export.h>
 
-#include <berryIWorkbenchWindow.h>
+namespace berry {
+struct IWorkbenchWindow;
+}
 
 /**
  * \ingroup org_mitk_gui_qt_application
@@ -38,13 +42,15 @@ class MITK_QT_APP QmitkCloseProjectAction : public QAction
   Q_OBJECT
 
 public:
-  QmitkCloseProjectAction(berry::IWorkbenchWindow::Pointer window);
-  QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window);
+  QmitkCloseProjectAction(berry::SmartPointer<berry::IWorkbenchWindow> window);
+  QmitkCloseProjectAction(berry::IWorkbenchWindow* window);
+  QmitkCloseProjectAction(const QIcon & icon, berry::SmartPointer<berry::IWorkbenchWindow> window);
+  QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow* window);
 protected slots:
   void Run();
 
 private:
-  void init(berry::IWorkbenchWindow::Pointer window);
-  berry::IWorkbenchWindow::Pointer m_Window;
+  void init(berry::IWorkbenchWindow* window);
+  berry::IWorkbenchWindow* m_Window;
 };
 #endif /*QmitkCloseProjectAction_H_*/

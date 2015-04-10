@@ -228,7 +228,7 @@ struct SaveViewRunnable: public SafeRunnable
         WorkbenchConstants::TAG_VIEW_STATE));
   }
 
-  void HandleException(const std::exception& /*e*/)
+  void HandleException(const ctkException& /*e*/)
   {
     //            result
     //            .add(new Status(

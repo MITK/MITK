@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_blueberry_ui_qt_Export.h>
 
+class QAction;
+
 namespace berry
 {
 
@@ -90,6 +92,8 @@ public:
 
 public:
 
+  ~ActionBarAdvisor();
+
   /**
    * Creates a new action bar advisor to configure a workbench
    * window's action bars via the given action bar configurer.
@@ -105,7 +109,7 @@ public:
    * bars of the corresponding workbench window; the
    * remaining flags indicate which combination of
    * the menu bar (<code>FILL_MENU_BAR</code>),
-   * the tool bar (<code>FILL_COOL_BAR</code>),
+   * the tool bar (<code>FILL_TOOL_BAR</code>),
    * and the status line (<code>FILL_STATUS_LINE</code>) are to be filled.
    * <p>
    * If <code>flags</code> does include <code>FILL_PROXY</code>, then this
@@ -114,17 +118,14 @@ public:
    * again, the remaining flags indicate which combination of the menu bar,
    * the tool bar, and the status line are to be described.
    * The actions included in the proxy action bars can be the same instances
-   * as in the actual window's action bars. Calling <code>ActionFactory</code>
-   * to create new action instances is not recommended, because these
-   * actions internally register listeners with the window and there is no
-   * opportunity to dispose of these actions.
+   * as in the actual window's action bars.
    * </p>
    * <p>
-   * This method is called just after {@link WorkbenchWindowAdvisor#preWindowOpen()}.
+   * This method is called just after {@link WorkbenchWindowAdvisor#PreWindowOpen()}.
    * Clients must not call this method directly (although super calls are okay).
-   * The default implementation calls <code>makeActions</code> if
-   * <code>FILL_PROXY</code> is specified, then calls <code>fillMenuBar</code>,
-   * <code>fillCoolBar</code>, and <code>fillStatusLine</code>
+   * The default implementation calls <code>MakeActions</code> if
+   * <code>FILL_PROXY</code> is specified, then calls <code>FillMenuBar</code>,
+   * <code>FillToolBar</code>, and <code>FillStatusLine</code>
    * if the corresponding flags are specified.
    * </p>
    * <p>
@@ -134,7 +135,7 @@ public:
    *
    * @param flags bit mask composed from the constants
    * {@link #FILL_MENU_BAR FILL_MENU_BAR},
-   * {@link #FILL_COOL_BAR FILL_COOL_BAR},
+   * {@link #FILL_TOOL_BAR FILL_TOOL_BAR},
    * {@link #FILL_STATUS_LINE FILL_STATUS_LINE},
    * and {@link #FILL_PROXY FILL_PROXY}
    */
@@ -166,6 +167,8 @@ public:
    */
   public: virtual bool RestoreState(SmartPointer<IMemento> memento);
 
+  using Object::Register;
+
 protected:
 
   /**
@@ -177,47 +180,28 @@ protected:
 
   /**
    * Instantiates the actions used in the fill methods.
-   * Use {@link #register(IAction)} to register the action with the key binding service
-   * and add it to the list of actions to be disposed when the window is closed.
+   * Use {@link #Register(QAction*)} to add it to the list of actions to
+   * be disposed when the window is closed.
    *
    * @param window the window containing the action bars
    */
   virtual void MakeActions(IWorkbenchWindow* window);
 
-  /*
-   * Registers the given action with the key binding service
-   * (by calling {@link IActionBarConfigurer#registerGlobalAction(IAction)}),
-   * and adds it to the list of actions to be disposed when the window is closed.
-   * <p>
-   * In order to participate in key bindings, the action must have an action
-   * definition id (aka command id), and a corresponding command extension.
-   * See the <code>org.blueberry.ui.commands</code> extension point documentation
-   * for more details.
-   * </p>
+  /**
+   * Adds the given action to the list of actions to be disposed when the window is closed.
    *
    * @param action the action to register, this cannot be <code>null</code>
-   *
-   * @see IAction#setActionDefinitionId(String)
-   * @see #disposeAction(IAction)
+   * @param id the unique action id
    */
-//    protected: virtual void Register(IAction action) {
-//      Assert.isNotNull(action, "Action must not be null"); //$NON-NLS-1$
-//        String id = action.getId();
-//        Assert.isNotNull(id, "Action must not have null id"); //$NON-NLS-1$
-//        getActionBarConfigurer().registerGlobalAction(action);
-//        actions.put(id, action);
-//    }
+  virtual void Register(QAction* action, const QString& id);
 
-  /*
+  /**
    * Returns the action with the given id, or <code>null</code> if not found.
    *
    * @param id the action id
    * @return the action with the given id, or <code>null</code> if not found
-   * @see IAction#getId()
    */
-//    protected: virtual IAction GetAction(const QString& id) {
-//        return (IAction) actions.get(id);
-//    }
+  virtual QAction* GetAction(const QString& id) const;
 
   /**
    * Fills the menu bar with the main menus for the window.
@@ -257,7 +241,7 @@ private:
 
   SmartPointer<IActionBarConfigurer> actionBarConfigurer;
 
-  //private: Map actions = new HashMap();
+  QHash<QString, QAction*> actions;
 
 };
 

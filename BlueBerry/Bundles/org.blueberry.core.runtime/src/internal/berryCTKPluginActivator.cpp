@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPlatform.h"
 #include "berryInternalPlatform.h"
 //#include "berryCTKPluginListener_p.h"
+#include "berryDebugOptions.h"
 #include "berryPreferencesService.h"
 #include "berryExtensionRegistry.h"
 #include "berryRegistryConstants.h"
@@ -42,6 +43,10 @@ void org_blueberry_core_runtime_Activator::start(ctkPluginContext* context)
 {
   this->context = context;
 
+  debugOptions.reset(new DebugOptions());
+  debugOptions->Start(context);
+  debugOptionsReg = context->registerService<IDebugOptions>(debugOptions.data());
+
   RegistryProperties::SetContext(context);
   //ProcessCommandLine();
   this->startRegistry();
@@ -60,11 +65,13 @@ void org_blueberry_core_runtime_Activator::start(ctkPluginContext* context)
 //  // the registry is a synchronized object and will not add the
 //  // same bundle twice.
 //  pluginListener->processPlugins(context->getPlugins());
+
+  InternalPlatform::GetInstance()->Start(context);
 }
 
 void org_blueberry_core_runtime_Activator::stop(ctkPluginContext* context)
 {
-  Q_UNUSED(context)
+  InternalPlatform::GetInstance()->Stop(context);
 
   //pluginListener.reset();
 
@@ -77,6 +84,10 @@ void org_blueberry_core_runtime_Activator::stop(ctkPluginContext* context)
 
   this->stopRegistry();
   RegistryProperties::SetContext(NULL);
+
+  debugOptionsReg.unregister();
+  debugOptions->Stop(context);
+  debugOptions.reset();
 
   this->context = 0;
 }

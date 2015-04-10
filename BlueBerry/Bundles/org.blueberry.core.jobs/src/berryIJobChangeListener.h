@@ -47,8 +47,6 @@ namespace berry
 struct BERRY_JOBS IJobChangeListener
 {
 
-  berryObjectMacro(berry::IJobChangeListener)
-
   struct BERRY_JOBS Events
   {
 

@@ -21,12 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIConfigurationElement.h>
 #include <berryCoreException.h>
 
-#include "Poco/Hash.h"
-
 namespace berry {
 
-const QString ReferenceExpression::ATT_DEFINITION_ID= "definitionId";
-const std::size_t ReferenceExpression::HASH_INITIAL= Poco::Hash<std::string>()("berry::ReferenceExpression");
+const QString ReferenceExpression::ATT_DEFINITION_ID = "definitionId";
+const uint ReferenceExpression::HASH_INITIAL= qHash(QString("berry::ReferenceExpression"));
 
 DefinitionRegistry ReferenceExpression::fgDefinitionRegistry = DefinitionRegistry();
 
@@ -90,7 +88,7 @@ ReferenceExpression::operator==(const Object* object) const
 uint
 ReferenceExpression::ComputeHashCode() const
 {
-  return HASH_INITIAL * HASH_FACTOR + Poco::Hash<std::string>()(fDefinitionId.toStdString());
+  return HASH_INITIAL * HASH_FACTOR + qHash(fDefinitionId);
 }
 
 }

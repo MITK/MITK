@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 //class CTKPluginListener;
+class DebugOptions;
 class PreferencesService;
 struct IExtensionRegistry;
 
@@ -68,6 +69,9 @@ private:
 
   QScopedPointer<IExtensionRegistry> defaultRegistry;
   ctkServiceRegistration registryServiceReg;
+
+  QScopedPointer<DebugOptions> debugOptions;
+  ctkServiceRegistration debugOptionsReg;
 
   QScopedPointer<QObject> userRegistryKey;
   QScopedPointer<QObject> masterRegistryKey;

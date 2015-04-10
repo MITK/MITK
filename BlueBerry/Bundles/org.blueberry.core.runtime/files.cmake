@@ -3,6 +3,7 @@ set(MOC_H_FILES
 
   src/internal/berryCTKPluginListener.h
   src/internal/berryCTKPluginActivator.h
+  src/internal/berryDebugOptions.h
   src/internal/berryExtensionRegistry.h
   src/internal/berryPreferencesService.h
 )
@@ -24,6 +25,7 @@ set(SRC_CPP_FILES
   berryIDebugObjectListener.cpp
   berryILog.cpp
   berryIPreferences.cpp
+  berryIProduct.cpp
   berryIBerryPreferences.cpp
   berryIPreferencesService.cpp
   berryListenerList.h
@@ -35,11 +37,13 @@ set(SRC_CPP_FILES
   berryObjects.cpp
   berryObjectString.cpp
   berryObjectStringMap.cpp
+  berryObjectTypeInfo.cpp
   berryOperationCanceledException.cpp
   berryPlatform.cpp
   berryPlatformException.cpp
   berryPlatformObject.cpp
   berryPlugin.cpp
+  berryReflection.cpp
   berrySafeRunner.cpp
   berrySmartPointer.h
   berryStatus.cpp
@@ -49,6 +53,13 @@ set(SRC_CPP_FILES
   application/berryIApplication.cpp
   application/berryStarter.cpp
 
+  debug/berryDebugOptionsListener.cpp
+  debug/berryIDebugOptions.cpp
+
+  dynamichelpers/berryExtensionTracker.cpp
+  dynamichelpers/berryIExtensionChangeHandler.cpp
+  dynamichelpers/berryIExtensionTracker.cpp
+
   # registry
   registry/berryIConfigurationElement.cpp
   registry/berryIContributor.cpp
@@ -56,6 +67,7 @@ set(SRC_CPP_FILES
   registry/berryIExecutableExtensionFactory.cpp
   registry/berryIExtension.cpp
   registry/berryIExtensionPoint.cpp
+  registry/berryIExtensionPointFilter.cpp
   registry/berryIExtensionRegistry.cpp
   registry/berryInvalidRegistryObjectException.cpp
   registry/berryIRegistryEventListener.cpp
@@ -74,6 +86,7 @@ set(INTERNAL_CPP_FILES
   berryCTKPluginActivator.cpp
   berryCTKPluginListener.cpp
   berryCTKPluginUtils.cpp
+  berryDebugOptions.cpp
   berryExtension.cpp
   berryExtensionHandle.cpp
   berryExtensionPoint.cpp
@@ -103,6 +116,7 @@ set(INTERNAL_CPP_FILES
   berryRegistryStrategy.cpp
   berryRegistryTimestamp.cpp
   berryRegistrySupport.cpp
+  berrySimpleExtensionPointFilter.cpp
   berryTemporaryObjectManager.cpp
   berryThirdLevelConfigurationElementHandle.cpp
   berryXMLPreferencesStorage.cpp

@@ -129,8 +129,8 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
     const char* typeName = qobject_interface_iid<A*>();
     if (typeName == NULL)
     {
-      BERRY_WARN << "Error getting adapter for '" << Object::DemangleName(typeid(*adaptable).name()) << "': "
-                 << "Cannot get the interface id for type '" << Object::DemangleName(typeid(A).name())
+      BERRY_WARN << "Error getting adapter for '" << Reflection::GetClassName(adaptable) << "': "
+                 << "Cannot get the interface id for type '" << Reflection::GetClassName<A>()
                  << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
       return NULL;
     }
@@ -182,8 +182,8 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
     const char* typeName = qobject_interface_iid<A*>();
     if (typeName == NULL)
     {
-      BERRY_WARN << "Error querying adapter manager for '" << Object::DemangleName(typeid(*adaptable).name()) << "': "
-                 << "Cannot get the interface id for type '" << Object::DemangleName(typeid(A).name())
+      BERRY_WARN << "Error querying adapter manager for '" << Reflection::GetClassName(adaptable) << "': "
+                 << "Cannot get the interface id for type '" << Reflection::GetClassName<A>()
                  << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
       return NONE;
     }
@@ -231,8 +231,8 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
     const char* typeName = qobject_interface_iid<A*>();
     if (typeName == NULL)
     {
-      BERRY_WARN << "Error getting adapter for '" << Object::DemangleName(typeid(*adaptable).name()) << "': "
-                 << "Cannot get the interface id for type '" << Object::DemangleName(typeid(A).name())
+      BERRY_WARN << "Error getting adapter for '" << Reflection::GetClassName(adaptable) << "': "
+                 << "Cannot get the interface id for type '" << Reflection::GetClassName<A>()
                  << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
       return NULL;
     }

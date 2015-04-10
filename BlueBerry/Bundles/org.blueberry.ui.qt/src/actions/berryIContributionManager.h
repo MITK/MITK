@@ -21,9 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryMacros.h>
 #include <berryObject.h>
 
+class QAction;
+
 namespace berry {
 
-//struct Action;
 struct IContributionItem;
 struct IContributionManagerOverrides;
 
@@ -57,6 +58,15 @@ struct IContributionManager : public virtual Object
   berryObjectMacro(berry::IContributionManager)
 
   /**
+   * Adds an action as a contribution item to this manager.
+   * Equivalent to <code>Add(IContributionItem::Pointer(new QActionContributionItem(action, id)))</code>.
+   *
+   * @param action the action, this cannot be <code>null</code>
+   * @param id the unique action id
+   */
+  virtual void Add(QAction* action, const QString& id) = 0;
+
+  /**
    * Adds a contribution item to this manager.
    *
    * @param item the contribution item, this cannot be <code>null</code>
@@ -64,12 +74,26 @@ struct IContributionManager : public virtual Object
   virtual void Add(const SmartPointer<IContributionItem>& item) = 0;
 
   /**
+   * Adds a contribution item for the given action at the end of the group
+   * with the given name.
+   * Equivalent to
+   * <code>AppendToGroup(groupName,IContributionItem::Pointer(new QActionContributionItem(action, id)))</code>.
+   *
+   * @param groupName the name of the group
+   * @param action the action
+   * @param id the unique action id
+   * @exception ctkInvalidArgumentException if there is no group with
+   *   the given name
+   */
+  virtual void AppendToGroup(const QString& groupName, QAction* action, const QString& id) = 0;
+
+  /**
    * Adds a contribution item to this manager at the end of the group
    * with the given name.
    *
    * @param groupName the name of the group
    * @param item the contribution item
-   * @exception std::invalid_argument if there is no group with
+   * @exception ctkInvalidArgumentException if there is no group with
    *   the given name
    */
   virtual void AppendToGroup(const QString& groupName, const SmartPointer<IContributionItem>& item) = 0;

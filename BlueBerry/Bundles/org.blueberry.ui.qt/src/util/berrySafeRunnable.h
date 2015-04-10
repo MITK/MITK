@@ -60,11 +60,9 @@ public:
   SafeRunnable(const QString& message = "");
 
   /*
-   * (non-Javadoc)
-   *
-   * @see ISafeRunnable#HandleException(const std::exception&)
+   * @see ISafeRunnable#HandleException(const ctkException&)
    */
-  void HandleException(const std::exception& e);
+  void HandleException(const ctkException& e);
 
   /**
    * Flag to avoid interactive error dialogs during automated testing.

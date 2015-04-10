@@ -24,8 +24,7 @@ const QString CustomViewerWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.e
 // //! [WorkbenchAdvisorCreateWindowAdvisor]
 berry::WorkbenchWindowAdvisor* CustomViewerWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer)
 {
-  wwAdvisor.reset(new CustomViewerWorkbenchWindowAdvisor(configurer));
-  return wwAdvisor.data();
+  return new CustomViewerWorkbenchWindowAdvisor(configurer);
 }
 // //! [WorkbenchAdvisorCreateWindowAdvisor]
 

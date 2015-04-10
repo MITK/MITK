@@ -57,31 +57,6 @@ class HandlerAuthority : private IPropertyChangeListener
 private:
 
   /**
-   * Whether the workbench command support should kick into debugging mode.
-   * This causes the unresolvable handler conflicts to be printed to the
-   * console.
-   */
-  static const bool DEBUG; // = Policy.DEBUG_HANDLERS;
-
-  /**
-   * Whether the performance information should be printed about the
-   * performance of the handler authority.
-   */
-  static const bool DEBUG_PERFORMANCE; // = Policy.DEBUG_HANDLERS_PERFORMANCE;
-
-  /**
-   * Whether the workbench command support should kick into verbose debugging
-   * mode. This causes the resolvable handler conflicts to be printed to the
-   * console.
-   */
-  static const bool DEBUG_VERBOSE; // = Policy.DEBUG_HANDLERS && Policy.DEBUG_HANDLERS_VERBOSE;
-
-  /**
-   * The command identifier to which the verbose output should be restricted.
-   */
-  static const QString DEBUG_VERBOSE_COMMAND_ID; // = Policy.DEBUG_HANDLERS_VERBOSE_COMMAND_ID;
-
-  /**
    * The component name to print when displaying tracing information.
    */
   static const QString TRACING_COMPONENT; // = "HANDLERS";
@@ -118,6 +93,32 @@ private:
   IPropertyChangeListener* GetServiceListener() const;
 
 public:
+
+  /**
+   * Whether the workbench command support should kick into debugging mode.
+   * This causes the unresolvable handler conflicts to be printed to the
+   * console.
+   */
+  static bool DEBUG; // = Policy.DEBUG_HANDLERS;
+
+  /**
+   * Whether the performance information should be printed about the
+   * performance of the handler authority.
+   */
+  static bool DEBUG_PERFORMANCE; // = Policy.DEBUG_HANDLERS_PERFORMANCE;
+
+  /**
+   * Whether the workbench command support should kick into verbose debugging
+   * mode. This causes the resolvable handler conflicts to be printed to the
+   * console.
+   */
+  static bool DEBUG_VERBOSE; // = Policy.DEBUG_HANDLERS && Policy.DEBUG_HANDLERS_VERBOSE;
+
+  /**
+   * The command identifier to which the verbose output should be restricted.
+   */
+  static QString DEBUG_VERBOSE_COMMAND_ID; // = Policy.DEBUG_HANDLERS_VERBOSE_COMMAND_ID;
+
 
   /**
    * Constructs a new instance of <code>HandlerAuthority</code>.

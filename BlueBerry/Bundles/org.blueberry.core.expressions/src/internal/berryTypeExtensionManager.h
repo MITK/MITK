@@ -25,13 +25,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryProperty.h"
 
 #include <berryIConfigurationElement.h>
+#include <berryIRegistryEventListener.h>
 
 #include <QHash>
 #include <typeinfo>
 
 namespace berry {
 
-class TypeExtensionManager { // implements IRegistryChangeListener {
+class TypeExtensionManager : private IRegistryEventListener
+{
 
 private:
   QString fExtensionPoint;
@@ -83,6 +85,8 @@ private:
 
 public:
 
+  static bool DEBUG;
+
   TypeExtensionManager(const QString& extensionPoint);
   ~TypeExtensionManager();
 
@@ -100,24 +104,22 @@ protected:
    * This method doesn't need to be synchronized since it is called
    * from withing the getProperty method which is synchronized
    */
-  /* package */TypeExtension::Pointer Get(const QString& type);
+  TypeExtension::Pointer Get(const Reflection::TypeInfo& typeInfo);
 
   /*
    * This method doesn't need to be synchronized since it is called
    * from withing the getProperty method which is synchronized
    */
-  /* package */QList<IPropertyTester::Pointer> LoadTesters(const QString& typeName);
-
-  //  public void registryChanged(IRegistryChangeEvent event) {
-  //    IExtensionDelta[] deltas= event.getExtensionDeltas(ExpressionPlugin.getPluginId(), fExtensionPoint);
-  //    if (deltas.length > 0) {
-  //      initializeCaches();
-  //    }
-  //  }
+  QList<IPropertyTester::Pointer> LoadTesters(const QString& typeName);
 
 private:
 
   /*synchronized*/void InitializeCaches();
+
+  virtual void Added(const QList<SmartPointer<IExtension> >& extensions);
+  virtual void Removed(const QList<SmartPointer<IExtension> >& extensions);
+  virtual void Added(const QList<SmartPointer<IExtensionPoint> >& extensionPoints);
+  virtual void Removed(const QList<SmartPointer<IExtensionPoint> >& extensionPoints);
 };
 
 }

@@ -16,35 +16,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryProperty.h"
 
-#include <Poco/Hash.h>
-#include <Poco/Bugcheck.h>
+#include <cassert>
 
 namespace berry {
 
-Property::Property(Object::ConstPointer type,
+Property::Property(const Reflection::TypeInfo& typeInfo,
                    const QString &namespaze, const QString &name)
- : fType(type), fNamespace(namespaze), fName(name)
+ : fType(typeInfo), fNamespace(namespaze), fName(name)
 {
 }
 
 void Property::SetPropertyTester(IPropertyTester::Pointer tester)
 {
-  poco_check_ptr(tester);
-
-  fTester= tester;
+  assert(tester.GetPointer() != 0);
+  fTester = tester;
 }
 
-bool Property::IsInstantiated()
+bool Property::IsInstantiated() const
 {
   return fTester->IsInstantiated();
 }
 
-bool Property::IsDeclaringPluginActive()
+bool Property::IsDeclaringPluginActive() const
 {
   return fTester->IsDeclaringPluginActive();
 }
 
-bool Property::IsValidCacheEntry(bool forcePluginActivation)
+bool Property::IsValidCacheEntry(bool forcePluginActivation) const
 {
   if (forcePluginActivation)
   {
@@ -63,22 +61,26 @@ bool Property::Test(Object::ConstPointer receiver, const QList<Object::Pointer>&
   return fTester->Test(receiver, fName, args, expectedValue);
 }
 
-bool Property::operator==(Property& obj)
+bool Property::operator==(const Object* obj) const
 {
-   return fType == obj.fType && fNamespace == obj.fNamespace &&
-           fName == obj.fName;
- }
-
-bool Property::operator==(Property* obj)
-{
-  return this->operator==(*obj);
+  if (const Property* other = dynamic_cast<const Property*>(obj))
+  {
+    return fType == other->fType && fNamespace == other->fNamespace &&
+        fName == other->fName;
+  }
+  return false;
 }
 
-int Property::HashCode()
+bool Property::operator<(const Object* obj) const
 {
-  return (int) ((Poco::Hash<std::string>()(typeid(fType).name()) << 16) |
-                (Poco::Hash<std::string>()(fNamespace.toStdString()) << 8) |
-                Poco::Hash<std::string>()(fName.toStdString()));
+  return this->HashCode() < obj->HashCode();
+}
+
+uint Property::HashCode() const
+{
+  return qHash(fType.GetName()) << 16 |
+                                   qHash(fNamespace) << 8 |
+                                   qHash(fName);
 }
 
 }

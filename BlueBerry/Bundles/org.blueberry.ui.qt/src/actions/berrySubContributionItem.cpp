@@ -33,22 +33,20 @@ void SubContributionItem::Fill(QStatusBar* parent)
   }
 }
 
-QAction *SubContributionItem::Fill(QMenu *parent, QAction *before)
+void SubContributionItem::Fill(QMenu *parent, QAction *before)
 {
   if (visible)
   {
-    return innerItem->Fill(parent, before);
+    innerItem->Fill(parent, before);
   }
-  return 0;
 }
 
-QAction *SubContributionItem::Fill(QToolBar *parent, QAction *before)
+void SubContributionItem::Fill(QToolBar *parent, QAction *before)
 {
   if (visible)
   {
-    return innerItem->Fill(parent, before);
+    innerItem->Fill(parent, before);
   }
-  return 0;
 }
 
 QString SubContributionItem::GetId() const

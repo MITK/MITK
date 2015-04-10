@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryEditorDescriptor.h"
 #include "berryWorkbenchRegistryConstants.h"
 #include "berryPlatformUI.h"
+#include "berryPlatform.h"
 
 #include <QStringList>
 
@@ -29,7 +30,8 @@ namespace berry
 void EditorRegistryReader::AddEditors(EditorRegistry* registry)
 {
   this->editorRegistry = registry;
-  this->ReadRegistry(PlatformUI::PLUGIN_ID(),
+  this->ReadRegistry(Platform::GetExtensionRegistry(),
+                     PlatformUI::PLUGIN_ID(),
                      WorkbenchRegistryConstants::PL_EDITOR);
 }
 

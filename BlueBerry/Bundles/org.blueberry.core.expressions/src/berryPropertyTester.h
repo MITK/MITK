@@ -68,10 +68,11 @@ namespace berry {
  * to handle &lt;test property="..."/&gt; requests. So property testers
  * should always be implemented in a stateless fashion.
  * </p>
- * @since 3.0
  */
-class BERRY_EXPRESSIONS PropertyTester : public IPropertyTester
+class BERRY_EXPRESSIONS PropertyTester : public QObject, public IPropertyTester
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IPropertyTester)
 
 private:
   IConfigurationElement::Pointer fConfigElement;

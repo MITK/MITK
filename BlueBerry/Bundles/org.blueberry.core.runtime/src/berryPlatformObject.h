@@ -48,11 +48,12 @@ namespace berry {
  *
  * @see Platform#getAdapterManager
  */
-class org_blueberry_core_runtime_EXPORT PlatformObject : public virtual Object, public IAdaptable {
+class org_blueberry_core_runtime_EXPORT PlatformObject : public virtual Object, public virtual IAdaptable
+{
 
 public:
 
-  berryObjectMacro(berry::PlatformObject);
+  berryObjectMacro(berry::PlatformObject)
 
   /**
    * Constructs a new platform object.
@@ -75,7 +76,7 @@ public:
    * @see IAdaptable#getAdapter
    * @see Platform#getAdapterManager
    */
-  Object* GetAdapter(const QString& adapter);
+  Object* GetAdapter(const QString& adapter) const;
 
 };
 

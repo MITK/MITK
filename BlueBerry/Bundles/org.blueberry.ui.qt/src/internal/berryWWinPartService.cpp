@@ -126,9 +126,9 @@ IWorkbenchPartReference::Pointer WWinPartService::GetActivePartReference()
   return partService.GetActivePartReference();
 }
 
-ISelectionService* WWinPartService::GetSelectionService()
+ISelectionService* WWinPartService::GetSelectionService() const
 {
-  return &selectionService;
+  return const_cast<WindowSelectionService*>(&selectionService);
 }
 
 void WWinPartService::PageActivated(SmartPointer<IWorkbenchPage> newPage)

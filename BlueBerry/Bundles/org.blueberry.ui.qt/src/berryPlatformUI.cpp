@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const QString PlatformUI::PLUGIN_ID() { static QString str = "org.blueberry.ui"; return str; }
+QString PlatformUI::PLUGIN_ID() { static QString str = "org.blueberry.ui"; return str; }
 const QString PlatformUI::XP_WORKBENCH = PlatformUI::PLUGIN_ID() + ".workbench";
 const QString PlatformUI::XP_VIEWS = PlatformUI::PLUGIN_ID() + ".views";
 

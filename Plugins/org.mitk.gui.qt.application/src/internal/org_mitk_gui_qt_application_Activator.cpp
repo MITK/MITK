@@ -21,6 +21,8 @@
 
 #include <QmitkRegisterClasses.h>
 
+#include "QmitkShowPreferencePageHandler.h"
+
 #include <QtPlugin>
 
 namespace mitk
@@ -36,6 +38,7 @@ namespace mitk
 
     BERRY_REGISTER_EXTENSION_CLASS(QmitkGeneralPreferencePage, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkEditorsPreferencePage, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkShowPreferencePageHandler, context)
 
     QmitkRegisterClasses();
 

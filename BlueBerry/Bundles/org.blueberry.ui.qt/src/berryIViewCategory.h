@@ -28,7 +28,7 @@ namespace berry {
  * \ingroup org_blueberry_ui_qt
  *
  */
-struct BERRY_UI_QT IViewCategory : public Object
+struct BERRY_UI_QT IViewCategory : public virtual Object
 {
   berryObjectMacro(berry::IViewCategory)
 

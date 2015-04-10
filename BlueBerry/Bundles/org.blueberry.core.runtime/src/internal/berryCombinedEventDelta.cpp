@@ -20,7 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIExtensionPoint.h"
 #include "berryExtensionHandle.h"
 #include "berryIExtension.h"
+#include "berryIExtensionPointFilter.h"
 #include "berryIObjectManager.h"
+
+#include "berrySimpleExtensionPointFilter.h"
 
 #include <QSharedData>
 
@@ -68,6 +71,46 @@ struct CombinedEventDeltaData : public QSharedData
 CombinedEventDelta::CombinedEventDelta(bool addition)
   : d(new CombinedEventDeltaData(addition))
 {
+}
+
+QList<int> CombinedEventDelta::FilterExtensions(const IExtensionPointFilter& filter) const
+{
+  if (const SimpleExtensionPointFilter* simpleFilter = dynamic_cast<const SimpleExtensionPointFilter*>(filter.GetConcept()))
+  {
+    if (simpleFilter->m_Id.isEmpty()) return d->allExtensions;
+    return d->extensionsByID[simpleFilter->m_Id];
+  }
+
+  QList<int> result;
+  foreach(int extPt, d->allExtensionPoints)
+  {
+    ExtensionPointHandle handle(d->objectManager, extPt);
+    if (filter.Matches(&handle))
+    {
+      result.append(d->extensionsByID[handle.GetUniqueIdentifier()]);
+    }
+  }
+  return result;
+}
+
+QList<int> CombinedEventDelta::FilterExtensionPoints(const IExtensionPointFilter& filter) const
+{
+  if (const SimpleExtensionPointFilter* simpleFilter = dynamic_cast<const SimpleExtensionPointFilter*>(filter.GetConcept()))
+  {
+    if (simpleFilter->m_Id.isEmpty()) return d->allExtensionPoints;
+    return d->extPointsByID[simpleFilter->m_Id];
+  }
+
+  QList<int> result;
+  foreach(int extPt, d->allExtensionPoints)
+  {
+    ExtensionPointHandle handle(d->objectManager, extPt);
+    if (filter.Matches(&handle))
+    {
+      result.push_back(extPt);
+    }
+  }
+  return result;
 }
 
 CombinedEventDelta::CombinedEventDelta()
@@ -153,14 +196,14 @@ void CombinedEventDelta::RememberExtensions(const SmartPointer<ExtensionPoint>& 
     RememberExtension(extensionPoint, exts[i]);
 }
 
-QList<SmartPointer<IExtensionPoint> > CombinedEventDelta::GetExtensionPoints(const QString& id) const
+QList<SmartPointer<IExtensionPoint> > CombinedEventDelta::GetExtensionPoints(const IExtensionPointFilter& filter) const
 {
   QList<int> extensionPoints;
-  if (!id.isEmpty() && !d->extPointsByID.isEmpty())
+  if (!filter.IsNull() && !d->extPointsByID.isEmpty())
   {
-    extensionPoints = d->extPointsByID[id];
+    extensionPoints = FilterExtensionPoints(filter);
   }
-  else if (id.isEmpty())
+  else if (filter.IsNull())
   {
     extensionPoints = d->allExtensionPoints;
   }
@@ -178,14 +221,14 @@ QList<SmartPointer<IExtensionPoint> > CombinedEventDelta::GetExtensionPoints(con
   return result;
 }
 
-QList<SmartPointer<IExtension> > CombinedEventDelta::GetExtensions(const QString& id) const
+QList<SmartPointer<IExtension> > CombinedEventDelta::GetExtensions(const IExtensionPointFilter& filter) const
 {
   QList<int> extensions;
-  if (!id.isEmpty() && !d->extensionsByID.isEmpty())
+  if (!filter.IsNull() && !d->extensionsByID.isEmpty())
   {
-    extensions = d->extensionsByID[id];
+    extensions = FilterExtensions(filter);
   }
-  else if (id.isEmpty())
+  else if (filter.IsNull())
   {
     extensions = d->allExtensions;
   }

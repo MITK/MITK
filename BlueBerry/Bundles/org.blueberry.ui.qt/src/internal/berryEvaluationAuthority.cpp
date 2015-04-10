@@ -17,9 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryEvaluationAuthority.h"
 
+#include "berryCommandTracing.h"
 #include "berryExpressionInfo.h"
 #include "berryExpression.h"
 #include "berryEvaluationReference.h"
+#include "berryPolicy.h"
 #include "berryWorkbenchPlugin.h"
 
 #include <berryObjects.h>
@@ -84,8 +86,12 @@ void EvaluationAuthority::RefsWithSameExpression(const QList<SmartPointer<Evalua
   }
 }
 
-void EvaluationAuthority::StartSourceChange(const QStringList& /*sourceNames*/)
+void EvaluationAuthority::StartSourceChange(const QStringList& sourceNames)
 {
+  if (Policy::DEBUG_SOURCES())
+  {
+    CommandTracing::PrintTrace(COMPONENT, "start source changed: " + sourceNames.join(", "));
+  }
   notifying++;
   if (notifying == 1)
   {
@@ -94,9 +100,14 @@ void EvaluationAuthority::StartSourceChange(const QStringList& /*sourceNames*/)
   }
 }
 
-void EvaluationAuthority::EndSourceChange(const QStringList& /*sourceNames*/)
+void EvaluationAuthority::EndSourceChange(const QStringList& sourceNames)
 {
-  if (notifying == 1) {
+  if (Policy::DEBUG_SOURCES())
+  {
+    CommandTracing::PrintTrace(COMPONENT, "end source changed: " + sourceNames.join(", "));
+  }
+  if (notifying == 1)
+  {
     FireServiceChange(IEvaluationService::PROP_NOTIFYING, ValueOf(true),
                       ValueOf(false));
   }

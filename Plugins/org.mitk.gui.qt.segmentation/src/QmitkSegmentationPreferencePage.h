@@ -18,9 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkSegmentationPreferencePage_h_included
 #define QmitkSegmentationPreferencePage_h_included
 
-#include "berryIQtPreferencePage.h"
 #include "org_mitk_gui_qt_segmentation_Export.h"
 #include <berryIPreferences.h>
+#include "berryIQtPreferencePage.h"
 
 class QWidget;
 class QCheckBox;

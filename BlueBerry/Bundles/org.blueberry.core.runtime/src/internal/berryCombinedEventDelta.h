@@ -26,6 +26,7 @@ namespace berry {
 struct CombinedEventDeltaData;
 struct IExtension;
 struct IExtensionPoint;
+struct IExtensionPointFilter;
 struct IObjectManager;
 
 class ExtensionPoint;
@@ -68,12 +69,15 @@ public:
   void RememberExtensions(const SmartPointer<ExtensionPoint>& extensionPoint,
                           const QList<int>& exts);
 
-  QList<SmartPointer<IExtensionPoint> > GetExtensionPoints(const QString& id) const;
-  QList<SmartPointer<IExtension> > GetExtensions(const QString& id) const;
+  QList<SmartPointer<IExtensionPoint> > GetExtensionPoints(const IExtensionPointFilter& id) const;
+  QList<SmartPointer<IExtension> > GetExtensions(const IExtensionPointFilter& id) const;
 
 private:
 
   CombinedEventDelta(bool addition);
+
+  QList<int> FilterExtensionPoints(const IExtensionPointFilter& filter) const;
+  QList<int> FilterExtensions(const IExtensionPointFilter& filter) const;
 
   QExplicitlySharedDataPointer<CombinedEventDeltaData> d;
 };

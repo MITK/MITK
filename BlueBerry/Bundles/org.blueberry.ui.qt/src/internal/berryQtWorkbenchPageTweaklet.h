@@ -32,8 +32,6 @@ class BERRY_UI_QT QtWorkbenchPageTweaklet : public QObject, public WorkbenchPage
 
 public:
 
-  berryObjectMacro(QtWorkbenchPageTweaklet)
-
   QtWorkbenchPageTweaklet();
 
   QWidget* CreateClientComposite(QWidget* pageControl);

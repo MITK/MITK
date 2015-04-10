@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtPlugin>
 
+#include <org_blueberry_core_runtime_Export.h>
+
 namespace berry {
 
 /**
@@ -47,7 +49,8 @@ namespace berry {
  *
  * @see IConfigurationElement
  */
-struct IExecutableExtensionFactory {
+struct org_blueberry_core_runtime_EXPORT IExecutableExtensionFactory
+{
 
   virtual ~IExecutableExtensionFactory();
 

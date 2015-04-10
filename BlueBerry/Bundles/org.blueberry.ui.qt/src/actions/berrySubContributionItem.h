@@ -70,12 +70,12 @@ public:
     /*
      * Method declared on IContributionItem.
      */
-    QAction* Fill(QMenu* parent, QAction* before);
+    void Fill(QMenu* parent, QAction* before);
 
     /*
      * Method declared on IContributionItem.
      */
-    QAction* Fill(QToolBar* parent, QAction* before);
+    void Fill(QToolBar* parent, QAction* before);
 
     /*
      * Method declared on IContributionItem.

@@ -13,6 +13,7 @@
    <extension-point id="org.blueberry.ui.perspectives" name="Perspectives" schema="schema/perspectives.exsd"/>
    <extension-point id="org.blueberry.ui.presentationFactories" name="Presentation Factories" schema="schema/presentationFactories.exsd"/>
    <extension-point id="org.blueberry.ui.services" name="Services" schema="schema/services.exsd"/>
+   <extension-point id="org.blueberry.ui.perspectiveExtensions" name="Perspective Extensions" schema="schema/perspectiveExtensions.exsd"/>
 
    <extension point="org.blueberry.ui.services">
 

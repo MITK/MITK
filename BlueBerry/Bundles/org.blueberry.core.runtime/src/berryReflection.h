@@ -160,10 +160,11 @@ public:
   QString GetName() const;
   QList<TypeInfo> GetSuperclasses() const;
 
+
 private:
 
-  struct Concept {
-    virtual ~Concept() = default;
+  struct org_blueberry_core_runtime_EXPORT Concept {
+    virtual ~Concept();
     virtual QString GetName() const = 0;
     virtual QList<TypeInfo> GetSuperclasses() const = 0;
   };

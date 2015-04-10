@@ -38,7 +38,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionPointFilter
   struct org_blueberry_core_runtime_EXPORT Concept {
     virtual bool Matches(const IExtensionPoint* target) const = 0;
 
-    virtual ~Concept() = default;
+    virtual ~Concept();
   };
 
   IExtensionPointFilter(const Concept* concept);
@@ -53,7 +53,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionPointFilter
    *
    * @param target the object to match
    * @return <code>true</code> if the target matches this filter
-   * 	and <code>false</code> otherwise
+   *  and <code>false</code> otherwise
    */
   bool Matches(const IExtensionPoint* target) const;
 

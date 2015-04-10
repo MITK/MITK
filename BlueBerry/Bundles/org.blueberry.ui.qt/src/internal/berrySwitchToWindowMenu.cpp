@@ -81,6 +81,7 @@ SwitchToWindowMenu::SwitchToWindowMenu(IWorkbenchWindow* window, const QString& 
   : ContributionItem(id)
   , workbenchWindow(window)
   , showSeparator(showSeparator)
+  , dirty(true)
 {
 }
 

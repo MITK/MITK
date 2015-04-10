@@ -23,6 +23,11 @@ IExtensionPointFilter::IExtensionPointFilter(const IExtensionPointFilter::Concep
 {
 }
 
+IExtensionPointFilter::Concept::~Concept()
+{
+
+}
+
 bool IExtensionPointFilter::IsNull() const
 {
   return m_Self.get() == nullptr;

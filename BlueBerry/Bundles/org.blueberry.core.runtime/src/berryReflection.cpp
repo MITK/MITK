@@ -76,6 +76,8 @@ QString GetClassName(const Object* obj)
   return DemangleName(typeid(*const_cast<Object*>(obj)).name());
 }
 
+TypeInfo::Concept::~Concept(){}
+
 template<>
 struct TypeInfo::Model<EmptyType> : Concept {
   QString GetName() const { return QString(); }

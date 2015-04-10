@@ -41,7 +41,7 @@ private:
 
   bool showSeparator;
 
-  bool dirty = true;
+  bool dirty;
 
   Q_SLOT void AboutToShow(IMenuManager* manager);
 

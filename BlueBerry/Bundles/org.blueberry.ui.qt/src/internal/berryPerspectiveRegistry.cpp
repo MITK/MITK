@@ -17,8 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPerspectiveRegistry.h"
 
 #include "berryWorkbench.h"
+#include "berryWorkbenchPage.h"
 #include "berryWorkbenchPlugin.h"
+#include "berryPreferenceConstants.h"
+#include "berryPerspective.h"
 #include "berryPerspectiveRegistryReader.h"
+#include "berryPlatformUI.h"
+#include "handlers/berryClosePerspectiveHandler.h"
+#include "berryIPreferencesService.h"
+#include "berryIBerryPreferences.h"
+#include "berryIExtension.h"
+#include "berryIExtensionTracker.h"
 
 namespace berry
 {
@@ -28,15 +37,131 @@ const QString PerspectiveRegistry::ID_DEF_PERSP = "PerspectiveRegistry.DEFAULT_P
 const QString PerspectiveRegistry::PERSP = "_persp";
 const char PerspectiveRegistry::SPACE_DELIMITER = ' ';
 
-PerspectiveRegistry::PerspectiveRegistry()
+class PerspectiveRegistry::PreferenceChangeListener
 {
-  //IExtensionTracker tracker = PlatformUI.getWorkbench() .getExtensionTracker();
-  //tracker.registerHandler(this, null);
 
-  //this->InitializePreferenceChangeListener();
-  //WorkbenchPlugin::GetDefault()->GetPreferenceStore()->AddPropertyChangeListener(
-  //    preferenceListener);
+  PerspectiveRegistry* m_Registry;
 
+public:
+
+  PreferenceChangeListener(PerspectiveRegistry* registry)
+    : m_Registry(registry)
+  {}
+
+  void PropertyChange(const IBerryPreferences::ChangeEvent& event)
+  {
+    /*
+     * To ensure that no custom perspective definitions are
+     * deleted when preferences are imported, merge old and new
+     * values
+     */
+    if (event.GetProperty().endsWith(PERSP))
+    {
+      /* A Perspective is being changed, merge */
+      this->MergePerspectives(event);
+    }
+    else if (event.GetProperty() == PreferenceConstants::PERSPECTIVES)
+    {
+      /* The list of perpsectives is being changed, merge */
+      UpdatePreferenceList(event.GetSource());
+    }
+  }
+
+  void MergePerspectives(const IBerryPreferences::ChangeEvent& event)
+  {
+    IBerryPreferences* store = event.GetSource();
+    if (event.GetNewValue().isNull() ||
+        event.GetNewValue().isEmpty())
+    {
+      /*
+       * Perpsective is being removed; if the user has deleted or
+       * reverted a custom perspective, let the change pass
+       * through. Otherwise, restore the custom perspective entry
+       */
+
+      // Find the matching descriptor in the registry
+      QList<IPerspectiveDescriptor::Pointer> perspectiveList = m_Registry->GetPerspectives();
+      for (int i = 0; i < perspectiveList.size(); i++)
+      {
+        QString id = perspectiveList[i]->GetId();
+        if (event.GetProperty() == id + PERSP)
+        { // found
+          // descriptor
+          // see if the perspective has been flagged for
+          // reverting or deleting
+          if (!m_Registry->perspToRemove.contains(id))
+          { // restore
+            store->Put(id + PERSP, event.GetOldValue());
+          }
+          else
+          { // remove element from the list
+            m_Registry->perspToRemove.removeAll(id);
+          }
+        }
+      }
+    }
+    else if ((event.GetOldValue().isNull() || event.GetOldValue().isEmpty()))
+    {
+
+      /*
+       * New perspective is being added, update the
+       * perspectiveRegistry to contain the new custom perspective
+       */
+
+      QString id = event.GetProperty().left(event.GetProperty().lastIndexOf(PERSP));
+      if (m_Registry->FindPerspectiveWithId(id).IsNull())
+      {
+        // perspective does not already exist in registry, add
+        // it
+        PerspectiveDescriptor::Pointer desc(new PerspectiveDescriptor(
+                                              QString::null, QString::null, PerspectiveDescriptor::Pointer()));
+        std::stringstream reader;
+        std::string xmlStr = event.GetNewValue().toStdString();
+        reader.str(xmlStr);
+        try
+        {
+          XMLMemento::Pointer memento = XMLMemento::CreateReadRoot(reader);
+          desc->RestoreState(memento);
+          m_Registry->AddPerspective(desc);
+        }
+        catch (const WorkbenchException& e)
+        {
+          //m_Registry->UnableToLoadPerspective(e.getStatus());
+          m_Registry->UnableToLoadPerspective(e.what());
+        }
+      }
+    }
+    /* If necessary, add to the list of perspectives */
+    this->UpdatePreferenceList(store);
+  }
+
+  void UpdatePreferenceList(IBerryPreferences* store)
+  {
+    QList<IPerspectiveDescriptor::Pointer> perspectiveList = m_Registry->GetPerspectives();
+    QStringList perspBuffer;
+    for (int i = 0; i < perspectiveList.size(); i++)
+    {
+      PerspectiveDescriptor::Pointer desc = perspectiveList[i].Cast<PerspectiveDescriptor>();
+      if (m_Registry->HasCustomDefinition(desc))
+      {
+        perspBuffer.push_back(desc->GetId());
+      }
+    }
+    store->Put(PreferenceConstants::PERSPECTIVES, perspBuffer.join(QString(SPACE_DELIMITER)));
+  }
+};
+
+PerspectiveRegistry::PerspectiveRegistry()
+  : preferenceListener(new PreferenceChangeListener(this))
+{
+  IExtensionTracker* tracker = PlatformUI::GetWorkbench()->GetExtensionTracker();
+  tracker->RegisterHandler(this, QString("org.blueberry.ui.perspectives"));
+
+  berry::IBerryPreferences::Pointer prefs =
+      WorkbenchPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences().Cast<IBerryPreferences>();
+  prefs->OnPropertyChanged +=
+      berry::MessageDelegate1<PreferenceChangeListener, const IBerryPreferences::ChangeEvent&>(
+        preferenceListener.data(), &PreferenceChangeListener::PropertyChange);
 }
 
 void PerspectiveRegistry::AddPerspective(PerspectiveDescriptor::Pointer desc)
@@ -187,36 +312,29 @@ void PerspectiveRegistry::Load()
   this->VerifyDefaultPerspective();
 }
 
-//void PerspectiveRegistry::SaveCustomPersp(PerspectiveDescriptor::Pointer desc,
-//    XMLMemento::Pointer memento)
-//{
-//
-//  IPreferenceStore store = WorkbenchPlugin.getDefault() .getPreferenceStore();
-//
-//  // Save it to the preference store.
-//  Writer writer = new StringWriter();
-//
-//  memento.save(writer);
-//  writer.close();
-//  store.setValue(desc.getId() + PERSP, writer.toString());
-//
-//}
-
-IMemento::Pointer PerspectiveRegistry::GetCustomPersp(const QString&  /*id*/)
+void PerspectiveRegistry::SaveCustomPersp(PerspectiveDescriptor::Pointer desc,
+                                          XMLMemento* memento)
 {
-  //TODO CustomPersp
-//  Reader reader = null;
-//
-//  IPreferenceStore store = WorkbenchPlugin.getDefault() .getPreferenceStore();
-//  QString xmlString = store.getString(id + PERSP);
-//  if (xmlString != null && xmlString.length() != 0)
-//  { // defined in store
-//    reader = new StringReader(xmlString);
-//  }
-//  XMLMemento memento = XMLMemento.createReadRoot(reader);
-//  reader.close();
-//  return memento;
-  return IMemento::Pointer(0);
+  IPreferencesService* prefs = WorkbenchPlugin::GetDefault()->GetPreferencesService();
+
+  // Save it to the preference store.
+  std::stringstream ss;
+  memento->Save(ss);
+  prefs->GetSystemPreferences()->Put(desc->GetId() + PERSP, QString::fromStdString(ss.str()));
+}
+
+IMemento::Pointer PerspectiveRegistry::GetCustomPersp(const QString&  id)
+{
+  std::stringstream ss;
+
+  IPreferencesService* prefs = WorkbenchPlugin::GetDefault()->GetPreferencesService();
+  std::string xmlString = prefs->GetSystemPreferences()->Get(id + PERSP, QString::null).toStdString();
+  if (!xmlString.empty())
+  { // defined in store
+    ss.str(xmlString);
+  }
+  XMLMemento::Pointer memento = XMLMemento::CreateReadRoot(ss);
+  return memento;
 }
 
 void PerspectiveRegistry::SetDefaultPerspective(const QString& id)
@@ -270,156 +388,34 @@ void PerspectiveRegistry::RevertPerspective(IPerspectiveDescriptor::Pointer pers
 
 PerspectiveRegistry::~PerspectiveRegistry()
 {
-//  PlatformUI.getWorkbench().getExtensionTracker().unregisterHandler(this);
-//  WorkbenchPlugin.getDefault().getPreferenceStore() .removePropertyChangeListener(
+//  PlatformUI::GetWorkbench()->GetExtensionTracker()->UnregisterHandler(this);
+//  WorkbenchPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences()->RemovePropertyChangeListener(
 //      preferenceListener);
 }
 
-void PerspectiveRegistry::DeleteCustomDefinition(PerspectiveDescriptor::Pointer  /*desc*/)
+void PerspectiveRegistry::DeleteCustomDefinition(PerspectiveDescriptor::Pointer  desc)
 {
-  //TODO Preferences
   // remove the entry from the preference store.
-  //IPreferenceStore store = WorkbenchPlugin.getDefault() .getPreferenceStore();
+  IPreferencesService* store = WorkbenchPlugin::GetDefault()->GetPreferencesService();
 
-  /*
-   * To delete the perspective definition from the preference store, use
-   * the setToDefault method. Since no default is defined, this will
-   * remove the entry
-   */
-  //store.setToDefault(desc.getId() + PERSP);
-
+  store->GetSystemPreferences()->Remove(desc->GetId() + PERSP);
 }
 
-bool PerspectiveRegistry::HasCustomDefinition(PerspectiveDescriptor::ConstPointer  /*desc*/) const
+bool PerspectiveRegistry::HasCustomDefinition(PerspectiveDescriptor::ConstPointer desc) const
 {
-  //TODO Preferences
-  //IPreferenceStore store = WorkbenchPlugin::GetDefault()->GetPreferenceStore();
-  //return store.contains(desc.getId() + PERSP);
-  return false;
-}
-
-void PerspectiveRegistry::InitializePreferenceChangeListener()
-{
-//  preferenceListener = new IPropertyChangeListener()
-//  {
-//  public void propertyChange(PropertyChangeEvent event)
-//    {
-//      /*
-//       * To ensure the that no custom perspective definitions are
-//       * deleted when preferences are imported, merge old and new
-//       * values
-//       */
-//      if (event.getProperty().endsWith(PERSP))
-//      {
-//        /* A Perspective is being changed, merge */
-//        mergePerspectives(event);
-//      }
-//      else if (event.getProperty().equals(
-//              IPreferenceConstants.PERSPECTIVES))
-//      {
-//        /* The list of perpsectives is being changed, merge */
-//        updatePreferenceList((IPreferenceStore) event.getSource());
-//      }
-//    }
-//
-//    void MergePerspectives(PropertyChangeEvent::Pointer event)
-//    {
-//      IPreferenceStore store = (IPreferenceStore) event.getSource();
-//      if (event.getNewValue() == null
-//          || event.getNewValue().equals(""))
-//      { //$NON-NLS-1$
-//        /*
-//         * Perpsective is being removed; if the user has deleted or
-//         * reverted a custom perspective, let the change pass
-//         * through. Otherwise, restore the custom perspective entry
-//         */
-//
-//        // Find the matching descriptor in the registry
-//        IPerspectiveDescriptor[] perspectiveList = getPerspectives();
-//        for (int i = 0; i < perspectiveList.length; i++)
-//        {
-//          QString id = perspectiveList[i].getId();
-//          if (event.getProperty().equals(id + PERSP))
-//          { // found
-//            // descriptor
-//            // see if the perspective has been flagged for
-//            // reverting or deleting
-//            if (!perspToRemove.contains(id))
-//            { // restore
-//              store.setValue(id + PERSP, (QString) event
-//                  .getOldValue());
-//            }
-//            else
-//            { // remove element from the list
-//              perspToRemove.remove(id);
-//            }
-//          }
-//        }
-//      }
-//      else if ((event.getOldValue() == null || event.getOldValue()
-//              .equals("")))
-//      { //$NON-NLS-1$
-//
-//        /*
-//         * New perspective is being added, update the
-//         * perspectiveRegistry to contain the new custom perspective
-//         */
-//
-//        QString id = event.getProperty().substring(0,
-//            event.getProperty().lastIndexOf(PERSP));
-//        if (findPerspectiveWithId(id) == null)
-//        {
-//          // perspective does not already exist in registry, add
-//          // it
-//          PerspectiveDescriptor desc = new PerspectiveDescriptor(
-//              null, null, null);
-//          StringReader reader = new StringReader((QString) event
-//              .getNewValue());
-//          try
-//          {
-//            XMLMemento memento = XMLMemento
-//            .createReadRoot(reader);
-//            desc.restoreState(memento);
-//            addPerspective(desc);
-//          }
-//          catch (WorkbenchException e)
-//          {
-//            unableToLoadPerspective(e.getStatus());
-//          }
-//        }
-//      }
-//      /* If necessary, add to the list of perspectives */
-//      updatePreferenceList(store);
-//    }
-//
-//    void UpdatePreferenceList(IPreferenceStore store)
-//    {
-//      IPerspectiveDescriptor[] perspectiveList = getPerspectives();
-//      StringBuffer perspBuffer = new StringBuffer();
-//      for (int i = 0; i < perspectiveList.length; i++)
-//      {
-//        PerspectiveDescriptor desc = (PerspectiveDescriptor) perspectiveList[i];
-//        if (hasCustomDefinition(desc))
-//        {
-//          perspBuffer.append(desc.getId())
-//          .append(SPACE_DELIMITER);
-//        }
-//      }
-//      QString newList = perspBuffer.toString().trim();
-//      store.setValue(IPreferenceConstants.PERSPECTIVES, newList);
-//    }
-//  };
+  IPreferencesService* store = WorkbenchPlugin::GetDefault()->GetPreferencesService();
+  return store->GetSystemPreferences()->Keys().contains(desc->GetId() + PERSP);
 }
 
 void PerspectiveRegistry::Add(PerspectiveDescriptor::Pointer desc)
 {
   perspectives.push_back(desc);
-//  IConfigurationElement::Pointer element = desc->GetConfigElement();
-//  if (element != 0)
-//  {
-//    PlatformUI::GetWorkbench().getExtensionTracker().registerObject(
-//        element.getDeclaringExtension(), desc, IExtensionTracker.REF_WEAK);
-//  }
+  IConfigurationElement::Pointer element = desc->GetConfigElement();
+  if (element.IsNotNull())
+  {
+    PlatformUI::GetWorkbench()->GetExtensionTracker()->RegisterObject(
+          element->GetDeclaringExtension(), desc, IExtensionTracker::REF_WEAK);
+  }
 }
 
 void PerspectiveRegistry::InternalDeletePerspective(PerspectiveDescriptor::Pointer desc)
@@ -432,47 +428,55 @@ void PerspectiveRegistry::InternalDeletePerspective(PerspectiveDescriptor::Point
 
 void PerspectiveRegistry::LoadCustom()
 {
-//  Reader reader = null;
-//
-//  /* Get the entries from the Preference store */
-//  IPreferenceStore store = WorkbenchPlugin.getDefault() .getPreferenceStore();
-//
-//  /* Get the space-delimited list of custom perspective ids */
-//  QString customPerspectives = store .getString(
-//      IPreferenceConstants.PERSPECTIVES);
-//  QString[] perspectivesList = StringConverter.asArray(customPerspectives);
-//
-//  for (int i = 0; i < perspectivesList.length; i++)
-//  {
-//    try
-//    {
-//      QString xmlString = store.getString(perspectivesList[i] + PERSP);
-//      if (xmlString != null && xmlString.length() != 0)
-//      {
-//        reader = new StringReader(xmlString);
-//      }
-//
-//      // Restore the layout state.
-//      XMLMemento memento = XMLMemento.createReadRoot(reader);
-//      PerspectiveDescriptor newPersp =
-//          new PerspectiveDescriptor(null, null, null);
-//      newPersp.restoreState(memento);
-//      QString id = newPersp.getId();
-//      IPerspectiveDescriptor oldPersp = findPerspectiveWithId(id);
-//      if (oldPersp == null)
-//      {
-//        add(newPersp);
-//      }
-//      reader.close();
-//    } catch (IOException e)
-//    {
-//      unableToLoadPerspective(null);
-//    } catch (WorkbenchException e)
-//    {
-//      unableToLoadPerspective(e.getStatus());
-//    }
-//  }
-//
+  QScopedPointer<std::istream> reader;
+
+  /* Get the entries from the Preference store */
+  IPreferencesService* store = WorkbenchPlugin::GetDefault()->GetPreferencesService();
+
+  IPreferences::Pointer prefs = store->GetSystemPreferences();
+
+  /* Get the space-delimited list of custom perspective ids */
+  QString customPerspectives = prefs->Get(PreferenceConstants::PERSPECTIVES, QString::null);
+  QStringList perspectivesList = customPerspectives.split(' ', QString::SkipEmptyParts);
+
+  for (int i = 0; i < perspectivesList.size(); i++)
+  {
+    try
+    {
+      std::string xmlString = prefs->Get(perspectivesList[i] + PERSP, QString::null).toStdString();
+      if (!xmlString.empty())
+      {
+        reader.reset(new std::stringstream(xmlString));
+        //reader->exceptions(std::ios_base::failbit);
+      }
+      else
+      {
+        throw WorkbenchException(QString("Description of '%1' perspective could not be found.").arg(perspectivesList[i]));
+      }
+
+      // Restore the layout state.
+      XMLMemento::Pointer memento = XMLMemento::CreateReadRoot(*reader);
+      PerspectiveDescriptor::Pointer newPersp(new PerspectiveDescriptor(
+                                                QString::null, QString::null,
+                                                PerspectiveDescriptor::Pointer(nullptr)));
+      newPersp->RestoreState(memento);
+      QString id = newPersp->GetId();
+      IPerspectiveDescriptor::Pointer oldPersp = FindPerspectiveWithId(id);
+      if (oldPersp.IsNull())
+      {
+        Add(newPersp);
+      }
+    }
+    catch (const std::ios_base::failure&)
+    {
+      UnableToLoadPerspective(QString::null);
+    }
+    catch (const WorkbenchException& e)
+    {
+      UnableToLoadPerspective(e.message());
+    }
+  }
+
 //  // Get the entries from files, if any
 //  // if -data @noDefault specified the state location may not be
 //  // initialized
@@ -481,9 +485,9 @@ void PerspectiveRegistry::LoadCustom()
 //  {
 //    return;
 //  }
-//
+
 //  File folder = path.toFile();
-//
+
 //  if (folder.isDirectory())
 //  {
 //    File[] fileList = folder.listFiles();
@@ -499,7 +503,7 @@ void PerspectiveRegistry::LoadCustom()
 //        {
 //          stream = new FileInputStream(file);
 //          reader = new BufferedReader(new InputStreamReader(stream, "utf-8")); //$NON-NLS-1$
-//
+
 //          // Restore the layout state.
 //          XMLMemento memento = XMLMemento.createReadRoot(reader);
 //          PerspectiveDescriptor newPersp =
@@ -511,13 +515,13 @@ void PerspectiveRegistry::LoadCustom()
 //          {
 //            add(newPersp);
 //          }
-//
+
 //          // save to the preference store
 //          saveCustomPersp(newPersp, memento);
-//
+
 //          // delete the file
 //          file.delete();
-//
+
 //          reader.close();
 //          stream.close();
 //        } catch (IOException e)
@@ -552,8 +556,8 @@ void PerspectiveRegistry::UnableToLoadPerspective(const QString& status)
 
 void PerspectiveRegistry::LoadPredefined()
 {
-  PerspectiveRegistryReader reader;
-  reader.ReadPerspectives(this);
+  PerspectiveRegistryReader reader(this);
+  reader.ReadPerspectives(Platform::GetExtensionRegistry());
 }
 
 void PerspectiveRegistry::VerifyDefaultPerspective()
@@ -586,5 +590,43 @@ void PerspectiveRegistry::VerifyDefaultPerspective()
   // Step 3. Use application-specific default
   defaultPerspID = Workbench::GetInstance()->GetDefaultPerspectiveId();
 }
+
+void PerspectiveRegistry::RemoveExtension(const IExtension::Pointer& /*source*/,
+                                          const QList<Object::Pointer>& objects)
+{
+  for (int i = 0; i < objects.size(); i++)
+  {
+    if (PerspectiveDescriptor::Pointer desc = objects[i].Cast<PerspectiveDescriptor>())
+    {
+      // close the perspective in all windows
+      QList<IWorkbenchWindow::Pointer> windows = PlatformUI::GetWorkbench()->GetWorkbenchWindows();
+      for (int w = 0; w < windows.size(); ++w)
+      {
+        IWorkbenchWindow::Pointer window = windows[w];
+        QList<IWorkbenchPage::Pointer> pages = window->GetPages();
+        for (int p = 0; p < pages.size(); ++p)
+        {
+          WorkbenchPage::Pointer page = pages[p].Cast<WorkbenchPage>();
+          ClosePerspectiveHandler::ClosePerspective(page, page->FindPerspective(desc));
+        }
+      }
+
+      // ((Workbench)PlatformUI.getWorkbench()).getPerspectiveHistory().removeItem(desc);
+
+      this->InternalDeletePerspective(desc);
+    }
+  }
+}
+
+void PerspectiveRegistry::AddExtension(IExtensionTracker* /*tracker*/,
+                                       const IExtension::Pointer& addedExtension)
+{
+  QList<IConfigurationElement::Pointer> addedElements = addedExtension->GetConfigurationElements();
+    for (int i = 0; i < addedElements.size(); i++)
+    {
+      PerspectiveRegistryReader reader(this);
+      reader.ReadElement(addedElements[i]);
+    }
+  }
 
 }

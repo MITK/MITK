@@ -353,7 +353,7 @@ void QmitkPropertyTreeView::SetFocus()
   m_Controls.filterLineEdit->setFocus();
 }
 
-void QmitkPropertyTreeView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+void QmitkPropertyTreeView::RenderWindowPartActivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
   if (m_Controls.propertyListComboBox->count() == 2)
   {

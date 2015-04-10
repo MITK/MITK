@@ -117,8 +117,7 @@ void PageLayout::AddPart(LayoutPart::Pointer newPart,
 
 void PageLayout::AddPerspectiveShortcut(const QString& id)
 {
-  if (std::find(perspectiveShortcuts.begin(),
-      perspectiveShortcuts.end(), id) == perspectiveShortcuts.end())
+  if (!perspectiveShortcuts.contains(id))
   {
     perspectiveShortcuts.push_back(id);
   }

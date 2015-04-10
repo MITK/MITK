@@ -83,8 +83,8 @@ Shell::Pointer Window::GetModalChild(const QList<Shell::Pointer>& toSearch)
 {
   int modal = Constants::APPLICATION_MODAL | Constants::SYSTEM_MODAL | Constants::PRIMARY_MODAL;
 
-  size_t size = toSearch.size();
-  for (size_t i = size - 1; i < size; i--)
+  int size = toSearch.size();
+  for (int i = size - 1; i < size; i--)
   {
     Shell::Pointer shell = toSearch[i];
 

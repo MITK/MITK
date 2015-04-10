@@ -51,7 +51,7 @@ public:
 
   void SetActive();
 
-  QWidget* GetControl();
+  QWidget* GetControl() const;
 
   void SetImages(const QList<QIcon>& images);
 

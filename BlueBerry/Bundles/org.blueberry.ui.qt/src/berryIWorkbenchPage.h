@@ -38,6 +38,8 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 namespace berry {
 
+struct IExtensionTracker;
+
 /**
  * A workbench page consists of an arrangement of views and editors intended to
  * be presented together to the user in a single workbench window.
@@ -449,7 +451,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *
    * @return the workbench window
    */
-  virtual IWorkbenchWindow::Pointer GetWorkbenchWindow() = 0;
+  virtual IWorkbenchWindow::Pointer GetWorkbenchWindow() const = 0;
 
   /**
    * Hides the given view. The view must belong to this page.
@@ -470,7 +472,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
   /**
    * Returns true if perspective with given id contains view with given id
    */
-  virtual bool HasView(const QString& perspectiveId, const QString& viewId) = 0;
+  //virtual bool HasView(const QString& perspectiveId, const QString& viewId) = 0;
 
   /**
    * Returns whether the specified part is visible.
@@ -487,7 +489,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * @param desc
    *            the perspective that will be removed
    */
-  virtual void RemovePerspective(IPerspectiveDescriptor::Pointer desc) = 0;
+  //virtual void RemovePerspective(IPerspectiveDescriptor::Pointer desc) = 0;
 
   /**
    * Reuses the specified editor by setting its new input.
@@ -804,7 +806,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * @param closePage
    *            whether the page itself should be closed if last perspective
    */
-  virtual void CloseCurrentPerspective(bool saveParts, bool closePage) = 0;
+  //virtual void CloseCurrentPerspective(bool saveParts, bool closePage) = 0;
 
   /**
    * Closes the specified perspective in this page. If the last perspective in
@@ -836,6 +838,21 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    *            whether the page itself should be closed
    */
   virtual void CloseAllPerspectives(bool saveEditors, bool closePage) = 0;
+
+  /**
+   * Return the extension tracker for the workbench. This tracker may be used
+   * by plug-ins to ensure responsiveness to changes to the plug-in registry.
+   * <p>
+   * The tracker at this level of the workbench is typically used to track
+   * elements that only exist over the lifespan of a page. For example,
+   * <code>ViewPart</code> objects fall into this category.
+   * </p>
+   *
+   * @return the extension tracker
+   * @see IWorkbench#GetExtensionTracker()
+   * @see IWorkbenchWindow#GetExtensionTracker()
+   */
+  virtual IExtensionTracker* GetExtensionTracker() const = 0;
 
   /**
    * Find the part reference for the given part. A convenience method to

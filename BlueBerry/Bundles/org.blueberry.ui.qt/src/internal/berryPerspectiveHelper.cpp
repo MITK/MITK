@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryDragUtil.h"
 #include "berryPresentationFactoryUtil.h"
 #include "berryWorkbenchConstants.h"
+#include "berryWorkbenchPlugin.h"
+#include "berryPolicy.h"
 
 #include <berryDebugUtil.h>
 
@@ -373,7 +375,32 @@ void PerspectiveHelper::AddPart(LayoutPart::Pointer part)
               container.Cast<ContainerPlaceholder>();
           ILayoutContainer::Pointer parentContainer =
               containerPlaceholder->GetContainer();
-          if (parentContainer == 0) return;
+          if (parentContainer == 0)
+          {
+            if (Policy::DEBUG_PERSPECTIVES())
+            {
+              QString msg = "Previous ContainerPlaceholder for " + tmpViewId;
+              if (tmpStackTrace.isNull())
+              {
+                WorkbenchPlugin::Log(msg);
+              }
+              else
+              {
+                WorkbenchPlugin::Log(msg, *tmpStackTrace.data());
+              }
+              tmpViewId.clear();
+              tmpStackTrace.reset(new ctkException(""));
+              WorkbenchPlugin::Log("Current ContainerPlaceholder with null parent for " +
+                                   primaryId + ":" + secondaryId, *tmpStackTrace.data());
+              tmpStackTrace.reset();
+            }
+            return;
+          }
+          if (Policy::DEBUG_PERSPECTIVES())
+          {
+            tmpViewId = primaryId + ":" + secondaryId;
+            tmpStackTrace.reset(new ctkException(""));
+          }
 
           container = containerPlaceholder->GetRealContainer().Cast<ILayoutContainer>();
           if (container.Cast<LayoutPart> () != 0)

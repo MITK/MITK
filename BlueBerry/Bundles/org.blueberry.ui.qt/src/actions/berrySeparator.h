@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYSEPARATOR_H
 #define BERRYSEPARATOR_H
 
-#include "berryAbstractGroupMarker.h"
+#include "internal/berryAbstractGroupMarker.h"
 
 namespace berry {
 
@@ -33,7 +33,7 @@ namespace berry {
  * </p>
  * @noextend This class is not intended to be subclassed by clients.
  */
-class Separator : public AbstractGroupMarker
+class BERRY_UI_QT Separator : public AbstractGroupMarker
 {
 
 public:
@@ -54,9 +54,9 @@ public:
 
   using AbstractGroupMarker::Fill;
 
-  QAction* Fill(QMenu* menu, QAction* before);
+  void Fill(QMenu* menu, QAction* before);
 
-  QAction* Fill(QToolBar* toolbar, QAction* before);
+  void Fill(QToolBar* toolbar, QAction* before);
 
   /**
    * The <code>Separator</code> implementation of this <code>IContributionItem</code>

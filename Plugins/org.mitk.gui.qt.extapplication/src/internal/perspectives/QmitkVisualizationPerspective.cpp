@@ -50,4 +50,7 @@ void QmitkVisualizationPerspective::CreateInitialLayout(berry::IPageLayout::Poin
   left->AddView("org.mitk.views.moviemaker");
   lo = layout->GetViewLayout("org.mitk.views.moviemaker");
   lo->SetCloseable(true);
+
+  layout->AddPerspectiveShortcut("org.mitk.extapp.defaultperspective");
+  layout->AddPerspectiveShortcut("org.mitk.mitkworkbench.perspectives.editor");
 }

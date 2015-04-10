@@ -255,9 +255,9 @@ public:
 
    Events::Types GetPerspectiveEventTypes() const
    {
-    return Events::ACTIVATED | Events::SAVED_AS | Events::DEACTIVATED
+    return Events::ACTIVATED | Events::SAVED_AS | Events::DEACTIVATED;
      // remove the following line when command framework is finished
-     | Events::CLOSED | Events::OPENED;
+     //| Events::CLOSED | Events::OPENED;
    }
 
    void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
@@ -430,10 +430,9 @@ QmitkExtWorkbenchWindowAdvisor::~QmitkExtWorkbenchWindowAdvisor()
 berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(
  berry::IActionBarConfigurer::Pointer configurer)
 {
- //berry::ActionBarAdvisor::Pointer actionBarAdvisor(
- // new QmitkExtActionBarAdvisor(configurer));
- //return actionBarAdvisor;
-  return berry::WorkbenchWindowAdvisor::CreateActionBarAdvisor(configurer);
+  berry::ActionBarAdvisor::Pointer actionBarAdvisor(
+        new QmitkExtActionBarAdvisor(configurer));
+  return actionBarAdvisor;
 }
 
 QWidget* QmitkExtWorkbenchWindowAdvisor::CreateEmptyWindowContents(QWidget* parent)
@@ -516,9 +515,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  QMainWindow* mainWindow =
   qobject_cast<QMainWindow*> (window->GetShell()->GetControl());
 
- window->SetPerspectiveExcludeList(perspectiveExcludeList);
-    window->SetViewExcludeList(viewExcludeList);
-
  if (!windowIcon.isEmpty())
  {
   mainWindow->setWindowIcon(QIcon(windowIcon));
@@ -548,7 +544,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     QIcon::setThemeName( iconTheme );
 
  // ==== Application menu ============================
-
+/*
  QMenuBar* menuBar = mainWindow->menuBar();
  menuBar->setContextMenuPolicy(Qt::PreventContextMenu);
  menuBar->setNativeMenuBar(false);
@@ -861,7 +857,7 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
         QmitkMemoryUsageIndicatorView* memoryIndicator = new QmitkMemoryUsageIndicatorView();
  qStatusBar->addPermanentWidget(memoryIndicator, 0);
     }
-
+*/
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
@@ -1154,10 +1150,10 @@ void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(
 {
  // hook up the listeners to update the window title
  titlePartListener.reset(new PartListenerForTitle(this));
- //titlePerspectiveListener = new PerspectiveListenerForTitle(this);
+ titlePerspectiveListener.reset(new PerspectiveListenerForTitle(this));
  editorPropertyListener.reset(new berry::PropertyChangeIntAdapter<
-  QmitkExtWorkbenchWindowAdvisor>(this,
-  &QmitkExtWorkbenchWindowAdvisor::PropertyChange));
+                              QmitkExtWorkbenchWindowAdvisor>(this,
+                                                              &QmitkExtWorkbenchWindowAdvisor::PropertyChange));
 
  //    configurer.getWindow().addPageListener(new IPageListener() {
  //      public void pageActivated(IWorkbenchPage page) {
@@ -1173,7 +1169,7 @@ void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(
  //      }
  //    });
 
- //configurer->GetWindow()->AddPerspectiveListener(titlePerspectiveListener);
+ configurer->GetWindow()->AddPerspectiveListener(titlePerspectiveListener.data());
  configurer->GetWindow()->GetPartService()->AddPartListener(titlePartListener.data());
 }
 

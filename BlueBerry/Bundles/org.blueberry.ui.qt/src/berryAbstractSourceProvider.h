@@ -38,12 +38,6 @@ class AbstractSourceProvider : public ISourceProvider {
 protected:
 
   /**
-   * Whether source providers should print out debugging information to the
-   * console when events arrive.
-   */
-  static bool DEBUG; // = Policy.DEBUG_SOURCES;
-
-  /**
    * Notifies all listeners that a single source has changed.
    *
    * @param sourcePriority
@@ -90,6 +84,12 @@ private:
 
 
 public:
+
+  /**
+   * Whether source providers should print out debugging information to the
+   * console when events arrive.
+   */
+  static bool DEBUG; // = Policy.DEBUG_SOURCES;
 
   berryObjectMacro(berry::AbstractSourceProvider)
 

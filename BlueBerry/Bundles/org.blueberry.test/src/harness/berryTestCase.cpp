@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QString>
 
+#include <cassert>
+
 berry::TestCase::TestCase(const QString& testName) :
   CppUnit::TestCase(testName.toStdString()), m_LeakDetails(false),
   m_IgnoreLeakage(false)

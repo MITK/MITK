@@ -46,7 +46,7 @@ private:
    */
   static const uint HASH_INITIAL;
 
-  static TypeExtensionManager fgTypeExtensionManager;
+  static TypeExtensionManager& GetTypeExtensionManager();
 
 
 public:

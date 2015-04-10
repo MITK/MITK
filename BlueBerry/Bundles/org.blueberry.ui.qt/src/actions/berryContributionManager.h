@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+struct IContributionManagerOverrides;
+
 /**
  * Abstract base class for all contribution managers, and standard
  * implementation of <code>IContributionManager</code>. This class provides
@@ -53,10 +55,12 @@ public:
 
   berryObjectMacro(berry::ContributionManager)
 
+  ~ContributionManager();
+
   /*
    * Method declared on IContributionManager.
    */
-  //void Add(Action* action);
+  void Add(QAction* action, const QString& id);
 
   /*
    * Method declared on IContributionManager.
@@ -66,7 +70,7 @@ public:
   /*
    * Method declared on IContributionManager.
    */
-  //void AppendToGroup(const QString& groupName, Action* action);
+  void AppendToGroup(const QString& groupName, QAction* action, const QString& id);
 
   /*
    * Method declared on IContributionManager.

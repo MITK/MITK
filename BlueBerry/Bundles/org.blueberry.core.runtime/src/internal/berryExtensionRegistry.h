@@ -127,7 +127,7 @@ private:
 
   QSet<QString> AddExtensionsAndExtensionPoints(const SmartPointer<RegistryContribution>& element);
 
-  void AddListenerInternal(IRegistryEventListener* listener, const QString& filter);
+  void AddListenerInternal(IRegistryEventListener* listener, const IExtensionPointFilter& filter);
 
   void BasicAdd(const SmartPointer<RegistryContribution>& element, bool link);
 
@@ -229,6 +229,7 @@ public:
   SmartPointer<RegistryObjectManager> GetObjectManager() const;
 
   void AddListener(IRegistryEventListener* listener, const QString& extensionPointId = QString());
+  void AddListener(IRegistryEventListener *listener, const IExtensionPointFilter& filter);
 
   /*
    * @see IExtensionRegistry#getConfigurationElementsFor(java.lang.  QString)

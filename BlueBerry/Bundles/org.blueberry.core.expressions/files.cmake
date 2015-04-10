@@ -1,4 +1,7 @@
 set(MOC_H_FILES
+  src/berryPropertyTester.h
+
+  src/internal/berryPlatformPropertyTester.h
   src/internal/berryExpressionPlugin.h
 )
 
@@ -38,6 +41,7 @@ set(INTERNAL_CPP_FILES
   berryIterateExpression.cpp
   berryNotExpression.cpp
   berryOrExpression.cpp
+  berryPlatformPropertyTester.cpp
   berryProperty.cpp
   berryPropertyTesterDescriptor.cpp
   berryReferenceExpression.cpp

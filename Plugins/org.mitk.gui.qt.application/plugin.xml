@@ -6,5 +6,11 @@
     <page id="org.mitk.GeneralPreferencePage" name="General" class="QmitkGeneralPreferencePage"/>
     <page id="org.mitk.EditorsPreferencePage" name="Editors" class="QmitkEditorsPreferencePage"/>
   </extension>
-  
+
+  <extension point="org.blueberry.ui.handlers">
+    <handler
+      class="QmitkShowPreferencePageHandler"
+      commandId="org.blueberry.ui.window.preferences"/>
+  </extension>
+
 </plugin>

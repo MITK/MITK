@@ -30,8 +30,6 @@ class BERRY_UI_QT QtWorkbenchTweaklet : public QObject, public WorkbenchTweaklet
 
 public:
 
-  berryObjectMacro(QtWorkbenchTweaklet)
-
   QtWorkbenchTweaklet();
 
   Display* CreateDisplay();

@@ -38,6 +38,7 @@ class MITK_QT_APP QmitkFileSaveAction : public QAction
 public:
   QmitkFileSaveAction(berry::IWorkbenchWindow::Pointer window);
   QmitkFileSaveAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window);
+  QmitkFileSaveAction(const QIcon & icon, berry::IWorkbenchWindow* window);
 
   ~QmitkFileSaveAction();
 

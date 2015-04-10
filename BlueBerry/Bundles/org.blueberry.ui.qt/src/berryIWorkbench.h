@@ -31,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+struct IElementFactory;
+struct IExtensionTracker;
 struct IWorkbenchPage;
 
 /**
@@ -97,7 +99,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    * @return the display to be used for all UI interactions with this
    *         workbench
    */
-  virtual Display* GetDisplay() = 0;
+  virtual Display* GetDisplay() const = 0;
 
   /**
    * Adds a workbench listener.
@@ -169,11 +171,26 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
   virtual IWorkbenchWindow::Pointer GetActiveWorkbenchWindow() const = 0;
 
   /**
+   * Return the extension tracker for the workbench. This tracker may be used
+   * by plug-ins to ensure responsiveness to changes to the plug-in registry.
+   * <p>
+   * The tracker at this level of the workbench is typically used to track
+   * elements that persist for the life of the workbench. For example,
+   * <code>IEditorDescriptor</code> objects fall into this category.
+   * </p>
+   *
+   * @return the extension tracker
+   * @see IWorkbenchWindow#GetExtensionTracker()
+   * @see IWorkbenchPage#GetExtensionTracker()
+   */
+  virtual IExtensionTracker* GetExtensionTracker() const = 0;
+
+  /**
    * Returns the perspective registry for the workbench.
    *
    * @return the workbench perspective registry
    */
-  virtual IPerspectiveRegistry* GetPerspectiveRegistry() = 0;
+  virtual IPerspectiveRegistry* GetPerspectiveRegistry() const = 0;
 
   /**
    * Returns the view registry for the workbench.
@@ -181,14 +198,14 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    * @return the workbench view registry
    * @since 3.1
    */
-  virtual IViewRegistry* GetViewRegistry() = 0;
+  virtual IViewRegistry* GetViewRegistry() const = 0;
 
   /**
    * Returns the editor registry for the workbench.
    *
    * @return the workbench editor registry
    */
-  virtual IEditorRegistry* GetEditorRegistry() = 0;
+  virtual IEditorRegistry* GetEditorRegistry() const = 0;
 
   /**
    * Returns the number of open main windows associated with this workbench.
@@ -198,7 +215,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    * @return the number of open windows
    * @since 3.0
    */
-  virtual std::size_t GetWorkbenchWindowCount() = 0;
+  virtual std::size_t GetWorkbenchWindowCount() const = 0;
 
   /**
    * Returns a list of the open main windows associated with this workbench.
@@ -207,7 +224,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    *
    * @return a list of open windows
    */
-  virtual QList<IWorkbenchWindow::Pointer> GetWorkbenchWindows() = 0;
+  virtual QList<IWorkbenchWindow::Pointer> GetWorkbenchWindows() const = 0;
 
   /**
    * Creates and opens a new workbench window with one page. The perspective
@@ -370,12 +387,23 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
   virtual bool SaveAllEditors(bool confirm) = 0;
 
   /**
+   * Returns the element factory with the given id. The calles takes
+   * ownership of the returned pointer.
+   *
+   * @param factoryId
+   *            the id of the element factory
+   * @return the element factory, or <code>null</code> if none
+   * @see IElementFactory
+   */
+  virtual IElementFactory* GetElementFactory(const QString& factoryId) const = 0;
+
+  /**
    * Return the intro manager for this workbench.
    *
    * @return the intro manager for this workbench. Guaranteed not to be
    *         <code>null</code>.
    */
-  virtual IIntroManager* GetIntroManager() = 0;
+  virtual IIntroManager* GetIntroManager() const = 0;
 
   /**
    * Returns a boolean indicating whether the workbench is in the process of
@@ -385,7 +413,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
    *         closing, <code>false</code> otherwise
    * @since 3.1
    */
-  virtual bool IsClosing() = 0;
+  virtual bool IsClosing() const = 0;
 
   /**
    * Applies changes of the current theme to the user interface.

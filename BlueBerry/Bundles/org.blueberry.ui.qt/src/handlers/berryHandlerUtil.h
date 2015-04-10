@@ -157,7 +157,7 @@ public:
      *            The execution event that contains the application context
      * @return the active workbench window, or <code>null</code>.
      */
-   static IWorkbenchWindow::ConstPointer GetActiveWorkbenchWindow(const ExecutionEvent::ConstPointer& event);
+   static IWorkbenchWindow::Pointer GetActiveWorkbenchWindow(const ExecutionEvent::ConstPointer& event);
 
     /**
      * Return the active workbench window.
@@ -168,7 +168,7 @@ public:
      * @throws ExecutionException
      *             If the active workbench window variable is not found.
      */
-    static IWorkbenchWindow::ConstPointer GetActiveWorkbenchWindowChecked(
+    static IWorkbenchWindow::Pointer GetActiveWorkbenchWindowChecked(
         const ExecutionEvent::ConstPointer& event);
 
   /**
@@ -219,7 +219,7 @@ public:
    *            The execution event that contains the application context
    * @return the active part, or <code>null</code>.
    */
-  static IWorkbenchPart::ConstPointer GetActivePart(const ExecutionEvent::ConstPointer& event);
+  static IWorkbenchPart::Pointer GetActivePart(const ExecutionEvent::ConstPointer& event);
 
   /**
    * Return the active part.
@@ -230,7 +230,7 @@ public:
    * @throws ExecutionException
    *             If the active part variable is not found.
    */
-  static IWorkbenchPart::ConstPointer GetActivePartChecked(const ExecutionEvent::ConstPointer& event);
+  static IWorkbenchPart::Pointer GetActivePartChecked(const ExecutionEvent::ConstPointer& event);
 
   /**
    * Return the part id of the active part.
@@ -259,7 +259,7 @@ public:
    *            The execution event that contains the application context
    * @return the active part site, or <code>null</code>.
    */
-  static IWorkbenchPartSite::ConstPointer GetActiveSite(const ExecutionEvent::ConstPointer& event);
+  static IWorkbenchPartSite::Pointer GetActiveSite(const ExecutionEvent::ConstPointer& event);
 
   /**
    * Return the active part site.
@@ -270,7 +270,7 @@ public:
    * @throws ExecutionException
    *             If the active part site variable is not found.
    */
-  static IWorkbenchPartSite::ConstPointer GetActiveSiteChecked(const ExecutionEvent::ConstPointer& event);
+  static IWorkbenchPartSite::Pointer GetActiveSiteChecked(const ExecutionEvent::ConstPointer& event);
 
   /**
    * Return the current selection.

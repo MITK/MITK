@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const std::size_t EqualsExpression::HASH_INITIAL= Poco::Hash<std::string>()("berry::EqualsExpression");
+const uint EqualsExpression::HASH_INITIAL= qHash("berry::EqualsExpression");
 
 
 EqualsExpression::EqualsExpression(Object::Pointer expectedValue) {

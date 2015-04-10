@@ -311,7 +311,7 @@ ParameterizedCommand::Pointer ParameterizedCommand::GenerateCommand(const SmartP
       ParameterType::Pointer parameterType(command->GetParameterType(key));
       if (!parameterType)
       {
-        QString val(*(i.value().Cast<ObjectString>()));
+        QString val = i.value()->ToString();
         parms.push_back(Parameterization(parameter, val));
       }
       else
@@ -324,7 +324,7 @@ ParameterizedCommand::Pointer ParameterizedCommand::GenerateCommand(const SmartP
         }
         else
         {
-          QString val(*(i.value().Cast<ObjectString>()));
+          QString val = i.value()->ToString();
           parms.push_back(Parameterization(parameter, val));
         }
       }

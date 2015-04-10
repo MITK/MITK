@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "intro/berryIntroConstants.h"
 #include "berryWorkbenchWindow.h"
 #include "berryStatusUtil.h"
+#include "berryMultiStatus.h"
+#include "berryXMLMemento.h"
 
 #include "presentations/berryIStackPresentationSite.h"
 #include "berryIContextService.h"
@@ -504,7 +506,7 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
   // Run layout engine.
   factory->CreateInitialLayout(layout);
   PerspectiveExtensionReader extender;
-  extender.ExtendLayout(descriptor->GetId(), layout);
+  extender.ExtendLayout(page->GetExtensionTracker(), descriptor->GetId(), layout);
 
   // Retrieve view layout info stored in the page layout.
   QHash<QString, ViewLayoutRec::Pointer> layoutInfo = layout->GetIDtoViewLayoutRecMap();
@@ -542,9 +544,9 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
 
 //  newWizardShortcuts = layout.getNewWizardShortcuts();
     showViewShortcuts = layout->GetShowViewShortcuts();
-//  perspectiveShortcuts = layout.getPerspectiveShortcuts();
-//  showInPartIds = layout.getShowInPartIds();
-//
+    perspectiveShortcuts = layout->GetPerspectiveShortcuts();
+    showInPartIds = layout->GetShowInPartIds();
+
 //  // Retrieve fast views
 //  if (fastViewManager != 0)
 //  {
@@ -702,6 +704,7 @@ void Perspective::OnActivate()
 //    setEditorAreaTrimVisibility(editorAreaState == IStackPresentationSite.STATE_MINIMIZED);
   }
 
+  // Fix perspectives whose contributing bundle has gone away
   FixOrphan();
 }
 
@@ -790,17 +793,6 @@ bool Perspective::RestoreState(IMemento::Pointer memento)
   if (desc)
   {
     descriptor = desc;
-  }
-  else
-  {
-    try
-    {
-      WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry()->CreatePerspective(descriptor->GetLabel(), descriptor.Cast<berry::IPerspectiveDescriptor>());
-    }
-    catch (...)
-    {
-      std::cout << "Perspective could not be loaded" << std::endl;
-    }
   }
 
   this->memento = memento;
@@ -1218,7 +1210,7 @@ QList<QString> Perspective::GetShowInIdsFromRegistry()
   tags.push_back(WorkbenchRegistryConstants::TAG_SHOW_IN_PART);
   reader.SetIncludeOnlyTags(tags);
   PageLayout::Pointer layout(new PageLayout());
-  reader.ExtendLayout(descriptor->GetOriginalId(), layout);
+  reader.ExtendLayout(nullptr, descriptor->GetOriginalId(), layout);
   return layout->GetShowInPartIds();
 }
 
@@ -1227,45 +1219,50 @@ void Perspective::SaveDesc()
   this->SaveDescAs(descriptor);
 }
 
-void Perspective::SaveDescAs(IPerspectiveDescriptor::Pointer  /*desc*/)
+void Perspective::SaveDescAs(IPerspectiveDescriptor::Pointer desc)
 {
-  //TODO Perspective SaveDescAs
-//  PerspectiveDescriptor::Pointer realDesc = desc.Cast<PerspectiveDescriptor>();
-//  //get the layout from the registry
-//  PerspectiveRegistry* perspRegistry = dynamic_cast<PerspectiveRegistry*>(WorkbenchPlugin
-//  ::GetDefault()->GetPerspectiveRegistry());
-//  // Capture the layout state.
-//  XMLMemento memento = XMLMemento.createWriteRoot("perspective");//$NON-NLS-1$
-//  IStatus status = saveState(memento, realDesc, false);
-//  if (status.getSeverity() == IStatus.ERR)
+  PerspectiveDescriptor::Pointer realDesc = desc.Cast<PerspectiveDescriptor>();
+  //get the layout from the registry
+  PerspectiveRegistry* perspRegistry = dynamic_cast<PerspectiveRegistry*>(
+                                         WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry());
+  // Capture the layout state.
+  XMLMemento::Pointer memento = XMLMemento::CreateWriteRoot("perspective");
+  //IStatus::Pointer status = SaveState(memento, realDesc, false);
+//  if (status->GetSeverity() == IStatus::ERROR_TYPE)
 //  {
-//    ErrorDialog.openError((Shell) 0, WorkbenchMessages.Perspective_problemSavingTitle,
-//        WorkbenchMessages.Perspective_problemSavingMessage,
+//    ErrorDialog.openError((Shell) 0, "Saving Problems",
+//        "Unable to store layout state.",
 //        status);
 //    return;
 //  }
-//  //save it to the preference store
-//  try
-//  {
-//    perspRegistry.saveCustomPersp(realDesc, memento);
-//    descriptor = realDesc;
-//  }
-//  catch (IOException e)
-//  {
-//    perspRegistry.deletePerspective(realDesc);
-//    MessageDialog.openError((Shell) 0, WorkbenchMessages.Perspective_problemSavingTitle,
-//        WorkbenchMessages.Perspective_problemSavingMessage);
-//  }
+  bool status = SaveState(memento, realDesc, false);
+  if (!status)
+  {
+    QMessageBox::critical(nullptr, "Saving Problems", "Unable to store layout state.");
+    return;
+  }
+
+  //save it to the preference store
+  try
+  {
+    perspRegistry->SaveCustomPersp(realDesc, memento.GetPointer());
+    descriptor = realDesc;
+  }
+  catch (const std::exception& /*e*/)
+  {
+    perspRegistry->DeletePerspective(realDesc);
+    QMessageBox::critical(nullptr, "Saving Problems", "Unable to store layout state.");
+  }
 }
 
 bool Perspective::SaveState(IMemento::Pointer memento)
 {
-//  MultiStatus result = new MultiStatus(
-//      PlatformUI.PLUGIN_ID,
-//      IStatus.OK,
-//      WorkbenchMessages.Perspective_problemsSavingPerspective, 0);
-//
-//  result.merge(saveState(memento, descriptor, true));
+//  MultiStatus::Pointer result(new MultiStatus(
+//                                PlatformUI::PLUGIN_ID(),
+//                                IStatus::OK_TYPE,
+//                                "Problems occurred saving perspective.",
+//                                BERRY_STATUS_LOC));
+//  result->Merge(SaveState(memento, descriptor, true));
 
   bool result = true;
   result &= this->SaveState(memento, descriptor, true);
@@ -1277,10 +1274,11 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
     bool saveInnerViewState)
 {
 
-//  MultiStatus result = new MultiStatus(
-//      PlatformUI.PLUGIN_ID,
-//      IStatus.OK,
-//      WorkbenchMessages.Perspective_problemsSavingPerspective, 0);
+//  MultiStatus::Pointer result(new MultiStatus(
+//                                PlatformUI::PLUGIN_ID(),
+//                                IStatus::OK_TYPE,
+//                                "Problems occurred saving perspective.",
+//                                BERRY_STATUS_LOC));
   bool result = true;
 
   if (this->memento)
@@ -1420,7 +1418,7 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
 
   // Save the layout.
   IMemento::Pointer childMem(memento->CreateChild(WorkbenchConstants::TAG_LAYOUT));
-  //result.add(presentation.saveState(childMem));
+  //result->Add(presentation->SaveState(childMem));
   result &= presentation->SaveState(childMem);
 
   // Save the editor visibility state

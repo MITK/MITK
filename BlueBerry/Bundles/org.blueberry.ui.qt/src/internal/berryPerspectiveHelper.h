@@ -50,12 +50,13 @@ class PerspectiveHelper
   friend class ViewSashContainer;
 
 private:
+  QScopedPointer<ctkException> tmpStackTrace;
+  QString tmpViewId;
+
   WorkbenchPage* page;
 
 protected:
   Perspective* perspective;
-
-protected:
   QWidget* parentWidget;
 
 private:
@@ -77,7 +78,6 @@ private:
   typedef QList<DetachedWindow::Pointer> DetachedWindowsType;
   DetachedWindowsType detachedWindowList;
 
-private:
   typedef QList<DetachedPlaceHolder::Pointer> DetachedPlaceHoldersType;
   DetachedPlaceHoldersType detachedPlaceHolderList;
 
@@ -88,10 +88,8 @@ private:
    * iterative 'minimize' calls cause the intial stack's
    * bounds to change.
    */
-private:
   QHash<QString, QRect> boundsMap;
 
-private:
   bool detachable;
 
 protected:
@@ -102,8 +100,6 @@ protected:
 
 private:
   static const int MIN_DETACH_WIDTH;
-
-private:
   static const int MIN_DETACH_HEIGHT;
 
   struct DragOverListener: public IDragOverListener
@@ -181,17 +177,17 @@ private:
     bool operator()(const MatchingPart& m1, const MatchingPart& m2) const;
   };
 
+public:
+
   /**
    * Constructs a new object.
    */
-public:
   PerspectiveHelper(WorkbenchPage* workbenchPage,
       ViewSashContainer::Pointer mainLayout, Perspective* perspective);
 
   /**
    * Show the presentation.
    */
-public:
   void Activate(QWidget* parent);
 
   /**
@@ -199,7 +195,6 @@ public:
    * then swap the part in. Otherwise, add the part in the bottom right
    * corner of the presentation.
    */
-public:
   void AddPart(LayoutPart::Pointer part);
 
   /**
@@ -207,13 +202,11 @@ public:
    *
    * @param ref
    */
-public:
   void AttachPart(IViewReference::Pointer ref);
 
   /**
    * Return whether detachable parts can be supported.
    */
-public:
   bool CanDetach();
 
   /**
@@ -221,7 +214,6 @@ public:
    *
    * @return true if the part was brought to top, false if not.
    */
-public:
   bool BringPartToTop(LayoutPart::Pointer part);
 
   /**
@@ -229,53 +221,27 @@ public:
    * A part is visible if it's top-level (not in a tab folder) or if it is the top one
    * in a tab folder.
    */
-public:
   bool IsPartVisible(IWorkbenchPartReference::Pointer partRef);
 
   /**
    * Returns true is not in a tab folder or if it is the top one in a tab
    * folder.
    */
-public:
   bool WillPartBeVisible(const QString& partId);
 
-public:
   bool WillPartBeVisible(const QString& partId,
       const QString& secondaryId);
 
   /**
-   * Answer a list of the PartPlaceholder objects.
-   */
-private:
-  QList<PartPlaceholder::Pointer> CollectPlaceholders();
-
-  /**
-   * Answer a list of the PartPlaceholder objects.
-   */
-private:
-  QList<PartPlaceholder::Pointer> CollectPlaceholders(
-      const QList<LayoutPart::Pointer>& parts);
-
-  /**
    * Answer a list of the view panes.
    */
-public:
   void CollectViewPanes(QList<PartPane::Pointer>& result);
-
-  /**
-   * Answer a list of the view panes.
-   */
-private:
-  void CollectViewPanes(QList<PartPane::Pointer>& result,
-      const QList<LayoutPart::Pointer>& parts);
 
   /**
    * Hide the presentation.
    */
-public:
   void Deactivate();
 
-public:
   ~PerspectiveHelper();
 
   /**
@@ -291,24 +257,41 @@ public:
    *
    * @param buf
    */
-public:
   void DescribeLayout(QString& buf) const;
+
+private:
+
+  /**
+   * Answer a list of the PartPlaceholder objects.
+   */
+  QList<PartPlaceholder::Pointer> CollectPlaceholders();
+
+  /**
+   * Answer a list of the PartPlaceholder objects.
+   */
+  QList<PartPlaceholder::Pointer> CollectPlaceholders(
+      const QList<LayoutPart::Pointer>& parts);
+
+  /**
+   * Answer a list of the view panes.
+   */
+  void CollectViewPanes(QList<PartPane::Pointer>& result,
+      const QList<LayoutPart::Pointer>& parts);
+
+  /**
+   * Create a detached window containing a part.
+   */
+  void DetachPart(LayoutPart::Pointer source, int x, int y);
+
+  void Detach(LayoutPart::Pointer source, int x, int y);
+
+protected:
 
   /**
    * Deref a given part. Deconstruct its container as required. Do not remove
    * drag listeners.
    */
-protected:
-  /* package */void DerefPart(LayoutPart::Pointer part);
-
-  /**
-   * Create a detached window containing a part.
-   */
-private:
-  void DetachPart(LayoutPart::Pointer source, int x, int y);
-
-private:
-  void Detach(LayoutPart::Pointer source, int x, int y);
+  void DerefPart(LayoutPart::Pointer part);
 
   /**
    * Detached a part from the mainLayout. Presently this does not use placeholders

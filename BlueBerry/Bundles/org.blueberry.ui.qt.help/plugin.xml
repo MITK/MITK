@@ -40,4 +40,10 @@
                  icon="resources/help.png">
     </perspective>
   </extension>
+
+  <extension point="org.blueberry.ui.elementFactories">
+    <factory id="org.blueberry.ui.internal.HelpEditorInputFactory"
+            class="berry::HelpEditorInputFactory">
+    </factory>
+  </extension>
 </plugin>

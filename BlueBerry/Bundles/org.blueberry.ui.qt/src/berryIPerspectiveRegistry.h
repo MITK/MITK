@@ -52,8 +52,8 @@ struct BERRY_UI_QT IPerspectiveRegistry {
    * @return a new perspective descriptor or <code>null</code> if the
    *         creation failed.
    */
-  virtual IPerspectiveDescriptor::Pointer CreatePerspective(const QString& label,
-                                                            IPerspectiveDescriptor::Pointer originalDescriptor) = 0;
+  //virtual IPerspectiveDescriptor::Pointer CreatePerspective(const QString& label,
+  //                                                          IPerspectiveDescriptor::Pointer originalDescriptor) = 0;
 
   /**
    * Clones an existing perspective.

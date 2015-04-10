@@ -58,12 +58,11 @@ public:
     }
   }
 
-  void init ( berry::IWorkbenchWindow::Pointer window, QmitkFileSaveAction* action )
+  void init ( berry::IWorkbenchWindow* window, QmitkFileSaveAction* action )
   {
-    m_Window = window;
+    m_Window = berry::IWorkbenchWindow::Pointer(window);
     m_Action = action;
 
-    action->setParent(static_cast<QWidget*>(m_Window.Lock()->GetShell()->GetControl()));
     action->setText("&Save...");
     action->setToolTip("Save data objects (images, surfaces,...)");
 
@@ -136,10 +135,17 @@ public:
 QmitkFileSaveAction::QmitkFileSaveAction(berry::IWorkbenchWindow::Pointer window)
   : QAction(0), d(new QmitkFileSaveActionPrivate)
 {
-  d->init(window, this);
+  d->init(window.GetPointer(), this);
 }
 
 QmitkFileSaveAction::QmitkFileSaveAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
+  : QAction(0), d(new QmitkFileSaveActionPrivate)
+{
+  d->init(window.GetPointer(), this);
+  this->setIcon(icon);
+}
+
+QmitkFileSaveAction::QmitkFileSaveAction(const QIcon& icon, berry::IWorkbenchWindow* window)
   : QAction(0), d(new QmitkFileSaveActionPrivate)
 {
   d->init(window, this);

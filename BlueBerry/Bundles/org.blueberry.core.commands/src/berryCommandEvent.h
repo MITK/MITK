@@ -134,17 +134,17 @@ private:
   /**
    * The bit used to represent whether the command has changed its category.
    */
-  static const int CHANGED_CATEGORY; // = LAST_USED_BIT << 1;
+  static int CHANGED_CATEGORY(); // = LAST_USED_BIT << 1;
 
   /**
    * The bit used to represent whether the command has changed its handler.
    */
-  static const int CHANGED_HANDLED; // = LAST_USED_BIT << 2;
+  static int CHANGED_HANDLED(); // = LAST_USED_BIT << 2;
 
   /**
    * The bit used to represent whether the command has changed its parameters.
    */
-  static const int CHANGED_PARAMETERS; // = LAST_USED_BIT << 3;
+  static int CHANGED_PARAMETERS(); // = LAST_USED_BIT << 3;
 
   /**
    * The bit used to represent whether the command has changed its return
@@ -152,7 +152,7 @@ private:
    *
    * @since 3.2
    */
-  static const int CHANGED_RETURN_TYPE; // = LAST_USED_BIT << 4;
+  static int CHANGED_RETURN_TYPE(); // = LAST_USED_BIT << 4;
 
   /**
    * The bit used to represent whether the command has changed its help
@@ -160,7 +160,7 @@ private:
    *
    * @since 3.2
    */
-  static const int CHANGED_HELP_CONTEXT_ID; // = LAST_USED_BIT << 5;
+  static int CHANGED_HELP_CONTEXT_ID(); // = LAST_USED_BIT << 5;
 
   /**
    * The bit used to represent whether this commands active handler has
@@ -168,7 +168,7 @@ private:
    *
    * @since 3.3
    */
-  static const int CHANGED_ENABLED; // = LAST_USED_BIT << 6;
+  static int CHANGED_ENABLED(); // = LAST_USED_BIT << 6;
 
   /**
    * The command that has changed; this value is never <code>null</code>.

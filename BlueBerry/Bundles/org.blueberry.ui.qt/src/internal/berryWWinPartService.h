@@ -77,7 +77,7 @@ public:
   /*
    * Returns the selection service.
    */
-  ISelectionService* GetSelectionService();
+  ISelectionService* GetSelectionService() const;
 
   /*
    * Notifies that a page has been activated.

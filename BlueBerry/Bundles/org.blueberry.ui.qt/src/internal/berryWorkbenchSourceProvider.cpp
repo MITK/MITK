@@ -593,9 +593,9 @@ void WorkbenchSourceProvider::HandleShellEvent()
 //  }
 
   LogDebuggingInfo("\tWSP:lastActiveShell: " +
-                   (lastActiveShell ? lastActiveShell->ToString() : QString("NULL")));
+                   (lastActiveShell ? lastActiveShell->GetControl()->objectName() : QString("NULL")));
   LogDebuggingInfo("\tWSP:lastActiveWorkbenchWindowShell: " +
-                   (lastActiveWorkbenchWindowShell ? lastActiveWorkbenchWindowShell->ToString() : QString("NULL")));
+                   (lastActiveWorkbenchWindowShell ? lastActiveWorkbenchWindowShell->GetControl()->objectName() : QString("NULL")));
 
   const ISourceProvider::StateMapType currentState = GetCurrentState();
   const Shell::ConstPointer newActiveShell = currentState.value(ISources::ACTIVE_SHELL_NAME()).Cast<const Shell>();

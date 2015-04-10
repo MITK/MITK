@@ -33,7 +33,7 @@ class EqualsExpression : public Expression {
    */
 private:
 
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
   Object::Pointer fExpectedValue;
 

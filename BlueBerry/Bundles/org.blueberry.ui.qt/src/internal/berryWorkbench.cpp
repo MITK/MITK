@@ -22,13 +22,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berrySafeRunner.h>
 
+#include "berryPolicy.h"
 #include "berrySaveablesList.h"
 #include "berryViewRegistry.h"
 #include "berryEditorRegistry.h"
+#include "berryEditorHistory.h"
+#include "berryEditorHistoryItem.h"
 #include "berryServiceLocatorCreator.h"
 #include "berryWorkbenchPage.h"
 #include "berryPerspective.h"
 #include "berryPreferenceConstants.h"
+#include "berryUIExtensionTracker.h"
 #include "berryWorkbenchWindow.h"
 #include "berryDisplay.h"
 #include "services/berryIServiceFactory.h"
@@ -41,11 +45,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryEvaluationService.h"
 #include "berryCommandService.h"
 #include "berryCommandManager.h"
+#include "berryMenuManager.h"
 #include "berryParameterType.h"
+#include "berryQActionProperties.h"
 #include "berrySourceProviderService.h"
 #include "berryWorkbenchLocationService.h"
 
+#include <berryCommand.h>
 #include <berryCommandCategory.h>
+#include <berryIElementFactory.h>
 #include <berryIHandler.h>
 #include <berryIHandlerService.h>
 #include <berryIPreferencesService.h>
@@ -57,8 +65,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 #include <QMessageBox>
 
-//#include <Poco/Thread.h>
-//#include <Poco/Bugcheck.h>
 #include <Poco/FileStream.h>
 
 namespace berry
@@ -176,7 +182,7 @@ public:
     //        }
   }
 
-  void HandleException(const std::exception& e)
+  void HandleException(const ctkException& e)
   {
     //StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
@@ -193,11 +199,12 @@ public:
 
 private:
 
-  void Handle(const std::exception& e)
+  void Handle(const ctkException& e)
   {
     SafeRunnable::HandleException(e);
   }
 };
+
 
 int Workbench::CreateAndRunWorkbench(Display* display,
     WorkbenchAdvisor* advisor)
@@ -248,6 +255,7 @@ Workbench::Workbench(Display* display, WorkbenchAdvisor* advisor)
   : commandManager(0), progressCount(-1)
   , serviceLocatorOwner(new ServiceLocatorOwner(this))
   , largeUpdates(0), introManager(0), isStarting(true), isClosing(false)
+  , activeWorkbenchWindow(nullptr)
 {
   poco_check_ptr(display)
 ;  poco_check_ptr(advisor);
@@ -276,7 +284,7 @@ Workbench::Workbench(Display* display, WorkbenchAdvisor* advisor)
   returnCode = PlatformUI::RETURN_UNSTARTABLE;
 }
 
-Display* Workbench::GetDisplay()
+Display* Workbench::GetDisplay() const
 {
   return display;
 }
@@ -657,7 +665,9 @@ void Workbench::InitializeDefaultServices()
   //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
   //
   //      public void runWithException() {
-  //        Command.DEBUG_COMMAND_EXECUTION = Policy.DEBUG_COMMANDS;
+  Command::DEBUG_COMMAND_EXECUTION = Policy::DEBUG_COMMANDS();
+  Command::DEBUG_HANDLERS = Policy::DEBUG_HANDLERS_VERBOSE();
+  Command::DEBUG_HANDLERS_COMMAND_ID = Policy::DEBUG_HANDLERS_VERBOSE_COMMAND_ID();
   commandManager.reset(new CommandManager());
   //      }});
   //
@@ -751,7 +761,7 @@ void Workbench::InitializeDefaultServices()
 //          commandManager, contextManager, handlerService[0]);
 //      initializeCommandResolver();
 
-//      addWindowListener(windowListener);
+  this->AddWindowListener(this);
 //      bindingManager.addBindingManagerListener(bindingManagerListener);
 
 //      serviceLocator.registerService(ISelectionConversionService.class,
@@ -785,17 +795,17 @@ int Workbench::RunUI()
   return display->RunEventLoop();
 }
 
-QString Workbench::GetDefaultPerspectiveId()
+QString Workbench::GetDefaultPerspectiveId() const
 {
   return this->GetAdvisor()->GetInitialWindowPerspectiveId();
 }
 
-IAdaptable* Workbench::GetDefaultPageInput()
+IAdaptable* Workbench::GetDefaultPageInput() const
 {
   return this->GetAdvisor()->GetDefaultPageInput();
 }
 
-QString Workbench::GetPresentationId()
+QString Workbench::GetPresentationId() const
 {
   if (factoryID != "")
   {
@@ -811,6 +821,11 @@ QString Workbench::GetPresentationId()
   factoryID = WorkbenchConstants::DEFAULT_PRESENTATION_ID;
 
   return factoryID;
+}
+
+IElementFactory* Workbench::GetElementFactory(const QString& factoryId) const
+{
+  return WorkbenchPlugin::GetDefault()->GetElementFactory(factoryId);
 }
 
 void Workbench::UpdateTheme()
@@ -859,6 +874,15 @@ void Workbench::LargeUpdateEnd()
   }
 }
 
+IExtensionTracker*Workbench::GetExtensionTracker() const
+{
+  if (tracker.isNull())
+  {
+    tracker.reset(new UIExtensionTracker(this->GetDisplay()));
+  }
+  return tracker.data();
+}
+
 void Workbench::OpenFirstTimeWindow()
 {
   try
@@ -896,22 +920,31 @@ WorkbenchConfigurer::Pointer Workbench::GetWorkbenchConfigurer()
   return workbenchConfigurer;
 }
 
-WorkbenchAdvisor* Workbench::GetAdvisor()
+WorkbenchAdvisor* Workbench::GetAdvisor() const
 {
   return advisor;
 }
 
-IViewRegistry* Workbench::GetViewRegistry()
+IViewRegistry* Workbench::GetViewRegistry() const
 {
   return WorkbenchPlugin::GetDefault()->GetViewRegistry();
 }
 
-IEditorRegistry* Workbench::GetEditorRegistry()
+IEditorRegistry* Workbench::GetEditorRegistry() const
 {
   return WorkbenchPlugin::GetDefault()->GetEditorRegistry();
 }
 
-IPerspectiveRegistry* Workbench::GetPerspectiveRegistry()
+EditorHistory* Workbench::GetEditorHistory() const
+{
+  if (editorHistory.isNull())
+  {
+    editorHistory.reset(new EditorHistory());
+  }
+  return editorHistory.data();
+}
+
+IPerspectiveRegistry* Workbench::GetPerspectiveRegistry() const
 {
   return WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry();
 }
@@ -1094,12 +1127,12 @@ IWorkbenchWindow::Pointer Workbench::GetActiveWorkbenchWindow() const
   return win;
 }
 
-std::size_t Workbench::GetWorkbenchWindowCount()
+std::size_t Workbench::GetWorkbenchWindowCount() const
 {
   return windowManager.GetWindowCount();
 }
 
-QList<IWorkbenchWindow::Pointer> Workbench::GetWorkbenchWindows()
+QList<IWorkbenchWindow::Pointer> Workbench::GetWorkbenchWindows() const
 {
   QList<Window::Pointer> windows = windowManager.GetWindows();
   QList<IWorkbenchWindow::Pointer> result;
@@ -1400,16 +1433,16 @@ bool Workbench::SaveAllEditors(bool /*confirm*/)
   return true;
 }
 
-IIntroManager* Workbench::GetIntroManager()
+IIntroManager* Workbench::GetIntroManager() const
 {
   return GetWorkbenchIntroManager();
 }
 
-WorkbenchIntroManager* Workbench::GetWorkbenchIntroManager()
+WorkbenchIntroManager* Workbench::GetWorkbenchIntroManager() const
 {
   if (introManager.isNull())
   {
-    introManager.reset(new WorkbenchIntroManager(this));
+    introManager.reset(new WorkbenchIntroManager(const_cast<Workbench*>(this)));
   }
   return introManager.data();
 }
@@ -1428,17 +1461,17 @@ void Workbench::SetIntroDescriptor(IntroDescriptor::Pointer descriptor)
   introDescriptor = descriptor;
 }
 
-bool Workbench::IsRunning()
+bool Workbench::IsRunning() const
 {
   return Tweaklets::Get(WorkbenchTweaklet::KEY)->IsRunning();
 }
 
-bool Workbench::IsStarting()
+bool Workbench::IsStarting() const
 {
   return isStarting;
 }
 
-bool Workbench::IsClosing()
+bool Workbench::IsClosing() const
 {
   return isClosing;
 }
@@ -1831,9 +1864,9 @@ void Workbench::StartSourceProviders()
       }
     }
 
-    void HandleException(const std::exception& exception)
+    void HandleException(const ctkException& exception)
     {
-      WorkbenchPlugin::Log("Failed to initialize a source provider", ctkException(QString(exception.what())));
+      WorkbenchPlugin::Log("Failed to initialize a source provider", exception);
     }
 
   private:
@@ -1863,6 +1896,86 @@ void Workbench::StartSourceProviders()
 //        WorkbenchPlugin.log("Failed to initialize a source provider", exception); //$NON-NLS-1$
 //      }
 //    });
+}
+
+void Workbench::UpdateActiveWorkbenchWindowMenuManager(bool textOnly)
+{
+  if (activeWorkbenchWindow != nullptr)
+  {
+//    if (actionSetSourceProvider != null)
+//    {
+//      activeWorkbenchWindow->RemoveActionSetsListener(actionSetSourceProvider);
+//    }
+    activeWorkbenchWindow = nullptr;
+  }
+  //bool actionSetsUpdated = false;
+
+  IWorkbenchWindow::Pointer workbenchWindow = GetActiveWorkbenchWindow();
+
+  if (WorkbenchWindow::Pointer wbWnd = workbenchWindow.Cast<WorkbenchWindow>())
+  {
+    activeWorkbenchWindow = wbWnd.GetPointer();
+    if (activeWorkbenchWindow->IsClosing())
+    {
+      return;
+    }
+
+    // Update the action sets.
+//    Shell::Pointer windowShell = activeWorkbenchWindow->GetShell();
+//    Shell::Pointer activeShell = GetDisplay()->GetActiveShell();
+//    IContextService* service = GetService<IContextService>();
+//    if ((Util.equals(windowShell, activeShell) || service.getShellType(activeShell) == IContextService.TYPE_WINDOW)
+//        && actionSetSourceProvider != null)
+//    {
+//      activeWorkbenchWindow->AddActionSetsListener(actionSetSourceProvider);
+//      final WorkbenchPage page = activeWorkbenchWindow.getActiveWorkbenchPage();
+//      final IActionSetDescriptor[] newActionSets;
+//      if (page != null)
+//      {
+//        newActionSets = page.getActionSets();
+//        final ActionSetsEvent event = new ActionSetsEvent(newActionSets);
+//        actionSetSourceProvider.actionSetsChanged(event);
+//        actionSetsUpdated = true;
+//      }
+//    }
+
+    MenuManager* menuManager = activeWorkbenchWindow->GetMenuManager();
+
+    if (textOnly)
+    {
+      menuManager->Update(QActionProperties::TEXT);
+    }
+    else
+    {
+      menuManager->Update(true);
+    }
+  }
+
+//  if (!actionSetsUpdated && actionSetSourceProvider != null)
+//  {
+//    ActionSetsEvent event = new ActionSetsEvent(null);
+//    actionSetSourceProvider.actionSetsChanged(event);
+  //  }
+}
+
+void Workbench::WindowActivated(const IWorkbenchWindow::Pointer&)
+{
+  this->UpdateActiveWorkbenchWindowMenuManager(true);
+}
+
+void Workbench::WindowDeactivated(const IWorkbenchWindow::Pointer&)
+{
+  this->UpdateActiveWorkbenchWindowMenuManager(true);
+}
+
+void Workbench::WindowClosed(const IWorkbenchWindow::Pointer&)
+{
+  this->UpdateActiveWorkbenchWindowMenuManager(true);
+}
+
+void Workbench::WindowOpened(const IWorkbenchWindow::Pointer&)
+{
+  this->UpdateActiveWorkbenchWindowMenuManager(true);
 }
 
 }

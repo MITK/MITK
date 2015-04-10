@@ -94,7 +94,7 @@ void IPerspectiveListener::PerspectiveDeactivated(const SmartPointer<IWorkbenchP
 void IPerspectiveListener::PerspectiveSavedAs(const SmartPointer<IWorkbenchPage>& /*page*/,
           const IPerspectiveDescriptor::Pointer& /*oldPerspective*/,
           const IPerspectiveDescriptor::Pointer&  /*newPerspective*/)
-{};
+{}
 
 void IPerspectiveListener::PerspectivePreDeactivate(const SmartPointer<IWorkbenchPage>& /*page*/,
       const IPerspectiveDescriptor::Pointer&  /*perspective*/)

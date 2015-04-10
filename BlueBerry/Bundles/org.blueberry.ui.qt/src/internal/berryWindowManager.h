@@ -110,14 +110,14 @@ public:
      * @return the number of windows
      * @since 3.0
      */
-    std::size_t GetWindowCount();
+    std::size_t GetWindowCount() const;
 
     /**
      * Returns this window manager's set of windows.
      *
      * @return a possibly empty list of window
      */
-    QList<SmartPointer<Window> > GetWindows();
+    QList<SmartPointer<Window> > GetWindows() const;
 
     /**
      * Removes the given window from the set of windows managed by

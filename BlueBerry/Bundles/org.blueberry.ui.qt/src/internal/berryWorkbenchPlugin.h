@@ -122,7 +122,7 @@ public:
   ~WorkbenchPlugin();
 
 
-  /**
+  /*
    * Creates an extension.  If the extension plugin has not
    * been loaded a busy cursor will be activated during the duration of
    * the load.
@@ -132,7 +132,6 @@ public:
    * @return the extension object
    * @throws CoreException if the extension cannot be created
    */
-
 //    template<class E>
 //    static E* CreateExtension(IConfigurationElement::ConstPointer element,
 //            const QString& classAttribute) {
@@ -244,31 +243,19 @@ public:
   IEditorRegistry* GetEditorRegistry();
 
   /**
+   * Answer the element factory for an id, or <code>null</code. if not found.
+   * @param targetID
+   * @return IElementFactory
+   */
+  IElementFactory* GetElementFactory(const QString& targetID) const;
+
+  /**
    * Returns the presentation factory with the given id, or <code>null</code> if not found.
    * @param targetID The id of the presentation factory to use.
    * @return IPresentationFactory or <code>null</code>
    * if not factory matches that id.
    */
   IPresentationFactory* GetPresentationFactory();
-
-
-protected:
-
-  /*
-   * Returns the image registry for this plugin.
-   *
-   * Where are the images? The images (typically gifs) are found in the same
-   * plugins directory.
-   *
-   * @see ImageRegistry
-   *
-   * Note: The workbench uses the standard JFace ImageRegistry to track its
-   * images. In addition the class WorkbenchGraphicResources provides
-   * convenience access to the graphics resources and fast field access for
-   * some of the commonly used graphical images.
-   */
-  //ImageRegistry createImageRegistry();
-
 
 
 private:
@@ -357,15 +344,6 @@ public:
    * the receiver.
    */
   //PreferenceManager getPreferenceManager();
-
-  /*
-   * Returns the shared images for the workbench.
-   *
-   * @return the shared image manager
-   */
-  //ISharedImages getSharedImages();
-
-
 
   /**
    * Answer the view registry.

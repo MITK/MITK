@@ -302,7 +302,7 @@ void QmitkPropertyItemModel::OnPreferencesChanged(const berry::IBerryPreferences
     this->SetNewPropertyList(m_PropertyList.GetPointer());
 }
 
-void QmitkPropertyItemModel::OnPropertyDeleted(const itk::Object* property, const itk::EventObject&)
+void QmitkPropertyItemModel::OnPropertyDeleted(const itk::Object* /*property*/, const itk::EventObject&)
 {
   /*QModelIndex index = this->FindProperty(static_cast<const mitk::BaseProperty*>(property));
 

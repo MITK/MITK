@@ -33,21 +33,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageService.h>
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
+#include <berryIWorkbenchWindow.h>
 #include <berryIPreferencesService.h>
 #include "berryPlatform.h"
 
 
 QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window)
-: QAction(0)
+  : QAction(0)
+  , m_Window(nullptr)
+{
+  this->Init(window.GetPointer());
+}
+
+QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow* window)
+  : QAction(0)
+  , m_Window(nullptr)
+{
+  this->Init(window);
+}
+
+void QmitkExtFileSaveProjectAction::Init(berry::IWorkbenchWindow* window)
 {
   m_Window = window;
-  this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&Save Project...");
   this->setToolTip("Save content of Data Manager as a .mitk project file");
-  m_Window = window;
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }
+
 
 void QmitkExtFileSaveProjectAction::Run()
 {

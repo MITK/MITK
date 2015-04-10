@@ -32,6 +32,7 @@ struct IConfigurationElement;
 struct IContributor;
 struct IExtension;
 struct IExtensionPoint;
+struct IExtensionPointFilter;
 struct IRegistryEventListener;
 
 /**
@@ -353,6 +354,27 @@ struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
    * @see IExtensionPoint#GetUniqueIdentifier()
    */
   virtual void AddListener(IRegistryEventListener* listener, const QString& extensionPointId = QString()) = 0;
+
+  /**
+   * Adds the given listener for registry change events for extension points
+   * matching the provided filter.
+   * <p>
+   * Depending on activity, listeners of this type might receive a large number
+   * of modifications and negatively impact overall system performance. Whenever
+   * possible, consider registering listener specific to an extension point rather
+   * than a "global" listener.
+   * </p><p>
+   * Once registered, a listener starts receiving notification of changes to
+   * the registry. Registry change notifications are sent asynchronously.
+   * The listener continues to receive notifications until it is removed.
+   * </p><p>
+   * This method has no effect if the listener is already registered.
+   * </p>
+   * @param listener the listener
+   * @param filter An extension point filter
+   * @see ExtensionTracker
+   */
+  virtual void AddListener(IRegistryEventListener *listener, const IExtensionPointFilter& filter) = 0;
 
   /**
    * Removes the given registry change listener from this registry.

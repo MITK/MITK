@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryObject.h"
 
+#include <org_blueberry_core_commands_Export.h>
+
 #include <QHash>
 #include <QString>
 
@@ -30,7 +32,7 @@ namespace berry {
  * parameters need to be displayed to the user. Otherwise, they will be ignored.
  * </p>
 */
-struct IParameterValues
+struct BERRY_COMMANDS IParameterValues
 {
   virtual ~IParameterValues();
 

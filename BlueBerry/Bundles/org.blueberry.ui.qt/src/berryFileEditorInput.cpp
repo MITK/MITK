@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryFileEditorInput.h"
 
+#include <QIcon>
 
 namespace berry {
 
@@ -43,6 +44,21 @@ QString FileEditorInput::GetName() const
 QString FileEditorInput::GetToolTipText() const
 {
   return m_Path.absolutePath();
+}
+
+QIcon FileEditorInput::GetIcon() const
+{
+  return QIcon();
+}
+
+const IPersistableElement*FileEditorInput::GetPersistable() const
+{
+  return nullptr;
+}
+
+Object* FileEditorInput::GetAdapter(const QString& /*adapterType*/) const
+{
+  return nullptr;
 }
 
 bool FileEditorInput::operator==(const Object* o) const

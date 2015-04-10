@@ -32,10 +32,6 @@ namespace berry
  */
 class WorkbenchPagePartList : public PartList
 {
-public:
-
-  berryObjectMacro(WorkbenchPagePartList)
-
 private:
 
   PageSelectionService* selectionService;

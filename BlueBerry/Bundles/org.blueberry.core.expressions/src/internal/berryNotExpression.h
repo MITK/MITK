@@ -28,7 +28,7 @@ private:
   /**
     * The seed for the hash code for all not expressions.
     */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
   Expression::Pointer fExpression;
 

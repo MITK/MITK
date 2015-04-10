@@ -10,10 +10,7 @@
     </view>
   </extension>
   <extension point="org.blueberry.ui.keywords">
-    <keyword label="Properties" id="org.mitk.views.properties.Keyword"/>
-    <keyword label="DataNode" id="org.mitk.views.properties.Keyword"/>
-    <keyword label="Data" id="org.mitk.views.properties.Keyword"/>
-    <keyword label="Show" id="org.mitk.views.properties.Keyword"/>
+    <keyword label="DataNode Data Show" id="org.mitk.views.properties.Keyword"/>
   </extension>
   <extension point="org.blueberry.ui.preferencePages">
     <page id="org.mitk.gui.qt.application.PropertiesPreferencePage" name="Properties" class="QmitkPropertiesPreferencePage" />

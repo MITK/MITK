@@ -74,7 +74,7 @@ struct IContributionItem : public virtual Object
    * @param index the index where the controls are inserted,
    *   or <code>-1</code> to insert at the end
    */
-  virtual QAction* Fill(QMenuBar* parent, QAction* before) = 0;
+  virtual void Fill(QMenuBar* parent, QAction* before) = 0;
 
   /**
    * Fills the given menu with controls representing this contribution item.
@@ -84,7 +84,7 @@ struct IContributionItem : public virtual Object
    * @param index the index where the controls are inserted,
    *   or <code>-1</code> to insert at the end
    */
-  virtual QAction* Fill(QMenu* parent, QAction* before) = 0;
+  virtual void Fill(QMenu* parent, QAction* before) = 0;
 
   /**
    * Fills the given tool bar with controls representing this contribution item.
@@ -94,7 +94,7 @@ struct IContributionItem : public virtual Object
    * @param index the index where the controls are inserted,
    *   or <code>-1</code> to insert at the end
    */
-  virtual QAction* Fill(QToolBar* parent, QAction* before) = 0;
+  virtual void Fill(QToolBar* parent, QAction* before) = 0;
 
   /**
    * Returns the identifier of this contribution item.

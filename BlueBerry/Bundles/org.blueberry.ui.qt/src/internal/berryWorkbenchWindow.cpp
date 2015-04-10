@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPartSite.h"
 #include "berryIServiceLocatorCreator.h"
 #include "berryMenuManager.h"
+#include "berryQActionProperties.h"
 #include "berryQtControlWidget.h"
 #include "berryQtPerspectiveSwitcher.h"
 #include "berryWWinActionBars.h"
@@ -117,7 +118,7 @@ WorkbenchWindow::WorkbenchWindow(int number)
 
 WorkbenchWindow::~WorkbenchWindow()
 {
-  //BERRY_INFO << "WorkbenchWindow::~WorkbenchWindow()";
+  // BERRY_INFO << "WorkbenchWindow::~WorkbenchWindow()";
 }
 
 Object* WorkbenchWindow::GetService(const QString& key)
@@ -430,7 +431,7 @@ bool WorkbenchWindow::BusyClose()
     // also check for starting - if the first window dies on startup
     // then we'll need to open a default window.
     if (!workbench->IsStarting() && !workbench->IsClosing() && count <= 1
-        && workbench->GetWorkbenchConfigurer() ->GetExitOnLastWindowClose())
+        && workbench->GetWorkbenchConfigurer()->GetExitOnLastWindowClose())
     {
       windowClosed = workbench->Close();
     }
@@ -637,18 +638,9 @@ QStringList WorkbenchWindow::GetViewExcludeList() const
   return viewExcludeList;
 }
 
-IWorkbenchPage::Pointer WorkbenchWindow::GetPage(int i) const
+QList<IWorkbenchPage::Pointer> WorkbenchWindow::GetPages() const
 {
-  QList<IWorkbenchPage::Pointer> pages = pageList.GetPages();
-  int j = 0;
-  for (auto it = pages.begin(); it!=pages.end(); it++, j++)
-  {
-    if (j==i)
-    {
-      return *it;
-    }
-  }
-  return IWorkbenchPage::Pointer();
+  return pageList.GetPages();
 }
 
 IWorkbenchPage::Pointer WorkbenchWindow::GetActivePage() const
@@ -656,7 +648,7 @@ IWorkbenchPage::Pointer WorkbenchWindow::GetActivePage() const
   return pageList.GetActive();
 }
 
-IWorkbench* WorkbenchWindow::GetWorkbench()
+IWorkbench* WorkbenchWindow::GetWorkbench() const
 {
   return PlatformUI::GetWorkbench();
 }
@@ -666,7 +658,7 @@ IPartService* WorkbenchWindow::GetPartService()
   return &partService;
 }
 
-ISelectionService* WorkbenchWindow::GetSelectionService()
+ISelectionService* WorkbenchWindow::GetSelectionService() const
 {
   return partService.GetSelectionService();
 }
@@ -1396,7 +1388,7 @@ void WorkbenchWindow::SetActivePage(IWorkbenchPage::Pointer in)
   //  perspectiveSwitcher.update(false);
   //}
 
-  //getMenuManager().update(IAction.TEXT);
+  GetMenuManager()->Update(QActionProperties::TEXT);
   //  }
   //});
 }

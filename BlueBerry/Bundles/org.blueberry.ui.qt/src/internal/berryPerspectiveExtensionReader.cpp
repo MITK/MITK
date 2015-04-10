@@ -18,8 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchRegistryConstants.h"
+#include "berryDirtyPerspectiveMarker.h"
 
 #include <berryIExtension.h>
+#include <berryIExtensionTracker.h>
 
 namespace berry
 {
@@ -334,11 +336,12 @@ bool PerspectiveExtensionReader::ReadElement(
     QString id = element->GetAttribute(WorkbenchRegistryConstants::ATT_TARGET_ID);
     if (targetID == id || "*" == id)
     {
-//      if (tracker != null)
-//      {
-//        tracker.registerObject(element.getDeclaringExtension(),
-//            new DirtyPerspectiveMarker(id), IExtensionTracker.REF_STRONG);
-//      }
+      if (tracker != nullptr)
+      {
+        Object::Pointer obj(new DirtyPerspectiveMarker(id));
+        tracker->RegisterObject(element->GetDeclaringExtension(),
+                                obj, IExtensionTracker::REF_STRONG);
+      }
       return this->ProcessExtension(element);
     }
     return true;
@@ -347,18 +350,21 @@ bool PerspectiveExtensionReader::ReadElement(
 }
 
 PerspectiveExtensionReader::PerspectiveExtensionReader()
+  : tracker(nullptr)
 {
   // do nothing
 }
 
-void PerspectiveExtensionReader::ExtendLayout(const QString& id,
-    PageLayout::Pointer out)
+void PerspectiveExtensionReader::ExtendLayout(IExtensionTracker* extensionTracker,
+                                              const QString& id,
+                                              PageLayout::Pointer out)
 {
-  //tracker = extensionTracker;
+  tracker = extensionTracker;
   targetID = id;
   pageLayout = out;
-  this->ReadRegistry(PlatformUI::PLUGIN_ID(),
-      WorkbenchRegistryConstants::PL_PERSPECTIVE_EXTENSIONS);
+  this->ReadRegistry(Platform::GetExtensionRegistry(),
+                     PlatformUI::PLUGIN_ID(),
+                     WorkbenchRegistryConstants::PL_PERSPECTIVE_EXTENSIONS);
 }
 
 void PerspectiveExtensionReader::SetIncludeOnlyTags(

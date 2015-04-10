@@ -58,7 +58,7 @@ namespace berry {
  * @see IPerspectiveRegistry
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct BERRY_UI_QT IPerspectiveDescriptor : public Object
+struct BERRY_UI_QT IPerspectiveDescriptor : public virtual Object
 {
 
   berryObjectMacro(berry::IPerspectiveDescriptor)
@@ -105,7 +105,7 @@ struct BERRY_UI_QT IPerspectiveDescriptor : public Object
      *
      * @return boolean whether this perspective is predefined by an extension
      */
-    virtual bool IsPredefined() const = 0;
+    //virtual bool IsPredefined() const = 0;
 
     /**
      * Return the category path of this descriptor
@@ -114,7 +114,15 @@ struct BERRY_UI_QT IPerspectiveDescriptor : public Object
      */
     virtual QStringList GetCategoryPath() const = 0;
 
-    virtual QStringList GetKeywordReferences() const = 0;
+  /**
+   * Returns a list of ids belonging to keyword reference extensions.
+   *
+   * The keywords listed in each referenced id can be used to filter
+   * this perspective.
+   *
+   * @return A list of ids for keyword reference extensions.
+   */
+  virtual QStringList GetKeywordReferences() const = 0;
 };
 
 }

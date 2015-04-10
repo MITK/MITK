@@ -43,7 +43,7 @@ private:
   /**
    * The seed for the hash code for all equals expressions.
    */
-  static const std::size_t HASH_INITIAL;
+  static const uint HASH_INITIAL;
 
   QString fDefinitionId;
 

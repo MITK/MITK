@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYCATEGORY_H_
 
 #include <berryIAdaptable.h>
-#include <berryMacros.h>
+#include <berryIPluginContribution.h>
 
 namespace berry
 {
@@ -34,12 +34,12 @@ namespace berry
  * achieve hierarchy.
  * </p>
  */
-template<class T> class Category : /*IWorkbenchAdapter*/public IAdaptable, public Object
+template<class T> class Category : /*IWorkbenchAdapter*/ public IPluginContribution, public IAdaptable
 {
 
 public:
 
-  berryObjectMacro(Category<T>)
+  berryObjectMacro(Category<T>, IPluginContribution, IAdaptable)
 
   typedef T ElementType;
 
@@ -62,6 +62,8 @@ private:
   QList<ElementType> elements;
 
   IConfigurationElement::Pointer configurationElement;
+
+  QString pluginId;
 
 public:
 
@@ -158,10 +160,20 @@ public:
    */
   bool HasElements() const;
 
-  /* (non-Javadoc)
-   * @see org.blueberry.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
+  /*
+   * @see IWorkbenchAdapter#GetParent(Object)
    */
   ElementType* GetParent(const ElementType& o);
+
+  /*
+   * @see IPluginContribution#GetLocalId()
+   */
+  QString GetLocalId() const;
+
+  /*
+   * @see IPluginContribution#GetPluginId()
+   */
+  QString GetPluginId() const;
 
   /**
    * Clear all elements from this category.
@@ -174,7 +186,7 @@ protected:
   /* (non-Javadoc)
    * Method declared on IAdaptable.
    */
-  Object* GetAdapter(const QString& adapter);
+  Object* GetAdapter(const QString& adapter) const;
 };
 
 } // namespace berry

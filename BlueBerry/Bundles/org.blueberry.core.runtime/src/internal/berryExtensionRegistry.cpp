@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIConfigurationElement.h"
 #include "berryIExtension.h"
 #include "berryIExtensionPoint.h"
+#include "berrySimpleExtensionPointFilter.h"
 #include "berryMultiStatus.h"
 #include "berryPlatform.h"
 #include "berryRegistryConstants.h"
@@ -47,10 +48,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 struct ExtensionRegistry::ListenerInfo {
-  QString filter;
+  IExtensionPointFilter filter;
   IRegistryEventListener* listener;
 
-  ListenerInfo(IRegistryEventListener* listener, const QString& filter)
+  ListenerInfo(IRegistryEventListener* listener, const IExtensionPointFilter& filter)
     : filter(filter), listener(listener)
   {
   }
@@ -131,7 +132,7 @@ QSet<QString> ExtensionRegistry::AddExtensionsAndExtensionPoints(const SmartPoin
   return affectedNamespaces;
 }
 
-void ExtensionRegistry::AddListenerInternal(IRegistryEventListener* listener, const QString& filter)
+void ExtensionRegistry::AddListenerInternal(IRegistryEventListener* listener, const IExtensionPointFilter& filter)
 {
   listeners.Add(ListenerInfo(listener, filter));
 }
@@ -534,7 +535,13 @@ SmartPointer<RegistryObjectManager> ExtensionRegistry::GetObjectManager() const
 
 void ExtensionRegistry::AddListener(IRegistryEventListener* listener, const QString& extensionPointId)
 {
-  AddListenerInternal(listener, extensionPointId);
+  AddListenerInternal(listener, extensionPointId.isEmpty() ? IExtensionPointFilter(nullptr)
+                                                           : IExtensionPointFilter(new SimpleExtensionPointFilter(extensionPointId)));
+}
+
+void ExtensionRegistry::AddListener(IRegistryEventListener* listener, const IExtensionPointFilter& filter)
+{
+  this->AddListenerInternal(listener, filter);
 }
 
 QList<SmartPointer<IConfigurationElement> > ExtensionRegistry::GetConfigurationElementsFor(const QString& extensionPointId) const
@@ -770,7 +777,7 @@ void ExtensionRegistry::Remove(const QString& removedContributorId)
 
 void ExtensionRegistry::RemoveListener(IRegistryEventListener* listener)
 {
-  listeners.Remove(ListenerInfo(listener, QString()));
+  listeners.Remove(ListenerInfo(listener, IExtensionPointFilter(nullptr)));
 }
 
 ExtensionRegistry::ExtensionRegistry(RegistryStrategy* registryStrategy, QObject* masterToken, QObject* userToken)

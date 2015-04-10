@@ -1,6 +1,5 @@
 set(SRC_CPP_FILES
   QmitkViewNavigatorWidget.cpp
-  QmitkNewPerspectiveDialog.cpp
 
 #  mitkQtPerspectiveItem.h
 #  mitkQtViewItem.h
@@ -12,7 +11,6 @@ set(INTERNAL_CPP_FILES
 )
 
 set(UI_FILES
-  src/internal/ViewNavigatorViewControls.ui
   src/QmitkViewNavigatorWidgetControls.ui
 )
 
@@ -21,7 +19,6 @@ set(MOC_H_FILES
   src/internal/ViewNavigatorView.h
 
   src/QmitkViewNavigatorWidget.h
-  src/QmitkNewPerspectiveDialog.h
 )
 
 # list of resource files which can be used by the plug-in

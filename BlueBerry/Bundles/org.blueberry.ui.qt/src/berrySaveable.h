@@ -277,7 +277,7 @@ protected:
    *
    * @since 3.3
    */
-  virtual Object* GetAdapter(const QString& adapter);
+  virtual Object* GetAdapter(const QString& adapter) const;
 };
 
 }

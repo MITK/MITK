@@ -69,7 +69,7 @@ void QCTabBar::mouseMoveEvent(QMouseEvent* event)
 
 AbstractTabItem* QCTabBar::getTab(int index) const
 {
-  if (index < 0 || ((unsigned int) index) >= tabItemList.size()) return 0;
+  if (index < 0 || index >= tabItemList.size()) return 0;
   return tabItemList[index];
 }
 
@@ -88,7 +88,7 @@ void QCTabBar::moveAbstractTab(int from, int to)
 {
   AbstractTabItem* item = tabItemList[from];
 
-  if ((unsigned int)to >= tabItemList.size()) --to;
+  if (to >= tabItemList.size()) --to;
 
   tabItemList.removeAt(from);
   tabItemList.insert(to, item);

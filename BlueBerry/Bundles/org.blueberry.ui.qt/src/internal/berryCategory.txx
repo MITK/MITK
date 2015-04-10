@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __BERRY_CATEGORY_TXX__
 
 #include "berryWorkbenchRegistryConstants.h"
-#include "../berryUIException.h"
+
+#include <berryIContributor.h>
+#include <berryUIException.h>
 
 #include <QStringList>
 
@@ -36,6 +38,7 @@ template<class T> Category<T>::Category()
 {
   this->id = MISC_ID;
   this->name = MISC_NAME;
+  this->pluginId = MISC_ID;
 }
 
 template<class T> Category<T>::Category(const QString& ID,
@@ -48,9 +51,9 @@ template<class T>
 Category<T>::Category(IConfigurationElement::Pointer configElement)
  : configurationElement(configElement) {
 
-  QString id = configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
+  id = configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
 
-  if (id == "" || GetLabel() == "")
+  if (id.isEmpty() || GetLabel().isEmpty())
   {
     throw WorkbenchException(QString("Invalid category: ") + id);
   }
@@ -63,7 +66,7 @@ void Category<T>::AddElement(ElementType element)
 }
 
 template<class T>
-Object* Category<T>::GetAdapter(const QString& adapter)
+Object* Category<T>::GetAdapter(const QString& adapter) const
 {
   if (adapter == qobject_interface_iid<IConfigurationElement*>())
   {
@@ -165,6 +168,19 @@ template<class T>
 T* Category<T>::GetParent(const ElementType& o)
 {
   return 0;
+}
+
+template<class T>
+QString Category<T>::GetLocalId() const
+{
+  return id;
+}
+
+template<class T>
+QString Category<T>::GetPluginId() const
+{
+  return configurationElement.IsNull() ?
+        pluginId : configurationElement->GetContributor()->GetName();
 }
 
 template<class T>

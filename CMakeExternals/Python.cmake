@@ -114,6 +114,10 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       list(APPEND additional_cmake_cache_args
         "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
       )
+
+    set(_python_install_dir )
+    if(WIN32)
+      set(_python_install_dir -DCMAKE_INSTALL_PREFIX:PATH=${ep_prefix}/lib/python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION})
     endif()
 
     # CMake build environment for python from:
@@ -136,6 +140,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         -DBUILD_STATIC:BOOL=OFF
         -DUSE_SYSTEM_LIBRARIES:BOOL=OFF
         ${additional_cmake_cache_args}
+        ${_python_install_dir}
         -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
         -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
         # Python (and Numpy) do not like different shared library names
@@ -146,9 +151,12 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         ${Python_DEPENDENCIES}
     )
 
-    set(Python_DIR "${ep_prefix}")
+    # set versions, override
+    set(PYTHON_VERSION_MAJOR ${MITK_PYTHON_MAJOR_VERSION})
+    set(PYTHON_VERSION_MINOR ${MITK_PYTHON_MINOR_VERSION})
 
     if(UNIX)
+      set(Python_DIR "${ep_prefix}")
       set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include/python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}")
       set(PYTHON_INCLUDE_DIR2 "${PYTHON_INCLUDE_DIR}")
@@ -180,6 +188,7 @@ ${PYTHON_EXECUTABLE} -m compileall
       #ExternalProject_Get_Property(${proj} binary_dir)
       #set(PYTHON_EXECUTABLE "${binary_dir}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
     else()
+      set(Python_DIR "${ep_prefix}/lib/python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}")
       set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include")
       set(PYTHON_INCLUDE_DIR2 "${PYTHON_INCLUDE_DIR}")

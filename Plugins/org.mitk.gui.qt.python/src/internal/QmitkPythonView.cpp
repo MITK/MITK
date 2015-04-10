@@ -15,12 +15,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkPythonView.h"
-#include <QtGui>
 #include <QmitkCtkPythonShell.h>
 #include "mitkPluginActivator.h"
 #include <QmitkPythonVariableStackTableView.h>
 #include <QmitkPythonTextEditor.h>
 #include <QmitkPythonSnippets.h>
+
+#include <QHeaderView>
+#include <QSplitter>
+#include <QGridLayout>
 
 const std::string QmitkPythonView::VIEW_ID = "org.mitk.views.python";
 
@@ -50,7 +53,7 @@ void QmitkPythonView::CreateQtPartControl(QWidget* parent)
 {
     d->m_PythonVariableStackTableView = new QmitkPythonVariableStackTableView;
     d->m_PythonVariableStackTableView->SetDataStorage(this->GetDataStorage());
-    d->m_PythonVariableStackTableView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+    //d->m_PythonVariableStackTableView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
 
     QString snippetsFilePath = mitk::PluginActivator::m_XmlFilePath;
     MITK_DEBUG("QmitkPythonView") << "got snippetsFilePath " << snippetsFilePath.toStdString();

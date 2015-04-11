@@ -138,7 +138,7 @@ TestExpression::operator==(const Object* object) const
 uint TestExpression::ComputeHashCode() const
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fArgs)
-  * HASH_FACTOR + fExpectedValue.IsNull() ? 0 : fExpectedValue->HashCode()
+  * HASH_FACTOR + (fExpectedValue.IsNull() ? 0 : fExpectedValue->HashCode())
   * HASH_FACTOR + qHash(fNamespace)
   * HASH_FACTOR + qHash(fProperty)
   * HASH_FACTOR + (fForcePluginActivation ? 1 : 0);

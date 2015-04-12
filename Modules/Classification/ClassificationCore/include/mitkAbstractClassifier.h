@@ -43,21 +43,21 @@ public:
   ///
   /// @brief VectorType
   ///
-  typedef Eigen::VectorXd VectorType;
+//  typedef Eigen::VectorXd VectorType;
 
   ///
   /// @brief Build a forest of trees from the training set (X, y).
   /// @param X, The training input samples. Matrix of shape = [n_samples, n_features]
   /// @param Y, The target values (class labels in classification, real numbers in regression). Array of shape = [n_samples]
   ///
-  virtual void Train(const MatrixType &X, const VectorType &Y) = 0;
+  virtual void Train(const MatrixType &X, const MatrixType &Y) = 0;
 
   ///
   /// @brief Predict class for X.
   /// @param X, The input samples.
   /// @return The predicted classes. Y array of shape = [n_samples]
   ///
-  virtual VectorType Predict(const MatrixType &X) = 0;
+  virtual MatrixType Predict(const MatrixType &X) = 0;
 
 
   // * --------------- *
@@ -74,7 +74,7 @@ public:
   /// @brief GetPointWiseWeightCopy
   /// @return Create and return a copy of W
   ///
-  VectorType & GetPointWiseWeight()
+  MatrixType & GetPointWiseWeight()
   {
     return m_PointWiseWeight;
   }
@@ -83,7 +83,7 @@ public:
   /// @brief SetPointWiseWeight
   /// @param W, The pointwise weights. W array of shape = [n_samples]
   ///
-  void SetPointWiseWeight(const VectorType& W)
+  void SetPointWiseWeight(const MatrixType& W)
   {
     this->m_PointWiseWeight = W;
   }
@@ -107,7 +107,7 @@ public:
   }
 
 protected:
-  VectorType m_PointWiseWeight;
+  MatrixType m_PointWiseWeight;
   bool m_IsUsingPointWiseWeight;
 
   // * --------------- *
@@ -127,7 +127,7 @@ public:
   ///
   MatrixType & GetPointWiseProbabilities()
   {
-    return m_PointWiseProbability;
+    return m_OutProbability;
   }
 
   ///
@@ -149,7 +149,8 @@ public:
   }
 
 protected:
-  MatrixType m_PointWiseProbability;
+  MatrixType m_OutProbability;
+  MatrixType m_OutLabel;
   bool m_IsUsingPointWiseProbability;
 
 public:

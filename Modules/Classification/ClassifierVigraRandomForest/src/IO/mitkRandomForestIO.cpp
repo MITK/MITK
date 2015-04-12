@@ -120,7 +120,7 @@ Read()
     }
 
 
-    vigra::RandomForest<int> rf;
+    vigra::RandomForest<double> rf;
     vigra::rf_import_HDF5(rf, this->GetInputLocation());
 //    vigra::HDF5File hdf5_file;
 //    vigra::rf_import_HDF5(rf,hdf5_file,this->GetInputLocation());

@@ -37,26 +37,16 @@ class mitkVigraRandomForestTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  typedef mitk::ImageToEigenTransform::MatrixType EigenMatrixType;
-  typedef mitk::ImageToEigenTransform::MatrixType EigenVectorType;
-  //  static std::string GetTestDataFilePath(const std::string& testData)
-  //  {
-  //    if (itksys::SystemTools::FileIsFullPath(testData.c_str())) return testData;
-  //    return std::string(MITK_MBI_DATA_DIR) + "/" + testData;
-  //  }
+  typedef mitk::ImageToEigenTransform::MatrixType MatrixType;
 
-  //  mitk::DecisionForest::Pointer m_EmptyDecisionForest, m_LoadedDecisionForest;
-  //  mitk::DataCollection::Pointer m_TrainDatacollection;
-  //  mitk::DataCollection::Pointer m_TestDatacollection;
-  //  std::vector<std::string> m_Selected_items;
   mitk::Image::Pointer inputImage;
   mitk::Image::Pointer classMask;
   mitk::Image::Pointer F1;
   mitk::Image::Pointer F2;
   mitk::Image::Pointer F3;
-  EigenMatrixType X;
-  EigenVectorType y;
-  EigenMatrixType X_predict;
+  MatrixType X;
+  MatrixType y;
+  MatrixType X_predict;
 
   mitk::VigraRandomForestClassifier::Pointer classifier;
 
@@ -81,7 +71,7 @@ public:
     auto ADDFILTER = itk::AddImageFilter<UCharImageType>::New();
     auto filter = itk::LabelSampler<UCharImageType>::New();
     filter->SetInput(itkClass);
-    filter->SetAcceptRate(0.5);
+    filter->SetAcceptRate(1.0);
     filter->SetLabel(2);
     filter->Update();
     ADDFILTER->SetInput1(filter->GetOutput());
@@ -120,22 +110,25 @@ public:
     mitk::CastToMitkImage(ADDFILTER->GetOutput(), sampledClassMask);
 
     // Initialize X
-    EigenVectorType vec = mitk::ImageToEigenTransform::transform(inputImage,sampledClassMask);
+    MatrixType vec = mitk::ImageToEigenTransform::transform(inputImage,sampledClassMask);
     unsigned int n_features = 4; // F1,F2,F3 and inputImage
     unsigned int n_samples = vec.rows();
 
-    X = EigenMatrixType(n_samples,n_features);
+    X = MatrixType(n_samples,n_features);
     X.col(0) = vec;
     X.col(1) = mitk::ImageToEigenTransform::transform(F1,sampledClassMask);
     X.col(2) = mitk::ImageToEigenTransform::transform(F2,sampledClassMask);
     X.col(3) = mitk::ImageToEigenTransform::transform(F3,sampledClassMask);
+
+//    MatrixType X2(n_samples*2,n_features);
+//    X2 << X , X;
 
     y = mitk::ImageToEigenTransform::transform(classMask,sampledClassMask);
 
     vec = mitk::ImageToEigenTransform::transform(inputImage,classMask);
     n_samples = vec.rows();
 
-    X_predict = EigenMatrixType(n_samples,n_features);
+    X_predict = MatrixType(n_samples,n_features);
     X_predict.col(0) = vec;
     X_predict.col(1) = mitk::ImageToEigenTransform::transform(F1,classMask);
     X_predict.col(2) = mitk::ImageToEigenTransform::transform(F2,classMask);
@@ -152,7 +145,7 @@ public:
   void TrainThreadedDecisionForest()
   {
 
-    classifier->SetTreeCount(500);
+    classifier->SetTreeCount(100);
     classifier->SetTreeDepth(10);
     classifier->PrintParameter();
     classifier->Train(X,y);
@@ -160,7 +153,7 @@ public:
     MITK_INFO << classifier->GetRandomForest().class_count();
     MITK_INFO << classifier->GetRandomForest().tree_count();
 
-    EigenVectorType classes = classifier->Predict(X_predict);
+    MatrixType classes = classifier->Predict(X_predict);
     mitk::Image::Pointer img = mitk::EigenToImageTransform::transform(classes, classMask);
     mitk::IOUtil::Save(img,"/Users/jc/prediction.nrrd");
   }

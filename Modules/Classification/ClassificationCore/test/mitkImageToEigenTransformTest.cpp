@@ -37,7 +37,7 @@ private:
   mitk::Image::Pointer input_image,mask;
 
   typedef mitk::ImageToEigenTransform::MatrixType MatrixType;
-  typedef mitk::ImageToEigenTransform::VectorType VectorType;
+//  typedef mitk::ImageToEigenTransform::VectorType VectorType;
 public:
 
   void setUp(void)
@@ -51,7 +51,7 @@ public:
   void ImageToEigenToImageTest()
   {
 
-    VectorType eigen_matrix_from_image = mitk::ImageToEigenTransform::transform(input_image,mask);
+    MatrixType eigen_matrix_from_image = mitk::ImageToEigenTransform::transform(input_image,mask);
     mitk::Image::Pointer image_from_eigen_matrix = mitk::EigenToImageTransform::transform(eigen_matrix_from_image,mask);
 
     MITK_ASSERT_EQUAL(image_from_eigen_matrix,input_image,"Output 0 should be equal to i0");

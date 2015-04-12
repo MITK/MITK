@@ -35,12 +35,7 @@ namespace mitk
     ///
     typedef Eigen::MatrixXd MatrixType;
 
-    ///
-    /// @brief VectorType
-    ///
-    typedef Eigen::VectorXd VectorType;
-
-    static VectorType transform(const mitk::Image::Pointer & image, const mitk::Image::Pointer & mask);
+    static MatrixType transform(const mitk::Image::Pointer & image, const mitk::Image::Pointer & mask);
 
   private:
     typedef itk::Image<double, 3> DoubleImageType;

@@ -38,7 +38,7 @@ class mitkLibSVMClassifierTestSuite : public mitk::TestFixture
 
 private:
   typedef mitk::ImageToEigenTransform::MatrixType EigenMatrixType;
-  typedef mitk::ImageToEigenTransform::VectorType EigenVectorType;
+//  typedef mitk::ImageToEigenTransform::VectorType EigenVectorType;
 //  static std::string GetTestDataFilePath(const std::string& testData)
 //  {
 //    if (itksys::SystemTools::FileIsFullPath(testData.c_str())) return testData;
@@ -55,7 +55,7 @@ private:
   mitk::Image::Pointer F2;
   mitk::Image::Pointer F3;
   EigenMatrixType X;
-  EigenVectorType y;
+  EigenMatrixType y;
   EigenMatrixType X_predict;
 
   mitk::LibSVMClassifier::Pointer classifier;
@@ -112,7 +112,7 @@ public:
     mitk::CastToMitkImage(filter->GetOutput(), sampledClassMask);
 
     // Initialize X
-    EigenVectorType vec = mitk::ImageToEigenTransform::transform(inputImage,sampledClassMask);
+    EigenMatrixType vec = mitk::ImageToEigenTransform::transform(inputImage,sampledClassMask);
     unsigned int n_features = 4; // F1,F2,F3 and inputImage
     unsigned int n_samples = vec.rows();
 
@@ -141,7 +141,7 @@ public:
   {
     classifier->Train(X,y);
 
-    EigenVectorType classes = classifier->Predict(X_predict);
+    EigenMatrixType classes = classifier->Predict(X_predict);
     mitk::Image::Pointer img = mitk::EigenToImageTransform::transform(classes, classMask);
     mitk::IOUtil::Save(img,"/Users/jc/prediction.nrrd");
   }

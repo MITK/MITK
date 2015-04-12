@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIterator.h>
 #include <mitkImageStatisticsHolder.h>
 
-mitk::ImageToEigenTransform::VectorType mitk::ImageToEigenTransform::transform(const mitk::Image::Pointer & image,
+mitk::ImageToEigenTransform::MatrixType mitk::ImageToEigenTransform::transform(const mitk::Image::Pointer & image,
                                                                                const mitk::Image::Pointer & mask)
 {
   UCharImageType::Pointer current_mask;
@@ -39,7 +39,7 @@ mitk::ImageToEigenTransform::VectorType mitk::ImageToEigenTransform::transform(c
     }
   }
 
-  VectorType vector(n_numSamples);
+  MatrixType vector(n_numSamples,1);
 
   auto mit = itk::ImageRegionConstIterator<UCharImageType>(current_mask, current_mask->GetLargestPossibleRegion());
   auto iit = itk::ImageRegionConstIterator<DoubleImageType>(current_input,current_input->GetLargestPossibleRegion());

@@ -13,6 +13,7 @@ public:
   typedef LabelSampler             Self;
   typedef ImageToImageFilter< TImage, TImage > Superclass;
   typedef SmartPointer< Self >        Pointer;
+  typedef std::map<int,int> outmap;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self)
@@ -22,9 +23,8 @@ public:
 
   itkSetMacro(AcceptRate, double)
   itkSetMacro(Label, int)
-
-  typedef std::map<int,int> outmap;
   itkGetMacro(LabelVoxelCountMap, outmap)
+  itkGetMacro(NumberOfSampledVoxels,int)
 
   int GetLabelVoxelCount(int label)
   {
@@ -50,7 +50,7 @@ private:
   void operator=(const Self &);  //purposely not implemented
 
   int m_Label;
-  int m_LabelNumberOfVoxels;
+  int m_NumberOfSampledVoxels;
   double m_AcceptRate;
   bool m_UseLabelVoxelCount;
   std::map<int,int> m_LabelVoxelCountMap;

@@ -24,7 +24,7 @@ void LabelSampler< TImage>
     this->AllocateOutputs();
     srand (time(NULL));
 
-    m_LabelNumberOfVoxels = 0;
+    m_NumberOfSampledVoxels = 0;
 
     ImageRegionConstIterator<TImage> inputIter(input, input->GetLargestPossibleRegion());
     ImageRegionIterator<TImage> outputIter(output, output->GetLargestPossibleRegion());
@@ -43,7 +43,7 @@ void LabelSampler< TImage>
                 if (r < m_AcceptRate)
                 {
                     outputIter.Set(inputIter.Get());
-                    m_LabelNumberOfVoxels++;
+                    m_NumberOfSampledVoxels++;
                 }
             }else
                 outputIter.Set(0);

@@ -55,18 +55,30 @@ public:
   typedef AbstractClassifier::MatrixType MatrixType;
   typedef AbstractClassifier::VectorType VectorType;
 
-  typedef vigra::MultiArray<2,double> VigraMatrix2dType;
-  typedef vigra::MultiArray<2,int>    VigraLabel2dType;
+//  typedef  //VigraMatrix2dType;
+//  typedef     VigraLabel2dType;
 
   void SetRandomForest(const vigra::RandomForest<int> & rf)
   {
     m_RandomForest = rf;
   }
 
-  const vigra::RandomForest<int> GetRandomForest() const
+  const vigra::RandomForest<int> & GetRandomForest() const
   {
     return m_RandomForest;
   }
+
+  void UsePointBasedWeights(bool);
+  void SetTreeDepth(int);
+  void SetMinumumSplitNodeSize(int);
+  void SetPrecision(double);
+  void SetSamplesPerTree(double);
+  void UseSampleWithReplacement(bool);
+  void SetTreeCount(int);
+  void SetWeightLambda(double);
+//  void SetStratification(vigra::RF_OptionTag);
+
+  void PrintParameter();
 
 private:
   // *-------------------
@@ -76,24 +88,24 @@ private:
   static ITK_THREAD_RETURN_TYPE TrainTreesCallback(void *);
   static ITK_THREAD_RETURN_TYPE PredictCallback(void *);
 
-  struct TrainMultiThreaderData;
-  struct TestMultiThreaderData;
+  struct TrainingData;
+  struct PredictionData;
   struct EigenToVigraTransform;
   struct Parameter;
 
   Parameter * m_Parameter;
   vigra::RandomForest<int> m_RandomForest;
 
-  static VigraMatrix2dType transform(const MatrixType & matrix)
+  static vigra::MultiArray<2, double> transform(const MatrixType & matrix)
   {
-    VigraMatrix2dType outMatrix(matrix.rows(),matrix.cols());
+    vigra::MultiArray<2, double> outMatrix(matrix.rows(),matrix.cols());
     for(int x = 0 ; x < matrix.rows(); x++)
       for(int y = 0; y < matrix.cols(); y++)
         outMatrix(x,y) = matrix(x,y);
     return outMatrix;
   }
 
-  static MatrixType transform(const VigraMatrix2dType & matrix)
+  static MatrixType transform(const vigra::MultiArray<2, double> & matrix)
   {
     MatrixType outMatrix(matrix.shape()[0],matrix.shape()[1]);
     for(int x = 0 ; x < matrix.shape()[0]; x++)
@@ -102,15 +114,15 @@ private:
     return outMatrix;
   }
 
-  static VigraLabel2dType transform(const VectorType & vec)
+  static vigra::MultiArray<2, int> transform(const VectorType & vec)
   {
-    VigraLabel2dType outVec(vec.rows(),1);
+    vigra::MultiArray<2, int> outVec(vec.rows(),1);
     for(int x = 0 ; x < vec.rows(); x++)
       outVec(x,0) = vec(x);
     return outVec;
   }
 
-  static VectorType transform(const VigraLabel2dType & vec)
+  static VectorType transform(const vigra::MultiArray<2, int> & vec)
   {
     VectorType outVec(vec.shape()[0]);
     for(int x = 0 ; x < vec.shape()[0]; x++)

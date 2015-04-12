@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkEigenToImageTransform.h>
 #include <mitkVigraRandomForestClassifier.h>
 #include <itkLabelSampler.h>
+#include <itkAddImageFilter.h>
 #include <mitkImageCast.h>
 
 class mitkVigraRandomForestTestSuite : public mitk::TestFixture
@@ -31,23 +32,23 @@ class mitkVigraRandomForestTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkVigraRandomForestTestSuite  );
 
   MITK_TEST(TrainThreadedDecisionForest);
-//  MITK_TEST(TestThreadedDecisionForest);
+  //  MITK_TEST(TestThreadedDecisionForest);
 
   CPPUNIT_TEST_SUITE_END();
 
 private:
   typedef mitk::ImageToEigenTransform::MatrixType EigenMatrixType;
-  typedef mitk::ImageToEigenTransform::VectorType EigenVectorType;
-//  static std::string GetTestDataFilePath(const std::string& testData)
-//  {
-//    if (itksys::SystemTools::FileIsFullPath(testData.c_str())) return testData;
-//    return std::string(MITK_MBI_DATA_DIR) + "/" + testData;
-//  }
+  typedef mitk::ImageToEigenTransform::MatrixType EigenVectorType;
+  //  static std::string GetTestDataFilePath(const std::string& testData)
+  //  {
+  //    if (itksys::SystemTools::FileIsFullPath(testData.c_str())) return testData;
+  //    return std::string(MITK_MBI_DATA_DIR) + "/" + testData;
+  //  }
 
-//  mitk::DecisionForest::Pointer m_EmptyDecisionForest, m_LoadedDecisionForest;
-//  mitk::DataCollection::Pointer m_TrainDatacollection;
-//  mitk::DataCollection::Pointer m_TestDatacollection;
-//  std::vector<std::string> m_Selected_items;
+  //  mitk::DecisionForest::Pointer m_EmptyDecisionForest, m_LoadedDecisionForest;
+  //  mitk::DataCollection::Pointer m_TrainDatacollection;
+  //  mitk::DataCollection::Pointer m_TestDatacollection;
+  //  std::vector<std::string> m_Selected_items;
   mitk::Image::Pointer inputImage;
   mitk::Image::Pointer classMask;
   mitk::Image::Pointer F1;
@@ -76,13 +77,47 @@ public:
     itk::Image<unsigned char,3>::Pointer itkClass;
     mitk::CastToItkImage(classMask,itkClass);
 
-    itk::LabelSampler<itk::Image<unsigned char,3> >::Pointer filter = itk::LabelSampler<itk::Image<unsigned char,3> >::New();
+    typedef itk::Image<unsigned char,3> UCharImageType;
+    auto ADDFILTER = itk::AddImageFilter<UCharImageType>::New();
+    auto filter = itk::LabelSampler<UCharImageType>::New();
     filter->SetInput(itkClass);
-    filter->SetAcceptRate(0.01);
+    filter->SetAcceptRate(0.5);
+    filter->SetLabel(2);
     filter->Update();
+    ADDFILTER->SetInput1(filter->GetOutput());
+    MITK_INFO << "Label 2: " << filter->GetNumberOfSampledVoxels();
+
+    auto labelcountmap = filter->GetLabelVoxelCountMap();
+    double rate_1 = filter->GetNumberOfSampledVoxels() / (double)labelcountmap[1];
+    double rate_3 = filter->GetNumberOfSampledVoxels() / (double)labelcountmap[3];
+
+    filter = itk::LabelSampler<itk::Image<unsigned char,3> >::New();
+    filter->SetInput(itkClass);
+    filter->SetAcceptRate(rate_1);
+    filter->SetLabel(1);
+    filter->Update();
+    ADDFILTER->SetInput2(filter->GetOutput());
+    ADDFILTER->Update();
+    MITK_INFO << "Label 1: " << filter->GetNumberOfSampledVoxels();
+    ADDFILTER->SetInput1(ADDFILTER->GetOutput());
+
+    filter = itk::LabelSampler<itk::Image<unsigned char,3> >::New();
+    filter->SetInput(itkClass);
+    filter->SetAcceptRate(rate_3);
+    filter->SetLabel(3);
+    filter->Update();
+    ADDFILTER->SetInput2(filter->GetOutput());
+    ADDFILTER->Update();
+
+    MITK_INFO << "Label 3: " << filter->GetNumberOfSampledVoxels();
+//    exit(0);
+
+
+//    for(const auto & pair : filter->GetLabelVoxelCountMap())
+//      MITK_INFO << pair.first << " " << pair.second;
 
     mitk::Image::Pointer sampledClassMask;
-    mitk::CastToMitkImage(filter->GetOutput(), sampledClassMask);
+    mitk::CastToMitkImage(ADDFILTER->GetOutput(), sampledClassMask);
 
     // Initialize X
     EigenVectorType vec = mitk::ImageToEigenTransform::transform(inputImage,sampledClassMask);
@@ -116,8 +151,14 @@ public:
 
   void TrainThreadedDecisionForest()
   {
-    classifier->ConvertParameter();
+
+    classifier->SetTreeCount(500);
+    classifier->SetTreeDepth(10);
+    classifier->PrintParameter();
     classifier->Train(X,y);
+
+    MITK_INFO << classifier->GetRandomForest().class_count();
+    MITK_INFO << classifier->GetRandomForest().tree_count();
 
     EigenVectorType classes = classifier->Predict(X_predict);
     mitk::Image::Pointer img = mitk::EigenToImageTransform::transform(classes, classMask);
@@ -126,12 +167,12 @@ public:
 
   void TestThreadedDecisionForest()
   {
-//    m_LoadedDecisionForest->SetCollection(m_TrainDatacollection);
-//    m_LoadedDecisionForest->SetModalities(m_Selected_items);
-//    m_LoadedDecisionForest->SetMaskName("ClassMask");
-//    m_LoadedDecisionForest->SetResultMask("ResultMask");
-//    m_LoadedDecisionForest->SetResultProb("ResultProb");
-//    m_LoadedDecisionForest->TestThreaded();
+    //    m_LoadedDecisionForest->SetCollection(m_TrainDatacollection);
+    //    m_LoadedDecisionForest->SetModalities(m_Selected_items);
+    //    m_LoadedDecisionForest->SetMaskName("ClassMask");
+    //    m_LoadedDecisionForest->SetResultMask("ResultMask");
+    //    m_LoadedDecisionForest->SetResultProb("ResultProb");
+    //    m_LoadedDecisionForest->TestThreaded();
 
     //    mitk::DataCollection::Pointer res_col = dynamic_cast<mitk::DataCollection *>(dynamic_cast<mitk::DataCollection *>(m_TrainDatacollection->GetData("Test-Study").GetPointer())->GetData("Test-Subject").GetPointer());
     //    mitk::IOUtil::Save(res_col->GetMitkImage("ResultMask"),"/Users/jc/res_mask.nrrd");

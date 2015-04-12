@@ -21,14 +21,14 @@ namespace mitk
         void UsePointBasedWeights(bool weightsOn);
         bool IsUsingPointBasedWeights() const;
 
-        void UseRandomSplit(bool split) {m_UseRandomSplit = split;};
-        bool IsUsingRandomSplit() { return m_UseRandomSplit; };
+        void UseRandomSplit(bool split) {m_UseRandomSplit = split;}
+        bool IsUsingRandomSplit() const { return m_UseRandomSplit; }
 
         void SetPrecision(double value);
         double GetPrecision() const;
 
         void SetMaximumTreeDepth(int value);
-        int GetMaximumTreeDepth();
+        int GetMaximumTreeDepth() const;
 
         void SetWeights(vigra::MultiArrayView<2, double> weights);
         vigra::MultiArrayView<2, double> GetWeights();

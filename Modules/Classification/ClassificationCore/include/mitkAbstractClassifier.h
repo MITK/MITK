@@ -59,6 +59,15 @@ public:
   ///
   virtual MatrixType Predict(const MatrixType &X) = 0;
 
+  ///
+  /// @brief GetPointWiseWeightCopy
+  /// @return return label matrix of shape = [n_samples , 1]
+  ///
+  MatrixType & GetLabels()
+  {
+    return m_OutLabel;
+  }
+
 protected:
   MatrixType m_OutLabel;
 
@@ -127,7 +136,7 @@ public:
 
   ///
   /// @brief GetPointWiseWeightCopy
-  /// @return Create and return probability matrix
+  /// @return return probability matrix
   ///
   MatrixType & GetPointWiseProbabilities()
   {

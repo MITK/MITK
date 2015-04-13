@@ -304,15 +304,14 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   dimensionString.append(QString("["));
   dimensionString.append(QString::number(imgDim[0]));
   for (unsigned i = 1; i < 3; ++i)
+    // always three because otherwise the 3d-geometry gets destroyed
+    // (relevant for backtransformation of simple itk image to mitk.
   {
     dimensionString.append(QString(","));
     dimensionString.append(QString::number(imgDim[i]));
     npy_dims[0] *= imgDim[i];
   }
   dimensionString.append("]");
-
-
-  MITK_INFO << "dimension string" << dimensionString.toStdString();
 
 
   // the next line is necessary for vectorimages
@@ -470,27 +469,27 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
     --nr_dimensions;
   }
 
-  mitk::PixelType pixelType = MakePixelType<short, short>(nr_Components);
+  mitk::PixelType pixelType = MakePixelType<short, itk::Vector<short,3> >(nr_Components);
   if( dtype.compare("float64") == 0   ) {
-    pixelType = MakePixelType<double, double>(nr_Components);
+    pixelType = MakePixelType<double, itk::Vector<double,3> >(nr_Components);
   } else if( dtype.compare("float32") == 0 ) {
-    pixelType = MakePixelType<float, float>(nr_Components);
+    pixelType = MakePixelType<float, itk::Vector<float,3> >(nr_Components);
   } else if( dtype.compare("int16") == 0) {
-    pixelType = MakePixelType<short, short>(nr_Components);
+    pixelType = MakePixelType<short, itk::Vector<short,3> >(nr_Components);
   } else if( dtype.compare("int8") == 0 ) {
-    pixelType = MakePixelType<char, char>(nr_Components);
+    pixelType = MakePixelType<char, itk::Vector<char,3> >(nr_Components);
   } else if( dtype.compare("int32") == 0 ) {
-    pixelType = MakePixelType<int, int>(nr_Components);
+    pixelType = MakePixelType<int, itk::Vector<int,3> >(nr_Components);
   } else if( dtype.compare("int64") == 0 ) {
-    pixelType = MakePixelType<long, long>(nr_Components);
+    pixelType = MakePixelType<long, itk::Vector<long,3> >(nr_Components);
   } else if( dtype.compare("uint8") == 0 ) {
-    pixelType = MakePixelType<unsigned char, unsigned char>(nr_Components);
+    pixelType = MakePixelType<unsigned char, itk::Vector<unsigned char,3> >(nr_Components);
   } else if( dtype.compare("uint32") == 0 ) {
-    pixelType = MakePixelType<unsigned int, unsigned int>(nr_Components);
+    pixelType = MakePixelType<unsigned int, itk::Vector<unsigned int,3> >(nr_Components);
   } else if( dtype.compare("uint64") == 0 ) {
-    pixelType = MakePixelType<unsigned long, unsigned long>(nr_Components);
+    pixelType = MakePixelType<unsigned long, itk::Vector<unsigned long,3> >(nr_Components);
   } else if( dtype.compare("uint16") == 0 ) {
-    pixelType = MakePixelType<unsigned short, unsigned short>(nr_Components);
+    pixelType = MakePixelType<unsigned short, itk::Vector<unsigned short,3> >(nr_Components);
   }
 
 
@@ -501,31 +500,19 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
     dimensions[i] = py_data->dimensions[nr_dimensions - 1 - i];
   }
 
-  MITK_INFO << "copy stuff ";
   mitkImage->Initialize(pixelType, nr_dimensions, dimensions);
-
-  MITK_INFO << "made image with pixeltype: " << mitkImage->GetPixelType(0).GetComponentTypeAsString();
-  MITK_INFO << "with nr components: " << mitkImage->GetPixelType(0).GetNumberOfComponents();
-  MITK_INFO << " and nr dimensions: " << nr_dimensions;
-  MITK_INFO << " with shape: " << dimensions[0] << ", " << dimensions[1] << ", " << dimensions[2];
-
-  MITK_INFO << "filled data to array, now set channel";
 
 
   mitkImage->SetChannel(py_data->data);
 
-  MITK_INFO << "channel is set: " << mitkImage->IsChannelSet(0);
-  MITK_INFO << "Set spacing";
 
   ds = (double*)py_spacing->data;
   spacing[0] = ds[0];
   spacing[1] = ds[1];
   spacing[2] = ds[2];
 
-  MITK_INFO << "determined spacing " << spacing;
   mitkImage->GetGeometry()->SetSpacing(spacing);
 
- MITK_INFO << "Set origin";
 
   ds = (double*)py_origin->data;
   origin[0] = ds[0];
@@ -533,7 +520,6 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   origin[2] = ds[2];
   mitkImage->GetGeometry()->SetOrigin(origin);
 
-  MITK_INFO << "Cleanup";
 
   // cleanup
   command.clear();
@@ -547,7 +533,6 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
 
   delete[] dimensions;
 
-  MITK_INFO << "Finished";
 
   return mitkImage;
 }

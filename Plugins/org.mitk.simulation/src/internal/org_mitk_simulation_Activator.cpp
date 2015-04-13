@@ -15,13 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "org_mitk_simulation_Activator.h"
+#include <QmitkNodeDescriptorManager.h>
 #include <mitkGetSimulationPreferences.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkMeshMitkLoader.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkPropertyFilter.h>
 #include <mitkSimulationObjectFactory.h>
-#include <QmitkNodeDescriptorManager.h>
 #include <boost/core/ignore_unused.hpp>
 #include <QtPlugin>
 #include <sofa/core/ObjectFactory.h>

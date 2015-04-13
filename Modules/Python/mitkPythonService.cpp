@@ -295,8 +295,6 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   npy_intp* npy_dims = new npy_intp[1];
   npy_dims[0] = imgDim[0];
 
-  MITK_INFO << "Image dimension number " << image->GetDimension();
-
   /**
    * Build a string in the format [1024,1028,1]
    * to describe the dimensionality. This is needed for simple itk
@@ -305,13 +303,18 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   QString dimensionString;
   dimensionString.append(QString("["));
   dimensionString.append(QString::number(imgDim[0]));
-  for (unsigned i = 1; i < image->GetDimension(); ++i)
+  for (unsigned i = 1; i < 3; ++i)
   {
     dimensionString.append(QString(","));
     dimensionString.append(QString::number(imgDim[i]));
     npy_dims[0] *= imgDim[i];
   }
   dimensionString.append("]");
+
+
+  MITK_INFO << "dimension string" << dimensionString.toStdString();
+
+
   // the next line is necessary for vectorimages
   npy_dims[0] *= pixelType.GetNumberOfComponents();
 
@@ -391,24 +394,20 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
     return false;
   }
 
-  MITK_INFO << "Pixeltype " << npy_type;
   // creating numpy array
   import_array1 (true);
   npyArray = PyArray_SimpleNewFromData(npy_nd,npy_dims,npy_type,array);
 
-  MITK_INFO << "Read npyArray";
   // add temp array it to the python dictionary to access it in python code
   const int status = PyDict_SetItemString( pyDict,QString("%1_numpy_array")
                                            .arg(varName).toStdString().c_str(),
                                            npyArray );
 
 
-  MITK_INFO << "Status check pending...";
   // sanity check
   if ( status != 0 )
     return false;
 
-  MITK_INFO << "Status check passed";
 
   command.append( QString("%1 = sitk.Image(%2,sitk.%3,%4)\n").arg(varName)
                   .arg(dimensionString)
@@ -428,11 +427,8 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
 
 
-  MITK_INFO << "Omg, about to convert it to SimpleITK";
-
   this->Execute( command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
-  MITK_INFO << "Converted it to SimpleITK";
   return true;
 }
 
@@ -452,7 +448,8 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   command.append( QString("%1_numpy_array = sitk.GetArrayFromImage(%1)\n").arg(varName) );
   command.append( QString("%1_spacing = numpy.asarray(%1.GetSpacing())\n").arg(varName) );
   command.append( QString("%1_origin = numpy.asarray(%1.GetOrigin())\n").arg(varName) );
-  command.append( QString("%1_dtype = %1_numpy_array.dtype.name").arg(varName) );
+  command.append( QString("%1_nrComponents = numpy.asarray(%1.GetNumberOfComponentsPerPixel())\n").arg(varName));
+  command.append( QString("%1_dtype = %1_numpy_array.dtype.name\n").arg(varName) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
@@ -463,56 +460,72 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   PyArrayObject* py_spacing = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_spacing").arg(varName).toStdString().c_str() );
   PyArrayObject* py_origin = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_origin").arg(varName).toStdString().c_str() );
 
-  size_t sz = sizeof(short);
-  mitk::PixelType pixelType = MakeScalarPixelType<short>();
-  if( dtype.compare("float64") == 0   ) {
-    pixelType = MakeScalarPixelType<double>();
-    sz = sizeof(double);
-  } else if( dtype.compare("float32") == 0 ) {
-    pixelType = MakeScalarPixelType<float>();
-    sz = sizeof(float);
-  } else if( dtype.compare("int16") == 0) {
-    pixelType = MakeScalarPixelType<short>();
-    sz = sizeof(short);
-  } else if( dtype.compare("int8") == 0 ) {
-    pixelType = MakeScalarPixelType<char>();
-    sz = sizeof(char);
-  } else if( dtype.compare("int32") == 0 ) {
-    pixelType = MakeScalarPixelType<int>();
-    sz = sizeof(int);
-  } else if( dtype.compare("int64") == 0 ) {
-    pixelType = MakeScalarPixelType<long>();
-    sz = sizeof(long);
-  } else if( dtype.compare("uint8") == 0 ) {
-    pixelType = MakeScalarPixelType<unsigned char>();
-    sz = sizeof(unsigned char);
-  } else if( dtype.compare("uint32") == 0 ) {
-    pixelType = MakeScalarPixelType<unsigned int>();
-    sz = sizeof(unsigned int);
-  } else if( dtype.compare("uint64") == 0 ) {
-    pixelType = MakeScalarPixelType<unsigned long>();
-    sz = sizeof(unsigned long);
-  } else if( dtype.compare("uint16") == 0 ) {
-    pixelType = MakeScalarPixelType<unsigned short>();
-    sz = sizeof(unsigned short);
-  }
+  PyArrayObject* py_nrComponents = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_nrComponents").arg(varName).toStdString().c_str() );
 
-  unsigned int* dimensions = new unsigned int[py_data->nd];
-  // fill backwards , nd data saves dimensions in opposite direction
-  for( int i = 0; i < py_data->nd; ++i )
+  unsigned int nr_Components = *((unsigned int*) py_nrComponents->data);
+
+  unsigned int nr_dimensions = py_data->nd;
+  if (nr_Components > 1) // for VectorImages the last dimension in the numpy array are the vector components.
   {
-    dimensions[i] = py_data->dimensions[py_data->nd - 1 - i];
-    sz *= dimensions[i];
+    --nr_dimensions;
   }
 
-  mitkImage->Initialize(pixelType, py_data->nd, dimensions);
+  mitk::PixelType pixelType = MakePixelType<short, short>(nr_Components);
+  if( dtype.compare("float64") == 0   ) {
+    pixelType = MakePixelType<double, double>(nr_Components);
+  } else if( dtype.compare("float32") == 0 ) {
+    pixelType = MakePixelType<float, float>(nr_Components);
+  } else if( dtype.compare("int16") == 0) {
+    pixelType = MakePixelType<short, short>(nr_Components);
+  } else if( dtype.compare("int8") == 0 ) {
+    pixelType = MakePixelType<char, char>(nr_Components);
+  } else if( dtype.compare("int32") == 0 ) {
+    pixelType = MakePixelType<int, int>(nr_Components);
+  } else if( dtype.compare("int64") == 0 ) {
+    pixelType = MakePixelType<long, long>(nr_Components);
+  } else if( dtype.compare("uint8") == 0 ) {
+    pixelType = MakePixelType<unsigned char, unsigned char>(nr_Components);
+  } else if( dtype.compare("uint32") == 0 ) {
+    pixelType = MakePixelType<unsigned int, unsigned int>(nr_Components);
+  } else if( dtype.compare("uint64") == 0 ) {
+    pixelType = MakePixelType<unsigned long, unsigned long>(nr_Components);
+  } else if( dtype.compare("uint16") == 0 ) {
+    pixelType = MakePixelType<unsigned short, unsigned short>(nr_Components);
+  }
+
+
+  unsigned int* dimensions = new unsigned int[nr_dimensions];
+  // fill backwards , nd data saves dimensions in opposite direction
+  for( unsigned i = 0; i < nr_dimensions; ++i )
+  {
+    dimensions[i] = py_data->dimensions[nr_dimensions - 1 - i];
+  }
+
+  MITK_INFO << "copy stuff ";
+  mitkImage->Initialize(pixelType, nr_dimensions, dimensions);
+
+  MITK_INFO << "made image with pixeltype: " << mitkImage->GetPixelType(0).GetComponentTypeAsString();
+  MITK_INFO << "with nr components: " << mitkImage->GetPixelType(0).GetNumberOfComponents();
+  MITK_INFO << " and nr dimensions: " << nr_dimensions;
+  MITK_INFO << " with shape: " << dimensions[0] << ", " << dimensions[1] << ", " << dimensions[2];
+
+  MITK_INFO << "filled data to array, now set channel";
+
+
   mitkImage->SetChannel(py_data->data);
+
+  MITK_INFO << "channel is set: " << mitkImage->IsChannelSet(0);
+  MITK_INFO << "Set spacing";
 
   ds = (double*)py_spacing->data;
   spacing[0] = ds[0];
   spacing[1] = ds[1];
   spacing[2] = ds[2];
+
+  MITK_INFO << "determined spacing " << spacing;
   mitkImage->GetGeometry()->SetSpacing(spacing);
+
+ MITK_INFO << "Set origin";
 
   ds = (double*)py_origin->data;
   origin[0] = ds[0];
@@ -520,16 +533,21 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   origin[2] = ds[2];
   mitkImage->GetGeometry()->SetOrigin(origin);
 
+  MITK_INFO << "Cleanup";
+
   // cleanup
   command.clear();
   command.append( QString("del %1_numpy_array\n").arg(varName) );
   command.append( QString("del %1_dtype\n").arg(varName) );
   command.append( QString("del %1_spacing\n").arg(varName) );
-  command.append( QString("del %1_origin").arg(varName) );
+  command.append( QString("del %1_origin\n").arg(varName) );
+  command.append( QString("del %1_nrComponents\n").arg(varName) );
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
   delete[] dimensions;
+
+  MITK_INFO << "Finished";
 
   return mitkImage;
 }

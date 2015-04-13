@@ -146,7 +146,7 @@ public:
   {
 
     classifier->SetTreeCount(100);
-    classifier->SetTreeDepth(10);
+    classifier->SetMaximumTreeDepth(10);
     classifier->PrintParameter();
     classifier->Train(X,y);
 

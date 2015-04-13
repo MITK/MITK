@@ -54,9 +54,6 @@ public:
 
   typedef AbstractClassifier::MatrixType MatrixType;
 
-//  typedef  //VigraMatrix2dType;
-//  typedef     VigraLabel2dType;
-
   void SetRandomForest(const vigra::RandomForest<double> & rf)
   {
     m_RandomForest = rf;
@@ -68,16 +65,26 @@ public:
   }
 
   void UsePointBasedWeights(bool);
-  void SetTreeDepth(int);
-  void SetMinumumSplitNodeSize(int);
+  void SetMaximumTreeDepth(int);
+  void SetMinimumSplitNodeSize(int);
   void SetPrecision(double);
   void SetSamplesPerTree(double);
   void UseSampleWithReplacement(bool);
   void SetTreeCount(int);
   void SetWeightLambda(double);
-//  void SetStratification(vigra::RF_OptionTag);
-
   void PrintParameter();
+
+  ///
+  /// \brief EigenAccessByVigra allows direct access to EigenMatrix data structure (no need to copy data)
+  /// \param Already initialized eigen matrix
+  /// \return vigra MultiArrayView structure
+  ///
+  static vigra::MultiArrayView<2, double> EigenAccessByVigra(const MatrixType & matrix)
+  {
+    vigra::Shape2 shape(matrix.rows(),matrix.cols());
+    vigra::MultiArrayView<2, double> outMatrix(shape,matrix.data());
+    return outMatrix;
+  }
 
 private:
   // *-------------------
@@ -94,19 +101,6 @@ private:
 
   Parameter * m_Parameter;
   vigra::RandomForest<double> m_RandomForest;
-
-
-  ///
-  /// \brief EigenAccessByVigra allows direct access to EigenMatrix data structure (no need to copy data)
-  /// \param Already initialized eigen matrix
-  /// \return vigra MultiArrayView structure
-  ///
-  vigra::MultiArrayView<2, double> EigenAccessByVigra(const MatrixType & matrix)
-  {
-    vigra::Shape2 shape(matrix.rows(),matrix.cols());
-    vigra::MultiArrayView<2, double> outMatrix(shape,matrix.data());
-    return outMatrix;
-  }
 
 };
 }

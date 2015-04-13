@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkCustomMimeType.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkProperties.h>
 
 #include <mitkFileReaderWriterBase.h>
 
@@ -134,6 +135,7 @@ DataStorage::SetOfObjects::Pointer AbstractFileReader::Read(DataStorage& ds)
        iter != data.end(); ++iter)
   {
     mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->AddProperty("need check is binary", mitk::BoolProperty::New( true ));
     node->SetData(*iter);
     this->SetDefaultDataNodeProperties(node, this->GetInputLocation());
     ds.Add(node);

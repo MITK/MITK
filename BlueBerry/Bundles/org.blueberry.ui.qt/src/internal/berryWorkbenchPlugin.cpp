@@ -27,9 +27,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryQtStyleManager.h"
 
+#include "berryExtensionFactory.h"
 #include "berryQtWorkbenchTweaklet.h"
 #include "berryQtWorkbenchPageTweaklet.h"
 #include "berryQtWidgetsTweaklet.h"
+#include "dialogs/berryPerspectivesPreferencePage.h"
 #include "berryQtStylePreferencePage.h"
 #include "berryStatusUtil.h"
 #include "berryHandlerServiceFactory.h"
@@ -38,12 +40,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchSourceProvider.h"
 #include "berryObjectString.h"
 #include "berryObjects.h"
+#include "berryPolicy.h"
+#include "berryHandlerAuthority.h"
 
-#include "berryShowViewHandler.h"
+#include "berryOpenPerspectivePropertyTester.h"
+#include "berryPerspectiveParameterValues.h"
+
+#include "handlers/berryCloseAllPerspectivesHandler.h"
+#include "handlers/berryClosePerspectiveHandler.h"
+#include "handlers/berryDynamicHelpHandler.h"
+#include "handlers/berryHelpContentsHandler.h"
+#include "handlers/berryIntroHandler.h"
+#include "handlers/berryOpenInNewWindowHandler.h"
+#include "handlers/berryNewEditorHandler.h"
+#include "handlers/berryQuitHandler.h"
+#include "handlers/berryResetPerspectiveHandler.h"
+#include "handlers/berrySavePerspectiveHandler.h"
+#include "handlers/berryShowPerspectiveHandler.h"
+#include "handlers/berryShowViewHandler.h"
 
 #include "berryIQtStyleManager.h"
 #include "berryIContributor.h"
 #include "berryILog.h"
+#include "berryIElementFactory.h"
 
 #include "berryIExtension.h"
 
@@ -170,31 +189,25 @@ std::size_t WorkbenchPlugin::GetBundleCount()
   return 0;
 }
 
-
-//    ImageRegistry createImageRegistry() {
-//        return WorkbenchImages.getImageRegistry();
-//    }
-
-
-IPerspectiveRegistry* WorkbenchPlugin::GetPerspectiveRegistry() {
-  if (perspRegistry == 0) {
+IPerspectiveRegistry* WorkbenchPlugin::GetPerspectiveRegistry()
+{
+  if (perspRegistry == 0)
+  {
     perspRegistry = new PerspectiveRegistry();
 
-  // the load methods can touch on WorkbenchImages if an image is
-  // missing so we need to wrap the call in
-  // a startup block for the case where a custom descriptor exists on
-  // startup that does not have an image
-  // associated with it. See bug 196352.
-  //StartupThreading.runWithoutExceptions(new StartupRunnable() {
-  //  public void runWithException() throws Throwable {
-      perspRegistry->Load();
-  //  }
-  //});
-
+    // the load methods can touch on WorkbenchImages if an image is
+    // missing so we need to wrap the call in
+    // a startup block for the case where a custom descriptor exists on
+    // startup that does not have an image
+    // associated with it. See bug 196352.
+    //StartupThreading.runWithoutExceptions(new StartupRunnable() {
+    //  public void runWithException() throws Throwable {
+    perspRegistry->Load();
+    //  }
+    //});
   }
   return perspRegistry;
 }
-
 
 //    PreferenceManager getPreferenceManager() {
 //        if (preferenceManager == null) {
@@ -210,14 +223,6 @@ IPerspectiveRegistry* WorkbenchPlugin::GetPerspectiveRegistry() {
 //
 //        }
 //        return preferenceManager;
-//    }
-
-
-//    ISharedImages getSharedImages() {
-//        if (sharedImages == null) {
-//      sharedImages = new SharedImages();
-//    }
-//        return sharedImages;
 //    }
 
 IIntroRegistry* WorkbenchPlugin::GetIntroRegistry()
@@ -245,16 +250,65 @@ IEditorRegistry* WorkbenchPlugin::GetEditorRegistry()
   return editorRegistry;
 }
 
+IElementFactory* WorkbenchPlugin::GetElementFactory(const QString& targetID) const
+{
+  // Get the extension point registry.
+  IExtensionPoint::Pointer extensionPoint = Platform::GetExtensionRegistry()->GetExtensionPoint(
+                                              PlatformUI::PLUGIN_ID(),
+                                              WorkbenchRegistryConstants::PL_ELEMENT_FACTORY);
+
+  IElementFactory* factory = nullptr;
+  if (!extensionPoint)
+  {
+    WorkbenchPlugin::Log("Unable to find element factory. Extension point: " +
+                         WorkbenchRegistryConstants::PL_ELEMENT_FACTORY + " not found");
+    return factory;
+  }
+
+  // Loop through the config elements.
+  IConfigurationElement::Pointer targetElement;
+  QList<IConfigurationElement::Pointer> configElements =
+      extensionPoint->GetConfigurationElements();
+  for (int j = 0; j < configElements.size(); j++)
+  {
+    QString strID = configElements[j]->GetAttribute("id");
+    if (targetID == strID)
+    {
+      targetElement = configElements[j];
+      break;
+    }
+  }
+  if (!targetElement)
+  {
+    // log it since we cannot safely display a dialog.
+    WorkbenchPlugin::Log("Unable to find element factory: " + targetID);
+    return factory;
+  }
+
+  // Create the extension.
+  try
+  {
+    factory = targetElement->CreateExecutableExtension<IElementFactory>("class");
+  }
+  catch (const CoreException& e)
+  {
+    // log it since we cannot safely display a dialog.
+    WorkbenchPlugin::Log("Unable to create element factory.", e.GetStatus());
+    factory = nullptr;
+  }
+  return factory;
+}
+
 IPresentationFactory* WorkbenchPlugin::GetPresentationFactory() {
   if (presentationFactory != 0) return presentationFactory;
 
   QString targetID = Workbench::GetInstance()->GetPresentationId();
   presentationFactory = this->CreateExtension<IPresentationFactory>(
-          WorkbenchRegistryConstants::PL_PRESENTATION_FACTORIES,
-          "factory", targetID);
+                          WorkbenchRegistryConstants::PL_PRESENTATION_FACTORIES,
+                          "factory", targetID);
   if (presentationFactory == 0)
     WorkbenchPlugin::Log("Error creating presentation factory: " +
-        targetID + " -- class is not an IPresentationFactory");
+                         targetID + " -- class is not an IPresentationFactory");
 
   return presentationFactory;
 }
@@ -285,7 +339,7 @@ void WorkbenchPlugin::Log(const QString& clazz,
                           const QString& methodName, const ctkException &t)
 {
   QString msg = QString("Exception in ") + clazz + "." + methodName + ": "
-      + t.what();
+                + t.what();
 
   WorkbenchPlugin::Log(msg, t);
 }
@@ -313,13 +367,23 @@ void WorkbenchPlugin::start(ctkPluginContext* context)
   AbstractUICTKPlugin::start(context);
   bundleContext = context;
 
+  AbstractSourceProvider::DEBUG = Policy::DEBUG_SOURCES();
+
+  HandlerAuthority::DEBUG = Policy::DEBUG_HANDLERS();
+  HandlerAuthority::DEBUG_PERFORMANCE = Policy::DEBUG_HANDLERS_PERFORMANCE();
+  HandlerAuthority::DEBUG_VERBOSE = Policy::DEBUG_HANDLERS_VERBOSE();
+  HandlerAuthority::DEBUG_VERBOSE_COMMAND_ID = Policy::DEBUG_HANDLERS_VERBOSE_COMMAND_ID();
+
   BERRY_REGISTER_EXTENSION_CLASS(EditorIntroAdapterPart, context)
+
+  BERRY_REGISTER_EXTENSION_CLASS(ExtensionFactory, context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QtWidgetsTweaklet, context)
   BERRY_REGISTER_EXTENSION_CLASS(QtWorkbenchTweaklet, context)
   BERRY_REGISTER_EXTENSION_CLASS(QtWorkbenchPageTweaklet, context)
   BERRY_REGISTER_EXTENSION_CLASS(QtWorkbenchPresentationFactory, context)
 
+  BERRY_REGISTER_EXTENSION_CLASS(PerspectivesPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QtStylePreferencePage, context)
 
   BERRY_REGISTER_EXTENSION_CLASS(HandlerServiceFactory, context)
@@ -328,7 +392,21 @@ void WorkbenchPlugin::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(WorkbenchSourceProvider, context)
 
+  BERRY_REGISTER_EXTENSION_CLASS(OpenPerspectivePropertyTester, context)
+  BERRY_REGISTER_EXTENSION_CLASS(PerspectiveParameterValues, context)
+
+  BERRY_REGISTER_EXTENSION_CLASS(HelpContentsHandler, context)
+  BERRY_REGISTER_EXTENSION_CLASS(DynamicHelpHandler, context)
+  BERRY_REGISTER_EXTENSION_CLASS(IntroHandler, context)
+  BERRY_REGISTER_EXTENSION_CLASS(OpenInNewWindowHandler, context)
+  BERRY_REGISTER_EXTENSION_CLASS(NewEditorHandler, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QuitHandler, context)
+  BERRY_REGISTER_EXTENSION_CLASS(ShowPerspectiveHandler, context)
   BERRY_REGISTER_EXTENSION_CLASS(ShowViewHandler, context)
+  BERRY_REGISTER_EXTENSION_CLASS(SavePerspectiveHandler, context)
+  BERRY_REGISTER_EXTENSION_CLASS(ClosePerspectiveHandler, context)
+  BERRY_REGISTER_EXTENSION_CLASS(CloseAllPerspectivesHandler, context)
+  BERRY_REGISTER_EXTENSION_CLASS(ResetPerspectiveHandler, context)
 
   styleManager.reset(new QtStyleManager());
   context->registerService<berry::IQtStyleManager>(styleManager.data());

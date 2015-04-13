@@ -1,6 +1,5 @@
 set(SRC_CPP_FILES
   QmitkExtActionBarAdvisor.cpp
-  QmitkExtActionConstants.cpp
   QmitkExtWorkbenchWindowAdvisor.cpp
   QmitkExtFileSaveProjectAction.cpp
   QmitkOpenDicomEditorAction.cpp
@@ -8,6 +7,7 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
+  QmitkAboutHandler.cpp
   QmitkAppInstancesPreferencePage.cpp
   QmitkExternalProgramsPreferencePage.cpp
   QmitkCommonExtPlugin.cpp
@@ -24,6 +24,7 @@ set(MOC_H_FILES
   src/QmitkExtFileSaveProjectAction.h
   src/QmitkExtWorkbenchWindowAdvisor.h
 
+  src/internal/QmitkAboutHandler.h
   src/internal/QmitkAppInstancesPreferencePage.h
   src/internal/QmitkExternalProgramsPreferencePage.h
   src/internal/QmitkCommonExtPlugin.h

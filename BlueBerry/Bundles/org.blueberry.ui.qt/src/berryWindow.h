@@ -88,7 +88,7 @@ class BERRY_UI_QT Window: public IShellProvider
 
 public:
 
-  berryObjectMacro(Window)
+  berryObjectMacro(Window, IShellProvider)
 
   /**
    * Standard return code constant (value 0) indicating that the window was

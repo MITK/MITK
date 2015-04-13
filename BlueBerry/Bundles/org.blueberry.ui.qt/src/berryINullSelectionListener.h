@@ -41,8 +41,6 @@ namespace berry
  */
 struct BERRY_UI_QT INullSelectionListener : public ISelectionListener
 {
-  berryObjectMacro(berry::INullSelectionListener)
-
   ~INullSelectionListener();
 };
 

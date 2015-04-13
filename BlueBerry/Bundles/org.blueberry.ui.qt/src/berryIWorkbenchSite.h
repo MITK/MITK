@@ -60,7 +60,7 @@ class  Shell;
  */
 struct BERRY_UI_QT IWorkbenchSite : public IServiceLocator { // IAdaptable, IShellProvider {
 
-  berryObjectMacro(berry::IWorkbenchSite)
+  berryObjectMacro(berry::IWorkbenchSite, IServiceLocator)
 
   virtual ~IWorkbenchSite();
 

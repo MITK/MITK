@@ -107,7 +107,7 @@ void QtShell::SetActive()
   widget->raise();
 }
 
-QWidget *QtShell::GetControl()
+QWidget *QtShell::GetControl() const
 {
   return widget;
 }

@@ -51,6 +51,8 @@ private:
 
 public:
 
+  ExpressionInfo();
+
   /**
    * Returns <code>true</code> if the default variable is accessed
    * by the expression tree.

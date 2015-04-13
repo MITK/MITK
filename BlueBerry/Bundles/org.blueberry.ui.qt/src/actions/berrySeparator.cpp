@@ -31,22 +31,28 @@ Separator::Separator(const QString& groupName)
 {
 }
 
-QAction* Separator::Fill(QMenu* menu, QAction* before)
+void Separator::Fill(QMenu* menu, QAction* before)
 {
   if (before)
   {
-    return menu->insertSeparator(before);
+    menu->insertSeparator(before);
   }
-  return menu->addSeparator();
+  else
+  {
+    menu->addSeparator();
+  }
 }
 
-QAction* Separator::Fill(QToolBar* toolbar, QAction* before)
+void Separator::Fill(QToolBar* toolbar, QAction* before)
 {
   if (before)
   {
-    return toolbar->insertSeparator(before);
+    toolbar->insertSeparator(before);
   }
-  return toolbar->addSeparator();
+  else
+  {
+    toolbar->addSeparator();
+  }
 }
 
 bool Separator::IsSeparator() const

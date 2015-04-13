@@ -47,7 +47,7 @@ namespace berry {
 struct BERRY_UI_QT IServiceLocator : public virtual Object
 {
 
-  berryObjectMacro(berry::IServiceLocator)
+  berryObjectMacro(berry::IServiceLocator, Object)
 
   ~IServiceLocator();
 
@@ -66,7 +66,7 @@ struct BERRY_UI_QT IServiceLocator : public virtual Object
     const char* typeName = qobject_interface_iid<S*>();
     if (typeName == NULL)
     {
-      BERRY_WARN << "Error getting service: Cannot get the interface id for type '" << Object::DemangleName(typeid(S).name())
+      BERRY_WARN << "Error getting service: Cannot get the interface id for type '" << Reflection::GetClassName<S>()
                  << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
       return NULL;
     }
@@ -75,7 +75,7 @@ struct BERRY_UI_QT IServiceLocator : public virtual Object
     if (obj != NULL && service == NULL)
     {
       BERRY_WARN << "Error getting service: Class '" << obj->GetClassName() << "' cannot be cast to service interface "
-                 << "'" << Object::DemangleName(typeid(S).name()) << "'";
+                 << "'" << Reflection::GetClassName<S>() << "'";
     }
     return service;
   }

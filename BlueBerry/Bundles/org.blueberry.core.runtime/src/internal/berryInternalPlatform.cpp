@@ -42,6 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryPlatform.h"
 #include "berryPlatformException.h"
 #include "berryDebugUtil.h"
+#include "berryDebugOptions.h"
 //#include "event/berryPlatformEvents.h"
 //#include "berryPlatformLogChannel.h"
 #include "berryProvisioningInfo.h"
@@ -59,10 +60,14 @@ namespace berry {
 
 Poco::Mutex InternalPlatform::m_Mutex;
 
+bool InternalPlatform::DEBUG = false;
+bool InternalPlatform::DEBUG_PLUGIN_PREFERENCES = false;
+
 InternalPlatform::InternalPlatform()
   : m_Initialized(false)
   , m_Running(false)
   , m_ConsoleLog(false)
+  , m_Context(nullptr)
   , m_PlatformLogger(0)
   , m_ctkPluginFrameworkFactory(0)
 {
@@ -83,6 +88,16 @@ InternalPlatform* InternalPlatform::GetInstance()
 bool InternalPlatform::ConsoleLog() const
 {
   return m_ConsoleLog;
+}
+
+QVariant InternalPlatform::GetOption(const QString& option, const QVariant& defaultValue) const
+{
+  IDebugOptions* options = GetDebugOptions();
+  if (options != nullptr)
+  {
+    return options->GetOption(option, defaultValue);
+  }
+  return QVariant();
 }
 
 ctkPluginContext* InternalPlatform::GetCTKPluginFrameworkContext() const
@@ -285,6 +300,11 @@ void InternalPlatform::uninstallPugin(const QUrl& pluginUrl, ctkPluginContext* p
   }
 }
 
+IDebugOptions* InternalPlatform::GetDebugOptions() const
+{
+  return m_DebugTracker.isNull() ? nullptr : m_DebugTracker->getService();
+}
+
 void InternalPlatform::Launch()
 {
   AssertInitialized();
@@ -316,6 +336,19 @@ void InternalPlatform::Shutdown()
   ctkPluginFW->waitForStop(10000);
 }
 
+void InternalPlatform::Start(ctkPluginContext* context)
+{
+  this->m_Context = context;
+  OpenServiceTrackers();
+  InitializeDebugFlags();
+}
+
+void InternalPlatform::Stop(ctkPluginContext* /*context*/)
+{
+  CloseServiceTrackers();
+  this->m_Context = nullptr;
+}
+
 
 void InternalPlatform::AssertInitialized() const
 {
@@ -323,24 +356,56 @@ void InternalPlatform::AssertInitialized() const
     throw Poco::SystemException("The Platform has not been initialized yet!");
 }
 
+void InternalPlatform::OpenServiceTrackers()
+{
+  ctkPluginContext* context = this->m_Context;
+
+  m_PreferencesTracker.reset(new ctkServiceTracker<berry::IPreferencesService*>(context));
+  m_PreferencesTracker->open();
+
+  m_RegistryTracker.reset(new ctkServiceTracker<berry::IExtensionRegistry*>(context));
+  m_RegistryTracker->open();
+
+  m_DebugTracker.reset(new ctkServiceTracker<berry::IDebugOptions*>(context));
+  m_DebugTracker->open();
+}
+
+void InternalPlatform::CloseServiceTrackers()
+{
+  if (!m_PreferencesTracker.isNull())
+  {
+    m_PreferencesTracker->close();
+    m_PreferencesTracker.reset();
+  }
+  if (!m_RegistryTracker.isNull())
+  {
+    m_RegistryTracker->close();
+    m_RegistryTracker.reset();
+  }
+  if (!m_DebugTracker.isNull())
+  {
+    m_DebugTracker->close();
+    m_DebugTracker.reset();
+  }
+}
+
+void InternalPlatform::InitializeDebugFlags()
+{
+  DEBUG = this->GetOption(Platform::PI_RUNTIME + "/debug", false).toBool();
+  if (DEBUG)
+  {
+    DEBUG_PLUGIN_PREFERENCES = GetOption(Platform::PI_RUNTIME + "/preferences/plugin", false).toBool();
+  }
+}
+
 IExtensionRegistry* InternalPlatform::GetExtensionRegistry()
 {
-  if (m_RegistryTracker.isNull())
-  {
-    m_RegistryTracker.reset(new ctkServiceTracker<berry::IExtensionRegistry*>(berry::CTKPluginActivator::getPluginContext()));
-    m_RegistryTracker->open();
-  }
-  return m_RegistryTracker->getService();
+  return m_RegistryTracker.isNull() ? nullptr : m_RegistryTracker->getService();
 }
 
 IPreferencesService *InternalPlatform::GetPreferencesService()
 {
-  if (m_PreferencesTracker.isNull())
-  {
-    m_PreferencesTracker.reset(new ctkServiceTracker<berry::IPreferencesService*>(berry::CTKPluginActivator::getPluginContext()));
-    m_PreferencesTracker->open();
-  }
-  return m_PreferencesTracker->getService();
+  return m_PreferencesTracker.isNull() ? nullptr : m_PreferencesTracker->getService();
 }
 
 QDir InternalPlatform::GetConfigurationPath()
@@ -516,6 +581,10 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   consoleLogOption.binding(Platform::ARG_CONSOLELOG.toStdString());
   options.addOption(consoleLogOption);
 
+  Poco::Util::Option debugOption(Platform::ARG_DEBUG.toStdString(), "", "enable debug mode");
+  debugOption.argument("<options file>", false).binding("blueberry.debug");
+  options.addOption(debugOption);
+
   Poco::Util::Option forcePluginOption(Platform::ARG_FORCE_PLUGIN_INSTALL.toStdString(), "", "force installing plug-ins with same symbolic name");
   forcePluginOption.binding(Platform::ARG_FORCE_PLUGIN_INSTALL.toStdString());
   options.addOption(forcePluginOption);
@@ -578,7 +647,18 @@ int InternalPlatform::main(const std::vector<std::string>& args)
     BERRY_INFO(m_ConsoleLog) << "Starting CTK plug-in: " << context->getPlugin(pluginId)->getSymbolicName().toStdString()
                              << " [" << pluginId << "]";
     // do not change the autostart setting of this plugin
-    context->getPlugin(pluginId)->start(ctkPlugin::START_TRANSIENT | ctkPlugin::START_ACTIVATION_POLICY);
+    try
+    {
+      context->getPlugin(pluginId)->start(ctkPlugin::START_TRANSIENT | ctkPlugin::START_ACTIVATION_POLICY);
+    }
+    catch (const ctkException& e)
+    {
+      qDebug() << e.printStackTrace();
+    }
+    catch (const std::exception& e)
+    {
+      qDebug() << e.what();
+    }
   }
 
   return EXIT_OK;

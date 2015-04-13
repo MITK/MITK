@@ -121,7 +121,7 @@ IStatus::Pointer Worker::JobRunnable::HandleException(InternalJob::Pointer sptr_
 
 
 Worker::Worker(WeakPointer<WorkerPool> myPool) :
-  Poco::Thread("Worker-" + m_nextWorkerNumber++), m_Runnable(this), m_wpPool(
+  Poco::Thread("Worker-" + std::to_string(m_nextWorkerNumber++)), m_Runnable(this), m_wpPool(
       myPool), ptr_currentJob(0)
 {
 }

@@ -27,12 +27,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryObjects.h>
 #include <berryObjectString.h>
 #include <berryObjectList.h>
+#include <berryReflection.h>
 
 
 namespace berry
 {
 
-  const bool Expressions::TRACING = true;
+  bool Expressions::TRACING = false;
 
   Expressions::Expressions()
   {
@@ -46,12 +47,8 @@ namespace berry
     if (element == 0)
       return false;
 
-    // TODO Reflection
-    // return IsSubtype(element, type)
-
-    return element->GetClassName() == type;
+    return IsSubtype(element->GetTypeInfo(), type);
   }
-
 
   void
   Expressions::CheckAttribute(const QString& name, const QString& value)
@@ -242,6 +239,20 @@ namespace berry
     }
 
     return -1;
+  }
+
+  bool Expressions::IsSubtype(const Reflection::TypeInfo& typeInfo, const QString& type)
+  {
+    if (typeInfo.GetName() == type) return true;
+    QList<Reflection::TypeInfo> superClasses = typeInfo.GetSuperclasses();
+    for (int i = 0; i < superClasses.size(); ++i)
+    {
+      if (IsSubtype(superClasses[i], type))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   Object::Pointer

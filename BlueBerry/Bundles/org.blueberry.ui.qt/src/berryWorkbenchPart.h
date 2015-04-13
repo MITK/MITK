@@ -49,7 +49,7 @@ class BERRY_UI_QT WorkbenchPart : public QObject,
   Q_INTERFACES(berry::IExecutableExtension);
 
 public:
-  berryObjectMacro(WorkbenchPart)
+  berryObjectMacro(WorkbenchPart, QObject, IWorkbenchPart, IExecutableExtension)
 
   ~WorkbenchPart();
 

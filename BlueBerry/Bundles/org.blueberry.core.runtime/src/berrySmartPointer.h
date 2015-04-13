@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryConfig.h>
 
+#include <Poco/Bugcheck.h>
+
 #if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
 #include <QMutex>
 #endif
@@ -214,27 +216,33 @@ public:
   }
 
   /** Comparison of pointers. Less than comparison.  */
-  bool operator <(const SmartPointer &r) const
+  template<typename R>
+  bool operator <(const SmartPointer<R>& r) const
   {
-    return (void*) m_Pointer < (void*) r.m_Pointer;
+    const R* o = r.GetPointer();
+    return m_Pointer == 0 ? o == 0 : o && m_Pointer->operator<(o);
   }
 
   /** Comparison of pointers. Greater than comparison.  */
-  bool operator>(const SmartPointer &r) const
+  template<typename R>
+  bool operator>(const SmartPointer<R>& r) const
   {
-    return (void*) m_Pointer > (void*) r.m_Pointer;
+    const R* o = r.GetPointer();
+    return m_Pointer == 0 ? o == 0 : o && m_Pointer->operator>(o);
   }
 
   /** Comparison of pointers. Less than or equal to comparison.  */
-  bool operator <=(const SmartPointer &r) const
+  template<typename R>
+  bool operator <=(const SmartPointer<R>& r) const
   {
-    return (void*) m_Pointer <= (void*) r.m_Pointer;
+    return this->operator<(r) || this->operator==(r);
   }
 
   /** Comparison of pointers. Greater than or equal to comparison.  */
-  bool operator >=(const SmartPointer &r) const
+  template<typename R>
+  bool operator >=(const SmartPointer<R>& r) const
   {
-    return (void*) m_Pointer >= (void*) r.m_Pointer;
+    return this->operator>(r) || this->operator==(r);
   }
 
   /** Overload operator assignment.  */

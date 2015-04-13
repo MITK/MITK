@@ -56,6 +56,16 @@ QString ViewRegistry::ViewCategoryProxy::GetLabel() const
   return rawCategory->GetLabel();
 }
 
+QString ViewRegistry::ViewCategoryProxy::GetLocalId() const
+{
+  return GetId();
+}
+
+QString ViewRegistry::ViewCategoryProxy::GetPluginId() const
+{
+  return rawCategory->GetPluginId();
+}
+
 bool ViewRegistry::ViewCategoryProxy::operator==(const Object* o) const
 {
   if (const IViewCategory* other = dynamic_cast<const IViewCategory*>(o))
@@ -101,7 +111,7 @@ ViewRegistry::ViewRegistry() :
 
   //PlatformUI.getWorkbench().getExtensionTracker().registerHandler(this,
   //    ExtensionTracker.createExtensionPointFilter(getExtensionPointFilter()));
-  reader.ReadViews(this);
+  reader.ReadViews(Platform::GetExtensionRegistry(), this);
 }
 
 void ViewRegistry::Add(IViewDescriptorCategoryPtr desc)

@@ -32,6 +32,8 @@ namespace berry
 
 struct IConfigurationElement;
 
+namespace Reflection { class TypeInfo; }
+
 class Expressions {
 
 private:
@@ -40,10 +42,12 @@ private:
 
   static int FindNextComma(const QString& str, int start);
 
+  static bool IsSubtype(const Reflection::TypeInfo& typeInfo, const QString& type);
+
 public:
 
   /* debugging flag to enable tracing */
-  static const bool TRACING;
+  static bool TRACING;
 
   static bool IsInstanceOf(const Object *element, const QString& type);
 

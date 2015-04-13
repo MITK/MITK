@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 struct IExtension;
+struct IExtensionRegistry;
 struct IConfigurationElement;
 
 /**
@@ -136,7 +137,8 @@ public:
      * @param pluginId the plugin id of the extenion point
      * @param extensionPoint the extension point id
      */
-    virtual void ReadRegistry(const QString& pluginId,
+    virtual void ReadRegistry(IExtensionRegistry* registry,
+                              const QString& pluginId,
                               const QString& extensionPoint);
 
     /**

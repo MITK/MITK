@@ -19,4 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 void QmitkEditorPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   layout->GetEditorArea();
+
+  layout->AddPerspectiveShortcut("org.mitk.extapp.defaultperspective");
+  layout->AddPerspectiveShortcut("org.mitk.mitkworkbench.perspectives.visualization");
 }

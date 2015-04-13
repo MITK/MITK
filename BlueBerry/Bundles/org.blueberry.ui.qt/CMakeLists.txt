@@ -8,6 +8,7 @@ set(PLUGIN_exported_include_suffixes
   src/guitk
   src/handlers
   src/intro
+  src/model
   src/presentations
   src/services
   src/testing

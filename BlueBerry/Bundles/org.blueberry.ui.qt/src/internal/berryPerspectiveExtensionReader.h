@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
+struct IExtensionTracker;
+
 /**
  * A strategy to read perspective extension from the registry.
  * A pespective extension is one of a view, viewAction, perspAction,
@@ -58,7 +60,7 @@ private:
   // technically this is API now...
   //static const QString VAL_FALSE; // = "false";//$NON-NLS-1$
 
-  // IExtensionTracker tracker;
+  IExtensionTracker* tracker;
 
   /**
    * Returns whether the given tag should be included.
@@ -120,8 +122,9 @@ public:
    * @param id the id
    * @param out the layout
    */
-  void ExtendLayout(const QString& id,
-      PageLayout::Pointer out);
+  void ExtendLayout(IExtensionTracker* extensionTracker,
+                    const QString& id,
+                    PageLayout::Pointer out);
 
   /**
    * Sets the tags to include.  All others are ignored.

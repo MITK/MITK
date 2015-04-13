@@ -66,6 +66,8 @@ class MITK_QT_COMMON QmitkAbstractRenderEditor : public berry::QtEditorPart,
 
 public:
 
+  berryObjectMacro(QmitkAbstractRenderEditor, QtEditorPart, mitk::IRenderWindowPart)
+
   QmitkAbstractRenderEditor();
   ~QmitkAbstractRenderEditor();
 

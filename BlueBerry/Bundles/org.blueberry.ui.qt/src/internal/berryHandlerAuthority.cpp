@@ -40,10 +40,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-const bool HandlerAuthority::DEBUG = false; // = Policy.DEBUG_HANDLERS;
-const bool HandlerAuthority::DEBUG_PERFORMANCE = false; // = Policy.DEBUG_HANDLERS_PERFORMANCE;
-const bool HandlerAuthority::DEBUG_VERBOSE = false; // = Policy.DEBUG_HANDLERS && Policy.DEBUG_HANDLERS_VERBOSE;
-const QString HandlerAuthority::DEBUG_VERBOSE_COMMAND_ID; // = Policy.DEBUG_HANDLERS_VERBOSE_COMMAND_ID;
+bool HandlerAuthority::DEBUG = false; // = Policy.DEBUG_HANDLERS;
+bool HandlerAuthority::DEBUG_PERFORMANCE = false; // = Policy.DEBUG_HANDLERS_PERFORMANCE;
+bool HandlerAuthority::DEBUG_VERBOSE = false; // = Policy.DEBUG_HANDLERS && Policy.DEBUG_HANDLERS_VERBOSE;
+QString HandlerAuthority::DEBUG_VERBOSE_COMMAND_ID; // = Policy.DEBUG_HANDLERS_VERBOSE_COMMAND_ID;
 const QString HandlerAuthority::TRACING_COMPONENT = "HANDLERS";
 
 const QList<QString> HandlerAuthority::SELECTION_VARIABLES = QList<QString>()

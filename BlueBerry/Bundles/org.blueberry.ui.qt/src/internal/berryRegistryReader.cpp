@@ -116,10 +116,10 @@ void RegistryReader::ReadExtension(const IExtension::Pointer& extension)
   this->ReadElements(extension->GetConfigurationElements());
 }
 
-void RegistryReader::ReadRegistry(
-    const QString& pluginId, const QString& extensionPoint)
+void RegistryReader::ReadRegistry(IExtensionRegistry* registry,
+                                  const QString& pluginId, const QString& extensionPoint)
 {
-  IExtensionPoint::Pointer point = Platform::GetExtensionRegistry()->GetExtensionPoint(pluginId + "." + extensionPoint);
+  IExtensionPoint::Pointer point = registry->GetExtensionPoint(pluginId, extensionPoint);
   if (point == 0)
   {
     return;

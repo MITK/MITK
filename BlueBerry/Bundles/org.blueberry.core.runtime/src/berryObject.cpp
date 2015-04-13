@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 
 #include "berryLog.h"
+#include "berryReflection.h"
 
 #include <QDebug>
 
@@ -28,53 +29,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <memory>
 #include <exception>
 
-// Better name demangling for gcc
-#if __GNUC__ > 3 || ( __GNUC__ == 3 && __GNUC_MINOR__ > 0 )
-#define GCC_USEDEMANGLE
-#endif
-
-#ifdef GCC_USEDEMANGLE
-#include <cstdlib>
-#include <cxxabi.h>
-#endif
-
-#if defined(_WIN32) && defined(NDEBUG)
-// exported from VC CRT
-extern "C"
-char * __unDName(char * outputString, const char * name, int maxStringLength,
-                void * (* pAlloc )(size_t), void (* pFree )(void *),
-                unsigned short disableFlags);
-#endif
-
 namespace berry
 {
 
 void Object::Delete()
 {
   this->UnRegister();
-}
-
-QString Object::DemangleName(const char* mangledName)
-{
-  QString name(mangledName);
-#ifdef GCC_USEDEMANGLE
-  int status;
-  char* unmangled = abi::__cxa_demangle(mangledName, 0, 0, &status);
-
-  if(status == 0)
-  {
-    name = QString(unmangled);
-    free(unmangled);
-  }
-#elif defined(_WIN32) && defined(NDEBUG)
-  char * const unmangled = __unDName(0, mangledName, 0, malloc, free, 0x2800);
-  if (unmangled)
-  {
-    name = QString(unmangled);
-    free(unmangled);
-  }
-#endif
-  return name;
 }
 
 #ifdef _WIN32
@@ -114,7 +74,27 @@ const char* Object::GetStaticClassName()
 
 QString Object::GetClassName() const
 {
-  return DemangleName(typeid(*this).name());
+  return Reflection::DemangleName(typeid(*this).name());
+}
+
+Reflection::TypeInfo Object::GetStaticTypeInfo()
+{
+  return Reflection::TypeInfo::New<Self>();
+}
+
+Reflection::TypeInfo Object::GetTypeInfo() const
+{
+  return Self::GetStaticTypeInfo();
+}
+
+QList<Reflection::TypeInfo> Object::GetStaticSuperclasses()
+{
+  return QList<Reflection::TypeInfo>();
+}
+
+QList<Reflection::TypeInfo> Object::GetSuperclasses() const
+{
+  return GetStaticSuperclasses();
 }
 
 QDebug Object::Print(QDebug os, Indent indent) const
@@ -231,7 +211,7 @@ Object::~Object()
 
 QDebug Object::PrintSelf(QDebug os, Indent Indent) const
 {
-  QString demangledName = DemangleName(typeid(*this).name());
+  QString demangledName = Reflection::DemangleName(typeid(*this).name());
   os << Indent << "RTTI typeinfo:   " << demangledName << '\n';
   os << Indent << "Reference Count: " <<
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))

@@ -55,8 +55,8 @@ QString IntroRegistry::GetIntroForProduct(
            elements[j].getDeclaringExtension()
            .getNamespace(),
            IStatus.ERROR,
-           "introId and productId must be defined.", new IllegalArgumentException()); //$NON-NLS-1$
-           WorkbenchPlugin.log("Invalid intro binding", status); //$NON-NLS-1$
+           "introId and productId must be defined.", new IllegalArgumentException());
+           WorkbenchPlugin.log("Invalid intro binding", status);
            */
           WorkbenchPlugin::Log(
                 elements[j]->GetDeclaringExtension()->GetNamespaceIdentifier()

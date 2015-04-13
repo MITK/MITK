@@ -24,15 +24,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-PerspectiveRegistryReader::PerspectiveRegistryReader()
+PerspectiveRegistryReader::PerspectiveRegistryReader(PerspectiveRegistry* out)
+  : registry(out)
 {
-
 }
 
-void PerspectiveRegistryReader::ReadPerspectives(PerspectiveRegistry* out)
+void PerspectiveRegistryReader::ReadPerspectives(IExtensionRegistry* in)
 {
-  registry = out;
-  this->ReadRegistry(PlatformUI::PLUGIN_ID(),
+  this->ReadRegistry(in, PlatformUI::PLUGIN_ID(),
                      WorkbenchRegistryConstants::PL_PERSPECTIVES);
 }
 
@@ -52,7 +51,7 @@ bool PerspectiveRegistryReader::ReadElement(const IConfigurationElement::Pointer
       }
       registry->AddPerspective(desc);
     }
-    catch (CoreException e)
+    catch (const CoreException& e)
     {
       // log an error since its not safe to open a dialog here
       WorkbenchPlugin::Log("Unable to create layout descriptor.", e);//$NON-NLS-1$

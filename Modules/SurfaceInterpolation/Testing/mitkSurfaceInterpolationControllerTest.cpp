@@ -540,28 +540,28 @@ public:
 
     // Test 1
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
-    bool equal = AssertImagesEqual4D( m_Controller->GetCurrentSegmentation(), segmentation_1->Clone() );
+    AssertImagesEqual4D( m_Controller->GetCurrentSegmentation(), segmentation_1->Clone() );
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_1.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 1", m_Controller->GetNumberOfInterpolationSessions() == 1);
 
     // Test 2
     m_Controller->SetCurrentInterpolationSession(segmentation_2);
     //MITK_ASSERT_EQUAL(m_Controller->GetCurrentSegmentation(), segmentation_2->Clone(), "Segmentation images are not equal");
-    equal = AssertImagesEqual4D( m_Controller->GetCurrentSegmentation(), segmentation_2->Clone() );
+    AssertImagesEqual4D( m_Controller->GetCurrentSegmentation(), segmentation_2->Clone() );
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_2.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2", m_Controller->GetNumberOfInterpolationSessions() == 2);
 
     // Test 3
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
     //MITK_ASSERT_EQUAL(m_Controller->GetCurrentSegmentation(), segmentation_1->Clone(), "Segmentation images are not equal");
-    equal = AssertImagesEqual4D( m_Controller->GetCurrentSegmentation(), segmentation_1->Clone() );
+    AssertImagesEqual4D( m_Controller->GetCurrentSegmentation(), segmentation_1->Clone() );
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_1.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2", m_Controller->GetNumberOfInterpolationSessions() == 2);
 
     // Test 4
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
     //MITK_ASSERT_EQUAL(m_Controller->GetCurrentSegmentation(), segmentation_1->Clone(), "Segmentation images are not equal");
-    equal = AssertImagesEqual4D( m_Controller->GetCurrentSegmentation(), segmentation_1->Clone() );
+    AssertImagesEqual4D( m_Controller->GetCurrentSegmentation(), segmentation_1->Clone() );
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_1.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2", m_Controller->GetNumberOfInterpolationSessions() == 2);
 

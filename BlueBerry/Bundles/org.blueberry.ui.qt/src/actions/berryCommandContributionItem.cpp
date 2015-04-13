@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryCommandEvent.h>
 #include <berryParameterizedCommand.h>
 #include <berryCommandExceptions.h>
+#include <berryCommandContributionItemParameter.h>
 
 #include "../berryDisplay.h"
 #include "../berryAsyncRunnable.h"
@@ -38,7 +39,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../handlers/berryIHandlerService.h"
 #include "../services/berryIServiceLocator.h"
 
-#include "../internal/berryCommandContributionItemParameter.h"
 #include "../internal/berryWorkbenchPlugin.h"
 
 #include <QMenu>
@@ -173,15 +173,11 @@ CommandContributionItem::CommandContributionItem(
   }
 }
 
-QAction* CommandContributionItem::Fill(QMenu* parent, QAction* before)
+void CommandContributionItem::Fill(QMenu* parent, QAction* before)
 {
-  if (!command)
+  if (!command || action || parent == 0)
   {
-    return 0;
-  }
-  if (action || parent == 0)
-  {
-    return 0;
+    return;
   }
 
   // Menus don't support the pulldown style
@@ -201,31 +197,27 @@ QAction* CommandContributionItem::Fill(QMenu* parent, QAction* before)
   }
   item->setData(QVariant::fromValue(Object::Pointer(this)));
   item->setProperty("contributionItem", QVariant::fromValue(Object::Pointer(this)));
+
   //  if (workbenchHelpSystem != null)
   //  {
   //    workbenchHelpSystem.setHelp(item, helpContextId);
   //  }
 
-  connect(item, SIGNAL(triggered()), this, SLOT(HandleWidgetSelection()));
+  connect(item, SIGNAL(triggered()), SLOT(HandleWidgetSelection()));
+  connect(item, SIGNAL(destroyed()), SLOT(HandleActionDestroyed()));
   action = item;
 
   this->Update();
   this->UpdateIcons();
 
   //bindingService.addBindingManagerListener(bindingManagerListener);
-
-  return item;
 }
 
-QAction *CommandContributionItem::Fill(QToolBar *parent, QAction *before)
+void CommandContributionItem::Fill(QToolBar *parent, QAction *before)
 {
-  if (!command)
+  if (!command || action || parent == 0)
   {
-    return 0;
-  }
-  if (action || parent == 0)
-  {
-    return 0;
+    return;
   }
 
   QAction* item = 0;
@@ -241,20 +233,19 @@ QAction *CommandContributionItem::Fill(QToolBar *parent, QAction *before)
   item->setData(QVariant::fromValue(Object::Pointer(this)));
   item->setProperty("contributionItem", QVariant::fromValue(Object::Pointer(this)));
 
-  //item->AddListener(this->GetItemListener());
+  connect(item, SIGNAL(triggered()), SLOT(HandleWidgetSelection()));
+  connect(item, SIGNAL(destroyed()), SLOT(HandleActionDestroyed()));
   action = item;
 
   this->Update();
   this->UpdateIcons();
 
   //bindingService.addBindingManagerListener(bindingManagerListener);
-
-  return item;
 }
 
 void CommandContributionItem::Update()
 {
-  this->Update(QString());
+  this->Update(QString::null);
 }
 
 void CommandContributionItem::Update(const QString& /*id*/)
@@ -490,21 +481,26 @@ void CommandContributionItem::UpdateCommandPropertiesInUI(const SmartPointer<
     const CommandEvent>& commandEvent)
 {
    if (commandEvent->GetCommand()->IsDefined())
-      {
-        this->Update();
-      }
-      if (commandEvent->IsEnabledChanged()
-          || commandEvent->IsHandledChanged())
-      {
-        if (visibleEnabled)
-        {
-          IContributionManager* parent = this->GetParent();
-          if (parent)
-          {
-            parent->Update(true);
-          }
-        }
-      }
+   {
+     this->Update();
+   }
+   if (commandEvent->IsEnabledChanged()
+       || commandEvent->IsHandledChanged())
+   {
+     if (visibleEnabled)
+     {
+       IContributionManager* parent = this->GetParent();
+       if (parent)
+       {
+         parent->Update(true);
+       }
+     }
+   }
+}
+
+void CommandContributionItem::HandleActionDestroyed()
+{
+  this->action = nullptr;
 }
 
 bool CommandContributionItem::ShouldRestoreAppearance(const SmartPointer<IHandler>& handler)
@@ -645,26 +641,6 @@ void CommandContributionItem::HandleWidgetSelection()
     WorkbenchPlugin::Log("Failed to execute item " + GetId(), e);
   }
 }
-
-#if (QT_VERSION < QT_VERSION_CHECK(5,0,0))
-void CommandContributionItem::connectNotify(const char *signal)
-{
-  qDebug() << "Connected to:" << signal;
-}
-void CommandContributionItem::disconnectNotify(const char *signal)
-{
-  qDebug() << "Disconnected from:" << signal;
-}
-#else
-void CommandContributionItem::connectNotify(const QMetaMethod& signal)
-{
-  qDebug() << "Connected to:" << signal.name();
-}
-void CommandContributionItem::disconnectNotify(const QMetaMethod& signal)
-{
-  qDebug() << "Disconnected from:" << signal.name();
-}
-#endif
 
 //TODO Tool item drop down menu contributions
 //bool CommandContributionItem::OpenDropDownMenu(SmartPointer<GuiTk::Event> event)

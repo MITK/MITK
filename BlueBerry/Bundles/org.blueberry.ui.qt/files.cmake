@@ -4,6 +4,7 @@ set(SRC_CPP_FILES
   berryConstants.cpp
   berryDisplay.cpp
   berryEditorPart.cpp
+  berryExtensionFactory.cpp
   berryFileEditorInput.cpp
   berryGeometry.cpp
 
@@ -18,6 +19,7 @@ set(SRC_CPP_FILES
   berryIEditorReference.cpp
   berryIEditorRegistry.cpp
   berryIEditorSite.cpp
+  berryIElementFactory.cpp
   berryIFileEditorMapping.cpp
   berryIFolderLayout.cpp
   berryIMemento.cpp
@@ -27,6 +29,8 @@ set(SRC_CPP_FILES
   berryIPageService.cpp
   berryIPartService.cpp
   berryIPathEditorInput.cpp
+  berryIPersistable.cpp
+  berryIPersistableElement.h
   berryIPerspectiveDescriptor.cpp
   berryIPerspectiveFactory.cpp
   berryIPerspectiveListener.cpp
@@ -103,18 +107,20 @@ set(SRC_CPP_FILES
 
   #actions
   actions/berryAbstractContributionFactory.cpp
-  actions/berryAbstractGroupMarker.cpp
-  actions/berryCommandContributionItem.h
   actions/berryCommandContributionItem.cpp
+  actions/berryCommandContributionItemParameter.cpp
   actions/berryContributionItem.cpp
   actions/berryContributionItemFactory.cpp
   actions/berryContributionManager.cpp
+  actions/berryGroupMarker.cpp
   actions/berryIContributionItem.h
   actions/berryIContributionManager.h
   actions/berryIContributionManagerOverrides.cpp
   actions/berryIMenuManager.h
   #actions/berryMenuBarManager.cpp
   actions/berryMenuManager.cpp
+  actions/berryQActionContributionItem.cpp
+  actions/berryQActionProperties.cpp
   actions/berrySeparator.cpp
   actions/berrySubContributionItem.cpp
 
@@ -139,7 +145,6 @@ set(SRC_CPP_FILES
   guitk/berryGuiTkControlEvent.cpp
   guitk/berryGuiTkEvent.cpp
   guitk/berryGuiTkIControlListener.cpp
-  guitk/berryGuiTkIMenuListener.cpp
   guitk/berryGuiTkISelectionListener.cpp
   guitk/berryGuiTkSelectionEvent.cpp
 
@@ -149,7 +154,6 @@ set(SRC_CPP_FILES
   handlers/berryIHandlerService.cpp
   handlers/berryRadioState.cpp
   handlers/berryRegistryToggleState.cpp
-  handlers/berryShowViewHandler.cpp
   handlers/berryToggleState.cpp
 
   #intro
@@ -157,6 +161,10 @@ set(SRC_CPP_FILES
   intro/berryIIntroPart.cpp
   intro/berryIIntroSite.cpp
   intro/berryIntroPart.cpp
+
+  #models
+  model/berryPerspectiveListModel.cpp
+  model/berryViewTreeModel.cpp
 
   #tweaklets
   tweaklets/berryGuiWidgetsTweaklet.cpp
@@ -202,6 +210,22 @@ set(INTERNAL_CPP_FILES
   defaultpresentation/berryQCTabBar.cpp
   defaultpresentation/berryQtWorkbenchPresentationFactory.cpp
 
+  dialogs/berryPerspectivesPreferencePage.cpp
+  dialogs/berrySavePerspectiveDialog.cpp
+
+  handlers/berryCloseAllPerspectivesHandler.cpp
+  handlers/berryClosePerspectiveHandler.cpp
+  handlers/berryDynamicHelpHandler.cpp
+  handlers/berryHelpContentsHandler.cpp
+  handlers/berryIntroHandler.cpp
+  handlers/berryNewEditorHandler.cpp
+  handlers/berryOpenInNewWindowHandler.cpp
+  handlers/berryQuitHandler.cpp
+  handlers/berryResetPerspectiveHandler.cpp
+  handlers/berrySavePerspectiveHandler.cpp
+  handlers/berryShowPerspectiveHandler.cpp
+  handlers/berryShowViewHandler.cpp
+
   util/berryAbstractTabFolder.cpp
   util/berryAbstractTabItem.cpp
   util/berryIPresentablePartList.cpp
@@ -225,6 +249,7 @@ set(INTERNAL_CPP_FILES
   intro/berryViewIntroAdapterPart.cpp
   intro/berryWorkbenchIntroManager.cpp
 
+  berryAbstractGroupMarker.cpp
   berryAbstractMenuAdditionCacheEntry.cpp
   berryAbstractPartSelectionTracker.cpp
   berryAbstractSelectionService.cpp
@@ -232,7 +257,7 @@ set(INTERNAL_CPP_FILES
   berryAlwaysEnabledExpression.cpp
   berryAndExpression.cpp
   berryBundleUtility.cpp
-  berryCommandContributionItemParameter.cpp
+  berryChangeToPerspectiveMenu.cpp
   berryCommandParameter.cpp
   berryCommandPersistence.cpp
   berryCommandService.cpp
@@ -245,9 +270,12 @@ set(INTERNAL_CPP_FILES
   berryDefaultSaveable.cpp
   berryDefaultStackPresentationSite.cpp
   berryDetachedWindow.cpp
+  berryDirtyPerspectiveMarker.cpp
   berryDragUtil.cpp
   berryEditorAreaHelper.cpp
   berryEditorDescriptor.cpp
+  berryEditorHistory.cpp
+  berryEditorHistoryItem.cpp
   berryEditorManager.cpp
   berryEditorReference.cpp
   berryEditorRegistry.cpp
@@ -277,15 +305,16 @@ set(INTERNAL_CPP_FILES
   berryIServiceLocatorCreator.cpp
   berryIStickyViewManager.cpp
   berryIWorkbenchLocationService.cpp
+  berryKeywordRegistry.cpp
   berryLayoutHelper.cpp
   berryLayoutPart.cpp
   berryLayoutPartSash.cpp
   berryLayoutTree.cpp
   berryLayoutTreeNode.cpp
   berryMenuServiceFactory.cpp
-  berryMMMenuListener.cpp
   berryNestableHandlerService.cpp
   berryNullEditorInput.cpp
+  berryOpenPerspectivePropertyTester.cpp
   berryPageLayout.cpp
   berryPagePartSelectionTracker.cpp
   berryPageSelectionService.cpp
@@ -303,10 +332,13 @@ set(INTERNAL_CPP_FILES
   berryPerspectiveDescriptor.cpp
   berryPerspectiveExtensionReader.cpp
   berryPerspectiveHelper.cpp
+  berryPerspectiveParameterValues.cpp
   berryPerspectiveRegistry.cpp
   berryPerspectiveRegistryReader.cpp
   berryPlaceholderFolderLayout.cpp
+  berryPolicy.cpp
   berryPreferenceConstants.cpp
+  berryPreferencePageParameterValues.cpp
   berryPresentablePart.cpp
   berryPresentationFactoryUtil.cpp
   berryPresentationSerializer.cpp
@@ -320,6 +352,7 @@ set(INTERNAL_CPP_FILES
   berryQtSafeApplication.cpp
   berryQtSash.cpp
   berryQtShell.cpp
+  berryQtShowPerspectiveDialog.cpp
   berryQtShowViewAction.cpp
   berryQtShowViewDialog.cpp
   berryQtStyleManager.cpp
@@ -332,6 +365,7 @@ set(INTERNAL_CPP_FILES
   berryQtWorkbenchTweaklet.cpp
   berryRegistryPersistence.cpp
   berryRegistryReader.cpp
+  berryReopenEditorMenu.cpp
   berrySaveablesList.cpp
   berryShowViewMenu.cpp
   berryServiceLocator.cpp
@@ -345,7 +379,9 @@ set(INTERNAL_CPP_FILES
   berryStatusUtil.cpp
   berryStickyViewDescriptor.cpp
   berryStickyViewManager.cpp
+  berrySwitchToWindowMenu.cpp
   berryTweaklets.cpp
+  berryUIExtensionTracker.cpp
   berryUtil.cpp
   berryViewDescriptor.cpp
   berryViewFactory.cpp
@@ -383,27 +419,35 @@ set(MOC_H_FILES
 
   src/berryAbstractUICTKPlugin.h
   src/berryEditorPart.h
+  src/berryExtensionFactory.h
   src/berryQtSelectionProvider.h
   src/berryViewPart.h
   src/berryWorkbenchPart.h
 
   src/actions/berryCommandContributionItem.h
+  src/actions/berryMenuManager.h
 
   src/intro/berryIntroPart.h
 
-  src/handlers/berryShowViewHandler.h
+  src/model/berryPerspectiveListModel.h
+  src/model/berryViewTreeModel.h
 
+  src/internal/berryChangeToPerspectiveMenu.h
   src/internal/berryCommandServiceFactory.h
   src/internal/berryHandlerServiceFactory.h
   src/internal/berryMenuServiceFactory.h
-  src/internal/berryMMMenuListener.h
+  src/internal/berryOpenPerspectivePropertyTester.h
+  src/internal/berryPerspectiveParameterValues.h
+  src/internal/berryPreferencePageParameterValues.h
   src/internal/berryQtDisplay.h
   src/internal/berryQtGlobalEventFilter.h
   src/internal/berryQtMainWindowControl.h
   src/internal/berryQtOpenPerspectiveAction.h
   src/internal/berryQtPerspectiveSwitcher.h
   src/internal/berryQtSash.h
+  src/internal/berryQtShowPerspectiveDialog.h
   src/internal/berryQtShowViewAction.h
+  src/internal/berryQtShowViewDialog.h
   src/internal/berryQtStyleManager.h
   src/internal/berryQtStylePreferencePage.h
   src/internal/berryQtTracker.h
@@ -411,6 +455,9 @@ set(MOC_H_FILES
   src/internal/berryQtWidgetsTweakletImpl.h
   src/internal/berryQtWorkbenchTweaklet.h
   src/internal/berryQtWorkbenchPageTweaklet.h
+  src/internal/berryReopenEditorMenu.h
+  src/internal/berryShowViewMenu.h
+  src/internal/berrySwitchToWindowMenu.h
   src/internal/berryWorkbenchPlugin.h
   src/internal/berryWorkbenchSourceProvider.h
 
@@ -419,13 +466,33 @@ set(MOC_H_FILES
   src/internal/defaultpresentation/berryQCTabBar.h
   src/internal/defaultpresentation/berryQtWorkbenchPresentationFactory.h
 
+  src/internal/dialogs/berryPerspectivesPreferencePage.h
+  src/internal/dialogs/berrySavePerspectiveDialog.h
+
+  src/internal/handlers/berryCloseAllPerspectivesHandler.h
+  src/internal/handlers/berryClosePerspectiveHandler.h
+  src/internal/handlers/berryDynamicHelpHandler.h
+  src/internal/handlers/berryHelpContentsHandler.h
+  src/internal/handlers/berryIntroHandler.h
+  src/internal/handlers/berryNewEditorHandler.h
+  src/internal/handlers/berryOpenInNewWindowHandler.h
+  src/internal/handlers/berryQuitHandler.h
+  src/internal/handlers/berryResetPerspectiveHandler.h
+  src/internal/handlers/berrySavePerspectiveHandler.h
+  src/internal/handlers/berryShowPerspectiveHandler.h
+  src/internal/handlers/berryShowViewHandler.h
+
   src/internal/intro/berryEditorIntroAdapterPart.h
 )
 
 set(UI_FILES
+  src/internal/berryQtShowPerspectiveDialog.ui
   src/internal/berryQtShowViewDialog.ui
   src/internal/berryQtStylePreferencePage.ui
   src/internal/berryQtStatusPart.ui
+
+  src/internal/dialogs/berryPerspectivesPreferencePage.ui
+  src/internal/dialogs/berrySavePerspectiveDialog.ui
 )
 
 set(QRC_FILES

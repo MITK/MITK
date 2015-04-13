@@ -26,7 +26,13 @@ namespace berry {
 class PropertyCache {
 
 private:
-  Poco::LRUCache<Property::Pointer, Property> fCache;
+
+  struct PropertyHandle
+  {
+    Property* m_Property;
+  };
+
+  Poco::LRUCache<Property::Pointer, PropertyHandle> fCache;
 
 public:
 
@@ -35,11 +41,13 @@ public:
   }
 
   Property::Pointer Get(Property::Pointer key) {
-    return fCache.get(key);
+    Poco::SharedPtr<PropertyHandle> value = fCache.get(key);
+    return value.isNull() ? Property::Pointer(0) : Property::Pointer(value->m_Property);
   }
 
   void Put(Property::Pointer method) {
-    fCache.add(method, method);
+    PropertyHandle handle = { method.GetPointer() };
+    fCache.add(method, handle);
   }
 
   void Remove(Property::Pointer method) {

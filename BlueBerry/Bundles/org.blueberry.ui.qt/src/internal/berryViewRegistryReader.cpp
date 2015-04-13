@@ -33,11 +33,11 @@ ViewRegistryReader::ViewRegistryReader() :
 
 }
 
-void ViewRegistryReader::ReadViews(ViewRegistry* out)
+void ViewRegistryReader::ReadViews(IExtensionRegistry* in, ViewRegistry* out)
 {
   // this does not seem to really ever be throwing an the exception
   viewRegistry = out;
-  this->ReadRegistry(PlatformUI::PLUGIN_ID(),
+  this->ReadRegistry(in, PlatformUI::PLUGIN_ID(),
                      WorkbenchRegistryConstants::PL_VIEWS);
 }
 
@@ -52,7 +52,7 @@ void ViewRegistryReader::ReadCategory(const IConfigurationElement::Pointer& elem
   {
     // log an error since its not safe to show a dialog here
     WorkbenchPlugin::Log(
-        "Unable to create view category.", e);//$NON-NLS-1$
+        "Unable to create view category.", e);
   }
 }
 

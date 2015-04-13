@@ -105,7 +105,7 @@ class BERRY_UI_QT WorkbenchAdvisor {
    */
   //private: AbstractStatusHandler workbenchErrorHandler;
 
-  private: bool introOpened;
+  //private: bool introOpened;
 
   /**
    * Creates and initializes a new workbench advisor instance.

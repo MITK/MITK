@@ -63,6 +63,7 @@ HandlerProxy::HandlerProxy(const QString commandId,
   , commandId(commandId)
   , loadException(NULL)
 {
+  this->Register();
   if (configurationElement.IsNull())
   {
     throw ctkInvalidArgumentException(
@@ -92,6 +93,7 @@ HandlerProxy::HandlerProxy(const QString commandId,
   }
 
   CEToProxyMap.insert(configurationElement, this);
+  this->UnRegister(false);
 }
 
 void HandlerProxy::UpdateStaleCEs(const QList<SmartPointer<IConfigurationElement> >& replacements)
@@ -139,7 +141,7 @@ void HandlerProxy::Dispose()
     handler->Dispose();
     handler = 0;
   }
-  if (evaluationService)
+  if (evaluationService && enablementRef)
   {
     evaluationService->RemoveEvaluationListener(enablementRef);
   }

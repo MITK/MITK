@@ -49,12 +49,12 @@ protected:
    * The bit used to represent whether the category has changed its defined
    * state.
    */
-  static const int CHANGED_DEFINED; // = 1;
+  static int CHANGED_DEFINED(); // = 1;
 
   /**
    * The last used bit so that subclasses can add more properties.
    */
-  static const int LAST_BIT_USED_ABSTRACT_HANDLE; // = CHANGED_DEFINED;
+  static int LAST_BIT_USED_ABSTRACT_HANDLE(); // = CHANGED_DEFINED;
 
   /**
    * Constructs a new instance of <code>AbstractHandleObjectEvent</code>.

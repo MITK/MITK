@@ -179,6 +179,7 @@ struct IBundle;
 struct IExtensionPointService;
 struct IExtensionRegistry;
 struct IPreferencesService;
+struct IProduct;
 
 /**
  * The central class of the BlueBerry Platform Runtime. This class cannot
@@ -200,6 +201,9 @@ struct IPreferencesService;
 class org_blueberry_core_runtime_EXPORT Platform
 {
 public:
+
+  static const QString PI_RUNTIME;
+
   static int OS_FREE_BSD;
   static int OS_AIX;
   static int OS_HPUX;
@@ -241,6 +245,7 @@ public:
   static QString ARG_FORCE_PLUGIN_INSTALL;
   static QString ARG_PRELOAD_LIBRARY;
   static QString ARG_PROVISIONING;
+  static QString ARG_DEBUG;
 
   static QString ARG_CONSOLELOG;
   static QString ARG_TESTPLUGIN;
@@ -282,6 +287,27 @@ public:
    * @return an object to interface into the preference mechanism
    */
   static IPreferencesService* GetPreferencesService();
+
+  /**
+   * Returns the product which was selected when running this BlueBerry instance
+   * or <code>null</code> if none
+   * @return the current product or <code>null</code> if none
+   */
+  static IProduct* GetProduct();
+
+  /**
+   * Returns the identified option. A null QString
+   * is returned if no such option is found. Options are specified
+   * in the general form <i>&lt;plug-in id&gt;/&lt;option-path&gt;</i>.
+   * For example, <code>org.blueberry.core.runtime/debug</code>
+   * <p>
+   * Clients are also able to acquire the {@link DebugOptions} service
+   * and query it for debug options.
+   * </p>
+   * @param option the name of the option to lookup
+   * @return the value of the requested debug option or <code>QString::null</code>
+   */
+  static QVariant GetDebugOption(const QString& option);
 
   /**
    * Returns the path of the configuration information

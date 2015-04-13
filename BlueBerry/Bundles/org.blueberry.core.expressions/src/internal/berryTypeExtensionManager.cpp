@@ -31,12 +31,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+  /**
+   * Tells whether this class is in debug mode.
+   */
+  bool TypeExtensionManager::DEBUG = false;
+
   const QString TypeExtensionManager::TYPE= "type";
 
   TypeExtensionManager::TypeExtensionManager(const QString& extensionPoint)
   : fExtensionPoint(extensionPoint)
   {
-    //Platform.getExtensionRegistry().addRegistryChangeListener(this);
+    Platform::GetExtensionRegistry()->AddListener(this);
     this->InitializeCaches();
   }
 
@@ -53,21 +58,23 @@ namespace berry {
   {
     std::clock_t start= 0;
     if (Expressions::TRACING)
-    start = std::clock();
+    {
+      start = std::clock();
+    }
 
     // if we call a static method than the receiver is the class object
     //Class clazz= receiver instanceof Class ? (Class)receiver : receiver.getClass();
 
-    Property::Pointer result(new Property(receiver, namespaze, method));
+    Property::Pointer result(new Property(receiver->GetTypeInfo(), namespaze, method));
     Property::Pointer cached(fPropertyCache->Get(result));
-    if (!cached.isNull())
+    if (!cached.IsNull())
     {
       if (cached->IsValidCacheEntry(forcePluginActivation))
       {
         if (Expressions::TRACING)
         {
           BERRY_INFO << "[Type Extension] - method "
-                     << receiver->ToString() << "#" << method.toStdString()
+                     << receiver->GetClassName() << "#" << method.toStdString()
                      << " found in cache: "
                      << (double(std::clock() - start))/(CLOCKS_PER_SEC/1000) << " ms.";
         }
@@ -78,7 +85,7 @@ namespace berry {
       // implementation class gets loaded.
       fPropertyCache->Remove(cached);
     }
-    TypeExtension::Pointer extension(this->Get(receiver->GetClassName()));
+    TypeExtension::Pointer extension(this->Get(receiver->GetTypeInfo()));
     IPropertyTester::Pointer extender(extension->FindTypeExtender(*this, namespaze, method, false /*receiver instanceof Class*/, forcePluginActivation));
     if (!extender.Cast<TypeExtension::CONTINUE_>().IsNull() || extender.IsNull())
     {
@@ -95,21 +102,20 @@ namespace berry {
     if (Expressions::TRACING)
     {
       BERRY_INFO << "[Type Extension] - method "
-                 << typeid(receiver).name() << "#" << method
+                 << receiver->GetClassName() << "#" << method
                  << " not found in cache: "
                  << (double(std::clock() - start))/(CLOCKS_PER_SEC/1000) << " ms.";
     }
     return result;
   }
 
-  /* package */TypeExtension::Pointer
-  TypeExtensionManager::Get(const QString& type)
+  TypeExtension::Pointer TypeExtensionManager::Get(const Reflection::TypeInfo& typeInfo)
   {
-    TypeExtension::Pointer result(fTypeExtensionMap[type]);
+    TypeExtension::Pointer result(fTypeExtensionMap[typeInfo.GetName()]);
     if (result.IsNull())
     {
-      result = new TypeExtension(type);
-      fTypeExtensionMap[type] = result;
+      result = new TypeExtension(typeInfo);
+      fTypeExtensionMap[typeInfo.GetName()] = result;
     }
     return result;
   }
@@ -140,10 +146,11 @@ namespace berry {
         IPropertyTester::Pointer descr(new PropertyTesterDescriptor(config));
         result.push_back(descr);
       }
-      catch (const CoreException& /*e*/)
+      catch (const CoreException& e)
       {
         //TODO
         //ExpressionPlugin.getDefault().getLog().log(e.getStatus());
+        BERRY_ERROR << e.what();
         IPropertyTester::Pointer nullTester(new NULL_PROPERTY_TESTER_());
         result.push_back(nullTester);
       }
@@ -159,8 +166,33 @@ namespace berry {
     fTypeExtensionMap.clear();
   }
 
+  void TypeExtensionManager::Added(const QList<SmartPointer<IExtension> >& /*extensions*/)
+  {
+    this->InitializeCaches();
+  }
+
+  void TypeExtensionManager::Removed(const QList<SmartPointer<IExtension> >& /*extensions*/)
+  {
+    this->InitializeCaches();
+  }
+
+  void TypeExtensionManager::Added(const QList<SmartPointer<IExtensionPoint> >& /*extensionPoints*/)
+  {
+    this->InitializeCaches();
+  }
+
+  void TypeExtensionManager::Removed(const QList<SmartPointer<IExtensionPoint> >& /*extensionPoints*/)
+  {
+    this->InitializeCaches();
+  }
+
   TypeExtensionManager::~TypeExtensionManager()
   {
+    IExtensionRegistry* registry = Platform::GetExtensionRegistry();
+    if (registry)
+    {
+      registry->RemoveListener(this);
+    }
     if (fPropertyCache) delete fPropertyCache;
   }
 

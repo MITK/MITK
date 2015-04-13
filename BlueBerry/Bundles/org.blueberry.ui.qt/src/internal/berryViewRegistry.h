@@ -51,7 +51,7 @@ private:
    * Proxies a Category implementation.
    *
    */
-  class ViewCategoryProxy : public IViewCategory
+  class ViewCategoryProxy : public IViewCategory, public IPluginContribution
   {
 
   private:
@@ -68,33 +68,43 @@ private:
   public:
     ViewCategoryProxy(IViewDescriptorCategoryPtr rawCategory);
 
-    /* (non-Javadoc)
-     * @see org.blueberry.ui.views.IViewCategory#getViews()
+    /*
+     * @see IViewCategory#GetViews()
      */
     QList<IViewDescriptor::Pointer> GetViews() const;
 
-    /* (non-Javadoc)
-     * @see org.blueberry.ui.views.IViewCategory#getId()
+    /*
+     * @see IViewCategory#GetId()
      */
     QString GetId() const;
 
-    /* (non-Javadoc)
-     * @see org.blueberry.ui.views.IViewCategory#getPath()
+    /*
+     * @see IViewCategory#GetPath()
      */
     QStringList GetPath() const;
 
-    /* (non-Javadoc)
-     * @see org.blueberry.ui.views.IViewCategory#getLabel()
+    /*
+     * @see IViewCategory#GetLabel()
      */
     QString GetLabel() const;
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
+    /*
+     * @see IPluginContribution#GetLocalId()
+     */
+    QString GetLocalId() const;
+
+    /*
+     * @see IPluginContribution#GetPluginId()
+     */
+    QString GetPluginId() const;
+
+    /*
+     * @see Object#operator==(Object*)
      */
     bool operator==(const Object* o) const;
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
+    /*
+     * @see Object#HashCode()
      */
     uint HashCode() const;
   };

@@ -51,6 +51,7 @@ struct ISourceProviderService;
 struct IWorkbenchLocationService;
 
 class CommandManager;
+class EditorHistory;
 class ViewRegistry;
 class EditorRegistry;
 class WorkbenchWindowConfigurer;
@@ -65,7 +66,7 @@ class WorkbenchWindowConfigurer;
  * Note that any code that is run during the creation of a workbench instance
  * should not required access to the display.
  */
-class BERRY_UI_QT Workbench : public IWorkbench
+class BERRY_UI_QT Workbench : public IWorkbench, private IWindowListener
 {
 
 public:
@@ -176,12 +177,13 @@ public:
 
   IWorkbenchWindow::Pointer GetActiveWorkbenchWindow() const;
 
-  IViewRegistry* GetViewRegistry();
-  IEditorRegistry* GetEditorRegistry();
-  IPerspectiveRegistry* GetPerspectiveRegistry();
+  IViewRegistry* GetViewRegistry() const;
+  IEditorRegistry* GetEditorRegistry() const;
+  EditorHistory* GetEditorHistory() const;
+  IPerspectiveRegistry* GetPerspectiveRegistry() const;
 
-  std::size_t GetWorkbenchWindowCount();
-  QList<IWorkbenchWindow::Pointer> GetWorkbenchWindows();
+  std::size_t GetWorkbenchWindowCount() const;
+  QList<IWorkbenchWindow::Pointer> GetWorkbenchWindows() const;
   IWorkbenchWindow::Pointer OpenWorkbenchWindow(const QString& perspectiveId,
         IAdaptable* input);
   IWorkbenchWindow::Pointer OpenWorkbenchWindow(IAdaptable* input);
@@ -194,12 +196,12 @@ public:
 
   bool SaveAllEditors(bool confirm);
 
-  IIntroManager* GetIntroManager();
+  IIntroManager* GetIntroManager() const;
 
   /**
    * @return the workbench intro manager
    */
-  WorkbenchIntroManager* GetWorkbenchIntroManager();
+  WorkbenchIntroManager* GetWorkbenchIntroManager() const;
 
   /**
    * @return the intro extension for this workbench.
@@ -222,7 +224,7 @@ public:
    * @return <code>true</code> if the workbench is running,
    *         <code>false</code> if it has been terminated.
    */
-  bool IsRunning();
+  bool IsRunning() const;
 
   /**
    * Returns true if the Workbench is in the process of starting.
@@ -230,23 +232,23 @@ public:
    * @return <code>true</code> if the Workbench is starting, but not yet
    *         running the event loop.
    */
-  bool IsStarting();
+  bool IsStarting() const;
 
-  bool IsClosing();
+  bool IsClosing() const;
 
   /**
    * Returns the default perspective id, which may be <code>null</code>.
    *
    * @return the default perspective id, or <code>null</code>
    */
-  QString GetDefaultPerspectiveId();
+  QString GetDefaultPerspectiveId() const;
 
   /**
    * Returns the default workbench window page input.
    *
    * @return the default window page input or <code>null</code> if none
    */
-  IAdaptable* GetDefaultPageInput();
+  IAdaptable* GetDefaultPageInput() const;
 
   /**
    * Return the presentation ID specified by the preference or the default ID
@@ -255,7 +257,9 @@ public:
    * @return the presentation ID
    * @see IWorkbenchPreferenceConstants#PRESENTATION_FACTORY_ID
    */
-  QString GetPresentationId();
+  QString GetPresentationId() const;
+
+  IElementFactory* GetElementFactory(const QString& factoryId) const;
 
   void UpdateTheme();
 
@@ -287,6 +291,7 @@ public:
    */
   void LargeUpdateEnd();
 
+  IExtensionTracker* GetExtensionTracker() const;
 
 protected:
 
@@ -358,7 +363,7 @@ protected:
    * workbench advisor is internal to the application.
    * </p>
    */
-  WorkbenchAdvisor* GetAdvisor();
+  WorkbenchAdvisor* GetAdvisor() const;
 
   /*
    * Returns the workbench window which was last known being the active one,
@@ -470,6 +475,8 @@ private:
 
   QScopedPointer<IMenuService, QScopedPointerObjectDeleter> menuService;
 
+  mutable QScopedPointer<IExtensionTracker> tracker;
+
   /**
    * A count of how many plug-ins were loaded while restoring the workbench
    * state. Initially -1 for unknown number.
@@ -521,7 +528,9 @@ private:
   WindowManager windowManager;
   SmartPointer<WorkbenchWindow> activatedWindow;
 
-  QScopedPointer<WorkbenchIntroManager> introManager;
+  mutable QScopedPointer<EditorHistory> editorHistory;
+
+  mutable QScopedPointer<WorkbenchIntroManager> introManager;
 
   /**
    * The descriptor for the intro extension that is valid for this workspace,
@@ -534,7 +543,9 @@ private:
 
   int returnCode;
 
-  QString factoryID;
+  mutable QString factoryID;
+
+  WorkbenchWindow* activeWorkbenchWindow;
 
   /**
    * Creates a new workbench.
@@ -551,7 +562,7 @@ private:
   /**
    * see IWorkbench#GetDisplay
    */
-  Display* GetDisplay();
+  Display* GetDisplay() const;
 
   /*
    * Creates a new workbench window.
@@ -628,6 +639,13 @@ private:
   void InitializeSourcePriorities();
 
   void StartSourceProviders();
+
+  void UpdateActiveWorkbenchWindowMenuManager(bool textOnly);
+
+  void WindowActivated(const IWorkbenchWindow::Pointer& /*window*/) override;
+  void WindowDeactivated(const IWorkbenchWindow::Pointer& /*window*/) override;
+  void WindowClosed(const IWorkbenchWindow::Pointer& /*window*/) override;
+  void WindowOpened(const IWorkbenchWindow::Pointer& /*window*/) override;
 };
 
 } // namespace berry

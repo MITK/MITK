@@ -49,11 +49,11 @@ const std::string QmitkSegmentationView::VIEW_ID =
 // public methods
 
 QmitkSegmentationView::QmitkSegmentationView()
-   :m_Parent(NULL)
+   :m_MouseCursorSet(false)
+   ,m_Parent(NULL)
    ,m_Controls(NULL)
    ,m_MultiWidget(NULL)
    ,m_DataSelectionChanged(false)
-   ,m_MouseCursorSet(false)
 {
    mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
    mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");

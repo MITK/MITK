@@ -62,8 +62,6 @@ public:
 
 struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
 {
-  berryObjectMacro(QmitkStdMultiWidgetPartListener)
-
   QmitkStdMultiWidgetPartListener(QmitkStdMultiWidgetEditorPrivate* dd)
     : d(dd)
   {}

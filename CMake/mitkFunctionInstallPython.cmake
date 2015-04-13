@@ -28,7 +28,7 @@ function(mitkFunctionInstallPython _python_libs_out _search_path_out _app_bundle
     if(UNIX)
       list(APPEND _python_dirs "${MITK_EXTERNAL_PROJECT_PREFIX}/lib")
       set(PYTHON_LIB_SUFFIX ".so")
-      set(_py_include_postfix python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/)
+      set(_py_include_postfix python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/) # add the slash here so windows and unix will work with same code
       set(_python_runtime_dir python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/)
     else() #WIN32
       list(APPEND _python_dirs "${MITK_EXTERNAL_PROJECT_PREFIX}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/Lib")

@@ -116,6 +116,8 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       )
     endif()
 
+    # windows has to be installed to a seperate dir, or all py files will end up
+    # directly in the ep/lib folder
     set(_python_install_dir )
     if(WIN32)
       set(_python_install_dir -DCMAKE_INSTALL_PREFIX:PATH=${ep_prefix}/lib/python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION})

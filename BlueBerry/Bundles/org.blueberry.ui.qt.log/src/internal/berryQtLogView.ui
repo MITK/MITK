@@ -38,13 +38,6 @@
      <item>
       <widget class="QLineEdit" name="filterContent"/>
      </item>
-     <item>
-      <widget class="QPushButton" name="clearPushButton">
-       <property name="text">
-        <string>Clear</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
@@ -180,22 +173,5 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections>
-  <connection>
-   <sender>clearPushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>filterContent</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>543</x>
-     <y>23</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>275</x>
-     <y>23</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

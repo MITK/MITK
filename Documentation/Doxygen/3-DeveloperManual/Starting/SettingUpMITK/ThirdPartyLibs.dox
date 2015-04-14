@@ -31,7 +31,7 @@ http://dicom.offis.de/dcmtk.php.en
 
 http://gdcm.sourceforge.net/
 
-\par GLEW (The OpenGL Extension Wrangler Library)
+\par GLEW
 
 http://glew.sourceforge.net/
 
@@ -43,14 +43,6 @@ https://www.opengl.org/resources/libraries/glut/
 
 http://www.itk.org/
 
-\par KWStlye
-
-http://public.kitware.com/KWStyle/
-
-\par LibQxt (the Qt eXTension library)
-
-http://www.libqxt.org/
-
 \par NumPy
 
 http://www.numpy.org/
@@ -59,11 +51,15 @@ http://www.numpy.org/
 
 http://opencv.willowgarage.com/wiki/Welcome
 
+\par OpenIGTLink
+
+http://openigtlink.org/
+
 \par PCRE
 
 http://www.pcre.org/
 
-\par POCO (Portable Components)
+\par POCO
 
 http://pocoproject.org
 
@@ -73,11 +69,15 @@ https://www.python.org/
 
 \par Qt
 
-http://qt.nokia.com/
+http://www.qt.io/
 
-\par Qwt (Qt Widgets for Technical Applications)
+\par Qwt
 
 http://qwt.sourceforge.net/
+
+\par Redland
+
+http://librdf.org/
 
 \par SimpleITK
 
@@ -94,6 +94,10 @@ http://swig.org/
 \par tinyxml
 
 http://sourceforge.net/projects/tinyxml/
+
+\par VIGRA
+
+http://ukoethe.github.io/vigra/
 
 \par VTK
 

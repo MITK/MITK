@@ -2,17 +2,6 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.deformableregistration"
-          name="DeformableRegistration"
-          category="Registration"
-          class="QmitkDeformableRegistrationView"
-          icon="resources/DeformableRegistration.xpm" >
-      <description>Register two images using a deformable registration</description>
-      <keywordReference id="org.mitk.views.xnat.registrationViews.ViewKeyword"/>
-    </view>
-  </extension>
-
-  <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.pointbasedregistration"
           name="PointBasedRegistration"
           category="Registration"

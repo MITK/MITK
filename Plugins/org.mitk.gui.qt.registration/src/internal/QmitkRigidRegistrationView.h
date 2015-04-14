@@ -99,6 +99,7 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     void DataNodeHasBeenRemoved(const mitk::DataNode* node);
 
   signals:
+    void PresetSelected( QString preset_name );
 
   protected slots:
 
@@ -116,6 +117,11 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     * checks if registration is possible
     */
     bool CheckCalculate();
+
+    /**
+      \brief Load the preset set within the combo box
+      */
+    void LoadSelectedPreset();
 
     /*!
     * \brief Undo the last registration.
@@ -269,7 +275,10 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     */
     void OnMovingMaskImageChanged(const mitk::DataNode* node);
 
-  protected:
+    void PresetSelectionChanged();
+protected:
+
+    void FillPresetComboBox(const std::list<std::string> &preset);
 
     QScopedPointer<berry::ISelectionListener> m_SelListener;
     berry::IStructuredSelection::ConstPointer m_CurrentSelection;
@@ -316,6 +325,8 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     int m_TranslateSliderPos[3];
     int m_RotateSliderPos[3];
     int m_ScaleSliderPos[3];
+
+    bool m_PresetSelected;
 
     QmitkStepperAdapter*      m_TimeStepperAdapter;
 };

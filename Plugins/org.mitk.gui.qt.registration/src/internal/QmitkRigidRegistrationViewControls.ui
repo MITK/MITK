@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>482</width>
+    <width>496</width>
     <height>973</height>
    </rect>
   </property>
@@ -23,7 +23,16 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -57,7 +66,16 @@
           <property name="spacing">
            <number>0</number>
           </property>
-          <property name="margin">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
            <number>0</number>
           </property>
           <item>
@@ -69,58 +87,68 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QGridLayout" name="gridLayout">
-             <item row="0" column="0">
-              <widget class="QLabel" name="m_FixedLabel">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>Fixed Image:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="TextLabelFixed">
-               <property name="font">
-                <font>
-                 <pointsize>10</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0" colspan="2">
-              <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <item row="3" column="0" colspan="2">
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
                <item>
-                <widget class="QLabel" name="m_FixedMaskLB">
+                <widget class="QLabel" name="m_MovingMaskLB">
                  <property name="text">
-                  <string>Fixed Image Mask:</string>
+                  <string>Moving Image Mask:</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QmitkDataStorageComboBox" name="m_FixedImageCB"/>
+                <widget class="QmitkDataStorageComboBox" name="m_MovingImageCB"/>
                </item>
               </layout>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="m_MovingLabel">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                </font>
-               </property>
+             <item row="16" column="0">
+              <layout class="QVBoxLayout" name="verticalLayout_3">
+               <item>
+                <widget class="QPushButton" name="m_LoadRigidRegistrationParameter">
+                 <property name="text">
+                  <string>Load Preset</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="9" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout">
+               <item>
+                <widget class="QCheckBox" name="m_ShowContour">
+                 <property name="text">
+                  <string>Show contour</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSlider" name="m_ContourSlider">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="m_ThresholdLabel">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="16" column="1">
+              <widget class="QCheckBox" name="m_cbAlignImageCenters">
                <property name="text">
-                <string>Moving Image:</string>
+                <string>Align Image Centers</string>
                </property>
               </widget>
+             </item>
+             <item row="8" column="0" colspan="2">
+              <widget class="QmitkSliderNavigatorWidget" name="timeSlider" native="true"/>
              </item>
              <item row="2" column="1">
               <widget class="QLabel" name="TextLabelMoving">
@@ -137,31 +165,63 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="0" colspan="2">
-              <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item row="7" column="0" colspan="2">
+              <layout class="QHBoxLayout" name="_3">
                <item>
-                <widget class="QLabel" name="m_MovingMaskLB">
+                <widget class="QLabel" name="label">
                  <property name="text">
-                  <string>Moving Image Mask:</string>
+                  <string>0%</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QmitkDataStorageComboBox" name="m_MovingImageCB"/>
+                <widget class="QLabel" name="m_OpacityLabel">
+                 <property name="text">
+                  <string>Moving Image Opacity:</string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSlider" name="m_OpacitySlider">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                 <property name="value">
+                  <number>50</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>100%</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
-             <item row="4" column="0">
-              <widget class="QPushButton" name="m_SwitchImages">
-               <property name="text">
-                <string>Switch fixed and moving image</string>
+             <item row="10" column="0">
+              <widget class="QCheckBox" name="m_ShowRedGreenValues">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
                </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <widget class="QCheckBox" name="m_UseMaskingCB">
                <property name="text">
-                <string>Use Image Masking</string>
+                <string>Show Images Red/Green</string>
                </property>
               </widget>
              </item>
@@ -271,107 +331,96 @@
                </property>
               </widget>
              </item>
-             <item row="7" column="0" colspan="2">
-              <layout class="QHBoxLayout" name="_3">
-               <item>
-                <widget class="QLabel" name="label">
-                 <property name="text">
-                  <string>0%</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="m_OpacityLabel">
-                 <property name="text">
-                  <string>Moving Image Opacity:</string>
-                 </property>
-                 <property name="wordWrap">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QSlider" name="m_OpacitySlider">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="maximum">
-                  <number>100</number>
-                 </property>
-                 <property name="value">
-                  <number>50</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_2">
-                 <property name="text">
-                  <string>100%</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="8" column="0" colspan="2">
-              <widget class="QmitkSliderNavigatorWidget" name="timeSlider" native="true"/>
-             </item>
-             <item row="9" column="0">
-              <layout class="QHBoxLayout" name="horizontalLayout">
-               <item>
-                <widget class="QCheckBox" name="m_ShowContour">
-                 <property name="text">
-                  <string>Show contour</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QSlider" name="m_ContourSlider">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="m_ThresholdLabel">
-                 <property name="text">
-                  <string>0</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="10" column="0">
-              <widget class="QCheckBox" name="m_ShowRedGreenValues">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
+             <item row="15" column="1">
+              <widget class="QLabel" name="label_3">
                <property name="text">
-                <string>Show Images Red/Green</string>
+                <string>Initialization Step:</string>
                </property>
               </widget>
              </item>
-             <item row="11" column="0">
-              <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item row="1" column="0" colspan="2">
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
-                <widget class="QPushButton" name="m_LoadRigidRegistrationParameter">
+                <widget class="QLabel" name="m_FixedMaskLB">
                  <property name="text">
-                  <string>Load Preset</string>
+                  <string>Fixed Image Mask:</string>
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QmitkDataStorageComboBox" name="m_FixedImageCB"/>
+               </item>
               </layout>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="m_MovingLabel">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Moving Image:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QCheckBox" name="m_UseMaskingCB">
+               <property name="text">
+                <string>Use Image Masking</string>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="0">
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Registration method:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="15" column="0">
+              <widget class="QComboBox" name="m_RigidRegistrationPresetBox"/>
+             </item>
+             <item row="4" column="0">
+              <widget class="QPushButton" name="m_SwitchImages">
+               <property name="text">
+                <string>Switch fixed and moving image</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="TextLabelFixed">
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_FixedLabel">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Fixed Image:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="11" column="0" colspan="2">
+              <widget class="Line" name="line">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -445,7 +494,7 @@
                  <property name="frameShadow">
                   <enum>QFrame::Raised</enum>
                  </property>
-                 <property name="numDigits">
+                 <property name="digitCount">
                   <number>10</number>
                  </property>
                  <property name="segmentStyle">
@@ -518,7 +567,16 @@
                 <enum>QFrame::Raised</enum>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_5">
-                <property name="margin">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
                  <number>0</number>
                 </property>
                 <item>
@@ -555,7 +613,16 @@
                    <property name="spacing">
                     <number>6</number>
                    </property>
-                   <property name="margin">
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
                     <number>0</number>
                    </property>
                    <item>
@@ -681,7 +748,16 @@
                    <bool>true</bool>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_6">
-                   <property name="margin">
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
                     <number>0</number>
                    </property>
                    <item>
@@ -807,7 +883,16 @@
                    <bool>true</bool>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_10">
-                   <property name="margin">
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
                     <number>0</number>
                    </property>
                    <item>

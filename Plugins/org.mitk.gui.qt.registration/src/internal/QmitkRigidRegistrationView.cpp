@@ -1342,6 +1342,7 @@ void QmitkRigidRegistrationView::Calculate()
 {
   m_Controls.qmitkRigidRegistrationSelector1->SetFixedNode(m_FixedNode);
   m_Controls.qmitkRigidRegistrationSelector1->SetMovingNode(m_MovingNode);
+
   if (m_FixedMaskNode.IsNotNull() && m_Controls.m_UseMaskingCB->isChecked())
   {
     m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(m_FixedMaskNode);
@@ -1358,6 +1359,12 @@ void QmitkRigidRegistrationView::Calculate()
   {
     m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(NULL);
   }
+
+  if(m_Controls.m_cbAlignImageCenters->isChecked() )
+  {
+    this->AlignCenters();
+  }
+
   m_Controls.frame_2->setEnabled(false);
   m_Controls.frame_3->setEnabled(false);
   m_Controls.m_CalculateTransformation->setEnabled(false);

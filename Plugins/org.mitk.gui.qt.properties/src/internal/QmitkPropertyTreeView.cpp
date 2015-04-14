@@ -87,6 +87,10 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
   m_Delegate = new QmitkPropertyItemDelegate(m_Controls.treeView);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+  m_Controls.filterLineEdit->setClearButtonEnabled(true);
+#endif
+
   m_Controls.treeView->setItemDelegateForColumn(1, m_Delegate);
   m_Controls.treeView->setModel(m_ProxyModel);
   m_Controls.treeView->setColumnWidth(0, 160);

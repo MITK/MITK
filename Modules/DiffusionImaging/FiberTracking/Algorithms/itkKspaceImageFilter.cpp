@@ -160,15 +160,19 @@ void KspaceImageFilter< TPixelType >
 
     double numPix = kxMax*kyMax;
     double dt =  m_Parameters.m_SignalGen.m_tLine/kxMax;
-    double fromMaxEcho = -m_Parameters.m_SignalGen.m_tLine*kyMax/2-dt*kxMax/2;
 
-    double upsampling = xMax/kxMax;     //  discrepany between k-space resolution and image resolution
-    double yMaxFov = kyMax*upsampling;  //  actual FOV in y-direction (in x-direction xMax==FOV)
+    // k-space center at maximum echo
+    double fromMaxEcho = 0;
+    if ( (int)kyMax%2==0 )
+    {
+        fromMaxEcho = -m_Parameters.m_SignalGen.m_tLine*(kyMax-1)/2 + dt*(kxMax-(int)kxMax%2)/2;
+    }
+    else
+        fromMaxEcho = -m_Parameters.m_SignalGen.m_tLine*(kyMax-1)/2 - dt*(kxMax-(int)kxMax%2)/2;
 
-    int xRingingOffset = xMax-kxMax;
-    int yRingingOffset = yMaxFov-kyMax;
+    double yMaxFov = yMax*m_Parameters.m_SignalGen.m_CroppingFactor;  //  actual FOV in y-direction (in x-direction FOV=xMax)
 
-    double noiseVar = m_Parameters.m_SignalGen.m_PartialFourier*m_Parameters.m_SignalGen.m_NoiseVariance/(yMaxFov*kxMax); // adjust noise variance since it is the intended variance in physical space and not in k-space
+    double noiseVar = m_Parameters.m_SignalGen.m_PartialFourier*m_Parameters.m_SignalGen.m_NoiseVariance/(kyMax*kxMax); // adjust noise variance since it is the intended variance in physical space and not in k-space
 
     while( !oit.IsAtEnd() )
     {
@@ -180,15 +184,11 @@ void KspaceImageFilter< TPixelType >
         double t= fromMaxEcho + ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
 
         // readout time
-        double tall = 0;
-//        if (!m_Parameters.m_SignalGen.m_ReversePhase)
-            tall = ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
-//        else
-//            tall = ((double)(kyMax-1-kIdx[1])*kxMax+(double)kIdx[0])*dt;
+        double tall = ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
 
         // calculate eddy current decay factor
         double eddyDecay = 0;
-        if ( m_Parameters.m_SignalGen.m_EddyStrength>0)
+        if ( m_Parameters.m_Misc.m_CheckAddEddyCurrentsBox && m_Parameters.m_SignalGen.m_EddyStrength>0)
             eddyDecay = exp(-tall/m_Parameters.m_SignalGen.m_Tau );
 
         // calcualte signal relaxation factors
@@ -210,23 +210,19 @@ void KspaceImageFilter< TPixelType >
         if (oit.GetIndex()[1]%2 == 1)
             kIdx[0] = kxMax-kIdx[0]-1;
 
-//        if (!pf)
-//            m_KSpaceImage->SetPixel(kIdx, t );
-
-        // rearrange slice
-        if( kIdx[0] <  kxMax/2 )
-            kIdx[0] = kIdx[0] + kxMax/2;
-        else
-            kIdx[0] = kIdx[0] - kxMax/2;
-
-        if( kIdx[1] <  kyMax/2 )
-            kIdx[1] = kIdx[1] + kyMax/2;
-        else
-            kIdx[1] = kIdx[1] - kyMax/2;
-
-        // add ghosting
+        // shift k for DFT: (0 -- N) --> (-N/2 -- N/2)
         double kx = kIdx[0];
         double ky = kIdx[1];
+        if ((int)kxMax%2==1)
+            kx -= (kxMax-1)/2;
+        else
+            kx -= kxMax/2;
+        if ((int)kyMax%2==1)
+            ky -= (kyMax-1)/2;
+        else
+            ky -= kyMax/2;
+
+        // add ghosting
         if (oit.GetIndex()[1]%2 == 1)
             kx -= m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
         else
@@ -234,18 +230,20 @@ void KspaceImageFilter< TPixelType >
 
         if (!pf)
         {
-            // add gibbs ringing offset (cropps k-space)
-            if (kx>=kxMax/2)
-                kx += xRingingOffset;
-            if (ky>=kyMax/2)
-                ky += yRingingOffset;
-
             vcl_complex<double> s(0,0);
             InputIteratorType it(m_CompartmentImages.at(0), m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
             while( !it.IsAtEnd() )
             {
-                double x = it.GetIndex()[0]-xMax/2;
-                double y = it.GetIndex()[1]-yMax/2;
+                double x = it.GetIndex()[0];
+                double y = it.GetIndex()[1];
+                if ((int)xMax%2==1)
+                    x -= (xMax-1)/2;
+                else
+                    x -= xMax/2;
+                if ((int)yMax%2==1)
+                    y -= (yMax-1)/2;
+                else
+                    y -= yMax/2;
 
                 DoubleVectorType pos; pos[0] = x; pos[1] = y; pos[2] = m_Z;
                 pos = m_Transform*pos/1000;   // vector from image center to current position (in meter)
@@ -264,7 +262,7 @@ void KspaceImageFilter< TPixelType >
 
                 // simulate eddy currents and other distortions
                 double omega = 0;   // frequency offset
-                if (  m_Parameters.m_SignalGen.m_EddyStrength>0 && !m_IsBaseline)
+                if (  m_Parameters.m_SignalGen.m_EddyStrength>0 && m_Parameters.m_Misc.m_CheckAddEddyCurrentsBox && !m_IsBaseline)
                 {
                     omega += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2]) * eddyDecay;
                 }
@@ -286,6 +284,7 @@ void KspaceImageFilter< TPixelType >
                     }
                 }
 
+                // if signal comes from outside FOV, mirror it back (wrap-around artifact - aliasing)
                 if (y<-yMaxFov/2)
                     y += yMaxFov;
                 else if (y>=yMaxFov/2)
@@ -305,8 +304,8 @@ void KspaceImageFilter< TPixelType >
                 s = vcl_complex<double>(s.real()+randGen->GetNormalVariate(0,noiseVar), s.imag()+randGen->GetNormalVariate(0,noiseVar));
 
             outputImage->SetPixel(kIdx, s);
-            m_KSpaceImage->SetPixel(oit.GetIndex(), sqrt(s.imag()*s.imag()+s.real()*s.real()) );
-//            m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
+//            m_KSpaceImage->SetPixel(kIdx, t/dt );
+            m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
         }
 
         ++oit;
@@ -338,27 +337,17 @@ void KspaceImageFilter< TPixelType >
             if (oit.GetIndex()[1]%2 == 1)
                 kIdx[0] = kxMax-kIdx[0]-1;
 
-            // flip k-space
-            if( kIdx[0] <  kxMax/2 )
-                kIdx[0] = kIdx[0] + kxMax/2;
-            else
-                kIdx[0] = kIdx[0] - kxMax/2;
-
-            if( kIdx[1] <  kyMax/2 )
-                kIdx[1] = kIdx[1] + kyMax/2;
-            else
-                kIdx[1] = kIdx[1] - kyMax/2;
-
+            // calculate symmetric index
             itk::Index< 2 > kIdx2;
-            kIdx2[0] = (int)(kxMax-kIdx[0])%(int)kxMax;
-            kIdx2[1] = (int)(kyMax-kIdx[1])%(int)kyMax;
+            kIdx2[0] = (int)(kxMax-kIdx[0]-(int)kxMax%2)%(int)kxMax;
+            kIdx2[1] = (int)(kyMax-kIdx[1]-(int)kyMax%2)%(int)kyMax;
 
+            // use complex conjugate of symmetric index value at current index
             vcl_complex<double> s = outputImage->GetPixel(kIdx2);
             s = vcl_complex<double>(s.real(), -s.imag());
             outputImage->SetPixel(kIdx, s);
 
-            m_KSpaceImage->SetPixel(oit.GetIndex(), sqrt(s.imag()*s.imag()+s.real()*s.real()) );
-//            m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
+            m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
         }
         ++oit;
     }

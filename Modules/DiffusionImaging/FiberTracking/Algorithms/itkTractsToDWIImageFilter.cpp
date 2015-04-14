@@ -514,35 +514,36 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
     temp.Fill(0.0);
     m_OutputImage->FillBuffer(temp);
 
-    if ( m_CroppedRegion.GetSize(0)%2 == 1 )
-        m_CroppedRegion.SetSize(0, m_CroppedRegion.GetSize(0)+1);
-    if ( m_CroppedRegion.GetSize(1)%2 == 1 )
-        m_CroppedRegion.SetSize(1, m_CroppedRegion.GetSize(1)+1);
+    //// NOT NECESSARY ANYMORE
+//    if ( m_CroppedRegion.GetSize(0)%2 == 1 )
+//        m_CroppedRegion.SetSize(0, m_CroppedRegion.GetSize(0)+1);
+//    if ( m_CroppedRegion.GetSize(1)%2 == 1 )
+//        m_CroppedRegion.SetSize(1, m_CroppedRegion.GetSize(1)+1);
 
-    // ADJUST GEOMETRY FOR FURTHER PROCESSING
-    // is input slize size a power of two?
-    unsigned int x=m_Parameters.m_SignalGen.m_ImageRegion.GetSize(0); unsigned int y=m_Parameters.m_SignalGen.m_ImageRegion.GetSize(1);
-    ItkDoubleImgType::SizeType pad; pad[0]=x%2; pad[1]=y%2; pad[2]=0;
-    m_Parameters.m_SignalGen.m_ImageRegion.SetSize(0, x+pad[0]);
-    m_Parameters.m_SignalGen.m_ImageRegion.SetSize(1, y+pad[1]);
-    if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull() && (pad[0]>0 || pad[1]>0))
-    {
-        itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
-        zeroPadder->SetInput(m_Parameters.m_SignalGen.m_FrequencyMap);
-        zeroPadder->SetConstant(0);
-        zeroPadder->SetPadUpperBound(pad);
-        zeroPadder->Update();
-        m_Parameters.m_SignalGen.m_FrequencyMap = zeroPadder->GetOutput();
-    }
-    if (m_Parameters.m_SignalGen.m_MaskImage.IsNotNull() && (pad[0]>0 || pad[1]>0))
-    {
-        itk::ConstantPadImageFilter<ItkUcharImgType, ItkUcharImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
-        zeroPadder->SetInput(m_Parameters.m_SignalGen.m_MaskImage);
-        zeroPadder->SetConstant(0);
-        zeroPadder->SetPadUpperBound(pad);
-        zeroPadder->Update();
-        m_Parameters.m_SignalGen.m_MaskImage = zeroPadder->GetOutput();
-    }
+//    // ADJUST GEOMETRY FOR FURTHER PROCESSING
+//    // is input slize size a power of two?
+//    unsigned int x=m_Parameters.m_SignalGen.m_ImageRegion.GetSize(0); unsigned int y=m_Parameters.m_SignalGen.m_ImageRegion.GetSize(1);
+//    ItkDoubleImgType::SizeType pad; pad[0]=x%2; pad[1]=y%2; pad[2]=0;
+//    m_Parameters.m_SignalGen.m_ImageRegion.SetSize(0, x+pad[0]);
+//    m_Parameters.m_SignalGen.m_ImageRegion.SetSize(1, y+pad[1]);
+//    if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull() && (pad[0]>0 || pad[1]>0))
+//    {
+//        itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
+//        zeroPadder->SetInput(m_Parameters.m_SignalGen.m_FrequencyMap);
+//        zeroPadder->SetConstant(0);
+//        zeroPadder->SetPadUpperBound(pad);
+//        zeroPadder->Update();
+//        m_Parameters.m_SignalGen.m_FrequencyMap = zeroPadder->GetOutput();
+//    }
+//    if (m_Parameters.m_SignalGen.m_MaskImage.IsNotNull() && (pad[0]>0 || pad[1]>0))
+//    {
+//        itk::ConstantPadImageFilter<ItkUcharImgType, ItkUcharImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
+//        zeroPadder->SetInput(m_Parameters.m_SignalGen.m_MaskImage);
+//        zeroPadder->SetConstant(0);
+//        zeroPadder->SetPadUpperBound(pad);
+//        zeroPadder->Update();
+//        m_Parameters.m_SignalGen.m_MaskImage = zeroPadder->GetOutput();
+//    }
 
     // Apply in-plane upsampling for Gibbs ringing artifact
     double upsampling = 1;

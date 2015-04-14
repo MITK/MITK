@@ -208,6 +208,8 @@ namespace mitk {
 
   bool RigidRegistrationPreset::save()
   {
+    // falsely removed return value, the previous implementation was also empty (and only returning false)
+    return false;
   }
 
   itk::Array<double> RigidRegistrationPreset::loadTransformValues(itk::Array<double> transformValues, double transform, const char **atts)

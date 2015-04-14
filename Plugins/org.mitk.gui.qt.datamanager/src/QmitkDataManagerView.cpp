@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDataManagerView.h"
 
-#include <itkOtsuThresholdImageFilter.h>
-
 //# Own Includes
 //## mitk
 #include "mitkDataStorageEditorInput.h"
@@ -401,14 +399,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( ShowInfoDialogForSelectedNodes(bool) ) );
   unknownDataNodeDescriptor->AddAction(actionShowInfoDialog);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,actionShowInfoDialog));
-
-  //obsolete...
-  //QAction* otsuFilterAction = new QAction("Apply Otsu Filter", this);
-  //QObject::connect( otsuFilterAction, SIGNAL( triggered(bool) )
-  //  , this, SLOT( OtsuFilter(bool) ) );
-  // //Otsu filter does not work properly, remove it temporarily
-  // imageDataNodeDescriptor->AddAction(otsuFilterAction);
-  // m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,otsuFilterAction));
 
   QGridLayout* _DndFrameWidgetLayout = new QGridLayout;
   _DndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);

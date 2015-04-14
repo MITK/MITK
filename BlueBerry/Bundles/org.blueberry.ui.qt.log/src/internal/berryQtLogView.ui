@@ -38,7 +38,7 @@
      <item>
       <widget class="QLineEdit" name="filterContent">
        <property name="clearButtonEnabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>

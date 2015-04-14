@@ -74,6 +74,9 @@ QtLogView::QtLogView(QWidget *parent)
 
   ui.ShowAdvancedFields->setChecked( showAdvancedFields );
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+  ui.filterContent->setClearButtonEnabled(true);
+#endif
 }
 
 QtLogView::~QtLogView()

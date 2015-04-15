@@ -496,3 +496,4 @@ bool mitk::CorrectorAlgorithm::ModifySegment(const TSegData &segment, itk::Image
   }
   return true;
 }
+

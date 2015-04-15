@@ -103,6 +103,7 @@ public:
     }
 
     /** input/output image specifications */
+    itk::ImageRegion<3>                 m_CroppedRegion;            ///< Image size with reduced FOV.
     itk::ImageRegion<3>                 m_ImageRegion;              ///< Image size.
     itk::Vector<double,3>               m_ImageSpacing;             ///< Image voxel size.
     itk::Point<double,3>                m_ImageOrigin;              ///< Image origin.

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageFileWriter.h>
+#include <mitkSingleShotEpi.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -52,7 +53,7 @@ void KspaceImageFilter< TPixelType >
     m_Spike = vcl_complex<double>(0,0);
 
     typename OutputImageType::Pointer outputImage = OutputImageType::New();
-    itk::ImageRegion<2> region; region.SetSize(0, m_OutSize[0]);  region.SetSize(1, m_OutSize[1]);
+    itk::ImageRegion<2> region; region.SetSize(0, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(0));  region.SetSize(1, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1));
     outputImage->SetLargestPossibleRegion( region );
     outputImage->SetBufferedRegion( region );
     outputImage->SetRequestedRegion( region );
@@ -103,6 +104,10 @@ void KspaceImageFilter< TPixelType >
         break;
     }
     }
+
+    if (m_ReadoutScheme!=nullptr)
+        delete m_ReadoutScheme;
+    m_ReadoutScheme = new mitk::SingleShotEpi(m_Parameters);
 }
 
 template< class TPixelType >
@@ -153,38 +158,23 @@ void KspaceImageFilter< TPixelType >
 
     typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
 
-    double kxMax = outputImage->GetLargestPossibleRegion().GetSize(0);  // k-space size in x-direction
-    double kyMax = outputImage->GetLargestPossibleRegion().GetSize(1);  // k-space size in y-direction
+    double kxMax = m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(0);
+    double kyMax = m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1);
     double xMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(0); // scanner coverage in x-direction
     double yMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(1); // scanner coverage in y-direction
+    double yMaxFov = yMax*m_Parameters.m_SignalGen.m_CroppingFactor;                // actual FOV in y-direction (in x-direction FOV=xMax)
 
     double numPix = kxMax*kyMax;
-    double dt =  m_Parameters.m_SignalGen.m_tLine/kxMax;
-
-    // k-space center at maximum echo
-    double fromMaxEcho = 0;
-    if ( (int)kyMax%2==0 )
-    {
-        fromMaxEcho = -m_Parameters.m_SignalGen.m_tLine*(kyMax-1)/2 + dt*(kxMax-(int)kxMax%2)/2;
-    }
-    else
-        fromMaxEcho = -m_Parameters.m_SignalGen.m_tLine*(kyMax-1)/2 - dt*(kxMax-(int)kxMax%2)/2;
-
-    double yMaxFov = yMax*m_Parameters.m_SignalGen.m_CroppingFactor;  //  actual FOV in y-direction (in x-direction FOV=xMax)
 
     double noiseVar = m_Parameters.m_SignalGen.m_PartialFourier*m_Parameters.m_SignalGen.m_NoiseVariance/(kyMax*kxMax); // adjust noise variance since it is the intended variance in physical space and not in k-space
 
     while( !oit.IsAtEnd() )
     {
-        itk::Index< 2 > kIdx;
-        kIdx[0] = oit.GetIndex()[0];
-        kIdx[1] = oit.GetIndex()[1];
-
         // dephasing time
-        double t= fromMaxEcho + ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
+        double t= m_ReadoutScheme->GetTimeFromMaxEcho(oit.GetIndex());
 
         // readout time
-        double tall = ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
+        double tall = m_ReadoutScheme->GetRedoutTime(oit.GetIndex());
 
         // calculate eddy current decay factor
         double eddyDecay = 0;
@@ -197,18 +187,14 @@ void KspaceImageFilter< TPixelType >
             for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
                 relaxFactor.push_back( exp(-( m_Parameters.m_SignalGen.m_tEcho+t)/m_T2.at(i) -fabs(t)/ m_Parameters.m_SignalGen.m_tInhom)*(1.0-exp(-m_Parameters.m_SignalGen.m_tRep/m_T1.at(i))) );
 
-        // reverse phase
-        if (!m_Parameters.m_SignalGen.m_ReversePhase)
-            kIdx[1] = kyMax-1-kIdx[1];
+        // get current k-space index (depends on the schosen k-space readout scheme)
+        itk::Index< 2 > kIdx = m_ReadoutScheme->GetActualKspaceIndex(oit.GetIndex());
+
 
         // partial fourier
         bool pf = false;
         if (kIdx[1]>kyMax*m_Parameters.m_SignalGen.m_PartialFourier)
             pf = true;
-
-        // reverse readout direction
-        if (oit.GetIndex()[1]%2 == 1)
-            kIdx[0] = kxMax-kIdx[0]-1;
 
         // shift k for DFT: (0 -- N) --> (-N/2 -- N/2)
         double kx = kIdx[0];

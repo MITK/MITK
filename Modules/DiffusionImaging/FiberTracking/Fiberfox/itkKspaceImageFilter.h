@@ -29,6 +29,7 @@ This file is based heavily on a corresponding ITK filter.
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <mitkFiberfoxParameters.h>
 #include <mitkFiberBundle.h>
+#include <mitkKspaceReadout.h>
 
 using namespace std;
 
@@ -77,7 +78,6 @@ namespace itk{
 
     itkSetMacro( SpikesPerSlice, unsigned int )     ///< Number of spikes per slice. Corresponding parameter in fiberfox parameter object specifies the number of spikes for the whole image and can thus not be used here.
     itkSetMacro( Z, double )                        ///< Slice position, necessary for eddy current simulation.
-    itkSetMacro( OutSize, itk::Size<2> )            ///< Output slice size. Can be different from input size, e.g. if Gibbs ringing is enabled.
     itkSetMacro( UseConstantRandSeed, bool )        ///< Use constant seed for random generator for reproducible results.
     itkSetMacro( Rotation, DoubleVectorType )
     itkSetMacro( Translation, DoubleVectorType )
@@ -114,7 +114,6 @@ namespace itk{
     int                                     m_Zidx;
     bool                                    m_UseConstantRandSeed;
     unsigned int                            m_SpikesPerSlice;
-    itk::Size<2>                            m_OutSize;
     FiberBundle::Pointer                    m_FiberBundle;
     double                                  m_Gamma;
     DoubleVectorType                        m_Rotation;     ///< used to find correct point in frequency map (head motion)
@@ -126,6 +125,7 @@ namespace itk{
 
     double                                  m_CoilSensitivityFactor;
     typename InputImageType::Pointer        m_KSpaceImage;
+    KspaceReadout*                          m_ReadoutScheme;
 
   private:
 

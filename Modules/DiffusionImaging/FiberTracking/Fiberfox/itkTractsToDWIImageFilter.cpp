@@ -49,6 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractsToVectorImageFilter.h>
 #include <itkInvertIntensityImageFilter.h>
 #include <itkShiftScaleImageFilter.h>
+#include <itkExtractImageFilter.h>
 
 namespace itk
 {
@@ -86,9 +87,9 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     magnitudeDwiImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
     magnitudeDwiImage->SetOrigin( m_Parameters.m_SignalGen.m_ImageOrigin );
     magnitudeDwiImage->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
-    magnitudeDwiImage->SetLargestPossibleRegion( m_CroppedRegion );
-    magnitudeDwiImage->SetBufferedRegion( m_CroppedRegion );
-    magnitudeDwiImage->SetRequestedRegion( m_CroppedRegion );
+    magnitudeDwiImage->SetLargestPossibleRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    magnitudeDwiImage->SetBufferedRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    magnitudeDwiImage->SetRequestedRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
     magnitudeDwiImage->SetVectorLength( images.at(0)->GetVectorLength() );
     magnitudeDwiImage->Allocate();
     magnitudeDwiImage->FillBuffer(nullPix);
@@ -97,9 +98,9 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     m_PhaseImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
     m_PhaseImage->SetOrigin( m_Parameters.m_SignalGen.m_ImageOrigin );
     m_PhaseImage->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
-    m_PhaseImage->SetLargestPossibleRegion( m_CroppedRegion );
-    m_PhaseImage->SetBufferedRegion( m_CroppedRegion );
-    m_PhaseImage->SetRequestedRegion( m_CroppedRegion );
+    m_PhaseImage->SetLargestPossibleRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    m_PhaseImage->SetBufferedRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    m_PhaseImage->SetRequestedRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
     m_PhaseImage->SetVectorLength( images.at(0)->GetVectorLength() );
     m_PhaseImage->Allocate();
     m_PhaseImage->FillBuffer(nullPix);
@@ -109,9 +110,9 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 //    itk::Vector<double,4>               imageSpacing4D; imageSpacing4D.Fill(1);
 //    itk::Point<double,4>                imageOrigin4D; imageOrigin4D.Fill(0);
 //    itk::Matrix<double, 4, 4>           imageDirection4D; imageDirection4D.SetIdentity();
-//    imageRegion4D.SetSize(0, m_CroppedRegion.GetSize(0));
-//    imageRegion4D.SetSize(1, m_CroppedRegion.GetSize(1));
-//    imageRegion4D.SetSize(2, m_CroppedRegion.GetSize(2));
+//    imageRegion4D.SetSize(0, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(0));
+//    imageRegion4D.SetSize(1, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1));
+//    imageRegion4D.SetSize(2, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(2));
 //    imageRegion4D.SetSize(3, m_Parameters.m_SignalGen.m_NumberOfCoils);
 //    for (int i=0; i<3; i++)
 //    {
@@ -139,9 +140,9 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     m_KspaceImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
     m_KspaceImage->SetOrigin( m_Parameters.m_SignalGen.m_ImageOrigin );
     m_KspaceImage->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
-    m_KspaceImage->SetLargestPossibleRegion( m_CroppedRegion );
-    m_KspaceImage->SetBufferedRegion( m_CroppedRegion );
-    m_KspaceImage->SetRequestedRegion( m_CroppedRegion );
+    m_KspaceImage->SetLargestPossibleRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    m_KspaceImage->SetBufferedRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    m_KspaceImage->SetRequestedRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
     m_KspaceImage->SetVectorLength( m_Parameters.m_SignalGen.m_NumberOfCoils );
     m_KspaceImage->Allocate();
     m_KspaceImage->FillBuffer(nullPix);
@@ -248,7 +249,6 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
             for (int c=0; c<m_Parameters.m_SignalGen.m_NumberOfCoils; c++)
             {
                 // create k-sapce (inverse fourier transform slices)
-                itk::Size<2> outSize; outSize.SetElement(0, m_CroppedRegion.GetSize(0)); outSize.SetElement(1, m_CroppedRegion.GetSize(1));
                 itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
                 idft->SetCompartmentImages(compartmentSlices);
                 idft->SetT2(t2Vector);
@@ -265,7 +265,6 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                     idft->SetRotation(m_Rotations.at(g));
                 }
                 idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
-                idft->SetOutSize(outSize);
                 if (c==spikeCoil)
                     idft->SetSpikesPerSlice(numSpikes);
 //                idft->SetNumberOfThreads(1);
@@ -498,15 +497,15 @@ template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::InitializeData()
 {
     // initialize output dwi image
-    m_CroppedRegion = m_Parameters.m_SignalGen.m_ImageRegion; m_CroppedRegion.SetSize(1, m_CroppedRegion.GetSize(1)*m_Parameters.m_SignalGen.m_CroppingFactor);
-    itk::Point<double,3> shiftedOrigin = m_Parameters.m_SignalGen.m_ImageOrigin; shiftedOrigin[1] += (m_Parameters.m_SignalGen.m_ImageRegion.GetSize(1)-m_CroppedRegion.GetSize(1))*m_Parameters.m_SignalGen.m_ImageSpacing[1]/2;
+    m_Parameters.m_SignalGen.m_CroppedRegion = m_Parameters.m_SignalGen.m_ImageRegion; m_Parameters.m_SignalGen.m_CroppedRegion.SetSize(1, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1)*m_Parameters.m_SignalGen.m_CroppingFactor);
+    itk::Point<double,3> shiftedOrigin = m_Parameters.m_SignalGen.m_ImageOrigin; shiftedOrigin[1] += (m_Parameters.m_SignalGen.m_ImageRegion.GetSize(1)-m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1))*m_Parameters.m_SignalGen.m_ImageSpacing[1]/2;
     m_OutputImage = OutputImageType::New();
     m_OutputImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
     m_OutputImage->SetOrigin( shiftedOrigin );
     m_OutputImage->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
-    m_OutputImage->SetLargestPossibleRegion( m_CroppedRegion );
-    m_OutputImage->SetBufferedRegion( m_CroppedRegion );
-    m_OutputImage->SetRequestedRegion( m_CroppedRegion );
+    m_OutputImage->SetLargestPossibleRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    m_OutputImage->SetBufferedRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    m_OutputImage->SetRequestedRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
     m_OutputImage->SetVectorLength( m_Parameters.m_SignalGen.GetNumVolumes() );
     m_OutputImage->Allocate();
     typename OutputImageType::PixelType temp;
@@ -515,10 +514,10 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
     m_OutputImage->FillBuffer(temp);
 
     //// NOT NECESSARY ANYMORE
-//    if ( m_CroppedRegion.GetSize(0)%2 == 1 )
-//        m_CroppedRegion.SetSize(0, m_CroppedRegion.GetSize(0)+1);
-//    if ( m_CroppedRegion.GetSize(1)%2 == 1 )
-//        m_CroppedRegion.SetSize(1, m_CroppedRegion.GetSize(1)+1);
+//    if ( m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(0)%2 == 1 )
+//        m_Parameters.m_SignalGen.m_CroppedRegion.SetSize(0, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(0)+1);
+//    if ( m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1)%2 == 1 )
+//        m_Parameters.m_SignalGen.m_CroppedRegion.SetSize(1, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1)+1);
 
 //    // ADJUST GEOMETRY FOR FURTHER PROCESSING
 //    // is input slize size a power of two?

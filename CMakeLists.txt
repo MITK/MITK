@@ -93,7 +93,15 @@ endif()
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   # require at least gcc 4.7.3 as provided by ppa:ubuntu-toolchain-r/test for Ubuntu 12.04
   if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7.3)
-    message(FATAL_ERROR "GCC version must be at least 4.7.3")
+    message(FATAL_ERROR "GCC version must be at least 4.7.3
+If you are using Ubuntu 12.04, you can easily install gcc and g++ 4.7.3 (or any later version available) in addition to your version ${CMAKE_CXX_COMPILER_VERSION}:
+  sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+  sudo apt-get update
+  sudo apt-get install gcc-4.7 g++-4.7
+Make sure to explicitly specify these compilers when configuring MITK:
+  CMAKE_C_COMPILER:FILEPATH=/usr/bin/gcc-4.7
+  CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++-4.7
+For more information on the proposed PPA see the Toolchain Updates section of https://wiki.ubuntu.com/ToolChain.")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # require at least clang 3.4 as provided by Ubuntu 12.04

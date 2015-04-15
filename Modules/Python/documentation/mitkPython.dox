@@ -35,7 +35,7 @@ When using this options all additional libraries installed in the python runtime
 \subsection python_ssec3 Qt5 Support
 
 In order to build MITK-Python with Qt5 support an external build of CTK and PythonQt 3.0 is necessary.
-The actual CTK superbuild only supports PythonQt 2.0 that has no Qt 5 support. This will most likely
+The current MITK CTK superbuild only supports PythonQt 2.0 that has no Qt 5 support. This will most likely
 only work with the MITK_USE_SYSTEM_PYTHON option due to dependencies of each external project.
 It can be build with the following steps:
 
@@ -44,7 +44,7 @@ PythonQt 3 has no CMake build system and has to be build by hand with qmake.
 Download and build PythonQt 3 from <a href="http://pythonqt.sourceforge.net/">sourceforge</a>.
 
 \subsubsection python_Step2 Step2 - Build CTK
-Build the actual CTK with the external PythonQt 3 binaries.
+Build the current CTK master with the external PythonQt 3 binaries.
 The external PythonQt 3 binaries can be added in CTK by adding the following
 CMake variable that points to the PythonQt build directory:
 \code

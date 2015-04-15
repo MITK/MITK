@@ -60,7 +60,7 @@ class MITKSEGMENTATION_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     // used by TobiasHeimannCorrectionAlgorithm
     typedef struct
     {
-      int  lineStart;
+      int lineStart;
       int lineEnd;
       bool modified;
 

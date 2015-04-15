@@ -132,7 +132,7 @@ void QmitkToFUtilView::Activated()
     GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
     GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOn();
 
-    this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
+    mitk::RenderingManager::GetInstance()->InitializeViews();
 
     this->UseToFVisibilitySettings(true);
 
@@ -240,7 +240,7 @@ void QmitkToFUtilView::ResetGUIToDefault()
     this->UseToFVisibilitySettings(false);
 
     //global reinit
-    this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
+    mitk::RenderingManager::GetInstance()->InitializeViews();
     this->RequestRenderWindowUpdate();
   }
 }
@@ -498,7 +498,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   // initialize images
   if (m_MitkDistanceImage.IsNotNull())
   {
-    this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
+      mitk::RenderingManager::GetInstance()->InitializeViews(
           this->m_MitkDistanceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS, true);
   }
   if(this->m_SurfaceNode.IsNotNull())

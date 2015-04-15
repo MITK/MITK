@@ -1146,25 +1146,29 @@ void QmitkRigidRegistrationView::SetRedoEnabled( bool enable )
 
 void QmitkRigidRegistrationView::CheckCalculateEnabled()
 {
-  if (m_FixedNode.IsNotNull() && m_MovingNode.IsNotNull() && m_PresetSelected )
+  if (m_FixedNode.IsNotNull() && m_MovingNode.IsNotNull() )
   {
     m_Controls.m_ManualFrame->setEnabled(true);
-    m_Controls.m_CalculateTransformation->setEnabled(true);
-    if ( (m_FixedDimension != m_MovingDimension && std::max<int>(m_FixedDimension, m_MovingDimension) != 4) || m_FixedDimension < 2 /*|| m_FixedDimension > 3*/)
+
+    if( m_PresetSelected )
     {
-      m_Controls.m_CalculateTransformation->setEnabled(false);
-    }
-    else if (m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() < 5 &&  (m_FixedDimension < 2) /*|| m_FixedDimension > 3)*/)
-    {
-      m_Controls.m_CalculateTransformation->setEnabled(false);
-    }
-    else if ((m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() > 4 && m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() < 13) && !(m_FixedDimension > 2))
-    {
-      m_Controls.m_CalculateTransformation->setEnabled(false);
-    }
-    else if (m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() > 12 &&  m_FixedDimension != 2)
-    {
-      m_Controls.m_CalculateTransformation->setEnabled(false);
+      m_Controls.m_CalculateTransformation->setEnabled(true);
+      if ( (m_FixedDimension != m_MovingDimension && std::max<int>(m_FixedDimension, m_MovingDimension) != 4) || m_FixedDimension < 2 /*|| m_FixedDimension > 3*/)
+      {
+        m_Controls.m_CalculateTransformation->setEnabled(false);
+      }
+      else if (m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() < 5 &&  (m_FixedDimension < 2) /*|| m_FixedDimension > 3)*/)
+      {
+        m_Controls.m_CalculateTransformation->setEnabled(false);
+      }
+      else if ((m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() > 4 && m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() < 13) && !(m_FixedDimension > 2))
+      {
+        m_Controls.m_CalculateTransformation->setEnabled(false);
+      }
+      else if (m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() > 12 &&  m_FixedDimension != 2)
+      {
+        m_Controls.m_CalculateTransformation->setEnabled(false);
+      }
     }
   }
   else

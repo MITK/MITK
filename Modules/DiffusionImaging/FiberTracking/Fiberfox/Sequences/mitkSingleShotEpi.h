@@ -44,7 +44,8 @@ public:
         else
             m_TEhalf = -m_Parameters.m_SignalGen.m_tLine*(kyMax-1)/2 - dt*(kxMax-(int)kxMax%2)/2;
     }
-    ~SingleShotEpi(){}
+    ~SingleShotEpi()
+    {}
 
     double GetTimeFromMaxEcho(itk::Index< 2 > index)
     {

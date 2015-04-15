@@ -34,7 +34,7 @@ public:
     {
         m_Parameters = parameters;
     }
-    ~KspaceReadout(){}
+    virtual ~KspaceReadout(){}
 
     virtual double GetTimeFromMaxEcho(itk::Index< 2 > index) = 0;               ///< time from maximum echo intensity in milliseconds
     virtual double GetRedoutTime(itk::Index< 2 > index) = 0;                    ///< time passed since readout started in milliseconds

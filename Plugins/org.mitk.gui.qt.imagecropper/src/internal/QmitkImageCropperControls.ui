@@ -189,7 +189,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The yellow box around the selected image can be changed in size and orientation. You can use it to mark an interesing region of the image and then use the &amp;quot;Crop&amp;quot; button to cut off parts of the image that are outside the box.&lt;br /&gt;The original image will not be modified, it will only be hidden.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The yellow box around the selected image can be changed in size and orientation. You can use it to mark an interesing region of the image and then use the &amp;quot;Crop&amp;quot; button to cut off parts of the image that are outside the box.&lt;br /&gt;In order to undo/redo operations, please use the corresponding buttons in the workbench. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignVCenter</set>

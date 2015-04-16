@@ -120,6 +120,10 @@ protected:
     /// \brief SetupProgressDialog Sets up progress dialog.
     void SetupProgressDialog(QWidget* parent);
 
+    bool DeletePatients();
+    bool DeleteStudies();
+    bool DeleteSeries();
+
     QProgressDialog* m_ProgressDialog;
     QLabel* m_ProgressDialogLabel;
 

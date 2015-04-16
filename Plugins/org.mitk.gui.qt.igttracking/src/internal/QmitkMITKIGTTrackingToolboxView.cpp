@@ -449,8 +449,8 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
     //create convertion filter
     m_IGTLConversionFilter =  mitk::NavigationDataToIGTLMessageFilter::New();
     m_IGTLConversionFilter->SetName("IGT Tracking Toolbox");
-    m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);
     m_IGTLConversionFilter->ConnectTo(m_ToolVisualizationFilter);
+    m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);
     m_IGTLConversionFilter->RegisterAsMicroservice();
 
     //create server and message provider

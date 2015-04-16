@@ -49,7 +49,7 @@ public:
   QStringList mimeTypes() const;
   bool dropMimeData ( const QMimeData *, Qt::DropAction, int, int, const QModelIndex & );
   Qt::DropActions supportedDropActions() const;
-  Qt::DropActions supportedDragActions() const;
+  //Qt::DropActions supportedDragActions() const;
 
   void CommandExecuted(const std::string& pythonCommand);
 

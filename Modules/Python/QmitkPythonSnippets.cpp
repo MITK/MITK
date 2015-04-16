@@ -16,9 +16,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPythonSnippets.h"
 #include "QmitkPythonScriptEditorHighlighter.h"
-#include <QtGui>
 #include <mitkCommon.h>
 #include <memory>
+
+#include <QToolBar>
+#include <QComboBox>
+#include <QTextEdit>
+#include <QGridLayout>
+#include <QDir>
+#include <QAction>
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+#include <QResource>
+#include <QFileDialog>
 
 struct QmitkPythonSnippetsData
 {

@@ -145,6 +145,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_xmlFormat, SIGNAL(clicked()), this, SLOT(OnToggleFileExtension()));
     connect( m_Controls->m_UseDifferentUpdateRates, SIGNAL(clicked()), this, SLOT(OnToggleDifferentUpdateRates()));
     connect( m_Controls->m_RenderUpdateRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangeRenderUpdateRate()));
+    connect( m_Controls->m_DisableAllTimers, SIGNAL(stateChanged(int)), this, SLOT(EnableDisableTimerButtons(int)));
 
     //connections for the tracking device configuration widget
     connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
@@ -360,6 +361,13 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
 
   //disable buttons
   this->m_Controls->m_MainWidget->setEnabled(false);
+}
+
+void QmitkMITKIGTTrackingToolboxView::EnableDisableTimerButtons(int enable)
+{
+  bool enableBool = enable;
+  m_Controls->m_UpdateRateOptionsGroupBox->setEnabled(!enableBool);
+  m_Controls->m_renderWarningLabel->setVisible(enableBool);
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString errorMessage)

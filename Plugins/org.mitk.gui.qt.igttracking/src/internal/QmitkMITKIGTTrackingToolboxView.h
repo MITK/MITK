@@ -150,6 +150,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    void DisableTrackingConfigurationButtons();
    void EnableTrackingControls();
    void DisableTrackingControls();
+   void EnableDisableTimerButtons(int enable);
 
    void OnToggleDifferentUpdateRates();
 

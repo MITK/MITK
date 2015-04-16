@@ -15,9 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkStaticIGTHelperFunctions.h>
+#include <itkVector.h>
 
-
-double StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quaternion a, mitk::Quaternion b, itk::Vector<double,3> rotationVector)
+double mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quaternion a, mitk::Quaternion b, itk::Vector<double,3> rotationVector)
   {
   double returnValue;
 
@@ -45,7 +45,16 @@ double StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quaternion a
   return returnValue;
   }
 
-itk::Matrix<double,3,3> StaticIGTHelperFunctions::ConvertEulerAnglesToRotationMatrix(double alpha, double beta, double gamma)
+double mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quaternion a, mitk::Quaternion b)
+{
+  itk::Vector<double,3> rotationVector = itk::Vector<double,3>();
+  rotationVector[0] = 0;
+  rotationVector[1] = 0;
+  rotationVector[2] = 1000;
+  return GetAngleBetweenTwoQuaterions(a,b,rotationVector);
+}
+
+itk::Matrix<double,3,3> mitk::StaticIGTHelperFunctions::ConvertEulerAnglesToRotationMatrix(double alpha, double beta, double gamma)
 {
     double PI = 3.141592653589793;
     alpha = alpha * PI / 180;

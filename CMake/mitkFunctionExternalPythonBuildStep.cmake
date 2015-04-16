@@ -40,10 +40,15 @@ function(mitkFunctionExternalPythonBuildStep proj step _python_executable _bin_d
      COMMAND ${_python} ${_command}
      WORKING_DIRECTORY ${_workdir}
      RESULT_VARIABLE result
+     #ERROR_QUIET
+     ERROR_VARIABLE error
+     OUTPUT_VARIABLE output
+     #OUTPUT_QUIET
   )
 
   if(NOT ${result} EQUAL 0)
-    message(FATAL_ERROR "Error in: ${proj}: ${error}")
+    message("Error in: ${proj}: ${error}")
+    message("Output in: ${proj}: ${output}")
   endif()
 endfunction()
 

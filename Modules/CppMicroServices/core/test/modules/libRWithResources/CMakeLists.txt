@@ -8,7 +8,7 @@ set(resource_files
   test.xml
 )
 
-configure_file(resources/foo.txt ${CMAKE_CURRENT_BINARY_DIR}/resources/foo2.txt @COPYONLY)
+configure_file(resources/foo.txt ${CMAKE_CURRENT_BINARY_DIR}/resources/foo2.txt COPYONLY)
 
 usFunctionCreateTestModuleWithResources(TestModuleR
   RESOURCES ${resource_files}

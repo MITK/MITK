@@ -342,13 +342,18 @@ namespace berry
 
   void Preferences::Put(const QString& key, const QString& value)
   {
+    QString oldValue;
     {
       QMutexLocker scopedMutex(&m_Mutex);
       AssertValid_unlocked();
-
+      oldValue = m_Properties[key];
       m_Properties[key] = value;
     }
-    this->SetDirty(true);
+    if (oldValue != value)
+    {
+      this->SetDirty(true);
+      this->OnPropertyChanged(ChangeEvent(this, key, oldValue, value));
+    }
   }
 
   void Preferences::PutByteArray(const QString& key, const QByteArray& value)

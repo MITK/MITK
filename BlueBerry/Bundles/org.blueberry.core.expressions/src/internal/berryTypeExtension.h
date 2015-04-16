@@ -31,64 +31,49 @@ class END_POINT_;
 class TypeExtension : public Object {
 
 public:
-  berryObjectMacro(TypeExtension);
+  berryObjectMacro(TypeExtension)
 
 private:
 
   /* the type this extension is extending */
-  QString fTypeInfo;
+  Reflection::TypeInfo fTypeInfo;
   /* the list of associated extenders */
   QList<IPropertyTester::Pointer> fExtenders;
   bool fExtendersLoaded;
 
   /* the extensions associated with <code>fType</code>'s super classes */
-  QList<TypeExtension::Pointer> fExtends;
-  bool fExtendsLoaded;
+  QList<TypeExtension::Pointer> fInherits;
+  bool fInheritsLoaded;
 
-  TypeExtension() : fExtendersLoaded(false), fExtendsLoaded(false) {
-    // special constructor to create the CONTINUE instance
-  }
-
+  TypeExtension();
 
 protected:
 
   friend class TypeExtensionManager;
 
   /* a special property tester instance that is used to signal that method searching has to continue */
-   /* package */ class CONTINUE_ : public IPropertyTester {
+  class CONTINUE_ : public IPropertyTester {
 
-   public:
+  public:
 
-     berryObjectMacro(CONTINUE_);
+    berryObjectMacro(CONTINUE_)
 
-     bool Handles(const QString&  /*namespaze*/, const QString&  /*method*/) {
-       return false;
-     }
-     bool IsInstantiated() {
-       return true;
-     }
-     bool IsDeclaringPluginActive() {
-       return true;
-     }
-     IPropertyTester* Instantiate() {
-       return this;
-     }
-     bool Test(Object::ConstPointer /*receiver*/, const QString& /*method*/,
-               const QList<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/) {
-       return false;
-     }
-   };
+    bool Handles(const QString&  /*namespaze*/, const QString&  /*method*/);
+    bool IsInstantiated();
+    bool IsDeclaringPluginActive();
+    IPropertyTester* Instantiate();
+    bool Test(Object::ConstPointer /*receiver*/, const QString& /*method*/,
+              const QList<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/);
+  };
 
-   static const CONTINUE_ CONTINUE;
-   static const END_POINT_ END_POINT;
+  static const CONTINUE_ CONTINUE;
+  static const END_POINT_ END_POINT;
 
-  /* package */
-   TypeExtension(const QString &typeInfo);
+  TypeExtension(const Reflection::TypeInfo& typeInfo);
 
-  /* package */
-   IPropertyTester::Pointer FindTypeExtender(TypeExtensionManager& manager,
-       const QString &namespaze, const QString &method,
-       bool staticMethod, bool forcePluginActivation);
+  IPropertyTester::Pointer FindTypeExtender(TypeExtensionManager& manager,
+                                            const QString &namespaze, const QString &method,
+                                            bool staticMethod, bool forcePluginActivation);
 };
 
 
@@ -97,11 +82,8 @@ class END_POINT_ : public TypeExtension
 {
 protected:
   IPropertyTester::Pointer FindTypeExtender(TypeExtensionManager& /*manager*/,
-      const QString& /*namespaze*/, const QString& /*name*/,
-      bool  /*staticMethod*/, bool  /*forcePluginActivation*/)
-  {
-    return CONTINUE_::Pointer(new CONTINUE_());
-  }
+                                            const QString& /*namespaze*/, const QString& /*name*/,
+                                            bool  /*staticMethod*/, bool  /*forcePluginActivation*/);
 };
 
 }  // namespace berry

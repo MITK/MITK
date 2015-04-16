@@ -25,7 +25,7 @@ PlatformObject::PlatformObject()
 {
 }
 
-Object* PlatformObject::GetAdapter(const QString& adapter)
+Object* PlatformObject::GetAdapter(const QString& adapter) const
 {
   IAdapterManager* adapterManager = Platform::GetAdapterManager();
   if (adapterManager)

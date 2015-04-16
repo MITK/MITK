@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryWorkbenchConstants.h"
 #include "berryPartService.h"
 #include "berryStickyViewManager.h"
+#include "berryUIExtensionTracker.h"
 #include "intro/berryIntroConstants.h"
 #include "intro/berryViewIntroAdapterPart.h"
 
@@ -238,7 +239,7 @@ Perspective::Pointer WorkbenchPage::PerspectiveList::GetNextActive()
     }
     else
     {
-      return *(--usedList.end());
+      return *(usedList.end() - 2);
     }
   }
 }
@@ -536,6 +537,11 @@ QList<SmartPointer<IWorkbenchPartReference> > WorkbenchPage::ActivationList::Get
   return resultList;
 }
 
+WorkbenchPage::ActionSwitcher::ActionSwitcher(WorkbenchPage* page)
+  : page(page)
+{
+}
+
 void WorkbenchPage::ActionSwitcher::UpdateActivePart(
     IWorkbenchPart::Pointer newPart)
 {
@@ -625,7 +631,7 @@ void WorkbenchPage::ActionSwitcher::UpdateActivePart(
   //
   //  if (!updateActionSets(newActionSets))
   //  {
-  //    updateActionBars();
+  page->UpdateActionBars();
   //  }
 
   if (isNewPartAnEditor)
@@ -688,7 +694,7 @@ void WorkbenchPage::ActionSwitcher::UpdateTopEditor(
   //  ArrayList newActionSets = calculateActionSets(activePart, newEditor);
   //  if (!updateActionSets(newActionSets))
   //  {
-  //    updateActionBars();
+  page->UpdateActionBars();
   //  }
 
   topEditor = newEditor;
@@ -716,6 +722,7 @@ IExtensionPoint::Pointer WorkbenchPage::GetPerspectiveExtensionPoint()
 
 WorkbenchPage::WorkbenchPage(WorkbenchWindow* w, const QString& layoutID,
                              IAdaptable* input)
+  : actionSwitcher(this)
 {
   if (layoutID == "")
   {
@@ -728,6 +735,7 @@ WorkbenchPage::WorkbenchPage(WorkbenchWindow* w, const QString& layoutID,
 }
 
 WorkbenchPage::WorkbenchPage(WorkbenchWindow* w, IAdaptable* input)
+  : actionSwitcher(this)
 {
   this->Register();
   this->Init(w, "", input, false);
@@ -1150,6 +1158,11 @@ IViewPart::Pointer WorkbenchPage::BusyShowView(const QString& viewID,
     window->FirePerspectiveChanged(thisPage, GetPerspective(), CHANGE_VIEW_SHOW);
   }
   return view;
+}
+
+void WorkbenchPage::UpdateActionBars()
+{
+  window->UpdateActionBars();
 }
 
 void WorkbenchPage::BusyShowView(IViewPart::Pointer part, int mode)
@@ -2193,7 +2206,7 @@ QList<IViewPart::Pointer> WorkbenchPage::GetViews(
   return parts;
 }
 
-IWorkbenchWindow::Pointer WorkbenchPage::GetWorkbenchWindow()
+IWorkbenchWindow::Pointer WorkbenchPage::GetWorkbenchWindow() const
 {
   return IWorkbenchWindow::Pointer(window);
 }
@@ -2363,9 +2376,9 @@ void WorkbenchPage::Init(WorkbenchWindow* w, const QString& layoutID,
     window->FirePerspectiveActivated(IWorkbenchPage::Pointer(this), desc);
   }
 
-  //  getExtensionTracker() .registerHandler(perspectiveChangeHandler,
-  //      ExtensionTracker .createExtensionPointFilter(
-  //          getPerspectiveExtensionPoint()));
+  //this->GetExtensionTracker()->RegisterHandler(perspectiveChangeHandler,
+  //                                             ExtensionTracker::CreateExtensionPointFilter(
+  //                                              GetPerspectiveExtensionPoint()));
 }
 
 void WorkbenchPage::OpenPerspectiveExtras()
@@ -2998,7 +3011,6 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
           WorkbenchConstants::TAG_PERSPECTIVE));
       Perspective::Pointer activePerspective;
 
-      IPerspectiveDescriptor::Pointer validPersp;
       for (int i = 0; i < perspMems.size(); i++)
       {
 
@@ -3014,14 +3026,6 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
         //result.merge(persp.restoreState(current));
         result &= persp->RestoreState(current);
         IPerspectiveDescriptor::Pointer desc = persp->GetDesc();
-        if (desc.IsNotNull())
-        {
-          validPersp=desc;
-        } else
-        {
-          IPerspectiveDescriptor::Pointer desc = WorkbenchPlugin::GetDefault()->
-      GetPerspectiveRegistry()->CreatePerspective("Hallo",validPersp);
-        }
         if (desc == activeDescriptor)
         {
           activePerspective = persp;
@@ -3032,7 +3036,6 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
           activePerspective = persp;
         }
         perspList.Add(persp);
-        //berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry()->Add
         window->FirePerspectiveOpened(WorkbenchPage::Pointer(this), desc);
         //                }
         //              });
@@ -3955,7 +3958,7 @@ void WorkbenchPage::FindSashParts(LayoutTree::Pointer tree,
 
 QList<IWorkbenchPartReference::Pointer> WorkbenchPage::GetAllParts()
 {
-  QList<IViewReference::Pointer> views = viewFactory->GetViews();
+  QList<IViewReference::Pointer> views = this->GetViewFactory()->GetViews();
   QList<IEditorReference::Pointer> editors = this->GetEditorReferences();
 
   QList<IWorkbenchPartReference::Pointer> result;
@@ -4013,17 +4016,14 @@ void WorkbenchPage::TestInvariants()
 
 }
 
-/* (non-Javadoc)
- * @see org.blueberry.ui.IWorkbenchPage#getExtensionTracker()
- */
-//  IExtensionTracker WorkbenchPage::GetExtensionTracker()
-//  {
-//    if (tracker == 0)
-//    {
-//      tracker = new UIExtensionTracker(getWorkbenchWindow().getWorkbench().getDisplay());
-//    }
-//    return tracker;
-//  }
+IExtensionTracker* WorkbenchPage::GetExtensionTracker() const
+{
+  if (tracker.isNull())
+  {
+    tracker.reset(new UIExtensionTracker(GetWorkbenchWindow()->GetWorkbench()->GetDisplay()));
+  }
+  return tracker.data();
+}
 
 /*
  * (non-Javadoc)

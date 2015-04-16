@@ -39,6 +39,7 @@ struct IExtensionRegistry;
 struct IPreferencesService;
 struct ILog;
 
+struct IDebugOptions;
 class LogImpl;
 class PlatformLogChannel;
 
@@ -53,8 +54,11 @@ private:
 
   bool m_ConsoleLog;
 
+  ctkPluginContext* m_Context;
+
   QScopedPointer<ctkServiceTracker<berry::IPreferencesService*> > m_PreferencesTracker;
   QScopedPointer<ctkServiceTracker<berry::IExtensionRegistry*> > m_RegistryTracker;
+  QScopedPointer<ctkServiceTracker<berry::IDebugOptions*> > m_DebugTracker;
 
   QDir m_BaseStatePath;
   QDir m_InstallPath;
@@ -85,13 +89,23 @@ private:
 
   void AssertInitialized() const;
 
+  void OpenServiceTrackers();
+  void CloseServiceTrackers();
+  void InitializeDebugFlags();
+
   void handlePreloadLibraryOption(const std::string &name, const std::string &value);
 
   int main(const std::vector<std::string>& args);
 
   void uninstallPugin(const QUrl& pluginUrl, ctkPluginContext* pfwContext);
 
+  IDebugOptions* GetDebugOptions() const;
+
 public:
+
+  static bool DEBUG;
+  static bool DEBUG_PLUGIN_PREFERENCES;
+
   virtual ~InternalPlatform();
 
   // Poco::Application method overrides
@@ -105,6 +119,9 @@ public:
   void Launch();
   void Shutdown();
 
+  void Start(ctkPluginContext* context);
+  void Stop(ctkPluginContext* context);
+
   ctkPluginContext* GetCTKPluginFrameworkContext() const;
 
   IAdapterManager* GetAdapterManager() const;
@@ -114,6 +131,8 @@ public:
   IPreferencesService* GetPreferencesService();
 
   bool ConsoleLog() const;
+
+  QVariant GetOption(const QString& option, const QVariant& defaultValue = QVariant()) const;
 
   QDir GetConfigurationPath();
 

@@ -55,7 +55,9 @@ Object* HandlerServiceFactory::Create(
     ICommandService* commands = locator->GetService<ICommandService>();
     IEvaluationService* evals = locator->GetService<IEvaluationService>();
     HandlerService* handlerService = new HandlerService(commands, evals, locator);
+    handlerService->Register();
     handlerService->ReadRegistry();
+    handlerService->UnRegister(false);
     return handlerService;
   }
 

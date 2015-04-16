@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchPartReference.h"
 #include "berryIViewReference.h"
 #include "berryIViewPart.h"
+#include "berryIStatus.h"
 
 namespace berry {
 
@@ -418,12 +419,12 @@ private:
     /**
      * Save the layout.
      */
-    public: bool SaveState(IMemento::Pointer memento);
+public: bool SaveState(IMemento::Pointer memento);
 
     /**
      * Save the layout.
      */
-    private: bool SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Pointer p,
+private: bool SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Pointer p,
             bool saveInnerViewState);
 
 //    public: void turnOnActionSets(IActionSetDescriptor[] newArray) {

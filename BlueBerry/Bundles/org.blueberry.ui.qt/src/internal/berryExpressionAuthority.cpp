@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryExpressionAuthority.h"
 
 #include <berryObjectList.h>
+#include <berryObjectTypeInfo.h>
+#include <berryPlatform.h>
+
 #include "berryEvaluationContext.h"
 #include "berryIEvaluationResultCache.h"
 
@@ -39,7 +42,8 @@ ExpressionAuthority::ExpressionAuthority()
   // break smart-pointer self-cycle
   this->UnRegister(false);
   context->SetAllowPluginActivation(true);
-  //context->AddVariable("org.blueberry.core.runtime.Platform", Platform.class);
+  Object::Pointer platformVariable(new ObjectTypeInfo(Reflection::TypeInfo::New<Platform>()));
+  context->AddVariable("org.blueberry.core.runtime.Platform", platformVariable);
 }
 
 bool ExpressionAuthority::Evaluate(const QList<SmartPointer<IEvaluationResultCache> >& collection) const

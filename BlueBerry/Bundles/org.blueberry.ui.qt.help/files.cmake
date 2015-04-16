@@ -7,6 +7,7 @@ set(INTERNAL_CPP_FILES
   berryHelpEditor.cpp
   berryHelpEditorFindWidget.cpp
   berryHelpEditorInput.cpp
+  berryHelpEditorInputFactory.cpp
   berryHelpIndexView.cpp
   berryHelpPerspective.cpp
   berryHelpPluginActivator.cpp
@@ -24,6 +25,7 @@ set(MOC_H_FILES
   src/internal/berryHelpContentView.h
   src/internal/berryHelpEditor.h
   src/internal/berryHelpEditorFindWidget.h
+  src/internal/berryHelpEditorInputFactory.h
   src/internal/berryHelpIndexView.h
   src/internal/berryHelpPerspective.h
   src/internal/berryHelpPluginActivator.h

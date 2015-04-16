@@ -43,6 +43,12 @@ public:
 
   QString GetToolTipText() const;
 
+  QIcon GetIcon() const;
+
+  const IPersistableElement* GetPersistable() const;
+
+  Object* GetAdapter(const QString &adapterType) const;
+
   bool operator==(const Object* o) const;
 
 private:

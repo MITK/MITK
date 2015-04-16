@@ -36,10 +36,16 @@ public:
     try
     {
       code->Run();
-    } catch (const std::exception& e)
+    }
+    catch (const ctkException& e)
     {
       HandleException(code, e);
-    } catch (...)
+    }
+    catch (const std::exception& e)
+    {
+      HandleException(code, e);
+    }
+    catch (...)
     {
       HandleException(code);
     }
@@ -47,8 +53,18 @@ public:
 
 private:
 
-  void HandleException(ISafeRunnable::Pointer code, const std::exception& e =
-      std::exception())
+  void HandleException(ISafeRunnable::Pointer code)
+  {
+    HandleException(code, ctkException("Unknown exception thrown"));
+  }
+
+  void HandleException(ISafeRunnable::Pointer code,
+                       const std::exception& e)
+  {
+    HandleException(code, ctkException(e.what()));
+  }
+
+  void HandleException(ISafeRunnable::Pointer code, const ctkException& e)
   {
     try
     {
@@ -64,7 +80,9 @@ private:
         //                    new Status(IStatus.ERROR, Policy.JFACE,
         //                        IStatus.ERROR,
         //                        "Exception occurred", e)); //$NON-NLS-1$
-      } catch (...)
+        qDebug() << e.printStackTrace();
+      }
+      catch (...)
       {
         //e.printStackTrace();
         BERRY_ERROR << "Exception occurred" << std::endl;
@@ -86,7 +104,7 @@ SafeRunnable::SafeRunnable(const QString& message) :
 
 }
 
-void SafeRunnable::HandleException(const std::exception&  /*e*/)
+void SafeRunnable::HandleException(const ctkException&  /*e*/)
 {
   // Workaround to avoid interactive error dialogs during
   // automated testing

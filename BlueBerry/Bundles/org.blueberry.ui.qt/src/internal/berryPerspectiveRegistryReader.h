@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+struct IExtensionRegistry;
 class PerspectiveRegistry;
 
 /**
@@ -37,25 +38,22 @@ private:
 
 public:
 
-    /**
-     * RegistryViewReader constructor comment.
-     */
-    PerspectiveRegistryReader();
+  /**
+   * RegistryViewReader constructor comment.
+   */
+  PerspectiveRegistryReader(PerspectiveRegistry* out);
 
-    /**
-     * Read the view extensions within a registry.
-     *
-     * @param out the perspective registry to use
-     */
-    void ReadPerspectives(PerspectiveRegistry* out);
+  /**
+   * Read the view extensions within a registry.
+   *
+   * @param out the perspective registry to use
+   */
+  void ReadPerspectives(IExtensionRegistry* in);
 
-protected:
-
-    /**
-     * readElement method comment.
-     */
-    // for dynamic UI - change access from protected to public
-    bool ReadElement(const IConfigurationElement::Pointer& element);
+  /**
+   * readElement method comment.
+   */
+  bool ReadElement(const IConfigurationElement::Pointer& element);
 
 };
 

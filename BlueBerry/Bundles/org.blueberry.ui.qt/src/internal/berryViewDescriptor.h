@@ -150,7 +150,7 @@ protected:
   /* (non-Javadoc)
    * @see IAdaptable#GetAdapterImpl(const std::type_info&)
    */
-  Object* GetAdapter(const QString& adapter);
+  Object* GetAdapter(const QString& adapter) const;
 
 private:
   /**

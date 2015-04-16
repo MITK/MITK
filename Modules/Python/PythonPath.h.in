@@ -4,16 +4,25 @@
 #define PYTHON_PATH_BUILD_TYPE "/Release"
 #endif
 
-#define PYTHONPATH_COMMAND "import sys\n"\
-"sys.path.append('@SimpleITK_DIR@/bin')\n"\
-"sys.path.append('@SimpleITK_DIR@/lib')\n"\
-"sys.path.append('@SimpleITK_DIR@/Wrapping')\n"\
-"sys.path.append('@VTK_DIR@/Wrapping/Python')\n"\
-"sys.path.append('@VTK_DIR@/lib')\n"\
-"sys.path.append('@VTK_DIR@/bin" PYTHON_PATH_BUILD_TYPE "')\n"\
-"sys.path.append('@OpenCV_DIR@/lib" PYTHON_PATH_BUILD_TYPE "')\n"\
-"sys.path.append('@OpenCV_DIR@/lib')\n"\
-"sys.path.append('@OpenCV_DIR@/bin')\n"\
-"sys.path.append('@OpenCV_DIR@/bin" PYTHON_PATH_BUILD_TYPE "')"
+#ifdef WIN32
+//Todo: windows system python
+#define EXTERNAL_SITE_PACKAGES "@MITK_EXTERNAL_PROJECT_PREFIX@/lib/python2.7/Lib/site-packages"
+#define EXTERNAL_DIST_PACKAGES "@MITK_EXTERNAL_PROJECT_PREFIX@/lib/python2.7/Lib/dist-packages"
+#define PYTHONHOME "@MITK_EXTERNAL_PROJECT_PREFIX@/lib/python2.7"
+#else
+#define EXTERNAL_SITE_PACKAGES "@MITK_EXTERNAL_PROJECT_PREFIX@/lib/python2.7/site-packages"
+#define EXTERNAL_DIST_PACKAGES "@MITK_EXTERNAL_PROJECT_PREFIX@/lib/python2.7/dist-packages"
+#define PYTHONHOME "@MITK_EXTERNAL_PROJECT_PREFIX@"
+#endif
 
-#define PYTHONHOME "@Python_DIR@"
+//#define PYTHONPATH_COMMAND "import sys\n"\
+//"sys.path.append('@SimpleITK_DIR@/bin')\n"\
+//"sys.path.append('@SimpleITK_DIR@/lib')\n"\
+//"sys.path.append('@SimpleITK_DIR@/Wrapping')\n"\
+//"sys.path.append('@VTK_DIR@/Wrapping/Python')\n"\
+//"sys.path.append('@VTK_DIR@/lib')\n"\
+//"sys.path.append('@VTK_DIR@/bin" PYTHON_PATH_BUILD_TYPE "')\n"\
+//"sys.path.append('@OpenCV_DIR@/lib" PYTHON_PATH_BUILD_TYPE "')\n"\
+//"sys.path.append('@OpenCV_DIR@/lib')\n"\
+//"sys.path.append('@OpenCV_DIR@/bin')\n"\
+//"sys.path.append('@OpenCV_DIR@/bin" PYTHON_PATH_BUILD_TYPE "')"

@@ -27,7 +27,7 @@ namespace berry {
 /**
  * An abstract base implementation for contribution items.
  */
-class ContributionItem : public IContributionItem
+class BERRY_UI_QT ContributionItem : public IContributionItem
 {
 
 public:
@@ -79,19 +79,19 @@ public:
    * The default implementation of this <code>IContributionItem</code>
    * method does nothing. Subclasses may override.
    */
-  QAction* Fill(QMenu* menu, QAction* before);
+  void Fill(QMenu* menu, QAction* before);
 
   /**
    * The default implementation of this <code>IContributionItem</code>
    * method does nothing. Subclasses may override.
    */
-  QAction* Fill(QMenuBar* menu, QAction* before);
+  void Fill(QMenuBar* menu, QAction* before);
 
   /**
    * The default implementation of this <code>IContributionItem</code>
    * method does nothing. Subclasses may override.
    */
-  QAction* Fill(QToolBar* parent, QAction* before);
+  void Fill(QToolBar* parent, QAction* before);
 
   /**
    * The default implementation of this <code>IContributionItem</code>

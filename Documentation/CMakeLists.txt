@@ -40,7 +40,7 @@ set(MITK_DOXYGEN_TAGFILE_NAME ${MITK_DOXYGEN_OUTPUT_DIR}/MITK.tag CACHE INTERNAL
 # This is relative to the working directory of the doxygen command
 set(MITK_DOXYGEN_STYLESHEET mitk_doxygen_extra.css)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${MITK_DOXYGEN_STYLESHEET}
-               ${CMAKE_CURRENT_BINARY_DIR}/${MITK_DOXYGEN_STYLESHEET} @COPYONLY)
+               ${CMAKE_CURRENT_BINARY_DIR}/${MITK_DOXYGEN_STYLESHEET} COPYONLY)
 
 # Create QCH files for MITK and external projects
 set(MITK_DOXYGEN_GENERATE_QHP "NO")
@@ -188,21 +188,19 @@ if(MITK_USE_BLUEBERRY)
                          )
 
     add_dependencies(doc mitkXPDoc BlueBerryXPDoc)
-    #if(${PROJECT_NAME} STREQUAL "MITK")
-    #  add_dependencies(doc BlueBerryDoc)
-    #endif()
   endif(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
+  add_dependencies(doc BlueBerryDoc)
 endif(MITK_USE_BLUEBERRY)
 
 #if(MITK_DOXYGEN_GENERATE_ITK_QCH_FILE)
-#  # add the command to generate the ITK documantation
+#  # add the command to generate the ITK documentation
 #  add_custom_target(doc-itk
 #                    COMMAND ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.itk.conf)
 #  add_dependencies(doc doc-itk)
 #endif()
 
 #if(MITK_DOXYGEN_GENERATE_VTK_QCH_FILE)
-#  # add the command to generate the VTK documantation
+#  # add the command to generate the VTK documentation
 #  add_custom_target(doc-vtk
 #                    COMMAND ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.vtk.conf)
 #  add_dependencies(doc doc-vtk)

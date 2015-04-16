@@ -175,6 +175,11 @@ QString PerspectiveDescriptor::GetId() const
   return id;
 }
 
+QString PerspectiveDescriptor::GetLocalId() const
+{
+  return GetId();
+}
+
 QString PerspectiveDescriptor::GetPluginId() const
 {
   return configElement == 0 ? pluginId : configElement->GetContributor()->GetName();

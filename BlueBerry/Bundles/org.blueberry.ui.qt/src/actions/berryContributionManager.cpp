@@ -21,7 +21,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIContributionManagerOverrides.h"
 #include "berryIContributionItem.h"
 
+#include <berryQActionContributionItem.h>
+
 namespace berry {
+
+ContributionManager::~ContributionManager()
+{
+}
+
+void ContributionManager::Add(QAction* action, const QString& id)
+{
+  Q_ASSERT_X(action, "nullcheck", "QAction must not be null");
+  this->Add(IContributionItem::Pointer(new QActionContributionItem(action, id)));
+}
 
 void ContributionManager::Add(const SmartPointer<IContributionItem>& item)
 {
@@ -31,6 +43,11 @@ void ContributionManager::Add(const SmartPointer<IContributionItem>& item)
     contributions.append(item);
     ItemAdded(item);
   }
+}
+
+void ContributionManager::AppendToGroup(const QString& groupName, QAction* action, const QString& id)
+{
+  AddToGroup(groupName, IContributionItem::Pointer(new QActionContributionItem(action, id)), true);
 }
 
 void ContributionManager::AppendToGroup(const QString& groupName, const SmartPointer<IContributionItem>& item)

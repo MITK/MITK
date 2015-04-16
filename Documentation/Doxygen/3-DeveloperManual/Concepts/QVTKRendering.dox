@@ -58,8 +58,9 @@ mitk::Mapper::SetDefaultProperties() should be used to define mapper-specific pr
 \li The QmitkRenderWindow can be accessed like this: this->GetRenderWindowPart()->GetRenderWindow("axial");
 \li The vtkRenderWindow can be accessed like this: this->GetRenderWindowPart()->GetRenderWindow("axial")->GetVtkRenderWindow();
 \li The mitkBaseRenderer can be accessed like this: mitk::BaseRenderer* renderer  = mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart()->GetRenderWindow("sagittal")->GetRenderWindow());
-\li An update request of the overall QmitkStdMultiWidget can be performed with: this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
-\li A single QmitkRenderWindow update request can be done like this: this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdate(this->GetRenderWindowPart()->GetRenderWindow("axial")->GetVtkRenderWindow());
+\li An update request of the overall QmitkStdMultiWidget can be performed with: mitk::RenderingManager::GetInstance()->RequestUpdateAll() or alternatively with the shorthand this->RequestRenderWindowUpdate();
+\li A single QmitkRenderWindow update request can be done like this: mitk::RenderingManager::GetInstance()->RequestUpdate(this->GetRenderWindowPart()->GetRenderWindow("axial")->GetVtkRenderWindow());
+\li be aware that GetRenderWindowPart() can return null if the editor is closed. This is a common reason for nullpointer exceptions.
 
 \note The usage of ForceImmediateUpdateAll() is not desired in most common use-cases.
 
@@ -101,8 +102,8 @@ to add additional Interactors/Listeners.
 
 \subsection QVTKRendering_userGuideMapper How to write your own Mapper
 
-If you want to write your own mapper, you first need to decide whether you want to write a VTK-based mapper or a GL-based mapper. 
-We recommend  to write a VTK-based mapper, as VTK is easy to learn and some GL-based mappers can have unexpected site effects. 
+If you want to write your own mapper, you first need to decide whether you want to write a VTK-based mapper or a GL-based mapper.
+We recommend  to write a VTK-based mapper, as VTK is easy to learn and some GL-based mappers can have unexpected site effects.
 However, you need to derive from the respective classes.
 
 In the following we provide some programming hints for writing a Vtk-based mapper:
@@ -112,14 +113,14 @@ contain all VTK ressources such as actors, textures, mappers, polydata etc.
 The LocalStorageHandler is responsible for providing a LocalStorage to a concrete mitk::Mapper subclass. Each RenderWindow / mitk::BaseRenderer is
 assigned its own LocalStorage instance so that all contained ressources (actors, shaders, textures, ...) are provided individually per window.
 
-\li GenerateDataForRenderer() should be reimplemented in order to generate the primitives that should be rendered. This method is called in each Mapper::Update() pass, thus, 
+\li GenerateDataForRenderer() should be reimplemented in order to generate the primitives that should be rendered. This method is called in each Mapper::Update() pass, thus,
 all primitives that are rendered are recomputed. Employ LocalStorage::IsGenerateDataRequired() to determine whether it is necessary to generate the primitives again. It is not
-necessary to generate them again in case the scene has just been translated or rotated.  
+necessary to generate them again in case the scene has just been translated or rotated.
 
-\li For 2D mappers, it is necessary to determine the 3D primitives close to the current plane that should be drawn. Use 
+\li For 2D mappers, it is necessary to determine the 3D primitives close to the current plane that should be drawn. Use
    planeGeometry = renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry() to get the current plane. The distance to it can be determined by using planeGeometry->DistanceFromPlane(point).
 
-\li Reimplement GetVtkProp(), that should return the specific VtkProp generated in GenerateDataForRender() (e.g. a single actor or a propassembly, which is a combination of different actors). 
+\li Reimplement GetVtkProp(), that should return the specific VtkProp generated in GenerateDataForRender() (e.g. a single actor or a propassembly, which is a combination of different actors).
 The VtkProp is picked up in one of the four render passes and thus integrated into the VTK render pipeline.
 
 \li SetDefaultProperties() should be used to define mapper-specific properties.

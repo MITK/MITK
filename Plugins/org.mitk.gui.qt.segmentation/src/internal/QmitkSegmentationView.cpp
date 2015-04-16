@@ -46,15 +46,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkSegmentationView::VIEW_ID =
    "org.mitk.views.segmentation";
-
 // public methods
 
 QmitkSegmentationView::QmitkSegmentationView()
-   :m_Parent(NULL)
+   :m_MouseCursorSet(false)
+   ,m_Parent(NULL)
    ,m_Controls(NULL)
    ,m_MultiWidget(NULL)
    ,m_DataSelectionChanged(false)
-   ,m_MouseCursorSet(false)
 {
    mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
    mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
@@ -486,7 +485,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
          this->UpdateWarningLabel("Select or create a segmentation");
       }
 
-      mitk::SurfaceInterpolationController::GetInstance()->RemoveSegmentationFromContourList(image);
+      mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);
    }
    mitk::DataNode* tempNode = const_cast<mitk::DataNode*>(node);
    //Since the binary property could be changed during runtime by the user

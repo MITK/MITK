@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef BERRYOSGILIGHTOBJECT_H_
-#define BERRYOSGILIGHTOBJECT_H_
+#ifndef BERRYOBJECT_H_
+#define BERRYOBJECT_H_
 
 #include <org_blueberry_core_runtime_Export.h>
 
@@ -93,6 +93,12 @@ public:
   static const char* GetStaticClassName();
   virtual QString GetClassName() const;
 
+  static Reflection::TypeInfo GetStaticTypeInfo();
+  virtual Reflection::TypeInfo GetTypeInfo() const;
+
+  static QList<Reflection::TypeInfo> GetStaticSuperclasses();
+  virtual QList<Reflection::TypeInfo> GetSuperclasses() const;
+
   /** Delete an BlueBerry object. This method should always be used to delete an
    * object when the new operator was used to create it. Using the C
    * delete method will not work with reference counting.  */
@@ -106,8 +112,6 @@ public:
   void operator delete(void*);
   void operator delete[](void*, size_t);
 #endif
-
-  static QString DemangleName(const char* typeName);
 
   /**
    * Cause the object to print itself out. This is usually used to provide
@@ -244,4 +248,4 @@ Q_DECLARE_METATYPE(berry::Object::Pointer)
 
 org_blueberry_core_runtime_EXPORT uint qHash(const berry::Object& o);
 
-#endif /*BERRYOSGILIGHTOBJECT_H_*/
+#endif /*BERRYOBJECT_H_*/

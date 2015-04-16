@@ -31,8 +31,6 @@ class QAction;
 namespace berry
 {
 
-class MMMenuListener;
-
 /**
  * A menu manager is a contribution manager which realizes itself and its items
  * in a menu control; either as a menu bar, a sub-menu, or a context menu.
@@ -40,8 +38,9 @@ class MMMenuListener;
  * This class may be instantiated; it may also be subclassed.
  * </p>
  */
-class BERRY_UI_QT MenuManager: public ContributionManager, public IMenuManager
+class BERRY_UI_QT MenuManager: public QObject, public ContributionManager, public IMenuManager
 {
+  Q_OBJECT
 
 public:
 
@@ -49,18 +48,10 @@ public:
 
 private:
 
-  friend class MMMenuListener;
-
   /**
    * The menu id.
    */
   QString id;
-
-  /**
-   * List of registered menu listeners (element type: <code>IMenuListener</code>).
-   */
-  //IMenuListener::Events menuEvents;
-  //GuiTk::IMenuListener::Pointer menuListener;
 
   /**
    * The menu control; <code>null</code> before
@@ -68,8 +59,6 @@ private:
    */
   QMenuProxy* menu;
   QAction* menuItem;
-
-  QScopedPointer<MMMenuListener> menuListener;
 
   /**
    * The menu item widget; <code>null</code> before
@@ -87,11 +76,6 @@ private:
    * The image for a sub-menu.
    */
   QIcon image;
-
-  /**
-   * A resource manager to remember all of the images that have been used by this menu.
-   */
-  //LocalResourceManager imageManager;
 
   /**
    * The overrides for items of this manager
@@ -115,6 +99,11 @@ private:
    */
   QString definitionId;
 
+private:
+
+  Q_SLOT void HandleAboutToShow();
+  Q_SLOT void HandleAboutToHide();
+
 protected:
 
   /**
@@ -124,6 +113,9 @@ protected:
   bool visible;
 
 public:
+
+  Q_SIGNAL void AboutToShow(IMenuManager* mm);
+  Q_SIGNAL void AboutToHide(IMenuManager* mm);
 
   /**
    * Creates a menu manager with the given text and id.
@@ -147,11 +139,6 @@ public:
    */
   MenuManager(const QString& text, const QIcon& image,
               const QString& id);
-
-  /*
-   * @see IMenuManager#AddMenuListener(SmartPointer<IMenuListener>)
-   */
-  //void AddMenuListener(SmartPointer<IMenuListener> listener);
 
   bool IsDirty() const;
 
@@ -179,6 +166,9 @@ public:
    */
   QMenuBar* CreateMenuBar(QWidget* parent);
 
+  void AddMenuListener(QObject* listener);
+  void RemoveMenuListener(QObject *listener);
+
   /*
    * @see IContributionItem#Fill(QStatusBar*)
    */
@@ -187,17 +177,17 @@ public:
   /*
    * @see IContributionItem#Fill(QToolBar*, int)
    */
-  QAction* Fill(QToolBar* parent, QAction *index);
+  void Fill(QToolBar* parent, QAction *index);
 
   /*
    * @see IContributionItem#Fill(QMenu*, int)
    */
-  QAction* Fill(QMenu* parent, QAction *before);
+  void Fill(QMenu* parent, QAction *before);
 
   /*
    * @see IContributionItem#Fill(QMenuBar*, int)
    */
-  QAction* Fill(QMenuBar* parent, QAction *before);
+  void Fill(QMenuBar* parent, QAction *before);
 
   /*
    * @see IMenuManager#FindMenuUsingPath(const QString&)
@@ -328,14 +318,14 @@ public:
   void SetVisible(bool visible);
 
   /**
-   * Sets the action definition id of this action. This simply allows the menu
+   * Sets the command id of this action. This simply allows the menu
    * item text to include a short cut if available.  It can be used to
    * notify a user of a key combination that will open a quick menu.
    *
    * @param definitionId
    *            the command definition id
    */
-  void SetActionDefinitionId(const QString& definitionId);
+  void SetCommandId(const QString& definitionId);
 
   /*
    * @see IContributionItem#Update()
@@ -360,35 +350,6 @@ public:
 private:
 
   /**
-   * Notifies any menu listeners that a menu is about to show.
-   * Only listeners registered at the time this method is called are notified.
-   *
-   * @param manager the menu manager
-   *
-   * @see IMenuListener#menuAboutToShow
-   */
-  //void FireAboutToShow(IMenuManager::Pointer manager);
-
-  /**
-   * Notifies any menu listeners that a menu is about to hide.
-   * Only listeners registered at the time this method is called are notified.
-   *
-   * @param manager the menu manager
-   *
-   */
-  //void FireAboutToHide(IMenuManager::Pointer manager);
-
-  /**
-   * Notifies all listeners that this menu is about to appear.
-   */
-  //void HandleAboutToShow();
-
-  /**
-   * Notifies all listeners that this menu is about to disappear.
-   */
-  //void HandleAboutToHide();
-
-  /**
    * Initializes the menu control.
    */
   void InitializeMenu();
@@ -405,35 +366,12 @@ private:
    */
   void UpdateMenuItem();
 
-  QAction* FillMenu(QWidget* parent, QAction* before);
+  void FillMenu(QWidget* parent, QAction* before);
 
   void DumpActionInfo(QMenuProxy* menu);
   void DumpActionInfo(QWidget* widget, int level);
 
 protected:
-
-  /**
-   * Get all the items from the implementation's widget.
-   *
-   * @return the menu items
-   */
-  //QList<SmartPointer<IMenuItem> > GetMenuItems();
-
-  /**
-   * Get an item from the implementation's widget.
-   *
-   * @param index
-   *            of the item
-   * @return the menu item
-   */
-  //SmartPointer<IMenuItem> GetMenuItem(unsigned int index);
-
-  /**
-   * Get the menu item count for the implementation's widget.
-   *
-   * @return the number of items
-   */
-  //unsigned int GetMenuItemCount();
 
   /**
    * Call an <code>IContributionItem</code>'s fill method with the

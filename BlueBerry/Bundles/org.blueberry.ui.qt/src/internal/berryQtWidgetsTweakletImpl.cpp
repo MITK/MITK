@@ -356,6 +356,7 @@ QWidget* QtWidgetsTweakletImpl::CreateComposite(QWidget* parent)
 void QtWidgetsTweakletImpl::DisposeShell(Shell::Pointer shell)
 {
   shellList.removeAll(shell);
+  shell->SetVisible(false);
 }
 
 QList<Shell::Pointer> QtWidgetsTweakletImpl::GetShells()

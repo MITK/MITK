@@ -75,6 +75,11 @@
       <action name="start_hovering" />
       <action name="select_point" />
     </transition>
+
+    <transition event_class="InteractionKeyEvent" event_variant="StdDelete" target="Start" > <!-- delete figure -->
+      <condition name="figure_is_selected" />
+      <action name="delete_figure" />
+    </transition>
   </state>
 
   <state name="HoveringOverFigure">

@@ -34,6 +34,10 @@ public:
   virtual bool Exists() const;
   virtual QString GetName() const;
   virtual QString GetToolTipText() const;
+  QIcon GetIcon() const;
+  const berry::IPersistableElement* GetPersistable() const;
+  berry::Object* GetAdapter(const QString& adapterType) const;
+
   virtual bool operator==(const berry::Object* o) const;
 
 private:

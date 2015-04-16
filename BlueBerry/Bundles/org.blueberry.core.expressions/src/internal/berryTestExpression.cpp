@@ -32,10 +32,13 @@ const QString TestExpression::ATT_PROPERTY = "property";
 const QString TestExpression::ATT_ARGS = "args";
 const QString TestExpression::ATT_FORCE_PLUGIN_ACTIVATION = "forcePluginActivation";
 
-TypeExtensionManager TestExpression::fgTypeExtensionManager("propertyTesters");
-
 const uint TestExpression::HASH_INITIAL= qHash("berry::TextExpression");
 
+TypeExtensionManager& TestExpression::GetTypeExtensionManager()
+{
+  static TypeExtensionManager mgr("propertyTesters");
+  return mgr;
+}
 
 TestExpression::TestExpression(const IConfigurationElement::Pointer& element)
 {
@@ -102,14 +105,10 @@ TestExpression::Evaluate(IEvaluationContext* context) const
       return EvaluationResult::FALSE_EVAL;
     }
 
-    ObjectString::Pointer var = fArgs[0].Cast<ObjectString>();
-    if (var)
-      return EvaluationResult::ValueOf(static_cast<QString&>(*var) == str);
-
-    return EvaluationResult::FALSE_EVAL;
+    return EvaluationResult::ValueOf(str == fArgs[0]->ToString());
   }
 
-  Property::Pointer property= fgTypeExtensionManager.GetProperty(element, fNamespace, fProperty, context->GetAllowPluginActivation() && fForcePluginActivation);
+  Property::Pointer property= GetTypeExtensionManager().GetProperty(element, fNamespace, fProperty, context->GetAllowPluginActivation() && fForcePluginActivation);
   if (!property->IsInstantiated())
     return EvaluationResult::NOT_LOADED;
   return EvaluationResult::ValueOf(property->Test(element, fArgs, fExpectedValue));
@@ -139,7 +138,7 @@ TestExpression::operator==(const Object* object) const
 uint TestExpression::ComputeHashCode() const
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fArgs)
-  * HASH_FACTOR + fExpectedValue->HashCode()
+  * HASH_FACTOR + (fExpectedValue.IsNull() ? 0 : fExpectedValue->HashCode())
   * HASH_FACTOR + qHash(fNamespace)
   * HASH_FACTOR + qHash(fProperty)
   * HASH_FACTOR + (fForcePluginActivation ? 1 : 0);
@@ -184,7 +183,7 @@ TestExpression::TestGetForcePluginActivation()
 TypeExtensionManager&
 TestExpression::TestGetTypeExtensionManager()
 {
-  return fgTypeExtensionManager;
+  return GetTypeExtensionManager();
 }
 
 }

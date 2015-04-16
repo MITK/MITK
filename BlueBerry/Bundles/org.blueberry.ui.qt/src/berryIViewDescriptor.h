@@ -58,6 +58,14 @@ struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAd
    */
   virtual IViewPart::Pointer CreateView() = 0;
 
+  /**
+   * Returns a list of ids belonging to keyword reference extensions.
+   *
+   * The keywords listed in each referenced id can be used to filter
+   * this view.
+   *
+   * @return A list of ids for keyword reference extensions.
+   */
   virtual QStringList GetKeywordReferences() const = 0;
 
   /**

@@ -19,8 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkXMLParser.h>
 #include "MitkRigidRegistrationExports.h"
+
 #include <map>
 #include <string>
+#include <list>
+
 #include <itkArray.h>
 #include "mitkCommon.h"
 
@@ -68,6 +71,9 @@ namespace mitk {
     * \brief Returns an array including all interpolator values belonging to preset \e name.
     */
     itk::Array<double> getInterpolatorValues(std::string name);
+
+    std::list< std::string>& getAvailablePresets();
+
     /**
     * \brief Returns a map with all preset names and their according transform values as an array.
     */
@@ -156,6 +162,7 @@ namespace mitk {
       std::map<std::string, itk::Array<double> > m_MetricValues;
       std::map<std::string, itk::Array<double> > m_OptimizerValues;
       std::map<std::string, itk::Array<double> > m_InterpolatorValues;
+      std::list<std::string> m_LoadedPresets;
 
       std::string m_XmlFileName;
   };

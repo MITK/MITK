@@ -76,6 +76,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION( "end_interaction", EndInteraction );
   CONNECT_FUNCTION( "start_hovering", StartHovering )
   CONNECT_FUNCTION( "end_hovering", EndHovering );
+  CONNECT_FUNCTION( "delete_figure", DeleteFigure );
 }
 
 
@@ -181,6 +182,18 @@ bool mitk::PlanarFigureInteractor::EndHovering( StateMachineAction*, Interaction
   // Set bool property to indicate that planar figure is no longer in "hovering" mode
   GetDataNode()->SetBoolProperty( "planarfigure.ishovering", false );
 
+  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+
+  return false;
+}
+
+bool mitk::PlanarFigureInteractor::DeleteFigure( StateMachineAction*, InteractionEvent* interactionEvent )
+{
+  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
+  planarFigure->RemoveAllObservers();
+  GetDataNode()->RemoveAllObservers();
+
+  interactionEvent->GetSender()->GetDataStorage()->Remove( GetDataNode() );
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 
   return false;

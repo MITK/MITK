@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPreferencesDialog.h"
 
 #include "berryPlatform.h"
+#include "berryPlatformUI.h"
+#include "berryIWorkbench.h"
 #include "berryIConfigurationElement.h"
 #include "berryIExtensionRegistry.h"
 #include "berryIExtension.h"
@@ -80,8 +82,6 @@ public:
 
     QList<berry::IConfigurationElement::Pointer>::iterator keywordRefsIt;
 
-    QString keywordLabels;
-
     for (prefPagesIt = prefPages.begin(); prefPagesIt != prefPages.end(); ++prefPagesIt)
     {
       QString id = (*prefPagesIt)->GetAttribute("id");
@@ -89,6 +89,8 @@ public:
       QString className = (*prefPagesIt)->GetAttribute("class");
       if(!id.isEmpty() && !name.isEmpty() && !className.isEmpty())
       {
+        QString keywordLabels;
+
         QString category = (*prefPagesIt)->GetAttribute("category");
         //# collect keywords
         QList<berry::IConfigurationElement::Pointer> keywordRefs = (*prefPagesIt)->GetChildren("keywordreference"); // get all keyword references
@@ -318,6 +320,7 @@ void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
   {
 
     d->m_CurrentPage = 0;
+    berry::IWorkbench* workbench = berry::PlatformUI::GetWorkbench();
     for(QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin(); it != d->m_PrefPages.end(); ++it, ++d->m_CurrentPage)
     {
       if(it->treeWidgetItem == selectedItems.at(0))
@@ -326,12 +329,8 @@ void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
         if(it->prefPage == 0)
         {
           berry::IPreferencePage* page = it->confElem->CreateExecutableExtension<berry::IPreferencePage>("class");
-          if (page == 0)
-          {
-            // support legacy BlueBerry extensions
-            page = it->confElem->CreateExecutableExtension<berry::IPreferencePage>("class");
-          }
           it->prefPage = dynamic_cast<berry::IQtPreferencePage*>(page);
+          it->prefPage->Init(berry::IWorkbench::Pointer(workbench));
           it->prefPage->CreateQtControl(d->m_PreferencesPanel);
           d->m_PreferencesPanel->addWidget(it->prefPage->GetQtControl());
         }

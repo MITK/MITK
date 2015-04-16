@@ -167,7 +167,7 @@ m_MovingGeometry(NULL), m_ImageGeometry(NULL)
   m_Preset = new mitk::RigidRegistrationPreset();
   m_Preset->LoadPreset();
 
-  this->DoLoadRigidRegistrationPreset("AffineMutualInformationGradientDescent");
+  this->DoLoadRigidRegistrationPreset("Affine3DMutualInformation_LinearInterp");
 }
 
 QmitkRigidRegistrationSelectorView::~QmitkRigidRegistrationSelectorView()
@@ -545,6 +545,11 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationParameter()
   if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
 
   this->DoLoadRigidRegistrationPreset(dialog.GetPresetName());
+}
+
+void QmitkRigidRegistrationSelectorView::LoadRigidRegistrationPresetParameter(QString preset_name)
+{
+  this->DoLoadRigidRegistrationPreset(preset_name.toStdString() );
 }
 
 void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::string presetName)

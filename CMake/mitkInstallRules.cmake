@@ -45,11 +45,17 @@ if(WIN32)
     install(FILES "${_qmake_path}/../plugins/sqldrivers/qsqlite.dll"
             DESTINATION "bin/plugins/sqldrivers"
             CONFIGURATIONS Release)
+    install(FILES "${_qmake_path}/../plugins/imageformats/qsvg.dll"
+            DESTINATION "bin/plugins/imageformats"
+            CONFIGURATIONS Release)
     install(FILES "${_qmake_path}/../plugins/platforms/qwindowsd.dll"
             DESTINATION "bin/plugins/platforms"
             CONFIGURATIONS Debug)
     install(FILES "${_qmake_path}/../plugins/sqldrivers/qsqlited.dll"
             DESTINATION "bin/plugins/sqldrivers"
+            CONFIGURATIONS Debug)
+    install(FILES "${_qmake_path}/../plugins/imageformats/qsvgd.dll"
+            DESTINATION "bin/plugins/imageformats"
             CONFIGURATIONS Debug)
   endif()
 

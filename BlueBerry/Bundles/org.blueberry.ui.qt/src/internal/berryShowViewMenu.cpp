@@ -38,6 +38,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+const QString ShowViewMenu::NO_TARGETS_MSG = "<No Applicable Views>";
+
 struct ActionComparator {
   bool operator()(const CommandContributionItemParameter::Pointer& p1,
                   const CommandContributionItemParameter::Pointer& p2) const
@@ -79,25 +81,25 @@ bool ShowViewMenu::IsDynamic() const
   return true;
 }
 
-QAction* ShowViewMenu::Fill(QMenu* menu, QAction* before)
+void ShowViewMenu::Fill(QMenu* menu, QAction* before)
 {
-//  if (MenuManager::Pointer mm = GetParent().Cast<MenuManager>())
-//  {
-//    mm->AddMenuListener(menuListener);
-//  }
+  if (MenuManager* mm = dynamic_cast<MenuManager*>(GetParent()))
+  {
+    this->connect(mm, SIGNAL(AboutToShow(IMenuManager*)), SLOT(AboutToShow(IMenuManager*)));
+  }
 
   if (!dirty)
   {
-    return 0;
+    return;
   }
 
   MenuManager::Pointer manager(new MenuManager());
   FillMenu(manager.GetPointer());
 
   QList<IContributionItem::Pointer> items = manager->GetItems();
-  if (items.size() == 0)
+  if (items.isEmpty())
   {
-    QAction* action = new QAction("No Views registered", menu);
+    QAction* action = new QAction(NO_TARGETS_MSG, menu);
     action->setEnabled(false);
     menu->insertAction(before, action);
   }
@@ -105,12 +107,11 @@ QAction* ShowViewMenu::Fill(QMenu* menu, QAction* before)
   {
     foreach (IContributionItem::Pointer item, items)
     {
-      before = item->Fill(menu, before);
+      item->Fill(menu, before);
     }
   }
 
   dirty = false;
-  return before;
 }
 
 void ShowViewMenu::FillMenu(IMenuManager* innerMgr)
@@ -187,6 +188,12 @@ QSet<QPair<QString,QString> > ShowViewMenu::GetShortcuts(IWorkbenchPage* page) c
   return list;
 }
 
+void ShowViewMenu::AboutToShow(IMenuManager* manager)
+{
+  manager->MarkDirty();
+  this->dirty = true;
+}
+
 CommandContributionItemParameter::Pointer ShowViewMenu::GetItem(const QString& viewId, const QString& secondaryId) const
 {
   IViewRegistry* reg = WorkbenchPlugin::GetDefault()->GetViewRegistry();
@@ -203,6 +210,9 @@ CommandContributionItemParameter::Pointer ShowViewMenu::GetItem(const QString& v
     QString pluginId;
 
   public:
+
+    berryObjectMacro(PluginCCIP, CommandContributionItemParameter, IPluginContribution)
+
     PluginCCIP(const IViewDescriptor::Pointer& v, IServiceLocator* serviceLocator,
                const QString& id, const QString& commandId, CommandContributionItem::Style style)
       : CommandContributionItemParameter(serviceLocator, id, commandId, style)

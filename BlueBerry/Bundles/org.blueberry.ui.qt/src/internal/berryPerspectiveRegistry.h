@@ -20,17 +20,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIPerspectiveRegistry.h"
 
+#include "berryIExtensionChangeHandler.h"
 #include "berryPerspectiveDescriptor.h"
 
 #include <list>
 
 namespace berry {
 
+class XMLMemento;
+
 /**
  * Perspective registry.
  */
-class PerspectiveRegistry : public IPerspectiveRegistry {
-    // IExtensionChangeHandler {
+class PerspectiveRegistry : public IPerspectiveRegistry,
+     public IExtensionChangeHandler
+{
 
   friend class PerspectiveDescriptor;
 
@@ -51,7 +55,13 @@ private:
   // keep track of the perspectives the user has selected to remove or revert
   QList<QString> perspToRemove;
 
-  //IPropertyChangeListener::Pointer preferenceListener;
+  class PreferenceChangeListener;
+  QScopedPointer<PreferenceChangeListener> preferenceListener;
+
+  virtual void AddExtension(IExtensionTracker* tracker, const SmartPointer<IExtension>& extension);
+
+  virtual void RemoveExtension(const SmartPointer<IExtension>& extension,
+                               const QList<SmartPointer<Object> >& objects);
 
 public:
 
@@ -61,203 +71,122 @@ public:
   PerspectiveRegistry();
 
   /**
-     * Adds a perspective. This is typically used by the reader.
-     *
-     * @param desc
-     */
-    void AddPerspective(PerspectiveDescriptor::Pointer desc);
+   * Adds a perspective. This is typically used by the reader.
+   *
+   * @param desc
+   */
+  void AddPerspective(PerspectiveDescriptor::Pointer desc);
 
-    /**
-       * Create a new perspective.
-       *
-       * @param label
-       *            the name of the new descriptor
-       * @param originalDescriptor
-       *            the descriptor on which to base the new descriptor
-       * @return a new perspective descriptor or <code>null</code> if the
-       *         creation failed.
-       */
-      IPerspectiveDescriptor::Pointer CreatePerspective(const QString& label,
-          IPerspectiveDescriptor::Pointer originalDescriptor);
+  /**
+   * Create a new perspective.
+   *
+   * @param label
+   *            the name of the new descriptor
+   * @param originalDescriptor
+   *            the descriptor on which to base the new descriptor
+   * @return a new perspective descriptor or <code>null</code> if the
+   *         creation failed.
+   */
+  IPerspectiveDescriptor::Pointer CreatePerspective(const QString& label,
+                                                    IPerspectiveDescriptor::Pointer originalDescriptor);
 
-      /**
-       * Reverts a list of perspectives back to the plugin definition
-       *
-       * @param perspToRevert
-       */
-      void RevertPerspectives(const QList<PerspectiveDescriptor::Pointer>& perspToRevert);
+  /**
+   * Reverts a list of perspectives back to the plugin definition
+   *
+   * @param perspToRevert
+   */
+  void RevertPerspectives(const QList<PerspectiveDescriptor::Pointer>& perspToRevert);
 
-      /**
-       * Deletes a list of perspectives
-       *
-       * @param perspToDelete
-       */
-      void DeletePerspectives(const QList<PerspectiveDescriptor::Pointer>& perspToDelete);
+  /**
+   * Deletes a list of perspectives
+   *
+   * @param perspToDelete
+   */
+  void DeletePerspectives(const QList<PerspectiveDescriptor::Pointer>& perspToDelete);
 
-      /**
-       * Delete a perspective. Has no effect if the perspective is defined in an
-       * extension.
-       *
-       * @param in
-       */
-      void DeletePerspective(IPerspectiveDescriptor::Pointer in);
+  /**
+   * Delete a perspective. Has no effect if the perspective is defined in an
+   * extension.
+   *
+   * @param in
+   */
+  void DeletePerspective(IPerspectiveDescriptor::Pointer in);
 
-      /*
-         * (non-Javadoc)
-         *
-         * @see org.blueberry.ui.IPerspectiveRegistry#findPerspectiveWithId(java.lang.QString)
-         */
-         IPerspectiveDescriptor::Pointer FindPerspectiveWithId(const QString& id);
+  /**
+   * Loads the registry.
+   */
+  void Load();
 
-        /*
-         * (non-Javadoc)
-         *
-         * @see org.blueberry.ui.IPerspectiveRegistry#findPerspectiveWithLabel(java.lang.QString)
-         */
-         IPerspectiveDescriptor::Pointer FindPerspectiveWithLabel(const QString& label);
+  /**
+   * Saves a custom perspective definition to the preference store.
+   *
+   * @param desc
+   *            the perspective
+   * @param memento
+   *            the memento to save to
+   * @throws IOException
+   */
+  void SaveCustomPersp(PerspectiveDescriptor::Pointer desc, XMLMemento* memento);
 
-        /**
-         * @see IPerspectiveRegistry#getDefaultPerspective()
-         */
-         QString GetDefaultPerspective();
+  /**
+   * Gets the Custom perspective definition from the preference store.
+   *
+   * @param id
+   *            the id of the perspective to find
+   * @return IMemento a memento containing the perspective description
+   *
+   * @throws WorkbenchException
+   * @throws IOException
+   */
+  IMemento::Pointer GetCustomPersp(const QString& id);
 
-        /*
-         * (non-Javadoc)
-         *
-         * @see org.blueberry.ui.IPerspectiveRegistry#getPerspectives()
-         */
-         QList<IPerspectiveDescriptor::Pointer> GetPerspectives();
+  /**
+   * Return <code>true</code> if a label is valid. This checks only the
+   * given label in isolation. It does not check whether the given label is
+   * used by any existing perspectives.
+   *
+   * @param label
+   *            the label to test
+   * @return whether the label is valid
+   */
+  bool ValidateLabel(const QString& label);
 
-        /**
-         * Loads the registry.
-         */
-        void Load();
+  /**
+   * Dispose the receiver.
+   */
+  ~PerspectiveRegistry();
 
-        /**
-           * Saves a custom perspective definition to the preference store.
-           *
-           * @param desc
-           *            the perspective
-           * @param memento
-           *            the memento to save to
-           * @throws IOException
-           */
-        //  void SaveCustomPersp(PerspectiveDescriptor::Pointer desc, XMLMemento::Pointer memento);
+  // ---------- IPerspectiveRegistry methods ------------
 
-          /**
-           * Gets the Custom perspective definition from the preference store.
-           *
-           * @param id
-           *            the id of the perspective to find
-           * @return IMemento a memento containing the perspective description
-           *
-           * @throws WorkbenchException
-           * @throws IOException
-           */
-          IMemento::Pointer GetCustomPersp(const QString& id);
+  virtual IPerspectiveDescriptor::Pointer FindPerspectiveWithId(const QString& id);
+  virtual IPerspectiveDescriptor::Pointer FindPerspectiveWithLabel(const QString& label);
 
-          /**
-             * @see IPerspectiveRegistry#setDefaultPerspective(QString)
-             */
-            void SetDefaultPerspective(const QString& id);
+  virtual QString GetDefaultPerspective();
 
-            /**
-             * Return <code>true</code> if a label is valid. This checks only the
-             * given label in isolation. It does not check whether the given label is
-             * used by any existing perspectives.
-             *
-             * @param label
-             *            the label to test
-             * @return whether the label is valid
-             */
-            bool ValidateLabel(const QString& label);
+  virtual QList<IPerspectiveDescriptor::Pointer> GetPerspectives();
 
-            /*
-               * (non-Javadoc)
-               *
-               * @see org.blueberry.ui.IPerspectiveRegistry#clonePerspective(java.lang.QString,
-               *      java.lang.QString, org.blueberry.ui.IPerspectiveDescriptor)
-               */
-              IPerspectiveDescriptor::Pointer ClonePerspective(const QString& id, const QString& label,
-                  IPerspectiveDescriptor::Pointer originalDescriptor);
+  virtual void SetDefaultPerspective(const QString& id);
 
-              /*
-               * (non-Javadoc)
-               *
-               * @see org.blueberry.ui.IPerspectiveRegistry#revertPerspective(org.blueberry.ui.IPerspectiveDescriptor)
-               */
-              void RevertPerspective(IPerspectiveDescriptor::Pointer perspToRevert);
+  virtual IPerspectiveDescriptor::Pointer ClonePerspective(const QString& id, const QString& label,
+      IPerspectiveDescriptor::Pointer originalDescriptor);
 
-              /**
-               * Dispose the receiver.
-               */
-              ~PerspectiveRegistry();
-
-              /*
-               * (non-Javadoc)
-               *
-               * @see org.blueberry.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.blueberry.core.runtime.IExtension,
-               *      java.lang.Object[])
-               */
-//              void removeExtension(IExtension source, Object[] objects) {
-//                for (int i = 0; i < objects.length; i++) {
-//                  if (objects[i] instanceof PerspectiveDescriptor) {
-//                    // close the perspective in all windows
-//                    IWorkbenchWindow[] windows = PlatformUI.getWorkbench()
-//                        .getWorkbenchWindows();
-//                    PerspectiveDescriptor desc = (PerspectiveDescriptor) objects[i];
-//                    for (int w = 0; w < windows.length; ++w) {
-//                      IWorkbenchWindow window = windows[w];
-//                      IWorkbenchPage[] pages = window.getPages();
-//                      for (int p = 0; p < pages.length; ++p) {
-//                        WorkbenchPage page = (WorkbenchPage) pages[p];
-//                        ClosePerspectiveHandler.closePerspective(page, page
-//                            .findPerspective(desc));
-//                      }
-//                    }
-//
-//                    // ((Workbench)PlatformUI.getWorkbench()).getPerspectiveHistory().removeItem(desc);
-//
-//                    internalDeletePerspective(desc);
-//                  }
-//
-//                }
-//              }
-
-              /*
-               * (non-Javadoc)
-               *
-               * @see org.blueberry.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.blueberry.core.runtime.dynamicHelpers.IExtensionTracker,
-               *      org.blueberry.core.runtime.IExtension)
-               */
-//              void addExtension(IExtensionTracker tracker,
-//                  IExtension addedExtension) {
-//                IConfigurationElement[] addedElements = addedExtension
-//                    .getConfigurationElements();
-//                for (int i = 0; i < addedElements.length; i++) {
-//                  PerspectiveRegistryReader reader = new PerspectiveRegistryReader(
-//                      this);
-//                  reader.readElement(addedElements[i]);
-//                }
-//              }
+  virtual void RevertPerspective(IPerspectiveDescriptor::Pointer perspToRevert);
 
 protected:
 
   /**
-     * Removes the custom definition of a perspective from the preference store
-     *
-     * @param desc
-     */
-    /* package */
-    void DeleteCustomDefinition(PerspectiveDescriptor::Pointer desc);
+   * Removes the custom definition of a perspective from the preference store
+   *
+   * @param desc
+   */
+  void DeleteCustomDefinition(PerspectiveDescriptor::Pointer desc);
 
-    /**
-     * Method hasCustomDefinition.
-     *
-     * @param desc
-     */
-    /* package */
-    bool HasCustomDefinition(PerspectiveDescriptor::ConstPointer desc) const;
+  /**
+   * Method hasCustomDefinition.
+   *
+   * @param desc
+   */
+  bool HasCustomDefinition(PerspectiveDescriptor::ConstPointer desc) const;
 
 private:
 
@@ -277,7 +206,6 @@ private:
    *
    * @param desc
    *            the perspective to delete
-   * @since 3.1
    */
   void InternalDeletePerspective(PerspectiveDescriptor::Pointer desc);
 

@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDataManagerView.h"
 
-#include <itkOtsuThresholdImageFilter.h>
-
 //# Own Includes
 //## mitk
 #include "mitkDataStorageEditorInput.h"
@@ -401,14 +399,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( ShowInfoDialogForSelectedNodes(bool) ) );
   unknownDataNodeDescriptor->AddAction(actionShowInfoDialog);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,actionShowInfoDialog));
-
-  //obsolete...
-  //QAction* otsuFilterAction = new QAction("Apply Otsu Filter", this);
-  //QObject::connect( otsuFilterAction, SIGNAL( triggered(bool) )
-  //  , this, SLOT( OtsuFilter(bool) ) );
-  // //Otsu filter does not work properly, remove it temporarily
-  // imageDataNodeDescriptor->AddAction(otsuFilterAction);
-  // m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,otsuFilterAction));
 
   QGridLayout* _DndFrameWidgetLayout = new QGridLayout;
   _DndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);
@@ -834,9 +824,9 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
   {
     return;
   }
-  std::vector<mitk::DataNode*> selectedNodes;
+  std::vector<mitk::DataNode::Pointer> selectedNodes;
 
-  mitk::DataNode* node = 0;
+  mitk::DataNode::Pointer node = 0;
   QString question = tr("Do you really want to remove ");
 
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
@@ -844,7 +834,7 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
   {
     node = m_NodeTreeModel->GetNode(*it);
     // if node is not defined or if the node contains geometry data do not remove it
-    if ( node != 0 /*& strcmp(node->GetData()->GetNameOfClass(), "PlaneGeometryData") != 0*/ )
+    if ( node.IsNotNull() /*& strcmp(node->GetData()->GetNameOfClass(), "PlaneGeometryData") != 0*/ )
     {
       selectedNodes.push_back(node);
       question.append(QString::fromStdString(node->GetName()));
@@ -862,7 +852,7 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
 
   if(answerButton == QMessageBox::Yes)
   {
-    for (std::vector<mitk::DataNode*>::iterator it = selectedNodes.begin()
+    for (std::vector<mitk::DataNode::Pointer>::iterator it = selectedNodes.begin()
       ; it != selectedNodes.end(); it++)
     {
       node = *it;
@@ -943,58 +933,6 @@ void QmitkDataManagerView::GlobalReinit( bool )
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 }
 
-void QmitkDataManagerView::OtsuFilter( bool )
-{
-  QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
-
-  mitk::Image::Pointer mitkImage = 0;
-  foreach(mitk::DataNode::Pointer node, selectedNodes)
-  {
-    mitkImage = dynamic_cast<mitk::Image*>( node->GetData() );
-
-    if(mitkImage.IsNull())
-      continue;
-
-    try
-    {
-      // get selected mitk image
-      const unsigned short dim = 3;
-      typedef short InputPixelType;
-      typedef unsigned char OutputPixelType;
-
-      typedef itk::Image< InputPixelType, dim > InputImageType;
-      typedef itk::Image< OutputPixelType, dim > OutputImageType;
-
-      typedef itk::OtsuThresholdImageFilter< InputImageType, OutputImageType > FilterType;
-      FilterType::Pointer filter = FilterType::New();
-
-      filter->SetOutsideValue( 1 );
-      filter->SetInsideValue( 0 );
-
-      InputImageType::Pointer itkImage;
-      mitk::CastToItkImage(mitkImage, itkImage);
-
-      filter->SetInput( itkImage );
-
-      filter->Update();
-
-      mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-      std::string nameOfResultImage = node->GetName();
-      nameOfResultImage.append("Otsu");
-      resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
-      resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
-      resultNode->SetData( mitk::ImportItkImage(filter->GetOutput())->Clone());
-
-      this->GetDataStorage()->Add(resultNode, node);
-
-    }
-    catch( std::exception& err )
-    {
-      MITK_ERROR(qPrintable(this->GetClassName())) << err.what();
-    }
-
-  }
-}
 void QmitkDataManagerView::NodeTreeViewRowsRemoved (
   const QModelIndex & /*parent*/, int /*start*/, int /*end*/ )
 {

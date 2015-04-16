@@ -45,7 +45,7 @@ class BERRY_UI_QT PlatformUI
 {
 public:
 
-  static const QString PLUGIN_ID();
+  static QString PLUGIN_ID();
   static const QString XP_WORKBENCH;
   static const QString XP_VIEWS;
 

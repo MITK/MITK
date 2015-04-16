@@ -25,11 +25,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-
-TypeExtension::TypeExtension(const QString& typeInfo)
- : fTypeInfo(typeInfo), fExtendersLoaded(false), fExtendsLoaded(false)
+TypeExtension::TypeExtension()
+  : fExtendersLoaded(false)
+  , fInheritsLoaded(false)
 {
+  // special constructor to create the CONTINUE instance
+}
 
+TypeExtension::TypeExtension(const Reflection::TypeInfo& typeInfo)
+  : fTypeInfo(typeInfo)
+  , fExtendersLoaded(false)
+  , fInheritsLoaded(false)
+{
 }
 
 IPropertyTester::Pointer TypeExtension::FindTypeExtender(
@@ -38,7 +45,7 @@ IPropertyTester::Pointer TypeExtension::FindTypeExtender(
 {
   if (!fExtendersLoaded)
   {
-    fExtenders = manager.LoadTesters(fTypeInfo);
+    fExtenders = manager.LoadTesters(fTypeInfo.GetName());
     fExtendersLoaded = true;
   }
   IPropertyTester::Pointer result;
@@ -100,22 +107,49 @@ IPropertyTester::Pointer TypeExtension::FindTypeExtender(
     return CONTINUE_::Pointer(new CONTINUE_());
 
   // handle inheritance chain
-  // TODO Reflection
-//  if (!fExtendsLoaded) {
-//    fExtends.clear();
-//    Object::ExtTypeInfo types(fTypeInfo);
-//    while (!types.m_TypeNames.empty()) {
-//      types.m_TypeNames.pop_back();
-//      types.m_TypeInfos.pop_back();
-//      fExtends.push_back(manager.Get(types));
-//    }
-//    fExtendsLoaded = true;
-//  }
-//  for (unsigned int i= 0; i < fExtends.size(); i++) {
-//    result = fExtends[i]->FindTypeExtender(manager, namespaze, method, staticMethod, forcePluginActivation);
-//    if (result.Cast<CONTINUE_>().IsNull())
-//      return result;
-//  }
+  if (!fInheritsLoaded)
+  {
+    fInherits.clear();
+    QList<Reflection::TypeInfo> superClasses = fTypeInfo.GetSuperclasses();
+    foreach(const Reflection::TypeInfo& superClass, superClasses)
+    {
+      fInherits.push_back(manager.Get(superClass));
+    }
+    fInheritsLoaded = true;
+  }
+  foreach(const TypeExtension::Pointer& typeExtension, fInherits)
+  {
+    result = typeExtension->FindTypeExtender(manager, namespaze, method, staticMethod, forcePluginActivation);
+    if (result.Cast<CONTINUE_>().IsNull())
+    {
+      return result;
+    }
+  }
+  return CONTINUE_::Pointer(new CONTINUE_());
+}
+
+bool TypeExtension::CONTINUE_::Handles(const QString&, const QString&) {
+  return false;
+}
+
+bool TypeExtension::CONTINUE_::IsInstantiated() {
+  return true;
+}
+
+bool TypeExtension::CONTINUE_::IsDeclaringPluginActive() {
+  return true;
+}
+
+IPropertyTester*TypeExtension::CONTINUE_::Instantiate() {
+  return this;
+}
+
+bool TypeExtension::CONTINUE_::Test(Object::ConstPointer, const QString&, const QList<Object::Pointer>&, Object::Pointer) {
+  return false;
+}
+
+IPropertyTester::Pointer END_POINT_::FindTypeExtender(TypeExtensionManager&, const QString&, const QString&, bool, bool)
+{
   return CONTINUE_::Pointer(new CONTINUE_());
 }
 

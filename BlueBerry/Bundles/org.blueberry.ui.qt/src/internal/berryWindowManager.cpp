@@ -80,12 +80,12 @@ bool WindowManager::Close()
   return true;
 }
 
-std::size_t WindowManager::GetWindowCount()
+std::size_t WindowManager::GetWindowCount() const
 {
   return windows.size();
 }
 
-QList<Window::Pointer> WindowManager::GetWindows()
+QList<Window::Pointer> WindowManager::GetWindows() const
 {
   return windows;
 }

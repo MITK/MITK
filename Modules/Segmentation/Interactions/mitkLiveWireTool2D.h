@@ -101,6 +101,13 @@ class MITKSEGMENTATION_EXPORT LiveWireTool2D : public SegTool2D
     /// \brief Finish contour interaction.
     void FinishTool();
 
+    ///
+    /// \brief IsPositionEventInsideImageRegion
+    /// \param interactionEvent
+    /// \return
+    ///
+    virtual bool IsPositionEventInsideImageRegion(InteractionPositionEvent *positionEvent, BaseData * data);
+
     /** \brief Enable interaction with contours.
     * Contours that are created by the tool can be edited using LiveWire functionality.
     * Points can thus be inserted, moved or deleted.

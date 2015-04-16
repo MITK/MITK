@@ -40,6 +40,7 @@ public:
 
   static QString GetPluginId();
 
+  void start(ctkPluginContext *context);
   void stop(ctkPluginContext* context);
   ctkPluginContext* GetPluginContext() const;
 

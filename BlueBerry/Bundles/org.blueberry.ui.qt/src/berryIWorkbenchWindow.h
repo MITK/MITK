@@ -70,7 +70,7 @@ struct IWorkbench;
 struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocator, public virtual Object
 {
 
-  berryObjectMacro(berry::IWorkbenchWindow)
+  berryObjectMacro(berry::IWorkbenchWindow, IPageService, IServiceLocator, Object)
 
   /**
    * Closes this workbench window.
@@ -84,7 +84,16 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    */
   virtual bool Close() = 0;
 
-  virtual SmartPointer<IWorkbenchPage> GetPage(int i) const = 0;
+  /**
+   * Returns a list of the pages in this workbench window.
+   * <p>
+   * Note that each window has its own pages; pages are never shared between
+   * different windows.
+   * </p>
+   *
+   * @return a list of pages
+   */
+  virtual QList<SmartPointer<IWorkbenchPage> > GetPages() const = 0;
 
   /**
    * Returns the currently active page for this workbench window.
@@ -115,7 +124,7 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    *
    * @return the selection service
    */
-  virtual ISelectionService* GetSelectionService() = 0;
+  virtual ISelectionService* GetSelectionService() const = 0;
 
   /**
    * Returns this workbench window's shell.
@@ -130,7 +139,7 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    *
    * @return the workbench
    */
-  virtual IWorkbench* GetWorkbench() = 0;
+  virtual IWorkbench* GetWorkbench() const = 0;
 
   /**
    * Returns whether the specified menu is an application menu as opposed to
@@ -198,11 +207,11 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    */
   virtual SmartPointer<IWorkbenchPage> OpenPage(IAdaptable* input) = 0;
 
-  virtual void SetPerspectiveExcludeList(const QStringList& v) = 0;
-  virtual QStringList GetPerspectiveExcludeList() const = 0;
+  //virtual void SetPerspectiveExcludeList(const QStringList& v) = 0;
+  //virtual QStringList GetPerspectiveExcludeList() const = 0;
 
-  virtual void SetViewExcludeList(const QStringList& v) = 0;
-  virtual QStringList GetViewExcludeList() const = 0;
+  //virtual void SetViewExcludeList(const QStringList& v) = 0;
+  //virtual QStringList GetViewExcludeList() const = 0;
 
   virtual ~IWorkbenchWindow();
 

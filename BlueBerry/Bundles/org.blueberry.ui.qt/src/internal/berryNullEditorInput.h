@@ -32,7 +32,7 @@ private: EditorReference::Pointer editorReference;
 
 public:
 
-  berryObjectMacro(NullEditorInput);
+  berryObjectMacro(NullEditorInput)
 
   NullEditorInput();
 
@@ -41,31 +41,20 @@ public:
    * given editor reference.
    *
    * @param editorReference the editor reference
-   * @since 3.4
    */
   NullEditorInput(EditorReference::Pointer editorReference);
 
-    /* (non-Javadoc)
-     * @see org.blueberry.ui.IEditorInput#exists()
-     */
    bool Exists() const;
 
-    /* (non-Javadoc)
-     * @see org.blueberry.ui.IEditorInput#getImageDescriptor()
-     */
-//   ImageDescriptor getImageDescriptor() {
-//        return ImageDescriptor.getMissingImageDescriptor();
-//    }
+   QIcon GetIcon() const;
 
-    /* (non-Javadoc)
-     * @see org.blueberry.ui.IEditorInput#getName()
-     */
-    QString GetName() const;
+   QString GetName() const;
 
-    /* (non-Javadoc)
-     * @see org.blueberry.ui.IEditorInput#getToolTipText()
-     */
-    QString GetToolTipText() const;
+   const IPersistableElement* GetPersistable() const;
+
+   QString GetToolTipText() const;
+
+   Object* GetAdapter(const QString &adapterType) const;
 
     bool operator==(const Object* o) const;
 

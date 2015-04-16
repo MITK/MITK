@@ -66,7 +66,7 @@ public:
    *    or <code>null</code> if this object does not
    *    have an adapter for the given class
    */
-  virtual Object* GetAdapter(const QString& adapterType) = 0;
+  virtual Object* GetAdapter(const QString& adapterType) const = 0;
 
   template<class A>
   A* GetAdapter()
@@ -74,8 +74,8 @@ public:
     const char* typeName = qobject_interface_iid<A*>();
     if (typeName == NULL)
     {
-      BERRY_WARN << "Error getting adapter for '" << Object::DemangleName(typeid(*this).name()) << "': "
-                 << "Cannot get the interface id for type '" << Object::DemangleName(typeid(A).name())
+      BERRY_WARN << "Error getting adapter for '" << Reflection::DemangleName(typeid(*this).name()) << "': "
+                 << "Cannot get the interface id for type '" << Reflection::GetClassName<A>()
                  << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
       return NULL;
     }

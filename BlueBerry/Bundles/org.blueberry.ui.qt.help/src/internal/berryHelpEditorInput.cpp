@@ -15,8 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "berryHelpEditorInput.h"
+#include "berryHelpEditorInputFactory.h"
 
 #include <berryPlatform.h>
+
+#include <QIcon>
 
 namespace berry
 {
@@ -41,6 +44,31 @@ QString HelpEditorInput::GetName() const
 QString HelpEditorInput::GetToolTipText() const
 {
   return url.toString();
+}
+
+QIcon HelpEditorInput::GetIcon() const
+{
+  return QIcon();
+}
+
+const IPersistableElement* HelpEditorInput::GetPersistable() const
+{
+  return this;
+}
+
+Object* HelpEditorInput::GetAdapter(const QString& adapterType) const
+{
+  return PlatformObject::GetAdapter(adapterType);
+}
+
+QString HelpEditorInput::GetFactoryId() const
+{
+  return HelpEditorInputFactory::GetFactoryId();
+}
+
+void HelpEditorInput::SaveState(const SmartPointer<IMemento>& memento) const
+{
+  HelpEditorInputFactory::SaveState(memento, this);
 }
 
 bool HelpEditorInput::operator==(const berry::Object* o) const

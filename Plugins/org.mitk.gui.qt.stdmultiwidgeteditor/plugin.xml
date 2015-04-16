@@ -5,6 +5,7 @@
     <editor
       id="org.mitk.editors.stdmultiwidget"
       name="Display"
+      icon="resources/StdMultiWidgetEditor.png"
       extensions="mitk"
       class="QmitkStdMultiWidgetEditor">
     </editor>

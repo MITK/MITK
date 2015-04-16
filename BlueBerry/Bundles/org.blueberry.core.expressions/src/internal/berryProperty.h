@@ -29,41 +29,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-class Property {
+class Property : public Object {
 
 public:
-  typedef Property Self;
-  typedef Poco::SharedPtr<Self> Pointer;
-  typedef Poco::SharedPtr<const Self> ConstPointer;
+
+  berryObjectMacro(Property)
 
 private:
-  Object::ConstPointer fType;
+  Reflection::TypeInfo fType;
   QString fNamespace;
   QString fName;
 
   IPropertyTester::Pointer fTester;
 
   friend class TypeExtensionManager;
-  /* package */ Property(Object::ConstPointer type,
+  /* package */ Property(const Reflection::TypeInfo& typeInfo,
                          const QString& namespaze, const QString& name);
 
   /* package */ void SetPropertyTester(IPropertyTester::Pointer tester);
 
 public:
-  bool IsInstantiated();
+  bool IsInstantiated() const;
 
-  bool IsDeclaringPluginActive();
+  bool IsDeclaringPluginActive() const;
 
-  bool IsValidCacheEntry(bool forcePluginActivation);
+  bool IsValidCacheEntry(bool forcePluginActivation) const;
 
   bool Test(Object::ConstPointer receiver, const QList<Object::Pointer>& args,
             Object::Pointer expectedValue);
 
-  bool operator==(Property& obj);
+  bool operator==(const Object* obj) const;
 
-  bool operator==(Property* obj);
+  bool operator<(const Object* obj) const;
 
-  int HashCode();
+  uint HashCode() const;
 };
 
 }  // namespace berry

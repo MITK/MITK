@@ -2,7 +2,7 @@
 Supported Platforms  {#SupportedPlatformsPage}
 ===================
 
-MITK is a cross-platform framework and is available for the following platforms:
+MITK is a cross-platform framework that is available for the following platforms:
 
 - Windows
 - Linux/X11
@@ -13,10 +13,10 @@ Supported Platforms Details
 
 The MITK team provides support for the most frequently used platforms and continuously runs testing procedures
 to ensure compatibility. Due to the large amount of possible combinations of operating systems and compiler versions,
-we divide platform support into two test categories (Tier 1 and Tier 2).
+we divide platform support into two test categories: Tier 1 and Tier 2.
 
-Although MITK may be built on a range of platform-compiler combinations, only a subset of these are actively
-support by the MITK development team.
+Although MITK may be built on a broader range of platform-compiler combinations, only a subset of these are actively
+supported by the MITK development team.
 
 Tier 1 Platforms
 ----------------
@@ -25,10 +25,11 @@ All Tier 1 platforms are continuously tested by our unit test suite and other in
 Errors or bugs discovered in these platforms are prioritized and corrected as soon as possible.
 
 | Platform                            | Compilers
-| ----------------------------------- | -----------------------------
-| Ubuntu Linux 12.04 (64-bit)         | gcc as provided by Ubuntu
-| Microsoft Windows 7 (64-bit)        | MSVC 2010 Professional SP1 (x64)
-| Apple OS X 10.9 "Mavericks"         | LLVM-Clang 6.0 as provided by Apple (XCode)
+| ----------------------------------- | --------------------------------------------------
+| Ubuntu Linux 14.04 (x64)            | GNU 4.8
+| Ubuntu Linux 12.04 (x64)            | GNU 4.7 as provided by ppa:ubuntu-toolchain-r/test
+| Microsoft Windows 7 (x64)           | MSVC 2012 Express Update 4
+| Apple OS X 10.10 "Yosemite"         | Clang 6.0
 
 
 Tier 2 Platforms
@@ -40,12 +41,11 @@ strive to support these platforms, MITK users should note that errors may be pre
 as well as in the current master branch.
 
 | Platform                           | Compilers
-| ---------------------------------- | -----------------------------
-| Fedora 20 (64-bit)                 | gcc as provided by Fedora
-| Fedora 20 (64-bit)                 | Clang as provided by Fedora
-| Microsoft Windows 7 (32-bit)       | MSVC 2012 Express (x64)
-| Apple OS X 10.7 "Lion"             | LLVM-Clang as provided by Apple (XCode)
-
+| ---------------------------------- | --------------------------------------------------
+| Ubuntu Linux 12.04 (x86)           | GNU 4.7 as provided by ppa:ubuntu-toolchain-r/test
+| Microsoft Windows 7 (x64)          | MSVC 2012 Express Update 4 (x86)
+| Microsoft Windows 8 (x64)          | MSVC 2013 Community Update 4
+| Apple OS X 10.9 "Mavericks"        | Clang 5.0
 
 All platforms not listed above are not officially supported by the MITK team. However, we will happily accept
 contributions to improve support for other platforms.

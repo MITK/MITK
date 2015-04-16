@@ -121,7 +121,7 @@ bool ViewDescriptor::IsRestorable() const
   return str.isNull() ? true : str.compare("true", Qt::CaseInsensitive) == 0;
 }
 
-Object* ViewDescriptor::GetAdapter(const QString& adapter)
+Object* ViewDescriptor::GetAdapter(const QString& adapter) const
 {
   if (adapter == qobject_interface_iid<IConfigurationElement*>())
   {

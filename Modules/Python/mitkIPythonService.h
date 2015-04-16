@@ -133,6 +133,9 @@ namespace mitk
         ///
         /// nothing to do here
         virtual ~IPythonService(); // leer in mitkIPythonService.cpp implementieren
+
+        // force us module loading by linking
+        static std::string ForceLoadModule();
     };
 }
 

@@ -19,8 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryPlatform.h"
 #include "internal/berryInternalPlatform.h"
+#include "internal/berryIRuntimeConstants.h"
 
 namespace berry {
+
+const QString Platform::PI_RUNTIME = IRuntimeConstants::PI_RUNTIME();
 
 int Platform::OS_FREE_BSD = BERRY_OS_FREE_BSD;
 int Platform::OS_AIX = BERRY_OS_AIX;
@@ -63,6 +66,7 @@ QString Platform::ARG_PLUGIN_DIRS = "BlueBerry.plugin_dirs";
 QString Platform::ARG_FORCE_PLUGIN_INSTALL = "BlueBerry.forcePlugins";
 QString Platform::ARG_PRELOAD_LIBRARY = "BlueBerry.preloadLibrary";
 QString Platform::ARG_PROVISIONING = "BlueBerry.provisioning";
+QString Platform::ARG_DEBUG = "BlueBerry.debug";
 QString Platform::ARG_CONSOLELOG = "BlueBerry.consoleLog";
 QString Platform::ARG_TESTPLUGIN = "BlueBerry.testplugin";
 QString Platform::ARG_TESTAPPLICATION = "BlueBerry.testapplication";
@@ -175,6 +179,7 @@ QDir Platform::GetUserPath()
 
 QString Platform::GetProperty(const QString& key)
 {
+  if (!GetConfiguration().hasProperty(key.toStdString())) return QString::null;
   return QString::fromStdString(GetConfiguration().getString(key.toStdString(), ""));
 }
 
@@ -235,6 +240,18 @@ QList<QSharedPointer<ctkPlugin> > Platform::GetPlugins(const QString& symbolicNa
                                                        const QString& version)
 {
   return InternalPlatform::GetInstance()->GetPlugins(symbolicName, version);
+}
+
+QVariant berry::Platform::GetDebugOption(const QString& option)
+{
+  return InternalPlatform::GetInstance()->GetOption(option);
+}
+
+IProduct* berry::Platform::GetProduct()
+{
+  //TODO
+  //return InternalPlatform::GetDefault()->GetProduct();
+  return nullptr;
 }
 
 }

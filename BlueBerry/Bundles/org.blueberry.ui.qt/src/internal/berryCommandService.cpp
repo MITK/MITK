@@ -208,7 +208,7 @@ void CommandService::RefreshElements(const QString& commandId,
         : updater(updater), callbackRef(callbackRef)
       {}
 
-      void HandleException(const std::exception& exc)
+      void HandleException(const ctkException& exc)
       {
         WorkbenchPlugin::Log(QString("Failed to update callback: ") +
                              callbackRef->GetCommandId() + exc.what());

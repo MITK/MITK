@@ -18,22 +18,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYHELPEDITORINPUT_H_
 
 #include <berryIEditorInput.h>
+#include <berryIPersistableElement.h>
+
+#include <berryPlatformObject.h>
 
 #include <QUrl>
 
 namespace berry
 {
 
-class HelpEditorInput : public berry::IEditorInput
+class HelpEditorInput : public PlatformObject, public IEditorInput, public IPersistableElement
 {
 public:
-  berryObjectMacro(HelpEditorInput);
+  berryObjectMacro(HelpEditorInput)
 
   HelpEditorInput(const QUrl& url = QUrl());
 
   bool Exists() const;
   QString GetName() const;
   QString GetToolTipText() const;
+
+  QIcon GetIcon() const;
+
+  const IPersistableElement* GetPersistable() const;
+  Object* GetAdapter(const QString &adapterType) const;
+
+  QString GetFactoryId() const;
+  void SaveState(const SmartPointer<IMemento>& memento) const;
 
   bool operator==(const berry::Object*) const;
 

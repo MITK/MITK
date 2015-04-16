@@ -17,6 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryExpressionPlugin.h"
 
+#include "berryExpressions.h"
+#include "berryTypeExtensionManager.h"
+#include "berryPlatformPropertyTester.h"
+
+#include "berryPlatform.h"
+
 #include <QtPlugin>
 
 namespace berry {
@@ -37,6 +43,14 @@ ExpressionPlugin* ExpressionPlugin::GetDefault()
 QString ExpressionPlugin::GetPluginId()
 {
   return "org.blueberry.core.expressions";
+}
+
+void ExpressionPlugin::start(ctkPluginContext* context)
+{
+  BERRY_REGISTER_EXTENSION_CLASS(PlatformPropertyTester, context)
+
+  Expressions::TRACING = Platform::GetDebugOption("org.blueberry.core.expressions/tracePropertyResolving").toBool();
+  TypeExtensionManager::DEBUG = Platform::GetDebugOption("org.blueberry.core.expressions/debug/TypeExtensionManager").toBool();
 }
 
 void ExpressionPlugin::stop(ctkPluginContext* context)

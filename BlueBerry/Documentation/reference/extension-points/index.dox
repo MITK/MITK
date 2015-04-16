@@ -9,7 +9,15 @@
 The following extension points can be used to extend the capabilities
 of the platform infrastructure:
 
-<h3><a name="runtime"></a>Platform runtime</h3>
+<h3><a name="runtime"></a>Platform Core Expressions</h3>
+<ul>
+  <li>\subpage xp_org_blueberry_core_expresions_definitions
+  <li>\subpage xp_org_blueberry_core_expresions_expressionLanguage
+  <li>\subpage xp_org_blueberry_core_expresions_propertyTesters
+</ul>
+
+
+<h3><a name="runtime"></a>Platform Runtime</h3>
 <ul>
   <li>\subpage xp_org_blueberry_osgi_applications
 </ul>
@@ -17,11 +25,14 @@ of the platform infrastructure:
 <h3><a name="workbench"></a>Workbench</h3>
 <ul>
   <li>\subpage xp_org_blueberry_ui_editors
+  <li>\subpage xp_org_blueberry_ui_elementFactories
+  <li>\subpage xp_org_blueberry_ui_keywords
+  <li>\subpage xp_org_blueberry_ui_menus
+  <li>\subpage xp_org_blueberry_ui_perspectiveExtensions
   <li>\subpage xp_org_blueberry_ui_perspectives
+  <li>\subpage xp_org_blueberry_ui_preferencePages
   <li>\subpage xp_org_blueberry_ui_presentationFactories
   <li>\subpage xp_org_blueberry_ui_services
-  <li>\subpage xp_org_blueberry_ui_keywords
-  <li>\subpage xp_org_blueberry_ui_preferencePages
   <li>\subpage xp_org_blueberry_ui_tweaklets
   <li>\subpage xp_org_blueberry_ui_views
 </ul>
@@ -31,8 +42,28 @@ of the platform infrastructure:
     <li>\subpage xp_org_blueberry_tests
 </ul>
 
+\page xp_org_blueberry_core_expressions_definitions org.blueberry.core.expressions.definitions
+\htmlinclude org_blueberry_core_expressions_definitions.html
+
+\page xp_org_blueberry_core_expressions_expressionLanguage org.blueberry.core.expressions.expressionLanguage
+\htmlinclude org_blueberry_core_expressions_expressionLanguage.html
+
+\page xp_org_blueberry_core_expressions_propertyTesters org.blueberry.core.expressions.propertyTesters
+\htmlinclude org_blueberry_core_expressions_propertyTesters.html
+
+
 \page xp_org_blueberry_osgi_applications org.blueberry.osgi.applications
 \htmlinclude org_blueberry_osgi_applications.html
+
+
+\page xp_org_blueberry_ui_elementFactories org.blueberry.ui.elementFactories
+\htmlinclude org_blueberry_ui_elementFactories.html
+
+\page xp_org_blueberry_ui_menus org.blueberry.ui.menus
+\htmlinclude org_blueberry_ui_menus.html
+
+\page xp_org_blueberry_ui_perspectiveExtensions org.blueberry.ui.perspectiveExtensions
+\htmlinclude org_blueberry_ui_perspectiveExtensions.html
 
 \page xp_org_blueberry_ui_editors org.blueberry.ui.editors
 \htmlinclude org_blueberry_ui_editors.html

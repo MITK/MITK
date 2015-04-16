@@ -143,7 +143,7 @@ To activate a specific plugin (again replace paths as needed):
 </ol>
 
 \note If you want to use an application provided by MITK (e.g. MITK Workbench) you
-have to tick the appropriate checkbox as well (in this case MITK_BUILD_APP_mitkWorkbench)
+have to tick the appropriate checkbox as well (in this case MITK_BUILD_APP_Workbench)
 and build MITK. Do note, that this application will be located in the bin directory
 of the "D:\AwesomeProject-superbuild\MITK-superbuild\MITK-build\" folder.
 

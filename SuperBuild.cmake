@@ -118,12 +118,6 @@ if(BUILD_TESTING)
   endif()
 endif()
 
-# Look for git early on, if needed
-if((BUILD_TESTING AND NOT EXTERNAL_MITK_DATA_DIR) OR
-   (MITK_USE_CTK AND NOT EXTERNAL_CTK_DIR))
-  find_package(Git REQUIRED)
-endif()
-
 #-----------------------------------------------------------------------------
 # External project settings
 #-----------------------------------------------------------------------------
@@ -256,7 +250,6 @@ set(mitk_cmake_boolean_args
 
   MITK_BUILD_ALL_PLUGINS
   MITK_BUILD_ALL_APPS
-  MITK_BUILD_TUTORIAL # Deprecated. Use MITK_BUILD_EXAMPLES instead
   MITK_BUILD_EXAMPLES
 
   MITK_USE_QT

@@ -49,7 +49,7 @@ struct IMenuManager : public virtual IContributionManager, public IContributionI
    *
    * @param listener a menu listener
    */
-  //virtual void AddMenuListener(QObject* listener, const char* slot) = 0;
+  virtual void AddMenuListener(QObject* listener) = 0;
 
   /**
    * Finds the manager for the menu at the given path. A path
@@ -102,7 +102,7 @@ struct IMenuManager : public virtual IContributionManager, public IContributionI
    *
    * @param listener the menu listener
    */
-  //virtual void RemoveMenuListener(QObject* listener) = 0;
+  virtual void RemoveMenuListener(QObject* listener) = 0;
 
   /**
    * Sets whether all items should be removed when the menu is about to show,

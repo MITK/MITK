@@ -120,15 +120,19 @@ bool QmitkDicomLocalStorageWidget::DeletePatients()
     for (const auto& studyUID : studyUIDs)
       seriesUIDs.append(m_LocalDatabase->seriesForStudy(studyUID));
 
-    auto answer = QMessageBox::question(nullptr, "Delete Patients",
+    auto answer = QMessageBox::question(
+      nullptr,
+      "Delete Patients",
       QString("Do you really want to delete %1 %2, containing %3 series in %4 %5?")
         .arg(selectedPatientUIDs.count())
         .arg(selectedPatientUIDs.count() != 1 ? "patients" : "patient")
         .arg(seriesUIDs.count())
         .arg(studyUIDs.count())
-        .arg(studyUIDs.count() != 1 ? "studies" : "study"));
+        .arg(studyUIDs.count() != 1 ? "studies" : "study"),
+      QMessageBox::Yes | QMessageBox::No,
+      QMessageBox::No);
 
-    if (answer == QMessageBox::Ok)
+    if (answer == QMessageBox::Yes)
     {
       for (const auto& patientUID : selectedPatientUIDs)
         m_LocalDatabase->removePatient(patientUID);
@@ -151,13 +155,17 @@ bool QmitkDicomLocalStorageWidget::DeleteStudies()
     for (const auto& studyUID : selectedStudyUIDs)
       seriesUIDs.append(m_LocalDatabase->seriesForStudy(studyUID));
 
-    auto answer = QMessageBox::question(nullptr, "Delete Studies",
+    auto answer = QMessageBox::question(
+      nullptr,
+      "Delete Studies",
       QString("Do you really want to delete %1 %2, containing %3 series?")
         .arg(selectedStudyUIDs.count())
         .arg(selectedStudyUIDs.count() != 1 ? "studies" : "study")
-        .arg(seriesUIDs.count()));
+        .arg(seriesUIDs.count()),
+      QMessageBox::Yes | QMessageBox::No,
+      QMessageBox::No);
 
-    if (answer == QMessageBox::Ok)
+    if (answer == QMessageBox::Yes)
     {
       for (const auto& studyUID : selectedStudyUIDs)
         m_LocalDatabase->removeStudy(studyUID);
@@ -175,11 +183,15 @@ bool QmitkDicomLocalStorageWidget::DeleteSeries()
 
   if (!selectedSeriesUIDs.empty())
   {
-    auto answer = QMessageBox::question(nullptr, "Delete Series",
+    auto answer = QMessageBox::question(
+      nullptr,
+      "Delete Series",
       QString("Do you really want to delete %1 series?")
-        .arg(selectedSeriesUIDs.count()));
+        .arg(selectedSeriesUIDs.count()),
+      QMessageBox::Yes | QMessageBox::No,
+      QMessageBox::No);
 
-    if (answer == QMessageBox::Ok)
+    if (answer == QMessageBox::Yes)
     {
       for (const auto& seriesUID : selectedSeriesUIDs)
         m_LocalDatabase->removeSeries(seriesUID);

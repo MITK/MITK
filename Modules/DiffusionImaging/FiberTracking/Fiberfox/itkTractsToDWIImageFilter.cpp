@@ -254,7 +254,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 idft->SetT2(t2Vector);
                 idft->SetT1(t1Vector);
                 idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
-                idft->SetParameters(m_Parameters);
+                idft->SetParameters(&m_Parameters);
                 idft->SetZ((double)z-(double)(images.at(0)->GetLargestPossibleRegion().GetSize(2)-images.at(0)->GetLargestPossibleRegion().GetSize(2)%2)/2.0);
                 idft->SetZidx(z);
                 idft->SetCoilPosition(coilPositions.at(c));
@@ -1199,7 +1199,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             m_StatusText += "Simulating ghosts\n";
 
         doubleOutImage = SimulateKspaceAcquisition(m_CompartmentImages);
-        signalScale = 1; // already scaled in DoKspaceStuff
+        signalScale = 1; // already scaled in SimulateKspaceAcquisition()
     }
     else    // don't do k-space stuff, just sum compartments
     {

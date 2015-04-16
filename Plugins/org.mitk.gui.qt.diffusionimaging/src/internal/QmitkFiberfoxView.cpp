@@ -238,6 +238,9 @@ void QmitkFiberfoxView::AfterThread()
             }
         }
         m_TractsToDwiFilter = NULL;
+
+        if (parameters.m_Misc.m_AfterSimulationMessage.size()>0)
+            QMessageBox::information( NULL, "Warning", parameters.m_Misc.m_AfterSimulationMessage.c_str());
         break;
     }
     case 1:
@@ -494,6 +497,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     parameters.m_Misc.m_CheckAdvancedFiberOptionsBox = m_Controls->m_AdvancedOptionsBox->isChecked();
     parameters.m_Misc.m_CheckAdvancedSignalOptionsBox = m_Controls->m_AdvancedOptionsBox_2->isChecked();
     parameters.m_Misc.m_CheckOutputVolumeFractionsBox = m_Controls->m_VolumeFractionsBox->isChecked();
+    parameters.m_Misc.m_AfterSimulationMessage = "";
 
     string outputPath = m_Controls->m_SavePathEdit->text().toStdString();
     if (outputPath.compare("-")!=0)
@@ -729,15 +733,6 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
         m_Controls->m_SignalScaleBox->setValue(parameters.m_SignalGen.m_SignalScale);
         QMessageBox::information( NULL, "Warning", "Maximum signal exceeding data type limits. Automatically adjusted to "+QString::number(parameters.m_SignalGen.m_SignalScale)+" to obtain a maximum  signal of 75% of the data type maximum. Relaxation and other effects that affect the signal intensities are not accounted for.");
     }
-
-    // adjust echo time if needed
-//    int numLines = parameters.m_SignalGen.m_ImageRegion.GetSize(1)+parameters.m_SignalGen.m_ImageRegion.GetSize(1)%2;
-//    if ( parameters.m_SignalGen.m_tEcho < numLines*parameters.m_SignalGen.m_tLine )
-//    {
-//        this->m_Controls->m_TEbox->setValue( numLines*parameters.m_SignalGen.m_tLine );
-//        parameters.m_SignalGen.m_tEcho = m_Controls->m_TEbox->value();
-//        QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automatically adjusted to "+QString::number(parameters.m_SignalGen.m_tEcho)+" ms");
-//    }
 
     // Noise
     parameters.m_Misc.m_CheckAddNoiseBox = m_Controls->m_AddNoise->isChecked();

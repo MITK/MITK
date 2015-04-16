@@ -241,6 +241,7 @@ public:
     string              m_SignalModelString;                ///< Appendet to the name of the result node
     string              m_ArtifactModelString;              ///< Appendet to the name of the result node
     string              m_OutputPath;                       ///< Image is automatically saved to the specified folder after simulation is finished.
+    string              m_AfterSimulationMessage;           ///< Store messages that are displayed after the simulation has finished (e.g. warnings, automatic parameter adjustments etc.)
 
     /** member variables that store the check-state of GUI checkboxes */
     // image generation

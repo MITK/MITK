@@ -86,8 +86,7 @@ namespace itk{
     itkSetMacro( CoilPosition, DoubleVectorType )
     itkGetMacro( KSpaceImage, typename InputImageType::Pointer )    ///< k-space magnitude image
 
-    void SetParameters( FiberfoxParameters<double> param ){ m_Parameters = param; }
-    FiberfoxParameters<double> GetParameters(){ return m_Parameters; }
+    void SetParameters( FiberfoxParameters<double>* param ){ m_Parameters = param; }
 
     void SetCompartmentImages( std::vector< InputImagePointerType > cImgs ) { m_CompartmentImages=cImgs; }  ///< One signal image per compartment.
     void SetT2( std::vector< double > t2Vector ) { m_T2=t2Vector; } ///< One T2 relaxation constant per compartment image.
@@ -105,7 +104,7 @@ namespace itk{
     void AfterThreadedGenerateData();
 
     DoubleVectorType                        m_CoilPosition;
-    FiberfoxParameters<double>              m_Parameters;
+    FiberfoxParameters<double>*             m_Parameters;
     vector< double >                        m_T2;
     vector< double >                        m_T1;
     vector< InputImagePointerType >         m_CompartmentImages;
@@ -125,7 +124,9 @@ namespace itk{
 
     double                                  m_CoilSensitivityFactor;
     typename InputImageType::Pointer        m_KSpaceImage;
-    AcquisitionType*                          m_ReadoutScheme;
+    typename InputImageType::Pointer        m_TimeFromEchoImage;
+    typename InputImageType::Pointer        m_ReadoutTimeImage;
+    AcquisitionType*                        m_ReadoutScheme;
 
   private:
 

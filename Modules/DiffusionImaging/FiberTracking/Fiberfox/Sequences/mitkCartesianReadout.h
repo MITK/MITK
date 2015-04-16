@@ -29,12 +29,12 @@ class CartesianReadout : public AcquisitionType
 {
 public:
 
-    CartesianReadout(FiberfoxParameters<double>& parameters) : AcquisitionType(parameters)
+    CartesianReadout(FiberfoxParameters<double>* parameters) : AcquisitionType(parameters)
     {
-        kxMax = m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(0);
-        kyMax = m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1);
+        kxMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0);
+        kyMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1);
 
-        dt =  m_Parameters.m_SignalGen.m_tLine/kxMax;  // time to read one k-space voxel
+        dt =  m_Parameters->m_SignalGen.m_tLine/kxMax;  // time to read one k-space voxel
 
         // maximum echo at center of each line
         m_TEhalf = -dt*(kxMax-(int)kxMax%2)/2;
@@ -59,10 +59,20 @@ public:
     itk::Index< 2 > GetActualKspaceIndex(itk::Index< 2 > index)
     {
         // reverse phase
-        if (!m_Parameters.m_SignalGen.m_ReversePhase)
+        if (!m_Parameters->m_SignalGen.m_ReversePhase)
             index[1] = kyMax-1-index[1];
 
         return index;
+    }
+
+    void AdjustEchoTime()
+    {
+        if ( m_Parameters->m_SignalGen.m_tEcho/2 < m_Parameters->m_SignalGen.m_tLine/2 )
+        {
+            m_Parameters->m_SignalGen.m_tEcho = m_Parameters->m_SignalGen.m_tLine;
+            MITK_WARN << "Echo time is too short! Time not sufficient to read slice. Automatically adjusted to " << m_Parameters->m_SignalGen.m_tEcho << " ms";
+            m_Parameters->m_Misc.m_AfterSimulationMessage += "Echo time was chosen too short! Time not sufficient to read slice. Internally adjusted to " + boost::lexical_cast<string>(m_Parameters->m_SignalGen.m_tEcho) + " ms\n";
+        }
     }
 
 protected:

@@ -415,7 +415,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   d->m_StdMultiWidget->EnableColoredRectangles();
 
   // Set preferences respecting zooming and padding
-  bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", false);
+  bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", true);
 
   mitk::RenderingManager::GetInstance()->SetConstrainedPaddingZooming(constrainedZooming);
 

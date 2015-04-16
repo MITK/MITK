@@ -76,7 +76,7 @@ and configure the project.
 
 CMake will present you a couple of options, these are the most important ones:
 
- - <tt><b>CMAKE_PREFIX_PATH</b></tt> The path to your Qt installation, e.g., <i>C:\Qt\5.4\msvc2013_64_opengl</i> or <i>/home/user/Qt/5.4/gcc_64</i>
+ - <tt><b>CMAKE_PREFIX_PATH</b></tt> The path to your Qt installation, e.g., <i>C:/Qt/5.4/msvc2013_64_opengl</i> or <i>/home/user/Qt/5.4/gcc_64</i>
  - <tt><b>MITK_USE_ACVD</b></tt> Build MITK code which depends on ACVD (this
    will download and build ACVD)
  - <tt><b>MITK_USE_BLUEBERRY</b></tt> Build the BlueBerry application framework
@@ -89,8 +89,6 @@ CMake will present you a couple of options, these are the most important ones:
  - <tt><b>MITK_USE_Python</b></tt> Enables Python wrapping in MITK. This will also
    configure ITK, VTK, and OpenCV (if enabled) to build Python wrappers.
  - <tt><b>MITK_USE_QT</b></tt> Build MITK code which depends on Qt
- - <tt><b>MITK_USE_SOFA</b></tt> Build MITK code which depends on SOFA (this will
-   download and build SOFA)
 
 If you are satisfied with the configuration of your MITK superbuild, generate
 the project files with CMake by pressing "Generate".
@@ -98,7 +96,7 @@ the project files with CMake by pressing "Generate".
 <b>Linux</b> and <b>Mac OS X</b> users usually just enter "make" (optionally
 supplying the number threads to be used for a parallel build):
 \code
-make -j4
+make -j6
 \endcode
 
 <b>Windows</b> users using Visual Studio can open the generated

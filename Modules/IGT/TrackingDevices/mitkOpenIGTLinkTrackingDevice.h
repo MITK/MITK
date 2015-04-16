@@ -35,7 +35,7 @@ namespace mitk
   *          continuously update the tool coordinates.
   *   \ingroup IGT
   */
-  class MitkIGT_EXPORT OpenIGTLinkTrackingDevice : public TrackingDevice
+  class MITKIGT_EXPORT OpenIGTLinkTrackingDevice : public TrackingDevice
   {
   public:
     mitkClassMacro(OpenIGTLinkTrackingDevice, TrackingDevice);

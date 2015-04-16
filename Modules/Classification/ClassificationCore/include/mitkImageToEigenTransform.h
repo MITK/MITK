@@ -36,6 +36,7 @@ namespace mitk
     typedef Eigen::MatrixXd MatrixType;
 
     static MatrixType transform(const mitk::Image::Pointer & image, const mitk::Image::Pointer & mask);
+    static unsigned int countIf(const mitk::Image::Pointer & maks, bool (*func_pointer) (double));
 
   private:
     typedef itk::Image<double, 3> DoubleImageType;

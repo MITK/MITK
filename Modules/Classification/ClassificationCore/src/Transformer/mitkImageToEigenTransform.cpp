@@ -29,15 +29,7 @@ mitk::ImageToEigenTransform::MatrixType mitk::ImageToEigenTransform::transform(c
   DoubleImageType::Pointer current_input;
   mitk::CastToItkImage(image,current_input);
 
-  unsigned int n_numSamples = 0;
-  {
-    auto mit = itk::ImageRegionConstIterator<UCharImageType>(current_mask, current_mask->GetLargestPossibleRegion());
-    while (!mit.IsAtEnd())
-    {
-      if(mit.Value() > 0) n_numSamples++;
-      ++mit;
-    }
-  }
+  unsigned int n_numSamples = countIf(mask, [](double c){ return c > 0;});
 
   MatrixType vector(n_numSamples,1);
 
@@ -52,4 +44,23 @@ mitk::ImageToEigenTransform::MatrixType mitk::ImageToEigenTransform::transform(c
   }
 
   return vector;
+}
+
+
+unsigned int mitk::ImageToEigenTransform::countIf(const mitk::Image::Pointer & mask, bool (*func_pointer) (double) )
+{
+  UCharImageType::Pointer current_mask;
+  mitk::CastToItkImage(mask,current_mask);
+
+  unsigned int n_numSamples = 0;
+  {
+    auto mit = itk::ImageRegionConstIterator<UCharImageType>(current_mask, current_mask->GetLargestPossibleRegion());
+    while (!mit.IsAtEnd())
+    {
+      if((*func_pointer)(mit.Value()))
+        n_numSamples++;
+      ++mit;
+    }
+  }
+  return n_numSamples;
 }

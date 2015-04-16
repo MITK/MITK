@@ -128,7 +128,7 @@ bool QmitkDicomLocalStorageWidget::DeletePatients()
         .arg(studyUIDs.count())
         .arg(studyUIDs.count() != 1 ? "studies" : "study"));
 
-    if (answer == QMessageBox::Yes)
+    if (answer == QMessageBox::Ok)
     {
       for (const auto& patientUID : selectedPatientUIDs)
         m_LocalDatabase->removePatient(patientUID);
@@ -157,7 +157,7 @@ bool QmitkDicomLocalStorageWidget::DeleteStudies()
         .arg(selectedStudyUIDs.count() != 1 ? "studies" : "study")
         .arg(seriesUIDs.count()));
 
-    if (answer == QMessageBox::Yes)
+    if (answer == QMessageBox::Ok)
     {
       for (const auto& studyUID : selectedStudyUIDs)
         m_LocalDatabase->removeStudy(studyUID);
@@ -179,7 +179,7 @@ bool QmitkDicomLocalStorageWidget::DeleteSeries()
       QString("Do you really want to delete %1 series?")
         .arg(selectedSeriesUIDs.count()));
 
-    if (answer == QMessageBox::Yes)
+    if (answer == QMessageBox::Ok)
     {
       for (const auto& seriesUID : selectedSeriesUIDs)
         m_LocalDatabase->removeSeries(seriesUID);

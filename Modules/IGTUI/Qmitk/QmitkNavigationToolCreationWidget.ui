@@ -62,6 +62,11 @@
          <string>Virtual Tracker</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>Open IGT Link</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>
@@ -166,7 +171,7 @@
         <x>0</x>
         <y>0</y>
         <width>303</width>
-        <height>98</height>
+        <height>95</height>
        </rect>
       </property>
       <attribute name="label">
@@ -275,8 +280,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>236</width>
-        <height>115</height>
+        <width>145</width>
+        <height>73</height>
        </rect>
       </property>
       <attribute name="label">

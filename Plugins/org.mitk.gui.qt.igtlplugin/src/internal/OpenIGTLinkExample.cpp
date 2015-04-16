@@ -51,9 +51,7 @@ void OpenIGTLinkExample::SetFocus()
 
 OpenIGTLinkExample::~OpenIGTLinkExample()
 {
-  this->GetDataStorage()->Remove(m_DemoNodeT1);
-  this->GetDataStorage()->Remove(m_DemoNodeT2);
-  this->GetDataStorage()->Remove(m_DemoNodeT3);
+   this->DestroyPipeline();
 }
 
 void OpenIGTLinkExample::CreateQtPartControl( QWidget *parent )
@@ -102,54 +100,49 @@ void OpenIGTLinkExample::CreatePipeline()
   m_VisFilter->ConnectTo(m_IGTLMsgToNavDataFilter);
 
   //create an object that will be moved respectively to the navigation data
-  m_DemoNodeT1 = mitk::DataNode::New();
-  m_DemoNodeT1->SetName("DemoNode IGTLExmpl T1");
-  m_DemoNodeT2 = mitk::DataNode::New();
-  m_DemoNodeT2->SetName("DemoNode IGTLExmpl T2");
-  m_DemoNodeT3 = mitk::DataNode::New();
-  m_DemoNodeT3->SetName("DemoNode IGTLExmpl T3");
+  for (size_t i = 0; i < m_IGTLMsgToNavDataFilter->GetNumberOfIndexedOutputs(); i++)
+  {
+     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+     QString name("DemoNode IGTLProviderExmpl T");
+     name.append(QString::number(i));
+     newNode->SetName(name.toStdString());
 
-  //create small sphere and use it as surface
-  mitk::Surface::Pointer mySphere = mitk::Surface::New();
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius(2.0f);
-  vtkData->SetCenter(0.0, 0.0, 0.0);
-  vtkData->Update();
-  mySphere->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
-  m_DemoNodeT1->SetData(mySphere);
+     //create small sphere and use it as surface
+     mitk::Surface::Pointer mySphere = mitk::Surface::New();
+     vtkSphereSource *vtkData = vtkSphereSource::New();
+     vtkData->SetRadius(2.0f);
+     vtkData->SetCenter(0.0, 0.0, 0.0);
+     vtkData->Update();
+     mySphere->SetVtkPolyData(vtkData->GetOutput());
+     vtkData->Delete();
+     newNode->SetData(mySphere);
 
-  mitk::Surface::Pointer mySphere2 = mySphere->Clone();
-  m_DemoNodeT2->SetData(mySphere2);
-  mitk::Surface::Pointer mySphere3 = mySphere->Clone();
-  m_DemoNodeT3->SetData(mySphere3);
+     this->GetDataStorage()->Add(newNode);
 
-  // add node to DataStorage
-  this->GetDataStorage()->Add(m_DemoNodeT1);
-  this->GetDataStorage()->Add(m_DemoNodeT2);
-  this->GetDataStorage()->Add(m_DemoNodeT3);
+     m_VisFilter->SetRepresentationObject(i, mySphere);
 
-  //use this sphere as representation object
-  m_VisFilter->SetRepresentationObject(0, mySphere);
-  m_VisFilter->SetRepresentationObject(1, mySphere2);
-  m_VisFilter->SetRepresentationObject(2, mySphere3);
+     m_DemoNodes.append(newNode);
+  }
 }
 
 void OpenIGTLinkExample::DestroyPipeline()
 {
-  m_VisFilter = NULL;
-  this->GetDataStorage()->Remove(m_DemoNodeT1);
-  this->GetDataStorage()->Remove(m_DemoNodeT2);
-  this->GetDataStorage()->Remove(m_DemoNodeT3);
+  m_VisFilter = nullptr;
+  foreach(mitk::DataNode::Pointer node, m_DemoNodes)
+  {
+     this->GetDataStorage()->Remove(node);
+  }
+  this->m_DemoNodes.clear();
 }
 
 void OpenIGTLinkExample::Start()
 {
   if ( this->m_Controls.butStart->text().contains("Start Pipeline") )
   {
-    m_Timer.setInterval(90);
+    m_Timer.setInterval(this->m_Controls.visualizationUpdateRateSpinBox->value());
     m_Timer.start();
     this->m_Controls.butStart->setText("Stop Pipeline");
+    this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(true);
   }
   else
   {
@@ -158,6 +151,7 @@ void OpenIGTLinkExample::Start()
         igtl::StopTrackingDataMessage::New();
     this->m_IGTLClient->SendMessage(stopStreaming.GetPointer());
     this->m_Controls.butStart->setText("Start Pipeline");
+    this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(false);
   }
 }
 
@@ -171,4 +165,13 @@ void OpenIGTLinkExample::UpdatePipeline()
 
   //Update rendering
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  //check if the timer interval changed
+  static int previousValue = 0;
+  int currentValue = this->m_Controls.visualizationUpdateRateSpinBox->value();
+  if (previousValue != currentValue)
+  {
+     m_Timer.setInterval(currentValue);
+     previousValue = currentValue;
+  }
 }

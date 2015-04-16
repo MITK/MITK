@@ -304,6 +304,8 @@ void QmitkNavigationToolManagementWidget::UpdateToolTable()
               currentTool += "(NP Optitrack/"; break;
         case mitk::VirtualTracker:
               currentTool += "(Virtual Tracker/"; break;
+        case mitk::OpenIGTLinkTrackingDeviceConnection:
+              currentTool += "(Open IGT Link/"; break;
         default:
               currentTool += "(unknown tracking system/"; break;
         }

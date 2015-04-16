@@ -15,9 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkMorphologicalOperationsWidget.h"
-#include <mitkMorphologicalOperations.h>
 #include <mitkProgressBar.h>
 #include <mitkSliceNavigationController.h>
+#include <QCheckBox>
 
 static const char* const HelpText = "Select a segmentation above";
 
@@ -88,12 +88,7 @@ void QmitkMorphologicalOperationsWidget::OnClosingButtonClicked()
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-  bool ball = m_Controls.radioButtonMorphoBall->isChecked();
-
-  mitk::MorphologicalOperations::StructuralElementType structuralElement = ball
-    ? mitk::MorphologicalOperations::Ball
-    : mitk::MorphologicalOperations::Cross;
-
+  mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateStructerElement_UI();
   try
   {
     mitk::MorphologicalOperations::Closing(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
@@ -120,11 +115,8 @@ void QmitkMorphologicalOperationsWidget::OnOpeningButtonClicked()
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-  bool ball = m_Controls.radioButtonMorphoBall->isChecked();
 
-  mitk::MorphologicalOperations::StructuralElementType structuralElement = ball
-    ? mitk::MorphologicalOperations::Ball
-    : mitk::MorphologicalOperations::Cross;
+  mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateStructerElement_UI();
 
   try
   {
@@ -152,11 +144,7 @@ void QmitkMorphologicalOperationsWidget::OnDilatationButtonClicked()
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-  bool ball = m_Controls.radioButtonMorphoBall->isChecked();
-
-  mitk::MorphologicalOperations::StructuralElementType structuralElement = ball
-    ? mitk::MorphologicalOperations::Ball
-    : mitk::MorphologicalOperations::Cross;
+  mitk::MorphologicalOperations::StructuralElementType structuralElement = this->CreateStructerElement_UI();
 
   try
   {
@@ -184,11 +172,7 @@ void QmitkMorphologicalOperationsWidget::OnErosionButtonClicked()
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
-  bool ball = m_Controls.radioButtonMorphoBall->isChecked();
-
-  mitk::MorphologicalOperations::StructuralElementType structuralElement = ball
-    ? mitk::MorphologicalOperations::Ball
-    : mitk::MorphologicalOperations::Cross;
+mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateStructerElement_UI();
 
   try
   {
@@ -233,4 +217,23 @@ void QmitkMorphologicalOperationsWidget::OnFillHolesButtonClicked()
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   QApplication::restoreOverrideCursor();
+}
+
+
+mitk::MorphologicalOperations::StructuralElementType QmitkMorphologicalOperationsWidget::CreateStructerElement_UI()
+{
+  bool ball = m_Controls.radioButtonMorphoBall->isChecked();
+  int accum_flag = 0;
+  if(ball){
+   if(m_Controls.planeSelectionComboBox->currentIndex() == 0) accum_flag = mitk::MorphologicalOperations::Ball; // 3D Operation
+   if(m_Controls.planeSelectionComboBox->currentIndex() == 1) accum_flag = mitk::MorphologicalOperations::Ball_Axial; // 2D Operation - Axial plane
+   if(m_Controls.planeSelectionComboBox->currentIndex() == 2) accum_flag = mitk::MorphologicalOperations::Ball_Sagital; // 2D Operation - Sagital plane
+   if(m_Controls.planeSelectionComboBox->currentIndex() == 3) accum_flag = mitk::MorphologicalOperations::Ball_Coronal; // 2D Operation - Coronal plane
+  }else{
+    if(m_Controls.planeSelectionComboBox->currentIndex() == 0) accum_flag = mitk::MorphologicalOperations::Cross;
+    if(m_Controls.planeSelectionComboBox->currentIndex() == 1) accum_flag = mitk::MorphologicalOperations::Cross_Axial;
+    if(m_Controls.planeSelectionComboBox->currentIndex() == 2) accum_flag = mitk::MorphologicalOperations::Cross_Sagital;
+    if(m_Controls.planeSelectionComboBox->currentIndex() == 3) accum_flag = mitk::MorphologicalOperations::Cross_Coronal;
+  }
+  return (mitk::MorphologicalOperations::StructuralElementType)accum_flag;
 }

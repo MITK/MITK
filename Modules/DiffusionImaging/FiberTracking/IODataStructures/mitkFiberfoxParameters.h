@@ -49,7 +49,7 @@ public:
     typedef itk::Vector<double,3>                   GradientType;
     typedef std::vector<GradientType>               GradientListType;
 
-    enum DiffusionDirectionMode {
+    enum DiffusionDirectionMode : int {
         FIBER_TANGENT_DIRECTIONS,
         MAIN_FIBER_DIRECTIONS,
         RANDOM_DIRECTIONS
@@ -61,8 +61,14 @@ public:
         COIL_EXPONENTIAL
     };
 
+    enum AcquisitionType : int {
+        SingleShotEpi,
+        Cartesian
+    };
+
     SignalGenerationParameters()
-        : m_SignalScale(100)
+        : m_AcquisitionType(SignalGenerationParameters::SingleShotEpi)
+        , m_SignalScale(100)
         , m_tEcho(100)
         , m_tRep(4000)
         , m_tLine(1)
@@ -110,6 +116,7 @@ public:
     itk::Matrix<double, 3, 3>           m_ImageDirection;           ///< Image rotation matrix.
 
     /** Other acquisitions parameters */
+    AcquisitionType                     m_AcquisitionType;            ///< determines k-space trajectory and maximum echo position(s)
     double                              m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
     double                              m_tEcho;                    ///< Echo time TE.
     double                              m_tRep;                     ///< Echo time TR.

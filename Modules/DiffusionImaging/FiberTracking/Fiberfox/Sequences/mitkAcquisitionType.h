@@ -23,18 +23,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 /**
-  * \brief Abstract class for k-space readout schemes
+  * \brief Abstract class for k-space acquisiton type (k-space trajectory and echo placement)
   *
   */
-class KspaceReadout
+class AcquisitionType
 {
 public:
 
-    KspaceReadout(FiberfoxParameters<double>& parameters)
+    AcquisitionType(FiberfoxParameters<double>& parameters)
     {
         m_Parameters = parameters;
     }
-    virtual ~KspaceReadout(){}
+    virtual ~AcquisitionType(){}
 
     virtual double GetTimeFromMaxEcho(itk::Index< 2 > index) = 0;               ///< time from maximum echo intensity in milliseconds
     virtual double GetRedoutTime(itk::Index< 2 > index) = 0;                    ///< time passed since readout started in milliseconds

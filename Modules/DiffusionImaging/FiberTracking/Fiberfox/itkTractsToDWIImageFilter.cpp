@@ -1171,6 +1171,18 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         m_StatusText += this->GetTime()+" > Simulating k-space acquisition using "+boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_NumberOfCoils)+" coil(s)\n";
         MITK_INFO << "Simulating k-space acquisition using " << m_Parameters.m_SignalGen.m_NumberOfCoils << " coil(s).";
 
+        switch (m_Parameters.m_SignalGen.m_AcquisitionType)
+        {
+        case SignalGenerationParameters::SingleShotEpi:
+            m_StatusText += "Acquisition type: single shot EPI\n";
+            break;
+        case SignalGenerationParameters::Cartesian:
+            m_StatusText += "Acquisition type: classic spin echo with cartesian k-space trajectory\n";
+            break;
+        default:
+            m_StatusText += "Acquisition type: single shot EPI\n";
+        }
+
         if (m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
             m_StatusText += "Simulating signal relaxation\n";
         if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull())
@@ -1432,7 +1444,7 @@ void TractsToDWIImageFilter< PixelType >::SimulateExtraAxonalSignal(ItkUcharImgT
             double other = extraAxonalVolume - interAxonalVolume;        // rest of compartment
             if (other<0)
             {
-                MITK_ERROR << "Coorupted signal voxel detected. Fiber volume larger voxel volume!";
+                MITK_ERROR << "Corrupted signal voxel detected. Fiber volume larger voxel volume!";
                 other = 0;
             }
 

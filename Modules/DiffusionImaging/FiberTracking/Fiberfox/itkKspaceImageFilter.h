@@ -29,7 +29,7 @@ This file is based heavily on a corresponding ITK filter.
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <mitkFiberfoxParameters.h>
 #include <mitkFiberBundle.h>
-#include <mitkKspaceReadout.h>
+#include <mitkAcquisitionType.h>
 
 using namespace std;
 
@@ -125,7 +125,7 @@ namespace itk{
 
     double                                  m_CoilSensitivityFactor;
     typename InputImageType::Pointer        m_KSpaceImage;
-    KspaceReadout*                          m_ReadoutScheme;
+    AcquisitionType*                          m_ReadoutScheme;
 
   private:
 

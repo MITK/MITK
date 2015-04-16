@@ -68,8 +68,9 @@ set(H_FILES
   Fiberfox/SignalModels/mitkRicianNoiseModel.h
   Fiberfox/SignalModels/mitkChiSquareNoiseModel.h
 
-  Fiberfox/Sequences/mitkKspaceReadout.h
+  Fiberfox/Sequences/mitkAcquisitionType.h
   Fiberfox/Sequences/mitkSingleShotEpi.h
+  Fiberfox/Sequences/mitkCartesianReadout.h
 )
 
 set(RESOURCE_FILES

@@ -237,6 +237,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
         parameters.put("fiberfox.image.gradients."+boost::lexical_cast<string>(i)+".z", m_SignalGen.GetGradientDirection(i)[2]);
     }
 
+    parameters.put("fiberfox.image.acquisitiontype", m_SignalGen.m_AcquisitionType);
     parameters.put("fiberfox.image.coilsensitivityprofile", m_SignalGen.m_CoilSensitivityProfile);
     parameters.put("fiberfox.image.numberofcoils", m_SignalGen.m_NumberOfCoils);
     parameters.put("fiberfox.image.reversephase", m_SignalGen.m_ReversePhase);
@@ -546,6 +547,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             m_SignalGen.m_ImageDirection[2][1] = ReadVal<double>(v1,"basic.direction.8",m_SignalGen.m_ImageDirection[2][1]);
             m_SignalGen.m_ImageDirection[2][2] = ReadVal<double>(v1,"basic.direction.9",m_SignalGen.m_ImageDirection[2][2]);
 
+            m_SignalGen.m_AcquisitionType = (SignalGenerationParameters::AcquisitionType)ReadVal<int>(v1,"acquisitiontype", m_SignalGen.m_AcquisitionType);
             m_SignalGen.m_CoilSensitivityProfile = (SignalGenerationParameters::CoilSensitivityProfile)ReadVal<int>(v1,"coilsensitivityprofile", m_SignalGen.m_CoilSensitivityProfile);
             m_SignalGen.m_NumberOfCoils = ReadVal<int>(v1,"numberofcoils", m_SignalGen.m_NumberOfCoils);
             m_SignalGen.m_ReversePhase = ReadVal<bool>(v1,"reversephase", m_SignalGen.m_ReversePhase);

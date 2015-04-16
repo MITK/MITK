@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIterator.h>
 #include <itkImageFileWriter.h>
 #include <mitkSingleShotEpi.h>
+#include <mitkCartesianReadout.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -105,7 +106,17 @@ void KspaceImageFilter< TPixelType >
     }
     }
 
-    m_ReadoutScheme = new mitk::SingleShotEpi(m_Parameters);
+    switch (m_Parameters.m_SignalGen.m_AcquisitionType)
+    {
+    case SignalGenerationParameters::SingleShotEpi:
+        m_ReadoutScheme = new mitk::SingleShotEpi(m_Parameters);
+        break;
+    case SignalGenerationParameters::Cartesian:
+        m_ReadoutScheme = new mitk::CartesianReadout(m_Parameters);
+        break;
+    default:
+        m_ReadoutScheme = new mitk::SingleShotEpi(m_Parameters);
+    }
 }
 
 template< class TPixelType >
@@ -166,6 +177,8 @@ void KspaceImageFilter< TPixelType >
 
     double noiseVar = m_Parameters.m_SignalGen.m_PartialFourier*m_Parameters.m_SignalGen.m_NoiseVariance/(kyMax*kxMax); // adjust noise variance since it is the intended variance in physical space and not in k-space
 
+    double dt =  m_Parameters.m_SignalGen.m_tLine/kxMax;  // time to read one k-space voxel
+
     while( !oit.IsAtEnd() )
     {
         // dephasing time
@@ -194,26 +207,26 @@ void KspaceImageFilter< TPixelType >
         if (kIdx[1]>kyMax*m_Parameters.m_SignalGen.m_PartialFourier)
             pf = true;
 
-        // shift k for DFT: (0 -- N) --> (-N/2 -- N/2)
-        double kx = kIdx[0];
-        double ky = kIdx[1];
-        if ((int)kxMax%2==1)
-            kx -= (kxMax-1)/2;
-        else
-            kx -= kxMax/2;
-        if ((int)kyMax%2==1)
-            ky -= (kyMax-1)/2;
-        else
-            ky -= kyMax/2;
-
-        // add ghosting
-        if (oit.GetIndex()[1]%2 == 1)
-            kx -= m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
-        else
-            kx += m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
-
         if (!pf)
         {
+            // shift k for DFT: (0 -- N) --> (-N/2 -- N/2)
+            double kx = kIdx[0];
+            double ky = kIdx[1];
+            if ((int)kxMax%2==1)
+                kx -= (kxMax-1)/2;
+            else
+                kx -= kxMax/2;
+            if ((int)kyMax%2==1)
+                ky -= (kyMax-1)/2;
+            else
+                ky -= kyMax/2;
+
+            // add ghosting
+            if (oit.GetIndex()[1]%2 == 1)
+                kx -= m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
+            else
+                kx += m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
+
             vcl_complex<double> s(0,0);
             InputIteratorType it(m_CompartmentImages.at(0), m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
             while( !it.IsAtEnd() )
@@ -288,8 +301,8 @@ void KspaceImageFilter< TPixelType >
                 s = vcl_complex<double>(s.real()+randGen->GetNormalVariate(0,noiseVar), s.imag()+randGen->GetNormalVariate(0,noiseVar));
 
             outputImage->SetPixel(kIdx, s);
-//            m_KSpaceImage->SetPixel(kIdx, t/dt );
-            m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
+            m_KSpaceImage->SetPixel(kIdx, t/dt );
+//            m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
         }
 
         ++oit;
@@ -333,7 +346,7 @@ void KspaceImageFilter< TPixelType >
             s = vcl_complex<double>(s.real(), -s.imag());
             outputImage->SetPixel(kIdx, s);
 
-            m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
+//            m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
         }
         ++oit;
     }

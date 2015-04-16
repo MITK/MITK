@@ -731,13 +731,13 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     }
 
     // adjust echo time if needed
-    int numLines = parameters.m_SignalGen.m_ImageRegion.GetSize(1)+parameters.m_SignalGen.m_ImageRegion.GetSize(1)%2;
-    if ( parameters.m_SignalGen.m_tEcho < numLines*parameters.m_SignalGen.m_tLine )
-    {
-        this->m_Controls->m_TEbox->setValue( numLines*parameters.m_SignalGen.m_tLine );
-        parameters.m_SignalGen.m_tEcho = m_Controls->m_TEbox->value();
-        QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automatically adjusted to "+QString::number(parameters.m_SignalGen.m_tEcho)+" ms");
-    }
+//    int numLines = parameters.m_SignalGen.m_ImageRegion.GetSize(1)+parameters.m_SignalGen.m_ImageRegion.GetSize(1)%2;
+//    if ( parameters.m_SignalGen.m_tEcho < numLines*parameters.m_SignalGen.m_tLine )
+//    {
+//        this->m_Controls->m_TEbox->setValue( numLines*parameters.m_SignalGen.m_tLine );
+//        parameters.m_SignalGen.m_tEcho = m_Controls->m_TEbox->value();
+//        QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automatically adjusted to "+QString::number(parameters.m_SignalGen.m_tEcho)+" ms");
+//    }
 
     // Noise
     parameters.m_Misc.m_CheckAddNoiseBox = m_Controls->m_AddNoise->isChecked();

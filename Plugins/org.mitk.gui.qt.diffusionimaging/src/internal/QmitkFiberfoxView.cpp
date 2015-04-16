@@ -113,7 +113,7 @@ QmitkFiberfoxView::QmitkFiberfoxView()
     connect(&m_Thread, SIGNAL(started()), this, SLOT(BeforeThread()));
     connect(&m_Thread, SIGNAL(started()), &m_Worker, SLOT(run()));
     connect(&m_Thread, SIGNAL(finished()), this, SLOT(AfterThread()));
-    connect(&m_Thread, SIGNAL(terminated()), this, SLOT(AfterThread()));
+//    connect(&m_Thread, SIGNAL(terminated()), this, SLOT(AfterThread()));
     m_SimulationTimer = new QTimer(this);
 }
 

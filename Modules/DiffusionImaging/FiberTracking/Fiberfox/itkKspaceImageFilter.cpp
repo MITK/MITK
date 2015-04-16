@@ -105,8 +105,6 @@ void KspaceImageFilter< TPixelType >
     }
     }
 
-    if (m_ReadoutScheme!=nullptr)
-        delete m_ReadoutScheme;
     m_ReadoutScheme = new mitk::SingleShotEpi(m_Parameters);
 }
 
@@ -302,6 +300,8 @@ template< class TPixelType >
 void KspaceImageFilter< TPixelType >
 ::AfterThreadedGenerateData()
 {
+    delete m_ReadoutScheme;
+
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
     double kxMax = outputImage->GetLargestPossibleRegion().GetSize(0);  // k-space size in x-direction
     double kyMax = outputImage->GetLargestPossibleRegion().GetSize(1);  // k-space size in y-direction

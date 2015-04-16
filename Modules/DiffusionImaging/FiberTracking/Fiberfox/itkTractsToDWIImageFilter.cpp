@@ -1411,9 +1411,9 @@ void TractsToDWIImageFilter< PixelType >::SimulateExtraAxonalSignal(ItkUcharImgT
             DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
 
             if (g>=0)
-                pix[g] += m_Parameters.m_NonFiberModelList[maxVolumeIndex]->SimulateMeasurement(g);
+                pix[g] += m_Parameters.m_NonFiberModelList[maxVolumeIndex]->SimulateMeasurement(g)*m_VoxelVolume;
             else
-                pix += m_Parameters.m_NonFiberModelList[maxVolumeIndex]->SimulateMeasurement();
+                pix += m_Parameters.m_NonFiberModelList[maxVolumeIndex]->SimulateMeasurement()*m_VoxelVolume;
             doubleDwi->SetPixel(index, pix);
             if (g==0)
                 m_VolumeFractions.at(maxVolumeIndex+numFiberCompartments)->SetPixel(index, 1);

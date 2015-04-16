@@ -1139,7 +1139,10 @@ void mitk::FiberBundle::SetFiberWeights(float newWeight)
 void mitk::FiberBundle::SetFiberWeights(vtkSmartPointer<vtkFloatArray> weights)
 {
     if (m_NumFibers!=weights->GetSize())
+    {
+        MITK_INFO << "Weights array not equal to number of fibers!";
         return;
+    }
 
     for (int i=0; i<weights->GetSize(); i++)
         m_FiberWeights->SetValue(i, weights->GetValue(i));

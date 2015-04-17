@@ -29,6 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSliceNavigationController.h>
 #include <mitkVtkImageOverwrite.h>
 
+#include <QtConcurrentRun>
+#include <QFuture>
+#include <QFutureWatcher>
 #include <qmessagebox.h>
 
 static const char* const HelpText = "Select a image and a contour(set)";
@@ -93,6 +96,16 @@ void QmitkContourModelToImageWidget::EnableButtons(bool enable)
 
 void QmitkContourModelToImageWidget::OnProcessPressed()
 {
+  QFutureWatcher<void> watcher;
+  connect(&watcher, SIGNAL(finished()), this, SLOT(OnProcessingFinished()));
+
+  QFuture<void> future = QtConcurrent::run(this, &QmitkContourModelToImageWidget::FillContourModelSetIntoImage);
+
+  watcher.setFuture(future);
+}
+
+void QmitkContourModelToImageWidget::FillContourModelSetIntoImage()
+{
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
 
   mitk::DataNode::Pointer imageNode = dataSelectionWidget->GetSelection(0);
@@ -136,9 +149,6 @@ void QmitkContourModelToImageWidget::OnProcessPressed()
 
   //Disable Buttons during calculation and initialize Progressbar
   this->EnableButtons(false);
-  unsigned int num_contours = contourSet->GetContourModelList()->size();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(num_contours);
-  mitk::ProgressBar::GetInstance()->Progress();
 
   // Use mitk::ContourModelSetToImageFilter to fill the ContourModelSet into the image
   mitk::ContourModelSetToImageFilter::Pointer contourFiller = mitk::ContourModelSetToImageFilter::New();
@@ -169,4 +179,9 @@ void QmitkContourModelToImageWidget::OnProcessPressed()
   this->EnableButtons();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkContourModelToImageWidget::OnProcessingFinished()
+{
+  // Called when processing finished, nothing has to be done here
 }

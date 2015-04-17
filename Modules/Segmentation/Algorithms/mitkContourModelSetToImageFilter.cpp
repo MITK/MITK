@@ -119,6 +119,10 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
 {
   mitk::ContourModelSet* contourSet = const_cast<mitk::ContourModelSet*>(this->GetInput());
 
+  // Initializing progressbar
+  unsigned int num_contours = contourSet->GetContourModelList()->size();
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(num_contours);
+
   // Assure that the volume data of the output is set (fill volume with zeros)
   this->InitializeOutputEmpty();
 
@@ -230,6 +234,10 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     extractor->Update();
 
     reslice->SetInputSlice(0);
+
+    // Progress
+    mitk::ProgressBar::GetInstance()->Progress();
+
     ++it;
   }
 

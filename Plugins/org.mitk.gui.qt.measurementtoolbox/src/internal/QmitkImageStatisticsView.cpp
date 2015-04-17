@@ -875,7 +875,8 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
 
   t = std::min(image->GetTimeSteps() - 1, t);
 
-  QString hotspotMean; hotspotMean.append(QString("%1").arg(s[t].GetHotspotStatistics().GetMean(), 0, 'f', decimals));
+  // See bug 18340
+  /*QString hotspotMean; hotspotMean.append(QString("%1").arg(s[t].GetHotspotStatistics().GetMean(), 0, 'f', decimals));
     hotspotMean += " (";
     for (int i=0; i<s[t].GetHotspotIndex().size(); i++)
     {
@@ -911,7 +912,7 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     }
     hotspotMin += ")";
 
-  this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem( hotspotMin ) );
+  this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem( hotspotMin ) );*/
 }
 
 void QmitkImageStatisticsView::InvalidateStatisticsTableView()

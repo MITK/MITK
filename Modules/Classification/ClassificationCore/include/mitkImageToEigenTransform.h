@@ -43,6 +43,7 @@ namespace mitk
       unsigned int n_numSamples = countIf(mask, [](double c){ return c > 0;});
 
       out_matrix.resize(n_numSamples,1);
+      out_matrix.fill(0);
 
       auto mit = itk::ImageRegionConstIterator<UCharImageType>(current_mask, current_mask->GetLargestPossibleRegion());
       auto iit = itk::ImageRegionConstIterator<DoubleImageType>(current_input,current_input->GetLargestPossibleRegion());

@@ -53,7 +53,8 @@ struct mitk::VigraRandomForestClassifier::TrainingData
                const DefaultSplitType & refSplitter,
                const vigra::MultiArrayView<2, double> refFeature,
                const vigra::MultiArrayView<2, int> refLabel)
-    : m_NumberOfTrees(numberOfTrees),
+    : m_ClassCount(0),
+      m_NumberOfTrees(numberOfTrees),
       m_RandomForest(refRF),
       m_Splitter(refSplitter),
       m_Label(refLabel),
@@ -63,7 +64,8 @@ struct mitk::VigraRandomForestClassifier::TrainingData
   }
   vigra::ArrayVector<vigra::RandomForest<int>::DecisionTree_t>  trees_;
 
-  unsigned int m_NumberOfThreads, m_NumberOfTrees;
+  int m_ClassCount;
+  unsigned int m_NumberOfTrees;
   const vigra::RandomForest<int> & m_RandomForest;
   const DefaultSplitType & m_Splitter;
   const vigra::MultiArrayView<2, int> m_Label;
@@ -130,6 +132,7 @@ void mitk::VigraRandomForestClassifier::Train(const Eigen::MatrixXd & X_in, cons
   vigra::MultiArrayView<2, double> X(vigra::Shape2(X_in.rows(),X_in.cols()),X_in.data());
   vigra::MultiArrayView<2, int> Y(vigra::Shape2(Y_in.rows(),Y_in.cols()),Y_in.data());
 
+
   m_RandomForest.set_options().tree_count(1); // Number of trees that are calculated;
   m_RandomForest.learn(X, Y,vigra::rf::visitors::VisitorBase(),splitter);
 
@@ -141,6 +144,7 @@ void mitk::VigraRandomForestClassifier::Train(const Eigen::MatrixXd & X_in, cons
 
   // set result trees
   m_RandomForest.set_options().tree_count(m_Parameter->TreeCount);
+  m_RandomForest.ext_param_.class_count_ = data->m_ClassCount;
   m_RandomForest.trees_ = data->trees_;
 }
 
@@ -149,9 +153,14 @@ Eigen::MatrixXi mitk::VigraRandomForestClassifier::Predict(const Eigen::MatrixXd
 
   // Initialize output Eigen matrices
   m_OutProbability = Eigen::MatrixXd(X_in.rows(),m_RandomForest.class_count());
+  m_OutProbability.fill(0);
   m_OutLabel = Eigen::MatrixXi(X_in.rows(),1);
+  m_OutLabel.fill(0);
+  MITK_INFO("VigraRandomForestClassifier") << "Prediction setup done:";
+  MITK_INFO("VigraRandomForestClassifier") << "\tLabels= [" << m_OutLabel.rows() << ", " << m_OutLabel.cols() << "]";
+  MITK_INFO("VigraRandomForestClassifier") << "\tProbabilities= [" << m_OutProbability.rows() << ", " << m_OutProbability.cols() << "]";
 
-  // Access Eigen matrices by vigra MultiArrayView
+  MITK_INFO("VigraRandomForestClassifier") << "Vigra access!";
 
   vigra::MultiArrayView<2, double> P(vigra::Shape2(m_OutProbability.rows(),m_OutProbability.cols()),m_OutProbability.data());
   vigra::MultiArrayView<2, int> Y(vigra::Shape2(m_OutLabel.rows(),m_OutLabel.cols()),m_OutLabel.data());
@@ -159,10 +168,9 @@ Eigen::MatrixXi mitk::VigraRandomForestClassifier::Predict(const Eigen::MatrixXd
 
 
   std::auto_ptr<PredictionData> data;
-  itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
-
   data.reset( new PredictionData(m_RandomForest,X,Y,P));
 
+  itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
   threader->SetSingleMethod(this->PredictCallback,data.get());
   threader->SingleMethodExecute();
 
@@ -180,40 +188,48 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::TrainTreesCallback(voi
   const unsigned int threadId = infoStruct->ThreadID;
   // Get the user defined parameters containing all
   // neccesary informations
-  TrainingData * userData = (TrainingData *)(infoStruct->UserData);
+  TrainingData * data = (TrainingData *)(infoStruct->UserData);
   unsigned int numberOfTreesToCalculate = 0;
   // define the number of tress the forest have to calculate
-  numberOfTreesToCalculate = userData->m_NumberOfTrees / infoStruct->NumberOfThreads;
+  numberOfTreesToCalculate = data->m_NumberOfTrees / infoStruct->NumberOfThreads;
   // the 0th thread takes the residuals
-  if(threadId == 0) numberOfTreesToCalculate += userData->m_NumberOfTrees % infoStruct->NumberOfThreads;
+  if(threadId == 0) numberOfTreesToCalculate += data->m_NumberOfTrees % infoStruct->NumberOfThreads;
 
 
   if(numberOfTreesToCalculate != 0){
     // Copy the Treestructure defined in userData
-    vigra::RandomForest<int> rf = userData->m_RandomForest;
+    vigra::RandomForest<int> rf = data->m_RandomForest;
 
     // Initialize a splitter for the leraning process
     DefaultSplitType splitter;
-    splitter.UsePointBasedWeights(userData->m_Splitter.IsUsingPointBasedWeights());
-    splitter.UseRandomSplit(userData->m_Splitter.IsUsingRandomSplit());
-    splitter.SetPrecision(userData->m_Splitter.GetPrecision());
-    splitter.SetMaximumTreeDepth(userData->m_Splitter.GetMaximumTreeDepth());
+    splitter.UsePointBasedWeights(data->m_Splitter.IsUsingPointBasedWeights());
+    splitter.UseRandomSplit(data->m_Splitter.IsUsingRandomSplit());
+    splitter.SetPrecision(data->m_Splitter.GetPrecision());
+    splitter.SetMaximumTreeDepth(data->m_Splitter.GetMaximumTreeDepth());
+
 
     // set the numbers of trees calculated by this thread
     rf.trees_.clear();
     rf.set_options().tree_count(numberOfTreesToCalculate);
-    rf.learn(userData->m_Feature, userData->m_Label,vigra::rf::visitors::VisitorBase(),splitter);
+    rf.learn(data->m_Feature, data->m_Label,vigra::rf::visitors::VisitorBase(),splitter);
 
     // Write the calculated trees into the return array
-    userData->m_mutex->Lock(); // lock the critical areax
+    data->m_mutex->Lock(); // lock the critical areax
+    MITK_INFO << data->m_Label;
+
 
     for(unsigned int i = 0 ; i < rf.trees_.size(); i++)
-      userData->trees_.push_back(rf.trees_[i]);
-    MITK_INFO << "Thread = " << threadId << " done" << rf.trees_.size();
+      data->trees_.push_back(rf.trees_[i]);
+    data->m_ClassCount = rf.class_count();
 
-    userData->m_mutex->Unlock(); // unlock it
+    MITK_INFO << "Thread = " << threadId << " done!";
+    MITK_INFO << "\tTree count: " << rf.trees_.size();
+    MITK_INFO << "\tClass count: " << data->m_ClassCount;
+    data->m_mutex->Unlock(); // unlock it
 
   }
+
+
 
   ITK_THREAD_RETURN_TYPE value = NULL;
   return value;

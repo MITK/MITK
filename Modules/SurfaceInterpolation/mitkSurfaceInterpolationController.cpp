@@ -190,23 +190,6 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
   {
     this->RemoveContour(contourInfo);
   }
-
-  m_ReduceFilter->Update();
-  m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
-
-  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-  timeSelector->SetInput( m_SelectedSegmentation );
-  timeSelector->SetTimeNr( m_CurrentTimeStep );
-  timeSelector->SetChannelNr( 0 );
-  timeSelector->Update();
-  mitk::Image::Pointer refSegImage = timeSelector->GetOutput();
-
-  m_NormalsFilter->SetSegmentationBinaryImage(refSegImage);
-  for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
-  {
-    m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
-    m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
-  }
 }
 
 bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformation contourInfo )
@@ -281,6 +264,14 @@ void mitk::SurfaceInterpolationController::Interpolate()
   m_ReduceFilter->Update();
   m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
 
+  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+  timeSelector->SetInput( m_SelectedSegmentation );
+  timeSelector->SetTimeNr( m_CurrentTimeStep );
+  timeSelector->SetChannelNr( 0 );
+  timeSelector->Update();
+  mitk::Image::Pointer refSegImage = timeSelector->GetOutput();
+
+  m_NormalsFilter->SetSegmentationBinaryImage(refSegImage);
   for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
   {
     mitk::Surface::Pointer reducedContour = m_ReduceFilter->GetOutput(i);

@@ -207,11 +207,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
 static void ColorSegment(const mitk::CorrectorAlgorithm::TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic, int fillColor, int eraseColor)
 {
   int colorMode = (pic->GetPixel(segment.points[0]) == fillColor);
-  int color = 0;
-  if (colorMode)
-    color = eraseColor;
-  else
-    color = fillColor;
+  int color = colorMode ? eraseColor : fillColor;
 
   std::vector< itk::Index<2> >::const_iterator indexIterator;
   std::vector< itk::Index<2> >::const_iterator indexEnd;
@@ -224,17 +220,21 @@ static void ColorSegment(const mitk::CorrectorAlgorithm::TSegData &segment, itk:
     pic->SetPixel(*indexIterator, color);
   }
 }
+
 static itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer CloneImage(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic)
 {
   typedef itk::Image< ipMITKSegmentationTYPE, 2 > ItkImageType;
-
   typedef itk::ImageDuplicator< ItkImageType > DuplicatorType;
+
   DuplicatorType::Pointer duplicator = DuplicatorType::New();
   duplicator->SetInputImage(pic);
   duplicator->Update();
 
   return duplicator->GetOutput();
 }
+
+/// Changed offset range from -1 -> +1 to -2 -> +2
+/// So I expect there will be better chance to not miss the first point
 static itk::Index<2> GetFirstPoint(const mitk::CorrectorAlgorithm::TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic, int fillColor)
 {
   int colorMode = (pic->GetPixel(segment.points[0]) == fillColor);
@@ -248,9 +248,9 @@ static itk::Index<2> GetFirstPoint(const mitk::CorrectorAlgorithm::TSegData &seg
   for (; indexIterator != indexEnd; ++indexIterator)
   {
     itk::Index<2> index;
-    for (int xOffset = -1 ; xOffset < 2; ++xOffset)
+    for (int xOffset = -2 ; xOffset < 3; ++xOffset)
     {
-      for (int yOffset = -1 ; yOffset < 2; ++yOffset)
+      for (int yOffset = -2 ; yOffset < 3; ++yOffset)
       {
         index[0] = (*indexIterator)[0] - xOffset;
         index[1] = (*indexIterator)[1] - yOffset;
@@ -272,6 +272,8 @@ static std::vector<itk::Index<2> > FindSeedPoints(const mitk::CorrectorAlgorithm
   int colorMode = (pic->GetPixel(segment.points[0]) == fillColor);
   std::vector<itk::Index<2> > seedPoints;
 
+  /// Rarely correction fails because of that and it not clear why does it fail
+  /// Maybe segment line comes with wrong color but it should not
   try
   {
     itk::Index<2> firstPoint = GetFirstPoint(segment,  pic, fillColor);
@@ -299,10 +301,16 @@ static std::vector<itk::Index<2> > FindSeedPoints(const mitk::CorrectorAlgorithm
     listOfPoints->SetPixel(*indexIterator, 2);
   }
   indexIterator = segment.points.begin();
-  indexIterator++;
+  /// There we need to keep first and last segment uncolored
+  /// Because in next call of this function (for second part) we will search it again
+  /// TODO: Ideally it should be recoded
   indexIterator++;
   indexEnd--;
-  indexEnd--;
+  /// This two lines cause unexpected behaviour when seed points only can find one point
+  /// And whith only one seed point Fill function randomly could pick wrong point as splitting image
+  /// And then it will only cut (replace with 0 color) the cutting line segment
+  //indexIterator++;
+  //indexEnd--;
   for (; indexIterator != indexEnd; ++indexIterator)
   {
     bool pointFound = true;
@@ -366,15 +374,10 @@ static int FillRegion(const std::vector<itk::Index<2> > &seedPoints, itk::Image<
 {
   int numberOfPixel = 0;
   int mode = (pic->GetPixel(seedPoints[0]) == fillColor);
-  int drawColor = fillColor;
-  if (mode)
-  {
-    drawColor = eraseColor;
-  }
+  int drawColor = mode ? eraseColor : fillColor;
 
   std::vector<itk::Index<2> > workPoints;
   workPoints = seedPoints;
-  //   workPoints.push_back(seedPoints[0]);
   while (workPoints.size() > 0)
   {
     itk::Index<2> currentIndex = workPoints.back();
@@ -397,11 +400,8 @@ static int FillRegion(const std::vector<itk::Index<2> > &seedPoints, itk::Image<
     if (pic->GetLargestPossibleRegion().IsInside(currentIndex) &&  (pic->GetPixel(currentIndex) == fillColor) == mode)
       workPoints.push_back(currentIndex);
   }
-
   return numberOfPixel;
 }
-
-
 
 static void OverwriteImage(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer source, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer target)
 {
@@ -418,7 +418,7 @@ static void OverwriteImage(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer sour
   }
 }
 
-bool  mitk::CorrectorAlgorithm::ModifySegment(const TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic)
+bool mitk::CorrectorAlgorithm::ModifySegment(const TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic)
 {
     typedef itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer ItkImagePointerType;
 

@@ -693,7 +693,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
     while( !itOutput.IsAtEnd() && !itInput.IsAtEnd() )
     {
       //Use threshold slider to determine if pixel is set to 1
-      if( itInput.Value() != 0 && itInput.Value() > currentTreshold )
+      if( itInput.Value() != 0 && itInput.Value() >= currentTreshold )
       {
         itOutput.Set( 1 );
       }

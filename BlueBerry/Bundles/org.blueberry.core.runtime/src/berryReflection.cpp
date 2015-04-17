@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryObject.h"
 
+#include <QStringList>
+
 // Better name demangling for gcc
 #if __GNUC__ > 3 || ( __GNUC__ == 3 && __GNUC_MINOR__ > 0 )
 #define GCC_USEDEMANGLE

@@ -32,7 +32,7 @@ plugin.xml ........................... BlueBerry integration
 \endverbatim
 
 If you are not familiar with Qt development, please look into
-<a href="http://doc.qt.digia.com/4.7/designer-manual.html">this Digia page describing .ui files</a> (no, forget about the please, DO it!)
+<a href="http://doc.qt.io/qt-5/qtdesigner-manual.html">this Qt company page describing .ui files</a> (no, forget about the please, DO it!)
 
 The C++ files implement a subclass of QmitkAbstractView. In this special case of QmitkRegionGrowing, we added the option to set some seed points and run a region grower. If you are interested in the concrete changes necessary to turn a freshly generated QmitkRegionGrowing into an integrated one:
 

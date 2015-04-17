@@ -273,9 +273,7 @@ void KspaceImageFilter< TPixelType >
                     {
                         m_Parameters->m_SignalGen.m_FrequencyMap->TransformIndexToPhysicalPoint(index, point3D);
                         point3D = m_FiberBundle->TransformPoint(point3D.GetVnlVector(), -m_Rotation[0],-m_Rotation[1],-m_Rotation[2],-m_Translation[0],-m_Translation[1],-m_Translation[2]);
-                        m_Parameters->m_SignalGen.m_FrequencyMap->TransformPhysicalPointToIndex(point3D, index);
-                        if (m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().IsInside(index))
-                            omega += m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(index);
+                        omega += InterpolateFmapValue(point3D);
                     }
                     else
                     {
@@ -303,8 +301,19 @@ void KspaceImageFilter< TPixelType >
                 s = vcl_complex<double>(s.real()+randGen->GetNormalVariate(0,noiseVar), s.imag()+randGen->GetNormalVariate(0,noiseVar));
 
             outputImage->SetPixel(kIdx, s);
-//            m_KSpaceImage->SetPixel(kIdx, t/dt );
+            //            m_KSpaceImage->SetPixel(kIdx, t/dt );
             m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
+//            if (m_Parameters->m_SignalGen.m_FrequencyMap.IsNotNull()) // simulate distortions
+//            {
+//                itk::Point<double, 3> point3D;
+//                ItkDoubleImgType::IndexType index; index[0] = kIdx[0]; index[1] = kIdx[1]; index[2] = m_Zidx;
+//                if (m_Parameters->m_SignalGen.m_DoAddMotion)
+//                {
+//                    m_Parameters->m_SignalGen.m_FrequencyMap->TransformIndexToPhysicalPoint(index, point3D);
+//                    point3D = m_FiberBundle->TransformPoint(point3D.GetVnlVector(), -m_Rotation[0],-m_Rotation[1],-m_Rotation[2],-m_Translation[0],-m_Translation[1],-m_Translation[2]);
+//                    m_KSpaceImage->SetPixel(kIdx, InterpolateFmapValue(point3D) );
+//                }
+//            }
         }
 
         ++oit;
@@ -368,6 +377,79 @@ void KspaceImageFilter< TPixelType >
         spikeIdx[1] = randGen->GetIntegerVariate()%(int)kyMax;
         outputImage->SetPixel(spikeIdx, m_Spike);
     }
+}
+
+
+
+template< class TPixelType >
+double KspaceImageFilter< TPixelType >::InterpolateFmapValue(itk::Point<float, 3> itkP)
+{
+    itk::Index<3> idx;
+    itk::ContinuousIndex< double, 3> cIdx;
+    m_Parameters->m_SignalGen.m_FrequencyMap->TransformPhysicalPointToIndex(itkP, idx);
+    m_Parameters->m_SignalGen.m_FrequencyMap->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
+
+    double pix = 0;
+    if ( m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().IsInside(idx) )
+        pix = m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(idx);
+    else
+        return pix;
+
+    double frac_x = cIdx[0] - idx[0];
+    double frac_y = cIdx[1] - idx[1];
+    double frac_z = cIdx[2] - idx[2];
+    if (frac_x<0)
+    {
+        idx[0] -= 1;
+        frac_x += 1;
+    }
+    if (frac_y<0)
+    {
+        idx[1] -= 1;
+        frac_y += 1;
+    }
+    if (frac_z<0)
+    {
+        idx[2] -= 1;
+        frac_z += 1;
+    }
+    frac_x = 1-frac_x;
+    frac_y = 1-frac_y;
+    frac_z = 1-frac_z;
+
+    // int coordinates inside image?
+    if (idx[0] >= 0 && idx[0] < m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().GetSize(0)-1 &&
+            idx[1] >= 0 && idx[1] < m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().GetSize(1)-1 &&
+            idx[2] >= 0 && idx[2] < m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().GetSize(2)-1)
+    {
+        vnl_vector_fixed<double, 8> interpWeights;
+        interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
+        interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
+        interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
+        interpWeights[3] = (  frac_x)*(  frac_y)*(1-frac_z);
+        interpWeights[4] = (1-frac_x)*(1-frac_y)*(  frac_z);
+        interpWeights[5] = (  frac_x)*(1-frac_y)*(1-frac_z);
+        interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
+        interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
+
+        pix = m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(idx) * interpWeights[0];
+        ItkDoubleImgType::IndexType tmpIdx = idx; tmpIdx[0]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[1];
+        tmpIdx = idx; tmpIdx[1]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[2];
+        tmpIdx = idx; tmpIdx[2]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[3];
+        tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[4];
+        tmpIdx = idx; tmpIdx[1]++; tmpIdx[2]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[5];
+        tmpIdx = idx; tmpIdx[2]++; tmpIdx[0]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[6];
+        tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[7];
+    }
+
+    return pix;
 }
 
 }

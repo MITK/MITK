@@ -102,6 +102,7 @@ namespace itk{
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadID);
     void AfterThreadedGenerateData();
+    double InterpolateFmapValue(itk::Point<float, 3> itkP);
 
     DoubleVectorType                        m_CoilPosition;
     FiberfoxParameters<double>*             m_Parameters;

@@ -325,6 +325,8 @@ typename MLBSTrackingFilter< NumImageFeatures >::FeatureImageType::PixelType MLB
         tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
         pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[7];
     }
+
+    return pix;
 }
 
 template< int NumImageFeatures >

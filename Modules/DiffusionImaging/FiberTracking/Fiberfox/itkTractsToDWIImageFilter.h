@@ -105,6 +105,7 @@ protected:
     ItkDoubleImgType::Pointer NormalizeInsideMask(ItkDoubleImgType::Pointer image);
     void InitializeData();
     void InitializeFiberData();
+    double InterpolateValue(itk::Point<float, 3> itkP, ItkDoubleImgType::Pointer img);
 
     // input
     mitk::FiberfoxParameters<double>            m_Parameters;
@@ -122,7 +123,7 @@ protected:
     itk::TimeProbe                              m_TimeProbe;
     bool                                        m_UseConstantRandSeed;
     bool                                        m_MaskImageSet;
-    ofstream                                    m_Logfile;
+    ofstream                                    m_MotionLogfile;
 
     // signal generation
     FiberBundleType                             m_FiberBundleWorkingCopy;   ///< we work on an upsampled version of the input bundle
@@ -142,6 +143,8 @@ protected:
     double                                      m_SegmentVolume;
     bool                                        m_UseRelativeNonFiberVolumeFractions;
     mitk::PointSet::Pointer                     m_CoilPointset;
+    int                                         m_MotionCounter;
+    int                                         m_NumMotionVolumes;
 
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 };

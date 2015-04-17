@@ -270,7 +270,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
     parameters.put("fiberfox.image.artifacts.rotation0", m_SignalGen.m_Rotation[0]);
     parameters.put("fiberfox.image.artifacts.rotation1", m_SignalGen.m_Rotation[1]);
     parameters.put("fiberfox.image.artifacts.rotation2", m_SignalGen.m_Rotation[2]);
-
+    parameters.put("fiberfox.image.artifacts.motionvolumes", m_Misc.m_MotionVolumesBox);
     parameters.put("fiberfox.image.artifacts.addnoise", m_Misc.m_CheckAddNoiseBox);
     parameters.put("fiberfox.image.artifacts.addghosts", m_Misc.m_CheckAddGhostsBox);
     parameters.put("fiberfox.image.artifacts.addaliasing", m_Misc.m_CheckAddAliasingBox);
@@ -594,6 +594,28 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             m_SignalGen.m_Rotation[0] = ReadVal<double>(v1,"artifacts.rotation0", m_SignalGen.m_Rotation[0]);
             m_SignalGen.m_Rotation[1] = ReadVal<double>(v1,"artifacts.rotation1", m_SignalGen.m_Rotation[1]);
             m_SignalGen.m_Rotation[2] = ReadVal<double>(v1,"artifacts.rotation2", m_SignalGen.m_Rotation[2]);
+
+            m_Misc.m_MotionVolumesBox = ReadVal<string>(v1,"artifacts.motionvolumes", m_Misc.m_MotionVolumesBox);
+            m_SignalGen.m_MotionVolumes.clear();
+            if (m_Misc.m_MotionVolumesBox=="random")
+            {
+                for (int i=0; i<m_SignalGen.GetNumVolumes(); i++)
+                    m_SignalGen.m_MotionVolumes.push_back(rand()%2);
+            }
+            else if (!m_Misc.m_MotionVolumesBox.empty())
+            {
+                for (int i=0; i<m_SignalGen.GetNumVolumes(); i++)
+                    m_SignalGen.m_MotionVolumes.push_back(false);
+
+                stringstream stream(m_Misc.m_MotionVolumesBox);
+                int n;
+                while(stream >> n)
+                {
+                    if (n<m_SignalGen.GetNumVolumes() && n>=0)
+                        m_SignalGen.m_MotionVolumes[n]=true;
+                }
+            }
+
             //            m_SignalGen.SetNumWeightedVolumes(ReadVal<unsigned int>(v1,"numgradients", m_SignalGen.GetNumWeightedVolumes()));
             SignalGenerationParameters::GradientListType gradients;
             BOOST_FOREACH( boost::property_tree::ptree::value_type const& v2, v1.second.get_child("gradients") )

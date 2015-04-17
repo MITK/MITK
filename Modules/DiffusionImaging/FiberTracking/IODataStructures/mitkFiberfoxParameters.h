@@ -145,6 +145,7 @@ public:
     bool                                m_DoSimulateRelaxation;     ///< Add T2 relaxation effects
     bool                                m_DoAddMotion;              ///< Enable motion artifacts.
     bool                                m_DoRandomizeMotion;        ///< Toggles between random and linear motion.
+    std::vector< bool >                 m_MotionVolumes;            ///< Indicates the image volumes that are affected by motion
     itk::Vector<double,3>               m_Translation;              ///< Maximum translational motion.
     itk::Vector<double,3>               m_Rotation;                 ///< Maximum rotational motion.
     ItkDoubleImgType::Pointer           m_FrequencyMap;             ///< If != NULL, distortions are added to the image using this frequency map.
@@ -230,6 +231,7 @@ public:
         , m_CheckAddSpikesBox(false)
         , m_CheckAddEddyCurrentsBox(false)
         , m_CheckAddDistortionsBox(false)
+        , m_MotionVolumesBox("random")
         , m_CheckRealTimeFibersBox(true)
         , m_CheckAdvancedFiberOptionsBox(false)
         , m_CheckConstantRadiusBox(false)
@@ -253,6 +255,7 @@ public:
     bool                m_CheckAddSpikesBox;
     bool                m_CheckAddEddyCurrentsBox;
     bool                m_CheckAddDistortionsBox;
+    string              m_MotionVolumesBox;
     // fiber generation
     bool                m_CheckRealTimeFibersBox;
     bool                m_CheckAdvancedFiberOptionsBox;

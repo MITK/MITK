@@ -371,10 +371,6 @@ namespace mitk {
     /** Get the bounding box */
     itkGetConstObjectMacro(BoundingBox, BoundingBoxType);
 
-    //##Documentation
-    //## @brief Get the time bounds (in ms)
-    //itkGetConstReferenceMacro(TimeBounds, TimeBounds);
-
     // a bit of a misuse, but we want only doxygen to see the following:
 #ifdef DOXYGEN_SKIP
     //##Documentation

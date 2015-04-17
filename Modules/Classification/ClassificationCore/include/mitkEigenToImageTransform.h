@@ -19,7 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkEigenToImageTransform_h
 
 #include <MitkClassificationCoreExports.h>
-#include <mitkImageToImageFilter.h>
+#include <mitkImageCast.h>
+#include <itkImageRegionConstIterator.h>
+#include <itkImageRegionIterator.h>
 
 // Eigen
 #include <Eigen/Dense>
@@ -30,11 +32,48 @@ namespace mitk
   {
   public:
 
-    typedef Eigen::VectorXd VectorType;
+    template<typename TEigenMatrixtype>
+    static mitk::Image::Pointer transform(const TEigenMatrixtype & matrix, const mitk::Image::Pointer & mask)
+    {
+      UCharImageType::Pointer itkMask;
+      mitk::CastToItkImage(mask,itkMask);
 
-    mitk::Image::Pointer operator()(const VectorType & matrix, const mitk::Image::Pointer & mask);
+      unsigned int n_numSamples = 0;
+      {
+        auto mit = itk::ImageRegionConstIterator<UCharImageType>(itkMask, itkMask->GetLargestPossibleRegion());
+        while (!mit.IsAtEnd())
+        {
+          if(mit.Value() > 0) n_numSamples++;
+          ++mit;
+        }
+      }
 
-    static mitk::Image::Pointer transform(const VectorType & matrix, const mitk::Image::Pointer & mask);
+      if(n_numSamples != matrix.rows())
+        MITK_ERROR << "Number of samples in matrix and number of points under the masks is not the same!";
+
+
+      mitk::Image::Pointer output = mask->Clone();
+
+      DoubleImageType::Pointer itkImg;
+      mitk::CastToItkImage(output,itkImg);
+
+      auto mit = itk::ImageRegionConstIterator<UCharImageType>(itkMask, itkMask->GetLargestPossibleRegion());
+      auto oit = itk::ImageRegionIterator<DoubleImageType>(itkImg, itkImg->GetLargestPossibleRegion());
+
+      unsigned int current_row = 0;
+      while(!mit.IsAtEnd())
+      {
+        if(mit.Value() > 0)
+          oit.Set(matrix(current_row++,0));
+        else
+          oit.Set(0.0);
+        ++mit;
+        ++oit;
+      }
+
+      mitk::CastToMitkImage(itkImg,output);
+      return output;
+    }
 
   private:
     typedef itk::Image<unsigned char, 3> UCharImageType;

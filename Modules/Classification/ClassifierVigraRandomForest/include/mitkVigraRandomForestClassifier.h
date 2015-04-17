@@ -43,8 +43,8 @@ public:
 
   ~VigraRandomForestClassifier();
 
-  void Train(const MatrixType &X, const MatrixType &Y);
-  MatrixType Predict(const MatrixType &X);
+  void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
+  Eigen::MatrixXi Predict(const Eigen::MatrixXd &X);
 
   bool SupportsPointWiseWeight();
   bool SupportsPointWiseProbability();
@@ -52,14 +52,12 @@ public:
 
   vigra::MultiArrayView<2, double> GetPointWiseWeight();
 
-  typedef AbstractClassifier::MatrixType MatrixType;
-
-  void SetRandomForest(const vigra::RandomForest<double> & rf)
+  void SetRandomForest(const vigra::RandomForest<int> & rf)
   {
     m_RandomForest = rf;
   }
 
-  const vigra::RandomForest<double> & GetRandomForest() const
+  const vigra::RandomForest<int> & GetRandomForest() const
   {
     return m_RandomForest;
   }
@@ -74,17 +72,6 @@ public:
   void SetWeightLambda(double);
   void PrintParameter();
 
-  ///
-  /// \brief EigenAccessByVigra allows direct access to EigenMatrix data structure (no need to copy data)
-  /// \param Already initialized eigen matrix
-  /// \return vigra MultiArrayView structure
-  ///
-  static vigra::MultiArrayView<2, double> EigenAccessByVigra(const MatrixType & matrix)
-  {
-    vigra::Shape2 shape(matrix.rows(),matrix.cols());
-    vigra::MultiArrayView<2, double> outMatrix(shape,matrix.data());
-    return outMatrix;
-  }
 
 private:
   // *-------------------
@@ -100,7 +87,7 @@ private:
   struct Parameter;
 
   Parameter * m_Parameter;
-  vigra::RandomForest<double> m_RandomForest;
+  vigra::RandomForest<int> m_RandomForest;
 
 };
 }

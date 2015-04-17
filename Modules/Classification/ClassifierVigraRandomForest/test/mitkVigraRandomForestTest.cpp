@@ -37,16 +37,14 @@ class mitkVigraRandomForestTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  typedef mitk::ImageToEigenTransform::MatrixType MatrixType;
-
   mitk::Image::Pointer inputImage;
   mitk::Image::Pointer classMask;
   mitk::Image::Pointer F1;
   mitk::Image::Pointer F2;
   mitk::Image::Pointer F3;
-  MatrixType X;
-  MatrixType y;
-  MatrixType X_predict;
+  Eigen::MatrixXd X;
+  Eigen::MatrixXi y;
+  Eigen::MatrixXd X_predict;
 
   mitk::VigraRandomForestClassifier::Pointer classifier;
 
@@ -103,36 +101,34 @@ public:
 //    exit(0);
 
 
-//    for(const auto & pair : filter->GetLabelVoxelCountMap())
-//      MITK_INFO << pair.first << " " << pair.second;
-
     mitk::Image::Pointer sampledClassMask;
     mitk::CastToMitkImage(ADDFILTER->GetOutput(), sampledClassMask);
+    Eigen::MatrixXd fea1,fea2,fea3,fea4;
 
-    // Initialize X
-    MatrixType vec = mitk::ImageToEigenTransform::transform(inputImage,sampledClassMask);
     unsigned int n_features = 4; // F1,F2,F3 and inputImage
-    unsigned int n_samples = vec.rows();
+    unsigned int n_samples =  mitk::ImageToEigenTransform::countIf(sampledClassMask,[](double x){return x>0;});
 
-    X = MatrixType(n_samples,n_features);
-    X.col(0) = vec;
-    X.col(1) = mitk::ImageToEigenTransform::transform(F1,sampledClassMask);
-    X.col(2) = mitk::ImageToEigenTransform::transform(F2,sampledClassMask);
-    X.col(3) = mitk::ImageToEigenTransform::transform(F3,sampledClassMask);
+    mitk::ImageToEigenTransform::transform(inputImage,sampledClassMask,fea1);
+    mitk::ImageToEigenTransform::transform(F1,sampledClassMask,fea2);
+    mitk::ImageToEigenTransform::transform(F2,sampledClassMask,fea3);
+    mitk::ImageToEigenTransform::transform(F3,sampledClassMask,fea4);
 
-//    MatrixType X2(n_samples*2,n_features);
-//    X2 << X , X;
+    X = Eigen::MatrixXd(n_samples,n_features);
+    X << fea1,fea2,fea3,fea4;
 
-    y = mitk::ImageToEigenTransform::transform(classMask,sampledClassMask);
+    mitk::ImageToEigenTransform::transform(classMask,sampledClassMask,y);
 
-    vec = mitk::ImageToEigenTransform::transform(inputImage,classMask);
-    n_samples = vec.rows();
+    n_features = 4;
+    n_samples =  mitk::ImageToEigenTransform::countIf(classMask,[](double x){return x>0;});
 
-    X_predict = MatrixType(n_samples,n_features);
-    X_predict.col(0) = vec;
-    X_predict.col(1) = mitk::ImageToEigenTransform::transform(F1,classMask);
-    X_predict.col(2) = mitk::ImageToEigenTransform::transform(F2,classMask);
-    X_predict.col(3) = mitk::ImageToEigenTransform::transform(F3,classMask);
+    mitk::ImageToEigenTransform::transform(inputImage,classMask,fea1);
+    mitk::ImageToEigenTransform::transform(F1,classMask,fea2);
+    mitk::ImageToEigenTransform::transform(F2,classMask,fea3);
+    mitk::ImageToEigenTransform::transform(F3,classMask,fea4);
+
+
+    X_predict = Eigen::MatrixXd(n_samples,n_features);
+    X_predict << fea1,fea2,fea3,fea4;
 
     MITK_INFO << "Shape of X [" << X.rows() << " " << X.cols() << "]";
     MITK_INFO << "Shape of X_predict [" << X_predict.rows() << " " << X_predict.cols() << "]";
@@ -153,7 +149,7 @@ public:
     MITK_INFO << classifier->GetRandomForest().class_count();
     MITK_INFO << classifier->GetRandomForest().tree_count();
 
-    MatrixType classes = classifier->Predict(X_predict);
+    Eigen::MatrixXi classes = classifier->Predict(X_predict);
     mitk::Image::Pointer img = mitk::EigenToImageTransform::transform(classes, classMask);
     mitk::IOUtil::Save(img,"/Users/jc/prediction.nrrd");
   }

@@ -35,41 +35,32 @@ namespace mitk
 class MITKCLASSIFICATIONCORE_EXPORT AbstractClassifier : public BaseData
 {
 public:
-  ///
-  /// @brief MatrixType
-  ///
-  typedef Eigen::MatrixXd MatrixType;
-
-  ///
-  /// @brief VectorType
-  ///
-//  typedef Eigen::VectorXd VectorType;
 
   ///
   /// @brief Build a forest of trees from the training set (X, y).
   /// @param X, The training input samples. Matrix of shape = [n_samples, n_features]
   /// @param Y, The target values (class labels in classification, real numbers in regression). Matrix of shape = [n_samples, 1]
   ///
-  virtual void Train(const MatrixType &X, const MatrixType &Y) = 0;
+  virtual void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y) = 0;
 
   ///
   /// @brief Predict class for X.
   /// @param X, The input samples.
   /// @return The predicted classes. Y matrix of shape = [n_samples, 1]
   ///
-  virtual MatrixType Predict(const MatrixType &X) = 0;
+  virtual Eigen::MatrixXi Predict(const Eigen::MatrixXd &X) = 0;
 
   ///
   /// @brief GetPointWiseWeightCopy
   /// @return return label matrix of shape = [n_samples , 1]
   ///
-  MatrixType & GetLabels()
+  Eigen::MatrixXi & GetLabels()
   {
     return m_OutLabel;
   }
 
 protected:
-  MatrixType m_OutLabel;
+  Eigen::MatrixXi m_OutLabel;
 
 
 public:
@@ -87,7 +78,7 @@ public:
   /// @brief GetPointWiseWeightCopy
   /// @return Create and return a copy of W
   ///
-  MatrixType & GetPointWiseWeight()
+  Eigen::MatrixXd & GetPointWiseWeight()
   {
     return m_PointWiseWeight;
   }
@@ -96,7 +87,7 @@ public:
   /// @brief SetPointWiseWeight
   /// @param W, The pointwise weights. W matrix of shape = [n_samples, 1]
   ///
-  void SetPointWiseWeight(const MatrixType& W)
+  void SetPointWiseWeight(const Eigen::MatrixXd& W)
   {
     this->m_PointWiseWeight = W;
   }
@@ -120,7 +111,7 @@ public:
   }
 
 protected:
-  MatrixType m_PointWiseWeight;
+  Eigen::MatrixXd m_PointWiseWeight;
   bool m_IsUsingPointWiseWeight;
 
   // * --------------- *
@@ -138,7 +129,7 @@ public:
   /// @brief GetPointWiseWeightCopy
   /// @return return probability matrix
   ///
-  MatrixType & GetPointWiseProbabilities()
+  Eigen::MatrixXd & GetPointWiseProbabilities()
   {
     return m_OutProbability;
   }
@@ -162,7 +153,7 @@ public:
   }
 
 protected:
-  MatrixType m_OutProbability;
+  Eigen::MatrixXd m_OutProbability;
   bool m_IsUsingPointWiseProbability;
 
 public:

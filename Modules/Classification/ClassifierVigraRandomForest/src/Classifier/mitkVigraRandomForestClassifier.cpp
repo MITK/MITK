@@ -49,10 +49,10 @@ struct mitk::VigraRandomForestClassifier::Parameter
 struct mitk::VigraRandomForestClassifier::TrainingData
 {
   TrainingData(unsigned int numberOfTrees,
-               const vigra::RandomForest<double> & refRF,
+               const vigra::RandomForest<int> & refRF,
                const DefaultSplitType & refSplitter,
                const vigra::MultiArrayView<2, double> refFeature,
-               const vigra::MultiArrayView<2, double> refLabel)
+               const vigra::MultiArrayView<2, int> refLabel)
     : m_NumberOfTrees(numberOfTrees),
       m_RandomForest(refRF),
       m_Splitter(refSplitter),
@@ -61,20 +61,21 @@ struct mitk::VigraRandomForestClassifier::TrainingData
   {
     m_mutex = itk::FastMutexLock::New();
   }
-  vigra::ArrayVector<vigra::RandomForest<double>::DecisionTree_t>  trees_;
+  vigra::ArrayVector<vigra::RandomForest<int>::DecisionTree_t>  trees_;
 
   unsigned int m_NumberOfThreads, m_NumberOfTrees;
-  const vigra::RandomForest<double> & m_RandomForest;
+  const vigra::RandomForest<int> & m_RandomForest;
   const DefaultSplitType & m_Splitter;
-  const vigra::MultiArrayView<2, double> m_Label,m_Feature;
+  const vigra::MultiArrayView<2, int> m_Label;
+  const vigra::MultiArrayView<2, double> m_Feature;
   itk::FastMutexLock::Pointer m_mutex;
 };
 
 struct mitk::VigraRandomForestClassifier::PredictionData
 {
-  PredictionData(const vigra::RandomForest<double> & refRF,
+  PredictionData(const vigra::RandomForest<int> & refRF,
                  const vigra::MultiArrayView<2, double> refFeature,
-                 vigra::MultiArrayView<2, double> refLabel,
+                 vigra::MultiArrayView<2, int> refLabel,
                  vigra::MultiArrayView<2, double> refProb)
     : m_RandomForest(refRF),
       m_Feature(refFeature),
@@ -82,9 +83,10 @@ struct mitk::VigraRandomForestClassifier::PredictionData
       m_Probabilities(refProb)
   {
   }
-  const vigra::RandomForest<double> & m_RandomForest;
+  const vigra::RandomForest<int> & m_RandomForest;
   const vigra::MultiArrayView<2, double> m_Feature;
-  vigra::MultiArrayView<2, double> m_Label, m_Probabilities;
+  vigra::MultiArrayView<2, int> m_Label;
+  vigra::MultiArrayView<2, double> m_Probabilities;
 };
 
 mitk::VigraRandomForestClassifier::VigraRandomForestClassifier()
@@ -113,7 +115,7 @@ vigra::MultiArrayView<2, double> mitk::VigraRandomForestClassifier::GetPointWise
   return eigenview;
 }
 
-void mitk::VigraRandomForestClassifier::Train(const MatrixType & X_in, const MatrixType & Y_in)
+void mitk::VigraRandomForestClassifier::Train(const Eigen::MatrixXd & X_in, const Eigen::MatrixXi &Y_in)
 {
   DefaultSplitType splitter;
   splitter.UsePointBasedWeights(m_Parameter->UsePointBasedWeights);
@@ -125,8 +127,8 @@ void mitk::VigraRandomForestClassifier::Train(const MatrixType & X_in, const Mat
   if (m_Parameter->UsePointBasedWeights)
     splitter.SetWeights(this->GetPointWiseWeight());
 
-  vigra::MultiArrayView<2, double> X = EigenAccessByVigra(X_in);
-  vigra::MultiArrayView<2, double> Y = EigenAccessByVigra(Y_in);
+  vigra::MultiArrayView<2, double> X(vigra::Shape2(X_in.rows(),X_in.cols()),X_in.data());
+  vigra::MultiArrayView<2, int> Y(vigra::Shape2(Y_in.rows(),Y_in.cols()),Y_in.data());
 
   m_RandomForest.set_options().tree_count(1); // Number of trees that are calculated;
   m_RandomForest.learn(X, Y,vigra::rf::visitors::VisitorBase(),splitter);
@@ -142,17 +144,19 @@ void mitk::VigraRandomForestClassifier::Train(const MatrixType & X_in, const Mat
   m_RandomForest.trees_ = data->trees_;
 }
 
-mitk::VigraRandomForestClassifier::MatrixType mitk::VigraRandomForestClassifier::Predict(const MatrixType &X_in)
+Eigen::MatrixXi mitk::VigraRandomForestClassifier::Predict(const Eigen::MatrixXd &X_in)
 {
 
   // Initialize output Eigen matrices
-  m_OutProbability = MatrixType(X_in.rows(),m_RandomForest.class_count());
-  m_OutLabel = MatrixType(X_in.rows(),1);
+  m_OutProbability = Eigen::MatrixXd(X_in.rows(),m_RandomForest.class_count());
+  m_OutLabel = Eigen::MatrixXi(X_in.rows(),1);
 
   // Access Eigen matrices by vigra MultiArrayView
-  vigra::MultiArrayView<2,double> P = EigenAccessByVigra(m_OutProbability);
-  vigra::MultiArrayView<2,double> Y = EigenAccessByVigra(m_OutLabel);
-  vigra::MultiArrayView<2,double> X = EigenAccessByVigra(X_in);
+
+  vigra::MultiArrayView<2, double> P(vigra::Shape2(m_OutProbability.rows(),m_OutProbability.cols()),m_OutProbability.data());
+  vigra::MultiArrayView<2, int> Y(vigra::Shape2(m_OutLabel.rows(),m_OutLabel.cols()),m_OutLabel.data());
+  vigra::MultiArrayView<2, double> X(vigra::Shape2(X_in.rows(),X_in.cols()),X_in.data());
+
 
   std::auto_ptr<PredictionData> data;
   itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
@@ -186,7 +190,7 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::TrainTreesCallback(voi
 
   if(numberOfTreesToCalculate != 0){
     // Copy the Treestructure defined in userData
-    vigra::RandomForest<double> rf = userData->m_RandomForest;
+    vigra::RandomForest<int> rf = userData->m_RandomForest;
 
     // Initialize a splitter for the leraning process
     DefaultSplitType splitter;
@@ -240,7 +244,7 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::PredictCallback(void *
   if(threadId == infoStruct->NumberOfThreads-1) numberOfRowsToCalculate += data->m_Feature.shape()[0] % infoStruct->NumberOfThreads;
 
   vigra::MultiArrayView<2, double> split_features;
-  vigra::MultiArrayView<2, double> split_labels;
+  vigra::MultiArrayView<2, int> split_labels;
   vigra::MultiArrayView<2, double> split_probability;
   {
     vigra::TinyVector<vigra::MultiArrayIndex, 2> lowerBound(start_index,0);

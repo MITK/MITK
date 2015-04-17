@@ -37,7 +37,6 @@ class mitkLibSVMClassifierTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  typedef mitk::ImageToEigenTransform::MatrixType EigenMatrixType;
 //  typedef mitk::ImageToEigenTransform::VectorType EigenVectorType;
 //  static std::string GetTestDataFilePath(const std::string& testData)
 //  {
@@ -54,9 +53,9 @@ private:
   mitk::Image::Pointer F1;
   mitk::Image::Pointer F2;
   mitk::Image::Pointer F3;
-  EigenMatrixType X;
-  EigenMatrixType y;
-  EigenMatrixType X_predict;
+  Eigen::MatrixXd X;
+  Eigen::MatrixXi y;
+  Eigen::MatrixXd X_predict;
 
   mitk::LibSVMClassifier::Pointer classifier;
 
@@ -111,39 +110,39 @@ public:
     mitk::Image::Pointer sampledClassMask;
     mitk::CastToMitkImage(filter->GetOutput(), sampledClassMask);
 
-    // Initialize X
-    EigenMatrixType vec = mitk::ImageToEigenTransform::transform(inputImage,sampledClassMask);
-    unsigned int n_features = 4; // F1,F2,F3 and inputImage
-    unsigned int n_samples = vec.rows();
+//    // Initialize X
+//    Eigen::MatrixXd vec = mitk::ImageToEigenTransform::transform(inputImage,sampledClassMask);
+//    unsigned int n_features = 4; // F1,F2,F3 and inputImage
+//    unsigned int n_samples = vec.rows();
 
-    X = EigenMatrixType(n_samples,n_features);
-    X.col(0) = vec;
-    X.col(1) = mitk::ImageToEigenTransform::transform(F1,sampledClassMask);
+//    X = Eigen::MatrixXd(n_samples,n_features);
+//    X.col(0) = vec;
+//    X.col(1) = mitk::ImageToEigenTransform::transform(F1,sampledClassMask);
 
-    y = mitk::ImageToEigenTransform::transform(classMask,sampledClassMask);
+//    y = mitk::ImageToEigenTransform::transform(classMask,sampledClassMask);
 
-    vec = mitk::ImageToEigenTransform::transform(inputImage,classMask);
-    n_samples = vec.rows();
+//    vec = mitk::ImageToEigenTransform::transform(inputImage,classMask);
+//    n_samples = vec.rows();
 
-    X_predict = EigenMatrixType(n_samples,n_features);
-    X_predict.col(0) = vec;
-    X_predict.col(1) = mitk::ImageToEigenTransform::transform(F1,classMask);
+//    X_predict = Eigen::MatrixXd(n_samples,n_features);
+//    X_predict.col(0) = vec;
+//    X_predict.col(1) = mitk::ImageToEigenTransform::transform(F1,classMask);
 
-    MITK_INFO << "Shape of X [" << X.rows() << " " << X.cols() << "]";
-    MITK_INFO << "Shape of X_predict [" << X_predict.rows() << " " << X_predict.cols() << "]";
-    MITK_INFO << "Shape of Y [" << y.rows() << "]";
+//    MITK_INFO << "Shape of X [" << X.rows() << " " << X.cols() << "]";
+//    MITK_INFO << "Shape of X_predict [" << X_predict.rows() << " " << X_predict.cols() << "]";
+//    MITK_INFO << "Shape of Y [" << y.rows() << "]";
 
-    classifier = mitk::LibSVMClassifier::New();
+//    classifier = mitk::LibSVMClassifier::New();
 
   }
 
   void TrainSVMClassifier()
   {
-    classifier->Train(X,y);
+//    classifier->Train(X,y);
 
-    EigenMatrixType classes = classifier->Predict(X_predict);
-    mitk::Image::Pointer img = mitk::EigenToImageTransform::transform(classes, classMask);
-    mitk::IOUtil::Save(img,"/Users/jc/prediction.nrrd");
+//    Eigen::MatrixXd classes = classifier->Predict(X_predict);
+//    mitk::Image::Pointer img = mitk::EigenToImageTransform::transform(classes, classMask);
+//    mitk::IOUtil::Save(img,"/Users/jc/prediction.nrrd");
   }
 
   void TestThreadedDecisionForest()

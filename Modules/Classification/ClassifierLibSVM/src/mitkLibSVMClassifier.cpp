@@ -36,7 +36,7 @@ mitk::LibSVMClassifier::~LibSVMClassifier()
   }
 }
 
-void mitk::LibSVMClassifier::Train(const MatrixType &X, const MatrixType &Y)
+void mitk::LibSVMClassifier::Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y)
 {
   LibSVM::svm_parameter parameter;
   LibSVM::svm_problem problem;
@@ -67,7 +67,7 @@ void mitk::LibSVMClassifier::Train(const MatrixType &X, const MatrixType &Y)
   free(xSpace);
 }
 
-mitk::LibSVMClassifier::MatrixType mitk::LibSVMClassifier::Predict(const MatrixType &X)
+Eigen::MatrixXi mitk::LibSVMClassifier::Predict(const Eigen::MatrixXd &X)
 {
   if ( ! m_Model)
   {
@@ -76,7 +76,7 @@ mitk::LibSVMClassifier::MatrixType mitk::LibSVMClassifier::Predict(const MatrixT
   int noOfPoints = static_cast<int>(X.rows());
   int noOfFeatures = static_cast<int>(X.cols());
 
-  MatrixType result(noOfPoints,1);
+  Eigen::MatrixXi result(noOfPoints,1);
 
   LibSVM::svm_node * xVector = static_cast<LibSVM::svm_node *>(malloc(sizeof(LibSVM::svm_node) * (noOfFeatures+1)));
   for (int point = 0; point < noOfPoints; ++point)
@@ -114,7 +114,7 @@ void  mitk::LibSVMClassifier::ConvertParameter(LibSVM::svm_parameter* parameter)
   parameter->weight = nullptr;
 }
 
-void mitk::LibSVMClassifier::ReadXValues(LibSVM::svm_problem * problem, LibSVM::svm_node** xSpace, const MatrixType &X)
+void mitk::LibSVMClassifier::ReadXValues(LibSVM::svm_problem * problem, LibSVM::svm_node** xSpace, const Eigen::MatrixXd &X)
 {
   int noOfPoints = static_cast<int>(X.rows());
   int features = static_cast<int>(X.cols());
@@ -135,7 +135,7 @@ void mitk::LibSVMClassifier::ReadXValues(LibSVM::svm_problem * problem, LibSVM::
   }
 }
 
-void mitk::LibSVMClassifier::ReadYValues(LibSVM::svm_problem * problem, const MatrixType &Y)
+void mitk::LibSVMClassifier::ReadYValues(LibSVM::svm_problem * problem, const Eigen::MatrixXi &Y)
 {
   int noOfPoints = static_cast<int>(Y.rows());
   problem->y = static_cast<double *>(malloc(sizeof(double)  * noOfPoints));
@@ -148,7 +148,7 @@ void mitk::LibSVMClassifier::ReadYValues(LibSVM::svm_problem * problem, const Ma
 
 void mitk::LibSVMClassifier::ReadWValues(LibSVM::svm_problem * problem)
 {
-  MatrixType & W = this->GetPointWiseWeight();
+  Eigen::MatrixXd & W = this->GetPointWiseWeight();
   int noOfPoints = problem->l;
   problem->W = static_cast<double *>(malloc(sizeof(double)  * noOfPoints));
 

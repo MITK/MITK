@@ -14,17 +14,12 @@ http://mitk.org/download/tutorial-data/lungs.vtk (surface)
  \dontinclude Step2.cpp
 
  This program shows how to load multiple data sets.
-
- A DataNodeFactory is used to produce nodes containing the data.
-
  The picture above shows the result of the program when reading both the image file and the surface file.
-
  In order to obtain the result the program has to be executed using the image file Pic3D.nrrd and the surface file lungs.vtk.
 
  The code for this example equals the code of Step 1 except for part II and part III which are changed as follows:
  \skipline Part II
- \until exit(2)
- \line }
+ \until mitk::IOUtil::Load(argv[i],*storage);
  \line }
 
 

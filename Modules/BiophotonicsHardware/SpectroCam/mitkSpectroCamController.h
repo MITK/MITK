@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <opencv\cv.h>
 
+#include <MitkSpectroCamExports.h>
+
 namespace mitk
 {
     /**
@@ -31,16 +33,18 @@ namespace mitk
     * @ingroup BiophotonicsHardware
     */
 
-    class SpectroCamController
+    class MITKSPECTROCAM_EXPORT SpectroCamController
     {
     public:
         SpectroCamController();
         ~SpectroCamController();
 
         bool Ini();
-        bool OpenCameraConnection();
-        bool CloseCameraConnection();
-        ISpectroCam* GetSpectroCam() const;
+        int OpenCameraConnection();
+        int CloseCameraConnection();
+        bool isCameraRunning();
+
+
         J_tIMAGE_INFO GetImageInfo();
 
         std::string mode;
@@ -52,8 +56,11 @@ namespace mitk
 
     private:
 
+        bool m_IsCameraRunning;
 
         unsigned m_NumRecordedImages;
+
+
 
         ISpectroCam*  spectroCam;                        //SpectroCam var
         J_tIMAGE_INFO m_CnvImageInfo;                    //Image Info
@@ -74,8 +81,6 @@ namespace mitk
         FastModeSettings fastSettings;
         SequenceModeSettings seqSettings;
         IndexModeSettings indexSettings;
-
-
 
         void SaveCameraStreamToDisk();
     };

@@ -31,6 +31,8 @@ using namespace cv;
 
 
 
+
+
 // Implementation
 void getSettingsFromIni(FastModeSettings &fastSettings, SequenceModeSettings &seqSettings, IndexModeSettings &indexSettings, std::string &mode);
 
@@ -44,7 +46,8 @@ mitk::SpectroCamController::SpectroCamController()
     m_hView(NULL),
     m_NumRecordedImages(0),
     m_Image(cvCreateImage(cvSize(2456, 2058), IPL_DEPTH_16U, 1)),
-    m_8BitImage(cvCreateImage(cvSize(2456, 2058), IPL_DEPTH_8U, 1))
+    m_8BitImage(cvCreateImage(cvSize(2456, 2058), IPL_DEPTH_8U, 1)),
+    m_IsCameraRunning(false)
 {
     my_SpectroCamController = this;
 }
@@ -55,10 +58,6 @@ mitk::SpectroCamController::~SpectroCamController()
 {
 }
 
-ISpectroCam* mitk::SpectroCamController::GetSpectroCam() const
-{
-    return spectroCam;
-}
 
 J_tIMAGE_INFO mitk::SpectroCamController::GetImageInfo()
 {
@@ -99,8 +98,8 @@ bool mitk::SpectroCamController::Ini()
 {
     //===============Get Ini from File===============
     //Get model from file    std::string CChildWindowSampleDlg::getModelNameFromIni()
-    std::ifstream fin("..\\ModeSettings.txt");   //Set File to read
-    std::ofstream fout("..\\ModeSettingsCheck.txt");   //Set output
+    std::ifstream fin("C:\\ModeSettings.txt");   //Set File to read
+    std::ofstream fout("C:\\ModeSettingsCheck.txt");   //Set output
     const int bufferSize = 1000;
     char buffer[bufferSize];
 
@@ -225,7 +224,6 @@ static void DisplayCameraStream(SpectroCamImage image)
         {
             std::cout << "Filter number out of range.\n"<<  std::endl;
         }
-
         else
         {
             // Allocate the buffer to hold converted the image. (We only want to do this once for performance reasons)
@@ -271,7 +269,7 @@ static void DisplayCameraStream(SpectroCamImage image)
 
 
 
-bool mitk::SpectroCamController::OpenCameraConnection()
+int mitk::SpectroCamController::OpenCameraConnection()
 {
     //=====================OpenFactoryAndCamera=====================
     //Create Factory and cam based on   //BOOL OpenFactoryAndCamera();        // Open factory and search for cameras. Open first camera
@@ -281,7 +279,7 @@ bool mitk::SpectroCamController::OpenCameraConnection()
 
 
     //=====================Open Streams=====================
-    J_STATUS_TYPE status = spectroCam->initialize(model.c_str(), (std::string("..\\..\\Camera Scripts\\") + model + "\\").c_str());
+    J_STATUS_TYPE status = spectroCam->initialize(model.c_str(), (std::string("C:\\") + model + "\\").c_str());
 
     if (status != J_ST_SUCCESS)
     {
@@ -292,45 +290,56 @@ bool mitk::SpectroCamController::OpenCameraConnection()
     //=====================Open Streams=====================
     if (mode == "Fast")
     {
-        spectroCam->start(fastSettings);
+        status = status | spectroCam->start(fastSettings);
     }
 
     else if (mode == "Sequence")
     {
-        spectroCam->start(seqSettings);
+        status = status |  spectroCam->start(seqSettings);
     }
 
     else if (mode == "IndexFast")
     {
         indexSettings.filterModeSpeed = IndexModeSettings::INDEX_FAST;
-        spectroCam->start(indexSettings);
+        status = status |  spectroCam->start(indexSettings);
     }
 
     else if (mode == "IndexSlow")
     {
         indexSettings.filterModeSpeed = IndexModeSettings::INDEX_SLOW;
-        spectroCam->start(indexSettings);
+        status = status | spectroCam->start(indexSettings);
     }
 
     else if (mode == "IndexTriggered")
     {
         indexSettings.filterModeSpeed = IndexModeSettings::INDEX_TRIGGERED;
-        spectroCam->start(indexSettings);
+        status = status |  spectroCam->start(indexSettings);
     }
 
     else
     {
-        spectroCam->start(fastSettings);
+        status = status |  spectroCam->start(fastSettings);
     }
-    return true;
+
+    if (status == J_ST_SUCCESS)
+    {
+        m_IsCameraRunning = true;
+    }
+
+    return status;
+}
+
+bool mitk::SpectroCamController::isCameraRunning()
+{
+    return m_IsCameraRunning;
 }
 
 
 
-
 //Method to close down connections
-bool mitk::SpectroCamController::CloseCameraConnection()
+int mitk::SpectroCamController::CloseCameraConnection()
 {
+
     // On click -> Stop acquisition
     J_STATUS_TYPE retval;
     CAM_HANDLE hCam = spectroCam->GetCameraHandle();
@@ -448,5 +457,10 @@ bool mitk::SpectroCamController::CloseCameraConnection()
     //BOOL TerminateStreamThread(void);   // Terminate the image acquisition thread
     DestroySpectroCam(spectroCam);          //Destroy SpectroCam-Objekt
 
-    return 0;
+    if (J_ST_SUCCESS)
+    {
+        m_IsCameraRunning = false;
+    }
+
+    return retval;
 }

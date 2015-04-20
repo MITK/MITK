@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkExtendedStatisticsImageFilter_h
 
 #include "itkStatisticsImageFilter.h"
+#include "itkScalarImageToHistogramGenerator.h"
+#include <mbilog.h>
+#include <mitkLogMacros.h>
 
 namespace itk
 {
@@ -25,17 +28,18 @@ namespace itk
   * \brief Extension of the itkStatisticsImageFilter that also calculates the Skewness and Kurtosis.
   *
   * This class inherits from the itkStatisticsImageFilter and
-  * uses its results for the calculation of the two additional coefficients:
+  * uses its results for the calculation of other additional coefficients:
   * the Skewness and Kurtosis.
   *
   * As these coefficient are based on the mean and the sigma which are both calculated
   * by the StatisticsImageFilter, the method AfterThreadedGenerateData() is overwritten
-  * and calls ComputeSkewnessAndKurtosis() after the AfterThreadedGenerateData()
+  * and calls ComputeSkewnessKurtosisAndMPP() and ComputeEntropyUniformityAndUPP
+  * after the AfterThreadedGenerateData()
   * implementation of the superclass is called.
   *
   * As the StatisticsImageFilter stores the statistics in the outputs 1 to 6 by the
-  * StatisticsImageFilter, the skewness and kurtosis are stored in the outputs
-  * 7 and 8 by this filter.
+  * StatisticsImageFilter, the skewness, kurtosis,MPP,UPP,Uniformity and Entropy are stored in the outputs
+  * 7 to 12 by this filter.
   */
   template< class TInputImage >
   class ExtendedStatisticsImageFilter : public StatisticsImageFilter< TInputImage >
@@ -48,10 +52,15 @@ namespace itk
     typedef SmartPointer< const Self >                       ConstPointer;
     typedef typename Superclass::RealType                    RealType;
     typedef typename Superclass::RealObjectType              RealObjectType;
+    typedef typename Superclass::PixelType                   PixelType;
 
     itkFactorylessNewMacro( Self );
     itkCloneMacro( Self );
     itkTypeMacro( ExtendedStatisticsImageFilter, StatisticsImageFilter );
+
+
+        typedef itk::Statistics::ScalarImageToHistogramGenerator< TInputImage >
+          HistogramGeneratorType;
 
     /**
     * \brief Return the computed Skewness.
@@ -69,6 +78,52 @@ namespace itk
       return this->GetKurtosisOutput()->Get();
     }
 
+    /* \brief Return the computed MPP.
+      */
+      double GetMPP() const
+    {
+      return this->GetMPPOutput()->Get();
+    }
+
+    /**
+    * \brief Return the computed Uniformity.
+    */
+    double GetUniformity() const
+    {
+      return this->GetUniformityOutput()->Get();
+    }
+
+    /**
+      *\brief Return the computed Entropy.
+      */
+      double GetEntropy() const
+    {
+      return this->GetEntropyOutput()->Get();
+    }
+
+    /**
+      * \brief Return the computed UPP.
+      */
+      double GetUPP() const
+    {
+      return this->GetUPPOutput()->Get();
+    }
+
+
+      /**
+      * \brief Return the computed Histogram.
+      */
+      typename const HistogramGeneratorType::HistogramType*
+        GetHistogram()
+      {
+        return m_histogramGenerator->GetOutput();
+      }
+
+      /**
+      * \brief Set the Binsize for the Histogram.
+      */
+    void SetBinSize(int size);
+
   protected:
 
     ExtendedStatisticsImageFilter();
@@ -76,17 +131,27 @@ namespace itk
     virtual ~ExtendedStatisticsImageFilter(){};
 
     /**
-    * brief Calls AfterThreadedGenerateData() of the superclass and ComputeSkewnessAndKurtosis().
+    * brief Calls AfterThreadedGenerateData() of the superclass and the main methods
     */
     void AfterThreadedGenerateData();
-
+    void CalculteHistogram();
     /**
-    * \brief Compute the Skewness Kurtosis.
+    * \brief Compute Entropy,uniformity,MPP,UPP.
     *
-    * The Skewness and Kurtosis will be calculated with the Sigma and Mean Value of the
+    * The Entropy,uniformity,MPP and UPP will be calculated with the Sigma, Hisotgram and Mean Value of the
     * itkStatisticsImageFilter which comes out of the threadedGenerateData().
     */
-    void ComputeSkewnessAndKurtosis();
+    void ComputeSkewnessKurtosisAndMPP();
+    void ComputeEntropyUniformityAndUPP();
+
+  /**
+    * \brief Histogram.
+    *
+    * new members for setting and calculating the hisotgram for those coefficients which depends on this
+    */
+    typename  HistogramGeneratorType::Pointer  m_histogramGenerator;
+    int m_Binsize;
+    bool m_histogramCalculated;
 
 
     RealObjectType* GetSkewnessOutput();
@@ -96,6 +161,22 @@ namespace itk
     RealObjectType* GetKurtosisOutput();
 
     const RealObjectType* GetKurtosisOutput() const;
+
+    RealObjectType* GetMPPOutput();
+
+    const RealObjectType* GetMPPOutput() const;
+
+    RealObjectType* GetEntropyOutput();
+
+    const RealObjectType* GetEntropyOutput() const;
+
+    RealObjectType* GetUniformityOutput();
+
+    const RealObjectType* GetUniformityOutput() const;
+
+    RealObjectType* GetUPPOutput();
+
+    const RealObjectType* GetUPPOutput() const;
 
     virtual DataObject::Pointer MakeOutput( ProcessObject::DataObjectPointerArraySizeType idx );
 

@@ -22,15 +22,16 @@ namespace itk
 {
   /**
   * \class ExtendedLabelStatisticsImageFilter
-  * \brief Extension of the itkLabelStatisticsImageFilter that also calculates the Skewness and Kurtosis.
+  * \brief Extension of the itkLabelStatisticsImageFilter that also calculates the Skewness,Kurtosis,Entropy,Uniformity.
   *
   * This class inherits from the itkLabelStatisticsImageFilter and
-  * uses its results for the calculation of two additional coefficients:
-  * the Skewness and Kurtosis.
+  * uses its results for the calculation of six additional coefficients:
+  * the Skewness,Kurtosis,Uniformity,UPP,MPP,Entropy
   *
   * As these coefficient are based on the mean and the sigma which are both calculated
   * by the LabelStatisticsImageFilter, the method AfterThreadedGenerateData() is overwritten
-  * and calls ComputeSkewnessAndKurtosis() after the AfterThreadedGenerateData()
+  * and calls ComputeSkewnessKurtosisAndMPP() and ComputeEntropyUniformityAndUPP after the AfterThreadedGenerateData()
+  * while the second coefficient Method is only called when the the method useHistogram is on!!!
   * implementation of the superclass is called.
   *
   */
@@ -53,7 +54,7 @@ namespace itk
     itkTypeMacro(ExtendedLabelStatisticsImageFilter, LabelStatisticsImageFilter);
 
     /**
-    * \brief Internal class which stores the calculated coefficients Skewness and Kurtosis.
+    * \brief Internal class which stores the calculated coefficients Skewness,Kurtosis,Uniformity,UPP,MPP,Entropy.
     */
     class CoefficientsClass
     {
@@ -63,8 +64,10 @@ namespace itk
       {
         m_Kurtosis = 0.0;
         m_Skewness = 0.0;
-        m_Entropy = 0;
-        m_Uniformity = 0;
+        m_Entropy = 0.0;
+        m_Uniformity = 0.0;
+        m_MPP = 0.0;
+        m_UPP = 0.0;
       };
 
       ~CoefficientsClass(){};
@@ -74,6 +77,8 @@ namespace itk
       RealType m_Skewness;
       RealType m_Entropy;
       RealType m_Uniformity;
+      RealType m_MPP;
+      RealType m_UPP;
     };
 
 
@@ -82,6 +87,8 @@ namespace itk
     RealType GetKurtosis(LabelPixelType label) const;
     RealType GetUniformity( LabelPixelType label) const;
     RealType GetEntropy( LabelPixelType label) const;
+    RealType GetMPP( LabelPixelType label) const;
+    RealType GetUPP( LabelPixelType label) const;
 
     std::list< int>  GetRelevantlabels() const;
     bool             GetMaskingNonEmpty() const;
@@ -96,21 +103,14 @@ namespace itk
     virtual ~ExtendedLabelStatisticsImageFilter(){};
 
     /**
-    * brief Calls AfterThreadedGenerateData() of the superclass and ComputeSkewnessAndKurtosis().
+    * \brief  ComputeSkewnessKurtosisAndMPP(),ComputeEntropyUniformityAndUPP() will be called after superclass
+    * both methods are seprated because one is build up on the pixel values and one is build up a step after on a
+    * histogram
     */
-    void ComputeSkewnessAndKurtosis();
+    void ComputeSkewnessKurtosisAndMPP();
     void AfterThreadedGenerateData();
-    void ComputeEntropyAndUniformity();
+    void ComputeEntropyUniformityAndUPP();
     void CalculateSettingsForLabels();
-
-
-    /**
-    * \brief Calculate Skewness and Kurtosis.
-    *
-    * This method will calculate the new coefficients with sigma and mean value of the threaded generate data of the base class.
-    */
-
-
 
   private:
 

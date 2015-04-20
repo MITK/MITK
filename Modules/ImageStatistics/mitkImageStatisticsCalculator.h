@@ -231,6 +231,8 @@ namespace mitk
       mitkSetGetConstMacro(Kurtosis, double)
       mitkSetGetConstMacro(Uniformity, double)
       mitkSetGetConstMacro(Entropy, double)
+      mitkSetGetConstMacro(UPP, double);
+      mitkSetGetConstMacro(MPP, double);
 
     private:
       unsigned int Label;
@@ -255,6 +257,8 @@ namespace mitk
       double Kurtosis;
       double Uniformity;
       double Entropy;
+      double UPP;
+      double MPP;
 
       bool m_HasHotspotStatistics;
       vnl_vector<int> HotspotIndex;     //< index of hotspotsphere origin

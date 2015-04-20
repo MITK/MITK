@@ -42,7 +42,7 @@ class mitkImageStatisticsTextureAnalysisTestClass
 
 public:
 
-  typedef itk::Image<unsigned short,3 >ImageType;
+  typedef itk::Image< int,3 >ImageType;
   typedef ImageType::Pointer PointerOfImage;
 
   typedef itk::ExtendedLabelStatisticsImageFilter< ImageType, ImageType > LabelStatisticsFilterType;
@@ -73,6 +73,7 @@ public:
     image->SetRegions(region);
     image->Allocate();
     image->FillBuffer(bufferValue);
+              int i = 0;
 
     for(unsigned int r = 0; r < 50; r++)
     {
@@ -84,6 +85,7 @@ public:
           pixelIndex[0] = r;
           pixelIndex[1] = c;
           pixelIndex[2] = l;
+
 
           image->SetPixel(pixelIndex, labelValue);
         }
@@ -99,6 +101,8 @@ public:
     LabelStatisticsFilterType::Pointer labelStatisticsFilter;
     labelStatisticsFilter = LabelStatisticsFilterType::New();
     labelStatisticsFilter->SetInput( image );
+    labelStatisticsFilter->UseHistogramsOn();
+    labelStatisticsFilter->SetHistogramParameters( 20, -10, 10);
     labelStatisticsFilter->SetLabelInput( maskImage );
     labelStatisticsFilter->Update();
 
@@ -111,14 +115,15 @@ public:
     StatisticsFilterType::Pointer StatisticsFilter;
     StatisticsFilter = StatisticsFilterType::New();
     StatisticsFilter->SetInput( image );
+    StatisticsFilter->SetBinSize( 20 );
     StatisticsFilter->Update();
 
 
     return StatisticsFilter;
   }
 
-
-  void TestofSkewnessAndKurtosisForMaskedImages(LabelStatisticsFilterType::Pointer labelStatisticsFilter, double expectedSkewness, double expectedKurtosis)
+  //test for Skewness,Kurtosis and MPP for masked Images
+  void TestofSkewnessKurtosisAndMPPForMaskedImages(LabelStatisticsFilterType::Pointer labelStatisticsFilter, double expectedSkewness, double expectedKurtosis, double expectedMPP)
   {
     // let's create an object of our class
     bool isSkewsnessLowerlimitCorrect = labelStatisticsFilter->GetSkewness( 1 )- expectedKurtosis+ std::pow(10,-3) <= expectedSkewness;
@@ -131,11 +136,29 @@ public:
     bool isKurtosisLowerlimitCorrect = expectedKurtosis- std::pow(10,-3) <= labelStatisticsFilter->GetKurtosis( 1 );
 
     MITK_TEST_CONDITION( isKurtosisUpperlimitCorrect && isKurtosisLowerlimitCorrect,"expectedKurtosis: " << expectedKurtosis << " actual Value: " << labelStatisticsFilter->GetKurtosis( 1 ) );
+
+    MITK_TEST_CONDITION( expectedMPP == labelStatisticsFilter->GetMPP( 1 ), "expected MPP: " << expectedMPP << " actual Value: " << labelStatisticsFilter->GetMPP( 1 ) );
   }
 
+  //test for Entropy,Uniformity and UPP for masked Images
+  void TestofEntropyUniformityAndUppForMaskedImages(LabelStatisticsFilterType::Pointer labelStatisticsFilter, double expectedEntropy, double expectedUniformity, double expectedUPP)
+  {
+    bool calculatedEntropyLowerLimit = labelStatisticsFilter->GetEntropy( 1 ) >= expectedEntropy - std::pow(10,-3);
+    bool calculatedUniformityLowerLimit = labelStatisticsFilter->GetUniformity( 1 ) >= expectedUniformity - std::pow(10,-3);
+    bool calculatedUppLowerLimit = labelStatisticsFilter->GetUPP( 1 ) >= expectedUPP - std::pow(10,-3);
+
+    bool calculatedEntropyUpperLimit = labelStatisticsFilter->GetEntropy( 1 ) <= expectedEntropy + std::pow(10,-3);
+    bool calculatedUniformityUpperLimit = labelStatisticsFilter->GetUniformity( 1 ) <= expectedUniformity + std::pow(10,-3);
+    bool calculatedUppUpperLimit = labelStatisticsFilter->GetUPP( 1 ) <= expectedUPP + std::pow(10,-3);
 
 
-  void TestofSkewnessAndKurtosisForUnmaskedImages(StatisticsFilterType::Pointer StatisticsFilter, double expectedSkewness, double expectedKurtosis)
+   MITK_TEST_CONDITION( calculatedEntropyLowerLimit && calculatedEntropyUpperLimit, "expected Entropy: " << expectedEntropy << " actual Value: " << labelStatisticsFilter->GetEntropy( 1 ) );
+   MITK_TEST_CONDITION( calculatedUniformityLowerLimit && calculatedUniformityUpperLimit, "expected Uniformity: " << expectedUniformity << " actual Value: " << labelStatisticsFilter->GetUniformity( 1 ) );
+   MITK_TEST_CONDITION( calculatedUppLowerLimit && calculatedUppUpperLimit, "expected UPP: " << expectedUPP << " actual Value: " << labelStatisticsFilter->GetUPP( 1 ) );
+  }
+
+    //test for Skewness,Kurtosis and MPP for unmasked Images
+  void TestofSkewnessKurtosisAndMPPForUnmaskedImages(StatisticsFilterType::Pointer StatisticsFilter, double expectedSkewness, double expectedKurtosis, double expectedMPP)
   {
     // let's create an object of our class
     bool isSkewsnessLowerlimitCorrect = StatisticsFilter->GetSkewness()- expectedKurtosis+ std::pow(10,-3) <= expectedSkewness;
@@ -148,6 +171,25 @@ public:
     bool isKurtosisLowerlimitCorrect = expectedKurtosis- std::pow(10,-3) <= StatisticsFilter->GetKurtosis();
 
     MITK_TEST_CONDITION( isKurtosisUpperlimitCorrect && isKurtosisLowerlimitCorrect,"expectedKurtosis: " << expectedKurtosis << " actual Value: " << StatisticsFilter->GetKurtosis() );
+
+    MITK_TEST_CONDITION( expectedMPP == StatisticsFilter->GetMPP(), "expected MPP: " << expectedMPP << " actual Value: " << StatisticsFilter->GetMPP() );
+  }
+
+  //test for Entropy,Uniformity and UPP for unmasked Images
+  void TestofEntropyUniformityAndUppForUnmaskedImages(StatisticsFilterType::Pointer StatisticsFilter, double expectedEntropy, double expectedUniformity, double expectedUPP)
+  {
+    bool calculatedEntropyLowerLimit = StatisticsFilter->GetEntropy() >= expectedEntropy - std::pow(10,-3);
+    bool calculatedUniformityLowerLimit = StatisticsFilter->GetUniformity() >= expectedUniformity - std::pow(10,-3);
+    bool calculatedUppLowerLimit = StatisticsFilter->GetUPP() >= expectedUPP - std::pow(10,-3);
+
+    bool calculatedEntropyUpperLimit = StatisticsFilter->GetEntropy() <= expectedEntropy + std::pow(10,-3);
+    bool calculatedUniformityUpperLimit = StatisticsFilter->GetUniformity() <= expectedUniformity + std::pow(10,-3);
+    bool calculatedUppUpperLimit = StatisticsFilter->GetUPP() <= expectedUPP + std::pow(10,-3);
+
+
+    MITK_TEST_CONDITION( calculatedEntropyLowerLimit && calculatedEntropyUpperLimit, "expected Entropy: " << expectedEntropy << " actual Value: " << StatisticsFilter->GetEntropy() );
+    MITK_TEST_CONDITION( calculatedUniformityLowerLimit && calculatedUniformityUpperLimit, "expected Uniformity: " << expectedUniformity << " actual Value: " << StatisticsFilter->GetUniformity() );
+    MITK_TEST_CONDITION( calculatedUppLowerLimit && calculatedUppUpperLimit, "expected UPP: " << expectedUPP << " actual Value: " << StatisticsFilter->GetUPP() );
   }
 
 
@@ -165,18 +207,29 @@ int mitkImageStatisticsTextureAnalysisTest(int, char* [])
   mitkImageStatisticsTextureAnalysisTestClass::PointerOfImage image  = testclassInstance.CreatingTestImageForDifferentLabelSize(100, 3, 2);
   mitkImageStatisticsTextureAnalysisTestClass::PointerOfImage image2 = testclassInstance.CreatingTestImageForDifferentLabelSize(50, 3, 2);
 
-
+  //test for masked images
   mitkImageStatisticsTextureAnalysisTestClass::labelStatisticsFilterPointer mitkLabelFilter= testclassInstance.TestInstanceFortheMaskedStatisticsFilter( image,labelImage);
-  testclassInstance.TestofSkewnessAndKurtosisForMaskedImages(mitkLabelFilter, 0, 0.999998);
+  testclassInstance.TestofSkewnessKurtosisAndMPPForMaskedImages(mitkLabelFilter, 0, 0.999998, 2.5);
+
+  testclassInstance.TestofEntropyUniformityAndUppForMaskedImages(mitkLabelFilter, 1, 0.5, 0.5);
 
   mitkImageStatisticsTextureAnalysisTestClass::labelStatisticsFilterPointer mitkLabelFilter2= testclassInstance.TestInstanceFortheMaskedStatisticsFilter( image2,labelImage);
-  testclassInstance.TestofSkewnessAndKurtosisForMaskedImages(mitkLabelFilter2, -1.1547, 2.33333);
+  testclassInstance.TestofSkewnessKurtosisAndMPPForMaskedImages(mitkLabelFilter2, -1.1547, 2.33333, 2.75);
 
+  testclassInstance.TestofEntropyUniformityAndUppForMaskedImages(mitkLabelFilter2, 0.811278, 0.625, 0.625);
+
+
+
+  //test for unmasked images
   mitkImageStatisticsTextureAnalysisTestClass::StatisticsFilterPointer mitkFilter= testclassInstance.TestInstanceFortheUnmaskedStatisticsFilter( image);
-  testclassInstance.TestofSkewnessAndKurtosisForUnmaskedImages(mitkFilter, 0, 0.999998);
+  testclassInstance.TestofSkewnessKurtosisAndMPPForUnmaskedImages(mitkFilter, 0, 0.999998, 2.5);
+
+  testclassInstance.TestofEntropyUniformityAndUppForUnmaskedImages(mitkFilter, 1, 0.5, 0.5);
 
   mitkImageStatisticsTextureAnalysisTestClass::StatisticsFilterPointer mitkFilter2= testclassInstance.TestInstanceFortheUnmaskedStatisticsFilter( image2);
-  testclassInstance.TestofSkewnessAndKurtosisForUnmaskedImages(mitkFilter2, -1.1547, 2.33333);
+  testclassInstance.TestofSkewnessKurtosisAndMPPForUnmaskedImages(mitkFilter2, -1.1547, 2.33333, 2.75);
+
+  testclassInstance.TestofEntropyUniformityAndUppForUnmaskedImages( mitkFilter2, 0.811278, 0.625, 0.625);
 
   MITK_TEST_END()
 }

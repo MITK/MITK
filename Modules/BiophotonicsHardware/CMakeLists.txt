@@ -9,13 +9,13 @@
 
 
 #Set Subfolder according to moduls
-set( biophotonicsHardware_modul_dir
+set( biophotonicsHardware_module_dir
       SpectroCam
 )
 
 # add_subdirectories for each module
-foreach(biophotonicsHardware_modul_dir ${biophotonicsHardware_modul_dir})
-  add_subdirectory(${biophotonicsHardware_modul_dir})
+foreach(biophotonicsHardware_module_dir ${biophotonicsHardware_module_dir})
+  add_subdirectory(${biophotonicsHardware_module_dir})
 endforeach()
 
 

@@ -7,6 +7,7 @@ SET(CPP_FILES
   mitkIsoDoseLevelCollections.cpp
   mitkIsoDoseLevelSetProperty.cpp
   mitkIsoDoseLevelVectorProperty.cpp
+  mitkRTStructureSetReader.cpp
   Rendering/mitkDoseImageVtkMapper2D.cpp
 )
 

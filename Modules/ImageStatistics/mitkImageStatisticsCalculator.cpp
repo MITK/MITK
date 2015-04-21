@@ -1383,7 +1383,15 @@ namespace mitk
     labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
 
     // Execute the filter
-    labelStatisticsFilter->Update();
+    try
+    {
+      labelStatisticsFilter->Update();
+    }
+    catch ( ... )
+    {
+
+    }
+
 
     this->InvokeEvent( itk::EndEvent() );
     labelStatisticsFilter->RemoveObserver( observerTag );

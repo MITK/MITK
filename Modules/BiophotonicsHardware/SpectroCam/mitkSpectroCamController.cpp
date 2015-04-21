@@ -14,6 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkSpectroCamController.h"
+#include "mitkLogMacros.h"
 
 #include <fstream>
 #include <string>
@@ -25,26 +26,83 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <opencv\cxcore.h>
 #include <opencv\highgui.h>
 
+#include <ISpectroCam.h>
+#include <Jai_Factory.h>
 
 using namespace std;
 using namespace cv;
 
 
+namespace mitk {
 
+    /**
+        Here basically all of the implementation for the Spectrocam Controller is located.
+        It is necessary because of the additional JAI and SpectroCam libraries, which should be totally hidden
+        to external modules/plugins.
+    */
+    class SpectroCamController_pimpl
+    {
+    public:
+        SpectroCamController_pimpl();
+        ~SpectroCamController_pimpl();
+
+        bool Ini();
+        int OpenCameraConnection();
+        int CloseCameraConnection();
+        bool isCameraRunning();
+
+
+        J_tIMAGE_INFO GetImageInfo();
+
+        std::string mode;
+        std::string model;
+
+
+        IplImage* m_Image;
+        IplImage* m_8BitImage;
+
+    private:
+
+        bool m_IsCameraRunning;
+
+        unsigned m_NumRecordedImages;
+
+        ISpectroCam*  spectroCam;                        //SpectroCam var
+        J_tIMAGE_INFO m_CnvImageInfo;                    //Image Info
+
+        STREAM_HANDLE   m_hDS;                            // Handle to the data stream
+        HANDLE          m_hStreamThread;                  // Handle to the image acquisition thread
+        HANDLE          m_hStreamEvent;                    // Thread used to signal when image thread stops
+        VIEW_HANDLE     m_hView;                          // View window handles
+
+        uint32_t        m_iValidBuffers;                // Number of buffers allocated to image acquisition
+        BUF_HANDLE      m_pAquBufferID;                  // Handles for all the image buffers
+        HANDLE          m_hEventKill;                    // Event used for speeding up the termination of image capture
+        bool            m_bEnableThread;                // Flag indicating if the image thread should run
+
+
+        //Vars for Ini from file
+        FastModeSettings fastSettings;
+        SequenceModeSettings seqSettings;
+        IndexModeSettings indexSettings;
+
+        void SaveCameraStreamToDisk();
+    };
+
+}
 
 
 // Implementation
-void getSettingsFromIni(FastModeSettings &fastSettings, SequenceModeSettings &seqSettings, IndexModeSettings &indexSettings, std::string &mode);
 
 
-static mitk::SpectroCamController* my_SpectroCamController;
+static mitk::SpectroCamController_pimpl* my_SpectroCamController;
 
-mitk::SpectroCamController::SpectroCamController()
+mitk::SpectroCamController_pimpl::SpectroCamController_pimpl()
     :m_hDS(NULL),
     m_hStreamThread(NULL),
     m_hStreamEvent(NULL),
     m_hView(NULL),
-    m_NumRecordedImages(0),
+    m_NumRecordedImages(1),
     m_Image(cvCreateImage(cvSize(2456, 2058), IPL_DEPTH_16U, 1)),
     m_8BitImage(cvCreateImage(cvSize(2456, 2058), IPL_DEPTH_8U, 1)),
     m_IsCameraRunning(false)
@@ -54,12 +112,12 @@ mitk::SpectroCamController::SpectroCamController()
 
 
 
-mitk::SpectroCamController::~SpectroCamController()
+mitk::SpectroCamController_pimpl::~SpectroCamController_pimpl()
 {
 }
 
 
-J_tIMAGE_INFO mitk::SpectroCamController::GetImageInfo()
+J_tIMAGE_INFO mitk::SpectroCamController_pimpl::GetImageInfo()
 {
     return m_CnvImageInfo;
 }
@@ -67,7 +125,7 @@ J_tIMAGE_INFO mitk::SpectroCamController::GetImageInfo()
 
 
 
-void mitk::SpectroCamController::SaveCameraStreamToDisk()
+void mitk::SpectroCamController_pimpl::SaveCameraStreamToDisk()
 {
     /*
     //=================================Save Images to HDD=================================
@@ -94,7 +152,7 @@ void mitk::SpectroCamController::SaveCameraStreamToDisk()
 
 
 //Initialize Camera Controller
-bool mitk::SpectroCamController::Ini()
+bool mitk::SpectroCamController_pimpl::Ini()
 {
     //===============Get Ini from File===============
     //Get model from file    std::string CChildWindowSampleDlg::getModelNameFromIni()
@@ -105,7 +163,7 @@ bool mitk::SpectroCamController::Ini()
 
     if (fin.fail())
     {
-        cout<< "Failed opening file ModeSettings.txt!" << endl ;
+        MITK_INFO << "Failed opening file ModeSettings.txt!" << endl ;
     }
 
     fin.getline(buffer, bufferSize);
@@ -218,6 +276,7 @@ bool mitk::SpectroCamController::Ini()
 
 static void DisplayCameraStream(SpectroCamImage image)
 {
+    MITK_INFO << "image callback call";
     try
     {
         if (image.m_FilterNum < 0 || image.m_FilterNum >= NUMBER_FILTERS)
@@ -246,7 +305,7 @@ static void DisplayCameraStream(SpectroCamImage image)
                 //Change brightness via addition + resizing the image
                 cv::Mat temp_8bitMat = cv::Mat(my_SpectroCamController->m_8BitImage, false);       //Convert to proper cv::matrix
                 cv::Mat display;
-                cv::resize(temp_8bitMat, display, cvSize(1228, 1029)  );   //do some resizeing for faster display
+                cv::resize(temp_8bitMat, display, cvSize(614, 514)  );   //do some resizeing for faster display
                 //=======================================================================
 
                 //Display Image
@@ -269,12 +328,12 @@ static void DisplayCameraStream(SpectroCamImage image)
 
 
 
-int mitk::SpectroCamController::OpenCameraConnection()
+int mitk::SpectroCamController_pimpl::OpenCameraConnection()
 {
     //=====================OpenFactoryAndCamera=====================
     //Create Factory and cam based on   //BOOL OpenFactoryAndCamera();        // Open factory and search for cameras. Open first camera
     spectroCam = CreateSpectroCam(&DisplayCameraStream, nullptr, 0);
-    cout << "Camera " <<  model << " is running in: " << mode << "-mode" << endl;
+    MITK_INFO << "Camera " <<  model << " is running in: " << mode << "-mode" << endl;
 
 
 
@@ -283,7 +342,7 @@ int mitk::SpectroCamController::OpenCameraConnection()
 
     if (status != J_ST_SUCCESS)
     {
-        cout << "Could not initialize camera!" << endl;
+        MITK_INFO << "Could not initialize camera!" << endl;
     }
 
 
@@ -321,6 +380,8 @@ int mitk::SpectroCamController::OpenCameraConnection()
         status = status |  spectroCam->start(fastSettings);
     }
 
+    MITK_INFO << "status flag: " << status;
+
     if (status == J_ST_SUCCESS)
     {
         m_IsCameraRunning = true;
@@ -329,7 +390,7 @@ int mitk::SpectroCamController::OpenCameraConnection()
     return status;
 }
 
-bool mitk::SpectroCamController::isCameraRunning()
+bool mitk::SpectroCamController_pimpl::isCameraRunning()
 {
     return m_IsCameraRunning;
 }
@@ -337,7 +398,7 @@ bool mitk::SpectroCamController::isCameraRunning()
 
 
 //Method to close down connections
-int mitk::SpectroCamController::CloseCameraConnection()
+int mitk::SpectroCamController_pimpl::CloseCameraConnection()
 {
 
     // On click -> Stop acquisition
@@ -420,8 +481,6 @@ int mitk::SpectroCamController::CloseCameraConnection()
         // Remove the frame buffer from the Acquisition engine.
         J_DataStream_RevokeBuffer(m_hDS, m_pAquBufferID, &pBuffer , &pPrivate);
 
-        delete m_pAquBuffer;
-        m_pAquBuffer = NULL;
         m_pAquBufferID = 0;
 
         m_iValidBuffers = 0;
@@ -463,4 +522,35 @@ int mitk::SpectroCamController::CloseCameraConnection()
     }
 
     return retval;
+}
+
+
+mitk::SpectroCamController::SpectroCamController()
+{
+    m_SpectroCamController_pimpl = new SpectroCamController_pimpl();
+}
+
+mitk::SpectroCamController::~SpectroCamController()
+{
+    delete m_SpectroCamController_pimpl;
+}
+
+int mitk::SpectroCamController::OpenCameraConnection()
+{
+    return m_SpectroCamController_pimpl->OpenCameraConnection();
+}
+
+int mitk::SpectroCamController::CloseCameraConnection()
+{
+    return m_SpectroCamController_pimpl->CloseCameraConnection();
+}
+
+bool mitk::SpectroCamController::Ini()
+{
+    return m_SpectroCamController_pimpl->Ini();
+}
+
+bool mitk::SpectroCamController::isCameraRunning()
+{
+    return m_SpectroCamController_pimpl->isCameraRunning();
 }

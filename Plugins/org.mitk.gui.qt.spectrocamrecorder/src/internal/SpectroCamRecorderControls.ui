@@ -21,16 +21,6 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="labelWarning">
-     <property name="styleSheet">
-      <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
-     </property>
-     <property name="text">
-      <string>Please select an image!!</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QPushButton" name="buttonPerformImageProcessing">
      <property name="toolTip">
       <string>Do image processing</string>

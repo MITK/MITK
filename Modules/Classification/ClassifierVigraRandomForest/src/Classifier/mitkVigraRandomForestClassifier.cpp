@@ -57,8 +57,8 @@ struct mitk::VigraRandomForestClassifier::TrainingData
       m_NumberOfTrees(numberOfTrees),
       m_RandomForest(refRF),
       m_Splitter(refSplitter),
-      m_Label(refLabel),
-      m_Feature(refFeature)
+      m_Feature(refFeature),
+      m_Label(refLabel)
   {
     m_mutex = itk::FastMutexLock::New();
   }
@@ -68,8 +68,8 @@ struct mitk::VigraRandomForestClassifier::TrainingData
   unsigned int m_NumberOfTrees;
   const vigra::RandomForest<int> & m_RandomForest;
   const DefaultSplitType & m_Splitter;
-  const vigra::MultiArrayView<2, int> m_Label;
   const vigra::MultiArrayView<2, double> m_Feature;
+  const vigra::MultiArrayView<2, int> m_Label;
   itk::FastMutexLock::Pointer m_mutex;
 };
 
@@ -135,6 +135,8 @@ void mitk::VigraRandomForestClassifier::Train(const Eigen::MatrixXd & X_in, cons
 
   m_RandomForest.set_options().tree_count(1); // Number of trees that are calculated;
   m_RandomForest.learn(X, Y,vigra::rf::visitors::VisitorBase(),splitter);
+
+  MITK_INFO << "TRAIN: " << m_RandomForest.class_count();
 
   std::auto_ptr<TrainingData> data(new TrainingData(m_Parameter->TreeCount,m_RandomForest,splitter,X,Y));
 
@@ -215,11 +217,10 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::TrainTreesCallback(voi
 
     // Write the calculated trees into the return array
     data->m_mutex->Lock(); // lock the critical areax
-    MITK_INFO << data->m_Label;
-
 
     for(unsigned int i = 0 ; i < rf.trees_.size(); i++)
       data->trees_.push_back(rf.trees_[i]);
+
     data->m_ClassCount = rf.class_count();
 
     MITK_INFO << "Thread = " << threadId << " done!";

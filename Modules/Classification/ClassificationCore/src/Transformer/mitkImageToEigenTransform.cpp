@@ -23,18 +23,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 unsigned int mitk::ImageToEigenTransform::countIf(const mitk::Image::Pointer & mask, bool (*func_pointer) (double) )
 {
-  UCharImageType::Pointer current_mask;
+  ImageType::Pointer current_mask;
   mitk::CastToItkImage(mask,current_mask);
+
+  func_pointer = 0;
 
   unsigned int n_numSamples = 0;
   {
-    auto mit = itk::ImageRegionConstIterator<UCharImageType>(current_mask, current_mask->GetLargestPossibleRegion());
+    auto mit = itk::ImageRegionConstIterator<ImageType>(current_mask, current_mask->GetLargestPossibleRegion());
     while (!mit.IsAtEnd())
     {
-      if((*func_pointer)(mit.Value()))
+      if(mit.Value() > 0)
         n_numSamples++;
       ++mit;
     }
   }
+
+
+
   return n_numSamples;
 }

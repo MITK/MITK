@@ -19,7 +19,7 @@ public:
   itkNewMacro(Self)
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(ImageFilter, ImageToImageFilter)
+  itkTypeMacro(Self, ImageToImageFilter)
 
   itkSetMacro(AcceptRate, double)
   itkSetMacro(Label, int)
@@ -38,7 +38,10 @@ protected:
   :m_Label(-1)
   ,m_AcceptRate(1.0)
   ,m_UseLabelVoxelCount(false)
-  {}
+  {
+    this->SetNumberOfRequiredInputs(1);
+    this->SetNumberOfRequiredOutputs(1);
+  }
 
   ~LabelSampler(){}
 

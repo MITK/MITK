@@ -294,6 +294,8 @@ mitk::NavigationDataObjectVisualizationFilter::Pointer mitk::TrackingDeviceSourc
   mitk::NavigationDataObjectVisualizationFilter::Pointer returnValue = mitk::NavigationDataObjectVisualizationFilter::New();
   for (unsigned int i=0; i<trackingDeviceSource->GetNumberOfIndexedOutputs(); i++)
     {
+    // Note: If all tools have the same name only the first tool will always be returned and
+    //       the others won't be updated during rendering.This could potentially lead to inconstencies
     mitk::NavigationTool::Pointer currentTool = navigationTools->GetToolByName(trackingDeviceSource->GetOutput(i)->GetName());
     if (currentTool.IsNull())
       {

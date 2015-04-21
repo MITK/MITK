@@ -49,14 +49,14 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
 }
 
 mitk::DisplayInteractor::DisplayInteractor()
-: m_IndexToSliceModifier(4)
-, m_AutoRepeat(false)
-, m_InvertScrollDirection( false )
-, m_InvertZoomDirection( false )
-, m_InvertMoveDirection( false )
-, m_InvertLevelWindowDirection( false )
-, m_AlwaysReact(false)
-, m_ZoomFactor(2)
+  : m_IndexToSliceModifier(4)
+  , m_AutoRepeat(false)
+  , m_InvertScrollDirection( false )
+  , m_InvertZoomDirection( false )
+  , m_InvertMoveDirection( false )
+  , m_InvertLevelWindowDirection( false )
+  , m_AlwaysReact(false)
+  , m_ZoomFactor(2)
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
@@ -89,7 +89,7 @@ bool mitk::DisplayInteractor::Init(StateMachineAction*, InteractionEvent* intera
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   m_StartCoordinateInMM = mitk::Point2D(
-      (origin + m_StartDisplayCoordinate.GetVectorFromOrigin() * scaleFactorMMPerDisplayUnit).GetDataPointer());
+        (origin + m_StartDisplayCoordinate.GetVectorFromOrigin() * scaleFactorMMPerDisplayUnit).GetDataPointer());
   return true;
 }
 
@@ -396,8 +396,13 @@ void mitk::DisplayInteractor::ConfigurationChanged()
   }
 }
 
-bool mitk::DisplayInteractor::FilterEvents(InteractionEvent* /*interactionEvent*/, DataNode* /*dataNode*/)
+bool mitk::DisplayInteractor::FilterEvents(InteractionEvent* interactionEvent, DataNode* /*dataNode*/)
 {
+  if (interactionEvent->GetSender() == nullptr)
+    return false;
+  if(interactionEvent->GetSender()->GetMapperID() == 2)
+    return false;
+
   return true;
 }
 

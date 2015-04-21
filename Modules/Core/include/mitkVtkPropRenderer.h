@@ -169,6 +169,9 @@ protected:
   virtual ~VtkPropRenderer();
   virtual void Update();
 
+  static void RenderingCallback(
+    vtkObject *caller, unsigned long eid, void *clientdata, void *calldata );
+
   /**
     \brief Convert display geometry coordinates to VTK coordinates.
 

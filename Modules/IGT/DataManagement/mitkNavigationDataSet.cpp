@@ -30,7 +30,7 @@ bool mitk::NavigationDataSet::AddNavigationDatas( std::vector<mitk::NavigationDa
   // test if tool with given index exist
   if ( navigationDatas.size() != m_NumberOfTools )
   {
-    MITK_WARN("NavigationDataSet") << "Tried to add to many or too few navigation Datas to NavigationDataSet. " << m_NavigationDataVectors.size() << " required, tried to add " << navigationDatas.size() << ".";
+    MITK_WARN("NavigationDataSet") << "Tried to add too many or too few navigation Datas to NavigationDataSet. " << m_NumberOfTools << " required, tried to add " << navigationDatas.size() << ".";
     return false;
   }
 

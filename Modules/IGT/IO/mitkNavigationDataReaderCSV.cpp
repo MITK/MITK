@@ -99,7 +99,7 @@ std::vector<mitk::NavigationData::Pointer> mitk::NavigationDataReaderCSV::parseL
 
 
 
-  for (int n= 0; n=NumOfTools; n++)
+  for (int n = 0; n < NumOfTools; n++)
   {
     mitk::NavigationData::Pointer nd;
     nd = CreateNd(time, parts[n+1],parts[n+2],parts[n+3], parts[n+4], parts[n+5], parts[n+6], parts[n+7], parts[n+8]);

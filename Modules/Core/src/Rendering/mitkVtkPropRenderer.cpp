@@ -308,6 +308,7 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow* renderWindow)
   renderCallbackCommand->SetCallback(
     VtkPropRenderer::RenderingCallback );
   renderWindow->GetInteractor()->AddObserver( vtkCommand::RenderEvent, renderCallbackCommand );
+  renderCallbackCommand->Delete();
 
   if(renderWindow == NULL)
   {

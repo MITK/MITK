@@ -89,7 +89,7 @@ bool mitk::DisplayInteractor::Init(StateMachineAction*, InteractionEvent* intera
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   m_StartCoordinateInMM = mitk::Point2D(
-        (origin + m_StartDisplayCoordinate.GetVectorFromOrigin() * scaleFactorMMPerDisplayUnit).GetDataPointer());
+      (origin + m_StartDisplayCoordinate.GetVectorFromOrigin() * scaleFactorMMPerDisplayUnit).GetDataPointer());
   return true;
 }
 

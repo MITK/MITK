@@ -943,9 +943,15 @@ void QmitkMITKIGTTrackingToolboxView::StopLogging()
 void QmitkMITKIGTTrackingToolboxView::OnAddSingleTool()
 {
   QString Identifier = "Tool#";
-  if (m_toolStorage.IsNotNull()) Identifier += QString::number(m_toolStorage->GetToolCount());
-  else Identifier += "0";
-  m_Controls->m_NavigationToolCreationWidget->Initialize(GetDataStorage(),Identifier.toStdString());
+  QString Name = "NewTool";
+  if (m_toolStorage.IsNotNull()) {
+    Identifier += QString::number(m_toolStorage->GetToolCount());
+    Name += QString::number(m_toolStorage->GetToolCount());
+  } else {
+    Identifier += "0";
+    Name += "0";
+  }
+  m_Controls->m_NavigationToolCreationWidget->Initialize(GetDataStorage(),Identifier.toStdString(),Name.toStdString());
   m_Controls->m_NavigationToolCreationWidget->SetTrackingDeviceType(m_Controls->m_configurationWidget->GetTrackingDevice()->GetType(),false);
   m_Controls->m_TrackingToolsWidget->setCurrentIndex(1);
 

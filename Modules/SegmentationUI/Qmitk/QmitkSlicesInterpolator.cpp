@@ -819,7 +819,10 @@ void::QmitkSlicesInterpolator::OnSuggestPlaneClicked()
 
 void::QmitkSlicesInterpolator::RunPlaneSuggestion()
 {
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(8);
+  if(m_FirstRun)
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(8);
+  else
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(3);
 
   m_EdgeDetector->SetSegmentationMask(m_Segmentation);
   m_EdgeDetector->SetInput(dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData()));
@@ -875,6 +878,8 @@ void::QmitkSlicesInterpolator::RunPlaneSuggestion()
   mitk::BaseRenderer::Pointer br = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"));
   br->GetSliceNavigationController()->ReorientSlices(plane->GetOrigin(),plane->GetNormal());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  m_FirstRun = false;
 }
 
 void QmitkSlicesInterpolator::OnReinit3DInterpolation()

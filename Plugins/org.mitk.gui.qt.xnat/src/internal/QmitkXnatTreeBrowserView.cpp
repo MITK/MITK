@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkDataStorage.h>
-#include <mitkIOUtil.h>
+#include <QmitkIOUtil.h>
 
 const std::string QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treebrowser";
 
@@ -143,7 +143,18 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
       {
         InternalFileDownload(index);
         mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
-        mitk::IOUtil::Load((m_DownloadPath + file->name()).toStdString(), *dsService->GetDataStorage()->GetDataStorage());
+        mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
+        QStringList list;
+        list << (m_DownloadPath + file->name());
+        try
+        {
+          QmitkIOUtil::Load(list, *dataStorage);
+        }
+        catch (const mitk::Exception& e)
+        {
+          MITK_INFO << e;
+          return;
+        }
         mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(
           dsService->GetDataStorage()->GetDataStorage());
       }
@@ -243,8 +254,20 @@ void QmitkXnatTreeBrowserView::MenuShow()
     ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(variant.value<ctkXnatObject*>());
     if (file != NULL)
     {
+      InternalFileDownload(index);
       mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
-      mitk::IOUtil::Load((m_DownloadPath + file->name()).toStdString(), *dsService->GetDataStorage()->GetDataStorage());
+      mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
+      QStringList list;
+      list << (m_DownloadPath + file->name());
+      try
+      {
+        QmitkIOUtil::Load(list, *dataStorage);
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_INFO << e;
+        return;
+      }
       mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(
         dsService->GetDataStorage()->GetDataStorage());
     }

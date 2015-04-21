@@ -124,7 +124,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   connect(m_BtnApplyForAllSlices2D, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
   connect(m_BtnApply3D, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
 
-  connect(m_BtnSuggestPlane, SIGNAL(clicked()), this, SLOT(OnSuggestPlaneClicked));
+  connect(m_BtnSuggestPlane, SIGNAL(clicked()), this, SLOT(OnSuggestPlaneClicked()));
 
   connect(m_BtnReinit3DInterpolation, SIGNAL(clicked()), this, SLOT(OnReinit3DInterpolation()));
   connect(m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
@@ -811,12 +811,24 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
 void::QmitkSlicesInterpolator::OnSuggestPlaneClicked()
 {
+  if (m_PlaneWatcher.isRunning())
+    m_PlaneWatcher.waitForFinished();
+  m_PlaneFuture = QtConcurrent::run(this, &QmitkSlicesInterpolator::RunPlaneSuggestion);
+  m_PlaneWatcher.setFuture(m_PlaneFuture);
+}
+
+void::QmitkSlicesInterpolator::RunPlaneSuggestion()
+{
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(8);
+
   m_EdgeDetector->SetSegmentationMask(m_Segmentation);
   m_EdgeDetector->SetInput(dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData()));
   m_EdgeDetector->Update();
 
   mitk::UnstructuredGrid::Pointer uGrid = mitk::UnstructuredGrid::New();
   uGrid->SetVtkUnstructuredGrid(m_EdgeDetector->GetOutput()->GetVtkUnstructuredGrid());
+
+  mitk::ProgressBar::GetInstance()->Progress();
 
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData());
 
@@ -846,6 +858,8 @@ void::QmitkSlicesInterpolator::OnSuggestPlaneClicked()
   mitk::UnstructuredGrid::Pointer scoredGrid = mitk::UnstructuredGrid::New();
   scoredGrid = m_PointScorer->GetOutput();
 
+  mitk::ProgressBar::GetInstance()->Progress();
+
   double spacing = mitk::SurfaceInterpolationController::GetInstance()->GetDistanceImageSpacing();
 
   m_PlaneSuggester->SetInput(scoredGrid);
@@ -856,7 +870,11 @@ void::QmitkSlicesInterpolator::OnSuggestPlaneClicked()
   mitk::GeometryData::Pointer geoData = m_PlaneSuggester->GetGeoData();
   mitk::PlaneGeometry::Pointer plane = dynamic_cast<mitk::PlaneGeometry*>(geoData->GetGeometry());
 
-//  this->GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->ReorientSlices(plane->GetOrigin(),plane->GetNormal());
+  mitk::ProgressBar::GetInstance()->Progress();
+
+  mitk::BaseRenderer::Pointer br = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"));
+  br->GetSliceNavigationController()->ReorientSlices(plane->GetOrigin(),plane->GetNormal());
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSlicesInterpolator::OnReinit3DInterpolation()

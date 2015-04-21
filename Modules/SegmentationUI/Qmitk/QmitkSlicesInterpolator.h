@@ -195,6 +195,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSlicesInterpolator : public QWidget
 
     void Run3DInterpolation();
 
+    void RunPlaneSuggestion();
+
     void OnSurfaceInterpolationFinished();
 
     void StartUpdateInterpolationTimer();
@@ -289,6 +291,9 @@ private:
     QFuture<void> m_Future;
     QFutureWatcher<void> m_Watcher;
     QTimer* m_Timer;
+
+    QFuture<void> m_PlaneFuture;
+    QFutureWatcher<void> m_PlaneWatcher;
 };
 
 #endif

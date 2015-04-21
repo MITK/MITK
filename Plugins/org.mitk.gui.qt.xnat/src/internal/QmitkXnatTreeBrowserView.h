@@ -32,6 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MitkXNAT Module
 #include "mitkXnatSessionTracker.h"
 
+#include <mitkIDataStorageService.h>
+#include <ctkServiceTracker.h>
+
+class QMenu;
+
 /*!
 \brief QmitkXnatTreeBrowserView
 
@@ -57,14 +62,19 @@ public:
 
   protected slots:
 
-    /// \brief Opens or reuses the xnat editor with the activated node as root item.
-    void OnActivatedNode(const QModelIndex& index);
+  /// \brief Opens or reuses the xnat editor with the activated node as root item.
+  void OnActivatedNode(const QModelIndex& index);
 
-    /// \brief Updates the ctkXnatSession and the user interface
-    void UpdateSession(ctkXnatSession* session);
+  /// \brief Updates the ctkXnatSession and the user interface
+  void UpdateSession(ctkXnatSession* session);
 
-    /// \brief Cleans the tree model
-    void CleanTreeModel(ctkXnatSession* session);
+  /// \brief Cleans the tree model
+  void CleanTreeModel(ctkXnatSession* session);
+
+  void NodeTableViewContextMenuRequested(const QPoint & pos);
+
+  void MenuShow();
+  void MenuDownloadFile();
 
 protected:
 
@@ -74,11 +84,16 @@ protected:
 
 private:
 
+  void InternalFileDownload(const QModelIndex& index);
   berry::QtSelectionProvider::Pointer m_SelectionProvider;
   void SetSelectionProvider();
 
+  ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
   ctkXnatTreeModel* m_TreeModel;
   mitk::XnatSessionTracker* m_Tracker;
+  QString m_DownloadPath;
+
+  QMenu* m_NodeMenu;
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H

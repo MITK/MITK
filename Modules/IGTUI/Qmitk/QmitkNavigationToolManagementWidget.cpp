@@ -191,6 +191,7 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
     }
     mitk::NavigationTool::Pointer selectedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
     m_Controls->m_ToolCreationWidget->SetDefaultData(selectedTool);
+    m_NavigationToolStorage->SetName("test");
     m_edit = true;
     m_Controls->m_MainWidgets->setCurrentIndex(1);
   }

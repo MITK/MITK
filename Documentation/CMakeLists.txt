@@ -189,7 +189,11 @@ if(MITK_USE_BLUEBERRY)
 
     add_dependencies(doc mitkXPDoc BlueBerryXPDoc)
   endif(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
-  add_dependencies(doc BlueBerryDoc)
+  # adding the dependency forces BlueBerryDoc to be build on all_build
+  # see bug 19024
+  if( MITK_CTEST_SCRIPT_MODE STREQUAL "nightly" )
+    add_dependencies(doc BlueBerryDoc)
+  endif()
 endif(MITK_USE_BLUEBERRY)
 
 #if(MITK_DOXYGEN_GENERATE_ITK_QCH_FILE)

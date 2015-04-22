@@ -73,8 +73,8 @@ public:
 
   void NodeTableViewContextMenuRequested(const QPoint & pos);
 
-  void MenuShow();
-  void MenuDownloadFile();
+  void OnContextMenuDownloadAndOpenFile();
+  void OnContextMenuDownloadFile();
 
 protected:
 
@@ -84,7 +84,7 @@ protected:
 
 private:
 
-  void InternalFileDownload(const QModelIndex& index);
+  void InternalFileDownload(const QModelIndex& index, bool loadData);
   berry::QtSelectionProvider::Pointer m_SelectionProvider;
   void SetSelectionProvider();
 

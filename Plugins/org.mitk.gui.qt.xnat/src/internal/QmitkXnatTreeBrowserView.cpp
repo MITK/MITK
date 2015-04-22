@@ -137,29 +137,15 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
 
     if (editors.isEmpty())
     {
-      // No XnatEditor is currently open, create a new one
       ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(oPtr->GetXnatObject());
       if (file != NULL)
       {
-        InternalFileDownload(index);
-        mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
-        mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
-        QStringList list;
-        list << (m_DownloadPath + file->name());
-        try
-        {
-          QmitkIOUtil::Load(list, *dataStorage);
-        }
-        catch (const mitk::Exception& e)
-        {
-          MITK_INFO << e;
-          return;
-        }
-        mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(
-          dsService->GetDataStorage()->GetDataStorage());
+        // If the selected node is a file, so show it in MITK
+        InternalFileDownload(index, true);
       }
       else
       {
+        // No XnatEditor is currently open, create a new one
         page->OpenEditor(editorInput, QmitkXnatEditor::EDITOR_ID);
       }
     }
@@ -199,7 +185,7 @@ void QmitkXnatTreeBrowserView::CleanTreeModel(ctkXnatSession* session)
   }
 }
 
-void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index)
+void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bool loadData)
 {
   QVariant variant = m_TreeModel->data(index, Qt::UserRole);
   if (variant.isValid())
@@ -231,6 +217,27 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index)
           MITK_INFO << "Download of " << file->name().toStdString() << " failed!";
         }
       }
+      if (downDir.exists(file->name()))
+      {
+        if (loadData)
+        {
+          mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
+          mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
+          QStringList list;
+          list << (m_DownloadPath + file->name());
+          try
+          {
+            QmitkIOUtil::Load(list, *dataStorage);
+          }
+          catch (const mitk::Exception& e)
+          {
+            MITK_INFO << e;
+            return;
+          }
+          mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(
+            dsService->GetDataStorage()->GetDataStorage());
+        }
+      }
     }
     else
     {
@@ -239,39 +246,16 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index)
   }
 }
 
-void QmitkXnatTreeBrowserView::MenuDownloadFile()
+void QmitkXnatTreeBrowserView::OnContextMenuDownloadFile()
 {
   QModelIndex index = m_Controls.treeView->currentIndex();
-  InternalFileDownload(index);
+  InternalFileDownload(index, false);
 }
 
-void QmitkXnatTreeBrowserView::MenuShow()
+void QmitkXnatTreeBrowserView::OnContextMenuDownloadAndOpenFile()
 {
   QModelIndex index = m_Controls.treeView->currentIndex();
-  QVariant variant = m_TreeModel->data(index, Qt::UserRole);
-  if (variant.isValid())
-  {
-    ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(variant.value<ctkXnatObject*>());
-    if (file != NULL)
-    {
-      InternalFileDownload(index);
-      mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
-      mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
-      QStringList list;
-      list << (m_DownloadPath + file->name());
-      try
-      {
-        QmitkIOUtil::Load(list, *dataStorage);
-      }
-      catch (const mitk::Exception& e)
-      {
-        MITK_INFO << e;
-        return;
-      }
-      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(
-        dsService->GetDataStorage()->GetDataStorage());
-    }
-  }
+  InternalFileDownload(index, true);
 }
 
 void QmitkXnatTreeBrowserView::NodeTableViewContextMenuRequested(const QPoint & pos)
@@ -284,13 +268,12 @@ void QmitkXnatTreeBrowserView::NodeTableViewContextMenuRequested(const QPoint & 
     ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(variant.value<ctkXnatObject*>());
     if (file != NULL)
     {
-      QAction* actShow = new QAction("Show File", m_NodeMenu);
-      QAction* actDownload = new QAction("Download File", m_NodeMenu);
+      QAction* actShow = new QAction("Download and Open", m_NodeMenu);
+      QAction* actDownload = new QAction("Download", m_NodeMenu);
       m_NodeMenu->addAction(actShow);
       m_NodeMenu->addAction(actDownload);
-      QString path = m_DownloadPath + file->name();
-      connect(actShow, SIGNAL(triggered()), this, SLOT(MenuShow()));
-      connect(actDownload, SIGNAL(triggered()), this, SLOT(MenuDownloadFile()));
+      connect(actShow, SIGNAL(triggered()), this, SLOT(OnContextMenuDownloadAndOpenFile()));
+      connect(actDownload, SIGNAL(triggered()), this, SLOT(OnContextMenuDownloadFile()));
       m_NodeMenu->popup(QCursor::pos());
     }
   }

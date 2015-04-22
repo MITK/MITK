@@ -45,10 +45,12 @@ public:
 
     static const std::string VIEW_ID;
 
-    protected slots:
+    virtual ~SpectroCamRecorder();
 
-        /// \brief Called when the user clicks the GUI button
-        void DoImageProcessing();
+protected slots:
+
+    /// \brief Called when the user clicks the GUI button
+    void DoImageProcessing();
 
 protected:
 
@@ -65,7 +67,7 @@ protected:
 private:
 
     mitk::SpectroCamController m_Controller;
-    
+
 
 
 };

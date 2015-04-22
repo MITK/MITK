@@ -46,7 +46,14 @@ void SpectroCamRecorder::CreateQtPartControl( QWidget *parent )
 
     // intialize the camera (!= start).
     m_Controller.Ini();
+}
 
+SpectroCamRecorder::~SpectroCamRecorder()
+{
+    if (m_Controller.isCameraRunning())
+    {
+        m_Controller.CloseCameraConnection();
+    }
 }
 
 void SpectroCamRecorder::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,

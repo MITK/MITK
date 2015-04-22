@@ -26,8 +26,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <opencv\cxcore.h>
 #include <opencv\highgui.h>
 
+// itk includes
+#include <itkImage.h>
+#include <itkOpenCVImageBridge.h>
+#include <itkComposeImageFilter.h>
+
+//Spectrocam includes
 #include <ISpectroCam.h>
 #include <Jai_Factory.h>
+
+
 
 using namespace std;
 using namespace cv;
@@ -36,9 +44,9 @@ using namespace cv;
 namespace mitk {
 
     /**
-        Here basically all of the implementation for the Spectrocam Controller is located.
-        It is necessary because of the additional JAI and SpectroCam libraries, which should be totally hidden
-        to external modules/plugins.
+    Here basically all of the implementation for the Spectrocam Controller is located.
+    It is necessary because of the additional JAI and SpectroCam libraries, which should be totally hidden
+    to external modules/plugins.
     */
     class SpectroCamController_pimpl
     {
@@ -51,15 +59,10 @@ namespace mitk {
         int CloseCameraConnection();
         bool isCameraRunning();
 
-
-        J_tIMAGE_INFO GetImageInfo();
+        J_tIMAGE_INFO m_CnvImageInfo;                    //Image Info
 
         std::string mode;
         std::string model;
-
-
-        IplImage* m_Image;
-        IplImage* m_8BitImage;
 
     private:
 
@@ -68,7 +71,6 @@ namespace mitk {
         unsigned m_NumRecordedImages;
 
         ISpectroCam*  spectroCam;                        //SpectroCam var
-        J_tIMAGE_INFO m_CnvImageInfo;                    //Image Info
 
         STREAM_HANDLE   m_hDS;                            // Handle to the data stream
         HANDLE          m_hStreamThread;                  // Handle to the image acquisition thread
@@ -103,8 +105,6 @@ mitk::SpectroCamController_pimpl::SpectroCamController_pimpl()
     m_hStreamEvent(NULL),
     m_hView(NULL),
     m_NumRecordedImages(1),
-    m_Image(cvCreateImage(cvSize(2456, 2058), IPL_DEPTH_16U, 1)),
-    m_8BitImage(cvCreateImage(cvSize(2456, 2058), IPL_DEPTH_8U, 1)),
     m_IsCameraRunning(false)
 {
     my_SpectroCamController = this;
@@ -116,11 +116,6 @@ mitk::SpectroCamController_pimpl::~SpectroCamController_pimpl()
 {
 }
 
-
-J_tIMAGE_INFO mitk::SpectroCamController_pimpl::GetImageInfo()
-{
-    return m_CnvImageInfo;
-}
 
 
 
@@ -276,6 +271,8 @@ bool mitk::SpectroCamController_pimpl::Ini()
 
 static void DisplayCameraStream(SpectroCamImage image)
 {
+    my_SpectroCamController->m_CnvImageInfo = *image.m_pAcqImage;
+
     MITK_INFO << "image callback call";
     try
     {
@@ -286,39 +283,46 @@ static void DisplayCameraStream(SpectroCamImage image)
         else
         {
             // Allocate the buffer to hold converted the image. (We only want to do this once for performance reasons)
-            if (my_SpectroCamController->GetImageInfo().pImageBuffer == NULL)
+            if (image.m_pAcqImage->pImageBuffer == NULL)
             {
-                if (J_Image_Malloc(image.m_pAcqImage, &my_SpectroCamController->GetImageInfo()) != J_ST_SUCCESS)
+                if (J_Image_Malloc(image.m_pAcqImage, image.m_pAcqImage) != J_ST_SUCCESS)
                 {
                     return;
                 }
             }
 
+            //============= Get data from spectrocam to opencv
 
-            ////IF "Show all Images" is selected, show all files
-            //if ( Selection == 0)
-            {
-                //=============Converting Images to OpenCV to enable brightness changes==
-                memcpy( my_SpectroCamController->m_Image->imageData , image.m_pAcqImage->pImageBuffer , my_SpectroCamController->m_Image->imageSize); //Copy Image from JAI-Format to OCV´s IplImage
-                cvConvertScale(my_SpectroCamController->m_Image, my_SpectroCamController->m_8BitImage, 1./40); //Convert image from 16 to 8 bit to properly display it
-
-                //Change brightness via addition + resizing the image
-                cv::Mat temp_8bitMat = cv::Mat(my_SpectroCamController->m_8BitImage, false);       //Convert to proper cv::matrix
-                cv::Mat display;
-                cv::resize(temp_8bitMat, display, cvSize(614, 514)  );   //do some resizeing for faster display
-                //=======================================================================
-
-                //Display Image
-                cv::imshow("Display window", display);            //Display image
-                cv::waitKey(1);
-
-            }
+            cv::Mat data = cv::Mat( image.m_pAcqImage->iSizeY, image.m_pAcqImage->iSizeX, CV_16U);
+            memcpy( data.datastart , image.m_pAcqImage->pImageBuffer , image.m_pAcqImage->iImageSize); //Copy Image from JAI-Format to OCV´s IplImage
 
 
-            ////Show only images aproriate to the selection
-            //else if ()
-            //    {
-            //    }
+            ////============= From opencv to mitk::Image (VectorImage)
+            //
+            //typedef itk::Image<unsigned short, 2> CameraImageType;
+            //// 1. convert to itk::Image using itkOpenCVImageBridge//
+            //CameraImageType::Pointer cameraImage = itk::OpenCVImageBridge::CVMatToITKImage<CameraImageType> >(data);
+
+            //// 2. convert to itk::VectorImage using itk::CompositImageFilter
+
+
+            //// 3. convert to mitk::Image using ...
+
+
+            //============= Display image as opencv window ==
+
+            cv::Mat display;
+            cv::resize(data, display, cvSize(614, 514)  );   //do some resizeing for faster display
+            display *= 16; // image is only 12 bit large, but datatype is 16 bit. Expand to full range for displaying by multiplying by 2^4.
+
+            //Display Image
+            cv::imshow("Display window", display);            //Display image
+            cv::waitKey(1);
+
+
+
+            //============= TODO: live oxygenation estimation
+
         }
 
     }//try
@@ -402,13 +406,13 @@ int mitk::SpectroCamController_pimpl::CloseCameraConnection()
 {
 
     // On click -> Stop acquisition
-    J_STATUS_TYPE retval;
+    J_STATUS_TYPE retval = 0;
     CAM_HANDLE hCam = spectroCam->GetCameraHandle();
 
     // Stop Acquision
     if (hCam)
     {
-        retval = J_Camera_ExecuteCommand(hCam, NODE_NAME_ACQSTOP);
+        retval = retval | J_Camera_ExecuteCommand(hCam, (int8_t*) NODE_NAME_ACQSTOP);
     }
 
 
@@ -501,7 +505,7 @@ int mitk::SpectroCamController_pimpl::CloseCameraConnection()
     if (m_hView)
     {
         // Close view window
-        retval = J_Image_CloseViewWindow(m_hView);
+        J_Image_CloseViewWindow(m_hView);
         m_hView = NULL;
         cout<< "Closed view window\n" << endl;
     }
@@ -509,14 +513,14 @@ int mitk::SpectroCamController_pimpl::CloseCameraConnection()
 
     //===================Close Factory and destroy Cam=====================
     //void CloseFactoryAndCamera();       // Close camera and factory to clean up
-    spectroCam->stop();
+    retval = retval | spectroCam->stop();
 
-    if (m_CnvImageInfo.pImageBuffer)    J_Image_Free(&m_CnvImageInfo);
+    // if (m_CnvImageInfo.pImageBuffer)    J_Image_Free(&m_CnvImageInfo);
 
     //BOOL TerminateStreamThread(void);   // Terminate the image acquisition thread
     DestroySpectroCam(spectroCam);          //Destroy SpectroCam-Objekt
 
-    if (J_ST_SUCCESS)
+    if (J_ST_SUCCESS == retval)
     {
         m_IsCameraRunning = false;
     }

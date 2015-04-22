@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <MitkSpectroCamExports.h>
+#include <mitkImage.h>
 
 namespace mitk
 {
@@ -42,6 +43,11 @@ namespace mitk
         int OpenCameraConnection();
         int CloseCameraConnection();
         bool isCameraRunning();
+
+        /**
+          Returns the current image stack. Is of VectorType, unsigned short
+        */
+        mitk::Image::Pointer GetCurrentImage();
 
     private:
         SpectroCamController_pimpl* m_SpectroCamController_pimpl;

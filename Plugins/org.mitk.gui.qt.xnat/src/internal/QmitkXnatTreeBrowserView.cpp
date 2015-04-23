@@ -41,7 +41,7 @@ const std::string QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treeb
 
 QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView() :
 m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
-m_TreeModel(new ctkXnatTreeModel()),
+m_TreeModel(new QmitkXnatTreeModel()),
 m_Tracker(0),
 m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", ""))
 {

@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
   PACKAGE_DEPENDS
     PUBLIC CTK|CTKXNATCore
-    PRIVATE Qt4 Qt5|UiTools+XmlPatterns
+    PRIVATE Qt4|QtGui Qt5|UiTools+XmlPatterns
 )

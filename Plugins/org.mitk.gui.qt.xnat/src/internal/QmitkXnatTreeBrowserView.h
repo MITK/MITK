@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkXnatSession.h"
 
 // ctkXnatWidget
-#include "ctkXnatTreeModel.h"
+#include "QmitkXnatTreeModel.h"
 
 // MitkXNAT Module
 #include "mitkXnatSessionTracker.h"
@@ -89,7 +89,8 @@ private:
   void SetSelectionProvider();
 
   ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
-  ctkXnatTreeModel* m_TreeModel;
+  QmitkXnatTreeModel* m_TreeModel;
+
   mitk::XnatSessionTracker* m_Tracker;
   QString m_DownloadPath;
 

@@ -186,6 +186,7 @@ void PointSetInteractionMultispectrum::DoImageProcessing()
     }
 }
 
+
 void PointSetInteractionMultispectrum::PlotReflectance(mitk::PointSet::Pointer m_PointSet, mitk::Image* image)
 {
     mitk::PointSet::PointsIterator PtIterator; // The point iterator in the PointSet, which gets accesss to each point.
@@ -215,6 +216,7 @@ void PointSetInteractionMultispectrum::PlotReflectance(mitk::PointSet::Pointer m
     itk::VariableLengthVector<double> reflectance;
     int channels;
 
+    int colorSelection = 0;
     //  The loop goes through each point in the point set  //
     for (PtIterator = m_PointSet->Begin(0); PtIterator != m_PointSet->End(0); PtIterator++)
     {
@@ -228,8 +230,11 @@ void PointSetInteractionMultispectrum::PlotReflectance(mitk::PointSet::Pointer m
         channels = reflectance.GetNumberOfElements();
 
         //  plot the reflectance dynamically  //
-        QColor curveColor((double) 255 * rand() / (RAND_MAX),(double) 255 * rand() / (RAND_MAX),
-                (double) 255 * rand() / (RAND_MAX));
+        ++colorSelection;
+        // create colors for each element in pointset.
+        // "randomly" select colors for each added point by multiplying with prime.
+        QColor curveColor((200 + (41 * colorSelection)) % 255, (89 * colorSelection) % 255,
+            (37 * colorSelection) % 255);
         QString curveName("Point ");
         curveName.append(QString::number(pointIdx));
         QPolygonF qwtPoints;

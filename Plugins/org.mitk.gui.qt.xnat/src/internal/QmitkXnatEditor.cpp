@@ -50,9 +50,9 @@ const QString QmitkXnatEditor::EDITOR_ID = "org.mitk.editors.xnat.browser";
 QmitkXnatEditor::QmitkXnatEditor() :
   m_DownloadPath(berry::Platform::GetPreferencesService()->
                  GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", "")),
+  m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
   m_ListModel(new ctkXnatListModel()),
   m_Session(0),
-  m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
   m_SelectionListener(new berry::SelectionChangedAdapter<QmitkXnatEditor>(this, &QmitkXnatEditor::SelectionChanged))
 {
   m_DataStorageServiceTracker.open();
@@ -120,7 +120,7 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
 
   GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener.data());
 
-  connect( m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnObjectActivated(const QModelIndex&)) );
+  connect( m_Controls.listView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnObjectActivated(const QModelIndex&)) );
 
   connect( m_Controls.buttonDownloadResource, SIGNAL(clicked()), this, SLOT(DownloadResource()) );
   connect( m_Controls.buttonDownloadFile, SIGNAL(clicked()), this, SLOT(DownloadFile()) );
@@ -180,9 +180,9 @@ void QmitkXnatEditor::UpdateList()
   if( inputObject == NULL )
     return;
 
-  m_Controls.treeView->setModel(m_ListModel);
+  m_Controls.listView->setModel(m_ListModel);
   m_ListModel->setRootObject( inputObject );
-  m_Controls.treeView->reset();
+  m_Controls.listView->reset();
 
   // recursive method to check parents of the inputObject
   m_ParentCount = ParentChecker(inputObject);
@@ -264,10 +264,10 @@ void QmitkXnatEditor::SelectionChanged(const berry::IWorkbenchPart::Pointer& sou
 
 void QmitkXnatEditor::DownloadResource()
 {
-  if (!m_Controls.treeView->selectionModel()->hasSelection())
+  if (!m_Controls.listView->selectionModel()->hasSelection())
     return;
 
-  const QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+  const QModelIndex index = m_Controls.listView->selectionModel()->currentIndex();
   QVariant variant = m_ListModel->data(index, Qt::UserRole);
   if ( variant.isValid() )
   {
@@ -299,9 +299,9 @@ void QmitkXnatEditor::DownloadResource()
 
 void QmitkXnatEditor::DownloadFile()
 {
-  if (!m_Controls.treeView->selectionModel()->hasSelection())
+  if (!m_Controls.listView->selectionModel()->hasSelection())
     return;
-  const QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+  const QModelIndex index = m_Controls.listView->selectionModel()->currentIndex();
   InternalFileDownload(index);
 }
 
@@ -493,9 +493,9 @@ void QmitkXnatEditor::CleanListModel(ctkXnatSession* session)
 {
   if(session != 0)
   {
-    m_Controls.treeView->setModel(0);
+    m_Controls.listView->setModel(0);
     m_ListModel->setRootObject(0);
-    m_Controls.treeView->reset();
+    m_Controls.listView->reset();
     m_Controls.buttonDownloadFile->setEnabled(false);
     m_Controls.buttonDownloadResource->setEnabled(false);
   }

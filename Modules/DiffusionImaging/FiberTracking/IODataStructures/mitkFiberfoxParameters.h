@@ -63,7 +63,7 @@ public:
 
     enum AcquisitionType : int {
         SingleShotEpi,
-        Cartesian
+        SpinEcho
     };
 
     SignalGenerationParameters()

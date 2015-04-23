@@ -111,7 +111,7 @@ void KspaceImageFilter< TPixelType >
     case SignalGenerationParameters::SingleShotEpi:
         m_ReadoutScheme = new mitk::SingleShotEpi(m_Parameters);
         break;
-    case SignalGenerationParameters::Cartesian:
+    case SignalGenerationParameters::SpinEcho:
         m_ReadoutScheme = new mitk::CartesianReadout(m_Parameters);
         break;
     default:
@@ -179,7 +179,7 @@ void KspaceImageFilter< TPixelType >
 
     double noiseVar = m_Parameters->m_SignalGen.m_PartialFourier*m_Parameters->m_SignalGen.m_NoiseVariance/(kyMax*kxMax); // adjust noise variance since it is the intended variance in physical space and not in k-space
 
-    double dt =  m_Parameters->m_SignalGen.m_tLine/kxMax;  // time to read one k-space voxel
+//    double dt =  m_Parameters->m_SignalGen.m_tLine/kxMax;  // time to read one k-space voxel
 
     while( !oit.IsAtEnd() )
     {

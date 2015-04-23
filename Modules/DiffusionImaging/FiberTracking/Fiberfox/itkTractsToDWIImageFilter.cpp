@@ -1184,7 +1184,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         case SignalGenerationParameters::SingleShotEpi:
             m_StatusText += "Acquisition type: single shot EPI\n";
             break;
-        case SignalGenerationParameters::Cartesian:
+        case SignalGenerationParameters::SpinEcho:
             m_StatusText += "Acquisition type: classic spin echo with cartesian k-space trajectory\n";
             break;
         default:

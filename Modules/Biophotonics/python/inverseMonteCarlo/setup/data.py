@@ -12,7 +12,7 @@ import numpy as np
 import helper.monteCarloHelper as mch
 
 
-import csvImageReader
+import reader.csvImageReader as csvR
 
 
 def perfect(dataFolder):
@@ -52,7 +52,7 @@ def realImage(dataFolder, imageToLoad):
     #trainingReflectances = np.delete(trainingReflectances, [2, 7], axis=1)
     trainingReflectances = mch.normalizeImageQuotient(trainingReflectances)
 
-    shape, image, trainsegmentation, testsegmentation = csvImageReader.csvMultiSpectralImageReader2(dataFolder + imageToLoad)
+    shape, image, trainsegmentation, testsegmentation = csvR.csvMultiSpectralImageReader2(dataFolder + imageToLoad)
 
     #image = np.delete(image, [2, 7], axis=1)
     image = mch.normalizeImageQuotient(image)

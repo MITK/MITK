@@ -11,6 +11,7 @@ import numpy as np
 import mieMonteCarlo
 import subprocess
 import os
+from setup import systemPaths
 
 import contextlib
 
@@ -160,9 +161,9 @@ def runOneSimulation(wavelength, eHbO2, eHb,
         'c_ph': str(nrPhotons)}
 
     createSimulationFile(infile, replacements,
-                         "data/output/simulationFile.mci")
+                         systemPaths.getOutputFolder() + "simulationFile.mci")
 
-    args = ("./" + gpumcmlExecutable, "-A", os.getcwd() + "/data/output/simulationFile.mci")
+    args = ("./" + gpumcmlExecutable, "-A", systemPaths.getOutputFolder() + "simulationFile.mci")
 
     with cd(gpumcmlDirectory):
         popen = subprocess.Popen(args, stdout=subprocess.PIPE)

@@ -6,6 +6,7 @@ import numpy as np
 
 from helper import monteCarloHelper as mch
 from setup  import simulation
+from setup import systemPaths
 
 """
 generating:
@@ -23,18 +24,10 @@ _____
 
 def perfectGrid(generatedFilename):
 
-    # the input file without the run specific parameters for ua, us and d:
-    infileString = 'data/colonTemplate.mci'
-    infile       = open(infileString)
-    # the output folder for the mc simulations
-    # attention: this is relative to your gpumcml path!
-    outfolderMC ='outputMC/'
-    # the output folder for the reflectance spectra
-    outfolderRS = 'data/output/'
-    gpumcmlDirectory = '/home/wirkert/workspace/monteCarlo/gpumcml/fast-gpumcml/'
-    gpumcmlExecutable = 'gpumcml.sm_20'
+    infileString, outfolderMC, outfolderRS, gpumcmlDirectory, gpumcmlExecutable = systemPaths.initPaths()
+    infile = open(infileString)
 
-    BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb = simulation.perfect()
+    BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations = simulation.perfect()
 
     reflectances = np.zeros((nrSamples, len(wavelengths)))
 
@@ -78,7 +71,7 @@ def perfectGrid(generatedFilename):
     # save the reflectance results!
     now = datetime.datetime.now().strftime("%Y%B%d%I:%M%p")
     np.save(outfolderRS + now + generatedFilename + "reflectances" + str(photons) + "photons", reflectances)
-    np.save(outfolderRS + now + generatedFilename + "parameters", parameters)
+    np.save(outfolderRS + now + generatedFilename  + str(nrSamples) + "parameters", paramsList)
 
     end = time.time()
     print "total time for generating perfect data on grid: " + str((end - start))

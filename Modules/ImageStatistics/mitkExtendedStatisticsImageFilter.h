@@ -116,7 +116,7 @@ namespace itk
       typename const HistogramGeneratorType::HistogramType*
         GetHistogram()
       {
-        return m_histogramGenerator->GetOutput();
+        return m_HistogramGenerator->GetOutput();
       }
 
       /**
@@ -149,9 +149,9 @@ namespace itk
     *
     * new members for setting and calculating the hisotgram for those coefficients which depends on this
     */
-    typename  HistogramGeneratorType::Pointer  m_histogramGenerator;
-    int m_Binsize;
-    bool m_histogramCalculated;
+    typename  HistogramGeneratorType::Pointer  m_HistogramGenerator;
+    int m_BinSize;
+    bool m_HistogramCalculated;
 
 
     RealObjectType* GetSkewnessOutput();

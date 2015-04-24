@@ -38,9 +38,9 @@ namespace itk
   template< class TInputImage, class TLabelImage >
   std::list<int>
     ExtendedLabelStatisticsImageFilter< TInputImage, TLabelImage >
-    ::GetRelevantlabels() const
+    ::GetRelevantLabels() const
   {
-    return m_relevantLabels;
+    return m_RelevantLabels;
   }
 
 
@@ -49,7 +49,7 @@ namespace itk
     ExtendedLabelStatisticsImageFilter< TInputImage, TLabelImage >
     ::GetMaskingNonEmpty() const
   {
-    return m_maskNonEmpty;
+    return m_MaskNonEmpty;
   }
 
 
@@ -174,13 +174,13 @@ namespace itk
     CalculateSettingsForLabels()
   {
     LabelPixelType i;
-    m_maskNonEmpty = false;
+    m_MaskNonEmpty = false;
     for ( i = 1; i < 4096; ++i )
     {
       if ( this->HasLabel( i ) )
       {
-        m_relevantLabels.push_back( i );
-        m_maskNonEmpty = true;
+        m_RelevantLabels.push_back( i );
+        m_MaskNonEmpty = true;
         m_LabelStatisticsCoefficients.insert( std::make_pair(i, CoefficientsClass()) );
       }
     }
@@ -199,12 +199,11 @@ namespace itk
     RealType upp( 0.0 );
 
     LabelPixelType i;
-
-    if ( m_maskNonEmpty )
+    if ( m_MaskNonEmpty )
     {
-      typename std::list< int >::iterator it;
-      for ( it = m_relevantLabels.begin(), i = 0;
-        it != m_relevantLabels.end();
+      typename std::list< int >::const_iterator it;
+      for ( it = m_RelevantLabels.cbegin(), i = 0;
+        it != m_RelevantLabels.cend();
         ++it, ++i )
       {
         HistogramType::ConstPointer histogramForEntropy = GetHistogram(*it);
@@ -245,13 +244,12 @@ namespace itk
     RealType currentPixel( 0.0 );
 
     std::list< LabelPixelType> relevantLabels;
-    bool maskNonEmpty = false;
     LabelPixelType i;
-    if ( m_maskNonEmpty )
+    if ( m_MaskNonEmpty )
     {
-      typename std::list< int >::iterator it;
-      for ( it = m_relevantLabels.begin(), i = 0;
-        it != m_relevantLabels.end();
+      typename std::list< int >::const_iterator it;
+      for ( it = m_RelevantLabels.cbegin(), i = 0;
+        it != m_RelevantLabels.cend();
         ++it )
       {
         RealType sigma = GetSigma( *it );

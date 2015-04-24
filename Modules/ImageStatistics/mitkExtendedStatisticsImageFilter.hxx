@@ -26,8 +26,8 @@ namespace itk
     : StatisticsImageFilter< TInputImage >()
   {
     /*
-    * add the Skewness and Kurtosis to the other statistical calculated Values
-    * of the mitkStatisticsImageFilter as the 7th and 8th Output
+    * add the Skewness,Kurtosis,Entropy,Uniformity,MPP, UPP to the other statistical calculated Values
+    * of the mitkStatisticsImageFilter as the 7th to the 12th Output
     */
     for ( int i = 7; i < 13; ++i )
     {
@@ -36,15 +36,15 @@ namespace itk
       this->ProcessObject::SetNthOutput( i, output.GetPointer() );
     }
 
-    this->GetSkewnessOutput()->Set( NumericTraits< RealType >::max() );
-    this->GetKurtosisOutput()->Set( NumericTraits< RealType >::max() );
-    this->GetEntropyOutput()->Set( NumericTraits< RealType >::max() );
-    this->GetUniformityOutput()->Set( NumericTraits< RealType >::max() );
-    this->GetUPPOutput()->Set( NumericTraits< RealType >::max() );
-    this->GetMPPOutput()->Set( NumericTraits< RealType >::max() );
+    this->GetSkewnessOutput()->Set( 0.0 );
+    this->GetKurtosisOutput()->Set( 0.0 );
+    this->GetEntropyOutput()->Set( -1.0 );
+    this->GetUniformityOutput()->Set( 0.0 );
+    this->GetUPPOutput()->Set( 0.0 );
+    this->GetMPPOutput()->Set( 0.0 );
 
-    this->m_histogramCalculated = false;
-    this->m_histogramGenerator =  HistogramGeneratorType::New();
+    this->m_HistogramCalculated = false;
+    this->m_HistogramGenerator =  HistogramGeneratorType::New();
   }
 
   template< class TInputImage >
@@ -77,7 +77,7 @@ namespace itk
   void  ExtendedStatisticsImageFilter< TInputImage >
     ::SetBinSize( int size )
   {
-    m_Binsize = size;
+    m_BinSize = size;
   }
 
   template< class TInputImage >
@@ -190,7 +190,7 @@ namespace itk
 
     CalculteHistogram();
 
-    if(m_histogramCalculated == true)
+    if(m_HistogramCalculated == true)
     {
       ComputeEntropyUniformityAndUPP();
     }
@@ -257,22 +257,14 @@ namespace itk
     ExtendedStatisticsImageFilter< TInputImage >
     ::CalculteHistogram()
   {
-    // Calculate histogram
-       typedef itk::Statistics::ScalarImageToHistogramGenerator< TInputImage >
-    HistogramGeneratorType;
+    m_HistogramGenerator->SetInput( this->GetInput() );
+    m_HistogramGenerator->SetMarginalScale( 100 );
+    m_HistogramGenerator->SetNumberOfBins( m_BinSize );
+    m_HistogramGenerator->SetHistogramMin( this->GetMinimum() );
+    m_HistogramGenerator->SetHistogramMax( this->GetMaximum() );
+    m_HistogramGenerator->Compute();
 
-
-    m_histogramGenerator->SetInput( this->GetInput() );
-    m_histogramGenerator->SetMarginalScale( 100 );
-    m_histogramGenerator->SetNumberOfBins( m_Binsize );
-    m_histogramGenerator->SetHistogramMin( this->GetMinimum() );
-    m_histogramGenerator->SetHistogramMax( this->GetMaximum() );
-    m_histogramGenerator->Compute();
-
-    //SetHistogramOutput(m_histogramGenerator->GetOutput() );
-
-    m_histogramCalculated = true;
-
+    m_HistogramCalculated = true;
   }
 
 
@@ -287,27 +279,27 @@ namespace itk
     RealType entropy( 0.0 );
     RealType upp( 0.0 );
 
-        typename  const HistogramGeneratorType::HistogramType* histogramForEntropy = GetHistogram();
+    typename  const HistogramGeneratorType::HistogramType* histogramForEntropy = GetHistogram();
 
-        for (int i = 0; i < histogramForEntropy->Size(); i++)
+    for (int i = 0; i < histogramForEntropy->Size(); i++)
+    {
+      partialProbability = histogramForEntropy->GetFrequency(i,0) / double ( histogramForEntropy->GetTotalFrequency() ) ;
+
+      if( partialProbability != 0)
+      {
+        entropy -= partialProbability *( std::log10(partialProbability) / std::log10(2) ) ;
+        uniformity += std::pow(partialProbability,2);
+
+
+        if(histogramForEntropy->GetMeasurement(i,0) > 0)
         {
-          partialProbability = histogramForEntropy->GetFrequency(i,0) / double ( histogramForEntropy->GetTotalFrequency() ) ;
-
-          if( partialProbability != 0)
-          {
-            entropy -= partialProbability *( std::log10(partialProbability) / std::log10(2) ) ;
-            uniformity += std::pow(partialProbability,2);
-
-
-            if(histogramForEntropy->GetMeasurement(i,0) > 0)
-            {
-              upp += std::pow(partialProbability,2);
-            }
-          }
+          upp += std::pow(partialProbability,2);
         }
-        this->GetEntropyOutput()->Set( entropy );
-        this->GetUniformityOutput()->Set( uniformity );
-        this->GetUPPOutput()->Set( upp );
+      }
+    }
+    this->GetEntropyOutput()->Set( entropy );
+    this->GetUniformityOutput()->Set( uniformity );
+    this->GetUPPOutput()->Set( upp );
 
   }
 }

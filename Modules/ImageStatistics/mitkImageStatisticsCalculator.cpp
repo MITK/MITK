@@ -1441,7 +1441,7 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
     labelStatisticsFilter->RemoveObserver( observerTag );
 
     // Find all relevant labels of mask (other than 0)
-    std::list< int > relevantLabels = labelStatisticsFilter->GetRelevantlabels();
+    std::list< int > relevantLabels = labelStatisticsFilter->GetRelevantLabels();
     unsigned int i;
 
     if ( labelStatisticsFilter->GetMaskingNonEmpty() )

@@ -64,7 +64,7 @@ namespace itk
       {
         m_Kurtosis = 0.0;
         m_Skewness = 0.0;
-        m_Entropy = 0.0;
+        m_Entropy = -1.0;
         m_Uniformity = 0.0;
         m_MPP = 0.0;
         m_UPP = 0.0;
@@ -90,7 +90,7 @@ namespace itk
     RealType GetMPP( LabelPixelType label) const;
     RealType GetUPP( LabelPixelType label) const;
 
-    std::list< int>  GetRelevantlabels() const;
+    std::list< int>  GetRelevantLabels() const;
     bool             GetMaskingNonEmpty() const;
 
   protected:
@@ -115,8 +115,8 @@ namespace itk
   private:
 
     CoefficientsMap         m_LabelStatisticsCoefficients;
-    std::list< int>         m_relevantLabels;
-    bool                    m_maskNonEmpty;
+    std::list< int>         m_RelevantLabels;
+    bool                    m_MaskNonEmpty;
 
   }; // end of class
 

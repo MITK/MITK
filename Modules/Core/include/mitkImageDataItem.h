@@ -71,6 +71,9 @@ namespace mitk {
   typedef itk::SmartPointer<const mitk::Image> ImageConstPointer;
 
     mitkClassMacro(ImageDataItem, itk::LightObject);
+    itkCloneMacro(ImageDataItem);
+
+    virtual itk::LightObject::Pointer InternalClone() const;
 
     ImageDataItem(const ImageDataItem& aParent, const mitk::ImageDescriptor::Pointer desc,
                   int timestep, unsigned int dimension, void *data = NULL,
@@ -109,6 +112,11 @@ namespace mitk {
     PixelType GetPixelType() const
     {
       return *m_PixelType;
+    }
+
+    void SetTimestep(int t)
+    {
+        m_Timestep = t;
     }
 
     int GetDimension() const

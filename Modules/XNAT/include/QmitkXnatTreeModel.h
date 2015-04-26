@@ -23,6 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK includes
 #include "MitkXNATExports.h"
 
+namespace mitk {
+class DataNode;
+}
+
 class MITKXNAT_EXPORT QmitkXnatTreeModel : public ctkXnatTreeModel
 {
   Q_OBJECT
@@ -31,6 +35,16 @@ public:
   QmitkXnatTreeModel();
 
   virtual QVariant data(const QModelIndex& index, int role) const;
+
+  virtual bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+
+  using QAbstractItemModel::supportedDropActions;
+  virtual Qt::DropActions supportedDropActions();
+
+  virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+
+  signals:
+  void ResourceDropped(const QList<mitk::DataNode*>&, ctkXnatObject*);
 
 };
 

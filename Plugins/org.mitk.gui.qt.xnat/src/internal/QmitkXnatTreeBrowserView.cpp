@@ -83,10 +83,11 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   m_Controls.treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
   m_Tracker = new mitk::XnatSessionTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext());
-  m_NodeMenu = new QMenu(m_Controls.treeView);
+
+  m_ContextMenu = new QMenu(m_Controls.treeView);
 
   connect(m_Controls.treeView, SIGNAL(customContextMenuRequested(const QPoint&)),
-    this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)));
+    this, SLOT(OnContextMenuRequested(const QPoint&)));
   connect(m_Tracker, SIGNAL(AboutToBeClosed(ctkXnatSession*)), this, SLOT(CleanTreeModel(ctkXnatSession*)));
   connect(m_Tracker, SIGNAL(Opened(ctkXnatSession*)), this, SLOT(UpdateSession(ctkXnatSession*)));
 
@@ -258,15 +259,13 @@ void QmitkXnatTreeBrowserView::OnContextMenuDownloadAndOpenFile()
   InternalFileDownload(index, true);
 }
 
-void QmitkXnatTreeBrowserView::NodeTableViewContextMenuRequested(const QPoint & pos)
+void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
 {
-  m_NodeMenu->clear();
+  m_ContextMenu->clear();
   QModelIndex index = m_Controls.treeView->indexAt(pos);
-  QVariant variant = m_TreeModel->data(index, Qt::UserRole);
-  if (variant.isValid())
+
+  ctkXnatObject* xnatObject = m_TreeModel->xnatObject(index);
   {
-    ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(variant.value<ctkXnatObject*>());
-    if (file != NULL)
     {
       QAction* actShow = new QAction("Download and Open", m_NodeMenu);
       QAction* actDownload = new QAction("Download", m_NodeMenu);

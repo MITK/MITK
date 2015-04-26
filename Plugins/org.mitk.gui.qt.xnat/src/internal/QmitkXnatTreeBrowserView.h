@@ -71,8 +71,7 @@ public:
   /// \brief Cleans the tree model
   void CleanTreeModel(ctkXnatSession* session);
 
-  void NodeTableViewContextMenuRequested(const QPoint & pos);
-
+  void OnContextMenuRequested(const QPoint & pos);
   void OnContextMenuDownloadAndOpenFile();
   void OnContextMenuDownloadFile();
 
@@ -94,7 +93,7 @@ private:
   mitk::XnatSessionTracker* m_Tracker;
   QString m_DownloadPath;
 
-  QMenu* m_NodeMenu;
+  QMenu* m_ContextMenu;
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H

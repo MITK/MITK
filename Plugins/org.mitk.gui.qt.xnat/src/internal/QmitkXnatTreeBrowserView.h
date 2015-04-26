@@ -74,6 +74,12 @@ public:
   void OnContextMenuRequested(const QPoint & pos);
   void OnContextMenuDownloadAndOpenFile();
   void OnContextMenuDownloadFile();
+  void OnContextMenuCreateResourceFolder();
+  void OnContextMenuUploadFile();
+
+  void OnUploadResource(const QList<mitk::DataNode*>& , ctkXnatObject *);
+
+  void OnProgress(QUuid, double);
 
 protected:
 
@@ -84,6 +90,9 @@ protected:
 private:
 
   void InternalFileDownload(const QModelIndex& index, bool loadData);
+  void InternalFileUpload(ctkXnatFile *file);
+  ctkXnatResource* InternalAddResourceFolder(ctkXnatObject* parent);
+
   berry::QtSelectionProvider::Pointer m_SelectionProvider;
   void SetSelectionProvider();
 

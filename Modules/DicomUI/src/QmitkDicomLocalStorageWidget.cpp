@@ -62,11 +62,13 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
     }
 }
 
+
+
 void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QString& dicomData)
 {
     if(m_LocalDatabase->isOpen())
     {
-        m_LocalIndexer->addDirectory(*m_LocalDatabase,dicomData,m_LocalDatabase->databaseDirectory());
+      m_LocalIndexer->addDirectory(*m_LocalDatabase, dicomData, m_LocalDatabase->databaseDirectory());
     }
 }
 

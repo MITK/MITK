@@ -163,6 +163,7 @@ int main(int argc, char* argv[])
     tracker->SetSamplingDistance(samplingdist);
     tracker->SetNumberOfSamples(samples);
     //tracker->SetAvoidStop(false);
+    tracker->SetVerbose(verbose);
     tracker->SetAposterioriCurvCheck(false);
     tracker->SetRemoveWmEndFibers(false);
     tracker->Update();

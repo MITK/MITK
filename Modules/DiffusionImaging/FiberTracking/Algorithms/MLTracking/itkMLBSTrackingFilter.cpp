@@ -58,6 +58,7 @@ MLBSTrackingFilter< NumImageFeatures >
     , m_AposterioriCurvCheck(false)
     , m_AvoidStop(true)
     , m_RandomSampling(false)
+    , m_Verbose(false)
 {
     this->SetNumberOfRequiredInputs(1);
 }
@@ -401,11 +402,14 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::Classify(itk:
     }
 
     ItkDoubleImgType::IndexType idx;
-    m_NotWmImage->TransformPhysicalPointToIndex(pos, idx);
-    if (m_NotWmImage->GetLargestPossibleRegion().IsInside(idx))
+    if (m_Verbose)
     {
-        m_NotWmImage->SetPixel(idx, m_NotWmImage->GetPixel(idx)+outProb);
-        m_WmImage->SetPixel(idx, m_WmImage->GetPixel(idx)+prob);
+        m_NotWmImage->TransformPhysicalPointToIndex(pos, idx);
+        if (m_NotWmImage->GetLargestPossibleRegion().IsInside(idx))
+        {
+            m_NotWmImage->SetPixel(idx, m_NotWmImage->GetPixel(idx)+outProb);
+            m_WmImage->SetPixel(idx, m_WmImage->GetPixel(idx)+prob);
+        }
     }
     if (outProb>prob && prob>0)
     {
@@ -413,7 +417,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::Classify(itk:
         prob = 0;
         direction.fill(0.0);
     }
-    if (avoidStop && m_AvoidStopImage->GetLargestPossibleRegion().IsInside(idx) && candidates>0 && direction.magnitude()>0.001)
+    if (m_Verbose && avoidStop && m_AvoidStopImage->GetLargestPossibleRegion().IsInside(idx) && candidates>0 && direction.magnitude()>0.001)
         m_AvoidStopImage->SetPixel(idx, m_AvoidStopImage->GetPixel(idx)+0.1);
 
     return direction;

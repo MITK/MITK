@@ -106,6 +106,7 @@ public:
     itkSetMacro( AposterioriCurvCheck, bool )
     itkSetMacro( AvoidStop, bool )
     itkSetMacro( RandomSampling, bool )
+    itkSetMacro( Verbose, bool )
 
     void SetDecisionForest( DecisionForestType* forest )
     {
@@ -167,7 +168,7 @@ public:
     bool                                m_AposterioriCurvCheck;
     bool                                m_RemoveWmEndFibers;
     bool                                m_AvoidStop;
-
+    bool                                m_Verbose;
     int                                 m_Threads;
     bool                                m_DemoMode;
     void BuildFibers(bool check);

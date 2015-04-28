@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCellData.h>
 #include <vtkLine.h>
 #include <vtkPoints.h>
+#include <vtkTriangle.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper2D.h>
 
@@ -120,6 +121,10 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer( mitk::BaseRendere
 void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *renderer)
 {
   bool visible = true;
+  LocalStorage* ls = m_LSH.GetLocalStorage(renderer);
+  ls->m_CrosshairActor->SetVisibility(0);
+  ls->m_ArrowActor->SetVisibility(0);
+  ls->m_CrosshairHelperLineActor->SetVisibility(0);
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
@@ -245,30 +250,25 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
 
       // Add the points to the dataset
       linesPolyData->SetPoints(points);
-
       // Add the lines to the dataset
       linesPolyData->SetLines(lines);
 
-      // Visualize
+      Vector3D orthogonalVector;
+      orthogonalVector = inputPlaneGeometry->GetNormal();
+      worldPlaneGeometry->Project(orthogonalVector,orthogonalVector);
+      orthogonalVector.Normalize();
 
-      LocalStorage* ls = m_LSH.GetLocalStorage(renderer);
+      // Visualize
       ls->m_Mapper->SetInputData(linesPolyData);
       ls->m_CrosshairActor->SetMapper(ls->m_Mapper);
-
-      vtkCoordinate *tcoord = vtkCoordinate::New();
-      tcoord->SetCoordinateSystemToWorld();
-      ls->m_Mapper->SetTransformCoordinate(tcoord);
-      tcoord->Delete();
 
       // Determine if we should draw the area covered by the thick slicing, default is false.
       // This will also show the area of slices that do not have thick slice mode enabled
       bool showAreaOfThickSlicing = false;
       GetDataNode()->GetBoolProperty( "reslice.thickslices.showarea", showAreaOfThickSlicing );
 
-      // get the normal of the inputPlaneGeometry
-      Vector3D normal = inputPlaneGeometry->GetNormal();
       // determine the pixelSpacing in that direction
-      double thickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), normal );
+      double thickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), orthogonalVector );
 
       IntProperty *intProperty=0;
       if( GetDataNode()->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
@@ -280,25 +280,36 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       // so we store it in this fancy property
       GetDataNode()->SetFloatProperty( "reslice.thickslices.sizeinmm", thickSliceDistance*2 );
 
-      ls->m_CrosshairAssembly = vtkSmartPointer <vtkPropAssembly>::New();
-      ls->m_CrosshairAssembly->AddPart(ls->m_CrosshairActor);
+      ls->m_CrosshairActor->SetVisibility(1);
+
+      vtkSmartPointer<vtkPolyData> arrowPolyData = vtkSmartPointer<vtkPolyData>::New();
+      ls->m_Arrowmapper->SetInputData(arrowPolyData);
+      if(this->m_RenderOrientationArrows)
+      {
+        ScalarType triangleSizeMM = 7.0 * displayGeometry->GetScaleFactorMMPerDisplayUnit();
+
+        vtkSmartPointer<vtkCellArray> triangles = vtkSmartPointer<vtkCellArray>::New();
+        vtkSmartPointer<vtkPoints> triPoints = vtkSmartPointer<vtkPoints>::New();
+
+        DrawOrientationArrow(triangles,triPoints,triangleSizeMM,orthogonalVector,point1,point2);
+        DrawOrientationArrow(triangles,triPoints,triangleSizeMM,orthogonalVector,point2,point1);
+        arrowPolyData->SetPoints(triPoints);
+        arrowPolyData->SetPolys(triangles);
+        ls->m_ArrowActor->SetVisibility(1);
+      }
 
       // Visualize
       vtkSmartPointer<vtkPolyData> helperlinesPolyData = vtkSmartPointer<vtkPolyData>::New();
       ls->m_HelperLinesmapper->SetInputData(helperlinesPolyData);
-      ls->m_CrosshairHelperLineActor->SetVisibility(showAreaOfThickSlicing);
       if ( showAreaOfThickSlicing )
       {
         vtkSmartPointer<vtkCellArray> helperlines = vtkSmartPointer<vtkCellArray>::New();
         // vectorToHelperLine defines how to reach the helperLine from the mainLine
-        Vector3D vectorToHelperLine;
-        vectorToHelperLine = normal;
-        vectorToHelperLine.Normalize();
         // got the right direction, so we multiply the width
-        vectorToHelperLine *= thickSliceDistance;
+        Vector3D vecToHelperLine = orthogonalVector * thickSliceDistance;
 
-        this->DrawLine(point1 - vectorToHelperLine, point2 - vectorToHelperLine,helperlines,points);
-        this->DrawLine(point1 + vectorToHelperLine, point2 + vectorToHelperLine,helperlines,points);
+        this->DrawLine(point1 - vecToHelperLine, point2 - vecToHelperLine,helperlines,points);
+        this->DrawLine(point1 + vecToHelperLine, point2 + vecToHelperLine,helperlines,points);
 
         // Add the points to the dataset
         helperlinesPolyData->SetPoints(points);
@@ -308,7 +319,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
 
         ls->m_CrosshairActor->GetProperty()->SetLineStipplePattern(0xf0f0);
         ls->m_CrosshairActor->GetProperty()->SetLineStippleRepeatFactor(1);
-        ls->m_CrosshairAssembly->AddPart(ls->m_CrosshairHelperLineActor);
+        ls->m_CrosshairHelperLineActor->SetVisibility(1);
       }
     }
   }
@@ -328,6 +339,40 @@ void mitk::PlaneGeometryDataMapper2D::DrawLine( mitk::Point3D p0,mitk::Point3D p
 
   lines->InsertNextCell(lineVtk);
 
+}
+
+void mitk::PlaneGeometryDataMapper2D::DrawOrientationArrow(vtkSmartPointer<vtkCellArray> triangles,
+                                                           vtkSmartPointer<vtkPoints> triPoints,
+                                                           double triangleSizeMM,
+                                                           Vector3D& orthogonalVector,
+                                                           Point3D& point1, Point3D& point2)
+{
+  // Draw arrows to indicate plane orientation
+  // Vector along line
+  Vector3D v1 = point2 - point1;
+  v1.Normalize();
+  v1 *= triangleSizeMM;
+
+  // Orthogonal vector
+  Vector3D v2 = orthogonalVector;
+  v2 *= triangleSizeMM;
+  if(!this->m_ArrowOrientationPositive) v2*=-1.0;
+
+  // Initialize remaining triangle coordinates accordingly
+  Point3D p1 = point1 + v1 * 2.0;
+  Point3D p2 = point1 + v1 + v2;
+
+  vtkIdType t0 = triPoints->InsertNextPoint(point1[0],point1[1], point1[2]); // start of the line
+  vtkIdType t1 = triPoints->InsertNextPoint(p1[0],p1[1], p1[2]); // point on line
+  vtkIdType t2 = triPoints->InsertNextPoint(p2[0],p2[1], p2[2]); // direction point
+
+  vtkSmartPointer<vtkTriangle> triangle =
+      vtkSmartPointer<vtkTriangle>::New();
+  triangle->GetPointIds()->SetId ( 0, t0 );
+  triangle->GetPointIds()->SetId ( 1, t1 );
+  triangle->GetPointIds()->SetId ( 2, t2 );
+
+  triangles->InsertNextCell(triangle);
 }
 
 int mitk::PlaneGeometryDataMapper2D::DetermineThickSliceMode( DataNode * dn, int &thickSlicesNum )
@@ -357,6 +402,7 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
   ApplyColorAndOpacityProperties2D(renderer, ls->m_CrosshairActor);
   ApplyColorAndOpacityProperties2D(renderer, ls->m_CrosshairHelperLineActor);
+  ApplyColorAndOpacityProperties2D(renderer, ls->m_ArrowActor);
 
   float thickness;
   this->GetDataNode()->GetFloatProperty("Line width",thickness,renderer);
@@ -421,17 +467,33 @@ void mitk::PlaneGeometryDataMapper2D::UpdateVtkTransform(mitk::BaseRenderer* /*r
 mitk::PlaneGeometryDataMapper2D::LocalStorage::LocalStorage()
 {
   m_CrosshairAssembly = vtkSmartPointer <vtkPropAssembly>::New();
+
   m_CrosshairActor = vtkSmartPointer <vtkActor2D>::New();
+  m_ArrowActor = vtkSmartPointer <vtkActor2D>::New();
   m_CrosshairHelperLineActor = vtkSmartPointer <vtkActor2D>::New();
+
   m_HelperLinesmapper = vtkSmartPointer<vtkPolyDataMapper2D>::New();
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper2D>::New();
+  m_Arrowmapper = vtkSmartPointer<vtkPolyDataMapper2D>::New();
+
   m_CrosshairActor->SetMapper(m_Mapper);
+  m_ArrowActor->SetMapper(m_Arrowmapper);
   m_CrosshairHelperLineActor->SetMapper(m_HelperLinesmapper);
+
+  m_CrosshairActor->SetVisibility(0);
+  m_ArrowActor->SetVisibility(0);
+  m_CrosshairHelperLineActor->SetVisibility(0);
+
+  m_CrosshairAssembly->AddPart(m_CrosshairActor);
+  m_CrosshairAssembly->AddPart(m_ArrowActor);
+  m_CrosshairAssembly->AddPart(m_CrosshairHelperLineActor);
 
   vtkCoordinate *tcoord = vtkCoordinate::New();
   tcoord->SetCoordinateSystemToWorld();
   m_HelperLinesmapper->SetTransformCoordinate(tcoord);
   m_Mapper->SetTransformCoordinate(tcoord);
+//  tcoord->SetCoordinateSystemToNormalizedDisplay();
+  m_Arrowmapper->SetTransformCoordinate(tcoord);
   tcoord->Delete();
 }
 

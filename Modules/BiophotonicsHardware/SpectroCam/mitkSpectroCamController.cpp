@@ -47,7 +47,6 @@ using namespace cv;
 namespace mitk {
 
 
-  typedef itk::Image<unsigned short, 2> CameraImageType;
   typedef itk::VectorImage<unsigned short, 2> CompositeCameraImageType;
 
   /**
@@ -68,27 +67,37 @@ namespace mitk {
     int CloseCameraConnection();
     bool isCameraRunning();
 
+
     void SetCurrentImageAsWhiteBalance();
 
     mitk::Image::Pointer GetCurrentImage();
 
-    CompositeCameraImageType::Pointer m_CompositeItkImage;
+    CompositeCameraImageType::Pointer m_CompositeItkImage_1;
+    CompositeCameraImageType::Pointer m_CompositeItkImage_2;
     mitk::Image::Pointer m_CompositeMitkImage;
 
     cv::Mat m_CurrentStackSmall;
     cv::Mat m_CurrentTransformedStack;
     cv::Mat m_FlatfieldSmall;
     cv::Mat m_LLSQSolutionSmall;
+
+    const int m_FullWidth;
+    const int m_FullHeight;
+
     const int m_SmallWidth;
     const int m_SmallHeight;
 
     bool m_ShowOxygenation;
 
+    // for image double buffer swap
+    bool m_Image1Selected;
 
     std::string mode;
     std::string model;
 
   private:
+
+    void InitializeItkImage(mitk::CompositeCameraImageType::Pointer& compositeImage);
 
     bool m_IsCameraRunning;
 
@@ -120,6 +129,28 @@ static mitk::SpectroCamController_pimpl* my_SpectroCamController;
 
 mitk::Image::Pointer mitk::SpectroCamController_pimpl::GetCurrentImage()
 {
+  mitk::CompositeCameraImageType::Pointer selectedImage;
+
+  // TODO SW: semaphore here so it cannot interfere with callback readout of m_Image1Selected
+  if (this->m_Image1Selected)
+  {
+    this->m_Image1Selected = !this->m_Image1Selected;
+    selectedImage = this->m_CompositeItkImage_1;
+  }
+  else
+  {
+    this->m_Image1Selected = !this->m_Image1Selected;
+    selectedImage = this->m_CompositeItkImage_2;
+  }
+
+  this->m_CompositeMitkImage = mitk::Image::New();
+  MITK_INFO << "Image created";
+  this->m_CompositeMitkImage->InitializeByItk<mitk::CompositeCameraImageType>(selectedImage);
+  MITK_INFO << "Initialized image by ITK";
+  this->m_CompositeMitkImage->SetVolume(selectedImage->GetBufferPointer());
+  MITK_INFO << "Copied data";
+
+
   return m_CompositeMitkImage;
 }
 
@@ -154,6 +185,9 @@ mitk::SpectroCamController_pimpl::SpectroCamController_pimpl()
   m_IsCameraRunning(false),
   m_SmallWidth(614),
   m_SmallHeight(514),
+  m_FullWidth(2456),
+  m_FullHeight(2058),
+  m_Image1Selected(true),
   m_ShowOxygenation(false)
 {
   my_SpectroCamController = this;
@@ -161,7 +195,6 @@ mitk::SpectroCamController_pimpl::SpectroCamController_pimpl()
   m_FlatfieldSmall    = cv::Mat(8, m_SmallWidth * m_SmallHeight, CV_32F, cv::Scalar(1));
   m_CurrentTransformedStack = cv::Mat(8, m_SmallWidth * m_SmallHeight, CV_32F, cv::Scalar(1));
 
-  m_CompositeItkImage = mitk::CompositeCameraImageType::New();
 
   m_LLSQSolutionSmall = createLLSQSolutionFromHMatrix();
 
@@ -335,23 +368,30 @@ bool mitk::SpectroCamController_pimpl::Ini()
 
 }
 
-void initializeSpectroCamImage(SpectroCamImage image)
+void mitk::SpectroCamController_pimpl::InitializeItkImage(mitk::CompositeCameraImageType::Pointer& compositeImage)
 {
-  mitk::CameraImageType::RegionType region;
-  mitk::CameraImageType::RegionType::SizeType size;
-  mitk::CameraImageType::RegionType::IndexType index;
-  mitk::CameraImageType::SpacingType spacing;
-  size.Fill( 1 );
-  size[0] = image.m_pAcqImage->iSizeY;
-  size[1] = image.m_pAcqImage->iSizeX;
-  index.Fill(0);
-  spacing.Fill(1);
-  region.SetSize(size);
-  region.SetIndex(index);
-  my_SpectroCamController->m_CompositeItkImage->SetRegions(region);
-  my_SpectroCamController->m_CompositeItkImage->SetSpacing(spacing);
-  my_SpectroCamController->m_CompositeItkImage->SetNumberOfComponentsPerPixel(NUMBER_FILTERS);
-  my_SpectroCamController->m_CompositeItkImage->Allocate();
+  if (compositeImage.IsNull())
+  {
+
+    MITK_INFO << "initializing itk::Composite Image";
+    mitk::CompositeCameraImageType::RegionType region;
+    mitk::CompositeCameraImageType::RegionType::SizeType size;
+    mitk::CompositeCameraImageType::RegionType::IndexType index;
+    mitk::CompositeCameraImageType::SpacingType spacing;
+    size.Fill( 1 );
+    size[0] = this->m_FullWidth;
+    size[1] = this->m_FullHeight;
+    index.Fill(0);
+    spacing.Fill(1);
+    region.SetSize(size);
+    region.SetIndex(index);
+
+    compositeImage = mitk::CompositeCameraImageType::New();
+    compositeImage->SetRegions(region);
+    compositeImage->SetSpacing(spacing);
+    compositeImage->SetNumberOfComponentsPerPixel(NUMBER_FILTERS);
+    compositeImage->Allocate();
+  }
 }
 
 /**
@@ -378,39 +418,54 @@ static void DisplayCameraStream(SpectroCamImage image)
           return;
         }
       }
-      if (my_SpectroCamController->m_CompositeItkImage.IsNull())
-      { // initialize VectorImage
-        initializeSpectroCamImage(image);
-      }
 
 
       //============= Get data from spectrocam to opencv
 
+      // TODO SW: probably we can get around this memcopy by simply setting data pointer? Not sure.
       cv::Mat data = cv::Mat( image.m_pAcqImage->iSizeY, image.m_pAcqImage->iSizeX, CV_16U);
       memcpy( data.datastart , image.m_pAcqImage->pImageBuffer , image.m_pAcqImage->iImageSize); //Copy Image from JAI-Format to OCV´s IplImage
 
 
       //============= From opencv to mitk::Image (VectorImage)
 
-      //my_SpectroCamController->m_CompositeMitkImage
+      mitk::CompositeCameraImageType::Pointer selectedImage;
+
+      if (my_SpectroCamController->m_Image1Selected)
+      {
+        selectedImage = my_SpectroCamController->m_CompositeItkImage_1;
+      }
+      else
+      {
+        selectedImage = my_SpectroCamController->m_CompositeItkImage_2;
+      }
+
+      itk::ImageRegionIterator<mitk::CompositeCameraImageType> imageIterator(selectedImage, selectedImage->GetLargestPossibleRegion());
+
+      MatConstIterator_<unsigned short> it, end;
+      it  = data.begin<unsigned short>();
+      end = data.end<unsigned short>();
+
+
+      while(!imageIterator.IsAtEnd())
+      {
+        mitk::CompositeCameraImageType::PixelType compositePixel = imageIterator.Get();
+
+        compositePixel[image.m_FilterNum] = *it;
+
+        ++it;
+        ++imageIterator;
+      }
+
+       //both matrix and itk image shall reach end at the same time.
+      assert(it == end);
+
+
       //============= Display image as opencv window ==
 
       cv::Mat display;
       cv::resize(data, display, cvSize(my_SpectroCamController->m_SmallWidth, my_SpectroCamController->m_SmallHeight)  );   //do some resizeing for faster display
 
-
-      cv::Range slice[2];
-      slice[0] = cv::Range( image.m_FilterNum, image.m_FilterNum+1 );
-      slice[1] = cv::Range::all();
-
-      cv::Mat currentSlice = my_SpectroCamController->m_CurrentStackSmall(slice);
-
-      cv::Mat currentImageF32;
-      display.convertTo(currentImageF32, CV_32F);
-
-      currentImageF32 = currentImageF32.reshape(0, 1);
-      currentImageF32.copyTo(currentSlice);
-      //currentSlice = currentImageF32;
       display *= 16; // image is only 12 bit large, but datatype is 16 bit. Expand to full range for displaying by multiplying by 2^4.
 
 
@@ -424,6 +479,18 @@ static void DisplayCameraStream(SpectroCamImage image)
 
       if (my_SpectroCamController->m_ShowOxygenation)
       {
+        cv::Range slice[2];
+        slice[0] = cv::Range( image.m_FilterNum, image.m_FilterNum+1 );
+        slice[1] = cv::Range::all();
+
+        cv::Mat currentSlice = my_SpectroCamController->m_CurrentStackSmall(slice);
+
+        cv::Mat currentImageF32;
+        display.convertTo(currentImageF32, CV_32F);
+
+        currentImageF32 = currentImageF32.reshape(0, 1);
+        currentImageF32.copyTo(currentSlice);
+
         cv::Mat currentWorkingSlice = currentSlice.clone();
 
         cv::Mat currentFlatfieldSlice = my_SpectroCamController->m_FlatfieldSmall(slice);
@@ -477,7 +544,9 @@ static void DisplayCameraStream(SpectroCamImage image)
 
   }//try
 
-  catch (std::exception &e) {}
+  catch (std::exception &e) {
+    MITK_INFO << e.what();
+  }
 }
 
 
@@ -498,6 +567,11 @@ int mitk::SpectroCamController_pimpl::OpenCameraConnection()
   {
     MITK_INFO << "Could not initialize camera!" << endl;
   }
+
+  // initialize VectorImage
+  this->InitializeItkImage(this->m_CompositeItkImage_1);
+  this->InitializeItkImage(this->m_CompositeItkImage_2);
+
 
 
   //=====================Open Streams=====================

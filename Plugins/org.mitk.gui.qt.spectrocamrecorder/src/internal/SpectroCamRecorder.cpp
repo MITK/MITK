@@ -44,6 +44,7 @@ void SpectroCamRecorder::CreateQtPartControl( QWidget *parent )
     m_Controls.setupUi( parent );
     connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
     connect( m_Controls.buttonWhiteBalance, SIGNAL(clicked()), this, SLOT(SetWhiteBalance()) );
+    connect( m_Controls.buttonSave, SIGNAL(clicked()), this, SLOT(SaveImage()) );
 
     // intialize the camera (!= start).
     m_Controller.Ini();
@@ -73,6 +74,22 @@ void SpectroCamRecorder::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*so
 
     //m_Controls.labelWarning->setVisible( true );
     //m_Controls.buttonPerformImageProcessing->setEnabled( false );
+}
+
+
+void SpectroCamRecorder::SaveImage()
+{
+  mitk::Image::Pointer imageToSave = m_Controller.GetCurrentImage();
+  QString imageName = m_Controls.lineEdit->text();
+
+
+  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+  imageNode->SetData(imageToSave);
+  imageNode->SetName(imageName.toStdString());
+
+
+  GetDataStorage()->Add(imageNode);
+
 }
 
 void SpectroCamRecorder::SetWhiteBalance()

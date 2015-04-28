@@ -54,6 +54,8 @@ protected slots:
 
     void SetWhiteBalance();
 
+    void SaveImage();
+
 protected:
 
     virtual void CreateQtPartControl(QWidget *parent);

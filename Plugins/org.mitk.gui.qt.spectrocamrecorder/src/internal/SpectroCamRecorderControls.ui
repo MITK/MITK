@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>222</width>
-    <height>161</height>
+    <height>228</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -34,6 +34,27 @@
     <widget class="QPushButton" name="buttonWhiteBalance">
      <property name="text">
       <string>Use current stack as white balance</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="buttonSave">
+     <property name="text">
+      <string>Save current stack to datastorage</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>stack name</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="text">
+      <string>stack_1</string>
      </property>
     </widget>
    </item>

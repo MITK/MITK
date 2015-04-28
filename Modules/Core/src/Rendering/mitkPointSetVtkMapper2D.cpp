@@ -312,8 +312,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     vec = p-lastP;    // valid only for counter > 0
 
     // compute distance to current plane
-    float diff = geo2D->Distance(point);
-    diff = diff * diff;
+    float diff = fabs(geo2D->Distance(point));
+//    diff = diff * diff;
 
     //draw markers on slices a certain distance away from the points
     //location according to the tolerance threshold (m_DistanceToPlane)
@@ -324,13 +324,13 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
       {
         ls->m_SelectedPoints->InsertNextPoint(point[0],point[1],point[2]);
         // point is scaled according to its distance to the plane
-        ls->m_SelectedScales->InsertNextTuple3(m_Point2DSize - (2*diff),0,0);
+        ls->m_SelectedScales->InsertNextTuple3((double)m_Point2DSize*(1-diff/m_DistanceToPlane),0,0);
       }
       else
       {
         ls->m_UnselectedPoints->InsertNextPoint(point[0],point[1],point[2]);
         // point is scaled according to its distance to the plane
-        ls->m_UnselectedScales->InsertNextTuple3(m_Point2DSize - (2*diff),0,0);
+        ls->m_UnselectedScales->InsertNextTuple3((double)m_Point2DSize*(1-diff/m_DistanceToPlane),0,0);
       }
 
       //---- LABEL -----//
@@ -512,6 +512,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     ls->m_UnselectedGlyphSource2D->FilledOn();
   else
     ls->m_UnselectedGlyphSource2D->FilledOff();
+
+  ls->m_UnselectedGlyphSource2D->SetScale((double)m_Point2DSize/100);
 
   // apply transform
   vtkSmartPointer<vtkTransformFilter> transformFilterU = vtkSmartPointer<vtkTransformFilter>::New();

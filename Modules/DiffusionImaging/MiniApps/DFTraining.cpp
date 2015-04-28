@@ -188,7 +188,6 @@ int main(int argc, char* argv[])
     parser.addArgument("numtrees", "n", mitkCommandLineParser::Int, "Number of trees:", "number of trees", us::Any());
     parser.addArgument("max_tree_depth", "d", mitkCommandLineParser::Int, "Max. tree depth:", "maximum tree depth", us::Any());
     parser.addArgument("sample_fraction", "sf", mitkCommandLineParser::Float, "Sample fraction:", "fraction of samples used per tree", us::Any());
-    parser.addArgument("usedirection", "ud", mitkCommandLineParser::Bool, "bla:", "bla", us::Any());
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -233,9 +232,6 @@ int main(int argc, char* argv[])
         MITK_INFO << "Missing training images!";
         return EXIT_FAILURE;
     }
-    bool useDirection = false;
-    if (parsedArgs.count("usedirection"))
-        useDirection = true;
 
     const int order = 6;
     typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,order,numOdfSamples> QballFilterType;
@@ -324,9 +320,7 @@ int main(int argc, char* argv[])
             directionIndices.push_back(f);  // remember indices that are on the desired hemisphere
     }
     const int numSignalFeatures = numOdfSamples/2;
-    int numDirectionFeatures = 0;
-    if (useDirection)
-        numDirectionFeatures = 3;
+    int numDirectionFeatures = 3;
 
     vigra::MultiArray<2, double> featureData( vigra::Shape2(numSamples,numSignalFeatures+numDirectionFeatures) );
     MITK_INFO << "Number of features: " << featureData.shape(1);
@@ -351,83 +345,44 @@ int main(int argc, char* argv[])
             if (it.Get()==0 && (mask.IsNull() || (mask.IsNotNull() && mask->GetPixel(it.GetIndex())>0)))
             {
                 SampledShImageType::PixelType pix = image->GetPixel(it.GetIndex());
-                if (useDirection)
-                {
-                    // null direction
-                    for (unsigned int f=0; f<numSignalFeatures; f++)
-                    {
-                        featureData(sampleCounter,f) = pix[directionIndices[f]];
-                        if(featureData(sampleCounter,f)!=featureData(sampleCounter,f))
-                            featureData(sampleCounter,f) = 0;
-                    }
-                    featureData(sampleCounter,numSignalFeatures) = 0;
-                    featureData(sampleCounter,numSignalFeatures+1) = 0;
-                    featureData(sampleCounter,numSignalFeatures+2) = 0;
-                    labelData(sampleCounter,0) = directionIndices.size();
-                    sampleCounter++;
 
-                    // we use random "previous" directions for the non-WM samples
-                    for (int i=1; i<gmsamples; i++)
-                    {
-                        for (unsigned int f=0; f<numSignalFeatures; f++)
-                        {
-                            featureData(sampleCounter,f) = pix[directionIndices[f]];
-                            if(featureData(sampleCounter,f)!=featureData(sampleCounter,f))
-                                featureData(sampleCounter,f) = 0;
-                        }
-                        int c=0;
-                        vnl_vector_fixed<double,3> probe;
-                        probe[0] = m_RandGen->GetVariate()*2-1;
-                        probe[1] = m_RandGen->GetVariate()*2-1;
-                        probe[2] = m_RandGen->GetVariate()*2-1;
-                        probe.normalize();
-                        if (dot_product(ref, probe)<0)
-                            probe *= -1;
-                        for (unsigned int f=numSignalFeatures; f<numSignalFeatures+3; f++)
-                        {
-                            featureData(sampleCounter,f) = probe[c];
-                            c++;
-                        }
-                        labelData(sampleCounter,0) = directionIndices.size();
-                        sampleCounter++;
-                    }
+                // null direction
+                for (unsigned int f=0; f<numSignalFeatures; f++)
+                {
+                    featureData(sampleCounter,f) = pix[directionIndices[f]];
+                    if(featureData(sampleCounter,f)!=featureData(sampleCounter,f))
+                        featureData(sampleCounter,f) = 0;
                 }
-                else
+                featureData(sampleCounter,numSignalFeatures) = 0;
+                featureData(sampleCounter,numSignalFeatures+1) = 0;
+                featureData(sampleCounter,numSignalFeatures+2) = 0;
+                labelData(sampleCounter,0) = directionIndices.size();
+                sampleCounter++;
+
+                // we use random "previous" directions for the non-WM samples
+                for (int i=1; i<gmsamples; i++)
                 {
-                    itk::ContinuousIndex<double, 3> idx;
-                    idx[0] = it.GetIndex()[0];
-                    idx[1] = it.GetIndex()[1];
-                    idx[2] = it.GetIndex()[2];
-                    itk::Point<float, 3> itkP1;
-                    image->TransformContinuousIndexToPhysicalPoint(idx, itkP1);
-                    SampledShImageType::PixelType pix = GetImageValues(itkP1, image);;
                     for (unsigned int f=0; f<numSignalFeatures; f++)
                     {
                         featureData(sampleCounter,f) = pix[directionIndices[f]];
                         if(featureData(sampleCounter,f)!=featureData(sampleCounter,f))
                             featureData(sampleCounter,f) = 0;
                     }
+                    int c=0;
+                    vnl_vector_fixed<double,3> probe;
+                    probe[0] = m_RandGen->GetVariate()*2-1;
+                    probe[1] = m_RandGen->GetVariate()*2-1;
+                    probe[2] = m_RandGen->GetVariate()*2-1;
+                    probe.normalize();
+                    if (dot_product(ref, probe)<0)
+                        probe *= -1;
+                    for (unsigned int f=numSignalFeatures; f<numSignalFeatures+3; f++)
+                    {
+                        featureData(sampleCounter,f) = probe[c];
+                        c++;
+                    }
                     labelData(sampleCounter,0) = directionIndices.size();
                     sampleCounter++;
-
-                    for (int i=1; i<gmsamples; i++)
-                    {
-                        itk::ContinuousIndex<double, 3> idx;
-                        idx[0] = it.GetIndex()[0] + m_RandGen->GetVariate()-0.5;
-                        idx[1] = it.GetIndex()[1] + m_RandGen->GetVariate()-0.5;
-                        idx[2] = it.GetIndex()[2] + m_RandGen->GetVariate()-0.5;
-                        itk::Point<float, 3> itkP1;
-                        image->TransformContinuousIndexToPhysicalPoint(idx, itkP1);
-                        SampledShImageType::PixelType pix = GetImageValues(itkP1, image);;
-                        for (unsigned int f=0; f<numSignalFeatures; f++)
-                        {
-                            featureData(sampleCounter,f) = pix[directionIndices[f]];
-                            if(featureData(sampleCounter,f)!=featureData(sampleCounter,f))
-                                featureData(sampleCounter,f) = 0;
-                        }
-                        labelData(sampleCounter,0) = directionIndices.size();
-                        sampleCounter++;
-                    }
                 }
             }
             ++it;
@@ -487,12 +442,11 @@ int main(int argc, char* argv[])
                 if (dot_product(ref, dirOld)<0)
                     dirOld *= -1;
 
-                if (useDirection)
-                    for (unsigned int f=numSignalFeatures; f<numSignalFeatures+3; f++)
-                    {
-                        featureData(sampleCounter,f) = dirOld[c];
-                        c++;
-                    }
+                for (unsigned int f=numSignalFeatures; f<numSignalFeatures+3; f++)
+                {
+                    featureData(sampleCounter,f) = dirOld[c];
+                    c++;
+                }
 
                 // set label values
                 double angle = 0;

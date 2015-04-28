@@ -143,6 +143,8 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
     int numFibers = m_FiberBundle->GetNumFibers();
     m_DirectionsContainer = ContainerType::New();
 
+    VectorContainer< unsigned int, std::vector< double > >::Pointer peakLengths = VectorContainer< unsigned int, std::vector< double > >::New();
+
     MITK_INFO << "Generating directions from tractogram";
     boost::progress_display disp(numFibers);
     for( int i=0; i<numFibers; i++ )
@@ -157,6 +159,9 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
         vnl_vector_fixed<double, 3> dir;
         itk::Point<double, 3> worldPos;
         vnl_vector<double> v;
+
+
+        float fiberWeight = m_FiberBundle->GetFiberWeight(i);
 
         for( int j=0; j<numPoints-1; j++)
         {
@@ -180,6 +185,8 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
             DirectionContainerType::Pointer dirCont;
             if (m_DirectionsContainer->IndexExists(idx))
             {
+                peakLengths->ElementAt(idx).push_back(fiberWeight);
+
                 dirCont = m_DirectionsContainer->GetElement(idx);
                 if (dirCont.IsNull())
                 {
@@ -195,6 +202,9 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
                 dirCont = DirectionContainerType::New();
                 dirCont->push_back(dir);
                 m_DirectionsContainer->InsertElement(idx, dirCont);
+
+                std::vector< double > lengths; lengths.push_back(fiberWeight);
+                peakLengths->InsertElement(idx, lengths);
             }
         }
     }
@@ -224,11 +234,11 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
             continue;
         }
 
-        std::vector< double > lengths; lengths.resize(dirCont->size(), 1);  // all peaks have size 1
+//        std::vector< double > lengths; lengths.resize(dirCont->size(), 1);  // all peaks have size 1
         DirectionContainerType::Pointer directions;
         if (m_MaxNumDirections>0)
         {
-            directions = FastClustering(dirCont, lengths);
+            directions = FastClustering(dirCont, peakLengths->GetElement(idx));
             std::sort( directions->begin(), directions->end(), CompareVectorLengths );
         }
         else

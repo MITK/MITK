@@ -48,6 +48,8 @@ int main(int argc, char* argv[])
     parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
     parser.addArgument("mask", "m", mitkCommandLineParser::StringList, "Masks:", "mask images");
     parser.addArgument("athresh", "a", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
+    parser.addArgument("sthresh", "s", mitkCommandLineParser::Float, "Size threshold:", "Relative peak size threshold per voxel.", 0.0, true);
+    parser.addArgument("maxdirs", "md", mitkCommandLineParser::Int, "Max. Clusters:", "Maximum number of fiber clusters.", 0, true);
     parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
     parser.addArgument("ignore", "n", mitkCommandLineParser::Bool, "Ignore:", "don't increase error for missing or too many directions");
     parser.addArgument("fileID", "id", mitkCommandLineParser::String, "ID:", "optional ID field");
@@ -66,6 +68,14 @@ int main(int argc, char* argv[])
     float angularThreshold = 25;
     if (parsedArgs.count("athresh"))
         angularThreshold = us::any_cast<float>(parsedArgs["athresh"]);
+
+    float sizeThreshold = 0;
+    if (parsedArgs.count("sthresh"))
+        sizeThreshold = us::any_cast<float>(parsedArgs["sthresh"]);
+
+    int maxDirs = 0;
+    if (parsedArgs.count("maxdirs"))
+        maxDirs = us::any_cast<int>(parsedArgs["maxdirs"]);
 
     string outRoot = us::any_cast<string>(parsedArgs["out"]);
 
@@ -127,6 +137,8 @@ int main(int argc, char* argv[])
         fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
         fOdfFilter->SetNormalizeVectors(true);
         fOdfFilter->SetUseWorkingCopy(false);
+        fOdfFilter->SetSizeThreshold(sizeThreshold);
+        fOdfFilter->SetMaxNumDirections(maxDirs);
         fOdfFilter->Update();
         ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
 

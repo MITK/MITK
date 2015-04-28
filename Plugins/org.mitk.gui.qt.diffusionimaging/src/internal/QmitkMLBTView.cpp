@@ -34,6 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkImageCast.h>
+#include <mitkEnumerationProperty.h>
+#include <mitkPointSetShapeProperty.h>
+#include <mitkPointSet.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -98,7 +101,7 @@ void QmitkMLBTView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_TrackingMaskImageBox->SetPredicate(finalPredicate);
         m_Controls->m_TrackingSeedImageBox->SetPredicate(finalPredicate);
         m_Controls->m_TrackingStopImageBox->SetPredicate(finalPredicate);
-        m_Controls->m_TrackingRawImageBox->SetPredicate(isDwi);
+        m_Controls->m_TrackingRawImageBox->SetPredicate(isMitkImage);
     }
 }
 
@@ -138,12 +141,16 @@ void QmitkMLBTView::BuildFibers()
     {
         vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
         mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
-        outFib->SetFiberColors(255,0,0);
+        outFib->SetFiberColors(255,255,255);
         m_TractogramNode->SetData(outFib);
+
+        m_SamplingPointsNode->SetData(tracker->m_SamplingPointset);
+        m_AlternativePointsNode->SetData(tracker->m_AlternativePointset);
+
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         tracker->m_BuildFibersFinished = false;
-        tracker->m_Stop = false;
         tracker->m_BuildFibersReady = 0;
+        tracker->m_Stop = false;
     }
 }
 
@@ -167,11 +174,32 @@ void QmitkMLBTView::StartTrackingThread()
     m_TractogramNode->SetProperty("color",mitk::ColorProperty::New(0, 1, 1));
     this->GetDataStorage()->Add(m_TractogramNode);
 
+    m_SamplingPointsNode = mitk::DataNode::New();
+    m_SamplingPointsNode->SetName("SamplingPoints");
+    m_SamplingPointsNode->SetProperty("pointsize", mitk::FloatProperty::New(0.2));
+    m_SamplingPointsNode->SetProperty("color", mitk::ColorProperty::New(1,1,1));
+    mitk::PointSetShapeProperty::Pointer bla = mitk::PointSetShapeProperty::New(); bla->SetValue(8);
+    m_SamplingPointsNode->SetProperty("Pointset.2D.shape", bla);
+    m_SamplingPointsNode->SetProperty("Pointset.2D.distance to plane", mitk::FloatProperty::New(1.5));
+    m_SamplingPointsNode->SetProperty("point 2D size", mitk::IntProperty::New(3));
+    m_SamplingPointsNode->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
+    this->GetDataStorage()->Add(m_SamplingPointsNode);
+
+    m_AlternativePointsNode = mitk::DataNode::New();
+    m_AlternativePointsNode->SetName("AlternativePoints");
+    m_AlternativePointsNode->SetProperty("pointsize", mitk::FloatProperty::New(0.2));
+    m_AlternativePointsNode->SetProperty("color", mitk::ColorProperty::New(1,0,0));
+    m_AlternativePointsNode->SetProperty("Pointset.2D.shape", bla);
+    m_AlternativePointsNode->SetProperty("Pointset.2D.distance to plane", mitk::FloatProperty::New(1.5));
+    m_AlternativePointsNode->SetProperty("point 2D size", mitk::IntProperty::New(3));
+    m_AlternativePointsNode->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
+    this->GetDataStorage()->Add(m_AlternativePointsNode);
+
     QFuture<void> future = QtConcurrent::run( this, &QmitkMLBTView::StartTracking );
     m_TrackingWatcher.setFuture(future);
     m_TrackingThreadIsRunning = true;
     m_Controls->m_StartTrackingButton->setEnabled(false);
-    m_TrackingTimer->start(10);
+    m_TrackingTimer->start(m_Controls->m_TimerIntervalBox->value());
 }
 
 void QmitkMLBTView::OnTrackingThreadStop()
@@ -179,15 +207,18 @@ void QmitkMLBTView::OnTrackingThreadStop()
     m_TrackingThreadIsRunning = false;
     m_Controls->m_StartTrackingButton->setEnabled(true);
 
-
     vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
     mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
-    outFib->SetFiberColors(255,0,0);
+    outFib->SetFiberColors(255,255,255);
 //    mitk::DataNode::Pointer node = mitk::DataNode::New();
     m_TractogramNode->SetData(outFib);
+    m_SamplingPointsNode->SetData(tracker->m_SamplingPointset);
+    m_AlternativePointsNode->SetData(tracker->m_AlternativePointset);
 
     tracker = NULL;
     m_TrackingTimer->stop();
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkMLBTView::StartTracking()
@@ -202,6 +233,8 @@ void QmitkMLBTView::StartTracking()
     tracker->SetGradientDirections( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi) );
     tracker->SetB_Value( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi) );
     tracker->SetDemoMode(m_Controls->m_DemoModeBox->isChecked());
+    if (m_Controls->m_DemoModeBox->isChecked())
+        tracker->SetNumberOfThreads(1);
     if (m_Controls->m_TrackingUseMaskImageBox->isChecked() && m_Controls->m_TrackingMaskImageBox->GetSelectedNode().IsNotNull())
     {
         mitk::Image::Pointer mask = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingMaskImageBox->GetSelectedNode()->GetData());
@@ -224,16 +257,19 @@ void QmitkMLBTView::StartTracking()
         tracker->SetStoppingRegions(itkImg);
     }
     tracker->SetSeedsPerVoxel(m_Controls->m_NumberOfSeedsBox->value());
-    tracker->SetUseDirection(true);
     tracker->SetStepSize(m_Controls->m_TrackingStepSizeBox->value());
     tracker->SetAngularThreshold(cos((float)m_Controls->m_AngularThresholdBox->value()*M_PI/180));
     tracker->SetMinTractLength(m_Controls->m_MinLengthBox->value());
     tracker->SetMaxTractLength(m_Controls->m_MaxLengthBox->value());
+    tracker->SetAposterioriCurvCheck(m_Controls->m_Curvcheck2->isChecked());
+    tracker->SetRemoveWmEndFibers(false);
+    tracker->SetAvoidStop(m_Controls->m_AvoidStop->isChecked());
 
     vigra::RandomForest<int> forest = m_ForestHandler.GetForest();
     tracker->SetDecisionForest(&forest);
     tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
     tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
+    tracker->SetRandomSampling(m_Controls->m_RandomSampling->isChecked());
     tracker->Update();
 //    vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
 //    mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
@@ -283,7 +319,6 @@ void QmitkMLBTView::StartTraining()
     m_ForestHandler.SetGrayMatterSamplesPerVoxel(m_Controls->m_GmSamplingBox->value());
     m_ForestHandler.SetSampleFraction(m_Controls->m_SampleFractionBox->value());
     m_ForestHandler.SetStepSize(m_Controls->m_TrainingStepSizeBox->value());
-    m_ForestHandler.SetUsePreviousDirection(m_Controls->m_TrackingUsePreviousDirectionBox->isChecked());
     m_ForestHandler.StartTraining();
 }
 

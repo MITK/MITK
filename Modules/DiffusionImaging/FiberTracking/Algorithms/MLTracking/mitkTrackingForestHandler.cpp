@@ -28,7 +28,6 @@ template< int NumberOfSignalFeatures >
 TrackingForestHandler< NumberOfSignalFeatures >::TrackingForestHandler()
     : m_GrayMatterSamplesPerVoxel(50)
     , m_StepSize(-1)
-    , m_UsePreviousDirection(true)
     , m_NumTrees(30)
     , m_MaxTreeDepth(50)
     , m_SampleFraction(1.0)
@@ -238,9 +237,7 @@ void TrackingForestHandler< NumberOfSignalFeatures >::CalculateFeatures()
             directionIndices.push_back(f);
     }
 
-    int numDirectionFeatures = 0;
-    if (m_UsePreviousDirection)
-        numDirectionFeatures = 3;
+    int numDirectionFeatures = 3;
 
     m_FeatureData.reshape( vigra::Shape2(m_NumberOfSamples, NumberOfSignalFeatures+numDirectionFeatures) );
     m_LabelData.reshape( vigra::Shape2(m_NumberOfSamples,1) );
@@ -265,8 +262,7 @@ void TrackingForestHandler< NumberOfSignalFeatures >::CalculateFeatures()
             if (it.Get()==0 && (mask.IsNull() || (mask.IsNotNull() && mask->GetPixel(it.GetIndex())>0)))
             {
                 typename InterpolatedRawImageType::PixelType pix = image->GetPixel(it.GetIndex());
-                if (m_UsePreviousDirection)
-                {
+
                     // null direction
                     for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
                     {
@@ -305,44 +301,6 @@ void TrackingForestHandler< NumberOfSignalFeatures >::CalculateFeatures()
                         m_LabelData(sampleCounter,0) = directionIndices.size();
                         sampleCounter++;
                     }
-                }
-                else
-                {
-                    itk::ContinuousIndex<double, 3> idx;
-                    idx[0] = it.GetIndex()[0];
-                    idx[1] = it.GetIndex()[1];
-                    idx[2] = it.GetIndex()[2];
-                    itk::Point<float, 3> itkP1;
-                    image->TransformContinuousIndexToPhysicalPoint(idx, itkP1);
-                    typename InterpolatedRawImageType::PixelType pix = GetImageValues(itkP1, image);;
-                    for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
-                    {
-                        m_FeatureData(sampleCounter,f) = pix[directionIndices[f]];
-                        if(m_FeatureData(sampleCounter,f)!=m_FeatureData(sampleCounter,f))
-                            m_FeatureData(sampleCounter,f) = 0;
-                    }
-                    m_LabelData(sampleCounter,0) = directionIndices.size();
-                    sampleCounter++;
-
-                    for (int i=1; i<m_GrayMatterSamplesPerVoxel; i++)
-                    {
-                        itk::ContinuousIndex<double, 3> idx;
-                        idx[0] = it.GetIndex()[0] + m_RandGen->GetVariate()-0.5;
-                        idx[1] = it.GetIndex()[1] + m_RandGen->GetVariate()-0.5;
-                        idx[2] = it.GetIndex()[2] + m_RandGen->GetVariate()-0.5;
-                        itk::Point<float, 3> itkP1;
-                        image->TransformContinuousIndexToPhysicalPoint(idx, itkP1);
-                        typename InterpolatedRawImageType::PixelType pix = GetImageValues(itkP1, image);;
-                        for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
-                        {
-                            m_FeatureData(sampleCounter,f) = pix[directionIndices[f]];
-                            if(m_FeatureData(sampleCounter,f)!=m_FeatureData(sampleCounter,f))
-                                m_FeatureData(sampleCounter,f) = 0;
-                        }
-                        m_LabelData(sampleCounter,0) = directionIndices.size();
-                        sampleCounter++;
-                    }
-                }
             }
             ++it;
         }
@@ -402,12 +360,11 @@ void TrackingForestHandler< NumberOfSignalFeatures >::CalculateFeatures()
                 if (dot_product(ref, dirOld)<0)
                     dirOld *= -1;
 
-                if (m_UsePreviousDirection)
-                    for (unsigned int f=NumberOfSignalFeatures; f<NumberOfSignalFeatures+3; f++)
-                    {
-                        m_FeatureData(sampleCounter,f) = dirOld[c];
-                        c++;
-                    }
+                for (unsigned int f=NumberOfSignalFeatures; f<NumberOfSignalFeatures+3; f++)
+                {
+                    m_FeatureData(sampleCounter,f) = dirOld[c];
+                    c++;
+                }
 
                 // set label values
                 double angle = 0;
@@ -437,38 +394,15 @@ void TrackingForestHandler< NumberOfSignalFeatures >::CalculateFeatures()
 template< int NumberOfSignalFeatures >
 void TrackingForestHandler< NumberOfSignalFeatures >::TrainForest()
 {
+
     MITK_INFO << "Maximum tree depths: " << m_MaxTreeDepth;
     MITK_INFO << "Sample fraction per tree: " << m_SampleFraction;
     MITK_INFO << "Number of trees: " << m_NumTrees;
-    bool random_split = false;
-    vigra::rf::visitors::OOB_Error oob_v;
-    MITK_INFO << "Create Split Function";
-    //   typedef ThresholdSplit<int, vigra::BestGiniOfColumn<vigra::GiniCriterion>, vigra::ClassificationTag> DefaultSplitType;
 
-    m_Forest.set_options().use_stratification(vigra::RF_NONE); // How the data should be made equal
-    m_Forest.set_options().sample_with_replacement(true); // if sampled with replacement or not
-    m_Forest.set_options().samples_per_tree(m_SampleFraction); // Fraction of samples that are used to train a tree
-    m_Forest.set_options().tree_count(1); // Number of trees that are calculated;
-    m_Forest.set_options().min_split_node_size(5); // Minimum number of datapoints that must be in a node
-    //    rf.set_options().features_per_node(10);
-
-    m_Forest.learn(m_FeatureData, m_LabelData, vigra::rf::visitors::create_visitor(oob_v));
-
-    // Prepare parallel VariableImportance Calculation
-    int numMod =  m_FeatureData.shape(1);
-    const int numClass = 2 + 2;
-
-    float** varImp = new float*[numMod];
-
-    for(int i = 0; i < numMod; i++)
-        varImp[i] = new float[numClass];
-
-    for (int i = 0; i < numMod; ++i)
-        for (int j = 0; j < numClass; ++j)
-            varImp[i][j] = 0.0;
-
+    std::vector< vigra::RandomForest<int> > trees;
+    int count = 0;
 #pragma omp parallel for
-    for (int i = 0; i < m_NumTrees - 1; ++i)
+    for (int i = 0; i < m_NumTrees; ++i)
     {
         vigra::RandomForest<int> lrf;
         vigra::rf::visitors::OOB_Error loob_v;
@@ -478,20 +412,23 @@ void TrackingForestHandler< NumberOfSignalFeatures >::TrainForest()
         lrf.set_options().samples_per_tree(m_SampleFraction); // Fraction of samples that are used to train a tree
         lrf.set_options().tree_count(1); // Number of trees that are calculated;
         lrf.set_options().min_split_node_size(5); // Minimum number of datapoints that must be in a node
-        //        lrf.set_options().features_per_node(10);
+        lrf.ext_param_.max_tree_depth = m_MaxTreeDepth;
 
-        vigra::rf::visitors::VariableImportanceVisitor lvariableImportance;
-        lrf.learn(m_FeatureData, m_LabelData, vigra::rf::visitors::create_visitor(loob_v));
-
+        lrf.learn(m_FeatureData, m_LabelData);
 #pragma omp critical
         {
-            m_Forest.trees_.push_back(lrf.trees_[0]);
+            count++;
+            MITK_INFO << "Tree " << count << " finished training.";
+            trees.push_back(lrf);
         }
     }
 
+    for (int i = 1; i < m_NumTrees; ++i)
+        trees.at(0).trees_.push_back(trees.at(i).trees_[0]);
+
+    m_Forest = trees.at(0);
     m_Forest.options_.tree_count_ = m_NumTrees;
     MITK_INFO << "Training finsihed";
-    MITK_INFO << "The out-of-bag error is: " << oob_v.oob_breiman << std::endl;
 }
 
 template< int NumberOfSignalFeatures >

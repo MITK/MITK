@@ -36,6 +36,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.measurementtoolbox:OFF
   org.mitk.gui.qt.moviemaker:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
+  org.mitk.gui.qt.pointsetinteractionmultispectrum:OFF
   org.mitk.gui.qt.python:OFF
   org.mitk.gui.qt.registration:OFF
   org.mitk.gui.qt.remeshing:OFF

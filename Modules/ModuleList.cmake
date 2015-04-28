@@ -63,6 +63,7 @@ set(mitk_modules
   IOExt
   XNAT
   TubeGraph
+  BiophotonicsHardware
 )
 
 if(MITK_ENABLE_PIC_READER)

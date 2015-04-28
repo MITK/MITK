@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <opencv\cv.h>
 #include <opencv\cxcore.h>
 #include <opencv\highgui.h>
+#include <opencv2/contrib/contrib.hpp>
 
 // itk includes
 #include <itkImage.h>
@@ -47,6 +48,7 @@ namespace mitk {
 
 
   typedef itk::Image<unsigned short, 2> CameraImageType;
+  typedef itk::VectorImage<unsigned short, 2> CompositeCameraImageType;
 
   /**
   Here basically all of the implementation for the Spectrocam Controller is located.
@@ -66,11 +68,22 @@ namespace mitk {
     int CloseCameraConnection();
     bool isCameraRunning();
 
+    void SetCurrentImageAsWhiteBalance();
+
     mitk::Image::Pointer GetCurrentImage();
 
-    // TODO SW: check if composition can directly convert image to double
-    itk::ComposeImageFilter<CameraImageType>::Pointer m_ComposeFilter;
+    CompositeCameraImageType::Pointer m_CompositeItkImage;
     mitk::Image::Pointer m_CompositeMitkImage;
+
+    cv::Mat m_CurrentStackSmall;
+    cv::Mat m_CurrentTransformedStack;
+    cv::Mat m_FlatfieldSmall;
+    cv::Mat m_LLSQSolutionSmall;
+    const int m_SmallWidth;
+    const int m_SmallHeight;
+
+    bool m_ShowOxygenation;
+
 
     std::string mode;
     std::string model;
@@ -84,14 +97,10 @@ namespace mitk {
     ISpectroCam*  spectroCam;                        //SpectroCam var
 
     STREAM_HANDLE   m_hDS;                            // Handle to the data stream
-    HANDLE          m_hStreamThread;                  // Handle to the image acquisition thread
-    HANDLE          m_hStreamEvent;                    // Thread used to signal when image thread stops
-    VIEW_HANDLE     m_hView;                          // View window handles
 
     uint32_t        m_iValidBuffers;                // Number of buffers allocated to image acquisition
     BUF_HANDLE      m_pAquBufferID;                  // Handles for all the image buffers
     HANDLE          m_hEventKill;                    // Event used for speeding up the termination of image capture
-    bool            m_bEnableThread;                // Flag indicating if the image thread should run
 
 
     //Vars for Ini from file
@@ -107,7 +116,6 @@ namespace mitk {
 
 // Implementation
 
-
 static mitk::SpectroCamController_pimpl* my_SpectroCamController;
 
 mitk::Image::Pointer mitk::SpectroCamController_pimpl::GetCurrentImage()
@@ -115,16 +123,58 @@ mitk::Image::Pointer mitk::SpectroCamController_pimpl::GetCurrentImage()
   return m_CompositeMitkImage;
 }
 
+static cv::Mat createLLSQSolutionFromHMatrix()
+{
+  //Create the H-Matrix
+  //            Ox            DOx                  //Lookup values at http://omlc.org/spectra/hemoglobin/summary.html
+  float H[8][4]= {{50104    ,   37020.   ,    405,  1.}, //Filter0 = 580nm  +- 10
+  {33209.2  ,   16156.4 ,    785., 1.}, //Filter1 = 470nm  +- 10
+  {319.6    ,   3226.56 ,    280.,  1.}, //Filter2 = 660nm  +- 10
+  {32613.2  ,   53788   ,    495.,  1.}, //Filter3 = 560nm  +- 10
+  {26629.2  ,   14550   ,    760.,  1.}, //Filter4 = 480nm +- 12,5
+  {20035.2  ,   25773.6 ,    665.,  1.}, //Filter5 = 511nm +- 10         ->took 510nm
+  {3200     ,   14677.2 ,    380.,  1.}, //Filter6 = 600nm  +- 10
+  {290      ,   1794.28 ,    220.,  1.}}; //Filter7 = 700nm
+
+  //Create the hMatrix
+  cv::Mat hMatrix = cv::Mat(8, 4, CV_32F, &H ); //cv::Mat(rows, cols, type, fill with)
+
+  cv::Mat transH;
+  transpose(hMatrix,transH);
+  cv::Mat mulImage = transH * hMatrix;
+  cv::Mat invImage = mulImage.inv();
+  cv::Mat HCompononentsForLLSQ =  invImage  * transH;
+
+  return HCompononentsForLLSQ;
+}
+
 mitk::SpectroCamController_pimpl::SpectroCamController_pimpl()
   :m_hDS(NULL),
-  m_hStreamThread(NULL),
-  m_hStreamEvent(NULL),
-  m_hView(NULL),
   m_NumRecordedImages(1),
-  m_IsCameraRunning(false)
+  m_IsCameraRunning(false),
+  m_SmallWidth(614),
+  m_SmallHeight(514),
+  m_ShowOxygenation(false)
 {
   my_SpectroCamController = this;
-  m_ComposeFilter = itk::ComposeImageFilter<CameraImageType>::New();
+  m_CurrentStackSmall = cv::Mat(8, m_SmallWidth * m_SmallHeight, CV_32F, cv::Scalar(0));
+  m_FlatfieldSmall    = cv::Mat(8, m_SmallWidth * m_SmallHeight, CV_32F, cv::Scalar(1));
+  m_CurrentTransformedStack = cv::Mat(8, m_SmallWidth * m_SmallHeight, CV_32F, cv::Scalar(1));
+
+  m_CompositeItkImage = mitk::CompositeCameraImageType::New();
+
+  m_LLSQSolutionSmall = createLLSQSolutionFromHMatrix();
+
+
+}
+
+void mitk::SpectroCamController_pimpl::SetCurrentImageAsWhiteBalance()
+{
+  // deep copy of current image stack
+  m_FlatfieldSmall = m_CurrentStackSmall.clone();
+
+  cv::namedWindow("Oxygenation Estimate", WINDOW_AUTOSIZE);
+  m_ShowOxygenation = true;
 }
 
 
@@ -285,6 +335,25 @@ bool mitk::SpectroCamController_pimpl::Ini()
 
 }
 
+void initializeSpectroCamImage(SpectroCamImage image)
+{
+  mitk::CameraImageType::RegionType region;
+  mitk::CameraImageType::RegionType::SizeType size;
+  mitk::CameraImageType::RegionType::IndexType index;
+  mitk::CameraImageType::SpacingType spacing;
+  size.Fill( 1 );
+  size[0] = image.m_pAcqImage->iSizeY;
+  size[1] = image.m_pAcqImage->iSizeX;
+  index.Fill(0);
+  spacing.Fill(1);
+  region.SetSize(size);
+  region.SetIndex(index);
+  my_SpectroCamController->m_CompositeItkImage->SetRegions(region);
+  my_SpectroCamController->m_CompositeItkImage->SetSpacing(spacing);
+  my_SpectroCamController->m_CompositeItkImage->SetNumberOfComponentsPerPixel(NUMBER_FILTERS);
+  my_SpectroCamController->m_CompositeItkImage->Allocate();
+}
+
 /**
 * this c callback function is where the magic happens.
 * it is called every time a new image has arrived from the SpectroCam.
@@ -309,6 +378,11 @@ static void DisplayCameraStream(SpectroCamImage image)
           return;
         }
       }
+      if (my_SpectroCamController->m_CompositeItkImage.IsNull())
+      { // initialize VectorImage
+        initializeSpectroCamImage(image);
+      }
+
 
       //============= Get data from spectrocam to opencv
 
@@ -317,40 +391,88 @@ static void DisplayCameraStream(SpectroCamImage image)
 
 
       //============= From opencv to mitk::Image (VectorImage)
-      //            IplImage* iplImage(cvCreateImage(cvSize(2456, 2058), IPL_DEPTH_16U, 1));
-      //            memcpy( iplImage->imageData, image.m_pAcqImage->pImageBuffer, image.m_pAcqImage->iImageSize);
-      // 1. convert to itk::Image using itkOpenCVImageBridge//
-      //            cv::Mat dataDouble;
-      //            data.convertTo(dataDouble, CV_64F);
-      // use mitk opencv bridge because the itk bridge is buggy.
-      mitk::OpenCVToMitkImageFilter::Pointer openCVToMitkImageFilter = mitk::OpenCVToMitkImageFilter::New();
-      openCVToMitkImageFilter->SetOpenCVMat(data);
-      openCVToMitkImageFilter->Update();
 
-      mitk::CameraImageType::Pointer itkCameraImage;
-      mitk::CastToItkImage(openCVToMitkImageFilter->GetOutput(), itkCameraImage);
-
-      // 2. convert to itk::VectorImage using itk::CompositImageFilter
-      my_SpectroCamController->m_ComposeFilter->SetInput(image.m_FilterNum, itkCameraImage);
-      my_SpectroCamController->m_ComposeFilter->Update();
-
-      //// 3. convert to mitk::Image using ...
-      //mitk::CastToMitkImage(my_SpectroCamController->m_ComposeFilter->GetOutput(), my_SpectroCamController->m_CompositeMitkImage);
-
+      //my_SpectroCamController->m_CompositeMitkImage
       //============= Display image as opencv window ==
 
       cv::Mat display;
-      cv::resize(data, display, cvSize(614, 514)  );   //do some resizeing for faster display
+      cv::resize(data, display, cvSize(my_SpectroCamController->m_SmallWidth, my_SpectroCamController->m_SmallHeight)  );   //do some resizeing for faster display
+
+
+      cv::Range slice[2];
+      slice[0] = cv::Range( image.m_FilterNum, image.m_FilterNum+1 );
+      slice[1] = cv::Range::all();
+
+      cv::Mat currentSlice = my_SpectroCamController->m_CurrentStackSmall(slice);
+
+      cv::Mat currentImageF32;
+      display.convertTo(currentImageF32, CV_32F);
+
+      currentImageF32 = currentImageF32.reshape(0, 1);
+      currentImageF32.copyTo(currentSlice);
+      //currentSlice = currentImageF32;
       display *= 16; // image is only 12 bit large, but datatype is 16 bit. Expand to full range for displaying by multiplying by 2^4.
+
+
 
       //Display Image
       cv::imshow("Display window", display);            //Display image
-      cv::waitKey(1);
-
+      //MITK_INFO << "pixel 100,100" << display.at<unsigned short>(0,100);
 
 
       //============= TODO: live oxygenation estimation
 
+      if (my_SpectroCamController->m_ShowOxygenation)
+      {
+        cv::Mat currentWorkingSlice = currentSlice.clone();
+
+        cv::Mat currentFlatfieldSlice = my_SpectroCamController->m_FlatfieldSmall(slice);
+        MITK_INFO << "flat current: " << currentFlatfieldSlice.at<float>(0,100);
+
+
+        MITK_INFO << "raw measured pixel value: " << currentWorkingSlice.at<float>(0,100);
+
+        cv::divide(currentWorkingSlice, currentFlatfieldSlice, currentWorkingSlice);
+        MITK_INFO << "corrected by flatfield pixel: " << currentWorkingSlice.at<float>(0,100);
+
+        cv::log(currentWorkingSlice, currentWorkingSlice);
+        currentWorkingSlice = -0.43429 * currentWorkingSlice;
+        MITK_INFO << "to absorption: " << currentWorkingSlice.at<float>(0,100);
+
+        currentWorkingSlice.copyTo(my_SpectroCamController->m_CurrentTransformedStack(slice) );
+
+        //MITK_INFO << "slice 0: " << my_SpectroCamController->m_CurrentTransformedStack.at<float>(0,100);;
+
+        cv::Mat currentEstimate = my_SpectroCamController->m_LLSQSolutionSmall * my_SpectroCamController->m_CurrentTransformedStack;
+        cv::Range oxyHemo[2];
+        oxyHemo[0] = cv::Range(0,1);
+        oxyHemo[1] = cv::Range::all();
+
+        cv::Range deOxyHemo[2];
+        deOxyHemo[0] = cv::Range(1,2);
+        deOxyHemo[1] = cv::Range::all();
+
+        cv::Mat saO2 = currentEstimate(oxyHemo) / (currentEstimate(oxyHemo) + currentEstimate(deOxyHemo));
+
+        cv::Mat saO2Image = saO2.reshape(0, my_SpectroCamController->m_SmallHeight);
+        MITK_INFO << "saO2, 200 200: " << saO2Image.at<float>(200,200);
+
+        cv::threshold(saO2Image, saO2Image, 1., 1., cv::THRESH_TRUNC);
+        cv::threshold(saO2Image, saO2Image, 0., 0., cv::THRESH_TOZERO);
+
+        saO2Image = saO2Image * 637.;// 255.;
+
+        cv::Mat SaO2IntImage;
+        saO2Image.convertTo(SaO2IntImage, CV_8U);
+        // MITK_INFO << saO2Image.at<float>(0,100);
+
+        cv::Mat colorImage;
+        cv::applyColorMap(SaO2IntImage, colorImage, COLORMAP_JET);
+        cv::imshow("Oxygenation Estimate", colorImage);            //Display image
+      }
+
+
+      cv::waitKey(1);
     }
 
   }//try
@@ -419,6 +541,9 @@ int mitk::SpectroCamController_pimpl::OpenCameraConnection()
     m_IsCameraRunning = true;
   }
 
+
+  cv::namedWindow( "Display window", WINDOW_AUTOSIZE );// Create a window for display.
+
   return status;
 }
 
@@ -444,62 +569,15 @@ int mitk::SpectroCamController_pimpl::CloseCameraConnection()
   }
 
 
+  MITK_INFO << "execute acqstop command";
+
+
   // Close stream (this frees all allocated buffers)
-  {
-    // Reset the thread execution flag
-    m_bEnableThread = false;
-
-    // Signal the image thread to stop faster
-    SetEvent(m_hEventKill);
-
-    // Stop the image acquisition engine
-    J_DataStream_StopAcquisition(m_hDS, ACQ_STOP_FLAG_KILL);
+  // Stop the image acquisition engine
+  J_DataStream_StopAcquisition(m_hDS, ACQ_STOP_FLAG_KILL);
 
 
-
-    // Wait for the thread to end
-    {
-      WaitForSingleObject(m_hStreamEvent, INFINITE);
-
-      //Close the thread handle and stream event handle
-      //void CChildWindowSampleDlg::CloseThreadHandle(void)
-      {
-        if(m_hStreamThread)
-        {
-          CloseHandle(m_hStreamThread);
-          m_hStreamThread = NULL;
-        }
-
-        if(m_hStreamEvent)
-        {
-          CloseHandle(m_hStreamEvent);
-          m_hStreamEvent = NULL;
-        }
-      }
-    }
-  }
-
-
-  {
-    WaitForSingleObject(m_hStreamEvent, INFINITE);
-
-    // Close the thread handle and stream event handle
-    {
-      if(m_hStreamThread)
-      {
-        CloseHandle(m_hStreamThread);
-        m_hStreamThread = NULL;
-      }
-
-      if(m_hStreamEvent)
-      {
-        CloseHandle(m_hStreamEvent);
-        m_hStreamEvent = NULL;
-      }
-    }
-  }
-
-
+  MITK_INFO << "execute stop aqui";
 
   // UnPrepare Buffers (this removed the buffers from the acquisition engine and frees buffers)
   {
@@ -518,6 +596,7 @@ int mitk::SpectroCamController_pimpl::CloseCameraConnection()
     m_iValidBuffers = 0;
   }
 
+  MITK_INFO << "unprepared buffers";
 
 
   // Close Stream
@@ -528,24 +607,22 @@ int mitk::SpectroCamController_pimpl::CloseCameraConnection()
   }
 
 
-
-  // View window opened?
-  if (m_hView)
-  {
-    // Close view window
-    J_Image_CloseViewWindow(m_hView);
-    m_hView = NULL;
-    cout<< "Closed view window\n" << endl;
-  }
-
+  MITK_INFO << "closed stream";
 
   //===================Close Factory and destroy Cam=====================
   //void CloseFactoryAndCamera();       // Close camera and factory to clean up
   retval = retval | spectroCam->stop();
 
 
+  MITK_INFO << "stopped camera";
+
   //BOOL TerminateStreamThread(void);   // Terminate the image acquisition thread
-  DestroySpectroCam(spectroCam);          //Destroy SpectroCam-Objekt
+  if (spectroCam)
+  {
+    //DestroySpectroCam(spectroCam);          //Destroy SpectroCam-Objekt
+  }
+
+  MITK_INFO << "destroyed spectrocam";
 
   if (J_ST_SUCCESS == retval)
   {
@@ -590,4 +667,9 @@ bool mitk::SpectroCamController::isCameraRunning()
 mitk::Image::Pointer mitk::SpectroCamController::GetCurrentImage()
 {
   return m_SpectroCamController_pimpl->GetCurrentImage();
+}
+
+void mitk::SpectroCamController::SetCurrentImageAsWhiteBalance()
+{
+  m_SpectroCamController_pimpl->SetCurrentImageAsWhiteBalance();
 }

@@ -24,34 +24,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-    // forward declaration of the implementation for the SpectroCam
-    class SpectroCamController_pimpl;
+  // forward declaration of the implementation for the SpectroCam
+  class SpectroCamController_pimpl;
+
+  /**
+  * @brief Controller for Pixelteq SpectroCam
+  *
+  *
+  * @ingroup BiophotonicsHardware
+  */
+  class MITKSPECTROCAM_EXPORT SpectroCamController
+  {
+  public:
+    SpectroCamController();
+    ~SpectroCamController();
+
+    bool Ini();
+    int OpenCameraConnection();
+    int CloseCameraConnection();
+    bool isCameraRunning();
 
     /**
-    * @brief Controller for Pixelteq SpectroCam
-    *
-    *
-    * @ingroup BiophotonicsHardware
+    Returns the current image stack. Is of VectorType, unsigned short
     */
-    class MITKSPECTROCAM_EXPORT SpectroCamController
-    {
-    public:
-        SpectroCamController();
-        ~SpectroCamController();
+    mitk::Image::Pointer GetCurrentImage();
 
-        bool Ini();
-        int OpenCameraConnection();
-        int CloseCameraConnection();
-        bool isCameraRunning();
+    void SetCurrentImageAsWhiteBalance();
 
-        /**
-          Returns the current image stack. Is of VectorType, unsigned short
-        */
-        mitk::Image::Pointer GetCurrentImage();
-
-    private:
-        SpectroCamController_pimpl* m_SpectroCamController_pimpl;
-    };
+  private:
+    SpectroCamController_pimpl* m_SpectroCamController_pimpl;
+  };
 
 }
 #endif

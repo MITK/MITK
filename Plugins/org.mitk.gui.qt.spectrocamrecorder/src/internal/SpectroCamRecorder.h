@@ -52,6 +52,8 @@ protected slots:
     /// \brief Called when the user clicks the GUI button
     void DoImageProcessing();
 
+    void SetWhiteBalance();
+
 protected:
 
     virtual void CreateQtPartControl(QWidget *parent);

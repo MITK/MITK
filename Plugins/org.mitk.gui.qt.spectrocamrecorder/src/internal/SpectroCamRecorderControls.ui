@@ -26,7 +26,14 @@
       <string>Do image processing</string>
      </property>
      <property name="text">
-      <string>Start/Stop recording</string>
+      <string>Start/Stop camera</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="buttonWhiteBalance">
+     <property name="text">
+      <string>Use current stack as white balance</string>
      </property>
     </widget>
    </item>

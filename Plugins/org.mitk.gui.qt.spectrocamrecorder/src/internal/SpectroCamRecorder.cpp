@@ -43,6 +43,7 @@ void SpectroCamRecorder::CreateQtPartControl( QWidget *parent )
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
     connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
+    connect( m_Controls.buttonWhiteBalance, SIGNAL(clicked()), this, SLOT(SetWhiteBalance()) );
 
     // intialize the camera (!= start).
     m_Controller.Ini();
@@ -74,6 +75,10 @@ void SpectroCamRecorder::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*so
     //m_Controls.buttonPerformImageProcessing->setEnabled( false );
 }
 
+void SpectroCamRecorder::SetWhiteBalance()
+{
+  m_Controller.SetCurrentImageAsWhiteBalance();
+}
 
 void SpectroCamRecorder::DoImageProcessing()
 {

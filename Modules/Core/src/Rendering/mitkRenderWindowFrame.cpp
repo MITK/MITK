@@ -86,7 +86,6 @@ void mitk::RenderWindowFrame::Disable()
 void mitk::RenderWindowFrame::Enable(float col1, float col2, float col3)
 {
   vtkSmartPointer<vtkMitkRectangleProp> rect = vtkSmartPointer<vtkMitkRectangleProp>::New();
-  rect->SetRenderWindow(m_RenderWindow);
   rect->SetColor(col1, col2, col3);
 
   m_RectangleRenderer->AddActor(rect);

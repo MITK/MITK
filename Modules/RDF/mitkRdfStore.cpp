@@ -55,7 +55,7 @@ namespace mitk {
     m_Prefixes[""] = RdfUri(m_BaseUri.ToString());
   }
 
-  RdfUri RdfStore::GetBaseUri()
+  RdfUri RdfStore::GetBaseUri() const
   {
     return m_BaseUri;
   }
@@ -65,7 +65,7 @@ namespace mitk {
     m_Prefixes[prefix] = uri;
   }
 
-  RdfStore::PrefixMap RdfStore::GetPrefixes()
+  RdfStore::PrefixMap RdfStore::GetPrefixes() const
   {
     return m_Prefixes;
   }
@@ -165,7 +165,7 @@ namespace mitk {
     return false;
   }
 
-  RdfStore::ResultMap RdfStore::Query(std::string sparqlQuery)
+  RdfStore::ResultMap RdfStore::Query(std::string sparqlQuery) const
   {
     RdfStore::ResultMap resultMap;
     std::string completeQuery;
@@ -320,7 +320,7 @@ namespace mitk {
     else return false;
   }
 
-  librdf_statement* RdfStore::RdfTripleToStatement(RdfTriple triple)
+  librdf_statement* RdfStore::RdfTripleToStatement(RdfTriple triple) const
   {
     librdf_node* subject = RdfNodeToLibRdfNode(triple.GetTripleSubject());
     librdf_node* predicate = RdfNodeToLibRdfNode(triple.GetTriplePredicate());
@@ -331,7 +331,7 @@ namespace mitk {
     return statement;
   }
 
-  librdf_node* RdfStore::RdfNodeToLibRdfNode(RdfNode node)
+  librdf_node* RdfStore::RdfNodeToLibRdfNode(RdfNode node) const
   {
     librdf_node* newNode = 0;
 
@@ -364,14 +364,14 @@ namespace mitk {
     return newNode;
   }
 
-  librdf_uri* RdfStore::RdfUriToLibRdfUri(RdfUri uri)
+  librdf_uri* RdfStore::RdfUriToLibRdfUri(RdfUri uri) const
   {
     librdf_uri* libUri = librdf_new_uri(m_World, (const unsigned char*) uri.ToString().c_str());
     if (!libUri) return 0;
     return libUri;
   }
 
-  RdfTriple RdfStore::StatementToRdfTriple(librdf_statement* statement)
+  RdfTriple RdfStore::StatementToRdfTriple(librdf_statement* statement) const
   {
     librdf_node *subject = librdf_statement_get_subject(statement);
     librdf_node *predicate = librdf_statement_get_predicate(statement);
@@ -384,7 +384,7 @@ namespace mitk {
     return triple;
   }
 
-  RdfNode RdfStore::LibRdfNodeToRdfNode(librdf_node* node)
+  RdfNode RdfStore::LibRdfNodeToRdfNode(librdf_node* node) const
   {
     RdfNode mitkNode;
 
@@ -413,7 +413,7 @@ namespace mitk {
     return mitkNode;
   }
 
-  RdfUri RdfStore::LibRdfUriToRdfUri(librdf_uri* uri)
+  RdfUri RdfStore::LibRdfUriToRdfUri(librdf_uri* uri) const
   {
     std::string str = (const char*) librdf_uri_as_string(uri);
     if (!str.empty()) return RdfUri(str);

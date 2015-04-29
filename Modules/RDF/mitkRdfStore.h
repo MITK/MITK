@@ -52,7 +52,7 @@ namespace mitk {
     /**
     * Get the base URI of the triplestore.
     */
-    RdfUri GetBaseUri();
+    RdfUri GetBaseUri() const;
 
     /**
     * Add a new prefix which represents an URI as an abbreviation to the triplestore.
@@ -65,7 +65,7 @@ namespace mitk {
     * Get a Map with all prefixes of the triplestore.
     * @return A Map with all Prefixes of the RdfStore.
     */
-    PrefixMap GetPrefixes();
+    PrefixMap GetPrefixes() const;
 
     /**
     * Clean up the triplestore to the state of a new store.
@@ -100,7 +100,7 @@ namespace mitk {
     * @param query A std:string which stands for a SPARQL query text.
     * @return The result of the query will be returned as a map of keys with there values as lists of nodes.
     */
-    ResultMap Query(std::string query);
+    ResultMap Query(std::string query) const;
 
     /**
     * Saves the current state of the triplestore in a file. The currently supported formats are: "ntriples", "turtle"(default), "nquads".
@@ -125,13 +125,13 @@ namespace mitk {
     librdf_storage* m_Storage;
     librdf_world* m_World;
 
-    librdf_statement* RdfTripleToStatement(RdfTriple triple);
-    librdf_node* RdfNodeToLibRdfNode(RdfNode node);
-    librdf_uri* RdfUriToLibRdfUri(RdfUri uri);
+    librdf_statement* RdfTripleToStatement(RdfTriple triple) const;
+    librdf_node* RdfNodeToLibRdfNode(RdfNode node) const;
+    librdf_uri* RdfUriToLibRdfUri(RdfUri uri) const;
 
-    RdfTriple StatementToRdfTriple(librdf_statement* statement);
-    RdfNode LibRdfNodeToRdfNode(librdf_node* node);
-    RdfUri LibRdfUriToRdfUri(librdf_uri* uri);
+    RdfTriple StatementToRdfTriple(librdf_statement* statement) const;
+    RdfNode LibRdfNodeToRdfNode(librdf_node* node) const;
+    RdfUri LibRdfUriToRdfUri(librdf_uri* uri) const;
 
     bool CheckComplete(librdf_statement* statement);
   };

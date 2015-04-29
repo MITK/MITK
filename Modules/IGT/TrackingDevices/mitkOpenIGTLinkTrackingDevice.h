@@ -46,7 +46,7 @@ namespace mitk
     void SetPortNumber(int portNumber);
 
     /** Sets the hostname for the Open IGT Link connection. Default value is 127.0.0.1 (localhost). */
-    void mitk::OpenIGTLinkTrackingDevice::SetHostname(std::string hostname);
+    void SetHostname(std::string hostname);
 
     int GetPortNumber();
 

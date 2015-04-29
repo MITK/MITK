@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //headers of IGT classes releated to the tested class
 #include <mitkOpenIGTLinkTrackingDevice.h>
 
+//sleep headers
+#include <chrono>
+#include <thread>
 
 class mitkOpenIGTLinkTrackingDeviceTestSuite : public mitk::TestFixture
 {
@@ -73,7 +76,7 @@ public:
   m_OpenIGTLinkTrackingDevice->OpenConnection();
   m_OpenIGTLinkTrackingDevice->StartTracking();
 
-  Sleep(20000);
+  std::this_thread::sleep_for(std::chrono::seconds(20));
 
   m_OpenIGTLinkTrackingDevice->StopTracking();
   m_OpenIGTLinkTrackingDevice->CloseConnection();

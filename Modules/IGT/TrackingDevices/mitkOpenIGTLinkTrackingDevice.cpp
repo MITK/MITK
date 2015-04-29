@@ -26,6 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 #include <igtlTrackingDataMessage.h>
 
+//sleep headers
+#include <chrono>
+#include <thread>
+
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
@@ -116,7 +120,8 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int WaitingTime)
   ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(1);
   m_OpenIGTLinkClient->SendMessage(sttMsg);
 
-  Sleep(WaitingTime); //wait for data to arrive
+  std::this_thread::sleep_for(std::chrono::seconds(WaitingTime));
+  //Sleep(WaitingTime); //wait for data to arrive
 
   m_IGTLDeviceSource->Update();
 

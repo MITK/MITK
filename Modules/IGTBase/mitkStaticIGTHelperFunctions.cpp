@@ -40,7 +40,7 @@ double mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quater
   itk::Vector<double,3> pt2 = rotMatrixB * point;
 
   returnValue = (pt1[0]*pt2[0]+pt1[1]*pt2[1]+pt1[2]*pt2[2]) / ( sqrt(pow(pt1[0],2.0)+pow(pt1[1],2.0)+pow(pt1[2],2.0)) * sqrt(pow(pt2[0],2.0)+pow(pt2[1],2.0)+pow(pt2[2],2.0)));
-  returnValue = acos(returnValue) * 57,296; //57,296 = 180/Pi ; conversion to degrees
+  returnValue = acos(returnValue) * 57.296; //57,296 = 180/Pi ; conversion to degrees
 
   return returnValue;
   }

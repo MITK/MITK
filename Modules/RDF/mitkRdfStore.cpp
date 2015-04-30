@@ -19,14 +19,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <mitkCommon.h>
 
+#include <redland.h>
+
 namespace mitk {
-  class RdfStorePrivate {
+  class RdfStorePrivate
+  {
   public:
+    typedef std::map<std::string, std::list<RdfNode> > ResultMap;
+    typedef std::map<std::string, RdfUri> PrefixMap;
+
     RdfStorePrivate();
     ~RdfStorePrivate();
+
+    void SetBaseUri(RdfUri uri);
+    RdfUri GetBaseUri() const;
+
+    void AddPrefix(std::string prefix, RdfUri uri);
+    PrefixMap GetPrefixes() const;
+
+    void CleanUp();
+
+    bool Add(RdfTriple triple);
+    bool Remove(RdfTriple triple);
+    bool Contains(RdfTriple triple);
+
+    ResultMap Query(std::string query) const;
+
+    void Save(std::string filename, std::string format = "");
+    void Import(std::string url, std::string format = "");
+
+    RdfUri m_BaseUri;
+
+    PrefixMap m_Prefixes;
+
+    librdf_model* m_Model;
+    librdf_storage* m_Storage;
+    librdf_world* m_World;
+
+    librdf_statement* RdfTripleToStatement(RdfTriple triple) const;
+    librdf_node* RdfNodeToLibRdfNode(RdfNode node) const;
+    librdf_uri* RdfUriToLibRdfUri(RdfUri uri) const;
+
+    RdfTriple StatementToRdfTriple(librdf_statement* statement) const;
+    RdfNode LibRdfNodeToRdfNode(librdf_node* node) const;
+    RdfUri LibRdfUriToRdfUri(librdf_uri* uri) const;
+
+    bool CheckComplete(librdf_statement* statement);
   };
 
-  RdfStore::RdfStore()
+  /****************************************************************************
+  **************************** mitkRdfStorePrivate ****************************
+  ****************************************************************************/
+
+  RdfStorePrivate::RdfStorePrivate()
     : m_World(0), m_Storage(0), m_Model(0)
   {
     // SetUp base prefixes
@@ -39,7 +84,7 @@ namespace mitk {
     CleanUp();
   }
 
-  RdfStore::~RdfStore()
+  RdfStorePrivate::~RdfStorePrivate()
   {
     if(m_Model)
       librdf_free_model(m_Model);
@@ -49,28 +94,28 @@ namespace mitk {
       librdf_free_world(m_World);
   }
 
-  void RdfStore::SetBaseUri(RdfUri uri)
+  void RdfStorePrivate::SetBaseUri(RdfUri uri)
   {
     m_BaseUri = uri;
     m_Prefixes[""] = RdfUri(m_BaseUri.ToString());
   }
 
-  RdfUri RdfStore::GetBaseUri() const
+  RdfUri RdfStorePrivate::GetBaseUri() const
   {
     return m_BaseUri;
   }
 
-  void RdfStore::AddPrefix(std::string prefix, RdfUri uri)
+  void RdfStorePrivate::AddPrefix(std::string prefix, RdfUri uri)
   {
     m_Prefixes[prefix] = uri;
   }
 
-  RdfStore::PrefixMap RdfStore::GetPrefixes() const
+  RdfStorePrivate::PrefixMap RdfStorePrivate::GetPrefixes() const
   {
     return m_Prefixes;
   }
 
-  void RdfStore::CleanUp()
+  void RdfStorePrivate::CleanUp()
   {
     // CleanUp old Store if there is one
     if(m_Model)
@@ -99,7 +144,7 @@ namespace mitk {
     }
   }
 
-  bool RdfStore::Add(RdfTriple triple)
+  bool RdfStorePrivate::Add(RdfTriple triple)
   {
     librdf_statement* statement = RdfTripleToStatement(triple);
 
@@ -123,7 +168,7 @@ namespace mitk {
     }
   }
 
-  bool RdfStore::Remove(RdfTriple triple)
+  bool RdfStorePrivate::Remove(RdfTriple triple)
   {
     librdf_statement* statement = RdfTripleToStatement(triple);
 
@@ -148,7 +193,7 @@ namespace mitk {
     return false;
   }
 
-  bool RdfStore::Contains(RdfTriple triple)
+  bool RdfStorePrivate::Contains(RdfTriple triple)
   {
     librdf_statement* statement = RdfTripleToStatement(triple);
 
@@ -165,9 +210,9 @@ namespace mitk {
     return false;
   }
 
-  RdfStore::ResultMap RdfStore::Query(std::string sparqlQuery) const
+  RdfStorePrivate::ResultMap RdfStorePrivate::Query(std::string sparqlQuery) const
   {
-    RdfStore::ResultMap resultMap;
+    RdfStorePrivate::ResultMap resultMap;
     std::string completeQuery;
 
     for (PrefixMap::const_iterator i = m_Prefixes.begin(); i != m_Prefixes.end(); i++)
@@ -230,7 +275,7 @@ namespace mitk {
     return resultMap;
   }
 
-  void RdfStore::Save(std::string filename, std::string format)
+  void RdfStorePrivate::Save(std::string filename, std::string format)
   {
     if (format == "") format = "turtle";
 
@@ -257,7 +302,7 @@ namespace mitk {
     fclose(f);
   }
 
-  void RdfStore::Import(std::string url, std::string format)
+  void RdfStorePrivate::Import(std::string url, std::string format)
   {
     std::string baseUri = m_BaseUri.ToString();
 
@@ -300,7 +345,7 @@ namespace mitk {
 
       if (uri == RdfUri()) return;
 
-      RdfStore::PrefixMap::iterator it = m_Prefixes.find(prefix);
+      RdfStorePrivate::PrefixMap::iterator it = m_Prefixes.find(prefix);
 
       // map iterator is equal to iterator-end so it is not already added
       if (it == m_Prefixes.end()) {
@@ -310,17 +355,13 @@ namespace mitk {
     librdf_free_parser(p);
   }
 
-  /*****************************************************************************
-  ********************************** Private **********************************
-  *****************************************************************************/
-
-  bool RdfStore::CheckComplete(librdf_statement* statement)
+  bool RdfStorePrivate::CheckComplete(librdf_statement* statement)
   {
     if (librdf_statement_is_complete(statement) != 0) return true;
     else return false;
   }
 
-  librdf_statement* RdfStore::RdfTripleToStatement(RdfTriple triple) const
+  librdf_statement* RdfStorePrivate::RdfTripleToStatement(RdfTriple triple) const
   {
     librdf_node* subject = RdfNodeToLibRdfNode(triple.GetTripleSubject());
     librdf_node* predicate = RdfNodeToLibRdfNode(triple.GetTriplePredicate());
@@ -331,7 +372,7 @@ namespace mitk {
     return statement;
   }
 
-  librdf_node* RdfStore::RdfNodeToLibRdfNode(RdfNode node) const
+  librdf_node* RdfStorePrivate::RdfNodeToLibRdfNode(RdfNode node) const
   {
     librdf_node* newNode = 0;
 
@@ -364,14 +405,14 @@ namespace mitk {
     return newNode;
   }
 
-  librdf_uri* RdfStore::RdfUriToLibRdfUri(RdfUri uri) const
+  librdf_uri* RdfStorePrivate::RdfUriToLibRdfUri(RdfUri uri) const
   {
     librdf_uri* libUri = librdf_new_uri(m_World, (const unsigned char*) uri.ToString().c_str());
     if (!libUri) return 0;
     return libUri;
   }
 
-  RdfTriple RdfStore::StatementToRdfTriple(librdf_statement* statement) const
+  RdfTriple RdfStorePrivate::StatementToRdfTriple(librdf_statement* statement) const
   {
     librdf_node *subject = librdf_statement_get_subject(statement);
     librdf_node *predicate = librdf_statement_get_predicate(statement);
@@ -384,7 +425,7 @@ namespace mitk {
     return triple;
   }
 
-  RdfNode RdfStore::LibRdfNodeToRdfNode(librdf_node* node) const
+  RdfNode RdfStorePrivate::LibRdfNodeToRdfNode(librdf_node* node) const
   {
     RdfNode mitkNode;
 
@@ -413,11 +454,83 @@ namespace mitk {
     return mitkNode;
   }
 
-  RdfUri RdfStore::LibRdfUriToRdfUri(librdf_uri* uri) const
+  RdfUri RdfStorePrivate::LibRdfUriToRdfUri(librdf_uri* uri) const
   {
     std::string str = (const char*) librdf_uri_as_string(uri);
     if (!str.empty()) return RdfUri(str);
 
     return RdfUri();
+  }
+
+  /****************************************************************************
+  ******************************* mitkRdfStore ********************************
+  ****************************************************************************/
+
+  typedef std::map<std::string, std::list<RdfNode> > ResultMap;
+  typedef std::map<std::string, RdfUri> PrefixMap;
+
+  RdfStore::RdfStore()
+    :d(new RdfStorePrivate)
+  {
+  }
+
+  RdfStore::~RdfStore()
+  {
+    delete d;
+  }
+
+  void RdfStore::SetBaseUri(RdfUri uri)
+  {
+    d->SetBaseUri(uri);
+  }
+
+  RdfUri RdfStore::GetBaseUri() const
+  {
+    return d->GetBaseUri();
+  }
+
+  void RdfStore::AddPrefix(std::string prefix, RdfUri uri)
+  {
+    d->AddPrefix(prefix, uri);
+  }
+
+  PrefixMap RdfStore::GetPrefixes() const
+  {
+    return d->GetPrefixes();
+  }
+
+  void RdfStore::CleanUp()
+  {
+    d->CleanUp();
+  }
+
+  bool RdfStore::Add(RdfTriple triple)
+  {
+    return d->Add(triple);
+  }
+
+  bool RdfStore::Remove(RdfTriple triple)
+  {
+    return d->Remove(triple);
+  }
+
+  bool RdfStore::Contains(RdfTriple triple)
+  {
+    return d->Contains(triple);
+  }
+
+  ResultMap RdfStore::Query(std::string query) const
+  {
+    return d->Query(query);
+  }
+
+  void RdfStore::Save(std::string filename, std::string format)
+  {
+    d->Save(filename, format);
+  }
+
+  void RdfStore::Import(std::string url, std::string format)
+  {
+    d->Import(url, format);
   }
 } // end of namespace mitk

@@ -21,11 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <map>
 #include <list>
 
-#include <redland.h>
-
 #include "mitkRdfTriple.h"
 
 namespace mitk {
+  class RdfStorePrivate;
+
   /**
   * \ingroup MitkRDFModule
   */
@@ -41,6 +41,9 @@ namespace mitk {
     */
     RdfStore();
 
+    /**
+    * Destruct a triplestore.
+    */
     ~RdfStore();
 
     /**
@@ -117,23 +120,7 @@ namespace mitk {
     void Import(std::string url, std::string format = "");
 
   private:
-    RdfUri m_BaseUri;
-
-    PrefixMap m_Prefixes;
-
-    librdf_model* m_Model;
-    librdf_storage* m_Storage;
-    librdf_world* m_World;
-
-    librdf_statement* RdfTripleToStatement(RdfTriple triple) const;
-    librdf_node* RdfNodeToLibRdfNode(RdfNode node) const;
-    librdf_uri* RdfUriToLibRdfUri(RdfUri uri) const;
-
-    RdfTriple StatementToRdfTriple(librdf_statement* statement) const;
-    RdfNode LibRdfNodeToRdfNode(librdf_node* node) const;
-    RdfUri LibRdfUriToRdfUri(librdf_uri* uri) const;
-
-    bool CheckComplete(librdf_statement* statement);
+    RdfStorePrivate* d;
   };
 }
 

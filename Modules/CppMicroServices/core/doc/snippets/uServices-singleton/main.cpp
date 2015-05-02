@@ -17,7 +17,7 @@ public:
   {}
 
   //![0]
-  void Load(ModuleContext* context)
+  void Load(ModuleContext* context) override
   {
     // The Load() method of the module activator is called during static
     // initialization time of the shared library.
@@ -34,7 +34,7 @@ public:
   //![0]
 
   //![1]
-  void Unload(ModuleContext* /*context*/)
+  void Unload(ModuleContext* /*context*/) override
   {
     // Services are automatically unregistered during unloading of
     // the shared library after the call to Unload(ModuleContext*)

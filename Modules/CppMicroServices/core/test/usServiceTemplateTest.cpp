@@ -43,7 +43,7 @@ struct MyFactory1 : public us::ServiceFactory
 {
   std::map<long, MyService1*> m_idToServiceMap;
 
-  virtual us::InterfaceMap GetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/)
+  virtual us::InterfaceMap GetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/) override
   {
     MyService1* s = new MyService1;
     m_idToServiceMap.insert(std::make_pair(module->GetModuleId(), s));
@@ -51,7 +51,7 @@ struct MyFactory1 : public us::ServiceFactory
   }
 
   virtual void UngetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/,
-                            const us::InterfaceMap& service)
+                            const us::InterfaceMap& service) override
   {
     std::map<long, MyService1*>::iterator iter = m_idToServiceMap.find(module->GetModuleId());
     if (iter != m_idToServiceMap.end())
@@ -67,7 +67,7 @@ struct MyFactory2 : public us::ServiceFactory
 {
   std::map<long, MyService2*> m_idToServiceMap;
 
-  virtual us::InterfaceMap GetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/)
+  virtual us::InterfaceMap GetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/) override
   {
     MyService2* s = new MyService2;
     m_idToServiceMap.insert(std::make_pair(module->GetModuleId(), s));
@@ -75,7 +75,7 @@ struct MyFactory2 : public us::ServiceFactory
   }
 
   virtual void UngetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/,
-                            const us::InterfaceMap& service)
+                            const us::InterfaceMap& service) override
   {
     std::map<long, MyService2*>::iterator iter = m_idToServiceMap.find(module->GetModuleId());
     if (iter != m_idToServiceMap.end())
@@ -91,7 +91,7 @@ struct MyFactory3 : public us::ServiceFactory
 {
   std::map<long, MyService3*> m_idToServiceMap;
 
-  virtual us::InterfaceMap GetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/)
+  virtual us::InterfaceMap GetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/) override
   {
     MyService3* s = new MyService3;
     m_idToServiceMap.insert(std::make_pair(module->GetModuleId(), s));
@@ -99,7 +99,7 @@ struct MyFactory3 : public us::ServiceFactory
   }
 
   virtual void UngetService(us::Module* module, const us::ServiceRegistrationBase& /*registration*/,
-                            const us::InterfaceMap& service)
+                            const us::InterfaceMap& service) override
   {
     std::map<long, MyService3*>::iterator iter = m_idToServiceMap.find(module->GetModuleId());
     if (iter != m_idToServiceMap.end())

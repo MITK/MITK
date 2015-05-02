@@ -69,7 +69,7 @@ class TestModuleHPrototypeServiceFactory : public PrototypeServiceFactory
 
 public:
 
-  InterfaceMap GetService(Module* caller, const ServiceRegistrationBase& /*sReg*/)
+  InterfaceMap GetService(Module* caller, const ServiceRegistrationBase& /*sReg*/) override
   {
     std::cout << "GetService (prototype) in H" << std::endl;
     TestProduct2* product = new TestProduct2(caller);
@@ -77,7 +77,7 @@ public:
     return MakeInterfaceMap<TestModuleH,TestModuleH2>(product);
   }
 
-  void UngetService(Module* caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMap& service)
+  void UngetService(Module* caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMap& service) override
   {
     TestProduct2* product = dynamic_cast<TestProduct2*>(ExtractInterface<TestModuleH>(service));
     delete product;
@@ -104,7 +104,7 @@ public:
     , mc(NULL)
   {}
 
-  void Load(ModuleContext* mc)
+  void Load(ModuleContext* mc) override
   {
     std::cout << "start in H" << std::endl;
     this->mc = mc;
@@ -112,12 +112,12 @@ public:
     prototypeFactoryService = mc->RegisterService<TestModuleH,TestModuleH2>(static_cast<ServiceFactory*>(&prototypeFactory));
   }
 
-  void Unload(ModuleContext* /*mc*/)
+  void Unload(ModuleContext* /*mc*/) override
   {
     factoryService.Unregister();
   }
 
-  InterfaceMap GetService(Module* caller, const ServiceRegistrationBase& /*sReg*/)
+  InterfaceMap GetService(Module* caller, const ServiceRegistrationBase& /*sReg*/) override
   {
     std::cout << "GetService in H" << std::endl;
     TestProduct* product = new TestProduct(caller);
@@ -125,7 +125,7 @@ public:
     return MakeInterfaceMap<TestModuleH>(product);
   }
 
-  void UngetService(Module* caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMap& service)
+  void UngetService(Module* caller, const ServiceRegistrationBase& /*sReg*/, const InterfaceMap& service) override
   {
     TestModuleH* product = ExtractInterface<TestModuleH>(service);
     delete product;

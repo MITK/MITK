@@ -448,6 +448,60 @@ int main(int argc, char* argv[])
               << " " << sumCC / count
               << " " << sumBC / count
               << " " << count;
+
+            // count number of connections and fibers between regions
+            std::map< std::string, std::vector<std::string> >::iterator loopRegionsIterator;
+            for (loopRegionsIterator = parsedRegionsIterator; loopRegionsIterator != parsedRegions.end(); loopRegionsIterator++)
+            {
+              int numberConnections(0), possibleConnections(0);
+              double summedFiberCount(0.0);
+              std::vector<std::string> loopLabelsVector = loopRegionsIterator->second;
+              std::string loopName = loopRegionsIterator->first;
+
+              for (int loop(0); loop < regionLabelsVector.size(); loop++)
+              {
+                if (thresholdedNetwork->CheckForLabel(regionLabelsVector.at(loop)))
+                {
+                  for (int innerLoop(0); innerLoop < loopLabelsVector.size(); innerLoop++)
+                  {
+                    if (thresholdedNetwork->CheckForLabel(loopLabelsVector.at(loop)))
+                    {
+                      bool exists = thresholdedNetwork->EdgeExists(
+                        labelToIdMap.find(regionLabelsVector.at(loop))->second,
+                        labelToIdMap.find(loopLabelsVector.at(innerLoop))->second);
+                      possibleConnections++;
+                      if (exists)
+                      {
+                        numberConnections++;
+                        summedFiberCount += thresholdedNetwork->GetEdge(
+                          labelToIdMap.find(regionLabelsVector.at(loop))->second,
+                          labelToIdMap.find(loopLabelsVector.at(innerLoop))->second).weight;
+                      }
+                    }
+                    else
+                    {
+                      MITK_ERROR << "Illegal label. Label: \"" << loopLabelsVector.at(loop) << "\" not found.";
+                    }
+                  }
+                }
+                else
+                {
+                  MITK_ERROR << "Illegal label. Label: \"" << regionLabelsVector.at(loop) << "\" not found.";
+                }
+              }
+
+              if (firstRun)
+              {
+                regionalHeaderStream << " " << regionName << "_" << loopName << "_Connections "
+                  << " " << regionName << "_" << loopName << "_possibleConnections "
+                  << " " << regionName << "_" << loopName << "_ConnectingFibers";
+              }
+
+              regionalDataStream << " " << numberConnections
+                << " " << possibleConnections
+                << " " << summedFiberCount;
+
+            }
           }
         }
 

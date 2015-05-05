@@ -70,7 +70,7 @@ if(MITK_USE_SOFA)
     )
   endif()
 
-  set(rev "386a3a7")
+  set(rev "386a3a7+7568b4")
 
   set(SOFA_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSOFA-${rev}.cmake)
   set(SOFA_PRECONFIGURE_COMMAND ${CMAKE_COMMAND} -G${gen} ${ep_common_args} ${preconfigure_cmake_args} ${boost_cmake_args} <SOURCE_DIR>)
@@ -79,7 +79,7 @@ if(MITK_USE_SOFA)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SOFA-${rev}.tar.gz
-      URL_MD5 31ca701e985331e96bd52d9e58842a86
+      URL_MD5 45ba5a931855f06e30405a60229938ca
       PATCH_COMMAND ${SOFA_PATCH_COMMAND}
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

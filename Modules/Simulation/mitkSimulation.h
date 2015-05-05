@@ -42,11 +42,11 @@ namespace mitk
     void SetDt(double dt);
     void SetRootNode(sofa::simulation::Node::SPtr rootNode);
 
-    bool RequestedRegionIsOutsideOfTheBufferedRegion();
-    void SetRequestedRegion(const itk::DataObject*);
-    void SetRequestedRegionToLargestPossibleRegion();
-    void UpdateOutputInformation();
-    bool VerifyRequestedRegion();
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    void SetRequestedRegion(const itk::DataObject*) override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
+    void UpdateOutputInformation() override;
+    bool VerifyRequestedRegion() override;
 
   private:
     Simulation();

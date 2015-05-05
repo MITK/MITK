@@ -183,7 +183,7 @@ public:
   // The parameter window could be used to determine which graphic
   // resources to release.
   // \deprecatedSince{2013_12}
-  DEPRECATED(void ReleaseGraphicsResources(vtkWindow *))
+  DEPRECATED(void ReleaseGraphicsResources(vtkWindow *) override)
   {
   };
 

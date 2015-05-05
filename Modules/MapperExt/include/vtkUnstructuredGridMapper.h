@@ -45,7 +45,7 @@ public:
   // The parameter window could be used to determine which graphic
   // resources to release.
    // deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
-  DEPRECATED(void ReleaseGraphicsResources(vtkWindow *));
+  DEPRECATED(void ReleaseGraphicsResources(vtkWindow *) override);
 
    // Description:
   // Release any graphics resources that are being consumed by this mapper.

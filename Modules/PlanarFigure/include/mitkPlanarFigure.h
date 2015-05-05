@@ -376,7 +376,7 @@ private:
     bool Visible;
   };
 
-  virtual itk::LightObject::Pointer InternalClone() const = 0;
+  virtual itk::LightObject::Pointer InternalClone() const override = 0;
 
   PlaneGeometry *m_PlaneGeometry;
 

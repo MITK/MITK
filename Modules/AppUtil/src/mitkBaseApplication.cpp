@@ -229,7 +229,7 @@ struct BaseApplication::Impl
     if (provFile.exists())
     {
       MITK_INFO(consoleLog) << "Using provisioning file: " << qPrintable(provFile.absoluteFilePath());
-      ProvisioningInfo provInfo(provFile.absoluteFilePath());
+      ProvisioningInfo provInfo(provFile.absoluteFilePath().toUtf8().constData());
       // it can still happen, that the encoding is not compatible with the fromUtf8 function ( i.e. when manipulating the LANG variable
       // in such case, the QStringList in provInfo is empty which we can easily check for
       if( provInfo.getPluginDirs().empty() )

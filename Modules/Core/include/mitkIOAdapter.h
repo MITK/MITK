@@ -70,7 +70,7 @@ public:
 
   /** Methods from mitk::BaseProcess. */
   itkFactorylessNewMacro(Self);
-  mitk::BaseProcess::Pointer CreateIOProcessObject(const std::string filename, const std::string filePrefix, const std::string filePattern)
+  mitk::BaseDataSource::Pointer CreateIOProcessObject(const std::string filename, const std::string filePrefix, const std::string filePattern)
   {
     typename T::Pointer ioProcessObject = T::New();
     ioProcessObject->SetFileName(filename.c_str());

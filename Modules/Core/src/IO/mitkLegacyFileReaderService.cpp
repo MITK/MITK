@@ -91,7 +91,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::LegacyFileReaderService::R
 
     if( canReadFile )
     {
-      BaseProcess::Pointer ioObject = (*k)->CreateIOProcessObject(path, "", "");
+      BaseDataSource::Pointer ioObject = (*k)->CreateIOProcessObject(path, "", "");
       ioObject->Update();
       int numberOfContents = static_cast<int>(ioObject->GetNumberOfOutputs());
 

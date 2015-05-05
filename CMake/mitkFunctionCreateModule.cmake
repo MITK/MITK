@@ -363,6 +363,7 @@ function(mitk_create_module)
         mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=static-member-init" module_c_flags module_cxx_flags)
         mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unknown-warning" module_c_flags module_cxx_flags)
         mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=gnu" module_c_flags module_cxx_flags)
+        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=inconsistent-missing-override" module_c_flags module_cxx_flags)
       endif()
     endif(MODULE_WARNINGS_AS_ERRORS)
 

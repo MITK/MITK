@@ -53,10 +53,10 @@ class MITKCORE_EXPORT GroupTagProperty : public BaseProperty
     // purposely not implemented
     GroupTagProperty& operator=(const GroupTagProperty&);
 
-    itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty& property) const;
-    virtual bool Assign(const BaseProperty& property);
+    virtual bool IsEqual(const BaseProperty& property) const override;
+    virtual bool Assign(const BaseProperty& property) override;
 };
 
 #ifdef _MSC_VER

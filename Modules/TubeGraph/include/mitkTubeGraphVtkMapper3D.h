@@ -54,7 +54,7 @@ namespace mitk
     * case, a mitk::Graph< TubeGraphVertex, TubeGraphEdge > is returned.
     */
     virtual const TubeGraph* GetInput();
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
+    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
   protected:
 
@@ -64,7 +64,7 @@ namespace mitk
     /**
     * This method is called, each time a specific renderer is updated.
     */
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
     /**
     * Generate vtkPolyData containing the tube centerlines and

@@ -36,11 +36,11 @@ public:
   virtual ~LegacyFileReaderService();
 
   using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read();
+  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
 private:
 
-  LegacyFileReaderService* Clone() const;
+  LegacyFileReaderService* Clone() const override;
 
   us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
 };

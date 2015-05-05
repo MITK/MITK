@@ -46,7 +46,7 @@ public:
     /**
      * reimplemented from Baseclass
      */
-    virtual void Paint(BaseRenderer * renderer);
+    virtual void Paint(BaseRenderer * renderer) override;
 
     /**
      * return a refernce of the rendered data object

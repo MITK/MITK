@@ -234,13 +234,13 @@ us::ServiceRegistration<IFileWriter> AbstractFileWriter::RegisterService(us::Mod
       : m_Prototype(prototype)
     {}
 
-    us::InterfaceMap GetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/)
+    us::InterfaceMap GetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/) override
     {
       return us::MakeInterfaceMap<IFileWriter>(m_Prototype->Clone());
     }
 
     void UngetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/,
-      const us::InterfaceMap& service)
+      const us::InterfaceMap& service) override
     {
       delete us::ExtractInterface<IFileWriter>(service);
     }

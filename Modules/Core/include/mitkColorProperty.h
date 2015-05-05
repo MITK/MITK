@@ -77,7 +77,7 @@ public:
 
   const mitk::Color & GetColor() const;
   const mitk::Color & GetValue() const;
-  std::string GetValueAsString() const;
+  std::string GetValueAsString() const override;
   void SetColor(const mitk::Color & color );
   void SetValue(const mitk::Color & color );
   void SetColor( float red, float green, float blue );
@@ -89,10 +89,10 @@ private:
   // purposely not implemented
   ColorProperty& operator=(const ColorProperty&);
 
-  virtual itk::LightObject::Pointer InternalClone() const;
+  virtual itk::LightObject::Pointer InternalClone() const override;
 
-  virtual bool IsEqual(const BaseProperty& property) const;
-  virtual bool Assign(const BaseProperty & property);
+  virtual bool IsEqual(const BaseProperty& property) const override;
+  virtual bool Assign(const BaseProperty & property) override;
 
 };
 

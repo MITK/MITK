@@ -35,7 +35,7 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    void GenerateDataForRenderer( mitk::BaseRenderer *renderer );
+    void GenerateDataForRenderer( mitk::BaseRenderer *renderer ) override;
 
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
 

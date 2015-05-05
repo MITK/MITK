@@ -40,7 +40,7 @@ namespace mitk {
   class MITKIGT_EXPORT TrackingDeviceSourceConfigurator : public itk::Object
   {
   public:
-    mitkClassMacro(TrackingDeviceSourceConfigurator,  itk::Object);
+    mitkClassMacroItkParent(TrackingDeviceSourceConfigurator,  itk::Object);
     mitkNewMacro2Param(Self,mitk::NavigationToolStorage::Pointer,mitk::TrackingDevice::Pointer);
 
     /** @return Returns if it's possible to create a tracking device source, which means the tools are checked

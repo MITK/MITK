@@ -36,7 +36,7 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
 {
   public:
 
-    mitkClassMacro( SceneIO, itk::Object );
+    mitkClassMacroItkParent( SceneIO, itk::Object );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

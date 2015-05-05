@@ -35,7 +35,7 @@ class MITKDIFFUSIONCORE_EXPORT vtkMaskedProgrammableGlyphFilter : public vtkProg
 {
 public:
   vtkTypeMacro(vtkMaskedProgrammableGlyphFilter,vtkProgrammableGlyphFilter);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Constructor
@@ -98,7 +98,7 @@ protected:
   vtkMaskedProgrammableGlyphFilter();
   ~vtkMaskedProgrammableGlyphFilter();
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
 
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;

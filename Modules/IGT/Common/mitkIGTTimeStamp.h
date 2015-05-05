@@ -53,7 +53,7 @@ namespace mitk {
   {
   public:
 
-    mitkClassMacro(IGTTimeStamp, itk::Object);
+    mitkClassMacroItkParent(IGTTimeStamp, itk::Object);
 
    /**
     * \brief creates a new instance of mitkTimeStamp

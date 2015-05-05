@@ -50,8 +50,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkNumberPropertyView : public QLabel, public mi
 
     void initialize();
 
-    virtual void PropertyChanged();
-    virtual void PropertyRemoved();
+    virtual void PropertyChanged() override;
+    virtual void PropertyRemoved() override;
 
     void DisplayNumber();
 

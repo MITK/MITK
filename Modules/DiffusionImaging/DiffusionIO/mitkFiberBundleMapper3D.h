@@ -45,10 +45,10 @@ public:
 
     //========== essential implementation for 3D mapper ========
     const FiberBundle* GetInput();
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer); //looks like depricated.. should be replaced bz GetViewProp()
+    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override; //looks like depricated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
     //=========================================================
 
     class  FBXLocalStorage3D : public mitk::Mapper::BaseLocalStorage

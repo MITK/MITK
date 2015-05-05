@@ -18,7 +18,7 @@ private:
 
 public:
 
-  void Added(const std::vector<ListenerInfo>& listeners)
+  void Added(const std::vector<ListenerInfo>& listeners) override
   {
     for (std::vector<ListenerInfo>::const_iterator iter = listeners.begin(),
          endIter = listeners.end(); iter != endIter; ++iter)
@@ -30,7 +30,7 @@ public:
     }
   }
 
-  void Removed(const std::vector<ListenerInfo>& listeners)
+  void Removed(const std::vector<ListenerInfo>& listeners) override
   {
     for (std::vector<ListenerInfo>::const_iterator iter = listeners.begin(),
          endIter = listeners.end(); iter != endIter; ++iter)

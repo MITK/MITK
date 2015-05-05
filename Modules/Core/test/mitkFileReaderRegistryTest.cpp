@@ -51,7 +51,7 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read()
+  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read() override
   {
     std::vector<mitk::BaseData::Pointer> result;
     return result;
@@ -59,7 +59,7 @@ public:
 
 private:
 
-  DummyReader* Clone() const
+  DummyReader* Clone() const override
   {
     return new DummyReader(*this);
   }
@@ -95,7 +95,7 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read()
+  virtual std::vector< itk::SmartPointer<mitk::BaseData> >  Read() override
   {
     std::vector<mitk::BaseData::Pointer> result;
     return result;
@@ -103,7 +103,7 @@ public:
 
 private:
 
-  DummyReader2* Clone() const
+  DummyReader2* Clone() const override
   {
     return new DummyReader2(*this);
   }

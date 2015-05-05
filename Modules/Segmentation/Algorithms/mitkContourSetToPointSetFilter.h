@@ -46,9 +46,9 @@ public:
 
   itkGetMacro(Frequency, unsigned int);
 
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   const mitk::ContourSet* GetInput(void);
 

@@ -65,9 +65,9 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
-      virtual void GenerateOutputInformation();
+      virtual void GenerateOutputInformation() override;
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     const PlaneGeometryData *GetInput(void);
     const PlaneGeometryData *GetInput(unsigned int idx);

@@ -60,7 +60,7 @@ private:
 
 public:
 
-    void setUp()
+    void setUp() override
     {
         // reference files
         m_InputDwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(GetTestDataFilePath("DiffusionImaging/Fiberfox/StickBall_RELAX.dwi"))->GetData());

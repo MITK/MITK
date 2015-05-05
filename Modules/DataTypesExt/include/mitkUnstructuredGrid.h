@@ -45,27 +45,27 @@ public:
 
   virtual vtkUnstructuredGrid* GetVtkUnstructuredGrid(unsigned int t = 0);
 
-  virtual void UpdateOutputInformation();
+  virtual void UpdateOutputInformation() override;
 
-  virtual void SetRequestedRegionToLargestPossibleRegion();
+  virtual void SetRequestedRegionToLargestPossibleRegion() override;
 
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
-  virtual bool VerifyRequestedRegion();
+  virtual bool VerifyRequestedRegion() override;
 
-  virtual void SetRequestedRegion( const itk::DataObject *data);
+  virtual void SetRequestedRegion( const itk::DataObject *data) override;
 
   virtual void SetRequestedRegion(UnstructuredGrid::RegionType *region);
 
-  virtual void Graft(const DataObject* data);
+  virtual void Graft(const DataObject* data) override;
 
-  virtual void CopyInformation(const itk::DataObject *data);
+  virtual void CopyInformation(const itk::DataObject *data) override;
 
-  virtual void Update();
+  virtual void Update() override;
 
   // Initialize should not be called manually;
   // The polydata vector is initialized automatically when enlarged;
-  virtual void Expand( unsigned int timeSteps = 1 );
+  virtual void Expand( unsigned int timeSteps = 1 ) override;
 
   const RegionType& GetLargestPossibleRegion() const
   {
@@ -96,9 +96,9 @@ protected:
 
   virtual ~UnstructuredGrid();
 
-  virtual void ClearData();
+  virtual void ClearData() override;
 
-  virtual void InitializeEmpty();
+  virtual void InitializeEmpty() override;
 
   VTKUnstructuredGridSeries m_GridSeries;
 

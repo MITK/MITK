@@ -37,16 +37,16 @@ public:
   static vtkThickPlane *New();
 
   vtkTypeMacro(vtkThickPlane,vtkImplicitFunction);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description
   // Evaluate plane equation for point x[3].
-  double EvaluateFunction(double x[3]);
+  double EvaluateFunction(double x[3]) override;
   double EvaluateFunction(double x, double y, double z);
 
   // Description
   // Evaluate function gradient at point x[3].
-  void EvaluateGradient(double x[3], double g[3]);
+  void EvaluateGradient(double x[3], double g[3]) override;
 
   // Description:
   // Set/get plane normal. Plane is defined by point and normal.

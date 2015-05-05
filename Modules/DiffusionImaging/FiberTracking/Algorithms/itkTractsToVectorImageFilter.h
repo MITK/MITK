@@ -66,7 +66,7 @@ public:
     itkGetMacro( DirectionImageContainer, DirectionImageContainerType::Pointer) ///< output directions
     itkSetMacro( CreateDirectionImages, bool)
 
-    void GenerateData();
+    void GenerateData() override;
 
 protected:
 

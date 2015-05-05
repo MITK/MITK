@@ -43,7 +43,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkSelectableGLWidget : public QWidget
   mitk::CameraRotationController* GetCameraRotationController() const;
   mitk::BaseController* GetController() const;
   protected:
-  void wheelEvent( QWheelEvent * e );
+  void wheelEvent( QWheelEvent * e ) override;
     QmitkRenderWindow *m_RenderWindow;
     mitk::VtkPropRenderer::Pointer m_Renderer;
   private:

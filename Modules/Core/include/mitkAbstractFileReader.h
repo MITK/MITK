@@ -47,13 +47,13 @@ class MITKCORE_EXPORT AbstractFileReader : public mitk::IFileReader
 
 public:
 
-  virtual void SetInput(const std::string& location);
+  virtual void SetInput(const std::string& location) override;
 
-  virtual void SetInput(const std::string &location, std::istream* is);
+  virtual void SetInput(const std::string &location, std::istream* is) override;
 
-  virtual std::string GetInputLocation() const;
+  virtual std::string GetInputLocation() const override;
 
-  virtual std::istream* GetInputStream() const;
+  virtual std::istream* GetInputStream() const override;
 
   MimeType GetRegisteredMimeType() const;
 
@@ -73,21 +73,21 @@ public:
    * @see GetLocalFileName()
    * @see IFileReader::Read()
    */
-  virtual std::vector<itk::SmartPointer<BaseData> > Read() = 0;
+  virtual std::vector<itk::SmartPointer<BaseData> > Read() override = 0;
 
-  virtual DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage& ds);
+  virtual DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage& ds) override;
 
-  virtual ConfidenceLevel GetConfidenceLevel() const;
+  virtual ConfidenceLevel GetConfidenceLevel() const override;
 
-  virtual Options GetOptions() const;
-  virtual us::Any GetOption(const std::string &name) const;
+  virtual Options GetOptions() const override;
+  virtual us::Any GetOption(const std::string &name) const override;
 
-  virtual void SetOptions(const Options& options);
-  virtual void SetOption(const std::string& name, const us::Any& value);
+  virtual void SetOptions(const Options& options) override;
+  virtual void SetOption(const std::string& name, const us::Any& value) override;
 
-  virtual void AddProgressCallback(const ProgressCallback& callback);
+  virtual void AddProgressCallback(const ProgressCallback& callback) override;
 
-  virtual void RemoveProgressCallback(const ProgressCallback& callback);
+  virtual void RemoveProgressCallback(const ProgressCallback& callback) override;
 
   /**
    * Associate this reader with the MIME type returned by the current IMimeTypeProvider

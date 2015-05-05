@@ -37,7 +37,7 @@ class OperationActor;
 class MITKCORE_EXPORT UndoModel : public itk::Object
 {
   public:
-  mitkClassMacro(UndoModel, itk::Object);
+  mitkClassMacroItkParent(UndoModel, itk::Object);
 
   // no New Macro because this is an abstract class!
 

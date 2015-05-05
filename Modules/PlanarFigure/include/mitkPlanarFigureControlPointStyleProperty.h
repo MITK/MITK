@@ -75,7 +75,7 @@ protected:
    * this function is overridden as protected, so that the user may not add
    * additional invalid types.
    */
-  virtual bool AddEnum( const std::string &name, const IdType &id );
+  virtual bool AddEnum( const std::string &name, const IdType &id ) override;
 
   /**
    * Adds the standard enumeration types with corresponding strings.
@@ -87,7 +87,7 @@ private:
   // purposely not implemented
   PlanarFigureControlPointStyleProperty& operator=(const PlanarFigureControlPointStyleProperty&);
 
-  virtual itk::LightObject::Pointer InternalClone() const;
+  virtual itk::LightObject::Pointer InternalClone() const override;
 };
 
 } // end of namespace mitk

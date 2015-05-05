@@ -37,7 +37,7 @@ namespace mitk
   {
     public:
 
-      mitkClassMacro( DICOMTagCache, itk::Object );
+      mitkClassMacroItkParent( DICOMTagCache, itk::Object );
 
       virtual std::string GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const = 0;
 

@@ -45,8 +45,8 @@ public:
     Editor(mitk::FloatProperty*, Impl* impl);
     Editor(mitk::DoubleProperty*, Impl* impl);
 
-    virtual void PropertyChanged();
-    virtual void PropertyRemoved();
+    virtual void PropertyChanged() override;
+    virtual void PropertyRemoved() override;
 
     void BeginModifyProperty()
     { mitk::PropertyEditor::BeginModifyProperty(); }

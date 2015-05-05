@@ -97,7 +97,7 @@ public:
   * Reimplemented from QWebView::resizeEvent(),
   * reloads the webframe
   */
-  void resizeEvent(QResizeEvent* resizeEvent);
+  void resizeEvent(QResizeEvent* resizeEvent) override;
 
   /**
   * \brief Calculates the histogram.

@@ -81,7 +81,7 @@ public:
 
   typedef std::vector< DiffusionImageDICOMHeaderInformation > DICOMHeaderListType;
 
-  mitkClassMacro( DiffusionHeaderDICOMFileReader, itk::LightObject )
+  mitkClassMacroItkParent( DiffusionHeaderDICOMFileReader, itk::LightObject )
   itkSimpleNewMacro( Self )
 
   /**

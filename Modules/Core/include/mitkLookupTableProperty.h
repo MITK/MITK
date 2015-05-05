@@ -67,7 +67,7 @@ class MITKCORE_EXPORT LookupTableProperty : public BaseProperty
     void SetLookupTable(const mitk::LookupTable::Pointer aLookupTable);
     void SetValue(const ValueType&);
 
-    virtual std::string GetValueAsString() const;
+    virtual std::string GetValueAsString() const override;
 
     using BaseProperty::operator=;
 
@@ -76,10 +76,10 @@ class MITKCORE_EXPORT LookupTableProperty : public BaseProperty
     // purposely not implemented
     LookupTableProperty& operator=(const LookupTableProperty&);
 
-    itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty& property) const;
-    virtual bool Assign(const BaseProperty& property);
+    virtual bool IsEqual(const BaseProperty& property) const override;
+    virtual bool Assign(const BaseProperty& property) override;
 
   };
 

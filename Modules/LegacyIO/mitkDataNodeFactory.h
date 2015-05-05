@@ -117,7 +117,7 @@ protected:
   * Determines of which file type a given file is and calls the
   * appropriate reader function.
   */
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
 
   /**

@@ -57,18 +57,18 @@ public:
   void Start();
   void Stop();
 
-  virtual std::vector<MimeType> GetMimeTypes() const;
-  virtual std::vector<MimeType> GetMimeTypesForFile(const std::string& filePath) const;
-  virtual std::vector<MimeType> GetMimeTypesForCategory(const std::string& category) const;
-  virtual MimeType GetMimeTypeForName(const std::string& name) const;
+  virtual std::vector<MimeType> GetMimeTypes() const override;
+  virtual std::vector<MimeType> GetMimeTypesForFile(const std::string& filePath) const override;
+  virtual std::vector<MimeType> GetMimeTypesForCategory(const std::string& category) const override;
+  virtual MimeType GetMimeTypeForName(const std::string& name) const override;
 
-  virtual std::vector<std::string> GetCategories() const;
+  virtual std::vector<std::string> GetCategories() const override;
 
 private:
 
-  virtual TrackedType AddingService(const ServiceReferenceType& reference);
-  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedType service);
-  virtual void RemovedService(const ServiceReferenceType& reference, TrackedType service);
+  virtual TrackedType AddingService(const ServiceReferenceType& reference) override;
+  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedType service) override;
+  virtual void RemovedService(const ServiceReferenceType& reference, TrackedType service) override;
 
   MimeType GetMimeType(const ServiceReferenceType& reference) const;
 

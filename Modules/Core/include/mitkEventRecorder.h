@@ -56,7 +56,7 @@ public:
   /**
      * By this function the Observer gets notified about new events.
      */
-  virtual void Notify(InteractionEvent* interactionEvent, bool);
+  virtual void Notify(InteractionEvent* interactionEvent, bool) override;
 
   /**
      * @brief SetEventIgnoreList Optional. Provide a list of strings that describe which events are to be ignored

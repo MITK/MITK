@@ -41,7 +41,7 @@ namespace mitk {
   class MITKIGT_EXPORT NavigationDataSource : public itk::ProcessObject
   {
   public:
-    mitkClassMacro(NavigationDataSource, itk::ProcessObject);
+    mitkClassMacroItkParent(NavigationDataSource, itk::ProcessObject);
 
     /** @return Returns a human readable name of this source. There will be a default name,
       *         or you can set the name with the method SetName() if you want to change it.

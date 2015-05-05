@@ -34,13 +34,13 @@ public:
 
   using AbstractFileWriter::Write;
 
-  virtual void Write();
+  virtual void Write() override;
 
-  virtual ConfidenceLevel GetConfidenceLevel() const;
+  virtual ConfidenceLevel GetConfidenceLevel() const override;
 
 private:
 
-    LegacyFileWriterService* Clone() const;
+    LegacyFileWriterService* Clone() const override;
 
     mitk::FileWriter::Pointer m_LegacyWriter;
 

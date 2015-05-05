@@ -40,7 +40,7 @@ namespace mitk
     int ExtractSiemensDiffusionGradientInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray);
 
     /** Read the data */
-    virtual void Update();
+    virtual void Update() override;
 
   protected:
     /** Default c'tor */

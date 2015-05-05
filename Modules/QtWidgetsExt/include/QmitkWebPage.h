@@ -47,7 +47,7 @@ public slots:
    *  Overwritten from QWebView, to stop asking Qt to stop the JavaScript.
    * @return false so JavaScript is not stopped
    */
-  bool shouldInterruptJavaScript();
+  bool shouldInterruptJavaScript() override;
 };
 
 #endif

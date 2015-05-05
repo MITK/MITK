@@ -41,7 +41,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_Surface = mitk::IOUtil::LoadSurface(GetTestDataFilePath(
                                           "RenderingTestData/Stanford_bunny.stl"
@@ -68,7 +68,7 @@ public:
     m_Reference.push_back(m3);
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_Surface = NULL;
     m_Reference.clear();

@@ -78,7 +78,7 @@ public:
    */
   itkEventMacro(InteractorChangedEvent, itk::AnyEvent);
 
-  mitkClassMacro(DataNode, itk::DataObject);
+  mitkClassMacroItkParent(DataNode, itk::DataObject);
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -125,17 +125,17 @@ public:
 
   mitk::DataNode& operator=(BaseData* right);
   virtual void SetMapper(MapperSlotId id, mitk::Mapper* mapper);
-  virtual void UpdateOutputInformation();
+  virtual void UpdateOutputInformation() override;
 
-  virtual void SetRequestedRegionToLargestPossibleRegion();
+  virtual void SetRequestedRegionToLargestPossibleRegion() override;
 
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
-  virtual bool VerifyRequestedRegion();
+  virtual bool VerifyRequestedRegion() override;
 
-  virtual void SetRequestedRegion( const itk::DataObject *data);
+  virtual void SetRequestedRegion( const itk::DataObject *data) override;
 
-  virtual void CopyInformation(const itk::DataObject *data);
+  virtual void CopyInformation(const itk::DataObject *data) override;
 
   /**
    * \brief Set the property (instance of BaseProperty) with key \a propertyKey in the PropertyList
@@ -511,7 +511,7 @@ public:
    * \brief Get the timestamp of the last change of the contents of this node or
    * the referenced BaseData.
    */
-  virtual unsigned long GetMTime() const;
+  virtual unsigned long GetMTime() const override;
 
   /**
    * \brief Get the timestamp of the last change of the reference to the

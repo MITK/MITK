@@ -34,17 +34,17 @@ public:
   // -------------- AbstractFileReader -------------
 
   using AbstractFileReader::Read;
-  virtual std::vector<BaseData::Pointer> Read();
+  virtual std::vector<BaseData::Pointer> Read() override;
 
-  virtual ConfidenceLevel GetReaderConfidenceLevel() const;
+  virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
 
   // -------------- AbstractFileWriter -------------
 
-  virtual void Write();
+  virtual void Write() override;
 
 private:
 
-  SurfaceVtkLegacyIO* IOClone() const;
+  SurfaceVtkLegacyIO* IOClone() const override;
 
 };
 

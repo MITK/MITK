@@ -43,7 +43,7 @@ public:
      * @param viewport viewport of the renderwindow.
      * @return
      */
-  int RenderOverlay(vtkViewport* viewport);
+  int RenderOverlay(vtkViewport* viewport) override;
 
   /**
      * @brief SetRenderWindow Set the renderwindow.

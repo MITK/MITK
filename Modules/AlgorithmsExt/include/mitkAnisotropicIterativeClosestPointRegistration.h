@@ -216,7 +216,7 @@ protected:
 
 
 public:
-  mitkClassMacro(AnisotropicIterativeClosestPointRegistration, itk::Object)
+  mitkClassMacroItkParent(AnisotropicIterativeClosestPointRegistration, itk::Object)
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 

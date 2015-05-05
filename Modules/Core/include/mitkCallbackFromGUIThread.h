@@ -39,17 +39,17 @@ namespace mitk
 
     virtual ~CallbackEventOneParameter() {}
 
-    virtual const char * GetEventName() const
+    virtual const char * GetEventName() const override
     {
       return "CallbackEventOneParameter";
     }
 
-    virtual bool CheckEvent(const ::itk::EventObject* e) const
+    virtual bool CheckEvent(const ::itk::EventObject* e) const override
     {
       return dynamic_cast<const Self*>(e);
     }
 
-    virtual ::itk::EventObject* MakeObject() const
+    virtual ::itk::EventObject* MakeObject() const override
     {
       return new Self( m_Data );
     }

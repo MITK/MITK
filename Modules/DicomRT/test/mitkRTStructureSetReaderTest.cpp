@@ -34,7 +34,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_rtStructureReader = mitk::RTStructureSetReader::New();
     CPPUNIT_ASSERT_MESSAGE("Failed to initialize RTStructureSetReader", m_rtStructureReader.IsNotNull());

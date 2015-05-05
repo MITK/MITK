@@ -42,12 +42,12 @@ namespace mitk
     virtual ~ConnectomicsNetworkWriter();
 
     using AbstractFileWriter::Write;
-    virtual void Write();
+    virtual void Write() override;
 
   protected:
 
     ConnectomicsNetworkWriter(const ConnectomicsNetworkWriter& other);
-    virtual mitk::ConnectomicsNetworkWriter* Clone() const;
+    virtual mitk::ConnectomicsNetworkWriter* Clone() const override;
 
   };
 

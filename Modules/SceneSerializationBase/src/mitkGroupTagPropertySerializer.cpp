@@ -32,7 +32,7 @@ class GroupTagPropertySerializer : public BasePropertySerializer
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual TiXmlElement* Serialize()
+    virtual TiXmlElement* Serialize() override
     {
       if (dynamic_cast<const GroupTagProperty*>(m_Property.GetPointer()) != NULL)
       {
@@ -42,7 +42,7 @@ class GroupTagPropertySerializer : public BasePropertySerializer
       else return NULL;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement*)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement*) override
     {
       //if (!element)
       //  return NULL;

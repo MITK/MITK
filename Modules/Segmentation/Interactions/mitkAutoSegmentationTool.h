@@ -59,7 +59,7 @@ class MITKSEGMENTATION_EXPORT AutoSegmentationTool : public Tool
     AutoSegmentationTool(); // purposely hidden
     virtual ~AutoSegmentationTool();
 
-    virtual const char* GetGroup() const;
+    virtual const char* GetGroup() const override;
 
     virtual itk::SmartPointer<Image> Get3DImage(itk::SmartPointer<Image> image, unsigned int timestep);
 

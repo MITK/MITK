@@ -29,8 +29,8 @@ Q_OBJECT
 public:
 
   QmitkColorTransferFunctionCanvas( QWidget* parent = 0, Qt::WindowFlags f = 0 )  ;
-  virtual void paintEvent( QPaintEvent* e );
-  int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32);
+  virtual void paintEvent( QPaintEvent* e ) override;
+  int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32) override;
   void SetTitle(const QString& title);
 
   void SetColorTransferFunction(vtkColorTransferFunction* colorTransferFunction)
@@ -42,12 +42,12 @@ public:
     update();
   }
 
-  int AddFunctionPoint(double x, double)
+  int AddFunctionPoint(double x, double) override
   {
     return m_ColorTransferFunction->AddRGBPoint(x,m_ColorTransferFunction->GetRedValue(x),m_ColorTransferFunction->GetGreenValue(x),m_ColorTransferFunction->GetBlueValue(x));
   }
 
-  void RemoveFunctionPoint(double x)
+  void RemoveFunctionPoint(double x) override
   {
     int old_size = GetFunctionSize();
     m_ColorTransferFunction->RemovePoint(x);
@@ -58,18 +58,18 @@ public:
     }
   }
 
-  double GetFunctionX(int index)
+  double GetFunctionX(int index) override
   {
     return m_ColorTransferFunction->GetDataPointer()[index*4];
   }
 
-  int GetFunctionSize()
+  int GetFunctionSize() override
   {
     return m_ColorTransferFunction->GetSize();
   }
 
-  void DoubleClickOnHandle(int handle);
-  void MoveFunctionPoint(int index, std::pair<double,double> pos);
+  void DoubleClickOnHandle(int handle) override;
+  void MoveFunctionPoint(int index, std::pair<double,double> pos) override;
 
   void AddRGB(double x, double r, double g, double b);
 
@@ -103,7 +103,7 @@ public:
     m_ColorTransferFunction->AddRGBSegment(this->GetFunctionMin(),1,0,0,this->GetFunctionMax(),1,1,0);
   }
 
-  double GetFunctionY(int)
+  double GetFunctionY(int) override
   {
     return 0.0;
   }

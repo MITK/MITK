@@ -53,7 +53,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     // Create a new labelset image
     m_LabelSetImage = mitk::LabelSetImage::New();
@@ -63,7 +63,7 @@ public:
     m_LabelSetImage->Initialize(regularImage);
   }
 
-  void tearDown()
+  void tearDown() override
   {
     // Delete LabelSetImage
     m_LabelSetImage = 0;

@@ -33,7 +33,7 @@ namespace mitk
   class MITKCORE_EXPORT StateMachineAction: public itk::LightObject
   {
   public:
-    mitkClassMacro(StateMachineAction, itk::Object)
+    mitkClassMacroItkParent(StateMachineAction, itk::Object)
     mitkNewMacro1Param(Self, const std::string&)
     /**
      * @brief Returns the String-Id of this action.

@@ -85,7 +85,7 @@ public:
 
   const Surface* GetInput(void);
 
-  virtual void Paint(BaseRenderer* renderer);
+  virtual void Paint(BaseRenderer* renderer) override;
 
   /**
    * @brief The Surface to map can be explicitly set by this method.
@@ -106,7 +106,7 @@ public:
   /**
    *\brief Overwritten to initialize lookup table for point scalar data
    */
-  void SetDataNode( DataNode* node );
+  void SetDataNode( DataNode* node ) override;
 
   /**
    * \brief Generate OpenGL primitives for the VTK contour held in contour.

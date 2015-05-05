@@ -38,14 +38,14 @@ public:
     virtual ~NrrdTensorImageWriter();
 
     using AbstractFileWriter::Write;
-    virtual void Write();
+    virtual void Write() override;
 
-    virtual ConfidenceLevel GetConfidenceLevel() const;
+    virtual ConfidenceLevel GetConfidenceLevel() const override;
 
 protected:
 
   NrrdTensorImageWriter(const NrrdTensorImageWriter& other);
-  virtual mitk::NrrdTensorImageWriter* Clone() const;
+  virtual mitk::NrrdTensorImageWriter* Clone() const override;
 };
 
 

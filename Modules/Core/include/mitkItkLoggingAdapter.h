@@ -47,7 +47,7 @@ public:
     */
   static void Initialize();
 
-  virtual void DisplayText(const char* s);
+  virtual void DisplayText(const char* s) override;
 
 protected:
   ItkLoggingAdapter();

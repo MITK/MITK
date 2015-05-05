@@ -38,13 +38,13 @@ public:
   /**
    * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
    */
-  void setUp()
+  void setUp() override
   {
     m_ImagePath = GetTestDataFilePath("brain.raw");
     m_ImagePathNrrdRef = GetTestDataFilePath("brainHalfSize.nrrd"); //we need half size because the brain file has spacing 2 and this reader doesn't support spacing
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 

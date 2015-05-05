@@ -101,7 +101,7 @@ protected:
   virtual void OnSliceControllerRemoved(SliceNavigationController* snc);
 
   /** for implementation in subclasses */
-  virtual bool ExecuteAction(Action * action, StateEvent const* stateEvent);
+  virtual bool ExecuteAction(Action * action, StateEvent const* stateEvent) override;
 
   SNCVector m_SliceNavigationControllers;
 

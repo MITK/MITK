@@ -107,7 +107,7 @@ namespace mitk
 #pragma GCC visibility pop
 
     /** Standard class typedefs. */
-    mitkClassMacro(BaseRenderer, itk::Object);
+    mitkClassMacroItkParent(BaseRenderer, itk::Object);
 
     BaseRenderer(const char* name = NULL, vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL,RenderingMode::Type mode = RenderingMode::Standard);
 
@@ -618,7 +618,7 @@ namespace mitk
     bool m_KeepDisplayedRegion;
 
   protected:
-    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
     //##Documentation
     //## Data object containing the m_WorldGeometry defined above.

@@ -849,12 +849,12 @@ protected:
     {
     }
 
-    void Execute(const itk::Object *caller, const itk::EventObject&)
+    void Execute(const itk::Object *caller, const itk::EventObject&) override
     {
       (*this->m_Callback)(static_cast<const itk::ProcessObject*>(caller)->GetProgress());
     }
 
-    void Execute(itk::Object *caller, const itk::EventObject&)
+    void Execute(itk::Object *caller, const itk::EventObject&) override
     {
       (*this->m_Callback)(static_cast<itk::ProcessObject*>(caller)->GetProgress());
     }

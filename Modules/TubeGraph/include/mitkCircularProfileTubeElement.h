@@ -36,12 +36,12 @@ namespace mitk {
     /**
     * Set the 3D position of the element.
     */
-    void SetCoordinates(Point3D coordinates);
+    void SetCoordinates(Point3D coordinates) override;
 
     /**
     * Returns the 3D position of the element.
     */
-    const Point3D& GetCoordinates() const;
+    const Point3D& GetCoordinates() const override;
 
     /**
     * Set the diameter of the circle.
@@ -58,7 +58,7 @@ namespace mitk {
     * @param right The object to compare with.
     * @return true, if the object is the same;false, if not.
     */
-    bool operator==(const TubeElement& right) const;
+    bool operator==(const TubeElement& right) const override;
 
   private:
 

@@ -52,7 +52,7 @@ class vtkXMLMaterial : public vtkObject
 public:
   static vtkXMLMaterial* New();
   vtkTypeMacro(vtkXMLMaterial, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // Create a new instance. It searches for the material

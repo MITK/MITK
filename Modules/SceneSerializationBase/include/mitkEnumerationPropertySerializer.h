@@ -30,7 +30,7 @@ class MITKSCENESERIALIZATIONBASE_EXPORT EnumerationPropertySerializer : public B
 
     mitkClassMacro( EnumerationPropertySerializer, BasePropertySerializer );
 
-    virtual TiXmlElement* Serialize();
+    virtual TiXmlElement* Serialize() override;
 
   protected:
 

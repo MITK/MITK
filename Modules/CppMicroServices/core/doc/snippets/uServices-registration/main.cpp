@@ -25,7 +25,7 @@ class MyActivator : public ModuleActivator
 
 public:
 
-  void Load(ModuleContext* context)
+  void Load(ModuleContext* context) override
   {
     Register1(context);
     Register2(context);
@@ -54,14 +54,14 @@ context->RegisterService<InterfaceA, InterfaceB>(myService);
 //! [f1]
 class MyServiceFactory : public ServiceFactory
 {
-  virtual InterfaceMap GetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/)
+  virtual InterfaceMap GetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/) override
   {
     MyService* myService = new MyService;
     return MakeInterfaceMap<InterfaceA>(myService);
   }
 
   virtual void UngetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/,
-                            const InterfaceMap& service)
+                            const InterfaceMap& service) override
   {
     delete ExtractInterface<InterfaceA>(service);
   }
@@ -77,14 +77,14 @@ context->RegisterService<InterfaceA>(myServiceFactory);
 //! [f2]
 class MyServiceFactory : public ServiceFactory
 {
-  virtual InterfaceMap GetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/)
+  virtual InterfaceMap GetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/) override
   {
     MyService2* myService = new MyService2;
     return MakeInterfaceMap<InterfaceA,InterfaceB>(myService);
   }
 
   virtual void UngetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/,
-                            const InterfaceMap& service)
+                            const InterfaceMap& service) override
   {
     delete ExtractInterface<InterfaceA>(service);
   }
@@ -101,7 +101,7 @@ context->RegisterService<InterfaceA,InterfaceB>(static_cast<ServiceFactory*>(myS
   }
 
 
-  void Unload(ModuleContext* /*context*/)
+  void Unload(ModuleContext* /*context*/) override
   { /* cleanup */ }
 
 };

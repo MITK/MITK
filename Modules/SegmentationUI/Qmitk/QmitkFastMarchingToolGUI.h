@@ -64,7 +64,7 @@ protected:
 
   void Update();
 
-  void BusyStateChanged(bool);
+  void BusyStateChanged(bool) override;
 
   ctkRangeWidget*  m_slwThreshold;
   ctkSliderWidget* m_slStoppingValue;

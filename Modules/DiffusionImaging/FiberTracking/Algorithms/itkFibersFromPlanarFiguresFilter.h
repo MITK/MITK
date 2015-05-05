@@ -53,7 +53,7 @@ public:
     itkCloneMacro(Self)
     itkTypeMacro( FibersFromPlanarFiguresFilter, ProcessObject )
 
-    virtual void Update(){
+    virtual void Update() override{
         this->GenerateData();
     }
 
@@ -68,7 +68,7 @@ public:
 
 protected:
 
-    void GenerateData();
+    void GenerateData() override;
 
     FibersFromPlanarFiguresFilter();
     virtual ~FibersFromPlanarFiguresFilter();

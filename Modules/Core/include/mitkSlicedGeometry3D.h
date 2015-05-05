@@ -105,10 +105,10 @@ namespace mitk {
 
     //##Documentation
     //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
-    virtual void ChangeImageGeometryConsideringOriginOffset(const bool isAnImageGeometry);
+    virtual void ChangeImageGeometryConsideringOriginOffset(const bool isAnImageGeometry) override;
 
     //virtual void SetTimeBounds( const mitk::TimeBounds& timebounds );
-    virtual const mitk::BoundingBox* GetBoundingBox() const;
+    virtual const mitk::BoundingBox* GetBoundingBox() const override;
 
     /**
     * \brief Get the number of slices
@@ -167,7 +167,7 @@ namespace mitk {
     virtual void SetDirectionVector(const mitk::Vector3D& directionVector);
     itkGetConstMacro(DirectionVector, const mitk::Vector3D&)
 
-      virtual itk::LightObject::Pointer InternalClone() const;
+      virtual itk::LightObject::Pointer InternalClone() const override;
 
     static const std::string SLICES;
     const static std::string DIRECTION_VECTOR;
@@ -228,9 +228,9 @@ namespace mitk {
       mitk::PlaneGeometry::PlaneOrientation planeorientation, bool top = true,
       bool frontside = true, bool rotated = false);
 
-    virtual void SetImageGeometry(const bool isAnImageGeometry);
+    virtual void SetImageGeometry(const bool isAnImageGeometry) override;
 
-    virtual void ExecuteOperation(Operation* operation);
+    virtual void ExecuteOperation(Operation* operation) override;
 
     static double CalculateSpacing(const mitk::Vector3D spacing, const mitk::Vector3D &d);
 
@@ -259,7 +259,7 @@ namespace mitk {
 
     ScalarType GetLargestExtent(const BaseGeometry *geometry);
 
-    void PrintSelf(std::ostream& os, itk::Indent indent) const;
+    void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
     /** Calculate "directed spacing", i.e. the spacing in directions
     * non-orthogonal to the coordinate axes. This is done via the
@@ -314,7 +314,7 @@ namespace mitk {
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing);
+    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing) override;
   };
 } // namespace mitk
 

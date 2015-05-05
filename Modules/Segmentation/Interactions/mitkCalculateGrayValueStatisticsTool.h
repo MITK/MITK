@@ -50,8 +50,8 @@ class MITKSEGMENTATION_EXPORT CalculateGrayValueStatisticsTool : public Segmenta
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-  virtual const char** GetXPM() const;
-  virtual const char* GetName() const;
+  virtual const char** GetXPM() const override;
+  virtual const char* GetName() const override;
 
   virtual std::string GetReport() const;
   //
@@ -71,11 +71,11 @@ protected:
   CalculateGrayValueStatisticsTool(); // purposely hidden
   virtual ~CalculateGrayValueStatisticsTool();
 
-  virtual void StartProcessingAllData();
-    virtual bool ProcessOneWorkingData( DataNode* node );
-  virtual void FinishProcessingAllData();
+  virtual void StartProcessingAllData() override;
+    virtual bool ProcessOneWorkingData( DataNode* node ) override;
+  virtual void FinishProcessingAllData() override;
 
-  virtual std::string GetErrorMessage();
+  virtual std::string GetErrorMessage() override;
 
   /**
    Calculates the minimum and maximum of the pixelvalues. They have to be known to initialize the histogram.

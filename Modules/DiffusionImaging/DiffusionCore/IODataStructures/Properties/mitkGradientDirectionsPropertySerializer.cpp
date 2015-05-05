@@ -34,7 +34,7 @@ class MITKDIFFUSIONCORE_EXPORT GradientDirectionsPropertySerializer : public Bas
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual TiXmlElement* Serialize()
+    virtual TiXmlElement* Serialize() override
     {
       if (const GradientDirectionsProperty* prop = dynamic_cast<const GradientDirectionsProperty*>(m_Property.GetPointer()))
       {
@@ -65,7 +65,7 @@ class MITKDIFFUSIONCORE_EXPORT GradientDirectionsPropertySerializer : public Bas
       else return NULL;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element) return NULL;
 

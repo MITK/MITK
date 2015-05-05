@@ -33,7 +33,7 @@ namespace mitk {
   class MITKCORE_EXPORT StateMachineState : public itk::LightObject
   {
   public:
-    mitkClassMacro(StateMachineState, itk::LightObject);
+    mitkClassMacroItkParent(StateMachineState, itk::LightObject);
     mitkNewMacro2Param(Self, const std::string&, const std::string&);
 
 

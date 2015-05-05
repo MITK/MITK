@@ -34,7 +34,7 @@ namespace mitk
       ///
       /// Smart pointer defs
       ///
-      mitkClassMacro( VideoSource, itk::Object );
+      mitkClassMacroItkParent( VideoSource, itk::Object );
       ///
       /// assigns the grabbing devices for acquiring the next frame.
       /// in this base implementation it does nothing except incrementing

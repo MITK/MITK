@@ -45,7 +45,7 @@ namespace mitk {
   {
   public:
 
-    mitkClassMacro(NavigationTool,itk::DataObject);
+    mitkClassMacroItkParent(NavigationTool,itk::DataObject);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

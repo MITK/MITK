@@ -37,7 +37,7 @@ namespace mitk
 
   public:
 
-    mitkClassMacro( RTDoseReader, itk::Object );
+    mitkClassMacroItkParent( RTDoseReader, itk::Object );
     itkNewMacro( Self );
 
     template<typename TPixel, unsigned int VImageDimension>

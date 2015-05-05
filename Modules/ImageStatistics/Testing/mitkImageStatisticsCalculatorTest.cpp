@@ -49,7 +49,7 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
 
 public:
 
-  void setUp();
+  void setUp() override;
 
   void TestUninitializedImage();
 

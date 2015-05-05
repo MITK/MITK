@@ -41,7 +41,7 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(ToFCameraDevice, itk::Object);
+    mitkClassMacroItkParent(ToFCameraDevice, itk::Object);
     /*!
     \brief Opens a connection to the ToF camera. Has to be implemented
     in the specialized inherited classes.

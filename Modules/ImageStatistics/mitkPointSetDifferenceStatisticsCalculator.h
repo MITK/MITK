@@ -35,7 +35,7 @@ class MITKIMAGESTATISTICS_EXPORT PointSetDifferenceStatisticsCalculator : public
 {
 public:
 
-  mitkClassMacro( PointSetDifferenceStatisticsCalculator, itk::Object );
+  mitkClassMacroItkParent( PointSetDifferenceStatisticsCalculator, itk::Object );
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 

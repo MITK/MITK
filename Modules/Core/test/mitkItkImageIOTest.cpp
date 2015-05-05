@@ -49,12 +49,12 @@ class mitkItkImageIOTestSuite : public mitk::TestFixture
 
 public:
 
-  void setUp()
+  void setUp() override
   {
 
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 

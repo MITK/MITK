@@ -45,7 +45,7 @@ namespace mitk {
   {
   public:
 
-    mitkClassMacro(OptimizerFactory, Object);
+    mitkClassMacroItkParent(OptimizerFactory, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

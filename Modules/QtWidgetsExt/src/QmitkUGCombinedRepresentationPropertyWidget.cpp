@@ -53,7 +53,7 @@ class _UGCombinedBoolPropEditor : public mitk::PropertyEditor
 
   protected:
 
-    virtual void PropertyChanged()
+    virtual void PropertyChanged() override
     {
       if (m_BoolProperty)
         enabled = m_BoolProperty->GetValue();
@@ -63,7 +63,7 @@ class _UGCombinedBoolPropEditor : public mitk::PropertyEditor
       m_ComboBox->IsVolumeChanged(enabled);
     }
 
-    virtual void PropertyRemoved()
+    virtual void PropertyRemoved() override
     {
       m_Property = 0;
       m_BoolProperty = 0;
@@ -102,7 +102,7 @@ public:
     this->EndModifyProperty();
   }
 
-  virtual void PropertyChanged()
+  virtual void PropertyChanged() override
   {
     if (m_EnumerationProperty)
     {
@@ -117,7 +117,7 @@ public:
     }
   }
 
-  virtual void PropertyRemoved()
+  virtual void PropertyRemoved() override
   {
     m_Property = 0;
     m_EnumerationProperty = 0;

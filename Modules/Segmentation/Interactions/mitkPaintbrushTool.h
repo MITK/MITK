@@ -63,10 +63,10 @@ class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
     PaintbrushTool(int paintingPixelValue = 1); // purposely hidden
     virtual ~PaintbrushTool();
 
-    void ConnectActionsAndFunctions();
+    void ConnectActionsAndFunctions() override;
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
     virtual bool OnMouseMoved   ( StateMachineAction*, InteractionEvent* );

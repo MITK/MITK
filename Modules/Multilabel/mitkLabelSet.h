@@ -39,7 +39,7 @@ class MITKMULTILABEL_EXPORT LabelSet : public itk::Object
 {
 public:
 
-    mitkClassMacro( LabelSet, itk::Object );
+    mitkClassMacroItkParent( LabelSet, itk::Object );
     itkNewMacro(Self);
 
     typedef mitk::Label::PixelType PixelType;
@@ -203,7 +203,7 @@ protected:
 
     virtual ~LabelSet();
 
-    void PrintSelf(std::ostream &os, itk::Indent indent) const;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     LabelContainerType m_LabelContainer;
 

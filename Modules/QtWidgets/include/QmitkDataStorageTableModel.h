@@ -77,24 +77,24 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageTableModel : public QAbstractTableMod
     /// for given orientation and role.
     ///
     virtual QVariant headerData(int section, Qt::Orientation orientation,
-      int role) const;
+      int role) const override;
     ///
     /// Overridden from QAbstractTableModel. Returns what can be done
     /// with an item.
     ///
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
     ///
     /// Overridden from QAbstractTableModel. Returns the node count.
     ///
-    virtual int rowCount(const QModelIndex &parent) const;
+    virtual int rowCount(const QModelIndex &parent) const override;
     ///
     /// Overridden from QAbstractTableModel. Returns the number of features (columns) to display.
     ///
-    virtual int columnCount(const QModelIndex &parent) const;
+    virtual int columnCount(const QModelIndex &parent) const override;
     ///
     /// Overridden from QAbstractTableModel. Returns the data at index for given role.
     ///
-    virtual QVariant data(const QModelIndex &index, int role) const;
+    virtual QVariant data(const QModelIndex &index, int role) const override;
 
   //# Public SETTERS
   public:
@@ -133,11 +133,11 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageTableModel : public QAbstractTableMod
     /// Overridden from QAbstractTableModel. Sets data at index for given role.
     ///
     bool setData(const QModelIndex &index, const QVariant &value,
-      int role);
+      int role) override;
     ///
     /// \brief Reimplemented sort function from QAbstractTableModel to enable sorting on the table.
     ///
-    void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder );
+    void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder ) override;
 
     //#PROTECTED INNER CLASSES
 protected:

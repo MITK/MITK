@@ -28,7 +28,7 @@ namespace mitk
   class MITKCORE_EXPORT PropertyExtension : public itk::LightObject
   {
   public:
-    mitkClassMacro(PropertyExtension, itk::LightObject);
+    mitkClassMacroItkParent(PropertyExtension, itk::LightObject);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

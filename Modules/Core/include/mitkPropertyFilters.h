@@ -28,12 +28,12 @@ namespace mitk
     PropertyFilters();
     ~PropertyFilters();
 
-    bool AddFilter(const PropertyFilter& filter, const std::string& className, bool overwrite);
-    std::map<std::string, BaseProperty::Pointer> ApplyFilter(const std::map<std::string, BaseProperty::Pointer>& propertyMap, const std::string& className) const;
-    PropertyFilter GetFilter(const std::string& className) const;
-    bool HasFilter(const std::string& className) const;
-    void RemoveAllFilters();
-    void RemoveFilter(const std::string& className);
+    bool AddFilter(const PropertyFilter& filter, const std::string& className, bool overwrite) override;
+    std::map<std::string, BaseProperty::Pointer> ApplyFilter(const std::map<std::string, BaseProperty::Pointer>& propertyMap, const std::string& className) const override;
+    PropertyFilter GetFilter(const std::string& className) const override;
+    bool HasFilter(const std::string& className) const override;
+    void RemoveAllFilters() override;
+    void RemoveFilter(const std::string& className) override;
 
   private:
     PropertyFilters(const PropertyFilters&);

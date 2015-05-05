@@ -43,7 +43,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT AbstractOpenCVImageFilter : public itk::Obje
 public:
   static int INVALID_IMAGE_ID;
 
-  mitkClassMacro(AbstractOpenCVImageFilter, itk::Object);
+  mitkClassMacroItkParent(AbstractOpenCVImageFilter, itk::Object);
 
   virtual bool FilterImage( cv::Mat& image, int id = INVALID_IMAGE_ID );
 

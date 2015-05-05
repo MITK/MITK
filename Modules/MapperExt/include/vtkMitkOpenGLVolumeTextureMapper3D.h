@@ -44,7 +44,7 @@ class MITKMAPPEREXT_EXPORT vtkMitkOpenGLVolumeTextureMapper3D : public vtkMitkVo
 {
 public:
   vtkTypeMacro(vtkMitkOpenGLVolumeTextureMapper3D,vtkMitkVolumeTextureMapper3D);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkMitkOpenGLVolumeTextureMapper3D *New();
 
@@ -53,7 +53,7 @@ public:
   // more than one independent component, or if the hardware does
   // not support the required extensions
   // int IsRenderSupported(vtkVolumeProperty *);
-  int IsRenderSupported(vtkRenderer *ren,vtkVolumeProperty *);
+  int IsRenderSupported(vtkRenderer *ren,vtkVolumeProperty *) override;
 
 //BTX
 
@@ -61,7 +61,7 @@ public:
   // WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
   // DO NOT USE THIS METHOD OUTSIDE OF THE RENDERING PROCESS
   // Render the volume
-  virtual void Render(vtkRenderer *ren, vtkVolume *vol);
+  virtual void Render(vtkRenderer *ren, vtkVolume *vol) override;
 
 //ETX
 

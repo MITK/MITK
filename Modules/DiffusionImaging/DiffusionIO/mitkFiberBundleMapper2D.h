@@ -52,14 +52,14 @@ public:
 
 
     /** \brief Checks whether this mapper needs to update itself and generate data. */
-    virtual void Update(mitk::BaseRenderer * renderer);
+    virtual void Update(mitk::BaseRenderer * renderer) override;
 
 
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
 
 
     //### methods of MITK-VTK rendering pipeline
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
     //### end of methods of MITK-VTK rendering pipeline
 
 
@@ -93,7 +93,7 @@ protected:
     virtual ~FiberBundleMapper2D();
 
     /** Does the actual resampling, without rendering. */
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer*);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer*) override;
 
     void UpdateShaderParameter(mitk::BaseRenderer*);
 

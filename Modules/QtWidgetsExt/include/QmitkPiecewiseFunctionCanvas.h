@@ -29,9 +29,9 @@ Q_OBJECT
 public:
 
   QmitkPiecewiseFunctionCanvas( QWidget * parent=0,  Qt::WindowFlags f = 0 );
-  virtual void paintEvent( QPaintEvent* e );
+  virtual void paintEvent( QPaintEvent* e ) override;
   void SetTitle(const QString& title);
-  int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32);
+  int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32) override;
 
   void SetPiecewiseFunction(vtkPiecewiseFunction* piecewiseFunction)
   {
@@ -43,12 +43,12 @@ public:
     update();
   }
 
-  int AddFunctionPoint(double x,double val)
+  int AddFunctionPoint(double x,double val) override
   {
     return m_PiecewiseFunction->AddPoint(x,val);
   }
 
-  void RemoveFunctionPoint(double x)
+  void RemoveFunctionPoint(double x) override
   {
     int old_size = GetFunctionSize();
     m_PiecewiseFunction->RemovePoint(x);
@@ -59,26 +59,26 @@ public:
     }
   }
 
-  double GetFunctionX(int index)
+  double GetFunctionX(int index) override
   {
     return m_PiecewiseFunction->GetDataPointer()[index*2];
   }
 
-  double GetFunctionY(int index)
+  double GetFunctionY(int index) override
   {
     return m_PiecewiseFunction->GetValue(m_PiecewiseFunction->GetDataPointer()[index*2]);
   }
 
-  int GetFunctionSize()
+  int GetFunctionSize() override
   {
     return m_PiecewiseFunction->GetSize();
   }
 
-  void DoubleClickOnHandle(int)
+  void DoubleClickOnHandle(int) override
   {
   }
 
-  void MoveFunctionPoint(int index, std::pair<double,double> pos);
+  void MoveFunctionPoint(int index, std::pair<double,double> pos) override;
 
   double GetFunctionMax()
   {

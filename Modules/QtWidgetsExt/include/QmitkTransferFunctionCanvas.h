@@ -87,13 +87,13 @@ public:
     this->m_Upper = upper;
   }
 
-  void mousePressEvent( QMouseEvent* mouseEvent );
-  virtual void paintEvent( QPaintEvent* e );
+  void mousePressEvent( QMouseEvent* mouseEvent ) override;
+  virtual void paintEvent( QPaintEvent* e ) override;
   virtual void DoubleClickOnHandle(int handle) = 0;
 
-  void mouseMoveEvent( QMouseEvent* mouseEvent );
-  void mouseReleaseEvent( QMouseEvent* mouseEvent );
-  void mouseDoubleClickEvent( QMouseEvent* mouseEvent );
+  void mouseMoveEvent( QMouseEvent* mouseEvent ) override;
+  void mouseReleaseEvent( QMouseEvent* mouseEvent ) override;
+  void mouseDoubleClickEvent( QMouseEvent* mouseEvent ) override;
   void PaintHistogram(QPainter &p);
 
   virtual int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32) = 0;
@@ -113,7 +113,7 @@ public:
 
   mitk::SimpleHistogram *m_Histogram;
 
-  void keyPressEvent ( QKeyEvent * e );
+  void keyPressEvent ( QKeyEvent * e ) override;
 
   void SetImmediateUpdate(bool state);
 

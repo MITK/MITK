@@ -54,7 +54,7 @@ namespace mitk {
     /**
     * \brief returns the current time in milliseconds as a double
     */
-    virtual double GetCurrentStamp();
+    virtual double GetCurrentStamp() override;
 
   }; //namespace
 }

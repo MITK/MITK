@@ -63,7 +63,7 @@ namespace mitk {
     class MITKOPENIGTLINK_EXPORT IGTLDevice : public itk::Object
     {
     public:
-      mitkClassMacro(IGTLDevice, itk::Object)
+      mitkClassMacroItkParent(IGTLDevice, itk::Object)
 
       /**
        * \brief Type for state variable.

@@ -73,7 +73,7 @@ namespace mitk
     /*!
     * \brief Starts the B-Spline registration.
     */
-    virtual void GenerateData()
+    virtual void GenerateData() override
     {
       if (this->GetInput())
       {

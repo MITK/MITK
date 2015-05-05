@@ -34,9 +34,9 @@ public:
 
   static bool LoadCalled();
 
-  void Load(ModuleContext*);
+  void Load(ModuleContext*) override;
 
-  void Unload(ModuleContext* );
+  void Unload(ModuleContext* ) override;
 
 private:
 

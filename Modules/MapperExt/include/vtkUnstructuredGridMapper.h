@@ -33,8 +33,8 @@ class MITKMAPPEREXT_EXPORT vtkUnstructuredGridMapper : public vtkMapper
 public:
   static vtkUnstructuredGridMapper *New();
   vtkTypeMacro(vtkUnstructuredGridMapper,vtkMapper);
-  void PrintSelf(ostream& os, vtkIndent indent);
-  void Render(vtkRenderer *ren, vtkActor *act);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void Render(vtkRenderer *ren, vtkActor *act) override;
 
   // Description:
   // Get the internal poly data mapper used to map data set to graphics system.
@@ -57,7 +57,7 @@ public:
 
   // Description:
   // Get the mtime also considering the lookup table.
-  unsigned long GetMTime();
+  unsigned long GetMTime() override;
 
   // Description:
   // Set the Input of this mapper.
@@ -75,10 +75,10 @@ protected:
 
   mitk::BoundingObject::Pointer m_BoundingObject;
 
-  virtual void ReportReferences(vtkGarbageCollector*);
+  virtual void ReportReferences(vtkGarbageCollector*) override;
 
   // see algorithm for more info
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) override;
 
 private:
   vtkUnstructuredGridMapper(const vtkUnstructuredGridMapper&);  // Not implemented.

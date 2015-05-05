@@ -104,7 +104,7 @@ protected:
   CompareImageDataFilter();
   virtual ~CompareImageDataFilter() {}
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   /*! \brief Method resets the compare detail memeber struct to its initial state */
   void ResetCompareResultsToInitial();

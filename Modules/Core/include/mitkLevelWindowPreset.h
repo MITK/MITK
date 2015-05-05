@@ -44,7 +44,7 @@ protected:
 private:
   //##Documentation
   //## @brief method used in XLM-Reading; gets called when a start-tag is read
-  void StartElement (const char *elementName, const char **atts);
+  void StartElement (const char *elementName, const char **atts) override;
 
   //void saveXML(mitk::XMLWriter& xmlWriter);
   void save();

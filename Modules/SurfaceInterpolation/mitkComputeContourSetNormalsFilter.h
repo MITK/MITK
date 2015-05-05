@@ -92,8 +92,8 @@ public:
 protected:
   ComputeContourSetNormalsFilter();
   virtual ~ComputeContourSetNormalsFilter();
-  virtual void GenerateData();
-  virtual void GenerateOutputInformation();
+  virtual void GenerateData() override;
+  virtual void GenerateOutputInformation() override;
 
 private:
 

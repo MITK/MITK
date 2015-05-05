@@ -39,13 +39,13 @@ public:
   virtual ~ObjFileReaderService();
 
   using AbstractFileReader::Read;
-  virtual std::vector< itk::SmartPointer<BaseData> > Read();
+  virtual std::vector< itk::SmartPointer<BaseData> > Read() override;
 
   static mitk::CustomMimeType mimeType;
 
 private:
 
-  ObjFileReaderService* Clone() const;
+  ObjFileReaderService* Clone() const override;
 };
 
 } // namespace mitk

@@ -46,7 +46,7 @@ public:
   /** Create a Layouter that, depending on the identifier sorts the Overlays in one corner of the Renderwindow*/
   static Overlay2DLayouter::Pointer CreateLayouter(const std::string& identifier, BaseRenderer* renderer);
 
-  void PrepareLayout();
+  void PrepareLayout() override;
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */

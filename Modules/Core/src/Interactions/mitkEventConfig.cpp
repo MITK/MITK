@@ -46,12 +46,12 @@ protected:
   /**
    * @brief Derived from XMLReader
    **/
-  void StartElement(const char* elementName, const char **atts);
+  void StartElement(const char* elementName, const char **atts) override;
 
   /**
    * @brief Derived from XMLReader
    **/
-  void EndElement(const char* elementName);
+  void EndElement(const char* elementName) override;
 
   std::string ReadXMLStringAttribute(const std::string& name, const char** atts);
   bool ReadXMLBooleanAttribute(const std::string& name, const char** atts);

@@ -37,10 +37,10 @@ namespace mitk
     PlanarFigureCompositeReader();
     virtual ~PlanarFigureCompositeReader(){}
     PlanarFigureCompositeReader(const PlanarFigureCompositeReader& other);
-    virtual PlanarFigureCompositeReader * Clone() const;
+    virtual PlanarFigureCompositeReader * Clone() const override;
 
     using mitk::AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read();
+    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   private:
 

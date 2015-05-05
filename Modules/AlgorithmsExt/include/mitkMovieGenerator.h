@@ -31,7 +31,7 @@ class MITKALGORITHMSEXT_EXPORT  MovieGenerator : public  itk::LightObject
 {
 public:
 
-  mitkClassMacro(MovieGenerator, itk::LightObject);
+  mitkClassMacroItkParent(MovieGenerator, itk::LightObject);
 
   // delivers Win32 or Linux-versions of MovieGenerator
   static Pointer New(void);

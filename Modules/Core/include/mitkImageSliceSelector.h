@@ -48,11 +48,11 @@ class MITKCORE_EXPORT ImageSliceSelector : public SubImageSelector
   itkSetMacro(ChannelNr,int);
 
 protected:
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
-  virtual void GenerateInputRequestedRegion();
+  virtual void GenerateInputRequestedRegion() override;
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   ImageSliceSelector();
 

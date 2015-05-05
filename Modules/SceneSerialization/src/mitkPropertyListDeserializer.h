@@ -29,7 +29,7 @@ class PropertyListDeserializer : public itk::Object
 {
   public:
 
-    mitkClassMacro( PropertyListDeserializer, itk::Object );
+    mitkClassMacroItkParent( PropertyListDeserializer, itk::Object );
     itkFactorylessNewMacro(Self) // is this needed? should never be instantiated, only subclasses should
     itkCloneMacro(Self)
 

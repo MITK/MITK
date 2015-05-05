@@ -70,7 +70,7 @@ protected:
   DWIHeadMotionCorrectionFilter();
   virtual ~DWIHeadMotionCorrectionFilter() {}
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   unsigned long   m_CurrentStep;
   unsigned long   m_Steps;

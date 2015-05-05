@@ -64,21 +64,21 @@ class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const;
-    virtual us::ModuleResource GetCursorIconResource() const;
-    us::ModuleResource GetIconResource() const;
+    virtual const char** GetXPM() const override;
+    virtual us::ModuleResource GetCursorIconResource() const override;
+    us::ModuleResource GetIconResource() const override;
 
-    virtual const char* GetName() const;
+    virtual const char* GetName() const override;
 
   protected:
 
     RegionGrowingTool(); // purposely hidden
     virtual ~RegionGrowingTool();
 
-    void ConnectActionsAndFunctions();
+    void ConnectActionsAndFunctions() override;
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMousePressedInside ( StateMachineAction*, InteractionEvent* interactionEvent, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset);

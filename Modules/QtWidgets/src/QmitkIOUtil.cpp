@@ -44,7 +44,7 @@ struct QmitkIOUtil::Impl
   struct ReaderOptionsDialogFunctor : public ReaderOptionsFunctorBase
   {
 
-    virtual bool operator()(LoadInfo& loadInfo)
+    virtual bool operator()(LoadInfo& loadInfo) override
     {
       QmitkFileReaderOptionsDialog dialog(loadInfo);
       if (dialog.exec() == QDialog::Accepted)
@@ -62,7 +62,7 @@ struct QmitkIOUtil::Impl
   struct WriterOptionsDialogFunctor : public WriterOptionsFunctorBase
   {
 
-    virtual bool operator()(SaveInfo& saveInfo)
+    virtual bool operator()(SaveInfo& saveInfo) override
     {
       QmitkFileWriterOptionsDialog dialog(saveInfo);
       if (dialog.exec() == QDialog::Accepted)

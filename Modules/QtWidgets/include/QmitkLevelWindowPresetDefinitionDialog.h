@@ -73,11 +73,11 @@ protected:
                      std::map<std::string, double>& windows,
                      QObject* parent = 0);
 
-    int rowCount(const QModelIndex&) const;
-    int columnCount(const QModelIndex&) const;
-    QVariant data(const QModelIndex& index, int) const;
+    int rowCount(const QModelIndex&) const override;
+    int columnCount(const QModelIndex&) const override;
+    QVariant data(const QModelIndex& index, int) const override;
 
-    QVariant headerData(int section, Qt::Orientation orientation, int) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int) const override;
 
     void addPreset(std::string& name, double level, double window);
     void removePreset(const QModelIndex&);
@@ -96,8 +96,8 @@ protected:
 
   };
 
-  void resizeEvent(QResizeEvent* event);
-  void showEvent(QShowEvent* event);
+  void resizeEvent(QResizeEvent* event) override;
+  void showEvent(QShowEvent* event) override;
 
   void resizeColumns();
 

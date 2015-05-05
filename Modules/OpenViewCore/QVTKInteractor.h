@@ -82,13 +82,13 @@ public:
   // Description:
   // Overloaded terminiate app, which does nothing in Qt.
   // Use qApp->exit() instead.
-  virtual void TerminateApp();
+  virtual void TerminateApp() override;
 
   // Description:
   // Overloaded start method does nothing.
   // Use qApp->exec() instead.
-  virtual void Start();
-  virtual void Initialize();
+  virtual void Start() override;
+  virtual void Initialize() override;
 
   // Description:
   // Start listening events on 3DConnexion device.
@@ -113,9 +113,9 @@ protected:
   ~QVTKInteractor();
 
   // create a Qt Timer
-  virtual int InternalCreateTimer(int timerId, int timerType, unsigned long duration);
+  virtual int InternalCreateTimer(int timerId, int timerType, unsigned long duration) override;
   // destroy a Qt Timer
-  virtual int InternalDestroyTimer(int platformTimerId);
+  virtual int InternalDestroyTimer(int platformTimerId) override;
 #if defined(VTK_USE_TDX) && defined(Q_WS_WIN)
   vtkTDxWinDevice *Device;
 #endif

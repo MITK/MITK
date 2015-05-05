@@ -37,7 +37,7 @@ namespace mitk
   class MITKCORE_EXPORT VolumeCalculator : public itk::Object
   {
   public:
-    mitkClassMacro(VolumeCalculator,itk::Object);
+    mitkClassMacroItkParent(VolumeCalculator,itk::Object);
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

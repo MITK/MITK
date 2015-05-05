@@ -71,7 +71,7 @@ public:
 private:
 
   /// creates the contextmenu for this widget from class QmitkLevelWindowWidgetContextMenu
-  void contextMenuEvent ( QContextMenuEvent * );
+  void contextMenuEvent ( QContextMenuEvent * ) override;
 
   /// change notifications from the mitkLevelWindowManager
   void OnPropertyModified(const itk::EventObject& e);

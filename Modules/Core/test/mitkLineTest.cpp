@@ -36,7 +36,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
   m_Line = mitk::Line<double,3>();
 

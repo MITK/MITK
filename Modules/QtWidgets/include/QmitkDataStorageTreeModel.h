@@ -81,26 +81,26 @@ public:
 
   //# (Re-)implemented from QAbstractItemModel
   //# Read model
-  Qt::ItemFlags flags(const QModelIndex& index) const;
-  QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
-  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-  int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
-  int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
+  QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+  int rowCount ( const QModelIndex & parent = QModelIndex() ) const override;
+  int columnCount ( const QModelIndex & parent = QModelIndex() ) const override;
   //# hierarchical model
   ///
   /// called whenever the model or the view needs to create a QModelIndex for a particular
   /// child item (or a top-level item if parent is an invalid QModelIndex)
   ///
-  QModelIndex index ( int row, int column, const QModelIndex & parent = QModelIndex() ) const;
-  QModelIndex parent ( const QModelIndex & index ) const;
+  QModelIndex index ( int row, int column, const QModelIndex & parent = QModelIndex() ) const override;
+  QModelIndex parent ( const QModelIndex & index ) const override;
   //# editable model
-  bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-  bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole);
-  bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
-  Qt::DropActions supportedDropActions() const;
-  Qt::DropActions supportedDragActions() const;
-  QStringList mimeTypes() const;
-  QMimeData * mimeData(const QModelIndexList & indexes) const;
+  bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+  bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
+  bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
+  Qt::DropActions supportedDropActions() const override;
+  Qt::DropActions supportedDragActions() const override;
+  QStringList mimeTypes() const override;
+  QMimeData * mimeData(const QModelIndexList & indexes) const override;
 
   static QMimeData* mimeDataFromModelIndexList(const QModelIndexList& indexes);
 

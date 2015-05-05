@@ -47,7 +47,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_UnstructuredGrid = mitk::UnstructuredGrid::New();
 

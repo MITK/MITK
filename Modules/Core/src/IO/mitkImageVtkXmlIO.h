@@ -31,19 +31,19 @@ public:
   // -------------- AbstractFileReader -------------
 
   using AbstractFileReader::Read;
-  virtual std::vector<BaseData::Pointer> Read();
+  virtual std::vector<BaseData::Pointer> Read() override;
 
-  virtual ConfidenceLevel GetReaderConfidenceLevel() const;
+  virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
 
   // -------------- AbstractFileWriter -------------
 
-  virtual void Write();
+  virtual void Write() override;
 
-  virtual ConfidenceLevel GetWriterConfidenceLevel() const;
+  virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
 
 private:
 
-  ImageVtkXmlIO* IOClone() const;
+  ImageVtkXmlIO* IOClone() const override;
 };
 
 }

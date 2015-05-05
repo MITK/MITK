@@ -43,7 +43,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     //Create PointSet
     pointSet = mitk::PointSet::New();
@@ -58,7 +58,7 @@ public:
     pointSet->InsertPoint(4,point4);
   }
 
-  void tearDown()
+  void tearDown() override
   {
     pointSet = NULL;
     delete doOp;

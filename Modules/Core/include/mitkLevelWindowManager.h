@@ -52,7 +52,7 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(LevelWindowManager, itk::Object)
+    mitkClassMacroItkParent(LevelWindowManager, itk::Object)
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

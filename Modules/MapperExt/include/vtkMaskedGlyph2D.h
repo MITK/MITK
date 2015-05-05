@@ -35,7 +35,7 @@ class MITKMAPPEREXT_EXPORT vtkMaskedGlyph2D : public vtkGlyph2D
 {
 public:
   vtkTypeMacro(vtkMaskedGlyph2D,vtkGlyph2D);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Constructor
@@ -93,7 +93,7 @@ protected:
   vtkMaskedGlyph2D();
   ~vtkMaskedGlyph2D();
 
-  virtual int RequestData(vtkInformation* info,vtkInformationVector** inInfoVec,vtkInformationVector* outInfoVec);
+  virtual int RequestData(vtkInformation* info,vtkInformationVector** inInfoVec,vtkInformationVector* outInfoVec) override;
 
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;

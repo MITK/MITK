@@ -43,7 +43,7 @@ namespace mitk
     typedef ::itk::RGBPixel<float> ColorType;
     typedef DoseValueRel DoseValueType;
 
-    mitkClassMacro(IsoDoseLevel, itk::Object);
+    mitkClassMacroItkParent(IsoDoseLevel, itk::Object);
     itkNewMacro(Self);
     mitkNewMacro4Param(Self,DoseValueType, ColorType, bool, bool);
 
@@ -78,7 +78,7 @@ namespace mitk
 
     mitkCloneMacro(IsoDoseLevel);
 
-    void PrintSelf(std::ostream &os, itk::Indent indent) const;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
   private:
     /** Relative dose value and lower boundary of the iso level instance

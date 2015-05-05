@@ -47,7 +47,7 @@ class MITKSEGMENTATION_EXPORT ContourSetVtkMapper3D : public VtkMapper
 
     virtual const mitk::ContourSet* GetInput();
 
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
 
   protected:
 
@@ -55,7 +55,7 @@ class MITKSEGMENTATION_EXPORT ContourSetVtkMapper3D : public VtkMapper
 
     virtual ~ContourSetVtkMapper3D();
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
     vtkPolyDataMapper* m_VtkPolyDataMapper;
     vtkTubeFilter*     m_TubeFilter;

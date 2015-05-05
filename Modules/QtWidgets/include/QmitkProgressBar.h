@@ -48,16 +48,16 @@ public:
 
   //##Documentation
   //## @brief Sets whether the current progress value is displayed.
-  virtual void SetPercentageVisible(bool visible);
+  virtual void SetPercentageVisible(bool visible) override;
 
   //##Documentation
   //## @brief Adds steps to totalSteps.
-  virtual void AddStepsToDo(unsigned int steps);
+  virtual void AddStepsToDo(unsigned int steps) override;
 
   //##Documentation
   //## @brief Sets the current amount of progress to current progress + steps.
   //## @param: steps the number of steps done since last Progress(int steps) call.
-  virtual void Progress(unsigned int steps);
+  virtual void Progress(unsigned int steps) override;
 
 signals:
 
@@ -75,7 +75,7 @@ private:
 
   //##Documentation
   //## @brief Reset the progress bar. The progress bar "rewinds" and shows no progress.
-  void Reset();
+  void Reset() override;
 
   unsigned int m_TotalSteps;
 

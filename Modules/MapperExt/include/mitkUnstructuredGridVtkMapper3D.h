@@ -54,11 +54,11 @@ public:
 
   virtual const mitk::UnstructuredGrid* GetInput();
 
-  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
 
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
-  void ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer);
+  void ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer) override;
 
   LocalStorageHandler<BaseLocalStorage> m_LSH;
 
@@ -68,8 +68,8 @@ protected:
 
   virtual ~UnstructuredGridVtkMapper3D();
 
-  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
-  virtual void ResetMapper( BaseRenderer* /*renderer*/ );
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
+  virtual void ResetMapper( BaseRenderer* /*renderer*/ ) override;
 
   void SetProperties(mitk::BaseRenderer* renderer);
 

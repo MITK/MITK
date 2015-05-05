@@ -30,7 +30,7 @@ class PropertyListsXmlFileReaderAndWriter : public itk::Object
   public:
     static const char* GetPropertyListIdElementName();
 
-    mitkClassMacro( PropertyListsXmlFileReaderAndWriter, itk::Object );
+    mitkClassMacroItkParent( PropertyListsXmlFileReaderAndWriter, itk::Object );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

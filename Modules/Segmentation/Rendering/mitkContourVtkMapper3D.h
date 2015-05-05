@@ -47,13 +47,13 @@ public:
 
   virtual const mitk::Contour* GetInput();
 
-  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
 
 protected:
   ContourVtkMapper3D();
   virtual ~ContourVtkMapper3D();
 
-  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
   vtkSmartPointer<vtkPolyDataMapper> m_VtkPolyDataMapper;
   vtkSmartPointer<vtkTubeFilter>     m_TubeFilter;

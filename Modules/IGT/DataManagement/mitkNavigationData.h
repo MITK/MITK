@@ -40,7 +40,7 @@ namespace mitk {
   class MITKIGT_EXPORT NavigationData : public itk::DataObject
     {
     public:
-      mitkClassMacro(NavigationData, itk::DataObject);
+      mitkClassMacroItkParent(NavigationData, itk::DataObject);
       itkFactorylessNewMacro(Self);
       itkCloneMacro(Self);
       mitkNewMacro2Param(Self, mitk::AffineTransform3D::Pointer, const bool);

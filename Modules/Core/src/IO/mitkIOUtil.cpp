@@ -294,7 +294,7 @@ struct IOUtil::Impl
       : m_Options(options)
     {}
 
-    virtual bool operator()(LoadInfo& loadInfo)
+    virtual bool operator()(LoadInfo& loadInfo) override
     {
       IFileReader* reader = loadInfo.m_ReaderSelector.GetSelected().GetReader();
       if (reader)
@@ -314,7 +314,7 @@ struct IOUtil::Impl
       : m_Options(options)
     {}
 
-    virtual bool operator()(SaveInfo& saveInfo)
+    virtual bool operator()(SaveInfo& saveInfo) override
     {
       IFileWriter* writer = saveInfo.m_WriterSelector.GetSelected().GetWriter();
       if (writer)

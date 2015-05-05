@@ -95,7 +95,7 @@ public:
 
 
   // Change the current locale to m_Locale
-  void setUp()
+  void setUp() override
   {
     m_SkipImageTest = false;
     m_OldLocale = NULL;
@@ -115,7 +115,7 @@ public:
     }
   }
 
-  void tearDown()
+  void tearDown() override
   {
     if (m_OldLocale)
     {

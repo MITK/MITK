@@ -55,11 +55,11 @@ class MITKSEGMENTATION_EXPORT LiveWireTool2D : public SegTool2D
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const;
-    virtual us::ModuleResource GetCursorIconResource() const;
-    us::ModuleResource GetIconResource() const;
+    virtual const char** GetXPM() const override;
+    virtual us::ModuleResource GetCursorIconResource() const override;
+    us::ModuleResource GetIconResource() const override;
 
-    virtual const char* GetName() const;
+    virtual const char* GetName() const override;
 
     /// \brief Convert all current contour objects to binary segmentation image.
     void ConfirmSegmentation();
@@ -72,10 +72,10 @@ class MITKSEGMENTATION_EXPORT LiveWireTool2D : public SegTool2D
     LiveWireTool2D();
     virtual ~LiveWireTool2D();
 
-    void ConnectActionsAndFunctions();
+    void ConnectActionsAndFunctions() override;
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     /// \brief Initialize tool
     virtual bool OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent );

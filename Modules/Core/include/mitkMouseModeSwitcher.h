@@ -70,7 +70,7 @@ namespace mitk {
     itkEventMacro( MouseModeChangedEvent, itk::AnyEvent );
 #pragma GCC visibility pop
 
-    mitkClassMacro( MouseModeSwitcher, itk::Object );
+    mitkClassMacroItkParent( MouseModeSwitcher, itk::Object );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

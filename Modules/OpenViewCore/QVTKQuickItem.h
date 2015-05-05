@@ -38,7 +38,7 @@ public:
   // destructor
   ~QVTKQuickItem();
 
-  void itemChange(ItemChange change, const ItemChangeData &);
+  void itemChange(ItemChange change, const ItemChangeData &) override;
 
   // Description:
   // set the render window to use with this item
@@ -77,21 +77,21 @@ protected:
   virtual void cleanupAfterRender();
 
   // handle item key events
-  virtual void keyPressEvent(QKeyEvent* e);
-  virtual void keyReleaseEvent(QKeyEvent* e);
+  virtual void keyPressEvent(QKeyEvent* e) override;
+  virtual void keyReleaseEvent(QKeyEvent* e) override;
 
   // handle item mouse events
-  virtual void mousePressEvent(QMouseEvent* e);
-  virtual void mouseReleaseEvent(QMouseEvent* e);
-  virtual void mouseDoubleClickEvent(QMouseEvent* e);
-  virtual void mouseMoveEvent(QMouseEvent* e);
-  virtual void geometryChanged(const QRectF & newGeometry, const QRectF & oldGeometry);
-  virtual void wheelEvent(QWheelEvent* e);
-  virtual void hoverEnterEvent(QHoverEvent* e);
-  virtual void hoverLeaveEvent(QHoverEvent* e);
-  virtual void hoverMoveEvent(QHoverEvent* e);
+  virtual void mousePressEvent(QMouseEvent* e) override;
+  virtual void mouseReleaseEvent(QMouseEvent* e) override;
+  virtual void mouseDoubleClickEvent(QMouseEvent* e) override;
+  virtual void mouseMoveEvent(QMouseEvent* e) override;
+  virtual void geometryChanged(const QRectF & newGeometry, const QRectF & oldGeometry) override;
+  virtual void wheelEvent(QWheelEvent* e) override;
+  virtual void hoverEnterEvent(QHoverEvent* e) override;
+  virtual void hoverLeaveEvent(QHoverEvent* e) override;
+  virtual void hoverMoveEvent(QHoverEvent* e) override;
 
-  virtual QSGNode* updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* updatePaintNodeData);
+  virtual QSGNode* updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* updatePaintNodeData) override;
 
   QMutex m_viewLock;
 

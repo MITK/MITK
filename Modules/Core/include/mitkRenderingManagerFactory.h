@@ -77,7 +77,7 @@ public:
 
   virtual ~TestingRenderingManagerFactory() {};
 
-  virtual mitk::RenderingManager::Pointer CreateRenderingManager() const
+  virtual mitk::RenderingManager::Pointer CreateRenderingManager() const override
   {
     TestingRenderingManager::Pointer specificSmartPtr = TestingRenderingManager::New();
     RenderingManager::Pointer smartPtr = specificSmartPtr.GetPointer();

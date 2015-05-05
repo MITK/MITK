@@ -45,7 +45,7 @@ namespace mitk
   {
 
   public:
-    mitkClassMacro(InteractionEventHandler, itk::LightObject)
+    mitkClassMacroItkParent(InteractionEventHandler, itk::LightObject)
 
     /**
      * @brief Loads a configuration from an XML resource.

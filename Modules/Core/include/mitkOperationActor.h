@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define OPERATIONACTOR_H_HEADER_INCLUDED_C16E28BD
 
 #include <MitkCoreExports.h>
-#include <itkMacro.h>
+#include <mitkCommon.h>
 
 /** Macro for checking the type of an operation */
 #define mitkCheckOperationTypeMacro(OperationType, operation, newOperationName) \
@@ -44,7 +44,7 @@ class OperationEvent;
 class MITKCORE_EXPORT OperationActor
 {
 public:
-  itkTypeMacroNoParent(OperationActor)
+  mitkClassMacroNoParent(OperationActor)
 
   virtual ~OperationActor() {}
   virtual void ExecuteOperation(Operation* operation) = 0;

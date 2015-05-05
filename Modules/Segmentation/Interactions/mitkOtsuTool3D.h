@@ -36,12 +36,12 @@ namespace mitk{
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-      virtual const char* GetName() const;
-      virtual const char** GetXPM() const;
-    us::ModuleResource GetIconResource() const;
+      virtual const char* GetName() const override;
+      virtual const char** GetXPM() const override;
+    us::ModuleResource GetIconResource() const override;
 
-      virtual void Activated();
-      virtual void Deactivated();
+      virtual void Activated() override;
+      virtual void Deactivated() override;
 
       void RunSegmentation( int regions, bool useValley, int numberOfBins);
       void ConfirmSegmentation();

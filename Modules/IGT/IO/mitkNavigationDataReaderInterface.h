@@ -26,7 +26,7 @@ namespace mitk {
   class MITKIGT_EXPORT NavigationDataReaderInterface : public itk::Object
   {
   public:
-    mitkClassMacro(NavigationDataReaderInterface, itk::Object);
+    mitkClassMacroItkParent(NavigationDataReaderInterface, itk::Object);
 
     virtual mitk::NavigationDataSet::Pointer Read(std::string filename) = 0;
 

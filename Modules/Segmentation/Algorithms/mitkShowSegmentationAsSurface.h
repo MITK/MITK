@@ -37,12 +37,12 @@ class MITKSEGMENTATION_EXPORT ShowSegmentationAsSurface : public SegmentationSin
     ShowSegmentationAsSurface();  // use smart pointers
     virtual ~ShowSegmentationAsSurface();
 
-    virtual void Initialize(const NonBlockingAlgorithm* other = NULL);
-    virtual bool ReadyToRun();
+    virtual void Initialize(const NonBlockingAlgorithm* other = NULL) override;
+    virtual bool ReadyToRun() override;
 
-    virtual bool ThreadedUpdateFunction(); // will be called from a thread after calling StartAlgorithm
+    virtual bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
 
-    virtual void ThreadedUpdateSuccessful(); // will be called from a thread after calling StartAlgorithm
+    virtual void ThreadedUpdateSuccessful() override; // will be called from a thread after calling StartAlgorithm
 
   private:
 

@@ -56,7 +56,7 @@ namespace mitk {
        * This method calls CreateSurface from mitkImageToSurfaceFilter and
        * does not need a manual call since we use Update().
        */
-      virtual void GenerateData();
+      virtual void GenerateData() override;
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 

@@ -53,7 +53,7 @@ protected:
   ImageToPlanarFigureFilter();
   ~ImageToPlanarFigureFilter();
 
-  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
   /** What is the input requested region that is required to produce the
   * output requested region? The base assumption for image processing
@@ -69,7 +69,7 @@ protected:
   *
   * \sa ProcessObject::GenerateInputRequestedRegion(),
   *     ImageSource::GenerateInputRequestedRegion() */
-  virtual void GenerateInputRequestedRegion();
+  virtual void GenerateInputRequestedRegion() override;
 
 private:
   void operator=(const Self&); //purposely not implemented

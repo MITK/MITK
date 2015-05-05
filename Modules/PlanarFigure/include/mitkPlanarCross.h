@@ -76,25 +76,25 @@ public:
 
 
   /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
-  unsigned int GetMinimumNumberOfControlPoints() const
+  unsigned int GetMinimumNumberOfControlPoints() const override
   {
     return this->GetSingleLineMode() ? 2 : 4;
   }
 
   /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
-  unsigned int GetMaximumNumberOfControlPoints() const
+  unsigned int GetMaximumNumberOfControlPoints() const override
   {
     return this->GetSingleLineMode() ? 2 : 4;
   }
 
   /** \brief The cross shall be reset to a single line when a control point is selected. */
-  virtual bool ResetOnPointSelect();
+  virtual bool ResetOnPointSelect() override;
 
 
   /** \brief Returns the number of features available for this PlanarCross (1 or 2). */
-  virtual unsigned int GetNumberOfFeatures() const;
+  virtual unsigned int GetNumberOfFeatures() const override;
 
-  virtual bool Equals(const mitk::PlanarFigure& other) const;
+  virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
 protected:
   PlanarCross();
@@ -103,19 +103,19 @@ protected:
   mitkCloneMacro(Self);
 
   /** \brief Spatially constrain control points of second (orthogonal) line */
-  virtual Point2D ApplyControlPointConstraints( unsigned int index, const Point2D& point );
+  virtual Point2D ApplyControlPointConstraints( unsigned int index, const Point2D& point ) override;
 
   /** \brief Generates the poly-line representation of the planar figure. */
-  virtual void GeneratePolyLine();
+  virtual void GeneratePolyLine() override;
 
   /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-  virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight);
+  virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
 
   /** \brief Calculates feature quantities of the planar figure. */
-  virtual void EvaluateFeaturesInternal();
+  virtual void EvaluateFeaturesInternal() override;
 
 
-  virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
+  virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const override;
 
   // Feature identifiers
   const unsigned int FEATURE_ID_LONGESTDIAMETER;

@@ -37,7 +37,7 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro( KinectV2Controller , itk::Object );
+    mitkClassMacroItkParent( KinectV2Controller , itk::Object );
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

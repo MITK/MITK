@@ -33,11 +33,11 @@ class MITKCORE_EXPORT VtkOverlay : public Overlay {
 public:
 
   mitkClassMacro(VtkOverlay, Overlay);
-  void Update(BaseRenderer *renderer);
-  void AddToBaseRenderer(BaseRenderer *renderer);
-  void AddToRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer);
-  void RemoveFromRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer);
-  void RemoveFromBaseRenderer(BaseRenderer *renderer);
+  void Update(BaseRenderer *renderer) override;
+  void AddToBaseRenderer(BaseRenderer *renderer) override;
+  void AddToRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer) override;
+  void RemoveFromRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer) override;
+  void RemoveFromBaseRenderer(BaseRenderer *renderer) override;
 
   /**
   * \brief Paints the overlay.

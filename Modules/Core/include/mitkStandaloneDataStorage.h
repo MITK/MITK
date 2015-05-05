@@ -55,22 +55,22 @@ namespace mitk {
     //## the addition of a new object will fire the notification mechanism.
     //## If the node parameter is NULL or if the DataNode has already been added,
     //## an exception will be thrown.
-    void Add(mitk::DataNode* node, const mitk::DataStorage::SetOfObjects* parents = NULL);
+    void Add(mitk::DataNode* node, const mitk::DataStorage::SetOfObjects* parents = NULL) override;
 
     //##Documentation
     //## @brief Removes node from the StandaloneDataStorage
     //##
-    void Remove(const mitk::DataNode* node);
+    void Remove(const mitk::DataNode* node) override;
 
     //##Documentation
     //## @brief Checks if a node exists in the StandaloneDataStorage
     //##
-    virtual bool Exists(const mitk::DataNode* node) const;
+    virtual bool Exists(const mitk::DataNode* node) const override;
 
     //##Documentation
     //## @brief returns a set of source objects for a given node that meet the given condition(s).
     //##
-    SetOfObjects::ConstPointer GetSources(const mitk::DataNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectSources = true) const;
+    SetOfObjects::ConstPointer GetSources(const mitk::DataNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectSources = true) const override;
 
     //##Documentation
     //## @brief returns a set of derived objects for a given node.
@@ -82,12 +82,12 @@ namespace mitk {
     //## derived from derivations of node are returned too.
     //## The derived objects can be filtered with a predicate object as described in the GetSubset()
     //## method by providing a predicate as the condition parameter.
-    SetOfObjects::ConstPointer GetDerivations(const mitk::DataNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectDerivations = true) const;
+    SetOfObjects::ConstPointer GetDerivations(const mitk::DataNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectDerivations = true) const override;
 
     //##Documentation
     //## @brief returns a set of all data objects that are stored in the data storage
     //##
-    SetOfObjects::ConstPointer GetAll() const;
+    SetOfObjects::ConstPointer GetAll() const override;
 
     /*ITK Mutex */
     mutable itk::SimpleFastMutexLock m_Mutex;
@@ -119,7 +119,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Prints the contents of the StandaloneDataStorage to os. Do not call directly, call ->Print() instead
-    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
     //##Documentation
     //## @brief Nodes and their relation are stored in m_SourceNodes

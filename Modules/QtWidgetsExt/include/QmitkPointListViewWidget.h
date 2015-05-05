@@ -80,7 +80,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListViewWidget : public QListWidget
     void OnCurrentRowChanged( int /*currentRow*/ );
 
   protected:
-    void keyPressEvent( QKeyEvent * e ); ///< react to F2, F3 and DEL keys
+    void keyPressEvent( QKeyEvent * e ) override; ///< react to F2, F3 and DEL keys
     void MoveSelectedPointUp();
     void MoveSelectedPointDown();
     void RemoveSelectedPoint();

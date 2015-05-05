@@ -36,9 +36,9 @@ class MITKSEGMENTATION_EXPORT CalculateSegmentationVolume : public SegmentationS
     CalculateSegmentationVolume();  // use smart pointers
     virtual ~CalculateSegmentationVolume();
 
-    virtual bool ReadyToRun();
+    virtual bool ReadyToRun() override;
 
-    virtual bool ThreadedUpdateFunction(); // will be called from a thread after calling StartAlgorithm
+    virtual bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
 
     template < typename TPixel, unsigned int VImageDimension >
     void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, TPixel* dummy = NULL );

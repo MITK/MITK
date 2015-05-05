@@ -42,7 +42,7 @@ public:
 
   void UpdateGL();
 
-  void mousePressEvent( QMouseEvent * e );
+  void mousePressEvent( QMouseEvent * e ) override;
 
   void setPopUpEnabled( bool b );
 
@@ -75,7 +75,7 @@ public slots:
 
   void InitWidget( mitk::SliceNavigationController::ViewDirection viewDirection );
 
-  void wheelEvent( QWheelEvent * e );
+  void wheelEvent( QWheelEvent * e ) override;
 
   void ChangeView(QAction* val);
 

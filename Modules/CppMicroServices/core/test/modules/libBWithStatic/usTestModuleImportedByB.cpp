@@ -45,12 +45,12 @@ public:
   TestModuleImportedByBActivator() : s(0) {}
   ~TestModuleImportedByBActivator() { delete s; }
 
-  void Load(ModuleContext* context)
+  void Load(ModuleContext* context) override
   {
     s = new TestModuleImportedByB(context);
   }
 
-  void Unload(ModuleContext*)
+  void Unload(ModuleContext*) override
   {
   }
 

@@ -31,7 +31,7 @@ public:
                   DiffusionHeaderSiemensDICOMFileReader )
   itkNewMacro( Self )
 
-  virtual bool ReadDiffusionHeader(std::string filename);
+  virtual bool ReadDiffusionHeader(std::string filename) override;
 
   mitk::MosaicDescriptor GetMosaicDescriptor()
   {

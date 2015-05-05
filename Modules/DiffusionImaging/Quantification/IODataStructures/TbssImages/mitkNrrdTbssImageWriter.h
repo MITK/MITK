@@ -93,21 +93,21 @@ public:
     /**
     * @return possible file extensions for the data type associated with the writer
     */
-    virtual std::vector<std::string> GetPossibleFileExtensions();
+    virtual std::vector<std::string> GetPossibleFileExtensions() override;
 
-    std::string GetSupportedBaseData() const;
+    std::string GetSupportedBaseData() const override;
 
     // FileWriterWithInformation methods
-    virtual const char * GetDefaultFilename() { return "TbssImage.tbss"; }
-    virtual const char * GetFileDialogPattern() { return "Tbss Images (*.tbss)"; }
-    virtual const char * GetDefaultExtension() { return ".tbss"; }
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data)
+    virtual const char * GetDefaultFilename() override { return "TbssImage.tbss"; }
+    virtual const char * GetFileDialogPattern() override { return "Tbss Images (*.tbss)"; }
+    virtual const char * GetDefaultExtension() override { return ".tbss"; }
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) override
     {
       return (dynamic_cast<mitk::TbssImage*>(data.GetPointer()) != NULL);
     }
 
 
-    virtual void DoWrite(BaseData::Pointer data) {
+    virtual void DoWrite(BaseData::Pointer data) override {
       if (CanWriteBaseDataType(data)) {
         this->SetInput(dynamic_cast<mitk::TbssImage*>(data.GetPointer()));
         this->Update();
@@ -120,7 +120,7 @@ protected:
 
     virtual ~NrrdTbssImageWriter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     std::string m_FileName;
 

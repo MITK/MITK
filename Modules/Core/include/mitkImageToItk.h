@@ -73,7 +73,7 @@ public:
   //virtual void SetInput(unsigned int index, mitk::Image * image);
   //virtual void SetInput(unsigned int index, const mitk::Image * image);
 
-  virtual void UpdateOutputInformation();
+  virtual void UpdateOutputInformation() override;
 
   itkGetMacro( Channel, int );
   itkSetMacro( Channel, int );
@@ -101,12 +101,12 @@ protected:
   {
   }
 
-  void PrintSelf(std::ostream& os, itk::Indent indent) const;
+  void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
 private:
   bool m_CopyMemFlag;

@@ -54,7 +54,7 @@ class MITKMAPPEREXT_EXPORT vtkMitkGPUVolumeRayCastMapper : public vtkVolumeMappe
 {
 public:
   vtkTypeMacro(vtkMitkGPUVolumeRayCastMapper,vtkVolumeMapper);
-  void PrintSelf( ostream& os, vtkIndent indent );
+  void PrintSelf( ostream& os, vtkIndent indent ) override;
 
   // Description:
   // If AutoAdjustSampleDistances is on, the the ImageSampleDistance
@@ -170,7 +170,7 @@ public:
   // Description:
   // WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
   // Initialize rendering for this volume.
-  void Render( vtkRenderer *, vtkVolume * );
+  void Render( vtkRenderer *, vtkVolume * ) override;
 
   // Description:
   // Handled in the subclass - the actual render method

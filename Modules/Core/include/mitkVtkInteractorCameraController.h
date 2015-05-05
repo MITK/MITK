@@ -40,15 +40,15 @@ public:
   //## @brief Returns the vtkRenderWindowInteractor used internally by this CameraController
   vtkRenderWindowInteractor* GetVtkInteractor();
 
-  virtual void Resize(int w, int h);
-  virtual void MousePressEvent(mitk::MouseEvent*);
-  virtual void MouseReleaseEvent(mitk::MouseEvent*);
-  virtual void MouseMoveEvent(mitk::MouseEvent*);
-  virtual void KeyPressEvent(mitk::KeyEvent*);
+  virtual void Resize(int w, int h) override;
+  virtual void MousePressEvent(mitk::MouseEvent*) override;
+  virtual void MouseReleaseEvent(mitk::MouseEvent*) override;
+  virtual void MouseMoveEvent(mitk::MouseEvent*) override;
+  virtual void KeyPressEvent(mitk::KeyEvent*) override;
 
   //##Documentation
   //## @brief Set the BaseRenderer to be controlled by this vtk-based camera controller
-  virtual void SetRenderer(const mitk::BaseRenderer* renderer);
+  virtual void SetRenderer(const mitk::BaseRenderer* renderer) override;
 
 protected:
   /**

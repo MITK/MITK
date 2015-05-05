@@ -48,8 +48,8 @@ public:
   void First();
   void Last(); */
   // unsigned int GetPos();
-  void SetPos(unsigned int pos);
-  void SetSteps(const unsigned int steps);
+  void SetPos(unsigned int pos) override;
+  void SetSteps(const unsigned int steps) override;
 
 protected:
   MultiStepper();

@@ -44,19 +44,19 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    const char* GetFileName() const;
-    void SetFileName(const char* aFileName);
-    const char* GetFilePrefix() const;
-    void SetFilePrefix(const char* aFilePrefix);
-    const char* GetFilePattern() const;
-    void SetFilePattern(const char* aFilePattern);
+    const char* GetFileName() const override;
+    void SetFileName(const char* aFileName) override;
+    const char* GetFilePrefix() const override;
+    void SetFilePrefix(const char* aFilePrefix) override;
+    const char* GetFilePattern() const override;
+    void SetFilePattern(const char* aFilePattern) override;
 
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
   protected:
 
     /** Does the real work. */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     void ReadRoiInfo(itk::MetaDataDictionary dict);
 

@@ -72,7 +72,7 @@ public:
    * @param image the image which is used for initializing the mitk::LabelSetImage
    */
   using mitk::Image::Initialize;
-  virtual void Initialize(const mitk::Image* image);
+  virtual void Initialize(const mitk::Image* image) override;
 
   /**
     * \brief  */

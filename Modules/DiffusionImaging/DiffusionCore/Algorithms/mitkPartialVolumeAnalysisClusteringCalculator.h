@@ -429,7 +429,7 @@ namespace mitk
       }
     };
 
-    mitkClassMacro( PartialVolumeAnalysisClusteringCalculator, itk::Object )
+    mitkClassMacroItkParent( PartialVolumeAnalysisClusteringCalculator, itk::Object )
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

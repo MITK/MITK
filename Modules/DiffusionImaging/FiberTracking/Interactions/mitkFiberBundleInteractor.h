@@ -50,7 +50,7 @@ namespace mitk
     //## @brief derived from mitk::Interactor; calculates Jurisdiction according to points
     //##
     //## standard method can not be used, since it doesn't calculate in points, only in BoundingBox of Points
-    virtual float CanHandleEvent(StateEvent const* stateEvent) const;
+    virtual float CanHandleEvent(StateEvent const* stateEvent) const override;
 
 
   protected:
@@ -72,7 +72,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Executes Actions
-    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) override;
 
 
   private:

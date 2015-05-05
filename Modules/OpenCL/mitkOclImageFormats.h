@@ -44,7 +44,7 @@ namespace mitk
 class MITKOPENCL_EXPORT OclImageFormats : public itk::LightObject
 {
 public:
-    mitkClassMacro(OclImageFormats, itk::LightObject);
+    mitkClassMacroItkParent(OclImageFormats, itk::LightObject);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

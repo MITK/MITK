@@ -84,13 +84,13 @@ protected:
 
   virtual ~ITKImageImport();
 
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
-  virtual void GenerateInputRequestedRegion();
+  virtual void GenerateInputRequestedRegion() override;
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
-  virtual void SetNthOutput(DataObjectPointerArraySizeType num, itk::DataObject *output);
+  virtual void SetNthOutput(DataObjectPointerArraySizeType num, itk::DataObject *output) override;
 
   /** Typedef for the region copier function object that converts an
    * output region to an input region. */

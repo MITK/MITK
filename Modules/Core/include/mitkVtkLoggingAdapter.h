@@ -39,15 +39,15 @@ public:
     */
   static void Initialize();
 
-  virtual void DisplayText(const char* t);
+  virtual void DisplayText(const char* t) override;
 
-  virtual void DisplayErrorText(const char *t);
+  virtual void DisplayErrorText(const char *t) override;
 
-  virtual void DisplayWarningText(const char *t);
+  virtual void DisplayWarningText(const char *t) override;
 
-  virtual void DisplayGenericWarningText(const char *t);
+  virtual void DisplayGenericWarningText(const char *t) override;
 
-  virtual void DisplayDebugText(const char *t);
+  virtual void DisplayDebugText(const char *t) override;
 
 
 protected:

@@ -119,11 +119,11 @@ protected:
 
   ~HeightFieldSurfaceClipImageFilter();
 
-  virtual void GenerateInputRequestedRegion();
+  virtual void GenerateInputRequestedRegion() override;
 
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   template < typename TPixel, unsigned int VImageDimension >
   void _InternalComputeClippedImage(

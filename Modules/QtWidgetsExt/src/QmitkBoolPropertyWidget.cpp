@@ -27,13 +27,13 @@ public:
   {
   }
 
-  virtual void PropertyChanged()
+  virtual void PropertyChanged() override
   {
     if ( m_Property )
       m_CheckBox->setChecked( m_BoolProperty->GetValue() );
   }
 
-  virtual void PropertyRemoved()
+  virtual void PropertyRemoved() override
   {
     m_Property = NULL;
     m_BoolProperty = NULL;

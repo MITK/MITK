@@ -35,7 +35,7 @@ class MITKCONTOURMODEL_EXPORT ContourModelUtils : public itk::Object
 {
   public:
 
-    mitkClassMacro(ContourModelUtils, itk::Object);
+    mitkClassMacroItkParent(ContourModelUtils, itk::Object);
 
 
 

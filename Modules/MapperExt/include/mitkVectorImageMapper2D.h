@@ -55,7 +55,7 @@ public:
      */
     const mitk::Image * GetInput( void );
 
-    virtual void Paint( mitk::BaseRenderer * renderer );
+    virtual void Paint( mitk::BaseRenderer * renderer ) override;
 
     /**
      * Explicitly set an vector image. This image will be used for

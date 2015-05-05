@@ -33,8 +33,8 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual mitk::ScalarType GetVolume();
-  virtual bool IsInside(const Point3D& p)  const;
+  virtual mitk::ScalarType GetVolume() override;
+  virtual bool IsInside(const Point3D& p)  const override;
 
 protected:
   Cuboid();

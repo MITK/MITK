@@ -62,7 +62,7 @@ protected:
   //## @brief Destructor
   ~AffineInteractor(){};
 
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) override;
 
   //##Documentation
   //## @brief calculates how good the data this state machine handles is hit by the event.
@@ -71,7 +71,7 @@ protected:
   //## (Used by GlobalInteraction to decide which DESELECTED state machine to send the event to.)
   //##
   //## \WARNING This is interactor currently does not work for interaction in 3D. Try using mitkAffineInteractor3D instead.
-  virtual float CanHandleEvent(StateEvent const* stateEvent) const;
+  virtual float CanHandleEvent(StateEvent const* stateEvent) const override;
 
   bool CheckSelected(const mitk::Point3D& worldPoint, int timestep);
   bool ConvertDisplayEventToWorldPosition(mitk::DisplayPositionEvent const* displayEvent, mitk::Point3D& worldPoint);

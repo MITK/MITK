@@ -36,8 +36,8 @@ public:
   mitkClassMacro(CoreObjectFactory,CoreObjectFactoryBase)
   itkFactorylessNewMacro(CoreObjectFactory)
 
-  virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
-  virtual void SetDefaultProperties(mitk::DataNode* node);
+  virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
+  virtual void SetDefaultProperties(mitk::DataNode* node) override;
 
   virtual void MapEvent(const mitk::Event* event, const int eventID);
 
@@ -56,7 +56,7 @@ public:
    * @return The c-string that contains the file extensions
    * @deprecatedSince{2014_10} See mitk::FileReaderRegistry and QmitkIOUtil
    */
-  DEPRECATED(virtual const char* GetFileExtensions());
+  DEPRECATED(virtual const char* GetFileExtensions() override);
 
   /**
    * @brief get the defined (open) file extension map
@@ -64,7 +64,7 @@ public:
    * @return the defined (open) file extension map
    * @deprecatedSince{2014_10} See mitk::FileReaderRegistry and QmitkIOUtil
    */
-  DEPRECATED(virtual MultimapType GetFileExtensionsMap());
+  DEPRECATED(virtual MultimapType GetFileExtensionsMap() override);
 
   /**
    * @brief This method gets the supported (save) file extensions as string.
@@ -74,7 +74,7 @@ public:
    * @return The c-string that contains the (save) file extensions
    * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
    */
-  DEPRECATED(virtual const char* GetSaveFileExtensions());
+  DEPRECATED(virtual const char* GetSaveFileExtensions() override);
 
   /**
    * @brief get the defined (save) file extension map
@@ -82,7 +82,7 @@ public:
    * @return the defined (save) file extension map
    * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
    */
-  virtual MultimapType GetSaveFileExtensionsMap();
+  virtual MultimapType GetSaveFileExtensionsMap() override;
 
   /**
    * @deprecatedSince{2014_10} See mitk::FileWriterRegistry

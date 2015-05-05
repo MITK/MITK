@@ -58,7 +58,7 @@ public:
     void SetIsoDoseLevelSet(IsoDoseLevelSet* levelSet);
     void SetValue(IsoDoseLevelSet* levelSet);
 
-    virtual std::string GetValueAsString() const;
+    virtual std::string GetValueAsString() const override;
 
     using BaseProperty::operator=;
 
@@ -67,10 +67,10 @@ private:
     // purposely not implemented
     IsoDoseLevelSetProperty& operator=(const IsoDoseLevelSetProperty&);
 
-    itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty& property) const;
-    virtual bool Assign(const BaseProperty& property);
+    virtual bool IsEqual(const BaseProperty& property) const override;
+    virtual bool Assign(const BaseProperty& property) override;
 
 };
 

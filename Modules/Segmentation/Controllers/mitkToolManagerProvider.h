@@ -47,7 +47,7 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT ToolManagerProvider : public itk::LightObject
   {
   public:
-    mitkClassMacro(ToolManagerProvider, itk::LightObject);
+    mitkClassMacroItkParent(ToolManagerProvider, itk::LightObject);
 
     /**
     \brief Returns ToolManager object.

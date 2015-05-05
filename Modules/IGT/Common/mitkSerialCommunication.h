@@ -47,7 +47,7 @@ namespace mitk
   class MITKIGT_EXPORT SerialCommunication : public itk::Object
   {
   public:
-    mitkClassMacro(SerialCommunication, itk::Object);
+    mitkClassMacroItkParent(SerialCommunication, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

@@ -53,7 +53,7 @@ protected:
 
   ~VtkImageReader();
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   //##Description
   //## @brief Time when Header was last read

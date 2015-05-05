@@ -39,32 +39,32 @@ class MITKCORE_EXPORT vtkMitkRenderProp : public vtkProp
 
     void SetPropRenderer(mitk::VtkPropRenderer::Pointer propRenderer);
 
-    int RenderOpaqueGeometry(vtkViewport* viewport);
+    int RenderOpaqueGeometry(vtkViewport* viewport) override;
 
-    int RenderOverlay(vtkViewport* viewport);
+    int RenderOverlay(vtkViewport* viewport) override;
 
-    double *GetBounds();
+    double *GetBounds() override;
 
-    void ReleaseGraphicsResources(vtkWindow* window);
-
-    /**
-     * \brief Used by vtkPointPicker/vtkPicker.
-     * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
-     */
-    virtual void InitPathTraversal();
+    void ReleaseGraphicsResources(vtkWindow* window) override;
 
     /**
      * \brief Used by vtkPointPicker/vtkPicker.
      * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
      */
-    virtual vtkAssemblyPath* GetNextPath();
+    virtual void InitPathTraversal() override;
 
-    virtual int GetNumberOfPaths();
+    /**
+     * \brief Used by vtkPointPicker/vtkPicker.
+     * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
+     */
+    virtual vtkAssemblyPath* GetNextPath() override;
+
+    virtual int GetNumberOfPaths() override;
 
     //BUG (#1551) added method for depth peeling support
-    virtual int HasTranslucentPolygonalGeometry();
-    virtual int RenderTranslucentPolygonalGeometry( vtkViewport *);
-    virtual int RenderVolumetricGeometry( vtkViewport *);
+    virtual int HasTranslucentPolygonalGeometry() override;
+    virtual int RenderTranslucentPolygonalGeometry( vtkViewport *) override;
+    virtual int RenderVolumetricGeometry( vtkViewport *) override;
 
   protected:
     vtkMitkRenderProp();

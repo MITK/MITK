@@ -67,7 +67,7 @@ namespace mitk {
          * BaseRenderer is itself deallocating it in its destructor, it has to set
          * unregisterFromBaseRenderer=false)
          */
-        virtual void ClearLocalStorage(mitk::BaseRenderer *renderer,bool unregisterFromBaseRenderer=true )
+        virtual void ClearLocalStorage(mitk::BaseRenderer *renderer,bool unregisterFromBaseRenderer=true ) override
         {
           //MITK_INFO << "deleting a localstorage on a mapper request";
           if(unregisterFromBaseRenderer)

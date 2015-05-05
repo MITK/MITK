@@ -52,7 +52,7 @@ public:
 
 protected:
 
-  virtual const Image* GetImage() const;
+  virtual const Image* GetImage() const override;
 
 private:
 

@@ -107,7 +107,7 @@ class MITKSEGMENTATION_EXPORT ToolManager : public itk::Object
     Message1<std::string> ToolErrorMessage;
     Message1<std::string> GeneralToolMessage;
 
-    mitkClassMacro(ToolManager, itk::Object);
+    mitkClassMacroItkParent(ToolManager, itk::Object);
     mitkNewMacro1Param(ToolManager, DataStorage*);
 
     /**
